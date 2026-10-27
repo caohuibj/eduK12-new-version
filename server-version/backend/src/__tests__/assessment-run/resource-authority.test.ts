@@ -111,6 +111,27 @@ describe('Run owning-resource authority adapters', () => {
     })).toThrow(/minimumRespondents/)
   })
 
+  it('represents exact cognitive content without publishing a draft or admitting a missing source', async () => {
+    const original = publishedRegistry.findExact({resourceKind: 'BUNDLE', resourceKey: 'demo-bundle', resourceVersion: '1.0.0'})!
+    const entry = {...original, applicability: {...original.applicability,
+      resourceKind: 'COGNITIVE' as const, resourceKey: 'synthetic-cognitive',
+    }}
+    const registry = createRelationalProductRegistry([entry])
+    const adapter = createRelationalRunResourceAdapter({family: 'COGNITIVE', registry})
+    const authority = new RunResourceAuthorityRegistry([adapter])
+    const ref = {family: 'COGNITIVE' as const, key: 'synthetic-cognitive', version: '1.0.0'}
+    expect(await authority.resolveExact(ref)).toMatchObject({family: 'COGNITIVE',
+      runtimeLaunchTarget: {kind: 'COMPOSITE', ref: 'composite-demo-v1'}, minimumRespondents: 5})
+    await expect(authority.resolveExact({...ref,version: '1.0.1'})).rejects.toMatchObject({code: 'RUN_RESOURCE_NOT_FOUND'})
+    const draft = new RunResourceAuthorityRegistry([createRelationalRunResourceAdapter({family: 'COGNITIVE',
+      registry: createRelationalProductRegistry([{...entry,releaseStatus: 'DRAFT'}]),
+    })])
+    await expect(draft.resolveExact(ref)).rejects.toMatchObject({code: 'RUN_RESOURCE_NOT_PUBLISHED'})
+    expect(() => authority.assertStartSupported('COGNITIVE')).toThrow()
+    expect(() => productionRunResourceAuthorityRegistry.assertStartSupported('COGNITIVE')).not.toThrow()
+    await expect(productionRunResourceAuthorityRegistry.resolveExact({family:'COGNITIVE',key:'missing-synthetic-source',version:'1.0.0'})).rejects.toMatchObject({code:'RUN_RESOURCE_NOT_FOUND'})
+  })
+
   it('cannot enable an external adapter without stable operationKey lookup', () => {
     const unsafe: RunResourceAuthorityAdapter = {
       family: 'COGNITIVE',
@@ -123,9 +144,9 @@ describe('Run owning-resource authority adapters', () => {
     expect(() => new RunResourceAuthorityRegistry([unsafe])).toThrow(/operationKey/)
   })
 
-  it('enables only the C12-proven transactional Composite families in production', () => {
+  it('advertises five transactional Composite families without external runtime dispatch', () => {
     const matrix = productionRunResourceAuthorityRegistry.capabilityMatrix()
-    expect(matrix.map((row) => row.family).sort()).toEqual(['BUNDLE', 'FORM', 'SCALE', 'SITUATIONAL'])
+    expect(matrix.map((row) => row.family).sort()).toEqual(['BUNDLE', 'COGNITIVE', 'FORM', 'SCALE', 'SITUATIONAL'])
     for (const row of matrix) {
       expect(row.capabilities).toMatchObject({
         runV1Enabled: true,
@@ -136,6 +157,6 @@ describe('Run owning-resource authority adapters', () => {
       })
     }
     expect(() => productionRunResourceAuthorityRegistry.assertStartSupported('BUNDLE')).not.toThrow()
-    expect(() => productionRunResourceAuthorityRegistry.adapterFor('COGNITIVE')).toThrow(/unsupported/)
+    expect(productionRunResourceAuthorityRegistry.assertStartSupported('COGNITIVE').capabilities.runtimeBindingKind).toBe('COMPOSITE')
   })
 })

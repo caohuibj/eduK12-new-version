@@ -1,0 +1,11 @@
+{
+  "time": "2026-10-27T10:25:40.167798+00:00",
+  "base": "361fce11c046da16c3bae2a53cdd7bfd23470c82",
+  "files": {
+    "server-version/frontend/src/components/education-tools/assessmentResourceClient.ts": "ce2a57bed382a13e97489941ad7e9b4c189e99fe4ebc3493c3538aaca66eb06d",
+    "server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.tsx": "143aae3479fc157f5f504c67dc59671d2a170750c9f7e9312abe29838dd4b024",
+    "server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.test.tsx": "c0d5bfd61602b66f22e81a39de090a52901ef1714510b1f7531239e97f98a327",
+    "server-version/frontend/src/huiteacher/HuiteacherApp.tsx": "a4f265c3c325bdbe1177ba8a5f79e3bc250bd37731b77f965a13ff7e493771e2",
+    "server-version/frontend/src/school/SchoolApp.tsx": "8188a1d1684519e1cb0bf6c13e37b1ec3dba5d7768c1b97216be60530a03ce3a"
+  }
+}

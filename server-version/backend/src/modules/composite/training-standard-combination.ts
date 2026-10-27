@@ -1,3 +1,4 @@
+import {readEducationMarkerSource,prelockEducationStandardSourceActors} from '../education-tools/assessment-resource.marker'
 import {assertToolEntryPolicy} from '../assessment-governance/tool-entry-policy'
 import {Prisma} from '@prisma/client'
 import {z} from 'zod'
@@ -99,7 +100,20 @@ export function trainingStandardCombinationSummary(raw:unknown){
   CONTENT:combination.axes.CONTENT.version,PARAMETERS:combination.axes.PARAMETERS.version,REPORT:combination.axes.REPORT.version}}
 }
 
-export async function verifyStoredTrainingStandardItem(tx:Prisma.TransactionClient,composite:any,item:any,purpose:Purpose='NEW_REFERENCE'){
+export async function verifyStoredTrainingStandardItem(tx:Prisma.TransactionClient,composite:any,item:any,purpose:Purpose='NEW_REFERENCE'):Promise<Awaited<ReturnType<typeof prepareTrainingStandardItemSource>>>{
+ if(composite.productKind==='ORGANIZATION_RESOURCE'){
+  const snapshot=composite.trainingContentSnapshot as {units?:Array<{itemId:string;source:{educationBinding?:unknown}}> }|null
+  const binding=snapshot?.units?.find(unit=>unit.itemId===item.id)?.source.educationBinding
+  if(!binding)fail('EDUCATION_BINDING_REQUIRED')
+  const exact=await readEducationMarkerSource(tx,binding,{compositeId:composite.id,itemId:item.id,ownerId:composite.createdBy},'NEW_USE')
+  if(canonicalHash(item.standardCombinationSource)!==canonicalHash(exact.item.standardCombinationSource))fail('BINDING_IDENTITY_MISMATCH')
+  // The independently published education delivery and its pinned target
+  // distribution grants authorize this entry; original Training source rights
+  // are separately rechecked by the recursive original-container verifier.
+  if(!exact.source.createdBy)fail('BINDING_IDENTITY_MISMATCH')
+  await prelockEducationStandardSourceActors(tx,exact.source.createdBy,[exact.item])
+  return verifyStoredTrainingStandardItem(tx,exact.source,exact.item,purpose)
+ }
  const stored=decodeTrainingStandardItemSource(item.standardCombinationSource,{compositeId:composite.id,itemId:item.id,scaleId:item.scaleId,ownerId:composite.createdBy})
  const r=stored.reference,current=await prepareTrainingStandardItemSource(tx,r.ownerId,composite,item,r.combination,purpose,r.authority.useGrantId,r.authority.useGrantVersion)
  if(current.referenceHash!==stored.referenceHash)fail('FROZEN_IDENTITY_CHANGED')

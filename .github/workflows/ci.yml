@@ -104,11 +104,11 @@ jobs:
   pr356-refuse-unsupported:
     name: PR356 / refuse unsupported activation parameters
     if: >-
-      ${{ github.event_name == 'workflow_dispatch' &&
+      ${{ !(github.event_name == 'pull_request' && (github.event.pull_request.number == 363 || github.event.pull_request.head.ref == 'perf/four-entry-feedback-20261027')) && (!(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (github.event_name == 'workflow_dispatch' &&
           ((github.ref_name == 'fix/runtime-time-and-validation-20261025' &&
             ((inputs.pr356_phase != 'qualify' && inputs.pr356_phase != 'admit') ||
              inputs.step_probe != 'none' || inputs.complete_training || inputs.full_acceptance)) ||
-           (github.ref_name != 'fix/runtime-time-and-validation-20261025' && inputs.pr356_phase != 'none')) }}
+           (github.ref_name != 'fix/runtime-time-and-validation-20261025' && inputs.pr356_phase != 'none')))) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 1
     steps:
@@ -118,7 +118,7 @@ jobs:
           exit 1
 
   exact-candidate-manual-refusal:
-    if: github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 1
     steps:
@@ -126,7 +126,7 @@ jobs:
         run: node -e "throw new Error('These two candidates require their reviewed bounded PR qualification; manual full/probe is not authorized')"
 
   known-admin-functional-manual-refusal:
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020'
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') }}
     runs-on: ubuntu-24.04
     timeout-minutes: 1
     steps:
@@ -135,7 +135,7 @@ jobs:
         run: throw new Error('Administrator performance/load work is not authorized; use its reviewed functional-only PR route.');
 
   known-training-functional-manual-refusal:
-    if: github.event_name == 'workflow_dispatch' && (github.ref == 'refs/heads/work/training-functional-final-20261020' || github.ref == 'refs/heads/perf/training-load-followup-20261020')
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (github.event_name == 'workflow_dispatch' && (github.ref == 'refs/heads/work/training-functional-final-20261020' || github.ref == 'refs/heads/perf/training-load-followup-20261020')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 1
     steps:
@@ -144,7 +144,7 @@ jobs:
         run: throw new Error('Training performance/load work is paused; use the reviewed functional-only PR route.');
 
   known-survey-manual-refusal:
-    if: github.event_name == 'workflow_dispatch' && (github.ref == 'refs/heads/survey/mac-visual-s01-20261019' || github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021')
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (github.event_name == 'workflow_dispatch' && (github.ref == 'refs/heads/survey/mac-visual-s01-20261019' || github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 1
     steps:
@@ -153,7 +153,7 @@ jobs:
         run: throw new Error('Known Survey Mac candidate has no manual full/probe qualification; await independent tools review and explicit PR/CI authorization.');
 
   probe-frontend-build:
-    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && contains(fromJSON('["frontend","browser","media","ui","ui-chromium","qa-ui"]'), inputs.step_probe))) }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (!(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && contains(fromJSON('["frontend","browser","media","ui","ui-chromium","qa-ui"]'), inputs.step_probe)))) }}
     uses: ./.github/workflows/ci-frontend-build.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
@@ -161,19 +161,19 @@ jobs:
       ui_runner_labels: '["ubuntu-24.04"]'
 
   probe-browser-build:
-    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && contains(fromJSON('["browser","media"]'), inputs.step_probe))) }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (!(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && contains(fromJSON('["browser","media"]'), inputs.step_probe)))) }}
     uses: ./.github/workflows/ci-backend-browser-build.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
 
   probe-backend:
-    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'backend')) }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (!(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'backend'))) }}
     uses: ./.github/workflows/ci-backend.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
 
   probe-backend-regression:
-    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && contains(fromJSON('["backend-regression","assessment-repair","reporting"]'), inputs.step_probe))) }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (!(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && contains(fromJSON('["backend-regression","assessment-repair","reporting"]'), inputs.step_probe)))) }}
     uses: ./.github/workflows/ci-backend-regression.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
@@ -181,14 +181,14 @@ jobs:
 
   probe-browser:
     needs: [probe-frontend-build, probe-browser-build]
-    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'browser')) }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (!(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'browser'))) }}
     uses: ./.github/workflows/ci-browser.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
 
   probe-media:
     needs: [probe-frontend-build, probe-browser-build]
-    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'media')) }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (!(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'media'))) }}
     uses: ./.github/workflows/ci-media.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
@@ -197,7 +197,7 @@ jobs:
 
   probe-ui-mac:
     needs: probe-frontend-build
-    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'ui')) }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (!(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'ui'))) }}
     strategy:
       fail-fast: false
       matrix:
@@ -212,7 +212,7 @@ jobs:
 
   probe-qa-ui:
     needs: probe-frontend-build
-    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'qa-ui')) }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (!(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'qa-ui'))) }}
     uses: ./.github/workflows/ci-ui.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
@@ -222,7 +222,7 @@ jobs:
 
   probe-ui-hosted:
     needs: probe-frontend-build
-    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'ui-chromium')) }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (!(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'ui-chromium'))) }}
     strategy:
       fail-fast: false
       matrix:
@@ -236,27 +236,27 @@ jobs:
       qa_round3: true
 
   probe-maintenance:
-    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'maintenance')) }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (!(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'maintenance'))) }}
     uses: ./.github/workflows/ci-maintenance.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
 
   probe-ops:
-    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'ops')) }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (!(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'ops'))) }}
     uses: ./.github/workflows/ops-prelaunch.yml
 
   probe-perf:
-    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'perf')) }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (!(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'perf'))) }}
     uses: ./.github/workflows/perf-phase0-smoke.yml
 
   probe-images:
-    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'images')) }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (!(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'images'))) }}
     uses: ./.github/workflows/ci-images.yml
     with:
       frontend_only: ${{ inputs.probe_frontend_only }}
 
   probe-cognitive:
-    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'cognitive')) }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (!(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'cognitive'))) }}
     # Inline the unchanged diagnostic job to keep reusable references at GitHub's limit.
     permissions:
       contents: read
@@ -288,14 +288,14 @@ jobs:
 
   probe-frontend:
     needs: probe-frontend-build
-    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'frontend')) }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (!(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'frontend'))) }}
     uses: ./.github/workflows/ci-frontend.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
 
   scope:
     name: classify changed content
-    if: ${{ (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (!inputs.complete_training && (inputs.step_probe == '' || inputs.step_probe == 'none') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository))) }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && ((!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (!inputs.complete_training && (inputs.step_probe == '' || inputs.step_probe == 'none') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)))) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 8
     outputs:
@@ -326,6 +326,7 @@ jobs:
       training_appearance_plan: ${{ steps.scope.outputs.training_appearance_plan }}
       survey_workspace_plan: ${{ steps.scope.outputs.survey_workspace_plan }}
       survey_governance_plan: ${{ steps.scope.outputs.survey_governance_plan }}
+      pr363_plan: ${{ steps.scope.outputs.pr363_plan }}
       report_planning_plan: ${{ steps.scope.outputs.report_planning_plan }}
       pr357_plan: ${{ steps.scope.outputs.pr357_plan }}
       post356_plan: ${{ steps.scope.outputs.post356_plan }}
@@ -398,6 +399,11 @@ jobs:
         run: |
           node .github/scripts/runner-preflight.mjs --control
           node .github/scripts/fetch-ci-base.mjs
+      - name: fetch exact PR363 source without application execution
+        if: github.event_name == 'pull_request' && github.event.pull_request.number == 363
+        env:
+          PR363_SOURCE: ${{ github.event.pull_request.head.sha }}
+        run: git fetch --no-tags --depth=1 origin "$PR363_SOURCE"
       - name: fetch exact report-planning source for shallow tree comparison
         if: github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'perf/four-entry-shared-path-20261027'
         env:
@@ -778,7 +784,7 @@ jobs:
   visual:
     needs: scope
     name: presentation / frontend lint + typecheck + build
-    if: ${{ needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.presentation == 'true' && github.event_name == 'pull_request' && vars.CI_FORCE_FULL != 'true' && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling') }}
+    if: ${{ !(github.event_name == 'pull_request' && (github.event.pull_request.number == 363 || github.event.pull_request.head.ref == 'perf/four-entry-feedback-20261027')) && (needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.presentation == 'true' && github.event_name == 'pull_request' && vars.CI_FORCE_FULL != 'true' && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     env:
@@ -926,7 +932,7 @@ jobs:
   pr-light-backend:
     needs: scope
     name: PR light / backend compile
-    if: ${{ needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (needs.scope.outputs.scenario != 'frontend-test' && needs.scope.outputs.scenario != 'survey-wave-selection' && (needs.scope.outputs.scenario != 'dependencies' && (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && github.event_name == 'pull_request' && github.event.pull_request.draft == true && vars.CI_FORCE_FULL != 'true')) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling') }}
+    if: ${{ !(github.event_name == 'pull_request' && (github.event.pull_request.number == 363 || github.event.pull_request.head.ref == 'perf/four-entry-feedback-20261027')) && (needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (needs.scope.outputs.scenario != 'frontend-test' && needs.scope.outputs.scenario != 'survey-wave-selection' && (needs.scope.outputs.scenario != 'dependencies' && (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && github.event_name == 'pull_request' && github.event.pull_request.draft == true && vars.CI_FORCE_FULL != 'true')) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 35
     defaults:
@@ -984,7 +990,7 @@ jobs:
   pr-light-frontend:
     needs: scope
     name: PR light / frontend lint + typecheck
-    if: ${{ needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (needs.scope.outputs.scenario != 'frontend-test' && needs.scope.outputs.scenario != 'survey-wave-selection' && needs.scope.outputs.scenario != 'frontend-performance' && (needs.scope.outputs.scenario != 'dependencies' && (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && github.event_name == 'pull_request' && github.event.pull_request.draft == true && vars.CI_FORCE_FULL != 'true' && (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false')) && (github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' || vars.CI_FORCE_FULL == 'true'))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling') }}
+    if: ${{ !(github.event_name == 'pull_request' && (github.event.pull_request.number == 363 || github.event.pull_request.head.ref == 'perf/four-entry-feedback-20261027')) && (!(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (needs.scope.outputs.scenario != 'frontend-test' && needs.scope.outputs.scenario != 'survey-wave-selection' && needs.scope.outputs.scenario != 'frontend-performance' && (needs.scope.outputs.scenario != 'dependencies' && (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && github.event_name == 'pull_request' && github.event.pull_request.draft == true && vars.CI_FORCE_FULL != 'true' && (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false')) && (github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' || vars.CI_FORCE_FULL == 'true'))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling'))) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 35
     env:
@@ -1018,7 +1024,7 @@ jobs:
   post-merge-smoke:
     needs: scope
     name: main / post-merge compile smoke
-    if: ${{ needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (needs.scope.outputs.scenario != 'frontend-test' && needs.scope.outputs.scenario != 'survey-wave-selection' && needs.scope.outputs.scenario != 'frontend-performance' && (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.presentation != 'true' && github.event_name == 'push' && vars.CI_FORCE_FULL != 'true') && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling') }}
+    if: ${{ !(github.event_name == 'pull_request' && (github.event.pull_request.number == 363 || github.event.pull_request.head.ref == 'perf/four-entry-feedback-20261027')) && (needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (needs.scope.outputs.scenario != 'frontend-test' && needs.scope.outputs.scenario != 'survey-wave-selection' && needs.scope.outputs.scenario != 'frontend-performance' && (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.presentation != 'true' && github.event_name == 'push' && vars.CI_FORCE_FULL != 'true') && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 35
     env:
@@ -1065,7 +1071,7 @@ jobs:
   backend:
     needs: scope
     name: ${{ (needs.scope.outputs.training_functional_only == 'true' || needs.scope.outputs.admin_permissions_functional_only == 'true') && 'backend (migrate + build + functional gate; performance not executed)' || 'backend (migrate + build + performance gate)' }}
-    if: ${{ needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (needs.scope.outputs.scenario != 'frontend-test' && needs.scope.outputs.scenario != 'survey-wave-selection' && (!cancelled() && ((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling') }}
+    if: ${{ !(github.event_name == 'pull_request' && (github.event.pull_request.number == 363 || github.event.pull_request.head.ref == 'perf/four-entry-feedback-20261027')) && (!(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (needs.scope.outputs.scenario != 'frontend-test' && needs.scope.outputs.scenario != 'survey-wave-selection' && (!cancelled() && ((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling'))) }}
     uses: ./.github/workflows/ci-backend.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
@@ -1076,7 +1082,7 @@ jobs:
   backend-regression:
     needs: scope
     name: backend regression (isolated job database)
-    if: ${{ needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (needs.scope.outputs.scenario != 'frontend-test' && (!cancelled() && ((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling') }}
+    if: ${{ !(github.event_name == 'pull_request' && (github.event.pull_request.number == 363 || github.event.pull_request.head.ref == 'perf/four-entry-feedback-20261027')) && (!(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (needs.scope.outputs.scenario != 'frontend-test' && (!cancelled() && ((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling'))) }}
     uses: ./.github/workflows/ci-backend-regression.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
@@ -1085,7 +1091,7 @@ jobs:
   frontend-build:
     name: frontend artifacts / release consumers early
     needs: scope
-    if: ${{ needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (!cancelled() && ((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.frontend_build == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling') }}
+    if: ${{ !(github.event_name == 'pull_request' && (github.event.pull_request.number == 363 || github.event.pull_request.head.ref == 'perf/four-entry-feedback-20261027')) && (!(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (!cancelled() && ((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.frontend_build == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling'))) }}
     uses: ./.github/workflows/ci-frontend-build.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
@@ -1098,7 +1104,7 @@ jobs:
     # Run independently; the aggregate still requires both successful jobs.
     needs: scope
     name: frontend (lint + types + full tests + build)
-    if: ${{ needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (!cancelled() && ((needs.scope.outputs.scenario == 'frontend-test' && github.event_name == 'pull_request') || (needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling') }}
+    if: ${{ !(github.event_name == 'pull_request' && (github.event.pull_request.number == 363 || github.event.pull_request.head.ref == 'perf/four-entry-feedback-20261027')) && (!(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (!cancelled() && ((needs.scope.outputs.scenario == 'frontend-test' && github.event_name == 'pull_request') || (needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling'))) }}
     uses: ./.github/workflows/ci-frontend.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
@@ -1108,7 +1114,7 @@ jobs:
     name: browser (seeded Situational Bundle + static visual acceptance)
     # Browser acceptance executes after both production lanes have passed.
     needs: [scope, backend, backend-browser-build, frontend-build]
-    if: ${{ needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (needs.scope.outputs.scenario != 'survey-wave-selection' && needs.scope.outputs.scenario != 'frontend-performance' && needs.scope.outputs.scenario != 'dependencies' && (!cancelled() && needs.scope.result == 'success' && needs.frontend-build.result == 'success' && ((needs.scope.outputs.frontend == 'true' && needs.backend-browser-build.result == 'success') || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && needs.backend.result == 'success')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling') }}
+    if: ${{ !(github.event_name == 'pull_request' && (github.event.pull_request.number == 363 || github.event.pull_request.head.ref == 'perf/four-entry-feedback-20261027')) && (!(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (needs.scope.outputs.scenario != 'survey-wave-selection' && needs.scope.outputs.scenario != 'frontend-performance' && needs.scope.outputs.scenario != 'dependencies' && (!cancelled() && needs.scope.result == 'success' && needs.frontend-build.result == 'success' && ((needs.scope.outputs.frontend == 'true' && needs.backend-browser-build.result == 'success') || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && needs.backend.result == 'success')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling'))) }}
     uses: ./.github/workflows/ci-browser.yml
     with:
       admin_permissions_functional: ${{ needs.scope.outputs.admin_permissions_functional_only == 'true' }}
@@ -1121,7 +1127,7 @@ jobs:
     # artifacts. Start it with scope; the merge gate independently requires
     # backend, production image scans and all other selected checks.
     needs: scope
-    if: ${{ needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (needs.scope.outputs.scenario != 'frontend-test' && (!cancelled() && ((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling') }}
+    if: ${{ !(github.event_name == 'pull_request' && (github.event.pull_request.number == 363 || github.event.pull_request.head.ref == 'perf/four-entry-feedback-20261027')) && (!(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (needs.scope.outputs.scenario != 'frontend-test' && (!cancelled() && ((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling'))) }}
     uses: ./.github/workflows/ci-images.yml
     with:
       frontend_only: ${{ needs.scope.outputs.frontend == 'true' }}
@@ -1131,7 +1137,7 @@ jobs:
     name: codeql (javascript/typescript SAST)
     # Static analysis runs independently; the aggregate gate still requires frontend.
     needs: scope
-    if: ${{ needs.scope.result == 'success' && needs.scope.outputs.application_route != 'pr356' && (((!cancelled() && ((((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.codeql == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)))) && needs.scope.outputs.application_route == 'legacy') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'homepage-copy' && fromJSON(needs.scope.outputs.homepage_copy_plan).toolsChanged) || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && (needs.scope.outputs.application_route == 'assessment-capacity' || needs.scope.outputs.application_route == 'survey-experience' || needs.scope.outputs.application_route == 'survey-cloud' || needs.scope.outputs.application_route == 'training-appearance' || needs.scope.outputs.application_route == 'survey-workspace')) || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'access-efficiency') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'teacher-survey') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'admin-authenticator') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'training-workspace') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'composite-csv-memory') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'scale-library-governance') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'backend-security-efficiency') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'shared-asset-storage') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'survey-mac-ui') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'reviewed-candidate') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'survey-candidate') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'teacher-home') || (github.event_name == 'pull_request' && needs.scope.outputs.application_route == 'survey-home') || (github.event_name == 'pull_request' && needs.scope.outputs.application_route == 'campus') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'exact-candidate') || (github.event_name == 'pull_request' && (needs.scope.outputs.application_route == 'A' || needs.scope.outputs.application_route == 'B') && contains(fromJSON(needs.scope.outputs.release_plan).required, 'sast')))) || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'training-manual-ui') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'school-teacher-visual') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'survey-manual-ui') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'shared-authoring') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'school-teacher') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'participant-access') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && (needs.scope.outputs.application_route == 'training-assessment' || (needs.scope.outputs.application_route == 'survey-assessment' || needs.scope.outputs.application_route == 'participant-capacity')))  || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'training-admin-integration')) || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'training-teacher-management' && needs.scope.outputs.codeql == 'true') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && (needs.scope.outputs.application_route == 'sjt-native' || needs.scope.outputs.application_route == 'training-entry')) || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'survey-review') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && ((needs.scope.outputs.application_route == 'training-polish' || ((needs.scope.outputs.application_route == 'post356' || needs.scope.outputs.application_route == 'report-planning') || needs.scope.outputs.application_route == 'pr357')) || needs.scope.outputs.application_route == 'survey-governance'))) }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (needs.scope.result == 'success' && needs.scope.outputs.application_route != 'pr356' && (((!cancelled() && ((((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.codeql == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)))) && needs.scope.outputs.application_route == 'legacy') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'homepage-copy' && fromJSON(needs.scope.outputs.homepage_copy_plan).toolsChanged) || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && (needs.scope.outputs.application_route == 'assessment-capacity' || needs.scope.outputs.application_route == 'survey-experience' || needs.scope.outputs.application_route == 'survey-cloud' || needs.scope.outputs.application_route == 'training-appearance' || needs.scope.outputs.application_route == 'survey-workspace')) || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'access-efficiency') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'teacher-survey') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'admin-authenticator') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'training-workspace') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'composite-csv-memory') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'scale-library-governance') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'backend-security-efficiency') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'shared-asset-storage') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'survey-mac-ui') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'reviewed-candidate') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'survey-candidate') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'teacher-home') || (github.event_name == 'pull_request' && needs.scope.outputs.application_route == 'survey-home') || (github.event_name == 'pull_request' && needs.scope.outputs.application_route == 'campus') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'exact-candidate') || (github.event_name == 'pull_request' && (needs.scope.outputs.application_route == 'A' || needs.scope.outputs.application_route == 'B') && contains(fromJSON(needs.scope.outputs.release_plan).required, 'sast')))) || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'training-manual-ui') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'school-teacher-visual') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'survey-manual-ui') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'shared-authoring') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'school-teacher') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'participant-access') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && (needs.scope.outputs.application_route == 'training-assessment' || (needs.scope.outputs.application_route == 'survey-assessment' || needs.scope.outputs.application_route == 'participant-capacity')))  || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'training-admin-integration')) || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'training-teacher-management' && needs.scope.outputs.codeql == 'true') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && (needs.scope.outputs.application_route == 'sjt-native' || needs.scope.outputs.application_route == 'training-entry')) || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'survey-review') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && ((needs.scope.outputs.application_route == 'training-polish' || ((needs.scope.outputs.application_route == 'post356' || needs.scope.outputs.application_route == 'report-planning') || needs.scope.outputs.application_route == 'pr357')) || needs.scope.outputs.application_route == 'survey-governance'))))  || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'pr363') }}
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     permissions:
@@ -1323,13 +1329,28 @@ jobs:
           node -e "if(!/^[a-f0-9]{40}$/.test(process.env.CI_SOURCE_HEAD||''))throw Error('Exact PR source required')"
           git fetch --no-tags --depth=1 origin "$CI_SOURCE_HEAD" 04a8d994207d7b831b874d4be4f5c31640466458 667b7fec3f19716aeb0fbf15811f4887b15da4c5
           node .github/scripts/pr357-checks.mjs sast-reuse
+      - name: authenticate original PR363 full SAST before changed-control analysis
+        if: needs.scope.outputs.application_route == 'pr363'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git fetch --no-tags --depth=1 origin b6a5e9ede0dcd339d93570f76bf046dcb06c5a2d 893f61b94deaf191d552f3145c03a8d1a750a666
+          node .github/scripts/pr363-continuation.mjs sast
+      - name: retain original PR363 SAST success identity
+        if: needs.scope.outputs.application_route == 'pr363'
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr363-original-sast-${{ github.sha }}
+          path: pr363-evidence/original-sast.json
+          if-no-files-found: error
+          retention-days: 3
       - name: initialize CodeQL
         if: steps.appearance-codeql-reuse.outputs.reused != 'true'
         uses: github/codeql-action/init@v3
         with:
           languages: ${{ needs.scope.outputs.application_route == 'survey-governance' && steps.governance-directory-config.outputs.languages || needs.scope.outputs.scenario == 'survey-wave-selection' && 'javascript-typescript,python' || contains(fromJSON('["shared-asset-storage","survey-candidate","reviewed-candidate","survey-mac-ui","exact-candidate","scale-library-governance"]'), needs.scope.outputs.application_route) && 'javascript-typescript,python' || 'javascript-typescript' }}
           config: >-
-            ${{ needs.scope.outputs.application_route == 'report-planning' && 'paths: [server-version/backend/src/modules/reporting, server-version/backend/src/__tests__/reporting/education-scale-personal-report.service.test.ts, server-version/scripts/performance/survey-governance-probe, .github/scripts/report-planning-scope.mjs, .github/scripts/report-planning-scope.test.mjs, .github/scripts/report-planning-checks.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'survey-governance' && steps.governance-directory-config.outputs.config || needs.scope.outputs.application_route == 'training-polish' && steps.polish-codeql-config.outputs.config || needs.scope.outputs.application_route == 'survey-review' && steps.survey-review-codeql-config.outputs.config || needs.scope.outputs.application_route == 'sjt-native' && 'paths: [server-version/backend/src, server-version/frontend/src, .github/scripts/sjt-native-scope.mjs, .github/scripts/sjt-native-migration.mjs, .github/scripts/sjt-native-browser.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'training-entry' && 'paths: [server-version/frontend/src, server-version/backend/src, .github/scripts/training-entry-scope.mjs, .github/scripts/training-entry-checks.mjs, .github/scripts/training-entry.test.mjs, .github/scripts/training-entry-browser.mjs, .github/scripts/training-entry-migration.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'training-teacher-management' && steps.teacher-codeql-config.outputs.config || needs.scope.outputs.application_route == 'training-admin-integration' && steps.admin-integration-codeql-config.outputs.config || needs.scope.outputs.application_route == 'participant-capacity' && 'paths: [server-version/backend/src/modules/composite/authenticated-admission-lock.ts, server-version/backend/src/modules/composite/composite.service.ts, server-version/backend/src/modules/survey/public-rate.middleware.ts, .github/scripts]' || needs.scope.outputs.application_route == 'survey-assessment' && 'paths: [server-version/frontend/src, server-version/backend/src, .github/scripts]' || needs.scope.outputs.application_route == 'training-assessment' && 'paths: [server-version/frontend/src/modules/cognitive/core/useRunnerPreparation.ts, server-version/frontend/src/modules/assessment-media/__tests__/media-2.adapter.test.tsx, .github/scripts/training-assessment-reuse.mjs, .github/scripts/training-assessment-reuse.test.mjs, .github/scripts/training-assessment-scope.mjs, .github/scripts/training-assessment.test.mjs, .github/scripts/training-assessment-native-idb.js]' || needs.scope.outputs.application_route == 'school-teacher-visual' && 'paths: [server-version/frontend/src, .github/scripts/school-teacher-visual-scope.mjs, .github/scripts/school-teacher-visual-reuse.mjs, .github/scripts/school-teacher-visual-browser.cjs, .github/scripts/school-teacher-visual-fixtures.cjs, .github/scripts/school-teacher-visual.test.mjs, .github/scripts/training-assessment.test.mjs, .github/scripts/training-manual-ui.test.mjs, .github/scripts/survey-manual-ui.test.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'participant-access' && 'paths: [server-version/frontend/src, server-version/backend/src, .github/scripts]' || needs.scope.outputs.application_route == 'school-teacher' && 'paths: [server-version/backend/src, server-version/frontend/src, server-version/e2e, .github/scripts]' || needs.scope.outputs.application_route == 'training-manual-ui' && 'paths: [server-version/frontend/src, .github/scripts/training-manual-ui-scope.mjs, .github/scripts/training-manual-ui-checks.mjs, .github/scripts/training-manual-ui.test.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'survey-manual-ui' && 'paths: [server-version/frontend/src/survey, server-version/frontend/src/pages/admin, server-version/frontend/src/pages/AdminLogin.tsx, server-version/frontend/src/admin, server-version/frontend/src/components/app-shell, server-version/frontend/src/components/auth, server-version/frontend/public/entry-brand.js, .github/scripts/survey-manual-ui-scope.mjs, .github/scripts/survey-manual-ui-checks.mjs, .github/scripts/survey-manual-ui.test.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'shared-authoring' && 'paths: [.github/scripts/shared-authoring-checks.mjs, .github/scripts/shared-authoring.test.mjs, .github/scripts/shared-authoring-reuse.mjs, .github/scripts/shared-authoring-reuse.test.mjs, .github/scripts/shared-authoring-browser.mjs]' || needs.scope.outputs.application_route == 'survey-workspace' && 'paths: [.github/scripts/survey-workspace-reuse.mjs, .github/scripts/survey-workspace-reuse.test.mjs, .github/scripts/survey-workspace.test.mjs, .github/scripts/survey-workspace-checks.mjs]' || needs.scope.outputs.application_route == 'training-workspace' && fromJSON(needs.scope.outputs.training_workspace_plan || '{}').candidate == 'student-followup' && steps.student-codeql-config.outputs.config || needs.scope.outputs.application_route == 'admin-authenticator' && 'paths: [.github/scripts/admin-authenticator-browser.mjs, .github/scripts/admin-authenticator-reuse.mjs, .github/scripts/admin-authenticator-scope.mjs, .github/scripts/admin-authenticator-checks.mjs, .github/scripts/admin-authenticator.test.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'training-workspace' && fromJSON(needs.scope.outputs.training_workspace_plan || '{}').candidate == 'mac-integrated' && steps.workspace-codeql-config.outputs.config || needs.scope.outputs.application_route == 'scale-library-governance' && steps.governance-codeql-config.outputs.config || needs.scope.outputs.application_route == 'composite-csv-memory' && 'paths: [server-version/backend/src/modules/cognitive/export.service.ts, server-version/backend/src/modules/composite/composite-export.service.ts, server-version/backend/src/__tests__/cognitive/export.service.test.ts, server-version/backend/src/__tests__/composite/typed-form-export.test.ts, server-version/backend/src/__tests__/composite/composite-analysis-export.service.test.ts, .github/scripts/composite-csv-memory-scope.mjs, .github/scripts/composite-csv-memory-scope.test.mjs, .github/scripts/composite-csv-memory-probe.cjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'training-workspace' && 'paths: [server-version/frontend/src, server-version/backend/src/controllers/courseController.ts, server-version/backend/src/controllers/assignmentController.ts, server-version/backend/src/constants/messages.ts, .github/scripts/training-workspace-scope.mjs, .github/scripts/training-workspace-checks.mjs, .github/scripts/training-workspace-reuse.mjs, .github/scripts/training-workspace-browser.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs, server-version/backend/src/modules/questionnaire-product, server-version/backend/src/modules/composite/composite.service.ts, server-version/backend/src/routes/trainingWorkspace.ts, .github/scripts/training-followup-scope.mjs, .github/scripts/training-followup-checks.mjs, .github/scripts/training-followup-browser.mjs, .github/scripts/training-followup-reuse.mjs]' || needs.scope.outputs.scenario == 'survey-wave-selection' && steps.wave-codeql-config.outputs.config || needs.scope.outputs.scenario == 'frontend-performance' && 'paths: [server-version/frontend/src, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs, .github/scripts/frontend-performance.test.mjs, .github/scripts/frontend-performance-browser.mjs]' || needs.scope.outputs.application_route == 'exact-candidate' && fromJSON(needs.scope.outputs.exact_candidate_plan || '{}').candidate == 'scale-authoring' && steps.scale-codeql-config.outputs.config || needs.scope.outputs.application_route == 'pr357' && steps.pr357-codeql-config.outputs.config || needs.scope.outputs.application_route == 'exact-candidate' && 'paths: [server-version/backend/src, server-version/backend/scripts, server-version/frontend/src, server-version/scripts/recovery, server-version/e2e, .github/scripts]' || needs.scope.outputs.application_route == 'survey-mac-ui' && 'paths: [server-version/frontend/src/survey, server-version/frontend/src/pages/admin, .github/scripts]' || needs.scope.outputs.application_route == 'reviewed-candidate' && 'paths: [.github/scripts, server-version/frontend/src/pages, server-version/e2e]' || needs.scope.outputs.application_route == 'survey-candidate' && 'paths: [server-version/backend/src, server-version/backend/scripts, server-version/frontend/src/survey, server-version/frontend/src/modules/cognitive, server-version/frontend/src/modules/composite, server-version/frontend/src/components/app-shell, server-version/frontend/src/pages/admin, server-version/frontend/src/services/persistence, server-version/e2e, .github/scripts]' || needs.scope.outputs.application_route == 'assessment-capacity' && 'paths: [server-version/backend/src, server-version/frontend/src/modules/composite, server-version/frontend/src/components/FinalCompositeAssessment.tsx, .github/scripts/assessment-capacity-scope.mjs, .github/scripts/assessment-capacity-browser.mjs, .github/scripts/assessment-capacity-candidate.py, .github/scripts/assessment-capacity-reuse.py, .github/scripts/assessment-capacity-recovery.py, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'teacher-survey' && 'paths: [server-version/frontend/src/huiteacher, server-version/frontend/src/survey, .github/scripts/teacher-survey-scope.mjs, .github/scripts/teacher-survey-candidate.py, .github/scripts/teacher-survey-browser.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'access-efficiency' && 'paths: [server-version/backend/src, server-version/frontend/src/hooks, server-version/frontend/src/pages/student, server-version/frontend/src/pages/CheckinList.tsx, server-version/frontend/src/training/TrainingLearnerHome.tsx, server-version/miniprogram, server-version/miniprogram-v2/domains, .github/scripts/github-official-source.test.mjs, .github/scripts/ci-image-plan.mjs, .github/scripts/dependency-scope.mjs, .github/scripts/access-efficiency-scope.mjs, .github/scripts/access-efficiency-browser.mjs, .github/scripts/access-efficiency-candidate.py, .github/scripts/access-efficiency-reuse.py, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'shared-asset-storage' && 'paths: [server-version/backend/src, server-version/scripts/asset-upload-cleanup, .github/scripts]' || needs.scope.outputs.application_route == 'backend-security-efficiency' && 'paths: [server-version/backend/src, .github/scripts/backend-security-efficiency-scope.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs, .github/scripts/campus-candidate.py]' || needs.scope.outputs.application_route == 'teacher-home' && 'paths: [server-version/frontend/src/huiteacher, server-version/backend/src/index.ts, server-version/backend/src/modules/huiteacher, server-version/backend/src/modules/campus, server-version/backend/src/middleware, server-version/backend/src/utils, .github/scripts/teacher-home-scope.mjs, .github/scripts/teacher-home-browser.mjs, .github/scripts/teacher-home-fixture.cjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'training-appearance' && 'paths: [server-version/frontend/src/training, server-version/frontend/src/components/app-shell, server-version/frontend/src/pages/student/StudentProfile.tsx, server-version/frontend/src/pages/teacher/TeacherProfile.tsx, .github/scripts/training-appearance-scope.mjs, .github/scripts/training-appearance-checks.mjs, .github/scripts/training-appearance.test.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'survey-cloud' && 'paths: [server-version/frontend/src/survey, server-version/frontend/src/pages/AdminLogin.tsx, server-version/frontend/src/pages/admin, server-version/frontend/src/admin, server-version/frontend/src/components/app-shell, server-version/frontend/src/components/auth, server-version/frontend/src/components/Footer.tsx, .github/scripts/survey-cloud-scope.mjs, .github/scripts/survey-cloud-checks.mjs, .github/scripts/survey-cloud.test.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'survey-experience' && 'paths: [.github/scripts/survey-experience-scope.test.mjs, .github/scripts/survey-experience-candidate.mjs, .github/scripts/survey-experience-browser.cjs]' || needs.scope.outputs.application_route == 'survey-home' && 'paths: [server-version/frontend/src/survey, .github/scripts/survey-home-scope.mjs, .github/scripts/survey-home-browser.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'homepage-copy' && 'paths: [.github/scripts/homepage-copy-scope.mjs, .github/scripts/homepage-copy-browser.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.scenario == 'release-tooling' && 'paths: [.github/scripts, server-version/scripts/release]' || '' }}
+            ${{ needs.scope.outputs.application_route == 'pr363' && 'paths: [.github/scripts/pr363-continuation.mjs, .github/scripts/pr363-continuation.test.mjs, .github/scripts/pr363-controls.test.mjs, server-version/e2e/pr363-browser.cjs, server-version/e2e/pr363-browser.test.cjs, server-version/e2e/pr363-navigation-contract.cjs]' || needs.scope.outputs.application_route == 'report-planning' && 'paths: [server-version/backend/src/modules/reporting, server-version/backend/src/__tests__/reporting/education-scale-personal-report.service.test.ts, server-version/scripts/performance/survey-governance-probe, .github/scripts/report-planning-scope.mjs, .github/scripts/report-planning-scope.test.mjs, .github/scripts/report-planning-checks.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'survey-governance' && steps.governance-directory-config.outputs.config || needs.scope.outputs.application_route == 'training-polish' && steps.polish-codeql-config.outputs.config || needs.scope.outputs.application_route == 'survey-review' && steps.survey-review-codeql-config.outputs.config || needs.scope.outputs.application_route == 'sjt-native' && 'paths: [server-version/backend/src, server-version/frontend/src, .github/scripts/sjt-native-scope.mjs, .github/scripts/sjt-native-migration.mjs, .github/scripts/sjt-native-browser.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'training-entry' && 'paths: [server-version/frontend/src, server-version/backend/src, .github/scripts/training-entry-scope.mjs, .github/scripts/training-entry-checks.mjs, .github/scripts/training-entry.test.mjs, .github/scripts/training-entry-browser.mjs, .github/scripts/training-entry-migration.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'training-teacher-management' && steps.teacher-codeql-config.outputs.config || needs.scope.outputs.application_route == 'training-admin-integration' && steps.admin-integration-codeql-config.outputs.config || needs.scope.outputs.application_route == 'participant-capacity' && 'paths: [server-version/backend/src/modules/composite/authenticated-admission-lock.ts, server-version/backend/src/modules/composite/composite.service.ts, server-version/backend/src/modules/survey/public-rate.middleware.ts, .github/scripts]' || needs.scope.outputs.application_route == 'survey-assessment' && 'paths: [server-version/frontend/src, server-version/backend/src, .github/scripts]' || needs.scope.outputs.application_route == 'training-assessment' && 'paths: [server-version/frontend/src/modules/cognitive/core/useRunnerPreparation.ts, server-version/frontend/src/modules/assessment-media/__tests__/media-2.adapter.test.tsx, .github/scripts/training-assessment-reuse.mjs, .github/scripts/training-assessment-reuse.test.mjs, .github/scripts/training-assessment-scope.mjs, .github/scripts/training-assessment.test.mjs, .github/scripts/training-assessment-native-idb.js]' || needs.scope.outputs.application_route == 'school-teacher-visual' && 'paths: [server-version/frontend/src, .github/scripts/school-teacher-visual-scope.mjs, .github/scripts/school-teacher-visual-reuse.mjs, .github/scripts/school-teacher-visual-browser.cjs, .github/scripts/school-teacher-visual-fixtures.cjs, .github/scripts/school-teacher-visual.test.mjs, .github/scripts/training-assessment.test.mjs, .github/scripts/training-manual-ui.test.mjs, .github/scripts/survey-manual-ui.test.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'participant-access' && 'paths: [server-version/frontend/src, server-version/backend/src, .github/scripts]' || needs.scope.outputs.application_route == 'school-teacher' && 'paths: [server-version/backend/src, server-version/frontend/src, server-version/e2e, .github/scripts]' || needs.scope.outputs.application_route == 'training-manual-ui' && 'paths: [server-version/frontend/src, .github/scripts/training-manual-ui-scope.mjs, .github/scripts/training-manual-ui-checks.mjs, .github/scripts/training-manual-ui.test.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'survey-manual-ui' && 'paths: [server-version/frontend/src/survey, server-version/frontend/src/pages/admin, server-version/frontend/src/pages/AdminLogin.tsx, server-version/frontend/src/admin, server-version/frontend/src/components/app-shell, server-version/frontend/src/components/auth, server-version/frontend/public/entry-brand.js, .github/scripts/survey-manual-ui-scope.mjs, .github/scripts/survey-manual-ui-checks.mjs, .github/scripts/survey-manual-ui.test.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'shared-authoring' && 'paths: [.github/scripts/shared-authoring-checks.mjs, .github/scripts/shared-authoring.test.mjs, .github/scripts/shared-authoring-reuse.mjs, .github/scripts/shared-authoring-reuse.test.mjs, .github/scripts/shared-authoring-browser.mjs]' || needs.scope.outputs.application_route == 'survey-workspace' && 'paths: [.github/scripts/survey-workspace-reuse.mjs, .github/scripts/survey-workspace-reuse.test.mjs, .github/scripts/survey-workspace.test.mjs, .github/scripts/survey-workspace-checks.mjs]' || needs.scope.outputs.application_route == 'training-workspace' && fromJSON(needs.scope.outputs.training_workspace_plan || '{}').candidate == 'student-followup' && steps.student-codeql-config.outputs.config || needs.scope.outputs.application_route == 'admin-authenticator' && 'paths: [.github/scripts/admin-authenticator-browser.mjs, .github/scripts/admin-authenticator-reuse.mjs, .github/scripts/admin-authenticator-scope.mjs, .github/scripts/admin-authenticator-checks.mjs, .github/scripts/admin-authenticator.test.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'training-workspace' && fromJSON(needs.scope.outputs.training_workspace_plan || '{}').candidate == 'mac-integrated' && steps.workspace-codeql-config.outputs.config || needs.scope.outputs.application_route == 'scale-library-governance' && steps.governance-codeql-config.outputs.config || needs.scope.outputs.application_route == 'composite-csv-memory' && 'paths: [server-version/backend/src/modules/cognitive/export.service.ts, server-version/backend/src/modules/composite/composite-export.service.ts, server-version/backend/src/__tests__/cognitive/export.service.test.ts, server-version/backend/src/__tests__/composite/typed-form-export.test.ts, server-version/backend/src/__tests__/composite/composite-analysis-export.service.test.ts, .github/scripts/composite-csv-memory-scope.mjs, .github/scripts/composite-csv-memory-scope.test.mjs, .github/scripts/composite-csv-memory-probe.cjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'training-workspace' && 'paths: [server-version/frontend/src, server-version/backend/src/controllers/courseController.ts, server-version/backend/src/controllers/assignmentController.ts, server-version/backend/src/constants/messages.ts, .github/scripts/training-workspace-scope.mjs, .github/scripts/training-workspace-checks.mjs, .github/scripts/training-workspace-reuse.mjs, .github/scripts/training-workspace-browser.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs, server-version/backend/src/modules/questionnaire-product, server-version/backend/src/modules/composite/composite.service.ts, server-version/backend/src/routes/trainingWorkspace.ts, .github/scripts/training-followup-scope.mjs, .github/scripts/training-followup-checks.mjs, .github/scripts/training-followup-browser.mjs, .github/scripts/training-followup-reuse.mjs]' || needs.scope.outputs.scenario == 'survey-wave-selection' && steps.wave-codeql-config.outputs.config || needs.scope.outputs.scenario == 'frontend-performance' && 'paths: [server-version/frontend/src, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs, .github/scripts/frontend-performance.test.mjs, .github/scripts/frontend-performance-browser.mjs]' || needs.scope.outputs.application_route == 'exact-candidate' && fromJSON(needs.scope.outputs.exact_candidate_plan || '{}').candidate == 'scale-authoring' && steps.scale-codeql-config.outputs.config || needs.scope.outputs.application_route == 'pr357' && steps.pr357-codeql-config.outputs.config || needs.scope.outputs.application_route == 'exact-candidate' && 'paths: [server-version/backend/src, server-version/backend/scripts, server-version/frontend/src, server-version/scripts/recovery, server-version/e2e, .github/scripts]' || needs.scope.outputs.application_route == 'survey-mac-ui' && 'paths: [server-version/frontend/src/survey, server-version/frontend/src/pages/admin, .github/scripts]' || needs.scope.outputs.application_route == 'reviewed-candidate' && 'paths: [.github/scripts, server-version/frontend/src/pages, server-version/e2e]' || needs.scope.outputs.application_route == 'survey-candidate' && 'paths: [server-version/backend/src, server-version/backend/scripts, server-version/frontend/src/survey, server-version/frontend/src/modules/cognitive, server-version/frontend/src/modules/composite, server-version/frontend/src/components/app-shell, server-version/frontend/src/pages/admin, server-version/frontend/src/services/persistence, server-version/e2e, .github/scripts]' || needs.scope.outputs.application_route == 'assessment-capacity' && 'paths: [server-version/backend/src, server-version/frontend/src/modules/composite, server-version/frontend/src/components/FinalCompositeAssessment.tsx, .github/scripts/assessment-capacity-scope.mjs, .github/scripts/assessment-capacity-browser.mjs, .github/scripts/assessment-capacity-candidate.py, .github/scripts/assessment-capacity-reuse.py, .github/scripts/assessment-capacity-recovery.py, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'teacher-survey' && 'paths: [server-version/frontend/src/huiteacher, server-version/frontend/src/survey, .github/scripts/teacher-survey-scope.mjs, .github/scripts/teacher-survey-candidate.py, .github/scripts/teacher-survey-browser.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'access-efficiency' && 'paths: [server-version/backend/src, server-version/frontend/src/hooks, server-version/frontend/src/pages/student, server-version/frontend/src/pages/CheckinList.tsx, server-version/frontend/src/training/TrainingLearnerHome.tsx, server-version/miniprogram, server-version/miniprogram-v2/domains, .github/scripts/github-official-source.test.mjs, .github/scripts/ci-image-plan.mjs, .github/scripts/dependency-scope.mjs, .github/scripts/access-efficiency-scope.mjs, .github/scripts/access-efficiency-browser.mjs, .github/scripts/access-efficiency-candidate.py, .github/scripts/access-efficiency-reuse.py, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'shared-asset-storage' && 'paths: [server-version/backend/src, server-version/scripts/asset-upload-cleanup, .github/scripts]' || needs.scope.outputs.application_route == 'backend-security-efficiency' && 'paths: [server-version/backend/src, .github/scripts/backend-security-efficiency-scope.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs, .github/scripts/campus-candidate.py]' || needs.scope.outputs.application_route == 'teacher-home' && 'paths: [server-version/frontend/src/huiteacher, server-version/backend/src/index.ts, server-version/backend/src/modules/huiteacher, server-version/backend/src/modules/campus, server-version/backend/src/middleware, server-version/backend/src/utils, .github/scripts/teacher-home-scope.mjs, .github/scripts/teacher-home-browser.mjs, .github/scripts/teacher-home-fixture.cjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'training-appearance' && 'paths: [server-version/frontend/src/training, server-version/frontend/src/components/app-shell, server-version/frontend/src/pages/student/StudentProfile.tsx, server-version/frontend/src/pages/teacher/TeacherProfile.tsx, .github/scripts/training-appearance-scope.mjs, .github/scripts/training-appearance-checks.mjs, .github/scripts/training-appearance.test.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'survey-cloud' && 'paths: [server-version/frontend/src/survey, server-version/frontend/src/pages/AdminLogin.tsx, server-version/frontend/src/pages/admin, server-version/frontend/src/admin, server-version/frontend/src/components/app-shell, server-version/frontend/src/components/auth, server-version/frontend/src/components/Footer.tsx, .github/scripts/survey-cloud-scope.mjs, .github/scripts/survey-cloud-checks.mjs, .github/scripts/survey-cloud.test.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'survey-experience' && 'paths: [.github/scripts/survey-experience-scope.test.mjs, .github/scripts/survey-experience-candidate.mjs, .github/scripts/survey-experience-browser.cjs]' || needs.scope.outputs.application_route == 'survey-home' && 'paths: [server-version/frontend/src/survey, .github/scripts/survey-home-scope.mjs, .github/scripts/survey-home-browser.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'homepage-copy' && 'paths: [.github/scripts/homepage-copy-scope.mjs, .github/scripts/homepage-copy-browser.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.scenario == 'release-tooling' && 'paths: [.github/scripts, server-version/scripts/release]' || '' }}
           # Bound analysis resources on the hosted Ubuntu VM.
           ram: 3500
           threads: 2
@@ -1406,7 +1427,7 @@ jobs:
   miniprogram:
     name: mini program / foundation contract and page smoke
     needs: scope
-    if: ${{ needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (needs.scope.outputs.scenario != 'frontend-test' && needs.scope.outputs.scenario != 'survey-wave-selection' && (needs.scope.outputs.scenario != 'dependencies' && (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && (github.event_name != 'push' || vars.CI_FORCE_FULL == 'true'))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling') }}
+    if: ${{ !(github.event_name == 'pull_request' && (github.event.pull_request.number == 363 || github.event.pull_request.head.ref == 'perf/four-entry-feedback-20261027')) && (needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (needs.scope.outputs.scenario != 'frontend-test' && needs.scope.outputs.scenario != 'survey-wave-selection' && (needs.scope.outputs.scenario != 'dependencies' && (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && (github.event_name != 'push' || vars.CI_FORCE_FULL == 'true'))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
@@ -1428,7 +1449,7 @@ jobs:
   backend-browser-build:
     name: UI/content route / backend browser build
     needs: scope
-    if: ${{ needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (needs.scope.outputs.scenario != 'survey-wave-selection' && needs.scope.outputs.scenario != 'frontend-performance' && needs.scope.outputs.scenario != 'dependencies' && (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.scenario != 'platform' && needs.scope.outputs.media_selection != '[]')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling') }}
+    if: ${{ !(github.event_name == 'pull_request' && (github.event.pull_request.number == 363 || github.event.pull_request.head.ref == 'perf/four-entry-feedback-20261027')) && (!(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (needs.scope.outputs.scenario != 'survey-wave-selection' && needs.scope.outputs.scenario != 'frontend-performance' && needs.scope.outputs.scenario != 'dependencies' && (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.scenario != 'platform' && needs.scope.outputs.media_selection != '[]')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling'))) }}
     uses: ./.github/workflows/ci-backend-browser-build.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
@@ -1449,7 +1470,7 @@ jobs:
 
   accept-media:
     needs: [scope, backend, backend-browser-build, frontend-build]
-    if: ${{ needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (!cancelled() && needs.scope.result == 'success' && needs.scope.outputs.media_selection != '[]' && needs.frontend-build.result == 'success' && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success') && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling') }}
+    if: ${{ !(github.event_name == 'pull_request' && (github.event.pull_request.number == 363 || github.event.pull_request.head.ref == 'perf/four-entry-feedback-20261027')) && (!(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (!cancelled() && needs.scope.result == 'success' && needs.scope.outputs.media_selection != '[]' && needs.frontend-build.result == 'success' && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success') && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling'))) }}
     uses: ./.github/workflows/ci-media.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
@@ -1459,7 +1480,7 @@ jobs:
   accept-ui:
     # UI acceptance uses exact-run artifacts; lint/test result is independently gated.
     needs: [scope, frontend-build]
-    if: ${{ needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (!cancelled() && needs.scope.result == 'success' && needs.scope.outputs.ui_required == 'true' && needs.frontend-build.result == 'success' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling') }}
+    if: ${{ !(github.event_name == 'pull_request' && (github.event.pull_request.number == 363 || github.event.pull_request.head.ref == 'perf/four-entry-feedback-20261027')) && (!(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (!cancelled() && needs.scope.result == 'success' && needs.scope.outputs.ui_required == 'true' && needs.frontend-build.result == 'success' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling'))) }}
     strategy:
       fail-fast: false
       matrix:
@@ -1474,7 +1495,7 @@ jobs:
 
   accept-visual:
     needs: [scope, frontend-build]
-    if: ${{ needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (needs.scope.outputs.canonical_visual == 'true' && needs.scope.outputs.visual_hosted == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling') }}
+    if: ${{ !(github.event_name == 'pull_request' && (github.event.pull_request.number == 363 || github.event.pull_request.head.ref == 'perf/four-entry-feedback-20261027')) && (!(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (needs.scope.outputs.canonical_visual == 'true' && needs.scope.outputs.visual_hosted == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling'))) }}
     strategy:
       fail-fast: false
       matrix:
@@ -1487,7 +1508,7 @@ jobs:
   accept-perf:
     # Independent fresh-fixture runtime proof; do not wait for backend compile.
     needs: scope
-    if: ${{ needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (needs.scope.outputs.perf_smoke == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling') }}
+    if: ${{ !(github.event_name == 'pull_request' && (github.event.pull_request.number == 363 || github.event.pull_request.head.ref == 'perf/four-entry-feedback-20261027')) && (!(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (needs.scope.outputs.perf_smoke == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling'))) }}
     uses: ./.github/workflows/perf-phase0-smoke.yml
     with:
       runner_profile: hosted
@@ -1495,7 +1516,7 @@ jobs:
   accept-ops:
     # Independent recovery evidence; merge gate still requires backend success.
     needs: scope
-    if: ${{ needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (needs.scope.outputs.ops == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling') }}
+    if: ${{ !(github.event_name == 'pull_request' && (github.event.pull_request.number == 363 || github.event.pull_request.head.ref == 'perf/four-entry-feedback-20261027')) && (!(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (needs.scope.outputs.ops == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling'))) }}
     uses: ./.github/workflows/ops-prelaunch.yml
     with:
       runner_profile: hosted
@@ -1685,6 +1706,516 @@ jobs:
             server-version/frontend/dist
           retention-days: 3
           if-no-files-found: error
+
+  pr363-manual-refusal:
+    if: github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 1
+    steps:
+    - run: echo 'PR363 manual full/probe is forbidden; final root review is required'; exit 1
+  pr363-backend-build:
+    needs: [scope]
+    if: github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'pr363'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      images_id: ${{ steps.reuse.outputs.images_id }}
+      dist_id: ${{ steps.reuse.outputs.dist_id }}
+    env:
+      CI: 'true'
+      PLAN: ${{ needs.scope.outputs.pr363_plan }}
+      CI_EVENT: pull_request
+      CI_HEAD_REF: ${{ github.head_ref }}
+      CI_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
+      CI_PR_NUMBER: ${{ github.event.pull_request.number }}
+      CI_PR_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+      NODE_ENV: test
+      NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+      NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        persist-credentials: false
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 24.21.0
+    - run: node .github/scripts/pr363-checks.mjs source
+    - id: reuse
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: node .github/scripts/pr363-continuation.mjs build-backend
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: pr363-backend-build-reuse-${{ github.sha }}
+        path: pr363-evidence/*.json
+        if-no-files-found: error
+        retention-days: 3
+  pr363-frontend-build:
+    needs: [scope]
+    if: github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'pr363'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      images_id: ${{ steps.reuse.outputs.images_id }}
+      dist_id: ${{ steps.reuse.outputs.dist_id }}
+    env:
+      CI: 'true'
+      PLAN: ${{ needs.scope.outputs.pr363_plan }}
+      CI_EVENT: pull_request
+      CI_HEAD_REF: ${{ github.head_ref }}
+      CI_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
+      CI_PR_NUMBER: ${{ github.event.pull_request.number }}
+      CI_PR_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+      NODE_ENV: test
+      NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+      NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        persist-credentials: false
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 24.21.0
+    - run: node .github/scripts/pr363-checks.mjs source
+    - id: reuse
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: node .github/scripts/pr363-continuation.mjs build-frontend
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: pr363-frontend-build-reuse-${{ github.sha }}
+        path: pr363-evidence/*.json
+        if-no-files-found: error
+        retention-days: 3
+  pr363-backend-checks:
+    needs: [scope, pr363-backend-build, pr363-frontend-build]
+    if: github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'pr363'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      actions: read
+    env:
+      CI: 'true'
+      PLAN: ${{ needs.scope.outputs.pr363_plan }}
+      CI_EVENT: pull_request
+      CI_HEAD_REF: ${{ github.head_ref }}
+      CI_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
+      CI_PR_NUMBER: ${{ github.event.pull_request.number }}
+      CI_PR_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+      NODE_ENV: test
+      NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+      NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        persist-credentials: false
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 24.21.0
+    - run: node .github/scripts/pr363-checks.mjs source
+    - id: reuse
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: node .github/scripts/pr363-continuation.mjs backend
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: pr363-backend-checks-reuse-${{ github.sha }}
+        path: pr363-evidence/*.json
+        if-no-files-found: error
+        retention-days: 3
+  pr363-frontend-checks:
+    needs: [scope, pr363-backend-build, pr363-frontend-build]
+    if: github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'pr363'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      actions: read
+    env:
+      CI: 'true'
+      PLAN: ${{ needs.scope.outputs.pr363_plan }}
+      CI_EVENT: pull_request
+      CI_HEAD_REF: ${{ github.head_ref }}
+      CI_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
+      CI_PR_NUMBER: ${{ github.event.pull_request.number }}
+      CI_PR_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+      NODE_ENV: test
+      NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+      NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        persist-credentials: false
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 24.21.0
+    - run: node .github/scripts/pr363-checks.mjs source
+    - id: reuse
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: node .github/scripts/pr363-continuation.mjs frontend
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: pr363-frontend-checks-reuse-${{ github.sha }}
+        path: pr363-evidence/*.json
+        if-no-files-found: error
+        retention-days: 3
+  pr363-audit:
+    needs: [scope, pr363-backend-build, pr363-frontend-build]
+    if: github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'pr363'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      actions: read
+    env:
+      CI: 'true'
+      PLAN: ${{ needs.scope.outputs.pr363_plan }}
+      CI_EVENT: pull_request
+      CI_HEAD_REF: ${{ github.head_ref }}
+      CI_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
+      CI_PR_NUMBER: ${{ github.event.pull_request.number }}
+      CI_PR_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+      NODE_ENV: test
+      NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+      NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        persist-credentials: false
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 24.21.0
+    - run: node .github/scripts/pr363-checks.mjs source
+    - id: reuse
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: node .github/scripts/pr363-continuation.mjs audit
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: pr363-audit-reuse-${{ github.sha }}
+        path: pr363-evidence/*.json
+        if-no-files-found: error
+        retention-days: 3
+  pr363-pg:
+    needs: [scope, pr363-backend-build, pr363-frontend-build]
+    if: github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'pr363'
+    strategy:
+      fail-fast: false
+      matrix:
+        suite: [reports, scales]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      actions: read
+    env:
+      CI: 'true'
+      PLAN: ${{ needs.scope.outputs.pr363_plan }}
+      CI_EVENT: pull_request
+      CI_HEAD_REF: ${{ github.head_ref }}
+      CI_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
+      CI_PR_NUMBER: ${{ github.event.pull_request.number }}
+      CI_PR_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+      PR363_PG_SUITE: ${{ matrix.suite }}
+      NODE_ENV: test
+      NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+      NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        persist-credentials: false
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 24.21.0
+    - run: node .github/scripts/pr363-checks.mjs source
+    - env:
+        GH_TOKEN: ${{ github.token }}
+      run: node .github/scripts/pr363-continuation.mjs pg-schema
+    - env:
+        GH_TOKEN: ${{ github.token }}
+      run: node .github/scripts/pr363-continuation.mjs pg-current
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: pr363-pg-reuse-${{ github.sha }}-${{ matrix.suite }}
+        path: pr363-evidence/*.json
+        if-no-files-found: error
+        retention-days: 3
+  pr363-browser:
+    needs: [scope, pr363-backend-build, pr363-frontend-build]
+    if: github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'pr363'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    permissions:
+      contents: read
+      actions: read
+    env:
+      CI: 'true'
+      PLAN: ${{ needs.scope.outputs.pr363_plan }}
+      CI_EVENT: pull_request
+      CI_HEAD_REF: ${{ github.head_ref }}
+      CI_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
+      CI_PR_NUMBER: ${{ github.event.pull_request.number }}
+      CI_PR_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+      NODE_ENV: test
+      TZ: UTC
+      SCHOOL_TEACHER_ISOLATED_DB: '1'
+      NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+      NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+    services:
+      postgres:
+        image: postgres:16.15-bookworm
+        env:
+          POSTGRES_USER: ptool
+          POSTGRES_PASSWORD: synthetic-pr363-only
+          POSTGRES_DB: school_teacher_browser_ci_test
+        ports: ['5432/tcp']
+        options: --health-cmd "pg_isready -U ptool -d school_teacher_browser_ci_test" --health-interval 5s --health-timeout 5s --health-retries 20
+      redis:
+        image: redis:7.4.11-bookworm
+        ports: ['6379/tcp']
+        options: --health-cmd "redis-cli ping" --health-interval 5s --health-timeout 5s --health-retries 20
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        persist-credentials: false
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 24.21.0
+    - run: node .github/scripts/pr363-checks.mjs source
+    - env:
+        GH_TOKEN: ${{ github.token }}
+      run: node .github/scripts/pr363-continuation.mjs browser
+    - uses: actions/download-artifact@v4
+      with:
+        github-token: ${{ github.token }}
+        run-id: 40525412926
+        artifact-ids: ${{ needs.pr363-backend-build.outputs.images_id }}
+        path: pr363-evidence
+        merge-multiple: true
+    - uses: actions/download-artifact@v4
+      with:
+        github-token: ${{ github.token }}
+        run-id: 40511522009
+        artifact-ids: ${{ needs.pr363-frontend-build.outputs.images_id }}
+        path: pr363-evidence
+        merge-multiple: true
+    - name: bind disposable service identity after initialization
+      env:
+        PG_PORT: ${{ job.services.postgres.ports['5432'] }}
+        REDIS_PORT: ${{ job.services.redis.ports['6379'] }}
+        PG_SERVICE: ${{ job.services.postgres.id }}
+      run: |
+        echo "PR363_PG_PORT=$PG_PORT" >> "$GITHUB_ENV"
+        echo "PR363_REDIS_PORT=$REDIS_PORT" >> "$GITHUB_ENV"
+        echo "CI_POSTGRES_SERVICE_ID=$PG_SERVICE" >> "$GITHUB_ENV"
+    - uses: actions/download-artifact@v4
+      with:
+        github-token: ${{ github.token }}
+        run-id: 40525412926
+        artifact-ids: ${{ needs.pr363-backend-build.outputs.dist_id }}
+        path: server-version/backend/dist
+        merge-multiple: true
+    - uses: actions/download-artifact@v4
+      with:
+        github-token: ${{ github.token }}
+        run-id: 40511522009
+        artifact-ids: ${{ needs.pr363-frontend-build.outputs.dist_id }}
+        path: server-version/frontend/dist
+        merge-multiple: true
+    - name: prepare official locked browser tools and system libraries without rebuilding applications
+      run: |
+        npm ci --ignore-scripts --prefix .github/release-tools
+        if [ -f /etc/apt/apt-mirrors.txt ]; then
+          sudo sed -i 's|http://azure.archive.ubuntu.com/ubuntu|https://archive.ubuntu.com/ubuntu|g' /etc/apt/apt-mirrors.txt
+        fi
+        bash server-version/scripts/ci-install-canvas-deps.sh
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends fonts-wqy-zenhei libnss3-tools nginx openssl
+        sudo systemctl stop nginx
+        printf '%s\n' '127.0.0.1 school.eduk12.top teacher.eduk12.top # pr363-ci-ingress' | sudo tee -a /etc/hosts > /dev/null
+    - name: tighten only the approved Chrome and CJK trusted paths on this ephemeral runner
+      run: |
+        # Specific user approvals: 2026-10-27 03:31 and 03:38 UTC.
+        sudo python3 - <<'PYOPT'
+        import os,stat,subprocess,pathlib,json
+        chrome=['/opt/google/chrome/chrome','/opt/google/chrome/chrome-sandbox']
+        fonts=sorted(set(subprocess.check_output(['/usr/bin/fc-list',':lang=zh','--format','%{file}\n'],text=True).splitlines()))
+        assert fonts, 'No installed Chinese font candidates'
+        assert all(f.startswith('/usr/share/fonts/') and pathlib.Path(f).suffix.lower() in ('.ttf','.ttc','.otf','.otc') for f in fonts)
+        targets={}
+        for file in chrome+fonts:
+          p=pathlib.Path(file);targets[str(p)]='file'
+          for parent in p.parents:
+            if str(parent) in ('/','/usr'):continue
+            assert str(parent) in ('/opt','/opt/google','/opt/google/chrome','/usr/share','/usr/share/fonts') or str(parent).startswith('/usr/share/fonts/')
+            targets[str(parent)]='directory'
+        # Validate the complete bounded set before changing any of it.
+        before={}
+        for p,kind in targets.items():
+          st=os.lstat(p)
+          assert st.st_uid==0 and st.st_gid==0 and not stat.S_ISLNK(st.st_mode) and os.path.realpath(p)==p
+          assert stat.S_ISREG(st.st_mode) if kind=='file' else stat.S_ISDIR(st.st_mode)
+          before[p]=stat.S_IMODE(st.st_mode)
+        for p,mode in before.items():
+          os.chmod(p,mode & ~0o022)
+          assert stat.S_IMODE(os.lstat(p).st_mode)==mode & ~0o022
+        print(json.dumps({'scope':'approved-ephemeral-chrome-cjk-only','changes':[{'path':p,'before':oct(mode),'after':oct(mode & ~0o022)} for p,mode in sorted(before.items())]}))
+        PYOPT
+        python3 - <<'PYFONT'
+        import subprocess,os,stat,json,pathlib
+        paths=subprocess.check_output(['/usr/bin/fc-list','--format','%{file}\n'],text=True).splitlines()
+        rows=[]
+        for file in sorted(set(paths)):
+          if not file.startswith('/usr/share/fonts/'):
+            continue
+          for p in [pathlib.Path(file),*pathlib.Path(file).parents]:
+            if str(p)=='/':continue
+            st=os.lstat(p)
+            if st.st_uid!=0 or stat.S_IMODE(st.st_mode)&0o022 or stat.S_ISLNK(st.st_mode):
+              row={'path':str(p),'uid':st.st_uid,'gid':st.st_gid,'mode':oct(stat.S_IMODE(st.st_mode)),'symlink':stat.S_ISLNK(st.st_mode)}
+              if row not in rows:rows.append(row)
+        out=pathlib.Path('pr363-evidence');out.mkdir(exist_ok=True)
+        (out/'font-path-diagnostics.json').write_text(json.dumps({'readOnly':True,'untrustedPaths':rows},indent=2))
+        print(json.dumps({'readOnly':True,'untrustedPaths':rows}))
+        PYFONT
+    - name: run actual same-build private fixture and sandboxed browser through trusted HTTPS443
+      run: node .github/scripts/pr363-checks.mjs browser
+    - name: remove only this job's product ingress host aliases
+      if: always()
+      run: sudo sed -i '/# pr363-ci-ingress$/d' /etc/hosts
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: pr363-browser-reports-${{ github.sha }}
+        path: |
+          pr363-evidence/*.json
+          pr363-evidence/*.log
+        if-no-files-found: error
+        retention-days: 3
+  pr363-backend-scan:
+    needs: [scope, pr363-backend-build, pr363-frontend-build]
+    if: github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'pr363'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      actions: read
+    env:
+      CI: 'true'
+      PLAN: ${{ needs.scope.outputs.pr363_plan }}
+      CI_EVENT: pull_request
+      CI_HEAD_REF: ${{ github.head_ref }}
+      CI_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
+      CI_PR_NUMBER: ${{ github.event.pull_request.number }}
+      CI_PR_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+      NODE_ENV: test
+      NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+      NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        persist-credentials: false
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 24.21.0
+    - run: node .github/scripts/pr363-checks.mjs source
+    - env:
+        GH_TOKEN: ${{ github.token }}
+      run: node .github/scripts/pr363-continuation.mjs scan-backend
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: pr363-backend-scan-reuse-${{ github.sha }}
+        path: pr363-evidence/*.json
+        if-no-files-found: error
+        retention-days: 3
+  pr363-frontend-scan:
+    needs: [scope, pr363-backend-build, pr363-frontend-build]
+    if: github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'pr363'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      actions: read
+    env:
+      CI: 'true'
+      PLAN: ${{ needs.scope.outputs.pr363_plan }}
+      CI_EVENT: pull_request
+      CI_HEAD_REF: ${{ github.head_ref }}
+      CI_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
+      CI_PR_NUMBER: ${{ github.event.pull_request.number }}
+      CI_PR_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+      NODE_ENV: test
+      NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+      NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        persist-credentials: false
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 24.21.0
+    - run: node .github/scripts/pr363-checks.mjs source
+    - env:
+        GH_TOKEN: ${{ github.token }}
+      run: node .github/scripts/pr363-continuation.mjs scan-frontend
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: pr363-frontend-scan-reuse-${{ github.sha }}
+        path: pr363-evidence/*.json
+        if-no-files-found: error
+        retention-days: 3
+  pr363:
+    needs: [scope, pr363-backend-build, pr363-frontend-build, pr363-backend-checks, pr363-frontend-checks, pr363-audit, pr363-pg, pr363-browser, pr363-backend-scan, pr363-frontend-scan]
+    if: always() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'pr363'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      CI: 'true'
+      PLAN: ${{ needs.scope.outputs.pr363_plan }}
+      CI_EVENT: pull_request
+      CI_HEAD_REF: ${{ github.head_ref }}
+      CI_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
+      CI_PR_NUMBER: ${{ github.event.pull_request.number }}
+      CI_PR_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+      NODE_ENV: test
+      NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+      NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        persist-credentials: false
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 24.21.0
+    - run: node .github/scripts/pr363-checks.mjs aggregate
+      env:
+        NEEDS_JSON: ${{ toJSON(needs) }}
 
   report-planning:
     name: report-planning
@@ -2658,6 +3189,7 @@ jobs:
     - survey-governance
     - post356
     - pr357
+    - pr363
     - report-planning
     - training-polish
     - sjt-native
@@ -2718,7 +3250,7 @@ jobs:
     - survey-home
     - teacher-survey
     - pr356-admission
-    if: ${{ always() && ((github.event_name == 'pull_request' && github.event.pull_request.number == 356 && github.event.pull_request.draft == false) || (github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025' && inputs.pr356_phase == 'admit')
+    if: ${{ !(github.event_name == 'push' && needs.scope.outputs.application_route == 'pr363') && !(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (always() && ((github.event_name == 'pull_request' && github.event.pull_request.number == 356 && github.event.pull_request.draft == false) || (github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025' && inputs.pr356_phase == 'admit')
       || (!((github.event_name == 'pull_request' && (github.event.pull_request.number == 356 || github.event.pull_request.head.ref == 'fix/runtime-time-and-validation-20261025'))
       || github.ref_name == 'fix/runtime-time-and-validation-20261025') && needs.scope.outputs.application_route != 'pr356' && (!(github.event_name == 'workflow_dispatch'
       && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023","work/training-assessment-performance-20261023","work/survey-training-branding-20261023"]'),
@@ -2727,7 +3259,7 @@ jobs:
       && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch'
       && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (always() && (inputs.step_probe == '' || inputs.step_probe == 'none') && (github.event_name
       != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch'
-      || github.event_name == 'pull_request')))))) }}
+      || github.event_name == 'pull_request'))))))) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 8
     env:

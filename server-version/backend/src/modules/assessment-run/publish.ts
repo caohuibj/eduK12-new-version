@@ -225,7 +225,11 @@ const prepareTracks = async (
           'Peer assessments require published aggregate-only content and privacy floor >= 5',409)
       }
     }
-    if (track.resourceFamily === 'COGNITIVE') {
+    // The exact education source was independently resolved/authorized above.
+    // Its production adapter launches the canonical Composite bridge; historical
+    // standalone Cognitive families still have no relational publication path.
+    if (track.resourceFamily === 'COGNITIVE' && (!track.resourceKey.startsWith('education-assessment:')
+      || resourcePolicy.runtimeLaunchTarget?.kind !== 'COMPOSITE')) {
       throw new RunPublishError('RUN_RESOURCE_UNSUPPORTED', 'COGNITIVE does not use the relational assignment bridge in PR2 V1', 409)
     }
     return { ...track, resourcePolicy }

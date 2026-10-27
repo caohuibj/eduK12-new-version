@@ -1,0 +1,32 @@
+{
+  "recordKind": "source snapshot captured during pg-report-policy-r4 execution before any follow-up edit",
+  "head": "c7caab78327cdb7ed55159985de475b623ec0612",
+  "tree": "797ee5b95ad85423960c9e9f1ecb6e1bddfb794c",
+  "node": "24.21.0",
+  "database": "pr363_runtime_test",
+  "runtimePrincipal": "actual restricted role, verifyRuntimePrivileges in beforeAll",
+  "productionSourceMocks": false,
+  "acceptedFinalSeeding": false,
+  "files": [
+    {
+      "path": "server-version/backend/src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts",
+      "sha256": "48e6c4c3430b0248617ea9cbac9ada9a4b5c2280fcbdcb539e681e6a161f1db6"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/huiteacher/assessment-runtime.postgres.fixture.ts",
+      "sha256": "5c3857771fef6c66a9e7bd8be5b3b7a24927d6b9787f7d5795d71619ded54cb1"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/integration/educationLibraryRuntimeFixture.ts",
+      "sha256": "a5b2464869b6aea25208c740f693dbfa286cd58da1764f851a0c2612c0a5989d"
+    },
+    {
+      "path": "server-version/backend/src/modules/education-tools/assessment-resource.service.ts",
+      "sha256": "d6a4c6d9146d3d5b4b00f23eb53a938092387eca469e3126907638261229f9fe"
+    },
+    {
+      "path": "server-version/backend/src/modules/reporting/education-assessment-personal-report.service.ts",
+      "sha256": "ecf96291100468a478a452cd31c4b8a20bc38cb94e3f83b635135710c40125c5"
+    }
+  ]
+}

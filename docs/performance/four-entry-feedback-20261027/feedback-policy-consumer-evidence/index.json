@@ -1,0 +1,239 @@
+{
+  "recordedAt": "2026-10-27T10:23:32.847872+00:00",
+  "codeCommitAtExecution": "892c55996a118e93833f9f8609d3ead248cd4dad",
+  "codeTreeAtExecution": "5392828f322667e5c8613e6912183e01223e9955",
+  "mergedSourceContract": "385277be09228ace5d9ff8da1bbd8934d86cd471",
+  "postMergeCommit": "19d58f8ab3d83919fb4074b2bf492bde47e5f35d",
+  "postMergeTree": "1401590420f7ac4c468223772a094cc1141dccc9",
+  "node": "24.19.0",
+  "scope": "Unsigned development observation only; below engines; not formal qualification",
+  "commands": {
+    "unit": "./node_modules/.bin/vitest run src/__tests__/reporting/education-assessment-personal-report.service.test.ts src/__tests__/reporting/education-assessment-report.routes.test.ts --maxWorkers=2 --reporter=json --outputFile=/tmp/pr363-feedback-policy/unit-1.json",
+    "types": "./node_modules/.bin/tsc --noEmit"
+  },
+  "results": {
+    "unitExitCode": 0,
+    "passed": 47,
+    "failed": 0,
+    "filtered": 0,
+    "typesExitCode": 0
+  },
+  "sourceObservation": {
+    "kind": "post-execution observation of actual execution commit; not a backdated start manifest",
+    "sha256": {
+      "server-version/backend/src/modules/reporting/education-assessment-personal-report.service.ts": "ecf96291100468a478a452cd31c4b8a20bc38cb94e3f83b635135710c40125c5",
+      "server-version/backend/src/modules/reporting/education-assessment-report.routes.ts": "1a2394d43b1c2c37e82f0d12854a3da01dc244357c2749ab4129de936e4498fb",
+      "server-version/backend/src/__tests__/reporting/education-assessment-personal-report.service.test.ts": "4c58bff0249e29fda0e5d986e29b6319adf795dba9546b43df7334333abbd0e9",
+      "server-version/backend/src/__tests__/reporting/education-assessment-report.routes.test.ts": "5296a65d0a5b9e3492504fa189041acd2baa8f22d25017de32d166be7561d3bc",
+      "server-version/backend/src/modules/assessment-policy/training-feedback-policy.ts": "e2eef914d088deee2d98bea840d3142de02e9e60f4a9e185d894e752f822bbb1",
+      "server-version/backend/src/modules/education-tools/assessment-resource.contract.ts": "972a72c337836397706793764af6ed83f8a409f21d22f3f6879b4b205aebd85c",
+      "server-version/backend/package-lock.json": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+      "server-version/backend/vitest.config.ts": "26b98b70914617771d41657be8cdf6d7b6d7024c81d1c8a49aeae6a9220cf93b",
+      "server-version/backend/tsconfig.json": "c79ccf595a80514e94936f1ffcd2fa09b57265f0c140d275c81770f494175143"
+    }
+  },
+  "reuseBoundary": [
+    "The 47 consumer cases and types ran at 892c55996 before absorption of root optional-field contract 385277be. They are not relabelled as fresh final-tree executions.",
+    "385277be adds optional feedbackPolicy with the same pure schema and no default; root owns its two new compatibility contracts. No root source tests were repeated.",
+    "Consumer policy cases deliberately set source.origin.feedbackPolicy on a mocked verified-source boundary and use the real policy schema/evaluator. They are not real producer/FINAL/PG evidence.",
+    "No PG, source/runtime suites, frontend checks, CI/build/merge/deployment were run in this delta.",
+    "Source/producer/management/App files are unchanged relative to absorbed root 385277be."
+  ],
+  "cases": [
+    {
+      "name": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) reads exact saved mixed reports and independently rechecks current source and respondent rights",
+      "status": "passed"
+    },
+    {
+      "name": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) refuses not-own before facts and never treats identity as authorization",
+      "status": "passed"
+    },
+    {
+      "name": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) refuses membership before facts and never treats identity as authorization",
+      "status": "passed"
+    },
+    {
+      "name": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) refuses source-authority before facts and never treats identity as authorization",
+      "status": "passed"
+    },
+    {
+      "name": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) rejects wrong product binding",
+      "status": "passed"
+    },
+    {
+      "name": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) rejects wrong organization binding",
+      "status": "passed"
+    },
+    {
+      "name": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) rejects wrong version binding",
+      "status": "passed"
+    },
+    {
+      "name": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) rejects wrong subject binding",
+      "status": "passed"
+    },
+    {
+      "name": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) rejects wrong assignment binding",
+      "status": "passed"
+    },
+    {
+      "name": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) honors current respondent disclosure without materializing raw canonical facts",
+      "status": "passed"
+    },
+    {
+      "name": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) shows only completion when the frozen tool permits that mode",
+      "status": "passed"
+    },
+    {
+      "name": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) returns PENDING only for a real matching accepted asynchronous job",
+      "status": "passed"
+    },
+    {
+      "name": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) never invents PENDING for absent report job",
+      "status": "passed"
+    },
+    {
+      "name": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) never invents PENDING for wrong-epoch report job",
+      "status": "passed"
+    },
+    {
+      "name": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) never invents PENDING for wrong-slots report job",
+      "status": "passed"
+    },
+    {
+      "name": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) never invents PENDING for failed report job",
+      "status": "passed"
+    },
+    {
+      "name": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) rejects respondent withdrawal during asynchronous materialization",
+      "status": "passed"
+    },
+    {
+      "name": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) rejects authority withdrawal during asynchronous materialization",
+      "status": "passed"
+    },
+    {
+      "name": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) rejects release withdrawal during asynchronous materialization",
+      "status": "passed"
+    },
+    {
+      "name": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) refuses a changed canonical FINAL source rather than displaying a stored template",
+      "status": "passed"
+    },
+    {
+      "name": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) repeated reads do not write FINAL, reinterpretation or queue state",
+      "status": "passed"
+    },
+    {
+      "name": "honors an exact configured education report opening and becomes readable after that time",
+      "status": "passed"
+    },
+    {
+      "name": "refuses a different frozen publication even if unit IDs are the same",
+      "status": "passed"
+    },
+    {
+      "name": "does not replace original source authority proofs with another later administrator during a read",
+      "status": "passed"
+    },
+    {
+      "name": "refuses replacement of the frozen distribution proof while materializing a saved report",
+      "status": "passed"
+    },
+    {
+      "name": "keeps identically named metrics in distinct approved unit reports instead of flattening a mixed bundle",
+      "status": "passed"
+    },
+    {
+      "name": "production composition consumes HISTORY and original proofs without new-use or current-issuer admission",
+      "status": "passed"
+    },
+    {
+      "name": "pure Form BUNDLE confirms a completed parent without measurement, interpretation or score rows",
+      "status": "passed"
+    },
+    {
+      "name": "pure Form NONE never exposes completion feedback from the measurement-free exception",
+      "status": "passed"
+    },
+    {
+      "name": "pure Form completion obeys the same frozen opening and opens without creating report facts",
+      "status": "passed"
+    },
+    {
+      "name": "pure Form uses its frozen education schedule without borrowing a Training course snapshot",
+      "status": "passed"
+    },
+    {
+      "name": "production composition enforces frozen education timing with no injected opening reader",
+      "status": "passed"
+    },
+    {
+      "name": "an optional earlier workflow opening cannot widen the frozen schedule",
+      "status": "passed"
+    },
+    {
+      "name": "rejects malformed present frozen policy instead of silently enabling legacy immediate: null",
+      "status": "passed"
+    },
+    {
+      "name": "rejects malformed present frozen policy instead of silently enabling legacy immediate: {\"schemaVersion\":1,\"mode\":\"SCHEDULED\",\"releaseAt\":\"bad-date\"}",
+      "status": "passed"
+    },
+    {
+      "name": "rejects malformed present frozen policy instead of silently enabling legacy immediate: {\"schemaVersion\":1,\"mode\":\"OTHER\"}",
+      "status": "passed"
+    },
+    {
+      "name": "an elapsed frozen schedule does not open NONE, incomplete or unauthorized Form reads",
+      "status": "passed"
+    },
+    {
+      "name": "education multi-tool report route contract (mock authentication, real HTTP) passes authenticated SCHOOL identity and execution only with no-store response",
+      "status": "passed"
+    },
+    {
+      "name": "education multi-tool report route contract (mock authentication, real HTTP) passes authenticated TEACHER identity and execution only with no-store response",
+      "status": "passed"
+    },
+    {
+      "name": "education multi-tool report route contract (mock authentication, real HTTP) refuses a Training realm fixture, missing authentication, and lookalike execution IDs",
+      "status": "passed"
+    },
+    {
+      "name": "education multi-tool report route contract (mock authentication, real HTTP) does not turn observer or unapproved student access into a self-report read",
+      "status": "passed"
+    },
+    {
+      "name": "education multi-tool report route contract (mock authentication, real HTTP) rejects client source/audience selectors and inaccessible executions",
+      "status": "passed"
+    },
+    {
+      "name": "education multi-tool report route contract (mock authentication, real HTTP) admits an approved School-domain ADMIN only through the own-report reader",
+      "status": "passed"
+    },
+    {
+      "name": "education multi-tool report route contract (mock authentication, real HTTP) never treats another domain, unapproved account or role as Teacher report authority: {\"x-fixture-domain\":\"TRAINING\"}",
+      "status": "passed"
+    },
+    {
+      "name": "education multi-tool report route contract (mock authentication, real HTTP) never treats another domain, unapproved account or role as Teacher report authority: {\"x-fixture-domain\":\"LEGACY\"}",
+      "status": "passed"
+    },
+    {
+      "name": "education multi-tool report route contract (mock authentication, real HTTP) never treats another domain, unapproved account or role as Teacher report authority: {\"x-fixture-approved\":\"false\"}",
+      "status": "passed"
+    },
+    {
+      "name": "education multi-tool report route contract (mock authentication, real HTTP) never treats another domain, unapproved account or role as Teacher report authority: {\"x-fixture-role\":\"STUDENT\"}",
+      "status": "passed"
+    }
+  ],
+  "files": {
+    "types-1.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "types-1.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "unit-1.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "unit-1.json": "8f7a966e5e13f5703eae34ebef51afa6f3806adf15de80c2a6eba96837b740b6",
+    "unit-1.log": "558189aaad281e16148e1aa90c17ec4bf43295670ebe1ea2cbbb3605e6c35aa0"
+  }
+}

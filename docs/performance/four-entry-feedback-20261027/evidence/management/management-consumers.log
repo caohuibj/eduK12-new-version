@@ -1,0 +1,15 @@
+
+ RUN  v4.1.11 /workspace/eduK12-new-version/server-version/frontend
+
+ ✓ src/huiteacher/HuiteacherRunPreview.test.tsx (4 tests) 711ms
+   ✓ shows per-tool unique counts and total executions, with a neutral publication confirmation  348ms
+ ✓ src/school/SchoolActivityManager.test.tsx (14 tests) 1730ms
+     ✓ allows an administrator to choose the class of an already open Activity  345ms
+   ✓ separates compact configuration and preserves unsaved inputs per activity without opening anything  455ms
+
+ Test Files  2 passed (2)
+      Tests  18 passed (18)
+   Start at  08:52:38
+   Duration  3.30s (transform 946ms, setup 412ms, import 1.35s, tests 2.44s, environment 1.06s)
+
+JSON report written to /tmp/pr363-education-management/management-consumers.json

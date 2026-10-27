@@ -47,6 +47,7 @@ function platformSjtDistribution(grant:Pick<ContentGrantInput,'scope'|'capabilit
     &&grant.scope.resourceKind==='material'&&grant.capabilities.length===1&&grant.capabilities[0]==='material.distribute'
 }
 function supported(grant:Pick<ContentGrantInput,'scope'|'capabilities'>){
+  if(educationDistribution(grant))return true
   if(platformSjt(grant)||platformReference(grant)||platformScaleLibrary(grant)||platformScalePublic(grant)||platformSjtDistribution(grant))return true
   if(grant.scope.product==='TRAINING')return grant.scope.scopeKind==='COURSE'&&(
     grant.scope.resourceKind==='report'&&grant.capabilities.every(capability=>['report.edit','report.publish'].includes(capability))||
@@ -55,6 +56,10 @@ function supported(grant:Pick<ContentGrantInput,'scope'|'capabilities'>){
   return grant.scope.product==='SURVEY'&&grant.scope.scopeKind==='PROJECT'&&
     (grant.scope.resourceKind==='reference'&&grant.capabilities.every(c=>['reference.analyze','reference.review','reference.publish'].includes(c))||
      grant.scope.resourceKind==='data'&&grant.capabilities.length===1&&grant.capabilities[0]==='data.reinterpret')
+}
+function educationDistribution(grant:Pick<ContentGrantInput,'scope'|'capabilities'>){
+ return ['SCHOOL','TEACHER'].includes(grant.scope.product)&&grant.scope.scopeKind==='ORGANIZATION'
+  &&grant.scope.resourceKind==='material'&&grant.capabilities.length===1&&grant.capabilities[0]==='material.distribute'
 }
 type UserRow={id:string;token_version:number;platform_role:string;account_domain:string;role:string;teacher_approved:boolean;is_active:boolean;is_frozen:boolean;must_change_password:boolean;expires_at:Date|null}
 function assertProof(proof:AdminSessionProof){if(!validAdminProof(proof,ADMIN_STEP_UP_SECONDS))deny('内容授权变更需要最近的管理员双因素验证')}
@@ -87,7 +92,8 @@ function storedInput(row:GrantRow):ContentGrantInput{return contentGrantInputSch
 const comparable=(grant:ContentGrantInput)=>({...grant,validFrom:grant.validFrom.toISOString(),expiresAt:grant.expiresAt.toISOString()})
 /** Root issuance only. No administrator/owner identity implicitly acquires rights. */
 export async function issueAdminContentRoot(actorId:string,proof:AdminSessionProof,raw:unknown){
-  const input=adminContentRootRequestSchema.parse(raw),grant=input.grant,scope=grant.scope,isPlatformSjt=platformSjt(grant),isPlatformReference=platformReference(grant),isLibrary=platformScaleLibrary(grant),isScalePublic=platformScalePublic(grant),isSjtDistribution=platformSjtDistribution(grant)
+  const input=adminContentRootRequestSchema.parse(raw),grant=input.grant,scope=grant.scope,isPlatformSjt=platformSjt(grant),isPlatformReference=platformReference(grant),isLibrary=platformScaleLibrary(grant),isScalePublic=platformScalePublic(grant),isSjtDistribution=platformSjtDistribution(grant),isEducationDistribution=educationDistribution(grant)
+  if(isEducationDistribution&&(grant.remainingDelegationDepth!==0||grant.delegableCapabilities.length))deny('教育资源分发授权不允许转委托')
   assertProof(proof)
   return prisma.$transaction(async tx=>{
     // Match consumers: Project/Course → Users → composites/deliveries → grants/resources.
@@ -99,16 +105,36 @@ export async function issueAdminContentRoot(actorId:string,proof:AdminSessionPro
       if(mappings.length!==scope.resourceKeys.length||mappings.some(row=>!scope.resourceKeys.includes(row.id)))deny()
       registryResources=mappings
     }
-    const projects=isPlatformSjt||isPlatformReference||isLibrary||isScalePublic||isSjtDistribution?[{id:scope.scopeId}]:scope.product==='TRAINING'
+    const projects=isEducationDistribution?await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT id FROM organizations
+      WHERE id=${scope.scopeId} AND product_domain='SCHOOL' AND status='ACTIVE' FOR UPDATE`)
+      :isPlatformSjt||isPlatformReference||isLibrary||isScalePublic||isSjtDistribution?[{id:scope.scopeId}]:scope.product==='TRAINING'
       ?await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT id FROM courses
         WHERE id=${scope.scopeId} AND creator_id=${grant.subjectId} AND course_type='TRAINING_COURSE' AND NOT is_library FOR SHARE`)
       :await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT id FROM survey_projects
       WHERE id=${scope.scopeId} AND owner_user_id=${grant.subjectId} FOR SHARE`)
     if(projects.length!==1)deny()
+    if(isEducationDistribution){
+      const {lockEducationAssessmentUsers}=await import('../education-tools/assessment-resource.locks')
+      await lockEducationAssessmentUsers(tx,[actorId,grant.subjectId])
+    }
     const {users}=await lockActor(tx,actorId,proof,grant.subjectId)
     const target=users.find(user=>user.id===grant.subjectId)
     if(!target||!target.is_active||target.is_frozen||target.must_change_password)deny()
-    if(isLibrary||isScalePublic||isSjtDistribution){
+    if(isEducationDistribution){
+      const product=scope.product==='TEACHER'?'HUITEACHER':'HUISCHOOL'
+      const [entitlement]=await tx.$queryRaw<Array<{organization_id:string}>>(Prisma.sql`SELECT organization_id FROM education_product_entitlements
+        WHERE organization_id=${scope.scopeId} AND product=${product} AND status='ACTIVE' FOR SHARE`)
+      if(!entitlement)deny()
+      // A distinct explicit system authorization, never implied by target admin
+      // status or by being able to read the underlying Training definitions.
+      if(target.account_domain!=='SCHOOL'&&!(target.platform_role==='SYSTEM_ADMIN'&&['LEGACY','TRAINING'].includes(target.account_domain)))deny()
+      if(target.account_domain==='SCHOOL'){
+        const {captureEducationAssessmentIssuer}=await import('../education-tools/assessment-resource.issuer')
+        await captureEducationAssessmentIssuer(tx,{product:scope.product as 'SCHOOL'|'TEACHER',organizationId:scope.scopeId,
+          principal:{userId:target.id,accountDomain:'SCHOOL',platformRole:target.platform_role as 'STANDARD',role:target.role as 'ADMIN',
+            username:'',tokenVersion:target.token_version,mustChangePassword:target.must_change_password}})
+      }
+    }else if(isLibrary||isScalePublic||isSjtDistribution){
       if(!['TRAINING','LEGACY'].includes(target.account_domain))deny()
       if(grant.scope.resourceKind==='material'){
         const entry=await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT id FROM admin_entry_grants WHERE user_id=${grant.subjectId} AND entry=${scope.product} AND revoked_at IS NULL FOR SHARE`)
@@ -165,7 +191,21 @@ export async function issueAdminContentRoot(actorId:string,proof:AdminSessionPro
         }
       }
     }
-    const resources=isSjtDistribution?distributionResources:isScalePublic?await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT id FROM scales WHERE id IN (${Prisma.join(scope.resourceKeys)}) AND instrument_class='CUSTOM_DESCRIPTIVE' ORDER BY id FOR SHARE`)
+    let educationResources:Array<{id:string}>=[]
+    if(isEducationDistribution){
+      // Exact source assembly, C/P/R releases and declared stimulus assets all
+      // require separate resource identities. No wildcard or fake Scale wrapper.
+      const composites=await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT id FROM composite_assessments
+        WHERE id IN (${Prisma.join(scope.resourceKeys)}) AND status='PUBLISHED' ORDER BY id FOR SHARE`)
+      const releases=await tx.$queryRaw<Array<{id:string;scope:unknown;layer:string}>>(Prisma.sql`SELECT id,scope,layer FROM measurement_content_releases
+        WHERE id IN (${Prisma.join(scope.resourceKeys)}) AND status='PUBLISHED' ORDER BY id FOR SHARE`)
+      if(releases.some(row=>row.layer!=='MEASUREMENT'&&(row.scope as {kind:string;product?:string}).kind!=='PLATFORM'
+        &&(row.scope as {product?:string}).product!==scope.product))deny('私有参考与报告必须先在目标教育产品独立发布')
+      const assets=await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT id FROM stored_assets
+        WHERE id IN (${Prisma.join(scope.resourceKeys)}) AND deleted_at IS NULL AND size_bytes>0 ORDER BY id FOR SHARE`)
+      educationResources=[...composites,...releases,...assets]
+    }
+    const resources=isEducationDistribution?educationResources:isSjtDistribution?distributionResources:isScalePublic?await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT id FROM scales WHERE id IN (${Prisma.join(scope.resourceKeys)}) AND instrument_class='CUSTOM_DESCRIPTIVE' ORDER BY id FOR SHARE`)
       :isLibrary?await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT id FROM measurement_content_releases WHERE id IN (${Prisma.join(scope.resourceKeys)}) AND family='SCALE' AND layer='MEASUREMENT' AND status='PUBLISHED' ORDER BY id FOR SHARE`)
       :isPlatformSjt?registryResources:isPlatformReference
       ?await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT id FROM measurement_content_releases
@@ -201,7 +241,9 @@ export async function issueAdminContentRoot(actorId:string,proof:AdminSessionPro
     }
     await recheckAfterWait(tx,proof,users)
     await tx.adminAuthorizationAudit.create({data:{id:input.requestId,actorUserId:actorId,targetUserId:grant.subjectId,
-      entry:scope.product as 'SURVEY'|'TRAINING',action:'CONTENT_ROOT_GRANTED',version:1,reason:input.reason}})
+      // entry is the legacy browser-entry enum (TRAINING/SURVEY). Education's
+      // exact product/organization remains in the grant, not a false entry label.
+      entry:isEducationDistribution?null:scope.product,action:'CONTENT_ROOT_GRANTED',version:1,reason:input.reason}})
     return {grantId:input.requestId,version:1,changed:true}
   },options)
 }
@@ -225,7 +267,7 @@ export async function revokeAdminContentGrant(actorId:string,proof:AdminSessionP
       WHERE id=${grantId} AND version=${input.expectedVersion} AND revoked_at IS NULL`)
     if(count!==1)throw new AdminPermissionError(409,'授权版本已变化')
     await tx.adminAuthorizationAudit.create({data:{id:randomUUID(),actorUserId:actorId,targetUserId:grant.subject_id,
-      entry:grant.product as 'SURVEY'|'TRAINING',action:'CONTENT_GRANT_REVOKED',version:input.expectedVersion+1,reason:JSON.stringify({grantId,reason:input.reason})}})
+      entry:['SCHOOL','TEACHER'].includes(grant.product)?null:grant.product,action:'CONTENT_GRANT_REVOKED',version:input.expectedVersion+1,reason:JSON.stringify({grantId,reason:input.reason})}})
     return {grantId,version:input.expectedVersion+1,changed:true}
   },options)
 }

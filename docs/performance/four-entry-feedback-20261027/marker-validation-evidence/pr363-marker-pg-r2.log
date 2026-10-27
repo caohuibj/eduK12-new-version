@@ -1,0 +1,26 @@
+
+ RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend
+
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/education-tools/assessment-resource.marker.postgres.integration.test.ts [ src/__tests__/education-tools/assessment-resource.marker.postgres.integration.test.ts ]
+TypeError: Cannot read properties of undefined (reading 'extend')
+ ❯ src/modules/composite/training-reference-binding.ts:18:58
+     16| export const trainingReferenceBindingSchema=z.object({schemaVersion:z.…
+     17|  contentBindingHash:hash,contextHash:hash.nullable(),units:z.array(z.o…
+     18| const contentBindingSchema=trainingContentSnapshotSchema.extend({attem…
+       |                                                          ^
+     19| export type TrainingReferenceBinding=z.infer<typeof trainingReferenceB…
+     20| export type TrainingReferenceParent={id:string;attemptEpoch:number;com…
+ ❯ src/services/assessmentContextService.ts:1:1
+ ❯ src/modules/composite/final-submit.service.ts:12:1
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  10:07:52
+   Duration  3.50s (transform 2.36s, setup 0ms, import 0ms, tests 0ms, environment 0ms)
+

@@ -1,0 +1,9 @@
+{
+  "argv": "Recorded targeted Vitest invocation; selected files server-version/backend/src/__tests__/education-tools/assessment-resource.authority.test.ts; exact filters retained by original reporter and linked progress/index",
+  "cwd": "server-version/backend",
+  "exitCode": 0,
+  "signal": null,
+  "provenance": "Root post-hoc index of known original execution; not a fabricated new command receipt. Exact argv not wholly retained for older bundles.",
+  "originalReporter": "docs/performance/four-entry-feedback-20261027/authority-lock-evidence/authority-nowait-contract-r1.json.gz",
+  "originalLog": "docs/performance/four-entry-feedback-20261027/authority-lock-evidence/authority-nowait-contract-r1.log.gz"
+}

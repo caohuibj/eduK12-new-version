@@ -1,0 +1,65 @@
+{
+  "recordKind": "unsigned initial diagnostic executions, not CI admission",
+  "branch": "feat/pr363-teacher-runtime",
+  "immediateImplementationCommit": "92719e100df216eb82117b715341f08602697d16",
+  "productTree": "ceec1c0f870cff06e28725cebf98af58f04067a4",
+  "rootSourceBaseline": "467baeb59a72e61a5e4104b5c0163b288b0c234e",
+  "qualification": {
+    "actualCanonicalFinal": true,
+    "directApprovedFinalSeeding": false,
+    "browserExecuted": false,
+    "explicitScheduledProducerTested": false,
+    "formalCI": false
+  },
+  "checks": [
+    {
+      "log": "pg-report-journey-r1.log",
+      "archive": "pg-report-journey-r1.log.gz",
+      "exit": 1,
+      "rawSha256": "f2a3476553475ec286d8ed6d1f34d529c88fadd2a02fe61b9292d2f71bf6c903",
+      "archiveSha256": "1d74c18724704a17aa81396d4f912fd1627866b53295cad5843ccaac20b9afbb",
+      "commandAfterNode": [
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts",
+        "--reporter=verbose"
+      ],
+      "note": "Teacher actual producer C/R to mixed FINAL and report READY passed; School stopped at missing isolated HMAC key",
+      "inputBinding": "mutable diagnostic fixture; no full immutable input manifest captured; source baseline467baeb"
+    },
+    {
+      "log": "pg-report-school-r2.log",
+      "archive": "pg-report-school-r2.log.gz",
+      "exit": 1,
+      "rawSha256": "b60e4c9deda7ee422bc081e95dd4996e93565e5a921f2bae46bcc9c9a663061a",
+      "archiveSha256": "3eca37283adc8465bd7c1ee249fa32cf56fffa1cbe7a2980559cb5a369a6590a",
+      "commandAfterNode": [
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts",
+        "-t",
+        "SCHOOL",
+        "--reporter=verbose"
+      ],
+      "note": "School fixture reached actual run draft; missing exact current expectedVersion/workflow bindings",
+      "inputBinding": "mutable diagnostic fixture; no full immutable input manifest captured; source baseline467baeb"
+    },
+    {
+      "log": "pg-report-school-r3.log",
+      "archive": "pg-report-school-r3.log.gz",
+      "exit": 0,
+      "rawSha256": "e46a39baf582397d5ddc4b1a0266cf729c23e2a69a66f6e9c1f8e075a8766eb1",
+      "archiveSha256": "eefabd556aedd3308be6dbaf0c3c501b0e0226df9dd996095d71f424d58e0f27",
+      "commandAfterNode": [
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts",
+        "-t",
+        "SCHOOL",
+        "--reporter=verbose"
+      ],
+      "note": "School real approved student/activity/producer/START/shared Composite HTTP FINAL/own report READY passed",
+      "inputBinding": "mutable diagnostic fixture; no full immutable input manifest captured; source baseline467baeb"
+    }
+  ]
+}

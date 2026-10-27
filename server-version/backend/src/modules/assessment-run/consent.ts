@@ -26,7 +26,8 @@ export const createRunPendingConsent = async (tx: Tx, input: {
   }
   const consent = createAttemptConsent({
     subjectUserId: input.subjectUserId, respondentUserId: input.respondentUserId,
-    respondentType: input.respondentRole as 'PARENT' | 'TEACHER',
+    respondentType: input.respondentRole === 'TEACHER' && input.subjectUserId === input.respondentUserId && input.perspective === 'SELF_REPORT'
+      ? 'SELF' : input.respondentRole as 'PARENT' | 'TEACHER',
     consentVersion: 'organization-run-observer-v1',
     purpose: `organization_run:${input.resourceKind}:${input.resourceKey}:${input.resourceVersion}`,
     visibilityScope: scope, shareTargets: scope === 'PRIVATE_RESPONDENT' ? [] : [input.createdByUserId],
@@ -65,7 +66,7 @@ export const acceptRunExecutionConsent = async (input: { executionId: string; ac
     }
     const pending: AssessmentAttemptConsentRecordV1 = {
       consentId: root.id, priorConsentId: null, subjectUserId: root.subjectUserId,
-      respondentUserId: root.respondentUserId, respondentType: root.respondentType as 'PARENT' | 'TEACHER',
+      respondentUserId: root.respondentUserId, respondentType: root.respondentType as AssessmentAttemptConsentRecordV1['respondentType'],
       consentVersion: root.consentVersion, consentHash: root.consentHash, purpose: root.purpose,
       visibilityScope: root.visibilityScope, shareTargets: root.shareTargetsJson as string[], acceptedAt: null, revokedAt: null,
     }

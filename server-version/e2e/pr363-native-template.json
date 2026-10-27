@@ -1,0 +1,538 @@
+{
+  "templateVersion": "sjt-upload-v1",
+  "instrumentKey": "synthetic-student-native-staged",
+  "instrumentVersion": "1.0.0",
+  "title": "Synthetic student teamwork staged fixture",
+  "respondentType": "student_self_report",
+  "entryNodeKey": "PLAN",
+  "author": "Repository test fixture authors",
+  "sourceNote": "Newly self-authored synthetic test material. Redistribution is allowed. No third-party assessment content or participant data is included.",
+  "disclaimer": "For software contract testing only. These arbitrary example scores do not measure ability and must not inform educational or personnel decisions.",
+  "licenseStatus": "self_authored",
+  "redistribution": "allowed",
+  "nodes": [
+    {
+      "nodeKey": "PLAN",
+      "motherSceneKey": "TEAM_PROJECT",
+      "title": "Plan a classroom display",
+      "stimulus": "Your fictional student team has two blank display panels and has not yet divided the work. What would you do first?"
+    },
+    {
+      "nodeKey": "REVIEW",
+      "motherSceneKey": "TEAM_PROJECT",
+      "title": "Review the shared display",
+      "stimulus": "The fictional team now has a draft for each panel. One title appears on both drafts. What would you do next?"
+    }
+  ],
+  "questions": [
+    {
+      "nodeKey": "PLAN",
+      "questionKey": "PLAN_CHOICE",
+      "prompt": "Choose your first action.",
+      "kind": "CORE",
+      "purpose": "BEHAVIOR_TENDENCY",
+      "required": true,
+      "order": 0
+    },
+    {
+      "nodeKey": "PLAN",
+      "questionKey": "PLAN_PROBE",
+      "prompt": "After confirming that action, which information would you look for?",
+      "kind": "NOMINAL",
+      "purpose": "APPRAISAL",
+      "required": false,
+      "order": 1
+    },
+    {
+      "nodeKey": "REVIEW",
+      "questionKey": "REVIEW_CHOICE",
+      "prompt": "Choose your next action.",
+      "kind": "CORE",
+      "purpose": "BEHAVIOR_TENDENCY",
+      "required": true,
+      "order": 0
+    },
+    {
+      "nodeKey": "REVIEW",
+      "questionKey": "REVIEW_PROBE",
+      "prompt": "After confirming that action, how would you check the next step?",
+      "kind": "NOMINAL",
+      "purpose": "APPRAISAL",
+      "required": false,
+      "order": 1
+    }
+  ],
+  "options": [
+    {
+      "questionKey": "PLAN_CHOICE",
+      "optionKey": "A",
+      "label": "Ask the team to agree on a task for each panel."
+    },
+    {
+      "questionKey": "PLAN_CHOICE",
+      "optionKey": "B",
+      "label": "Start drawing one panel without discussing the division."
+    },
+    {
+      "questionKey": "PLAN_CHOICE",
+      "optionKey": "U",
+      "label": "I cannot judge this fictional situation.",
+      "nonanswerReason": "UNABLE_TO_JUDGE"
+    },
+    {
+      "questionKey": "PLAN_PROBE",
+      "optionKey": "CHECK",
+      "label": "Check the written display instructions."
+    },
+    {
+      "questionKey": "PLAN_PROBE",
+      "optionKey": "ASK",
+      "label": "Ask a teammate what information they have."
+    },
+    {
+      "questionKey": "REVIEW_CHOICE",
+      "optionKey": "A",
+      "label": "Compare both drafts with the team and agree on distinct titles."
+    },
+    {
+      "questionKey": "REVIEW_CHOICE",
+      "optionKey": "B",
+      "label": "Change your own title without checking the other draft."
+    },
+    {
+      "questionKey": "REVIEW_CHOICE",
+      "optionKey": "U",
+      "label": "I cannot judge this fictional situation.",
+      "nonanswerReason": "UNABLE_TO_JUDGE"
+    },
+    {
+      "questionKey": "REVIEW_PROBE",
+      "optionKey": "CHECK",
+      "label": "Read the revised drafts side by side."
+    },
+    {
+      "questionKey": "REVIEW_PROBE",
+      "optionKey": "ASK",
+      "label": "Ask each teammate to describe the agreed next step."
+    }
+  ],
+  "transitions": [
+    {
+      "nodeKey": "PLAN",
+      "optionKey": "A",
+      "nextNodeKey": "REVIEW",
+      "bridgeText": "Later, the team meets to review the two drafts."
+    },
+    {
+      "nodeKey": "PLAN",
+      "optionKey": "B",
+      "nextNodeKey": "REVIEW",
+      "bridgeText": "Later, the team meets to review the two drafts."
+    },
+    {
+      "nodeKey": "PLAN",
+      "optionKey": "U",
+      "nextNodeKey": "REVIEW",
+      "bridgeText": "Later, the team meets to review the two drafts."
+    },
+    {
+      "nodeKey": "REVIEW",
+      "optionKey": "A",
+      "nextNodeKey": "END",
+      "bridgeText": ""
+    },
+    {
+      "nodeKey": "REVIEW",
+      "optionKey": "B",
+      "nextNodeKey": "END",
+      "bridgeText": ""
+    },
+    {
+      "nodeKey": "REVIEW",
+      "optionKey": "U",
+      "nextNodeKey": "END",
+      "bridgeText": ""
+    }
+  ],
+  "metrics": [
+    {
+      "metricKey": "coordination",
+      "label": "Synthetic coordination total",
+      "construct": "synthetic_coordination",
+      "role": "primary"
+    }
+  ],
+  "opportunities": [
+    {
+      "nodeKey": "PLAN",
+      "metricKey": "coordination",
+      "applicability": "OPPORTUNITY"
+    },
+    {
+      "nodeKey": "REVIEW",
+      "metricKey": "coordination",
+      "applicability": "OPPORTUNITY"
+    }
+  ],
+  "scores": [
+    {
+      "nodeKey": "PLAN",
+      "optionKey": "A",
+      "metricKey": "coordination",
+      "contribution": 2
+    },
+    {
+      "nodeKey": "PLAN",
+      "optionKey": "B",
+      "metricKey": "coordination",
+      "contribution": 0
+    },
+    {
+      "nodeKey": "REVIEW",
+      "optionKey": "A",
+      "metricKey": "coordination",
+      "contribution": 3
+    },
+    {
+      "nodeKey": "REVIEW",
+      "optionKey": "B",
+      "metricKey": "coordination",
+      "contribution": 1
+    }
+  ],
+  "feedback": [
+    {
+      "questionKey": "PLAN_CHOICE",
+      "optionKey": "A",
+      "kind": "ACTION",
+      "text": "You chose to discuss the division of work before starting."
+    },
+    {
+      "questionKey": "PLAN_CHOICE",
+      "optionKey": "B",
+      "kind": "ACTION",
+      "text": "You chose to begin drawing before discussing the division of work."
+    },
+    {
+      "questionKey": "PLAN_CHOICE",
+      "optionKey": "U",
+      "kind": "ACTION",
+      "text": "You did not provide an action judgment for the planning situation."
+    },
+    {
+      "questionKey": "PLAN_PROBE",
+      "optionKey": "CHECK",
+      "kind": "PROBE",
+      "text": "You identified the written instructions as a possible information source."
+    },
+    {
+      "questionKey": "PLAN_PROBE",
+      "optionKey": "ASK",
+      "kind": "PROBE",
+      "text": "You identified a teammate as a possible information source."
+    },
+    {
+      "questionKey": "REVIEW_CHOICE",
+      "optionKey": "A",
+      "kind": "ACTION",
+      "text": "You chose to compare the drafts and agree on titles together."
+    },
+    {
+      "questionKey": "REVIEW_CHOICE",
+      "optionKey": "B",
+      "kind": "ACTION",
+      "text": "You chose to revise your own title without comparing the drafts."
+    },
+    {
+      "questionKey": "REVIEW_CHOICE",
+      "optionKey": "U",
+      "kind": "ACTION",
+      "text": "You did not provide an action judgment for the review situation."
+    },
+    {
+      "questionKey": "REVIEW_PROBE",
+      "optionKey": "CHECK",
+      "kind": "PROBE",
+      "text": "You chose to check the revised drafts directly."
+    },
+    {
+      "questionKey": "REVIEW_PROBE",
+      "optionKey": "ASK",
+      "kind": "PROBE",
+      "text": "You chose to ask teammates to describe the next step."
+    }
+  ],
+  "comparisons": [],
+  "cases": [
+    {
+      "name": "path-A-A",
+      "responses": [
+        {
+          "nodeKey": "PLAN",
+          "questionKey": "PLAN_CHOICE",
+          "responseValue": "A"
+        },
+        {
+          "nodeKey": "PLAN",
+          "questionKey": "PLAN_PROBE",
+          "responseValue": "CHECK"
+        },
+        {
+          "nodeKey": "REVIEW",
+          "questionKey": "REVIEW_CHOICE",
+          "responseValue": "A"
+        },
+        {
+          "nodeKey": "REVIEW",
+          "questionKey": "REVIEW_PROBE",
+          "responseValue": "ASK"
+        }
+      ],
+      "expected": {
+        "coordination": 5
+      }
+    },
+    {
+      "name": "path-A-B",
+      "responses": [
+        {
+          "nodeKey": "PLAN",
+          "questionKey": "PLAN_CHOICE",
+          "responseValue": "A"
+        },
+        {
+          "nodeKey": "PLAN",
+          "questionKey": "PLAN_PROBE",
+          "responseValue": "ASK"
+        },
+        {
+          "nodeKey": "REVIEW",
+          "questionKey": "REVIEW_CHOICE",
+          "responseValue": "B"
+        },
+        {
+          "nodeKey": "REVIEW",
+          "questionKey": "REVIEW_PROBE",
+          "responseValue": "CHECK"
+        }
+      ],
+      "expected": {
+        "coordination": 3
+      }
+    },
+    {
+      "name": "path-B-A",
+      "responses": [
+        {
+          "nodeKey": "PLAN",
+          "questionKey": "PLAN_CHOICE",
+          "responseValue": "B"
+        },
+        {
+          "nodeKey": "PLAN",
+          "questionKey": "PLAN_PROBE",
+          "responseValue": "CHECK"
+        },
+        {
+          "nodeKey": "REVIEW",
+          "questionKey": "REVIEW_CHOICE",
+          "responseValue": "A"
+        },
+        {
+          "nodeKey": "REVIEW",
+          "questionKey": "REVIEW_PROBE",
+          "responseValue": "CHECK"
+        }
+      ],
+      "expected": {
+        "coordination": 3
+      }
+    },
+    {
+      "name": "path-B-B",
+      "responses": [
+        {
+          "nodeKey": "PLAN",
+          "questionKey": "PLAN_CHOICE",
+          "responseValue": "B"
+        },
+        {
+          "nodeKey": "PLAN",
+          "questionKey": "PLAN_PROBE",
+          "responseValue": "ASK"
+        },
+        {
+          "nodeKey": "REVIEW",
+          "questionKey": "REVIEW_CHOICE",
+          "responseValue": "B"
+        },
+        {
+          "nodeKey": "REVIEW",
+          "questionKey": "REVIEW_PROBE",
+          "responseValue": "ASK"
+        }
+      ],
+      "expected": {
+        "coordination": 1
+      }
+    },
+    {
+      "name": "path-A-U",
+      "responses": [
+        {
+          "nodeKey": "PLAN",
+          "questionKey": "PLAN_CHOICE",
+          "responseValue": "A"
+        },
+        {
+          "nodeKey": "PLAN",
+          "questionKey": "PLAN_PROBE",
+          "responseValue": "CHECK"
+        },
+        {
+          "nodeKey": "REVIEW",
+          "questionKey": "REVIEW_CHOICE",
+          "responseValue": "U"
+        },
+        {
+          "nodeKey": "REVIEW",
+          "questionKey": "REVIEW_PROBE",
+          "responseValue": "ASK"
+        }
+      ],
+      "expected": {
+        "coordination": null
+      }
+    },
+    {
+      "name": "path-B-U",
+      "responses": [
+        {
+          "nodeKey": "PLAN",
+          "questionKey": "PLAN_CHOICE",
+          "responseValue": "B"
+        },
+        {
+          "nodeKey": "PLAN",
+          "questionKey": "PLAN_PROBE",
+          "responseValue": "ASK"
+        },
+        {
+          "nodeKey": "REVIEW",
+          "questionKey": "REVIEW_CHOICE",
+          "responseValue": "U"
+        },
+        {
+          "nodeKey": "REVIEW",
+          "questionKey": "REVIEW_PROBE",
+          "responseValue": "CHECK"
+        }
+      ],
+      "expected": {
+        "coordination": null
+      }
+    },
+    {
+      "name": "path-U-A",
+      "responses": [
+        {
+          "nodeKey": "PLAN",
+          "questionKey": "PLAN_CHOICE",
+          "responseValue": "U"
+        },
+        {
+          "nodeKey": "PLAN",
+          "questionKey": "PLAN_PROBE",
+          "responseValue": "CHECK"
+        },
+        {
+          "nodeKey": "REVIEW",
+          "questionKey": "REVIEW_CHOICE",
+          "responseValue": "A"
+        },
+        {
+          "nodeKey": "REVIEW",
+          "questionKey": "REVIEW_PROBE",
+          "responseValue": "CHECK"
+        }
+      ],
+      "expected": {
+        "coordination": null
+      }
+    },
+    {
+      "name": "path-U-B",
+      "responses": [
+        {
+          "nodeKey": "PLAN",
+          "questionKey": "PLAN_CHOICE",
+          "responseValue": "U"
+        },
+        {
+          "nodeKey": "PLAN",
+          "questionKey": "PLAN_PROBE",
+          "responseValue": "ASK"
+        },
+        {
+          "nodeKey": "REVIEW",
+          "questionKey": "REVIEW_CHOICE",
+          "responseValue": "B"
+        },
+        {
+          "nodeKey": "REVIEW",
+          "questionKey": "REVIEW_PROBE",
+          "responseValue": "ASK"
+        }
+      ],
+      "expected": {
+        "coordination": null
+      }
+    },
+    {
+      "name": "path-U-U",
+      "responses": [
+        {
+          "nodeKey": "PLAN",
+          "questionKey": "PLAN_CHOICE",
+          "responseValue": "U"
+        },
+        {
+          "nodeKey": "PLAN",
+          "questionKey": "PLAN_PROBE",
+          "responseValue": "CHECK"
+        },
+        {
+          "nodeKey": "REVIEW",
+          "questionKey": "REVIEW_CHOICE",
+          "responseValue": "U"
+        },
+        {
+          "nodeKey": "REVIEW",
+          "questionKey": "REVIEW_PROBE",
+          "responseValue": "ASK"
+        }
+      ],
+      "expected": {
+        "coordination": null
+      }
+    },
+    {
+      "name": "optional-probes-skipped",
+      "responses": [
+        {
+          "nodeKey": "PLAN",
+          "questionKey": "PLAN_CHOICE",
+          "responseValue": "A"
+        },
+        {
+          "nodeKey": "REVIEW",
+          "questionKey": "REVIEW_CHOICE",
+          "responseValue": "A"
+        }
+      ],
+      "expected": {
+        "coordination": 5
+      }
+    }
+  ]
+}

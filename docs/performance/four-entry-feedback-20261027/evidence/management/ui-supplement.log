@@ -1,0 +1,13 @@
+
+ RUN  v4.1.11 /workspace/eduK12-new-version/server-version/frontend
+
+ ✓ src/components/education-tools/EducationAssessmentResourcePicker.test.tsx (25 tests | 16 skipped) 577ms
+ ✓ src/components/education-tools/EducationAssessmentManagement.test.tsx (2 tests) 754ms
+     ✓ binds Teacher organization, event, run and version while keeping group Form configuration independent  513ms
+
+ Test Files  2 passed (2)
+      Tests  11 passed | 16 skipped (27)
+   Start at  08:50:30
+   Duration  7.50s (transform 3.91s, setup 2.44s, import 3.78s, tests 1.33s, environment 4.70s)
+
+JSON report written to /tmp/pr363-education-management/ui-supplement.json

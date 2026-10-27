@@ -4,8 +4,8 @@ export type ContentCapability = 'reference.analyze' | 'reference.review' | 'refe
 export type AdminContentGrant = {
   subjectId: string
   scope: {
-    product: 'SURVEY' | 'TRAINING'
-    scopeKind: 'PROJECT' | 'COURSE' | 'PLATFORM'
+    product: 'SURVEY' | 'TRAINING' | 'SCHOOL' | 'TEACHER'
+    scopeKind: 'PROJECT' | 'COURSE' | 'PLATFORM' | 'ORGANIZATION'
     scopeId: string
     resourceKind: 'reference' | 'data' | 'report' | 'measurement' | 'catalog' | 'material'
     resourceKeys: string[]

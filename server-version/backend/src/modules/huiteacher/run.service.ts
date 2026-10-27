@@ -1,3 +1,4 @@
+import {assertTeacherPersonalAssessmentPolicy} from './assessmentRunPolicy'
 import {addPrivateScaleRunTrack,addPrivateFormRunTrack} from '../education-tools/private-tool.run-adapter'
 import {listEducationLibraryResourcePage} from '../scale-library-governance/education-catalog'
 import {canonicalHash} from '../assessment-runtime/canonical'
@@ -58,9 +59,11 @@ async function activeLink(input:{
 type Key={organizationId:string;eventId:string;actorUserId:string}
 export async function addTeacherRunTrack(input:Key&{
   resource:RunResourceRef;subjectSelector:unknown;respondentSelector:unknown;
-  requestedPolicy:RunTrackNarrowingRequest
+  requestedPolicy:RunTrackNarrowingRequest;expectedVersion?:number;expectedRunId?:string
 }){
   const link=await activeLink(input)
+  if(input.resource.key.startsWith('education-assessment:')&&input.expectedRunId!==link.runId)
+    fail('HUITEACHER_RUN_BINDING_CHANGED')
   if(link.eventStatus!=='DRAFT'||link.runStatus!=='DRAFT')
     fail('HUITEACHER_RUN_NOT_DRAFT')
   // A configured STUDENT->TEACHER Run can only receive the exact immutable
@@ -92,7 +95,7 @@ export async function addTeacherRunTrack(input:Key&{
     ||input.requestedPolicy.analysisMode!=='INDIVIDUAL_ONLY'))
     fail('HUITEACHER_PERSONAL_SCALE_RELEASE_REQUIRED',403)
   if(!['FORM','SCALE'].includes(input.resource.family))
-    fail('HUITEACHER_RESOURCE_KIND_UNSUPPORTED',403)
+    assertTeacherPersonalAssessmentPolicy(policy,input.requestedPolicy)
   if(!policy.subjectRoles.includes('TEACHER')
     ||!input.requestedPolicy.subjectRoles.includes('TEACHER'))
     fail('HUITEACHER_RESOURCE_TARGET_UNSUPPORTED',403)
@@ -104,6 +107,8 @@ export async function addTeacherRunTrack(input:Key&{
   await assertRegisteredResourceUse(input.resource,input.actorUserId,prisma,false,{organizationId:input.organizationId,runId:link.runId})
   return addAssessmentRunTrackDraft({
     actorUserId:input.actorUserId,
+    expectedVersion:input.expectedVersion,
+    ...(input.resource.key.startsWith('education-assessment:')?{expectedRunId:input.expectedRunId,educationWorkflow:{product:'TEACHER' as const,id:input.eventId}}:{}),
     organizationId:input.organizationId,runId:link.runId,
     resource:input.resource,subjectSelector:input.subjectSelector,
     respondentSelector:input.respondentSelector,requestedPolicy,

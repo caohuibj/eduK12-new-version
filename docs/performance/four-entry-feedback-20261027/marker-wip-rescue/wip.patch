@@ -1,0 +1,292 @@
+diff --git a/server-version/backend/src/modules/composite/training-content-binding.ts b/server-version/backend/src/modules/composite/training-content-binding.ts
+index 1f657f213..3658b0422 100644
+--- a/server-version/backend/src/modules/composite/training-content-binding.ts
++++ b/server-version/backend/src/modules/composite/training-content-binding.ts
+@@ -1,3 +1,4 @@
++import {educationMarkerBindingSchema,readEducationMarkerSource} from '../education-tools/assessment-resource.marker'
+ import {readPrivateRuntimeScaleSource,assertPrivateRuntimeCompositeIdentity} from '../education-tools/private-tool.runtime-source'
+ import {readLibraryScaleMeasurementSource} from '../scale-library-governance/training-source'
+ import {trainingReferencePolicySchema} from './training-reference-selection'
+@@ -23,7 +24,7 @@ import { situationalReleaseKey, type ResolvedSituationalRelease } from '../situa
+ 
+ const text=z.string().min(1).max(240),digest=z.string().regex(/^[a-f0-9]{64}$/)
+ const sourceSchema=z.object({kind:z.enum(['SCALE','COGNITIVE_CONFIG','SJT_AUTHOR_RELEASE','STATIC_SJT_REGISTRY']),id:text,ownerId:text.optional(),
+-  standardCombination:trainingStandardItemSourceSchema.optional(),libraryEntryId:z.string().guid().optional(),privateVersionId:z.string().guid().optional(),assignmentId:text.optional(),instrumentKey:text.optional(),instrumentVersion:text.optional()}).strict().superRefine((source,ctx)=>{
++  educationBinding:educationMarkerBindingSchema.optional(),standardCombination:trainingStandardItemSourceSchema.optional(),libraryEntryId:z.string().guid().optional(),privateVersionId:z.string().guid().optional(),assignmentId:text.optional(),instrumentKey:text.optional(),instrumentVersion:text.optional()}).strict().superRefine((source,ctx)=>{
+  if(source.standardCombination&&(source.kind!=='SCALE'||source.libraryEntryId||source.privateVersionId||source.id!==source.standardCombination.reference.scaleId))ctx.addIssue({code:'custom',message:'Standard combination must retain its installed Scale identity'})
+  if(source.privateVersionId&&(source.kind!=='SCALE'||source.libraryEntryId!==undefined))ctx.addIssue({code:'custom',message:'Private Scale identity cannot alias library or other families'})
+  if(source.libraryEntryId&&source.kind!=='SCALE')ctx.addIssue({code:'custom',message:'Library identity is only valid for Scale'})
+@@ -115,8 +116,12 @@ export async function prepareTrainingContentSnapshot(db:Prisma.TransactionClient
+     const source:Unit['source']={kind:row.kind,id:row.id,...(row.library_entry_id?{libraryEntryId:row.library_entry_id}:{}),...(row.kind==='STATIC_SJT_REGISTRY'?{}:{ownerId:row.owner_id??item.cognitiveAssignment?.createdBy}),
+       ...(item.type==='COGNITIVE'?{assignmentId:item.cognitiveAssignment.id}:{}),
+       ...(identity?{instrumentKey:identity.instrumentKey,instrumentVersion:identity.instrumentVersion}:{})}
++    const original=trainingContentSnapshotSchema.safeParse((composite as any).trainingContentSnapshot)
++    const privateId=original.success?original.data.units.find(unit=>unit.itemId===item.id)?.source.privateVersionId:undefined
++    const privateSource=privateId?await readExactPrivateSource(db,release,{...source,privateVersionId:privateId}):null
++    if(privateSource)source.privateVersionId=privateId
+     const library=source.libraryEntryId?await readExactLibrarySource(db,release,source,'NEW_USE'):null
+-    if(!library)assertScope(release,source)
++    if(!library&&!privateSource)assertScope(release,source)
+     if(library&&canonicalHash(item.scale.definition)!==canonicalHash(library.definition))fail('SOURCE_MISMATCH')
+     const expected=projectActualMeasurement(item,release,resolvedSituational,Boolean(library))
+     const projected=prepareRelease(expected)
+@@ -190,7 +195,15 @@ export async function trainingMeasurementSourceScopeMatchesForConsumer(db:Prisma
+   const exact=await readTrainingStandardContentIdentity(db,{itemId:context.itemId,family:'SCALE',source,measurement:{releaseId:release.releaseId,contentHash:release.contentHash,measurementHash:release.content.measurementHash}},context)
+   return exact.measurement.releaseId===release.releaseId&&exact.measurement.contentHash===release.contentHash
+  }
+- if(source.privateVersionId){await readExactPrivateSource(db,release,source);return true}
++ if(source.privateVersionId){
++  const exact=await readExactPrivateSource(db,release,source)
++  if(source.educationBinding){
++   if(!context)fail('SCOPE_DENIED')
++   const proof=await readEducationMarkerSource(db,source.educationBinding,context)
++   if(proof.binding.product!==exact.version.entry||proof.binding.organizationId!==exact.version.organizationId||proof.binding.ownerId!==exact.version.ownerUserId)fail('SCOPE_DENIED')
++  }
++  return true
++ }
+  if(!source.libraryEntryId)return trainingMeasurementSourceScopeMatches(release,source)
+  await readExactLibrarySource(db,release,source,'FROZEN_IDENTITY')
+  return true
+@@ -249,7 +262,12 @@ export async function prepareTrainingContentAttemptBinding(db:Prisma.Transaction
+       ||release.contentHash!==unit.measurement.contentHash||release.content.measurementHash!==unit.measurement.measurementHash)fail('BINDING_INVALID')
+     const library=unit.source.libraryEntryId?await readExactLibrarySource(db,release,unit.source,'FROZEN_IDENTITY'):null
+     const privateSource=unit.source.privateVersionId?await readExactPrivateSource(db,release,unit.source):null
+-    if(privateSource)await assertPrivateRuntimeCompositeIdentity(db,input.compositeId,unit.source.id,unit.source.privateVersionId!)
++    if(privateSource){
++      if(unit.source.educationBinding){
++       const exact=await readEducationMarkerSource(db,unit.source.educationBinding,{compositeId:input.compositeId,itemId:unit.itemId,ownerId:input.composite.createdBy!},'NEW_USE')
++       if(exact.binding.product!==privateSource.version.entry||exact.binding.organizationId!==privateSource.version.organizationId||exact.binding.ownerId!==privateSource.version.ownerUserId)fail('SCOPE_DENIED')
++      }else await assertPrivateRuntimeCompositeIdentity(db,input.compositeId,unit.source.id,unit.source.privateVersionId!)
++    }
+     if(!library&&!privateSource)assertScope(release,unit.source)
+     if((library||privateSource)&&canonicalHash(item.scale.definition)!==canonicalHash((library??privateSource)!.definition))fail('SOURCE_MISMATCH')
+     const expected=projectActualMeasurement(item,release,input.resolvedSituational,Boolean(library||privateSource))
+diff --git a/server-version/backend/src/modules/composite/training-standard-collection.ts b/server-version/backend/src/modules/composite/training-standard-collection.ts
+index 5b59b9feb..03950dbcc 100644
+--- a/server-version/backend/src/modules/composite/training-standard-collection.ts
++++ b/server-version/backend/src/modules/composite/training-standard-collection.ts
+@@ -60,7 +60,7 @@ export async function assertTrainingStandardCollectionAllowed(tx:Prisma.Transact
+    if(canonicalHash(current.reference.measurement)!==canonicalHash(unit.measurement))throw new ContentReleaseError('CONTENT_TRAINING_STANDARD_FROZEN_IDENTITY_CHANGED')
+    // New admission also requires the approved combination to have admitted
+    // Training explicitly; already-admitted executions skip this re-check.
+-   await assertToolEntryPolicy(tx,{resourceKey:'standard-release:'+current.reference.combination.releaseId,fingerprint:current.reference.combination.combinationHash},'TRAINING')
++   if(!unit.source.educationBinding)await assertToolEntryPolicy(tx,{resourceKey:'standard-release:'+current.reference.combination.releaseId,fingerprint:current.reference.combination.combinationHash},'TRAINING')
+   }
+   exactScaleIds.add(item.scaleId!)
+  }
+diff --git a/server-version/backend/src/modules/composite/training-standard-combination.ts b/server-version/backend/src/modules/composite/training-standard-combination.ts
+index e45b0aa4d..9aec329ae 100644
+--- a/server-version/backend/src/modules/composite/training-standard-combination.ts
++++ b/server-version/backend/src/modules/composite/training-standard-combination.ts
+@@ -1,3 +1,4 @@
++import {readEducationMarkerSource} from '../education-tools/assessment-resource.marker'
+ import {assertToolEntryPolicy} from '../assessment-governance/tool-entry-policy'
+ import {Prisma} from '@prisma/client'
+ import {z} from 'zod'
+@@ -99,7 +100,18 @@ export function trainingStandardCombinationSummary(raw:unknown){
+   CONTENT:combination.axes.CONTENT.version,PARAMETERS:combination.axes.PARAMETERS.version,REPORT:combination.axes.REPORT.version}}
+ }
+ 
+-export async function verifyStoredTrainingStandardItem(tx:Prisma.TransactionClient,composite:any,item:any,purpose:Purpose='NEW_REFERENCE'){
++export async function verifyStoredTrainingStandardItem(tx:Prisma.TransactionClient,composite:any,item:any,purpose:Purpose='NEW_REFERENCE'):Promise<Awaited<ReturnType<typeof prepareTrainingStandardItemSource>>>{
++ if(composite.productKind==='ORGANIZATION_RESOURCE'){
++  const snapshot=composite.trainingContentSnapshot as {units?:Array<{itemId:string;source:{educationBinding?:unknown}}> }|null
++  const binding=snapshot?.units?.find(unit=>unit.itemId===item.id)?.source.educationBinding
++  if(!binding)fail('EDUCATION_BINDING_REQUIRED')
++  const exact=await readEducationMarkerSource(tx,binding,{compositeId:composite.id,itemId:item.id,ownerId:composite.createdBy},'NEW_USE')
++  if(canonicalHash(item.standardCombinationSource)!==canonicalHash(exact.item.standardCombinationSource))fail('BINDING_IDENTITY_MISMATCH')
++  // The independently published education delivery and its pinned target
++  // distribution grants authorize this entry; original Training source rights
++  // are separately rechecked by the recursive original-container verifier.
++  return verifyStoredTrainingStandardItem(tx,exact.source,exact.item,purpose)
++ }
+  const stored=decodeTrainingStandardItemSource(item.standardCombinationSource,{compositeId:composite.id,itemId:item.id,scaleId:item.scaleId,ownerId:composite.createdBy})
+  const r=stored.reference,current=await prepareTrainingStandardItemSource(tx,r.ownerId,composite,item,r.combination,purpose,r.authority.useGrantId,r.authority.useGrantVersion)
+  if(current.referenceHash!==stored.referenceHash)fail('FROZEN_IDENTITY_CHANGED')
+diff --git a/server-version/backend/src/modules/composite/training-standard-content.ts b/server-version/backend/src/modules/composite/training-standard-content.ts
+index 19355a73f..ed86872d5 100644
+--- a/server-version/backend/src/modules/composite/training-standard-content.ts
++++ b/server-version/backend/src/modules/composite/training-standard-content.ts
+@@ -1,3 +1,4 @@
++import {readEducationMarkerSource,type EducationMarkerBinding} from '../education-tools/assessment-resource.marker'
+ import type {Prisma} from '@prisma/client'
+ import {canonicalHash} from '../assessment-runtime/canonical'
+ import {readCurrentStandardCombination} from '../measurement-content/standard-combination-source'
+@@ -5,12 +6,14 @@ import {assertStandardCombinationDerivedRelease} from '../measurement-content/st
+ import type {StoredRelease} from '../measurement-content/repository'
+ import {ContentReleaseError} from '../measurement-content/release'
+ import {decodeTrainingStandardItemSource,type TrainingStandardItemSource} from './training-standard-combination'
+-type Unit={itemId:string;family:string;source:{id:string;standardCombination?:TrainingStandardItemSource};measurement:{releaseId:string;contentHash:string;measurementHash:string}}
++type Unit={itemId:string;family:string;source:{id:string;educationBinding?:EducationMarkerBinding;standardCombination?:TrainingStandardItemSource};measurement:{releaseId:string;contentHash:string;measurementHash:string}}
+ function fail():never{throw new ContentReleaseError('CONTENT_TRAINING_STANDARD_CONTENT_IDENTITY_MISMATCH')}
+ /** Immutable provenance only, after the caller's real container/data ACL. This
+  * never evaluates a current use grant or changes historical report policy. */
+ export async function readTrainingStandardContentIdentity(tx:Prisma.TransactionClient,unit:Unit,context:{compositeId:string;ownerId:string}){
+- const stored=decodeTrainingStandardItemSource(unit.source.standardCombination,{compositeId:context.compositeId,ownerId:context.ownerId,itemId:unit.itemId,scaleId:unit.source.id})
++ const exact=unit.source.educationBinding?await readEducationMarkerSource(tx,unit.source.educationBinding,{...context,itemId:unit.itemId}):null
++ const original=exact?{compositeId:exact.source.id,ownerId:exact.source.createdBy!,itemId:exact.item.id,scaleId:unit.source.id}:{...context,itemId:unit.itemId,scaleId:unit.source.id}
++ const stored=decodeTrainingStandardItemSource(unit.source.standardCombination,original)
+  const r=stored.reference,source=await readCurrentStandardCombination(tx,r.combination,'HISTORY')
+  if(unit.family!=='SCALE'||canonicalHash(unit.measurement)!==canonicalHash(r.measurement)
+   ||source.measurement.releaseId!==r.measurement.releaseId||source.measurement.contentHash!==r.measurement.contentHash
+diff --git a/server-version/backend/src/modules/education-tools/assessment-resource.service.ts b/server-version/backend/src/modules/education-tools/assessment-resource.service.ts
+index cbcd1cffe..776747c7b 100644
+--- a/server-version/backend/src/modules/education-tools/assessment-resource.service.ts
++++ b/server-version/backend/src/modules/education-tools/assessment-resource.service.ts
+@@ -1,3 +1,6 @@
++import {decodeTrainingStandardItemSource} from '../composite/training-standard-combination'
++import {readCurrentStandardCombination} from '../measurement-content/standard-combination-source'
++import {assertStandardCombinationDerivedRelease} from '../measurement-content/standard-combination-content'
+ import {randomUUID} from 'node:crypto'
+ import {Prisma} from '@prisma/client'
+ import {z} from 'zod'
+@@ -76,6 +79,10 @@ export async function prepareEducationAssessment(c:EducationAssessmentContext,ra
+    return {...projection(p),created:false,units:p.snapshot.units.map(unit=>({itemId:unit.itemId,family:unit.family,measurement:unit.measurement})),canPublish:false}
+   }
+   const {source,content}=await readEducationAssessmentSource(tx,input.sourceCompositeId,identities,c.product)
++  for(const unit of content.snapshot.units)if(unit.source.privateVersionId){
++   const version=await tx.educationPrivateToolVersion.findUnique({where:{id:unit.source.privateVersionId}})
++   if(!version||version.entry!==c.product||version.organizationId!==c.organizationId||version.ownerUserId!==c.principal.userId)fail('EDUCATION_ASSESSMENT_PRIVATE_OWNER_REQUIRED',403)
++  }
+   const assets=educationAssessmentAssets(source,content.releases.values())
+   await assertEducationAssessmentAssets(tx,assets)
+   const distribution=await assertEducationAssessmentDistribution(tx,{...c,actorId:c.principal.userId,selection:input.licenses,
+@@ -91,7 +98,7 @@ export async function prepareEducationAssessment(c:EducationAssessmentContext,ra
+     formType:item.formType,formLabel:item.formLabel,formPlaceholder:item.formPlaceholder,formOptions:item.formOptions??Prisma.DbNull,formPolicy:item.formPolicy??Prisma.DbNull,
+     formDefinition:item.formDefinition??Prisma.DbNull,contextKey:item.contextKey,formSectionId:item.formSectionId?sections.get(item.formSectionId)!:null,
+     formSectionPosition:item.formSectionPosition,standardCombinationSource:item.standardCombinationSource??Prisma.DbNull}))}},include:educationCompositeInclude})
+-  const snapshot=trainingContentSnapshotSchema.parse({schemaVersion:1,compositeId:runtime.id,units:content.snapshot.units.map(unit=>({itemId:items.get(unit.itemId)!,family:unit.family,source:unit.source,measurement:unit.measurement}))})
++  const snapshot=trainingContentSnapshotSchema.parse({schemaVersion:1,compositeId:runtime.id,units:content.snapshot.units.map(unit=>({itemId:items.get(unit.itemId)!,family:unit.family,source:{...unit.source,...(unit.source.standardCombination||unit.source.privateVersionId?{educationBinding:{schemaVersion:1,product:c.product,organizationId:c.organizationId,resourceId:input.resourceId,sourceCompositeId:source.id,sourceItemId:unit.itemId,runtimeCompositeId:runtime.id,runtimeItemId:items.get(unit.itemId)!,ownerId:c.principal.userId}}:{})},measurement:unit.measurement}))})
+   const p=preparationSchema.parse({schemaVersion:1,resourceId:input.resourceId,...{product:c.product,organizationId:c.organizationId},family:input.family,sourceCompositeId:source.id,
+    sourceSnapshotHash:canonicalHash(source.trainingContentSnapshot),sourceDefinitionHash:canonicalHash(buildTrainingFlowUnits(source)),runtimeCompositeId:runtime.id,
+    runtimeSnapshotHash:canonicalHash(snapshot),runtimeDefinitionHash:canonicalHash(buildTrainingFlowUnits(runtime)),snapshot,title:input.title,createdAuthority:actor,distribution})
+@@ -135,7 +142,12 @@ async function selectedContent(tx:Tx,c:EducationAssessmentContext,p:Preparation,
+    const reference=releases.get(selected.releaseId)
+    if(!reference||reference.layer!=='REFERENCE'||reference.family!==unit.family||reference.content.measurement.releaseId!==measurement.releaseId
+     ||reference.content.measurement.contentHash!==measurement.contentHash)fail('EDUCATION_ASSESSMENT_REFERENCE_MISMATCH')
+-   if(reference.scope.kind==='PLATFORM')await resolveFormalReferenceRelease(tx,{releaseId:reference.releaseId,contentHash:reference.contentHash,measurementReleaseId:measurement.releaseId,purpose:'NEW_BINDING'},reference)
++   if(reference.scope.kind==='PLATFORM'&&unit.source.standardCombination){
++    const marker=decodeTrainingStandardItemSource(unit.source.standardCombination)
++    const exact=await readCurrentStandardCombination(tx,marker.reference.combination)
++    if(exact.measurement.releaseId!==unit.measurement.releaseId||exact.measurement.contentHash!==unit.measurement.contentHash)fail('EDUCATION_ASSESSMENT_REFERENCE_MISMATCH')
++    assertStandardCombinationDerivedRelease(exact.row,exact.measurement,reference)
++   }else if(reference.scope.kind==='PLATFORM')await resolveFormalReferenceRelease(tx,{releaseId:reference.releaseId,contentHash:reference.contentHash,measurementReleaseId:measurement.releaseId,purpose:'NEW_BINDING'},reference)
+    else if(reference.scope.product!==c.product||reference.scope.ownerId!==p.createdAuthority.actorId||reference.scope.resourceId!==p.runtimeCompositeId)fail('EDUCATION_ASSESSMENT_REFERENCE_SCOPE',403)
+    const checked=validateReferenceSetDefinition({schemaVersion:1,instrumentType:unit.family==='COGNITIVE'?'cognitive':unit.family==='SCALE'?'scale':'sjt',
+     instrumentKey:measurement.key,referenceVersion:reference.version,status:'ACTIVE',entries:reference.content.entries.map(entry=>entry.definition)})
+diff --git a/server-version/backend/src/modules/education-tools/assessment-resource.source.ts b/server-version/backend/src/modules/education-tools/assessment-resource.source.ts
+index c5e472c16..dcd1e97e3 100644
+--- a/server-version/backend/src/modules/education-tools/assessment-resource.source.ts
++++ b/server-version/backend/src/modules/education-tools/assessment-resource.source.ts
+@@ -12,7 +12,7 @@ import {educationManagementFail as fail} from './assessment-resource.issuer'
+ import {frozenDatabaseScaleDefinition} from '../scale/scale-workflow.service'
+ import {assertScalePublicationRights} from '../scale/scale-publication-guard'
+ 
+-export const educationCompositeInclude={items:{orderBy:{position:'asc' as const},include:{scale:true,cognitiveAssignment:{include:{config:true}}}},formSections:{orderBy:{position:'asc' as const},include:{items:{orderBy:{position:'asc' as const}}}}}
++export const educationCompositeInclude={questionnaireCourses:true,items:{orderBy:{position:'asc' as const},include:{scale:true,cognitiveAssignment:{include:{config:true}}}},formSections:{orderBy:{position:'asc' as const},include:{items:{orderBy:{position:'asc' as const}}}}}
+ /** Lock these advisory source identities before Org/User/Composite row locks.
+  * The initial item read orders locks only; readEducationAssessmentSource then
+  * verifies the same exact identities under the composite lock. */
+@@ -70,7 +70,7 @@ export async function readEducationAssessmentSource(tx:Prisma.TransactionClient,
+   if(!['participant_self_report',product==='TEACHER'?'teacher_self_report':'student_self_report'].includes(definition.respondentType))fail('EDUCATION_ASSESSMENT_SELF_SOURCE_REQUIRED',403)
+   if(definition.license.status==='unknown'||definition.license.redistribution==='unknown')fail('EDUCATION_ASSESSMENT_SOURCE_RIGHTS_UNKNOWN',403)
+  }
+- await assertScalePublicationRights(tx,owner.id,owner.role,scales.map(item=>item.scaleId!))
++ await assertScalePublicationRights(tx,owner.id,owner.role,scales.filter(item=>item.standardCombinationSource===null).map(item=>item.scaleId!))
+  for(const item of source.items)if(item.type==='COGNITIVE'&&item.cognitiveAssignment?.config.accessPolicy==='GRANT'){
+   const author=await tx.user.findUnique({where:{id:item.cognitiveAssignment.createdBy!}})
+   if(!author||!author.isActive||author.isFrozen||author.mustChangePassword||author.expiresAt&&author.expiresAt<=new Date())fail('EDUCATION_ASSESSMENT_SOURCE_OWNER_UNAVAILABLE',403)
+diff --git a/server-version/backend/src/__tests__/education-tools/assessment-resource.marker.postgres.integration.test.ts b/server-version/backend/src/__tests__/education-tools/assessment-resource.marker.postgres.integration.test.ts
+new file mode 100644
+index 000000000..cb5537b1f
+--- /dev/null
++++ b/server-version/backend/src/__tests__/education-tools/assessment-resource.marker.postgres.integration.test.ts
+@@ -0,0 +1,52 @@
++import {randomUUID} from 'node:crypto'
++import {beforeAll,afterAll,describe,it,expect} from 'vitest'
++import {prisma as db} from '../../config/database'
++import {integrationDatabaseUrl,requireIsolatedReleaseDatabase} from '../integration/integration-env'
++import * as tools from '../../modules/education-tools/private-tool.service'
++import {preparePrivateScaleRuntimeResource} from '../../modules/education-tools/private-tool.runtime-resources'
++import {compileResearchScale} from '../../modules/survey/builder.compiler'
++import {issueAdminContentRoot} from '../../modules/measurement-content/admin-authority.service'
++import * as service from '../../modules/education-tools/assessment-resource.service'
++import {prepareTrainingContentAttemptBinding} from '../../modules/composite/training-content-binding'
++import {readEducationMarkerSource} from '../../modules/education-tools/assessment-resource.marker'
++import {testDisclosure} from '../assessment-policy/result-disclosure.fixture'
++import type {EducationAssessmentContext} from '../../modules/education-tools/assessment-resource.issuer'
++const url=integrationDatabaseUrl('EDUCATION_MARKER_TEST_DATABASE_URL'),suite=url?describe:describe.skip
++suite('Education privateVersion real persisted source and shared START binding',()=>{
++ beforeAll(async()=>{requireIsolatedReleaseDatabase(url!);process.env.DATA_ENCRYPTION_KEY||='ab'.repeat(32);await db.$connect()})
++ afterAll(async()=>{await db.$disconnect()})
++ it('retains an owned exact version in an independent education runtime and rejects a forged source-item mapping',async()=>{
++  const system=await db.user.create({data:{username:'marker-system-'+randomUUID(),passwordHash:'synthetic-only',accountDomain:'TRAINING',platformRole:'SYSTEM_ADMIN',role:'ADMIN'}})
++  const organizationId=randomUUID();await db.organization.create({data:{id:organizationId,name:'Synthetic marker school',productDomain:'SCHOOL',createdByUserId:system.id}})
++  await db.educationProductEntitlement.create({data:{organizationId,product:'HUITEACHER',grantedByUserId:system.id}})
++  async function actor(){
++   const user=await db.user.create({data:{username:'marker-author-'+randomUUID(),passwordHash:'synthetic-only',accountDomain:'SCHOOL',role:'TEACHER',teacherApproved:true}})
++   const membershipId=randomUUID();await db.organizationMembership.create({data:{id:membershipId,organizationId,userId:user.id}})
++   await db.educationProductRoleGrant.create({data:{id:randomUUID(),organizationId,membershipId,product:'HUITEACHER',role:'PRODUCT_ADMIN',grantedByUserId:system.id}})
++   await db.organizationPersonaGrant.create({data:{id:randomUUID(),organizationId,membershipId,persona:'COUNSELOR',grantedByUserId:system.id}})
++   await db.organizationCapabilityGrant.create({data:{id:randomUUID(),organizationId,membershipId,capability:'PSYCHOLOGY_STAFF',grantedByUserId:system.id}})
++   const context:EducationAssessmentContext={product:'TEACHER',organizationId,principal:{userId:user.id,username:user.username,role:'TEACHER',platformRole:'STANDARD',accountDomain:'SCHOOL',tokenVersion:0,mustChangePassword:false}}
++   return {user,context}
++  }
++  const author=await actor(),reviewer=await actor(),c={entry:'TEACHER' as const,organizationId,principal:author.context.principal}
++  const draft=await tools.createPrivateTool(c,{kind:'SCALE',title:'Synthetic private marker'})
++  const definition=compileResearchScale(draft.title,{schemaVersion:1,respondentType:'teacher_self_report',aggregation:'mean',responseOptions:[{optionKey:'a',label:'A',score:1},{optionKey:'b',label:'B',score:2}],dimensions:[{dimensionKey:'total',label:'Total',direction:'descriptive'}],items:[{itemKey:'q',prompt:'Synthetic question',required:true,reverse:false,dimensionKeys:['total']}]})
++  const saved=await tools.updatePrivateTool(c,draft.id,{expectedRevision:draft.revision,title:draft.title,definition})
++  const version=await tools.freezePrivateTool(c,draft.id,{expectedRevision:saved.revision,expectedContentHash:saved.contentHash})
++  const original=await db.$transaction(tx=>preparePrivateScaleRuntimeResource(tx,c,{versionId:version.id,contentHash:version.contentHash,administration:{population:'TEACHER',responseMode:'SELF'}}))
++  const resourceIds=[original.compositeId,original.origin.releaseId]
++  const issued=await issueAdminContentRoot(system.id,{tokenVersion:0,adminSessionId:'synthetic-proof',adminVerifiedAt:Date.now()/1000},{requestId:randomUUID(),expectedVersion:0,reason:'Explicit exact private marker fixture',grant:{subjectId:author.user.id,scope:{product:'TEACHER',scopeKind:'ORGANIZATION',scopeId:organizationId,resourceKind:'material',resourceKeys:resourceIds},capabilities:['material.distribute'],delegableCapabilities:[],remainingDelegationDepth:0,validFrom:new Date(Date.now()-60000).toISOString(),expiresAt:new Date(Date.now()+3600000).toISOString()}})
++  const licenses=resourceIds.map(resourceId=>({resourceId,grantId:issued.grantId}))
++  const p=await service.prepareEducationAssessment(author.context,{resourceId:randomUUID(),sourceCompositeId:original.compositeId,title:'Owned private bundle',family:'BUNDLE',licenses})
++  const registered=await service.registerEducationAssessment(author.context,p.resourceId,{expectedPreparationHash:p.preparationHash,disclosure:testDisclosure(),references:{schemaVersion:1,units:[]},reports:[],licenses})
++  await service.transitionEducationAssessment(reviewer.context,p.resourceId,'REVIEW',{expectedEntryHash:registered.entryHash,reason:'Independent fixture review'})
++  await service.transitionEducationAssessment(reviewer.context,p.resourceId,'PUBLISH',{expectedEntryHash:registered.entryHash,reason:'Fixture publication'})
++  const runtime=await db.compositeAssessment.findUniqueOrThrow({where:{id:p.runtimeCompositeId},include:{items:{include:{scale:true,cognitiveAssignment:{include:{config:true}}}}}})
++  const snapshot=runtime.trainingContentSnapshot as any,binding=snapshot.units[0].source.educationBinding
++  expect(snapshot.units[0].source.privateVersionId).toBe(version.id)
++  expect(binding).toMatchObject({sourceCompositeId:original.compositeId,sourceItemId:original.compositeItemId,runtimeCompositeId:runtime.id,runtimeItemId:runtime.items[0].id})
++  const candidate=await db.$transaction(tx=>prepareTrainingContentAttemptBinding(tx,{compositeId:runtime.id,attemptId:randomUUID(),epoch:1,snapshot,snapshotHash:runtime.trainingContentSnapshotHash,composite:runtime,resolvedSituational:new Map()}))
++  expect(candidate?.binding.units[0].source.privateVersionId).toBe(version.id)
++  await expect(db.$transaction(tx=>readEducationMarkerSource(tx,{...binding,sourceItemId:randomUUID()},{compositeId:runtime.id,itemId:runtime.items[0].id,ownerId:author.user.id}))).rejects.toThrow('MARKER_IDENTITY')
++ })
++})
+diff --git a/server-version/backend/src/modules/education-tools/assessment-resource.marker.ts b/server-version/backend/src/modules/education-tools/assessment-resource.marker.ts
+new file mode 100644
+index 000000000..af889655f
+--- /dev/null
++++ b/server-version/backend/src/modules/education-tools/assessment-resource.marker.ts
+@@ -0,0 +1,30 @@
++import {z} from 'zod'
++import {Prisma} from '@prisma/client'
++import {canonicalHash} from '../assessment-runtime/canonical'
++import {EducationAssessmentSourceError,readEducationAssessmentDeliveryIdentity} from './assessment-resource.repository'
++import {assertEducationAssessmentDistributionCurrent} from './assessment-resource.distribution'
++const id=z.string().guid()
++export const educationMarkerBindingSchema=z.object({schemaVersion:z.literal(1),product:z.enum(['SCHOOL','TEACHER']),organizationId:id,resourceId:id,
++ sourceCompositeId:id,sourceItemId:id,runtimeCompositeId:id,runtimeItemId:id,ownerId:id}).strict()
++export type EducationMarkerBinding=z.infer<typeof educationMarkerBindingSchema>
++/** A persisted education binding authenticates the target container; upstream
++ * Training/private markers remain original provenance, never target permission. */
++export async function readEducationMarkerSource(tx:Prisma.TransactionClient,raw:unknown,context:{compositeId:string;itemId:string;ownerId:string},purpose:'NEW_USE'|'HISTORY'='HISTORY'){
++ const b=educationMarkerBindingSchema.parse(raw)
++ function fail():never{throw new EducationAssessmentSourceError('EDUCATION_ASSESSMENT_MARKER_IDENTITY')}
++ if(b.runtimeCompositeId!==context.compositeId||b.runtimeItemId!==context.itemId||b.ownerId!==context.ownerId)fail()
++ const identity=await readEducationAssessmentDeliveryIdentity(tx,{resourceKey:`education-assessment:${b.product}:${b.organizationId}:${b.resourceId}`,version:'1.0.0',purpose})
++ if(identity.origin.sourceCompositeId!==b.sourceCompositeId||identity.runtime.id!==b.runtimeCompositeId||identity.runtime.createdBy!==b.ownerId)fail()
++ const target=identity.runtime.items.find(item=>item.id===b.runtimeItemId)
++ const targetUnit=(identity.runtime.trainingContentSnapshot as {units:Array<{itemId:string;source:Record<string,unknown>;measurement:unknown}>}).units.find(unit=>unit.itemId===b.runtimeItemId)
++ if(!target||!targetUnit||canonicalHash(targetUnit.source.educationBinding)!==canonicalHash(b))fail()
++ await tx.$queryRaw(Prisma.sql`SELECT id FROM composite_assessments WHERE id=${b.sourceCompositeId} FOR SHARE`)
++ const source=await tx.compositeAssessment.findUnique({where:{id:b.sourceCompositeId},include:{questionnaireCourses:true,items:{include:{scale:true}}}})
++ if(!source||canonicalHash(source.trainingContentSnapshot)!==identity.origin.sourceSnapshotHash)fail()
++ const item=source.items.find(item=>item.id===b.sourceItemId)
++ const unit=(source.trainingContentSnapshot as {units:Array<{itemId:string;source:unknown;measurement:unknown}>}|null)?.units.find(unit=>unit.itemId===b.sourceItemId)
++ const {educationBinding:_,...originalSource}=targetUnit.source
++ if(!item||!unit||item.scaleId!==target.scaleId||canonicalHash(unit.source)!==canonicalHash(originalSource)||canonicalHash(unit.measurement)!==canonicalHash(targetUnit.measurement))fail()
++ if(purpose==='NEW_USE')await assertEducationAssessmentDistributionCurrent(tx,identity.origin)
++ return {binding:b,source,item,unit,identity}
++}

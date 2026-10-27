@@ -3,3 +3,7 @@
 .education-personal-report--teacher{--hui-ds-color-ink:var(--ht-ink,#362925);--hui-ds-color-muted:var(--ht-quiet,#76665e);--hui-ds-color-line:var(--ht-line,#e5d5ca);--hui-ds-color-surface:var(--ht-paper,#fffdf9);--hui-ds-color-page:var(--ht-bg,#fbf4ed);--hui-ds-color-action:var(--ht-copper,#944638)}
 .education-personal-report .report-core{background:var(--hui-ds-color-page);border-color:var(--hui-ds-color-line)}
 .education-personal-report img{max-width:100%;height:auto}
+.education-task-feedback{display:grid;gap:1rem;min-width:0;overflow-wrap:anywhere}
+.education-task-feedback h3:focus{outline:2px solid currentColor;outline-offset:4px}
+.education-feedback-actions{display:flex;flex-wrap:wrap;gap:.75rem}
+.education-task-feedback table{max-width:100%;table-layout:fixed;overflow-wrap:anywhere}

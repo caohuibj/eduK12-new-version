@@ -1,6 +1,7 @@
 import {beforeEach,afterEach,describe,it,expect,vi} from 'vitest'
-const mocks=vi.hoisted(()=>({get:vi.fn()}))
+const mocks=vi.hoisted(()=>({educationReport:vi.fn(),get:vi.fn()}))
 vi.mock('../../modules/measurement-content/repository',()=>({getContentRelease:mocks.get}))
+vi.mock('../../modules/composite/training-report-selection',()=>({validateTrainingReportPointer:mocks.educationReport}))
 import {prepareTrainingFinalReceipt,decodeTrainingFinalReceipt} from '../../modules/composite/training-content-final'
 import {canonicalHash} from '../../modules/assessment-runtime/canonical'
 import {compositeItemSlotKey} from '../../modules/assessment-runtime/slot-set'
@@ -185,4 +186,13 @@ it('handles shared measurements without reference bindings and legacy null witho
  mocks.get.mockClear();scope.mockClear()
  expect(await prepareTrainingFinalReceipt({} as never,{...f.input,parent:{...f.input.parent,trainingContentBinding:null,trainingContentBindingHash:null}})).toBeNull()
  expect(mocks.get).not.toHaveBeenCalled();expect(scope).not.toHaveBeenCalled()
+})
+
+it.each(['SCHOOL','TEACHER','PLATFORM'])('routes %s frozen reports through exact bound report validation',async product=>{
+ const f=fixture();f.report.scope=product==='PLATFORM'?{kind:'PLATFORM',product:'TRAINING',resourceId:'platform'}:{kind:'PRIVATE',product,ownerId:'owner',resourceId:'composite'}
+ const db={} as never
+ await expect(prepareTrainingFinalReceipt(db,f.input)).resolves.not.toBeNull()
+ expect(mocks.educationReport).toHaveBeenCalledWith(db,expect.objectContaining({compositeId:'composite',ownerId:'owner',reportReleaseId:rId,publication:false}))
+ mocks.educationReport.mockRejectedValue(new Error('CONTENT_EDUCATION_SCOPE_DENIED'))
+ await expect(prepareTrainingFinalReceipt(db,f.input)).rejects.toThrow('CONTENT_EDUCATION_SCOPE_DENIED')
 })

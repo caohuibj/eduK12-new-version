@@ -12,7 +12,7 @@ import {
 } from '../assessment-relational/product-registry'
 import type { RelationalResourceKindV1 } from '../assessment-relational/types'
 
-export type RunResourceFamily = RelationalResourceKindV1 | 'COGNITIVE'
+export type RunResourceFamily = RelationalResourceKindV1
 export type RunAdapterTransactionMode = 'TRANSACTIONAL_DB' | 'EXTERNAL'
 export type RunAdapterStartMode = 'TRANSACTIONAL' | 'OPERATION_KEY' | 'UNSUPPORTED'
 
@@ -277,4 +277,7 @@ export const productionRunResourceAuthorityRegistry = new RunResourceAuthorityRe
           :original.resolveExact(ref)}
   })(),
   createRelationalRunResourceAdapter({ family: 'SITUATIONAL', capabilities: transactionalCompositeCapabilities }),
+  // One cognitive tool uses the same transactional Composite parent and canonical
+  // child FINAL. This advertises capability, not approval of any source/version.
+  createRelationalRunResourceAdapter({ family: 'COGNITIVE', capabilities: transactionalCompositeCapabilities }),
 ])

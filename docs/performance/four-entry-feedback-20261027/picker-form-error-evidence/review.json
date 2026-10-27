@@ -1,0 +1,27 @@
+{
+  "base": "85e9ee0c66ada6a2b0550b9e11f3e31b96ab62ce",
+  "finding": "Root96 typed-error narrowing omitted actual InstrumentFinalSubmitError emitted by typed Form definition validation. This was independently traced, not an Actions or newly observed PG failure.",
+  "fix": "Accept only InstrumentFinalSubmitError FORM_ANSWER_INVALID with statusCode 400. Other codes/500/unknown SQL and authority contention remain failures.",
+  "check": {
+    "command": "node node_modules/vitest/vitest.mjs run src/__tests__/education-tools/assessment-resource.picker-error.test.ts -t 'actual typed Form' --reporter=json --outputFile=<retained report>",
+    "cwd": "server-version/backend",
+    "node": "24.22.1",
+    "exit": 0,
+    "passed": 1,
+    "failed": 0,
+    "filtered": 1,
+    "kind": "Real typedCompositeFormQuestion validation into actual picker filter; no mocked validator and no new PG run"
+  },
+  "inputs": {
+    "server-version/backend/src/modules/education-tools/assessment-resource.service.ts": "9c113c3a60d8d21debd763d24eeded42d29f49562b947b2036e4e3d15d72c22e",
+    "server-version/backend/src/__tests__/education-tools/assessment-resource.picker-error.test.ts": "0bb5d9d72bdb20885054ca9439ef05ec0f0e7cdc6a637c141b99fcad6c2a48cc",
+    "server-version/backend/src/services/instrumentFinalSubmit.ts": "abdd778dbb2df0883f5b975b240155ca0158fd0cd075b72a7c11c94adf72ce51",
+    "server-version/backend/src/modules/assessment-runtime/typed-form.ts": "22916625447e435c019a8a81b025895dd35f2fc39779d97b2a8199dd0e58ae4d",
+    "server-version/backend/package-lock.json": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450"
+  },
+  "artifacts": {
+    "picker-form-error.log": "678c99035e995888dbec63494b3671be0cace04c01cd545c081103579d08de08",
+    "picker-form-error.json": "4ab91d29c39f2586420f484cabb3cf31737723b358f94a5dd5db199032258cbe"
+  },
+  "reuseBoundary": "The old source PG bad-definition case is not called a new current PG pass. Its original execution and the now-directly-validated actual typed error conversion are separately retained. Other source/feedback inventory files remain historical observations, not automatic CI qualification."
+}

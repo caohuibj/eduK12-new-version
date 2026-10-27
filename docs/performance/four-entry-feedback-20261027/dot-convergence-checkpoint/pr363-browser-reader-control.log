@@ -1,0 +1,14 @@
+✔ report consumers reject empty, failed, missing, extra and unexpectedly filtered cases (12.188693ms)
+✔ main source observation cannot enter aggregate, scan, checks or browser qualification (1.956324ms)
+✔ lossless gzip transport preserves exact original reporter hash instead of relabelling the compressed bytes (4.292761ms)
+✔ browser preflight may use real command receipts but cannot replace compiled browser with preflight-only or Vitest (1.199498ms)
+✔ actual browser CLI uses same verified dist, isolated job services and canonical trusted HTTPS443 (2.609694ms)
+✔ actual browser YAML wires native fixture prerequisites and only sanitized public receipts (385.138099ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 544.267016

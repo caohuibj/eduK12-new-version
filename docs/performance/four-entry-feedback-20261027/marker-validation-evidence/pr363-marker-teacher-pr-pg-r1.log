@@ -1,0 +1,12 @@
+
+ RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend
+
+ ↓ src/__tests__/education-tools/assessment-resource.standard-marker.postgres.integration.test.ts > Education exact standard marker real approved source > performs actual approval/trials and preserves original Training rights in a separately authorized School runtime
+ ↓ src/__tests__/education-tools/assessment-resource.standard-marker.postgres.integration.test.ts > Education exact standard marker real approved source > checks exact original use at collection, rejects revocation and keeps frozen identity independently readable
+ ✓ src/__tests__/education-tools/assessment-resource.standard-marker.postgres.integration.test.ts > Education exact standard marker real approved source > selects exact approved PLATFORM parameters and a teacher-audience report for an independently reviewed Teacher delivery 676ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 2 skipped (3)
+   Start at  10:20:13
+   Duration  5.57s (transform 3.50s, setup 0ms, import 4.75s, tests 701ms, environment 0ms)
+

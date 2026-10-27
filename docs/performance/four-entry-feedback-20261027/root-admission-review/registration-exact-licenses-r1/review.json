@@ -1,0 +1,135 @@
+{
+  "kind": "pr363-root-case-review-v1",
+  "reviewer": "root dot",
+  "decision": "HOLD",
+  "admissionId": "registration-exact-licenses-r1",
+  "outcomes": [
+    "shared education registration management real client contracts freezes exact P/R, real grant ids, explicit scheduled UTC and respondent-only disclosure without publication flags",
+    "shared education registration management real client contracts requires an explicit immediate choice and supports pure Form with explicit empty P/R and completion only",
+    "shared education registration management real client contracts recovers an existing preparation by id and reloads actual source and grant choices without creating another preparation",
+    "shared education registration management real client contracts refuses multiple grant conflicts before POST rather than replacing a pinned source asset",
+    "shared education registration management real client contracts submits NONE disclosure with stable readonly policy id and only original licenses when P/R are not selected",
+    "shared education registration management real client contracts clears an old source selection when the current source list refreshes"
+  ],
+  "originalSHA256": {
+    "report": "cdc3b1abf224910e1d9382d4bc88722d06b2bb5c775a823d08b6260d065add9f",
+    "execution": "52790338d0c40b84ca4a1c30f0dd5a499000d52a79dd72f5cd40c7a348d9083f",
+    "log": "57d11ade3f3487283d9b98f36bc18f6bae8552aa62a9457d4ffcc9b3432a6a0d",
+    "inputs": "3a82d14ebc1383760c789b98b330269e53dcfa531c7be66290cb83252eee2ef2"
+  },
+  "currentInputsSHA256": "6d478502a3102331af051643f3d83495a3be38fdc744f55078cab3e588654672",
+  "originalExecution": {
+    "argv": "Recorded targeted Vitest invocation; selected files server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.test.tsx; exact filters retained by original reporter and linked progress/index",
+    "cwd": "server-version/frontend",
+    "exitCode": 1,
+    "signal": null
+  },
+  "originalReporterSummary": {
+    "success": false,
+    "numTotalTests": 13,
+    "numPassedTests": 6,
+    "numFailedTests": 1,
+    "numPendingTests": 6
+  },
+  "originalInvocationCases": [
+    {
+      "fullName": "shared education registration management real client contracts presents readable frozen metadata and preserves historical missing feedback policy without inventing defaults",
+      "status": "skipped"
+    },
+    {
+      "fullName": "shared education registration management real client contracts does not expose operations before actual issuer read succeeds and keeps denial closed",
+      "status": "skipped"
+    },
+    {
+      "fullName": "shared education registration management real client contracts freezes exact P/R, real grant ids, explicit scheduled UTC and respondent-only disclosure without publication flags",
+      "status": "passed"
+    },
+    {
+      "fullName": "shared education registration management real client contracts requires an explicit immediate choice and supports pure Form with explicit empty P/R and completion only",
+      "status": "passed"
+    },
+    {
+      "fullName": "shared education registration management real client contracts recovers a lost registration response by original id without repeating the mutation",
+      "status": "skipped"
+    },
+    {
+      "fullName": "shared education registration management real client contracts discards a pending read after organization switches",
+      "status": "skipped"
+    },
+    {
+      "fullName": "shared education registration management real client contracts recovers an existing preparation by id and reloads actual source and grant choices without creating another preparation",
+      "status": "passed"
+    },
+    {
+      "fullName": "shared education registration management real client contracts refuses multiple grant conflicts before POST rather than replacing a pinned source asset",
+      "status": "passed"
+    },
+    {
+      "fullName": "shared education registration management real client contracts disables unavailable sources and P/R without guessing missing authority",
+      "status": "failed"
+    },
+    {
+      "fullName": "shared education registration management real client contracts submits NONE disclosure with stable readonly policy id and only original licenses when P/R are not selected",
+      "status": "passed"
+    },
+    {
+      "fullName": "shared education registration management real client contracts clears an old source selection when the current source list refreshes",
+      "status": "passed"
+    },
+    {
+      "fullName": "shared education registration management real client contracts cancels a pending permission read without late resurrection",
+      "status": "skipped"
+    },
+    {
+      "fullName": "shared education registration management real client contracts reviews an independent frozen registration with its hash and reads the result back",
+      "status": "skipped"
+    }
+  ],
+  "completeSourceBindings": [
+    {
+      "path": "server-version/frontend",
+      "currentObject": "361fcbf63584d4e07cef72192a47d27e9392e050",
+      "rationale": "Root read actual panel/client/tests and verified original source/artifact digests. r1 retains its locator failure; r2 alone supplies that repaired case. Later merge changed only external host mounts, not panel/client logic. Existing tests not selected here are not newly qualified."
+    }
+  ],
+  "environmentComparison": {
+    "original": {
+      "environment": {
+        "node": "not-recorded",
+        "kind": "original local development environment; not current Actions"
+      },
+      "dependencies": {
+        "lockBlob": "38d624d2dd610673f9392a89af7290682862e2b0",
+        "installedByteManifest": "not retained"
+      },
+      "tools": {
+        "vitest": "4.1.11",
+        "binaryHash": "not retained"
+      },
+      "generated": {
+        "kind": "No independently captured generated dependency byte manifest; no such identity claimed"
+      }
+    },
+    "current": {
+      "host": {
+        "node": "v24.21.0",
+        "platform": "linux",
+        "arch": "x64"
+      },
+      "configuration": {
+        "TZ": "UTC",
+        "NODE_ENV": "test"
+      }
+    },
+    "decision": "COMPATIBLE",
+    "rationale": "Historical semantic assertions only. Original Node not-recorded is preserved, never called a fresh engines-qualified Actions run. Same locked dependencies and pure JS/DOM or mocked-boundary assertions reviewed; actual compiled browser, backend TypeScript build, dependency/image scans and current runtime PG remain separate requirements. Installed byte manifests and original signatures were not recorded and are not reconstructed as facts."
+  },
+  "deltas": [],
+  "limitations": [
+    "No whole current-tree all-suite pass claim.",
+    "Original failures, filtered cases and nonzero exits are unchanged.",
+    "Source checkpoint is a post-execution reconstruction; root records known boundaries rather than inventing run-time binary provenance."
+  ],
+  "rootReadRationale": "Root read actual panel/client/tests and verified original source/artifact digests. r1 retains its locator failure; r2 alone supplies that repaired case. Later merge changed only external host mounts, not panel/client logic. Existing tests not selected here are not newly qualified.",
+  "holdReason": "Original Node/tool environment was not recorded in these registration artifacts. Keep original passed cases as development evidence; do not claim formal admission. Only the seven affected cases are selected for a recorded target-environment check."
+}

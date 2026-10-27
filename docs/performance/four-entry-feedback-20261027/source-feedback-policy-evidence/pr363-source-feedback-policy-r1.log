@@ -1,0 +1,13 @@
+
+ RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend
+
+ ✓ src/__tests__/education-tools/assessment-resource.feedback-policy.test.ts > education registration requires an explicit shared feedback timing policy > refuses absence, null, unknown mode and invalid or timezone-free scheduled times 4ms
+ ✓ src/__tests__/education-tools/assessment-resource.feedback-policy.test.ts > education registration requires an explicit shared feedback timing policy > normalizes explicit offset timestamps to the existing Training UTC representation 1ms
+ ✓ src/__tests__/education-tools/assessment-resource.feedback-policy.postgres.integration.test.ts > education registration freezes explicit feedback timing in real PostgreSQL > stores normalized UTC in the frozen entry, replays equivalent input and rejects changing a registered schedule 295ms
+ ✓ src/__tests__/education-tools/assessment-resource.feedback-policy.postgres.integration.test.ts > education registration freezes explicit feedback timing in real PostgreSQL > reads a prior real publication without inserting a policy or changing its original entry hash 13ms
+
+ Test Files  2 passed (2)
+      Tests  4 passed (4)
+   Start at  10:26:05
+   Duration  5.59s (transform 6.92s, setup 0ms, import 10.26s, tests 345ms, environment 0ms)
+

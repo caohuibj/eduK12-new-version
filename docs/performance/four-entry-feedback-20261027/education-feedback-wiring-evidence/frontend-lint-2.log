@@ -1,0 +1,6 @@
+
+/workspace/eduK12-new-version/server-version/frontend/src/huiteacher/HuiteacherApp.tsx
+  281:5  warning  React Hook useEffect has a missing dependency: 'org'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+✖ 1 problem (0 errors, 1 warning)
+

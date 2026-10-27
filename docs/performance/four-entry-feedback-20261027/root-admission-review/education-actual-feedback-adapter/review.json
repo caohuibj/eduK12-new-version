@@ -1,0 +1,101 @@
+{
+  "kind": "pr363-root-case-review-v1",
+  "reviewer": "root dot",
+  "decision": "ADMIT",
+  "admissionId": "education-actual-feedback-adapter",
+  "outcomes": [
+    "assembles the real feedback adapter after durable Teacher parent completion"
+  ],
+  "originalSHA256": {
+    "report": "f4045eaa940e2cae486b4c4619fd31216ad72709cd09764b3220d536b4bdd154",
+    "execution": "7699cf02ca980daef654b53ea5e490734f41007950901cdc9bcdc2427e7a863f",
+    "log": "22f345755ef1d9b55f0e3de2fe62ae8182525ba5cfa359608d7ce2a03514f50a",
+    "inputs": "f8bddf38b7306a9095e67835932179172bc1cc1e41c88911ba5a6690c4ea3ca0"
+  },
+  "currentInputsSHA256": "373efcf2f3ce1959ab409105a1d3f0fba1055b124b079696e712e5cf3db59a7b",
+  "originalExecution": {
+    "argv": "Recorded targeted Vitest invocation; selected files server-version/frontend/src/huiteacher/HuiteacherAssessmentTasks.test.tsx; exact filters retained by original reporter and linked progress/index",
+    "cwd": "server-version/frontend",
+    "exitCode": 0,
+    "signal": null
+  },
+  "originalReporterSummary": {
+    "success": true,
+    "numTotalTests": 6,
+    "numPassedTests": 1,
+    "numFailedTests": 0,
+    "numPendingTests": 5
+  },
+  "originalInvocationCases": [
+    {
+      "fullName": "unified Teacher assessment inbox adds the approved runtime source only when explicitly assembled and forwards authoritative completion",
+      "status": "skipped"
+    },
+    {
+      "fullName": "unified Teacher assessment inbox combines formats and retains the authorized start route",
+      "status": "skipped"
+    },
+    {
+      "fullName": "unified Teacher assessment inbox waits for all sources before showing one empty state",
+      "status": "skipped"
+    },
+    {
+      "fullName": "unified Teacher assessment inbox keeps successful tasks during partial failure and recovers via existing retry",
+      "status": "skipped"
+    },
+    {
+      "fullName": "unified Teacher assessment inbox retains private task pagination in the unified list",
+      "status": "skipped"
+    },
+    {
+      "fullName": "assembles the real feedback adapter after durable Teacher parent completion",
+      "status": "passed"
+    }
+  ],
+  "completeSourceBindings": [
+    {
+      "path": "server-version/frontend",
+      "currentObject": "361fcbf63584d4e07cef72192a47d27e9392e050",
+      "rationale": "Root read the affected implementation and original raw reports. Authority/NOWAIT and FINAL/report dispatch implementations remain byte-identical at their exercised boundary; host tests retain their original assertions, and the new adapter assertion is selected separately. Added registration UI does not alter the separately mounted inbox/feedback test subject. Validators mocked in these reports remain explicitly mock contracts, not PostgreSQL or browser evidence."
+    }
+  ],
+  "environmentComparison": {
+    "original": {
+      "environment": {
+        "node": "24.22.1",
+        "kind": "original local development environment; not current Actions"
+      },
+      "dependencies": {
+        "lockBlob": "38d624d2dd610673f9392a89af7290682862e2b0",
+        "installedByteManifest": "not retained"
+      },
+      "tools": {
+        "vitest": "4.1.11",
+        "binaryHash": "not retained"
+      },
+      "generated": {
+        "kind": "No independently captured generated dependency byte manifest; no such identity claimed"
+      }
+    },
+    "current": {
+      "host": {
+        "node": "v24.21.0",
+        "platform": "linux",
+        "arch": "x64"
+      },
+      "configuration": {
+        "TZ": "UTC",
+        "NODE_ENV": "test"
+      }
+    },
+    "decision": "COMPATIBLE",
+    "rationale": "Historical semantic assertions only. Original Node 24.22.1 is preserved, never called a fresh engines-qualified Actions run. Same locked dependencies and pure JS/DOM or mocked-boundary assertions reviewed; actual compiled browser, backend TypeScript build, dependency/image scans and current runtime PG remain separate requirements. Installed byte manifests and original signatures were not recorded and are not reconstructed as facts."
+  },
+  "deltas": [],
+  "limitations": [
+    "No whole current-tree all-suite pass claim.",
+    "Original failures, filtered cases and nonzero exits are unchanged.",
+    "Source checkpoint is a post-execution reconstruction; root records known boundaries rather than inventing run-time binary provenance."
+  ],
+  "rootReadRationale": "Root read the affected implementation and original raw reports. Authority/NOWAIT and FINAL/report dispatch implementations remain byte-identical at their exercised boundary; host tests retain their original assertions, and the new adapter assertion is selected separately. Added registration UI does not alter the separately mounted inbox/feedback test subject. Validators mocked in these reports remain explicitly mock contracts, not PostgreSQL or browser evidence."
+}

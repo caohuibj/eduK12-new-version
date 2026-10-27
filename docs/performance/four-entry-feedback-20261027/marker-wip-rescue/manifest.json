@@ -1,0 +1,114 @@
+{
+  "base": "8fcfadcadeb7fd09fd8e453aa6eb16d87d53e686",
+  "status": "UNVALIDATED_WIP_RESCUE_ONLY",
+  "capturedAt": "2026-10-27T10:00:08.626841+00:00",
+  "files": [
+    {
+      "path": "server-version/backend/src/modules/composite/training-content-binding.ts",
+      "sha256": "f5c420d4e71f93af5d8a0a71a0666caaa2a93b935519dd483f0c784343db3453",
+      "gitBlob": "3658b04224051901d98d3e9f330c8832755c8523",
+      "bytes": 26090,
+      "wasUntracked": false
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-standard-collection.ts",
+      "sha256": "ac668df080e6a1f62efe2a063a46f054c1c9b7d245302ea19e61a1a0c746c2d1",
+      "gitBlob": "03950dbcc2970b5b221f97676d580f81a461bdc8",
+      "bytes": 6157,
+      "wasUntracked": false
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-standard-combination.ts",
+      "sha256": "f66b806b5c3773d3431f60bcbcfbc1eaad10ce0b58dfdde4faa785a1719e6fad",
+      "gitBlob": "9aec329ae6ef8dc73cd0a1c4e5e46e8900ae9cb6",
+      "bytes": 12891,
+      "wasUntracked": false
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-standard-content.ts",
+      "sha256": "67197abd66217b4503749cd35daf4da0cb7db4140e545749886c5b7b58e481d2",
+      "gitBlob": "ed86872d52c52195b383b0392de4dbd0c556fcc1",
+      "bytes": 2727,
+      "wasUntracked": false
+    },
+    {
+      "path": "server-version/backend/src/modules/education-tools/assessment-resource.service.ts",
+      "sha256": "6c7307ac3bc55adafb8545aae29f1d09178d97a4d47b87c96bb8d53486215c95",
+      "gitBlob": "776747c7b581e4a5c7c9fee641d9a9a3c2384ef9",
+      "bytes": 35647,
+      "wasUntracked": false
+    },
+    {
+      "path": "server-version/backend/src/modules/education-tools/assessment-resource.source.ts",
+      "sha256": "15121c68a552c6b6bed538648a237fb86296e96fc25866152d7e93c878116aef",
+      "gitBlob": "dcd1e97e35f2ee06cb7c35aa037738e39100b1d9",
+      "bytes": 8170,
+      "wasUntracked": false
+    },
+    {
+      "path": "server-version/backend/src/__tests__/education-tools/assessment-resource.marker.postgres.integration.test.ts",
+      "sha256": "7631c88fea9ec8cb642e944f24c7e37276aaa2101f9eea72f1daf47ca33e32f3",
+      "gitBlob": "cb5537b1f292f55ad8b74fbccd0e50e623c9ddee",
+      "bytes": 6697,
+      "wasUntracked": true
+    },
+    {
+      "path": "server-version/backend/src/modules/education-tools/assessment-resource.marker.ts",
+      "sha256": "22af2e54004e36c037454814592c2e00525109783a519325e7f9e8aa46981086",
+      "gitBlob": "af889655fac7c8e067ec5a353224f97b785a78f9",
+      "bytes": 3002,
+      "wasUntracked": true
+    }
+  ],
+  "evidence": [
+    {
+      "path": "pr363-marker-pg-r1.json",
+      "sha256": "a5c910a4009f4fd055e5d8dbf954790a9960577b51ab4db7d7799e7a1f7ddf86",
+      "bytes": 789
+    },
+    {
+      "path": "pr363-marker-pg-r1.log",
+      "sha256": "10df659ae079937b532b9491d91faad820370021a92bdefe1a28ab26f18894e7",
+      "bytes": 52
+    },
+    {
+      "path": "pr363-marker-types-r1.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "pr363-marker-types-r2.log",
+      "sha256": "02d97e775a526523e55fbedad42fa3d5712f4e2fbdc9131a74081c37f9551346",
+      "bytes": 497
+    },
+    {
+      "path": "pr363-marker-types-r3.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  ],
+  "processReceipts": {
+    "types-r1": {
+      "sessionId": 8638,
+      "exitCode": 0,
+      "scope": "Initial partial marker implementation; std edit script had failed cwd before that invocation"
+    },
+    "types-r2": {
+      "exitCode": 2,
+      "reason": "Two ToolEntryProduct type diagnostics; original log retained"
+    },
+    "types-r3": {
+      "sessionId": 60455,
+      "exitCode": 0,
+      "confirmation": "Original yielded session resumed after environment recovery; no new type invocation"
+    },
+    "pg-r1": {
+      "exitCode": 1,
+      "testCount": 0,
+      "passedAssertions": 0,
+      "firstError": "Cannot read properties of undefined (reading 'extend')",
+      "reasonStatus": "Loading failure not yet traced; not a PG business or marker success"
+    }
+  },
+  "patchSHA256": "19d0609e42cf0023ea58d531fb88cce9f3f2811b8ef64f3d8440c979b329a1b7"
+}

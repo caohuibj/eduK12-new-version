@@ -1,0 +1,44 @@
+{
+  "kind": "read-only-historical-evidence-index-no-new-qualification",
+  "targetCommit": "85e9ee0c66ada6a2b0550b9e11f3e31b96ab62ce",
+  "targetTree": "a2ba0fb7bd278165a4adbd44013f2a72f526285f",
+  "sourceBranchBase": "b045751a29c080e6e52f67252fed7c875f007f7c",
+  "newApplicationExecutions": [],
+  "newPostgresExecutions": [],
+  "newCIExecutions": [],
+  "businessChanges": [],
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 12610,
+      "sha256": "29c460b05e1ebc6bb6d993dcc7f58de1b532acda339ee0c69620a3ee2018ad73"
+    },
+    {
+      "path": "installed-dependencies-observed-now.json.gz",
+      "bytes": 115236,
+      "sha256": "0b6e1697e47ac4c1587d0dcdd8bfe8dab3cc1b6c3b42eb37c49e4d5a0febee76"
+    },
+    {
+      "path": "invocations.json",
+      "bytes": 322945,
+      "sha256": "a9e58bd8aac85a0cf4b680a5d2f16c81a4e3876026879c87eea5b677baf57907"
+    },
+    {
+      "path": "pg-case-history.md",
+      "bytes": 8604,
+      "sha256": "5881bd27f8731949f06e755376023424ded17840d4d757692c2438aef8952db0"
+    },
+    {
+      "path": "recorded-input-comparison.json",
+      "bytes": 47591,
+      "sha256": "759b45fa7ade9100755d87094a734f0ad506eddd03aed40b0c6379f58ca9d3e3"
+    },
+    {
+      "path": "static-input-closures.json.gz",
+      "bytes": 846089,
+      "sha256": "91619773fcc9c6bf9ec13416cc1743556756bfe23a50c78d95543024a50b4f66"
+    }
+  ],
+  "blockingReuseFinding": "b045 invalid Form picker PG uses actual InstrumentFinalSubmitError, which root96/85 typed whitelist excludes; static mismatch, not newly executed PG failure",
+  "formalAdmission": "Not granted; root independently reviews original evidence and real gaps."
+}

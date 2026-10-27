@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "node",
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "src/__tests__/huiteacher/assessment-scale-marker-final.postgres.integration.test.ts",
+    "--reporter=verbose"
+  ],
+  "cwd": "/workspace/eduK12-new-version/server-version/backend",
+  "exitCode": 0,
+  "signal": null,
+  "recordKind": "post-hoc index of original recorded logical command and exit, not a contemporaneous signed receipt",
+  "argvCapture": "Logical argv recorded in original manifest; absolute executable path not retained",
+  "signalBasis": "Original normal exit 0 and completed reporter; not an independently recorded signal field",
+  "sourceManifest": "docs/performance/four-entry-feedback-20261027/teacher-runtime-evidence/phase6/checks.json"
+}

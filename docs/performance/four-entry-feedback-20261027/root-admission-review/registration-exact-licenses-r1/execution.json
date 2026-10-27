@@ -1,0 +1,9 @@
+{
+  "argv": "Recorded targeted Vitest invocation; selected files server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.test.tsx; exact filters retained by original reporter and linked progress/index",
+  "cwd": "server-version/frontend",
+  "exitCode": 1,
+  "signal": null,
+  "provenance": "Root post-hoc index of known original execution; not a fabricated new command receipt. Exact argv not wholly retained for older bundles.",
+  "originalReporter": "docs/performance/four-entry-feedback-20261027/registration-exact-license-evidence/ui-r1.json",
+  "originalLog": "docs/performance/four-entry-feedback-20261027/registration-exact-license-evidence/ui-r1.log.gz"
+}

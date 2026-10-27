@@ -1,6 +1,8 @@
+import {EducationAssessmentRegistrationPanel} from '../components/education-tools/EducationAssessmentRegistrationPanel'
 import {SchoolTaskHelp as ManagementHelp} from '../school/SchoolTaskHelp'
 import {TeacherAssessmentProvider} from './TeacherAssessmentPage'
 import {EducationRosterManagement} from '../components/education-roster/EducationRosterManagement'
+import {createEducationAssessmentFeedback} from '../components/education-tools/educationAssessmentFeedbackAdapter'
 import {HuiteacherAssessmentTasks} from './HuiteacherAssessmentTasks'
 import {SCHOOL_HOST} from '../school/context'
 import {EducationPrivateToolStudio} from '../components/education-tools/EducationPrivateToolStudio'
@@ -14,6 +16,7 @@ import './huiteacher.css'
 import { HuiteacherFormStudio } from './HuiteacherFormStudio'
 import { HuiteacherClassRelationships } from './HuiteacherClassRelationships'
 import { HuiteacherEvaluationStudio } from './HuiteacherEvaluationStudio'
+import {createEducationAssessmentResourceAdapter} from '../api/educationAssessmentResourceClient'
 import { HuiteacherMyFormTasks } from './HuiteacherMyFormTasks'
 import {HuiteacherMyStudentFeedback} from './HuiteacherMyStudentFeedback'
 import { HuiteacherPersonalSelf } from './HuiteacherPersonalSelf'
@@ -68,6 +71,8 @@ async function teacherApi<T>(path:string,method='GET',data?:unknown,options?:{re
   if(!response.ok||result.code!==0)throw Object.assign(new Error(result.message||'请求未能完成'),{code:result.code,data:result.data,status:response.status,retryAfterSeconds:Number(response.headers.get('Retry-After'))||undefined})
   return result.data
 }
+const assessmentRuntime={renderFeedback:createEducationAssessmentFeedback({api:teacherApi,entry:'TEACHER'})}
+const assessmentResources=createEducationAssessmentResourceAdapter(teacherApi,'TEACHER')
 const Field=({label,value,set,type='text',required=true}:{
   label:string;value:string;set:(value:string)=>void;type?:string;required?:boolean
 })=><label className="ht-field"><span>{label}</span><input
@@ -386,7 +391,7 @@ export default function HuiteacherApp(){
       <nav className="ht-workspace-tabs" aria-label="Teacher 工作台">
         <button type="button" aria-pressed={workspaceTab==='teacher'}
           onClick={()=>changeWorkspaceTab('teacher')}><BookOpen size={18} aria-hidden="true"/>教师成长</button>
-        {canAuthorPrivateTools&&<button type="button" aria-pressed={workspaceTab==='private-tools'} onClick={()=>changeWorkspaceTab('private-tools')}><FileText size={18} aria-hidden="true"/>我的工具</button>}
+        {me.role!=='STUDENT'&&<button type="button" aria-pressed={workspaceTab==='private-tools'} onClick={()=>changeWorkspaceTab('private-tools')}><FileText size={18} aria-hidden="true"/>我的工具</button>}
         {me.organizations.some(o=>o.productAdmin)&&<button type="button"
           aria-pressed={workspaceTab==='school'}
           onClick={()=>changeWorkspaceTab('school')}><UsersRound size={18} aria-hidden="true"/>学校改进</button>}
@@ -489,6 +494,7 @@ export default function HuiteacherApp(){
       {me.role==='STUDENT'?<HuiteacherMyFormTasks student api={teacherApi}/>:
       <>
 
+      {workspaceTab==='private-tools'&&selectedOrg&&<EducationAssessmentRegistrationPanel key={'registration:'+me.id+':'+selectedOrg} api={teacherApi} organizationId={selectedOrg} actorId={me.id} product="TEACHER"/>}
       {workspaceTab==='private-tools'&&(canAuthorPrivateTools?<><aside className="ht-panel" aria-label="学生测评编制入口提示"><p className="ht-muted">此处自编工具用于 Teacher 教师测评。心理教师为学生编制量表、表单及发布活动，请前往 School 的“我的工具”和活动管理。学校须已开通 School，并授予本人对应权限；使用同一教育账号单独登录，两个入口的私有草稿与固定版本不会自动互通。</p><a href={`https://${SCHOOL_HOST}/login`} target="_blank" rel="noopener noreferrer">前往 School 编制学生测评</a></aside><EducationPrivateToolStudio key={`TEACHER:${me.id}:${selectedOrg}`} api={teacherApi} organizationId={selectedOrg} entry="TEACHER" actorId={me.id} onDraftStateChange={setPrivateDraftState}/></>:<section className="ht-panel"><h2>我的工具</h2><p>当前账号或学校暂无私有量表与表单编制权限。</p></section>)}
       {workspaceTab==='teacher'&&<>
         <div className="ht-workspace-body">
@@ -501,7 +507,7 @@ export default function HuiteacherApp(){
         </nav>
         <div className="ht-workspace-sections">
         <section id="ht-personal-self" hidden={personalSection!=='ht-personal-self'} className="ht-workspace-section" tabIndex={-1} aria-label="个人测评"><HuiteacherPersonalSelf api={teacherApi}/></section>
-        <section id="ht-personal-tasks" hidden={personalSection!=='ht-personal-tasks'} className="ht-workspace-section" tabIndex={-1} aria-label="参与测评"><HuiteacherAssessmentTasks key={me.id} actorKey={me.id} api={teacherApi}/></section>
+        <section id="ht-personal-tasks" hidden={personalSection!=='ht-personal-tasks'} className="ht-workspace-section" tabIndex={-1} aria-label="参与测评"><HuiteacherAssessmentTasks key={me.id} actorKey={me.id} api={teacherApi} assessmentRuntime={assessmentRuntime}/></section>
         {import.meta.env.VITE_HUITEACHER_STUDENT_FEEDBACK_ENABLED==='true'
           &&<section id="ht-personal-feedback" hidden={personalSection!=='ht-personal-feedback'} className="ht-workspace-section" tabIndex={-1} aria-label="学生反馈"><HuiteacherMyStudentFeedback api={teacherApi}/></section>}
         {import.meta.env.VITE_HUITEACHER_IMPROVEMENT_ENABLED==='true'
@@ -563,7 +569,7 @@ export default function HuiteacherApp(){
         <section id="ht-school-relationships" hidden={schoolSection!=='ht-school-relationships'} className="ht-workspace-section" tabIndex={-1} aria-label="班级关系"><HuiteacherClassRelationships key={'relations:'+org.organizationId}
           organizationId={org.organizationId} members={members} units={units} api={teacherApi}/></section>
         <section id="ht-school-evaluations" hidden={schoolSection!=='ht-school-evaluations'} className="ht-workspace-section" tabIndex={-1} aria-label="评价活动"><HuiteacherEvaluationStudio key={'targets:'+me.id+':'+org.organizationId}
-          organizationId={org.organizationId} api={teacherApi} canAuthorPrivateTools={canAuthorPrivateTools} actorKey={me.id}/></section>
+          organizationId={org.organizationId} api={teacherApi} assessmentResources={schoolSection==='ht-school-evaluations'?assessmentResources:undefined} canAuthorPrivateTools={canAuthorPrivateTools} actorKey={me.id}/></section>
         <section id="ht-school-forms" hidden={schoolSection!=='ht-school-forms'} className="ht-workspace-section" tabIndex={-1} aria-label="学校表单"><HuiteacherFormStudio key={'forms:'+org.organizationId}
           organizationId={org.organizationId} api={teacherApi} onDraftStateChange={setFormDraftState}/></section>
       </div></div>

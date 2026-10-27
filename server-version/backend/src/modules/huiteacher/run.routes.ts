@@ -1,4 +1,6 @@
+import { RELATIONAL_RESOURCE_KINDS } from '../assessment-relational/types'
 import {privateToolRunTrackInput} from '../education-tools/private-tool.run-contract'
+import {listEducationAssessmentResources} from '../education-tools/assessment-resource.catalog'
 import { Router } from 'express'
 import { z,ZodError } from 'zod'
 import { asyncHandler } from '../../middleware/asyncHandler'
@@ -15,11 +17,13 @@ router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
 const uuid=z.string().guid()
 const keys=z.object({organizationId:uuid,eventId:uuid}).strict()
 const resource=z.object({
-  family:z.enum(['BUNDLE','SCALE','FORM','SITUATIONAL']),
+  family:z.enum(RELATIONAL_RESOURCE_KINDS),
   key:z.string().trim().min(1).max(200),
   version:z.string().trim().min(1).max(120),
 }).strict()
 const track=z.object({
+  expectedVersion:z.number().int().min(1).max(Number.MAX_SAFE_INTEGER).optional(),
+  expectedRunId:uuid.optional(),
   resource,
   subjectSelector:z.record(z.string(), z.unknown()).default({}),
   respondentSelector:z.record(z.string(), z.unknown()).default({}),
@@ -38,7 +42,12 @@ const track=z.object({
     visibilityPolicyKey:z.string().min(1),
     minimumRespondents:z.number().int().min(1).nullable(),
   }).strict(),
-}).strict()
+}).strict().superRefine((value,ctx)=>{
+  if(value.resource.key.startsWith('education-assessment:')&&value.expectedVersion===undefined)
+    ctx.addIssue({code:'custom',path:['expectedVersion'],message:'固定教育测评必须绑定当前任务版本'})
+  if(value.resource.key.startsWith('education-assessment:')&&value.expectedRunId===undefined)
+    ctx.addIssue({code:'custom',path:['expectedRunId'],message:'固定教育测评必须绑定当前任务批次'})
+})
 const version=z.object({expectedVersion:z.number().int().min(1)}).strict()
 const wrap=(fn:(req:any,res:any)=>Promise<unknown>)=>asyncHandler(async(req,res)=>{
   try{return await fn(req,res)}
@@ -57,6 +66,12 @@ const wrap=(fn:(req:any,res:any)=>Promise<unknown>)=>asyncHandler(async(req,res)
   }
 })
 const base='/organizations/:organizationId/evaluation-events/:eventId/run'
+router.get(base+'/assessment-resources',authenticateHuiteacher,requireTeacherProductAdmin,
+  wrap(async(req,res)=>{
+    const scope=keys.parse(req.params)
+    const query=z.object({runId:uuid,expectedVersion:z.coerce.number().int().min(1).max(Number.MAX_SAFE_INTEGER),cursor:uuid.optional()}).strict().parse(req.query)
+    return success(res,await listEducationAssessmentResources({product:'TEACHER',...scope,workflowId:scope.eventId,...query,actor:req.user!}))
+  }))
 router.get(base+'/released-scales',authenticateHuiteacher,requireTeacherProductAdmin,
   wrap(async(req,res)=>success(res,await listTeacherAvailableScales({
     ...keys.parse(req.params),actorUserId:req.user!.userId,cursor:z.string().optional().parse(req.query.cursor),

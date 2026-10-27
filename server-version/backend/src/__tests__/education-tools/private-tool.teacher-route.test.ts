@@ -44,3 +44,13 @@ describe('Actual Teacher product track route private branch',()=>{
   expect((await post(legacy)).status).toBe(200);expect(m.legacyAdd).toHaveBeenCalledWith({...legacy,organizationId:id(1),eventId:id(2),actorUserId:'server-actor'});expect(m.privateAdd).not.toHaveBeenCalled()
  })
 })
+
+
+it.each(['COGNITIVE','SITUATIONAL','BUNDLE'])('routes %s through the existing administrator and exact-resource service, not private Scale',async family=>{
+ const candidate={resource:{family,key:'synthetic-only',version:'1.0.0'},requestedPolicy:{subjectRoles:['TEACHER'],respondentRoles:['TEACHER'],relationshipKinds:['SELF'],perspectives:['SELF_REPORT'],analysisMode:'INDIVIDUAL_ONLY',visibilityPolicyKey:'synthetic',minimumRespondents:null}}
+ expect((await post(candidate,true)).status).toBe(403)
+ expect(m.legacyAdd).not.toHaveBeenCalled()
+ expect((await post(candidate)).status).toBe(200)
+ expect(m.legacyAdd).toHaveBeenCalledWith({...candidate,subjectSelector:{},respondentSelector:{},organizationId:id(1),eventId:id(2),actorUserId:'server-actor'})
+ expect(m.privateAdd).not.toHaveBeenCalled();expect(m.formAdd).not.toHaveBeenCalled()
+})
