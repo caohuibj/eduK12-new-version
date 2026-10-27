@@ -3,7 +3,7 @@
   "enabled": true,
   "base": "5c427f2bfe646def2200162bab449a0711a6e133",
   "product": "83da994e8e3312601fd0258657287dda798edf25",
-  "controlCheckpoint": "92493d838dfe1ccc382bf2f9c40257ab84b099fc",
+  "controlCheckpoint": "440b21b4ae8ca138e62019dac1a638c9c80240bc",
   "source": {
     "docs/performance/four-entry-postmerge-20261028/README.md": {
       "before": null,
