@@ -386,3 +386,29 @@ export type NumberlineTrialPayload = {
   rtMs: number | null
   interrupted: boolean
 }
+
+/** Arithverify 冻结 config（与后端 arithverify.config schema 一致）。 */
+export interface ArithverifyConfig {
+  totalTrials: number
+  operandMax: number
+  trueRatio: number
+  fixationMs: number
+  timeoutMs: number
+  validRtFloorMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+/** Arithverify 单 trial payload（与后端 arithverify.trial schema 一致）。 */
+export type ArithverifyTrialPayload = {
+  leftOperand: number
+  rightOperand: number
+  displayedResult: number
+  response: boolean | null
+  rtMs: number | null
+  interrupted: boolean
+}

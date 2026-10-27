@@ -25,6 +25,7 @@ import { executionEntries as task22 } from '../tasks/wordlist/package'
 import { executionEntries as task23 } from '../tasks/lexicaldecision/package'
 import { executionEntries as task24 } from '../tasks/emotionrecognition/package'
 import { executionEntries as task25 } from '../tasks/numberline/package'
+import { executionEntries as task26 } from '../tasks/arithverify/package'
 export const cognitiveExecutionEntries = [
   task0[0],
   task1[0],
@@ -55,5 +56,6 @@ export const cognitiveExecutionEntries = [
   task23[0],
   task24[0],
   task25[0],
+  task26[0],
   task21[1],
 ]

@@ -197,6 +197,12 @@ const SCORING_DECLARATIONS: Record<string, CognitiveScoringContractDeclaration> 
     runtimeReconstructableFacts: ['逐试次目标数（seed/config 分层序列）', '数字线端点（frozen config）'],
     serverDerivedFacts: ['估计值/绝对误差/符号误差换算', 'metrics（paePercent/biasPercent/withinTenRate）', 'quality flags'],
   },
+  arithverify: {
+    testType: 'arithverify',
+    clientObservedFacts: ['对/错判断响应', 'raw RT', 'interrupted'],
+    runtimeReconstructableFacts: ['操作数与呈现结果（seed/config）', '等式真伪（由操作数权威推导）'],
+    serverDerivedFacts: ['等式真伪与正确性判定', 'metrics（accuracy/medianRtMs/problemSizeSlopeMs）', 'quality flags'],
+  },
 }
 
 // 当前通用事实（所有任务一致）：完整加密 trial payload、v2 trial envelope qualityEvents、
@@ -332,6 +338,11 @@ const RESEARCH_CAPTURE_DECLARATIONS: Record<string, CognitiveResearchCaptureDecl
     testType: 'numberline',
     currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次 responsePosition 与 raw RT'],
     futureCaptureFacts: ['输入通道区分（touch/mouse/keyboard 定位）', 'device provenance', 'viewport/dpr'],
+  },
+  arithverify: {
+    testType: 'arithverify',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次响应与 raw RT'],
+    futureCaptureFacts: ['真实 input modality', 'device provenance', 'viewport/dpr'],
   },
 }
 
