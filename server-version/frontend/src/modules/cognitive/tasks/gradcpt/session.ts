@@ -1,0 +1,45 @@
+import {GradCapture} from './capture'
+import {reviewGrad} from './generated/analysis'
+import {isGradReport} from './generated/report'
+import {digest,gradManifest,validateGradContext,type GradContext,type GradPorts,type GradDraft,type GradFinal,type GradReceipt} from './contracts'
+export type GradView='intro'|'preparing'|'practice-ready'|'running'|'saving-item'|'feedback'|'practice-instructions'|'formal-ready'|'retry'|'saving-final'|'report'|'stopped'|'blocked'
+export class GradSession {
+ readonly context:GradContext;readonly manifest:ReturnType<typeof gradManifest>;readonly realm={timeOriginMs:performance.timeOrigin,pageInstanceId:crypto.randomUUID()}
+ view:GradView='intro';capture:GradCapture|null=null;receipt:GradReceipt|null=null;phase:'practice'|'test'='practice';round=0;practiceIndex=0;correct=0;lastCorrect:boolean|null=null;reason=''
+ private opened=false;private disposed=false;private aborted=false;private busy=false;private records:GradDraft[]=[];private pending:GradDraft|null=null;private final:GradFinal|null=null;private ports:GradPorts
+ constructor(context:GradContext,ports:GradPorts,private changed:()=>void,private now=()=>performance.now()){this.context=validateGradContext(context);this.manifest=gradManifest(this.context);this.ports={prepareLocalAttempt:ports.prepareLocalAttempt.bind(ports),persistLocalDraft:ports.persistLocalDraft.bind(ports),finalize:ports.finalize.bind(ports)}}
+ get retained(){return structuredClone([...this.records,...this.pending?[this.pending]:[]])}
+ get practicePassed(){return this.practiceIndex===8&&this.correct>=7}
+ get canRetryPractice(){return this.round+1<3}
+ async prepare(){if(this.view!=='intro'||this.opened||this.disposed)return;this.view='preparing';this.changed();try{const receipt=await this.ports.prepareLocalAttempt(structuredClone(this.context),structuredClone(this.manifest),{...this.realm});if(this.disposed)return
+  if(receipt.fresh!==true||receipt.contextKey!==this.context.contextKey||receipt.bindingDigest!==digest({context:this.context,manifest:this.manifest,realm:this.realm}))throw Error('Fresh durable gradCPT identity required');this.opened=true;this.view='practice-ready';this.changed()
+ }catch{if(!this.disposed){this.reason='local-attempt-not-confirmed';this.view='blocked';this.changed()}}}
+ begin(now:number){if(this.disposed||!this.opened||!['practice-ready','practice-instructions','formal-ready'].includes(this.view))return
+  if(this.view==='practice-instructions'){if(!this.canRetryPractice)return;this.round++;this.practiceIndex=0;this.correct=0;this.lastCorrect=null}
+  if(this.view==='formal-ready'){if(!this.practicePassed)return;this.phase='test'}this.start(now)}
+ private start(now:number){this.capture=new GradCapture(this.context.snapshot.config,this.phase==='test'?this.manifest.formal:this.manifest.practice[this.round][this.practiceIndex],now);this.view='running';this.changed()}
+ tick(now:number){if(this.disposed||this.view!=='running'||!this.capture)return;this.capture.tick(now);if(this.capture.done)this.captureDone()}
+ private captureDone(){const raw=structuredClone(this.capture!.raw);this.capture=null;if(raw.status!=='complete'){this.aborted=true;if(!this.reason)this.reason=raw.stopReason??'capture-stopped'}
+  if(this.phase==='practice'){this.lastCorrect=raw.status==='complete'&&reviewGrad(raw,raw.plan).rows[0].correct===true;if(this.lastCorrect)this.correct++}
+  const base={contextKey:this.context.contextKey,phase:this.phase,round:this.round,index:this.phase==='test'?0:this.practiceIndex,raw,configHash:this.context.snapshot.configHash,protocolSignature:this.context.snapshot.protocolSignature,manifestHash:this.context.manifestHash,realm:{...this.realm},recordKey:this.phase==='test'?'test:0':`practice:${this.round}:${this.practiceIndex}`}
+  this.pending={...base,recordDigest:digest(base)};this.view='saving-item';this.changed();void this.persist()}
+ private async persist(){if(this.busy||!this.pending)return;this.busy=true;try{const record=this.pending,receipt=await this.ports.persistLocalDraft(structuredClone(record))
+  if(receipt.retained!==true||receipt.contextKey!==record.contextKey||receipt.recordKey!==record.recordKey||receipt.recordDigest!==record.recordDigest)throw Error('GradCPT local receipt mismatch')
+  this.records.push(record);this.pending=null;if(this.disposed)return
+  if(this.phase==='practice'){this.practiceIndex++;this.view=this.aborted?'stopped':'feedback';this.changed()}else{this.view='saving-final';this.changed()}
+ }catch{if(!this.disposed){this.aborted=true;if(!this.reason)this.reason='local-save-failure';this.view='retry';this.changed()}}finally{this.busy=false;if(!this.disposed&&this.view==='saving-final')void this.finish()}}
+ nextPractice(now:number){if(this.disposed||this.view!=='feedback'||this.practiceIndex>=8)return;this.start(now)}
+ acceptPractice(){if(this.disposed||this.view!=='feedback'||!this.practicePassed)return;this.view='formal-ready';this.changed()}
+ reviewInstructions(){if(this.disposed||this.view!=='feedback'||this.practiceIndex!==8||this.practicePassed||!this.canRetryPractice)return;this.view='practice-instructions';this.changed()}
+ endPractice(){if(this.disposed||this.phase!=='practice'||!['intro','practice-ready','feedback','practice-instructions','formal-ready'].includes(this.view))return;this.reason='practice-ended';this.view='stopped';this.changed()}
+ stop(reason:string,now:number){if(this.disposed||!['running','saving-item','formal-ready'].includes(this.view))return;this.aborted=true;if(!this.reason)this.reason=reason
+  if(this.capture){this.capture.interrupt(reason,now);this.captureDone()}else if(this.view==='saving-item')return;else{this.view='stopped';this.changed()}}
+ async retry(){if(this.disposed||this.busy||this.view!=='retry')return;if(this.pending)await this.persist();else await this.finish()}
+ private async finish(){if(this.disposed||this.busy||this.pending||this.phase!=='test')return;this.busy=true;this.view='saving-final';this.changed()
+  try{if(!this.final){const raw=this.records.find(r=>r.phase==='test')!.raw,review=reviewGrad(raw,this.manifest.formal),claim={contextKey:this.context.contextKey,configHash:this.context.snapshot.configHash,protocolSignature:this.context.snapshot.protocolSignature,manifestHash:this.context.manifestHash,formalCaptureCount:1,presented:review.presented,practiceCount:this.records.filter(r=>r.phase==='practice').length,termination:(!this.aborted&&raw.status==='complete'?'completed':'aborted') as 'completed'|'aborted',terminationReason:this.reason||null,recordDigests:this.records.map(r=>r.recordDigest)};this.final={...claim,finalPayloadDigest:digest(claim)}}
+   const receipt=await this.ports.finalize(structuredClone(this.final));if(this.disposed)return
+   if(receipt.finalSaved!==true||receipt.contextKey!==this.context.contextKey||receipt.finalPayloadDigest!==this.final.finalPayloadDigest||!receipt.receiptId||!isGradReport(receipt.report,{configHash:this.context.snapshot.configHash,protocolSignature:this.context.snapshot.protocolSignature,profile:this.context.snapshot.config.profile,presented:this.final.presented}))throw Error('Matching saved gradCPT report receipt required')
+   this.receipt=structuredClone(receipt);this.view='report';this.changed()
+  }catch{if(!this.disposed){if(!this.reason)this.reason='final-save-not-confirmed';this.view='retry';this.changed()}}finally{this.busy=false}}
+ dispose(){if(this.capture&&this.view==='running')this.stop('context-disposed',this.now());this.disposed=true}
+}
