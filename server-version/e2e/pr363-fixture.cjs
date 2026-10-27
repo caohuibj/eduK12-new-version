@@ -13,7 +13,8 @@ async function artifact(kind){
  const dir=kind==='backend'?path.join(base.backend,'dist'):fs.realpathSync(process.env.SCHOOL_TEACHER_FRONTEND_DIST||path.join(base.repo,'server-version/frontend/dist'))
  const tools=await import(pathToFileURL(path.join(base.repo,'.github/scripts/ci-artifact.mjs')).href)
  const manifest=JSON.parse(fs.readFileSync(path.join(dir,'ci-build-manifest.json'),'utf8'))
- tools.verifyManifest(manifest,{schemaVersion:1,kind,sha:base.sourceIdentity().head,runId:process.env.GITHUB_RUN_ID,lockDigest:sha(fs.readFileSync(path.join(base.repo,'server-version',kind,'package-lock.json')))},tools.treeDigest(dir))
+ const prior=await import(pathToFileURL(path.join(base.repo,'.github/scripts/pr363-continuation.mjs')).href)
+ tools.verifyManifest(manifest,{schemaVersion:1,kind,...prior.artifactIdentity(),lockDigest:sha(fs.readFileSync(path.join(base.repo,'server-version',kind,'package-lock.json')))},tools.treeDigest(dir))
  return manifest
 }
 function assertCases(cases){assert.ok(Array.isArray(cases));assert.deepEqual(cases.map(c=>c.product+':'+c.mode).sort(),['SCHOOL:IMMEDIATE','TEACHER:IMMEDIATE','TEACHER:SCHEDULED']);assert.equal(new Set(cases.map(c=>c.executionId)).size,3);assert.ok(cases.every(c=>typeof c.executionId==='string'&&typeof c.runtimeId==='string'&&c.title?.startsWith('PR363 ')))}

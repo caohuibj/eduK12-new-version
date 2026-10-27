@@ -6,7 +6,7 @@ import {participantAccessOutputs} from './participant-access-scope.mjs';
 export const REPOSITORY='caohuibj/eduK12-new-version';
 export const BRANCH='perf/four-entry-feedback-20261027';
 export const MARKER='.github/scripts/pr363-bindings.json';
-export const CONTROL_FILES=Object.freeze([MARKER,'.github/scripts/pr363-scope.mjs','.github/scripts/pr363-checks.mjs','.github/scripts/pr363-controls.test.mjs','.github/scripts/pr363-control-evidence.json','.github/scripts/content-scope.mjs','.github/scripts/merge-gate.mjs','.github/workflows/ci.yml'].sort());
+export const CONTROL_FILES=Object.freeze([MARKER,'.github/scripts/pr363-continuation.mjs','.github/scripts/pr363-continuation-pins.json','.github/scripts/pr363-continuation.test.mjs','.github/scripts/pr363-scope.mjs','.github/scripts/pr363-checks.mjs','.github/scripts/pr363-controls.test.mjs','.github/scripts/pr363-control-evidence.json','.github/scripts/content-scope.mjs','.github/scripts/merge-gate.mjs','.github/workflows/ci.yml'].sort());
 export const digest=value=>createHash('sha256').update(JSON.stringify(value)).digest('hex');
 export const JOBS=['pr363-backend-build','pr363-frontend-build','pr363-backend-checks','pr363-frontend-checks','pr363-audit','pr363-pg','pr363-browser','pr363-backend-scan','pr363-frontend-scan'];
 export const binding=JSON.parse(readFileSync(new URL('./pr363-bindings.json',import.meta.url),'utf8'));
