@@ -1,4 +1,4 @@
-import {cleanup,fireEvent,render,screen,within,waitFor} from '@testing-library/react'
+import {act,cleanup,fireEvent,render,screen,within,waitFor} from '@testing-library/react'
 import {afterEach,describe,expect,it,vi} from 'vitest'
 import {HuiteacherAssessmentTasks} from './HuiteacherAssessmentTasks'
 vi.mock('../survey/SurveyPublicApp',()=>({TaskForm:()=> <input aria-label="测评答案"/>}))
@@ -10,6 +10,21 @@ const privateForm={executionId:'private-task',formTitle:'课堂观察测评',eve
 const scale={executionId:'scale-task',title:'教师发展测评',eventTitle:'专业发展活动',status:'COMPLETED',runStatus:'CLOSED'}
 const card=(title:string)=>screen.getByText(title,{selector:'strong'}).closest('article')!
 describe('unified Teacher assessment inbox',()=>{
+ it('adds the approved runtime source only when explicitly assembled and forwards authoritative completion',async()=>{
+  const onCompleted=vi.fn(),api=vi.fn(async(path:string)=>{
+   if(path==='/my-assessment-tasks')return {list:[{executionId:'runtime-task',title:'认知情境组合任务',eventTitle:'合成活动',family:'BUNDLE',status:'STARTED',runStatus:'PUBLISHED',runtimeBindingRef:'runtime-parent'}],nextCursor:null}
+   if(path==='/assessment-composite-attempts/runtime-parent?view=current-unit')return {id:'runtime-parent',status:'COMPLETED',deliveryMode:'FINAL_ONLY',currentItem:null}
+   return {list:[]}
+  })
+  render(<HuiteacherAssessmentTasks api={api as Api} actorKey="actor" assessmentRuntime={{onCompleted,renderFeedback:()=> <p>独立授权反馈组件</p>}}/>)
+  await act(async()=>{await vi.dynamicImportSettled()})
+  await screen.findByText('认知情境组合任务',{selector:'strong'})
+  fireEvent.click(screen.getByRole('button',{name:'继续测评'}))
+  await screen.findByText('本次测评已完成')
+  expect(onCompleted).toHaveBeenCalledExactlyOnceWith({executionId:'runtime-task',attemptId:'runtime-parent'})
+  expect(screen.getByText('独立授权反馈组件')).toBeInTheDocument()
+  expect(api.mock.calls.some(call=>call[0].includes('/start-assessment'))).toBe(false)
+ })
  it('combines formats and retains the authorized start route',async()=>{
   const api=vi.fn(async(path:string)=>{
    if(path==='/my-form-tasks')return {list:[form]}

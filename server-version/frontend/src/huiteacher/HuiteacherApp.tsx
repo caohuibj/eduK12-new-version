@@ -503,7 +503,7 @@ export default function HuiteacherApp(){
         </nav>
         <div className="ht-workspace-sections">
         <section id="ht-personal-self" hidden={personalSection!=='ht-personal-self'} className="ht-workspace-section" tabIndex={-1} aria-label="个人测评"><HuiteacherPersonalSelf api={teacherApi}/></section>
-        <section id="ht-personal-tasks" hidden={personalSection!=='ht-personal-tasks'} className="ht-workspace-section" tabIndex={-1} aria-label="参与测评"><HuiteacherAssessmentTasks key={me.id} actorKey={me.id} api={teacherApi}/></section>
+        <section id="ht-personal-tasks" hidden={personalSection!=='ht-personal-tasks'} className="ht-workspace-section" tabIndex={-1} aria-label="参与测评"><HuiteacherAssessmentTasks key={me.id} actorKey={me.id} api={teacherApi} assessmentRuntime={{}}/></section>
         {import.meta.env.VITE_HUITEACHER_STUDENT_FEEDBACK_ENABLED==='true'
           &&<section id="ht-personal-feedback" hidden={personalSection!=='ht-personal-feedback'} className="ht-workspace-section" tabIndex={-1} aria-label="学生反馈"><HuiteacherMyStudentFeedback api={teacherApi}/></section>}
         {import.meta.env.VITE_HUITEACHER_IMPROVEMENT_ENABLED==='true'

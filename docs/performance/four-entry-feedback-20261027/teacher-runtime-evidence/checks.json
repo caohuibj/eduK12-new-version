@@ -1,0 +1,326 @@
+{
+  "schemaVersion": 1,
+  "recordKind": "post-execution diagnostic index; unsigned, not CI admission",
+  "recordedAt": "2026-10-27T09:11:42.770042+00:00",
+  "branch": "feat/pr363-teacher-runtime",
+  "base": "6cf241d65b4bc44878ef9d9fe21c81fdd02561cd",
+  "mainReference": "7e6d7da4a01e4a42b410cf2dbdcfa76f11759fdc",
+  "productCommit": "bad260a01406cae83e736ae7f6c3f7437e003b24",
+  "productTree": "c5256958017d158c24be7dfd9a10aaf5a4086b87",
+  "readOnlyRootSourceCommit": "f46336cc45abaa21d4b946029cda2a0dfadec654",
+  "rootSourceMerged": false,
+  "versions": {
+    "node": "24.21.0",
+    "backendTypescript": "5.9.3",
+    "frontendTypescript": "5.6.3",
+    "vitest": "4.1.11",
+    "prisma": "5.22.0",
+    "attemptedPostgres": "16.15"
+  },
+  "qualification": {
+    "formalCI": false,
+    "finalFullTestInvocation": false,
+    "realPGAuthorizationPassed": false,
+    "durableFinalVerified": false,
+    "browserExecuted": false,
+    "productionEnabled": false
+  },
+  "uniqueCasesObservedPassedAcrossInvocations": {
+    "backendHTTP": 18,
+    "frontend": 16
+  },
+  "deliveredFiles": [
+    {
+      "path": "server-version/backend/src/__tests__/huiteacher/assessment-runtime.query.postgres.integration.test.ts",
+      "sha256": "115a2bc6bed7290294eaeee6f0165e600ce13d7781dc4d48a07107e07c364e82",
+      "gitBlob": "4829d8a8ccb22425ac578c223467fa14ca072130"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/huiteacher/assessment-runtime.routes.test.ts",
+      "sha256": "552d921a3a029252b12efc27d6a99e55202d6291c3fae7334f984993bbacaf1d",
+      "gitBlob": "0dc41a350e5efda388ed86fd20c89b98e505111c"
+    },
+    {
+      "path": "server-version/backend/src/modules/huiteacher/assessmentRuntime.access.ts",
+      "sha256": "a5d16b1b933958b125041ffd3c011fd0f5fff0c4067b7fb99c4f9996eabfe9a6",
+      "gitBlob": "73c629456d9ee92deffeae9f17297d1ee97be21e"
+    },
+    {
+      "path": "server-version/backend/src/modules/huiteacher/assessmentRuntime.routes.ts",
+      "sha256": "e358a7516adbdc5acd697d73e77aae309fe227f11c700c24546c4f97f4827e7b",
+      "gitBlob": "2447817e92ca244f3f7ad54c78bc23998a75d356"
+    },
+    {
+      "path": "server-version/frontend/src/huiteacher/HuiteacherAssessmentTasks.test.tsx",
+      "sha256": "06005c07c12d222ed21763cddce1265e20b62bad64bf685287721efd1a9942f7",
+      "gitBlob": "7574d59b854350ddd01979afd20648a47cdc9ec5"
+    },
+    {
+      "path": "server-version/frontend/src/huiteacher/HuiteacherAssessmentTasks.tsx",
+      "sha256": "05bfaf2b7e2e4318857b85fe47e9eaa96d1688f683037666062f3dab160776e0",
+      "gitBlob": "51e1a49d95bd36906bcf163aacf312dc6d3d4e03"
+    },
+    {
+      "path": "server-version/frontend/src/huiteacher/HuiteacherMyAssessmentTasks.test.tsx",
+      "sha256": "2e9f5c449aff56420bacf15702f253884055045ac50f42e87784590ee2e67f05",
+      "gitBlob": "f7fa7a5551e24a007fb75b2995b1767f369507ee"
+    },
+    {
+      "path": "server-version/frontend/src/huiteacher/HuiteacherMyAssessmentTasks.tsx",
+      "sha256": "878fd10a12ccc028d4dcfda61bd6daa0f68493cfa6d6d7a63347c9a20e740d11",
+      "gitBlob": "9757f9de8c7b6931e6a6fa75bb8d28e1d9a5be14"
+    },
+    {
+      "path": "server-version/frontend/src/huiteacher/assessmentRuntime.client.test.ts",
+      "sha256": "d89a3e3b245d04ec9999d1a6d7fc1b2f828065b3403f944b2729d432e0eb44f7",
+      "gitBlob": "5331f37cc92f6a7e6e7475ddf9d30b276e1af903"
+    },
+    {
+      "path": "server-version/frontend/src/huiteacher/assessmentRuntime.client.ts",
+      "sha256": "380b8d8e67da63592370cb70d519886b9e56b6d125adc50b70f92abe427032a9",
+      "gitBlob": "93107cd133e1e321d83a874b371a2df226bceb74"
+    }
+  ],
+  "unchangedDependencyLocks": [
+    {
+      "path": "server-version/backend/package-lock.json",
+      "sha256": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450"
+    },
+    {
+      "path": "server-version/frontend/package-lock.json",
+      "sha256": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe"
+    }
+  ],
+  "checks": [
+    {
+      "log": "backend-http-initial.transcript.log.gz",
+      "cwd": "server-version/backend",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/vitest/vitest.mjs run src/__tests__/huiteacher/assessment-runtime.routes.test.ts --reporter=verbose",
+      "exitCode": 1,
+      "passed": 12,
+      "failed": 1,
+      "retention": "manually transcribed tool-output summary; original tee failed",
+      "originalLogName": "backend-http-initial.transcript.log",
+      "rawLogSha256": "7bc02f6280e8afff9a503c30a63f1cb38af838406cbeeaf80aaa6b2e60629b58",
+      "archiveSha256": "e7ba0adae1a7bf2ded41c511ce79cb8de51fccee48ec3a778e18cc6d90a7755e",
+      "encoding": "gzip; lossless original stdout or explicitly labelled initial transcription"
+    },
+    {
+      "log": "backend-http-targeted-recheck.log.gz",
+      "cwd": "server-version/backend",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/vitest/vitest.mjs run src/__tests__/huiteacher/assessment-runtime.routes.test.ts -t 'forwards one-shot Cognitive FINAL|uses root NEW_USE' --reporter=verbose",
+      "exitCode": 0,
+      "passed": 2,
+      "filtered": 12,
+      "originalLogName": "backend-http-targeted-recheck.log",
+      "rawLogSha256": "6411480564a33bf0a6ba1ff055c0c2ce584f3bc435a26c6b9f992de64dcdde56",
+      "archiveSha256": "8d620d1522cc9854244b03ca096b0df87ebce380179c97584e7edfa9f89aafef",
+      "encoding": "gzip; lossless original stdout or explicitly labelled initial transcription"
+    },
+    {
+      "log": "backend-frozen-child-recheck.log.gz",
+      "cwd": "server-version/backend",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/vitest/vitest.mjs run src/__tests__/huiteacher/assessment-runtime.routes.test.ts -t 'reads the exact|rejects foreign|requires independent|keeps shared consent|forwards one-shot|projects SJT|uses root NEW_USE|rejects stale frozen' --reporter=verbose",
+      "exitCode": 0,
+      "passed": 8,
+      "filtered": 7,
+      "originalLogName": "backend-frozen-child-recheck.log",
+      "rawLogSha256": "2e823363fa9fbe2074e5d7eafae625cdf6434102f32427084a61bb96ca081e4b",
+      "archiveSha256": "889b38bcb9e1f30230767a3549a5951081c1a6642936a4a13dc4be588437aa4a",
+      "encoding": "gzip; lossless original stdout or explicitly labelled initial transcription"
+    },
+    {
+      "log": "backend-auth-scope-and-single-family.log.gz",
+      "cwd": "server-version/backend",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/vitest/vitest.mjs run src/__tests__/huiteacher/assessment-runtime.routes.test.ts -t 'does not intercept|accepts only a Teacher|supports a dedicated' --reporter=verbose",
+      "exitCode": 0,
+      "passed": 4,
+      "filtered": 14,
+      "originalLogName": "backend-auth-scope-and-single-family.log",
+      "rawLogSha256": "e43d2170624ca427ab4c00204d39469f1c3bd415ee0fb4fbdcfda02bfbf1b625",
+      "archiveSha256": "d26d24e0b15ef8c511f3e3c39ecd0e457e5a5d5213d74e7039b607ffeb106690",
+      "encoding": "gzip; lossless original stdout or explicitly labelled initial transcription"
+    },
+    {
+      "log": "backend-types-initial.log",
+      "cwd": "server-version/backend",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/typescript/bin/tsc --noEmit",
+      "exitCode": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "log": "backend-types-frozen-child.log.gz",
+      "cwd": "server-version/backend",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/typescript/bin/tsc --noEmit",
+      "exitCode": 2,
+      "failure": "TS18048 possibly undefined slot",
+      "originalLogName": "backend-types-frozen-child.log",
+      "rawLogSha256": "40527eec4f47f6cdcb9fada2045956886441473c405cf72086a1aedb2db26c69",
+      "archiveSha256": "794ff1394ed9c42dd0c262727d137f18dce1037ce20c3a857d8ee8e5c52e9c93",
+      "encoding": "gzip; lossless original stdout or explicitly labelled initial transcription"
+    },
+    {
+      "log": "backend-types-final.log",
+      "cwd": "server-version/backend",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/typescript/bin/tsc --noEmit",
+      "exitCode": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "log": "backend-postgres-query.log.gz",
+      "cwd": "server-version/backend",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/vitest/vitest.mjs run src/__tests__/huiteacher/assessment-runtime.query.postgres.integration.test.ts --reporter=verbose",
+      "exitCode": 1,
+      "failed": 1,
+      "failure": "actual PG16 schema lacks organizations.product_domain; no schema/row writes",
+      "originalLogName": "backend-postgres-query.log",
+      "rawLogSha256": "18eba02e807d6d33875e12abf35c5d489e9cafe0808f721145dd4c58082d0763",
+      "archiveSha256": "b4d5f2d4c55d528b1ae3966e688a2989a577f517abb9e165b2b67cd1d7728f19",
+      "encoding": "gzip; lossless original stdout or explicitly labelled initial transcription"
+    },
+    {
+      "log": "frontend-initial.log.gz",
+      "cwd": "server-version/frontend",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/vitest/vitest.mjs run src/huiteacher/assessmentRuntime.client.test.ts src/huiteacher/HuiteacherMyAssessmentTasks.test.tsx --reporter=verbose",
+      "exitCode": 1,
+      "passed": 9,
+      "failed": 2,
+      "originalLogName": "frontend-initial.log",
+      "rawLogSha256": "ea95e46da796df4387dab83c710841b8396fac226e08d9aa12f933dbd37c2df3",
+      "archiveSha256": "15df2c1b6ee9d462492f278cdfc90f4586b041260c622db8c2a44cd113e1737b",
+      "encoding": "gzip; lossless original stdout or explicitly labelled initial transcription"
+    },
+    {
+      "log": "frontend-media-recheck.log.gz",
+      "cwd": "server-version/frontend",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/vitest/vitest.mjs run src/huiteacher/assessmentRuntime.client.test.ts -t 'maps only the current' --reporter=verbose",
+      "exitCode": 0,
+      "passed": 2,
+      "filtered": 2,
+      "originalLogName": "frontend-media-recheck.log",
+      "rawLogSha256": "17af257762c4551ef760aa11e28a0de179cf8203254751f3a373a17061bdb5f1",
+      "archiveSha256": "b996c8aca9d1040e0f3f9e411aa0339bdc78dcabf9d587d3d1d87d2222f4528e",
+      "encoding": "gzip; lossless original stdout or explicitly labelled initial transcription"
+    },
+    {
+      "log": "frontend-lifecycle-recheck.log.gz",
+      "cwd": "server-version/frontend",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/vitest/vitest.mjs run src/huiteacher/HuiteacherMyAssessmentTasks.test.tsx -t 'runs Cognitive|rejects a late|does not revive' --reporter=verbose",
+      "exitCode": 0,
+      "passed": 3,
+      "filtered": 4,
+      "originalLogName": "frontend-lifecycle-recheck.log",
+      "rawLogSha256": "feccf481847caa5fb07e6acd652ef49e1543c93feb368403c4d3d34e722303cd",
+      "archiveSha256": "a8823e84d9244f6da28d28774bd7deb9ade25d1517db39ab1dad7df8620b2778",
+      "encoding": "gzip; lossless original stdout or explicitly labelled initial transcription"
+    },
+    {
+      "log": "frontend-assembly.log.gz",
+      "cwd": "server-version/frontend",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/vitest/vitest.mjs run src/huiteacher/HuiteacherAssessmentTasks.test.tsx --reporter=verbose",
+      "exitCode": 1,
+      "passed": 4,
+      "failed": 1,
+      "originalLogName": "frontend-assembly.log",
+      "rawLogSha256": "309e6f49935fec53c3cbbc3425fdd4dd986531467d026f1815f9225694545bcd",
+      "archiveSha256": "ac5366b5a719e5b3143e7a8b12bf65ab9882daae25c6b8d8eeb9aebdd6da6dd7",
+      "encoding": "gzip; lossless original stdout or explicitly labelled initial transcription"
+    },
+    {
+      "log": "frontend-assembly-recheck.log.gz",
+      "cwd": "server-version/frontend",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/vitest/vitest.mjs run src/huiteacher/HuiteacherAssessmentTasks.test.tsx -t 'adds the approved runtime source' --reporter=verbose",
+      "exitCode": 0,
+      "passed": 1,
+      "filtered": 4,
+      "originalLogName": "frontend-assembly-recheck.log",
+      "rawLogSha256": "cb40591f9ae96f932b73d12575c9c46692d824f93d257fc3901d186b4d61ebcf",
+      "archiveSha256": "ae9d528bd1e1a91a05cf385ae3b425d7f4981791e7d6d3fb8bf5895ed14495db",
+      "encoding": "gzip; lossless original stdout or explicitly labelled initial transcription"
+    },
+    {
+      "log": "frontend-types-initial.log.gz",
+      "cwd": "server-version/frontend",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/typescript/bin/tsc -p tsconfig.app.json --noEmit",
+      "exitCode": 2,
+      "failure": "fixture DTO and rest argument types",
+      "originalLogName": "frontend-types-initial.log",
+      "rawLogSha256": "71cdf80401292372e943f9226f6506a03e9284dd9fceab7e00f5c10f498ed027",
+      "archiveSha256": "1d269872c99c6e008f9e6c1688387c11bf246dcf0ffa7dc4b67c479b0cff2670",
+      "encoding": "gzip; lossless original stdout or explicitly labelled initial transcription"
+    },
+    {
+      "log": "frontend-types-recheck.log",
+      "cwd": "server-version/frontend",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/typescript/bin/tsc -p tsconfig.app.json --noEmit",
+      "exitCode": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "log": "frontend-types-final.log",
+      "cwd": "server-version/frontend",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/typescript/bin/tsc -p tsconfig.app.json --noEmit",
+      "exitCode": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "note": "test-only lazy import wait changed during interval; not used as exact final test snapshot"
+    },
+    {
+      "log": "frontend-lint.log.gz",
+      "cwd": "server-version/frontend",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/eslint/bin/eslint.js src/huiteacher/assessmentRuntime.client.ts src/huiteacher/HuiteacherMyAssessmentTasks.tsx src/huiteacher/HuiteacherAssessmentTasks.tsx src/huiteacher/assessmentRuntime.client.test.ts src/huiteacher/HuiteacherMyAssessmentTasks.test.tsx",
+      "exitCode": 0,
+      "warnings": 8,
+      "originalLogName": "frontend-lint.log",
+      "rawLogSha256": "21fcf493c43aaa76e3a631bb5fac2dec2b70d58979c47f6e9a846ba738109dc8",
+      "archiveSha256": "02d7c3ea1aec8df11fe61193b17f1e27082cbe3b59db6eb148695b09d663d318",
+      "encoding": "gzip; lossless original stdout or explicitly labelled initial transcription"
+    },
+    {
+      "log": "frontend-lint-final.log",
+      "cwd": "server-version/frontend",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/eslint/bin/eslint.js src/huiteacher/assessmentRuntime.client.ts src/huiteacher/HuiteacherMyAssessmentTasks.tsx src/huiteacher/HuiteacherAssessmentTasks.tsx src/huiteacher/assessmentRuntime.client.test.ts src/huiteacher/HuiteacherMyAssessmentTasks.test.tsx",
+      "exitCode": 0,
+      "warnings": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "log": "frontend-lint-assembled.log",
+      "cwd": "server-version/frontend",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/eslint/bin/eslint.js src/huiteacher/assessmentRuntime.client.ts src/huiteacher/HuiteacherMyAssessmentTasks.tsx src/huiteacher/HuiteacherAssessmentTasks.tsx src/huiteacher/assessmentRuntime.client.test.ts src/huiteacher/HuiteacherMyAssessmentTasks.test.tsx src/huiteacher/HuiteacherAssessmentTasks.test.tsx",
+      "exitCode": 0,
+      "warnings": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "log": "frontend-types-frozen-product.log",
+      "cwd": "server-version/frontend",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/typescript/bin/tsc -p tsconfig.app.json --noEmit",
+      "exitCode": 0,
+      "exitReceipt": "frontend-types-frozen-product.exit",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sourceCommit": "bad260a01406cae83e736ae7f6c3f7437e003b24",
+      "precondition": "git diff --quiet HEAD -- src ../backend/src passed; no subsequent source edit"
+    }
+  ],
+  "preliminaryFailures": [
+    "git status from /workspace: exit 128 (not a repository)",
+    "git show specified integration object before fetch: exit 128 (not present locally)",
+    "initial HTTP tee destination missing after wrong-cwd rg; pipeline exit 1; original tool stdout retained in transcript",
+    "Unsuccessful apply_patch attempts matched stale documentation context; no partial mutation.",
+    "Full git diff --check exited 2 on whitespace in unchanged raw stdout. Nonempty logs were losslessly gzip-packed, with raw/archive SHA-256 and decompression identity checked; raw copies retained in /tmp/pr363-teacher-runtime-original-evidence. No application source changed."
+  ],
+  "blockers": [
+    {
+      "action": "Actual Teacher PG START/restore/FINAL/race qualification",
+      "target": "generated local eduk12_test on PostgreSQL16.15",
+      "state": "pending",
+      "reason": "Provided test schema lacks organizations.product_domain. The read-only query failed (42703); schema was not modified."
+    },
+    {
+      "action": "Enable Teacher runtime in production assembly",
+      "target": "backend index.ts, HuiteacherApp.tsx and shared START/FINAL transaction source consumers",
+      "state": "pending",
+      "reason": "Root owns exact reader/use proof, production COGNITIVE adapter and transaction C/P/R integration. This worker supplies a required-injection factory and opt-in inbox source."
+    }
+  ]
+}
