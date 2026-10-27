@@ -76,3 +76,18 @@ it('keeps the active task feedback identity when a background list changes its p
  expect(await screen.findByRole('region',{name:'获准的个人测评反馈'})).toHaveTextContent('正式本人测评')
  expect(api).toHaveBeenCalledWith('/reports/student/executions/'+id)
 })
+
+it('uses the server-declared education feedback namespace for approved new families',async()=>{
+ const api=vi.fn(async(path:string)=>{
+  if(path==='/my/student-reference')return {reference:'SYNTHETIC'}
+  if(path.startsWith('/my/activity-tasks')){const data=page('COGNITIVE');return {...data,list:data.list.map(task=>({...task,feedbackNamespace:'EDUCATION_ASSESSMENT'}))}}
+  if(path==='/assessment-reports/executions/'+id)return {state:'COMPLETED',kind:'EDUCATION_ASSESSMENT_PERSONAL_REPORT',schemaVersion:1}
+  throw Error('Unexpected feedback path '+path)
+ })
+ render(<SchoolStudentTasks api={api as unknown as SchoolApi}/>)
+ fireEvent.click(await screen.findByRole('button',{name:'开始／继续官方测评'}))
+ await screen.findByRole('button',{name:'退出合成测评宿主'})
+ act(()=>capture.finished!())
+ await waitFor(()=>expect(api).toHaveBeenCalledWith('/assessment-reports/executions/'+id))
+ expect(api.mock.calls.some(([path])=>path.startsWith('/reports/student/'))).toBe(false)
+})

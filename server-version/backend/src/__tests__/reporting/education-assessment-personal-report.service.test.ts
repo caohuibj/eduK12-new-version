@@ -1,9 +1,11 @@
 import { beforeEach, afterEach, describe, it, expect, vi } from 'vitest'
-const m=vi.hoisted(()=>({query:vi.fn(),scope:vi.fn(),summary:vi.fn(),parent:vi.fn(),units:vi.fn(),job:vi.fn()}))
+const m=vi.hoisted(()=>({query:vi.fn(),scope:vi.fn(),summary:vi.fn(),parent:vi.fn(),units:vi.fn(),job:vi.fn(),identity:vi.fn()}))
 vi.mock('../../config/database',()=>({prisma:{$transaction:(work:(tx:unknown)=>unknown)=>work({$queryRaw:m.query,
   compositeAssessmentAttempt:{findUnique:m.parent},assessmentUnitSnapshot:{findMany:m.units},compositeReportJob:{findUnique:m.job}})}}))
 vi.mock('../../modules/organization/educationProductAccess',()=>({resolveEducationProductMemberScope:m.scope}))
 vi.mock('../../modules/reporting/respondentSummary',()=>({readRespondentRunSummary:m.summary}))
+vi.mock('../../modules/assessment-run/educationAssessmentExecution',()=>({assertEducationAssessmentExecutionSource:m.identity}))
+import { readEducationRespondentAssessmentReport } from '../../modules/reporting/education-assessment-report.service'
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 import { educationReportFixture } from './education-assessment-report.fixture'
 import { createEducationAssessmentReportReader } from '../../modules/reporting/education-assessment-personal-report.service'
@@ -127,4 +129,20 @@ it('keeps identically named metrics in distinct approved unit reports instead of
   {itemId:f.origin.units[1].itemId,rendered:{blocks:[{type:'TEXT'},{metricKey:'score',value:11}]}},
  ]})
  expect(m.summary).toHaveBeenCalledWith('self','execution',{disclosureOnly:true})
+})
+
+it('production composition consumes HISTORY and original proofs without new-use or current-issuer admission',async()=>{
+ const f=await setup()
+ f.source.authority=[0,1,2].map(index=>({kind:'SYSTEM_ADMIN',actorId:'00000000-0000-4000-8000-'+String(index+900).padStart(12,'0')})) as unknown as typeof f.source.authority
+ m.identity.mockResolvedValue(f.source)
+ expect(await readEducationRespondentAssessmentReport(input)).toMatchObject({state:'READY'})
+ expect(m.identity).toHaveBeenCalledWith(expect.anything(),{executionId:'execution',compositeId:f.origin.runtimeCompositeId,purpose:'FROZEN'})
+ expect(m.query).toHaveBeenCalledTimes(2)
+})
+
+it('pure Form BUNDLE confirms a completed parent without measurement, interpretation or score rows',async()=>{
+ const f=await setup();f.origin.family='BUNDLE';f.origin.units=[]
+ Object.assign(f.source.runtime,{formSections:[{id:'approved-form-section'}],items:[]})
+ expect(await f.read(input)).toMatchObject({state:'COMPLETED',mode:'COMPLETION_ONLY'})
+ expect(m.units).not.toHaveBeenCalled();expect(m.summary).not.toHaveBeenCalled()
 })

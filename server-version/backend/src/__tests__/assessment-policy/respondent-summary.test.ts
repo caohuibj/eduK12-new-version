@@ -35,6 +35,7 @@ it('checks current respondent disclosure without flattening same-named canonical
  ownDisclosure();mocks.resolve.mockRejectedValue(Error('AMBIGUOUS_OBSERVATION'))
  expect(await readRespondentRunSummary('self','e',{disclosureOnly:true})).toEqual({schemaVersion:1,mode:'INDIVIDUAL_SUMMARY',state:'READY',metricKeys:['score']})
  expect(mocks.resolve).not.toHaveBeenCalled();expect(mocks.query).toHaveBeenCalledTimes(2)
+ expect(mocks.query.mock.calls[0][0].join(' ')).toContain('REPORT_READ')
 })
 it('retains the default metric summary refusal for an ambiguous observation',async()=>{
  ownDisclosure();mocks.resolve.mockRejectedValue(Error('AMBIGUOUS_OBSERVATION'))

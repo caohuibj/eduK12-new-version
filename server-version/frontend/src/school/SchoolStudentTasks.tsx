@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { BookOpen, CalendarCheck2, ClipboardList, FileText, RefreshCw, ArrowLeft, Clock3 } from 'lucide-react'
+import { createEducationAssessmentFeedback } from '../components/education-tools/educationAssessmentFeedbackAdapter'
 import { EducationTaskFeedback, type EducationFeedbackData } from '../components/education-tools/EducationTaskFeedback'
 import {SchoolCollectionControls,type SchoolCollectionView} from './SchoolCollectionControls'
 import {schoolSearchText,schoolDeadline} from './school-collection'
@@ -11,7 +12,7 @@ export type SchoolTask={
   id:string;activityId:string;activityTitle:string
   kind:'ASSIGNMENT'|'READING'|'CHECKIN'|'MEASUREMENT'
   title:string;status:'PENDING'|'COMPLETED'|'EXPIRED'|'IN_PROGRESS'|'UNAVAILABLE'
-  deadline:string|null;href:string|null;resourceFamily?:string
+  deadline:string|null;href:string|null;resourceFamily?:string;feedbackNamespace?:'EDUCATION_ASSESSMENT'
   canResumeExisting?:boolean
   consentRequired?:boolean;consentPurpose?:string|null;consentVisibility?:string|null
 }
@@ -108,6 +109,7 @@ export function SchoolStudentTasks({api,activityId}: {api:SchoolApi;activityId?:
     if(!visibleFeedback&&feedbackWasOpen.current){inboxTitle.current?.focus({preventScroll:true});inboxTitle.current?.scrollIntoView?.({block:'start'})}
     feedbackWasOpen.current=Boolean(visibleFeedback)
   },[visibleFeedback])
+  const renderAssessmentFeedback=useMemo(()=>createEducationAssessmentFeedback({api,entry:'SCHOOL'}),[api])
   const feedbackExecutionId=visibleFeedback?.task.id
   const readFeedback=useCallback(()=>api<EducationFeedbackData>(
     '/reports/student/executions/'+feedbackExecutionId),[api,feedbackExecutionId])
@@ -199,9 +201,11 @@ export function SchoolStudentTasks({api,activityId}: {api:SchoolApi;activityId?:
     </details>
     </div>
     {!selected&&(visibleExecution||visibleFeedback)&&error&&<p className="hs-alert" role="alert">{error}</p>}
-    {visibleFeedback&&<EducationTaskFeedback key={visibleFeedback.task.id} entry="SCHOOL"
+    {visibleFeedback&&(visibleFeedback.task.feedbackNamespace==='EDUCATION_ASSESSMENT'?
+      renderAssessmentFeedback({executionId:visibleFeedback.task.id,title:visibleFeedback.task.title,onClose:()=>setFeedback(null)}):
+      <EducationTaskFeedback key={visibleFeedback.task.id} entry="SCHOOL"
       executionId={visibleFeedback.task.id} title={visibleFeedback.task.title} api={api}
-      loadFeedback={readFeedback} onClose={()=>setFeedback(null)}/>}
+      loadFeedback={readFeedback} onClose={()=>setFeedback(null)}/>)}
     {visibleExecution&&<SchoolCompositeRunner key={visibleExecution.executionId} api={api} execution={visibleExecution} title={executionTask.current?.scope===scope?executionTask.current.task.title:undefined}
       onExit={()=>setExecution(null)}
       onFinished={finishExecution} onParentCompleted={finishExecution}/>}

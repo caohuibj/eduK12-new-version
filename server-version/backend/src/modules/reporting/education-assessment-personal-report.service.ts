@@ -3,7 +3,7 @@ import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { currentRunPopulationAuthoritySql } from '../assessment-run/currentPopulationAuthority'
 import { resolveEducationProductMemberScope } from '../organization/educationProductAccess'
-import { educationAssessmentOriginSchema, educationAssessmentResourceKey, type EducationAssessmentOrigin } from '../education-tools/assessment-resource.contract'
+import { educationAssessmentResourceKey, type EducationAssessmentOrigin } from '../education-tools/assessment-resource.contract'
 import type { RelationalProductEntryV1 } from '../assessment-relational/product-registry'
 import type { StoredRelease } from '../measurement-content/repository'
 import { validateResultDisclosureContract } from '../assessment-policy/result-disclosure'
@@ -21,12 +21,12 @@ export type EducationAssessmentReportInput={actorUserId:string;executionId:strin
 /** Minimum source seam. This internal reader proves immutable source identity,
  * never caller report authority. The root adapter owns publication/source rights. */
 export type EducationAssessmentReportIdentity={identityOnly:true;origin:EducationAssessmentOrigin;
-  entry:RelationalProductEntryV1;runtime:{id:string};releases:ReadonlyMap<string,StoredRelease>;authority:ReadonlyArray<unknown>}
+  entry:RelationalProductEntryV1;runtime:{id:string;formSections?:ReadonlyArray<unknown>;items?:ReadonlyArray<{type:string}>};releases:ReadonlyMap<string,StoredRelease>;authority:ReadonlyArray<unknown>}
 export type EducationAssessmentReportDependencies<Source extends EducationAssessmentReportIdentity=EducationAssessmentReportIdentity>={
   /** Optional stricter education opening policy, read from the actual frozen
    * task/source settings. Null means no additional opening-time restriction. */
   readReportOpening?:(tx:Prisma.TransactionClient,input:EducationAssessmentReportInput&{organizationId:string;source:Source;attemptId:string;attemptEpoch:number})=>Promise<{releaseAt:string|null}>
-  readSource:(tx:Prisma.TransactionClient,input:{product:'SCHOOL'|'TEACHER';organizationId:string;resourceKey:string;resourceVersion:string;purpose:'HISTORY'})=>Promise<Source|null>
+  readSource:(tx:Prisma.TransactionClient,input:{product:'SCHOOL'|'TEACHER';organizationId:string;resourceKey:string;resourceVersion:string;purpose:'HISTORY';executionId:string;compositeId:string})=>Promise<Source|null>
   assertSourceAuthority:(tx:Prisma.TransactionClient,input:EducationAssessmentReportInput&{organizationId:string;source:Source;purpose:'REPORT_READ'})=>Promise<void>
 }
 type Own={organizationId:string;resourceKey:string;resourceVersion:string;attemptId:string;assignmentId:string;policy:Record<string,unknown>;policyHash:string}
@@ -77,10 +77,13 @@ export function createEducationAssessmentReportReader<Source extends EducationAs
     const own=await readOwn(tx,input)
     if(!own)return null
     if(canonicalHash(own.policy)!==own.policyHash)hidden()
-    const sourceInput={product:input.product,organizationId:own.organizationId,resourceKey:own.resourceKey,resourceVersion:own.resourceVersion,purpose:'HISTORY' as const}
+    const parent=await tx.compositeAssessmentAttempt.findUnique({where:{id:own.attemptId},include:{compositeAssessment:true}})
+    if(!parent||parent.userId!==input.actorUserId||parent.respondentUserId!==input.actorUserId
+      ||parent.subjectUserId!==input.actorUserId||parent.assignmentRef!==own.assignmentId)hidden()
+    const sourceInput={executionId:input.executionId,compositeId:parent.compositeAssessmentId,product:input.product,organizationId:own.organizationId,resourceKey:own.resourceKey,resourceVersion:own.resourceVersion,purpose:'HISTORY' as const}
     const source=await deps.readSource(tx,sourceInput)
     if(!source||source.identityOnly!==true)hidden()
-    const origin=educationAssessmentOriginSchema.parse(source.origin)
+    const origin=source.origin
     if(origin.product!==input.product||origin.organizationId!==own.organizationId||educationAssessmentResourceKey(origin)!==own.resourceKey
       ||origin.adapterVersion!==own.resourceVersion||source.runtime.id!==origin.runtimeCompositeId
       ||source.entry.releaseStatus!=='PUBLISHED'||source.entry.applicability.resourceKey!==own.resourceKey
@@ -88,9 +91,7 @@ export function createEducationAssessmentReportReader<Source extends EducationAs
     const contract=validateResultDisclosureContract(own.policy.resultDisclosure)
     if(canonicalHash(contract)!==canonicalHash(source.entry.resultDisclosure))hidden()
     await deps.assertSourceAuthority(tx,{...input,organizationId:own.organizationId,source,purpose:'REPORT_READ'})
-    const parent=await tx.compositeAssessmentAttempt.findUnique({where:{id:own.attemptId},include:{compositeAssessment:true}})
-    if(!parent||parent.compositeAssessmentId!==origin.runtimeCompositeId||parent.userId!==input.actorUserId
-      ||parent.respondentUserId!==input.actorUserId||parent.subjectUserId!==input.actorUserId||parent.assignmentRef!==own.assignmentId)hidden()
+    if(parent.compositeAssessmentId!==origin.runtimeCompositeId)hidden()
     let openingIdentity:{releaseAt:string|null}|undefined
     const recheck=async()=>{
       const current=await readOwn(tx,input)
@@ -107,6 +108,14 @@ export function createEducationAssessmentReportReader<Source extends EducationAs
       }
     }
     const rule=contract.audiences.RESPONDENT
+    if(origin.family==='BUNDLE'&&origin.units.length===0){
+      // The source resolver validates the frozen pure-Form definition. No
+      // measurement/reference/report receipt is needed to confirm a Form FINAL.
+      if(!source.runtime.formSections?.length||source.runtime.items?.some(item=>item.type!=='FORM'))hidden()
+      await recheck()
+      return parent.status==='COMPLETED'?response('COMPLETED','本次表单已正式完成，当前只提供完成确认。'):
+        response('WITHHELD','当前尚未收到整份表单的完成确认。')
+    }
     if(rule.mode==='NONE'){await recheck();return response('WITHHELD','本次测评暂不提供个人反馈。')}
     const job=parent.asyncReportEpoch===parent.attemptEpoch?await tx.compositeReportJob.findUnique({where:{attemptId_attemptEpoch:{attemptId:parent.id,attemptEpoch:parent.attemptEpoch}},
       select:{status:true,attemptEpoch:true,slotSetHash:true,contextHash:true,aggregateInputHash:true,wholeAcceptedAt:true}}):null

@@ -3,9 +3,11 @@ import {useCallback,useState} from 'react'
 import {HuiteacherMyFormTasks} from './HuiteacherMyFormTasks'
 import {HuiteacherMyPrivateFormTasks} from './HuiteacherMyPrivateFormTasks'
 import {HuiteacherMyScaleTasks} from './HuiteacherMyScaleTasks'
+import type {EducationAssessmentFeedbackRenderer} from '../components/education-tools/educationAssessmentFeedbackAdapter'
 import type {AssessmentListState} from './assessmentTaskPresentation'
 
-type Props={api:Parameters<typeof HuiteacherMyScaleTasks>[0]['api'];actorKey:string}
+type Props={api:Parameters<typeof HuiteacherMyScaleTasks>[0]['api'];actorKey:string;
+ assessmentRuntime?:{renderFeedback?:EducationAssessmentFeedbackRenderer;onCompleted?:(completion:{executionId:string;attemptId:string})=>void}}
 const initial:AssessmentListState={pending:true,error:false,count:0}
 // Keep the existing authorized runners mounted; only their task presentation is combined.
 export function HuiteacherAssessmentTasks({api,actorKey}:Props){

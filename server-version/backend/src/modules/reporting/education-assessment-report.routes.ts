@@ -4,6 +4,7 @@ import { authenticateSchool, authenticateHuiteacher } from '../../middleware/aut
 import { asyncHandler } from '../../middleware/asyncHandler'
 import { success } from '../../utils/response'
 import { readCampusStudentStatus } from '../campus/admission.service'
+import { readEducationRespondentAssessmentReport } from './education-assessment-report.service'
 import type { EducationAssessmentReportReader } from './education-assessment-personal-report.service'
 
 /** Root mounts the independently composed reader under each authenticated
@@ -24,3 +25,6 @@ export function createEducationAssessmentReportRouter(product:'SCHOOL'|'TEACHER'
   }))
   return router
 }
+
+export const educationSchoolAssessmentReportRouter=createEducationAssessmentReportRouter('SCHOOL',readEducationRespondentAssessmentReport)
+export const educationTeacherAssessmentReportRouter=createEducationAssessmentReportRouter('TEACHER',readEducationRespondentAssessmentReport)
