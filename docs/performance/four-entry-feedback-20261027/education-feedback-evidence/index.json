@@ -1,0 +1,345 @@
+{
+  "recordedAt": "2026-10-27T09:18:30.311143+00:00",
+  "branch": "feat/pr363-education-feedback",
+  "codeCommit": "9555c2c4bebe9a851af57638aaa5e9b321cb75ec",
+  "codeTree": "6fbe95e22ede62fdc7b5ef100f0094d2754dcb21",
+  "base": "6cf241d65b4bc44878ef9d9fe21c81fdd02561cd",
+  "node": "24.19.0",
+  "tools": {
+    "backend": {
+      "typescript": "5.9.3",
+      "vitest": "4.1.11",
+      "vite": "7.3.7"
+    },
+    "frontend": {
+      "typescript": "5.6.3",
+      "vitest": "4.1.11",
+      "vite": "6.4.4"
+    }
+  },
+  "executions": [
+    {
+      "id": "frontend-tests-1",
+      "cwd": "server-version/frontend",
+      "command": "./node_modules/.bin/vitest run src/components/education-tools/EducationTaskFeedback.test.tsx src/school/SchoolStudentTasks.test.tsx src/huiteacher/HuiteacherMyScaleTasks.test.tsx src/modules/composite/__tests__/TrainingContentReports.test.tsx --maxWorkers=2 --reporter=json --outputFile=/tmp/pr363-feedback-evidence/frontend-tests-1.json > /tmp/pr363-feedback-evidence/frontend-tests-1.log 2>&1",
+      "exitCode": 0,
+      "passed": 37,
+      "failed": 0,
+      "filtered": 0,
+      "report": "frontend-tests-1.json",
+      "originalResultSuccess": true
+    },
+    {
+      "id": "backend-tests-1",
+      "cwd": "server-version/backend",
+      "command": "./node_modules/.bin/vitest run src/__tests__/reporting/education-assessment-report.projector.test.ts src/__tests__/reporting/education-assessment-personal-report.service.test.ts --maxWorkers=2 --reporter=json --outputFile=/tmp/pr363-feedback-evidence/backend-tests-1.json > /tmp/pr363-feedback-evidence/backend-tests-1.log 2>&1",
+      "exitCode": 0,
+      "passed": 11,
+      "failed": 0,
+      "filtered": 0,
+      "report": "backend-tests-1.json",
+      "originalResultSuccess": true
+    },
+    {
+      "id": "backend-service-tests-1",
+      "cwd": "server-version/backend",
+      "command": "./node_modules/.bin/vitest run src/__tests__/reporting/education-assessment-personal-report.service.test.ts --maxWorkers=2 --reporter=json --outputFile=/tmp/pr363-feedback-evidence/backend-service-tests-1.json > /tmp/pr363-feedback-evidence/backend-service-tests-1.log 2>&1",
+      "exitCode": 1,
+      "passed": 20,
+      "failed": 1,
+      "filtered": 0,
+      "report": "backend-service-tests-1.json",
+      "originalResultSuccess": false
+    },
+    {
+      "id": "backend-service-routes-2",
+      "cwd": "server-version/backend",
+      "command": "./node_modules/.bin/vitest run src/__tests__/reporting/education-assessment-personal-report.service.test.ts src/__tests__/reporting/education-assessment-report.routes.test.ts --maxWorkers=2 --reporter=json --outputFile=/tmp/pr363-feedback-evidence/backend-service-routes-2.json > /tmp/pr363-feedback-evidence/backend-service-routes-2.log 2>&1",
+      "exitCode": 1,
+      "passed": 5,
+      "failed": 23,
+      "filtered": 0,
+      "report": "backend-service-routes-2.json",
+      "originalResultSuccess": false
+    },
+    {
+      "id": "backend-service-projector-3",
+      "cwd": "server-version/backend",
+      "command": "./node_modules/.bin/vitest run src/__tests__/reporting/education-assessment-personal-report.service.test.ts src/__tests__/reporting/education-assessment-report.projector.test.ts --maxWorkers=2 --reporter=json --outputFile=/tmp/pr363-feedback-evidence/backend-service-projector-3.json > /tmp/pr363-feedback-evidence/backend-service-projector-3.log 2>&1",
+      "exitCode": 0,
+      "passed": 34,
+      "failed": 0,
+      "filtered": 0,
+      "report": "backend-service-projector-3.json",
+      "originalResultSuccess": true
+    },
+    {
+      "id": "frontend-school-completion-2",
+      "cwd": "server-version/frontend",
+      "command": "./node_modules/.bin/vitest run src/school/SchoolCompositeRunner.test.tsx src/school/SchoolStudentTasks.completion.test.tsx --maxWorkers=2 --reporter=json --outputFile=/tmp/pr363-feedback-evidence/frontend-school-completion-2.json > /tmp/pr363-feedback-evidence/frontend-school-completion-2.log 2>&1",
+      "exitCode": 1,
+      "passed": 20,
+      "failed": 1,
+      "filtered": 0,
+      "report": "frontend-school-completion-2.json",
+      "originalResultSuccess": false
+    },
+    {
+      "id": "frontend-teacher-increment-2",
+      "cwd": "server-version/frontend",
+      "command": "./node_modules/.bin/vitest run src/huiteacher/HuiteacherMyScaleTasks.test.tsx src/components/education-tools/EducationTaskFeedback.test.tsx -t 'opens feedback from|renders authorized Teacher|does not render metric|shows honest missing-threshold' --maxWorkers=2 --reporter=json --outputFile=/tmp/pr363-feedback-evidence/frontend-teacher-increment-2.json > /tmp/pr363-feedback-evidence/frontend-teacher-increment-2.log 2>&1",
+      "exitCode": 0,
+      "passed": 4,
+      "failed": 0,
+      "filtered": 16,
+      "report": "frontend-teacher-increment-2.json",
+      "originalResultSuccess": true
+    },
+    {
+      "id": "frontend-observer-repair-3",
+      "cwd": "server-version/frontend",
+      "command": "./node_modules/.bin/vitest run src/school/SchoolCompositeRunner.test.tsx -t 'observer: true' --maxWorkers=1 --reporter=json --outputFile=/tmp/pr363-feedback-evidence/frontend-observer-repair-3.json > /tmp/pr363-feedback-evidence/frontend-observer-repair-3.log 2>&1",
+      "exitCode": 0,
+      "passed": 1,
+      "failed": 0,
+      "filtered": 18,
+      "report": "frontend-observer-repair-3.json",
+      "originalResultSuccess": true
+    },
+    {
+      "id": "frontend-school-guards-4",
+      "cwd": "server-version/frontend",
+      "command": "./node_modules/.bin/vitest run src/school/SchoolCompositeRunner.test.tsx src/school/SchoolStudentTasks.completion.test.tsx -t 'completion hint|remounts a newly' --maxWorkers=2 --reporter=json --outputFile=/tmp/pr363-feedback-evidence/frontend-school-guards-4.json > /tmp/pr363-feedback-evidence/frontend-school-guards-4.log 2>&1",
+      "exitCode": 0,
+      "passed": 2,
+      "failed": 0,
+      "filtered": 21,
+      "report": "frontend-school-guards-4.json",
+      "originalResultSuccess": true
+    },
+    {
+      "id": "frontend-school-list-5",
+      "cwd": "server-version/frontend",
+      "command": "./node_modules/.bin/vitest run src/school/SchoolStudentTasks.completion.test.tsx -t 'background list changes' --maxWorkers=1 --reporter=json --outputFile=/tmp/pr363-feedback-evidence/frontend-school-list-5.json > /tmp/pr363-feedback-evidence/frontend-school-list-5.log 2>&1",
+      "exitCode": 0,
+      "passed": 1,
+      "failed": 0,
+      "filtered": 3,
+      "report": "frontend-school-list-5.json",
+      "originalResultSuccess": true
+    },
+    {
+      "id": "backend-types-1",
+      "cwd": "server-version/backend",
+      "command": "./node_modules/.bin/tsc --noEmit > /tmp/pr363-feedback-evidence/backend-types-1.log 2>&1",
+      "exitCode": 2,
+      "log": "backend-types-1.log"
+    },
+    {
+      "id": "backend-types-2",
+      "cwd": "server-version/backend",
+      "command": "./node_modules/.bin/tsc --noEmit > /tmp/pr363-feedback-evidence/backend-types-2.log 2>&1",
+      "exitCode": 0,
+      "log": "backend-types-2.log"
+    },
+    {
+      "id": "backend-types-3",
+      "cwd": "server-version/backend",
+      "command": "./node_modules/.bin/tsc --noEmit > /tmp/pr363-feedback-evidence/backend-types-3.log 2>&1",
+      "exitCode": 0,
+      "log": "backend-types-3.log"
+    },
+    {
+      "id": "backend-types-4",
+      "cwd": "server-version/backend",
+      "command": "./node_modules/.bin/tsc --noEmit > /tmp/pr363-feedback-evidence/backend-types-4.log 2>&1",
+      "exitCode": 0,
+      "log": "backend-types-4.log"
+    },
+    {
+      "id": "frontend-types-1",
+      "cwd": ".",
+      "command": "./server-version/frontend/node_modules/.bin/tsc -p server-version/frontend/tsconfig.app.json --noEmit > /tmp/pr363-feedback-evidence/frontend-types-1.log 2>&1",
+      "exitCode": 0,
+      "log": "frontend-types-1.log"
+    },
+    {
+      "id": "frontend-types-2",
+      "cwd": "server-version/frontend",
+      "command": "./node_modules/.bin/tsc -p tsconfig.app.json --noEmit > /tmp/pr363-feedback-evidence/frontend-types-2.log 2>&1",
+      "exitCode": 0,
+      "log": "frontend-types-2.log"
+    },
+    {
+      "id": "frontend-types-3",
+      "cwd": "server-version/frontend",
+      "command": "./node_modules/.bin/tsc -p tsconfig.app.json --noEmit > /tmp/pr363-feedback-evidence/frontend-types-3.log 2>&1",
+      "exitCode": 2,
+      "log": "frontend-types-3.log"
+    },
+    {
+      "id": "frontend-types-4",
+      "cwd": "server-version/frontend",
+      "command": "./node_modules/.bin/tsc -p tsconfig.app.json --noEmit > /tmp/pr363-feedback-evidence/frontend-types-4.log 2>&1",
+      "exitCode": 0,
+      "log": "frontend-types-4.log"
+    },
+    {
+      "id": "frontend-lint-1",
+      "exitCode": 0,
+      "warnings": 4,
+      "note": "Initial changed-files lint; two warnings were later removed, two preexisting runner state dependency warnings remain.",
+      "cwd": "server-version/frontend",
+      "command": "./node_modules/.bin/eslint src/components/education-tools/EducationTaskFeedback.tsx src/components/education-tools/EducationAssessmentReport.tsx src/components/education-tools/EducationTaskFeedback.test.tsx src/modules/composite/TrainingContentReports.tsx src/school/SchoolStudentTasks.tsx src/school/SchoolStudentTasks.completion.test.tsx src/school/SchoolCompositeRunner.tsx src/school/SchoolCompositeRunner.test.tsx src/huiteacher/HuiteacherMyScaleTasks.tsx src/huiteacher/HuiteacherMyScaleTasks.test.tsx > /tmp/pr363-feedback-evidence/frontend-lint-1.log 2>&1"
+    },
+    {
+      "id": "frontend-lint-2",
+      "exitCode": 0,
+      "warnings": 2,
+      "note": "Final changed frontend files; original two runner state dependency warnings remain.",
+      "cwd": "server-version/frontend",
+      "command": "./node_modules/.bin/eslint src/components/education-tools/EducationTaskFeedback.tsx src/components/education-tools/EducationAssessmentReport.tsx src/components/education-tools/EducationTaskFeedback.test.tsx src/modules/composite/TrainingContentReports.tsx src/school/SchoolStudentTasks.tsx src/school/SchoolStudentTasks.completion.test.tsx src/school/SchoolCompositeRunner.tsx src/school/SchoolCompositeRunner.test.tsx src/huiteacher/HuiteacherMyScaleTasks.tsx src/huiteacher/HuiteacherMyScaleTasks.test.tsx > /tmp/pr363-feedback-evidence/frontend-lint-2.log 2>&1"
+    },
+    {
+      "id": "frontend-lint-test-repair-3",
+      "exitCode": 0,
+      "warnings": 0,
+      "command": "./node_modules/.bin/eslint src/school/SchoolCompositeRunner.test.tsx"
+    },
+    {
+      "id": "frontend-school-cognitive-6",
+      "cwd": "server-version/frontend",
+      "command": "./node_modules/.bin/vitest run src/school/SchoolCompositeRunner.cognitive.integration.test.tsx --maxWorkers=1 --reporter=json --outputFile=/tmp/pr363-feedback-evidence/frontend-school-cognitive-6.json > /tmp/pr363-feedback-evidence/frontend-school-cognitive-6.log 2>&1",
+      "exitCode": 1,
+      "passed": 0,
+      "failed": 2,
+      "filtered": 0,
+      "report": "frontend-school-cognitive-6.json",
+      "originalResultSuccess": false
+    },
+    {
+      "id": "frontend-school-cognitive-7",
+      "cwd": "server-version/frontend",
+      "command": "./node_modules/.bin/vitest run src/school/SchoolCompositeRunner.cognitive.integration.test.tsx --maxWorkers=1 --reporter=json --outputFile=/tmp/pr363-feedback-evidence/frontend-school-cognitive-7.json > /tmp/pr363-feedback-evidence/frontend-school-cognitive-7.log 2>&1",
+      "exitCode": 0,
+      "passed": 2,
+      "failed": 0,
+      "filtered": 0,
+      "report": "frontend-school-cognitive-7.json",
+      "originalResultSuccess": true
+    },
+    {
+      "id": "backend-authority-increment-4",
+      "cwd": "server-version/backend",
+      "command": "./node_modules/.bin/vitest run src/__tests__/reporting/education-assessment-personal-report.service.test.ts -t 'original source authority|reads exact saved|rejects .*withdrawal|honors an exact configured' --maxWorkers=1 --reporter=json --outputFile=/tmp/pr363-feedback-evidence/backend-authority-increment-4.json > /tmp/pr363-feedback-evidence/backend-authority-increment-4.log 2>&1",
+      "exitCode": 0,
+      "passed": 6,
+      "failed": 0,
+      "filtered": 18,
+      "report": "backend-authority-increment-4.json",
+      "originalResultSuccess": true
+    },
+    {
+      "id": "backend-types-5",
+      "cwd": "server-version/backend",
+      "command": "./node_modules/.bin/tsc --noEmit > /tmp/pr363-feedback-evidence/backend-types-5.log 2>&1",
+      "exitCode": 0,
+      "log": "backend-types-5.log"
+    },
+    {
+      "id": "frontend-lint-cognitive-fixture-4",
+      "cwd": "server-version/frontend",
+      "command": "./node_modules/.bin/eslint src/school/SchoolCompositeRunner.cognitive.integration.test.tsx",
+      "exitCode": 0,
+      "warnings": 0
+    },
+    {
+      "id": "backend-unit-disclosure-5",
+      "cwd": "server-version/backend",
+      "command": "./node_modules/.bin/vitest run src/__tests__/assessment-policy/respondent-summary.test.ts src/__tests__/reporting/education-assessment-personal-report.service.test.ts --maxWorkers=2 --reporter=json --outputFile=/tmp/pr363-feedback-evidence/backend-unit-disclosure-5.json > /tmp/pr363-feedback-evidence/backend-unit-disclosure-5.log 2>&1",
+      "exitCode": 0,
+      "passed": 29,
+      "failed": 0,
+      "filtered": 0,
+      "report": "backend-unit-disclosure-5.json",
+      "originalResultSuccess": true
+    },
+    {
+      "id": "backend-types-6",
+      "cwd": "server-version/backend",
+      "command": "./node_modules/.bin/tsc --noEmit > /tmp/pr363-feedback-evidence/backend-types-6.log 2>&1",
+      "exitCode": 0,
+      "log": "backend-types-6.log"
+    }
+  ],
+  "files": {
+    "backend-authority-increment-4.json": "a1e33b89a1e181eb30a5d00d79511eaeaa3df836b27047442c4b09fad832ce30",
+    "backend-authority-increment-4.log": "22e93b93d7867b08bc9f350adf3a8899f978301d335f53eb327c48cfe47615e7",
+    "backend-service-projector-3.json": "c226582f98d367694ce0bda396bdd9ec22c0ac4a55cd070fdb6b70b37761ed40",
+    "backend-service-projector-3.log": "c3a48680faa0ac9053aed1f0c0fe45926662fbde2bd895b4ea9d19568b03a547",
+    "backend-service-routes-2.json": "5645d49cb8e6e3d58aebeeba595e9c950eaf34725202e590d02f4105ca144225",
+    "backend-service-routes-2.log": "230048f97d493689c08ce435e6c4444d087bf193fe84c1cf8d7355b1e162eac7",
+    "backend-service-tests-1.json": "4564c2b4ba44bd2a760d0b4ea4f983c57ccffa551c4a3e2c2b6298a423d01d38",
+    "backend-service-tests-1.log": "90888ceb2c0c150cf1272ff532d62d8c69c536d77831f2e5a859fcb4b2ffbd96",
+    "backend-tests-1.json": "91a53a0deeae4c98fb91c1efce87579109a79b6eb7fc17c4657577cc23f44c4d",
+    "backend-tests-1.log": "d377f59a91a3b59003724ab260a654afd075f71f73f424217dcb42d7796b868c",
+    "backend-types-1.log": "e3f762e406140646798481812f798f7078174b116daf97418ba1f2f25826a558",
+    "backend-types-2.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "backend-types-3.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "backend-types-4.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "backend-types-5.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "backend-types-6.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "backend-unit-disclosure-5.json": "fe511955351cfef3df9125640d49ff4bd8fd00ec6e871cb66de3a4cac47bbbb5",
+    "backend-unit-disclosure-5.log": "cadb61c7ea442aead079e45c54f1fbac4d8560eda39b92eb0582a4f50a33eaea",
+    "final-input-observation-2.json": "d0e1e039863392343542a23a05a61e5e1c7e4ed43b2ec4f9c05098de36788184",
+    "final-input-observation-3.json": "1aa6fb1ee78d05a76ba4ec69a654dfa5ab68ecd82e06bbfa369a506387e7c99c",
+    "final-input-observation-4.json": "9ece659ad797b6b84fcdf3da129f591422af8207cc2462bc9e3dd04ff9f06f47",
+    "final-input-observation.json": "228f6769735261a46f402729c5bf12f9ee748248f9d3c4273096ef700cabc68d",
+    "frontend-lint-1.log": "2b68fb1294a2a327a1c1aaba56963e7fb2f9ac6acc919a6ac916063bec573105",
+    "frontend-lint-2.log": "a052f045e4e2e024bef5df98a169291417ea02d424bb55f5722b312481f24cc0",
+    "frontend-lint-cognitive-fixture-4.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "frontend-lint-test-repair-3.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "frontend-observer-repair-3.json": "f6588694f8d86e83c4ec3d6db07fd44f192788395390dcef67cd9f25e6acbe5c",
+    "frontend-observer-repair-3.log": "647f9b9240e264220083587e920c69d3c9a2aef15bc860c0ac617bc8f44d2503",
+    "frontend-school-cognitive-6.json": "3cdbfa6c641c434c17f2ff16fcb07ccf130018871109571e4d5bd774b9cfd7af",
+    "frontend-school-cognitive-6.log": "49cb9cfdf889c686af2e54dc8286899d1113a9f1df9b21482ab48680ab60a515",
+    "frontend-school-cognitive-7.json": "6c378879d6a2312665fb8303b5d49f126f024e6c98f20db4905662a3d6b29aa9",
+    "frontend-school-cognitive-7.log": "5170cdbebc883385532f299aba0b9031b76cdc7b9b3441fc3d25f9aefe46dd14",
+    "frontend-school-completion-2.json": "d1826cc773e3b283366a19bf21f43088a583f9801fe5061b985abea4b8c2eac6",
+    "frontend-school-completion-2.log": "227ee94f1d7d22b4de0a1fe510c76b9e8bfdf259fc9e9ea18302e61639d7729b",
+    "frontend-school-guards-4.json": "06a6b4025724d17c74b79b29d6588e6fed5d6f8677adf068e107514ea6dfaae2",
+    "frontend-school-guards-4.log": "4ff39884751cb1b4eb11a7f97a25a8809572e57b8454dba3b29fa6e3253bd839",
+    "frontend-school-list-5.json": "b18885b2fbc73654c4cc4ad5929fa1fb181feadd362d51d25a59ddaf0e5e9649",
+    "frontend-school-list-5.log": "1283099f9eedf8c79d9b0ba0706402c314c32f7f6dbc158346d1abc174dafc1f",
+    "frontend-teacher-increment-2.json": "9b911afcbdfbd2b9eab4a50a476e6c62c0cefd8cf5e3fcf36288f1119980e962",
+    "frontend-teacher-increment-2.log": "abaeb5ce165c1373a9a173c9b5081b71ca9e0907c0556f3012fc3ba13bdfa15f",
+    "frontend-tests-1.json": "802679820e4bb37e31d241108cd094a42880cfaca77616a6c9bbfe952e4b1bba",
+    "frontend-tests-1.log": "4a3e25286a559b4b4f7ab41132dbd3283ef3e5cdf4b6a18588ddbc211a3ee3be",
+    "frontend-types-1.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "frontend-types-2.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "frontend-types-3.log": "48eadb129e3bdf6cb9888b21568e5070ba16569dc4b9323a5ccbd7329f06283c",
+    "frontend-types-4.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "qualification": {
+    "formalCI": false,
+    "realPostgres": false,
+    "realBrowser": false,
+    "historicalExecutionSigned": false,
+    "completeHistoricalDependencyBytesRecorded": false
+  },
+  "notes": [
+    "Reporter failures retain their original invocation results. Latest-case union is an inventory, not final-tree formal qualification.",
+    "backend-tests-1 executed the projector only: a prior wrong-cwd file creation failed and the service file was not present.",
+    "Several preparation writes used an incorrect relative cwd and failed with ENOENT; later absolute-path writes fixed preparation. No uncommitted work was reset or overwritten.",
+    "Node 24.19.0 is below repository engines >=24.21.0 <25. These are exploratory scoped development results, not formal runtime qualification.",
+    "No source registry/authority/migration/CI files were changed on this branch.",
+    "frontend-school-cognitive-6 preserves two failures caused by a preexisting stale fixture matching the parent URL without ?view=current-unit; only that fixture literal changed, then exactly those two cases and file lint passed. Final frontend typecheck 4 predates this string-only fixture correction and was not replayed.",
+    "The internal disclosureOnly mode reuses existing respondent/source/current-policy authorization without calling the flat metric collector. Education reports independently verify per-unit frozen canonical facts, so same metric names in distinct approved units remain distinct. Existing two-argument summaries retain their original flat-metric behavior and ambiguity refusal."
+  ],
+  "latestActualCaseInventory": {
+    "cases": 110,
+    "passed": 110,
+    "failed": 0,
+    "formalQualification": false
+  }
+}

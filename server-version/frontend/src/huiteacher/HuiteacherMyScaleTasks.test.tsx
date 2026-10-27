@@ -86,3 +86,25 @@ it('requests only a receipt from the existing Teacher scale submission endpoint'
  await capture.props.submitScale('existing-attempt','scale-item',payload)
  expect(api).toHaveBeenCalledWith('/composite-attempts/existing-attempt/items/scale-item/scale/submit?response=receipt','POST',payload)
 })
+
+it('opens feedback from completed parent reload while a list refresh stays pending, without duplicate completion reads',async()=>{
+ let parentReads=0,lists=0
+ const api=vi.fn(async(path:string)=>{
+  if(path==='/my-scale-tasks'){lists+=1;if(lists>2)return new Promise(()=>{});return {list:[task]}}
+  if(path.endsWith('/personal-summary'))return {state:'PENDING'}
+  if(path==='/composite-attempts/existing-attempt?view=current-unit')return {id:'existing-attempt',status:++parentReads===1?'IN_PROGRESS':'COMPLETED',currentItem:{id:'scale',type:'SCALE'}}
+  throw Error('Unexpected path '+path)
+ })
+ render(<HuiteacherMyScaleTasks api={api as Parameters<typeof HuiteacherMyScaleTasks>[0]['api']}/>)
+ fireEvent.click(await screen.findByRole('button',{name:'继续已有自评'}))
+ await screen.findByText('已有自评作答界面')
+ const original=capture.props
+ // A child/caller completion hint cannot stand in for the authoritative parent.
+ original.onCompleted()
+ expect(api.mock.calls.filter(([path])=>path.endsWith('/personal-summary'))).toHaveLength(0)
+ await original.onReload()
+ await screen.findByText('报告正在生成，请稍后重新读取。无需再次交卷。')
+ original.onCompleted()
+ await waitFor(()=>expect(api.mock.calls.filter(([path])=>path.endsWith('/personal-summary'))).toHaveLength(1))
+ expect(screen.getByRole('region',{name:'获准的个人测评反馈'})).toHaveTextContent('正式提交已确认')
+})
