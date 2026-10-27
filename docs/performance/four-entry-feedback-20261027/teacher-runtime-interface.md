@@ -54,3 +54,20 @@ Local fixtures are synthetic source/HTTP/UI contracts. They are not actual
 PostgreSQL authorization, immutable FINAL durability, content approval or
 browser end-to-end qualification. Actual PG/race/browser coverage remains an
 integration obligation until run and recorded against the combined candidate.
+
+## Worker progress (2026-10-27)
+
+The independent cloud environment is ready. Initial checkout `work` was clean;
+remote main was verified as `7e6d7da4a01e4a42b410cf2dbdcfa76f11759fdc` and
+integration as `6cf241d65b4bc44878ef9d9fe21c81fdd02561cd`. Branch
+`feat/pr363-teacher-runtime` was created from that exact integration commit.
+`AGENTS.md`, release rules, matrix and progress records were read. No nested
+AGENTS.md exists in this checkout. The first interface-only commit is
+`6a79351d0a9b6f998ddc8c2a90d9477948450321`, pushed and read back from origin.
+
+Backend router/access guard, scoped clients, participant host and direct
+synthetic HTTP tests are now authored in the working tree; validation remains
+pending. The production source adapter and shared START/FINAL transaction
+integration remain root-owned dependencies. No PG/browser/CI/merge/deploy action
+has occurred. `runtime-table-policy.json` is outside this worker's changes and
+will not be uploaded or used to bypass root's reported approval blocker.
