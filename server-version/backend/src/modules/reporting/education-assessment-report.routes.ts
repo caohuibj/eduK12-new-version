@@ -16,7 +16,7 @@ export function createEducationAssessmentReportRouter(product:'SCHOOL'|'TEACHER'
     res.setHeader('Cache-Control','private, no-store, max-age=0')
     res.setHeader('Referrer-Policy','no-referrer')
     if(!req.user||(product==='SCHOOL'&&(req.user.role!=='STUDENT'||(await readCampusStudentStatus(req.user)).status!=='APPROVED'))
-      ||(product==='TEACHER'&&req.user.role!=='TEACHER'))return res.status(404).end()
+      ||(product==='TEACHER'&&(req.user.accountDomain!=='SCHOOL'||!['TEACHER','ADMIN'].includes(req.user.role)||req.user.teacherApproved!==true)))return res.status(404).end()
     const executionId=z.string().guid().safeParse(req.params.executionId)
     if(!executionId.success||Object.keys(req.query).length)return res.status(404).end()
     const report=await readReport({actorUserId:req.user.userId,executionId:executionId.data,product})
