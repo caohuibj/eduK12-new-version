@@ -1,0 +1,10 @@
+locator.waitFor: Timeout 30000ms exceeded.
+Call log:
+[2m  - waiting for getByRole('region', { name: '完整说明与三个例子' }) to be visible[22m
+
+    at /tmp/child-learning-review/render-actual.cjs:14:53 {
+  log: [
+    "  - waiting for getByRole('region', { name: '完整说明与三个例子' }) to be visible"
+  ],
+  name: 'TimeoutError'
+}

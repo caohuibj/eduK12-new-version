@@ -1,0 +1,1541 @@
+{
+  "recordKind": "static-design-review-evidence-not-runtime-schema",
+  "recordedAtUtc": "2026-10-27T10:06:20.639993+00:00",
+  "environment": {
+    "cwd": "/workspace/eduK12-new-version",
+    "cloudNodeOnly": true,
+    "macUsed": false,
+    "subagentsSpawned": false,
+    "modelConfiguration": "DOT confirmed cloud_threads.create model=gpt-6.1-sol, thinking=high, admissionOutcome=started; no substitution warning",
+    "modelRuntimeIntrospection": "not exposed; not treated as a gate after DOT configuration confirmation"
+  },
+  "git": {
+    "branch": "cognitive/domain-child-learning-20261027",
+    "base": "a0130ea6603d7e37fd4f900d8694b5b7d490c51e",
+    "remoteCognitiveRechecked": "a0130ea6603d7e37fd4f900d8694b5b7d490c51e",
+    "remoteMainRechecked": "7e6d7da4a01e4a42b410cf2dbdcfa76f11759fdc",
+    "initialBranch": "work",
+    "initialHead": "7e6d7da4a01e4a42b410cf2dbdcfa76f11759fdc",
+    "initialWorkingTree": "clean",
+    "committed": false,
+    "pushed": false,
+    "scope": "only this domain directory"
+  },
+  "instructionsRead": [
+    "AGENTS.md",
+    "docs/release/README.md",
+    "docs/cognitive-library/scenario-roadmap-20261027/README.md",
+    "docs/cognitive-library/scenario-roadmap-20261027/candidates.json",
+    "docs/cognitive-library/scenario-roadmap-20261027/sources.json"
+  ],
+  "localSkillDiscovery": {
+    "trackedDotAgentsFilesAtBase": 0,
+    "workspaceDotAgentsFiles": 0,
+    "repositoryDotAgentsDirectory": "absent",
+    "note": "No applicable repository .agents/skills files found. No third-party document instructions adopted."
+  },
+  "notion": {
+    "url": "https://app.notion.com/p/405d27635a3881b2a2d3fecce26d7cb3",
+    "readSucceeded": true,
+    "pageLastEditedAt": "2026-10-27T09:08:24.763Z",
+    "styleImageActuallyViewed": "enumeration-review-approved-20261026.png",
+    "imageSource": "page attachment, temporary copy outside repository; signed URLs not retained",
+    "styleObserved": "white panels on light gray; blue primary controls; phone instruction/stimulus/response review columns",
+    "approvalInheritance": false,
+    "completeness": "response omitted truncation/unknown-block flags; not claiming all subtrees available"
+  },
+  "taxonomy": {
+    "commit": "22721e5c63dd78819e8c58921adf20157cdaa08c",
+    "path": "docs/cognitive-library/candidate-tags-20261026/taxonomy.json",
+    "gitBlob": "f28a14159348d3cebbfa04a3675b126307dd9e43",
+    "sha256": "951334e4357f4d438b90ca7d821267da37f986a0da7e6d19f14166d1b579faae",
+    "dimensionCount": 18,
+    "valueCount": 131,
+    "currentBasePathAbsent": true,
+    "sharedFilesModified": false,
+    "missingReasoningTags": "unmapped; not relabeled attention/numerosity"
+  },
+  "deduplication": {
+    "legacyCount": 24,
+    "existingCandidateCount": 11,
+    "newDesignCount": 1,
+    "newRunnerCount": 0,
+    "legacy": [
+      {
+        "id": "bart",
+        "readScope": "protocol/input/condition/scoring-path inspection for deduplication; not full runtime audit",
+        "files": [
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/bart/task-package.json",
+            "gitBlob": "83d4b373e12dcbcf4f5f0340cdd8aafe407a445e",
+            "sha256": "8d32d043ee1166cea4777ac0d40078325b0b559e4156135bd3e3871aeed98eb6"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/bart/package.ts",
+            "gitBlob": "112f471d40dace7c3bf22b5a11dc6fde679e92ad",
+            "sha256": "bb36f1c99b20ddf68d0d16d78a596992f6e4a76a0aba2f7ea78b06e319478d50"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/bart/semantics.ts",
+            "gitBlob": "06e99fe795e52256eea97bf992c3bda4cc590a24",
+            "sha256": "a33e1d0409ca496a605242b608d13bf61dfbc706d68e0dd6250794c2785ac554"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/bart/definitions.ts",
+            "gitBlob": "ddda576344c187c0a1812cac82f2903e5a8c5405",
+            "sha256": "c5c47b6f54ffa2ea67d417f1386b4a192a344ff3990040a7d203ee2844460158"
+          },
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/bart/bart.registry.ts",
+            "gitBlob": "ffafae00a902680f8585e5be4cfd16526a82071e",
+            "sha256": "d0ef9821450271743e1352e18ee28dc5b9d858268868ef067f69afda87231c1f"
+          },
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/bart/BartTask.tsx",
+            "gitBlob": "462a35b5e031e9efccd1cd8b4a8e771c9b4f393f",
+            "sha256": "6200e01557bc5b0d26175f14444485d4e0cadb29cbbbf811cf34df36409b904f"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/scoring/bart.v1.ts",
+            "gitBlob": "c3c19f1676d41d21e697323764cab236bfecd63c",
+            "sha256": "065dfe50f0db8d70e9451f62ab8be98ec71ba022f490d53a5c2a090eac8199b5"
+          }
+        ]
+      },
+      {
+        "id": "cardsort",
+        "readScope": "protocol/input/condition/scoring-path inspection for deduplication; not full runtime audit",
+        "files": [
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/cardsort/task-package.json",
+            "gitBlob": "5e9123b9b6d35541e7d848e7122a06f6b1e881f9",
+            "sha256": "61a1b80b0632a3c7a3366f448f3de44f2c0053fe579baebc3ef6d99b59e09d37"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/cardsort/package.ts",
+            "gitBlob": "3487f420ebbc76a22c8dc4541b4028b6829157f7",
+            "sha256": "a84683c22e5a75c83967c50a153d5ce11088e7c44ac5070f88e584b29934595a"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/cardsort/semantics.ts",
+            "gitBlob": "24822baef9ffc5e46f3bf879e4dcd23841077ae3",
+            "sha256": "2e37bef7ff60837fa5a6105dc42f6e879f7f3f1fc91d9bdb126ceca2f22585a4"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/cardsort/definitions.ts",
+            "gitBlob": "25eaf4303f73775d6e3f32a3cfe8573f7f90fb08",
+            "sha256": "1f2a8a26cf7a51ee38cb8607510d91ffc2a75b0b652f0c5adc133a08791e717f"
+          },
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/cardsort/cardsort.registry.ts",
+            "gitBlob": "5df6fbe4c8101fb2927da814f55717f63184d9e6",
+            "sha256": "d1d3db487b30be99ca2993b1c017bbb1f1649edf83a5f9aa5a5c4fbce23b462d"
+          },
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/cardsort/CardsortTask.tsx",
+            "gitBlob": "d72617fb7a7394759914a383a416ec3549b488e7",
+            "sha256": "ae22ab7bd734d1b840fbf30f05602f65cc493c937799050f09b270afab4f7f83"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/scoring/cardsort.v1.ts",
+            "gitBlob": "6cc2b88328a6ea1ba6596a6b5bdc716ffde0cf26",
+            "sha256": "268f62761fe473d633f7334dd1231be9471b7d4aeb6cad1218610a1f57bf3ba6"
+          }
+        ]
+      },
+      {
+        "id": "corsi",
+        "readScope": "protocol/input/condition/scoring-path inspection for deduplication; not full runtime audit",
+        "files": [
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/corsi/task-package.json",
+            "gitBlob": "b32b29353f7ea0ab5083cdb4a2868df87e0fb63c",
+            "sha256": "8c61b11fb61dfb637364f64b79a3c657cf7274266e1c941a83e5ff57d01bb8d5"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/corsi/package.ts",
+            "gitBlob": "3334f44fd2ef615374e83224656420858ad4eeaf",
+            "sha256": "791a39d107151ae03fef04648fc66437af4cd27040a1928378dd0a10bea2a443"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/corsi/semantics.ts",
+            "gitBlob": "1884d454cd27717f2c5f6fb4c9c10f923d7a23cf",
+            "sha256": "8e151e88b8811401c68c1627e1a1fa5a2d1b8c9cd7aa28e4d9787a9f0462b9e9"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/corsi/definitions.ts",
+            "gitBlob": "6e5db5c5b7688c07aa8a8302237fa3ce84d9b932",
+            "sha256": "59781b197dd1a038d81e470db7cf5097b4dbbc9111d4b2c3051178994017faea"
+          },
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/corsi/corsi.registry.ts",
+            "gitBlob": "e362a704018a7133afd01b84b642ddbba4c4d6c1",
+            "sha256": "8cff3478f9286128b3c31e549c25cab073d7f8294d397e79a877d605ced67993"
+          },
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/corsi/CorsiTask.tsx",
+            "gitBlob": "e6fa2f2354567b8a9d7e1aa29e95cb4ac6e1dbaf",
+            "sha256": "5a9480e8f8988f6099eff0ed239dd6980fe9a96a31bd3d4efe59a304fa81cd61"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/scoring/corsi.v1.ts",
+            "gitBlob": "fa5258e66cc0b7ffada72326859e672af0c086a3",
+            "sha256": "1d97552448a0c06ea7301a988e484816e4e85ef720ea47ef1ed4794f39051e41"
+          }
+        ]
+      },
+      {
+        "id": "cpt",
+        "readScope": "protocol/input/condition/scoring-path inspection for deduplication; not full runtime audit",
+        "files": [
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/cpt/task-package.json",
+            "gitBlob": "0c0981ce5a91582e11b7422e1b430f168fd42390",
+            "sha256": "e5cd86e060edc6c605f39258abef63f0a1bc5533c2e478ed9b5f94d75969b25d"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/cpt/package.ts",
+            "gitBlob": "85436be091d61225432b87cc6c08e6a711049d7d",
+            "sha256": "81f857e16f871429cdba0a95cb1d020602f39683e2c74546c96a7b11a4fd2e22"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/cpt/semantics.ts",
+            "gitBlob": "d11fd9082006567f61b23bdd19dd0956e4de2adf",
+            "sha256": "51f4d17804cc800c81ca4569c48cd18fad4ea265ac37bd125334fb2a9f39b35f"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/cpt/definitions.ts",
+            "gitBlob": "f1d79a19372e96ecc8bf55dc9f63af86b03b0541",
+            "sha256": "3bfbc3ec423cee68ce372e78e991cd7068bb5caea8412db0ffc97683cd5fe5ff"
+          },
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/cpt/cpt.registry.ts",
+            "gitBlob": "e2438b9daad2276b758204428e62cacb18857884",
+            "sha256": "202d48c1a4b04497c34b81507026e0e8d411b393e13a8cff34a7272b3bc16335"
+          },
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/cpt/CptFrameTask.tsx",
+            "gitBlob": "5eab10db1dd39b8442129f6e3f50d5c72339a06d",
+            "sha256": "b3c77ca44d36c78f5796532fc209ea22b9515bb5fc69be3ed8d4861c40d94aff"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/scoring/cpt.v1.ts",
+            "gitBlob": "502f7d58b3af87f0901cf99083cd0760195cbf91",
+            "sha256": "be29fa5f1fb6ac57f74f4bdeebd01309d2bfd50ee715141f280adf54f23d121f"
+          }
+        ]
+      },
+      {
+        "id": "digitbackward",
+        "readScope": "protocol/input/condition/scoring-path inspection for deduplication; not full runtime audit",
+        "files": [
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/digitbackward/task-package.json",
+            "gitBlob": "3354310fb0419317e920bd6af166b80151ff2d88",
+            "sha256": "ab8534a72c033dcf6429c1e085e007c15c6830607619ab45cb5c41d0e262a337"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/digitbackward/package.ts",
+            "gitBlob": "1fa068f11e4ba4d7ceedba4901918c5684fb6d0f",
+            "sha256": "452726019e84dbe305411fc957550e1866ee67c9e29051514e2bfa13cf888218"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/digitbackward/semantics.ts",
+            "gitBlob": "35b252f9b55b1a474ad70d42bcd6d53f8c3322d2",
+            "sha256": "e29ea70dddeb4bb8cd2253dd69f7002e52b930e6fca7ea40f9f7100f7d9894bb"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/digitbackward/definitions.ts",
+            "gitBlob": "c086bebb69468eab479b6a60dd38dea9a7aafb23",
+            "sha256": "52dbb8bc019eecc63975080e6af1217cf2c622c720087db2bb962d205b8ad890"
+          },
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/digitbackward/digitbackward.registry.ts",
+            "gitBlob": "5e3e2ee404720a8d6d208df4fa2c156ff1f35ba5",
+            "sha256": "7b9b8157320c4555622fb474afdfb30078649e8e39e68878e6e8e7034e70b577"
+          },
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/digitbackward/DigitbackwardTask.tsx",
+            "gitBlob": "e8d480138934dd8aa08db6425879d7c666468f19",
+            "sha256": "b2afc98264b99c1146fd8c69b353eeb9c80d9706c97e9a90693e9e57480accc5"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/scoring/digitbackward.v1.ts",
+            "gitBlob": "a2ecc130abfba84cc58465e9f2d4777cf128015f",
+            "sha256": "56a826d76f81047f075bcb88383f520760561aff5a4315b41663baaf3a371a2d"
+          }
+        ]
+      },
+      {
+        "id": "emotionrecognition",
+        "readScope": "protocol/input/condition/scoring-path inspection for deduplication; not full runtime audit",
+        "files": [
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/emotionrecognition/task-package.json",
+            "gitBlob": "67f85eaedcdb7ebf9435a4cb5cf76ae9fd4d8cee",
+            "sha256": "fd2f6adde3a15a24d88a0a513ae1b4c34aca6d399c3505aea7673cbac6d5135b"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/emotionrecognition/package.ts",
+            "gitBlob": "26d2aa9c450c1a33f7994399bdc9f2c36c6bb978",
+            "sha256": "3ed5a38fba1e67bf2555510d9e539cd76eee7e2297a2490d9f6ffa1fc1b42c20"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/emotionrecognition/semantics.ts",
+            "gitBlob": "52ac3ae5e0512d4536d238cd0bc013a98d491a2d",
+            "sha256": "f5df9137ee06402b1187baae0764dd79cce932d7d30c2ad139512c0aca87c438"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/emotionrecognition/definitions.ts",
+            "gitBlob": "d0d8c742d676aa66f58996e0c82ff54a86a7b687",
+            "sha256": "c09a92f1cf2483b1c85a0eabb249253e03db3e2af8b554df2f3e9c6947c8d4a7"
+          },
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/emotionrecognition/emotionrecognition.registry.ts",
+            "gitBlob": "731e767a82fe31e52e9180e89854e577cd60477e",
+            "sha256": "eb1ecfe7df2170bc897dda999c8508e804deeb9e87150b4115cade663b1c2222"
+          },
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/emotionrecognition/EmotionrecognitionTask.tsx",
+            "gitBlob": "48c023ff81634ae11d71a84ed300f72aa73e84e8",
+            "sha256": "47a45d3296a7e7714d3fac461b8807c25ff1a76ad6a53999e18f2a893bf039ee"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/scoring/emotionrecognition.v1.ts",
+            "gitBlob": "5827baed3d7bb556416ab4f0fe122f6b4cd8ab00",
+            "sha256": "34b04d2e175a6caa686cb703cbe55685a2e871081a5867784572e2a6509b73cd"
+          }
+        ]
+      },
+      {
+        "id": "flanker",
+        "readScope": "protocol/input/condition/scoring-path inspection for deduplication; not full runtime audit",
+        "files": [
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/flanker/task-package.json",
+            "gitBlob": "9210d91d13226c9ac931e897918e20277933935a",
+            "sha256": "14eecdfd4a066849902b935f1fad2cf3211b7ce46b0f88e1f66a608a959eca13"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/flanker/package.ts",
+            "gitBlob": "52df42cf7cfe7dff9fff239600bc7ab52a5be4be",
+            "sha256": "413f4b46b994a9aabfe2ea495977fa29dec3d9d7d086ee05fee1efa20413a965"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/flanker/semantics.ts",
+            "gitBlob": "94f16f5928ab44ac186f6327167254dfad6073c2",
+            "sha256": "2caefa63ed27520f89ccae1971e27894ae836b94c06dcb3e4ceb0d919b173a7c"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/flanker/definitions.ts",
+            "gitBlob": "b4a3904fd6de8e21a97a68c75310fc5c8852467a",
+            "sha256": "b5678e3aff2eb4911131ae2e73af142433af1e81aef02d91526c5f37def929ec"
+          },
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/flanker/flanker.registry.ts",
+            "gitBlob": "3df2eeb9959a463c41e71540fa3622e487bd3f2c",
+            "sha256": "cf82192b0f30d3930c18a500ac0bba757ec9f76983896464a7cc4e85bf768075"
+          },
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/flanker/FlankerTask.tsx",
+            "gitBlob": "733649ae65b0fbeacd39f4ba47f3d1ecda318675",
+            "sha256": "022e17196ed8feef857145a39d54dc8d399e13d581ce43d5bdccd2c2903d9671"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/scoring/flanker.v1.ts",
+            "gitBlob": "e9634d48d048b51daca1307e9a8c317bc6f8c8f0",
+            "sha256": "c2eaf878732a34866877588380a8f450b87aec05f976c2552c323efbd9547cbe"
+          }
+        ]
+      },
+      {
+        "id": "gonogo",
+        "readScope": "protocol/input/condition/scoring-path inspection for deduplication; not full runtime audit",
+        "files": [
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/gonogo/task-package.json",
+            "gitBlob": "634ca8a2ec25ce181273991029ad2ff9f885fdf1",
+            "sha256": "70e23a74a20c0e507e1789a9f6abb246d390c95b7e25192d83bd8fa6e324b6fe"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/gonogo/package.ts",
+            "gitBlob": "c7a2cfe49a39aa632f9fc55678b95445b6199429",
+            "sha256": "48a932ce8efa19b024afce916bc13e65e187826f926ea8eb2ad92f72e1a7abb0"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/gonogo/semantics.ts",
+            "gitBlob": "e359344f807ae664bd4a8db1bea10ec7e54b9ac8",
+            "sha256": "5c64e53a6c07503a0d8376203dfdb58c5336353142c1caa423296fd4ae8fac8e"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/gonogo/definitions.ts",
+            "gitBlob": "a20af3615aeb4a7b05a38a40bff806bef30dc750",
+            "sha256": "eace0bb5a908a01ec60c0cefdab5b0ae80c66df621f9dcf2e719793b92819dcc"
+          },
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/gonogo/gonogo.registry.ts",
+            "gitBlob": "9e5ca5db1483aa00d584231ec2ef75a0afcb1250",
+            "sha256": "9fd56e11e3942c6f9c7e26ecd7ce31e96df009dcf80b07b968ff07926fc7a7e0"
+          },
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/gonogo/GonogoFrameTask.tsx",
+            "gitBlob": "b4a692e931fdc70557387c9e6793e87588a71dc4",
+            "sha256": "0a1457480df7a8e1ec7b03452cac5d6d59f6eacf701879242e52374fc96c0db7"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/scoring/gonogo.v1.ts",
+            "gitBlob": "d5b727b4e8416b38d62312ebae5c59150bb16dd6",
+            "sha256": "93ad3afe5342176dc7d2bb3121d9ad7648a9f9ff50fd192e49c1003973e901a3"
+          }
+        ]
+      },
+      {
+        "id": "lexicaldecision",
+        "readScope": "protocol/input/condition/scoring-path inspection for deduplication; not full runtime audit",
+        "files": [
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/lexicaldecision/task-package.json",
+            "gitBlob": "a56c6b476fd0bd0a20de754e850c59e6aed9d63f",
+            "sha256": "d933c780a2ada5348cff11a0f3d862a235e6bb2fd5523fb8987cb8875f39e082"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/lexicaldecision/package.ts",
+            "gitBlob": "5e42bb2ab2710a686659a6bb97d5dd30e19819d0",
+            "sha256": "bb40c89bd277fcbbd9396eb6ecd04c43ff373f196b5028e080ae571134e0b351"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/lexicaldecision/semantics.ts",
+            "gitBlob": "e39c13bbf135b180c74f6a9bfc7995e6c8ce8c06",
+            "sha256": "d43917b4bc7726b2e3a820a68a5b5ba0b668e49efabf8356040ba1a1ec9f63b1"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/lexicaldecision/definitions.ts",
+            "gitBlob": "ec6f70c727d8cee09cc3aa8bcf6e2e0aef571a5f",
+            "sha256": "050903c107fea63fa7bade53a04b53be0eae66c0d06d881b286c8ffc94dfdc98"
+          },
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/lexicaldecision/lexicaldecision.registry.ts",
+            "gitBlob": "3badc054d821d34ff0d427bf5211c22dba0d9a8c",
+            "sha256": "05529e7441bd3b5423cdc5d5e01c5d6c3925b32e0dc388c8e1a436e0f2dc6415"
+          },
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/lexicaldecision/LexicaldecisionTask.tsx",
+            "gitBlob": "fc1f3f335df5179b71f91bcc1fffbc7a62707c55",
+            "sha256": "5cd15141d96397d1d7da6dd0b65be9bd66c34bfdc2c12b4bb5e95346db1c8ab2"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/scoring/lexicaldecision.v1.ts",
+            "gitBlob": "bae92f225a480a6d5394bce02d7baed2c0b4f675",
+            "sha256": "1a891cfa3726f03c4550de7d79258ffc045958fe4a03ab1c11d9bd29bf91b444"
+          }
+        ]
+      },
+      {
+        "id": "matrix",
+        "readScope": "protocol/input/condition/scoring-path inspection for deduplication; not full runtime audit",
+        "files": [
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/matrix/task-package.json",
+            "gitBlob": "fd0b2fbb6a13d614ae7e39d25f0c48d60587290c",
+            "sha256": "d0e9a78c508ff30aca30403059e418e8f1df87009ed1170ea87eb970d569b28a"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/matrix/package.ts",
+            "gitBlob": "bcfb9c9c035aff25f4b3d15a005a06d5b85169f8",
+            "sha256": "8b7c1938c02404187e82e99407318d1da8a6670aeb0360a541cea21ed4cc4286"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/matrix/semantics.ts",
+            "gitBlob": "4f857c3895a721d74bfa5d2b0a654699a491f764",
+            "sha256": "c5e1cee7c29755ffe7c73ab97c789cb971bb66a03bd03e01468e6aa6714f9983"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/matrix/definitions.ts",
+            "gitBlob": "71581908c93c0a0ba42bf3cc57fbe1bdff5a8016",
+            "sha256": "9604b41776f7ffb684ef5110454a79a30fa28ba2f1c551c265b91767ca3af5fd"
+          },
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/matrix/matrix.registry.ts",
+            "gitBlob": "14a5f844e85026d235fe42df005b54879c775b97",
+            "sha256": "6b8d66e30004241ac4f2a3a7a2addb7c10146e7d2e01d0e90c4298d8736b9948"
+          },
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/matrix/MatrixTask.tsx",
+            "gitBlob": "4f83306216dbbcc550b888900b3067b05bb82a26",
+            "sha256": "284c74e84c75241a10c8eaf51037083d736ce58e8c097b33739c64b1006a3324"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/scoring/matrix.v1.ts",
+            "gitBlob": "6ff7eb950f5ebe8f40b6cf98b146e2a80961c212",
+            "sha256": "8ed74d9cc03ce888a289ca1cb38376bfb034642b934ae94939209b48cde9e018"
+          }
+        ]
+      },
+      {
+        "id": "memory",
+        "readScope": "protocol/input/condition/scoring-path inspection for deduplication; not full runtime audit",
+        "files": [
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/memory/task-package.json",
+            "gitBlob": "d615cad87889ec179254e301bfbaae45e687caa5",
+            "sha256": "ffb30d7e81d081d5df74922ed2a1a8e499aded57d98d6f4ab2d72bda1799cdfb"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/memory/package.ts",
+            "gitBlob": "92f92fa3213a53d471812d907d09952fdbb0def2",
+            "sha256": "2a83d000b9754c13e29bc30a90b7f252a2c7036f270449390060bf1b7383f412"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/memory/semantics.ts",
+            "gitBlob": "877d816c030c53fce40a393218c83be137a3eea6",
+            "sha256": "d26a0c4b4604837eee7333ce06f37d559700bc8d034b1e0148a158206b36092d"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/memory/definitions.ts",
+            "gitBlob": "d7adccbfc9d6de2b49219be6089b896edce1ffa8",
+            "sha256": "3671328bdc1f94a06da6e7e034d8703e148109e7bc3ecee7c9492e1196cb939b"
+          },
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/memory/memory.registry.ts",
+            "gitBlob": "d4fe6f6410242c29d7dede37f4b4722edf15eb28",
+            "sha256": "1a0b8cf234185b8616f1c5ec6534877fe4c0872f94b0b0b4284364ee6d181df6"
+          },
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/memory/MemoryTask.tsx",
+            "gitBlob": "318b6c89ecafe2ead12bbcde8686dc4d4953b15a",
+            "sha256": "5cec4836b354cea284f9dcada648e2ac724b9772f11e58a6c41aaec67d6fbea8"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/scoring/memory.v1.ts",
+            "gitBlob": "5c99b398cbd94a658ca091d9e1e8b6f149367067",
+            "sha256": "24843ff3ef2f237e238fba85935babea27e9c6b8ec8dd8bca36b6381d5fbdf32"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/scoring/memory.v1_1.ts",
+            "gitBlob": "af935f4cd5ceb83f7a07249371fdb1c3baf8c285",
+            "sha256": "c375d37e0831db1715098bd23cd2633c7b8e6f4c85cbdc0c702b8a6962e1284b"
+          }
+        ]
+      },
+      {
+        "id": "mentalrotation",
+        "readScope": "protocol/input/condition/scoring-path inspection for deduplication; not full runtime audit",
+        "files": [
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/mentalrotation/task-package.json",
+            "gitBlob": "0e224b42942c02ca17b369188e9b48a49c5c68a8",
+            "sha256": "0c376fcf19f0009c588166ca738c2b0d56a84cd0bc53f1cf6610dd94efa80e8f"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/mentalrotation/package.ts",
+            "gitBlob": "7e54dbd6c42d7e3b595840d0838d90ca67700185",
+            "sha256": "a000c1dff547df9a785abd49d4a01769aea3b8efdffcbe867e1c03c3feda238b"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/mentalrotation/semantics.ts",
+            "gitBlob": "327a2d6b8a35693e34f1c915ff10458cf4e5d88f",
+            "sha256": "2324952975a4d63beb5ae9995ce6bd69b767c1ac7417cb4d8491860f45b8cef7"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/mentalrotation/definitions.ts",
+            "gitBlob": "9eea8c8a64814d843fde9a24291d589cad28395a",
+            "sha256": "ea857f230bf1d293ad196738f52641a82866fc10a73619b531c2307e359fd2d9"
+          },
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/mentalrotation/mentalrotation.registry.ts",
+            "gitBlob": "7d317d5bd8b99ac2a77e6ff52b05f5fc988f9803",
+            "sha256": "c424f14c55c0d13886e21282893c41720273f0579ef5484d77481b42c7d962a9"
+          },
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/mentalrotation/MentalrotationTask.tsx",
+            "gitBlob": "9dbe1406e708eabc4cd267cd624db644231b690e",
+            "sha256": "19895f334b0654db234b703da85461f15a4b7de8b15065412e568fd872db9692"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/scoring/mentalrotation.v1.ts",
+            "gitBlob": "d9f00763d8bec845d6b6cbd99f1eb847e70ac16a",
+            "sha256": "9db48603005a079d535d6667ba86de618e0da8b11cfebe7cc84d04ef9b5f650b"
+          }
+        ]
+      },
+      {
+        "id": "nback",
+        "readScope": "protocol/input/condition/scoring-path inspection for deduplication; not full runtime audit",
+        "files": [
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/nback/task-package.json",
+            "gitBlob": "0f85565154372d1c19adea2446e6f1df295c6418",
+            "sha256": "b924d9db4145d1a69a730918e6d0f2cc389d96f9c8cee0c7e80a0b6cd83b88b1"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/nback/package.ts",
+            "gitBlob": "6bee07715dc2106c0fa8408b637258468ace0029",
+            "sha256": "3837b3a8cc5fc21fc904a850c44a5ade968c18d8f36a2f7eb485f4554b085ff3"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/nback/semantics.ts",
+            "gitBlob": "35e0a0638b5f26f7fee51e015e8622dfc0bcd6ec",
+            "sha256": "056087c09ee86d7f8a276452c1be5654740b0169da855ddbafea6a284b84b45e"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/nback/definitions.ts",
+            "gitBlob": "482d21410927343e80ebacc601ed1cdf5e8dba1f",
+            "sha256": "bf9d91cb2e6540d4b5709ef34bf2727e90abd094077f31e9265f595700881aaa"
+          },
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/nback/nback.registry.ts",
+            "gitBlob": "eb898355d17994265934b677f86befc251ec4f3a",
+            "sha256": "b23d1db5529a7fd87534198528823d98287977c412aa7712087dc4f0360953e2"
+          },
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/nback/NbackTask.tsx",
+            "gitBlob": "78b51a348f59b7ece768315b41e124417806bf93",
+            "sha256": "2b141041490dae9e8c7e84a7aadec2d51d200e4da4c8dcf970d02689e54aa958"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/scoring/nback.v1.ts",
+            "gitBlob": "535f17d921ba996d6c019866bd5487964f90e91e",
+            "sha256": "75c736a7727f97107d6d635f09a13efee3bdd0b7e84b1ccf0034356beae457a3"
+          }
+        ]
+      },
+      {
+        "id": "pairedassociate",
+        "readScope": "protocol/input/condition/scoring-path inspection for deduplication; not full runtime audit",
+        "files": [
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/pairedassociate/task-package.json",
+            "gitBlob": "0caa5ca6be71c92883c80fdd16c6773315b8e24d",
+            "sha256": "fbaaa2e3e8bc002b3a21c2f350689873055aa4f0fcb2443ff3af57696624603c"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/pairedassociate/package.ts",
+            "gitBlob": "83c481e35d887374ecab0853bbf3259b60b5da7c",
+            "sha256": "7c9fcc68e7fb587dd1b8f53c78c5dddb11224b1357f9fa407c3d4d4a1b77296b"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/pairedassociate/semantics.ts",
+            "gitBlob": "84dfb5c45cde1a5ca045ead4ac96a914c559fb03",
+            "sha256": "03ea9d7b4cb3f844c5a0025ceb5ebfa78e1736e502fa6e8c3e5c4a4bda69bc48"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/pairedassociate/definitions.ts",
+            "gitBlob": "12f3fe00789db364c342e8a95e7f31048506033d",
+            "sha256": "15e6620faa2755942232b09e219fdd5c5851ef40b21ac3a6532c90ff071752a7"
+          },
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/pairedassociate/pairedassociate.registry.ts",
+            "gitBlob": "89484ed1b106c4d3788d9236f4813a69d9a4c55a",
+            "sha256": "69d3b30598c837f920765843fbde83bfb9fa2954de27b2545e6d2a4b46f582dc"
+          },
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/pairedassociate/PairedassociateTask.tsx",
+            "gitBlob": "3759019e4fd5c1b3b6b37af7562ebf3e16c348b3",
+            "sha256": "f4652381c59f7b8fbc4509eb74dd5a7c0111b2620c0331bbf5f3d456a0a16d39"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/scoring/pairedassociate.v1.ts",
+            "gitBlob": "f703675fd8d79d97249adcded7fe6bc3b9a75f32",
+            "sha256": "87a7beb1b9b46eed9ac422690b9751dc1a20f265d2c0a981ae10d2ee18103266"
+          }
+        ]
+      },
+      {
+        "id": "patterncompare",
+        "readScope": "protocol/input/condition/scoring-path inspection for deduplication; not full runtime audit",
+        "files": [
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/patterncompare/task-package.json",
+            "gitBlob": "833f3a52d7a86bb5527a44717281f7e4a351866c",
+            "sha256": "d206430d8188e4cb0ffbd00e6b2e90da155e3e36bdc5b26bbe6d32d11d554cd0"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/patterncompare/package.ts",
+            "gitBlob": "d437ca0fe43b6b5cfe453133d5552b1dcf1e5f1b",
+            "sha256": "b4872e8f51e11913be8258fc6d27010439451f670fbbe887187207eae8f80c50"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/patterncompare/semantics.ts",
+            "gitBlob": "a7e140e6d618d68a0dfdafc7b3794ee500e1cac3",
+            "sha256": "8e8c6f547291dc5e5acda6575dc526634dd317af4185458aced55e13cc31f9eb"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/patterncompare/definitions.ts",
+            "gitBlob": "7c9cd43acfd1b03f51a65151817d9e3f14194774",
+            "sha256": "44d7e36cbe8ae48c5eeed4c0d714635e8d18d1f3cd5d133e3ae70067277b3bd4"
+          },
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/patterncompare/patterncompare.registry.ts",
+            "gitBlob": "ce6e5aafa18ad19b03e53ad3288a55e5b60dece7",
+            "sha256": "6d3c9799812e65e2bdabdca4a361401a54bb0ba4e5e3218316285a35df2a0fe8"
+          },
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/patterncompare/PatterncompareTask.tsx",
+            "gitBlob": "f0033ffaee4de9226b02be44b1a672f9861dde10",
+            "sha256": "9e09f03afdd3102eebba61a8840c635526b14a9ae8a5e85f3f23fd70a71c5694"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/scoring/patterncompare.v1.ts",
+            "gitBlob": "065dca115c94f02aa37d8b8761155a360af2dc6a",
+            "sha256": "17b29583f055bc5318ddc825f1a3d74d42fe2ba028f328790f75066b766b9e7d"
+          }
+        ]
+      },
+      {
+        "id": "picturesequence",
+        "readScope": "protocol/input/condition/scoring-path inspection for deduplication; not full runtime audit",
+        "files": [
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/picturesequence/task-package.json",
+            "gitBlob": "0a1313658f2328e697c7a831e71238e5c07ccd69",
+            "sha256": "f17ab9f07da8464302bb36fd070720a68df142ff2395dd6d7bf94f15c4d4e6f6"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/picturesequence/package.ts",
+            "gitBlob": "9c0495ef1156437fc260682f5d135b8582c943df",
+            "sha256": "7fef58820655f21c8e3691f8e661ad52869c358d622807b316dd6af926c81a05"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/picturesequence/semantics.ts",
+            "gitBlob": "ba9b47529c601b0a50d244455f765bca241f8245",
+            "sha256": "9708f7ba97f0ff39c0b149346e456f6cc0cfcceedbf0fc143c81656e0de2c1b1"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/picturesequence/definitions.ts",
+            "gitBlob": "f4f5167ff87026abf2a78c38f0a6065a5e01fa1f",
+            "sha256": "2b1cd9e3041d598c2d00b5b7a177e98db0c3fdff59f31ad3a6e032b42e38f0b1"
+          },
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/picturesequence/picturesequence.registry.ts",
+            "gitBlob": "97589c7954692906d8b6696505dbcb1f3c39a3bc",
+            "sha256": "8a5f5a5e0baae3057b05bbed214043e92c052ba6d25563fe6fea4cd8aa650c23"
+          },
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/picturesequence/PicturesequenceTask.tsx",
+            "gitBlob": "28e9d855000eb1a800747a99d7da715479f3dd79",
+            "sha256": "00b8809ef9d87c99e3b57a68cb0a3cbdfeaa93769fd51cf2dd61242c76b702ee"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/scoring/picturesequence.v1.ts",
+            "gitBlob": "6e375ad48f8808513bc1680f39f762e132dcd2d2",
+            "sha256": "812e1a090bf7896d14a73a4fb9a131a3eb4e2fad57ab9603590fbde76d82a999"
+          }
+        ]
+      },
+      {
+        "id": "reaction",
+        "readScope": "protocol/input/condition/scoring-path inspection for deduplication; not full runtime audit",
+        "files": [
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/reaction/task-package.json",
+            "gitBlob": "e0b5eff73ca30d20ecf3a93b6064f6677f96fe0c",
+            "sha256": "fc839ec7a89ea65a4f12d79591a5020540e26e282e53714d12fcb64ad88fe5dc"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/reaction/package.ts",
+            "gitBlob": "9e0b4ccc37dc210e4afcb670d8b9d0ffc8642f12",
+            "sha256": "0b7b6e30063fd19962c284b733cdd2ec304f7be8d7dc4d1e937bf3005a3094f3"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/reaction/semantics.ts",
+            "gitBlob": "cd87641dc127c6ae3c1881d827b68bd3d22363c9",
+            "sha256": "ee47842ef0afbab3a2b3377a58db5e370f056a4831d14d574e097ad0c962eff5"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/reaction/definitions.ts",
+            "gitBlob": "cde0ac9bbe783fed6bb10966522df44ce4cdac2a",
+            "sha256": "6f18bfb89dbf0ad2dbab21b87dd395f4b4da57e662830ae7794f4fc1d9aedd11"
+          },
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/reaction/reaction.registry.ts",
+            "gitBlob": "81e3ad7fa0d5442ea9132f2edd7ae7d6db7bb80c",
+            "sha256": "de6204e893f0b0adee6a7382aea2033acf8d5e5ecaf487d1763f4ad676fa2dda"
+          },
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/reaction/ReactionFrameTask.tsx",
+            "gitBlob": "a8bac2e39835fcb3753feca4935fe3b6fbe4f06d",
+            "sha256": "1a061366be59137582213f3ac5e8cb5fc55fb10eb99b904786edb7e06cefbebe"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/scoring/reaction.v1.ts",
+            "gitBlob": "89fe0b379028b08c266a635363aa0619942eaba2",
+            "sha256": "85a456ae63fc6855bc89a94dca13089bb90968f6c18de0ab89f3aac826da5a11"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/scoring/reaction.v1_1.ts",
+            "gitBlob": "9cdb75a3162c5c179daf2daf1003ccd3caf63d79",
+            "sha256": "0d1b0a124f0103ff0bf411050c08d9b970e1174457a4f45626ad4592c3243868"
+          }
+        ]
+      },
+      {
+        "id": "reversallearning",
+        "readScope": "protocol/input/condition/scoring-path inspection for deduplication; not full runtime audit",
+        "files": [
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/reversallearning/task-package.json",
+            "gitBlob": "7cb93aa6e45a9263aae592bac90c89a53161aaef",
+            "sha256": "a618f9438c7f10cbcba86b1c1715eb7fd627cd137d0d871e6928e866ee492729"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/reversallearning/package.ts",
+            "gitBlob": "9596e764160c6e08753b121021b081b1d4328ba6",
+            "sha256": "6c046aba049efcb24be1ab8133cc55d00d5eb463afd51ec3e771bd4dfda8fc38"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/reversallearning/semantics.ts",
+            "gitBlob": "c99d6ee309ca82d249e044e59d59286807590728",
+            "sha256": "cee53b087aa58e0a93211386ddac917ff8e842018a9927ae18ca3dc8912c1052"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/reversallearning/definitions.ts",
+            "gitBlob": "f8e50f7d5fc8eb29c313ab20e3ee1e7ae6e78368",
+            "sha256": "581664ae5f7328e5c7a35ce8989f00ecb2d5078ee6720f1d976cc06fbad08588"
+          },
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/reversallearning/reversallearning.registry.ts",
+            "gitBlob": "9a9150fa9c7ef780f80cea880a3ee5019f1e559b",
+            "sha256": "eaf385c3ccf964c55285bffb1426eae462b4eff9672b18bd363ff99bf9b78515"
+          },
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/reversallearning/ReversallearningTask.tsx",
+            "gitBlob": "63975a993606c32876c3c37911663d78f1be87a7",
+            "sha256": "bc1f5240af6cd771ca8b6c1e47d5ce9b6c8539f19c2a16043127fb579fb78d1c"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/scoring/reversallearning.v1.ts",
+            "gitBlob": "a52031c83b35360c34a7e7638be14bdcd7fe5fc6",
+            "sha256": "22e66d6b39938eff5136aefb09193129487eb98068db520ea864fa9ff88d4cb8"
+          }
+        ]
+      },
+      {
+        "id": "sst",
+        "readScope": "protocol/input/condition/scoring-path inspection for deduplication; not full runtime audit",
+        "files": [
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/sst/task-package.json",
+            "gitBlob": "a187b9abd42c767c62c282f1eacd9cca3af96e26",
+            "sha256": "35174b46f4e4a56c26c30b1fe539f3a1e4f6aa824318c91f3d459dac3d3fe742"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/sst/package.ts",
+            "gitBlob": "e19cc7becbb930a4030aae16eb45cd012605e3b9",
+            "sha256": "b17dde069367dbb0261ca8152dcbca80b52694e924e3f471bdf00cab58e27be8"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/sst/semantics.ts",
+            "gitBlob": "47f001ca10cafee306323a26a71e8606965a03f5",
+            "sha256": "a430c152ae80ef5edb5152aef41028a49e751c0a35a57444112b20a624b89052"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/sst/definitions.ts",
+            "gitBlob": "6e18e13dacc833ce4bdf4f580aa51d7da4750d14",
+            "sha256": "c65741fef0db5e8b4e2c16089b2fa14afe2f9135689d86870df7a6e5b7454ccf"
+          },
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/sst/sst.registry.ts",
+            "gitBlob": "0d4db2d89a4fdbcab3d09d14ce7a859c3aed2af7",
+            "sha256": "acfea8df303a16dd58c20904b7e6c02d1859a62f18af58e0a34fbe2d08acbde0"
+          },
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/sst/SstTask.tsx",
+            "gitBlob": "27f9f7ae9b2984e7ed097bec217466d0cfa5e33e",
+            "sha256": "5a537837953d7bfc57643cfcd0ff70debf83e5b75a2e6294839203ad927b79c6"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/scoring/sst.v1.ts",
+            "gitBlob": "5ce8dda786cd374ef28abc0d74926e2731b48165",
+            "sha256": "c89ce635d0adf74003026d2a78f0f6608b816a02761fe7ca2f5c6d6dded609fb"
+          }
+        ]
+      },
+      {
+        "id": "stroop",
+        "readScope": "protocol/input/condition/scoring-path inspection for deduplication; not full runtime audit",
+        "files": [
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/stroop/task-package.json",
+            "gitBlob": "97be44790e26d747c2b4c036131bdfffd3c81036",
+            "sha256": "a3fc93105d374e47e2b34eea568a031007861be1dac3bc4b4a54c0064732e972"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/stroop/package.ts",
+            "gitBlob": "c4026bcc374a8c14b2f7fda21b0c2aacba609dc2",
+            "sha256": "ee971b8c89d3b1a094fde0dd9d5f54b4cdd18988b71d64430f643be72fa9f686"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/stroop/semantics.ts",
+            "gitBlob": "a4c0fe38dda91c236c215b589ec8b63ecf4e7448",
+            "sha256": "abc16ca1253bd283748590276ca637a2db8e05db42078ab387f156457fccc4e7"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/stroop/definitions.ts",
+            "gitBlob": "9dff0940a8ba0dcb9df6fea8c1e44f8f135a5bfd",
+            "sha256": "38102049a5522460deb5fe83140c0bc28aac5b0f73041b4ef9f7a1aa97aa34d4"
+          },
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/stroop/stroop.registry.ts",
+            "gitBlob": "3dd8e9f419886491c0cab847e1941a0fe1b69b91",
+            "sha256": "f559e08443768f7f9ac56d44be04131d5b31509278aea2c507d4c9541a2b5851"
+          },
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/stroop/StroopTask.tsx",
+            "gitBlob": "2de896bad1597aa21d893e56e1e70e9669515e42",
+            "sha256": "a0b9dfc11001b011fb77263d57d97a5f58fe04aec2359c2dbfbe521a92bae91f"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/scoring/stroop.v1.ts",
+            "gitBlob": "af56aebd95393e78eb7cab0f702d6d90ff8f68bc",
+            "sha256": "ead0a3791e8866ba269bfb9999c46b748e37b61325d8dbfcc8735de52340568d"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/scoring/stroop.v1_1.ts",
+            "gitBlob": "dfa36f2e7767002ed698cf4739accf09fd662496",
+            "sha256": "8e7fdb4d26abdc5ede69624a753fb8b4a15e5753a2eef98fa0cabad210bc61ca"
+          }
+        ]
+      },
+      {
+        "id": "taskswitch",
+        "readScope": "protocol/input/condition/scoring-path inspection for deduplication; not full runtime audit",
+        "files": [
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/taskswitch/task-package.json",
+            "gitBlob": "303235518e787b56f85327ecf401e65b539d7566",
+            "sha256": "ca67cb3b90e51a8d16dee3656f2ea7213c6db1004e8febc86a81fb19dfe0abb8"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/taskswitch/package.ts",
+            "gitBlob": "6e9383396c28b7c47a228d2d4417fac38e22b2c8",
+            "sha256": "1e917e21ccb666c0353a075620f3a7579e3d5d84c35103dbd0f81929266cc92f"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/taskswitch/semantics.ts",
+            "gitBlob": "5bbde5520ebaf8b62a787d17af98c59531365fac",
+            "sha256": "1d887a6662b3ea7f01190f4267ce465fd3fa2d2ffc6052150e8b2e556c0826c9"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/taskswitch/definitions.ts",
+            "gitBlob": "505678ecf5bbb2917fcb710d4d3d5a0a55090bae",
+            "sha256": "a9844ef797c56b86b0537711c8faa73c1f63cdb3075af9937da5651891996788"
+          },
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/taskswitch/taskswitch.registry.ts",
+            "gitBlob": "c86904428f390d1bd91162d9c60b14ed47674a80",
+            "sha256": "373700b050527ddffd8880300f8532f3133d0f79d2b0a440a5e9a43ad596d234"
+          },
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/taskswitch/TaskswitchTask.tsx",
+            "gitBlob": "a4ddc98e7cd0240b71d53a7f373edb8290c6df5e",
+            "sha256": "b9ff63c72ddb504a47453a30afb8aae9eb8a1afdb94559a117a53a1958af4929"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/scoring/taskswitch.v1.ts",
+            "gitBlob": "93f7a7441b17e90ba2f7fe913a6a1d9860abfb19",
+            "sha256": "f79f3552da4e762ea77274c4c3e9de804b5e4a7c97c29d0dff71de60ccebf507"
+          }
+        ]
+      },
+      {
+        "id": "tower",
+        "readScope": "protocol/input/condition/scoring-path inspection for deduplication; not full runtime audit",
+        "files": [
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/tower/task-package.json",
+            "gitBlob": "97840f9fc2344cbd82433b15d3dd9d28c950c501",
+            "sha256": "4736b19d0c2d26006590ffb71c3e17a15504f11947ea9e3bd31a502a72995389"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/tower/package.ts",
+            "gitBlob": "4a979c09e47a402cc89be772bc7f61b257a5b288",
+            "sha256": "f1e51a887e50f81b7bbdc1c2629be23e6fe1eda5ee120bfe5ce348dca12ae5cb"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/tower/semantics.ts",
+            "gitBlob": "9892d03003aaab107f698fcfe88d4dbb21f99575",
+            "sha256": "0ec5a29a3a58d91d512c7d6892d7494e2d83e48e3023dc6e9db3308338796119"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/tower/definitions.ts",
+            "gitBlob": "4ba40ba2eec3caaa2a0816ca9911bd68f019b7eb",
+            "sha256": "3c14c98ca774d4a7b6cdfa66187e865b9c5ebebb4d97288a830e5d95454f8ba1"
+          },
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/tower/tower.registry.ts",
+            "gitBlob": "68361f437045b12ecb173e916a58a364a645a866",
+            "sha256": "f57818f69a81f84f3ed3317e66173e0bb5f6414a30c3d413c12672dce7ea1c26"
+          },
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/tower/TowerTask.tsx",
+            "gitBlob": "c3b200c56197f3cce097ce3cfa17173baade2931",
+            "sha256": "de83b4bb32f1bbdf0e72d38c31a0a546498d03a1507c3bb281caa57a04a1f187"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/scoring/tower.v1.ts",
+            "gitBlob": "49d3b58a9dc2854e4180a98a779c966f3fcc159a",
+            "sha256": "bc81d5453454188a7721ba524d36711a067ea5dd54a655e8c3dbacd947984e3e"
+          }
+        ]
+      },
+      {
+        "id": "trailmaking",
+        "readScope": "protocol/input/condition/scoring-path inspection for deduplication; not full runtime audit",
+        "files": [
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/trailmaking/task-package.json",
+            "gitBlob": "d544308fe240962e934896c211fcfe400b255a5a",
+            "sha256": "af7f8db8f6621996d29c0c66b3bb0a24403b8c62b45a2e62356d07d2e6e87408"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/trailmaking/package.ts",
+            "gitBlob": "0f08553163abf9ec090e03e4eadf793ae852a466",
+            "sha256": "4a73220a13dc30e62947ff6013747825414d3d5e44deeed4e42a8d1d36744ca9"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/trailmaking/semantics.ts",
+            "gitBlob": "6efb2e0bc7405199310abe3ed9874e668a3399eb",
+            "sha256": "b02933b42c5464febbbdbac49e0f73adc00b2912b63891c2240d91d5e42dae7c"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/trailmaking/definitions.ts",
+            "gitBlob": "8364d7e2a164d691452d39da6a3b128c4559a534",
+            "sha256": "3bc9622a4da494430bfd17dd153144ddf844e2fdbbe3351ad76295bfc8884b9d"
+          },
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/trailmaking/trailmaking.registry.ts",
+            "gitBlob": "016ce4cae1e9f215f2fe913c1170e97aaf68aea1",
+            "sha256": "02a603b2d568d88df98486aa4aa137ce75c04b60bd80ddcdf8c8a97132c0d4d0"
+          },
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/trailmaking/TrailmakingTask.tsx",
+            "gitBlob": "7128ab2edb84c1b925a3f87c95eabc921326e66d",
+            "sha256": "3209e2fd2cd1bfef0e0677b5973477df7512dcbb4a61ea86faf75863dcf32772"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/scoring/trailmaking.v1.ts",
+            "gitBlob": "01d40beacd756e567f39b8d1d00db93e03974364",
+            "sha256": "d1fb15ce14fcb04986e608630291019b7902c9272670b26bc43066c16ef123b2"
+          }
+        ]
+      },
+      {
+        "id": "wordlist",
+        "readScope": "protocol/input/condition/scoring-path inspection for deduplication; not full runtime audit",
+        "files": [
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/wordlist/task-package.json",
+            "gitBlob": "6c0690effe9196090b1beb2d55999c71c0708523",
+            "sha256": "a945db31cdfbfe300533d61ed20150467cd1b2b504a006764e5d66a8a517260b"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/wordlist/package.ts",
+            "gitBlob": "8fdcb1d1bd6ac5118815ed6c1cccbb90530124ca",
+            "sha256": "609a4e5f110492ae0ed85e109e424c3d8a837a5a51e90c68c95ebfe083f2b105"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/wordlist/semantics.ts",
+            "gitBlob": "365fc067bbd4d60cc7fd735fd48c8a189174566b",
+            "sha256": "5ee46a0e66566cb94af8669feb9df15e53411880093c21df200a40005c6e13ea"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/tasks/wordlist/definitions.ts",
+            "gitBlob": "e24593c932e2bd7c81ea666d4d869d65784691ca",
+            "sha256": "76b0ea5c4a0c84d9c9d3507cebd5c1c18a8ffd3a9358ed888c92528daf8919f4"
+          },
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/wordlist/wordlist.registry.ts",
+            "gitBlob": "f5bd40097aff3699f7596a072484e38c818fc3bd",
+            "sha256": "fef67745f2ab3d262930c5b290368384a55c65bb3550ce343d83fc60781c39f7"
+          },
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/wordlist/WordlistTask.tsx",
+            "gitBlob": "e10eabb17a5283935f1a6ac5df7f4bba0ef6ac95",
+            "sha256": "6e49e8c6ccf024b13f08da425082513411b9910d9cc7cccdbc65fac7ac1e20b1"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/scoring/wordlist.v1.ts",
+            "gitBlob": "2145990679714229e09c9f4d4e7b147bc712d129",
+            "sha256": "7207a1bf2cc4b5ad820d5ace4ef2bf4a74ad0b8960258393da025ed766da70a0"
+          }
+        ]
+      }
+    ],
+    "existingCandidates": [
+      {
+        "id": "mot",
+        "status": "EXISTING_CANDIDATE_NOT_NEW_WORK",
+        "acceptance": "not revalidated; historical PASS not reused",
+        "files": [
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/mot/MotTask.tsx",
+            "gitBlob": "b8e5f0697b65db14f81865faee9411bfe53ab5bd",
+            "sha256": "c662727a6aeab049f751d37ea0d728332ec053bc8d4f791795146b79ab0ba3aa"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/content-candidates/mot/scorer.ts",
+            "gitBlob": "a0d0449f797fcfdbd47d93938875ad883fb8a1ad",
+            "sha256": "0a6afc6aaabb6a1464b0b957f5a99dea912d49b8ad85d4cf827b7ebfb90e88d4"
+          }
+        ]
+      },
+      {
+        "id": "enumeration",
+        "status": "EXISTING_CANDIDATE_NOT_NEW_WORK",
+        "acceptance": "not revalidated; historical PASS not reused",
+        "files": [
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/enumeration/EnumerationTask.tsx",
+            "gitBlob": "e1c02363e592da1fbc69eb76f572c18e0dd476be",
+            "sha256": "aa3d6cc2aff6fc1b678fa64becf6e7f9222211ef4e1d42beae0de4d9b0543ab8"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/content-candidates/enumeration/scorer.ts",
+            "gitBlob": "680250aea3b2dd1a99274aeaa29486f0f8ad4620",
+            "sha256": "2eec4bce079bd62b02c7d28216e0ba037cf609ffc36044af7bd29c445a732380"
+          }
+        ]
+      },
+      {
+        "id": "continuous-recognition",
+        "status": "EXISTING_CANDIDATE_NOT_NEW_WORK",
+        "acceptance": "not revalidated; historical PASS not reused",
+        "files": [
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/RecognitionTask.tsx",
+            "gitBlob": "c1c59c8411460bafe5a96fde9071c31006682935",
+            "sha256": "c7ec36ee842b8a521140baf77e63383108572fa174993a2e7a9f030008ed8e77"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/content-candidates/continuous-recognition/scorer.ts",
+            "gitBlob": "f46de585c07d2f1bca1b5cbf1a403936cde16675",
+            "sha256": "cd3f53ad81d127da6342fe62f91ed7aa52b6c9a665c1484d0895ed7bbb7272ff"
+          }
+        ]
+      },
+      {
+        "id": "ant",
+        "status": "EXISTING_CANDIDATE_NOT_NEW_WORK",
+        "acceptance": "not revalidated; historical PASS not reused",
+        "files": [
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/ant/AntTask.tsx",
+            "gitBlob": "9fb2c469a0ea91f79fa71736eb94133d60a49177",
+            "sha256": "546175653a862ec89336ffb06f5208f2b8fb0d3e2e25232fd35ca3028fc1419a"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/content-candidates/ant/scorer.ts",
+            "gitBlob": "eb5f9c56be38a86e3367bb2d07d966fd05f3d5a6",
+            "sha256": "856eb0f0303731ddcbfd327f9bef56c9d636ed8169221b95e1eafe5e3e2238eb"
+          }
+        ]
+      },
+      {
+        "id": "precision-working-memory",
+        "status": "EXISTING_CANDIDATE_NOT_NEW_WORK",
+        "acceptance": "not revalidated; historical PASS not reused",
+        "files": [
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/precision-working-memory/SpatialMemoryTask.tsx",
+            "gitBlob": "73f74c143c5c1f10ae29ee8c8df43bcf9614ab9c",
+            "sha256": "8aba512eb6b8aeef6941024d48348d2a55f4b5a2c685a92a60c65c4fffa56b5b"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/content-candidates/precision-working-memory/scorer.ts",
+            "gitBlob": "377d00de72a01da3fa176bfab0f5bfaf04d24018",
+            "sha256": "0c9725fd2904aa9fa585a619421478c490aac75548d53c47e4ab526485d9c6ab"
+          }
+        ]
+      },
+      {
+        "id": "balloon-effort",
+        "status": "EXISTING_CANDIDATE_NOT_NEW_WORK",
+        "acceptance": "not revalidated; historical PASS not reused",
+        "files": [
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/balloon-effort/BalloonEffortTask.tsx",
+            "gitBlob": "994478e23afaf53852978172a6723968a5919dc5",
+            "sha256": "150152cdbe817b9bc30152d06cdd48d31b228520100f6f5ad6135829a921309a"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/content-candidates/balloon-effort/scorer.ts",
+            "gitBlob": "45859ebdc2b64f2ec07c7706d1a7769620fd76ac",
+            "sha256": "c639a878eba7f457734a80ab54fe9f479d6c1e058a1204b1e276ed8fcb0bdf3a"
+          }
+        ]
+      },
+      {
+        "id": "gradcpt",
+        "status": "EXISTING_CANDIDATE_NOT_NEW_WORK",
+        "acceptance": "not revalidated; historical PASS not reused",
+        "files": [
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/gradcpt/GradCptTask.tsx",
+            "gitBlob": "6b0c35ba1917a40cbdb471e58b5940e17b0854a8",
+            "sha256": "929ece4ad691a3b16017905f037a7c054a96d2ec177ac3ccc40bbb78b707880e"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/content-candidates/gradcpt/scorer.ts",
+            "gitBlob": "eeba65b202bed701535efba24a7f011e2e4e3c60",
+            "sha256": "a8f1a723de779c6d0b811d2c33d1bb981631371b88f2ce914a33a0b9a7648aab"
+          }
+        ]
+      },
+      {
+        "id": "attentional-blink",
+        "status": "EXISTING_CANDIDATE_NOT_NEW_WORK",
+        "acceptance": "not revalidated; historical PASS not reused",
+        "files": [
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/attentional-blink/AttentionalBlinkTask.tsx",
+            "gitBlob": "38649b10860c3d29e36985143a5fa5388e0ce540",
+            "sha256": "2170f34605f0eed95274f07512505d86a3392a0445e6dee9a7e2adc0ab68f396"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/content-candidates/attentional-blink/scorer.ts",
+            "gitBlob": "8397b34231370364431414d336e81255271191ce",
+            "sha256": "294fe4ec916563bf7101c96947a5f1e1b5a6b7e37047ad22197ac3b0758728c2"
+          }
+        ]
+      },
+      {
+        "id": "visual-search",
+        "status": "EXISTING_CANDIDATE_NOT_NEW_WORK",
+        "acceptance": "not revalidated; historical PASS not reused",
+        "files": [
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/visual-search/VisualSearchTask.tsx",
+            "gitBlob": "0841099b8b8610f8730457d65a43dcf1edae06e7",
+            "sha256": "6f7771cb30fbe8cc234221f4f943698ea993131ea25530d30b49d1424a246bea"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/content-candidates/visual-search/scorer.ts",
+            "gitBlob": "90dc8fb398efac030f0d4a940fe1bb72a27013a0",
+            "sha256": "ef18fde61c353dfb9fe70d50fdd1ae78c1faa0b45bad25879523eba918b67d9c"
+          }
+        ]
+      },
+      {
+        "id": "dual-arrow",
+        "status": "EXISTING_CANDIDATE_NOT_NEW_WORK",
+        "acceptance": "not revalidated; historical PASS not reused",
+        "files": [
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/dual-arrow/DualArrowTask.tsx",
+            "gitBlob": "6b189cd0a45e748eb47d1d577b81b5f657f24355",
+            "sha256": "cf5fb09acc407c464993f346f2ffa3be60234458580b727226e4f470e56a9124"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/content-candidates/dual-arrow/scorer.ts",
+            "gitBlob": "338d3367d10e9da8cee7fd2321498e9a178e47dc",
+            "sha256": "0410a08b2c155b6d78e2804400f656c47b7c5c4c9d8e74c042e9ca1e7fa5be2b"
+          }
+        ]
+      },
+      {
+        "id": "horizon-exploration",
+        "status": "EXISTING_CANDIDATE_NOT_NEW_WORK",
+        "acceptance": "not revalidated; historical PASS not reused",
+        "files": [
+          {
+            "path": "server-version/frontend/src/modules/cognitive/tasks/horizon-exploration/HorizonTask.tsx",
+            "gitBlob": "7af9233775b114843e286a21d9e97cc0139c58a1",
+            "sha256": "543f527c0d3f900a5a6116c34ab39ae38802ba2fc4562f1beaa0383160a277c3"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/content-candidates/horizon-exploration/scorer.ts",
+            "gitBlob": "8849ad52bbd55db90b1f50c7b244b17865499661",
+            "sha256": "160609b5962e26f7e8c321cd8b3369af814065e8cae58faea948c09f153bc7cb"
+          }
+        ]
+      }
+    ],
+    "additionalSharedSource": {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/shared/prng.ts",
+      "gitBlob": "6d133583525e26366823e385ca695438cdb2fc1c",
+      "sha256": "657834cca5ab705609dce8505dbf8e76c86a5a3f8c3cfec8f252acd8a57a11e7"
+    }
+  },
+  "sourceChecks": [
+    {
+      "id": "sun-2019",
+      "doi": "10.3389/fpsyg.2019.00884",
+      "read": "publisher full method and copyright passages",
+      "license": "article CC BY; code and complete supplementary bank not verified; no third-party Raven materials reused"
+    },
+    {
+      "id": "icar-current",
+      "doi": "10.23668/psycharchives.22167",
+      "url": "https://icar-project.com/",
+      "read": "official redirected FAQ",
+      "license": "academic only SUL1, project registration, no public redistribution; no item downloads"
+    },
+    {
+      "id": "sul1",
+      "doi": "10.23668/psycharchives.4988",
+      "read": "public landing metadata; PDF download failed",
+      "license": "license-document CC BY does not license ICAR bank CC BY"
+    },
+    {
+      "id": "mars-ib",
+      "doi": "10.1098/rsos.190232",
+      "read": "author institution PDF methods/license distinction; OSF bank page 403",
+      "license": "article CC BY4.0; bank described noncommercial; actual bank/code/translation files unverified"
+    },
+    {
+      "id": "phenx-dccs",
+      "doi": "10.82568/phenx_toolkit/530102",
+      "read": "official traditional interviewer protocol and availability",
+      "license": "protocol use free; specific asset/code/translation redistribution not verified"
+    },
+    {
+      "id": "noto-cjk",
+      "read": "local /usr/share/doc/fonts-noto-cjk/copyright",
+      "license": "font SIL OFL1.1; no font binaries distributed"
+    }
+  ],
+  "layout": {
+    "browser": "151.0.7922.173",
+    "chromiumSandbox": false,
+    "javaScriptEnabled": false,
+    "launchFailureAttempt1": "SUID helper not root-owned mode 4755; no system permission changed",
+    "checks": [
+      {
+        "width": 1728,
+        "scrollWidth": 1728,
+        "panels": [
+          {
+            "id": "phone-intro",
+            "width": 390,
+            "scrollWidth": 388,
+            "clientWidth": 388
+          },
+          {
+            "id": "phone-task",
+            "width": 390,
+            "scrollWidth": 388,
+            "clientWidth": 388
+          },
+          {
+            "id": "tablet-review",
+            "width": 820,
+            "scrollWidth": 818,
+            "clientWidth": 818
+          }
+        ],
+        "scripts": 0,
+        "enabledButtons": 0
+      },
+      {
+        "width": 820,
+        "scrollWidth": 820,
+        "panels": [
+          {
+            "id": "phone-intro",
+            "width": 788,
+            "scrollWidth": 786,
+            "clientWidth": 786
+          },
+          {
+            "id": "phone-task",
+            "width": 788,
+            "scrollWidth": 786,
+            "clientWidth": 786
+          },
+          {
+            "id": "tablet-review",
+            "width": 788,
+            "scrollWidth": 786,
+            "clientWidth": 786
+          }
+        ],
+        "scripts": 0,
+        "enabledButtons": 0
+      },
+      {
+        "width": 390,
+        "scrollWidth": 390,
+        "panels": [
+          {
+            "id": "phone-intro",
+            "width": 358,
+            "scrollWidth": 356,
+            "clientWidth": 356
+          },
+          {
+            "id": "phone-task",
+            "width": 358,
+            "scrollWidth": 356,
+            "clientWidth": 356
+          },
+          {
+            "id": "tablet-review",
+            "width": 358,
+            "scrollWidth": 356,
+            "clientWidth": 356
+          }
+        ],
+        "scripts": 0,
+        "enabledButtons": 0
+      }
+    ],
+    "errors": [],
+    "externalRequests": [],
+    "experimentExecuted": false,
+    "renderOnly": true
+  },
+  "manualVisualReview": {
+    "file": "number-series-review.png",
+    "viewed": true,
+    "finding": "Phone instructions/examples, phone task and tablet practice/report states legible; counts/time budgets and synthetic-data labels visible; no clipped answer options or footer observed.",
+    "scientificValidation": false
+  },
+  "notPerformed": [
+    "new runner",
+    "sequence generator",
+    "scorer",
+    "formal item bank generation",
+    "participant testing",
+    "application tests",
+    "centralized validation",
+    "product build",
+    "shared README/registry changes",
+    "PR363 changes",
+    "MOT/ANT WIP changes",
+    "API/DB/COS access",
+    "CI",
+    "git commit",
+    "push",
+    "merge",
+    "deploy",
+    "activation"
+  ],
+  "artifacts": [
+    {
+      "file": "README.md",
+      "bytes": 2804,
+      "sha256": "60cf5f8a1ef068ee85fc8091a0cf2570e5c56157a4dc96ca54f91fc406972ab9"
+    },
+    {
+      "file": "delivery-receipt.json",
+      "bytes": 1714,
+      "sha256": "90f02c1b89710edfc40e245d79435b520fb224300b07335c598ef366c77f1945"
+    },
+    {
+      "file": "number-series-appendix.md",
+      "bytes": 19347,
+      "sha256": "82403cb1ecadb798d97b4a31574c8f5f54929245a1e9e6bd4c78770e3b0a16f7"
+    },
+    {
+      "file": "number-series-brief-20261027.md",
+      "bytes": 2114,
+      "sha256": "747cf523d09f35818bb2797b56daee6f7ea8669f953cad0765cc39d3a47d5e72"
+    },
+    {
+      "file": "number-series-review.png",
+      "bytes": 455045,
+      "sha256": "b6f53716640b665b21e5eb7b67fcf49add24118f979f4c8ffeed21c12bf3f271",
+      "pixels": [
+        1680,
+        1430
+      ]
+    },
+    {
+      "file": "phone-390.png",
+      "bytes": 95841,
+      "sha256": "4bb9ab15f6b5b3462a6b775d20e53288132076d4e8df89f892b0c08c79b6fac6",
+      "pixels": [
+        358,
+        1096
+      ]
+    },
+    {
+      "file": "reuse-audit.md",
+      "bytes": 8377,
+      "sha256": "33e723e465ec8357ce393f10ad45c08e5b15c18a36b9503576389a3fe1a24f9f"
+    },
+    {
+      "file": "review.html",
+      "bytes": 17119,
+      "sha256": "4c79d64b26ddcadb4014c32b1acdae1c91c690936cc4ca01b31a027e6135bc85"
+    },
+    {
+      "file": "tablet-820.png",
+      "bytes": 172689,
+      "sha256": "4dba1d7274b9023698312592ea29ac453f2886c7c9314cf896329c027187efc4",
+      "pixels": [
+        788,
+        1617
+      ]
+    }
+  ],
+  "finalContentChecks": {
+    "completedAtUtc": "2026-10-27T10:12:01.810996+00:00",
+    "domainOnlyFileCount": 10,
+    "localLinksResolve": true,
+    "artifactHashesMatch": true,
+    "sourcePathsExist": true,
+    "countsAndExampleArithmeticChecked": true,
+    "whitespaceCheckedForUntrackedTextFiles": true,
+    "staticHtmlScriptCount": 0,
+    "taskEventHandlers": 0,
+    "appOrScientificTestsRun": false,
+    "remoteHeadsUnchangedOnFinalRead": true
+  },
+  "notPerformedAtOriginalDesignCompletion": [
+    "new runner",
+    "sequence generator",
+    "scorer",
+    "formal item bank generation",
+    "participant testing",
+    "application tests",
+    "centralized validation",
+    "product build",
+    "shared README/registry changes",
+    "PR363 changes",
+    "MOT/ANT WIP changes",
+    "API/DB/COS access",
+    "CI",
+    "git commit",
+    "push",
+    "merge",
+    "deploy",
+    "activation",
+    "Notion write"
+  ],
+  "externalDelivery": {
+    "deliveryMethod": "existing Notion page append, authorized follow-up",
+    "pageUrl": "https://app.notion.com/p/405d27635a3881b2a2d3fecce26d7cb3",
+    "imageAnchorUrl": "https://app.notion.com/p/405d27635a3881b2a2d3fecce26d7cb3#26c00a2146234c07b76e3b2ae5a69356",
+    "section": "儿童学习｜数列规则推理｜待单项图审",
+    "notionFileUploadId": "406d2763-5a38-81bc-a3bf-00b234a1108a",
+    "notionImageBlockId": "26c00a21-4623-4c07-b76e-3b2ae5a69356",
+    "imageFilename": "number-series-review.png",
+    "imageSha256": "b6f53716640b665b21e5eb7b67fcf49add24118f979f4c8ffeed21c12bf3f271",
+    "imageBytes": 455045,
+    "imageBytesDownloadedAndMatched": true,
+    "briefFilename": "number-series-brief-20261027.md",
+    "briefLocalSha256": "747cf523d09f35818bb2797b56daee6f7ea8669f953cad0765cc39d3a47d5e72",
+    "briefDelivery": "inline Notion text, native formatting normalization; not claiming byte-identical Markdown storage",
+    "finalPageReadbackAtUtc": "2026-10-27T10:12:01.805679+00:00",
+    "pageLastEditedAt": "2026-10-27T10:11:10.739Z",
+    "readbackClaimsConfirmed": [
+      "original examples and interface",
+      "formal bank not yet authored; planned original authorship after approval",
+      "no child empirical difficulty/reliability/validity/norming evidence",
+      "not equivalent to Wechsler or Raven",
+      "24/12 counts and duration are proposals",
+      "pending DOT actual review and user design approval"
+    ],
+    "sharingMutationPerformed": false,
+    "libraryAttempt": {
+      "status": "failed before upload",
+      "reason": "hosted apps tools/list HTTP 401",
+      "createdLibraryFileIds": [],
+      "retried": false
+    },
+    "gitCommitPerformed": false,
+    "gitPushPerformed": false,
+    "runnerOrScorerDeveloped": false
+  }
+}

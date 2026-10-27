@@ -1,0 +1,35 @@
+{
+  "deliveryMethod": "existing Notion page append, authorized follow-up",
+  "pageUrl": "https://app.notion.com/p/405d27635a3881b2a2d3fecce26d7cb3",
+  "imageAnchorUrl": "https://app.notion.com/p/405d27635a3881b2a2d3fecce26d7cb3#26c00a2146234c07b76e3b2ae5a69356",
+  "section": "儿童学习｜数列规则推理｜待单项图审",
+  "notionFileUploadId": "406d2763-5a38-81bc-a3bf-00b234a1108a",
+  "notionImageBlockId": "26c00a21-4623-4c07-b76e-3b2ae5a69356",
+  "imageFilename": "number-series-review.png",
+  "imageSha256": "b6f53716640b665b21e5eb7b67fcf49add24118f979f4c8ffeed21c12bf3f271",
+  "imageBytes": 455045,
+  "imageBytesDownloadedAndMatched": true,
+  "briefFilename": "number-series-brief-20261027.md",
+  "briefLocalSha256": "747cf523d09f35818bb2797b56daee6f7ea8669f953cad0765cc39d3a47d5e72",
+  "briefDelivery": "inline Notion text, native formatting normalization; not claiming byte-identical Markdown storage",
+  "finalPageReadbackAtUtc": "2026-10-27T10:12:01.805679+00:00",
+  "pageLastEditedAt": "2026-10-27T10:11:10.739Z",
+  "readbackClaimsConfirmed": [
+    "original examples and interface",
+    "formal bank not yet authored; planned original authorship after approval",
+    "no child empirical difficulty/reliability/validity/norming evidence",
+    "not equivalent to Wechsler or Raven",
+    "24/12 counts and duration are proposals",
+    "pending DOT actual review and user design approval"
+  ],
+  "sharingMutationPerformed": false,
+  "libraryAttempt": {
+    "status": "failed before upload",
+    "reason": "hosted apps tools/list HTTP 401",
+    "createdLibraryFileIds": [],
+    "retried": false
+  },
+  "gitCommitPerformed": false,
+  "gitPushPerformed": false,
+  "runnerOrScorerDeveloped": false
+}

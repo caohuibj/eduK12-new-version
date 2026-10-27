@@ -1,0 +1,48 @@
+{
+  "synthetic": true,
+  "participantData": false,
+  "browser": "151.0.7922.173",
+  "chromiumSandbox": false,
+  "reason": "original local bundle, all network requests blocked, no system sandbox permissions changed",
+  "layouts": [
+    {
+      "name": "phone formal after failed-three-item round and full reread",
+      "width": 390,
+      "scrollWidth": 390,
+      "row": [
+        {
+          "client": 354,
+          "scroll": 354
+        }
+      ],
+      "buttons": [
+        {
+          "width": 171,
+          "height": 88.6875
+        },
+        {
+          "width": 171,
+          "height": 88.6875
+        },
+        {
+          "width": 171,
+          "height": 88.6875
+        },
+        {
+          "width": 171,
+          "height": 88.6875
+        }
+      ]
+    }
+  ],
+  "practiceRoundSize": 3,
+  "failedRoundRetained": true,
+  "fullInstructionsRePresented": true,
+  "secondRoundPassed": true,
+  "errors": [],
+  "externalRequests": [],
+  "serverCalls": 0,
+  "fixtureOrigin": "https://number-series.fixture.invalid/ served only by local route fulfillment for a secure browser context",
+  "centralizedAcceptance": false,
+  "previewBundleSha256": "08e4d47f0e2325bb81e8a4a2b0308eb5e6447e3509a312dd66206cc2873c70df"
+}

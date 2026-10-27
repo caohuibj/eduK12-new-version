@@ -1,0 +1,230 @@
+[
+  {
+    "component": "backend",
+    "roots": [
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/number-series/analysis.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/number-series/items.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/number-series/metadata.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/number-series/package.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/number-series/participant-presentation.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/number-series/protocol.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/number-series/report.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/number-series/scorer.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/number-series/validation.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/__tests__/cognitive/number-series-content.test.ts"
+    ],
+    "typescript": "5.9.3",
+    "sourceFiles": [
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/number-series/items.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/number-series/protocol.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/number-series/analysis.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/number-series/metadata.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-reference/governance.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-media/material.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-media/assessment-asset-identity.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-media/assessment-image.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-media/assessment-image-presentation.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/scale/raw-score-feedback.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/scale/library/audience-report-gate.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-media/assessment-video.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/scale/scale-definition.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/scale/scale-scoring.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-context/context.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-runtime/control-reference-codec.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-runtime/compact-field-codec.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/utils/logger.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/utils/encryption.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-context/form-answer.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-context/security.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-context/index.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-reference/reference.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-runtime/canonical.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-runtime/types.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/task-package.types.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/v2/presentation.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/cognitive.types.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/v2/types.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/services/runtimeObservability.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/v2/canonical.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/situational/situation-scientific-contract.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/situational/situation-definition.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/situational/situation-scientific-validation.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/situational/situation-branching.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/situational/situation-runtime-definition.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-runtime/compiler.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-governance/operational-hold.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/v2/final-submission-budget.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/cognitive.errors.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/v2/session-snapshot.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/number-series/validation.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/v2/trial-envelope.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/number-series/scorer.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/number-series/report.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/number-series/package.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/protocol-presentation.types.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/participant-presentation.types.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/number-series/participant-presentation.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/__tests__/cognitive/number-series-content.test.ts"
+    ],
+    "diagnostics": [
+      {
+        "file": "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/number-series/report.ts",
+        "line": 54,
+        "code": 2345,
+        "message": "Argument of type '\"先看过三类关系的例子，再把关系用到新的数字组合；下面只描述这次规则应用的记录。\" | \"You saw examples of three relationships before applying them to new number combinations. This describes this session of rule application only.\"' is not assignable to parameter of type '\"谢谢你认真完成这组题\" | \"这次有题未完成或被打断，先不解读表现。谢谢你已经付出的努力；方便时再完整体验。\" | \"这次记录不足以生成可解释的反馈。你可以先休息，准备好后重新开始。\" | \"Thank you for working through these questions\" | \"Some questions were unfinished or interrupted, so we will not interpret performance. Thank you for your effort; you can try a complete activity when convenient.\" | \"There...'.\n  Type '\"先看过三类关系的例子，再把关系用到新的数字组合；下面只描述这次规则应用的记录。\"' is not assignable to type '\"谢谢你认真完成这组题\" | \"这次有题未完成或被打断，先不解读表现。谢谢你已经付出的努力；方便时再完整体验。\" | \"这次记录不足以生成可解释的反馈。你可以先休息，准备好后重新开始。\" | \"Thank you for working through these questions\" | \"Some questions were unfinished or interrupted, so we will not interpret performance. Thank you for your effort; you can try a complete activity when convenient.\" | \"There...'."
+      },
+      {
+        "file": "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/number-series/report.ts",
+        "line": 55,
+        "code": 2345,
+        "message": "Argument of type '`\\u7B49\\u5DEE\\u5173\\u7CFB: ${number}/${number}` | `\\u7B49\\u6BD4\\u5173\\u7CFB: ${number}/${number}` | `\\u9012\\u589E\\u5DEE\\u503C: ${number}/${number}` | `Constant addition: ${number}/${number}` | `Constant multiplication: ${number}/${number}` | `Growing gaps: ${number}/${number}`' is not assignable to parameter of type '\"谢谢你认真完成这组题\" | \"这次有题未完成或被打断，先不解读表现。谢谢你已经付出的努力；方便时再完整体验。\" | \"这次记录不足以生成可解释的反馈。你可以先休息，准备好后重新开始。\" | \"Thank you for working through these questions\" | \"Some questions were unfinished or interrupted, so we will not interpret performance. Thank you for your effort; you can try a complete activity when convenient.\" | \"There...'.\n  Type '`\\u7B49\\u5DEE\\u5173\\u7CFB: ${number}/${number}`' is not assignable to type '\"谢谢你认真完成这组题\" | \"这次有题未完成或被打断，先不解读表现。谢谢你已经付出的努力；方便时再完整体验。\" | \"这次记录不足以生成可解释的反馈。你可以先休息，准备好后重新开始。\" | \"Thank you for working through these questions\" | \"Some questions were unfinished or interrupted, so we will not interpret performance. Thank you for your effort; you can try a complete activity when convenient.\" | \"There...'."
+      },
+      {
+        "file": "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/number-series/report.ts",
+        "line": 56,
+        "code": 2345,
+        "message": "Argument of type 'string' is not assignable to parameter of type '\"谢谢你认真完成这组题\" | \"这次有题未完成或被打断，先不解读表现。谢谢你已经付出的努力；方便时再完整体验。\" | \"这次记录不足以生成可解释的反馈。你可以先休息，准备好后重新开始。\" | \"Thank you for working through these questions\" | \"Some questions were unfinished or interrupted, so we will not interpret performance. Thank you for your effort; you can try a complete activity when convenient.\" | \"There...'."
+      },
+      {
+        "file": "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/number-series/report.ts",
+        "line": 58,
+        "code": 2345,
+        "message": "Argument of type '\"题量、练习、学校教学和运算经验都会影响表现；触屏与短版效度尚未验证。这不是韦氏或瑞文的等价版，不给 IQ、常模、同龄排名、诊断或学业与岗位预测。\" | \"Item count, practice, schooling and arithmetic experience affect this record. Touch and short-version validity are unverified. This is not equivalent to Wechsler or Raven, and provides no IQ, norms, age ranking, diagnosis, school or job pr...' is not assignable to parameter of type '\"谢谢你认真完成这组题\" | \"这次有题未完成或被打断，先不解读表现。谢谢你已经付出的努力；方便时再完整体验。\" | \"这次记录不足以生成可解释的反馈。你可以先休息，准备好后重新开始。\" | \"Thank you for working through these questions\" | \"Some questions were unfinished or interrupted, so we will not interpret performance. Thank you for your effort; you can try a complete activity when convenient.\" | \"There...'.\n  Type '\"题量、练习、学校教学和运算经验都会影响表现；触屏与短版效度尚未验证。这不是韦氏或瑞文的等价版，不给 IQ、常模、同龄排名、诊断或学业与岗位预测。\"' is not assignable to type '\"谢谢你认真完成这组题\" | \"这次有题未完成或被打断，先不解读表现。谢谢你已经付出的努力；方便时再完整体验。\" | \"这次记录不足以生成可解释的反馈。你可以先休息，准备好后重新开始。\" | \"Thank you for working through these questions\" | \"Some questions were unfinished or interrupted, so we will not interpret performance. Thank you for your effort; you can try a complete activity when convenient.\" | \"There...'."
+      }
+    ]
+  },
+  {
+    "component": "frontend",
+    "roots": [
+      "/workspace/eduK12-new-version/server-version/frontend/src/modules/cognitive/tasks/number-series/NumberSeriesInstructions.tsx",
+      "/workspace/eduK12-new-version/server-version/frontend/src/modules/cognitive/tasks/number-series/NumberSeriesReport.tsx",
+      "/workspace/eduK12-new-version/server-version/frontend/src/modules/cognitive/tasks/number-series/NumberSeriesTask.tsx",
+      "/workspace/eduK12-new-version/server-version/frontend/src/modules/cognitive/tasks/number-series/capture.ts",
+      "/workspace/eduK12-new-version/server-version/frontend/src/modules/cognitive/tasks/number-series/content.test.tsx",
+      "/workspace/eduK12-new-version/server-version/frontend/src/modules/cognitive/tasks/number-series/contracts.ts",
+      "/workspace/eduK12-new-version/server-version/frontend/src/modules/cognitive/tasks/number-series/session.ts"
+    ],
+    "typescript": "5.9.3",
+    "sourceFiles": [
+      "/workspace/eduK12-new-version/server-version/frontend/src/modules/cognitive/tasks/number-series/generated/items.ts",
+      "/workspace/eduK12-new-version/server-version/frontend/src/modules/cognitive/tasks/number-series/generated/protocol.ts",
+      "/workspace/eduK12-new-version/server-version/frontend/src/modules/cognitive/tasks/number-series/generated/analysis.ts",
+      "/workspace/eduK12-new-version/server-version/frontend/src/modules/cognitive/tasks/number-series/generated/report.ts",
+      "/workspace/eduK12-new-version/server-version/frontend/src/modules/cognitive/tasks/number-series/NumberSeriesInstructions.tsx",
+      "/workspace/eduK12-new-version/server-version/frontend/src/modules/cognitive/tasks/number-series/NumberSeriesReport.tsx",
+      "/workspace/eduK12-new-version/server-version/frontend/src/modules/cognitive/tasks/number-series/capture.ts",
+      "/workspace/eduK12-new-version/server-version/frontend/src/modules/cognitive/tasks/number-series/contracts.ts",
+      "/workspace/eduK12-new-version/server-version/frontend/src/modules/cognitive/tasks/number-series/session.ts",
+      "/workspace/eduK12-new-version/server-version/frontend/src/modules/cognitive/tasks/number-series/NumberSeriesTask.tsx",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-reference/governance.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-media/material.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-media/assessment-asset-identity.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-media/assessment-image.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-media/assessment-image-presentation.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/scale/raw-score-feedback.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/scale/library/audience-report-gate.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-media/assessment-video.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/scale/scale-definition.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/scale/scale-scoring.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-context/context.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-runtime/control-reference-codec.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-runtime/compact-field-codec.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/utils/logger.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/utils/encryption.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-context/form-answer.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-context/security.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-context/index.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-reference/reference.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-runtime/canonical.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-runtime/types.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/task-package.types.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/v2/presentation.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/cognitive.types.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/v2/types.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/services/runtimeObservability.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/v2/canonical.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/situational/situation-scientific-contract.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/situational/situation-definition.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/situational/situation-scientific-validation.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/situational/situation-branching.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/situational/situation-runtime-definition.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-runtime/compiler.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-governance/operational-hold.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/v2/final-submission-budget.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/cognitive.errors.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/v2/session-snapshot.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/number-series/items.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/number-series/protocol.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/number-series/validation.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/v2/trial-envelope.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/number-series/analysis.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/number-series/scorer.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/number-series/report.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/number-series/metadata.ts",
+      "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/number-series/package.ts",
+      "/workspace/eduK12-new-version/server-version/frontend/src/modules/cognitive/tasks/number-series/content.test.tsx"
+    ],
+    "diagnostics": [
+      {
+        "file": "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/number-series/report.ts",
+        "line": 54,
+        "code": 2345,
+        "message": "Argument of type '\"先看过三类关系的例子，再把关系用到新的数字组合；下面只描述这次规则应用的记录。\" | \"You saw examples of three relationships before applying them to new number combinations. This describes this session of rule application only.\"' is not assignable to parameter of type '\"谢谢你认真完成这组题\" | \"这次有题未完成或被打断，先不解读表现。谢谢你已经付出的努力；方便时再完整体验。\" | \"这次记录不足以生成可解释的反馈。你可以先休息，准备好后重新开始。\" | \"Thank you for working through these questions\" | \"Some questions were unfinished or interrupted, so we will not interpret performance. Thank you for your effort; you can try a complete activity when convenient.\" | \"There...'.\n  Type '\"先看过三类关系的例子，再把关系用到新的数字组合；下面只描述这次规则应用的记录。\"' is not assignable to type '\"谢谢你认真完成这组题\" | \"这次有题未完成或被打断，先不解读表现。谢谢你已经付出的努力；方便时再完整体验。\" | \"这次记录不足以生成可解释的反馈。你可以先休息，准备好后重新开始。\" | \"Thank you for working through these questions\" | \"Some questions were unfinished or interrupted, so we will not interpret performance. Thank you for your effort; you can try a complete activity when convenient.\" | \"There...'."
+      },
+      {
+        "file": "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/number-series/report.ts",
+        "line": 55,
+        "code": 2345,
+        "message": "Argument of type '`\\u7B49\\u5DEE\\u5173\\u7CFB: ${number}/${number}` | `\\u7B49\\u6BD4\\u5173\\u7CFB: ${number}/${number}` | `\\u9012\\u589E\\u5DEE\\u503C: ${number}/${number}` | `Constant addition: ${number}/${number}` | `Constant multiplication: ${number}/${number}` | `Growing gaps: ${number}/${number}`' is not assignable to parameter of type '\"谢谢你认真完成这组题\" | \"这次有题未完成或被打断，先不解读表现。谢谢你已经付出的努力；方便时再完整体验。\" | \"这次记录不足以生成可解释的反馈。你可以先休息，准备好后重新开始。\" | \"Thank you for working through these questions\" | \"Some questions were unfinished or interrupted, so we will not interpret performance. Thank you for your effort; you can try a complete activity when convenient.\" | \"There...'.\n  Type '`\\u7B49\\u5DEE\\u5173\\u7CFB: ${number}/${number}`' is not assignable to type '\"谢谢你认真完成这组题\" | \"这次有题未完成或被打断，先不解读表现。谢谢你已经付出的努力；方便时再完整体验。\" | \"这次记录不足以生成可解释的反馈。你可以先休息，准备好后重新开始。\" | \"Thank you for working through these questions\" | \"Some questions were unfinished or interrupted, so we will not interpret performance. Thank you for your effort; you can try a complete activity when convenient.\" | \"There...'."
+      },
+      {
+        "file": "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/number-series/report.ts",
+        "line": 56,
+        "code": 2345,
+        "message": "Argument of type 'string' is not assignable to parameter of type '\"谢谢你认真完成这组题\" | \"这次有题未完成或被打断，先不解读表现。谢谢你已经付出的努力；方便时再完整体验。\" | \"这次记录不足以生成可解释的反馈。你可以先休息，准备好后重新开始。\" | \"Thank you for working through these questions\" | \"Some questions were unfinished or interrupted, so we will not interpret performance. Thank you for your effort; you can try a complete activity when convenient.\" | \"There...'."
+      },
+      {
+        "file": "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/number-series/report.ts",
+        "line": 58,
+        "code": 2345,
+        "message": "Argument of type '\"题量、练习、学校教学和运算经验都会影响表现；触屏与短版效度尚未验证。这不是韦氏或瑞文的等价版，不给 IQ、常模、同龄排名、诊断或学业与岗位预测。\" | \"Item count, practice, schooling and arithmetic experience affect this record. Touch and short-version validity are unverified. This is not equivalent to Wechsler or Raven, and provides no IQ, norms, age ranking, diagnosis, school or job pr...' is not assignable to parameter of type '\"谢谢你认真完成这组题\" | \"这次有题未完成或被打断，先不解读表现。谢谢你已经付出的努力；方便时再完整体验。\" | \"这次记录不足以生成可解释的反馈。你可以先休息，准备好后重新开始。\" | \"Thank you for working through these questions\" | \"Some questions were unfinished or interrupted, so we will not interpret performance. Thank you for your effort; you can try a complete activity when convenient.\" | \"There...'.\n  Type '\"题量、练习、学校教学和运算经验都会影响表现；触屏与短版效度尚未验证。这不是韦氏或瑞文的等价版，不给 IQ、常模、同龄排名、诊断或学业与岗位预测。\"' is not assignable to type '\"谢谢你认真完成这组题\" | \"这次有题未完成或被打断，先不解读表现。谢谢你已经付出的努力；方便时再完整体验。\" | \"这次记录不足以生成可解释的反馈。你可以先休息，准备好后重新开始。\" | \"Thank you for working through these questions\" | \"Some questions were unfinished or interrupted, so we will not interpret performance. Thank you for your effort; you can try a complete activity when convenient.\" | \"There...'."
+      },
+      {
+        "file": "/workspace/eduK12-new-version/server-version/frontend/src/modules/cognitive/tasks/number-series/content.test.tsx",
+        "line": 18,
+        "code": 2322,
+        "message": "Type 'SessionConfigSnapshot<NumberSeriesConfig>' is not assignable to type 'NumberSeriesSnapshot'.\n  The types of 'protocol.phases' are incompatible between these types.\n    Type 'ProtocolPhaseDefinition[]' is not assignable to type '{ key: \"test\"; persists: boolean; required: boolean; }[]'.\n      Type 'ProtocolPhaseDefinition' is not assignable to type '{ key: \"test\"; persists: boolean; required: boolean; }'.\n        Types of property 'key' are incompatible.\n          Type 'CognitivePhase' is not assignable to type '\"test\"'.\n            Type '\"learning\"' is not assignable to type '\"test\"'."
+      },
+      {
+        "file": "/workspace/eduK12-new-version/server-version/frontend/src/modules/cognitive/tasks/number-series/content.test.tsx",
+        "line": 92,
+        "code": 2322,
+        "message": "Type 'Mock<(r: any) => Promise<unknown>>' is not assignable to type '(record: NumberSeriesDraft) => Promise<{ retained: true; contextKey: string; recordKey: string; recordDigest: string; }>'.\n  Type 'Promise<unknown>' is not assignable to type 'Promise<{ retained: true; contextKey: string; recordKey: string; recordDigest: string; }>'.\n    Type 'unknown' is not assignable to type '{ retained: true; contextKey: string; recordKey: string; recordDigest: string; }'."
+      },
+      {
+        "file": "/workspace/eduK12-new-version/server-version/frontend/src/modules/cognitive/tasks/number-series/generated/report.ts",
+        "line": 54,
+        "code": 2345,
+        "message": "Argument of type '\"先看过三类关系的例子，再把关系用到新的数字组合；下面只描述这次规则应用的记录。\" | \"You saw examples of three relationships before applying them to new number combinations. This describes this session of rule application only.\"' is not assignable to parameter of type '\"谢谢你认真完成这组题\" | \"这次有题未完成或被打断，先不解读表现。谢谢你已经付出的努力；方便时再完整体验。\" | \"这次记录不足以生成可解释的反馈。你可以先休息，准备好后重新开始。\" | \"Thank you for working through these questions\" | \"Some questions were unfinished or interrupted, so we will not interpret performance. Thank you for your effort; you can try a complete activity when convenient.\" | \"There...'.\n  Type '\"先看过三类关系的例子，再把关系用到新的数字组合；下面只描述这次规则应用的记录。\"' is not assignable to type '\"谢谢你认真完成这组题\" | \"这次有题未完成或被打断，先不解读表现。谢谢你已经付出的努力；方便时再完整体验。\" | \"这次记录不足以生成可解释的反馈。你可以先休息，准备好后重新开始。\" | \"Thank you for working through these questions\" | \"Some questions were unfinished or interrupted, so we will not interpret performance. Thank you for your effort; you can try a complete activity when convenient.\" | \"There...'."
+      },
+      {
+        "file": "/workspace/eduK12-new-version/server-version/frontend/src/modules/cognitive/tasks/number-series/generated/report.ts",
+        "line": 55,
+        "code": 2345,
+        "message": "Argument of type '`\\u7B49\\u5DEE\\u5173\\u7CFB: ${number}/${number}` | `\\u7B49\\u6BD4\\u5173\\u7CFB: ${number}/${number}` | `\\u9012\\u589E\\u5DEE\\u503C: ${number}/${number}` | `Constant addition: ${number}/${number}` | `Constant multiplication: ${number}/${number}` | `Growing gaps: ${number}/${number}`' is not assignable to parameter of type '\"谢谢你认真完成这组题\" | \"这次有题未完成或被打断，先不解读表现。谢谢你已经付出的努力；方便时再完整体验。\" | \"这次记录不足以生成可解释的反馈。你可以先休息，准备好后重新开始。\" | \"Thank you for working through these questions\" | \"Some questions were unfinished or interrupted, so we will not interpret performance. Thank you for your effort; you can try a complete activity when convenient.\" | \"There...'.\n  Type '`\\u7B49\\u5DEE\\u5173\\u7CFB: ${number}/${number}`' is not assignable to type '\"谢谢你认真完成这组题\" | \"这次有题未完成或被打断，先不解读表现。谢谢你已经付出的努力；方便时再完整体验。\" | \"这次记录不足以生成可解释的反馈。你可以先休息，准备好后重新开始。\" | \"Thank you for working through these questions\" | \"Some questions were unfinished or interrupted, so we will not interpret performance. Thank you for your effort; you can try a complete activity when convenient.\" | \"There...'."
+      },
+      {
+        "file": "/workspace/eduK12-new-version/server-version/frontend/src/modules/cognitive/tasks/number-series/generated/report.ts",
+        "line": 56,
+        "code": 2345,
+        "message": "Argument of type 'string' is not assignable to parameter of type '\"谢谢你认真完成这组题\" | \"这次有题未完成或被打断，先不解读表现。谢谢你已经付出的努力；方便时再完整体验。\" | \"这次记录不足以生成可解释的反馈。你可以先休息，准备好后重新开始。\" | \"Thank you for working through these questions\" | \"Some questions were unfinished or interrupted, so we will not interpret performance. Thank you for your effort; you can try a complete activity when convenient.\" | \"There...'."
+      },
+      {
+        "file": "/workspace/eduK12-new-version/server-version/frontend/src/modules/cognitive/tasks/number-series/generated/report.ts",
+        "line": 58,
+        "code": 2345,
+        "message": "Argument of type '\"题量、练习、学校教学和运算经验都会影响表现；触屏与短版效度尚未验证。这不是韦氏或瑞文的等价版，不给 IQ、常模、同龄排名、诊断或学业与岗位预测。\" | \"Item count, practice, schooling and arithmetic experience affect this record. Touch and short-version validity are unverified. This is not equivalent to Wechsler or Raven, and provides no IQ, norms, age ranking, diagnosis, school or job pr...' is not assignable to parameter of type '\"谢谢你认真完成这组题\" | \"这次有题未完成或被打断，先不解读表现。谢谢你已经付出的努力；方便时再完整体验。\" | \"这次记录不足以生成可解释的反馈。你可以先休息，准备好后重新开始。\" | \"Thank you for working through these questions\" | \"Some questions were unfinished or interrupted, so we will not interpret performance. Thank you for your effort; you can try a complete activity when convenient.\" | \"There...'.\n  Type '\"题量、练习、学校教学和运算经验都会影响表现；触屏与短版效度尚未验证。这不是韦氏或瑞文的等价版，不给 IQ、常模、同龄排名、诊断或学业与岗位预测。\"' is not assignable to type '\"谢谢你认真完成这组题\" | \"这次有题未完成或被打断，先不解读表现。谢谢你已经付出的努力；方便时再完整体验。\" | \"这次记录不足以生成可解释的反馈。你可以先休息，准备好后重新开始。\" | \"Thank you for working through these questions\" | \"Some questions were unfinished or interrupted, so we will not interpret performance. Thank you for your effort; you can try a complete activity when convenient.\" | \"There...'."
+      }
+    ]
+  }
+]

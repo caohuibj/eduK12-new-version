@@ -1,0 +1,17 @@
+Thank you for working through these questions
+
+You saw examples of three relationships before applying them to new number combinations. This describes this session of rule application only.
+
+Correct: 9/12. Skipped: 0.
+
+Constant addition: 3/4
+
+Constant multiplication: 2/4
+
+Growing gaps: 4/4
+
+Median correct-answer time: 0.1 seconds
+
+For everyday number patterns, try describing how each step changes before checking the next step. This is general advice, not a judgement of learning ability.
+
+Item count, practice, schooling and arithmetic experience affect this record. Touch and short-version validity are unverified. This is not equivalent to Wechsler or Raven, and provides no IQ, norms, age ranking, diagnosis, school or job prediction.

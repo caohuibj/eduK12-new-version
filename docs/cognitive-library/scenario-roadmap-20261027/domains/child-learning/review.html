@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>数列规则推理 · 单项设计图审</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#edf1f5;color:#1f2937;font:16px/1.65 "Noto Sans CJK SC",sans-serif}main{padding:24px;max-width:1800px;margin:auto}h1,h2,h3,p{margin:0}h1{font-size:29px;line-height:1.4}h2{font-size:25px;line-height:1.5}h3{font-size:18px;line-height:1.5}p+p{margin-top:12px}.muted{color:#526174}.eyebrow{font-size:13px;letter-spacing:.06em;color:#435470}.notice{font-size:14px;margin:8px 0 18px;max-width:1500px}.summary{display:grid;grid-template-columns:1fr 1fr 1.2fr;gap:14px;margin:18px 0 24px}.summary>div{background:#fff;padding:14px 18px;border:1px solid #cad5e4;border-radius:9px}.summary b{display:block;font-size:19px}.summary span{display:block;font-size:14px;color:#526174}.board{display:grid;grid-template-columns:390px 390px 820px;gap:18px}.column-label{font-size:14px;font-weight:600;margin:0 0 10px;color:#435470}.screen{border:1px solid #c5d1e0;border-radius:12px;background:#fff;overflow:hidden;min-height:1120px}.screen-header{display:flex;justify-content:space-between;align-items:center;gap:8px;border-bottom:1px solid #d8e1ec;padding:16px 20px;font-size:13px;color:#435470;background:#f8fafc}.pill{background:#e8eefb;color:#244681;padding:3px 8px;border-radius:5px;font-size:12px}.content{padding:24px 20px}.lead{font-size:17px;margin:10px 0 18px}.example{padding:13px 14px;background:#f5f7fb;border-left:3px solid #5273bd;margin:12px 0;border-radius:0 6px 6px 0}.digits{font-size:22px;font-weight:600;letter-spacing:.015em;font-variant-numeric:tabular-nums;line-height:1.6;white-space:normal}.example p{font-size:14px;color:#435470;margin-top:4px}.practice{background:#eef4ff;border:1px solid #bdcfea;border-radius:8px;padding:15px;margin:18px 0}.practice p{font-size:14px;margin-top:8px}.button{display:block;width:100%;border:0;border-radius:7px;background:#214bd8;color:#fff;font:inherit;font-weight:600;padding:13px;text-align:center;margin:18px 0 10px;min-height:50px}.button:disabled{opacity:1;cursor:default}.subtle{font-size:13px;color:#526174}.rule{border-top:1px solid #d8e1ec;margin-top:18px;padding-top:14px;font-size:14px;color:#435470}.response-area{margin:32px 0 24px;padding:26px 10px;background:#f5f7fb;border-radius:10px;text-align:center}.response-area .digits{font-size:27px}.choices{display:grid;grid-template-columns:1fr 1fr;gap:12px}.choice{border:1px solid #8597b4;background:#fff;border-radius:8px;min-height:72px;padding:10px;color:#1f2937;font:600 26px/1.5 "Noto Sans CJK SC",sans-serif}.choice small{display:block;font-size:12px;font-weight:400;color:#526174}.skip{display:block;width:100%;border:1px solid #8597b4;background:#fff;border-radius:7px;color:#435470;font:inherit;padding:12px;min-height:50px;margin:18px 0}.end{font-size:14px;text-align:center;color:#526174;margin-top:20px}.empty-answer{padding:12px;background:#f5f7fb;text-align:center;font-size:14px;margin-top:16px}.below{margin-top:30px;padding-top:22px;border-top:1px solid #d8e1ec}.small-list{margin:12px 0;padding-left:20px;font-size:14px;color:#435470}.small-list li+li{margin-top:7px}.tablet-header{padding:20px 24px}.tablet-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;padding:24px}.tablet-grid .content{padding:0}.lang{font-size:13px;color:#526174}.mini-question{font-size:23px;font-weight:600;margin:15px 0 8px}.feedback{background:#eef5ed;border:1px solid #bbd1b7;color:#32552b;padding:14px;border-radius:7px;font-size:14px}.report{background:#f8fafc;border:1px solid #d1dce8;border-radius:9px;padding:17px}.report h3{margin-top:8px}.count{font-size:38px;line-height:1.4;font-weight:700;color:#1f385f;margin-top:12px}.counts{width:100%;border-collapse:collapse;font-size:14px;margin:12px 0}.counts td{padding:7px 0;border-bottom:1px solid #d8e1ec}.counts td+td{text-align:right}.report p{font-size:14px;margin-top:10px}.synthetic{color:#77522b;background:#fff4e5;border:1px solid #dfc59f;border-radius:5px;padding:7px 10px;font-size:12px;margin-bottom:12px}.state{border:1px solid #d1dce8;border-radius:8px;padding:15px;margin-top:16px}.state p{font-size:14px;margin-top:7px}.state .subtle{font-size:12px}.english-note{padding:18px 24px;margin:0 24px 24px;border-radius:8px;background:#f5f7fb;font-size:14px;color:#435470}.footer{font-size:13px;color:#526174;border-top:1px solid #c5d1e0;margin-top:20px;padding-top:14px}.full-notes{margin-top:24px;padding:24px;background:#fff;border:1px solid #cad5e4;border-radius:10px;max-width:1200px}.full-notes p{margin-top:12px}.full-notes h3{margin-top:20px}.full-notes a{color:#214bd8}.tag{font-size:12px;padding:4px 8px;background:#eef2f7;display:inline-block;border-radius:5px;margin:8px 4px 0 0}
+@media(max-width:1700px){.board{grid-template-columns:390px 390px}.tablet-column{grid-column:1/-1;max-width:820px}}
+@media(max-width:850px){main{padding:16px}.summary{grid-template-columns:1fr}.board{display:block}.column{margin-top:22px}.screen{min-height:0}.tablet-column{max-width:none}.tablet-grid{grid-template-columns:1fr}.content{padding:22px 18px}.tablet-grid{padding:22px 18px}.english-note{margin:0 18px 22px;padding:16px}.screen-header{padding:14px 18px}.response-area .digits{font-size:24px}.notice{font-size:13px}.full-notes{padding:18px}h1{font-size:25px}.summary{margin-bottom:16px}.tablet-column{grid-column:auto}}
+</style>
+<main>
+<section id="review-package">
+  <header>
+    <p class="eyebrow">儿童学习与推理 · 单项图审 · DESIGN R1</p>
+    <h1>数列规则推理：看懂变化，再选下一项</h1>
+    <p class="notice muted">原创静态示意，未开发、未获单项批准、未接入。拟招募已学所需加法与乘法的 8–12 岁儿童；年龄、语言和设备适用性未验证。界面内所有按钮均不可操作，报告数字全部为虚构排版例。</p>
+  </header>
+  <div class="summary">
+    <div><b>research · 24 题 · 约 9–15 分钟</b><span>三条件各 8 题；含首次说明和练习，非实测。</span></div>
+    <div><b>experience · 12 题 · 约 6–9 分钟</b><span>三条件各 4 题；同界面、同规则，只减少重复。</span></div>
+    <div><b>先教学，再做 3 题简单练习</b><span>每条件 1 题，3/3 继续；未过或未完成先重看全部说明和三例，最多 3 轮，可退出。</span></div>
+  </div>
+  <div class="board">
+    <section class="column">
+      <p class="column-label">手机 · 390 px · 说明与三个例子</p>
+      <div class="screen" id="phone-intro">
+        <div class="screen-header"><span>数列规则推理</span><span class="pill">说明 / 体验版</span></div>
+        <div class="content">
+          <h2>先一起看三个例子</h2>
+          <p class="lead">看一行数字怎样变化，选出问号处的数字。正式题会混合下面三类，不会提示规则。</p>
+          <div class="example"><h3>① 每次加同样多</h3><div class="digits">3 · 7 · 11 · 15 · ?</div><p>每次加 4，所以下一个是 <b>19</b>。</p></div>
+          <div class="example"><h3>② 每次乘同样的数</h3><div class="digits">2 · 6 · 18 · 54 · ?</div><p>每次乘 3，54 × 3 ＝ <b>162</b>。</p></div>
+          <div class="example"><h3>③ 增加量一步步变大</h3><div class="digits">2 · 5 · 9 · 14 · ?</div><p>先加 3、再加 4、再加 5，下一步加 6，所以选 <b>20</b>。</p></div>
+          <p class="subtle">数字会一直留着，不用抢答。想清楚再点选，点下即提交，不能回改。不会可跳过，也可以结束。</p>
+          <div class="practice"><h3>练习只是帮助熟悉</h3><p>3 题，数字更小、每题解释、不限时，不算入正式结果。3/3 后继续；未过或没完成，先重看全部说明和三个例子再试，最多 3 轮。</p></div>
+          <p class="subtle">正式每组 6 题，组间可休息。请自己作答，不用计算器，也不请别人代答；不熟悉或不舒服时可退出。</p>
+          <button class="button" disabled>我看懂了，先做练习</button>
+          <p class="subtle">示意按钮，不会启动测验。</p>
+          <div class="rule">只描述今天这组题的表现，不评智力高低，不给 IQ 或同龄排名。</div>
+        </div>
+      </div>
+    </section>
+    <section class="column">
+      <p class="column-label">手机 · 390 px · 四选一作答定格</p>
+      <div class="screen" id="phone-task">
+        <div class="screen-header"><span>数列规则推理</span><span class="pill">第 1 / 12 题 · 占位</span></div>
+        <div class="content">
+          <p class="eyebrow">静态例题 · 非正式题库</p>
+          <h2>下一个数字是什么？</h2>
+          <p class="lead">看一看变化的规律，再选一个最合适的数字。</p>
+          <div class="response-area"><div class="digits">3 · 7 · 11 · 15 · ?</div></div>
+          <div class="choices">
+            <button class="choice" disabled>17<small>选项 1</small></button>
+            <button class="choice" disabled>19<small>选项 2</small></button>
+            <button class="choice" disabled>21<small>选项 3</small></button>
+            <button class="choice" disabled>23<small>选项 4</small></button>
+          </div>
+          <div class="empty-answer">没有预选答案 · 点选即提交</div>
+          <button class="skip" disabled>这题先跳过</button>
+          <p class="subtle">没有倒计时。正式题提交后不立即公布对错；点“下一题”再继续。</p>
+          <p class="end">结束本次任务</p>
+          <div class="below">
+            <h3>两版保持相同单题体验</h3>
+            <ul class="small-list"><li>同样三类关系、数字范围和四个选项。</li><li>每组 6 题，各类 2 题；组间可休息。</li><li>短版 2 组，科研版 4 组。</li><li>触控 / 鼠标点选；键盘 1–4。输入等值性未验证。</li></ul>
+          </div>
+          <div class="rule">这是文献方法上的原创项目改造。四选一与儿童数字范围不继承原纸笔研究的效度。</div>
+        </div>
+      </div>
+    </section>
+    <section class="column tablet-column">
+      <p class="column-label">平板 · 820 px · 精简练习与报告三态（并排为审阅编排）</p>
+      <div class="screen" id="tablet-review">
+        <div class="screen-header tablet-header"><span>数列规则推理 <span class="lang">/ Number patterns</span></span><span class="pill">静态审阅，不是并行测验</span></div>
+        <div class="tablet-grid">
+          <div class="content">
+            <p class="eyebrow">PRACTICE · 练习示例</p>
+            <h2>试一题小数字</h2>
+            <p class="mini-question">1 · 2 · 3 · 4 · ?</p>
+            <div class="choices"><button class="choice" disabled>5<small>选项 1</small></button><button class="choice" disabled>6<small>选项 2</small></button><button class="choice" disabled>7<small>选项 3</small></button><button class="choice" disabled>8<small>选项 4</small></button></div>
+            <div class="feedback" style="margin-top:16px"><b>假设选了 5：这题答对了。</b><br>每次加 1，4 再加 1 是 5。练习会逐题解释，正式题不会立即显示答案。</div>
+            <div class="practice"><h3>练习未通过 / 未完成</h3><p>没关系，先一起重看说明和三个例子，再试一组练习。最多 3 轮；今天不想继续也可以结束。</p><p lang="en">Let's review the instructions and all three examples before trying practice again.</p></div>
+            <h3>English · task introduction</h3>
+            <p class="subtle" lang="en" style="margin-top:10px">Look at how the numbers change. Choose the next number from four options. The whole row stays visible. Take your time. Your first choice submits the answer. You may skip or stop. Complete instructions and all three examples appear below this review sheet.</p>
+            <p class="rule">认知负担：数值识读、基础运算和关系保持；学校教学与运算经验都会影响表现。先讲例子后测的是规则应用。</p>
+          </div>
+          <div class="content">
+            <div class="report">
+              <div class="synthetic">虚构排版例 · 没有参与者数据 · 禁止当真实结果</div>
+              <p class="eyebrow">INTERPRETABLE · 完整记录</p>
+              <h3>谢谢你认真完成这组题</h3>
+              <div class="count">9 / 12 <span style="font-size:16px;font-weight:400">答对</span></div>
+              <table class="counts"><tr><td>等差关系</td><td>3 / 4</td></tr><tr><td>等比关系</td><td>2 / 4</td></tr><tr><td>递增差值</td><td>4 / 4</td></tr><tr><td>明确跳过</td><td>0 题</td></tr></table>
+              <p>这只是今天这组题的记录。可以试着说出每一步怎样变化，再检查下一步。</p>
+              <p class="muted">题量少、练习与运算经验都会影响表现，不能说明智力高低。</p>
+              <p class="subtle">正式反馈用真实记录；无数据不显示本示例数字。</p>
+            </div>
+            <div class="state"><p class="eyebrow">LIMITED · 本次有未完成或中断</p><p>先不解读表现。谢谢你已经付出的努力；方便时再完整体验。</p><p class="subtle">正文不显示表现数值；不生成表现图片；下载只含状态说明。</p></div>
+            <div class="state"><p class="eyebrow">INVALID · 记录不足以解释</p><p>这次还不能生成反馈。你可以先休息，准备好后重新开始。</p><p class="subtle">正文、图片及下载同样受限；缺失不是 0 分。</p></div>
+            <p class="rule">不显示内部指标、合成能力分、IQ、常模、诊断、同龄排名或岗位匹配。可选小图至多一张，标注 EDUK12.TOP。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+  <p class="footer">来源：Sun, Liu &amp; Luo (2019), DOI 10.3389/fpsyg.2019.00884，仅方法参照；全部示例与界面原创。ICAR 当前为学术专用 SUL1，未复制受限题库。已设计 / 待批准 / 未开发 / 未验证 / 未接入。本图不代表运行、数据保存或完整原件归档成功。</p>
+</section>
+<section class="full-notes">
+  <h2>正式练习前展示的完整说明</h2>
+  <p>接下来，你会看到一行数字，最后一个位置是问号。请看看相邻数字怎样变化，再从四个选项中选出最符合规律的下一个数字。有的每次加同样多，有的每次乘同样的数，有的增加量会一步步变大。上面的三个例子分别演示这三种关系。正式题会混合出现，不会告诉你属于哪类。整行数字会一直留着，不用抢答；请先想清楚。点选即提交，不能回改；也可以选“这题先跳过”。想停下时可以结束，不需要猜完。每组 6 题后可以休息。请自己作答，不使用计算器，也不请别人代答；不会或不舒服时可以退出。先做三题较简单的练习，帮助熟悉规则和操作，练习不算入正式结果。</p>
+  <h3 lang="en">Full English instructions</h3>
+  <p lang="en">You will see a row of numbers ending in a question mark. Look at how the numbers change, then choose the next number from four options. Some rows add the same amount each time, some multiply by the same number, and some have gaps that grow step by step. The three examples above show these relationships. Formal questions mix the three types without naming the rule. The whole row stays visible. Take your time and think before choosing. Your first choice submits the answer and cannot be changed. You may choose “Skip this question” or end the activity. You may rest after each group of six questions. Work on your own, without a calculator or someone answering for you. If this feels unfamiliar or uncomfortable, you may stop. First, complete three easier practice questions to learn the rules and controls. Practice does not count toward your formal result.</p>
+  <p lang="en"><b>Examples:</b> 3, 7, 11, 15, ? adds 4 each time, so choose 19. 2, 6, 18, 54, ? multiplies by 3 each time, so choose 162. In 2, 5, 9, 14, ?, the gaps are 3, 4 and 5. The next gap is 6, so choose 20. These are teaching examples, not formal items.</p>
+  <p>练习共 3 题，三类各 1；较小数字，不限时、逐题解释，3/3 才继续。失败、跳过或未完成后，先完整重呈说明和全部三例，再练，最多 3 轮，可退出。重练每轮另估 2–3 分钟，不包含在首次预算中。</p>
+  <h3>来源、公式与当前边界</h3>
+  <p><a href="number-series-appendix.md">完整来源 / 分轴许可 / 公式 / 三态 / 版本及标签附录</a> · <a href="reuse-audit.md">24 旧项目＋11 候选去重清单</a></p>
+  <p>页面无 JavaScript、计时、顺序生成、计分或网络保存。按钮仅作静态图片内容；不会启动练习或正式任务。未对任何真实参与者施测，未接入 API/DB/COS，未运行应用测试或 CI。</p>
+</section>
+</main>
+</html>

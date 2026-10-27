@@ -1,0 +1,2665 @@
+{
+  "synthetic": true,
+  "participantData": false,
+  "note": "Software fixtures only; all values authored, not observations or norms.",
+  "examples": [
+    {
+      "profile": "experience",
+      "session": {
+        "schemaVersion": 1,
+        "frozenAt": "2026-10-27T00:00:00.000Z",
+        "testType": "number-series",
+        "configVersion": "0.1.0",
+        "engineVersion": "0.1.0",
+        "scoringVersion": "0.1.0",
+        "config": {
+          "profile": "experience",
+          "totalItems": 12,
+          "itemsPerCondition": 4,
+          "itemsPerBlock": 6,
+          "bankVersion": "original-number-series-bank-0.1.0",
+          "bankHash": "017995379001d7aa202f13fc52425520df43e2383a8e7012d7f02e37bd853292",
+          "parameterInterpretationVersion": "0.1.0",
+          "reportDefinitionVersion": "0.1.0",
+          "presentationVersion": "0.1.0",
+          "profileDefinitionVersion": "0.1.0",
+          "randomizationAlgorithmVersion": "number-series-fnv1a-utf16-xorshift32-fisher-yates-v1",
+          "responseRule": "first-valid-choice-or-explicit-skip",
+          "itemDeadlineMs": null,
+          "maxAnswer": 200,
+          "practice": {
+            "items": 3,
+            "passCorrect": 3,
+            "maximumRounds": 3,
+            "feedback": "explain-each",
+            "reRead": "full-instructions-and-three-examples"
+          }
+        },
+        "configHash": "cd2aed91b62effca6cdbafcd5960b1f73862a34995c375e0abd09989162d6f68",
+        "protocol": {
+          "schemaVersion": 1,
+          "key": "number-series/0.1.0/0.1.0",
+          "version": "0.1.0",
+          "clock": "performance",
+          "randomizationAlgorithmVersion": "number-series-fnv1a-utf16-xorshift32-fisher-yates-v1",
+          "trialEnvelopeVersion": 1,
+          "phases": [
+            {
+              "key": "test",
+              "persists": true,
+              "required": true
+            }
+          ],
+          "measurementCriticalConfigPaths": [
+            "*"
+          ]
+        },
+        "protocolSignature": "310f76bf4f7235df6572da7b5ac2c7ced51b35da3597296cdd80c9f4afa38541"
+      },
+      "randomSeed": "synthetic-number-series-browser",
+      "manifestHash": "142bc8f165a9a9884a61819cc252c402ec607f4dc01d03d407dace6c6490027e",
+      "formalPlan": [
+        {
+          "index": 0,
+          "phase": "test",
+          "round": 0,
+          "blockIndex": 0,
+          "itemId": "ns-m05",
+          "family": "multiplication",
+          "known": [
+            6,
+            12,
+            24,
+            48
+          ],
+          "options": [
+            98,
+            48,
+            50,
+            96
+          ],
+          "correctIndex": 3,
+          "answer": 96
+        },
+        {
+          "index": 1,
+          "phase": "test",
+          "round": 0,
+          "blockIndex": 0,
+          "itemId": "ns-a02",
+          "family": "addition",
+          "known": [
+            5,
+            9,
+            13,
+            17
+          ],
+          "options": [
+            25,
+            20,
+            21,
+            17
+          ],
+          "correctIndex": 2,
+          "answer": 21
+        },
+        {
+          "index": 2,
+          "phase": "test",
+          "round": 0,
+          "blockIndex": 0,
+          "itemId": "ns-g03",
+          "family": "growing-gap",
+          "known": [
+            4,
+            5,
+            8,
+            13
+          ],
+          "options": [
+            13,
+            18,
+            20,
+            22
+          ],
+          "correctIndex": 2,
+          "answer": 20
+        },
+        {
+          "index": 3,
+          "phase": "test",
+          "round": 0,
+          "blockIndex": 0,
+          "itemId": "ns-a03",
+          "family": "addition",
+          "known": [
+            11,
+            13,
+            15,
+            17
+          ],
+          "options": [
+            17,
+            21,
+            18,
+            19
+          ],
+          "correctIndex": 3,
+          "answer": 19
+        },
+        {
+          "index": 4,
+          "phase": "test",
+          "round": 0,
+          "blockIndex": 0,
+          "itemId": "ns-m03",
+          "family": "multiplication",
+          "known": [
+            4,
+            8,
+            16,
+            32
+          ],
+          "options": [
+            32,
+            64,
+            34,
+            66
+          ],
+          "correctIndex": 1,
+          "answer": 64
+        },
+        {
+          "index": 5,
+          "phase": "test",
+          "round": 0,
+          "blockIndex": 0,
+          "itemId": "ns-g02",
+          "family": "growing-gap",
+          "known": [
+            3,
+            5,
+            8,
+            12
+          ],
+          "options": [
+            12,
+            17,
+            18,
+            16
+          ],
+          "correctIndex": 1,
+          "answer": 17
+        },
+        {
+          "index": 6,
+          "phase": "test",
+          "round": 0,
+          "blockIndex": 1,
+          "itemId": "ns-m08",
+          "family": "multiplication",
+          "known": [
+            1,
+            3,
+            9,
+            27
+          ],
+          "options": [
+            30,
+            84,
+            81,
+            27
+          ],
+          "correctIndex": 2,
+          "answer": 81
+        },
+        {
+          "index": 7,
+          "phase": "test",
+          "round": 0,
+          "blockIndex": 1,
+          "itemId": "ns-a01",
+          "family": "addition",
+          "known": [
+            2,
+            5,
+            8,
+            11
+          ],
+          "options": [
+            14,
+            11,
+            17,
+            13
+          ],
+          "correctIndex": 0,
+          "answer": 14
+        },
+        {
+          "index": 8,
+          "phase": "test",
+          "round": 0,
+          "blockIndex": 1,
+          "itemId": "ns-a04",
+          "family": "addition",
+          "known": [
+            7,
+            12,
+            17,
+            22
+          ],
+          "options": [
+            32,
+            27,
+            22,
+            26
+          ],
+          "correctIndex": 1,
+          "answer": 27
+        },
+        {
+          "index": 9,
+          "phase": "test",
+          "round": 0,
+          "blockIndex": 1,
+          "itemId": "ns-m01",
+          "family": "multiplication",
+          "known": [
+            2,
+            4,
+            8,
+            16
+          ],
+          "options": [
+            32,
+            34,
+            16,
+            18
+          ],
+          "correctIndex": 0,
+          "answer": 32
+        },
+        {
+          "index": 10,
+          "phase": "test",
+          "round": 0,
+          "blockIndex": 1,
+          "itemId": "ns-g01",
+          "family": "growing-gap",
+          "known": [
+            2,
+            3,
+            5,
+            8
+          ],
+          "options": [
+            12,
+            11,
+            8,
+            13
+          ],
+          "correctIndex": 0,
+          "answer": 12
+        },
+        {
+          "index": 11,
+          "phase": "test",
+          "round": 0,
+          "blockIndex": 1,
+          "itemId": "ns-g04",
+          "family": "growing-gap",
+          "known": [
+            6,
+            9,
+            13,
+            18
+          ],
+          "options": [
+            23,
+            18,
+            25,
+            24
+          ],
+          "correctIndex": 3,
+          "answer": 24
+        }
+      ],
+      "records": [
+        {
+          "plan": {
+            "index": 0,
+            "phase": "test",
+            "round": 0,
+            "blockIndex": 0,
+            "itemId": "ns-m05",
+            "family": "multiplication",
+            "known": [
+              6,
+              12,
+              24,
+              48
+            ],
+            "options": [
+              98,
+              48,
+              50,
+              96
+            ],
+            "correctIndex": 3,
+            "answer": 96
+          },
+          "startedAtPerfMs": 100,
+          "endedAtPerfMs": 200,
+          "status": "answered",
+          "response": 0,
+          "rtMs": 100,
+          "input": "touch",
+          "stopReason": null,
+          "events": [
+            {
+              "kind": "answer",
+              "choice": 0,
+              "input": "touch",
+              "key": null,
+              "atMs": 200
+            }
+          ],
+          "ignoredRepeatCount": 0
+        },
+        {
+          "plan": {
+            "index": 1,
+            "phase": "test",
+            "round": 0,
+            "blockIndex": 0,
+            "itemId": "ns-a02",
+            "family": "addition",
+            "known": [
+              5,
+              9,
+              13,
+              17
+            ],
+            "options": [
+              25,
+              20,
+              21,
+              17
+            ],
+            "correctIndex": 2,
+            "answer": 21
+          },
+          "startedAtPerfMs": 1100,
+          "endedAtPerfMs": 1200,
+          "status": "answered",
+          "response": 2,
+          "rtMs": 100,
+          "input": "touch",
+          "stopReason": null,
+          "events": [
+            {
+              "kind": "answer",
+              "choice": 2,
+              "input": "touch",
+              "key": null,
+              "atMs": 1200
+            }
+          ],
+          "ignoredRepeatCount": 0
+        },
+        {
+          "plan": {
+            "index": 2,
+            "phase": "test",
+            "round": 0,
+            "blockIndex": 0,
+            "itemId": "ns-g03",
+            "family": "growing-gap",
+            "known": [
+              4,
+              5,
+              8,
+              13
+            ],
+            "options": [
+              13,
+              18,
+              20,
+              22
+            ],
+            "correctIndex": 2,
+            "answer": 20
+          },
+          "startedAtPerfMs": 2100,
+          "endedAtPerfMs": 2200,
+          "status": "answered",
+          "response": 2,
+          "rtMs": 100,
+          "input": "touch",
+          "stopReason": null,
+          "events": [
+            {
+              "kind": "answer",
+              "choice": 2,
+              "input": "touch",
+              "key": null,
+              "atMs": 2200
+            }
+          ],
+          "ignoredRepeatCount": 0
+        },
+        {
+          "plan": {
+            "index": 3,
+            "phase": "test",
+            "round": 0,
+            "blockIndex": 0,
+            "itemId": "ns-a03",
+            "family": "addition",
+            "known": [
+              11,
+              13,
+              15,
+              17
+            ],
+            "options": [
+              17,
+              21,
+              18,
+              19
+            ],
+            "correctIndex": 3,
+            "answer": 19
+          },
+          "startedAtPerfMs": 3100,
+          "endedAtPerfMs": 3200,
+          "status": "answered",
+          "response": 3,
+          "rtMs": 100,
+          "input": "touch",
+          "stopReason": null,
+          "events": [
+            {
+              "kind": "answer",
+              "choice": 3,
+              "input": "touch",
+              "key": null,
+              "atMs": 3200
+            }
+          ],
+          "ignoredRepeatCount": 0
+        },
+        {
+          "plan": {
+            "index": 4,
+            "phase": "test",
+            "round": 0,
+            "blockIndex": 0,
+            "itemId": "ns-m03",
+            "family": "multiplication",
+            "known": [
+              4,
+              8,
+              16,
+              32
+            ],
+            "options": [
+              32,
+              64,
+              34,
+              66
+            ],
+            "correctIndex": 1,
+            "answer": 64
+          },
+          "startedAtPerfMs": 4100,
+          "endedAtPerfMs": 4200,
+          "status": "answered",
+          "response": 2,
+          "rtMs": 100,
+          "input": "touch",
+          "stopReason": null,
+          "events": [
+            {
+              "kind": "answer",
+              "choice": 2,
+              "input": "touch",
+              "key": null,
+              "atMs": 4200
+            }
+          ],
+          "ignoredRepeatCount": 0
+        },
+        {
+          "plan": {
+            "index": 5,
+            "phase": "test",
+            "round": 0,
+            "blockIndex": 0,
+            "itemId": "ns-g02",
+            "family": "growing-gap",
+            "known": [
+              3,
+              5,
+              8,
+              12
+            ],
+            "options": [
+              12,
+              17,
+              18,
+              16
+            ],
+            "correctIndex": 1,
+            "answer": 17
+          },
+          "startedAtPerfMs": 5100,
+          "endedAtPerfMs": 5200,
+          "status": "answered",
+          "response": 1,
+          "rtMs": 100,
+          "input": "touch",
+          "stopReason": null,
+          "events": [
+            {
+              "kind": "answer",
+              "choice": 1,
+              "input": "touch",
+              "key": null,
+              "atMs": 5200
+            }
+          ],
+          "ignoredRepeatCount": 0
+        },
+        {
+          "plan": {
+            "index": 6,
+            "phase": "test",
+            "round": 0,
+            "blockIndex": 1,
+            "itemId": "ns-m08",
+            "family": "multiplication",
+            "known": [
+              1,
+              3,
+              9,
+              27
+            ],
+            "options": [
+              30,
+              84,
+              81,
+              27
+            ],
+            "correctIndex": 2,
+            "answer": 81
+          },
+          "startedAtPerfMs": 6100,
+          "endedAtPerfMs": 6200,
+          "status": "answered",
+          "response": 2,
+          "rtMs": 100,
+          "input": "touch",
+          "stopReason": null,
+          "events": [
+            {
+              "kind": "answer",
+              "choice": 2,
+              "input": "touch",
+              "key": null,
+              "atMs": 6200
+            }
+          ],
+          "ignoredRepeatCount": 0
+        },
+        {
+          "plan": {
+            "index": 7,
+            "phase": "test",
+            "round": 0,
+            "blockIndex": 1,
+            "itemId": "ns-a01",
+            "family": "addition",
+            "known": [
+              2,
+              5,
+              8,
+              11
+            ],
+            "options": [
+              14,
+              11,
+              17,
+              13
+            ],
+            "correctIndex": 0,
+            "answer": 14
+          },
+          "startedAtPerfMs": 7100,
+          "endedAtPerfMs": 7200,
+          "status": "answered",
+          "response": 0,
+          "rtMs": 100,
+          "input": "touch",
+          "stopReason": null,
+          "events": [
+            {
+              "kind": "answer",
+              "choice": 0,
+              "input": "touch",
+              "key": null,
+              "atMs": 7200
+            }
+          ],
+          "ignoredRepeatCount": 0
+        },
+        {
+          "plan": {
+            "index": 8,
+            "phase": "test",
+            "round": 0,
+            "blockIndex": 1,
+            "itemId": "ns-a04",
+            "family": "addition",
+            "known": [
+              7,
+              12,
+              17,
+              22
+            ],
+            "options": [
+              32,
+              27,
+              22,
+              26
+            ],
+            "correctIndex": 1,
+            "answer": 27
+          },
+          "startedAtPerfMs": 8100,
+          "endedAtPerfMs": 8200,
+          "status": "answered",
+          "response": 2,
+          "rtMs": 100,
+          "input": "touch",
+          "stopReason": null,
+          "events": [
+            {
+              "kind": "answer",
+              "choice": 2,
+              "input": "touch",
+              "key": null,
+              "atMs": 8200
+            }
+          ],
+          "ignoredRepeatCount": 0
+        },
+        {
+          "plan": {
+            "index": 9,
+            "phase": "test",
+            "round": 0,
+            "blockIndex": 1,
+            "itemId": "ns-m01",
+            "family": "multiplication",
+            "known": [
+              2,
+              4,
+              8,
+              16
+            ],
+            "options": [
+              32,
+              34,
+              16,
+              18
+            ],
+            "correctIndex": 0,
+            "answer": 32
+          },
+          "startedAtPerfMs": 9100,
+          "endedAtPerfMs": 9200,
+          "status": "answered",
+          "response": 0,
+          "rtMs": 100,
+          "input": "touch",
+          "stopReason": null,
+          "events": [
+            {
+              "kind": "answer",
+              "choice": 0,
+              "input": "touch",
+              "key": null,
+              "atMs": 9200
+            }
+          ],
+          "ignoredRepeatCount": 0
+        },
+        {
+          "plan": {
+            "index": 10,
+            "phase": "test",
+            "round": 0,
+            "blockIndex": 1,
+            "itemId": "ns-g01",
+            "family": "growing-gap",
+            "known": [
+              2,
+              3,
+              5,
+              8
+            ],
+            "options": [
+              12,
+              11,
+              8,
+              13
+            ],
+            "correctIndex": 0,
+            "answer": 12
+          },
+          "startedAtPerfMs": 10100,
+          "endedAtPerfMs": 10200,
+          "status": "answered",
+          "response": 0,
+          "rtMs": 100,
+          "input": "touch",
+          "stopReason": null,
+          "events": [
+            {
+              "kind": "answer",
+              "choice": 0,
+              "input": "touch",
+              "key": null,
+              "atMs": 10200
+            }
+          ],
+          "ignoredRepeatCount": 0
+        },
+        {
+          "plan": {
+            "index": 11,
+            "phase": "test",
+            "round": 0,
+            "blockIndex": 1,
+            "itemId": "ns-g04",
+            "family": "growing-gap",
+            "known": [
+              6,
+              9,
+              13,
+              18
+            ],
+            "options": [
+              23,
+              18,
+              25,
+              24
+            ],
+            "correctIndex": 3,
+            "answer": 24
+          },
+          "startedAtPerfMs": 11100,
+          "endedAtPerfMs": 11200,
+          "status": "answered",
+          "response": 3,
+          "rtMs": 100,
+          "input": "touch",
+          "stopReason": null,
+          "events": [
+            {
+              "kind": "answer",
+              "choice": 3,
+              "input": "touch",
+              "key": null,
+              "atMs": 11200
+            }
+          ],
+          "ignoredRepeatCount": 0
+        }
+      ],
+      "score": {
+        "metrics": {
+          "counts": {
+            "planned": 12,
+            "received": 12,
+            "opportunities": 12,
+            "correct": 9,
+            "wrong": 3,
+            "skipped": 0,
+            "interrupted": 0,
+            "unpresented": 0
+          },
+          "conditions": {
+            "addition": {
+              "planned": 4,
+              "opportunities": 4,
+              "correct": 3,
+              "wrong": 1,
+              "skipped": 0,
+              "interrupted": 0,
+              "correctRtMs": 100
+            },
+            "multiplication": {
+              "planned": 4,
+              "opportunities": 4,
+              "correct": 2,
+              "wrong": 2,
+              "skipped": 0,
+              "interrupted": 0,
+              "correctRtMs": 100
+            },
+            "growing-gap": {
+              "planned": 4,
+              "opportunities": 4,
+              "correct": 4,
+              "wrong": 0,
+              "skipped": 0,
+              "interrupted": 0,
+              "correctRtMs": 100
+            }
+          },
+          "accuracy": 0.75,
+          "skipRate": 0,
+          "correctRtMs": 100,
+          "conditionRates": {
+            "addition": {
+              "accuracy": 0.75,
+              "skipRate": 0
+            },
+            "multiplication": {
+              "accuracy": 0.5,
+              "skipRate": 0
+            },
+            "growing-gap": {
+              "accuracy": 1,
+              "skipRate": 0
+            }
+          },
+          "growingMinusAdditionAccuracy": 0.25,
+          "growingMinusAdditionRtMs": 0,
+          "reportBinding": {
+            "testType": "number-series",
+            "engineVersion": "0.1.0",
+            "scoringVersion": "0.1.0",
+            "configVersion": "0.1.0",
+            "profile": "experience",
+            "configHash": "cd2aed91b62effca6cdbafcd5960b1f73862a34995c375e0abd09989162d6f68",
+            "protocolSignature": "310f76bf4f7235df6572da7b5ac2c7ced51b35da3597296cdd80c9f4afa38541",
+            "manifestHash": "142bc8f165a9a9884a61819cc252c402ec607f4dc01d03d407dace6c6490027e",
+            "bankHash": "017995379001d7aa202f13fc52425520df43e2383a8e7012d7f02e37bd853292",
+            "parameterInterpretationVersion": "0.1.0",
+            "reportDefinitionVersion": "0.1.0",
+            "presentationVersion": "0.1.0"
+          }
+        },
+        "quality": {
+          "state": "interpretable",
+          "flags": {
+            "noCompleteOpportunities": false,
+            "incompletePlan": false,
+            "technicalInterruption": false
+          },
+          "reasons": []
+        },
+        "audit": {
+          "trialCount": 12,
+          "scorerVersion": "0.1.0"
+        }
+      },
+      "publicReport": {
+        "testType": "number-series",
+        "engineVersion": "0.1.0",
+        "scoringVersion": "0.1.0",
+        "configVersion": "0.1.0",
+        "profile": "experience",
+        "configHash": "cd2aed91b62effca6cdbafcd5960b1f73862a34995c375e0abd09989162d6f68",
+        "protocolSignature": "310f76bf4f7235df6572da7b5ac2c7ced51b35da3597296cdd80c9f4afa38541",
+        "manifestHash": "142bc8f165a9a9884a61819cc252c402ec607f4dc01d03d407dace6c6490027e",
+        "bankHash": "017995379001d7aa202f13fc52425520df43e2383a8e7012d7f02e37bd853292",
+        "parameterInterpretationVersion": "0.1.0",
+        "reportDefinitionVersion": "0.1.0",
+        "presentationVersion": "0.1.0",
+        "state": "interpretable",
+        "progress": {
+          "planned": 12,
+          "received": 12,
+          "completed": 12
+        },
+        "summary": {
+          "correct": 9,
+          "skipped": 0,
+          "opportunities": 12,
+          "correctRtMs": 100,
+          "conditions": {
+            "addition": {
+              "correct": 3,
+              "skipped": 0,
+              "opportunities": 4,
+              "correctRtMs": 100
+            },
+            "multiplication": {
+              "correct": 2,
+              "skipped": 0,
+              "opportunities": 4,
+              "correctRtMs": 100
+            },
+            "growing-gap": {
+              "correct": 4,
+              "skipped": 0,
+              "opportunities": 4,
+              "correctRtMs": 100
+            }
+          }
+        }
+      }
+    },
+    {
+      "profile": "research",
+      "session": {
+        "schemaVersion": 1,
+        "frozenAt": "2026-10-27T00:00:00.000Z",
+        "testType": "number-series",
+        "configVersion": "0.1.0",
+        "engineVersion": "0.1.0",
+        "scoringVersion": "0.1.0",
+        "config": {
+          "profile": "research",
+          "totalItems": 24,
+          "itemsPerCondition": 8,
+          "itemsPerBlock": 6,
+          "bankVersion": "original-number-series-bank-0.1.0",
+          "bankHash": "017995379001d7aa202f13fc52425520df43e2383a8e7012d7f02e37bd853292",
+          "parameterInterpretationVersion": "0.1.0",
+          "reportDefinitionVersion": "0.1.0",
+          "presentationVersion": "0.1.0",
+          "profileDefinitionVersion": "0.1.0",
+          "randomizationAlgorithmVersion": "number-series-fnv1a-utf16-xorshift32-fisher-yates-v1",
+          "responseRule": "first-valid-choice-or-explicit-skip",
+          "itemDeadlineMs": null,
+          "maxAnswer": 200,
+          "practice": {
+            "items": 3,
+            "passCorrect": 3,
+            "maximumRounds": 3,
+            "feedback": "explain-each",
+            "reRead": "full-instructions-and-three-examples"
+          }
+        },
+        "configHash": "29c8ec1aad86e85b12f63ea661e5bd6aa295af2083ec2d69b6b4f2af3f22874e",
+        "protocol": {
+          "schemaVersion": 1,
+          "key": "number-series/0.1.0/0.1.0",
+          "version": "0.1.0",
+          "clock": "performance",
+          "randomizationAlgorithmVersion": "number-series-fnv1a-utf16-xorshift32-fisher-yates-v1",
+          "trialEnvelopeVersion": 1,
+          "phases": [
+            {
+              "key": "test",
+              "persists": true,
+              "required": true
+            }
+          ],
+          "measurementCriticalConfigPaths": [
+            "*"
+          ]
+        },
+        "protocolSignature": "310f76bf4f7235df6572da7b5ac2c7ced51b35da3597296cdd80c9f4afa38541"
+      },
+      "randomSeed": "synthetic-number-series-browser",
+      "manifestHash": "6832e83ca059e160d46bceb7b92df6b3482e9444107cdc34c160eb2f635c50b5",
+      "formalPlan": [
+        {
+          "index": 0,
+          "phase": "test",
+          "round": 0,
+          "blockIndex": 0,
+          "itemId": "ns-g06",
+          "family": "growing-gap",
+          "known": [
+            7,
+            8,
+            12,
+            19
+          ],
+          "options": [
+            19,
+            29,
+            32,
+            26
+          ],
+          "correctIndex": 1,
+          "answer": 29
+        },
+        {
+          "index": 1,
+          "phase": "test",
+          "round": 0,
+          "blockIndex": 0,
+          "itemId": "ns-m02",
+          "family": "multiplication",
+          "known": [
+            3,
+            6,
+            12,
+            24
+          ],
+          "options": [
+            48,
+            24,
+            26,
+            50
+          ],
+          "correctIndex": 0,
+          "answer": 48
+        },
+        {
+          "index": 2,
+          "phase": "test",
+          "round": 0,
+          "blockIndex": 0,
+          "itemId": "ns-g02",
+          "family": "growing-gap",
+          "known": [
+            3,
+            5,
+            8,
+            12
+          ],
+          "options": [
+            18,
+            16,
+            17,
+            12
+          ],
+          "correctIndex": 2,
+          "answer": 17
+        },
+        {
+          "index": 3,
+          "phase": "test",
+          "round": 0,
+          "blockIndex": 0,
+          "itemId": "ns-a06",
+          "family": "addition",
+          "known": [
+            13,
+            16,
+            19,
+            22
+          ],
+          "options": [
+            28,
+            25,
+            24,
+            22
+          ],
+          "correctIndex": 1,
+          "answer": 25
+        },
+        {
+          "index": 4,
+          "phase": "test",
+          "round": 0,
+          "blockIndex": 0,
+          "itemId": "ns-a05",
+          "family": "addition",
+          "known": [
+            6,
+            7,
+            8,
+            9
+          ],
+          "options": [
+            11,
+            12,
+            10,
+            9
+          ],
+          "correctIndex": 2,
+          "answer": 10
+        },
+        {
+          "index": 5,
+          "phase": "test",
+          "round": 0,
+          "blockIndex": 0,
+          "itemId": "ns-m04",
+          "family": "multiplication",
+          "known": [
+            5,
+            10,
+            20,
+            40
+          ],
+          "options": [
+            40,
+            80,
+            42,
+            82
+          ],
+          "correctIndex": 1,
+          "answer": 80
+        },
+        {
+          "index": 6,
+          "phase": "test",
+          "round": 0,
+          "blockIndex": 1,
+          "itemId": "ns-a08",
+          "family": "addition",
+          "known": [
+            21,
+            23,
+            25,
+            27
+          ],
+          "options": [
+            31,
+            27,
+            29,
+            28
+          ],
+          "correctIndex": 2,
+          "answer": 29
+        },
+        {
+          "index": 7,
+          "phase": "test",
+          "round": 0,
+          "blockIndex": 1,
+          "itemId": "ns-g07",
+          "family": "growing-gap",
+          "known": [
+            5,
+            8,
+            13,
+            20
+          ],
+          "options": [
+            29,
+            27,
+            20,
+            31
+          ],
+          "correctIndex": 0,
+          "answer": 29
+        },
+        {
+          "index": 8,
+          "phase": "test",
+          "round": 0,
+          "blockIndex": 1,
+          "itemId": "ns-a07",
+          "family": "addition",
+          "known": [
+            18,
+            22,
+            26,
+            30
+          ],
+          "options": [
+            33,
+            30,
+            38,
+            34
+          ],
+          "correctIndex": 3,
+          "answer": 34
+        },
+        {
+          "index": 9,
+          "phase": "test",
+          "round": 0,
+          "blockIndex": 1,
+          "itemId": "ns-m03",
+          "family": "multiplication",
+          "known": [
+            4,
+            8,
+            16,
+            32
+          ],
+          "options": [
+            34,
+            32,
+            64,
+            66
+          ],
+          "correctIndex": 2,
+          "answer": 64
+        },
+        {
+          "index": 10,
+          "phase": "test",
+          "round": 0,
+          "blockIndex": 1,
+          "itemId": "ns-m01",
+          "family": "multiplication",
+          "known": [
+            2,
+            4,
+            8,
+            16
+          ],
+          "options": [
+            34,
+            18,
+            16,
+            32
+          ],
+          "correctIndex": 3,
+          "answer": 32
+        },
+        {
+          "index": 11,
+          "phase": "test",
+          "round": 0,
+          "blockIndex": 1,
+          "itemId": "ns-g08",
+          "family": "growing-gap",
+          "known": [
+            9,
+            11,
+            16,
+            24
+          ],
+          "options": [
+            35,
+            38,
+            24,
+            32
+          ],
+          "correctIndex": 0,
+          "answer": 35
+        },
+        {
+          "index": 12,
+          "phase": "test",
+          "round": 0,
+          "blockIndex": 2,
+          "itemId": "ns-a04",
+          "family": "addition",
+          "known": [
+            7,
+            12,
+            17,
+            22
+          ],
+          "options": [
+            27,
+            32,
+            26,
+            22
+          ],
+          "correctIndex": 0,
+          "answer": 27
+        },
+        {
+          "index": 13,
+          "phase": "test",
+          "round": 0,
+          "blockIndex": 2,
+          "itemId": "ns-g04",
+          "family": "growing-gap",
+          "known": [
+            6,
+            9,
+            13,
+            18
+          ],
+          "options": [
+            23,
+            18,
+            25,
+            24
+          ],
+          "correctIndex": 3,
+          "answer": 24
+        },
+        {
+          "index": 14,
+          "phase": "test",
+          "round": 0,
+          "blockIndex": 2,
+          "itemId": "ns-m05",
+          "family": "multiplication",
+          "known": [
+            6,
+            12,
+            24,
+            48
+          ],
+          "options": [
+            98,
+            48,
+            96,
+            50
+          ],
+          "correctIndex": 2,
+          "answer": 96
+        },
+        {
+          "index": 15,
+          "phase": "test",
+          "round": 0,
+          "blockIndex": 2,
+          "itemId": "ns-m07",
+          "family": "multiplication",
+          "known": [
+            8,
+            16,
+            32,
+            64
+          ],
+          "options": [
+            64,
+            130,
+            66,
+            128
+          ],
+          "correctIndex": 3,
+          "answer": 128
+        },
+        {
+          "index": 16,
+          "phase": "test",
+          "round": 0,
+          "blockIndex": 2,
+          "itemId": "ns-a03",
+          "family": "addition",
+          "known": [
+            11,
+            13,
+            15,
+            17
+          ],
+          "options": [
+            19,
+            18,
+            21,
+            17
+          ],
+          "correctIndex": 0,
+          "answer": 19
+        },
+        {
+          "index": 17,
+          "phase": "test",
+          "round": 0,
+          "blockIndex": 2,
+          "itemId": "ns-g03",
+          "family": "growing-gap",
+          "known": [
+            4,
+            5,
+            8,
+            13
+          ],
+          "options": [
+            18,
+            13,
+            22,
+            20
+          ],
+          "correctIndex": 3,
+          "answer": 20
+        },
+        {
+          "index": 18,
+          "phase": "test",
+          "round": 0,
+          "blockIndex": 3,
+          "itemId": "ns-a01",
+          "family": "addition",
+          "known": [
+            2,
+            5,
+            8,
+            11
+          ],
+          "options": [
+            13,
+            14,
+            17,
+            11
+          ],
+          "correctIndex": 1,
+          "answer": 14
+        },
+        {
+          "index": 19,
+          "phase": "test",
+          "round": 0,
+          "blockIndex": 3,
+          "itemId": "ns-m08",
+          "family": "multiplication",
+          "known": [
+            1,
+            3,
+            9,
+            27
+          ],
+          "options": [
+            81,
+            30,
+            27,
+            84
+          ],
+          "correctIndex": 0,
+          "answer": 81
+        },
+        {
+          "index": 20,
+          "phase": "test",
+          "round": 0,
+          "blockIndex": 3,
+          "itemId": "ns-a02",
+          "family": "addition",
+          "known": [
+            5,
+            9,
+            13,
+            17
+          ],
+          "options": [
+            20,
+            17,
+            25,
+            21
+          ],
+          "correctIndex": 3,
+          "answer": 21
+        },
+        {
+          "index": 21,
+          "phase": "test",
+          "round": 0,
+          "blockIndex": 3,
+          "itemId": "ns-g05",
+          "family": "growing-gap",
+          "known": [
+            1,
+            3,
+            7,
+            13
+          ],
+          "options": [
+            13,
+            21,
+            23,
+            19
+          ],
+          "correctIndex": 1,
+          "answer": 21
+        },
+        {
+          "index": 22,
+          "phase": "test",
+          "round": 0,
+          "blockIndex": 3,
+          "itemId": "ns-g01",
+          "family": "growing-gap",
+          "known": [
+            2,
+            3,
+            5,
+            8
+          ],
+          "options": [
+            13,
+            11,
+            12,
+            8
+          ],
+          "correctIndex": 2,
+          "answer": 12
+        },
+        {
+          "index": 23,
+          "phase": "test",
+          "round": 0,
+          "blockIndex": 3,
+          "itemId": "ns-m06",
+          "family": "multiplication",
+          "known": [
+            7,
+            14,
+            28,
+            56
+          ],
+          "options": [
+            56,
+            112,
+            58,
+            114
+          ],
+          "correctIndex": 1,
+          "answer": 112
+        }
+      ],
+      "records": [
+        {
+          "plan": {
+            "index": 0,
+            "phase": "test",
+            "round": 0,
+            "blockIndex": 0,
+            "itemId": "ns-g06",
+            "family": "growing-gap",
+            "known": [
+              7,
+              8,
+              12,
+              19
+            ],
+            "options": [
+              19,
+              29,
+              32,
+              26
+            ],
+            "correctIndex": 1,
+            "answer": 29
+          },
+          "startedAtPerfMs": 100,
+          "endedAtPerfMs": 200,
+          "status": "answered",
+          "response": 2,
+          "rtMs": 100,
+          "input": "touch",
+          "stopReason": null,
+          "events": [
+            {
+              "kind": "answer",
+              "choice": 2,
+              "input": "touch",
+              "key": null,
+              "atMs": 200
+            }
+          ],
+          "ignoredRepeatCount": 0
+        },
+        {
+          "plan": {
+            "index": 1,
+            "phase": "test",
+            "round": 0,
+            "blockIndex": 0,
+            "itemId": "ns-m02",
+            "family": "multiplication",
+            "known": [
+              3,
+              6,
+              12,
+              24
+            ],
+            "options": [
+              48,
+              24,
+              26,
+              50
+            ],
+            "correctIndex": 0,
+            "answer": 48
+          },
+          "startedAtPerfMs": 1100,
+          "endedAtPerfMs": 1200,
+          "status": "answered",
+          "response": 0,
+          "rtMs": 100,
+          "input": "touch",
+          "stopReason": null,
+          "events": [
+            {
+              "kind": "answer",
+              "choice": 0,
+              "input": "touch",
+              "key": null,
+              "atMs": 1200
+            }
+          ],
+          "ignoredRepeatCount": 0
+        },
+        {
+          "plan": {
+            "index": 2,
+            "phase": "test",
+            "round": 0,
+            "blockIndex": 0,
+            "itemId": "ns-g02",
+            "family": "growing-gap",
+            "known": [
+              3,
+              5,
+              8,
+              12
+            ],
+            "options": [
+              18,
+              16,
+              17,
+              12
+            ],
+            "correctIndex": 2,
+            "answer": 17
+          },
+          "startedAtPerfMs": 2100,
+          "endedAtPerfMs": 2200,
+          "status": "answered",
+          "response": 2,
+          "rtMs": 100,
+          "input": "touch",
+          "stopReason": null,
+          "events": [
+            {
+              "kind": "answer",
+              "choice": 2,
+              "input": "touch",
+              "key": null,
+              "atMs": 2200
+            }
+          ],
+          "ignoredRepeatCount": 0
+        },
+        {
+          "plan": {
+            "index": 3,
+            "phase": "test",
+            "round": 0,
+            "blockIndex": 0,
+            "itemId": "ns-a06",
+            "family": "addition",
+            "known": [
+              13,
+              16,
+              19,
+              22
+            ],
+            "options": [
+              28,
+              25,
+              24,
+              22
+            ],
+            "correctIndex": 1,
+            "answer": 25
+          },
+          "startedAtPerfMs": 3100,
+          "endedAtPerfMs": 3200,
+          "status": "answered",
+          "response": 1,
+          "rtMs": 100,
+          "input": "touch",
+          "stopReason": null,
+          "events": [
+            {
+              "kind": "answer",
+              "choice": 1,
+              "input": "touch",
+              "key": null,
+              "atMs": 3200
+            }
+          ],
+          "ignoredRepeatCount": 0
+        },
+        {
+          "plan": {
+            "index": 4,
+            "phase": "test",
+            "round": 0,
+            "blockIndex": 0,
+            "itemId": "ns-a05",
+            "family": "addition",
+            "known": [
+              6,
+              7,
+              8,
+              9
+            ],
+            "options": [
+              11,
+              12,
+              10,
+              9
+            ],
+            "correctIndex": 2,
+            "answer": 10
+          },
+          "startedAtPerfMs": 4100,
+          "endedAtPerfMs": 4200,
+          "status": "answered",
+          "response": 3,
+          "rtMs": 100,
+          "input": "touch",
+          "stopReason": null,
+          "events": [
+            {
+              "kind": "answer",
+              "choice": 3,
+              "input": "touch",
+              "key": null,
+              "atMs": 4200
+            }
+          ],
+          "ignoredRepeatCount": 0
+        },
+        {
+          "plan": {
+            "index": 5,
+            "phase": "test",
+            "round": 0,
+            "blockIndex": 0,
+            "itemId": "ns-m04",
+            "family": "multiplication",
+            "known": [
+              5,
+              10,
+              20,
+              40
+            ],
+            "options": [
+              40,
+              80,
+              42,
+              82
+            ],
+            "correctIndex": 1,
+            "answer": 80
+          },
+          "startedAtPerfMs": 5100,
+          "endedAtPerfMs": 5200,
+          "status": "answered",
+          "response": 1,
+          "rtMs": 100,
+          "input": "touch",
+          "stopReason": null,
+          "events": [
+            {
+              "kind": "answer",
+              "choice": 1,
+              "input": "touch",
+              "key": null,
+              "atMs": 5200
+            }
+          ],
+          "ignoredRepeatCount": 0
+        },
+        {
+          "plan": {
+            "index": 6,
+            "phase": "test",
+            "round": 0,
+            "blockIndex": 1,
+            "itemId": "ns-a08",
+            "family": "addition",
+            "known": [
+              21,
+              23,
+              25,
+              27
+            ],
+            "options": [
+              31,
+              27,
+              29,
+              28
+            ],
+            "correctIndex": 2,
+            "answer": 29
+          },
+          "startedAtPerfMs": 6100,
+          "endedAtPerfMs": 6200,
+          "status": "answered",
+          "response": 2,
+          "rtMs": 100,
+          "input": "touch",
+          "stopReason": null,
+          "events": [
+            {
+              "kind": "answer",
+              "choice": 2,
+              "input": "touch",
+              "key": null,
+              "atMs": 6200
+            }
+          ],
+          "ignoredRepeatCount": 0
+        },
+        {
+          "plan": {
+            "index": 7,
+            "phase": "test",
+            "round": 0,
+            "blockIndex": 1,
+            "itemId": "ns-g07",
+            "family": "growing-gap",
+            "known": [
+              5,
+              8,
+              13,
+              20
+            ],
+            "options": [
+              29,
+              27,
+              20,
+              31
+            ],
+            "correctIndex": 0,
+            "answer": 29
+          },
+          "startedAtPerfMs": 7100,
+          "endedAtPerfMs": 7200,
+          "status": "answered",
+          "response": 0,
+          "rtMs": 100,
+          "input": "touch",
+          "stopReason": null,
+          "events": [
+            {
+              "kind": "answer",
+              "choice": 0,
+              "input": "touch",
+              "key": null,
+              "atMs": 7200
+            }
+          ],
+          "ignoredRepeatCount": 0
+        },
+        {
+          "plan": {
+            "index": 8,
+            "phase": "test",
+            "round": 0,
+            "blockIndex": 1,
+            "itemId": "ns-a07",
+            "family": "addition",
+            "known": [
+              18,
+              22,
+              26,
+              30
+            ],
+            "options": [
+              33,
+              30,
+              38,
+              34
+            ],
+            "correctIndex": 3,
+            "answer": 34
+          },
+          "startedAtPerfMs": 8100,
+          "endedAtPerfMs": 8200,
+          "status": "answered",
+          "response": 0,
+          "rtMs": 100,
+          "input": "touch",
+          "stopReason": null,
+          "events": [
+            {
+              "kind": "answer",
+              "choice": 0,
+              "input": "touch",
+              "key": null,
+              "atMs": 8200
+            }
+          ],
+          "ignoredRepeatCount": 0
+        },
+        {
+          "plan": {
+            "index": 9,
+            "phase": "test",
+            "round": 0,
+            "blockIndex": 1,
+            "itemId": "ns-m03",
+            "family": "multiplication",
+            "known": [
+              4,
+              8,
+              16,
+              32
+            ],
+            "options": [
+              34,
+              32,
+              64,
+              66
+            ],
+            "correctIndex": 2,
+            "answer": 64
+          },
+          "startedAtPerfMs": 9100,
+          "endedAtPerfMs": 9200,
+          "status": "answered",
+          "response": 2,
+          "rtMs": 100,
+          "input": "touch",
+          "stopReason": null,
+          "events": [
+            {
+              "kind": "answer",
+              "choice": 2,
+              "input": "touch",
+              "key": null,
+              "atMs": 9200
+            }
+          ],
+          "ignoredRepeatCount": 0
+        },
+        {
+          "plan": {
+            "index": 10,
+            "phase": "test",
+            "round": 0,
+            "blockIndex": 1,
+            "itemId": "ns-m01",
+            "family": "multiplication",
+            "known": [
+              2,
+              4,
+              8,
+              16
+            ],
+            "options": [
+              34,
+              18,
+              16,
+              32
+            ],
+            "correctIndex": 3,
+            "answer": 32
+          },
+          "startedAtPerfMs": 10100,
+          "endedAtPerfMs": 10200,
+          "status": "answered",
+          "response": 3,
+          "rtMs": 100,
+          "input": "touch",
+          "stopReason": null,
+          "events": [
+            {
+              "kind": "answer",
+              "choice": 3,
+              "input": "touch",
+              "key": null,
+              "atMs": 10200
+            }
+          ],
+          "ignoredRepeatCount": 0
+        },
+        {
+          "plan": {
+            "index": 11,
+            "phase": "test",
+            "round": 0,
+            "blockIndex": 1,
+            "itemId": "ns-g08",
+            "family": "growing-gap",
+            "known": [
+              9,
+              11,
+              16,
+              24
+            ],
+            "options": [
+              35,
+              38,
+              24,
+              32
+            ],
+            "correctIndex": 0,
+            "answer": 35
+          },
+          "startedAtPerfMs": 11100,
+          "endedAtPerfMs": 11200,
+          "status": "answered",
+          "response": 0,
+          "rtMs": 100,
+          "input": "touch",
+          "stopReason": null,
+          "events": [
+            {
+              "kind": "answer",
+              "choice": 0,
+              "input": "touch",
+              "key": null,
+              "atMs": 11200
+            }
+          ],
+          "ignoredRepeatCount": 0
+        },
+        {
+          "plan": {
+            "index": 12,
+            "phase": "test",
+            "round": 0,
+            "blockIndex": 2,
+            "itemId": "ns-a04",
+            "family": "addition",
+            "known": [
+              7,
+              12,
+              17,
+              22
+            ],
+            "options": [
+              27,
+              32,
+              26,
+              22
+            ],
+            "correctIndex": 0,
+            "answer": 27
+          },
+          "startedAtPerfMs": 12100,
+          "endedAtPerfMs": 12200,
+          "status": "answered",
+          "response": 1,
+          "rtMs": 100,
+          "input": "touch",
+          "stopReason": null,
+          "events": [
+            {
+              "kind": "answer",
+              "choice": 1,
+              "input": "touch",
+              "key": null,
+              "atMs": 12200
+            }
+          ],
+          "ignoredRepeatCount": 0
+        },
+        {
+          "plan": {
+            "index": 13,
+            "phase": "test",
+            "round": 0,
+            "blockIndex": 2,
+            "itemId": "ns-g04",
+            "family": "growing-gap",
+            "known": [
+              6,
+              9,
+              13,
+              18
+            ],
+            "options": [
+              23,
+              18,
+              25,
+              24
+            ],
+            "correctIndex": 3,
+            "answer": 24
+          },
+          "startedAtPerfMs": 13100,
+          "endedAtPerfMs": 13200,
+          "status": "answered",
+          "response": 3,
+          "rtMs": 100,
+          "input": "touch",
+          "stopReason": null,
+          "events": [
+            {
+              "kind": "answer",
+              "choice": 3,
+              "input": "touch",
+              "key": null,
+              "atMs": 13200
+            }
+          ],
+          "ignoredRepeatCount": 0
+        },
+        {
+          "plan": {
+            "index": 14,
+            "phase": "test",
+            "round": 0,
+            "blockIndex": 2,
+            "itemId": "ns-m05",
+            "family": "multiplication",
+            "known": [
+              6,
+              12,
+              24,
+              48
+            ],
+            "options": [
+              98,
+              48,
+              96,
+              50
+            ],
+            "correctIndex": 2,
+            "answer": 96
+          },
+          "startedAtPerfMs": 14100,
+          "endedAtPerfMs": 14200,
+          "status": "answered",
+          "response": 2,
+          "rtMs": 100,
+          "input": "touch",
+          "stopReason": null,
+          "events": [
+            {
+              "kind": "answer",
+              "choice": 2,
+              "input": "touch",
+              "key": null,
+              "atMs": 14200
+            }
+          ],
+          "ignoredRepeatCount": 0
+        },
+        {
+          "plan": {
+            "index": 15,
+            "phase": "test",
+            "round": 0,
+            "blockIndex": 2,
+            "itemId": "ns-m07",
+            "family": "multiplication",
+            "known": [
+              8,
+              16,
+              32,
+              64
+            ],
+            "options": [
+              64,
+              130,
+              66,
+              128
+            ],
+            "correctIndex": 3,
+            "answer": 128
+          },
+          "startedAtPerfMs": 15100,
+          "endedAtPerfMs": 15200,
+          "status": "answered",
+          "response": 3,
+          "rtMs": 100,
+          "input": "touch",
+          "stopReason": null,
+          "events": [
+            {
+              "kind": "answer",
+              "choice": 3,
+              "input": "touch",
+              "key": null,
+              "atMs": 15200
+            }
+          ],
+          "ignoredRepeatCount": 0
+        },
+        {
+          "plan": {
+            "index": 16,
+            "phase": "test",
+            "round": 0,
+            "blockIndex": 2,
+            "itemId": "ns-a03",
+            "family": "addition",
+            "known": [
+              11,
+              13,
+              15,
+              17
+            ],
+            "options": [
+              19,
+              18,
+              21,
+              17
+            ],
+            "correctIndex": 0,
+            "answer": 19
+          },
+          "startedAtPerfMs": 16100,
+          "endedAtPerfMs": 16200,
+          "status": "answered",
+          "response": 1,
+          "rtMs": 100,
+          "input": "touch",
+          "stopReason": null,
+          "events": [
+            {
+              "kind": "answer",
+              "choice": 1,
+              "input": "touch",
+              "key": null,
+              "atMs": 16200
+            }
+          ],
+          "ignoredRepeatCount": 0
+        },
+        {
+          "plan": {
+            "index": 17,
+            "phase": "test",
+            "round": 0,
+            "blockIndex": 2,
+            "itemId": "ns-g03",
+            "family": "growing-gap",
+            "known": [
+              4,
+              5,
+              8,
+              13
+            ],
+            "options": [
+              18,
+              13,
+              22,
+              20
+            ],
+            "correctIndex": 3,
+            "answer": 20
+          },
+          "startedAtPerfMs": 17100,
+          "endedAtPerfMs": 17200,
+          "status": "answered",
+          "response": 3,
+          "rtMs": 100,
+          "input": "touch",
+          "stopReason": null,
+          "events": [
+            {
+              "kind": "answer",
+              "choice": 3,
+              "input": "touch",
+              "key": null,
+              "atMs": 17200
+            }
+          ],
+          "ignoredRepeatCount": 0
+        },
+        {
+          "plan": {
+            "index": 18,
+            "phase": "test",
+            "round": 0,
+            "blockIndex": 3,
+            "itemId": "ns-a01",
+            "family": "addition",
+            "known": [
+              2,
+              5,
+              8,
+              11
+            ],
+            "options": [
+              13,
+              14,
+              17,
+              11
+            ],
+            "correctIndex": 1,
+            "answer": 14
+          },
+          "startedAtPerfMs": 18100,
+          "endedAtPerfMs": 18200,
+          "status": "answered",
+          "response": 1,
+          "rtMs": 100,
+          "input": "touch",
+          "stopReason": null,
+          "events": [
+            {
+              "kind": "answer",
+              "choice": 1,
+              "input": "touch",
+              "key": null,
+              "atMs": 18200
+            }
+          ],
+          "ignoredRepeatCount": 0
+        },
+        {
+          "plan": {
+            "index": 19,
+            "phase": "test",
+            "round": 0,
+            "blockIndex": 3,
+            "itemId": "ns-m08",
+            "family": "multiplication",
+            "known": [
+              1,
+              3,
+              9,
+              27
+            ],
+            "options": [
+              81,
+              30,
+              27,
+              84
+            ],
+            "correctIndex": 0,
+            "answer": 81
+          },
+          "startedAtPerfMs": 19100,
+          "endedAtPerfMs": 19200,
+          "status": "answered",
+          "response": 0,
+          "rtMs": 100,
+          "input": "touch",
+          "stopReason": null,
+          "events": [
+            {
+              "kind": "answer",
+              "choice": 0,
+              "input": "touch",
+              "key": null,
+              "atMs": 19200
+            }
+          ],
+          "ignoredRepeatCount": 0
+        },
+        {
+          "plan": {
+            "index": 20,
+            "phase": "test",
+            "round": 0,
+            "blockIndex": 3,
+            "itemId": "ns-a02",
+            "family": "addition",
+            "known": [
+              5,
+              9,
+              13,
+              17
+            ],
+            "options": [
+              20,
+              17,
+              25,
+              21
+            ],
+            "correctIndex": 3,
+            "answer": 21
+          },
+          "startedAtPerfMs": 20100,
+          "endedAtPerfMs": 20200,
+          "status": "answered",
+          "response": 0,
+          "rtMs": 100,
+          "input": "touch",
+          "stopReason": null,
+          "events": [
+            {
+              "kind": "answer",
+              "choice": 0,
+              "input": "touch",
+              "key": null,
+              "atMs": 20200
+            }
+          ],
+          "ignoredRepeatCount": 0
+        },
+        {
+          "plan": {
+            "index": 21,
+            "phase": "test",
+            "round": 0,
+            "blockIndex": 3,
+            "itemId": "ns-g05",
+            "family": "growing-gap",
+            "known": [
+              1,
+              3,
+              7,
+              13
+            ],
+            "options": [
+              13,
+              21,
+              23,
+              19
+            ],
+            "correctIndex": 1,
+            "answer": 21
+          },
+          "startedAtPerfMs": 21100,
+          "endedAtPerfMs": 21200,
+          "status": "answered",
+          "response": 1,
+          "rtMs": 100,
+          "input": "touch",
+          "stopReason": null,
+          "events": [
+            {
+              "kind": "answer",
+              "choice": 1,
+              "input": "touch",
+              "key": null,
+              "atMs": 21200
+            }
+          ],
+          "ignoredRepeatCount": 0
+        },
+        {
+          "plan": {
+            "index": 22,
+            "phase": "test",
+            "round": 0,
+            "blockIndex": 3,
+            "itemId": "ns-g01",
+            "family": "growing-gap",
+            "known": [
+              2,
+              3,
+              5,
+              8
+            ],
+            "options": [
+              13,
+              11,
+              12,
+              8
+            ],
+            "correctIndex": 2,
+            "answer": 12
+          },
+          "startedAtPerfMs": 22100,
+          "endedAtPerfMs": 22200,
+          "status": "answered",
+          "response": 2,
+          "rtMs": 100,
+          "input": "touch",
+          "stopReason": null,
+          "events": [
+            {
+              "kind": "answer",
+              "choice": 2,
+              "input": "touch",
+              "key": null,
+              "atMs": 22200
+            }
+          ],
+          "ignoredRepeatCount": 0
+        },
+        {
+          "plan": {
+            "index": 23,
+            "phase": "test",
+            "round": 0,
+            "blockIndex": 3,
+            "itemId": "ns-m06",
+            "family": "multiplication",
+            "known": [
+              7,
+              14,
+              28,
+              56
+            ],
+            "options": [
+              56,
+              112,
+              58,
+              114
+            ],
+            "correctIndex": 1,
+            "answer": 112
+          },
+          "startedAtPerfMs": 23100,
+          "endedAtPerfMs": 23200,
+          "status": "answered",
+          "response": 1,
+          "rtMs": 100,
+          "input": "touch",
+          "stopReason": null,
+          "events": [
+            {
+              "kind": "answer",
+              "choice": 1,
+              "input": "touch",
+              "key": null,
+              "atMs": 23200
+            }
+          ],
+          "ignoredRepeatCount": 0
+        }
+      ],
+      "score": {
+        "metrics": {
+          "counts": {
+            "planned": 24,
+            "received": 24,
+            "opportunities": 24,
+            "correct": 18,
+            "wrong": 6,
+            "skipped": 0,
+            "interrupted": 0,
+            "unpresented": 0
+          },
+          "conditions": {
+            "addition": {
+              "planned": 8,
+              "opportunities": 8,
+              "correct": 3,
+              "wrong": 5,
+              "skipped": 0,
+              "interrupted": 0,
+              "correctRtMs": 100
+            },
+            "multiplication": {
+              "planned": 8,
+              "opportunities": 8,
+              "correct": 8,
+              "wrong": 0,
+              "skipped": 0,
+              "interrupted": 0,
+              "correctRtMs": 100
+            },
+            "growing-gap": {
+              "planned": 8,
+              "opportunities": 8,
+              "correct": 7,
+              "wrong": 1,
+              "skipped": 0,
+              "interrupted": 0,
+              "correctRtMs": 100
+            }
+          },
+          "accuracy": 0.75,
+          "skipRate": 0,
+          "correctRtMs": 100,
+          "conditionRates": {
+            "addition": {
+              "accuracy": 0.375,
+              "skipRate": 0
+            },
+            "multiplication": {
+              "accuracy": 1,
+              "skipRate": 0
+            },
+            "growing-gap": {
+              "accuracy": 0.875,
+              "skipRate": 0
+            }
+          },
+          "growingMinusAdditionAccuracy": 0.5,
+          "growingMinusAdditionRtMs": 0,
+          "reportBinding": {
+            "testType": "number-series",
+            "engineVersion": "0.1.0",
+            "scoringVersion": "0.1.0",
+            "configVersion": "0.1.0",
+            "profile": "research",
+            "configHash": "29c8ec1aad86e85b12f63ea661e5bd6aa295af2083ec2d69b6b4f2af3f22874e",
+            "protocolSignature": "310f76bf4f7235df6572da7b5ac2c7ced51b35da3597296cdd80c9f4afa38541",
+            "manifestHash": "6832e83ca059e160d46bceb7b92df6b3482e9444107cdc34c160eb2f635c50b5",
+            "bankHash": "017995379001d7aa202f13fc52425520df43e2383a8e7012d7f02e37bd853292",
+            "parameterInterpretationVersion": "0.1.0",
+            "reportDefinitionVersion": "0.1.0",
+            "presentationVersion": "0.1.0"
+          }
+        },
+        "quality": {
+          "state": "interpretable",
+          "flags": {
+            "noCompleteOpportunities": false,
+            "incompletePlan": false,
+            "technicalInterruption": false
+          },
+          "reasons": []
+        },
+        "audit": {
+          "trialCount": 24,
+          "scorerVersion": "0.1.0"
+        }
+      },
+      "publicReport": {
+        "testType": "number-series",
+        "engineVersion": "0.1.0",
+        "scoringVersion": "0.1.0",
+        "configVersion": "0.1.0",
+        "profile": "research",
+        "configHash": "29c8ec1aad86e85b12f63ea661e5bd6aa295af2083ec2d69b6b4f2af3f22874e",
+        "protocolSignature": "310f76bf4f7235df6572da7b5ac2c7ced51b35da3597296cdd80c9f4afa38541",
+        "manifestHash": "6832e83ca059e160d46bceb7b92df6b3482e9444107cdc34c160eb2f635c50b5",
+        "bankHash": "017995379001d7aa202f13fc52425520df43e2383a8e7012d7f02e37bd853292",
+        "parameterInterpretationVersion": "0.1.0",
+        "reportDefinitionVersion": "0.1.0",
+        "presentationVersion": "0.1.0",
+        "state": "interpretable",
+        "progress": {
+          "planned": 24,
+          "received": 24,
+          "completed": 24
+        },
+        "summary": {
+          "correct": 18,
+          "skipped": 0,
+          "opportunities": 24,
+          "correctRtMs": 100,
+          "conditions": {
+            "addition": {
+              "correct": 3,
+              "skipped": 0,
+              "opportunities": 8,
+              "correctRtMs": 100
+            },
+            "multiplication": {
+              "correct": 8,
+              "skipped": 0,
+              "opportunities": 8,
+              "correctRtMs": 100
+            },
+            "growing-gap": {
+              "correct": 7,
+              "skipped": 0,
+              "opportunities": 8,
+              "correctRtMs": 100
+            }
+          }
+        }
+      }
+    }
+  ]
+}

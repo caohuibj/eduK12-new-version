@@ -1,0 +1,578 @@
+{
+  "kind": "unsigned-development-evidence-not-CI-or-final-acceptance",
+  "recordedAtUtc": "2026-10-27T11:21:04.316601+00:00",
+  "scope": "number-series candidate only; pending DOT review, not integrated",
+  "baseline": "a0130ea6603d7e37fd4f900d8694b5b7d490c51e",
+  "branch": "cognitive/domain-child-learning-20261027",
+  "modelConfiguration": "DOT confirmed gpt-6.1-sol/high admitted; no model substitution warning",
+  "node": "24.21.0",
+  "installedPackageVersions": {
+    "backend/typescript": "5.9.3",
+    "backend/vitest": "4.1.11",
+    "backend/zod": "4.6.7",
+    "backend/tsx": "4.23.12",
+    "frontend/react": "18.3.1",
+    "frontend/react-dom": "18.3.1",
+    "frontend/@noble/hashes": "1.8.0",
+    "frontend/esbuild": "0.25.12"
+  },
+  "threeVersionLayers": {
+    "protocolEngine": "0.1.0",
+    "parameterScoringConfig": "0.1.0",
+    "reportPresentation": "0.1.0"
+  },
+  "bankHash": "017995379001d7aa202f13fc52425520df43e2383a8e7012d7f02e37bd853292",
+  "profileFormalCounts": {
+    "research": 24,
+    "experience": 12
+  },
+  "practice": {
+    "perCompleteRound": 3,
+    "passCorrect": 3,
+    "maximumRounds": 3,
+    "incompleteRound": "actual interruption only; do not fabricate remaining exposures"
+  },
+  "checks": [
+    {
+      "file": "backend-attempt1.json",
+      "success": true,
+      "passed": 6,
+      "failed": 0,
+      "filteredOrPending": 0,
+      "startTime": 1793098912447,
+      "cases": [
+        {
+          "name": "keeps an original 24-item bank, defensible model answers, distinct distractors and frozen bilingual module copies",
+          "status": "passed"
+        },
+        {
+          "name": "preserves three conditions and correct-position balance per profile and six-item block, with the short version a fixed subset",
+          "status": "passed"
+        },
+        {
+          "name": "scores real condition denominators, true zero and null separately without an ability index",
+          "status": "passed"
+        },
+        {
+          "name": "does not turn unpresented or interrupted questions into errors and keeps signed condition differences",
+          "status": "passed"
+        },
+        {
+          "name": "uses the same restrictive projection for text, image and download; internal fields never survive public states",
+          "status": "passed"
+        },
+        {
+          "name": "rejects changed frozen identities, bank/answer tampering, duplicate order, mismatched first responses and bad clocks",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "frontend-attempt1.json",
+      "success": true,
+      "passed": 5,
+      "failed": 0,
+      "filteredOrPending": 0,
+      "startTime": 1793098912485,
+      "cases": [
+        {
+          "name": "locks the first input, retains real zero time and explicit skip null, and ignores held-key repeats",
+          "status": "passed"
+        },
+        {
+          "name": "requires confirmed retention before exposure and full instructions before each of at most three practice rounds",
+          "status": "passed"
+        },
+        {
+          "name": "runs actual React teaching/review, touch and keyboard choices, 12 formal items, same-draft and same-final retries",
+          "status": "passed"
+        },
+        {
+          "name": "keeps interrupted/invalid public bodies, pictures and exports free of performance values and refuses changed report bindings",
+          "status": "passed"
+        },
+        {
+          "name": "isolates a changed context from a pending old write and never sends the old record to new ports",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "backend-module-sync-after-types.json",
+      "success": true,
+      "passed": 1,
+      "failed": 0,
+      "filteredOrPending": 5,
+      "startTime": 1793099149568,
+      "cases": [
+        {
+          "name": "keeps an original 24-item bank, defensible model answers, distinct distractors and frozen bilingual module copies",
+          "status": "passed"
+        },
+        {
+          "name": "preserves three conditions and correct-position balance per profile and six-item block, with the short version a fixed subset",
+          "status": "skipped"
+        },
+        {
+          "name": "scores real condition denominators, true zero and null separately without an ability index",
+          "status": "skipped"
+        },
+        {
+          "name": "does not turn unpresented or interrupted questions into errors and keeps signed condition differences",
+          "status": "skipped"
+        },
+        {
+          "name": "uses the same restrictive projection for text, image and download; internal fields never survive public states",
+          "status": "skipped"
+        },
+        {
+          "name": "rejects changed frozen identities, bank/answer tampering, duplicate order, mismatched first responses and bad clocks",
+          "status": "skipped"
+        }
+      ]
+    },
+    {
+      "file": "frontend-practice-alignment.json",
+      "success": true,
+      "passed": 2,
+      "failed": 0,
+      "filteredOrPending": 3,
+      "startTime": 1793099665121,
+      "cases": [
+        {
+          "name": "locks the first input, retains real zero time and explicit skip null, and ignores held-key repeats",
+          "status": "skipped"
+        },
+        {
+          "name": "requires confirmed retention before exposure and full instructions before each of at most three practice rounds",
+          "status": "passed"
+        },
+        {
+          "name": "runs actual React teaching/review, touch and keyboard choices, 12 formal items, same-draft and same-final retries",
+          "status": "passed"
+        },
+        {
+          "name": "keeps interrupted/invalid public bodies, pictures and exports free of performance values and refuses changed report bindings",
+          "status": "skipped"
+        },
+        {
+          "name": "isolates a changed context from a pending old write and never sends the old record to new ports",
+          "status": "skipped"
+        }
+      ]
+    },
+    {
+      "file": "frontend-feedback-final.json",
+      "success": true,
+      "passed": 1,
+      "failed": 0,
+      "filteredOrPending": 4,
+      "startTime": 1793099779666,
+      "cases": [
+        {
+          "name": "locks the first input, retains real zero time and explicit skip null, and ignores held-key repeats",
+          "status": "skipped"
+        },
+        {
+          "name": "requires confirmed retention before exposure and full instructions before each of at most three practice rounds",
+          "status": "skipped"
+        },
+        {
+          "name": "runs actual React teaching/review, touch and keyboard choices, 12 formal items, same-draft and same-final retries",
+          "status": "passed"
+        },
+        {
+          "name": "keeps interrupted/invalid public bodies, pictures and exports free of performance values and refuses changed report bindings",
+          "status": "skipped"
+        },
+        {
+          "name": "isolates a changed context from a pending old write and never sends the old record to new ports",
+          "status": "skipped"
+        }
+      ]
+    },
+    {
+      "file": "frontend-state-ownership-final.json",
+      "success": true,
+      "passed": 2,
+      "failed": 0,
+      "filteredOrPending": 3,
+      "startTime": 1793099935679,
+      "cases": [
+        {
+          "name": "locks the first input, retains real zero time and explicit skip null, and ignores held-key repeats",
+          "status": "skipped"
+        },
+        {
+          "name": "requires confirmed retention before exposure and full instructions before each of at most three practice rounds",
+          "status": "skipped"
+        },
+        {
+          "name": "runs actual React teaching/review, touch and keyboard choices, 12 formal items, same-draft and same-final retries",
+          "status": "skipped"
+        },
+        {
+          "name": "keeps interrupted/invalid public bodies, pictures and exports free of performance values and refuses changed report bindings",
+          "status": "passed"
+        },
+        {
+          "name": "isolates a changed context from a pending old write and never sends the old record to new ports",
+          "status": "passed"
+        }
+      ]
+    }
+  ],
+  "types": {
+    "backendCurrent": "types-attempt2.json",
+    "frontendCurrent": "types-frontend-final.json",
+    "failureRetained": "types-attempt1.json"
+  },
+  "browser": {
+    "unchangedReportLayoutAndExports": "actual-browser.json",
+    "currentPracticeBranch": "actual-browser-practice-alignment.json",
+    "earlierFailuresRetained": [
+      "actual-browser-attempt1.log",
+      "actual-browser-attempt2.log",
+      "actual-browser-attempt2-diagnosis.json"
+    ],
+    "syntheticPortsOnly": true,
+    "realServerCalls": 0,
+    "realDeviceEquivalence": false
+  },
+  "evidenceLimits": [
+    "Initial per-file hashes were not captured contemporaneously; sourceBindings below describe the final files, not signed assertions of earlier invocations.",
+    "Initial unit results are retained under their original identity. Later checks select only affected cases; filtered cases are not claimed newly executed.",
+    "The report string-array type fix changes TypeScript annotations only; teaching-flow behavior changes were rechecked in the affected session/React cases.",
+    "Backend/standalone report/pure modules and CSS did not change during the final practice-flow correction.",
+    "Synthetic fixtures and memory ports do not prove physical device timing, actual durable storage, permissions, API, DB, COS or final platform acceptance."
+  ],
+  "sourceBindings": [
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/number-series/analysis.ts",
+      "bytes": 1065,
+      "sha256": "5afa467307be7593b271bf56c6e2436e3638273471a9cc89e84201ea2b73e44a"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/number-series/items.ts",
+      "bytes": 12044,
+      "sha256": "99a0d45d12d3605433971c5bc091392c728e0b46a41d71dc60c36a116d868f7f"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/number-series/metadata.ts",
+      "bytes": 1996,
+      "sha256": "9dfc7d700a7008ca381e11e5e0899202274cb650f03aa0442a03b11b86e7981e"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/number-series/package.ts",
+      "bytes": 3699,
+      "sha256": "9f24d13f5555f62929bf21bdf6cc1d69014d3030ea5d4109dd09a9dd1116c6bb"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/number-series/participant-presentation.ts",
+      "bytes": 1041,
+      "sha256": "3df0400e2b761d3156b25f262dd8c1e27c45b94d35e4e12db47ac352d5908559"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/number-series/protocol.ts",
+      "bytes": 7613,
+      "sha256": "941a5c4327578909839b543437e256f9f39be398a3b4cd54fc894fb10a43ab65"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/number-series/report.ts",
+      "bytes": 10212,
+      "sha256": "8ae22361df150f3debd238efc54d4437f0dce1fa071df9275c9b9ac0d5520775"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/number-series/scorer.ts",
+      "bytes": 5204,
+      "sha256": "e34876464bc0676d1d324eb88631d50c6dc4db09e62b0f94f49e269b976cc0c6"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/number-series/validation.ts",
+      "bytes": 1627,
+      "sha256": "a0ec0d28b751b615602c547363782b63ab18b913a0c87114a7b1891eaee72048"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/number-series/NumberSeriesInstructions.tsx",
+      "bytes": 6025,
+      "sha256": "69e8677b6483e98255c59533937528607202408ab2ca244527e4bbc2689c8dfd"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/number-series/NumberSeriesReport.tsx",
+      "bytes": 2592,
+      "sha256": "fa9bb1c57276918c221b317a26627c3f66c09633439052a40b81f4244d6fec4a"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/number-series/NumberSeriesTask.tsx",
+      "bytes": 10112,
+      "sha256": "ac2a0a9e0a1aa8b87342e13512356bd8a367a4f471ee6195cf61dae00d7c1f72"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/number-series/capture.ts",
+      "bytes": 2104,
+      "sha256": "3687c8d77ed6b15f6e7b82f45073e6fb7d133ff36c3cf26974a43111f7aaf990"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/number-series/content.test.tsx",
+      "bytes": 12280,
+      "sha256": "73572b75bc22c7fcf83b0316c54f805aab6dbd500c7996f515c21f9d69b38292"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/number-series/contracts.ts",
+      "bytes": 3446,
+      "sha256": "e32e34acc7ea9c595f03f3542128754f15c156cc08747307d77b84649cfcd9a2"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/number-series/generated/analysis.ts",
+      "bytes": 1065,
+      "sha256": "5afa467307be7593b271bf56c6e2436e3638273471a9cc89e84201ea2b73e44a"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/number-series/generated/items.ts",
+      "bytes": 12044,
+      "sha256": "99a0d45d12d3605433971c5bc091392c728e0b46a41d71dc60c36a116d868f7f"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/number-series/generated/protocol.ts",
+      "bytes": 7613,
+      "sha256": "941a5c4327578909839b543437e256f9f39be398a3b4cd54fc894fb10a43ab65"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/number-series/generated/report.ts",
+      "bytes": 10212,
+      "sha256": "8ae22361df150f3debd238efc54d4437f0dce1fa071df9275c9b9ac0d5520775"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/number-series/number-series.css",
+      "bytes": 2582,
+      "sha256": "04e5caf050a83c3f2daa0da35f7806fa45ec708dbc6b23cd8689b52b600803a1"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/number-series/session.ts",
+      "bytes": 9365,
+      "sha256": "51dbefec23d42a887ba6294e136d6d2a89e2a1f83c90220e51875be8a190c61a"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/cognitive/number-series-content.test.ts",
+      "bytes": 9913,
+      "sha256": "546a690719391478e037abbd54e23716a8979d0767ebaa8e65c1d1091b61596c"
+    }
+  ],
+  "evidenceArtifacts": [
+    {
+      "file": "README.md",
+      "bytes": 12828,
+      "sha256": "e95d88b56690cdd1c03871acddec8a51da35252587684960540b61554e0209e4"
+    },
+    {
+      "file": "actual-browser-attempt1.log",
+      "bytes": 2111,
+      "sha256": "f2ccbac6d33d5ee5b98897e78d9ec660d4eb5259c5b66d93e9115885de8cfb20"
+    },
+    {
+      "file": "actual-browser-attempt2-diagnosis.json",
+      "bytes": 142,
+      "sha256": "43a0210c5ee733583e605abcb6a5e024a330b0dcfcfb56fa1b407b76b2bd855c"
+    },
+    {
+      "file": "actual-browser-attempt2.log",
+      "bytes": 350,
+      "sha256": "6d6d784e7fd0e0b9359f7df90dfeacf1590345562782207d13db53acd935d792"
+    },
+    {
+      "file": "actual-browser-attempt3.log",
+      "bytes": 1229,
+      "sha256": "46e548cbfd415213a5b51bb8dc4bca6ef2caa0dd17cef81462e11f33cc306000"
+    },
+    {
+      "file": "actual-browser-practice-alignment.json",
+      "bytes": 1225,
+      "sha256": "076909d855ae901f4084bed1d48b90ec76f2f6aa2f87fc1c742a521841b3f8d4"
+    },
+    {
+      "file": "actual-browser-practice-alignment.log",
+      "bytes": 883,
+      "sha256": "213ae5f460374b2b9bcddd1e3db9474d8f115fe1cb31c9cb497ba4cf61bd1119"
+    },
+    {
+      "file": "actual-browser.json",
+      "bytes": 1834,
+      "sha256": "b652b86cd296fdf3d4e0b8fb303396f95c4665228bd8a3222ae7308c8d1a4250"
+    },
+    {
+      "file": "actual-phone-formal-390.png",
+      "bytes": 37295,
+      "sha256": "1711c2c92c68478dae9a74d09596dbd609d2c05330d0460d1d445219c7bd2a6b"
+    },
+    {
+      "file": "actual-phone-intro-390.png",
+      "bytes": 180078,
+      "sha256": "5ee3f91a04b424c52438c9797ee9e0acbde5cfe4bae5fc72c3fb4301c5d876da"
+    },
+    {
+      "file": "actual-phone-limited-390.png",
+      "bytes": 46699,
+      "sha256": "0e3efd68f45be79675ad956512bf4a7781612851e1fadb053e776699e357911d"
+    },
+    {
+      "file": "actual-practice-reread-390.png",
+      "bytes": 180730,
+      "sha256": "0d6f6ff9b09ac2af8a49297a34a1779dfb6a68160b7c2d66ecd5d782832f0dc7"
+    },
+    {
+      "file": "actual-tablet-report-820.png",
+      "bytes": 81729,
+      "sha256": "b49538525999df2ff98debe6b44b065e070e248bf143136bc51ef54c74cb3761"
+    },
+    {
+      "file": "backend-attempt1.json",
+      "bytes": 3531,
+      "sha256": "bbc734344f35fefcb5d64e4286e981b610c619a3425e4249731d4c6229074518"
+    },
+    {
+      "file": "backend-attempt1.log",
+      "bytes": 162,
+      "sha256": "dc2692d09e9471629a190545d41126795cca790eee157d23cf10ecb35ca19121"
+    },
+    {
+      "file": "backend-module-sync-after-types.json",
+      "bytes": 3386,
+      "sha256": "4d52151fc19eb578aa4ecc3b4b3dbc5d2f646759a0f7aa331913d37a72593e26"
+    },
+    {
+      "file": "backend-module-sync-after-types.log",
+      "bytes": 177,
+      "sha256": "c617b2b90393157b1f0fb1afae9add7ade4a6b2b405d8cc8c540ae5bd5660ac5"
+    },
+    {
+      "file": "browser-fixture.json",
+      "bytes": 5158,
+      "sha256": "dbfd470c0b71f7d8a8dd38a904ccad5655560fa03c354f426fcbeffeb4a5db1d"
+    },
+    {
+      "file": "browser-harness.tsx",
+      "bytes": 2299,
+      "sha256": "620f259b0e4b78b65900aaac9a139be3d2f7b0754346ada44ab102d82c6ef611"
+    },
+    {
+      "file": "browser-render-initial.cjs",
+      "bytes": 6002,
+      "sha256": "a5f3d2552e9ec1f348666de48f938f5e4d2fc0b2861ab472509e3526cc9ba699"
+    },
+    {
+      "file": "browser-render-practice-alignment.cjs",
+      "bytes": 5158,
+      "sha256": "4edae7bc577bdb5720d9bfa3ed01c304825b8fbd5831cf892ee12f4847fd5ad9"
+    },
+    {
+      "file": "frontend-attempt1.json",
+      "bytes": 3098,
+      "sha256": "4eec11a57f0e64dc96bac3cec70e4a4dae0d75a5716f9b50f14738a5a1950b26"
+    },
+    {
+      "file": "frontend-attempt1.log",
+      "bytes": 163,
+      "sha256": "102eda120c1143b32a1b12050d86d37927a6dec81fea934f460c95b5f628bda0"
+    },
+    {
+      "file": "frontend-feedback-final.json",
+      "bytes": 2982,
+      "sha256": "721588b1a1ad41d6fe600d3f734b3e6cc476ac905f3fb796c4a9f5cbf0f9f61b"
+    },
+    {
+      "file": "frontend-feedback-final.log",
+      "bytes": 169,
+      "sha256": "35159e1c6f779bccef4534706495bda021351a120e9a2bdea3cd3b261e2e4974"
+    },
+    {
+      "file": "frontend-practice-alignment.json",
+      "bytes": 3010,
+      "sha256": "fa3f4f0315d268ea3a193b3cf481ada37bead7f9424878763ecfa5e3bc8e1e1a"
+    },
+    {
+      "file": "frontend-practice-alignment.log",
+      "bytes": 173,
+      "sha256": "cc34df8442d268c59d0f98b2abad3536a219658992c78491c1949582a17d8d0d"
+    },
+    {
+      "file": "frontend-state-ownership-final.json",
+      "bytes": 3003,
+      "sha256": "644c9ff3bb14822473e7bfc4470d194e4b6a4f05d7730c720444f6e4787d6d46"
+    },
+    {
+      "file": "frontend-state-ownership-final.log",
+      "bytes": 176,
+      "sha256": "deab14b38fda22c71bc130f7c83ba3ff7bf8fb0f3c1b6ff92702e7be506e9e58"
+    },
+    {
+      "file": "make-fixtures.ts",
+      "bytes": 3084,
+      "sha256": "af99782f3a3e90c81587c7a0564af00c3bb88ea0fc868fbad7867984987fe04e"
+    },
+    {
+      "file": "synthetic-report-en.txt",
+      "bytes": 742,
+      "sha256": "61621416f4b88320561138dddd6cc4bebd3918bc74ed6d3c03b6dd2cd45ac978"
+    },
+    {
+      "file": "synthetic-report-zh.txt",
+      "bytes": 647,
+      "sha256": "78b1d2ea8fa69effa8d1d49b9e956535da763597c18f4db67ebf56ec5283e9e7"
+    },
+    {
+      "file": "synthetic-report.svg",
+      "bytes": 540,
+      "sha256": "4d285a49b4650d5381caa99582886ae17574d701bdfa3025744841abb40e676b"
+    },
+    {
+      "file": "synthetic-worked-examples.json",
+      "bytes": 62815,
+      "sha256": "f891e9de165097de3cce9d00de1afe66152adb2566140d547083a7a38fc6d4b6"
+    },
+    {
+      "file": "typecheck-scope-final.cjs",
+      "bytes": 1820,
+      "sha256": "c48c95274b55e1976f43f6deedc51033472d565801b0928224dac119d46df97c"
+    },
+    {
+      "file": "types-attempt1.json",
+      "bytes": 34278,
+      "sha256": "adc5cb0c8c8e659b15ea6a8286990a9388df3d9641c0b9ff798fef3c98fd5438"
+    },
+    {
+      "file": "types-attempt2.json",
+      "bytes": 14454,
+      "sha256": "d9241e41a0a80b2d2790960eed9ac4c383ed1959cd25eb8ded0b2a13de2167d1"
+    },
+    {
+      "file": "types-frontend-final.json",
+      "bytes": 7450,
+      "sha256": "127b6fe9b65b6f6af6e073b7cbce44398357153a5c5334708d2195ebd0268dea"
+    }
+  ],
+  "dataAndRights": {
+    "participantData": false,
+    "restrictedTestMaterials": false,
+    "externalImageAudioAssets": false,
+    "newDependencies": false,
+    "credentialsFoundInScopedNewFiles": false,
+    "bankAuthorship": "original project numeric items",
+    "sourceMethodDOI": "10.3389/fpsyg.2019.00884",
+    "ICARMaterialsUsed": false,
+    "WechslerRavenMaterialsUsed": false
+  },
+  "notPerformed": [
+    "global registration",
+    "global metadata writes",
+    "API integration",
+    "database or platform schema changes",
+    "COS",
+    "permission changes",
+    "CI activation",
+    "merge",
+    "deployment",
+    "final centralized testing",
+    "Notion update after implementation"
+  ],
+  "commit": "recorded by post-commit Git readback; not self-signed here"
+}

@@ -1,0 +1,149 @@
+{
+  "synthetic": true,
+  "context": {
+    "contextKey": "synthetic-browser-number-series:epoch1",
+    "snapshot": {
+      "schemaVersion": 1,
+      "frozenAt": "2026-10-27T00:00:00.000Z",
+      "testType": "number-series",
+      "configVersion": "0.1.0",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "config": {
+        "profile": "experience",
+        "totalItems": 12,
+        "itemsPerCondition": 4,
+        "itemsPerBlock": 6,
+        "bankVersion": "original-number-series-bank-0.1.0",
+        "bankHash": "017995379001d7aa202f13fc52425520df43e2383a8e7012d7f02e37bd853292",
+        "parameterInterpretationVersion": "0.1.0",
+        "reportDefinitionVersion": "0.1.0",
+        "presentationVersion": "0.1.0",
+        "profileDefinitionVersion": "0.1.0",
+        "randomizationAlgorithmVersion": "number-series-fnv1a-utf16-xorshift32-fisher-yates-v1",
+        "responseRule": "first-valid-choice-or-explicit-skip",
+        "itemDeadlineMs": null,
+        "maxAnswer": 200,
+        "practice": {
+          "items": 3,
+          "passCorrect": 3,
+          "maximumRounds": 3,
+          "feedback": "explain-each",
+          "reRead": "full-instructions-and-three-examples"
+        }
+      },
+      "configHash": "cd2aed91b62effca6cdbafcd5960b1f73862a34995c375e0abd09989162d6f68",
+      "protocol": {
+        "schemaVersion": 1,
+        "key": "number-series/0.1.0/0.1.0",
+        "version": "0.1.0",
+        "clock": "performance",
+        "randomizationAlgorithmVersion": "number-series-fnv1a-utf16-xorshift32-fisher-yates-v1",
+        "trialEnvelopeVersion": 1,
+        "phases": [
+          {
+            "key": "test",
+            "persists": true,
+            "required": true
+          }
+        ],
+        "measurementCriticalConfigPaths": [
+          "*"
+        ]
+      },
+      "protocolSignature": "310f76bf4f7235df6572da7b5ac2c7ced51b35da3597296cdd80c9f4afa38541"
+    },
+    "randomSeed": "synthetic-number-series-browser",
+    "manifestHash": "142bc8f165a9a9884a61819cc252c402ec607f4dc01d03d407dace6c6490027e"
+  },
+  "reports": {
+    "interpretable": {
+      "testType": "number-series",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "configVersion": "0.1.0",
+      "profile": "experience",
+      "configHash": "cd2aed91b62effca6cdbafcd5960b1f73862a34995c375e0abd09989162d6f68",
+      "protocolSignature": "310f76bf4f7235df6572da7b5ac2c7ced51b35da3597296cdd80c9f4afa38541",
+      "manifestHash": "142bc8f165a9a9884a61819cc252c402ec607f4dc01d03d407dace6c6490027e",
+      "bankHash": "017995379001d7aa202f13fc52425520df43e2383a8e7012d7f02e37bd853292",
+      "parameterInterpretationVersion": "0.1.0",
+      "reportDefinitionVersion": "0.1.0",
+      "presentationVersion": "0.1.0",
+      "state": "interpretable",
+      "progress": {
+        "planned": 12,
+        "received": 12,
+        "completed": 12
+      },
+      "summary": {
+        "correct": 9,
+        "skipped": 0,
+        "opportunities": 12,
+        "correctRtMs": 100,
+        "conditions": {
+          "addition": {
+            "correct": 3,
+            "skipped": 0,
+            "opportunities": 4,
+            "correctRtMs": 100
+          },
+          "multiplication": {
+            "correct": 2,
+            "skipped": 0,
+            "opportunities": 4,
+            "correctRtMs": 100
+          },
+          "growing-gap": {
+            "correct": 4,
+            "skipped": 0,
+            "opportunities": 4,
+            "correctRtMs": 100
+          }
+        }
+      }
+    },
+    "limited": {
+      "testType": "number-series",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "configVersion": "0.1.0",
+      "profile": "experience",
+      "configHash": "cd2aed91b62effca6cdbafcd5960b1f73862a34995c375e0abd09989162d6f68",
+      "protocolSignature": "310f76bf4f7235df6572da7b5ac2c7ced51b35da3597296cdd80c9f4afa38541",
+      "manifestHash": "142bc8f165a9a9884a61819cc252c402ec607f4dc01d03d407dace6c6490027e",
+      "bankHash": "017995379001d7aa202f13fc52425520df43e2383a8e7012d7f02e37bd853292",
+      "parameterInterpretationVersion": "0.1.0",
+      "reportDefinitionVersion": "0.1.0",
+      "presentationVersion": "0.1.0",
+      "state": "limited",
+      "progress": {
+        "planned": 12,
+        "received": 1,
+        "completed": 1
+      },
+      "summary": null
+    },
+    "invalid": {
+      "testType": "number-series",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "configVersion": "0.1.0",
+      "profile": "experience",
+      "configHash": "cd2aed91b62effca6cdbafcd5960b1f73862a34995c375e0abd09989162d6f68",
+      "protocolSignature": "310f76bf4f7235df6572da7b5ac2c7ced51b35da3597296cdd80c9f4afa38541",
+      "manifestHash": "142bc8f165a9a9884a61819cc252c402ec607f4dc01d03d407dace6c6490027e",
+      "bankHash": "017995379001d7aa202f13fc52425520df43e2383a8e7012d7f02e37bd853292",
+      "parameterInterpretationVersion": "0.1.0",
+      "reportDefinitionVersion": "0.1.0",
+      "presentationVersion": "0.1.0",
+      "state": "invalid",
+      "progress": {
+        "planned": 12,
+        "received": 0,
+        "completed": 0
+      },
+      "summary": null
+    }
+  }
+}

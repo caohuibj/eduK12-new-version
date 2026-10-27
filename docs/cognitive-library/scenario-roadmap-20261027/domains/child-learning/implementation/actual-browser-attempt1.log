@@ -1,0 +1,18 @@
+Error: Build failed with 4 errors:
+docs/cognitive-library/scenario-roadmap-20261027/domains/child-learning/implementation/browser-harness.tsx:4:31: ERROR: Could not resolve "../../../../../../../../server-version/frontend/src/modules/cognitive/tasks/number-series/NumberSeriesTask"
+docs/cognitive-library/scenario-roadmap-20261027/domains/child-learning/implementation/browser-harness.tsx:5:33: ERROR: Could not resolve "../../../../../../../../server-version/frontend/src/modules/cognitive/tasks/number-series/NumberSeriesReport"
+docs/cognitive-library/scenario-roadmap-20261027/domains/child-learning/implementation/browser-harness.tsx:6:39: ERROR: Could not resolve "../../../../../../../../server-version/frontend/src/modules/cognitive/tasks/number-series/NumberSeriesInstructions"
+docs/cognitive-library/scenario-roadmap-20261027/domains/child-learning/implementation/browser-harness.tsx:7:90: ERROR: Could not resolve "../../../../../../../../server-version/frontend/src/modules/cognitive/tasks/number-series/contracts"
+    at failureErrorWithLog (/workspace/eduK12-new-version/server-version/frontend/node_modules/esbuild/lib/main.js:1467:15)
+    at /workspace/eduK12-new-version/server-version/frontend/node_modules/esbuild/lib/main.js:926:25
+    at /workspace/eduK12-new-version/server-version/frontend/node_modules/esbuild/lib/main.js:878:52
+    at buildResponseToResult (/workspace/eduK12-new-version/server-version/frontend/node_modules/esbuild/lib/main.js:924:7)
+    at /workspace/eduK12-new-version/server-version/frontend/node_modules/esbuild/lib/main.js:951:16
+    at responseCallbacks.<computed> (/workspace/eduK12-new-version/server-version/frontend/node_modules/esbuild/lib/main.js:603:9)
+    at handleIncomingPacket (/workspace/eduK12-new-version/server-version/frontend/node_modules/esbuild/lib/main.js:658:12)
+    at Socket.readFromStdout (/workspace/eduK12-new-version/server-version/frontend/node_modules/esbuild/lib/main.js:581:7)
+    at Socket.emit (node:events:514:28)
+    at addChunk (node:internal/streams/readable:568:12) {
+  errors: [Getter/Setter],
+  warnings: [Getter/Setter]
+}
