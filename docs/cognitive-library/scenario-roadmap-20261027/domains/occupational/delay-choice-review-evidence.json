@@ -1,0 +1,159 @@
+{
+  "kind": "STATIC_DESIGN_REVIEW_ONLY_NOT_RUNTIME_ACCEPTANCE",
+  "status": "DOMAIN_OWNERSHIP_CONFIRMED_AWAITING_USER_DESIGN_APPROVAL",
+  "browser": "cloud system Chromium via installed Python Playwright; Chromium internal sandbox unavailable; rendered original script-free HTML inside execution container with temporary writable XDG dirs",
+  "chromiumSandbox": false,
+  "firstFailedAttempt": "delay-choice-render-first.json",
+  "network": "all page requests aborted; authored HTML set_content only",
+  "executedTaskRunner": false,
+  "captures": [
+    {
+      "label": "review",
+      "viewport": [
+        1290,
+        1400
+      ],
+      "imagePath": "delay-choice-review.png",
+      "facts": {
+        "viewport": 1290,
+        "documentWidth": 1290,
+        "height": 1667,
+        "scripts": 0,
+        "forms": 0,
+        "images": 0,
+        "offers": [
+          {
+            "text": "选项 A / Option A\n\n20点\n\n今天\nToday · 第0天",
+            "x": 473,
+            "y": 510.8125,
+            "width": 166
+          },
+          {
+            "text": "选项 B / Option B\n\n25点\n\n2周后\nIn 2 weeks · 第14天",
+            "x": 651,
+            "y": 510.8125,
+            "width": 166
+          }
+        ],
+        "overflow": []
+      }
+    },
+    {
+      "label": "phone",
+      "viewport": [
+        390,
+        844
+      ],
+      "imagePath": "delay-choice-phone.png",
+      "facts": {
+        "viewport": 390,
+        "documentWidth": 390,
+        "height": 4064,
+        "scripts": 0,
+        "forms": 0,
+        "images": 0,
+        "offers": [
+          {
+            "text": "选项 A / Option A\n\n20点\n\n今天\nToday · 第0天",
+            "x": 31,
+            "y": 1554.546875,
+            "width": 159
+          },
+          {
+            "text": "选项 B / Option B\n\n25点\n\n2周后\nIn 2 weeks · 第14天",
+            "x": 200,
+            "y": 1554.546875,
+            "width": 159
+          }
+        ],
+        "overflow": []
+      }
+    },
+    {
+      "label": "tablet",
+      "viewport": [
+        820,
+        1180
+      ],
+      "imagePath": "delay-choice-tablet.png",
+      "facts": {
+        "viewport": 820,
+        "documentWidth": 820,
+        "height": 3313,
+        "scripts": 0,
+        "forms": 0,
+        "images": 0,
+        "offers": [
+          {
+            "text": "选项 A / Option A\n\n20点\n\n今天\nToday · 第0天",
+            "x": 43,
+            "y": 1284.359375,
+            "width": 361
+          },
+          {
+            "text": "选项 B / Option B\n\n25点\n\n2周后\nIn 2 weeks · 第14天",
+            "x": 416,
+            "y": 1284.359375,
+            "width": 361
+          }
+        ],
+        "overflow": []
+      }
+    }
+  ],
+  "budgetMinutes": {
+    "researchExact": [
+      6.2,
+      9.6
+    ],
+    "researchLabel": [
+      6,
+      10
+    ],
+    "experienceExact": [
+      4.1,
+      6.3
+    ],
+    "experienceLabel": [
+      4,
+      7
+    ]
+  },
+  "files": [
+    {
+      "filename": "delay-choice-review.html",
+      "bytes": 8390,
+      "sha256": "2ebeeb98815d892695c629361bf62d7aa61de4686f5bfe307b99cdc6233ee424"
+    },
+    {
+      "filename": "delay-choice-review.png",
+      "bytes": 417090,
+      "sha256": "dd0b74ac35aa23583ce6903ab444a534680ffce21f7d38d15d8edf5a373021dc"
+    },
+    {
+      "filename": "delay-choice-brief.md",
+      "bytes": 4274,
+      "sha256": "e132637393f3f21bb17bcc2343226b25169e39e62f648219c830076fab62ddf2"
+    },
+    {
+      "filename": "delay-choice-appendix.md",
+      "bytes": 6663,
+      "sha256": "65e81fca56a7f65f740d13e0b583e5a9cdde9869a1660a8f754de1e7dcd3f154"
+    },
+    {
+      "filename": "delay-choice-proposal-20261027.md",
+      "bytes": 8932,
+      "sha256": "6ec09bf41b45f741354f153b454c0b504a9b3c96722e2773ea04d64e89729c2a"
+    },
+    {
+      "filename": "delay-choice-render-first.json",
+      "bytes": 526,
+      "sha256": "04d51304843e8b0f5b1ff400fddfc5281daa9a94593ad57da836155cae87505f"
+    }
+  ],
+  "limits": [
+    "static layout, not real devices",
+    "no participant records",
+    "no runner, sequence, scorer, application test, CI or product integration"
+  ]
+}
