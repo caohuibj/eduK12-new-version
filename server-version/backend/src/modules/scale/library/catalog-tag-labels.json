@@ -259,6 +259,26 @@
     "label": "社会意识",
     "axis": "construct"
   },
+  "construct:sel_secq25_relationship_management": {
+    "label": "关系管理",
+    "axis": "construct"
+  },
+  "construct:sel_secq25_responsible_decision_making": {
+    "label": "负责的决策",
+    "axis": "construct"
+  },
+  "construct:sel_secq25_self_awareness": {
+    "label": "自我觉察",
+    "axis": "construct"
+  },
+  "construct:sel_secq25_self_management": {
+    "label": "自我管理",
+    "axis": "construct"
+  },
+  "construct:sel_secq25_social_awareness": {
+    "label": "社会觉察",
+    "axis": "construct"
+  },
   "construct:sel_wcsd_seca_emotion_knowledge": {
     "label": "自我觉察：情绪知识",
     "axis": "construct"
