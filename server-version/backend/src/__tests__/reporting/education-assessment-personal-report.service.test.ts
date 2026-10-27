@@ -27,7 +27,7 @@ describe('education respondent multi-tool report service (mock DB boundary, real
     expect(data).toMatchObject({kind:'EDUCATION_ASSESSMENT_PERSONAL_REPORT',state:'READY',reports:[{status:'READY'},{status:'READY'}]})
     expect(f.assertSourceAuthority).toHaveBeenCalledTimes(2)
     expect(m.query).toHaveBeenCalledTimes(2)
-    expect(m.summary).toHaveBeenCalledWith('self','execution',{disclosureOnly:true})
+    expect(m.summary).toHaveBeenCalledWith('self','execution',{disclosureOnly:true,db:expect.objectContaining({$queryRaw:m.query})})
     expect(m.units).toHaveBeenCalledTimes(1)
     const sql=m.query.mock.calls[0][0].strings.join(' ')
     expect(sql).toContain("a.relationship_kind='SELF'")
@@ -135,7 +135,7 @@ it('keeps identically named metrics in distinct approved unit reports instead of
   {itemId:f.origin.units[0].itemId,rendered:{blocks:[{type:'TEXT'},{metricKey:'score',value:10}]}},
   {itemId:f.origin.units[1].itemId,rendered:{blocks:[{type:'TEXT'},{metricKey:'score',value:11}]}},
  ]})
- expect(m.summary).toHaveBeenCalledWith('self','execution',{disclosureOnly:true})
+ expect(m.summary).toHaveBeenCalledWith('self','execution',{disclosureOnly:true,db:expect.objectContaining({$queryRaw:m.query})})
 })
 
 it('production composition consumes HISTORY and original proofs without new-use or current-issuer admission',async()=>{
@@ -147,9 +147,36 @@ it('production composition consumes HISTORY and original proofs without new-use 
  expect(m.query).toHaveBeenCalledTimes(2)
 })
 
-it('pure Form BUNDLE confirms a completed parent without measurement, interpretation or score rows',async()=>{
+async function formOnly(mode:'NONE'|'COMPLETION_ONLY'='COMPLETION_ONLY'){
  const f=await setup();f.origin.family='BUNDLE';f.origin.units=[]
- Object.assign(f.source.runtime,{formSections:[{id:'approved-form-section'}],items:[]})
+ Object.assign(f.source.runtime,{formSections:[{id:'approved-form-section'}],items:[{type:'FORM'}]})
+ f.contract.audiences.RESPONDENT={mode,metricKeys:[],longitudinalMetricKeys:[]}
+ f.source.entry.resultDisclosure=f.contract;f.own.policyHash=canonicalHash(f.own.policy)
+ Object.assign(f.parent,{trainingContentInterpretationEncrypted:null,trainingContentInterpretationHash:null})
+ return f
+}
+it('pure Form BUNDLE confirms a completed parent without measurement, interpretation or score rows',async()=>{
+ const f=await formOnly()
  expect(await f.read(input)).toMatchObject({state:'COMPLETED',mode:'COMPLETION_ONLY'})
+ expect(m.units).not.toHaveBeenCalled();expect(m.summary).not.toHaveBeenCalled();expect(m.job).not.toHaveBeenCalled()
+})
+it('pure Form NONE never exposes completion feedback from the measurement-free exception',async()=>{
+ const f=await formOnly('NONE')
+ expect(await f.read(input)).toMatchObject({state:'WITHHELD',mode:'NONE'})
+ expect(m.units).not.toHaveBeenCalled();expect(m.summary).not.toHaveBeenCalled();expect(m.job).not.toHaveBeenCalled()
+})
+it('pure Form completion obeys the same frozen opening and opens without creating report facts',async()=>{
+ const f=await formOnly(),readReportOpening=vi.fn().mockResolvedValue({releaseAt:'2099-01-01T00:00:00.000Z'})
+ const read=createEducationAssessmentReportReader({readSource:f.readSource,assertSourceAuthority:f.assertSourceAuthority,readReportOpening})
+ expect(await read(input)).toMatchObject({state:'WITHHELD',mode:'NONE',releaseAt:'2099-01-01T00:00:00.000Z'})
+ expect(readReportOpening).toHaveBeenCalledTimes(2)
+ readReportOpening.mockResolvedValue({releaseAt:'2000-01-01T00:00:00.000Z'})
+ expect(await read(input)).toMatchObject({state:'COMPLETED',mode:'COMPLETION_ONLY'})
+ expect(m.units).not.toHaveBeenCalled();expect(m.summary).not.toHaveBeenCalled();expect(m.job).not.toHaveBeenCalled()
+})
+it('pure Form still fails closed for configured but missing shared feedback timing identity',async()=>{
+ const f=await formOnly()
+ Object.assign(f.parent.compositeAssessment,{trainingFeedbackPolicy:{schemaVersion:1,mode:'SCHEDULED',releaseAt:'2099-01-01T00:00:00.000Z'},trainingFeedbackPolicyHash:'a'.repeat(64)})
+ expect(await f.read(input)).toMatchObject({state:'WITHHELD',mode:'NONE'})
  expect(m.units).not.toHaveBeenCalled();expect(m.summary).not.toHaveBeenCalled()
 })

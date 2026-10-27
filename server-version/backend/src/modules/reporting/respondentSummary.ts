@@ -9,13 +9,17 @@ import { reportingFail } from './types'
 
 const hidden = (): never => reportingFail('REPORT_NOT_FOUND', 'reporting resource not found', 404)
 type RespondentDisclosure={schemaVersion:1;mode:string;state:'READY'|'COMPLETED'|'WITHHELD';metricKeys?:string[]}
+type RespondentDisclosureOptions={disclosureOnly:true;db?:Prisma.TransactionClient}
 export function readRespondentRunSummary(userId:string,executionId:string):Promise<ReturnType<typeof projectAudienceResult>>
-export function readRespondentRunSummary(userId:string,executionId:string,options:{disclosureOnly:true}):Promise<RespondentDisclosure>
+export function readRespondentRunSummary(userId:string,executionId:string,options:RespondentDisclosureOptions):Promise<RespondentDisclosure>
 /** The internal disclosure-only consumer independently verifies canonical facts
  * per unit. It receives no metrics and cannot flatten or merge identically named
- * metrics from different instruments. Existing two-argument callers are unchanged. */
-export async function readRespondentRunSummary(userId: string, executionId: string, options?:{disclosureOnly:true}) {
-  const readOwn = () => prisma.$queryRaw<Array<{ organizationId: string; runId: string; trackId: string; subjectUserId: string; relationship: string; perspective: any; family: string; key: string; version: string; policy: any; hash: string }>>`
+ * metrics from different instruments. A supplied db keeps its own/current source
+ * checks in the caller's transaction; it never replaces them with cached rights.
+ * Existing two-argument callers are unchanged. */
+export async function readRespondentRunSummary(userId: string, executionId: string, options?:RespondentDisclosureOptions) {
+  const db=options?.db??prisma
+  const readOwn = () => db.$queryRaw<Array<{ organizationId: string; runId: string; trackId: string; subjectUserId: string; relationship: string; perspective: any; family: string; key: string; version: string; policy: any; hash: string }>>`
     SELECT e.organization_id AS "organizationId",e.run_id AS "runId",e.track_id AS "trackId",s.user_id AS "subjectUserId",
       a.relationship_kind AS relationship,a.perspective,t.resource_family AS family,t.resource_key AS key,t.resource_version AS version,
       t.frozen_resource_policy AS policy,t.resource_policy_hash AS hash
@@ -48,7 +52,7 @@ export async function readRespondentRunSummary(userId: string, executionId: stri
   `
   const row = (await readOwn())[0]
   if (!row?.policy?.resultDisclosure || canonicalHash(row.policy) !== row.hash) return hidden()
-  const entry = await resolveHistoricalRelationalEntry({resourceKind:row.family as any,resourceKey:row.key,resourceVersion:row.version})
+  const entry = await resolveHistoricalRelationalEntry({resourceKind:row.family as any,resourceKey:row.key,resourceVersion:row.version},db)
   if (!entry || entry.releaseStatus !== 'PUBLISHED' || !entry.resultDisclosure || canonicalHash(entry.resultDisclosure) !== canonicalHash(row.policy.resultDisclosure)) return hidden()
   const contract = validateResultDisclosureContract(row.policy.resultDisclosure)
   const rule = contract.audiences.RESPONDENT
@@ -56,7 +60,7 @@ export async function readRespondentRunSummary(userId: string, executionId: stri
   if (rule.mode !== 'INDIVIDUAL_SUMMARY' || row.policy.analysisMode !== 'INDIVIDUAL_ONLY') return hidden()
   const assertCurrent=async()=>{
     const current = (await readOwn())[0]
-    const currentEntry = await resolveHistoricalRelationalEntry({resourceKind:row.family as any,resourceKey:row.key,resourceVersion:row.version})
+    const currentEntry = await resolveHistoricalRelationalEntry({resourceKind:row.family as any,resourceKey:row.key,resourceVersion:row.version},db)
     if (!current || current.hash !== row.hash || canonicalHash(current.policy) !== current.hash
         || !currentEntry || currentEntry.releaseStatus !== 'PUBLISHED' || !currentEntry.resultDisclosure
         || canonicalHash(currentEntry.resultDisclosure) !== canonicalHash(contract)) return hidden()

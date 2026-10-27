@@ -108,18 +108,17 @@ export function createEducationAssessmentReportReader<Source extends EducationAs
       }
     }
     const rule=contract.audiences.RESPONDENT
-    if(origin.family==='BUNDLE'&&origin.units.length===0){
+    if(rule.mode==='NONE'){await recheck();return response('WITHHELD','本次测评暂不提供个人反馈。')}
+    const formOnly=origin.family==='BUNDLE'&&origin.units.length===0
+    if(formOnly){
       // The source resolver validates the frozen pure-Form definition. No
       // measurement/reference/report receipt is needed to confirm a Form FINAL.
       if(!source.runtime.formSections?.length||source.runtime.items?.some(item=>item.type!=='FORM'))hidden()
-      await recheck()
-      return parent.status==='COMPLETED'?response('COMPLETED','本次表单已正式完成，当前只提供完成确认。'):
-        response('WITHHELD','当前尚未收到整份表单的完成确认。')
+      if(parent.status!=='COMPLETED'){await recheck();return response('WITHHELD','当前尚未收到整份表单的完成确认。')}
     }
-    if(rule.mode==='NONE'){await recheck();return response('WITHHELD','本次测评暂不提供个人反馈。')}
-    const job=parent.asyncReportEpoch===parent.attemptEpoch?await tx.compositeReportJob.findUnique({where:{attemptId_attemptEpoch:{attemptId:parent.id,attemptEpoch:parent.attemptEpoch}},
+    const job=!formOnly&&parent.asyncReportEpoch===parent.attemptEpoch?await tx.compositeReportJob.findUnique({where:{attemptId_attemptEpoch:{attemptId:parent.id,attemptEpoch:parent.attemptEpoch}},
       select:{status:true,attemptEpoch:true,slotSetHash:true,contextHash:true,aggregateInputHash:true,wholeAcceptedAt:true}}):null
-    if(parent.status!=='COMPLETED'||!trainingFeedbackReportReady(parent,job)){
+    if(!formOnly&&(parent.status!=='COMPLETED'||!trainingFeedbackReportReady(parent,job))){
       // PENDING describes a real accepted asynchronous job, never missing facts.
       if(job&&['PENDING','PROCESSING'].includes(job.status)&&job.attemptEpoch===parent.attemptEpoch&&job.slotSetHash===parent.frozenActiveSlotSetHash
         &&job.contextHash===parent.contextSnapshotHash&&(parent.status==='COMPLETED'||job.wholeAcceptedAt)){
@@ -136,10 +135,11 @@ export function createEducationAssessmentReportReader<Source extends EducationAs
     }
     const timing=evaluateTrainingFeedbackForAttempt(parent,{reportReady:true})
     if(!timing.allowed){await recheck();return response('WITHHELD','反馈尚未达到开放时间或披露条件。',timing.releaseAt)}
+    if(formOnly){await recheck();return response('COMPLETED','本次表单已正式完成，当前只提供完成确认。')}
     if(rule.mode==='COMPLETION_ONLY'){await recheck();return response('COMPLETED','本次作答已完成，当前仅提供完成确认。')}
     if(rule.mode!=='INDIVIDUAL_SUMMARY'||own.policy.analysisMode!=='INDIVIDUAL_ONLY')hidden()
     // Existing current respondent disclosure remains an independent ceiling.
-    const summary=await readRespondentRunSummary(input.actorUserId,input.executionId,{disclosureOnly:true})
+    const summary=await readRespondentRunSummary(input.actorUserId,input.executionId,{disclosureOnly:true,db:tx})
     if(summary.state!=='READY'||summary.mode!=='INDIVIDUAL_SUMMARY'){
       await recheck();return response('WITHHELD','当前反馈尚未获准显示。')
     }
