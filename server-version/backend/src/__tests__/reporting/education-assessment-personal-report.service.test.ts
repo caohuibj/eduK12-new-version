@@ -122,6 +122,13 @@ it('does not replace original source authority proofs with another later adminis
  await expect(f.read(input)).rejects.toMatchObject({statusCode:404})
 })
 
+it('refuses replacement of the frozen distribution proof while materializing a saved report',async()=>{
+ const f=await setup(),origin=structuredClone(f.origin)
+ origin.distribution.grants[0].version+=1
+ f.readSource.mockResolvedValueOnce(f.source).mockResolvedValueOnce({...f.source,origin})
+ await expect(f.read(input)).rejects.toMatchObject({statusCode:404})
+})
+
 it('keeps identically named metrics in distinct approved unit reports instead of flattening a mixed bundle',async()=>{
  const f=await setup('score'),data=await f.read(input)
  expect(data).toMatchObject({state:'READY',reports:[

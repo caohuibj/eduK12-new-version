@@ -16,9 +16,12 @@ import {readEducationRespondentAssessmentReport} from '../../modules/reporting/e
 import {generateToken} from '../../utils/jwt'
 import {cacheService} from '../../services/cacheService'
 import {closeQueues} from '../../config/queue'
+import {issueAdminContentRoot,revokeAdminContentGrant} from '../../modules/measurement-content/admin-authority.service'
+import {assertEducationAssessmentDistributionCurrent} from '../../modules/education-tools/assessment-resource.distribution'
 
 const url=integrationDatabaseUrl('PR363_FEEDBACK_DATABASE_URL'),suite=url?describe:describe.skip
 let db:PrismaClient,server:Server,base:string
+const adminProof=()=>({tokenVersion:0,adminSessionId:'synthetic-report-fixture-only',adminVerifiedAt:Date.now()/1000})
 /** Synthetic accepted FINAL facts only. This verifies production source/current
  * report SQL and real account middleware on a fully migrated disposable DB;
  * it does not claim new-tool publication/START/scoring/FINAL qualification. */
@@ -27,7 +30,7 @@ async function seed(product:'SCHOOL'|'TEACHER'){
  const map=new Map<number,string>([[2,actors.organizationId]])
  const id=(n:number)=>{if(!map.has(n))map.set(n,randomUUID());return map.get(n)!}
  const attemptId=randomUUID(),assignmentId=randomUUID(),executionId=randomUUID(),trackId=randomUUID(),actorId=randomUUID(),relationshipId=randomUUID()
- const f=await educationReportFixture(product,['COGNITIVE'],{id,actorUserId:actors.participantUserId,ownerUserId:actors.managerUserId,attemptId,assignmentId})
+ const f=await educationReportFixture(product,['COGNITIVE'],{id,actorUserId:actors.participantUserId,ownerUserId:actors.libraryAdminUserId,sourceActorId:actors.libraryAdminUserId,attemptId,assignmentId})
  for(const release of f.releases.values()){
   if(release.layer==='REPORT'&&release.scope.kind!=='PLATFORM')release.scope.resourceId=f.origin.runtimeCompositeId
   await db.measurementContentRelease.create({data:{id:release.releaseId,key:release.key+'-'+f.origin.resourceId,version:release.version,layer:release.layer,family:release.family,
@@ -35,14 +38,20 @@ async function seed(product:'SCHOOL'|'TEACHER'){
    assetRefs:release.assetRefs,sourceReleaseId:null,publishedBy:actors.libraryAdminUserId,status:'PUBLISHED'}})
  }
  await db.cognitiveTestConfig.create({data:{id:id(100),testType:'synthetic-report-'+randomUUID(),configVersion:'1',name:'Synthetic frozen report identity',engineVersion:'1',scoringVersion:'1',config:{},status:'PUBLISHED'}})
- await db.cognitiveAssignment.create({data:{id:id(110),configId:id(100),createdBy:actors.managerUserId,title:'Synthetic accepted report',status:'PUBLISHED',listedStandalone:false}})
+ await db.cognitiveAssignment.create({data:{id:id(110),configId:id(100),createdBy:actors.libraryAdminUserId,title:'Synthetic accepted report',status:'PUBLISHED',listedStandalone:false}})
  const snapshot={schemaVersion:1 as const,compositeId:f.origin.runtimeCompositeId,units:f.binding.units}
- await db.compositeAssessment.create({data:{id:f.origin.sourceCompositeId,code:'synthetic-source-'+randomUUID(),name:'Synthetic original source',status:'PUBLISHED',createdBy:actors.managerUserId}})
- await db.compositeAssessment.create({data:{id:f.origin.runtimeCompositeId,code:'synthetic-runtime-'+randomUUID(),name:'Synthetic education report runtime',status:'PUBLISHED',createdBy:actors.managerUserId,
+ await db.compositeAssessment.create({data:{id:f.origin.sourceCompositeId,code:'synthetic-source-'+randomUUID(),name:'Synthetic original source',status:'PUBLISHED',createdBy:actors.libraryAdminUserId}})
+ await db.compositeAssessment.create({data:{id:f.origin.runtimeCompositeId,code:'synthetic-runtime-'+randomUUID(),name:'Synthetic education report runtime',status:'PUBLISHED',createdBy:actors.libraryAdminUserId,
   productKind:'ORGANIZATION_RESOURCE',publicEnabled:false,copyable:false,trainingContentSnapshot:snapshot,trainingContentSnapshotHash:canonicalHash(snapshot)}})
  await db.compositeAssessmentItem.create({data:{id:id(10),compositeAssessmentId:f.origin.runtimeCompositeId,type:'COGNITIVE',position:0,required:true,cognitiveAssignmentId:id(110)}})
  const runtime=await db.compositeAssessment.findUniqueOrThrow({where:{id:f.origin.runtimeCompositeId},include:{items:true,formSections:true}})
  f.origin.runtimeDefinitionHash=canonicalHash(buildTrainingFlowUnits(runtime))
+ const resourceKeys=[f.origin.sourceCompositeId,...f.releases.keys()]
+ const distribution=await issueAdminContentRoot(actors.libraryAdminUserId,adminProof(),{requestId:randomUUID(),expectedVersion:0,reason:'Explicit isolated synthetic report history fixture only',
+  grant:{subjectId:actors.libraryAdminUserId,scope:{product,scopeKind:'ORGANIZATION',scopeId:actors.organizationId,resourceKind:'material',resourceKeys},capabilities:['material.distribute'],
+   delegableCapabilities:[],remainingDelegationDepth:0,validFrom:new Date(Date.now()-60_000).toISOString(),expiresAt:new Date(Date.now()+3_600_000).toISOString()}})
+ f.origin.distribution={actorId:actors.libraryAdminUserId,grants:resourceKeys.map(resourceId=>({resourceId,grantId:distribution.grantId,version:distribution.version})).sort((a,b)=>a.resourceId.localeCompare(b.resourceId))}
+ await db.$transaction(tx=>assertEducationAssessmentDistributionCurrent(tx,f.origin))
  const draft=draftEducationAssessmentEntry({origin:f.origin,title:'Synthetic approved education report',disclosure:f.contract})
  const reviewer=await db.user.create({data:{username:'report-reviewer-'+randomUUID(),passwordHash:'synthetic-only',role:'ADMIN',platformRole:'SYSTEM_ADMIN',accountDomain:'LEGACY'}})
  const original={kind:'SYSTEM_ADMIN',actorId:actors.libraryAdminUserId},review={kind:'SYSTEM_ADMIN',actorId:reviewer.id}
@@ -73,7 +82,7 @@ async function seed(product:'SCHOOL'|'TEACHER'){
  for(const row of f.rows)await db.assessmentUnitSnapshot.create({data:{...row,unitType:'COGNITIVE',terminalState:'COMPLETED',payloadKind:'UNIT_RESULT',completedAt:new Date()}})
  await db.$executeRaw`INSERT INTO assessment_run_executions(id,organization_id,run_id,track_id,subject_actor_snapshot_id,respondent_actor_snapshot_id,relationship_snapshot_id,status,relational_assignment_id,runtime_binding_kind,runtime_binding_ref,started_at,completed_at)
   VALUES(${executionId},${actors.organizationId},${actors.runId},${trackId},${actorId},${actorId},${relationshipId},'COMPLETED',${assignmentId},'COMPOSITE',${attemptId},clock_timestamp(),clock_timestamp())`
- return {...actors,...f,executionId,reviewer,role,entry,key}
+ return {...actors,...f,executionId,reviewer,role,entry,key,distribution}
 }
 
 suite('education production report composition with real migrated PostgreSQL and real account middleware',()=>{
@@ -94,6 +103,9 @@ suite('education production report composition with real migrated PostgreSQL and
   expect((await fetch(endpoint,{headers:{cookie}})).status).toBe(200)
   expect((await fetch(endpoint,{headers:{cookie:'ptool_session='+token}})).status).toBe(401)
   expect((await fetch(endpoint,{headers:{cookie:(product==='SCHOOL'?'huiteacher_session':'huischool_session')+'='+token}})).status).toBe(401)
+  await revokeAdminContentGrant(f.libraryAdminUserId,adminProof(),f.distribution.grantId,{expectedVersion:f.distribution.version,reason:'Stop only new synthetic distribution'})
+  await expect(db.$transaction(tx=>assertEducationAssessmentDistributionCurrent(tx,f.origin))).rejects.toThrow('CONTENT_AUTHORITY_DENIED')
+  expect((await fetch(endpoint,{headers:{cookie}})).status).toBe(200)
   await db.user.update({where:{id:f.libraryAdminUserId},data:{isFrozen:true}})
   await db.user.update({where:{id:f.reviewer.id},data:{platformRole:'STANDARD'}})
   await db.$executeRaw`UPDATE education_assessment_deliveries SET status='RETIRED',retired_by_user_id=${f.managerUserId},retired_at=clock_timestamp() WHERE id=${f.origin.resourceId}`

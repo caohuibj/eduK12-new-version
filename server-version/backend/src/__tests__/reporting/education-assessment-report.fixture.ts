@@ -8,19 +8,17 @@ import type { StoredRelease } from '../../modules/measurement-content/repository
 import { interpretContentBinding } from '../../modules/measurement-content/final-interpretation'
 import type { TrainingFinalReceipt } from '../../modules/composite/training-content-final'
 import type { TrainingContentSnapshot } from '../../modules/composite/training-content-binding'
-import { educationAssessmentOriginSchema, educationAssessmentResourceKey, type EducationAssessmentOrigin } from '../../modules/education-tools/assessment-resource.contract'
+import { educationAssessmentResourceKey, type EducationAssessmentOrigin } from '../../modules/education-tools/assessment-resource.contract'
 import { draftEducationAssessmentEntry } from '../../modules/education-tools/assessment-resource.contract'
 
 const hash='a'.repeat(64)
 const uid=(n:number)=>`00000000-0000-4000-8000-${String(n).padStart(12,'0')}`
-export async function educationReportFixture(product:'SCHOOL'|'TEACHER'='SCHOOL',families:Array<'SCALE'|'COGNITIVE'|'SJT'>=['COGNITIVE'],options:{sharedMetricKey?:string;id?:(n:number)=>string;actorUserId?:string;ownerUserId?:string;attemptId?:string;assignmentId?:string}={}){
+export async function educationReportFixture(product:'SCHOOL'|'TEACHER'='SCHOOL',families:Array<'SCALE'|'COGNITIVE'|'SJT'>=['COGNITIVE'],options:{sharedMetricKey?:string;id?:(n:number)=>string;actorUserId?:string;ownerUserId?:string;sourceActorId?:string;attemptId?:string;assignmentId?:string}={}){
   const id=options.id??uid,actorUserId=options.actorUserId??'self',ownerUserId=options.ownerUserId??'approved-author',attemptId=options.attemptId??'attempt',assignmentId=options.assignmentId??'assignment'
-  const candidate={schemaVersion:1,adapterVersion:'1.0.0',resourceId:id(1),organizationId:id(2),product,
+  const origin:EducationAssessmentOrigin={schemaVersion:1,adapterVersion:'1.0.0',resourceId:id(1),organizationId:id(2),product,
     family:families.length>1?'BUNDLE':families[0]==='SJT'?'SITUATIONAL':'COGNITIVE',sourceCompositeId:id(3),runtimeCompositeId:id(4),
-    sourceSnapshotHash:hash,runtimeSnapshotHash:hash,runtimeDefinitionHash:hash,units:[] as EducationAssessmentOrigin['units']}
-  // Compatible with root's additive source field without modifying its module.
-  if(!('runtimeDefinitionHash' in educationAssessmentOriginSchema.shape))delete (candidate as {runtimeDefinitionHash?:string}).runtimeDefinitionHash
-  const origin=candidate as EducationAssessmentOrigin
+    sourceSnapshotHash:hash,runtimeSnapshotHash:hash,runtimeDefinitionHash:hash,
+    distribution:{actorId:options.sourceActorId??id(80),grants:[]},units:[]}
   const contract:ResultDisclosureContractV1={schemaVersion:1,policyKey:'synthetic-reviewed-self-report',minimumRespondents:null,
     audiences:Object.fromEntries(resultAudiences.map(key=>[key,{mode:key==='RESPONDENT'?'INDIVIDUAL_SUMMARY':'NONE',
       metricKeys:key==='RESPONDENT'?[...new Set(families.map((_,i)=>options.sharedMetricKey??'score'+i))]:[],longitudinalMetricKeys:[]}])) as ResultDisclosureContractV1['audiences']}
@@ -46,6 +44,7 @@ export async function educationReportFixture(product:'SCHOOL'|'TEACHER'='SCHOOL'
     const core:CanonicalUnitResultCoreV1={schemaVersion:1,unitType:type,instrumentKey:'synthetic'+i,instrumentVersion:'1',sourceDefinitionHash:hash,compilerVersion:'1',compiledRuntimeHash:hash,scorerKey:'synthetic',scorerVersion:'1',quality:{status:'interpretable',flags:[]},metrics:[{key:metricKey,value:10+i,quality:'OK'},{key:'secret'+i,value:999}],facts:[],references:[],contextHash:null,scientificProvenance:{instrumentKey:'synthetic'+i,instrumentVersion:'1'}}
     facts.set(itemId,createCanonicalUnitResultEnvelope({core,completedAt:'2026-10-27T00:00:00Z',persistenceProvenance:{sourceType:family==='COGNITIVE'?'COGNITIVE_SESSION':family==='SCALE'?'ASSESSMENT':'SITUATIONAL_ATTEMPT',sourceAttemptId:id(200+i),sourceSubmissionId:id(300+i)}}))
   }
+  origin.distribution.grants=[origin.sourceCompositeId,...releases.keys()].map((resourceId,i)=>({resourceId,grantId:id(500+i),version:1})).sort((a,b)=>a.resourceId.localeCompare(b.resourceId))
   origin.runtimeSnapshotHash=canonicalHash({schemaVersion:binding.schemaVersion,compositeId:binding.compositeId,units:binding.units})
   binding.publicationHash=origin.runtimeSnapshotHash
   const bindingHash=canonicalHash(binding)
