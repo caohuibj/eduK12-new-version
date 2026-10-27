@@ -1,0 +1,654 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "swls5_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "text": "下面有五句话，表达一个人对自己整体生活的看法。请根据你现在的真实感受，选择每句话与你的想法有多一致。1表示完全不同意，7表示非常同意；答案没有对错，也不必考虑别人会怎样评价。",
+    "source": "依照Diener等1985英文原版说明独立编写的中文工作引导语；未复制官网2002年Mantak Yuen特别授权研究译文。"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "生活满意度量表（SWLS，5题）— 独立中文研究工作译稿",
+      "abbreviation": "SWLS5-ZH-WORKING",
+      "instrumentFamily": "Satisfaction With Life Scale (SWLS)"
+    },
+    "construct": {
+      "primaryDomain": "WELL_BEING",
+      "secondaryDomains": [],
+      "constructDefinition": "对自身整体生活状况的认知性满意度判断，五题只产生一个总分；不是临床抑郁/焦虑量表，也不能作为生活成败、人格优劣、经济条件或教育能力的客观评价。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "domain:wellbeing",
+        "domain:subjective_wellbeing",
+        "construct:life_satisfaction",
+        "construct:global_cognitive_judgment",
+        "construct:single_total_score",
+        "construct:not_clinical_diagnosis",
+        "orientation:subjective_wellbeing",
+        "orientation:positive_psychology",
+        "orientation:not_therapy_specific",
+        "population:adult_research",
+        "population:project_18_plus",
+        "population:self_report",
+        "population:not_k12_validated",
+        "population:not_chinese_translation_validated",
+        "response:self",
+        "response:digital_self",
+        "response:five_items",
+        "response:seven_point_agreement_1_to_7",
+        "response:no_reverse_items",
+        "response:fixed_original_order",
+        "response:sum_5_to_35",
+        "response:no_fixed_recall_window",
+        "response:complete_required_project_policy",
+        "use:research",
+        "use:individual_reflection",
+        "use:score_only",
+        "use:not_diagnostic",
+        "use:not_selection",
+        "use:no_chinese_norms",
+        "use:no_activated_bands",
+        "license:noncommercial_only",
+        "license:author_contact_required",
+        "license:redistribution_review_pending",
+        "license:translation_review_pending",
+        "license:original_author_attribution_required",
+        "license:full_original_text_acquired",
+        "language_validation:source_en",
+        "language_validation:content_zh-CN",
+        "language_validation:independent_working_translation",
+        "language_validation:official_traditional_translation_separate",
+        "language_validation:expert_review_pending",
+        "language_validation:cognitive_debrief_not_established",
+        "language_validation:local_validation_pending",
+        "生活满意度",
+        "幸福感",
+        "生活质量主观评价",
+        "成人自评",
+        "五题",
+        "7级同意度",
+        "非商业",
+        "需要联系作者",
+        "独立中文研究工作稿",
+        "非诊断"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "源量表有成人和大学生研究。平台保守限18+自评；平台独立中文译稿未经专业译审或中国人群验证，不借官网繁体中文版或其他研究的适用性结论。"
+    },
+    "administration": {
+      "itemCount": 5,
+      "estimatedMinutes": 2,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED"
+      ],
+      "timeFrame": "整体生活评价，无原作者规定的固定回顾天数。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "固定1985 SWLS英文原版及作者官网下载PDF的5题次序，不混5级改编版或3题缩写版。",
+        "每题1–7同意度，7个锚点按照作者PDF语义独立中文表达，4为中间中立选项。",
+        "全部5题无反向；唯一总分是5题原值求和5–35，不输出小维度或其他心理能力总分。",
+        "本平台保守采用五题齐全才计算总分，缺一题时不插补；并非作者正式规定的个人缺答规则。",
+        "作者PDF所载7级原版解释和另一本解释指南分档边界不同；此工作稿不激活任一套经验分档，不冒充中国常模。",
+        "官方Mantak Yuen 2002繁体中文研究译本另有特别许可，本工作稿不复制其文字或继承验证。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "原英语版本有发展/应用文献；独立中文工作稿的译文信效度尚未建立。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "辅助个人思考对生活的整体评价；不是诊断、职业选拔或学校考核。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "swls-diener1985-original",
+        "evidenceType": "CONTENT_VALIDITY",
+        "population": "原英文研究人群；研究取样细节及受试国家不在本次静态复核中重建",
+        "locale": "en",
+        "territory": "ZZ",
+        "studyDesign": "原开发和效度研究提出SWLS五题总量表；此处仅登记原文献，不推导平台独立中文译稿的结构效度。",
+        "rating": "UNKNOWN",
+        "citation": "Diener, E., Emmons, R. A., Larsen, R. J., & Griffin, S. (1985). The Satisfaction With Life Scale. Journal of Personality Assessment, 49(1), 71–75. https://doi.org/10.1207/s15327752jpa4901_13.",
+        "doi": "10.1207/s15327752jpa4901_13",
+        "url": "https://doi.org/10.1207/s15327752jpa4901_13"
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "官方英文SWLS五题PDF：https://eddiener.com/wp-content/uploads/2024/09/SWLS-Scale.pdf；平台依据英文逐项新译，官网有Mantak Yuen 2002独立授权繁体中文版本仅链接，不复制。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "五题均为平台独立简体中文草稿，不是官网繁体中文译本转简体。人工译审/认知访谈/中国人群效度与语言等值均待评估。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "swls5_zh_cn_research-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": [],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    }
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "swls5_zh_cn_research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "swls5_zh_cn_research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "translation",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL"
+    ],
+    "notes": [
+      "© Ed Diener 等原作者。Ed Diener 网站公开声明：SWLS可用于有署名的非商业研究，研究使用无需逐次申请；https://eddiener.com/satisfaction-with-life-scale-swls/。该声明不自动覆盖商业用途、公开GitHub完整翻译文本再分发或对第三方再授权。平台中文题文、指导语、反馈均为从1985原版英文题意独立撰写的研究工作译稿，没有复制Mantak Yuen于2002年获特别许可的官网中文研究译本。版权/翻译/数字化和公开分发范围由管理员另行协调；作者未批准此精确平台版本，不能将取得完整英文题本或官网中文PDF误记为已获全面授权。",
+      "授权与作者联系由管理员最终决定，本提交为DRAFT/HIDDEN研发内容，权限待办不是新增内容开发门禁。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "SWLS 5-item original English form (Diener et al. 1985), independent Chinese working draft",
+        "citation": "Diener, E., Emmons, R. A., Larsen, R. J., & Griffin, S. (1985). The Satisfaction With Life Scale. Journal of Personality Assessment, 49(1), 71–75. https://doi.org/10.1207/s15327752jpa4901_13.",
+        "url": "https://eddiener.com/wp-content/uploads/2024/09/SWLS-Scale.pdf",
+        "publicationYear": 1985
+      },
+      "license": {
+        "status": "unknown",
+        "redistribution": "restricted",
+        "note": "© Ed Diener 等原作者。Ed Diener 网站公开声明：SWLS可用于有署名的非商业研究，研究使用无需逐次申请；https://eddiener.com/satisfaction-with-life-scale-swls/。该声明不自动覆盖商业用途、公开GitHub完整翻译文本再分发或对第三方再授权。平台中文题文、指导语、反馈均为从1985原版英文题意独立撰写的研究工作译稿，没有复制Mantak Yuen于2002年获特别许可的官网中文研究译本。版权/翻译/数字化和公开分发范围由管理员另行协调；作者未批准此精确平台版本，不能将取得完整英文题本或官网中文PDF误记为已获全面授权。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "swls_agreement_1_7",
+          "options": [
+            {
+              "value": "1",
+              "label": "完全不同意",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "不同意",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "有点不同意",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "既不同意也不赞同",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "有点赞同",
+              "score": 5
+            },
+            {
+              "value": "6",
+              "label": "同意",
+              "score": 6
+            },
+            {
+              "value": "7",
+              "label": "非常同意",
+              "score": 7
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "SWLS5_01",
+          "content": "从生活的多数方面来看，我现在的生活和自己理想中的状态比较接近。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "swls_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SWLS5_02",
+          "content": "我觉得自己目前的生活条件非常好。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "swls_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SWLS5_03",
+          "content": "整体而言，我对自己的生活感到满意。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "swls_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SWLS5_04",
+          "content": "到目前为止，我已经在生活中获得了那些自己很看重、也一直希望得到的东西。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "swls_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SWLS5_05",
+          "content": "假如能重新经历一次人生，我想改变的事情会非常少。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "swls_agreement_1_7",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "itemRules": [
+          {
+            "itemCode": "SWLS5_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SWLS5_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SWLS5_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SWLS5_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SWLS5_05",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "scores": [
+          {
+            "key": "total",
+            "type": "total",
+            "label": "生活满意度总分",
+            "description": "五题直接求和，理论范围5–35；更高表示在本次作答中自述对整体生活更满意，但不是诊断、常模排名或能力分级。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "SWLS5_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SWLS5_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SWLS5_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SWLS5_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SWLS5_05",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "total"
+        ],
+        "scoreOrder": [
+          "total"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "total",
+            "headline": "你如何看待现在的生活",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这份问卷邀请你从整体上看看目前的生活，与自己重视的期待是否接近。它关注的是你自己的生活评价，不是别人认为你应该有多幸福，也不是对工作、家庭或能力的客观评分。生活满意度可能受到最近的经历、关系和环境影响，分数本身不能说明你有什么心理问题，也不适合拿来和别人比较。可以想一想：哪些部分已经接近你想要的生活？哪些地方仍有距离，而且值得得到一些支持？如果愿意，可以先选一件自己有把握改变的小事，或者向信任的人谈谈一个长期没有被看见的需要。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回想近期生活中一件让你感到踏实的事，以及一个仍然需要关注的方面。"
+              },
+              {
+                "category": "strategy",
+                "text": "选一个对你重要、负担不大的具体行动，安排在适合自己的时间做一次。"
+              },
+              {
+                "category": "support",
+                "text": "如果有些生活条件暂时无法靠自己改变，可以考虑寻求可信任的人或专业资源支持。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这是独立简体中文研究工作译稿，尚未得到作者/译者认定、专业翻译审校、认知访谈或中国目标样本效度验证，不能继承官网2002繁体译文的证据。",
+          "理论分数5–35，没有将作者不同版本的经验解释档转换成中国人群常模、临床阈值或正常/异常标签。",
+          "个人生活满意度可能随时间、生活资源和环境变化，不能根据一个总分推断真实生活质量、精神障碍、能力或未来发展。",
+          "五题必须完整才计算总分；这是平台保守缺答策略，不是作者已发布的缺失处理算法。",
+          "原工具官网仅明确非商业研究用途及署名要求；正式系统公开分发、译文与商业用途交由管理员另核。"
+        ],
+        "disclaimer": "SWLS由Diener、Emmons、Larsen、Griffin（1985）编制，官网允许署名的非商业研究使用；本中文题文与反馈为EDUK12.TOP独立研究工作草稿，未经科学或授权正式审批。请勿用于诊断、排名或高风险选择。"
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "swls5",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "SWLS5_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SWLS5_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SWLS5_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SWLS5_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SWLS5_05",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 5
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "SWLS5_01",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SWLS5_02",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SWLS5_03",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SWLS5_04",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SWLS5_05",
+            "responseValue": "7"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 35
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "neutral",
+        "answers": [
+          {
+            "itemCode": "SWLS5_01",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SWLS5_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SWLS5_03",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SWLS5_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SWLS5_05",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 20
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "mixed_1_to_5",
+        "answers": [
+          {
+            "itemCode": "SWLS5_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SWLS5_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SWLS5_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SWLS5_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SWLS5_05",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 15
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "one_missing",
+        "answers": [
+          {
+            "itemCode": "SWLS5_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SWLS5_03",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SWLS5_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SWLS5_05",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "total": null
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "all_missing",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "total": null
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      }
+    ]
+  }
+}

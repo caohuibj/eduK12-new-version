@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "swls5_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "sourceCarrier": {
+    "officialEnglishPdf": "https://eddiener.com/wp-content/uploads/2024/09/SWLS-Scale.pdf",
+    "officialChinesePdf": "https://eddiener.com/wp-content/uploads/2025/02/SWLS_Chinese.pdf",
+    "originalDoi": "10.1207/s15327752jpa4901_13",
+    "englishEdition": "five_item_seven_point_author_site",
+    "chineseEdition": "Mantak Yuen 2002 specially-permitted separate translation, NOT copied"
+  },
+  "itemMap": [
+    {
+      "itemCode": "SWLS5_01",
+      "originalOrder": 1,
+      "englishConcept": "overall life near one's ideal"
+    },
+    {
+      "itemCode": "SWLS5_02",
+      "originalOrder": 2,
+      "englishConcept": "excellent conditions of life"
+    },
+    {
+      "itemCode": "SWLS5_03",
+      "originalOrder": 3,
+      "englishConcept": "general satisfaction with life"
+    },
+    {
+      "itemCode": "SWLS5_04",
+      "originalOrder": 4,
+      "englishConcept": "important desired things obtained so far"
+    },
+    {
+      "itemCode": "SWLS5_05",
+      "originalOrder": 5,
+      "englishConcept": "few changes if life were lived again"
+    }
+  ],
+  "scoring": {
+    "scoringVersion": "1.0.0",
+    "aggregation": "sum",
+    "itemCount": 5,
+    "reverseItemNumbers": [],
+    "theoreticalRange": [
+      5,
+      35
+    ],
+    "responseOptions": [
+      {
+        "value": "1",
+        "label": "完全不同意",
+        "score": 1
+      },
+      {
+        "value": "2",
+        "label": "不同意",
+        "score": 2
+      },
+      {
+        "value": "3",
+        "label": "有点不同意",
+        "score": 3
+      },
+      {
+        "value": "4",
+        "label": "既不同意也不赞同",
+        "score": 4
+      },
+      {
+        "value": "5",
+        "label": "有点赞同",
+        "score": 5
+      },
+      {
+        "value": "6",
+        "label": "同意",
+        "score": 6
+      },
+      {
+        "value": "7",
+        "label": "非常同意",
+        "score": 7
+      }
+    ],
+    "missingPolicy": "complete_required_project_choice"
+  },
+  "parameter": {
+    "policy": "score_only",
+    "referenceSet": "NOT_CREATED",
+    "publishedCutoffs": false
+  },
+  "report": {
+    "reportVersion": "1.0.0",
+    "scoreKeys": [
+      "total"
+    ]
+  },
+  "tags": {
+    "axes": [
+      "domain",
+      "construct",
+      "orientation",
+      "population",
+      "response",
+      "use",
+      "license",
+      "language_validation"
+    ],
+    "runtimeIndexing": "NOTRUN"
+  },
+  "rights": {
+    "researchNoncommercialWithCredit": "PERMITTED_BY_OFFICIAL_SITE",
+    "translationRedistribution": "ADMIN_REVIEW_PENDING",
+    "commercialUse": "NOT_GRANTED",
+    "authorContact": "ADMIN_TODO"
+  },
+  "execution": {
+    "staticInMemoryOnly": true,
+    "unit": "NOTRUN",
+    "db": "NOTRUN",
+    "ci": "NOTRUN",
+    "release": "DRAFT_HIDDEN"
+  }
+}
