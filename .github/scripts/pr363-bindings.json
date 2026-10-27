@@ -4,7 +4,7 @@
   "readiness": "READY",
   "branch": "perf/four-entry-feedback-20261027",
   "base": "7e6d7da4a01e4a42b410cf2dbdcfa76f11759fdc",
-  "product": "8b7d7a36887f64e9a3543b5561dbf197e290b40d",
+  "product": "7f472b204abc2fb6f715b6841b61fbf6c5dc2324",
   "components": {
     "backend": "3f56dbc63c9be94321c5f3d81dc10fffee5a9240",
     "frontend": "361fcbf63584d4e07cef72192a47d27e9392e050"
@@ -2620,7 +2620,7 @@
     },
     "server-version/e2e/pr363-fixture.cjs": {
       "before": null,
-      "after": "f9c90819e1514a0ed15adb8ad5084dc94e98074e"
+      "after": "77b2f39ac1f6d0de1aed35690d56dde977fb2083"
     },
     "server-version/e2e/pr363-native-template.json": {
       "before": null,
@@ -2807,9 +2807,12 @@
     ".github/scripts/pr363-control-evidence.json": null,
     ".github/scripts/pr363-controls.test.mjs": null,
     ".github/scripts/pr363-scope.mjs": null,
-    ".github/workflows/ci.yml": "31c345639cc790249d0c6a51a284971890613572"
+    ".github/workflows/ci.yml": "31c345639cc790249d0c6a51a284971890613572",
+    ".github/scripts/pr363-continuation-pins.json": null,
+    ".github/scripts/pr363-continuation.mjs": null,
+    ".github/scripts/pr363-continuation.test.mjs": null
   },
-  "controlCheckpoint": "8b7d7a36887f64e9a3543b5561dbf197e290b40d",
+  "controlCheckpoint": "7f472b204abc2fb6f715b6841b61fbf6c5dc2324",
   "protectedInputs": {
     "server-version/backend/Dockerfile": "8dfd85f6e843d964eb192cfdf52addffdc3c4132",
     "server-version/frontend/Dockerfile": "45dd87f6a8ed5a5bf45d3ea1e4126ce5e8d9f8b4",
@@ -11694,6 +11697,16 @@
           "blob": "113e99e003bd376bb7a25d617dc299ae54418671"
         },
         {
+          "path": ".github/scripts/pr363-continuation-pins.json",
+          "mode": "100644",
+          "blob": "b23a9974ebe85af2368c988e0fbf5ea84f0e08d1"
+        },
+        {
+          "path": ".github/scripts/pr363-continuation.mjs",
+          "mode": "100644",
+          "blob": "22da28d6ece1f512db935876ff06981fd02f65cf"
+        },
+        {
           "path": "server-version/backend/package-lock.json",
           "mode": "100644",
           "blob": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6"
@@ -11716,7 +11729,7 @@
         {
           "path": "server-version/e2e/pr363-fixture.cjs",
           "mode": "100644",
-          "blob": "f9c90819e1514a0ed15adb8ad5084dc94e98074e"
+          "blob": "77b2f39ac1f6d0de1aed35690d56dde977fb2083"
         },
         {
           "path": "server-version/e2e/pr363-native-template.json",
