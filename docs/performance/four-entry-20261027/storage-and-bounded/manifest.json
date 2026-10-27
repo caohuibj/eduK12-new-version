@@ -1,0 +1,39 @@
+{
+  "head": "2ae1e0d93fcf0851c4206b7f317b63786d5236e2",
+  "environment": {
+    "node": "24.22.1",
+    "postgres": "17.11",
+    "redis": "8.0.2",
+    "jit": "off",
+    "sharedBuffers": "64MB",
+    "maxConnections": 20
+  },
+  "boundedRead": {
+    "concurrency": [
+      1,
+      4,
+      8
+    ],
+    "requestsPerLevelPerProduct": 24,
+    "timeoutMs": 5000,
+    "stopOnFailure": true,
+    "requestsVerified": 144,
+    "failed": 0,
+    "distinctCompletedReports": 2
+  },
+  "files": {
+    "education-report-bounded.ts.txt": "ee4e1c887fbc2714347f50426e6bb3159a31e72bb6247989b1d3ae490e7c4bc5",
+    "education-report-bounded.json": "0197f3ffeddcfefa21392a315eb2818b72c07ce61a66c842219a987ffeabb97e",
+    "education-storage-probe.ts.txt": "bc6448cd889680493d14a8ed465d3512f96881b2558d14e6575c74f88bf1c3b9",
+    "survey-compact.json": "9b437b2908b3956c8fd0ed4230cc20cd6a134b451799eaa26b9788db4e9c57ef",
+    "education-storage-legacy.json": "de7b69b266d897b2b24829c42cfdbc10c1b928338a758e8f2e71f5371531426b",
+    "education-storage-compact-shared.json": "134560a310a4e5c7c52763edf1a4c1197a0677dc2a333d4a9db67c7188857152",
+    "training-whole-compact-probe.json": "bbd87eee662943ca582550c05d764f863579675c8df03e6ed2cbbafa9c7398ab"
+  },
+  "limits": [
+    "bounded batches are not sustained capacity",
+    "storage samples include fixture/version overhead across specified eight tables, not total system cost",
+    "no production flags changed",
+    "existing shared storage verified, not newly developed"
+  ]
+}

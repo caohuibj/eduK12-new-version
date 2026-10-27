@@ -93,3 +93,16 @@ main认知FINAL仍有cognitiveRawSubmission写入，未合并PR360的native/COS�
 两次都验证ACK接受、重放不变、处理前不是READY、真实worker后READY且两个不可变量表FINAL存在。worker耗时不是生产排队时间；整体用户等待还包括浏览器、调度和网络，不能将单个ACK作为报告可见时间。Node/PG/Redis同前述版本，另建独立合成DB，async/whole/durable-backlog/atomic-receipt开启，background worker自动循环关闭，compact/shared-control未开启。结束时自有进程均停止。
 
 现在四入口均有一条代表性观测，但口径不完全相同：Survey是独立研究协议；Training是prepared whole链；School/Teacher是service completion＋实际权限报告HTTP。完整工具矩阵、浏览器展示、同口径容量尚未完成，不把它们直接排名或计为M1全部关闭。
+
+## 有界并发与已有存储机制（06:32 UTC）
+
+不是持续容量：对每入口一个已完成合成报告，分别concurrency1/4/8、每档24次、单请求5秒上限、任一失败停止。School/Teacher合计144次HTTP均成功。School三档批次耗时733.7/368.2/358.7ms，单请求最大82.1/105.8/160.6ms；Teacher665.2/268.5/282.8ms，最大51.4/57.2/109.7ms。批次后规划设置恢复8。不是不同用户到达模型、不是长期稳定负载、不能用24/短批次耗时外推生产吞吐。
+
+已有`ASSESSMENT_COMPACT_FACTS_ENABLED`与`ASSESSMENT_SHARED_CONTROL_ENABLED`在独立合成进程对照开启，没有改生产开关，没有新存储引擎：
+
+- Survey三个场景再次完成原六个HTTP样本及持久化重放验证。选中结果密文：ordinary1116→546bytes；native-mixed6686→2275/2279；whole-package6786→2295，包报告1412→718。不是总DB空间或备份费用。
+- Training prepared whole两样本在这两个开关开启下，真实ACK/重放/worker/READY/报告同样闭环。
+- School/Teacher真实私有量表完成和授权报告均正常。明确8张运行/事实/模板表的fixture＋完成逻辑行增量：School28395→17431bytes，Teacher28393→16131bytes，已包含新增fact/template/binding，而不是只拿assessment行变小报节省。
+- 首份compact样本会为新事实/模板/绑定表分配页与索引，**物理分配可能比旧格式更大**；Teacher又复用了部分已建立模板，不能把两份简单平均当每答卷固定成本。尚缺多答卷摊销、WAL/备份/COS总体成本。实际报告读取也不是免费：本轮compact样本School90.5/47.5ms、Teacher70.3/44.8ms；legacy对照83.8/42.2、60.4/40.7，小样本仅记录，不下显著性或稳定代价结论。
+
+这些结果说明现有共享机制确实能被四入口代表链消费，下一步应核配置、摊销和实际负载，不重复开发一套压缩/引用逻辑。完整原件及边界在`storage-and-bounded/`。未合并本优化、未启用生产开关、未部署。

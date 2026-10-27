@@ -1,0 +1,34 @@
+import {performance} from 'node:perf_hooks'
+import {writeFileSync} from 'node:fs'
+const root=process.env.PROBE_BACKEND_ROOT!,imp=(p:string)=>import(root+'/'+p)
+async function main(){
+ const target=new URL(process.env.DATABASE_URL!);if(target.hostname!=='127.0.0.1'||target.port!=='55433'||target.pathname!=='/survey_governance_probe_test'||process.env.NODE_ENV!=='test')throw Error('Exact synthetic environment required')
+ const {prisma:db}=await imp('src/config/database.ts'),{default:express}=await imp('node_modules/express/index.js')
+ const {cacheService}=await imp('src/services/cacheService.ts');await cacheService.initialize();if(!cacheService.getStatus().connected)throw Error('Dedicated Redis required')
+ const {setupPrivateScaleExecutionFixture:setup}=await imp('src/__tests__/integration/educationPrivateScaleExecutionFixture.ts')
+ const {completeEducationLibraryScaleExecution:complete}=await imp('src/__tests__/integration/educationLibraryReportFixture.ts')
+ const {educationSchoolScaleReportRouter:school,educationTeacherScaleReportRouter:teacher}=await imp('src/modules/reporting/education-scale-report.routes.ts')
+ const {generateToken}=await imp('src/utils/jwt.ts')
+ const events:any[]=[];db.$on('query',(e:any)=>events.push({query:e.query,duration:e.duration}))
+ const app=express();app.use('/api/campus',school);app.use('/api/huiteacher',teacher);app.use((e:any,_q:any,r:any,_n:any)=>r.status(e.statusCode||500).json({code:e.code||'ERROR'}))
+ const server=app.listen(0,'127.0.0.1');await new Promise<void>(r=>server.once('listening',r));const rows:any[]=[]
+ try{
+  for(const product of ['SCHOOL','TEACHER']){
+   const f=await setup(db,product);const before=events.length,cpu=process.cpuUsage(),t=performance.now()
+   await complete({db,actorUserId:f.participantUserId,executionId:f.executionId,answers:f.answers})
+   const d=process.cpuUsage(cpu);rows.push({product,phase:'service-start-final-parent-completion',elapsedMs:performance.now()-t,cpuMs:(d.user+d.system)/1000,sqlEvents:events.length-before})
+   const u=await db.user.findUniqueOrThrow({where:{id:f.participantUserId}});const token=generateToken({userId:u.id,role:u.role,accountDomain:u.accountDomain,tokenVersion:u.tokenVersion,...(product==='TEACHER'?{sessionProduct:'HUITEACHER'}:{})})
+   const prefix=product==='SCHOOL'?'/api/campus':'/api/huiteacher',cookie=product==='SCHOOL'?'huischool_session':'huiteacher_session'
+   const url='http://127.0.0.1:'+server.address().port+prefix+'/library-scale/executions/'+f.executionId+'/report'
+   for(const concurrency of [1,4,8]){
+    const count=24,latencies:number[]=[];let cursor=0,failed=false;const cpu=process.cpuUsage(),start=performance.now();let peak=process.memoryUsage().rss
+    const sampleTimer=setInterval(()=>{peak=Math.max(peak,process.memoryUsage().rss)},5)
+    try{await Promise.all(Array.from({length:concurrency},async()=>{while(!failed){const index=cursor++;if(index>=count)return;const t=performance.now();try{const r=await fetch(url,{headers:{Cookie:cookie+'='+token},signal:AbortSignal.timeout(5000)}),v=await r.json();if(r.status!==200||v.code!==0||v.data?.state!=='READY')throw Error('Report failed');latencies.push(performance.now()-t)}catch(e){failed=true;throw e}}}))}finally{clearInterval(sampleTimer)}
+    const d=process.cpuUsage(cpu);if(latencies.length!==count)throw Error('Incomplete bounded observation');const settings=await db.$queryRawUnsafe("SELECT current_setting('join_collapse_limit') AS setting");if(settings[0].setting!=='8')throw Error('Planner setting leaked')
+    rows.push({product,phase:'bounded-report-batch',concurrency,requests:count,elapsedMs:performance.now()-start,cpuMs:(d.user+d.system)/1000,peakRssBytes:Math.max(peak,process.memoryUsage().rss),latenciesMs:latencies,failures:0,restoredPlannerSetting:settings[0].setting})
+   }
+  }
+  writeFileSync(process.env.EDUCATION_PROBE_OUTPUT!,JSON.stringify({scope:'bounded repeated-read batch on one synthetic completed report per product; concurrency 1/4/8,24 requests each,5s request timeout,stop on failure; not sustained capacity or distinct-user arrival model',flags:{compactFacts:process.env.ASSESSMENT_COMPACT_FACTS_ENABLED==='true',sharedControl:process.env.ASSESSMENT_SHARED_CONTROL_ENABLED==='true'},rows},null,2));console.log('education report probe completed')
+ }finally{await new Promise<void>(r=>server.close(()=>r()));await(await imp('src/config/queue.ts')).closeQueues(true);await cacheService.close();await db.$disconnect()}
+}
+main().catch(e=>{console.error(JSON.stringify({name:e?.name,code:e?.code,message:String(e?.message),stack:String(e?.stack).split('\n').slice(1,5)}));process.exit(1)})
