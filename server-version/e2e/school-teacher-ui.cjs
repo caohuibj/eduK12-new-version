@@ -150,6 +150,21 @@ async function readRenderedCjk(page, product, state, width, inventory) {
   }
 }
 
+const appearanceLabels = { auto: '自动', light: '浅色', dark: '深色' }
+async function selectAppearanceButton(control, product, mode) {
+  assert(Object.hasOwn(appearanceLabels, mode))
+  for (let i = 0; i < 3; i++) {
+    const label = await control.getAttribute('aria-label')
+    const match = new RegExp('^' + product + ' 外观：(自动|浅色|深色)，点击切换为(自动|浅色|深色)$').exec(label)
+    assert(match, 'Expected the current accessible cyclic theme button')
+    if (match[1] === appearanceLabels[mode]) return
+    await control.click()
+    // Locator auto-waits on the actual accessible label after React commits.
+    await control.and(control.page().getByRole('button', { name: new RegExp('^' + product + ' 外观：' + match[2] + '，') })).waitFor()
+  }
+  throw new Error('Appearance button did not reach requested mode')
+}
+
 function createUiChecks({ report, out, axeSource, getFontInventory }) {
   const done = new Set()
   report.schemaVersion = 1; report.scope = 'bounded-brand-theme-layout'
@@ -175,7 +190,7 @@ function createUiChecks({ report, out, axeSource, getFontInventory }) {
       phase = 'initial-network-idle'
       await s.page.waitForLoadState('networkidle')
       const count = s.audit.apiMutations.length
-      const control = s.page.getByRole('combobox', { name: names[s.product] + ' 外观', exact: true })
+      const control = s.page.getByRole('button', { name: new RegExp('^' + names[s.product] + ' 外观：') })
       let menu = false
       phase = 'control-visibility'
       if (!await control.isVisible()) {
@@ -184,11 +199,11 @@ function createUiChecks({ report, out, axeSource, getFontInventory }) {
         await s.page.getByRole('button', { name: '打开菜单', exact: true }).click(); menu = true
       }
       phase = 'select-mode'
-      await control.selectOption(mode)
+      await selectAppearanceButton(control, names[s.product], mode)
       phase = 'theme-root'
       await s.page.locator(roots[s.product] + `[data-theme="${mode}"]`).waitFor()
       phase = 'control-value'
-      assert.equal(await control.inputValue(), mode)
+      assert.match(await control.getAttribute('aria-label'), new RegExp('^' + names[s.product] + ' 外观：' + appearanceLabels[mode] + '，'))
       phase = 'close-menu'
       if (menu) await control.press('Escape')
       phase = 'post-theme-network-idle'
@@ -569,4 +584,4 @@ function verifyReport(report, options, readScreenshot) {
     notCovered: [...report.notCovered, ...ui.notCovered] }
 }
 
-module.exports = { classifyThemeFailure, readKeyboardState, probeKeyboard, settleThemeTransitions, OFFICIAL_BACKEND, BACKEND_FIXTURE_EXCEPTION, computeBackendCompileDigest, validateOfficialBackendReceipt, OFFICIAL_FRONTEND, validateOfficialFrontendReceipt, validateReportBuildInputs, cjkSampleIds, validateUiFontEvidence, prepareRenderedCjk, readRenderedCjk, appearanceKeys, imageMode, validateSelectedImages, createUiChecks, verifyReport, products, darkStates, originalShots }
+module.exports = { selectAppearanceButton, classifyThemeFailure, readKeyboardState, probeKeyboard, settleThemeTransitions, OFFICIAL_BACKEND, BACKEND_FIXTURE_EXCEPTION, computeBackendCompileDigest, validateOfficialBackendReceipt, OFFICIAL_FRONTEND, validateOfficialFrontendReceipt, validateReportBuildInputs, cjkSampleIds, validateUiFontEvidence, prepareRenderedCjk, readRenderedCjk, appearanceKeys, imageMode, validateSelectedImages, createUiChecks, verifyReport, products, darkStates, originalShots }

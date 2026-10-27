@@ -156,3 +156,15 @@ test('screenshot reader is restricted to exact PNG names and matching viewport d
   s.report.ui.observations[0].file = '../private/fixture.json'
   assert.throws(() => verifyReport(s.report, s.identity, png))
 })
+
+test('theme consumer uses the real cyclic button for every source and target mode', async () => {
+  const {selectAppearanceButton}=require('./school-teacher-ui.cjs')
+  const labels=['自动','浅色','深色'],modes=['auto','light','dark']
+  for(const product of ['School','Teacher'])for(let start=0;start<3;start++)for(let target=0;target<3;target++){
+    let current=start,clicks=0
+    const label=()=>`${product} 外观：${labels[current]}，点击切换为${labels[(current+1)%3]}`
+    const control={getAttribute:async key=>{assert.equal(key,'aria-label');return label()},click:async()=>{current=(current+1)%3;clicks++},page:()=>({getByRole:(role,options)=>{assert.equal(role,'button');return options.name}}),and:regex=>({waitFor:async()=>assert.match(label(),regex)})}
+    await selectAppearanceButton(control,product,modes[target]);assert.equal(current,target);assert.equal(clicks,(target-start+3)%3)
+  }
+  await assert.rejects(selectAppearanceButton({getAttribute:async()=> 'legacy select'},'Teacher','light'))
+})
