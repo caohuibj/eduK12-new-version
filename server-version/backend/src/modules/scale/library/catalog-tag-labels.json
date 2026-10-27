@@ -331,6 +331,14 @@
     "label": "情绪变化与负面反应",
     "axis": "construct"
   },
+  "construct:sel_erq_ca_dimension_1": {
+    "label": "认知重评",
+    "axis": "construct"
+  },
+  "construct:sel_erq_ca_dimension_2": {
+    "label": "表达抑制",
+    "axis": "construct"
+  },
   "construct:sel_fasttrack_scs_academic": {
     "label": "学习活动表现",
     "axis": "construct"
