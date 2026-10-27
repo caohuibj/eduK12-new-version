@@ -1,3 +1,4 @@
+import {canonicalHash} from '../../modules/assessment-runtime/canonical'
 import {describe,it,expect} from 'vitest'
 import {draftEducationAssessmentEntry,educationAssessmentOriginSchema} from '../../modules/education-tools/assessment-resource.contract'
 import {testDisclosure} from '../assessment-policy/result-disclosure.fixture'
@@ -47,4 +48,18 @@ it('allows a Form-only BUNDLE draft but not invented measurement feedback or emp
  const numeric=testDisclosure();numeric.audiences.RESPONDENT={mode:'INDIVIDUAL_SUMMARY',metricKeys:['invented'],longitudinalMetricKeys:[]}
  expect(()=>draftEducationAssessmentEntry({origin:form,title:'Synthetic',disclosure:numeric})).toThrow()
  expect(()=>educationAssessmentOriginSchema.parse({...origin,units:[]})).toThrow()
+})
+
+it('preserves exact historical origin bytes without defaulting feedback policy',()=>{
+ const parsed=educationAssessmentOriginSchema.parse(origin)
+ expect(parsed).not.toHaveProperty('feedbackPolicy')
+ expect(canonicalHash(parsed)).toBe(canonicalHash(origin))
+})
+it('freezes an explicit shared feedback policy and refuses null or malformed timing',()=>{
+ const policy={schemaVersion:1,mode:'SCHEDULED',releaseAt:'2026-11-01T09:00:00+09:00'}
+ const parsed=educationAssessmentOriginSchema.parse({...origin,feedbackPolicy:policy})
+ expect(parsed.feedbackPolicy).toEqual(policy)
+ expect(canonicalHash(parsed)).not.toBe(canonicalHash(origin))
+ for(const bad of [null,{schemaVersion:1,mode:'SCHEDULED',releaseAt:'tomorrow'},{schemaVersion:1,mode:'IMMEDIATE',releaseAt:'2026-11-01T00:00:00Z'}])
+  expect(()=>educationAssessmentOriginSchema.parse({...origin,feedbackPolicy:bad})).toThrow()
 })
