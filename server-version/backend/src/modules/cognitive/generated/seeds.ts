@@ -27,6 +27,7 @@ import { seeds as task24 } from '../tasks/emotionrecognition/seeds'
 import { seeds as task25 } from '../tasks/numberline/seeds'
 import { seeds as task26 } from '../tasks/arithverify/seeds'
 import { seeds as task27 } from '../tasks/sizecongruity/seeds'
+import { seeds as task28 } from '../tasks/delaydiscount/seeds'
 export const cognitiveSeeds = [
   task0[0],
   task1[0],
@@ -59,5 +60,6 @@ export const cognitiveSeeds = [
   task25[0],
   task26[0],
   task27[0],
+  task28[0],
   task21[1],
 ]

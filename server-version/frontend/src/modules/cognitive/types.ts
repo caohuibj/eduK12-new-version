@@ -443,3 +443,29 @@ export type SizecongruityTrialPayload = {
   rtMs: number | null
   interrupted: boolean
 }
+
+/** Delaydiscount 冻结 config（与后端 delaydiscount.config schema 一致）。 */
+export interface DelaydiscountConfig {
+  delayBands: number[]
+  delayedAmount: number
+  bisectionSteps: number
+  fixationMs: number
+  timeoutMs: number
+  validRtFloorMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+/** Delaydiscount 单 trial payload（与后端 delaydiscount.trial schema 一致）。 */
+export type DelaydiscountTrialPayload = {
+  delayDays: number
+  delayedAmount: number
+  immediateAmount: number
+  choice: 'now' | 'later' | null
+  rtMs: number | null
+  interrupted: boolean
+}

@@ -209,6 +209,12 @@ const SCORING_DECLARATIONS: Record<string, CognitiveScoringContractDeclaration> 
     runtimeReconstructableFacts: ['数字对与字号条件（seed/config）', '数值较大侧（由数字权威推导）'],
     serverDerivedFacts: ['较大侧与一致性条件判定', 'metrics（sizeCongruityEffectMs/条件RT与正确率）', 'quality flags'],
   },
+  delaydiscount: {
+    testType: 'delaydiscount',
+    clientObservedFacts: ['now/later 选择', 'raw RT', 'interrupted'],
+    runtimeReconstructableFacts: ['延迟带与延后全额（frozen config）', '每步即时金额（二分轨迹可由选择权威复核）'],
+    serverDerivedFacts: ['二分轨迹校验与无差异点', 'metrics（aucDelayDiscounting/laterChoiceRate）', 'quality flags'],
+  },
 }
 
 // 当前通用事实（所有任务一致）：完整加密 trial payload、v2 trial envelope qualityEvents、
@@ -354,6 +360,11 @@ const RESEARCH_CAPTURE_DECLARATIONS: Record<string, CognitiveResearchCaptureDecl
     testType: 'sizecongruity',
     currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次响应与 raw RT'],
     futureCaptureFacts: ['真实 input modality', 'device provenance', 'viewport/dpr'],
+  },
+  delaydiscount: {
+    testType: 'delaydiscount',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次选择与轨迹金额'],
+    futureCaptureFacts: ['真实激励（真实货币/积分兑换）', 'device provenance', 'viewport/dpr'],
   },
 }
 
