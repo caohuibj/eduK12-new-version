@@ -1,0 +1,822 @@
+{
+  "baseline": "85e9ee0c66ada6a2b0550b9e11f3e31b96ab62ce",
+  "recordedDirectInputs": {
+    "publication": [
+      {
+        "path": "server-version/backend/src/__tests__/education-tools/assessment-resource.contract.test.ts",
+        "sha256": "d089d10d923b07828f1fef442d833e5acb74a8f9459d7eb642127a00bb6910de",
+        "kind": "source",
+        "recordedAt": "after execution collection, not contemporaneous per-invocation attestation",
+        "checkpoint": "8fcfadcadeb7fd09fd8e453aa6eb16d87d53e686",
+        "checkpointSHA256": "d089d10d923b07828f1fef442d833e5acb74a8f9459d7eb642127a00bb6910de",
+        "matchesRecordedHashAtCheckpoint": true,
+        "currentSHA256": "fd11d1d2087deb9f8966beb9d497ef3e88cdb224cf2df6830e0615eb684b1cb1",
+        "currentGitBlob": "8f81f4544d6a01e0bffee469f107c8235007823b",
+        "currentMatchesRecordedHash": false
+      },
+      {
+        "path": "server-version/backend/src/__tests__/education-tools/assessment-resource.publication.postgres.integration.test.ts",
+        "sha256": "f84a65e8193bf6a0083368366116c3b1d15a1d18d4ec12e07c4e33c3748ccda3",
+        "kind": "source",
+        "recordedAt": "after execution collection, not contemporaneous per-invocation attestation",
+        "checkpoint": "8fcfadcadeb7fd09fd8e453aa6eb16d87d53e686",
+        "checkpointSHA256": "f84a65e8193bf6a0083368366116c3b1d15a1d18d4ec12e07c4e33c3748ccda3",
+        "matchesRecordedHashAtCheckpoint": true,
+        "currentSHA256": "976ea85a8644f74678fb0214f49d1dc92830ed6974f6a579e51c88f1eb52636c",
+        "currentGitBlob": "e928739b1a8bef1f81f3d96925f4b526cfb63e55",
+        "currentMatchesRecordedHash": false
+      },
+      {
+        "path": "server-version/backend/src/__tests__/education-tools/assessment-resource.repository.test.ts",
+        "sha256": "b2cb98245372a16d7095be1ca6f616f856ebf909fa3c7402d3e679959ba0dedf",
+        "kind": "source",
+        "recordedAt": "after execution collection, not contemporaneous per-invocation attestation",
+        "checkpoint": "8fcfadcadeb7fd09fd8e453aa6eb16d87d53e686",
+        "checkpointSHA256": "b2cb98245372a16d7095be1ca6f616f856ebf909fa3c7402d3e679959ba0dedf",
+        "matchesRecordedHashAtCheckpoint": true,
+        "currentSHA256": "6514ba2324a6af6947b2be61811c417fb7da01a915c0d558966a1f1c50e0ac1f",
+        "currentGitBlob": "c0822ab046fe89fd3a30e9ad2fcf8e452ebe8478",
+        "currentMatchesRecordedHash": false
+      },
+      {
+        "path": "server-version/backend/src/modules/admin-permissions/routes.ts",
+        "sha256": "c2cb39ba3bd7bc51b5edfd892f52ae23aa803ac84d2cc72893cd90bc224043c1",
+        "kind": "source",
+        "recordedAt": "after execution collection, not contemporaneous per-invocation attestation",
+        "checkpoint": "8fcfadcadeb7fd09fd8e453aa6eb16d87d53e686",
+        "checkpointSHA256": "c2cb39ba3bd7bc51b5edfd892f52ae23aa803ac84d2cc72893cd90bc224043c1",
+        "matchesRecordedHashAtCheckpoint": true,
+        "currentSHA256": "c2cb39ba3bd7bc51b5edfd892f52ae23aa803ac84d2cc72893cd90bc224043c1",
+        "currentGitBlob": "df99f522350edd04a86a67a4d6762dbec4990881",
+        "currentMatchesRecordedHash": true
+      },
+      {
+        "path": "server-version/backend/src/modules/assessment-runtime/typed-form.ts",
+        "sha256": "22916625447e435c019a8a81b025895dd35f2fc39779d97b2a8199dd0e58ae4d",
+        "kind": "source",
+        "recordedAt": "after execution collection, not contemporaneous per-invocation attestation",
+        "checkpoint": "8fcfadcadeb7fd09fd8e453aa6eb16d87d53e686",
+        "checkpointSHA256": "22916625447e435c019a8a81b025895dd35f2fc39779d97b2a8199dd0e58ae4d",
+        "matchesRecordedHashAtCheckpoint": true,
+        "currentSHA256": "22916625447e435c019a8a81b025895dd35f2fc39779d97b2a8199dd0e58ae4d",
+        "currentGitBlob": "4a95fde00a03c6f6708221ee4752e684b4377ca4",
+        "currentMatchesRecordedHash": true
+      },
+      {
+        "path": "server-version/backend/src/modules/campus/organization.routes.ts",
+        "sha256": "f409adec078b316cd8897f86869ebeb631ee910cc8a39c11e973a56c6bd119a2",
+        "kind": "source",
+        "recordedAt": "after execution collection, not contemporaneous per-invocation attestation",
+        "checkpoint": "8fcfadcadeb7fd09fd8e453aa6eb16d87d53e686",
+        "checkpointSHA256": "f409adec078b316cd8897f86869ebeb631ee910cc8a39c11e973a56c6bd119a2",
+        "matchesRecordedHashAtCheckpoint": true,
+        "currentSHA256": "f409adec078b316cd8897f86869ebeb631ee910cc8a39c11e973a56c6bd119a2",
+        "currentGitBlob": "5ca2a75e263ac331d6c491fab3722c109c8fb224",
+        "currentMatchesRecordedHash": true
+      },
+      {
+        "path": "server-version/backend/src/modules/education-tools/assessment-resource.contract.ts",
+        "sha256": "71b75b43f8e8f754189499db1576f327e19f79786480024cae4d4c19d29cb59f",
+        "kind": "source",
+        "recordedAt": "after execution collection, not contemporaneous per-invocation attestation",
+        "checkpoint": "8fcfadcadeb7fd09fd8e453aa6eb16d87d53e686",
+        "checkpointSHA256": "71b75b43f8e8f754189499db1576f327e19f79786480024cae4d4c19d29cb59f",
+        "matchesRecordedHashAtCheckpoint": true,
+        "currentSHA256": "cd9ce862e282dc994d10214d77094175db3a94f3d67d8f47e28a7c9addcf0364",
+        "currentGitBlob": "391cf78a3dbe4869d5bfcc553173a0c65a917204",
+        "currentMatchesRecordedHash": false
+      },
+      {
+        "path": "server-version/backend/src/modules/education-tools/assessment-resource.distribution.ts",
+        "sha256": "05d9904e8721107de63e5d4aa45bda33e84fd2f8cbb220d8693c9e0b2f7f7e5d",
+        "kind": "source",
+        "recordedAt": "after execution collection, not contemporaneous per-invocation attestation",
+        "checkpoint": "8fcfadcadeb7fd09fd8e453aa6eb16d87d53e686",
+        "checkpointSHA256": "05d9904e8721107de63e5d4aa45bda33e84fd2f8cbb220d8693c9e0b2f7f7e5d",
+        "matchesRecordedHashAtCheckpoint": true,
+        "currentSHA256": "cd5be9519a42ce9c9e099ecbff06137739bc26e4567ea17a75fa0e2220ee4f6c",
+        "currentGitBlob": "258fe4301c49af1490ca6ff3e80c40332acdadb2",
+        "currentMatchesRecordedHash": false
+      },
+      {
+        "path": "server-version/backend/src/modules/education-tools/assessment-resource.issuer.ts",
+        "sha256": "0f7d2985540650b5397a7c926f8f2e6735d6bc4959a4fe1cc1575c4ae1c4d7ef",
+        "kind": "source",
+        "recordedAt": "after execution collection, not contemporaneous per-invocation attestation",
+        "checkpoint": "8fcfadcadeb7fd09fd8e453aa6eb16d87d53e686",
+        "checkpointSHA256": "0f7d2985540650b5397a7c926f8f2e6735d6bc4959a4fe1cc1575c4ae1c4d7ef",
+        "matchesRecordedHashAtCheckpoint": true,
+        "currentSHA256": "ecc368764cbd6a73088b578b4cbdd1b7918c643d777817b3317d6caa39732d57",
+        "currentGitBlob": "04373e6e5bd6dc00f9d8360a677932b9dd5b06a0",
+        "currentMatchesRecordedHash": false
+      },
+      {
+        "path": "server-version/backend/src/modules/education-tools/assessment-resource.routes.ts",
+        "sha256": "bd92e95aebfb4108c90426ebf4fea986e9ae5ee21a6c394c108843f8980906f3",
+        "kind": "source",
+        "recordedAt": "after execution collection, not contemporaneous per-invocation attestation",
+        "checkpoint": "8fcfadcadeb7fd09fd8e453aa6eb16d87d53e686",
+        "checkpointSHA256": "bd92e95aebfb4108c90426ebf4fea986e9ae5ee21a6c394c108843f8980906f3",
+        "matchesRecordedHashAtCheckpoint": true,
+        "currentSHA256": "bd92e95aebfb4108c90426ebf4fea986e9ae5ee21a6c394c108843f8980906f3",
+        "currentGitBlob": "4e294af6e3a2f6c217e6033d4d460c2a110ec891",
+        "currentMatchesRecordedHash": true
+      },
+      {
+        "path": "server-version/backend/src/modules/education-tools/assessment-resource.service.ts",
+        "sha256": "ba1157f2749aaacd99c8aa6922bceff049cb0df1f9b830ae4f66df8ce10699b9",
+        "kind": "source",
+        "recordedAt": "after execution collection, not contemporaneous per-invocation attestation",
+        "checkpoint": "8fcfadcadeb7fd09fd8e453aa6eb16d87d53e686",
+        "checkpointSHA256": "ba1157f2749aaacd99c8aa6922bceff049cb0df1f9b830ae4f66df8ce10699b9",
+        "matchesRecordedHashAtCheckpoint": true,
+        "currentSHA256": "b4a8fe8b4aa7cd0d4daa220d6dd36d27c81ee8162a0b3ac4a22523ebf69ca414",
+        "currentGitBlob": "7363182e7457dd47370ae3a373e2cf729f48b4ad",
+        "currentMatchesRecordedHash": false
+      },
+      {
+        "path": "server-version/backend/src/modules/education-tools/assessment-resource.source.ts",
+        "sha256": "ae0ac2ce7892712e3376d44a3ed942d46aa6b87e58c7f6b72dc77b88865cd273",
+        "kind": "source",
+        "recordedAt": "after execution collection, not contemporaneous per-invocation attestation",
+        "checkpoint": "8fcfadcadeb7fd09fd8e453aa6eb16d87d53e686",
+        "checkpointSHA256": "ae0ac2ce7892712e3376d44a3ed942d46aa6b87e58c7f6b72dc77b88865cd273",
+        "matchesRecordedHashAtCheckpoint": true,
+        "currentSHA256": "b223b62c6cc81a0ccf3a8a20578016b537629f1b359beb3e6aa0c040e9e19416",
+        "currentGitBlob": "0b5065dc61fcafc0d0a7dd14efefb808d9a076d3",
+        "currentMatchesRecordedHash": false
+      },
+      {
+        "path": "server-version/backend/src/modules/huiteacher/organization.routes.ts",
+        "sha256": "31ff6200056d0ff65595d2ac90c9a5937eaed5d205cfe45cd5b695a9bf00db5e",
+        "kind": "source",
+        "recordedAt": "after execution collection, not contemporaneous per-invocation attestation",
+        "checkpoint": "8fcfadcadeb7fd09fd8e453aa6eb16d87d53e686",
+        "checkpointSHA256": "31ff6200056d0ff65595d2ac90c9a5937eaed5d205cfe45cd5b695a9bf00db5e",
+        "matchesRecordedHashAtCheckpoint": true,
+        "currentSHA256": "31ff6200056d0ff65595d2ac90c9a5937eaed5d205cfe45cd5b695a9bf00db5e",
+        "currentGitBlob": "7039701ffc53497bdeca09a261dec44cdd02a817",
+        "currentMatchesRecordedHash": true
+      },
+      {
+        "path": "server-version/backend/src/modules/measurement-content/admin-authority.service.ts",
+        "sha256": "3fa0fb665cd3a792201bf58c361536f95bcbea0e486ac9229fa43163a0a08118",
+        "kind": "source",
+        "recordedAt": "after execution collection, not contemporaneous per-invocation attestation",
+        "checkpoint": "8fcfadcadeb7fd09fd8e453aa6eb16d87d53e686",
+        "checkpointSHA256": "3fa0fb665cd3a792201bf58c361536f95bcbea0e486ac9229fa43163a0a08118",
+        "matchesRecordedHashAtCheckpoint": true,
+        "currentSHA256": "12e8ed813da2cfeb0f4dde625cedece814f0fa67f4c924996fd3bce25aa13e6a",
+        "currentGitBlob": "2b59d4a09f4fa27d77efff356fd50c3643a18534",
+        "currentMatchesRecordedHash": false
+      },
+      {
+        "path": "server-version/frontend/src/admin/AdminContentPermissions.test.tsx",
+        "sha256": "fd080a1a37e06397e034357f86215d286ce3e7e2334d8a0c41572e2ff53ef2bb",
+        "kind": "source",
+        "recordedAt": "after execution collection, not contemporaneous per-invocation attestation",
+        "checkpoint": "8fcfadcadeb7fd09fd8e453aa6eb16d87d53e686",
+        "checkpointSHA256": "fd080a1a37e06397e034357f86215d286ce3e7e2334d8a0c41572e2ff53ef2bb",
+        "matchesRecordedHashAtCheckpoint": true,
+        "currentSHA256": "fd080a1a37e06397e034357f86215d286ce3e7e2334d8a0c41572e2ff53ef2bb",
+        "currentGitBlob": "5cd9c5bcc04355a0df1c733cade8f377301ad407",
+        "currentMatchesRecordedHash": true
+      },
+      {
+        "path": "server-version/frontend/src/admin/AdminContentPermissions.tsx",
+        "sha256": "2a89bf0c6c86d137dc2b0914042801671a4fece1fa9a1659fb0d76ea0e562019",
+        "kind": "source",
+        "recordedAt": "after execution collection, not contemporaneous per-invocation attestation",
+        "checkpoint": "8fcfadcadeb7fd09fd8e453aa6eb16d87d53e686",
+        "checkpointSHA256": "2a89bf0c6c86d137dc2b0914042801671a4fece1fa9a1659fb0d76ea0e562019",
+        "matchesRecordedHashAtCheckpoint": true,
+        "currentSHA256": "2a89bf0c6c86d137dc2b0914042801671a4fece1fa9a1659fb0d76ea0e562019",
+        "currentGitBlob": "752711d8d17ed1c1d0231f065b4da24744bb492e",
+        "currentMatchesRecordedHash": true
+      },
+      {
+        "path": "server-version/frontend/src/admin/contentRequestRecovery.ts",
+        "sha256": "b8935d2394cdd184ef404778c677043368dd9315b60853ccd29a7cb46928c8ae",
+        "kind": "source",
+        "recordedAt": "after execution collection, not contemporaneous per-invocation attestation",
+        "checkpoint": "8fcfadcadeb7fd09fd8e453aa6eb16d87d53e686",
+        "checkpointSHA256": "b8935d2394cdd184ef404778c677043368dd9315b60853ccd29a7cb46928c8ae",
+        "matchesRecordedHashAtCheckpoint": true,
+        "currentSHA256": "b8935d2394cdd184ef404778c677043368dd9315b60853ccd29a7cb46928c8ae",
+        "currentGitBlob": "85412e5b8037e456735c2a8506e725565427aa54",
+        "currentMatchesRecordedHash": true
+      },
+      {
+        "path": "server-version/frontend/src/api/adminContent.ts",
+        "sha256": "f3f862cdc05aba81b90f391cb2a0d3509a780f32facb9f87fcc32ff5861f420a",
+        "kind": "source",
+        "recordedAt": "after execution collection, not contemporaneous per-invocation attestation",
+        "checkpoint": "8fcfadcadeb7fd09fd8e453aa6eb16d87d53e686",
+        "checkpointSHA256": "f3f862cdc05aba81b90f391cb2a0d3509a780f32facb9f87fcc32ff5861f420a",
+        "matchesRecordedHashAtCheckpoint": true,
+        "currentSHA256": "f3f862cdc05aba81b90f391cb2a0d3509a780f32facb9f87fcc32ff5861f420a",
+        "currentGitBlob": "dfa18375037b3782892ec8e274b65fad94184207",
+        "currentMatchesRecordedHash": true
+      },
+      {
+        "path": "server-version/frontend/src/components/education-tools/assessmentResourceClient.ts",
+        "sha256": "51cdbf84ba932f5db09042b5dcc92a29f612dfa7494135bd33225af88c1261e7",
+        "kind": "source",
+        "recordedAt": "after execution collection, not contemporaneous per-invocation attestation",
+        "checkpoint": "8fcfadcadeb7fd09fd8e453aa6eb16d87d53e686",
+        "checkpointSHA256": "51cdbf84ba932f5db09042b5dcc92a29f612dfa7494135bd33225af88c1261e7",
+        "matchesRecordedHashAtCheckpoint": true,
+        "currentSHA256": "b861dcb9c5db146220e58bd83a39df09fa98febe05c1f3e158bd1404bf03c92c",
+        "currentGitBlob": "1eafa2c5cc56bd76e2ae95c827a2666385fdfbde",
+        "currentMatchesRecordedHash": false
+      },
+      {
+        "path": "server-version/backend/package.json",
+        "sha256": "d629185584fcd679ca367c2d536c6c7783f7a9fe23363a8cd870964a47b2990a",
+        "kind": "configuration",
+        "recordedAt": "after execution collection, not contemporaneous per-invocation attestation",
+        "checkpoint": "8fcfadcadeb7fd09fd8e453aa6eb16d87d53e686",
+        "checkpointSHA256": "d629185584fcd679ca367c2d536c6c7783f7a9fe23363a8cd870964a47b2990a",
+        "matchesRecordedHashAtCheckpoint": true,
+        "currentSHA256": "d629185584fcd679ca367c2d536c6c7783f7a9fe23363a8cd870964a47b2990a",
+        "currentGitBlob": "3157b4edaaecd9c495458434ab4cfd1bd5fcdfaf",
+        "currentMatchesRecordedHash": true
+      },
+      {
+        "path": "server-version/backend/package-lock.json",
+        "sha256": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+        "kind": "configuration",
+        "recordedAt": "after execution collection, not contemporaneous per-invocation attestation",
+        "checkpoint": "8fcfadcadeb7fd09fd8e453aa6eb16d87d53e686",
+        "checkpointSHA256": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+        "matchesRecordedHashAtCheckpoint": true,
+        "currentSHA256": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+        "currentGitBlob": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6",
+        "currentMatchesRecordedHash": true
+      },
+      {
+        "path": "server-version/backend/tsconfig.json",
+        "sha256": "c79ccf595a80514e94936f1ffcd2fa09b57265f0c140d275c81770f494175143",
+        "kind": "configuration",
+        "recordedAt": "after execution collection, not contemporaneous per-invocation attestation",
+        "checkpoint": "8fcfadcadeb7fd09fd8e453aa6eb16d87d53e686",
+        "checkpointSHA256": "c79ccf595a80514e94936f1ffcd2fa09b57265f0c140d275c81770f494175143",
+        "matchesRecordedHashAtCheckpoint": true,
+        "currentSHA256": "c79ccf595a80514e94936f1ffcd2fa09b57265f0c140d275c81770f494175143",
+        "currentGitBlob": "246383a71a5c4c979ffd01fdf011ebeb21e71a1d",
+        "currentMatchesRecordedHash": true
+      },
+      {
+        "path": "server-version/backend/vitest.config.ts",
+        "sha256": "26b98b70914617771d41657be8cdf6d7b6d7024c81d1c8a49aeae6a9220cf93b",
+        "kind": "configuration",
+        "recordedAt": "after execution collection, not contemporaneous per-invocation attestation",
+        "checkpoint": "8fcfadcadeb7fd09fd8e453aa6eb16d87d53e686",
+        "checkpointSHA256": "26b98b70914617771d41657be8cdf6d7b6d7024c81d1c8a49aeae6a9220cf93b",
+        "matchesRecordedHashAtCheckpoint": true,
+        "currentSHA256": "26b98b70914617771d41657be8cdf6d7b6d7024c81d1c8a49aeae6a9220cf93b",
+        "currentGitBlob": "619cca9b71a3046d22f1e8bcbcf59eaea5f0b406",
+        "currentMatchesRecordedHash": true
+      },
+      {
+        "path": "server-version/backend/prisma/schema.prisma",
+        "sha256": "3bea3c07159f95eadce9257207648658bc8f10e5996f594667cb6c877a84b515",
+        "kind": "configuration",
+        "recordedAt": "after execution collection, not contemporaneous per-invocation attestation",
+        "checkpoint": "8fcfadcadeb7fd09fd8e453aa6eb16d87d53e686",
+        "checkpointSHA256": "3bea3c07159f95eadce9257207648658bc8f10e5996f594667cb6c877a84b515",
+        "matchesRecordedHashAtCheckpoint": true,
+        "currentSHA256": "3bea3c07159f95eadce9257207648658bc8f10e5996f594667cb6c877a84b515",
+        "currentGitBlob": "eefdf15e7ec9084c4c9e06bd3693063ee0dc6034",
+        "currentMatchesRecordedHash": true
+      },
+      {
+        "path": "server-version/frontend/package.json",
+        "sha256": "ba3959e4e7935cb3b60b8391f590a2622990397b1b33b99a545c45867d51e49f",
+        "kind": "configuration",
+        "recordedAt": "after execution collection, not contemporaneous per-invocation attestation",
+        "checkpoint": "8fcfadcadeb7fd09fd8e453aa6eb16d87d53e686",
+        "checkpointSHA256": "ba3959e4e7935cb3b60b8391f590a2622990397b1b33b99a545c45867d51e49f",
+        "matchesRecordedHashAtCheckpoint": true,
+        "currentSHA256": "ba3959e4e7935cb3b60b8391f590a2622990397b1b33b99a545c45867d51e49f",
+        "currentGitBlob": "41eaa68acf3f387f2e6ecbdfa697947232fe1fda",
+        "currentMatchesRecordedHash": true
+      },
+      {
+        "path": "server-version/frontend/package-lock.json",
+        "sha256": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+        "kind": "configuration",
+        "recordedAt": "after execution collection, not contemporaneous per-invocation attestation",
+        "checkpoint": "8fcfadcadeb7fd09fd8e453aa6eb16d87d53e686",
+        "checkpointSHA256": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+        "matchesRecordedHashAtCheckpoint": true,
+        "currentSHA256": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+        "currentGitBlob": "38d624d2dd610673f9392a89af7290682862e2b0",
+        "currentMatchesRecordedHash": true
+      },
+      {
+        "path": "server-version/frontend/tsconfig.app.json",
+        "sha256": "97ed0e951ac068a9b2d08635b327932db8e41193f9c82e8291a919b7c68bd62e",
+        "kind": "configuration",
+        "recordedAt": "after execution collection, not contemporaneous per-invocation attestation",
+        "checkpoint": "8fcfadcadeb7fd09fd8e453aa6eb16d87d53e686",
+        "checkpointSHA256": "97ed0e951ac068a9b2d08635b327932db8e41193f9c82e8291a919b7c68bd62e",
+        "matchesRecordedHashAtCheckpoint": true,
+        "currentSHA256": "97ed0e951ac068a9b2d08635b327932db8e41193f9c82e8291a919b7c68bd62e",
+        "currentGitBlob": "990a9f4222f2330106b8141fe5658283326e49df",
+        "currentMatchesRecordedHash": true
+      }
+    ],
+    "marker": [
+      {
+        "path": "server-version/backend/src/__tests__/education-tools/assessment-resource.marker.postgres.integration.test.ts",
+        "sha256": "b5a14add6c2970878f9504505e8fe660929d172b8a8e91e78a9f0ed2fc53ea5a",
+        "gitBlob": "af894149fb01d35d3069b65a18d963ddc2013cb6",
+        "kind": "source",
+        "recordedAt": "after execution collection, not contemporaneous per-invocation attestation",
+        "checkpoint": "9ce3f44d7c1b2fb5025a8c6442f61faaa3ec3e9b",
+        "checkpointSHA256": "b5a14add6c2970878f9504505e8fe660929d172b8a8e91e78a9f0ed2fc53ea5a",
+        "matchesRecordedHashAtCheckpoint": true,
+        "currentSHA256": "9533ea4bfbe60453c3422078fa2e82a51df80189e982da5f2d579a2fbca2b2a9",
+        "currentGitBlob": "cea8dea1d66b1983a7457f2065b2cc9e53c99ab9",
+        "currentMatchesRecordedHash": false
+      },
+      {
+        "path": "server-version/backend/src/__tests__/education-tools/assessment-resource.standard-marker.postgres.integration.test.ts",
+        "sha256": "4b0ddef5c0bfb10b816dc612c2c54519dcf178ff1f7f1931d1558c9f01e6b235",
+        "gitBlob": "0b8e016eac0ca64fce62fe633903a23e88c679ff",
+        "kind": "source",
+        "recordedAt": "after execution collection, not contemporaneous per-invocation attestation",
+        "checkpoint": "9ce3f44d7c1b2fb5025a8c6442f61faaa3ec3e9b",
+        "checkpointSHA256": "4b0ddef5c0bfb10b816dc612c2c54519dcf178ff1f7f1931d1558c9f01e6b235",
+        "matchesRecordedHashAtCheckpoint": true,
+        "currentSHA256": "8f8d6e6fa247b3c6c56eaced63e03c569d609de7e92e49371d8db8aa8aaf8282",
+        "currentGitBlob": "b932db1d53c3899ffae6a0ecb52f3f88ff56e5eb",
+        "currentMatchesRecordedHash": false
+      },
+      {
+        "path": "server-version/backend/src/__tests__/measurement-content/training-standard-combination-boundary.test.ts",
+        "sha256": "06426b026379f0c0e25c7d37166a0c869fd5d4595b94ce6b5c7b690549fb929e",
+        "gitBlob": "1137d1872e379d0499b28cbcd393159467c5be3c",
+        "kind": "source",
+        "recordedAt": "after execution collection, not contemporaneous per-invocation attestation",
+        "checkpoint": "9ce3f44d7c1b2fb5025a8c6442f61faaa3ec3e9b",
+        "checkpointSHA256": "06426b026379f0c0e25c7d37166a0c869fd5d4595b94ce6b5c7b690549fb929e",
+        "matchesRecordedHashAtCheckpoint": true,
+        "currentSHA256": "06426b026379f0c0e25c7d37166a0c869fd5d4595b94ce6b5c7b690549fb929e",
+        "currentGitBlob": "1137d1872e379d0499b28cbcd393159467c5be3c",
+        "currentMatchesRecordedHash": true
+      },
+      {
+        "path": "server-version/backend/src/modules/composite/training-content-binding.ts",
+        "sha256": "aea1f755eafe6d25bf37fa4da1e29a7d9afcb4a124e44c703977156858765abf",
+        "gitBlob": "446c722d59f2f442aff9af7446065f8b20fb72b4",
+        "kind": "source",
+        "recordedAt": "after execution collection, not contemporaneous per-invocation attestation",
+        "checkpoint": "9ce3f44d7c1b2fb5025a8c6442f61faaa3ec3e9b",
+        "checkpointSHA256": "aea1f755eafe6d25bf37fa4da1e29a7d9afcb4a124e44c703977156858765abf",
+        "matchesRecordedHashAtCheckpoint": true,
+        "currentSHA256": "aea1f755eafe6d25bf37fa4da1e29a7d9afcb4a124e44c703977156858765abf",
+        "currentGitBlob": "446c722d59f2f442aff9af7446065f8b20fb72b4",
+        "currentMatchesRecordedHash": true
+      },
+      {
+        "path": "server-version/backend/src/modules/composite/training-standard-collection.ts",
+        "sha256": "ac668df080e6a1f62efe2a063a46f054c1c9b7d245302ea19e61a1a0c746c2d1",
+        "gitBlob": "03950dbcc2970b5b221f97676d580f81a461bdc8",
+        "kind": "source",
+        "recordedAt": "after execution collection, not contemporaneous per-invocation attestation",
+        "checkpoint": "9ce3f44d7c1b2fb5025a8c6442f61faaa3ec3e9b",
+        "checkpointSHA256": "ac668df080e6a1f62efe2a063a46f054c1c9b7d245302ea19e61a1a0c746c2d1",
+        "matchesRecordedHashAtCheckpoint": true,
+        "currentSHA256": "ac668df080e6a1f62efe2a063a46f054c1c9b7d245302ea19e61a1a0c746c2d1",
+        "currentGitBlob": "03950dbcc2970b5b221f97676d580f81a461bdc8",
+        "currentMatchesRecordedHash": true
+      },
+      {
+        "path": "server-version/backend/src/modules/composite/training-standard-combination.ts",
+        "sha256": "ba407c9d77e84cb4408179a2af1014a6f9f757ed3aca7127b47cd5e7d1afc87b",
+        "gitBlob": "89ac7a1ff288d3c89bf25d616a4d246b72afede7",
+        "kind": "source",
+        "recordedAt": "after execution collection, not contemporaneous per-invocation attestation",
+        "checkpoint": "9ce3f44d7c1b2fb5025a8c6442f61faaa3ec3e9b",
+        "checkpointSHA256": "ba407c9d77e84cb4408179a2af1014a6f9f757ed3aca7127b47cd5e7d1afc87b",
+        "matchesRecordedHashAtCheckpoint": true,
+        "currentSHA256": "ba407c9d77e84cb4408179a2af1014a6f9f757ed3aca7127b47cd5e7d1afc87b",
+        "currentGitBlob": "89ac7a1ff288d3c89bf25d616a4d246b72afede7",
+        "currentMatchesRecordedHash": true
+      },
+      {
+        "path": "server-version/backend/src/modules/composite/training-standard-content.ts",
+        "sha256": "67197abd66217b4503749cd35daf4da0cb7db4140e545749886c5b7b58e481d2",
+        "gitBlob": "ed86872d52c52195b383b0392de4dbd0c556fcc1",
+        "kind": "source",
+        "recordedAt": "after execution collection, not contemporaneous per-invocation attestation",
+        "checkpoint": "9ce3f44d7c1b2fb5025a8c6442f61faaa3ec3e9b",
+        "checkpointSHA256": "67197abd66217b4503749cd35daf4da0cb7db4140e545749886c5b7b58e481d2",
+        "matchesRecordedHashAtCheckpoint": true,
+        "currentSHA256": "67197abd66217b4503749cd35daf4da0cb7db4140e545749886c5b7b58e481d2",
+        "currentGitBlob": "ed86872d52c52195b383b0392de4dbd0c556fcc1",
+        "currentMatchesRecordedHash": true
+      },
+      {
+        "path": "server-version/backend/src/modules/education-tools/assessment-resource.marker-contract.ts",
+        "sha256": "fda5ac0598ede0de50cfd557fac9973036660885c060e669319382e732418793",
+        "gitBlob": "2c131002ecfff33e5dbbe853f824430bf9a6bfc4",
+        "kind": "source",
+        "recordedAt": "after execution collection, not contemporaneous per-invocation attestation",
+        "checkpoint": "9ce3f44d7c1b2fb5025a8c6442f61faaa3ec3e9b",
+        "checkpointSHA256": "fda5ac0598ede0de50cfd557fac9973036660885c060e669319382e732418793",
+        "matchesRecordedHashAtCheckpoint": true,
+        "currentSHA256": "fda5ac0598ede0de50cfd557fac9973036660885c060e669319382e732418793",
+        "currentGitBlob": "2c131002ecfff33e5dbbe853f824430bf9a6bfc4",
+        "currentMatchesRecordedHash": true
+      },
+      {
+        "path": "server-version/backend/src/modules/education-tools/assessment-resource.marker.ts",
+        "sha256": "db3ef91e54be8b4c26a74f8136a3903e52f2bd6663bdc08c1c6ff8bceb117e48",
+        "gitBlob": "3c052a40475e777c3decee2b1a7343bded01d3e9",
+        "kind": "source",
+        "recordedAt": "after execution collection, not contemporaneous per-invocation attestation",
+        "checkpoint": "9ce3f44d7c1b2fb5025a8c6442f61faaa3ec3e9b",
+        "checkpointSHA256": "db3ef91e54be8b4c26a74f8136a3903e52f2bd6663bdc08c1c6ff8bceb117e48",
+        "matchesRecordedHashAtCheckpoint": true,
+        "currentSHA256": "db3ef91e54be8b4c26a74f8136a3903e52f2bd6663bdc08c1c6ff8bceb117e48",
+        "currentGitBlob": "3c052a40475e777c3decee2b1a7343bded01d3e9",
+        "currentMatchesRecordedHash": true
+      },
+      {
+        "path": "server-version/backend/src/modules/education-tools/assessment-resource.service.ts",
+        "sha256": "6c7307ac3bc55adafb8545aae29f1d09178d97a4d47b87c96bb8d53486215c95",
+        "gitBlob": "776747c7b581e4a5c7c9fee641d9a9a3c2384ef9",
+        "kind": "source",
+        "recordedAt": "after execution collection, not contemporaneous per-invocation attestation",
+        "checkpoint": "9ce3f44d7c1b2fb5025a8c6442f61faaa3ec3e9b",
+        "checkpointSHA256": "6c7307ac3bc55adafb8545aae29f1d09178d97a4d47b87c96bb8d53486215c95",
+        "matchesRecordedHashAtCheckpoint": true,
+        "currentSHA256": "b4a8fe8b4aa7cd0d4daa220d6dd36d27c81ee8162a0b3ac4a22523ebf69ca414",
+        "currentGitBlob": "7363182e7457dd47370ae3a373e2cf729f48b4ad",
+        "currentMatchesRecordedHash": false
+      },
+      {
+        "path": "server-version/backend/src/modules/education-tools/assessment-resource.source.ts",
+        "sha256": "b223b62c6cc81a0ccf3a8a20578016b537629f1b359beb3e6aa0c040e9e19416",
+        "gitBlob": "0b5065dc61fcafc0d0a7dd14efefb808d9a076d3",
+        "kind": "source",
+        "recordedAt": "after execution collection, not contemporaneous per-invocation attestation",
+        "checkpoint": "9ce3f44d7c1b2fb5025a8c6442f61faaa3ec3e9b",
+        "checkpointSHA256": "b223b62c6cc81a0ccf3a8a20578016b537629f1b359beb3e6aa0c040e9e19416",
+        "matchesRecordedHashAtCheckpoint": true,
+        "currentSHA256": "b223b62c6cc81a0ccf3a8a20578016b537629f1b359beb3e6aa0c040e9e19416",
+        "currentGitBlob": "0b5065dc61fcafc0d0a7dd14efefb808d9a076d3",
+        "currentMatchesRecordedHash": true
+      }
+    ],
+    "feedback": [
+      {
+        "path": "server-version/backend/src/__tests__/education-tools/assessment-resource.feedback-policy.postgres.integration.test.ts",
+        "sha256": "72959c65219bdea1eaec20fb9dcf00a539a5a90ee8209deed0ace7d263e6de03",
+        "gitBlob": "80008fc8e3f1011c14c0e1073430b1d38bdf3399",
+        "kind": "source",
+        "recordedAt": "after execution collection, not contemporaneous per-invocation attestation",
+        "checkpoint": "41caf96cac175bafeccc4fd9e6c76111409767e6",
+        "checkpointSHA256": "72959c65219bdea1eaec20fb9dcf00a539a5a90ee8209deed0ace7d263e6de03",
+        "matchesRecordedHashAtCheckpoint": true,
+        "currentSHA256": "72959c65219bdea1eaec20fb9dcf00a539a5a90ee8209deed0ace7d263e6de03",
+        "currentGitBlob": "80008fc8e3f1011c14c0e1073430b1d38bdf3399",
+        "currentMatchesRecordedHash": true
+      },
+      {
+        "path": "server-version/backend/src/__tests__/education-tools/assessment-resource.feedback-policy.test.ts",
+        "sha256": "d4450951a6b0dd055924b4b27f66fe547fb3a0661ad88c330b292baecebccfe7",
+        "gitBlob": "acb3ce901dca314f4c5f7e15160158d6ebcd5fd2",
+        "kind": "source",
+        "recordedAt": "after execution collection, not contemporaneous per-invocation attestation",
+        "checkpoint": "41caf96cac175bafeccc4fd9e6c76111409767e6",
+        "checkpointSHA256": "d4450951a6b0dd055924b4b27f66fe547fb3a0661ad88c330b292baecebccfe7",
+        "matchesRecordedHashAtCheckpoint": true,
+        "currentSHA256": "d4450951a6b0dd055924b4b27f66fe547fb3a0661ad88c330b292baecebccfe7",
+        "currentGitBlob": "acb3ce901dca314f4c5f7e15160158d6ebcd5fd2",
+        "currentMatchesRecordedHash": true
+      },
+      {
+        "path": "server-version/backend/src/modules/assessment-policy/training-feedback-policy.ts",
+        "sha256": "e2eef914d088deee2d98bea840d3142de02e9e60f4a9e185d894e752f822bbb1",
+        "gitBlob": "f3294b402475ae7c9b5deed86785b7cd5f076551",
+        "kind": "source",
+        "recordedAt": "after execution collection, not contemporaneous per-invocation attestation",
+        "checkpoint": "41caf96cac175bafeccc4fd9e6c76111409767e6",
+        "checkpointSHA256": "e2eef914d088deee2d98bea840d3142de02e9e60f4a9e185d894e752f822bbb1",
+        "matchesRecordedHashAtCheckpoint": true,
+        "currentSHA256": "e2eef914d088deee2d98bea840d3142de02e9e60f4a9e185d894e752f822bbb1",
+        "currentGitBlob": "f3294b402475ae7c9b5deed86785b7cd5f076551",
+        "currentMatchesRecordedHash": true
+      },
+      {
+        "path": "server-version/backend/src/modules/education-tools/assessment-resource.contract.ts",
+        "sha256": "cd9ce862e282dc994d10214d77094175db3a94f3d67d8f47e28a7c9addcf0364",
+        "gitBlob": "391cf78a3dbe4869d5bfcc553173a0c65a917204",
+        "kind": "source",
+        "recordedAt": "after execution collection, not contemporaneous per-invocation attestation",
+        "checkpoint": "41caf96cac175bafeccc4fd9e6c76111409767e6",
+        "checkpointSHA256": "cd9ce862e282dc994d10214d77094175db3a94f3d67d8f47e28a7c9addcf0364",
+        "matchesRecordedHashAtCheckpoint": true,
+        "currentSHA256": "cd9ce862e282dc994d10214d77094175db3a94f3d67d8f47e28a7c9addcf0364",
+        "currentGitBlob": "391cf78a3dbe4869d5bfcc553173a0c65a917204",
+        "currentMatchesRecordedHash": true
+      },
+      {
+        "path": "server-version/backend/src/modules/education-tools/assessment-resource.service.ts",
+        "sha256": "d6a4c6d9146d3d5b4b00f23eb53a938092387eca469e3126907638261229f9fe",
+        "gitBlob": "422bf5559676321cf9523b79d73c3cfa1d1b311c",
+        "kind": "source",
+        "recordedAt": "after execution collection, not contemporaneous per-invocation attestation",
+        "checkpoint": "41caf96cac175bafeccc4fd9e6c76111409767e6",
+        "checkpointSHA256": "d6a4c6d9146d3d5b4b00f23eb53a938092387eca469e3126907638261229f9fe",
+        "matchesRecordedHashAtCheckpoint": true,
+        "currentSHA256": "b4a8fe8b4aa7cd0d4daa220d6dd36d27c81ee8162a0b3ac4a22523ebf69ca414",
+        "currentGitBlob": "7363182e7457dd47370ae3a373e2cf729f48b4ad",
+        "currentMatchesRecordedHash": false
+      }
+    ],
+    "exact-license": [
+      {
+        "path": "server-version/backend/src/modules/education-tools/assessment-resource.service.ts",
+        "sha256": "b7a56aec57f62f9d5ee574f29f5a9edab6d0736de3bf30df5a561b7777c326a3",
+        "gitBlob": "3e4ff95ed22d5d21cc38c2cc5742468ca4b9bca0",
+        "kind": "source",
+        "recordedAt": "after execution collection, not contemporaneous per-invocation attestation",
+        "checkpoint": "b045751a29c080e6e52f67252fed7c875f007f7c",
+        "checkpointSHA256": "b7a56aec57f62f9d5ee574f29f5a9edab6d0736de3bf30df5a561b7777c326a3",
+        "matchesRecordedHashAtCheckpoint": true,
+        "currentSHA256": "b4a8fe8b4aa7cd0d4daa220d6dd36d27c81ee8162a0b3ac4a22523ebf69ca414",
+        "currentGitBlob": "7363182e7457dd47370ae3a373e2cf729f48b4ad",
+        "currentMatchesRecordedHash": false
+      },
+      {
+        "path": "server-version/backend/src/__tests__/education-tools/assessment-resource.license-selection.postgres.integration.test.ts",
+        "sha256": "9abc31878d434f27b3f709022c630c6c1eef30de12dd899df41791bc8e932959",
+        "gitBlob": "c16cd9d2d7896c656c906e5ad70fb0d3874b7c49",
+        "kind": "source",
+        "recordedAt": "after execution collection, not contemporaneous per-invocation attestation",
+        "checkpoint": "b045751a29c080e6e52f67252fed7c875f007f7c",
+        "checkpointSHA256": "9abc31878d434f27b3f709022c630c6c1eef30de12dd899df41791bc8e932959",
+        "matchesRecordedHashAtCheckpoint": true,
+        "currentSHA256": "9abc31878d434f27b3f709022c630c6c1eef30de12dd899df41791bc8e932959",
+        "currentGitBlob": "c16cd9d2d7896c656c906e5ad70fb0d3874b7c49",
+        "currentMatchesRecordedHash": true
+      },
+      {
+        "path": "server-version/backend/src/__tests__/education-tools/assessment-resource.publication.postgres.integration.test.ts",
+        "sha256": "976ea85a8644f74678fb0214f49d1dc92830ed6974f6a579e51c88f1eb52636c",
+        "gitBlob": "e928739b1a8bef1f81f3d96925f4b526cfb63e55",
+        "kind": "source",
+        "recordedAt": "after execution collection, not contemporaneous per-invocation attestation",
+        "checkpoint": "b045751a29c080e6e52f67252fed7c875f007f7c",
+        "checkpointSHA256": "976ea85a8644f74678fb0214f49d1dc92830ed6974f6a579e51c88f1eb52636c",
+        "matchesRecordedHashAtCheckpoint": true,
+        "currentSHA256": "976ea85a8644f74678fb0214f49d1dc92830ed6974f6a579e51c88f1eb52636c",
+        "currentGitBlob": "e928739b1a8bef1f81f3d96925f4b526cfb63e55",
+        "currentMatchesRecordedHash": true
+      }
+    ]
+  },
+  "configSchemaLockIdentity": {
+    "8fcfadcadeb7fd09fd8e453aa6eb16d87d53e686": {
+      "server-version/backend/package.json": {
+        "sha256": "d629185584fcd679ca367c2d536c6c7783f7a9fe23363a8cd870964a47b2990a",
+        "gitBlob": "3157b4edaaecd9c495458434ab4cfd1bd5fcdfaf"
+      },
+      "server-version/backend/package-lock.json": {
+        "sha256": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+        "gitBlob": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6"
+      },
+      "server-version/backend/tsconfig.json": {
+        "sha256": "c79ccf595a80514e94936f1ffcd2fa09b57265f0c140d275c81770f494175143",
+        "gitBlob": "246383a71a5c4c979ffd01fdf011ebeb21e71a1d"
+      },
+      "server-version/backend/vitest.config.ts": {
+        "sha256": "26b98b70914617771d41657be8cdf6d7b6d7024c81d1c8a49aeae6a9220cf93b",
+        "gitBlob": "619cca9b71a3046d22f1e8bcbcf59eaea5f0b406"
+      },
+      "server-version/backend/prisma/schema.prisma": {
+        "sha256": "3bea3c07159f95eadce9257207648658bc8f10e5996f594667cb6c877a84b515",
+        "gitBlob": "eefdf15e7ec9084c4c9e06bd3693063ee0dc6034"
+      },
+      "server-version/frontend/package.json": {
+        "sha256": "ba3959e4e7935cb3b60b8391f590a2622990397b1b33b99a545c45867d51e49f",
+        "gitBlob": "41eaa68acf3f387f2e6ecbdfa697947232fe1fda"
+      },
+      "server-version/frontend/package-lock.json": {
+        "sha256": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+        "gitBlob": "38d624d2dd610673f9392a89af7290682862e2b0"
+      },
+      "server-version/frontend/tsconfig.app.json": {
+        "sha256": "97ed0e951ac068a9b2d08635b327932db8e41193f9c82e8291a919b7c68bd62e",
+        "gitBlob": "990a9f4222f2330106b8141fe5658283326e49df"
+      },
+      "server-version/frontend/vitest.config.ts": {
+        "sha256": "3d757d2b1cee6c1c09a3ec7016b296aa159c938f83365e2370a1d423f29917db",
+        "gitBlob": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7"
+      },
+      "server-version/frontend/src/test/setup.ts": {
+        "sha256": "6e40f95ed1a8c33a9142d1d1ceb9400abc38b6a8de2d5798f7fa3fe9984482f8",
+        "gitBlob": "3217d9d84ea1285cf3495e27669a88e3fe7d2cf3"
+      },
+      "migrationTree": {
+        "gitTree": "d393d33a21e8fffeeba698219a7225db26a52aec",
+        "sqlFiles": 240,
+        "entryListSHA256": "965b15adc5c7f468d5edf2bd16ab5777d87bcc729f1553d70169114f2eb15d43"
+      }
+    },
+    "9ce3f44d7c1b2fb5025a8c6442f61faaa3ec3e9b": {
+      "server-version/backend/package.json": {
+        "sha256": "d629185584fcd679ca367c2d536c6c7783f7a9fe23363a8cd870964a47b2990a",
+        "gitBlob": "3157b4edaaecd9c495458434ab4cfd1bd5fcdfaf"
+      },
+      "server-version/backend/package-lock.json": {
+        "sha256": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+        "gitBlob": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6"
+      },
+      "server-version/backend/tsconfig.json": {
+        "sha256": "c79ccf595a80514e94936f1ffcd2fa09b57265f0c140d275c81770f494175143",
+        "gitBlob": "246383a71a5c4c979ffd01fdf011ebeb21e71a1d"
+      },
+      "server-version/backend/vitest.config.ts": {
+        "sha256": "26b98b70914617771d41657be8cdf6d7b6d7024c81d1c8a49aeae6a9220cf93b",
+        "gitBlob": "619cca9b71a3046d22f1e8bcbcf59eaea5f0b406"
+      },
+      "server-version/backend/prisma/schema.prisma": {
+        "sha256": "3bea3c07159f95eadce9257207648658bc8f10e5996f594667cb6c877a84b515",
+        "gitBlob": "eefdf15e7ec9084c4c9e06bd3693063ee0dc6034"
+      },
+      "server-version/frontend/package.json": {
+        "sha256": "ba3959e4e7935cb3b60b8391f590a2622990397b1b33b99a545c45867d51e49f",
+        "gitBlob": "41eaa68acf3f387f2e6ecbdfa697947232fe1fda"
+      },
+      "server-version/frontend/package-lock.json": {
+        "sha256": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+        "gitBlob": "38d624d2dd610673f9392a89af7290682862e2b0"
+      },
+      "server-version/frontend/tsconfig.app.json": {
+        "sha256": "97ed0e951ac068a9b2d08635b327932db8e41193f9c82e8291a919b7c68bd62e",
+        "gitBlob": "990a9f4222f2330106b8141fe5658283326e49df"
+      },
+      "server-version/frontend/vitest.config.ts": {
+        "sha256": "3d757d2b1cee6c1c09a3ec7016b296aa159c938f83365e2370a1d423f29917db",
+        "gitBlob": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7"
+      },
+      "server-version/frontend/src/test/setup.ts": {
+        "sha256": "6e40f95ed1a8c33a9142d1d1ceb9400abc38b6a8de2d5798f7fa3fe9984482f8",
+        "gitBlob": "3217d9d84ea1285cf3495e27669a88e3fe7d2cf3"
+      },
+      "migrationTree": {
+        "gitTree": "d393d33a21e8fffeeba698219a7225db26a52aec",
+        "sqlFiles": 240,
+        "entryListSHA256": "965b15adc5c7f468d5edf2bd16ab5777d87bcc729f1553d70169114f2eb15d43"
+      }
+    },
+    "41caf96cac175bafeccc4fd9e6c76111409767e6": {
+      "server-version/backend/package.json": {
+        "sha256": "d629185584fcd679ca367c2d536c6c7783f7a9fe23363a8cd870964a47b2990a",
+        "gitBlob": "3157b4edaaecd9c495458434ab4cfd1bd5fcdfaf"
+      },
+      "server-version/backend/package-lock.json": {
+        "sha256": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+        "gitBlob": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6"
+      },
+      "server-version/backend/tsconfig.json": {
+        "sha256": "c79ccf595a80514e94936f1ffcd2fa09b57265f0c140d275c81770f494175143",
+        "gitBlob": "246383a71a5c4c979ffd01fdf011ebeb21e71a1d"
+      },
+      "server-version/backend/vitest.config.ts": {
+        "sha256": "26b98b70914617771d41657be8cdf6d7b6d7024c81d1c8a49aeae6a9220cf93b",
+        "gitBlob": "619cca9b71a3046d22f1e8bcbcf59eaea5f0b406"
+      },
+      "server-version/backend/prisma/schema.prisma": {
+        "sha256": "3bea3c07159f95eadce9257207648658bc8f10e5996f594667cb6c877a84b515",
+        "gitBlob": "eefdf15e7ec9084c4c9e06bd3693063ee0dc6034"
+      },
+      "server-version/frontend/package.json": {
+        "sha256": "ba3959e4e7935cb3b60b8391f590a2622990397b1b33b99a545c45867d51e49f",
+        "gitBlob": "41eaa68acf3f387f2e6ecbdfa697947232fe1fda"
+      },
+      "server-version/frontend/package-lock.json": {
+        "sha256": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+        "gitBlob": "38d624d2dd610673f9392a89af7290682862e2b0"
+      },
+      "server-version/frontend/tsconfig.app.json": {
+        "sha256": "97ed0e951ac068a9b2d08635b327932db8e41193f9c82e8291a919b7c68bd62e",
+        "gitBlob": "990a9f4222f2330106b8141fe5658283326e49df"
+      },
+      "server-version/frontend/vitest.config.ts": {
+        "sha256": "3d757d2b1cee6c1c09a3ec7016b296aa159c938f83365e2370a1d423f29917db",
+        "gitBlob": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7"
+      },
+      "server-version/frontend/src/test/setup.ts": {
+        "sha256": "6e40f95ed1a8c33a9142d1d1ceb9400abc38b6a8de2d5798f7fa3fe9984482f8",
+        "gitBlob": "3217d9d84ea1285cf3495e27669a88e3fe7d2cf3"
+      },
+      "migrationTree": {
+        "gitTree": "d393d33a21e8fffeeba698219a7225db26a52aec",
+        "sqlFiles": 240,
+        "entryListSHA256": "965b15adc5c7f468d5edf2bd16ab5777d87bcc729f1553d70169114f2eb15d43"
+      }
+    },
+    "b045751a29c080e6e52f67252fed7c875f007f7c": {
+      "server-version/backend/package.json": {
+        "sha256": "d629185584fcd679ca367c2d536c6c7783f7a9fe23363a8cd870964a47b2990a",
+        "gitBlob": "3157b4edaaecd9c495458434ab4cfd1bd5fcdfaf"
+      },
+      "server-version/backend/package-lock.json": {
+        "sha256": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+        "gitBlob": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6"
+      },
+      "server-version/backend/tsconfig.json": {
+        "sha256": "c79ccf595a80514e94936f1ffcd2fa09b57265f0c140d275c81770f494175143",
+        "gitBlob": "246383a71a5c4c979ffd01fdf011ebeb21e71a1d"
+      },
+      "server-version/backend/vitest.config.ts": {
+        "sha256": "26b98b70914617771d41657be8cdf6d7b6d7024c81d1c8a49aeae6a9220cf93b",
+        "gitBlob": "619cca9b71a3046d22f1e8bcbcf59eaea5f0b406"
+      },
+      "server-version/backend/prisma/schema.prisma": {
+        "sha256": "3bea3c07159f95eadce9257207648658bc8f10e5996f594667cb6c877a84b515",
+        "gitBlob": "eefdf15e7ec9084c4c9e06bd3693063ee0dc6034"
+      },
+      "server-version/frontend/package.json": {
+        "sha256": "ba3959e4e7935cb3b60b8391f590a2622990397b1b33b99a545c45867d51e49f",
+        "gitBlob": "41eaa68acf3f387f2e6ecbdfa697947232fe1fda"
+      },
+      "server-version/frontend/package-lock.json": {
+        "sha256": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+        "gitBlob": "38d624d2dd610673f9392a89af7290682862e2b0"
+      },
+      "server-version/frontend/tsconfig.app.json": {
+        "sha256": "97ed0e951ac068a9b2d08635b327932db8e41193f9c82e8291a919b7c68bd62e",
+        "gitBlob": "990a9f4222f2330106b8141fe5658283326e49df"
+      },
+      "server-version/frontend/vitest.config.ts": {
+        "sha256": "3d757d2b1cee6c1c09a3ec7016b296aa159c938f83365e2370a1d423f29917db",
+        "gitBlob": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7"
+      },
+      "server-version/frontend/src/test/setup.ts": {
+        "sha256": "6e40f95ed1a8c33a9142d1d1ceb9400abc38b6a8de2d5798f7fa3fe9984482f8",
+        "gitBlob": "3217d9d84ea1285cf3495e27669a88e3fe7d2cf3"
+      },
+      "migrationTree": {
+        "gitTree": "d393d33a21e8fffeeba698219a7225db26a52aec",
+        "sqlFiles": 240,
+        "entryListSHA256": "965b15adc5c7f468d5edf2bd16ab5777d87bcc729f1553d70169114f2eb15d43"
+      }
+    },
+    "85e9ee0c66ada6a2b0550b9e11f3e31b96ab62ce": {
+      "server-version/backend/package.json": {
+        "sha256": "d629185584fcd679ca367c2d536c6c7783f7a9fe23363a8cd870964a47b2990a",
+        "gitBlob": "3157b4edaaecd9c495458434ab4cfd1bd5fcdfaf"
+      },
+      "server-version/backend/package-lock.json": {
+        "sha256": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+        "gitBlob": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6"
+      },
+      "server-version/backend/tsconfig.json": {
+        "sha256": "c79ccf595a80514e94936f1ffcd2fa09b57265f0c140d275c81770f494175143",
+        "gitBlob": "246383a71a5c4c979ffd01fdf011ebeb21e71a1d"
+      },
+      "server-version/backend/vitest.config.ts": {
+        "sha256": "26b98b70914617771d41657be8cdf6d7b6d7024c81d1c8a49aeae6a9220cf93b",
+        "gitBlob": "619cca9b71a3046d22f1e8bcbcf59eaea5f0b406"
+      },
+      "server-version/backend/prisma/schema.prisma": {
+        "sha256": "3bea3c07159f95eadce9257207648658bc8f10e5996f594667cb6c877a84b515",
+        "gitBlob": "eefdf15e7ec9084c4c9e06bd3693063ee0dc6034"
+      },
+      "server-version/frontend/package.json": {
+        "sha256": "ba3959e4e7935cb3b60b8391f590a2622990397b1b33b99a545c45867d51e49f",
+        "gitBlob": "41eaa68acf3f387f2e6ecbdfa697947232fe1fda"
+      },
+      "server-version/frontend/package-lock.json": {
+        "sha256": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+        "gitBlob": "38d624d2dd610673f9392a89af7290682862e2b0"
+      },
+      "server-version/frontend/tsconfig.app.json": {
+        "sha256": "97ed0e951ac068a9b2d08635b327932db8e41193f9c82e8291a919b7c68bd62e",
+        "gitBlob": "990a9f4222f2330106b8141fe5658283326e49df"
+      },
+      "server-version/frontend/vitest.config.ts": {
+        "sha256": "3d757d2b1cee6c1c09a3ec7016b296aa159c938f83365e2370a1d423f29917db",
+        "gitBlob": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7"
+      },
+      "server-version/frontend/src/test/setup.ts": {
+        "sha256": "6e40f95ed1a8c33a9142d1d1ceb9400abc38b6a8de2d5798f7fa3fe9984482f8",
+        "gitBlob": "3217d9d84ea1285cf3495e27669a88e3fe7d2cf3"
+      },
+      "migrationTree": {
+        "gitTree": "d393d33a21e8fffeeba698219a7225db26a52aec",
+        "sqlFiles": 240,
+        "entryListSHA256": "965b15adc5c7f468d5edf2bd16ab5777d87bcc729f1553d70169114f2eb15d43"
+      }
+    }
+  },
+  "historicalActualEnvironment": "No historical full dependency byte closure or per-invocation DB snapshot retained. Existing package metadata now is separately timestamped, not a backfilled historical proof."
+}

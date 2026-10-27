@@ -1,4 +1,5 @@
 import {CompositeServiceError} from '../composite/composite.errors'
+import {InstrumentFinalSubmitError} from '../../services/instrumentFinalSubmit'
 import {decodeTrainingStandardItemSource} from '../composite/training-standard-combination'
 import {readCurrentStandardCombination} from '../measurement-content/standard-combination-source'
 import {assertStandardCombinationDerivedRelease} from '../measurement-content/standard-combination-content'
@@ -106,6 +107,7 @@ export function pickerSourceUnavailable(error:unknown){
  // Account contention must roll back the transaction, never masquerade as an
  // unavailable candidate; database/unknown errors likewise propagate.
  if(error instanceof Error&&'code'in error&&error.code==='EDUCATION_ASSESSMENT_AUTHORITY_BUSY')return false
+ if(error instanceof InstrumentFinalSubmitError)return error.code==='FORM_ANSWER_INVALID'&&error.statusCode===400
  return error instanceof z.ZodError||error instanceof ContentReleaseError||error instanceof CompositeServiceError
   ||error instanceof EducationAssessmentManagementError||error instanceof EducationAssessmentSourceError
 }
