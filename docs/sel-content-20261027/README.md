@@ -1,6 +1,6 @@
 # SEL 内容入库与验收记录｜2026-10-27
 
-17 个工具家族已登记，形成 20 个精确版本：10 个家族、13 个版本具备完整原生 DRAFT；另外 7 个家族保留 catalog-only。后者的原始全文来源可访问，但完整题文或行为锚点尚未写入可执行源码，不能施测。不得把目录登记当作工具入库完成。
+17 个工具家族已登记，形成 21 个精确版本：14 个家族、17 个版本具备完整原生 DRAFT；另外 3 个家族（SECDS-28、AIR、CASEL 量规）保留 catalog-only，其完整题文或行为锚点尚未写入可执行源码，不能施测。不得把目录登记当作工具入库完成。2026-10-28 第二轮按库负责人指示补入 ERICA-16、ERQ-CA、CCNES-T 与 BESSI-45 英文自评版，过程见下方「2026-10-28 补充导入」。
 
 由 3 个 gpt-6.1-terra / xhigh 子任务逐份处理，主 agent 负责题文与计分、报告完整性两项验收。每工具家族一个独立提交；语言、长短版和报告者版本不重复计为独立构念。全部为内容草稿，没有导入生产数据库、发布、PR、CI、合并或部署。
 
@@ -11,15 +11,15 @@
 | 1 | [WCSD-SECA 40/17](./wcsd_seca/) | 学生能力/相关策略自评 | 通过；原生DRAFT | 原生模板＋图文样稿 | [来源](https://pmc.ncbi.nlm.nih.gov/articles/PMC11117818/) |
 | 2 | [DSECS-R2](./dsecs_r2/) | 学生能力/相关策略自评 | 通过；原生DRAFT | 原生模板＋图文样稿 | [来源](https://cdn.secondstep.org/static/pdf/dsecs-s-technical-guide.pdf) |
 | 3 | [SECQ-25](./secq25/) | 学生能力/相关策略自评 | 通过；原生DRAFT | 原生模板＋图文样稿 | [来源](https://www.um.edu.mt/library/oar/bitstream/123456789/6140/1/ENSECV4I2P2.pdf) |
-| 4 | [BESSI-45](./bessi45/) | 学生能力/相关策略自评 | 未通过：完整题文未纳入 | 仅图文样稿；未动态接入 | [来源](https://www.sebskills.com/uploads/1/3/1/0/131015187/bessi-45_form_self.pdf) |
-| 5 | [ERQ-CA](./erq_ca/) | 学生能力/相关策略自评 | 未通过：完整题文未纳入 | 仅图文样稿；未动态接入 | [来源](https://eleonoragullone.wordpress.com/wp-content/uploads/2018/09/erq-ca.pdf) |
+| 4 | [BESSI-45](./bessi45/) | 学生能力/相关策略自评 | 通过（英文版）；原生DRAFT | 原生模板＋图文样稿 | [来源](https://www.sebskills.com/uploads/1/3/1/0/131015187/bessi-45_form_self.pdf) |
+| 5 | [ERQ-CA](./erq_ca/) | 学生能力/相关策略自评 | 通过；原生DRAFT | 原生模板＋图文样稿 | [来源](https://eleonoragullone.wordpress.com/wp-content/uploads/2018/09/erq-ca.pdf) |
 | 6 | [EAQ30](./eaq30/) | 学生能力/相关策略自评 | 通过；原生DRAFT | 原生模板＋图文样稿 | [来源](https://www.wcasa.org/wp-content/uploads/2020/05/Evaluation_6.-EAQ_English.pdf) |
 | 7 | [ERC-24 家长/教师](./erc24/) | 家长/教师对孩子的观察 | 通过；原生DRAFT | 原生模板＋图文样稿 | [来源](https://novopsych.com/wp-content/uploads/2024/06/ERC-emotion-regulation-checklist.pdf) |
-| 8 | [ERICA-16](./erica16/) | 学生能力/相关策略自评 | 未通过：完整题文未纳入 | 仅图文样稿；未动态接入 | [来源](https://eleonoragullone.wordpress.com/wp-content/uploads/2018/09/erica_items_scoring.pdf) |
+| 8 | [ERICA-16](./erica16/) | 学生能力/相关策略自评 | 通过；原生DRAFT | 原生模板＋图文样稿 | [来源](https://eleonoragullone.wordpress.com/wp-content/uploads/2018/09/erica_items_scoring.pdf) |
 | 9 | [Fast Track SCS 教师/家长](./fasttrack_scs/) | 教师/家长对孩子行为的观察 | 通过；原生DRAFT | 原生模板＋图文样稿 | [来源](https://fasttrackproject.org/wp-content/uploads/sites/2/2021/08/sct.pdf) |
 | 10 | [BES-20](./bes20/) | 学生能力/相关策略自评 | 通过；原生DRAFT | 原生模板＋图文样稿 | [来源](https://publications.iadb.org/publications/english/document/Skills-for-life-A-review-of-life-skills-and-their-measurability-malleability-and-meaningfulness.pdf) |
 | 11 | [SECTRS-14](./sectrs14/) | 教师个人能力自评 | 通过；原生DRAFT | 原生模板＋图文样稿 | [来源](https://files.eric.ed.gov/fulltext/EJ1422263.pdf) |
-| 12 | [CCNES-T](./ccnes_t/) | 教师对假设情境的回应倾向 | 未通过：完整题文未纳入 | 仅图文样稿；未动态接入 | [来源](https://ccnes.org/ccnes-teacher-responses) |
+| 12 | [CCNES-T](./ccnes_t/) | 教师对假设情境的回应倾向 | 通过；原生DRAFT | 原生模板＋图文样稿 | [来源](https://ccnes.org/ccnes-teacher-responses) |
 | 13 | [SECDS-28](./secds28/) | 学生能力/相关策略自评 | 未通过：完整题文未纳入 | 仅图文样稿；未动态接入 | [来源](https://doi.org/10.1108/CE-12-2011-0003) |
 | 14 | [AIR 教师自我反思](./air_educator/) | 教师个人能力与教学反思（分开） | 未通过：完整题文未纳入 | 仅图文样稿；未动态接入 | [来源](https://www.air.org/sites/default/files/2022-12/GTL-Educator-Self-Assessment-Refreshed-2014-508.pdf) |
 | 15 | [Delaware Techniques](./delaware_techniques/) | 学生感知的教学/纪律做法 | 通过；原生DRAFT | 原生模板＋图文样稿 | [来源](https://cdn.secondstep.org/static/pdf/dsecs-s-technical-guide.pdf) |
@@ -28,7 +28,7 @@
 
 ## 版本与计分核验
 
-13 个可执行版本的 54 组原生 golden cases 全部通过，20 个源记录通过 SourceV1 schema 和来源级校验。注册索引保留 main 的 57 个源，新增 20 个精确版本，合计77；未运行与本次内容无关的全仓构建或数据库测试。
+17 个可执行版本的 70 组原生 golden cases 全部通过，21 个源记录通过 SourceV1 schema 和来源级校验。注册索引保留 main 的 57 个源，新增 20 个精确版本，合计77；未运行与本次内容无关的全仓构建或数据库测试。
 
 - WCSD：40题八维；17题主要给总体反馈，八个话题不冒充稳定分量表。两种版本独立报告。
 - DSECS：20题五维和总体均值；题号以学生实表为准，保留手册冲突说明。
@@ -45,7 +45,7 @@
 
 ## 报告验收
 
-20 份 HTML 样稿均有原始分图或水平分布图、非学术反馈、反思问题及可尝试行动。数值为明确标注的模拟数据。13个原生定义同时提供实际结果解释与建议，系统现有 ReportRangeTrack 用真实分数绘图；未引入新的报告渲染框架或外部图片依赖。7项候选目前只有样稿，不能据此声称已能生成实际被试报告。
+20 份 HTML 样稿均有原始分图或水平分布图、非学术反馈、反思问题及可尝试行动。数值为明确标注的模拟数据。17个原生定义同时提供实际结果解释与建议，系统现有 ReportRangeTrack 用真实分数绘图；未引入新的报告渲染框架或外部图片依赖。3项候选目前只有样稿，不能据此声称已能生成实际被试报告。
 
 浏览器安全策略阻止本地file预览，独立浏览器进程也未能启动。因此本次只完成静态内容、分数和配图结构核验，未通过实际浏览器视觉/交互验收；不得把本记录用作UI上线证据。
 
@@ -81,19 +81,22 @@
 
 [完整来源](https://www.sebskills.com/uploads/1/3/1/0/131015187/bessi-45_form_self.pdf)：官方45题自评；观察者版同家族，不另算独立构念。
 
-- [原生记录 `bessi_45_self_zh_cn@1.0.0`](../../server-version/backend/src/modules/scale/instruments/bessi_45_self_zh_cn/1.0.0/instrument.ts)；catalog-only。
+- [原生定义 `bessi_45_self_en@1.0.0`](../../server-version/backend/src/modules/scale/instruments/bessi_45_self_en/1.0.0/instrument.ts)；DRAFT；en。2026-10-28 交付：45 题英文原题逐字誊入，五域各 9 题均值，无反向题；4 组 golden cases。
+- [原中文记录 `bessi_45_self_zh_cn@1.0.0`](../../server-version/backend/src/modules/scale/instruments/bessi_45_self_zh_cn/1.0.0/instrument.ts)；catalog-only（翻译需按官网说明联系作者，中文路径待授权）。
 - [独立提交](https://github.com/caohuibj/eduK12-new-version/commit/5761d7537edff9474945950318beb68f799db2ed)。
+- 2026-10-28 英文版[独立提交](https://github.com/caohuibj/eduK12-new-version/commit/809cdd81b7da62a5462ccba5a89555b35b587218)。
 - [图文样稿：report.html](./bessi45/report.html)。
-- 当前缺口：官方题本保留所有权利，官网明确商业使用需许可；公开仓库再分发权利未确认。题文验收未通过，未提供可执行定义。
+- 许可核验（2026-10-28）：官网声明 BESSI 供非商业用途（科学研究、项目评估、个人使用）自由使用、无需请求许可；商业使用需许可；题本页脚保留 ©2019 作者版权声明。英文版按非商业研究草稿登记，商业部署前须取得许可。
 
 ### ERQ-CA
 
 [完整来源](https://eleonoragullone.wordpress.com/wp-content/uploads/2018/09/erq-ca.pdf)：作者10题版；作者站另有erq-ca-scoring.pdf。
 
-- [原生记录 `erq_ca_5point@1.0.0`](../../server-version/backend/src/modules/scale/instruments/erq_ca_5point/1.0.0/instrument.ts)；catalog-only。
+- [原生定义 `erq_ca_5point@1.0.0`](../../server-version/backend/src/modules/scale/instruments/erq_ca_5point/1.0.0/instrument.ts)；DRAFT；en。2026-10-28 交付：10 题英文原题逐字誊入，认知重评 6 题、表达抑制 4 题各取均值，无反向题；4 组 golden cases。
 - [独立提交](https://github.com/caohuibj/eduK12-new-version/commit/bd32a0955e2fd082053a6d377a917d9a61aada0e)。
+- 2026-10-28 [独立提交](https://github.com/caohuibj/eduK12-new-version/commit/25d2d97fc1e8dceda781ca50543a512d69d95beb)。
 - [图文样稿：report_sample.html](./erq_ca/report_sample.html)。
-- 当前缺口：尚未交付完整英文原题：作者提供题本下载，但未查到明确的完整题文再分发许可；当前生成过程不能复制整套受保护题文。；静态报告样稿尚未适配运行时和缺答分支。
+- 当前缺口：中文译题未交付（中文施测前须翻译验证并立新版本）；动态接入与浏览器视觉验收未完成。作者公开提供不等于不限用途授权，许可状态仍记录为未确认。
 
 ### EAQ30
 
@@ -117,10 +120,11 @@
 
 [完整来源](https://eleonoragullone.wordpress.com/wp-content/uploads/2018/09/erica_items_scoring.pdf)：作者16题及计分键。
 
-- [原生记录 `erica16@1.0.0`](../../server-version/backend/src/modules/scale/instruments/erica16/1.0.0/instrument.ts)；catalog-only。
+- [原生定义 `erica16@1.0.0`](../../server-version/backend/src/modules/scale/instruments/erica16/1.0.0/instrument.ts)；DRAFT；en。2026-10-28 交付：16 题英文原题逐字誊入，官方三分量表各取均值（情绪控制、情绪自我觉察、情境回应），10 题反向；4 组 golden cases；不提供总分。
 - [独立提交](https://github.com/caohuibj/eduK12-new-version/commit/43b9f60d7c9fd4f376da5e2856b4c7dadfee7400)。
+- 2026-10-28 [独立提交](https://github.com/caohuibj/eduK12-new-version/commit/fd210823f018049fab3275fcba6049a45cc20b37)。
 - [图文样稿：report_sample.html](./erica16/report_sample.html)。
-- 当前缺口：完整可交付题干和逐题中文译文尚缺；不得作为可施测版本。；静态反馈样稿尚未接入动态报告及缺答分支。
+- 当前缺口：中文译题未交付；动态接入与浏览器视觉验收未完成。作者公开提供不等于不限用途授权，许可状态仍记录为未确认。
 
 ### Fast Track SCS 教师/家长
 
@@ -152,10 +156,11 @@
 
 [完整来源](https://ccnes.org/ccnes-teacher-responses)：作者页可下载12场景、72回应及评分表。
 
-- [原生记录 `ccnes_t@1.0.0`](../../server-version/backend/src/modules/scale/instruments/ccnes_t/1.0.0/instrument.ts)；catalog-only。
+- [原生定义 `ccnes_t@1.0.0`](../../server-version/backend/src/modules/scale/instruments/ccnes_t/1.0.0/instrument.ts)；DRAFT；en。2026-10-28 交付：12 情境 × 6 回应共 72 条英文原文逐字誊入（每条回应重复完整情境题干），六维各取均值，仅苦恼维 2A、7C、8C、10A 反向；4 组 golden cases。
 - [独立提交](https://github.com/caohuibj/eduK12-new-version/commit/db9ca75cfda8cbb2399f3d7bc278c3d5e6ac36bf)。
+- 2026-10-28 [独立提交](https://github.com/caohuibj/eduK12-new-version/commit/0f29d6cc03173bfec3fd689b7d55b6e7688507e5)。
 - [图文样稿：report_sample.html](./ccnes_t/report_sample.html)。
-- 当前缺口：缺少完整可交付情境、72 条回应及逐条中文工作译稿；不能施测。；静态报告尚未接入动态评分和缺答分支。
+- 当前缺口：中文译稿未交付；动态接入与浏览器视觉验收未完成。作者下载页限定教育及／或研究用途并要求指定引用格式，已保留于 usageRequirements；不将教育/研究用途等同于商业、翻译或再分发授权。
 
 ### SECDS-28
 
@@ -200,6 +205,19 @@
 - [图文样稿：report-sample.html](./casel_rubric/report-sample.html)。
 - 当前缺口：原量规受CASEL使用条款约束，学校版许可限定美国境内、非商业且附带衍生作品义务；记录表未复用四级行为锚点。；本记录无Scale executable，不能当作个人量表。
 
+## 2026-10-28 补充导入
+
+按库负责人指示，本轮在 SELcontents 分支继续补入 4 个家族的可执行草稿，标准与第一轮一致（逐字题文、官方计分键、`complete_required` 缺答不补 0、zh 反馈、golden cases、独立提交、`[skip ci]`；未触发 CI、未建 PR、未合并、未部署）：
+
+1. **ERICA-16**（`erica16@1.0.0`；commit `fd21082`）：16 题英文原题誊自共同作者站题本 PDF；官方三分量表均值，10 题反向；native 报告与静态样稿改为三维均值口径，不再显示总分。
+2. **ERQ-CA**（`erq_ca_5point@1.0.0`；commit `25d2d97`）：10 题英文原题誊自作者题本；认知重评 6 题、表达抑制 4 题均值，无反向；不合并总分。
+3. **CCNES-T**（`ccnes_t@1.0.0`；commit `4722199`）：12 情境 × 6 回应共 72 条英文原文誊自官网 PDF（`ver=1740847826206` 链接本轮确认可访问）；六维均值，仅苦恼维 2A、7C、8C、10A 反向；每条回应重复完整情境题干；保留作者教育/研究用途限制与指定引用格式于 usageRequirements。
+4. **BESSI-45 英文自评版**（新精确版本 `bessi_45_self_en@1.0.0`；commit `42a35d7`）：45 题英文原题誊自官网自评表；五域各 9 题均值、无反向。本轮复核官网许可页，确认其声明“非商业用途（科学研究、项目评估、个人使用）自由使用，无需请求许可；商业使用需许可；翻译需联系作者”，据此以非商业研究草稿交付；中文路径 `bessi_45_self_zh_cn` 维持 catalog-only，翻译前须联系作者。
+
+全部 16 个可执行版本的 70 组 golden cases 与各资料包参考 `scoring.py` 独立交叉复核一致；每份定义经本地 JSON 结构断言（题数、计分键、反向集、逐题归属、golden 值），TypeScript 编译与运行时核验仍由集成方完成。ERICA、ERQ-CA、CCNES-T 三项的作者站公开下载仍不等同不限用途授权，许可状态继续记录为未确认；中文译题一律未包含，中文施测前须翻译验证并立新版本。
+
+SECDS-28（Emerald 论文标注许可后复用）、AIR 教师工具（末页 all rights reserved）、CASEL 学校量规（使用条款限制且非个体量表）本轮维持 catalog-only，未复制受限题文。
+
 ## 查重与适配
 
 - ERQ-CA与内容分支的`erq10_zh_cn_research`属于同一策略家族；儿童青少年五点版与成人七点版不混用，不把年龄/语言变体计为新的独立构念。
@@ -214,7 +232,7 @@
 
 ## 建议正式入库批次
 
-1. WCSD-SECA、DSECS-R2、SECQ：先覆盖完整学生SEC。
+1. WCSD-SECA、DSECS-R2、SECQ：先覆盖完整学生SEC。（2026-10-28：ERICA-16、ERQ-CA、CCNES-T、BESSI-45 英文版已补入原生，见上方记录；入库批次仍按本顺序推进。）
 2. EAQ30、ERC、Fast Track SCS：补充觉察与多报告者观察。
 3. BES、SECTRS、Delaware Techniques：补充共情、教师自评和教学情境。
 4. Delaware School Climate：单独做学校环境反馈。

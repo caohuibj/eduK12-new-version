@@ -78,10 +78,63 @@
     {
       "file": "server-version/backend/src/modules/scale/instruments/ccnes_t/1.0.0/instrument.ts",
       "key": "ccnes_t",
-      "executable": false,
+      "executable": true,
       "valid": true,
       "issues": [],
-      "goldens": []
+      "goldens": [
+        {
+          "name": "minimum-keyed",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "distress_reactions": 3,
+            "punitive_reactions": 1,
+            "expressive_encouragement": 1,
+            "emotion_focused": 1,
+            "problem_focused": 1,
+            "minimization": 1
+          }
+        },
+        {
+          "name": "maximum-keyed",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "distress_reactions": 5,
+            "punitive_reactions": 7,
+            "expressive_encouragement": 7,
+            "emotion_focused": 7,
+            "problem_focused": 7,
+            "minimization": 7
+          }
+        },
+        {
+          "name": "sample-mixed",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "distress_reactions": 4.083333333333333,
+            "punitive_reactions": 4.083333333333333,
+            "expressive_encouragement": 4.083333333333333,
+            "emotion_focused": 4.25,
+            "problem_focused": 4.583333333333333,
+            "minimization": 4.583333333333333
+          }
+        },
+        {
+          "name": "missing-subscale-response",
+          "passed": true,
+          "quality": "invalid",
+          "scores": {
+            "distress_reactions": 4.083333333333333,
+            "punitive_reactions": 4.083333333333333,
+            "expressive_encouragement": 4.083333333333333,
+            "emotion_focused": 4.25,
+            "problem_focused": null,
+            "minimization": 4.583333333333333
+          }
+        }
+      ]
     },
     {
       "file": "server-version/backend/src/modules/scale/instruments/delaware_school_climate_student_en/1.0.0/instrument.ts",
@@ -446,18 +499,96 @@
     {
       "file": "server-version/backend/src/modules/scale/instruments/erica16/1.0.0/instrument.ts",
       "key": "erica16",
-      "executable": false,
+      "executable": true,
       "valid": true,
       "issues": [],
-      "goldens": []
+      "goldens": [
+        {
+          "name": "minimum-keyed",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "emotional_control": 5,
+            "emotional_self_awareness": 2.6,
+            "situational_responsiveness": 2
+          }
+        },
+        {
+          "name": "maximum-keyed",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "emotional_control": 1,
+            "emotional_self_awareness": 3.4,
+            "situational_responsiveness": 4
+          }
+        },
+        {
+          "name": "sample-mixed",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "emotional_control": 3,
+            "emotional_self_awareness": 4,
+            "situational_responsiveness": 4.5
+          }
+        },
+        {
+          "name": "missing-subscale-item",
+          "passed": true,
+          "quality": "invalid",
+          "scores": {
+            "emotional_control": 3,
+            "emotional_self_awareness": null,
+            "situational_responsiveness": 4.5
+          }
+        }
+      ]
     },
     {
       "file": "server-version/backend/src/modules/scale/instruments/erq_ca_5point/1.0.0/instrument.ts",
       "key": "erq_ca_5point",
-      "executable": false,
+      "executable": true,
       "valid": true,
       "issues": [],
-      "goldens": []
+      "goldens": [
+        {
+          "name": "minimum-keyed",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "cognitive_reappraisal": 1,
+            "expressive_suppression": 1
+          }
+        },
+        {
+          "name": "maximum-keyed",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "cognitive_reappraisal": 5,
+            "expressive_suppression": 5
+          }
+        },
+        {
+          "name": "sample-mixed",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "cognitive_reappraisal": 4,
+            "expressive_suppression": 3
+          }
+        },
+        {
+          "name": "missing-subscale-item",
+          "passed": true,
+          "quality": "invalid",
+          "scores": {
+            "cognitive_reappraisal": null,
+            "expressive_suppression": 3
+          }
+        }
+      ]
     },
     {
       "file": "server-version/backend/src/modules/scale/instruments/fasttrack_scs_parent_zh_cn/1.0.0/instrument.ts",
@@ -792,6 +923,63 @@
             "school_work": 4,
             "relationship_skills": 4,
             "responsible_decision": 4
+          }
+        }
+      ]
+    },
+    {
+      "file": "server-version/backend/src/modules/scale/instruments/bessi_45_self_en/1.0.0/instrument.ts",
+      "key": "bessi_45_self_en",
+      "executable": true,
+      "valid": true,
+      "issues": [],
+      "goldens": [
+        {
+          "name": "minimum-keyed",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "self_management": 1,
+            "social_engagement": 1,
+            "cooperation": 1,
+            "emotional_resilience": 1,
+            "innovation": 1
+          }
+        },
+        {
+          "name": "maximum-keyed",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "self_management": 5,
+            "social_engagement": 5,
+            "cooperation": 5,
+            "emotional_resilience": 5,
+            "innovation": 5
+          }
+        },
+        {
+          "name": "sample-cycled",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "self_management": 1,
+            "social_engagement": 2,
+            "cooperation": 3,
+            "emotional_resilience": 4,
+            "innovation": 5
+          }
+        },
+        {
+          "name": "missing-domain-item",
+          "passed": true,
+          "quality": "invalid",
+          "scores": {
+            "self_management": null,
+            "social_engagement": 2,
+            "cooperation": 3,
+            "emotional_resilience": 4,
+            "innovation": 5
           }
         }
       ]

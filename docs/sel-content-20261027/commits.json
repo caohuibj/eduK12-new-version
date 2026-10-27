@@ -83,5 +83,25 @@
     "family": "bes20",
     "sha": "565079c7ec43a2090552218f588853941b1fe08d",
     "tree": "e0a911612bbbd3c722afb6218dbbf124bc95b424"
+  },
+  {
+    "family": "erica16",
+    "sha": "fd210823f018049fab3275fcba6049a45cc20b37",
+    "tree": "77a7cb21bc96686c38b57cbc180763baff567e12"
+  },
+  {
+    "family": "erq_ca",
+    "sha": "25d2d97fc1e8dceda781ca50543a512d69d95beb",
+    "tree": "aaf10d2343f1a3e46aad841c200f160b7e5d82be"
+  },
+  {
+    "family": "ccnes_t",
+    "sha": "0f29d6cc03173bfec3fd689b7d55b6e7688507e5",
+    "tree": "58e9f5c297248695adfd089308d17f89de7ff419"
+  },
+  {
+    "family": "bessi45",
+    "sha": "809cdd81b7da62a5462ccba5a89555b35b587218",
+    "tree": "f7b281d2e9308a32341e5e5108ad9aab120ad2f8"
   }
 ]
