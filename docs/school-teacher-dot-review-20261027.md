@@ -83,3 +83,16 @@ while detail still returns all50parts/5000errors. Three targeted UI cases verify
 history selection, completed receipt loading and late-response isolation using
 summary-only fixtures. This is a bounded payload/consumer proof, not a whole-site
 capacity or production latency benchmark.
+
+
+## 四入口共同链路补齐（2026-10-27，第二片）
+
+用户明确将 PR355/356 的可复用优化扩展到 Survey、Training、School、Teacher，重点是作答→报告反馈→数据存储，而非复制一套引擎。
+
+- School Scale、Teacher Scale 与 Teacher 私有 FORM 的 attempt 读取接入既有 `view=current-unit`；两端 Scale FINAL 接入既有 `response=receipt`。不新增 API，不更换身份域，不随回执泄露答案或报告。
+- 共用 FINAL 已有持久化确认、submissionId/payloadHash 幂等及确认后清理本地草稿；本片复用而不重写。Teacher 报告仍经独立授权按需读取，完成状态不等于报告开放许可。
+- 真实 HTTP 检查发现整合 main 后，已开始的精确教育量表被普通 Training 采集守卫拒绝。底层服务对照也失败，不能归因于 receipt-only 查询本身。保留原失败记录，未删除断言。
+- 精确教育来源按原冻结完成约定处理：只有数据库中真实 Run、assignment、父测评、当前 epoch 的物化 child、精确来源与冻结策略全部吻合才允许完成。复用既有教育来源身份核验；无客户端跳过参数。新 START、无匹配 child、错误 item、普通来源仍受原停用检查。Teacher 的入口身份核验同步区分新 START 与已有精确 child，当前用户/组织/同意/报告授权不放宽。
+- 实际 PostgreSQL + HTTP 验证覆盖 School/Teacher 私有来源当前单元读取、外人拒绝、新 START 停用拒绝、已有 FINAL、无报告正文的回执、同键重放及权威结果快照。公共库来源另用原真实 PG 直接服务检查，不能冒称其 HTTP 已验收。
+
+尚未完成：组织资源不直接支持普通问卷 whole ACK/worker 路线；不能仅打开 Training 的开关。报告开放、关系评估结果投影、认知/SJT、冷/热资源基线仍须按具体消费者核查。没有证明四入口所有性能指标相同或全部优化完成。当前局部结果不等于正式 CI 或可合并资格。
