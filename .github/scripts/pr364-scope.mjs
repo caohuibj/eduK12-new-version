@@ -29,7 +29,16 @@ export function pr364Plan(entries,base,head,read=git,env=process.env,b=binding){
   assert.equal(ref,BRANCH);assert.equal(String(env.CI_PR_NUMBER),'364');
   assert.equal(env.CI_PR_REPOSITORY,'caohuibj/eduK12-new-version');
  }
- sha(sourceHead);assert.equal(read('rev-parse',sourceHead+'^{tree}'),read('rev-parse',head+'^{tree}'),'Source/merge tree drift');
+ const object=(commit,suffix)=>{
+  sha(commit);
+  try{return read('rev-parse',commit+suffix);}catch{
+   // Scope checkout is shallow. Fetch only the immutable object requested;
+   // never substitute the moving branch or weaken source/merge equality.
+   read('fetch','--no-tags','--depth=1','origin',commit);
+   return read('rev-parse',commit+suffix);
+  }
+ };
+ sha(sourceHead);assert.equal(object(sourceHead,'^{tree}'),read('rev-parse',head+'^{tree}'),'Source/merge tree drift');
  assert.deepEqual(Object.keys(b.controlBefore).sort(),CONTROLS);
  const expected=[...Object.keys(b.source),...CONTROLS];assert.equal(new Set(expected).size,expected.length);
  assert.deepEqual(entries.map(e=>e.file).sort(),expected.sort(),'Complete change inventory drift');
@@ -46,7 +55,7 @@ export function pr364Plan(entries,base,head,read=git,env=process.env,b=binding){
  assert.deepEqual(Object.keys(b.components).sort(),['backend','frontend']);
  for(const [component,tree]of Object.entries(b.components)){
   sha(tree);assert.equal(read('rev-parse',head+':server-version/'+component),tree);
-  assert.equal(read('rev-parse',b.product+':server-version/'+component),tree);
+  assert.equal(object(b.product,':server-version/'+component),tree);
  }
  return {schema:1,route:'pr364',base,head,sourceHead,tree:read('rev-parse',head+'^{tree}'),product:b.product,components:b.components,controlCheckpoint:b.controlCheckpoint,postMerge,draft:!postMerge&&env.CI_IS_DRAFT==='true'};
 }

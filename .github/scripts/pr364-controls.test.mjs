@@ -29,6 +29,17 @@ test('formal reports require exactly the real selected assertions, not empty or 
   for(const bad of [{...report,success:false},{...report,testResults:[]},{...report,numPassedTests:0},{...report,testResults:[{assertionResults:names.map(fullName=>({fullName,status:'skipped'}))}]}])assert.throws(()=>verifySelected(bad,names,0));
  }
 });
+test('shallow scope fetches exact missing source and product objects and still refuses tree drift',()=>{
+ const f=fixture(),fetched=new Set(),calls=[];
+ const read=(cmd,a,...rest)=>{
+  if(cmd==='fetch'){const commit=rest.at(-1);calls.push(commit);fetched.add(commit);return '';}
+  if(cmd==='rev-parse'&&[source,f.b.product].some(commit=>a.startsWith(commit)&&!fetched.has(commit)))throw Error('Unknown revision');
+  return f.read(cmd,a,...rest);
+ };
+ assert.equal(pr364Plan(f.entries,BASE,head,read,f.env,f.b).sourceHead,source);
+ assert.deepEqual(calls,[source,f.b.product]);
+ assert.throws(()=>pr364Plan(f.entries,BASE,head,(cmd,a,...rest)=>cmd==='rev-parse'&&a===source+'^{tree}'?h('9'):read(cmd,a,...rest),f.env,f.b),/tree drift/);
+});
 test('stable required gate rejects draft, failure, missing and skipped qualifications',()=>{
  const f=fixture(),p=pr364Plan(f.entries,BASE,head,f.read,f.env,f.b);
  const scope=Object.fromEntries(Object.entries(pr364Outputs(p)).map(([k,v])=>[k,String(v)]));
