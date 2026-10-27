@@ -398,6 +398,17 @@ jobs:
         run: |
           node .github/scripts/runner-preflight.mjs --control
           node .github/scripts/fetch-ci-base.mjs
+      - name: fetch exact report-planning source for shallow tree comparison
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'perf/four-entry-shared-path-20261027'
+        env:
+          SOURCE_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          import {execFileSync} from 'node:child_process';
+          assert.match(process.env.SOURCE_SHA||'',/^[a-f0-9]{40}$/);
+          execFileSync('git',['fetch','--no-tags','--depth=1','origin',process.env.SOURCE_SHA],{stdio:'inherit'});
+          JS
       - id: pr356-entry
         name: detect the fixed PR356 entry before any legacy classification
         env:
