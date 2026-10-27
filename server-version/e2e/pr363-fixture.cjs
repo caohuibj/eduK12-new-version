@@ -14,7 +14,7 @@ async function artifact(kind){
  const tools=await import(pathToFileURL(path.join(base.repo,'.github/scripts/ci-artifact.mjs')).href)
  const manifest=JSON.parse(fs.readFileSync(path.join(dir,'ci-build-manifest.json'),'utf8'))
  const prior=await import(pathToFileURL(path.join(base.repo,'.github/scripts/pr363-continuation.mjs')).href)
- tools.verifyManifest(manifest,{schemaVersion:1,kind,...prior.artifactIdentity(),lockDigest:sha(fs.readFileSync(path.join(base.repo,'server-version',kind,'package-lock.json')))},tools.treeDigest(dir))
+ tools.verifyManifest(manifest,{schemaVersion:1,kind,...prior.artifactIdentity(kind),lockDigest:sha(fs.readFileSync(path.join(base.repo,'server-version',kind,'package-lock.json')))},tools.treeDigest(dir))
  return manifest
 }
 function assertCases(cases){assert.ok(Array.isArray(cases));assert.deepEqual(cases.map(c=>c.product+':'+c.mode).sort(),['SCHOOL:IMMEDIATE','TEACHER:IMMEDIATE','TEACHER:SCHEDULED']);assert.equal(new Set(cases.map(c=>c.executionId)).size,3);assert.ok(cases.every(c=>typeof c.executionId==='string'&&typeof c.runtimeId==='string'&&c.title?.startsWith('PR363 ')))}
@@ -23,7 +23,7 @@ function runtime(fixture){Object.assign(process.env,fixture.secrets,{DATABASE_UR
 function principal(u){return {userId:u.id,username:u.username,role:u.role,platformRole:u.platformRole,accountDomain:u.accountDomain,tokenVersion:u.tokenVersion,mustChangePassword:u.mustChangePassword}}
 const fixtureStages=['bootstrap','guard','artifact-identity',...['SCHOOL','TEACHER'].flatMap(product=>['IMMEDIATE','SCHEDULED'].flatMap(mode=>['source-','workflow-'].map(prefix=>prefix+product+'-'+mode)))]
 const fixtureCodes=[...base.seedDiagnosticContract.codes,'BASE_IDENTITY_SEED_FAILED','EDUCATION_START_CONTEXT_MISMATCH','INSTRUMENT_NOT_AVAILABLE','TEACHER_SELF_IN_TRAINING']
-function safeFixtureDiagnostic(value){return {stage:[...fixtureStages,...base.seedDiagnosticContract.stages].includes(value?.stage)?value.stage:'bootstrap',errorName:base.seedDiagnosticContract.errorNames.includes(value?.errorName)?value.errorName:'UNKNOWN',code:fixtureCodes.includes(value?.code)?value.code:'UNKNOWN',...(typeof value?.digest==='string'&&/^[a-f0-9]{64}$/.test(value.digest)?{digest:value.digest}:{})}}
+function safeFixtureDiagnostic(value){return {stage:[...fixtureStages,...base.seedDiagnosticContract.stages].includes(value?.stage)?value.stage:'bootstrap',errorName:[...base.seedDiagnosticContract.errorNames,'CompositeServiceError','InstrumentFinalSubmitError','RunStartExecutionError','EducationAssessmentSourceError'].includes(value?.errorName)?value.errorName:'UNKNOWN',code:fixtureCodes.includes(value?.code)?value.code:'UNKNOWN',...(typeof value?.digest==='string'&&/^[a-f0-9]{64}$/.test(value.digest)?{digest:value.digest}:{})}}
 function readSafeSetupDiagnostics(text){const records=[];for(const line of String(text).slice(-1048576).split('\n')){const match=/^(PR363_FIXTURE_FAILED|PR363_BASE_SEED_DIAGNOSTIC|SCHOOL_TEACHER_SEED_DIAGNOSTIC) (\{.*\})$/.exec(line);if(!match)continue;try{records.push({source:match[1],...safeFixtureDiagnostic(JSON.parse(match[2]))})}catch{}}return records.slice(-4)}
 async function seed(){
  stage='guard';const root=base.guard();privateRoot=root;stage='artifact-identity';await artifact('backend');await artifact('frontend')

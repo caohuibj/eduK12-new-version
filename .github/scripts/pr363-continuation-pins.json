@@ -92,5 +92,19 @@
       "sha256": "c7db12873b845c27e5c2a72e13af3b2150ee608489f21703d84604a61d0cbff5",
       "size": 20920
     }
+  },
+  "backendRevision": {
+    "checkpoint": "243c866789f67d2d85c61c70daa1e3f7e491de30",
+    "tree": "857b09f27913b2d630a306d339a87ecec974e68e",
+    "files": {
+      "server-version/backend/src/__tests__/integration/education-start-context.test.ts": "9c68a23244ba35ffd12e3afa8929a26693ed3978",
+      "server-version/backend/src/modules/assessment-run/education-start-context.ts": "eaaf9def6fba07c36979908548737b27116da99c",
+      "server-version/backend/src/modules/assessment-run/educationAssessmentExecution.ts": "6f496c3f92905bbe1ca44817a7b65821036acae0",
+      "server-version/backend/src/modules/assessment-run/startExecution.ts": "2c57e5935e521bddd71833150335db2634f9bbe9",
+      "server-version/backend/src/modules/composite/composite.service.ts": "457d5a794df63a85e4b212f2f33b0ca0d97aa242",
+      "server-version/backend/src/modules/education-tools/assessment-resource.source.ts": "9c26307f0e29d19ecfd7b92504d1cd56146fbec0",
+      "server-version/backend/src/modules/situational/situational-runtime.service.ts": "296441cfcbe5ae5431200f6d81a782a7c9f0d5a4"
+    },
+    "basis": "Teacher-only transaction/parent context correction; current backend build and current PG START/FINAL/report consumers mandatory. Original schema/dependency/frontend qualifications remain exact."
   }
 }

@@ -124,7 +124,7 @@ function checkPlan(){
  return {...p,execution:binding.execution,historicalAdmissions:binding.historicalAdmissions};
 }
 function manifest(component){const dir=`server-version/${component}/dist`,m=JSON.parse(readFileSync(dir+'/ci-build-manifest.json'));
- verifyManifest(m,{schemaVersion:1,...artifactIdentity(),kind:component,lockDigest:sha(readFileSync(`server-version/${component}/package-lock.json`))},treeDigest(dir));return m;}
+ verifyManifest(m,{schemaVersion:1,...artifactIdentity(component),kind:component,lockDigest:sha(readFileSync(`server-version/${component}/package-lock.json`))},treeDigest(dir));return m;}
 export function assertFirstBuildAttempt(env=process.env){assert.equal(String(env.GITHUB_RUN_ATTEMPT),'1','Producer retries require root review of original partial build/upload; never automatically rebuild');}
 function build(component,p){
  assert(['backend','frontend'].includes(component));assertFirstBuildAttempt();
@@ -149,7 +149,7 @@ export function verifyImageReceipt(r,{component,head,runId,consumerAttempt,lockB
  for(const[file,v]of Object.entries(r.images)){assert(['builder.tar','runtime.tar'].includes(file));assert.equal(v.tag,`pr363-${component}-${file==='builder.tar'?'build':'runtime'}`);assert.match(v.imageId,/^sha256:[a-f0-9]{64}$/);const bytes=read(`${component}-${file}`);assert.equal(typeof bytes==='string'?bytes:sha(bytes),v.sha256);}
  assert.deepEqual(Object.keys(r.images).sort(),['builder.tar','runtime.tar']);return r.images;
 }
-function loadImages(component,p){const r=JSON.parse(readFileSync(`${out}/${component}-images.json`));const images=verifyImageReceipt(r,{component,head:artifactIdentity().sha,runId:artifactIdentity().runId,consumerAttempt:process.env.GITHUB_RUN_ATTEMPT,lockBlob:git('rev-parse',p.head+':server-version/'+component+'/package-lock.json'),lockSHA256:fileSHA('server-version/'+component+'/package-lock.json')},f=>fileSHA(`${out}/${f}`));
+function loadImages(component,p){const r=JSON.parse(readFileSync(`${out}/${component}-images.json`));const images=verifyImageReceipt(r,{component,head:artifactIdentity(component).sha,runId:artifactIdentity(component).runId,consumerAttempt:process.env.GITHUB_RUN_ATTEMPT,lockBlob:git('rev-parse',p.head+':server-version/'+component+'/package-lock.json'),lockSHA256:fileSHA('server-version/'+component+'/package-lock.json')},f=>fileSHA(`${out}/${f}`));
  for(const[file,v]of Object.entries(images)){run(component+'-load-'+file.replace('.tar',''),'docker',['load','-i',`${out}/${component}-${file}`]);assert.equal(execFileSync('docker',['image','inspect',v.tag,'--format','{{.Id}}'],{encoding:'utf8'}).trim(),v.imageId);}return r;}
 const preparedDependencies=new Set(),loadedImages=new Map();
 function prepareDependencies(component,p,entireApp=false){
