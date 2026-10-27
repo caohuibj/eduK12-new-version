@@ -1,3 +1,4 @@
+import { RELATIONAL_RESOURCE_KINDS } from '../assessment-relational/types'
 import {privateToolRunTrackInput} from '../education-tools/private-tool.run-contract'
 import { Router } from 'express'
 import { z,ZodError } from 'zod'
@@ -15,7 +16,7 @@ router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
 const uuid=z.string().guid()
 const keys=z.object({organizationId:uuid,eventId:uuid}).strict()
 const resource=z.object({
-  family:z.enum(['BUNDLE','SCALE','FORM','SITUATIONAL']),
+  family:z.enum(RELATIONAL_RESOURCE_KINDS),
   key:z.string().trim().min(1).max(200),
   version:z.string().trim().min(1).max(120),
 }).strict()

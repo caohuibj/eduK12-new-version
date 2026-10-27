@@ -1,3 +1,4 @@
+import { isRelationalResourceKind } from './types'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { relationalFail } from './errors'
 import type {
@@ -42,7 +43,7 @@ const uniqueNonEmpty = <T extends string>(values: T[], allowed: Set<T>, field: s
 
 export const validateRelationalApplicability = (input: RelationalApplicabilityV1): RelationalApplicabilityV1 => {
   if (input.schemaVersion !== 1) relationalFail('RELATIONAL_APPLICABILITY', 'schemaVersion must be 1')
-  if (!['BUNDLE', 'SCALE', 'FORM', 'SITUATIONAL'].includes(input.resourceKind)) {
+  if (!isRelationalResourceKind(input.resourceKind)) {
     relationalFail('RELATIONAL_APPLICABILITY', `unsupported resourceKind: ${String(input.resourceKind)}`)
   }
   if (!input.resourceKey.trim()) relationalFail('RELATIONAL_APPLICABILITY', 'resourceKey is required')

@@ -1,3 +1,4 @@
+import { RELATIONAL_RESOURCE_KINDS } from '../assessment-relational/types'
 import {addPrivateScaleRunTrack,addPrivateFormRunTrack} from '../education-tools/private-tool.run-adapter'
 import {privateToolRunTrackInput} from '../education-tools/private-tool.run-contract'
 import {prisma} from '../../config/database'
@@ -44,7 +45,7 @@ const createRunSchema = z.object({
 })
 const addTrackSchema = z.object({
   resource: z.object({
-    family: z.enum(['BUNDLE', 'SCALE', 'FORM', 'SITUATIONAL', 'COGNITIVE']),
+    family: z.enum(RELATIONAL_RESOURCE_KINDS),
     key: z.string().trim().min(1),
     version: z.string().trim().min(1),
   }),

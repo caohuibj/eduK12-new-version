@@ -12,7 +12,7 @@ import {
 } from '../assessment-relational/product-registry'
 import type { RelationalResourceKindV1 } from '../assessment-relational/types'
 
-export type RunResourceFamily = RelationalResourceKindV1 | 'COGNITIVE'
+export type RunResourceFamily = RelationalResourceKindV1
 export type RunAdapterTransactionMode = 'TRANSACTIONAL_DB' | 'EXTERNAL'
 export type RunAdapterStartMode = 'TRANSACTIONAL' | 'OPERATION_KEY' | 'UNSUPPORTED'
 

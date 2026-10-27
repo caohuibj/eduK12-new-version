@@ -111,6 +111,26 @@ describe('Run owning-resource authority adapters', () => {
     })).toThrow(/minimumRespondents/)
   })
 
+  it('can represent an independently published cognitive source without auto-enabling production START', async () => {
+    const original = publishedRegistry.findExact({resourceKind: 'BUNDLE', resourceKey: 'demo-bundle', resourceVersion: '1.0.0'})!
+    const entry = {...original, applicability: {...original.applicability,
+      resourceKind: 'COGNITIVE' as const, resourceKey: 'synthetic-cognitive',
+    }}
+    const registry = createRelationalProductRegistry([entry])
+    const adapter = createRelationalRunResourceAdapter({family: 'COGNITIVE', registry})
+    const authority = new RunResourceAuthorityRegistry([adapter])
+    const ref = {family: 'COGNITIVE' as const, key: 'synthetic-cognitive', version: '1.0.0'}
+    expect(await authority.resolveExact(ref)).toMatchObject({family: 'COGNITIVE',
+      runtimeLaunchTarget: {kind: 'COMPOSITE', ref: 'composite-demo-v1'}, minimumRespondents: 5})
+    await expect(authority.resolveExact({...ref,version: '1.0.1'})).rejects.toMatchObject({code: 'RUN_RESOURCE_NOT_FOUND'})
+    const draft = new RunResourceAuthorityRegistry([createRelationalRunResourceAdapter({family: 'COGNITIVE',
+      registry: createRelationalProductRegistry([{...entry,releaseStatus: 'DRAFT'}]),
+    })])
+    await expect(draft.resolveExact(ref)).rejects.toMatchObject({code: 'RUN_RESOURCE_NOT_PUBLISHED'})
+    expect(() => authority.assertStartSupported('COGNITIVE')).toThrow()
+    expect(() => productionRunResourceAuthorityRegistry.assertStartSupported('COGNITIVE')).toThrow()
+  })
+
   it('cannot enable an external adapter without stable operationKey lookup', () => {
     const unsafe: RunResourceAuthorityAdapter = {
       family: 'COGNITIVE',

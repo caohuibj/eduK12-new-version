@@ -1,7 +1,7 @@
 import apiClient from './client'
 
 export type AssessmentRunStatus = 'DRAFT' | 'PUBLISHED' | 'CLOSED' | 'CANCELLED'
-export type RunResourceFamily = 'BUNDLE' | 'SCALE' | 'FORM' | 'SITUATIONAL'
+export type RunResourceFamily = 'BUNDLE' | 'SCALE' | 'FORM' | 'SITUATIONAL' | 'COGNITIVE'
 export type RunActorRole = 'STUDENT' | 'TEACHER' | 'PARENT' | 'COUNSELOR' | 'CLIENT'
 export type RunRelationshipKind = 'SELF' | 'PARENT_CHILD' | 'COURSE_TEACHER_STUDENT' | 'CLASS_TEACHER_STUDENT' | 'COUNSELOR_CLIENT'
 export type RunPerspective = 'SELF_REPORT' | 'OBSERVER_REPORT' | 'RELATIONAL_EXPERIENCE'

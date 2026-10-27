@@ -72,3 +72,20 @@ describe('Relational applicability contract', () => {
       .toBe('430e31826af43a20c86b18ae61a796abc18926fc9acd981f848d6c7202da3570')
   })
 })
+
+
+describe('five-family resource contract without implicit content admission', () => {
+  it('accepts an exact cognitive self-assessment policy without changing legacy bundle hashes', () => {
+    const policy: RelationalApplicabilityV1 = {
+      ...studentTeacher, resourceKind: 'COGNITIVE', resourceKey: 'synthetic-cognitive',
+      subjectRoles: ['TEACHER'], respondentRoles: ['TEACHER'], relationshipKinds: ['SELF'],
+      perspectives: ['SELF_REPORT'], analysisMode: 'INDIVIDUAL_ONLY', minimumRespondents: null,
+    }
+    expect(validateRelationalApplicability(policy)).toEqual(policy)
+    expect(() => assertRelationalApplicabilityMatch({applicability: policy,
+      subjectRole: 'STUDENT', respondentRole: 'STUDENT', relationshipKind: 'SELF', perspective: 'SELF_REPORT',
+    })).toThrow()
+    expect(() => validateRelationalApplicability({...policy,resourceVersion: 'latest'})).toThrow()
+    expect(() => validateRelationalApplicability({...policy,resourceKind: 'UNKNOWN' as never})).toThrow()
+  })
+})

@@ -1,3 +1,4 @@
+import { isRelationalResourceKind } from './types'
 import { Router, type Response } from 'express'
 import { authenticate } from '../../middleware/auth'
 import { instrumentError, success, unauthorized } from '../../utils/response'
@@ -50,7 +51,7 @@ const requiredQueryString = (query: Record<string, unknown>, key: string): strin
   return value.trim()
 }
 const checkedResourceKind = (value: string): RelationalResourceKindV1 => {
-  if (!['BUNDLE', 'SCALE', 'FORM', 'SITUATIONAL'].includes(value)) throw new RelationalAssessmentError('RELATIONAL_PRODUCT_REQUEST', 'unsupported resourceKind')
+  if (!isRelationalResourceKind(value)) throw new RelationalAssessmentError('RELATIONAL_PRODUCT_REQUEST', 'unsupported resourceKind')
   return value as RelationalResourceKindV1
 }
 const productRef = (body: unknown) => ({
