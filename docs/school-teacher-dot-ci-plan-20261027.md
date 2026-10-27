@@ -7,7 +7,7 @@
 - main/base：`04a8d994207d7b831b874d4be4f5c31640466458`。
 - 产品候选：`3fb06cd2bf35b863144e4554f30b4284311b7751`，tree `d8e1b3d9970c2fef6e79a9a5774194fca19f0926`。
 - 现有 PR357 分支 `work/school-teacher-consolidated-20261027`，保留原历史、正常 fast-forward，无新 Codex 对话。
-- 产品 235 个实际差异路径，含原 School/Teacher 名单/UI 两项迁移及此次四入口直接复用修订。另有 10 个逐名控制/本计划路径。完整 blob/mode/组件 tree 由 `pr357-bindings.json` 冻结；最终控制提交与 merge preview 必须独立回读。
+- 产品 235 个实际差异路径，含原 School/Teacher 名单/UI 两项迁移及此次四入口直接复用修订。另有 9 个逐名控制/本计划路径。完整 blob/mode/组件 tree 由 `pr357-bindings.json` 冻结；最终控制提交与 merge preview 必须独立回读。
 - 不把普通名单 PR 当纯 UI。也不恢复九套 opt-in、全平台 22 项、压测、生产操作或无关内容入库。
 
 ## 唯一主要执行位置
@@ -46,3 +46,11 @@ HEAD `41ad563d` 的主workflow run `40430737854` 与可复用workflow校验记�
 独立静态核查确认：新YAML把 `job.services.*` 和 `runner.temp` 用在job级env，超出该层可用context。按GitHub官方context合同及仓库原有写法，改为step级env取得真实服务端口/容器ID/临时目录，再写入本job的GITHUB_ENV。新增实际YAML层级反例先FAIL，修正后单项PASS；补查所有job级env，不仅修改首个变量。应用两组件tree均未变，没有应用检查可重复，也没有producer产物可复用。
 
 来源：https://docs.github.com/en/actions/reference/workflows-and-actions/contexts
+
+## 两轮后独立定位：可复用 workflow 引用上限
+
+已直接读取 GitHub 原始 run HTML：第二轮 `40431334757` 主 CI 失败原因是 `too many workflows are referenced, total: 51, limit: 50`。暂停继续试跑；将本次6个选中作业内联回原ci.yml，撤回新增的ci-pr357.yml引用及文件。旧50条复用引用和所有旧门禁不删不降级，当前限定scope仍要求同一候选的6个真实作业及CodeQL。不再为此增加第51个复用框架。第一轮的job/runner context也是独立真实配置错误，记录两者而不覆盖历史。
+
+独立收敛证据补充：已用公开 GitHub run HTML 补得首轮真实annotation，确为job/runner不可用context；第二轮确为51/50上限。两类错误分别保存，不用后一项覆盖前一项。原main的完整递归调用图为50个被调用workflow（另加顶层caller共51个文件）；内联后与原main调用集合完全一致。固定集合写入binding供可移植控制使用，避免单元测试依赖本机完整Git历史。官方规则按被调用工作流计数，不把顶层caller计入50。
+
+使用官方actionlint v1.7.7发布二进制，先核官方checksums中SHA256 `023070a287cd8cccd71515fedc843f1985bf96c436b7effaecce67290e7e0757`。实际主ci.yml语义lint发现新端口索引使用数字键，改为等价字符串键后exit0；关闭的是此工具的可选shellcheck/pyflakes调用，不是GitHub应用检查、SAST或安全门禁。另有3个直接控制PASS：真实YAML接线、context层级、递归调用图。未再次启动GitHub试跑来定位这些错误。

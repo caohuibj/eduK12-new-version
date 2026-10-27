@@ -25,15 +25,20 @@ test('required merge gate needs genuine qualification and CodeQL, refusing every
  assert(failedChecks(n,true).length);assert(failedChecks({...n,scope:{result:'success',outputs:{...outputs,frontend:'true'}}},false).length);
 });
 test('real YAML connects exact source, independent affected workflow, CodeQL and stable gate',()=>{
- const y=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8'),w=readFileSync(new URL('../workflows/ci-pr357.yml',import.meta.url),'utf8');
- assert.match(y,/pr357_plan: \$\{\{ steps.scope.outputs.pr357_plan/);assert.match(y,/uses: \.\/\.github\/workflows\/ci-pr357.yml/);assert.match(y,/- pr357\n/);assert(y.includes(binding.branch));assert.match(y,/application_route == 'pr357' && 'paths:/);
- for(const name of ['admission','frontend','backend','audit','connected','qualified'])assert(w.includes('\n  '+name+':'));
- assert.match(w,/needs: \[admission, frontend, backend, audit, connected\]/);assert.match(w,/chrom[e].cjs preflight/);assert(!w.includes('--no-sandbox'));assert(!w.includes('continue-on-error'));assert(!w.includes('ignoreHTTPSErrors'));assert(!w.includes('permissions.cjs tighten'));
+ const y=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8'),w=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
+ assert.match(y,/pr357_plan: \$\{\{ steps.scope.outputs.pr357_plan/);assert(!y.includes('uses: ./.github/workflows/ci-pr357.yml'));assert.match(y,/- pr357\n/);assert(y.includes(binding.branch));assert.match(y,/application_route == 'pr357' && 'paths:/);
+ for(const name of ['pr357-admission','pr357-frontend','pr357-backend','pr357-audit','pr357-connected','pr357'])assert(w.includes('\n  '+name+':'));
+ for(const name of ['pr357-admission','pr357-frontend','pr357-backend','pr357-audit','pr357-connected'])assert(w.includes('- '+name));assert.match(w,/chrom[e].cjs preflight/);const bounded=w.slice(w.indexOf('\n  pr357-admission:'),w.indexOf('\n  post356:'));assert(!bounded.includes('--no-sandbox'));assert(!bounded.includes('continue-on-error'));assert(!bounded.includes('ignoreHTTPSErrors'));assert(!bounded.includes('permissions.cjs tighten'));
 });
 test('service and runner contexts are bound in steps, never in job env',()=>{
- const yaml=readFileSync(new URL('../workflows/ci-pr357.yml',import.meta.url),'utf8');
+ const all=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');const yaml=all.slice(all.indexOf('\n  pr357-admission:'),all.indexOf('\n  post356:'));
  const check=text=>{for(const match of text.matchAll(/^    env:\n([\s\S]*?)(?=^    \S|^  \S|$(?![\s\S]))/gm))assert(!/\$\{\{\s*(job|runner|steps)\./.test(match[1]),'Unavailable job env context');};
  assert.throws(()=>check("  backend:\n    env:\n      DATABASE_URL: ${{ job.services.postgres.id }}\n    steps:\n"));
  assert.throws(()=>check("  connected:\n    env:\n      PRIVATE_DIR: ${{ runner.temp }}\n    steps:\n"));
- check(yaml);assert.equal((yaml.match(/name: bind service endpoints only after runner service initialization/g)||[]).length,2);assert.match(yaml,/        env:\n          DATABASE_URL: .*job.services/);
+ check(yaml);assert.equal((yaml.match(/name: bind service endpoints only after runner service initialization/g)||[]).length,2);assert.match(yaml,/^      env:\n        DATABASE_URL: .*job.services/m);
+});
+test('inline PR357 adds no reusable-workflow references and retains the preexisting bounded call graph',async()=>{
+ const graph=read=>{const seen=new Set();function walk(path){if(seen.has(path))return;seen.add(path);const text=read(path);for(const m of text.matchAll(/uses:\s*["']?(\.\/\.github\/workflows\/[A-Za-z0-9._-]+\.ya?ml)/g))walk(m[1].slice(2));}walk('.github/workflows/ci.yml');return [...seen].sort();};
+ const previous=binding.reusableWorkflows;const current=graph(path=>readFileSync(path,'utf8'));
+ assert.deepEqual(current,previous,'Do not remove old gates or add the 51st reusable workflow');assert(current.length-1<=50,'At most 50 referenced workflows, excluding the top-level caller');assert(!current.includes('.github/workflows/ci-pr357.yml'));
 });
