@@ -1,0 +1,20 @@
+{
+  "instrument": "DSECS-R2 Student",
+  "version": "2020 revision as labelled in manual body and SEC section; May 2021 technical manual",
+  "source": "https://cdn.secondstep.org/static/pdf/dsecs-s-technical-guide.pdf",
+  "grades": [3,4,5,6,7,8,9,10,11,12],
+  "item_count": 20,
+  "options": [{"value":1,"label_zh":"完全不像我"},{"value":2,"label_zh":"不太像我"},{"value":3,"label_zh":"有些像我"},{"value":4,"label_zh":"非常像我"}],
+  "dimensions": [
+    {"id":"responsible_decision_making","name_zh":"负责决策","items":[1,6,11,16]},
+    {"id":"social_awareness","name_zh":"社会意识","items":[2,7,12,17]},
+    {"id":"self_management","name_zh":"自我管理","items":[3,8,13,18]},
+    {"id":"relationship_skills","name_zh":"人际关系技能","items":[4,9,14,19]},
+    {"id":"self_awareness","name_zh":"自我意识","items":[5,10,15,20]}
+  ],
+  "reverse_items": [],
+  "implementation_rule": "Only complete subscales yield sums and means; total requires all 20 valid responses. Missing is null and never zero. This is a conservative product rule, not an asserted manual missing-data rule.",
+  "complete_subscale_sum_range": [4,16], "complete_total_sum_range": [20,80], "mean_range": [1,4],
+  "thresholds": null,
+  "tags": ["SEL","学生自评","三至十二年级","社会情绪能力","DSECS-R2","20题","五维"]
+}

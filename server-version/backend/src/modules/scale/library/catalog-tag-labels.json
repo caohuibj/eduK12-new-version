@@ -239,6 +239,26 @@
     "label": "学校归属",
     "axis": "construct"
   },
+  "construct:sel_dsecs_r2_relationship_skills": {
+    "label": "人际关系技能",
+    "axis": "construct"
+  },
+  "construct:sel_dsecs_r2_responsible_decision_making": {
+    "label": "负责决策",
+    "axis": "construct"
+  },
+  "construct:sel_dsecs_r2_self_awareness": {
+    "label": "自我意识",
+    "axis": "construct"
+  },
+  "construct:sel_dsecs_r2_self_management": {
+    "label": "自我管理",
+    "axis": "construct"
+  },
+  "construct:sel_dsecs_r2_social_awareness": {
+    "label": "社会意识",
+    "axis": "construct"
+  },
   "construct:sel_wcsd_seca_emotion_knowledge": {
     "label": "自我觉察：情绪知识",
     "axis": "construct"
@@ -453,6 +473,10 @@
   },
   "language_validation:digital_presentation_review_pending": {
     "label": "本次数字呈现审核待完成",
+    "axis": "language_validation"
+  },
+  "language_validation:english_original": {
+    "label": "英文原版",
     "axis": "language_validation"
   },
   "language_validation:local_validation_pending": {
