@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "enabled": false,
+  "readiness": "NOTREADY",
+  "branch": "perf/four-entry-feedback-20261027",
+  "base": "7e6d7da4a01e4a42b410cf2dbdcfa76f11759fdc",
+  "product": null,
+  "components": null,
+  "source": {},
+  "controlBefore": {},
+  "protectedInputs": {},
+  "execution": null,
+  "historicalAdmissions": [],
+  "unresolved": [
+    "Root must freeze final standard marker and IMMEDIATE/SCHEDULED feedbackPolicy inputs and full diff after independent review",
+    "Runtime owner must supply actual connected PostgreSQL and compiled browser commands, source closures, case names and report validators",
+    "Root must map actual per-case original evidence and complete consumed inputs; no summary-only admission or automatic replay",
+    "Root must select final types/lint/audit, migrations/restricted-role/nonempty restore and shared consumers before enabling"
+  ]
+}
