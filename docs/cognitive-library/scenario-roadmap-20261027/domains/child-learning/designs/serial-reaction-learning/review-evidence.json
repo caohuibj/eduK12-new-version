@@ -1,0 +1,57 @@
+{
+  "artifact_kind": "STATIC_DESIGN_REVIEW_ONLY",
+  "design_id": "serial-reaction-learning-design-r1",
+  "stable_key_proposal": "serial-reaction-learning",
+  "date_utc": "2026-10-27",
+  "branch": "cognitive/domain-child-learning-20261027",
+  "base_head": "5db79eb8cfbbe97d05f048d50fd8bed3a1794391",
+  "read_only_remote_snapshots": {
+    "cognitive-next-three-core-20261026": "072b2900d4295c7d741d5e55c9ce6cfbbf6f58d2",
+    "main": "7e6d7da4a01e4a42b410cf2dbdcfa76f11759fdc"
+  },
+  "ownership": "DOT confirmed child-learning; other next candidates delay-choice, pvt and emotion-situation-understanding remain with their owners",
+  "approval": "AWAITING_USER_IMAGE_REVIEW; ownership is not development approval",
+  "image": {
+    "filename": "serial-reaction-learning-review.png",
+    "sha256": "e72491c9e3ede44fd4d550fccfff051f9d0b4e2321a68b0e3ab3696ce0451f51",
+    "bytes": 1481515,
+    "width": 1536,
+    "height": 1024,
+    "method": "ImageGen original static concept board; inspected generated output; copied original PNG bytes without editing",
+    "is_runtime_screenshot": false,
+    "contains_participant_data": false
+  },
+  "source": {
+    "primary_doi": "10.3389/fpsyg.2014.00153",
+    "read_sections": ["Experiment 1 Procedure", "Figure 1", "Data preprocessing", "Statistical analyses and learning measure", "Copyright"],
+    "article_license": "CC BY; version not stated in inspected paragraph",
+    "source_xml_sha256_read_only": "7c242deeddfd8bdfa10eca02628126540dab547d49e801859d3e136f396f16c4",
+    "source_xml_distributed": false,
+    "original_paper_1987_fulltext": "NOT_READ_HTTP_403; historical citation only",
+    "code_commit": "5887b4a50f71fe4b93254754956ea488b0a0c16e",
+    "code_tree": "e858c511dd3f30c61cf64a1596f13ea9d55db153",
+    "code_license": "MIT; no code copied",
+    "third_party_characters_distributed": false
+  },
+  "proposed_profiles": {
+    "research": {"runs": 5, "presented": 420, "analysis_S": 200, "analysis_R": 200, "tail_excluded": 20, "estimated_minutes": [9,14]},
+    "experience": {"runs": 3, "presented": 252, "analysis_S": 120, "analysis_R": 120, "tail_excluded": 12, "estimated_minutes": [6,10]},
+    "run": {"groups": 5, "R_per_group_presented": 6, "S_per_group_presented": 10, "tail_R": 4, "presented": 84, "analysis_S": 40, "analysis_R": 40},
+    "practice": {"trials": 4, "first_correct_required": 4, "maximum_rounds": 3, "full_instructions_and_example_again_after_failure_or_incompletion": true},
+    "duration_is_measured": false,
+    "short_profile_validated": false
+  },
+  "explicit_adaptations": ["four-square touchscreen instead of separate button box", "original star and geometric artwork", "four-trial practice instead of original 36", "three-run experience profile", "explicit 30-R aggregate position-count constraint; original randomizer unavailable", "raw signed millisecond contrast without original z-normalization or 2.5-SD trimming"],
+  "response_design": "All four in-grid first responses retained including errors; correction separate and never overwrites first response; advance after correct response; no target-only error suppression",
+  "known_limitations": ["touch movement and position costs", "analysis categories do not automatically match location frequencies after source reclassification", "no awareness test and no claim of pure implicit learning", "no age, language, profile-equivalence or individual validity established"],
+  "checks": {
+    "performed": ["primary-source and pinned-code read", "source Figure 1 arithmetic and complete profile conditions reviewed", "image and short bilingual introduction visually/content reviewed", "controlled-key existence read at fixed taxonomy commit", "PASS four-file scope, PNG bytes/dimensions/hash, profile arithmetic, relative links and scoped text credential-pattern check"],
+    "scope": "Only new files under this design directory",
+    "application_checks": "NOT_RUN_UNCHANGED_APPLICATION",
+    "sequence_generation": "NOT_IMPLEMENTED_NOT_RUN",
+    "scoring": "NOT_IMPLEMENTED_NOT_RUN",
+    "ci": "NOT_TRIGGERED_BY_THIS_REVIEW",
+    "product_integration": "NOT_CONNECTED"
+  },
+  "delivery": "GitHub design-only skip-ci commit; exact final commit/tree and remote byte verification reported separately after push"
+}
