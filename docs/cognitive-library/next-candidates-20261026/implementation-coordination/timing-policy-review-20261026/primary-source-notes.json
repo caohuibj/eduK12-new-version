@@ -1,0 +1,47 @@
+{
+  "retrievedDateUtc": "2026-10-26",
+  "sourceSummariesAreOwnParaphrases": true,
+  "noThirdPartyRuntimeOrCodeCopied": true,
+  "references": [
+    {
+      "id": "S1",
+      "url": "https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame",
+      "kind": "official browser API documentation",
+      "supports": "rAF在重绘前回调；同帧回调共享标记，该标记不等于调用入口performance.now。",
+      "doesNotSupport": "本项目任何抖动/容差阈值、实际像素onset或本设备时序保证。"
+    },
+    {
+      "id": "S2",
+      "url": "https://html.spec.whatwg.org/multipage/webappapis.html#event-loop-processing-model",
+      "companion": "https://html.spec.whatwg.org/multipage/imagebitmap-and-animations.html#animation-frames",
+      "kind": "WHATWG living standard",
+      "supports": "回调接受调度器给出的时间参数；rendering opportunity受硬件、可见性与浏览器节流影响，可降频。",
+      "doesNotSupport": "固定60/120Hz的普遍保证；直接测得显示像素时长。"
+    },
+    {
+      "id": "S3",
+      "url": "https://www.w3.org/TR/2026/WD-hr-time-3-20260901/",
+      "kind": "W3C Working Draft,2026-09-01; not a final Recommendation",
+      "supports": "同源可达环境使用单调时钟；浏览器可粗化/抖动计时。coarsen算法允许100微秒或更粗，隔离能力开启时5微秒或更粗。",
+      "doesNotSupport": "实测Chromium一定使用某一精度；本项目0.25/0.5/0.75等阈值；跨刷新比较裸performance数值。"
+    },
+    {
+      "id": "S4",
+      "url": "https://www.jspsych.org/v8/plugins/browser-check/",
+      "fixedSource": "https://github.com/jspsych/jsPsych/blob/5887b4a50f71fe4b93254754956ea488b0a0c16e/packages/plugin-browser-check/src/index.ts",
+      "sourceBlob": "3ccfa3a3a35d3f33d0402e92959888abdbaa751e",
+      "license": "MIT; https://github.com/jspsych/jsPsych/blob/5887b4a50f71fe4b93254754956ea488b0a0c16e/license.txt",
+      "licenseBlob": "bb4e7cacada8236dc89ba4a763c5174c00afc8bc",
+      "supports": "源码用相邻回调中的performance.now差求均值来估计cadence；默认vsync_frame_count为60。simulation分支可直接给60，不能当设备实测。",
+      "doesNotSupport": "默认60是有效预检长度或我们240/30等数字的验证；稳定性或50ms合格证明。"
+    },
+    {
+      "id": "S5",
+      "url": "https://www.jspsych.org/v8/overview/timing-accuracy/",
+      "kind": "official framework timing guidance",
+      "supports": "显示精度有实验和浏览器限制，旧论文的结果不一定适用于现浏览器。",
+      "doesNotSupport": "本项目平台与当前手机已达精度；可沿用框架名称获得效度。"
+    }
+  ],
+  "proposedProjectNumbersAreNotPublishedNorms": true
+}

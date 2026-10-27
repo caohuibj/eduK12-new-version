@@ -13,6 +13,7 @@ import {
 } from './administration-provenance'
 import { usesGlobalKeyboardCapture } from './readiness'
 import { finalDraftStore } from '../../../services/persistence/finalDraftStore'
+import { standaloneCognitiveDraftKey } from './native-enumeration-draft-key'
 
 export const COGNITIVE_ADMINISTRATION_PROVENANCE_METADATA_KEY = 'cognitiveAdministrationProvenance'
 
@@ -56,7 +57,7 @@ export const useAdministrationProvenance = (
   session: CognitiveSession | null,
   status: RunnerStatus,
 ) => {
-  const sessionKey = session?.deliveryMode === 'FINAL_ONLY' ? session.sessionId : null
+  const sessionKey = session?.deliveryMode === 'FINAL_ONLY' ? standaloneCognitiveDraftKey(session) : null
   const trackerSessionRef = useRef<string | null>(null)
   const trackerRef = useRef<ReturnType<typeof createAdministrationProvenanceTracker> | null>(null)
   const persistChainRef = useRef<Promise<unknown>>(Promise.resolve())
@@ -85,7 +86,7 @@ export const useAdministrationProvenance = (
   useEffect(() => {
     if (!sessionKey || !trackerRef.current) return
     let cancelled = false
-    const draftKey = `cognitive:${sessionKey}`
+    const draftKey = sessionKey
     void finalDraftStore.get(draftKey).then((meta) => {
       if (cancelled || trackerSessionRef.current !== sessionKey || !trackerRef.current || !meta) return
       const stored = readCognitiveAdministrationProvenance(meta.instrumentMetadata)
@@ -108,7 +109,7 @@ export const useAdministrationProvenance = (
     if (!sessionKey || !trackerRef.current) return
     const changed = trackerRef.current.observe(modality)
     if (!changed) return
-    persist(`cognitive:${sessionKey}`, trackerRef.current.snapshot())
+    persist(sessionKey, trackerRef.current.snapshot())
   }, [persist, sessionKey])
 
   useEffect(() => {

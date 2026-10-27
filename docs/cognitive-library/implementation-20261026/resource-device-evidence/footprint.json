@@ -1,0 +1,128 @@
+{
+  "kind": "FIELD_SIZE_ANALYSIS_OF_PREVIOUS_SYNTHETIC_CORPUS",
+  "note": "Removing fields here only measures their contribution; it does not propose deleting evidence or change the scorer.",
+  "cases": [
+    {
+      "profile": "experience",
+      "hz": 60,
+      "trialCount": 9,
+      "frameTimestampCount": 4329,
+      "selectionCount": 45,
+      "totalBytes": 79120,
+      "withoutFrameTimingsBytes": 18847,
+      "breakdown": {
+        "frameTimings": {
+          "removedBytes": 60273,
+          "percentage": 76.17922143579374
+        },
+        "responses": {
+          "removedBytes": 4437,
+          "percentage": 5.6079373104145605
+        },
+        "stimulusTruth": {
+          "removedBytes": 9933,
+          "percentage": 12.554347826086957
+        },
+        "phaseClocksAndQuality": {
+          "removedBytes": 2659,
+          "percentage": 3.3607178968655207
+        }
+      },
+      "uncompressedPer1000DecimalGB": 0.07912,
+      "uncompressedPer1000GiB": 0.07368624210357666
+    },
+    {
+      "profile": "experience",
+      "hz": 120,
+      "trialCount": 9,
+      "frameTimestampCount": 8649,
+      "selectionCount": 45,
+      "totalBytes": 139150,
+      "withoutFrameTimingsBytes": 18847,
+      "breakdown": {
+        "frameTimings": {
+          "removedBytes": 120303,
+          "percentage": 86.45562342795544
+        },
+        "responses": {
+          "removedBytes": 4437,
+          "percentage": 3.188645346748113
+        },
+        "stimulusTruth": {
+          "removedBytes": 9933,
+          "percentage": 7.138339920948616
+        },
+        "phaseClocksAndQuality": {
+          "removedBytes": 2659,
+          "percentage": 1.9108875314408913
+        }
+      },
+      "uncompressedPer1000DecimalGB": 0.13915,
+      "uncompressedPer1000GiB": 0.12959353625774384
+    },
+    {
+      "profile": "research",
+      "hz": 60,
+      "trialCount": 45,
+      "frameTimestampCount": 21645,
+      "selectionCount": 225,
+      "totalBytes": 395595,
+      "withoutFrameTimingsBytes": 94230,
+      "breakdown": {
+        "frameTimings": {
+          "removedBytes": 301365,
+          "percentage": 76.18018427937663
+        },
+        "responses": {
+          "removedBytes": 22283,
+          "percentage": 5.632781000770991
+        },
+        "stimulusTruth": {
+          "removedBytes": 49651,
+          "percentage": 12.550967529923279
+        },
+        "phaseClocksAndQuality": {
+          "removedBytes": 13531,
+          "percentage": 3.4204173460230787
+        }
+      },
+      "uncompressedPer1000DecimalGB": 0.395595,
+      "uncompressedPer1000GiB": 0.3684265539050102
+    },
+    {
+      "profile": "research",
+      "hz": 120,
+      "trialCount": 45,
+      "frameTimestampCount": 43245,
+      "selectionCount": 225,
+      "totalBytes": 695745,
+      "withoutFrameTimingsBytes": 94230,
+      "breakdown": {
+        "frameTimings": {
+          "removedBytes": 601515,
+          "percentage": 86.45624474484185
+        },
+        "responses": {
+          "removedBytes": 22283,
+          "percentage": 3.2027538825288
+        },
+        "stimulusTruth": {
+          "removedBytes": 49651,
+          "percentage": 7.136378989428597
+        },
+        "phaseClocksAndQuality": {
+          "removedBytes": 13531,
+          "percentage": 1.9448217378493555
+        }
+      },
+      "uncompressedPer1000DecimalGB": 0.695745,
+      "uncompressedPer1000GiB": 0.6479630246758461
+    }
+  ],
+  "unitExamples": {
+    "sixHundredKBtimes1000Bytes": 600000000,
+    "decimalGB": 0.6,
+    "sixHundredKiBtimes1000Bytes": 614400000,
+    "GiB": 0.57220458984375
+  }
+}

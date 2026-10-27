@@ -1,0 +1,178 @@
+{
+  "date": "2026-10-27",
+  "timezone": "Asia/Tokyo",
+  "scope": "Approved continuous-recognition guided teaching candidate; no product activation",
+  "environment": {
+    "execution": "cloud",
+    "node": "24.21.0",
+    "dependencies": "existing locked node_modules"
+  },
+  "runtime": {
+    "backend-original": {
+      "numPassedTests": 7,
+      "numFailedTests": 0,
+      "numPendingTests": 15,
+      "success": true
+    },
+    "frontend-original": {
+      "numPassedTests": 11,
+      "numFailedTests": 0,
+      "numPendingTests": 48,
+      "success": true
+    },
+    "backend-corrected-cases": {
+      "numPassedTests": 3,
+      "numFailedTests": 0,
+      "numPendingTests": 3,
+      "success": true
+    }
+  },
+  "types": {
+    "backend-types-continued": {
+      "config": "tsconfig.json",
+      "roots": [
+        "src/modules/cognitive/content-candidates/continuous-recognition/package.ts",
+        "src/modules/cognitive/task-resource.ts",
+        "src/modules/cognitive/content-candidates/native-registry/participant-presentations.ts",
+        "src/__tests__/cognitive/recognition-guided-practice.test.ts",
+        "src/__tests__/cognitive/v2-native-registry.test.ts",
+        "src/middleware/auth.ts"
+      ],
+      "sourceCount": 1008,
+      "sourceClosureSha256": "d633384a7d4892ebe99315ddf469d872117bdd13a6c8a877f965b4aba3153723",
+      "diagnostics": []
+    },
+    "frontend-types-continued": {
+      "config": "tsconfig.app.json",
+      "roots": [
+        "src/modules/cognitive/tasks/continuous-recognition/RecognitionTask.tsx",
+        "src/modules/cognitive/tasks/continuous-recognition/guided-practice.test.tsx",
+        "src/test/setup.ts",
+        "src/vite-env.d.ts"
+      ],
+      "sourceCount": 57,
+      "sourceClosureSha256": "a90abed6da74ec49e9405f7f7c4dfed0f258b34deca360b63ae54dd653359788",
+      "diagnostics": []
+    },
+    "frontend-types-packaging": {
+      "config": "tsconfig.app.json",
+      "roots": [
+        "src/modules/cognitive/tasks/continuous-recognition/RecognitionTask.tsx",
+        "src/modules/cognitive/tasks/continuous-recognition/guided-practice.test.tsx",
+        "src/test/setup.ts",
+        "src/vite-env.d.ts"
+      ],
+      "sourceCount": 58,
+      "sourceClosureSha256": "4629e7457acab4951a617f8aeb11793f6dd8dd9f958b68594e0c6b6c25d8be56",
+      "diagnostics": []
+    }
+  },
+  "typeFailures": {
+    "backend-types-original": {
+      "originalReportSha256": "3befcdd40e44d14a319e12a8f2beb987889159125c72d6542b5e80557a998b47",
+      "diagnostics": [
+        {
+          "file": "src/__tests__/cognitive/recognition-guided-practice.test.ts",
+          "line": 25,
+          "message": "Type 'SessionConfigSnapshot<{ profile: \"experience\" | \"research\"; formalAssetIds: string[]; practiceAssetIds: string[]; imageMs: 750; isiMs: 800; responseRule: \"image-and-following-isi-half-open-0.1.0\"; generatorVersion: \"seeded-blocks-0.1.0\"; qualityRule: \"product-session-descriptive-0.2.0\"; assetManifestBinding: { ...; ...' is not assignable to type 'SessionConfigSnapshot<{ practicePolicy: Readonly<{ readonly version: \"recognition-guided-practice-v1\"; readonly trials: 8; readonly minimumCorrect: 7; readonly maxRounds: 3; readonly imageMs: 1200; readonly isiMs: 800; readonly feedback: \"per_trial\"; readonly repeatInstructionsBeforeRetry: true; readonly sequenceVer...'.   Property 'practicePolicy' is missing in type '{ profile: \"experience\" | \"research\"; formalAssetIds: string[]; practiceAssetIds: string[]; imageMs: 750; isiMs: 800; responseRule: \"image-and-following-isi-half-open-0.1.0\"; generatorVersion: \"seeded-blocks-0.1.0\"; qualityRule: \"product-session-descriptive-0.2.0\"; assetManifestBinding: { ...; }; }' but required in type '{ practicePolicy: Readonly<{ readonly version: \"recognition-guided-practice-v1\"; readonly trials: 8; readonly minimumCorrect: 7; readonly maxRounds: 3; readonly imageMs: 1200; readonly isiMs: 800; readonly feedback: \"per_trial\"; readonly repeatInstructionsBeforeRetry: true; readonly sequenceVersion: \"recognition-sho...'."
+        },
+        {
+          "file": "src/modules/cognitive/content-candidates/continuous-recognition/native.ts",
+          "line": 41,
+          "message": "Argument of type '$ZodIssue' is not assignable to parameter of type 'string | { [x: string]: unknown; readonly format: $ZodStringFormats | (string & {}); readonly pattern?: string | undefined; readonly input?: string | undefined; readonly code: \"invalid_format\"; readonly message?: string | undefined; readonly path?: PropertyKey[] | undefined; readonly inst?: $ZodType<...> | ... 1 mor...'.   Type '$ZodIssueInvalidStringFormat' is not assignable to type 'string | { [x: string]: unknown; readonly format: $ZodStringFormats | (string & {}); readonly pattern?: string | undefined; readonly input?: string | undefined; readonly code: \"invalid_format\"; readonly message?: string | undefined; readonly path?: PropertyKey[] | undefined; readonly inst?: $ZodType<...> | ... 1 mor...'.     Type '$ZodIssueInvalidStringFormat' is not assignable to type '{ [x: string]: unknown; readonly format: $ZodStringFormats | (string & {}); readonly pattern?: string | undefined; readonly input?: string | undefined; readonly code: \"invalid_format\"; readonly message?: string | undefined; readonly path?: PropertyKey[] | undefined; readonly inst?: $ZodType<...> | ... 1 more ... | u...'.       Index signature for type 'string' is missing in type '$ZodIssueInvalidStringFormat'."
+        }
+      ]
+    },
+    "frontend-types-original": {
+      "originalReportSha256": "9bdd670bc87ec1a81206fe4b6b0bdb22b283c1f37616b99e761ea4ea97f522f6",
+      "diagnostics": [
+        {
+          "file": "../backend/src/modules/cognitive/content-candidates/continuous-recognition/native.ts",
+          "line": 41,
+          "message": "Argument of type '$ZodIssue' is not assignable to parameter of type 'string | { [x: string]: unknown; readonly format: $ZodStringFormats | (string & {}); readonly pattern?: string | undefined; readonly input?: string | undefined; readonly code: \"invalid_format\"; readonly message?: string | undefined; readonly path?: PropertyKey[] | undefined; readonly inst?: $ZodType<...> | ... 1 mor...'.   Type '$ZodIssueInvalidStringFormat' is not assignable to type 'string | { [x: string]: unknown; readonly format: $ZodStringFormats | (string & {}); readonly pattern?: string | undefined; readonly input?: string | undefined; readonly code: \"invalid_format\"; readonly message?: string | undefined; readonly path?: PropertyKey[] | undefined; readonly inst?: $ZodType<...> | ... 1 mor...'.     Type '$ZodIssueInvalidStringFormat' is not assignable to type '{ [x: string]: unknown; readonly format: $ZodStringFormats | (string & {}); readonly pattern?: string | undefined; readonly input?: string | undefined; readonly code: \"invalid_format\"; readonly message?: string | undefined; readonly path?: PropertyKey[] | undefined; readonly inst?: $ZodType<...> | ... 1 more ... | u...'.       Index signature for type 'string' is missing in type '$ZodIssueInvalidStringFormat'."
+        }
+      ]
+    }
+  },
+  "sourceSha256": {
+    "server-version/backend/src/__tests__/cognitive/recognition-guided-practice.test.ts": "96c4d2282cb4c91e01cc7901ac18d8998460d51b0b5b81748ce8656fa2c6865c",
+    "server-version/backend/src/__tests__/cognitive/v2-native-registry.test.ts": "ef9aa7e4ad637f2010f6dd4df8bc6080359f6f367de02f3d93b4684e45895573",
+    "server-version/backend/src/modules/cognitive/content-candidates/continuous-recognition/native.ts": "3c3a7a83a5b4987b2bdb1c307d0db2524756c98d324dd794e94ec6ba7f05efac",
+    "server-version/backend/src/modules/cognitive/content-candidates/continuous-recognition/package.ts": "7c0a2e0caa6cf016b2e3d5e144cc99351de8c1dd520ddd086d59f633480b6eb4",
+    "server-version/backend/src/modules/cognitive/content-candidates/continuous-recognition/participant-presentation.ts": "41face3d82626322e90f493092873f50b87ac70b0b5416e4cf0410b9d4eb2039",
+    "server-version/backend/src/modules/cognitive/content-candidates/continuous-recognition/practice.ts": "7bfd58de5c55f1e0d3242c75c8d300ff4fd0c9055709808d08be0b472c79a0bb",
+    "server-version/backend/src/modules/cognitive/content-candidates/native-registry/definitions.ts": "1138875dd230f89b2e6e0bb1a52fe7b6bb353268653e6736c150c88beda19af7",
+    "server-version/backend/src/modules/cognitive/content-candidates/native-registry/participant-presentations.ts": "d11e5426a4c8e876c375979e659cadb9f5132e776b9911398f639422789018ea",
+    "server-version/backend/src/modules/cognitive/task-resource.ts": "4f24dd5dd54ee7eccd7684994ad7311f53bca5631ec6e4822e18ab88b7bb636e",
+    "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/RecognitionGuidedInstructions.tsx": "cf52cb4f42303c5900808e12351544b312f554625119903a6b244c0a9cac9feb",
+    "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/RecognitionReport.tsx": "e1b11d3aa81349f708cfb7a1222e0a13c86a834cb20a643197a236a12107f76c",
+    "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/RecognitionTask.tsx": "c7ec36ee842b8a521140baf77e63383108572fa174993a2e7a9f030008ed8e77",
+    "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/assets.ts": "c53a3ff75770d1a5b2f41227a0c54a596bf12c6c64c23ac5677bfa41576759f4",
+    "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/capture.ts": "f53ec7bb9709379d0d794733990fde91279f10525e6403bac957dcf7fe7644bf",
+    "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/contracts.ts": "e06469ce9b3f8b6a3330c5aa944d48f117fd7c49f3d08009894f254f56c402d4",
+    "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/generated/practice.ts": "a2a7b9ec6f92d8ba6ca6f27e5dce041293edc7cb04ebbd4574fa44e985220cc5",
+    "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/guided-practice.test.tsx": "cf70dcfda650f29ac1233f0863b1824d1e546d28ad5240cf6309b9a726319b60",
+    "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/session.ts": "6612e6ddca969813513938babee996da1f6e46d6c544eeeffc5a8e7b20e0ef58",
+    "server-version/scripts/cognitive/recognition-content.cjs": "1f1f5b4e9fb5afa33c0eaadeff9025665ed0db587063485d54b55b14f4e09fcf"
+  },
+  "componentBundle": {
+    "kind": "ISOLATED_COMPONENT_BROWSER_BUNDLE_NOT_FULL_APP",
+    "entry": "RecognitionTask.tsx",
+    "css": "empty; not a visual check",
+    "inputs": [
+      "node_modules/react/cjs/react.development.js",
+      "node_modules/react/index.js",
+      "node_modules/scheduler/cjs/scheduler.development.js",
+      "node_modules/scheduler/index.js",
+      "node_modules/react-dom/cjs/react-dom.development.js",
+      "node_modules/react-dom/index.js",
+      "src/modules/cognitive/tasks/continuous-recognition/contracts.ts",
+      "node_modules/@noble/hashes/esm/crypto.js",
+      "node_modules/@noble/hashes/esm/utils.js",
+      "node_modules/@noble/hashes/esm/_md.js",
+      "node_modules/@noble/hashes/esm/_u64.js",
+      "node_modules/@noble/hashes/esm/sha2.js",
+      "node_modules/@noble/hashes/esm/sha256.js",
+      "src/modules/cognitive/tasks/continuous-recognition/generated/practice.ts",
+      "src/modules/cognitive/tasks/continuous-recognition/assets.ts",
+      "src/modules/cognitive/tasks/continuous-recognition/capture.ts",
+      "src/modules/cognitive/tasks/continuous-recognition/digest.ts",
+      "src/modules/cognitive/tasks/continuous-recognition/save-queue.ts",
+      "src/modules/cognitive/tasks/continuous-recognition/report-projection.ts",
+      "src/modules/cognitive/tasks/continuous-recognition/session.ts",
+      "src/modules/cognitive/tasks/continuous-recognition/recognition.css",
+      "src/modules/cognitive/tasks/continuous-recognition/RecognitionReport.tsx",
+      "src/modules/cognitive/tasks/continuous-recognition/RecognitionGuidedInstructions.tsx",
+      "src/modules/cognitive/tasks/continuous-recognition/RecognitionTask.tsx"
+    ],
+    "externalRuntimeSourcePaths": [],
+    "bytes": 1078491,
+    "sha256": "d73d648a944fa36393943a60a07c7841a030d2b71502b37ffae0ef7de5f731c9",
+    "success": true
+  },
+  "reuse": {
+    "backend": {
+      "covered": 9,
+      "missing": [],
+      "mismatched": [],
+      "diagnostics": 0
+    },
+    "frontend": {
+      "covered": 9,
+      "missing": [],
+      "mismatched": [],
+      "diagnostics": 0
+    },
+    "runtime_reuse": "Only assets/session import targets changed after runtime tests; reversing those import strings reproduces the previously checked source hashes. Generated pure body equals backend practice.ts."
+  },
+  "notRun": [
+    "full App/CSRF",
+    "real browser journey",
+    "physical phone/tablet/Safari",
+    "external COS",
+    "database seed",
+    "both full formal browser journeys",
+    "CI/deployment",
+    "backend tag persistence/filter/search"
+  ]
+}

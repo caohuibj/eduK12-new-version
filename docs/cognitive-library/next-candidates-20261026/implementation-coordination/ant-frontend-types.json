@@ -1,0 +1,26 @@
+{
+  "kind": "ANT_FRONTEND_ACTUAL_TSCONFIG_CANDIDATE_ROOTS_ONLY",
+  "startedUtc": "2026-10-26T07:13:47.844093+00:00",
+  "durationSeconds": 1.8897670430014841,
+  "exitCode": 0,
+  "node": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node",
+  "script": "const ts=require('typescript');const path=require('node:path');const config=ts.readConfigFile('tsconfig.app.json',ts.sys.readFile);if(config.error)throw new Error('frontend config unreadable');const parsed=ts.parseJsonConfigFileContent(config.config,ts.sys,process.cwd());const roots=JSON.parse(process.env.CANDIDATE_ROOTS);const program=ts.createProgram(roots,parsed.options);const diagnostics=ts.getPreEmitDiagnostics(program);if(diagnostics.length){const host={getCanonicalFileName:f=>f,getCurrentDirectory:()=>process.cwd(),getNewLine:()=>\"\\n\"};process.stdout.write(ts.formatDiagnosticsWithColorAndContext(diagnostics,host));process.exitCode=1;}",
+  "config": "server-version/frontend/tsconfig.app.json",
+  "rootFiles": 11,
+  "sourceSha256": {
+    "server-version/frontend/src/modules/cognitive/tasks/ant/AntReportCard.tsx": "a51fe5dab09503dae2e3436a5cb6f8619febb7298766fc56653e9b9f878eb660",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/AntTask.tsx": "2ffe2aff48d05d39f69532dc6f9dd4b7104e4e4f60d810fa78817a0e0b4ec35a",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/capture.ts": "3ea2e3dcd4bdc7010b209b4edf980b67d2572bf4560487e0c4d3994faefe5f90",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/display.ts": "6046840499f49662756f48c56a435deec06db6f892c4c9908e5a41c75498cd5a",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/generated/protocol.ts": "3792e7a94f6be7e19c9d496cafa380412c1760242e8a76c5cd9d064153c78cc9",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/generated/report.ts": "371c1834ad1a63ba8962b21173c6a399c398f5d40b5d254077b5da0502814326",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/local-save.ts": "ce23b298a385435a122bdc1992c21401490f4637ce7946fd9ba6ab9e3cba8219",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/paint.ts": "d4a43342fa73c7e591901a7411d04304d7d5b70e63e85514035589ea86438ef3",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/seal.ts": "5c0e39ea3cf60286ba37db5a89fcc21319f46ba980dd9f08b589ad595692b029",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/session.ts": "1b30fb429d31f118b6e29559afe999fa3dec5a7befe9d822a12b4cae60d69fed",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/test-fixtures.ts": "5f727f76b8249281d282354d6a913faab33ee173b01b9f54b01b077c9897acb4"
+  },
+  "frontendTsconfigSha256": "97ed0e951ac068a9b2d08635b327932db8e41193f9c82e8291a919b7c68bd62e",
+  "notWholeApplication": true,
+  "notRepeated": "enumeration and recognition owner checks already passed; not executed here"
+}

@@ -61,7 +61,7 @@ export const evaluateCognitiveProductReadiness = (
           message: 'Cognitive product config must resolve to an object before profile patches are applied',
         })
       } else {
-        for (const profile of releaseProfiles.filter(p => p === 'standard' || Object.prototype.hasOwnProperty.call(definition.profiles, p))) {
+        for (const profile of releaseProfiles.filter(p => Object.prototype.hasOwnProperty.call(definition.profiles, p))) {
           const profileDefinition = definition.profiles[profile]
           if (!profileDefinition) {
             blockers.push({

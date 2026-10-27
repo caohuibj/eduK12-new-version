@@ -1,0 +1,2 @@
+src/__tests__/cognitive/mot-report-format.test.ts(99,19): error TS2352: Conversion of type 'Record<string, unknown>' to type 'ThreeLayerReport' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type 'Record<string, unknown>' is missing the following properties from type 'ThreeLayerReport': title, profileLabel, qualityState, conclusion, and 7 more.

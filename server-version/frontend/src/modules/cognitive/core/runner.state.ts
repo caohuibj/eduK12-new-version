@@ -40,6 +40,8 @@ export const initialRunnerState: RunnerState = {
 }
 
 const buildTaskContext = (session: NonNullable<RunnerState['session']>): CognitiveTaskContext => ({
+  ...(session.nativeTask ? { nativeTask: true, sessionSnapshot: session.sessionSnapshot,
+    attemptEpoch: session.attemptEpoch, sessionEpoch: session.sessionEpoch, definitionHash: session.definitionHash } : {}),
   sessionId: session.sessionId,
   testType: session.testType,
   engineVersion: session.engineVersion,

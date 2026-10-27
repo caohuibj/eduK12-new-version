@@ -1,0 +1,54 @@
+{
+  "observedAt": "2026-10-26T10:01:48.728Z",
+  "repository": "caohuibj/eduK12-new-version",
+  "pr": {
+    "number": 356,
+    "head": "58c43e22c2fa6f120320594e17a940dd2a24ae7a",
+    "base": "ff8471e529e7b3c56e1e20f17d1e2581040fc896",
+    "state": "open",
+    "draft": true,
+    "merged": false,
+    "headTree": "7df98aaaab3c0f8010867af27fa7d0944af56f9d"
+  },
+  "files": [
+    {
+      "ref": "ff8471e529e7b3c56e1e20f17d1e2581040fc896",
+      "path": "server-version/backend/src/modules/cognitive/v2/registry.ts",
+      "sha": "f0fc61c176aeb3e3d19d962075a09a8ebd0b13cf",
+      "encoding": "utf-8",
+      "bytes": 8487
+    },
+    {
+      "ref": "ff8471e529e7b3c56e1e20f17d1e2581040fc896",
+      "path": "server-version/backend/src/modules/cognitive/v2/publication-gate.ts",
+      "sha": "e831b529411f6ffad2df12a38fcdfff4205e358e",
+      "encoding": "utf-8",
+      "bytes": 11168
+    },
+    {
+      "ref": "58c43e22c2fa6f120320594e17a940dd2a24ae7a",
+      "path": "server-version/backend/src/modules/cognitive/v2/registry.ts",
+      "sha": "f0fc61c176aeb3e3d19d962075a09a8ebd0b13cf",
+      "encoding": "utf-8",
+      "bytes": 8487
+    },
+    {
+      "ref": "58c43e22c2fa6f120320594e17a940dd2a24ae7a",
+      "path": "server-version/backend/src/modules/cognitive/v2/publication-gate.ts",
+      "sha": "e831b529411f6ffad2df12a38fcdfff4205e358e",
+      "encoding": "utf-8",
+      "bytes": 11168
+    },
+    {
+      "ref": "ff8471e529e7b3c56e1e20f17d1e2581040fc896",
+      "path": "server-version/backend/src/modules/cognitive/v2/audit.ts",
+      "sha": "f20dbe0d7c432f9226b88f709c03a7451c6ae42d"
+    },
+    {
+      "ref": "58c43e22c2fa6f120320594e17a940dd2a24ae7a",
+      "path": "server-version/backend/src/modules/cognitive/v2/audit.ts",
+      "sha": "f20dbe0d7c432f9226b88f709c03a7451c6ae42d"
+    }
+  ],
+  "scope": "Only these three direct integration files rechecked. Main pinned base and PR356 latest exact head return identical Git blobs; local originals matched before edit. Does not claim the whole 353-file PR or other platform consumers are equivalent."
+}

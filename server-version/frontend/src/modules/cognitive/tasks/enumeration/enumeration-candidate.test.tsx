@@ -1,0 +1,299 @@
+import React from 'react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { EnumerationTask } from './EnumerationTask'
+import { EnumerationCapture, ENUMERATION_MAX_FRAME_RECORDS } from './capture'
+import { enumerationArtifact, enumerationDigest, enumerationGeometry, enumerationStartBlock,
+  enumerationStimulus, type EnumerationArtifact } from './display'
+import { enumerationPlan, type EnumerationTrial } from './generated/protocol'
+import { EnumerationPersistence, type EnumerationPersistencePort, type EnumerationSavedRecord } from './persistence'
+import { enumerationFixtureContext } from './fixtures.test-support'
+let clock = 0
+let paint: FrameRequestCallback
+const pending = <T,>() => { let resolve!: (value: T) => void; const promise = new Promise<T>(yes => { resolve = yes }); return { promise, resolve } }
+/** Unit-only stand-in for the host durable contract; browser evidence separately exercises localStorage. */
+function fixturePort() {
+  const markers = new Set<string>(), retained = new Map<string, EnumerationSavedRecord>()
+  let origin: unknown = null, ended = false
+  const port: EnumerationPersistencePort = {
+    id: 'synthetic-unit-port', durability: { kind: 'host_verified_browser_durable', verificationId: 'synthetic-contract-only' },
+    openAttempt: vi.fn(async value => {
+      const different = origin !== null && enumerationDigest(origin) !== enumerationDigest(value.pageOrigin)
+      origin ??= structuredClone(value.pageOrigin)
+      return { ...value, state: ended || different ? 'ended' as const : 'bound' as const }
+    }),
+    endAttempt: vi.fn(() => { ended = true }),
+    retainArtifact: vi.fn(async artifact => ({ contextId: artifact.context.contextId, artifactHash: artifact.artifactHash, retained: true as const })),
+    reserve: vi.fn(async value => {
+      const key = value.attemptId + ':' + value.phase + ':' + value.trialIndex + ':' + value.exposureOrdinal
+      const repeated = markers.has(key); markers.add(key)
+      return { ...value, state: repeated || ended ? 'unresolved_exposure' as const : 'new' as const }
+    }),
+    retain: vi.fn(async value => {
+      retained.set(value.record.exposureId, structuredClone(value))
+      return { contextId: value.record.contextId, exposureId: value.record.exposureId, recordHash: value.recordHash, accepted: true as const }
+    }),
+    onTrialComplete: vi.fn(async (_core, value) => ({ contextId: value.record.contextId, exposureId: value.record.exposureId, recordHash: value.recordHash, accepted: true as const })),
+    onPracticeComplete: vi.fn(async value => ({ contextId: value.record.contextId, exposureId: value.record.exposureId, recordHash: value.recordHash, accepted: true as const })),
+    complete: vi.fn(async value => ({ ...value, confirmed: true as const })),
+  }
+  return { port, markers, retained }
+}
+function capture(index = 0, phase: 'test' | 'practice' = 'test', artifact = enumerationArtifact(enumerationFixtureContext()), base = 0) {
+  const c = new EnumerationCapture(artifact.context, enumerationPlan(artifact.context.config, artifact.context.randomSeed, index, phase), phase + '-' + index, artifact.artifactHash)
+  c.frame(base); c.frame(base + 1000)
+  c.frame(base + (phase === 'practice' ? 2000 : 1050)); c.frame(base + (phase === 'practice' ? 3000 : 2050))
+  return c
+}
+const reservation = (a: EnumerationArtifact, c: EnumerationCapture) => ({ contextId: a.context.contextId,
+  attemptId: a.context.attemptId, exposureId: c.exposureId, artifactHash: a.artifactHash,
+  phase: c.plan.phase, trialIndex: c.plan.trialIndex, exposureOrdinal: c.exposureOrdinal })
+const finishRecord = (c: EnumerationCapture, now = 2300) => { c.confirm('touch', now); return c.record() }
+async function startUI(port: EnumerationPersistencePort) {
+  render(<EnumerationTask context={enumerationFixtureContext()} persistence={port} />)
+  fireEvent.click(screen.getByRole('button', { name: '查看准备状态' }))
+  fireEvent.click(screen.getByRole('button', { name: '开始练习' }))
+  await waitFor(() => expect(document.querySelector('[data-enumeration-view="running"]')).not.toBeNull())
+}
+async function paintUI(phase: 'practice' | 'test') {
+  const base = clock
+  for (const offset of [0, 1000, phase === 'practice' ? 2000 : 1050, phase === 'practice' ? 3000 : 2050])
+    act(() => { clock = base + offset; paint(clock) })
+}
+async function confirmUI(phase: 'practice' | 'test') {
+  await paintUI(phase)
+  act(() => { clock += 100; fireEvent.keyDown(screen.getByRole('slider'), { key: 'End' }); fireEvent.change(screen.getByRole('slider'), { target: { value: '15' } }); fireEvent.click(screen.getByRole('button', { name: '确认' })) })
+}
+beforeEach(() => {
+  clock = 0; vi.spyOn(performance, 'now').mockImplementation(() => clock)
+  vi.stubGlobal('requestAnimationFrame', vi.fn((fn: FrameRequestCallback) => { paint = fn; return 1 }))
+  vi.stubGlobal('cancelAnimationFrame', vi.fn())
+  Object.defineProperty(window, 'innerWidth', { configurable: true, value: 390 })
+  Object.defineProperty(window, 'innerHeight', { configurable: true, value: 844 })
+  Object.defineProperty(window, 'devicePixelRatio', { configurable: true, value: 1 })
+  vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue({ width: 390, height: 844, top: 0, left: 0, right: 390, bottom: 844, x: 0, y: 0, toJSON() {} })
+  vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({ setTransform: vi.fn(), clearRect: vi.fn(), fillRect: vi.fn(), beginPath: vi.fn(), moveTo: vi.fn(), lineTo: vi.fn(), stroke: vi.fn(), arc: vi.fn(), fill: vi.fn() } as unknown as CanvasRenderingContext2D)
+})
+afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.unstubAllGlobals() })
+
+describe('enumeration candidate frontend closed loop', () => {
+  it('requires explicit sourced calibration/recipe and rejects display changes or silent shrinking', () => {
+    const c = enumerationFixtureContext(), viewport = { width: 390, height: 844, dpr: 1, scale: 1 }
+    expect(enumerationStartBlock({ ...c, calibration: null }, viewport, 350, 500)).toBe('missing_calibration')
+    expect(enumerationStartBlock({ ...c, recipe: null }, viewport, 350, 500)).toBe('missing_recipe')
+    expect(enumerationStartBlock(c, { ...viewport, scale: 2 }, 350, 500)).toBe('display_changed')
+    expect(enumerationStartBlock(c, viewport, 200, 500)).toBe('field_does_not_fit')
+    expect(enumerationStartBlock(c, viewport, 350, 500)).toBeNull()
+    const geometry = enumerationGeometry(c.calibration!, c.recipe!)
+    expect(geometry.fieldCssPx).toBeGreaterThan(303); expect(geometry.fieldCssPx).toBeLessThan(305)
+    const changed = structuredClone(c); changed.recipe!.formalExposureMs = 100
+    expect(enumerationStartBlock(changed, viewport, 350, 500)).toBe('invalid_context')
+  })
+  it('keeps the approved fixed 48×48 mask once per artifact and deterministic nonoverlapping circular dot sampling', () => {
+    const c = enumerationFixtureContext(), artifact = enumerationArtifact(c)
+    expect(artifact.maskBits).toHaveLength(2304)
+    expect(artifact.maskBits.reduce((sum, value) => sum + value, 0)).toBe(1139)
+    expect(enumerationArtifact(c)).toEqual(artifact)
+    expect(artifact.pageOrigin.timeOrigin).toBe(performance.timeOrigin)
+    expect(artifact.pageOrigin.source).toBe('performance.timeOrigin-and-crypto.randomUUID')
+    const plan = enumerationPlan(c.config, c.randomSeed, 0), dots = enumerationStimulus(c, plan, 'test-0')
+    expect(dots).toEqual(enumerationStimulus(c, plan, 'test-0'))
+    expect(dots.dots).toHaveLength(plan.targetValue)
+    for (let i = 0; i < dots.dots.length; i++) {
+      const p = dots.dots[i]
+      expect(Math.hypot(p.x - 0.5, p.y - 0.5) + dots.dotDiameter / 2).toBeLessThanOrEqual(0.5)
+      for (const other of dots.dots.slice(i + 1)) expect(Math.hypot(p.x - other.x, p.y - other.y)).toBeGreaterThanOrEqual(dots.dotDiameter)
+    }
+    expect(dots).not.toHaveProperty('maskBits')
+  })
+  it('records real passed draw clocks with one transition per frame and preserves operation/input/raw facts', () => {
+    const a = enumerationArtifact(enumerationFixtureContext()), c = new EnumerationCapture(a.context, enumerationPlan(a.context.config, a.context.randomSeed, 0), 'test-0', a.artifactHash)
+    expect(c.frame(100)).toBe('fixation'); expect(c.frame(10000)).toBe('stimulus')
+    expect(c.core.stimulusOnsetPerfMs).toBe(10000); expect(c.core.maskOnsetPerfMs).toBeNull()
+    c.frame(10017); c.frame(10067); c.frame(11100)
+    c.change(1, 'keyboard', 11200); c.confirm('keyboard', 11300)
+    const record = c.record()
+    expect(record.core.responseValue).toBe(1); expect(record.core.responseInput).toBe('keyboard')
+    expect(record.core.startedAtPerfMs).toBe(100); expect(record.core.confirmedAtPerfMs).toBe(11300)
+    expect(record.core.timingFacts.stimulusMaxFrameGapMs).toBe(50)
+    expect(record.raw.frames.map(frame => frame.atPerfMs)).toEqual([100, 10000, 10017, 10067, 11100])
+    expect(record.raw.onsetMeaning).toBe('client_reported_raf_draw_command_not_physical_onset')
+    expect(record.raw).not.toHaveProperty('score')
+  })
+  it('never converts interruption into a response or practice pass and records early input timestamps', () => {
+    const a = enumerationArtifact(enumerationFixtureContext()), c = new EnumerationCapture(a.context, enumerationPlan(a.context.config, a.context.randomSeed, 0, 'practice'), 'practice-0', a.artifactHash)
+    c.frame(0); c.premature('touch', 10); c.interrupt('visibility_lost', 20)
+    const record = c.record()
+    expect(record.core.phase).toBe('practice'); expect(record.core.responseValue).toBeNull()
+    expect(record.raw.prematureEvents).toEqual([{ input: 'touch', atPerfMs: 10 }])
+    expect(record.raw.completion).toBe('interrupted')
+    expect(record.core.timingFacts.incomplete).toBe(true)
+  })
+  it('bounds frame and slider buffers with explicit terminal overflow, rejects invalid values/clocks', () => {
+    const c = capture()
+    expect(() => c.change(16, 'touch', 2100)).toThrow(/1–15/)
+    expect(() => c.change(NaN, 'touch', 2100)).toThrow()
+    expect(() => c.change(2, 'touch', 2000)).toThrow(/clock/)
+    for (let i = 0; i < 513; i++) c.change(1, 'touch', 2200 + i)
+    expect(c.record().core.sliderChanges).toHaveLength(512)
+    expect(c.record().raw.completion).toBe('telemetry_overflow')
+    const a = enumerationArtifact(enumerationFixtureContext()), frames = new EnumerationCapture(a.context, enumerationPlan(a.context.config, a.context.randomSeed, 0), 'bounded', a.artifactHash)
+    for (let i = 0; i <= ENUMERATION_MAX_FRAME_RECORDS; i++) frames.frame(i / 100000)
+    expect(frames.record().raw.frames).toHaveLength(ENUMERATION_MAX_FRAME_RECORDS)
+    expect(frames.record().core.timingFacts.overflow).toBe(true)
+  })
+  it('serializes double save and retries immutable full raw after a false ACK without exposing again', async () => {
+    const a = enumerationArtifact(enumerationFixtureContext()), { port } = fixturePort(), gate = new EnumerationPersistence(a, port)
+    const c = capture(0, 'test', a), record = finishRecord(c), wait = pending<Awaited<ReturnType<typeof port.onTrialComplete>>>()
+    vi.mocked(port.onTrialComplete).mockImplementationOnce(async (core, value) => {
+      core.responseValue = 15; value.record.stimulus.dots = []; return wait.promise
+    })
+    const first = gate.save(record), duplicate = gate.save(record)
+    expect(first).toBe(duplicate)
+    await waitFor(() => expect(port.onTrialComplete).toHaveBeenCalledTimes(1))
+    wait.resolve({ contextId: record.contextId, exposureId: record.exposureId, recordHash: 'wrong', accepted: true })
+    await expect(first).rejects.toThrow(/receipt/)
+    await gate.save(record)
+    expect(vi.mocked(port.retain).mock.calls[1][0].record).toEqual(record)
+    expect(port.reserve).not.toHaveBeenCalled()
+    expect(vi.mocked(port.onTrialComplete).mock.calls[1][0].responseValue).toBe(record.core.responseValue)
+    const changed = structuredClone(record); changed.core.responseValue = 1
+    await expect(gate.save(changed)).rejects.toThrow(/conflicts/)
+  })
+  it('stops old asynchronous continuations when the context is disposed', async () => {
+    const a = enumerationArtifact(enumerationFixtureContext()), { port } = fixturePort(), gate = new EnumerationPersistence(a, port)
+    const wait = pending<Awaited<ReturnType<typeof port.retain>>>(), c = capture(0, 'test', a), record = finishRecord(c)
+    vi.mocked(port.retain).mockReturnValueOnce(wait.promise)
+    const saving = gate.save(record)
+    await waitFor(() => expect(port.retain).toHaveBeenCalledTimes(1)); gate.dispose()
+    wait.resolve({ contextId: record.contextId, exposureId: record.exposureId, recordHash: enumerationDigest(record), accepted: true })
+    await expect(saving).rejects.toThrow(/replaced/)
+    expect(port.onTrialComplete).not.toHaveBeenCalled()
+  })
+  it('blocks acknowledged and unresolved markers after a new mount or changed context, and ends a changed realm', async () => {
+    const a = enumerationArtifact(enumerationFixtureContext()), fixture = fixturePort(), c = capture(0, 'test', a)
+    const gate = new EnumerationPersistence(a, fixture.port), request = reservation(a, c)
+    await gate.prepare(request)
+    await expect(new EnumerationPersistence(a, fixture.port).prepare(request)).rejects.toThrow(/unresolved/)
+    await gate.save(finishRecord(c))
+    const changedContext = structuredClone(a.context); changedContext.contextId = 'new-context-same-attempt'
+    const changed = enumerationArtifact(changedContext), changedCapture = capture(0, 'test', changed)
+    await expect(new EnumerationPersistence(changed, fixture.port).prepare(reservation(changed, changedCapture))).rejects.toThrow(/unresolved/)
+    const nextRealm = structuredClone(a); nextRealm.pageOrigin.pageInstanceId = 'different-page-instance'
+    const { artifactHash: _old, ...payload } = nextRealm; nextRealm.artifactHash = enumerationDigest(payload)
+    await expect(new EnumerationPersistence(nextRealm, fixture.port).prepare({ ...request, artifactHash: nextRealm.artifactHash })).rejects.toThrow(/realm/)
+  })
+  it('requires verified durability and permanently blocks new exposure after interruption while allowing the same raw save', async () => {
+    const a = enumerationArtifact(enumerationFixtureContext()), { port } = fixturePort(), gate = new EnumerationPersistence(a, port), c = capture(0, 'test', a)
+    await gate.prepare(reservation(a, c)); gate.end('visibility_lost')
+    c.interrupt('visibility_lost', 2200); await gate.save(c.record())
+    expect(gate.attemptEnded).toBe(true)
+    await expect(gate.prepare(reservation(a, capture(1, 'test', a)))).rejects.toThrow(/ended/)
+    expect(port.endAttempt).toHaveBeenCalledTimes(1)
+    const bad = fixturePort().port; (bad.durability as unknown as { kind: string }).kind = 'memory_only'
+    await expect(new EnumerationPersistence(a, bad).prepare(reservation(a, c))).rejects.toThrow(/durable/)
+  })
+  it('requires all practice and ordered formal ACKs and a final matching host receipt', async () => {
+    const a = enumerationArtifact(enumerationFixtureContext()), { port } = fixturePort(), gate = new EnumerationPersistence(a, port)
+    await expect(gate.finalize()).rejects.toThrow(/practice/)
+    for (let index = 0; index < 3; index++) await gate.save(finishRecord(capture(index, 'practice', a, index * 10000), index * 10000 + 3200))
+    await expect(gate.finalize()).rejects.toThrow(/incomplete/)
+    for (let index = 0; index < 25; index++) await gate.save(finishRecord(capture(index, 'test', a, 30000 + index * 10000), 32300 + index * 10000))
+    vi.mocked(port.complete).mockImplementationOnce(async value => ({ ...value, recordHashes: [], confirmed: true }))
+    await expect(gate.finalize()).rejects.toThrow(/not confirmed/)
+    const before = vi.mocked(port.onTrialComplete).mock.calls.length
+    await gate.finalize()
+    expect(port.onTrialComplete).toHaveBeenCalledTimes(before)
+    expect(port.complete).toHaveBeenCalledTimes(2)
+  })
+  it('renders blocked state for missing host setup and keeps formal start disabled', async () => {
+    render(<EnumerationTask context={{ ...enumerationFixtureContext(), calibration: null }} persistence={fixturePort().port} />)
+    fireEvent.click(screen.getByRole('button', { name: '查看准备状态' }))
+    expect(screen.getByRole('alert').textContent).toContain('校准')
+    expect((screen.getByRole('button', { name: '开始练习' }) as HTMLButtonElement).disabled).toBe(true)
+  })
+  it('retries failed practice retention with identical raw and no new rAF/exposure', async () => {
+    const { port } = fixturePort()
+    vi.mocked(port.retain).mockRejectedValueOnce(Error('quota'))
+    await startUI(port); await confirmUI('practice')
+    expect((await screen.findByRole('alert')).textContent).toContain('无需重复作答')
+    const before = vi.mocked(requestAnimationFrame).mock.calls.length, original = vi.mocked(port.retain).mock.calls[0][0]
+    const retryButton = screen.getByRole('button', { name: '重试提交' })
+    act(() => { fireEvent.click(retryButton); fireEvent.click(retryButton) })
+    await screen.findByRole('heading', { name: '练习记录' })
+    expect(port.retain).toHaveBeenCalledTimes(2)
+    expect(vi.mocked(port.retain).mock.calls[1][0]).toEqual(original)
+    expect(requestAnimationFrame).toHaveBeenCalledTimes(before)
+  })
+  it('does not score an interrupted practice or expose again after visibility/pagehide', async () => {
+    const { port } = fixturePort(); await startUI(port)
+    act(() => { clock = 100; paint(clock); window.dispatchEvent(new Event('pagehide')) })
+    expect((await screen.findByRole('heading', { name: '练习记录' })).textContent).toBe('练习记录')
+    expect(screen.getByText(/这轮练习中断了/).textContent).toContain('不判断对错')
+    expect((screen.getByRole('button', { name: '重新做这轮练习' }) as HTMLButtonElement).disabled).toBe(true)
+    expect(port.reserve).toHaveBeenCalledTimes(1); expect(port.onTrialComplete).not.toHaveBeenCalled()
+    expect(port.endAttempt).toHaveBeenCalledTimes(1)
+  })
+  it('clears old context prepare callbacks before they can start a new capture', async () => {
+    const { port } = fixturePort(), delayed = pending<Awaited<ReturnType<typeof port.retainArtifact>>>()
+    vi.mocked(port.retainArtifact).mockReturnValueOnce(delayed.promise)
+    const context = enumerationFixtureContext(), rendered = render(<EnumerationTask context={context} persistence={port} />)
+    fireEvent.click(screen.getByRole('button', { name: '查看准备状态' })); fireEvent.click(screen.getByRole('button', { name: '开始练习' }))
+    await waitFor(() => expect(port.retainArtifact).toHaveBeenCalledTimes(1))
+    rendered.rerender(<EnumerationTask context={{ ...context, contextId: 'different-context' }} persistence={port} />)
+    const old = vi.mocked(port.retainArtifact).mock.calls[0][0]
+    await act(async () => delayed.resolve({ contextId: old.context.contextId, artifactHash: old.artifactHash, retained: true }))
+    expect(port.reserve).not.toHaveBeenCalled(); expect(requestAnimationFrame).not.toHaveBeenCalled()
+    expect(screen.getByRole('heading', { name: '刚才有几个点？' })).toBeTruthy()
+  })
+  it('keeps a same-context same-id port-object rerender inside the same capture without restart or extra saving', async () => {
+    const { port } = fixturePort(), context = enumerationFixtureContext()
+    const ui = render(<EnumerationTask context={context} persistence={port} />)
+    fireEvent.click(screen.getByRole('button', { name: '查看准备状态' })); fireEvent.click(screen.getByRole('button', { name: '开始练习' }))
+    await waitFor(() => expect(document.querySelector('[data-enumeration-view="running"]')).not.toBeNull())
+    act(() => { clock = 100; paint(clock) })
+    const before = vi.mocked(requestAnimationFrame).mock.calls.length
+    ui.rerender(<EnumerationTask context={structuredClone(context)} persistence={{ ...port, onPracticeComplete: vi.fn(async value => ({ contextId: value.record.contextId, exposureId: value.record.exposureId, recordHash: value.recordHash, accepted: true as const })) }} />)
+    expect(document.querySelector('[data-enumeration-view="running"][data-stage="fixation"]')).not.toBeNull()
+    expect(port.retain).not.toHaveBeenCalled(); expect(port.endAttempt).not.toHaveBeenCalled()
+    expect(requestAnimationFrame).toHaveBeenCalledTimes(before)
+  })
+  it('clears pending old callbacks when a different port id creates a new generation', async () => {
+    const { port } = fixturePort(), delayed = pending<Awaited<ReturnType<typeof port.retainArtifact>>>()
+    vi.mocked(port.retainArtifact).mockReturnValueOnce(delayed.promise)
+    const context = enumerationFixtureContext(), ui = render(<EnumerationTask context={context} persistence={port} />)
+    fireEvent.click(screen.getByRole('button', { name: '查看准备状态' })); fireEvent.click(screen.getByRole('button', { name: '开始练习' }))
+    await waitFor(() => expect(port.retainArtifact).toHaveBeenCalledTimes(1))
+    ui.rerender(<EnumerationTask context={context} persistence={{ ...port, id: 'new-generation-port' }} />)
+    const old = vi.mocked(port.retainArtifact).mock.calls[0][0]
+    await act(async () => delayed.resolve({ contextId: old.context.contextId, artifactHash: old.artifactHash, retained: true }))
+    expect(port.reserve).not.toHaveBeenCalled(); expect(requestAnimationFrame).not.toHaveBeenCalled()
+    expect(screen.getByRole('heading', { name: '刚才有几个点？' })).toBeTruthy()
+  })
+  it('completes the actual three-practice/25-formal component loop, waits final ACK and hides a missing host result', async () => {
+    const { port } = fixturePort(), final = pending<Awaited<ReturnType<typeof port.complete>>>()
+    vi.mocked(port.complete).mockReturnValueOnce(final.promise)
+    await startUI(port)
+    for (let index = 0; index < 3; index++) {
+      if (index > 0) { fireEvent.click(screen.getByRole('button', { name: '开始练习' })); await waitFor(() => expect(document.querySelector('[data-enumeration-view="running"]')).not.toBeNull()) }
+      await confirmUI('practice'); await screen.findByRole('heading', { name: '练习记录' })
+      fireEvent.click(screen.getByRole('button', { name: index < 2 ? '下一次练习' : '准备开始作答' }))
+    }
+    for (let index = 0; index < 25; index++) {
+      fireEvent.click(screen.getByRole('button', { name: '开始这一轮' }))
+      await waitFor(() => expect(document.querySelector('[data-enumeration-view="running"]')).not.toBeNull())
+      await confirmUI('test')
+      if (index < 24) await screen.findByRole('button', { name: '开始这一轮' })
+    }
+    await waitFor(() => expect(port.complete).toHaveBeenCalledTimes(1))
+    expect(screen.getByRole('status').textContent).toContain('正在提交')
+    expect(screen.queryByRole('heading', { name: '这次的记录' })).toBeNull()
+    const request = vi.mocked(port.complete).mock.calls[0][0]
+    await act(async () => final.resolve({ ...request, confirmed: true }))
+    expect(await screen.findByRole('heading', { name: '暂时没有可描述的作答结果' })).toBeTruthy()
+    expect(document.querySelector('[data-report-state="invalid"]')).not.toBeNull()
+    expect(port.onTrialComplete).toHaveBeenCalledTimes(25)
+    expect(port.onPracticeComplete).toHaveBeenCalledTimes(3)
+    expect((vi.mocked(port.onTrialComplete).mock.calls[0][0] as EnumerationTrial).responseValue).toBe(15)
+  })
+})

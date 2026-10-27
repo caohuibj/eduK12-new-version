@@ -1,0 +1,92 @@
+{
+  "date": "2026-10-27",
+  "execution": "cloud; Node24.21.0; existing dependencies",
+  "scope": "Content-only visual search research180 / experience36, practice3 pass3. Integration and final tests deferred by user.",
+  "mainReadback": "dff80f0604163a04e2f5a8119d7d4295116eeb41",
+  "contentBranchMainBaseline": "04a8d994207d7b831b874d4be4f5c31640466458",
+  "mainMerged": false,
+  "distinctRuntimeTargets": 6,
+  "tests": {
+    "backend-original": {
+      "success": true,
+      "numPassedTests": 3,
+      "numFailedTests": 0,
+      "numPendingTests": 0
+    },
+    "frontend-original": {
+      "success": true,
+      "numPassedTests": 3,
+      "numFailedTests": 0,
+      "numPendingTests": 0
+    }
+  },
+  "types": {
+    "backend": {
+      "config": "tsconfig.json",
+      "roots": [
+        "src/modules/cognitive/content-candidates/visual-search/package.ts",
+        "src/modules/cognitive/content-candidates/visual-search/participant-presentation.ts",
+        "src/__tests__/cognitive/visual-search-content.test.ts"
+      ],
+      "sourceCount": 50,
+      "diagnostics": []
+    },
+    "frontend": {
+      "config": "tsconfig.app.json",
+      "roots": [
+        "src/modules/cognitive/tasks/visual-search/VisualSearchTask.tsx",
+        "src/modules/cognitive/tasks/visual-search/content.test.tsx",
+        "src/test/setup.ts",
+        "src/vite-env.d.ts"
+      ],
+      "sourceCount": 60,
+      "diagnostics": []
+    }
+  },
+  "sourceSha256": {
+    "server-version/backend/src/__tests__/cognitive/visual-search-content.test.ts": "62e2e1cf4537a140e9fba625640499dd0c6034ae227f9482c223c6ac583363c1",
+    "server-version/backend/src/modules/cognitive/content-candidates/visual-search/analysis.ts": "d17aab72f8d78662ef01d48211fb79ce6502f1a9771deff93e20162dbb9d1ad2",
+    "server-version/backend/src/modules/cognitive/content-candidates/visual-search/font.ts": "2515cff6feff3196e1e4fcc09537d349c8f1b35f92560cf347909b17c0aeae1c",
+    "server-version/backend/src/modules/cognitive/content-candidates/visual-search/metadata.ts": "a6bcf2120f76566a8e81bfb3551236a7bd8e5255ac351564e12f4250d1a81e94",
+    "server-version/backend/src/modules/cognitive/content-candidates/visual-search/package.ts": "8dbd703b1a677df30791edeb22c3b0bfcb64ddf9a1c62fd41597cc902230bb40",
+    "server-version/backend/src/modules/cognitive/content-candidates/visual-search/participant-presentation.ts": "e909fff66be697badc6003353d4727a0ddab6520fcbefd7440c5a6e19d73af19",
+    "server-version/backend/src/modules/cognitive/content-candidates/visual-search/protocol.ts": "640cf2f7f288e99a505a7a70a253e723cfaadcc0ec1ec65eba629d797beaeda8",
+    "server-version/backend/src/modules/cognitive/content-candidates/visual-search/report.ts": "d77325c3ad39d6541a61295aa7e6946d598100197df1e7fea7a4411ecb40767e",
+    "server-version/backend/src/modules/cognitive/content-candidates/visual-search/schema.ts": "b28fc5cfa6e693612a03d565b29aea5bc1fc11f69d61438e4884a29154aa9f2e",
+    "server-version/backend/src/modules/cognitive/content-candidates/visual-search/scorer.ts": "ef18fde61c353dfb9fe70d50fdd1ae78c1faa0b45bad25879523eba918b67d9c",
+    "server-version/frontend/src/modules/cognitive/tasks/visual-search/SearchInstructions.tsx": "42b6857e09cbbdea803dca963cdb02553f762bd92e10bdc22ed2ebf98ac2f171",
+    "server-version/frontend/src/modules/cognitive/tasks/visual-search/SearchReport.tsx": "cfc89e18785ad2fc4cf2d52a0a161b124512890591832cf49e68adf99eba5131",
+    "server-version/frontend/src/modules/cognitive/tasks/visual-search/VisualSearchTask.tsx": "6f7771cb30fbe8cc234221f4f943698ea993131ea25530d30b49d1424a246bea",
+    "server-version/frontend/src/modules/cognitive/tasks/visual-search/assets/FONT-LICENSE.txt": "f32df582a2aab128c07b2f7e36e7b928dc5f6bd82657b905c04f91459f9e5cf9",
+    "server-version/frontend/src/modules/cognitive/tasks/visual-search/assets/LiberationSans-Regular.ttf": "bade59d822652f76e6941aa87b40a87c13d1cc70db98ededb5011127efafd1d3",
+    "server-version/frontend/src/modules/cognitive/tasks/visual-search/capture.ts": "ce6eabb657e046810c0470e8fb5746523d20cbb3e2c9af039c377b801bc1c0a6",
+    "server-version/frontend/src/modules/cognitive/tasks/visual-search/content.test.tsx": "316a108333f4526995c9acef90870d00071d776c5e162a54ee0556298958004b",
+    "server-version/frontend/src/modules/cognitive/tasks/visual-search/contracts.ts": "9567f3aef59b6e79aa08cf697617109204c41a564ac902421e969efc05bdd0c4",
+    "server-version/frontend/src/modules/cognitive/tasks/visual-search/font-loader.ts": "ed9461019efcff5e659758622328adfe89f7e013529d3c8a9d5869a6eaf7b9ab",
+    "server-version/frontend/src/modules/cognitive/tasks/visual-search/generated/analysis.ts": "47aadd9f3605ac8f1ecbb73f6b180248f59b6b48fa7ba0df0fb45b6dbe7ee7c2",
+    "server-version/frontend/src/modules/cognitive/tasks/visual-search/generated/font.ts": "7630e19547ae299958c6ad4a45454d1a53e25e64327f8df6f106761a3ed431d6",
+    "server-version/frontend/src/modules/cognitive/tasks/visual-search/generated/protocol.ts": "75e057e6ed6012a5ed45ed886c90147a9b9943a2b5f324b46ecb1c51d3d9f84e",
+    "server-version/frontend/src/modules/cognitive/tasks/visual-search/generated/report.ts": "ccff04c76ff38a894bddad6bc38c5bb559051cae95ce778cd73fa5ba6337dbbb",
+    "server-version/frontend/src/modules/cognitive/tasks/visual-search/search.css": "4bcd3914c4ed04f09bcfdb7d8266e5e817e2cc3942a27890f2e5c3f82f50ac24",
+    "server-version/frontend/src/modules/cognitive/tasks/visual-search/session.ts": "8b76616c7882149a021bc6cc27ffd48a7968c7c0d3e4b1617a2c35e1c56e17a0",
+    "server-version/scripts/cognitive/search-content.cjs": "9b817d8eb23b110dc12e5e05f121af87e6e1b8d80d7527ec4f1c3f0a421e92e8"
+  },
+  "notRun": [
+    "product registry/admission/seed",
+    "actual browser FontFace/physical devices",
+    "real IndexedDB durability",
+    "real HTTP/core/report readback",
+    "COS",
+    "full App",
+    "research180 browser journey",
+    "new main merge validation",
+    "CI",
+    "deployment"
+  ],
+  "verificationNotes": [
+    "First six runtime targets and both actual-config type closures passed; no repeat runs.",
+    "Actual static task stores stage/input events only, not per-frame logs; repeat keydown events are counted in a bounded aggregate, not fabricated as answers.",
+    "Synthetic software clocks, mock font loader and in-memory ports do not establish browser FontFace, durable product persistence or final integration.",
+    "New main was fetched for read-only baseline inspection, not merged. Both sides touch the old CognitiveRunner.tsx; this task does not change that path."
+  ]
+}

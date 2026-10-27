@@ -1,0 +1,39 @@
+
+ RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend
+
+stdout | src/__tests__/cognitive/native-mot-http-archive.integration.test.ts > MOT actual authenticated HTTP START FINAL archive slice with synthetic COS
+[2026-10-26T11:08:20.776Z] [INFO] [CacheService] Redis缓存服务初始化完成
+
+stderr | src/__tests__/cognitive/native-mot-http-archive.integration.test.ts > MOT actual authenticated HTTP START FINAL archive slice with synthetic COS
+[2026-10-26T11:08:22.369Z] [WARN] [CacheService] Redis客户端已断开
+
+stdout | src/__tests__/cognitive/native-mot-http-archive.integration.test.ts > MOT actual authenticated HTTP START FINAL archive slice with synthetic COS
+[2026-10-26T11:08:22.370Z] [INFO] [CacheService] Redis连接已关闭
+
+ × src/__tests__/cognitive/native-mot-http-archive.integration.test.ts > MOT actual authenticated HTTP START FINAL archive slice with synthetic COS > runs real cookie auth/current principal, START and FINAL with authority receipt 134ms
+   → {"message":"Cannot find module '/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/cognitive-admission.service' imported from /workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/session.service.ts","stack":"Error: Cannot find module '/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/cognitive-admission.service' imported from /workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/session.service.ts\n    at finalizeResolution (node:internal/modules/esm/resolve:272:11)\n    at moduleResolve (node:internal/modules/esm/resolve:879:10)\n    at defaultResolve (node:internal/modules/esm/resolve:1006:11)\n    at ModuleLoader.#cachedDefaultResolve (node:internal/modules/esm/loader:705:20)\n    at ModuleLoader.#resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:725:38)\n    at ModuleLoader.resolveSync (node:internal/modules/esm/loader:763:56)\n    at ModuleLoader.#resolve (node:internal/modules/esm/loader:687:17)\n    at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:607:35)\n    at node:internal/modules/esm/loader:636:32\n    at TracingChannel.tracePromise (node:diagnostics_channel:362:14)\n    at ModuleLoader.import (node:internal/modules/esm/loader:632:21)\n    at defaultImportModuleDynamicallyForScript (node:internal/modules/esm/utils:240:31)\n    at importModuleDynamicallyCallback (node:internal/modules/esm/utils:264:12)\n    at buildRunnerPayload (/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/session.service.ts:2:11082)\n    at toRunnerPayload (/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/session.service.ts:2:15173)\n    at Object.createSession (/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/session.service.ts:2:16366)"}: expected 500 to be 200 // Object.is equality
+ ↓ src/__tests__/cognitive/native-mot-http-archive.integration.test.ts > MOT actual authenticated HTTP START FINAL archive slice with synthetic COS > keeps archive pending on failure, rejects wrong identity/role/format then confirms same sealed retry
+ ↓ src/__tests__/cognitive/native-mot-http-archive.integration.test.ts > MOT actual authenticated HTTP START FINAL archive slice with synthetic COS > only the authenticated binary archive route bypasses the unchanged global 2MiB JSON parser
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/cognitive/native-mot-http-archive.integration.test.ts > MOT actual authenticated HTTP START FINAL archive slice with synthetic COS > runs real cookie auth/current principal, START and FINAL with authority receipt
+AssertionError: {"message":"Cannot find module '/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/cognitive-admission.service' imported from /workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/session.service.ts","stack":"Error: Cannot find module '/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/cognitive-admission.service' imported from /workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/session.service.ts\n    at finalizeResolution (node:internal/modules/esm/resolve:272:11)\n    at moduleResolve (node:internal/modules/esm/resolve:879:10)\n    at defaultResolve (node:internal/modules/esm/resolve:1006:11)\n    at ModuleLoader.#cachedDefaultResolve (node:internal/modules/esm/loader:705:20)\n    at ModuleLoader.#resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:725:38)\n    at ModuleLoader.resolveSync (node:internal/modules/esm/loader:763:56)\n    at ModuleLoader.#resolve (node:internal/modules/esm/loader:687:17)\n    at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:607:35)\n    at node:internal/modules/esm/loader:636:32\n    at TracingChannel.tracePromise (node:diagnostics_channel:362:14)\n    at ModuleLoader.import (node:internal/modules/esm/loader:632:21)\n    at defaultImportModuleDynamicallyForScript (node:internal/modules/esm/utils:240:31)\n    at importModuleDynamicallyCallback (node:internal/modules/esm/utils:264:12)\n    at buildRunnerPayload (/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/session.service.ts:2:11082)\n    at toRunnerPayload (/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/session.service.ts:2:15173)\n    at Object.createSession (/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/session.service.ts:2:16366)"}: expected 500 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 500
+
+ ❯ src/__tests__/cognitive/native-mot-http-archive.integration.test.ts:20:210
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 2 skipped (3)
+   Start at  11:08:20
+   Duration  2.14s (transform 31ms, setup 0ms, import 44ms, tests 1.97s, environment 0ms)
+

@@ -1,0 +1,45 @@
+{
+  "status": "READY_SOURCE_STOPPED",
+  "baseHead": "5c13eb261e7e7dc34e6a066704ffeaf98fb6a163",
+  "sourceHashes": {
+    "server-version/backend/src/modules/cognitive/raw-archive.service.ts": "3c29b8a540e471edf99cf91c8d5fb80a8a323f3206245a77c9977b03a68e4793",
+    "server-version/backend/src/modules/cognitive/content-candidates/enumeration/archive-schema.ts": "cc601ce6e1f8b533306a0ea2cda1136a811e84a1e7f98c02d6caf9fee65684f3",
+    "server-version/backend/src/__tests__/cognitive/enumeration-raw-archive.postgres.integration.test.ts": "83ba94a46b367362eed12eed3e241313aaac64298111aa01cb568f3311a2bae6"
+  },
+  "contract": {
+    "path": "original-attempt1.json",
+    "exitCode": 0,
+    "passed": 1,
+    "durationSeconds": 6.43,
+    "realPostgres": true,
+    "realSeedPublishStartFinal": true,
+    "privateCosUploader": "synthetic",
+    "externalCOS": false,
+    "fullApplicationOrBrowser": false,
+    "reportInterpretabilityNotAsserted": true,
+    "savedReportCiphertextUnchanged": true
+  },
+  "schemaChanged": false,
+  "artifactAndRecordSchemaVersion": 1,
+  "candidateHashScheme": "candidate-json-stringify-sha256-v1",
+  "rawOuterShape": "{schemaVersion:1,artifact,formal:[SavedRecord],practice:[SavedRecord]}",
+  "newVersions": {
+    "engineVersion": "0.2.0",
+    "scoringVersion": "0.2.0",
+    "configVersion": "0.3.0"
+  },
+  "oldMotTestsNotRepeated": true,
+  "physicalTimingNotTested": true,
+  "redisNotInitializedByThisContract": true,
+  "dotenvDisabledInFixture": true,
+  "typeCheckOwner": "main coordination; not separately executed here",
+  "coordination": {
+    "newSeedDeliveryPassed": 2,
+    "affectedExistingMotSeedPassed": 1,
+    "productionTypeSources": 1001,
+    "productionTypeDiagnostics": 0,
+    "fixtureTypeSources": 1014,
+    "fixtureTypeDiagnostics": 0,
+    "fixtureInitialMissingAuthDeclarationDiagnostics": 13
+  }
+}

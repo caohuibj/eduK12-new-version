@@ -1,0 +1,425 @@
+{
+  "createdAt": "2026-10-27T10:19:50.053618+00:00",
+  "baseHEAD": "a0130ea6603d7e37fd4f900d8694b5b7d490c51e",
+  "branch": "cognitive-next-three-core-20261026",
+  "status": "LOCAL_UNCOMMITTED_UNPUSHED_READY_FOR_DOT_REVIEW",
+  "sourceManifestSHA256": "d30f2dea43799d77fcb0b52780172c7948fb60474bf49160dfc6800894e63a31",
+  "files": [
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/IMPLEMENTATION.md",
+      "sha256": "a459f2be82371be1abb51b0ef3b043fb4aa853999403555b609df04abc2fe5ac",
+      "bytes": 7404
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/README.md",
+      "sha256": "9cf4946c0e8b5193838841139bcd2a5a967160d931f5462b7663b73dfa06d671",
+      "bytes": 5933
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/backend-test-first.execution.json",
+      "sha256": "421a7cb29be47b156d6b3886201aa7a4c62a1d627f28d551442e7cd671d015c7",
+      "bytes": 13635
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/backend-test-first.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/backend-test-first.stdout.log",
+      "sha256": "705b2dd460667839453efa0ade0ef9314991317128c71b8831c0d79141d039d5",
+      "bytes": 91
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/backend-test-first.vitest.json",
+      "sha256": "7909ff231b69b83d7fdf5b8f6b6e575311d744a78c19a1e2e94ef3b8ca3079f3",
+      "bytes": 2085
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/backend-types-correction.execution.json",
+      "sha256": "c2d1aed4345e7e566eb2f2b72f7a475820cf9fa97cb21d2e1b489203297d2906",
+      "bytes": 13484
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/backend-types-correction.json",
+      "sha256": "d5b80b47d137baf0c498505b81f621f8ed327e9f9cc18ac2fb7706ce72705f9c",
+      "bytes": 8784
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/backend-types-correction.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/backend-types-correction.stdout.log",
+      "sha256": "3dd3e4aa52c5f085acbf9d8103d70e2ae4aa76d1cf11257c46b2e03f73a91361",
+      "bytes": 512
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/backend-types-final.execution.json",
+      "sha256": "4d0cd864646b1044a47972a010c6d428d5c9b8cb0ab6786bd664ce78725125fc",
+      "bytes": 13474
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/backend-types-final.json",
+      "sha256": "cd9b43b1fecea80b2a995a0c239032b17df8d734d39d7f45ca5c77de60f8cca1",
+      "bytes": 8277
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/backend-types-final.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/backend-types-final.stdout.log",
+      "sha256": "8053ad0a1a740a900c7d20e64e162463c51d970cfd57628ff6a8e99747f2be6e",
+      "bytes": 42
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/backend-types-first.execution.json",
+      "sha256": "a744fe9d583db2c28e2f2c145b860f27844208cf7a879ed0ef45d71159648ccf",
+      "bytes": 13093
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/backend-types-first.json",
+      "sha256": "ebfe9d1d88b4c37655bb45c787810d469797053becbe7f509ba05e027a47a24a",
+      "bytes": 9544
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/backend-types-first.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/backend-types-first.stdout.log",
+      "sha256": "d60b521be7e57d14d9757a5b2efc541b90d67fbec8291dfa0e824525fc7225b6",
+      "bytes": 1272
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/frontend-test-boundary-correction.execution.json",
+      "sha256": "42e885ca8fc780dd56fd87fbbb3d425dc635a9bd29c78dcb048a0e0ae6ba78fd",
+      "bytes": 13720
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/frontend-test-boundary-correction.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/frontend-test-boundary-correction.stdout.log",
+      "sha256": "a3ac01f6cdf1bf440d055af83239b0f4d32fed6ad910d0a98f92ecfdac918178",
+      "bytes": 106
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/frontend-test-boundary-correction.vitest.json",
+      "sha256": "c7ec63b37e1416f5b08c489c81596a7f587b61e9125acd3922f2ef66d61bd8c7",
+      "bytes": 2506
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/frontend-test-connected-correction.execution.json",
+      "sha256": "82ab52b4727b97a8b38b3e6206b819456a77fab86be31a44c273e917de0c969d",
+      "bytes": 13720
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/frontend-test-connected-correction.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/frontend-test-connected-correction.stdout.log",
+      "sha256": "4a2faa8bf67b566baad4e7d67af3aa2eefba4a687638a86ea22a06a67c8427ef",
+      "bytes": 107
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/frontend-test-connected-correction.vitest.json",
+      "sha256": "bb089c4d08d424661a5a289eac3f9d656837f82891a379e4619459d3d314d78c",
+      "bytes": 2506
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/frontend-test-first.execution.json",
+      "sha256": "00a044d7c348b31a4f1ec717e2348234d08b45f4f81916b15b811e4229a10ac4",
+      "bytes": 13643
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/frontend-test-first.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/frontend-test-first.stdout.log",
+      "sha256": "ae6d86845e5ec2c7f49440f88d0a9282e280484eaf4233e350a8f9a96b73a6dd",
+      "bytes": 92
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/frontend-test-first.vitest.json",
+      "sha256": "1d838e962f14d698094e7304efacd7c0207fe57b127a2ca2dae8bd493120afa8",
+      "bytes": 2986
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/frontend-test-lifecycle-correction.execution.json",
+      "sha256": "9dc47327ec4668dbeef06447be0fa9ee91284cad30086a3cb456ca847f17be7c",
+      "bytes": 13730
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/frontend-test-lifecycle-correction.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/frontend-test-lifecycle-correction.stdout.log",
+      "sha256": "0e8ee66503fcdb62d5e73fa3deca372f61a39598ebdd655e9de63229229212ac",
+      "bytes": 107
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/frontend-test-lifecycle-correction.vitest.json",
+      "sha256": "24e3d3afc23d5f12ba63d5a0586c6ba41938dbb5f0c572c2f0325a38075fe4cb",
+      "bytes": 2622
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/frontend-types-correction.execution.json",
+      "sha256": "cb401ce61fc2efd4af2f71885521092e182b54046ab3bc547a999e56f00a0222",
+      "bytes": 13487
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/frontend-types-correction.json",
+      "sha256": "17da604a60a5d0cc8d9d7e43ba8636fce2597e0fc34cce82b86e4769ea0b580c",
+      "bytes": 10716
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/frontend-types-correction.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/frontend-types-correction.stdout.log",
+      "sha256": "7a64af29bd37d226509d62ec0410d802a8b61dbc81f776174c64d5758c29cd7f",
+      "bytes": 523
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/frontend-types-final.execution.json",
+      "sha256": "553112ca14619d94568083a0bd935f6d5fb5e79172714b3320959f3f0040f1bb",
+      "bytes": 13477
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/frontend-types-final.json",
+      "sha256": "81b8651e01f844a52a7c063c2f0f28444144a168441ee43444bd34de9fe45cc7",
+      "bytes": 10198
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/frontend-types-final.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/frontend-types-final.stdout.log",
+      "sha256": "23b8908be35debeb00932966e135a614a7ea6eee1b9812d79767df1e7d1ca216",
+      "bytes": 42
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/frontend-types-first.execution.json",
+      "sha256": "d1bf5aeb335bf66e5458865c78d9f999138c0bce625ca7f8145461a95a4cf2f0",
+      "bytes": 6066
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/frontend-types-first.json",
+      "sha256": "838126506038473da705e8e27fac1752f3e58c8eb81ad971a182e4e211627e02",
+      "bytes": 12038
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/frontend-types-first.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/frontend-types-first.stdout.log",
+      "sha256": "102459b46224c3aeff64b6b69690dda2d6ea33d991b538b93d5e83ec7655534a",
+      "bytes": 1777
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/index.json",
+      "sha256": "d6d0283de9f8ab2e7b55f047c42b7b2eb113a9ab06829506921a3cbf3f979aa6",
+      "bytes": 30944
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/projection-check-final.execution.json",
+      "sha256": "6c42ef3d7942cadc07a6318c92edca743643e274548700de0634cc9f352a5821",
+      "bytes": 13454
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/projection-check-final.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/projection-check-final.stdout.log",
+      "sha256": "6cb78f46faa8dabfdf332b88fac99e02c21ebc7e6f4adf9d8864a741cbdf8380",
+      "bytes": 64
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/protected-check-final.json",
+      "sha256": "494bed152c4dbcde569734794949f92693cef34454fab933e5e699fddcc811dc",
+      "bytes": 8003
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/run.cjs",
+      "sha256": "36fe0cc184bb7b3278aab052ed12f1de0fdec5be7d7140588e112a0e0f47e8ff",
+      "bytes": 2729
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/evidence/types.cjs",
+      "sha256": "5468110fcd306f7c81706eb5e28002160dcc49d12926ce0c2e218c1b1221d8eb",
+      "bytes": 1621
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/preview.html",
+      "sha256": "cadf0b2c6db23d995a635aacb5473e75f57735c378bcaf41a53c83e169966a41",
+      "bytes": 5476
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/review.png",
+      "sha256": "fbf42bfcf772afbb5f406d5306cfbfee3817ab0f49e5d34fc2cea4000834b3e3",
+      "bytes": 142746
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/sources.json",
+      "sha256": "784cd8e783ef8c9a50f6e98373c827c2de1801ca4f9cec8efdf92415078d7323",
+      "bytes": 2392
+    },
+    {
+      "path": "server-version/backend/src/__tests__/cognitive/hearts-flowers-content.test.ts",
+      "sha256": "4ae6cf69ef7c47fb716f9f3301cda3d60a04f9a87be3a22ef76a7128b1a61510",
+      "bytes": 8450
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/hearts-flowers/analysis.ts",
+      "sha256": "f5760e2743a992dbe6fd027a6ed7d796f0975bca7a7a157fa73ec661d9053732",
+      "bytes": 1253
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/hearts-flowers/metadata.ts",
+      "sha256": "d87fb8216982d9af8c561f35cca1cac7fca8a7b6bbe115d3a626e1cd7d11f00f",
+      "bytes": 1826
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/hearts-flowers/package.ts",
+      "sha256": "d0f9ee9f355535549450ec8242191ae2e1e629c8fb2f60da66843605121dd91a",
+      "bytes": 3252
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/hearts-flowers/participant-presentation.ts",
+      "sha256": "0f18f697c82f68b04674b109428b19b2d84e085cd17ebd7a9dd1ba54af85c278",
+      "bytes": 1103
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/hearts-flowers/protocol.ts",
+      "sha256": "872c811cd63d60e932710907ffee777e29e75b2ec35b9aced1d2d31915aa1d4a",
+      "bytes": 8419
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/hearts-flowers/report.ts",
+      "sha256": "81058a17652c157af55fe5bbcc3ee37295345e89bee1ffefc711b57b99a1e95e",
+      "bytes": 7073
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/hearts-flowers/schema.ts",
+      "sha256": "0ea40a91a9037dee197565fa6abc12c652ba2e59345ea78d473b9ff86735b3d8",
+      "bytes": 1652
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/hearts-flowers/scorer.ts",
+      "sha256": "0d2bea775f433f8b4d886e3cc0f47b291c1a99de1ee85509ecff70b4b792188f",
+      "bytes": 5020
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/HFInstructions.tsx",
+      "sha256": "7811eb01790b2dbfe5b8c71d4aae0f4f2f31e687b7d97039cef44f5e6a572466",
+      "bytes": 3685
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/HFReport.tsx",
+      "sha256": "c8f9bd8ee520e3fed4d92a213aa770b307308b7af3a46ac6ccd4a8f2d8fa90f2",
+      "bytes": 5334
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/HFShape.tsx",
+      "sha256": "694546f02d874515a4e30bcd44bd429ac14ad51a741f2e14c5bf6c5296c1e9c9",
+      "bytes": 710
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/HeartsFlowersTask.tsx",
+      "sha256": "a3eb89b9554549678ec62ffc894802e41cf3fb18eda2e524f7c4e5971160a6da",
+      "bytes": 10746
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/capture.ts",
+      "sha256": "d4bd137bdcbcc4813f22f4b4a6df31a32ebce27e983636318d5c8944df3a33d6",
+      "bytes": 2329
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/content.test.tsx",
+      "sha256": "9065336ea4814cf8246e9258a802052aad41b596a737c7e86aed91521020d4fa",
+      "bytes": 14824
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/contracts.ts",
+      "sha256": "732421b614eb698d1bdd20a71fe04db2f744d47223f93a9ba5616d2d0589207b",
+      "bytes": 3799
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/generated/analysis.ts",
+      "sha256": "d674840eb75627462c6fc7e8321ea3cb206302f45cc10ae9e3cff2be5d6add69",
+      "bytes": 1368
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/generated/protocol.ts",
+      "sha256": "c08eef7f9fcd1cab02a2b97add5301f3ddf9e6d28e2c985102b250ca94476938",
+      "bytes": 8534
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/generated/report.ts",
+      "sha256": "76e3a55d34e0b754f0e3f0252351f79a50bc575dde24734aeb83508e2eb23974",
+      "bytes": 7188
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/hearts-flowers.css",
+      "sha256": "c28af6a9530992a2b119b9f8e888732145ba7d5875f8a7830fb10b9c560d6708",
+      "bytes": 1835
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/session.ts",
+      "sha256": "8ef5a61ca22d7c9f74263454a56177658d701d719b08935621b470a65b8dfa08",
+      "bytes": 9102
+    },
+    {
+      "path": "server-version/scripts/cognitive/hearts-flowers-content.cjs",
+      "sha256": "7a489e378106f8f40a10e63e2656ba038274c422538d674d2a71fa9aaad9ddab",
+      "bytes": 1043
+    }
+  ],
+  "patch": {
+    "path": "/tmp/hearts-flowers-content-20261027/hearts-flowers-only.patch",
+    "sha256": "c6b60a8641d8e120704b38db1b778355d77589e5cc5c7b90296296f2d7f0c65d",
+    "bytes": 618033
+  },
+  "zip": {
+    "path": "/tmp/hearts-flowers-content-20261027/hearts-flowers-only.zip",
+    "sha256": "99e18212976b8a4dcd88b05cb45120c679e601bcfe267ac0ac3ca87e2891ee5d",
+    "bytes": 297162
+  },
+  "primaryReview": {
+    "actualSourcesRead": [
+      "protocol/schema/analysis/scorer/report/package",
+      "contracts/capture/session",
+      "HeartsFlowersTask/HFInstructions/HFReport/HFShape/css",
+      "backend and frontend dedicated tests",
+      "final execution/type/evidence originals"
+    ],
+    "correctionsReviewed": [
+      "restore approved shape/color/geometry",
+      "arithmetic mean correct RT with actual input-specific denominators",
+      "overflow bounded interrupt",
+      "dispose retains raw through original frozen local port without core/FINAL or duplicate write"
+    ],
+    "remainingScope": "No integration or real durable adapter; no synthetic full raw/report export claimed; no CI, merge, deploy or Notion completion append."
+  }
+}

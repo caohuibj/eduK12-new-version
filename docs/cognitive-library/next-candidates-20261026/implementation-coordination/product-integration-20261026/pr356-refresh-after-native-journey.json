@@ -1,0 +1,170 @@
+{
+  "kind": "READ_ONLY_PR356_REFRESH_AFTER_NATIVE_JOURNEY",
+  "previousHead": "a57b6c8d1a671209b55ae5558da0964c1d4eea6f",
+  "head": "392b8128b9f4b9d9d4b6375279ea5e0e559e0554",
+  "branch": "fix/runtime-time-and-validation-20261025",
+  "base": "ff8471e529e7b3c56e1e20f17d1e2581040fc896",
+  "state": "open",
+  "draft": true,
+  "main": "ff8471e529e7b3c56e1e20f17d1e2581040fc896",
+  "newCommits": [
+    {
+      "sha": "f2753e0f61c1ab735fceb2be2546997b37dba852",
+      "message": "ci(pr356): isolate database phases and frozen child consumer [skip ci]"
+    },
+    {
+      "sha": "1a9a1937257d89a7a7fcbfdd722e58a0cdc2129c",
+      "message": "ci(pr356): add frozen same-dist product consumers [skip ci]"
+    },
+    {
+      "sha": "49a55a371af1c2793a0ab9c170bfde0a68385109",
+      "message": "ci(pr356): retain CodeQL analysis and explicit finding reviews [skip ci]"
+    },
+    {
+      "sha": "17538c62337dba1d8ec26a6aed442b2f739962c0",
+      "message": "ci(pr356): verify retained runtime scan and entry protocols [skip ci]"
+    },
+    {
+      "sha": "392b8128b9f4b9d9d4b6375279ea5e0e559e0554",
+      "message": "ci(pr356): bind explicit qualification and reviewed admission [skip ci]"
+    }
+  ],
+  "files": [
+    {
+      "path": ".github/scripts/content-scope.mjs",
+      "sha": "3cf1005cb0ff522a8cc7e5add1267510a2d8faec",
+      "status": "modified"
+    },
+    {
+      "path": ".github/scripts/pr356-acceptance.json",
+      "sha": "05a4e4c955f1cd43696e8885c843a7f55db23342",
+      "status": "added"
+    },
+    {
+      "path": ".github/scripts/pr356-admission.mjs",
+      "sha": "0fbb4bd89b02a33045f8524d7ae01eda55fea68d",
+      "status": "added"
+    },
+    {
+      "path": ".github/scripts/pr356-admission.test.mjs",
+      "sha": "607c9ab5d265d2e3c8a746b4a7acdb9901d2deb7",
+      "status": "added"
+    },
+    {
+      "path": ".github/scripts/pr356-browser-fixture.cjs",
+      "sha": "96452cdf1522f8bdbbf7f8874c1bbf7b1b9eef02",
+      "status": "added"
+    },
+    {
+      "path": ".github/scripts/pr356-browser.mjs",
+      "sha": "e17f55b0a56b71933b66fd463a9bf50afb506f7f",
+      "status": "modified"
+    },
+    {
+      "path": ".github/scripts/pr356-codeql.mjs",
+      "sha": "e4a1113ad746f145522f63f09cc7032f56563e18",
+      "status": "added"
+    },
+    {
+      "path": ".github/scripts/pr356-codeql.test.mjs",
+      "sha": "7f9d806c25835d203ab6c53a2f47dc11166d6330",
+      "status": "added"
+    },
+    {
+      "path": ".github/scripts/pr356-database.py",
+      "sha": "dc5cb9ac5f8bfa2ac2a4bd38bbaece6da779879a",
+      "status": "added"
+    },
+    {
+      "path": ".github/scripts/pr356-database.test.py",
+      "sha": "3438b4fbb46d91ea780fa3bf305915abd0198e0f",
+      "status": "added"
+    },
+    {
+      "path": ".github/scripts/pr356-entry.mjs",
+      "sha": "14216fdf0a627fe2694b80516a8c35932c5bbe3b",
+      "status": "modified"
+    },
+    {
+      "path": ".github/scripts/pr356-entry.test.mjs",
+      "sha": "5f205ff549dddf825c052a1a91a0ddfabed1ce15",
+      "status": "modified"
+    },
+    {
+      "path": ".github/scripts/pr356-exact-lazy-fixture.cjs",
+      "sha": "eba79329ee3bc9316d20929f4c6b0649106fb5ed",
+      "status": "added"
+    },
+    {
+      "path": ".github/scripts/pr356-exact-lazy-fixture.test.cjs",
+      "sha": "087effc1d328a8e4accddcac740a8095ff6741c5",
+      "status": "added"
+    },
+    {
+      "path": ".github/scripts/pr356-local-evidence.json",
+      "sha": "d202ddd05b31ec1a28ea250e513c93739538131c",
+      "status": "modified"
+    },
+    {
+      "path": ".github/scripts/pr356-metadata-reuse.mjs",
+      "sha": "a05f2892e96d7a4faca075897dc7979d585bd9c3",
+      "status": "added"
+    },
+    {
+      "path": ".github/scripts/pr356-metadata-reuse.test.mjs",
+      "sha": "9d323336d77a4bd7be98c4614115e5aa7a631702",
+      "status": "added"
+    },
+    {
+      "path": ".github/scripts/pr356-plan.mjs",
+      "sha": "2e6a74214c9cbbd1ae3a679769a21755754e48b1",
+      "status": "added"
+    },
+    {
+      "path": ".github/scripts/pr356-product-browser.mjs",
+      "sha": "868f35097e4324d0ac8364628530131736479bee",
+      "status": "added"
+    },
+    {
+      "path": ".github/scripts/pr356-product-browser.test.mjs",
+      "sha": "47ff145b03926bdf1439f9509a5d4948d4819562",
+      "status": "added"
+    },
+    {
+      "path": ".github/scripts/pr356-qualification.py",
+      "sha": "2a9454af56909a0c579cd2e6a7ced6c4e9fb0c1f",
+      "status": "modified"
+    },
+    {
+      "path": ".github/scripts/pr356-qualification.test.py",
+      "sha": "fc63f531fbac3b261b1c71707c303c26e3ee4fb9",
+      "status": "modified"
+    },
+    {
+      "path": ".github/scripts/pr356-runtime-scan.mjs",
+      "sha": "64b3aa63dfbd16b969a01ec9acc8be8069298189",
+      "status": "added"
+    },
+    {
+      "path": ".github/scripts/pr356-runtime-scan.test.mjs",
+      "sha": "5915b29aefc00a37eff37968310a940362cc7ac9",
+      "status": "added"
+    },
+    {
+      "path": ".github/scripts/pr356-sarif.mjs",
+      "sha": "331a50de393b569239fb56e529020e53c16f2155",
+      "status": "added"
+    },
+    {
+      "path": ".github/scripts/pr356-sarif.test.mjs",
+      "sha": "0654738db5d7975520450b24a35bc5ccfe366c2f",
+      "status": "added"
+    },
+    {
+      "path": "docs/pr356-ci-activation-20261026.md",
+      "sha": "6ac6843c4cd3737f28e8f416540711cd4c89a1b6",
+      "status": "modified"
+    }
+  ],
+  "conclusion": "Five new commits change only .github controls and one PR356 CI document; no new application-source delta since the prior exact shared-source comparison. Not merged; no PR356 branch edits, CI or deployment."
+}

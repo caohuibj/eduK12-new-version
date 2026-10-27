@@ -1,0 +1,27 @@
+{
+  "status": "THIN_CONTEXT_READ_ONLY_BRIDGE_NOT_RUNTIME_ENTRY",
+  "tests": {
+    "passed": 2,
+    "exitCode": 0,
+    "report": "tests.json"
+  },
+  "types": {
+    "exitCode": 0,
+    "roots": 5,
+    "sources": 10,
+    "report": "types.json"
+  },
+  "sourceSha256": {
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/display.ts": "dd6675148fa214c328e6b4f7e24644742175b2fd7fb4eea9183bbec1ba3bc0fb",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/EnumerationTask.tsx": "4c925ea9db7fb6f649e0e999cee1da7ffd2b0dc0e2dced866dcf29210bbe0b24",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/persistence.ts": "9e9053fac439290201b3a474051a87692e779413d1179d07850238058c0967c4",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/enumeration-native-context.test.ts": "4dd1078bd7436ca0c78ce31ee056cf1d82183972e167f808f1c7ad7b07966b7e"
+  },
+  "notChanged": [
+    "draw/capture/timing",
+    "CSS",
+    "Artifact/Record v1 bytes/hash scheme",
+    "core fields",
+    "native entry registration"
+  ]
+}

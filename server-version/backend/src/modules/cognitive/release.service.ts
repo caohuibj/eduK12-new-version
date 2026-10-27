@@ -6,6 +6,7 @@ import { prisma } from '../../config/database'
 import { assertConfigStatusTransition } from './config-immutability'
 import { BAD_REQUEST, CONFLICT, NOT_FOUND } from './cognitive.errors'
 import { evaluateCognitiveProductReadiness } from './library/product-readiness'
+import { requireCognitiveTaskResource, assertResourceConfigVersion, assertNativeDeliverySupported } from './task-resource'
 import { getCognitiveV2TaskDefinition } from './v2/registry'
 
 const lifecycleSelect = {
@@ -53,6 +54,9 @@ export const publishCognitiveConfig = async (configId: string, actorUserId?: str
     )
   }
 
+  const resource = requireCognitiveTaskResource(config.testType, config.engineVersion, config.scoringVersion)
+  assertResourceConfigVersion(resource, config.configVersion)
+  assertNativeDeliverySupported(resource, 'authenticated')
   const readiness = evaluateCognitiveProductReadiness(definition, config.config)
   if (!readiness.ready) {
     throw BAD_REQUEST(`Cognitive product readiness failed: ${readinessBlockerMessage(readiness.blockers)}`)

@@ -1,0 +1,12 @@
+{
+  "status": "REPRODUCED_FAILURE",
+  "baseline": "94152032885d5cbaf149a15ec03d5a0c72ea2c67",
+  "exitCode": 1,
+  "rawResult": "vitest-post-stop-save-repro.json",
+  "inputSha256": {
+    "server-version/frontend/src/modules/cognitive/tasks/ant/session.ts": "1b30fb429d31f118b6e29559afe999fa3dec5a7befe9d822a12b4cae60d69fed",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/session.test.ts": "c7f66c2dbeb694d898992d6da34a459cbe859a6ade7d0bdb6f7729d616483f2e",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/local-save.ts": "ce23b298a385435a122bdc1992c21401490f4637ce7946fd9ba6ab9e3cba8219",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/seal.ts": "5c0e39ea3cf60286ba37db5a89fcc21319f46ba980dd9f08b589ad595692b029"
+  }
+}

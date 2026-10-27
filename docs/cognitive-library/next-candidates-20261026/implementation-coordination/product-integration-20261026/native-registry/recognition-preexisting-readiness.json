@@ -1,0 +1,12 @@
+{
+  "kind": "PREEXISTING_CANDIDATE_VISIBILITY_CONTRACT_BLOCKER",
+  "candidateSourceSha256": "5a614387a4e5d944a8b5bd5cbd15bcee1ad371898296297ec566e492769fc4c2",
+  "issues": [
+    {
+      "path": "report.headlineMetrics.0",
+      "message": "hitRate must be declared with headline visibility",
+      "severity": "error"
+    }
+  ],
+  "ready": false
+}

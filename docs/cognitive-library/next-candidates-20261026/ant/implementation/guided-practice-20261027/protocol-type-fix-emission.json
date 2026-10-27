@@ -1,0 +1,5 @@
+{
+  "equal": true,
+  "sha256": "41e46e99b11bcaf396c79dfb4ac9bda1b71dfe6a564bf41cd643cdbc7ed7289d",
+  "meaning": "readonly-array annotation only; comments removed, ES2020 CommonJS outputs identical"
+}

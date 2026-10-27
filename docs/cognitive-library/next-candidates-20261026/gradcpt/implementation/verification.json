@@ -1,0 +1,147 @@
+{
+  "date": "2026-10-27",
+  "execution": "cloud; Node24.21.0; existing dependencies",
+  "scope": "Content-only gradCPT research300 / experience100, practice8 pass7. Integration and final tests deferred by user.",
+  "distinctRuntimeTargets": 6,
+  "tests": {
+    "backend-original": {
+      "success": false,
+      "numPassedTests": 0,
+      "numFailedTests": 3,
+      "numPendingTests": 0
+    },
+    "backend-corrected": {
+      "success": true,
+      "numPassedTests": 3,
+      "numFailedTests": 0,
+      "numPendingTests": 0
+    },
+    "frontend-original": {
+      "success": false,
+      "numPassedTests": 0,
+      "numFailedTests": 3,
+      "numPendingTests": 0
+    },
+    "frontend-corrected": {
+      "success": true,
+      "numPassedTests": 3,
+      "numFailedTests": 0,
+      "numPendingTests": 0
+    }
+  },
+  "types": {
+    "backend": {
+      "config": "tsconfig.json",
+      "roots": [
+        "src/modules/cognitive/content-candidates/gradcpt/package.ts",
+        "src/modules/cognitive/content-candidates/gradcpt/participant-presentation.ts",
+        "src/__tests__/cognitive/gradcpt-content.test.ts"
+      ],
+      "sourceCount": 52,
+      "diagnostics": []
+    },
+    "frontend": {
+      "config": "tsconfig.app.json",
+      "roots": [
+        "src/modules/cognitive/tasks/gradcpt/GradCptTask.tsx",
+        "src/modules/cognitive/tasks/gradcpt/content.test.tsx",
+        "src/test/setup.ts",
+        "src/vite-env.d.ts"
+      ],
+      "sourceCount": 64,
+      "diagnostics": []
+    }
+  },
+  "firstTypeDiagnostics": {
+    "backend": [
+      {
+        "file": "src/modules/cognitive/content-candidates/gradcpt/analysis.ts",
+        "line": 25,
+        "message": "'inverseNormal' implicitly has return type 'any' because it does not have a return type annotation and is referenced directly or indirectly in one of its return expressions."
+      }
+    ],
+    "frontend": [
+      {
+        "file": "../backend/src/modules/cognitive/content-candidates/gradcpt/analysis.ts",
+        "line": 25,
+        "message": "'inverseNormal' implicitly has return type 'any' because it does not have a return type annotation and is referenced directly or indirectly in one of its return expressions."
+      },
+      {
+        "file": "src/modules/cognitive/tasks/gradcpt/generated/analysis.ts",
+        "line": 26,
+        "message": "'inverseNormal' implicitly has return type 'any' because it does not have a return type annotation and is referenced directly or indirectly in one of its return expressions."
+      }
+    ]
+  },
+  "sourceSha256": {
+    "server-version/backend/src/__tests__/cognitive/gradcpt-content.test.ts": "397aae983fe9c8b006e766befa215b78a86dd3ed816e1ec6281d6faeed57dbf9",
+    "server-version/backend/src/modules/cognitive/content-candidates/gradcpt/COPYING.LESSER": "e3a994d82e644b03a792a930f574002658412f62407f5fee083f2555c5f23118",
+    "server-version/backend/src/modules/cognitive/content-candidates/gradcpt/LICENSE": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+    "server-version/backend/src/modules/cognitive/content-candidates/gradcpt/analysis.ts": "03467b41eb9fedf18b9f68c103beef73110f7b97fd15ed370bfd729c0b1a1733",
+    "server-version/backend/src/modules/cognitive/content-candidates/gradcpt/assets.ts": "b6564f9ff0e8c16a2c8fac7ec533d5ee357787872b47ba458b4b00bc8f2e85b9",
+    "server-version/backend/src/modules/cognitive/content-candidates/gradcpt/assignment.ts": "0d6261afbe42d9fb0c111a5d719cb604ed10ac66366f90af708eeccecd2789df",
+    "server-version/backend/src/modules/cognitive/content-candidates/gradcpt/metadata.ts": "2b136b5dd537bd82945a4f159a83ca8c69392588f0044e99f11e1d941265d506",
+    "server-version/backend/src/modules/cognitive/content-candidates/gradcpt/package.ts": "b906bdb275771fcd624077d621363afca5822522e4e08c13dbf9f538b0ce190b",
+    "server-version/backend/src/modules/cognitive/content-candidates/gradcpt/participant-presentation.ts": "22f698b26dd2ec5ece600d5a899f51f58b7954d2e8257be01cf110d17da9c077",
+    "server-version/backend/src/modules/cognitive/content-candidates/gradcpt/protocol.ts": "6e4b4f8d8ee7e9c347778dffae60f599745594102f399886e3ab32b85ac837ce",
+    "server-version/backend/src/modules/cognitive/content-candidates/gradcpt/report.ts": "9fdace21d50d71c3b0884ca2133c243b1cce593e915ae6e39ac10651f3bc2e2e",
+    "server-version/backend/src/modules/cognitive/content-candidates/gradcpt/schema.ts": "03c17f1e00e84298dee31814799a0376e0f7f3b59624357cd5d35eaf16ce2bae",
+    "server-version/backend/src/modules/cognitive/content-candidates/gradcpt/scorer.ts": "a8f1a723de779c6d0b811d2c33d1bb981631371b88f2ce914a33a0b9a7648aab",
+    "server-version/backend/src/modules/cognitive/content-candidates/gradcpt/source-data.ts": "4b2be1bdc280cd974f41ba0be2ecb5a6ac2b086458019a3fb2514bf7d45055a3",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/GradCptTask.tsx": "929ece4ad691a3b16017905f037a7c054a96d2ec177ac3ccc40bbb78b707880e",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/GradInstructions.tsx": "11ada690410adeac1af4cb49718df5af27a29eb51c12a09452ad55036b927e3a",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/GradReport.tsx": "1928502236a1f00ce871630bd69a31922d729d8b8435d37b9276fc515f83c7c9",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/asset-loader.ts": "56455637cceb82883118a9cf224453f2ce7390d65b132cc7d8b338c5ac323319",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/assets/city1.png": "9a52eae067677548318b29127195192c1ea18b81622d7e8a3784f510e3152778",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/assets/city10.png": "cd23611f5a2c5e7bbe189e809f829e4b7949f5f8f562edfa35ff354944408b92",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/assets/city2.png": "72c8cb76cbe4abe28d57f5dce675cb1a51503ed4e111dde478dbad069ace40e5",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/assets/city3.png": "7d81b06338be5027554939843a39a15c1faa05dce93aad5823af2d11e5695d43",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/assets/city4.png": "5648cf0bb8f1045d786bef4404a3120f4c347dc5a9e8e02258ddb1db6931deb7",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/assets/city5.png": "efae13c90877d3d61a1650aed0c56ff189920a02644a124c8561e8e05f0f4420",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/assets/city6.png": "7bbc10b3992bb4bfa98b8f76cdd4c724a09b3ffb7d564b0e5e604551fe947853",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/assets/city7.png": "7289778719a485a185e7431958f7cb1f0d8bc28307ef01a0bebd7b8b7f6b05d9",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/assets/city8.png": "c52b36458948e3389a06c567fb058a24dd25099a78bb989aad4d6f04dcb9852c",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/assets/city9.png": "9c538d8dee501b9367ca5edbd9caaa180f2769f8fba5e5c705fde9a4bbdb4aef",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/assets/mountain1.png": "5c53e40c0fff9131d282a8b6aefff0f28d505c2e223958bb21d11228d406719d",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/assets/mountain10.png": "0396a295b3d543f9dd111d1c80363a71dcc62adc33016810aa1beff84cc0abd2",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/assets/mountain2.png": "64bc3cda26feeb4f0490c55a9175c16fe27867d5305138e95d08211d8c234d57",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/assets/mountain3.png": "e8d3afe89fc26bf98deacfefbe865fa28a01ebc999ac4bef445c7887a1975385",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/assets/mountain4.png": "889386078739fb65a69300879fa3197445020ac414c51953718646d3683951a1",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/assets/mountain5.png": "a5d9cef9e1db8a0599b39149531dca9d4b6347668d3f8fc2bab83d6e047dc110",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/assets/mountain6.png": "aed705693c211c32a2590082fc77ba35507e7e9daa6d170508341a02cb22c4ef",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/assets/mountain7.png": "65cce503632ce652462ea39443a050b19c44a738239dd66e531aeee3711f7f65",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/assets/mountain8.png": "dd542c806c1bb9ed1ce10029e6bb349b49805f3c2945daf5fe6338e1dc5de478",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/assets/mountain9.png": "4bdaafc8a3e032b9ff14cf9b41c334d6390ed9ce4b95c18bc5b3b8b1d3f79aa9",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/assets/scrambled.png": "54dbd9a141c0ddde035a12c7e55ebddf3f773f95096b579b4bd22ea94f728a7e",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/capture.ts": "e3a253cabff7a645d8c07dcff8ecbc3f3a437086ae28dbc1da4f42014698f402",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/content.test.tsx": "0f21e2ea5008eb32d40d5d784535a4843f3ea6afb57d78e537857222fd6cf14b",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/contracts.ts": "ada7b5aa23d907146627808ee76c4dd054443f678c42df902f58dcdb477582d8",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/generated/COPYING.LESSER": "e3a994d82e644b03a792a930f574002658412f62407f5fee083f2555c5f23118",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/generated/LICENSE": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/generated/analysis.ts": "3ac923a5d1f0170d32cae4b88c3795e2e298070424dc98b80fea51e2b520faad",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/generated/assets.ts": "e6ce55d81489382e0f523949411c062145dbdbf2e167bc5dfb4b4932da888016",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/generated/assignment.ts": "1b4add6f39a38b3b4028b15b6d8ec187eeb9a52257aec37057632dd74ba62e4f",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/generated/protocol.ts": "7139c4067fafe8d5307bb8ae1d9445d4b3bc2002cfb347787f0f62c765bd6957",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/generated/report.ts": "be58264c9af34f5facf591c05c310a2becf9440816558a000ad4f53b42aa8d04",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/generated/source-data.ts": "007d80928a84eea2542dd8ebb6fa8cdfbfd4a5fc45c585bae0d55775fb707d82",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/grad.css": "da6d37fc64eb26e916e0648e3cf2407ddc68bf3d3b6c34871b106d562d0fd0b8",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/session.ts": "c46837b165dd7f9804d3a00a982f74920154a47bdf3ae95479eacb6028f22e6d",
+    "server-version/scripts/cognitive/grad-content.cjs": "d405fe54344989535ecbae894673afd516c11929ff8e18847f3ecbcd36d9bc6e"
+  },
+  "notRun": [
+    "product registry/admission/seed",
+    "real IndexedDB durability",
+    "real HTTP/core/report readback",
+    "COS",
+    "full App/browser/physical devices",
+    "actual browser asset decode",
+    "research300 browser journey",
+    "CI",
+    "deployment"
+  ],
+  "verificationNotes": [
+    "Original six runtime targets failed at short plan fixture generation; original type closures reported missing inverseNormal return type. Fixed whole-sequence rejection by direct categories/image bags and explicit number return; rechecked the same affected targets, final 3+3 passed.",
+    "Only six distinct targets. No old-task/full integration checks. Runtime uses synthetic clocks/ports and mocked image loader; bytes/dimensions were independently inspected.",
+    "Final actual-config type inputs match recorded source SHA256. No compiler options weakened."
+  ]
+}

@@ -1,0 +1,5 @@
+import type {CognitiveParticipantPresentationV1} from '../../participant-presentation.types'
+import {HF_IDENTITY} from './protocol'
+import {hfDefinition as d} from './package'
+/** Candidate metadata only; the shared public projection owns the actual performance gate. */
+export function createHFPresentation():CognitiveParticipantPresentationV1{return {schemaVersion:1,presentationVersion:'0.1.0',testType:HF_IDENTITY.testType,engineVersion:HF_IDENTITY.engineVersion,scoringVersion:HF_IDENTITY.scoringVersion,title:d.report.title,metrics:{},hiddenMetrics:Object.keys(d.metrics),singleHiddenMetrics:Object.keys(d.metrics),disclaimer:d.report.disclaimer,suppressTips:false,practicalTips:[...d.report.practicalTips],protocols:{research:{tier:'PILOT',profileLabel:'科研版',participantConclusion:'分规则描述本次真实记录，无常模或诊断。',reportCaveats:[...d.profiles.research!.reportCaveats]},experience:{tier:'PILOT',profileLabel:'实用版',participantConclusion:'32次短版只描述本次记录，不代表稳定能力。',reportCaveats:[...d.profiles.experience!.reportCaveats]}}}}

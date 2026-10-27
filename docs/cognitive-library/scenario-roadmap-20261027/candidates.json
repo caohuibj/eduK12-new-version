@@ -1,0 +1,548 @@
+{
+  "date": "2026-10-27",
+  "timezone": "Asia/Tokyo",
+  "scope": "all proposed entries are scientific research only",
+  "status": "RESEARCH_PLAN_ONLY",
+  "counts": {
+    "P1": 6,
+    "P2": 4,
+    "reserve": 2,
+    "alreadyDevelopedAddedByThisPlan": 0
+  },
+  "profilePolicy": "research and experience remain real separate frozen profiles, same UI where appropriate; parameters not frozen by this plan; no fabricated standard alias or longer version merely by repeating a naturally short task",
+  "candidates": [
+    {
+      "proposalId": "hf",
+      "name": "Hearts & Flowers",
+      "status": "RESEARCH_PLAN_ONLY_NOT_IMPLEMENTED_NOT_DESIGN_APPROVED",
+      "priorityRecommendation": "P1",
+      "suggestedOrder": 1,
+      "researchOnly": true,
+      "domains": [
+        "执行控制"
+      ],
+      "targetProcesses": [
+        "抑制同侧反应",
+        "规则保持",
+        "规则切换"
+      ],
+      "researchScenes": [
+        "儿童执行功能",
+        "低龄规则理解",
+        "学龄注意研究"
+      ],
+      "targetPopulationProposal": "低龄/学龄儿童为拟研究人群；具体年龄和中文适用性未核",
+      "validatedAgeRange": null,
+      "chineseProjectValidation": null,
+      "difficultyValidated": null,
+      "deviceEquivalence": null,
+      "shortVersionEstimatedTotalMinutes": [
+        4,
+        6
+      ],
+      "timeBasis": "design budget including instruction/practice; no frozen counts or measured duration; PVT3/10min has published task versions",
+      "inputProposal": [
+        "touch",
+        "mouse",
+        "keyboard"
+      ],
+      "relationToExisting": "Flanker/task switching近邻，独立规则结构",
+      "sourceIds": [
+        "diamond-hf",
+        "hf-2019"
+      ],
+      "researchRightsRoute": "文献独立自研；原创符号，演示素材/译文许可另核",
+      "controlledVocabularyMapping": "human-readable proposals only; preserve existing18 dimensions/131stable keys; mapping/addition reviewed at individual design",
+      "backendTagsPersisted": false,
+      "requiresIndividualSketchApproval": true
+    },
+    {
+      "proposalId": "ist",
+      "name": "信息采样",
+      "status": "RESEARCH_PLAN_ONLY_NOT_IMPLEMENTED_NOT_DESIGN_APPROVED",
+      "priorityRecommendation": "P1",
+      "suggestedOrder": 2,
+      "researchOnly": true,
+      "domains": [
+        "决策学习"
+      ],
+      "targetProcesses": [
+        "主动采样",
+        "成本与准确权衡",
+        "停止规则"
+      ],
+      "researchScenes": [
+        "职业相关决策研究",
+        "信息核查",
+        "证据不足下停止决策"
+      ],
+      "targetPopulationProposal": "成人职业相关构念研究，非已验证岗位预测",
+      "validatedAgeRange": null,
+      "chineseProjectValidation": null,
+      "difficultyValidated": null,
+      "deviceEquivalence": null,
+      "shortVersionEstimatedTotalMinutes": [
+        4,
+        6
+      ],
+      "timeBasis": "design budget including instruction/practice; no frozen counts or measured duration; PVT3/10min has published task versions",
+      "inputProposal": [
+        "touch",
+        "mouse",
+        "keyboard"
+      ],
+      "relationToExisting": "Horizon近邻，不是相同未来收益探索协议",
+      "sourceIds": [
+        "expfactory/expfactory-experiments"
+      ],
+      "researchRightsRoute": "MIT参考实现；独立React与原创色形刺激",
+      "controlledVocabularyMapping": "human-readable proposals only; preserve existing18 dimensions/131stable keys; mapping/addition reviewed at individual design",
+      "backendTagsPersisted": false,
+      "requiresIndividualSketchApproval": true
+    },
+    {
+      "proposalId": "sart",
+      "name": "SART",
+      "status": "RESEARCH_PLAN_ONLY_NOT_IMPLEMENTED_NOT_DESIGN_APPROVED",
+      "priorityRecommendation": "P1",
+      "suggestedOrder": 3,
+      "researchOnly": true,
+      "domains": [
+        "持续注意",
+        "执行控制"
+      ],
+      "targetProcesses": [
+        "罕见反应抑制",
+        "漏答",
+        "反应分布变化"
+      ],
+      "researchScenes": [
+        "学龄儿童注意研究",
+        "成人注意波动",
+        "重复监控过程研究"
+      ],
+      "targetPopulationProposal": "具数字识别能力学龄儿童及成人；年龄/中文未核",
+      "validatedAgeRange": null,
+      "chineseProjectValidation": null,
+      "difficultyValidated": null,
+      "deviceEquivalence": null,
+      "shortVersionEstimatedTotalMinutes": [
+        3,
+        5
+      ],
+      "timeBasis": "design budget including instruction/practice; no frozen counts or measured duration; PVT3/10min has published task versions",
+      "inputProposal": [
+        "touch",
+        "mouse",
+        "keyboard"
+      ],
+      "relationToExisting": "Go/No-Go、CPT、gradCPT近邻，不新增伪同义任务",
+      "sourceIds": [
+        "staiw/SART",
+        "sart-original",
+        "rtv-adhd"
+      ],
+      "researchRightsRoute": "MIT代码；参考带反馈变式需区别；文献自研连续协议",
+      "controlledVocabularyMapping": "human-readable proposals only; preserve existing18 dimensions/131stable keys; mapping/addition reviewed at individual design",
+      "backendTagsPersisted": false,
+      "requiresIndividualSketchApproval": true
+    },
+    {
+      "proposalId": "metacognition",
+      "name": "知觉判断与信心",
+      "status": "RESEARCH_PLAN_ONLY_NOT_IMPLEMENTED_NOT_DESIGN_APPROVED",
+      "priorityRecommendation": "P1",
+      "suggestedOrder": 4,
+      "researchOnly": true,
+      "domains": [
+        "元认知",
+        "知觉判断"
+      ],
+      "targetProcesses": [
+        "选择后信心",
+        "信心与正确的对应"
+      ],
+      "researchScenes": [
+        "职业判断监控研究",
+        "错误察觉",
+        "自我评估校准"
+      ],
+      "targetPopulationProposal": "成人；不从自信水平推个体岗位能力",
+      "validatedAgeRange": null,
+      "chineseProjectValidation": null,
+      "difficultyValidated": null,
+      "deviceEquivalence": null,
+      "shortVersionEstimatedTotalMinutes": [
+        5,
+        8
+      ],
+      "timeBasis": "design budget including instruction/practice; no frozen counts or measured duration; PVT3/10min has published task versions",
+      "inputProposal": [
+        "touch",
+        "mouse",
+        "keyboard"
+      ],
+      "relationToExisting": "新增第二阶段；与正确率单独区分",
+      "sourceIds": [
+        "expfactory/expfactory-experiments"
+      ],
+      "researchRightsRoute": "MIT参考；ordinal信心不当概率，不默认启用meta-d拟合",
+      "controlledVocabularyMapping": "human-readable proposals only; preserve existing18 dimensions/131stable keys; mapping/addition reviewed at individual design",
+      "backendTagsPersisted": false,
+      "requiresIndividualSketchApproval": true
+    },
+    {
+      "proposalId": "pvt",
+      "name": "PVT / PVT-B",
+      "status": "RESEARCH_PLAN_ONLY_NOT_IMPLEMENTED_NOT_DESIGN_APPROVED",
+      "priorityRecommendation": "P1",
+      "suggestedOrder": 5,
+      "researchOnly": true,
+      "domains": [
+        "警觉",
+        "持续注意"
+      ],
+      "targetProcesses": [
+        "随机等待反应",
+        "提前响应",
+        "迟缓分布"
+      ],
+      "researchScenes": [
+        "成人警觉",
+        "疲劳与睡眠条件研究",
+        "持续监控过程研究"
+      ],
+      "targetPopulationProposal": "主要成人；论文短版验证样本22–45岁，不外推儿童",
+      "validatedAgeRange": null,
+      "chineseProjectValidation": null,
+      "difficultyValidated": null,
+      "deviceEquivalence": null,
+      "shortVersionEstimatedTotalMinutes": [
+        4,
+        6
+      ],
+      "timeBasis": "design budget including instruction/practice; no frozen counts or measured duration; PVT3/10min has published task versions",
+      "inputProposal": [
+        "touch",
+        "mouse",
+        "keyboard"
+      ],
+      "relationToExisting": "简单反应时近邻；持续时间和等待不同",
+      "sourceIds": [
+        "pvt-brief",
+        "marsja/psychomotor_vigilance_task"
+      ],
+      "researchRightsRoute": "文献自研；示例README研究/学生使用，未见通用代码LICENSE",
+      "controlledVocabularyMapping": "human-readable proposals only; preserve existing18 dimensions/131stable keys; mapping/addition reviewed at individual design",
+      "backendTagsPersisted": false,
+      "requiresIndividualSketchApproval": true
+    },
+    {
+      "proposalId": "discounting",
+      "name": "延迟选择",
+      "status": "RESEARCH_PLAN_ONLY_NOT_IMPLEMENTED_NOT_DESIGN_APPROVED",
+      "priorityRecommendation": "P1",
+      "suggestedOrder": 6,
+      "researchOnly": true,
+      "domains": [
+        "决策学习"
+      ],
+      "targetProcesses": [
+        "即时与延迟收益",
+        "金额和时间敏感性"
+      ],
+      "researchScenes": [
+        "成人职业相关偏好研究",
+        "ADHD相关奖励研究",
+        "年龄适配后儿童等待选择研究"
+      ],
+      "targetPopulationProposal": "成人优先，儿童货币/时间理解另设计",
+      "validatedAgeRange": null,
+      "chineseProjectValidation": null,
+      "difficultyValidated": null,
+      "deviceEquivalence": null,
+      "shortVersionEstimatedTotalMinutes": [
+        3,
+        5
+      ],
+      "timeBasis": "design budget including instruction/practice; no frozen counts or measured duration; PVT3/10min has published task versions",
+      "inputProposal": [
+        "touch",
+        "mouse",
+        "keyboard"
+      ],
+      "relationToExisting": "不同于BART风险、气球努力；跨场景只登记一次",
+      "sourceIds": [
+        "expfactory/expfactory-experiments"
+      ],
+      "researchRightsRoute": "MIT参考；假想奖励明确标识，不承诺实际延期付款",
+      "controlledVocabularyMapping": "human-readable proposals only; preserve existing18 dimensions/131stable keys; mapping/addition reviewed at individual design",
+      "backendTagsPersisted": false,
+      "requiresIndividualSketchApproval": true
+    },
+    {
+      "proposalId": "ax-cpt",
+      "name": "AX-CPT",
+      "status": "RESEARCH_PLAN_ONLY_NOT_IMPLEMENTED_NOT_DESIGN_APPROVED",
+      "priorityRecommendation": "P2",
+      "suggestedOrder": 7,
+      "researchOnly": true,
+      "domains": [
+        "注意",
+        "执行控制"
+      ],
+      "targetProcesses": [
+        "上下文保持",
+        "反应准备",
+        "AY/BX差异"
+      ],
+      "researchScenes": [
+        "成人上下文控制",
+        "较大学龄儿童执行功能",
+        "目标保持研究"
+      ],
+      "targetPopulationProposal": "成人及较大学龄儿童拟研究；字母理解和中文适用性未核",
+      "validatedAgeRange": null,
+      "chineseProjectValidation": null,
+      "difficultyValidated": null,
+      "deviceEquivalence": null,
+      "shortVersionEstimatedTotalMinutes": [
+        4,
+        6
+      ],
+      "timeBasis": "design budget including instruction/practice; no frozen counts or measured duration; PVT3/10min has published task versions",
+      "inputProposal": [
+        "touch",
+        "mouse",
+        "keyboard"
+      ],
+      "relationToExisting": "与CPT-X分别冻结，不能复用旧名和效度",
+      "sourceIds": [
+        "expfactory/expfactory-experiments"
+      ],
+      "researchRightsRoute": "MIT参考，保持稀有条件真实分母",
+      "controlledVocabularyMapping": "human-readable proposals only; preserve existing18 dimensions/131stable keys; mapping/addition reviewed at individual design",
+      "backendTagsPersisted": false,
+      "requiresIndividualSketchApproval": true
+    },
+    {
+      "proposalId": "icar-selected",
+      "name": "ICAR指定题型",
+      "status": "RESEARCH_PLAN_ONLY_NOT_IMPLEMENTED_NOT_DESIGN_APPROVED",
+      "priorityRecommendation": "P2",
+      "suggestedOrder": 8,
+      "researchOnly": true,
+      "domains": [
+        "推理"
+      ],
+      "targetProcesses": [
+        "字母数列",
+        "言语关系"
+      ],
+      "researchScenes": [
+        "职业相关认知研究",
+        "推理题型比较",
+        "中文材料研究"
+      ],
+      "targetPopulationProposal": "成人研究；中文译本存在，不等于本项目样本验证",
+      "validatedAgeRange": null,
+      "chineseProjectValidation": null,
+      "difficultyValidated": null,
+      "deviceEquivalence": null,
+      "shortVersionEstimatedTotalMinutes": [
+        6,
+        10
+      ],
+      "timeBasis": "design budget including instruction/practice; no frozen counts or measured duration; PVT3/10min has published task versions",
+      "inputProposal": [
+        "touch",
+        "mouse",
+        "keyboard"
+      ],
+      "relationToExisting": "矩阵/旋转已存在；选择未覆盖题型而非全套重复计数",
+      "sourceIds": [
+        "icar-current"
+      ],
+      "researchRightsRoute": "学术用途SUL1，按项目登记；受限材料不放公开仓库",
+      "controlledVocabularyMapping": "human-readable proposals only; preserve existing18 dimensions/131stable keys; mapping/addition reviewed at individual design",
+      "backendTagsPersisted": false,
+      "requiresIndividualSketchApproval": true
+    },
+    {
+      "proposalId": "dictator",
+      "name": "单方资源分配",
+      "status": "RESEARCH_PLAN_ONLY_NOT_IMPLEMENTED_NOT_DESIGN_APPROVED",
+      "priorityRecommendation": "P2",
+      "suggestedOrder": 9,
+      "researchOnly": true,
+      "domains": [
+        "社会决策"
+      ],
+      "targetProcesses": [
+        "自他资源分配",
+        "情境差异"
+      ],
+      "researchScenes": [
+        "社会决策科研",
+        "合作情境研究",
+        "分配偏好"
+      ],
+      "targetPopulationProposal": "成人；不从分配量推慷慨人格或道德",
+      "validatedAgeRange": null,
+      "chineseProjectValidation": null,
+      "difficultyValidated": null,
+      "deviceEquivalence": null,
+      "shortVersionEstimatedTotalMinutes": [
+        3,
+        5
+      ],
+      "timeBasis": "design budget including instruction/practice; no frozen counts or measured duration; PVT3/10min has published task versions",
+      "inputProposal": [
+        "touch",
+        "mouse",
+        "keyboard"
+      ],
+      "relationToExisting": "与信任互惠分开，单轮示例不假称成熟多轮测验",
+      "sourceIds": [
+        "oTree-org/otree"
+      ],
+      "researchRightsRoute": "宽松代码许可另含发表引用义务；重复/假想情境为新协议",
+      "controlledVocabularyMapping": "human-readable proposals only; preserve existing18 dimensions/131stable keys; mapping/addition reviewed at individual design",
+      "backendTagsPersisted": false,
+      "requiresIndividualSketchApproval": true
+    },
+    {
+      "proposalId": "trust",
+      "name": "信任与互惠",
+      "status": "RESEARCH_PLAN_ONLY_NOT_IMPLEMENTED_NOT_DESIGN_APPROVED",
+      "priorityRecommendation": "P2",
+      "suggestedOrder": 10,
+      "researchOnly": true,
+      "domains": [
+        "社会决策"
+      ],
+      "targetProcesses": [
+        "转出",
+        "预期",
+        "返还"
+      ],
+      "researchScenes": [
+        "社会决策科研",
+        "双人互动研究",
+        "标准化伙伴变式研究"
+      ],
+      "targetPopulationProposal": "成人，角色与对手类型另冻结",
+      "validatedAgeRange": null,
+      "chineseProjectValidation": null,
+      "difficultyValidated": null,
+      "deviceEquivalence": null,
+      "shortVersionEstimatedTotalMinutes": [
+        5,
+        8
+      ],
+      "timeBasis": "design budget including instruction/practice; no frozen counts or measured duration; PVT3/10min has published task versions",
+      "inputProposal": [
+        "touch",
+        "mouse",
+        "keyboard"
+      ],
+      "relationToExisting": "相较单方分配有回应和配对，真实多人需最小系统delta",
+      "sourceIds": [
+        "oTree-org/otree"
+      ],
+      "researchRightsRoute": "宽松代码许可另含发表引用义务；不伪装模拟伙伴为真人",
+      "controlledVocabularyMapping": "human-readable proposals only; preserve existing18 dimensions/131stable keys; mapping/addition reviewed at individual design",
+      "backendTagsPersisted": false,
+      "requiresIndividualSketchApproval": true
+    },
+    {
+      "proposalId": "dccs",
+      "name": "DCCS标准版",
+      "status": "RESEARCH_PLAN_ONLY_NOT_IMPLEMENTED_NOT_DESIGN_APPROVED",
+      "priorityRecommendation": "reserve",
+      "suggestedOrder": 11,
+      "researchOnly": true,
+      "domains": [
+        "执行控制"
+      ],
+      "targetProcesses": [
+        "明示维度切换",
+        "旧规则持续"
+      ],
+      "researchScenes": [
+        "低龄规则切换研究",
+        "儿童发展研究"
+      ],
+      "targetPopulationProposal": "来源标准版2.5–7岁；本项目自助触屏与中文年龄适用性未核",
+      "validatedAgeRange": null,
+      "chineseProjectValidation": null,
+      "difficultyValidated": null,
+      "deviceEquivalence": null,
+      "shortVersionEstimatedTotalMinutes": [
+        3,
+        5
+      ],
+      "timeBasis": "design budget including instruction/practice; no frozen counts or measured duration; PVT3/10min has published task versions",
+      "inputProposal": [
+        "touch",
+        "mouse",
+        "keyboard"
+      ],
+      "relationToExisting": "卡片分类近邻；不是NIH Toolbox/WCST许可替身",
+      "sourceIds": [
+        "phenx-dccs",
+        "dccs-primary"
+      ],
+      "researchRightsRoute": "PhenX标准协议可免费使用；原创图形，具体材料来源另核",
+      "controlledVocabularyMapping": "human-readable proposals only; preserve existing18 dimensions/131stable keys; mapping/addition reviewed at individual design",
+      "backendTagsPersisted": false,
+      "requiresIndividualSketchApproval": true
+    },
+    {
+      "proposalId": "sjt",
+      "name": "原创岗位SJT/工作样例",
+      "status": "RESEARCH_PLAN_ONLY_NOT_IMPLEMENTED_NOT_DESIGN_APPROVED",
+      "priorityRecommendation": "reserve",
+      "suggestedOrder": 12,
+      "researchOnly": true,
+      "domains": [
+        "情境判断",
+        "工作过程"
+      ],
+      "targetProcesses": [
+        "真实情境选择",
+        "信息核查",
+        "工作样例表现"
+      ],
+      "researchScenes": [
+        "客服异常情境研究",
+        "运营核查情境研究",
+        "岗位学习研究"
+      ],
+      "targetPopulationProposal": "成人，岗位及研究效标由管理员/课题确定",
+      "validatedAgeRange": null,
+      "chineseProjectValidation": null,
+      "difficultyValidated": null,
+      "deviceEquivalence": null,
+      "shortVersionEstimatedTotalMinutes": [
+        6,
+        10
+      ],
+      "timeBasis": "design budget including instruction/practice; no frozen counts or measured duration; PVT3/10min has published task versions",
+      "inputProposal": [
+        "touch",
+        "mouse",
+        "keyboard"
+      ],
+      "relationToExisting": "不是纯认知测验；优先复用量表/表单呈现",
+      "sourceIds": [
+        "opm-sjt",
+        "harver-current"
+      ],
+      "researchRightsRoute": "方法公开不等于现成中文题库；独立写作，不复制商业题目",
+      "controlledVocabularyMapping": "human-readable proposals only; preserve existing18 dimensions/131stable keys; mapping/addition reviewed at individual design",
+      "backendTagsPersisted": false,
+      "requiresIndividualSketchApproval": true
+    }
+  ]
+}

@@ -1,0 +1,142 @@
+{
+  "kind": "UNSIGNED_CLIENT_PERSISTENCE_DEVELOPMENT_EVIDENCE_NOT_CI",
+  "baseCommit": "517c2d21d2ca315aed48316bcbfb36069180a707",
+  "integrationBase": "48516ef5900cf9f711ea3cc852ac148cd221d7f8",
+  "observedPlatformHead": "0e8e1181b5009f712944d730fc4cf2119f2872c3",
+  "cloudOnly": true,
+  "node": "24.21.0",
+  "unitUniqueCases": 7,
+  "browserUniqueScenarios": 5,
+  "reports": [
+    {
+      "source": "/tmp/mot-persistence-20261026-unit-1.json",
+      "sha256": "6712e7bf834888db67bc2af1f34af2a0ae9b262afa0f3713a6342c8d33d4ff90",
+      "exitCode": 1,
+      "meaning": "No tests ran: initial write command used the wrong working directory. Not a passing invocation.",
+      "total": 0,
+      "passed": 0,
+      "failed": 0,
+      "cases": []
+    },
+    {
+      "source": "/tmp/mot-persistence-20261026-unit-2.json",
+      "sha256": "f183bbfca53eb77486cecb419400693f5f5531effc3139d375506631772b631c",
+      "exitCode": 0,
+      "meaning": "Four concurrency and three UI cases passed.",
+      "total": 7,
+      "passed": 7,
+      "failed": 0,
+      "cases": [
+        {
+          "name": "MOT capture and persistence recovery UI retries failed practice saving with its original record and suppresses double clicks",
+          "status": "passed"
+        },
+        {
+          "name": "MOT capture and persistence recovery UI refuses pending exposure from a different parent progress",
+          "status": "passed"
+        },
+        {
+          "name": "MOT capture and persistence recovery UI keeps captured core immutable across a callback mutation and an unconfirmed ACK",
+          "status": "passed"
+        },
+        {
+          "name": "MOT persistence concurrency shares one in-flight save for repeated retries of a captured trial",
+          "status": "passed"
+        },
+        {
+          "name": "MOT persistence concurrency refuses interleaving a different record",
+          "status": "passed"
+        },
+        {
+          "name": "MOT persistence concurrency allows an actual retry after failure",
+          "status": "passed"
+        },
+        {
+          "name": "MOT persistence concurrency releases after synchronous failure and successful completion",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "source": "/tmp/mot-persistence-20261026-ui-final.json",
+      "sha256": "4f214869bcd14f31ec827f3330424a32906553607e54ce0e0b38fb255f84d462",
+      "exitCode": 0,
+      "meaning": "Only the three UI cases reran after correcting RTL locator options and matcher types. Four unchanged concurrency cases were not rerun.",
+      "total": 3,
+      "passed": 3,
+      "failed": 0,
+      "cases": [
+        {
+          "name": "MOT capture and persistence recovery UI retries failed practice saving with its original record and suppresses double clicks",
+          "status": "passed"
+        },
+        {
+          "name": "MOT capture and persistence recovery UI refuses pending exposure from a different parent progress",
+          "status": "passed"
+        },
+        {
+          "name": "MOT capture and persistence recovery UI keeps captured core immutable across a callback mutation and an unconfirmed ACK",
+          "status": "passed"
+        }
+      ]
+    }
+  ],
+  "sourceSnapshotTakenAfterExecution": true,
+  "sourceSnapshot": [
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/mot/MotTask.tsx",
+      "sha256": "5f5eb2aefdbff0855d732f71e91390f8c2308f15619a6c7c9fa68a0a9ed509a3"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/mot/draft.ts",
+      "sha256": "bee07748dc837e0d23df5ad319f4db75be40982cb68de5febdd882aa0f7147f7"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/mot/save-gate.ts",
+      "sha256": "40264a4d74d1df47f9587f94ec748106f2611342b6df4f290026c1332b3e35c1"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/mot/save-gate.test.ts",
+      "sha256": "fdc21271c2c63b9f478bf22049d5dd703626c4bf7e8a33079ffaa31df4921810"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/mot/MotTask.persistence.test.tsx",
+      "sha256": "76c502a10677c3923846d1fabb66c1e085298973b36a9b2748348b9d907cc4a1"
+    },
+    {
+      "path": "server-version/scripts/cognitive/mot-browser-review.cjs",
+      "sha256": "7f8b73f3f7020ee8ab4135fdc01feabb832bc538db5595d6ac3f98be17169fad"
+    },
+    {
+      "path": "server-version/scripts/cognitive/mot-draft-browser-cases.cjs",
+      "sha256": "0312d0c99013f94bed5efc99070ae6fe032c80f9107ed6aad7406bc53c3b8eff"
+    }
+  ],
+  "typeCheck": {
+    "status": "passed",
+    "scope": "MOT component, draft, save gate and new tests",
+    "earlierFailure": "Test-only ByRoleOptions.exact and missing matcher types; fixed with anchored names and explicit jest-dom/vitest import."
+  },
+  "lint": {
+    "status": "passed",
+    "scope": "five changed/new frontend files"
+  },
+  "browserReports": [
+    "draft-recovery-review-20261026.json",
+    "draft-practice-save-review-20261026.json"
+  ],
+  "browserReuse": "First four real IndexedDB scenarios retain their original invocation. Only the new practice retry case executed after adding the optional case selector and isolated temp directory. No combined five-case invocation is claimed.",
+  "semanticImpact": {
+    "protocolAndScoringConfig": "unchanged",
+    "stimulusAndTiming": "unchanged",
+    "reportAndMetricSchema": "unchanged",
+    "clientStorageSchema": "IndexedDB version 1 to 2; adds binding alias index while preserving all old rows",
+    "candidateVersionPolicy": "Unpublished candidate; commit binds this development artifact. No historical frozen result is rewritten. Any parallel published execution of old/new artifacts requires explicit engine/presentation compatibility review."
+  },
+  "limits": [
+    "No real product API, server database or COS integration.",
+    "Client save serialization does not replace server idempotency.",
+    "Concurrent active-tab execution ownership remains a platform adapter dependency; ambiguous stored aliases are rejected and retained.",
+    "IndexedDB v1 code cannot open a v2 database; rollback must retain the v2-aware reader. Do not reset/delete drafts to downgrade."
+  ]
+}

@@ -231,7 +231,25 @@ export interface CognitivePresentationDefinitionV1 {
   }
 }
 
+/** Server-returned native snapshot only; the browser never constructs the authoritative tuple. */
+export interface CognitiveNativeSnapshot {
+  schemaVersion: 1
+  frozenAt: string
+  testType: string
+  engineVersion: string
+  scoringVersion: string
+  configVersion: string
+  config: Record<string, unknown>
+  configHash: string
+  protocolSignature: string
+  protocol: NonNullable<CognitiveSession['protocol']>
+}
+
 export interface CognitiveSession {
+  nativeTask?: boolean
+  sessionSnapshot?: CognitiveNativeSnapshot
+  submissionId?: string | null
+  submissionPayloadHash?: string | null
   trainingPersistence?: import('../../training/training-cognitive-retention').TrainingPersistenceDescriptor
   sessionEpoch?: number
   feedbackDeferred?: boolean

@@ -1,0 +1,31 @@
+
+ RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend
+
+stdout | src/__tests__/cognitive/native-mot-http-archive.integration.test.ts > MOT actual authenticated HTTP START FINAL archive slice with synthetic COS
+[2026-10-26T11:05:55.932Z] [INFO] [CacheService] Redis缓存服务初始化完成
+
+ ↓ src/__tests__/cognitive/native-mot-http-archive.integration.test.ts > MOT actual authenticated HTTP START FINAL archive slice with synthetic COS > runs real cookie auth/current principal, START and FINAL with authority receipt
+ ↓ src/__tests__/cognitive/native-mot-http-archive.integration.test.ts > MOT actual authenticated HTTP START FINAL archive slice with synthetic COS > keeps archive pending on failure, rejects wrong identity/role/format then confirms same sealed retry
+ ↓ src/__tests__/cognitive/native-mot-http-archive.integration.test.ts > MOT actual authenticated HTTP START FINAL archive slice with synthetic COS > only the authenticated binary archive route bypasses the unchanged global 2MiB JSON parser
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/cognitive/native-mot-http-archive.integration.test.ts > MOT actual authenticated HTTP START FINAL archive slice with synthetic COS
+Error: HTTP fixture requires exclusive empty MOT config slot
+ ❯ Object.createNativeMotHttpReview ../scripts/cognitive/native-mot-http-review.cjs:23:26
+ ❯ src/__tests__/cognitive/native-mot-http-archive.integration.test.ts:13:5
+     11|  beforeAll(async()=>{
+     12|   const require=createRequire(import.meta.url)
+     13|   h=await require(path.resolve(process.cwd(),'../scripts/cognitive/nat…
+       |     ^
+     14|  },60000)
+     15|  afterAll(async()=>{if(h)await h.close()},30000)
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 skipped (3)
+   Start at  11:05:55
+   Duration  988ms (transform 31ms, setup 0ms, import 43ms, tests 818ms, environment 0ms)
+

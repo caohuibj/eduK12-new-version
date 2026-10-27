@@ -1,0 +1,606 @@
+{
+  "artifactKind": "COGNITIVE_TASK_DESIGN_AND_STATIC_PREVIEW_NOT_RUNTIME",
+  "candidateId": "continuous-recognition",
+  "status": "DESIGN_PROPOSAL",
+  "revision": "recognition-design-proposal-20261026-v1",
+  "name": {
+    "zh": "连续图像再认",
+    "en": "Continuous Image Recognition"
+  },
+  "scope": "协议/布局提案；不代表任务已实现、入库、发布或科学验证",
+  "sourceEvidence": [
+    {
+      "kind": "fixed_project_research_card",
+      "repository": "caohuibj/eduK12-new-version",
+      "commit": "22721e5c63dd78819e8c58921adf20157cdaa08c",
+      "path": "docs/cognitive-library/task-selection-20261026/memory-decision-task-cards.json",
+      "cardId": "continuous-recognition",
+      "blob": "da379d3c6d24f5952bbb8bd25bc6d70e57e00c09"
+    },
+    {
+      "kind": "fixed_controlled_tags",
+      "repository": "caohuibj/eduK12-new-version",
+      "commit": "22721e5c63dd78819e8c58921adf20157cdaa08c",
+      "paths": [
+        "docs/cognitive-library/candidate-tags-20261026/catalog.json",
+        "docs/cognitive-library/candidate-tags-20261026/taxonomy.json"
+      ],
+      "blobs": [
+        "065bc3313e591d667ca0f26cdf7ea0e16a296d7c",
+        "f28a14159348d3cebbfa04a3675b126307dd9e43"
+      ]
+    },
+    {
+      "kind": "direct_static_read_this_design_round",
+      "repository": "nwrim/continuous_recognition_task_jsPsych",
+      "commit": "b4ad68e5376ee7256763abb622cf06470514edf5",
+      "path": "jspsych-continuous-recognition-task.js",
+      "blob": "30664ba4da4efa800b441013ab6bb2d627bb1f8a",
+      "locations": [
+        "calculateTrialNumbers lines108–123",
+        "makeSequence block loop lines335–385"
+      ],
+      "supports": "总数、随机重复候选池、块内洗牌；未运行第三方源码"
+    },
+    {
+      "kind": "direct_static_read_this_design_round",
+      "repository": "nwrim/continuous_recognition_task_jsPsych",
+      "commit": "b4ad68e5376ee7256763abb622cf06470514edf5",
+      "path": "scripts/03_calculate_metrics.py",
+      "blob": "80b18fd31f5964de966115208e8021934fc5ab51",
+      "supports": "ISI合并、填充FAR/警觉miss筛选、原指标为跨参与者图片层汇总"
+    },
+    {
+      "kind": "author_documentation_inherited_from_research_card",
+      "url": "https://www.wilmabainbridge.com/makeexperiments.html",
+      "supports": "原任务定位为刺激集memorability研究；本轮未重新访问或宣称个人量表验证"
+    },
+    {
+      "kind": "asset_license_inherited_from_research_card",
+      "url": "https://github.com/jcpeterson/omi/blob/53bb3c13113afc3ae67aa6ede4ac9dfe33f306af/LICENSE.txt",
+      "supports": "示例人脸CC BY-NC-SA4.0，不随插件MIT放行"
+    }
+  ],
+  "inheritedResearchTags": {
+    "cognitive_domain": [
+      "recognition_memory"
+    ],
+    "target_process": [
+      "repeat_recognition"
+    ],
+    "paradigm": [
+      "continuous_old_new"
+    ],
+    "stimulus_form": [
+      "image_stream"
+    ],
+    "input_upstream": [
+      "r_key_detection"
+    ],
+    "input_proposed": [
+      "not_frozen"
+    ],
+    "key_metric": [
+      "recognition_hit_false_alarm",
+      "corrected_recognition"
+    ],
+    "intended_use": [
+      "research_protocol_selection"
+    ],
+    "code_license": [
+      "mit_recorded"
+    ],
+    "code_rights_disposition": [
+      "github_public_conditional"
+    ],
+    "asset_rights_disposition": [
+      "authorization_pending"
+    ],
+    "asset_license_review": [
+      "omi_nc_sa_project_unconfirmed"
+    ],
+    "implementation_strategy": [
+      "code_adaptation"
+    ],
+    "maturity": [
+      "source_research_only"
+    ],
+    "evidence_limitations": [
+      "timing_device_unverified",
+      "personal_scoring_redefinition",
+      "protocol_version_decision"
+    ],
+    "baseline_relation": [
+      "new_family_candidate"
+    ],
+    "research_priority": [
+      "priority_finalize"
+    ],
+    "rule_type": [
+      "technical_quality",
+      "theoretical_reference",
+      "literature_experience",
+      "project_provisional"
+    ]
+  },
+  "designTags": {
+    "cognitiveDomain": [
+      {
+        "key": "recognition_memory",
+        "status": "intended_domain"
+      }
+    ],
+    "targetProcess": [
+      {
+        "key": "repeat_recognition",
+        "status": "intended_process"
+      }
+    ],
+    "applicationScenarios": [
+      {
+        "key": "research",
+        "status": "proposed_research_use"
+      },
+      {
+        "key": "self_exploration",
+        "status": "descriptive_only"
+      },
+      {
+        "key": "recreational_exploration",
+        "status": "descriptive_only"
+      },
+      {
+        "key": "learning_evaluation_support",
+        "status": "unvalidated_not_diagnostic"
+      },
+      {
+        "key": "recruitment_support",
+        "status": "unvalidated_not_predictive"
+      }
+    ],
+    "ageApplicability": {
+      "minAge": null,
+      "maxAge": null,
+      "status": "unverified"
+    },
+    "difficulty": {
+      "level": null,
+      "status": "unverified",
+      "taskDemand": "连续流中保留图像身份并对重复做一次回应；不回应新图"
+    },
+    "languages": [
+      {
+        "key": "zh",
+        "comprehensionValidation": "pending"
+      },
+      {
+        "key": "en",
+        "comprehensionValidation": "pending"
+      }
+    ],
+    "devicePriority": [
+      "phone",
+      "tablet",
+      "desktop"
+    ],
+    "inputProject": [
+      {
+        "key": "touch",
+        "priority": 1
+      },
+      {
+        "key": "pointer",
+        "priority": 2
+      },
+      {
+        "key": "keyboard",
+        "priority": 3
+      }
+    ],
+    "extensionPolicy": "新增场景/设备/难度仅设计扩展提案，不冒充后台schema；18维原key原值保留",
+    "runtimePersistence": false,
+    "globalSearchConnected": false,
+    "norms": "none",
+    "maturity": "design_proposal"
+  },
+  "rights": {
+    "upstreamCode": {
+      "license": "MIT",
+      "route": "可适配序列/纯计数逻辑并保留通知；不移入第三方runtime"
+    },
+    "upstreamAssets": {
+      "license": "OMI示例CC BY-NC-SA4.0",
+      "clearance": "pending_not_included"
+    },
+    "previewAssets": {
+      "route": "原创SVG几何布局占位",
+      "formalStimulusBank": false,
+      "equivalenceClaim": false
+    },
+    "productionAssets": {
+      "route": "有权图片清单、作者/许可证/哈希逐项审查",
+      "status": "not_selected"
+    },
+    "trademarks": "仅用户要求的EDUK12.TOP用于可选报告小图",
+    "strategy": "协议参考/独立TS实现拟案；素材未清权前不进入完整任务开发"
+  },
+  "upstreamObserved": {
+    "targetNum": 60,
+    "imgBlockSize": 4,
+    "firstRepeatDelayBlocks": 5,
+    "minRepeatDelayBlocks": 4,
+    "vigilanceIntervalBlocks": 4,
+    "fixedOrder": false,
+    "imageMs": 750,
+    "isiMs": 800,
+    "independentPractice": "none",
+    "response": "R键；首次图不按",
+    "analysisConsolidatesFollowingIsi": true,
+    "instructionConflict": "说明不要在+按，但评分默认并入ISI。必须择一冻结，不能隐瞒"
+  },
+  "profiles": {
+    "research": {
+      "status": "PROPOSED_NOT_FROZEN",
+      "labelZh": "研究对照版（上游示例参数）",
+      "targetNum": 60,
+      "totalBlocks": 65,
+      "formalImagePresentations": 260,
+      "formalIsiPresentations": 260,
+      "counts": {
+        "targetFirst": 60,
+        "targetRepeat": 60,
+        "fillerFirst": 124,
+        "vigilanceRepeat": 16
+      },
+      "uniqueFormalImagesRequired": 184,
+      "netPresentationMs": 403000,
+      "evidence": "固定随机重复示例的静态公式；不是原始固定顺序版同等复刻",
+      "labelEn": "Research comparison (upstream example parameters)",
+      "literatureComparisonStatus": "260次来自fixedOrder=false示例；开关值不保证此默认参数下重复顺序随机，仍需对论文逐项核对"
+    },
+    "experience": {
+      "status": "PROPOSED_NOT_FROZEN",
+      "labelZh": "体验版",
+      "targetNum": 20,
+      "totalBlocks": 25,
+      "formalImagePresentations": 100,
+      "formalIsiPresentations": 100,
+      "counts": {
+        "targetFirst": 20,
+        "targetRepeat": 20,
+        "fillerFirst": 54,
+        "vigilanceRepeat": 6
+      },
+      "uniqueFormalImagesRequired": 74,
+      "netPresentationMs": 155000,
+      "evidence": "项目暂定短版，无可靠性/常模资格",
+      "countReduction": 160,
+      "fractionFewerPresentations": 0.6153846153846154,
+      "structuralDifferences": [
+        "目标重复占比60/260≈23.08%改为20/100=20%",
+        "固定5块起始/尾部开销在短版中比例更高",
+        "默认参数下ready池静态推导只有1个候选、配对块差5；块内洗牌使实际图片lag约17–23。短版实际lag频数仍须manifest核验，不宣称完全相同，也不主张其范围必然改变。"
+      ],
+      "equivalenceClaim": false
+    }
+  },
+  "countDerivation": {
+    "totalBlocks": "targetNum + firstRepeatDelayBlocks",
+    "totalPresentations": "totalBlocks × imgBlockSize",
+    "targetFirst": "targetNum",
+    "targetRepeat": "targetNum",
+    "vigilanceRepeat": "floor(totalBlocks / vigilanceIntervalBlocks), interval=4",
+    "fillerFirst": "totalPresentations − targetFirst − targetRepeat − vigilanceRepeat",
+    "meaning": "blocks是生成结构，不是计划加入屏幕休息的次数"
+  },
+  "sharedProposedProtocol": {
+    "status": "NOT_FROZEN",
+    "imageMs": 750,
+    "isiMs": 800,
+    "fixedOrder": false,
+    "imgBlockSize": 4,
+    "firstRepeatDelayBlocks": 5,
+    "minRepeatDelayBlocks": 4,
+    "vigilanceIntervalBlocks": 4,
+    "response": {
+      "rule": "仅认出重复时做一次seen回应；首次图不回应",
+      "touch": "固定大面积见过按钮pointerdown，图片与ISI位置不变",
+      "pointer": "同一按钮，仅主指针按下",
+      "keyboard": "R，忽略held/repeat，保留原始按键；其余键只记录不计有效seen",
+      "isiAttributionProposal": "Following ISI归上一张图，说明同步明示‘图片消失后的短间隔也可回应上一张’；窗口[图像onset,下一图onset)，当前图优先边界；每图仅首个有效seen，后续输入保留但不叠加命中",
+      "changesFromUpstream": [
+        "触屏/指针替代R键，运动负担与时延不等值",
+        "明确ISI可回应的指导与上游文字不同",
+        "个人会话计分是项目定义，原脚本跨参与者图片层统计"
+      ]
+    },
+    "geometry": {
+      "proposal": "固定300 CSS px方形图像区，两profile与四入口一致；容纳不足不自动缩小",
+      "minimumViewportWidthCssPxProposal": 348,
+      "sourceImageCssPx": 512,
+      "sourceFixationCssPx": 400,
+      "physicalVisualAngleKnown": false,
+      "changedFromUpstream": true,
+      "devicePooling": "CSS相同不代表视角/亮度相同；设备分层后研究能否汇总"
+    },
+    "practice": {
+      "status": "PROJECT_PROVISIONAL_NOT_UPSTREAM",
+      "presentations": 8,
+      "sequence": [
+        "A",
+        "B",
+        "C",
+        "A",
+        "D",
+        "B",
+        "E",
+        "F"
+      ],
+      "types": [
+        "first",
+        "first",
+        "first",
+        "repeat",
+        "first",
+        "repeat",
+        "first",
+        "first"
+      ],
+      "uniquePracticeImages": 6,
+      "netPresentationMs": 12400,
+      "imageMs": 750,
+      "isiMs": 800,
+      "formalPoolDisjoint": true,
+      "accuracyPassThreshold": null,
+      "repetitionPolicy": "可重看说明/重试，记录次数与曝光；不编造上游通过线",
+      "lagAndPrevalenceBoundary": "8呈现练习仅教操作，A0→A3/B1→B5的短lag及2/8重复率不代表正式4块最小delay或正式种类比例；两profile均用此相同练习提案。"
+    }
+  },
+  "lagContract": {
+    "indexBase": 0,
+    "fields": [
+      "firstTrialIndex",
+      "repeatTrialIndex",
+      "lagImagePresentations",
+      "interveningImages",
+      "lagOnsetMs",
+      "sourceBlockIndex",
+      "actualRenderedAtPerfMs"
+    ],
+    "formulas": {
+      "lagImagePresentations": "repeatTrialIndex − firstTrialIndex",
+      "interveningImages": "lagImagePresentations − 1",
+      "lagOnsetMs": "actual repeat onset − actual first onset"
+    },
+    "example": {
+      "firstTrialIndex": 3,
+      "repeatTrialIndex": 23,
+      "lagImagePresentations": 20,
+      "interveningImages": 19,
+      "sourceBlockDifference": 5,
+      "notAClaimOfFixedLag": true
+    },
+    "note": "minRepeatDelay=4是块参数；块内随机位置和候选池抽取使实际间隔变化。记录实际配对；在第二次呈现前成功完成加载/曝光才可纳入对应pair。",
+    "defaultParameterStaticFinding": {
+      "status": "STATIC_DERIVATION_NOT_UPSTREAM_EXECUTION",
+      "argument": "blockIdx>minRepeatDelay+1即>5时每块shift一个shown入ready，同一块blockIdx>firstRepeatDelay即>5又pop一个repeat；ready初始空，默认路径每次repeat前池大小1。",
+      "pairBlockDifference": 5,
+      "lagImagePresentationsRangeFromWithinBlockPermutation": [
+        17,
+        23
+      ],
+      "interveningImagesRange": [
+        16,
+        22
+      ],
+      "implication": "fixedOrder=false不等于这些参数下目标重复顺序真正随机；当前不改算法或参数。"
+    }
+  },
+  "metricDefinitions": [
+    {
+      "key": "targetHitRate",
+      "unit": "ratio",
+      "numerator": "完整且技术有效目标配对中的重复seen数",
+      "denominator": "完整且技术有效的正式targetRepeat数；不含vigilanceRepeat",
+      "direction": "descriptive",
+      "nullWhen": "目标配对为0、配对/序列/版本不合法，或质量gate未获准",
+      "provenance": "本项目个人会话汇总，不是上游跨人图片指标"
+    },
+    {
+      "key": "targetFalseAlarmRate",
+      "unit": "ratio",
+      "numerator": "同一有效目标配对中目标首次出现的seen数",
+      "denominator": "相同配对集合中的targetFirst数；不含fillerFirst",
+      "direction": "descriptive",
+      "nullWhen": "目标首次分母0或对应gate未获准",
+      "critical": "不把所有首次呈现或警觉重复混入此FAR"
+    },
+    {
+      "key": "correctedRecognitionRate",
+      "unit": "signed_ratio",
+      "formula": "targetHitRate − targetFalseAlarmRate",
+      "range": [
+        -1,
+        1
+      ],
+      "direction": "descriptive",
+      "nullWhen": "任一输入null或gate未获准",
+      "clampNegative": false
+    },
+    {
+      "key": "fillerFalseAlarmRate",
+      "unit": "ratio",
+      "numerator": "有效fillerFirst上的seen数",
+      "denominator": "有效fillerFirst数",
+      "visibility": "research_quality_detail_only",
+      "nullWhen": "fillerFirst分母0"
+    },
+    {
+      "key": "vigilanceMissRate",
+      "unit": "ratio",
+      "numerator": "有效vigilanceRepeat中未回应数",
+      "denominator": "有效vigilanceRepeat数",
+      "visibility": "research_quality_detail_only",
+      "nullWhen": "vigilanceRepeat分母0"
+    },
+    {
+      "key": "firstSeenResponseMs",
+      "unit": "ms",
+      "origin": "所归属图像实际onset",
+      "nullable": true,
+      "meaning": "含图像/ISI阶段的首个seen回应时长，不是纯记忆检索速度"
+    }
+  ],
+  "qualityProposal": {
+    "status": "PROVISIONAL_NOT_VALIDATED",
+    "ruleTypes": [
+      "技术质量规则",
+      "理论参照",
+      "文献经验",
+      "项目暂定研究者规则"
+    ],
+    "technical": [
+      "刺激全部预加载并核manifest哈希；正式阶段不请求图片/字体",
+      "逐图原始呈现、ISI、失焦/旋转/缩放及中断日志；未显示的图片不计真实miss",
+      "不完整pair排除两端，保留排除原因；不得把缺失当未回应",
+      "准备后生成全序列，验证种类/唯一性/配对/实际lag和预算；不偷偷缩短序列"
+    ],
+    "behavioralReference": {
+      "upstreamFillerFarThreshold": 0.7,
+      "upstreamVigilanceMissThreshold": 0.7,
+      "comparison": ">=",
+      "category": "文献经验",
+      "adoptedForProject": false,
+      "clinicalCutoff": false,
+      "zeroVigilanceResult": null
+    },
+    "reportStates": {
+      "interpretable": "全部计划target配对完整有效，系统性技术错误/未核门禁不存在；展示获准HR/FAR/CRR与分母。此全完整规则是项目保守提案，不是可靠性证明。",
+      "limited": "存在部分配对/刺激无效；本版整体HR/FAR/CRR受影响则隐藏，只显示完整性/排除数和恢复选择。未来若有预定义完整stratum才单独放行该stratum。",
+      "invalid": "manifest/版本无法核验或无有效目标配对，不给表现结论，只给友好状态和后续选择"
+    },
+    "notAutomaticallyAdopted": "不把高错误率当能力差，也不把上游0.7作为本产品诊断/普遍无效线；时序容差和统计最低N待研究冻结"
+  },
+  "rawDataProposal": {
+    "core": [
+      "frozen task/config/profile/report/presentation identities and actual reference bindings",
+      "session/submission/attemptEpoch/seed and randomization algorithm",
+      "stimulusId/hash/type/pairId/sourceBlockIndex/first/repeat indices/actual lag",
+      "image and ISI actual onset/end clocks, first seen response, phase attribution, all bounded input events",
+      "device class and actual input axes, viewport/DPR/geometry/language and measurement source",
+      "quality summaries/exclusion reasons/denominators/frozen gated report"
+    ],
+    "researchRawCos": [
+      "complete frame times",
+      "full manifest/sequence and asset hash list",
+      "database-core frozen snapshot and field dictionary"
+    ],
+    "resourcePolicy": "浏览器计时和响应，逐trial边界本机持久化；无逐帧API/DB；DB-COS平台合同仍未实现"
+  },
+  "previewSyntheticResults": {
+    "profile": "experience",
+    "source": "synthetic_design_fixture_not_measured",
+    "plannedPresentations": 100,
+    "targetFirstValid": 20,
+    "targetRepeatValid": 20,
+    "targetRepeatSeen": 16,
+    "targetFirstSeen": 5,
+    "hitRate": 0.8,
+    "falseAlarmRate": 0.25,
+    "correctedRecognitionRate": 0.55,
+    "fillerFirst": 54,
+    "vigilanceRepeat": 6,
+    "limited": {
+      "receivedPresentations": 82,
+      "expectedPresentations": 100,
+      "completeTargetPairs": 17,
+      "expectedTargetPairs": 20,
+      "hitRate": null,
+      "falseAlarmRate": null,
+      "correctedRecognitionRate": null
+    },
+    "invalid": {
+      "hitRate": null,
+      "falseAlarmRate": null,
+      "correctedRecognitionRate": null
+    },
+    "research": {
+      "targetFirstValid": 60,
+      "targetRepeatValid": 60,
+      "targetRepeatSeen": 48,
+      "targetFirstSeen": 15,
+      "hitRate": 0.8,
+      "falseAlarmRate": 0.25,
+      "correctedRecognitionRate": 0.55,
+      "fillerFirst": 124,
+      "vigilanceRepeat": 16,
+      "limitedReceived": 218,
+      "limitedCompletePairs": 54
+    },
+    "negativeExperience": {
+      "targetFirstValid": 20,
+      "targetRepeatValid": 20,
+      "targetRepeatSeen": 6,
+      "targetFirstSeen": 10,
+      "hitRate": 0.3,
+      "falseAlarmRate": 0.5,
+      "correctedRecognitionRate": -0.2
+    }
+  },
+  "versionImpact": {
+    "assessment": "输入、指导/练习、几何、素材、序列/lag及个人计分定义均须独立冻结；相对上游是本项目变式",
+    "parametersReferences": "双profile及清楚四类规则；无normVersion虚构字段，无常模",
+    "report": "中英文本/可选一张小结图/EDUK12.TOP，和数据语义独立版本；图文只用获准投影",
+    "draftProposalRevision": "仅本提案revision，不宣称当前DB已有这些发行版本"
+  },
+  "decisionsPending": [
+    {
+      "id": "R01",
+      "topic": "生产素材库",
+      "proposal": "选择至少184张研究版正式有权图及与正式池分离的练习图，逐项哈希/许可/作者记录",
+      "blocking": "编码真实内容前；占位SVG不能替代"
+    },
+    {
+      "id": "R02",
+      "topic": "短版100呈现与比例/lag差异",
+      "proposal": "targetNum20，其余生成参数保留；明确不是严格只改次数/等值",
+      "blocking": "协议冻结前，需用户接受或另设计"
+    },
+    {
+      "id": "R03",
+      "topic": "ISI归属与指导",
+      "proposal": "把紧随ISI并入上一图，指令明示可在该短间隔回应；边界用半开窗口",
+      "blocking": "协议冻结前"
+    },
+    {
+      "id": "R04",
+      "topic": "触屏与几何",
+      "proposal": "单seen大按钮；固定300 CSS图像区；承认与512px上游及物理角度未知的差异",
+      "blocking": "预览确认前"
+    },
+    {
+      "id": "R05",
+      "topic": "新增8呈现练习",
+      "proposal": "练习池分离、保留原时序、无任意通过率线",
+      "blocking": "预览/协议确认前"
+    },
+    {
+      "id": "R06",
+      "topic": "个体分母/质量与0.7规则",
+      "proposal": "target-only成对分母，填充/警觉分开，0.7不自动采用",
+      "blocking": "scorer与报告冻结前"
+    },
+    {
+      "id": "R07",
+      "topic": "显示时序与最小数据量",
+      "proposal": "真实设备试点后冻结容差/个人解释门槛；不因无成熟常模无限推迟研发",
+      "blocking": "正式施测准入/解释前"
+    },
+    {
+      "id": "R08",
+      "topic": "fixedOrder=false开关与实际重复顺序",
+      "proposal": "保留已核默认参数和实际顺序；若要求更大随机候选池，需单独改变参数/协议并确认，不能静默优化。",
+      "blocking": "协议冻结前，现有结论为静态推导，尚无第三方执行证明。"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "extends": "/workspace/eduK12-new-version/server-version/backend/tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "incremental": false
+  },
+  "files": [
+    "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/mot/package.ts",
+    "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/mot/metadata.ts",
+    "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/task-resource.ts",
+    "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/profile-freeze.ts",
+    "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/session.service.ts",
+    "/workspace/eduK12-new-version/server-version/backend/src/__tests__/cognitive/mot-report-format.test.ts",
+    "/workspace/eduK12-new-version/server-version/backend/src/middleware/auth.ts"
+  ],
+  "include": [],
+  "exclude": []
+}

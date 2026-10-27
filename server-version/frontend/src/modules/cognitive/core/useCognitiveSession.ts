@@ -7,7 +7,10 @@ import {
   writeSessionLedger,
 } from './session-ledger'
 import { initialRunnerState, runnerReducer } from './runner.state'
-import type { RunnerError, RunnerState } from './runner.types'
+import { assertNativeSession, nativeCoreReceipt, nativeCompletedReceipt } from './native-session-contract'
+import { standaloneCognitiveDraftKey } from './native-enumeration-draft-key'
+import { finishCognitiveCoreDraft, requireCognitiveDurability, sealCognitiveArchive, cognitiveRawDigest } from './raw-archive'
+import type { CognitiveNativeHost, RunnerError, RunnerState } from './runner.types'
 import { wrapCognitiveTrial } from './trial-envelope'
 import type { AdministrationProvenanceV1, CognitiveAdministrationMode } from './administration-provenance'
 import { reconcileDeviceClass } from './administration-provenance'
@@ -24,6 +27,8 @@ import { checkpointId, type CheckpointBatch } from '../../../services/persistenc
 import { useCheckpointLifecycle } from '../../../services/persistence/flushLifecycle'
 import {
   createFinalDraftMeta,
+  assertFinalDraftWriteIdentity,
+  type FinalDraftWriteIdentity,
   finalDraftStore,
   trainingCognitiveDraftKey,
 } from '../../../services/persistence/finalDraftStore'
@@ -40,9 +45,10 @@ const trainingBinding = (session: CognitiveSession) => {
   }
   return binding
 }
-const cognitiveDraftKey = (session: CognitiveSession) => {
+export const cognitiveDraftKey = (session: CognitiveSession) => {
   const binding = trainingBinding(session)
-  return binding ? trainingCognitiveDraftKey(binding) : `cognitive:${session.sessionId}`
+  if (binding) return trainingCognitiveDraftKey(binding)
+  return standaloneCognitiveDraftKey(session)
 }
 
 interface CognitiveCheckpointPayload {
@@ -121,8 +127,14 @@ const mergeAdministrationProvenance = (
   }
 }
 
+interface NativeCompletionGuard {session:CognitiveSession;expected:FinalDraftWriteIdentity;assertCurrent:()=>void}
+const nativeHostIdentity=(session:CognitiveSession|null)=>session?.nativeTask?JSON.stringify([
+ session.sessionId,session.attemptEpoch,session.sessionEpoch,session.definitionHash,session.protocolSignature,
+ session.engineVersion,session.scoringVersion,session.configVersion,session.randomSeed]):null
+
 export interface CognitiveSessionController {
   state: RunnerState
+  nativeHost: CognitiveNativeHost
   start: () => void
   appendTrial: (payload: Record<string, unknown>) => Promise<boolean>
   complete: (administrationProvenance?: AdministrationProvenanceV1) => Promise<void>
@@ -136,6 +148,7 @@ export function useCognitiveSession(
   options: { aggregateOnly?: boolean; failClosedOnTrialPersistence?: boolean } = {},
 ): CognitiveSessionController {
   const [state, dispatch] = useReducer(runnerReducer, initialRunnerState)
+  const hostLife=useRef({active:true,generation:0})
   const trainingLease = useRef<{ controller: AbortController; holds: Map<string, Promise<() => void>>; cleaned: boolean }>({
     controller: new AbortController(), holds: new Map(), cleaned: false,
   })
@@ -183,20 +196,30 @@ export function useCognitiveSession(
   )
 
   const load = useCallback(async () => {
+    const loadGeneration=++hostLife.current.generation
+    const currentLoad=()=>hostLife.current.active&&hostLife.current.generation===loadGeneration&&sessionIdRef.current===sessionId
     const lease = trainingLease.current
+    if(!currentLoad())return
     dispatch({ type: 'LOADING' })
     try {
       const response = await api.getSession(sessionId)
       if (response.code !== 0 || !response.data) {
+        if(!currentLoad())return
         dispatch({ type: 'SESSION_ERROR', error: { code: 'NOT_FOUND', message: '测评不存在或不可访问' } })
         return
       }
-      if (lease.controller.signal.aborted) return
+      if (lease.controller.signal.aborted || !currentLoad()) return
       const session: CognitiveSession = response.data
+      if (session.nativeTask) {
+        assertNativeSession(session)
+        if (!api.archiveRaw || options.aggregateOnly || api.localDraftScope) throw new Error('当前入口尚不支持此认知测验')
+        requireCognitiveDurability()
+      }
 
       if (session.deliveryMode === 'FINAL_ONLY') {
         const submitFinal = api.submitFinal
         if (!submitFinal || !session.definitionHash) {
+          if(!currentLoad())return
           dispatch({ type: 'SESSION_ERROR', error: { code: 'DEFINITION_MISMATCH', message: '该认知测评缺少可恢复的冻结定义，请重启后重试' } })
           return
         }
@@ -205,15 +228,18 @@ export function useCognitiveSession(
         if (retention) {
           if (!lease.holds.has(draftKey)) lease.holds.set(draftKey, holdTrainingCognitiveDraft(retention, lease.controller.signal))
           await lease.holds.get(draftKey)
-          if (lease.controller.signal.aborted) return
+          if (lease.controller.signal.aborted || !currentLoad()) return
           if (!lease.cleaned) {
             lease.cleaned = true
             await cleanupExpiredTrainingCognitiveDrafts()
-            if (lease.controller.signal.aborted) return
+            if (lease.controller.signal.aborted || !currentLoad()) return
           }
         }
         if (session.status === 'COMPLETED') {
-          await finalDraftStore.delete(draftKey).catch(() => undefined)
+          const savedMeta = await finalDraftStore.get(draftKey)
+          if (session.nativeTask && savedMeta?.cognitiveRawArchive) nativeCompletedReceipt(session, savedMeta)
+          if(savedMeta)await finishCognitiveCoreDraft(draftKey,finalDraftStore,session.nativeTask?savedMeta:undefined).catch(() => undefined)
+          if(!currentLoad())return
           dispatch({ type: 'SESSION_LOADED', session, trialIndex: 0 })
           return
         }
@@ -231,11 +257,14 @@ export function useCognitiveSession(
             ...(api.localDraftScope === 'survey-cognitive'
               ? { surveyRetention: { schemaVersion: 1 as const, lastWriteAt: Date.now() } } : {}),
           }))
+          if(!currentLoad())return
           if (meta.status === 'CONFLICT') {
+            if(!currentLoad())return
             dispatch({ type: 'RECOVERY_REQUIRED', session })
             return
           }
           if (session.status !== 'IN_PROGRESS') {
+            if(!currentLoad())return
             dispatch({ type: 'SESSION_ERROR', error: { code: session.status, message: '该测评已失效' } })
             return
           }
@@ -243,12 +272,14 @@ export function useCognitiveSession(
             try {
               await runFinalDraftCapacityRetry({
                 onRetry: async ({ error }) => {
+                  if(!currentLoad())throw Error('测验身份已变化')
                   await finalDraftStore.setStatus(draftKey, 'RETRY_PENDING', {
                     code: String((error as { code?: unknown })?.code || 'ASSESSMENT_SUBMIT_BUSY'),
                     message: friendlyError(error).message,
-                  }).catch(() => undefined)
+                  },session.nativeTask?meta:undefined).catch(() => undefined)
                 },
                 operation: async () => {
+                  if(!currentLoad())throw Error('测验身份已变化')
                   const next = await submitFinal(
                     session.sessionId,
                     meta.sealedSubmission!.payload as Parameters<typeof submitFinal>[1],
@@ -257,27 +288,34 @@ export function useCognitiveSession(
                   return next
                 },
               })
+              if(!currentLoad())return
               const terminal = await api.getSession(sessionId)
+              if(!currentLoad())return
               if (terminal.code === 0 && terminal.data?.status === 'COMPLETED') {
-                await finalDraftStore.setStatus(draftKey, 'COMPLETED').catch(() => undefined)
-                await finalDraftStore.delete(draftKey).catch(() => undefined)
+                if (session.nativeTask) nativeCompletedReceipt(terminal.data, meta)
+                await finishCognitiveCoreDraft(draftKey,finalDraftStore,session.nativeTask?meta:undefined).catch(() => undefined)
+                if(!currentLoad())return
                 dispatch({ type: 'SESSION_LOADED', session: terminal.data, trialIndex: 0 })
                 return
               }
+              if(!currentLoad())return
               dispatch({
                 type: 'SESSION_ERROR',
                 error: { code: 'FINAL_SUBMISSION_PENDING', message: '提交已发送但服务器终态暂未确认，请稍后重试核对。' },
               })
               return
             } catch (error) {
+              if(!currentLoad())return
               const status = finalDraftErrorStatus(error)
               await finalDraftStore.setStatus(draftKey, status, {
                 code: String((error as { code?: unknown })?.code ?? ''),
                 message: friendlyError(error).message,
-              }).catch(() => undefined)
+              },session.nativeTask?meta:undefined).catch(() => undefined)
               if (status === 'CONFLICT') {
+                if(!currentLoad())return
                 dispatch({ type: 'RECOVERY_REQUIRED', session })
               } else {
+                if(!currentLoad())return
                 dispatch({
                   type: 'SESSION_ERROR',
                   error: { code: 'FINAL_SUBMISSION_PENDING', message: '已封存提交仍未确认，请稍后重试核对。' },
@@ -287,6 +325,7 @@ export function useCognitiveSession(
             }
           }
           if (meta.status !== 'DRAFT') {
+            if(!currentLoad())return
             dispatch({
               type: 'SESSION_ERROR',
               error: {
@@ -298,9 +337,11 @@ export function useCognitiveSession(
           }
           const trials = await finalDraftStore.listTrials(draftKey)
           const nextTrialIndex = trials.reduce((max, trial) => Math.max(max, trial.trialIndex + 1), 0)
+          if(!currentLoad())return
           dispatch({ type: 'SESSION_LOADED', session, trialIndex: nextTrialIndex })
         } catch (error) {
           const recoveryError = friendlyError(error)
+          if(!currentLoad())return
           dispatch(recoveryError.code === 'FINAL_DRAFT_EXPIRED'
             ? { type: 'RECOVERY_REQUIRED', session, error: recoveryError }
             : { type: 'SESSION_ERROR', error: recoveryError })
@@ -309,6 +350,7 @@ export function useCognitiveSession(
       }
 
       if (session.deliveryMode === 'LEGACY') {
+        if(!currentLoad())return
         dispatch({ type: 'LEGACY_READ_ONLY', session })
         return
       }
@@ -320,14 +362,17 @@ export function useCognitiveSession(
       })
 
       if (session.status === 'COMPLETED') {
+        if(!currentLoad())return
         dispatch({ type: 'SESSION_LOADED', session, trialIndex: 0 })
         return
       }
       if (session.status !== 'IN_PROGRESS') {
+        if(!currentLoad())return
         dispatch({ type: 'SESSION_ERROR', error: { code: session.status, message: '该测评已失效' } })
         return
       }
       if (!resolveRunner(session.testType, session.engineVersion)) {
+        if(!currentLoad())return
         dispatch({ type: 'RUNNER_UNSUPPORTED' })
         return
       }
@@ -338,6 +383,7 @@ export function useCognitiveSession(
         return Math.max(nextIndex, payload.trialIndex + 1)
       }, 0)
       if (!ledger && session.nextTrialIndex === undefined && pendingNextTrialIndex === 0) {
+        if(!currentLoad())return
         dispatch({ type: 'RECOVERY_REQUIRED', session })
         return
       }
@@ -347,20 +393,23 @@ export function useCognitiveSession(
         pendingNextTrialIndex,
       )
       writeSessionLedger(sessionId, { status: session.status, trialIndex: trialIndex - 1 })
+      if(!currentLoad())return
       dispatch({ type: 'SESSION_LOADED', session, trialIndex })
       void checkpointScheduler.flush('cognitive', sessionId).catch((err) => {
+        if(!currentLoad())return
         dispatch({ type: 'TRIAL_SUBMIT_FAILED', error: friendlyError(err) })
       })
     } catch (err) {
+      if(!currentLoad())return
       dispatch({ type: 'SESSION_ERROR', error: friendlyError(err) })
     }
-  }, [api, cognitiveCheckpointTransport, handleCheckpointError, sessionId])
-
+  }, [api, cognitiveCheckpointTransport, handleCheckpointError, sessionId, options.aggregateOnly])
   useEffect(() => {
     const lease = { controller: new AbortController(), holds: new Map<string, Promise<() => void>>(), cleaned: false }
     trainingLease.current = lease
+    hostLife.current.active=true
     void load()
-    return () => { lease.controller.abort() }
+    return () => { hostLife.current.active=false;hostLife.current.generation++;lease.controller.abort() }
   }, [load])
 
   const start = useCallback(() => {
@@ -418,29 +467,32 @@ export function useCognitiveSession(
     [cognitiveCheckpointTransport, handleCheckpointError, options.failClosedOnTrialPersistence, sessionId]
   )
 
-  const complete = useCallback(async (administrationProvenance?: AdministrationProvenanceV1) => {
+  const complete = useCallback(async (administrationProvenance?: AdministrationProvenanceV1,nativeGuard?:NativeCompletionGuard) => {
+    nativeGuard?.assertCurrent()
+    const checked=async<T,>(promise:Promise<T>):Promise<T>=>{const value=await promise;nativeGuard?.assertCurrent();return value}
     if (stateRef.current.status === 'RECOVERY_REQUIRED') return
     dispatch({ type: 'COMPLETE_START' })
     let finalDraftKey: string | null = null
     try {
-      const session = stateRef.current.session
+      const session = nativeGuard?.session ?? stateRef.current.session
       if (session?.deliveryMode === 'FINAL_ONLY') {
         const submitFinal = api.submitFinal
         if (!submitFinal || !session.definitionHash) throw new Error('该认知测评无法提交：缺少冻结定义')
         const draftKey = cognitiveDraftKey(session)
         finalDraftKey = draftKey
-        const currentMeta = await finalDraftStore.get(draftKey)
+        const currentMeta = await checked(finalDraftStore.get(draftKey))
         if (!currentMeta) throw new Error('本地认知草稿不存在，请重启测评')
+        assertFinalDraftWriteIdentity(currentMeta,nativeGuard?.expected)
         let sealProvenance = readCognitiveAdministrationProvenance(currentMeta.instrumentMetadata) ?? undefined
         if (!currentMeta.sealedSubmission) {
           sealProvenance = mergeAdministrationProvenance(sealProvenance ?? null, administrationProvenance)
-          if (sealProvenance) {
+          if (sealProvenance && !nativeGuard) {
             await finalDraftStore.setInstrumentMetadata(draftKey, {
               [COGNITIVE_ADMINISTRATION_PROVENANCE_METADATA_KEY]: sealProvenance,
             }).catch(() => null)
           }
         }
-        const sealed = await finalDraftStore.sealForSubmission(draftKey, (snapshot) => {
+        const sealed = await checked(finalDraftStore.sealForSubmission(draftKey, (snapshot) => {
           if (snapshot.trials.length === 0) throw new Error('尚未记录任何认知试次')
           const finalProvenance = readCognitiveAdministrationProvenance(snapshot.meta.instrumentMetadata)
             ?? sealProvenance
@@ -452,24 +504,26 @@ export function useCognitiveSession(
             trials: snapshot.trials.map((trial) => trial.payload),
             ...(finalProvenance ? { administrationProvenance: finalProvenance } : {}),
           }
-        })
+        },nativeGuard?.expected))
         if (!sealed) throw new Error('本地认知草稿不存在，请重启测评')
-        const response = await runFinalDraftCapacityRetry({
+        const response = await checked(runFinalDraftCapacityRetry({
           onRetry: async ({ error }) => {
-            await finalDraftStore.setStatus(draftKey, 'RETRY_PENDING', {
+            nativeGuard?.assertCurrent()
+            await checked(finalDraftStore.setStatus(draftKey, 'RETRY_PENDING', {
               code: String((error as { code?: unknown })?.code || 'ASSESSMENT_SUBMIT_BUSY'),
               message: friendlyError(error).message,
-            }).catch(() => undefined)
+            },nativeGuard?.expected).catch(() => undefined))
           },
           operation: async () => {
-            const next = await submitFinal(session.sessionId, sealed.payload)
+            nativeGuard?.assertCurrent()
+            const next = await checked(submitFinal(session.sessionId, sealed.payload))
             if (next.code !== 0 || !next.data) throw responseError(next)
             return next
           },
-        })
+        }))
+        if (session.nativeTask) coreReceiptRef.current = nativeCoreReceipt(session, currentMeta, response.data)
         if ((options.aggregateOnly || (response.data as any).feedbackDeferred === true) && (response.data as any).completed === true) {
-          await finalDraftStore.setStatus(draftKey, 'COMPLETED')
-          await finalDraftStore.delete(draftKey)
+          await checked(finishCognitiveCoreDraft(draftKey,finalDraftStore,nativeGuard?.expected).catch(() => undefined))
           dispatch({
             type: 'SESSION_LOADED',
             session: { ...session, status: 'COMPLETED' },
@@ -491,8 +545,7 @@ export function useCognitiveSession(
               }
             : null)
         if (!result) throw new Error('服务器未返回认知测评结果')
-        await finalDraftStore.setStatus(draftKey, 'COMPLETED')
-        await finalDraftStore.delete(draftKey)
+        await checked(finishCognitiveCoreDraft(draftKey,finalDraftStore,nativeGuard?.expected).catch(() => undefined))
         dispatch({ type: 'COMPLETE_SUCCESS', result })
         return
       }
@@ -514,26 +567,28 @@ export function useCognitiveSession(
       writeSessionLedger(sessionId, { status: 'COMPLETED', trialIndex: -1 })
       dispatch(result ? { type: 'COMPLETE_SUCCESS', result } : { type: 'COMPLETE_FAILED', error: { code: 'NO_RESULT', message: '服务器未返回结果' } })
     } catch (err) {
+      nativeGuard?.assertCurrent()
       if (finalDraftKey) {
-        const currentMeta = await finalDraftStore.get(finalDraftKey).catch(() => null)
+        const currentMeta = await checked(finalDraftStore.get(finalDraftKey).catch(() => null))
+        if(currentMeta)assertFinalDraftWriteIdentity(currentMeta,nativeGuard?.expected)
         if (currentMeta?.sealedSubmission) {
-          const terminal = await api.getSession(sessionId).catch(() => null)
+          const terminal = await checked(api.getSession(sessionId).catch(() => null))
           if (terminal?.code === 0 && terminal.data?.status === 'COMPLETED') {
-            await finalDraftStore.setStatus(finalDraftKey, 'COMPLETED').catch(() => undefined)
-            await finalDraftStore.delete(finalDraftKey).catch(() => undefined)
+            if (terminal.data.nativeTask) coreReceiptRef.current = nativeCompletedReceipt(terminal.data, currentMeta)
+            await checked(finishCognitiveCoreDraft(finalDraftKey,finalDraftStore,nativeGuard?.expected).catch(() => undefined))
             dispatch({ type: 'SESSION_LOADED', session: terminal.data, trialIndex: 0 })
             return
           }
           const draftStatus = finalDraftErrorStatus(err)
-          await finalDraftStore.setStatus(finalDraftKey, draftStatus, {
+          await checked(finalDraftStore.setStatus(finalDraftKey, draftStatus, {
             code: String((err as { code?: number | string })?.code ?? ''),
             message: friendlyError(err).message,
-          }).catch(() => undefined)
+          },nativeGuard?.expected).catch(() => undefined))
           if (draftStatus === 'CONFLICT') {
             dispatch({ type: 'FINAL_SUBMIT_CONFLICT', error: friendlyError(err) })
           } else {
             dispatch({
-              type: 'SESSION_ERROR',
+              type: stateRef.current.session?.nativeTask ? 'COMPLETE_FAILED' : 'SESSION_ERROR',
               error: { code: 'FINAL_SUBMISSION_PENDING', message: '提交已封存但服务器终态暂未确认，请稍后重试核对。' },
             })
           }
@@ -551,6 +606,7 @@ export function useCognitiveSession(
   }, [load])
 
   const restart = useCallback(async (): Promise<CognitiveSession | null> => {
+    hostLife.current.generation++
     if (stateRef.current.session?.trainingPersistence?.attemptId) {
       throw new Error('请返回上层综合测评并从那里处理恢复')
     }
@@ -563,11 +619,63 @@ export function useCognitiveSession(
     if ('recoveryToken' in payload && payload.recoveryToken) {
       saveCognitiveRecoveryCredential(nextSession.sessionId, payload.recoveryToken)
     }
+    // The authorized restart can reuse its session URL; reload the new enum epoch explicitly.
+    if(nextSession.sessionId===sessionId&&nextSession.nativeTask&&nextSession.testType==='enumeration'
+      &&nextSession.engineVersion==='0.2.0')await load()
     return nextSession
-  }, [api, sessionId])
+  }, [api, sessionId, load])
 
+  const coreReceiptRef = useRef<Awaited<ReturnType<CognitiveNativeHost['complete']>> | null>(null)
+  // Each published port owns the render's frozen identity, never a later stateRef session.
+  const boundSession=state.session?.nativeTask?state.session:null
+  const boundGeneration=hostLife.current.generation,boundIdentity=nativeHostIdentity(boundSession)
+  const currentHost=()=>hostLife.current.active&&hostLife.current.generation===boundGeneration
+    &&sessionIdRef.current===sessionId&&boundIdentity!==null&&nativeHostIdentity(stateRef.current.session)===boundIdentity
+  const assertHost=()=>{if(!currentHost())throw Error('测验身份已变化')}
+  const checkedHost=async<T,>(promise:Promise<T>):Promise<T>=>{const value=await promise;assertHost();return value}
+  const boundMeta=async()=>{
+    assertHost();const session=boundSession!;assertNativeSession(session)
+    const meta=await checkedHost(finalDraftStore.get(cognitiveDraftKey(session)))
+    if(!meta||meta.attemptId!==session.sessionId||meta.attemptEpoch!==session.attemptEpoch||meta.definitionHash!==session.definitionHash)
+      throw Error('本地测验身份不一致')
+    return meta
+  }
+  const nativeHost: CognitiveNativeHost = {
+    appendEnvelope: async (envelope) => {
+      assertHost();const session=boundSession!;requireCognitiveDurability()
+      const meta=await boundMeta(),index=envelope.trialIndex,key=meta.draftKey
+      if (!Number.isSafeInteger(index) || Number(index) < 0 || envelope.schemaVersion !== 1) throw new Error('试次记录格式不正确')
+      const existing=(await checkedHost(finalDraftStore.listTrials(key))).find(t=>t.trialIndex===index)
+      if (existing) {
+        if (cognitiveRawDigest(existing.payload)!==cognitiveRawDigest(envelope)) throw new Error('原试次记录不允许替换')
+        return true
+      }
+      if (index!==stateRef.current.trialIndex || !['RUNNING','SUBMITTING_TRIAL'].includes(stateRef.current.status)) throw new Error('试次次序不一致')
+      dispatch({type:'TRIAL_SUBMIT_START'})
+      try {
+        await checkedHost(finalDraftStore.putTrial({draftKey:key,trialIndex:Number(index),payload:structuredClone(envelope),createdAt:Date.now()},meta))
+        dispatch({type:'TRIAL_SUBMIT_SUCCESS',trialIndex:Number(index)}); return true
+      } catch(error) { if(currentHost())dispatch({type:'TRIAL_SUBMIT_FAILED',error:friendlyError(error)});throw error }
+    },
+    sealRaw: async (rawPayload) => {
+      const meta=await boundMeta()
+      await checkedHost(sealCognitiveArchive(meta.draftKey,rawPayload,finalDraftStore,meta))
+    },
+    complete: async (provenance) => {
+      const meta=await boundMeta(),session=boundSession!
+      if(!meta.cognitiveRawArchive)throw Error('原件尚未封存')
+      await checkedHost(complete(provenance,{session,expected:meta,assertCurrent:assertHost}))
+      const receipt=coreReceiptRef.current
+      if(receipt&&receipt.sessionId===sessionId&&receipt.attemptEpoch===meta.attemptEpoch&&receipt.submissionId===meta.submissionId)return receipt
+      const terminal=await checkedHost(api.getSession(sessionId))
+      if(terminal.code!==0||!terminal.data)throw Error('服务器尚未确认本次提交成功')
+      const confirmed=nativeCompletedReceipt(terminal.data,meta)
+      await checkedHost(finishCognitiveCoreDraft(meta.draftKey,finalDraftStore,meta).catch(() => undefined));coreReceiptRef.current=confirmed
+      dispatch({type:'SESSION_LOADED',session:terminal.data,trialIndex:0});return confirmed
+    },
+  }
   const stateRef = useRef(state)
   stateRef.current = state
 
-  return { state, start, appendTrial, complete, restart, reload }
+  return { state, nativeHost, start, appendTrial, complete, restart, reload }
 }

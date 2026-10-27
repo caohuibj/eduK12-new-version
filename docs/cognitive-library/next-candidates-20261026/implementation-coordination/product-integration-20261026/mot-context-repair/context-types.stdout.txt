@@ -1,0 +1,1 @@
+MOT C-02 actual tsconfig changed-entry closure: PASS (3 roots, noEmit)

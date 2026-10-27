@@ -1,0 +1,787 @@
+{
+  "artifactKind": "ANT_FRONTEND_CANDIDATE_LOCAL_EVIDENCE",
+  "candidateId": "attention-ant-pebl",
+  "status": "TARGETED_LOCAL_CLOUD_CHECKS_PASS_UNREGISTERED",
+  "recordedAt": "2026-10-26T07:43:31.575123+00:00",
+  "branch": "cognitive-next-three-core-20261026",
+  "priorSafetySnapshot": {
+    "head": "94152032885d5cbaf149a15ec03d5a0c72ea2c67",
+    "tree": "a8b69c99eebf966e0f5c8e51f8c21314f62a85f7",
+    "readBackByParent": true,
+    "note": "Parent owns Git remote verification; this agent did not commit/push"
+  },
+  "execution": {
+    "cwd": "/workspace/eduK12-new-version",
+    "os": "cloud Linux 6.18.55 x86_64",
+    "cpuLimit": 4,
+    "memoryLimitBytes": 17179869184,
+    "node": "24.21.0",
+    "nodeExecutable": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node",
+    "maxWorkers": 1,
+    "installedDependencies": false,
+    "macFilesTerminalBrowserUsed": false,
+    "browser": "cloud /usr/bin/chromium headless chromiumSandbox=true",
+    "formalCI": false,
+    "registered": false,
+    "deployed": false
+  },
+  "sourceHashes": [
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/ant/AntReportCard.tsx",
+      "sha256": "1e3747000eb1025dd81e5789559dbc0c52e6b5140e9bbfe15edc19df4f89a162"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/ant/AntTask.test.tsx",
+      "sha256": "0c7e6848354dc31a667cc8023a23127aea3a682021bd6c2286851e8cfd90db22"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/ant/AntTask.tsx",
+      "sha256": "ef5e970714895db6a37a9b9d9b76a5e98e3d542f06ee37c263f961edc435e712"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/ant/ant.css",
+      "sha256": "c9f5df2248708e9444629d384a972837f279e780d9f8bb67961e8b0f6458ffc4"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/ant/capture.test.ts",
+      "sha256": "20dc2d3327854f6e2e2f2e5945ace00970b69257ce190c564f0f3c85f5387a5a"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/ant/capture.ts",
+      "sha256": "3ea2e3dcd4bdc7010b209b4edf980b67d2572bf4560487e0c4d3994faefe5f90"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/ant/display.ts",
+      "sha256": "6046840499f49662756f48c56a435deec06db6f892c4c9908e5a41c75498cd5a"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/ant/generated/protocol.ts",
+      "sha256": "3792e7a94f6be7e19c9d496cafa380412c1760242e8a76c5cd9d064153c78cc9"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/ant/generated/report.ts",
+      "sha256": "371c1834ad1a63ba8962b21173c6a399c398f5d40b5d254077b5da0502814326"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/ant/local-save.ts",
+      "sha256": "ce23b298a385435a122bdc1992c21401490f4637ce7946fd9ba6ab9e3cba8219"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/ant/paint.ts",
+      "sha256": "d4a43342fa73c7e591901a7411d04304d7d5b70e63e85514035589ea86438ef3"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/ant/seal.ts",
+      "sha256": "5c0e39ea3cf60286ba37db5a89fcc21319f46ba980dd9f08b589ad595692b029"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/ant/session.test.ts",
+      "sha256": "c7f66c2dbeb694d898992d6da34a459cbe859a6ade7d0bdb6f7729d616483f2e"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/ant/session.ts",
+      "sha256": "6bb06eb510d0e2948d88b07c8922edf37675414ffd8000b2b651e22b89d2d3d1"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/ant/test-fixtures.ts",
+      "sha256": "5f727f76b8249281d282354d6a913faab33ee173b01b9f54b01b077c9897acb4"
+    },
+    {
+      "file": "server-version/scripts/cognitive/ant-content.cjs",
+      "sha256": "0cc449ba248cc9a241d3a4cfe2bf2e29b7cad012979782582a6366f04b92b2fe"
+    }
+  ],
+  "historicalSourceBinding9415203": {
+    "server-version/frontend/src/modules/cognitive/tasks/ant/AntReportCard.tsx": "3e8c88b885a2ca147a1da350eeb0cda256ffa67fc5b20f4bf04c77e1f34d8809",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/AntTask.test.tsx": "f0cfef3f05de42002b3bf4fe64c900b52ec6c4472fa5126d4eb42c146a0abbf9",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/AntTask.tsx": "bc35b6273cd3815788873de981d427cbbb35aad09ce31158429e3f4c9a588fb0",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/ant.css": "c9f5df2248708e9444629d384a972837f279e780d9f8bb67961e8b0f6458ffc4",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/capture.test.ts": "20dc2d3327854f6e2e2f2e5945ace00970b69257ce190c564f0f3c85f5387a5a",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/capture.ts": "3ea2e3dcd4bdc7010b209b4edf980b67d2572bf4560487e0c4d3994faefe5f90",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/display.ts": "6046840499f49662756f48c56a435deec06db6f892c4c9908e5a41c75498cd5a",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/generated/protocol.ts": "3792e7a94f6be7e19c9d496cafa380412c1760242e8a76c5cd9d064153c78cc9",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/generated/report.ts": "371c1834ad1a63ba8962b21173c6a399c398f5d40b5d254077b5da0502814326",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/local-save.ts": "ce23b298a385435a122bdc1992c21401490f4637ce7946fd9ba6ab9e3cba8219",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/paint.ts": "d4a43342fa73c7e591901a7411d04304d7d5b70e63e85514035589ea86438ef3",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/seal.ts": "5c0e39ea3cf60286ba37db5a89fcc21319f46ba980dd9f08b589ad595692b029",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/session.test.ts": "c0c2df9c4a6c13ffc017334080a6b4707f9163b9529cc96ea36fbfee8977bd8c",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/session.ts": "1b30fb429d31f118b6e29559afe999fa3dec5a7befe9d822a12b4cae60d69fed",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/test-fixtures.ts": "5f727f76b8249281d282354d6a913faab33ee173b01b9f54b01b077c9897acb4",
+    "server-version/scripts/cognitive/ant-content.cjs": "0cc449ba248cc9a241d3a4cfe2bf2e29b7cad012979782582a6366f04b92b2fe"
+  },
+  "historicalBindingCaveat": "9415203 preserves the candidate safety snapshot and raw historical artifacts. Not every early attempt executed that exact final tree; initial failure/partial runs are retained as history, while accepted unchanged paths and subsequent focused fixes are enumerated. No retrospective claim of signed execution.",
+  "backendProjectionSources": [
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/ant/protocol.ts",
+      "sha256": "eec480585323197971d147a29826e197aeda9c6a42dd8b82d9a6d084412a905b"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/ant/scorer.ts",
+      "sha256": "193c468841a6e71cc52470f0d327290830a9be377307d1841454e017be7dd856"
+    }
+  ],
+  "projectionCheck": {
+    "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node server-version/scripts/cognitive/ant-content.cjs --check",
+    "exitCode": 0,
+    "backendRuntimeBundled": false,
+    "generatedReportRuntimeBundled": false,
+    "bundleReviewMetafileSha256": "c544a4b13404f5764076018854feb84718f8f4da07eab4584078cb787722d4f4"
+  },
+  "testRuns": [
+    {
+      "file": "vitest-attempt1.json",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/vitest/vitest.mjs run src/modules/cognitive/tasks/ant/capture.test.ts src/modules/cognitive/tasks/ant/session.test.ts src/modules/cognitive/tasks/ant/AntTask.test.tsx --maxWorkers=1 --reporter=json --outputFile=/workspace/eduK12-new-version/docs/cognitive-library/next-candidates-20261026/ant/implementation/frontend/vitest-attempt1.json",
+      "cwd": "/workspace/eduK12-new-version/server-version/frontend",
+      "exitCode": 0,
+      "passed": 20,
+      "failed": 0,
+      "skipped": 0,
+      "totalInSelectedFiles": 20,
+      "startTimeUnixMs": 1792998160106,
+      "scope": "Only two files actually existed: 20 pass. Initial UI write had wrong cwd; do not claim three-file coverage.",
+      "sha256": "ba894110f62eb49f83ec7c109d0c77042514d6a04de5b2da4d6d84995f2a9e55"
+    },
+    {
+      "file": "vitest-ui-attempt1.json",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/vitest/vitest.mjs run src/modules/cognitive/tasks/ant/AntTask.test.tsx --maxWorkers=1 --reporter=json --outputFile=/workspace/eduK12-new-version/docs/cognitive-library/next-candidates-20261026/ant/implementation/frontend/vitest-ui-attempt1.json",
+      "cwd": "/workspace/eduK12-new-version/server-version/frontend",
+      "exitCode": 1,
+      "passed": 6,
+      "failed": 1,
+      "skipped": 0,
+      "totalInSelectedFiles": 7,
+      "startTimeUnixMs": 1792998221575,
+      "scope": "6 pass/1 fail, real accessibility missing scope=row; preserved and fixed.",
+      "sha256": "bffb34cd10f0471d38f7fd6ab5c6866e057d0d6dd1dabb31aa2e19f3416d7540"
+    },
+    {
+      "file": "vitest-receipts-ui-attempt2.json",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/vitest/vitest.mjs run src/modules/cognitive/tasks/ant/session.test.ts src/modules/cognitive/tasks/ant/AntTask.test.tsx --maxWorkers=1 --reporter=json --outputFile=/workspace/eduK12-new-version/docs/cognitive-library/next-candidates-20261026/ant/implementation/frontend/vitest-receipts-ui-attempt2.json",
+      "cwd": "/workspace/eduK12-new-version/server-version/frontend",
+      "exitCode": 0,
+      "passed": 21,
+      "failed": 0,
+      "skipped": 0,
+      "totalInSelectedFiles": 21,
+      "startTimeUnixMs": 1792998385738,
+      "scope": "Affected receipt/final/freeze and UI paths after review; 21 pass; unchanged capture reused.",
+      "sha256": "06d7c93fec08ed40389def5361e66eb3fa8114c56aebd1a830cfddc20ff0258c"
+    },
+    {
+      "file": "vitest-approved-primitives.json",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/vitest/vitest.mjs run src/modules/cognitive/tasks/ant/capture.test.ts -t 'synchronously paints each cue' --maxWorkers=1 --reporter=json --outputFile=/workspace/eduK12-new-version/docs/cognitive-library/next-candidates-20261026/ant/implementation/frontend/vitest-approved-primitives.json",
+      "cwd": "/workspace/eduK12-new-version/server-version/frontend",
+      "exitCode": 0,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 8,
+      "totalInSelectedFiles": 9,
+      "startTimeUnixMs": 1792998637156,
+      "scope": "Only changed approved SVG primitive case rechecked, not all capture/session.",
+      "sha256": "548b4e816c3c0237b285ad32402fc70241c1166f7810981b91e1d337ba3ff505"
+    },
+    {
+      "file": "vitest-report-responsive.json",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/vitest/vitest.mjs run src/modules/cognitive/tasks/ant/AntTask.test.tsx -t 'shows only projected|limited and invalid|context mismatch' --maxWorkers=1 --reporter=json --outputFile=/workspace/eduK12-new-version/docs/cognitive-library/next-candidates-20261026/ant/implementation/frontend/vitest-report-responsive.json",
+      "cwd": "/workspace/eduK12-new-version/server-version/frontend",
+      "exitCode": 0,
+      "passed": 3,
+      "failed": 0,
+      "skipped": 4,
+      "totalInSelectedFiles": 7,
+      "startTimeUnixMs": 1792998986742,
+      "scope": "Only 3 responsive report cases; others reused.",
+      "sha256": "e57631caf4e9d204da91d4eac05b7a9c36bcd36cb8305c879863830fbf7ae429"
+    },
+    {
+      "file": "vitest-frozen-host-ui.json",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/vitest/vitest.mjs run src/modules/cognitive/tasks/ant/AntTask.test.tsx -t 'shows fixed left/right areas' --maxWorkers=1 --reporter=json --outputFile=/workspace/eduK12-new-version/docs/cognitive-library/next-candidates-20261026/ant/implementation/frontend/vitest-frozen-host-ui.json",
+      "cwd": "/workspace/eduK12-new-version/server-version/frontend",
+      "exitCode": 0,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 6,
+      "totalInSelectedFiles": 7,
+      "startTimeUnixMs": 1792999232101,
+      "scope": "Only frozen host inputMap/UI boundary rechecked.",
+      "sha256": "371721d35a506efb3c36c922b438161f72a9393da19de18fdb977083f4e20491"
+    },
+    {
+      "file": "vitest-participant-copy.json",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/vitest/vitest.mjs run src/modules/cognitive/tasks/ant/AntTask.test.tsx --maxWorkers=1 --reporter=json --outputFile=/workspace/eduK12-new-version/docs/cognitive-library/next-candidates-20261026/ant/implementation/frontend/vitest-participant-copy.json",
+      "cwd": "/workspace/eduK12-new-version/server-version/frontend",
+      "exitCode": 0,
+      "passed": 8,
+      "failed": 0,
+      "skipped": 0,
+      "totalInSelectedFiles": 8,
+      "startTimeUnixMs": 1793000015314,
+      "scope": "8 UI cases directly affected by copy/selectors, including new implementation-term diagnostic visibility case; current Task/Card copy accepted.",
+      "sha256": "49ae31d268fcd3cd43cc13b6e3eadd06e06b06c4ba26715448a906945d09613c"
+    },
+    {
+      "file": "vitest-post-stop-save-repro.json",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/vitest/vitest.mjs run src/modules/cognitive/tasks/ant/session.test.ts -t 'a deferred local failure after blur termination' --maxWorkers=1 --reporter=json --outputFile=/workspace/eduK12-new-version/docs/cognitive-library/next-candidates-20261026/ant/implementation/frontend/vitest-post-stop-save-repro.json",
+      "cwd": "/workspace/eduK12-new-version/server-version/frontend",
+      "exitCode": 1,
+      "passed": 0,
+      "failed": 1,
+      "skipped": 14,
+      "totalInSelectedFiles": 15,
+      "startTimeUnixMs": 1793000249490,
+      "scope": "New authorized repro before fix: expected error, got terminated; source/test binding retained separately.",
+      "sha256": "49205dfae5dfa9e3c4fa0d72fec322de5d2b8b2af361de67fd777e6e4b1a4ed7"
+    },
+    {
+      "file": "vitest-post-stop-save-fixed.json",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/vitest/vitest.mjs run src/modules/cognitive/tasks/ant/session.test.ts -t 'a deferred local failure after blur termination|save failure interrupts|closed contexts' --maxWorkers=1 --reporter=json --outputFile=/workspace/eduK12-new-version/docs/cognitive-library/next-candidates-20261026/ant/implementation/frontend/vitest-post-stop-save-fixed.json",
+      "cwd": "/workspace/eduK12-new-version/server-version/frontend",
+      "exitCode": 0,
+      "passed": 3,
+      "failed": 0,
+      "skipped": 12,
+      "totalInSelectedFiles": 15,
+      "startTimeUnixMs": 1793000280349,
+      "scope": "Only new regression plus 2 genuinely affected queue-fault lifecycle cases; raw/reason/digest retained.",
+      "sha256": "37266c87b79a12722e75a590cc3894bc01176a3ea3e6ad320c828ce21c56aa05"
+    }
+  ],
+  "acceptedDistinctTests": {
+    "count": 32,
+    "byName": {
+      "ANT paint clock and fixed-display capture uses actual paint onset/offset, one transition per frame and a 4000ms start-to-start duration": {
+        "status": "passed",
+        "evidence": "vitest-attempt1.json"
+      },
+      "ANT paint clock and fixed-display capture does not fabricate skipped phases after a long background pause": {
+        "status": "passed",
+        "evidence": "vitest-attempt1.json"
+      },
+      "ANT paint clock and fixed-display capture captures early, held and repeat inputs without allowing them to become the first response": {
+        "status": "passed",
+        "evidence": "vitest-attempt1.json"
+      },
+      "ANT paint clock and fixed-display capture keeps a response exactly at the deadline as timeout, with no fabricated RT event": {
+        "status": "passed",
+        "evidence": "vitest-attempt1.json"
+      },
+      "ANT paint clock and fixed-display capture interrupts with actual stage records, including before any target appeared": {
+        "status": "passed",
+        "evidence": "vitest-attempt1.json"
+      },
+      "ANT paint clock and fixed-display capture bounds raw input/frame traces and preserves original clock discontinuity in diagnostics": {
+        "status": "passed",
+        "evidence": "vitest-attempt1.json"
+      },
+      "ANT paint clock and fixed-display capture separates practice phase and marks synthetic fixture origin non-live": {
+        "status": "passed",
+        "evidence": "vitest-attempt1.json"
+      },
+      "ANT paint clock and fixed-display capture rejects missing/mismatched/unfit geometry and synthetic calibration outside explicit review mode": {
+        "status": "passed",
+        "evidence": "vitest-attempt1.json"
+      },
+      "ANT paint clock and fixed-display capture synchronously paints each cue/target and preserves absent/dash neutral identity": {
+        "status": "passed",
+        "evidence": "vitest-approved-primitives.json"
+      },
+      "ANT serial durable-local draft and attempt isolation requires a fresh durable context marker before the first exposure": {
+        "status": "passed",
+        "evidence": "vitest-receipts-ui-attempt2.json"
+      },
+      "ANT serial durable-local draft and attempt isolation serializes writes, retries the exact cached record, and rejects false durability receipts": {
+        "status": "passed",
+        "evidence": "vitest-receipts-ui-attempt2.json"
+      },
+      "ANT serial durable-local draft and attempt isolation bounds the queue, retains the overflow record and never invokes parallel writes": {
+        "status": "passed",
+        "evidence": "vitest-receipts-ui-attempt2.json"
+      },
+      "ANT serial durable-local draft and attempt isolation does not expose its cached original to callback mutation or accept a conflicting duplicate": {
+        "status": "passed",
+        "evidence": "vitest-receipts-ui-attempt2.json"
+      },
+      "ANT serial durable-local draft and attempt isolation keeps 4-second starts continuous while the local write is pending": {
+        "status": "passed",
+        "evidence": "vitest-receipts-ui-attempt2.json"
+      },
+      "ANT serial durable-local draft and attempt isolation completes 24 separate practice then 48 formal, final server ack remains distinct": {
+        "status": "passed",
+        "evidence": "vitest-receipts-ui-attempt2.json"
+      },
+      "ANT serial durable-local draft and attempt isolation interrupted practice cannot unlock formal or silently count as passed": {
+        "status": "passed",
+        "evidence": "vitest-receipts-ui-attempt2.json"
+      },
+      "ANT serial durable-local draft and attempt isolation missing actual stages after a stall terminates practice without progress": {
+        "status": "passed",
+        "evidence": "vitest-receipts-ui-attempt2.json"
+      },
+      "ANT serial durable-local draft and attempt isolation save failure interrupts the already-exposed trial; retry saves originals without restarting": {
+        "status": "passed",
+        "evidence": "vitest-post-stop-save-fixed.json"
+      },
+      "ANT serial durable-local draft and attempt isolation only resumes at the real research block boundary, preserving planned indices": {
+        "status": "passed",
+        "evidence": "vitest-receipts-ui-attempt2.json"
+      },
+      "ANT serial durable-local draft and attempt isolation closed contexts cannot finalize after a late durable callback or mutate another context": {
+        "status": "passed",
+        "evidence": "vitest-post-stop-save-fixed.json"
+      },
+      "ANT candidate UI and report boundary blocks first exposure without frozen physical geometry or a durable attempt marker": {
+        "status": "passed",
+        "evidence": "vitest-participant-copy.json"
+      },
+      "ANT candidate UI and report boundary requires explicit fixture mode for synthetic calibration and a fresh marker": {
+        "status": "passed",
+        "evidence": "vitest-participant-copy.json"
+      },
+      "ANT candidate UI and report boundary shows fixed left/right areas, records keyboard repeats and stops on viewport changes": {
+        "status": "passed",
+        "evidence": "vitest-participant-copy.json"
+      },
+      "ANT candidate UI and report boundary isolates a late first-exposure claim from the next context": {
+        "status": "passed",
+        "evidence": "vitest-participant-copy.json"
+      },
+      "ANT candidate UI and report boundary shows only projected condition values, preserves negative differences and needs no decorative picture": {
+        "status": "passed",
+        "evidence": "vitest-participant-copy.json"
+      },
+      "ANT candidate UI and report boundary limited and invalid reports hide gated values even if provided in the projection": {
+        "status": "passed",
+        "evidence": "vitest-participant-copy.json"
+      },
+      "ANT candidate UI and report boundary context mismatch and missing flags fail closed; mixed input hides projected RT": {
+        "status": "passed",
+        "evidence": "vitest-participant-copy.json"
+      },
+      "ANT serial durable-local draft and attempt isolation binds local receipt digest and final receipt to the exact frozen request": {
+        "status": "passed",
+        "evidence": "vitest-receipts-ui-attempt2.json"
+      },
+      "ANT serial durable-local draft and attempt isolation shares one final promise before local acknowledgement and rejects concurrent submission": {
+        "status": "passed",
+        "evidence": "vitest-receipts-ui-attempt2.json"
+      },
+      "ANT serial durable-local draft and attempt isolation clones and freezes measurement config/display before the host mutates its objects": {
+        "status": "passed",
+        "evidence": "vitest-receipts-ui-attempt2.json"
+      },
+      "ANT candidate UI and report boundary keeps implementation terms and raw reason codes out of participant copy": {
+        "status": "passed",
+        "evidence": "vitest-participant-copy.json"
+      },
+      "ANT serial durable-local draft and attempt isolation a deferred local failure after blur termination exposes retry without changing the sealed interruption": {
+        "status": "passed",
+        "evidence": "vitest-post-stop-save-fixed.json"
+      }
+    },
+    "method": "Reuse unchanged capture/session cases; newest focused accepted case per identity. Counts across reruns are not added.",
+    "noBackend41Rerun": true,
+    "noFullApplicationBuildOrTypecheck": true
+  },
+  "typeEvidence": [
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/implementation-coordination/ant-frontend-types.json",
+      "sha256": "349421630619d08c98a311c729d1df19c9d2c47e453da085eb96a03f1c3e13f7",
+      "exitCode": 0,
+      "details": {
+        "kind": "ANT_FRONTEND_ACTUAL_TSCONFIG_CANDIDATE_ROOTS_ONLY",
+        "startedUtc": "2026-10-26T07:13:47.844093+00:00",
+        "durationSeconds": 1.8897670430014841,
+        "exitCode": 0,
+        "node": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node",
+        "script": "const ts=require('typescript');const path=require('node:path');const config=ts.readConfigFile('tsconfig.app.json',ts.sys.readFile);if(config.error)throw new Error('frontend config unreadable');const parsed=ts.parseJsonConfigFileContent(config.config,ts.sys,process.cwd());const roots=JSON.parse(process.env.CANDIDATE_ROOTS);const program=ts.createProgram(roots,parsed.options);const diagnostics=ts.getPreEmitDiagnostics(program);if(diagnostics.length){const host={getCanonicalFileName:f=>f,getCurrentDirectory:()=>process.cwd(),getNewLine:()=>\"\\n\"};process.stdout.write(ts.formatDiagnosticsWithColorAndContext(diagnostics,host));process.exitCode=1;}",
+        "config": "server-version/frontend/tsconfig.app.json",
+        "rootFiles": 11,
+        "sourceSha256": {
+          "server-version/frontend/src/modules/cognitive/tasks/ant/AntReportCard.tsx": "a51fe5dab09503dae2e3436a5cb6f8619febb7298766fc56653e9b9f878eb660",
+          "server-version/frontend/src/modules/cognitive/tasks/ant/AntTask.tsx": "2ffe2aff48d05d39f69532dc6f9dd4b7104e4e4f60d810fa78817a0e0b4ec35a",
+          "server-version/frontend/src/modules/cognitive/tasks/ant/capture.ts": "3ea2e3dcd4bdc7010b209b4edf980b67d2572bf4560487e0c4d3994faefe5f90",
+          "server-version/frontend/src/modules/cognitive/tasks/ant/display.ts": "6046840499f49662756f48c56a435deec06db6f892c4c9908e5a41c75498cd5a",
+          "server-version/frontend/src/modules/cognitive/tasks/ant/generated/protocol.ts": "3792e7a94f6be7e19c9d496cafa380412c1760242e8a76c5cd9d064153c78cc9",
+          "server-version/frontend/src/modules/cognitive/tasks/ant/generated/report.ts": "371c1834ad1a63ba8962b21173c6a399c398f5d40b5d254077b5da0502814326",
+          "server-version/frontend/src/modules/cognitive/tasks/ant/local-save.ts": "ce23b298a385435a122bdc1992c21401490f4637ce7946fd9ba6ab9e3cba8219",
+          "server-version/frontend/src/modules/cognitive/tasks/ant/paint.ts": "d4a43342fa73c7e591901a7411d04304d7d5b70e63e85514035589ea86438ef3",
+          "server-version/frontend/src/modules/cognitive/tasks/ant/seal.ts": "5c0e39ea3cf60286ba37db5a89fcc21319f46ba980dd9f08b589ad595692b029",
+          "server-version/frontend/src/modules/cognitive/tasks/ant/session.ts": "1b30fb429d31f118b6e29559afe999fa3dec5a7befe9d822a12b4cae60d69fed",
+          "server-version/frontend/src/modules/cognitive/tasks/ant/test-fixtures.ts": "5f727f76b8249281d282354d6a913faab33ee173b01b9f54b01b077c9897acb4"
+        },
+        "frontendTsconfigSha256": "97ed0e951ac068a9b2d08635b327932db8e41193f9c82e8291a919b7c68bd62e",
+        "notWholeApplication": true,
+        "notRepeated": "enumeration and recognition owner checks already passed; not executed here"
+      }
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/implementation-coordination/frontend-copy-types.json",
+      "sha256": "56f1db5cb447fc8f9849593e2f6ea79c65b8f41f7e308736d2dfcf08915f9481",
+      "exitCode": 0,
+      "details": {
+        "kind": "CHANGED_FRONTEND_ENTRY_CLOSURES_ACTUAL_TSCONFIG",
+        "startedUtc": "2026-10-26T07:41:37.649262+00:00",
+        "durationSeconds": 3.825955590000376,
+        "exitCode": 0,
+        "command": [
+          "/workspace/eduk12-cloud/tools/node_modules/node/bin/node",
+          "-e",
+          "const ts=require('typescript');const config=ts.readConfigFile('tsconfig.app.json',ts.sys.readFile);if(config.error)throw new Error('frontend config unreadable');const parsed=ts.parseJsonConfigFileContent(config.config,ts.sys,process.cwd());const roots=JSON.parse(process.env.CANDIDATE_ROOTS);const program=ts.createProgram(roots,parsed.options);const diagnostics=ts.getPreEmitDiagnostics(program);if(diagnostics.length){const host={getCanonicalFileName:f=>f,getCurrentDirectory:()=>process.cwd(),getNewLine:()=>\"\\n\"};process.stdout.write(ts.formatDiagnosticsWithColorAndContext(diagnostics,host));process.exitCode=1;}"
+        ],
+        "cwd": "/workspace/eduK12-new-version/server-version/frontend",
+        "config": "server-version/frontend/tsconfig.app.json",
+        "rootFiles": 5,
+        "sourceSha256": {
+          "server-version/frontend/src/modules/cognitive/tasks/ant/AntTask.tsx": "ef5e970714895db6a37a9b9d9b76a5e98e3d542f06ee37c263f961edc435e712",
+          "server-version/frontend/src/modules/cognitive/tasks/ant/AntReportCard.tsx": "1e3747000eb1025dd81e5789559dbc0c52e6b5140e9bbfe15edc19df4f89a162",
+          "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/RecognitionTask.tsx": "465a1981f21f179b06db541ee1dbb7a4dd5cde727df7bbf8597b6893b55d0e44",
+          "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/RecognitionReport.tsx": "12155d942b44750536640b1f88b701a570e48aa367ddcb6bf544901b35e1b00d",
+          "server-version/frontend/src/modules/cognitive/tasks/enumeration/EnumerationTask.tsx": "a2cacadbed917ae742a285a8818e060ee07be284b42938a88ee061d9eaacf463"
+        },
+        "inputStableDuringCheck": true,
+        "configSha256": "97ed0e951ac068a9b2d08635b327932db8e41193f9c82e8291a919b7c68bd62e",
+        "includesChangedAntSessionDependency": true,
+        "notWholeApplication": true,
+        "notRepeated": "backend147,unchanged capture/sequence/browser streams and unchanged root inputs not separately rerun"
+      }
+    }
+  ],
+  "browserEvidence": {
+    "priorNormalFlow": {
+      "file": "browser-result.json",
+      "checks": 24,
+      "screenshots": 17,
+      "pageErrors": 0,
+      "scope": "Original cloud mobile/tablet/actual touch/4s/IDB marker/save retry/three-state gates; preserved"
+    },
+    "responsiveReading": {
+      "file": "browser-reading-result.json",
+      "checks": 4,
+      "scope": "Only narrow report presentation changed; 4 screenshots retained"
+    },
+    "participantCopy": {
+      "file": "browser-participant-copy-result.json",
+      "checks": 11,
+      "screenshots": 11,
+      "inputBinding": "participant-copy-browser-inputs.json",
+      "scope": "Only changed participant copy/status/readability; earlier session source preserved in binding"
+    },
+    "lateWriteAfterTermination": {
+      "file": "browser-late-local-copy-result.json",
+      "screenshots": 2,
+      "scope": "Actual Chrome state check: deferred local failure after blur exposes retry; original reason/digest retained and no exposure restart"
+    },
+    "zoom": "CSS 200% reading proxy; not actual OS/browser optical zoom or physical calibration",
+    "mobile": "390x844 and820x1180 Chromium viewport/touch emulation, not real hardware",
+    "selfCheckNotIndependentAudit": true
+  },
+  "knownFailuresPreserved": [
+    {
+      "file": "browser-failure-attempt1.json",
+      "sha256": "52510603c325d95470ea8cddda10074cc18b20caf506d83fda3d1aa5f54da68d"
+    }
+  ],
+  "failureAndRepairNotes": [
+    "First frontend command attempted to write UI test from wrong cwd; only two files ran20 pass; later actual UI file ran6 pass1 fail.",
+    "Missing scope=row caused UI accessibility failure; fixed rather than weakening assertion.",
+    "Initial paint primitives diverged from approved preview; restored before screenshot acceptance; only affected paint DOM case rerun.",
+    "100ms cue polling missed brief stage; protocol unchanged; rAF polling captured real cue. Own failed browser process cleaned; raw failure retained.",
+    "Initial200% three-column phone report was manually judged hard to read despite no overflow; narrow rows made vertical, affected report only rechecked.",
+    "Post-stop deferred local fault was first reproduced failing, then authorized focused callback fix; original fail and exact input hashes retained."
+  ],
+  "screenshotHashes": [
+    {
+      "file": "phone-after-retry.png",
+      "sha256": "49ee31bcfc5d2d6fa81d0c75fa908aaca03ea19dc909fb65a75075beb8a77a35",
+      "bytes": 43428
+    },
+    {
+      "file": "phone-calibration-required-copy.png",
+      "sha256": "72d6a3031de5eabfebd90d599ffac7d05b3e0ac21b60a416184fb57da81dbd32",
+      "bytes": 60558
+    },
+    {
+      "file": "phone-cue.png",
+      "sha256": "af3a41dbb11610e472ab09710ff6c82dedaa0204cb6e3260648cfc421df9cc5f",
+      "bytes": 8428
+    },
+    {
+      "file": "phone-intro-copy.png",
+      "sha256": "1ad54fb685ccfb22fdb24fd0550453bb0a97cb4054dae2b2aa1eb1ace888209d",
+      "bytes": 50546
+    },
+    {
+      "file": "phone-intro.png",
+      "sha256": "1ff581c3dd3c828ce68066e484945d5ae1999fc8911999d6106af9fc4f52f5ff",
+      "bytes": 54543
+    },
+    {
+      "file": "phone-late-local-failure-copy.png",
+      "sha256": "a061b21d9ac19fb23291675ce682dc8b797359bc5937425fa57ecc4ec170ddfa",
+      "bytes": 33816
+    },
+    {
+      "file": "phone-late-local-retry-copy.png",
+      "sha256": "b48677c94782419b6e1e2449cddc21a157e12b4adcef79d63492dcc7155a4225",
+      "bytes": 42332
+    },
+    {
+      "file": "phone-local-saved-copy.png",
+      "sha256": "326a615d7d6356b46616986787454f9579d61602f7baab2d0fe125eebfa43968",
+      "bytes": 42421
+    },
+    {
+      "file": "phone-old-attempt-copy.png",
+      "sha256": "e933faa785629504e79d74ddfea07d03264b2a4bec479980573f10fc9f1d268f",
+      "bytes": 64623
+    },
+    {
+      "file": "phone-refresh-blocked.png",
+      "sha256": "4fd0c07c76a341d0648282b2f2291587a65afd12c17cf20459bda12ca7f83fb6",
+      "bytes": 64902
+    },
+    {
+      "file": "phone-report-copy.png",
+      "sha256": "ab3cb5997feedb4e1f505b2f32226cde34d080c14092f74bee38909262f7e9a5",
+      "bytes": 78004
+    },
+    {
+      "file": "phone-report-en-200-copy.png",
+      "sha256": "7aaee35829bf0504fe13d4e3af176abf5c4bde170f8c64be53c634c1df0da134",
+      "bytes": 187084
+    },
+    {
+      "file": "phone-report-en-200-responsive.png",
+      "sha256": "0a3f3ddec4084b79ddf2b306e9a9213b7891fe8ffc90e7a900e8688c18949cc7",
+      "bytes": 177629
+    },
+    {
+      "file": "phone-report-en-200.png",
+      "sha256": "6dd4d50d9abe19520f05f390206b02d62f79330519bb88a27e85b23901d93821",
+      "bytes": 169344
+    },
+    {
+      "file": "phone-report-interpretable-responsive.png",
+      "sha256": "90b5a6a243d8aa9dd642fbe29f6326a3aa76226bbff10a0ce468c9beffa122bb",
+      "bytes": 74626
+    },
+    {
+      "file": "phone-report-interpretable.png",
+      "sha256": "342b8453794f7e6f951afbfe3cc00f983c1783c82b30d89bce55fcf5df1ed0b0",
+      "bytes": 69154
+    },
+    {
+      "file": "phone-report-invalid-copy.png",
+      "sha256": "5c25b114332e137d139983fd35beefe1fb1171fc1865c651d82e3099b412e776",
+      "bytes": 41733
+    },
+    {
+      "file": "phone-report-invalid-responsive.png",
+      "sha256": "5c25b114332e137d139983fd35beefe1fb1171fc1865c651d82e3099b412e776",
+      "bytes": 41733
+    },
+    {
+      "file": "phone-report-invalid.png",
+      "sha256": "7c572390a7d162aae0badaa2aad10e0a04da17690fe64547087d971e5521bc53",
+      "bytes": 45103
+    },
+    {
+      "file": "phone-report-limited-copy.png",
+      "sha256": "25f6e66f81a2d1c32d771c40b7b49701acfb676911921893d4d2c5b6253c607b",
+      "bytes": 70783
+    },
+    {
+      "file": "phone-report-limited-responsive.png",
+      "sha256": "5a078df3e486197509397cc134fa0734fd72d637f04c7ab901f05fec1de8b4ff",
+      "bytes": 68528
+    },
+    {
+      "file": "phone-report-limited.png",
+      "sha256": "2a24d1c35f6fea6fb92b839dc536cf046f4e2fec1bd66070397975690bc87dde",
+      "bytes": 66340
+    },
+    {
+      "file": "phone-save-failure-copy.png",
+      "sha256": "a061b21d9ac19fb23291675ce682dc8b797359bc5937425fa57ecc4ec170ddfa",
+      "bytes": 33816
+    },
+    {
+      "file": "phone-save-failure.png",
+      "sha256": "ddbd6523ed714ba94743e033236c54d3784653151d030deac904b71e726dfd2a",
+      "bytes": 34935
+    },
+    {
+      "file": "phone-submission-unconfirmed-copy.png",
+      "sha256": "326a615d7d6356b46616986787454f9579d61602f7baab2d0fe125eebfa43968",
+      "bytes": 42421
+    },
+    {
+      "file": "phone-target.png",
+      "sha256": "1a695a9004b1b325800d0ede78ca0b243a65527024356d62e96e337731d9057a",
+      "bytes": 9008
+    },
+    {
+      "file": "tablet-cue.png",
+      "sha256": "0ee82e59d7c4bd61aba983d85180d43474a71115ffe51574e0e1afc8ed3c724a",
+      "bytes": 11312
+    },
+    {
+      "file": "tablet-intro-en-copy.png",
+      "sha256": "805f7facfb696949d406391c712d08a48be9708e7e3578421d406e07abea37b3",
+      "bytes": 57713
+    },
+    {
+      "file": "tablet-intro.png",
+      "sha256": "8ddbfba914ec35eac20936a37a5a545231304673d52fd675bdd69114b7f0efff",
+      "bytes": 58687
+    },
+    {
+      "file": "tablet-report-en-200.png",
+      "sha256": "508f619b8c2e1b1c7c98645f97469087b2948b0aa3fb07d057976ff44a821e2e",
+      "bytes": 158261
+    },
+    {
+      "file": "tablet-report-interpretable.png",
+      "sha256": "359e1c38f644a987bf3ade85b3d5b270d12ac6c39482d5a22128c6e7fa5635bf",
+      "bytes": 74950
+    },
+    {
+      "file": "tablet-report-invalid.png",
+      "sha256": "d98b52e424d193cacacb769e56d5446967255b1ceefaf1fe670c1847d89a8ba4",
+      "bytes": 48778
+    },
+    {
+      "file": "tablet-report-limited.png",
+      "sha256": "198443f0a5cf09fb7f8d1594fa8561c1db3fdc9360ad1c2b95b322ee551bf81a",
+      "bytes": 72362
+    },
+    {
+      "file": "tablet-target.png",
+      "sha256": "a8f89dc8ffb3e99f6ad2d482a9e76986e9d5967124e9da10f2b94c17e8d81ede",
+      "bytes": 11885
+    }
+  ],
+  "rawJsonHashes": [
+    {
+      "file": "browser-failure-attempt1.json",
+      "sha256": "52510603c325d95470ea8cddda10074cc18b20caf506d83fda3d1aa5f54da68d"
+    },
+    {
+      "file": "browser-late-local-copy-result.json",
+      "sha256": "18a391745d3f757be5e2bb4c0c2763455ae8be1e05604fc8ff725f855f804502"
+    },
+    {
+      "file": "browser-participant-copy-result.json",
+      "sha256": "2a41a921c1b8dec4dfb5b4d1f0fccdd4a3e1a2ba7a6d794b2d477ee914c3fd04"
+    },
+    {
+      "file": "browser-reading-result.json",
+      "sha256": "16f06b0b90cb854ef8bbc1061fb0b48d9230091527e36580844848c53412f45a"
+    },
+    {
+      "file": "browser-result.json",
+      "sha256": "485ff46369e7044bcb53ec7320b39907700863b7f13cdebcecf805ff50acc98d"
+    },
+    {
+      "file": "participant-copy-browser-inputs.json",
+      "sha256": "6fb4e28adfd404461839f0a7218afd1ae16618bf240d07fd06b3bbda06cacb09"
+    },
+    {
+      "file": "post-stop-save-repro-binding.json",
+      "sha256": "b0022c539ee0c3e5815c13fbc3d90ad4710b165789a24e6245065da8dd4272d3"
+    },
+    {
+      "file": "preview-data.json",
+      "sha256": "43fd4028636783d202052a16bc7b5c72cbac0004a2fad42ce960cff74de3fd9a"
+    },
+    {
+      "file": "vitest-approved-primitives.json",
+      "sha256": "548b4e816c3c0237b285ad32402fc70241c1166f7810981b91e1d337ba3ff505"
+    },
+    {
+      "file": "vitest-attempt1.json",
+      "sha256": "ba894110f62eb49f83ec7c109d0c77042514d6a04de5b2da4d6d84995f2a9e55"
+    },
+    {
+      "file": "vitest-frozen-host-ui.json",
+      "sha256": "371721d35a506efb3c36c922b438161f72a9393da19de18fdb977083f4e20491"
+    },
+    {
+      "file": "vitest-participant-copy.json",
+      "sha256": "49ae31d268fcd3cd43cc13b6e3eadd06e06b06c4ba26715448a906945d09613c"
+    },
+    {
+      "file": "vitest-post-stop-save-fixed.json",
+      "sha256": "37266c87b79a12722e75a590cc3894bc01176a3ea3e6ad320c828ce21c56aa05"
+    },
+    {
+      "file": "vitest-post-stop-save-repro.json",
+      "sha256": "49205dfae5dfa9e3c4fa0d72fec322de5d2b8b2af361de67fd777e6e4b1a4ed7"
+    },
+    {
+      "file": "vitest-receipts-ui-attempt2.json",
+      "sha256": "06d7c93fec08ed40389def5361e66eb3fa8114c56aebd1a830cfddc20ff0258c"
+    },
+    {
+      "file": "vitest-report-responsive.json",
+      "sha256": "e57631caf4e9d204da91d4eac05b7a9c36bcd36cb8305c879863830fbf7ae429"
+    },
+    {
+      "file": "vitest-ui-attempt1.json",
+      "sha256": "bffb34cd10f0471d38f7fd6ab5c6866e057d0d6dd1dabb31aa2e19f3416d7540"
+    }
+  ],
+  "finalParticipantScreens": [
+    "phone-intro-copy.png",
+    "tablet-intro-en-copy.png",
+    "phone-calibration-required-copy.png",
+    "phone-old-attempt-copy.png",
+    "phone-save-failure-copy.png",
+    "phone-local-saved-copy.png",
+    "phone-submission-unconfirmed-copy.png",
+    "phone-report-copy.png",
+    "phone-report-limited-copy.png",
+    "phone-report-invalid-copy.png",
+    "phone-report-en-200-copy.png",
+    "phone-late-local-failure-copy.png",
+    "phone-late-local-retry-copy.png"
+  ],
+  "unchangedStimulusScreens": [
+    "phone-cue.png",
+    "phone-target.png",
+    "tablet-cue.png",
+    "tablet-target.png"
+  ],
+  "focusedDiff": {
+    "file": "final-focused-source.diff",
+    "sha256": "e9445a50ef58dcf7f21e74f8f9c3d968b214c65a697f43c50b700fa79bda49f3",
+    "scope": "Task/Card participant labels+collapsed diagnostic; session late local fault UI recovery only"
+  },
+  "unchangedProtocolPaths": [
+    "capture.ts",
+    "display.ts",
+    "paint.ts",
+    "local-save.ts",
+    "seal.ts",
+    "generated/protocol.ts",
+    "generated/report.ts",
+    "ant.css"
+  ],
+  "unverified": [
+    "Real phone/tablet/desktop hardware and Safari/Firefox",
+    "Physical onset/offset, latency, angular geometry/luminance and provisional20ms applicability",
+    "Host durable attempt marker/local draft and device snapshot integration in the real product",
+    "Native two-profile registry/publication/standard/legacy score consumers",
+    "Database/COS/final export and four-entry consistent consumption",
+    "Chinese/English comprehension/translation validation",
+    "Age/population validity, reliability, short/long equivalence and norms",
+    "Independent audit acceptance and required formal release gates"
+  ],
+  "scopeBoundary": [
+    "No backend or archived design/old raw evidence overwritten",
+    "No shared core/registry/schema/lock/CI/production changes",
+    "No user Mac files, terminal or browser",
+    "No agent commit/push/Notion write",
+    "No claim that server callback resolution or server receipt proves COS archival"
+  ]
+}

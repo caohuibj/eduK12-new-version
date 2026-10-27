@@ -1,0 +1,269 @@
+{
+  "status": "PASS",
+  "browser": "cloud headless /usr/bin/chromium sandbox=true",
+  "fixtureOnly": true,
+  "physicalOnsetVerified": false,
+  "readingZoom": "CSS zoom 200% proxy, no physical display calibration",
+  "checks": [
+    {
+      "name": "phone intro",
+      "innerWidth": 390,
+      "scrollWidth": 390,
+      "bodyWidth": 390,
+      "text": "SYNTHETIC FIXTURE · 未物理校准 · 云端候选预览\n\n合成设备示例 · 未完成物理校准\n\n看中间箭头，判断它的方向\n\n请注视中央。画面可能先出现短暂提示，随后在上方或下方出现箭头。判断中间箭头朝向，忽略两侧箭头。\n\n← ← → ← ←\n\n使用固定左右回应区，支持触控与鼠标。键盘映射见下方；一次作答中混用输入会限制用时比较。\n\n时序、操作与时长\n\n正式启动需要宿主提供已确认的冻结物理几何。CSS示意不代替校准。\n\n核验设置并开始练习",
+      "fields": [],
+      "buttons": []
+    },
+    {
+      "name": "phone target",
+      "innerWidth": 390,
+      "scrollWidth": 390,
+      "bodyWidth": 390,
+      "text": "SYNTHETIC FIXTURE · 未物理校准 · 云端候选预览\n←\n→",
+      "fields": [
+        {
+          "width": 280,
+          "height": 280
+        }
+      ],
+      "buttons": [
+        {
+          "width": 130,
+          "height": 78
+        },
+        {
+          "width": 130,
+          "height": 78
+        }
+      ]
+    },
+    {
+      "name": "phone actual touch/raw",
+      "key": "practice:0",
+      "digest": "e846c0259079cf5c8520c1adba0aab830c1a1af3c77770f13d243695e3ca48fc",
+      "input": "touch",
+      "cueOnset": 1447.800000000745,
+      "targetOnset": 1963.699999999255,
+      "targetOffset": 2363.699999999255,
+      "duration": 4008.10000000149,
+      "origin": "recovered_without_timing",
+      "fixture": true
+    },
+    {
+      "name": "phone refresh marker blocks re-exposure",
+      "passed": true
+    },
+    {
+      "name": "phone report interpretable",
+      "innerWidth": 390,
+      "scrollWidth": 390,
+      "bodyWidth": 390,
+      "text": "SYNTHETIC FIXTURE · 未物理校准 · 云端候选预览\n\n合成数据示例 · 不是真实被试结果\n\n这次的线索与箭头记录\n本轮答对比例\n\n100.0%\n\n真实条件次数与正确反应均值\n提示\t正确 / 有效\t正确平均用时\n无提示\t12 / 12\t463 ms\nn=12 · touch\n\n中央提示\t12 / 12\t433 ms\nn=12 · touch\n\n双位置提示\t12 / 12\t403 ms\nn=12 · touch\n\n空间提示\t12 / 12\t413 ms\nn=12 · touch\n条件差值与分母\n\n这里只描述本轮记录，条件差值不是能力等级；体验版不代表稳定的注意网络能力。\n\n下次可以把设备放稳、关闭通知，让视线留在中央注视点。\n\n方法与限制",
+      "fields": [],
+      "buttons": []
+    },
+    {
+      "name": "phone report gate interpretable",
+      "tables": 1,
+      "overall": 1,
+      "rows": 4,
+      "images": 0
+    },
+    {
+      "name": "phone report limited",
+      "innerWidth": 390,
+      "scrollWidth": 390,
+      "bodyWidth": 390,
+      "text": "SYNTHETIC FIXTURE · 未物理校准 · 云端候选预览\n\n合成数据示例 · 不是真实被试结果\n\n这次的线索与箭头记录\n\n部分记录不完整或受到影响，相关指标暂不展示。\n\n真实条件次数与正确反应均值\n提示\t正确 / 有效\t正确平均用时\n无提示\t12 / 12\t463 ms\nn=12 · touch\n\n中央提示\t12 / 12\t433 ms\nn=12 · touch\n\n双位置提示\t12 / 12\t403 ms\nn=12 · touch\n条件差值与分母\n\n这里只描述本轮记录，条件差值不是能力等级；体验版不代表稳定的注意网络能力。\n\n下次可以把设备放稳、关闭通知，让视线留在中央注视点。\n\n方法与限制",
+      "fields": [],
+      "buttons": []
+    },
+    {
+      "name": "phone report gate limited",
+      "tables": 1,
+      "overall": 0,
+      "rows": 3,
+      "images": 0
+    },
+    {
+      "name": "phone report invalid",
+      "innerWidth": 390,
+      "scrollWidth": 390,
+      "bodyWidth": 390,
+      "text": "SYNTHETIC FIXTURE · 未物理校准 · 云端候选预览\n\n合成数据示例 · 不是真实被试结果\n\n本次暂不提供表现结论\n\n部分记录不完整或受到影响，相关指标暂不展示。\n\n这里只描述本轮记录，条件差值不是能力等级；体验版不代表稳定的注意网络能力。\n\n下次可以把设备放稳、关闭通知，让视线留在中央注视点。\n\n方法与限制",
+      "fields": [],
+      "buttons": []
+    },
+    {
+      "name": "phone report gate invalid",
+      "tables": 0,
+      "overall": 0,
+      "rows": 0,
+      "images": 0
+    },
+    {
+      "name": "phone English report CSS zoom200 reading proxy",
+      "innerWidth": 390,
+      "scrollWidth": 390,
+      "bodyWidth": 195,
+      "text": "SYNTHETIC FIXTURE · 未物理校准 · 云端候选预览\n\nSYNTHETIC FIXTURE · Not a participant result\n\nYour cue and arrow record\nCorrect this session\n\n100.0%\n\nActual condition counts and correct-response means\nCue\tCorrect / valid\tMean correct RT\nNo cue\t12 / 12\t463 ms\nn=12 · touch\n\nCentral cue\t12 / 12\t433 ms\nn=12 · touch\n\nDouble cue\t12 / 12\t403 ms\nn=12 · touch\n\nSpatial cue\t12 / 12\t413 ms\nn=12 · touch\nCondition differences and denominators\n\nThis describes this session only. Condition differences are not ability levels",
+      "fields": [],
+      "buttons": []
+    },
+    {
+      "name": "tablet intro",
+      "innerWidth": 820,
+      "scrollWidth": 820,
+      "bodyWidth": 820,
+      "text": "SYNTHETIC FIXTURE · 未物理校准 · 云端候选预览\n\n合成设备示例 · 未完成物理校准\n\n看中间箭头，判断它的方向\n\n请注视中央。画面可能先出现短暂提示，随后在上方或下方出现箭头。判断中间箭头朝向，忽略两侧箭头。\n\n← ← → ← ←\n\n使用固定左右回应区，支持触控与鼠标。键盘映射见下方；一次作答中混用输入会限制用时比较。\n\n时序、操作与时长\n\n正式启动需要宿主提供已确认的冻结物理几何。CSS示意不代替校准。\n\n核验设置并开始练习",
+      "fields": [],
+      "buttons": []
+    },
+    {
+      "name": "tablet target",
+      "innerWidth": 820,
+      "scrollWidth": 820,
+      "bodyWidth": 820,
+      "text": "SYNTHETIC FIXTURE · 未物理校准 · 云端候选预览\n←\n→",
+      "fields": [
+        {
+          "width": 280,
+          "height": 280
+        }
+      ],
+      "buttons": [
+        {
+          "width": 130,
+          "height": 78
+        },
+        {
+          "width": 130,
+          "height": 78
+        }
+      ]
+    },
+    {
+      "name": "tablet actual touch/raw",
+      "key": "practice:0",
+      "digest": "f55a4e8f57b292118ce0b7c8862c6e585df021cfad8392637b3749b54bf5bf74",
+      "input": "touch",
+      "cueOnset": 1406.0999999977648,
+      "targetOnset": 1939.199999999255,
+      "targetOffset": 2406.199999999255,
+      "duration": 4014.89999999851,
+      "origin": "recovered_without_timing",
+      "fixture": true
+    },
+    {
+      "name": "tablet refresh marker blocks re-exposure",
+      "passed": true
+    },
+    {
+      "name": "tablet report interpretable",
+      "innerWidth": 820,
+      "scrollWidth": 820,
+      "bodyWidth": 820,
+      "text": "SYNTHETIC FIXTURE · 未物理校准 · 云端候选预览\n\n合成数据示例 · 不是真实被试结果\n\n这次的线索与箭头记录\n本轮答对比例\n\n100.0%\n\n真实条件次数与正确反应均值\n提示\t正确 / 有效\t正确平均用时\n无提示\t12 / 12\t463 ms\nn=12 · touch\n\n中央提示\t12 / 12\t433 ms\nn=12 · touch\n\n双位置提示\t12 / 12\t403 ms\nn=12 · touch\n\n空间提示\t12 / 12\t413 ms\nn=12 · touch\n条件差值与分母\n\n这里只描述本轮记录，条件差值不是能力等级；体验版不代表稳定的注意网络能力。\n\n下次可以把设备放稳、关闭通知，让视线留在中央注视点。\n\n方法与限制",
+      "fields": [],
+      "buttons": []
+    },
+    {
+      "name": "tablet report gate interpretable",
+      "tables": 1,
+      "overall": 1,
+      "rows": 4,
+      "images": 0
+    },
+    {
+      "name": "tablet report limited",
+      "innerWidth": 820,
+      "scrollWidth": 820,
+      "bodyWidth": 820,
+      "text": "SYNTHETIC FIXTURE · 未物理校准 · 云端候选预览\n\n合成数据示例 · 不是真实被试结果\n\n这次的线索与箭头记录\n\n部分记录不完整或受到影响，相关指标暂不展示。\n\n真实条件次数与正确反应均值\n提示\t正确 / 有效\t正确平均用时\n无提示\t12 / 12\t463 ms\nn=12 · touch\n\n中央提示\t12 / 12\t433 ms\nn=12 · touch\n\n双位置提示\t12 / 12\t403 ms\nn=12 · touch\n条件差值与分母\n\n这里只描述本轮记录，条件差值不是能力等级；体验版不代表稳定的注意网络能力。\n\n下次可以把设备放稳、关闭通知，让视线留在中央注视点。\n\n方法与限制",
+      "fields": [],
+      "buttons": []
+    },
+    {
+      "name": "tablet report gate limited",
+      "tables": 1,
+      "overall": 0,
+      "rows": 3,
+      "images": 0
+    },
+    {
+      "name": "tablet report invalid",
+      "innerWidth": 820,
+      "scrollWidth": 820,
+      "bodyWidth": 820,
+      "text": "SYNTHETIC FIXTURE · 未物理校准 · 云端候选预览\n\n合成数据示例 · 不是真实被试结果\n\n本次暂不提供表现结论\n\n部分记录不完整或受到影响，相关指标暂不展示。\n\n这里只描述本轮记录，条件差值不是能力等级；体验版不代表稳定的注意网络能力。\n\n下次可以把设备放稳、关闭通知，让视线留在中央注视点。\n\n方法与限制",
+      "fields": [],
+      "buttons": []
+    },
+    {
+      "name": "tablet report gate invalid",
+      "tables": 0,
+      "overall": 0,
+      "rows": 0,
+      "images": 0
+    },
+    {
+      "name": "tablet English report CSS zoom200 reading proxy",
+      "innerWidth": 820,
+      "scrollWidth": 820,
+      "bodyWidth": 410,
+      "text": "SYNTHETIC FIXTURE · 未物理校准 · 云端候选预览\n\nSYNTHETIC FIXTURE · Not a participant result\n\nYour cue and arrow record\nCorrect this session\n\n100.0%\n\nActual condition counts and correct-response means\nCue\tCorrect / valid\tMean correct RT\nNo cue\t12 / 12\t463 ms\nn=12 · touch\n\nCentral cue\t12 / 12\t433 ms\nn=12 · touch\n\nDouble cue\t12 / 12\t403 ms\nn=12 · touch\n\nSpatial cue\t12 / 12\t413 ms\nn=12 · touch\nCondition differences and denominators\n\nThis describes this session only. Condition differences are not ability levels",
+      "fields": [],
+      "buttons": []
+    },
+    {
+      "name": "save failure/retry preserves exact sealed record and ends stream",
+      "before": [
+        {
+          "key": "practice:0",
+          "digest": "fc2f406ff03ca4968def41a6ace8a6f67d8c7f5375d8a8674f0f878f088abef5"
+        }
+      ],
+      "after": [
+        {
+          "key": "practice:0",
+          "digest": "fc2f406ff03ca4968def41a6ace8a6f67d8c7f5375d8a8674f0f878f088abef5"
+        },
+        {
+          "key": "practice:0",
+          "digest": "fc2f406ff03ca4968def41a6ace8a6f67d8c7f5375d8a8674f0f878f088abef5"
+        },
+        {
+          "key": "practice:1",
+          "digest": "b99a28cac85812260df47bca6558de3f76fd1a7a6d76c3bce414f487410d3182"
+        }
+      ],
+      "serverSaved": false
+    },
+    {
+      "name": "host null server receipt remains unconfirmed",
+      "status": "limited",
+      "requestDigest": "302e01a76a9f6c27980fac564fc4c659d5a776e2c308b22597c1625f16b515ef",
+      "recordSetDigest": "ed8c84ffeeb21b74d8cb8f948741abadb8a200a1fd8f408986def301b03817c4"
+    }
+  ],
+  "errors": [],
+  "screenshots": [
+    "phone-intro.png",
+    "phone-cue.png",
+    "phone-target.png",
+    "phone-refresh-blocked.png",
+    "phone-report-interpretable.png",
+    "phone-report-limited.png",
+    "phone-report-invalid.png",
+    "phone-report-en-200.png",
+    "tablet-intro.png",
+    "tablet-cue.png",
+    "tablet-target.png",
+    "tablet-report-interpretable.png",
+    "tablet-report-limited.png",
+    "tablet-report-invalid.png",
+    "tablet-report-en-200.png",
+    "phone-save-failure.png",
+    "phone-after-retry.png"
+  ]
+}

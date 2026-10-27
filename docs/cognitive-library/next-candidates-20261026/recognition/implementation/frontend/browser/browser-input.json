@@ -1,0 +1,137 @@
+{
+  "synthetic": true,
+  "hasTouch": true,
+  "checks": [
+    "actual touchscreen tap, mouse pointer and R key",
+    "keydown repeat retained once as raw repeat",
+    "4 distinct raw events; owned first presentation"
+  ],
+  "records": [
+    {
+      "contextKey": "recognition-synthetic-browser:actual-inputs",
+      "recordKey": "practice:0",
+      "binding": {
+        "configHash": "132159eb01888f7752f2a7c577617978552988a832851f243ba7c0a5f8bf016b",
+        "protocolSignature": "4fccd8435b47a5929149f9dd717105028ee392f2cf31d4ab8ff75b1c6231cdc5",
+        "manifestHash": "d14067f8e4a8c584b0e45e46dc1fe085ad3e3e04085fe7aaa4e169df9f42c399",
+        "assetManifestHash": "da5842c342bd5675a50d21a951c10633dff4b048fd40c82a6df5b1af670a387d",
+        "randomSeed": "recognition-golden"
+      },
+      "phase": "practice",
+      "envelope": {
+        "schemaVersion": 1,
+        "trialIndex": 0,
+        "phase": "test",
+        "condition": "target-first",
+        "startedAtPerfMs": 16,
+        "endedAtPerfMs": 1568,
+        "durationMs": 1552,
+        "flags": {
+          "timeout": false,
+          "premature": false
+        },
+        "qualityEvents": [],
+        "payload": {
+          "record": {
+            "index": 0,
+            "assetId": "practice-0",
+            "kind": "target-first",
+            "imageOnsetMs": 16,
+            "imageOffsetMs": 768,
+            "windowEndMs": 1568,
+            "status": "complete",
+            "interruptions": []
+          },
+          "events": [
+            {
+              "id": "image-0-event-0",
+              "atMs": 34,
+              "action": "seen",
+              "input": "touch",
+              "key": null,
+              "isRepeat": false
+            },
+            {
+              "id": "image-0-event-1",
+              "atMs": 34,
+              "action": "seen",
+              "input": "mouse",
+              "key": null,
+              "isRepeat": false
+            },
+            {
+              "id": "image-0-event-2",
+              "atMs": 34,
+              "action": "seen",
+              "input": "keyboard",
+              "key": "r",
+              "isRepeat": false
+            },
+            {
+              "id": "image-0-event-3",
+              "atMs": 34,
+              "action": "seen",
+              "input": "keyboard",
+              "key": "r",
+              "isRepeat": true
+            }
+          ],
+          "startedAtPerfMs": 16,
+          "endedAtPerfMs": 1568,
+          "recordOrigin": "live",
+          "telemetryOverflow": false
+        }
+      },
+      "note": {
+        "stopReason": null,
+        "synthetic": true,
+        "unassignedBoundaryEvents": [],
+        "allEvents": [
+          {
+            "id": "image-0-event-0",
+            "atMs": 34,
+            "action": "seen",
+            "input": "touch",
+            "key": null,
+            "isRepeat": false
+          },
+          {
+            "id": "image-0-event-1",
+            "atMs": 34,
+            "action": "seen",
+            "input": "mouse",
+            "key": null,
+            "isRepeat": false
+          },
+          {
+            "id": "image-0-event-2",
+            "atMs": 34,
+            "action": "seen",
+            "input": "keyboard",
+            "key": "r",
+            "isRepeat": false
+          },
+          {
+            "id": "image-0-event-3",
+            "atMs": 34,
+            "action": "seen",
+            "input": "keyboard",
+            "key": "r",
+            "isRepeat": true
+          }
+        ],
+        "actualExposure": {
+          "imageOnsetMs": 16,
+          "imageOffsetMs": 768,
+          "windowEndMs": 1568
+        },
+        "realm": {
+          "timeOriginMs": 1792972800000,
+          "pageInstanceId": "ce479a5f-2900-4dd8-9f9f-de1689a42b0a"
+        }
+      },
+      "recordDigest": "6cbced6b6cccb0cb556ba3f503eb037da00eb61f523eb773711ed0bb3e3ccd55"
+    }
+  ],
+  "errors": []
+}

@@ -1,0 +1,26 @@
+{
+  "kind": "C01_DIRECTLY_AFFECTED_REGRESSION_AFTER_C02_NOT_NEW_CASES",
+  "reason": "C02 changes the real practice local-save/lifecycle path, so three prior C01 UI states are directly affected; no backend/version/trajectory/timing workflow is rerun.",
+  "initialPreparationIssue": "The first attempt to isolate test attempt IDs used repository-relative path from frontend cwd and failed before any source mutation; the following test command ran the old shared-identity fixture.",
+  "initialResult": {
+    "file": "c01-affected-initial.json",
+    "passed": 1,
+    "failed": 2,
+    "notRun": 1,
+    "cause": "Independent tests reused the exact same synthetic attempt. The new intentional retained-record mechanism correctly exposed the prior unresolved record instead of fresh intro."
+  },
+  "fix": "Test fixture only: each independent case receives a distinct synthetic sessionId. Product source, assertions, seed, responses, raw and timing remain unchanged. No cache is cleared to bypass recovery.",
+  "continuedResult": {
+    "file": "c01-affected-failed-two-continued.json",
+    "passed": 2,
+    "failed": 0,
+    "notRun": 2,
+    "filter": "completed genuinely|interrupted second",
+    "reused": "The successful interrupted-practice state from initial invocation is not rerun; previous version-key test is unselected."
+  },
+  "currentFixtureSha256": "984c394bef669f4d8d25069fcbbf736801e94817dd79039d573122e74a7213ff",
+  "previousFixtureSha256": "d437104aa32588c0b19f6bdc74bf217936a43832f6946344afbc275c2a6127fe",
+  "currentMotTaskSha256": "0b97f2b08a1e68c80a7504f701699f25beac88ed73e27adb3873a58636fa4325",
+  "measurementChanges": false,
+  "policyTestsOrPhysicalTimingStudy": false
+}

@@ -1,0 +1,5 @@
+{
+  "exitCode": 1,
+  "executedCases": 0,
+  "reason": "Installed Vitest rejects --minWorkers; remove unsupported CLI option. No product check executed."
+}

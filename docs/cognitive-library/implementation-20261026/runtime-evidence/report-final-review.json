@@ -1,0 +1,45 @@
+{
+  "kind": "ACTUAL_COMPONENT_SYNTHETIC_FROZEN_RESULT",
+  "browser": "151.0.7922.173",
+  "chromiumSandbox": true,
+  "shots": [
+    {
+      "name": "report-interpretable-390",
+      "file": "docs/cognitive-library/implementation-20261026/runtime-evidence/report-interpretable-390.png",
+      "sha256": "ec9dcf046f32734a8998ad4376dbc7d6a7c7d71688c10e0f56e9bc023b510246"
+    },
+    {
+      "name": "report-limited-390",
+      "file": "docs/cognitive-library/implementation-20261026/runtime-evidence/report-limited-390.png",
+      "sha256": "caf58b16a1977e8bcc3d88a2cf8ef5b16a381c253ec3a3b39794a7fa689c33c0"
+    },
+    {
+      "name": "report-invalid-390",
+      "file": "docs/cognitive-library/implementation-20261026/runtime-evidence/report-invalid-390.png",
+      "sha256": "d3ae7c4e83e7f2046a4cd5db28217bba361265e63298935d921cc40f53c7bf2d"
+    },
+    {
+      "name": "report-en-390",
+      "file": "docs/cognitive-library/implementation-20261026/runtime-evidence/report-en-390.png",
+      "sha256": "03040bc0060416aed4b83a1c670b52f09ae4f9b8b5631aa42fd815bf9e510461"
+    },
+    {
+      "name": "report-en-200percent",
+      "file": "docs/cognitive-library/implementation-20261026/runtime-evidence/report-en-200percent.png",
+      "sha256": "65e4add7f5fb2c65a345f53a71fd76cedb5461044c1f8ce1be987fb0f252ede0"
+    },
+    {
+      "name": "current-authoritative-report-390",
+      "file": "docs/cognitive-library/implementation-20261026/runtime-evidence/current-authoritative-report-390.png",
+      "sha256": "b34a744ec351527f57b5d87014bab940bcaad9be063fe6afe3e986e756a26f75"
+    },
+    {
+      "name": "current-authoritative-report-1280",
+      "file": "docs/cognitive-library/implementation-20261026/runtime-evidence/current-authoritative-report-1280.png",
+      "sha256": "039a4ca6acfbed7c0eccca2b5de61f09aec11d5336a76a0404e0e5a15ac58c37"
+    }
+  ],
+  "reportPNG": true,
+  "zoom200": true,
+  "errors": []
+}

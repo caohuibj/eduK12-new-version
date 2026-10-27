@@ -1,0 +1,330 @@
+{
+  "kind": "STATIC_COLOR_COLLECTION_REVIEW_ONLY",
+  "measurements": [
+    {
+      "name": "intro",
+      "width": 390,
+      "viewport": 390,
+      "scrollWidth": 390,
+      "objects": [],
+      "field": null,
+      "action": "rgb(29, 78, 216)",
+      "mainText": "rgb(31, 41, 55)"
+    },
+    {
+      "name": "intro-experience",
+      "width": 390,
+      "viewport": 390,
+      "scrollWidth": 390,
+      "objects": [],
+      "field": null,
+      "action": "rgb(29, 78, 216)",
+      "mainText": "rgb(31, 41, 55)"
+    },
+    {
+      "name": "intro-en",
+      "width": 390,
+      "viewport": 390,
+      "scrollWidth": 390,
+      "objects": [],
+      "field": null,
+      "action": "rgb(29, 78, 216)",
+      "mainText": "rgb(31, 41, 55)"
+    },
+    {
+      "name": "cue",
+      "width": 390,
+      "viewport": 390,
+      "scrollWidth": 390,
+      "objects": [
+        "rgb(229, 57, 53)",
+        "rgb(34, 34, 34)",
+        "rgb(229, 57, 53)",
+        "rgb(229, 57, 53)",
+        "rgb(34, 34, 34)",
+        "rgb(34, 34, 34)",
+        "rgb(229, 57, 53)",
+        "rgb(34, 34, 34)",
+        "rgb(229, 57, 53)",
+        "rgb(34, 34, 34)"
+      ],
+      "field": "rgb(242, 242, 242)",
+      "action": null,
+      "mainText": "rgb(31, 41, 55)"
+    },
+    {
+      "name": "track",
+      "width": 390,
+      "viewport": 390,
+      "scrollWidth": 390,
+      "objects": [
+        "rgb(34, 34, 34)",
+        "rgb(34, 34, 34)",
+        "rgb(34, 34, 34)",
+        "rgb(34, 34, 34)",
+        "rgb(34, 34, 34)",
+        "rgb(34, 34, 34)",
+        "rgb(34, 34, 34)",
+        "rgb(34, 34, 34)",
+        "rgb(34, 34, 34)",
+        "rgb(34, 34, 34)"
+      ],
+      "field": "rgb(242, 242, 242)",
+      "action": null,
+      "mainText": "rgb(31, 41, 55)"
+    },
+    {
+      "name": "response",
+      "width": 390,
+      "viewport": 390,
+      "scrollWidth": 390,
+      "objects": [
+        "rgb(34, 34, 34)",
+        "rgb(34, 34, 34)",
+        "rgb(29, 78, 216)",
+        "rgb(34, 34, 34)",
+        "rgb(34, 34, 34)",
+        "rgb(34, 34, 34)",
+        "rgb(29, 78, 216)",
+        "rgb(34, 34, 34)",
+        "rgb(34, 34, 34)",
+        "rgb(34, 34, 34)"
+      ],
+      "field": "rgb(242, 242, 242)",
+      "action": null,
+      "mainText": "rgb(31, 41, 55)"
+    },
+    {
+      "name": "report",
+      "width": 390,
+      "viewport": 390,
+      "scrollWidth": 390,
+      "objects": [],
+      "field": null,
+      "action": null,
+      "mainText": "rgb(31, 41, 55)"
+    },
+    {
+      "name": "report-experience",
+      "width": 390,
+      "viewport": 390,
+      "scrollWidth": 390,
+      "objects": [],
+      "field": null,
+      "action": null,
+      "mainText": "rgb(31, 41, 55)"
+    },
+    {
+      "name": "limited",
+      "width": 390,
+      "viewport": 390,
+      "scrollWidth": 390,
+      "objects": [],
+      "field": null,
+      "action": null,
+      "mainText": "rgb(31, 41, 55)"
+    },
+    {
+      "name": "invalid",
+      "width": 390,
+      "viewport": 390,
+      "scrollWidth": 390,
+      "objects": [],
+      "field": null,
+      "action": "rgb(29, 78, 216)",
+      "mainText": "rgb(31, 41, 55)"
+    },
+    {
+      "name": "intro",
+      "width": 820,
+      "viewport": 820,
+      "scrollWidth": 820,
+      "objects": [],
+      "field": null,
+      "action": "rgb(29, 78, 216)",
+      "mainText": "rgb(31, 41, 55)"
+    },
+    {
+      "name": "intro-experience",
+      "width": 820,
+      "viewport": 820,
+      "scrollWidth": 820,
+      "objects": [],
+      "field": null,
+      "action": "rgb(29, 78, 216)",
+      "mainText": "rgb(31, 41, 55)"
+    },
+    {
+      "name": "intro-en",
+      "width": 820,
+      "viewport": 820,
+      "scrollWidth": 820,
+      "objects": [],
+      "field": null,
+      "action": "rgb(29, 78, 216)",
+      "mainText": "rgb(31, 41, 55)"
+    },
+    {
+      "name": "cue",
+      "width": 820,
+      "viewport": 820,
+      "scrollWidth": 820,
+      "objects": [
+        "rgb(229, 57, 53)",
+        "rgb(34, 34, 34)",
+        "rgb(229, 57, 53)",
+        "rgb(229, 57, 53)",
+        "rgb(34, 34, 34)",
+        "rgb(34, 34, 34)",
+        "rgb(229, 57, 53)",
+        "rgb(34, 34, 34)",
+        "rgb(229, 57, 53)",
+        "rgb(34, 34, 34)"
+      ],
+      "field": "rgb(242, 242, 242)",
+      "action": null,
+      "mainText": "rgb(31, 41, 55)"
+    },
+    {
+      "name": "track",
+      "width": 820,
+      "viewport": 820,
+      "scrollWidth": 820,
+      "objects": [
+        "rgb(34, 34, 34)",
+        "rgb(34, 34, 34)",
+        "rgb(34, 34, 34)",
+        "rgb(34, 34, 34)",
+        "rgb(34, 34, 34)",
+        "rgb(34, 34, 34)",
+        "rgb(34, 34, 34)",
+        "rgb(34, 34, 34)",
+        "rgb(34, 34, 34)",
+        "rgb(34, 34, 34)"
+      ],
+      "field": "rgb(242, 242, 242)",
+      "action": null,
+      "mainText": "rgb(31, 41, 55)"
+    },
+    {
+      "name": "response",
+      "width": 820,
+      "viewport": 820,
+      "scrollWidth": 820,
+      "objects": [
+        "rgb(34, 34, 34)",
+        "rgb(34, 34, 34)",
+        "rgb(29, 78, 216)",
+        "rgb(34, 34, 34)",
+        "rgb(34, 34, 34)",
+        "rgb(34, 34, 34)",
+        "rgb(29, 78, 216)",
+        "rgb(34, 34, 34)",
+        "rgb(34, 34, 34)",
+        "rgb(34, 34, 34)"
+      ],
+      "field": "rgb(242, 242, 242)",
+      "action": null,
+      "mainText": "rgb(31, 41, 55)"
+    },
+    {
+      "name": "report",
+      "width": 820,
+      "viewport": 820,
+      "scrollWidth": 820,
+      "objects": [],
+      "field": null,
+      "action": null,
+      "mainText": "rgb(31, 41, 55)"
+    },
+    {
+      "name": "report-experience",
+      "width": 820,
+      "viewport": 820,
+      "scrollWidth": 820,
+      "objects": [],
+      "field": null,
+      "action": null,
+      "mainText": "rgb(31, 41, 55)"
+    },
+    {
+      "name": "limited",
+      "width": 820,
+      "viewport": 820,
+      "scrollWidth": 820,
+      "objects": [],
+      "field": null,
+      "action": null,
+      "mainText": "rgb(31, 41, 55)"
+    },
+    {
+      "name": "invalid",
+      "width": 820,
+      "viewport": 820,
+      "scrollWidth": 820,
+      "objects": [],
+      "field": null,
+      "action": "rgb(29, 78, 216)",
+      "mainText": "rgb(31, 41, 55)"
+    }
+  ],
+  "staticThemeVariableIsolation": [
+    {
+      "entry": "Survey",
+      "sha256": "5e3ac8efd1418af4c6b165562cb966ac48f7234a361302f982a58230e159348e"
+    },
+    {
+      "entry": "Training",
+      "sha256": "5e3ac8efd1418af4c6b165562cb966ac48f7234a361302f982a58230e159348e"
+    },
+    {
+      "entry": "HuiSchool",
+      "sha256": "5e3ac8efd1418af4c6b165562cb966ac48f7234a361302f982a58230e159348e"
+    },
+    {
+      "entry": "HuiTeacher",
+      "sha256": "5e3ac8efd1418af4c6b165562cb966ac48f7234a361302f982a58230e159348e"
+    }
+  ],
+  "realFourEntrancesVerified": false,
+  "zoom": [
+    {
+      "name": "intro",
+      "width": 390,
+      "scrollWidth": 390
+    },
+    {
+      "name": "intro-experience",
+      "width": 390,
+      "scrollWidth": 390
+    },
+    {
+      "name": "intro-en",
+      "width": 390,
+      "scrollWidth": 390
+    }
+  ],
+  "browserErrors": [],
+  "physicalColorCalibration": false,
+  "colorVisionValidation": false,
+  "measurementValidityVerified": false,
+  "runtimeImplemented": false,
+  "artifacts": [
+    {
+      "file": "colors.json",
+      "sha256": "fb6650fbe5cb18c35c5b5463f7f4e34d39eb27a0c5942ed077db63360102f45a"
+    },
+    {
+      "file": "collection.html",
+      "sha256": "aa039180787e92986b2c285e353ba5865dc90831a41150d13f21f2b07d1c0da2"
+    },
+    {
+      "file": "collection.png",
+      "sha256": "2f00513964e53458c3e45bf7e1d9677072130d2fb8cedd07cfe247e2935811f4"
+    },
+    {
+      "file": "mot-standard-review.png",
+      "sha256": "2c01d9f902e9e2f4cbee184e9a4f08b246866eb0437f86775fe83a74de8218c5"
+    }
+  ]
+}

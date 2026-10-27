@@ -1,0 +1,22 @@
+{
+  "kind": "TEST_FIXTURE_TYPE_ANNOTATIONS_ONLY",
+  "createdUtc": "2026-10-26T09:46:04.833090+00:00",
+  "originalFailedTypeReport": "/tmp/cognitive-product-types-frontend-20261026.json",
+  "originalFailedTypeReportSha256": "805c8f8729fa40dd02a7668380a7cc6be2c751e76fca763dfa9f45f1ec0e00fc",
+  "fix": "Literal true/false/logo assertions and explicit Promise<LocalReceipt>; emitted JS semantics unchanged.",
+  "files": [
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/lifecycle.test.tsx",
+      "beforeSha256": "2c0fddaa9343c736bcee35b064d86711b51c6dff7fc3d5957ac851ef22cad7c2",
+      "sha256": "458a54553a52a2176befd0cc50fe9564ae58bc98bdecf2f00eced05d114acafe"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/recognition.test.ts",
+      "beforeSha256": "5e9656b8da71e3144f35d3c796b739c698c2b95bd1837e5e031fa20a4cd5b296",
+      "sha256": "6e3dc17dd74edd018f3cdc710a4627352111c64094cfbad10b37fd842d5429d5"
+    }
+  ],
+  "runtimeTestsOrScreenshotsRepeated": false,
+  "backendTypesRepeated": false,
+  "frontendTypeRecheck": "Main agent to resume only failed fixture roots."
+}

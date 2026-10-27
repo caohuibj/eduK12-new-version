@@ -1,0 +1,16 @@
+{
+  "command": [
+    "/workspace/eduk12-cloud/tools/node_modules/node/bin/node",
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "src/__tests__/cognitive/v2-native-registry.test.ts",
+    "-t",
+    "covers the exact combined inventory",
+    "--maxWorkers=1",
+    "--reporter=json",
+    "--outputFile=/workspace/eduK12-new-version/docs/cognitive-library/next-candidates-20261026/enumeration/implementation/recipe-config-20261026/inventory-continued.json"
+  ],
+  "exitCode": 0,
+  "seconds": 2.4084707250003703,
+  "scope": "Only failed combined inventory consumer, not the already-qualified freeze case or old native suites."
+}

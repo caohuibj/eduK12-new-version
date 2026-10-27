@@ -54,6 +54,7 @@ const CognitiveV2ReportCard: React.FC<{
   const activeQuality = report.quality.filter((item) => item.active)
   const reviewedProfileLabel = (report as CognitiveV2Report & { profileLabel?: string | null }).profileLabel
   const profileText = reviewedProfileLabel || profileLabel(report.method.profile)
+  const practical = reviewedProfileLabel === '实用版'
   const qualityLabel = report.qualityState === 'interpretable'
     ? '数据质量：可解释'
     : report.qualityState === 'limited'
@@ -75,8 +76,8 @@ const CognitiveV2ReportCard: React.FC<{
       </header>
 
       {report.method.profile === 'experience' && (
-        <ReportCoreSummary label="体验版 · 短程协议">
-          <p className="text-sm font-normal">指标由正式评分器计算，但试次数较少，更适合描述本次体验，不用于人口百分位、年龄等级或稳定能力等级。</p>
+        <ReportCoreSummary label={practical?'实用版 · 精简协议':'体验版 · 短程协议'}>
+          <p className="text-sm font-normal">{practical?'正式作答次数较少，用于减少测量负担。实际工作用途应结合本次数据质量与适用证据，不直接转换为同龄排名或稳定能力等级。':'指标由正式评分器计算，但试次数较少，更适合描述本次体验，不用于人口百分位、年龄等级或稳定能力等级。'}</p>
         </ReportCoreSummary>
       )}
 

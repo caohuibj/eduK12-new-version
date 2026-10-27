@@ -1,0 +1,28 @@
+{
+  "kind": "REAL_CHROMIUM_INDEXEDDB_EXPECTED_OWNERSHIP_CONTRACT",
+  "startedAt": "2026-10-26T12:09:56.651Z",
+  "sourceSha256": {
+    "server-version/frontend/src/services/persistence/finalDraftStore.ts": "df1664b17c7e6ab9fe6e7d97a241a584190539bbe2ac2db2895a16cb226dec99",
+    "server-version/frontend/src/services/persistence/cognitiveRawArchiveState.ts": "8403ffab818df9743e50a76ae3f32745b7120f5adf840d5472f8cf681514f908"
+  },
+  "bundleSha256": "2ab4f6ebb85ad959e162c0f187a4999cb558145c02784c12c9c534c320df5c47",
+  "checks": [
+    {
+      "name": "active_expected_identity_writes_seals_completes_and_cleans",
+      "passed": true
+    },
+    {
+      "name": "same_session_new_epoch_rejects_all_four_stale_transaction_mutations_and_stale_submission_cleanup",
+      "passed": true
+    }
+  ],
+  "notVerified": [
+    "No assessment exposure/scorer/HTTP business workflow rerun",
+    "No external COS or production data",
+    "No cross-browser or physical timing claim"
+  ],
+  "chromium": "151.0.7922.173",
+  "status": "PASS",
+  "finishedAt": "2026-10-26T12:09:57.369Z",
+  "scriptSha256": "69798a1a8b68fad43923adbc1f8c878ad20e81e3e74c3848d28c7e7351a84f52"
+}

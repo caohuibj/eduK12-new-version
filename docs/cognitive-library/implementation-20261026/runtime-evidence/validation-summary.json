@@ -1,0 +1,453 @@
+{
+  "kind": "UNSIGNED_DEVELOPMENT_EVIDENCE_NOT_FORMAL_CI",
+  "baseline": "ff8471e529e7b3c56e1e20f17d1e2581040fc896",
+  "cloudOnly": true,
+  "node": "24.21.0",
+  "vitest": "4.1.11",
+  "sourceSnapshotTakenAfterExecution": true,
+  "reports": [
+    {
+      "originalReport": "/tmp/mot-backend-final-tests.json",
+      "sha256": "1cfa433aa22689bd2f0e14c8195deb861ae870c4f36aa48177baa535d671652e",
+      "total": 14,
+      "passed": 13,
+      "failed": 1,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "MOT native content candidate meets native definition readiness without manufacturing a legacy result",
+          "status": "failed"
+        },
+        {
+          "name": "MOT native content candidate pins each exact profile hash, protocol signature and seeded stimulus plan to a checked-in golden",
+          "status": "passed"
+        },
+        {
+          "name": "MOT native content candidate refuses legacy full frame payloads, impossible summaries and incompatible display geometry",
+          "status": "passed"
+        },
+        {
+          "name": "MOT native content candidate freezes only the two real profiles, with balanced condition order and no manufactured total score",
+          "status": "passed"
+        },
+        {
+          "name": "MOT native content candidate keeps seed, object truth and sequence stable, with non-overlapping starts and time-based reflections",
+          "status": "passed"
+        },
+        {
+          "name": "MOT native content candidate returns invalid/null for empty records, and preserves genuine zero results",
+          "status": "passed"
+        },
+        {
+          "name": "MOT native content candidate hides the affected speed and the aggregate on a missing trial rather than showing internal values",
+          "status": "passed"
+        },
+        {
+          "name": "MOT native content candidate gates frame_gap separately from incorrect selections",
+          "status": "passed"
+        },
+        {
+          "name": "MOT native content candidate gates premature separately from incorrect selections",
+          "status": "passed"
+        },
+        {
+          "name": "MOT native content candidate gates interruption separately from incorrect selections",
+          "status": "passed"
+        },
+        {
+          "name": "MOT native content candidate gates timeout separately from incorrect selections",
+          "status": "passed"
+        },
+        {
+          "name": "MOT native content candidate does not expose conclusions when every condition is affected",
+          "status": "passed"
+        },
+        {
+          "name": "MOT native content candidate rejects non-contiguous, repeated, forged and out-of-order events",
+          "status": "passed"
+        },
+        {
+          "name": "MOT native content candidate rejects incompatible frozen identities/configs and replays the original snapshot without latest lookup",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "originalReport": "/tmp/mot-backend-affected-retry.json",
+      "sha256": "aeb2add5579fa55b37617569bccf692249550f3d6013494f2a7fd8aff2b31214",
+      "total": 14,
+      "passed": 10,
+      "failed": 0,
+      "skipped": 4,
+      "cases": [
+        {
+          "name": "MOT native content candidate preserves the real platform rejection of a two-profile candidate without manufacturing a standard profile",
+          "status": "passed"
+        },
+        {
+          "name": "MOT native content candidate pins each exact profile hash, protocol signature and seeded stimulus plan to a checked-in golden",
+          "status": "skipped"
+        },
+        {
+          "name": "MOT native content candidate refuses legacy full frame payloads, impossible summaries and incompatible display geometry",
+          "status": "skipped"
+        },
+        {
+          "name": "MOT native content candidate freezes only the two real profiles, with balanced condition order and no manufactured total score",
+          "status": "passed"
+        },
+        {
+          "name": "MOT native content candidate keeps seed, object truth and sequence stable, with non-overlapping starts and time-based reflections",
+          "status": "skipped"
+        },
+        {
+          "name": "MOT native content candidate returns invalid/null for empty records, and preserves genuine zero results",
+          "status": "passed"
+        },
+        {
+          "name": "MOT native content candidate hides the affected speed and the aggregate on a missing trial rather than showing internal values",
+          "status": "passed"
+        },
+        {
+          "name": "MOT native content candidate gates frame_gap separately from incorrect selections",
+          "status": "passed"
+        },
+        {
+          "name": "MOT native content candidate gates premature separately from incorrect selections",
+          "status": "passed"
+        },
+        {
+          "name": "MOT native content candidate gates interruption separately from incorrect selections",
+          "status": "passed"
+        },
+        {
+          "name": "MOT native content candidate gates timeout separately from incorrect selections",
+          "status": "passed"
+        },
+        {
+          "name": "MOT native content candidate does not expose conclusions when every condition is affected",
+          "status": "passed"
+        },
+        {
+          "name": "MOT native content candidate rejects non-contiguous, repeated, forged and out-of-order events",
+          "status": "passed"
+        },
+        {
+          "name": "MOT native content candidate rejects incompatible frozen identities/configs and replays the original snapshot without latest lookup",
+          "status": "skipped"
+        }
+      ]
+    },
+    {
+      "originalReport": "/tmp/mot-frontend-implementation-tests.json",
+      "sha256": "791ba674cbac820d07a20fb52a5d4bec2d2496737c79d93350ed52292f1f0b4b",
+      "total": 15,
+      "passed": 15,
+      "failed": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "MOT user report gate renders allowed descriptive values and effective denominators without an ability score",
+          "status": "passed"
+        },
+        {
+          "name": "MOT user report gate hides affected internal metrics and the aggregate in a limited result",
+          "status": "passed"
+        },
+        {
+          "name": "MOT user report gate does not show performance values when all records are invalid, even if internal numbers exist",
+          "status": "passed"
+        },
+        {
+          "name": "MOT user report gate allows a concise text report without a decorative image",
+          "status": "passed"
+        },
+        {
+          "name": "MOT user report gate supports English and preserves a genuine zero in the experience version",
+          "status": "passed"
+        },
+        {
+          "name": "MOT actual capture state machine uses actual paint transitions and separates core summaries from complete raw frames",
+          "status": "passed"
+        },
+        {
+          "name": "MOT actual capture state machine does not fabricate intermediate phase timestamps after a long pause",
+          "status": "passed"
+        },
+        {
+          "name": "MOT actual capture state machine records early inputs and never changes a prior selection",
+          "status": "passed"
+        },
+        {
+          "name": "MOT actual capture state machine ignores ambiguous touch overlap but permits an explicitly focused keyboard circle",
+          "status": "passed"
+        },
+        {
+          "name": "MOT actual capture state machine retains incomplete visibility_lost evidence",
+          "status": "passed"
+        },
+        {
+          "name": "MOT actual capture state machine retains incomplete window_blur evidence",
+          "status": "passed"
+        },
+        {
+          "name": "MOT actual capture state machine retains incomplete viewport_changed evidence",
+          "status": "passed"
+        },
+        {
+          "name": "MOT actual capture state machine retains incomplete runner_restart evidence",
+          "status": "passed"
+        },
+        {
+          "name": "MOT actual capture state machine bounds frame collection and records overflow instead of claiming complete telemetry",
+          "status": "passed"
+        },
+        {
+          "name": "MOT actual capture state machine preserves visual-angle geometry and refuses a too-small display without shrinking",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "originalReport": "/tmp/mot-capture-final-tests.json",
+      "sha256": "cf9213ad851b8570a38d6efcc0a1dc1158c92933eef5a56b7d5b605e167c1ac0",
+      "total": 10,
+      "passed": 10,
+      "failed": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "MOT actual capture state machine uses actual paint transitions and separates core summaries from complete raw frames",
+          "status": "passed"
+        },
+        {
+          "name": "MOT actual capture state machine does not fabricate intermediate phase timestamps after a long pause",
+          "status": "passed"
+        },
+        {
+          "name": "MOT actual capture state machine records early inputs and never changes a prior selection",
+          "status": "passed"
+        },
+        {
+          "name": "MOT actual capture state machine ignores ambiguous touch overlap but permits an explicitly focused keyboard circle",
+          "status": "passed"
+        },
+        {
+          "name": "MOT actual capture state machine retains incomplete visibility_lost evidence",
+          "status": "passed"
+        },
+        {
+          "name": "MOT actual capture state machine retains incomplete window_blur evidence",
+          "status": "passed"
+        },
+        {
+          "name": "MOT actual capture state machine retains incomplete viewport_changed evidence",
+          "status": "passed"
+        },
+        {
+          "name": "MOT actual capture state machine retains incomplete runner_restart evidence",
+          "status": "passed"
+        },
+        {
+          "name": "MOT actual capture state machine bounds frame collection and records overflow instead of claiming complete telemetry",
+          "status": "passed"
+        },
+        {
+          "name": "MOT actual capture state machine preserves visual-angle geometry and refuses a too-small display without shrinking",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "originalReport": "/tmp/mot-report-final-tests.json",
+      "sha256": "7bdfe4c2da91166659ec8695cbff605532ed8270c74508961f05a0961515bd2b",
+      "total": 6,
+      "passed": 6,
+      "failed": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "MOT user report gate renders allowed descriptive values and effective denominators without an ability score",
+          "status": "passed"
+        },
+        {
+          "name": "MOT user report gate hides affected internal metrics and the aggregate in a limited result",
+          "status": "passed"
+        },
+        {
+          "name": "MOT user report gate does not show performance values when all records are invalid, even if internal numbers exist",
+          "status": "passed"
+        },
+        {
+          "name": "MOT user report gate allows a concise text report without a decorative image",
+          "status": "passed"
+        },
+        {
+          "name": "MOT user report gate fails closed when quality flags or the headline value are missing",
+          "status": "passed"
+        },
+        {
+          "name": "MOT user report gate supports English and preserves a genuine zero in the experience version",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "originalReport": "/tmp/mot-pr356-aligned-backend.json",
+      "sha256": "0e335e1dd237d1da2124116cdee3818ff6427057b145d6f22ed896e5657ff288",
+      "total": 17,
+      "passed": 17,
+      "failed": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "MOT projection into PR356 shared discovery contract keeps stable cognitive IDs and multiscenario unknown suitability without assigning age or ability",
+          "status": "passed"
+        },
+        {
+          "name": "MOT projection into PR356 shared discovery contract uses the existing server AND matcher for Chinese/English keywords and exact IDs",
+          "status": "passed"
+        },
+        {
+          "name": "MOT projection into PR356 shared discovery contract projects supported shared facets and preserves unrepresented dimensions as pending",
+          "status": "passed"
+        },
+        {
+          "name": "MOT native content candidate preserves the real platform rejection of a two-profile candidate without manufacturing a standard profile",
+          "status": "passed"
+        },
+        {
+          "name": "MOT native content candidate pins each exact profile hash, protocol signature and seeded stimulus plan to a checked-in golden",
+          "status": "passed"
+        },
+        {
+          "name": "MOT native content candidate refuses legacy full frame payloads, impossible summaries and incompatible display geometry",
+          "status": "passed"
+        },
+        {
+          "name": "MOT native content candidate freezes only the two real profiles, with balanced condition order and no manufactured total score",
+          "status": "passed"
+        },
+        {
+          "name": "MOT native content candidate keeps seed, object truth and sequence stable, with non-overlapping starts and time-based reflections",
+          "status": "passed"
+        },
+        {
+          "name": "MOT native content candidate returns invalid/null for empty records, and preserves genuine zero results",
+          "status": "passed"
+        },
+        {
+          "name": "MOT native content candidate hides the affected speed and the aggregate on a missing trial rather than showing internal values",
+          "status": "passed"
+        },
+        {
+          "name": "MOT native content candidate gates frame_gap separately from incorrect selections",
+          "status": "passed"
+        },
+        {
+          "name": "MOT native content candidate gates premature separately from incorrect selections",
+          "status": "passed"
+        },
+        {
+          "name": "MOT native content candidate gates interruption separately from incorrect selections",
+          "status": "passed"
+        },
+        {
+          "name": "MOT native content candidate gates timeout separately from incorrect selections",
+          "status": "passed"
+        },
+        {
+          "name": "MOT native content candidate does not expose conclusions when every condition is affected",
+          "status": "passed"
+        },
+        {
+          "name": "MOT native content candidate rejects non-contiguous, repeated, forged and out-of-order events",
+          "status": "passed"
+        },
+        {
+          "name": "MOT native content candidate rejects incompatible frozen identities/configs and replays the original snapshot without latest lookup",
+          "status": "passed"
+        }
+      ]
+    }
+  ],
+  "currentSourceSnapshot": [
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/mot/catalog.ts",
+      "sha256": "8946a10a2c40aa70dfc5d506502a3469211085074a59652c10568b12e409b7cb"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/mot/metadata.ts",
+      "sha256": "ec83e618b465cb62211f63d12997ede404947bf22e177aaa917bbcff3297225a"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/mot/package.ts",
+      "sha256": "ca8b3eeca9ed65808a82980875100b7924e55a588de2def9ffe58d93060a5d94"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/mot/protocol.ts",
+      "sha256": "bd79691a33a6680c220e170ef9e5fc210fca518ad7823f2c2c7fdca418c37da9"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/mot/schema.ts",
+      "sha256": "094ca7760198f49bbe2126036fe58a27aa8389bfba0959be5f8217113e2d04f6"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/mot/scorer.ts",
+      "sha256": "9b1dffc9dc53ccf69b4c1ad0679bd510c2e1a7f67a6d3d7c0fc34264d2babeb4"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/mot/trial-envelope.ts",
+      "sha256": "d6a63ac33a75f79dfc4fc3fefb86be934f105ffb2b480ef5cd17b6765590037d"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/mot/MotCalibration.tsx",
+      "sha256": "b50b10b92a75ac23d24b4af39c6973eedb8efae5580588ff745669aec218be20"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/mot/MotReportCard.test.tsx",
+      "sha256": "59200155aa04856c3b3fd384b42623c5b5e74c295efdfd1a3d4188ae2f14b350"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/mot/MotReportCard.tsx",
+      "sha256": "825863f2d01f1e8ed9d8becdac49d915f11bbc546cb7998545389a1709be06c3"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/mot/MotTakeHome.tsx",
+      "sha256": "96a865347ae96388c96856cf3e2bfa69f9c55da267e95b6d2ecd403f191bc075"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/mot/MotTask.tsx",
+      "sha256": "7216db62c932d8cab024ea9a0be102b185fe5001737a588f6ad1456c2a89ac65"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/mot/capture.test.ts",
+      "sha256": "86664c9520b128e546cc861dea01434533ab5cb65206c8011092ffdcb0249ada"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/mot/capture.ts",
+      "sha256": "7a7deeb1e657250f59f54916d5a99d7b768eb7c17d805194a8b897cae03034ea"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/mot/display.ts",
+      "sha256": "47942092c64eaa1c0527c5dce66cd6202cc39e2164bf58728f36b16a3811444c"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/mot/draft.ts",
+      "sha256": "bd33e06379bcd9d4b2a67fc33d9fa6fa162b84235c7362d8c71fcabfd4ae3339"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/mot/generated/protocol.ts",
+      "sha256": "1da1287d7abf108e728425c85bb3618b994364e4f6c59cd37f2ab8767ab3ef25"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/mot/mot.css",
+      "sha256": "3c71d70fa7eba2f62d81f05859424075ae3b8f10bcd4b73e19edca2ef324ba90"
+    }
+  ],
+  "reuseNote": "Original failed readiness assertion is preserved. Follow-up explicitly proves the current platform rejection; it does not make release readiness pass. Tests of unchanged seed/config/frozen functions are retained; modified scorer/report paths were targeted again. No formal signing/admission claim.",
+  "releaseGate": "BLOCKED",
+  "apiDbCosProductionVerified": false,
+  "alignedBaseline": "48516ef5900cf9f711ea3cc852ac148cd221d7f8",
+  "alignmentReuse": "Backend shared reference/runtime dependencies changed; 17 affected native/catalog assertions executed anew. Frontend cognitive sources/dependencies from PR356 do not differ; unchanged component evidence retained. New small-layout and report CSS were checked separately."
+}

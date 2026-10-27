@@ -1,0 +1,65 @@
+{
+  "kind": "REAL_CLOUD_CHROMIUM_COMPONENT_AND_INDEXEDDB_NOT_PRODUCT_API_OR_COS",
+  "browser": "151.0.7922.173",
+  "chromiumSandbox": true,
+  "shots": [
+    {
+      "name": "report-interpretable-390",
+      "file": "docs/cognitive-library/implementation-20261026/runtime-evidence/report-interpretable-390.png",
+      "sha256": "4b03f091ef8a60864ca1dbf1115067894fefa93409c68820a798d739172be9f6"
+    },
+    {
+      "name": "report-limited-390",
+      "file": "docs/cognitive-library/implementation-20261026/runtime-evidence/report-limited-390.png",
+      "sha256": "7f850b550afd68c3d230c8ad458550b0d5a83299c1b87040ff4592f386aa73f6"
+    },
+    {
+      "name": "report-invalid-390",
+      "file": "docs/cognitive-library/implementation-20261026/runtime-evidence/report-invalid-390.png",
+      "sha256": "04de7b03fcaa2f891bd13798b984d7ec2fbc9281713783638360bea13749e25f"
+    },
+    {
+      "name": "report-en-390",
+      "file": "docs/cognitive-library/implementation-20261026/runtime-evidence/report-en-390.png",
+      "sha256": "f28fc9cbe1fe87aff572f3b110cf66e3a067937520540a95968dd646745d6aed"
+    },
+    {
+      "name": "report-en-200percent",
+      "file": "docs/cognitive-library/implementation-20261026/runtime-evidence/report-en-200percent.png",
+      "sha256": "247495723afdd3f8c6b32fbbc32dfe8ede10464e64b3abf04afd9513691fb8b5"
+    },
+    {
+      "name": "calibration-390",
+      "file": "docs/cognitive-library/implementation-20261026/runtime-evidence/calibration-390.png",
+      "sha256": "3d08eaf77c14323eedf8faafbf57592bedc0789b3c8b49a2483bfbbc38fc28a3"
+    },
+    {
+      "name": "actual-cue-390",
+      "file": "docs/cognitive-library/implementation-20261026/runtime-evidence/actual-cue-390.png",
+      "sha256": "5c361c21b1e9d3192020fbc1f2b5c3f18ab53a0a33697bd82e38bdbc487917d0"
+    },
+    {
+      "name": "actual-motion-390",
+      "file": "docs/cognitive-library/implementation-20261026/runtime-evidence/actual-motion-390.png",
+      "sha256": "95f20379292cb73c3be803bb927ac27758f68eaa79fe92b56b2f820280bf1fc4"
+    },
+    {
+      "name": "actual-response-390",
+      "file": "docs/cognitive-library/implementation-20261026/runtime-evidence/actual-response-390.png",
+      "sha256": "49e83171d2a5aea86d90f544257340dc51fd6a64297f3f24f3ca61d3cd74cf52"
+    },
+    {
+      "name": "practice-feedback-390",
+      "file": "docs/cognitive-library/implementation-20261026/runtime-evidence/practice-feedback-390.png",
+      "sha256": "4e4d4df40ca33007e4f5432ff27753cb27fe1467c25717b51db198fe6a980044"
+    }
+  ],
+  "practiceCount": 1,
+  "frames": 481,
+  "reportPNG": true,
+  "zoom200": true,
+  "realProductEntrances": false,
+  "realCOS": false,
+  "hardwareTimingValidated": false,
+  "errors": []
+}

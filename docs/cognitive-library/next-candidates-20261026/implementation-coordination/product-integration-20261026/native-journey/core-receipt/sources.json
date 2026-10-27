@@ -1,0 +1,6 @@
+{
+  "server-version/backend/src/modules/cognitive/native-final-receipt.ts": "57d760f72ccda4ee1688034c44234d196baf2a1c0503b11e2bd2fe54f01ce5db",
+  "server-version/backend/src/modules/cognitive/final-submit.service.ts": "310a4b570dd446e88079302c58d3742d3b9aa82b0f38ce86bda503e936a05d8c",
+  "server-version/backend/src/modules/cognitive/cognitive.controller.ts": "8ab4e343dac436b4ec06d98a3727fc1d1872d37f50b74960a609d06be72948a6",
+  "server-version/backend/src/__tests__/cognitive/native-final-receipt.test.ts": "e8e9f16bd4d23bbd4e6dcfbd5ae701900bec09ea85bd448dd88c1537c14bd9fe"
+}

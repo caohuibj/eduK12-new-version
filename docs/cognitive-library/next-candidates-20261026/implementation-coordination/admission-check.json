@@ -1,0 +1,19 @@
+{
+  "kind": "REAL_VALIDATOR_AND_RESOLVER_AUDIT",
+  "command": [
+    "/workspace/eduk12-cloud/tools/node_modules/node/bin/node",
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "src/__tests__/cognitive/candidate-native-admission-audit.test.ts",
+    "--maxWorkers=1",
+    "--reporter=json",
+    "--outputFile=../../docs/cognitive-library/next-candidates-20261026/implementation-coordination/admission-vitest.json"
+  ],
+  "cwd": "/workspace/eduK12-new-version/server-version/backend",
+  "exitCode": 0,
+  "startedUtc": "2026-10-26T06:41:21.861829+00:00",
+  "durationSeconds": 1.9195390040003986,
+  "report": "admission-vitest.json",
+  "testSha256": "356d600d9d7b771cb68b64af21887807f99717fcf254c37b840be64d5288302e",
+  "notReleaseQualification": true
+}

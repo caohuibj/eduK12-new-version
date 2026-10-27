@@ -1,0 +1,78 @@
+/* Cloud-only native enumeration HTTP slice. Auth/START/FINAL/report/DB/archive route are real;
+ * uploader is the explicitly synthetic service in native-enumeration-http-review.cjs. */
+const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
+const root=path.resolve(__dirname,'../../..'),front=path.join(root,'server-version/frontend');
+const out=path.join(root,'docs/cognitive-library/next-candidates-20261026/enumeration/native-input-20261026/browser');
+const backend=process.env.ENUMERATION_HTTP_REVIEW_ORIGIN||'http://127.0.0.1:18856';
+let server,browser,temp;
+const report={kind:'REAL_NATIVE_FRONTEND_HTTP_SLICE_SYNTHETIC_CLOCK_AND_COS_UPLOADER',startedAt:new Date().toISOString(),api:[],pageErrors:[],checks:[],notVerified:['External COS credentials/upload','Physical timing/refresh validity','Full product auth shell','Public/Survey/composite native delivery']};
+(async()=>{try{
+ fs.mkdirSync(out,{recursive:true});temp=fs.mkdtempSync(path.join(front,'.native-enumeration-client-review-'));
+ const relative='/'+path.basename(temp)+'/app.tsx';
+ fs.writeFileSync(path.join(temp,'app.tsx'),`import React from 'react';import{createRoot}from'react-dom/client';import{BrowserRouter,Routes,Route}from'react-router-dom';import Runner from '../src/modules/cognitive/pages/CognitiveRunner';import Result from '../src/modules/cognitive/pages/CognitiveResult';import{LearnerNavigationContext}from'../src/training/learnerNavigation';import '../src/index.css';document.title='SYNTHETIC CLOCK / FAKE COS — REAL NATIVE HTTP';createRoot(document.getElementById('root')!).render(<LearnerNavigationContext.Provider value={true}><BrowserRouter><Routes><Route path='/student/cognitive/sessions/:sessionId' element={<Runner/>}/><Route path='/student/cognitive/sessions/:sessionId/result' element={<Result/>}/></Routes></BrowserRouter></LearnerNavigationContext.Provider>);`);
+ const {createServer}=await import(path.join(front,'node_modules/vite/dist/node/index.js'));
+ server=await createServer({configFile:path.join(front,'vite.config.ts'),root:front,plugins:[{name:'native-enumeration-http-review-entry',configureServer(v){v.middlewares.use(async(req,res,next)=>{if(!req.url?.startsWith('/student/cognitive/sessions/'))return next();res.setHeader('Content-Type','text/html');res.end(await v.transformIndexHtml(req.url,`<!doctype html><html lang='zh'><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><div id='root'></div><script type='module' src='${relative}'></script></html>`))})}}],server:{host:'127.0.0.1',port:5199,strictPort:true,proxy:{'/api':{target:backend,changeOrigin:true},'/__review':{target:backend,changeOrigin:true}}}});
+ await server.listen();
+ const {chromium}=require('/opt/codex/runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
+ browser=await chromium.launch({executablePath:'/usr/bin/chromium',chromiumSandbox:true,headless:true,args:['--disable-dev-shm-usage']});
+ const context=await browser.newContext({viewport:{width:390,height:844},deviceScaleFactor:1,hasTouch:true,isMobile:true});
+ const base='http://127.0.0.1:5199';
+ let response=await context.request.get(base+'/__review/login?actor=student');if(!response.ok())throw Error('Review cookie handoff failed '+response.status());
+ const fixture=await (await context.request.get(base+'/__review/context')).json();
+ response=await context.request.post(base+'/api/cognitive/sessions',{data:{assignmentId:fixture.assignmentId}});const started=await response.json();
+ if(!response.ok()||started.code!==0||!started.data?.sessionId)throw Error('Real START failed '+response.status()+' '+String(started.message));
+ const session=started.data;report.identity={sessionId:session.sessionId,attemptEpoch:session.attemptEpoch,definitionHash:session.definitionHash,protocolSignature:session.protocolSignature,profile:session.profile};
+ if(!session.nativeTask||session.config.totalTrials!==25||session.config.profile!=='experience')throw Error('Unexpected frozen native profile');
+ await context.request.post(base+'/__review/archive-mode',{data:{failUploads:1}});
+ const page=await context.newPage();page.on('pageerror',e=>report.pageErrors.push(e.message));
+ page.on('response',r=>{if(r.url().includes('/api/'))report.api.push({method:r.request().method(),path:new URL(r.url()).pathname,status:r.status()})});
+ await page.clock.install();
+ await page.goto(base+'/student/cognitive/sessions/'+session.sessionId);
+ await page.getByRole('button',{name:'开始测评',exact:true}).click();
+ await page.getByLabel('眼睛到屏幕的距离（毫米）').fill('350');
+ await page.getByRole('checkbox').check();await page.getByRole('button',{name:'确认校准',exact:true}).click();
+ report.checks.push({name:'actual_ui_calibration',syntheticSelfReport:true,viewport:'390x844',referenceCssPx:190,distanceMm:350});
+ await page.screenshot({path:path.join(out,'calibration-and-guide-390.png'),fullPage:true});
+ await page.getByRole('button',{name:'查看准备状态',exact:true}).tap();
+ for(let i=0;i<28;i++){
+  await page.getByRole('button',{name:i<3?'开始练习':'开始这一轮',exact:true}).tap();
+  await page.clock.runFor(i<3?3150:2150);
+  const slider=page.locator('#enumeration-slider');await slider.waitFor();
+  if(!await slider.isEnabled())throw Error('Response controls did not become available for synthetic trial '+i);
+  if(i===3)await page.screenshot({path:path.join(out,'formal-response-390.png'),fullPage:true});
+  const box=await slider.boundingBox();if(!box)throw Error('Slider geometry unavailable');
+  await page.touchscreen.tap(box.x+box.width/2,box.y+box.height/2);
+  await page.getByRole('button',{name:'确认',exact:true}).tap();
+  if(i<3){await page.getByRole('heading',{name:'练习记录',exact:true}).waitFor();await page.getByRole('button',{name:i<2?'下一次练习':'准备开始作答',exact:true}).tap()}
+  else if(i<27)await page.getByRole('heading',{name:'准备开始下一轮',exact:true}).waitFor();
+ }
+ await page.waitForURL('**/result');
+ await page.getByText('完整记录仍保留在本设备，归档尚未确认。',{exact:false}).waitFor();
+ await page.getByRole('button',{name:'保存完整记录',exact:true}).waitFor();
+ await page.waitForFunction(()=>document.body.innerText.includes('完整记录仍保留在本设备')&&!document.querySelector('button[disabled]'));
+ const readDraft=()=>page.evaluate(async id=>{
+  const req=indexedDB.open('eduk12-final-drafts-v1');const db=await new Promise((r,j)=>{req.onsuccess=()=>r(req.result);req.onerror=()=>j(req.error)});
+  const names=Array.from(db.objectStoreNames);const metaName=names.find(n=>n.toLowerCase().includes('meta'));if(!metaName)return {stores:names,error:'meta store missing'};
+  const tx=db.transaction(metaName,'readonly'),q=tx.objectStore(metaName).get('cognitive:enumeration:'+JSON.stringify([id,1]));const meta=await new Promise((r,j)=>{q.onsuccess=()=>r(q.result);q.onerror=()=>j(q.error)});db.close();
+  const raw=meta?.cognitiveRawArchive;return meta?{status:meta.status,submissionId:meta.submissionId,coreSealed:Boolean(meta.sealedSubmission),raw:raw?{coreSaved:raw.coreSaved,archiveConfirmed:raw.archiveConfirmed,rawSha256:raw.rawSha256,formal:raw.rawPayload.formal.length,practice:raw.rawPayload.practice.length,artifactHash:raw.rawPayload.artifact.artifactHash,inputs:[...new Set(raw.rawPayload.formal.map(r=>r.record.core.responseInput))]}:null}:null;
+ },session.sessionId);
+ report.afterFailedArchive=await readDraft();report.archiveAfterFailure=await(await context.request.get(base+'/__review/archive-state')).json();
+ if(report.afterFailedArchive?.raw?.formal!==25||report.afterFailedArchive?.raw?.practice!==3||report.afterFailedArchive?.raw?.archiveConfirmed!==false)throw Error('Unconfirmed raw was not durably retained');
+ if(!report.afterFailedArchive.raw.inputs.includes('touch'))throw Error('Actual browser touch input not retained');
+ await page.evaluate(()=>{const label=document.createElement('p');label.id='synthetic-review-label';label.textContent='合成联调示例：软件时钟；COS为测试替身，未访问外部存储';label.style.cssText='margin:0;padding:12px;background:#fff3cd;color:#332600;font:14px/1.6 system-ui;overflow-wrap:anywhere';document.body.prepend(label)});
+ report.reportBeforeArchive=await page.locator('body').innerText();
+ await page.screenshot({path:path.join(out,'report-core-saved-archive-pending-390.png'),fullPage:true});
+ await page.getByRole('button',{name:'保存完整记录',exact:true}).click();await page.getByText('完整记录已归档。',{exact:true}).waitFor();
+ report.afterConfirmedArchive=await readDraft();report.archiveAfterRetry=await(await context.request.get(base+'/__review/archive-state')).json();
+ if(report.afterConfirmedArchive!==null)throw Error('Confirmed generic draft not cleared');
+ await page.screenshot({path:path.join(out,'report-archive-confirmed-390.png'),fullPage:true});
+ await page.setViewportSize({width:820,height:1180});await page.screenshot({path:path.join(out,'report-archive-confirmed-820.png'),fullPage:true});
+ await page.evaluate(()=>document.documentElement.style.zoom='2');await page.screenshot({path:path.join(out,'report-200-percent.png'),fullPage:true});
+ report.reportOverflow200=await page.evaluate(()=>({scroll:document.documentElement.scrollWidth,client:document.documentElement.clientWidth}));
+ if(report.reportOverflow200.scroll>report.reportOverflow200.client+1)throw Error('Report overflows at 200%');
+ if(report.pageErrors.length)throw Error('Browser page errors: '+report.pageErrors.join('; '));
+ if(report.api.filter(r=>r.path.endsWith('/submit')&&r.method==='POST').length!==1)throw Error('FINAL repeated unexpectedly');
+ report.status='PASS';report.checks.push({name:'3_practice_25_formal_software_clock_actual_UI_emulated_touch_real_START_FINAL_report',passed:true},{name:'core_report_visible_before_fake_COS_confirmation_raw_retained_then_retry_confirmed',passed:true});
+ }catch(error){report.status='FAIL';report.error=String(error?.stack||error);if(browser){try{const p=browser.contexts()[0]?.pages()[0];if(p){report.failurePageText=await p.locator('body').innerText();await p.screenshot({path:path.join(out,'failure.png'),fullPage:true})}}catch{}}process.exitCode=1}
+ finally{report.finishedAt=new Date().toISOString();report.scriptSha256=crypto.createHash('sha256').update(fs.readFileSync(__filename)).digest('hex');if(temp)fs.rmSync(temp,{recursive:true,force:true});if(browser)await browser.close();if(server)await server.close();fs.writeFileSync(path.join(out,'review.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify({status:report.status,error:report.error?.split('\n')[0],out}));}
+})();

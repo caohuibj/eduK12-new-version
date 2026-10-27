@@ -1,0 +1,17 @@
+{
+  "kind": "DOCUMENT_ONLY_STATIC_HASH_CALCULATION",
+  "attempts": [
+    {
+      "exitCode": 1,
+      "reason": "Absolute tsx/cjs path ignored package exports; no canonical encoder/task/test executed."
+    },
+    {
+      "exitCode": 0,
+      "fix": "Resolve tsx/cjs through createRequire(backend/package.json), then invoke existing pure assessment-runtime/canonical.ts."
+    }
+  ],
+  "installedDependencies": false,
+  "taskExecuted": false,
+  "testsExecuted": false,
+  "ci": false
+}

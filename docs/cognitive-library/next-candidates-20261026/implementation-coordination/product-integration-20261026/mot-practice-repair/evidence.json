@@ -1,0 +1,108 @@
+{
+  "kind": "MOT_PRACTICE_PATCH_DEVELOPMENT_EVIDENCE_NOT_ADMISSION",
+  "baseline": "eb5d90274c2f4301c1be93b107eb8c7bb10360ee",
+  "sourceSha256": {
+    "server-version/backend/src/__tests__/cognitive/fixtures/mot-native-v1.1.1.json": "ff11a8b2bbfbbabd4ed54e8cf401964c22cd643e845cd2f88a6c09c06e5bb413",
+    "server-version/backend/src/__tests__/cognitive/mot-native-content.test.ts": "d1a82ed87d4ace287e85969e986fde1fa38ad9639b642882c53f45c40b7c3691",
+    "server-version/backend/src/__tests__/cognitive/mot-practice-version.test.ts": "0f8185d660819c881c3e8a2c36126ee2995d90441e635afa1459422e4a12ef36",
+    "server-version/backend/src/modules/cognitive/content-candidates/mot/metadata.ts": "53f026377e29e4a96ec7f747e51d68d22739f6e11a59f4f21963bd38a6cca8cd",
+    "server-version/backend/src/modules/cognitive/content-candidates/mot/package.ts": "709b00610482a2d4014090e9a400728009d5b2e2ad9cdd5468d3bc4cfe73c261",
+    "server-version/backend/src/modules/cognitive/content-candidates/mot/protocol.ts": "59813dd8b4cbde0571ecdad9e87113cb52ab1b9885d506f0273cb8cca34a5612",
+    "server-version/backend/src/modules/cognitive/content-candidates/mot/scorer.ts": "0a6afc6aaabb6a1464b0b957f5a99dea912d49b8ad85d4cf827b7ebfb90e88d4",
+    "server-version/frontend/src/modules/cognitive/tasks/mot/MotTask.persistence.test.tsx": "fcee5effb2f8f6a5e644623e03af3cad344307f785f7a993bc97709e058430a2",
+    "server-version/frontend/src/modules/cognitive/tasks/mot/MotTask.practice-policy.test.tsx": "d437104aa32588c0b19f6bdc74bf217936a43832f6946344afbc275c2a6127fe",
+    "server-version/frontend/src/modules/cognitive/tasks/mot/MotTask.tsx": "ce8221cb5c59bd72989d0ef9f651b4ee81b1dec6d695c3e83cacb463c6d52a1e",
+    "server-version/frontend/src/modules/cognitive/tasks/mot/draft.ts": "c1f48de1bcf08b37d04648e949a71ac1f682178a39fdcedf0b625eba16bff77c",
+    "server-version/frontend/src/modules/cognitive/tasks/mot/generated/protocol.ts": "7a8fa5c93d3032c86a9156cdc24bde0c019cc4eb4b990f56aaaa9be553c485fb",
+    "server-version/scripts/cognitive/mot-browser-review.cjs": "385da32656ccc0232c37892dd16d8e4c9b153dd93fd45f5934a7661508b27483"
+  },
+  "checks": [
+    {
+      "file": "mot-practice-draft-version-20261026.json",
+      "passed": 1,
+      "failed": 0,
+      "notRun": 3,
+      "assertions": [
+        {
+          "name": "keeps interrupted practice as an interrupted record and cannot advance to formal",
+          "status": "skipped"
+        },
+        {
+          "name": "allows a completed genuinely zero-hit practice to remain zero and advance",
+          "status": "skipped"
+        },
+        {
+          "name": "does not let an interrupted second practice unlock formal trials",
+          "status": "skipped"
+        },
+        {
+          "name": "preserves old draft identity for reading without aliasing it into the new engine",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "mot-practice-policy-after-20261026.json",
+      "passed": 3,
+      "failed": 0,
+      "notRun": 0,
+      "assertions": [
+        {
+          "name": "keeps interrupted practice as an interrupted record and cannot advance to formal",
+          "status": "passed"
+        },
+        {
+          "name": "allows a completed genuinely zero-hit practice to remain zero and advance",
+          "status": "passed"
+        },
+        {
+          "name": "does not let an interrupted second practice unlock formal trials",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "mot-practice-policy-before-20261026.json",
+      "passed": 0,
+      "failed": 1,
+      "notRun": 2,
+      "assertions": [
+        {
+          "name": "keeps interrupted practice as an interrupted record and cannot advance to formal",
+          "status": "failed"
+        },
+        {
+          "name": "allows a completed genuinely zero-hit practice to remain zero and advance",
+          "status": "skipped"
+        },
+        {
+          "name": "does not let an interrupted second practice unlock formal trials",
+          "status": "skipped"
+        }
+      ]
+    },
+    {
+      "file": "mot-practice-version-20261026.json",
+      "passed": 2,
+      "failed": 0,
+      "notRun": 0,
+      "assertions": [
+        {
+          "name": "MOT completed-practice engine patch freezes its execution identity pins new protocol signature while preserving each frozen config and historical golden",
+          "status": "passed"
+        },
+        {
+          "name": "MOT completed-practice engine patch freezes its execution identity rejects an old frozen engine or protocol instead of silently applying new practice policy",
+          "status": "passed"
+        }
+      ]
+    }
+  ],
+  "typesEvidence": "../types/evidence-union.json",
+  "notRun": [
+    "unchanged seed/trajectory/frame capture/scorer arithmetic",
+    "full-task browser",
+    "API/DB/COS",
+    "CI/merge/deploy"
+  ]
+}

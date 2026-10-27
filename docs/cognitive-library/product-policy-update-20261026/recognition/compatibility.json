@@ -1,0 +1,28 @@
+{
+  "candidateId": "continuous-recognition",
+  "allowed": {
+    "engineVersion": "0.1.0",
+    "scoringVersion": "0.2.0",
+    "configVersion": "0.2.0",
+    "protocolKey": "continuous-recognition/0.1.0/0.2.0",
+    "protocolVersion": "0.1.0",
+    "generatorVersion": "seeded-blocks-0.1.0",
+    "qualityRule": "product-session-descriptive-0.2.0",
+    "reportVersion": "0.2.0",
+    "profiles": [
+      "research",
+      "experience"
+    ],
+    "referenceBindings": []
+  },
+  "refused": [
+    "native scoring/config0.1 tuple",
+    "client ResearchReview",
+    "input.config different from stored freeze",
+    "old report/quality version",
+    "normal projection without matching authorized asset binding"
+  ],
+  "migration": "No automatic reanalysis or historical report overwrite; explicit reanalysis requires a new frozen tuple/result with original source retained",
+  "hostAssetMapperImplemented": false,
+  "formalAssetBankCleared": false
+}

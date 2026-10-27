@@ -1,0 +1,32 @@
+{
+  "kind": "NATIVE_REGISTRY_CHANGED_ROOTS_ACTUAL_BACKEND_TSCONFIG",
+  "exitCode": 0,
+  "durationSeconds": 3.369917869567871,
+  "cwd": "/workspace/eduK12-new-version/server-version/backend",
+  "roots": [
+    "src/modules/cognitive/v2/registry.ts",
+    "src/modules/cognitive/v2/publication-gate.ts",
+    "src/modules/cognitive/v2/audit.ts",
+    "src/modules/cognitive/content-candidates/native-registry/definitions.ts"
+  ],
+  "script": "const ts=require('typescript'),path=require('node:path');const c=ts.readConfigFile('tsconfig.json',ts.sys.readFile);if(c.error)throw Error('tsconfig unreadable');const p=ts.parseJsonConfigFileContent(c.config,ts.sys,process.cwd());const roots=[\"src/modules/cognitive/v2/registry.ts\", \"src/modules/cognitive/v2/publication-gate.ts\", \"src/modules/cognitive/v2/audit.ts\", \"src/modules/cognitive/content-candidates/native-registry/definitions.ts\"].map(f=>path.join(process.cwd(),f));const program=ts.createProgram(roots,p.options);const ds=ts.getPreEmitDiagnostics(program);if(ds.length){process.stdout.write(ts.formatDiagnosticsWithColorAndContext(ds,{getCanonicalFileName:f=>f,getCurrentDirectory:()=>process.cwd(),getNewLine:()=>String.fromCharCode(10)}));process.exitCode=1;}",
+  "sourceSha256": {
+    "server-version/backend/src/modules/cognitive/v2/registry.ts": "3097ab3b6b52f8cfb8f73c851db93dc4da09815725e19952431d1e762f166f97",
+    "server-version/backend/src/modules/cognitive/v2/publication-gate.ts": "2f0ff974f4be034c88cb47831f63e6768ee7fabd5e8896095ebd56358302daf9",
+    "server-version/backend/src/modules/cognitive/v2/audit.ts": "63183ef391d2cc0d7524be76cd0f38c4b3b187b3354cc28f0e87b2d5df35e8d7",
+    "server-version/backend/src/modules/cognitive/content-candidates/native-registry/definitions.ts": "d00bcca6851175120c548d7b56c53e658259ab34e33afb51ca803a8cdcfc8a5a",
+    "server-version/backend/src/modules/cognitive/content-candidates/enumeration/package.ts": "2d002b020ed9053ea6d16299ba7edd14afd30a6d1263964a28d600d6b64c2028",
+    "server-version/backend/src/modules/cognitive/content-candidates/continuous-recognition/package.ts": "eaf7c9e3b2d41d95c77546deebb3ce80c0ee9bd12b5b1c235849024fecf7dfc3",
+    "server-version/backend/src/modules/cognitive/content-candidates/mot/package.ts": "709b00610482a2d4014090e9a400728009d5b2e2ad9cdd5468d3bc4cfe73c261",
+    "server-version/backend/src/modules/cognitive/content-candidates/ant/package.ts": "dccf4723f4ea9b66d317b532310fc30768406c74614e7d645aa990939266f56f",
+    "server-version/backend/src/modules/cognitive/content-candidates/enumeration/protocol.ts": "b7c61565dfc2182327fa8d25368d4435d75669452d30c50240915a5f3080ad69",
+    "server-version/backend/src/modules/cognitive/content-candidates/continuous-recognition/protocol.ts": "f9b724b0bbca7c172089ae1699b311605e1681845a331f192f9afc4de454804b",
+    "server-version/backend/src/modules/cognitive/content-candidates/mot/protocol.ts": "59813dd8b4cbde0571ecdad9e87113cb52ab1b9885d506f0273cb8cca34a5612",
+    "server-version/backend/src/modules/cognitive/content-candidates/ant/protocol.ts": "3c7d56f2bc6bf4ef92d7251e90bedbc94baaa98ad507fca5e255b13be846d974",
+    "server-version/backend/src/modules/cognitive/content-candidates/continuous-recognition/native.ts": "8780ed5a2d7ec90f14a4f5129c97f1a84fd271197c40c32a39148a4b256d0016"
+  },
+  "inputHashesStable": true,
+  "wholeApplication": false,
+  "recognitionPackageCoveredAsDependency": true,
+  "PrismaGenerated": false
+}

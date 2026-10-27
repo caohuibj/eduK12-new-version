@@ -1,0 +1,161 @@
+{
+  "kind": "SYNTHETIC_CPU_AND_PAYLOAD_PROBE_NOT_SERVER_CAPACITY",
+  "node": "v24.21.0",
+  "hardwareContext": "task cloud container; CPU quota equivalent to 4 cores; 16 GiB memory limit",
+  "baseline": "ff8471e529e7b3c56e1e20f17d1e2581040fc896",
+  "bodyParserBytes": 2097152,
+  "cognitiveCanonicalBudgetBytes": 1572864,
+  "cases": [
+    {
+      "profile": "experience",
+      "nominalHz": 60,
+      "trialCount": 9,
+      "framesInSeparateArchivePerTrial": 481,
+      "jsonBytes": 23140,
+      "provenanceAdditionalBytes": 99,
+      "withinCurrentCanonicalBudget": true,
+      "firstScorerMs": 9.006968,
+      "warmScorerMedianMs": 0.8354969999999753,
+      "warmScorerP95Ms": 3.600459999999998,
+      "jsonParseP95Ms": 0.14855499999998756,
+      "canonicalizeAndHashP95Ms": 1.4668950000000223
+    },
+    {
+      "profile": "experience",
+      "nominalHz": 90,
+      "trialCount": 9,
+      "framesInSeparateArchivePerTrial": 721,
+      "jsonBytes": 23149,
+      "provenanceAdditionalBytes": 99,
+      "withinCurrentCanonicalBudget": true,
+      "firstScorerMs": 1.2360840000000053,
+      "warmScorerMedianMs": 0.6945230000000038,
+      "warmScorerP95Ms": 0.9326839999999947,
+      "jsonParseP95Ms": 0.10831399999995028,
+      "canonicalizeAndHashP95Ms": 0.6658700000000408
+    },
+    {
+      "profile": "experience",
+      "nominalHz": 120,
+      "trialCount": 9,
+      "framesInSeparateArchivePerTrial": 961,
+      "jsonBytes": 23131,
+      "provenanceAdditionalBytes": 99,
+      "withinCurrentCanonicalBudget": true,
+      "firstScorerMs": 0.5753730000000132,
+      "warmScorerMedianMs": 0.6119280000000344,
+      "warmScorerP95Ms": 1.2486230000000091,
+      "jsonParseP95Ms": 0.11677700000001323,
+      "canonicalizeAndHashP95Ms": 0.4446350000000052
+    },
+    {
+      "profile": "experience",
+      "nominalHz": 240,
+      "trialCount": 9,
+      "framesInSeparateArchivePerTrial": 1921,
+      "jsonBytes": 23140,
+      "provenanceAdditionalBytes": 99,
+      "withinCurrentCanonicalBudget": true,
+      "firstScorerMs": 0.9377220000000079,
+      "warmScorerMedianMs": 0.5500940000000014,
+      "warmScorerP95Ms": 0.8422170000000051,
+      "jsonParseP95Ms": 0.11085799999995061,
+      "canonicalizeAndHashP95Ms": 0.7408940000000257
+    },
+    {
+      "profile": "research",
+      "nominalHz": 60,
+      "trialCount": 45,
+      "framesInSeparateArchivePerTrial": 481,
+      "jsonBytes": 115695,
+      "provenanceAdditionalBytes": 99,
+      "withinCurrentCanonicalBudget": true,
+      "firstScorerMs": 2.183161000000041,
+      "warmScorerMedianMs": 2.3931890000000067,
+      "warmScorerP95Ms": 3.6865700000000174,
+      "jsonParseP95Ms": 0.5121660000000361,
+      "canonicalizeAndHashP95Ms": 1.988525999999979
+    },
+    {
+      "profile": "research",
+      "nominalHz": 90,
+      "trialCount": 45,
+      "framesInSeparateArchivePerTrial": 721,
+      "jsonBytes": 115740,
+      "provenanceAdditionalBytes": 99,
+      "withinCurrentCanonicalBudget": true,
+      "firstScorerMs": 2.7811979999999608,
+      "warmScorerMedianMs": 2.1101899999999887,
+      "warmScorerP95Ms": 2.670168999999987,
+      "jsonParseP95Ms": 0.44876100000004726,
+      "canonicalizeAndHashP95Ms": 1.9155349999999771
+    },
+    {
+      "profile": "research",
+      "nominalHz": 120,
+      "trialCount": 45,
+      "framesInSeparateArchivePerTrial": 961,
+      "jsonBytes": 115650,
+      "provenanceAdditionalBytes": 99,
+      "withinCurrentCanonicalBudget": true,
+      "firstScorerMs": 2.022597000000019,
+      "warmScorerMedianMs": 2.1182019999999966,
+      "warmScorerP95Ms": 2.7608370000000377,
+      "jsonParseP95Ms": 0.4434830000000147,
+      "canonicalizeAndHashP95Ms": 1.928134
+    },
+    {
+      "profile": "research",
+      "nominalHz": 240,
+      "trialCount": 45,
+      "framesInSeparateArchivePerTrial": 1921,
+      "jsonBytes": 115695,
+      "provenanceAdditionalBytes": 99,
+      "withinCurrentCanonicalBudget": true,
+      "firstScorerMs": 2.4863000000000284,
+      "warmScorerMedianMs": 2.03774999999996,
+      "warmScorerP95Ms": 2.805835000000002,
+      "jsonParseP95Ms": 0.455120000000079,
+      "canonicalizeAndHashP95Ms": 1.7345109999999977
+    }
+  ],
+  "schemaFrameBoundary": {
+    "profile": "research",
+    "framesInSeparateArchivePerTrial": 3000,
+    "jsonBytes": 115740,
+    "withinCurrentCanonicalBudget": true
+  },
+  "sourceBindings": [
+    {
+      "file": "server-version/scripts/cognitive/mot-resource-probe.ts",
+      "sha256": "168c9e597289d79e0b6a585916efbb6159a8b36f5346594d601264380196d3a3"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/mot/protocol.ts",
+      "sha256": "bd79691a33a6680c220e170ef9e5fc210fca518ad7823f2c2c7fdca418c37da9"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/mot/scorer.ts",
+      "sha256": "9b1dffc9dc53ccf69b4c1ad0679bd510c2e1a7f67a6d3d7c0fc34264d2babeb4"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/mot/schema.ts",
+      "sha256": "094ca7760198f49bbe2126036fe58a27aa8389bfba0959be5f8217113e2d04f6"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/unified-raw-submission.ts",
+      "sha256": "4a76c052ae223b6d4079d34fb66b62762c8be424a2c4232bacd400738ad0f378"
+    },
+    {
+      "file": "server-version/backend/src/services/instrumentFinalSubmit.ts",
+      "sha256": "abdd778dbb2df0883f5b975b240155ca0158fd0cd075b72a7c11c94adf72ce51"
+    }
+  ],
+  "limitations": [
+    "Synthetic exact frame times are not physical-device traces or a payload maximum guarantee.",
+    "The first invocation per case is recorded separately; process module initialization is not measured.",
+    "No actual browser rendering, HTTP/auth/encryption/compression, database, report worker or concurrency capacity was measured.",
+    "Provenance roundtrip checks the current strict raw payload shape in memory, not a new database persistence proof.",
+    "This revised FINAL contains frame summaries only. Separate archive bytes and COS upload/assembly are not measured; global limits were not raised."
+  ]
+}

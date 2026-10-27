@@ -1,0 +1,12 @@
+{
+  "research": {
+    "configHash": "a7a2660c4defe8d336926e63ae821d6e750130226bbfba85e8b054d891e4fbba",
+    "protocolSignature": "f4e03c6eaefe0f19191ea37bb2f25edd07a4ce75ce82dcb1bc5451d6d88e7d25",
+    "planSha256": "db2b9527309b8748b4030fc656f5444386cd942657e20733ce633aa4e0f20325"
+  },
+  "experience": {
+    "configHash": "ac18eb0d0ee10f354a6ae9dd9d8bdec4587f991c6e19676eb0f45041154eaf13",
+    "protocolSignature": "f4e03c6eaefe0f19191ea37bb2f25edd07a4ce75ce82dcb1bc5451d6d88e7d25",
+    "planSha256": "b232ca378ac62107aa2332edf0144d157fb1ebed53005be3631ccdb32318fade"
+  }
+}

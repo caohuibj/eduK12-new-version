@@ -1,26 +1,23 @@
+import { listNativeCognitiveTaskDefinitions } from '../../modules/cognitive/content-candidates/native-registry/definitions'
 import { describe, expect, it } from 'vitest'
-import {
-  buildCognitiveV2TaskDefinition,
-  getCognitiveV2TaskDefinition,
-  listCognitiveV2TaskDefinitions,
-  auditCognitiveV2Registry,
-  validateTaskDefinition,
-  computeConfigSnapshotHash,
-  computeProtocolSignature,
-  createTrialEnvelope,
-  resolveCognitiveFinalMaxTrials,
-  runAuthoritativeScorer,
-  validateRegistryReferenceEligibility,
-} from '../../modules/cognitive/v2'
+import { buildCognitiveV2TaskDefinition,getCognitiveV2TaskDefinition,listCognitiveV2TaskDefinitions,
+  validateRegistryReferenceEligibility } from '../../modules/cognitive/v2/registry'
+import { auditCognitiveV2Registry } from '../../modules/cognitive/v2/audit'
+import { validateTaskDefinition } from '../../modules/cognitive/v2/publication-gate'
+import { computeConfigSnapshotHash,computeProtocolSignature } from '../../modules/cognitive/v2/canonical'
+import { createTrialEnvelope } from '../../modules/cognitive/v2/trial-envelope'
+import { resolveCognitiveFinalMaxTrials } from '../../modules/cognitive/v2/final-submission-budget'
+import { runAuthoritativeScorer } from '../../modules/cognitive/v2/authoritative-scorer'
 import { listCognitiveRegistryEntries } from '../../modules/cognitive/cognitive.registry'
 
 describe('Cognitive v2 registry adapter', () => {
-  it('migrates every static cognitive registry entry without changing task inventory', () => {
+  it('preserves every legacy identity and adds only the explicit native task inventory', () => {
     const legacy = listCognitiveRegistryEntries()
     const definitions = listCognitiveV2TaskDefinitions()
-    expect(definitions).toHaveLength(legacy.length)
+    const native = listNativeCognitiveTaskDefinitions()
+    expect(definitions).toHaveLength(legacy.length + native.length)
     expect(new Set(definitions.map((definition) => `${definition.testType}/${definition.engineVersion}/${definition.scoringVersion}`)).size)
-      .toBe(legacy.length)
+      .toBe(legacy.length + native.length)
     for (const definition of definitions) {
       const errors = validateTaskDefinition(definition).filter((candidate) => candidate.severity === 'error')
       expect(errors, `${definition.testType}/${definition.scoringVersion}`).toEqual([])
@@ -36,17 +33,22 @@ describe('Cognitive v2 registry adapter', () => {
       entry,
     ]))
 
-    expect(definitions).toHaveLength(legacy.length)
+    const native = listNativeCognitiveTaskDefinitions()
+    expect(definitions).toHaveLength(legacy.length + native.length)
     for (const definition of definitions) {
       const entry = legacyByKey.get(`${definition.testType}/${definition.engineVersion}/${definition.scoringVersion}`)
-      expect(entry, `${definition.testType}/${definition.engineVersion}/${definition.scoringVersion}`).toBeDefined()
-      expect(typeof entry?.finalSubmission.maxTrials).toBe('function')
-      expect(definition.finalSubmission).toBe(entry?.finalSubmission)
+      if (entry) {
+        expect(typeof entry.finalSubmission.maxTrials).toBe('function')
+        expect(definition.finalSubmission).toBe(entry.finalSubmission)
+      } else {
+        expect(native).toContain(definition)
+        expect(typeof definition.finalSubmission.maxTrials).toBe('function')
+      }
     }
 
     const audit = auditCognitiveV2Registry(definitions)
-    expect(audit.registryCount).toBe(legacy.length)
-    expect(audit.entries).toHaveLength(legacy.length)
+    expect(audit.registryCount).toBe(legacy.length + native.length)
+    expect(audit.entries).toHaveLength(legacy.length + native.length)
     expect(audit.entries.every((entry) => entry.issues.every((issue) => issue.severity !== 'error'))).toBe(true)
   })
 
@@ -57,7 +59,9 @@ describe('Cognitive v2 registry adapter', () => {
     const compatibilityDrafts = definitions.filter((definition) => definition.publication.status === 'DRAFT')
     const compatibilityRetired = definitions.filter((definition) => definition.publication.status === 'RETIRED')
 
-    expect(compatibilityDrafts.map((definition) => definition.testType)).toEqual(['fake'])
+    expect(compatibilityDrafts.map((definition) => definition.testType).sort()).toEqual([
+      'fake', ...listNativeCognitiveTaskDefinitions().filter(definition => definition.publication.status === 'DRAFT').map(definition => definition.testType),
+    ].sort())
     expect(compatibilityRetired.map((definition) => `${definition.testType}/${definition.engineVersion}/${definition.scoringVersion}`).sort()).toEqual([
       'memory/1.0.0/1.0.0',
       'reaction/1.0.0/1.0.0',

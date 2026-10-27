@@ -1,0 +1,490 @@
+{
+  "artifactKind": "COGNITIVE_PROTOCOL_AND_STATIC_UI_DESIGN_NOT_RUNTIME",
+  "candidateId": "attention-ant-pebl",
+  "status": "DESIGN_PROPOSAL",
+  "proposalRevision": "2026-10-26-ant-v1",
+  "names": {
+    "zh": "注意网络任务 · 触屏变式提案",
+    "en": "Attentional Network Task · touch-first proposal"
+  },
+  "taskFamilyRelationship": {
+    "classification": "protocol_variant",
+    "closestBaselineFamily": "flanker",
+    "isNewRegisteredFamily": false
+  },
+  "sourceEvidence": [
+    {
+      "repository": "caohuibj/eduK12-new-version",
+      "commit": "22721e5c63dd78819e8c58921adf20157cdaa08c",
+      "file": "docs/cognitive-library/task-selection-20261026/attention-task-cards.json",
+      "pointer": "/cards/0"
+    },
+    {
+      "repository": "stmueller/pebl",
+      "commit": "eb22a0725d765a0597a4905920ad3c603b1c9ae8",
+      "file": "battery/ANT/ANT.pbl",
+      "version": "gPANTVersion 1.2; not schema 1.1"
+    },
+    {
+      "repository": "stmueller/pebl",
+      "commit": "eb22a0725d765a0597a4905920ad3c603b1c9ae8",
+      "file": "battery/ANT/params/ANT.pbl.schema.json",
+      "blob": "d7cce1e0985e3262d445452eb2e691c3b2a2768e"
+    },
+    {
+      "citation": "Fan et al. (2002), Testing the Efficiency and Independence of Attentional Networks",
+      "url": "https://raz-lab.org/wp-content/uploads/2023/09/089892902317361886.pdf",
+      "readStatus": "prior fixed research card; this design does not claim a new full-paper read"
+    }
+  ],
+  "construct": {
+    "domains": [
+      "attention",
+      "executive_control"
+    ],
+    "processes": [
+      "alerting",
+      "spatial_orienting",
+      "conflict_processing"
+    ],
+    "claim": "Conditions within this attempt; not direct brain network measurements or an ADHD/IQ/ability diagnosis."
+  },
+  "inheritedResearchTags": {
+    "cognitive_domain": [
+      "attention",
+      "executive_control"
+    ],
+    "target_process": [
+      "alerting",
+      "spatial_orienting",
+      "conflict_processing"
+    ],
+    "paradigm": [
+      "ant_pant_cue_flanker"
+    ],
+    "stimulus_form": [
+      "geometric_arrows_cues"
+    ],
+    "input_upstream": [
+      "auto_layout_keys_or_mouse"
+    ],
+    "input_proposed": [
+      "keyboard_plan_not_frozen"
+    ],
+    "key_metric": [
+      "condition_accuracy",
+      "condition_rt",
+      "cue_conflict_rt_differences"
+    ],
+    "intended_use": [
+      "research_protocol_selection"
+    ],
+    "code_license": [
+      "gpl_2_0_recorded"
+    ],
+    "code_rights_disposition": [
+      "github_public_conditional"
+    ],
+    "asset_rights_disposition": [
+      "authorization_pending"
+    ],
+    "asset_license_review": [
+      "fonts_ui_unverified"
+    ],
+    "implementation_strategy": [
+      "literature_reimplementation"
+    ],
+    "maturity": [
+      "source_research_only"
+    ],
+    "evidence_limitations": [
+      "timing_device_unverified",
+      "protocol_variant_unvalidated",
+      "static_runtime_risk",
+      "protocol_version_decision"
+    ],
+    "baseline_relation": [
+      "protocol_variant"
+    ],
+    "research_priority": [
+      "priority_finalize"
+    ],
+    "rule_type": [
+      "technical_quality",
+      "theoretical_reference",
+      "literature_experience",
+      "project_provisional"
+    ]
+  },
+  "tagExtensionsProposal": {
+    "applicationScenarios": [
+      {
+        "key": "cognitive_research",
+        "status": "paradigm_literature_project_variant_unvalidated"
+      },
+      {
+        "key": "self_exploration",
+        "status": "descriptive_only"
+      },
+      {
+        "key": "learning_evaluation_support",
+        "status": "unvalidated_not_diagnostic"
+      },
+      {
+        "key": "recruitment_support",
+        "status": "unvalidated_not_predictive"
+      }
+    ],
+    "age": {
+      "min": null,
+      "max": null,
+      "status": "unverified"
+    },
+    "difficulty": {
+      "level": null,
+      "status": "unverified",
+      "taskDemand": "Central-arrow direction while ignoring flankers and spatial position; speeded left/right response."
+    },
+    "languages": [
+      {
+        "key": "zh",
+        "implementation": "static_proposal",
+        "comprehensionValidation": "pending"
+      },
+      {
+        "key": "en",
+        "implementation": "static_proposal",
+        "comprehensionValidation": "pending"
+      }
+    ],
+    "devices": [
+      "phone",
+      "tablet",
+      "desktop"
+    ],
+    "inputs": [
+      {
+        "key": "touch",
+        "priority": 1
+      },
+      {
+        "key": "pointer",
+        "priority": 2
+      },
+      {
+        "key": "keyboard",
+        "priority": 3
+      }
+    ],
+    "newDimensionsNotRuntimeImport": true,
+    "persistenceAndSearchConnected": false
+  },
+  "protocol": {
+    "freezeStatus": "NOT_FROZEN",
+    "factorLevels": {
+      "cue": [
+        "none",
+        "central",
+        "double",
+        "spatial_valid"
+      ],
+      "targetPosition": [
+        "top",
+        "bottom"
+      ],
+      "targetDirection": [
+        "left",
+        "right"
+      ],
+      "flanker": [
+        "congruent",
+        "incongruent",
+        "neutral"
+      ]
+    },
+    "uniqueCells": 48,
+    "practice": {
+      "trials": 24,
+      "selection": "Proposed saved-seed sample of 24 distinct cells from 48; actual marginals recorded; not a verified practice accuracy gate.",
+      "feedback": "Correct/error only; no RT feedback; incomplete/interrupted flow and repeat policy require confirmation.",
+      "ruleProvenance": "Source has SampleN(48-cell design,24); distinct saved-seed sampling is a project proposal, not an upstream persistence guarantee."
+    },
+    "profiles": {
+      "research": {
+        "formalTrials": 288,
+        "blocks": 3,
+        "trialsPerBlock": 96,
+        "repetitionsPerCell": 6,
+        "marginalPlannedTrials": {
+          "perCue": 72,
+          "perFlanker": 96,
+          "perTargetPosition": 144,
+          "perDirection": 144
+        },
+        "minimumFormalPresentationMinutes": 19.2,
+        "evidence": "Matches fixed PEBL design count, not all Fan stimuli or device conditions."
+      },
+      "experience": {
+        "formalTrials": 48,
+        "blocks": 1,
+        "trialsPerBlock": 48,
+        "repetitionsPerCell": 1,
+        "marginalPlannedTrials": {
+          "perCue": 12,
+          "perFlanker": 16,
+          "perTargetPosition": 24,
+          "perDirection": 24
+        },
+        "minimumFormalPresentationMinutes": 3.2,
+        "evidence": "Project provisional short form; no reliability/equivalence evidence; no stable network ability inference."
+      }
+    },
+    "minimumPracticePresentationMinutes": 1.6,
+    "durationNote": "4000 ms origin-to-origin rhythm; add instruction/calibration/breaks and completion overhead. Do not promise a 3-minute complete experience.",
+    "stageTimingMs": {
+      "preCueNominalRange": [
+        400,
+        1600
+      ],
+      "cue": 100,
+      "postCueFixation": 400,
+      "responseWindow": 1700,
+      "trialStartInterval": 4000
+    },
+    "trialStartIntervalMeaning": "Absolute next trial start deadline, not an additional 4000 ms ITI.",
+    "neutralProposal": {
+      "recommended": "PEBL-default no flankers",
+      "alternative": "Fan-style horizontal dashes",
+      "status": "USER_CONFIRMATION_REQUIRED; different protocol variant if switched"
+    },
+    "inputProposal": {
+      "touch": "Fixed left/right zones below field, first valid pointerdown; target direction not target screen position.",
+      "pointer": "Click the same fixed zones; actual input recorded.",
+      "keyboard": "ArrowLeft/ArrowRight as proposed explicit mapping; auto layout is not copied as an implicit default.",
+      "extraEvents": "Record premature, repeated, held-key and out-of-zone events; exact exclusion rule not yet frozen."
+    },
+    "geometry": {
+      "upstream": {
+        "background": "white",
+        "foreground": "black",
+        "arrowCanvasPx": [
+          40,
+          20
+        ],
+        "arrowSpacingPx": 42,
+        "rowCanvasPx": [
+          210,
+          20
+        ],
+        "targetOffsetFormula": "round(tan(1.06 degrees) * assumed eye distance in screen pixels)",
+        "screenAssumptionsInCode": {
+          "screenHeightInches": 7,
+          "viewDistanceInches": 21
+        }
+      },
+      "project": {
+        "physicalCalibration": "Required proposal; reuse calibrated-unit method, not MOT's 12-degree geometry",
+        "arrowVisualAngle": null,
+        "cueVisualAngle": null,
+        "viewDistance": null,
+        "previewCssOnly": {
+          "fieldHeightPx": 280,
+          "targetOffsetPx": 52,
+          "rowWidthPx": 210
+        },
+        "warning": "All preview geometry illustrative and uncalibrated; dimensions awaiting literature/display decision."
+      }
+    },
+    "randomization": {
+      "proposal": "Saved seed, balanced formal 48-cell cycles, explicit block order, jitter schedule and realized sequence; versioned algorithm TBD",
+      "upstream": "Shuffle/SampleN; seed persistence not observed"
+    }
+  },
+  "rawFieldProposal": {
+    "session": [
+      "testType",
+      "engineVersion",
+      "scoringVersion",
+      "configVersion",
+      "profile",
+      "resolvedConfigHash",
+      "protocolSignature",
+      "actual reference bindings or empty",
+      "device/input/display/calibration source",
+      "seed and realized design order"
+    ],
+    "trial": [
+      "block",
+      "trial",
+      "phase",
+      "cue",
+      "targetPosition",
+      "targetDirection",
+      "flanker",
+      "neutralVariant",
+      "plannedDelayMs",
+      "actualPhaseTimesPerfMs",
+      "targetOnsetPerfMs",
+      "responseInput",
+      "firstResponse",
+      "responseAtPerfMs",
+      "responseRtMs or null",
+      "timedOut",
+      "actualElapsedAtDeadlineMs",
+      "correct",
+      "technicalEvents"
+    ],
+    "timeoutNote": "Timeout stays in accuracy denominator. Preserve actual deadline elapsed and source latency; absent response RT is null, not fabricated 0 or 1700."
+  },
+  "metricDefinitions": [
+    {
+      "key": "condition_accuracy",
+      "unit": "ratio",
+      "formula": "correct / technically usable formal trials in that condition; full count retained alongside separately identified technical exclusions",
+      "denominator": "Includes wrong and timeout formal trials; practice excluded.",
+      "direction": "descriptive",
+      "nullWhen": "No technically usable records",
+      "qualityGate": "Hide affected conditions; no low-accuracy exclusion without explicit rule."
+    },
+    {
+      "key": "condition_correct_mean_rt",
+      "unit": "ms",
+      "formula": "Arithmetic mean of first accepted correct response latencies within the 1700ms window",
+      "denominator": "Correct technically usable formal responses; wrong/timeout excluded from this RT mean but retained raw/accuracy.",
+      "direction": "descriptive",
+      "nullWhen": "No valid correct response; sufficiency rule not yet frozen",
+      "qualityGate": "Insufficient/technical-compromised conditions hidden."
+    },
+    {
+      "key": "alerting_difference",
+      "unit": "ms",
+      "formula": "meanRT(none) - meanRT(double)",
+      "denominator": "Show both marginal correct-response counts and planned counts",
+      "direction": "signed_descriptive",
+      "nullWhen": "Either constituent condition unavailable or fails frozen precision/quality rule",
+      "qualityGate": "Not a stable ability measure; short-form interpretation pending."
+    },
+    {
+      "key": "orienting_difference",
+      "unit": "ms",
+      "formula": "meanRT(central) - meanRT(spatial_valid)",
+      "direction": "signed_descriptive",
+      "nullWhen": "Any constituent invalid/insufficient",
+      "qualityGate": "Never clamp negative values.",
+      "denominator": "Separate correct-response counts for central and spatial_valid cues; each with planned count and technical exclusions."
+    },
+    {
+      "key": "conflict_difference",
+      "unit": "ms",
+      "formula": "meanRT(incongruent) - meanRT(congruent)",
+      "direction": "signed_descriptive",
+      "nullWhen": "Any constituent invalid/insufficient",
+      "qualityGate": "Never convert to brain health/ability score.",
+      "denominator": "Separate correct-response counts for incongruent and congruent flankers; each with planned count and technical exclusions."
+    }
+  ],
+  "analysis": {
+    "publicDefault": "Correct-only marginal RT plus corresponding accuracy/denominators; per-cell precision not implied.",
+    "auditComparison": "Upstream all-trials RT summary may be retained as distinctly named research audit only, never silently merged.",
+    "blockSummary": "Recompute each block from raw; upstream cumulative arrays must not be labeled independent per-block scores.",
+    "experiencePolicy": "Each complete cell has only one trial. Proposed public feedback emphasizes actual marginal records; directional differences require separately frozen sufficiency/quality rules. No network ranking."
+  },
+  "qualityRules": {
+    "categories": [
+      "技术质量规则",
+      "理论参照",
+      "文献经验",
+      "项目暂定研究者规则"
+    ],
+    "protocolParametersAreNotQualityThresholds": true,
+    "technical": {
+      "record": [
+        "visibility_lost",
+        "window_blur",
+        "viewport_changed",
+        "frame anomalies",
+        "premature/repeated input",
+        "load/clock failures"
+      ],
+      "frameToleranceMs": null,
+      "minimumCorrectCounts": null,
+      "decisions": "Must be frozen with target devices; not invented from source flags."
+    },
+    "theoretical": {
+      "zeroDifference": "Arithmetic equality this attempt; not a normal/abnormal cutoff."
+    },
+    "literatureExperience": {
+      "note": "Source research supports paradigm comparison; no project-specific norms or ability cutoffs."
+    },
+    "projectProvisional": {
+      "shortTrials": 48,
+      "owner": "cognitive content design; approval pending",
+      "reviewCondition": "Protocol/input/geometry and real device study before release."
+    },
+    "states": {
+      "interpretable": "Only approved metrics with all required constituent conditions sufficient.",
+      "limited": "Affected metrics/aggregate hidden; unaffected descriptive records may remain.",
+      "invalid": "No performance conclusion; friendly state and next choices."
+    }
+  },
+  "licensing": {
+    "implementationRoute": "Independent literature implementation",
+    "code": {
+      "upstreamLicense": "GPL-2.0 recorded, scope/integration must be reviewed if code copied",
+      "proposed": "Original project implementation; no upstream code copied in this static preview"
+    },
+    "stimuli": {
+      "proposed": "Original geometric SVG arrows/fixation/cue shapes; no external pictures or bundled fonts",
+      "upstreamFonts": "Unverified; not bundled"
+    },
+    "translations": {
+      "status": "Project draft Chinese/English, comprehension unverified"
+    },
+    "rightsDisposition": "Clearance route and implementation strategy kept separate; no blanket commercial claim.",
+    "trademark": "EDUK12.TOP only in optional report image; not timed stimulus"
+  },
+  "presentation": {
+    "interfacePaletteSource": "implementation-20261026/color-collection/colors.json",
+    "stimulus": {
+      "field": "#FFFFFF",
+      "foreground": "#000000",
+      "basis": "Fixed PEBL current source uses white/black; not its outdated grey comment."
+    },
+    "brandInheritance": false,
+    "automaticDarkMode": false,
+    "researchExperienceStimulusSame": true,
+    "staticPreview": true,
+    "syntheticReportData": true
+  },
+  "versionImpact": {
+    "assessment": "Neutral form, geometry, input, jitter/response semantics and practice policy affect protocol identity; freeze after user confirmation.",
+    "parameters": "Profiles/config hashes and QC rules independently bind; no normVersion invented; norms absent.",
+    "report": "Report/presentation can evolve independently; changing denominator/aggregation is semantic.",
+    "currentVersionAssignment": "Design revision only; no product engine/scorer/config version reserved or release compatibility claimed."
+  },
+  "decisionsPending": [
+    "PEBL neutral no-flanker vs Fan horizontal dashes",
+    "Calibrated arrow/cue/target geometry and actual viewing-distance procedure",
+    "Fixed response-zone placement/size and explicit keyboard mapping",
+    "48-trial experience balance and burden; practice repeats/interruption handling",
+    "Correct-only public metric definitions plus minimal correct counts/quality thresholds",
+    "Real device timing, Chinese/English understanding and population suitability",
+    "Native platform admission/frozen tuples/FINAL/report/export and device metadata consumers"
+  ],
+  "resourceAndPlatform": {
+    "client": "Seeded presentation and performance clock locally; no per-frame HTTP/DB writes.",
+    "storage": "Key trial responses/QC summaries for DB; full bounded frame/event data for approved COS full archive, platform contract pending.",
+    "existingPlatformSupport": "Not assumed; native profiles/registration/Survey/FINAL/archive remain dependencies.",
+    "noServerHeavyImageRendering": true
+  },
+  "validationStatus": {
+    "staticPreviewOnly": true,
+    "realDevices": false,
+    "productFourEntrances": false,
+    "scientificValidity": false,
+    "chineseComprehension": false,
+    "ageApplicability": false,
+    "registered": false,
+    "deployed": false
+  }
+}

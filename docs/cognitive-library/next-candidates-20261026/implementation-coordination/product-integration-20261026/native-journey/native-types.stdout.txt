@@ -1,0 +1,93 @@
+[96msrc/__tests__/cognitive/native-mot-journey.postgres.integration.test.ts[0m:[93m143[0m:[93m19[0m - [91merror[0m[90m TS2339: [0mProperty 'result' does not exist on type '{ anonymousCode?: string | null | undefined; submittedAt?: Date | undefined; nextTrialIndex?: number | undefined; contextSnapshotHash: string | null; nativeTask?: boolean | undefined; ... 25 more ...; sessionId: string; } | { ...; } | { ...; } | { ...; } | { ...; }'.
+  Property 'result' does not exist on type '{ anonymousCode?: string | null | undefined; submittedAt?: Date | undefined; nextTrialIndex?: number | undefined; contextSnapshotHash: string | null; nativeTask?: boolean | undefined; ... 25 more ...; sessionId: string; }'.
+
+[7m143[0m       expect(read.result).not.toHaveProperty('score')
+[7m   [0m [91m                  ~~~~~~[0m
+[96msrc/__tests__/cognitive/native-mot-journey.postgres.integration.test.ts[0m:[93m144[0m:[93m19[0m - [91merror[0m[90m TS2339: [0mProperty 'result' does not exist on type '{ anonymousCode?: string | null | undefined; submittedAt?: Date | undefined; nextTrialIndex?: number | undefined; contextSnapshotHash: string | null; nativeTask?: boolean | undefined; ... 25 more ...; sessionId: string; } | { ...; } | { ...; } | { ...; } | { ...; }'.
+  Property 'result' does not exist on type '{ anonymousCode?: string | null | undefined; submittedAt?: Date | undefined; nextTrialIndex?: number | undefined; contextSnapshotHash: string | null; nativeTask?: boolean | undefined; ... 25 more ...; sessionId: string; }'.
+
+[7m144[0m       expect(read.result?.quality?.state).toBe(invalid ? 'invalid' : 'interpretable')
+[7m   [0m [91m                  ~~~~~~[0m
+[96msrc/__tests__/cognitive/native-mot-journey.postgres.integration.test.ts[0m:[93m145[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'result' does not exist on type '{ anonymousCode?: string | null | undefined; submittedAt?: Date | undefined; nextTrialIndex?: number | undefined; contextSnapshotHash: string | null; nativeTask?: boolean | undefined; ... 25 more ...; sessionId: string; } | { ...; } | { ...; } | { ...; } | { ...; }'.
+  Property 'result' does not exist on type '{ anonymousCode?: string | null | undefined; submittedAt?: Date | undefined; nextTrialIndex?: number | undefined; contextSnapshotHash: string | null; nativeTask?: boolean | undefined; ... 25 more ...; sessionId: string; }'.
+
+[7m145[0m       const report = read.result?.report as { qualityState: string; headline: unknown[] }
+[7m   [0m [91m                          ~~~~~~[0m
+[96msrc/__tests__/cognitive/native-mot-journey.postgres.integration.test.ts[0m:[93m154[0m:[93m70[0m - [91merror[0m[90m TS2339: [0mProperty 'result' does not exist on type '{ anonymousCode?: string | null | undefined; submittedAt?: Date | undefined; nextTrialIndex?: number | undefined; contextSnapshotHash: string | null; nativeTask?: boolean | undefined; ... 25 more ...; sessionId: string; } | { ...; } | { ...; } | { ...; } | { ...; }'.
+  Property 'result' does not exist on type '{ anonymousCode?: string | null | undefined; submittedAt?: Date | undefined; nextTrialIndex?: number | undefined; contextSnapshotHash: string | null; nativeTask?: boolean | undefined; ... 25 more ...; sessionId: string; }'.
+
+[7m154[0m       expect((await sessions.getSession(student, session.sessionId)).result).toEqual(read.result)
+[7m   [0m [91m                                                                     ~~~~~~[0m
+[96msrc/__tests__/cognitive/native-mot-journey.postgres.integration.test.ts[0m:[93m154[0m:[93m91[0m - [91merror[0m[90m TS2339: [0mProperty 'result' does not exist on type '{ anonymousCode?: string | null | undefined; submittedAt?: Date | undefined; nextTrialIndex?: number | undefined; contextSnapshotHash: string | null; nativeTask?: boolean | undefined; ... 25 more ...; sessionId: string; } | { ...; } | { ...; } | { ...; } | { ...; }'.
+  Property 'result' does not exist on type '{ anonymousCode?: string | null | undefined; submittedAt?: Date | undefined; nextTrialIndex?: number | undefined; contextSnapshotHash: string | null; nativeTask?: boolean | undefined; ... 25 more ...; sessionId: string; }'.
+
+[7m154[0m       expect((await sessions.getSession(student, session.sessionId)).result).toEqual(read.result)
+[7m   [0m [91m                                                                                          ~~~~~~[0m
+[96msrc/__tests__/cognitive/native-task-resource.test.ts[0m:[93m19[0m:[93m38[0m - [91merror[0m[90m TS2345: [0mArgument of type '{ engineVersion: string; id: string; status: string; publishedAt: Date; testType: "mot"; configVersion: "1.0.0"; name: string; scoringVersion: "1.1.0"; config: MotConfig; }' is not assignable to parameter of type '{ id: string; status: string; publishedAt: Date; testType: "mot"; configVersion: "1.0.0"; name: string; engineVersion: "1.1.1"; scoringVersion: "1.1.0"; config: MotConfig; }'.
+  Types of property 'engineVersion' are incompatible.
+    Type 'string' is not assignable to type '"1.1.1"'.
+
+[7m19[0m     findUnique.mockResolvedValueOnce(divergent)
+[7m  [0m [91m                                     ~~~~~~~~~[0m
+[96msrc/modules/cognitive/assignment.service.ts[0m:[93m70[0m:[93m52[0m - [91merror[0m[90m TS2352: [0mConversion of type 'CognitiveConfigIdentity & { config: unknown; }' to type 'CognitiveConfigIdentity & { configVersion: string; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Property 'configVersion' is missing in type 'CognitiveConfigIdentity & { config: unknown; }' but required in type '{ configVersion: string; }'.
+
+[7m70[0m     if (entry) assertResourceConfigVersion(entry, (row as CognitiveConfigIdentity & { configVersion: string }).configVersion)
+[7m  [0m [91m                                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+  [96msrc/modules/cognitive/assignment.service.ts[0m:[93m70[0m:[93m87[0m
+    [7m70[0m     if (entry) assertResourceConfigVersion(entry, (row as CognitiveConfigIdentity & { configVersion: string }).configVersion)
+    [7m  [0m [96m                                                                                      ~~~~~~~~~~~~~[0m
+    'configVersion' is declared here.
+[96msrc/modules/organization/access.ts[0m:[93m222[0m:[93m14[0m - [91merror[0m[90m TS2339: [0mProperty 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+
+[7m222[0m     if (!req.user) return unauthorized(res)
+[7m   [0m [91m             ~~~~[0m
+[96msrc/modules/organization/access.ts[0m:[93m225[0m:[93m79[0m - [91merror[0m[90m TS2339: [0mProperty 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+
+[7m225[0m     const context = await resolveAssessmentDeliveryAuthority({ principal: req.user, organizationId })
+[7m   [0m [91m                                                                              ~~~~[0m
+[96msrc/modules/organization/access.ts[0m:[93m236[0m:[93m14[0m - [91merror[0m[90m TS2339: [0mProperty 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+
+[7m236[0m     if (!req.user) return unauthorized(res)
+[7m   [0m [91m             ~~~~[0m
+[96msrc/modules/organization/access.ts[0m:[93m239[0m:[93m77[0m - [91merror[0m[90m TS2339: [0mProperty 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+
+[7m239[0m     const context = await resolveOrganizationAccessContext({ principal: req.user, organizationId })
+[7m   [0m [91m                                                                            ~~~~[0m
+[96msrc/modules/organization/access.ts[0m:[93m263[0m:[93m14[0m - [91merror[0m[90m TS2339: [0mProperty 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+
+[7m263[0m     if (!req.user) return unauthorized(res)
+[7m   [0m [91m             ~~~~[0m
+[96msrc/modules/organization/access.ts[0m:[93m266[0m:[93m77[0m - [91merror[0m[90m TS2339: [0mProperty 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+
+[7m266[0m     const context = await resolveOrganizationAccessContext({ principal: req.user, organizationId })
+[7m   [0m [91m                                                                            ~~~~[0m
+[96msrc/modules/organization/access.ts[0m:[93m268[0m:[93m13[0m - [91merror[0m[90m TS2339: [0mProperty 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+
+[7m268[0m     if (req.user.platformRole !== 'SYSTEM_ADMIN' && !context.canGovern) {
+[7m   [0m [91m            ~~~~[0m
+[96msrc/modules/organization/access.ts[0m:[93m281[0m:[93m16[0m - [91merror[0m[90m TS2339: [0mProperty 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+
+[7m281[0m       if (!req.user) return unauthorized(res)
+[7m   [0m [91m               ~~~~[0m
+[96msrc/modules/organization/access.ts[0m:[93m284[0m:[93m79[0m - [91merror[0m[90m TS2339: [0mProperty 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+
+[7m284[0m       const context = await resolveOrganizationAccessContext({ principal: req.user, organizationId })
+[7m   [0m [91m                                                                              ~~~~[0m
+[96msrc/modules/survey/admin-role.ts[0m:[93m21[0m:[93m10[0m - [91merror[0m[90m TS2339: [0mProperty 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+
+[7m21[0m   if(req.user?.platformRole!=='STANDARD'||!req.user.entryGrants?.some(g=>g.entry==='SURVEY'))
+[7m  [0m [91m         ~~~~[0m
+[96msrc/modules/survey/admin-role.ts[0m:[93m21[0m:[93m48[0m - [91merror[0m[90m TS2339: [0mProperty 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+
+[7m21[0m   if(req.user?.platformRole!=='STANDARD'||!req.user.entryGrants?.some(g=>g.entry==='SURVEY'))
+[7m  [0m [91m                                               ~~~~[0m
+[96msrc/modules/survey/admin-role.ts[0m:[93m21[0m:[93m71[0m - [91merror[0m[90m TS7006: [0mParameter 'g' implicitly has an 'any' type.
+
+[7m21[0m   if(req.user?.platformRole!=='STANDARD'||!req.user.entryGrants?.some(g=>g.entry==='SURVEY'))
+[7m  [0m [91m                                                                      ~[0m
+[96msrc/services/assetStorage.ts[0m:[93m700[0m:[93m46[0m - [91merror[0m[90m TS2339: [0mProperty 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+
+[7m700[0m   if (!(await canReadPrivateAsset(asset, req.user))) return forbidden(res, '无权限访问此文件')
+[7m   [0m [91m                                             ~~~~[0m

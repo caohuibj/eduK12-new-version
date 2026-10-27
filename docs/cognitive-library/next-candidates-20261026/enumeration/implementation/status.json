@@ -1,0 +1,74 @@
+{
+  "candidateId": "attention-enumeration-flower",
+  "status": "PURE_LOGIC_CANDIDATE_UNREGISTERED",
+  "base": "9969583b2c95fa87ff44a4f2b3aa68cbd7471390",
+  "approval": {
+    "date": "2026-10-26",
+    "source": "parent relayed user: 三个都通过，图片保存notion",
+    "scope": [
+      "three static previews",
+      "research100",
+      "experience25"
+    ],
+    "notApprovedByInference": [
+      "real_device_timing",
+      "physical_geometry",
+      "mask_statistics",
+      "individual_validity"
+    ]
+  },
+  "configStatus": "DESIGN_PROPOSAL",
+  "reportState": "invalid",
+  "interpretationPolicy": "research_provisional",
+  "verification": {
+    "uniqueCasesWithPassingEvidence": 22,
+    "run1": {
+      "total": 21,
+      "passed": 20,
+      "failed": 1,
+      "exitCode": 1
+    },
+    "run2Targeted": {
+      "totalDiscovered": 22,
+      "passed": 2,
+      "pendingSkipped": 20,
+      "failed": 0,
+      "exitCode": 0
+    },
+    "reuseBasis": "reconstructed original test matches original SHA256; only original failed budget fixture changed and one PRNG golden test added; runtime sources unchanged",
+    "testSourceRun1ReconstructionSha256": "833f573cd27af0ac795ab9fad07e7f03a1099732cebb3cf2a072833c3683c8de"
+  },
+  "sourceSha256": {
+    "server-version/backend/src/modules/cognitive/content-candidates/enumeration/metadata.ts": "56dcd201fa290eda8aa48a3a0b23afe668f21e6de6cfff45e40f5d1b26e0f0a8",
+    "server-version/backend/src/modules/cognitive/content-candidates/enumeration/package.ts": "679dbd85bfbbac12b89549dc03bded87d0a57b6d522f85332d50c17ad00f1ffa",
+    "server-version/backend/src/modules/cognitive/content-candidates/enumeration/protocol.ts": "ff2215ae31ae280dbec19d582ab0aead2608445706bf5c4f403a4887472faed4",
+    "server-version/backend/src/modules/cognitive/content-candidates/enumeration/schema.ts": "228c23516e78fea3030ac21b3e7ef8d5f3078e4a363201c82c440c1baea4ca36",
+    "server-version/backend/src/modules/cognitive/content-candidates/enumeration/scorer.ts": "f89b3ccc3b3f33afd72bd8c1948a4a220d4ffab30ad039a491b5aa762a0bbd72",
+    "server-version/backend/src/modules/cognitive/content-candidates/enumeration/trial-envelope.ts": "87bb3ec491005ebbfb6419a778f598ffafa29e503e49414c29398d4e2c12afbd",
+    "server-version/backend/src/__tests__/cognitive/enumeration-candidate.test.ts": "ccc137e555faa25ff99f16533522899e14c67ea7efa1de26fdc8937c398a2f8e"
+  },
+  "notDone": [
+    "runner",
+    "stimulus",
+    "registration",
+    "backend_tag_search",
+    "DB_API",
+    "COS",
+    "real_device_timing",
+    "physical_calibration",
+    "language_comprehension",
+    "norms",
+    "CI",
+    "typecheck",
+    "build",
+    "commit",
+    "push",
+    "deployment"
+  ],
+  "preparationFailure": {
+    "commandScope": "independent Python golden-vector generation helper",
+    "exitCode": 1,
+    "reason": "NameError: Path not imported; before golden test write",
+    "resolution": "added import and generated vector; original Vitest failure retained"
+  }
+}

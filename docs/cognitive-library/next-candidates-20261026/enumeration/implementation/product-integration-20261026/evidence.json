@@ -1,0 +1,164 @@
+{
+  "status": "DEVELOPMENT_CANDIDATE_NOT_DEPLOYED_OR_INDEPENDENTLY_AUDITED",
+  "baseHead": "5c13eb261e7e7dc34e6a066704ffeaf98fb6a163",
+  "capturedAt": "2026-10-26T14:38:59.096753+00:00",
+  "sourceSnapshotMeaning": "post-run source snapshot; no product/harness source edits since the browser run, not an in-browser capture-time source signature",
+  "sourceFiles": [
+    {
+      "path": "server-version/backend/prisma/seeds/cognitive.ts",
+      "sha256": "49ac3223ba77e1ad0e96af12603bc709536e482425bcb02517c656c8b96aa740"
+    },
+    {
+      "path": "server-version/backend/prisma/seeds/native-cognitive.ts",
+      "sha256": "f533b9c2c6e48259101c06ec4fa6411b0853367a594cb9dbaa87831c924003b7"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/task-resource.ts",
+      "sha256": "8636aa5abb8d97d6989d2304ba197771f34299e9dc0b4945430be25988afb9e5"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/raw-archive.service.ts",
+      "sha256": "3c29b8a540e471edf99cf91c8d5fb80a8a323f3206245a77c9977b03a68e4793"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/enumeration/archive-schema.ts",
+      "sha256": "cc601ce6e1f8b533306a0ea2cda1136a811e84a1e7f98c02d6caf9fee65684f3"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/cognitive/enumeration-delivery-seed.test.ts",
+      "sha256": "ef609ceee82c3ee564d5ccb976de00d2e2d52a512159f92586d69f6690c50b41"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/cognitive/enumeration-raw-archive.postgres.integration.test.ts",
+      "sha256": "83ba94a46b367362eed12eed3e241313aaac64298111aa01cb568f3311a2bae6"
+    },
+    {
+      "path": "server-version/frontend/src/services/persistence/finalDraftStore.ts",
+      "sha256": "007bfcbe75134e424b306940d60001698595ef8499598f956cf509f7af6787ca"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/core/readiness.ts",
+      "sha256": "0efc5f94d1ce240788492cbeb3ab36d5b9db252f0302a711e34494523ed6829a"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/core/useCognitiveSession.ts",
+      "sha256": "659cb60b027626ccc62b6ed256bdf0bbb0a124a27c0d0ec7628c60a1f9640f61"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/core/useAdministrationProvenance.ts",
+      "sha256": "ba5841f6a5b20f76e5654c86773b64b778d122823499b3c8716d8d2c5d30ad09"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/core/native-enumeration-draft-key.ts",
+      "sha256": "71fd11c0e3a75476cb6f0cdc564892df8fa686d86507e55a6656b047cb710b96"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/core/__tests__/native-enumeration-draft-key.test.ts",
+      "sha256": "0889ac28bc6dfefbf57090063da1621df64f28fc303c9cd0fb291849c04cbe3b"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/core/__tests__/native-enumeration-epoch.test.tsx",
+      "sha256": "8a07e13e7535fc71708f3329511e61aac44302797d7fe407de34fa8e3ab7ea83"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/native-runners.tsx",
+      "sha256": "9fc09285fba6f532e43ec9769257112955cddf22deeb78e49b7091b922244f8b"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/enumeration/NativeEnumerationRunner.tsx",
+      "sha256": "6bab1951e6b8eb266e71f91966d17025d2eabcdf92bfedf5ea7847f33ff06004"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/enumeration/native-port.ts",
+      "sha256": "adb17d66a35516cbefc1e0fb8c7544ab9e906e5d6599ce212d3f557271d341bc"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/enumeration/native-port.test.tsx",
+      "sha256": "612007d85d992ceb29784c56bdf1f5aba992d2da6db7684d2ccfb7cbca4e0615"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/enumeration/EnumerationCalibration.tsx",
+      "sha256": "646649ef9f86ba2fd122c1069314a1737fa16972add435f16a3a6b14bd28b48e"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/enumeration/EnumerationTask.tsx",
+      "sha256": "aa3d6cc2aff6fc1b678fa64becf6e7f9222211ef4e1d42beae0de4d9b0543ab8"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/enumeration/persistence.ts",
+      "sha256": "c90a8067cefdcc291ded4262db050dd9bf6eba23d189713dbb3330b9325eb579"
+    },
+    {
+      "path": "server-version/scripts/cognitive/native-enumeration-http-review.cjs",
+      "sha256": "bd9a14fa37d9dddc342efe8fa160ffbb07fa41132f06c227f3d06c18b4a26e51"
+    },
+    {
+      "path": "server-version/scripts/cognitive/native-enumeration-client-review.cjs",
+      "sha256": "e896f4778e2fff5ffe6b286b506d34e88e07dfd79f38bd55fbbefc417193bb6b"
+    }
+  ],
+  "backendTypes": {
+    "path": "../../../implementation-coordination/product-integration-20261026/raw-archive/enumeration/backend-types-continued.json",
+    "rootCount": 6,
+    "sourceCount": 1001,
+    "diagnostics": 0,
+    "productionConfigUnchanged": true,
+    "rootDirOverride": "backend only to include the existing Prisma seed root"
+  },
+  "frontendTypes": {
+    "path": "frontend-types-current.json",
+    "rootCount": 7,
+    "sourceCount": 189,
+    "diagnostics": 0,
+    "actualConfig": "tsconfig.app.json"
+  },
+  "newUnitCases": {
+    "seedAndDelivery": 2,
+    "epochKey": 2,
+    "epochConsumers": 2,
+    "nativePort": 9,
+    "metaFreezePreviousStage": 13
+  },
+  "affectedExistingSeedCase": {
+    "passed": 1,
+    "skipped": 3,
+    "reason": "shared seed helper extraction"
+  },
+  "newPostgresArchiveCases": 1,
+  "newBrowserJourney": {
+    "path": "../../native-input-20261026/browser/review.json",
+    "softwareClock": true,
+    "emulatedTouch": true,
+    "practice": 3,
+    "formal": 25,
+    "realHttpStartFinal": true,
+    "realIndexedDb": true,
+    "cosUploader": "synthetic",
+    "finalRequests": 1,
+    "archiveStatuses": [
+      503,
+      200
+    ],
+    "sourceChangedAfterRun": false
+  },
+  "notRun": [
+    "External COS",
+    "Full App / CSRF (review trace includes actual 404)",
+    "Physical phone/tablet/Safari/physical presentation",
+    "English product entry",
+    "Public/Survey/composite native delivery",
+    "research100 real browser run",
+    "Full CI/release/merge/deploy",
+    "Independent root audit"
+  ],
+  "schemaMigration": false,
+  "newFinalFields": false,
+  "timingPolicyChanged": false,
+  "cosRescoreOrReportCorrection": false,
+  "backendCandidateCommit": "43a85a231",
+  "archiveFixtureTypes": {
+    "sourceCount": 1014,
+    "diagnostics": 0,
+    "path": "../../../implementation-coordination/product-integration-20261026/raw-archive/enumeration/archive-fixture-types-continued.json"
+  }
+}

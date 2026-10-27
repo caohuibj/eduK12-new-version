@@ -1,0 +1,78 @@
+{
+  "status": "SCOPED_NATIVE_HOST_GENERATION_PASS",
+  "sealedAt": "2026-10-26T12:15:03.542723+00:00",
+  "scope": "Only native host binding/async ownership and optional atomic draft ownership; no draft key migration, protocol/scorer/stimulus/timing changes.",
+  "checks": [
+    {
+      "command": "node node_modules/vitest/vitest.mjs run src/modules/cognitive/core/__tests__/native-mot-session.test.tsx -t host-generation --maxWorkers=1 --reporter=json --outputFile=/tmp/native-host-generation-tests.json",
+      "exitCode": 0,
+      "passed": 7,
+      "failed": 0,
+      "skipped": 5
+    },
+    {
+      "command": "node node_modules/vitest/vitest.mjs run src/modules/cognitive/core/__tests__/native-mot-session.test.tsx -t 'StrictMode active|delayed sealed replay' --maxWorkers=1 --reporter=json --outputFile=/tmp/native-host-generation-followup-tests.json",
+      "exitCode": 0,
+      "passed": 2,
+      "failed": 0,
+      "skipped": 11,
+      "reason": "Additional delayed sealed-replay busy response; active case fixture corrected from invalid MOBILE enum to real PHONE and rerun."
+    }
+  ],
+  "uniqueNewCases": 8,
+  "types": {
+    "command": "node /tmp/native-host-generation-types.cjs",
+    "actualConfig": "server-version/frontend/tsconfig.app.json",
+    "exitCode": 0,
+    "diagnostics": 0,
+    "evidence": "types.json",
+    "scope": "helper/store/hook/new test entry closure, not full project/UI build"
+  },
+  "ownership": [
+    "Native ports capture render session/epoch/definition/protocol/versions/randomSeed and hook generation; old port never adopts later stateRef session.",
+    "load/restart start and effect cleanup invalidate old generation; setup reactivates current lifecycle, including StrictMode setup-cleanup-setup.",
+    "Every relevant native await checks current generation before advancing UI or issuing another action; old in-flight write may finish only against original expected identity.",
+    "Optional expected identity compares draftKey/instrument/session/epoch/definition/submission inside Memory operation or the same IDB META/TRIAL write transaction for put/seal/status/delete. Legacy callers omit it.",
+    "Raw seal and core finish carry original expected identity through get/mutate/status/delete; sealed-load replay onRetry/catch are also current-load/expected guarded.",
+    "Already-issued server FINAL is not cancelled; it may commit for its original identity. A late response cannot change new local metadata or UI.",
+    "Actual device/input provenance remains in the sealed FINAL payload; native skips separate unguarded metadata write."
+  ],
+  "caseScope": [
+    "Delayed list/put same session new epoch",
+    "Unmount during owned put retains old record; old new actions reject",
+    "Late FINAL on unmount or same-session epoch reload keeps old seal/raw and does not advance UI",
+    "StrictMode active path completes once with PHONE/TOUCH provenance",
+    "All four expected write operations reject stale owner after same-key replacement",
+    "Old sealed replay BUSY response cannot setStatus after epoch reload"
+  ],
+  "notRepeated": [
+    "Original 25 + 18 checks",
+    "Prior single-flight 2 cases",
+    "Actual 2-practice + 9-formal HTTP/browser journey",
+    "Any timing/validity/scorer study"
+  ],
+  "notClaimed": [
+    "Same-session changed epoch can overwrite existing frozen meta: ensure deliberately rejects and preserves old originals.",
+    "Cancellation of an already-issued server transaction.",
+    "External COS/new production deployment/full App CSRF."
+  ],
+  "sourceHashesAtSeal": [
+    {
+      "path": "server-version/frontend/src/services/persistence/finalDraftStore.ts",
+      "sha256": "df1664b17c7e6ab9fe6e7d97a241a584190539bbe2ac2db2895a16cb226dec99"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/core/raw-archive.ts",
+      "sha256": "9b3b4a11179c471ff4e91938ba9b9ae31cdc481c28190535d4cfddd42844c0fb"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/core/useCognitiveSession.ts",
+      "sha256": "f49af276492c3e0f59e26a48b5c1e88d3df744765465f0d790399b6ff5de74cf"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/core/__tests__/native-mot-session.test.tsx",
+      "sha256": "355eb9846d87ff13252b078f45bbef601bbe16ebf0d737831183a8e537e14d2a"
+    }
+  ],
+  "stageEvidenceReuse": "Initial seven cases ran before the recovery-only guard followup; the additional affected recovery case and corrected active fixture ran separately. Current seal hashes are not retroactively assigned to old browser or earlier stage artifacts."
+}

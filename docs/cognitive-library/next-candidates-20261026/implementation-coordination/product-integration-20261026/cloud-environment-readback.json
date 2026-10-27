@@ -1,0 +1,13 @@
+{
+  "kind": "CLOUD_EXECUTION_ENVIRONMENT_READBACK",
+  "recordedAt": "2026-10-26T11:55:38.727545+00:00",
+  "os": "Linux-6.18.55-x86_64-with-glibc2.41",
+  "osRelease": "PRETTY_NAME=\"Debian GNU/Linux 13 (trixie)\"\nNAME=\"Debian GNU/Linux\"\nVERSION_ID=\"13\"\nVERSION=\"13 (trixie)\"\nVERSION_CODENAME=trixie\nDEBIAN_VERSION_FULL=13.6\nID=debian\nHOME_URL=\"https://www.debian.org/\"\nSUPPORT_URL=\"https://www.debian.org/support\"\nBUG_REPORT_URL=\"https://bugs.debian.org/\"\n",
+  "cwd": "/workspace/eduK12-new-version",
+  "schedulableLogicalCpus": 5,
+  "cpuMax": "400000 100000",
+  "cpuQuotaCores": 4.0,
+  "memoryMaxBytes": 17179869184,
+  "execution": "All source, locked dependencies, PostgreSQL/Redis tests and Chromium run in this cloud workspace; no Mac filesystem, terminal or local browser used.",
+  "ownedResources": "HTTP18855 stopped; own PG/Redis containers stopped and automatically removed. Exclusive HTTP synthetic fixture cleanup readback zero is retained under raw-archive/http/cleanup.json."
+}
