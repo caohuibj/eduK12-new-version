@@ -1,0 +1,1799 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "prfq18_parent_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "text": "下面这些句子涉及你和孩子的日常相处，以及你通常怎样理解孩子的感受与行为。请根据你的实际看法判断每句话与你有多一致。1表示非常不同意，4表示中立，7表示非常同意；其余数字表示不同程度。没有正确或错误答案。请以家中一名0–5岁的孩子为对象回答，不要在不同题目中随意切换所指的孩子。",
+    "source": "Luyten等2017作者英文18题说明独立中文研究工作译稿；题号顺序和0–5岁适用边界均按UCL作者网页固定，不复制UCL已有中文版本。"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "父母反思功能问卷（PRFQ，18题）— 独立中文研究工作稿",
+      "abbreviation": "PRFQ18-ZH-WORKING",
+      "instrumentFamily": "Parental Reflective Functioning Questionnaire (Luyten et al. 2017), original 0–5-year form"
+    },
+    "construct": {
+      "primaryDomain": "SOCIAL_EMOTIONAL",
+      "secondaryDomains": [
+        "PARENT_OBSERVATION"
+      ],
+      "constructDefinition": "针对0–5岁儿童的父母如何理解孩子内在状态，分为前心理化、对心理状态的确定感、兴趣与好奇三个各6题因素，不输出虚构的总分；不是针对所有学龄儿童的PRFQ-A。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "domain:parental_mentalizing",
+        "domain:parenting",
+        "domain:social_emotional",
+        "construct:parental_reflective_functioning",
+        "construct:prementalizing",
+        "construct:certainty_about_mental_states",
+        "construct:interest_and_curiosity",
+        "construct:three_facet_means_no_total",
+        "construct:opacity_of_mental_states",
+        "orientation:attachment_research",
+        "orientation:mentalization",
+        "orientation:parent_child_interaction",
+        "orientation:not_therapy_specific",
+        "population:parent_self_report",
+        "population:child_0_to_5_years_original",
+        "population:not_school_age_original",
+        "population:independent_chinese_working_draft",
+        "population:not_validated_for_china",
+        "response:parent",
+        "response:digital_parent_self",
+        "response:18_items",
+        "response:seven_point_agreement",
+        "response:three_original_six_item_sets",
+        "response:reverse_11_18",
+        "response:fixed_original_order",
+        "response:complete_facet_project_missing_policy",
+        "use:research",
+        "use:individual_reflection",
+        "use:score_only",
+        "use:not_diagnostic",
+        "use:not_selection",
+        "use:not_general_parent_screening",
+        "use:no_chinese_norms",
+        "license:research_only_original",
+        "license:author_contact_required",
+        "license:written_translation_permission_required",
+        "license:public_redistribution_pending",
+        "license:full_original_english_acquired",
+        "language_validation:source_en",
+        "language_validation:content_zh-CN",
+        "language_validation:independent_working_translation",
+        "language_validation:existing_official_chinese_distinct",
+        "language_validation:expert_review_pending",
+        "language_validation:local_validation_pending",
+        "父母反思功能",
+        "亲职心理化",
+        "心理状态确定感",
+        "好奇心",
+        "前心理化",
+        "0到5岁儿童",
+        "18题",
+        "研究工作稿",
+        "非诊断",
+        "需联系作者"
+      ]
+    },
+    "population": {
+      "minAge": 0,
+      "maxAge": 5,
+      "respondentTypes": [
+        "PARENT"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "源PRFQ仅设计并建议用于父母回答0–5岁儿童，UCL不建议直接用于年龄超过5岁的儿童父母；12–18岁是另一个PRFQ-A变体。本工具catalog年龄描述对象为目标儿童，respondentTypes=PARENT是家长自己作答；父母成年人资格与亲子关系仍需要实际产品适配层核实，不能把child age当成人年龄。"
+    },
+    "administration": {
+      "itemCount": 18,
+      "estimatedMinutes": 6,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED"
+      ],
+      "timeFrame": "描述一名0–5岁孩子及照护者日常互动的典型体验；非固定最近一周回忆量表。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "原作者PRFQ 18题固定原序，不与PRFQ-A青少年版、PRFQ-I婴儿删题版、研究改版16题混用。",
+        "1–7原版同意度，作者正式说明仅1 strongly disagree、4 neutral/undecided、7 strongly agree；其余中间档只标数字。",
+        "PM 1/4/7/10/13/16、CMS 2/5/8/11/14/17、IC 3/6/9/12/15/18，各6题均分，独立1–7；第11、18题反向8−raw；不生成总分。",
+        "作者UCL首页只建议父母针对0–5岁的孩子填写，并明确不建议把此版用在超过5岁的孩子；技术PARENT和child age <72个月，仅作为草稿候选适用边界。",
+        "CMS与IC并非单调‘越高越好’，不同人群的高低分意义可能不同；PM报告只描述对孩子敌意或单一归因的认同，不直接赋予临床定性。",
+        "研究中存在PM方向说明的文字差异、反向号笔误（11/16 vs 11/18）及不同缩短版本，本包依据18题英语原文语义、2017原版分组及多个验证研究对11/18的反向说明，后续正式科学审查须独立核对作者现行评分语法；不激活切点。",
+        "某六题维度未全答则该维不计算，其他完整维度可显示；这是平台保守缺答约定而非作者指定的插补规则。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "UCL现行规定仅供研究，本独立中文未经书面翻译许可或中国人群语言与结构效度验证；保留DRAFT。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "只是报告文案草稿，不等于许可对外实施或临床使用；反思不能用于家长好坏评价。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "prfq-luyten2017-source",
+        "evidenceType": "CONTENT_VALIDITY",
+        "population": "2017英语原版父母与0–5岁儿童样本；本站独立中文未验证",
+        "locale": "en",
+        "territory": "ZZ",
+        "studyDesign": "原作者制定18题3维，现UCL不建议在5岁以上使用；译稿精确题序与11/18反向待人审再次锁定评分脚本，不假称获得对中国父母的验证。",
+        "rating": "UNKNOWN",
+        "citation": "Luyten, P., Mayes, L. C., Nijssens, L., & Fonagy, P. (2017). The parental reflective functioning questionnaire: Development and preliminary validation. PLOS ONE, 12(5), e0176218. https://doi.org/10.1371/journal.pone.0176218.",
+        "doi": "10.1371/journal.pone.0176218",
+        "url": "https://doi.org/10.1371/journal.pone.0176218"
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "作者署名的原PRFQ18英文PDF：https://haruv-usa.org/wp-content/uploads/2022/09/The-Parental-Reflective-Functioning-Questionnaire.pdf；UCL官方许可及来源：https://www.ucl.ac.uk/brain-sciences/pals/psychoanalysis/research/parental-reflective-functioning-questionnaire-prfq。平台独立撰写中文工作译文，不复制任何已有UCL官方中文PDF措辞。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "开发者UCL明确要求译文事前书面许可；当前独立中文为未经许可确认、未经人工译审的研究工作草稿，绝不冒称已获正式中文验证或作者背书。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "prfq18_parent_zh_cn_research-1.0.0",
+    "respondentTypes": [
+      "PARENT"
+    ],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 0,
+        "maxExclusive": 72
+      }
+    },
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "prfq18_parent_zh_cn_research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "prfq18_parent_zh_cn_research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "translation",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL"
+    ],
+    "notes": [
+      "PRFQ (Luyten, Mayes, Nijssens & Fonagy, 2017) UCL作者主页明确仅可免费下载用于研究，明确规定独立翻译需要开发者书面许可：https://www.ucl.ac.uk/brain-sciences/pals/psychoanalysis/research/parental-reflective-functioning-questionnaire-prfq。原作者署名的完整英文18题PDF见：https://haruv-usa.org/wp-content/uploads/2022/09/The-Parental-Reflective-Functioning-Questionnaire.pdf。目前未取得本站独立中文译文、公开GitHub全文再分发、电子施测或商业许可；中文是EDUK12.TOP直接依据英文制作的未经审校工作译稿，不等于UCL已有中文译本，也不继承该译本的权利/人群验证。作者/译者协调归管理员待办，内容研发不因许可待办停止，但DRAFT不允许冒充已授权激活。",
+      "若无指定儿童年龄，本候选不得自动视为适用。正式父母角色/儿童年龄必须由产品承载实际事实，而不是仅凭说明文案。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "PRFQ original 2017 18-item English authors' form, independently translated Chinese research draft",
+        "citation": "Luyten, P., Mayes, L. C., Nijssens, L., & Fonagy, P. (2017). The parental reflective functioning questionnaire: Development and preliminary validation. PLOS ONE, 12(5), e0176218. https://doi.org/10.1371/journal.pone.0176218.",
+        "url": "https://haruv-usa.org/wp-content/uploads/2022/09/The-Parental-Reflective-Functioning-Questionnaire.pdf",
+        "publicationYear": 2017
+      },
+      "license": {
+        "status": "unknown",
+        "redistribution": "restricted",
+        "note": "PRFQ (Luyten, Mayes, Nijssens & Fonagy, 2017) UCL作者主页明确仅可免费下载用于研究，明确规定独立翻译需要开发者书面许可：https://www.ucl.ac.uk/brain-sciences/pals/psychoanalysis/research/parental-reflective-functioning-questionnaire-prfq。原作者署名的完整英文18题PDF见：https://haruv-usa.org/wp-content/uploads/2022/09/The-Parental-Reflective-Functioning-Questionnaire.pdf。目前未取得本站独立中文译文、公开GitHub全文再分发、电子施测或商业许可；中文是EDUK12.TOP直接依据英文制作的未经审校工作译稿，不等于UCL已有中文译本，也不继承该译本的权利/人群验证。作者/译者协调归管理员待办，内容研发不因许可待办停止，但DRAFT不允许冒充已授权激活。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "prfq_agree_1_7",
+          "options": [
+            {
+              "value": "1",
+              "label": "非常不同意",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "2",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "3",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "中立",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "5",
+              "score": 5
+            },
+            {
+              "value": "6",
+              "label": "6",
+              "score": 6
+            },
+            {
+              "value": "7",
+              "label": "非常同意",
+              "score": 7
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "PRFQ18_01",
+          "content": "只有孩子对我笑的时候，我才敢肯定他或她爱我。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 0,
+          "responseSetKey": "prfq_agree_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PRFQ18_02",
+          "content": "我总是知道孩子想要什么。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 1,
+          "responseSetKey": "prfq_agree_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PRFQ18_03",
+          "content": "我喜欢思考孩子为什么会有那些行为和感受。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 2,
+          "responseSetKey": "prfq_agree_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PRFQ18_04",
+          "content": "孩子会在陌生人面前哭，是为了让我难堪。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 3,
+          "responseSetKey": "prfq_agree_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PRFQ18_05",
+          "content": "我能够完全看透孩子在想什么。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 4,
+          "responseSetKey": "prfq_agree_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PRFQ18_06",
+          "content": "我经常琢磨孩子心里正在想什么、感受如何。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 5,
+          "responseSetKey": "prfq_agree_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PRFQ18_07",
+          "content": "我觉得自己很难真正参与孩子的假扮游戏。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 6,
+          "responseSetKey": "prfq_agree_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PRFQ18_08",
+          "content": "我总能预料孩子接下来会做什么。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 7,
+          "responseSetKey": "prfq_agree_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PRFQ18_09",
+          "content": "我常常好奇孩子正在经历怎样的感受。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 8,
+          "responseSetKey": "prfq_agree_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PRFQ18_10",
+          "content": "孩子有时生病，是为了让我没办法做自己想做的事。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 9,
+          "responseSetKey": "prfq_agree_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PRFQ18_11",
+          "content": "我有时也会误解孩子的反应。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 10,
+          "responseSetKey": "prfq_agree_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PRFQ18_12",
+          "content": "我会尝试从孩子的角度来看待事情。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 11,
+          "responseSetKey": "prfq_agree_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PRFQ18_13",
+          "content": "孩子闹脾气时，只是为了故意惹我生气。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 12,
+          "responseSetKey": "prfq_agree_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PRFQ18_14",
+          "content": "我总是知道自己为什么要以某种方式对待孩子。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 13,
+          "responseSetKey": "prfq_agree_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PRFQ18_15",
+          "content": "当孩子表现得不合适时，我会试着理解背后的原因。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 14,
+          "responseSetKey": "prfq_agree_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PRFQ18_16",
+          "content": "孩子的行为常常让人难以理解，以至于我懒得再去弄清原因。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 15,
+          "responseSetKey": "prfq_agree_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PRFQ18_17",
+          "content": "我总是知道孩子为什么会有那样的行为。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 16,
+          "responseSetKey": "prfq_agree_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PRFQ18_18",
+          "content": "我认为费力猜测孩子的感受并没有什么意义。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 17,
+          "responseSetKey": "prfq_agree_1_7",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "itemRules": [
+          {
+            "itemCode": "PRFQ18_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PRFQ18_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PRFQ18_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PRFQ18_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PRFQ18_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PRFQ18_06",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PRFQ18_07",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PRFQ18_08",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PRFQ18_09",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PRFQ18_10",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PRFQ18_11",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "PRFQ18_12",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PRFQ18_13",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PRFQ18_14",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PRFQ18_15",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PRFQ18_16",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PRFQ18_17",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PRFQ18_18",
+            "transform": {
+              "type": "reverse"
+            }
+          }
+        ],
+        "scores": [
+          {
+            "key": "prementalizing",
+            "type": "dimension",
+            "label": "前心理化倾向",
+            "description": "六题均分1–7。描述对孩子行为作单一或敌意归因、难以考虑其内在体验的倾向；不是一项整体反思能力的结论。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "PRFQ18_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PRFQ18_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PRFQ18_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PRFQ18_10",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PRFQ18_13",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PRFQ18_16",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "certainty",
+            "type": "dimension",
+            "label": "对孩子内心状态的确定感",
+            "description": "六题均分1–7，第11题反向。描述自己多大程度上确信能了解孩子及其行为动机；不能简单解释成越高越好。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "PRFQ18_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PRFQ18_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PRFQ18_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PRFQ18_11",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PRFQ18_14",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PRFQ18_17",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "curiosity",
+            "type": "dimension",
+            "label": "对孩子内心世界的兴趣与好奇",
+            "description": "六题均分1–7，第18题反向。描述愿意了解孩子情绪、想法和行为原因的倾向；高分不能自动诊断良好亲职能力。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "PRFQ18_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PRFQ18_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PRFQ18_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PRFQ18_12",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PRFQ18_15",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PRFQ18_18",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "prementalizing",
+          "certainty",
+          "curiosity"
+        ],
+        "scoreOrder": [
+          "prementalizing",
+          "certainty",
+          "curiosity"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "prementalizing",
+            "headline": "前心理化倾向",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "孩子哭闹、不合作或表现得难以理解时，大人有时会想：孩子是不是故意让我难堪、就是在和我作对？这样的念头可能与疲惫、压力或不知所措有关。这组回答记录你是否容易从类似角度理解孩子，但不能据此判断你是不是好父母，也不能通过一个分数猜测孩子真正的动机。可以回想最近一次令你挫败的互动：如果先不急于判断孩子的意图，还可能有哪些感受、需求或处境影响了他的行为？",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "孩子有一次让你很烦恼时，还有哪些不带指责的解释可能成立？"
+              },
+              {
+                "category": "strategy",
+                "text": "尝试先描述孩子做了什么，再考虑可能的感受与需要，避免立即认定是故意针对自己。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "certainty",
+            "headline": "对孩子内心状态的确定感",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "长期照顾孩子的人，可能逐渐了解他常见的习惯和反应，但任何人都不可能时时准确知道另一个人在想什么。这个维度反映你对自己理解孩子内心状态的把握感，并不是一张衡量洞察力高低的成绩单。太不确定时，大人可能感到困惑；过于确定时，也可能错过孩子新的变化。你可以想一想：最近哪一次，孩子真实的想法和你原来的判断有所不同？给孩子留一个说出自己感受的机会，也许比急着得出答案更重要。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "有没有一次孩子的真实想法与你原先的理解不太一样？"
+              },
+              {
+                "category": "strategy",
+                "text": "与其直接说“我知道你在想什么”，可以试着问一句开放的问题，并认真听听孩子的回应。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "curiosity",
+            "headline": "对孩子内心世界的兴趣与好奇",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "照顾孩子不仅需要解决吃饭、休息和学习之类的具体问题，也常常需要想一想孩子当时为什么会伤心、兴奋或拒绝配合。这组问题关注你是否愿意了解孩子的感受和行为背后的原因。愿意探索孩子的内心世界很重要，但不意味着必须一直追问、分析，或者要求孩子随时说出全部想法。有些时候，安静陪伴、尊重孩子暂时不想说话的需要，也是一种理解。可以回想最近一次你愿意停下来听孩子表达的时刻，想想当时有哪些做法让双方更自在。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "你最近好奇过孩子的哪一种情绪或行为？"
+              },
+              {
+                "category": "strategy",
+                "text": "在轻松而安全的时候问一个开放问题，并允许孩子选择是否回答。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "本包是2017年PRFQ18原版，作者UCL只建议0–5岁孩子的家长使用，不适用于把它当成所有小学/中学家长量表；青少年使用须另建PRFQ-A，不可直接迁移。",
+          "PM/CMS/IC三维各六题均分1–7，无全局总分；11与18分别为CMS与IC反向8−raw，任何短版、研究改编版计分不得套用。",
+          "UCL及研究之间存在PM文字方向描述差异，以及个别二次研究将11/16列为反向。原句中11与18为反向语义，当前固定18题11/18方案，正式科学复核必须核对现行UCL评分syntax；本草稿不使用任何临床或中国本地切点。",
+          "CMS与IC高分未必普遍代表较高的父母反思能力，不能把任何一个维度解读成家长好坏、亲子关系等级或职业能力。",
+          "本独立简体中文稿没有经过作者书面翻译许可确认、专业译审、认知访谈、中国父母的心理测量验证，不继承UCL现成中文版效度。",
+          "各维6题全答才计该维、不插补是项目保守缺答策略，不是作者原版正式缺失值算法。",
+          "UCL仅批准研究下载；本项目公开GitHub全文、电子施测、翻译与商业范围待管理员向权利方核实，本次为不可激活的DRAFT工作包。"
+        ],
+        "disclaimer": "PRFQ © Luyten, Mayes, Nijssens & Fonagy（2017）。此独立中文研究工作稿未经验证及作者正式授权确认，旨在描述反思方向而非评价父母优劣，不得用于临床诊断、家长排名或学校评价。"
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "prfq18_child0_5",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "all_one",
+        "answers": [
+          {
+            "itemCode": "PRFQ18_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_15",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_17",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_18",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "prementalizing": 1,
+            "certainty": 2,
+            "curiosity": 2
+          },
+          "totalScoreKeys": [
+            "prementalizing",
+            "certainty",
+            "curiosity"
+          ]
+        }
+      },
+      {
+        "name": "all_seven",
+        "answers": [
+          {
+            "itemCode": "PRFQ18_01",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "PRFQ18_02",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "PRFQ18_03",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "PRFQ18_04",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "PRFQ18_05",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "PRFQ18_06",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "PRFQ18_07",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "PRFQ18_08",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "PRFQ18_09",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "PRFQ18_10",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "PRFQ18_11",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "PRFQ18_12",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "PRFQ18_13",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "PRFQ18_14",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "PRFQ18_15",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "PRFQ18_16",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "PRFQ18_17",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "PRFQ18_18",
+            "responseValue": "7"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "prementalizing": 7,
+            "certainty": 6,
+            "curiosity": 6
+          },
+          "totalScoreKeys": [
+            "prementalizing",
+            "certainty",
+            "curiosity"
+          ]
+        }
+      },
+      {
+        "name": "all_four",
+        "answers": [
+          {
+            "itemCode": "PRFQ18_01",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_03",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_06",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_07",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_08",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_09",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_10",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_11",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_12",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_13",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_14",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_15",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_16",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_17",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_18",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "prementalizing": 4,
+            "certainty": 4,
+            "curiosity": 4
+          },
+          "totalScoreKeys": [
+            "prementalizing",
+            "certainty",
+            "curiosity"
+          ]
+        }
+      },
+      {
+        "name": "pm_high_other_low",
+        "answers": [
+          {
+            "itemCode": "PRFQ18_01",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "PRFQ18_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_04",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "PRFQ18_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_07",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "PRFQ18_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_10",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "PRFQ18_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_13",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "PRFQ18_14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_15",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_16",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "PRFQ18_17",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_18",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "prementalizing": 7,
+            "certainty": 2,
+            "curiosity": 2
+          },
+          "totalScoreKeys": [
+            "prementalizing",
+            "certainty",
+            "curiosity"
+          ]
+        }
+      },
+      {
+        "name": "certainty_high_other_low",
+        "answers": [
+          {
+            "itemCode": "PRFQ18_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_02",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "PRFQ18_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_05",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "PRFQ18_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_08",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "PRFQ18_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_11",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "PRFQ18_12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_14",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "PRFQ18_15",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_17",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "PRFQ18_18",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "prementalizing": 1,
+            "certainty": 6,
+            "curiosity": 2
+          },
+          "totalScoreKeys": [
+            "prementalizing",
+            "certainty",
+            "curiosity"
+          ]
+        }
+      },
+      {
+        "name": "curiosity_high_other_low",
+        "answers": [
+          {
+            "itemCode": "PRFQ18_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_03",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "PRFQ18_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_06",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "PRFQ18_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_09",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "PRFQ18_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_12",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "PRFQ18_13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_15",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "PRFQ18_16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_17",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_18",
+            "responseValue": "7"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "prementalizing": 1,
+            "certainty": 2,
+            "curiosity": 6
+          },
+          "totalScoreKeys": [
+            "prementalizing",
+            "certainty",
+            "curiosity"
+          ]
+        }
+      },
+      {
+        "name": "reverse_eleven18_7_other1",
+        "answers": [
+          {
+            "itemCode": "PRFQ18_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_11",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "PRFQ18_12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_15",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_17",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_18",
+            "responseValue": "7"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "prementalizing": 1,
+            "certainty": 1,
+            "curiosity": 1
+          },
+          "totalScoreKeys": [
+            "prementalizing",
+            "certainty",
+            "curiosity"
+          ]
+        }
+      },
+      {
+        "name": "cyclic",
+        "answers": [
+          {
+            "itemCode": "PRFQ18_01",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "PRFQ18_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PRFQ18_03",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PRFQ18_05",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "PRFQ18_06",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "PRFQ18_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_08",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "PRFQ18_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PRFQ18_10",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_11",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PRFQ18_12",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "PRFQ18_13",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "PRFQ18_14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PRFQ18_15",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "PRFQ18_16",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PRFQ18_17",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_18",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "prementalizing": 3.6666666666666665,
+            "certainty": 3.1666666666666665,
+            "curiosity": 4.166666666666667
+          },
+          "totalScoreKeys": [
+            "prementalizing",
+            "certainty",
+            "curiosity"
+          ]
+        }
+      },
+      {
+        "name": "one_pm_missing",
+        "answers": [
+          {
+            "itemCode": "PRFQ18_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_03",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_06",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_07",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_08",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_09",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_10",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_11",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_12",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_13",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_14",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_15",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_16",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_17",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_18",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "prementalizing": null,
+            "certainty": 4,
+            "curiosity": 4
+          },
+          "totalScoreKeys": [
+            "prementalizing",
+            "certainty",
+            "curiosity"
+          ]
+        }
+      },
+      {
+        "name": "one_certainty_missing",
+        "answers": [
+          {
+            "itemCode": "PRFQ18_01",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_03",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_06",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_07",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_08",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_09",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_10",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_12",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_13",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_14",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_15",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_16",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_17",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_18",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "prementalizing": 4,
+            "certainty": null,
+            "curiosity": 4
+          },
+          "totalScoreKeys": [
+            "prementalizing",
+            "certainty",
+            "curiosity"
+          ]
+        }
+      },
+      {
+        "name": "one_curiosity_missing",
+        "answers": [
+          {
+            "itemCode": "PRFQ18_01",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_03",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_06",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_07",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_08",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_09",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_10",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_11",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_12",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_13",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_14",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_15",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_16",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PRFQ18_17",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "prementalizing": 4,
+            "certainty": 4,
+            "curiosity": null
+          },
+          "totalScoreKeys": [
+            "prementalizing",
+            "certainty",
+            "curiosity"
+          ]
+        }
+      },
+      {
+        "name": "all_missing",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "prementalizing": null,
+            "certainty": null,
+            "curiosity": null
+          },
+          "totalScoreKeys": [
+            "prementalizing",
+            "certainty",
+            "curiosity"
+          ]
+        }
+      }
+    ]
+  }
+}

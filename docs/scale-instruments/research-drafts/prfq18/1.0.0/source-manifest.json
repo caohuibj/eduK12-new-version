@@ -1,0 +1,120 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "prfq18_parent_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "source": {
+    "originalAuthors": [
+      "Luyten",
+      "Mayes",
+      "Nijssens",
+      "Fonagy"
+    ],
+    "published": 2017,
+    "doi": "10.1371/journal.pone.0176218",
+    "authorLandingPage": "https://www.ucl.ac.uk/brain-sciences/pals/psychoanalysis/research/parental-reflective-functioning-questionnaire-prfq",
+    "originalEnglish18Pdf": "https://haruv-usa.org/wp-content/uploads/2022/09/The-Parental-Reflective-Functioning-Questionnaire.pdf",
+    "originalChildAgeRangeYears": [
+      0,
+      5
+    ],
+    "notVersions": [
+      "PRFQ-A 12–18",
+      "PRFQ-I 15 items",
+      "other revised 16"
+    ]
+  },
+  "originalMapping": [
+    {
+      "key": "prementalizing",
+      "numbers": [
+        1,
+        4,
+        7,
+        10,
+        13,
+        16
+      ]
+    },
+    {
+      "key": "certainty",
+      "numbers": [
+        2,
+        5,
+        8,
+        11,
+        14,
+        17
+      ]
+    },
+    {
+      "key": "curiosity",
+      "numbers": [
+        3,
+        6,
+        9,
+        12,
+        15,
+        18
+      ]
+    }
+  ],
+  "response": {
+    "min": 1,
+    "max": 7,
+    "officialLabeledAnchors": {
+      "1": "Strongly disagree",
+      "4": "Neutral or undecided",
+      "7": "Strongly agree"
+    },
+    "otherLabeledAnchors": false
+  },
+  "scoring": {
+    "version": "1.0.0",
+    "reverseNumbers": [
+      11,
+      18
+    ],
+    "reverseExpression": "8-raw",
+    "facetAggregation": "mean",
+    "facetRange": [
+      1,
+      7
+    ],
+    "combinedTotal": false,
+    "missingPolicy": "complete_required_project_choice",
+    "sourceSyntaxNeedsFinalReview": true,
+    "reportedLiteratureDirectionConflict": true
+  },
+  "population": {
+    "respondentType": "PARENT",
+    "childAgeMonths": {
+      "minInclusive": 0,
+      "maxExclusive": 72
+    }
+  },
+  "rights": {
+    "uclPermitsResearchDownload": true,
+    "translationRequiresWrittenPermission": true,
+    "contact": "admin_todo",
+    "publicGithubRights": "UNVERIFIED",
+    "commercialRights": "UNVERIFIED"
+  },
+  "versionAxes": {
+    "measurement": "1.0.0",
+    "scoring": "1.0.0",
+    "localization": "1.0.0",
+    "report": "1.0.0",
+    "reference": "none"
+  },
+  "checks": {
+    "authoredFixtureCount": 12,
+    "staticCalculated": true,
+    "vitest": "NOTRUN",
+    "typecheck": "NOTRUN",
+    "db": "NOTRUN",
+    "ci": "NOTRUN",
+    "activation": "DRAFT_HIDDEN"
+  }
+}
