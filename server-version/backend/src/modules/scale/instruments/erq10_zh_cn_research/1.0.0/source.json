@@ -1,0 +1,1043 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "erq10_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "text": "请根据平时调节情绪的习惯回答。情绪体验是内心的感受，情绪表达是通过言语、动作、表情等让人知道感受。下面句子涉及不同的习惯，即使看起来相似，也请逐句判断自己有多赞同。1表示非常不同意、4表示中立、7表示非常同意；其他档用数字表示程度。请保持原题序作答。",
+    "source": "Gross & John 2003 Stanford官方英文指导语的独立中文工作译稿。"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "情绪调节问卷（ERQ，10题）— 独立中文研究工作稿",
+      "abbreviation": "ERQ10-ZH-WORKING",
+      "instrumentFamily": "Emotion Regulation Questionnaire (Gross & John, 2003)"
+    },
+    "construct": {
+      "primaryDomain": "SOCIAL_EMOTIONAL",
+      "secondaryDomains": [
+        "SELF_REGULATION"
+      ],
+      "constructDefinition": "自陈在日常中使用认知重评（换思考内容或理解方式）与表达抑制（控制外在表达）两种策略的习惯。独立两个维度均分，不生成综合情绪能力得分，也不是临床筛查工具。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "domain:emotion_regulation",
+        "domain:self_regulation",
+        "construct:cognitive_reappraisal",
+        "construct:expressive_suppression",
+        "construct:two_facets_no_total",
+        "orientation:process_model_of_emotion_regulation",
+        "orientation:transdiagnostic",
+        "population:adult_18_plus",
+        "population:not_erq_ca",
+        "population:unvalidated_chinese_draft",
+        "response:self",
+        "response:digital_self",
+        "response:ten_items",
+        "response:seven_point_agreement",
+        "response:labels_1_4_7_only",
+        "response:fixed_item_order",
+        "response:no_reverse_items",
+        "response:two_facet_means",
+        "use:research",
+        "use:individual_reflection",
+        "use:score_only",
+        "use:no_chinese_norms",
+        "use:not_diagnostic",
+        "license:academic_research",
+        "license:attribution_required",
+        "license:author_contact_required",
+        "license:redistribution_review_pending",
+        "language_validation:source_english",
+        "language_validation:content_zh-CN",
+        "language_validation:independent_working_translation",
+        "language_validation:expert_review_pending",
+        "language_validation:local_validation_pending",
+        "认知重评",
+        "表达抑制",
+        "情绪调节",
+        "成人研究工作稿",
+        "两维均分",
+        "需联系作者"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "原英语版成人研究量表，平台独立中文工作稿未经中国人群信效度验证；18+为保守项目使用范围，不与儿童/青少年ERQ-CA混用。"
+    },
+    "administration": {
+      "itemCount": 10,
+      "estimatedMinutes": 4,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED"
+      ],
+      "timeFrame": "描述一般情绪调节习惯，无原作者规定的最近一周或其他固定回忆期。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "原英文固定第1–10题顺序，尤其第1题积极情绪示例和第3题消极情绪示例用来界定术语，禁止按两维重排。",
+        "原版英文只命名1强烈不同意、4中立、7强烈同意，中间仅数字。",
+        "认知重评1/3/5/7/8/10均分，表达抑制2/4/6/9均分；无反向题和全局总分。",
+        "分维缺答以complete_required处理，不插补；是平台保守规定而非作者原版缺答说明。",
+        "现有Stanford官方中文译本独立保存，不将其著作权/效度归属于本工作稿。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "英语原版有原始研究证据，本独立中文工作稿没有实证验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "用于讨论情绪习惯和情境，不诊断、不按人格价值排序。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "erq-gross-john-2003",
+        "evidenceType": "CONTENT_VALIDITY",
+        "population": "源研究英语成人参与者",
+        "locale": "en",
+        "territory": "US",
+        "studyDesign": "正式2003年英文题本和原论文定义十题两类策略；不提供本新译中文效度。",
+        "rating": "UNKNOWN",
+        "citation": "Gross, J. J., & John, O. P. (2003). Individual differences in two emotion regulation processes: Implications for affect, relationships, and well-being. Journal of Personality and Social Psychology, 85, 348–362.",
+        "url": "https://spl.stanford.edu/sites/g/files/sbiybj19321/files/media/file/english_0.pdf"
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Stanford 2003官方英文10题：https://spl.stanford.edu/sites/g/files/sbiybj19321/files/media/file/english_0.pdf。独立中文研究工作译稿；官方Stanford已有Ann Chu等译文，未复制。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "该译本未获原作者认可，不能继承现有Stanford中文版或儿童ERQ-CA版的权利与心理测量证据。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "erq10_zh_cn_research-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    },
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "erq10_zh_cn_research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "erq10_zh_cn_research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "translation",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL"
+    ],
+    "notes": [
+      "Stanford原作者实验室公开原版英文10题及现有中文翻译，并允许适当引注的学术研究使用：https://spl.stanford.edu/resources；英文：https://spl.stanford.edu/sites/g/files/sbiybj19321/files/media/file/english_0.pdf；署名中文：https://spl.stanford.edu/sites/g/files/sbiybj19321/files/media/file/chinese.pdf（译者Ann Chu、Wang Li、Liu Qi-gang、Iris Mauss）。本稿由平台直接参考英文内容独立撰写，未复制现有署名中文版句子，未经原作者认可或本地验证。独立中文工作译文、公开GitHub再分发及超出学术研究的商业用途交管理员联系作者/权利方确认。未将作者未回复或版权待核设为内容开发门禁，也不冒称已有这些额外授权。",
+      "该版权标签属于管理员待办而不是内容加工门禁。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "Gross & John ERQ-10 English original, independent Chinese working translation",
+        "citation": "Gross, J. J., & John, O. P. (2003). Individual differences in two emotion regulation processes: Implications for affect, relationships, and well-being. Journal of Personality and Social Psychology, 85, 348–362.",
+        "url": "https://spl.stanford.edu/sites/g/files/sbiybj19321/files/media/file/english_0.pdf",
+        "publicationYear": 2003
+      },
+      "license": {
+        "status": "unknown",
+        "redistribution": "restricted",
+        "note": "Stanford原作者实验室公开原版英文10题及现有中文翻译，并允许适当引注的学术研究使用：https://spl.stanford.edu/resources；英文：https://spl.stanford.edu/sites/g/files/sbiybj19321/files/media/file/english_0.pdf；署名中文：https://spl.stanford.edu/sites/g/files/sbiybj19321/files/media/file/chinese.pdf（译者Ann Chu、Wang Li、Liu Qi-gang、Iris Mauss）。本稿由平台直接参考英文内容独立撰写，未复制现有署名中文版句子，未经原作者认可或本地验证。独立中文工作译文、公开GitHub再分发及超出学术研究的商业用途交管理员联系作者/权利方确认。未将作者未回复或版权待核设为内容开发门禁，也不冒称已有这些额外授权。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "erq_agreement_1_7",
+          "options": [
+            {
+              "value": "1",
+              "label": "非常不同意",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "2",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "3",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "中立",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "5",
+              "score": 5
+            },
+            {
+              "value": "6",
+              "label": "6",
+              "score": 6
+            },
+            {
+              "value": "7",
+              "label": "非常同意",
+              "score": 7
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "ERQ10_01",
+          "content": "想让自己体验更多积极情绪（例如喜悦或觉得有趣）时，我会调整当下正在想的事情。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 0,
+          "responseSetKey": "erq_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ERQ10_02",
+          "content": "我习惯把自己的情绪留在心里，不告诉别人。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 1,
+          "responseSetKey": "erq_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ERQ10_03",
+          "content": "希望悲伤或愤怒等消极情绪少一些时，我会改变自己正在思考的内容。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 2,
+          "responseSetKey": "erq_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ERQ10_04",
+          "content": "感到高兴等积极情绪时，我会有意识地不把这些感受表露出来。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 3,
+          "responseSetKey": "erq_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ERQ10_05",
+          "content": "身处压力较大的情境时，我会试着用有助于自己平静下来的方式去看待这件事。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 4,
+          "responseSetKey": "erq_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ERQ10_06",
+          "content": "我会通过不表达情绪来调节自己的感受。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 5,
+          "responseSetKey": "erq_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ERQ10_07",
+          "content": "当我想体验更多积极情绪时，我会改变对眼前处境的看法。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 6,
+          "responseSetKey": "erq_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ERQ10_08",
+          "content": "我会通过调整对所处情境的理解来调节情绪。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 7,
+          "responseSetKey": "erq_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ERQ10_09",
+          "content": "当我有悲伤或愤怒等消极情绪时，我会确保不把这些情绪表现出来。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 8,
+          "responseSetKey": "erq_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ERQ10_10",
+          "content": "想减少消极情绪时，我会尝试用另一种角度理解当下的处境。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 9,
+          "responseSetKey": "erq_agreement_1_7",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "itemRules": [
+          {
+            "itemCode": "ERQ10_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ERQ10_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ERQ10_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ERQ10_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ERQ10_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ERQ10_06",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ERQ10_07",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ERQ10_08",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ERQ10_09",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ERQ10_10",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "scores": [
+          {
+            "key": "reappraisal",
+            "type": "dimension",
+            "label": "认知重评",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "ERQ10_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ERQ10_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ERQ10_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ERQ10_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ERQ10_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ERQ10_10",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "suppression",
+            "type": "dimension",
+            "label": "表达抑制",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "ERQ10_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ERQ10_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ERQ10_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ERQ10_09",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "reappraisal",
+          "suppression"
+        ],
+        "scoreOrder": [
+          "reappraisal",
+          "suppression"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "reappraisal",
+            "headline": "尝试换一个角度理解事情",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "面对压力、烦恼或想让开心持续更久的时候，有人会改变关注的事情，也会尝试换种角度理解眼前的处境。这一维度描述你平时多大程度上有这种习惯，并不代表你比别人更会控制情绪。重新理解可能使感受有所变化，但它不能代替现实中需要的休息、改变环境或他人支持。回想一次最近有情绪起伏的时刻：有没有哪个符合事实的新看法帮你看清处境？如果现实问题仍然存在，你还需要哪些具体帮助？",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "哪种不同的理解曾让你更清楚地认识一次困难？"
+              },
+              {
+                "category": "strategy",
+                "text": "在压力时试着写下另一种符合事实的解释，不要求自己必须马上乐观。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "suppression",
+            "headline": "什么时候把感受留在心里",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "有时我们会选择不让别人看出自己是开心、难过还是生气。这份分数描述平时你是否倾向这样做，而不是说这种习惯一定好或不好。暂时不表达有时能够保护自己，在需要礼貌或冷静的场合也可能合适；如果长期无法表达需要，也可能让人更难获得帮助。你可以想想：什么时候不表现情绪是自己安全而主动的选择？什么时候向可信任的人讲清真实感受，反而对自己有益？这两种方式都应结合具体情况理解。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "你通常在什么情况下把情绪留给自己？"
+              },
+              {
+                "category": "support",
+                "text": "在安全的情境中，试着向值得信任的人说明一个感受和一项需要。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "两种独立的自陈情绪调节习惯，不是总体情商、临床诊断、人格好坏或真实疗效。",
+          "认知重评6题均分、表达抑制4题均分，均1–7，无反向或综合总分，不设中国常模与临床切点。",
+          "工作稿未经人工译审、认知访谈、中文测量验证；Stanford已发布的另一份中文译文不能视为对本稿的授权。",
+          "按平台保守策略只有完整作答的分维才计算结果，不插补；非作者正式缺答政策。",
+          "版权与公开再分发范围需管理员与权利方确认，当前未激活。"
+        ],
+        "disclaimer": "ERQ Gross & John（2003）；该独立简体中文研究工作稿未经科学验证，授权范围待管理员协调。仅供内容研发和非诊断研究准备，不用于选拔、诊断或排名。"
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "erq10",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "all1",
+        "answers": [
+          {
+            "itemCode": "ERQ10_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERQ10_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERQ10_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERQ10_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERQ10_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERQ10_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERQ10_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERQ10_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERQ10_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERQ10_10",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "reappraisal": 1,
+            "suppression": 1
+          },
+          "totalScoreKeys": [
+            "reappraisal",
+            "suppression"
+          ]
+        }
+      },
+      {
+        "name": "all7",
+        "answers": [
+          {
+            "itemCode": "ERQ10_01",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERQ10_02",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERQ10_03",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERQ10_04",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERQ10_05",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERQ10_06",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERQ10_07",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERQ10_08",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERQ10_09",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERQ10_10",
+            "responseValue": "7"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "reappraisal": 7,
+            "suppression": 7
+          },
+          "totalScoreKeys": [
+            "reappraisal",
+            "suppression"
+          ]
+        }
+      },
+      {
+        "name": "all4",
+        "answers": [
+          {
+            "itemCode": "ERQ10_01",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERQ10_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERQ10_03",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERQ10_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERQ10_05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERQ10_06",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERQ10_07",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERQ10_08",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERQ10_09",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERQ10_10",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "reappraisal": 4,
+            "suppression": 4
+          },
+          "totalScoreKeys": [
+            "reappraisal",
+            "suppression"
+          ]
+        }
+      },
+      {
+        "name": "reapp7_supp1",
+        "answers": [
+          {
+            "itemCode": "ERQ10_01",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERQ10_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERQ10_03",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERQ10_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERQ10_05",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERQ10_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERQ10_07",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERQ10_08",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERQ10_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERQ10_10",
+            "responseValue": "7"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "reappraisal": 7,
+            "suppression": 1
+          },
+          "totalScoreKeys": [
+            "reappraisal",
+            "suppression"
+          ]
+        }
+      },
+      {
+        "name": "reapp1_supp7",
+        "answers": [
+          {
+            "itemCode": "ERQ10_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERQ10_02",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERQ10_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERQ10_04",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERQ10_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERQ10_06",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERQ10_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERQ10_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERQ10_09",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERQ10_10",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "reappraisal": 1,
+            "suppression": 7
+          },
+          "totalScoreKeys": [
+            "reappraisal",
+            "suppression"
+          ]
+        }
+      },
+      {
+        "name": "mixed",
+        "answers": [
+          {
+            "itemCode": "ERQ10_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERQ10_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "ERQ10_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ERQ10_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERQ10_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ERQ10_06",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "ERQ10_07",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "ERQ10_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ERQ10_09",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "ERQ10_10",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "reappraisal": 3.3333333333333335,
+            "suppression": 3.5
+          },
+          "totalScoreKeys": [
+            "reappraisal",
+            "suppression"
+          ]
+        }
+      },
+      {
+        "name": "one_reapp_missing",
+        "answers": [
+          {
+            "itemCode": "ERQ10_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERQ10_03",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERQ10_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERQ10_05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERQ10_06",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERQ10_07",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERQ10_08",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERQ10_09",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERQ10_10",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "reappraisal": null,
+            "suppression": 4
+          },
+          "totalScoreKeys": [
+            "reappraisal",
+            "suppression"
+          ]
+        }
+      },
+      {
+        "name": "one_supp_missing",
+        "answers": [
+          {
+            "itemCode": "ERQ10_01",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERQ10_03",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERQ10_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERQ10_05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERQ10_06",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERQ10_07",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERQ10_08",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERQ10_09",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ERQ10_10",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "reappraisal": 4,
+            "suppression": null
+          },
+          "totalScoreKeys": [
+            "reappraisal",
+            "suppression"
+          ]
+        }
+      },
+      {
+        "name": "all_missing",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "reappraisal": null,
+            "suppression": null
+          },
+          "totalScoreKeys": [
+            "reappraisal",
+            "suppression"
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,144 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "erq10_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "original": {
+    "authors": [
+      "Gross J. J.",
+      "John O. P."
+    ],
+    "year": 2003,
+    "englishForm": "https://spl.stanford.edu/sites/g/files/sbiybj19321/files/media/file/english_0.pdf",
+    "separateOfficialChinese": "https://spl.stanford.edu/sites/g/files/sbiybj19321/files/media/file/chinese.pdf",
+    "licensePortal": "https://spl.stanford.edu/resources"
+  },
+  "itemOrder": [
+    {
+      "itemCode": "ERQ10_01",
+      "number": 1,
+      "englishSemanticBasis": "increase positive emotions: change current thought topic",
+      "facet": "reappraisal"
+    },
+    {
+      "itemCode": "ERQ10_02",
+      "number": 2,
+      "englishSemanticBasis": "keep emotion to oneself",
+      "facet": "suppression"
+    },
+    {
+      "itemCode": "ERQ10_03",
+      "number": 3,
+      "englishSemanticBasis": "reduce negative emotions: change current thought topic",
+      "facet": "reappraisal"
+    },
+    {
+      "itemCode": "ERQ10_04",
+      "number": 4,
+      "englishSemanticBasis": "avoid outward expression of positive emotion",
+      "facet": "suppression"
+    },
+    {
+      "itemCode": "ERQ10_05",
+      "number": 5,
+      "englishSemanticBasis": "reframe stressful situation to stay calm",
+      "facet": "reappraisal"
+    },
+    {
+      "itemCode": "ERQ10_06",
+      "number": 6,
+      "englishSemanticBasis": "control emotion by not expressing it",
+      "facet": "suppression"
+    },
+    {
+      "itemCode": "ERQ10_07",
+      "number": 7,
+      "englishSemanticBasis": "increase positive feeling: change view of situation",
+      "facet": "reappraisal"
+    },
+    {
+      "itemCode": "ERQ10_08",
+      "number": 8,
+      "englishSemanticBasis": "control feelings: change view of present situation",
+      "facet": "reappraisal"
+    },
+    {
+      "itemCode": "ERQ10_09",
+      "number": 9,
+      "englishSemanticBasis": "ensure negative feelings are not shown",
+      "facet": "suppression"
+    },
+    {
+      "itemCode": "ERQ10_10",
+      "number": 10,
+      "englishSemanticBasis": "reduce negative feeling: reframe current situation",
+      "facet": "reappraisal"
+    }
+  ],
+  "response": {
+    "min": 1,
+    "max": 7,
+    "formalEnglishAnchors": {
+      "1": "strongly disagree",
+      "4": "neutral",
+      "7": "strongly agree"
+    },
+    "otherNumbersUnlabeled": true
+  },
+  "scoring": {
+    "scoringVersion": "1.0.0",
+    "reappraisalItemNumbers": [
+      1,
+      3,
+      5,
+      7,
+      8,
+      10
+    ],
+    "suppressionItemNumbers": [
+      2,
+      4,
+      6,
+      9
+    ],
+    "aggregation": "mean",
+    "reverseItems": [],
+    "overallTotal": false,
+    "range": [
+      1,
+      7
+    ],
+    "missingPolicy": "facet_complete_required_project_choice"
+  },
+  "axes": [
+    "domain",
+    "construct",
+    "orientation",
+    "population",
+    "response",
+    "use",
+    "license",
+    "language_validation"
+  ],
+  "versionAxes": {
+    "instrumentVersion": "1.0.0",
+    "localizationVersion": "1.0.0",
+    "reportVersion": "1.0.0",
+    "referenceVersion": null
+  },
+  "rights": {
+    "academicResearch": "with_citation",
+    "independentTranslation": "admin_contact_pending",
+    "publicRedistribution": "admin_review_pending",
+    "commercial": "admin_review_pending"
+  },
+  "execution": {
+    "staticInputReview": "DONE",
+    "vitest": "NOTRUN",
+    "typescript": "NOTRUN",
+    "db": "NOTRUN",
+    "ci": "NOTRUN",
+    "deployment": "DRAFT_HIDDEN"
+  }
+}
