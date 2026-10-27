@@ -1,0 +1,247 @@
+{
+  "date": "2026-10-27",
+  "timezone": "Asia/Tokyo",
+  "scope": "research-only scenario roadmap; no runtime/sequence/scoring implementation",
+  "researchOnlyInstruction": "All candidate-library entries are for scientific research. NC/academic-only sources are eligible subject to actual scope and distribution conditions; no commercial-use gate.",
+  "reuse": {
+    "catalogCommit": "22721e5c63dd78819e8c58921adf20157cdaa08c",
+    "catalogPath": "docs/cognitive-library/source-survey-20261026/README.md",
+    "catalogBlob": "a34843f267f36263c6c2525422cc3ff6380de307",
+    "note": "34 independent repositories plus5 follow-up project families is historical, not a new search count"
+  },
+  "repositories": [
+    {
+      "repository": "expfactory/expfactory-experiments",
+      "commit": "49b8123f18b26d94dfc010bb8a6ec7458b265e2e",
+      "license": "MIT root text read",
+      "role": "legacy lineage shared by later expfactory-experiments subrepositories"
+    },
+    {
+      "repository": "staiw/SART",
+      "commit": "735d300eab4a18784e7f12f85a1123b754a981a1",
+      "license": "MIT root text read",
+      "role": "feedback variant, not blindly equivalent to canonical SART"
+    },
+    {
+      "repository": "marsja/psychomotor_vigilance_task",
+      "commit": "053e76820b404eeba3a6ac10f09679c1a56042c2",
+      "license": "README research/student use with credit; no LICENSE file in observed tree",
+      "role": "method-only reference; no general code redistribution permission inferred"
+    },
+    {
+      "repository": "oTree-org/otree",
+      "commit": "4731e6ac46a6dd35b4bd44813933e081ac205965",
+      "license": "permissive text plus publication naming/citation undertaking; GitHub NOASSERTION; not plain MIT",
+      "role": "Python two-person economic-game examples, not directly reusable React apps"
+    }
+  ],
+  "codeFiles": [
+    {
+      "source": 0,
+      "path": "discount_titrate/experiment.js",
+      "blob": "84bbe4c3553a6cca64d596bd1aa5a33fdaad254e",
+      "url": "https://github.com/expfactory/expfactory-experiments/blob/49b8123f18b26d94dfc010bb8a6ec7458b265e2e/discount_titrate/experiment.js",
+      "depth": "read source; selected task parameter/interaction paths, no runtime audit",
+      "findings": "36 precomputed amount/delay combinations and future-payment instruction"
+    },
+    {
+      "source": 1,
+      "path": "information_sampling_task/experiment.js",
+      "blob": "435a8e1fefc13e3a60e214dc76f08f121728d306",
+      "url": "https://github.com/expfactory/expfactory-experiments/blob/49b8123f18b26d94dfc010bb8a6ec7458b265e2e/information_sampling_task/experiment.js",
+      "depth": "read source; selected task parameter/interaction paths, no runtime audit",
+      "findings": "25-cell board, fixed/decreasing sampling rewards"
+    },
+    {
+      "source": 2,
+      "path": "ax_cpt/experiment.js",
+      "blob": "2a32b59456caf8d3957a12c301e768384415145e",
+      "url": "https://github.com/expfactory/expfactory-experiments/blob/49b8123f18b26d94dfc010bb8a6ec7458b265e2e/ax_cpt/experiment.js",
+      "depth": "read source; selected task parameter/interaction paths, no runtime audit",
+      "findings": "AX70/AY10/BX10/BY10; 3x40 formal trials"
+    },
+    {
+      "source": 3,
+      "path": "perceptual_metacognition/experiment.js",
+      "blob": "bbcbe98932f58a1427a7a21e6b71007910ff4ec8",
+      "url": "https://github.com/expfactory/expfactory-experiments/blob/49b8123f18b26d94dfc010bb8a6ec7458b265e2e/perceptual_metacognition/experiment.js",
+      "depth": "read source; selected task parameter/interaction paths, no runtime audit",
+      "findings": "300 formal, 10 practice, four ordinal confidence choices"
+    },
+    {
+      "source": 4,
+      "path": "README.md",
+      "blob": "16b2968389f721a3710b87596a7b5ffe712cb0a6",
+      "url": "https://github.com/staiw/SART/blob/735d300eab4a18784e7f12f85a1123b754a981a1/README.md",
+      "depth": "read complete README/license",
+      "findings": "18 practice, 3x75, feedback variant"
+    },
+    {
+      "source": 5,
+      "path": "LICENSE",
+      "blob": "76cffea6b187b3e5ff7addb8cc7363dd9ed64800",
+      "url": "https://github.com/staiw/SART/blob/735d300eab4a18784e7f12f85a1123b754a981a1/LICENSE",
+      "depth": "read complete README/license",
+      "findings": "MIT license"
+    },
+    {
+      "source": 6,
+      "path": "README.md",
+      "blob": "1eee318cb80e406e3c404e6d3df6e8f8972defef",
+      "url": "https://github.com/marsja/psychomotor_vigilance_task/blob/053e76820b404eeba3a6ac10f09679c1a56042c2/README.md",
+      "depth": "read complete README/license",
+      "findings": "research/student use with credit"
+    },
+    {
+      "source": "extra0",
+      "path": "LICENSE",
+      "blob": "b2ed33ff82a86eb9c81e9a5fe67ab6707d54aa0c",
+      "url": "https://github.com/oTree-org/oTree/blob/4731e6ac46a6dd35b4bd44813933e081ac205965/LICENSE",
+      "depth": "read full selected example/license",
+      "findings": "permissive plus publication citation obligation"
+    },
+    {
+      "source": "extra1",
+      "path": "trust/__init__.py",
+      "blob": "d8c2ebd0c06fe355ea6cffb59a2bb1c2d02c8331",
+      "url": "https://github.com/oTree-org/oTree/blob/4731e6ac46a6dd35b4bd44813933e081ac205965/trust/__init__.py",
+      "depth": "read full selected example/license",
+      "findings": "2 players, 1 round, transfer multiplier3, wait pages"
+    },
+    {
+      "source": "extra2",
+      "path": "dictator/__init__.py",
+      "blob": "8033d6886257259e072c4e11a520229ae8ae5832",
+      "url": "https://github.com/oTree-org/oTree/blob/4731e6ac46a6dd35b4bd44813933e081ac205965/dictator/__init__.py",
+      "depth": "read full selected example/license",
+      "findings": "2 players, 1 round, allocation0..100"
+    },
+    {
+      "source": "extra3",
+      "path": "LICENSE",
+      "blob": "7ef17fe706ce88195e18473069d561dd4910a5ee",
+      "url": "https://github.com/expfactory/expfactory-experiments/blob/49b8123f18b26d94dfc010bb8a6ec7458b265e2e/LICENSE",
+      "depth": "read full selected example/license",
+      "findings": "MIT license"
+    },
+    {
+      "source": "extra4",
+      "path": "sart.py",
+      "blob": "05367638b77d7cdb39f49962aaef36e96a2617b7",
+      "url": "https://github.com/staiw/SART/blob/735d300eab4a18784e7f12f85a1123b754a981a1/sart.py",
+      "depth": "read parameters and actual trial feedback/sequence generation paths",
+      "findings": "3-second error feedback and per75 truncation before shuffle"
+    }
+  ],
+  "websites": [
+    {
+      "id": "harver-current",
+      "url": "https://harver.com/gamified-assessments/",
+      "readDepth": "read official page",
+      "finding": "nine current broad trait areas; comparison only, no inherited task/occupation validity"
+    },
+    {
+      "id": "icar-current",
+      "url": "https://icar-project.com/",
+      "readDepth": "read redirected official FAQ",
+      "finding": "academic-only Scientific Use License1; project registration; Chinese translations listed; no individual IQ/norms; no public item redistribution"
+    },
+    {
+      "id": "diamond-hf",
+      "url": "https://www.devcogneuro.com/eftasks.html",
+      "readDepth": "read official task/research page",
+      "finding": "same-side/opposite-side/mixed design and developmental references; no unrestricted demo asset license inferred"
+    },
+    {
+      "id": "hf-2019",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6675624/",
+      "readDepth": "research page/search excerpts, not full method audit",
+      "finding": "speed and accuracy jointly relevant; no project age or ADHD validity"
+    },
+    {
+      "id": "sart-original",
+      "url": "https://scienceofbehaviorchange.org/wp-content/uploads/2017/10/robertson_etal_1997-1.pdf",
+      "readDepth": "opened original PDF with imperfect OCR; abstract and method passages checked",
+      "finding": "rare no-go paradigm, adult/brain-injury origins; future exact protocol freezing needed"
+    },
+    {
+      "id": "pvt-brief",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/22025811/",
+      "readDepth": "read primary paper abstract",
+      "finding": "74 healthy adults22–45, 10/3min sensitivity tradeoff, standard500ms vs brief355ms analytic lapse threshold; not diagnosis"
+    },
+    {
+      "id": "rtv-adhd",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/23872284/",
+      "readDepth": "read meta-analysis abstract",
+      "finding": "319studies; RT variability not specific to ADHD; no individual threshold"
+    },
+    {
+      "id": "phenx-dccs",
+      "url": "https://www.phenxtoolkit.org/protocols/view/530102",
+      "readDepth": "read official standard protocol and permission/age statements",
+      "finding": "free protocol; traditional interviewer administration;2.5–7years reference, not project validation or NIH Toolbox reuse"
+    },
+    {
+      "id": "dccs-primary",
+      "url": "https://doi.org/10.1038/nprot.2006.46",
+      "readDepth": "primary publication metadata/search; PhenX source protocol read",
+      "finding": "Zelazo2006 standard DCCS; no claim full copyrighted article was read"
+    },
+    {
+      "id": "cdc-adhd",
+      "url": "https://www.cdc.gov/adhd/diagnosis/",
+      "readDepth": "read official guidance page",
+      "finding": "no single diagnostic test; several steps and differential conditions"
+    },
+    {
+      "id": "nice-adhd",
+      "url": "https://www.nice.org.uk/guidance/ng87/chapter/recommendations",
+      "readDepth": "official search excerpts only; direct full page403",
+      "finding": "specific QbTest6–17 as adjunct to clinical assessment, not generic task clearance"
+    },
+    {
+      "id": "asrs",
+      "url": "https://www.hcp.med.harvard.edu/ncs/asrs_2025.php",
+      "readDepth": "search excerpts only; page timeout",
+      "finding": "18Q permission request indicated, precise current version/translation/electronic rights pending; no items copied"
+    },
+    {
+      "id": "opm-sjt",
+      "url": "https://www.opm.gov/policy-data-oversight/assessment-and-selection/other-assessment-methods/situational-judgment-tests/",
+      "readDepth": "read official method page",
+      "finding": "job-related scenarios, independent new content needed; no verified ready Chinese item bank"
+    },
+    {
+      "id": "hbn-nimh",
+      "url": "https://cmn.nimh.nih.gov/dsst/datasets/hbn/",
+      "readDepth": "read official dataset metadata",
+      "finding": "click-through DUA; no participant data accessed/downloaded"
+    },
+    {
+      "id": "hbn-portal",
+      "url": "https://fcon_1000.projects.nitrc.org/indi/cmi_healthy_brain_network/",
+      "readDepth": "read public portal metadata",
+      "finding": "external research reference, not imported norms or confirmed comparable task versions"
+    }
+  ],
+  "accessLimitations": [
+    "first two repository searches used invalid repo qualifier and returned422; corrected directory/API queries later read relevant sources",
+    "NICE full page403, no bypass attempted",
+    "Harvard ASRS fetch timeout",
+    "some PMC pages challenge automated access; use primary PubMed abstracts, not claim full reading",
+    "some PDF OCR malformed; no exact trial timings inferred solely from corrupted OCR"
+  ],
+  "notPerformed": [
+    "application tests",
+    "new task runner/manifest/scorer",
+    "restricted material download",
+    "participant data download",
+    "author contact or user messages",
+    "account registration",
+    "clinical diagnosis",
+    "commercial/clinical admission workflow",
+    "server/schema/COS/permissions changes",
+    "CI/merge/deploy"
+  ]
+}
