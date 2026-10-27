@@ -1,5 +1,7 @@
 # PR363 education feedback task result
 
+Historical first handoff at `bc49043f`. Production wiring continuation and real PG evidence are in [education-feedback-wiring-result.md](education-feedback-wiring-result.md).
+
 Independent cloud branch: `feat/pr363-education-feedback`. Started from the requested clean integration anchor `6cf241d65b4bc44878ef9d9fe21c81fdd02561cd`, without resetting the previous workspace HEAD `dff80f0604163a04e2f5a8119d7d4295116eeb41`. Main task baseline remains `7e6d7da4a01e4a42b410cf2dbdcfa76f11759fdc`.
 
 The final application source commit is `9555c2c4b` (full identity in the evidence index), tree `6fbe95e22ede62fdc7b5ef100f0094d2754dcb21`. Backend tree: `394873d5a694b268c3a271f34ff51e11e7a9c937`; frontend tree: `1fe7f42ff5c7900c058f8c950dd9f4b313991183`. The following evidence/documentation commit does not change those application trees. Every push was followed by a remote ref read. All commits use `[skip ci]`; no integration branch/PR/CI/protection/credential/merge/deploy mutation was made.
