@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "base": "04a8d994207d7b831b874d4be4f5c31640466458",
-  "product": "3fb06cd2bf35b863144e4554f30b4284311b7751",
+  "product": "b37c60aebaa05b15d28f8172fc3a4600f5c29b90",
   "branch": "work/school-teacher-consolidated-20261027",
   "source": {
     "docs/evidence/school-teacher-review-20261027.json": {
@@ -722,7 +722,7 @@
       "oldMode": "100644",
       "newMode": "100644",
       "before": "2246ed563d03d242b64acd50cd668490989c77fe",
-      "after": "30593e3cc91bf9fe2a970ffc95dd361fa7f6e8fe",
+      "after": "8642a9e9aa0896281bf2c37f5e06e5afb0c6e1fe",
       "status": "M"
     },
     "server-version/frontend/src/huiteacher/HuiteacherAssessmentTasks.test.tsx": {
@@ -1072,7 +1072,7 @@
       "oldMode": "100644",
       "newMode": "100644",
       "before": "756b5f5335269d1ca7cc33f9537bc252f831716c",
-      "after": "b92eaf10e224b76ae880d85a7c9d8685e098d474",
+      "after": "b9dac04bac843f14031fe25856aad057570c798b",
       "status": "M"
     },
     "server-version/frontend/src/school/SchoolCollectionControls.tsx": {
@@ -1659,11 +1659,12 @@
     ".github/scripts/content-scope.mjs",
     ".github/scripts/merge-gate.mjs",
     "docs/school-teacher-dot-ci-plan-20261027.md",
-    ".github/scripts/pr357-checks.test.mjs"
+    ".github/scripts/pr357-checks.test.mjs",
+    ".github/scripts/pr357-continuation.mjs"
   ],
   "components": {
     "backend": "100ae07d90a1bf9fc53b1df0a610008571f565dd",
-    "frontend": "80b6b3802410a48b5fbc4af90a11dd499f61d5f2"
+    "frontend": "1bb800f156220de1e5a2f043a82208f713cfa273"
   },
   "tests": {
     "backend": [

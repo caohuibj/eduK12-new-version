@@ -26,7 +26,7 @@ test('required merge gate needs genuine qualification and CodeQL, refusing every
 });
 test('real YAML connects exact source, independent affected workflow, CodeQL and stable gate',()=>{
  const y=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8'),w=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
- assert.match(y,/pr357_plan: \$\{\{ steps.scope.outputs.pr357_plan/);assert(!y.includes('uses: ./.github/workflows/ci-pr357.yml'));assert.match(y,/- pr357\n/);assert(y.includes(binding.branch));assert.match(y,/application_route == 'pr357' && 'paths:/);
+ assert.match(y,/pr357_plan: \$\{\{ steps.scope.outputs.pr357_plan/);assert(!y.includes('uses: ./.github/workflows/ci-pr357.yml'));assert.match(y,/- pr357\n/);assert(y.includes(binding.branch));assert.match(y,/application_route == 'pr357' && steps.pr357-codeql-config.outputs.config/);
  for(const name of ['pr357-admission','pr357-frontend','pr357-backend','pr357-audit','pr357-connected','pr357'])assert(w.includes('\n  '+name+':'));
  for(const name of ['pr357-admission','pr357-frontend','pr357-backend','pr357-audit','pr357-connected'])assert(w.includes('- '+name));assert.match(w,/chrom[e].cjs preflight/);const bounded=w.slice(w.indexOf('\n  pr357-admission:'),w.indexOf('\n  post356:'));assert(!bounded.includes('--no-sandbox'));assert(!bounded.includes('continue-on-error'));assert(!bounded.includes('ignoreHTTPSErrors'));assert(!bounded.includes('permissions.cjs tighten'));
 });

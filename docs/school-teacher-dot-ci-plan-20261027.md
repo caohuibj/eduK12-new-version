@@ -54,3 +54,20 @@ HEAD `41ad563d` 的主workflow run `40430737854` 与可复用workflow校验记�
 独立收敛证据补充：已用公开 GitHub run HTML 补得首轮真实annotation，确为job/runner不可用context；第二轮确为51/50上限。两类错误分别保存，不用后一项覆盖前一项。原main的完整递归调用图为50个被调用workflow（另加顶层caller共51个文件）；内联后与原main调用集合完全一致。固定集合写入binding供可移植控制使用，避免单元测试依赖本机完整Git历史。官方规则按被调用工作流计数，不把顶层caller计入50。
 
 使用官方actionlint v1.7.7发布二进制，先核官方checksums中SHA256 `023070a287cd8cccd71515fedc843f1985bf96c436b7effaecce67290e7e0757`。实际主ci.yml语义lint发现新端口索引使用数字键，改为等价字符串键后exit0；关闭的是此工具的可选shellcheck/pyflakes调用，不是GitHub应用检查、SAST或安全门禁。另有3个直接控制PASS：真实YAML接线、context层级、递归调用图。未再次启动GitHub试跑来定位这些错误。
+
+## 第一次应用检查后的精确续跑
+
+原正式run40432261300（source667b7fec，checkout2fa23b853f1cc31efecbbd45a8869733cd6287a6）：scope/admission、两依赖audit、backend编译、旧用户237→239升级、JS/TS CodeQL均有实际成功。前端类型通过、lint0errors/19warnings，64文件570项为560PASS/10FAIL；后端unit13文件中5文件33PASS、8文件因CI合成JWT不足32字符未加载。PG文件、恢复、前端build、两runtime扫描与浏览器未执行。不能把原run整体标PASS。
+
+修订产品只有两个失败前端fixture，明确匹配 `?view=current-unit`；本地10项定向PASS。CI只将合成JWT延长，实际配置消费者9项定向PASS。没有放宽生产保护。backend整个tree不变；除两个失败fixture外，frontend所有源码/配置/依赖均不变。
+
+本次续跑固定原run、job、artifact ID及ZIP SHA256，先正式API回读并验证原scope/admission和producer状态，再核精确组件、变化路径、lock和产物digest。不支持任意“最近一次绿色”，输入漂移即停止。原完整失败report不修改，资格仅接纳整文件全部PASS：前端62文件560项＋新跑2文件原10个fullName；后端5个JWT无依赖文件33项＋新跑8个原未加载文件。后端这5文件是名单schema/工作簿和mock数据库的反馈、共识、报告服务，已逐项审读，不含实际JWT配置读取。不会只把旧report的success改成true。
+
+- backend原dist的原manifest与官方ZIP摘要保存为原身份；当前组件tree与旧组件完全相同，包装为本候选产物时显式记录 `REPACKAGED_IDENTICAL_COMPONENT_NOT_RECOMPILED`，保留originalManifest。新包装manifest不声称重新编译。Docker只准备依赖与运行镜像，COPY原dist，不再次tsc。每份续跑证明分开写candidate身份与原run/head，防止字段覆盖混淆。
+- 原升级receipt按同backend/schema接纳；当前deploy239仅为未跑PG的新隔离fixture准备，不再冒称第二次升级验收。13个PG文件、compact格式、非空恢复仍真实执行。
+- frontend两个test文件属于tsconfig的输入，故类型检查确需更新；lint只查这两个变化文件。前端生产build此前未执行，本轮第一次构建并扫描，不使用旧不存在的产物。
+- 原依赖audit按完全相同的两lock接纳，保持HIGH/CRITICAL门槛。原CodeQL job121952617174已于01:44:02UTC实际完成success；按仓库既有“官方成功应用SAST＋新控制分析”方式复用不变应用源，当前CodeQL仍实际扫描CI控制闭包及两个变化fixture，查询集和阈值不减。原工作流为upload:never，记录原job/阶段成功而不声称GitHub保有未上传的原SARIF或无发现。
+- 读取令牌仅出现在必要step，传给产品测试/构建的子进程前移除；artifact重定向不转发Authorization。官方GET的502/503/504及网络错误仅有界重试，权限/身份/摘要错误不回退。
+- 新复用消费者有固定ID/摘要/过期/输入漂移/原FAIL保留/缺失SAST阶段反例；实际原ZIP选择得到62/2与5/8，原backenddist按ci-artifact重新计算digest一致。Actions语义lint在本地真实执行；新增CodeQLstep缩进曾被本地lint拒绝并修正，没有推到CI试错。
+
+续跑冻结口径：产品检查点为 `b37c60aebaa05b15d28f8172fc3a4600f5c29b90`（只增加上述两份fixture修订），backend tree `100ae07d90a1bf9fc53b1df0a610008571f565dd` 不变，frontend tree `1bb800f156220de1e5a2f043a82208f713cfa273`；235个source＋新增固定续跑消费者后的10个control＝245路径。页首旧候选作为首次激活历史保留，不把旧候选身份改写成新执行身份。
