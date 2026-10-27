@@ -5,7 +5,7 @@ const fs=require('node:fs'),os=require('node:os'),path=require('node:path')
 const {artifactResponseFile}=require('./pr363-browser.cjs')
 test('entry origins cannot become HTTP, another host or credential URL',()=>{
  assert.equal(origin('SCHOOL',{}),'https://school.eduk12.top')
- for(const value of ['http://school.eduk12.top','https://training.eduk12.top','https://user:secret@school.eduk12.top','https://school.eduk12.top/path','https://school.eduk12.top?x=1'])assert.throws(()=>origin('SCHOOL',{PR363_SCHOOL_ORIGIN:value}))
+ for(const value of ['http://school.eduk12.top','https://school.eduk12.top:9443','https://training.eduk12.top','https://user:secret@school.eduk12.top','https://school.eduk12.top/path','https://school.eduk12.top?x=1'])assert.throws(()=>origin('SCHOOL',{PR363_SCHOOL_ORIGIN:value}))
 })
 test('rendered report metric binds the exact key rather than equal-valued sibling',()=>{
  const saved={core:{metrics:[{key:'a',value:7},{key:'b',value:8}]}}

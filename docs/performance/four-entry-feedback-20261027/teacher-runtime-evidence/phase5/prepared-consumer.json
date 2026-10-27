@@ -1,0 +1,51 @@
+{
+  "recordKind": "prepared browser consumer: syntax/control observations only",
+  "browserStatus": "NOTRUN",
+  "fixtureSeedStatus": "NOTRUN",
+  "productionStartupStatus": "NOTRUN",
+  "appBuildStatus": "NOTRUN",
+  "checks": [
+    {
+      "command": "node --check server-version/e2e/pr363-fixture.cjs",
+      "exit": 0
+    },
+    {
+      "command": "node --check server-version/e2e/pr363-browser.cjs",
+      "exit": 0
+    },
+    {
+      "command": "node --test server-version/e2e/pr363-browser.test.cjs",
+      "exit": 0,
+      "passed": 3,
+      "note": "tool reporter stdout only, not an original saved log"
+    },
+    {
+      "command": "node --test --test-name-pattern='entry origins' server-version/e2e/pr363-browser.test.cjs",
+      "exit": 0,
+      "passed": 1,
+      "note": "new production canonical port constraint; other two control assertions not repeated"
+    }
+  ],
+  "files": [
+    {
+      "path": "server-version/e2e/pr363-fixture.cjs",
+      "sha256": "b90ecd33b1a0861679ec3d56e98672e2ed09ad8da765646a741824164a5c0350"
+    },
+    {
+      "path": "server-version/e2e/pr363-browser.cjs",
+      "sha256": "77878d8105cbe6acc41c1bd69758ab5f6ddcac99de01f080461a7a0597be7634"
+    },
+    {
+      "path": "server-version/e2e/pr363-browser.test.cjs",
+      "sha256": "0d510a1bcaf38f4e911932e3e0d92fbbaa6cf7f18b57d32437ef9b5905859a31"
+    },
+    {
+      "path": "server-version/e2e/pr363-native-template.json",
+      "sha256": "8c43e814b1c58af6ae74c37c5f4ea3ef25721072203e6fd9b757961c7d979b66"
+    }
+  ],
+  "nativeDataSource": "backend/src/__tests__/fixtures/sjt-native-staged.fixture.ts: JSON data extraction only; no engine/App build",
+  "inputNote": "final file hashes recorded after syntax/control checks; controls are not browser or production startup results",
+  "absorbedRegistrationInterface": "85e9ee0c66ada6a2b0550b9e11f3e31b96ab62ce",
+  "networkContract": "real canonical HTTPS443, loopback DNS and actual peer, network document/static bytes equal official artifact before credentials; no route fulfillment or TLS bypass"
+}

@@ -4,10 +4,11 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path')
 const {randomUUID,createHash}=require('node:crypto'),{spawnSync,spawn}=require('node:child_process'),{pathToFileURL}=require('node:url')
 const base=require('./school-teacher-fixture.cjs')
+let stage='bootstrap',privateRoot
 const app=name=>require(path.join(base.backend,'dist',name))
 const sha=value=>createHash('sha256').update(value).digest('hex')
 const origins={SCHOOL:'https://school.eduk12.top',TEACHER:'https://teacher.eduk12.top'}
-function origin(product,env=process.env){const value=env['PR363_'+product+'_ORIGIN']||origins[product];const url=new URL(value);assert.equal(url.protocol,'https:');assert.equal(url.hostname,new URL(origins[product]).hostname);assert.equal(url.origin,value);return value}
+function origin(product,env=process.env){const value=env['PR363_'+product+'_ORIGIN']||origins[product];const url=new URL(value);assert.equal(url.protocol,'https:');assert.equal(url.port,'','Use the actual production canonical origin, no port rewrite');assert.equal(url.hostname,new URL(origins[product]).hostname);assert.equal(url.origin,value);return value}
 async function artifact(kind){
  const dir=kind==='backend'?path.join(base.backend,'dist'):fs.realpathSync(process.env.SCHOOL_TEACHER_FRONTEND_DIST||path.join(base.repo,'server-version/frontend/dist'))
  const tools=await import(pathToFileURL(path.join(base.repo,'.github/scripts/ci-artifact.mjs')).href)
@@ -19,10 +20,10 @@ function privateFile(root,name,value){assert.equal(path.basename(name),name);fs.
 function runtime(fixture){Object.assign(process.env,fixture.secrets,{DATABASE_URL:fixture.runtimeUrl,DATABASE_URL_RUNTIME:fixture.runtimeUrl,NODE_ENV:'test',BACKGROUND_WORKERS_ENABLED:'false',COGNITIVE_MODULE_ENABLED:'true',HUITEACHER_WORKSPACE_ENABLED:'true'})}
 function principal(u){return {userId:u.id,username:u.username,role:u.role,platformRole:u.platformRole,accountDomain:u.accountDomain,tokenVersion:u.tokenVersion,mustChangePassword:u.mustChangePassword}}
 async function seed(){
- const root=base.guard();await artifact('backend');await artifact('frontend')
+ const root=base.guard();privateRoot=root;stage='artifact-identity';await artifact('backend');await artifact('frontend')
  assert.equal(fs.existsSync(path.join(root,'fixture.json')),false,'Use a fresh isolated service; no seeded-attempt retry')
  const seeded=spawnSync(process.execPath,[path.join(__dirname,'school-teacher-fixture.cjs'),'seed'],{env:process.env,encoding:'utf8',maxBuffer:1024*1024})
- assert.equal(seeded.status,0,'BASE_IDENTITY_SEED_FAILED')
+ if(seeded.status!==0){if(fs.existsSync(root))fs.writeFileSync(path.join(root,'pr363-base-seed.log'),seeded.stdout+'\n'+seeded.stderr,{mode:0o600,flag:'wx'});throw new Error('BASE_IDENTITY_SEED_FAILED')}
  const {value:fixture}=base.readFixture();const ownerUrl=process.env.DATABASE_URL;runtime(fixture)
  const {PrismaClient}=require('../backend/node_modules/@prisma/client'),owner=new PrismaClient({datasources:{db:{url:ownerUrl}}})
  try{
@@ -31,8 +32,10 @@ async function seed(){
   const issuer=await system('issuer'),reviewer=await system('reviewer'),cases=[]
   for(const [product,mode] of [['SCHOOL','IMMEDIATE'],['TEACHER','IMMEDIATE'],['TEACHER','SCHEDULED']]){
    const f=fixture.products[product],author=await owner.user.findUniqueOrThrow({where:{id:f.author.id}}),actor=principal(author)
+   stage='source-'+product+'-'+mode
    const title='PR363 '+product+' '+mode+' '+fixture.suffix,feedbackPolicy=mode==='IMMEDIATE'?{schemaVersion:1,mode}:{schemaVersion:1,mode,releaseAt:new Date(Date.now()+86400000).toISOString()}
    const delivery=await createDelivery(owner,product,{id:f.organizationId},issuer,reviewer,'BUNDLE',false,true,feedbackPolicy,false,false,author,title)
+   stage='workflow-'+product+'-'+mode
    let workflowId,runId
    if(product==='SCHOOL'){
     const activities=app('modules/campus/activity.service'),scope={actor,organizationId:f.organizationId}
@@ -89,7 +92,7 @@ async function serveBackend(product){
  await new Promise((resolve,reject)=>{child.once('error',reject);child.once('exit',code=>code===0?resolve():reject(new Error('BACKEND_EXIT_'+code)))})
 }
 module.exports={origin,artifact,exactMetric,seed,verify,privateFile,serveBackend}
-if(require.main===module)Promise.resolve().then(()=>{assert.ok(['seed','verify','serve-backend'].includes(process.argv[2]));return process.argv[2]==='seed'?seed():process.argv[2]==='verify'?verify():serveBackend(process.argv[3])}).catch(error=>{console.error('PR363_FIXTURE_FAILED '+sha(String(error)));process.exitCode=1})
+if(require.main===module)Promise.resolve().then(()=>{assert.ok(['seed','verify','serve-backend'].includes(process.argv[2]));return process.argv[2]==='seed'?seed():process.argv[2]==='verify'?verify():serveBackend(process.argv[3])}).catch(error=>{if(privateRoot&&fs.existsSync(privateRoot))fs.writeFileSync(path.join(privateRoot,'pr363-failure.log'),String(error?.stack||error),{mode:0o600});console.error('PR363_FIXTURE_FAILED '+JSON.stringify({stage,errorName:error?.name,code:/^[A-Z0-9_]{2,80}$/.test(error?.code||'')?error.code:null,digest:sha(String(error))}));process.exitCode=1})
 async function createDelivery(owner, product, org, issuer, reviewer, family, consentRequired = false, withReports = false, feedbackPolicy = { schemaVersion: 1, mode: 'IMMEDIATE' }, formOnly = false, completionOnly = false, author, caseTitle) {
     const resourceId = randomUUID(), resourceKey = `education-assessment:${product}:${org.id}:${resourceId}`;
     const { getContentRelease, publishContentRelease } = app('modules/measurement-content/repository');

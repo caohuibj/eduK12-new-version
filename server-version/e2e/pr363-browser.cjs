@@ -31,7 +31,8 @@ async function login(browser,product,user,privileged){
   assetChecks.push((async()=>{assert.equal(response.status(),200);const file=artifactResponseFile(dist,response.url(),response.request().resourceType()==='document');assert.equal(base.sha(await response.body()),base.sha(fs.readFileSync(file)),'Network document/asset must be actual official artifact bytes')})().catch(error=>assetErrors.push(base.sha(String(error)))))
  })
  const verifyAssets=async()=>{await Promise.all(assetChecks);assert.deepEqual(assetErrors,[])}
- const response=await page.goto(url+'/login');assert.equal(response.status(),200);assert.ok(await response.securityDetails(),'Trusted TLS document required')
+ const response=await page.goto(url+'/login');assert.equal(response.status(),200);assert.ok(await response.securityDetails(),'Trusted TLS document required');const peer=await response.serverAddr();assert.ok(peer&&['127.0.0.1','::1'].includes(peer.ipAddress),'HTTPS must terminate in this isolated job')
+ await page.getByLabel(product==='SCHOOL'?'用户名':'教育账号',{exact:true}).waitFor();await verifyAssets()
  await page.getByLabel(product==='SCHOOL'?'用户名':'教育账号',{exact:true}).fill(user.username)
  await page.getByLabel('密码',{exact:true}).fill(user.password)
  const pending=page.waitForResponse(r=>new URL(r.url()).pathname===prefix+'/auth/login'&&r.request().method()==='POST')
@@ -92,21 +93,23 @@ async function run(){
  const report={schemaVersion:1,status:'RUNNING',source:fixture.identity,cases:[],inputs:{backend:backendArtifact,frontend:frontendArtifact}}
  let browser
  try{
-  const preflight=preflightChrome();assert.equal(preflight.ok,true)
+  report.stage='chrome-preflight';const preflight=preflightChrome();report.chromePreflight=preflight;assert.equal(preflight.ok,true)
   const {chromium}=require('../../.github/release-tools/node_modules/playwright-core')
-  browser=await chromium.launch(CHROME_LAUNCH_OPTIONS);assert.equal((await verifyChromeSandbox(browser)).ok,true)
+  report.stage='chrome-launch';browser=await chromium.launch(CHROME_LAUNCH_OPTIONS);report.chromeSandbox=await verifyChromeSandbox(browser);assert.equal(report.chromeSandbox.ok,true)
   const observed=[]
   for(const product of ['SCHOOL','TEACHER']){
    // Real password + TOTP enrollment/confirmation. No generated session cookies.
-   const manager=await login(browser,product,fixture.products[product].author,true);await manager.verifyAssets();await manager.context.close()
+   report.stage=product+'-manager-mfa';const manager=await login(browser,product,fixture.products[product].author,true);await manager.verifyAssets();await manager.context.close()
    for(const c of data.cases.filter(c=>c.product===product)){
-    const {page,context,prefix,verifyAssets}=await login(browser,product,fixture.products[product].participant,false),pageErrors=[]
+    report.stage=product+'-'+c.mode+'-participant-login';const {page,context,prefix,verifyAssets}=await login(browser,product,fixture.products[product].participant,false),pageErrors=[]
+    const mutations=[]
     page.on('pageerror',e=>pageErrors.push(base.sha(String(e))))
+    page.on('response',response=>{const request=response.request(),url=new URL(response.url());if(url.pathname.startsWith('/api/')&&!['GET','HEAD','OPTIONS'].includes(request.method()))mutations.push({path:url.pathname,status:response.status()})})
     try{
-     const parentId=await openCase(page,c)
+     report.stage=product+'-'+c.mode+'-start-resume';const parentId=await openCase(page,c)
      await page.reload();const resumedParentId=await openCase(page,c);assert.equal(resumedParentId,parentId,'Refresh must keep the actual durable parent')
-     await reaction(page);await native(page)
-     await page.getByLabel('Synthetic note',{exact:false}).fill('Synthetic browser Form answer')
+     report.stage=product+'-'+c.mode+'-cognitive';await reaction(page);report.stage=product+'-'+c.mode+'-native';await native(page)
+     report.stage=product+'-'+c.mode+'-form-report';await page.getByLabel('Synthetic note',{exact:false}).fill('Synthetic browser Form answer')
      const feedback=page.waitForResponse(r=>new URL(r.url()).pathname===prefix+'/assessment-reports/executions/'+c.executionId&&r.request().method()==='GET')
      await page.getByRole('button',{name:'提交本页',exact:true}).click()
      const response=await feedback;assert.equal(response.status(),200);const result=(await response.json()).data
@@ -118,6 +121,8 @@ async function run(){
       assert.equal(result.state,'READY');assert.equal(result.reports.length,2)
       await page.getByRole('heading',{name:'Synthetic frozen report',exact:true}).first().waitFor()
      }
+     assert.ok(mutations.every(row=>row.path.startsWith(prefix+'/')),'No Training/global credential or runtime transport fallback')
+     for(const pattern of [/\/cognitive\/[^/]+\/submit$/,/\/situational\/[^/]+\/submit$/,/\/form-sections\/[^/]+\/submit$/])assert.ok(mutations.some(row=>pattern.test(row.path)&&row.status===200),'Actual UI must accept each canonical unit FINAL')
      await verifyAssets();assert.deepEqual(pageErrors,[]);observed.push({executionId:c.executionId,parentId,resumedParentId,report:result})
      report.cases.push({product,mode:c.mode,complete:true,resumedSameParent:true,reportState:result.state})
     }finally{await context.close()}
@@ -125,7 +130,7 @@ async function run(){
   }
   fixtureTools.privateFile(root,'pr363-observed.json',observed)
   const checked=spawnSync(process.execPath,[path.join(__dirname,'pr363-fixture.cjs'),'verify'],{env:process.env,encoding:'utf8',maxBuffer:1024*1024});assert.equal(checked.status,0,'Persisted FINAL exact metric-key/value verification required')
-  report.status='PASS'
+  report.status='PASS';report.stage='complete'
  }catch(error){report.status='FAILED';report.errorDigest=base.sha(String(error));throw error}
  finally{if(browser)await browser.close();fs.writeFileSync(path.join(out,'browser.json'),JSON.stringify(report,null,2)+'\n')}
 }

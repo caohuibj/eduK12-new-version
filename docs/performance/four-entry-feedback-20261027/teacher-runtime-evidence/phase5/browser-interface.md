@@ -65,13 +65,13 @@ Reuse school-teacher-fixture.cjs exact guard, not fake CI flags:
   absent with an existing nonsymlink parent. Existing seed creates actual restricted
   role with the full table-policy/release-schema checker; only runtime services
   receive its URL. Source/account fixture setup alone uses owner.
-- REDIS_URL points to a real loopback isolated Redis. No production endpoint.
+- REDIS_URL points to a real loopback isolated Redis. No production endpoint. HTTPS ingress binds canonical port443, distinct from the two unprivileged backend ports.
 - SCHOOL_TEACHER_FRONTEND_DIST points at verified same-candidate frontend files.
 - PR363_BACKEND_SCHOOL_PORT and PR363_BACKEND_TEACHER_PORT are distinct loopback
   ports >=1024; serve-backend writes raw logs only to the private directory.
 - PR363_SCHOOL_ORIGIN / PR363_TEACHER_ORIGIN are exact trusted HTTPS origins on
-  school.eduk12.top / teacher.eduk12.top, optional CI ingress port. Their DNS must
-  resolve exclusively to loopback. Default canonical origin has no port.
+  school.eduk12.top / teacher.eduk12.top on the canonical HTTPS port443. Their DNS must
+  resolve exclusively to loopback. Noncanonical ports are refused: the real Teacher origin guard requires its exact host.
 - CI provides actual TLS ingress/static serving those official files and proxies
   /api to the corresponding product backend. Preserve Host, Origin and separate
   Set-Cookie headers, X-Forwarded-Proto=https, one trusted proxy hop. Do not rewrite
