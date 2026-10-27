@@ -1,0 +1,23 @@
+
+ RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend
+
+ ↓ src/__tests__/huiteacher/assessment-runtime.routes.test.ts > Teacher assessment runtime synthetic HTTP boundary > accepts only a Teacher product credential and a current Teacher account
+ ↓ src/__tests__/huiteacher/assessment-runtime.routes.test.ts > Teacher assessment runtime synthetic HTTP boundary > reads the exact bound Cognitive session while omitting reports and Training persistence
+ ↓ src/__tests__/huiteacher/assessment-runtime.routes.test.ts > Teacher assessment runtime synthetic HTTP boundary > rejects foreign parent, item and session before any runtime or asset handler
+ ↓ src/__tests__/huiteacher/assessment-runtime.routes.test.ts > Teacher assessment runtime synthetic HTTP boundary > requires independent source-use authorization; identity alone cannot pass
+ ✓ src/__tests__/huiteacher/assessment-runtime.routes.test.ts > Teacher assessment runtime synthetic HTTP boundary > uses root NEW_USE for new assignments and HISTORY for exact bound continuation 84ms
+ ↓ src/__tests__/huiteacher/assessment-runtime.routes.test.ts > Teacher assessment runtime synthetic HTTP boundary > rejects mismatched organization, frozen policy hash and runtime target
+ ↓ src/__tests__/huiteacher/assessment-runtime.routes.test.ts > Teacher assessment runtime synthetic HTTP boundary > keeps shared consent authority before materials, child reads and FINAL
+ ✓ src/__tests__/huiteacher/assessment-runtime.routes.test.ts > Teacher assessment runtime synthetic HTTP boundary > forwards one-shot Cognitive FINAL and its replay to the canonical service without scores 43ms
+ ↓ src/__tests__/huiteacher/assessment-runtime.routes.test.ts > Teacher assessment runtime synthetic HTTP boundary > resumes the original bound parent without calling new-intake START, including CLOSED Run
+ ↓ src/__tests__/huiteacher/assessment-runtime.routes.test.ts > Teacher assessment runtime synthetic HTTP boundary > uses canonical START and then verifies its persisted exact binding
+ ↓ src/__tests__/huiteacher/assessment-runtime.routes.test.ts > Teacher assessment runtime synthetic HTTP boundary > projects SJT resume and FINAL as runner state plus completion, with no report
+ ↓ src/__tests__/huiteacher/assessment-runtime.routes.test.ts > Teacher assessment runtime synthetic HTTP boundary > exposes an existing completed parent without re-running FINAL or report code
+ ↓ src/__tests__/huiteacher/assessment-runtime.routes.test.ts > Teacher assessment runtime synthetic HTTP boundary > binds pagination cursors to the actor and rejects oversized input before SQL
+ ↓ src/__tests__/huiteacher/assessment-runtime.routes.test.ts > Teacher assessment runtime synthetic HTTP boundary > projects completed children to completion-only responses
+
+ Test Files  1 passed (1)
+      Tests  2 passed | 12 skipped (14)
+   Start at  08:54:20
+   Duration  7.31s (transform 5.16s, setup 0ms, import 7.00s, tests 128ms, environment 0ms)
+

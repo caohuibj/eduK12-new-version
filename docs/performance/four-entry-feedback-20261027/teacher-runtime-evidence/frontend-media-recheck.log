@@ -1,0 +1,13 @@
+
+ RUN  v4.1.11 /workspace/eduK12-new-version/server-version/frontend
+
+ ↓ src/huiteacher/assessmentRuntime.client.test.ts > Teacher frozen runtime transport (synthetic API) > uses only the injected Teacher API for Cognitive read, FINAL and binary assets
+ ↓ src/huiteacher/assessmentRuntime.client.test.ts > Teacher frozen runtime transport (synthetic API) > binds SJT resume/result/FINAL to one parent slot and forbids standalone start
+ ✓ src/huiteacher/assessmentRuntime.client.test.ts > Teacher frozen runtime transport (synthetic API) > maps only the current SCALE unit image path 11ms
+ ✓ src/huiteacher/assessmentRuntime.client.test.ts > Teacher frozen runtime transport (synthetic API) > maps only the current FORM_SECTION unit image path 2ms
+
+ Test Files  1 passed (1)
+      Tests  2 passed | 2 skipped (4)
+   Start at  08:52:03
+   Duration  1.15s (transform 172ms, setup 228ms, import 204ms, tests 14ms, environment 494ms)
+

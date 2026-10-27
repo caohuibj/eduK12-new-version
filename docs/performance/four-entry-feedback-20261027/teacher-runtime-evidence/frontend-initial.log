@@ -1,0 +1,40 @@
+
+ RUN  v4.1.11 /workspace/eduK12-new-version/server-version/frontend
+
+ ✓ src/huiteacher/assessmentRuntime.client.test.ts > Teacher frozen runtime transport (synthetic API) > uses only the injected Teacher API for Cognitive read, FINAL and binary assets 9ms
+ ✓ src/huiteacher/assessmentRuntime.client.test.ts > Teacher frozen runtime transport (synthetic API) > binds SJT resume/result/FINAL to one parent slot and forbids standalone start 1ms
+ × src/huiteacher/assessmentRuntime.client.test.ts > Teacher frozen runtime transport (synthetic API) > maps only the current SCALE unit image path 9ms
+   → 素材不属于当前冻结测评单元
+ × src/huiteacher/assessmentRuntime.client.test.ts > Teacher frozen runtime transport (synthetic API) > maps only the current FORM_SECTION unit image path 1ms
+   → 素材不属于当前冻结测评单元
+ ✓ src/huiteacher/HuiteacherMyAssessmentTasks.test.tsx > Teacher participant host with synthetic runtime DTOs > runs Cognitive, SJT, Scale and Form transports and completes only after a fresh parent COMPLETED 285ms
+ ✓ src/huiteacher/HuiteacherMyAssessmentTasks.test.tsx > Teacher participant host with synthetic runtime DTOs > does not treat a child completion hint or missing current item as parent completion 40ms
+ ✓ src/huiteacher/HuiteacherMyAssessmentTasks.test.tsx > Teacher participant host with synthetic runtime DTOs > preserves durable completion when list refresh fails and emits each completion once 118ms
+ ✓ src/huiteacher/HuiteacherMyAssessmentTasks.test.tsx > Teacher participant host with synthetic runtime DTOs > collects the actual assigned consent before first canonical START 46ms
+ ✓ src/huiteacher/HuiteacherMyAssessmentTasks.test.tsx > Teacher participant host with synthetic runtime DTOs > rejects a late completed response after exit and after account replacement 18ms
+ ✓ src/huiteacher/HuiteacherMyAssessmentTasks.test.tsx > Teacher participant host with synthetic runtime DTOs > does not revive an old task on a new API identity 20ms
+ ✓ src/huiteacher/HuiteacherMyAssessmentTasks.test.tsx > Teacher participant host with synthetic runtime DTOs > keeps a recoverable error when child progress cannot be read; it never re-submits FINAL 49ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/huiteacher/assessmentRuntime.client.test.ts > Teacher frozen runtime transport (synthetic API) > maps only the current SCALE unit image path
+ FAIL  src/huiteacher/assessmentRuntime.client.test.ts > Teacher frozen runtime transport (synthetic API) > maps only the current FORM_SECTION unit image path
+Error: 素材不属于当前冻结测评单元
+ ❯ location src/huiteacher/assessmentRuntime.client.ts:68:49
+     66|   ?'/form-sections/'+encodeURIComponent(item.formSectionId??item.id)+'…
+     67|  const location=(path:string,kind:'image'|'video')=>{
+     68|   if(!unit||!path.startsWith(parent+unit))throw new Error('素材不属于当前冻结测评…
+       |                                                 ^
+     69|   const suffix=path.slice((parent+unit).length)
+     70|   const match=(kind==='image'?/^assets\/([^/]+)\/content$/:item.type==…
+ ❯ Object.loadImage src/huiteacher/assessmentRuntime.client.ts:77:37
+ ❯ src/huiteacher/assessmentRuntime.client.test.ts:48:24
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  2 failed | 9 passed (11)
+   Start at  08:51:26
+   Duration  2.37s (transform 404ms, setup 512ms, import 657ms, tests 600ms, environment 1.55s)
+

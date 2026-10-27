@@ -5,13 +5,17 @@ approve or publish any tool. No Training or School credential is accepted by
 the Teacher authentication middleware.
 
 The runtime factory requires a `TeacherAssessmentSourceAccess` dependency.
-`readIdentity(db, {key, version})` returns `{origin, entry, identityOnly:true}`;
+`readIdentity(db, {resourceKey, version, purpose:'NEW_USE'|'HISTORY'})` maps to root's
+`readEducationAssessmentDeliveryIdentity` and returns `{origin, entry, identityOnly:true}`;
 additional `runtime` and `releases` fields from the root reader are permitted.
 The consumer independently binds the origin to the actual organization, exact
 track policy/hash, SELF Teacher assignment and its exact Composite parent.
 `assertUse(db, {identity, executionId, actorUserId, purpose})` must separately
-check the current organization grant and original authorizer, exact frozen C/P/R
-and runtime snapshot. Purpose is `START`, `BOUND_COLLECTION` or `HISTORY_READ`.
+check the original authorizer's current exact proof for new use, plus any
+source-specific collection stop policy. The identity reader already validates
+exact frozen C/P/R and runtime snapshots. Purpose is `START`, `BOUND_COLLECTION`
+or `HISTORY_READ`. The participant guard owns current actor/organization access;
+the manager-only `assertEducationAssessmentRunUse` is never a participant guard.
 An identity-only reader is never a use authorization. Source retirement must
 retain the existing bound-completion contract; emergency stop, actor revocation
 and consent withdrawal remain authoritative. There is no permissive default.
@@ -71,3 +75,52 @@ pending. The production source adapter and shared START/FINAL transaction
 integration remain root-owned dependencies. No PG/browser/CI/merge/deploy action
 has occurred. `runtime-table-policy.json` is outside this worker's changes and
 will not be uploaded or used to bypass root's reported approval blocker.
+
+## Implementation delivered
+
+Product commit: `bad260a01406cae83e736ae7f6c3f7437e003b24`; tree:
+`c5256958017d158c24be7dfd9a10aaf5a4086b87`. Pushed on the independent branch
+and verified with `git ls-remote`; the integration branch was never written.
+Root source commit `f46336cc45abaa21d4b946029cda2a0dfadec654` was fetched and
+read only. Its new `runtimeDefinitionHash` is accommodated by the synthetic
+fixture when that later contract is present; no merged-source run is claimed.
+
+The participant SQL checks actual SCHOOL account/Teacher approval and expiry,
+HUITEACHER entitlement, current organization/persona, exact event/run, SELF
+subject/respondent, individual policy, assignment/episode and durable parent.
+Every child additionally checks the encrypted frozen slot plan/hash/epoch;
+Cognitive and SJT compare the child's compiled runtime, and SJT also its frozen
+definition. Canonical FINAL services retain idempotency and durable storage.
+The HTTP tests mock those services; they do not prove storage durability.
+
+The frontend uses the injected Teacher API for JSON, binary material and video
+capabilities. It never falls back to a Training client or raw `fetch`. It loads
+the shared Cognitive/SJT runners through their neutral embedded/host bindings.
+The unified inbox lazy-loads this source only when `assessmentRuntime` is
+explicitly supplied, preserving the existing Form/Scale assembly. Only a fresh
+parent COMPLETED state emits the completion callback. Late responses after
+exit, API or account change cannot restore an old task.
+
+Integration still required:
+
+1. Supply `readIdentity: readEducationAssessmentDeliveryIdentity`. Its return
+   retains `authority`, `runtime` and `releases`; the runtime never serves those
+   internal objects as a participant response.
+2. Supply the separate `assertUse` implementation. For START, validate the
+   returned original authority proofs with `assertEducationDeliveryIssuerCurrent`;
+   never require the respondent to be a manager or substitute a current arbitrary
+   administrator. HISTORY is exact source identity only. Bound continuation
+   retains the existing retirement/consent/current-account contract.
+3. Finish root's production COGNITIVE adapter and exact source/C/P/R bindings in
+   shared START/FINAL transactions. Preflight is insufficient for revocation races.
+4. Mount the required-source router in backend `index.ts`, then supply
+   `assessmentRuntime={{onCompleted,renderFeedback}}` (or `{}` for completion only)
+   to the existing inbox in `HuiteacherApp.tsx`. Neither production enablement is
+   performed by this worker while the transaction consumer is absent.
+5. The report worker provides the independent authorized feedback component. The
+   runtime provides completion, pending/error/retry UX and never copies report
+   access from a child submission or Training result.
+
+See [the evidence index](teacher-runtime-evidence/README.md) for exact commands,
+exits, original failures and limitations. No CI, production build, merge,
+deployment, protection or credential change occurred.

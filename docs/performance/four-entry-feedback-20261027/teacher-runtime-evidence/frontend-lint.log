@@ -1,0 +1,15 @@
+
+/workspace/eduK12-new-version/server-version/frontend/src/huiteacher/HuiteacherMyAssessmentTasks.tsx
+   37:82   warning  The ref value 'generation.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'generation.current' to a variable inside the effect, and use that variable in the cleanup function          react-hooks/exhaustive-deps
+   37:107  warning  The ref value 'listGeneration.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'listGeneration.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+   52:25   warning  The ref value 'generation.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'generation.current' to a variable inside the effect, and use that variable in the cleanup function          react-hooks/exhaustive-deps
+   52:50   warning  The ref value 'listGeneration.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'listGeneration.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+   55:123  warning  React Hook useEffect has a missing dependency: 'session'. Either include it or remove the dependency array                                                                                                                                                                   react-hooks/exhaustive-deps
+  117:96   warning  React Hook useMemo has a missing dependency: 'attempt'. Either include it or remove the dependency array                                                                                                                                                                     react-hooks/exhaustive-deps
+  119:92   warning  React Hook useMemo has a missing dependency: 'attempt'. Either include it or remove the dependency array                                                                                                                                                                     react-hooks/exhaustive-deps
+
+/workspace/eduK12-new-version/server-version/frontend/src/huiteacher/assessmentRuntime.client.ts
+  7:14  warning  'AssessmentVideoCapabilitySources' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+✖ 8 problems (0 errors, 8 warnings)
+

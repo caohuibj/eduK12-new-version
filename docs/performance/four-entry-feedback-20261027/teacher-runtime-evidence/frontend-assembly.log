@@ -1,0 +1,392 @@
+
+ RUN  v4.1.11 /workspace/eduK12-new-version/server-version/frontend
+
+ × src/huiteacher/HuiteacherAssessmentTasks.test.tsx > unified Teacher assessment inbox > adds the approved runtime source only when explicitly assembled and forwards authoritative completion 1053ms
+   → Unable to find an element with the text: 认知情境组合任务, which matches selector 'strong'. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"ht-panel ht-assessment-inbox"[39m
+    [36m>[39m
+      [36m<header[39m
+        [33mclass[39m=[32m"ht-section-heading"[39m
+      [36m>[39m
+        [36m<h2[39m
+          [33mclass[39m=[32m"ht-assessment-section-title"[39m
+          [33mid[39m=[32m"ht-assessment-inbox-title"[39m
+        [36m>[39m
+          [0m参与测评[0m
+        [36m</h2>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"hs-teacher-task-help"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33maria-expanded[39m=[32m"false"[39m
+            [33maria-label[39m=[32m"参与测评说明"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-info"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"16"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"16"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"12"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"10"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M12 16v-4"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M12 8h.01"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</header>[39m
+      [36m<p[39m
+        [33mrole[39m=[32m"status"[39m
+      [36m>[39m
+        [0m正在读取测评任务，请稍候…[0m
+      [36m</p>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"ht-assessment-items"[39m
+      [36m>[39m
+        [36m<section[39m
+          [33mclass[39m=[32m"ht-assessment-source"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"ht-event-list"[39m
+          [36m/>[39m
+        [36m</section>[39m
+        [36m<section[39m
+          [33mclass[39m=[32m"ht-assessment-source"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"ht-event-list"[39m
+          [36m/>[39m
+        [36m</section>[39m
+        [36m<section[39m
+          [33mclass[39m=[32m"ht-assessment-source"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"ht-event-list"[39m
+          [36m/>[39m
+        [36m</section>[39m
+        [36m<p[39m
+          [33mrole[39m=[32m"status"[39m
+        [36m>[39m
+          [0m正在读取测评任务…[0m
+        [36m</p>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"ht-panel ht-assessment-inbox"[39m
+    [36m>[39m
+      [36m<header[39m
+        [33mclass[39m=[32m"ht-section-heading"[39m
+      [36m>[39m
+        [36m<h2[39m
+          [33mclass[39m=[32m"ht-assessment-section-title"[39m
+          [33mid[39m=[32m"ht-assessment-inbox-title"[39m
+        [36m>[39m
+          [0m参与测评[0m
+        [36m</h2>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"hs-teacher-task-help"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33maria-expanded[39m=[32m"false"[39m
+            [33maria-label[39m=[32m"参与测评说明"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-info"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"16"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"16"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"12"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"10"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M12 16v-4"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M12 8h.01"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</header>[39m
+      [36m<p[39m
+        [33mrole[39m=[32m"status"[39m
+      [36m>[39m
+        [0m正在读取测评任务，请稍候…[0m
+      [36m</p>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"ht-assessment-items"[39m
+      [36m>[39m
+        [36m<section[39m
+          [33mclass[39m=[32m"ht-assessment-source"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"ht-event-list"[39m
+          [36m/>[39m
+        [36m</section>[39m
+        [36m<section[39m
+          [33mclass[39m=[32m"ht-assessment-source"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"ht-event-list"[39m
+          [36m/>[39m
+        [36m</section>[39m
+        [36m<section[39m
+          [33mclass[39m=[32m"ht-assessment-source"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"ht-event-list"[39m
+          [36m/>[39m
+        [36m</section>[39m
+        [36m<p[39m
+          [33mrole[39m=[32m"status"[39m
+        [36m>[39m
+          [0m正在读取测评任务…[0m
+        [36m</p>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ✓ src/huiteacher/HuiteacherAssessmentTasks.test.tsx > unified Teacher assessment inbox > combines formats and retains the authorized start route 195ms
+ ✓ src/huiteacher/HuiteacherAssessmentTasks.test.tsx > unified Teacher assessment inbox > waits for all sources before showing one empty state 18ms
+ ✓ src/huiteacher/HuiteacherAssessmentTasks.test.tsx > unified Teacher assessment inbox > keeps successful tasks during partial failure and recovers via existing retry 33ms
+ ✓ src/huiteacher/HuiteacherAssessmentTasks.test.tsx > unified Teacher assessment inbox > retains private task pagination in the unified list 46ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/huiteacher/HuiteacherAssessmentTasks.test.tsx > unified Teacher assessment inbox > adds the approved runtime source only when explicitly assembled and forwards authoritative completion
+TestingLibraryElementError: Unable to find an element with the text: 认知情境组合任务, which matches selector 'strong'. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"ht-panel ht-assessment-inbox"[39m
+    [36m>[39m
+      [36m<header[39m
+        [33mclass[39m=[32m"ht-section-heading"[39m
+      [36m>[39m
+        [36m<h2[39m
+          [33mclass[39m=[32m"ht-assessment-section-title"[39m
+          [33mid[39m=[32m"ht-assessment-inbox-title"[39m
+        [36m>[39m
+          [0m参与测评[0m
+        [36m</h2>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"hs-teacher-task-help"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33maria-expanded[39m=[32m"false"[39m
+            [33maria-label[39m=[32m"参与测评说明"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-info"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"16"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"16"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"12"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"10"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M12 16v-4"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M12 8h.01"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</header>[39m
+      [36m<p[39m
+        [33mrole[39m=[32m"status"[39m
+      [36m>[39m
+        [0m正在读取测评任务，请稍候…[0m
+      [36m</p>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"ht-assessment-items"[39m
+      [36m>[39m
+        [36m<section[39m
+          [33mclass[39m=[32m"ht-assessment-source"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"ht-event-list"[39m
+          [36m/>[39m
+        [36m</section>[39m
+        [36m<section[39m
+          [33mclass[39m=[32m"ht-assessment-source"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"ht-event-list"[39m
+          [36m/>[39m
+        [36m</section>[39m
+        [36m<section[39m
+          [33mclass[39m=[32m"ht-assessment-source"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"ht-event-list"[39m
+          [36m/>[39m
+        [36m</section>[39m
+        [36m<p[39m
+          [33mrole[39m=[32m"status"[39m
+        [36m>[39m
+          [0m正在读取测评任务…[0m
+        [36m</p>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"ht-panel ht-assessment-inbox"[39m
+    [36m>[39m
+      [36m<header[39m
+        [33mclass[39m=[32m"ht-section-heading"[39m
+      [36m>[39m
+        [36m<h2[39m
+          [33mclass[39m=[32m"ht-assessment-section-title"[39m
+          [33mid[39m=[32m"ht-assessment-inbox-title"[39m
+        [36m>[39m
+          [0m参与测评[0m
+        [36m</h2>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"hs-teacher-task-help"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33maria-expanded[39m=[32m"false"[39m
+            [33maria-label[39m=[32m"参与测评说明"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-info"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"16"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"16"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"12"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"10"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M12 16v-4"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M12 8h.01"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</header>[39m
+      [36m<p[39m
+        [33mrole[39m=[32m"status"[39m
+      [36m>[39m
+        [0m正在读取测评任务，请稍候…[0m
+      [36m</p>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"ht-assessment-items"[39m
+      [36m>[39m
+        [36m<section[39m
+          [33mclass[39m=[32m"ht-assessment-source"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"ht-event-list"[39m
+          [36m/>[39m
+        [36m</section>[39m
+        [36m<section[39m
+          [33mclass[39m=[32m"ht-assessment-source"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"ht-event-list"[39m
+          [36m/>[39m
+        [36m</section>[39m
+        [36m<section[39m
+          [33mclass[39m=[32m"ht-assessment-source"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"ht-event-list"[39m
+          [36m/>[39m
+        [36m</section>[39m
+        [36m<p[39m
+          [33mrole[39m=[32m"status"[39m
+        [36m>[39m
+          [0m正在读取测评任务…[0m
+        [36m</p>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/huiteacher/HuiteacherAssessmentTasks.test.tsx:20:16
+     18|   })
+     19|   render(<HuiteacherAssessmentTasks api={api as Api} actorKey="actor" …
+     20|   await screen.findByText('认知情境组合任务',{selector:'strong'})
+       |                ^
+     21|   fireEvent.click(screen.getByRole('button',{name:'继续测评'}))
+     22|   await screen.findByText('本次测评已完成')
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 4 passed (5)
+   Start at  09:05:39
+   Duration  3.10s (transform 1.41s, setup 187ms, import 644ms, tests 1.35s, environment 585ms)
+
