@@ -104,3 +104,14 @@ node --test pr363-browser.test.cjs (three direct control cases). They establish
 syntax, exact-key mismatch rejection, origin restrictions and artifact traversal
 rejection, not seed/production startup/actual UI or browser success. All latter
 statuses remain NOTRUN until the designated formal CI consumer executes.
+
+
+Final output contract: browser.json schemaVersion=1, runId, source={head,tree},
+inputs={backend,frontend} original build manifests, chromePreflight/chromeSandbox,
+status RUNNING/PASS/FAILED, stage and sanitized errorDigest, cases containing only
+product/mode/complete/resumedSameParent/reportState. PASS requires exactly School
+IMMEDIATE, Teacher IMMEDIATE, Teacher SCHEDULED; empty/duplicate/incomplete scope
+fails. Network mutation checks require each real Cognitive/native/Form FINAL200
+under its product prefix. No Training/global transport fallback is accepted.
+Read the same official component receipts/digests; do not promote NOTRUN metadata
+or the four direct control assertions into browser acceptance.

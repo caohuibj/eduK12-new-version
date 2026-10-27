@@ -24,20 +24,26 @@
       "exit": 0,
       "passed": 1,
       "note": "new production canonical port constraint; other two control assertions not repeated"
+    },
+    {
+      "command": "node --test --test-name-pattern='fixture scope' server-version/e2e/pr363-browser.test.cjs",
+      "exit": 0,
+      "passed": 1,
+      "note": "new exact-case scope: rejects empty, duplicate or missing-product runs; prior controls not repeated"
     }
   ],
   "files": [
     {
       "path": "server-version/e2e/pr363-fixture.cjs",
-      "sha256": "b90ecd33b1a0861679ec3d56e98672e2ed09ad8da765646a741824164a5c0350"
+      "sha256": "3e48735248ff471d8cc24c2ce079000a1533061f7a6517eb24cee4c4dc8f21f7"
     },
     {
       "path": "server-version/e2e/pr363-browser.cjs",
-      "sha256": "77878d8105cbe6acc41c1bd69758ab5f6ddcac99de01f080461a7a0597be7634"
+      "sha256": "faa7f5895611ff3b965cb0792c142dfda8f8923af38a859cc0359ea46d92a7be"
     },
     {
       "path": "server-version/e2e/pr363-browser.test.cjs",
-      "sha256": "0d510a1bcaf38f4e911932e3e0d92fbbaa6cf7f18b57d32437ef9b5905859a31"
+      "sha256": "9c3698c54dfff91a398b862afabbef545b1b31ca603eb3d649a8bdfe47165377"
     },
     {
       "path": "server-version/e2e/pr363-native-template.json",
@@ -47,5 +53,6 @@
   "nativeDataSource": "backend/src/__tests__/fixtures/sjt-native-staged.fixture.ts: JSON data extraction only; no engine/App build",
   "inputNote": "final file hashes recorded after syntax/control checks; controls are not browser or production startup results",
   "absorbedRegistrationInterface": "85e9ee0c66ada6a2b0550b9e11f3e31b96ab62ce",
-  "networkContract": "real canonical HTTPS443, loopback DNS and actual peer, network document/static bytes equal official artifact before credentials; no route fulfillment or TLS bypass"
+  "networkContract": "real canonical HTTPS443, loopback DNS and actual peer, network document/static bytes equal official artifact before credentials; no route fulfillment or TLS bypass",
+  "uniqueControlCasesObservedPassed": 4
 }

@@ -16,6 +16,7 @@ async function artifact(kind){
  tools.verifyManifest(manifest,{schemaVersion:1,kind,sha:base.sourceIdentity().head,runId:process.env.GITHUB_RUN_ID,lockDigest:sha(fs.readFileSync(path.join(base.repo,'server-version',kind,'package-lock.json')))},tools.treeDigest(dir))
  return manifest
 }
+function assertCases(cases){assert.ok(Array.isArray(cases));assert.deepEqual(cases.map(c=>c.product+':'+c.mode).sort(),['SCHOOL:IMMEDIATE','TEACHER:IMMEDIATE','TEACHER:SCHEDULED']);assert.equal(new Set(cases.map(c=>c.executionId)).size,3);assert.ok(cases.every(c=>typeof c.executionId==='string'&&typeof c.runtimeId==='string'&&c.title?.startsWith('PR363 ')))}
 function privateFile(root,name,value){assert.equal(path.basename(name),name);fs.writeFileSync(path.join(root,name),JSON.stringify(value,null,2)+'\n',{flag:'wx',mode:0o600})}
 function runtime(fixture){Object.assign(process.env,fixture.secrets,{DATABASE_URL:fixture.runtimeUrl,DATABASE_URL_RUNTIME:fixture.runtimeUrl,NODE_ENV:'test',BACKGROUND_WORKERS_ENABLED:'false',COGNITIVE_MODULE_ENABLED:'true',HUITEACHER_WORKSPACE_ENABLED:'true'})}
 function principal(u){return {userId:u.id,username:u.username,role:u.role,platformRole:u.platformRole,accountDomain:u.accountDomain,tokenVersion:u.tokenVersion,mustChangePassword:u.mustChangePassword}}
@@ -64,13 +65,13 @@ async function seed(){
    assert.equal(await db.compositeAssessmentAttempt.count({where:{compositeAssessmentId:delivery.runtimeId}}),0)
    cases.push({product,mode,title,organizationId:f.organizationId,workflowId,runId,executionId:execution.id,resourceKey:delivery.resourceKey,runtimeId:delivery.runtimeId,feedbackPolicy})
   }
-  privateFile(root,'pr363.json',{schemaVersion:1,identity:fixture.identity,cases})
+  assertCases(cases);privateFile(root,'pr363.json',{schemaVersion:1,identity:fixture.identity,cases})
  }finally{await owner.$disconnect();await app('config/database').prisma.$disconnect();await app('services/cacheService').cacheService.close();await app('config/queue').closeQueues()}
 }
 function exactMetric(reportMetric,fact){assert.equal(typeof reportMetric.metricKey,'string');const saved=fact.core.metrics.find(m=>m.key===reportMetric.metricKey);assert.ok(saved,'Exact metric key missing');assert.equal(reportMetric.value,saved.value)}
 async function verify(){
  const {root,value:fixture}=base.readFixture(),data=JSON.parse(fs.readFileSync(path.join(root,'pr363.json'))),observed=JSON.parse(fs.readFileSync(path.join(root,'pr363-observed.json')))
- runtime(fixture);const db=app('config/database').prisma
+ assertCases(data.cases);assert.equal(observed.length,3);runtime(fixture);const db=app('config/database').prisma
  try{for(const c of data.cases){
   const o=observed.find(x=>x.executionId===c.executionId);assert.ok(o)
   const [execution]=await db.$queryRaw`SELECT status,runtime_binding_ref FROM assessment_run_executions WHERE id=${c.executionId}`;assert.equal(execution.status,'COMPLETED')
@@ -91,7 +92,7 @@ async function serveBackend(product){
  for(const signal of ['SIGTERM','SIGINT'])process.on(signal,()=>child.kill(signal))
  await new Promise((resolve,reject)=>{child.once('error',reject);child.once('exit',code=>code===0?resolve():reject(new Error('BACKEND_EXIT_'+code)))})
 }
-module.exports={origin,artifact,exactMetric,seed,verify,privateFile,serveBackend}
+module.exports={origin,artifact,exactMetric,assertCases,seed,verify,privateFile,serveBackend}
 if(require.main===module)Promise.resolve().then(()=>{assert.ok(['seed','verify','serve-backend'].includes(process.argv[2]));return process.argv[2]==='seed'?seed():process.argv[2]==='verify'?verify():serveBackend(process.argv[3])}).catch(error=>{if(privateRoot&&fs.existsSync(privateRoot))fs.writeFileSync(path.join(privateRoot,'pr363-failure.log'),String(error?.stack||error),{mode:0o600});console.error('PR363_FIXTURE_FAILED '+JSON.stringify({stage,errorName:error?.name,code:/^[A-Z0-9_]{2,80}$/.test(error?.code||'')?error.code:null,digest:sha(String(error))}));process.exitCode=1})
 async function createDelivery(owner, product, org, issuer, reviewer, family, consentRequired = false, withReports = false, feedbackPolicy = { schemaVersion: 1, mode: 'IMMEDIATE' }, formOnly = false, completionOnly = false, author, caseTitle) {
     const resourceId = randomUUID(), resourceKey = `education-assessment:${product}:${org.id}:${resourceId}`;

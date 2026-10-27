@@ -85,12 +85,12 @@ async function native(page){
 }
 async function run(){
  const {root,value:fixture}=base.readFixture(),data=JSON.parse(fs.readFileSync(path.join(root,'pr363.json')))
- assert.deepEqual(data.identity,fixture.identity)
+ assert.deepEqual(data.identity,fixture.identity);fixtureTools.assertCases(data.cases)
  const backendArtifact=await fixtureTools.artifact('backend'),frontendArtifact=await fixtureTools.artifact('frontend')
  for(const product of ['SCHOOL','TEACHER']){const addresses=await dns.lookup(new URL(fixtureTools.origin(product)).hostname,{all:true});assert.ok(addresses.length&&addresses.every(x=>['127.0.0.1','::1'].includes(x.address)),'Never connect to public/production product hosts')}
  const out=path.resolve(process.env.PR363_EVIDENCE_DIR||path.join(base.repo,'pr363-evidence'))
  assert.ok(!out.startsWith(root+path.sep)&&!root.startsWith(out+path.sep)&&out!==root);fs.mkdirSync(out,{recursive:true})
- const report={schemaVersion:1,status:'RUNNING',source:fixture.identity,cases:[],inputs:{backend:backendArtifact,frontend:frontendArtifact}}
+ const report={schemaVersion:1,runId:process.env.GITHUB_RUN_ID,status:'RUNNING',source:fixture.identity,cases:[],inputs:{backend:backendArtifact,frontend:frontendArtifact}}
  let browser
  try{
   report.stage='chrome-preflight';const preflight=preflightChrome();report.chromePreflight=preflight;assert.equal(preflight.ok,true)

@@ -1,6 +1,6 @@
 'use strict'
 const test=require('node:test'),assert=require('node:assert/strict')
-const {origin,exactMetric}=require('./pr363-fixture.cjs')
+const {origin,exactMetric,assertCases}=require('./pr363-fixture.cjs')
 const fs=require('node:fs'),os=require('node:os'),path=require('node:path')
 const {artifactResponseFile}=require('./pr363-browser.cjs')
 test('entry origins cannot become HTTP, another host or credential URL',()=>{
@@ -20,4 +20,12 @@ test('artifact file traversal and encoded separators cannot bypass network byte 
   assert.equal(artifactResponseFile(dist,'https://school.eduk12.top/safe.js',false),path.join(dist,'safe.js'))
   for(const url of ['https://school.eduk12.top/%2e%2e%2foutside.js','https://school.eduk12.top/%5csecret','https://school.eduk12.top/%00secret'])assert.throws(()=>artifactResponseFile(dist,url,false))
  }finally{fs.rmSync(root,{recursive:true,force:true})}
+})
+
+test('fixture scope cannot pass empty, duplicate or product-incomplete browser cases',()=>{
+ const cases=[['SCHOOL','IMMEDIATE'],['TEACHER','IMMEDIATE'],['TEACHER','SCHEDULED']].map(([product,mode],i)=>({product,mode,executionId:'execution-'+i,runtimeId:'runtime-'+i,title:'PR363 '+i}))
+ assertCases(cases)
+ assert.throws(()=>assertCases([]))
+ assert.throws(()=>assertCases([cases[0],cases[0],cases[2]]))
+ assert.throws(()=>assertCases(cases.map(c=>({...c,executionId:'same'}))))
 })
