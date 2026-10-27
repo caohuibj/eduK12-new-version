@@ -1,0 +1,311 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "fidl21_horne_zh_cn_research",
+    "instrumentVersion": "1.0.1"
+  },
+  "source": {
+    "authors": [
+      "Kristina S. Horne",
+      "Tao Chen",
+      "Muireann Irish"
+    ],
+    "originalOnlineYear": 2024,
+    "publishedVolumeYear": 2025,
+    "doi": "10.1111/bjc.12505",
+    "officialArticle": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12057328/",
+    "officialSupplementName": "BJC-64-315-s001.docx",
+    "originalSupplementSha256": "da3393c6b1d362e6d7fcbdba78b9210b6ec7cb923eeff2bdd442825102eada8e",
+    "originalSupplementBytes": 40288,
+    "supplementSource": "USER_UPLOADED_ORIGINAL_OFFICIAL_DOCX",
+    "originalInitialForm": "37 items, Supplementary Methods 1, not imported",
+    "originalFinalForm": "21 items, Supplementary Methods 2, pages 8–11",
+    "officialScoring": "Supplementary Methods 3, page 12"
+  },
+  "original21": [
+    {
+      "number": 1,
+      "english": "I insist on eating the same foods or at the same time every day.",
+      "chinese": "我坚持每天吃相同的食物，或者每天在相同的时间吃饭。",
+      "facet": "routine",
+      "reverse": false
+    },
+    {
+      "number": 2,
+      "english": "I become frustrated or upset if things don't go to plan.",
+      "chinese": "如果事情没有按计划进行，我会感到沮丧或烦躁。",
+      "facet": "predictability_control",
+      "reverse": false
+    },
+    {
+      "number": 3,
+      "english": "I can modify my plans when there is a change in circumstances (e.g., change of time or venue, unexpected weather, something is unavailable).",
+      "chinese": "情况发生变化时，我能够调整自己的计划（例如时间或地点改变、天气突变，或者原定需要的东西无法使用）。",
+      "facet": "switching",
+      "reverse": true
+    },
+    {
+      "number": 4,
+      "english": "I feel anxious or stressed when faced with unfamiliar situations or people.",
+      "chinese": "面对不熟悉的情况或人时，我会感到焦虑或压力。",
+      "facet": "predictability_control",
+      "reverse": false
+    },
+    {
+      "number": 5,
+      "english": "I have specific routines related to my meals/food (e.g. needing to sit in the same spot, use the same cutlery).",
+      "chinese": "我在吃饭方面有固定的习惯（例如必须坐在同一个位置、使用同一套餐具）。",
+      "facet": "routine",
+      "reverse": false
+    },
+    {
+      "number": 6,
+      "english": "I can easily change my approach to a task if shown a better way.",
+      "chinese": "如果有人告诉我做某项任务有更好的方法，我能轻松改变自己的做法。",
+      "facet": "switching",
+      "reverse": true
+    },
+    {
+      "number": 7,
+      "english": "I often repeat particular words or phrases in exactly the same way (e.g., catchphrases).",
+      "chinese": "我经常以完全相同的方式重复某些词语或短句（例如口头禅）。",
+      "facet": "repetition",
+      "reverse": false
+    },
+    {
+      "number": 8,
+      "english": "I like to follow specific routines when I leave the house (e.g., always taking the same route, always being dropped off at the same spot).",
+      "chinese": "离家外出时，我喜欢遵循固定的习惯（例如总走同一条路，或总在同一个地点下车）。",
+      "facet": "routine",
+      "reverse": false
+    },
+    {
+      "number": 9,
+      "english": "I have to be right, even if it means not listening to others’ opinions.",
+      "chinese": "我认为自己必须是对的，即使这意味着不听别人的意见。",
+      "facet": "thoughts_beliefs",
+      "reverse": false
+    },
+    {
+      "number": 10,
+      "english": "I expect others to uphold the same ideas, values, and beliefs as mine.",
+      "chinese": "我希望别人也坚持与我相同的观点、价值观和信念。",
+      "facet": "thoughts_beliefs",
+      "reverse": false
+    },
+    {
+      "number": 11,
+      "english": "I need to repeat some actions/tasks until they feel “just right”.",
+      "chinese": "我需要反复做某些动作或任务，直到觉得“恰到好处”为止。",
+      "facet": "repetition",
+      "reverse": false
+    },
+    {
+      "number": 12,
+      "english": "I find it hard to let go of my ideas or beliefs, even when presented with new information.",
+      "chinese": "即使得到了新的信息，我也很难放下原有的想法或信念。",
+      "facet": "thoughts_beliefs",
+      "reverse": false
+    },
+    {
+      "number": 13,
+      "english": "I feel like I need to repeat certain actions (e.g., pacing, tapping, checking).",
+      "chinese": "我觉得自己必须重复某些动作（例如来回踱步、敲击或反复检查）。",
+      "facet": "repetition",
+      "reverse": false
+    },
+    {
+      "number": 14,
+      "english": "I get overly focused on small details even when it’s not helpful to do so.",
+      "chinese": "即使关注细节没有帮助，我也会过度关注一些小细节。",
+      "facet": "repetition",
+      "reverse": false
+    },
+    {
+      "number": 15,
+      "english": "I repetitively count and/or order objects in my environment.",
+      "chinese": "我会反复清点或排列周围的物品。",
+      "facet": "repetition",
+      "reverse": false
+    },
+    {
+      "number": 16,
+      "english": "When interrupted, I can easily switch back to what I was previously doing.",
+      "chinese": "被打断后，我能够轻松回到之前正在做的事情上。",
+      "facet": "switching",
+      "reverse": true
+    },
+    {
+      "number": 17,
+      "english": "I prefer it when people behave in a specific way or according to a set of rules during activities.",
+      "chinese": "在活动中，我更希望别人以特定方式行事，或者按照一套规则行动。",
+      "facet": "predictability_control",
+      "reverse": false
+    },
+    {
+      "number": 18,
+      "english": "I can easily adapt to changes in the topic of conversation.",
+      "chinese": "谈话话题发生变化时，我能够轻松适应。",
+      "facet": "switching",
+      "reverse": true
+    },
+    {
+      "number": 19,
+      "english": "I have specific interests in items or objects that others find unusual.",
+      "chinese": "我对某些物品有特别的兴趣，而别人觉得这些物品很不寻常。",
+      "facet": "repetition",
+      "reverse": false
+    },
+    {
+      "number": 20,
+      "english": "I can adapt my behaviour according to the social situation (e.g., casual versus formal settings)",
+      "chinese": "我能够根据不同的社交场合调整自己的行为（例如非正式场合与正式场合）。",
+      "facet": "switching",
+      "reverse": true
+    },
+    {
+      "number": 21,
+      "english": "I am very unsettled by last-minute changes to my plans.",
+      "chinese": "如果我的计划在最后一刻发生变化，我会感到很不安。",
+      "facet": "predictability_control",
+      "reverse": false
+    }
+  ],
+  "form": {
+    "itemCount": 21,
+    "dimensions": [
+      {
+        "key": "repetition",
+        "itemNumbers": [
+          7,
+          11,
+          13,
+          14,
+          15,
+          19
+        ],
+        "aggregation": "sum",
+        "range": [
+          6,
+          30
+        ]
+      },
+      {
+        "key": "switching",
+        "itemNumbers": [
+          3,
+          6,
+          16,
+          18,
+          20
+        ],
+        "aggregation": "sum",
+        "range": [
+          5,
+          25
+        ]
+      },
+      {
+        "key": "predictability_control",
+        "itemNumbers": [
+          2,
+          4,
+          17,
+          21
+        ],
+        "aggregation": "sum",
+        "range": [
+          4,
+          20
+        ]
+      },
+      {
+        "key": "routine",
+        "itemNumbers": [
+          1,
+          5,
+          8
+        ],
+        "aggregation": "sum",
+        "range": [
+          3,
+          15
+        ]
+      },
+      {
+        "key": "thoughts_beliefs",
+        "itemNumbers": [
+          9,
+          10,
+          12
+        ],
+        "aggregation": "sum",
+        "range": [
+          3,
+          15
+        ]
+      }
+    ],
+    "reverseItems": [
+      3,
+      6,
+      16,
+      18,
+      20
+    ],
+    "reverseTransform": "6 - raw",
+    "anchors": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "labelAnchorsEnglish": [
+      "Never",
+      "Rarely",
+      "Sometimes",
+      "Often",
+      "All the time"
+    ],
+    "lookback": "two weeks",
+    "higherScore": "less daily-life flexibility",
+    "totalFromSubscaleSums": true,
+    "totalRange": [
+      21,
+      105
+    ],
+    "platformMissingPolicy": "complete_required",
+    "authorMissingRule": "NOT_SPECIFIED"
+  },
+  "versions": {
+    "measurement": "1.0.1",
+    "scoring": "1.0.0",
+    "localization": "1.0.0",
+    "report": "1.0.0",
+    "reference": null
+  },
+  "rights": {
+    "article": "CC_BY_4_0",
+    "fullEnglishSupplement": "COPYRIGHT_SCOPE_ADMIN_REVIEW",
+    "translation": "ADMIN_REVIEW",
+    "onlineAdministration": "ADMIN_REVIEW",
+    "publicGitHubRedistribution": "ADMIN_REVIEW",
+    "authorContact": "REQUIRED_BY_PROJECT_POLICY"
+  },
+  "checks": {
+    "officialSourceAttachment": "BYTE_SHA256_VERIFIED_IN_UPLOADED_DOCX",
+    "sourceItems21": "EXTRACTED_AND_CROSSCHECKED",
+    "authorFactorMap": "VERIFIED_FROM_S1_P12",
+    "reverseItems": "VERIFIED_FROM_S1_P12_AND_FIVE_STARS",
+    "staticRangeArithmetic": "PASS",
+    "goldenCases": 11,
+    "vitest": "NOTRUN",
+    "typeScript": "NOTRUN",
+    "realScoring": "NOTRUN",
+    "CI": "NOTRUN",
+    "database": "NOTRUN",
+    "deployment": "NOTRUN",
+    "humanLanguageReview": "NOTRUN"
+  }
+}

@@ -1,0 +1,2143 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "fidl21_horne_zh_cn_research",
+    "instrumentVersion": "1.0.1"
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "我们想了解，在日常生活中，你有多经常出现以下想法或行为。请回想过去两周的实际经历，按每种情况出现的频率选择答案。没有正确或错误的答案。",
+    "language": "zh-CN",
+    "version": "1.0.1",
+    "source": "原作者官方补充材料BJC-64-315-s001.docx，第8页修订21题指导语；本站独立简体中文工作译稿。"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "日常生活灵活性量表 FIDL-21（原作者修订21题）— 简体中文研究工作稿",
+      "abbreviation": "FIDL-21-ZH-CN-WORKING",
+      "instrumentFamily": "Flexibility in Daily Life (Horne, Chen & Irish, 2025), final revised 21-item five-factor form"
+    },
+    "construct": {
+      "primaryDomain": "EXECUTIVE_FUNCTION",
+      "secondaryDomains": [
+        "SELF_REGULATION"
+      ],
+      "constructDefinition": "回顾过去两周在日常情境中坚持重复某些行为、切换做法、面对变化时的不安、依循固定习惯及固守观念等五类倾向。五维原题来自作者正式修订21题；总分越高仅表示自报的日常不灵活性倾向越突出，不是客观认知能力测试、精神障碍诊断或人格评价。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "domain:cognitive_flexibility",
+        "domain:behavioural_flexibility",
+        "domain:daily_life",
+        "construct:daily_life_inflexibility",
+        "construct:fidl21_horne_final",
+        "construct:repetition",
+        "construct:switching",
+        "construct:predictability_control",
+        "construct:routine",
+        "construct:thoughts_beliefs",
+        "construct:five_factor_original_6_5_4_3_3",
+        "orientation:transdiagnostic_non_diagnostic",
+        "orientation:not_performance_executive_task",
+        "population:adult_19_to_78_original",
+        "population:self_report",
+        "population:chinese_psychometric_validation_pending",
+        "population:not_k12_validated",
+        "response:21_original_items",
+        "response:1_5_frequency",
+        "response:past_two_weeks",
+        "response:five_reverse_3_6_16_18_20",
+        "response:five_facet_sum_and_total",
+        "response:complete_required_platform",
+        "use:research",
+        "use:individual_reflection",
+        "use:score_only",
+        "use:not_diagnostic",
+        "use:no_clinical_cutoffs",
+        "use:no_chinese_norms",
+        "license:original_paper_cc_by_4_0",
+        "license:author_contact_required",
+        "license:supplement_rights_review_pending",
+        "license:translation_review_pending",
+        "language_validation:original_en_supplement",
+        "language_validation:independent_zh_cn_draft",
+        "language_validation:expert_pending",
+        "认知灵活性",
+        "行为灵活性",
+        "日常生活灵活性",
+        "FIDL",
+        "重复行为",
+        "切换",
+        "日常习惯",
+        "可预测性",
+        "控制感",
+        "思想信念",
+        "成人自评",
+        "反向计分",
+        "需要联系作者",
+        "研究工作稿"
+      ]
+    },
+    "population": {
+      "minAge": 19,
+      "maxAge": 78,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "原作者英文正式量表成人发展研究样本N=295，19–78岁；此版本仅依据原英文Appendix S1独立译成简体中文，未经双语专家审校、认知访谈或中国人群测量验证。平台保守使用原版研究年龄范围作适用边界，不推广到中国K12。"
+    },
+    "administration": {
+      "itemCount": 21,
+      "estimatedMinutes": 8,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED"
+      ],
+      "timeFrame": "过去两周",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "固定Supplementary Methods 2: Revised 21-item FIDL（Appendix S1第8–11页）；严禁混入Supplementary Methods 1原始37题或2026中国OCD独立25题三因子研究版。",
+        "五级选项1 Never（从不）、2 Rarely（很少）、3 Sometimes（有时）、4 Often（经常）、5 All the time（总是），指导语回顾过去两周；不得反向重排响应值。",
+        "作者Supplementary Methods 3（附件第12页）锁定五维题号：Repetition7/11/13/14/15/19，Switching3/6/16/18/20，Predictability/Control2/4/17/21，Routine1/5/8，Thoughts/Beliefs9/10/12。",
+        "反向项仅3/6/16/18/20，反向分6-原始值；其余均不反向，原文第3/6/16/18/20题均以星号标注，且与第12页计分键一致。",
+        "原附录明确Total FIDL为五个分维分数求和；平台直接原始题加和、缺题不插补。每维缺一题该维不计，21题完整才有总分；complete_required是保守平台技术策略，不声称原作者规定缺失处理。",
+        "当前中文独立翻译待审；8分钟为平台目录技术估计，而非作者精确施测时长。无作者/中国常模、分位数、轻中重诊断阈值或干预建议分界。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "英文原版的开发验证不等于此简体工作翻译已有中文测量效度。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "仅描述自报的日常倾向，用通俗语言提示自我反思，不能作为诊断或能力结论。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "horne-chen-irish-original-fidl21-2025",
+        "evidenceType": "STRUCTURAL_VALIDITY",
+        "population": "US adult community healthy participants, original source ages 19–78",
+        "ageRange": "19–78",
+        "locale": "en",
+        "territory": "US",
+        "sampleSize": 295,
+        "studyDesign": "Horne, Chen & Irish development study; 37-item original reduced to 21-item final revised FIDL with five factor solution. Official author Appendix S1 supplies 21 exact items and original subscale scoring, rather than relying on factor summary in article alone.",
+        "rating": "UNKNOWN",
+        "citation": "Horne, K., Chen, T., & Irish, M. (2025). Development of the Flexibility in Daily Life scale to measure multidimensional cognitive and behavioural flexibility in health and disease. British Journal of Clinical Psychology, 64, 315–329.",
+        "doi": "10.1111/bjc.12505",
+        "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12057328/",
+        "notes": "Author official supplementary DOCX BJC-64-315-s001.docx (SHA256 da3393c6b1d362e6d7fcbdba78b9210b6ec7cb923eeff2bdd442825102eada8e). Evidence is original English; independent Chinese version not validated."
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Official revised 21-item FIDL Supplementary Methods 2 and scoring instructions 3 in author DOCX BJC-64-315-s001.docx, SHA-256 da3393c6b1d362e6d7fcbdba78b9210b6ec7cb923eeff2bdd442825102eada8e; direct independent English→Simplified Chinese research draft.",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "简体工作译稿逐题直接依据本次取得的官方Appendix S1英文21题与独立计分表，未借用37题或不同25题版、无人工专家审校、没有认知访谈、没有中国成人心理测量学验证。语言审校另交用户，保留需要联系作者及论文/附录权利确认。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "fidl21_horne_zh_cn_research-1.0.1",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 228,
+        "maxExclusive": 948
+      }
+    },
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "fidl21_horne_zh_cn_research-1.0.1",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "fidl21_horne_zh_cn_research-1.0.1",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "translation",
+      "display"
+    ],
+    "notes": [
+      "原作者Appendix S1第8–11页正式修订21题，第12页原计分键，五因素和正向反向题号全部以此附件为权威，不采用初始37题或中国不同25题版。",
+      "原文章开放获取标注CC BY 4.0，补充表具体版权和翻译/线上电子实施/完整公开GitHub复制及商业用途等由管理员核查或联系作者；本独立中文研究工作译稿并非作者官方中文版本。",
+      "暂为DRAFT/CANDIDATE：语言专家审校、认知访谈、当地信效度验证及正式使用批准均未完成。版权协调由管理员决定，不作为草稿编码的技术门禁。",
+      "原作者高分表示较低日常灵活性；只有题3/6/16/18/20反向。中文报告不输出常模、严重等级、病理诊断或治疗成效判断。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "Flexibility in Daily Life (FIDL) 21-item final revised author Appendix S1; independent zh-CN research draft",
+        "citation": "Horne, K., Chen, T., & Irish, M. (2025). Development of the Flexibility in Daily Life scale to measure multidimensional cognitive and behavioural flexibility in health and disease. British Journal of Clinical Psychology, 64, 315–329. DOI: 10.1111/bjc.12505.",
+        "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12057328/",
+        "publicationYear": 2025
+      },
+      "license": {
+        "status": "unknown",
+        "redistribution": "restricted",
+        "note": "研究原论文标注CC BY4.0，正式最终21题来自用户提供的作者Appendix S1，具体补充材料声明及第三方完整公开GitHub转载、独立翻译、线上施测与商用范围仍由管理员复核；保留“需要联系作者”。本中文工作稿非原作者认可、非完成中国验证，不作为发布资格。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "fidl_1_5_frequency",
+          "options": [
+            {
+              "value": "1",
+              "label": "从不",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "很少",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "有时",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "经常",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "总是",
+              "score": 5
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "FIDL21_01",
+          "content": "我坚持每天吃相同的食物，或者每天在相同的时间吃饭。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 0,
+          "responseSetKey": "fidl_1_5_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FIDL21_02",
+          "content": "如果事情没有按计划进行，我会感到沮丧或烦躁。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 1,
+          "responseSetKey": "fidl_1_5_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FIDL21_03",
+          "content": "情况发生变化时，我能够调整自己的计划（例如时间或地点改变、天气突变，或者原定需要的东西无法使用）。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 2,
+          "responseSetKey": "fidl_1_5_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FIDL21_04",
+          "content": "面对不熟悉的情况或人时，我会感到焦虑或压力。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 3,
+          "responseSetKey": "fidl_1_5_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FIDL21_05",
+          "content": "我在吃饭方面有固定的习惯（例如必须坐在同一个位置、使用同一套餐具）。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 4,
+          "responseSetKey": "fidl_1_5_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FIDL21_06",
+          "content": "如果有人告诉我做某项任务有更好的方法，我能轻松改变自己的做法。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 5,
+          "responseSetKey": "fidl_1_5_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FIDL21_07",
+          "content": "我经常以完全相同的方式重复某些词语或短句（例如口头禅）。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 6,
+          "responseSetKey": "fidl_1_5_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FIDL21_08",
+          "content": "离家外出时，我喜欢遵循固定的习惯（例如总走同一条路，或总在同一个地点下车）。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 7,
+          "responseSetKey": "fidl_1_5_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FIDL21_09",
+          "content": "我认为自己必须是对的，即使这意味着不听别人的意见。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 8,
+          "responseSetKey": "fidl_1_5_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FIDL21_10",
+          "content": "我希望别人也坚持与我相同的观点、价值观和信念。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 9,
+          "responseSetKey": "fidl_1_5_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FIDL21_11",
+          "content": "我需要反复做某些动作或任务，直到觉得“恰到好处”为止。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 10,
+          "responseSetKey": "fidl_1_5_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FIDL21_12",
+          "content": "即使得到了新的信息，我也很难放下原有的想法或信念。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 11,
+          "responseSetKey": "fidl_1_5_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FIDL21_13",
+          "content": "我觉得自己必须重复某些动作（例如来回踱步、敲击或反复检查）。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 12,
+          "responseSetKey": "fidl_1_5_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FIDL21_14",
+          "content": "即使关注细节没有帮助，我也会过度关注一些小细节。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 13,
+          "responseSetKey": "fidl_1_5_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FIDL21_15",
+          "content": "我会反复清点或排列周围的物品。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 14,
+          "responseSetKey": "fidl_1_5_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FIDL21_16",
+          "content": "被打断后，我能够轻松回到之前正在做的事情上。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 15,
+          "responseSetKey": "fidl_1_5_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FIDL21_17",
+          "content": "在活动中，我更希望别人以特定方式行事，或者按照一套规则行动。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 16,
+          "responseSetKey": "fidl_1_5_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FIDL21_18",
+          "content": "谈话话题发生变化时，我能够轻松适应。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 17,
+          "responseSetKey": "fidl_1_5_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FIDL21_19",
+          "content": "我对某些物品有特别的兴趣，而别人觉得这些物品很不寻常。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 18,
+          "responseSetKey": "fidl_1_5_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FIDL21_20",
+          "content": "我能够根据不同的社交场合调整自己的行为（例如非正式场合与正式场合）。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 19,
+          "responseSetKey": "fidl_1_5_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FIDL21_21",
+          "content": "如果我的计划在最后一刻发生变化，我会感到很不安。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 20,
+          "responseSetKey": "fidl_1_5_frequency",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "itemRules": [
+          {
+            "itemCode": "FIDL21_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "FIDL21_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "FIDL21_03",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "FIDL21_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "FIDL21_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "FIDL21_06",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "FIDL21_07",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "FIDL21_08",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "FIDL21_09",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "FIDL21_10",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "FIDL21_11",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "FIDL21_12",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "FIDL21_13",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "FIDL21_14",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "FIDL21_15",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "FIDL21_16",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "FIDL21_17",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "FIDL21_18",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "FIDL21_19",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "FIDL21_20",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "FIDL21_21",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "scores": [
+          {
+            "key": "total",
+            "type": "total",
+            "label": "日常生活不灵活性总分",
+            "description": "作者五个分量表求和，21–105；越高反映更多自报日常不灵活性倾向，不是诊断或客观能力测验。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "FIDL21_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FIDL21_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FIDL21_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FIDL21_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FIDL21_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FIDL21_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FIDL21_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FIDL21_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FIDL21_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FIDL21_10",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FIDL21_11",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FIDL21_12",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FIDL21_13",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FIDL21_14",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FIDL21_15",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FIDL21_16",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FIDL21_17",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FIDL21_18",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FIDL21_19",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FIDL21_20",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FIDL21_21",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "repetition",
+            "type": "dimension",
+            "label": "重复行为",
+            "description": "重复词语、动作、关注细节或特定物品的频率，6题求和6–30。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "FIDL21_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FIDL21_11",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FIDL21_13",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FIDL21_14",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FIDL21_15",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FIDL21_19",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "switching",
+            "type": "dimension",
+            "label": "做法与情境切换",
+            "description": "改变计划、方法、恢复任务、适应谈话/场合的相对困难；五个正向灵活性题反向后求和5–25。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "FIDL21_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FIDL21_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FIDL21_16",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FIDL21_18",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FIDL21_20",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "predictability_control",
+            "type": "dimension",
+            "label": "可预测性与控制",
+            "description": "事情偏离计划、陌生情境、他人活动规则及临时变化带来的不适，4题求和4–20。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "FIDL21_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FIDL21_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FIDL21_17",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FIDL21_21",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "routine",
+            "type": "dimension",
+            "label": "固定习惯",
+            "description": "食物、就餐、出门安排方面遵循惯例的倾向，3题求和3–15。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "FIDL21_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FIDL21_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FIDL21_08",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "thoughts_beliefs",
+            "type": "dimension",
+            "label": "想法与信念",
+            "description": "坚持自己正确、希望他人保持相同观念，以及面对新证据难改变看法，3题求和3–15。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "FIDL21_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FIDL21_10",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FIDL21_12",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "total",
+          "repetition",
+          "switching",
+          "predictability_control",
+          "routine",
+          "thoughts_beliefs"
+        ],
+        "scoreOrder": [
+          "total",
+          "repetition",
+          "switching",
+          "predictability_control",
+          "routine",
+          "thoughts_beliefs"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "total",
+            "headline": "看看日常生活中，哪些变化对你更费力",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "每个人都有喜欢熟悉安排的时候，也会遇到需要改变计划的时刻。这21道题关注你过去两周是否经常坚持某些做法，或者在改变计划、调整习惯时感到困难。原始总分只帮助整理你自己的体验，不能直接说你“灵活”或“不灵活”，更不适合拿来和别人比较。可以回想近期一个小变化：你最在意的是被打乱的时间、做法，还是那种来不及准备的感觉？",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "这种情况在过去两周什么时候比较容易发生？"
+              },
+              {
+                "category": "strategy",
+                "text": "先选择一个很小、可尝试的改变，必要时向信任的人寻求支持。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "repetition",
+            "headline": "有些动作或细节，会不会让你反复停留",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "生活中重复某些动作或词语不一定意味着问题，有时只是个人习惯。这组题记录的是这些重复体验在过去两周出现多少。你可以想一想：哪些重复对你有实际帮助，哪些让你觉得费时，或让你难以转向下一件事？如果它们明显影响日常生活，可以和可信任的人讨论可能需要的支持。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "这种情况在过去两周什么时候比较容易发生？"
+              },
+              {
+                "category": "strategy",
+                "text": "先选择一个很小、可尝试的改变，必要时向信任的人寻求支持。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "switching",
+            "headline": "计划变了，你通常怎样调整",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这里的题目问你能否在计划改变、任务被打断或谈话换了话题时调整做法。五道原题描述的是较灵活的行为，所以计分时会反向处理；分高只表示这些较灵活的行为出现得相对少，不意味着你缺乏能力。你可以回想一个最近的例子，看看有准备时间时和事情突然变化时是否不同。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近哪一次计划变动让你最难调整？"
+              },
+              {
+                "category": "strategy",
+                "text": "先选择一个很小、可尝试的改变，必要时向信任的人寻求支持。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "predictability_control",
+            "headline": "面对不确定的情况时，你有什么感受",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "计划临时变化、不熟悉的人或环境，都可能让人感到不舒服。这组题记录这类体验的频率，并不评价你是不是“太敏感”。如果想更好理解自己，可以留意：让你不安的究竟是时间不够、信息不足，还是担心无法控制结果？适当提早获得信息，有时能帮助自己做好准备。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "这种情况在过去两周什么时候比较容易发生？"
+              },
+              {
+                "category": "strategy",
+                "text": "先选择一个很小、可尝试的改变，必要时向信任的人寻求支持。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "routine",
+            "headline": "熟悉的习惯带给你什么",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "固定的饮食、路线和生活安排有时能带来安心和效率。这三道题只是观察你依赖这些习惯的频率，不会把有规律当成缺点。你可以想一想：哪些习惯是自己喜欢的，哪些在不得不调整时会带来明显困扰？",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "这种情况在过去两周什么时候比较容易发生？"
+              },
+              {
+                "category": "strategy",
+                "text": "先选择一个很小、可尝试的改变，必要时向信任的人寻求支持。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "thoughts_beliefs",
+            "headline": "遇到不同看法时，你容易调整吗",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "有自己的观点和价值观很正常。这组题关注的是当别人不同意或出现新信息时，你是否仍坚持原来的想法。原始分数不能评价一个人的智慧或品格。你可以回想一次观点不同的讨论：哪些事情是你确实看重的原则，哪些或许可以留出重新考虑的空间？",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "这种情况在过去两周什么时候比较容易发生？"
+              },
+              {
+                "category": "strategy",
+                "text": "先选择一个很小、可尝试的改变，必要时向信任的人寻求支持。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "Horne、Chen和Irish正式修订FIDL-21原版共有21题5因素：Repetition6、Switching5、Predictability/Control4、Routine3、Thoughts/Beliefs3；原37题与后续2026中国OCD 25题不同版，不得混用。",
+          "过去两周1–5频率响应；仅3/6/16/18/20为正向灵活性措辞，按6－原值反向。原版五维分别求和，总分21–105；没有基于中文目标人群的常模、百分位或切点。",
+          "维度题数不同，原始分数范围不相同；维度间原始分大小不能直接视为一种行为必然比另一种更强。",
+          "作者附录无明确缺失作答阈值。本系统按各维完整作答才出该维分，21题完整才出总分；是平台保守技术规则而非作者官方缺失处理口径。",
+          "此简体中文版本为本站从正式英文Appendix S1独立直译的研究草稿；译文待专家、认知访谈及目标人群效度验证，不适用于中国K12、筛查诊断、用药指导或治疗成效认证。",
+          "原作者文章CC BY4.0并不替代补充文件全部权利核验。简体翻译、电子施测、公开GitHub完整再分发及可能的商业使用范围由管理员和作者联系核查。"
+        ],
+        "disclaimer": "FIDL-21（Horne等）原版21题，本站独立简体中文研究工作译稿DRAFT。五维与反向计分直接依据作者Appendix S1；没有中文正式效度/常模或临床诊断资格，仅用于获准范围内研究准备与非诊断性反思。"
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "fidl21_horne",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "references": [],
+    "goldenCases": [
+      {
+        "name": "raw_all1",
+        "answers": [
+          {
+            "itemCode": "FIDL21_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_15",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_17",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_18",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_19",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_20",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_21",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 41,
+            "repetition": 6,
+            "switching": 25,
+            "predictability_control": 4,
+            "routine": 3,
+            "thoughts_beliefs": 3
+          },
+          "totalScoreKeys": [
+            "total",
+            "repetition",
+            "switching",
+            "predictability_control",
+            "routine",
+            "thoughts_beliefs"
+          ]
+        }
+      },
+      {
+        "name": "raw_all5",
+        "answers": [
+          {
+            "itemCode": "FIDL21_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_07",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_08",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_09",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_10",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_11",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_12",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_13",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_14",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_15",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_16",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_17",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_18",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_19",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_20",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_21",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 85,
+            "repetition": 30,
+            "switching": 5,
+            "predictability_control": 20,
+            "routine": 15,
+            "thoughts_beliefs": 15
+          },
+          "totalScoreKeys": [
+            "total",
+            "repetition",
+            "switching",
+            "predictability_control",
+            "routine",
+            "thoughts_beliefs"
+          ]
+        }
+      },
+      {
+        "name": "raw_all3",
+        "answers": [
+          {
+            "itemCode": "FIDL21_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_12",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_14",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_15",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_16",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_17",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_18",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_19",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_20",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_21",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 63,
+            "repetition": 18,
+            "switching": 15,
+            "predictability_control": 12,
+            "routine": 9,
+            "thoughts_beliefs": 9
+          },
+          "totalScoreKeys": [
+            "total",
+            "repetition",
+            "switching",
+            "predictability_control",
+            "routine",
+            "thoughts_beliefs"
+          ]
+        }
+      },
+      {
+        "name": "true_min21",
+        "answers": [
+          {
+            "itemCode": "FIDL21_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_15",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_16",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_17",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_18",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_19",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_20",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_21",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 21,
+            "repetition": 6,
+            "switching": 5,
+            "predictability_control": 4,
+            "routine": 3,
+            "thoughts_beliefs": 3
+          },
+          "totalScoreKeys": [
+            "total",
+            "repetition",
+            "switching",
+            "predictability_control",
+            "routine",
+            "thoughts_beliefs"
+          ]
+        }
+      },
+      {
+        "name": "true_max105",
+        "answers": [
+          {
+            "itemCode": "FIDL21_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_07",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_08",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_09",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_10",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_11",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_12",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_13",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_14",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_15",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_17",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_18",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_19",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_20",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_21",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 105,
+            "repetition": 30,
+            "switching": 25,
+            "predictability_control": 20,
+            "routine": 15,
+            "thoughts_beliefs": 15
+          },
+          "totalScoreKeys": [
+            "total",
+            "repetition",
+            "switching",
+            "predictability_control",
+            "routine",
+            "thoughts_beliefs"
+          ]
+        }
+      },
+      {
+        "name": "only_repetition_max",
+        "answers": [
+          {
+            "itemCode": "FIDL21_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_07",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_11",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_13",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_14",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_15",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_16",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_17",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_18",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_19",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_20",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_21",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 45,
+            "repetition": 30,
+            "switching": 5,
+            "predictability_control": 4,
+            "routine": 3,
+            "thoughts_beliefs": 3
+          },
+          "totalScoreKeys": [
+            "total",
+            "repetition",
+            "switching",
+            "predictability_control",
+            "routine",
+            "thoughts_beliefs"
+          ]
+        }
+      },
+      {
+        "name": "only_switching_max",
+        "answers": [
+          {
+            "itemCode": "FIDL21_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_15",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_17",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_18",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_19",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_20",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_21",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 41,
+            "repetition": 6,
+            "switching": 25,
+            "predictability_control": 4,
+            "routine": 3,
+            "thoughts_beliefs": 3
+          },
+          "totalScoreKeys": [
+            "total",
+            "repetition",
+            "switching",
+            "predictability_control",
+            "routine",
+            "thoughts_beliefs"
+          ]
+        }
+      },
+      {
+        "name": "alternating_1to5",
+        "answers": [
+          {
+            "itemCode": "FIDL21_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "FIDL21_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "FIDL21_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_07",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "FIDL21_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_09",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "FIDL21_10",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_12",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "FIDL21_13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_14",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "FIDL21_15",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FIDL21_17",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "FIDL21_18",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_19",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "FIDL21_20",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FIDL21_21",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 65,
+            "repetition": 19,
+            "switching": 17,
+            "predictability_control": 9,
+            "routine": 9,
+            "thoughts_beliefs": 11
+          },
+          "totalScoreKeys": [
+            "total",
+            "repetition",
+            "switching",
+            "predictability_control",
+            "routine",
+            "thoughts_beliefs"
+          ]
+        }
+      },
+      {
+        "name": "missing_repetition_item7",
+        "answers": [
+          {
+            "itemCode": "FIDL21_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_12",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_14",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_15",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_16",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_17",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_18",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_19",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_20",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_21",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "total": null,
+            "repetition": null,
+            "switching": 15,
+            "predictability_control": 12,
+            "routine": 9,
+            "thoughts_beliefs": 9
+          },
+          "totalScoreKeys": [
+            "total",
+            "repetition",
+            "switching",
+            "predictability_control",
+            "routine",
+            "thoughts_beliefs"
+          ]
+        }
+      },
+      {
+        "name": "missing_reverse_item3",
+        "answers": [
+          {
+            "itemCode": "FIDL21_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_12",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_14",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_15",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_16",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_17",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_18",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_19",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_20",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FIDL21_21",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "total": null,
+            "repetition": 18,
+            "switching": null,
+            "predictability_control": 12,
+            "routine": 9,
+            "thoughts_beliefs": 9
+          },
+          "totalScoreKeys": [
+            "total",
+            "repetition",
+            "switching",
+            "predictability_control",
+            "routine",
+            "thoughts_beliefs"
+          ]
+        }
+      },
+      {
+        "name": "missing_all",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "total": null,
+            "repetition": null,
+            "switching": null,
+            "predictability_control": null,
+            "routine": null,
+            "thoughts_beliefs": null
+          },
+          "totalScoreKeys": [
+            "total",
+            "repetition",
+            "switching",
+            "predictability_control",
+            "routine",
+            "thoughts_beliefs"
+          ]
+        }
+      }
+    ]
+  }
+}
