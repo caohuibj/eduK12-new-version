@@ -1,0 +1,527 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "dbt_wccl59_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "source": {
+    "authors": "Neacsiu, Rizvi, Vitaliano, Lynch, Linehan",
+    "year": 2010,
+    "doi": "10.1002/jclp.20685",
+    "englishOfficial": "https://depts.washington.edu/uwbrtc/wp-content/uploads/DBT-WCCL.pdf",
+    "traditionalChineseOfficial": "https://depts.washington.edu/uwbrtc/wp-content/uploads/DBT-WCCL-Chinese.pdf",
+    "officialScoring": "https://depts.washington.edu/uwbrtc/wp-content/uploads/Scoring-description-for-the-DBT-WCCL.pdf",
+    "licensePage": "https://depts.washington.edu/uwbrtc/resources/assessment-instruments/",
+    "notionArchive": "https://app.notion.com/p/404d27635a3881a39f65e308d920130a",
+    "registeredLocale": "zh-CN",
+    "englishVersion": "ORIGINAL_59_REVIEWED",
+    "traditionalVersion": "UW_HOSTED_59_REVIEWED",
+    "simplifiedChinese": "INDEPENDENT_WORKING_TRANSLATION_UNREVIEWED",
+    "originalTraditionalRegistryPath": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.0/source.json",
+    "originalTraditionalBlobSha": "e4ec1b8ae0051a2277e4d277179a39fc6daec43f",
+    "adaptationProcedure": "每题同序由UW官方繁体译本转为简体并调整中国内地常用表达；未取得官方简体语料及当地效度验证；不改正式计分键。"
+  },
+  "items": [
+    {
+      "number": 1,
+      "itemCode": "DBTWC01",
+      "officialFacet": "dss",
+      "reverse": false
+    },
+    {
+      "number": 2,
+      "itemCode": "DBTWC02",
+      "officialFacet": "dss",
+      "reverse": false
+    },
+    {
+      "number": 3,
+      "itemCode": "DBTWC03",
+      "officialFacet": "dcs1",
+      "reverse": false
+    },
+    {
+      "number": 4,
+      "itemCode": "DBTWC04",
+      "officialFacet": "dss",
+      "reverse": false
+    },
+    {
+      "number": 5,
+      "itemCode": "DBTWC05",
+      "officialFacet": "dcs1",
+      "reverse": false
+    },
+    {
+      "number": 6,
+      "itemCode": "DBTWC06",
+      "officialFacet": "dss",
+      "reverse": false
+    },
+    {
+      "number": 7,
+      "itemCode": "DBTWC07",
+      "officialFacet": "dcs2",
+      "reverse": false
+    },
+    {
+      "number": 8,
+      "itemCode": "DBTWC08",
+      "officialFacet": "dcs1",
+      "reverse": false
+    },
+    {
+      "number": 9,
+      "itemCode": "DBTWC09",
+      "officialFacet": "dss",
+      "reverse": false
+    },
+    {
+      "number": 10,
+      "itemCode": "DBTWC10",
+      "officialFacet": "dss",
+      "reverse": false
+    },
+    {
+      "number": 11,
+      "itemCode": "DBTWC11",
+      "officialFacet": "dss",
+      "reverse": false
+    },
+    {
+      "number": 12,
+      "itemCode": "DBTWC12",
+      "officialFacet": "dcs1",
+      "reverse": false
+    },
+    {
+      "number": 13,
+      "itemCode": "DBTWC13",
+      "officialFacet": "dss",
+      "reverse": false
+    },
+    {
+      "number": 14,
+      "itemCode": "DBTWC14",
+      "officialFacet": "dcs1",
+      "reverse": false
+    },
+    {
+      "number": 15,
+      "itemCode": "DBTWC15",
+      "officialFacet": "dcs2",
+      "reverse": false
+    },
+    {
+      "number": 16,
+      "itemCode": "DBTWC16",
+      "officialFacet": "dss",
+      "reverse": false
+    },
+    {
+      "number": 17,
+      "itemCode": "DBTWC17",
+      "officialFacet": "dcs1",
+      "reverse": false
+    },
+    {
+      "number": 18,
+      "itemCode": "DBTWC18",
+      "officialFacet": "dss",
+      "reverse": false
+    },
+    {
+      "number": 19,
+      "itemCode": "DBTWC19",
+      "officialFacet": "dss",
+      "reverse": false
+    },
+    {
+      "number": 20,
+      "itemCode": "DBTWC20",
+      "officialFacet": "dcs1",
+      "reverse": false
+    },
+    {
+      "number": 21,
+      "itemCode": "DBTWC21",
+      "officialFacet": "dss",
+      "reverse": false
+    },
+    {
+      "number": 22,
+      "itemCode": "DBTWC22",
+      "officialFacet": "dss",
+      "reverse": false
+    },
+    {
+      "number": 23,
+      "itemCode": "DBTWC23",
+      "officialFacet": "dss",
+      "reverse": false
+    },
+    {
+      "number": 24,
+      "itemCode": "DBTWC24",
+      "officialFacet": "dcs2",
+      "reverse": false
+    },
+    {
+      "number": 25,
+      "itemCode": "DBTWC25",
+      "officialFacet": "dcs1",
+      "reverse": false
+    },
+    {
+      "number": 26,
+      "itemCode": "DBTWC26",
+      "officialFacet": "dss",
+      "reverse": false
+    },
+    {
+      "number": 27,
+      "itemCode": "DBTWC27",
+      "officialFacet": "dss",
+      "reverse": false
+    },
+    {
+      "number": 28,
+      "itemCode": "DBTWC28",
+      "officialFacet": "dcs2",
+      "reverse": false
+    },
+    {
+      "number": 29,
+      "itemCode": "DBTWC29",
+      "officialFacet": "dss",
+      "reverse": false
+    },
+    {
+      "number": 30,
+      "itemCode": "DBTWC30",
+      "officialFacet": "dcs2",
+      "reverse": false
+    },
+    {
+      "number": 31,
+      "itemCode": "DBTWC31",
+      "officialFacet": "dss",
+      "reverse": false
+    },
+    {
+      "number": 32,
+      "itemCode": "DBTWC32",
+      "officialFacet": "dcs1",
+      "reverse": false
+    },
+    {
+      "number": 33,
+      "itemCode": "DBTWC33",
+      "officialFacet": "dss",
+      "reverse": false
+    },
+    {
+      "number": 34,
+      "itemCode": "DBTWC34",
+      "officialFacet": "dss",
+      "reverse": false
+    },
+    {
+      "number": 35,
+      "itemCode": "DBTWC35",
+      "officialFacet": "dss",
+      "reverse": false
+    },
+    {
+      "number": 36,
+      "itemCode": "DBTWC36",
+      "officialFacet": "dss",
+      "reverse": false
+    },
+    {
+      "number": 37,
+      "itemCode": "DBTWC37",
+      "officialFacet": "dcs1",
+      "reverse": false
+    },
+    {
+      "number": 38,
+      "itemCode": "DBTWC38",
+      "officialFacet": "dss",
+      "reverse": false
+    },
+    {
+      "number": 39,
+      "itemCode": "DBTWC39",
+      "officialFacet": "dss",
+      "reverse": false
+    },
+    {
+      "number": 40,
+      "itemCode": "DBTWC40",
+      "officialFacet": "dss",
+      "reverse": false
+    },
+    {
+      "number": 41,
+      "itemCode": "DBTWC41",
+      "officialFacet": "dcs1",
+      "reverse": false
+    },
+    {
+      "number": 42,
+      "itemCode": "DBTWC42",
+      "officialFacet": "dss",
+      "reverse": false
+    },
+    {
+      "number": 43,
+      "itemCode": "DBTWC43",
+      "officialFacet": "dss",
+      "reverse": false
+    },
+    {
+      "number": 44,
+      "itemCode": "DBTWC44",
+      "officialFacet": "dss",
+      "reverse": false
+    },
+    {
+      "number": 45,
+      "itemCode": "DBTWC45",
+      "officialFacet": "dcs1",
+      "reverse": false
+    },
+    {
+      "number": 46,
+      "itemCode": "DBTWC46",
+      "officialFacet": "dcs1",
+      "reverse": false
+    },
+    {
+      "number": 47,
+      "itemCode": "DBTWC47",
+      "officialFacet": "dss",
+      "reverse": false
+    },
+    {
+      "number": 48,
+      "itemCode": "DBTWC48",
+      "officialFacet": "dcs2",
+      "reverse": false
+    },
+    {
+      "number": 49,
+      "itemCode": "DBTWC49",
+      "officialFacet": "dss",
+      "reverse": false
+    },
+    {
+      "number": 50,
+      "itemCode": "DBTWC50",
+      "officialFacet": "dss",
+      "reverse": false
+    },
+    {
+      "number": 51,
+      "itemCode": "DBTWC51",
+      "officialFacet": "dss",
+      "reverse": false
+    },
+    {
+      "number": 52,
+      "itemCode": "DBTWC52",
+      "officialFacet": "dcs1",
+      "reverse": false
+    },
+    {
+      "number": 53,
+      "itemCode": "DBTWC53",
+      "officialFacet": "dss",
+      "reverse": false
+    },
+    {
+      "number": 54,
+      "itemCode": "DBTWC54",
+      "officialFacet": "dss",
+      "reverse": false
+    },
+    {
+      "number": 55,
+      "itemCode": "DBTWC55",
+      "officialFacet": "dcs1",
+      "reverse": false
+    },
+    {
+      "number": 56,
+      "itemCode": "DBTWC56",
+      "officialFacet": "dss",
+      "reverse": false
+    },
+    {
+      "number": 57,
+      "itemCode": "DBTWC57",
+      "officialFacet": "dss",
+      "reverse": false
+    },
+    {
+      "number": 58,
+      "itemCode": "DBTWC58",
+      "officialFacet": "dss",
+      "reverse": false
+    },
+    {
+      "number": 59,
+      "itemCode": "DBTWC59",
+      "officialFacet": "dss",
+      "reverse": false
+    }
+  ],
+  "response": {
+    "min": 0,
+    "max": 3,
+    "recall": "last_month",
+    "originalAnchors": [
+      "Never used",
+      "Rarely used",
+      "Sometimes used",
+      "Regularly used (4–5 times/week or more)"
+    ]
+  },
+  "scoring": {
+    "version": "1.0.0",
+    "reverseItems": [],
+    "globalTotal": null,
+    "dimensions": [
+      {
+        "key": "dss",
+        "itemNumbers": [
+          1,
+          2,
+          4,
+          6,
+          9,
+          10,
+          11,
+          13,
+          16,
+          18,
+          19,
+          21,
+          22,
+          23,
+          26,
+          27,
+          29,
+          31,
+          33,
+          34,
+          35,
+          36,
+          38,
+          39,
+          40,
+          42,
+          43,
+          44,
+          47,
+          49,
+          50,
+          51,
+          53,
+          54,
+          56,
+          57,
+          58,
+          59
+        ],
+        "aggregation": "mean",
+        "range": [
+          0,
+          3
+        ],
+        "officialMinimumAnswered": 30,
+        "platformMissingPolicy": "complete_required"
+      },
+      {
+        "key": "dcs1",
+        "itemNumbers": [
+          3,
+          5,
+          8,
+          12,
+          14,
+          17,
+          20,
+          25,
+          32,
+          37,
+          41,
+          45,
+          46,
+          52,
+          55
+        ],
+        "aggregation": "mean",
+        "range": [
+          0,
+          3
+        ],
+        "officialMinimumAnswered": 10,
+        "platformMissingPolicy": "complete_required"
+      },
+      {
+        "key": "dcs2",
+        "itemNumbers": [
+          7,
+          15,
+          24,
+          28,
+          30,
+          48
+        ],
+        "aggregation": "mean",
+        "range": [
+          0,
+          3
+        ],
+        "officialMinimumAnswered": 4,
+        "platformMissingPolicy": "complete_required"
+      }
+    ],
+    "optionalOriginalDCSCombined": "SPSS MEAN.4 available but not emitted as current dimension"
+  },
+  "versions": {
+    "measurement": "1.0.0",
+    "scoring": "1.0.0",
+    "localization": "1.0.0",
+    "report": "1.0.0",
+    "reference": null
+  },
+  "rights": {
+    "allowedNoncommercialUses": [
+      "RESEARCH",
+      "CLINICAL",
+      "EDUCATIONAL"
+    ],
+    "commercial": "FORBIDDEN_BY_UW",
+    "digitalDisplay": "ADMIN_REVIEW",
+    "publicGitHubRedistribution": "ADMIN_REVIEW",
+    "simplifiedTranslation": "ADMIN_REVIEW",
+    "translatorIdentity": "NOT_VERIFIED"
+  },
+  "checks": {
+    "officialTraditionalSource": "STATIC_REUSED",
+    "simplifiedItems": "DRAFT_FOR_REVIEW",
+    "scoringKeyParity": "STATIC_VERIFIED",
+    "responseAnchors": "STATIC_VERIFIED",
+    "goldenCases": 12,
+    "vitest": "NOTRUN",
+    "typeScript": "NOTRUN",
+    "realScoring": "NOTRUN",
+    "CI": "NOTRUN",
+    "database": "NOTRUN",
+    "deployment": "NOTRUN",
+    "humanScienceReview": "NOTRUN"
+  }
+}
