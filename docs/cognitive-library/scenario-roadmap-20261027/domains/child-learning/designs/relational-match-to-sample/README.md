@@ -1,15 +1,25 @@
-# 图形关系匹配 / Relational match-to-sample
+# 图形关系匹配：三个版本 / Three population versions
 
-**单项设计 R1 · 待用户图审 · 未开发、未验证、未接入。** stable key 提案：`relational-match-to-sample`。属于儿童学习领域的一般关系推理方案，不是原有数列或矩阵任务的新名字。下图是原创静态图，没有可启动的运行器。
+**设计 R2 · 待用户图审 · 未开发、未验证、未接入。** 用户认可原操作，并要求提高题目难度、覆盖学前／小学／青少年与成人三类人群。本次修改刺激结构和难度条件，尚不把三种具体方案视为已获开发批准。stable key 仍为 `relational-match-to-sample`；三个版本未来共用任务家族，分别冻结材料和解释，不复制成三个独立能力测验。
 
-![图形关系匹配：说明、二选一作答和练习重呈的原创图审](relational-match-to-sample-review.png)
+![三个版本：增加关系复杂度和外形诱饵，操作仍为二选一](relational-match-to-sample-review.png)
 
-**简短实施介绍：** 先看上面一对图形，再选下面“关系相同”的一张卡。例如上面是 `● ●`，就选 `▲ ▲`；上面是 `● ▲`，就选 `■ ★`。图形可以换，对内“两个一样／两个不同”的关系要对应。research **16题，两类各8，约5–8分钟**；experience **8题，两类各4，约3–5分钟**。两版同界面、同一轮完整条件，短版只减少重复；估时含完整说明、两个例子、四题练习和通常的短休息，均未实测，没有抢答期限。
+**简短实施介绍：** 仍然看上方卡片，再点选下方一张。图形可以换，要核对的是**哪些位置属于同一种图形**。例如上方 `● ● ▲ ▲`，可对应 `▲ ▲ ● ●`；`● ▲ ● ▲` 虽然用了相同图形、数量也一样，成组位置却不对应。原来的两图形“同／不同”只在学前版保留一部分基础题，不能代表所有正式题。
 
-正式前完整解释两类关系；四题简单练习，两类各两题，逐题解释，**4/4首答正确**才继续。失败或未完成先重呈全部说明和两个例子，再练，最多三轮，可以结束。正式二选一，首次有效点选提交，不能改答，不立即公布对错；可以明确跳过、结束，每8题后可休息。成人可以逐字读说明，正式题由孩子自己选，不提示答案。
+|人群版本（研究分组参考，非已验证年龄界限）|正式基础／较复杂条件|research|experience|
+|---|---|---|---|
+|学前版，参考4–6岁|2／4个位置|16题，约5–9分钟|8题，约3–6分钟|
+|小学版，参考6–12岁|4／6个位置|16题，约6–10分钟|8题，约4–6分钟|
+|青少年／成人版|6／8个位置|16题，约7–12分钟|8题，约4–7分钟|
 
-主要改造：参照开放论文中的混合关系任务，自绘单色几何卡片，改成触屏，并增加明确教学与简短练习。原研究考察的是**没有预先教学的自发关系匹配**；本方案研究**教学后应用“相同／不同”关系**，不能继承其结论。拟用于能理解说明的儿童非临床研究，具体年龄范围、独立阅读、中文理解和长短版等值均未验证。题量少、教学与触屏会影响表现，与韦氏／瑞文不等价，不输出IQ、常模、诊断、同龄排名或学业预测。
+**每版都含四格条件：基础／较复杂 × 外形线索一致／冲突。** 科研版每格4题，体验版每格2题，不为缩短删掉复杂题。4位置以上，两个候选保持相同图形种类数和重复次数，不能只数数量作答；两候选复用同一组图形；外形上更像标准的卡有时正确、有时错误，不能固定选最像、最不像或含新图形的卡。所有卡片一直可见，无记忆期限、倒计时或模糊图形。2／4／6／8位置使用相应清晰网格，同一题三张卡的网格一致；整张候选卡都是点选区。
 
-**Brief implementation note (English).** Look at the top pair, then choose the lower card with the same within-pair relation. For example, `● ●` matches `▲ ▲`, while `● ▲` matches `■ ★`. The proposed research profile has **16 items, eight per relation, about 5–8 minutes**; experience has **eight items, four per relation, about 3–5 minutes**. Both retain the same interface and both relations. Estimates include full instructions, two examples, four practice items and typical short rests; they are not measured durations. Practice has two items per relation, with explanations; all four first choices must be correct. Failed or incomplete practice returns to the full instructions and both examples, with at most three rounds and an option to stop. Formal first choices are final, without immediate correctness feedback; skipping and stopping are available. An adult may read the instructions verbatim but must not answer or guide formal choices. Explicit teaching, original monochrome artwork and touchscreen input are adaptations: this studies taught relation application, not spontaneous analogy discovery or IQ, and age/language/profile equivalence is unvalidated.
+图中三列仅为并排图审；实际每次只用指定一个版本，手机／平板仍是一张标准卡和下方两张候选卡。
 
-[来源与许可、原协议、分母／首答／null／有符号公式、三态报告及版本附录](protocol-and-rights.md)。只新增设计材料，不编写运行器、正式序列、题库生成或计分实现。待用户单项图审批准后再开发；不把“下一个”当作对本项具体设计的批准。
+每版先完整讲解两个例子，分别覆盖本版两种位置数量；练习4题、每格1题，采用更直观的成组布局并逐题解释。4/4首答正确才继续；失败或未完成先重呈全部说明和两个例子，最多三轮，可结束。正式首次有效点选提交，不改答，不即时公布对错，可明确跳过／结束，每8题可休息。成人可逐字读说明，不提示或代选正式题。
+
+估时包括首次说明、例子、四题练习及通常的短休息，均未实测；加难后的时长不能沿用R1的统一3–5分钟承诺。三版的原始正确数不直接作跨年龄比较。增加关系约束和外形线索冲突是降低天花板风险的**设计措施**，不宣称已经消除天花板或完成难度标定；没有安排新的招募／实证研究门禁。
+
+**Brief implementation note (English).** The interaction stays the same: inspect the upper card and select one lower card. Match which positions contain the same shape, even when the shapes change. The proposed preschool version uses 2/4 positions, primary-school version 4/6, and adolescent/adult version 6/8. Each version crosses two relation complexities with congruent/conflicting surface cues: research has **16 items, four per cell**; experience has **eight, two per cell**. Proposed total times are respectively **5–9 / 3–6**, **6–10 / 4–6**, and **7–12 / 4–7 minutes** for research/experience, including teaching and practice; none are measured. With four or more positions, both alternatives reuse the same shape vocabulary and repetition counts. Greater surface similarity is correct on some items and misleading on others; position grouping determines the answer. Each version teaches two examples and provides four easier practice items, one per cell. All four first choices must be correct; failed/incomplete practice returns to full instructions and both examples, at most three rounds. Cards stay visible, without time pressure or degraded graphics. Higher-order matching and the balanced surface cues are original adaptations, not validated age norms or proof that ceiling effects are absent. Raw scores across versions are not interchangeable.
+
+[来源、分轴许可、具体例子与唯一答案依据、四格分母、有符号差、报告三态与版本附录](protocol-and-rights.md)。只有设计材料，未写runner、正式序列、题库生成或计分实现。R1图稿与文字保留在Git历史 `d6d2c98122a0d3e6fdbdc63cc93779f8c3c32eed`，不倒写成当前三版本。

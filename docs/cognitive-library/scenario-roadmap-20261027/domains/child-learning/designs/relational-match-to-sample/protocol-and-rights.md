@@ -1,6 +1,6 @@
-# 图形关系匹配：设计 R1 附录
+# 图形关系匹配：设计 R2 附录
 
-主审入口是 [单张原创图＋简短中英介绍](README.md)。本文件只解释提案，不是实现、有效度证明或接入记录。
+主审入口是 [单张原创图＋简短中英介绍](README.md)。用户要求提高难度并覆盖三个人群版本。本文件只解释新的提案，不是实现、有效度证明或接入记录。R1仅有两图形same／different的正式条件已被本次方案替代。
 
 ## 来源身份与分别许可
 
@@ -22,59 +22,98 @@ ICAR 当前 Scientific Use License 1 与按项目登记／禁止公开完整题�
 - 现有 matrix 的实际 `shared/prng.ts` 是 progression／alternation／combination 八格补全；本项是比较**两组对象内部关系是否相同**的二选一，不求矩阵缺失项。
 - cardsort 的实际规则 cue 是颜色／形状及 switch／repeat；本项一直采用同一关系匹配规则，不操纵切换，不做DCCS或心与花。
 - number-series 是教学后的数值规律应用；本项不用数字运算，研究几何对内关系对应。两者都涉及关系推理，不能加总成两个独立智力构念。
+- patterncompare 的实际代码比较单个图案的shape／fill／marks／rotation是否相同；本项允许形状整体替换，比较多个位置的等价成组结构，不是照原样图案找不同。
 - SRT 是重复位置序列中连续反应的变化；本项每题三卡一直可见，不记忆序列、不用连续速度操纵。picturesequence／Corsi 是看后回报顺序，pairedassociate 是图形位置配对，均不提供同一关系二选一结构。
 - 临床SART／PVT／AX-CPT、职业信息采样／信心／delay-choice、EI情绪识别及emotion-situation-understanding仍归原领域；MOT／ANT暂停WIP和心与花原归属不动。
 
-本次实际核对共享分支、儿童本分支及三个领域最新远端；未发现本项 scorer、目录或候选占用。24旧项目前端目录相对已审 `a0130ea6603d7e37fd4f900d8694b5b7d490c51e` 在这五个快照均无变化，沿用原逐项代码审读并重读近邻 matrix／cardsort／lexicaldecision，不重跑旧测试、不把旧PASS当当前验收。远端未推送WIP不能由此穷尽，当前只占儿童领域的这一个设计提案。
+R1前已实际核对共享分支、儿童本分支及三个领域当时最新远端；未发现其他拥有者的相同候选。R2仅修订本项自有设计目录，没有将它重新计为另一新项目。24旧项目前端目录相对已审 `a0130ea6603d7e37fd4f900d8694b5b7d490c51e` 在这五个快照均无变化，沿用原逐项代码审读并重读近邻 matrix／cardsort／lexicaldecision，不重跑旧测试、不把旧PASS当当前验收。远端未推送WIP不能由此穷尽，当前只占儿童领域的这一个设计提案。
 
-## 原方法与拟改造
+## 难度依据与新增许可边界
 
-原文 Experiment 1 的 mixed 组使用8题，same／different各半；Experiment 2 改为卡内图形水平排列、mixed16题，每前／后8题两类各半。原施测由成人摆卡、孩子指选，标准卡与备选不共用形状，无事先教学或练习反馈，正式无对错反馈，末尾另有3道catch。本文未给浏览器源码或触屏个体常模。
+新增方法依据：Richland, Morrison & Holyoak (2006), *Children’s development of analogical reasoning: Insights from scene analogy problems*, DOI **10.1016/j.jecp.2006.02.002**。已读 [作者大学实验室提供的全文](https://sites.lifesci.ucla.edu/psych-reasoninglab/wp-content/uploads/sites/273/2021/04/Richland-Morrison-Holyoak2006.pdf) 的摘要、方法及相关讨论；下载PDF SHA256 **`531e51caa982fa958e646ef85d6ec6fcf889ede2450462315913c66496944632`**。该研究分别操纵需整合的关系与外形干扰，为两个难度方向提供方法依据；**不提供本项目2／4／6／8位置变式的标定**。
 
-本方案只用 **mixed**，不把same-only／different-only凑成另两种profile。拟采用水平两图形、上方标准卡＋下方同时可见的左右两卡；触屏首次点整张候选卡提交，无预选、无倒计时。标准先呈现、下方两卡随后一同出现，反应时从三卡全部就绪的软件时刻起算；不规定人为固定延迟或增加时序研究。正式卡片一直可见，无记忆要求。跳过和结束独立按钮。研究版每8题可休息，体验版完成一组即结束。
+该文注明 ©2006 Elsevier、all rights reserved。只引用方法思想，不复制场景图片、原题、原指导语、译文或代码，也不把作者网页可读当作再分发许可。用于先期核对的作者托管会议稿同样不作为可复制题库。原2023论文CC BY4.0只覆盖其相应内容，不能替2006素材授权。本包图像／示例／说明依旧原创，无外来场景或受限题库。额外检索到的 iScience 论文全文API500、出版社403，未取得可依赖的全文，不以其片段支持本设计。
 
-|profile 提案|正式题数|标准关系相同／不同|每条件正确侧左／右|估时（含说明练习）|
-|---|---:|---:|---:|---|
-|research|16|8／8|4／4|5–8分钟|
-|experience|8|4／4|2／2|3–5分钟|
+## 原方法与R2的实质变化
 
-每组8题都包括4 same／4 different，每条件左右正确位置各2。短版保留完整一组，不能删掉different或只取最容易的题；两版同界面、同输入与教学。原研究的8／16题观察不证明本改造长短版等值。估时按每题约12–20秒，加约1.5–2分钟说明／练习及通常的短休息估计，未实测；不是截止时间。
+2023原方法采用两图形same／different的三卡关系匹配，mixed8／16题、成人摆卡、孩子指选，没有预先教学，另有末尾catch；不等同本项。R2保留“标准卡＋两候选、指选”的交互家族，改成**已教学的多位置成组关系应用**。学前版2位置基础题仍是same／different，其余条件均为原创多位置扩展。不能将其称为经典RMTS、韦氏或瑞文的等价版，更不能把2006的实景关系结果当成这套几何刺激已经有效。
 
-图形规则明确为**形状身份**：同一卡内两形状相同为same，不同为different；大小、朝向、填充与颜色不另成隐含规则。所有图形拟统一单色、等名义尺寸、共同基线、无旋转／纹理难度，减少颜色单独作答捷径。每题一个候选为same、另一个different；两个候选的形状均不在标准卡出现，正确性取关系是否相同，避免把“找相同物体”当正确策略。只给设计示例，没有在本轮生成正式刺激组合、bank或顺序。
+三个population版本由研究分组明确指定，每版各有research／experience，合计**六个分别冻结组合**。参考年龄只帮助沟通，不自动依生日路由，不新增年龄权限、服务器或schema机制。无经过验证的年龄界限、难度等级、中文／照读／触屏／长短版等值；青少年／成人合并标签也不意味着所有年龄有同等难度。
 
-重要改造：原研究问**自发**关系匹配；我们明确教same／different、给例子并做练习，所以只能研究**教学后的关系应用**。自助触屏、单色图、教学与前置练习、取消事后catch／解释提问，均属改造；不继承原研究的年龄／发展阶段结论。拟用于能理解该说明的儿童非临床研究，适用年龄留null；成人可逐字读指导语，正式题不能代选或提示，未来需如实保留说明是否由成人照读，不新增家长权限机制。
+### 唯一答案规则
 
-## 教学与练习
+把每张卡中的位置按行读取。两张卡关系相同，当且仅当：对任意两位置i、j，上方这两位置用同一种图形，下方相应两位置也用同一种图形；上方不同，下方也必须不同。可写为 **`E_X(i,j) = [X_i = X_j]`，正确选项满足所有i、j的 `E_option = E_standard`**。这是项目对成组关系的明确规则，不称为文献中的标准心理计分公式。
 
-完整中文说明提案：“先看上面那一对，再看下面两张卡。看看每一对里面是两个一样的图形，还是两个不同的图形。上面两个一样，就选下面两个也一样的一张；上面两个不同，就选下面两个也不同的一张。图形可以换，关系要对应。比如 `● ●` 对应 `▲ ▲`；`● ▲` 对应 `■ ★`。看清再点，不用抢答；点选会提交，不能改答。可以按‘这题先跳过’，也可以随时结束。先做四题简单练习；没通过或没做完，我们会一起重看全部说明和两个例子，再试，最多三轮。每八题后可休息。这里只描述今天这组题，不判断智力或作诊断。”
+图形身份可以整体替换，位置顺序不能换。每题两候选恰好一张完全满足该规则，另一张至少破坏一个成组关系。4位置及以上，三卡采用相同的“每种形状各出现两次”频数结构，两个选项相同种类数／重复次数，避免只数种类、重复量或选某个固定图形。2位置基础题例外：same与different本就包含不同重复次数，只作学前基础条件。
 
-English proposal: “Look at the top pair, then the two lower cards. Check whether each pair contains two identical shapes or two different shapes. If the top pair is identical, choose an identical pair below. If the top pair is different, choose a different pair below. Shapes may change; the relation must match. For example, `● ●` matches `▲ ▲`, and `● ▲` matches `■ ★`. Look carefully; there is no race. Your first choice submits the answer and cannot be changed. You can skip an item or stop. First, try four simple practice items. If practice is failed or incomplete, review all instructions and both examples before trying again, with at most three rounds. You can rest after every eight items. We describe this activity only, not intelligence or a diagnosis.”
+以下是**静态审阅示例**，字母只标识图形身份，不要求参与者认识字母，不是已生成的正式题库或序列：
 
-练习4题：same2／different2，位置左右都出现，使用最熟悉的基础图形，不提前重复正式三卡组合，逐题简短说明“这两对都是相同／不同”。4/4首答正确继续；失败或未完成均重呈**全部**说明和**两个**例子，再练，最多3轮，仍可结束，不生成正式零分。正式不即时给对错反馈，不通过练习不是能力结论。
+|示例|标准位置关系|正确替换|错误关系（下列为外形线索冲突示例）|错误原因|
+|---|---|---|---|---|
+|2位置|`A A`|`C C`|`A B`|标准两位置相同，错误卡不同|
+|4位置|`A A B B`|`B B A A`|`A B A B`|标准成组为1–2、3–4，错误卡为1–3、2–4|
+|6位置|`A B C A C B`|`A C B A B C`|`A B C A B C`|标准2–6、3–5相同，错误卡2–5、3–6相同|
+|8位置|`A B C A D C B D`|`D B C D A C B A`|`A B C D A C B D`|错误卡仍满足部分成组，却破坏1–4和5–8|
 
-## 记录、权威计算与报告提案
+网格分别为2位置一行两格、4位置两行两格、6位置两行三格、8位置两行四格。同一道题三卡网格相同，逐行对应。整张候选卡接受首次点选，不要求精准点某个小符号。形状保持清晰、尺寸足够、同一固定朝向，无动态掩蔽、噪声或缩短时限；候选不足以清晰摆放时应扩大卡片，不能压小图形制造难度。形状库排除“菱形就是旋转方形”等等价歧义，不以朝向／模糊轮廓作为关系判断捷径。
 
-仅设计、没有scorer：每题拟保留真实计划及关系类别、正确侧、首个有效点选或明确跳过、软件onset／首答时间、完成／中断、输入及冻结材料身份。两候选都必须接受第一次有效响应，不能只收正确点击；提交后不能由后续点击改写。成人是否照读和实际教学language属于实际说明来源，未来随本次context冻结。
+### 四格条件与六组合
 
-- 条件机会数 `N_r`＝该条件有首个有效选择或明确跳过的次数；实际计划、呈现、有选择、跳过、当前中断、后续未执行各自保留。正式全部完成时，research每类 `N=8`，experience每类 `N=4`；中断不补成错答，也不补满分母。
-- 条件机会正确率 `A_r=C_r/N_r`，明确跳过计入机会分母，同时单列跳过数，不能冒称已选择错误。可选的“仅选择准确率”若用于研究须另用 `C_r/实际选择数`，不能混换分母。任何分母0则null，真实0正确／非零机会保留0。
-- 正确首答软件用时 `T_r` 为该条件首答正确且时间有效试次的**中位数**；没有正确用时为null，不补0。真实软件0保留但不能称生理零反应时。用时为项目新增辅助描述，原成人摆卡研究不提供相同软件计时效度。
-- 有符号差 `ΔA=A_different−A_same`、`ΔT=T_different−T_same`。正／负／真实0都保留，任一必要条件null则差值null。不能只保留正差或解释成“灵活性分数”；小条件分母尤其不稳定。
+每个人群版均采用 `complexity ∈ {basic, complex}` × `surfaceCue ∈ {congruent, conflict}`。这些名称表示客观结构操纵，不能当作已经标定的易／难等级。早先草图“无／有外形诱饵”已替换：只让错误项复用标准图形会留下“总选新图形”的捷径，不能满足本次加难目的。
 
-三态规则提案：完整计划、无中断且有实际选答可为interpretable，意思只是足够描述本次事实；有选答但未完整完成／中断为limited；无实际选择或资料不足以可靠对应为invalid。不借单人二选一的50%机会水平判“通过”，不从8题产生显著性、IQ或发展阶段结论。正式全部跳过时虽内部正确数是真0，但没有实际选答，公开状态为invalid，不显示“零能力”。原件身份／首答不可靠时不得生成表面完整的表现。
+- 4位置以上，标准、正确卡、错误卡复用相同图形词汇，每种形状各两次。两候选有相同图形种类、全局数量和重复次数，不能靠新旧图形或计数决定正确。
+- 用 `M(option)=Σ_i [standard_i = option_i]` 仅在设计附录核对**对应位置外形重合数**。congruent格满足 `M(correct)>M(wrong)`，conflict格满足 `M(correct)<M(wrong)`；平手不塞进这两格。这个M是刺激控制量，不是参与者能力分或公开指标。
+- 两种cue格同样多，所以固定选“最像”或“最不像”都不能覆盖全部条件。正式bank还须改变正确重标记方式及M值，不能让正确项恒为某个M值、固定形状／位置或某行局部模板；本图不是全部题目的生成规则。当前没有生成正式bank。
+- 2位置是学前基础例外：same标准只有一种形状，different需要两种；不能同时强称全局词汇／重复次数完全相同。仍把外形重合有利／误导与same／different平衡，不能把“全是新图形”固定当正确策略。
+- 例：4位置标准AABB，正确AABB相对错误ABAB为congruent；正确BBAA相对ABAB为conflict。6位置标准ABCACB，正确ACBABC：相对错误BCACBA为congruent（M为2对0），相对错误ABCABC为conflict（2对4）。8位置标准ABCADCBD，正确DBCDACBA：相对错误BACDBACD为congruent（4对2），相对错误ABCDACBD为conflict（4对6）。所有正确项都保持完整的成组关系，错误项破坏关系。
 
-三态同时控制正文、可选至多一张标EDUK12.TOP的图片和下载：只有interpretable呈现实际计数、跳过及有限解释；limited／invalid不公开表现数值、不生成表现图片，下载只含状态与原因。内部质量字段、研究差值与筛选标记不进通用公共报告，不做0–100能力转换、常模或诊断。没有真实数据，不在图审图里填报告分数。
+2006原研究对照为无外形干扰；本项目使用方向平衡的congruent／conflict作为原创刺激控制，不宣称复刻其操纵。2023原方法排除标准与候选共用形状；R2也已明确改变这点。
 
-中英报告正文模板已设计，未运行：
+|版本|basic／complex位置数|research四格条件|experience四格条件|估时research／experience|
+|---|---|---|---|---|
+|preschool，学前参考4–6岁|2／4|每格4＝16题，每格正确左2／右2|每格2＝8题，每格正确左1／右1|5–9／3–6分钟|
+|primary，小学参考6–12岁|4／6|每格4＝16题，每格正确左2／右2|每格2＝8题，每格正确左1／右1|6–10／4–6分钟|
+|adolescent-adult，青少年／成人|6／8|每格4＝16题，每格正确左2／右2|每格2＝8题，每格正确左1／右1|7–12／4–7分钟|
 
-- interpretable：“谢谢你认真完成。这次选对 {correct}/{opportunities} 题，明确跳过 {skipped} 题；‘两个一样’选对 {sameCorrect}/{sameN}，‘两个不同’选对 {differentCorrect}/{differentN}。这只是先学规则后完成这组题的记录。可以试着说说每一对里的关系，再选下一组；如果图形让你分心，先把两张卡都看一遍。题量少、练习和触屏会影响表现，不能据此判断智力或年龄水平。” / “Thank you for completing the activity. You chose the matching relation on {correct}/{opportunities} items and explicitly skipped {skipped}. Identical-pair items: {sameCorrect}/{sameN}; different-pair items: {differentCorrect}/{differentN}. This describes this set after instruction. Try describing the relation within each pair before comparing the cards. The small item count, practice and touchscreen affect performance; this does not determine intelligence or an age level.”
-- limited：“谢谢你已经付出的努力。这次尚未完整完成或发生中断，先不解释表现。可以休息后重看说明，再决定是否完整体验。” / “Thank you for your effort. This session was incomplete or interrupted, so we will not interpret performance. Rest and review the instructions before deciding whether to try a complete activity.”
+每组8题包含每格2题，研究版两组、体验版一组；短版不删高复杂或诱饵格。学前2位置格同时覆盖same／different，短版每格各一，两格合计左右也与关系平衡；不把它当三版本共用的主分类。正式不显示外形线索方向标签；孩子需要依指导语核对成组关系，不能从条件名称推答案。具体正式bank尚未编制。版本内的实际组合、形状／布局、材料身份及顺序须批准后冻结，不能临时按作答表现换难度或跨版拼接。
+
+估时按学前每题约12–25秒、小学15–30秒、青少年／成人20–35秒，加约1.5–2.5分钟初次教学／例子／简单练习与通常短休息估计。全部未实测，也不是截止时间；练习重试、较长核对或休息可更久。关系更复杂后不再沿用R1统一体验3–5分钟的预算。提高复杂度和诱饵仅是控制天花板风险的提案，是否真正没有天花板需要目标人群的真实分布；本轮不伪造通过率、不新增实证招募或开发门禁。
+
+## 各版教学、例子与简单练习
+
+通用指导语：“先看上方卡片，看看哪些位置放的是同一种图形。下方选一张：图形可以换，相同位置的成组关系要对应。请把几个位置一起看，慢慢核对，不用抢答。两张候选可以用同样的图形；外形更像的卡不一定关系也对应。点选会提交，不能改答。可以先跳过，也可以随时结束。每八题后可以休息。”
+
+English: “Look at the upper card and notice which positions contain the same shape. Choose one lower card: the shapes may change, but the grouping of corresponding positions must match. Check the positions together and take your time. The alternatives may use the same shapes; greater surface similarity does not always mean the groups match. Your first choice submits the answer and cannot be changed. You may skip an item, rest after eight items, or stop.”
+
+每版在正式前有完整中英说明、该版basic与complex各一个明确例子；学前从2位置的same／different开始，再示范4位置，不能只教两图形就开始4位置正式题。小学完整讲4与6位置，青少年／成人讲6与8位置。示例可用视觉标记逐步指出同组位置，正式题不保留答案线或高亮。成人可逐字读说明，不提示或代选正式题；实际照读状态与language未来随context保留。
+
+每版练习仍只有4题、四格各一，采用连续成组等更直观布局而非正式较复杂的交错布局，逐题解释所有关键对应关系。练习同时讲清：外形更像标准的卡可能对，也可能成组不对；需要核对关系。4/4首答正确继续；失败或未完成均重呈全部说明与本版两个例子，再练，最多3轮，可结束。未通过不是能力结论，不生成正式零分。正式首次选择或明确跳过生效，不能只收正确点击；不即时反馈对错，不用练习题作正式题。
+
+## 原件、条件分母与有符号计算提案
+
+当前没有实现或实际原件。未来需保留population版本、profile、每题位置数／成组结构／外形线索方向／正确侧、实际首响应／跳过／中断、软件onset与首答时间、材料和三层版本。两候选都接受第一有效响应，后续点击不能改写；未执行与当前中断不补错答。实际教学language／照读状态随本次context冻结。
+
+- 四格 `c=(complexity,surfaceCue)` 的机会数 `N_c`＝该格有首个有效选择或明确跳过的次数。完整research每格4，experience每格2；计划／呈现／选择／跳过／中断／未执行分别保留，不补满缺失分母。
+- `A_c=C_c/N_c` 为机会正确率，跳过单列并计入机会分母，不称为已选择错误；若另研究仅选择准确率，须另用实际选择数作分母。分母0为null；真实0正确／非零机会保留0。
+- `T_c`＝该格首答正确且时间有效的**中位软件用时**。没有正确用时为null，不补0；真实软件0可保留但不称生理零反应。辅助时间是项目新增记录，不继承摆卡研究的计时效度。
+- 同版本内，`ΔA_complexity=(A_complex,congruent+A_complex,conflict)/2−(A_basic,congruent+A_basic,conflict)/2`；`ΔA_surface=(A_basic,conflict+A_complex,conflict)/2−(A_basic,congruent+A_complex,congruent)/2`。两个因素按格等权，明确不是按缺失多少变权。时间差将A换为T，表示格中位数的等权差，不冒称合并样本中位数。任一需要的格null，则相应差为null；保留正、负、真实0，不裁成“能力分”。这些差值仅供研究描述，小分母不支持稳定个体推断。
+
+三版材料、关系数量及负担不同，原始正确数／时间／差值**不能直接作跨年龄排名或能力增长曲线**。只有同一冻结版本和profile的实际记录才使用该组合解释，不混为一个总分或重算旧报告。
+
+## 三态公开投影与完整中英报告模板
+
+interpretable仅指完整计划、无中断且有真实选答，足够描述本次事实；有选答但未完成／中断为limited；无实际选择或资料不足以可靠对应为invalid。全部跳过时内部正确数虽是真0，公开为invalid，不显示“零能力”。资料身份／首答不可靠时不得生成表面完整表现。不拿二选一50%机会水平给单人贴“通过”标签。
+
+正文、可选至多一张EDUK12.TOP图片和下载同步按三态控制；limited／invalid没有表现数值、表现图片或数值下载。内部格差值、筛选标记与研究指标不进通用公开报告；不生成0–100能力转换、IQ、常模、诊断、岗位预测或跨年龄名次。
+
+- interpretable：“谢谢你认真完成。这次是{versionName}的{profileName}，你选对{correct}/{opportunities}题，明确跳过{skipped}题。基础位置条件选对{basicCorrect}/{basicN}，较多位置条件选对{complexCorrect}/{complexN}。这是先学规则后完成这组题的记录。可以先找哪些位置是一组，再把两张候选卡都核对一遍。题量少、教学、干扰图形与触屏都会影响表现；这不是智力、年龄水平或与其他版本的比较。” / “Thank you for completing the {versionName}, {profileName} activity. You chose the matching grouping on {correct}/{opportunities} items and explicitly skipped {skipped}. Fewer-position items: {basicCorrect}/{basicN}; more-position items: {complexCorrect}/{complexN}. This describes this set after instruction. Identify the position groups, then check both alternatives. The small item count, teaching, distracting shapes and touchscreen affect performance. This is not intelligence, an age level, or a comparison with another version.”
+- limited：“谢谢你已经付出的努力。这次尚未完整完成或发生中断，先不解释表现。可以休息后重看本版说明与例子，再决定是否完整体验。” / “Thank you for your effort. This session was incomplete or interrupted, so we will not interpret performance. Rest and review this version’s instructions and examples before deciding whether to try a complete activity.”
 - invalid：“这次资料不足以生成可靠反馈，没有表现结果。这不代表你的能力；准备好后可以重新开始。” / “There is not enough information for reliable feedback, so no performance result is shown. This does not reflect your ability; you may start again when ready.”
 
-## 版本、稳定标签及本轮边界
+## 三层版本、稳定标签与交付边界
 
-仅设计标识：协议 `relational-match-to-sample-protocol-proposal-r1`（教学、图形规则、profile、输入）；解释 `relational-match-to-sample-interpretation-proposal-r1`（分母、首答、三态）；报告 `relational-match-to-sample-report-proposal-r1`（中英正文／图片／下载）。批准后实际组合还须冻结正式bank、具体profile／序列与左右平衡、参数、说明language／照读方式和版本；不重算旧报告。当前没有实际运行tuple。
+设计标识分别升级：`relational-match-to-sample-protocol-proposal-r2`、`relational-match-to-sample-interpretation-proposal-r2`、`relational-match-to-sample-report-proposal-r2`。批准后按population×profile冻结六种实际组合，同时绑定bank／实际材料与顺序、参数、网格／输入／教学来源和版本。R1未开发的历史不倒写为三版；旧报告不得因新解释重算。当前仍没有实际运行tuple。
 
-18维／131值仍按 `22721e5c63dd78819e8c58921adf20157cdaa08c` 的 taxonomy，blob `f28a14159348d3cebbfa04a3675b126307dd9e43`。cognitive_domain／target_process／paradigm／stimulus_form 当前无精确一般关系匹配值，留空，不借抑制或语义信心key；input_upstream无代码取用留空，input_proposed沿`not_frozen`。key_metric可沿`condition_accuracy`／`condition_rt`，intended_use沿`research_protocol_selection`；code_license／code_rights_disposition／asset_rights_disposition／asset_license_review不捏造对应值，许可用上表事实说明。implementation_strategy沿`literature_reimplementation`，maturity沿`source_research_only`；evidence_limitations沿`protocol_variant_unvalidated`／`cultural_language_burden`／`protocol_version_decision`，baseline_relation沿`protocol_variant`，research_priority沿`priority_finalize`，rule_type沿`theoretical_reference`／`project_provisional`。新标题不是新增受控key，不声称后台标签接通。
+18维／131值保持固定 `22721e5c63dd78819e8c58921adf20157cdaa08c`、taxonomy blob `f28a14159348d3cebbfa04a3675b126307dd9e43`。cognitive_domain／target_process／paradigm／stimulus_form无准确多位置关系匹配值，留空；input_upstream无代码取用留空，input_proposed沿`not_frozen`。key_metric沿`condition_accuracy`／`condition_rt`，intended_use沿`research_protocol_selection`；许可相关维度不捏造匹配值，依分轴事实说明。implementation_strategy沿`literature_reimplementation`，maturity沿`source_research_only`；evidence_limitations沿`protocol_variant_unvalidated`／`cultural_language_burden`／`protocol_version_decision`，baseline_relation沿`protocol_variant`，research_priority沿`priority_finalize`，rule_type沿`theoretical_reference`／`project_provisional`。人群版本是本项材料区分，不新增共享年龄标签或后台路由。
 
-本轮仅新增此设计子目录，不修改共享README／注册表、数列／SRT源码或其他领域，不实现runner、正式序列、计分或后端接入，不增加schema／权限／COS／服务器／依赖／CI／时序门禁，不跑应用测试、不合并部署。当前只是下一项单项图审，不因前项已批准而视为本项获批。
+本轮仅修订本设计目录的四个材料文件，不写runner、正式序列、题库生成或计分实现，不修改数列／SRT源码、共享README／注册、其他领域、权限／COS／服务器／schema／依赖／CI，不跑应用测试、不合并部署。用户认可操作并要求三个版本，是本次图审的任务范围；具体加难刺激与六组合仍需图审确认后才开发。

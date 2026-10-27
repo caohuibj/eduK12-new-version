@@ -1,19 +1,30 @@
 {
   "artifact_kind": "STATIC_DESIGN_REVIEW_ONLY",
   "stable_key_proposal": "relational-match-to-sample",
-  "design_version": "R1",
-  "status": "DESIGNED_AWAITING_SINGLE_ITEM_USER_APPROVAL_NOT_IMPLEMENTED_NOT_INTEGRATED",
-  "base_head": "202f01bbeec17bf8ace7b90048e547e9d320c172",
+  "design_version": "R2",
+  "status": "USER_REQUESTED_HARDER_THREE_POPULATION_VERSIONS_AWAITING_CONCRETE_R2_IMAGE_APPROVAL",
+  "base_head": "d6d2c98122a0d3e6fdbdc63cc93779f8c3c32eed",
   "branch": "cognitive/domain-child-learning-20261027",
-  "captured_at_utc": "2026-10-27T14:16:22.979497+00:00",
-  "remote_snapshots": {
+  "captured_at_utc": "2026-10-27T14:57:30.170302+00:00",
+  "user_scope": [
+    "original interaction accepted",
+    "increase formal difficulty to reduce ceiling risk",
+    "all three population versions requested"
+  ],
+  "prior_design": {
+    "version": "R1",
+    "commit": "d6d2c98122a0d3e6fdbdc63cc93779f8c3c32eed",
+    "image_sha256": "5ac8a271e263d34286131922cdcd10bf143e8d7647db19bd7c5922a0ff4f4b82",
+    "not_rewritten_as_R2": true
+  },
+  "baseline_remote_snapshots_from_R1": {
     "main": "7e6d7da4a01e4a42b410cf2dbdcfa76f11759fdc",
     "cognitive-next-three-core-20261026": "072b2900d4295c7d741d5e55c9ce6cfbbf6f58d2",
     "clinical-research": "5f5ffdee8c4d8bea25952e1aad4e926cedbbb816",
     "emotion-ei": "587a1b4e26db1f462bd43020eb9e24514a3d555c",
     "occupational": "9b39a51fbc6601220c6412d6f247296c74e5ab91"
   },
-  "dedup": {
+  "baseline_dedup_from_R1": {
     "old24_frontend_directories_changed_since_prior_code_audit": 0,
     "old_audited_base": "a0130ea6603d7e37fd4f900d8694b5b7d490c51e",
     "existing11_preserved": true,
@@ -31,7 +42,8 @@
     ],
     "unpublished_WIP_exhaustively_known": false
   },
-  "primary_source": {
+  "R2_additional_neighbour_read": "patterncompare actual shape/fill/marks/rotation identity comparison, distinct from renamed shape-position equivalence patterns",
+  "primary_RMTS_source": {
     "authors": "Shivaram, Shao, Simms, Hespos and Gentner",
     "year": 2023,
     "title": "When do Children Pass the Relational-Match-To-Sample Task?",
@@ -49,68 +61,330 @@
       "verbal-analogy inventory10.3758/s13428-019-01312-3 subscription preview only; no items used"
     ]
   },
-  "profiles_proposed": {
-    "research": {
+  "difficulty_method_source": {
+    "authors": "Richland, Morrison and Holyoak",
+    "year": 2006,
+    "doi": "10.1016/j.jecp.2006.02.002",
+    "author_lab_pdf": "https://sites.lifesci.ucla.edu/psych-reasoninglab/wp-content/uploads/sites/273/2021/04/Richland-Morrison-Holyoak2006.pdf",
+    "pdf_sha256": "531e51caa982fa958e646ef85d6ec6fcf889ede2450462315913c66496944632",
+    "read": "abstract, methods and relevant discussion of relation integration and featural distraction",
+    "rights": "2006 Elsevier, all rights reserved; method ideas only, no pictures/items/text/translation/code copied",
+    "not_validation_of_our_multi_position_task": true
+  },
+  "unused_access_failure": "PMC10074587 fullTextXML500 and publisher403; not relied upon",
+  "six_proposed_combinations": [
+    {
+      "population_version": "preschool",
+      "age_reference_not_validated": [
+        4,
+        6
+      ],
+      "profile": "research",
       "formal": 16,
-      "same": 8,
-      "different": 8,
-      "per_relation_correct_left": 4,
-      "per_relation_correct_right": 4,
+      "basic_complex_positions": [
+        2,
+        4
+      ],
+      "cells": 4,
+      "items_per_cell": 4,
+      "correct_left_per_cell": 2,
+      "correct_right_per_cell": 2,
       "estimated_minutes": [
         5,
-        8
+        9
       ]
     },
-    "experience": {
+    {
+      "population_version": "preschool",
+      "age_reference_not_validated": [
+        4,
+        6
+      ],
+      "profile": "experience",
       "formal": 8,
-      "same": 4,
-      "different": 4,
-      "per_relation_correct_left": 2,
-      "per_relation_correct_right": 2,
+      "basic_complex_positions": [
+        2,
+        4
+      ],
+      "cells": 4,
+      "items_per_cell": 2,
+      "correct_left_per_cell": 1,
+      "correct_right_per_cell": 1,
       "estimated_minutes": [
         3,
-        5
+        6
+      ]
+    },
+    {
+      "population_version": "primary",
+      "age_reference_not_validated": [
+        6,
+        12
+      ],
+      "profile": "research",
+      "formal": 16,
+      "basic_complex_positions": [
+        4,
+        6
+      ],
+      "cells": 4,
+      "items_per_cell": 4,
+      "correct_left_per_cell": 2,
+      "correct_right_per_cell": 2,
+      "estimated_minutes": [
+        6,
+        10
+      ]
+    },
+    {
+      "population_version": "primary",
+      "age_reference_not_validated": [
+        6,
+        12
+      ],
+      "profile": "experience",
+      "formal": 8,
+      "basic_complex_positions": [
+        4,
+        6
+      ],
+      "cells": 4,
+      "items_per_cell": 2,
+      "correct_left_per_cell": 1,
+      "correct_right_per_cell": 1,
+      "estimated_minutes": [
+        4,
+        6
+      ]
+    },
+    {
+      "population_version": "adolescent-adult",
+      "age_reference_not_validated": null,
+      "profile": "research",
+      "formal": 16,
+      "basic_complex_positions": [
+        6,
+        8
+      ],
+      "cells": 4,
+      "items_per_cell": 4,
+      "correct_left_per_cell": 2,
+      "correct_right_per_cell": 2,
+      "estimated_minutes": [
+        7,
+        12
+      ]
+    },
+    {
+      "population_version": "adolescent-adult",
+      "age_reference_not_validated": null,
+      "profile": "experience",
+      "formal": 8,
+      "basic_complex_positions": [
+        6,
+        8
+      ],
+      "cells": 4,
+      "items_per_cell": 2,
+      "correct_left_per_cell": 1,
+      "correct_right_per_cell": 1,
+      "estimated_minutes": [
+        4,
+        7
       ]
     }
+  ],
+  "factors": {
+    "complexity": [
+      "basic",
+      "complex"
+    ],
+    "surfaceCue": [
+      "congruent",
+      "conflict"
+    ],
+    "surface_definition": "M is count of exact shape identity at corresponding positions. congruent M(correct)>M(wrong); conflict M(correct)<M(wrong). No ties labelled as these cells. M is stimulus audit, not participant score.",
+    "four_plus_positions": "same shape vocabulary and repetition counts in standard and both options; exactly one candidate preserves all position-group equivalences",
+    "anti_shortcuts": "balance cue directions; vary correct recoding and M values; do not always choose new, most similar, least similar or one fixed local pattern",
+    "formal_bank_generated": false
   },
   "practice_proposed": {
     "trials": 4,
-    "same": 2,
-    "different": 2,
+    "one_per_cell": true,
+    "two_version_specific_examples": true,
     "first_correct_required": 4,
     "maximum_rounds": 3,
-    "failure_or_incompletion": "full instructions and both examples again"
+    "failure_or_incompletion": "full instructions and this version’s both examples again",
+    "simpler_layout_than_formal": true
   },
   "image": {
     "filename": "relational-match-to-sample-review.png",
-    "sha256": "5ac8a271e263d34286131922cdcd10bf143e8d7647db19bd7c5922a0ff4f4b82",
-    "bytes": 1674689,
-    "width": 1536,
-    "height": 1024,
-    "method": "ImageGen original concept board, then replace two diamonds with five-point stars to avoid rotated-square ambiguity; final PNG copied without other editing",
+    "sha256": "ee5989eb39c11e1ee7e6663bbf613386f16348a7c10db9acd3ce1bd364c3f41f",
+    "bytes": 1816854,
+    "width": 1422,
+    "height": 1106,
+    "method": "ImageGen original R2 board then targeted edit to balance surface cue direction and equalize candidate shape vocabularies; final original PNG copied without other edits",
     "runtime_screenshot": false,
     "participant_or_report_data": false
   },
-  "adaptations": [
-    "explicit teaching and4practice instead of original spontaneous no-training protocol",
-    "touchscreen instead of adult physical-card pointing",
-    "original monochrome shape pairs instead of paper colored cards",
-    "no after-task catch or explanation questions",
-    "proposed software RT is additional descriptive measure, not inherited paper evidence"
-  ],
-  "limits": [
-    "not spontaneous analogy discovery",
-    "no age/language/touch/profile equivalence",
-    "few trials and possible ceiling effects",
-    "not Wechsler/Raven equivalence; noIQ/norms/diagnosis/rank/prediction"
-  ],
+  "manual_figure_audit": {
+    "preschool": {
+      "standard_groups": [
+        [
+          1,
+          2
+        ],
+        [
+          3,
+          4
+        ]
+      ],
+      "left_groups": [
+        [
+          1,
+          2
+        ],
+        [
+          3,
+          4
+        ]
+      ],
+      "right_groups": [
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          4
+        ]
+      ],
+      "correct": "left",
+      "M_correct": 0,
+      "M_wrong": 2
+    },
+    "primary": {
+      "standard_groups": [
+        [
+          1,
+          4
+        ],
+        [
+          2,
+          6
+        ],
+        [
+          3,
+          5
+        ]
+      ],
+      "left_groups": [
+        [
+          1,
+          4
+        ],
+        [
+          2,
+          6
+        ],
+        [
+          3,
+          5
+        ]
+      ],
+      "right_groups": [
+        [
+          1,
+          4
+        ],
+        [
+          2,
+          5
+        ],
+        [
+          3,
+          6
+        ]
+      ],
+      "correct": "left",
+      "M_correct": 2,
+      "M_wrong": 4
+    },
+    "adolescent-adult": {
+      "standard_groups": [
+        [
+          1,
+          4
+        ],
+        [
+          2,
+          7
+        ],
+        [
+          3,
+          6
+        ],
+        [
+          5,
+          8
+        ]
+      ],
+      "left_groups": [
+        [
+          1,
+          5
+        ],
+        [
+          2,
+          7
+        ],
+        [
+          3,
+          6
+        ],
+        [
+          4,
+          8
+        ]
+      ],
+      "right_groups": [
+        [
+          1,
+          4
+        ],
+        [
+          2,
+          7
+        ],
+        [
+          3,
+          6
+        ],
+        [
+          5,
+          8
+        ]
+      ],
+      "correct": "right",
+      "M_correct": 4,
+      "M_wrong": 6
+    },
+    "note": "Hand-reviewed static examples, not a scorer, item bank, generated schedule or observed participant data; congruent examples specified separately in appendix"
+  },
+  "versioning": {
+    "protocol": "relational-match-to-sample-protocol-proposal-r2",
+    "interpretation": "relational-match-to-sample-interpretation-proposal-r2",
+    "report": "relational-match-to-sample-report-proposal-r2",
+    "actual_runtime_tuple": null,
+    "cross_version_raw_score_comparability": false
+  },
+  "difficulty_claim": "design risk mitigation only, no measured ceiling reduction, age norm, IQ/diagnosis or inherited validity",
   "checks": {
-    "source_and_license_read": true,
-    "image_reviewed": true,
-    "square_diamond_ambiguity_removed": true,
+    "source_rights_and_manual_diagrams_reviewed": true,
+    "profile_arithmetic": "PASS",
     "application_tests": "NOT_RUN_NO_APPLICATION_CHANGE",
     "runner_sequence_scorer": "NOT_IMPLEMENTED",
-    "shared_registry_product_server_permissions_COS_dependency_CI": "UNCHANGED"
+    "shared_registry_product_server_permissions_COS_dependencies_CI": "UNCHANGED"
   },
-  "delivery": "design-only [skip ci] commit on own branch; exact remote HEAD/tree and byte check reported after push"
+  "delivery": "four design files only; skip-ci commit on original branch, exact remote HEAD/tree/bytes read back separately"
 }
