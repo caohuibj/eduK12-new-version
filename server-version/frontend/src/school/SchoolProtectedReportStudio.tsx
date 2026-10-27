@@ -1,3 +1,4 @@
+import {SchoolReportHeader} from './SchoolReportPresentation'
 import { useEffect, useState } from 'react'
 import type { SchoolApi } from './SchoolRecovery'
 
@@ -15,8 +16,8 @@ const problem=(err:unknown)=>err instanceof Error?err.message:'当前任务不�
 /** All subject identity resolution and scoring are server-side. This view only
  * handles opaque school-specific codes and scientific plan identifiers.
  */
-export function SchoolProtectedReportStudio({api,organizationId}:{
-  api:SchoolApi;organizationId:string
+export function SchoolProtectedReportStudio({api,organizationId,compact=false}:{
+  api:SchoolApi;organizationId:string;compact?:boolean
 }){
   const [catalog,setCatalog]=useState<Catalog|null>(null)
   const [catalogLoading,setCatalogLoading]=useState(true)
@@ -51,18 +52,19 @@ export function SchoolProtectedReportStudio({api,organizationId}:{
     }catch(e){setError(problem(e))}
     finally{setBusy(false)}
   }
-  return <section className="hs-panel">
-    <h2>心理教师 · 受保护报告生成</h2>
+  return <section className={"hs-panel"+(compact?" hs-report-panel":"")}>
+    <SchoolReportHeader compact={compact} title={compact?"保护性反馈配置":"心理教师 · 受保护报告生成"} label="保护性反馈使用说明">
     <p>只处理本人当前正式服务个案中、已获批准并完成的校园测评。
       使用校园观察编号，不显示学生登录名、学号、评价者身份或任何原始作答。</p>
     <p>需要不少于五名独立有效评价者，并满足已发布科学方案的每项指标门槛。
       不满足条件时报告会被抑制；不同观察视角不得直接求平均或形成诊断结论。</p>
+    </SchoolReportHeader>
     {error&&<p role="alert" className="hs-alert">{error}</p>}
     {catalogLoading&&<p role="status">正在核查当前专业关系与已发布内容…</p>}
     {catalogError&&<div><p role="alert" className="hs-alert">{catalogError}</p>
       <button disabled={catalogLoading} onClick={()=>{setCatalogLoading(true);setCatalogError('');setCatalogRequest(value=>value+1)}}>重新读取报告目录</button>
     </div>}
-    {catalog&&<>
+    {catalog&&<div className={compact?"hs-report-controls":undefined}>
       <label className="hs-field"><span>合法个案与观察来源</span>
         <select value={choice} disabled={busy} onChange={e=>{setChoice(e.target.value);setResult(null)}}>
           <option value="">选择已结束的校园正式观察</option>
@@ -82,7 +84,7 @@ export function SchoolProtectedReportStudio({api,organizationId}:{
       <button disabled={busy||!source||!selectedSpec} onClick={()=>void generate()}>
         经近期动态验证码核验后生成
       </button>
-    </>}
+    </div>}
     {result&&<section className="hs-task-detail" role="region" aria-label="受保护报告生成结果">
       <h3>个案观察编号：{result.subjectReference}</h3>
       {result.status==='AVAILABLE'

@@ -1,0 +1,95 @@
+/* School staff navigation stays permission-driven; only its presentation is condensed. */
+.hs-app.hs-workspace.hs-professional .hs-header{grid-template-columns:minmax(0,1fr) auto;gap:4px 20px;min-height:0;padding-block:10px}
+.hs-app.hs-workspace.hs-professional .hs-header>.hs-workspace-brand{grid-column:1;grid-row:1;align-self:center}
+.hs-app.hs-workspace.hs-professional .hs-header>nav.hs-account-actions{grid-column:2;grid-row:1}
+.hs-app.hs-professional .hs-professional-navigation{grid-column:1/-1;grid-row:2;display:flex;align-items:center;flex-wrap:wrap;gap:4px 12px;min-width:0;padding-top:6px;border-top:1px solid var(--hs-border)}
+.hs-app.hs-workspace.hs-professional .hs-header .hs-professional-navigation>nav.hs-professional-groups{display:flex;flex:none;flex-wrap:nowrap;justify-content:flex-start;gap:4px;min-width:0;padding:0;border:0}
+.hs-app.hs-workspace.hs-professional .hs-header .hs-professional-navigation>nav.hs-professional-pages{position:relative;display:flex;flex:1 1 260px;flex-wrap:nowrap;justify-content:flex-start;gap:4px;min-width:0;max-width:100%;padding:0 0 0 12px;border:0;border-left:1px solid var(--hs-border);overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none}
+.hs-professional-pages::-webkit-scrollbar{display:none}
+.hs-app.hs-professional .hs-professional-navigation a{flex:none;min-height:44px;padding:7px 10px;gap:6px;border-radius:6px;font-size:13px;line-height:1.6;white-space:nowrap}
+.hs-app.hs-professional .hs-professional-pages>a{border:0;border-bottom:2px solid transparent;border-radius:0;background:transparent}
+.hs-app.hs-professional .hs-professional-pages>a[aria-current=page]{border-bottom-color:var(--hs-primary);background:transparent;color:var(--hs-primary);font-weight:600}
+.hs-app.hs-workspace.hs-professional .hs-main.hs-main-workspace{padding-top:14px}
+.hs-app.hs-professional .hs-workspace-page-heading{margin-bottom:14px}
+.hs-app.hs-professional .hs-workspace-page-heading h1{font-size:24px;line-height:1.5;margin-bottom:0}
+/* The selected function tab already names the page. Keep its H1 for assistive technology. */
+.hs-app.hs-professional:has(.hs-professional-pages [aria-current=page]) .hs-workspace-content>.hs-workspace-page-heading{height:0;min-height:0;margin:0;padding:0}
+.hs-app.hs-professional:has(.hs-professional-pages [aria-current=page]) .hs-workspace-content>.hs-workspace-page-heading>:not(h1){display:none}
+.hs-app.hs-professional:has(.hs-professional-pages [aria-current=page]) .hs-workspace-content>.hs-workspace-page-heading>h1{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
+/* Flat, single-row configuration tabs retain all existing controls and active states. */
+.hs-app.hs-professional :is(.hs-activity-config-tabs,.hs-recovery-tabs,.hs-admin-tabs,.education-private-tabs){display:flex;flex-wrap:nowrap;align-items:stretch;gap:4px;min-width:0;max-width:100%;padding:0;margin:0 0 12px;border:0;border-radius:0;background:transparent;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none}
+.hs-app.hs-professional :is(.hs-activity-config-tabs,.hs-recovery-tabs,.hs-admin-tabs,.education-private-tabs)::-webkit-scrollbar{display:none}
+.hs-app.hs-professional[data-theme] :is(.hs-activity-config-tabs,.hs-recovery-tabs,.hs-admin-tabs,.education-private-tabs)>button{flex:0 0 auto;min-height:44px;padding:7px 10px;border:0;border-bottom:2px solid transparent;border-radius:0;background:transparent;color:var(--hs-muted);font-size:13px;line-height:1.6;white-space:nowrap}
+.hs-app.hs-professional[data-theme] :is(.hs-activity-config-tabs,.hs-recovery-tabs,.hs-admin-tabs,.education-private-tabs)>button[aria-pressed=true]{border-bottom-color:var(--hs-primary);background:var(--hs-surface-soft);color:var(--hs-primary);font-weight:600}
+.hs-app.hs-professional .hs-activity-manager--compact>.hs-activity-detail{display:grid;grid-template-columns:minmax(0,1fr);gap:8px 16px;padding-top:0;margin-top:8px;border:0}
+.hs-app.hs-professional .hs-activity-manager--compact .hs-activity-detail>.hs-activity-summary{margin:0 0 4px;font-size:12px;line-height:1.7;text-align:left}
+.hs-app.hs-professional .hs-activity-manager--compact .hs-activity-detail>*{min-width:0}
+.hs-app.hs-professional .hs-activity-manager--compact .hs-activity-config-tabs{margin:0 0 4px}
+.hs-app.hs-professional .hs-workspace-content :is(.hs-report-panel,.hs-recovery-officer--compact,.hs-professional-class-scope,.hs-admin-panel){padding:18px 20px}
+.hs-app.hs-professional :is(.hs-report-heading,.hs-recovery-heading,.hs-professional-class-scope>header){margin-bottom:12px}
+.hs-app.hs-professional :is(.hs-recovery-pane,.hs-activity-config-panel)>h3{margin-bottom:12px}
+.hs-app.hs-professional .hs-workspace-content>.hs-workspace-context{margin-top:16px;padding-top:12px}
+@media(max-width:700px){
+ .hs-app.hs-workspace.hs-professional .hs-header{gap:4px 10px;padding-block:8px}
+ .hs-app.hs-professional .hs-professional-navigation{gap:0;padding-top:4px}
+ .hs-app.hs-workspace.hs-professional .hs-header .hs-professional-navigation>nav.hs-professional-groups{width:100%;justify-content:flex-start;gap:4px}
+ .hs-app.hs-workspace.hs-professional .hs-header .hs-professional-navigation>nav.hs-professional-pages{flex-basis:100%;padding:0;border:0}
+ .hs-app.hs-professional .hs-professional-navigation a{font-size:12px;padding-inline:8px}
+ .hs-app.hs-workspace.hs-professional .hs-main.hs-main-workspace{padding-top:12px}
+ .hs-app.hs-professional .hs-activity-manager--compact>.hs-activity-detail{grid-template-columns:minmax(0,1fr);gap:6px;margin-top:4px}
+ .hs-app.hs-professional .hs-workspace-content :is(.hs-report-panel,.hs-recovery-officer--compact,.hs-professional-class-scope,.hs-admin-panel){padding:16px 12px}
+ .hs-app.hs-professional[data-theme] :is(.hs-activity-config-tabs,.hs-recovery-tabs,.hs-admin-tabs,.education-private-tabs)>button{padding-inline:9px;font-size:12px}
+}
+@media(max-width:360px){
+ .hs-app.hs-workspace.hs-professional .hs-header{grid-template-columns:minmax(0,1fr)}
+ .hs-app.hs-workspace.hs-professional .hs-header>nav.hs-account-actions{grid-column:1;grid-row:2}
+ .hs-app.hs-professional .hs-professional-navigation{grid-row:3}
+}
+
+/* Keep the activity name beside its back action, and reserve creation for the list. */
+.hs-app.hs-professional .hs-activity-catalog-toolbar>.hs-activity-back:has(+.hs-activity-current-title){width:44px;min-width:44px;height:44px;margin:0;padding:0;flex:none;border:0;background:transparent}
+.hs-app.hs-professional .hs-activity-back:has(+.hs-activity-current-title)>span{display:none}
+.hs-app.hs-professional .hs-activity-current-title{flex:1;min-width:0;margin:0;font-family:inherit;font-size:20px;font-weight:600;line-height:1.5;color:var(--hs-ink);overflow-wrap:anywhere}
+.hs-activity-catalog-create{min-width:0;max-width:100%}
+.hs-activity-catalog-create[hidden]{display:none}
+.hs-app .hs-activity-catalog-create>.hs-activity-create{margin:0;padding:0;border:1px solid var(--hs-border);border-radius:9px;background:var(--hs-surface)}
+.hs-app .hs-activity-catalog-create>.hs-activity-create>summary{min-height:44px;padding:9px 12px;font-size:13px;line-height:1.7;white-space:nowrap;cursor:pointer}
+.hs-activity-catalog-create:has(.hs-activity-create[open]){flex:1 0 100%;width:100%}
+.hs-activity-catalog-create>.hs-activity-create[open]{width:100%}
+.hs-app.hs-professional .hs-activity-manager--compact:has(.hs-activity-create[open])>.hs-activity-detail{display:none}
+/* Recovery already has a selected destination and an action title below the tabs. */
+.hs-app.hs-professional .hs-recovery-officer--compact>.hs-recovery-heading{height:0;margin:0}
+.hs-app.hs-professional .hs-recovery-officer--compact>.hs-recovery-heading>h2{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.hs-app.hs-professional .hs-recovery-officer--compact>.hs-recovery-heading>.hs-teacher-task-help{position:absolute;right:0;top:0;z-index:2}
+.hs-app.hs-professional .hs-recovery-officer--compact>.hs-recovery-heading .hs-teacher-task-help>button{width:44px;min-height:44px;padding:8px;font-size:0;gap:0;justify-content:center}
+.hs-app.hs-professional .hs-recovery-officer--compact>.hs-recovery-tabs{width:calc(100% - 50px);margin-right:50px;padding-right:0}
+@media(max-width:700px){.hs-app.hs-professional .hs-activity-current-title{font-size:18px}}
+
+.hs-app.hs-professional .hs-activity-catalog-toolbar:has(.hs-activity-current-title){margin-bottom:8px}
+/* School/class labels already provide context; keep their selectors side by side on phones. */
+.hs-app.hs-professional .hs-professional-class-scope>header{margin-bottom:8px}
+.hs-app.hs-workspace.hs-professional[data-theme] .hs-workspace-content .hs-professional-class-scope>.hs-workspace-context{grid-template-columns:minmax(0,1fr) minmax(110px,.75fr);gap:10px 12px;align-items:start}
+.hs-app.hs-professional .hs-professional-class-scope .hs-workspace-context>label{min-width:0;width:100%;margin:0}
+.hs-app.hs-professional .hs-professional-class-scope .hs-workspace-context select{width:100%;max-width:none;min-width:0}
+.hs-app.hs-professional .hs-professional-class-scope .hs-context-security{min-height:32px;padding:0;border:0;align-self:center}
+.hs-app.hs-professional .hs-recovery-heading .hs-teacher-task-help-content{position:absolute;top:100%;right:0;left:auto;width:min(420px,calc(100vw - 64px));max-width:none;max-height:min(65vh,420px);overflow-y:auto;z-index:30}
+
+/* Wide screens put the three groups inside the brand/account banner. */
+@media(min-width:1101px){
+ .hs-app.hs-workspace.hs-professional .hs-header{grid-template-columns:auto minmax(0,1fr) auto}
+ .hs-app.hs-workspace.hs-professional .hs-header>nav.hs-account-actions{grid-column:3}
+ .hs-app.hs-professional .hs-professional-navigation{display:contents}
+ .hs-app.hs-workspace.hs-professional .hs-header .hs-professional-navigation>nav.hs-professional-groups{grid-column:2;grid-row:1;justify-self:center;justify-content:center}
+ .hs-app.hs-workspace.hs-professional .hs-header .hs-professional-navigation>nav.hs-professional-pages{grid-column:1/-1;grid-row:2;justify-self:stretch;padding:4px 0 0;border:0;border-top:1px solid var(--hs-border)}
+}
+/* Narrow screens keep groups and the current group's functions on separate rows. */
+@media(max-width:1100px){
+ .hs-app.hs-professional .hs-professional-navigation{row-gap:0}
+ .hs-app.hs-workspace.hs-professional .hs-header .hs-professional-navigation>nav.hs-professional-groups{width:100%;justify-content:flex-start}
+ .hs-app.hs-workspace.hs-professional .hs-header .hs-professional-navigation>nav.hs-professional-pages{flex-basis:100%;padding:0;border:0}
+}
+
+@media(max-width:380px){
+ .hs-app.hs-workspace.hs-school-admin .hs-header .hs-professional-navigation .hs-professional-pages:has(>a:nth-child(3):last-child)>a{padding-inline:6px;gap:4px;font-size:12px}
+ .hs-app.hs-school-admin .hs-professional-pages:has(>a:nth-child(3):last-child)>a>svg{display:none}
+}

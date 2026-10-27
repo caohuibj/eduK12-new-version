@@ -24,9 +24,9 @@ describe('Huischool Activity peer allocation after reopen',()=>{
     const originalConfirm=window.confirm
     window.confirm=vi.fn(()=>true)
     try{
-      render(<SchoolActivityManager api={api as unknown as SchoolApi}
+      render(<SchoolActivityManager compact api={api as unknown as SchoolApi}
         organizationId={org} isAdmin classes={[{id:classUnit,name:'五年级一班',unitKind:'CLASS'}]}/>)
-      fireEvent.change(await screen.findByLabelText('选择已有活动'),{target:{value:course}})
+      fireEvent.click(await screen.findByRole('button',{name:'配置活动：同伴支持'}))
       expect(await screen.findByText(/状态：已开放/)).toBeInTheDocument()
       const select=screen.getByLabelText('本次互评分配班级')
       fireEvent.change(select,{target:{value:classUnit}})
@@ -88,12 +88,12 @@ describe('School activity scoped class picker',()=>{
     expect(api.mock.calls.some(([path])=>path.endsWith('eligible-classes'))).toBe(false)
     fireEvent.change(screen.getByLabelText('选择已有活动'),{target:{value:course}})
     expect(await screen.findByText('班级目录暂不可用')).toBeInTheDocument()
-    expect(screen.getByRole('button',{name:'加入当前班级学生'})).toBeDisabled()
+    expect(screen.getByRole('button',{name:'加入所选班级学生'})).toBeDisabled()
     expect(screen.queryByText('管理目录中的其他班级')).not.toBeInTheDocument()
     fireEvent.click(screen.getByRole('button',{name:'重试加载班级'}))
-    await screen.findByRole('option',{name:'本人任教班级'})
-    fireEvent.change(screen.getByLabelText('班级'),{target:{value:classUnit}})
-    fireEvent.click(screen.getByRole('button',{name:'加入当前班级学生'}))
+    await screen.findByRole('checkbox',{name:'本人任教班级'})
+    fireEvent.click(screen.getByRole('checkbox',{name:'本人任教班级'}))
+    fireEvent.click(screen.getByRole('button',{name:'加入所选班级学生'}))
     await waitFor(()=>expect(api).toHaveBeenCalledWith(`${base}/${course}/participants`,'POST',expect.objectContaining({classUnitIds:[classUnit]})))
     expect(api.mock.calls.some(([path])=>path.includes('/units'))).toBe(false)
   })
@@ -114,10 +114,10 @@ describe('School activity scoped class picker',()=>{
     fireEvent.change(screen.getByLabelText('选择已有活动'),{target:{value:course}})
     await screen.findByText('正在加载可分配班级…')
     fireEvent.change(screen.getByLabelText('选择已有活动'),{target:{value:second.courseId}})
-    await screen.findByRole('option',{name:'第二活动班级'})
+    await screen.findByRole('checkbox',{name:'第二活动班级'})
     await act(async()=>{old.resolve({list:[{id:classUnit,name:'旧活动班级'}]})})
-    await waitFor(()=>expect(screen.queryByRole('option',{name:'旧活动班级'})).not.toBeInTheDocument())
-    expect(screen.getByRole('option',{name:'第二活动班级'})).toBeInTheDocument()
+    await waitFor(()=>expect(screen.queryByRole('checkbox',{name:'旧活动班级'})).not.toBeInTheDocument())
+    expect(screen.getByRole('checkbox',{name:'第二活动班级'})).toBeInTheDocument()
   })
 
   it('ignores an old activity detail after the organization changes and shows a scoped empty state',async()=>{
@@ -208,4 +208,73 @@ it('publishes own psychologist batch using server run capabilities without isAdm
     fireEvent.click(screen.getByRole('button',{name:'正式发布本人测评'}))
     await waitFor(()=>expect(api).toHaveBeenCalledWith(base+'/runs/run-own/publish','POST',{expectedVersion:2}))
   }finally{window.confirm=original}
+})
+
+it('separates compact configuration and preserves unsaved inputs per activity without opening anything',async()=>{
+ const second='00000000-0000-4000-8000-000000000004'
+ const draft={...activity,status:'DRAFT',runs:[],capabilities:{canSubmit:true}}
+ const other={...draft,courseId:second,title:'学习安排'}
+ const api=vi.fn(async(path:string)=>{
+  if(path.endsWith('pageSize=50'))return {list:[draft,other]}
+  if(path.endsWith('/eligible-classes'))return {list:[{id:classUnit,name:'五年级一班'}]}
+  if(path.endsWith('/'+second))return other
+  if(path.endsWith('/'+course))return draft
+  throw Error('unexpected compact activity read '+path)
+ })
+ render(<SchoolActivityManager compact api={api as unknown as SchoolApi} organizationId={org} isAdmin={false} classes={[]}/>)
+ expect(screen.getByRole('button',{name:'创建活动草稿'})).not.toBeVisible()
+ await screen.findByRole('button',{name:'配置活动：同伴支持'})
+ const choose=async(_id:string,title:string)=>{
+  const back=screen.queryByRole('button',{name:'返回活动列表'})
+  if(back)fireEvent.click(back)
+  fireEvent.click(await screen.findByRole('button',{name:'配置活动：'+title}))
+  await screen.findByRole('heading',{name:title})
+ }
+ await choose(course,'同伴支持')
+ expect(screen.getByRole('button',{name:'班级与参与者'})).toHaveAttribute('aria-pressed','true')
+ expect(screen.queryByRole('button',{name:'提交学校审核'})).not.toBeInTheDocument()
+ fireEvent.click(screen.getByRole('button',{name:'阅读／练习／打卡'}))
+ expect(screen.getByRole('region',{name:'阅读、练习与打卡'})).toBeVisible()
+ fireEvent.change(screen.getByLabelText('任务名称'),{target:{value:'活动A未保存标题'}})
+ fireEvent.change(screen.getByLabelText('内容'),{target:{value:'活动A未保存内容'}})
+ fireEvent.click(screen.getByRole('button',{name:'正式测评批次'}))
+ fireEvent.change(screen.getByLabelText('测评批次名称'),{target:{value:'活动A未保存批次'}})
+ fireEvent.click(screen.getByRole('button',{name:'进度与结果说明'}))
+ expect(screen.getByRole('button',{name:'提交学校审核'})).toBeInTheDocument()
+ await choose(second,'学习安排')
+ fireEvent.click(screen.getByRole('button',{name:'阅读／练习／打卡'}))
+ expect(screen.getByLabelText('任务名称')).toHaveValue('')
+ expect(screen.getByLabelText('内容')).toHaveValue('')
+ fireEvent.change(screen.getByLabelText('任务名称'),{target:{value:'活动B未保存标题'}})
+ await choose(course,'同伴支持')
+ fireEvent.click(screen.getByRole('button',{name:'阅读／练习／打卡'}))
+ expect(screen.getByLabelText('任务名称')).toHaveValue('活动A未保存标题')
+ expect(screen.getByLabelText('内容')).toHaveValue('活动A未保存内容')
+ fireEvent.click(screen.getByRole('button',{name:'正式测评批次'}))
+ expect(screen.getByLabelText('测评批次名称')).toHaveValue('活动A未保存批次')
+ expect(api.mock.calls.every(call=>call.length===1)).toBe(true)
+})
+
+
+it.each([true,false])('keeps compact psychologist lifecycle controls in the results panel and honors backend canOpen=%s',async canOpen=>{
+ const detail={...activity,status:'SUBMITTED',runs:[],capabilities:{canOpen,canSubmit:false,canClose:false,canPause:false,canResume:false,canPublishRun:false,ownPsychologyPublisher:true}}
+ const api=vi.fn(async(path:string)=>path.endsWith('pageSize=50')?{list:[detail]}:detail)
+ render(<SchoolActivityManager compact api={api as unknown as SchoolApi} organizationId={org} isAdmin={false} classes={[]}/>)
+ const help=screen.getByRole('button',{name:'活动与发布说明'})
+ expect(help).toHaveAttribute('aria-expanded','false')
+ expect(screen.queryByText(/教师准备活动；学校管理员/)).not.toBeInTheDocument()
+ fireEvent.click(help)
+ expect(screen.getByText(/只有已批准班级中的授权学生/)).toBeInTheDocument()
+ fireEvent.keyDown(help,{key:'Escape'})
+ expect(help).toHaveAttribute('aria-expanded','false')
+ fireEvent.click(await screen.findByRole('button',{name:'配置活动：同伴支持'}))
+ await screen.findByRole('heading',{name:'同伴支持'})
+ expect(screen.getByRole('button',{name:'班级与参与者'})).toHaveAttribute('aria-pressed','true')
+ expect(screen.queryByRole('button',{name:'开放本人活动'})).not.toBeInTheDocument()
+ fireEvent.click(screen.getByRole('button',{name:'进度与结果说明'}))
+ expect(screen.getByRole('region',{name:'活动进度与结果'})).toBeVisible()
+ expect(screen.queryByRole('region',{name:'阅读、练习与打卡'})).not.toBeInTheDocument()
+ if(canOpen)expect(screen.getByRole('button',{name:'开放本人活动'})).toBeEnabled()
+ else expect(screen.queryByRole('button',{name:'开放本人活动'})).not.toBeInTheDocument()
+ expect(api.mock.calls.every(call=>call.length===1)).toBe(true)
 })

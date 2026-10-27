@@ -890,3 +890,20 @@ describe('shared V1 text runner across hosts',()=>{
     if(host==='survey')await waitFor(()=>expect(onCompleted).toHaveBeenCalledTimes(1))
   })
 })
+
+ it('keeps School instructions collapsible without changing a selected response or submitting',async()=>{
+  const value=startData()
+  const client:any={start:vi.fn(),resume:vi.fn().mockResolvedValue({code:0,data:value}),result:vi.fn(),submit:vi.fn(),loadAsset:vi.fn(),loadVideoSources:vi.fn()}
+  const {container}=render(<MemoryRouter><SituationalRunner campus={{attemptId:'ui-attempt',parentAttemptId:'school-parent',compositeItemId:'school-slot',client,instructionsSummary:'作答说明',onCompleted:vi.fn()}}/></MemoryRouter>)
+  const answer=await screen.findByRole('radio',{name:'选择 A'})
+  fireEvent.click(answer)
+  await waitFor(()=>expect(answer).toBeChecked())
+  const details=container.querySelector('details.assessment-instructions')!
+  expect(details).not.toHaveAttribute('open')
+  fireEvent.click(screen.getByText('作答说明',{exact:true}))
+  expect(details).toHaveAttribute('open')
+  fireEvent.click(screen.getByText('作答说明',{exact:true}))
+  expect(details).not.toHaveAttribute('open')
+  expect(answer).toBeChecked()
+  expect(client.submit).not.toHaveBeenCalled()
+ })

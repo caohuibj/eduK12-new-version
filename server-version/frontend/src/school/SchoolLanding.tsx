@@ -33,22 +33,22 @@ export function SchoolPublicHeader({ onHome, onLogin, onRegister, onExplore, hom
     return () => { document.removeEventListener('keydown', close); document.removeEventListener('pointerdown', outside) }
   }, [open])
   const act = (action: () => void) => { setOpen(false); action() }
-  return <header className="hs-public-header" ref={header}>
+  return <header className={`hs-public-header${home ? ' hs-public-header--landing' : ''}`} ref={header}>
     <button className="hs-home-link" type="button" onClick={() => act(onHome)} aria-label="School 首页"><SchoolMark /></button>
     <nav className={`hs-public-nav${open ? ' hs-public-nav-open' : ''}`} id="hs-public-navigation" aria-label="校园导航">
       <button type="button" onClick={() => act(onHome)} aria-current={home ? 'page' : undefined}>首页</button>
       <a href="#hs-features" onClick={event => { event.preventDefault(); act(() => onExplore('hs-features')) }}>产品功能</a>
-      {appearance && <ProductThemeControl appearance={appearance} product="School"/>}
     </nav>
-    <div className="hs-header-actions" aria-label="校园账号入口">
-      <button type="button" className="hs-login-entry" onClick={() => act(onLogin)}>登录</button>
-      <button type="button" className="hs-register-entry hs-primary" onClick={() => act(onRegister)}>注册</button>
-    </div>
     <div className="hs-navigation-toggle">
       <button type="button" className="hs-menu-toggle" ref={menuButton} aria-expanded={open} aria-controls="hs-public-navigation"
         aria-label={open ? '关闭菜单' : '打开菜单'} onClick={() => setOpen(value => !value)}>
         {open ? <X size={22} aria-hidden="true" /> : <Menu size={22} aria-hidden="true" />}
       </button>
+    </div>
+    <div className="hs-header-actions" aria-label="校园账号入口">
+      <button type="button" className={`hs-login-entry${home ? ' hs-primary' : ''}`} onClick={() => act(onLogin)}>登录</button>
+      <button type="button" className={`hs-register-entry${home ? '' : ' hs-primary'}`} onClick={() => act(onRegister)}>注册</button>
+      {appearance && <ProductThemeControl appearance={appearance} product="School"/>}
     </div>
   </header>
 }

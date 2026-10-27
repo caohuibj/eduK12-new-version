@@ -126,7 +126,7 @@
  .hs-public-header .hs-brand-icon { width:42px;height:34px; }
  .hs-public-header .hs-brand strong { font-size:22px; }
  .hs-header-actions { gap:4px; }
- .hs-app .hs-header-actions>.hs-login-entry { min-width:44px;min-height:44px;padding:8px 5px;border:0;background:transparent;font-size:13px; }
+ .hs-app .hs-header-actions>.hs-login-entry { min-width:44px;min-height:44px;padding:8px 5px;border:0;background:transparent;color:var(--hs-ink);font-size:13px; }
  .hs-app .hs-header-actions>.hs-register-entry { min-width:52px;min-height:44px;padding:8px 9px;font-size:13px; }
  .hs-public-nav { left:12px;right:12px; }
  .hs-landing-hero { padding:18px 16px;gap:24px; }

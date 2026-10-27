@@ -28,7 +28,7 @@ const { spawn, execFileSync } = require('node:child_process')
 const { pathToFileURL } = require('node:url')
 const { randomUUID, createHmac } = require('node:crypto')
 const { readFixture, sourceIdentity, backend, repo, sha } = require('./school-teacher-fixture.cjs')
-const { probeKeyboard, prepareRenderedCjk, createUiChecks, verifyReport, validateOfficialFrontendReceipt, validateOfficialBackendReceipt, computeBackendCompileDigest } = require('./school-teacher-ui.cjs')
+const { readLayoutState, probeKeyboard, prepareRenderedCjk, createUiChecks, verifyReport, validateOfficialFrontendReceipt, validateOfficialBackendReceipt, computeBackendCompileDigest } = require('./school-teacher-ui.cjs')
 const { preflightChrome, verifyChromeSandbox, inspectCjkFonts, CHROME_LAUNCH_OPTIONS } = require('./school-teacher-chrome.cjs')
 const pause = ms => new Promise(resolve => setTimeout(resolve, ms))
 const origins = { SCHOOL: 'https://school.eduk12.top', TEACHER: 'https://teacher.eduk12.top' }
@@ -319,6 +319,21 @@ async function run() {
     stage = 'browser-sandbox-evidence'
     report.chrome.sandbox = await verifyChromeSandbox(browser)
     assert.equal(report.chrome.sandbox.ok, true, 'Runtime sandbox evidence missing or unsafe')
+    stage = 'layout-detector-native-contract'
+    // A network-free synthetic page verifies the detector on this exact browser.
+    // Business pages and API responses remain untouched.
+    const layoutContext = await browser.newContext({ viewport: { width: 320, height: 844 } })
+    try {
+      const page = await layoutContext.newPage()
+      await page.setContent('<details><summary>Closed</summary><select style="width:500px"><option>Sort</option></select></details><select id="visible" style="width:500px"><option>Visible</option></select>')
+      const closed = await page.evaluate(readLayoutState)
+      assert.equal(closed.clipped.length, 1, 'Visible overflowing SELECT must remain a failure')
+      assert.equal(closed.clipped[0].tag, 'SELECT')
+      await page.locator('summary').click()
+      const opened = await page.evaluate(readLayoutState)
+      assert.equal(opened.clipped.length, 2, 'Opening details must expose its overflowing SELECT')
+      report.layoutDetector = { status: 'PASSED', closedVisibleClips: 1, openVisibleClips: 2 }
+    } finally { await layoutContext.close() }
     // Do not inherit production credentials, external storage, mail or telemetry.
 
     async function session(product, user, label, options = {}) {
@@ -507,7 +522,12 @@ async function run() {
       await locator.focus(); await locator.press('Space')
       if (pressed) assert.equal(await locator.getAttribute('aria-pressed'), 'true', 'Keyboard Space selects the scale option')
       else assert.equal(await locator.isChecked(), true, 'Keyboard Space selects the native control')
-      assert.equal(await locator.evaluate(el => document.activeElement === el && el.matches(':focus-visible')), true, 'Keyboard focus remains visible')
+      // Selection can update aria-pressed before its asynchronous save unlocks
+      // the native control. Check final focus only after that real unlock.
+      await s.page.waitForFunction(el => el.isConnected && !el.disabled, await locator.elementHandle())
+      const focus = await locator.evaluate(el => ({ same: document.activeElement === el, visible: el.matches(':focus-visible'), disabled: el.disabled, activeTag: document.activeElement?.tagName }))
+      ;(report.keyboardDiagnostics ||= []).push({ product: s.product, pressed, ...focus })
+      assert.equal(focus.same && focus.visible, true, 'Keyboard focus remains visible')
       report.keyboard.push({ product: s.product, action: 'Space', control: pressed ? 'scale-option-button' : await locator.getAttribute('type'), selected: true, focusVisible: true })
     }
     async function toolsPage(s, f) {
@@ -537,6 +557,7 @@ async function run() {
       const title = `${s.product} 合成${kind} ${fixture.suffix}`
       await toolsPage(s, f)
       const studio = p.getByRole('region', { name: '我的私有工具', exact: true })
+      if (s.product === 'SCHOOL') await studio.locator('details.education-private-create > summary').click()
       await studio.getByLabel('工具名称', { exact: true }).fill(title)
       await studio.getByRole('combobox', { name: '类型', exact: true }).selectOption(kind)
       const draft = await s.click(studio.getByRole('button', { name: '创建私有工具' }), base)
@@ -544,10 +565,20 @@ async function run() {
       await s.api(uri, 'PUT', { expectedRevision: draft.revision, title, definition: f.definitions[kind.toLowerCase()] })
       await s.click(studio.getByRole('button', { name: '重新读取草稿' }), uri, 'GET')
       if (kind === 'FORM') {
-        const outline = studio.getByRole('navigation', { name: '表单区段与题目', exact: true })
-        await outline.getByRole('button', { name: '编辑题目：合成矩阵题', exact: true }).click()
+        const outline = studio.getByRole('navigation', { name: s.product === 'SCHOOL' ? '表单分组与题目' : '表单区段与题目', exact: true })
+        const choose = async prompt => {
+          const button = outline.getByRole('button', { name: '编辑题目：' + prompt, exact: true })
+          // The response can precede React's replacement of the empty editor.
+          // Wait for the actual new question, then let its ResizeObserver settle
+          // before opening the current disclosure rather than the old editor.
+          await button.waitFor({ state: 'attached' })
+          await p.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))))
+          if (s.product === 'SCHOOL' && !await button.isVisible()) await studio.locator('details.education-private-directory-disclosure > summary').click()
+          await button.click()
+        }
+        await choose('合成矩阵题')
         await shot(s, 'form-author-editor')
-        await outline.getByRole('button', { name: '编辑题目：合成单选条件题', exact: true }).click()
+        await choose('合成单选条件题')
       }
       const input = studio.getByLabel('工具名称', { exact: true }), savedTitle = title + ' 已保存'
       await input.fill(savedTitle)
@@ -590,7 +621,8 @@ async function run() {
     async function workflowPage(s, f, w) {
       if (s.product === 'SCHOOL') {
         await s.page.goto(s.origin + '/workspace/activities?organizationId=' + f.organizationId)
-        await s.page.getByRole('combobox', { name: '选择已有活动', exact: true }).selectOption(w.id)
+        await s.page.getByRole('button', { name: '配置活动：' + w.title, exact: true }).click()
+        await s.page.getByRole('navigation', { name: '活动配置分区', exact: true }).getByRole('button', { name: '正式测评批次', exact: true }).click()
         await s.page.getByRole('button', { name: w.runName + ' · 准备中', exact: true }).click()
         return s.page
       }
@@ -665,7 +697,7 @@ async function run() {
           : p.locator('article.ht-event').filter({ hasText: versions[kind].title })
         const open = async () => {
           const loaded = p.waitForResponse(r => r.request().method() === 'GET' && new RegExp('^' + s.prefix + '/(?:private-form-)?composite-attempts/[^/]+$').test(new URL(r.url()).pathname))
-          await card().getByRole('button', { name: s.product === 'SCHOOL' ? '开始／继续官方测评' : kind === 'SCALE' ? '进入本人自评' : '打开本人表单', exact: true }).click()
+          await card().getByRole('button', { name: s.product === 'SCHOOL' ? '开始／继续官方测评' : /^(开始测评|继续测评)$/, exact: true }).click()
           if (s.product === 'SCHOOL') {
             const consent = p.getByRole('checkbox', { name: '我已阅读本次测评的用途与可见性说明，自愿同意作答。', exact: true })
             if (await consent.count()) await consent.check()
@@ -695,23 +727,31 @@ async function run() {
           assert.deepEqual(fields.map(field => field.type), ['SINGLE', 'SHORT_TEXT', 'MULTIPLE', 'MATRIX'])
           assert.ok(fields.every(field => field.type === field.formDefinition.type))
           const player = () => p.locator('.form-player')
-          await keyboardCheck(s, player().getByRole('radio', { name: '合成选项乙', exact: true }))
-          await player().getByRole('button', { name: '下一字段', exact: true }).click()
+          const firstChoice = player().getByRole('radio', { name: '合成选项乙', exact: true })
+          await firstChoice.focus(); await firstChoice.press('Space')
+          // Auto-advance deliberately focuses the next question, not the now
+          // unmounted radio. Verify that real keyboard destination, then read
+          // the original saved selection after navigating back.
           await player().getByRole('group', { name: /合成多选题/ }).waitFor()
-          await player().getByRole('button', { name: '上一字段', exact: true }).click()
-          await player().getByRole('radio', { name: '合成选项甲', exact: true }).check()
+          assert.equal(await player().evaluate(el => document.activeElement === el && el.matches(':focus-visible')), true, 'Auto-advanced question receives visible keyboard focus')
+          await player().getByRole('button', { name: '上一题', exact: true }).click()
+          assert.equal(await player().getByRole('radio', { name: '合成选项乙', exact: true }).isChecked(), true)
+          report.keyboard.push({ product: s.product, action: 'Space', control: 'radio', selected: true, focusVisible: true, focusTarget: 'next-question' })
+          const selected = player().getByRole('radio', { name: '合成选项乙', exact: true })
+          await selected.focus(); await selected.press('ArrowLeft')
+          assert.equal(await player().getByRole('radio', { name: '合成选项甲', exact: true }).isChecked(), true)
           await p.getByRole('button', { name: '保存并退出', exact: true }).click(); await open()
           assert.equal(await player().getByRole('radio', { name: '合成选项甲', exact: true }).isChecked(), true)
           await shot(s, 'typed-single-restored')
-          await player().getByRole('button', { name: '下一字段', exact: true }).click()
+          await player().getByRole('button', { name: '下一题', exact: true }).click()
           const refuse = player().getByRole('checkbox', { name: '我选择不回答这一题', exact: true })
           await refuse.check(); await refuse.uncheck()
           assert.equal(await player().getByRole('textbox').isEnabled(), true)
-          await refuse.check(); await player().getByRole('button', { name: '下一字段', exact: true }).click()
+          await refuse.check(); await player().getByRole('button', { name: '下一题', exact: true }).click()
           await player().getByRole('checkbox', { name: '合成选项甲', exact: true }).check()
           await player().getByRole('checkbox', { name: '合成选项乙', exact: true }).check()
           await shot(s, 'typed-multiple')
-          await player().getByRole('button', { name: '下一字段', exact: true }).click()
+          await player().getByRole('button', { name: '下一题', exact: true }).click()
           const row = player().getByRole('group', { name: '合成矩阵第一行', exact: true }), rowRefusal = row.getByRole('checkbox', { name: '不愿回答本行' })
           await rowRefusal.check(); await rowRefusal.uncheck()
           assert.equal(await row.getByRole('radio', { name: '合成选项甲' }).isEnabled(), true)
@@ -720,7 +760,7 @@ async function run() {
           await shot(s, 'typed-matrix-row-refusal')
           for (const section of [1, 2]) {
             const pending = p.waitForResponse(r => r.request().method() === 'POST' && /\/form-sections\/[^/]+\/submit$/.test(new URL(r.url()).pathname))
-            await player().getByRole('button', { name: '提交整个区段', exact: true }).click()
+            await player().getByRole('button', { name: s.product === 'SCHOOL' ? '提交本页' : '提交整个区段', exact: true }).click()
             const response = await pending; assert.equal(response.status(), 200)
             if (section === 1) {
               const payload = response.request().postDataJSON(), values = Object.fromEntries(payload.answers.map(answer => [answer.formItemId, answer.value]))
@@ -735,7 +775,7 @@ async function run() {
         }
         if (s.product === 'SCHOOL') {
           await p.getByRole('button', { name: '返回我的校园活动', exact: true }).click()
-          await card().getByText('状态：已完成', { exact: true }).waitFor()
+          await card().getByLabel('状态：已完成', { exact: true }).waitFor()
         } else if (kind === 'FORM') {
           const completedForm = p.locator('.ht-task').filter({ has: p.getByText('本次表单已正式提交。', { exact: true }) })
           await completedForm.getByText('本次表单已正式提交。', { exact: true }).waitFor()

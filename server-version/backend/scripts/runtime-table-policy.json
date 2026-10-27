@@ -53,6 +53,10 @@
     "campus_parent_registrations": "RUNTIME_RW",
     "campus_peer_assignments": "RUNTIME_RW",
     "campus_peer_consents": "RUNTIME_RW",
+    "campus_personnel": "RUNTIME_RW",
+    "campus_personnel_import_batches": "RUNTIME_RW",
+    "campus_personnel_assignments": "RUNTIME_RW",
+    "campus_personnel_credentials": "RUNTIME_RW",
     "campus_staff_invitations": "RUNTIME_RW",
     "campus_student_eligibilities": "RUNTIME_RW",
     "campus_student_enrollments": "RUNTIME_RW",
@@ -260,6 +264,8 @@
     "survey_package_grants": "RUNTIME_RW",
     "survey_package_imports": "RUNTIME_RW",
     "survey_package_members": "RUNTIME_RW",
-    "survey_package_report_artifacts": "RUNTIME_RW"
+    "survey_package_report_artifacts": "RUNTIME_RW",
+    "education_roster_import_jobs": "RUNTIME_RW",
+    "education_roster_import_parts": "RUNTIME_RW"
   }
 }

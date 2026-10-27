@@ -1,9 +1,14 @@
 import a1Emblem from './huischool-a1-emblem.svg'
-import schoolWordmark from './huischool-wordmark.svg'
+import a1EmblemDark from './huischool-a1-emblem-dark.svg'
+import schoolWordmark from './school-home-wordmark.svg'
+import './school-brand.css'
 
 /** Preserve the approved A1 artwork; the two-line wordmark is outlined SVG. */
 export function HuischoolA1Emblem({ className }: { className: string }) {
-  return <img className={className} src={a1Emblem} alt="" aria-hidden="true"/>
+  return <>
+    <img className={`${className} hs-emblem hs-emblem--light`} src={a1Emblem} alt="" aria-hidden="true"/>
+    <img className={`${className} hs-emblem hs-emblem--dark`} src={a1EmblemDark} alt="" aria-hidden="true"/>
+  </>
 }
 export function SchoolMark() {
   return <div className="hs-brand" aria-label="School @eduk12.top">

@@ -52,6 +52,7 @@ describe('CognitiveRunner page', () => {
       result: null,
     }
     renderAt('/student/cognitive/sessions/s1')
+    expect(screen.getByRole('button', { name: '开始测评' }).closest('.cognitive-preparation')).not.toBeNull()
     expect(screen.getByRole('button', { name: '开始测评' })).toBeDisabled()
     await waitFor(() => expect(screen.getByRole('button', { name: '开始测评' })).toBeEnabled())
   })

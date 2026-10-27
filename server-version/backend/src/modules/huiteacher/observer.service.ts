@@ -253,6 +253,19 @@ const plain=(cipher:string)=>{
     denied('HUITEACHER_OBSERVATION_CIPHER_INVALID')
   return value.content
 }
+/** Serialize the formal slot across tabs, drafts and retries without changing
+ * immutable evidence or requiring a destructive cleanup of older duplicates. */
+async function requireOpenFormalFeedbackSlot(tx:Tx,input:{
+  organizationId:string;eventId:string;actorUserId:string
+}){
+  const key=JSON.stringify(['huiteacher-formal-feedback-v1',input.organizationId,input.eventId,input.actorUserId])
+  await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${key},94261))`
+  const completed=await tx.huiteacherObservationRecord.findFirst({where:{
+    organizationId:input.organizationId,eventId:input.eventId,
+    observerUserId:input.actorUserId,kind:'FORMAL_FEEDBACK',status:'SUBMITTED',
+  },select:{id:true}})
+  if(completed)denied('HUITEACHER_FORMAL_FEEDBACK_ALREADY_SUBMITTED')
+}
 export async function createHuiteacherObservation(input:{
   organizationId:string;eventId:string;actorUserId:string;
   kind:TeacherObservationKind;content:string
@@ -261,6 +274,7 @@ export async function createHuiteacherObservation(input:{
     await schoolEvent(tx,input)
     await activeObserver(tx,{organizationId:input.organizationId,
       eventId:input.eventId,userId:input.actorUserId})
+    if(input.kind==='FORMAL_FEEDBACK')await requireOpenFormalFeedbackSlot(tx,input)
     const item=await tx.huiteacherObservationRecord.create({data:{
       id:randomUUID(),organizationId:input.organizationId,
       eventId:input.eventId,observerUserId:input.actorUserId,
@@ -280,6 +294,9 @@ export async function updateHuiteacherObservation(input:{
     await schoolEvent(tx,{organizationId:item.organizationId,eventId:item.eventId})
     await activeObserver(tx,{organizationId:item.organizationId,
       eventId:item.eventId,userId:input.actorUserId})
+    if(item.kind==='FORMAL_FEEDBACK')await requireOpenFormalFeedbackSlot(tx,{
+      organizationId:item.organizationId,eventId:item.eventId,actorUserId:input.actorUserId,
+    })
     const updated=await tx.huiteacherObservationRecord.updateMany({where:{
       id:input.id,observerUserId:input.actorUserId,
       status:'DRAFT',revision:input.expectedRevision,
@@ -303,6 +320,9 @@ export async function submitHuiteacherObservation(input:{
       eventId:item.eventId,userId:input.actorUserId})
     if(item.status!=='DRAFT'||item.revision!==input.expectedRevision)
       denied('HUITEACHER_OBSERVATION_REVISION_CHANGED')
+    if(item.kind==='FORMAL_FEEDBACK')await requireOpenFormalFeedbackSlot(tx,{
+      organizationId:item.organizationId,eventId:item.eventId,actorUserId:input.actorUserId,
+    })
     const bound=await readBoundHuiteacherFieldForm(tx,{
       organizationId:item.organizationId,eventId:item.eventId,
     })

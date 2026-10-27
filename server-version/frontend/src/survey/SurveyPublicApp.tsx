@@ -119,10 +119,10 @@ const publicApi=async <T,>(path:string,method='GET',body?:unknown):Promise<T>=>{
   if(!result.ok||envelope.code!==0||!envelope.data)throw new SurveyPublicApiError(envelope.message||'操作未完成',result.status)
   return envelope.data
 }
-export function TaskForm({unit,answer,onChange,proof,pageIndex,onPageChange,purpose='SURVEY',readOnly=false,videoComplete,onVideoComplete,imageReady,onImageReadyChange}:{unit:Unit;answer:Record<string,Answer>;
+export function TaskForm({unit,answer,onChange,proof,pageIndex,onPageChange,purpose='SURVEY',readOnly=false,advanceSingleChoiceFocus=false,videoComplete,onVideoComplete,imageReady,onImageReadyChange}:{unit:Unit;answer:Record<string,Answer>;
   onChange:(name:string,value:Answer)=>void;proof?:SurveyImageProof;
   pageIndex:number;onPageChange:(next:number)=>void;
-  purpose?:'SURVEY'|'HUITEACHER';readOnly?:boolean;videoComplete?:Record<string,boolean>;onVideoComplete?:(itemKey:string)=>void;imageReady?:Record<string,boolean>;onImageReadyChange?:(itemKey:string,ready:boolean)=>void}){
+  purpose?:'SURVEY'|'HUITEACHER';readOnly?:boolean;advanceSingleChoiceFocus?:boolean;videoComplete?:Record<string,boolean>;onVideoComplete?:(itemKey:string)=>void;imageReady?:Record<string,boolean>;onImageReadyChange?:(itemKey:string,ready:boolean)=>void}){
   const [pageError,setPageError]=useState('')
   const surveyForm=purpose==='SURVEY'&&unit.kind==='FORM'
 
@@ -133,6 +133,21 @@ export function TaskForm({unit,answer,onChange,proof,pageIndex,onPageChange,purp
     .filter(p=>p.questions.some(q=>shownFormKeys?.has(q.itemKey))):[],[unit,shownFormKeys])
   const currentIndex=Math.min(pageIndex,Math.max(0,visiblePages.length-1))
   const activePage=visiblePages[currentIndex]
+  const pendingChoiceFocus=useRef<{key:string;value:string;unit:string;page:string}|null>(null)
+  useEffect(()=>{
+    const pending=pendingChoiceFocus.current
+    if(!advanceSingleChoiceFocus||readOnly||!pending||answer[pending.key]!==pending.value)return
+    pendingChoiceFocus.current=null
+    if(!activePage||pending.unit!==unit.instrumentKey||pending.page!==activePage.pageKey)return
+    const questions=activePage.questions.filter(q=>shownFormKeys?.has(q.itemKey))
+    const index=questions.findIndex(q=>q.itemKey===pending.key),question=questions[index]
+    if(!question||hasSelectedOther(question,answer[pending.key]))return
+    const next=questions[index+1]
+    if(!next)return // A page/block boundary always requires the existing manual action.
+    const target=document.getElementById('survey-answer-'+unit.instrumentKey+'-'+next.itemKey)
+    target?.focus({preventScroll:true});target?.scrollIntoView?.({block:'start'})
+  },[advanceSingleChoiceFocus,readOnly,answer,unit.instrumentKey,activePage,shownFormKeys])
+
   // A one-page form often repeats the tool name with only a generic suffix.
   const headingKey=(title:string)=>title.trim().replace(/\s+/g,'').replace(/(?:表单|问卷|表)$/u,'')
   const repeatedPageHeading=surveyForm&&visiblePages.length===1&&!!activePage
@@ -185,7 +200,7 @@ export function TaskForm({unit,answer,onChange,proof,pageIndex,onPageChange,purp
     }):options.map(o=><label className={surveyForm?'survey-form-choice':'block my-2 text-sm'} key={o.optionKey}>
       <input type="radio" name={unit.instrumentKey+'-'+q.itemKey}
         checked={answer[q.itemKey]===o.optionKey} disabled={unit.kind==='SCALE'&&!!q.images?.length&&imageReady?.[q.itemKey]!==true}
-        onChange={()=>onChange(q.itemKey,o.optionKey)}/><span>{o.label}</span></label>)
+        onChange={()=>{if(advanceSingleChoiceFocus&&activePage)pendingChoiceFocus.current={key:q.itemKey,value:o.optionKey,unit:unit.instrumentKey,page:activePage.pageKey};onChange(q.itemKey,o.optionKey)}}/><span>{o.label}</span></label>)
   const item=(q:Question,index?:number)=>{
     if(shownFormKeys&&!shownFormKeys.has(q.itemKey))return null
     return <fieldset disabled={readOnly} className={'border rounded-lg p-4 my-4 bg-white scroll-mt-4'+(surveyForm?' survey-form-item survey-form-item--'+q.type.toLowerCase():'')}

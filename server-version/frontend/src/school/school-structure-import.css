@@ -1,0 +1,25 @@
+:is(.hs-app.hs-school-admin,.education-roster) .hs-structure-import{margin:0 0 16px}
+:is(.hs-app.hs-school-admin,.education-roster) .hs-structure-import-toggle{min-height:44px;border-color:var(--hs-primary);color:var(--hs-primary)}
+:is(.hs-app.hs-school-admin,.education-roster) .hs-structure-import:has(>button[aria-expanded=true])+:is(.hs-admin-create-grid,.hs-admin-manual-create){display:none}
+:is(.hs-app.hs-school-admin,.education-roster) .hs-structure-import>section{padding-top:16px}
+.hs-structure-import-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:12px 20px;align-items:start}
+:is(.hs-app.hs-school-admin,.education-roster) .hs-structure-import .hs-structure-import-hint{font-size:12px;line-height:1.8;margin:10px 0;color:var(--hs-muted)}
+:is(.hs-app.hs-school-admin,.education-roster) .hs-structure-import input[type=file]{padding:8px;font-size:13px;white-space:normal}
+.hs-structure-import-preview{border-top:1px solid var(--hs-border);margin-top:16px;padding-top:16px;min-width:0}
+:is(.hs-app.hs-school-admin,.education-roster) .hs-structure-import-preview h3{margin:0 0 8px}
+.hs-structure-import-preview ol{padding:0;margin:12px 0;max-height:360px;overflow:auto;list-style:none}
+.hs-structure-import-preview li{display:grid;grid-template-columns:70px minmax(0,1fr) minmax(130px,.7fr);gap:8px 14px;align-items:start;padding:10px 0;border-bottom:1px solid var(--hs-border);font-size:13px;line-height:1.7;overflow-wrap:anywhere}
+.hs-structure-import-preview li>span{color:var(--hs-muted)}
+.hs-structure-import-preview li[data-state=error]{border-left:3px solid var(--hs-accent);padding-left:10px}
+@media(max-width:600px){
+ .hs-structure-import-fields{grid-template-columns:minmax(0,1fr)}
+ .hs-structure-import-preview li{grid-template-columns:60px minmax(0,1fr)}
+ .hs-structure-import-preview li>span:last-child{grid-column:2}
+ :is(.hs-app.hs-school-admin,.education-roster) .hs-structure-import .hs-actions{display:flex;flex-direction:row;gap:10px}
+ :is(.hs-app.hs-school-admin,.education-roster) .hs-structure-import .hs-actions>button{flex:1;width:auto}
+ :is(.hs-app.hs-school-admin,.education-roster) .hs-structure-import-preview>.hs-primary{width:100%}
+}
+
+:is(.hs-app.hs-school-admin,.education-roster) .hs-admin-manual-create{margin:12px 0 0;padding:0;border:0;background:transparent}
+:is(.hs-app.hs-school-admin,.education-roster) .hs-admin-manual-create>summary{font-size:13px;color:var(--hs-primary);padding:10px 0}
+:is(.hs-app.hs-school-admin,.education-roster) .hs-admin-manual-create .hs-admin-create-grid{margin-top:10px}

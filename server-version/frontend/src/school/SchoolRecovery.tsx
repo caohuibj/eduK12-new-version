@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react'
+import {SchoolTaskHelp} from './SchoolTaskHelp'
 
 export type SchoolApi = <T>(path: string, method?: string, payload?: unknown, options?: { responseType?: 'blob' }) => Promise<T>
 
@@ -48,7 +49,8 @@ export function SchoolStudentRecovery({api,onComplete}: {api:SchoolApi;onComplet
   </section>
 }
 
-export function SchoolRecoveryOfficer({api,classPath}: {api:SchoolApi;classPath:string}) {
+export function SchoolRecoveryOfficer({api,classPath,compact=false}: {api:SchoolApi;classPath:string;compact?:boolean}) {
+  const [pane,setPane]=useState('recovery')
   const [number,setNumber]=useState('')
   const [verified,setVerified]=useState(false)
   const [reason,setReason]=useState<'FORGOT_PASSWORD'|'FORGOT_LOGIN'|'INCIDENT_CORRECTION'>('FORGOT_PASSWORD')
@@ -73,13 +75,13 @@ export function SchoolRecoveryOfficer({api,classPath}: {api:SchoolApi;classPath:
     const result=await api<{list:Incident[]}>(classPath+'/incidents')
     setIncidents(result.list)
   }
-  return <section className="hs-panel">
-    <h2>学生账户恢复与注册异常</h2>
-    <p>仅授权学校管理员或心理教师可操作。必须在线下核实学生身份；
-      勾选仅记录已执行的核验步骤，不代替真实核验。</p>
+  return <section className={'hs-panel'+(compact?' hs-recovery-officer--compact':'')}>
+    {compact?<header className="hs-recovery-heading"><h2>账号与注册处理</h2><SchoolTaskHelp label="账号恢复操作说明" buttonText="操作说明"><p>仅授权学校管理员或心理教师可操作。必须在线下核实学生身份；勾选仅记录已执行的核验步骤，不代替真实核验。</p></SchoolTaskHelp></header>:<><h2>学生账户恢复与注册异常</h2><p>仅授权学校管理员或心理教师可操作。必须在线下核实学生身份；勾选仅记录已执行的核验步骤，不代替真实核验。</p></>}
+    {compact&&<nav className="hs-recovery-tabs" aria-label="账号与注册操作">{[['recovery','恢复账号'],['incidents','注册异常'],['reissue','资格重发'],['quarantine','紧急冻结']].map(([id,title])=><button key={id} type="button" aria-pressed={pane===id} disabled={busy} onClick={()=>setPane(id)}>{title}</button>)}</nav>}
     {error&&<p className="hs-alert" role="alert">{error}</p>}
     {notice&&<p className="hs-message" role="status">{notice}</p>}
-    <h3>为经核验的学生签发一次性恢复码</h3>
+    {(!compact||pane==='recovery')&&<section className="hs-recovery-pane" aria-label="签发恢复码表单">
+    <h3>{compact?'签发一次性恢复码':'为经核验的学生签发一次性恢复码'}</h3>
     <TextField label="资格学号（不显示在审计记录中）" value={number} setValue={setNumber}/>
     <label className="hs-field"><span>恢复事由</span>
       <select value={reason} onChange={event=>setReason(event.target.value as typeof reason)}>
@@ -101,6 +103,8 @@ export function SchoolRecoveryOfficer({api,classPath}: {api:SchoolApi;classPath:
       <p>有效期至 {new Date(receipt.expiresAt).toLocaleString('zh-CN')}</p>
       <button onClick={()=>setReceipt(null)}>已安全交付，隐藏凭据</button>
     </div>}
+    </section>}
+    {(!compact||pane==='incidents')&&<section className="hs-recovery-pane" aria-label="注册异常处理">
     <h3>班级注册异常</h3>
     <div className="hs-actions">
       <button disabled={busy} onClick={()=>void execute(async()=>{await readIncidents();setNotice('已刷新待处理异常。')})}>查看未结案异常</button>
@@ -133,9 +137,10 @@ export function SchoolRecoveryOfficer({api,classPath}: {api:SchoolApi;classPath:
         await readIncidents();setIncidentId('');setNotice('已记入处理结果，请检查注册状态。')
       })}>关闭已核实的异常</button>
     </div>}
+    </section>}
+    {(!compact||pane==='reissue')&&<section className="hs-recovery-pane" aria-label="重新发放资格表单">
     <h3>重新发放被冒用的资格</h3>
-    <p>仅在冻结原账号、保留未结案异常并完成独立身份核验后操作。
-      新资格需使用新注册码注册；历史测评和原账号不会转移。</p>
+    {compact?<SchoolTaskHelp label="资格重发操作说明" buttonText="资格重发说明"><p>仅在冻结原账号、保留未结案异常并完成独立身份核验后操作。新资格需使用新注册码注册；历史测评和原账号不会转移。</p></SchoolTaskHelp>:<p>仅在冻结原账号、保留未结案异常并完成独立身份核验后操作。新资格需使用新注册码注册；历史测评和原账号不会转移。</p>}
     <TextField label="经核验的真实学生学号" value={reissueNo} setValue={setReissueNo}/>
     <label className="hs-field"><span><input type="checkbox" checked={reissueVerified}
       onChange={event=>setReissueVerified(event.target.checked)}/> 已线下独立核实资格重发对象</span></label>
@@ -146,6 +151,8 @@ export function SchoolRecoveryOfficer({api,classPath}: {api:SchoolApi;classPath:
       setReissueNo('');setReissueVerified(false)
       setNotice('已创建全新待领取资格。请由管理员重新分发限时随机注册码；完成注册后再结案。')
     })}>审核后重新发放资格</button>
+    </section>}
+    {(!compact||pane==='quarantine')&&<section className="hs-recovery-pane" aria-label="紧急冻结账号表单">
     <h3>紧急冻结疑似抢注的账号</h3>
     <TextField label="涉嫌被冒用的资格学号" value={quarantineNo} setValue={setQuarantineNo}/>
     <button disabled={busy||!quarantineNo} onClick={()=>void execute(async()=>{
@@ -154,5 +161,6 @@ export function SchoolRecoveryOfficer({api,classPath}: {api:SchoolApi;classPath:
       setQuarantineNo('');await readIncidents()
       setNotice('账号已冻结，独立异常记录已生成。请完成线下身份核实。')
     })}>冻结疑似抢注身份</button>
+    </section>}
   </section>
 }

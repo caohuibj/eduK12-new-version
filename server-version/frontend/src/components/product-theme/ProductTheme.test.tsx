@@ -15,8 +15,17 @@ describe('product-local Training-compatible appearance', () => {
   it('defaults to auto and validates persisted choices', () => {
     expect(parseAppearance(null)).toBe('auto'); expect(parseAppearance('bad')).toBe('auto')
     for (const value of ['light','dark','auto'] as const) expect(parseAppearance(value)).toBe(value)
-    render(<Example/>); expect(screen.getByRole('combobox', { name: 'School 外观' })).toHaveValue('auto')
+    render(<Example/>); expect(screen.getByRole('button', { name: 'School 外观：自动，点击切换为浅色' })).toBeVisible()
     expect(screen.getByTestId('appearance')).toHaveAttribute('data-theme','light')
+  })
+  it.each(['school','teacher'] as const)('cycles %s through all three modes without a menu and persists each choice', product => {
+    render(<Example product={product}/>); expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
+    for (const [mode,label,theme] of [['light','浅色','light'],['dark','深色','dark'],['auto','自动','light']] as const) {
+      fireEvent.click(screen.getByRole('button'))
+      expect(screen.getByRole('button')).toHaveAccessibleName(new RegExp('外观：'+label))
+      expect(screen.getByTestId('appearance')).toHaveAttribute('data-theme',theme)
+      expect(localStorage.getItem(appearanceKey(product))).toBe(mode)
+    }
   })
   it.each([[6,59,'dark'],[7,0,'light'],[18,59,'light'],[19,0,'dark']] as const)('uses local clock %i:%i as %s', (hour, minute, theme) => {
     expect(appearanceTheme('auto', new Date(2026,9,22,hour,minute))).toBe(theme)
@@ -36,34 +45,34 @@ describe('product-local Training-compatible appearance', () => {
     expect(screen.getByTestId('appearance')).toHaveAttribute('data-theme','dark')
   })
   it('keeps manual choice through clock changes and remount', () => {
-    const view=render(<Example account="one"/>); fireEvent.change(screen.getByRole('combobox'),{target:{value:'dark'}})
+    const view=render(<Example account="one"/>); fireEvent.click(screen.getByRole('button')); fireEvent.click(screen.getByRole('button'))
     act(() => { vi.advanceTimersByTime(24*60*60*1000); window.dispatchEvent(new Event('focus')) })
     expect(screen.getByTestId('appearance')).toHaveAttribute('data-theme','dark')
-    view.unmount(); render(<Example account="one"/>); expect(screen.getByRole('combobox')).toHaveValue('dark')
+    view.unmount(); render(<Example account="one"/>); expect(screen.getByRole('button')).toHaveAccessibleName(/外观：深色/)
   })
   it('isolates guest, accounts and products without an intermediate previous choice', () => {
-    const view=render(<Example account="one"/>); fireEvent.change(screen.getByRole('combobox'),{target:{value:'dark'}})
+    const view=render(<Example account="one"/>); fireEvent.click(screen.getByRole('button')); fireEvent.click(screen.getByRole('button'))
     view.rerender(<Example account="two"/>); expect(screen.getByTestId('appearance')).toHaveAttribute('data-theme','light')
-    view.rerender(<Example/>); expect(screen.getByRole('combobox')).toHaveValue('auto')
-    view.rerender(<Example product="teacher" account="one"/>); expect(screen.getByRole('combobox')).toHaveValue('auto')
-    view.rerender(<Example account="one"/>); expect(screen.getByRole('combobox')).toHaveValue('dark')
+    view.rerender(<Example/>); expect(screen.getByRole('button')).toHaveAccessibleName(/外观：自动/)
+    view.rerender(<Example product="teacher" account="one"/>); expect(screen.getByRole('button')).toHaveAccessibleName(/外观：自动/)
+    view.rerender(<Example account="one"/>); expect(screen.getByRole('button')).toHaveAccessibleName(/外观：深色/)
     expect(appearanceKey('school','one/two')).not.toBe(appearanceKey('school','one%2Ftwo'))
   })
   it('defaults to auto at night when storage is unavailable and warns after a failed save', () => {
     vi.setSystemTime(new Date(2026,9,22,20)); vi.spyOn(Storage.prototype,'getItem').mockImplementation(()=>{throw new Error('blocked')})
     vi.spyOn(Storage.prototype,'setItem').mockImplementation(()=>{throw new Error('blocked')})
     render(<Example/>); expect(screen.getByTestId('appearance')).toHaveAttribute('data-theme','dark')
-    fireEvent.change(screen.getByRole('combobox'),{target:{value:'light'}})
+    fireEvent.click(screen.getByRole('button'))
     expect(screen.getByTestId('appearance')).toHaveAttribute('data-theme','light'); expect(screen.getByRole('alert')).toHaveTextContent('未能保存')
   })
   it('syncs only the current product/account key and returns to auto', () => {
     render(<Example account="one"/>); localStorage.setItem(appearanceKey('teacher','one'),'dark')
     act(()=>window.dispatchEvent(new StorageEvent('storage',{key:appearanceKey('teacher','one')})))
-    expect(screen.getByRole('combobox')).toHaveValue('auto')
+    expect(screen.getByRole('button')).toHaveAccessibleName(/外观：自动/)
     localStorage.setItem(appearanceKey('school','one'),'dark')
     act(()=>window.dispatchEvent(new StorageEvent('storage',{key:appearanceKey('school','one')})))
-    expect(screen.getByRole('combobox')).toHaveValue('dark')
-    fireEvent.change(screen.getByRole('combobox'),{target:{value:'auto'}})
+    expect(screen.getByRole('button')).toHaveAccessibleName(/外观：深色/)
+    fireEvent.click(screen.getByRole('button'))
     expect(screen.getByTestId('appearance')).toHaveAttribute('data-theme','light')
   })
   it('renders only the selected hero source and preserves responsive Teacher variants', () => {

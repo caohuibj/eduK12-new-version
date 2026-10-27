@@ -69,7 +69,7 @@ describe('logged-in checkin submit endTime', () => {
   it('reads only fresh submission gates, not checkin content or media', async () => {
     mockPrisma.checkin.findUnique.mockImplementation(async (query) => {
       expect(query).toEqual({
-        where: { id: 'ck-1' }, select: { courseId: true, endTime: true },
+        where: { id: 'ck-1' }, select: { courseId: true, endTime: true, course: { select: { courseType: true } } },
       })
       return { courseId: 'course-1', endTime: null }
     })
@@ -82,6 +82,17 @@ describe('logged-in checkin submit endTime', () => {
       where: { courseId: 'course-1', studentId: 'student-1', status: { in: ['ACTIVE', 'APPROVED'] } },
       select: { id: true },
     })
+  })
+
+  it.each([undefined,0,1])('rejects completed campus checkin rewrites with revision %s',async expectedRevision=>{
+    mockPrisma.checkin.findUnique.mockResolvedValue({courseId:'campus-1',endTime:null,course:{courseType:'CAMPUS_ACTIVITY'}})
+    mockPrisma.checkinSubmission.findUnique.mockResolvedValue({id:'sub-1',content:'original',images:[],revision:expectedRevision??1})
+    const res=makeRes()
+    await checkinController.submit(makeReq({body:{content:'overwrite',expectedRevision}}),res)
+    expect(res.statusCode).toBe(409)
+    expect(res.body.message).toContain('校园活动已提交')
+    expect(mockPrisma.checkinSubmission.update).not.toHaveBeenCalled()
+    expect(mockPrisma.assetReference.deleteMany).not.toHaveBeenCalled()
   })
 
   it('rechecks membership before replaying a committed keyed checkin', async () => {

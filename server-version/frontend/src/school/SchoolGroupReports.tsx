@@ -1,3 +1,4 @@
+import {SchoolReportHeader} from './SchoolReportPresentation'
 import { useEffect,useRef,useState } from 'react'
 import type { SchoolApi } from './SchoolRecovery'
 import {SchoolGeneralGroupV2} from './SchoolGeneralGroupV2'
@@ -19,8 +20,8 @@ const reason=(error:unknown)=>error instanceof Error&&error.message
 /** Intentionally not a report publication surface. Values are held in memory;
  * only after current server authorization, never stored in a URL or browser.
  */
-export function SchoolGroupReports({api,organizationId}:{
-  api:SchoolApi;organizationId:string
+export function SchoolGroupReports({api,organizationId,compact=false}:{
+  api:SchoolApi;organizationId:string;compact?:boolean
 }){
   const [catalog,setCatalog]=useState<Catalog|null>(null)
   const [catalogLoading,setCatalogLoading]=useState(true)
@@ -74,21 +75,22 @@ export function SchoolGroupReports({api,organizationId}:{
     }catch(e){if(token===current.current)setError(reason(e))}
     finally{if(token===current.current)setBusy(false)}
   }
-  return <section className="hs-panel">
-    <h2>学校内部 · 受控群体报告</h2>
-    {import.meta.env.VITE_REPORT_PRIVACY_SCHOOL_V2_ENABLED==='true'&&
-      <SchoolGeneralGroupV2 api={api} organizationId={organizationId}/>}
-    <h3>原有校园心理群体报告（保留完整保护）</h3>
+  return <section className={"hs-panel"+(compact?" hs-report-panel":"")}>
+    <SchoolReportHeader compact={compact} title={compact?"群体分析配置":"学校内部 · 受控群体报告"} label="群体报告使用说明">
     <p>仅使用已发布的正式科学方案和整组学生自评 Run，须在活动与 Run 结束后经过释放等待期。
       学生人数、作答时间、成员名单和原始答案不会进入此页面；不会向被评价教师或家长自动发布。</p>
     <p>现阶段只供校内授权人员开展支持性分析。群体均值不能证明某种教育措施产生了因果效果，也不能用于个人诊断、排名或绩效考核。</p>
+    </SchoolReportHeader>
+    {import.meta.env.VITE_REPORT_PRIVACY_SCHOOL_V2_ENABLED==='true'&&
+      <SchoolGeneralGroupV2 api={api} organizationId={organizationId}/>}
+    {!compact&&<h3>原有校园心理群体报告（保留完整保护）</h3>}
     {error&&<p role="alert" className="hs-alert">{error}</p>}
     {notice&&<p role="status" className="hs-message">{notice}</p>}
     {catalogLoading&&<p role="status">正在核查校园报告权限与已发布方案…</p>}
     {catalogError&&<div><p role="alert" className="hs-alert">{catalogError}</p>
       <button disabled={catalogLoading} onClick={()=>{setCatalogLoading(true);setCatalogError('');setCatalogRequest(value=>value+1)}}>重新读取报告目录</button>
     </div>}
-    {catalog&&<>
+    {catalog&&<div className={compact?"hs-report-controls":undefined}>
       <label className="hs-field"><span>选择正式校园测评来源</span>
         <select value={selection} onChange={e=>{setSelection(e.target.value);setReport(null)}}>
           <option value="">请选择已投放的学生自评测评</option>
@@ -112,7 +114,7 @@ export function SchoolGroupReports({api,organizationId}:{
       <button disabled={busy||!source||!selectedSpec} onClick={()=>void generate()}>
         通过二次验证生成受限群体摘要
       </button>
-    </>}
+    </div>}
     {report&&<div role="region" aria-label="校内群体受限投影" className="hs-task-detail">
       <h3>{report.state==='WITHHELD'?'数据暂不符合披露条件':'正式群体结果（受限）'}</h3>
       {report.state==='WITHHELD'?<p>样本或有效贡献不满足当前披露要求。

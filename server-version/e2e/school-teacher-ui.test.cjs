@@ -57,7 +57,7 @@ function sample() {
   const obs = width => ({ viewport: { width, height: width === 1440 ? 900 : 844 },
     layout: { width, scrollWidth: width, secretNodes: 0, filledPasswords: false, clipped: [] },
     keyboard: { visible: true, focusVisible: true, ring: true }, accessibility: { violations: [], passes: 1, incomplete: [] } })
-  const report = { schemaVersion: 1, status: 'PASSED', source: { head, tree }, runId, inputs: manifests, chrome,
+  const report = { schemaVersion: 1, status: 'PASSED', layoutDetector: { status: 'PASSED', closedVisibleClips: 1, openVisibleClips: 2 }, source: { head, tree }, runId, inputs: manifests, chrome,
     startups: [], errors: [], coverage: [], screenshots: [], keyboard: [], sessions: [], notCovered: ['Real media storage', 'Public TLS'],
     ui: { schemaVersion: 1, scope: 'bounded-brand-theme-layout', fontIssues: [], observations: [], screenshots: [], checks: [], sessions: [], notCovered: ['Real cognitive task computed-style isolation', 'CJK evidence covers four fixed real Chinese nodes, not every Unicode character or every page'] } }
   for (const product of ['SCHOOL', 'TEACHER']) {
@@ -95,7 +95,7 @@ function sample() {
     }
     for (const width of [320, 390]) {
       add('compact-workspace', 'dark', width, width === 320)
-      report.ui.checks.push({ product, check: 'workspace-keyboard-' + width, collapsedAfter: true, focusVerified: true })
+      report.ui.checks.push({ product, check: 'workspace-keyboard-' + width, restoredNavigation: true, focusVerified: true })
       for (const state of darkStates) add(state, 'dark', width, width === 390)
     }
   }
@@ -156,3 +156,69 @@ test('screenshot reader is restricted to exact PNG names and matching viewport d
   s.report.ui.observations[0].file = '../private/fixture.json'
   assert.throws(() => verifyReport(s.report, s.identity, png))
 })
+
+test('theme consumer uses the real cyclic button for every source and target mode', async () => {
+  const {selectAppearanceButton}=require('./school-teacher-ui.cjs')
+  const labels=['自动','浅色','深色'],modes=['auto','light','dark']
+  for(const product of ['School','Teacher'])for(let start=0;start<3;start++)for(let target=0;target<3;target++){
+    let current=start,clicks=0
+    const label=()=>`${product} 外观：${labels[current]}，点击切换为${labels[(current+1)%3]}`
+    const control={getAttribute:async key=>{assert.equal(key,'aria-label');return label()},click:async()=>{current=(current+1)%3;clicks++},page:()=>({getByRole:(role,options)=>{assert.equal(role,'button');return options.name}}),and:regex=>({waitFor:async()=>assert.match(label(),regex)})}
+    await selectAppearanceButton(control,product,modes[target]);assert.equal(current,target);assert.equal(clicks,(target-start+3)%3)
+  }
+  await assert.rejects(selectAppearanceButton({getAttribute:async()=> 'legacy select'},'Teacher','light'))
+})
+
+test('workspace and task consumers match the current compact product controls',()=>{
+ const fs=require('node:fs'),path=require('node:path'),root=path.resolve(__dirname,'..');
+ const ui=fs.readFileSync(path.join(__dirname,'school-teacher-ui.cjs'),'utf8'),browser=fs.readFileSync(path.join(__dirname,'school-teacher-browser.cjs'),'utf8');
+ const teacher=fs.readFileSync(path.join(root,'frontend/src/huiteacher/HuiteacherApp.tsx'),'utf8'),school=fs.readFileSync(path.join(root,'frontend/src/school/SchoolProfessionalWorkspace.tsx'),'utf8');
+ for(const label of ['账号设置','个人测评','参与测评']){assert(teacher.includes(label));assert(ui.includes(label))}
+ assert(school.includes('校园功能分组'));assert(ui.includes('校园功能分组'));
+ assert.doesNotMatch(ui,/details\.ht-workspace-account|name: '功能导航'|私有表单任务/);
+ assert.doesNotMatch(browser,/name: '选择已有活动'|kind === 'SCALE' \? '进入本人自评'|getByText\('状态：已完成'/);
+ assert.match(browser,/name: '配置活动：' \+ w.title/);assert.match(browser,/getByLabel\('状态：已完成'/);
+ assert.match(browser,/selected.press\('ArrowLeft'\)/);
+ const fn=ui.slice(ui.indexOf('async function schoolManagementAnchor'),ui.indexOf('async function schoolManagementAnchor')+700);
+ assert.doesNotMatch(fn,/if \(done.has\('teacher-school-anchor'\)\) return/);
+});
+
+test('compact form authoring and auto-advance checks use current labels and focus destination',()=>{
+ const fs=require('node:fs'),path=require('node:path'),source=fs.readFileSync(path.join(__dirname,'school-teacher-browser.cjs'),'utf8');
+ assert.match(source,/s.product === 'SCHOOL' \? '表单分组与题目' : '表单区段与题目'/);
+ assert.match(source,/details.education-private-directory-disclosure > summary/);
+ assert.match(source,/Auto-advanced question receives visible keyboard focus/);
+ assert.match(source,/focusTarget: 'next-question'/);
+ assert.doesNotMatch(source,/keyboardCheck\(s, player\(\).getByRole\('radio'/);
+});
+
+test('browser assertions wait for committed replacement controls and async save unlock',()=>{
+ const fs=require('node:fs'),path=require('node:path'),source=fs.readFileSync(path.join(__dirname,'school-teacher-browser.cjs'),'utf8');
+ const choose=source.slice(source.indexOf('const choose = async prompt'),source.indexOf("await choose('合成矩阵题')"));
+ assert(choose.indexOf("button.waitFor({ state: 'attached' })")<choose.indexOf('requestAnimationFrame'));
+ assert(choose.indexOf('requestAnimationFrame')<choose.indexOf('!await button.isVisible()'));
+ const keyboard=source.slice(source.indexOf('async function keyboardCheck'),source.indexOf('async function toolsPage'));
+ assert(keyboard.indexOf('!el.disabled')<keyboard.indexOf('Keyboard focus remains visible'));
+ assert.match(keyboard,/assert.equal\(focus.same && focus.visible, true/);
+});
+
+test('School publish consumer opens the actual assessment panel before choosing its run',()=>{
+ const fs=require('node:fs'),path=require('node:path'),source=fs.readFileSync(path.join(__dirname,'school-teacher-browser.cjs'),'utf8');
+ const fn=source.slice(source.indexOf('async function workflowPage'),source.indexOf('async function publish'));
+ assert(fn.indexOf("name: '配置活动：'")<fn.indexOf("name: '活动配置分区'"));
+ assert(fn.indexOf("name: '正式测评批次'")<fn.indexOf("w.runName + ' · 准备中'"));
+ const component=fs.readFileSync(path.join(__dirname,'../frontend/src/school/SchoolActivityManager.tsx'),'utf8');
+ assert.match(component,/aria-label="活动配置分区"/);assert.match(component,/hidden=\{compact&&panel!=='assessments'\}/);
+});
+
+test('layout detector excludes only unpainted overflow and still rejects visible SELECT',()=>{
+ const vm=require('node:vm');const {readLayoutState}=require('./school-teacher-ui.cjs');
+ const el=(visible,closed=false)=>({tagName:'SELECT',parentElement:null,getAttribute:()=>null,getBoundingClientRect:()=>({width:500,height:20,left:8,right:508}),checkVisibility:options=>{assert.equal(options.visibilityProperty,true);return visible},closest:()=>closed?{}:null});
+ const hidden=el(false,true),visible=el(true);let controls=[hidden,visible];
+ const ctx={document:{querySelectorAll:selector=>selector.startsWith('button,')?controls:[],documentElement:{scrollWidth:508}},innerWidth:320,getComputedStyle:()=>({visibility:'visible'})};
+ const read=()=>JSON.parse(JSON.stringify(vm.runInNewContext('('+readLayoutState.toString()+')()',ctx)));
+ assert.deepEqual(read().clipped,[{tag:'SELECT',role:null}]);assert.equal(read().unpaintedOverflow[0].closedDetails,true);
+ controls=[el(true),visible];assert.equal(read().clipped.length,2);
+ controls=[hidden];assert.equal(read().clipped.length,0);assert.equal(read().scrollWidth,508); // page overflow is never suppressed
+ controls=[{...visible,checkVisibility:undefined}];assert.throws(read); // unknown visibility fails closed
+});

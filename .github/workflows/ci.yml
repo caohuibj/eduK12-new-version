@@ -326,6 +326,7 @@ jobs:
       training_appearance_plan: ${{ steps.scope.outputs.training_appearance_plan }}
       survey_workspace_plan: ${{ steps.scope.outputs.survey_workspace_plan }}
       survey_governance_plan: ${{ steps.scope.outputs.survey_governance_plan }}
+      pr357_plan: ${{ steps.scope.outputs.pr357_plan }}
       post356_plan: ${{ steps.scope.outputs.post356_plan }}
       training_polish_plan: ${{ steps.scope.outputs.training_polish_plan }}
       sjt_native_plan: ${{ steps.scope.outputs.sjt_native_plan }}
@@ -402,7 +403,7 @@ jobs:
           CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
         run: node .github/scripts/pr356-entry.mjs --detect
       - name: fetch exact two-candidate PR source for checkout-tree comparison
-        if: github.event_name == 'pull_request' && contains(fromJSON('["fix/post358-shallow-ci-20261027","fix/post356-reference-kind-picker-20261027","backup/shared-sjt-native-20261024","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023","work/survey-training-branding-20261023"]'), github.event.pull_request.head.ref)
+        if: github.event_name == 'pull_request' && contains(fromJSON('["work/school-teacher-consolidated-20261027","fix/post358-shallow-ci-20261027","fix/post356-reference-kind-picker-20261027","backup/shared-sjt-native-20261024","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023","work/survey-training-branding-20261023"]'), github.event.pull_request.head.ref)
         env:
           EXACT_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
         run: |
@@ -1118,7 +1119,7 @@ jobs:
     name: codeql (javascript/typescript SAST)
     # Static analysis runs independently; the aggregate gate still requires frontend.
     needs: scope
-    if: ${{ needs.scope.result == 'success' && needs.scope.outputs.application_route != 'pr356' && (((!cancelled() && ((((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.codeql == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)))) && needs.scope.outputs.application_route == 'legacy') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'homepage-copy' && fromJSON(needs.scope.outputs.homepage_copy_plan).toolsChanged) || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && (needs.scope.outputs.application_route == 'assessment-capacity' || needs.scope.outputs.application_route == 'survey-experience' || needs.scope.outputs.application_route == 'survey-cloud' || needs.scope.outputs.application_route == 'training-appearance' || needs.scope.outputs.application_route == 'survey-workspace')) || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'access-efficiency') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'teacher-survey') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'admin-authenticator') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'training-workspace') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'composite-csv-memory') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'scale-library-governance') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'backend-security-efficiency') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'shared-asset-storage') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'survey-mac-ui') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'reviewed-candidate') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'survey-candidate') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'teacher-home') || (github.event_name == 'pull_request' && needs.scope.outputs.application_route == 'survey-home') || (github.event_name == 'pull_request' && needs.scope.outputs.application_route == 'campus') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'exact-candidate') || (github.event_name == 'pull_request' && (needs.scope.outputs.application_route == 'A' || needs.scope.outputs.application_route == 'B') && contains(fromJSON(needs.scope.outputs.release_plan).required, 'sast')))) || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'training-manual-ui') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'school-teacher-visual') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'survey-manual-ui') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'shared-authoring') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'school-teacher') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'participant-access') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && (needs.scope.outputs.application_route == 'training-assessment' || (needs.scope.outputs.application_route == 'survey-assessment' || needs.scope.outputs.application_route == 'participant-capacity')))  || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'training-admin-integration')) || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'training-teacher-management' && needs.scope.outputs.codeql == 'true') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && (needs.scope.outputs.application_route == 'sjt-native' || needs.scope.outputs.application_route == 'training-entry')) || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'survey-review') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && ((needs.scope.outputs.application_route == 'training-polish' || needs.scope.outputs.application_route == 'post356') || needs.scope.outputs.application_route == 'survey-governance'))) }}
+    if: ${{ needs.scope.result == 'success' && needs.scope.outputs.application_route != 'pr356' && (((!cancelled() && ((((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.codeql == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)))) && needs.scope.outputs.application_route == 'legacy') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'homepage-copy' && fromJSON(needs.scope.outputs.homepage_copy_plan).toolsChanged) || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && (needs.scope.outputs.application_route == 'assessment-capacity' || needs.scope.outputs.application_route == 'survey-experience' || needs.scope.outputs.application_route == 'survey-cloud' || needs.scope.outputs.application_route == 'training-appearance' || needs.scope.outputs.application_route == 'survey-workspace')) || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'access-efficiency') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'teacher-survey') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'admin-authenticator') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'training-workspace') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'composite-csv-memory') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'scale-library-governance') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'backend-security-efficiency') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'shared-asset-storage') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'survey-mac-ui') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'reviewed-candidate') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'survey-candidate') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'teacher-home') || (github.event_name == 'pull_request' && needs.scope.outputs.application_route == 'survey-home') || (github.event_name == 'pull_request' && needs.scope.outputs.application_route == 'campus') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'exact-candidate') || (github.event_name == 'pull_request' && (needs.scope.outputs.application_route == 'A' || needs.scope.outputs.application_route == 'B') && contains(fromJSON(needs.scope.outputs.release_plan).required, 'sast')))) || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'training-manual-ui') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'school-teacher-visual') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'survey-manual-ui') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'shared-authoring') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'school-teacher') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'participant-access') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && (needs.scope.outputs.application_route == 'training-assessment' || (needs.scope.outputs.application_route == 'survey-assessment' || needs.scope.outputs.application_route == 'participant-capacity')))  || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'training-admin-integration')) || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'training-teacher-management' && needs.scope.outputs.codeql == 'true') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && (needs.scope.outputs.application_route == 'sjt-native' || needs.scope.outputs.application_route == 'training-entry')) || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'survey-review') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && ((needs.scope.outputs.application_route == 'training-polish' || (needs.scope.outputs.application_route == 'post356' || needs.scope.outputs.application_route == 'pr357')) || needs.scope.outputs.application_route == 'survey-governance'))) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     permissions:
@@ -1294,13 +1295,29 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: node .github/scripts/survey-governance-checks.mjs codeql-config
+      - name: verify original PR357 application SAST before scanning changed controls and fixtures
+        id: pr357-codeql-config
+        if: needs.scope.outputs.application_route == 'pr357'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CI: 'true'
+          PLAN: ${{ needs.scope.outputs.pr357_plan }}
+          CI_EVENT: pull_request
+          CI_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          CI_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
+          CI_PR_NUMBER: ${{ github.event.pull_request.number }}
+          CI_PR_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+        run: |
+          node -e "if(!/^[a-f0-9]{40}$/.test(process.env.CI_SOURCE_HEAD||''))throw Error('Exact PR source required')"
+          git fetch --no-tags --depth=1 origin "$CI_SOURCE_HEAD" 04a8d994207d7b831b874d4be4f5c31640466458 667b7fec3f19716aeb0fbf15811f4887b15da4c5
+          node .github/scripts/pr357-checks.mjs sast-reuse
       - name: initialize CodeQL
         if: steps.appearance-codeql-reuse.outputs.reused != 'true'
         uses: github/codeql-action/init@v3
         with:
           languages: ${{ needs.scope.outputs.application_route == 'survey-governance' && steps.governance-directory-config.outputs.languages || needs.scope.outputs.scenario == 'survey-wave-selection' && 'javascript-typescript,python' || contains(fromJSON('["shared-asset-storage","survey-candidate","reviewed-candidate","survey-mac-ui","exact-candidate","scale-library-governance"]'), needs.scope.outputs.application_route) && 'javascript-typescript,python' || 'javascript-typescript' }}
           config: >-
-            ${{ needs.scope.outputs.application_route == 'survey-governance' && steps.governance-directory-config.outputs.config || needs.scope.outputs.application_route == 'training-polish' && steps.polish-codeql-config.outputs.config || needs.scope.outputs.application_route == 'survey-review' && steps.survey-review-codeql-config.outputs.config || needs.scope.outputs.application_route == 'sjt-native' && 'paths: [server-version/backend/src, server-version/frontend/src, .github/scripts/sjt-native-scope.mjs, .github/scripts/sjt-native-migration.mjs, .github/scripts/sjt-native-browser.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'training-entry' && 'paths: [server-version/frontend/src, server-version/backend/src, .github/scripts/training-entry-scope.mjs, .github/scripts/training-entry-checks.mjs, .github/scripts/training-entry.test.mjs, .github/scripts/training-entry-browser.mjs, .github/scripts/training-entry-migration.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'training-teacher-management' && steps.teacher-codeql-config.outputs.config || needs.scope.outputs.application_route == 'training-admin-integration' && steps.admin-integration-codeql-config.outputs.config || needs.scope.outputs.application_route == 'participant-capacity' && 'paths: [server-version/backend/src/modules/composite/authenticated-admission-lock.ts, server-version/backend/src/modules/composite/composite.service.ts, server-version/backend/src/modules/survey/public-rate.middleware.ts, .github/scripts]' || needs.scope.outputs.application_route == 'survey-assessment' && 'paths: [server-version/frontend/src, server-version/backend/src, .github/scripts]' || needs.scope.outputs.application_route == 'training-assessment' && 'paths: [server-version/frontend/src/modules/cognitive/core/useRunnerPreparation.ts, server-version/frontend/src/modules/assessment-media/__tests__/media-2.adapter.test.tsx, .github/scripts/training-assessment-reuse.mjs, .github/scripts/training-assessment-reuse.test.mjs, .github/scripts/training-assessment-scope.mjs, .github/scripts/training-assessment.test.mjs, .github/scripts/training-assessment-native-idb.js]' || needs.scope.outputs.application_route == 'school-teacher-visual' && 'paths: [server-version/frontend/src, .github/scripts/school-teacher-visual-scope.mjs, .github/scripts/school-teacher-visual-reuse.mjs, .github/scripts/school-teacher-visual-browser.cjs, .github/scripts/school-teacher-visual-fixtures.cjs, .github/scripts/school-teacher-visual.test.mjs, .github/scripts/training-assessment.test.mjs, .github/scripts/training-manual-ui.test.mjs, .github/scripts/survey-manual-ui.test.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'participant-access' && 'paths: [server-version/frontend/src, server-version/backend/src, .github/scripts]' || needs.scope.outputs.application_route == 'school-teacher' && 'paths: [server-version/backend/src, server-version/frontend/src, server-version/e2e, .github/scripts]' || needs.scope.outputs.application_route == 'training-manual-ui' && 'paths: [server-version/frontend/src, .github/scripts/training-manual-ui-scope.mjs, .github/scripts/training-manual-ui-checks.mjs, .github/scripts/training-manual-ui.test.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'survey-manual-ui' && 'paths: [server-version/frontend/src/survey, server-version/frontend/src/pages/admin, server-version/frontend/src/pages/AdminLogin.tsx, server-version/frontend/src/admin, server-version/frontend/src/components/app-shell, server-version/frontend/src/components/auth, server-version/frontend/public/entry-brand.js, .github/scripts/survey-manual-ui-scope.mjs, .github/scripts/survey-manual-ui-checks.mjs, .github/scripts/survey-manual-ui.test.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'shared-authoring' && 'paths: [.github/scripts/shared-authoring-checks.mjs, .github/scripts/shared-authoring.test.mjs, .github/scripts/shared-authoring-reuse.mjs, .github/scripts/shared-authoring-reuse.test.mjs, .github/scripts/shared-authoring-browser.mjs]' || needs.scope.outputs.application_route == 'survey-workspace' && 'paths: [.github/scripts/survey-workspace-reuse.mjs, .github/scripts/survey-workspace-reuse.test.mjs, .github/scripts/survey-workspace.test.mjs, .github/scripts/survey-workspace-checks.mjs]' || needs.scope.outputs.application_route == 'training-workspace' && fromJSON(needs.scope.outputs.training_workspace_plan || '{}').candidate == 'student-followup' && steps.student-codeql-config.outputs.config || needs.scope.outputs.application_route == 'admin-authenticator' && 'paths: [.github/scripts/admin-authenticator-browser.mjs, .github/scripts/admin-authenticator-reuse.mjs, .github/scripts/admin-authenticator-scope.mjs, .github/scripts/admin-authenticator-checks.mjs, .github/scripts/admin-authenticator.test.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'training-workspace' && fromJSON(needs.scope.outputs.training_workspace_plan || '{}').candidate == 'mac-integrated' && steps.workspace-codeql-config.outputs.config || needs.scope.outputs.application_route == 'scale-library-governance' && steps.governance-codeql-config.outputs.config || needs.scope.outputs.application_route == 'composite-csv-memory' && 'paths: [server-version/backend/src/modules/cognitive/export.service.ts, server-version/backend/src/modules/composite/composite-export.service.ts, server-version/backend/src/__tests__/cognitive/export.service.test.ts, server-version/backend/src/__tests__/composite/typed-form-export.test.ts, server-version/backend/src/__tests__/composite/composite-analysis-export.service.test.ts, .github/scripts/composite-csv-memory-scope.mjs, .github/scripts/composite-csv-memory-scope.test.mjs, .github/scripts/composite-csv-memory-probe.cjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'training-workspace' && 'paths: [server-version/frontend/src, server-version/backend/src/controllers/courseController.ts, server-version/backend/src/controllers/assignmentController.ts, server-version/backend/src/constants/messages.ts, .github/scripts/training-workspace-scope.mjs, .github/scripts/training-workspace-checks.mjs, .github/scripts/training-workspace-reuse.mjs, .github/scripts/training-workspace-browser.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs, server-version/backend/src/modules/questionnaire-product, server-version/backend/src/modules/composite/composite.service.ts, server-version/backend/src/routes/trainingWorkspace.ts, .github/scripts/training-followup-scope.mjs, .github/scripts/training-followup-checks.mjs, .github/scripts/training-followup-browser.mjs, .github/scripts/training-followup-reuse.mjs]' || needs.scope.outputs.scenario == 'survey-wave-selection' && steps.wave-codeql-config.outputs.config || needs.scope.outputs.scenario == 'frontend-performance' && 'paths: [server-version/frontend/src, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs, .github/scripts/frontend-performance.test.mjs, .github/scripts/frontend-performance-browser.mjs]' || needs.scope.outputs.application_route == 'exact-candidate' && fromJSON(needs.scope.outputs.exact_candidate_plan || '{}').candidate == 'scale-authoring' && steps.scale-codeql-config.outputs.config || needs.scope.outputs.application_route == 'exact-candidate' && 'paths: [server-version/backend/src, server-version/backend/scripts, server-version/frontend/src, server-version/scripts/recovery, server-version/e2e, .github/scripts]' || needs.scope.outputs.application_route == 'survey-mac-ui' && 'paths: [server-version/frontend/src/survey, server-version/frontend/src/pages/admin, .github/scripts]' || needs.scope.outputs.application_route == 'reviewed-candidate' && 'paths: [.github/scripts, server-version/frontend/src/pages, server-version/e2e]' || needs.scope.outputs.application_route == 'survey-candidate' && 'paths: [server-version/backend/src, server-version/backend/scripts, server-version/frontend/src/survey, server-version/frontend/src/modules/cognitive, server-version/frontend/src/modules/composite, server-version/frontend/src/components/app-shell, server-version/frontend/src/pages/admin, server-version/frontend/src/services/persistence, server-version/e2e, .github/scripts]' || needs.scope.outputs.application_route == 'assessment-capacity' && 'paths: [server-version/backend/src, server-version/frontend/src/modules/composite, server-version/frontend/src/components/FinalCompositeAssessment.tsx, .github/scripts/assessment-capacity-scope.mjs, .github/scripts/assessment-capacity-browser.mjs, .github/scripts/assessment-capacity-candidate.py, .github/scripts/assessment-capacity-reuse.py, .github/scripts/assessment-capacity-recovery.py, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'teacher-survey' && 'paths: [server-version/frontend/src/huiteacher, server-version/frontend/src/survey, .github/scripts/teacher-survey-scope.mjs, .github/scripts/teacher-survey-candidate.py, .github/scripts/teacher-survey-browser.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'access-efficiency' && 'paths: [server-version/backend/src, server-version/frontend/src/hooks, server-version/frontend/src/pages/student, server-version/frontend/src/pages/CheckinList.tsx, server-version/frontend/src/training/TrainingLearnerHome.tsx, server-version/miniprogram, server-version/miniprogram-v2/domains, .github/scripts/github-official-source.test.mjs, .github/scripts/ci-image-plan.mjs, .github/scripts/dependency-scope.mjs, .github/scripts/access-efficiency-scope.mjs, .github/scripts/access-efficiency-browser.mjs, .github/scripts/access-efficiency-candidate.py, .github/scripts/access-efficiency-reuse.py, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'shared-asset-storage' && 'paths: [server-version/backend/src, server-version/scripts/asset-upload-cleanup, .github/scripts]' || needs.scope.outputs.application_route == 'backend-security-efficiency' && 'paths: [server-version/backend/src, .github/scripts/backend-security-efficiency-scope.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs, .github/scripts/campus-candidate.py]' || needs.scope.outputs.application_route == 'teacher-home' && 'paths: [server-version/frontend/src/huiteacher, server-version/backend/src/index.ts, server-version/backend/src/modules/huiteacher, server-version/backend/src/modules/campus, server-version/backend/src/middleware, server-version/backend/src/utils, .github/scripts/teacher-home-scope.mjs, .github/scripts/teacher-home-browser.mjs, .github/scripts/teacher-home-fixture.cjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'training-appearance' && 'paths: [server-version/frontend/src/training, server-version/frontend/src/components/app-shell, server-version/frontend/src/pages/student/StudentProfile.tsx, server-version/frontend/src/pages/teacher/TeacherProfile.tsx, .github/scripts/training-appearance-scope.mjs, .github/scripts/training-appearance-checks.mjs, .github/scripts/training-appearance.test.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'survey-cloud' && 'paths: [server-version/frontend/src/survey, server-version/frontend/src/pages/AdminLogin.tsx, server-version/frontend/src/pages/admin, server-version/frontend/src/admin, server-version/frontend/src/components/app-shell, server-version/frontend/src/components/auth, server-version/frontend/src/components/Footer.tsx, .github/scripts/survey-cloud-scope.mjs, .github/scripts/survey-cloud-checks.mjs, .github/scripts/survey-cloud.test.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'survey-experience' && 'paths: [.github/scripts/survey-experience-scope.test.mjs, .github/scripts/survey-experience-candidate.mjs, .github/scripts/survey-experience-browser.cjs]' || needs.scope.outputs.application_route == 'survey-home' && 'paths: [server-version/frontend/src/survey, .github/scripts/survey-home-scope.mjs, .github/scripts/survey-home-browser.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'homepage-copy' && 'paths: [.github/scripts/homepage-copy-scope.mjs, .github/scripts/homepage-copy-browser.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.scenario == 'release-tooling' && 'paths: [.github/scripts, server-version/scripts/release]' || '' }}
+            ${{ needs.scope.outputs.application_route == 'survey-governance' && steps.governance-directory-config.outputs.config || needs.scope.outputs.application_route == 'training-polish' && steps.polish-codeql-config.outputs.config || needs.scope.outputs.application_route == 'survey-review' && steps.survey-review-codeql-config.outputs.config || needs.scope.outputs.application_route == 'sjt-native' && 'paths: [server-version/backend/src, server-version/frontend/src, .github/scripts/sjt-native-scope.mjs, .github/scripts/sjt-native-migration.mjs, .github/scripts/sjt-native-browser.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'training-entry' && 'paths: [server-version/frontend/src, server-version/backend/src, .github/scripts/training-entry-scope.mjs, .github/scripts/training-entry-checks.mjs, .github/scripts/training-entry.test.mjs, .github/scripts/training-entry-browser.mjs, .github/scripts/training-entry-migration.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'training-teacher-management' && steps.teacher-codeql-config.outputs.config || needs.scope.outputs.application_route == 'training-admin-integration' && steps.admin-integration-codeql-config.outputs.config || needs.scope.outputs.application_route == 'participant-capacity' && 'paths: [server-version/backend/src/modules/composite/authenticated-admission-lock.ts, server-version/backend/src/modules/composite/composite.service.ts, server-version/backend/src/modules/survey/public-rate.middleware.ts, .github/scripts]' || needs.scope.outputs.application_route == 'survey-assessment' && 'paths: [server-version/frontend/src, server-version/backend/src, .github/scripts]' || needs.scope.outputs.application_route == 'training-assessment' && 'paths: [server-version/frontend/src/modules/cognitive/core/useRunnerPreparation.ts, server-version/frontend/src/modules/assessment-media/__tests__/media-2.adapter.test.tsx, .github/scripts/training-assessment-reuse.mjs, .github/scripts/training-assessment-reuse.test.mjs, .github/scripts/training-assessment-scope.mjs, .github/scripts/training-assessment.test.mjs, .github/scripts/training-assessment-native-idb.js]' || needs.scope.outputs.application_route == 'school-teacher-visual' && 'paths: [server-version/frontend/src, .github/scripts/school-teacher-visual-scope.mjs, .github/scripts/school-teacher-visual-reuse.mjs, .github/scripts/school-teacher-visual-browser.cjs, .github/scripts/school-teacher-visual-fixtures.cjs, .github/scripts/school-teacher-visual.test.mjs, .github/scripts/training-assessment.test.mjs, .github/scripts/training-manual-ui.test.mjs, .github/scripts/survey-manual-ui.test.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'participant-access' && 'paths: [server-version/frontend/src, server-version/backend/src, .github/scripts]' || needs.scope.outputs.application_route == 'school-teacher' && 'paths: [server-version/backend/src, server-version/frontend/src, server-version/e2e, .github/scripts]' || needs.scope.outputs.application_route == 'training-manual-ui' && 'paths: [server-version/frontend/src, .github/scripts/training-manual-ui-scope.mjs, .github/scripts/training-manual-ui-checks.mjs, .github/scripts/training-manual-ui.test.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'survey-manual-ui' && 'paths: [server-version/frontend/src/survey, server-version/frontend/src/pages/admin, server-version/frontend/src/pages/AdminLogin.tsx, server-version/frontend/src/admin, server-version/frontend/src/components/app-shell, server-version/frontend/src/components/auth, server-version/frontend/public/entry-brand.js, .github/scripts/survey-manual-ui-scope.mjs, .github/scripts/survey-manual-ui-checks.mjs, .github/scripts/survey-manual-ui.test.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'shared-authoring' && 'paths: [.github/scripts/shared-authoring-checks.mjs, .github/scripts/shared-authoring.test.mjs, .github/scripts/shared-authoring-reuse.mjs, .github/scripts/shared-authoring-reuse.test.mjs, .github/scripts/shared-authoring-browser.mjs]' || needs.scope.outputs.application_route == 'survey-workspace' && 'paths: [.github/scripts/survey-workspace-reuse.mjs, .github/scripts/survey-workspace-reuse.test.mjs, .github/scripts/survey-workspace.test.mjs, .github/scripts/survey-workspace-checks.mjs]' || needs.scope.outputs.application_route == 'training-workspace' && fromJSON(needs.scope.outputs.training_workspace_plan || '{}').candidate == 'student-followup' && steps.student-codeql-config.outputs.config || needs.scope.outputs.application_route == 'admin-authenticator' && 'paths: [.github/scripts/admin-authenticator-browser.mjs, .github/scripts/admin-authenticator-reuse.mjs, .github/scripts/admin-authenticator-scope.mjs, .github/scripts/admin-authenticator-checks.mjs, .github/scripts/admin-authenticator.test.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'training-workspace' && fromJSON(needs.scope.outputs.training_workspace_plan || '{}').candidate == 'mac-integrated' && steps.workspace-codeql-config.outputs.config || needs.scope.outputs.application_route == 'scale-library-governance' && steps.governance-codeql-config.outputs.config || needs.scope.outputs.application_route == 'composite-csv-memory' && 'paths: [server-version/backend/src/modules/cognitive/export.service.ts, server-version/backend/src/modules/composite/composite-export.service.ts, server-version/backend/src/__tests__/cognitive/export.service.test.ts, server-version/backend/src/__tests__/composite/typed-form-export.test.ts, server-version/backend/src/__tests__/composite/composite-analysis-export.service.test.ts, .github/scripts/composite-csv-memory-scope.mjs, .github/scripts/composite-csv-memory-scope.test.mjs, .github/scripts/composite-csv-memory-probe.cjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'training-workspace' && 'paths: [server-version/frontend/src, server-version/backend/src/controllers/courseController.ts, server-version/backend/src/controllers/assignmentController.ts, server-version/backend/src/constants/messages.ts, .github/scripts/training-workspace-scope.mjs, .github/scripts/training-workspace-checks.mjs, .github/scripts/training-workspace-reuse.mjs, .github/scripts/training-workspace-browser.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs, server-version/backend/src/modules/questionnaire-product, server-version/backend/src/modules/composite/composite.service.ts, server-version/backend/src/routes/trainingWorkspace.ts, .github/scripts/training-followup-scope.mjs, .github/scripts/training-followup-checks.mjs, .github/scripts/training-followup-browser.mjs, .github/scripts/training-followup-reuse.mjs]' || needs.scope.outputs.scenario == 'survey-wave-selection' && steps.wave-codeql-config.outputs.config || needs.scope.outputs.scenario == 'frontend-performance' && 'paths: [server-version/frontend/src, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs, .github/scripts/frontend-performance.test.mjs, .github/scripts/frontend-performance-browser.mjs]' || needs.scope.outputs.application_route == 'exact-candidate' && fromJSON(needs.scope.outputs.exact_candidate_plan || '{}').candidate == 'scale-authoring' && steps.scale-codeql-config.outputs.config || needs.scope.outputs.application_route == 'pr357' && steps.pr357-codeql-config.outputs.config || needs.scope.outputs.application_route == 'exact-candidate' && 'paths: [server-version/backend/src, server-version/backend/scripts, server-version/frontend/src, server-version/scripts/recovery, server-version/e2e, .github/scripts]' || needs.scope.outputs.application_route == 'survey-mac-ui' && 'paths: [server-version/frontend/src/survey, server-version/frontend/src/pages/admin, .github/scripts]' || needs.scope.outputs.application_route == 'reviewed-candidate' && 'paths: [.github/scripts, server-version/frontend/src/pages, server-version/e2e]' || needs.scope.outputs.application_route == 'survey-candidate' && 'paths: [server-version/backend/src, server-version/backend/scripts, server-version/frontend/src/survey, server-version/frontend/src/modules/cognitive, server-version/frontend/src/modules/composite, server-version/frontend/src/components/app-shell, server-version/frontend/src/pages/admin, server-version/frontend/src/services/persistence, server-version/e2e, .github/scripts]' || needs.scope.outputs.application_route == 'assessment-capacity' && 'paths: [server-version/backend/src, server-version/frontend/src/modules/composite, server-version/frontend/src/components/FinalCompositeAssessment.tsx, .github/scripts/assessment-capacity-scope.mjs, .github/scripts/assessment-capacity-browser.mjs, .github/scripts/assessment-capacity-candidate.py, .github/scripts/assessment-capacity-reuse.py, .github/scripts/assessment-capacity-recovery.py, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'teacher-survey' && 'paths: [server-version/frontend/src/huiteacher, server-version/frontend/src/survey, .github/scripts/teacher-survey-scope.mjs, .github/scripts/teacher-survey-candidate.py, .github/scripts/teacher-survey-browser.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'access-efficiency' && 'paths: [server-version/backend/src, server-version/frontend/src/hooks, server-version/frontend/src/pages/student, server-version/frontend/src/pages/CheckinList.tsx, server-version/frontend/src/training/TrainingLearnerHome.tsx, server-version/miniprogram, server-version/miniprogram-v2/domains, .github/scripts/github-official-source.test.mjs, .github/scripts/ci-image-plan.mjs, .github/scripts/dependency-scope.mjs, .github/scripts/access-efficiency-scope.mjs, .github/scripts/access-efficiency-browser.mjs, .github/scripts/access-efficiency-candidate.py, .github/scripts/access-efficiency-reuse.py, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'shared-asset-storage' && 'paths: [server-version/backend/src, server-version/scripts/asset-upload-cleanup, .github/scripts]' || needs.scope.outputs.application_route == 'backend-security-efficiency' && 'paths: [server-version/backend/src, .github/scripts/backend-security-efficiency-scope.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs, .github/scripts/campus-candidate.py]' || needs.scope.outputs.application_route == 'teacher-home' && 'paths: [server-version/frontend/src/huiteacher, server-version/backend/src/index.ts, server-version/backend/src/modules/huiteacher, server-version/backend/src/modules/campus, server-version/backend/src/middleware, server-version/backend/src/utils, .github/scripts/teacher-home-scope.mjs, .github/scripts/teacher-home-browser.mjs, .github/scripts/teacher-home-fixture.cjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'training-appearance' && 'paths: [server-version/frontend/src/training, server-version/frontend/src/components/app-shell, server-version/frontend/src/pages/student/StudentProfile.tsx, server-version/frontend/src/pages/teacher/TeacherProfile.tsx, .github/scripts/training-appearance-scope.mjs, .github/scripts/training-appearance-checks.mjs, .github/scripts/training-appearance.test.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'survey-cloud' && 'paths: [server-version/frontend/src/survey, server-version/frontend/src/pages/AdminLogin.tsx, server-version/frontend/src/pages/admin, server-version/frontend/src/admin, server-version/frontend/src/components/app-shell, server-version/frontend/src/components/auth, server-version/frontend/src/components/Footer.tsx, .github/scripts/survey-cloud-scope.mjs, .github/scripts/survey-cloud-checks.mjs, .github/scripts/survey-cloud.test.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'survey-experience' && 'paths: [.github/scripts/survey-experience-scope.test.mjs, .github/scripts/survey-experience-candidate.mjs, .github/scripts/survey-experience-browser.cjs]' || needs.scope.outputs.application_route == 'survey-home' && 'paths: [server-version/frontend/src/survey, .github/scripts/survey-home-scope.mjs, .github/scripts/survey-home-browser.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'homepage-copy' && 'paths: [.github/scripts/homepage-copy-scope.mjs, .github/scripts/homepage-copy-browser.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.scenario == 'release-tooling' && 'paths: [.github/scripts, server-version/scripts/release]' || '' }}
           # Bound analysis resources on the hosted Ubuntu VM.
           ram: 3500
           threads: 2
@@ -1313,6 +1330,15 @@ jobs:
           # uploading results to an unavailable code-scanning endpoint.
           upload: never
           upload-database: false
+      - name: retain original PR357 SAST provenance without rewriting findings
+        if: (success() || failure()) && needs.scope.outputs.application_route == 'pr357'
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr357-sast-continuation-${{ github.sha }}
+          path: pr357-evidence/sast-reused.json
+          if-no-files-found: error
+          retention-days: 3
+
       - name: retain exact Training assessment application SAST evidence
         if: always() && needs.scope.outputs.application_route == 'training-assessment'
         uses: actions/upload-artifact@v4
@@ -1647,6 +1673,343 @@ jobs:
             server-version/frontend/dist
           retention-days: 3
           if-no-files-found: error
+
+  pr357-admission:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        persist-credentials: false
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 24.21.0
+    - run: node .github/scripts/pr357-checks.mjs source
+    - run: node --test .github/scripts/pr357-scope.test.mjs .github/scripts/pr357-checks.test.mjs
+    needs:
+    - scope
+    if: github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'pr357'
+    env:
+      CI: 'true'
+      TZ: UTC
+      PLAN: ${{ needs.scope.outputs.pr357_plan }}
+      CI_EVENT: pull_request
+      CI_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+      CI_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
+      CI_PR_NUMBER: ${{ github.event.pull_request.number }}
+      CI_PR_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+      NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+      NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+  pr357-frontend:
+    needs:
+    - scope
+    - pr357-admission
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      CI: 'true'
+      TZ: UTC
+      PLAN: ${{ needs.scope.outputs.pr357_plan }}
+      CI_EVENT: pull_request
+      CI_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+      CI_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
+      CI_PR_NUMBER: ${{ github.event.pull_request.number }}
+      CI_PR_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+      NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+      NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+      VITE_COGNITIVE_MODULE_ENABLED: 'true'
+      NODE_OPTIONS: --max-old-space-size=4096
+      DATABASE_URL: postgresql://synthetic:synthetic@127.0.0.1:5432/type_generation_only
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        persist-credentials: false
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 24.21.0
+    - run: node .github/scripts/pr357-checks.mjs source
+    - name: reuse the complete successfully built and scanned keyboard-focus frontend
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: node .github/scripts/pr357-checks.mjs frontend-focused-reuse
+    - uses: actions/upload-artifact@v4
+      with:
+        name: pr357-frontend-${{ github.sha }}
+        path: server-version/frontend/dist
+        if-no-files-found: error
+        retention-days: 3
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: pr357-frontend-checks-${{ github.sha }}
+        path: pr357-evidence/*.json
+        if-no-files-found: error
+        retention-days: 3
+    if: github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'pr357'
+  pr357-backend:
+    needs:
+    - scope
+    - pr357-admission
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        persist-credentials: false
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 24.21.0
+    - run: node .github/scripts/pr357-checks.mjs source
+    - name: retain completed backend checks and transfer the original compiled artifact
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: node .github/scripts/pr357-checks.mjs backend-reuse
+    - uses: actions/upload-artifact@v4
+      with:
+        name: pr357-backend-${{ github.sha }}
+        path: server-version/backend/dist
+        if-no-files-found: error
+        retention-days: 3
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: pr357-backend-checks-${{ github.sha }}
+        path: pr357-evidence/*.json
+        if-no-files-found: error
+        retention-days: 3
+    if: github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'pr357'
+    env:
+      CI: 'true'
+      TZ: UTC
+      PLAN: ${{ needs.scope.outputs.pr357_plan }}
+      CI_EVENT: pull_request
+      CI_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+      CI_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
+      CI_PR_NUMBER: ${{ github.event.pull_request.number }}
+      CI_PR_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+      NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+      NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+  pr357-audit:
+    needs:
+    - scope
+    - pr357-admission
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        persist-credentials: false
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 24.21.0
+    - run: node .github/scripts/pr357-checks.mjs source
+    - name: retain HIGH CRITICAL production dependency threshold
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        node .github/scripts/pr357-checks.mjs audit-reuse
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: pr357-audit-${{ github.sha }}
+        path: pr357-evidence/*.json
+        if-no-files-found: error
+        retention-days: 3
+    if: github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'pr357'
+    env:
+      CI: 'true'
+      TZ: UTC
+      PLAN: ${{ needs.scope.outputs.pr357_plan }}
+      CI_EVENT: pull_request
+      CI_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+      CI_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
+      CI_PR_NUMBER: ${{ github.event.pull_request.number }}
+      CI_PR_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+      NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+      NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+  pr357-connected:
+    needs:
+    - scope
+    - pr357-frontend
+    - pr357-backend
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:16.15-bookworm
+        env:
+          POSTGRES_DB: school_teacher_browser_ci_test
+          POSTGRES_USER: ptool
+          POSTGRES_PASSWORD: synthetic-actions-disposable
+        ports:
+        - 5432/tcp
+        options: --health-cmd "pg_isready -U ptool -d school_teacher_browser_ci_test" --health-interval 5s --health-timeout 5s --health-retries 20
+      redis:
+        image: redis:7.4.11-bookworm
+        ports:
+        - 6379/tcp
+        options: --health-cmd "redis-cli ping" --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      CI: 'true'
+      TZ: UTC
+      PLAN: ${{ needs.scope.outputs.pr357_plan }}
+      CI_EVENT: pull_request
+      CI_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+      CI_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
+      CI_PR_NUMBER: ${{ github.event.pull_request.number }}
+      CI_PR_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+      NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+      NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+      NODE_ENV: test
+      SCHOOL_TEACHER_ISOLATED_DB: '1'
+    steps:
+    - name: bind service endpoints only after runner service initialization
+      env:
+        DATABASE_URL: postgresql://ptool:synthetic-actions-disposable@127.0.0.1:${{ job.services.postgres.ports['5432'] }}/school_teacher_browser_ci_test?schema=public&connection_limit=10
+        SCHOOL_TEACHER_TEST_DATABASE_URL: postgresql://ptool:synthetic-actions-disposable@127.0.0.1:${{ job.services.postgres.ports['5432'] }}/school_teacher_browser_ci_test?schema=public&connection_limit=10
+        REDIS_URL: redis://127.0.0.1:${{ job.services.redis.ports['6379'] }}/0
+        CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
+        SCHOOL_TEACHER_PRIVATE_DIR: ${{ runner.temp }}/school-teacher-private
+      run: |
+        for key in DATABASE_URL SCHOOL_TEACHER_TEST_DATABASE_URL REDIS_URL CI_POSTGRES_SERVICE_ID SCHOOL_TEACHER_PRIVATE_DIR; do
+          printf '%s=%s\n' "$key" "${!key}" >> "$GITHUB_ENV"
+        done
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        persist-credentials: false
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 24.21.0
+    - run: node .github/scripts/pr357-checks.mjs source
+    - uses: actions/download-artifact@v4
+      with:
+        name: pr357-frontend-${{ github.sha }}
+        path: server-version/frontend/dist
+    - uses: actions/download-artifact@v4
+      with:
+        name: pr357-backend-${{ github.sha }}
+        path: server-version/backend/dist
+    - name: install locked runtime test dependencies, never rebuild either application
+      run: |
+        npm ci --ignore-scripts --prefix .github/release-tools
+        if [ -f /etc/apt/apt-mirrors.txt ]; then
+          sudo sed -i 's|http://azure.archive.ubuntu.com/ubuntu|https://archive.ubuntu.com/ubuntu|g' /etc/apt/apt-mirrors.txt
+        fi
+        bash server-version/scripts/ci-install-canvas-deps.sh
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends fonts-wqy-zenhei
+        npm ci --prefix server-version/backend
+        node server-version/backend/node_modules/prisma/build/index.js generate --schema server-version/backend/prisma/schema.prisma
+        node .github/scripts/ci-artifact.mjs verify frontend
+        node .github/scripts/ci-artifact.mjs verify backend
+    - name: tighten only the approved Chrome and CJK trusted paths on this ephemeral runner
+      run: |
+        # Specific user approvals: 2026-10-27 03:31 and 03:38 UTC.
+        sudo python3 - <<'PYOPT'
+        import os,stat,subprocess,pathlib,json
+        chrome=['/opt/google/chrome/chrome','/opt/google/chrome/chrome-sandbox']
+        fonts=sorted(set(subprocess.check_output(['/usr/bin/fc-list',':lang=zh','--format','%{file}\n'],text=True).splitlines()))
+        assert fonts, 'No installed Chinese font candidates'
+        assert all(f.startswith('/usr/share/fonts/') and pathlib.Path(f).suffix.lower() in ('.ttf','.ttc','.otf','.otc') for f in fonts)
+        targets={}
+        for file in chrome+fonts:
+          p=pathlib.Path(file);targets[str(p)]='file'
+          for parent in p.parents:
+            if str(parent) in ('/','/usr'):continue
+            assert str(parent) in ('/opt','/opt/google','/opt/google/chrome','/usr/share','/usr/share/fonts') or str(parent).startswith('/usr/share/fonts/')
+            targets[str(parent)]='directory'
+        # Validate the complete bounded set before changing any of it.
+        before={}
+        for p,kind in targets.items():
+          st=os.lstat(p)
+          assert st.st_uid==0 and st.st_gid==0 and not stat.S_ISLNK(st.st_mode) and os.path.realpath(p)==p
+          assert stat.S_ISREG(st.st_mode) if kind=='file' else stat.S_ISDIR(st.st_mode)
+          before[p]=stat.S_IMODE(st.st_mode)
+        for p,mode in before.items():
+          os.chmod(p,mode & ~0o022)
+          assert stat.S_IMODE(os.lstat(p).st_mode)==mode & ~0o022
+        print(json.dumps({'scope':'approved-ephemeral-chrome-cjk-only','changes':[{'path':p,'before':oct(mode),'after':oct(mode & ~0o022)} for p,mode in sorted(before.items())]}))
+        PYOPT
+        python3 - <<'PYFONT'
+        import subprocess,os,stat,json,pathlib
+        paths=subprocess.check_output(['/usr/bin/fc-list','--format','%{file}\n'],text=True).splitlines()
+        rows=[]
+        for file in sorted(set(paths)):
+          if not file.startswith('/usr/share/fonts/'):
+            continue
+          for p in [pathlib.Path(file),*pathlib.Path(file).parents]:
+            if str(p)=='/':continue
+            st=os.lstat(p)
+            if st.st_uid!=0 or stat.S_IMODE(st.st_mode)&0o022 or stat.S_ISLNK(st.st_mode):
+              row={'path':str(p),'uid':st.st_uid,'gid':st.st_gid,'mode':oct(stat.S_IMODE(st.st_mode)),'symlink':stat.S_ISLNK(st.st_mode)}
+              if row not in rows:rows.append(row)
+        out=pathlib.Path('school-teacher-evidence');out.mkdir(exist_ok=True)
+        (out/'font-path-diagnostics.json').write_text(json.dumps({'readOnly':True,'untrustedPaths':rows},indent=2))
+        print(json.dumps({'readOnly':True,'untrustedPaths':rows}))
+        PYFONT
+    - name: require official sandboxed Chrome without weakening security checks
+      run: node server-version/e2e/school-teacher-chrome.cjs preflight
+    - name: prepare browser-only disposable schema and actual restricted principal
+      run: |
+        node server-version/backend/node_modules/prisma/build/index.js migrate deploy --schema server-version/backend/prisma/schema.prisma
+        node server-version/e2e/school-teacher-fixture.cjs seed
+    - name: execute existing real product journey and its assertion matrix against the same artifacts
+      env:
+        SCHOOL_TEACHER_ARTIFACTS_VERIFIED: '1'
+      run: node server-version/e2e/school-teacher-browser.cjs
+    - name: remove only this job's private synthetic browser material
+      if: always()
+      run: |
+        node --input-type=module <<'JS'
+        import {resolve,sep} from 'node:path';import {rmSync} from 'node:fs';
+        const root=resolve(process.env.RUNNER_TEMP),dir=resolve(process.env.SCHOOL_TEACHER_PRIVATE_DIR);
+        if(dir!==root+sep+'school-teacher-private')throw Error('Refuse unexpected cleanup target');
+        rmSync(dir,{recursive:true,force:true});
+        JS
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: pr357-connected-${{ github.sha }}
+        path: |
+          school-teacher-evidence/*.json
+          school-teacher-evidence/screenshots/*.png
+        if-no-files-found: error
+        retention-days: 3
+    if: github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'pr357'
+  pr357:
+    needs:
+    - scope
+    - pr357-admission
+    - pr357-frontend
+    - pr357-backend
+    - pr357-audit
+    - pr357-connected
+    if: always() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'pr357'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+    - name: reject missing skipped cancelled and failed consumers
+      env:
+        NEEDS: ${{ toJSON(needs) }}
+      run: |
+        node -e "const n=JSON.parse(process.env.NEEDS);for(const k of ['pr357-admission','pr357-frontend','pr357-backend','pr357-audit','pr357-connected'])if(n[k]?.result!=='success')throw Error(k+' not qualified')"
+    env:
+      CI: 'true'
+      TZ: UTC
+      PLAN: ${{ needs.scope.outputs.pr357_plan }}
+      CI_EVENT: pull_request
+      CI_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+      CI_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
+      CI_PR_NUMBER: ${{ github.event.pull_request.number }}
+      CI_PR_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+      NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+      NPM_CONFIG_REPLACE_REGISTRY_HOST: always
 
   post356:
     name: Post356 bounded backend repair
@@ -2196,6 +2559,7 @@ jobs:
     - scope
     - survey-governance
     - post356
+    - pr357
     - training-polish
     - sjt-native
     - survey-review

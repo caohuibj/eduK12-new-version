@@ -9,7 +9,7 @@ import { validateResultDisclosureContract } from '../assessment-policy/result-di
 import { loadFrozenScaleRuntimeSnapshot } from '../assessment-runtime/runtime-snapshot'
 import { loadStoredVersionedUnitAdmission } from '../assessment-runtime/unit-admission'
 import { loadFrozenActiveSlotSet, compositeItemSlotKey } from '../assessment-runtime/slot-set'
-import { resolveStoredScaleResult, loadStoredCanonicalUnitResult } from '../assessment-runtime/compact-assessment-storage'
+import { resolveStoredScaleResult, loadStoredCanonicalUnitResults, createStoredScaleFactsReader } from '../assessment-runtime/compact-assessment-storage'
 import { scaleProjectionPolicyFromCompiled } from '../scale/projection/policy-resolver'
 import { DISCLOSURE_PRESETS } from '../scale/policy/disclosure'
 import { buildScaleUnitReport, type ScaleUnitReport } from './scale-unit-report'
@@ -107,14 +107,17 @@ export async function readEducationRespondentScaleReport(input: EducationPersona
     if (runtime.sourceDefinitionHash !== source.sourceDefinitionHash) return hidden()
     const admission = await loadStoredVersionedUnitAdmission(child, 'Report admission unavailable', tx)
     const slotSet = await loadFrozenActiveSlotSet(parent.frozenActiveSlotSetEncrypted, tx)
-    const canonical = await loadStoredCanonicalUnitResult(finalUnit.canonicalResultEncrypted, tx)
+    // Reuse immutable facts within this authorized transaction only. Both views
+    // retain independent reconstruction and canonical consistency checks.
+    const reader = await createStoredScaleFactsReader([child], tx)
+    const [canonical] = await loadStoredCanonicalUnitResults([finalUnit.canonicalResultEncrypted], tx, [], reader)
     if (canonical.core.unitType !== 'SCALE' || canonical.core.sourceDefinitionHash !== runtime.sourceDefinitionHash
       || canonical.core.compiledRuntimeHash !== runtime.compiledRuntime.compiledRuntimeHash
       || canonical.core.contextHash !== (parent.contextSnapshotHash ?? null)
       || canonical.persistenceProvenance.sourceType !== 'ASSESSMENT'
       || canonical.persistenceProvenance.sourceAttemptId !== child.id
       || canonical.persistenceProvenance.sourceSubmissionId !== child.submissionId) return hidden()
-    const storedResult = await resolveStoredScaleResult(child.result, { record: child, db: tx })
+    const storedResult = await resolveStoredScaleResult(child.result, { record: child, db: tx, reader })
     const report = buildScaleUnitReport({ assessmentId: child.id, itemId: child.compositeItemId,
       scaleId: child.scaleId, scaleCode: runtime.instrumentKey, scaleName: admission?.scale?.name ?? source.resourceEntry.title,
       result: storedResult, completedAt: child.completedAt, totalTime: child.totalTime })

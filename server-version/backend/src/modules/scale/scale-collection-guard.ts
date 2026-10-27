@@ -28,7 +28,7 @@ export async function assertTrainingScaleCollectionAllowed(tx:Prisma.Transaction
   if(!ids.length)return
   let exactStandardIds=new Set<string>()
   const enteredIds=new Set<string>()
-  let bound:Array<{scale_id:string;composite_item_id:string|null;attempt_epoch:number}>=[]
+  let bound:Array<{scale_id:string;composite_item_id:string|null;attempt_epoch:number;education_source:boolean}>=[]
   const rejectReceipt=async():Promise<never>=>{const {ReportProcessingLeaseLostError}=await import('../assessment-runtime/report-outbox.service');throw new ReportProcessingLeaseLostError()}
   if(scope.acceptedReceipt&&(!scope.compositeAttemptId||!Number.isSafeInteger(scope.compositeAttemptEpoch)||scope.compositeAttemptEpoch!<1
     ||!scope.compositeItemIds?.length||new Set(scope.compositeItemIds).size!==scope.compositeItemIds.length))await rejectReceipt()
@@ -45,8 +45,10 @@ export async function assertTrainingScaleCollectionAllowed(tx:Prisma.Transaction
     // frozen completion contract. An unmaterialized flow unit may use only
     // the exact current candidate verified above under this same parent lock;
     // caller parent/item claims and restarted epochs cannot borrow admission.
-    bound=await tx.$queryRaw<Array<{scale_id:string;composite_item_id:string|null;attempt_epoch:number}>>(Prisma.sql`SELECT a.scale_id,a.composite_item_id,a.attempt_epoch FROM assessments a
+    bound=await tx.$queryRaw<Array<{scale_id:string;composite_item_id:string|null;attempt_epoch:number;education_source:boolean}>>(Prisma.sql`SELECT a.scale_id,a.composite_item_id,a.attempt_epoch,
+      definition.product_kind='ORGANIZATION_RESOURCE' AS education_source FROM assessments a
       JOIN composite_assessment_attempts p ON p.id=a.composite_attempt_id
+      JOIN composite_assessments definition ON definition.id=p.composite_assessment_id
       WHERE a.composite_attempt_id=${scope.compositeAttemptId} AND a.attempt_epoch=p.attempt_epoch
       AND a.scale_id=ANY(${ids}::text[])
       ${scope.compositeItemIds?.length?Prisma.sql`AND a.composite_item_id=ANY(${[...scope.compositeItemIds]}::text[])`:Prisma.empty}
@@ -55,7 +57,10 @@ export async function assertTrainingScaleCollectionAllowed(tx:Prisma.Transaction
   }
   // The shared guard locks Scale rows and resolves release IDs from those locked
   // rows, so an explicit legacy conversion cannot race a stale pre-lock read.
-  const collectionIds=ids.filter(id=>!exactStandardIds.has(id))
+  const educationIds=scope.compositeAttemptId && bound.some(row=>row.education_source) && !scope.acceptedReceipt && !scope.verifiedFlowMaterialization
+    ? await (await import('../assessment-run/educationLibraryExecution')).educationFrozenScaleCompletionIds(tx,scope.compositeAttemptId,ids,scope.compositeItemIds??[])
+    : new Set<string>()
+  const collectionIds=ids.filter(id=>!exactStandardIds.has(id)&&!educationIds.has(id))
   if(scope.acceptedReceipt){
     // Only the exact committed current-epoch child/item set can consume this
     // receipt. A parent/Scale claim or a future lazy child is insufficient.

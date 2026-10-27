@@ -1,5 +1,5 @@
 import { describe,expect,it,vi } from 'vitest'
-import { fireEvent,render,screen,waitFor } from '@testing-library/react'
+import { fireEvent,render,screen,waitFor,within } from '@testing-library/react'
 import { SchoolRelationships } from './SchoolRelationships'
 import type { SchoolApi } from './SchoolRecovery'
 
@@ -26,12 +26,13 @@ describe('Huischool admin relationship management UI',()=>{
         return {id:'assignment-1'}
       throw Error('unexpected '+method+' '+path)
     })
-    render(<SchoolRelationships api={api as unknown as SchoolApi} organizationId={org}
+    render(<SchoolRelationships compact api={api as unknown as SchoolApi} organizationId={org}
       classes={[{id:cls,name:'一班',unitKind:'CLASS'}]}/>)
     expect(screen.queryByText('林-123456789ABC')).not.toBeInTheDocument()
     fireEvent.change(screen.getByLabelText('选择班级'),{target:{value:cls}})
     fireEvent.click(screen.getByRole('button',{name:'经二次验证读取关系'}))
-    expect(await screen.findByText('林-123456789ABC')).toBeInTheDocument()
+    await waitFor(()=>expect(within(screen.getByLabelText('教师')).getByRole('option',{name:'任课教师'})).toBeInTheDocument())
+    expect(screen.queryByText('林-123456789ABC')).not.toBeInTheDocument()
     fireEvent.change(screen.getByLabelText('教师'),{target:{value:teacher}})
     fireEvent.click(screen.getByRole('button',{name:'登记任教关系'}))
     await waitFor(()=>expect(api).toHaveBeenCalledWith(
@@ -51,10 +52,11 @@ describe('Huischool admin relationship management UI',()=>{
     const confirm=window.confirm
     window.confirm=vi.fn(()=>true)
     try{
-      render(<SchoolRelationships api={api as unknown as SchoolApi} organizationId={org}
+      render(<SchoolRelationships compact api={api as unknown as SchoolApi} organizationId={org}
         classes={[{id:cls,name:'一班',unitKind:'CLASS'}]}/>)
       fireEvent.change(screen.getByLabelText('选择班级'),{target:{value:cls}})
       fireEvent.click(screen.getByRole('button',{name:'经二次验证读取关系'}))
+      fireEvent.click(await screen.findByRole('button',{name:'心理个案'}))
       await screen.findByText('林-123456789ABC')
       fireEvent.change(screen.getByLabelText('心理教师（须持有专业能力）'),
         {target:{value:counselor}})
@@ -82,10 +84,11 @@ describe('Huischool admin relationship management UI',()=>{
     const confirm=window.confirm
     window.confirm=vi.fn(()=>true)
     try{
-      render(<SchoolRelationships api={api as unknown as SchoolApi} organizationId={org}
+      render(<SchoolRelationships compact api={api as unknown as SchoolApi} organizationId={org}
         classes={[{id:cls,name:'一班',unitKind:'CLASS'}]}/>)
       fireEvent.change(screen.getByLabelText('选择班级'),{target:{value:cls}})
       fireEvent.click(screen.getByRole('button',{name:'经二次验证读取关系'}))
+      fireEvent.click(await screen.findByRole('button',{name:'心理个案'}))
       await screen.findByText(/学生 林-AAAA/)
       const inputs=screen.getAllByLabelText('结束关系原因（记录到审计）')
       const buttons=screen.getAllByRole('button',{name:'终止个案关系'})

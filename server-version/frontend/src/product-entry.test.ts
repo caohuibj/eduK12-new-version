@@ -15,15 +15,20 @@ describe('product entry only imports the selected application', () => {
       ['./survey/SurveyPublicApp', 'participant'],
     ]) vi.doMock(path, () => { evaluated(name); return { default: name } })
   })
-  it.each([['school.eduk12.top','school'],['teacher.eduk12.top','teacher']])('keeps %s entry selection after the synchronous shared brand bootstrap',async(hostname,expected)=>{
+  it.each([
+    ['school.eduk12.top','school','false','School','/school/favicon.svg?v=20261025-a1'],
+    ['SCHOOL.EDUK12.TOP.','school','false','School','/school/favicon.svg?v=20261025-a1'],
+    ['school.localhost','school','true','School','/school/favicon.svg?v=20261025-a1'],
+    ['teacher.eduk12.top','teacher','false','慧育空间','/vite.svg'],
+  ])('keeps %s entry selection after the synchronous shared brand bootstrap',async(hostname,expected,development,title,favicon)=>{
     const html=readFileSync('index.html','utf8'),script=readFileSync('public/entry-brand.js','utf8')
     expect(html.indexOf('src="/entry-brand.js"')).toBeGreaterThanOrEqual(0)
     expect(html.indexOf('src="/entry-brand.js"')).toBeLessThan(html.indexOf('src="/src/main.tsx"'))
     expect(html).toContain('<script src="/entry-brand.js" data-development="%DEV%"></script>')
-    const icon={setAttribute:vi.fn()},doc={title:'',currentScript:{dataset:{development:'false'}},head:{querySelector:()=>icon}}
+    const icon={setAttribute:vi.fn()},doc={title:'',currentScript:{dataset:{development}},head:{querySelector:()=>icon}}
     runInNewContext(script,{window:{location:{hostname,pathname:'/',search:''}},document:doc,URLSearchParams})
-    expect(doc.title).toBe('慧育空间') // pre-React fallback, not the final product title.
-    expect(icon.setAttribute).toHaveBeenCalledWith('href','/vite.svg')
+    expect(doc.title).toBe(title)
+    expect(icon.setAttribute).toHaveBeenCalledWith('href',favicon)
     const result=await loadProductApp(hostname,'/')
     expect(result.default).toBe(expected);expect(evaluated.mock.calls).toEqual([[expected]])
   })

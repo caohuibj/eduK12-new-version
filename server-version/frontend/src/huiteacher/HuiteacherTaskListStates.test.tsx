@@ -108,16 +108,16 @@ describe('List-only retry preserves current answering',()=>{
    return {id:'attempt',status:'IN_PROGRESS',items:[{id:'item',type:'FORM'}],units:[{id:'section',type:'FORM_SECTION',formSectionId:'section'}],currentItem:{id:'section',type:'FORM_SECTION',formSectionId:'section',definitionHash:'hash'}}
   })
   render(view.render(api as Api))
-  const open={form:'继续评价',scale:'进入本人自评',personal:'开始／继续自主测评',private:'打开本人表单'}[key]
+  const open={form:'继续评价',scale:'进入本人自评',personal:'发起个人测评',private:'打开本人表单'}[key]
   fireEvent.click(await screen.findByRole('button',{name:open}))
   await screen.findByRole('alert')
   expect(screen.getByText('已分配任务',{selector:'strong'})).toBeInTheDocument()
-  if(key==='personal')fireEvent.click(screen.getByRole('radio',{name:'我的选择'}))
+  if(key==='personal')fireEvent.click(screen.getByRole('button',{name:'我的选择'}))
   else fireEvent.change(screen.getByRole('textbox',{name:'当前答案'}),{target:{value:'未提交的答案'}})
   const posts=api.mock.calls.filter(([,method])=>method==='POST').length
   fireEvent.click(screen.getByRole('button',{name:'重试读取任务列表'}))
   await waitFor(()=>expect(screen.queryByRole('alert')).not.toBeInTheDocument())
-  if(key==='personal')expect(screen.getByRole('radio',{name:'我的选择'})).toBeChecked()
+  if(key==='personal')expect(screen.getByRole('button',{name:'我的选择'})).toHaveAttribute('aria-pressed','true')
   else expect(screen.getByRole('textbox',{name:'当前答案'})).toHaveValue('未提交的答案')
   expect(api.mock.calls.filter(([,method])=>method==='POST')).toHaveLength(posts)
   expect(listReads).toBe(3)

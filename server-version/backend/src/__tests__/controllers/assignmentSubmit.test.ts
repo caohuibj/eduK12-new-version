@@ -51,7 +51,7 @@ describe('assignment submit deadline', () => {
     mockPrisma.assignment.findUnique.mockImplementation(async (query) => {
       expect(query).toEqual({
         where: { id: 'asg-1' },
-        select: { courseId: true, status: true, deadline: true },
+        select: { courseId: true, status: true, deadline: true, course: { select: { courseType: true } } },
       })
       return { courseId: 'course-1', status: AssignmentStatus.PUBLISHED, deadline: null }
     })
@@ -93,6 +93,28 @@ describe('assignment submit deadline', () => {
     expect(mockPrisma.submissionHistory.create).toHaveBeenCalledWith({ data: {
       submissionId: 'sub-1', content: 'previous content', answers: { q1: 'previous answer' }, version: 8,
     } })
+    expect(mockPrisma.submission.update).toHaveBeenCalledOnce()
+  })
+
+  it.each(['SUBMITTED','GRADED'])('rejects stale campus rewrites of %s even with its current revision', async (status) => {
+    mockPrisma.assignment.findUnique.mockResolvedValue({courseId:'campus-1',status:AssignmentStatus.PUBLISHED,deadline:null,course:{courseType:'CAMPUS_ACTIVITY'}})
+    mockPrisma.submission.findFirst.mockResolvedValue({id:'sub-1',status,revision:0,content:'original',answers:{}})
+    const res=makeRes()
+    await assignmentController.submit(makeReq({body:{content:'overwrite',expectedRevision:0}}),res)
+    expect(res.statusCode).toBe(409)
+    expect(res.body.message).toContain('校园活动已提交')
+    expect(mockPrisma.submission.update).not.toHaveBeenCalled()
+    expect(mockPrisma.submissionHistory.create).not.toHaveBeenCalled()
+  })
+
+  it('still permits a campus draft to make its first final submission', async () => {
+    mockPrisma.assignment.findUnique.mockResolvedValue({courseId:'campus-1',status:AssignmentStatus.PUBLISHED,deadline:null,course:{courseType:'CAMPUS_ACTIVITY'}})
+    mockPrisma.submission.findFirst.mockResolvedValue({id:'sub-1',status:'DRAFT',revision:0,content:'draft',answers:{}})
+    mockPrisma.submissionHistory.findFirst.mockResolvedValue(null)
+    mockPrisma.submission.update.mockResolvedValue({id:'sub-1',status:'SUBMITTED',revision:1})
+    const res=makeRes()
+    await assignmentController.submit(makeReq(),res)
+    expect(res.body.code).toBe(0)
     expect(mockPrisma.submission.update).toHaveBeenCalledOnce()
   })
 

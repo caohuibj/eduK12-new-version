@@ -24,7 +24,8 @@
     document.documentElement.dataset.trainingEntry = 'true'
     document.documentElement.dataset.trainingTheme = theme
   }
-  document.title = survey ? 'Research' : training ? 'Training' : '慧育空间'
+  const school = hostname === 'school.eduk12.top' || (development && hostname === 'school.localhost')
+  document.title = survey ? 'Research' : training ? 'Training' : school ? 'School' : '慧育空间'
   const icon = document.head.querySelector('link[rel="icon"]')
-  if (icon) icon.setAttribute('href', survey ? '/survey/huisurvey-w2-emblem.svg' : training ? '/training/favicon.svg?v=20261023-compact' : '/vite.svg')
+  if (icon) icon.setAttribute('href', survey ? '/survey/huisurvey-w2-emblem.svg' : training ? '/training/favicon.svg?v=20261023-compact' : school ? '/school/favicon.svg?v=20261025-a1' : '/vite.svg')
 })()

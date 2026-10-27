@@ -4,7 +4,8 @@ import { ProfessionalFormAnswer } from '../../modules/assessment-core/form/Profe
 import type { ProfessionalAnswer } from '../../modules/assessment-core/form/types'
 import { BasicFormAnswer } from '../../modules/assessment-core/form/BasicFormAnswer'
 import type { FormQuestion } from '../../modules/assessment-core/form/types'
-import type { ChangeEvent } from 'react'
+import {useEffect,useRef,type ChangeEvent,type MouseEvent} from 'react'
+import {useScaleAutoAdvance} from '../../hooks/useScaleAutoAdvance'
 
 export type FormPlayerValue = string | number | string[] | Record<string, string | number | string[] | {_surveyRefusal:true}> | {_surveyRefusal:true} | null
 
@@ -36,10 +37,13 @@ export interface FormPlayerProps {
   errorMessage?: string | null
   position: number
   total: number
-  onChange: (value: FormPlayerValue) => void | Promise<void>
+  onChange: (value: FormPlayerValue) => void | boolean | Promise<void | boolean>
+  autoAdvance?: boolean
+  scopeKey?: string
   onPrevious: () => void
   onNext?: () => void
   onSubmit?: () => void | Promise<void>
+  submitLabel?: string
   submitting?: boolean
   allowSkip?: boolean
 }
@@ -54,7 +58,7 @@ const ChoiceRow = ({
   checked,
   disabled,
   describedBy,
-  onChange,
+  onChange, onClick,
 }: {
   type: 'radio' | 'checkbox'
   name: string
@@ -63,6 +67,7 @@ const ChoiceRow = ({
   disabled: boolean
   describedBy?: string
   onChange: () => void
+  onClick?: (event:MouseEvent<HTMLInputElement>)=>void
 }) => (
   <label className={`flex min-h-11 w-full cursor-pointer items-center gap-3 rounded-lg border px-4 py-3 text-left transition ${checked ? 'border-blue-700 bg-blue-50 text-blue-900' : 'border-slate-300 bg-white text-slate-800 hover:border-slate-400'} ${disabled ? 'cursor-not-allowed opacity-60' : ''}`}>
     <input
@@ -73,6 +78,7 @@ const ChoiceRow = ({
       disabled={disabled}
       aria-describedby={describedBy}
       onChange={onChange}
+      onClick={onClick}
       className="h-5 w-5 shrink-0 accent-blue-700"
     />
     <span>{option.label}</span>
@@ -94,23 +100,40 @@ export function FormPlayer({
   onChange,
   onPrevious,
   onNext,
-  onSubmit,
+  onSubmit, submitLabel='提交整个区段',
   submitting = false,
   allowSkip = false,
+  autoAdvance = false, scopeKey = '',
 }: FormPlayerProps) {
   const describedBy = errorMessage ? errorId(item.id) : undefined
   const choiceName = `form-player-choice-${item.id}`
   const textValue = typeof value === 'string' ? value : ''
   const multipleValues = Array.isArray(value) ? value : []
-  const answerControlsDisabled = disabled || answerDisabled || submitting
-  const navigationControlsDisabled = disabled || navigationDisabled || submitting
-  const submitControlsDisabled = disabled || submitDisabled || submitting
 
   const q = item.formDefinition
   // Immutable private FORM versions retain their typed wire names. Normalize
   // only the matching typed choice presentation, never the stored definition.
   const choiceType = q?.type === item.type && q.type === 'SINGLE' ? 'single_choice'
     : q?.type === item.type && q.type === 'MULTIPLE' ? 'multiple_choice' : item.type
+  const automatic=autoAdvance&&choiceType==='single_choice'
+  const arrowSelection=useRef(false),suppressedClick=useRef(false),questionRef=useRef<HTMLElement>(null)
+  const selection=useScaleAutoAdvance<FormPlayerValue>({
+    questionKey:scopeKey+':'+item.id,enabled:automatic,
+    disabled:disabled||answerDisabled||navigationDisabled||submitting,
+    hasNext:position<total,onSave:onChange,onNext,
+  })
+  useEffect(()=>{
+    arrowSelection.current=false;suppressedClick.current=false
+    if(autoAdvance)questionRef.current?.focus({preventScroll:true})
+  },[autoAdvance,item.id,scopeKey])
+  const answerControlsDisabled=disabled||answerDisabled||submitting||selection.busy
+  const navigationControlsDisabled=disabled||navigationDisabled||submitting||selection.busy
+  const submitControlsDisabled=disabled||submitDisabled||submitting||selection.busy
+  const chooseSingle=(next:FormPlayerValue)=>{
+    if(suppressedClick.current)return
+    if(automatic&&!arrowSelection.current&&next!==q?.otherOptionKey)void selection.select(next)
+    else void onChange(next)
+  }
   const matrix = q?.type === 'MATRIX' || q?.type === 'MATRIX_MULTIPLE'
   // The shared renderer uses independent row keys; Training wire/storage uses one
   // typed object per DB item. Preserve row keys rather than serializing the object.
@@ -143,10 +166,13 @@ export function FormPlayer({
   )
 
   return (
-    <section className="form-player rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6" aria-label={`表单字段 ${position} / ${total}`}>
+    <section className="form-player rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6" ref={questionRef} tabIndex={autoAdvance?-1:undefined} aria-label={`表单题目 ${position} / ${total}`}
+      onPointerDownCapture={()=>{arrowSelection.current=false;suppressedClick.current=false}}
+      onKeyDownCapture={event=>{if(event.target instanceof HTMLInputElement&&event.target.type==='radio')arrowSelection.current=['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key)}}
+      onKeyUpCapture={()=>{arrowSelection.current=false}}>
       <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
         {allowSkip && !item.required ? <button type="button" disabled={answerControlsDisabled} onClick={() => void onChange(null)} className="form-player-skip min-h-11 rounded border px-3 py-2 text-sm">清空本题（不作答）</button> : null}
-        <p className="text-sm font-medium text-slate-500">字段 {position} / {total}</p>
+        <p className="text-sm font-medium text-slate-500">题目 {position} / {total}</p>
       </div>
 
       {choiceType === 'single_choice' ? (
@@ -162,7 +188,13 @@ export function FormPlayer({
                 checked={value === option.value}
                 disabled={answerControlsDisabled}
                 describedBy={describedBy}
-                onChange={() => void onChange(option.value)}
+                onChange={() => chooseSingle(option.value)}
+                onClick={event=>{
+                  if(!automatic)return
+                  suppressedClick.current=event.detail>1
+                  if(suppressedClick.current){event.preventDefault();return}
+                  if(value===option.value&&!arrowSelection.current&&option.value!==q?.otherOptionKey)void selection.select(option.value)
+                }}
               />
             ))}
           </div>
@@ -255,7 +287,7 @@ export function FormPlayer({
           disabled={position <= 1 || navigationControlsDisabled}
           className="min-h-11 rounded-lg border border-slate-300 bg-white px-4 py-2 font-medium text-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          上一字段
+          上一题
         </button>
         {position < total && onNext ? (
           <button
@@ -264,7 +296,7 @@ export function FormPlayer({
             disabled={navigationControlsDisabled}
             className="min-h-11 rounded-lg border border-slate-300 bg-white px-4 py-2 font-medium text-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            下一字段
+            下一题
           </button>
         ) : onSubmit ? (
           <button
@@ -273,7 +305,7 @@ export function FormPlayer({
             disabled={submitControlsDisabled}
             className="min-h-11 rounded-lg bg-blue-700 px-4 py-2 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {submitting ? '提交区段中…' : '提交整个区段'}
+            {submitting ? '正在提交…' : submitLabel}
           </button>
         ) : null}
       </div>

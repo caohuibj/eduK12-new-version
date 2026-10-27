@@ -1,6 +1,6 @@
-import teacherWordmark from './teacher-wordmark.svg'
+import teacherWordmark from './teacher-home-wordmark.svg'
 
-/** The approved B3 emblem and font-independent two-line Teacher identity. */
+/** One outlined Teacher identity for public, workspace and administrator pages. */
 export default function TeacherBrand() {
   return <div className="ht-brand" aria-label="Teacher @eduk12.top">
     <img className="ht-brand-symbol ht-brand-b3" src="/huiteacher/huiteacher-b3-emblem.svg"

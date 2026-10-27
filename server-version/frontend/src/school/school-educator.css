@@ -1,0 +1,325 @@
+/* Ordinary School teacher workspace. Banner layout is also shared by parents;
+ * task and answer rules remain scoped to the ordinary teacher. */
+.hs-app.hs-workspace.hs-educator .hs-main.hs-main-workspace{width:min(1200px,calc(100% - 64px));padding:28px 0 48px}
+.hs-educator .hs-workspace-content{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,360px);gap:24px;align-items:start}
+.hs-educator .hs-workspace-content>*{grid-column:1/-1;min-width:0}
+.hs-educator .hs-workspace-content>.hs-workspace-page-heading{grid-column:1;grid-row:1;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 20px;padding:0}
+.hs-educator .hs-workspace-page-heading>.hs-workspace-trail{grid-column:2;grid-row:1/3}
+.hs-educator .hs-workspace-trail>.hs-section-kicker{display:none}
+.hs-educator .hs-workspace-page-heading>:is(h1,p){grid-column:1;margin:0}
+.hs-educator .hs-workspace-page-heading h1{font-size:28px;line-height:1.5}
+.hs-educator .hs-workspace-page-heading>p{font-size:14px;line-height:1.8}
+.hs-app.hs-educator .hs-workspace-content>.hs-workspace-context{grid-column:2;grid-row:1;display:block;margin:0;padding:0;border:0;background:transparent;box-shadow:none}
+.hs-educator .hs-workspace-context>label{display:flex;align-items:center;gap:12px;margin:0}
+.hs-educator .hs-workspace-context>label>span{font-size:12px;white-space:nowrap}
+.hs-educator .hs-workspace-context select{min-width:0;flex:1;min-height:44px;font-size:13px}
+.hs-app.hs-educator .hs-panel:not(.hs-runner,.hs-runner *){margin:0;padding:24px;border-radius:16px;box-shadow:none}
+.hs-educator .hs-educator-home-heading{padding-bottom:22px;border-bottom:1px solid var(--hs-border)}
+.hs-educator .hs-educator-home-heading h1{margin:0 0 8px;font:600 30px/1.5 var(--hs-serif);color:var(--hs-ink)}
+.hs-app.hs-educator .hs-educator-home-heading p{font-size:14px;line-height:1.85;margin:0;color:var(--hs-muted)}
+.hs-educator .hs-overview-section{margin-top:24px}
+.hs-app.hs-educator .hs-overview-section>h2{font-size:18px;margin:0 0 16px}
+.hs-educator .hs-workspace-shortcuts{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.hs-app.hs-educator .hs-workspace-shortcuts>a{display:grid;grid-template-columns:36px minmax(0,1fr) auto;gap:4px 14px;min-height:112px;padding:22px;border-radius:14px;box-shadow:none}
+.hs-educator .hs-workspace-shortcuts>a>svg{grid-column:1;grid-row:1/3;align-self:center;width:24px;height:24px}
+.hs-app.hs-educator .hs-workspace-shortcuts h3{grid-column:2;grid-row:1;margin:0;font-size:18px;line-height:1.5}
+.hs-app.hs-educator .hs-workspace-shortcuts p{grid-column:2;grid-row:2;margin:0;font-size:13px;line-height:1.8}
+.hs-app.hs-educator .hs-workspace-shortcuts span{grid-column:3;grid-row:1/3;align-self:center;margin:0;font-size:12px}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-header{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:24px;align-items:center}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-header:not(:has(>.hs-educator-navigation)){grid-template-columns:minmax(0,1fr) auto}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-header nav.hs-educator-navigation{justify-self:center;justify-content:center;gap:8px;min-width:0}
+.hs-educator-navigation>a{display:flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 14px;border:1px solid transparent;border-radius:10px;color:var(--hs-muted);text-decoration:none;font-size:14px;line-height:1.5;white-space:nowrap}
+.hs-educator-navigation>a:hover{background:var(--hs-surface-soft);color:var(--hs-ink)}
+.hs-educator-navigation>a[aria-current=page]{background:var(--hs-surface-soft);border-color:var(--hs-border);color:var(--hs-primary);font-weight:600}
+@media(max-width:1000px){
+ .hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-header{grid-template-columns:minmax(0,1fr) auto;gap:12px 16px}
+ .hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-header nav.hs-account-actions{grid-column:2;grid-row:1;width:auto}
+ .hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-header nav.hs-educator-navigation{grid-column:1/-1;grid-row:2;justify-self:stretch;display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;padding-top:10px;border-top:1px solid var(--hs-border)}
+}
+@media(max-width:360px){
+ .hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-header,.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-header:not(:has(>.hs-educator-navigation)){grid-template-columns:minmax(0,1fr)}
+ .hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-header nav.hs-account-actions{grid-column:1;grid-row:2;width:100%}
+ .hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-header nav.hs-educator-navigation{grid-row:3}
+ .hs-educator-navigation>a{gap:6px;padding-inline:8px;font-size:13px}
+}
+.hs-app:is(.hs-educator,.hs-professional) .hs-activity-manager>h2{display:none}
+.hs-app:is(.hs-educator,.hs-professional) .hs-activity-manager>p{font-size:13px;line-height:1.85;margin:0 0 22px;max-width:88ch}
+:is(.hs-educator,.hs-professional) .hs-activity-entry-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:start}
+:is(.hs-educator,.hs-professional) .hs-activity-entry-grid>div{min-width:0;padding:22px;border:1px solid var(--hs-border);border-radius:12px;background:var(--hs-surface)}
+.hs-app:is(.hs-educator,.hs-professional) .hs-activity-entry-grid h3{margin:0 0 20px;font-size:18px;line-height:1.5}
+:is(.hs-educator,.hs-professional) .hs-activity-entry-grid .hs-field{margin:0 0 18px}
+:is(.hs-educator,.hs-professional) .hs-activity-entry-grid .hs-field>span{font-size:13px;margin-bottom:7px}
+:is(.hs-educator,.hs-professional) .hs-activity-entry-grid :is(input,select){min-width:0;width:100%;min-height:44px;font-size:15px}
+:is(.hs-educator,.hs-professional) .hs-activity-entry-grid button{min-height:44px;font-size:14px}
+:is(.hs-educator,.hs-professional) .hs-activity-detail{padding-top:26px;margin-top:26px;border-top:1px solid var(--hs-border)}
+:is(.hs-educator,.hs-professional) .hs-activity-detail>.hs-field{max-width:760px}
+:is(.hs-educator,.hs-professional) .hs-activity-detail>:is(h3,p){overflow-wrap:anywhere}
+.hs-app:is(.hs-educator,.hs-professional) .hs-activity-detail>h3{font-size:19px;line-height:1.6;margin:24px 0 14px}
+.hs-app:is(.hs-educator,.hs-professional) .hs-activity-detail>h3:first-child{margin-top:0}
+:is(.hs-educator,.hs-professional) .hs-activity-detail button{min-height:44px}
+.hs-teacher-task-heading{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:16px}
+.hs-app.hs-educator .hs-teacher-task-heading h2{display:none}
+.hs-app.hs-educator .hs-teacher-task-heading .hs-collection-summary{margin:0;font-size:13px}
+.hs-app.hs-educator .hs-teacher-task-help{padding:0;margin:0 0 20px;border:0;background:transparent;font-size:13px;line-height:1.85}
+.hs-teacher-task-help>summary{width:fit-content;cursor:pointer;min-height:36px;color:var(--hs-muted)}
+.hs-teacher-task-help>p{padding:12px 16px;border-left:2px solid var(--hs-border);margin:0}
+.hs-app.hs-educator form.hs-collection-search{display:flex;align-items:center;gap:10px;flex-basis:100%;max-width:650px;margin:0;padding:4px 5px 4px 14px;border:1px solid var(--hs-border);border-radius:10px;background:var(--hs-surface);color:var(--hs-muted)}
+.hs-app.hs-educator .hs-teacher-task-list{display:grid;grid-template-columns:minmax(0,1fr);gap:0}
+.hs-app.hs-educator .hs-teacher-task-list>.hs-task-card{display:grid;grid-template-columns:40px minmax(0,1fr) auto;align-items:center;gap:14px 18px;margin:0;padding:22px 0;border:0;border-bottom:1px solid var(--hs-border);border-radius:0;background:transparent;box-shadow:none}
+.hs-teacher-task-icon{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:10px;background:var(--hs-surface-soft,#edf3e7);color:var(--hs-primary)}
+.hs-teacher-task-copy{min-width:0}
+.hs-app.hs-educator .hs-teacher-task-copy small{font-size:12px;line-height:1.7;color:var(--hs-muted)}
+.hs-app.hs-educator .hs-teacher-task-copy h3{font-size:18px;line-height:1.6;margin:3px 0 8px;overflow-wrap:anywhere}
+.hs-app.hs-educator .hs-teacher-task-copy p{font-size:12px;line-height:1.8;margin:3px 0;color:var(--hs-muted);overflow-wrap:anywhere}
+.hs-teacher-task-copy strong{font-weight:500}
+.hs-teacher-task-action{max-width:260px}
+.hs-teacher-task-action button{min-height:44px;font-size:13px}
+.hs-app.hs-educator .hs-teacher-task-action p{font-size:12px;line-height:1.8;margin:0}
+.hs-app.hs-educator .hs-teacher-task-list--cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.hs-app.hs-educator .hs-teacher-task-list--cards>.hs-task-card{grid-template-columns:36px minmax(0,1fr);align-items:start;border:1px solid var(--hs-border);border-radius:12px;padding:20px}
+.hs-teacher-task-list--cards .hs-teacher-task-action{grid-column:1/-1;justify-self:end}
+.hs-app.hs-educator .hs-account-panel{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:32px 48px}
+.hs-educator .hs-account-panel>div{min-width:0}
+.hs-educator .hs-account-panel>div+div{padding-left:32px;border-left:1px solid var(--hs-border)}
+.hs-app.hs-educator .hs-account-panel :is(h2,h3){margin:0 0 20px;font-size:20px}
+.hs-app.hs-educator .hs-account-panel p{font-size:14px;line-height:1.85}
+@media(max-width:1000px){
+ .hs-educator .hs-workspace-content{grid-template-columns:minmax(0,1fr);gap:20px}
+ .hs-app.hs-educator .hs-workspace-content>.hs-workspace-context{grid-column:1;grid-row:auto;max-width:520px;width:100%}
+ .hs-educator .hs-workspace-shortcuts{grid-template-columns:minmax(0,1fr)}
+}
+@media(max-width:700px){
+ :is(.hs-educator,.hs-professional) .hs-activity-entry-grid,.hs-app.hs-educator .hs-account-panel{grid-template-columns:minmax(0,1fr);gap:20px}
+ .hs-educator .hs-account-panel>div+div{padding:24px 0 0;border-left:0;border-top:1px solid var(--hs-border)}
+ .hs-app.hs-educator .hs-teacher-task-list>.hs-task-card{grid-template-columns:36px minmax(0,1fr)}
+ .hs-teacher-task-action{grid-column:2;max-width:none}
+ .hs-app.hs-educator .hs-teacher-task-list--cards{grid-template-columns:minmax(0,1fr)}
+ .hs-educator .hs-teacher-task-list--cards .hs-teacher-task-action{grid-column:2;justify-self:start}
+}
+@media(max-width:600px){
+ .hs-app.hs-workspace.hs-educator .hs-main.hs-main-workspace{width:calc(100% - 32px);padding:20px 0 32px}
+ .hs-app.hs-educator .hs-panel:not(.hs-runner,.hs-runner *){padding:20px 16px;border-radius:14px}
+ .hs-educator .hs-workspace-page-heading h1,.hs-educator .hs-educator-home-heading h1{font-size:25px}
+ .hs-educator .hs-workspace-page-heading>.hs-workspace-trail a{white-space:nowrap}
+ :is(.hs-educator,.hs-professional) .hs-activity-entry-grid>div{padding:20px 16px}
+ .hs-educator .hs-workspace-context>label{gap:10px}
+ .hs-educator .hs-workspace-context select{font-size:12px}
+ .hs-app.hs-educator .hs-workspace-shortcuts>a{grid-template-columns:28px minmax(0,1fr) auto;padding:18px 16px;gap:5px 10px}
+ .hs-app.hs-educator .hs-workspace-shortcuts h3{font-size:17px}
+}
+/* Override legacy card spacing within this inbox, without touching runners. */
+.hs-app.hs-workspace.hs-educator[data-theme] section.hs-task-view.hs-teacher-tasks>details.hs-task-inbox{padding:0;border:0;background:transparent}
+.hs-app.hs-workspace.hs-educator[data-theme] .hs-teacher-tasks details.hs-teacher-task-help{padding:0;margin:0 0 12px;border:0;border-radius:0;background:transparent}
+.hs-app.hs-workspace.hs-educator .hs-teacher-tasks .hs-task-card .hs-teacher-task-copy h3{margin:3px 0 8px;font-size:18px;line-height:1.6}
+.hs-app.hs-workspace.hs-educator .hs-teacher-tasks .hs-task-card .hs-teacher-task-copy p{margin:3px 0;font-size:12px;line-height:1.8}
+.hs-app.hs-workspace.hs-educator:has(.hs-runner) .hs-main.hs-main-workspace{width:min(920px,calc(100% - 64px))}
+@media(max-width:600px){.hs-app.hs-workspace.hs-educator:has(.hs-runner) .hs-main.hs-main-workspace{width:calc(100% - 32px)}}
+.hs-app.hs-workspace.hs-educator[data-theme] section.hs-teacher-tasks .hs-teacher-task-list>.hs-task-card{background:transparent}
+.hs-app.hs-workspace.hs-educator[data-theme] section.hs-teacher-tasks .hs-teacher-task-list--cards>.hs-task-card{background:var(--hs-surface)}
+.hs-app.hs-workspace.hs-educator .hs-teacher-tasks .hs-task-card .hs-teacher-task-copy :is(small,p){font-weight:400}
+:is(.hs-educator,.hs-professional) .hs-activity-entry-grid :is(input,select){font-weight:400}
+.hs-educator .hs-workspace-content:not(:has(>.hs-workspace-context))>.hs-workspace-page-heading{grid-column:1/-1}
+
+/* Activity creation is separate from the selected activity's configuration. */
+.hs-app:is(.hs-educator,.hs-professional) .hs-activity-entry-grid--compact{grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:start}
+.hs-app:is(.hs-educator,.hs-professional) .hs-activity-entry-grid--compact>.hs-activity-select{grid-column:1;grid-row:1;display:flex;align-items:flex-end;gap:12px;padding:0;border:0;background:transparent}
+.hs-activity-entry-grid--compact>.hs-activity-select>h3{display:none}
+.hs-app:is(.hs-educator,.hs-professional) .hs-activity-entry-grid--compact>.hs-activity-select .hs-field{flex:1;min-width:0;margin:0}
+.hs-activity-entry-grid--compact>.hs-activity-select>button{flex:none}
+.hs-app:is(.hs-educator,.hs-professional)[data-theme] .hs-activity-entry-grid--compact>details.hs-activity-create{grid-column:2;grid-row:1;align-self:end;padding:0;margin:0;border:1px solid var(--hs-border);border-radius:10px;background:var(--hs-surface)}
+.hs-activity-entry-grid--compact>.hs-activity-create>summary{padding:10px 16px;min-height:44px;font-size:14px;line-height:1.6;cursor:pointer;white-space:nowrap}
+.hs-activity-entry-grid--compact>.hs-activity-create[open]{width:340px}
+.hs-activity-create-fields{padding:18px;border-top:1px solid var(--hs-border)}
+.hs-activity-manager--compact:has(.hs-activity-create[open])>.hs-activity-detail{display:none}
+.hs-app:is(.hs-educator,.hs-professional) .hs-activity-manager--compact>.hs-activity-detail{padding-top:22px;margin-top:22px}
+.hs-app:is(.hs-educator,.hs-professional) .hs-activity-manager--compact .hs-activity-detail>h3{font-size:22px;margin:0 0 8px;line-height:1.5}
+.hs-app:is(.hs-educator,.hs-professional) .hs-activity-manager--compact .hs-activity-detail>p{font-size:13px;line-height:1.8;margin:0 0 20px;color:var(--hs-muted)}
+.hs-activity-config-tabs{display:flex;flex-wrap:wrap;gap:8px;padding:0 0 18px;margin:0 0 22px;border-bottom:1px solid var(--hs-border)}
+.hs-app:is(.hs-educator,.hs-professional) .hs-activity-config-tabs>button{min-height:44px;padding:9px 16px;font-size:14px;line-height:1.6;border:1px solid var(--hs-border);border-radius:9px;background:transparent;color:var(--hs-muted)}
+.hs-app:is(.hs-educator,.hs-professional)[data-theme] .hs-activity-config-tabs>button[aria-pressed=true]{background:var(--hs-primary);border-color:var(--hs-primary);color:var(--hs-on-primary,#fff)}
+.hs-app:is(.hs-educator,.hs-professional) .hs-activity-manager--compact .hs-activity-config-panel[hidden]{display:none}
+.hs-activity-manager--compact .hs-activity-config-panel{min-width:0}
+.hs-app:is(.hs-educator,.hs-professional) .hs-activity-manager--compact .hs-activity-config-panel>h3{font-size:18px;margin:0 0 18px;line-height:1.6}
+.hs-app:is(.hs-educator,.hs-professional) .hs-activity-manager--compact .hs-activity-config-panel>p{font-size:14px;line-height:1.85;margin:12px 0}
+.hs-activity-manager--compact .hs-activity-config-panel>.hs-field{max-width:760px;margin:0 0 20px}
+.hs-activity-manager--compact .hs-activity-config-panel>.hs-field>:is(input,select,textarea){width:100%;min-width:0;font-size:16px;font-weight:400}
+.hs-activity-manager--compact .hs-activity-config-panel>.hs-field textarea{min-height:160px}
+.hs-activity-manager--compact .hs-activity-config-panel>button{min-height:44px;margin-bottom:18px}
+.hs-app:is(.hs-educator,.hs-professional) .hs-activity-config-panel>.hs-task-detail{padding:22px;border:1px solid var(--hs-border);border-radius:12px;margin-top:20px;background:var(--hs-surface)}
+.hs-activity-config-panel :is([aria-label="活动下一步"],[aria-label="进度与结果说明"]){max-width:88ch}
+.hs-app:is(.hs-educator,.hs-professional) .hs-activity-config-panel [aria-label="进度与结果说明"] h3{font-size:18px;line-height:1.6;margin:24px 0 12px}
+@media(max-width:700px){
+ .hs-app:is(.hs-educator,.hs-professional) .hs-activity-entry-grid--compact{grid-template-columns:minmax(0,1fr)}
+ .hs-app:is(.hs-educator,.hs-professional)[data-theme] .hs-activity-entry-grid--compact>details.hs-activity-create{grid-column:1;grid-row:2;justify-self:start;margin:0;max-width:100%}
+ .hs-app:is(.hs-educator,.hs-professional) .hs-activity-entry-grid--compact>.hs-activity-select{align-items:stretch;flex-direction:column;gap:12px}
+ .hs-activity-entry-grid--compact>.hs-activity-select>button{align-self:flex-start}
+ .hs-activity-config-tabs{gap:8px;margin-bottom:18px}
+ .hs-app:is(.hs-educator,.hs-professional) .hs-activity-config-tabs>button{flex:1 1 calc(50% - 8px);padding:8px 10px;font-size:13px}
+ .hs-app:is(.hs-educator,.hs-professional) .hs-activity-config-panel>.hs-task-detail{padding:18px 14px}
+}
+
+/* The ordinary teacher inbox is primary; the rarely changed school follows it. */
+.hs-app.hs-workspace.hs-educator .hs-workspace-content:has(>.hs-teacher-tasks){grid-template-columns:minmax(0,1fr);gap:20px}
+.hs-app.hs-workspace.hs-educator .hs-workspace-content:has(>.hs-teacher-tasks)>.hs-workspace-page-heading{grid-column:1/-1;grid-row:auto}
+.hs-app.hs-workspace.hs-educator .hs-workspace-content:has(>.hs-teacher-tasks)>.hs-workspace-page-heading h1{font-family:inherit;font-size:26px;line-height:1.45;font-weight:600;letter-spacing:.015em}
+.hs-educator .hs-workspace-content:has(>.hs-teacher-tasks)>.hs-workspace-page-heading>p{display:none}
+.hs-app.hs-workspace.hs-educator .hs-workspace-content:has(>.hs-teacher-tasks)>.hs-workspace-context{grid-column:1/-1;grid-row:auto;justify-self:end;width:min(100%,520px);max-width:none;padding:16px 0 0;border-top:1px solid var(--hs-border);border-radius:0;background:transparent;box-shadow:none;color:var(--hs-muted)}
+.hs-app.hs-workspace.hs-educator .hs-workspace-content:has(>.hs-teacher-tasks)>.hs-workspace-context select{font-size:14px;font-weight:400;background:transparent}
+.hs-app.hs-workspace.hs-educator .hs-teacher-tasks--compact{padding:24px 28px}
+.hs-teacher-tasks--compact .hs-teacher-task-heading{position:relative;gap:16px;margin:0;padding-bottom:18px;border-bottom:1px solid var(--hs-border)}
+.hs-teacher-tasks--compact .hs-teacher-task-summary{display:flex;align-items:center;flex-wrap:wrap;gap:8px 18px;min-width:0}
+.hs-app.hs-workspace.hs-educator .hs-teacher-task-summary>.hs-collection-summary{font-size:14px;line-height:1.7;font-weight:500}
+.hs-app.hs-workspace.hs-educator .hs-teacher-tasks--compact .hs-teacher-task-list{margin:0}
+.hs-app.hs-workspace.hs-educator .hs-teacher-tasks--compact .hs-teacher-task-list:not(.hs-teacher-task-list--cards)>.hs-task-card{padding:24px 0;gap:16px 20px}
+.hs-app.hs-workspace.hs-educator .hs-teacher-tasks--compact .hs-teacher-task-list:not(.hs-teacher-task-list--cards)>.hs-task-card:last-child{border-bottom:0;padding-bottom:4px}
+.hs-app.hs-workspace.hs-educator .hs-teacher-tasks--compact .hs-task-card .hs-teacher-task-copy small{display:block;font-size:13px;line-height:1.6;font-weight:400}
+.hs-app.hs-workspace.hs-educator .hs-teacher-tasks--compact .hs-task-card .hs-teacher-task-copy h3{font-family:inherit;font-size:19px;font-weight:600;line-height:1.5;margin:5px 0 10px}
+.hs-app.hs-workspace.hs-educator .hs-teacher-tasks--compact .hs-task-card .hs-teacher-task-copy p{font-size:14px;font-weight:400;line-height:1.7;margin:4px 0}
+.hs-teacher-tasks--compact .hs-teacher-task-copy strong{font-weight:500;font-variant-numeric:tabular-nums}
+.hs-app.hs-workspace.hs-educator .hs-teacher-tasks--compact .hs-teacher-task-action button{font-size:14px;font-weight:500;padding:11px 18px;line-height:1.5;white-space:normal}
+.hs-app.hs-workspace.hs-educator .hs-teacher-tasks--compact .hs-teacher-task-help{position:relative;margin:0;padding:0;border:0;background:transparent}
+.hs-app.hs-workspace.hs-educator .hs-teacher-tasks--compact .hs-teacher-task-help>button{display:flex;align-items:center;gap:6px;min-height:44px;padding:8px 0;border:0;background:transparent;color:var(--hs-muted);font-size:13px;font-weight:400}
+.hs-app.hs-workspace.hs-educator .hs-teacher-tasks--compact .hs-teacher-task-help>button:hover,.hs-app.hs-workspace.hs-educator .hs-teacher-tasks--compact .hs-teacher-task-help>button[aria-expanded=true]{color:var(--hs-primary)}
+.hs-app.hs-workspace.hs-educator .hs-teacher-tasks--compact .hs-teacher-task-help-content{position:absolute;z-index:30;left:0;top:100%;width:min(360px,calc(100vw - 80px));padding:16px 18px;border:1px solid var(--hs-border);border-radius:12px;background:var(--hs-surface);box-shadow:0 10px 28px #10251b20;color:var(--hs-muted)}
+.hs-app.hs-workspace.hs-educator .hs-teacher-tasks--compact .hs-teacher-task-help-content>p{font-size:14px;line-height:1.8;margin:0}
+.hs-app.hs-workspace.hs-educator .hs-teacher-tasks--compact .hs-teacher-task-help-content>p+p{margin-top:10px}
+@media(max-width:700px){
+ .hs-teacher-tasks--compact .hs-teacher-task-heading>.hs-collection-options{width:100%;justify-content:space-between;gap:8px}
+ .hs-teacher-tasks--compact .hs-teacher-task-heading .hs-collection-options>label{flex:1;min-width:100px}
+ .hs-teacher-tasks--compact .hs-teacher-task-heading .hs-collection-options select{min-width:0;width:100%;max-width:none}
+ .hs-teacher-tasks--compact .hs-collection-options>label>span{display:none}
+}
+@media(max-width:600px){
+ .hs-app.hs-workspace.hs-educator .hs-workspace-content:has(>.hs-teacher-tasks){gap:16px}
+ .hs-app.hs-workspace.hs-educator .hs-workspace-content:has(>.hs-teacher-tasks)>.hs-workspace-page-heading h1{font-size:23px}
+ .hs-app.hs-workspace.hs-educator .hs-teacher-tasks--compact{padding:16px}
+ .hs-teacher-tasks--compact .hs-teacher-task-heading{gap:10px;padding-bottom:16px}
+ .hs-app.hs-workspace.hs-educator .hs-teacher-tasks--compact .hs-task-card .hs-teacher-task-copy h3{font-size:17px;margin-bottom:8px}
+ .hs-app.hs-workspace.hs-educator .hs-teacher-tasks--compact .hs-task-card .hs-teacher-task-copy p{font-size:14px}
+ .hs-app.hs-workspace.hs-educator .hs-teacher-tasks--compact .hs-teacher-task-list:not(.hs-teacher-task-list--cards)>.hs-task-card{grid-template-columns:32px minmax(0,1fr);gap:8px 12px;padding:20px 0}
+ .hs-teacher-tasks--compact .hs-teacher-task-icon{width:32px;height:36px;background:transparent}
+ .hs-teacher-tasks--compact .hs-teacher-task-action{grid-column:2;justify-self:stretch;max-width:none;margin-top:4px}
+ .hs-app.hs-workspace.hs-educator .hs-teacher-tasks--compact .hs-teacher-task-action button{width:100%;font-size:14px;padding:11px 12px}
+ .hs-app.hs-workspace.hs-educator .hs-workspace-content:has(>.hs-teacher-tasks)>.hs-workspace-context{justify-self:stretch;width:100%;padding-top:14px}
+ .hs-app.hs-workspace.hs-educator .hs-workspace-content:has(>.hs-teacher-tasks)>.hs-workspace-context select{font-size:16px}
+ .hs-app.hs-workspace.hs-educator .hs-teacher-tasks--compact .hs-teacher-task-help{position:static}
+ .hs-app.hs-workspace.hs-educator .hs-teacher-tasks--compact .hs-teacher-task-help-content{left:0;right:auto;top:44px;width:100%;max-width:none}
+}
+@media(max-width:360px){
+ .hs-teacher-tasks--compact .hs-teacher-task-heading>.hs-collection-options{display:grid;grid-template-columns:minmax(0,1fr) auto}
+ .hs-teacher-tasks--compact .hs-collection-options>.hs-collection-actions{grid-column:2;justify-self:end}
+}
+
+/* Observer preparation only; formal answer and cognitive stimulus layouts stay unchanged. */
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) :is(.hs-teacher-tasks--compact,.hs-parent-tasks):has(>.hs-observer-runner--ready){padding:24px 28px;background:var(--hs-surface);--hs-primary:inherit}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) :is(.hs-teacher-tasks--compact,.hs-parent-tasks)>.hs-observer-runner--ready{display:grid;grid-template-columns:minmax(0,1fr);gap:24px;padding:0;margin:0;border:0;border-radius:0;box-shadow:none;background:transparent;color:var(--hs-ink);color-scheme:inherit;--hs-primary:inherit;--hs-border:inherit;--hs-ink:inherit}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-ready-toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;grid-column:1/-1;padding-bottom:18px;border-bottom:1px solid var(--hs-border)}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-ready-toolbar>.hs-runner-back{display:inline-flex;flex-direction:row;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:8px 12px;white-space:nowrap;font-size:14px;line-height:1.5;font-weight:500;background:transparent;color:var(--hs-ink);border:1px solid var(--hs-border);border-radius:9px}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-ready-heading{min-width:0;align-self:center}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-ready-heading>p{margin:0 0 8px;font-size:13px;line-height:1.6;color:var(--hs-muted)}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-ready-heading>h2{font-family:inherit;font-size:24px;line-height:1.5;font-weight:600;margin:0;color:var(--hs-ink);overflow-wrap:anywhere}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--ready>.hs-school-task-launch{display:flex;flex-direction:column;gap:18px;padding:22px;border:1px solid var(--hs-border);border-radius:12px;background:var(--hs-bg);min-width:0}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-ready-prompt{margin:0;font-size:14px;line-height:1.8;color:var(--hs-muted)}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--ready>.hs-school-task-launch>.hs-primary{width:100%;min-height:46px;padding:12px 16px;border-radius:9px;font-size:15px;line-height:1.5;font-weight:500;background:var(--hs-primary);border-color:var(--hs-primary);color:var(--hs-on-primary,#fff)}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-ready-toolbar .hs-teacher-task-help-content{left:auto;right:0;width:min(380px,calc(100vw - 96px))}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-ready-toolbar .hs-teacher-task-help-content strong{font-weight:600;color:var(--hs-ink)}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--ready>.hs-alert{grid-column:1/-1}
+@media(min-width:800px){
+ .hs-app.hs-workspace:is(.hs-educator,.hs-parent) :is(.hs-teacher-tasks--compact,.hs-parent-tasks)>.hs-observer-runner--ready{grid-template-columns:minmax(0,1fr) minmax(260px,.8fr);gap:26px 32px}
+}
+@media(max-width:600px){
+ .hs-app.hs-workspace:is(.hs-educator,.hs-parent) :is(.hs-teacher-tasks--compact,.hs-parent-tasks):has(>.hs-observer-runner--ready){padding:18px 16px}
+ .hs-app.hs-workspace:is(.hs-educator,.hs-parent) :is(.hs-teacher-tasks--compact,.hs-parent-tasks)>.hs-observer-runner--ready{gap:20px}
+ .hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-ready-heading>h2{font-size:21px}
+ .hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-ready-toolbar{position:relative;gap:10px;padding-bottom:14px}
+ .hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-ready-toolbar .hs-teacher-task-help{position:static}
+ .hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-ready-toolbar .hs-teacher-task-help-content{top:calc(100% - 10px);left:0;right:auto;width:100%;max-width:none}
+ .hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--ready>.hs-school-task-launch{padding:18px;gap:14px}
+}
+
+/* Ordinary observer Form/Scale answers opt into the same School answer surface. */
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent)[data-theme] :is(.hs-teacher-tasks--compact,.hs-parent-tasks):has(>.hs-observer-runner--answer){padding:0;border:0;background:transparent;--hs-primary:inherit}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent)[data-theme] :is(.hs-teacher-tasks--compact,.hs-parent-tasks)>.hs-observer-runner--answer{margin:0;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;color-scheme:inherit;color:var(--hs-ink);--hs-primary:inherit;--hs-ink:inherit;--hs-border:inherit}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--answer>.hs-observer-answer-toolbar{margin-bottom:18px;padding-bottom:14px}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--answer [data-assessment-shell-header] h1{font-family:inherit;font-size:26px;line-height:1.5;font-weight:600}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--answer [data-assessment-shell-header]>p{font-size:13px;margin:0 0 6px}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--answer [data-assessment-shell-content] h2{font-family:inherit;font-size:20px;font-weight:600;line-height:1.5}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--answer .form-player{box-shadow:none}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--answer .form-player legend{font-size:18px;font-weight:500;line-height:1.8;margin-bottom:16px}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--answer .form-player label:has(input:is([type=radio],[type=checkbox])){font-size:16px;font-weight:400;gap:10px}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--answer [data-assessment-shell-navigation] section>div{gap:8px}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--answer [data-assessment-shell-navigation] span{font-size:14px;line-height:1.7}
+@media(max-width:600px){
+ .hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--answer [data-assessment-shell-header] h1{font-size:22px}
+ .hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--answer [data-assessment-shell-content] h2{font-size:18px}
+ .hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--answer .form-player legend{font-size:17px}
+ .hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--answer .form-player label:has(input:is([type=radio],[type=checkbox])){font-size:16px;padding:12px}
+}
+
+/* One title and one instruction entry; keep questions near the top of the page. */
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-workspace-content:has(.hs-observer-runner--answer)>.hs-workspace-page-heading{display:none}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--answer{position:relative}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--answer>.hs-observer-answer-toolbar{min-height:58px;margin:0;padding:0 170px 14px 0}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent)[data-theme] .hs-observer-runner--answer>.hui-page--assessment{position:static;margin-top:18px;grid-template-areas:"heading heading" "progress progress" "statuses statuses" "content navigation";gap:16px 24px}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent)[data-theme] .hs-observer-runner--answer>.hui-page--assessment:has(>[data-assessment-shell-statuses]:empty){grid-template-areas:"heading heading" "progress progress" "content navigation"}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--answer [data-assessment-shell-actions]{position:absolute;top:0;right:0;margin:0}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--answer [data-assessment-shell-header]{position:relative;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--answer [data-assessment-shell-header]>div{min-width:0}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--answer [data-assessment-shell-header]>div>div>p{display:none}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--answer [data-assessment-shell-header] h1{font-size:24px;margin:0;line-height:1.5}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--answer .assessment-instructions{flex:none;margin:0;padding:0;border:0;background:transparent}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--answer .assessment-instructions>summary{display:flex;align-items:center;min-height:36px;white-space:nowrap;font-size:13px;line-height:1.6}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--answer .assessment-instructions>div{position:absolute;z-index:30;top:100%;right:0;width:min(440px,calc(100vw - 64px));max-width:100%;padding:16px 18px;margin:0;border:1px solid var(--hs-border);border-radius:10px;background:var(--hs-surface);box-shadow:0 10px 28px #10251b20;font-size:14px;line-height:1.8;color:var(--hs-muted)}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--answer>.hui-page--assessment>section[aria-label]{padding:0;margin:0}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--answer [role=progressbar]{height:4px}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--answer [data-assessment-shell-content]>div>div:first-child:not(:has(.form-player)){padding-bottom:12px}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--answer [data-assessment-shell-content]>div>div:first-child>p:first-child{display:none}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--answer [data-assessment-shell-content]>div>div:first-child>h2{font-size:17px;margin:0}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--answer [data-assessment-shell-content]>div>div:first-child>p:last-child{font-size:12px;margin-top:6px}
+@media(max-width:900px){
+ .hs-app.hs-workspace:is(.hs-educator,.hs-parent)[data-theme] .hs-observer-runner--answer>.hui-page--assessment{grid-template-areas:"heading heading" "progress progress" "statuses statuses" "content content" "navigation navigation"}
+ .hs-app.hs-workspace:is(.hs-educator,.hs-parent)[data-theme] .hs-observer-runner--answer>.hui-page--assessment:has(>[data-assessment-shell-statuses]:empty){grid-template-areas:"heading heading" "progress progress" "content content" "navigation navigation"}
+}
+@media(max-width:600px){
+ .hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--answer>.hs-observer-answer-toolbar{padding-right:145px}
+ .hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--answer [data-assessment-shell-header] h1{font-size:20px}
+ .hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--answer [data-assessment-shell-actions]>button{width:auto;padding:9px 12px}
+ .hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--answer [data-assessment-shell-header]{gap:10px}
+ .hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--answer .assessment-instructions>div{left:0;right:auto;width:100%}
+}
+
+/* The completion view has one message and one return action. */
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-workspace-content:has(.hs-observer-runner--done)>.hs-workspace-page-heading{display:none}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent)[data-theme] :is(.hs-teacher-tasks--compact,.hs-parent-tasks):has(>.hs-observer-runner--done){padding:0;border:0;background:transparent;--hs-primary:inherit}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent)[data-theme] :is(.hs-teacher-tasks--compact,.hs-parent-tasks)>.hs-observer-runner--done{padding:0;margin:0;border:0;background:transparent;box-shadow:none;color-scheme:inherit;color:var(--hs-ink);--hs-primary:inherit;--hs-ink:inherit;--hs-border:inherit}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent)[data-theme] .hs-observer-runner--done>.hs-message{display:flex;flex-direction:column;align-items:center;gap:16px;max-width:680px;margin:24px auto 0;padding:42px 32px;border:1px solid var(--hs-border);border-radius:18px;background:var(--hs-surface);color:var(--hs-ink);text-align:center}
+.hs-observer-complete-icon{box-sizing:content-box;padding:14px;border-radius:50%;background:var(--hs-surface-soft);color:var(--hs-primary)}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--done>.hs-message>h1{font-family:inherit;font-size:26px;font-weight:600;line-height:1.5;margin:0}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--done>.hs-message>p{font-size:14px;line-height:1.8;margin:0;color:var(--hs-muted)}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--done>.hs-message>button{min-height:46px;min-width:180px;margin-top:8px;padding:10px 22px;border:1px solid var(--hs-primary);border-radius:9px;background:var(--hs-primary);color:var(--hs-on-primary,#fff);font-size:15px;font-weight:500}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--answer [data-assessment-shell-navigation] section{box-shadow:none}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--answer [data-assessment-shell-navigation] section>p{font-size:13px;line-height:1.6;color:var(--hs-muted)}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--answer .form-player>div:last-child>button:last-child:not(:first-child){border-radius:9px}
+@media(max-width:600px){
+ .hs-app.hs-workspace:is(.hs-educator,.hs-parent)[data-theme] .hs-observer-runner--done>.hs-message{margin-top:8px;padding:30px 20px;gap:14px;border-radius:14px}
+ .hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--done>.hs-message>h1{font-size:23px}
+ .hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--done>.hs-message>button{width:100%}
+}
+
+/* Keep required consent readable; resource identifiers are not the explanation. */
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent)[data-theme] .hs-observer-runner--ready:has(.hs-runner-consent){grid-template-columns:minmax(0,1fr)}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--ready:has(.hs-runner-consent)>.hs-observer-ready-heading{align-self:start}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent)[data-theme] .hs-observer-runner--ready:has(.hs-runner-consent)>.hs-school-task-launch{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;align-items:start;padding:0;border:0;background:transparent}
+.hs-observer-runner--ready:has(.hs-runner-consent) .hs-observer-ready-prompt{display:none}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent)[data-theme] .hs-observer-runner--ready .hs-runner-consent{padding:20px;margin:0;border:1px solid var(--hs-border);border-radius:12px;background:var(--hs-bg);box-shadow:none;color:var(--hs-ink);min-width:0}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--ready .hs-runner-consent>h3{font-family:inherit;font-size:17px;line-height:1.6;font-weight:600;margin:0 0 16px;color:var(--hs-ink)}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--ready .hs-runner-consent>p{font-size:14px;line-height:1.85;margin:8px 0;color:var(--hs-ink);overflow-wrap:anywhere}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--ready .hs-runner-consent>p.hs-consent-report-note{font-size:13px;color:var(--hs-muted);margin-top:12px}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--ready .hs-runner-consent>.hs-consent{display:flex;align-items:flex-start;gap:10px;padding-top:14px;margin-top:14px;border-top:1px solid var(--hs-border);font-size:14px;line-height:1.8;color:var(--hs-ink)}
+.hs-observer-runner--ready .hs-runner-consent>.hs-consent>input{flex:none;width:18px;height:18px;margin:4px 0 0;accent-color:var(--hs-primary)}
+.hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--ready:has(.hs-runner-consent)>.hs-school-task-launch>.hs-primary{justify-self:end;width:auto;min-width:240px;margin:0}
+@media(max-width:700px){
+ .hs-app.hs-workspace:is(.hs-educator,.hs-parent)[data-theme] .hs-observer-runner--ready:has(.hs-runner-consent)>.hs-school-task-launch{grid-template-columns:minmax(0,1fr);gap:16px}
+ .hs-app.hs-workspace:is(.hs-educator,.hs-parent)[data-theme] .hs-observer-runner--ready .hs-runner-consent{padding:16px}
+ .hs-app.hs-workspace:is(.hs-educator,.hs-parent) .hs-observer-runner--ready:has(.hs-runner-consent)>.hs-school-task-launch>.hs-primary{width:100%;min-width:0}
+}

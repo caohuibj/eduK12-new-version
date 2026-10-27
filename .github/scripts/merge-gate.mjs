@@ -1,3 +1,4 @@
+import {pr357Plan,pr357Outputs} from './pr357-scope.mjs';
 import {post356Plan,post356Outputs} from './post356-scope.mjs';
 import {requiredPr356Checks,failedPr356Checks} from './pr356-gate-contract.mjs';
 import {surveyGovernancePlan,surveyGovernanceOutputs} from './survey-governance-scope.mjs';
@@ -64,6 +65,7 @@ const acceptanceJobs = {
 export function requiredChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
   if(scope.application_route==='pr356')return requiredPr356Checks();
+  if(scope.application_route==='pr357')return ['scope','pr357','codeql'];
   if(scope.application_route==='post356')return ['scope','post356','codeql'];
   if(scope.application_route==='survey-governance')return ['scope','survey-governance','codeql'];
   if(scope.application_route==='training-polish')return ['scope','training-polish','codeql'];
@@ -145,6 +147,10 @@ export function failedChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
   if(scope.application_route==='pr356')return failedPr356Checks(needs,draft);
   const failed = requiredChecks(needs, draft).filter(name => needs[name]?.result !== 'success');
+  if(scope.application_route==='pr357'){
+    try{const p=JSON.parse(scope.pr357_plan);if(draft||p.postMerge!==false||p.route!=='pr357'||Object.entries(pr357Outputs(p)).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');}catch{failed.push('scope');}
+    return [...new Set(failed)];
+  }
   if(scope.application_route==='post356'){
     try{const p=JSON.parse(scope.post356_plan);if(draft||p.postMerge!==false||p.route!=='post356'||Object.entries(post356Outputs(p)).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');}catch{failed.push('scope');}
     return [...new Set(failed)];
@@ -453,6 +459,9 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   }
   const draft = process.env.IS_DRAFT === 'true';
   const failed = failedChecks(needs, draft);
+  if(needs.scope?.outputs?.application_route==='pr357'){
+    try{const {changedEntries}=await import('./content-scope.mjs');const {execFileSync}=await import('node:child_process');const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),p=JSON.parse(needs.scope.outputs.pr357_plan);if(p.head!==head||p.base!==process.env.CI_BASE_SHA||JSON.stringify(pr357Plan(changedEntries(p.base,head),p.base,head))!==JSON.stringify(p))failed.push('recomputed-pr357-plan');}catch{failed.push('recomputed-pr357-plan');}
+  }
   if(needs.scope?.outputs?.application_route==='post356'){
     try{const {changedEntries}=await import('./content-scope.mjs');const {execFileSync}=await import('node:child_process');const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),p=JSON.parse(needs.scope.outputs.post356_plan);if(p.head!==head||p.base!==process.env.CI_BASE_SHA||JSON.stringify(post356Plan(changedEntries(p.base,head),p.base,head))!==JSON.stringify(p))failed.push('recomputed-post356-plan');}catch{failed.push('recomputed-post356-plan');}
   }

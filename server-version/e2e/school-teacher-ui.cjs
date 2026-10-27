@@ -13,6 +13,28 @@ const narrow = [{ width: 320, height: 844 }, { width: 390, height: 844 }]
 const darkStates = ['form-author-editor', 'typed-matrix-row-refusal', 'personal-fixed-version-report']
 const originalShots = ['scale-author-preview', 'form-author-editor', 'form-author-preview', 'fixed-version-selection-preview', 'scale-answer', 'personal-fixed-version-report', 'typed-single-restored', 'typed-multiple', 'typed-matrix-row-refusal', 'form-completed-no-score']
 
+function readLayoutState() {
+  const forbidden = document.querySelectorAll('.ht-secret,.hs-secret,.ht-mfa-setup').length
+  const filledPasswords = [...document.querySelectorAll('input[type="password"]')].some(el => el.value.length > 0)
+  const unpaintedOverflow = []
+  const clipped = [...document.querySelectorAll('button,a[href],input,select,textarea,summary')].filter(el => {
+    const r = el.getBoundingClientRect(), css = getComputedStyle(el)
+    if (!r.width || !r.height || css.visibility === 'hidden' || (r.left >= -1 && r.right <= innerWidth + 1)) return false
+    const visible = el.checkVisibility({ visibilityProperty: true })
+    if (!visible) {
+      unpaintedOverflow.push({ tag: el.tagName, closedDetails: Boolean(el.closest('details:not([open])')), left: r.left, right: r.right })
+      return false
+    }
+    // A deliberate, bounded inner scroll area (e.g. a matrix) is not page overflow.
+    for (let parent = el.parentElement; parent; parent = parent.parentElement) {
+      const p = parent.getBoundingClientRect(), style = getComputedStyle(parent)
+      if (['auto', 'scroll'].includes(style.overflowX) && parent.scrollWidth > parent.clientWidth && p.left >= -1 && p.right <= innerWidth + 1) return false
+    }
+    return true
+  }).map(el => ({ tag: el.tagName, role: el.getAttribute('role') }))
+  return { width: innerWidth, scrollWidth: document.documentElement.scrollWidth, secretNodes: forbidden, filledPasswords, clipped, unpaintedOverflow }
+}
+
 function readKeyboardState() {
   const el = document.activeElement, css = getComputedStyle(el), r = el.getBoundingClientRect()
   return { tag: el.tagName, type: el.getAttribute('type'), role: el.getAttribute('role'),
@@ -150,6 +172,21 @@ async function readRenderedCjk(page, product, state, width, inventory) {
   }
 }
 
+const appearanceLabels = { auto: '自动', light: '浅色', dark: '深色' }
+async function selectAppearanceButton(control, product, mode) {
+  assert(Object.hasOwn(appearanceLabels, mode))
+  for (let i = 0; i < 3; i++) {
+    const label = await control.getAttribute('aria-label')
+    const match = new RegExp('^' + product + ' 外观：(自动|浅色|深色)，点击切换为(自动|浅色|深色)$').exec(label)
+    assert(match, 'Expected the current accessible cyclic theme button')
+    if (match[1] === appearanceLabels[mode]) return
+    await control.click()
+    // Locator auto-waits on the actual accessible label after React commits.
+    await control.and(control.page().getByRole('button', { name: new RegExp('^' + product + ' 外观：' + match[2] + '，') })).waitFor()
+  }
+  throw new Error('Appearance button did not reach requested mode')
+}
+
 function createUiChecks({ report, out, axeSource, getFontInventory }) {
   const done = new Set()
   report.schemaVersion = 1; report.scope = 'bounded-brand-theme-layout'
@@ -175,7 +212,7 @@ function createUiChecks({ report, out, axeSource, getFontInventory }) {
       phase = 'initial-network-idle'
       await s.page.waitForLoadState('networkidle')
       const count = s.audit.apiMutations.length
-      const control = s.page.getByRole('combobox', { name: names[s.product] + ' 外观', exact: true })
+      const control = s.page.getByRole('button', { name: new RegExp('^' + names[s.product] + ' 外观：') })
       let menu = false
       phase = 'control-visibility'
       if (!await control.isVisible()) {
@@ -184,11 +221,11 @@ function createUiChecks({ report, out, axeSource, getFontInventory }) {
         await s.page.getByRole('button', { name: '打开菜单', exact: true }).click(); menu = true
       }
       phase = 'select-mode'
-      await control.selectOption(mode)
+      await selectAppearanceButton(control, names[s.product], mode)
       phase = 'theme-root'
       await s.page.locator(roots[s.product] + `[data-theme="${mode}"]`).waitFor()
       phase = 'control-value'
-      assert.equal(await control.inputValue(), mode)
+      assert.match(await control.getAttribute('aria-label'), new RegExp('^' + names[s.product] + ' 外观：' + appearanceLabels[mode] + '，'))
       phase = 'close-menu'
       if (menu) await control.press('Escape')
       phase = 'post-theme-network-idle'
@@ -226,21 +263,7 @@ function createUiChecks({ report, out, axeSource, getFontInventory }) {
     await s.page.setViewportSize(viewport)
     await s.page.waitForLoadState('networkidle')
     await s.page.evaluate(async () => { await document.fonts.ready; await Promise.all([...document.images].map(img => img.decode())) })
-    const layout = await s.page.evaluate(() => {
-      const forbidden = document.querySelectorAll('.ht-secret,.hs-secret,.ht-mfa-setup').length
-      const filledPasswords = [...document.querySelectorAll('input[type="password"]')].some(el => el.value.length > 0)
-      const clipped = [...document.querySelectorAll('button,a[href],input,select,textarea,summary')].filter(el => {
-        const r = el.getBoundingClientRect(), css = getComputedStyle(el)
-        if (!r.width || !r.height || css.visibility === 'hidden' || (r.left >= -1 && r.right <= innerWidth + 1)) return false
-        // A deliberate, bounded inner scroll area (e.g. a matrix) is not page overflow.
-        for (let parent = el.parentElement; parent; parent = parent.parentElement) {
-          const p = parent.getBoundingClientRect(), style = getComputedStyle(parent)
-          if (['auto', 'scroll'].includes(style.overflowX) && parent.scrollWidth > parent.clientWidth && p.left >= -1 && p.right <= innerWidth + 1) return false
-        }
-        return true
-      }).map(el => ({ tag: el.tagName, role: el.getAttribute('role') }))
-      return { width: innerWidth, scrollWidth: document.documentElement.scrollWidth, secretNodes: forbidden, filledPasswords, clipped }
-    })
+    const layout = await s.page.evaluate(readLayoutState)
     assert.equal(layout.secretNodes, 0); assert.equal(layout.filledPasswords, false)
     if (publicEmpty) assert.equal(await s.page.locator('input').evaluateAll(elements => elements.some(el => el.value)), false, 'Public screenshots must contain no entered account data')
     const renderedBrand = await brand(s, mode)
@@ -313,30 +336,39 @@ function createUiChecks({ report, out, axeSource, getFontInventory }) {
     await theme(s, 'dark')
     for (const viewport of narrow) {
       await s.page.setViewportSize(viewport)
+      const mutations = s.audit.apiMutations.length
       if (s.product === 'TEACHER') {
-        const details = s.page.locator('details.ht-workspace-account'), summary = details.locator(':scope > summary')
-        assert.equal(await details.evaluate(el => el.open), false, 'Existing school member starts with account details collapsed')
-        await summary.focus(); await summary.press('Enter'); assert.equal(await details.evaluate(el => el.open), true)
-        await summary.press('Enter'); assert.equal(await details.evaluate(el => el.open), false)
-        await anchor(s, '个人任务分区', '私有表单任务', 'ht-personal-private-forms')
+        const trigger = s.page.getByRole('button', { name: '账号设置', exact: true })
+        const dialog = s.page.getByRole('dialog', { name: '账号设置', exact: true })
+        assert.equal(await dialog.isVisible(), false, 'Account dialog starts closed')
+        await trigger.focus(); await trigger.press('Enter'); await dialog.waitFor()
+        assert.equal(await dialog.getByRole('heading', { name: '账号设置', exact: true }).evaluate(el => document.activeElement === el), true)
+        await s.page.keyboard.press('Escape'); await dialog.waitFor({ state: 'hidden' })
+        assert.equal(await trigger.evaluate(el => document.activeElement === el), true)
+        await anchor(s, '个人任务分区', '个人测评', 'ht-personal-self')
+        await anchor(s, '个人任务分区', '参与测评', 'ht-personal-tasks')
       } else {
-        const toggle = s.page.getByRole('button', { name: '功能导航', exact: true })
-        await toggle.focus(); await toggle.press('Enter'); assert.equal(await toggle.getAttribute('aria-expanded'), 'true')
-        const nav = s.page.getByRole('navigation', { name: '工作台功能导航', exact: true })
-        await nav.getByRole('link').first().focus(); await s.page.keyboard.press('Escape')
-        assert.equal(await toggle.getAttribute('aria-expanded'), 'false')
-        assert.equal(await toggle.evaluate(el => document.activeElement === el), true)
+        const nav = s.page.getByRole('navigation', { name: '校园功能分组', exact: true })
+        const link = nav.getByRole('link', { name: '校园活动', exact: true })
+        await link.focus(); await link.press('Enter')
+        await s.page.getByRole('navigation', { name: '校园活动功能入口', exact: true }).waitFor()
+        assert.equal(new URL(s.page.url()).pathname, '/workspace/activities')
+        assert.equal(await s.page.locator('.hs-workspace-content').evaluate(el => document.activeElement === el), true)
+        const back = s.page.locator('a.hs-workspace-brand')
+        await back.focus(); await back.press('Enter')
+        await s.page.getByRole('heading', { name: '心理教师工作台', exact: true }).waitFor()
+        assert.equal(await s.page.locator('.hs-workspace-content').evaluate(el => document.activeElement === el), true)
       }
-      report.checks.push({ product: s.product, check: 'workspace-keyboard-' + viewport.width, collapsedAfter: true, focusVerified: true })
+      assert.equal(s.audit.apiMutations.length, mutations, 'Workspace navigation and account dialog must not mutate business data')
+      report.checks.push({ product: s.product, check: 'workspace-keyboard-' + viewport.width, restoredNavigation: true, focusVerified: true })
       await observe(s, 'compact-workspace', 'dark', viewport, viewport.width === 320)
     }
     await theme(s, 'light'); await s.page.setViewportSize({ width: 1440, height: 900 })
   }
   async function schoolManagementAnchor(s) {
-    if (done.has('teacher-school-anchor')) return
     await s.page.setViewportSize(narrow[1])
     await anchor(s, '学校管理分区', '评价活动', 'ht-school-evaluations')
-    report.checks.push({ product: 'TEACHER', check: 'school-management-anchor', focusVerified: true })
+    if (!done.has('teacher-school-anchor')) report.checks.push({ product: 'TEACHER', check: 'school-management-anchor', focusVerified: true })
     done.add('teacher-school-anchor')
     await s.page.setViewportSize({ width: 1440, height: 900 })
   }
@@ -452,6 +484,7 @@ function validateReportBuildInputs(report, options) {
 function verifyReport(report, options, readScreenshot) {
   const { head, tree, runId } = options
   assert.equal(report.schemaVersion, 1); assert.equal(report.status, 'PASSED'); assert.deepEqual(report.errors, [])
+  assert.deepEqual(report.layoutDetector, { status: 'PASSED', closedVisibleClips: 1, openVisibleClips: 2 })
   validateReportBuildInputs(report, options)
   assert.deepEqual(report.startups, products.map(product => ({ product,
     corsOrigin: `https://${product.toLowerCase()}.eduk12.top`, ready: true, phase: 'READY' })))
@@ -553,7 +586,7 @@ function verifyReport(report, options, readScreenshot) {
       assert.deepEqual(c.isolatedValues, { guest: 'light', current: 'light', otherAccount: 'auto', otherProduct: 'dark' })
     } else {
       assert.equal(c.focusVerified, true)
-      if (c.check.startsWith('workspace-keyboard')) assert.equal(c.collapsedAfter, true)
+      if (c.check.startsWith('workspace-keyboard')) assert.equal(c.restoredNavigation, true)
     }
   }
   for (const product of products) {
@@ -569,4 +602,4 @@ function verifyReport(report, options, readScreenshot) {
     notCovered: [...report.notCovered, ...ui.notCovered] }
 }
 
-module.exports = { classifyThemeFailure, readKeyboardState, probeKeyboard, settleThemeTransitions, OFFICIAL_BACKEND, BACKEND_FIXTURE_EXCEPTION, computeBackendCompileDigest, validateOfficialBackendReceipt, OFFICIAL_FRONTEND, validateOfficialFrontendReceipt, validateReportBuildInputs, cjkSampleIds, validateUiFontEvidence, prepareRenderedCjk, readRenderedCjk, appearanceKeys, imageMode, validateSelectedImages, createUiChecks, verifyReport, products, darkStates, originalShots }
+module.exports = { readLayoutState, selectAppearanceButton, classifyThemeFailure, readKeyboardState, probeKeyboard, settleThemeTransitions, OFFICIAL_BACKEND, BACKEND_FIXTURE_EXCEPTION, computeBackendCompileDigest, validateOfficialBackendReceipt, OFFICIAL_FRONTEND, validateOfficialFrontendReceipt, validateReportBuildInputs, cjkSampleIds, validateUiFontEvidence, prepareRenderedCjk, readRenderedCjk, appearanceKeys, imageMode, validateSelectedImages, createUiChecks, verifyReport, products, darkStates, originalShots }

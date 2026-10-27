@@ -1,3 +1,4 @@
+import {lockImportedStudentIdentity} from '../campus/personnel.binding'
 import { createHash, randomBytes, randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -90,6 +91,7 @@ async function redeem(tx:Tx,input:{
   if(!invite||invite.studentNoDigest!==digestCampusStudentNumber(invite.organizationId,input.studentNumber))
     fail('HUITEACHER_STUDENT_INVITE_UNAVAILABLE',404)
   await requireIssuer(tx,invite.organizationId,invite.invitedByUserId)
+  try{await lockImportedStudentIdentity(tx,invite.organizationId,invite.studentNoDigest,input.actorUserId)}catch(error){if(error instanceof Error&&'code' in error&&error.code==='CAMPUS_REGISTRATION_UNAVAILABLE')fail('HUITEACHER_EXISTING_STUDENT_ACCOUNT_REQUIRED');throw error}
   let userId=input.actorUserId
   if(userId){
     const user=await tx.user.findUnique({where:{id:userId},

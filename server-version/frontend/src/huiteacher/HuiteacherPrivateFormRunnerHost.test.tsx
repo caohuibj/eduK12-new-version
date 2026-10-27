@@ -28,7 +28,7 @@ it('uses the real Teacher host and Final form section with CSRF, forwarding the 
   if(url===prefix+'/auth/csrf')return reply({csrfToken:'private-form-csrf'})
   if(url===prefix+'/my-private-form-tasks')return reply({list:[{executionId:'execution',runId:'run',organizationId:'school',eventId:'event',eventTitle:'教师活动',formTitle:'本人表单',status:saved?'COMPLETED':'ASSIGNED',runStatus:'PUBLISHED',eventStatus:'OPEN',runtimeBindingKind:null,runtimeBindingRef:null}]})
   if(url===prefix+'/run-executions/execution/start-private-form')return reply({state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:'private-form-attempt'})
-  if(url===prefix+'/private-form-composite-attempts/private-form-attempt'){
+  if(url===prefix+'/private-form-composite-attempts/private-form-attempt?view=current-unit'){
    if(!saved)return reply(state(false))
    return await new Promise<ReturnType<typeof reply>>(resolve=>finalReads.push(data=>resolve(reply(data))))
   }
@@ -41,8 +41,8 @@ it('uses the real Teacher host and Final form section with CSRF, forwarding the 
   return reply({list:[],canAuthor:false})
  })
  vi.stubGlobal('fetch',fetch);render(<HuiteacherApp/>)
- fireEvent.click(await screen.findByRole('link',{name:'私有表单任务'}))
- fireEvent.click(await screen.findByRole('button',{name:'打开本人表单'}))
+ fireEvent.click(await screen.findByRole('link',{name:'参与测评'}))
+ fireEvent.click(await screen.findByRole('button',{name:'开始测评'}))
  const input=await screen.findByRole('textbox',{name:/任教学科/})
  await waitFor(()=>expect(input).toBeEnabled())
  fireEvent.change(input,{target:{value:'数学'}})

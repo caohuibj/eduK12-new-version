@@ -145,7 +145,7 @@ const payload=(r:Awaited<ReturnType<typeof load>>,src:Awaited<ReturnType<typeof 
   independentEvaluatorCount:src.authors.size,approvalCount:approvals,
   submittedAt:r.submittedAt,
 })
-async function approvalCount(tx:Tx,r:Awaited<ReturnType<typeof load>>,
+async function approvedObservers(tx:Tx,r:Awaited<ReturnType<typeof load>>,
   src:Awaited<ReturnType<typeof readSources>>){
   const approvals=await tx.huiteacherFieldConsensusApproval.findMany({
     where:{consensusId:r.id,
@@ -154,7 +154,10 @@ async function approvalCount(tx:Tx,r:Awaited<ReturnType<typeof load>>,
     select:{observerUserId:true},
   })
   return new Set(approvals.filter(x=>src.authors.has(x.observerUserId))
-    .map(x=>x.observerUserId)).size
+    .map(x=>x.observerUserId))
+}
+async function approvalCount(tx:Tx,r:Awaited<ReturnType<typeof load>>,src:Awaited<ReturnType<typeof readSources>>){
+  return (await approvedObservers(tx,r,src)).size
 }
 async function eligibleReviewer(tx:Tx,record:Awaited<ReturnType<typeof load>>,
   src:Awaited<ReturnType<typeof readSources>>,userId:string){
@@ -304,8 +307,8 @@ export async function myHuiteacherConsensusReviews(actorUserId:string){
     for(const item of rows.slice(0,50)){
       const r=await load(tx,item.id)
       const src=await readSources(tx,{organizationId:r.organizationId,eventId:r.eventId,consensusId:r.id})
-      const n=await approvalCount(tx,r,src)
-      list.push(payload(r,src,n))
+      const approved=await approvedObservers(tx,r,src)
+      list.push({...payload(r,src,approved.size),approvedByMe:approved.has(actorUserId)})
     }
     return {list,truncated:rows.length>50}
   })
@@ -327,11 +330,18 @@ export async function approveHuiteacherFieldConsensus(input:{
       if(existed.contentHash!==input.expectedDigest)deny('HUITEACHER_CONSENSUS_APPROVAL_CONFLICT')
       return {approved:true,id:r.id,revision:r.revision,replayed:true}
     }
-    await tx.huiteacherFieldConsensusApproval.create({data:{
+    const inserted=await tx.huiteacherFieldConsensusApproval.createMany({skipDuplicates:true,data:[{
       id:randomUUID(),organizationId:r.organizationId,eventId:r.eventId,
       consensusId:r.id,observerUserId:input.actorUserId,revision:r.revision,
       contentHash:input.expectedDigest,
-    }})
+    }]})
+    if(inserted.count===0){
+      const concurrent=await tx.huiteacherFieldConsensusApproval.findFirst({where:{
+        consensusId:r.id,observerUserId:input.actorUserId,revision:r.revision,
+      },select:{id:true,contentHash:true}})
+      if(!concurrent||concurrent.contentHash!==input.expectedDigest)deny('HUITEACHER_CONSENSUS_APPROVAL_CONFLICT')
+      return {approved:true,id:r.id,revision:r.revision,replayed:true}
+    }
     await appendAudit(tx,{organizationId:r.organizationId,actorUserId:input.actorUserId,
       action:'HUITEACHER_CONSENSUS_INDEPENDENT_APPROVAL',
       targetType:'EVALUATION_EVENT',targetId:r.eventId,

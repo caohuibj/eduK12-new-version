@@ -1,3 +1,4 @@
+import {importPrivateForm} from './private-tool.form-import.service'
 import {importPrivateToolCsv} from './private-tool.csv.service'
 import {privateToolSharingRouter} from './private-tool.sharing.routes'
 import {educationPrivateToolMediaRouter} from './private-tool.media.routes'
@@ -43,6 +44,10 @@ export function educationPrivateToolRouter(entry:EducationToolEntry){
  router.put('/:toolId',handle(req=>service.updatePrivateTool(context(req),toolId(req),req.body)))
  router.post('/:toolId/import/preview',handle(req=>importPrivateToolCsv(context(req),toolId(req),req.body)))
  router.post('/:toolId/import/apply',handle(req=>importPrivateToolCsv(context(req),toolId(req),req.body,true)))
+ if(entry==='SCHOOL'){
+  router.post('/:toolId/form-import/preview',handle(req=>importPrivateForm(context(req),toolId(req),req.body)))
+  router.post('/:toolId/form-import/apply',handle(req=>importPrivateForm(context(req),toolId(req),req.body,true)))
+ }
  router.post('/:toolId/validate',handle(req=>{z.object({}).strict().parse(req.body??{});return service.validatePrivateTool(context(req),toolId(req))}))
  router.post('/:toolId/preview',handle(req=>service.previewPrivateTool(context(req),toolId(req),req.body)))
  router.post('/:toolId/freeze',handle(req=>service.freezePrivateTool(context(req),toolId(req),req.body)))

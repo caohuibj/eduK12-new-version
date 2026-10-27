@@ -1,10 +1,11 @@
-import {useEffect,useState} from 'react'
+import {RefreshCw} from 'lucide-react'
+import {useEffect,useRef,useState} from 'react'
 type Api=<T>(path:string,method?:string,body?:unknown)=>Promise<T>
 type Formal={id:string;kind:'FACT'|'FORMAL_FEEDBACK';content:string}
 type Consensus={id:string;organizationId:string;eventId:string;title:string;
   content:string;status:'DRAFT'|'SUBMITTED';revision:number;digest:string;
   sourceRecordIds:string[];independentEvaluatorCount:number;
-  approvalCount:number;submittedAt:string|null}
+  approvalCount:number;submittedAt:string|null;approvedByMe?:boolean}
 export function HuiteacherConsensusManager({organizationId,eventId,api}:{
   organizationId:string;eventId:string;api:Api
 }){
@@ -104,36 +105,52 @@ export function HuiteacherConsensusManager({organizationId,eventId,api}:{
 }
 export function HuiteacherConsensusReviews({api}:{api:Api}){
   const [reviews,setReviews]=useState<Consensus[]>([])
+  const [confirmed,setConfirmed]=useState<Set<string>>(()=>new Set())
+  const pending=useRef(false)
+  const reviewKey=(r:Consensus)=>JSON.stringify([r.id,r.revision,r.digest])
+  const approved=(r:Consensus)=>r.approvedByMe===true||confirmed.has(reviewKey(r))
   const [busy,setBusy]=useState(false),[notice,setNotice]=useState('')
-  const refresh=async()=>setReviews((await api<{list:Consensus[]}>('/my-consensus-reviews')).list)
+  const [loaded,setLoaded]=useState(false),[readError,setReadError]=useState(false)
+  const refresh=async()=>{
+    try{setReviews((await api<{list:Consensus[]}>('/my-consensus-reviews')).list);setLoaded(true);setReadError(false)}
+    catch(error){setReadError(true);throw error}
+  }
   useEffect(()=>{
     let live=true
+    setLoaded(false);setReadError(false)
     void api<{list:Consensus[]}>('/my-consensus-reviews')
-      .then(r=>{if(live)setReviews(r.list)})
-      .catch(e=>{if(live)setNotice(e instanceof Error?e.message:'共识待办读取失败')})
+      .then(r=>{if(live){setReviews(r.list);setLoaded(true)}})
+      .catch(e=>{if(live){setReadError(true);setNotice(e instanceof Error?e.message:'共识待办读取失败')}})
     return()=>{live=false}
   },[api])
   const approve=(r:Consensus)=>{
+    if(pending.current||approved(r))return
     if(!window.confirm('确认本人已阅读并认可本次精确版本的人工共识吗？'))return
-    setBusy(true);setNotice('')
-    void api('/consensuses/'+r.id+'/approve','POST',{
+    pending.current=true;setBusy(true);setNotice('')
+    void api<{approved:boolean;id:string;revision:number}>('/consensuses/'+r.id+'/approve','POST',{
       expectedRevision:r.revision,expectedDigest:r.digest,
-    }).then(refresh).then(()=>setNotice('本人对该版本的确认已保存。'))
+    }).then(receipt=>{
+      if(receipt.approved!==true||receipt.id!==r.id||receipt.revision!==r.revision)throw Error('确认回执与当前共识版本不一致，请刷新核对。')
+      setConfirmed(old=>new Set([...old,reviewKey(r)]))
+      return refresh()
+    }).then(()=>setNotice('本人对该版本的确认已保存。'))
       .catch(e=>setNotice(e instanceof Error?e.message:'独立签署失败'))
-      .finally(()=>setBusy(false))
+      .finally(()=>{pending.current=false;setBusy(false)})
   }
-  return <section className="ht-panel" aria-label="协商共识独立签署">
-    <h2>专家／同行共识确认</h2>
+  return <section className="ht-panel ht-practice-consensus" aria-label="协商共识独立签署">
+    <header className="ht-section-heading"><h2>专家／同行共识确认</h2>
+    <button type="button" className="ht-consensus-refresh" aria-label="刷新待办" title="刷新待办" disabled={busy} onClick={()=>{setBusy(true);setNotice('');void refresh()
+      .catch(e=>setNotice(e instanceof Error?e.message:'刷新失败'))
+      .finally(()=>setBusy(false))}}><RefreshCw size={17} aria-hidden="true"/></button></header>
     <p className="ht-muted">仅能确认明确引用了本人正式反馈的活动；个人观察原稿不被替换。</p>
     {notice&&<p role="status" className="ht-notice">{notice}</p>}
-    <button disabled={busy} onClick={()=>{setBusy(true);void refresh()
-      .catch(e=>setNotice(e instanceof Error?e.message:'刷新失败'))
-      .finally(()=>setBusy(false))}}>刷新待办</button>
+    {!loaded&&!readError&&<p role="status" className="ht-muted">正在读取共识待办…</p>}
+    {loaded&&!busy&&!readError&&reviews.length===0&&<p className="ht-empty">暂无需要你确认的共识。收到待办后，可在这里阅读并确认。</p>}
     {reviews.map(r=><article className="ht-event" key={r.id}>
       <h3>{r.title}</h3><p className="ht-field-content">{r.content}</p>
       <p className="ht-muted">版本 {r.revision} · 评价者确认数 {r.approvalCount} · {r.status}</p>
-      {r.status==='DRAFT'&&<button disabled={busy} onClick={()=>approve(r)}>
-        我确认此版本的人工共识</button>}
+      {r.status==='DRAFT'&&(approved(r)?<span className="ht-tag">本人已确认此版本</span>:<button disabled={busy} onClick={()=>approve(r)}>
+        我确认此版本的人工共识</button>)}
     </article>)}
   </section>
 }

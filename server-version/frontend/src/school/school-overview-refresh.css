@@ -1,0 +1,61 @@
+/* The simple student home uses the banner's existing account and home actions. */
+.hs-workspace .hs-workspace-layout.hs-workspace-layout--minimal{grid-template-columns:minmax(0,1fr)}
+.hs-workspace:has(.hs-overview){display:flex;flex-direction:column;min-height:100svh;background:var(--hs-bg)}
+.hs-workspace .hs-main.hs-main-workspace:has(.hs-overview){flex:1;width:min(1160px,calc(100% - 64px));padding:42px 0 60px;min-height:0}
+.hs-workspace .hs-overview{display:grid;gap:24px;min-width:0}
+.hs-workspace .hs-overview .hs-workspace-welcome{display:flex;align-items:center;min-height:290px;padding:46px 48px;border:1px solid var(--hs-border);border-radius:24px;background:var(--hs-surface);box-shadow:none}
+.hs-workspace .hs-overview .hs-workspace-welcome:before{background-position:center 53%;opacity:.88}
+.hs-workspace .hs-overview .hs-workspace-welcome:after{background:linear-gradient(90deg,#fffff6f5 0%,#fffff6d9 38%,#fffff680 62%,#fffff60a 100%)}
+.hs-workspace .hs-overview .hs-workspace-welcome>div{max-width:680px;position:relative;z-index:1}
+.hs-workspace .hs-overview .hs-workspace-welcome .hs-eyebrow{font-size:11px;line-height:1.6;letter-spacing:.16em;text-transform:uppercase;margin:0 0 20px;color:var(--hs-muted);font-weight:600}
+.hs-workspace .hs-overview .hs-workspace-welcome h1{font-size:clamp(28px,3.1vw,40px);font-weight:600;line-height:1.4;letter-spacing:.015em;margin:0 0 18px;color:var(--hs-ink);overflow-wrap:anywhere}
+.hs-workspace .hs-overview .hs-workspace-welcome h1 span{display:block;margin-top:2px}
+.hs-workspace .hs-overview .hs-workspace-welcome>div>p:last-child{font-family:var(--hs-serif);font-size:17px;font-weight:400;line-height:1.9;margin:0;letter-spacing:.025em;color:var(--hs-muted)}
+.hs-overview-copy-break{display:none}
+.hs-workspace .hs-overview-status{position:relative;display:flex;align-items:flex-start;gap:20px;padding:28px 32px;border:1px solid var(--hs-border);border-radius:18px;background:var(--hs-surface)}
+.hs-overview-status-icon{display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;flex:none;border-radius:14px;background:#eaf0df;color:var(--hs-primary)}
+.hs-workspace .hs-overview-status>.hs-panel{flex:1;min-width:0;margin:0;padding:0;border:0;border-radius:0;box-shadow:none;background:transparent}
+.hs-workspace .hs-overview-status>.hs-panel h2{font-family:inherit;font-size:18px;font-weight:600;line-height:1.5;margin:0 0 8px;color:var(--hs-ink)}
+.hs-workspace .hs-overview-status>.hs-panel p{font-size:14px;line-height:1.85;margin:0;color:var(--hs-muted)}
+.hs-workspace .hs-overview-status>.hs-panel p+p{margin-top:7px;font-size:13px}
+.hs-workspace .hs-overview .hs-overview-section{margin:10px 0 0}
+.hs-workspace .hs-overview .hs-overview-section>h2{font-family:inherit;font-size:18px;font-weight:600;margin:0 0 18px}
+.hs-workspace .hs-overview .hs-workspace-shortcuts{grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:16px}
+.hs-workspace .hs-overview .hs-workspace-shortcuts>a{padding:24px;border-radius:16px;background:var(--hs-surface);border-color:var(--hs-border);box-shadow:none}
+.hs-workspace .hs-overview .hs-workspace-shortcuts>a>svg{color:var(--hs-primary)}
+.hs-workspace .hs-overview .hs-workspace-shortcuts h3{font-size:17px;margin:16px 0 8px}
+.hs-workspace .hs-overview .hs-workspace-shortcuts p{font-size:14px;line-height:1.8}
+.hs-app.hs-workspace[data-theme=dark] .hs-overview .hs-workspace-welcome:after{background:linear-gradient(90deg,#15291ff5 0%,#15291fe0 38%,#15291f90 65%,#15291f20 100%)}
+.hs-app.hs-workspace[data-theme=dark] .hs-overview-status-icon{background:var(--hs-surface-soft);color:var(--hs-primary)}
+.hs-app.hs-workspace[data-theme=dark] .hs-overview-status>.hs-panel{background:transparent}
+@media(max-width:1000px){
+ .hs-workspace .hs-main.hs-main-workspace:has(.hs-overview){width:calc(100% - 48px);padding:28px 0 44px}
+ .hs-workspace .hs-overview .hs-workspace-welcome{min-height:280px;padding:36px}
+ .hs-workspace .hs-overview .hs-workspace-welcome:before{background-position:65% center}
+}
+@media(max-width:600px){
+ .hs-workspace .hs-main.hs-main-workspace:has(.hs-overview){width:calc(100% - 32px);padding:22px 0 36px}
+ .hs-workspace .hs-overview{gap:18px}
+ .hs-workspace .hs-overview .hs-workspace-welcome{min-height:300px;padding:30px 24px;border-radius:20px;align-items:flex-start}
+ .hs-workspace .hs-overview .hs-workspace-welcome h1{font-size:28px;line-height:1.45;margin-bottom:16px}
+ .hs-workspace .hs-overview .hs-workspace-welcome .hs-eyebrow{font-size:10px;letter-spacing:.12em;margin-bottom:22px}
+ .hs-workspace .hs-overview .hs-workspace-welcome>div>p:last-child{font-size:15px;line-height:1.9}
+ .hs-overview-copy-break{display:block}
+ .hs-workspace .hs-overview-status{padding:22px 20px;gap:14px;border-radius:16px}
+ .hs-overview-status-icon{width:36px;height:36px;border-radius:11px}
+ .hs-overview-status-icon svg{width:20px;height:20px}
+ .hs-workspace .hs-overview-status>.hs-panel h2{font-size:16px}
+ .hs-workspace .hs-overview-status>.hs-panel p{font-size:13px;line-height:1.85}
+ .hs-workspace .hs-overview-status>.hs-panel p+p{font-size:12px}
+}
+/* Greeting and status content grow naturally when narrow screens need extra lines. */
+.hs-workspace .hs-overview .hs-workspace-welcome>div{min-width:0;width:100%}
+.hs-workspace .hs-overview .hs-workspace-welcome h1 span{max-width:100%;overflow-wrap:anywhere}
+@media(max-width:360px){
+ .hs-workspace .hs-overview .hs-workspace-welcome{min-height:300px;padding:26px 22px}
+ .hs-workspace .hs-overview .hs-workspace-welcome h1{font-size:26px;line-height:1.5}
+ .hs-workspace .hs-overview .hs-workspace-welcome:after{background:linear-gradient(180deg,#fffff6f5 0%,#fffff6e6 70%,#fffff655 100%)}
+ .hs-workspace .hs-overview-status{flex-direction:column;gap:12px;padding:22px}
+ .hs-workspace .hs-overview-status>.hs-panel{width:100%}
+ .hs-app.hs-workspace[data-theme=dark] .hs-overview .hs-workspace-welcome:after{background:linear-gradient(180deg,#15291ff5 0%,#15291fe6 70%,#15291f70 100%)}
+}

@@ -10,6 +10,8 @@ export function useScaleAutoAdvance<Value>({ questionKey, enabled, disabled, has
   onNext?: () => void | Promise<void>
 }) {
   const headingRef = useRef<HTMLHeadingElement>(null)
+  const navigation = useRef({hasNext,onNext})
+  navigation.current = {hasNext,onNext}
   const identity = useRef(questionKey)
   const blocked = useRef(disabled)
   const generation = useRef(0)
@@ -45,14 +47,14 @@ export function useScaleAutoAdvance<Value>({ questionKey, enabled, disabled, has
     setBusy(true)
     try {
       const saved = await onSave(value)
-      if (saved === false || !alive.current || identity.current !== selectedQuestion || generation.current !== selectedGeneration || !hasNext || !onNext) return
+      if (saved === false || !alive.current || identity.current !== selectedQuestion || generation.current !== selectedGeneration || !navigation.current.hasNext || !navigation.current.onNext) return
       // Keep the selected choice visible briefly and consume rapid repeated clicks
       // on this question before exposing the next question's choices.
       await new Promise<void>(release => {
         pause.current = { timer: setTimeout(release, 220), release }
       })
       pause.current = null
-      if (alive.current && identity.current === selectedQuestion && generation.current === selectedGeneration && !blocked.current) await onNext()
+      if (alive.current && identity.current === selectedQuestion && generation.current === selectedGeneration && !blocked.current && navigation.current.hasNext) await navigation.current.onNext?.()
     } catch {
       // Save owners already expose their existing error feedback. Stay here.
     } finally {

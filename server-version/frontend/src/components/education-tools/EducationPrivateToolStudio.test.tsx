@@ -51,6 +51,7 @@ describe('EducationPrivateToolStudio bounded private authoring workflow',()=>{
   const api=apiWith((path,method)=>path===base&&method==='POST'?Promise.reject(Error('connection lost')):undefined)
   render(<EducationPrivateToolStudio api={api as PrivateToolApi} organizationId="a" entry="SCHOOL"/>)
   await waitFor(()=>expect(screen.getByLabelText('工具名称')).toBeEnabled())
+  fireEvent.click(screen.getByText('新建工具'))
   fireEvent.change(screen.getByLabelText('工具名称'),{target:{value:'新量表'}})
   fireEvent.click(screen.getByRole('button',{name:'创建私有工具'}))
   await screen.findByText(/创建结果尚未确认/)

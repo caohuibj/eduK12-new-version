@@ -13,7 +13,9 @@ export async function teacherLibraryExecutionBindingMatches(db: Prisma.Transacti
   const source = await readEducationScaleExecutionSource(db, {
     organizationId:input.organizationId,
     product: 'TEACHER', resourceKey: input.resourceKey, resourceVersion: input.resourceVersion,
-    purpose: input.purpose === 'REPORT_READ' ? 'HISTORY' : 'EXISTING_EXECUTION',
+    // An attempt claim alone grants nothing: parent, frozen slot and child are
+    // verified below. New START still reads current collection policy.
+    purpose: input.purpose === 'REPORT_READ' || input.attemptId ? 'HISTORY' : 'EXISTING_EXECUTION',
   })
   if (source.variantKey !== 'TEACHER:SELF' || (input.itemId && input.itemId !== source.compositeItemId)) return false
   if (!input.attemptId) return !input.itemId
@@ -31,7 +33,13 @@ export async function teacherLibraryExecutionBindingMatches(db: Prisma.Transacti
   const children = await db.assessment.findMany({ where: { compositeAttemptId: parent.id, attemptEpoch: parent.attemptEpoch } })
   // A parent frame may initialize the child lazily. Item/asset/submission routes
   // require an actual exact child, never another item supplied by the client.
-  if (children.length === 0) return !input.itemId
+  if (children.length === 0) {
+    if(input.purpose!=='REPORT_READ')await readEducationScaleExecutionSource(db,{
+      organizationId:input.organizationId,product:'TEACHER',resourceKey:input.resourceKey,
+      resourceVersion:input.resourceVersion,purpose:'EXISTING_EXECUTION',
+    })
+    return !input.itemId
+  }
   if (children.length !== 1) return false
   const child = children[0]
   if (child.scaleId !== source.scaleId || child.compositeItemId !== source.compositeItemId

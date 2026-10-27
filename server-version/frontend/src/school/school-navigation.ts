@@ -1,7 +1,7 @@
 import { BookOpen, CalendarDays, ChartNoAxesCombined, ClipboardList, HeartHandshake, House, School, ShieldCheck, Users, type LucideIcon } from 'lucide-react'
 
 export type SchoolAccess={orgRole:string|null;canGovern:boolean;personas:string[];capabilities:string[];explicitDenies:string[]}
-export type SchoolNavigationItem={id:string;label:string;group:string;description:string;icon:LucideIcon}
+export type SchoolNavigationItem={id:string;label:string;group:string;description:string;icon:LucideIcon;parentId?:string}
 export const workspacePath=(id:string)=>id==='overview'?'/workspace':`/workspace/${id}`
 export const workspaceHref=(id:string)=>{const source=new URLSearchParams(window.location.search);const query=new URLSearchParams();for(const name of ['organizationId','classUnitId']){const value=source.get(name);if(value)query.set(name,value)}return workspacePath(id)+(query.size?'?'+query.toString():'')}
 export const workspacePage=(path:string)=>path==='/workspace'||path==='/'?'overview':path.startsWith('/workspace/')?path.slice('/workspace/'.length):'overview'
@@ -12,10 +12,17 @@ export function canReadSchoolClasses(access:SchoolAccess|null):boolean {
   ||(access.personas.includes('COUNSELOR')&&access.capabilities.includes('PSYCHOLOGY_STAFF'))
 }
 
+/** Activity management is shown to school governors and authorized psychology staff. */
+export function canManageSchoolActivities(access:SchoolAccess|null):boolean {
+ if(!access||access.explicitDenies.some(x=>['*','ORGANIZATION_GOVERNANCE','ACTIVITY_MANAGE'].includes(x)))return false
+ return (access.orgRole==='ORG_ADMIN'&&access.canGovern)
+  ||(access.personas.includes('COUNSELOR')&&access.capabilities.includes('PSYCHOLOGY_STAFF')&&!access.explicitDenies.includes('PSYCHOLOGY_STAFF'))
+}
+
 /** Presentation only: mounted features retain their existing API and capability gates. */
 export function schoolNavigation(role:string,status:string,access:SchoolAccess|null,parentReports:boolean,canAuthorPrivateTools=false):SchoolNavigationItem[]{
  const items:SchoolNavigationItem[]=[{id:'overview',label:'校园概览',group:'校园空间',description:'从这里进入你的校园功能。',icon:House}]
- const add=(id:string,label:string,group:string,description:string,icon:LucideIcon)=>items.push({id,label,group,description,icon})
+ const add=(id:string,label:string,group:string,description:string,icon:LucideIcon,parentId?:string)=>items.push({id,label,group,description,icon,...(parentId?{parentId}:{})})
  const admin=access?.orgRole==='ORG_ADMIN'&&access.canGovern===true
  const psych=!!access?.personas.includes('COUNSELOR')&&!!access.capabilities.includes('PSYCHOLOGY_STAFF')&&!access.explicitDenies.some(x=>['*','PSYCHOLOGY_STAFF','CLASS_APPROVE','ORGANIZATION_GOVERNANCE'].includes(x))
  const denied=(names:string[])=>!!access?.explicitDenies.some(x=>names.includes(x))
@@ -34,15 +41,16 @@ export function schoolNavigation(role:string,status:string,access:SchoolAccess|n
   if(canAuthorPrivateTools)add('private-tools','我的工具','校园活动','编制本人私有量表和表单，检查并固定版本。',BookOpen)
   if(access){
    if(access.personas.includes('TEACHER'))add('tasks','学生观察任务','校园活动','查看你的教师观察任务。',ClipboardList)
-   add('activities','活动管理','校园活动','查看校园活动、任务与参与安排。',CalendarDays)
-   if(canReadSchoolClasses(access))add('classes','学校与班级','学校管理','查看学校和班级；管理员可维护年级与班级。',School)
+   if(canManageSchoolActivities(access))add('activities','活动管理','校园活动','查看校园活动、任务与参与安排。',CalendarDays)
+   if(canReadSchoolClasses(access))add('classes',admin?'年级与班级':'学校与班级','学校管理','查看学校和班级；管理员可维护年级与班级。',School)
    if(admin||psych){
-    add('admission','班级注册与审批','学校管理','处理注册进度、名册与班级审批。',ClipboardList)
-    add('recovery','学生账号恢复','学校管理','依照既有流程协助学生恢复校园账号。',ShieldCheck)
+    add('admission','班级注册与审批','学校管理','处理注册进度、名册与班级审批。',ClipboardList,admin?'classes':undefined)
+    add('recovery','学生账号恢复','学校管理','依照既有流程协助学生恢复校园账号。',ShieldCheck,admin?'classes':undefined)
    }
    if(admin){
-    add('relationships','校园关系','学校管理','维护任教、班级和家校关系。',Users)
-    add('staff','人员邀请','学校管理','分别配置教师、心理教师与管理权限。',Users)
+    add('personnel','人员名单','学校管理','检索学校人员、批量导入，并查看关系与有效权限。',Users)
+    add('relationships','关系与权限','学校管理','维护任教和专业服务关系，管理独立人员邀请。',Users)
+    add('staff','人员邀请','学校管理','分别配置教师、心理教师与管理权限。',Users,'relationships')
    }
    if((admin||psych)&&!denied(['*','REPORT_READ','ORG_GROUP_REPORT_V1'])){
     add('group-reports','群体报告','报告与支持','查看学校授权范围内的群体报告。',ChartNoAxesCombined)
@@ -54,7 +62,7 @@ export function schoolNavigation(role:string,status:string,access:SchoolAccess|n
     add('professional-reports','专业报告','报告与支持','处理心理专业报告和解读。',BookOpen)
     if(parentReports&&access.capabilities.includes('PARENT_REPORT_DISCLOSURE')&&!denied(['*','REPORT_READ','PARENT_REPORT_DISCLOSURE']))add('report-review','家长报告审核','报告与支持','独立审核向家长披露的报告。',ShieldCheck)
    }
-   if(parentReports&&admin)add('report-officers','披露人员授权','学校管理','单独管理家长报告披露人员。',ShieldCheck)
+   if(parentReports&&admin)add('report-officers','披露人员授权','学校管理','单独管理家长报告披露人员。',ShieldCheck,'relationships')
   }
  }
  add('account','我的账号','账号','查看校园账号与安全验证。',ShieldCheck)

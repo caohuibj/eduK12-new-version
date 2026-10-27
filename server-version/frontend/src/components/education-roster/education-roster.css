@@ -1,0 +1,58 @@
+.education-roster{min-width:0;color:var(--hs-ink);font-size:14px;line-height:1.7}
+.education-roster[data-entry=TEACHER]{--hs-bg:var(--ht-bg);--hs-surface:var(--ht-paper);--hs-surface-soft:var(--ht-surface-soft,var(--ht-bg));--hs-border:var(--ht-line);--hs-ink:var(--ht-ink);--hs-muted:var(--ht-quiet);--hs-primary:var(--ht-copper);--hs-accent:var(--ht-copper);--hs-on-primary:var(--ht-on-primary,#fff)}
+.education-roster [hidden]{display:none!important}
+.education-roster .hs-field{display:grid;gap:6px;margin:0;min-width:0}
+.education-roster .hs-field>span{font-size:13px;line-height:1.6;color:var(--hs-muted)}
+.education-roster :is(input,select,textarea,button){box-sizing:border-box;max-width:100%;font:inherit;color:var(--hs-ink)}
+.education-roster :is(input,select,textarea){width:100%;min-width:0;background:var(--hs-surface);border:1px solid var(--hs-border);border-radius:9px;padding:10px 12px;min-height:44px}
+.education-roster textarea{font-size:14px;font-weight:400;line-height:1.75;resize:vertical;min-height:140px}
+.education-roster button{min-height:44px;width:auto;margin:0;padding:8px 14px;border:1px solid var(--hs-border);border-radius:10px;background:var(--hs-surface);cursor:pointer;font-size:13px;line-height:1.6}
+.education-roster :is(button,select,input,textarea):focus-visible{outline:2px solid var(--hs-primary);outline-offset:3px}
+.education-roster button.hs-primary{background:var(--hs-primary);border-color:var(--hs-primary);color:var(--hs-on-primary,#fff)}
+.education-roster button:disabled{opacity:.55;cursor:default}
+.education-roster :is(p,li){overflow-wrap:anywhere}
+.education-roster p{font-size:13px;line-height:1.8}
+.education-roster h2{font-size:19px;margin:0}
+.education-roster .hs-panel{padding:0;background:transparent;border:0;box-shadow:none}
+.er-workbench{border-top:1px solid var(--hs-border);margin-top:16px;padding-top:16px}
+.er-workbench-heading{display:flex;align-items:end;gap:20px;justify-content:space-between;margin-bottom:12px}
+.er-workbench-heading>.hs-field{max-width:320px;flex:1}
+.er-workbench-heading>span{color:var(--hs-muted);font-size:12px;padding-bottom:10px}
+.er-source{display:grid;gap:10px;min-width:0}
+.er-file-toolbar{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:start}
+.er-file-toolbar input[type=file]{font-size:12px;padding:9px;overflow:hidden}
+.er-file-toolbar>details{max-width:400px;margin-top:23px}
+.er-source summary,.er-rules>summary{font-size:13px;color:var(--hs-primary);cursor:pointer;padding-block:8px}
+.er-source details p,.er-rules p{font-size:12px;color:var(--hs-muted);margin:8px 0}
+.er-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.er-match-paste{justify-self:start;font-size:12px!important}
+.er-mapping{padding:16px;border:1px solid var(--hs-border);border-radius:12px;background:var(--hs-surface-soft);min-width:0}
+.er-mapping-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;font-size:14px;overflow-wrap:anywhere}
+.er-mapping-heading label{display:grid;gap:4px;font-size:12px}
+.er-mapping-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:12px;margin-top:12px}
+.er-mapping-fields select{font-size:13px}
+.er-mapping p{font-size:12px;color:var(--hs-muted);margin:12px 0}
+.er-samples{list-style:none;padding:0;margin:0 0 14px;max-height:270px;overflow:auto}
+.er-samples>li{padding:10px 0;border-top:1px solid var(--hs-border);font-size:12px}
+.er-samples>li>span{color:var(--hs-muted)}
+.er-samples dl{display:flex;gap:8px 16px;flex-wrap:wrap;margin:6px 0 0}
+.er-samples dl>div{min-width:80px;max-width:100%}
+.er-samples dt{font-size:11px;color:var(--hs-muted)}
+.er-samples dd{margin:0;overflow-wrap:anywhere;font-size:13px}
+.er-file-error{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;font-size:13px;border-inline-start:3px solid var(--hs-accent);padding-inline-start:10px}
+.er-file-error>span{min-width:0;flex:1;overflow-wrap:anywhere}
+.er-file-error>button{flex:none}
+.er-rules{border-top:1px solid var(--hs-border);padding-top:6px;margin-top:14px}
+.education-roster .hs-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.education-roster .hs-personnel-help{border:1px solid var(--hs-border);border-radius:10px;padding:8px 12px;margin:0}
+.education-roster .hs-personnel-help p{font-size:12px;color:var(--hs-muted)}
+.education-roster .hs-personnel-confirm input{width:18px;height:18px;min-height:18px;flex:none}
+.education-roster .hs-personnel-mfa p{font-size:12px;color:var(--hs-muted)}
+.education-roster .hs-personnel-import-body{margin-top:0}
+@media(max-width:760px){.er-workbench-heading{align-items:start;gap:8px;flex-direction:column}.er-workbench-heading>.hs-field{width:100%;max-width:none}.er-workbench-heading>span{padding:0}.er-file-toolbar{grid-template-columns:minmax(0,1fr)}.er-file-toolbar>details{margin:0;max-width:none}.er-mapping{padding:12px}.er-mapping-fields{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:440px){.education-roster :is(input,select,textarea){font-size:16px}.er-mapping-fields{grid-template-columns:minmax(0,1fr)}.er-actions>button{flex:1;min-width:0}.er-file-error{align-items:start;flex-direction:column}.education-roster .hs-structure-import .hs-actions{gap:8px;display:flex;flex-wrap:wrap}}
+
+.hs-app .education-roster.er-workbench .hs-panel{border:0;border-radius:0;padding:0;margin:0;box-shadow:none;background:transparent}
+.hs-app .education-roster.er-workbench .hs-personnel-import-body{border-top:0;padding-top:0}
+.er-headerless{display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap;color:var(--hs-muted);font-size:12px}
+@media(max-width:600px){.hs-app .education-roster.hs-personnel-directory .hs-directory-heading>.hs-actions{display:flex;flex-direction:row;flex-wrap:wrap;gap:8px}.hs-app .education-roster.hs-personnel-directory .hs-directory-heading>.hs-actions>button{width:auto;min-height:44px}.hs-app .education-roster.hs-personnel-directory .hs-directory-heading>.hs-actions>button[aria-label]{width:44px;height:44px;padding:10px}}

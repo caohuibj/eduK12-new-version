@@ -1,3 +1,5 @@
+import {SchoolReportHeader} from './SchoolReportPresentation'
+import {SchoolTaskHelp} from './SchoolTaskHelp'
 import { useState } from 'react'
 import type { SchoolApi } from './SchoolRecovery'
 
@@ -12,9 +14,10 @@ type Directory={
   truncated:{staff:boolean;students:boolean;staffAssignments:boolean;clientRelationships:boolean}
 }
 
-export function SchoolRelationships({api,organizationId,classes}:{
-  api:SchoolApi;organizationId:string;classes:Unit[]
+export function SchoolRelationships({api,organizationId,classes,compact=false}:{
+  api:SchoolApi;organizationId:string;classes:Unit[];compact?:boolean
 }){
+  const [pane,setPane]=useState('teaching')
   const [classUnitId,setClassUnitId]=useState('')
   const [directory,setDirectory]=useState<Directory|null>(null)
   const [teacher,setTeacher]=useState('')
@@ -43,10 +46,9 @@ export function SchoolRelationships({api,organizationId,classes}:{
   const teachers=staff.filter(s=>s.canTeach)
   const counselors=staff.filter(s=>s.canCounsel&&s.hasPsychology)
   const staffName=(id:string)=>staff.find(s=>s.membershipId===id)?.displayName??'已离职或不再符合岗位的教职员工'
-  return <section className="hs-panel">
-    <h2>学校管理员 · 任教与心理个案关系</h2>
-    <p>仅当前学校管理员可操作。请先在上方完成最近五分钟的 TOTP 验证，再加载或修改关系。
-      学生只使用校园匿名观察编号，不会在这里公开学号、登录名或心理报告。</p>
+  return <section className={'hs-panel'+(compact?' hs-admin-panel hs-admin-relationships':'')}>
+    <SchoolReportHeader compact={compact} title={compact?'关系管理':'学校管理员 · 任教与心理个案关系'} label="校园关系使用说明"><p>仅当前学校管理员可操作。请先通过账号安全验证完成最近五分钟的 TOTP 验证，再加载或修改关系。学生只使用校园匿名观察编号，不会在这里公开学号、登录名或心理报告。</p>{compact&&<p>账号与班级权限变更后，旧关系需要重新核验。</p>}</SchoolReportHeader>
+    <div className={compact?'hs-admin-relation-search':undefined}>
     <label className="hs-field"><span>选择班级</span>
       <select value={classUnitId} onChange={e=>onClass(e.target.value)}>
         <option value="">请选择班级（仅查看教职人员）</option>
@@ -55,14 +57,16 @@ export function SchoolRelationships({api,organizationId,classes}:{
       </select>
     </label>
     <button disabled={busy} onClick={()=>void act(load)}>经二次验证读取关系</button>
+    </div>
     {error&&<p role="alert" className="hs-alert">{error}</p>}
     {notice&&<p role="status" className="hs-message">{notice}</p>}
     {directory&&<>
-      <p>当前目录：{staff.length} 名教职员工；当前所选班级 {directory.students.length} 名获批学生。
-        账号与班级权限变更后，旧关系需要重新核验。</p>
+      {compact&&<nav className="hs-admin-tabs" aria-label="校园关系管理">{[['teaching','任教关系'],['counseling','心理个案']].map(([id,label])=><button key={id} type="button" aria-pressed={pane===id} disabled={busy} onClick={()=>setPane(id)}>{label}</button>)}</nav>}
+      <p className={compact?"hs-admin-directory-summary":undefined}>当前目录：{staff.length} 名教职员工；当前所选班级 {directory.students.length} 名获批学生。
+        {!compact&&"账号与班级权限变更后，旧关系需要重新核验。"}</p>
       {Object.values(directory.truncated).some(Boolean)&&<p>有部分历史记录超出单页上限，请缩小到具体班级。</p>}
-      {classUnitId&&<div className="hs-grid">
-        <div>
+      {classUnitId&&<div className={compact?"hs-admin-relation-forms":"hs-grid"}>
+        {(!compact||pane==='teaching')&&<div>
           <h3>分配班主任／任课教师</h3>
           <label className="hs-field"><span>教师</span>
             <select value={teacher} onChange={e=>setTeacher(e.target.value)}>
@@ -82,10 +86,10 @@ export function SchoolRelationships({api,organizationId,classes}:{
             })
             setTeacher('');await load();setNotice('当前任教关系已登记，历史已结束的关系不会自动恢复。')
           })}>登记任教关系</button>
-        </div>
-        <div>
+        </div>}
+        {(!compact||pane==='counseling')&&<div>
           <h3>授权心理教师服务个案</h3>
-          <p>由学校管理员建立明确的服务对象范围；此操作不自动授予家长报告或心理结果读取权。</p>
+          {compact?<SchoolTaskHelp label="心理个案授权说明" buttonText="授权说明"><p>由学校管理员建立明确的服务对象范围；此操作不自动授予家长报告或心理结果读取权。</p></SchoolTaskHelp>:<p>由学校管理员建立明确的服务对象范围；此操作不自动授予家长报告或心理结果读取权。</p>}
           <label className="hs-field"><span>心理教师（须持有专业能力）</span>
             <select value={counselor} onChange={e=>setCounselor(e.target.value)}>
               <option value="">选择心理教师</option>
@@ -108,9 +112,9 @@ export function SchoolRelationships({api,organizationId,classes}:{
             setStudent('');await load()
             setNotice('心理个案关系已建立。学生 CLIENT 能力仅在正式授权操作中创建，专业报告继续逐次核权。')
           })}>建立独立个案关系</button>
-        </div>
+        </div>}
       </div>}
-      <h3>当前任教关系</h3>
+      {(!compact||pane==='teaching')&&<div className="hs-admin-relation-list"><h3>当前任教关系</h3>
       {directory.staffAssignments.length===0?<p>尚无当前任教关系。</p>:
         <div className="hs-task-list">{directory.staffAssignments.map(a=>
           <article key={a.id} className="hs-task-card">
@@ -121,7 +125,8 @@ export function SchoolRelationships({api,organizationId,classes}:{
               await load();setNotice('任教关系已结束。')
             })}>结束任教关系</button>
           </article>)}</div>}
-      <h3>当前专业个案关系</h3>
+      </div>}
+      {(!compact||pane==='counseling')&&<div className="hs-admin-relation-list"><h3>当前专业个案关系</h3>
       {directory.clientRelationships.length===0?<p>尚无当前心理教师个案关系。</p>:
         <div className="hs-task-list">{directory.clientRelationships.map(a=>
           <article key={a.id} className="hs-task-card">
@@ -137,6 +142,7 @@ export function SchoolRelationships({api,organizationId,classes}:{
               setNotice('个案关系已终止，专业报告的新请求必须重新通过当前关系校验。')
             })}>终止个案关系</button>
           </article>)}</div>}
+      </div>}
     </>}
   </section>
 }

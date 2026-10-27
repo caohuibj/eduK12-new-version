@@ -1,14 +1,26 @@
+import {SchoolActivityCollection} from './SchoolActivityCollection'
+import './school-activity-collection.css'
+import './school-activity-configuration.css'
 import {SelectedToolOutline} from '../modules/assessment-core/composition/SelectedToolOutline'
 import {EducationPrivateScalePicker} from '../components/education-tools/EducationPrivateScalePicker'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
+import {SchoolTaskHelp} from './SchoolTaskHelp'
 import type { SchoolApi } from './SchoolRecovery'
 import { schoolActivityNextStep, schoolRunStatusText } from './school-activity-workflow'
 
+const resourceFamilyText:Record<string,string>={FORM:'表单',SCALE:'量表',BUNDLE:'组合测评',SITUATIONAL:'情境测评',COGNITIVE:'认知测评'}
+
+type ActivityInputs={taskTitle:string;taskContent:string;taskKind:'ASSIGNMENT'|'READING'|'CHECKIN';runTitle:string}
+const emptyActivityInputs:ActivityInputs={taskTitle:'',taskContent:'',taskKind:'READING',runTitle:''}
+function ActivityLayout({compact,className,children}:{compact:boolean;className:string;children:ReactNode}){return compact?<div className={className}>{children}</div>:<>{children}</>}
+type ActivityPanel='participants'|'content'|'assessments'|'results'
+const activityPanels:readonly {id:ActivityPanel;label:string}[]=[{id:'participants',label:'班级与参与者'},{id:'content',label:'阅读／练习／打卡'},{id:'assessments',label:'正式测评批次'},{id:'results',label:'进度与结果说明'}]
 type ActivityState='DRAFT'|'SUBMITTED'|'OPEN'|'PAUSED'|'CLOSED'
 type Activity={
   courseId:string;organizationId:string;title:string;purpose:string;status:ActivityState
   version:number;participantCount:number;runCount:number
 }
+type ActivityPage={list:Activity[];hasMore?:boolean;page?:number}
 type RunTrackSummary={id:string;resourceFamily:string;resourceKey:string;resourceVersion:string}
 type Run={id:string;name:string;status:string;version:number;tracks?:RunTrackSummary[]}
 type RunDetail={run:Run;tracks?:RunTrackSummary[]}
@@ -50,14 +62,18 @@ const stateText:Record<ActivityState,string>={
   DRAFT:'准备中',SUBMITTED:'学校审核中',OPEN:'已开放',PAUSED:'已暂停',CLOSED:'已结束',
 }
 
-export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAuthorPrivateTools=false,actorKey=''}: {
-  api:SchoolApi;organizationId:string;isAdmin:boolean;classes:Unit[];canAuthorPrivateTools?:boolean;actorKey?:string
+export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAuthorPrivateTools=false,actorKey='',compact=false}: {
+  api:SchoolApi;organizationId:string;isAdmin:boolean;classes:Unit[];canAuthorPrivateTools?:boolean;actorKey?:string;compact?:boolean
 }){
   const [list,setList]=useState<Activity[]>([])
+  const [listLoading,setListLoading]=useState(true),[listError,setListError]=useState('')
+  const [listPage,setListPage]=useState(1),[listHasMore,setListHasMore]=useState(false)
+  const listRequest=useRef(0),listMore=useRef(false)
   const [selected,setSelected]=useState<Detail|null>(null)
   const [title,setTitle]=useState('')
   const [purpose,setPurpose]=useState<(typeof purposeOptions)[number][0]>('STUDENT_WELLBEING')
   const [classId,setClassId]=useState('')
+  const [allocationClassIds,setAllocationClassIds]=useState<string[]>([])
   const [eligibleClasses,setEligibleClasses]=useState<Array<{id:string;name:string}>>([])
   const [classesLoading,setClassesLoading]=useState(false)
   const [classesError,setClassesError]=useState('')
@@ -65,10 +81,16 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
   const detailRequest=useRef(0)
   const currentBase=useRef('')
   const [peersPerRespondent,setPeersPerRespondent]=useState(1)
-  const [taskTitle,setTaskTitle]=useState('')
-  const [taskContent,setTaskContent]=useState('')
-  const [taskKind,setTaskKind]=useState<'ASSIGNMENT'|'READING'|'CHECKIN'>('READING')
-  const [runTitle,setRunTitle]=useState('')
+  const [activityInputs,setActivityInputs]=useState<Record<string,ActivityInputs>>({})
+  const [panel,setPanel]=useState<ActivityPanel>('participants')
+  const createPanel=useRef<HTMLDetailsElement>(null)
+  const inputKey=actorKey+':'+organizationId+':'+(selected?.courseId??'')
+  const {taskTitle,taskContent,taskKind,runTitle}=activityInputs[inputKey]??emptyActivityInputs
+  const setInput=<K extends keyof ActivityInputs,>(key:K,value:ActivityInputs[K])=>setActivityInputs(previous=>({...previous,[inputKey]:{...emptyActivityInputs,...previous[inputKey],[key]:value}}))
+  const setTaskTitle=(value:string)=>setInput('taskTitle',value)
+  const setTaskContent=(value:string)=>setInput('taskContent',value)
+  const setTaskKind=(value:ActivityInputs['taskKind'])=>setInput('taskKind',value)
+  const setRunTitle=(value:string)=>setInput('runTitle',value)
   const [resources,setResources]=useState<CatalogResource[]>([])
   const [resourceCursor,setResourceCursor]=useState<string|null>(null)
   const [resourceLoading,setResourceLoading]=useState(false)
@@ -107,29 +129,46 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
     &&(!libraryTeacherReport||['HOMEROOM_TEACHER','ALL_CLASS_TEACHERS'].includes(mode))
     &&(!homeroomOnly||mode==='HOMEROOM_TEACHER'))
   useEffect(()=>{setTargetMode('')},[resourceId,isAdmin,selected?.capabilities?.ownPsychologyPublisher])
-  const fetchList=async()=>{
-    const result=await api<{list:Activity[]}>(base+'?page=1&pageSize=50')
-    setList(result.list)
+  const fetchList=useCallback(async()=>{
+    const token=++listRequest.current
+    listMore.current=false;setListLoading(true);setListError('')
+    try{
+      const result=await api<ActivityPage>(base+'?page=1&pageSize=50')
+      if(token!==listRequest.current)return
+      setList(result.list);setListPage(1);setListHasMore(result.hasMore===true)
+    }catch(err){if(token!==listRequest.current)return;setListError(err instanceof Error?err.message:'校园活动加载失败');throw err}
+    finally{if(token===listRequest.current)setListLoading(false)}
+  },[api,base])
+  const loadMoreActivities=async()=>{
+    if(listLoading||listMore.current||!listHasMore)return
+    const token=++listRequest.current,next=listPage+1
+    listMore.current=true;setListLoading(true);setListError('')
+    try{
+      const result=await api<ActivityPage>(base+`?page=${next}&pageSize=50`)
+      if(token!==listRequest.current)return
+      setList(previous=>Array.from(new Map([...previous,...result.list].map(item=>[item.courseId,item])).values()))
+      setListPage(next);setListHasMore(result.hasMore===true)
+    }catch(err){if(token===listRequest.current)setListError(err instanceof Error?err.message:'更多活动读取失败，请重试')}
+    finally{if(token===listRequest.current){listMore.current=false;setListLoading(false)}}
   }
   const fetchDetail=async(courseId:string)=>{
     const request=++detailRequest.current
     resourceRequest.current++;runRequest.current++
-    setSelected(null);setClassId('');setEligibleClasses([])
+    setSelected(null);setClassId('');setAllocationClassIds([]);setEligibleClasses([])
     const data=await api<Detail>(base+'/'+courseId)
     if(request!==detailRequest.current||currentBase.current!==base)return
     setSelected(data)
+    setClassesRetry(value=>value+1)
     setClassId('')
     setActiveRun(null);setResources([]);setPreview(null)
   }
   useEffect(()=>{
-    let live=true
     ++detailRequest.current
-    setSelected(null);setClassId('');setEligibleClasses([]);setList([])
-    void api<{list:Activity[]}>(base+'?page=1&pageSize=50')
-      .then(result=>{if(live)setList(result.list)})
-      .catch(err=>{if(live)setError(err instanceof Error?err.message:'校园活动加载失败')})
-    return()=>{live=false;resourceRequest.current++;runRequest.current++}
-  },[base,api])
+    setSelected(null);setClassId('');setAllocationClassIds([]);setEligibleClasses([]);setList([]);setPanel('participants')
+    setListPage(1);setListHasMore(false)
+    void fetchList().catch(()=>{})
+    return()=>{listRequest.current++;listMore.current=false;resourceRequest.current++;runRequest.current++}
+  },[base,api,actorKey,fetchList])
   useEffect(()=>{
     resourceRequest.current++
     setResources([]);setResourceId('');setResourceCursor(null)
@@ -139,7 +178,7 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
     ?selected.courseId:null
   useEffect(()=>{
     let live=true
-    setEligibleClasses([]);setClassId('');setClassesError('')
+    setEligibleClasses([]);setClassId('');setAllocationClassIds([]);setClassesError('')
     if(!editableCourseId){setClassesLoading(false);return}
     setClassesLoading(true)
     void api<{list:Array<{id:string;name:string}>}>(`${base}/${editableCourseId}/eligible-classes`)
@@ -155,7 +194,8 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
   }
   const create=()=>void execute(async()=>{
     const r=await api<{id:string}> (base,'POST',{title,purpose})
-    setTitle('');await fetchList();await fetchDetail(r.id)
+    setTitle('');await fetchList();await fetchDetail(r.id);setPanel('participants')
+    if(compact)createPanel.current?.removeAttribute('open')
     setNotice('活动草稿已建立，完成配置后由当前获授权人员开放。')
   })
   const transition=(action:'SUBMIT'|'OPEN'|'PAUSE'|'RESUME'|'CLOSE')=>void execute(async()=>{
@@ -168,20 +208,21 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
     await fetchDetail(selected.courseId);await fetchList()
     setNotice('活动状态已更新，版本 '+next.version)
   })
+  const allocationReady=Boolean(editableCourseId&&!classesLoading&&!classesError&&allocationClassIds.length>0&&allocationClassIds.length<=40&&allocationClassIds.every(id=>eligibleClasses.some(unit=>unit.id===id)))
   const allocate=()=>void execute(async()=>{
-    if(!selected||!classId)return
+    if(!selected||!allocationReady)return
     const result=await api<{selected:number}>(path+'/participants','POST',{
-      classUnitIds:[classId],requestKey:'school-'+crypto.randomUUID(),
+      classUnitIds:allocationClassIds,requestKey:'school-'+crypto.randomUUID(),
       expectedVersion:selected.version,
     })
     await fetchDetail(selected.courseId)
-    setNotice('已按当前获批班级分配 '+result.selected+' 名学生，未关联培训学员。')
+    setNotice('已按所选 '+allocationClassIds.length+' 个班级分配 '+result.selected+' 名学生。')
   })
   const addTask=()=>void execute(async()=>{
     if(!selected)return
     await api(path+'/tasks','POST',{kind:taskKind,title:taskTitle,content:taskContent})
     setTaskTitle('');setTaskContent('')
-    setNotice('已加入活动内容。发布活动前学生不可见。')
+    setNotice(compact?`已加入「${selected.title}」的活动内容。发布活动前学生不可见。`:'已加入活动内容。发布活动前学生不可见。')
   })
   const newRun=()=>void execute(async()=>{
     if(!selected)return
@@ -261,68 +302,61 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
     setActiveRun(null);setNotice('正式测评已发布。学生仍需以本人身份完成原有作答流程。')
   })
 
-  return <section className="hs-panel">
-    <h2>校园心理健康活动</h2>
-    <p>教师准备活动；学校管理员或获授权的心理教师控制其权限内活动的开放与暂停。只有已批准班级中的授权学生能看到活动和任务。</p>
-    {error&&<p className="hs-alert" role="alert">{error}</p>}
-    {notice&&<p className="hs-message" role="status">{notice}</p>}
-    <div className="hs-grid">
-      <div><label className="hs-field"><span>新建活动名称</span>
+  const chooseActivity=(id:string)=>void execute(async()=>{
+    setPanel('participants');if(compact)createPanel.current?.removeAttribute('open')
+    if(id)await fetchDetail(id);else {++detailRequest.current;setSelected(null)}
+  })
+  const createFields=<><label className="hs-field"><span>新建活动名称</span>
         <input value={title} onChange={event=>setTitle(event.target.value)} maxLength={200}/></label>
         <label className="hs-field"><span>活动主题</span>
           <select value={purpose} onChange={event=>setPurpose(event.target.value as typeof purpose)}>
             {purposeOptions.map(([value,text])=><option key={value} value={value}>{text}</option>)}
           </select></label>
-        <button disabled={busy||!title.trim()} onClick={create}>创建活动草稿</button></div>
-      <div><label className="hs-field"><span>选择已有活动</span>
-        <select value={selected?.courseId??''} onChange={event=>void execute(async()=>{
-          const id=event.target.value
-          if(id)await fetchDetail(id);else {++detailRequest.current;setSelected(null)}
-        })}>
+        <button disabled={busy||!title.trim()} onClick={create}>创建活动草稿</button></>
+  const lifecycleControls=selected?<>      {nextStep&&<section aria-label="活动下一步"><p>下一负责角色：{nextStep.owner}</p><p>{nextStep.text}</p></section>}
+      <div className="hs-actions">
+        {actions[selected.status].filter(a=>selected.capabilities?.[({SUBMIT:'canSubmit',OPEN:'canOpen',PAUSE:'canPause',RESUME:'canResume',CLOSE:'canClose'} as const)[a.key]]===true).map(a=>
+          <button key={a.key} disabled={busy} onClick={()=>transition(a.key)}>{selected.capabilities?.ownPsychologyPublisher&&a.key==='SUBMIT'?'完成配置':selected.capabilities?.ownPsychologyPublisher&&a.key==='OPEN'?'开放本人活动':a.label}</button>)}
+      </div>
+</>:null
+  return <section className={"hs-panel hs-activity-manager"+(compact?" hs-activity-manager--compact":"")}>
+
+    <h2>校园心理健康活动</h2>
+    {!compact&&<p>教师准备活动；学校管理员或获授权的心理教师控制其权限内活动的开放与暂停。只有已批准班级中的授权学生能看到活动和任务。</p>}
+    {error&&error!==listError&&<p className="hs-alert" role="alert">{error}</p>}
+    {!compact&&listError&&<p className="hs-alert" role="alert">{listError}</p>}
+    {notice&&<p className="hs-message" role="status">{notice}</p>}
+    {compact?<SchoolActivityCollection key={actorKey+':'+organizationId} items={list} selectedId={selected?.courseId} selectedTitle={selected?.title} busy={busy} loading={listLoading} error={listError} hasMore={listHasMore} onRefresh={()=>void execute(fetchList)} onMore={()=>void loadMoreActivities()} onSelect={chooseActivity} helpControl={<SchoolTaskHelp label="活动与发布说明" buttonText="活动说明"><p>教师准备活动；学校管理员或获授权的心理教师控制其权限内活动的开放与暂停。只有已批准班级中的授权学生能看到活动和任务。</p></SchoolTaskHelp>} createControl={<details className="hs-activity-create" ref={createPanel}><summary>新建活动</summary><div className="hs-activity-create-fields">{createFields}</div></details>}/>:<div className="hs-grid hs-activity-entry-grid">
+      {compact?<details className="hs-activity-create" ref={createPanel}><summary>新建活动</summary><div className="hs-activity-create-fields">{createFields}</div></details>:<div className="hs-activity-create"><h3>准备新活动</h3>{createFields}</div>}
+      <div className="hs-activity-select"><h3>{compact?'选择要配置的活动':'继续已有活动'}</h3><label className="hs-field"><span>选择已有活动</span>
+        <select value={selected?.courseId??''} onChange={event=>chooseActivity(event.target.value)}>
           <option value="">请选择活动</option>
           {list.map(a=><option key={a.courseId} value={a.courseId}>
             {a.title}（{stateText[a.status]}）</option>)}
         </select></label>
         <button disabled={busy} onClick={()=>void execute(fetchList)}>刷新活动列表</button></div>
-    </div>
+    </div>}
     {selected&&<div className="hs-activity-detail">
-      <h3>{selected.title}</h3>
-      <p>状态：{selected.status==='SUBMITTED'&&selected.capabilities?.ownPsychologyPublisher?'待开放':stateText[selected.status]} · 当前授权学生 {selected.participantCount} 人
+      {!compact&&<h3>{selected.title}</h3>}
+      <p className="hs-activity-summary">状态：{selected.status==='SUBMITTED'&&selected.capabilities?.ownPsychologyPublisher?'待开放':stateText[selected.status]} · 当前授权学生 {selected.participantCount} 人
         · 关联测评 {selected.runs.length} 项</p>
-      {nextStep&&<section aria-label="活动下一步"><p>下一负责角色：{nextStep.owner}</p><p>{nextStep.text}</p></section>}
-      <div className="hs-actions">
-        {actions[selected.status].filter(a=>selected.capabilities?.[({SUBMIT:'canSubmit',OPEN:'canOpen',PAUSE:'canPause',RESUME:'canResume',CLOSE:'canClose'} as const)[a.key]]===true).map(a=>
-          <button key={a.key} disabled={busy} onClick={()=>transition(a.key)}>{selected.capabilities?.ownPsychologyPublisher&&a.key==='SUBMIT'?'完成配置':selected.capabilities?.ownPsychologyPublisher&&a.key==='OPEN'?'开放本人活动':a.label}</button>)}
-      </div>
-      {selected.status==='DRAFT'&&<>
-        <h3>1. 准备 · 选择获批班级</h3>
-        <label className="hs-field"><span>班级</span>
-          <select value={classId} disabled={classesLoading||!!classesError} onChange={event=>setClassId(event.target.value)}>
-            <option value="">请选择已审核班级</option>
-            {eligibleClasses.map(unit=>
-              <option value={unit.id} key={unit.id}>{unit.name}</option>)}
-          </select></label>
+      {!compact&&lifecycleControls}
+      {compact&&<nav className="hs-activity-config-tabs" aria-label="活动配置分区">{activityPanels.map(item=><button type="button" key={item.id} aria-pressed={panel===item.id} aria-controls={'hs-activity-panel-'+item.id} onClick={()=>setPanel(item.id)}>{item.label}</button>)}</nav>}
+      <section className="hs-activity-config-panel" id="hs-activity-panel-participants" aria-label="班级与参与者" hidden={compact&&panel!=='participants'}>
+        {compact&&selected.status!=='DRAFT'&&<p>当前活动已离开准备阶段，参与范围按现有班级分配保留。</p>}
+        {selected.status==='DRAFT'&&<>
+        {eligibleClasses.length>0&&<fieldset className="hs-activity-class-picker" disabled={busy||classesLoading||!!classesError}>
+          <legend>选择获批班级（可多选）</legend>
+          <div className="hs-activity-class-options">{eligibleClasses.map(unit=><label key={unit.id}><input type="checkbox" checked={allocationClassIds.includes(unit.id)} disabled={!allocationClassIds.includes(unit.id)&&allocationClassIds.length>=40} onChange={event=>{const checked=event.target.checked;setAllocationClassIds(previous=>checked?[...new Set([...previous,unit.id])].slice(0,40):previous.filter(id=>id!==unit.id))}}/><span>{unit.name}</span></label>)}</div>
+          <div className="hs-activity-class-selection"><span role="status">已选 {allocationClassIds.length} / 40 个班级</span><button type="button" disabled={!allocationClassIds.length} onClick={()=>setAllocationClassIds([])}>清空选择</button></div>
+          <p className="hs-activity-class-hint">勾选用于本次加入，取消勾选不会移除已加入的学生。</p>
+        </fieldset>}
         {classesLoading&&<p role="status">正在加载可分配班级…</p>}
         {classesError&&<div><p role="alert">{classesError}</p>
           <button disabled={classesLoading} onClick={()=>setClassesRetry(value=>value+1)}>重试加载班级</button></div>}
         {!classesLoading&&!classesError&&eligibleClasses.length===0&&<p>当前没有可分配的获批班级。心理教师可选择本校获批班级，普通教师仅能选择本人有效任教指派的班级。</p>}
-        <button disabled={busy||classesLoading||!!classesError||!eligibleClasses.some(item=>item.id===classId)} onClick={allocate}>加入当前班级学生</button>
-        <h3>添加活动内容</h3>
-        <label className="hs-field"><span>任务类型</span>
-          <select value={taskKind} onChange={event=>setTaskKind(event.target.value as typeof taskKind)}>
-            <option value="READING">阅读材料</option><option value="ASSIGNMENT">练习任务</option>
-            <option value="CHECKIN">活动记录</option>
-          </select></label>
-        <label className="hs-field"><span>任务名称</span>
-          <input value={taskTitle} onChange={event=>setTaskTitle(event.target.value)}/></label>
-        <label className="hs-field"><span>内容</span>
-          <textarea rows={4} value={taskContent} onChange={event=>setTaskContent(event.target.value)}/></label>
-        <button disabled={busy||!taskTitle.trim()} onClick={addTask}>加入草稿</button>
-        <h3>准备测评批次</h3>
-        <label className="hs-field"><span>测评活动名称</span>
-          <input value={runTitle} onChange={event=>setRunTitle(event.target.value)}/></label>
-        <button disabled={busy||!runTitle.trim()} onClick={newRun}>创建测评草稿</button>
-      </>}
+        <button disabled={busy||!allocationReady} onClick={allocate}>加入所选班级学生</button>
+</>}
       {isAdmin&&selected.status==='OPEN'&&<section className="hs-panel">
         <h3>自愿同伴互评 · 安全抽样</h3>
         <p>仅允许已批准的同班学生，并要求学生本人及其有效监护人分别完成知情同意。
@@ -348,39 +382,65 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
             ' 组非自评关系。任何测评作答仍需正式发布的测评批次及科学政策。')
         })}>按同意记录随机生成非自评配对</button>
       </section>}
-      <h3>2. 发布 · 测评批次</h3>
-      <p>活动开放与测评发布是两个步骤。只有获授权人员正式发布的测评批次才会产生可作答任务。</p>
+      </section>
+      <section className="hs-activity-config-panel" id="hs-activity-panel-content" aria-label="阅读、练习与打卡" hidden={compact&&panel!=='content'}>
+        {selected.status==='DRAFT'&&<ActivityLayout compact={compact} className="hs-activity-content-create">{!compact&&<h3>添加活动内容</h3>}
+        <label className="hs-field hs-activity-content-kind"><span>任务类型</span>
+          <select value={taskKind} onChange={event=>setTaskKind(event.target.value as typeof taskKind)}>
+            <option value="READING">阅读材料</option><option value="ASSIGNMENT">练习任务</option>
+            <option value="CHECKIN">活动记录</option>
+          </select></label>
+        <label className="hs-field hs-activity-content-title"><span>任务名称</span>
+          <input value={taskTitle} onChange={event=>setTaskTitle(event.target.value)}/></label>
+        <label className="hs-field hs-activity-content-body"><span>内容</span>
+          <textarea rows={4} value={taskContent} onChange={event=>setTaskContent(event.target.value)}/></label>
+        <button disabled={busy||!taskTitle.trim()} onClick={addTask}>{compact?'加入当前活动草稿':'加入草稿'}</button>
+</ActivityLayout>}
+        {compact&&selected.status!=='DRAFT'&&<p>活动已离开准备阶段，当前不能在这里添加阅读、练习或记录。</p>}
+      </section>
+      <section className="hs-activity-config-panel" id="hs-activity-panel-assessments" aria-label="正式测评批次" hidden={compact&&panel!=='assessments'}>
+        <ActivityLayout compact={compact} className="hs-activity-batch-toolbar">
+        {selected.status==='DRAFT'&&<ActivityLayout compact={compact} className="hs-activity-run-create">{!compact&&<h3>准备测评批次</h3>}
+        <label className="hs-field"><span>{compact?'测评批次名称':'测评活动名称'}</span>
+          <input value={runTitle} onChange={event=>setRunTitle(event.target.value)}/></label>
+        <button disabled={busy||!runTitle.trim()} onClick={newRun}>{compact?'创建测评批次草稿':'创建测评草稿'}</button>
+      </ActivityLayout>}
+      {compact&&<SchoolTaskHelp label="测评批次与发布说明" buttonText="发布说明"><p>活动开放与测评发布是两个步骤。只有获授权人员正式发布的测评批次才会产生可作答任务。</p></SchoolTaskHelp>}
+      </ActivityLayout>
+      {!compact&&<><h3>2. 发布 · 测评批次</h3><p>活动开放与测评发布是两个步骤。只有获授权人员正式发布的测评批次才会产生可作答任务。</p></>}
       {!canInspectRuns&&<p>当前活动状态不支持读取测评批次详情；以下仅展示活动关联状态。</p>}
       {selected.runs.length===0?<p>暂无测评。可先使用阅读与练习内容。</p>:
-        <div className="hs-actions">{selected.runs.map(r=>
-          <button disabled={busy||!canInspectRuns} key={r.runId} onClick={()=>void execute(async()=>{
+        <div className={compact?'hs-activity-run-list':'hs-actions'}>{selected.runs.map(r=><ActivityLayout key={r.runId} compact={compact} className="hs-activity-run-row">
+          <button aria-pressed={compact?activeRun?.id===r.runId:undefined} disabled={busy||!canInspectRuns} key={r.runId} onClick={()=>void execute(async()=>{
             const request=++runRequest.current
             resourceRequest.current++;setActiveRun(null);setPreview(null)
             const d=await api<RunDetail>(path+'/runs/'+r.runId)
             if(request!==runRequest.current||activityPath.current!==path)return
             setActiveRun({...d.run,tracks:d.tracks})
-          })}>{r.name} · {schoolRunStatusText(r.status)}</button>)}</div>}
-      {selected.runs.map(r=>(r.capabilities?.canClose||r.capabilities?.canCancel)?<div key={'lifecycle-'+r.runId} className="hs-actions">
-        {r.capabilities.canClose&&<button disabled={busy} onClick={()=>void execute(async()=>{
+          })}>{r.name} · {schoolRunStatusText(r.status)}</button>
+          {(r.capabilities?.canClose||r.capabilities?.canCancel)?<div key={'lifecycle-'+r.runId} className="hs-actions">
+        {r.capabilities.canClose&&<button aria-label={compact?`收尾 ${r.name}`:undefined} disabled={busy} onClick={()=>void execute(async()=>{
           if(!window.confirm('停止该批次的新作答；已开始的作答按原有规则继续。确认收尾？'))return
           await api(path+'/runs/'+r.runId+'/close','POST',{})
           await fetchDetail(selected.courseId)
-        })}>收尾 {r.name}</button>}
-        {r.capabilities.canCancel&&<button disabled={busy} onClick={()=>void execute(async()=>{
+        })}>{compact?"收尾":`收尾 ${r.name}`}</button>}
+        {r.capabilities.canCancel&&<button aria-label={compact?`取消 ${r.name}`:undefined} disabled={busy} onClick={()=>void execute(async()=>{
           if(!window.confirm('取消该批次尚未开始的任务；存在进行中作答时系统会拒绝取消。确认？'))return
           await api(path+'/runs/'+r.runId+'/cancel','POST',{})
           await fetchDetail(selected.courseId)
-        })}>取消 {r.name}</button>}
-      </div>:null)}
-      {activeRun&&<div className="hs-task-detail">
-        <h3>测评批次：{activeRun.name}（{schoolRunStatusText(activeRun.status)}）</h3>
-        <details><summary>技术详情</summary><p>Run ID：{activeRun.id} · 状态：{activeRun.status} · 版本：{activeRun.version}</p></details>
-        <SelectedToolOutline className="hs-selected-tool-outline" items={activeRun.tracks?.map(track=>({
-          id:track.id,kind:track.resourceFamily,version:track.resourceVersion,
+        })}>{compact?"取消":`取消 ${r.name}`}</button>}
+      </div>:null}
+        </ActivityLayout>)}</div>}
+      {activeRun&&<div className={compact?"hs-task-detail hs-activity-run-editor":"hs-task-detail"}>
+        <h3 className={compact?'hs-visually-hidden':undefined}>测评批次：{activeRun.name}（{schoolRunStatusText(activeRun.status)}）</h3>
+        <details><summary>技术详情</summary><p>Run ID：{activeRun.id} · 状态：{activeRun.status} · 版本：{activeRun.version}</p>{compact&&<ul className="hs-activity-track-identifiers">{activeRun.tracks?.map(track=><li key={track.id}>{track.resourceFamily} · {track.resourceKey} · 固定版本：{track.resourceVersion}</li>)}</ul>}</details>
+        <SelectedToolOutline className="hs-selected-tool-outline" heading={compact?'已配置测评项目':'已选工具大纲'} items={activeRun.tracks?.map((track,index)=>({
+          id:track.id,kind:compact?(resourceFamilyText[track.resourceFamily]??track.resourceFamily):track.resourceFamily,version:track.resourceVersion,
           title:resources.find(resource=>resource.family===track.resourceFamily&&resource.key===track.resourceKey
-            &&resource.version===track.resourceVersion)?.title??track.resourceKey,
+            &&resource.version===track.resourceVersion)?.title??(compact?`${resourceFamilyText[track.resourceFamily]??'测评项目'} ${index+1}`:track.resourceKey),
         }))}/>
         {selected.status==='DRAFT'&&activeRun.status==='DRAFT'&&<>
+          <ActivityLayout compact={compact} className="hs-activity-private-pickers">
           {canAuthorPrivateTools&&actorKey&&<EducationPrivateScalePicker
             key={`private:${actorKey}:${organizationId}:${selected.courseId}:${activeRun.id}`}
             entry="SCHOOL" organizationId={organizationId} actorKey={actorKey} scopeKey={`${selected.courseId}:${activeRun.id}`}
@@ -401,6 +461,7 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
               const data=await api<RunDetail>(path+'/runs/'+activeRun.id)
               if(resourceContext.current.scope===context.scope&&resourceContext.current.api===context.api){setActiveRun({...data.run,tracks:data.tracks});setPreview(null)}
             }}/>}
+          </ActivityLayout>
           <button disabled={busy||resourceLoading} onClick={()=>void showResources()}>查看已发布、受授权的测评资源</button>
           {resourceLoading&&<p role="status">正在读取授权测评资源…</p>}
           {resourceError&&<div><p role="alert">{resourceError} 已配置的测评项目不受影响。</p>
@@ -451,11 +512,15 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
           <button className="hs-primary" disabled={busy||!preview} onClick={publishRun}>
             {selected.capabilities?.ownPsychologyPublisher?'正式发布本人测评':'学校管理员正式发布测评'}</button>}
       </div>}
+      </section>
+      <section className="hs-activity-config-panel" id="hs-activity-panel-results" aria-label="活动进度与结果" hidden={compact&&panel!=='results'}>
+        {compact&&lifecycleControls}
       <section aria-label="进度与结果说明">
         <h3>3. 进度 · 核对参与与作答</h3>
         <p>当前授权学生人数和批次发布状态不是完成率。本页不展示个体心理作答或报告。</p>
         <h3>4. 结果 · 按权限查看报告</h3>
         <p>请通过工作空间中已授权的报告入口查看。活动和测评批次的收尾、等待时间及隐私阈值分别校验，结束活动不会自动生成或公开报告。</p>
+      </section>
       </section>
     </div>}
   </section>

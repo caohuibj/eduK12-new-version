@@ -40,7 +40,7 @@ describe('Huischool student tasks remain inside the campus account realm',()=>{
       throw Error('FORM receipt must not request a report: '+path)
     })
     render(<SchoolStudentTasks api={api as unknown as SchoolApi}/>)
-    expect(await screen.findByText('状态：已完成')).toBeInTheDocument()
+    expect(await screen.findByLabelText('状态：已完成')).toBeInTheDocument()
     expect(screen.getByText('本次表单已正式提交。表单只记录作答，不计算量表分数，也不新增个人报告读取权。')).toBeInTheDocument()
     expect(screen.queryByRole('button',{name:'查看我的测评反馈'})).not.toBeInTheDocument()
     expect(screen.queryByRole('region',{name:'获准的个人测评反馈'})).not.toBeInTheDocument()
@@ -105,4 +105,68 @@ describe('Huischool student tasks remain inside the campus account realm',()=>{
     expect(execute.mock.calls.every(call=>call[0].startsWith('/'))).toBe(true)
     expect(execute.mock.calls.some(call=>call[0].includes('/api/auth'))).toBe(false)
   })
+})
+
+it('shows an existing completed activity response without offering editable unsavable text',async()=>{
+ const api=vi.fn(async(path:string)=>path==='/my/student-reference'?{reference:'test'}:path.startsWith('/my/activity-tasks')?
+  {list:[{id:'done',activityId:'activity',activityTitle:'校园活动',kind:'READING',title:'已读材料',status:'COMPLETED',href:'safe',deadline:null}],total:1,page:1,hasMore:false,truncated:false}:
+  {id:'done',title:'已读材料',content:'阅读正文',mySubmission:{content:'已有阅读感受',status:'SUBMITTED'}})
+ render(<SchoolStudentTasks api={api as unknown as SchoolApi}/>)
+ fireEvent.click(await screen.findByRole('button',{name:'查看阅读材料'}))
+ expect(await screen.findByRole('heading',{name:'我的提交'})).toBeInTheDocument()
+ expect(screen.getByRole('textbox',{name:'阅读感受（选填）'})).toHaveAttribute('readonly')
+ expect(screen.getByRole('textbox',{name:'阅读感受（选填）'})).toHaveValue('已有阅读感受')
+ expect(screen.getByRole('button',{name:'确认已阅读'})).toBeDisabled()
+ expect(api.mock.calls.every(call=>call.length===1)).toBe(true)
+})
+
+it('keeps typed answers on submission failure and returns focus to the inbox without posting again',async()=>{
+ const api=vi.fn(async(path:string,method?:string)=>{
+  if(path==='/my/student-reference')return {reference:'test'}
+  if(path.startsWith('/my/activity-tasks'))return {list:[{id:'task',activityId:'activity',activityTitle:'校园活动',kind:'ASSIGNMENT',title:'校园记录',status:'PENDING',href:'safe',deadline:null}],total:1,page:1,hasMore:false,truncated:false}
+  if(method==='POST')throw Error('本次提交暂未成功，请重试')
+  return {id:'task',title:'校园记录',content:'记录一次校园活动'}
+ })
+ render(<SchoolStudentTasks api={api as unknown as SchoolApi}/>)
+ fireEvent.click(await screen.findByRole('button',{name:'查看活动任务'}))
+ const field=await screen.findByRole('textbox',{name:'你的回答'})
+ fireEvent.change(field,{target:{value:'保留这份活动记录'}})
+ fireEvent.click(screen.getByRole('button',{name:'提交活动记录'}))
+ expect(await screen.findByRole('alert')).toHaveTextContent('本次提交暂未成功，请重试')
+ expect(field).toHaveValue('保留这份活动记录')
+ fireEvent.click(screen.getByRole('button',{name:'返回活动'}))
+ expect(screen.getByRole('heading',{name:'我的校园任务'})).toHaveFocus()
+ expect(api.mock.calls.filter(call=>call[1]==='POST')).toHaveLength(1)
+})
+
+it.each(['READING','ASSIGNMENT','CHECKIN'] as const)('uses fresh detail to lock a stale pending %s task',async kind=>{
+ const api=vi.fn(async(path:string)=>path==='/my/student-reference'?{reference:'test'}:path.startsWith('/my/activity-tasks')?
+  {list:[{id:'stale',activityId:'activity',activityTitle:'校园活动',kind,title:'旧页任务',status:'PENDING',href:'safe',deadline:null}],total:1,page:1,hasMore:false,truncated:false}:
+  {id:'stale',title:'旧页任务',mySubmission:{content:'已保存的首次记录',status:'SUBMITTED'}})
+ render(<SchoolStudentTasks api={api as unknown as SchoolApi}/>)
+ fireEvent.click(await screen.findByRole('button',{name:kind==='READING'?'查看阅读材料':'查看活动任务'}))
+ expect(await screen.findByRole('heading',{name:'我的提交'})).toBeInTheDocument()
+ expect(screen.getByRole('textbox')).toHaveAttribute('readonly')
+ expect(screen.getByRole('textbox')).toHaveValue('已保存的首次记录')
+ expect(screen.getByRole('button',{name:kind==='READING'?'确认已阅读':'提交活动记录'})).toBeDisabled()
+ expect(api.mock.calls.every(call=>call.length===1)).toBe(true)
+})
+
+it('sends only one campus task POST while a submission is pending',async()=>{
+ let finish!:(value:unknown)=>void
+ const pending=new Promise(resolve=>{finish=resolve})
+ const api=vi.fn(async(path:string,method?:string)=>{
+  if(method==='POST')return pending
+  if(path==='/my/student-reference')return {reference:'test'}
+  if(path.startsWith('/my/activity-tasks'))return {list:[{id:'task',activityId:'activity',activityTitle:'校园活动',kind:'ASSIGNMENT',title:'观察记录',status:'PENDING',href:'safe',deadline:null}],total:1,page:1,hasMore:false,truncated:false}
+  return {id:'task',title:'观察记录'}
+ })
+ render(<SchoolStudentTasks api={api as unknown as SchoolApi}/>)
+ fireEvent.click(await screen.findByRole('button',{name:'查看活动任务'}))
+ const submit=await screen.findByRole('button',{name:'提交活动记录'})
+ act(()=>{fireEvent.click(submit);fireEvent.click(submit)})
+ expect(api.mock.calls.filter(call=>call[1]==='POST')).toHaveLength(1)
+ expect(screen.getByRole('button',{name:'正在提交…'})).toBeDisabled()
+ await act(async()=>{finish({id:'saved'});await pending})
+ expect(await screen.findByText('提交成功。感谢你完成今天的校园活动。')).toHaveAttribute('role','status')
 })

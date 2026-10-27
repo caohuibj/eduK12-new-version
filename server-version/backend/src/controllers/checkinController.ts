@@ -112,6 +112,13 @@ class IdempotencyPayloadMismatchError extends Error {
   }
 }
 
+class CampusTaskAlreadySubmittedError extends Error {
+  constructor() {
+    super('本次校园活动已提交，请刷新查看已有记录')
+    this.name = 'CampusTaskAlreadySubmittedError'
+  }
+}
+
 class SubmissionRevisionConflictError extends Error {
   constructor() {
     super('提交版本已过期，请刷新后重试')
@@ -821,7 +828,7 @@ export const checkinController = {
       const checkin = await prisma.checkin.findUnique({
         where: { id },
         // Keep the fresh access/deadline read without loading task media/content.
-        select: { courseId: true, endTime: true },
+        select: { courseId: true, endTime: true, course: { select: { courseType: true } } },
       })
 
       if (!checkin) {
@@ -930,6 +937,12 @@ export const checkinController = {
           }
           return { saved: existing, wasExisting: true }
         }
+        // Campus tasks are final once submitted. Keep Training's intentional
+        // resubmissions, while guarding stale pages inside the existing lock.
+        if (checkin.course?.courseType === 'CAMPUS_ACTIVITY' && existing) {
+          throw new CampusTaskAlreadySubmittedError()
+        }
+
         if (!existing) {
           const requestedRevision = expectedRevision ?? (idempotencyKeyHash ? 0 : undefined)
           if (requestedRevision !== undefined && requestedRevision !== 0) {
@@ -989,6 +1002,9 @@ export const checkinController = {
         parentAccess: true,
       }), submission.replayed ? '打卡成功' : submission.wasExisting ? '打卡更新成功' : '打卡成功')
     } catch (err) {
+      if (err instanceof CampusTaskAlreadySubmittedError) {
+        return error(res, err.message, -1, 409)
+      }
       if (err instanceof IdempotencyPayloadMismatchError) {
         return error(res, err.message, -1, 409)
       }

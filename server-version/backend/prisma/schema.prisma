@@ -2788,6 +2788,8 @@ model CampusAccount {
   @@map("campus_accounts")
 }
 
+// Personnel staging/import/credential binding tables are SQL-owned in
+// 20261026150000_campus_personnel_import; no User or grant backfill is run.
 // Campus admissions use handwritten multi-column FKs/partial indexes in SQL
 // migrations, because OrganizationUnit is intentionally SQL-owned.
 model CampusClassAdmission {

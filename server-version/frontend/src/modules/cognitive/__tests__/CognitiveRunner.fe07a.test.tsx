@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import CognitiveRunner from '../pages/CognitiveRunner'
 import { TrainingLearnerNavigationBoundary } from '../../../training/TrainingLearnerNavigationBoundary'
@@ -77,6 +77,11 @@ beforeEach(() => {
 })
 
 describe('FE-07A Cognitive shell integration', () => {
+  it('never applies the preparation layout to active trial pages', async()=>{
+    const {container}=render(app())
+    await waitFor(()=>expect(container.querySelector('[data-cognitive-task-root]')).not.toBeNull())
+    expect(container.querySelector('.cognitive-preparation')).toBeNull()
+  })
   it.each(['UNSUPPORTED', 'COMPLETED'])('keeps the authoritative Training parent on %s without creating another attempt', status => {
     const serverSession = { ...baseState().session, trainingPersistence: { attemptId: 'parent-real', courseId: 'course-real' } }
     mocks.controller.state = { ...baseState(), session: serverSession }
