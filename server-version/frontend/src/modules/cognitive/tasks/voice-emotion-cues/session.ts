@@ -19,12 +19,13 @@ export class VoiceSession {
   async prepare() {
     if (this.view !== 'intro' || this.busy || this.disposed) return
     this.busy = true; this.view = 'preparing'; this.changed()
+    if (this.disposed) { this.busy = false; return }
     try {
       const binding = { context: this.context, plans: this.plans, realm: this.realm }
       const ack = await this.ports.prepareLocalAttempt(structuredClone(this.context), structuredClone(this.plans), structuredClone(this.realm))
       if (ack.prepared !== true || ack.exclusive !== true || ack.contextKey !== this.context.contextKey || ack.bindingDigest !== digest(binding)) throw Error('No exclusive durable preparation')
       if (!this.disposed) this.view = this.endAfterSave ? 'stopped' : 'practice-ready'
-    } catch { this.view = 'blocked'; this.reason = 'preparation-unconfirmed' } finally { this.busy = false; this.changed() }
+    } catch { if (!this.disposed) { this.view = 'blocked'; this.reason = 'preparation-unconfirmed' } } finally { this.busy = false; if (!this.disposed) this.changed() }
   }
   begin() {
     if (this.disposed || !['practice-ready', 'formal-ready', 'break'].includes(this.view)) return
@@ -49,10 +50,13 @@ export class VoiceSession {
     let terminal = false
     try { observe(raw); terminal = true } catch (error) { if ((error as Error).message !== 'Unexecuted voice trial has no terminal observation') throw error }
     if (terminal) {
-      const base = { contextKey: this.context.contextKey, language: this.context.language, configHash: this.context.snapshot.configHash, protocolSignature: this.context.snapshot.protocolSignature, manifestHash: this.context.manifestHash, realm: structuredClone(this.realm), recordKey: `${raw.plan.phase}:${raw.plan.round}:${raw.plan.index}`, raw: structuredClone(raw) }
-      this.pending = { ...base, recordDigest: digest(base) }; this.capture = null; this.view = 'saving'; void this.save()
+      this.retainCapture(raw); this.view = 'saving'; void this.save()
     }
     this.changed()
+  }
+  private retainCapture(raw: Raw) {
+    const base = { contextKey: this.context.contextKey, language: this.context.language, configHash: this.context.snapshot.configHash, protocolSignature: this.context.snapshot.protocolSignature, manifestHash: this.context.manifestHash, realm: structuredClone(this.realm), recordKey: `${raw.plan.phase}:${raw.plan.round}:${raw.plan.index}`, raw: structuredClone(raw) }
+    this.pending = { ...base, recordDigest: digest(base) }; this.capture = null
   }
   private async save() {
     if (this.busy || !this.pending) return
@@ -60,7 +64,9 @@ export class VoiceSession {
     try {
       const d = this.pending, ack = await this.ports.persistLocalDraft(structuredClone(d))
       if (ack.retained !== true || ack.contextKey !== d.contextKey || ack.recordKey !== d.recordKey || ack.recordDigest !== d.recordDigest) throw Error('Draft retention unconfirmed')
-      this.retained.push(structuredClone(d)); this.pending = null; this.last = structuredClone(d.raw)
+      this.retained.push(structuredClone(d)); this.pending = null
+      if (this.disposed) return
+      this.last = structuredClone(d.raw)
       if (d.raw.plan.phase === 'practice') {
         this.index++; const observed = observe(d.raw)
         if (observed.outcome === 'answered' && observed.choice === d.raw.plan.emotion) this.matches++
@@ -68,8 +74,8 @@ export class VoiceSession {
       } else {
         this.formalIndex++; this.view = this.abort || this.formalIndex === this.plans.formal.length ? 'finalizing' : this.formalIndex % 24 === 0 ? 'break' : 'formal-ready'
       }
-    } catch { this.view = 'retry'; this.reason = 'local-retention-unconfirmed' } finally { this.busy = false; this.changed() }
-    if (this.view === 'finalizing') await this.finalize()
+    } catch { if (!this.disposed) { this.view = 'retry'; this.reason = 'local-retention-unconfirmed' } } finally { this.busy = false; if (!this.disposed) this.changed() }
+    if (!this.disposed && this.view === 'finalizing') await this.finalize()
   }
   nextPractice() { if (this.view === 'feedback' && this.index < 3 && !this.disposed) { this.view = 'practice-ready'; this.changed() } }
   retryInstructions() {
@@ -85,7 +91,7 @@ export class VoiceSession {
     this.phase = 'test'; this.index = 0; this.formalIndex = 0; this.view = 'formal-ready'; this.changed()
   }
   stop(reason = 'participant-ended') {
-    if (this.view === 'report' || this.view === 'stopped' || this.view === 'blocked' || this.claim) return
+    if (this.disposed || this.view === 'report' || this.view === 'stopped' || this.view === 'blocked' || this.claim) return
     this.reason = reason
     if (this.phase === 'practice') this.endAfterSave = true
     else this.abort = true
@@ -95,18 +101,33 @@ export class VoiceSession {
     else { this.view = 'finalizing'; this.changed(); void this.finalize() }
   }
   private async finalize() {
-    if (this.busy || this.pending || this.phase !== 'test') return
+    if (this.disposed || this.busy || this.pending || this.phase !== 'test') return
     this.busy = true; this.view = 'finalizing'; this.changed()
+    if (this.disposed) { this.busy = false; return }
     if (!this.claim) {
       const base = { contextKey: this.context.contextKey, language: this.context.language, configHash: this.context.snapshot.configHash, protocolSignature: this.context.snapshot.protocolSignature, manifestHash: this.context.manifestHash, recordDigests: this.retained.map(d => d.recordDigest), formalCount: this.formalIndex, practiceCount: this.retained.length - this.formalIndex, termination: this.abort ? 'aborted' as const : 'completed' as const, terminationReason: this.abort ? this.reason : null }
       this.claim = { ...base, finalPayloadDigest: digest(base) }
     }
     try {
       const claim = this.claim, ack = await this.ports.finalize(structuredClone(claim)), s = this.context.snapshot
+      if (this.disposed) return
       if (ack.finalSaved !== true || ack.contextKey !== claim.contextKey || ack.finalPayloadDigest !== claim.finalPayloadDigest || !ack.receiptId || !isPublicReport(ack.report, { configHash: s.configHash, protocolSignature: s.protocolSignature, materialsHash: s.config.materialsHash, manifestHash: this.context.manifestHash, profile: s.config.profile, received: this.formalIndex })) throw Error('Final report save unconfirmed')
       this.receipt = structuredClone(ack); this.view = 'report'
-    } catch { this.reason = 'final-save-unconfirmed'; this.view = 'retry' } finally { this.busy = false; this.changed() }
+    } catch { if (!this.disposed) { this.reason = 'final-save-unconfirmed'; this.view = 'retry' } } finally { this.busy = false; if (!this.disposed) this.changed() }
   }
   async retry() { if (this.view !== 'retry' || this.busy || this.disposed) return; if (this.pending) { this.view = 'saving'; await this.save() } else await this.finalize() }
-  dispose() { this.stop('disposed'); this.disposed = true }
+  dispose() {
+    if (this.disposed) return
+    // Destruction closes presentation/FINAL authority first. It is not the
+    // participant's explicit stop, and it cannot cancel an already-issued FINAL.
+    this.disposed = true; this.view = 'stopped'; this.reason = 'disposed'
+    if (this.capture) {
+      const raw = this.capture, at = this.now()
+      raw.events.push({ kind: 'interrupt', at, reason: 'disposed' }); raw.endedAtPerfMs = at
+      observe(raw); this.retainCapture(raw)
+      // One best-effort raw write via the originally bound local port. A pending
+      // write is left alone; late success may retain raw but never start FINAL.
+      void this.save()
+    }
+  }
 }

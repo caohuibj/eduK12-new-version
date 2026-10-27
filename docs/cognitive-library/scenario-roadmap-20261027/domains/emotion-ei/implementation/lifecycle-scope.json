@@ -1,0 +1,172 @@
+{
+  "kind": "BOUNDED_LIFECYCLE_CORRECTION_ONLY_NOT_PRODUCT_ACCEPTANCE",
+  "base": "ea430728fed7e68a6723ca9059d69560ea9ad4ec",
+  "currentBranch": "cognitive/domain-emotion-ei-20261027",
+  "changedRuntime": [
+    "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/session.ts"
+  ],
+  "newTest": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/lifecycle.test.tsx",
+  "reproduction": {
+    "passed": 0,
+    "failed": 4,
+    "report": "lifecycle-reproduction.json"
+  },
+  "corrected": {
+    "passed": 4,
+    "failed": 0,
+    "report": "lifecycle-fixed.json"
+  },
+  "targetedContinuation": [
+    {
+      "report": "lifecycle-react-selector-corrected.json",
+      "passed": 1,
+      "filtered": 3
+    },
+    {
+      "report": "lifecycle-observer-guard.json",
+      "passed": 1,
+      "filtered": 3
+    }
+  ],
+  "types": {
+    "report": "lifecycle-types-final.stdout.txt",
+    "diagnostics": 0,
+    "sourceFiles": 57
+  },
+  "notRepeated": [
+    "102 WAV checks",
+    "96 formal sequence flow",
+    "complete 24-trial frontend flow",
+    "browser group",
+    "candidate compilation"
+  ],
+  "unchanged": [
+    "protocol",
+    "materials",
+    "approved design",
+    "VoiceEmotionTask StrictMode microtask",
+    "scorer",
+    "public report",
+    "shared registration",
+    "platform"
+  ],
+  "meaning": "Actual new synthetic lifecycle checks, unsigned local evidence only. Original failures and filtered outcomes remain. Existing in-flight FINAL not cancelled; late results ignored after dispose.",
+  "inputs": [
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/session.ts",
+      "sha256": "00e536fffaca23bc71fd873733efb1cb42684b36ad8e0cd1c2d0ffadcbaa4122"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/lifecycle.test.tsx",
+      "sha256": "fe0e6845cf513571338b142a98b4d9c7b8f97ed3f4ee3aabdd2255becd2048a8"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/lifecycle-reproduction.json",
+      "sha256": "863c93b7aea2a1328a588fb0c7a956a6007a7e3f388ca099fe12e2cc025ef6ed"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/lifecycle-types-corrected.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/lifecycle-react-selector-corrected.stdout.txt",
+      "sha256": "70a2b886457ea71a36e4a12221d2b08b734cf3fbe089b9eef08adc2db4b41405"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/lifecycle-types-final.stdout.txt",
+      "sha256": "c18f54f2ffec8cf57c2a3d1225976529ccd04985aec9c5e63c67f6e32d262cd5"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/lifecycle-reproduction.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/lifecycle-react-selector-corrected.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/lifecycle-types-corrected.stdout.txt",
+      "sha256": "a9648fde3356c7889f2d5276af5399bcdbf5704861b796f6f7fcd49cd6572d5f"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/lifecycle-react-selector-corrected.json",
+      "sha256": "333bdfce962a291a2e58f919a029e0d47286c8d36dc699b5d1a6b5ff8a025577"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/lifecycle-types.stdout.txt",
+      "sha256": "4bd46fc61eb2e3b7942dc5b270f9306ad53b847eb58dda2093ed848443ccbdce"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/lifecycle-react-selector-corrected.receipt.json",
+      "sha256": "f04bc53f9610816d370d003ad5b6d35763dd3fc7220b356e1702bbc0f7347661"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/lifecycle-reproduction.stdout.txt",
+      "sha256": "f877e7ef083e63dc082970715fdf11cf3fef9e9c76810a47c1c9b652b943a586"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/lifecycle-fixed.receipt.json",
+      "sha256": "20fb71a6e63226ed201ded6b7e47d64747d888944eca14aed970e98335ce3306"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/lifecycle-reproduction.receipt.json",
+      "sha256": "25ec88defcbc45c5156da9823a54e529acace69a679b2c4c5af151b1774a0474"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/lifecycle-types.receipt.json",
+      "sha256": "31d7adf7b6335afa9ae2265db3fc93373ffa7d1c6da5eb12d1c8c6e7de94d62d"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/lifecycle-fixed.json",
+      "sha256": "ae271de83d71971b823ed93c3df0998e03011bffcbe0af974b727f7ef0ec1fdc"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/lifecycle-types.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/lifecycle-fix.md",
+      "sha256": "e3a3730b647e1bfaaa6dd66f0411c1572800f62e72fc1380251b02297ec5f97f"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/lifecycle-types-final.receipt.json",
+      "sha256": "d41adccbfa43ae49febbf6a29f1534844f9b742e57028cccfa3142d1a53dda0f"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/lifecycle-fixed.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/lifecycle-observer-guard.receipt.json",
+      "sha256": "2e3815e229bd75c6c631c14dcc429e001771fa9770042740e484c6c29e6cf0ae"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/lifecycle-types-final.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/lifecycle-types-corrected.receipt.json",
+      "sha256": "883e40a3f3d2546628067614dbc649bbc959565a6033e98f7541718e71b60992"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/lifecycle-fixed.stdout.txt",
+      "sha256": "a5a938967de049fbc2ead9f4858f0f43cf4be16d4b84ff5ccce8dabb3ad1a593"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/lifecycle-types.cjs",
+      "sha256": "496ac3631205a9c424ec42199226d9dd9c5584e1d7d54050b3192d33cd61c4ed"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/lifecycle-observer-guard.stdout.txt",
+      "sha256": "bce1d01a3d1fef03e68e73c216b468c2b4f913d168dda36c0aa08054f4255d43"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/lifecycle-observer-guard.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/lifecycle-observer-guard.json",
+      "sha256": "cf3fac0f8171e77b8e2d8a2fcb8870b3c7a83e618efe9ea32acc142171396207"
+    }
+  ]
+}

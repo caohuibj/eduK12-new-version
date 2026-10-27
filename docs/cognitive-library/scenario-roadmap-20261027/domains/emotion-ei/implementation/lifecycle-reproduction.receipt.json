@@ -1,0 +1,115 @@
+{
+  "kind": "UNSIGNED_LOCAL_CANDIDATE_CHECK_NOT_CI",
+  "command": [
+    "./node_modules/.bin/vitest",
+    "run",
+    "src/modules/cognitive/tasks/voice-emotion-cues/lifecycle.test.tsx",
+    "--maxWorkers=1",
+    "--reporter=json",
+    "--outputFile=../../docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/lifecycle-reproduction.json"
+  ],
+  "cwd": "server-version/frontend",
+  "startedUtc": "2026-10-27T11:35:20.386798+00:00",
+  "endedUtc": "2026-10-27T11:35:21.909226+00:00",
+  "exitCode": 1,
+  "sourceInputs": [
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/voice-emotion-cues/report.ts",
+      "sha256": "88ee7a0c477a83ef88955631ae13e24aa8b987ec40a84488f17f474050023730"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/voice-emotion-cues/materials.ts",
+      "sha256": "22914030b6d93bc9670dbecea33bfe780e7d09906f543f1cc2e995132c4b2111"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/voice-emotion-cues/scorer.ts",
+      "sha256": "ad51fe537732626a6b89b1bc3ef2593dd56496e20b1b5a643c48b14c12aa8ee2"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/voice-emotion-cues/submission.ts",
+      "sha256": "70b73ce521c191f42a46e12216ec0ddd3b8f1a8e7aabac4c05c1ae7fb700ddc7"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/voice-emotion-cues/metadata.ts",
+      "sha256": "a741b9bd3d477cc68feada4335521ad6d5a2a9daab4e930794cfded6e14c82b3"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/voice-emotion-cues/schema.ts",
+      "sha256": "8a06d894a7c3700df791bac4322d7e7d59e4b1ec2a994351bbef20f2da798566"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/voice-emotion-cues/package.ts",
+      "sha256": "a63ff7ecea83d7ad2eb69042ae19b9c8ac08dce84399d974455055af9d002cb4"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/voice-emotion-cues/protocol.ts",
+      "sha256": "96d0ac7367c8918479a6219a11c901906852de8936a45feff8ab84dbe7a5634e"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/lifecycle.test.tsx",
+      "sha256": "92440e02c27008ea6e8e2d496dcdfdb17930aff13fad0a9295c70898e3e8c10e"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/contracts.ts",
+      "sha256": "abfc931b767d54293a1eacb6195b30ba94c9e4d8a532f20bf5ffecf35b12f4ef"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/assets.ts",
+      "sha256": "6ff7a10e56b7c70929109ce67e93446d5606d691908a63af885526e6e7c122f8"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/VoiceReport.tsx",
+      "sha256": "96681b028880aca245fbd00d6710843d5cef385f87641715a234b243f81eb833"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/VoiceEmotionTask.tsx",
+      "sha256": "98ecb564a69c7f835b8ea3cd89c9a4046fe5c44a2aa8a41c375d9d2fe9d7c119"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/content.test.tsx",
+      "sha256": "3a7e545188bdec79a31d04d3f68c151ed5ce2a97ad5c8a8763c2de24d30772df"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/VoiceInstructions.tsx",
+      "sha256": "b3f487b6717e1775cfe93ab4da791d2324d0263d8e999ad146c417f3c9b84e34"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/session.ts",
+      "sha256": "91486618679a1673e29cc8d5b74f5da748e3455fa0f6febd8378a3c7a2c4efb4"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/generated/report.ts",
+      "sha256": "88ee7a0c477a83ef88955631ae13e24aa8b987ec40a84488f17f474050023730"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/generated/materials.ts",
+      "sha256": "22914030b6d93bc9670dbecea33bfe780e7d09906f543f1cc2e995132c4b2111"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/generated/protocol.ts",
+      "sha256": "96d0ac7367c8918479a6219a11c901906852de8936a45feff8ab84dbe7a5634e"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/cognitive/voice-emotion-content.test.ts",
+      "sha256": "5aadb75269c4d167723c0c5e89d5f574a064a9a34baaef355ae068030b9486af"
+    },
+    {
+      "path": "server-version/backend/package-lock.json",
+      "sha256": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450"
+    },
+    {
+      "path": "server-version/frontend/package-lock.json",
+      "sha256": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe"
+    },
+    {
+      "path": "server-version/backend/vitest.config.ts",
+      "sha256": "26b98b70914617771d41657be8cdf6d7b6d7024c81d1c8a49aeae6a9220cf93b"
+    },
+    {
+      "path": "server-version/frontend/vitest.config.ts",
+      "sha256": "3d757d2b1cee6c1c09a3ec7016b296aa159c938f83365e2370a1d423f29917db"
+    }
+  ],
+  "stdout": "lifecycle-reproduction.stdout.txt",
+  "stderr": "lifecycle-reproduction.stderr.txt"
+}
