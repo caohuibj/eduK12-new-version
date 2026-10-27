@@ -1,0 +1,33 @@
+{
+  "oldBase": "5c427f2bfe646def2200162bab449a0711a6e133",
+  "integratedBase": "6203a829dc8d7de707e67f413acfa5a354a21e09",
+  "mergedAs": "88a631c6c45f2df54fbae601d2fae9e2b7d0cdd0",
+  "method": "normal no-ff merge, no force push",
+  "changedMainPaths": [
+    ".github/scripts/content-scope.mjs",
+    ".github/scripts/merge-gate.mjs",
+    ".github/scripts/pr364-bindings.json",
+    ".github/scripts/pr364-checks.mjs",
+    ".github/scripts/pr364-controls.test.mjs",
+    ".github/scripts/pr364-scope.mjs",
+    ".github/workflows/ci.yml",
+    "docs/performance/four-entry-postmerge-20261028/README.md",
+    "docs/performance/four-entry-postmerge-20261028/evidence/backend-types.log",
+    "docs/performance/four-entry-postmerge-20261028/evidence/frontend-types.log",
+    "docs/performance/four-entry-postmerge-20261028/evidence/initial-empty-selection.json",
+    "docs/performance/four-entry-postmerge-20261028/evidence/postgres-pagination.json",
+    "docs/performance/four-entry-postmerge-20261028/evidence/postgres-pagination.log",
+    "docs/performance/four-entry-postmerge-20261028/evidence/review.json",
+    "docs/performance/four-entry-postmerge-20261028/evidence/ui-pagination-passed.json",
+    "docs/performance/four-entry-postmerge-20261028/evidence/ui-transform-failed.json",
+    "server-version/backend/src/__tests__/education-tools/assessment-resource.license-selection.postgres.integration.test.ts",
+    "server-version/backend/src/__tests__/education-tools/assessment-resource.publication.postgres.integration.test.ts",
+    "server-version/backend/src/modules/education-tools/assessment-resource.routes.ts",
+    "server-version/backend/src/modules/education-tools/assessment-resource.service.ts",
+    "server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.test.tsx",
+    "server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.tsx",
+    "server-version/frontend/src/components/education-tools/assessmentResourceClient.ts"
+  ],
+  "directScaleInputsChanged": [],
+  "reuse": "Candidate source blobs, scale validators, source schemas, scoring, report protocol and locked dependencies are byte-identical across PR364 integration. No candidate audit or existing successful case was rerun for this merge. Backend types are freshly evaluated on the integrated source; no claim is made from the invocation overlapping the merge."
+}

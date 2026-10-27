@@ -1,0 +1,33 @@
+{
+  "command": "node node_modules/tsx/dist/cli.mjs scripts/audit-scale-candidate-structure.ts ../../docs/scale-library-structure-20261027/sources.json ../../docs/scale-library-structure-20261027/candidates.json",
+  "exitCode": 0,
+  "node": "v24.21.0",
+  "ciExecuted": false,
+  "databaseAccess": false,
+  "inventoryBase": "5c427f2bfe646def2200162bab449a0711a6e133",
+  "productionCodeCommit": "4171f2d1dd7e740ee72771f76f2e3ae42c421cdb",
+  "inputs": {
+    "server-version/backend/scripts/audit-scale-candidate-structure.ts": "7f458dc6ce3cb42e091a160a32481d908cdae2c9886957a5f1b81e3489513a14",
+    "server-version/backend/src/modules/scale/onboarding/axis-snapshots.ts": "96ba95d850446ce1b627807f866b46008787f0a245ec1a11b7da6a6c6f42ab69",
+    "server-version/backend/src/modules/scale/onboarding/backfill.ts": "e5bd53937b1853659f41bfb7fb4e8cfc6b06f7b4f39567c485fa2b5707adbf65",
+    "server-version/backend/src/modules/scale/onboarding/define-instrument.ts": "e6ade3db43e3945d7a33f7426cfe7056c6aae42e54cdc01d442450f628c52a93",
+    "server-version/backend/src/modules/scale/onboarding/executable-registry.ts": "ce29a39547fe550c29f7a2dced9017e2c462865b039c702e6cafb23d50c2e717",
+    "server-version/backend/src/modules/scale/onboarding/install.ts": "8def994a6c1878d440c0d982185dc120b9994e296648c72fa156daaaa05473b0",
+    "server-version/backend/src/modules/scale/onboarding/instrument-registry.ts": "f7f7881a9cc78cdd8d0f4ad69f793d00270d2e641665ac9fa5e2c4f650b6e992",
+    "server-version/backend/src/modules/scale/onboarding/instruments.generated.ts": "e220eec00f491fc89a7b3df914bda1d224bc993645d9eb79c88f1ff3eb210564",
+    "server-version/backend/src/modules/scale/onboarding/materialize.ts": "b0855811320e891bb0a76b875a745edf8ed7080f3ca119dbda2058d9baea9863",
+    "server-version/backend/src/modules/scale/onboarding/measurement-conversion.ts": "c275a0ff343a653af73d1a8bb9e5c236be82ea48fd9256dffab75f6a0d72732e",
+    "server-version/backend/src/modules/scale/onboarding/preview.ts": "841510d8bdb522ec9833b87bb6ad99c1a4e13a4e478fb22842846128104b71c3",
+    "server-version/backend/src/modules/scale/onboarding/publish.ts": "01fdb147bef660420466376dec14abd76468c05269ab2120bafac1db9543cc5f",
+    "server-version/backend/src/modules/scale/onboarding/schema.ts": "b7646a0fbd0abf13c18beb6eb9154eeba84fb9ef5de1a6b94c4cd25f4ab85c7d",
+    "server-version/backend/src/modules/scale/onboarding/self-authored.ts": "157e4850c5fd45a699ad8b4e7bbf1a9c75c4028ee6cfaed0e8984d45ace98334",
+    "server-version/backend/src/modules/scale/onboarding/source-snapshot.ts": "5140b2be3e744d577bf6ec45ba6a3ab1555499417b3cce2c040557d51acf13c6",
+    "server-version/backend/src/modules/scale/onboarding/status.ts": "2ca4e636fb6f848ee2a53c5701f31465e6849a32a24e39c2d1d2a139fa6ba3eb",
+    "server-version/backend/src/modules/scale/onboarding/types.ts": "7e6b6b4c69114a7480dde09581402ed637bc0fb22eab282ae4c13176aa0d1974",
+    "server-version/backend/src/modules/scale/onboarding/validate-instrument.ts": "04a3c914aee6f22bc4467533f5c743fd588e6b50bea7fe0fa1fb37bfbc7c1d96",
+    "server-version/backend/src/modules/scale/library/audience-report-gate.ts": "b6599f505932b01b3881ffe05f92306df728bff6ec15de3d026f36fdf9e1994b",
+    "server-version/backend/src/modules/scale/scale-definition.ts": "9d6b157a131839eaa932dddb82a85089283422ba3dab421a0fada55b24715854",
+    "server-version/backend/package-lock.json": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450"
+  },
+  "bindingNote": "Collected after execution and reviewed against the recorded code edits; not a contemporaneous signed execution manifest. An earlier zero-row invocation and defaults failure are retained. The first successful 18-row missing-contract summary omitted APQ due to its envelope schema error; the final per-part report restores that missing contract and preserves original failures. Initial successful full JSON was overwritten during reporting repair; its summary log remains."
+}

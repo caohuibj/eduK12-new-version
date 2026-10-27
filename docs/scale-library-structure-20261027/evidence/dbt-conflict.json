@@ -1,0 +1,32 @@
+{
+  "refs": [
+    "b92c69aefa2472775fa7ee86b9c208366886c908",
+    "2612a9f5bf22c1370ec786f3d6feb50805003065"
+  ],
+  "path": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_cn_research/1.0.2/source.json",
+  "sameIdentityConflict": true,
+  "differingPaths": [
+    "catalog.catalogStatus",
+    "catalog.identity.canonicalName",
+    "catalog.identity.abbreviation",
+    "catalog.construct.constructOverlapTags",
+    "localization.expertReviewStatus",
+    "localization.reviewStatus",
+    "localization.notes",
+    "localization.reviewedAt",
+    "usageRequirements.notes",
+    "executable.releaseStatus",
+    "executable.definition.license.note",
+    "executable.definition.report.limitations",
+    "executable.definition.report.disclaimer"
+  ],
+  "primaryValidation": "../candidates.json",
+  "alternateIssues": [
+    {
+      "path": "report.audienceContract",
+      "message": "AUDIENCE_LANGUAGE_QC_REQUIRED",
+      "severity": "error"
+    }
+  ],
+  "database": "NOTRUN"
+}

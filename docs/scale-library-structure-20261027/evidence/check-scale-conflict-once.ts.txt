@@ -1,0 +1,21 @@
+import { execFileSync } from 'node:child_process'
+import { writeFileSync } from 'node:fs'
+import { parseScaleInstrumentSourceSchema } from '../src/modules/scale/onboarding/schema'
+import { validateScaleInstrumentSource } from '../src/modules/scale/onboarding/validate-instrument'
+const path = 'server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_cn_research/1.0.2/source.json'
+const refs = ['b92c69aefa2472775fa7ee86b9c208366886c908', '2612a9f5bf22c1370ec786f3d6feb50805003065']
+const contents = refs.map(sha => JSON.parse(execFileSync('git', ['-C', '../..', 'show', `${sha}:${path}`], { encoding: 'utf8' })))
+const differences: string[] = []
+function compare(left: any, right: any, key = '') {
+  if (JSON.stringify(left) === JSON.stringify(right)) return
+  if (left && right && typeof left === 'object' && typeof right === 'object' && !Array.isArray(left) && !Array.isArray(right)) {
+    for (const child of new Set([...Object.keys(left), ...Object.keys(right)])) compare(left[child], right[child], key ? key + '.' + child : child)
+  } else differences.push(key)
+}
+compare(contents[0], contents[1])
+// Primary variant was already validated in candidates.json; execute only the
+// additional PR362 variant. No source is installed or rewritten.
+const alternate = parseScaleInstrumentSourceSchema(contents[1])
+const report = { refs, path, sameIdentityConflict: true, differingPaths: differences, primaryValidation: '../candidates.json', alternateIssues: validateScaleInstrumentSource(alternate, { requireInstruction: true }).issues, database: 'NOTRUN' }
+writeFileSync('../../docs/scale-library-structure-20261027/evidence/dbt-conflict.json', JSON.stringify(report, null, 2) + '\n')
+console.log(JSON.stringify({ differingPaths: differences, alternateIssueCount: report.alternateIssues.length }))
