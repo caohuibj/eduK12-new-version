@@ -3,7 +3,7 @@
   "browser": "151.0.7922.173",
   "chromiumSandbox": false,
   "executionContext": "Existing managed cloud process sandbox",
-  "htmlSha256": "3350793f47402e908fc3cb79c5077aafbb1ab45fa88d19d798d79fae89255bd0",
+  "htmlSha256": "5f7e9d1b7e3a6d675124ab0d3aa27447146fa046d9631b177560c4174b2c2b6f",
   "views": [
     {
       "viewport": 1480,
@@ -33,5 +33,5 @@
       "requests": []
     }
   ],
-  "pngSha256": "112801ad3dd0ecdf349d836f19cb4e08b6a0112b229d0a8f60b0076b791bff5a"
+  "pngSha256": "3807a68b0b19c44501354fc49e68933803e52d3797f51d5772e9dfa761192bce"
 }

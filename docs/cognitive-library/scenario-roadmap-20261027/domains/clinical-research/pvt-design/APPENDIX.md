@@ -1,6 +1,6 @@
-# PVT 图审附录 · 设计修订 0.1.1
+# PVT 图审附录 · 设计修订 0.1.2
 
-2026-10-27。`pvt` 唯一归属 clinical-research，DOT 已确认；用户已认可界面图并要求练习缩为3次，随后讨论实用版120秒；用户明确要求暂不开发。120秒是本次修订方案，不声称取得开发授权。只含原创静态资料，无 runner、随机序列生成器、计分代码或测试入口。本次只修订设计，不启动开发。
+2026-10-27。`pvt` 唯一归属 clinical-research，DOT 已确认；用户已认可界面图并要求练习缩为3次，随后讨论实用版120秒；用户明确要求暂不开发。120秒是本次修订方案，不声称取得开发授权。只含原创静态资料，无 runner、随机序列生成器、计分代码或测试入口。本次只修订设计，不启动开发；图稿保留已认可布局，阈值移除与最终参数组合仍待用户确认。
 
 ## 来源与核验范围
 
@@ -52,7 +52,7 @@ Practise three targets first. There is no speed pass mark. Respond after each of
 
 The research version lasts ten minutes and the practical version two minutes. The number of targets varies. At the time limit, the display stops. An unfinished wait is not a missed target. A target that has just appeared and could not be fully observed is listed separately. Respond to what you actually see rather than aiming for a score.
 
-**练习参数提案：**每组3个目标，等待各为3／5／3秒，慢节奏中性反馈2秒且包含在下一等待中；练习无100ms判定线、不要求快，只须无提前按并在三个目标后各新按一次。每目标仍有30秒无回应上限；提前按、无回应、主动退出或未完成不算练习通过，重新显示完整说明与例子。最多两组，不无限重试，不把教学通过率解释为能力；没有另写示例生成器。
+**练习参数提案：**每组3个目标，等待各为3／5／3秒，慢节奏中性反馈2秒且包含在下一等待中；练习无速度判定线、不要求快，只须无提前按并在三个目标后各新按一次。每目标仍有30秒无回应上限；提前按、无回应、主动退出或未完成不算练习通过，重新显示完整说明与例子。最多两组，不无限重试，不把教学通过率解释为能力；没有另写示例生成器。
 
 ## 提前按、未答、终点和中断：项目边界决定
 
@@ -61,7 +61,7 @@ The research version lasts ten minutes and the practical version two minutes. Th
 | 实际情况 | 记录与下一步 |
 | --- | --- |
 | 等待期第一次新按下 | 记一次等待提前按，RT=null，因为目标尚未出现。显示“等圆变实心后再按”1000ms；从这次事件重新抽取2–10秒等待，包含反馈。反馈内按下不再累计，不让一串按键刷新或拖长反馈。松开后、反馈结束的等待期间下一次新按下才可成为新的提前按事件 |
-| 目标出现后的首答 | 以目标出现到首个新按下的实际差为RT。0≤RT<100ms记“目标后过早首答”，保留真实RT（含0），不算有效速度样本；100≤RT<30000ms为有效RT。首答结束该目标，后续按下不能替换首答；反馈1000ms期间不采为下一题首答 |
+| 目标出现后的首答 | 以目标出现到首个新按下的实际差为RT。0≤RT<30000ms均按实际首答保留（含真实0）；不按100ms自动划为提前按，也不把小于100ms等同于操作错误。提前按仅指目标尚未出现时的新按下。首答结束该目标，后续按下不能替换首答；反馈1000ms期间不采为下一题首答 |
 | 目标出现后30秒仍无首答 | 仅在完整观察满30000ms时记timeout未答，RT=null；另保留观察满30秒这一事实。显示中性未答提示1000ms后按原等待规则继续，无声音。与原文把它代入30秒RT不同，不能混用原论文指标 |
 | 达到正式时限T，仍在等待 | 结束等待、不出现新目标、不算未答。未执行目标不进任何目标分母；等待提前按事件保留真实次数 |
 | 达到T，目标已出现但未结束 | 将此目标列为scheduled-end-censored，RT=null，保留实际观察时长；不算timeout、正确或错误，不进完整目标分母，不延时补答 |
@@ -71,25 +71,25 @@ The research version lasts ten minutes and the practical version two minutes. Th
 
 ## 研究指标、条件分母与缺失
 
-这是公式设计，不是scorer实现。令A为正式已出现目标数，V为有有效首答目标数，F为目标后RT<100ms的目标数，O为完整30秒无首答数，C为正常时限截断数，I为意外／主动中断目标数。各目标只归一类，A=V+F+O+C+I，完整观察目标D=V+F+O。等待期提前按W是事件次数，可能多于目标数，不拿W/A伪造概率。练习和正式各算各的，不合并分母；无No-Go条件，No-Go指标为null而非0。
+这是公式设计，不是scorer实现。两版均不采用文献100ms的首答分类或500／355ms的lapse分类；这些只在来源概述中保留。令A为正式已出现目标数，V为有实际目标后首答的目标数，O为完整30秒无首答数，C为正常时限截断数，I为意外／主动中断目标数。各目标只归一类，A=V+O+C+I，完整观察目标D=V+O。等待期提前按W是事件次数，可能多于目标数，不拿W/A伪造概率。练习和正式各算各的，不合并分母；无No-Go条件，No-Go指标为null而非0。
 
-- 内部响应速度：S=(1/V)×Σ(1000/RT_ms)，仅有效首答，单位s⁻¹；这是原文逐次倒数再平均的公式，不能改成1000/平均RT。项目排除了timeout代值，因此属于修改后的有效首答描述，不能冒充原文相同分析集。V=0时S=null。
-- 内部较慢首答数L=有效首答中RT≥500ms的数量；比例L/V，V=0为null；不采用355ms，不与临床阈值或常模比较。O单列，不能把未按加进L或伪成RT=30000。
-- 未答比例O/D；目标后过早首答比例F/D；D=0则各为null。正常时限截断C与中断I不进D，但分别公开说明实际数量，不藏掉部分观察。有效首答为0与无数据不能混同；O=0在D>0且观察完整时是真实0。
-- 内部时间进程差：按目标出现时刻分前后半段（T/2），每半段用自己的有效样本数；ΔS=S后半−S前半，保留正负号，两半任一无样本则null。仅可作探索性描述，不对实用版输出稳定趋势判断，不把个体差异归因睡眠或ADHD。
-- 不计算0–100能力总分、IQ、诊断、同龄排名或岗位预测。内部速度、阈值比例与半段差不直接投射公开个人报告；不把有限样本包装成精度已验证。
+- 内部响应速度：S=(1/V)×Σ(1000/RT_ms)，单位s⁻¹；仅当V>0且该分析集每个实际RT都大于0时可算。这是原文逐次倒数再平均的数学形式，不能改成1000/平均RT；但本项目分析集已改变，不能冒充原版指标或沿用其解释。V=0或有真实RT=0无法取倒数时S=null，真实RT=0仍保留在原始首答与次数中，不偷换为遗漏，也不删去以改善均值。
+- 不输出文献100／500／355ms阈值分类及比例；不把既有阈值移植到120秒项目版，亦不借由600秒同长就宣称原版效度。O单列，不把未按伪成RT=30000。30秒仅是本项目无回应观察窗口的结束规则，不是疾病或能力阈值。
+- 未答比例O/D；D=0则为null。正常时限截断C与中断I不进D，但分别公开说明实际数量，不藏掉部分观察。有效首答为0与无数据不能混同；O=0在D>0且观察完整时是真实0。
+- 内部时间进程差：按目标出现时刻分前后半段（T/2），每半段用自己的有效样本数；ΔS=S后半−S前半，保留正负号，两半任一无样本或因真实0而不可计算则null。仅可作探索性描述，不对实用版输出稳定趋势判断，不把个体差异归因睡眠或ADHD。
+- 不计算0–100能力总分、IQ、诊断、同龄排名或岗位预测。内部速度与半段差不直接投射公开个人报告；不把有限样本包装成精度已验证。
 
 ## 报告正文、图片和下载同一三态
 
-拟由相同公开投影供正文、图及下载使用；没有真实保存或后台接通。公开只用可追溯的目标、回应、提前按、未答及截断次数、实际时长，并解释其范围。没有个人测量数据时，不制造结果。图中仅用如下合成例子审阅排版（次数不是本版预期次数）：120秒；A=27、V=25、F=1、O=0、C=1、I=0、W=2，因此D=26。该数字不是生成器、scorer输出或参与者数据。
+拟由相同公开投影供正文、图及下载使用；没有真实保存或后台接通。公开只用可追溯的目标、回应、提前按、未答及截断次数、实际时长，并解释其范围。没有个人测量数据时，不制造结果。图中仅用如下合成例子审阅排版（次数不是本版预期次数）：120秒；A=27、V=26、O=0、C=1、I=0、W=2，因此D=26。该数字不是生成器、scorer输出或参与者数据。
 
 - interpretable：到达正式预算，结束原因和记录可核，完整观察目标分母有数据；正常终点截断已明确剔除并披露。允许描述这些实际次数；V=0只让响应速度为null，不因表现差将整份结果判无效。
 - limited：中断或部分记录，但有完整可解释目标。只显示这些目标的受支持次数和实际时长，明确未完成原profile；隐藏全程结论与受影响指标，不推断原因。
 - invalid：没有可解释目标分母、来源／首答无法核实等。正文只给原因及下一步，不给表现数字、表现图或下载中的表现字段；真实未开始不写已完成。该状态不表示疾病或认知能力差。
 
-**合成公开文案：**“谢谢你完成这段等待。本次完整观察了26次目标，其中25次记录到目标出现后的回应，1次按得过早；另有1次目标在时间到时尚未观察完。等待时还提前按了2次，完整观察中没有30秒未答。下次可以先确认空心／实心的区别，减少旁边打断，需要时安排休息。这些是本次记录，不能说明注意波动的原因；手部操作和设备也会影响结果。”
+**合成公开文案：**“谢谢你完成这段等待。本次完整观察了26次目标，26次都记录到目标出现后的首答；另有1次目标在时间到时尚未观察完。等待时还提前按了2次，完整观察中没有30秒未答。下次可以先确认空心／实心的区别，减少旁边打断，需要时安排休息。这些是本次记录，不能说明注意波动的原因；手部操作和设备也会影响结果。”
 
-English: “Thank you for completing this period of waiting. Of 26 fully observed targets, 25 had a response after onset and one had a response too early after onset. One further target was cut short by the time limit. There were two presses during waiting and no 30-second timeouts among fully observed targets. Before another task, review the outline/solid example, reduce interruptions and take a break when needed. These observations do not identify the cause of attention changes; hand movements and the device also matter.”
+English: “Thank you for completing this period of waiting. Of 26 fully observed targets, all 26 had a first response after onset. One further target was cut short by the time limit. There were two presses during waiting and no 30-second timeouts among fully observed targets. Before another task, review the outline/solid example, reduce interruptions and take a break when needed. These observations do not identify the cause of attention changes; hand movements and the device also matter.”
 
 ## 版本、标签与领域去重
 

@@ -39,38 +39,39 @@
   "sourceChecks": "Source/license review, local links, whitespace, narrow secret-pattern scan, existing controlled vocabulary keys, no original paper/assets included. Static layout evidence is separate; no participant/task run.",
   "files": {
     "APPENDIX.md": {
-      "bytes": 17063,
-      "sha256": "12dd05dfe5a48d08e283e7a9bda55af066df4fd2790437f39f0c6558aa0215e9"
+      "bytes": 17435,
+      "sha256": "fcd6e790da6591c07377e71a345a95e6cbc4810b06977be6660c784a5a3684de"
     },
     "REVIEW.md": {
-      "bytes": 2882,
-      "sha256": "3c15e684868195839d7fd15cf60f21347c9773e2090bb6b1a11316e73c4992a9"
+      "bytes": 3017,
+      "sha256": "ca5e164095e7ac92256e148817cbce4026a816086ebdab8a6e7917afe01445c7"
     },
     "pvt-review.html": {
-      "bytes": 9538,
-      "sha256": "3350793f47402e908fc3cb79c5077aafbb1ab45fa88d19d798d79fae89255bd0"
+      "bytes": 9532,
+      "sha256": "5f7e9d1b7e3a6d675124ab0d3aa27447146fa046d9631b177560c4174b2c2b6f"
     },
     "pvt-review.png": {
-      "bytes": 393469,
-      "sha256": "112801ad3dd0ecdf349d836f19cb4e08b6a0112b229d0a8f60b0076b791bff5a"
+      "bytes": 393225,
+      "sha256": "3807a68b0b19c44501354fc49e68933803e52d3797f51d5772e9dfa761192bce"
     },
     "static-review.json": {
       "bytes": 913,
-      "sha256": "2b6b93d4f1ea510b39b6c65d1cca33e382826e1a23398641b75f2c58e51aeb72"
+      "sha256": "ceb13d85759c0ec28166cc61d817fda0219e78950534fa58574f0447ad405f9d"
     },
     "tags.research.json": {
       "bytes": 1805,
       "sha256": "fc53e89a1063aabdaaae1abb6fa2a95cc705f0d187c74064bede88e34e0b1014"
     }
   },
-  "designRevisedAtUtc": "2026-10-27T13:08:52.059006+00:00",
+  "designRevisedAtUtc": "2026-10-27T13:12:07.507389+00:00",
   "designRevision": {
-    "version": "0.1.1",
-    "previousDesignCommit": "4515ad60dcd1e064063822929b335465d94279f4",
+    "version": "0.1.2",
+    "previousDesignCommit": "99b382b151bb1c6d8c080798cc37a767cc571c81",
     "practiceTargets": 3,
     "researchDurationMs": 600000,
     "practicalDurationMs": 120000,
     "userDirection": "Interface accepted; practice reduced to 3; 120 seconds discussed and proposed for practical version; do not develop.",
-    "checksThisRevision": "Only changed static labels/layout and file hashes; prior source review retained; no repeated runtime checks or new task implementation."
+    "checksThisRevision": "Only changed static labels/layout and file hashes; prior source review retained; no repeated runtime checks or new task implementation.",
+    "thresholdDisposition": "100/500/355 ms literature classifications are historical source context only; neither project profile adopts them. Actual first-response RT including zero is retained. Final substantive design awaits user confirmation; no implementation."
   }
 }
