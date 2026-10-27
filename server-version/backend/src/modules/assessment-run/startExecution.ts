@@ -205,7 +205,7 @@ const startTransactionalComposite = async (input: {
   if (admission.assignment.resourceKey.startsWith('library-scale:')||admission.assignment.resourceKey.startsWith('private-scale:')) {
     await assertEducationLibraryExecutionSource(tx, {executionId: input.executionId, compositeId: input.launch.runtimeTargetRef})
   }
-  if(admission.assignment.resourceKey.startsWith('education-assessment:'))await assertEducationAssessmentExecutionSource(tx,{executionId:input.executionId,compositeId:input.launch.runtimeTargetRef,purpose:'NEW_START'})
+  const educationSource=admission.assignment.resourceKey.startsWith('education-assessment:')?await assertEducationAssessmentExecutionSource(tx,{executionId:input.executionId,compositeId:input.launch.runtimeTargetRef,purpose:'NEW_START'}):undefined
   if(admission.assignment.resourceKey.startsWith('private-form:'))await readPrivateFormExecutionSource(tx,{executionId:input.executionId,compositeId:input.launch.runtimeTargetRef,actorUserId:input.actorUserId})
   const state=await tx.$queryRaw<Array<{runStatus:string}>>`
     SELECT r."status" AS "runStatus"
@@ -233,6 +233,7 @@ const startTransactionalComposite = async (input: {
     compositeAssessmentId: input.launch.runtimeTargetRef,
     respondentUserId: input.actorUserId,
     attemptIdentity: started.attemptIdentity,
+    educationStart: educationSource?.startProof,
   })
   const changed = await tx.$executeRaw`
     UPDATE "assessment_run_executions"

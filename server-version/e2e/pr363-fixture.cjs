@@ -21,17 +21,21 @@ function assertCases(cases){assert.ok(Array.isArray(cases));assert.deepEqual(cas
 function privateFile(root,name,value){assert.equal(path.basename(name),name);fs.writeFileSync(path.join(root,name),JSON.stringify(value,null,2)+'\n',{flag:'wx',mode:0o600})}
 function runtime(fixture){Object.assign(process.env,fixture.secrets,{DATABASE_URL:fixture.runtimeUrl,DATABASE_URL_RUNTIME:fixture.runtimeUrl,NODE_ENV:'test',BACKGROUND_WORKERS_ENABLED:'false',COGNITIVE_MODULE_ENABLED:'true',HUITEACHER_WORKSPACE_ENABLED:'true'})}
 function principal(u){return {userId:u.id,username:u.username,role:u.role,platformRole:u.platformRole,accountDomain:u.accountDomain,tokenVersion:u.tokenVersion,mustChangePassword:u.mustChangePassword}}
+const fixtureStages=['bootstrap','guard','artifact-identity',...['SCHOOL','TEACHER'].flatMap(product=>['IMMEDIATE','SCHEDULED'].flatMap(mode=>['source-','workflow-'].map(prefix=>prefix+product+'-'+mode)))]
+const fixtureCodes=[...base.seedDiagnosticContract.codes,'BASE_IDENTITY_SEED_FAILED','EDUCATION_START_CONTEXT_MISMATCH','INSTRUMENT_NOT_AVAILABLE','TEACHER_SELF_IN_TRAINING']
+function safeFixtureDiagnostic(value){return {stage:[...fixtureStages,...base.seedDiagnosticContract.stages].includes(value?.stage)?value.stage:'bootstrap',errorName:base.seedDiagnosticContract.errorNames.includes(value?.errorName)?value.errorName:'UNKNOWN',code:fixtureCodes.includes(value?.code)?value.code:'UNKNOWN',...(typeof value?.digest==='string'&&/^[a-f0-9]{64}$/.test(value.digest)?{digest:value.digest}:{})}}
+function readSafeSetupDiagnostics(text){const records=[];for(const line of String(text).slice(-1048576).split('\n')){const match=/^(PR363_FIXTURE_FAILED|PR363_BASE_SEED_DIAGNOSTIC|SCHOOL_TEACHER_SEED_DIAGNOSTIC) (\{.*\})$/.exec(line);if(!match)continue;try{records.push({source:match[1],...safeFixtureDiagnostic(JSON.parse(match[2]))})}catch{}}return records.slice(-4)}
 async function seed(){
- const root=base.guard();privateRoot=root;stage='artifact-identity';await artifact('backend');await artifact('frontend')
+ stage='guard';const root=base.guard();privateRoot=root;stage='artifact-identity';await artifact('backend');await artifact('frontend')
  assert.equal(fs.existsSync(path.join(root,'fixture.json')),false,'Use a fresh isolated service; no seeded-attempt retry')
  const seeded=spawnSync(process.execPath,[path.join(__dirname,'school-teacher-fixture.cjs'),'seed'],{env:process.env,encoding:'utf8',maxBuffer:1024*1024})
- if(seeded.status!==0){if(fs.existsSync(root))fs.writeFileSync(path.join(root,'pr363-base-seed.log'),seeded.stdout+'\n'+seeded.stderr,{mode:0o600,flag:'wx'});throw new Error('BASE_IDENTITY_SEED_FAILED')}
+ if(seeded.status!==0){for(const diagnostic of readSafeSetupDiagnostics(seeded.stderr+'\n'+seeded.stdout))console.error('PR363_BASE_SEED_DIAGNOSTIC '+JSON.stringify(diagnostic));if(fs.existsSync(root))fs.writeFileSync(path.join(root,'pr363-base-seed.log'),seeded.stdout+'\n'+seeded.stderr,{mode:0o600,flag:'wx'});throw new Error('BASE_IDENTITY_SEED_FAILED')}
  const {value:fixture}=base.readFixture();const ownerUrl=process.env.DATABASE_URL;runtime(fixture)
  const {PrismaClient}=require('../backend/node_modules/@prisma/client'),owner=new PrismaClient({datasources:{db:{url:ownerUrl}}})
  try{
   const passwordHash=await app('utils/password').hashPassword('Synthetic!'+randomUUID())
   const system=async label=>owner.user.create({data:{username:'pr363_'+label+'_'+randomUUID(),passwordHash,accountDomain:'TRAINING',role:'ADMIN',platformRole:'SYSTEM_ADMIN'}})
-  const issuer=await system('issuer'),reviewer=await system('reviewer'),cases=[]
+  const issuer=await system('issuer'),reviewer=await system('reviewer'),cases=[];let teacherTargetId
   for(const [product,mode] of [['SCHOOL','IMMEDIATE'],['TEACHER','IMMEDIATE'],['TEACHER','SCHEDULED']]){
    const f=fixture.products[product],author=await owner.user.findUniqueOrThrow({where:{id:f.author.id}}),actor=principal(author)
    stage='source-'+product+'-'+mode
@@ -47,8 +51,8 @@ async function seed(){
     const run=await app('modules/campus/activity.runs').createCampusActivityRunDraft({...scope,courseId:workflowId,name:title});runId=run.id
    }else{
     const service=app('modules/huiteacher/evaluation.service'),scope={organizationId:f.organizationId,actorUserId:author.id}
-    const target=await service.createHuiteacherTarget({...scope,kind:'ORGANIZATION',name:title})
-    const event=await service.createHuiteacherEvent({...scope,targetId:target.id,kind:'ASSESSMENT',title});workflowId=event.id
+    if(!teacherTargetId)teacherTargetId=(await service.createHuiteacherTarget({...scope,kind:'ORGANIZATION',name:title})).id
+    const event=await service.createHuiteacherEvent({...scope,targetId:teacherTargetId,kind:'ASSESSMENT',title});workflowId=event.id
     runId=(await service.createHuiteacherEventRunDraft({...scope,eventId:workflowId,name:title})).runId
    }
    const db=app('config/database').prisma,a=delivery.entry.applicability
@@ -94,8 +98,8 @@ async function serveBackend(product){
  for(const signal of ['SIGTERM','SIGINT'])process.on(signal,()=>child.kill(signal))
  await new Promise((resolve,reject)=>{child.once('error',reject);child.once('exit',code=>code===0?resolve():reject(new Error('BACKEND_EXIT_'+code)))})
 }
-module.exports={origin,artifact,exactMetric,assertCases,seed,verify,privateFile,serveBackend}
-if(require.main===module)Promise.resolve().then(()=>{assert.ok(['seed','verify','serve-backend'].includes(process.argv[2]));return process.argv[2]==='seed'?seed():process.argv[2]==='verify'?verify():serveBackend(process.argv[3])}).catch(error=>{if(privateRoot&&fs.existsSync(privateRoot))fs.writeFileSync(path.join(privateRoot,'pr363-failure.log'),String(error?.stack||error),{mode:0o600});console.error('PR363_FIXTURE_FAILED '+JSON.stringify({stage,errorName:error?.name,code:/^[A-Z0-9_]{2,80}$/.test(error?.code||'')?error.code:null,digest:sha(String(error))}));process.exitCode=1})
+module.exports={origin,artifact,exactMetric,assertCases,seed,verify,privateFile,serveBackend,readSafeSetupDiagnostics,safeFixtureDiagnostic}
+if(require.main===module)Promise.resolve().then(()=>{assert.ok(['seed','verify','serve-backend'].includes(process.argv[2]));return process.argv[2]==='seed'?seed():process.argv[2]==='verify'?verify():serveBackend(process.argv[3])}).catch(error=>{if(privateRoot&&fs.existsSync(privateRoot))fs.writeFileSync(path.join(privateRoot,'pr363-failure.log'),String(error?.stack||error),{mode:0o600});console.error('PR363_FIXTURE_FAILED '+JSON.stringify(safeFixtureDiagnostic({stage,errorName:error?.name,code:error?.message==='教师自评题包不能用于学员综合测评'?'TEACHER_SELF_IN_TRAINING':fixtureCodes.includes(error?.code)?error.code:error?.message,digest:sha(String(error))})));process.exitCode=1})
 async function createDelivery(owner, product, org, issuer, reviewer, family, consentRequired = false, withReports = false, feedbackPolicy = { schemaVersion: 1, mode: 'IMMEDIATE' }, formOnly = false, completionOnly = false, author, caseTitle) {
     const resourceId = randomUUID(), resourceKey = `education-assessment:${product}:${org.id}:${resourceId}`;
     const { getContentRelease, publishContentRelease } = app('modules/measurement-content/repository');
@@ -105,7 +109,7 @@ async function createDelivery(owner, product, org, issuer, reviewer, family, con
     const { requireCognitiveRegistryEntry } = app('modules/cognitive/cognitive.registry');
     const { formQuestionSchema } = app('modules/assessment-core/form/definition');
     const { prepareTrainingContentSnapshot } = app('modules/composite/training-content-binding');
-    const { resolveCompositeSituationalItems } = app('modules/composite/composite.service');
+    const { resolveEducationAssessmentSituationalItems } = app('modules/education-tools/assessment-resource.source');
     const { readEducationAssessmentDeliveryIdentity } = app('modules/education-tools/assessment-resource.repository');
     const { issueAdminContentRoot } = app('modules/measurement-content/admin-authority.service');
     const producer = app('modules/education-tools/assessment-resource.service');
@@ -139,7 +143,7 @@ async function createDelivery(owner, product, org, issuer, reviewer, family, con
                 formType: 'SHORT_TEXT', formLabel: 'Synthetic note', formDefinition: formQuestionSchema.parse({ itemKey: 'synthetic_note', type: 'SHORT_TEXT', prompt: 'Synthetic note', required: true, options: [], rows: [], maxLength: 100 }) } });
     }
     const loaded = await owner.compositeAssessment.findUniqueOrThrow({ where: { id: runtime.id }, include: { items: { include: { scale: true, cognitiveAssignment: { include: { config: true } } } }, formSections: { include: { items: true } } } });
-    const prepared = await owner.$transaction(async (tx) => prepareTrainingContentSnapshot(tx, loaded, await resolveCompositeSituationalItems(loaded.items, tx, true)));
+    const prepared = await owner.$transaction(async (tx) => prepareTrainingContentSnapshot(tx, loaded, await resolveEducationAssessmentSituationalItems(tx,loaded.items.filter(item=>item.type==='SITUATIONAL').map(item=>({instrumentKey:item.situationalInstrumentKey,instrumentVersion:item.situationalInstrumentVersion})),product)));
     await owner.compositeAssessment.update({ where: { id: source.id }, data: { trainingContentSnapshot: prepared.snapshot, trainingContentSnapshotHash: prepared.snapshotHash } });
     const proof = { tokenVersion: 0, adminSessionId: 'synthetic-strong-admin-proof', adminVerifiedAt: Date.now() / 1000 };
     const resourceIds = [source.id, ...prepared.snapshot.units.map(unit => unit.measurement.releaseId)];

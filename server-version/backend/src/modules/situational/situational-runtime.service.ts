@@ -1,3 +1,4 @@
+import {readVerifiedEducationAttempt,type VerifiedEducationAttempt} from '../assessment-run/education-start-context'
 import { trainingPersistenceMetadata } from '../composite/training-persistence.policy'
 import { assertTrainingChildSelected, TRAINING_VARIANT_PARENT_MARKER_SELECT } from '../composite/training-variant-child-scope'
 import { onlineSituationalCanonicalTaskSatisfaction } from './situational-task-satisfaction'
@@ -578,6 +579,7 @@ export const createEmbeddedSituationalAttempt = async (
     attemptEpoch: number
   },
   resolved?: ResolvedSituationalRelease,
+  educationAttempt?:VerifiedEducationAttempt,
 ) => {
   const existing = await db.situationalAttempt.findFirst({
     where: {
@@ -597,7 +599,7 @@ export const createEmbeddedSituationalAttempt = async (
   const release = resolved ?? await resolveSituationalRelease(input, db, true)
   const { situationPackage, snapshot } = release
   if (situationPackage.key !== input.instrumentKey || situationPackage.instrumentVersion !== input.instrumentVersion) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '情境化测评版本绑定不一致', 409)
-  if (situationPackage.definition.respondentType === 'teacher_self_report') throw new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE', '教师自评题包不能用于学员综合测评', 403)
+  if (situationPackage.definition.respondentType === 'teacher_self_report'&&readVerifiedEducationAttempt(educationAttempt,db,input.compositeAttemptId,input.userId)!=='TEACHER') throw new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE', '教师自评题包不能用于学员综合测评', 403)
   await assertSituationalAssetReferencesReady(situationPackage.definition, db)
   const encryptedSnapshot = encryptFrozenSituationalRuntimeSnapshot(snapshot)
   try {

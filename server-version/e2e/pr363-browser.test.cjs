@@ -38,3 +38,10 @@ test('management acceptance requires successful summary reads from both real pro
  assert.throws(()=>assertManagementReads([valid[0],{...valid[1],technicalJsonCollapsed:false}]))
  assert.throws(()=>assertManagementReads([valid[0],{...valid[1],cprVerified:false}]))
 })
+test('fixture failures retain only fixed safe diagnostics, never private raw message, URL or secret-shaped fields',()=>{
+ const {readSafeSetupDiagnostics}=require('./pr363-fixture.cjs')
+ const text='password=do-not-copy\nPR363_FIXTURE_FAILED '+JSON.stringify({stage:'source-TEACHER-IMMEDIATE',errorName:'CompositeServiceError',code:'TEACHER_SELF_IN_TRAINING',message:'secret',url:'https://private',digest:'a'.repeat(64)})+'\nSCHOOL_TEACHER_SEED_DIAGNOSTIC '+JSON.stringify({stage:'role-policy',errorName:'Error',code:'42501',credentials:'secret'})+'\nPR363_FIXTURE_FAILED '+JSON.stringify({stage:'secret-stage',errorName:'private-name',code:'PRIVATE_SECRET'})
+ const rows=readSafeSetupDiagnostics(text)
+ assert.equal(rows.length,3);assert.equal(rows[0].code,'TEACHER_SELF_IN_TRAINING');assert.equal(rows[1].code,'42501');assert.equal(rows[2].code,'UNKNOWN')
+ assert(!JSON.stringify(rows).includes('secret'));assert(!JSON.stringify(rows).includes('https://'));assert.equal(readSafeSetupDiagnostics('PR363_FIXTURE_FAILED {broken').length,0)
+})

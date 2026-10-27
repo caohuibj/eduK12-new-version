@@ -34,24 +34,7 @@ export async function readEducationAssessmentSource(tx:Prisma.TransactionClient,
  if(snapshot.compositeId!==source.id||!buildTrainingFlowUnits(source).length)fail('EDUCATION_ASSESSMENT_SOURCE_REQUIRED')
  const identities=source.items.filter(item=>item.type==='SITUATIONAL').map(item=>({instrumentKey:item.situationalInstrumentKey!,instrumentVersion:item.situationalInstrumentVersion!}))
  if(canonicalHash([...identities].sort((a,b)=>situationalReleaseKey(a).localeCompare(situationalReleaseKey(b))))!==canonicalHash(lockedIdentities))fail('EDUCATION_ASSESSMENT_SOURCE_CHANGED')
- const resolved=new Map<string,ResolvedSituationalRelease>(),builtins=listSituationPackages()
- for(const identity of identities){
-  let pkg=builtins.some(value=>value.key===identity.instrumentKey)?selectPublishedSituationPackage(builtins,identity.instrumentKey,identity.instrumentVersion):undefined
-  if(!pkg){
-   const release=await tx.sjtAuthorRelease.findUnique({where:{instrumentKey_instrumentVersion:identity}})
-   if(!release?.measurementReleaseId)fail('EDUCATION_ASSESSMENT_SJT_SOURCE_REQUIRED')
-   // Independent original author publication, never Training course permission.
-   await readSjtEntryDistributionSource(tx,release.measurementReleaseId)
-   pkg=selectPublishedSituationPackage([release.package as any],identity.instrumentKey,identity.instrumentVersion)
-  }
-  if(!pkg)fail('EDUCATION_ASSESSMENT_SJT_SOURCE_REQUIRED')
-  if(!['participant_self_report',product==='TEACHER'?'teacher_self_report':'student_self_report'].includes(pkg.definition.respondentType))fail('EDUCATION_ASSESSMENT_SELF_SOURCE_REQUIRED',403)
-  if(pkg.definition.license.status==='unknown'||pkg.definition.license.redistribution==='unknown')fail('EDUCATION_ASSESSMENT_SOURCE_RIGHTS_UNKNOWN',403)
-  const validation=validateSituationPackage(pkg.online?{...pkg,online:undefined}:pkg)
-  if(!validation.valid)fail('EDUCATION_ASSESSMENT_SJT_SOURCE_INVALID')
-  const frozen=freezeSituationalRuntimeAtAttemptStart({...identity,definition:pkg.definition,scientificContext:resolveSituationalScientificContext(pkg),...(pkg.online?{online:pkg.online}:{})})
-  resolved.set(situationalReleaseKey(identity),{situationPackage:pkg,definitionHash:validation.definitionHash,runtime:frozen.compiledRuntime,snapshot:frozen})
- }
+ const resolved=await resolveEducationAssessmentSituationalItems(tx,identities,product,false)
  // This existing helper proves executable/measurement identity only. Its Training
  // scope checks do NOT grant the target entry permission; explicit distribution
  // is checked separately before any draft or frozen metadata is written.
@@ -84,4 +67,29 @@ export async function readEducationAssessmentSource(tx:Prisma.TransactionClient,
   }
  }
  return {source,content,snapshot}
+}
+
+/** Exact original education releases; never borrows a Training course grant. */
+export async function resolveEducationAssessmentSituationalItems(tx:Prisma.TransactionClient,identities:Array<{instrumentKey:string;instrumentVersion:string}>,product:'SCHOOL'|'TEACHER',lockIdentities=true){
+ // Registration already holds these exact source locks before Org/row locks.
+ if(lockIdentities)for(const identity of [...identities].sort((a,b)=>situationalReleaseKey(a).localeCompare(situationalReleaseKey(b))))await lockInstrumentSourceIdentity(tx,identity,'READ')
+ const resolved=new Map<string,ResolvedSituationalRelease>(),builtins=listSituationPackages()
+ for(const identity of identities){
+  let pkg=builtins.some(value=>value.key===identity.instrumentKey)?selectPublishedSituationPackage(builtins,identity.instrumentKey,identity.instrumentVersion):undefined
+  if(!pkg){
+   const release=await tx.sjtAuthorRelease.findUnique({where:{instrumentKey_instrumentVersion:identity}})
+   if(!release?.measurementReleaseId)fail('EDUCATION_ASSESSMENT_SJT_SOURCE_REQUIRED')
+   // Independent original author publication, never Training course permission.
+   await readSjtEntryDistributionSource(tx,release.measurementReleaseId)
+   pkg=selectPublishedSituationPackage([release.package as any],identity.instrumentKey,identity.instrumentVersion)
+  }
+  if(!pkg)fail('EDUCATION_ASSESSMENT_SJT_SOURCE_REQUIRED')
+  if(!['participant_self_report',product==='TEACHER'?'teacher_self_report':'student_self_report'].includes(pkg.definition.respondentType))fail('EDUCATION_ASSESSMENT_SELF_SOURCE_REQUIRED',403)
+  if(pkg.definition.license.status==='unknown'||pkg.definition.license.redistribution==='unknown')fail('EDUCATION_ASSESSMENT_SOURCE_RIGHTS_UNKNOWN',403)
+  const validation=validateSituationPackage(pkg.online?{...pkg,online:undefined}:pkg)
+  if(!validation.valid)fail('EDUCATION_ASSESSMENT_SJT_SOURCE_INVALID')
+  const frozen=freezeSituationalRuntimeAtAttemptStart({...identity,definition:pkg.definition,scientificContext:resolveSituationalScientificContext(pkg),...(pkg.online?{online:pkg.online}:{})})
+  resolved.set(situationalReleaseKey(identity),{situationPackage:pkg,definitionHash:validation.definitionHash,runtime:frozen.compiledRuntime,snapshot:frozen})
+ }
+ return resolved
 }

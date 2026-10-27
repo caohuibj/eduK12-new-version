@@ -11,6 +11,7 @@ import {pr363Plan,requirePr363Jobs,safePath,binding,digest} from './pr363-scope.
 import {changedEntries} from './content-scope.mjs';
 import {treeDigest,verifyManifest} from './ci-artifact.mjs';
 import {artifactIdentity} from './pr363-continuation.mjs';
+import {readSafeSetupDiagnostics} from '../../server-version/e2e/pr363-fixture.cjs';
 export function jsonPointer(value,pointer){
  assert(typeof pointer==='string'&&(pointer===''||pointer.startsWith('/')),'Explicit JSON pointer required');
  for(const raw of pointer.split('/').slice(1)){const key=raw.replace(/~1/g,'/').replace(/~0/g,'~');assert(value!==null&&typeof value==='object'&&Object.hasOwn(value,key),'Missing original field '+pointer);value=value[key];}return value;
@@ -187,6 +188,7 @@ async function browserJourney(p,step,metadata){
  let stage='bootstrap',installedCA=false,installedNSS=false,ingressStarted=false;
  const privateRun=(id,exe,args)=>{
   stage=id;const path=resolve(privateDir,id+'.log'),fd=openSync(path,'wx',0o600);let r;try{const {GH_TOKEN,GITHUB_TOKEN,...safeEnvironment}=env;r=spawnSync(exe,args,{env:safeEnvironment,stdio:['ignore',fd,fd],timeout:180000});}finally{closeSync(fd);}
+  if(id==='fixture-seed'&&r.status!==0)save('browser-setup-fixture-safe-diagnostics',{privateMaterialUploaded:false,diagnostics:readSafeSetupDiagnostics(readFileSync(path,'utf8')),head:p.head,runId:env.GITHUB_RUN_ID});
   save('browser-setup-'+id,{kind:'actual-command-exit',argv:[exe,...args],exitCode:r.status,signal:r.signal,privateLogSHA256:fileSHA(path),head:p.head,runId:env.GITHUB_RUN_ID,ciExecuted:true,testsClaimed:false});assert.equal(r.status,0,'Browser setup failed at '+id+'; private log digest retained');
  };
  const ready=async(url,options={})=>{for(let i=0;i<60;i++){assert(children.every(c=>c.exitCode===null),'Product server exited before readiness');try{const good=await new Promise(resolveReady=>{const q=httpsRequest(url,{...options,timeout:1000},r=>{r.resume();resolveReady(r.statusCode===200);});q.on('error',()=>resolveReady(false));q.on('timeout',()=>q.destroy());q.end();});if(good)return;}catch{}await new Promise(r=>setTimeout(r,1000));}throw Error('Finite trusted HTTPS readiness exhausted');};

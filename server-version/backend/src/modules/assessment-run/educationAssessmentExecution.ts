@@ -1,3 +1,4 @@
+import {issueVerifiedEducationStart} from './education-start-context'
 import {Prisma} from '@prisma/client'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {readEducationAssessmentDeliveryIdentity,EducationAssessmentSourceError} from '../education-tools/assessment-resource.repository'
@@ -15,13 +16,13 @@ export async function assertEducationAssessmentExecutionSource(tx:Prisma.Transac
  function fail():never{throw new EducationAssessmentSourceError('EDUCATION_ASSESSMENT_EXECUTION_BINDING')}
  const [row]=await tx.$queryRaw<Array<{organizationId:string;key:string;version:string;family:string;policy:unknown;policyHash:string;
   school:boolean;teacher:boolean;subjectRole:string;respondentRole:string;relationship:string;perspective:string;
-  subjectId:string;respondentId:string;binding:string|null;boundComposite:string|null}>>(Prisma.sql`
+  assignmentRef:string;subjectId:string;respondentId:string;binding:string|null;boundComposite:string|null}>>(Prisma.sql`
   SELECT e.organization_id AS "organizationId",t.resource_key AS key,t.resource_version AS version,t.resource_family AS family,
    t.frozen_resource_policy AS policy,t.resource_policy_hash AS "policyHash",
    EXISTS(SELECT 1 FROM campus_activity_runs c WHERE c.organization_id=e.organization_id AND c.run_id=e.run_id) AS school,
    EXISTS(SELECT 1 FROM huiteacher_evaluation_run_links h WHERE h.organization_id=e.organization_id AND h.run_id=e.run_id) AS teacher,
    a.subject_role AS "subjectRole",a.respondent_role AS "respondentRole",a.relationship_kind AS relationship,a.perspective,
-   a.subject_user_id AS "subjectId",a.respondent_user_id AS "respondentId",e.runtime_binding_ref AS binding,
+   a.id AS "assignmentRef",a.subject_user_id AS "subjectId",a.respondent_user_id AS "respondentId",e.runtime_binding_ref AS binding,
    parent.composite_assessment_id AS "boundComposite"
   FROM assessment_run_executions e JOIN assessment_run_tracks t
    ON t.id=e.track_id AND t.organization_id=e.organization_id AND t.run_id=e.run_id
@@ -46,5 +47,5 @@ export async function assertEducationAssessmentExecutionSource(tx:Prisma.Transac
   for(const proof of source.authority)await assertEducationDeliveryIssuerCurrent(tx,{proof,organizationId:row.organizationId,product})
   await assertEducationAssessmentDistributionCurrent(tx,source.origin)
  }
- return source
+ return {...source,startProof:input.purpose==='NEW_START'?issueVerifiedEducationStart({tx,product,compositeId:input.compositeId,assignmentRef:row.assignmentRef,respondentUserId:row.respondentId}):undefined}
 }

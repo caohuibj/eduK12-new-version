@@ -1,3 +1,5 @@
+import {readVerifiedEducationStart,bindVerifiedEducationAttempt,type VerifiedEducationStart,type VerifiedEducationAttempt} from '../assessment-run/education-start-context'
+import {resolveEducationAssessmentSituationalItems} from '../education-tools/assessment-resource.source'
 import { emptyOptionalReportRelations, OPTIONAL_REPORT_RELATION_COUNTS } from './composite-report-read-plan'
 import { lockAuthenticatedAdmission } from './authenticated-admission-lock'
 import {publicTrainingFormDefinition} from '../assessment-runtime/typed-form'
@@ -411,12 +413,12 @@ export const lockCompositeAssetReferences = async (db: Db, items: any[], formSec
   if (references.length) await lockStoredAssetRows(db, references.map(reference => reference.assetId))
   return references
 }
-const assertSituationalCompositeItem = (situation: ResolvedSituationalRelease) => {
+const assertSituationalCompositeItem = (situation: ResolvedSituationalRelease, educationProduct?:'SCHOOL'|'TEACHER') => {
   const { runtime, situationPackage } = situation
   if (!runtime.runtimeCapabilities.supported || !runtime.runtimeCapabilities.embedded || !runtime.runtimeCapabilities.aggregateEligible || runtime.runtimeCapabilities.collectionFacts) throw compositeBadRequest('情境化题包不支持 Unified Bundle 运行时')
   // Composite course delivery and anonymous student entry must not silently
   // administer teacher self-report instruments to students.
-  if (situationPackage.definition.respondentType === 'teacher_self_report') throw compositeBadRequest('教师自评题包不能用于学员综合测评')
+  if (situationPackage.definition.respondentType === 'teacher_self_report' && educationProduct!=='TEACHER') throw compositeBadRequest('教师自评题包不能用于学员综合测评')
   return situation
 }
 
@@ -2493,7 +2495,7 @@ const createCognitiveChild = async (db: Db, attempt: any, item: any, userId: str
   })
 }
 
-const createChildRecords = async (db: Db, attempt: any, composite: {productKind:string}, items: any[], userId: string | null, formSections: any[], situationalReleases: Map<string, ResolvedSituationalRelease>, prepared?: PreparedVariantRuntimes, verifiedFlowMaterialization?:VerifiedTrainingFlowMaterialization) => {
+const createChildRecords = async (db: Db, attempt: any, composite: {productKind:string}, items: any[], userId: string | null, formSections: any[], situationalReleases: Map<string, ResolvedSituationalRelease>, prepared?: PreparedVariantRuntimes, verifiedFlowMaterialization?:VerifiedTrainingFlowMaterialization,educationProduct?:'SCHOOL'|'TEACHER',educationAttempt?:VerifiedEducationAttempt) => {
   // Prisma create/findUnique parent rows contain scalar fields only. Product
   // policy comes from the caller's already-loaded server-owned composite.
   // A composition may reference several sources in different orders. Always
@@ -2581,7 +2583,7 @@ const createChildRecords = async (db: Db, attempt: any, composite: {productKind:
       }
     } else if (item.type === 'SITUATIONAL') {
       if (attempt.runtimeGeneration !== 'UNIFIED_V1') throw compositeBadRequest('情境化模块必须使用 Unified FINAL_ONLY 运行时')
-      const situation = assertSituationalCompositeItem(situationalReleases.get(situationalReleaseKey(situationalItemIdentity(item)))!)
+      const situation = assertSituationalCompositeItem(situationalReleases.get(situationalReleaseKey(situationalItemIdentity(item)))!,educationProduct)
       const embedded = await createEmbeddedSituationalAttempt(db, {
         userId,
         // Composite parent rows retain their historical participant key
@@ -2594,7 +2596,7 @@ const createChildRecords = async (db: Db, attempt: any, composite: {productKind:
         instrumentKey: situation.situationPackage.key,
         instrumentVersion: situation.situationPackage.instrumentVersion,
         attemptEpoch: attempt.attemptEpoch ?? 1,
-      }, situation)
+      }, situation,educationAttempt)
       runtime.situational.push({
         compositeItemId: item.id,
         instrumentKey: embedded.snapshot.instrumentKey,
@@ -2707,8 +2709,11 @@ const createAttempt = async (
   attemptEpoch = 1,
   relationalIdentity?: RelationalCompositeAttemptIdentityV1,
   restartMaterialClaimId?: string,
+  educationStart?: VerifiedEducationStart,
 ) => {
   assertSupportedComposite(composite)
+  const educationProduct=educationStart?readVerifiedEducationStart(educationStart,{tx:db,compositeId:composite.id,assignmentRef:relationalIdentity?.assignmentRef??'',respondentUserId:userId??''}):undefined
+  if(educationProduct&&(composite.productKind!=='ORGANIZATION_RESOURCE'||!relationalIdentity||relationalIdentity.subjectUserId!==userId||relationalIdentity.respondentUserId!==userId))throw compositeForbidden('教育测评准入上下文不匹配')
   // Parent START and publication stop/archive serialize on the same row. Child
   // progression later consumes the already-admitted immutable runtime plan.
   await db.$queryRawUnsafe('SELECT "id" FROM "composite_assessments" WHERE "id" = $1 FOR SHARE', composite.id)
@@ -2851,7 +2856,9 @@ const createAttempt = async (
     for(const assignment of cognitive){if(assignment.status!=='PUBLISHED'||assignment.config.status!=='PUBLISHED')throw compositeForbidden('候选分卷的认知配置已不可用');assertCognitiveProductEligible(assignment.config.testType);validateCognitiveConfig(assignment.config)}
 
   }
-  const situationalReleases = await resolveCompositeSituationalItems(composite.items, db, true, compositeSjtGrantScope(composite))
+  const situationalReleases = educationProduct
+    ? await resolveEducationAssessmentSituationalItems(db as Prisma.TransactionClient,composite.items.filter((item:any)=>item.type==='SITUATIONAL').map(situationalItemIdentity),educationProduct)
+    : await resolveCompositeSituationalItems(composite.items, db, true, compositeSjtGrantScope(composite))
   if ([...situationalReleases.values()].some(release => release.snapshot.authorizationReceipt)) {
     // Anonymous entry obtains the same unique persisted delivery, never a client hint.
     composite.deliveryCourseId = compositeSjtGrantScope(composite)!.courseId
@@ -3025,7 +3032,7 @@ const createAttempt = async (
   }
   const materialAssignment = await allocateTrainingMaterial(db,attempt,composite,restartMaterialClaimId)
   const flowCandidate = flowEnabled ? await freezeTrainingFlowCandidates(db,attempt,composite,prepared!,situationalReleases) : null
-  const runtime = flowCandidate?.runtime ?? await createChildRecords(db, attempt, composite, composite.items, userId, formSections, situationalReleases, prepared)
+  const runtime = flowCandidate?.runtime ?? await createChildRecords(db, attempt, composite, composite.items, userId, formSections, situationalReleases, prepared,undefined,educationProduct,educationStart?bindVerifiedEducationAttempt(educationStart,db,attempt):undefined)
   if (finalOnly) {
     const frozenActiveSlotSet = freezeCompositeActiveSlotSet({
       attemptEpoch,
@@ -3061,6 +3068,7 @@ export const startRelationalCompositeAttemptInTransaction = async (
     compositeAssessmentId: string
     respondentUserId: string
     attemptIdentity: RelationalCompositeAttemptIdentityV1
+    educationStart?: VerifiedEducationStart
   },
 ) => {
   if (input.attemptIdentity.respondentUserId !== input.respondentUserId) {
@@ -3099,6 +3107,8 @@ export const startRelationalCompositeAttemptInTransaction = async (
     (latest?.attemptNo ?? 0) + 1,
     1,
     input.attemptIdentity,
+    undefined,
+    input.educationStart,
   )
 }
 
