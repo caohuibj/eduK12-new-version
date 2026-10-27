@@ -298,3 +298,18 @@ assertion, fake API or production-code change. This corrects the identified
 consumer readiness races; only a real next run can establish full UI success.
 The two-e2e-file repair4e19523d is skip-ci;12direct UI contractsPASS. Application
 components and complete qualification artifacts remain unchanged and reused.
+
+## School assessment-panel selection (04:53 UTC)
+
+Run40451354983 at7c42ced3 completed the Teacher realm's authoring, publication,
+SCALE and typedFORM answering/recovery/FINAL/report plus ordinary-author refusal.
+The raw report remains globally FAILED because School stopped at publish. Original
+artifact12710103614 ZIPe6c15fe0450dcb18fc6306d2ca2bfd4fdafad4150e0affa5e1bdecc4707f77de
+is preserved; do not call its partial realm evidence a successful whole job.
+School SCALE/FORM authoring now both pass. The remaining selector targeted a run
+inside the hidden assessments panel: current compact UI starts on participants.
+Select actual 活动配置分区 → 正式测评批次 before selecting the run, every reload.
+The source-matched direct contract passes. No application/permission/timeout or
+workflow change; both app qualifications remain fixed-artifact reuse. Do not add
+a large per-realm admission framework solely to avoid replay of the changed,
+not-yet-qualified browser consumer. Its previous per-realm results remain explicit.
