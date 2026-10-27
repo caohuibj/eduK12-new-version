@@ -21,7 +21,7 @@ export type EducationAssessmentReportInput={actorUserId:string;executionId:strin
 /** Minimum source seam. This internal reader proves immutable source identity,
  * never caller report authority. The root adapter owns publication/source rights. */
 export type EducationAssessmentReportIdentity={identityOnly:true;origin:EducationAssessmentOrigin;
-  entry:RelationalProductEntryV1;runtime:{id:string};releases:ReadonlyMap<string,StoredRelease>}
+  entry:RelationalProductEntryV1;runtime:{id:string};releases:ReadonlyMap<string,StoredRelease>;authority:ReadonlyArray<unknown>}
 export type EducationAssessmentReportDependencies<Source extends EducationAssessmentReportIdentity=EducationAssessmentReportIdentity>={
   /** Optional stricter education opening policy, read from the actual frozen
    * task/source settings. Null means no additional opening-time restriction. */
@@ -97,7 +97,7 @@ export function createEducationAssessmentReportReader<Source extends EducationAs
       if(!current||canonicalHash(current)!==canonicalHash(own))hidden()
       const latest=await deps.readSource(tx,sourceInput)
       if(!latest||canonicalHash(latest.origin)!==canonicalHash(origin)||canonicalHash(latest.entry)!==canonicalHash(source.entry)
-        ||latest.runtime.id!==origin.runtimeCompositeId)hidden()
+        ||latest.runtime.id!==origin.runtimeCompositeId||canonicalHash(latest.authority)!==canonicalHash(source.authority))hidden()
       // Lifecycle is current; immutable hashes alone cannot retain a withdrawn report.
       for(const [id,release] of source.releases){const fresh=latest.releases.get(id);if(!fresh||fresh.contentHash!==release.contentHash||fresh.status!==release.status)hidden()}
       await deps.assertSourceAuthority(tx,{...input,organizationId:own.organizationId,source:latest,purpose:'REPORT_READ'})

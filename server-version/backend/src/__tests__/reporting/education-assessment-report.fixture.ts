@@ -65,7 +65,7 @@ export async function educationReportFixture(product:'SCHOOL'|'TEACHER'='SCHOOL'
     frozenActiveSlotSetEncrypted:encryptUnifiedRuntimePayload(slots),frozenActiveSlotSetHash:slots.snapshotHash,
     compositeAssessment:{id:origin.runtimeCompositeId,trainingFeedbackPolicy:null,trainingFeedbackPolicyHash:null}}
   const entry={...draftEducationAssessmentEntry({origin,title:'合成教育资源',disclosure:contract}),releaseStatus:'PUBLISHED' as const}
-  const source={identityOnly:true as const,origin,entry,runtime:{id:origin.runtimeCompositeId},releases}
+  const source={identityOnly:true as const,origin,entry,runtime:{id:origin.runtimeCompositeId},releases,authority:[{kind:'PRODUCT_ADMIN',actorId:uid(80),membershipId:uid(81),grantId:uid(82)}]}
   const own={organizationId:origin.organizationId,resourceKey:educationAssessmentResourceKey(origin),resourceVersion:'1.0.0',attemptId:parent.id,assignmentId:'assignment',policy,policyHash:canonicalHash(policy)}
   return {source,origin,contract,binding,receipt,facts,releases,rows,slots,parent,own,product,references:null,metricKeys:new Set(contract.audiences.RESPONDENT.metricKeys)}
 }

@@ -113,3 +113,9 @@ it('refuses a different frozen publication even if unit IDs are the same',async(
  const f=await setup();f.origin.runtimeSnapshotHash='b'.repeat(64)
  await expect(f.read(input)).rejects.toMatchObject({statusCode:404})
 })
+
+it('does not replace original source authority proofs with another later administrator during a read',async()=>{
+ const f=await setup(),latest={...f.source,authority:[{kind:'PRODUCT_ADMIN',actorId:'later-admin',membershipId:'later-member',grantId:'later-grant'}]}
+ f.readSource.mockResolvedValueOnce(f.source).mockResolvedValueOnce(latest)
+ await expect(f.read(input)).rejects.toMatchObject({statusCode:404})
+})
