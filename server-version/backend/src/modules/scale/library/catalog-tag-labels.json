@@ -279,6 +279,26 @@
     "label": "创新",
     "axis": "construct"
   },
+  "construct:sel_casel_rubric_dimension_1": {
+    "label": "1A 基础支持",
+    "axis": "construct"
+  },
+  "construct:sel_casel_rubric_dimension_2": {
+    "label": "1B 共同计划",
+    "axis": "construct"
+  },
+  "construct:sel_casel_rubric_dimension_3": {
+    "label": "2 成人SEL",
+    "axis": "construct"
+  },
+  "construct:sel_casel_rubric_dimension_4": {
+    "label": "3 学生SEL",
+    "axis": "construct"
+  },
+  "construct:sel_casel_rubric_dimension_5": {
+    "label": "4 持续改进",
+    "axis": "construct"
+  },
   "construct:sel_ccnes_t_dimension_1": {
     "label": "苦恼反应",
     "axis": "construct"
@@ -935,6 +955,10 @@
     "label": "K12",
     "axis": "population"
   },
+  "population:school_teams": {
+    "label": "学校实施团队",
+    "axis": "population"
+  },
   "population:teacher": {
     "label": "教师本人（目录范围）",
     "axis": "population"
@@ -949,6 +973,10 @@
   },
   "response:digital_supervised": {
     "label": "数字指导作答",
+    "axis": "response"
+  },
+  "response:implementation_review": {
+    "label": "实施团队评议",
     "axis": "response"
   },
   "response:paper": {
@@ -1009,6 +1037,10 @@
   },
   "use:research": {
     "label": "研究用途",
+    "axis": "use"
+  },
+  "use:sel_implementation_evaluation": {
+    "label": "SEL实施评价",
     "axis": "use"
   }
 }

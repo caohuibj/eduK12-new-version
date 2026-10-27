@@ -1,0 +1,1043 @@
+{
+  "schemaVersion": 2,
+  "pages": [
+    {
+      "pageKey": "focus_1a",
+      "title": "1A｜建立基础支持",
+      "description": "记录工具草稿：行为锚点不在本表中，须按使用条件查阅CASEL原量规第1页；只记录学校层面的团队观察，不计算总分。",
+      "questions": [
+        {
+          "itemKey": "focus_1a_team_level",
+          "type": "SINGLE",
+          "prompt": "SEL团队：对照CASEL原量规第1页该指标的四个行为描述，记录团队选择的水平。原文：https://files.casel.org/sites/2/2019/06/Blank-Rubric-Template-3.30.20.pdf#page=1。尚未讨论或证据不足可留空。",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "level_1",
+              "label": "1"
+            },
+            {
+              "optionKey": "level_2",
+              "label": "2"
+            },
+            {
+              "optionKey": "level_3",
+              "label": "3"
+            },
+            {
+              "optionKey": "level_4",
+              "label": "4"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "focus_1a_team_evidence",
+          "type": "LONG_TEXT",
+          "prompt": "SEL团队：哪些具体事实、材料或不同成员的观察支持这一判断？还有哪些信息缺失？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1500
+        },
+        {
+          "itemKey": "focus_1a_team_action",
+          "type": "LONG_TEXT",
+          "prompt": "SEL团队：下一步准备做什么，由谁负责，何时回顾？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "focus_1a_foundational_learning_level",
+          "type": "SINGLE",
+          "prompt": "基础SEL学习机会：对照CASEL原量规第1页该指标的四个行为描述，记录团队选择的水平。原文：https://files.casel.org/sites/2/2019/06/Blank-Rubric-Template-3.30.20.pdf#page=1。尚未讨论或证据不足可留空。",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "level_1",
+              "label": "1"
+            },
+            {
+              "optionKey": "level_2",
+              "label": "2"
+            },
+            {
+              "optionKey": "level_3",
+              "label": "3"
+            },
+            {
+              "optionKey": "level_4",
+              "label": "4"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "focus_1a_foundational_learning_evidence",
+          "type": "LONG_TEXT",
+          "prompt": "基础SEL学习机会：哪些具体事实、材料或不同成员的观察支持这一判断？还有哪些信息缺失？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1500
+        },
+        {
+          "itemKey": "focus_1a_foundational_learning_action",
+          "type": "LONG_TEXT",
+          "prompt": "基础SEL学习机会：下一步准备做什么，由谁负责，何时回顾？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "focus_1a_two_way_communication_level",
+          "type": "SINGLE",
+          "prompt": "双向沟通：对照CASEL原量规第1页该指标的四个行为描述，记录团队选择的水平。原文：https://files.casel.org/sites/2/2019/06/Blank-Rubric-Template-3.30.20.pdf#page=1。尚未讨论或证据不足可留空。",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "level_1",
+              "label": "1"
+            },
+            {
+              "optionKey": "level_2",
+              "label": "2"
+            },
+            {
+              "optionKey": "level_3",
+              "label": "3"
+            },
+            {
+              "optionKey": "level_4",
+              "label": "4"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "focus_1a_two_way_communication_evidence",
+          "type": "LONG_TEXT",
+          "prompt": "双向沟通：哪些具体事实、材料或不同成员的观察支持这一判断？还有哪些信息缺失？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1500
+        },
+        {
+          "itemKey": "focus_1a_two_way_communication_action",
+          "type": "LONG_TEXT",
+          "prompt": "双向沟通：下一步准备做什么，由谁负责，何时回顾？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        }
+      ]
+    },
+    {
+      "pageKey": "focus_1b",
+      "title": "1B｜制定共同计划",
+      "description": "记录工具草稿：行为锚点不在本表中，须按使用条件查阅CASEL原量规第2页；只记录学校层面的团队观察，不计算总分。",
+      "questions": [
+        {
+          "itemKey": "focus_1b_shared_vision_level",
+          "type": "SINGLE",
+          "prompt": "共同愿景：对照CASEL原量规第2页该指标的四个行为描述，记录团队选择的水平。原文：https://files.casel.org/sites/2/2019/06/Blank-Rubric-Template-3.30.20.pdf#page=2。尚未讨论或证据不足可留空。",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "level_1",
+              "label": "1"
+            },
+            {
+              "optionKey": "level_2",
+              "label": "2"
+            },
+            {
+              "optionKey": "level_3",
+              "label": "3"
+            },
+            {
+              "optionKey": "level_4",
+              "label": "4"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "focus_1b_shared_vision_evidence",
+          "type": "LONG_TEXT",
+          "prompt": "共同愿景：哪些具体事实、材料或不同成员的观察支持这一判断？还有哪些信息缺失？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1500
+        },
+        {
+          "itemKey": "focus_1b_shared_vision_action",
+          "type": "LONG_TEXT",
+          "prompt": "共同愿景：下一步准备做什么，由谁负责，何时回顾？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "focus_1b_planning_level",
+          "type": "SINGLE",
+          "prompt": "计划：对照CASEL原量规第2页该指标的四个行为描述，记录团队选择的水平。原文：https://files.casel.org/sites/2/2019/06/Blank-Rubric-Template-3.30.20.pdf#page=2。尚未讨论或证据不足可留空。",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "level_1",
+              "label": "1"
+            },
+            {
+              "optionKey": "level_2",
+              "label": "2"
+            },
+            {
+              "optionKey": "level_3",
+              "label": "3"
+            },
+            {
+              "optionKey": "level_4",
+              "label": "4"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "focus_1b_planning_evidence",
+          "type": "LONG_TEXT",
+          "prompt": "计划：哪些具体事实、材料或不同成员的观察支持这一判断？还有哪些信息缺失？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1500
+        },
+        {
+          "itemKey": "focus_1b_planning_action",
+          "type": "LONG_TEXT",
+          "prompt": "计划：下一步准备做什么，由谁负责，何时回顾？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "focus_1b_resources_level",
+          "type": "SINGLE",
+          "prompt": "资源：对照CASEL原量规第2页该指标的四个行为描述，记录团队选择的水平。原文：https://files.casel.org/sites/2/2019/06/Blank-Rubric-Template-3.30.20.pdf#page=2。尚未讨论或证据不足可留空。",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "level_1",
+              "label": "1"
+            },
+            {
+              "optionKey": "level_2",
+              "label": "2"
+            },
+            {
+              "optionKey": "level_3",
+              "label": "3"
+            },
+            {
+              "optionKey": "level_4",
+              "label": "4"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "focus_1b_resources_evidence",
+          "type": "LONG_TEXT",
+          "prompt": "资源：哪些具体事实、材料或不同成员的观察支持这一判断？还有哪些信息缺失？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1500
+        },
+        {
+          "itemKey": "focus_1b_resources_action",
+          "type": "LONG_TEXT",
+          "prompt": "资源：下一步准备做什么，由谁负责，何时回顾？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        }
+      ]
+    },
+    {
+      "pageKey": "focus_2",
+      "title": "2｜发展成人SEL能力",
+      "description": "记录工具草稿：行为锚点不在本表中，须按使用条件查阅CASEL原量规第3页；只记录学校层面的团队观察，不计算总分。",
+      "questions": [
+        {
+          "itemKey": "focus_2_professional_learning_level",
+          "type": "SINGLE",
+          "prompt": "专业学习：对照CASEL原量规第3页该指标的四个行为描述，记录团队选择的水平。原文：https://files.casel.org/sites/2/2019/06/Blank-Rubric-Template-3.30.20.pdf#page=3。尚未讨论或证据不足可留空。",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "level_1",
+              "label": "1"
+            },
+            {
+              "optionKey": "level_2",
+              "label": "2"
+            },
+            {
+              "optionKey": "level_3",
+              "label": "3"
+            },
+            {
+              "optionKey": "level_4",
+              "label": "4"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "focus_2_professional_learning_evidence",
+          "type": "LONG_TEXT",
+          "prompt": "专业学习：哪些具体事实、材料或不同成员的观察支持这一判断？还有哪些信息缺失？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1500
+        },
+        {
+          "itemKey": "focus_2_professional_learning_action",
+          "type": "LONG_TEXT",
+          "prompt": "专业学习：下一步准备做什么，由谁负责，何时回顾？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "focus_2_adult_sel_culture_level",
+          "type": "SINGLE",
+          "prompt": "成人SEL与文化能力：对照CASEL原量规第3页该指标的四个行为描述，记录团队选择的水平。原文：https://files.casel.org/sites/2/2019/06/Blank-Rubric-Template-3.30.20.pdf#page=3。尚未讨论或证据不足可留空。",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "level_1",
+              "label": "1"
+            },
+            {
+              "optionKey": "level_2",
+              "label": "2"
+            },
+            {
+              "optionKey": "level_3",
+              "label": "3"
+            },
+            {
+              "optionKey": "level_4",
+              "label": "4"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "focus_2_adult_sel_culture_evidence",
+          "type": "LONG_TEXT",
+          "prompt": "成人SEL与文化能力：哪些具体事实、材料或不同成员的观察支持这一判断？还有哪些信息缺失？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1500
+        },
+        {
+          "itemKey": "focus_2_adult_sel_culture_action",
+          "type": "LONG_TEXT",
+          "prompt": "成人SEL与文化能力：下一步准备做什么，由谁负责，何时回顾？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "focus_2_staff_collaboration_level",
+          "type": "SINGLE",
+          "prompt": "教职工协作：对照CASEL原量规第3页该指标的四个行为描述，记录团队选择的水平。原文：https://files.casel.org/sites/2/2019/06/Blank-Rubric-Template-3.30.20.pdf#page=3。尚未讨论或证据不足可留空。",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "level_1",
+              "label": "1"
+            },
+            {
+              "optionKey": "level_2",
+              "label": "2"
+            },
+            {
+              "optionKey": "level_3",
+              "label": "3"
+            },
+            {
+              "optionKey": "level_4",
+              "label": "4"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "focus_2_staff_collaboration_evidence",
+          "type": "LONG_TEXT",
+          "prompt": "教职工协作：哪些具体事实、材料或不同成员的观察支持这一判断？还有哪些信息缺失？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1500
+        },
+        {
+          "itemKey": "focus_2_staff_collaboration_action",
+          "type": "LONG_TEXT",
+          "prompt": "教职工协作：下一步准备做什么，由谁负责，何时回顾？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "focus_2_staff_modeling_level",
+          "type": "SINGLE",
+          "prompt": "教职工示范：对照CASEL原量规第3页该指标的四个行为描述，记录团队选择的水平。原文：https://files.casel.org/sites/2/2019/06/Blank-Rubric-Template-3.30.20.pdf#page=3。尚未讨论或证据不足可留空。",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "level_1",
+              "label": "1"
+            },
+            {
+              "optionKey": "level_2",
+              "label": "2"
+            },
+            {
+              "optionKey": "level_3",
+              "label": "3"
+            },
+            {
+              "optionKey": "level_4",
+              "label": "4"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "focus_2_staff_modeling_evidence",
+          "type": "LONG_TEXT",
+          "prompt": "教职工示范：哪些具体事实、材料或不同成员的观察支持这一判断？还有哪些信息缺失？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1500
+        },
+        {
+          "itemKey": "focus_2_staff_modeling_action",
+          "type": "LONG_TEXT",
+          "prompt": "教职工示范：下一步准备做什么，由谁负责，何时回顾？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        }
+      ]
+    },
+    {
+      "pageKey": "focus_3a",
+      "title": "3｜支持学生SEL · 课堂",
+      "description": "记录工具草稿：行为锚点不在本表中，须按使用条件查阅CASEL原量规第4页；只记录学校层面的团队观察，不计算总分。",
+      "questions": [
+        {
+          "itemKey": "focus_3a_classroom_environment_level",
+          "type": "SINGLE",
+          "prompt": "支持性的课堂环境：对照CASEL原量规第4页该指标的四个行为描述，记录团队选择的水平。原文：https://files.casel.org/sites/2/2019/06/Blank-Rubric-Template-3.30.20.pdf#page=4。尚未讨论或证据不足可留空。",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "level_1",
+              "label": "1"
+            },
+            {
+              "optionKey": "level_2",
+              "label": "2"
+            },
+            {
+              "optionKey": "level_3",
+              "label": "3"
+            },
+            {
+              "optionKey": "level_4",
+              "label": "4"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "focus_3a_classroom_environment_evidence",
+          "type": "LONG_TEXT",
+          "prompt": "支持性的课堂环境：哪些具体事实、材料或不同成员的观察支持这一判断？还有哪些信息缺失？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1500
+        },
+        {
+          "itemKey": "focus_3a_classroom_environment_action",
+          "type": "LONG_TEXT",
+          "prompt": "支持性的课堂环境：下一步准备做什么，由谁负责，何时回顾？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "focus_3a_explicit_instruction_level",
+          "type": "SINGLE",
+          "prompt": "明确的SEL教学：对照CASEL原量规第4页该指标的四个行为描述，记录团队选择的水平。原文：https://files.casel.org/sites/2/2019/06/Blank-Rubric-Template-3.30.20.pdf#page=4。尚未讨论或证据不足可留空。",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "level_1",
+              "label": "1"
+            },
+            {
+              "optionKey": "level_2",
+              "label": "2"
+            },
+            {
+              "optionKey": "level_3",
+              "label": "3"
+            },
+            {
+              "optionKey": "level_4",
+              "label": "4"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "focus_3a_explicit_instruction_evidence",
+          "type": "LONG_TEXT",
+          "prompt": "明确的SEL教学：哪些具体事实、材料或不同成员的观察支持这一判断？还有哪些信息缺失？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1500
+        },
+        {
+          "itemKey": "focus_3a_explicit_instruction_action",
+          "type": "LONG_TEXT",
+          "prompt": "明确的SEL教学：下一步准备做什么，由谁负责，何时回顾？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "focus_3a_integrated_instruction_level",
+          "type": "SINGLE",
+          "prompt": "SEL融入学科教学：对照CASEL原量规第4页该指标的四个行为描述，记录团队选择的水平。原文：https://files.casel.org/sites/2/2019/06/Blank-Rubric-Template-3.30.20.pdf#page=4。尚未讨论或证据不足可留空。",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "level_1",
+              "label": "1"
+            },
+            {
+              "optionKey": "level_2",
+              "label": "2"
+            },
+            {
+              "optionKey": "level_3",
+              "label": "3"
+            },
+            {
+              "optionKey": "level_4",
+              "label": "4"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "focus_3a_integrated_instruction_evidence",
+          "type": "LONG_TEXT",
+          "prompt": "SEL融入学科教学：哪些具体事实、材料或不同成员的观察支持这一判断？还有哪些信息缺失？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1500
+        },
+        {
+          "itemKey": "focus_3a_integrated_instruction_action",
+          "type": "LONG_TEXT",
+          "prompt": "SEL融入学科教学：下一步准备做什么，由谁负责，何时回顾？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        }
+      ]
+    },
+    {
+      "pageKey": "focus_3b",
+      "title": "3｜支持学生SEL · 学校",
+      "description": "记录工具草稿：行为锚点不在本表中，须按使用条件查阅CASEL原量规第5页；只记录学校层面的团队观察，不计算总分。",
+      "questions": [
+        {
+          "itemKey": "focus_3b_cultural_responsiveness_level",
+          "type": "SINGLE",
+          "prompt": "文化回应：对照CASEL原量规第5页该指标的四个行为描述，记录团队选择的水平。原文：https://files.casel.org/sites/2/2019/06/Blank-Rubric-Template-3.30.20.pdf#page=5。尚未讨论或证据不足可留空。",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "level_1",
+              "label": "1"
+            },
+            {
+              "optionKey": "level_2",
+              "label": "2"
+            },
+            {
+              "optionKey": "level_3",
+              "label": "3"
+            },
+            {
+              "optionKey": "level_4",
+              "label": "4"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "focus_3b_cultural_responsiveness_evidence",
+          "type": "LONG_TEXT",
+          "prompt": "文化回应：哪些具体事实、材料或不同成员的观察支持这一判断？还有哪些信息缺失？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1500
+        },
+        {
+          "itemKey": "focus_3b_cultural_responsiveness_action",
+          "type": "LONG_TEXT",
+          "prompt": "文化回应：下一步准备做什么，由谁负责，何时回顾？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "focus_3b_school_climate_level",
+          "type": "SINGLE",
+          "prompt": "学校氛围：对照CASEL原量规第5页该指标的四个行为描述，记录团队选择的水平。原文：https://files.casel.org/sites/2/2019/06/Blank-Rubric-Template-3.30.20.pdf#page=5。尚未讨论或证据不足可留空。",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "level_1",
+              "label": "1"
+            },
+            {
+              "optionKey": "level_2",
+              "label": "2"
+            },
+            {
+              "optionKey": "level_3",
+              "label": "3"
+            },
+            {
+              "optionKey": "level_4",
+              "label": "4"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "focus_3b_school_climate_evidence",
+          "type": "LONG_TEXT",
+          "prompt": "学校氛围：哪些具体事实、材料或不同成员的观察支持这一判断？还有哪些信息缺失？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1500
+        },
+        {
+          "itemKey": "focus_3b_school_climate_action",
+          "type": "LONG_TEXT",
+          "prompt": "学校氛围：下一步准备做什么，由谁负责，何时回顾？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "focus_3b_evidence_based_programs_level",
+          "type": "SINGLE",
+          "prompt": "循证项目与实践：对照CASEL原量规第5页该指标的四个行为描述，记录团队选择的水平。原文：https://files.casel.org/sites/2/2019/06/Blank-Rubric-Template-3.30.20.pdf#page=5。尚未讨论或证据不足可留空。",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "level_1",
+              "label": "1"
+            },
+            {
+              "optionKey": "level_2",
+              "label": "2"
+            },
+            {
+              "optionKey": "level_3",
+              "label": "3"
+            },
+            {
+              "optionKey": "level_4",
+              "label": "4"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "focus_3b_evidence_based_programs_evidence",
+          "type": "LONG_TEXT",
+          "prompt": "循证项目与实践：哪些具体事实、材料或不同成员的观察支持这一判断？还有哪些信息缺失？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1500
+        },
+        {
+          "itemKey": "focus_3b_evidence_based_programs_action",
+          "type": "LONG_TEXT",
+          "prompt": "循证项目与实践：下一步准备做什么，由谁负责，何时回顾？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "focus_3b_student_voice_level",
+          "type": "SINGLE",
+          "prompt": "学生声音与参与：对照CASEL原量规第5页该指标的四个行为描述，记录团队选择的水平。原文：https://files.casel.org/sites/2/2019/06/Blank-Rubric-Template-3.30.20.pdf#page=5。尚未讨论或证据不足可留空。",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "level_1",
+              "label": "1"
+            },
+            {
+              "optionKey": "level_2",
+              "label": "2"
+            },
+            {
+              "optionKey": "level_3",
+              "label": "3"
+            },
+            {
+              "optionKey": "level_4",
+              "label": "4"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "focus_3b_student_voice_evidence",
+          "type": "LONG_TEXT",
+          "prompt": "学生声音与参与：哪些具体事实、材料或不同成员的观察支持这一判断？还有哪些信息缺失？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1500
+        },
+        {
+          "itemKey": "focus_3b_student_voice_action",
+          "type": "LONG_TEXT",
+          "prompt": "学生声音与参与：下一步准备做什么，由谁负责，何时回顾？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        }
+      ]
+    },
+    {
+      "pageKey": "focus_3c",
+      "title": "3｜支持学生SEL · 支持与伙伴",
+      "description": "记录工具草稿：行为锚点不在本表中，须按使用条件查阅CASEL原量规第6页；只记录学校层面的团队观察，不计算总分。",
+      "questions": [
+        {
+          "itemKey": "focus_3c_discipline_level",
+          "type": "SINGLE",
+          "prompt": "纪律政策与实践：对照CASEL原量规第6页该指标的四个行为描述，记录团队选择的水平。原文：https://files.casel.org/sites/2/2019/06/Blank-Rubric-Template-3.30.20.pdf#page=6。尚未讨论或证据不足可留空。",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "level_1",
+              "label": "1"
+            },
+            {
+              "optionKey": "level_2",
+              "label": "2"
+            },
+            {
+              "optionKey": "level_3",
+              "label": "3"
+            },
+            {
+              "optionKey": "level_4",
+              "label": "4"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "focus_3c_discipline_evidence",
+          "type": "LONG_TEXT",
+          "prompt": "纪律政策与实践：哪些具体事实、材料或不同成员的观察支持这一判断？还有哪些信息缺失？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1500
+        },
+        {
+          "itemKey": "focus_3c_discipline_action",
+          "type": "LONG_TEXT",
+          "prompt": "纪律政策与实践：下一步准备做什么，由谁负责，何时回顾？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "focus_3c_student_support_level",
+          "type": "SINGLE",
+          "prompt": "学生支持：对照CASEL原量规第6页该指标的四个行为描述，记录团队选择的水平。原文：https://files.casel.org/sites/2/2019/06/Blank-Rubric-Template-3.30.20.pdf#page=6。尚未讨论或证据不足可留空。",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "level_1",
+              "label": "1"
+            },
+            {
+              "optionKey": "level_2",
+              "label": "2"
+            },
+            {
+              "optionKey": "level_3",
+              "label": "3"
+            },
+            {
+              "optionKey": "level_4",
+              "label": "4"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "focus_3c_student_support_evidence",
+          "type": "LONG_TEXT",
+          "prompt": "学生支持：哪些具体事实、材料或不同成员的观察支持这一判断？还有哪些信息缺失？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1500
+        },
+        {
+          "itemKey": "focus_3c_student_support_action",
+          "type": "LONG_TEXT",
+          "prompt": "学生支持：下一步准备做什么，由谁负责，何时回顾？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "focus_3c_family_partnerships_level",
+          "type": "SINGLE",
+          "prompt": "家庭伙伴关系：对照CASEL原量规第6页该指标的四个行为描述，记录团队选择的水平。原文：https://files.casel.org/sites/2/2019/06/Blank-Rubric-Template-3.30.20.pdf#page=6。尚未讨论或证据不足可留空。",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "level_1",
+              "label": "1"
+            },
+            {
+              "optionKey": "level_2",
+              "label": "2"
+            },
+            {
+              "optionKey": "level_3",
+              "label": "3"
+            },
+            {
+              "optionKey": "level_4",
+              "label": "4"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "focus_3c_family_partnerships_evidence",
+          "type": "LONG_TEXT",
+          "prompt": "家庭伙伴关系：哪些具体事实、材料或不同成员的观察支持这一判断？还有哪些信息缺失？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1500
+        },
+        {
+          "itemKey": "focus_3c_family_partnerships_action",
+          "type": "LONG_TEXT",
+          "prompt": "家庭伙伴关系：下一步准备做什么，由谁负责，何时回顾？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "focus_3c_community_partnerships_level",
+          "type": "SINGLE",
+          "prompt": "社区伙伴关系：对照CASEL原量规第6页该指标的四个行为描述，记录团队选择的水平。原文：https://files.casel.org/sites/2/2019/06/Blank-Rubric-Template-3.30.20.pdf#page=6。尚未讨论或证据不足可留空。",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "level_1",
+              "label": "1"
+            },
+            {
+              "optionKey": "level_2",
+              "label": "2"
+            },
+            {
+              "optionKey": "level_3",
+              "label": "3"
+            },
+            {
+              "optionKey": "level_4",
+              "label": "4"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "focus_3c_community_partnerships_evidence",
+          "type": "LONG_TEXT",
+          "prompt": "社区伙伴关系：哪些具体事实、材料或不同成员的观察支持这一判断？还有哪些信息缺失？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1500
+        },
+        {
+          "itemKey": "focus_3c_community_partnerships_action",
+          "type": "LONG_TEXT",
+          "prompt": "社区伙伴关系：下一步准备做什么，由谁负责，何时回顾？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        }
+      ]
+    },
+    {
+      "pageKey": "focus_4",
+      "title": "4｜持续改进",
+      "description": "记录工具草稿：行为锚点不在本表中，须按使用条件查阅CASEL原量规第7页；只记录学校层面的团队观察，不计算总分。",
+      "questions": [
+        {
+          "itemKey": "focus_4_improvement_resources_level",
+          "type": "SINGLE",
+          "prompt": "持续改进的资源：对照CASEL原量规第7页该指标的四个行为描述，记录团队选择的水平。原文：https://files.casel.org/sites/2/2019/06/Blank-Rubric-Template-3.30.20.pdf#page=7。尚未讨论或证据不足可留空。",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "level_1",
+              "label": "1"
+            },
+            {
+              "optionKey": "level_2",
+              "label": "2"
+            },
+            {
+              "optionKey": "level_3",
+              "label": "3"
+            },
+            {
+              "optionKey": "level_4",
+              "label": "4"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "focus_4_improvement_resources_evidence",
+          "type": "LONG_TEXT",
+          "prompt": "持续改进的资源：哪些具体事实、材料或不同成员的观察支持这一判断？还有哪些信息缺失？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1500
+        },
+        {
+          "itemKey": "focus_4_improvement_resources_action",
+          "type": "LONG_TEXT",
+          "prompt": "持续改进的资源：下一步准备做什么，由谁负责，何时回顾？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "focus_4_improvement_systems_level",
+          "type": "SINGLE",
+          "prompt": "持续改进的机制：对照CASEL原量规第7页该指标的四个行为描述，记录团队选择的水平。原文：https://files.casel.org/sites/2/2019/06/Blank-Rubric-Template-3.30.20.pdf#page=7。尚未讨论或证据不足可留空。",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "level_1",
+              "label": "1"
+            },
+            {
+              "optionKey": "level_2",
+              "label": "2"
+            },
+            {
+              "optionKey": "level_3",
+              "label": "3"
+            },
+            {
+              "optionKey": "level_4",
+              "label": "4"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "focus_4_improvement_systems_evidence",
+          "type": "LONG_TEXT",
+          "prompt": "持续改进的机制：哪些具体事实、材料或不同成员的观察支持这一判断？还有哪些信息缺失？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1500
+        },
+        {
+          "itemKey": "focus_4_improvement_systems_action",
+          "type": "LONG_TEXT",
+          "prompt": "持续改进的机制：下一步准备做什么，由谁负责，何时回顾？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        }
+      ]
+    }
+  ]
+}

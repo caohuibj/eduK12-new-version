@@ -1,0 +1,94 @@
+[
+  {
+    "itemKey": "focus_1a_team_level",
+    "level": 1
+  },
+  {
+    "itemKey": "focus_1a_foundational_learning_level",
+    "level": 2
+  },
+  {
+    "itemKey": "focus_1a_two_way_communication_level",
+    "level": 3
+  },
+  {
+    "itemKey": "focus_1b_shared_vision_level",
+    "level": 2
+  },
+  {
+    "itemKey": "focus_1b_planning_level",
+    "level": 2
+  },
+  {
+    "itemKey": "focus_1b_resources_level",
+    "level": 4
+  },
+  {
+    "itemKey": "focus_2_professional_learning_level",
+    "level": 1
+  },
+  {
+    "itemKey": "focus_2_adult_sel_culture_level",
+    "level": 2
+  },
+  {
+    "itemKey": "focus_2_staff_collaboration_level",
+    "level": 3
+  },
+  {
+    "itemKey": "focus_2_staff_modeling_level",
+    "level": null
+  },
+  {
+    "itemKey": "focus_3a_classroom_environment_level",
+    "level": 1
+  },
+  {
+    "itemKey": "focus_3a_explicit_instruction_level",
+    "level": 1
+  },
+  {
+    "itemKey": "focus_3a_integrated_instruction_level",
+    "level": 2
+  },
+  {
+    "itemKey": "focus_3b_cultural_responsiveness_level",
+    "level": 2
+  },
+  {
+    "itemKey": "focus_3b_school_climate_level",
+    "level": 3
+  },
+  {
+    "itemKey": "focus_3b_evidence_based_programs_level",
+    "level": 3
+  },
+  {
+    "itemKey": "focus_3b_student_voice_level",
+    "level": 3
+  },
+  {
+    "itemKey": "focus_3c_discipline_level",
+    "level": 4
+  },
+  {
+    "itemKey": "focus_3c_student_support_level",
+    "level": 4
+  },
+  {
+    "itemKey": "focus_3c_family_partnerships_level",
+    "level": null
+  },
+  {
+    "itemKey": "focus_3c_community_partnerships_level",
+    "level": null
+  },
+  {
+    "itemKey": "focus_4_improvement_resources_level",
+    "level": 3
+  },
+  {
+    "itemKey": "focus_4_improvement_systems_level",
+    "level": 4
+  }
+]
