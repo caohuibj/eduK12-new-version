@@ -194,3 +194,34 @@ one NEW Vite build/runtime image/scan because CSS bytes changed. Browser consume
 that new output; old frontend image qualification is not claimed for it. Backend
 complete qualification/build remains reused. Source/scope identities refreshed;
 changed e2e consumer code is included in fresh CodeQL controls analysis.
+
+## Compact-workspace consumer audit before further CI (04:04 UTC)
+
+Run40446467080 source6675aaa9 successfully built/scanned the newCSS frontend;
+all nonbrowser jobs PASS. Real browser confirmed the prior contrast/theme fixes,
+all16 public home/login observations and both real author login/MFA/preference
+isolation checks. It then timed out on obsolete workspace selectors: School's
+removed navigation drawer, Teacher's removed account details. Partial browser
+artifact12708073992 ZIPb342cf0541fdf0e426557b06f209624d1e81191c6cb23b5bb9e543a77f3ae2be
+is retained; no dependent author/publish/answer/report success is inferred.
+
+Paused trial execution and audited the same consumers against current components:
+School grouped navigation with keyboard Enter/return/focus, Teacher account dialog
+open/Escape/focus return, current personal section links and mounted selection;
+School new-tool details opening and activity catalog button; Teacher unified
+start/continue task labels; completed School status accessible label; real
+single-choice auto-advance without an extra Next on the following question and
+arrow-key selection for the saved-first-answer check. School-management section
+activation must run after every reload, not disappear behind a prior-evidence
+flag. Original business, fixed-version, privacy, keyboard, draft-resume and final
+response assertions stay intact. Rename obsolete collapsedAfter evidence to
+restoredNavigation instead of claiming a removed drawer was tested.
+
+The3e2e-file correction d8fbd56b is pushed skip-ci; no application bytes changed.
+10direct UI-consumer contract tests PASS, not represented as browser acceptance.
+Reuse the fully successful styled frontend producer121999019564/run40446467080:
+checks12709080774 ZIPefc902e767c62ecfb6363e3b09190f9b8050153eb0125c551caa3a11588557e3;
+build12708916208 ZIPbf976a51b75625b185cbea2ed0d392e7070abaaae85b270c5d3992705c9502a8;
+image e8b25b9a1cfa3f9538828c4d92f9f4946920710f5e68adf52eb6ab207076b29d.
+No frontend rebuild/retest/rescan; backend remains complete-proof reuse. Only
+changed browser consumers, their control/SAST and final gates remain required.

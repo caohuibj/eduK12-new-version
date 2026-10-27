@@ -85,3 +85,10 @@ test('style-only continuation rejects any CSS other than the exact contrast corr
  assert.equal(verifyContinuationInputs(read).backendTree,original.backendTree);
  assert.throws(()=>verifyContinuationInputs((cmd,arg)=>arg==='HEAD:'+css?'0'.repeat(40):read(cmd,arg)));
 });
+import {styledFrontend,styleArtifacts} from './pr357-continuation.mjs';
+test('styled frontend reuse never falls back to the previous CSS artifact',()=>{
+ const now=Date.now(),a=styleArtifacts.build,m={id:a.id,name:a.prefix+styledFrontend.checkout,expired:false,digest:'sha256:'+a.sha,workflow_run:{id:styledFrontend.run,head_sha:styledFrontend.head,head_branch:binding.branch},size_in_bytes:22045209,created_at:new Date(now-1000).toISOString()};
+ assert.equal(verifyOriginalArtifact(m,'build',now,'style').id,a.id);
+ assert.throws(()=>verifyOriginalArtifact({...m,id:deliveredArtifacts.build.id},'build',now,'style'));
+ assert.throws(()=>verifyOriginalArtifact({...m,digest:'sha256:'+deliveredArtifacts.build.sha},'build',now,'style'));
+});
