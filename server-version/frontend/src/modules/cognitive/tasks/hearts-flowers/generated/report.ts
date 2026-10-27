@@ -1,0 +1,34 @@
+// Exact pure content projection. Backend SHA256: 81058a17652c157af55fe5bbcc3ee37295345e89bee1ffefc711b57b99a1e95e
+import {HF_IDENTITY,hfConfig,same,type Profile,type Input} from './protocol'
+export const HF_INPUTS:Input[]=['keyboard','touch','mouse','pen','assistive']
+export const HF_GROUPS=['heartOnly','flowerOnly','mixed','mixedSwitch','mixedRepeat','mixedFirst'] as const
+export type GroupKey=typeof HF_GROUPS[number]
+export interface InputStats {answered:number;correct:number;correctRTCount:number;sumCorrectMs:number;meanCorrectMs:number|null}
+export interface HFGroup {planned:number;valid:number;answered:number;correct:number;missed:number;accuracy:number|null;inputs:Record<Input,InputStats>}
+export type HFDifferences=Record<Input,{switchMinusRepeatMs:number|null}>
+export interface HFReport {testType:'hearts-flowers';engineVersion:'0.1.0';scoringVersion:'0.1.0';configVersion:'0.1.0';reportDefinitionVersion:'0.1.0';presentationVersion:'0.1.0';configHash:string;protocolSignature:string;profile:Profile;state:'interpretable'|'limited'|'invalid';planned:number;received:number;valid:number;interrupted:boolean;groups:Record<GroupKey,HFGroup>|null;differences:HFDifferences|null}
+export function hfPlanned(profile:Profile):Record<GroupKey,number>{const c=hfConfig(profile);return {heartOnly:c.heartTrials,flowerOnly:c.flowerTrials,mixed:c.mixedTrials,mixedSwitch:profile==='research'?16:8,mixedRepeat:profile==='research'?16:7,mixedFirst:1}}
+export function hfDifferences(groups:Record<GroupKey,HFGroup>):HFDifferences{return Object.fromEntries(HF_INPUTS.map(input=>{const a=groups.mixedSwitch.inputs[input].meanCorrectMs,b=groups.mixedRepeat.inputs[input].meanCorrectMs;return [input,{switchMinusRepeatMs:a===null||b===null?null:a-b}]})) as HFDifferences}
+const integer=(v:unknown):v is number=>typeof v==='number'&&Number.isSafeInteger(v)&&v>=0
+export function isHFReport(value:unknown,expected?:{configHash:string;protocolSignature:string;profile:Profile;received?:number}):value is HFReport {if(!value||typeof value!=='object')return false;const r=value as HFReport,hex=(v:unknown)=>typeof v==='string'&&/^[a-f0-9]{64}$/.test(v)
+ if(!same(Object.fromEntries(Object.keys(HF_IDENTITY).map(k=>[k,(r as unknown as Record<string,unknown>)[k]])),HF_IDENTITY)||r.reportDefinitionVersion!=='0.1.0'||r.presentationVersion!=='0.1.0'||!hex(r.configHash)||!hex(r.protocolSignature)||!['research','experience'].includes(r.profile)||!['interpretable','limited','invalid'].includes(r.state)||![r.planned,r.received,r.valid].every(integer)||r.planned!==hfConfig(r.profile).totalTrials||r.received>r.planned||r.valid>r.received||typeof r.interrupted!=='boolean')return false
+ if(expected&&(r.configHash!==expected.configHash||r.protocolSignature!==expected.protocolSignature||r.profile!==expected.profile||(expected.received!==undefined&&r.received!==expected.received)))return false
+ if(r.state==='invalid')return r.valid===0&&r.groups===null&&r.differences===null
+ if(!r.valid||!r.groups||Object.keys(r.groups).length!==HF_GROUPS.length)return false
+ const planned=hfPlanned(r.profile)
+ for(const key of HF_GROUPS){const g=r.groups[key];if(!g||![g.planned,g.valid,g.answered,g.correct,g.missed].every(integer)||g.planned!==planned[key]||g.valid>g.planned||g.answered+g.missed!==g.valid||g.correct>g.answered||g.accuracy!==(g.valid?g.correct/g.valid:null)||!g.inputs||Object.keys(g.inputs).length!==HF_INPUTS.length)return false
+  for(const input of HF_INPUTS){const i=g.inputs[input];if(!i||![i.answered,i.correct,i.correctRTCount].every(integer)||i.correct>i.answered||i.correctRTCount!==i.correct||typeof i.sumCorrectMs!=='number'||!Number.isFinite(i.sumCorrectMs)||i.sumCorrectMs<0||i.meanCorrectMs!==(i.correct?i.sumCorrectMs/i.correct:null)||(i.correct===0?(i.sumCorrectMs!==0||i.meanCorrectMs!==null):typeof i.meanCorrectMs!=='number'||!Number.isFinite(i.meanCorrectMs)||i.meanCorrectMs<0||i.meanCorrectMs>=2500))return false}
+  if(HF_INPUTS.reduce((n,input)=>n+g.inputs[input].answered,0)!==g.answered||HF_INPUTS.reduce((n,input)=>n+g.inputs[input].correct,0)!==g.correct)return false
+ }
+ const g=r.groups;if(g.heartOnly.valid+g.flowerOnly.valid+g.mixed.valid!==r.valid)return false
+ for(const field of ['valid','answered','correct','missed'] as const)if(g.mixedSwitch[field]+g.mixedRepeat[field]+g.mixedFirst[field]!==g.mixed[field])return false
+ for(const input of HF_INPUTS)for(const field of ['answered','correct','correctRTCount'] as const)if(g.mixedSwitch.inputs[input][field]+g.mixedRepeat.inputs[input][field]+g.mixedFirst.inputs[input][field]!==g.mixed.inputs[input][field])return false
+ if(!same(r.differences,hfDifferences(g)))return false
+ return r.state==='interpretable'?r.valid===r.planned&&!r.interrupted:r.valid<r.planned||r.interrupted
+}
+/** Sole public projection for body, downloads and future graphics; invalid exposes no performance groups. */
+export function projectHFReport(score:{metrics:Record<string,unknown>;quality:{state:string};audit:{scorerVersion:string}}):HFReport {const m=score.metrics,b=m.reportBinding as Record<string,unknown>|undefined
+ if(!b||!same(Object.fromEntries(Object.keys(HF_IDENTITY).map(k=>[k,b[k]])),HF_IDENTITY)||b.reportDefinitionVersion!=='0.1.0'||score.audit.scorerVersion!=='0.1.0')throw Error('Unknown report binding')
+ const report={...HF_IDENTITY,reportDefinitionVersion:'0.1.0',presentationVersion:'0.1.0',configHash:b.configHash,protocolSignature:b.protocolSignature,profile:b.profile,state:score.quality.state,planned:m.expectedTrialCount,received:m.receivedTrialCount,valid:m.validTrialCount,interrupted:m.technicalInterruptionCount===1,groups:score.quality.state==='invalid'?null:m.groups,differences:score.quality.state==='invalid'?null:m.differences};if(!isHFReport(report))throw Error('Inconsistent public hearts-flowers report');return report
+}
+export const HF_COPY={zh:{title:'心与花：这次怎样运用两条规则',finding:'谢谢你完成这次记录。下面分别保留心同侧、花对侧和混合规则中的实际结果。',explanation:'每个完整回应窗口都计入正确率分母，答错和未答也保留。混合首题没有前一条规则，单独列出。',tip:'需要切换规则时，可以先把规则说清楚，再逐项确认。可以将重要步骤列成简短清单，按规则逐项确认。',limit:'这是本次操作记录。输入、理解、练习、顺序及疲劳可能影响结果；没有同龄排名、0–100能力分、ADHD诊断或职业预测。'},en:{title:'Hearts and flowers: using two rules this time',finding:'Thank you for taking part. Your actual records for same-side hearts, opposite-side flowers and mixed rules appear separately.',explanation:'Every closed response window enters the accuracy denominator, including wrong answers and omissions. The first mixed trial has no previous rule and is separate.',tip:'When rules change, state the rule clearly and check each step. A short checklist can help you confirm important steps against the rule.',limit:'These are records of this attempt. Input, understanding, practice, order and fatigue may affect results. No age ranking, 0–100 ability score, ADHD diagnosis or career prediction is provided.'}}
