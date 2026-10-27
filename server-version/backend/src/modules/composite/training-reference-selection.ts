@@ -1,3 +1,4 @@
+import {assertEducationRuntimeContentScope} from './education-content-scope'
 import {validateTrainingReportPointer} from './training-report-selection'
 import {assertTrainingPrivateReferenceCourseUse} from './training-private-reference-use'
 import {Prisma} from '@prisma/client'
@@ -45,6 +46,10 @@ export async function validateTrainingReferenceRelease(tx:Prisma.TransactionClie
  }
  if(scope.kind==='PLATFORM')return resolveFormalReferenceRelease(tx,{releaseId:release.releaseId,contentHash:release.contentHash,
   measurementReleaseId:input.unit.measurement.releaseId,purpose:input.purpose},release)
+ if(scope.kind==='PRIVATE'&&['SCHOOL','TEACHER'].includes(scope.product)){
+  await assertEducationRuntimeContentScope(tx,{...input,release})
+  return {releaseId:release.releaseId,contentHash:release.contentHash,status:release.status,measurementReleaseId:input.unit.measurement.releaseId,entries}
+ }
  if(scope.kind!=='PRIVATE'||scope.product!=='TRAINING'||scope.ownerId!==input.ownerId)trainingReferenceFail('SCOPE_DENIED')
  if(scope.resourceId!==input.compositeId)await assertTrainingPrivateReferenceCourseUse(tx,{release,ownerId:input.ownerId,
   compositeId:input.compositeId,currentAdmission:input.purpose!=='HISTORY'||input.admission===true,draftSelection:input.purpose==='NEW_BINDING',recordAdmissionExpiry:input.admission===true})

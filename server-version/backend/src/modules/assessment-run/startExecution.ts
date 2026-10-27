@@ -1,3 +1,4 @@
+import {assertEducationAssessmentExecutionSource} from './educationAssessmentExecution'
 import {readPrivateFormExecutionSource} from './educationPrivateFormExecution'
 import { assertEducationLibraryExecutionSource } from './educationLibraryExecution'
 import {assertTrainingPrivateReferenceAdmissionCurrent} from '../composite/training-private-reference-use'
@@ -204,6 +205,7 @@ const startTransactionalComposite = async (input: {
   if (admission.assignment.resourceKey.startsWith('library-scale:')||admission.assignment.resourceKey.startsWith('private-scale:')) {
     await assertEducationLibraryExecutionSource(tx, {executionId: input.executionId, compositeId: input.launch.runtimeTargetRef})
   }
+  if(admission.assignment.resourceKey.startsWith('education-assessment:'))await assertEducationAssessmentExecutionSource(tx,{executionId:input.executionId,compositeId:input.launch.runtimeTargetRef,purpose:'NEW_START'})
   if(admission.assignment.resourceKey.startsWith('private-form:'))await readPrivateFormExecutionSource(tx,{executionId:input.executionId,compositeId:input.launch.runtimeTargetRef,actorUserId:input.actorUserId})
   const state=await tx.$queryRaw<Array<{runStatus:string}>>`
     SELECT r."status" AS "runStatus"

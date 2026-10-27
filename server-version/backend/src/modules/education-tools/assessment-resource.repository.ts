@@ -43,7 +43,9 @@ export async function readEducationAssessmentDeliveryIdentity(tx:Tx,input:{
  if(!runtime||runtime.productKind!=='ORGANIZATION_RESOURCE'||runtime.status!=='PUBLISHED'||runtime.publicEnabled||runtime.copyable
   ||runtime.courseId!==null||runtime.trainingContentSnapshotHash!==origin.runtimeSnapshotHash
   ||canonicalHash(runtime.trainingContentSnapshot)!==origin.runtimeSnapshotHash)fail('EDUCATION_ASSESSMENT_RUNTIME_IDENTITY')
- if(canonicalHash(buildTrainingFlowUnits(runtime))!==origin.runtimeDefinitionHash)fail('EDUCATION_ASSESSMENT_RUNTIME_DEFINITION')
+ const definition=buildTrainingFlowUnits(runtime)
+ if(!runtime.items.length||!definition.length||runtime.formSections.some(section=>!section.items.length)
+  ||canonicalHash(definition)!==origin.runtimeDefinitionHash)fail('EDUCATION_ASSESSMENT_RUNTIME_DEFINITION')
  const snapshot=trainingContentSnapshotSchema.parse(runtime.trainingContentSnapshot)
  if(snapshot.compositeId!==runtime.id||snapshot.units.length!==origin.units.length
   ||runtime.items.filter(item=>item.type!=='FORM').length!==origin.units.length)fail('EDUCATION_ASSESSMENT_RUNTIME_IDENTITY')
