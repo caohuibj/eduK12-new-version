@@ -85,3 +85,18 @@ was touched. Remaining proof: the narrow browser fixture in browser-fixture-plan
 Redis revocation and concurrent races as independently selected by root. No
 producer/report interface blocker remains for tested ordinary Teacher/School.
 These results are unsigned local observations, not formal CI success.
+
+
+## Root complete reviewed baseline
+
+`b38f8a783c1f3cb0d573bac1eff0a2fd1ae6f42a` was normally absorbed in
+`6c6d83b328d2e426fd5e3a4ff53e8a5a8168626a`. It adds only root evidence/docs
+relative to this branch. `reviewed-baseline-identity.json` verifies identical Git
+objects for all executed runtime/source/report/auth modules, config/services/utils,
+Prisma schema/migrations, package/lock, Vitest config, runtime role policy/checker
+and shared School fixture against the executed c7caab candidate and absorbed tree.
+The source comparison exits0. No runtime check was repeated for unchanged input.
+Each scenario independently performs the entire actual producer→START→FINAL→own
+report lifecycle; the 8+2 calls are distinct complete journeys, not stitched
+proof from separate seeded FINAL/report phases. No claim is made that the root
+production browser or CI was executed.

@@ -1,0 +1,98 @@
+{
+  "recordKind": "read-only immutable source identity comparison, not a new test run or CI admission",
+  "testedHead": "c7caab78327cdb7ed55159985de475b623ec0612",
+  "rootReviewedBaseline": "b38f8a783c1f3cb0d573bac1eff0a2fd1ae6f42a",
+  "absorbedHead": "6c6d83b328d2e426fd5e3a4ff53e8a5a8168626a",
+  "absorbedTree": "1695997fd69c9cf44548b4aa577a039ebf54d4a5",
+  "comparisonExit": 0,
+  "noAffectedRuntimeInputsChanged": true,
+  "checksRerun": false,
+  "reason": "normal absorption added only root evidence/docs; actual runtime/source/report/auth/schema/dependency/config and School setup inputs match the already executed complete journeys",
+  "journeyMeaning": "Every one of the ten scenarios independently calls actual producer, START, mixed/Form FINAL and current own report. Eight plus two are distinct complete scenarios in separate invocations, not stitched lifecycle fragments.",
+  "inputs": [
+    {
+      "path": "server-version/backend/src/modules",
+      "testedObject": "7d80cb36c254340e3f4851fdcecd5fed07fdb8ee",
+      "reviewedBaselineObject": "7d80cb36c254340e3f4851fdcecd5fed07fdb8ee",
+      "mergedObject": "7d80cb36c254340e3f4851fdcecd5fed07fdb8ee",
+      "identical": true
+    },
+    {
+      "path": "server-version/backend/src/config",
+      "testedObject": "dff457d37da95188509bda32d0a8c50f29519ee5",
+      "reviewedBaselineObject": "dff457d37da95188509bda32d0a8c50f29519ee5",
+      "mergedObject": "dff457d37da95188509bda32d0a8c50f29519ee5",
+      "identical": true
+    },
+    {
+      "path": "server-version/backend/src/middleware",
+      "testedObject": "078e550f9334347ded4e042576469c293d8aaae6",
+      "reviewedBaselineObject": "078e550f9334347ded4e042576469c293d8aaae6",
+      "mergedObject": "078e550f9334347ded4e042576469c293d8aaae6",
+      "identical": true
+    },
+    {
+      "path": "server-version/backend/src/services",
+      "testedObject": "b220b8fef97669b19c6f0eea0f3bd39a613f089e",
+      "reviewedBaselineObject": "b220b8fef97669b19c6f0eea0f3bd39a613f089e",
+      "mergedObject": "b220b8fef97669b19c6f0eea0f3bd39a613f089e",
+      "identical": true
+    },
+    {
+      "path": "server-version/backend/src/utils",
+      "testedObject": "6124610cffa9d450f8f5bce7b6f6a01128c46b10",
+      "reviewedBaselineObject": "6124610cffa9d450f8f5bce7b6f6a01128c46b10",
+      "mergedObject": "6124610cffa9d450f8f5bce7b6f6a01128c46b10",
+      "identical": true
+    },
+    {
+      "path": "server-version/backend/prisma",
+      "testedObject": "2da0306e1568c090ea0bd4b462d07ffb9eca353b",
+      "reviewedBaselineObject": "2da0306e1568c090ea0bd4b462d07ffb9eca353b",
+      "mergedObject": "2da0306e1568c090ea0bd4b462d07ffb9eca353b",
+      "identical": true
+    },
+    {
+      "path": "server-version/backend/package.json",
+      "testedObject": "3157b4edaaecd9c495458434ab4cfd1bd5fcdfaf",
+      "reviewedBaselineObject": "3157b4edaaecd9c495458434ab4cfd1bd5fcdfaf",
+      "mergedObject": "3157b4edaaecd9c495458434ab4cfd1bd5fcdfaf",
+      "identical": true
+    },
+    {
+      "path": "server-version/backend/package-lock.json",
+      "testedObject": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6",
+      "reviewedBaselineObject": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6",
+      "mergedObject": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6",
+      "identical": true
+    },
+    {
+      "path": "server-version/backend/vitest.config.ts",
+      "testedObject": "619cca9b71a3046d22f1e8bcbcf59eaea5f0b406",
+      "reviewedBaselineObject": "619cca9b71a3046d22f1e8bcbcf59eaea5f0b406",
+      "mergedObject": "619cca9b71a3046d22f1e8bcbcf59eaea5f0b406",
+      "identical": true
+    },
+    {
+      "path": "server-version/backend/scripts/runtime-role-contract.mjs",
+      "testedObject": "3669f1dabc2b26c42ea0158d93a1977d3f38898d",
+      "reviewedBaselineObject": "3669f1dabc2b26c42ea0158d93a1977d3f38898d",
+      "mergedObject": "3669f1dabc2b26c42ea0158d93a1977d3f38898d",
+      "identical": true
+    },
+    {
+      "path": "server-version/backend/scripts/runtime-table-policy.json",
+      "testedObject": "bb703b167ab21ed990031021d6e8d0bca1124d58",
+      "reviewedBaselineObject": "bb703b167ab21ed990031021d6e8d0bca1124d58",
+      "mergedObject": "bb703b167ab21ed990031021d6e8d0bca1124d58",
+      "identical": true
+    },
+    {
+      "path": "server-version/backend/src/__tests__/integration/educationLibraryRuntimeFixture.ts",
+      "testedObject": "c9efb4fa3d5e772880f3094e2cc6a0f340185778",
+      "reviewedBaselineObject": "c9efb4fa3d5e772880f3094e2cc6a0f340185778",
+      "mergedObject": "c9efb4fa3d5e772880f3094e2cc6a0f340185778",
+      "identical": true
+    }
+  ]
+}
