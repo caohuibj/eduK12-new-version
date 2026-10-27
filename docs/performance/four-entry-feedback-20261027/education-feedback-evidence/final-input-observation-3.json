@@ -1,0 +1,17 @@
+{
+  "recordedAt": "2026-10-27T09:11:46.817843+00:00",
+  "kind": "contemporaneous-final-backend-typecheck-input-observation",
+  "sourceTree": "d1b1a93f62a959da4ff3e3da3a9d92a034675989",
+  "codeBase": "f5d59e95a4ff9c400cfca09aa262711c8da93784",
+  "componentTrees": {
+    "server-version/backend": "1c5b760ccceae749b440f3e62cba3f220e619fd4",
+    "server-version/frontend": "1fe7f42ff5c7900c058f8c950dd9f4b313991183"
+  },
+  "sha256": {
+    "server-version/backend/src/__tests__/reporting/education-assessment-personal-report.service.test.ts": "05c3332c63cfe5a7c573468fd8206091cb604265c61d538e121a9967f8182613",
+    "server-version/backend/src/__tests__/reporting/education-assessment-report.fixture.ts": "57d744bd3a4cf76b042ab0eb4b504e1569ee20869dec6cb0351d89cb8e1f1628",
+    "server-version/backend/src/modules/reporting/education-assessment-personal-report.service.ts": "4d0810114294bb3ba4533b0cbdbc1a309b26f30d76ec222ad34217580dc718d2",
+    "server-version/frontend/src/school/SchoolCompositeRunner.cognitive.integration.test.tsx": "3bc8dda76ece631fcbf03b00e68e134674e6368df6e6d220fa2d0015f0f66bf2"
+  },
+  "limits": "Unsigned local observation; not a complete historical dependency manifest and not formal CI acceptance."
+}
