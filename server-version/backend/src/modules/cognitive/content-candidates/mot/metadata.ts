@@ -28,5 +28,5 @@ export const motContent = {
   versionBindings:{engine:'1.1.1',scoring:'1.1.0',config:'1.0.0',report:'1.1.1',presentation:'1.1.1',
     metricDefinition:'1.1.0',qualityDefinition:'1.1.0',profileDefinition:'1.0.0',
     randomization:'mot-fnv1a-mulberry32-v1'},
-  productAdmission:'blocked_on_platform_native_runtime_and_archive_contract',
+  productAdmission:'native_authenticated_development_candidate; runtime_activation_unverified',
 } as const

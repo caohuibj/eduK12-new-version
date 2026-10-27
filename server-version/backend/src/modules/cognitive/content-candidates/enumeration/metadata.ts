@@ -47,4 +47,8 @@ export const enumerationContent = {
 /** Additive metadata for the exact complete-recipe tuple; historical content metadata above is retained. */
 export const enumerationRecipeContent = { ...enumerationContent, versionBindings: ENUMERATION_RECIPE_IDENTITY,
   configurationContract: 'complete_recipe_directly_in_stimulusRecipe',
-  rollout: { seeded: false, deliveryEnabled: false, hostConnected: false } } as const
+  rights: { ...enumerationContent.rights, stimulusAssets: 'project_generated_dots_and_mask; no_external_stimulus_files_imported' },
+  extensions: { ...enumerationContent.extensions, maturity: 'native_authenticated_development_candidate' },
+  implementation: { configSeed: 'draft_only_definition', delivery: 'authenticated_exact_tuple_only', host: 'native_candidate',
+    archive: 'existing_private_asset_contract; external_COS_unverified',
+    deployment: 'unverified', runtimeImport: 'unverified', backendTagsConnected: false } } as const

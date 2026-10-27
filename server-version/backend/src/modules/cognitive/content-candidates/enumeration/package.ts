@@ -69,7 +69,7 @@ export const enumerationRecipeDefinition: TaskDefinition<EnumerationRecipeConfig
     research: { ...enumerationDefinition.profiles.research!, configPatch: { ...enumerationRecipeConfig('research') } },
     experience: { ...enumerationDefinition.profiles.experience!, configPatch: { ...enumerationRecipeConfig('experience') } },
   },
-  publication: { ...enumerationDefinition.publication, evidenceNote: '完整配方内容定义已接精确 native resolver；未 seed、未启用 delivery、未接真实宿主。' },
+  publication: { ...enumerationDefinition.publication, evidenceNote: '完整配方已接精确native定义、DRAFT seed及authenticated宿主候选；不代表运行系统已导入、发布或部署。' },
 }
 export function createEnumerationRecipeSnapshot(profile: EnumerationProfile, frozenAt = '2026-10-26T00:00:00.000Z') {
   return createSessionConfigSnapshot({ definition: enumerationRecipeDefinition,
@@ -78,3 +78,5 @@ export function createEnumerationRecipeSnapshot(profile: EnumerationProfile, fro
 export { enumerationContent, enumerationRecipeContent } from './metadata'
 export { enumerationTrialEnvelope } from './trial-envelope'
 export { projectEnumerationReport, projectStoredEnumerationReport } from './report'
+
+export { enumerationCatalogTags, enumerationCatalogSearchText, enumerationCatalogIntegration } from './catalog'

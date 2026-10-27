@@ -68,7 +68,7 @@ export const motDefinition:TaskDefinition<MotConfig,MotTrial> = {
   },
   metrics,quality,references:[],
   report:currentReport,
-  publication:{status:'DRAFT',referenceRequired:false,evidenceNote:'未注册候选；产品准入由平台真实生命周期决定。'},
+  publication:{status:'DRAFT',referenceRequired:false,evidenceNote:'原生定义、DRAFT seed、authenticated宿主及归档已有开发候选；运行系统是否启用仍由实际生命周期与管理员操作决定。'},
 }
 export const createMotSnapshot = (profile:MotProfile,frozenAt='2026-10-26T00:00:00.000Z') =>
   createSessionConfigSnapshot({definition:motDefinition,configVersion:MOT_IDENTITY.configVersion,
