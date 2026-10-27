@@ -5,6 +5,7 @@ export type RosterSource={rawDigest:string;mappingDigest:string;sheetDigest:stri
 export type JobInput=PersonnelImportInput|{kind:'GRADE'|'CLASS';defaultGradeId:string|null;rows:{line:number;name:string;grade:string}[]}
 export type JobPart={index:number;rows:number;state:'PLANNED'|'PREVIEWED'|'COMMITTED';add:number;skip:number;errors:number;issues:{line:number;message:string}[];receipt:{batchId:string;added:number;skipped:number}|null}
 export type RosterJob={id:string;kind:RosterKind;status:string;rows:number;partCount:number;createdAt:string;expiresAt:string;expired:boolean;confirmed:boolean;planToken:string;needsVerification:boolean;added:number;skipped:number;savedRows:number;parts:JobPart[];proof?:string;runToken?:string|null}
+export type RosterJobSummary=Pick<RosterJob,'id'|'kind'|'status'|'rows'|'partCount'|'createdAt'|'expiresAt'|'expired'|'added'|'skipped'|'savedRows'>
 export async function rosterDigest(value:string|Uint8Array){
  const bytes=typeof value==='string'?new TextEncoder().encode(value):value
  const digest=await crypto.subtle.digest('SHA-256',Uint8Array.from(bytes).buffer)

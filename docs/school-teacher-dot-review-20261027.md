@@ -67,3 +67,19 @@ counts must not double-count the strengthened concurrency rerun. Do not claim
 scientific-content approval, manual expert-page approval or production deployment.
 The user now authorizes corrections/push and PR357 CI, superseding the original
 submission-only restriction, but PR357 merge is not performed by this record.
+
+## Bounded history projection
+
+Independent review found that listing20 jobs fetched every part/error of each
+job, although the history UI needs only counts and identity. A single5000-row
+error task can otherwise dominate the list payload. The list now returns only
+summary fields and one grouped part-count query for the selected page; full
+errors and receipts remain behind the existing authorized detail endpoint.
+Selection fetches details explicitly and discards responses after a school/API
+scope change. No change to mutation permissions or immutable receipts.
+
+Real PostgreSQL verifies a5000-error fixture has a list response below1500bytes
+while detail still returns all50parts/5000errors. Three targeted UI cases verify
+history selection, completed receipt loading and late-response isolation using
+summary-only fixtures. This is a bounded payload/consumer proof, not a whole-site
+capacity or production latency benchmark.

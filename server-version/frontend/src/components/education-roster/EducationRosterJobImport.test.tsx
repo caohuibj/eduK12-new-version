@@ -12,7 +12,7 @@ function server(){
  const clone=()=>JSON.parse(JSON.stringify(job)) as RosterJob
  const api=vi.fn(async(path:string,method?:string,body?:any):Promise<any>=>{
   if(path==='/auth/mfa/step-up')return {ok:true}
-  if(path===base&&method!=='POST')return {list:job?[clone()]:[],next:null}
+  if(path===base&&method!=='POST')return {list:job?[Object.fromEntries(Object.entries(clone()).filter(([key])=>!['parts','planToken','needsVerification','confirmed'].includes(key)))]:[],next:null}
   if(path===base){job={id:'job',kind:body.input.kind,status:'PREVIEWING',rows:body.input.rows.length,partCount:Math.ceil(body.input.rows.length/100),createdAt:new Date().toISOString(),expiresAt:new Date(Date.now()+86400000).toISOString(),expired:false,confirmed:false,planToken:plan,needsVerification:false,added:0,skipped:0,savedRows:0,parts:jobParts(body.input).map((p,i)=>({index:i,rows:p.rows.length,state:'PLANNED',add:0,skip:0,errors:0,issues:[],receipt:null}))};return {...clone(),proof}}
   if(path.endsWith('/match'))return {...clone(),proof}
   if(path.endsWith('/confirm')||path.endsWith('/resume')){job!.confirmed=true;job!.status='RUNNING';return {...clone(),runToken:'r'.repeat(32)}}
@@ -80,10 +80,19 @@ describe('controlled whole-file import interaction',()=>{
  })
  it('shows history without a write and reselecting requires the original source',async()=>{
   const s=server();renderImport(s);await preview(2);fireEvent.click(screen.getByText('导入历史'));await screen.findByRole('button',{name:'选择续办'});expect(commits(s)).toHaveLength(0)
-  fireEvent.click(button('选择续办'));expect(screen.getByRole('textbox',{name:'粘贴名单（含表头）'})).toHaveValue('');expect(button('确认保存全部批次')).toBeDisabled();expect(button('核对原文件并继续')).toBeDisabled()
+  fireEvent.click(button('选择续办'));await waitFor(()=>expect(screen.getByRole('textbox',{name:'粘贴名单（含表头）'})).toHaveValue(''));expect(s.api).toHaveBeenCalledWith(base+'/job');expect(button('确认保存全部批次')).toBeDisabled();expect(button('核对原文件并继续')).toBeDisabled()
  })
  it('updates a visible history receipt when saving finishes and removes the misleading resume action',async()=>{
-  const s=server();renderImport(s);await preview(2);fireEvent.click(screen.getByText('导入历史'));await screen.findByRole('button',{name:'选择续办'});fireEvent.click(button('确认保存全部批次'));await screen.findByRole('button',{name:'查看回执'});expect(screen.queryByRole('button',{name:'选择续办'})).toBeNull();expect(screen.queryByRole('button',{name:'核对原文件并继续'})).toBeNull();expect(screen.queryByRole('textbox',{name:'粘贴名单（含表头）'})).toBeNull();fireEvent.click(button('查看回执'));expect(screen.getByText('已读取完整回执，无需重新选择文件。')).toBeInTheDocument()
+  const s=server();renderImport(s);await preview(2);fireEvent.click(screen.getByText('导入历史'));await screen.findByRole('button',{name:'选择续办'});fireEvent.click(button('确认保存全部批次'));await screen.findByRole('button',{name:'查看回执'});expect(screen.queryByRole('button',{name:'选择续办'})).toBeNull();expect(screen.queryByRole('button',{name:'核对原文件并继续'})).toBeNull();expect(screen.queryByRole('textbox',{name:'粘贴名单（含表头）'})).toBeNull();fireEvent.click(button('查看回执'));expect(await screen.findByText('已读取完整回执，无需重新选择文件。')).toBeInTheDocument()
+ })
+ it('does not install delayed history details into another school',async()=>{
+  const s=server();let finish!:(value:RosterJob)=>void
+  const api=vi.fn(async(path:string,method?:string,body?:unknown)=>path===base+'/job'?new Promise<RosterJob>(resolve=>{finish=resolve}):s.api(path,method,body)) as EducationRosterApi
+  const view=render(<EducationRosterJobImport api={api} organizationId="org" kind="STAFF" units={[]}/>);await preview(1)
+  fireEvent.click(screen.getByText('导入历史'));await screen.findByRole('button',{name:'选择续办'});fireEvent.click(button('选择续办'))
+  await waitFor(()=>expect(finish).toBeTypeOf('function'))
+  view.rerender(<EducationRosterJobImport api={api} organizationId="other" kind="STAFF" units={[]}/>);await act(async()=>finish(s.job()))
+  expect(screen.queryByRole('region',{name:'导入任务进度'})).toBeNull();expect(commits(s)).toHaveLength(0)
  })
  it('keeps corrected text when explicitly starting a new preview',async()=>{
   const s=server();renderImport(s);await preview(1);fireEvent.change(screen.getByRole('textbox',{name:'粘贴名单（含表头）'}),{target:{value:text(3)}})

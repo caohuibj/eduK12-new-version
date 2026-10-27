@@ -65,8 +65,18 @@ export async function listRosterJobs(s:Scope,before?:string){return txRead(async
  let boundary:Job|undefined
  if(before){const found=await tx.$queryRaw<Job[]>(Prisma.sql`SELECT ${jobSelect} FROM education_roster_import_jobs WHERE id=${before} AND organization_id=${s.organizationId} AND actor_user_id=${s.actor.userId} AND entry=${s.entry}`);boundary=found[0];if(!boundary)fail('ROSTER_CURSOR_INVALID','历史位置已失效，请刷新。',400)}
  const rows=await tx.$queryRaw<Job[]>(Prisma.sql`SELECT ${jobSelect} FROM education_roster_import_jobs WHERE organization_id=${s.organizationId} AND actor_user_id=${s.actor.userId} AND entry=${s.entry} AND (${personnel} OR kind IN ('GRADE','CLASS')) ${boundary?Prisma.sql`AND (created_at,id)<(${boundary.createdAt},${boundary.id})`:Prisma.empty} ORDER BY created_at DESC,id DESC LIMIT 21`)
- const list=[]
- for(const job of rows.slice(0,20))list.push(publicJob(job,await partsFor(tx,job.id)))
+ // History is a summary projection. Do not load/return up to 20 complete
+ // 5000-row error reports just to render a list; details retain their own ACL.
+ const page=rows.slice(0,20)
+ const totals=page.length?await tx.$queryRaw<Array<{jobId:string;added:number;skipped:number;savedRows:number}>>(Prisma.sql`
+  SELECT job_id AS "jobId",COALESCE(SUM((receipt->>'added')::int),0)::int AS added,
+   COALESCE(SUM((receipt->>'skipped')::int),0)::int AS skipped,
+   COALESCE(SUM(CASE WHEN state='COMMITTED' THEN row_count ELSE 0 END),0)::int AS "savedRows"
+  FROM education_roster_import_parts WHERE job_id IN (${Prisma.join(page.map(j=>j.id))}) GROUP BY job_id`):[]
+ const byId=new Map(totals.map(t=>[t.jobId,t]))
+ const list=page.map(job=>({id:job.id,kind:job.kind,status:job.status,rows:job.rowCount,partCount:job.partCount,
+  createdAt:job.createdAt,expiresAt:job.expiresAt,expired:job.expiresAt<=new Date(),
+  added:byId.get(job.id)?.added??0,skipped:byId.get(job.id)?.skipped??0,savedRows:byId.get(job.id)?.savedRows??0}))
  return {list,next:rows.length>20?rows[19].id:null}
 })}
 export async function matchRosterJob(s:Scope,id:string,p:{input:RosterJobInput;source:RosterSource}){return txRead(async tx=>{

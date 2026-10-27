@@ -104,6 +104,17 @@ suite('whole roster jobs over real HTTP and isolated PostgreSQL',()=>{
    expect(await f.count()).toBe(5000);expect(await prisma.user.count()).toBe(users);expect(await prisma.educationProductRoleGrant.count()).toBe(grants)
   }finally{process.env.NODE_ENV=previous;await cacheService.close();await redis.quit()}
  },120000)
+ it('bounds history summaries while keeping full error details behind an explicit read',async()=>{
+  const f=await fixture(),created=await f.call('',{requestId:randomUUID(),input:staff(5000),source});expect(created.status).toBe(200)
+  const id=created.body.data.id,issues=Array.from({length:100},(_,i)=>({line:i+1,message:'synthetic bounded preview error '.repeat(4)}))
+  await prisma.$executeRaw`UPDATE education_roster_import_parts SET state='PREVIEWED',error_count=100,issues=${JSON.stringify(issues)}::jsonb WHERE job_id=${id}`
+  const listed=await f.call('');expect(listed.status).toBe(200);expect(listed.body.data.list).toHaveLength(1)
+  const summary=listed.body.data.list[0];expect(summary).toMatchObject({id,rows:5000,savedRows:0,added:0,skipped:0})
+  for(const key of ['parts','planToken','proof','inputDigest','runnerDigest'])expect(summary).not.toHaveProperty(key)
+  expect(Buffer.byteLength(JSON.stringify(listed.body))).toBeLessThan(1500)
+  const detail=await f.call(`/${id}`);expect(detail.status).toBe(200);expect(detail.body.data.parts).toHaveLength(50)
+  expect(detail.body.data.parts.flatMap((p:any)=>p.issues)).toHaveLength(5000)
+ })
  it('validates cross-part duplicate numbers and accounts before persisting a plan',async()=>{
   const f=await fixture(),input=staff(101);input.rows[100].number=input.rows[0].number.toLowerCase()
   expect(await f.call('',{requestId:randomUUID(),input,source})).toMatchObject({status:400,body:{code:'ROSTER_WHOLE_FILE_INVALID',data:{issues:[{line:102}]}}})

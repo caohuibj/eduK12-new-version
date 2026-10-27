@@ -2,7 +2,7 @@ import {useEffect,useRef,useState} from 'react'
 import {ShieldCheck,RefreshCw,Pause,History} from 'lucide-react'
 import {EducationRosterSource} from './EducationRosterSource'
 import {jobRosterLimits,downloadRosterErrors,rosterLabels} from './preparation'
-import {parseJobInput,jobParts,textRosterSource,type JobInput,type RosterJob,type RosterSource} from './job-client'
+import {parseJobInput,jobParts,textRosterSource,type JobInput,type RosterJob,type RosterJobSummary,type RosterSource} from './job-client'
 import type {EducationRosterApi,RosterKind,RosterUnit} from './types'
 import './education-roster-jobs.css'
 type Props={api:EducationRosterApi;organizationId:string;kind:RosterKind;units:RosterUnit[];disabled?:boolean;onBusy?:(busy:boolean)=>void;onChanged?:()=>void;onUnits?:(units:RosterUnit[])=>void}
@@ -15,7 +15,7 @@ function JobSession({api,organizationId,kind,units,disabled,onBusy,onChanged,onU
  const [sourceBlocked,setSourceBlocked]=useState(false),[busy,setBusy]=useState(''),[error,setError]=useState(''),[notice,setNotice]=useState('')
  const [issues,setIssues]=useState<{line:number;message:string}[]>([]),[verified,setVerified]=useState(false),[needsProgress,setNeedsProgress]=useState(false)
  const [mfa,setMfa]=useState(false),[code,setCode]=useState(''),[retryAt,setRetryAt]=useState(0),[clock,setClock]=useState(Date.now())
- const [history,setHistory]=useState<RosterJob[]>([]),[historyLoaded,setHistoryLoaded]=useState(false),[historyNext,setHistoryNext]=useState<string|null>(null)
+ const [history,setHistory]=useState<RosterJobSummary[]>([]),[historyLoaded,setHistoryLoaded]=useState(false),[historyNext,setHistoryNext]=useState<string|null>(null)
  const lock=useRef(false),stop=useRef(false),alive=useRef(true),generation=useRef(0),requestId=useRef(''),callbacks=useRef({onBusy,onChanged,onUnits})
  callbacks.current={onBusy,onChanged,onUnits}
  const updateJob=(value:RosterJob|null)=>{setJob(value);if(value)setHistory(old=>old.some(item=>item.id===value.id)?old.map(item=>item.id===value.id?value:item):historyLoaded?[value,...old]:old)}
@@ -103,12 +103,14 @@ function JobSession({api,organizationId,kind,units,disabled,onBusy,onChanged,onU
   if(valid(g)){setMfa(false);setCode('');setNotice('验证成功，文件和进度已保留。请先核对服务器进度或重新点击校验；不会自动保存。')}
  })
  const loadHistory=(more=false)=>run('history',async g=>{
-  const result=await api<{list:RosterJob[];next:string|null}>(base+(more&&historyNext?`?before=${encodeURIComponent(historyNext)}`:''))
+  const result=await api<{list:RosterJobSummary[];next:string|null}>(base+(more&&historyNext?`?before=${encodeURIComponent(historyNext)}`:''))
   if(valid(g)){setHistory(old=>more?Array.from(new Map([...old,...result.list].map(j=>[j.id,j])).values()):result.list);setHistoryNext(result.next);setHistoryLoaded(true)}
  })
- const chooseHistory=(value:RosterJob)=>{
+ const chooseHistory=(summary:RosterJobSummary)=>run('history-detail',async g=>{
+  const value=await api<RosterJob>(`${base}/${summary.id}`)
+  if(!valid(g))return
   updateJob(value);setProof('');setPrepared(null);setVerified(false);setNeedsProgress(false);setError('');setNotice(value.status==='COMPLETED'?'已读取完整回执，无需重新选择文件。':'请重新选择该任务的原文件、工作表和列映射，再核对继续。');setText('');setSource(null);requestId.current=''
- }
+ })
  const newImport=()=>{updateJob(null);setNeedsProgress(false);invalidate();setNotice('当前输入已保留，请重新校验建立新任务；已有人员仍只会跳过或提示冲突。')}
  const jobIssues=job?.parts.flatMap(p=>p.issues)??[],allIssues=[...issues,...jobIssues]
  const pending=job?.parts.filter(p=>p.state!=='COMMITTED')??[]
