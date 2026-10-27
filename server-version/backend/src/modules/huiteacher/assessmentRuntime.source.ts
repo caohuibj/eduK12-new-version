@@ -1,3 +1,4 @@
+import {assertEducationAssessmentDistributionCurrent} from '../education-tools/assessment-resource.distribution'
 import {readEducationAssessmentDeliveryIdentity} from '../education-tools/assessment-resource.repository'
 import {assertEducationDeliveryIssuerCurrent} from '../education-tools/assessment-resource.authority'
 import type {TeacherAssessmentSourceAccess} from './assessmentRuntime.access'
@@ -12,6 +13,7 @@ export const teacherAssessmentRuntimeSource:TeacherAssessmentSourceAccess<Identi
  readIdentity:readEducationAssessmentDeliveryIdentity,
  async assertUse(tx,{identity,purpose}){
   if(purpose!=='START')return
+  await assertEducationAssessmentDistributionCurrent(tx,identity.origin)
   for(const proof of [...identity.authority].sort((a,b)=>a.actorId.localeCompare(b.actorId)))
    await assertEducationDeliveryIssuerCurrent(tx,{proof,organizationId:identity.origin.organizationId,product:'TEACHER'})
  },
