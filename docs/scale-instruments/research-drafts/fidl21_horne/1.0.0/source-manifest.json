@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "fidl21_horne_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "status": "SOURCE_KEY_PENDING_NOT_REGISTERED",
+  "source": {
+    "authors": [
+      "Kristina Horne",
+      "Tao Chen",
+      "Muireann Irish"
+    ],
+    "doi": "10.1111/bjc.12505",
+    "article": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12057328/",
+    "requiredSupplement": "BJC-64-315-s001.docx",
+    "supplementStatus": "UNRETRIEVED",
+    "originalLanguage": "en",
+    "citationYear": 2025
+  },
+  "form": {
+    "candidateItemCount": 21,
+    "initialNonFinalCount": 37,
+    "dimensions": [
+      {
+        "key": "repetition",
+        "count": 6
+      },
+      {
+        "key": "switching",
+        "count": 5
+      },
+      {
+        "key": "predictability_control",
+        "count": 4
+      },
+      {
+        "key": "routine",
+        "count": 3
+      },
+      {
+        "key": "thoughts_beliefs",
+        "count": 3
+      }
+    ],
+    "response": {
+      "min": 1,
+      "max": 5,
+      "anchors": [
+        "Never",
+        "Rarely",
+        "Sometimes",
+        "Often",
+        "All the time"
+      ],
+      "recall": "two weeks"
+    },
+    "totalArithmeticRange": [
+      21,
+      105
+    ],
+    "highScore": "less flexibility",
+    "itemTexts": null,
+    "itemFactorMap": null,
+    "reverseItemNumbers": null
+  },
+  "tags": [
+    "domain:cognitive_flexibility",
+    "construct:daily_life_inflexibility",
+    "orientation:transdiagnostic",
+    "population:adult_original_19_78",
+    "response:self_5_point_2_week",
+    "use:research",
+    "license:cc_by_4_paper_attribution",
+    "language_validation:zh_cn_pending",
+    "日常生活灵活性",
+    "行为灵活性",
+    "认知灵活性"
+  ],
+  "versions": {
+    "measurement": null,
+    "scoring": null,
+    "localization": null,
+    "report": null
+  },
+  "rights": {
+    "translation": "ADMIN_REVIEW",
+    "electronicAdministration": "ADMIN_REVIEW",
+    "redistribution": "ADMIN_REVIEW"
+  },
+  "checks": {
+    "sourceItems": "PENDING",
+    "scoringKey": "PENDING",
+    "reverseKey": "PENDING",
+    "staticArithmetic": "counts_only",
+    "vitest": "NOTRUN",
+    "typeScript": "NOTRUN",
+    "CI": "NOTRUN",
+    "database": "NOTRUN",
+    "deployment": "NOTRUN"
+  }
+}
