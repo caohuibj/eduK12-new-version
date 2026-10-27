@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "parental_stress_pss18_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "source": {
+    "authors": [
+      "Berry",
+      "Jones"
+    ],
+    "publicationYear": 1995,
+    "doi": "10.1177/0265407595123009",
+    "originalEnglishFullPdf": "https://www.corc.uk.net/media/2764/parent-stress-scale-fillable-pdf.pdf",
+    "licensingPage": "https://www.corc.uk.net/outcome-measures-guidance/directory-of-outcome-measures/parental-stress-scale-pss/",
+    "distinctFrom": [
+      "Cohen PSS10 Perceived Stress Scale",
+      "Cohen PSS14"
+    ]
+  },
+  "respondents": {
+    "type": "PARENT",
+    "subjectAge": "unrestricted_child_age",
+    "parentOrCarerSelfReport": true
+  },
+  "response": {
+    "scaleMin": 1,
+    "scaleMax": 5,
+    "officialLabels": [
+      "Strongly disagree",
+      "Disagree",
+      "Undecided",
+      "Agree",
+      "Strongly agree"
+    ],
+    "fixedRecallWindow": false
+  },
+  "scoring": {
+    "version": "1.0.0",
+    "itemCount": 18,
+    "reverseItemNumbers": [
+      1,
+      2,
+      5,
+      6,
+      7,
+      8,
+      17,
+      18
+    ],
+    "transform": "6-x",
+    "aggregation": "sum",
+    "range": [
+      18,
+      90
+    ],
+    "subscales": [],
+    "missingRule": "complete_required_project_choice"
+  },
+  "versions": {
+    "instrument": "1.0.0",
+    "scoring": "1.0.0",
+    "localization": "1.0.0",
+    "report": "1.0.0",
+    "reference": "none"
+  },
+  "rights": {
+    "corcPublicDomainStatement": true,
+    "corcFreeDigitalOrRemote": true,
+    "electronicSystemRequiresAuthorisation": true,
+    "adaptationRequiresWrittenPermission": true,
+    "publicGitHubTranslationRedistribution": "ADMIN_REVIEW_PENDING"
+  },
+  "checks": {
+    "authoredGoldenFixtures": 10,
+    "math": "static_checked",
+    "vitest": "NOTRUN",
+    "typescript": "NOTRUN",
+    "db": "NOTRUN",
+    "ci": "NOTRUN",
+    "activation": "DRAFT_HIDDEN"
+  }
+}

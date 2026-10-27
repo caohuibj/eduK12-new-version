@@ -1,0 +1,1486 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "parental_stress_pss18_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "下面的18句话描述人们作为父母或照护者时可能产生的感受和想法。请根据你与孩子（或家中孩子们）通常的相处经历，逐句判断自己是否同意。1表示非常不同意，2不同意，3不确定，4同意，5非常同意。没有正确答案；照顾孩子可能同时带来满足和压力，可以如实表达两方面感受。",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "依据Berry & Jones 1995原版及CORC发布完整英文18题PDF指导语独立起草的中文研究工作指引；固定家长/照护者自评，非Cohen感知压力表。"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "亲职压力量表（Parental Stress Scale，PSS-18）— 独立中文研究工作稿",
+      "abbreviation": "PARENTAL-PSS18-ZH-WORKING",
+      "instrumentFamily": "Parental Stress Scale (Berry & Jones, 1995); NOT Perceived Stress Scale (Cohen)"
+    },
+    "construct": {
+      "primaryDomain": "SOCIAL_EMOTIONAL",
+      "secondaryDomains": [
+        "WELL_BEING"
+      ],
+      "constructDefinition": "针对家长及照护者对养育角色的压力与满足体验，先对八个正向题反向，18题合计一项亲职压力总分。不是Cohen的PSS10、不是对父母养育能力或子女问题的诊断，不拆分未经确认证据的分量表。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "domain:parenting_stress",
+        "domain:parenting",
+        "domain:family_relationships",
+        "construct:parental_stress",
+        "construct:parental_role_burden",
+        "construct:parental_role_satisfaction",
+        "construct:positive_and_negative_parenthood_experiences",
+        "construct:one_total_no_facet_claim",
+        "orientation:parenting_research",
+        "orientation:family_support",
+        "orientation:stress_resources",
+        "orientation:not_general_perceived_stress",
+        "population:parents_or_carers",
+        "population:child_any_age_as_source",
+        "population:parent_self_report",
+        "population:independent_chinese_unvalidated",
+        "population:child_does_not_answer",
+        "response:parent",
+        "response:digital_parent_self",
+        "response:18_items",
+        "response:five_point_agreement",
+        "response:reverse_1_2_5_6_7_8_17_18",
+        "response:total_sum_18_to_90",
+        "response:fixed_original_order",
+        "response:no_fixed_recall_period",
+        "response:complete_required_project_choice",
+        "use:research",
+        "use:individual_reflection",
+        "use:score_only",
+        "use:not_diagnostic",
+        "use:not_selection",
+        "use:no_chinese_norms",
+        "use:no_clinical_cutoffs",
+        "license:corc_public_domain_statement",
+        "license:author_contact_required",
+        "license:electronic_integration_permission_required",
+        "license:derivatives_permission_required",
+        "license:redistribution_review_pending",
+        "language_validation:source_en",
+        "language_validation:content_zh-CN",
+        "language_validation:independent_working_translation",
+        "language_validation:expert_review_pending",
+        "language_validation:do_not_inherit_hk_chinese_scale_validity",
+        "language_validation:local_validation_pending",
+        "亲职压力",
+        "育儿压力",
+        "父母角色",
+        "照护者自评",
+        "家庭责任",
+        "压力与满足并存",
+        "18题",
+        "需联系作者",
+        "非诊断"
+      ]
+    },
+    "population": {
+      "respondentTypes": [
+        "PARENT"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "CORC说明该原18题量表适用于养育不同年龄儿童的父母或照护者，量表测量父母角色自身感受，不是儿童本人问卷；原英版研究与既有香港中文研究不能作为平台全新独立简体中文译稿有效性证明。由于适用儿童年龄宽，catalog不设置儿童年龄边界；PARENT身份/真实监护关系需场景适配层核查。"
+    },
+    "administration": {
+      "itemCount": 18,
+      "estimatedMinutes": 8,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED"
+      ],
+      "timeFrame": "典型的父母或照护者与孩子相处关系，无固定最近一周回忆期限。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "这是Berry/Jones Parental Stress Scale18，不是Cohen Perceived Stress Scale/一般感知压力量表PSS10；本源码使用专用身份防混。",
+        "严格保留CORC版原18题原序与5档同意程度：1 Strongly disagree，2 Disagree，3 Undecided，4 Agree，5 Strongly agree。",
+        "仅第1/2/5/6/7/8/17/18题按6−原分反向，然后18项原值求和18–90；高分仅表示更多报告亲职角色压力。",
+        "不采用未经版本匹配验证的各分量表、百分位、中国常模、疾病诊断或育儿胜任力合格标准。",
+        "不同孩子的父母或照护者均可作答，问卷可以针对一名孩子或全体孩子，但同一次施测应在指导语或研究元数据中明确参照对象，不能每题无记录地切换。",
+        "本平台DRAFT采取18题齐全才计算总分，缺答不插补，此规则不是作者正式的缺失值处理标准。",
+        "CORC写明可免费纸本及数字化远程使用，但电子系统集成与翻译改编需要联系权利方；内容加工不代表已具备公开上线许可。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "原版英文及海外多种翻译有研究，本独立简体中文工作译稿未经翻译审校/中国目标样本信效度研究。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "当前仅准备支持性家长报告文案；需要理解照护责任、资源和支持，不用于诊断。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "parental-stress-berry-jones1995-original",
+        "evidenceType": "CONTENT_VALIDITY",
+        "population": "Berry与Jones1995原研究成人父母；本新译中文未验证",
+        "locale": "en",
+        "territory": "US",
+        "studyDesign": "CORC完整原问卷及原开发研究说明18题5档、八题反向和唯一总分；此证据不迁移到本独立中文译文的可靠性结论。",
+        "rating": "UNKNOWN",
+        "citation": "Berry, J. O., & Jones, W. H. (1995). The Parental Stress Scale: Initial psychometric evidence. Journal of Social and Personal Relationships, 12(3), 463–472. https://doi.org/10.1177/0265407595123009.",
+        "doi": "10.1177/0265407595123009",
+        "url": "https://doi.org/10.1177/0265407595123009"
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "CORC官网完整Parental Stress Scale18原英文题本和反向计分表：https://www.corc.uk.net/media/2764/parent-stress-scale-fillable-pdf.pdf；平台独立简体中文研究工作稿，不复制香港或其他已验证翻译。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "源版权许可和本译稿的具体电子集成/公开再分发范围须由管理员确认；独立中文未做认知访谈及中国人群效度验证。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "parental_stress_pss18_zh_cn_research-1.0.0",
+    "respondentTypes": [
+      "PARENT"
+    ],
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "parental_stress_pss18_zh_cn_research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "parental_stress_pss18_zh_cn_research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "translation",
+      "display"
+    ],
+    "notes": [
+      "CORC权威说明（https://www.corc.uk.net/outcome-measures-guidance/directory-of-outcome-measures/parental-stress-scale-pss/）将Berry与Jones1995亲职压力PSS18描述为公共领域且允许免费纸面和远程/电子PDF使用，同时明确：改编/衍生需开发者书面许可；并入自有电子系统之前应取得权利人批准。CORC的可填写PDF共享许可并不自动覆盖本Eduk12独立中文工作译稿、公开GitHub完整题文再分发、数据库施测或商业整合。原18题、原题序与反向评分来源：https://www.corc.uk.net/media/2764/parent-stress-scale-fillable-pdf.pdf。管理员需核实作者Judy O. Berry等的电子集成、独立翻译、公开分发/商业使用及引用；联系待办不作为本批DRAFT内容编制阻塞。",
+      "CORC允许免费使用不等于本系统自动获电子集成授权。parent-role是PARENT技术策略，亲子关系由场景实际验证。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "Berry & Jones (1995) Parental Stress Scale 18 item CORC English original, independent Chinese working draft",
+        "citation": "Berry, J. O., & Jones, W. H. (1995). The Parental Stress Scale: Initial psychometric evidence. Journal of Social and Personal Relationships, 12(3), 463–472. https://doi.org/10.1177/0265407595123009.",
+        "url": "https://www.corc.uk.net/media/2764/parent-stress-scale-fillable-pdf.pdf",
+        "publicationYear": 1995
+      },
+      "license": {
+        "status": "unknown",
+        "redistribution": "restricted",
+        "note": "CORC权威说明（https://www.corc.uk.net/outcome-measures-guidance/directory-of-outcome-measures/parental-stress-scale-pss/）将Berry与Jones1995亲职压力PSS18描述为公共领域且允许免费纸面和远程/电子PDF使用，同时明确：改编/衍生需开发者书面许可；并入自有电子系统之前应取得权利人批准。CORC的可填写PDF共享许可并不自动覆盖本Eduk12独立中文工作译稿、公开GitHub完整题文再分发、数据库施测或商业整合。原18题、原题序与反向评分来源：https://www.corc.uk.net/media/2764/parent-stress-scale-fillable-pdf.pdf。管理员需核实作者Judy O. Berry等的电子集成、独立翻译、公开分发/商业使用及引用；联系待办不作为本批DRAFT内容编制阻塞。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "parental_pss18_agreement_1_5",
+          "options": [
+            {
+              "value": "1",
+              "label": "非常不同意",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "不同意",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "不确定",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "同意",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "非常同意",
+              "score": 5
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "PSS18_01",
+          "content": "作为父母，我感到快乐。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 0,
+          "responseSetKey": "parental_pss18_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PSS18_02",
+          "content": "只要孩子确实需要，几乎没有什么事是我不愿意为孩子做的。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 1,
+          "responseSetKey": "parental_pss18_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PSS18_03",
+          "content": "照顾孩子有时需要的时间和精力，超过了我能够付出的程度。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 2,
+          "responseSetKey": "parental_pss18_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PSS18_04",
+          "content": "我有时会担心自己为孩子做得还不够。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 3,
+          "responseSetKey": "parental_pss18_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PSS18_05",
+          "content": "我觉得自己与孩子很亲近。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 4,
+          "responseSetKey": "parental_pss18_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PSS18_06",
+          "content": "我享受与孩子在一起的时光。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 5,
+          "responseSetKey": "parental_pss18_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PSS18_07",
+          "content": "我的孩子是我获得关爱的重要来源。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 6,
+          "responseSetKey": "parental_pss18_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PSS18_08",
+          "content": "有孩子让我对未来感到更加有把握，也更加乐观。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 7,
+          "responseSetKey": "parental_pss18_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PSS18_09",
+          "content": "我生活中主要的压力来源是孩子。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 8,
+          "responseSetKey": "parental_pss18_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PSS18_10",
+          "content": "养育孩子让我生活中留给其他事情的时间和灵活安排空间很少。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 9,
+          "responseSetKey": "parental_pss18_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PSS18_11",
+          "content": "养育孩子给我带来了经济负担。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 10,
+          "responseSetKey": "parental_pss18_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PSS18_12",
+          "content": "由于要照顾孩子，我很难平衡生活中不同方面的责任。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 11,
+          "responseSetKey": "parental_pss18_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PSS18_13",
+          "content": "孩子的行为经常让我感到难堪或者很有压力。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 12,
+          "responseSetKey": "parental_pss18_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PSS18_14",
+          "content": "如果有机会重新作出决定，我可能会选择不要孩子。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 13,
+          "responseSetKey": "parental_pss18_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PSS18_15",
+          "content": "承担父母的责任有时让我感到不堪重负。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 14,
+          "responseSetKey": "parental_pss18_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PSS18_16",
+          "content": "有了孩子以后，我觉得自己能做的选择太少，对生活的掌控也太少。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 15,
+          "responseSetKey": "parental_pss18_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PSS18_17",
+          "content": "作为父母，我对自己感到满意。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 16,
+          "responseSetKey": "parental_pss18_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PSS18_18",
+          "content": "我觉得孩子给我的生活带来了乐趣。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 17,
+          "responseSetKey": "parental_pss18_agreement_1_5",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "itemRules": [
+          {
+            "itemCode": "PSS18_01",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "PSS18_02",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "PSS18_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PSS18_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PSS18_05",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "PSS18_06",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "PSS18_07",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "PSS18_08",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "PSS18_09",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PSS18_10",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PSS18_11",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PSS18_12",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PSS18_13",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PSS18_14",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PSS18_15",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PSS18_16",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PSS18_17",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "PSS18_18",
+            "transform": {
+              "type": "reverse"
+            }
+          }
+        ],
+        "scores": [
+          {
+            "key": "total",
+            "type": "total",
+            "label": "亲职压力总分",
+            "description": "CORC原18题1–5，反向1/2/5/6/7/8/17/18后求和18–90，高分只表示养育角色的压力体验报告得更多，不是疾病或好坏父母判断。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "PSS18_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PSS18_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PSS18_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PSS18_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PSS18_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PSS18_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PSS18_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PSS18_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PSS18_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PSS18_10",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PSS18_11",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PSS18_12",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PSS18_13",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PSS18_14",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PSS18_15",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PSS18_16",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PSS18_17",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PSS18_18",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "total"
+        ],
+        "scoreOrder": [
+          "total"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "total",
+            "headline": "照顾孩子时，你承担了哪些压力",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "成为父母或承担照护责任，可能既有亲近、满足和快乐，也有疲惫、担忧、经济负担以及时间不够用的时刻。这些感受可以同时存在，不需要通过否认某一面来证明自己是好家长。这个总分只是对18句话的自我报告，不是对你的爱、责任心或养育能力的评分，也不能说孩子就是造成压力的原因。可以回想最近哪项责任最需要有人共同分担，哪些关系和资源能够提供一点实际帮助。若压力持续影响生活，适当求助并不意味着做得不够好。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "哪些照护责任最近最让你感到吃力？哪些时候又会感到与孩子有联结？"
+              },
+              {
+                "category": "strategy",
+                "text": "挑一项实际可分担的事务，向家人或可信任的人明确提出一次具体的请求。"
+              },
+              {
+                "category": "support",
+                "text": "若疲惫、焦虑或关系压力持续影响生活，可以考虑专业的家庭支持或心理支持资源。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这是Berry/Jones1995亲职压力量表18题，不是Cohen PSS10感知压力量表；不能交叉使用题号、阈值或版本。",
+          "第1/2/5/6/7/8/17/18反向6−raw，再求和18–90；本草稿无统计验证过的分量表、没有中国常模、临床切点或父母合格标准。",
+          "高分描述压力体验，不意味着缺乏对子女的关爱，也不说明儿童必然存在问题；原条目既有积极也有消极角色感受。",
+          "本平台独立中文未通过双语译审、认知访谈或中国家长人群的心理测量验证；香港或其他语言研究不能直接被视为本译文常模。",
+          "完整18题才计算总分、缺答不插补是本站工作策略，不是作者指定的正式缺失处理规则。",
+          "CORC允许公共领域及免费远程形式使用，同时明确电子系统集成和改编需权利人同意；本独立工作稿的实施和GitHub再分发应由管理员确认。"
+        ],
+        "disclaimer": "Parental Stress Scale © Berry & Jones (1995)。本简体中文内容为EDUK12.TOP独立未验证研究工作稿，仅拟用于支持性非诊断反馈；尚未确认电子系统正式集成、译本与公开分发授权，不用于学校/家庭排名或医疗诊断。"
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "parental_stress_pss18",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "all_disagree",
+        "answers": [
+          {
+            "itemCode": "PSS18_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PSS18_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PSS18_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PSS18_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PSS18_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PSS18_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PSS18_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PSS18_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PSS18_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PSS18_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PSS18_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PSS18_12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PSS18_13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PSS18_14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PSS18_15",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PSS18_16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PSS18_17",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PSS18_18",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 50
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "all_agree",
+        "answers": [
+          {
+            "itemCode": "PSS18_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PSS18_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PSS18_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PSS18_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PSS18_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PSS18_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PSS18_07",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PSS18_08",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PSS18_09",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PSS18_10",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PSS18_11",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PSS18_12",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PSS18_13",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PSS18_14",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PSS18_15",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PSS18_16",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PSS18_17",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PSS18_18",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 58
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "all_neutral",
+        "answers": [
+          {
+            "itemCode": "PSS18_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_12",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_14",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_15",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_16",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_17",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_18",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 54
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "minimum_stress",
+        "answers": [
+          {
+            "itemCode": "PSS18_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PSS18_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PSS18_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PSS18_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PSS18_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PSS18_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PSS18_07",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PSS18_08",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PSS18_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PSS18_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PSS18_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PSS18_12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PSS18_13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PSS18_14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PSS18_15",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PSS18_16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PSS18_17",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PSS18_18",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 18
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "maximum_stress",
+        "answers": [
+          {
+            "itemCode": "PSS18_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PSS18_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PSS18_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PSS18_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PSS18_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PSS18_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PSS18_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PSS18_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PSS18_09",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PSS18_10",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PSS18_11",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PSS18_12",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PSS18_13",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PSS18_14",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PSS18_15",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PSS18_16",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PSS18_17",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PSS18_18",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 90
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "cycling",
+        "answers": [
+          {
+            "itemCode": "PSS18_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PSS18_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "PSS18_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PSS18_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PSS18_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PSS18_07",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "PSS18_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_09",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PSS18_10",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PSS18_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PSS18_12",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "PSS18_13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_14",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PSS18_15",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PSS18_16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PSS18_17",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "PSS18_18",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 61
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "positive_strong_negative_neutral",
+        "answers": [
+          {
+            "itemCode": "PSS18_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PSS18_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PSS18_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PSS18_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PSS18_07",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PSS18_08",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PSS18_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_12",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_14",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_15",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_16",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_17",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PSS18_18",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 38
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "reverse_only_first_missing",
+        "answers": [
+          {
+            "itemCode": "PSS18_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_12",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_14",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_15",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_16",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_17",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_18",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "total": null
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "regular_item_missing",
+        "answers": [
+          {
+            "itemCode": "PSS18_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_12",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_15",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_16",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_17",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSS18_18",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "total": null
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "all_missing",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "total": null
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      }
+    ]
+  }
+}
