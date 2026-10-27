@@ -1,0 +1,181 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "mspss12_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "source": {
+    "englishForm": "https://www.sralab.org/sites/default/files/2017-07/socsupp.pdf",
+    "sourceRegistry": "https://hsrp.sdsu.edu/measure-registry/multidimensional-scale-of-perceived-social-support-mspss/",
+    "authors": "Zimet/Dahlem/Zimet/Farley",
+    "year": 1988,
+    "doi": "10.1207/s15327752jpa5201_2"
+  },
+  "itemMapping": [
+    {
+      "number": 1,
+      "itemCode": "MSPSS12_01",
+      "facet": "significant_other"
+    },
+    {
+      "number": 2,
+      "itemCode": "MSPSS12_02",
+      "facet": "significant_other"
+    },
+    {
+      "number": 3,
+      "itemCode": "MSPSS12_03",
+      "facet": "family"
+    },
+    {
+      "number": 4,
+      "itemCode": "MSPSS12_04",
+      "facet": "family"
+    },
+    {
+      "number": 5,
+      "itemCode": "MSPSS12_05",
+      "facet": "significant_other"
+    },
+    {
+      "number": 6,
+      "itemCode": "MSPSS12_06",
+      "facet": "friends"
+    },
+    {
+      "number": 7,
+      "itemCode": "MSPSS12_07",
+      "facet": "friends"
+    },
+    {
+      "number": 8,
+      "itemCode": "MSPSS12_08",
+      "facet": "family"
+    },
+    {
+      "number": 9,
+      "itemCode": "MSPSS12_09",
+      "facet": "friends"
+    },
+    {
+      "number": 10,
+      "itemCode": "MSPSS12_10",
+      "facet": "significant_other"
+    },
+    {
+      "number": 11,
+      "itemCode": "MSPSS12_11",
+      "facet": "family"
+    },
+    {
+      "number": 12,
+      "itemCode": "MSPSS12_12",
+      "facet": "friends"
+    }
+  ],
+  "response": {
+    "min": 1,
+    "max": 7,
+    "officialAnchors": [
+      {
+        "score": 1,
+        "label": "非常强烈地不同意"
+      },
+      {
+        "score": 2,
+        "label": "强烈不同意"
+      },
+      {
+        "score": 3,
+        "label": "略不同意"
+      },
+      {
+        "score": 4,
+        "label": "既不赞同也不反对"
+      },
+      {
+        "score": 5,
+        "label": "略同意"
+      },
+      {
+        "score": 6,
+        "label": "强烈同意"
+      },
+      {
+        "score": 7,
+        "label": "非常强烈地同意"
+      }
+    ],
+    "reverseItems": []
+  },
+  "scoring": {
+    "version": "1.0.0",
+    "total": {
+      "items": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "aggregation": "mean"
+    },
+    "facets": [
+      {
+        "key": "significant_other",
+        "items": [
+          1,
+          2,
+          5,
+          10
+        ],
+        "aggregation": "mean"
+      },
+      {
+        "key": "family",
+        "items": [
+          3,
+          4,
+          8,
+          11
+        ],
+        "aggregation": "mean"
+      },
+      {
+        "key": "friends",
+        "items": [
+          6,
+          7,
+          9,
+          12
+        ],
+        "aggregation": "mean"
+      }
+    ],
+    "theoreticalRange": [
+      1,
+      7
+    ],
+    "missing": "complete_required_project_choice"
+  },
+  "rights": {
+    "publicEnglish": "free_to_access",
+    "translation": "author_contact_required",
+    "publicGitHubRedistribution": "unverified",
+    "commercial": "unverified"
+  },
+  "release": "DRAFT",
+  "checks": {
+    "staticConstructed": true,
+    "vitest": "NOTRUN",
+    "CI": "NOTRUN",
+    "DB": "NOTRUN"
+  }
+}

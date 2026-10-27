@@ -1,0 +1,1323 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "mspss12_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "text": "下面有12句话，涉及你感受到的来自家人、朋友和对你特别重要的人的支持。请根据自己现在的真实感受，分别判断同意程度。1表示非常强烈地不同意，7表示非常强烈地同意。没有正确或错误的答案，“特别重要的人”不限定为伴侣，可以是你认为重要的任何人。",
+    "source": "按Zimet等1988原版12题和Shirley Ryan AbilityLab英语施测表独立编写的简体中文指导语；不复制现有中文5级工具说明。"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "多维感知社会支持量表（MSPSS，12题）— 独立简体中文研究工作稿",
+      "abbreviation": "MSPSS12-ZH-WORKING",
+      "instrumentFamily": "Multidimensional Scale of Perceived Social Support (Zimet et al. 1988)"
+    },
+    "construct": {
+      "primaryDomain": "SOCIAL_EMOTIONAL",
+      "secondaryDomains": [
+        "WELL_BEING"
+      ],
+      "constructDefinition": "评估个人主观感受到的社会支持充足程度：家庭、朋友与重要他人三类不同来源，各四题，另外可求整体12题均分；不测客观社交人数、心理疾病、职业能力或关系好坏。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "domain:social_support",
+        "domain:wellbeing",
+        "construct:perceived_social_support",
+        "construct:perceived_support_adequacy",
+        "construct:significant_other_support",
+        "construct:family_support",
+        "construct:friend_support",
+        "construct:three_subscale_means_and_total_mean",
+        "construct:not_objective_network_size",
+        "orientation:social_support_theory",
+        "orientation:stress_buffering_related",
+        "orientation:not_therapy_specific",
+        "population:adult_research",
+        "population:project_18_plus",
+        "population:self_report",
+        "population:chinese_working_translation_unvalidated",
+        "population:not_child_norms",
+        "response:self",
+        "response:digital_self",
+        "response:12_items",
+        "response:original_seven_point_agreement",
+        "response:no_reverse_items",
+        "response:fixed_original_item_order",
+        "response:four_scores_mean_1_to_7",
+        "response:no_fixed_recall_window",
+        "response:complete_facet_required_project_policy",
+        "use:research",
+        "use:individual_reflection",
+        "use:score_only",
+        "use:not_diagnostic",
+        "use:not_selection",
+        "use:no_chinese_norms",
+        "use:no_activated_cutoffs",
+        "license:author_contact_required",
+        "license:redistribution_review_pending",
+        "license:official_publicly_available_free",
+        "license:original_author_attribution_required",
+        "license:independent_translation_review_pending",
+        "language_validation:source_en",
+        "language_validation:content_zh-CN",
+        "language_validation:independent_working_translation",
+        "language_validation:do_not_inherit_chinese_five_point_version",
+        "language_validation:expert_review_pending",
+        "language_validation:target_population_validation_pending",
+        "感知社会支持",
+        "重要他人",
+        "家庭支持",
+        "朋友支持",
+        "主观支持",
+        "成人自评",
+        "中文研究工作稿",
+        "非诊断"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "源1988研究取自大学生；本平台保守只限18岁及以上成人自评。中文独立译文未经专家审校与中国目标人群验证；不能把既有中文5级适配版的心理测量结果迁移到这套原7级版。"
+    },
+    "administration": {
+      "itemCount": 12,
+      "estimatedMinutes": 4,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED"
+      ],
+      "timeFrame": "当前对生活中一般支持关系的主观感受，无作者规定的过去七天或过去四周回顾窗。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "固定1988原版和SRALab英语PDF的12题次序，不将题目集中分组后重排，以免改变源题号。",
+        "七档正式锚点分别1非常强烈地不同意、2强烈不同意、3略不同意、4中立、5略同意、6强烈同意、7非常强烈地同意。不是部分中文研究的5点版本，也不是删除重要他人维度的8题版本。",
+        "重要他人1/2/5/10、家庭3/4/8/11、朋友6/7/9/12，各按1–7取四题均分；整体按12题均分，不反向，四种输出均范围1–7。",
+        "本工作稿缺一题不计算对应四题来源维度；整体均分要求全部12题，其他完成维度可展示。这是平台保守缺答策略而非作者原版已核实的插补规则。",
+        "不将重要他人默认翻译为配偶/恋人，不将家庭支持高低解释为家庭道德排名，不把社交支持解释成实际获得帮助的次数。",
+        "不启用未经核定适用于本独立中文7级译文的临床阈值、等级、中国常模和人群排名。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "原英语12题有结构研究，但平台独立中文译本的翻译等值及目标人群信效度均未确认。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "供普通成人理解可能得到支持的来源；不是诊断或选拔。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "mspss-zimet1988-original",
+        "evidenceType": "CONTENT_VALIDITY",
+        "population": "原研究美国大学生；非中国独立中文版的验证样本",
+        "locale": "en",
+        "territory": "US",
+        "studyDesign": "原开发研究提出感知社会支持三个来源及12题形式；本工作稿仅继承计分设计，不继承实证有效性。",
+        "rating": "UNKNOWN",
+        "citation": "Zimet, G. D., Dahlem, N. W., Zimet, S. G., & Farley, G. K. (1988). The Multidimensional Scale of Perceived Social Support. Journal of Personality Assessment, 52(1), 30–41. https://doi.org/10.1207/s15327752jpa5201_2.",
+        "doi": "10.1207/s15327752jpa5201_2",
+        "url": "https://doi.org/10.1207/s15327752jpa5201_2"
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Shirley Ryan AbilityLab作者原版12题英语表：https://www.sralab.org/sites/default/files/2017-07/socsupp.pdf；San Diego State University原版计分登记：https://hsrp.sdsu.edu/measure-registry/multidimensional-scale-of-perceived-social-support-mspss/；简体中文由EDUK12.TOP从英文独立起草，不复制既有验证中文5级版本。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "原版12题采用7点量尺；独立中文研究工作译文未经双语审校和中国成年人验证，不能借用已报告的5点中文量表cutoff或信效度。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "mspss12_zh_cn_research-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    },
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "mspss12_zh_cn_research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "mspss12_zh_cn_research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "translation",
+      "display"
+    ],
+    "notes": [
+      "MSPSS© Zimet、Dahlem、Zimet、Farley（1988），原始英文12题表由Shirley Ryan AbilityLab RehabMeasures提供（https://www.sralab.org/sites/default/files/2017-07/socsupp.pdf），San Diego State University测量登记页（https://hsrp.sdsu.edu/measure-registry/multidimensional-scale-of-perceived-social-support-mspss/）标明公开可得、免费，说明原版1–7、三维与总均分。免费可得不等于公共领域、CC或对完整独立中文译稿的GitHub公开再分发/商业下游授权；原论文由期刊出版。当前简体中文为直接依据12条原英语题义独立撰写的未验证工作稿，不复制现有中文5级译本。需管理员核实电子施测、翻译、公开再分发及商业使用范围，记录author_contact_required；不当作已获得额外许可，不以联系作者作为草稿开发阻塞。",
+      "管理员负责正式许可与版本身份确认；仍处于内容研发草稿阶段，不将版权待联系视为阻断。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "MSPSS original English 12-item form, independent Chinese research working translation",
+        "citation": "Zimet, G. D., Dahlem, N. W., Zimet, S. G., & Farley, G. K. (1988). The Multidimensional Scale of Perceived Social Support. Journal of Personality Assessment, 52(1), 30–41. https://doi.org/10.1207/s15327752jpa5201_2.",
+        "url": "https://www.sralab.org/sites/default/files/2017-07/socsupp.pdf",
+        "publicationYear": 1988
+      },
+      "license": {
+        "status": "unknown",
+        "redistribution": "restricted",
+        "note": "MSPSS© Zimet、Dahlem、Zimet、Farley（1988），原始英文12题表由Shirley Ryan AbilityLab RehabMeasures提供（https://www.sralab.org/sites/default/files/2017-07/socsupp.pdf），San Diego State University测量登记页（https://hsrp.sdsu.edu/measure-registry/multidimensional-scale-of-perceived-social-support-mspss/）标明公开可得、免费，说明原版1–7、三维与总均分。免费可得不等于公共领域、CC或对完整独立中文译稿的GitHub公开再分发/商业下游授权；原论文由期刊出版。当前简体中文为直接依据12条原英语题义独立撰写的未验证工作稿，不复制现有中文5级译本。需管理员核实电子施测、翻译、公开再分发及商业使用范围，记录author_contact_required；不当作已获得额外许可，不以联系作者作为草稿开发阻塞。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "mspss_agreement_1_7",
+          "options": [
+            {
+              "value": "1",
+              "label": "非常强烈地不同意",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "强烈不同意",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "略不同意",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "既不赞同也不反对",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "略同意",
+              "score": 5
+            },
+            {
+              "value": "6",
+              "label": "强烈同意",
+              "score": 6
+            },
+            {
+              "value": "7",
+              "label": "非常强烈地同意",
+              "score": 7
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "MSPSS12_01",
+          "content": "当我需要帮助时，有一位对我很重要的人愿意陪在我身边。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 0,
+          "responseSetKey": "mspss_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MSPSS12_02",
+          "content": "我有一位特别重要的人，可以和他／她分享快乐和难过。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 1,
+          "responseSetKey": "mspss_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MSPSS12_03",
+          "content": "我的家人确实会尽力帮助我。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 2,
+          "responseSetKey": "mspss_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MSPSS12_04",
+          "content": "我能从家人那里得到自己需要的情感帮助和支持。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 3,
+          "responseSetKey": "mspss_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MSPSS12_05",
+          "content": "有一位对我很重要的人，能够真正安慰我。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 4,
+          "responseSetKey": "mspss_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MSPSS12_06",
+          "content": "我的朋友确实会尽力帮助我。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 5,
+          "responseSetKey": "mspss_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MSPSS12_07",
+          "content": "当事情不顺利时，我能够依靠朋友。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 6,
+          "responseSetKey": "mspss_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MSPSS12_08",
+          "content": "我可以向家人谈论自己遇到的困难。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 7,
+          "responseSetKey": "mspss_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MSPSS12_09",
+          "content": "我有朋友可以一起分享快乐和难过。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 8,
+          "responseSetKey": "mspss_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MSPSS12_10",
+          "content": "在我的生活中，有一位特别重要的人会在意我的感受。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 9,
+          "responseSetKey": "mspss_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MSPSS12_11",
+          "content": "当我需要做决定时，家人愿意帮助我。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 10,
+          "responseSetKey": "mspss_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MSPSS12_12",
+          "content": "我可以向朋友谈论自己遇到的困难。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 11,
+          "responseSetKey": "mspss_agreement_1_7",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "itemRules": [
+          {
+            "itemCode": "MSPSS12_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MSPSS12_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MSPSS12_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MSPSS12_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MSPSS12_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MSPSS12_06",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MSPSS12_07",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MSPSS12_08",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MSPSS12_09",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MSPSS12_10",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MSPSS12_11",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MSPSS12_12",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "scores": [
+          {
+            "key": "total",
+            "type": "total",
+            "label": "整体感知社会支持",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "MSPSS12_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MSPSS12_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MSPSS12_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MSPSS12_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MSPSS12_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MSPSS12_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MSPSS12_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MSPSS12_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MSPSS12_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MSPSS12_10",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MSPSS12_11",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MSPSS12_12",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "significant_other",
+            "type": "dimension",
+            "label": "重要他人的支持",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "MSPSS12_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MSPSS12_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MSPSS12_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MSPSS12_10",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "family",
+            "type": "dimension",
+            "label": "家人的支持",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "MSPSS12_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MSPSS12_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MSPSS12_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MSPSS12_11",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "friends",
+            "type": "dimension",
+            "label": "朋友的支持",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "MSPSS12_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MSPSS12_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MSPSS12_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MSPSS12_12",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "total",
+          "significant_other",
+          "family",
+          "friends"
+        ],
+        "scoreOrder": [
+          "total",
+          "significant_other",
+          "family",
+          "friends"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "total",
+            "headline": "你觉得生活中有哪些支持可以依靠",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这份问卷了解的是：当生活中需要帮忙、分享心情或做决定时，你觉得身边有没有人愿意理解和支持你。整体分数综合了来自家人、朋友和对你特别重要的人的感受，但它不等于你朋友的数量，也不意味着关系一定不存在问题。有时某一种来源的支持多一些，另一种少一些，这种差异也值得被看见。如果你愿意，可以想一想：现在最容易依靠的是哪一种关系？还有哪一件具体的事情，让你希望获得更多理解或帮助？",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "遇到困难时，你一般最愿意找谁谈谈？"
+              },
+              {
+                "category": "strategy",
+                "text": "根据实际情况，向一位可信任的人表达一个具体而不过分勉强的需要。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "significant_other",
+            "headline": "重要他人的支持",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这一组回答关注你身边有没有一位对你特别重要、能够听你分享快乐与难过的人。他可能是伴侣、亲近的朋友、亲属，或者其他让你觉得安心的人，不必被限定为某一种关系。这个分数记录你对支持的感受，并不是说你应该拥有哪种亲密关系，也不表示支持实际发生的次数。可以想一想，遇到困难时你通常愿意先联系谁；如果暂时没有合适的人，也不意味着自己做得不够好，可以慢慢寻找值得信任的联系。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "谁会让你觉得自己的感受被认真看见？"
+              },
+              {
+                "category": "strategy",
+                "text": "找一个安全而自然的机会，和可信任的人分享一件小事或一种需要。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "family",
+            "headline": "家人的支持",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "家人给予支持的方式有很多种：一起商量难题、认真倾听、表达理解，或者在有需要时提供具体帮助。这四个回答记录的是你觉得自己能否从家人那里得到这类支持，而不是给你的家庭打分。有些人和家人的关系很亲密，也有人因为距离、关系或生活处境，很难向家人开口。可以思考：哪些回应让你感到被支持？如果有些需要暂时无法从家人那里得到，其他关系或资源是否能够提供一点帮助？",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "遇到困难时，家人哪种回应最能帮助你？"
+              },
+              {
+                "category": "strategy",
+                "text": "如果合适，可以用一句具体的话告诉家人：你此刻更需要倾听、陪伴还是建议。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "friends",
+            "headline": "朋友的支持",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "朋友不一定要很多，重要的是在你遇到不顺利的事情、想分享开心或难过时，是否有人愿意认真听你说话。这一维度描述你目前感受到的朋友支持，不是对受欢迎程度或交友能力的判断。有时朋友彼此忙碌，支持也可能因为距离、时间和具体经历而改变。可以回想最近一次向朋友表达真实心情的经历：什么让你感觉被理解？如果你想建立更多联系，也可以从一个负担较小的分享或问候开始。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近有没有哪次与朋友的交流让你觉得被理解？"
+              },
+              {
+                "category": "strategy",
+                "text": "选择一种适合双方的方式，向一位信任的朋友问候或分享。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "本工具测量主观感知支持，不计算真实关系数量、帮助次数、亲密关系质量或身心疾病风险。",
+          "原英语1988版为12题7级同意度，三维每维4题均分及整体12题均分，均1–7；不可直接套用某些中文5点或8题改编版的分数/阈值。",
+          "重要他人不限定为伴侣、配偶或监护人；支持来源具有文化和生活背景差异，不能仅凭分数评价家庭或个人价值。",
+          "独立简体中文工作译稿未经专业译审、认知访谈及中国目标群体验证；不继承原英语或其他正式中文译文的科学资格。",
+          "各维须该维4题齐备，整体需12题完整；缺答不插补，为当前平台草稿规则而不是已核实的作者缺失准则。",
+          "官网/科研测量目录显示原英语免费公开可得，但独立译稿、数字施测与公开GitHub再分发的权利范围仍由管理员确定。"
+        ],
+        "disclaimer": "MSPSS © Zimet等（1988）。本版本为EDUK12.TOP独立简体中文研究工作稿，不是已验证或官方许可的中文版本。结果仅用于非诊断性研究准备与个人反思，不用于学校排名、临床诊断或高风险决策。"
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "mspss12",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "MSPSS12_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MSPSS12_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MSPSS12_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MSPSS12_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MSPSS12_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MSPSS12_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MSPSS12_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MSPSS12_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MSPSS12_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MSPSS12_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MSPSS12_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MSPSS12_12",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 1,
+            "significant_other": 1,
+            "family": 1,
+            "friends": 1
+          },
+          "totalScoreKeys": [
+            "total",
+            "significant_other",
+            "family",
+            "friends"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "MSPSS12_01",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "MSPSS12_02",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "MSPSS12_03",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "MSPSS12_04",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "MSPSS12_05",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "MSPSS12_06",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "MSPSS12_07",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "MSPSS12_08",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "MSPSS12_09",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "MSPSS12_10",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "MSPSS12_11",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "MSPSS12_12",
+            "responseValue": "7"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 7,
+            "significant_other": 7,
+            "family": 7,
+            "friends": 7
+          },
+          "totalScoreKeys": [
+            "total",
+            "significant_other",
+            "family",
+            "friends"
+          ]
+        }
+      },
+      {
+        "name": "neutral",
+        "answers": [
+          {
+            "itemCode": "MSPSS12_01",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MSPSS12_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MSPSS12_03",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MSPSS12_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MSPSS12_05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MSPSS12_06",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MSPSS12_07",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MSPSS12_08",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MSPSS12_09",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MSPSS12_10",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MSPSS12_11",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MSPSS12_12",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 4,
+            "significant_other": 4,
+            "family": 4,
+            "friends": 4
+          },
+          "totalScoreKeys": [
+            "total",
+            "significant_other",
+            "family",
+            "friends"
+          ]
+        }
+      },
+      {
+        "name": "only_significant_other_7",
+        "answers": [
+          {
+            "itemCode": "MSPSS12_01",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "MSPSS12_02",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "MSPSS12_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MSPSS12_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MSPSS12_05",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "MSPSS12_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MSPSS12_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MSPSS12_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MSPSS12_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MSPSS12_10",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "MSPSS12_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MSPSS12_12",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 3,
+            "significant_other": 7,
+            "family": 1,
+            "friends": 1
+          },
+          "totalScoreKeys": [
+            "total",
+            "significant_other",
+            "family",
+            "friends"
+          ]
+        }
+      },
+      {
+        "name": "only_family_7",
+        "answers": [
+          {
+            "itemCode": "MSPSS12_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MSPSS12_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MSPSS12_03",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "MSPSS12_04",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "MSPSS12_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MSPSS12_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MSPSS12_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MSPSS12_08",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "MSPSS12_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MSPSS12_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MSPSS12_11",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "MSPSS12_12",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 3,
+            "significant_other": 1,
+            "family": 7,
+            "friends": 1
+          },
+          "totalScoreKeys": [
+            "total",
+            "significant_other",
+            "family",
+            "friends"
+          ]
+        }
+      },
+      {
+        "name": "only_friends_7",
+        "answers": [
+          {
+            "itemCode": "MSPSS12_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MSPSS12_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MSPSS12_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MSPSS12_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MSPSS12_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MSPSS12_06",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "MSPSS12_07",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "MSPSS12_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MSPSS12_09",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "MSPSS12_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MSPSS12_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MSPSS12_12",
+            "responseValue": "7"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 3,
+            "significant_other": 1,
+            "family": 1,
+            "friends": 7
+          },
+          "totalScoreKeys": [
+            "total",
+            "significant_other",
+            "family",
+            "friends"
+          ]
+        }
+      },
+      {
+        "name": "mixed_cycle",
+        "answers": [
+          {
+            "itemCode": "MSPSS12_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MSPSS12_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MSPSS12_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MSPSS12_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MSPSS12_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MSPSS12_06",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "MSPSS12_07",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "MSPSS12_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MSPSS12_09",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MSPSS12_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MSPSS12_11",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MSPSS12_12",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 3.5833333333333335,
+            "significant_other": 2.75,
+            "family": 3,
+            "friends": 5
+          },
+          "totalScoreKeys": [
+            "total",
+            "significant_other",
+            "family",
+            "friends"
+          ]
+        }
+      },
+      {
+        "name": "one_family_missing",
+        "answers": [
+          {
+            "itemCode": "MSPSS12_01",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MSPSS12_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MSPSS12_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MSPSS12_05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MSPSS12_06",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MSPSS12_07",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MSPSS12_08",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MSPSS12_09",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MSPSS12_10",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MSPSS12_11",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MSPSS12_12",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "total": null,
+            "significant_other": 4,
+            "family": null,
+            "friends": 4
+          },
+          "totalScoreKeys": [
+            "total",
+            "significant_other",
+            "family",
+            "friends"
+          ]
+        }
+      },
+      {
+        "name": "all_missing",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "total": null,
+            "significant_other": null,
+            "family": null,
+            "friends": null
+          },
+          "totalScoreKeys": [
+            "total",
+            "significant_other",
+            "family",
+            "friends"
+          ]
+        }
+      }
+    ]
+  }
+}
