@@ -1,6 +1,7 @@
 import {clone,type RecognitionContext,type Asset} from './contracts'
 import {sha256} from '@noble/hashes/sha256'
 import {bytesToHex} from '@noble/hashes/utils'
+import {RECOGNITION_PRACTICE_ORDER,assertRecognitionPracticePolicy} from './generated/practice'
 export function validateContext(value:RecognitionContext,syntheticReview=false):RecognitionContext {
   const c=clone(value), hex=(s:string)=>typeof s==='string'&&/^[a-f0-9]{64}$/.test(s)
   if(!c.contextKey||c.contextKey.length>512||!hex(c.configHash)||!hex(c.protocolSignature)||!hex(c.manifestHash)
@@ -23,7 +24,8 @@ export function validateContext(value:RecognitionContext,syntheticReview=false):
   if(counts['target-first']!==t||counts['target-repeat']!==t||counts['filler-first']!==(total===260?124:54)||counts['vigilance-repeat']!==(total===260?16:6))throw Error('Frozen counts mismatch')
   for(const pair of m.targetPairs){const a=m.formal[pair.firstIndex],b=m.formal[pair.repeatIndex]
     if(!a||!b||a.kind!=='target-first'||b.kind!=='target-repeat'||a.assetId!==b.assetId||a.assetId!==pair.assetId||b.firstIndex!==a.index||pair.lagImages!==b.index-a.index)throw Error('Frozen target pair mismatch')}
-  const practiceOrder=[0,1,2,0,3,1,4,5]
+  if('practicePolicy' in p)assertRecognitionPracticePolicy(p.practicePolicy)
+  const practiceOrder='practicePolicy' in p?RECOGNITION_PRACTICE_ORDER:[0,1,2,0,3,1,4,5]
   if(m.practice.some((r,i)=>r.index!==i||r.assetId!==p.practiceAssetIds[practiceOrder[i]]||r.seenBefore!==(practiceOrder.indexOf(practiceOrder[i])<i)))throw Error('Frozen independent practice mismatch')
   const a=c.assetManifest
   if(p.qualityRule!=='product-session-descriptive-0.2.0'||p.assetManifestBinding?.status!==a.status

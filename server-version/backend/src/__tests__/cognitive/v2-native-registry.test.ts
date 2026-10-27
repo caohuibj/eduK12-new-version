@@ -9,7 +9,7 @@ import { runAuthoritativeScorer } from '../../modules/cognitive/v2/authoritative
 import { projectThreeLayerReport } from '../../modules/cognitive/v2/report'
 import { createMotSnapshot,motDefinition } from '../../modules/cognitive/content-candidates/mot/package'
 import { createEnumerationSnapshot,enumerationDefinition,enumerationRecipeDefinition } from '../../modules/cognitive/content-candidates/enumeration/package'
-import { createRecognitionSnapshot,recognitionDefinition } from '../../modules/cognitive/content-candidates/continuous-recognition/package'
+import { createRecognitionSnapshot,recognitionDefinition,guidedRecognitionDefinition } from '../../modules/cognitive/content-candidates/continuous-recognition/package'
 import { createAntSnapshot,antDefinition,antGuidedDefinition } from '../../modules/cognitive/content-candidates/ant/package'
 import { antPlan,antTrialEnvelope,type AntTrial } from '../../modules/cognitive/content-candidates/ant/protocol'
 import { createSessionConfigSnapshot } from '../../modules/cognitive/v2/session-snapshot'
@@ -58,7 +58,7 @@ describe('Explicit native v2 registry admission',()=>{
   expect(getCognitiveV2TaskDefinition('unknown-task','1.0.0','1.0.0')).toBeUndefined()
  })
  it('covers the exact combined inventory and rejects missing, duplicate or cloned native backing',()=>{
-  const expectedNative=[motDefinition,enumerationDefinition,enumerationRecipeDefinition,recognitionDefinition,antDefinition,antGuidedDefinition]
+  const expectedNative=[motDefinition,enumerationDefinition,enumerationRecipeDefinition,recognitionDefinition,guidedRecognitionDefinition,antDefinition,antGuidedDefinition]
   const definitions=listCognitiveV2TaskDefinitions(),legacy=listCognitiveRegistryEntries(),expected=[...legacy,...expectedNative].map(key).sort()
   expect(definitions.map(key).sort()).toEqual(expected);expect(new Set(expected).size).toBe(expected.length)
   expect(listNativeCognitiveTaskDefinitions()).toEqual(expectedNative)

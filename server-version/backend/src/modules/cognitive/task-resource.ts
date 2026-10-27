@@ -6,7 +6,7 @@ import { getAntIdentity } from './content-candidates/ant/protocol'
 import { getEnumerationIdentity, ENUMERATION_RECIPE_IDENTITY } from './content-candidates/enumeration/protocol'
 import { getMotReportBundle } from './content-candidates/mot/package'
 import { MOT_IDENTITY } from './content-candidates/mot/protocol'
-import { NATIVE_IDENTITY } from './content-candidates/continuous-recognition/native'
+import { getRecognitionIdentity } from './content-candidates/continuous-recognition/native'
 import { BAD_REQUEST } from './cognitive.errors'
 /** Display/freeze metadata only: no legacy score method or manufactured numeric score. */
 interface ResourceMetadata {
@@ -36,8 +36,11 @@ const nativeVersionFacts = (d: TaskDefinition) => {
   }
   if (d.testType === 'mot') return { configVersion: MOT_IDENTITY.configVersion, profileDefinitionVersion: MOT_IDENTITY.configVersion,
     metricDefinitionVersion: MOT_IDENTITY.scoringVersion, qualityDefinitionVersion: MOT_IDENTITY.scoringVersion }
-  if (d.testType === 'continuous-recognition') return { configVersion: NATIVE_IDENTITY.configVersion, profileDefinitionVersion: NATIVE_IDENTITY.configVersion,
-    metricDefinitionVersion: NATIVE_IDENTITY.scoringVersion, qualityDefinitionVersion: NATIVE_IDENTITY.scoringVersion }
+  if (d.testType === 'continuous-recognition') {
+    const id=getRecognitionIdentity(d.engineVersion,d.scoringVersion)
+    if(!id)throw BAD_REQUEST('No exact recognition version metadata')
+    return {configVersion:id.configVersion,profileDefinitionVersion:id.configVersion,metricDefinitionVersion:id.scoringVersion,qualityDefinitionVersion:id.scoringVersion}
+  }
   throw BAD_REQUEST('No exact native version metadata')
 }
 const nativeResource = (definition: TaskDefinition<unknown, unknown>): CognitiveTaskResource => ({

@@ -1,4 +1,4 @@
-import type { NativeTrial,NativeConfig,projectNativeRecognitionReport } from '../../../../../../backend/src/modules/cognitive/content-candidates/continuous-recognition/native'
+import type { NativeTrial,NativeConfig,RecognitionConfig,projectNativeRecognitionReport } from '../../../../../../backend/src/modules/cognitive/content-candidates/continuous-recognition/native'
 import type { Manifest } from '../../../../../../backend/src/modules/cognitive/content-candidates/continuous-recognition/protocol'
 import type { TrialEnvelope } from '../../../../../../backend/src/modules/cognitive/v2/types'
 export type { NativeTrial,NativeConfig }
@@ -7,11 +7,11 @@ export type NativeReport=ReturnType<typeof projectNativeRecognitionReport>
 export interface Asset {assetId:string;sha256:string;url:string;width:number;height:number}
 /** Host-produced, already verified platform freeze/asset binding. No independent client generator or publication authority. */
 export interface RecognitionContext {contextKey:string;configHash:string;protocolSignature:string;randomSeed:string;
-  manifestHash:string;config:NativeConfig;manifest:Manifest;
+  manifestHash:string;config:RecognitionConfig;manifest:Manifest;
   presentationApproval:'recognition-300-css-single-seen-20261026';
   assetManifest:{status:'authorized'|'synthetic-review-only'|'pending';manifestHash:string;evidenceRef:string;assets:Asset[]}}
 export interface CapturedRecord {contextKey:string;recordKey:string;binding:{configHash:string;protocolSignature:string;manifestHash:string;assetManifestHash:string;randomSeed:string};phase:'practice'|'formal';envelope:Envelope;
-  note:{stopReason:string|null;synthetic:boolean;unassignedBoundaryEvents:NativeTrial['events'];allEvents:NativeTrial['events'];
+  note:{practice?:{policyVersion:'recognition-guided-practice-v1';round:number;imageMs:1200;isiMs:800};stopReason:string|null;synthetic:boolean;unassignedBoundaryEvents:NativeTrial['events'];allEvents:NativeTrial['events'];
     actualExposure:{imageOnsetMs:number;imageOffsetMs:number|null;windowEndMs:number|null};realm:{timeOriginMs:number;pageInstanceId:string}}}
 export interface SealedRecord extends CapturedRecord {recordDigest:string}
 export interface LocalReceipt {contextKey:string;recordKey:string;recordDigest:string;retained:true}

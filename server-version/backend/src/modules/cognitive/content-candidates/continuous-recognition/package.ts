@@ -3,6 +3,8 @@ import { createSessionConfigSnapshot } from '../../v2/session-snapshot'
 import { IDENTITY, type Profile } from './protocol'
 import { nativeConfig,nativeConfigSchema,nativeTrialSchema,NATIVE_IDENTITY,NATIVE_PROTOCOL,scoreNativeRecognition,
   type NativeConfig,type NativeTrial,type AssetManifestBinding,NATIVE_QUALITY_RULE } from './native'
+import {RECOGNITION_GUIDED_IDENTITY,RECOGNITION_PRACTICE_POLICY} from './practice'
+import {guidedRecognitionConfig,guidedRecognitionConfigSchema,GUIDED_RECOGNITION_PROTOCOL,scoreGuidedRecognition,type GuidedRecognitionConfig} from './native'
 const gate=['assetAuthorizationMissing','noValidTargetPairs','incompleteRecords','technicalLoss','incompleteTargetPairs']
 function metric(key:string,label:string,role:MetricDefinition['role'],unit:MetricDefinition['unit']='ratio',
   valueType:MetricDefinition['valueType']='number'):MetricDefinition {
@@ -56,3 +58,17 @@ export function createRecognitionSnapshot(profile:Profile,formalAssetIds:string[
 }
 export { RECOGNITION_METADATA } from './metadata'
 export { recognitionTrialEnvelope, projectNativeRecognitionReport } from './native'
+
+export const guidedRecognitionDefinition:TaskDefinition<GuidedRecognitionConfig,NativeTrial>={...recognitionDefinition,
+  engineVersion:RECOGNITION_GUIDED_IDENTITY.engineVersion,configSchema:guidedRecognitionConfigSchema,
+  protocol:GUIDED_RECOGNITION_PROTOCOL,scorer:scoreGuidedRecognition,
+  profiles:{research:{estimatedMinutes:[7,11],configPatch:{...recognitionDefinition.profiles.research!.configPatch,practicePolicy:{...RECOGNITION_PRACTICE_POLICY}},
+    reportCaveats:['科研版260正式呈现；每轮8次较易练习，至少7次正确，最多3轮。研究与发表按实际设计及适用证据说明。']},
+    experience:{estimatedMinutes:[3,6],configPatch:{...recognitionDefinition.profiles.experience!.configPatch,practicePolicy:{...RECOGNITION_PRACTICE_POLICY}},
+    reportCaveats:['实用版100正式呈现；每轮8次较易练习，至少7次正确，最多3轮。工作用途的精度与适用性需相应证据，不承诺与长版等值。']}},
+  publication:{status:'DRAFT',referenceRequired:false,evidenceNote:'已确认教学协议的内容候选；正式图片许可、产品宿主、seed与归档接线仍未完成。'}}
+export function createGuidedRecognitionSnapshot(profile:Profile,formalAssetIds:string[],practiceAssetIds:string[],
+  frozenAt='2026-10-27T00:00:00.000Z',binding:AssetManifestBinding={status:'pending',manifestHash:null,evidenceRef:null}):SessionConfigSnapshot<GuidedRecognitionConfig> {
+  return createSessionConfigSnapshot({definition:guidedRecognitionDefinition,configVersion:RECOGNITION_GUIDED_IDENTITY.configVersion,
+    config:guidedRecognitionConfig(profile,formalAssetIds,practiceAssetIds,binding),frozenAt:new Date(frozenAt)})
+}

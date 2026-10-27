@@ -3,6 +3,8 @@ import { ANT_GUIDED_IDENTITY } from '../ant/protocol'
 import { createAntGuidedPresentation } from '../ant/participant-presentation'
 import { ENUMERATION_RECIPE_IDENTITY } from '../enumeration/protocol'
 import { createEnumerationParticipantPresentation } from '../enumeration/participant-presentation'
+import {RECOGNITION_GUIDED_IDENTITY} from '../continuous-recognition/practice'
+import {createRecognitionGuidedPresentation} from '../continuous-recognition/participant-presentation'
 export interface NativePresentationIdentity {
   testType: string; engineVersion: string; scoringVersion: string; configVersion: string
 }
@@ -15,7 +17,7 @@ const factories: Array<{ identity: NativePresentationIdentity; create: () => Cog
     configVersion: ENUMERATION_RECIPE_IDENTITY.configVersion,
   },
   create: createEnumerationParticipantPresentation,
-},{identity:ANT_GUIDED_IDENTITY,create:createAntGuidedPresentation}]
+},{identity:ANT_GUIDED_IDENTITY,create:createAntGuidedPresentation},{identity:RECOGNITION_GUIDED_IDENTITY,create:createRecognitionGuidedPresentation}]
 /**
  * Exact tuple only, for native tasks that have no legacy RegistryEntry to read a presentation from.
  * An unregistered identity returns undefined and keeps the previous no-presentation behaviour.

@@ -3,7 +3,7 @@ import type {NativeReport} from './contracts'
 import {isNativeRecognitionProjection} from './report-projection'
 import './recognition.css'
 /** Receives only the authoritative this-session projection, never internal metrics or a client approval switch. */
-export function RecognitionReport({report,language='zh',synthetic=false}:{report:NativeReport;language?:'zh'|'en';synthetic?:boolean}){
+export function RecognitionReport({report,language='zh',synthetic=false,guidedPractice=false}:{report:NativeReport;language?:'zh'|'en';synthetic?:boolean;guidedPractice?:boolean}){
   const en=language==='en',allowed=isNativeRecognitionProjection(report)&&report.state==='interpretable',invalid=report.state==='invalid'
   const count=(x:number|null)=>typeof x==='number'&&Number.isSafeInteger(x)&&x>=0&&x<=260?x:'—'
   const percent=(x:number)=>new Intl.NumberFormat(en?'en':'zh-CN',{maximumFractionDigits:1}).format(x*100)
@@ -16,7 +16,9 @@ export function RecognitionReport({report,language='zh',synthetic=false}:{report
         <dt>{en?'First-time target pictures marked Seen':'目标图片首次出现时的误认率'}</dt><dd>{percent(report.falseAlarmRate!)}% · {report.targetFalseAlarms}/{report.denominator}</dd>
         <dt>{en?'Identification rate minus false-alarm rate':'识别率减误认率'}</dt><dd>{percent(report.correctedRecognitionRate!)} {en?'percentage points':'个百分点'}</dd></dl>
       <p>{en?'These are records from this run, not a rating of your everyday memory.': '这些数字只描述本轮图片识别，不代表你的日常记忆能力。'}</p>
-      {report.profile==='experience'&&<p>{en?'This shorter version has fewer observations; use it as a starting point for self-observation.':'体验版记录次数较少，可作为进一步自我观察的起点。'}</p>}
+      {guidedPractice&&<p>{en?(report.profile==='research'?'Research version':'Practical version'):(report.profile==='research'?'科研版':'实用版')}</p>}
+      {report.profile==='experience'&&guidedPractice&&<p>{en?'The practical version has fewer observations. Consider the precision and evidence needed for your intended work use.':'实用版测量次数较少，用于工作中的观察与交流时，请同时考虑该用途所需的精度与适用证据。'}</p>}
+      {report.profile==='experience'&&!guidedPractice&&<p>{en?'This shorter version has fewer observations; use it as a starting point for self-observation.':'体验版记录次数较少，可作为进一步自我观察的起点。'}</p>}
     </>:<p>{en?'Some key records or picture requirements are incomplete, so performance conclusions are hidden. This does not mean you performed poorly.':'关键记录或图片条件尚不完整，因此这次不展示表现结论。这不代表你做得不好。'}</p>}
     {!invalid&&<p>{en?'Recorded presentations':'已记录呈现'}：{count(report.receivedTrialCount)} / {count(report.expectedTrialCount)}</p>}
     <p>{en?'For next time, keep your device still and turn off notifications.':'下次可以把设备放稳、关闭通知，减少中断。'}</p>

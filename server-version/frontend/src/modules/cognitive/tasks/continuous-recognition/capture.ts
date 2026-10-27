@@ -6,7 +6,7 @@ export class RecognitionCapture {
   stage:Stage='image';private sequence=0;private stopReason:string|null=null
   private lastTime:number;private flags={timeout:false,premature:false};private qualityEvents:Envelope['qualityEvents']=[]
   readonly payload:NativeTrial;private actual:{imageOnsetMs:number;imageOffsetMs:number|null;windowEndMs:number|null}
-  constructor(index:number,assetId:string,kind:Kind,now:number){
+  constructor(index:number,assetId:string,kind:Kind,now:number,private readonly timing:{imageMs:number;isiMs:number}={imageMs:750,isiMs:800}){
     this.lastTime=now;this.actual={imageOnsetMs:now,imageOffsetMs:null,windowEndMs:null}
     this.payload={record:{index,assetId,kind,imageOnsetMs:now,imageOffsetMs:null,windowEndMs:null,status:'complete',interruptions:[]},
       events:[],startedAtPerfMs:now,endedAtPerfMs:now,recordOrigin:'live',telemetryOverflow:false}
@@ -14,8 +14,8 @@ export class RecognitionCapture {
   tick(now:number):Stage {
     this.check(now)
     const r=this.payload.record
-    if(this.stage==='image'&&now-this.payload.startedAtPerfMs>=750){r.imageOffsetMs=now;this.actual.imageOffsetMs=now;this.stage='isi'}
-    else if(this.stage==='isi'&&now-r.imageOffsetMs!>=800&&this.payload.events.every(e=>e.atMs<now)){
+    if(this.stage==='image'&&now-this.payload.startedAtPerfMs>=this.timing.imageMs){r.imageOffsetMs=now;this.actual.imageOffsetMs=now;this.stage='isi'}
+    else if(this.stage==='isi'&&now-r.imageOffsetMs!>=this.timing.isiMs&&this.payload.events.every(e=>e.atMs<now)){
       r.windowEndMs=now;this.actual.windowEndMs=now;this.payload.endedAtPerfMs=now;this.stage='complete'
     }
     return this.stage

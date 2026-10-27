@@ -3,7 +3,8 @@ import type { AuthoritativeScorerInput, CognitiveScoreResult, ProtocolDefinition
 import { parseSessionConfigSnapshot } from '../../v2/session-snapshot'
 import { canonicalJson } from '../../v2/canonical'
 import { parseTrialEnvelope } from '../../v2/trial-envelope'
-import { freezeCandidate, IDENTITY, type Profile } from './protocol'
+import { freezeCandidate, digest, IDENTITY, type Profile } from './protocol'
+import {RECOGNITION_GUIDED_IDENTITY,RECOGNITION_PRACTICE_POLICY,assertRecognitionPracticePolicy,recognitionPracticeManifest} from './practice'
 import { scoreRecognition, type RawRecord, type RawEvent } from './scorer'
 
 export const NATIVE_IDENTITY = Object.freeze({ testType:'continuous-recognition',engineVersion:'0.1.0',
@@ -33,6 +34,28 @@ export function nativeConfig(profile:Profile,formalAssetIds:string[],practiceAss
   return nativeConfigSchema.parse({profile,formalAssetIds,practiceAssetIds,imageMs:750,isiMs:800,
     responseRule:IDENTITY.responseRule,generatorVersion:IDENTITY.generatorVersion,qualityRule:NATIVE_QUALITY_RULE,assetManifestBinding})
 }
+export const guidedRecognitionConfigSchema=z.object({...nativeConfigSchema.shape,practicePolicy:z.custom<typeof RECOGNITION_PRACTICE_POLICY>(value=>{
+  try{assertRecognitionPracticePolicy(value);return true}catch{return false}
+})}).strict().superRefine((v,ctx)=>{
+  const {practicePolicy,...base}=v,parsed=nativeConfigSchema.safeParse(base)
+  if(!parsed.success)for(const issue of parsed.error.issues)ctx.addIssue({code:'custom',path:issue.path,message:issue.message})
+})
+export type GuidedRecognitionConfig=z.infer<typeof guidedRecognitionConfigSchema>
+export type RecognitionConfig=NativeConfig|GuidedRecognitionConfig
+export function guidedRecognitionConfig(profile:Profile,formalAssetIds:string[],practiceAssetIds:string[],
+  binding:AssetManifestBinding={status:'pending',manifestHash:null,evidenceRef:null}):GuidedRecognitionConfig {
+  return guidedRecognitionConfigSchema.parse({...nativeConfig(profile,formalAssetIds,practiceAssetIds,binding),practicePolicy:{...RECOGNITION_PRACTICE_POLICY}})
+}
+export const GUIDED_RECOGNITION_PROTOCOL:ProtocolDefinition={...NATIVE_PROTOCOL,key:'continuous-recognition/0.2.0/0.2.0',version:'0.2.0'}
+/** Host preparation helper. Formal randomization is unchanged; the entire new teaching config/manifest is bound. */
+export function freezeGuidedRecognitionManifest(value:GuidedRecognitionConfig,randomSeed:string){
+  const config=guidedRecognitionConfigSchema.parse(value),base=freezeCandidate({profile:config.profile,seed:randomSeed,
+    formalAssetIds:config.formalAssetIds,practiceAssetIds:config.practiceAssetIds})
+  const manifest={...base.manifest,practice:recognitionPracticeManifest(config.practiceAssetIds)}
+  return {manifest,manifestHash:digest({identity:RECOGNITION_GUIDED_IDENTITY,config,randomSeed,manifest})}
+}
+export const getRecognitionIdentity=(engineVersion:string,scoringVersion:string)=>[NATIVE_IDENTITY,RECOGNITION_GUIDED_IDENTITY]
+  .find(id=>id.engineVersion===engineVersion&&id.scoringVersion===scoringVersion)
 const recordSchema=z.object({index:z.number().int().min(0).max(259),assetId:asset,
   kind:z.enum(['target-first','target-repeat','filler-first','vigilance-repeat']),imageOnsetMs:time.nullable(),
   imageOffsetMs:time.nullable(),windowEndMs:time.nullable(),status:z.enum(['complete','load-failure','timeout','interrupted']),
@@ -47,13 +70,14 @@ const invocationSchema=z.object({config:z.unknown(),session:z.unknown(),trials:z
   randomSeed:z.string().min(1).max(256)}).strict()
 const near=(a:number,b:number)=>Math.abs(a-b)<=1e-6
 /** Only real v2 SessionConfigSnapshot is external truth. FrozenCandidate is rebuilt internally, never client supplied. */
-export function scoreNativeRecognition(input:AuthoritativeScorerInput<NativeConfig,NativeTrial>):CognitiveScoreResult {
+function scoreRecognitionIdentity(input:AuthoritativeScorerInput<RecognitionConfig,NativeTrial>,identity:ReturnType<typeof getRecognitionIdentity>,protocol:ProtocolDefinition,parseConfig:(value:unknown)=>RecognitionConfig):CognitiveScoreResult {
+  if(!identity)throw Error('Unknown recognition identity')
   const call=invocationSchema.parse(input), session=parseSessionConfigSnapshot<NativeConfig>(call.session)
-  if(session.testType!==NATIVE_IDENTITY.testType||session.engineVersion!==NATIVE_IDENTITY.engineVersion
-    ||session.scoringVersion!==NATIVE_IDENTITY.scoringVersion||session.configVersion!==NATIVE_IDENTITY.configVersion
-    ||canonicalJson(session.protocol)!==canonicalJson(NATIVE_PROTOCOL))throw new Error('Unsupported exact native recognition identity/protocol')
+  if(session.testType!==NATIVE_IDENTITY.testType||session.engineVersion!==identity.engineVersion
+    ||session.scoringVersion!==identity.scoringVersion||session.configVersion!==identity.configVersion
+    ||canonicalJson(session.protocol)!==canonicalJson(protocol))throw new Error('Unsupported exact native recognition identity/protocol')
   if((session.referenceBindings?.length??0)>0)throw new Error('Recognition candidate has no authorized reference binding')
-  const config=nativeConfigSchema.parse(session.config), supplied=nativeConfigSchema.parse(call.config)
+  const config=parseConfig(session.config), supplied=parseConfig(call.config)
   if(canonicalJson(config)!==canonicalJson(supplied))throw new Error('Scorer config differs from frozen session config')
   const frozen=freezeCandidate({profile:config.profile,seed:call.randomSeed,formalAssetIds:config.formalAssetIds,
     practiceAssetIds:config.practiceAssetIds})
@@ -98,6 +122,10 @@ export function scoreNativeRecognition(input:AuthoritativeScorerInput<NativeConf
     quality:{state,flags,reasons},
     audit:{trialCount:records.length,scorerVersion:NATIVE_IDENTITY.scoringVersion}}
 }
+export const scoreNativeRecognition=(input:AuthoritativeScorerInput<NativeConfig,NativeTrial>):CognitiveScoreResult=>
+  scoreRecognitionIdentity(input,NATIVE_IDENTITY,NATIVE_PROTOCOL,value=>nativeConfigSchema.parse(value))
+export const scoreGuidedRecognition=(input:AuthoritativeScorerInput<GuidedRecognitionConfig,NativeTrial>):CognitiveScoreResult=>
+  scoreRecognitionIdentity(input,RECOGNITION_GUIDED_IDENTITY,GUIDED_RECOGNITION_PROTOCOL,value=>guidedRecognitionConfigSchema.parse(value))
 /** Structural constructor only; authority/truth and cross-trial checks still run in the scorer. */
 export function recognitionTrialEnvelope(value:unknown,flags={timeout:false,premature:false},
   qualityEvents:TrialEnvelope['qualityEvents']=[]):TrialEnvelope<NativeTrial> {
