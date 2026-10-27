@@ -4,7 +4,7 @@
 - 原始研究：MacDermott ST, Gullone E, Allen JS, King NJ, Tonge BJ. The Emotion Regulation Index for Children and Adolescents (ERICA): A Psychometric Investigation. *Journal of Psychopathology and Behavioral Assessment* 32, 301–314 (2010), DOI [10.1007/s10862-009-9154-0](https://doi.org/10.1007/s10862-009-9154-0)。研究涉及澳大利亚 1,389 名 9–16 岁儿童青少年。自我觉察和情境回应分量表原研究的内部一致性分别为 0.60、0.64，因此个体解释宜谨慎。
 - 五点响应：1 非常不同意、2 不同意、3 一半一半、4 同意、5 非常同意；中文为工作表达，尚未经过正式语言和测量验证。
 - 题号以作者实际题本为准。维度：情绪控制 5、7、9、10、12、14、16；情绪自我觉察 1、3、4、11、13；情境回应 2、6、8、15。反向 5、7、8、9、10、11、12、13、14、16；统一方向后反向值 = 6 − 原始值。
-- 以下仅作逐题主题索引与原文定位，非施测题目；不是完整原文或译文。来源不是用户提供的题干全文，不能在交付材料中复现整套英文文本或逐题完整翻译。
+- 以下逐题主题索引保留作原文定位与维度核对。2026-10-28 起完整英文原题已按作者题本逐字誊入原生可执行草稿 `server-version/backend/src/modules/scale/instruments/erica16/1.0.0/instrument.ts`（DRAFT、en）；中文译题仍未包含，如需中文施测，先完成翻译与语言验证再立新版本。誊录依据本轮库负责人的入库决定，许可状态仍记录为未确认。
 
 | 题号 | 主题定位 | 维度 | 反向 |
 |---|---|---|---|
