@@ -66,9 +66,8 @@ export function draftEducationAssessmentEntry(input:{origin:unknown;title:string
   const origin=educationAssessmentOriginSchema.parse(input.origin)
   const title=z.string().trim().min(1).max(200).parse(input.title)
   const disclosure=validateResultDisclosureContract(input.disclosure)
+  if(origin.units.length===0&&!['NONE','COMPLETION_ONLY'].includes(disclosure.audiences.RESPONDENT.mode))throw new Error('Form-only delivery cannot invent measurement feedback')
   if(disclosure.minimumRespondents!==null)throw new Error('Personal delivery cannot imply group report authority')
-  if(!origin.units.length&&!['NONE','COMPLETION_ONLY'].includes(disclosure.audiences.RESPONDENT.mode))
-    throw new Error('Form-only bundles expose completion only')
   if(disclosure.audiences.RESPONDENT.longitudinalMetricKeys.length)throw new Error('Personal delivery does not authorize longitudinal reports')
   const role=origin.product==='TEACHER'?'TEACHER':'STUDENT'
   // Other audiences require their own separately reviewed workflows, not

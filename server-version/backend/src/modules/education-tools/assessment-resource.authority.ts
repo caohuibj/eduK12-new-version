@@ -1,5 +1,7 @@
+import {lockEducationAssessmentUsers} from './assessment-resource.locks'
 import {educationDeliveryAuthoritySchema,type EducationDeliveryAuthority} from './assessment-resource.contract'
 import {Prisma} from '@prisma/client'
+import {assertEducationAssessmentDistributionCurrent} from './assessment-resource.distribution'
 import {readEducationRunLibraryContext} from '../assessment-run/educationLibraryContext'
 import {assertCurrentRunManagerBoundary} from '../assessment-run/resourceBoundary'
 import {resolveEducationProductMemberScope} from '../organization/educationProductAccess'
@@ -13,6 +15,7 @@ export async function assertEducationDeliveryIssuerCurrent(tx:Prisma.Transaction
  proof:EducationDeliveryAuthority;organizationId:string;product:'SCHOOL'|'TEACHER'
 }){
  const proof=educationDeliveryAuthoritySchema.parse(input.proof)
+ await lockEducationAssessmentUsers(tx,[proof.actorId])
  const deny=()=>{throw new EducationAssessmentSourceError('EDUCATION_ASSESSMENT_ORIGINAL_ISSUER_REVOKED')}
  if(proof.kind==='SYSTEM_ADMIN'){
   const [platform]=await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT id FROM users WHERE id=${proof.actorId}
@@ -50,7 +53,8 @@ export async function assertEducationAssessmentRunUse(tx:Prisma.TransactionClien
  const workflow=await readEducationRunLibraryContext(tx,input)
  if(!workflow)throw new EducationAssessmentSourceError('EDUCATION_ASSESSMENT_WORKFLOW_REQUIRED')
  // Governance writers acquire Organization UPDATE. Keep Organization before
- // delivery/source locks; do not take a User lock after it.
+ // delivery/source locks; any later User lock is nonblocking to avoid
+ // inversion with account lifecycle User UPDATE -> Organization UPDATE.
  await tx.$queryRaw(Prisma.sql`SELECT id FROM organizations WHERE id=${input.organizationId} FOR SHARE`)
  const current=await readEducationRunLibraryContext(tx,input)
  if(!current||current.product!==workflow.product||current.schoolCourseId!==workflow.schoolCourseId||current.teacherEventId!==workflow.teacherEventId)
@@ -61,5 +65,6 @@ export async function assertEducationAssessmentRunUse(tx:Prisma.TransactionClien
   throw new EducationAssessmentSourceError('EDUCATION_ASSESSMENT_WORKFLOW_MISMATCH')
  for(const proof of [...source.authority].sort((a,b)=>a.actorId.localeCompare(b.actorId)))
   await assertEducationDeliveryIssuerCurrent(tx,{proof,organizationId:input.organizationId,product:workflow.product})
+ await assertEducationAssessmentDistributionCurrent(tx,source.origin)
  return source
 }

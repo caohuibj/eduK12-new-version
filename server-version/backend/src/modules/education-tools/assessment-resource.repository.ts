@@ -41,9 +41,12 @@ export async function readEducationAssessmentDeliveryIdentity(tx:Tx,input:{
  if(canonicalHash(entry)!==row.entry_hash)fail('EDUCATION_ASSESSMENT_POLICY_IDENTITY')
  const runtime=await tx.compositeAssessment.findUnique({where:{id:row.runtime_composite_id},include:{items:{include:{cognitiveAssignment:true,scale:true}},formSections:{include:{items:true}}}})
  if(!runtime||runtime.productKind!=='ORGANIZATION_RESOURCE'||runtime.status!=='PUBLISHED'||runtime.publicEnabled||runtime.copyable
+  ||runtime.createdBy!==row.created_by_user_id||origin.distribution.actorId!==row.created_by_user_id
   ||runtime.courseId!==null||runtime.trainingContentSnapshotHash!==origin.runtimeSnapshotHash
   ||canonicalHash(runtime.trainingContentSnapshot)!==origin.runtimeSnapshotHash)fail('EDUCATION_ASSESSMENT_RUNTIME_IDENTITY')
- if(canonicalHash(buildTrainingFlowUnits(runtime))!==origin.runtimeDefinitionHash)fail('EDUCATION_ASSESSMENT_RUNTIME_DEFINITION')
+ const definition=buildTrainingFlowUnits(runtime)
+ if(!runtime.items.length||!definition.length||runtime.formSections.some(section=>!section.items.length)
+  ||canonicalHash(definition)!==origin.runtimeDefinitionHash)fail('EDUCATION_ASSESSMENT_RUNTIME_DEFINITION')
  const snapshot=trainingContentSnapshotSchema.parse(runtime.trainingContentSnapshot)
  if(snapshot.compositeId!==runtime.id||snapshot.units.length!==origin.units.length
   ||runtime.items.filter(item=>item.type!=='FORM').length!==origin.units.length)fail('EDUCATION_ASSESSMENT_RUNTIME_IDENTITY')

@@ -15,7 +15,7 @@ function fixture(){
  const disclosure={schemaVersion:1,policyKey:'synthetic',minimumRespondents:null,audiences:{RESPONDENT:none,SUBJECT:none,TEACHER:none,PARENT:none,PROFESSIONAL:none,ORGANIZATION:none,RESEARCH:none}}
  const entry={...draftEducationAssessmentEntry({origin:{...origin,distribution:{actorId:id(9),grants:[{resourceId:id(3),grantId:id(10),version:1}]}},title:'Synthetic',disclosure}),releaseStatus:'PUBLISHED'}
  const row={id:id(1),product:'TEACHER',organization_id:id(2),family:'COGNITIVE',source_composite_id:id(3),runtime_composite_id:id(4),entry,entry_hash:canonicalHash(entry),status:'PUBLISHED',created_by_user_id:id(9),reviewed_by_user_id:id(10),reviewed_at:new Date(),published_by_user_id:id(10),published_at:new Date(),created_authority:{kind:'SYSTEM_ADMIN',actorId:id(9)},reviewed_authority:{kind:'SYSTEM_ADMIN',actorId:id(10)},published_authority:{kind:'SYSTEM_ADMIN',actorId:id(10)}}
- const runtime={id:id(4),createdBy:id(9),productKind:'ORGANIZATION_RESOURCE',status:'PUBLISHED',publicEnabled:false,copyable:false,courseId:null,trainingContentSnapshot:snapshot,trainingContentSnapshotHash:canonicalHash(snapshot),items:[{id:id(6),type:'COGNITIVE',position:0,required:true,cognitiveAssignmentId:id(7),cognitiveAssignment:{configId:id(8),createdBy:id(9)}}]}
+ const runtime={id:id(4),createdBy:id(9),formSections:[],productKind:'ORGANIZATION_RESOURCE',status:'PUBLISHED',publicEnabled:false,copyable:false,courseId:null,trainingContentSnapshot:snapshot,trainingContentSnapshotHash:canonicalHash(snapshot),items:[{id:id(6),type:'COGNITIVE',position:0,required:true,cognitiveAssignmentId:id(7),cognitiveAssignment:{configId:id(8),createdBy:id(9)}}]}
  const db={$queryRaw:vi.fn(async()=>[row]),compositeAssessment:{findUnique:vi.fn(async()=>runtime)}}
  const releases=new Map([[id(5),{...measurement,layer:'MEASUREMENT',family:'COGNITIVE',status:'PUBLISHED',content:{measurementHash:measurement.measurementHash}}]])
  mock.read.mockResolvedValue(releases)
@@ -74,4 +74,30 @@ it('rejects a parameter pointer absent from the frozen runtime selection',async(
 
 it('rejects a changed required flag or unit order even when content pointers still match',async()=>{
  for(const change of [(f:ReturnType<typeof fixture>)=>{f.runtime.items[0].required=false},(f:ReturnType<typeof fixture>)=>{f.runtime.items[0].position=2}]){const f=fixture();change(f);await expect(f.read()).rejects.toThrow()}
+})
+
+
+it('supports an actual Form-only BUNDLE without fake measurement or report pointers',async()=>{
+ const f=fixture()
+ const form={id:id(21),type:'FORM',position:0,required:true,formSectionId:id(22),formType:'TEXT',formLabel:'Synthetic only',formOptions:null,formSectionPosition:0}
+ const runtime={...f.runtime,items:[form],formSections:[{id:id(22),title:'Synthetic form',position:0,items:[form]}],trainingContentSnapshot:{schemaVersion:1,compositeId:id(4),units:[]}}
+ runtime.trainingContentSnapshotHash=canonicalHash(runtime.trainingContentSnapshot)
+ const origin={...f.row.entry.educationOrigin,family:'BUNDLE',units:[],runtimeSnapshotHash:runtime.trainingContentSnapshotHash,runtimeDefinitionHash:canonicalHash(buildTrainingFlowUnits(runtime))}
+ const entry={...draftEducationAssessmentEntry({origin,title:'Synthetic Form Bundle',disclosure:f.row.entry.resultDisclosure}),releaseStatus:'PUBLISHED'}
+ f.row.family='BUNDLE';f.row.entry=entry;f.row.entry_hash=canonicalHash(entry)
+ f.db.compositeAssessment.findUnique.mockResolvedValue(runtime as never);f.releases.clear()
+ await expect(f.read()).resolves.toMatchObject({identityOnly:true,origin:{family:'BUNDLE',units:[]}})
+ runtime.items=[];runtime.formSections=[]
+ f.row.entry.educationOrigin.runtimeDefinitionHash=canonicalHash(buildTrainingFlowUnits(runtime))
+ f.row.entry.educationOriginHash=canonicalHash(f.row.entry.educationOrigin);f.row.entry_hash=canonicalHash(f.row.entry)
+ await expect(f.read()).rejects.toThrow('RUNTIME_DEFINITION')
+})
+
+it('binds the distribution actor to the original creator and actual runtime owner',async()=>{
+ for(const target of ['actor','owner']){
+  const f=fixture()
+  if(target==='actor'){f.row.entry.educationOrigin.distribution.actorId=id(99);f.row.entry.educationOriginHash=canonicalHash(f.row.entry.educationOrigin);f.row.entry_hash=canonicalHash(f.row.entry)}
+  else f.runtime.createdBy=id(99)
+  await expect(f.read()).rejects.toThrow('RUNTIME_IDENTITY')
+ }
 })

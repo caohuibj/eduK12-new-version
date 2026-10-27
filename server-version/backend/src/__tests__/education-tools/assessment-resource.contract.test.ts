@@ -39,3 +39,12 @@ describe('education delivery identity is independent of tool publication',()=>{
   expect(draftEducationAssessmentEntry({origin,title:'Synthetic',disclosure}).releaseStatus).toBe('DRAFT')
  })
 })
+
+
+it('allows a Form-only BUNDLE draft but not invented measurement feedback or empty native tools',()=>{
+ const none=testDisclosure(),form={...origin,family:'BUNDLE',units:[]}
+ expect(draftEducationAssessmentEntry({origin:form,title:'Synthetic form only',disclosure:none}).educationOrigin.units).toEqual([])
+ const numeric=testDisclosure();numeric.audiences.RESPONDENT={mode:'INDIVIDUAL_SUMMARY',metricKeys:['invented'],longitudinalMetricKeys:[]}
+ expect(()=>draftEducationAssessmentEntry({origin:form,title:'Synthetic',disclosure:numeric})).toThrow()
+ expect(()=>educationAssessmentOriginSchema.parse({...origin,units:[]})).toThrow()
+})

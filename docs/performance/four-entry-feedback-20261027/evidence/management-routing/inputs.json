@@ -1,0 +1,33 @@
+{
+  "recordedAt": "2026-10-27T09:08:56.442848+00:00",
+  "head": "95a4ca5d6c9d4e31be332545af2777af85c18ca8",
+  "tree": "9c4376c7ec1f7a42584e784e8ecb29c97d07b8b1",
+  "kind": "unsigned-local-development-inputs-before-r2-checks",
+  "files": {
+    "server-version/backend/package-lock.json": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+    "server-version/backend/package.json": "d629185584fcd679ca367c2d536c6c7783f7a9fe23363a8cd870964a47b2990a",
+    "server-version/backend/src/__tests__/education-tools/assessment-resource.catalog.test.ts": "6cd9a40bccce1ce6998564a99162a098cecad7271b9a3af1f3cc6c263704cc36",
+    "server-version/backend/src/__tests__/education-tools/assessment-resource.http.test.ts": "1bc88a9aa30463d4904944f21ba06a6f4887078ea93c109280275cfe1ec70dae",
+    "server-version/backend/src/__tests__/education-tools/assessment-resource.track-version.test.ts": "a38c68fdbe79691490c83b6402319fd53af4ca83b386a94a7d2656b3d4820cce",
+    "server-version/backend/src/modules/assessment-run/repository.ts": "61d0a4b9b0dffa593291ec467bd09ac4cd3fe8b2a2bad349a35f634800838784",
+    "server-version/backend/src/modules/assessment-run/run.controller.ts": "75bcc27a93dad9139b411728a277f41d8d1a04775e317636806ed54ace33ac26",
+    "server-version/backend/src/modules/campus/activity.run.routes.ts": "5e368b8e7acf2be215ae33cb2de14697e5044035a5dc267565640b470328c9ae",
+    "server-version/backend/src/modules/education-tools/assessment-resource.catalog.ts": "80159e988a053d53e6ba3f6199229f3623333fa321ddd6fbb53484871ea5461a",
+    "server-version/backend/src/modules/huiteacher/run.routes.ts": "dff5317ab22716734febacbaa513142da1ace589f6f64f40b6b6acbfd43ccceb",
+    "server-version/backend/src/modules/huiteacher/run.service.ts": "2b6aff0aeb2702da016677f75a9b73541ae5b2f415ebadaa6bb9303265d1f60c",
+    "server-version/backend/tsconfig.json": "c79ccf595a80514e94936f1ffcd2fa09b57265f0c140d275c81770f494175143",
+    "server-version/backend/vitest.config.ts": "26b98b70914617771d41657be8cdf6d7b6d7024c81d1c8a49aeae6a9220cf93b",
+    "server-version/frontend/package-lock.json": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+    "server-version/frontend/package.json": "ba3959e4e7935cb3b60b8391f590a2622990397b1b33b99a545c45867d51e49f",
+    "server-version/frontend/src/api/educationAssessmentResourceClient.test.ts": "bf7f5f73afca618ffcf455cfaa8c1f04ffb8bffa56f0a1689e561679cd12d611",
+    "server-version/frontend/src/api/educationAssessmentResourceClient.ts": "1f053553b9d5089948e9f9d454f92e071224b6c03b2367cd664c06bb086200d1",
+    "server-version/frontend/src/api/educationAssessmentResources.ts": "28ba6bbaf8428ce9c6b6f3f2e9d9d81bb4259dc6990c281f0a9a4e48cb686563",
+    "server-version/frontend/src/components/education-tools/EducationAssessmentResourcePicker.test.tsx": "fd5bf17786135b85133e9878f12bc728477f826f0d07b913724cde91062ed221",
+    "server-version/frontend/src/components/education-tools/EducationAssessmentResourcePicker.tsx": "47766ef25c85fa458b53eb55b62d55051a87b8142c9cb78f70ce0b32f1ff5544",
+    "server-version/frontend/src/huiteacher/HuiteacherApp.tsx": "78978031e3a067d4b7ec365cd9c8fe058f79f25c93374e28816f2edbb734f15c",
+    "server-version/frontend/src/school/SchoolApp.tsx": "9fbef965c4f25bd35091125186916c42a5311366d9fe559f23cc6efcdd6a495b",
+    "server-version/frontend/tsconfig.app.json": "97ed0e951ac068a9b2d08635b327932db8e41193f9c82e8291a919b7c68bd62e",
+    "server-version/frontend/tsconfig.json": "770b4140bbb581e2dfd9ea9946ffc9c75a1d86ba7d2db5f77c83e37cbdf9d808",
+    "server-version/frontend/vitest.config.ts": "3d757d2b1cee6c1c09a3ec7016b296aa159c938f83365e2370a1d423f29917db"
+  }
+}

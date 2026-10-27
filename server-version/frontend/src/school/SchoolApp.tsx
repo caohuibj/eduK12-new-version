@@ -19,6 +19,7 @@ import { schoolFeatures } from './school-features'
 import { SchoolLanding, SchoolPublicHeader, SchoolCodeRegistration, type SchoolRegistrationEntry } from './SchoolLanding'
 import { SchoolStudentRecovery, SchoolRecoveryOfficer } from './SchoolRecovery'
 import { SchoolActivityManager } from './SchoolActivityManager'
+import {createEducationAssessmentResourceAdapter} from '../api/educationAssessmentResourceClient'
 import { schoolClassApprovalReasons } from './school-activity-workflow'
 import { ReportPrivacyPreferences } from '../components/report-privacy/ReportPrivacyPreferences'
 import { ProductPasswordChange } from '../components/account/ProductPasswordChange'
@@ -85,6 +86,7 @@ async function api<T>(path:string,method='GET',payload?:unknown,options?:{respon
   if(!response.ok||result.code!==0)throw Object.assign(new Error(result.message||'请求失败，请稍后重试'),{code:result.code,data:result.data,status:response.status,retryAfterSeconds:Number(response.headers.get('Retry-After'))||undefined})
   return result.data
 }
+const assessmentResources=createEducationAssessmentResourceAdapter(api,'SCHOOL')
 const field=(label:string,value:string,onChange:(v:string)=>void,type='text')=>(
   <label className="hs-field"><span>{label}</span>
     <input value={value} onChange={event=>onChange(event.target.value)} type={type}
@@ -572,7 +574,7 @@ export default function SchoolApp(){
                 scenarios={['SCHOOL_GENERAL_EDUCATION_GROUP','SCHOOL_SENSITIVE_WELLBEING_GROUP']}/>
             </details>}
           {page==='activities'&&schoolId&&access&&canManageSchoolActivities(access)&&<SchoolActivityManager
-            key={'SchoolActivityManager:'+user?.id+':'+schoolId} api={api} organizationId={schoolId}
+            key={'SchoolActivityManager:'+user?.id+':'+schoolId} api={api} assessmentResources={assessmentResources} organizationId={schoolId}
             compact={ordinaryTeacher||groupedWorkspace} isAdmin={schoolAdmin} classes={units} canAuthorPrivateTools={canAuthorPrivateTools} actorKey={user?.id}/>}
           {page==='group-reports'&&(schoolAdmin||(psychologyStaff&&access?.capabilities.includes('PSYCHOLOGY_STAFF')))&&schoolId
             &&!access?.explicitDenies.some(x=>['*','REPORT_READ','ORG_GROUP_REPORT_V1'].includes(x))

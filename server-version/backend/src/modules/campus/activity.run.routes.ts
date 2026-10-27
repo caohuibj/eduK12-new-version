@@ -11,6 +11,7 @@ import {
   createCampusActivityRunDraft,bindCampusActivityRun,
 } from './activity.runs'
 import { prisma } from '../../config/database'
+import {listEducationAssessmentResources} from '../education-tools/assessment-resource.catalog'
 
 const router=Router()
 router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
@@ -35,6 +36,14 @@ router.get('/organizations/:organizationId/activities/:courseId/run-resources',
   authenticateSchool,wrap(async(req,res)=>{
     await assertCampusActivityEditor({actor:req.user!,...path.parse(req.params)})
     return assessmentRunController.schoolActivityResources(req,res,path.parse(req.params))
+  })
+)
+router.get('/organizations/:organizationId/activities/:courseId/runs/:runId/assessment-resources',
+  authenticateSchool,wrap(async(req,res)=>{
+    const scope=runPath.parse(req.params)
+    await assertCampusActivityRunEditor({actor:req.user!,...scope})
+    const query=z.object({expectedVersion:z.coerce.number().int().min(1).max(Number.MAX_SAFE_INTEGER),cursor:uuid.optional()}).strict().parse(req.query)
+    return success(res,await listEducationAssessmentResources({product:'SCHOOL',...scope,workflowId:scope.courseId,...query,actor:req.user!}))
   })
 )
 

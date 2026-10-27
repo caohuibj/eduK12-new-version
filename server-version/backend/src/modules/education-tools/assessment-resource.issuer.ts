@@ -1,3 +1,4 @@
+import {lockEducationAssessmentUsers} from './assessment-resource.locks'
 import {Prisma} from '@prisma/client'
 import type {AuthenticatedPrincipal} from '../../types'
 import {validAdminProof,ADMIN_STEP_UP_SECONDS} from '../admin-permissions/proof'
@@ -12,9 +13,11 @@ export function educationManagementFail(code:string,status=409):never{throw new 
 export type EducationAssessmentContext={principal:AuthenticatedPrincipal;product:'SCHOOL'|'TEACHER';organizationId:string}
 /** Organization is always locked before Users, and Users before delivery/source
  * rows. All User locks are SHARE, never upgraded. Static SJT source advisory
- * locks, when needed, precede this helper. Governance writers also start at Org.
+ * locks, when needed, precede this helper. Account lifecycle may start at User;
+ * a nonblocking User prelock prevents waiting in the inverse order.
  * Call again at the final write fence to account for time spent waiting. */
 export async function captureEducationAssessmentIssuer(tx:Prisma.TransactionClient,c:EducationAssessmentContext){
+ await lockEducationAssessmentUsers(tx,[c.principal.userId])
  const [user]=await tx.$queryRaw<Array<{id:string;account_domain:string;platform_role:string;token_version:number}>>(Prisma.sql`
   SELECT id,account_domain,platform_role::text,token_version FROM users WHERE id=${c.principal.userId}
    AND is_active AND NOT is_frozen AND NOT must_change_password
@@ -58,7 +61,7 @@ export async function lockEducationAssessmentOrganization(tx:Prisma.TransactionC
 }
 export async function retainEducationAssessmentIssuers(tx:Prisma.TransactionClient,c:Pick<EducationAssessmentContext,'organizationId'|'product'>,proofs:EducationDeliveryAuthority[]){
  const ids=[...new Set(proofs.map(proof=>proof.actorId))].sort()
- if(ids.length)await tx.$queryRaw(Prisma.sql`SELECT id FROM users WHERE id IN (${Prisma.join(ids)}) ORDER BY id FOR SHARE`)
+ await lockEducationAssessmentUsers(tx,ids)
  for(const proof of proofs){
   if(proof.kind==='PRODUCT_ADMIN')await tx.$queryRaw(Prisma.sql`SELECT id FROM education_product_role_grants WHERE id=${proof.grantId} FOR SHARE`)
   if(proof.kind==='PSYCHOLOGY_STAFF'){

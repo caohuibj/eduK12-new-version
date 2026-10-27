@@ -1,0 +1,11 @@
+# Narrow education account-lock inversion fence
+
+Base0e3d210d63ae1b6c74835265e12943cf6e84ec4e. Independent source inspection found platform User lifecycle obtains User UPDATE then Organization UPDATE, while education publication and Run consumers already hold Organization. New User SHARE must not wait in the inverse order.
+
+The narrow adapter prelocks exact Users with FOR SHARE NOWAIT, before existing current identity/role/grant checks. Only PostgreSQL55P03 becomes EDUCATION_ASSESSMENT_AUTHORITY_BUSY409; unrelated errors propagate. The full transaction rolls back. No automatic retry, lock-timeout change, global account rewrite, authorization cache, lock omission or success fabrication. Existing Survey/Training grant issuance remains unchanged; only education issuance adds the fence. Content distribution discovers all exact ancestor subjects for this prelock and still runs the original scope/version/expiry/chain checks afterward. Discovery itself is not permission.
+
+Fresh observed checks: two real PostgreSQL17.11 cases exit0 using the previously fully migrated isolated synthetic source database and restricted non-owner runtime role. Actual two-client transactions establish Org SHARE versus User UPDATE→Org UPDATE; new-use rolls back with409, competing lifecycle commits, subsequent original issuer check rejects deactivation. No deadlock or fabricated acceptance. The other case permits uncontended authority and checks unrelated SQL error propagation. This intentionally exercises real locks plus actual issuer helper, not a complete HTTP publication/START journey or every lifecycle API.
+
+Nine affected original-issuer contracts exit0; backend tsc --noEmit exit0. Node24.22.1. Raw original reporters/logs saved losslessly gzip; empty type log is accompanied by the observed process exit, not treated alone as proof or signed CI. Self-owned PG process stopped afterward; no production DB/data/settings changed.
+
+Still pending: source-marker helper must apply the same nonblocking fence before any new original Training owner User lock. Worker owns that delta. Complete producer/START/FINAL concurrency and browser integration remain open. Account state contention is reported honestly as retryable conflict; it is not silently filtered from catalog lists or counted as a completed submission. No CI/merge/deploy qualification.
