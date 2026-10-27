@@ -1,0 +1,66 @@
+{
+  "recordedAt": "2026-10-27T16:32:46.860819+00:00",
+  "base": "5c427f2bfe646def2200162bab449a0711a6e133",
+  "state": "LOCAL_DEVELOPMENT_NOT_CI",
+  "sourceCapture": "post-execution; changed application/test bytes not edited during commands; no original execution signature",
+  "node": "v24.22.1",
+  "pg": "17.11",
+  "checks": [
+    {
+      "name": "frontend-app-tsc",
+      "exit": 0
+    },
+    {
+      "name": "backend-tsc",
+      "exit": 0
+    },
+    {
+      "name": "frontend-pagination",
+      "passed": 3,
+      "failed": 0,
+      "filtered": 13
+    },
+    {
+      "name": "postgres-pagination",
+      "passed": 1,
+      "failed": 0,
+      "filtered": 4
+    }
+  ],
+  "inputs": {
+    "server-version/backend/src/__tests__/education-tools/assessment-resource.license-selection.postgres.integration.test.ts": {
+      "blob": "4309d359826daaf981e907abcc298b9b6b69d8a2",
+      "sha256": "c25a35bc4057b8bd5f74aece6eff4bf6e01a03b51e5793e1e316e6e3c11b3a8e"
+    },
+    "server-version/backend/src/__tests__/education-tools/assessment-resource.publication.postgres.integration.test.ts": {
+      "blob": "b82a9ced59e471cd6005b934f2838d2989927cd1",
+      "sha256": "7418a23a466c194a47ad27c6a664bead1f26d20d582ab31d2eb2dee33be28d04"
+    },
+    "server-version/backend/src/modules/education-tools/assessment-resource.routes.ts": {
+      "blob": "f34a0f532a571fc85899435fdbf4c1d833d0c974",
+      "sha256": "6a6427665c60c8d07f8fc373732d7d95bdfc41436c96e7fef987897fbab516a7"
+    },
+    "server-version/backend/src/modules/education-tools/assessment-resource.service.ts": {
+      "blob": "77dc141bbd7817eaf18c8228a19fd0e8b5746f95",
+      "sha256": "5de3c311278a038388a1c73676398004bbb0a56b024cf869a6d47f199b7a77b8"
+    },
+    "server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.test.tsx": {
+      "blob": "6d310822184db5c4361155361df1fe1b5e74554f",
+      "sha256": "0488c5bed5e5e2807ddfc2b951ca1aaec8569d4058a02cabeb2e68a3b76f3c0a"
+    },
+    "server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.tsx": {
+      "blob": "a829e614dab2d491f29186a1dbf547a44050903f",
+      "sha256": "52167a4e9f0c898f3b8113c6944c07381bf2934506d62033ae5428e4d32e7806"
+    },
+    "server-version/frontend/src/components/education-tools/assessmentResourceClient.ts": {
+      "blob": "c413eeda62715fa8a054ddaf53ab6ce29e9fddb8",
+      "sha256": "d8ebfa54ce117e6f0f99cab2f9ed47ef80afdb7c84bf7d678228fccdd092e8a0"
+    }
+  },
+  "limitations": [
+    "Not formal Actions qualification; local Node differs from CI",
+    "Installed dependency bytes were not contemporaneously frozen",
+    "Original PG driver stdout reused stale guard wording; actual child command was Vitest against newly created loopback PG17, no fixture substitution or Actions identity",
+    "Initial append used wrong relative path and yielded zero selected tests; subsequent transform failed before tests; both preserved, neither counted as pass"
+  ]
+}

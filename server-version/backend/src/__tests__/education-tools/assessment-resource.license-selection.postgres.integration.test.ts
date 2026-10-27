@@ -98,4 +98,35 @@ suite('education management exact multi-grant selection with real isolated Postg
   const registered=await service.registerEducationAssessment(f.c,p.resourceId,input)
   expect(registered.entry.educationOrigin.distribution.grants.map(({resourceId,grantId})=>({resourceId,grantId}))).toEqual(licenses)
  })
+ it('paginates 51 authorized sources and 51 report versions without dropping the last item or widening authority',async()=>{
+  const f=await fixture(),ids:string[]=[]
+  for(let i=0;i<50;i++){
+   const id=randomUUID(),sectionId=randomUUID(),snapshot={schemaVersion:1,compositeId:id,units:[]}
+   await db.compositeAssessment.create({data:{id,code:randomUUID(),name:'Synthetic paged source '+i,createdBy:f.system.id,status:'PUBLISHED',publishedAt:new Date(),trainingContentSnapshot:snapshot,trainingContentSnapshotHash:canonicalHash(snapshot),formSections:{create:{id:sectionId,title:'Page',position:0}},items:{create:{type:'FORM',position:0,required:true,formType:'SHORT_TEXT',formLabel:'Synthetic',formDefinition:formQuestionSchema.parse({itemKey:'note',type:'SHORT_TEXT',prompt:'Synthetic',required:true,options:[],rows:[],maxLength:100}) as Prisma.InputJsonValue,formSectionId:sectionId,formSectionPosition:0}}}})
+   ids.push(id)
+  }
+  await f.grant(ids)
+  const first=await service.listEducationAssessmentSourceCandidates(f.c)
+  expect(first.list).toHaveLength(50);expect(first.nextCursor).not.toBeNull()
+  const second=await service.listEducationAssessmentSourceCandidates(f.c,first.nextCursor!)
+  expect(second.list).toHaveLength(1);expect(second.nextCursor).toBeNull()
+  expect([...first.list,...second.list].map(x=>x.sourceCompositeId).sort()).toEqual([...ids,f.sourceId].sort())
+  expect(new Set([...first.list,...second.list].map(x=>x.sourceCompositeId)).size).toBe(51)
+  await expect(service.listEducationAssessmentSourceCandidates({...f.c,organizationId:randomUUID()},first.nextCursor!)).rejects.toThrow()
+  await expect(service.listEducationAssessmentSourceCandidates(f.c,'not-a-cursor')).rejects.toThrow()
+  const preparation=await f.prepare(),measurement=await db.$transaction(tx=>getContentRelease(tx,f.measurement.releaseId))
+  if(!measurement||measurement.layer!=='MEASUREMENT')throw Error('Missing C')
+  const metric=measurement.content.metrics[0].metricKey,reportIds:string[]=[]
+  for(let i=0;i<51;i++){
+   const report=await db.$transaction(tx=>publishContentRelease(tx,{family:'COGNITIVE',layer:'REPORT',key:'synthetic-page-R-'+randomUUID(),version:'1.0.0',scope:{kind:'PRIVATE',product:'TEACHER',ownerId:f.c.principal.userId,resourceId:preparation.runtimeCompositeId},sourceReleaseId:null,assetRefs:[],provenance:{},content:{projectionVersion:1,measurements:[{releaseId:measurement.releaseId,contentHash:measurement.contentHash}],metricKeys:[metric],audience:'teacher',language:'zh-CN',generatorVersion:DECLARATIVE_REPORT_GENERATOR,template:{title:'Synthetic report '+i,blocks:[{type:'METRIC',metricKey:metric,display:'RAW'}]}}},f.system.id));reportIds.push(report.releaseId)
+  }
+  const grant=await f.grant(reportIds),p1=await service.listEducationAssessmentContentChoices(f.c,preparation.resourceId)
+  expect(p1.units[0].reports).toHaveLength(50);expect(p1.nextCursor).not.toBeNull()
+  const p2=await service.listEducationAssessmentContentChoices(f.c,preparation.resourceId,p1.nextCursor!)
+  expect(p2.units[0].reports).toHaveLength(1);expect(p2.nextCursor).toBeNull()
+  expect([...p1.units[0].reports,...p2.units[0].reports].map(x=>x.releaseId).sort()).toEqual(reportIds.sort())
+  await db.$transaction(tx=>revokeContentAuthority(tx,{actorId:f.system.id,grantId:grant.grantId,expectedVersion:1,reason:'Synthetic page withdrawal'}))
+  const withdrawn=await service.listEducationAssessmentContentChoices(f.c,preparation.resourceId,p1.nextCursor!)
+  expect(withdrawn.units[0].reports).toEqual([]);expect(withdrawn.nextCursor).toBeNull()
+ },60000)
 })
