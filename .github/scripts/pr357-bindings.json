@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "base": "04a8d994207d7b831b874d4be4f5c31640466458",
-  "product": "b37c60aebaa05b15d28f8172fc3a4600f5c29b90",
+  "product": "082aff88a557c21ceaad36e451c4f6e0cf30bde6",
   "branch": "work/school-teacher-consolidated-20261027",
   "source": {
     "docs/evidence/school-teacher-review-20261027.json": {
@@ -450,6 +450,20 @@
       "newMode": "100644",
       "before": "cf5cebf7c9ad119a20d80f314b989a632c7448bc",
       "after": "afbe40275e855e0d062df0c469247b8f8c22e671",
+      "status": "M"
+    },
+    "server-version/e2e/school-teacher-ui.cjs": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "a5113a9c4a58e7b598de78256a4497b4f0ca6664",
+      "after": "65c5a3a962d3b04cb3c9c0f7ae09b57c370dae17",
+      "status": "M"
+    },
+    "server-version/e2e/school-teacher-ui.test.cjs": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "0eb268531d0705bfdc7ec0a53100990a54e3f052",
+      "after": "5cbfea88285794c27ade282cdacbbfef7d60f4d1",
       "status": "M"
     },
     "server-version/frontend/public/entry-brand.js": {
@@ -1523,6 +1537,13 @@
       "after": "26a9b5a0075c02ec2dcfcdb7ab0f152d97cef283",
       "status": "A"
     },
+    "server-version/frontend/src/school/school-landing.css": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "79e573b3eb66c0ec65a68f833613fdf38955f382",
+      "after": "f4d993753daa178944a5b14ec7d7af58fe0e8bdd",
+      "status": "M"
+    },
     "server-version/frontend/src/school/school-learner.css": {
       "oldMode": "000000",
       "newMode": "100644",
@@ -1664,7 +1685,7 @@
   ],
   "components": {
     "backend": "100ae07d90a1bf9fc53b1df0a610008571f565dd",
-    "frontend": "1bb800f156220de1e5a2f043a82208f713cfa273"
+    "frontend": "438a7e9db83feadaaa3ebf080cc3a11c7f685d44"
   },
   "tests": {
     "backend": [

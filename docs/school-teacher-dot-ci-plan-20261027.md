@@ -166,3 +166,31 @@ bits, owner, read and execute bits are preserved; no new privilege is added.
 No unrelated recursive chmod, production change or sandbox bypass is allowed.
 The actual Python syntax and bounded-path workflow controls pass locally; actual
 Chrome/font/runtime acceptance remains a required real check, not assumed.
+
+## First real-browser findings and minimal UI repair (03:48 UTC)
+
+Run40445517199 at653cebc2 passed Chrome package/path and CJK preflight, actually
+launched officialChrome155 with PID namespace and seccomp-BPF sandbox verified.
+Both real API runtimes reached READY. Public UI and real Teacher login/MFA ran.
+Browser artifact12707769042 ZIP24c1e2638daf804e7a8cb9a5541e2211a72bd8e2b732a1a303f9054f619fb0b6
+retains the actual failure and three screenshots; dependent author/answer/report
+journeys are NOTRUN, not passing because authentication worked.
+
+Two distinct findings: School mobile transparent login button inherited white
+primary text (actualcontrast1.13 on#edf4dc); fix the one mobile rule to use
+--hs-ink. Teacher theme QA searched a removed combobox while the current shared
+ProductThemeControl is an accessible cyclic button. The QA now clicks that real
+button and waits for each actual accessible-label transition, preserving mode,
+reload, account/product preference isolation, zero business-mutation and layout
+assertions. A targeted pure consumer test covers18 product/source/target pairs
+and refuses invalid legacy markup. This test does not replace real browser QA.
+
+Product/consumer correction082aff88 is pushed withskip-ci. It adds3 previously
+main-only paths to the PR diff: exact source binding is now238+10=248 paths.
+Backend component remains100ae07; frontend438a7e9 differs from its successful
+qualification only in the exact one CSS blobf4d99375. TS/types/unit inputs and
+locks are unchanged: reuse their original570-case/type evidence, but produce
+one NEW Vite build/runtime image/scan because CSS bytes changed. Browser consumes
+that new output; old frontend image qualification is not claimed for it. Backend
+complete qualification/build remains reused. Source/scope identities refreshed;
+changed e2e consumer code is included in fresh CodeQL controls analysis.

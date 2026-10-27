@@ -35,7 +35,9 @@ export function verifyContinuationInputs(read=git){
  assert.equal(read('rev-parse','HEAD:server-version/backend'),original.backendTree,'Backend source/dependency/config changed; original build and DB evidence inapplicable');
  assert.equal(read('rev-parse',original.head+':server-version/backend'),original.backendTree);
  const changed=read('diff','--name-only',original.head,'HEAD','--','server-version/frontend').split('\n').filter(Boolean).sort();
- assert.deepEqual(changed,changedFixtureFiles.map(p=>'server-version/frontend/'+p).sort(),'Only the two failed frontend fixtures may differ');
+ const css='server-version/frontend/src/school/school-landing.css';
+ if(changed.includes(css)){assert.equal(read('rev-parse','HEAD:'+css),'f4d993753daa178944a5b14ec7d7af58fe0e8bdd','Only the exact mobile contrast correction is admitted');changed.splice(changed.indexOf(css),1);}
+ assert.deepEqual(changed,changedFixtureFiles.map(p=>'server-version/frontend/'+p).sort(),'Only the two failed fixtures and exact contrast CSS may differ');
  const old=JSON.parse(read('show',original.head+':.github/scripts/pr357-bindings.json'));
  assert.deepEqual(binding.tests,old.tests,'Cannot drop/change requested consumers while admitting prior files');
  return {original,backendTree:original.backendTree,changedFrontendFixtures:changedFixtureFiles};
@@ -81,20 +83,21 @@ export function verifyOriginalSastJob(job,now=Date.now()){
  for(const name of ['initialize CodeQL','analyze with CodeQL'])assert(job.steps.some(s=>s.name===name&&s.status==='completed'&&s.conclusion==='success'));
  const age=now-Date.parse(job.completed_at);assert(age>=0&&age<86400000);
  return {status:'REUSED_UNCHANGED_APPLICATION_SAST_FRESH_CONTROLS_REQUIRED',run:original.run,head:original.head,jobId:job.id,completedAt:job.completed_at,
-  config:'paths: [.github/scripts, server-version/scripts/release, '+changedFixtureFiles.map(p=>'server-version/frontend/'+p).join(', ')+']'};
+  config:'paths: [.github/scripts, server-version/scripts/release, server-version/e2e/school-teacher-ui.cjs, server-version/e2e/school-teacher-ui.test.cjs, '+changedFixtureFiles.map(p=>'server-version/frontend/'+p).join(', ')+']'};
 }
 export async function originalSast(){
  verifyContinuationInputs();const run=await api('/actions/runs/'+original.run);assert.equal(run.head_sha,original.head);assert.equal(run.run_attempt,1);assert.equal(run.event,'pull_request');assert.equal(run.path,'.github/workflows/ci.yml');
  return verifyOriginalSastJob(await api('/actions/jobs/121952617174'));
 }
 
-export async function copyDeliveredFrontend(){
- verifyContinuationInputs();assert.equal(git('rev-parse',deliveredFrontend.head+'^{tree}'),deliveredFrontend.tree);assert.equal(git('rev-parse','HEAD:server-version/frontend'),deliveredFrontend.frontendTree);assert.equal(git('rev-parse',deliveredFrontend.head+':server-version/frontend'),deliveredFrontend.frontendTree);
+export async function copyDeliveredFrontend(checksOnly=false){
+ verifyContinuationInputs();assert.equal(git('rev-parse',deliveredFrontend.head+'^{tree}'),deliveredFrontend.tree);if(checksOnly){assert.equal(git('diff','--name-only',deliveredFrontend.head,'HEAD','--','server-version/frontend'),'server-version/frontend/src/school/school-landing.css');}else assert.equal(git('rev-parse','HEAD:server-version/frontend'),deliveredFrontend.frontendTree);assert.equal(git('rev-parse',deliveredFrontend.head+':server-version/frontend'),deliveredFrontend.frontendTree);
  const prior=await testContinuation('frontend'),checks=await loadOriginal('checks',true),verified=checks.read('frontend-verified.json'),fresh=checks.read('frontend-tests.json');
  assert.equal(verified.status,'PASS_WITH_PINNED_PRIOR');assert.equal(verified.candidate.head,deliveredFrontend.checkout);assert.equal(verified.candidate.run,String(deliveredFrontend.run));assert.equal(verified.candidate.tree,deliveredFrontend.tree);
  assert.deepEqual(verified.prior.accepted,prior.accepted);assert.equal(verified.prior.proof.artifactId,artifacts.frontend.id);assert.equal(verified.prior.proof.zipSHA256,artifacts.frontend.sha);assert.equal(verified.prior.originalReportSuccess,false);assert.equal(verified.prior.priorPassedCases,560);
  assert.equal(fresh.success,true);assert.equal(fresh.numPassedTests,10);assert.equal(fresh.numFailedTests,0);assert.equal(fresh.numPendingTests,0);assert.equal(fresh.testResults.length,2);assert(fresh.testResults.every(row=>row.status==='passed'&&row.assertionResults.length>0&&row.assertionResults.every(a=>a.status==='passed')));assert.deepEqual(fresh.testResults.map(row=>'src/'+row.name.split('/src/').at(-1)).sort(),[...prior.fresh].sort());assert.deepEqual(fresh.testResults.flatMap(row=>row.assertionResults.map(a=>a.fullName)).sort(),prior.expectedFreshNames);
  const scan=checks.read('frontend-scan.json');assert.equal(scan.ArtifactID,'sha256:fcb1c6da11c7ffdebde7757625cb3b60f1ba19a8d690f50c787cf8cd1721105a');assert(Array.isArray(scan.Results));assert(!scan.Results.some(row=>(row.Vulnerabilities??[]).some(v=>['HIGH','CRITICAL'].includes(v.Severity))));
+ if(checksOnly)return {status:'REUSED_UNCHANGED_TS_QUALIFICATION_CSS_BUILD_AND_BROWSER_REQUIRED',checksProof:checks.proof,originalQualification:verified};
  const built=await loadOriginal('build',true),manifest=built.read('ci-build-manifest.json');verifyManifest(manifest,{schemaVersion:1,kind:'frontend',sha:deliveredFrontend.checkout,runId:String(deliveredFrontend.run),lockDigest:sha(readFileSync('server-version/frontend/package-lock.json'))},treeDigest(built.dir));cpSync(built.dir,resolve('server-version/frontend/dist'),{recursive:true,errorOnExist:true,force:false});
  return {status:'REUSED_COMPLETE_FRONTEND_QUALIFICATION_NOT_REBUILT',componentTree:deliveredFrontend.frontendTree,originalManifest:manifest,buildProof:built.proof,checksProof:checks.proof,originalQualification:verified,originalScanArtifactId:scan.ArtifactID};
 }

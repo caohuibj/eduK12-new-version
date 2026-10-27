@@ -79,3 +79,9 @@ test('complete backend qualification is pinned to the actual successful producer
  assert.throws(()=>verifyOriginalArtifact({...m,id:quotaArtifacts.checks.id},'checks',now,'backend'));
  assert.throws(()=>verifyOriginalArtifact({...m,workflow_run:{...m.workflow_run,id:quotaProgress.run}},'checks',now,'backend'));
 });
+test('style-only continuation rejects any CSS other than the exact contrast correction',()=>{
+ const css='server-version/frontend/src/school/school-landing.css';
+ const read=(cmd,arg)=>cmd==='show'?JSON.stringify({tests:binding.tests}):cmd==='diff'?[...['src/huiteacher/HuiteacherAssessmentMediaHost.test.tsx','src/school/SchoolBoundContinuation.test.tsx'].map(p=>'server-version/frontend/'+p),css].join('\n'):arg==='HEAD:'+css?'f4d993753daa178944a5b14ec7d7af58fe0e8bdd':arg?.endsWith('^{tree}')?original.tree:original.backendTree;
+ assert.equal(verifyContinuationInputs(read).backendTree,original.backendTree);
+ assert.throws(()=>verifyContinuationInputs((cmd,arg)=>arg==='HEAD:'+css?'0'.repeat(40):read(cmd,arg)));
+});
