@@ -1,0 +1,282 @@
+{
+  "recordedAt": "2026-10-27T09:25:54.742755+00:00",
+  "kind": "unsigned-local-development-evidence",
+  "base": "95a4ca5d6c9d4e31be332545af2777af85c18ca8",
+  "foundation": "f46336cc45abaa21d4b946029cda2a0dfadec654",
+  "node": "24.21.0",
+  "vitest": "4.1.11",
+  "backendTypeScript": "5.9.3",
+  "uniqueBackendCases": 48,
+  "uniqueFrontendCasesInThisSlice": 9,
+  "actualPassedExecutions": 88,
+  "runs": [
+    {
+      "report": "backend-initial.json",
+      "exitCode": 0,
+      "passed": 42,
+      "filtered": 0,
+      "command": "source /workspace/eduk12-cloud/activate.sh && node node_modules/vitest/vitest.mjs run src/__tests__/education-tools/assessment-resource.catalog.test.ts src/__tests__/education-tools/assessment-resource.track-version.test.ts src/__tests__/education-tools/assessment-resource.http.test.ts src/__tests__/education-tools/private-tool.teacher-route.test.ts --maxWorkers=2 --reporter=default --reporter=json --outputFile=/tmp/pr363-education-management-r2/backend-initial.json",
+      "cwd": "server-version/backend"
+    },
+    {
+      "report": "frontend-initial.json",
+      "exitCode": 0,
+      "passed": 5,
+      "filtered": 25,
+      "command": "source /workspace/eduk12-cloud/activate.sh && node node_modules/vitest/vitest.mjs run src/api/educationAssessmentResourceClient.test.ts src/components/education-tools/EducationAssessmentResourcePicker.test.tsx -t 'real education assessment product API factory|pure Form BUNDLE' --maxWorkers=2 --reporter=default --reporter=json --outputFile=/tmp/pr363-education-management-r2/frontend-initial.json",
+      "cwd": "server-version/frontend"
+    },
+    {
+      "report": "catalog-lock-supplement.json",
+      "exitCode": 0,
+      "passed": 15,
+      "filtered": 0,
+      "command": "source /workspace/eduk12-cloud/activate.sh && node node_modules/vitest/vitest.mjs run src/__tests__/education-tools/assessment-resource.catalog.test.ts --maxWorkers=2 --reporter=default --reporter=json --outputFile=/tmp/pr363-education-management-r2/catalog-lock-supplement.json",
+      "cwd": "server-version/backend"
+    },
+    {
+      "report": "navigation-supplement.json",
+      "exitCode": 0,
+      "passed": 2,
+      "filtered": 0,
+      "command": "source /workspace/eduk12-cloud/activate.sh && node node_modules/vitest/vitest.mjs run src/huiteacher/HuiteacherAssessmentDirectory.test.tsx --maxWorkers=2 --reporter=default --reporter=json --outputFile=/tmp/pr363-education-management-r2/navigation-supplement.json",
+      "cwd": "server-version/frontend"
+    },
+    {
+      "report": "run-binding-backend.json",
+      "exitCode": 0,
+      "passed": 16,
+      "filtered": 6,
+      "command": "source /workspace/eduk12-cloud/activate.sh && node node_modules/vitest/vitest.mjs run src/__tests__/education-tools/assessment-resource.track-version.test.ts src/__tests__/education-tools/assessment-resource.teacher-binding.test.ts src/__tests__/education-tools/assessment-resource.http.test.ts -t 'education track expected version|Teacher event implicit run binding|connects the real frontend|requires expectedVersion|rejects a School run' --maxWorkers=2 --reporter=default --reporter=json --outputFile=/tmp/pr363-education-management-r2/run-binding-backend.json",
+      "cwd": "server-version/backend"
+    },
+    {
+      "report": "run-binding-frontend.json",
+      "exitCode": 0,
+      "passed": 6,
+      "filtered": 24,
+      "command": "source /workspace/eduk12-cloud/activate.sh && node node_modules/vitest/vitest.mjs run src/api/educationAssessmentResourceClient.test.ts src/components/education-tools/EducationAssessmentResourcePicker.test.tsx -t 'real education assessment product API factory|sends only an exact personal track' --maxWorkers=2 --reporter=default --reporter=json --outputFile=/tmp/pr363-education-management-r2/run-binding-frontend.json",
+      "cwd": "server-version/frontend"
+    },
+    {
+      "report": "protected-form.json",
+      "exitCode": 0,
+      "passed": 2,
+      "filtered": 24,
+      "command": "source /workspace/eduk12-cloud/activate.sh && node node_modules/vitest/vitest.mjs run src/__tests__/education-tools/assessment-resource.catalog.test.ts src/__tests__/education-tools/assessment-resource.track-version.test.ts -t 'protected student' --maxWorkers=2 --reporter=default --reporter=json --outputFile=/tmp/pr363-education-management-r2/protected-form.json",
+      "cwd": "server-version/backend"
+    }
+  ],
+  "types": [
+    {
+      "log": "backend-types.log.gz",
+      "exitCode": 0,
+      "command": "node node_modules/typescript/bin/tsc --noEmit",
+      "inputSnapshot": "inputs.json"
+    },
+    {
+      "log": "frontend-types.log.gz",
+      "exitCode": 0,
+      "command": "node node_modules/typescript/bin/tsc -p tsconfig.app.json --noEmit",
+      "inputSnapshot": "inputs.json"
+    },
+    {
+      "log": "backend-final-types.log.gz",
+      "exitCode": 0,
+      "command": "node node_modules/typescript/bin/tsc --noEmit",
+      "inputSnapshot": "supplement-inputs.json"
+    },
+    {
+      "log": "frontend-final-types.log.gz",
+      "exitCode": 0,
+      "command": "node node_modules/typescript/bin/tsc -p tsconfig.app.json --noEmit",
+      "inputSnapshot": "supplement-inputs.json"
+    },
+    {
+      "log": "run-binding-backend-types.log.gz",
+      "exitCode": 0,
+      "command": "node node_modules/typescript/bin/tsc --noEmit",
+      "inputSnapshot": "run-binding-inputs.json"
+    },
+    {
+      "log": "run-binding-frontend-types.log.gz",
+      "exitCode": 0,
+      "command": "node node_modules/typescript/bin/tsc -p tsconfig.app.json --noEmit",
+      "inputSnapshot": "run-binding-inputs.json"
+    },
+    {
+      "log": "protected-form-backend-types.log.gz",
+      "exitCode": 0,
+      "command": "node node_modules/typescript/bin/tsc --noEmit",
+      "inputSnapshot": "protected-form-inputs.json layered over run-binding-inputs.json"
+    }
+  ],
+  "lint": [
+    {
+      "log": "frontend-lint.log.gz",
+      "exitCode": 0,
+      "errors": 0,
+      "warnings": 2,
+      "command": "node node_modules/eslint/bin/eslint.js src/api/educationAssessmentResources.ts src/api/educationAssessmentResourceClient.ts src/api/educationAssessmentResourceClient.test.ts src/components/education-tools/EducationAssessmentResourcePicker.tsx src/components/education-tools/EducationAssessmentResourcePicker.test.tsx src/huiteacher/HuiteacherApp.tsx src/school/SchoolApp.tsx"
+    },
+    {
+      "log": "navigation-lint.log.gz",
+      "exitCode": 0,
+      "errors": 0,
+      "warnings": 4,
+      "command": "node node_modules/eslint/bin/eslint.js src/huiteacher/HuiteacherApp.tsx src/huiteacher/HuiteacherAssessmentDirectory.test.tsx src/school/SchoolActivityManager.tsx"
+    },
+    {
+      "log": "run-binding-lint.log.gz",
+      "exitCode": 0,
+      "errors": 0,
+      "warnings": 0,
+      "command": "node node_modules/eslint/bin/eslint.js src/api/educationAssessmentResources.ts src/api/educationAssessmentResourceClient.ts src/api/educationAssessmentResourceClient.test.ts src/components/education-tools/EducationAssessmentResourcePicker.test.tsx"
+    }
+  ],
+  "logTransport": {
+    "backend-final-types.log.gz": {
+      "decodedFilename": "backend-final-types.log",
+      "decodedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "decodedBytes": 0
+    },
+    "backend-initial.log.gz": {
+      "decodedFilename": "backend-initial.log",
+      "decodedSha256": "8b771ae19d9275ea29662c9f2d914b95388fd34655595e8699198a9cb503e588",
+      "decodedBytes": 671
+    },
+    "backend-types.log.gz": {
+      "decodedFilename": "backend-types.log",
+      "decodedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "decodedBytes": 0
+    },
+    "catalog-lock-supplement.log.gz": {
+      "decodedFilename": "catalog-lock-supplement.log",
+      "decodedSha256": "add8ec940010e3356c44eb2919c3c6cea7145b474204566d0a893783bebc3334",
+      "decodedBytes": 412
+    },
+    "frontend-final-types.log.gz": {
+      "decodedFilename": "frontend-final-types.log",
+      "decodedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "decodedBytes": 0
+    },
+    "frontend-initial.log.gz": {
+      "decodedFilename": "frontend-initial.log",
+      "decodedSha256": "a1345c2e6f4c512ab63752aff5bd07c5478cff5215802decbacb09cd977cd183",
+      "decodedBytes": 666
+    },
+    "frontend-lint.log.gz": {
+      "decodedFilename": "frontend-lint.log",
+      "decodedSha256": "0225f2e67569247d669a41e20fb20b383bdc4d68d40434c3eced4e594548037f",
+      "decodedBytes": 699
+    },
+    "frontend-types.log.gz": {
+      "decodedFilename": "frontend-types.log",
+      "decodedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "decodedBytes": 0
+    },
+    "navigation-lint.log.gz": {
+      "decodedFilename": "navigation-lint.log",
+      "decodedSha256": "8c5ced002a47ec7c6d8b00b3e96793ba13ddb9a6899bc980a23b393c4799a431",
+      "decodedBytes": 1324
+    },
+    "navigation-supplement.log.gz": {
+      "decodedFilename": "navigation-supplement.log",
+      "decodedSha256": "c01032db2500019e67f4fd7548682feabc368ac79ca75c7fbe492f08195c3dec",
+      "decodedBytes": 646
+    },
+    "protected-form-backend-types.log.gz": {
+      "decodedFilename": "protected-form-backend-types.log",
+      "decodedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "decodedBytes": 0
+    },
+    "protected-form.log.gz": {
+      "decodedFilename": "protected-form.log",
+      "decodedSha256": "cbbc5f0e98d66cf6a0bc984dd97ac3a32803d58219232062b452f23f6ce224b0",
+      "decodedBytes": 535
+    },
+    "run-binding-backend-types.log.gz": {
+      "decodedFilename": "run-binding-backend-types.log",
+      "decodedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "decodedBytes": 0
+    },
+    "run-binding-backend.log.gz": {
+      "decodedFilename": "run-binding-backend.log",
+      "decodedSha256": "0660aa6f00f8e64406ed4ecfc0428b9a59397e42e3d041f4844ca40d549b6455",
+      "decodedBytes": 745
+    },
+    "run-binding-frontend-types.log.gz": {
+      "decodedFilename": "run-binding-frontend-types.log",
+      "decodedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "decodedBytes": 0
+    },
+    "run-binding-frontend.log.gz": {
+      "decodedFilename": "run-binding-frontend.log",
+      "decodedSha256": "a24022c2653e1c7ed31ff714109334e1337b605385f1cfc368bc1570d213539c",
+      "decodedBytes": 597
+    },
+    "run-binding-lint.log.gz": {
+      "decodedFilename": "run-binding-lint.log",
+      "decodedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "decodedBytes": 0
+    }
+  },
+  "artifacts": {
+    "backend-final-types.log.gz": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec",
+    "backend-initial.json": "54ff2e2c6e7c1b9d0f736ec87400f1744e52471b0f9a00e7e4ccf94053debe18",
+    "backend-initial.log.gz": "76df177e77b7a1a28ecad8a115420470d684dfcd6dfdd8c46d84530e102e3f10",
+    "backend-types.log.gz": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec",
+    "catalog-lock-supplement.json": "0dd0952314e8c946819c588e5a873cabcceaa6a33cab321ba9798bd6065dbdca",
+    "catalog-lock-supplement.log.gz": "21b90e894a1e81b112882b49f8d145724e728bf847151dde33749f04e5fd7e82",
+    "frontend-final-types.log.gz": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec",
+    "frontend-initial.json": "193a9461b4c74d89f42ed0cf1d1e702698a733082af86b5d7eafb913a78b8c84",
+    "frontend-initial.log.gz": "52c585052c4af446777cf0266a693512530a432a1c3e81daeb8019479967e4f0",
+    "frontend-lint.log.gz": "080bfecee7e1814e40d06edf11e120da77b19386037c8215d5fa65a93180231e",
+    "frontend-types.log.gz": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec",
+    "inputs.json": "90128b991e70ca534de6077e364a34e5b0c8ffb3e89a2d49e4e09ea97e774393",
+    "navigation-lint.log.gz": "be164a55c6aa4bc810a1a42cca5641feb13f2170706d45dda4bd9d4e5d0fcd63",
+    "navigation-supplement.json": "7f8002111541efc56395f81ae0cc4ce901a927781b6664f3079263ee7bbee3d9",
+    "navigation-supplement.log.gz": "3e47ea0420e0872ec91bb7cd84679a29586668e0c8d7795bcab675ffde2e5b18",
+    "protected-form-backend-types.log.gz": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec",
+    "protected-form-inputs.json": "ceb5688dbe6efd993d4c54ec77831ec774eecae183cc63499bb5dc486a8abc8c",
+    "protected-form.json": "1c38068b620fd7288d002d0edefb60934c32f5c8c018eaf7db8da4b7eb008533",
+    "protected-form.log.gz": "e9dc6b2cacc3abce5a07b2ad1e4c03b33b7bd9189a41fde68c10c384676d8e21",
+    "run-binding-backend-types.log.gz": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec",
+    "run-binding-backend.json": "8e1115fc96c267f201bed06b78a3f8902536c535ae68d2626d32550b8b41baf4",
+    "run-binding-backend.log.gz": "6a3a9230262a348e1ce0565400868f792a250976fb48596b3253addb945597b3",
+    "run-binding-frontend-types.log.gz": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec",
+    "run-binding-frontend.json": "dd03403177d6d17c846711184b97916fe7e82a1b4509f47386dfe41f3f33f038",
+    "run-binding-frontend.log.gz": "4fcb24554b2bfc8823be190569ca796dca90e14663605b6f71a1d9992cc6f23a",
+    "run-binding-inputs.json": "363107537d471080585fc1b677558f56f0eb8aa943d7c3d25b4395b07f3b131f",
+    "run-binding-lint.log.gz": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec",
+    "supplement-inputs.json": "4c1d25eaa616dbee8072b0487532e27c45cef46d0808707a588d7616ac3970b1"
+  },
+  "limits": [
+    "Actual loopback Express/HTTP contract with synthetic auth/business/database mocks; no real PostgreSQL authorization or concurrent CAS proof",
+    "No browser/build/CI/merge/deploy execution",
+    "Original passed/filtered invocation identities retained; earlier source snapshots are not silently relabelled final-source results",
+    "Complete historical node_modules bytes not captured; no signed CI evidence admission claimed"
+  ],
+  "distinctBackendFullNames": 47,
+  "caseIdentity": "Original file + original fullName + within-name occurrence index; preserve duplicate names and original source/input order, do not relabel history",
+  "duplicateNameEvidence": [
+    {
+      "report": "backend-initial.json",
+      "file": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/education-tools/assessment-resource.catalog.test.ts",
+      "fullName": "bounded authorized education assessment catalog does not turn infrastructure or corrupt identity into an empty catalog",
+      "occurrences": 2
+    },
+    {
+      "report": "catalog-lock-supplement.json",
+      "file": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/education-tools/assessment-resource.catalog.test.ts",
+      "fullName": "bounded authorized education assessment catalog does not turn infrastructure or corrupt identity into an empty catalog",
+      "occurrences": 2
+    },
+    {
+      "report": "protected-form.json",
+      "file": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/education-tools/assessment-resource.catalog.test.ts",
+      "fullName": "bounded authorized education assessment catalog does not turn infrastructure or corrupt identity into an empty catalog",
+      "occurrences": 2
+    }
+  ]
+}

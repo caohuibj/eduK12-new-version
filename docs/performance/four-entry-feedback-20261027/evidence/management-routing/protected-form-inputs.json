@@ -1,0 +1,11 @@
+{
+  "recordedAt": "2026-10-27T09:22:08.413619+00:00",
+  "head": "95a4ca5d6c9d4e31be332545af2777af85c18ca8",
+  "kind": "final protected-Form delta; other inputs pinned by run-binding-inputs.json",
+  "files": {
+    "server-version/backend/src/modules/assessment-run/repository.ts": "a89946b87cf8d31d0094ef04686c9e7b2febf61aa1f52286c4c60ff6e713d221",
+    "server-version/backend/src/modules/education-tools/assessment-resource.catalog.ts": "6a17ed9859fe3c0633707741ac981659a8f24de80b3e855f445ec474e2a27bdd",
+    "server-version/backend/src/__tests__/education-tools/assessment-resource.catalog.test.ts": "d00732190190d477f931522caeeb2dc1eea985829169da0d61e776446dbdf014",
+    "server-version/backend/src/__tests__/education-tools/assessment-resource.track-version.test.ts": "f055e8834c7268931675ba46b119023ba83b1d7493670d44bf592694a1d34f3a"
+  }
+}

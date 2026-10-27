@@ -110,6 +110,7 @@ function ScopedPicker({scope,adapter,disabled,onBusy,onRefresh}:Props){
           </select>
         </label>
         {selected&&<details><summary>核对固定内容、参数与报告版本</summary>
+          {selected.units.length===0&&<p>此组合不含测量 C/P/R 单元，按固定表单流程提供完成确认；不生成心理分数或报告。</p>}
           <ul>{selected.units.map((unit,index)=><li key={unit.itemId}>单元 {index+1} · {unit.family}
             <dl><dt>内容 C</dt><dd>{unit.measurement.releaseId} · {unit.measurement.contentHash}</dd>
               <dt>参数 P</dt><dd>{unit.references.length?unit.references.map(ref=>`${ref.releaseId} · ${ref.contentHash}`).join('；'):'明确未选参数版本'}</dd>

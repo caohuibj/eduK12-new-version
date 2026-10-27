@@ -15,6 +15,16 @@ async function open(){fireEvent.click(screen.getByRole('button',{name:'读取已
 async function select(scope=assessmentScope){const field=await open();fireEvent.change(field,{target:{value:educationAssessmentResourceId(assessmentResource(scope))}})}
 
 describe('education authorized assessment picker',()=>{
+  it('accepts an authorized pure Form BUNDLE with exact origin and completion-only policy without fabricating measurement or report versions',async()=>{
+    const row={...assessmentResource(assessmentScope,'BUNDLE'),units:[],requestedPolicy:{...assessmentResource().requestedPolicy,visibilityPolicyKey:'FORM_COMPLETION_ONLY_V1'}}
+    const adapter={list:vi.fn(async()=>assessmentDirectory(assessmentScope,[row])),addTrack:vi.fn(async()=>{})}
+    setup(assessmentScope,adapter)
+    const field=await open();fireEvent.change(field,{target:{value:educationAssessmentResourceId(row)}})
+    fireEvent.click(screen.getByText('核对固定内容、参数与报告版本'))
+    expect(screen.getByText(/此组合不含测量 C\/P\/R 单元/)).toHaveTextContent('不生成心理分数或报告')
+    fireEvent.click(screen.getByRole('button',{name:'加入已授权固定版本'}))
+    await waitFor(()=>expect(adapter.addTrack).toHaveBeenCalledWith(assessmentScope,expect.objectContaining({resource:{family:'BUNDLE',key:row.key,version:'1.0.0'},requestedPolicy:expect.objectContaining({visibilityPolicyKey:'FORM_COMPLETION_ONLY_V1'})})))
+  })
   it.each(['TEACHER','SCHOOL'] as const)('sends only an exact personal track for each family in %s',async product=>{
     const scope={...assessmentScope,product}
     const list=vi.fn(async()=>assessmentDirectory(scope,['COGNITIVE','SITUATIONAL','BUNDLE'].map(family=>assessmentResource(scope,family as 'COGNITIVE'|'SITUATIONAL'|'BUNDLE'))))
@@ -33,7 +43,7 @@ describe('education authorized assessment picker',()=>{
     fireEvent.click(add);fireEvent.click(add)
     expect(addTrack).toHaveBeenCalledTimes(1)
     expect(addTrack).toHaveBeenCalledWith(scope,{
-      expectedVersion:3,resource:{family:'BUNDLE',key:assessmentResource(scope).key,version:'1.0.0'},
+      expectedVersion:3,expectedRunId:scope.runId,resource:{family:'BUNDLE',key:assessmentResource(scope).key,version:'1.0.0'},
       subjectSelector:{kind:'ALL_CURRENT'},respondentSelector:{kind:'ALL_CURRENT'},
       requestedPolicy:assessmentResource(scope).requestedPolicy,
     })

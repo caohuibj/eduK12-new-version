@@ -446,7 +446,7 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
         {selected.status==='DRAFT'&&activeRun.status==='DRAFT'&&<>
           <EducationAssessmentResourcePicker
             scope={{product:'SCHOOL',organizationId,actorKey,workflowId:selected.courseId,runId:activeRun.id,expectedVersion:activeRun.version}}
-            adapter={assessmentResources} disabled={busy} onBusy={setBusy}
+            adapter={!compact||panel==='assessments'?assessmentResources:undefined} disabled={busy} onBusy={setBusy}
             onRefresh={async()=>{
               const context=resourceContext.current
               const data=await api<RunDetail>(path+'/runs/'+activeRun.id)

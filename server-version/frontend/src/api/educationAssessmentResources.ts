@@ -30,6 +30,7 @@ export type EducationAssessmentDirectory={
 }
 export type EducationAssessmentTrackInput={
   expectedVersion:number
+  expectedRunId:string
   resource:Pick<EducationAssessmentResource,'family'|'key'|'version'>
   subjectSelector:{kind:'ALL_CURRENT'};respondentSelector:{kind:'ALL_CURRENT'}
   requestedPolicy:RunRequestedPolicy
@@ -61,7 +62,7 @@ export function selectableEducationAssessmentResource(row:EducationAssessmentRes
     ||!policy||!only(policy.subjectRoles,role)||!only(policy.respondentRoles,role)||!only(policy.relationshipKinds,'SELF')
     ||!only(policy.perspectives,'SELF_REPORT')||policy.analysisMode!=='INDIVIDUAL_ONLY'||policy.minimumRespondents!==null
     ||!policy.visibilityPolicyKey?.trim()||(policy.targetPolicy&&policy.targetPolicy.mode!=='SELF'))return false
-  if(!Array.isArray(row.units)||!row.units.length||row.units.length>1000)return false
+  if(!Array.isArray(row.units)||row.units.length>1000||(row.family!=='BUNDLE'&&!row.units.length))return false
   if(row.family!=='BUNDLE'&&(row.units.length!==1||row.units[0]?.family!==(row.family==='SITUATIONAL'?'SJT':'COGNITIVE')))return false
   const items=new Set<string>(),releases=new Map<string,{hash:string;layer:string}>()
   for(const unit of row.units){
@@ -91,7 +92,7 @@ export function educationAssessmentTrackInput(scope:EducationAssessmentScope,row
   if(!selectableEducationAssessmentResource(row,scope)||!scope.actorKey||!scope.workflowId||!scope.runId
     ||!Number.isSafeInteger(scope.expectedVersion)||scope.expectedVersion<1)throw Error('资源资格或任务版本已变化，请重新读取授权目录。')
   const policy=row.requestedPolicy
-  return {expectedVersion:scope.expectedVersion,resource:{family:row.family,key:row.key,version:row.version},
+  return {expectedVersion:scope.expectedVersion,expectedRunId:scope.runId,resource:{family:row.family,key:row.key,version:row.version},
     subjectSelector:{kind:'ALL_CURRENT'},respondentSelector:{kind:'ALL_CURRENT'},requestedPolicy:{
       subjectRoles:[...policy.subjectRoles],respondentRoles:[...policy.respondentRoles],
       relationshipKinds:[...policy.relationshipKinds],perspectives:[...policy.perspectives],

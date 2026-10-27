@@ -1,5 +1,7 @@
 # School / Teacher 管理端独立切片
 
+后续真实 HTTP 目录、App adapter 注入和事务版本绑定已在[第二切片](management-routing.md)实现；本文保留第一切片当时的状态与原始证据。
+
 分支 `feat/pr363-education-management`，起点 `6cf241d65b4bc44878ef9d9fe21c81fdd02561cd`，主干参考 `7e6d7da4a01e4a42b410cf2dbdcfa76f11759fdc`。独立云端 `/workspace/eduK12-new-version` 已可用，原工作区干净，没有使用 Mac、创建其他对话或修改集成分支。
 
 ## 已核实调用点

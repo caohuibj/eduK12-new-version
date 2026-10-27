@@ -3,7 +3,7 @@ import {assertPrivateScaleRunResource,assertPrivateFormRunResource} from './educ
 import {privateRunTrackInput,privateFormRunTrackInput,assertPrivateRunSelection} from '../education-tools/private-tool.run-contract'
 import {assertRunTrackNarrowing,relationalEntryToRunPolicy} from './resourceAuthority'
 import {assertEducationLibraryPopulationSupport} from './educationLibraryPopulation'
-import {assertEducationRunLibraryResources} from './educationLibraryContext'
+import {assertEducationRunLibraryResources,readEducationRunLibraryContext,lockAndAssertEducationRunWorkflow} from './educationLibraryContext'
 import { randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -102,10 +102,29 @@ export async function addAssessmentRunTrackDraft(input: {
   requestedPolicy: RunTrackNarrowingRequest
   actorUserId?: string
   expectedVersion?: number
+  expectedRunId?:string
+  educationWorkflow?:{product:'SCHOOL'|'TEACHER';id:string}
   // Trusted product adapter can bind draft + track in the same transaction.
   tx?: Tx
 }): Promise<AssessmentRunTrackRecord> {
   const work=async (tx:Tx) => {
+    if(input.resource.key.startsWith('education-assessment:')){
+      if(!input.actorUserId||input.expectedVersion===undefined||!Number.isSafeInteger(input.expectedVersion)||input.expectedVersion<1)
+        throw new AssessmentRunRepositoryError('EDUCATION_ASSESSMENT_EXPECTED_VERSION_REQUIRED','Current editor and exact draft version required',400)
+      if(input.expectedRunId!==input.runId||!input.educationWorkflow)
+        throw new AssessmentRunRepositoryError('EDUCATION_ASSESSMENT_EXPECTED_RUN_REQUIRED','Exact workflow and run binding required',409)
+      const workflow=await readEducationRunLibraryContext(tx,input)
+      if(!workflow||workflow.product!==input.educationWorkflow.product
+        ||(workflow.product==='TEACHER'?workflow.teacherEventId:workflow.schoolCourseId)!==input.educationWorkflow.id)
+        throw new AssessmentRunRepositoryError('EDUCATION_ASSESSMENT_WORKFLOW_REQUIRED','Exact education workflow required',403)
+      await lockAndAssertEducationRunWorkflow(tx,{...input,actorUserId:input.actorUserId,purpose:'EDIT'},workflow)
+      if(workflow.product==='TEACHER'&&await tx.huiteacherStudentEvaluationConfig.findUnique({where:{
+        organizationId_eventId:{organizationId:input.organizationId,eventId:input.educationWorkflow.id}},select:{id:true}}))
+        throw new AssessmentRunRepositoryError('HUITEACHER_STUDENT_EVAL_TRACK_READONLY','Student evaluation tracks require their protected workflow',403)
+      const {assertEducationAssessmentRunUse}=await import('../education-tools/assessment-resource.authority')
+      const source=await assertEducationAssessmentRunUse(tx,{...input,actorUserId:input.actorUserId})
+      assertRunTrackNarrowing(relationalEntryToRunPolicy(source.entry),input.requestedPolicy)
+    }
     if(input.resource.key.startsWith('library-scale:'))assertEducationLibraryPopulationSupport([input])
     if(input.resource.key.startsWith('private-scale:')||input.resource.key.startsWith('private-form:')){
       const form=input.resource.key.startsWith('private-form:')
