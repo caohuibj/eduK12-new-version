@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "recordKind": "unsigned real PostgreSQL targeted integration evidence, not CI admission",
+  "branch": "feat/pr363-teacher-runtime",
+  "lastProductCommit": "cd6739bc07428a24f94311cb9da0fa42c78c57dc",
+  "lastProductTree": "3337b80465f5ff69c1285c41ac60270633055cf9",
+  "sourceProducerDependency": "41caf96cac175bafeccc4fd9e6c76111409767e6",
+  "feedbackReaderDependency": "b48dc7462bfaa8d9081a63c0d9e69f7338968763",
+  "postgres": "16.15",
+  "prisma": "5.22.0",
+  "node": "24.21.0",
+  "database": "pr363_runtime_test",
+  "restrictedRuntime": true,
+  "directFinalSeeding": false,
+  "serviceMocks": false,
+  "formalCI": false,
+  "browser": false,
+  "tenCaseSingleInvocation": false,
+  "uniquePolicyCasesPassed": 10,
+  "files": [
+    {
+      "path": "server-version/backend/src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts",
+      "sha256": "80bc3bb65496b5d39528a90d8d5b8bae63e3a1584379524c55d8ee6982a2dbfa"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/huiteacher/assessment-runtime.postgres.fixture.ts",
+      "sha256": "5c3857771fef6c66a9e7bd8be5b3b7a24927d6b9787f7d5795d71619ded54cb1"
+    }
+  ],
+  "checks": [
+    {
+      "archive": "pg-report-policy-r4.log.gz",
+      "exit": 0,
+      "rawSha256": "65540577ec23c48f90452f896cbf157d41e7ed5624a9fb7eba3d66b809f9612c",
+      "archiveSha256": "019645e903c25379890057e55a63fb1911ec9533b4ab874287bd434be705288e",
+      "passed": 8,
+      "commandAfterNode": [
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts",
+        "--reporter=verbose"
+      ],
+      "inputManifest": "policy-execution-inputs.json"
+    },
+    {
+      "archive": "pg-report-school-policy-r5.log.gz",
+      "exit": 0,
+      "rawSha256": "9844afe16c37e4d9a689189f9aaeb501e06d98422e97132a17be23db2826542f",
+      "archiveSha256": "889c10f933cc5da93d7016b50c375474c8765f983ef7ca16d8cad5fd6ac10eb7",
+      "passed": 2,
+      "commandAfterNode": [
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts",
+        "-t",
+        "SCHOOL.*FUTURE|SCHOOL.*DUE",
+        "--reporter=verbose"
+      ],
+      "inputManifest": "school-policy-inputs.json"
+    }
+  ]
+}

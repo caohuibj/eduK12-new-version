@@ -1,0 +1,9 @@
+{
+  "recordKind": "source snapshot during pg-report-school-policy-r5 execution; no bytes changed after invocation",
+  "head": "cd6739bc07428a24f94311cb9da0fa42c78c57dc",
+  "tree": "3337b80465f5ff69c1285c41ac60270633055cf9",
+  "file": "server-version/backend/src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts",
+  "sha256": "80bc3bb65496b5d39528a90d8d5b8bae63e3a1584379524c55d8ee6982a2dbfa",
+  "filter": "SCHOOL.*FUTURE|SCHOOL.*DUE",
+  "reason": "new School timed versions; original 8 successful configurations are not repeated"
+}
