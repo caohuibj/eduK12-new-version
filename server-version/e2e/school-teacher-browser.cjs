@@ -28,7 +28,7 @@ const { spawn, execFileSync } = require('node:child_process')
 const { pathToFileURL } = require('node:url')
 const { randomUUID, createHmac } = require('node:crypto')
 const { readFixture, sourceIdentity, backend, repo, sha } = require('./school-teacher-fixture.cjs')
-const { probeKeyboard, prepareRenderedCjk, createUiChecks, verifyReport, validateOfficialFrontendReceipt, validateOfficialBackendReceipt, computeBackendCompileDigest } = require('./school-teacher-ui.cjs')
+const { readLayoutState, probeKeyboard, prepareRenderedCjk, createUiChecks, verifyReport, validateOfficialFrontendReceipt, validateOfficialBackendReceipt, computeBackendCompileDigest } = require('./school-teacher-ui.cjs')
 const { preflightChrome, verifyChromeSandbox, inspectCjkFonts, CHROME_LAUNCH_OPTIONS } = require('./school-teacher-chrome.cjs')
 const pause = ms => new Promise(resolve => setTimeout(resolve, ms))
 const origins = { SCHOOL: 'https://school.eduk12.top', TEACHER: 'https://teacher.eduk12.top' }
@@ -319,6 +319,21 @@ async function run() {
     stage = 'browser-sandbox-evidence'
     report.chrome.sandbox = await verifyChromeSandbox(browser)
     assert.equal(report.chrome.sandbox.ok, true, 'Runtime sandbox evidence missing or unsafe')
+    stage = 'layout-detector-native-contract'
+    // A network-free synthetic page verifies the detector on this exact browser.
+    // Business pages and API responses remain untouched.
+    const layoutContext = await browser.newContext({ viewport: { width: 320, height: 844 } })
+    try {
+      const page = await layoutContext.newPage()
+      await page.setContent('<details><summary>Closed</summary><select style="width:500px"><option>Sort</option></select></details><select id="visible" style="width:500px"><option>Visible</option></select>')
+      const closed = await page.evaluate(readLayoutState)
+      assert.equal(closed.clipped.length, 1, 'Visible overflowing SELECT must remain a failure')
+      assert.equal(closed.clipped[0].tag, 'SELECT')
+      await page.locator('summary').click()
+      const opened = await page.evaluate(readLayoutState)
+      assert.equal(opened.clipped.length, 2, 'Opening details must expose its overflowing SELECT')
+      report.layoutDetector = { status: 'PASSED', closedVisibleClips: 1, openVisibleClips: 2 }
+    } finally { await layoutContext.close() }
     // Do not inherit production credentials, external storage, mail or telemetry.
 
     async function session(product, user, label, options = {}) {

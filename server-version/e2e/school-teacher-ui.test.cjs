@@ -57,7 +57,7 @@ function sample() {
   const obs = width => ({ viewport: { width, height: width === 1440 ? 900 : 844 },
     layout: { width, scrollWidth: width, secretNodes: 0, filledPasswords: false, clipped: [] },
     keyboard: { visible: true, focusVisible: true, ring: true }, accessibility: { violations: [], passes: 1, incomplete: [] } })
-  const report = { schemaVersion: 1, status: 'PASSED', source: { head, tree }, runId, inputs: manifests, chrome,
+  const report = { schemaVersion: 1, status: 'PASSED', layoutDetector: { status: 'PASSED', closedVisibleClips: 1, openVisibleClips: 2 }, source: { head, tree }, runId, inputs: manifests, chrome,
     startups: [], errors: [], coverage: [], screenshots: [], keyboard: [], sessions: [], notCovered: ['Real media storage', 'Public TLS'],
     ui: { schemaVersion: 1, scope: 'bounded-brand-theme-layout', fontIssues: [], observations: [], screenshots: [], checks: [], sessions: [], notCovered: ['Real cognitive task computed-style isolation', 'CJK evidence covers four fixed real Chinese nodes, not every Unicode character or every page'] } }
   for (const product of ['SCHOOL', 'TEACHER']) {
@@ -209,4 +209,16 @@ test('School publish consumer opens the actual assessment panel before choosing 
  assert(fn.indexOf("name: '正式测评批次'")<fn.indexOf("w.runName + ' · 准备中'"));
  const component=fs.readFileSync(path.join(__dirname,'../frontend/src/school/SchoolActivityManager.tsx'),'utf8');
  assert.match(component,/aria-label="活动配置分区"/);assert.match(component,/hidden=\{compact&&panel!=='assessments'\}/);
+});
+
+test('layout detector excludes only unpainted overflow and still rejects visible SELECT',()=>{
+ const vm=require('node:vm');const {readLayoutState}=require('./school-teacher-ui.cjs');
+ const el=(visible,closed=false)=>({tagName:'SELECT',parentElement:null,getAttribute:()=>null,getBoundingClientRect:()=>({width:500,height:20,left:8,right:508}),checkVisibility:options=>{assert.equal(options.visibilityProperty,true);return visible},closest:()=>closed?{}:null});
+ const hidden=el(false,true),visible=el(true);let controls=[hidden,visible];
+ const ctx={document:{querySelectorAll:selector=>selector.startsWith('button,')?controls:[],documentElement:{scrollWidth:508}},innerWidth:320,getComputedStyle:()=>({visibility:'visible'})};
+ const read=()=>JSON.parse(JSON.stringify(vm.runInNewContext('('+readLayoutState.toString()+')()',ctx)));
+ assert.deepEqual(read().clipped,[{tag:'SELECT',role:null}]);assert.equal(read().unpaintedOverflow[0].closedDetails,true);
+ controls=[el(true),visible];assert.equal(read().clipped.length,2);
+ controls=[hidden];assert.equal(read().clipped.length,0);assert.equal(read().scrollWidth,508); // page overflow is never suppressed
+ controls=[{...visible,checkVisibility:undefined}];assert.throws(read); // unknown visibility fails closed
 });

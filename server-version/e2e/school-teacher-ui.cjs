@@ -13,6 +13,28 @@ const narrow = [{ width: 320, height: 844 }, { width: 390, height: 844 }]
 const darkStates = ['form-author-editor', 'typed-matrix-row-refusal', 'personal-fixed-version-report']
 const originalShots = ['scale-author-preview', 'form-author-editor', 'form-author-preview', 'fixed-version-selection-preview', 'scale-answer', 'personal-fixed-version-report', 'typed-single-restored', 'typed-multiple', 'typed-matrix-row-refusal', 'form-completed-no-score']
 
+function readLayoutState() {
+  const forbidden = document.querySelectorAll('.ht-secret,.hs-secret,.ht-mfa-setup').length
+  const filledPasswords = [...document.querySelectorAll('input[type="password"]')].some(el => el.value.length > 0)
+  const unpaintedOverflow = []
+  const clipped = [...document.querySelectorAll('button,a[href],input,select,textarea,summary')].filter(el => {
+    const r = el.getBoundingClientRect(), css = getComputedStyle(el)
+    if (!r.width || !r.height || css.visibility === 'hidden' || (r.left >= -1 && r.right <= innerWidth + 1)) return false
+    const visible = el.checkVisibility({ visibilityProperty: true })
+    if (!visible) {
+      unpaintedOverflow.push({ tag: el.tagName, closedDetails: Boolean(el.closest('details:not([open])')), left: r.left, right: r.right })
+      return false
+    }
+    // A deliberate, bounded inner scroll area (e.g. a matrix) is not page overflow.
+    for (let parent = el.parentElement; parent; parent = parent.parentElement) {
+      const p = parent.getBoundingClientRect(), style = getComputedStyle(parent)
+      if (['auto', 'scroll'].includes(style.overflowX) && parent.scrollWidth > parent.clientWidth && p.left >= -1 && p.right <= innerWidth + 1) return false
+    }
+    return true
+  }).map(el => ({ tag: el.tagName, role: el.getAttribute('role') }))
+  return { width: innerWidth, scrollWidth: document.documentElement.scrollWidth, secretNodes: forbidden, filledPasswords, clipped, unpaintedOverflow }
+}
+
 function readKeyboardState() {
   const el = document.activeElement, css = getComputedStyle(el), r = el.getBoundingClientRect()
   return { tag: el.tagName, type: el.getAttribute('type'), role: el.getAttribute('role'),
@@ -241,21 +263,7 @@ function createUiChecks({ report, out, axeSource, getFontInventory }) {
     await s.page.setViewportSize(viewport)
     await s.page.waitForLoadState('networkidle')
     await s.page.evaluate(async () => { await document.fonts.ready; await Promise.all([...document.images].map(img => img.decode())) })
-    const layout = await s.page.evaluate(() => {
-      const forbidden = document.querySelectorAll('.ht-secret,.hs-secret,.ht-mfa-setup').length
-      const filledPasswords = [...document.querySelectorAll('input[type="password"]')].some(el => el.value.length > 0)
-      const clipped = [...document.querySelectorAll('button,a[href],input,select,textarea,summary')].filter(el => {
-        const r = el.getBoundingClientRect(), css = getComputedStyle(el)
-        if (!r.width || !r.height || css.visibility === 'hidden' || (r.left >= -1 && r.right <= innerWidth + 1)) return false
-        // A deliberate, bounded inner scroll area (e.g. a matrix) is not page overflow.
-        for (let parent = el.parentElement; parent; parent = parent.parentElement) {
-          const p = parent.getBoundingClientRect(), style = getComputedStyle(parent)
-          if (['auto', 'scroll'].includes(style.overflowX) && parent.scrollWidth > parent.clientWidth && p.left >= -1 && p.right <= innerWidth + 1) return false
-        }
-        return true
-      }).map(el => ({ tag: el.tagName, role: el.getAttribute('role') }))
-      return { width: innerWidth, scrollWidth: document.documentElement.scrollWidth, secretNodes: forbidden, filledPasswords, clipped }
-    })
+    const layout = await s.page.evaluate(readLayoutState)
     assert.equal(layout.secretNodes, 0); assert.equal(layout.filledPasswords, false)
     if (publicEmpty) assert.equal(await s.page.locator('input').evaluateAll(elements => elements.some(el => el.value)), false, 'Public screenshots must contain no entered account data')
     const renderedBrand = await brand(s, mode)
@@ -476,6 +484,7 @@ function validateReportBuildInputs(report, options) {
 function verifyReport(report, options, readScreenshot) {
   const { head, tree, runId } = options
   assert.equal(report.schemaVersion, 1); assert.equal(report.status, 'PASSED'); assert.deepEqual(report.errors, [])
+  assert.deepEqual(report.layoutDetector, { status: 'PASSED', closedVisibleClips: 1, openVisibleClips: 2 })
   validateReportBuildInputs(report, options)
   assert.deepEqual(report.startups, products.map(product => ({ product,
     corsOrigin: `https://${product.toLowerCase()}.eduk12.top`, ready: true, phase: 'READY' })))
@@ -593,4 +602,4 @@ function verifyReport(report, options, readScreenshot) {
     notCovered: [...report.notCovered, ...ui.notCovered] }
 }
 
-module.exports = { selectAppearanceButton, classifyThemeFailure, readKeyboardState, probeKeyboard, settleThemeTransitions, OFFICIAL_BACKEND, BACKEND_FIXTURE_EXCEPTION, computeBackendCompileDigest, validateOfficialBackendReceipt, OFFICIAL_FRONTEND, validateOfficialFrontendReceipt, validateReportBuildInputs, cjkSampleIds, validateUiFontEvidence, prepareRenderedCjk, readRenderedCjk, appearanceKeys, imageMode, validateSelectedImages, createUiChecks, verifyReport, products, darkStates, originalShots }
+module.exports = { readLayoutState, selectAppearanceButton, classifyThemeFailure, readKeyboardState, probeKeyboard, settleThemeTransitions, OFFICIAL_BACKEND, BACKEND_FIXTURE_EXCEPTION, computeBackendCompileDigest, validateOfficialBackendReceipt, OFFICIAL_FRONTEND, validateOfficialFrontendReceipt, validateReportBuildInputs, cjkSampleIds, validateUiFontEvidence, prepareRenderedCjk, readRenderedCjk, appearanceKeys, imageMode, validateSelectedImages, createUiChecks, verifyReport, products, darkStates, originalShots }
