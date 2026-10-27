@@ -1,0 +1,31 @@
+import {performance} from 'node:perf_hooks'
+import {randomUUID} from 'node:crypto'
+import {writeFileSync} from 'node:fs'
+const root=process.env.PROBE_BACKEND_ROOT!,imp=(p:string)=>import(root+'/'+p)
+async function main(){
+ const target=new URL(process.env.DATABASE_URL!);if(target.hostname!=='127.0.0.1'||target.port!=='55433'||target.pathname!=='/training_whole_probe_test'||process.env.NODE_ENV!=='test')throw Error('Owned synthetic Training database required')
+ const {prisma:db}=await imp('src/config/database.ts'),{default:express}=await imp('node_modules/express/index.js'),{default:router}=await imp('src/modules/composite/composite.routes.ts')
+ const {cacheService}=await imp('src/services/cacheService.ts');await cacheService.initialize();if(!cacheService.getStatus().connected)throw Error('Dedicated Redis required')
+ const {createReportOutboxFixture:create}=await imp('src/__tests__/integration/report-outbox-fixture.ts'),{generateToken}=await imp('src/utils/jwt.ts')
+ const {claimCompositeReportJob:claim}=await imp('src/modules/assessment-runtime/report-outbox.service.ts'),{processCompositeReportJob:work}=await imp('src/workers/compositeReportWorker.ts')
+ const events:any[]=[];db.$on('query',(e:any)=>events.push({sql:e.query,duration:e.duration}))
+ const app=express();app.use(express.json({limit:'2mb'}));app.use('/api/composite-assessments',router);app.use((e:any,_q:any,r:any,_n:any)=>r.status(e.statusCode||500).json({code:e.code||'ERROR'}))
+ const server=app.listen(0,'127.0.0.1');await new Promise<void>(r=>server.once('listening',r));const rows:any[]=[]
+ try{
+  for(const sample of ['FIRST_PREPARED','SECOND_PREPARED']){
+   const f=await create(db,2);const token=generateToken({userId:f.participant.id,role:f.participant.role,accountDomain:f.participant.accountDomain,tokenVersion:f.participant.tokenVersion});const prefix='/api/composite-assessments/attempts/'+f.parent.id
+   async function measure(label:string,task:()=>Promise<any>){const n=events.length,c=process.cpuUsage(),t=performance.now();const value=await task(),d=process.cpuUsage(c),selected=events.slice(n);rows.push({sample,label,elapsedMs:performance.now()-t,cpuMs:(d.user+d.system)/1000,sqlEvents:selected.length,queryEventDurationMs:selected.reduce((s,e)=>s+e.duration,0),rssBytes:process.memoryUsage().rss});return value}
+   async function call(label:string,suffix:string,body?:unknown){return measure(label,async()=>{const r=await fetch('http://127.0.0.1:'+server.address().port+prefix+suffix,{method:body===undefined?'GET':'POST',headers:{'Content-Type':'application/json',Cookie:'ptool_session='+token},...(body===undefined?{}:{body:JSON.stringify(body)})});const text=await r.text(),v=JSON.parse(text);if(r.status!==200||v.code!==0)throw Error(label+' failed '+r.status+' '+v.code);return v.data})}
+   const definition=await call('whole-definition','/whole/definition');const input={submissionId:randomUUID(),attemptEpoch:definition.attemptEpoch,slotSetHash:definition.slotSetHash,contextSnapshotHash:definition.contextSnapshotHash,units:definition.units.map((u:any)=>({itemId:u.itemId,definitionHash:u.definitionHash,answers:f.inputs.find((i:any)=>i.assessmentId===u.scaleAssessmentId)!.answers}))}
+   const accepted=await call('durable-ACK','/whole/submit',input);if(accepted.status!=='ACCEPTED')throw Error('No durable acceptance')
+   const replay=await call('ACK-replay','/whole/submit',input);if(!replay.replayed||replay.payloadHash!==accepted.payloadHash)throw Error('Receipt changed')
+   const pending=await call('report-status-before-worker','/report-status');if(pending.reportStatus.state==='READY')throw Error('Unexpected early report')
+   await measure('claim-and-process-worker',async()=>{const job=await claim();if(job?.attemptId!==f.parent.id)throw Error('Unexpected queue item');await work(job);const done=await db.compositeReportJob.findUniqueOrThrow({where:{id:job.id}});if(done.status!=='READY')throw Error('Worker did not complete')})
+   const ready=await call('report-status-ready','/report-status');if(ready.reportStatus.state!=='READY')throw Error('Ready absent')
+   await call('authorized-report','/report')
+   if(await db.assessmentUnitSnapshot.count({where:{compositeAttemptId:f.parent.id,unitType:'SCALE',terminalState:'COMPLETED'}})!==2)throw Error('Missing immutable finals')
+  }
+  writeFileSync(process.env.TRAINING_PROBE_OUTPUT!,JSON.stringify({scope:'prepared 2x3-item synthetic whole-questionnaire fixture; real authenticated HTTP ACK/status/report and manually claimed real worker; not publication/START, browser, production queue scheduling or capacity',flags:{async:true,whole:true,detached:true,compact:false,sharedControl:false},rows},null,2));console.log('Training whole probe completed')
+ }finally{await new Promise<void>(r=>server.close(()=>r()));await(await imp('src/config/queue.ts')).closeQueues(true);await cacheService.close();await db.$disconnect()}
+}
+main().catch(e=>{console.error(JSON.stringify({name:e?.name,code:e?.code,message:String(e?.message),stack:String(e?.stack).split('\n').slice(1,5)}));process.exit(1)})

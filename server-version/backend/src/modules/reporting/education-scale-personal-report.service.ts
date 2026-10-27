@@ -71,6 +71,10 @@ async function readOwn(tx: Prisma.TransactionClient, input: EducationPersonalRep
  * The public publication/START readiness gate remains outside this reader. */
 export async function readEducationRespondentScaleReport(input: EducationPersonalReportInput) {
   return prisma.$transaction(async tx => {
+    // One execution ID anchors the explicit joins. Bound planner search only
+    // inside this report transaction; PostgreSQL restores the pooled session
+    // setting at commit/rollback. Keep both current-authority reads unchanged.
+    await tx.$executeRaw`SET LOCAL join_collapse_limit = 1`
     const own = await readOwn(tx, input)
     if (!own || !(own.resourceKey.startsWith('library-scale:') || own.resourceKey.startsWith('private-scale:'))) return null
     if (canonicalHash(own.policy) !== own.policyHash) return hidden()

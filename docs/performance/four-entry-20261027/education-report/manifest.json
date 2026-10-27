@@ -1,0 +1,42 @@
+{
+  "base": "f2b6f984d5354ea0085b4df77e2c4e31febf7bd7",
+  "candidateFiles": {
+    "server-version/backend/src/modules/reporting/education-scale-personal-report.service.ts": "6de063a2b2d0aa56a1681d97f104a9b80d430f0006bef5f1724e012bd685702e",
+    "server-version/backend/src/__tests__/reporting/education-scale-personal-report.service.test.ts": "a3e953e7863b8b339e5c463531987b19f28fa4187b41a294d6f67cbcafe142e3"
+  },
+  "environment": {
+    "node": "24.22.1",
+    "postgres": "17.11",
+    "redis": "8.0.2",
+    "jit": "off",
+    "postgresSharedBuffers": "64MB",
+    "maxConnections": 20,
+    "compactFacts": false,
+    "sharedControl": false
+  },
+  "checks": {
+    "unit": {
+      "files": 1,
+      "passed": 5
+    },
+    "postgres": {
+      "files": 3,
+      "passed": 9,
+      "failed": 0,
+      "skipped": 0
+    },
+    "types": {
+      "roots": 5,
+      "sourceFiles": 1567,
+      "diagnostics": 0
+    }
+  },
+  "limits": [
+    "local development evidence, not formal CI admission",
+    "report-only HTTP mounts with actual product authentication; no browser or full middleware",
+    "synthetic fixture sizes not production concurrency",
+    "service START/FINAL aggregate is not comparable to Survey HTTP FINAL",
+    "first scalar subquery fence did not reduce planning, reverted",
+    "initial scoped typecheck lacked Express augmentation and exposed one pre-existing test cast; corrected scope/cast then zero diagnostics"
+  ]
+}

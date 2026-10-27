@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-const m = vi.hoisted(() => ({ query: vi.fn(), scope: vi.fn(), source: vi.fn(), parent: vi.fn(), children: vi.fn(), final: vi.fn(),
+const m = vi.hoisted(() => ({ execute: vi.fn(), query: vi.fn(), scope: vi.fn(), source: vi.fn(), parent: vi.fn(), children: vi.fn(), final: vi.fn(),
   runtime: vi.fn(), admission: vi.fn(), slots: vi.fn(), canonical: vi.fn(), reader: vi.fn(), result: vi.fn(), report: vi.fn(), project: vi.fn() }))
 vi.mock('../../config/database', () => ({ prisma: { $transaction: (work: (tx: unknown) => unknown) => work({
-  $queryRaw: m.query, compositeAssessmentAttempt: { findUnique: m.parent }, assessment: { findMany: m.children },
+  $executeRaw: m.execute, $queryRaw: m.query, compositeAssessmentAttempt: { findUnique: m.parent }, assessment: { findMany: m.children },
   assessmentUnitSnapshot: { findMany: m.final },
 }) } }))
 vi.mock('../../modules/organization/educationProductAccess', () => ({ resolveEducationProductMemberScope: m.scope }))
@@ -24,7 +24,7 @@ beforeEach(() => {
   m.reader.mockResolvedValue({read:vi.fn(),find:vi.fn()})
   const contract: ResultDisclosureContractV1 = { schemaVersion: 1, policyKey: 'test', minimumRespondents: null,
     audiences: Object.fromEntries(resultAudiences.map(key => [key, { mode: key === 'RESPONDENT' ? 'INDIVIDUAL_SUMMARY' : 'NONE',
-      metricKeys: key === 'RESPONDENT' ? ['score'] : [], longitudinalMetricKeys: [] }])) as ResultDisclosureContractV1['audiences'] }
+      metricKeys: key === 'RESPONDENT' ? ['score'] : [], longitudinalMetricKeys: [] }])) as unknown as ResultDisclosureContractV1['audiences'] }
   const policy = { analysisMode: 'INDIVIDUAL_ONLY', resultDisclosure: contract }
   own = { organizationId: 'org-1', resourceKey: 'library-scale:entry:TEACHER:TEACHER:SELF', resourceVersion: '1.0.0',
     attemptId: 'attempt-1', assignmentId: 'assignment-1', policy, policyHash: canonicalHash(policy) }
@@ -63,6 +63,9 @@ describe('education personal report reader orchestration (mock storage)', () => 
       context: expect.objectContaining({ audience: 'respondent' }) }))
     expect(m.project.mock.calls[0][0]).not.toHaveProperty('binding')
     expect(m.query).toHaveBeenCalledTimes(2)
+    expect(m.execute).toHaveBeenCalledTimes(1)
+    expect(m.execute.mock.calls[0][0].join('')).toBe('SET LOCAL join_collapse_limit = 1')
+    expect(m.execute.mock.invocationCallOrder[0]).toBeLessThan(m.query.mock.invocationCallOrder[0])
   })
   it('rechecks access after asynchronous result reads', async () => {
     m.query.mockReset().mockResolvedValueOnce([own]).mockResolvedValueOnce([])

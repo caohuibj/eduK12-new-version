@@ -1,3 +1,4 @@
+import {reportPlanningPlan,reportPlanningOutputs} from './report-planning-scope.mjs';
 import {pr357Plan,pr357Outputs} from './pr357-scope.mjs';
 import {post356Plan,post356Outputs} from './post356-scope.mjs';
 import {refuseUnplannedPR356} from './pr356-entry.mjs';
@@ -316,6 +317,8 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const event = process.env.CI_EVENT;
   refuseUnplannedPR356();
   const base = process.env.CI_BASE_SHA;
+  const reportPlanning=reportPlanningPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
+  if(reportPlanning){const output=reportPlanningOutputs(reportPlanning);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
   const pr357=pr357Plan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
   if(pr357){const output=pr357Outputs(pr357);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
   const post356=post356Plan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());

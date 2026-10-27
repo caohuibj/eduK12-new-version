@@ -1,0 +1,159 @@
+{
+  "scope": "synthetic fixture plus completed child storage deltas for explicit tables; includes fixture/version/start overhead, not marginal answer cost or production DB bill; authenticated reports checked",
+  "flags": {
+    "compactFacts": false,
+    "sharedControl": false
+  },
+  "rows": [
+    {
+      "product": "SCHOOL",
+      "phase": "service-start-final-parent-completion",
+      "elapsedMs": 364.56682100000035,
+      "cpuMs": 238.25,
+      "sqlEvents": 195
+    },
+    {
+      "product": "SCHOOL",
+      "phase": "fixture-and-completion-storage",
+      "tableDeltas": {
+        "assessments": {
+          "rows": 1,
+          "logicalBytes": 18040,
+          "allocatedBytes": 16384
+        },
+        "assessment_unit_snapshots": {
+          "rows": 1,
+          "logicalBytes": 4428,
+          "allocatedBytes": 0
+        },
+        "assessment_result_facts": {
+          "rows": 0,
+          "logicalBytes": 0,
+          "allocatedBytes": 0
+        },
+        "assessment_runtime_artifacts": {
+          "rows": 0,
+          "logicalBytes": 0,
+          "allocatedBytes": 0
+        },
+        "assessment_public_templates": {
+          "rows": 0,
+          "logicalBytes": 0,
+          "allocatedBytes": 0
+        },
+        "assessment_frozen_bindings": {
+          "rows": 0,
+          "logicalBytes": 0,
+          "allocatedBytes": 0
+        },
+        "composite_assessment_attempts": {
+          "rows": 1,
+          "logicalBytes": 5927,
+          "allocatedBytes": 8192
+        },
+        "composite_report_jobs": {
+          "rows": 0,
+          "logicalBytes": 0,
+          "allocatedBytes": 0
+        }
+      }
+    },
+    {
+      "product": "SCHOOL",
+      "phase": "first-report-read",
+      "elapsedMs": 83.79742699999997,
+      "cpuMs": 48.782,
+      "sqlEvents": 21,
+      "queryEventDurationMs": 31,
+      "responseBytes": 1655,
+      "rssBytes": 351219712,
+      "verified": true
+    },
+    {
+      "product": "SCHOOL",
+      "phase": "repeat-report-read",
+      "elapsedMs": 42.16805599999998,
+      "cpuMs": 24.881,
+      "sqlEvents": 21,
+      "queryEventDurationMs": 13,
+      "responseBytes": 1655,
+      "rssBytes": 351219712,
+      "verified": true
+    },
+    {
+      "product": "TEACHER",
+      "phase": "service-start-final-parent-completion",
+      "elapsedMs": 312.50403400000005,
+      "cpuMs": 163.015,
+      "sqlEvents": 195
+    },
+    {
+      "product": "TEACHER",
+      "phase": "fixture-and-completion-storage",
+      "tableDeltas": {
+        "assessments": {
+          "rows": 1,
+          "logicalBytes": 18035,
+          "allocatedBytes": 16384
+        },
+        "assessment_unit_snapshots": {
+          "rows": 1,
+          "logicalBytes": 4428,
+          "allocatedBytes": 8192
+        },
+        "assessment_result_facts": {
+          "rows": 0,
+          "logicalBytes": 0,
+          "allocatedBytes": 0
+        },
+        "assessment_runtime_artifacts": {
+          "rows": 0,
+          "logicalBytes": 0,
+          "allocatedBytes": 0
+        },
+        "assessment_public_templates": {
+          "rows": 0,
+          "logicalBytes": 0,
+          "allocatedBytes": 0
+        },
+        "assessment_frozen_bindings": {
+          "rows": 0,
+          "logicalBytes": 0,
+          "allocatedBytes": 0
+        },
+        "composite_assessment_attempts": {
+          "rows": 1,
+          "logicalBytes": 5930,
+          "allocatedBytes": 8192
+        },
+        "composite_report_jobs": {
+          "rows": 0,
+          "logicalBytes": 0,
+          "allocatedBytes": 0
+        }
+      }
+    },
+    {
+      "product": "TEACHER",
+      "phase": "first-report-read",
+      "elapsedMs": 60.3741829999999,
+      "cpuMs": 26.026,
+      "sqlEvents": 20,
+      "queryEventDurationMs": 30,
+      "responseBytes": 1655,
+      "rssBytes": 354578432,
+      "verified": true
+    },
+    {
+      "product": "TEACHER",
+      "phase": "repeat-report-read",
+      "elapsedMs": 40.670452999999725,
+      "cpuMs": 23.865,
+      "sqlEvents": 20,
+      "queryEventDurationMs": 14,
+      "responseBytes": 1655,
+      "rssBytes": 354709504,
+      "verified": true
+    }
+  ]
+}

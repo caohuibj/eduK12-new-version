@@ -1,0 +1,138 @@
+{
+  "scope": "prepared 2x3-item synthetic whole-questionnaire fixture; real authenticated HTTP ACK/status/report and manually claimed real worker; not publication/START, browser, production queue scheduling or capacity",
+  "flags": {
+    "async": true,
+    "whole": true,
+    "detached": true,
+    "compact": false,
+    "sharedControl": false
+  },
+  "rows": [
+    {
+      "sample": "FIRST_PREPARED",
+      "label": "whole-definition",
+      "elapsedMs": 158.65160100000048,
+      "cpuMs": 176.873,
+      "sqlEvents": 27,
+      "queryEventDurationMs": 6,
+      "rssBytes": 411860992
+    },
+    {
+      "sample": "FIRST_PREPARED",
+      "label": "durable-ACK",
+      "elapsedMs": 33.7410519999994,
+      "cpuMs": 28.441,
+      "sqlEvents": 13,
+      "queryEventDurationMs": 2,
+      "rssBytes": 412516352
+    },
+    {
+      "sample": "FIRST_PREPARED",
+      "label": "ACK-replay",
+      "elapsedMs": 7.371353000000454,
+      "cpuMs": 16.392,
+      "sqlEvents": 3,
+      "queryEventDurationMs": 0,
+      "rssBytes": 420511744
+    },
+    {
+      "sample": "FIRST_PREPARED",
+      "label": "report-status-before-worker",
+      "elapsedMs": 9.763554999999542,
+      "cpuMs": 16.208,
+      "sqlEvents": 6,
+      "queryEventDurationMs": 0,
+      "rssBytes": 426176512
+    },
+    {
+      "sample": "FIRST_PREPARED",
+      "label": "claim-and-process-worker",
+      "elapsedMs": 246.87290699999994,
+      "cpuMs": 221.812,
+      "sqlEvents": 70,
+      "queryEventDurationMs": 3,
+      "rssBytes": 440971264
+    },
+    {
+      "sample": "FIRST_PREPARED",
+      "label": "report-status-ready",
+      "elapsedMs": 7.647109999999884,
+      "cpuMs": 7.098,
+      "sqlEvents": 6,
+      "queryEventDurationMs": 0,
+      "rssBytes": 441102336
+    },
+    {
+      "sample": "FIRST_PREPARED",
+      "label": "authorized-report",
+      "elapsedMs": 10.175732000000608,
+      "cpuMs": 10.474,
+      "sqlEvents": 6,
+      "queryEventDurationMs": 0,
+      "rssBytes": 441102336
+    },
+    {
+      "sample": "SECOND_PREPARED",
+      "label": "whole-definition",
+      "elapsedMs": 21.849592999999913,
+      "cpuMs": 19.444,
+      "sqlEvents": 27,
+      "queryEventDurationMs": 0,
+      "rssBytes": 441364480
+    },
+    {
+      "sample": "SECOND_PREPARED",
+      "label": "durable-ACK",
+      "elapsedMs": 11.123430999999982,
+      "cpuMs": 9.312,
+      "sqlEvents": 12,
+      "queryEventDurationMs": 0,
+      "rssBytes": 441364480
+    },
+    {
+      "sample": "SECOND_PREPARED",
+      "label": "ACK-replay",
+      "elapsedMs": 5.311878999999863,
+      "cpuMs": 6.784,
+      "sqlEvents": 3,
+      "queryEventDurationMs": 0,
+      "rssBytes": 441888768
+    },
+    {
+      "sample": "SECOND_PREPARED",
+      "label": "report-status-before-worker",
+      "elapsedMs": 6.036380999999892,
+      "cpuMs": 6.714,
+      "sqlEvents": 6,
+      "queryEventDurationMs": 0,
+      "rssBytes": 441888768
+    },
+    {
+      "sample": "SECOND_PREPARED",
+      "label": "claim-and-process-worker",
+      "elapsedMs": 52.70267999999942,
+      "cpuMs": 44.576,
+      "sqlEvents": 70,
+      "queryEventDurationMs": 1,
+      "rssBytes": 442544128
+    },
+    {
+      "sample": "SECOND_PREPARED",
+      "label": "report-status-ready",
+      "elapsedMs": 6.334600000000137,
+      "cpuMs": 7.156,
+      "sqlEvents": 6,
+      "queryEventDurationMs": 0,
+      "rssBytes": 442544128
+    },
+    {
+      "sample": "SECOND_PREPARED",
+      "label": "authorized-report",
+      "elapsedMs": 6.370084999999563,
+      "cpuMs": 6.213,
+      "sqlEvents": 6,
+      "queryEventDurationMs": 0,
+      "rssBytes": 442544128
+    }
+  ]
+}

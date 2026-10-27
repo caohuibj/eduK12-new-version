@@ -4,7 +4,7 @@ export async function prepare(){
  const {prisma:db}=await imp('src/config/database.ts')
  const gov=await imp('src/modules/survey/governed-tool.service.ts'),pkg=await imp('src/modules/survey/governed-package.service.ts')
  const builder=await imp('src/modules/survey/builder.service.ts'),waves=await imp('src/modules/survey/waves.service.ts'),publish=await imp('src/modules/survey/waves.publish.ts')
- const catalog=await imp('src/modules/survey/catalog.service.ts'),{changeSurveyToolPolicy}=await imp('src/modules/survey/library-admin.service.ts')
+ const catalog=await imp('src/modules/survey/catalog.service.ts'),{assertToolEntryPolicy}=await imp('src/modules/survey/tool-policy.ts')
  const {governedPolicyIdentity}=await imp('src/modules/survey/governed-tool.model.ts')
  const create=async(domain:string,role='STANDARD')=>db.user.create({data:{username:'probe-'+randomUUID(),passwordHash:'synthetic-unusable',accountDomain:domain,platformRole:role}})
  const system=await create('TRAINING','SYSTEM_ADMIN'),manager=await create('TRAINING'),owner=await create('SURVEY')
@@ -14,8 +14,8 @@ export async function prepare(){
  await db.surveyResearcherGrant.create({data:{userId:owner.id,status:'ACTIVE',grantedBy:manager.id}})
  await db.surveyMfaCredential.create({data:{userId:owner.id,enabled:true,secretCipher:'synthetic-unusable'}})
  const proof={adminVerifiedAt:Math.floor(Date.now()/1000),adminSessionId:randomUUID(),tokenVersion:0}
- const approve=async(id:string)=>{const r=await gov.governedRow(db,id),a=await gov.approveGovernedTool(system.id,id,{expectedVersion:r.version,hash:r.snapshot_hash,decision:'APPROVE',reason:'Isolated resource fixture'},proof);if(a.state!=='ONLINE')throw Error('Synthetic exact version did not pass trial');return gov.governedRow(db,id)}
- const admit=async(row:any)=>changeSurveyToolPolicy(manager.id,{...governedPolicyIdentity(row),expectedVersion:0,decision:'APPROVED',paused:false,reason:'Isolated exact Survey fixture'})
+ const approve=async(id:string)=>{const r=await gov.governedRow(db,id),a=await gov.approveGovernedTool(system.id,id,{expectedVersion:r.version,hash:r.snapshot_hash,decision:'APPROVE',allowedProducts:['SURVEY'],reason:'Isolated resource fixture'},proof);if(a.state!=='ONLINE')throw Error('Synthetic exact version did not pass trial');return gov.governedRow(db,id)}
+ const admit=async(row:any)=>db.$transaction((tx:any)=>assertToolEntryPolicy(tx,governedPolicyIdentity(row),'SURVEY'))
  const project=async(title:string)=>db.surveyProject.create({data:{id:randomUUID(),ownerUserId:owner.id,title,collectionMode:'SINGLE_UNLINKED'}})
  const form=async(pid:string,key:string)=>{
   const d=await builder.createDraft(owner.id,pid,{requestId:randomUUID(),instrumentKey:key,kind:'FORM',title:'Synthetic form'})

@@ -1,0 +1,81 @@
+{
+  "scope": "real service completion plus actual authenticated report HTTP; no browser, not full application middleware or capacity",
+  "flags": {
+    "compactFacts": false,
+    "sharedControl": false
+  },
+  "rows": [
+    {
+      "product": "SCHOOL",
+      "phase": "service-start-final-parent-completion",
+      "elapsedMs": 362.72849700000006,
+      "cpuMs": 254.823,
+      "sqlEvents": 195
+    },
+    {
+      "product": "SCHOOL",
+      "phase": "first-report-read",
+      "elapsedMs": 266.8266689999996,
+      "cpuMs": 55.525,
+      "sqlEvents": 20,
+      "queryEventDurationMs": 212,
+      "planSummary": {
+        "planningTimeMs": 103.512,
+        "executionTimeMs": 1.424,
+        "actualRows": 1,
+        "sharedHitBlocks": 67,
+        "sharedReadBlocks": 0
+      },
+      "responseBytes": 1655,
+      "rssBytes": 348807168,
+      "verified": true
+    },
+    {
+      "product": "SCHOOL",
+      "phase": "repeat-report-read",
+      "elapsedMs": 250.77888100000018,
+      "cpuMs": 29.792,
+      "sqlEvents": 20,
+      "queryEventDurationMs": 220,
+      "responseBytes": 1655,
+      "rssBytes": 348938240,
+      "verified": true
+    },
+    {
+      "product": "TEACHER",
+      "phase": "service-start-final-parent-completion",
+      "elapsedMs": 233.66380000000026,
+      "cpuMs": 138.588,
+      "sqlEvents": 195
+    },
+    {
+      "product": "TEACHER",
+      "phase": "first-report-read",
+      "elapsedMs": 221.59135200000037,
+      "cpuMs": 27.448,
+      "sqlEvents": 19,
+      "queryEventDurationMs": 193,
+      "planSummary": {
+        "planningTimeMs": 92.879,
+        "executionTimeMs": 1.358,
+        "actualRows": 1,
+        "sharedHitBlocks": 179,
+        "sharedReadBlocks": 0
+      },
+      "responseBytes": 1655,
+      "rssBytes": 351576064,
+      "verified": true
+    },
+    {
+      "product": "TEACHER",
+      "phase": "repeat-report-read",
+      "elapsedMs": 220.93730700000015,
+      "cpuMs": 37.979,
+      "sqlEvents": 19,
+      "queryEventDurationMs": 191,
+      "responseBytes": 1655,
+      "rssBytes": 355508224,
+      "verified": true
+    }
+  ]
+}

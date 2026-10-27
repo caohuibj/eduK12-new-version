@@ -1,0 +1,11 @@
+{
+  "commit": "7bbfb0f26193ff32bfaa2d7e16f3613e67464b75",
+  "tree": "7c7127bce40dfbcd951279974b5603c611bbbc3a",
+  "node": "v24.22.1",
+  "backendLock": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+  "harness": {
+    "run.mjs": "4177ab3a421d18668d99e1e082ab20a2783286015aa827a2689083968168167d",
+    "fixture.ts": "9bb7d6667aaea85a2fafbdd758b595e593955c5ce00481aef4783e925c9c59dd",
+    "api.ts": "063267805d72819c7d374aa7baa3afcb58bc5752a7ededdb166a6ec0d0b5e512"
+  }
+}
