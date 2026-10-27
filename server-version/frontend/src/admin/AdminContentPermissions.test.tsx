@@ -1,9 +1,26 @@
 import {beforeEach,describe,it,expect,vi} from 'vitest'
 import {render,screen,fireEvent,waitFor} from '@testing-library/react'
 import AdminContentPermissions from './AdminContentPermissions'
+import {isContentGrant} from './contentRequestRecovery'
 const mocks=vi.hoisted(()=>({get:vi.fn(),post:vi.fn()}))
 vi.mock('../api/client',()=>({default:mocks}))
 const id=(n:number)=>'00000000-0000-4000-8000-'+String(n).padStart(12,'0')
+it.each(['SCHOOL','TEACHER'] as const)('issues and restores one exact %s organization distribution request with no delegation',async product=>{
+ mocks.post.mockRejectedValueOnce(new Error('Synthetic lost response'))
+ const first=render(<AdminContentPermissions actorId={id(9)}/>);openComposer()
+ fireEvent.change(screen.getByLabelText('产品授权范围'),{target:{value:product}})
+ expect(screen.queryByLabelText('允许上述能力一层受限委派')).not.toBeInTheDocument()
+ for(const [label,value] of [['目标本校产品管理员或心理老师 UUID',id(1)],['学校组织 UUID',id(2)],['精确资源 UUID（逗号或换行分隔）',id(3)],['生效时间（本地时间）','2098-10-20T06:00'],['到期时间（本地时间）','2098-10-21T06:00'],['内容授权原因','Explicit synthetic education source redistribution']])fireEvent.change(screen.getByLabelText(label),{target:{value}})
+ fireEvent.click(screen.getByRole('button',{name:'确认签发内容授权'}));await screen.findByRole('alert')
+ const request=mocks.post.mock.calls[0][1]
+ expect(request.grant).toMatchObject({scope:{product,scopeKind:'ORGANIZATION',scopeId:id(2),resourceKind:'material',resourceKeys:[id(3)]},capabilities:['material.distribute'],delegableCapabilities:[],remainingDelegationDepth:0})
+ expect(isContentGrant(request.grant)).toBe(true)
+ expect(isContentGrant({...request.grant,remainingDelegationDepth:1})).toBe(false)
+ expect(isContentGrant({...request.grant,scope:{...request.grant.scope,scopeKind:'COURSE'}})).toBe(false)
+ first.unmount();render(<AdminContentPermissions actorId={id(9)}/>)
+ fireEvent.click(screen.getByRole('button',{name:'重试同一签发请求'}));await waitFor(()=>expect(mocks.post).toHaveBeenCalledTimes(2))
+ expect(mocks.post.mock.calls[1][1]).toEqual(request)
+})
 function openComposer(){const summary=screen.getByText('编制精确内容授权');if(!summary.closest('details')?.open)fireEvent.click(summary)}
 function fill(){
  openComposer()

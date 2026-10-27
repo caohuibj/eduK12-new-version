@@ -3,6 +3,8 @@ import './school-activity-collection.css'
 import './school-activity-configuration.css'
 import {SelectedToolOutline} from '../modules/assessment-core/composition/SelectedToolOutline'
 import {EducationPrivateScalePicker} from '../components/education-tools/EducationPrivateScalePicker'
+import {EducationAssessmentResourcePicker} from '../components/education-tools/EducationAssessmentResourcePicker'
+import type {EducationAssessmentResourceAdapter} from '../api/educationAssessmentResources'
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import {SchoolTaskHelp} from './SchoolTaskHelp'
 import type { SchoolApi } from './SchoolRecovery'
@@ -62,8 +64,8 @@ const stateText:Record<ActivityState,string>={
   DRAFT:'准备中',SUBMITTED:'学校审核中',OPEN:'已开放',PAUSED:'已暂停',CLOSED:'已结束',
 }
 
-export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAuthorPrivateTools=false,actorKey='',compact=false}: {
-  api:SchoolApi;organizationId:string;isAdmin:boolean;classes:Unit[];canAuthorPrivateTools?:boolean;actorKey?:string;compact?:boolean
+export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAuthorPrivateTools=false,actorKey='',compact=false,assessmentResources}: {
+  api:SchoolApi;organizationId:string;isAdmin:boolean;classes:Unit[];canAuthorPrivateTools?:boolean;actorKey?:string;compact?:boolean;assessmentResources?:EducationAssessmentResourceAdapter
 }){
   const [list,setList]=useState<Activity[]>([])
   const [listLoading,setListLoading]=useState(true),[listError,setListError]=useState('')
@@ -114,7 +116,7 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
   const path=selected?`${base}/${selected.courseId}`:base
   const activityPath=useRef(path)
   activityPath.current=path
-  const resourceScope=path+'/'+(activeRun?.id??'')
+  const resourceScope=JSON.stringify([actorKey,path,activeRun?.id??'',activeRun?.version??null])
   const resourceContext=useRef({scope:resourceScope,api})
   resourceContext.current={scope:resourceScope,api}
   const nextStep=selected?schoolActivityNextStep(selected.status,selected.runs.map(run=>run.status),selected.capabilities?.ownPsychologyPublisher===true):null
@@ -241,7 +243,9 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
       const result=await api<{list:CatalogResource[];nextCursor?:string|null}>(
         path+'/run-resources'+(cursor?'?cursor='+encodeURIComponent(cursor):'?page=1'))
       if(!current())return
-      const visibleResources=result.list.filter(resource=>resource.family!=='COGNITIVE')
+      // Registered education deliveries use the scoped, authorized adapter below.
+      // Do not accept an identity-only resource via the legacy catalog projection.
+      const visibleResources=result.list.filter(resource=>!resource.key.startsWith('education-assessment:'))
       setResources(previous=>mergeResources(cursor?previous:[],visibleResources))
       setResourceCursor(result.nextCursor??null);setResourcesRead(true)
       if(!cursor)setResourceId(previous=>visibleResources.some(resource=>resourceIdentity(resource)===previous)?previous:'')
@@ -440,6 +444,14 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
             &&resource.version===track.resourceVersion)?.title??(compact?`${resourceFamilyText[track.resourceFamily]??'测评项目'} ${index+1}`:track.resourceKey),
         }))}/>
         {selected.status==='DRAFT'&&activeRun.status==='DRAFT'&&<>
+          <EducationAssessmentResourcePicker
+            scope={{product:'SCHOOL',organizationId,actorKey,workflowId:selected.courseId,runId:activeRun.id,expectedVersion:activeRun.version}}
+            adapter={!compact||panel==='assessments'?assessmentResources:undefined} disabled={busy} onBusy={setBusy}
+            onRefresh={async()=>{
+              const context=resourceContext.current
+              const data=await api<RunDetail>(path+'/runs/'+activeRun.id)
+              if(resourceContext.current.scope===context.scope&&resourceContext.current.api===context.api){setActiveRun({...data.run,tracks:data.tracks});setPreview(null)}
+            }}/>
           <ActivityLayout compact={compact} className="hs-activity-private-pickers">
           {canAuthorPrivateTools&&actorKey&&<EducationPrivateScalePicker
             key={`private:${actorKey}:${organizationId}:${selected.courseId}:${activeRun.id}`}

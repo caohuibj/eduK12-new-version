@@ -2,6 +2,7 @@ import {Prisma} from '@prisma/client'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {readEducationAssessmentDeliveryIdentity,EducationAssessmentSourceError} from '../education-tools/assessment-resource.repository'
 import {assertEducationDeliveryIssuerCurrent} from '../education-tools/assessment-resource.authority'
+import {assertEducationAssessmentDistributionCurrent} from '../education-tools/assessment-resource.distribution'
 import {relationalEntryToRunPolicy} from './resourceAuthority'
 
 /** Caller already holds the execution envelope and has checked the actual
@@ -43,6 +44,7 @@ export async function assertEducationAssessmentExecutionSource(tx:Prisma.Transac
   const [current]=await tx.$queryRaw<Array<{status:string}>>(Prisma.sql`SELECT status FROM education_assessment_deliveries WHERE id=${source.origin.resourceId}`)
   if(current?.status!=='PUBLISHED'||source.origin.units.some(unit=>source.releases.get(unit.measurement.releaseId)?.status!=='PUBLISHED'))fail()
   for(const proof of source.authority)await assertEducationDeliveryIssuerCurrent(tx,{proof,organizationId:row.organizationId,product})
+  await assertEducationAssessmentDistributionCurrent(tx,source.origin)
  }
  return source
 }

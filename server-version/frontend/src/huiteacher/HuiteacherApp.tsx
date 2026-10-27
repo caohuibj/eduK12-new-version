@@ -15,6 +15,7 @@ import './huiteacher.css'
 import { HuiteacherFormStudio } from './HuiteacherFormStudio'
 import { HuiteacherClassRelationships } from './HuiteacherClassRelationships'
 import { HuiteacherEvaluationStudio } from './HuiteacherEvaluationStudio'
+import {createEducationAssessmentResourceAdapter} from '../api/educationAssessmentResourceClient'
 import { HuiteacherMyFormTasks } from './HuiteacherMyFormTasks'
 import {HuiteacherMyStudentFeedback} from './HuiteacherMyStudentFeedback'
 import { HuiteacherPersonalSelf } from './HuiteacherPersonalSelf'
@@ -70,6 +71,7 @@ async function teacherApi<T>(path:string,method='GET',data?:unknown,options?:{re
   return result.data
 }
 const assessmentRuntime={renderFeedback:createEducationAssessmentFeedback({api:teacherApi,entry:'TEACHER'})}
+const assessmentResources=createEducationAssessmentResourceAdapter(teacherApi,'TEACHER')
 const Field=({label,value,set,type='text',required=true}:{
   label:string;value:string;set:(value:string)=>void;type?:string;required?:boolean
 })=><label className="ht-field"><span>{label}</span><input
@@ -565,7 +567,7 @@ export default function HuiteacherApp(){
         <section id="ht-school-relationships" hidden={schoolSection!=='ht-school-relationships'} className="ht-workspace-section" tabIndex={-1} aria-label="班级关系"><HuiteacherClassRelationships key={'relations:'+org.organizationId}
           organizationId={org.organizationId} members={members} units={units} api={teacherApi}/></section>
         <section id="ht-school-evaluations" hidden={schoolSection!=='ht-school-evaluations'} className="ht-workspace-section" tabIndex={-1} aria-label="评价活动"><HuiteacherEvaluationStudio key={'targets:'+me.id+':'+org.organizationId}
-          organizationId={org.organizationId} api={teacherApi} canAuthorPrivateTools={canAuthorPrivateTools} actorKey={me.id}/></section>
+          organizationId={org.organizationId} api={teacherApi} assessmentResources={schoolSection==='ht-school-evaluations'?assessmentResources:undefined} canAuthorPrivateTools={canAuthorPrivateTools} actorKey={me.id}/></section>
         <section id="ht-school-forms" hidden={schoolSection!=='ht-school-forms'} className="ht-workspace-section" tabIndex={-1} aria-label="学校表单"><HuiteacherFormStudio key={'forms:'+org.organizationId}
           organizationId={org.organizationId} api={teacherApi} onDraftStateChange={setFormDraftState}/></section>
       </div></div>

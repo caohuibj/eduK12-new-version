@@ -83,7 +83,7 @@ export async function prepareTrainingFinalReceipt(tx:Prisma.TransactionClient,in
     if(release.layer==='REPORT'){
       const matching=binding.units.filter(unit=>unit.report?.releaseId===id)
       if(!matching.length)fail()
-      for(const unit of matching)if(unit.source.standardCombination)await validateTrainingReportPointer(tx,{unit,compositeId:binding.compositeId,ownerId:parent.compositeAssessment.createdBy,
+      for(const unit of matching)if(unit.source.standardCombination||scope.kind==='PLATFORM'||scope.kind==='PRIVATE'&&['SCHOOL','TEACHER'].includes(scope.product))await validateTrainingReportPointer(tx,{unit,compositeId:binding.compositeId,ownerId:parent.compositeAssessment.createdBy,
         reportReleaseId:id,contentHash:expectedHash,publication:false,releases:cache})
       else if(scope.kind!=='PRIVATE'||scope.product!=='TRAINING'||scope.ownerId!==parent.compositeAssessment.createdBy||scope.resourceId!==binding.compositeId)fail()
     }else if(release.layer==='MEASUREMENT'){
