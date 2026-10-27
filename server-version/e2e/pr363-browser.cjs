@@ -81,12 +81,19 @@ async function reaction(page,progress=()=>{}){
  progress('return');await page.getByRole('button',{name:/^(继续本次测评|返回校园活动)$/}).click()
 }
 function nativeOptionLabel(questionKey,optionKey){const rows=require('./pr363-native-template.json').options.filter(option=>option.questionKey===questionKey&&option.optionKey===optionKey);assert.equal(rows.length,1);return rows[0].label}
+async function selectNativeOption(page,label){
+ const radio=page.getByRole('radio',{name:label,exact:true})
+ // React restores controlled checked state until the existing async draft save
+ // commits. One user click, then await persisted UI state; do not click again.
+ await radio.click()
+ await page.waitForFunction(element=>element?.checked===true,await radio.elementHandle())
+}
 async function native(page,progress=()=>{}){
  progress('open');await page.getByRole('button',{name:'开始/继续情境判断测评',exact:true}).click()
  for(let node=0;node<2;node++){progress('choice-'+node)
-  await page.getByRole('radio',{name:nativeOptionLabel(node===0?'PLAN_CHOICE':'REVIEW_CHOICE','A'),exact:true}).check()
+  await selectNativeOption(page,nativeOptionLabel(node===0?'PLAN_CHOICE':'REVIEW_CHOICE','A'))
   await page.getByRole('button',{name:'确认行动选择',exact:true}).click()
-  progress('probe-'+node);await page.getByRole('radio',{name:nativeOptionLabel(node===0?'PLAN_PROBE':'REVIEW_PROBE','CHECK'),exact:true}).check()
+  progress('probe-'+node);await selectNativeOption(page,nativeOptionLabel(node===0?'PLAN_PROBE':'REVIEW_PROBE','CHECK'))
   await page.getByRole('button',{name:'确认本阶段作答',exact:true}).click()
   if(node===0)await page.getByRole('button',{name:/^(下一题|确认本页并进入下一情境)$/}).click()
  }
@@ -196,5 +203,5 @@ async function run(){
  }catch(error){report.status='FAILED';report.errorName=['TimeoutError','AssertionError','Error'].includes(error?.name)?error.name:'UNKNOWN';report.errorDigest=base.sha(String(error));throw error}
  finally{if(browser)await browser.close();fs.writeFileSync(path.join(out,'browser.json'),JSON.stringify(report,null,2)+'\n')}
 }
-module.exports={api,login,openCase,reaction,native,artifactResponseFile,assertManagementReads,managementToolLink,nativeOptionLabel,readManagementSummary,run}
+module.exports={api,login,openCase,reaction,native,artifactResponseFile,assertManagementReads,managementToolLink,nativeOptionLabel,readManagementSummary,selectNativeOption,run}
 if(require.main===module)run().catch(error=>{console.error('PR363_BROWSER_FAILED '+base.sha(String(error)));process.exitCode=1})

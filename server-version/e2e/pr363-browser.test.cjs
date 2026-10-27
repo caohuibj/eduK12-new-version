@@ -54,3 +54,9 @@ test('Teacher refresh consumes the real bound-parent GET instead of manufacturin
  response.json=async()=>({data:{id:'different-parent',status:'IN_PROGRESS'}})
  await assert.rejects(()=>openCase(page,{product:'TEACHER',title:'Synthetic',executionId:'execution'},'parent'));assert.equal(handlers.size,0)
 })
+
+test('native single choice clicks once and awaits async checked state without replay',async()=>{
+ const {selectNativeOption}=require('./pr363-browser.cjs');let clicks=0,checked=false;const element={get checked(){return checked}};
+ const page={getByRole(role,options){assert.equal(role,'radio');assert.equal(options.name,'Synthetic async option');assert.equal(options.exact,true);return {async click(){clicks++;assert.equal(checked,false)},async elementHandle(){return element}}},async waitForFunction(predicate,arg){assert.equal(clicks,1);assert.equal(predicate(arg),false);checked=true;assert.equal(predicate(arg),true)}};
+ await selectNativeOption(page,'Synthetic async option');assert.equal(clicks,1);assert.equal(checked,true)
+})
