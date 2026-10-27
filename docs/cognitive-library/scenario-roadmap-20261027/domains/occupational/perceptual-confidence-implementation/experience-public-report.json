@@ -1,0 +1,282 @@
+{
+  "testType": "perceptual-confidence",
+  "engineVersion": "0.1.0",
+  "scoringVersion": "0.1.0",
+  "configVersion": "0.1.0",
+  "reportDefinitionVersion": "0.1.0",
+  "presentationVersion": "0.1.0",
+  "parameterExplanationVersion": "0.1.0",
+  "configHash": "eed396e473f349cbe095aba7e0614fad530e2abefb9ab69b46eaa16dc686dd44",
+  "protocolSignature": "49ed269210a4e1d063a487dbfecb908993d984b7397b1678bea0ae1217bd8f40",
+  "profile": "experience",
+  "state": "interpretable",
+  "planned": 60,
+  "started": 60,
+  "presented": 60,
+  "summary": {
+    "planned": 60,
+    "started": 60,
+    "presented": 60,
+    "judged": 60,
+    "correct": 45,
+    "paired": 60,
+    "pairedCorrect": 45,
+    "skippedJudgment": 0,
+    "skippedConfidence": 0,
+    "interruptions": 0,
+    "accuracy": 0.75,
+    "ratings": [
+      {
+        "rating": 1,
+        "n": 12,
+        "correct": 6
+      },
+      {
+        "rating": 2,
+        "n": 18,
+        "correct": 15
+      },
+      {
+        "rating": 3,
+        "n": 18,
+        "correct": 13
+      },
+      {
+        "rating": 4,
+        "n": 12,
+        "correct": 11
+      }
+    ]
+  },
+  "conditions": [
+    {
+      "planned": 10,
+      "started": 10,
+      "presented": 10,
+      "judged": 10,
+      "correct": 8,
+      "paired": 10,
+      "pairedCorrect": 8,
+      "skippedJudgment": 0,
+      "skippedConfidence": 0,
+      "interruptions": 0,
+      "accuracy": 0.8,
+      "ratings": [
+        {
+          "rating": 1,
+          "n": 0,
+          "correct": 0
+        },
+        {
+          "rating": 2,
+          "n": 3,
+          "correct": 3
+        },
+        {
+          "rating": 3,
+          "n": 5,
+          "correct": 3
+        },
+        {
+          "rating": 4,
+          "n": 2,
+          "correct": 2
+        }
+      ],
+      "conditionId": "left:4",
+      "target": "left",
+      "strengthPercent": 4
+    },
+    {
+      "planned": 10,
+      "started": 10,
+      "presented": 10,
+      "judged": 10,
+      "correct": 6,
+      "paired": 10,
+      "pairedCorrect": 6,
+      "skippedJudgment": 0,
+      "skippedConfidence": 0,
+      "interruptions": 0,
+      "accuracy": 0.6,
+      "ratings": [
+        {
+          "rating": 1,
+          "n": 3,
+          "correct": 1
+        },
+        {
+          "rating": 2,
+          "n": 2,
+          "correct": 2
+        },
+        {
+          "rating": 3,
+          "n": 4,
+          "correct": 3
+        },
+        {
+          "rating": 4,
+          "n": 1,
+          "correct": 0
+        }
+      ],
+      "conditionId": "left:10",
+      "target": "left",
+      "strengthPercent": 10
+    },
+    {
+      "planned": 10,
+      "started": 10,
+      "presented": 10,
+      "judged": 10,
+      "correct": 6,
+      "paired": 10,
+      "pairedCorrect": 6,
+      "skippedJudgment": 0,
+      "skippedConfidence": 0,
+      "interruptions": 0,
+      "accuracy": 0.6,
+      "ratings": [
+        {
+          "rating": 1,
+          "n": 3,
+          "correct": 1
+        },
+        {
+          "rating": 2,
+          "n": 3,
+          "correct": 2
+        },
+        {
+          "rating": 3,
+          "n": 3,
+          "correct": 2
+        },
+        {
+          "rating": 4,
+          "n": 1,
+          "correct": 1
+        }
+      ],
+      "conditionId": "left:20",
+      "target": "left",
+      "strengthPercent": 20
+    },
+    {
+      "planned": 10,
+      "started": 10,
+      "presented": 10,
+      "judged": 10,
+      "correct": 10,
+      "paired": 10,
+      "pairedCorrect": 10,
+      "skippedJudgment": 0,
+      "skippedConfidence": 0,
+      "interruptions": 0,
+      "accuracy": 1,
+      "ratings": [
+        {
+          "rating": 1,
+          "n": 1,
+          "correct": 1
+        },
+        {
+          "rating": 2,
+          "n": 4,
+          "correct": 4
+        },
+        {
+          "rating": 3,
+          "n": 1,
+          "correct": 1
+        },
+        {
+          "rating": 4,
+          "n": 4,
+          "correct": 4
+        }
+      ],
+      "conditionId": "right:4",
+      "target": "right",
+      "strengthPercent": 4
+    },
+    {
+      "planned": 10,
+      "started": 10,
+      "presented": 10,
+      "judged": 10,
+      "correct": 7,
+      "paired": 10,
+      "pairedCorrect": 7,
+      "skippedJudgment": 0,
+      "skippedConfidence": 0,
+      "interruptions": 0,
+      "accuracy": 0.7,
+      "ratings": [
+        {
+          "rating": 1,
+          "n": 5,
+          "correct": 3
+        },
+        {
+          "rating": 2,
+          "n": 3,
+          "correct": 2
+        },
+        {
+          "rating": 3,
+          "n": 0,
+          "correct": 0
+        },
+        {
+          "rating": 4,
+          "n": 2,
+          "correct": 2
+        }
+      ],
+      "conditionId": "right:10",
+      "target": "right",
+      "strengthPercent": 10
+    },
+    {
+      "planned": 10,
+      "started": 10,
+      "presented": 10,
+      "judged": 10,
+      "correct": 8,
+      "paired": 10,
+      "pairedCorrect": 8,
+      "skippedJudgment": 0,
+      "skippedConfidence": 0,
+      "interruptions": 0,
+      "accuracy": 0.8,
+      "ratings": [
+        {
+          "rating": 1,
+          "n": 0,
+          "correct": 0
+        },
+        {
+          "rating": 2,
+          "n": 3,
+          "correct": 2
+        },
+        {
+          "rating": 3,
+          "n": 5,
+          "correct": 4
+        },
+        {
+          "rating": 4,
+          "n": 2,
+          "correct": 2
+        }
+      ],
+      "conditionId": "right:20",
+      "target": "right",
+      "strengthPercent": 20
+    }
+  ],
+  "strongMinusWeakAccuracy": -0.2
+}

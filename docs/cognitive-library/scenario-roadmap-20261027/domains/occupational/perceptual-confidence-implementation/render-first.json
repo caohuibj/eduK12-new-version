@@ -1,0 +1,10 @@
+{
+  "kind": "COMMAND_FAILURE_SUMMARY_NOT_RAW_STDOUT",
+  "outcome": "FAILED_BEFORE_STATIC_RENDER",
+  "action": "node server-version/frontend/node_modules/esbuild/bin/esbuild ... then Python read /tmp/pc-protocol-preview.js",
+  "exitCode": 1,
+  "reason": "Installed esbuild CLI is an ELF executable, not JavaScript. Node raised SyntaxError: Invalid or unexpected token; subsequent Python raised FileNotFoundError for the absent bundle.",
+  "resolution": "render-stimulus.py executes the installed esbuild binary directly, then renders original fixed samples; no dependency or application change",
+  "taskRunnerExecuted": false,
+  "participantData": false
+}

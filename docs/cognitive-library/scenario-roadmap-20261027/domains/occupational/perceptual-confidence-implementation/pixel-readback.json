@@ -1,0 +1,106 @@
+{
+  "kind": "ACTUAL_GENERATOR_CANVAS_PIXEL_READBACK_STATIC_ONLY",
+  "source": "generated/protocol.ts bundled with installed esbuild; stimulus() only, no runner or sequence",
+  "browser": "cloud Chromium; inner sandbox unavailable; managed execution container, all network aborted",
+  "goldenSource": "independent Python integer/FNV/xorshift; 10% SHA256 matched native unit and browser getImageData",
+  "pixels": [
+    {
+      "strength": 4,
+      "side": "left",
+      "width": 128,
+      "height": 128,
+      "sha256": "9d5139ac496670643eae304e43cad47e3b00ba7cfff7daaf0b9bc97179202739"
+    },
+    {
+      "strength": 4,
+      "side": "right",
+      "width": 128,
+      "height": 128,
+      "sha256": "c1b9c6dc030529bfc5523615af8c4ea385bb0339b5b7c86e282ae11b60c8addb"
+    },
+    {
+      "strength": 10,
+      "side": "left",
+      "width": 128,
+      "height": 128,
+      "sha256": "9d5139ac496670643eae304e43cad47e3b00ba7cfff7daaf0b9bc97179202739"
+    },
+    {
+      "strength": 10,
+      "side": "right",
+      "width": 128,
+      "height": 128,
+      "sha256": "ec7a2d8a0c793f0fdf96209ffaae740639b547bdf5867d30456e079316d750e3"
+    },
+    {
+      "strength": 20,
+      "side": "left",
+      "width": 128,
+      "height": 128,
+      "sha256": "9d5139ac496670643eae304e43cad47e3b00ba7cfff7daaf0b9bc97179202739"
+    },
+    {
+      "strength": 20,
+      "side": "right",
+      "width": 128,
+      "height": 128,
+      "sha256": "0b2f37abb1e8fdc6d69f4fca59ee023c85735ca8bd0ab79937e07adc08f9a170"
+    },
+    {
+      "strength": 45,
+      "side": "left",
+      "width": 128,
+      "height": 128,
+      "sha256": "9d5139ac496670643eae304e43cad47e3b00ba7cfff7daaf0b9bc97179202739"
+    },
+    {
+      "strength": 45,
+      "side": "right",
+      "width": 128,
+      "height": 128,
+      "sha256": "d0a7632e1a21c247a36ae7eea6e03efd9e5a7eb972c8b471b78cedd5d0ed47c4"
+    }
+  ],
+  "phoneLayout": {
+    "width": 390,
+    "documentWidth": 390,
+    "patches": [
+      {
+        "width": 130,
+        "height": 130
+      },
+      {
+        "width": 130,
+        "height": 130
+      },
+      {
+        "width": 130,
+        "height": 130
+      },
+      {
+        "width": 130,
+        "height": 130
+      },
+      {
+        "width": 130,
+        "height": 130
+      },
+      {
+        "width": 130,
+        "height": 130
+      },
+      {
+        "width": 130,
+        "height": 130
+      },
+      {
+        "width": 130,
+        "height": 130
+      }
+    ]
+  },
+  "timingMeasured": false,
+  "physicalContrastCalibrated": false,
+  "realDeviceAcceptance": false,
+  "imageSHA256": "89890656fde6b5af611aa9a26d8e98f1d98e2bacd97bb3710b2bdc5858bcea9c"
+}

@@ -1,0 +1,531 @@
+{
+  "kind": "PERCEPTUAL_CONFIDENCE_CONTENT_CANDIDATE_EVIDENCE",
+  "status": "NOT_DOT_REVIEWED_NOT_INTEGRATED",
+  "base": "9b39a51fbc6601220c6412d6f247296c74e5ab91",
+  "nodeVersion": "24.21.0",
+  "independentTargets": 12,
+  "runs": [
+    {
+      "file": "backend-first.json",
+      "passed": 6,
+      "failed": 0,
+      "filtered": 0,
+      "cases": [
+        {
+          "title": "freezes 300/60 complete six-cell plans and four easier practice items without an adaptive staircase",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "title": "produces original equal-channel pixels matching independent Python golden bytes and changes seeds without importing assets",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "title": "scores retained 300/60 software-capture originals into the approved descriptive worked report",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "title": "preserves missing confidence, genuine zero RT/accuracy, signed negative differences and unpresented records",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "title": "separates stage activation, first responses, repeat/multi-contact, nominal timers and input bounds",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "title": "rejects forged stimuli/states/clocks/envelopes/versions and scrubs every public channel",
+          "status": "passed",
+          "failureMessages": []
+        }
+      ]
+    },
+    {
+      "file": "frontend-first.json",
+      "passed": 5,
+      "failed": 0,
+      "filtered": 0,
+      "cases": [
+        {
+          "title": "survives StrictMode through real stages and stops true unmount/replacement through the original frozen-language ports",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "title": "accepts three-of-four practice sides with low confidence, separates hotkeys and missing confidence, and renders a real limited report",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "title": "re-presents full instructions after incomplete practice and enforces three groups without a fourth or invented formal records",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "title": "preserves immutable pending raw/FINAL payloads across save failure and mismatched final receipts",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "title": "gates invalid public body/image/download together and refuses wrong-language or late prepare receipts",
+          "status": "passed",
+          "failureMessages": []
+        }
+      ]
+    },
+    {
+      "file": "frontend-bound-first.json",
+      "passed": 0,
+      "failed": 1,
+      "filtered": 5,
+      "cases": [
+        {
+          "title": "retains a bounded-log interruption when a stage timer is the next event instead of leaving a stopped capture on screen",
+          "status": "failed",
+          "failureMessages": [
+            "AssertionError: expected 'running' to be 'practice-feedback' // Object.is equality\n    at /workspace/eduK12-new-version/server-version/frontend/src/modules/cognitive/tasks/perceptual-confidence/content.test.tsx:28:60\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///workspace/eduK12-new-version/server-version/frontend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        },
+        {
+          "title": "survives StrictMode through real stages and stops true unmount/replacement through the original frozen-language ports",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "title": "accepts three-of-four practice sides with low confidence, separates hotkeys and missing confidence, and renders a real limited report",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "title": "re-presents full instructions after incomplete practice and enforces three groups without a fourth or invented formal records",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "title": "preserves immutable pending raw/FINAL payloads across save failure and mismatched final receipts",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "title": "gates invalid public body/image/download together and refuses wrong-language or late prepare receipts",
+          "status": "skipped",
+          "failureMessages": []
+        }
+      ]
+    },
+    {
+      "file": "frontend-final.json",
+      "passed": 5,
+      "failed": 0,
+      "filtered": 1,
+      "cases": [
+        {
+          "title": "retains a bounded-log interruption when a stage timer is the next event instead of leaving a stopped capture on screen",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "title": "survives StrictMode through real stages and stops true unmount/replacement through the original frozen-language ports",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "title": "accepts three-of-four practice sides with low confidence, separates hotkeys and missing confidence, and renders a real limited report",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "title": "re-presents full instructions after incomplete practice and enforces three groups without a fourth or invented formal records",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "title": "preserves immutable pending raw/FINAL payloads across save failure and mismatched final receipts",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "title": "gates invalid public body/image/download together and refuses wrong-language or late prepare receipts",
+          "status": "skipped",
+          "failureMessages": []
+        }
+      ]
+    },
+    {
+      "file": "frontend-visual-final.json",
+      "passed": 1,
+      "failed": 0,
+      "filtered": 5,
+      "cases": [
+        {
+          "title": "retains a bounded-log interruption when a stage timer is the next event instead of leaving a stopped capture on screen",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "title": "survives StrictMode through real stages and stops true unmount/replacement through the original frozen-language ports",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "title": "accepts three-of-four practice sides with low confidence, separates hotkeys and missing confidence, and renders a real limited report",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "title": "re-presents full instructions after incomplete practice and enforces three groups without a fourth or invented formal records",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "title": "preserves immutable pending raw/FINAL payloads across save failure and mismatched final receipts",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "title": "gates invalid public body/image/download together and refuses wrong-language or late prepare receipts",
+          "status": "skipped",
+          "failureMessages": []
+        }
+      ]
+    }
+  ],
+  "types": [
+    {
+      "file": "types-final.json",
+      "label": "backend",
+      "entries": 3,
+      "sources": 49,
+      "diagnostics": 0,
+      "hashesMatchCurrent": true
+    },
+    {
+      "file": "types-visual-final.json",
+      "label": "frontend",
+      "entries": 2,
+      "sources": 54,
+      "diagnostics": 0,
+      "hashesMatchCurrent": true
+    }
+  ],
+  "lint": [
+    {
+      "file": "lint-first.json",
+      "files": 10,
+      "errors": 0,
+      "warnings": 0
+    },
+    {
+      "file": "lint-final.json",
+      "files": 2,
+      "errors": 0,
+      "warnings": 0
+    },
+    {
+      "file": "lint-visual-final.json",
+      "files": 1,
+      "errors": 0,
+      "warnings": 0
+    }
+  ],
+  "versions": {
+    "engine": "0.1.0",
+    "scoring": "0.1.0",
+    "config": "0.1.0",
+    "protocol": "0.1.0",
+    "profile": "0.1.0",
+    "metric": "0.1.0",
+    "quality": "0.1.0",
+    "reportDefinition": "0.1.0",
+    "presentation": "0.1.0",
+    "parameterExplanation": "0.1.0"
+  },
+  "oldInformationSamplingAndDelayFilesPreserved": 114,
+  "approvedDesignPngUnchanged": true,
+  "pureCopiesIdentical": true,
+  "initialTypeFailure": "types-first.json retained: Event narrowing and unsupported getByRole exact option, fixed without shared configuration changes",
+  "regressionFix": "exactly256 nonterminal events followed by tick/drawn must consume capture.done and retain interruption; first FAIL retained; no stimulus/timing/input change",
+  "renderCommandFailure": "render-first.json is an explicit summary, not fabricated raw stdout; fixed by executing ELF esbuild directly",
+  "pixelReadback": "pixel-readback.json: actual 8 static Canvas buffers, 10% SHA256 matches independent Python and native test; no timing/physical contrast claim",
+  "replayedReactExample": {
+    "command": "node server-version/backend/node_modules/tsx/dist/cli.mjs docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/perceptual-confidence-implementation/replay-react-example.ts",
+    "exitCode": 0,
+    "formalRecords": 2,
+    "judged": 2,
+    "paired": 1,
+    "state": "limited",
+    "emptyState": "invalid"
+  },
+  "uiFixtureRetention": "react-synthetic-originals.json is the final targeted-run synthetic export; first UI fixture was not separately archived, first test report retained. No participant data. Backend 300/60 originals generated once.",
+  "limits": [
+    "synthetic software capture and jsdom mock Canvas/ports, not participant/API/device data",
+    "native software draw and timers do not prove physical exposure or equivalence",
+    "no old cognitive suite, app build, CI, server/schema/registry/permission/COS change, dependency install, product integration, merge, deployment or activation"
+  ],
+  "files": [
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/perceptual-confidence-appendix.md",
+      "bytes": 9940,
+      "sha256": "a15ee9b34285596d16518caaa994a395aedde1f87f2ab91503e66298d2c5d27f"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/perceptual-confidence-brief.md",
+      "bytes": 5256,
+      "sha256": "11257cd8eb8eeb73aa77e12844fda4baacc4d22326fb913c2e6c439ae8193bec"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/perceptual-confidence-implementation/README.md",
+      "bytes": 10525,
+      "sha256": "6630a729dab9bd29f3b5be79789b1b875d2bda2c42fe8fbc51686604085f50c7"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/perceptual-confidence-implementation/affected-types.cjs",
+      "bytes": 2177,
+      "sha256": "dc42d07914b925d398c7db6931ff654f33c1b3c56ffcef18083250d9e317709a"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/perceptual-confidence-implementation/backend-first.json",
+      "bytes": 3203,
+      "sha256": "6a9f82f259620c8e9a9d9fc97091d684ba51353f2e21b6a062a9bc67ba7e1fe2"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/perceptual-confidence-implementation/experience-public-report.json",
+      "bytes": 5503,
+      "sha256": "db5d28b908c3896c57dd08b76ad42d9c5ba3961b88b3af3b1645b0601d80e5c1"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/perceptual-confidence-implementation/experience-public-summary.svg",
+      "bytes": 939,
+      "sha256": "20408799d0ca5e14ee5218a6a715990086e349269d1e4dc7d697b47922fc37dd"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/perceptual-confidence-implementation/experience-synthetic-originals.json",
+      "bytes": 275037,
+      "sha256": "5db23a328e158c4c65aa88b42de82812f62f46528b8d70e9fc06353e5a42179a"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/perceptual-confidence-implementation/frontend-bound-first.json",
+      "bytes": 3741,
+      "sha256": "750e2beb8d8c92d6702e9816a0f58d894b6ed94d7c9ae63c15708329d268b3ea"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/perceptual-confidence-implementation/frontend-final.json",
+      "bytes": 3423,
+      "sha256": "4612064c916333236d7d9e6de3c7bc316c817127012700ecef850d91980edb5d"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/perceptual-confidence-implementation/frontend-first.json",
+      "bytes": 2996,
+      "sha256": "816b2963f3f72e1cb1ccb2ffadebfd5df83a1e36e879f490666f08584ed88fdc"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/perceptual-confidence-implementation/frontend-visual-final.json",
+      "bytes": 3317,
+      "sha256": "f847b37181f15ab1af5f04c97a614e4233828bce9277cfd6b7613b3e41312e49"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/perceptual-confidence-implementation/generated-stimulus-preview.png",
+      "bytes": 295549,
+      "sha256": "89890656fde6b5af611aa9a26d8e98f1d98e2bacd97bb3710b2bdc5858bcea9c"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/perceptual-confidence-implementation/invalid-public-projection.json",
+      "bytes": 708,
+      "sha256": "cb48512850dd13a40c6420ba2bb49452cbbdf3faea53d8b00d808715ef995ade"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/perceptual-confidence-implementation/limited-public-summary.svg",
+      "bytes": 919,
+      "sha256": "08bfdffffa0f83400f3edebee119ccb2a4f04b40f923a2f46db6d725fc95610e"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/perceptual-confidence-implementation/lint-final.json",
+      "bytes": 589,
+      "sha256": "8895d788d0ccc661e5b46c117e321f97d33b7f39e74221688cf484498c09a239"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/perceptual-confidence-implementation/lint-first.json",
+      "bytes": 2959,
+      "sha256": "ebae6ee6262c26b081afbd3ae45fe510c51b99d53ba33ec5e7477b5b3400133b"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/perceptual-confidence-implementation/lint-visual-final.json",
+      "bytes": 292,
+      "sha256": "31e41a7355acaddcca94368cc5d4794a8591429ff2f80bda633a15bdcd2388d3"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/perceptual-confidence-implementation/pixel-readback.json",
+      "bytes": 2631,
+      "sha256": "bfd5585da19b4b739b01d2e822b41e3143895ca9a3075229ff846e92c1a2269f"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/perceptual-confidence-implementation/react-replayed-report.json",
+      "bytes": 20311,
+      "sha256": "1be4dd1b3955bdb5fcb01e6a4e5befdfd3da05571df04d745c08f61be953ffe9"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/perceptual-confidence-implementation/react-synthetic-originals.json",
+      "bytes": 45268,
+      "sha256": "cdff2ba97abafba8090febf2e1fe5070b6b9d517857b3fd9c46c667c8f4062b4"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/perceptual-confidence-implementation/render-first.json",
+      "bytes": 655,
+      "sha256": "c49e9eca7d76764e19c3878dad07c74f6eff190bc97d05cf0108fceeb1df7667"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/perceptual-confidence-implementation/render-stimulus.py",
+      "bytes": 4940,
+      "sha256": "ca7570e671833180b4dd7951bb05860e6f5673668ea36aa184a06edaff524b4e"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/perceptual-confidence-implementation/replay-react-example.ts",
+      "bytes": 2159,
+      "sha256": "170daaf08de428037edcb068dae71f6cdea70bbceb920eedb0e1dd8422564e65"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/perceptual-confidence-implementation/research-public-report.json",
+      "bytes": 5576,
+      "sha256": "03994ee8afb7bc04f0181b7b45fc7f7d2044895e62cac4ebce002fd5220b4ab6"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/perceptual-confidence-implementation/research-public-summary.svg",
+      "bytes": 941,
+      "sha256": "cd160fb0bcc25112df9001f3e55f2dec7db79a024fe79323c51eb189e7f46670"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/perceptual-confidence-implementation/research-synthetic-originals.json",
+      "bytes": 1320303,
+      "sha256": "a1a66b3f20d9347ba41c45626abd04714f38e6cff5fa6c5db4fb19ecd03b6157"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/perceptual-confidence-implementation/types-current.json",
+      "bytes": 10960,
+      "sha256": "ceb96698c693987ac6428f3f440c194bf195cbee513c95b0704ff95c1db4feb7"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/perceptual-confidence-implementation/types-final.json",
+      "bytes": 20988,
+      "sha256": "78ab90581f69824aacfd077872b8a35cec56088c3976e996740d456031d809fd"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/perceptual-confidence-implementation/types-first.json",
+      "bytes": 35182,
+      "sha256": "029aed367eef1e5a32aeb88e748aa91dfcab4d7878ed5704e086082eaf455bd9"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/perceptual-confidence-implementation/types-visual-final.json",
+      "bytes": 10960,
+      "sha256": "7fb6dd24a673c2015b9246f5fb2e9f6bbc0387e6e0c8decb690521274de5d755"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/cognitive/perceptual-confidence-content.test.ts",
+      "bytes": 11002,
+      "sha256": "787b15ca82a7f107afdcc36585868b5892bbd43852e1829bfa38ab546606df3c"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/perceptual-confidence/NOTICE",
+      "bytes": 1530,
+      "sha256": "7d11b8410d603adfa84635d9784ceacb1e0348b52e7eb2b8014c266f0d8bf456"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/perceptual-confidence/capture.ts",
+      "bytes": 2252,
+      "sha256": "262fe2aa0a12e5da4958a45298c14a558b448b4135290defbe05f1673aea2c1a"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/perceptual-confidence/metadata.ts",
+      "bytes": 2057,
+      "sha256": "c6a4580e798aeb1f20022a1146eaf21d7e0966d84541f777b1fd946df72f1909"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/perceptual-confidence/package.ts",
+      "bytes": 3178,
+      "sha256": "4c5ce874cf40ae982b5b766ff5421e2b374592281576811efbd574b0f4ccd8f6"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/perceptual-confidence/participant-presentation.ts",
+      "bytes": 1238,
+      "sha256": "075429a21c1bfd6d0a86dd779b17ed9010bc47568c6f55561a6448087ba49372"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/perceptual-confidence/protocol.ts",
+      "bytes": 11362,
+      "sha256": "4be70f7e99daf537c5885919f5fb3fba9e741dd96419bf310aedac05550f5ee6"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/perceptual-confidence/report.ts",
+      "bytes": 11284,
+      "sha256": "92a708b0d2076d672652088fb890dbc4bf6d4ec949a1a1fa2b97a8c0a66a8167"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/perceptual-confidence/schema.ts",
+      "bytes": 2260,
+      "sha256": "8006b912599a18df304e9413c99a5ccaccbd4d2154c479b319c962d7a195e910"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/perceptual-confidence/scorer.ts",
+      "bytes": 5181,
+      "sha256": "d59f840934e74ae863317806e85437c1ba3e929b630ee5b84445cbd2c4ba1207"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/perceptual-confidence/PcInstructions.tsx",
+      "bytes": 4985,
+      "sha256": "a63711b21125a0087b37ddc75da42fc894c01711e0914b80946d42c53759851a"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/perceptual-confidence/PcReport.tsx",
+      "bytes": 6092,
+      "sha256": "860c77cfaf5ef4f2a7ba2e171b4747837f4ff9572a85fe0f10c7b3b0bc35e68b"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/perceptual-confidence/PcTask.tsx",
+      "bytes": 14739,
+      "sha256": "57c68cf150d2d26c9e7ccb60c7514b83aee27b05dfd9abf32d7cb41ffe0222e1"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/perceptual-confidence/capture.ts",
+      "bytes": 48,
+      "sha256": "4bc6283bad105ca22a80e68c98527b3c7392efb7f1e512296b4fd6588381a6ad"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/perceptual-confidence/content.test.tsx",
+      "bytes": 14003,
+      "sha256": "af99ffeb845f71a5adf0c39862cb3da61734daebf70f5c9d1e8e7eed2121ca15"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/perceptual-confidence/contracts.ts",
+      "bytes": 3455,
+      "sha256": "1c24f0d5535ce5ac2902beb36acee32c7da8ac48bf0a33f48189ef858470ad99"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/perceptual-confidence/generated/capture.ts",
+      "bytes": 2252,
+      "sha256": "262fe2aa0a12e5da4958a45298c14a558b448b4135290defbe05f1673aea2c1a"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/perceptual-confidence/generated/protocol.ts",
+      "bytes": 11362,
+      "sha256": "4be70f7e99daf537c5885919f5fb3fba9e741dd96419bf310aedac05550f5ee6"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/perceptual-confidence/generated/report.ts",
+      "bytes": 11284,
+      "sha256": "92a708b0d2076d672652088fb890dbc4bf6d4ec949a1a1fa2b97a8c0a66a8167"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/perceptual-confidence/pc.css",
+      "bytes": 2343,
+      "sha256": "3b63f0e45cccd885b262250fa62192dd947dc4fda37b76d5cda49cebf68f30d5"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/perceptual-confidence/session.ts",
+      "bytes": 9677,
+      "sha256": "01924288220d66b5f47aea58e63bd1ef1a539f9548e768e65127b5c14dfba4a0"
+    }
+  ],
+  "visualAlignment": "Inter-trial view displays the approved central fixation rather than a saved-status paragraph; 1000ms nominal interval unchanged."
+}

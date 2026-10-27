@@ -1,5 +1,6 @@
 # 知觉判断＋信心：图审附录
 
+当前状态补注：用户了解次数来源后已明确批准原计划300/60与4题练习。下文保留设计期口径；当前已实现候选、实际原件和限制见[实施交付](perceptual-confidence-implementation/README.md)，未DOT独审、未接入。
 2026-10-27（Asia/Tokyo）；DESIGN_ONLY_AWAITING_USER_APPROVAL。仅职业科研领域`perceptual-confidence`单项方案，不扩展平台／服务器／共享注册或其他领域。
 
 ## 固定来源与许可逐项处理

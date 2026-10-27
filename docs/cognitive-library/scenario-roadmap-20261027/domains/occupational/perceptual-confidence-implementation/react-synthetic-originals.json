@@ -1,0 +1,1680 @@
+{
+  "kind": "ACTUAL_REACT_JSDOM_MOCK_CANVAS_AND_PORTS_NOT_PARTICIPANT_OR_API",
+  "context": {
+    "language": "en",
+    "contextKey": "pc-synthetic-ui",
+    "randomSeed": "pc-react-software-only",
+    "snapshot": {
+      "schemaVersion": 1,
+      "testType": "perceptual-confidence",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "configVersion": "0.1.0",
+      "protocol": {
+        "schemaVersion": 1,
+        "key": "perceptual-confidence/0.1.0/0.1.0",
+        "version": "0.1.0",
+        "clock": "performance",
+        "randomizationAlgorithmVersion": "pc-fnv1a-xorshift32-block60-v1",
+        "trialEnvelopeVersion": 1,
+        "phases": [
+          {
+            "key": "test",
+            "persists": true,
+            "required": true
+          }
+        ],
+        "measurementCriticalConfigPaths": [
+          "*"
+        ]
+      },
+      "config": {
+        "profile": "experience",
+        "totalTrials": 60,
+        "blocks": 1,
+        "perCondition": 10,
+        "blockTrials": 60,
+        "strengthsPercent": [
+          4,
+          10,
+          20
+        ],
+        "fixationMs": 1000,
+        "stimulusMs": 200,
+        "interTrialMs": 1000,
+        "judgmentDeadlineMs": null,
+        "confidenceDeadlineMs": null,
+        "inputPolicy": "separate-first-full-activation-v1",
+        "stimulus": {
+          "generatorVersion": "pc-gray-uniform-fixed-sinusoid-micro-v1",
+          "patchPx": 128,
+          "gapPx": 24,
+          "periodPx": 16,
+          "waveMicrogray": [
+            255000000,
+            245294640,
+            217656115,
+            176292138,
+            127500000,
+            78707862,
+            37343885,
+            9705360,
+            0,
+            9705360,
+            37343885,
+            78707862,
+            127500000,
+            176292138,
+            217656115,
+            245294640
+          ],
+          "externalBackground": "#F8FAFC",
+          "fieldBackground": "#E8E8E8",
+          "grayChannelsEqual": true
+        },
+        "practice": {
+          "trials": 4,
+          "left": 2,
+          "right": 2,
+          "strengthPercent": 45,
+          "stimulusMs": 500,
+          "minimumCorrect": 3,
+          "maximumGroups": 3,
+          "pairedRequired": 4,
+          "confidencePreference": null
+        },
+        "profileDefinitionVersion": "0.1.0",
+        "metricDefinitionVersion": "0.1.0",
+        "qualityDefinitionVersion": "0.1.0",
+        "reportDefinitionVersion": "0.1.0",
+        "presentationVersion": "0.1.0",
+        "parameterExplanationVersion": "0.1.0"
+      },
+      "configHash": "eed396e473f349cbe095aba7e0614fad530e2abefb9ab69b46eaa16dc686dd44",
+      "protocolSignature": "49ed269210a4e1d063a487dbfecb908993d984b7397b1678bea0ae1217bd8f40",
+      "frozenAt": "2026-10-27T00:00:00.000Z"
+    },
+    "manifestHash": "eea2ead3017f010bfa3de169be50e91bda78dffac27c944393df465f0e136bbd"
+  },
+  "manifest": {
+    "formal": [
+      {
+        "index": 0,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "left",
+        "strengthPercent": 10,
+        "conditionId": "left:10",
+        "stimulusSeed": "pc-react-software-only:formal:0:left:10:0"
+      },
+      {
+        "index": 1,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "right",
+        "strengthPercent": 10,
+        "conditionId": "right:10",
+        "stimulusSeed": "pc-react-software-only:formal:0:right:10:8"
+      },
+      {
+        "index": 2,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "left",
+        "strengthPercent": 20,
+        "conditionId": "left:20",
+        "stimulusSeed": "pc-react-software-only:formal:0:left:20:7"
+      },
+      {
+        "index": 3,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "right",
+        "strengthPercent": 20,
+        "conditionId": "right:20",
+        "stimulusSeed": "pc-react-software-only:formal:0:right:20:1"
+      },
+      {
+        "index": 4,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "right",
+        "strengthPercent": 10,
+        "conditionId": "right:10",
+        "stimulusSeed": "pc-react-software-only:formal:0:right:10:0"
+      },
+      {
+        "index": 5,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "right",
+        "strengthPercent": 4,
+        "conditionId": "right:4",
+        "stimulusSeed": "pc-react-software-only:formal:0:right:4:3"
+      },
+      {
+        "index": 6,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "right",
+        "strengthPercent": 10,
+        "conditionId": "right:10",
+        "stimulusSeed": "pc-react-software-only:formal:0:right:10:9"
+      },
+      {
+        "index": 7,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "left",
+        "strengthPercent": 10,
+        "conditionId": "left:10",
+        "stimulusSeed": "pc-react-software-only:formal:0:left:10:1"
+      },
+      {
+        "index": 8,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "left",
+        "strengthPercent": 10,
+        "conditionId": "left:10",
+        "stimulusSeed": "pc-react-software-only:formal:0:left:10:2"
+      },
+      {
+        "index": 9,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "right",
+        "strengthPercent": 10,
+        "conditionId": "right:10",
+        "stimulusSeed": "pc-react-software-only:formal:0:right:10:4"
+      },
+      {
+        "index": 10,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "right",
+        "strengthPercent": 4,
+        "conditionId": "right:4",
+        "stimulusSeed": "pc-react-software-only:formal:0:right:4:7"
+      },
+      {
+        "index": 11,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "left",
+        "strengthPercent": 4,
+        "conditionId": "left:4",
+        "stimulusSeed": "pc-react-software-only:formal:0:left:4:6"
+      },
+      {
+        "index": 12,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "left",
+        "strengthPercent": 4,
+        "conditionId": "left:4",
+        "stimulusSeed": "pc-react-software-only:formal:0:left:4:1"
+      },
+      {
+        "index": 13,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "right",
+        "strengthPercent": 20,
+        "conditionId": "right:20",
+        "stimulusSeed": "pc-react-software-only:formal:0:right:20:2"
+      },
+      {
+        "index": 14,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "right",
+        "strengthPercent": 10,
+        "conditionId": "right:10",
+        "stimulusSeed": "pc-react-software-only:formal:0:right:10:5"
+      },
+      {
+        "index": 15,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "left",
+        "strengthPercent": 4,
+        "conditionId": "left:4",
+        "stimulusSeed": "pc-react-software-only:formal:0:left:4:4"
+      },
+      {
+        "index": 16,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "left",
+        "strengthPercent": 20,
+        "conditionId": "left:20",
+        "stimulusSeed": "pc-react-software-only:formal:0:left:20:6"
+      },
+      {
+        "index": 17,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "left",
+        "strengthPercent": 4,
+        "conditionId": "left:4",
+        "stimulusSeed": "pc-react-software-only:formal:0:left:4:5"
+      },
+      {
+        "index": 18,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "left",
+        "strengthPercent": 20,
+        "conditionId": "left:20",
+        "stimulusSeed": "pc-react-software-only:formal:0:left:20:5"
+      },
+      {
+        "index": 19,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "right",
+        "strengthPercent": 4,
+        "conditionId": "right:4",
+        "stimulusSeed": "pc-react-software-only:formal:0:right:4:6"
+      },
+      {
+        "index": 20,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "left",
+        "strengthPercent": 10,
+        "conditionId": "left:10",
+        "stimulusSeed": "pc-react-software-only:formal:0:left:10:4"
+      },
+      {
+        "index": 21,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "left",
+        "strengthPercent": 10,
+        "conditionId": "left:10",
+        "stimulusSeed": "pc-react-software-only:formal:0:left:10:3"
+      },
+      {
+        "index": 22,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "right",
+        "strengthPercent": 10,
+        "conditionId": "right:10",
+        "stimulusSeed": "pc-react-software-only:formal:0:right:10:3"
+      },
+      {
+        "index": 23,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "left",
+        "strengthPercent": 20,
+        "conditionId": "left:20",
+        "stimulusSeed": "pc-react-software-only:formal:0:left:20:3"
+      },
+      {
+        "index": 24,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "left",
+        "strengthPercent": 10,
+        "conditionId": "left:10",
+        "stimulusSeed": "pc-react-software-only:formal:0:left:10:6"
+      },
+      {
+        "index": 25,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "right",
+        "strengthPercent": 20,
+        "conditionId": "right:20",
+        "stimulusSeed": "pc-react-software-only:formal:0:right:20:3"
+      },
+      {
+        "index": 26,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "left",
+        "strengthPercent": 10,
+        "conditionId": "left:10",
+        "stimulusSeed": "pc-react-software-only:formal:0:left:10:5"
+      },
+      {
+        "index": 27,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "right",
+        "strengthPercent": 10,
+        "conditionId": "right:10",
+        "stimulusSeed": "pc-react-software-only:formal:0:right:10:6"
+      },
+      {
+        "index": 28,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "right",
+        "strengthPercent": 10,
+        "conditionId": "right:10",
+        "stimulusSeed": "pc-react-software-only:formal:0:right:10:7"
+      },
+      {
+        "index": 29,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "left",
+        "strengthPercent": 4,
+        "conditionId": "left:4",
+        "stimulusSeed": "pc-react-software-only:formal:0:left:4:8"
+      },
+      {
+        "index": 30,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "left",
+        "strengthPercent": 4,
+        "conditionId": "left:4",
+        "stimulusSeed": "pc-react-software-only:formal:0:left:4:0"
+      },
+      {
+        "index": 31,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "right",
+        "strengthPercent": 20,
+        "conditionId": "right:20",
+        "stimulusSeed": "pc-react-software-only:formal:0:right:20:7"
+      },
+      {
+        "index": 32,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "right",
+        "strengthPercent": 4,
+        "conditionId": "right:4",
+        "stimulusSeed": "pc-react-software-only:formal:0:right:4:2"
+      },
+      {
+        "index": 33,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "left",
+        "strengthPercent": 4,
+        "conditionId": "left:4",
+        "stimulusSeed": "pc-react-software-only:formal:0:left:4:9"
+      },
+      {
+        "index": 34,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "right",
+        "strengthPercent": 4,
+        "conditionId": "right:4",
+        "stimulusSeed": "pc-react-software-only:formal:0:right:4:4"
+      },
+      {
+        "index": 35,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "right",
+        "strengthPercent": 20,
+        "conditionId": "right:20",
+        "stimulusSeed": "pc-react-software-only:formal:0:right:20:8"
+      },
+      {
+        "index": 36,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "right",
+        "strengthPercent": 10,
+        "conditionId": "right:10",
+        "stimulusSeed": "pc-react-software-only:formal:0:right:10:1"
+      },
+      {
+        "index": 37,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "right",
+        "strengthPercent": 4,
+        "conditionId": "right:4",
+        "stimulusSeed": "pc-react-software-only:formal:0:right:4:8"
+      },
+      {
+        "index": 38,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "left",
+        "strengthPercent": 20,
+        "conditionId": "left:20",
+        "stimulusSeed": "pc-react-software-only:formal:0:left:20:9"
+      },
+      {
+        "index": 39,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "left",
+        "strengthPercent": 20,
+        "conditionId": "left:20",
+        "stimulusSeed": "pc-react-software-only:formal:0:left:20:4"
+      },
+      {
+        "index": 40,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "left",
+        "strengthPercent": 10,
+        "conditionId": "left:10",
+        "stimulusSeed": "pc-react-software-only:formal:0:left:10:9"
+      },
+      {
+        "index": 41,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "right",
+        "strengthPercent": 20,
+        "conditionId": "right:20",
+        "stimulusSeed": "pc-react-software-only:formal:0:right:20:5"
+      },
+      {
+        "index": 42,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "left",
+        "strengthPercent": 4,
+        "conditionId": "left:4",
+        "stimulusSeed": "pc-react-software-only:formal:0:left:4:3"
+      },
+      {
+        "index": 43,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "left",
+        "strengthPercent": 20,
+        "conditionId": "left:20",
+        "stimulusSeed": "pc-react-software-only:formal:0:left:20:0"
+      },
+      {
+        "index": 44,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "left",
+        "strengthPercent": 4,
+        "conditionId": "left:4",
+        "stimulusSeed": "pc-react-software-only:formal:0:left:4:7"
+      },
+      {
+        "index": 45,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "right",
+        "strengthPercent": 20,
+        "conditionId": "right:20",
+        "stimulusSeed": "pc-react-software-only:formal:0:right:20:0"
+      },
+      {
+        "index": 46,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "left",
+        "strengthPercent": 20,
+        "conditionId": "left:20",
+        "stimulusSeed": "pc-react-software-only:formal:0:left:20:1"
+      },
+      {
+        "index": 47,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "right",
+        "strengthPercent": 10,
+        "conditionId": "right:10",
+        "stimulusSeed": "pc-react-software-only:formal:0:right:10:2"
+      },
+      {
+        "index": 48,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "right",
+        "strengthPercent": 20,
+        "conditionId": "right:20",
+        "stimulusSeed": "pc-react-software-only:formal:0:right:20:9"
+      },
+      {
+        "index": 49,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "left",
+        "strengthPercent": 20,
+        "conditionId": "left:20",
+        "stimulusSeed": "pc-react-software-only:formal:0:left:20:8"
+      },
+      {
+        "index": 50,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "right",
+        "strengthPercent": 4,
+        "conditionId": "right:4",
+        "stimulusSeed": "pc-react-software-only:formal:0:right:4:0"
+      },
+      {
+        "index": 51,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "left",
+        "strengthPercent": 10,
+        "conditionId": "left:10",
+        "stimulusSeed": "pc-react-software-only:formal:0:left:10:8"
+      },
+      {
+        "index": 52,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "right",
+        "strengthPercent": 20,
+        "conditionId": "right:20",
+        "stimulusSeed": "pc-react-software-only:formal:0:right:20:6"
+      },
+      {
+        "index": 53,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "right",
+        "strengthPercent": 4,
+        "conditionId": "right:4",
+        "stimulusSeed": "pc-react-software-only:formal:0:right:4:1"
+      },
+      {
+        "index": 54,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "right",
+        "strengthPercent": 20,
+        "conditionId": "right:20",
+        "stimulusSeed": "pc-react-software-only:formal:0:right:20:4"
+      },
+      {
+        "index": 55,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "right",
+        "strengthPercent": 4,
+        "conditionId": "right:4",
+        "stimulusSeed": "pc-react-software-only:formal:0:right:4:5"
+      },
+      {
+        "index": 56,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "left",
+        "strengthPercent": 20,
+        "conditionId": "left:20",
+        "stimulusSeed": "pc-react-software-only:formal:0:left:20:2"
+      },
+      {
+        "index": 57,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "left",
+        "strengthPercent": 10,
+        "conditionId": "left:10",
+        "stimulusSeed": "pc-react-software-only:formal:0:left:10:7"
+      },
+      {
+        "index": 58,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "left",
+        "strengthPercent": 4,
+        "conditionId": "left:4",
+        "stimulusSeed": "pc-react-software-only:formal:0:left:4:2"
+      },
+      {
+        "index": 59,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "target": "right",
+        "strengthPercent": 4,
+        "conditionId": "right:4",
+        "stimulusSeed": "pc-react-software-only:formal:0:right:4:9"
+      }
+    ],
+    "practice": [
+      [
+        {
+          "index": 0,
+          "phase": "practice",
+          "round": 0,
+          "block": 0,
+          "target": "right",
+          "strengthPercent": 45,
+          "conditionId": "right:45",
+          "stimulusSeed": "pc-react-software-only:practice:0:0"
+        },
+        {
+          "index": 1,
+          "phase": "practice",
+          "round": 0,
+          "block": 0,
+          "target": "left",
+          "strengthPercent": 45,
+          "conditionId": "left:45",
+          "stimulusSeed": "pc-react-software-only:practice:0:1"
+        },
+        {
+          "index": 2,
+          "phase": "practice",
+          "round": 0,
+          "block": 0,
+          "target": "left",
+          "strengthPercent": 45,
+          "conditionId": "left:45",
+          "stimulusSeed": "pc-react-software-only:practice:0:2"
+        },
+        {
+          "index": 3,
+          "phase": "practice",
+          "round": 0,
+          "block": 0,
+          "target": "right",
+          "strengthPercent": 45,
+          "conditionId": "right:45",
+          "stimulusSeed": "pc-react-software-only:practice:0:3"
+        }
+      ],
+      [
+        {
+          "index": 0,
+          "phase": "practice",
+          "round": 1,
+          "block": 0,
+          "target": "right",
+          "strengthPercent": 45,
+          "conditionId": "right:45",
+          "stimulusSeed": "pc-react-software-only:practice:1:0"
+        },
+        {
+          "index": 1,
+          "phase": "practice",
+          "round": 1,
+          "block": 0,
+          "target": "left",
+          "strengthPercent": 45,
+          "conditionId": "left:45",
+          "stimulusSeed": "pc-react-software-only:practice:1:1"
+        },
+        {
+          "index": 2,
+          "phase": "practice",
+          "round": 1,
+          "block": 0,
+          "target": "left",
+          "strengthPercent": 45,
+          "conditionId": "left:45",
+          "stimulusSeed": "pc-react-software-only:practice:1:2"
+        },
+        {
+          "index": 3,
+          "phase": "practice",
+          "round": 1,
+          "block": 0,
+          "target": "right",
+          "strengthPercent": 45,
+          "conditionId": "right:45",
+          "stimulusSeed": "pc-react-software-only:practice:1:3"
+        }
+      ],
+      [
+        {
+          "index": 0,
+          "phase": "practice",
+          "round": 2,
+          "block": 0,
+          "target": "right",
+          "strengthPercent": 45,
+          "conditionId": "right:45",
+          "stimulusSeed": "pc-react-software-only:practice:2:0"
+        },
+        {
+          "index": 1,
+          "phase": "practice",
+          "round": 2,
+          "block": 0,
+          "target": "left",
+          "strengthPercent": 45,
+          "conditionId": "left:45",
+          "stimulusSeed": "pc-react-software-only:practice:2:1"
+        },
+        {
+          "index": 2,
+          "phase": "practice",
+          "round": 2,
+          "block": 0,
+          "target": "left",
+          "strengthPercent": 45,
+          "conditionId": "left:45",
+          "stimulusSeed": "pc-react-software-only:practice:2:2"
+        },
+        {
+          "index": 3,
+          "phase": "practice",
+          "round": 2,
+          "block": 0,
+          "target": "right",
+          "strengthPercent": 45,
+          "conditionId": "right:45",
+          "stimulusSeed": "pc-react-software-only:practice:2:3"
+        }
+      ]
+    ]
+  },
+  "records": [
+    {
+      "phase": "practice",
+      "round": 0,
+      "index": 0,
+      "raw": {
+        "plan": {
+          "index": 0,
+          "phase": "practice",
+          "round": 0,
+          "block": 0,
+          "target": "right",
+          "strengthPercent": 45,
+          "conditionId": "right:45",
+          "stimulusSeed": "pc-react-software-only:practice:0:0"
+        },
+        "startedAtPerfMs": 100,
+        "endedAtPerfMs": 1600,
+        "status": "complete",
+        "stopReason": null,
+        "checksums": {
+          "left": "b31c718a",
+          "right": "26444321"
+        },
+        "events": [
+          {
+            "kind": "fixation-ended",
+            "atMs": 1100
+          },
+          {
+            "kind": "stimulus-drawn",
+            "atMs": 1100
+          },
+          {
+            "kind": "stimulus-ended",
+            "atMs": 1600
+          },
+          {
+            "kind": "activate",
+            "atMs": 1600,
+            "target": "left",
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          },
+          {
+            "kind": "activate",
+            "atMs": 1600,
+            "target": "1",
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          }
+        ],
+        "state": {
+          "stage": "complete",
+          "requestedAtMs": 1100,
+          "drawnAtMs": 1100,
+          "judgmentAtMs": 1600,
+          "choice": "left",
+          "choiceAtMs": 1600,
+          "judgmentMs": 0,
+          "choiceInput": "assistive",
+          "rating": 1,
+          "ratingAtMs": 1600,
+          "confidenceMs": 0,
+          "ratingInput": "assistive",
+          "terminal": "paired",
+          "terminalAtMs": 1600,
+          "held": [],
+          "ignored": 0
+        },
+        "ignoredRepeatCount": 0,
+        "overflow": false
+      },
+      "language": "en",
+      "contextDigest": "648186c44d29aa918a21a4a8d0343a22dee0f7d99ac95c4d7410018831824134",
+      "contextKey": "pc-synthetic-ui",
+      "configHash": "eed396e473f349cbe095aba7e0614fad530e2abefb9ab69b46eaa16dc686dd44",
+      "protocolSignature": "49ed269210a4e1d063a487dbfecb908993d984b7397b1678bea0ae1217bd8f40",
+      "manifestHash": "eea2ead3017f010bfa3de169be50e91bda78dffac27c944393df465f0e136bbd",
+      "realm": {
+        "timeOriginMs": 1793111382514.778,
+        "pageInstanceId": "05c169fd-806e-4249-9bb9-163183bff630"
+      },
+      "recordKey": "practice:0:0",
+      "recordDigest": "bac8dd7221a0e8fa32b12a355ae059d562908ca89087e445e354db7bfe9ac804"
+    },
+    {
+      "phase": "practice",
+      "round": 0,
+      "index": 1,
+      "raw": {
+        "plan": {
+          "index": 1,
+          "phase": "practice",
+          "round": 0,
+          "block": 0,
+          "target": "left",
+          "strengthPercent": 45,
+          "conditionId": "left:45",
+          "stimulusSeed": "pc-react-software-only:practice:0:1"
+        },
+        "startedAtPerfMs": 1600,
+        "endedAtPerfMs": 3100,
+        "status": "complete",
+        "stopReason": null,
+        "checksums": {
+          "left": "afb0be91",
+          "right": "91085a85"
+        },
+        "events": [
+          {
+            "kind": "fixation-ended",
+            "atMs": 2600
+          },
+          {
+            "kind": "stimulus-drawn",
+            "atMs": 2600
+          },
+          {
+            "kind": "stimulus-ended",
+            "atMs": 3100
+          },
+          {
+            "kind": "activate",
+            "atMs": 3100,
+            "target": "left",
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          },
+          {
+            "kind": "activate",
+            "atMs": 3100,
+            "target": "1",
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          }
+        ],
+        "state": {
+          "stage": "complete",
+          "requestedAtMs": 2600,
+          "drawnAtMs": 2600,
+          "judgmentAtMs": 3100,
+          "choice": "left",
+          "choiceAtMs": 3100,
+          "judgmentMs": 0,
+          "choiceInput": "assistive",
+          "rating": 1,
+          "ratingAtMs": 3100,
+          "confidenceMs": 0,
+          "ratingInput": "assistive",
+          "terminal": "paired",
+          "terminalAtMs": 3100,
+          "held": [],
+          "ignored": 0
+        },
+        "ignoredRepeatCount": 0,
+        "overflow": false
+      },
+      "language": "en",
+      "contextDigest": "648186c44d29aa918a21a4a8d0343a22dee0f7d99ac95c4d7410018831824134",
+      "contextKey": "pc-synthetic-ui",
+      "configHash": "eed396e473f349cbe095aba7e0614fad530e2abefb9ab69b46eaa16dc686dd44",
+      "protocolSignature": "49ed269210a4e1d063a487dbfecb908993d984b7397b1678bea0ae1217bd8f40",
+      "manifestHash": "eea2ead3017f010bfa3de169be50e91bda78dffac27c944393df465f0e136bbd",
+      "realm": {
+        "timeOriginMs": 1793111382514.778,
+        "pageInstanceId": "05c169fd-806e-4249-9bb9-163183bff630"
+      },
+      "recordKey": "practice:0:1",
+      "recordDigest": "b475a721b0ccd3e114ddd78ee94f8d1282630f0dd546062fd76066344563a436"
+    },
+    {
+      "phase": "practice",
+      "round": 0,
+      "index": 2,
+      "raw": {
+        "plan": {
+          "index": 2,
+          "phase": "practice",
+          "round": 0,
+          "block": 0,
+          "target": "left",
+          "strengthPercent": 45,
+          "conditionId": "left:45",
+          "stimulusSeed": "pc-react-software-only:practice:0:2"
+        },
+        "startedAtPerfMs": 3100,
+        "endedAtPerfMs": 4600,
+        "status": "complete",
+        "stopReason": null,
+        "checksums": {
+          "left": "1c6c4052",
+          "right": "c0080959"
+        },
+        "events": [
+          {
+            "kind": "fixation-ended",
+            "atMs": 4100
+          },
+          {
+            "kind": "stimulus-drawn",
+            "atMs": 4100
+          },
+          {
+            "kind": "stimulus-ended",
+            "atMs": 4600
+          },
+          {
+            "kind": "activate",
+            "atMs": 4600,
+            "target": "left",
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          },
+          {
+            "kind": "activate",
+            "atMs": 4600,
+            "target": "1",
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          }
+        ],
+        "state": {
+          "stage": "complete",
+          "requestedAtMs": 4100,
+          "drawnAtMs": 4100,
+          "judgmentAtMs": 4600,
+          "choice": "left",
+          "choiceAtMs": 4600,
+          "judgmentMs": 0,
+          "choiceInput": "assistive",
+          "rating": 1,
+          "ratingAtMs": 4600,
+          "confidenceMs": 0,
+          "ratingInput": "assistive",
+          "terminal": "paired",
+          "terminalAtMs": 4600,
+          "held": [],
+          "ignored": 0
+        },
+        "ignoredRepeatCount": 0,
+        "overflow": false
+      },
+      "language": "en",
+      "contextDigest": "648186c44d29aa918a21a4a8d0343a22dee0f7d99ac95c4d7410018831824134",
+      "contextKey": "pc-synthetic-ui",
+      "configHash": "eed396e473f349cbe095aba7e0614fad530e2abefb9ab69b46eaa16dc686dd44",
+      "protocolSignature": "49ed269210a4e1d063a487dbfecb908993d984b7397b1678bea0ae1217bd8f40",
+      "manifestHash": "eea2ead3017f010bfa3de169be50e91bda78dffac27c944393df465f0e136bbd",
+      "realm": {
+        "timeOriginMs": 1793111382514.778,
+        "pageInstanceId": "05c169fd-806e-4249-9bb9-163183bff630"
+      },
+      "recordKey": "practice:0:2",
+      "recordDigest": "7713f497a71223ec68dbab3f63ae4e7a699470bbf54f77589a29af1117b1b70c"
+    },
+    {
+      "phase": "practice",
+      "round": 0,
+      "index": 3,
+      "raw": {
+        "plan": {
+          "index": 3,
+          "phase": "practice",
+          "round": 0,
+          "block": 0,
+          "target": "right",
+          "strengthPercent": 45,
+          "conditionId": "right:45",
+          "stimulusSeed": "pc-react-software-only:practice:0:3"
+        },
+        "startedAtPerfMs": 4600,
+        "endedAtPerfMs": 6100,
+        "status": "complete",
+        "stopReason": null,
+        "checksums": {
+          "left": "5538af64",
+          "right": "2a052a89"
+        },
+        "events": [
+          {
+            "kind": "fixation-ended",
+            "atMs": 5600
+          },
+          {
+            "kind": "stimulus-drawn",
+            "atMs": 5600
+          },
+          {
+            "kind": "stimulus-ended",
+            "atMs": 6100
+          },
+          {
+            "kind": "activate",
+            "atMs": 6100,
+            "target": "right",
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          },
+          {
+            "kind": "activate",
+            "atMs": 6100,
+            "target": "1",
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          }
+        ],
+        "state": {
+          "stage": "complete",
+          "requestedAtMs": 5600,
+          "drawnAtMs": 5600,
+          "judgmentAtMs": 6100,
+          "choice": "right",
+          "choiceAtMs": 6100,
+          "judgmentMs": 0,
+          "choiceInput": "assistive",
+          "rating": 1,
+          "ratingAtMs": 6100,
+          "confidenceMs": 0,
+          "ratingInput": "assistive",
+          "terminal": "paired",
+          "terminalAtMs": 6100,
+          "held": [],
+          "ignored": 0
+        },
+        "ignoredRepeatCount": 0,
+        "overflow": false
+      },
+      "language": "en",
+      "contextDigest": "648186c44d29aa918a21a4a8d0343a22dee0f7d99ac95c4d7410018831824134",
+      "contextKey": "pc-synthetic-ui",
+      "configHash": "eed396e473f349cbe095aba7e0614fad530e2abefb9ab69b46eaa16dc686dd44",
+      "protocolSignature": "49ed269210a4e1d063a487dbfecb908993d984b7397b1678bea0ae1217bd8f40",
+      "manifestHash": "eea2ead3017f010bfa3de169be50e91bda78dffac27c944393df465f0e136bbd",
+      "realm": {
+        "timeOriginMs": 1793111382514.778,
+        "pageInstanceId": "05c169fd-806e-4249-9bb9-163183bff630"
+      },
+      "recordKey": "practice:0:3",
+      "recordDigest": "794f7a329c0d9e76bd1d4f118d7901801d536e22cd1cb525f75a5e8d7c8bac8b"
+    },
+    {
+      "phase": "test",
+      "round": 0,
+      "index": 0,
+      "raw": {
+        "plan": {
+          "index": 0,
+          "phase": "test",
+          "round": 0,
+          "block": 0,
+          "target": "left",
+          "strengthPercent": 10,
+          "conditionId": "left:10",
+          "stimulusSeed": "pc-react-software-only:formal:0:left:10:0"
+        },
+        "startedAtPerfMs": 6100,
+        "endedAtPerfMs": 7300,
+        "status": "complete",
+        "stopReason": null,
+        "checksums": {
+          "left": "291fdae4",
+          "right": "57e61c59"
+        },
+        "events": [
+          {
+            "kind": "fixation-ended",
+            "atMs": 7100
+          },
+          {
+            "kind": "stimulus-drawn",
+            "atMs": 7100
+          },
+          {
+            "kind": "stimulus-ended",
+            "atMs": 7300
+          },
+          {
+            "kind": "down",
+            "atMs": 7300,
+            "target": "right",
+            "key": "ArrowRight",
+            "input": "keyboard",
+            "token": "hotkey:ArrowRight",
+            "repeat": false
+          },
+          {
+            "kind": "up",
+            "atMs": 7300,
+            "target": "right",
+            "key": "ArrowRight",
+            "input": "keyboard",
+            "token": "hotkey:ArrowRight",
+            "repeat": false
+          },
+          {
+            "kind": "down",
+            "atMs": 7300,
+            "target": "1",
+            "key": "Digit1",
+            "input": "keyboard",
+            "token": "hotkey:Digit1",
+            "repeat": false
+          },
+          {
+            "kind": "up",
+            "atMs": 7300,
+            "target": "1",
+            "key": "Digit1",
+            "input": "keyboard",
+            "token": "hotkey:Digit1",
+            "repeat": false
+          }
+        ],
+        "state": {
+          "stage": "complete",
+          "requestedAtMs": 7100,
+          "drawnAtMs": 7100,
+          "judgmentAtMs": 7300,
+          "choice": "right",
+          "choiceAtMs": 7300,
+          "judgmentMs": 0,
+          "choiceInput": "keyboard",
+          "rating": 1,
+          "ratingAtMs": 7300,
+          "confidenceMs": 0,
+          "ratingInput": "keyboard",
+          "terminal": "paired",
+          "terminalAtMs": 7300,
+          "held": [],
+          "ignored": 0
+        },
+        "ignoredRepeatCount": 1,
+        "overflow": false
+      },
+      "language": "en",
+      "contextDigest": "648186c44d29aa918a21a4a8d0343a22dee0f7d99ac95c4d7410018831824134",
+      "contextKey": "pc-synthetic-ui",
+      "configHash": "eed396e473f349cbe095aba7e0614fad530e2abefb9ab69b46eaa16dc686dd44",
+      "protocolSignature": "49ed269210a4e1d063a487dbfecb908993d984b7397b1678bea0ae1217bd8f40",
+      "manifestHash": "eea2ead3017f010bfa3de169be50e91bda78dffac27c944393df465f0e136bbd",
+      "realm": {
+        "timeOriginMs": 1793111382514.778,
+        "pageInstanceId": "05c169fd-806e-4249-9bb9-163183bff630"
+      },
+      "recordKey": "test:0:0",
+      "recordDigest": "8c66961d78e9db43b603fb423250f4032054c0ede0e05e0f18f5c665c9bd65f2"
+    },
+    {
+      "phase": "test",
+      "round": 0,
+      "index": 1,
+      "raw": {
+        "plan": {
+          "index": 1,
+          "phase": "test",
+          "round": 0,
+          "block": 0,
+          "target": "right",
+          "strengthPercent": 10,
+          "conditionId": "right:10",
+          "stimulusSeed": "pc-react-software-only:formal:0:right:10:8"
+        },
+        "startedAtPerfMs": 8300,
+        "endedAtPerfMs": 9500,
+        "status": "interrupted",
+        "stopReason": "participant-ended",
+        "checksums": {
+          "left": "734ead50",
+          "right": "8feac9ba"
+        },
+        "events": [
+          {
+            "kind": "fixation-ended",
+            "atMs": 9300
+          },
+          {
+            "kind": "stimulus-drawn",
+            "atMs": 9300
+          },
+          {
+            "kind": "stimulus-ended",
+            "atMs": 9500
+          },
+          {
+            "kind": "activate",
+            "atMs": 9500,
+            "target": "right",
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          }
+        ],
+        "state": {
+          "stage": "confidence",
+          "requestedAtMs": 9300,
+          "drawnAtMs": 9300,
+          "judgmentAtMs": 9500,
+          "choice": "right",
+          "choiceAtMs": 9500,
+          "judgmentMs": 0,
+          "choiceInput": "assistive",
+          "rating": null,
+          "ratingAtMs": null,
+          "confidenceMs": null,
+          "ratingInput": null,
+          "terminal": null,
+          "terminalAtMs": null,
+          "held": [],
+          "ignored": 0
+        },
+        "ignoredRepeatCount": 0,
+        "overflow": false
+      },
+      "language": "en",
+      "contextDigest": "648186c44d29aa918a21a4a8d0343a22dee0f7d99ac95c4d7410018831824134",
+      "contextKey": "pc-synthetic-ui",
+      "configHash": "eed396e473f349cbe095aba7e0614fad530e2abefb9ab69b46eaa16dc686dd44",
+      "protocolSignature": "49ed269210a4e1d063a487dbfecb908993d984b7397b1678bea0ae1217bd8f40",
+      "manifestHash": "eea2ead3017f010bfa3de169be50e91bda78dffac27c944393df465f0e136bbd",
+      "realm": {
+        "timeOriginMs": 1793111382514.778,
+        "pageInstanceId": "05c169fd-806e-4249-9bb9-163183bff630"
+      },
+      "recordKey": "test:0:1",
+      "recordDigest": "8e668facb77311b34e2861d400832a8437f2776fc953c77d962f03b9ea23da00"
+    }
+  ],
+  "final": {
+    "language": "en",
+    "contextDigest": "648186c44d29aa918a21a4a8d0343a22dee0f7d99ac95c4d7410018831824134",
+    "contextKey": "pc-synthetic-ui",
+    "configHash": "eed396e473f349cbe095aba7e0614fad530e2abefb9ab69b46eaa16dc686dd44",
+    "protocolSignature": "49ed269210a4e1d063a487dbfecb908993d984b7397b1678bea0ae1217bd8f40",
+    "manifestHash": "eea2ead3017f010bfa3de169be50e91bda78dffac27c944393df465f0e136bbd",
+    "formalCount": 2,
+    "practiceCount": 4,
+    "termination": "aborted",
+    "terminationReason": "participant-ended",
+    "recordDigests": [
+      "bac8dd7221a0e8fa32b12a355ae059d562908ca89087e445e354db7bfe9ac804",
+      "b475a721b0ccd3e114ddd78ee94f8d1282630f0dd546062fd76066344563a436",
+      "7713f497a71223ec68dbab3f63ae4e7a699470bbf54f77589a29af1117b1b70c",
+      "794f7a329c0d9e76bd1d4f118d7901801d536e22cd1cb525f75a5e8d7c8bac8b",
+      "8c66961d78e9db43b603fb423250f4032054c0ede0e05e0f18f5c665c9bd65f2",
+      "8e668facb77311b34e2861d400832a8437f2776fc953c77d962f03b9ea23da00"
+    ],
+    "finalPayloadDigest": "70df134b0964f09aa8f39393397bb44a1b08bcaef191325bca755fd1da465e80"
+  },
+  "report": {
+    "testType": "perceptual-confidence",
+    "engineVersion": "0.1.0",
+    "scoringVersion": "0.1.0",
+    "configVersion": "0.1.0",
+    "reportDefinitionVersion": "0.1.0",
+    "presentationVersion": "0.1.0",
+    "parameterExplanationVersion": "0.1.0",
+    "configHash": "eed396e473f349cbe095aba7e0614fad530e2abefb9ab69b46eaa16dc686dd44",
+    "protocolSignature": "49ed269210a4e1d063a487dbfecb908993d984b7397b1678bea0ae1217bd8f40",
+    "profile": "experience",
+    "state": "limited",
+    "planned": 60,
+    "started": 2,
+    "presented": 2,
+    "summary": {
+      "planned": 60,
+      "started": 2,
+      "presented": 2,
+      "judged": 2,
+      "correct": 1,
+      "paired": 1,
+      "pairedCorrect": 0,
+      "skippedJudgment": 0,
+      "skippedConfidence": 0,
+      "interruptions": 1,
+      "accuracy": 0.5,
+      "ratings": [
+        {
+          "rating": 1,
+          "n": 1,
+          "correct": 0
+        },
+        {
+          "rating": 2,
+          "n": 0,
+          "correct": 0
+        },
+        {
+          "rating": 3,
+          "n": 0,
+          "correct": 0
+        },
+        {
+          "rating": 4,
+          "n": 0,
+          "correct": 0
+        }
+      ]
+    },
+    "conditions": [
+      {
+        "planned": 10,
+        "started": 0,
+        "presented": 0,
+        "judged": 0,
+        "correct": 0,
+        "paired": 0,
+        "pairedCorrect": 0,
+        "skippedJudgment": 0,
+        "skippedConfidence": 0,
+        "interruptions": 0,
+        "accuracy": null,
+        "ratings": [
+          {
+            "rating": 1,
+            "n": 0,
+            "correct": 0
+          },
+          {
+            "rating": 2,
+            "n": 0,
+            "correct": 0
+          },
+          {
+            "rating": 3,
+            "n": 0,
+            "correct": 0
+          },
+          {
+            "rating": 4,
+            "n": 0,
+            "correct": 0
+          }
+        ],
+        "conditionId": "left:4",
+        "target": "left",
+        "strengthPercent": 4
+      },
+      {
+        "planned": 10,
+        "started": 1,
+        "presented": 1,
+        "judged": 1,
+        "correct": 0,
+        "paired": 1,
+        "pairedCorrect": 0,
+        "skippedJudgment": 0,
+        "skippedConfidence": 0,
+        "interruptions": 0,
+        "accuracy": 0,
+        "ratings": [
+          {
+            "rating": 1,
+            "n": 1,
+            "correct": 0
+          },
+          {
+            "rating": 2,
+            "n": 0,
+            "correct": 0
+          },
+          {
+            "rating": 3,
+            "n": 0,
+            "correct": 0
+          },
+          {
+            "rating": 4,
+            "n": 0,
+            "correct": 0
+          }
+        ],
+        "conditionId": "left:10",
+        "target": "left",
+        "strengthPercent": 10
+      },
+      {
+        "planned": 10,
+        "started": 0,
+        "presented": 0,
+        "judged": 0,
+        "correct": 0,
+        "paired": 0,
+        "pairedCorrect": 0,
+        "skippedJudgment": 0,
+        "skippedConfidence": 0,
+        "interruptions": 0,
+        "accuracy": null,
+        "ratings": [
+          {
+            "rating": 1,
+            "n": 0,
+            "correct": 0
+          },
+          {
+            "rating": 2,
+            "n": 0,
+            "correct": 0
+          },
+          {
+            "rating": 3,
+            "n": 0,
+            "correct": 0
+          },
+          {
+            "rating": 4,
+            "n": 0,
+            "correct": 0
+          }
+        ],
+        "conditionId": "left:20",
+        "target": "left",
+        "strengthPercent": 20
+      },
+      {
+        "planned": 10,
+        "started": 0,
+        "presented": 0,
+        "judged": 0,
+        "correct": 0,
+        "paired": 0,
+        "pairedCorrect": 0,
+        "skippedJudgment": 0,
+        "skippedConfidence": 0,
+        "interruptions": 0,
+        "accuracy": null,
+        "ratings": [
+          {
+            "rating": 1,
+            "n": 0,
+            "correct": 0
+          },
+          {
+            "rating": 2,
+            "n": 0,
+            "correct": 0
+          },
+          {
+            "rating": 3,
+            "n": 0,
+            "correct": 0
+          },
+          {
+            "rating": 4,
+            "n": 0,
+            "correct": 0
+          }
+        ],
+        "conditionId": "right:4",
+        "target": "right",
+        "strengthPercent": 4
+      },
+      {
+        "planned": 10,
+        "started": 1,
+        "presented": 1,
+        "judged": 1,
+        "correct": 1,
+        "paired": 0,
+        "pairedCorrect": 0,
+        "skippedJudgment": 0,
+        "skippedConfidence": 0,
+        "interruptions": 1,
+        "accuracy": 1,
+        "ratings": [
+          {
+            "rating": 1,
+            "n": 0,
+            "correct": 0
+          },
+          {
+            "rating": 2,
+            "n": 0,
+            "correct": 0
+          },
+          {
+            "rating": 3,
+            "n": 0,
+            "correct": 0
+          },
+          {
+            "rating": 4,
+            "n": 0,
+            "correct": 0
+          }
+        ],
+        "conditionId": "right:10",
+        "target": "right",
+        "strengthPercent": 10
+      },
+      {
+        "planned": 10,
+        "started": 0,
+        "presented": 0,
+        "judged": 0,
+        "correct": 0,
+        "paired": 0,
+        "pairedCorrect": 0,
+        "skippedJudgment": 0,
+        "skippedConfidence": 0,
+        "interruptions": 0,
+        "accuracy": null,
+        "ratings": [
+          {
+            "rating": 1,
+            "n": 0,
+            "correct": 0
+          },
+          {
+            "rating": 2,
+            "n": 0,
+            "correct": 0
+          },
+          {
+            "rating": 3,
+            "n": 0,
+            "correct": 0
+          },
+          {
+            "rating": 4,
+            "n": 0,
+            "correct": 0
+          }
+        ],
+        "conditionId": "right:20",
+        "target": "right",
+        "strengthPercent": 20
+      }
+    ],
+    "strongMinusWeakAccuracy": null
+  },
+  "drawingCalls": 12
+}

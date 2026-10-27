@@ -1,6 +1,6 @@
 # 下一项建议：知觉判断＋信心
 
-状态：**设计图审，未批准实现、未接入**。建议稳定key=`perceptual-confidence`。职业相关判断监控科研：看见多少视觉证据、是否选对，与“觉得自己答得对”的把握怎样对应。它在每次客观判断后增加独立信心阶段，区别于信息采样的停止选择、延迟选择的等待权衡；不替代它们，也不输出岗位结论。
+状态：**用户已了解次数依据并批准原计划；独立候选已实现，未DOT独审、未接入**。建议稳定key=`perceptual-confidence`。职业相关判断监控科研：看见多少视觉证据、是否选对，与“觉得自己答得对”的把握怎样对应。它在每次客观判断后增加独立信心阶段，区别于信息采样的停止选择、延迟选择的等待权衡；不替代它们，也不输出岗位结论。
 
 [直接看一张界面图](perceptual-confidence-review.png)；[静态HTML](perceptual-confidence-review.html)。图案为原创强化讲解示意，非正式刺激或200ms录像；报告数字全部为合成例子，无参与者数据。
 
@@ -21,4 +21,4 @@ English: “Look at the central cross. Two patches will appear briefly; one cont
 
 报告将给真实选对数／有效判断数、各信心档次数和该档选对数，并区分未答、仅判断、完整配对；零分母为空，真实0保留。不会把1–4映射成概率、算Brier或“过度自信百分比”，不拟合meta-d′／M-ratio。建议是“判断不确定时先说明把握，再寻找支持或反对证据”，不是鼓励高信心。正文／小图／下载共用三态，不生成IQ、诊断、常模、排名或就业结论。
 
-主要改造：固定6条件而非照搬旧阶梯、200ms而非源33ms、原创等样式移动图案及中英教学、信心阶段不设源4秒倒计时、减少练习与短版重复。所有改变均作为待审项目变式明示，不叫原版等效。来源为[固定Experiment Factory源码](https://github.com/expfactory/expfactory-experiments/blob/49b8123f18b26d94dfc010bb8a6ec7458b265e2e/perceptual_metacognition/experiment.js)，代码根MIT；方法边界参考[Fleming与Lau，2014](https://doi.org/10.3389/fnhum.2014.00443)。原图片、题库、译文和JGL派生helper不取用；精确来源、分项许可、公式与未核事项见[附录](perceptual-confidence-appendix.md)。本轮只有图稿和方案，等用户审计是否实施。
+主要改造：固定6条件而非照搬旧阶梯、200ms而非源33ms、原创等样式移动图案及中英教学、信心阶段不设源4秒倒计时、减少练习与短版重复。所有改变均作为待审项目变式明示，不叫原版等效。来源为[固定Experiment Factory源码](https://github.com/expfactory/expfactory-experiments/blob/49b8123f18b26d94dfc010bb8a6ec7458b265e2e/perceptual_metacognition/experiment.js)，代码根MIT；方法边界参考[Fleming与Lau，2014](https://doi.org/10.3389/fnhum.2014.00443)。原图片、题库、译文和JGL派生helper不取用；精确来源、分项许可、公式与未核事项见[附录](perceptual-confidence-appendix.md)。已按原计划实现；[代码、检查原件与报告样例](perceptual-confidence-implementation/README.md)供DOT独立复核。原图保留审批时原字节和历史待审标记，未替换为运行截图。

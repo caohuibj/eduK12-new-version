@@ -1,0 +1,27 @@
+Perceptual confidence: independently authored TypeScript, grayscale noise and sinusoidal patterns.
+Reference: expfactory/expfactory-experiments @49b8123f18b26d94dfc010bb8a6ec7458b265e2e
+perceptual_metacognition/experiment.js blobbbcbe98932f58a1427a7a21e6b71007910ff4ec8.
+No upstream JGL helper, runtime, image, question bank or translation imported.
+This retained source notice does not clear unrelated assets or dependencies.
+
+The MIT License (MIT)
+
+Copyright (c) 2016 Vanessa Sochat, Stanford University
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

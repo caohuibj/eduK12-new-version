@@ -1,0 +1,11 @@
+import { initialState, reduce, stimulus, type Config, type Plan, type Raw, type Event, type Activation } from './protocol'
+export class PcCapture {
+  readonly raw: Raw; readonly pixels: ReturnType<typeof stimulus>; done = false; private last: number
+  constructor(readonly config: Config, p: Plan, now: number) { if (!Number.isFinite(now) || now < 0) throw Error('Invalid confidence clock'); this.last = now; this.pixels = stimulus(p, config); this.raw = { plan: structuredClone(p), startedAtPerfMs: now, endedAtPerfMs: now, status: 'interrupted', stopReason: null, checksums: { left: this.pixels.left.checksum, right: this.pixels.right.checksum }, events: [], state: initialState(), ignoredRepeatCount: 0, overflow: false } }
+  private clock(now: number) { if (!Number.isFinite(now) || now < this.last) throw Error('Nonmonotonic confidence clock'); this.last = now }
+  input(e: Activation) { if (this.done) return; this.clock(e.atMs); if (e.kind === 'down' && e.repeat) { this.raw.ignoredRepeatCount++; return } this.store(e) }
+  tick(now: number) { if (this.done) return; this.clock(now); const s = this.raw.state; if (s.stage === 'fixation' && now >= this.raw.startedAtPerfMs + this.config.fixationMs) this.store({ kind: 'fixation-ended', atMs: now }); else if (s.stage === 'stimulus' && s.drawnAtMs !== null && now >= s.drawnAtMs + (this.raw.plan.phase === 'practice' ? this.config.practice.stimulusMs : this.config.stimulusMs)) this.store({ kind: 'stimulus-ended', atMs: now }) }
+  drawn(now: number) { if (this.done) return; this.clock(now); this.store({ kind: 'stimulus-drawn', atMs: now }) }
+  private store(e: Event) { if (this.raw.events.length >= 256) { this.raw.overflow = true; this.interrupt('input-log-bound', e.atMs); return } reduce(this.raw.state, e, this.raw.plan, this.config, this.raw.startedAtPerfMs); this.raw.events.push(e); if (this.raw.state.stage === 'complete') { this.raw.status = 'complete'; this.raw.stopReason = null; this.raw.endedAtPerfMs = e.atMs; this.done = true } }
+  interrupt(reason: string, now: number) { if (this.done) return; this.clock(now); if (!reason || reason.length > 100) throw Error('Confidence stop reason required'); this.raw.endedAtPerfMs = now; this.raw.stopReason = reason; this.done = true }
+}

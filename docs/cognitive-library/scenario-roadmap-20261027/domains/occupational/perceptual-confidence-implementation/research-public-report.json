@@ -1,0 +1,282 @@
+{
+  "testType": "perceptual-confidence",
+  "engineVersion": "0.1.0",
+  "scoringVersion": "0.1.0",
+  "configVersion": "0.1.0",
+  "reportDefinitionVersion": "0.1.0",
+  "presentationVersion": "0.1.0",
+  "parameterExplanationVersion": "0.1.0",
+  "configHash": "278027cb669a6ce713d2940debc0febdf4ab429a7eed0032443c1e6104b32bca",
+  "protocolSignature": "49ed269210a4e1d063a487dbfecb908993d984b7397b1678bea0ae1217bd8f40",
+  "profile": "research",
+  "state": "interpretable",
+  "planned": 300,
+  "started": 300,
+  "presented": 300,
+  "summary": {
+    "planned": 300,
+    "started": 300,
+    "presented": 300,
+    "judged": 300,
+    "correct": 225,
+    "paired": 300,
+    "pairedCorrect": 225,
+    "skippedJudgment": 0,
+    "skippedConfidence": 0,
+    "interruptions": 0,
+    "accuracy": 0.75,
+    "ratings": [
+      {
+        "rating": 1,
+        "n": 60,
+        "correct": 30
+      },
+      {
+        "rating": 2,
+        "n": 90,
+        "correct": 75
+      },
+      {
+        "rating": 3,
+        "n": 90,
+        "correct": 65
+      },
+      {
+        "rating": 4,
+        "n": 60,
+        "correct": 55
+      }
+    ]
+  },
+  "conditions": [
+    {
+      "planned": 50,
+      "started": 50,
+      "presented": 50,
+      "judged": 50,
+      "correct": 37,
+      "paired": 50,
+      "pairedCorrect": 37,
+      "skippedJudgment": 0,
+      "skippedConfidence": 0,
+      "interruptions": 0,
+      "accuracy": 0.74,
+      "ratings": [
+        {
+          "rating": 1,
+          "n": 8,
+          "correct": 6
+        },
+        {
+          "rating": 2,
+          "n": 12,
+          "correct": 9
+        },
+        {
+          "rating": 3,
+          "n": 17,
+          "correct": 10
+        },
+        {
+          "rating": 4,
+          "n": 13,
+          "correct": 12
+        }
+      ],
+      "conditionId": "left:4",
+      "target": "left",
+      "strengthPercent": 4
+    },
+    {
+      "planned": 50,
+      "started": 50,
+      "presented": 50,
+      "judged": 50,
+      "correct": 39,
+      "paired": 50,
+      "pairedCorrect": 39,
+      "skippedJudgment": 0,
+      "skippedConfidence": 0,
+      "interruptions": 0,
+      "accuracy": 0.78,
+      "ratings": [
+        {
+          "rating": 1,
+          "n": 8,
+          "correct": 5
+        },
+        {
+          "rating": 2,
+          "n": 18,
+          "correct": 15
+        },
+        {
+          "rating": 3,
+          "n": 11,
+          "correct": 8
+        },
+        {
+          "rating": 4,
+          "n": 13,
+          "correct": 11
+        }
+      ],
+      "conditionId": "left:10",
+      "target": "left",
+      "strengthPercent": 10
+    },
+    {
+      "planned": 50,
+      "started": 50,
+      "presented": 50,
+      "judged": 50,
+      "correct": 36,
+      "paired": 50,
+      "pairedCorrect": 36,
+      "skippedJudgment": 0,
+      "skippedConfidence": 0,
+      "interruptions": 0,
+      "accuracy": 0.72,
+      "ratings": [
+        {
+          "rating": 1,
+          "n": 15,
+          "correct": 8
+        },
+        {
+          "rating": 2,
+          "n": 17,
+          "correct": 14
+        },
+        {
+          "rating": 3,
+          "n": 13,
+          "correct": 9
+        },
+        {
+          "rating": 4,
+          "n": 5,
+          "correct": 5
+        }
+      ],
+      "conditionId": "left:20",
+      "target": "left",
+      "strengthPercent": 20
+    },
+    {
+      "planned": 50,
+      "started": 50,
+      "presented": 50,
+      "judged": 50,
+      "correct": 40,
+      "paired": 50,
+      "pairedCorrect": 40,
+      "skippedJudgment": 0,
+      "skippedConfidence": 0,
+      "interruptions": 0,
+      "accuracy": 0.8,
+      "ratings": [
+        {
+          "rating": 1,
+          "n": 9,
+          "correct": 2
+        },
+        {
+          "rating": 2,
+          "n": 13,
+          "correct": 12
+        },
+        {
+          "rating": 3,
+          "n": 16,
+          "correct": 14
+        },
+        {
+          "rating": 4,
+          "n": 12,
+          "correct": 12
+        }
+      ],
+      "conditionId": "right:4",
+      "target": "right",
+      "strengthPercent": 4
+    },
+    {
+      "planned": 50,
+      "started": 50,
+      "presented": 50,
+      "judged": 50,
+      "correct": 36,
+      "paired": 50,
+      "pairedCorrect": 36,
+      "skippedJudgment": 0,
+      "skippedConfidence": 0,
+      "interruptions": 0,
+      "accuracy": 0.72,
+      "ratings": [
+        {
+          "rating": 1,
+          "n": 11,
+          "correct": 6
+        },
+        {
+          "rating": 2,
+          "n": 16,
+          "correct": 13
+        },
+        {
+          "rating": 3,
+          "n": 16,
+          "correct": 11
+        },
+        {
+          "rating": 4,
+          "n": 7,
+          "correct": 6
+        }
+      ],
+      "conditionId": "right:10",
+      "target": "right",
+      "strengthPercent": 10
+    },
+    {
+      "planned": 50,
+      "started": 50,
+      "presented": 50,
+      "judged": 50,
+      "correct": 37,
+      "paired": 50,
+      "pairedCorrect": 37,
+      "skippedJudgment": 0,
+      "skippedConfidence": 0,
+      "interruptions": 0,
+      "accuracy": 0.74,
+      "ratings": [
+        {
+          "rating": 1,
+          "n": 9,
+          "correct": 3
+        },
+        {
+          "rating": 2,
+          "n": 14,
+          "correct": 12
+        },
+        {
+          "rating": 3,
+          "n": 17,
+          "correct": 13
+        },
+        {
+          "rating": 4,
+          "n": 10,
+          "correct": 9
+        }
+      ],
+      "conditionId": "right:20",
+      "target": "right",
+      "strengthPercent": 20
+    }
+  ],
+  "strongMinusWeakAccuracy": -0.040000000000000036
+}
