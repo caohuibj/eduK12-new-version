@@ -1,0 +1,93 @@
+{
+  "kind": "RESEARCH_DOCUMENT_MAPPING_NOT_RUNTIME_SCHEMA",
+  "taxonomyCommit": "22721e5c63dd78819e8c58921adf20157cdaa08c",
+  "taxonomyPath": "docs/cognitive-library/candidate-tags-20261026/taxonomy.json",
+  "taxonomyBlob": "f28a14159348d3cebbfa04a3675b126307dd9e43",
+  "candidate": "sart",
+  "currentDesignStatus": "DESIGNED_AWAITING_EXPLICIT_SINGLE_TASK_APPROVAL_NOT_IMPLEMENTED",
+  "preservedVocabularyMappings": {
+    "cognitive_domain": [
+      "attention",
+      "executive_control"
+    ],
+    "target_process": [
+      "sustained_monitoring",
+      "response_withholding"
+    ],
+    "paradigm": [],
+    "stimulus_form": [],
+    "input_upstream": [
+      "space_key"
+    ],
+    "input_proposed": [
+      "not_frozen"
+    ],
+    "key_metric": [
+      "condition_accuracy",
+      "condition_rt",
+      "omission_commission",
+      "rt_variability"
+    ],
+    "intended_use": [
+      "research_protocol_selection"
+    ],
+    "code_license": [
+      "mit_recorded"
+    ],
+    "code_rights_disposition": [
+      "github_public_conditional"
+    ],
+    "asset_rights_disposition": [
+      "authorization_pending"
+    ],
+    "asset_license_review": [
+      "fonts_ui_unverified"
+    ],
+    "implementation_strategy": [
+      "literature_reimplementation"
+    ],
+    "maturity": [
+      "source_research_only"
+    ],
+    "evidence_limitations": [
+      "timing_device_unverified",
+      "protocol_variant_unvalidated",
+      "protocol_version_decision",
+      "cultural_language_burden",
+      "motor_burden"
+    ],
+    "baseline_relation": [
+      "protocol_variant"
+    ],
+    "research_priority": [
+      "priority_finalize"
+    ],
+    "rule_type": [
+      "technical_quality",
+      "theoretical_reference",
+      "literature_experience",
+      "project_provisional"
+    ]
+  },
+  "emptyAxesExplanation": {
+    "paradigm": "No exact SART key; do not label as gradual_cpt",
+    "stimulus_form": "No exact digits-with-mask key; do not reuse letter-stream category"
+  },
+  "proposedExtensionsOnly": {
+    "paradigm": "frequent digit response / rare digit withholding",
+    "stimulus_form": "digits and geometric mask",
+    "input_proposed": "touch/mouse/Space proposed; no new registered key",
+    "scene": "ADHD-related process research, adult attention fluctuation research; not validated clinical applicability"
+  },
+  "applicability": {
+    "ageRange": null,
+    "populationValidation": null,
+    "chineseValidation": null,
+    "difficultyValidation": null,
+    "deviceEquivalence": null,
+    "shortProfileValidation": null
+  },
+  "backendTagsPersisted": false,
+  "backendSearchConnected": false,
+  "rightsCaveat": "Asset pending concerns future font and external assets, not a claim that original geometric storyboard is prohibited. Code MIT does not clear upstream images, questionnaires or translations. No upstream media copied."
+}

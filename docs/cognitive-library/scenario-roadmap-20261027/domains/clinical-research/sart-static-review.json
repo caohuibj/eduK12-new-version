@@ -1,0 +1,48 @@
+{
+  "kind": "STATIC_DESIGN_RENDER_ONLY",
+  "renderedAt": "2026-10-27T10:02:03.420Z",
+  "browser": "151.0.7922.173",
+  "sandbox": false,
+  "results": [
+    {
+      "source": "sart-review.html",
+      "png": "sart-review.png",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "width": 1440,
+      "scrollWidth": 1440,
+      "height": 1975,
+      "scripts": 0,
+      "requests": []
+    },
+    {
+      "source": "sart-review.html",
+      "png": "sart-phone.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "width": 390,
+      "scrollWidth": 390,
+      "height": 4422,
+      "scripts": 0,
+      "requests": []
+    },
+    {
+      "source": "sart-review.html",
+      "png": "sart-tablet.png",
+      "viewport": {
+        "width": 820,
+        "height": 1180
+      },
+      "width": 820,
+      "scrollWidth": 820,
+      "height": 3047,
+      "scripts": 0,
+      "requests": []
+    }
+  ],
+  "noTaskExecution": true
+}
