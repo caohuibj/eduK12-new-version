@@ -1,0 +1,71 @@
+{
+  "kind": "ISOLATED_COMPILED_CANDIDATE_REVIEW",
+  "browser": "151.0.7922.173",
+  "checks": [
+    {
+      "what": "390px actual candidate has no horizontal overflow",
+      "passed": true
+    },
+    {
+      "what": "practice 1: answers disabled during real audio playback",
+      "passed": true
+    },
+    {
+      "what": "practice 1: native full original audio ended at rate one",
+      "passed": true
+    },
+    {
+      "what": "practice 2: answers disabled during real audio playback",
+      "passed": true
+    },
+    {
+      "what": "practice 2: native full original audio ended at rate one",
+      "passed": true
+    },
+    {
+      "what": "practice 3: answers disabled during real audio playback",
+      "passed": true
+    },
+    {
+      "what": "practice 3: native full original audio ended at rate one",
+      "passed": true
+    },
+    {
+      "what": "three native-media practice records retained with completed pointer activation; no formal exposure",
+      "passed": true
+    },
+    {
+      "what": "820px English actual candidate has no horizontal overflow",
+      "passed": true
+    },
+    {
+      "what": "ending during actual playback pauses the detached media and retains the interrupted practice without formal success",
+      "passed": true
+    },
+    {
+      "what": "no browser page errors",
+      "passed": true
+    }
+  ],
+  "failures": [],
+  "requests": [
+    "index.html",
+    "entry-brand.css",
+    "preview-entry-rtgJwjxD.css",
+    "voice-entry.js",
+    "03-01-03-02-01-01-05-DPU3i0-_.wav",
+    "03-01-04-02-01-01-05-b2ookbg-.wav",
+    "03-01-05-02-01-01-05-CFmYwUUs.wav",
+    "index.html",
+    "entry-brand.css",
+    "preview-entry-rtgJwjxD.css",
+    "voice-entry.js",
+    "03-01-03-02-01-01-05-DPU3i0-_.wav"
+  ],
+  "buildManifest": "preview-build.json",
+  "browserSandbox": false,
+  "nodeSandbox": true,
+  "externalNetworkRequests": false,
+  "rawObservation": "browser-practice-synthetic-raw.json",
+  "limitations": "Synthetic memory ports; native Chromium decode/playback events, not audible sound validation, physical phone/tablet, hearing/cultural validation, durable IndexedDB/HTTP/COS or product acceptance. Three practice clips only; formal 24/96 flows tested separately with synthetic clocks."
+}

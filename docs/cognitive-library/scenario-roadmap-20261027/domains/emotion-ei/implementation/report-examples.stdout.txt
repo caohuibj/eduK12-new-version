@@ -1,0 +1,1 @@
+[{"name":"interpretable","state":"interpretable","overall":{"matched":18,"total":24}},{"name":"limited","state":"limited","overall":null},{"name":"invalid","state":"invalid","overall":null},{"name":"trueZero","state":"interpretable","overall":{"matched":0,"total":24}}]

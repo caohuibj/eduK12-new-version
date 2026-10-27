@@ -1,0 +1,2 @@
+Error: page.waitForFunction: Timeout 30000ms exceeded.
+    at main (/workspace/eduK12-new-version/docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/browser-review.cjs:56:30)

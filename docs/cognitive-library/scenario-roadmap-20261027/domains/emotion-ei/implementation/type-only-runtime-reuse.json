@@ -1,0 +1,21 @@
+{
+  "typescript": "5.9.3",
+  "results": [
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/voice-emotion-cues/protocol.ts",
+      "runtimeHash": "0f448e2019ccd158a21cfd92953620156e0e8e0456b5e1ddbb6b8b4d8a278836",
+      "afterRuntimeHash": "0f448e2019ccd158a21cfd92953620156e0e8e0456b5e1ddbb6b8b4d8a278836"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/contracts.ts",
+      "runtimeHash": "acd27af87fd11c38dee5be37ae90f63e009e8a7448f03212a3f085a0d8de2cd1",
+      "afterRuntimeHash": "acd27af87fd11c38dee5be37ae90f63e009e8a7448f03212a3f085a0d8de2cd1"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/content.test.tsx",
+      "runtimeHash": "a9a18727b994a2f1d254dd9bbfcfd294a41e0c62914f99982717bdf5141c92e0",
+      "afterRuntimeHash": "a9a18727b994a2f1d254dd9bbfcfd294a41e0c62914f99982717bdf5141c92e0"
+    }
+  ],
+  "meaning": "Only erased TypeScript types changed; existing runtime observations retained without rerunning passed suites."
+}

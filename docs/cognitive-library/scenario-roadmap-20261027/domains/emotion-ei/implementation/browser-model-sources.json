@@ -1,0 +1,17 @@
+[
+  {
+    "backend": "server-version/backend/src/modules/cognitive/content-candidates/voice-emotion-cues/protocol.ts",
+    "frontend": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/generated/protocol.ts",
+    "sha256": "96d0ac7367c8918479a6219a11c901906852de8936a45feff8ab84dbe7a5634e"
+  },
+  {
+    "backend": "server-version/backend/src/modules/cognitive/content-candidates/voice-emotion-cues/materials.ts",
+    "frontend": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/generated/materials.ts",
+    "sha256": "22914030b6d93bc9670dbecea33bfe780e7d09906f543f1cc2e995132c4b2111"
+  },
+  {
+    "backend": "server-version/backend/src/modules/cognitive/content-candidates/voice-emotion-cues/report.ts",
+    "frontend": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/generated/report.ts",
+    "sha256": "88ee7a0c477a83ef88955631ae13e24aa8b987ec40a84488f17f474050023730"
+  }
+]

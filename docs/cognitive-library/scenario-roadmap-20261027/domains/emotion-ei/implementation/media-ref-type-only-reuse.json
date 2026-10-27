@@ -1,0 +1,7 @@
+{
+  "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/VoiceEmotionTask.tsx",
+  "typescript": "5.9.3",
+  "runtimeUnchanged": true,
+  "runtimeSha256": "010ec06577b50b57bd8f960edf3e8011d7b10a5f5b679e0bd7ab206fc596957c",
+  "reason": "React ref overload was readonly; include null in the generic type. Erased output identical, no extra application build or runtime test needed."
+}

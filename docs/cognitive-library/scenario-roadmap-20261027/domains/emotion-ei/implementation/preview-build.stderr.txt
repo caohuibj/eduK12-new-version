@@ -1,0 +1,12 @@
+Error: EISDIR: illegal operation on a directory, read
+    at Object.readSync (node:fs:798:18)
+    at tryReadSync (node:fs:427:20)
+    at Object.readFileSync (node:fs:530:19)
+    at /workspace/eduK12-new-version/docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/build-preview.cjs:9:157
+    at Array.map (<anonymous>)
+    at main (/workspace/eduK12-new-version/docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/build-preview.cjs:9:40)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  errno: -21,
+  code: 'EISDIR',
+  syscall: 'read'
+}

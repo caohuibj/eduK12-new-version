@@ -1,0 +1,971 @@
+{
+  "kind": "NEW_SYNTHETIC_REVIEW_EXAMPLES_NOT_HUMAN_DATA_OR_HISTORICAL_TEST_RAW",
+  "session": {
+    "schemaVersion": 1,
+    "frozenAt": "2026-10-27T00:00:00.000Z",
+    "testType": "voice-emotion-cues",
+    "configVersion": "0.1.0",
+    "engineVersion": "0.1.0",
+    "scoringVersion": "0.1.0",
+    "config": {
+      "profile": "experience",
+      "totalTrials": 24,
+      "trialsPerBlock": 24,
+      "materialsVersion": "ravdess-1.0.0-speech-six-01-06-r1",
+      "materialsHash": "048599d5099830b58a48ffc48e9bfc268b8ebadd283aed2c8f6dfcc0941c50a1",
+      "playback": "whole-original-wav-once-native-ended",
+      "response": "fresh-first-complete-activation",
+      "responseDeadlineMs": null,
+      "practice": {
+        "trials": 3,
+        "minimumMatches": 2,
+        "maxGroups": 2,
+        "repeatFullInstructions": true
+      },
+      "profileDefinitionVersion": "0.1.0",
+      "parameterInterpretationVersion": "0.1.0",
+      "metricDefinitionVersion": "0.1.0",
+      "qualityDefinitionVersion": "0.1.0",
+      "reportDefinitionVersion": "0.1.0",
+      "presentationVersion": "0.1.0"
+    },
+    "configHash": "2def7cfcec3793aa2c369cd79bc972da43ee055bbd0af0d90bb75e2899d8cc28",
+    "protocol": {
+      "schemaVersion": 1,
+      "key": "voice-emotion-cues/0.1.0/0.1.0",
+      "version": "0.1.0",
+      "clock": "performance",
+      "randomizationAlgorithmVersion": "voice-fnv1a-utf16-xorshift32-24-cell-speaker-latin-v1",
+      "trialEnvelopeVersion": 1,
+      "phases": [
+        {
+          "key": "test",
+          "persists": true,
+          "required": true
+        }
+      ],
+      "measurementCriticalConfigPaths": [
+        "*"
+      ]
+    },
+    "protocolSignature": "252fd4ef96ed0fdf943803089c70c276bf6a14a56f77468936408964aa5ac518"
+  },
+  "randomSeed": "new-synthetic-review-artifact-not-a-person",
+  "originalExampleRaw": [
+    {
+      "plan": {
+        "index": 0,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "assetId": "03-01-05-02-02-01-03",
+        "emotion": "angry",
+        "intensity": "strong",
+        "statement": 2,
+        "actor": 3,
+        "condition": "angry:strong:2"
+      },
+      "startedAtPerfMs": 0,
+      "endedAtPerfMs": 5100,
+      "events": [
+        {
+          "kind": "play",
+          "at": 0
+        },
+        {
+          "kind": "ended",
+          "at": 5000
+        },
+        {
+          "kind": "activate",
+          "at": 5100,
+          "choice": "angry",
+          "input": "assistive"
+        }
+      ]
+    },
+    {
+      "plan": {
+        "index": 1,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "assetId": "03-01-07-02-02-01-01",
+        "emotion": "disgusted",
+        "intensity": "strong",
+        "statement": 2,
+        "actor": 1,
+        "condition": "disgusted:strong:2"
+      },
+      "startedAtPerfMs": 10000,
+      "endedAtPerfMs": 15100,
+      "events": [
+        {
+          "kind": "play",
+          "at": 10000
+        },
+        {
+          "kind": "ended",
+          "at": 15000
+        },
+        {
+          "kind": "activate",
+          "at": 15100,
+          "choice": "disgusted",
+          "input": "assistive"
+        }
+      ]
+    },
+    {
+      "plan": {
+        "index": 2,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "assetId": "03-01-06-01-01-01-01",
+        "emotion": "fearful",
+        "intensity": "normal",
+        "statement": 1,
+        "actor": 1,
+        "condition": "fearful:normal:1"
+      },
+      "startedAtPerfMs": 20000,
+      "endedAtPerfMs": 25100,
+      "events": [
+        {
+          "kind": "play",
+          "at": 20000
+        },
+        {
+          "kind": "ended",
+          "at": 25000
+        },
+        {
+          "kind": "activate",
+          "at": 25100,
+          "choice": "fearful",
+          "input": "assistive"
+        }
+      ]
+    },
+    {
+      "plan": {
+        "index": 3,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "assetId": "03-01-06-02-01-01-02",
+        "emotion": "fearful",
+        "intensity": "strong",
+        "statement": 1,
+        "actor": 2,
+        "condition": "fearful:strong:1"
+      },
+      "startedAtPerfMs": 30000,
+      "endedAtPerfMs": 35100,
+      "events": [
+        {
+          "kind": "play",
+          "at": 30000
+        },
+        {
+          "kind": "ended",
+          "at": 35000
+        },
+        {
+          "kind": "activate",
+          "at": 35100,
+          "choice": "fearful",
+          "input": "assistive"
+        }
+      ]
+    },
+    {
+      "plan": {
+        "index": 4,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "assetId": "03-01-07-01-02-01-04",
+        "emotion": "disgusted",
+        "intensity": "normal",
+        "statement": 2,
+        "actor": 4,
+        "condition": "disgusted:normal:2"
+      },
+      "startedAtPerfMs": 40000,
+      "endedAtPerfMs": 45100,
+      "events": [
+        {
+          "kind": "play",
+          "at": 40000
+        },
+        {
+          "kind": "ended",
+          "at": 45000
+        },
+        {
+          "kind": "activate",
+          "at": 45100,
+          "choice": "disgusted",
+          "input": "assistive"
+        }
+      ]
+    },
+    {
+      "plan": {
+        "index": 5,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "assetId": "03-01-03-01-02-01-04",
+        "emotion": "happy",
+        "intensity": "normal",
+        "statement": 2,
+        "actor": 4,
+        "condition": "happy:normal:2"
+      },
+      "startedAtPerfMs": 50000,
+      "endedAtPerfMs": 55100,
+      "events": [
+        {
+          "kind": "play",
+          "at": 50000
+        },
+        {
+          "kind": "ended",
+          "at": 55000
+        },
+        {
+          "kind": "activate",
+          "at": 55100,
+          "choice": "happy",
+          "input": "assistive"
+        }
+      ]
+    },
+    {
+      "plan": {
+        "index": 6,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "assetId": "03-01-05-01-01-01-04",
+        "emotion": "angry",
+        "intensity": "normal",
+        "statement": 1,
+        "actor": 4,
+        "condition": "angry:normal:1"
+      },
+      "startedAtPerfMs": 60000,
+      "endedAtPerfMs": 65100,
+      "events": [
+        {
+          "kind": "play",
+          "at": 60000
+        },
+        {
+          "kind": "ended",
+          "at": 65000
+        },
+        {
+          "kind": "activate",
+          "at": 65100,
+          "choice": "angry",
+          "input": "assistive"
+        }
+      ]
+    },
+    {
+      "plan": {
+        "index": 7,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "assetId": "03-01-07-01-01-01-02",
+        "emotion": "disgusted",
+        "intensity": "normal",
+        "statement": 1,
+        "actor": 2,
+        "condition": "disgusted:normal:1"
+      },
+      "startedAtPerfMs": 70000,
+      "endedAtPerfMs": 75100,
+      "events": [
+        {
+          "kind": "play",
+          "at": 70000
+        },
+        {
+          "kind": "ended",
+          "at": 75000
+        },
+        {
+          "kind": "activate",
+          "at": 75100,
+          "choice": "disgusted",
+          "input": "assistive"
+        }
+      ]
+    },
+    {
+      "plan": {
+        "index": 8,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "assetId": "03-01-05-01-02-01-02",
+        "emotion": "angry",
+        "intensity": "normal",
+        "statement": 2,
+        "actor": 2,
+        "condition": "angry:normal:2"
+      },
+      "startedAtPerfMs": 80000,
+      "endedAtPerfMs": 85100,
+      "events": [
+        {
+          "kind": "play",
+          "at": 80000
+        },
+        {
+          "kind": "ended",
+          "at": 85000
+        },
+        {
+          "kind": "activate",
+          "at": 85100,
+          "choice": "angry",
+          "input": "assistive"
+        }
+      ]
+    },
+    {
+      "plan": {
+        "index": 9,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "assetId": "03-01-04-01-02-01-01",
+        "emotion": "sad",
+        "intensity": "normal",
+        "statement": 2,
+        "actor": 1,
+        "condition": "sad:normal:2"
+      },
+      "startedAtPerfMs": 90000,
+      "endedAtPerfMs": 95100,
+      "events": [
+        {
+          "kind": "play",
+          "at": 90000
+        },
+        {
+          "kind": "ended",
+          "at": 95000
+        },
+        {
+          "kind": "activate",
+          "at": 95100,
+          "choice": "sad",
+          "input": "assistive"
+        }
+      ]
+    },
+    {
+      "plan": {
+        "index": 10,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "assetId": "03-01-08-02-02-01-02",
+        "emotion": "surprised",
+        "intensity": "strong",
+        "statement": 2,
+        "actor": 2,
+        "condition": "surprised:strong:2"
+      },
+      "startedAtPerfMs": 100000,
+      "endedAtPerfMs": 105100,
+      "events": [
+        {
+          "kind": "play",
+          "at": 100000
+        },
+        {
+          "kind": "ended",
+          "at": 105000
+        },
+        {
+          "kind": "activate",
+          "at": 105100,
+          "choice": "surprised",
+          "input": "assistive"
+        }
+      ]
+    },
+    {
+      "plan": {
+        "index": 11,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "assetId": "03-01-04-02-02-01-02",
+        "emotion": "sad",
+        "intensity": "strong",
+        "statement": 2,
+        "actor": 2,
+        "condition": "sad:strong:2"
+      },
+      "startedAtPerfMs": 110000,
+      "endedAtPerfMs": 115100,
+      "events": [
+        {
+          "kind": "play",
+          "at": 110000
+        },
+        {
+          "kind": "ended",
+          "at": 115000
+        },
+        {
+          "kind": "activate",
+          "at": 115100,
+          "choice": "sad",
+          "input": "assistive"
+        }
+      ]
+    },
+    {
+      "plan": {
+        "index": 12,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "assetId": "03-01-06-01-02-01-03",
+        "emotion": "fearful",
+        "intensity": "normal",
+        "statement": 2,
+        "actor": 3,
+        "condition": "fearful:normal:2"
+      },
+      "startedAtPerfMs": 120000,
+      "endedAtPerfMs": 125100,
+      "events": [
+        {
+          "kind": "play",
+          "at": 120000
+        },
+        {
+          "kind": "ended",
+          "at": 125000
+        },
+        {
+          "kind": "activate",
+          "at": 125100,
+          "choice": "fearful",
+          "input": "assistive"
+        }
+      ]
+    },
+    {
+      "plan": {
+        "index": 13,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "assetId": "03-01-04-02-01-01-04",
+        "emotion": "sad",
+        "intensity": "strong",
+        "statement": 1,
+        "actor": 4,
+        "condition": "sad:strong:1"
+      },
+      "startedAtPerfMs": 130000,
+      "endedAtPerfMs": 135100,
+      "events": [
+        {
+          "kind": "play",
+          "at": 130000
+        },
+        {
+          "kind": "ended",
+          "at": 135000
+        },
+        {
+          "kind": "activate",
+          "at": 135100,
+          "choice": "sad",
+          "input": "assistive"
+        }
+      ]
+    },
+    {
+      "plan": {
+        "index": 14,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "assetId": "03-01-03-02-02-01-01",
+        "emotion": "happy",
+        "intensity": "strong",
+        "statement": 2,
+        "actor": 1,
+        "condition": "happy:strong:2"
+      },
+      "startedAtPerfMs": 140000,
+      "endedAtPerfMs": 145100,
+      "events": [
+        {
+          "kind": "play",
+          "at": 140000
+        },
+        {
+          "kind": "ended",
+          "at": 145000
+        },
+        {
+          "kind": "activate",
+          "at": 145100,
+          "choice": "happy",
+          "input": "assistive"
+        }
+      ]
+    },
+    {
+      "plan": {
+        "index": 15,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "assetId": "03-01-04-01-01-01-03",
+        "emotion": "sad",
+        "intensity": "normal",
+        "statement": 1,
+        "actor": 3,
+        "condition": "sad:normal:1"
+      },
+      "startedAtPerfMs": 150000,
+      "endedAtPerfMs": 155100,
+      "events": [
+        {
+          "kind": "play",
+          "at": 150000
+        },
+        {
+          "kind": "ended",
+          "at": 155000
+        },
+        {
+          "kind": "activate",
+          "at": 155100,
+          "choice": "none",
+          "input": "assistive"
+        }
+      ]
+    },
+    {
+      "plan": {
+        "index": 16,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "assetId": "03-01-06-02-02-01-04",
+        "emotion": "fearful",
+        "intensity": "strong",
+        "statement": 2,
+        "actor": 4,
+        "condition": "fearful:strong:2"
+      },
+      "startedAtPerfMs": 160000,
+      "endedAtPerfMs": 165100,
+      "events": [
+        {
+          "kind": "play",
+          "at": 160000
+        },
+        {
+          "kind": "ended",
+          "at": 165000
+        },
+        {
+          "kind": "activate",
+          "at": 165100,
+          "choice": "fearful",
+          "input": "assistive"
+        }
+      ]
+    },
+    {
+      "plan": {
+        "index": 17,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "assetId": "03-01-08-02-01-01-04",
+        "emotion": "surprised",
+        "intensity": "strong",
+        "statement": 1,
+        "actor": 4,
+        "condition": "surprised:strong:1"
+      },
+      "startedAtPerfMs": 170000,
+      "endedAtPerfMs": 175100,
+      "events": [
+        {
+          "kind": "play",
+          "at": 170000
+        },
+        {
+          "kind": "ended",
+          "at": 175000
+        },
+        {
+          "kind": "activate",
+          "at": 175100,
+          "choice": "surprised",
+          "input": "assistive"
+        }
+      ]
+    },
+    {
+      "plan": {
+        "index": 18,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "assetId": "03-01-08-01-01-01-03",
+        "emotion": "surprised",
+        "intensity": "normal",
+        "statement": 1,
+        "actor": 3,
+        "condition": "surprised:normal:1"
+      },
+      "startedAtPerfMs": 180000,
+      "endedAtPerfMs": 185100,
+      "events": [
+        {
+          "kind": "play",
+          "at": 180000
+        },
+        {
+          "kind": "ended",
+          "at": 185000
+        },
+        {
+          "kind": "activate",
+          "at": 185100,
+          "choice": "none",
+          "input": "assistive"
+        }
+      ]
+    },
+    {
+      "plan": {
+        "index": 19,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "assetId": "03-01-03-01-01-01-02",
+        "emotion": "happy",
+        "intensity": "normal",
+        "statement": 1,
+        "actor": 2,
+        "condition": "happy:normal:1"
+      },
+      "startedAtPerfMs": 190000,
+      "endedAtPerfMs": 195100,
+      "events": [
+        {
+          "kind": "play",
+          "at": 190000
+        },
+        {
+          "kind": "ended",
+          "at": 195000
+        },
+        {
+          "kind": "activate",
+          "at": 195100,
+          "choice": "none",
+          "input": "assistive"
+        }
+      ]
+    },
+    {
+      "plan": {
+        "index": 20,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "assetId": "03-01-08-01-02-01-01",
+        "emotion": "surprised",
+        "intensity": "normal",
+        "statement": 2,
+        "actor": 1,
+        "condition": "surprised:normal:2"
+      },
+      "startedAtPerfMs": 200000,
+      "endedAtPerfMs": 205100,
+      "events": [
+        {
+          "kind": "play",
+          "at": 200000
+        },
+        {
+          "kind": "ended",
+          "at": 205000
+        },
+        {
+          "kind": "activate",
+          "at": 205100,
+          "choice": "none",
+          "input": "assistive"
+        }
+      ]
+    },
+    {
+      "plan": {
+        "index": 21,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "assetId": "03-01-05-02-01-01-01",
+        "emotion": "angry",
+        "intensity": "strong",
+        "statement": 1,
+        "actor": 1,
+        "condition": "angry:strong:1"
+      },
+      "startedAtPerfMs": 210000,
+      "endedAtPerfMs": 215100,
+      "events": [
+        {
+          "kind": "play",
+          "at": 210000
+        },
+        {
+          "kind": "ended",
+          "at": 215000
+        },
+        {
+          "kind": "activate",
+          "at": 215100,
+          "choice": "angry",
+          "input": "assistive"
+        }
+      ]
+    },
+    {
+      "plan": {
+        "index": 22,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "assetId": "03-01-03-02-01-01-03",
+        "emotion": "happy",
+        "intensity": "strong",
+        "statement": 1,
+        "actor": 3,
+        "condition": "happy:strong:1"
+      },
+      "startedAtPerfMs": 220000,
+      "endedAtPerfMs": 225100,
+      "events": [
+        {
+          "kind": "play",
+          "at": 220000
+        },
+        {
+          "kind": "ended",
+          "at": 225000
+        },
+        {
+          "kind": "activate",
+          "at": 225100,
+          "choice": "none",
+          "input": "assistive"
+        }
+      ]
+    },
+    {
+      "plan": {
+        "index": 23,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "assetId": "03-01-07-02-01-01-03",
+        "emotion": "disgusted",
+        "intensity": "strong",
+        "statement": 1,
+        "actor": 3,
+        "condition": "disgusted:strong:1"
+      },
+      "startedAtPerfMs": 230000,
+      "endedAtPerfMs": 235100,
+      "events": [
+        {
+          "kind": "play",
+          "at": 230000
+        },
+        {
+          "kind": "ended",
+          "at": 235000
+        },
+        {
+          "kind": "activate",
+          "at": 235100,
+          "choice": "none",
+          "input": "assistive"
+        }
+      ]
+    }
+  ],
+  "results": [
+    {
+      "name": "interpretable",
+      "report": {
+        "testType": "voice-emotion-cues",
+        "engineVersion": "0.1.0",
+        "scoringVersion": "0.1.0",
+        "configVersion": "0.1.0",
+        "reportDefinitionVersion": "0.1.0",
+        "parameterInterpretationVersion": "0.1.0",
+        "presentationVersion": "0.1.0",
+        "configHash": "2def7cfcec3793aa2c369cd79bc972da43ee055bbd0af0d90bb75e2899d8cc28",
+        "protocolSignature": "252fd4ef96ed0fdf943803089c70c276bf6a14a56f77468936408964aa5ac518",
+        "materialsHash": "048599d5099830b58a48ffc48e9bfc268b8ebadd283aed2c8f6dfcc0941c50a1",
+        "manifestHash": "7c1ec3255f5e52e757059524eacd264225969293966b849783999cc75883ca50",
+        "profile": "experience",
+        "state": "interpretable",
+        "planned": 24,
+        "received": 24,
+        "completed": 24,
+        "skipped": 0,
+        "interrupted": 0,
+        "unstarted": 0,
+        "overall": {
+          "matched": 18,
+          "total": 24
+        },
+        "intensity": {
+          "normal": {
+            "matched": 8,
+            "total": 12
+          },
+          "strong": {
+            "matched": 10,
+            "total": 12
+          }
+        }
+      },
+      "zh": "这次声音判断，哪些与目标表达一致？\n\n计划24段，已记录24段；可用选择24，跳过0，中断0，未开始0。\n\n你的18/24次选择与演员目标标签匹配。\n\n普通表达：8/12\n\n较强表达：10/12\n\n表达强度和具体声音都可能影响这次记录；这些次数不能单独确定纯粹的强度效应。\n\n交流时遇到不确定的语气，可以先问一句：“你的意思是……吗？”这是一条一般建议，不是对你现实沟通能力的预测。\n\n英语表演录音受语言、口音、听力、设备和文化解释影响；目标标签不代表演员真实内心。短版每条件一条，不能给精细稳定能力分。没有EI总分、常模、IQ、排名、诊断或岗位预测。",
+      "en": "Which choices matched the intended expression?\n\nRecorded 24 of 24; usable choices 24; skipped 0; interrupted 0; unstarted 0.\n\n18 of 24 choices matched the actor's intended label.\n\nNormal expression：8/12\n\nStrong expression：10/12\n\nExpression strength and the particular voices may both influence this record; these counts do not isolate a pure strength effect.\n\nWhen a tone is unclear, asking “Do you mean…?” can help. This is general advice, not a prediction of your everyday communication.\n\nEnglish acted speech is affected by language, accent, hearing, device and cultural interpretation. Intended labels do not reveal real feelings. The short form has one item per cell and cannot give fine, stable ability scores. No overall EI score, norms, IQ, ranking, diagnosis or job prediction."
+    },
+    {
+      "name": "limited",
+      "report": {
+        "testType": "voice-emotion-cues",
+        "engineVersion": "0.1.0",
+        "scoringVersion": "0.1.0",
+        "configVersion": "0.1.0",
+        "reportDefinitionVersion": "0.1.0",
+        "parameterInterpretationVersion": "0.1.0",
+        "presentationVersion": "0.1.0",
+        "configHash": "2def7cfcec3793aa2c369cd79bc972da43ee055bbd0af0d90bb75e2899d8cc28",
+        "protocolSignature": "252fd4ef96ed0fdf943803089c70c276bf6a14a56f77468936408964aa5ac518",
+        "materialsHash": "048599d5099830b58a48ffc48e9bfc268b8ebadd283aed2c8f6dfcc0941c50a1",
+        "manifestHash": "7c1ec3255f5e52e757059524eacd264225969293966b849783999cc75883ca50",
+        "profile": "experience",
+        "state": "limited",
+        "planned": 24,
+        "received": 24,
+        "completed": 23,
+        "skipped": 1,
+        "interrupted": 0,
+        "unstarted": 0,
+        "overall": null,
+        "intensity": {
+          "normal": null,
+          "strong": {
+            "matched": 10,
+            "total": 12
+          }
+        }
+      },
+      "zh": "这次声音判断，哪些与目标表达一致？\n\n计划24段，已记录24段；可用选择23，跳过1，中断0，未开始0。\n\n部分记录缺失或播放中断，全局和受影响条件不作解释；下列仅保留完整条件的真实次数。\n\n较强表达：10/12\n\n交流时遇到不确定的语气，可以先问一句：“你的意思是……吗？”这是一条一般建议，不是对你现实沟通能力的预测。\n\n英语表演录音受语言、口音、听力、设备和文化解释影响；目标标签不代表演员真实内心。短版每条件一条，不能给精细稳定能力分。没有EI总分、常模、IQ、排名、诊断或岗位预测。",
+      "en": "Which choices matched the intended expression?\n\nRecorded 24 of 24; usable choices 23; skipped 1; interrupted 0; unstarted 0.\n\nSome observations are missing or interrupted. The overall result and affected conditions are hidden; only complete conditions remain below.\n\nStrong expression：10/12\n\nWhen a tone is unclear, asking “Do you mean…?” can help. This is general advice, not a prediction of your everyday communication.\n\nEnglish acted speech is affected by language, accent, hearing, device and cultural interpretation. Intended labels do not reveal real feelings. The short form has one item per cell and cannot give fine, stable ability scores. No overall EI score, norms, IQ, ranking, diagnosis or job prediction."
+    },
+    {
+      "name": "invalid",
+      "report": {
+        "testType": "voice-emotion-cues",
+        "engineVersion": "0.1.0",
+        "scoringVersion": "0.1.0",
+        "configVersion": "0.1.0",
+        "reportDefinitionVersion": "0.1.0",
+        "parameterInterpretationVersion": "0.1.0",
+        "presentationVersion": "0.1.0",
+        "configHash": "2def7cfcec3793aa2c369cd79bc972da43ee055bbd0af0d90bb75e2899d8cc28",
+        "protocolSignature": "252fd4ef96ed0fdf943803089c70c276bf6a14a56f77468936408964aa5ac518",
+        "materialsHash": "048599d5099830b58a48ffc48e9bfc268b8ebadd283aed2c8f6dfcc0941c50a1",
+        "manifestHash": "7c1ec3255f5e52e757059524eacd264225969293966b849783999cc75883ca50",
+        "profile": "experience",
+        "state": "invalid",
+        "planned": 24,
+        "received": 0,
+        "completed": 0,
+        "skipped": 0,
+        "interrupted": 0,
+        "unstarted": 24,
+        "overall": null,
+        "intensity": {
+          "normal": null,
+          "strong": null
+        }
+      },
+      "zh": "这次声音判断，哪些与目标表达一致？\n\n计划24段，已记录0段；可用选择0，跳过0，中断0，未开始24。\n\n没有可用的正式观察，暂不提供表现结论。可以保留记录，向组织者询问下一步。\n\n英语表演录音受语言、口音、听力、设备和文化解释影响；目标标签不代表演员真实内心。短版每条件一条，不能给精细稳定能力分。没有EI总分、常模、IQ、排名、诊断或岗位预测。",
+      "en": "Which choices matched the intended expression?\n\nRecorded 0 of 24; usable choices 0; skipped 0; interrupted 0; unstarted 24.\n\nThere are no usable formal observations, so no performance conclusion is provided. Keep the record and ask the organiser about next steps.\n\nEnglish acted speech is affected by language, accent, hearing, device and cultural interpretation. Intended labels do not reveal real feelings. The short form has one item per cell and cannot give fine, stable ability scores. No overall EI score, norms, IQ, ranking, diagnosis or job prediction."
+    },
+    {
+      "name": "trueZero",
+      "report": {
+        "testType": "voice-emotion-cues",
+        "engineVersion": "0.1.0",
+        "scoringVersion": "0.1.0",
+        "configVersion": "0.1.0",
+        "reportDefinitionVersion": "0.1.0",
+        "parameterInterpretationVersion": "0.1.0",
+        "presentationVersion": "0.1.0",
+        "configHash": "2def7cfcec3793aa2c369cd79bc972da43ee055bbd0af0d90bb75e2899d8cc28",
+        "protocolSignature": "252fd4ef96ed0fdf943803089c70c276bf6a14a56f77468936408964aa5ac518",
+        "materialsHash": "048599d5099830b58a48ffc48e9bfc268b8ebadd283aed2c8f6dfcc0941c50a1",
+        "manifestHash": "7c1ec3255f5e52e757059524eacd264225969293966b849783999cc75883ca50",
+        "profile": "experience",
+        "state": "interpretable",
+        "planned": 24,
+        "received": 24,
+        "completed": 24,
+        "skipped": 0,
+        "interrupted": 0,
+        "unstarted": 0,
+        "overall": {
+          "matched": 0,
+          "total": 24
+        },
+        "intensity": {
+          "normal": {
+            "matched": 0,
+            "total": 12
+          },
+          "strong": {
+            "matched": 0,
+            "total": 12
+          }
+        }
+      },
+      "zh": "这次声音判断，哪些与目标表达一致？\n\n计划24段，已记录24段；可用选择24，跳过0，中断0，未开始0。\n\n你的0/24次选择与演员目标标签匹配。\n\n普通表达：0/12\n\n较强表达：0/12\n\n表达强度和具体声音都可能影响这次记录；这些次数不能单独确定纯粹的强度效应。\n\n交流时遇到不确定的语气，可以先问一句：“你的意思是……吗？”这是一条一般建议，不是对你现实沟通能力的预测。\n\n英语表演录音受语言、口音、听力、设备和文化解释影响；目标标签不代表演员真实内心。短版每条件一条，不能给精细稳定能力分。没有EI总分、常模、IQ、排名、诊断或岗位预测。",
+      "en": "Which choices matched the intended expression?\n\nRecorded 24 of 24; usable choices 24; skipped 0; interrupted 0; unstarted 0.\n\n0 of 24 choices matched the actor's intended label.\n\nNormal expression：0/12\n\nStrong expression：0/12\n\nExpression strength and the particular voices may both influence this record; these counts do not isolate a pure strength effect.\n\nWhen a tone is unclear, asking “Do you mean…?” can help. This is general advice, not a prediction of your everyday communication.\n\nEnglish acted speech is affected by language, accent, hearing, device and cultural interpretation. Intended labels do not reveal real feelings. The short form has one item per cell and cannot give fine, stable ability scores. No overall EI score, norms, IQ, ranking, diagnosis or job prediction."
+    }
+  ]
+}

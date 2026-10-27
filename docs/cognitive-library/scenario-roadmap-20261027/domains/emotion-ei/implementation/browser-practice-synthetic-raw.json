@@ -1,0 +1,161 @@
+[
+  {
+    "contextKey": "isolated-native-audio-preview",
+    "language": "zh",
+    "configHash": "2def7cfcec3793aa2c369cd79bc972da43ee055bbd0af0d90bb75e2899d8cc28",
+    "protocolSignature": "252fd4ef96ed0fdf943803089c70c276bf6a14a56f77468936408964aa5ac518",
+    "manifestHash": "a06c3c28bfc1e8e43720904e767ad8e93132a88a1af608f2892963c6d09c7b2a",
+    "realm": {
+      "timeOriginMs": 1793099897998.3,
+      "pageInstanceId": "5a051db3-ef4e-4e05-9ecf-20381c43fd7a"
+    },
+    "recordKey": "practice:0:0",
+    "raw": {
+      "plan": {
+        "index": 0,
+        "phase": "practice",
+        "round": 0,
+        "block": 0,
+        "assetId": "03-01-03-02-01-01-05",
+        "emotion": "happy",
+        "intensity": "strong",
+        "statement": 1,
+        "actor": 5,
+        "condition": "happy:strong:1"
+      },
+      "startedAtPerfMs": 428.5,
+      "endedAtPerfMs": 4845.9000000003725,
+      "events": [
+        {
+          "kind": "play",
+          "at": 540.5999999996275
+        },
+        {
+          "kind": "ended",
+          "at": 4759.5
+        },
+        {
+          "kind": "down",
+          "choice": "happy",
+          "token": "pointer:1",
+          "input": "mouse",
+          "at": 4845
+        },
+        {
+          "kind": "up",
+          "choice": "happy",
+          "token": "pointer:1",
+          "input": "mouse",
+          "at": 4845.9000000003725
+        }
+      ]
+    },
+    "recordDigest": "d205404a74af2867747eaacce8680d74e23d92a45411ccf394091b78a426ce9c"
+  },
+  {
+    "contextKey": "isolated-native-audio-preview",
+    "language": "zh",
+    "configHash": "2def7cfcec3793aa2c369cd79bc972da43ee055bbd0af0d90bb75e2899d8cc28",
+    "protocolSignature": "252fd4ef96ed0fdf943803089c70c276bf6a14a56f77468936408964aa5ac518",
+    "manifestHash": "a06c3c28bfc1e8e43720904e767ad8e93132a88a1af608f2892963c6d09c7b2a",
+    "realm": {
+      "timeOriginMs": 1793099897998.3,
+      "pageInstanceId": "5a051db3-ef4e-4e05-9ecf-20381c43fd7a"
+    },
+    "recordKey": "practice:0:1",
+    "raw": {
+      "plan": {
+        "index": 1,
+        "phase": "practice",
+        "round": 0,
+        "block": 0,
+        "assetId": "03-01-04-02-01-01-05",
+        "emotion": "sad",
+        "intensity": "strong",
+        "statement": 1,
+        "actor": 5,
+        "condition": "sad:strong:1"
+      },
+      "startedAtPerfMs": 4911.4000000003725,
+      "endedAtPerfMs": 8646.200000000186,
+      "events": [
+        {
+          "kind": "play",
+          "at": 4990.5999999996275
+        },
+        {
+          "kind": "ended",
+          "at": 8599.200000000186
+        },
+        {
+          "kind": "down",
+          "choice": "sad",
+          "token": "pointer:1",
+          "input": "mouse",
+          "at": 8645.400000000373
+        },
+        {
+          "kind": "up",
+          "choice": "sad",
+          "token": "pointer:1",
+          "input": "mouse",
+          "at": 8646.200000000186
+        }
+      ]
+    },
+    "recordDigest": "8c15dbba68c227803ecd99ffa464dece12b9d536f7bdb421369bc30a25096b92"
+  },
+  {
+    "contextKey": "isolated-native-audio-preview",
+    "language": "zh",
+    "configHash": "2def7cfcec3793aa2c369cd79bc972da43ee055bbd0af0d90bb75e2899d8cc28",
+    "protocolSignature": "252fd4ef96ed0fdf943803089c70c276bf6a14a56f77468936408964aa5ac518",
+    "manifestHash": "a06c3c28bfc1e8e43720904e767ad8e93132a88a1af608f2892963c6d09c7b2a",
+    "realm": {
+      "timeOriginMs": 1793099897998.3,
+      "pageInstanceId": "5a051db3-ef4e-4e05-9ecf-20381c43fd7a"
+    },
+    "recordKey": "practice:0:2",
+    "raw": {
+      "plan": {
+        "index": 2,
+        "phase": "practice",
+        "round": 0,
+        "block": 0,
+        "assetId": "03-01-05-02-01-01-05",
+        "emotion": "angry",
+        "intensity": "strong",
+        "statement": 1,
+        "actor": 5,
+        "condition": "angry:strong:1"
+      },
+      "startedAtPerfMs": 8710.5,
+      "endedAtPerfMs": 12293.799999999814,
+      "events": [
+        {
+          "kind": "play",
+          "at": 8773.900000000373
+        },
+        {
+          "kind": "ended",
+          "at": 12247.200000000186
+        },
+        {
+          "kind": "down",
+          "choice": "angry",
+          "token": "pointer:1",
+          "input": "mouse",
+          "at": 12293.200000000186
+        },
+        {
+          "kind": "up",
+          "choice": "angry",
+          "token": "pointer:1",
+          "input": "mouse",
+          "at": 12293.799999999814
+        }
+      ]
+    },
+    "recordDigest": "10dcfe46fabb5cc8532719a494284d61cca83f6c9da459c1982e00683c5754cd"
+  }
+]

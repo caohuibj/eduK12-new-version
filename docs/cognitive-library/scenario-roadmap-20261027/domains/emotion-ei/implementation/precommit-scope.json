@@ -1,0 +1,1244 @@
+{
+  "kind": "SCOPED_PRECOMMIT_EXCLUSION_CHECK_NOT_SECURITY_AUDIT",
+  "allowedRoots": [
+    "server-version/backend/src/modules/cognitive/content-candidates/voice-emotion-cues",
+    "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues",
+    "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation"
+  ],
+  "allowedTestFile": "server-version/backend/src/__tests__/cognitive/voice-emotion-content.test.ts",
+  "fileCount": 245,
+  "totalBytes": 43514251,
+  "largestBytes": 540470,
+  "wavFiles": 102,
+  "blockedMatches": [],
+  "privateParticipantData": "none; browser and test raw are synthetic",
+  "audioLicense": "CC-BY-NC-SA-4.0 with attribution and full text",
+  "oldDeniedDesignAppendixIncluded": false,
+  "sourceFiles": [
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/voice-emotion-cues/material-provenance.json",
+      "bytes": 37243,
+      "sha256": "5ddc2af02b20ceee06ad9521b30aad8e6241cb7bacfbf0b563abfd80be84b30b"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/voice-emotion-cues/report.ts",
+      "bytes": 8204,
+      "sha256": "88ee7a0c477a83ef88955631ae13e24aa8b987ec40a84488f17f474050023730"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/voice-emotion-cues/materials.ts",
+      "bytes": 34181,
+      "sha256": "22914030b6d93bc9670dbecea33bfe780e7d09906f543f1cc2e995132c4b2111"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/voice-emotion-cues/scorer.ts",
+      "bytes": 5279,
+      "sha256": "ad51fe537732626a6b89b1bc3ef2593dd56496e20b1b5a643c48b14c12aa8ee2"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/voice-emotion-cues/submission.ts",
+      "bytes": 4451,
+      "sha256": "70b73ce521c191f42a46e12216ec0ddd3b8f1a8e7aabac4c05c1ae7fb700ddc7"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/voice-emotion-cues/metadata.ts",
+      "bytes": 2018,
+      "sha256": "a741b9bd3d477cc68feada4335521ad6d5a2a9daab4e930794cfded6e14c82b3"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/voice-emotion-cues/schema.ts",
+      "bytes": 1607,
+      "sha256": "8a06d894a7c3700df791bac4322d7e7d59e4b1ec2a994351bbef20f2da798566"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/voice-emotion-cues/package.ts",
+      "bytes": 3973,
+      "sha256": "a63ff7ecea83d7ad2eb69042ae19b9c8ac08dce84399d974455055af9d002cb4"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/voice-emotion-cues/protocol.ts",
+      "bytes": 7747,
+      "sha256": "96d0ac7367c8918479a6219a11c901906852de8936a45feff8ab84dbe7a5634e"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/contracts.ts",
+      "bytes": 3188,
+      "sha256": "abfc931b767d54293a1eacb6195b30ba94c9e4d8a532f20bf5ffecf35b12f4ef"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/voice.css",
+      "bytes": 1277,
+      "sha256": "d7a9562fb2dd6cbe958df2bdd93d0a2dd36658d41b793b00be2376c565ecc7ad"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/assets.ts",
+      "bytes": 1128,
+      "sha256": "6ff7a10e56b7c70929109ce67e93446d5606d691908a63af885526e6e7c122f8"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/VoiceReport.tsx",
+      "bytes": 1527,
+      "sha256": "96681b028880aca245fbd00d6710843d5cef385f87641715a234b243f81eb833"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/VoiceEmotionTask.tsx",
+      "bytes": 11596,
+      "sha256": "98ecb564a69c7f835b8ea3cd89c9a4046fe5c44a2aa8a41c375d9d2fe9d7c119"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/content.test.tsx",
+      "bytes": 9304,
+      "sha256": "3a7e545188bdec79a31d04d3f68c151ed5ce2a97ad5c8a8763c2de24d30772df"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/VoiceInstructions.tsx",
+      "bytes": 5975,
+      "sha256": "b3f487b6717e1775cfe93ab4da791d2324d0263d8e999ad146c417f3c9b84e34"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/session.ts",
+      "bytes": 9022,
+      "sha256": "91486618679a1673e29cc8d5b74f5da748e3455fa0f6febd8378a3c7a2c4efb4"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-06-02-02-01-02.wav",
+      "bytes": 406922,
+      "sha256": "f42d66fc079607993271b79d2bf8bf313663d5f9d1f8f5c05358fb5002c978c8"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-05-01-02-01-02.wav",
+      "bytes": 422930,
+      "sha256": "0b9b8fad5c6b5728a692371d92e5638f6c17149784b97be5cf3c69fbc46cdec0"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-05-02-01-01-02.wav",
+      "bytes": 435746,
+      "sha256": "2f8cafdb522aec17a940ee829e6a42b46b53817fa626d65da6beab33c5bdfbfc"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-04-01-01-01-02.wav",
+      "bytes": 429334,
+      "sha256": "1dd1dea9b9f6522b2ada29cb60a35f55c6ce99fef1afb6e6fc48959d0de2c102"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-08-02-02-01-02.wav",
+      "bytes": 419744,
+      "sha256": "34d26a4be4259d595b4f178b97cd218f216c74cd41e76c324ab62ecb86c3b08d"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-03-02-01-01-01.wav",
+      "bytes": 412300,
+      "sha256": "1bc1ae2f36d7fa7314a42f7d250cc346723e2ed3d455a3b0dc4a1dbb50917044"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-08-01-01-01-02.wav",
+      "bytes": 400524,
+      "sha256": "909401c525b3d157d822fa3f66171086d531d7aa930e81c28fa15b9c557a931b"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-04-02-02-01-03.wav",
+      "bytes": 382794,
+      "sha256": "6cffd7fcf7bfba2321097741c554c970dff18e6737a4f66ce4200cd8c2308f19"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-05-02-01-01-04.wav",
+      "bytes": 419394,
+      "sha256": "126f749914b9e498039b8daf1c3a1ef28fa0bef8934af12535101da5ec5a6d39"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-04-02-01-01-02.wav",
+      "bytes": 419730,
+      "sha256": "c164e43034a28da0d81f97b6ca0df91b6d1970def189de9542af7c999af166a3"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-08-01-02-01-02.wav",
+      "bytes": 406930,
+      "sha256": "1489de3ebaf08e0dbfc70f72267702813420da79316e18a03af86e3958875c18"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-05-02-02-01-04.wav",
+      "bytes": 412982,
+      "sha256": "203b4ff2f70a29a369788becbe32d56422471294eba25b837b15dd3ca8056350"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-06-01-02-01-01.wav",
+      "bytes": 389916,
+      "sha256": "10fe698e7276dc4b180b79ef73989c3b347b026ef32ae0b5f5ddcac894e2f7f6"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-06-02-01-01-02.wav",
+      "bytes": 426040,
+      "sha256": "b59f804202fb4d2e5d5b6a75ec5f082aa20456eb217aaf633eff3397081142c7"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-06-02-02-01-04.wav",
+      "bytes": 403374,
+      "sha256": "50f8c50792fb0b5df5c2d801d15889eb89e7087b50e24a3c219cc35d976181c5"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-07-02-01-01-02.wav",
+      "bytes": 458178,
+      "sha256": "00b810a539ec56ef2f97ec110300c24cdb8067bf7cc05b0431590043838654c5"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-05-02-02-01-01.wav",
+      "bytes": 457178,
+      "sha256": "c1db52e1172cf1040eba230f01a679c48e4e06e09b7dd76323aad9f5c3b8519b"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-04-02-01-01-01.wav",
+      "bytes": 425138,
+      "sha256": "a617ba3cf207d2f22742a0b180c864c6311dc82b00944b7dab110b7ebf99e292"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-04-01-02-01-04.wav",
+      "bytes": 387356,
+      "sha256": "9c3986476124f7de51fc9ea23c76efca2ff21da8c6babf6a6d825ca94e2e7bd4"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-08-01-02-01-03.wav",
+      "bytes": 357176,
+      "sha256": "be5d67e4e056c2d2b8346120a0041369b3ebb35208038fada98df9a15df84e43"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-03-02-01-01-02.wav",
+      "bytes": 416542,
+      "sha256": "5269349f2129a0d1d1bb44262c6976e6629db2f258456af3d21014c1e9e2a681"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-07-02-01-01-04.wav",
+      "bytes": 441810,
+      "sha256": "d3a8ad4c7b40ebea38cc546eb668011fccc3e4832bc45a1068610ce6dee12ef7"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/ATTRIBUTION.md",
+      "bytes": 1919,
+      "sha256": "5129ee2bcb3f35db4c2c656df19ed182cad1e00402c9ecb684ac94444464114a"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-03-02-02-01-01.wav",
+      "bytes": 437936,
+      "sha256": "1198128784b8f851ee52ff21ad8f28e0c8a28feea19243b2c001b74efd0731c2"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-04-02-02-01-04.wav",
+      "bytes": 419394,
+      "sha256": "3f9354e0711e17be4e96033cbc3759188a8b66daaffbb305bf99f2fb7069e321"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-08-02-01-01-02.wav",
+      "bytes": 419742,
+      "sha256": "9e7c283f2a4cf53343a097990bed51b1aaf31da63c0fad30f337429a90f6a70b"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-03-01-01-01-01.wav",
+      "bytes": 393094,
+      "sha256": "db3035ff3b1dd243f0c63be0791514fae2762c941093dcef6ffdcb02cc013d14"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-08-02-01-01-03.wav",
+      "bytes": 363584,
+      "sha256": "973e2dcb420f68ad21a98e3f9a809400709229f99b6f96c5ddbd424efaf602c8"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-05-01-02-01-03.wav",
+      "bytes": 414826,
+      "sha256": "ee2e119031cdc3a2e8a50d727a70163fc3355d6452d1aaceedc1190704e4049f"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-06-01-02-01-04.wav",
+      "bytes": 390564,
+      "sha256": "53a3e0211d7dc778a99bc4807e81b0096d1aa310c0f8590335afdac60d692dd8"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-08-02-01-01-01.wav",
+      "bytes": 389898,
+      "sha256": "6786e322debf5aead0ad67df4751e2b3e1c09e4909857b53cbd88897f2251efb"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-06-01-02-01-03.wav",
+      "bytes": 386002,
+      "sha256": "c6f9d405ed78c02aac8e9d234ccc5e149312bbea422aeef125adaf742319f674"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-05-02-02-01-02.wav",
+      "bytes": 445372,
+      "sha256": "6481c21552fa49c7716d477ce26f37ce96a09d2a0a25ae1ec6603308794a1235"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-04-02-01-01-03.wav",
+      "bytes": 411624,
+      "sha256": "bdf16fd457fed2f6e5de374c7dac4fbd25cfd831b09edc38846f9c90d58c35c1"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-03-02-02-01-02.wav",
+      "bytes": 416542,
+      "sha256": "c3d8e4469c820ced8e776c910f621f02dbb4a57e8de275c4d1434aea819eb925"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/LICENSE-CC-BY-NC-SA-4.0.txt",
+      "bytes": 19018,
+      "sha256": "600ca4e25fe11762b75a97e714707fab48bb778374e92d24c6ca068791661c11"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-05-01-02-01-01.wav",
+      "bytes": 396310,
+      "sha256": "81d4b5010bfbea54ae10b6ffa1068f9b5ae3f1ae1410eb1a97b8f6f9403d9353"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-08-01-02-01-04.wav",
+      "bytes": 406564,
+      "sha256": "d027e70f227ec6f37384026ea639b864f7596cc85c071932bac8ead3a91dd3c2"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-04-01-01-01-04.wav",
+      "bytes": 380950,
+      "sha256": "8b6e0f419a113c05de859e17fcfb1af607991e99479d340ce38f4a713888b1c9"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-03-01-02-01-03.wav",
+      "bytes": 386006,
+      "sha256": "9ae11f747e207563a49434c8fe52c96cbe4003542de9ebb535dbcc615069607c"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-05-01-01-01-04.wav",
+      "bytes": 412988,
+      "sha256": "02c20d8c0bc3a3b21e3fcbbd91105eba1fb54c3951e3dcbac984a6153b4ae23c"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-08-01-02-01-01.wav",
+      "bytes": 399392,
+      "sha256": "30f76a703577ed6bc8d1b5e0dc2d68afbe508a17c960c79fa17cacef4adf05ec"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-03-01-01-01-04.wav",
+      "bytes": 393756,
+      "sha256": "3080245221302d843d80576ba27b63117aacb78569eef6151dee485293ce75c5"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-03-01-01-01-03.wav",
+      "bytes": 411628,
+      "sha256": "bf7281f0cfb95f98be2ce95a9c7ab6e66997965b9084f41e839776b1c401d12a"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-03-01-02-01-04.wav",
+      "bytes": 393756,
+      "sha256": "4de2dd416eec22448fe1c4df8037fd12d709dbaec9467d551ac253b0308f4309"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-07-01-02-01-02.wav",
+      "bytes": 431722,
+      "sha256": "a98b80c8a6838b75431555304fafed9de45945ba8aeb4342312b9e2afffc2b02"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-08-02-02-01-01.wav",
+      "bytes": 396306,
+      "sha256": "6e5db4d6fa637f12bbe74430d1da8178f9a5c5f6b3dfe6482e554668c9cc6a6e"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-03-01-01-01-02.wav",
+      "bytes": 406932,
+      "sha256": "4654ca86da9f02b60a5ab11b69f1ed0dbc9cd1caae1a02455f8918c46bb7fd2e"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-07-01-02-01-04.wav",
+      "bytes": 419388,
+      "sha256": "97cfd3d4049dfa107e24a84192ece5895015dcbd45d882707f956d4253d0fe30"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-05-02-01-01-05.wav",
+      "bytes": 376138,
+      "sha256": "361dcdaef09c2f508a3728147561e5f388e4a4e7de1ce294dc0e1288e66c5b2c"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-04-02-02-01-01.wav",
+      "bytes": 418734,
+      "sha256": "e4500d8ebbf3b5e4d090711ed165b096a963906edac733f140063f37e51e9a51"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-08-02-02-01-04.wav",
+      "bytes": 390546,
+      "sha256": "6f24ff38726860419250a624550b182c3f17bc82706a240e2b5432d28d524b43"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-07-02-02-01-01.wav",
+      "bytes": 447572,
+      "sha256": "a8562d7ff862398b8310852734e61f415d12cc8417d813ddf593edafea0fbbb0"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-03-02-01-01-05.wav",
+      "bytes": 446614,
+      "sha256": "e13169a4b2fe756e5206f51c8f9841439c5b5c74ac21a578b771905e47467f55"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-05-02-01-01-03.wav",
+      "bytes": 472488,
+      "sha256": "03ea4d9345729ee654b9a18742d2285daec33534bbb0f041c52b69d417ff08df"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-08-02-02-01-03.wav",
+      "bytes": 386006,
+      "sha256": "af4e286922da452ebb8c3c85fc86d475996e9ecbabc4e7f03c58dff8de7dab56"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-06-02-01-01-04.wav",
+      "bytes": 435406,
+      "sha256": "188bac8b6216438d281c0bb5414581aeaa04a852a326e0b686a7a279b7df27b1"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-07-02-02-01-04.wav",
+      "bytes": 429002,
+      "sha256": "6d0a02bbe36870e5efcdc48cdc5ff8f4aa7e35ce8a08bc7a5e5b7b5eb056e02b"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-05-01-02-01-04.wav",
+      "bytes": 390564,
+      "sha256": "9f268b530406c0d1c323b4d616005e6c8ebeaa79e5c85986531f0d0f9c1dbd39"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-03-01-02-01-01.wav",
+      "bytes": 399498,
+      "sha256": "7733fbdc0ea79eb710e4a81031aa4e9cbd0b015de25a5babe1b0ee3fc4e0c03a"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-04-02-01-01-04.wav",
+      "bytes": 409778,
+      "sha256": "8346608176061cdcced8950fda2399df15c3b024eb87540041f55999c4995f61"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-05-01-01-01-03.wav",
+      "bytes": 434044,
+      "sha256": "1016e7e730d0ce722881b0a306c3c88141155404ad6b0b308d9df22b161463e9"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-08-01-01-01-03.wav",
+      "bytes": 360378,
+      "sha256": "641676edc25de3c9a257286743a851720295fcf012c673c48512de0fb79aa320"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-04-01-02-01-01.wav",
+      "bytes": 396306,
+      "sha256": "ee8d71ab08e246729098d4277f2d6643287c2cfa9b8a09606a6761a58875fa8f"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-04-01-01-01-03.wav",
+      "bytes": 395608,
+      "sha256": "36c9db23dc891df8a4eae9ecb9d9553a284e6e9b1c05db26ec4c56ad5a2096c8"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-06-02-01-01-03.wav",
+      "bytes": 366788,
+      "sha256": "7c584f5dd7950b3dba8b45e2aba4e892580c9a0ef6ac244e78a4cb0d31796785"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-04-01-01-01-01.wav",
+      "bytes": 428338,
+      "sha256": "217c63ffd1b13eaa258c827c56acfcde592bed80c4809e158c755c284de2511a"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-07-02-01-01-01.wav",
+      "bytes": 473196,
+      "sha256": "3ef05a004c36909ce946154cf68cd551a485686866cf07291ef7a0a298328edd"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-07-01-02-01-03.wav",
+      "bytes": 395616,
+      "sha256": "1a30e12451e522b18b0b69472db4cc45a83b987037b79263483b38988083db1b"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-04-02-01-01-06.wav",
+      "bytes": 450962,
+      "sha256": "63fb57ff165f14a76b6778a6a15c89335b853ed450fe7396e764d73fcc208e89"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-07-01-01-01-02.wav",
+      "bytes": 413334,
+      "sha256": "b242119b1038e4f58474d2576322657505477bacc62a7d499b76cd3488eca650"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-04-01-02-01-02.wav",
+      "bytes": 419722,
+      "sha256": "05d80c8e8ffe4e53d9440a80be21a81df3f8bb26e80f5006e2e37d5acc100332"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-04-01-02-01-03.wav",
+      "bytes": 392404,
+      "sha256": "7c7b5bf72e22adf24c7ecc6b7047033a1218fc4bd58b94ef63aaa46c0d3fa804"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-08-01-01-01-04.wav",
+      "bytes": 368124,
+      "sha256": "3dfebc80da2fdbbca6e569f77ae930a835bfda279a8439130479a5aa516b7bc3"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-08-02-01-01-04.wav",
+      "bytes": 409778,
+      "sha256": "ca7be944c4f1987c13efbb94ac5025a4d6e93531346c72273a4150ad7c65ca64"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-03-02-01-01-04.wav",
+      "bytes": 428992,
+      "sha256": "c7fbcb4405381013e2fb4b761f570db69392452f895f98b33f5b3eb57a6ab03f"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-05-02-01-01-01.wav",
+      "bytes": 455342,
+      "sha256": "ba4d1f678784d9656239885413edd9699696f08f9a6e800619eed975ad7a98d6"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-03-02-01-01-03.wav",
+      "bytes": 462882,
+      "sha256": "ccb0b650d178b4ce33dd0b5d28e16db2a30f5fb5680d4196454a59bc45d05b40"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-05-02-01-01-06.wav",
+      "bytes": 441364,
+      "sha256": "8abb48178f83eac111cc74dd7c1e0814c8d054192a5b205917406f87c460be03"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-06-02-01-01-01.wav",
+      "bytes": 540470,
+      "sha256": "6b0752471c17ea8dfbdbbf9c976da3560c402ad2ca012704bea5b5b52dd00201"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-08-01-01-01-01.wav",
+      "bytes": 386692,
+      "sha256": "5e43c41dae0e824c1a07663b05a0dfdccac7412fb4a745510df58d2d6ee53231"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-07-02-02-01-02.wav",
+      "bytes": 444508,
+      "sha256": "a4c84778ebcb9c7eaec7d0d22f0d079ea64196cd8b3f6fe4edbd625b7a6899ac"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-04-02-02-01-02.wav",
+      "bytes": 416524,
+      "sha256": "efa86bccfd96610660d6518872b010e0c76202624ed4ccffedb644beaea925f4"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-07-01-01-01-04.wav",
+      "bytes": 432204,
+      "sha256": "5e5e415a2525ad2a7cd04841de336e96dbb5b5d41cce00921da384d7c12f41f1"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-03-02-01-01-06.wav",
+      "bytes": 383760,
+      "sha256": "5571df9002c07b4a372da61c7c4f28ec8e898e5d81953668f854b0e2eca8f0db"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-06-01-01-01-01.wav",
+      "bytes": 412342,
+      "sha256": "a2c792f3c5733f4469ae01c526833c22f3e14cbf145fab47f4d22e56f9552cdb"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-06-01-01-01-04.wav",
+      "bytes": 377282,
+      "sha256": "5b066be164068e0d991434bfeff3707462bcbbfae398841b779f51af7474dac8"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-05-02-02-01-03.wav",
+      "bytes": 456466,
+      "sha256": "a81a25e36cd59ddf318b1d566b53ed20da9a411753c98208b40dcf63feb10b24"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-04-02-01-01-05.wav",
+      "bytes": 388944,
+      "sha256": "2ddadb3041219f1267f22f30af08d990ee737656617df22f0d4df26c356e00b3"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-07-01-01-01-01.wav",
+      "bytes": 431554,
+      "sha256": "3812b1fcf5ba2019a0ec594251d1c35055b7f6233bcbce224aa08a319b444613"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-06-01-01-01-02.wav",
+      "bytes": 410134,
+      "sha256": "d5b45b08055b925e9cd66279940389490c663511fa5658ede38ed85e1ac88ddd"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-03-02-02-01-04.wav",
+      "bytes": 403366,
+      "sha256": "07d243297c0e3cd9f1f2c05505af9e49c8301a8b96b0c6455785d1567c034e9b"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-06-02-02-01-01.wav",
+      "bytes": 441170,
+      "sha256": "509626a3a63b3ce34ae6496daf5067fd42e48b8d074dd1ee605f01b4eaa77346"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-03-01-02-01-02.wav",
+      "bytes": 422948,
+      "sha256": "3e9668459238b80ac2b1c7b5ffe3d97c5382dcd60a7975d87fc4864b9c39e067"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-07-01-02-01-01.wav",
+      "bytes": 434760,
+      "sha256": "410a87d17bd8188c0dbe6edbd0bdf8189e801c6f58cf5039e18ceea66e01ee0b"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-03-02-02-01-03.wav",
+      "bytes": 446864,
+      "sha256": "ebfaf47aa2fd98a81ee42d1a5313acbc8d88a5dd11437f4cf3a421ab9849ea4f"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-06-01-01-01-03.wav",
+      "bytes": 408426,
+      "sha256": "16db41b1529a8d1ce27ee836830cf2368bb41bd5b3890caad24f60dc57183187"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-05-01-01-01-01.wav",
+      "bytes": 431546,
+      "sha256": "c9b2cfb8f3ed7153aa56b0a198ba0b81d9bae41c859c93f490b8c550b7c4cf97"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-07-02-02-01-03.wav",
+      "bytes": 418038,
+      "sha256": "fe884d2c0a850f27caa8b7ee59513f738bf90a5de1b289e563b452fe596a796b"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-06-01-02-01-02.wav",
+      "bytes": 413336,
+      "sha256": "492ae24bf56eb8d23c3db75585e097bff4915717fcccd220c0e7f0f2453a0a76"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-05-01-01-01-02.wav",
+      "bytes": 413322,
+      "sha256": "85e9338f1a1c5011221afce5d145a6a98784ff007b7562006cbcce93761b8fd4"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-07-02-01-01-03.wav",
+      "bytes": 443664,
+      "sha256": "a2cc154fad57b61dbe8d07c28b2d363ddb6b932842343e71b8cfad0513cc36b7"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-06-02-02-01-03.wav",
+      "bytes": 366788,
+      "sha256": "b40925f514a25216215e66ab96383111e4b80e2dd6afe45876ff5557a18f8996"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/recordings/03-01-07-01-01-01-03.wav",
+      "bytes": 437258,
+      "sha256": "f8d440c549b1e02809d15a549877cf4afedb5c575c5ea53c7d49b8a72a919186"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/generated/report.ts",
+      "bytes": 8204,
+      "sha256": "88ee7a0c477a83ef88955631ae13e24aa8b987ec40a84488f17f474050023730"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/generated/materials.ts",
+      "bytes": 34181,
+      "sha256": "22914030b6d93bc9670dbecea33bfe780e7d09906f543f1cc2e995132c4b2111"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/voice-emotion-cues/generated/protocol.ts",
+      "bytes": 7747,
+      "sha256": "96d0ac7367c8918479a6219a11c901906852de8936a45feff8ab84dbe7a5634e"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/browser-language-binding.stdout.txt",
+      "bytes": 52,
+      "sha256": "319436e874722908b52724e456d43ac3a7997964db59b99fbf2502f184cb8d11"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/types-corrected.stdout.txt",
+      "bytes": 21862,
+      "sha256": "f683a5a8a993dbdc585ebbfb9d91fd9bc3b27ad2c302e744a7809edf777a9783"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/browser-report-binding.stdout.txt",
+      "bytes": 52,
+      "sha256": "319436e874722908b52724e456d43ac3a7997964db59b99fbf2502f184cb8d11"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/preview-build-media-cleanup.json",
+      "bytes": 18321,
+      "sha256": "665616ad9c6f3781bd65b345ea93d98850bd9e191da90b55109703cebcb3e70d"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/browser-report-binding.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/frontend-stable-media-ref.receipt.json",
+      "bytes": 5201,
+      "sha256": "127744bba8979b30d71e905b7fc016b206993379d9d20d246f3ca55c8dcebb00"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/frontend-frozen-lifecycle.json",
+      "bytes": 2138,
+      "sha256": "fea4ebe4f1361dee8bc007de02d746b33d23a028355c1cb118cd5cb88914a8bc"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/backend-projection-affected.json",
+      "bytes": 2078,
+      "sha256": "4e1ece8bc81adb6b858401cb9c1438046ea64bd0d85aed8e37d3caf8e8203762"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/preview-build.json",
+      "bytes": 18321,
+      "sha256": "75b5edacef3da7ade6368d88a1e9cb4d9307b78607ee1cc3c74ef5e4ddcf838e"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/README.md",
+      "bytes": 9159,
+      "sha256": "676fac80f50f527e7d6e45856a67d9820653a66f310eacd28731d669e66a7feb"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/browser-model-sources.json",
+      "bytes": 946,
+      "sha256": "30687b8094f84504b3952e4f4563b177d90db76a6cf8f247411ec808e053ba0d"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/frontend-media-cleanup.receipt.json",
+      "bytes": 5192,
+      "sha256": "7f32ca04aeda099059fb4b2630ea79df5118c34b5e8e32833abb55b6773d6897"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/frontend-report-binding.receipt.json",
+      "bytes": 5132,
+      "sha256": "76fd12f119a8abffa0f801a8c3c339748c94e82115c0d883aa25a7b585f00b00"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/report-examples.receipt.json",
+      "bytes": 4956,
+      "sha256": "1d85d5dc539656561c33caee2c5969ee8f45b8fbbf094e281c6f7d49439fcb48"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/browser-media-cleanup.stderr.txt",
+      "bytes": 207,
+      "sha256": "c8d338031b5890c1a6a9c0d4815bc41f15b975fa425a9831a97194b062336dfb"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/preview-build-original.json",
+      "bytes": 18320,
+      "sha256": "89d34d43a97bcaa2578cbb8582c1735fb4de861def229f752b7022c11b8ac19f"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/report-examples.stdout.txt",
+      "bytes": 270,
+      "sha256": "8aa0bec6f7b4f513bfbd172786bd2bbb89345b2b57f1d0d141c2a3c67aa553a6"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/frontend-original.receipt.json",
+      "bytes": 5114,
+      "sha256": "798f12dffdd6a97b0344a5ce688f10bf15008febba5a58e13b54bffd83143b16"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/actual-phone-answer.png",
+      "bytes": 39020,
+      "sha256": "81dd7e8d4dbc0ac208d054df075a4e265674fb8e68f34051a777c924c8f607f4"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/preview-inventory.receipt.json",
+      "bytes": 4947,
+      "sha256": "9d0f7a84badb07ae9db21c953e32f189c11e4728d8b4f1513b454f509ad55676"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/frontend-stable-media-ref.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/frontend-types-media-cleanup.receipt.json",
+      "bytes": 4953,
+      "sha256": "9a3327828fbf20a04afa35e1fec6455a3c4167fda2b45522b0e00677e53b5935"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/type-only-runtime-reuse.json",
+      "bytes": 1075,
+      "sha256": "93486742f456d2d2597d01252178d625300efb30023e98d337037d313cb8b22e"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/backend-language-binding.receipt.json",
+      "bytes": 5173,
+      "sha256": "b56b36d18d145e69e950dd86574fc1e09969257540f0c5d65830ebe2eb0c73cc"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/preview-build-language-binding.stdout.txt",
+      "bytes": 9024,
+      "sha256": "0d6d8dece9b6fc5d49b9ee43762059561a18dbb7488a7a86f340dd94eeb565fc"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/browser-original.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/types-final.stdout.txt",
+      "bytes": 21862,
+      "sha256": "59dd0d84331106ab1f8cdfdbd07c84bf992e235de2a1e9b3acd47fb6f366d2f9"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/report-examples.json",
+      "bytes": 28319,
+      "sha256": "e60aeb3023208e2450d0dd6c297b60c3a74f5623eed7986349e7be009fc1937e"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/frontend-language-binding.receipt.json",
+      "bytes": 5138,
+      "sha256": "77efeaa9271e14c1c1dd9a1496fec6b8cc8372f33769f5029b8d1a83294cd182"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/preview-inventory.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/backend-original.receipt.json",
+      "bytes": 4921,
+      "sha256": "6550f0de118d750c502a2dedece768b2e568dbe57833b9c04d35729f54c2ccea"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/browser-review.cjs",
+      "bytes": 6402,
+      "sha256": "a4bcc24baeacdcc6f205ac5f443248176df0133c5d7f50f7eb7e0f253040d939"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/sync-browser-model.py",
+      "bytes": 744,
+      "sha256": "ae1a91d0f9bec939e804223ebd74602c6293f99a3b12876de9d5bca082261cb9"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/preview-build-media-cleanup.stdout.txt",
+      "bytes": 9024,
+      "sha256": "40a56dd18c3ce631c70f6a1fd263b3ac159db658748e643e57f44dc00291f618"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/actual-tablet-english-instructions.png",
+      "bytes": 225816,
+      "sha256": "e6afbb4d88846fe3ccd4e6abb38844919adc88d50fa0f458dbed2d763ecb6017"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/frontend-language-binding.stdout.txt",
+      "bytes": 167,
+      "sha256": "6173b6396894798a7c45fc0650bf0919b7c52c03eb3627ec44991661d0100d81"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/browser-review.json",
+      "bytes": 2230,
+      "sha256": "8ee5f5fef419023a356bfb761f989b0b1fbc70180dcc6150eb560703bc935462"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/browser-report-binding.receipt.json",
+      "bytes": 4930,
+      "sha256": "6eb0a65a79f4fee1bbb69d2f419de363903bb09a94dd77e8616d670615a14268"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/preview-build-stable-media-ref.stdout.txt",
+      "bytes": 9024,
+      "sha256": "9bcc622be109577a276663cc7da3fd9ebe6edcfb6513ddfcb43842c0dafc6cce"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/preview-build.receipt.json",
+      "bytes": 4911,
+      "sha256": "60725847ccd93bc4ea1e93c514894ba24ed5e20fc011787994077c1b9ba14537"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/backend-original.stderr.txt",
+      "bytes": 1028,
+      "sha256": "ec32e0888fbe06c30e3315bd02a8424f3f58231026f4c0708fe90ba2bd660fa1"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/frontend-frozen-lifecycle.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/backend-report-binding.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/frontend-report-binding.json",
+      "bytes": 2128,
+      "sha256": "651e0ae3a6b1f93a072aa9c2cc8b3b3794dd8b9c83d75b2eac9ecc7cad3da534"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/media-ref-type-only-reuse.json",
+      "bytes": 405,
+      "sha256": "fa4290ad0947316f898dec627ab0b12c52185db8be4e3c29bd182469e206f73f"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/types-language-binding.receipt.json",
+      "bytes": 4925,
+      "sha256": "d7dbaa6c797b4d7938409706739092ac324a00213ab1e191331bb98c5f5bde5e"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/types-corrected.receipt.json",
+      "bytes": 4911,
+      "sha256": "c10662a911236ecd4a434f72c6854e6c06c74e036f292d5c3ef903d874073279"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/browser-practice-synthetic-raw.json",
+      "bytes": 4524,
+      "sha256": "6e1896b81240d7e6e1768ddbfe8fa918cf88af4ef436ce5983ca3d1e43bf7b7f"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/backend-command-corrected.stdout.txt",
+      "bytes": 167,
+      "sha256": "44087d8bd0c2865c5a8bc0b36ba392c590bd1440c25a9b8dcc5c757a2ae3aa37"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/backend-report-binding.receipt.json",
+      "bytes": 5205,
+      "sha256": "6fe8d8f19f2d050800975c87283f8dce0ffbd40670e8cb3f2c5999e766e9398c"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/typecheck.cjs",
+      "bytes": 1905,
+      "sha256": "353cf6163246ababbd377c338ac5ac7a6961fec97f624e32246e0001568e3660"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/frontend-media-cleanup.json",
+      "bytes": 2079,
+      "sha256": "f929c02112a7e33f0cbd067e4a4a55f78013b6321da06e82941ec57db28d72f2"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/types-language-binding.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/backend-language-binding.json",
+      "bytes": 2086,
+      "sha256": "55cce8d3cc0746bef30c5364f882bf691f1c0b5d22e53cb9880e0a0c560116de"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/browser-practice-synthetic-raw-original.json",
+      "bytes": 4475,
+      "sha256": "91970e50b3dae2c8025ac023e887309c92da35d88f0850f846b7ad63b3677e99"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/frontend-frozen-lifecycle.stdout.txt",
+      "bytes": 167,
+      "sha256": "ff1bfb4e3001f6e50bc216b98cac29203b8df43dd9d13adc4cc08f06875e6872"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/types-original.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/types-language-binding.stdout.txt",
+      "bytes": 21862,
+      "sha256": "fd3ba30b13d1810731409f48ad1b8e00e10b6a8f70cc35a162283652a523e037"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/preview-build-language-binding.receipt.json",
+      "bytes": 4945,
+      "sha256": "d972f48326a6bf0db9a23c77dca9ca86feb254dfc01e7f7acdca488420967936"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/browser-media-cleanup-failed.json",
+      "bytes": 1029,
+      "sha256": "1ed89e6f0916fd59687e00bfdc2d9c8375dee73925e57781c1693349bb9a4482"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/browser-language-binding.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/types-corrected.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/frontend-types-ref-corrected.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/frontend-types-media-cleanup.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/frontend-report-binding.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/frontend-original.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/preview-build-language-binding.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/backend-projection-affected.receipt.json",
+      "bytes": 5188,
+      "sha256": "e5a8d5c4ecb67c63f65fe3541127f027876153609e5af5ed2ea050dc8f2c6f25"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/report-examples.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/preview-build-stable-media-ref.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/frontend-types-ref-corrected.receipt.json",
+      "bytes": 4953,
+      "sha256": "f7ade5d735747121b302cee7fa553a69aaa632a0809aeb1ae81a507bdb9fd473"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/browser-language-binding.receipt.json",
+      "bytes": 4934,
+      "sha256": "94256ffb0bb7a5caeee02714ae99762a2b440195212163a7b3a4a3bb10967d9d"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/backend-report-binding.json",
+      "bytes": 2113,
+      "sha256": "8e2154586809bd9462536176229638898f3269c7a39dd86d72bf02e42e7ab603"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/types-report-binding.receipt.json",
+      "bytes": 4921,
+      "sha256": "b00e4c58a5b056590f0048998e5a9ea32788c297c75e9c572063465bf39089df"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/frontend-types-ref-corrected.stdout.txt",
+      "bytes": 11947,
+      "sha256": "90213ec80af8210710681d3144766f5b22ce59a32a5546a732148ae2712ececd"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/types-final.receipt.json",
+      "bytes": 4903,
+      "sha256": "d813e06ecbc559587a885aef923ac7742e5d3c64371c12f0272183af76ee11d1"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/actual-phone-instructions.png",
+      "bytes": 225982,
+      "sha256": "7366f99896d8d09deca411d331e167760c8687d20c06a589c799e907e1f0f10e"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/backend-projection-affected.stdout.txt",
+      "bytes": 169,
+      "sha256": "3240c16165263bd72e90132b1c99efe4a356f95f92eb44277006217cbb1405cf"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/backend-command-corrected.receipt.json",
+      "bytes": 4926,
+      "sha256": "3fe85242ad7e71ff2121a6e4e66c440383066eabd89de17cb82cad9ec9195494"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/types-report-binding.stdout.txt",
+      "bytes": 21862,
+      "sha256": "94200e07ff9294e82b8433eb063dbd9ec5b0471d3147cfbdade7e57414cf2292"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/backend-language-binding.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/preview-build-stable-media-ref.receipt.json",
+      "bytes": 4945,
+      "sha256": "788f192ddc4876677bb28cc723c13893e5fb42459b2dd056f140f216d867843d"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/preview-build.stderr.txt",
+      "bytes": 636,
+      "sha256": "f1bc2709cd838ecb087e2bc2b68d220917eaf379626066e33921d0daddde29f8"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/backend-command-corrected.json",
+      "bytes": 2145,
+      "sha256": "d41f4c81c9907d5d7c12eb9e697f4e740f21ed4d232aa4aa56f1d5fd90a2a8cc"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/backend-projection-affected.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/frontend-language-binding.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/preview-build.stdout.txt",
+      "bytes": 9024,
+      "sha256": "014ebd079583f3df03ac0d988b5a22eb9d16ef19b1bed6575f60754b50823e44"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/browser-original.stdout.txt",
+      "bytes": 52,
+      "sha256": "66c3b063bb00c451f221e574c2c011af70ef24b83baf93de29787e9aa9aff832"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/preview-build-media-cleanup.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/frontend-report-binding.stdout.txt",
+      "bytes": 165,
+      "sha256": "e373ea5e686d2aff12aea9dc1a0324a7657b27e0f7f573de72ff23c8f5d72e79"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/browser-media-cleanup.receipt.json",
+      "bytes": 4928,
+      "sha256": "52598e34fefbb2d41917dddcde90aaa0c2abf66ba3393ffc29012deb7d9c78ee"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/preview-build-report-binding.receipt.json",
+      "bytes": 4941,
+      "sha256": "25a8eeb49981514d4c2dd4b9084ce3b3a719b4bbb460ba6c552d3cd212defb42"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/backend-command-corrected.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/preview-build-report-binding.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/types-original.stdout.txt",
+      "bytes": 29192,
+      "sha256": "d971dbfafa2002341a21890b4c8803f5c15a0cdce92c6ee4787e01a42cfa2f0d"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/browser-media-cleanup.stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/types-final.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/browser-original.receipt.json",
+      "bytes": 4918,
+      "sha256": "a4859c33dfe86bbdb45cde33cfdd4ac3912ec86856351947f83e1d097ffee3fd"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/frontend-media-cleanup.stdout.txt",
+      "bytes": 164,
+      "sha256": "27464791265ff1197f4ebab5a5b095862bf7b0160dc7a9429ace35db1349004b"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/browser-review-original.json",
+      "bytes": 2022,
+      "sha256": "d32f8c3572f4813dfa584d51a5c32aed377c0f53d2747ecf616a6617e48f1127"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/run-check.py",
+      "bytes": 1644,
+      "sha256": "5b8d0f887dfe68d49c4e326482047ed915c7922c875370c069e666191e891aa0"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/backend-original.stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/types-original.receipt.json",
+      "bytes": 4909,
+      "sha256": "9c9cfd9b7e153ed07d730afc4968c79416274e1fbde541894495dafe02357ced"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/frontend-stable-media-ref.stdout.txt",
+      "bytes": 167,
+      "sha256": "2a9aa73dfa73dfe5b386f5d8a67f06d989ef4ef0b8f9640fe03232a3234e72f8"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/report-examples.ts",
+      "bytes": 2156,
+      "sha256": "d2b9a8b99193051daf3b61d135bac7f8ec29899fe66a63de7a3b3c1a8a06d692"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/backend-report-binding.stdout.txt",
+      "bytes": 164,
+      "sha256": "93a84c589af125256dcf08f9954d41bd9c44428890be23a568eb07f5efb98152"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/preview-build-media-cleanup.receipt.json",
+      "bytes": 4939,
+      "sha256": "f7e2906a397fb6fe1bf58a0cafb505850073454ab3803ed4c055b06821b0dcef"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/frontend-frozen-lifecycle.receipt.json",
+      "bytes": 5138,
+      "sha256": "455efab4ab46569a2215a971a3f8e591a1406005fa5429f0030321d26e9aa7b3"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/preview-build-report-binding.stdout.txt",
+      "bytes": 9024,
+      "sha256": "9cadc372fbff35cdef5a20f0ce919db5aefdebb52c8dd14e07bc5f6f3b5abd66"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/frontend-original.stdout.txt",
+      "bytes": 159,
+      "sha256": "a5766ba533187742fdf14d5e7132f35ca1e3819bd817570455a5b3644d277632"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/frontend-language-binding.json",
+      "bytes": 2136,
+      "sha256": "14b9e8767fe4f5ef9458ff2965bd449b90fde28018c53bf46089907dc07cc5fb"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/preview-entry.tsx",
+      "bytes": 1768,
+      "sha256": "f3fcabc7a9d9fcbfb8bab7be4eaef2087bd330c693a9ffa55f57c2a9282ca0b7"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/frontend-types-media-cleanup.stdout.txt",
+      "bytes": 12219,
+      "sha256": "fa846eae817367d4dc1e7c0a0c60ae362380edc0d0fca68a2a4e94005751c3f0"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/build-preview.cjs",
+      "bytes": 2235,
+      "sha256": "7bcd9b30bb931c63f43c46e86b2ba14626f5a9b1f4c903f7edc78d99c283440d"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/frontend-media-cleanup.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/preview-inventory.stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/frontend-original.json",
+      "bytes": 2135,
+      "sha256": "0200238e83f5057203d1b88ab99650f12639796f643071ef9dda23fdd26dba89"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/backend-language-binding.stdout.txt",
+      "bytes": 166,
+      "sha256": "26d1d17d6f06244e89550f1cd40bad623e059d23fdda4f4e84bf8cad79093bca"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/types-report-binding.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/implementation/frontend-stable-media-ref.json",
+      "bytes": 2079,
+      "sha256": "bc6ccee4a705f9e04d07ffa0388cbceaa68a2cc01bd7f00df51f837804c06927"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/cognitive/voice-emotion-content.test.ts",
+      "bytes": 8348,
+      "sha256": "5aadb75269c4d167723c0c5e89d5f574a064a9a34baaef355ae068030b9486af"
+    }
+  ]
+}
