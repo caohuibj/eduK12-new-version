@@ -17,7 +17,7 @@ export const resolveScaleAdmissionInstruction = (
   installed?: InstalledScaleInstructionRow | null,
 ) => {
   if (source.instruction) return {
-    blockers: [] as string[],
+    diagnostics: [] as string[],
     binding: { origin: 'INSTRUMENT_SOURCE' as const, ...source.instruction },
   }
   if (source.executable && installed?.instrumentClass === 'STANDARD'
@@ -25,8 +25,12 @@ export const resolveScaleAdmissionInstruction = (
     && installed.definitionHash === hashScaleDefinition(source.executable.definition)
     && installed.definition && canonicalHash(installed.definition) === canonicalHash(source.executable.definition)
     && installed.instruction?.trim()) return {
-      blockers: [] as string[],
+      diagnostics: [] as string[],
       binding: { origin: 'SCALE_FIELD' as const, text: installed.instruction },
     }
-  return { blockers: ['instruction:INSTRUCTION_NOT_DECLARED'], binding: null }
+  // The existing engine/seed contract admits an explicit null instruction.
+  // Absence remains an audit diagnostic, never an invented reviewed source or
+  // a new installation blocker. Identity/definition conflicts are still checked
+  // by each caller independently of this optional presentation field.
+  return { diagnostics: ['instruction:INSTRUCTION_NOT_DECLARED'], binding: null }
 }

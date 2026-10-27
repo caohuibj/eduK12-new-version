@@ -35,7 +35,7 @@ export const previewScaleInstrument = (input: {
     ? validateScaleInstrumentSource(source)
     : getScaleInstrumentValidation(source.identity.instrumentKey, source.identity.instrumentVersion)!
   const issues = [...baseValidation.issues]
-  if (source.executable && !source.instruction) issues.push({ path: 'instruction', message: 'INSTRUCTION_NOT_DECLARED', severity: 'error' as const })
+  if (source.executable && !source.instruction) issues.push({ path: 'instruction', message: 'INSTRUCTION_NOT_DECLARED', severity: 'warning' as const })
   const validation = { valid: issues.every(issue => issue.severity !== 'error'), issues }
   const catalog = materializeCatalogManifest(source)
   const localization = materializeLocalizationManifest(source)

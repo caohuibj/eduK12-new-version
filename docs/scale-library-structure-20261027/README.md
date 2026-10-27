@@ -14,7 +14,7 @@
 
 main 本来有 57 个 source 版本。主候选来源的新增 85 版本去重为 78 个 instrumentKey；联合来源共 90 个新版本身份、最新 79 个工具。这里排除 main 原有身份，不把 142 个主分支快照来源或 85 个新增版本称为 142/85 个新工具。保留 11 个被新版覆盖的旧版本，仅标 `NOT_EXECUTED_SUPERSEDED`，不重跑旧版本。
 
-79 个最新身份中：3 个三部分结构完整且现有 runtime compiler 返回 supported；56 个缺独立 source.instruction；19 个缺 report.audienceContract；另 1 个是 CATALOG_ONLY、三部分未构建。3 个完整项为 `ars30_2016_zh_cn_research@1.0.0`、`cfq7_zh_cn_research@1.0.0`、`psyflex6_zh_cn_research@1.0.0`，**均仍是 DRAFT**。独立指导语缺失只表示未接入可冻结呈现字段，不证明资料文档没有指导语；本次不抽取或改写正文凑通过。
+79 个最新身份中：3 个三部分结构完整且现有 runtime compiler 返回 supported；56 个缺独立 source.instruction；19 个缺 report.audienceContract；另 1 个是 CATALOG_ONLY、三部分未构建。指导语缺字段是结构盘点诊断，不是新加给既有 nullable 引擎合同的安装门禁。3 个完整项为 `ars30_2016_zh_cn_research@1.0.0`、`cfq7_zh_cn_research@1.0.0`、`psyflex6_zh_cn_research@1.0.0`，**均仍是 DRAFT**。独立指导语缺失只表示未接入可冻结呈现字段，不证明资料文档没有指导语；本次不抽取或改写正文凑通过。
 
 额外阻碍均保留：
 
@@ -25,7 +25,7 @@ main 本来有 57 个 source 版本。主候选来源的新增 85 版本去重�
 
 ## 技术门槛与人工事项
 
-题本保留稳定身份、题项/选项结构、指导语语言与版本、适用人群/披露策略等。全新安装要求明确可冻结的 source 指导语；既有精确定义的 STANDARD 行可保留并绑定原 Scale.instruction，详见下方补充。已有运行/历史定义不因旧 source 缺字段改变已冻结尝试。指导语/报告文字不重写。
+题本保留稳定身份、题项/选项结构、指导语语言与版本、适用人群/披露策略等。指导语保持原引擎可空合同；缺 source 声明显式诊断，不因本 PR 新增必填字段阻断 seed/安装。既有精确定义的 STANDARD 行可保留并绑定原 Scale.instruction，详见下方补充。已有运行/历史定义不因旧 source 缺字段改变已冻结尝试。指导语/报告文字不重写。
 
 计分保留 item/score/reference 引用、参数 schema/边界、计分器注册与固定实现、golden 算例执行及版本关系。`referencePolicy=none` 继续表示明确无常模/阈值；没有新增全国常模、翻译专家签字或科研验证的要求。
 
@@ -84,12 +84,32 @@ install、materialize、publish 和按注册身份读取的预览/接入状态�
 - `instruction-admission.ts` 仅允许版本完全相同、STANDARD、measurement hash 与完整 definition 都匹配且字段非空的已安装行，作为 `origin=SCALE_FIELD` 的兼容文本。保留原始字节和空白，不补语言、版本、审校来源，不提升成正式 source 声明。materialize 不再因 source 字段缺失把已有行清成 null。
 - publication proof 加入当次读取的完整 instruction binding；既有行文字在预览后变化会使 proof stale，空文本、错版本、错定义/哈希、CUSTOM 行不能借用为兼容来源。冻结 runtime 原有 SCALE_FIELD/INSTRUMENT_SOURCE 行为保持，历史快照未改写。
 - 真正迁入正式 source，需要内容维护者核实原文字节、真实语言、来源，并按现有独立 instruction.version 声明；本次不自动抽取文档或数据补写，不新增迁移器或平行协议。新 source 声明仍进入原 source/axis snapshot 冻结机制。
-- **剩余冷启动边界**：没有已安装行且 source 未声明指导语时，即使包 PUBLISHED，也拒绝新安装/物化；原 `prisma/seeds/scales.ts` 会遍历物化所有 executable，所以空库 seed 将遇到该缺项。这是本 PR 新结构要求的实际兼容风险，尚未以真实空库执行或完成资料迁移；不得声称现有 53 包已全新安装可用。已安装行字段为空或与定义不符时也不能自动放行。source-only preview 无数据库字段，只报告 source 缺项；兼容绑定是否成立由 install/publication plan 对当前行核定。
+- **已修复的冷启动回归**：94a60766 曾因新必填指导语要求阻断无既有行的 seed/安装；独审明确指出该回归后，已移除该新增门禁，恢复所有来源共用的 nullable 合同，没有 53 项特例名单。无 source 声明且无可绑定行时返回 binding=null、INSTRUCTION_NOT_DECLARED 诊断；不写文案、不填审校/语言/版本。seed 创建 DRAFT/HIDDEN、instruction=null 并记录诊断，后续安装/发布计划保留诊断，声明缺项不会消失。已有行字段原样保留；身份、版本和定义冲突继续由原有硬检查拒绝。source-only preview 也将此缺项作为 warning。53 包真实数据库全量 seed 仍未执行，不能声称全量已验收。
 
-新证据只覆盖直接行为，见 [补充索引](evidence/cache-instruction-evidence-index.json)：
+94a60766 阶段证据只覆盖直接行为，见 [补充索引](evidence/cache-instruction-evidence-index.json)：
 
 - 新增 6 个定向场景，实际经过真实 registry/package/source 校验、scorer、runtime compiler、install/materialize 和 publication plan/apply；数据库、媒体、measurement release、入口政策及 axis 写入端为合成 mock。断言每个 golden 在完整调用链中只执行一次，原样返回失败缓存，源/缓存不能篡改，actor 冻结在事务内仍拒绝，部署哈希/版本/reference 数据变化仍拒绝，历史文字原样保留与 proof stale，PUBLISHED 不补造新安装指导语。
 - 直接修改的一个旧 instruction-freeze 用例只重核 materialize 的“source 缺字段时不清空既有行”行为，其注册源验证接口在该 unit 中明确 mock；真实缓存/结构保护由上面的新场景执行。未跑整个旧冻结套件。
-- 初次新用例 reporter 为 5 PASS，但外层 shell 退出 1；另一次新增场景/旧用例 reporter 为 2 PASS / 11 filtered，外层 shell 同样退出 1。这两条原 invocation 保留为失败/未归因，不改标整命令成功。只保留 reporter 能证明的 passed case，不声称退出清理成功。为核对退出边界，选中单个完整链场景的独立诊断退出 0（其余 4 filtered），随后直接 subprocess 捕获单个状态场景退出 0（其余 5 filtered）；没有重跑整套 5/6 项或现有全量。
+- 初次新用例 reporter 为 5 PASS，但外层 shell 退出 1；另一次新增场景/旧用例 reporter 为 2 PASS / 11 filtered，外层 shell 同样退出 1。这两条原 invocation 保留为外层失败，不改标整命令成功；当时未归因，后续已定位为 login shell 的退出清理，详见下方分层诊断。只保留 reporter 能证明的 passed case，不声称退出清理成功。为核对退出边界，选中单个完整链场景的独立诊断退出 0（其余 4 filtered），随后直接 subprocess 捕获单个状态场景退出 0（其余 5 filtered）；没有重跑整套 5/6 项或现有全量。
 - 变化源码的 backend tsc --noEmit 实际子进程退出 0，[前后输入哈希/时间/退出 receipt](evidence/cache-instruction-types-receipt.json) 保留；tests 不在该 tsc include 中，不声称测试或 scripts 已类型验收。
 - 旧 79 工具盘点、旧报告和原失败原件不覆盖、不重跑。候选审计调用 source validator 的默认参数，此次仅增加缓存专用的内部执行分工，默认校验和结构结果未改；56/19 是原快照字段结论，不能套成数据库结论。新证据不是 CI、已接纳证明或真实数据库生命周期资格。
+
+
+## 冷启动回归修复与外层退出码分层诊断
+
+最新兼容修订只涉及 `instruction-admission.ts`、install/materialize/publish/preview 的可空字段处理、原量表 seed 的一条诊断输出及两个直接代表场景。原 registry 缓存、真实 golden、动态权限/版本/reference 合同未改，未增加 legacy 名单、审核门禁或新入库系统。
+
+指导语缺项现在由 install plan 的 `instruction.diagnostics`、materialize 的返回结果、publication proof 的 `instructionDiagnostics`、source-only preview 的 warning 和 seed 的 warning 如实记录。`binding=null` 表示未声明或未能绑定，不是“指导语已完整/已审核”；存在正式 source 字段时仍校验结构和 locale。版本/完整定义相同且非空的历史文本仍标 SCALE_FIELD；其他行不得借文本冒充 source，原版本/身份/定义拒绝条件没有删除。materialize 更新已有定义时，source 未声明指导语就不写该字段，保留原 null、空串、空白或文本，不用 null 覆盖。
+
+[代表用例原件](evidence/seed-instruction-compatibility.json) 为 **2 PASS / 4 filtered**，实际检查子进程与外层工具均退出 **0**；[命令/时间/范围 receipt](evidence/seed-instruction-compatibility-receipt.json) 明确 `shellLogin=false`。用例调用真实 `seedScalePackages`（含原 ADEXI 迁移入口）→真实 materialize，以及真实 install/publication 计划；只让原 registry 枚举一个真实既有来源，数据写入端为内存空存储，不是生产或真实 PostgreSQL。验证空存储创建 DRAFT/HIDDEN/null 与显式缺项诊断，再次物化不改写；旧行原文字节保留、文字变化使 proof stale、可空字段不成为新门禁，错版本/定义不能绑定。没有对 53 个包或原 6-case 全套重复计分。
+
+本次变化源码 tsc 子进程退出 **0**，见 [输入哈希/退出 receipt](evidence/seed-compatibility-types-receipt.json)。原 94a60766 的计分缓存、事务内 actor、部署/版本/reference 证据保留；此次没有改这些缓存和动态拒绝实现，也没有再次执行那些成功 case。历史“缺指导语必须阻断新安装”的负向预期已由本次两个兼容用例取代；原 reporter 不改写为本次输入的结果。
+
+两次外层退出 1 已定位到 **login shell 退出清理层**，不是仅依据测试日志推断：
+
+- 默认 exec 使用 login bash；云端 `~/.bash_logout` 在 `SHLVL=1` 执行 `/usr/bin/clear_console -q`。实测当前无控制台时该命令返回 **1**。没有修改该系统文件或全局 shell 设置。
+- [受控原件](evidence/shell-exit-layer-diagnosis.json) 使用不运行任何应用测试的 `node -e process.exitCode=0`：记录检查子进程为 **0**；相同脚本配合 `set -e`、显式 exit，在 login=true 时 EXIT trap 和工具均记录 shell **1**，login=false 时分别记录检查 **0**、shell **0**、工具 **0**。因此已把失败隔离到 shell logout，不靠内部 reporter 的 PASS 覆盖外层状态。
+- 两条历史原命令都是 standalone 检查在 `set -e` 下完成后继续执行 cat，实际 reporter 原件存在；原检查子进程退出码当时没有单独持久化，这一记录缺口不追补。原外层 **1** 仍为失败，原退出清理不声称成功，原 passed case 只按 reporter 原身份保留。
+- 新代表用例与类型检查采用非 login shell，并直接捕获 subprocess.returncode；本次检查层与外层均为 **0**。修订仅限任务命令包装，没有修改产品断言、CI 或退出检查策略。
+
+以上是针对新增必填回归的有限修复与代表验证，不是 53 包/全库/真实数据库生命周期的通过声明。候选内容、版本、计分、阈值、科研与权利状态未改，仍不触发 CI、Ready、合并、部署或生产数据写入。

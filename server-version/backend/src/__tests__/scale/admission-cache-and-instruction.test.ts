@@ -6,12 +6,14 @@ import * as scoring from '../../modules/scale/scale-scoring'
 import { installScaleInstrument, planScaleInstrumentInstall } from '../../modules/scale/onboarding/install'
 import { materializeScaleInstrumentContent } from '../../modules/scale/onboarding/materialize'
 import { planStandardScalePublication, publishStandardScale } from '../../modules/scale/onboarding/publish'
+import { seedScalePackages } from '../../../prisma/seeds/scales'
 import { resolveScaleAdmissionInstruction } from '../../modules/scale/onboarding/instruction-admission'
 
 const state = vi.hoisted(() => ({ registry: null as any, deployment: null as any, freezeBeforeTransaction: false, actor: null as any }))
 vi.mock('../../modules/scale/onboarding/instrument-registry', async original => {
   const actual = await original<typeof import('../../modules/scale/onboarding/instrument-registry')>()
   return { ...actual,
+    listScaleInstrumentSources: () => state.registry.listSources(),
     getScaleInstrumentSource: (...args: any[]) => state.registry.getSource(...args),
     getScaleInstrumentValidation: (...args: any[]) => state.registry.getValidation(...args),
     getScaleInstrumentRuntimePolicy: (...args: any[]) => state.registry.getRuntimePolicy(...args),
@@ -124,7 +126,7 @@ describe('selected immutable scale admission contract and live row instruction',
     expect(scored).toHaveBeenCalledTimes(source.executable!.goldenCases.length)
   })
 
-  it('preserves exact legacy text, binds it into proof and rejects stale/empty or mismatched row fallbacks', async () => {
+  it('preserves old-row text and nullable instructions while still binding proof and rejecting wrong-version data', async () => {
     const scored = vi.spyOn(scoring, 'scoreScale')
     const { source, row, db, publicationInput } = fixture()
     const originalText = row.instruction
@@ -136,24 +138,42 @@ describe('selected immutable scale admission contract and live row instruction',
     const stale = await planStandardScalePublication(db as never, { ...publicationInput, expectedProofHash: preview.proofHash })
     expect(stale.blockers).toContain('PUBLICATION_PREVIEW_STALE')
     row.instruction = '  '
-    expect((await planStandardScalePublication(db as never, publicationInput)).blockers).toContain('instruction:INSTRUCTION_NOT_DECLARED')
+    const missing = await planStandardScalePublication(db as never, publicationInput)
+    expect(missing.allowPublish).toBe(true)
+    expect(missing.proof.instruction).toBeNull()
+    expect(missing.proof.instructionDiagnostics).toContain('instruction:INSTRUCTION_NOT_DECLARED')
+    expect(missing.blockers).not.toContain('instruction:INSTRUCTION_NOT_DECLARED')
     for (const changed of [{ instrumentVersion: '2.0.0' }, { instrumentClass: 'CUSTOM_DESCRIPTIVE' }, { definitionHash: '0'.repeat(64) }, { definition: null }]) {
       expect(resolveScaleAdmissionInstruction(source, { ...row, instruction: originalText, ...changed }).binding).toBeNull()
     }
     expect(scored).toHaveBeenCalledTimes(source.executable!.goldenCases.length)
   })
 
-  it('does not treat PUBLISHED package status or unreviewed materials as a formal instruction for a new install', async () => {
+  it('seeds an empty store through the actual scale seed/materializer and admits nullable legacy installation with explicit diagnostics', async () => {
     const { source, db, installInput } = fixture()
     expect(source.executable!.releaseStatus).toBe('PUBLISHED')
-    db.scale.findUnique.mockResolvedValue(null as never)
+    state.deployment = null
+    const scales = new Map<string, any>(), references = new Map<string, any>()
+    db.scale.findUnique.mockImplementation(async ({ where }: any) => scales.get(where.code) ?? null)
+    db.scale.create.mockImplementation(async ({ data }: any) => {
+      const row = { id: 'synthetic-seeded-scale', ...data }
+      scales.set(data.code, row)
+      return row
+    })
+    db.assessmentReferenceSet.findUnique.mockImplementation(async ({ where }: any) => references.get(where.instrumentType_instrumentKey_referenceVersion.referenceVersion) ?? null)
+    Object.assign(db.assessmentReferenceSet, { create: vi.fn(async ({ data }: any) => { references.set(data.referenceVersion, data); return data }) })
     const plan = await planScaleInstrumentInstall(db as never, installInput)
-    expect(plan.allowActivation).toBe(false)
-    expect(plan.blockers).toContain('instruction:INSTRUCTION_NOT_DECLARED')
-    await expect(materializeScaleInstrumentContent(db as never, input)).rejects.toThrow('INSTRUCTION_NOT_DECLARED')
-    expect(db.scale.create).not.toHaveBeenCalled()
+    expect(plan.allowActivation).toBe(true)
+    expect(plan.instruction).toEqual({ binding: null, diagnostics: ['instruction:INSTRUCTION_NOT_DECLARED'] })
+    await seedScalePackages(db as never, input.actorUserId)
+    expect(scales.size).toBe(1)
+    expect(scales.get(key)).toMatchObject({ instruction: null, status: 'DRAFT', visibility: 'HIDDEN', instrumentVersion: version })
+    expect(db.scale.create).toHaveBeenCalledTimes(1)
+    const again = await materializeScaleInstrumentContent(db as never, input)
+    expect(again.created).toBe(false)
+    expect(db.scale.update).not.toHaveBeenCalled()
+    expect(again.instruction.diagnostics).toContain('instruction:INSTRUCTION_NOT_DECLARED')
+    expect(state.registry.getSource(key, version).instruction).toBeUndefined()
     const explicitlyDeclared = { ...originalSource(), instruction: { schemaVersion: 1 as const, text: '原文字节', language: 'zh-CN', version: 'synthetic-reviewed-1', source: 'Synthetic explicit declaration, not an inferred migration' } }
     expect(resolveScaleAdmissionInstruction(explicitlyDeclared).binding).toMatchObject({ origin: 'INSTRUMENT_SOURCE', text: '原文字节', version: 'synthetic-reviewed-1' })
-    expect(source.instruction).toBeUndefined()
-  })
-})
+  })})

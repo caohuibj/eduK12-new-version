@@ -42,6 +42,7 @@ export interface InstallScaleInstrumentPlan {
   referenceUnchanged: string[]
   allowActivation: boolean
   blockers: string[]
+  instruction: ReturnType<typeof resolveScaleAdmissionInstruction>
   manualReview: { localization: string[]; scientificReview: unknown; rights: unknown; reportQc: unknown }
 }
 
@@ -81,7 +82,6 @@ const resolvePlan = async (
     select: { id: true, instrumentClass: true, instrumentVersion: true, definitionHash: true, definition: true, status: true, instruction: true },
   })
   const instruction = resolveScaleAdmissionInstruction(source, scale)
-  blockers.push(...instruction.blockers)
   if (scale) {
     if (scale.instrumentClass !== 'STANDARD') blockers.push('SCALE_CODE_OWNED_BY_CUSTOM_INSTRUMENT')
     if (scale.instrumentVersion !== input.instrumentVersion) blockers.push('DEPLOYMENT_VERSION_CONFLICT')
@@ -148,6 +148,7 @@ const resolvePlan = async (
     referenceUnchanged,
     allowActivation: [...new Set(blockers)].length === 0,
     blockers: [...new Set(blockers)].sort(),
+    instruction,
     manualReview: { localization: scaleLocalizationManualIssues(source), scientificReview: source.scientificReview ?? null, rights: source.executable.definition.license, reportQc: source.executable.definition.report.audienceContract?.qcReview ?? null },
   }
 }

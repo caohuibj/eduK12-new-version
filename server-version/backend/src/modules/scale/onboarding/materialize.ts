@@ -30,7 +30,6 @@ export const materializeScaleInstrumentContent = async (db: Db, input: {
   const definitionCounts = counts(executable.definition)
   let scale = await db.scale.findUnique({ where: { code: input.instrumentKey } })
   const instruction = resolveScaleAdmissionInstruction(source, scale)
-  if (instruction.blockers.length) throw new Error(`Scale materialization blocked: ${instruction.blockers.join('; ')}`)
   let created = false
   if (!scale) {
     scale = await db.scale.create({
@@ -49,7 +48,7 @@ export const materializeScaleInstrumentContent = async (db: Db, input: {
         estimatedTime: source.catalog.administration.estimatedMinutes,
         // STANDARD rows are platform-owned content: the source instruction is
         // the authoritative wording and is materialized with the definition.
-        instruction: instruction.binding!.text,
+        instruction: instruction.binding?.text ?? null,
         creatorId: input.actorUserId,
         tags: [source.catalog.construct.primaryDomain],
       },
@@ -71,7 +70,7 @@ export const materializeScaleInstrumentContent = async (db: Db, input: {
           itemCount: definitionCounts.itemCount,
           dimensionCount: definitionCounts.dimensionCount,
           estimatedTime: source.catalog.administration.estimatedMinutes,
-          instruction: instruction.binding!.text,
+          ...(source.instruction ? { instruction: source.instruction.text } : {}),
         },
       })
     } else if (source.instruction && (scale.instruction ?? null) !== source.instruction.text) {
@@ -111,5 +110,5 @@ export const materializeScaleInstrumentContent = async (db: Db, input: {
     }
     referenceUnchanged.push(reference.referenceVersion)
   }
-  return { scale, created, definitionHash, referenceCreates, referenceUnchanged }
+  return { scale, created, definitionHash, referenceCreates, referenceUnchanged, instruction }
 }

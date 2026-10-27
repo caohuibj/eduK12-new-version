@@ -38,7 +38,6 @@ export const planStandardScalePublication = async (db: Db, value: Input) => {
   const qualification = evaluateScaleSourceScientificQualification(source)
   const scale = await db.scale.findUnique({ where: { code: input.instrumentKey } })
   const instruction = resolveScaleAdmissionInstruction(source, scale)
-  blockers.push(...instruction.blockers)
   const active = scale ? await readActiveScaleDeployment(db, scale.id) : null
   if (!scale) blockers.push('SCALE_NOT_INSTALLED')
   if (!active) blockers.push('DEPLOYMENT_BINDING_MISSING')
@@ -53,7 +52,7 @@ export const planStandardScalePublication = async (db: Db, value: Input) => {
     definitionHash: hashScaleDefinition(source.executable.definition), sourceHash: canonicalHash({ ...source, executable: { ...source.executable, scorerPlugins: source.executable.scorerPlugins?.map(({ key, version }) => ({ key, version })) ?? [] } }),
     deploymentPolicyHash: active?.policyHash ?? null, deploymentRevision: active?.revision ?? null,
     scientificMaturity: source.catalog.scientificMaturity, qualification,
-    instruction: instruction.binding,
+    instruction: instruction.binding, instructionDiagnostics: instruction.diagnostics,
     manualReview: { localization: scaleLocalizationManualIssues(source), rights: source.executable.definition.license, reportQc: source.executable.definition.report.audienceContract?.qcReview ?? null },
     ...(input.allowedProducts?{allowedProducts:exactToolEntryProducts(input.allowedProducts)}:{}),visibility: input.visibility, previousStatus: scale?.status ?? null, previousVisibility: scale?.visibility ?? null,
   }
