@@ -25,7 +25,9 @@ export const databaseProgress={run:40439156003,head:'61c3d874a2b546971ed27a0eadf
 export const progressArtifacts={checks:{id:12704938910,sha:'441b7c3007dc9af8eb13a306f33e61bce3ac5e291070fdf3a3547f56e466a21f',prefix:'pr357-backend-checks-',job:121975194420}};
 export const quotaProgress={run:40440930935,head:'976e854339e046dba7dfe268794b498d171b51bc',checkout:'7a9c922d943a0967b8dabcc1d43bed264325c611',tree:'2dbb191477b23dcbd540666c1dc29bfc6613a09d',scopeJobs:[121980832682,121980920294]};
 export const quotaArtifacts={checks:{id:12706064269,sha:'86578174eda2c428141a891dd2d5e5a9c8b36da1f65099236fe88132be5469f1',prefix:'pr357-backend-checks-',job:121980995966}};
-function evidencePins(delivered){assert([false,true,'database','quota'].includes(delivered));return delivered==='quota'?[quotaProgress,quotaArtifacts]:delivered==='database'?[databaseProgress,progressArtifacts]:delivered?[deliveredFrontend,deliveredArtifacts]:[original,artifacts];}
+export const deliveredBackend={run:40441725961,head:'c8fef09433e536f8049d3a74c959de55d35c3c8a',checkout:'d1a1dda7f1b16558e59a28c830579a50ba5efedd',tree:'29eb1ceace745f80a511617b7f48fed944082d06',scopeJobs:[121983405334,121983495599]};
+export const backendArtifacts={checks:{id:12707500412,sha:'407f558c8e76984faf3b51d2c96e2d62359e271291ba4dba62582903e9a3ffd1',prefix:'pr357-backend-checks-',job:121983573857},build:{id:12707045680,sha:'4d0d603fc5b05944d42072839f36f18d8beb932031ec4edae616c0ef4206c81a',prefix:'pr357-backend-',job:121983573857}};
+function evidencePins(delivered){assert([false,true,'database','quota','backend'].includes(delivered));return delivered==='backend'?[deliveredBackend,backendArtifacts]:delivered==='quota'?[quotaProgress,quotaArtifacts]:delivered==='database'?[databaseProgress,progressArtifacts]:delivered?[deliveredFrontend,deliveredArtifacts]:[original,artifacts];}
 export const changedFixtureFiles=['src/huiteacher/HuiteacherAssessmentMediaHost.test.tsx','src/school/SchoolBoundContinuation.test.tsx'];
 const git=(...a)=>execFileSync('git',a,{encoding:'utf8'}).trim(),sha=x=>createHash('sha256').update(x).digest('hex');
 export function verifyContinuationInputs(read=git){
@@ -49,13 +51,13 @@ export async function loadOriginal(kind,delivered=false){
  const run=await api('/actions/runs/'+pin.run);assert.equal(run.head_sha,pin.head);assert.equal(run.event,'pull_request');assert.equal(run.head_branch,binding.branch);assert.equal(run.path,'.github/workflows/ci.yml');assert.equal(run.run_attempt,1);
  for(const id of (pin.scopeJobs??[121952530408,121952617241])){const source=await api('/actions/jobs/'+id);assert.equal(source.run_id,pin.run);assert.equal(source.head_sha,pin.head);assert.equal(source.conclusion,'success');}
  const meta=await api('/actions/artifacts/'+a.id);verifyOriginalArtifact(meta,kind,Date.now(),delivered);
- const job=await api('/actions/jobs/'+a.job);assert.equal(job.run_id,pin.run);assert.equal(job.head_sha,pin.head);assert.equal(job.status,'completed');assert.equal(job.conclusion,delivered===true||kind==='audit'?'success':'failure');
+ const job=await api('/actions/jobs/'+a.job);assert.equal(job.run_id,pin.run);assert.equal(job.head_sha,pin.head);assert.equal(job.status,'completed');assert.equal(job.conclusion,delivered===true||delivered==='backend'||kind==='audit'?'success':'failure');
  if(kind==='build'&&!delivered)for(const name of ['compile backend once using the unchanged production build dependencies','Run actions/upload-artifact@v4'])assert(job.steps.some(s=>s.name===name&&s.conclusion==='success'),'Original producer step did not succeed');
  const response=await trustedGet('https://api.github.com/repos/'+repo+'/actions/artifacts/'+a.id+'/zip',{headers:{Authorization:'Bearer '+process.env.GH_TOKEN},redirect:'manual'});let bytes;
  if(response.status===302){const location=new URL(response.headers.get('location'));assert.equal(location.protocol,'https:');assert(/(^|\.)(blob\.core\.windows\.net|githubusercontent\.com|s3\.amazonaws\.com)$/.test(location.hostname),'Unexpected artifact storage host');const r=await trustedGet(location);assert.equal(r.status,200);bytes=Buffer.from(await r.arrayBuffer());}
  else{assert.equal(response.status,200);bytes=Buffer.from(await response.arrayBuffer());}
  assert(bytes.length<32*1024*1024);assert.equal(sha(bytes),a.sha,'Original ZIP digest mismatch');
- const root=resolve(process.env.RUNNER_TEMP),dir=join(root,'pr357-original-'+(delivered==='quota'?'quota-':delivered==='database'?'database-':delivered?'delivered-':'')+kind),zip=dir+'.zip';mkdirSync(dir,{recursive:false});writeFileSync(zip,bytes,{mode:0o600});
+ const root=resolve(process.env.RUNNER_TEMP),dir=join(root,'pr357-original-'+(delivered==='backend'?'backend-complete-':delivered==='quota'?'quota-':delivered==='database'?'database-':delivered?'delivered-':'')+kind),zip=dir+'.zip';mkdirSync(dir,{recursive:false});writeFileSync(zip,bytes,{mode:0o600});
  const names=execFileSync('unzip',['-Z1',zip],{encoding:'utf8'}).trim().split('\n');assert.equal(new Set(names).size,names.length);assert(names.every(n=>/^[A-Za-z0-9_./-]+$/.test(n)&&!n.startsWith('/')&&!n.split('/').includes('..')));
  execFileSync('unzip',['-q',zip,'-d',dir]);
  return {dir,proof:{run:pin.run,head:pin.head,checkout:pin.checkout,artifactId:a.id,zipSHA256:a.sha,jobId:a.job,originalJobConclusion:job.conclusion},read:name=>JSON.parse(readFileSync(join(dir,name),'utf8'))};
@@ -131,4 +133,19 @@ export async function quotaContinuation(progress){
  assert.equal(git('rev-parse',quotaProgress.head+'^{tree}'),quotaProgress.tree);assert.equal(git('rev-parse',quotaProgress.head+':server-version/backend'),original.backendTree);
  const old=await loadOriginal('checks','quota'),report=old.read('postgres-5.json');
  return {proof:old.proof,originalReport:report,qualification:verifyQuotaContinuation(report,progress.acceptedRosterNames)};
+}
+
+export async function copyDeliveredBackend(){
+ verifyContinuationInputs();assert.equal(git('rev-parse',deliveredBackend.head+'^{tree}'),deliveredBackend.tree);assert.equal(git('rev-parse',deliveredBackend.head+':server-version/backend'),original.backendTree);
+ const prior=await testContinuation('backend'),progress=await databaseContinuation(prior),quota=await quotaContinuation(progress),checks=await loadOriginal('checks','backend');
+ const candidate=r=>{assert.equal(r.candidate.head,deliveredBackend.checkout);assert.equal(r.candidate.tree,deliveredBackend.tree);assert.equal(r.candidate.run,String(deliveredBackend.run));assert.equal(r.candidate.attempt,'1');};
+ const counts=[1,1,3,2,2,4,4],files=binding.tests.backend.filter(p=>p.includes('.postgres.')),reports=[];
+ for(const [label,file,count]of [...counts.map((total,i)=>['postgres-'+(i+6),files[i+6],total]),['compact-report',files[11],4]]){
+  const r=checks.read(label+'.json'),v=checks.read(label+'-verified.json');candidate(v);assert.deepEqual({files:v.files,passed:v.passed,failed:v.failed,pending:v.pending},{files:1,passed:count,failed:0,pending:0});
+  assert.equal(r.success,true);assert.equal(r.numPassedTests,count);assert.equal(r.numFailedTests,0);assert.equal(r.numPendingTests,0);assert.equal(r.testResults.length,1);assert(r.testResults[0].name.endsWith('/'+file));assert.equal(r.testResults[0].status,'passed');assert.equal(r.testResults[0].assertionResults.length,count);assert(r.testResults[0].assertionResults.every(a=>a.status==='passed'));reports.push({label,report:r,verification:v});
+ }
+ const restore=checks.read('restore.json');candidate(restore);assert.equal(restore.status,'PASS');assert.deepEqual(restore.tables.map(t=>[t.table,t.count]),[['campus_personnel_import_batches',1],['campus_personnel',1],['campus_personnel_assignments',0],['campus_personnel_credentials',0],['education_roster_import_jobs',1],['education_roster_import_parts',1]]);assert(restore.tables.every(t=>/^[a-f0-9]{64}$/.test(t.hash)));
+ const scan=checks.read('backend-scan.json');assert.equal(scan.ArtifactID,'sha256:6bab0b9dcd168a7836d193aa3ab8acb7cded40ec7ab5c069ec55b69f38d9cdbf');assert(Array.isArray(scan.Results));assert(!scan.Results.some(r=>(r.Vulnerabilities??[]).some(v=>['HIGH','CRITICAL'].includes(v.Severity))));
+ const built=await loadOriginal('build','backend'),manifest=built.read('ci-build-manifest.json');verifyManifest(manifest,{schemaVersion:1,kind:'backend',sha:deliveredBackend.checkout,runId:String(deliveredBackend.run),lockDigest:sha(readFileSync('server-version/backend/package-lock.json'))},treeDigest(built.dir));cpSync(built.dir,resolve('server-version/backend/dist'),{recursive:true,errorOnExist:true,force:false});
+ return {status:'REUSED_COMPLETE_BACKEND_QUALIFICATION_NOT_RETESTED_OR_REBUILT',componentTree:original.backendTree,originalManifest:manifest,buildProof:built.proof,checksProof:checks.proof,prior,progress,quota,reports,restore,scan};
 }

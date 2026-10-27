@@ -35,10 +35,18 @@ test('service and runner contexts are bound in steps, never in job env',()=>{
  const check=text=>{for(const match of text.matchAll(/^    env:\n([\s\S]*?)(?=^    \S|^  \S|$(?![\s\S]))/gm))assert(!/\$\{\{\s*(job|runner|steps)\./.test(match[1]),'Unavailable job env context');};
  assert.throws(()=>check("  backend:\n    env:\n      DATABASE_URL: ${{ job.services.postgres.id }}\n    steps:\n"));
  assert.throws(()=>check("  connected:\n    env:\n      PRIVATE_DIR: ${{ runner.temp }}\n    steps:\n"));
- check(yaml);assert.equal((yaml.match(/name: bind service endpoints only after runner service initialization/g)||[]).length,2);assert.match(yaml,/^      env:\n        DATABASE_URL: .*job.services/m);
+ const backend=yaml.split('  pr357-backend:')[1].split('  pr357-audit:')[0];assert.doesNotMatch(backend,/services:|pr357-checks.mjs database|docker buildx build/);assert.match(backend,/pr357-checks.mjs backend-reuse/);check(yaml);assert.equal((yaml.match(/name: bind service endpoints only after runner service initialization/g)||[]).length,1);assert.match(yaml,/^      env:\n        DATABASE_URL: .*job.services/m);
 });
 test('inline PR357 adds no reusable-workflow references and retains the preexisting bounded call graph',async()=>{
  const graph=read=>{const seen=new Set();function walk(path){if(seen.has(path))return;seen.add(path);const text=read(path);for(const m of text.matchAll(/uses:\s*["']?(\.\/\.github\/workflows\/[A-Za-z0-9._-]+\.ya?ml)/g))walk(m[1].slice(2));}walk('.github/workflows/ci.yml');return [...seen].sort();};
  const previous=binding.reusableWorkflows;const current=graph(path=>readFileSync(path,'utf8'));
  assert.deepEqual(current,previous,'Do not remove old gates or add the 51st reusable workflow');assert(current.length-1<=50,'At most 50 referenced workflows, excluding the top-level caller');assert(!current.includes('.github/workflows/ci-pr357.yml'));
+});
+test('browser environment repair is limited to the approved opt directory and read-only font diagnostics',()=>{
+ const text=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
+ const block=text.split('  pr357-connected:')[1].split('  pr357:')[0];
+ assert.match(block,/p='\/opt';st=os.lstat\(p\)/);assert.match(block,/os.chmod\(p,0o755\)/);
+ assert.equal((block.match(/os.chmod\(/g)||[]).length,1);assert.doesNotMatch(block,/chmod -R|no-sandbox|disable-setuid-sandbox/);
+ assert(block.indexOf('school-teacher-chrome.cjs preflight')<block.indexOf('school-teacher-fixture.cjs seed'));
+ assert.match(block,/'readOnly':True/);
 });

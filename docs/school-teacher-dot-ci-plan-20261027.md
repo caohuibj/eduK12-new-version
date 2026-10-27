@@ -130,3 +130,24 @@ This seed is storage-only, not a new permission, profile-decryption or business
 qualification. Its actual creation was diagnosed with local PG17, not claimed
 as formal PG16 restore success. Remaining PG6–12/compact/restore/runtime scan and
 browser stay required; no passing application checks or compilation are repeated.
+
+## Browser environment-only continuation (03:32 UTC)
+
+Run40441725961 completed backend121983573857 successfully, including missing
+PG17 cases, compact4, nonempty restore and runtime scan. Both application
+qualifications are now fixed-source complete proofs; backend reuse authenticates
+original partial-run chains plus this successful producer, every final report,
+restore, image scan and original build manifest. No database services, application
+tests, Docker repackaging or scans run in the backend reuse job. Actual changed
+control analysis and stable gate remain mandatory.
+
+Browser121985132030 stopped before launch: /opt root:root0777 violated the
+unchanged trusted-directory rule; fonts returned CJK_FONT_FILE_UNTRUSTED without
+a precise path. On2026-10-27 03:31UTC the user explicitly approved tightening
+only /opt to0755 on the disposable GitHub runner. The step verifies exact real
+root-owned directory/current mode, changes only that directory, and reads it
+back. No sandbox disable, permission relaxation, recursive chmod or production
+change. Font path metadata is read-only and constrained to /usr/share/fonts;
+any additional permission action needs its own specific approval. Preflight is
+moved before fixture seed so unavailable browser safety does not create unused
+fixture data. Actual browser journey remains NOTRUN, never replaced by preflight.

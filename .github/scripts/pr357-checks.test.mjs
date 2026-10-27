@@ -72,3 +72,10 @@ test('completed quota original report requires exact run artifact and actual Vit
  const wrong={success:true,numPassedTests:1,numFailedTests:0,numPendingTests:16,testResults:[{name:'/app/'+rosterFile,status:'passed',assertionResults:[{fullName:quotaName,status:'passed'},...accepted.map(fullName=>({fullName,status:'pending'}))]}]};
  assert.throws(()=>verifyQuotaContinuation(wrong,accepted));
 });
+import {deliveredBackend,backendArtifacts} from './pr357-continuation.mjs';
+test('complete backend qualification is pinned to the actual successful producer',()=>{
+ const now=Date.now(),a=backendArtifacts.checks,m={id:a.id,name:a.prefix+deliveredBackend.checkout,expired:false,digest:'sha256:'+a.sha,workflow_run:{id:deliveredBackend.run,head_sha:deliveredBackend.head,head_branch:binding.branch},size_in_bytes:115775,created_at:new Date(now-1000).toISOString()};
+ assert.equal(verifyOriginalArtifact(m,'checks',now,'backend').id,a.id);
+ assert.throws(()=>verifyOriginalArtifact({...m,id:quotaArtifacts.checks.id},'checks',now,'backend'));
+ assert.throws(()=>verifyOriginalArtifact({...m,workflow_run:{...m.workflow_run,id:quotaProgress.run}},'checks',now,'backend'));
+});

@@ -1755,31 +1755,7 @@ jobs:
     - pr357-admission
     runs-on: ubuntu-24.04
     timeout-minutes: 30
-    services:
-      postgres:
-        image: postgres:16.15-bookworm
-        env:
-          POSTGRES_DB: pr357_upgrade_ci_test
-          POSTGRES_USER: ptool
-          POSTGRES_PASSWORD: synthetic-actions-disposable
-        ports:
-        - 5432/tcp
-        options: --health-cmd "pg_isready -U ptool -d pr357_upgrade_ci_test" --health-interval 5s --health-timeout 5s --health-retries 20
-      redis:
-        image: redis:7.4.11-bookworm
-        ports:
-        - 6379/tcp
-        options: --health-cmd "redis-cli ping" --health-interval 5s --health-timeout 5s --health-retries 20
     steps:
-    - name: bind service endpoints only after runner service initialization
-      env:
-        DATABASE_URL: postgresql://ptool:synthetic-actions-disposable@127.0.0.1:${{ job.services.postgres.ports['5432'] }}/pr357_upgrade_ci_test
-        CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
-        REDIS_URL: redis://127.0.0.1:${{ job.services.redis.ports['6379'] }}/14
-      run: |
-        for key in DATABASE_URL CI_POSTGRES_SERVICE_ID REDIS_URL; do
-          printf '%s=%s\n' "$key" "${!key}" >> "$GITHUB_ENV"
-        done
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
@@ -1788,38 +1764,16 @@ jobs:
       with:
         node-version: 24.21.0
     - run: node .github/scripts/pr357-checks.mjs source
-    - uses: docker/setup-buildx-action@v3
-    - name: reuse the verified original backend compilation and package identical source
+    - name: retain completed backend checks and transfer the original compiled artifact
       env:
         GH_TOKEN: ${{ github.token }}
-      run: |
-        mkdir -p pr357-evidence
-        node .github/scripts/pr357-checks.mjs prepare-backend
-        unset GH_TOKEN
-        python3 - <<'PY'
-        from pathlib import Path
-        source=Path('server-version/backend/Dockerfile').read_text()
-        assert source.count('RUN npm run build')==1
-        Path('pr357.Dockerfile').write_text(source.replace('RUN npm run build','COPY --from=qualified_dist . /app/dist'))
-        PY
-        docker buildx build --load --build-context qualified_dist=server-version/backend/dist --build-arg DEBIAN_MIRROR=deb.debian.org --target build -f pr357.Dockerfile -t pr357-build server-version/backend
+      run: node .github/scripts/pr357-checks.mjs backend-reuse
     - uses: actions/upload-artifact@v4
       with:
         name: pr357-backend-${{ github.sha }}
         path: server-version/backend/dist
         if-no-files-found: error
         retention-days: 3
-    - name: upgrade nonempty baseline then execute isolated affected consumers and restore
-      run: node .github/scripts/pr357-checks.mjs database
-      env:
-        GH_TOKEN: ${{ github.token }}
-    - name: package the already compiled backend without another compilation
-      run: docker buildx build --load --build-context qualified_dist=server-version/backend/dist --build-arg DEBIAN_MIRROR=deb.debian.org --target runtime -f pr357.Dockerfile -t pr357-runtime server-version/backend
-    - uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514
-      with:
-        version: v0.70.0
-        cache: false
-    - run: trivy image --exit-code 1 --ignore-unfixed --scanners vuln --severity HIGH,CRITICAL --format json --output pr357-evidence/backend-scan.json pr357-runtime
     - uses: actions/upload-artifact@v4
       if: always()
       with:
@@ -1954,12 +1908,41 @@ jobs:
         node server-version/backend/node_modules/prisma/build/index.js generate --schema server-version/backend/prisma/schema.prisma
         node .github/scripts/ci-artifact.mjs verify frontend
         node .github/scripts/ci-artifact.mjs verify backend
+    - name: apply the specifically approved ephemeral opt directory hardening and inspect font paths
+      run: |
+        # User approval 2026-10-27 03:31 UTC covers only /opt on this job runner.
+        sudo python3 - <<'PYOPT'
+        import os,stat
+        p='/opt';st=os.lstat(p)
+        assert stat.S_ISDIR(st.st_mode) and not stat.S_ISLNK(st.st_mode)
+        assert st.st_uid==0 and st.st_gid==0 and os.path.realpath(p)==p
+        assert stat.S_IMODE(st.st_mode) in (0o777,0o755)
+        os.chmod(p,0o755)
+        assert stat.S_IMODE(os.lstat(p).st_mode)==0o755
+        PYOPT
+        python3 - <<'PYFONT'
+        import subprocess,os,stat,json,pathlib
+        paths=subprocess.check_output(['/usr/bin/fc-list','--format','%{file}\n'],text=True).splitlines()
+        rows=[]
+        for file in sorted(set(paths)):
+          if not file.startswith('/usr/share/fonts/'):
+            continue
+          for p in [pathlib.Path(file),*pathlib.Path(file).parents]:
+            if str(p)=='/':continue
+            st=os.lstat(p)
+            if st.st_uid!=0 or stat.S_IMODE(st.st_mode)&0o022 or stat.S_ISLNK(st.st_mode):
+              row={'path':str(p),'uid':st.st_uid,'gid':st.st_gid,'mode':oct(stat.S_IMODE(st.st_mode)),'symlink':stat.S_ISLNK(st.st_mode)}
+              if row not in rows:rows.append(row)
+        out=pathlib.Path('school-teacher-evidence');out.mkdir(exist_ok=True)
+        (out/'font-path-diagnostics.json').write_text(json.dumps({'readOnly':True,'untrustedPaths':rows},indent=2))
+        print(json.dumps({'readOnly':True,'untrustedPaths':rows}))
+        PYFONT
+    - name: require official sandboxed Chrome without weakening security checks
+      run: node server-version/e2e/school-teacher-chrome.cjs preflight
     - name: prepare browser-only disposable schema and actual restricted principal
       run: |
         node server-version/backend/node_modules/prisma/build/index.js migrate deploy --schema server-version/backend/prisma/schema.prisma
         node server-version/e2e/school-teacher-fixture.cjs seed
-    - name: require official sandboxed Chrome without changing security settings
-      run: node server-version/e2e/school-teacher-chrome.cjs preflight
     - name: execute existing real product journey and its assertion matrix against the same artifacts
       env:
         SCHOOL_TEACHER_ARTIFACTS_VERIFIED: '1'
