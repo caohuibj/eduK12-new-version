@@ -191,6 +191,12 @@ const SCORING_DECLARATIONS: Record<string, CognitiveScoringContractDeclaration> 
     runtimeReconstructableFacts: ['面孔身份与目标情绪（合成集 + seed）', '正确应答'],
     serverDerivedFacts: ['正确性判定', 'metrics（balancedAccuracy/confusionMatrix）', 'quality flags'],
   },
+  numberline: {
+    testType: 'numberline',
+    clientObservedFacts: ['线上点击位置比例（responsePosition）', 'raw RT', 'interrupted'],
+    runtimeReconstructableFacts: ['逐试次目标数（seed/config 分层序列）', '数字线端点（frozen config）'],
+    serverDerivedFacts: ['估计值/绝对误差/符号误差换算', 'metrics（paePercent/biasPercent/withinTenRate）', 'quality flags'],
+  },
 }
 
 // 当前通用事实（所有任务一致）：完整加密 trial payload、v2 trial envelope qualityEvents、
@@ -321,6 +327,11 @@ const RESEARCH_CAPTURE_DECLARATIONS: Record<string, CognitiveResearchCaptureDecl
     testType: 'emotionrecognition',
     currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE],
     futureCaptureFacts: ['真实 input modality', 'device provenance', 'viewport/dpr'],
+  },
+  numberline: {
+    testType: 'numberline',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次 responsePosition 与 raw RT'],
+    futureCaptureFacts: ['输入通道区分（touch/mouse/keyboard 定位）', 'device provenance', 'viewport/dpr'],
   },
 }
 

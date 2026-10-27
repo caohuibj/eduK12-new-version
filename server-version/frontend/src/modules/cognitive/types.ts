@@ -364,3 +364,25 @@ export type StroopTrialPayload = {
   rtMs: number | null
   interrupted: boolean
 }
+
+/** Numberline 冻结 config（与后端 numberline.config schema 一致）。 */
+export interface NumberlineConfig {
+  totalTrials: number
+  lineMax: number
+  maxResponseMs: number
+  validRtFloorMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+/** Numberline 单 trial payload（与后端 numberline.trial schema 一致）。 */
+export type NumberlineTrialPayload = {
+  targetNumber: number
+  responsePosition: number | null
+  rtMs: number | null
+  interrupted: boolean
+}
