@@ -339,7 +339,8 @@ export async function readEducationAssessmentRegistration(c:EducationAssessmentC
 /** Management picker metadata only. Exact source payload, copyright, lifecycle
  * and the complete grant set are revalidated at prepare/register, not inferred
  * from this navigation projection. No arbitrary Training library is enumerated. */
-export async function listEducationAssessmentSourceCandidates(c:EducationAssessmentContext){
+export async function listEducationAssessmentSourceCandidates(c:EducationAssessmentContext,cursor?:string){
+ if(cursor)uuid.parse(cursor)
  return transaction(async tx=>{
   // Discovery precedes the existing source-advisory -> Org lock boundary. It
   // authorizes no response; every emitted source grant is checked again below.
@@ -349,13 +350,13 @@ export async function listEducationAssessmentSourceCandidates(c:EducationAssessm
    WHERE grant_row.subject_id=${c.principal.userId} AND grant_row.product=${c.product} AND grant_row.scope_kind='ORGANIZATION'
     AND grant_row.scope_id=${c.organizationId} AND grant_row.resource_kind='material' AND 'material.distribute'=ANY(grant_row.capabilities)
     AND grant_row.revoked_at IS NULL AND grant_row.valid_from<=(clock_timestamp() AT TIME ZONE 'UTC') AND grant_row.expires_at>(clock_timestamp() AT TIME ZONE 'UTC')
-    AND composite.status='PUBLISHED' ORDER BY composite.id LIMIT 51`)
-  if(candidates.length>50)fail('EDUCATION_ASSESSMENT_CANDIDATE_BOUND')
+    AND composite.status='PUBLISHED' ${cursor?Prisma.sql`AND composite.id>${cursor}`:Prisma.empty} ORDER BY composite.id LIMIT 51`)
+  const page=candidates.slice(0,50),nextCursor=candidates.length>50?page[49].id:null
   const identities=new Map<string,Awaited<ReturnType<typeof lockEducationAssessmentSourceIdentities>>>()
-  for(const candidate of candidates)identities.set(candidate.id,await lockEducationAssessmentSourceIdentities(tx,candidate.id))
+  for(const candidate of page)identities.set(candidate.id,await lockEducationAssessmentSourceIdentities(tx,candidate.id))
   await lockEducationAssessmentOrganization(tx,c);await captureEducationAssessmentIssuer(tx,c)
   const list=[]
-  for(const candidate of candidates){
+  for(const candidate of page){
    const sourceLicenses=await discoverLicenses(tx,c,[candidate.id])
    if(!sourceLicenses)continue
    let licenses:License[]|null=null,unavailableReason:'SOURCE_NOT_AVAILABLE'|'MISSING_DISTRIBUTION_AUTHORITY'|null=null
@@ -371,18 +372,18 @@ export async function listEducationAssessmentSourceCandidates(c:EducationAssessm
    list.push({sourceCompositeId:candidate.id,title:candidate.name,canPrepare:unavailableReason===null,
     canPublish:false as const,unavailableReason,licenses:unavailableReason===null?licenses!:[]})
   }
-  return {list}
+  return {list,nextCursor}
  })
 }
-export async function listEducationAssessmentContentChoices(c:EducationAssessmentContext,id:string){
- uuid.parse(id)
+export async function listEducationAssessmentContentChoices(c:EducationAssessmentContext,id:string,cursor?:string){
+ uuid.parse(id);if(cursor)uuid.parse(cursor)
  return transaction(async tx=>{
   const p=await findPreparation(tx,c,id)
   await boundary(tx,c,p.sourceCompositeId,[p.createdAuthority])
   if(p.createdAuthority.actorId!==c.principal.userId)fail('EDUCATION_ASSESSMENT_PREPARATION_OWNER_REQUIRED',403)
   await readRuntime(tx,c,p)
   await assertEducationAssessmentDistributionCurrent(tx,p)
-  if(!p.snapshot.units.length)return {units:[],emptySelectionAllowed:true}
+  if(!p.snapshot.units.length)return {units:[],emptySelectionAllowed:true,nextCursor:null}
   const measurementIds=[...new Set(p.snapshot.units.map(unit=>unit.measurement.releaseId))]
   const rows=await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`
    SELECT DISTINCT release.id FROM measurement_content_releases release
@@ -395,12 +396,12 @@ export async function listEducationAssessmentContentChoices(c:EducationAssessmen
     AND grant_row.subject_id=${c.principal.userId} AND grant_row.product=${c.product} AND grant_row.scope_kind='ORGANIZATION'
     AND grant_row.scope_id=${c.organizationId} AND grant_row.resource_kind='material' AND 'material.distribute'=ANY(grant_row.capabilities)
     AND grant_row.revoked_at IS NULL AND grant_row.valid_from<=(clock_timestamp() AT TIME ZONE 'UTC') AND grant_row.expires_at>(clock_timestamp() AT TIME ZONE 'UTC')
-   ORDER BY release.id LIMIT 51`)
-  if(rows.length>50)fail('EDUCATION_ASSESSMENT_CANDIDATE_BOUND')
-  const releases=await getContentReleaseBatch(tx,rows.map(row=>row.id),true),units=[]
+   ${cursor?Prisma.sql`AND release.id>${cursor}`:Prisma.empty} ORDER BY release.id LIMIT 51`)
+  const page=rows.slice(0,50),nextCursor=rows.length>50?page[49].id:null
+  const releases=await getContentReleaseBatch(tx,page.map(row=>row.id),true),units=[]
   for(const unit of p.snapshot.units){
    const references=[],reports=[]
-   for(const row of rows){
+   for(const row of page){
     const release=releases.get(row.id)
     if(!release||release.family!==unit.family)continue
     const matches=release.layer==='REFERENCE'?release.content.measurement.releaseId===unit.measurement.releaseId:
@@ -423,6 +424,6 @@ export async function listEducationAssessmentContentChoices(c:EducationAssessmen
    }
    units.push({itemId:unit.itemId,family:unit.family,measurement:unit.measurement,references,reports})
   }
-  return {units,emptySelectionAllowed:true}
+  return {units,emptySelectionAllowed:true,nextCursor}
  })
 }

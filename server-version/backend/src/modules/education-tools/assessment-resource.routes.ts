@@ -13,6 +13,7 @@ import * as service from './assessment-resource.service'
  * The product is selected by the authenticated router, never by the JSON body. */
 export function educationAssessmentResourceRouter(product:'SCHOOL'|'TEACHER',requireRecentMfa:RequestHandler){
  const router=Router({mergeParams:true}),id=z.string().guid()
+ const pageQuery=z.object({cursor:id.optional()}).strict()
  const context=(req:Request):EducationAssessmentContext=>{
   if(!req.user)throw new EducationAssessmentManagementError('UNAUTHENTICATED',401)
   return {principal:req.user,product,organizationId:id.parse(req.params.organizationId)}
@@ -28,11 +29,11 @@ export function educationAssessmentResourceRouter(product:'SCHOOL'|'TEACHER',req
    throw error
   }
  })
- router.get('/',handle(req=>service.listEducationAssessmentRegistrations(context(req),z.object({cursor:id.optional()}).strict().parse(req.query).cursor)))
- router.get('/source-candidates',handle(req=>service.listEducationAssessmentSourceCandidates(context(req))))
+ router.get('/',handle(req=>service.listEducationAssessmentRegistrations(context(req),pageQuery.parse(req.query).cursor)))
+ router.get('/source-candidates',handle(req=>service.listEducationAssessmentSourceCandidates(context(req),pageQuery.parse(req.query).cursor)))
  router.post('/preparations',requireRecentMfa,handle(req=>service.prepareEducationAssessment(context(req),req.body)))
  router.get('/preparations/:resourceId',handle(req=>service.readEducationAssessmentPreparation(context(req),id.parse(req.params.resourceId))))
- router.get('/preparations/:resourceId/content-choices',handle(req=>service.listEducationAssessmentContentChoices(context(req),id.parse(req.params.resourceId))))
+ router.get('/preparations/:resourceId/content-choices',handle(req=>service.listEducationAssessmentContentChoices(context(req),id.parse(req.params.resourceId),pageQuery.parse(req.query).cursor)))
  router.post('/preparations/:resourceId/register',requireRecentMfa,handle(req=>service.registerEducationAssessment(context(req),id.parse(req.params.resourceId),req.body)))
  router.get('/:resourceId',handle(req=>service.readEducationAssessmentRegistration(context(req),id.parse(req.params.resourceId))))
  for(const [path,action] of [['review','REVIEW'],['publish','PUBLISH'],['retire','RETIRE']] as const)

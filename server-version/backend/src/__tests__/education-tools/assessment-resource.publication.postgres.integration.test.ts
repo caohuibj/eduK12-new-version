@@ -207,7 +207,7 @@ suite('Education resource producer with real isolated PostgreSQL, source engines
   const f=await fixture(),p=await f.prepare(),unit=p.units[0]
   const listed=await service.listEducationAssessmentSourceCandidates(f.creator.context)
   expect(listed.list).toEqual([expect.objectContaining({sourceCompositeId:f.compositeId,canPrepare:true,licenses:[...f.licenses].sort((a,b)=>a.resourceId.localeCompare(b.resourceId))})])
-  expect(await service.listEducationAssessmentSourceCandidates(f.reviewer.context)).toEqual({list:[]})
+  expect(await service.listEducationAssessmentSourceCandidates(f.reviewer.context)).toEqual({list:[],nextCursor:null})
   const measurement=await db.$transaction(tx=>getContentRelease(tx,unit.measurement.releaseId))
   if(!measurement||measurement.layer!=='MEASUREMENT')throw new Error('Actual measurement missing')
   const metric=measurement.content.metrics[0].metricKey,entry=testReference().entries[0]
