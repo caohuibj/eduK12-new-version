@@ -3,9 +3,10 @@ import {afterEach,describe,it,expect,vi} from 'vitest'
 import {EducationAssessmentRegistrationPanel} from './EducationAssessmentRegistrationPanel'
 const id=(n:number)=>`00000000-0000-4000-8000-${String(n).padStart(12,'0')}`
 const base=`/organizations/${id(1)}/assessment-resource-registrations`
-const source={sourceCompositeId:id(2),title:'获授权来源',grantId:id(3),grantedResourceIds:[id(2),id(4)],canPublish:false}
-const prep={resourceId:id(8),product:'TEACHER',organizationId:id(1),family:'BUNDLE',sourceCompositeId:id(2),runtimeCompositeId:id(9),preparationHash:'p'.repeat(64),title:'新登记',canPublish:false,units:[{itemId:id(4),family:'COGNITIVE',measurement:{releaseId:id(5),contentHash:'a'.repeat(64),measurementHash:'b'.repeat(64)}}]}
-const options={emptySelectionAllowed:true,units:[{...prep.units[0],references:[{releaseId:id(6),contentHash:'c'.repeat(64),grantId:id(16),choices:[{entryKey:'approved-reference',metricKey:'accuracy',referenceKind:'PERCENTILE'}]}],reports:[{releaseId:id(7),contentHash:'d'.repeat(64),grantId:id(17),audience:'teacher',title:'批准报告',metricKeys:['accuracy']}]}]}
+const pinnedLicenses=[{resourceId:id(2),grantId:id(3)},{resourceId:id(5),grantId:id(15)},{resourceId:id(10),grantId:id(20)}]
+const source={sourceCompositeId:id(2),title:'获授权来源',canPrepare:true,unavailableReason:null,licenses:pinnedLicenses,canPublish:false}
+const prep={resourceId:id(8),product:'TEACHER',organizationId:id(1),family:'BUNDLE',sourceCompositeId:id(2),runtimeCompositeId:id(9),preparationHash:'p'.repeat(64),title:'新登记',canPublish:false,licenses:pinnedLicenses,units:[{itemId:id(4),family:'COGNITIVE',measurement:{releaseId:id(5),contentHash:'a'.repeat(64),measurementHash:'b'.repeat(64)}}]}
+const options={emptySelectionAllowed:true,units:[{...prep.units[0],references:[{releaseId:id(6),contentHash:'c'.repeat(64),selectable:true,unavailableReason:null,licenses:[{resourceId:id(6),grantId:id(16)},{resourceId:id(10),grantId:id(20)},{resourceId:id(11),grantId:id(21)}],choices:[{entryKey:'approved-reference',metricKey:'accuracy',referenceKind:'PERCENTILE'}]}],reports:[{releaseId:id(7),contentHash:'d'.repeat(64),selectable:true,unavailableReason:null,licenses:[{resourceId:id(7),grantId:id(17)},{resourceId:id(10),grantId:id(20)},{resourceId:id(11),grantId:id(21)},{resourceId:id(12),grantId:id(22)}],audience:'teacher',title:'批准报告',metricKeys:['accuracy']}]}]}
 afterEach(cleanup)
 function setup(custom?:(path:string,method:string,data:any)=>unknown){
  let preparedId=id(8)
@@ -55,7 +56,7 @@ describe('shared education registration management real client contracts',()=>{
  })
  it('freezes exact P/R, real grant ids, explicit scheduled UTC and respondent-only disclosure without publication flags',async()=>{
   const {api}=setup();await prepare()
-  expect(api).toHaveBeenCalledWith(base+'/preparations','POST',expect.objectContaining({licenses:[{resourceId:id(2),grantId:id(3)},{resourceId:id(4),grantId:id(3)}]}))
+  expect(api).toHaveBeenCalledWith(base+'/preparations','POST',expect.objectContaining({licenses:pinnedLicenses}))
   fireEvent.click(screen.getByRole('checkbox',{name:/approved-reference/}))
   fireEvent.change(screen.getByLabelText('精确报告 R'),{target:{value:id(7)}})
   fireEvent.change(screen.getByLabelText('本人披露'),{target:{value:'INDIVIDUAL_SUMMARY'}})
@@ -68,7 +69,8 @@ describe('shared education registration management real client contracts',()=>{
   expect(payload.feedbackPolicy).toEqual({schemaVersion:1,mode:'SCHEDULED',releaseAt:new Date('2099-01-02T03:04').toISOString()})
   expect(payload.references.units[0].choices).toEqual([{releaseId:id(6),entryKey:'approved-reference',priority:0}])
   expect(payload.reports).toEqual([{itemId:id(4),releaseId:id(7)}])
-  expect(payload.licenses).toContainEqual({resourceId:id(6),grantId:id(16)})
+  expect(payload.licenses).toEqual([...pinnedLicenses,...options.units[0].references[0].licenses,...options.units[0].reports[0].licenses].filter((row,index,all)=>all.findIndex(other=>other.resourceId===row.resourceId)===index).sort((a,b)=>a.resourceId.localeCompare(b.resourceId)))
+  expect(payload.disclosure.policyKey).toBe(`education-assessment:${(screen.getByLabelText('登记编号') as HTMLInputElement).value}:disclosure:v1`)
   expect(payload.disclosure.audiences.ORGANIZATION.mode).toBe('NONE')
   expect(payload.disclosure.audiences.RESPONDENT.metricKeys).toEqual(['accuracy'])
   expect(payload).not.toHaveProperty('approved');expect(screen.queryByLabelText('反馈开放方式')).not.toBeInTheDocument()
@@ -104,13 +106,60 @@ describe('shared education registration management real client contracts',()=>{
   expect(screen.queryByText(/旧学校记录/)).not.toBeInTheDocument();expect(screen.queryByLabelText('登记编号')).not.toBeInTheDocument()
  })
  it('recovers an existing preparation by id and reloads actual source and grant choices without creating another preparation',async()=>{
-  const {api}=setup((path,method)=>{if(path===base+'/'+id(8)&&method==='GET')throw Object.assign(Error('not registered'),{status:404})})
+  let reads=0
+  const {api}=setup((path,method)=>{if(path===base+'/'+id(8)&&method==='GET'&&++reads===1)throw Object.assign(Error('not registered'),{status:404});if(path===base+'/source-candidates')throw Error('不得重新发现 grant')})
   fireEvent.click(screen.getByRole('button',{name:'读取登记权限与资源'}))
   fireEvent.change(await screen.findByLabelText('登记编号'),{target:{value:id(8)}})
   fireEvent.click(screen.getByRole('button',{name:'回读准备或冻结登记'}))
   await screen.findByLabelText('披露政策编号（系统标识）')
-  expect(screen.getByLabelText('获授权来源')).toHaveValue(id(2))
-  expect(screen.getByRole('checkbox',{name:id(4)})).toBeChecked()
+  expect(screen.getByLabelText('登记标题')).toHaveValue(prep.title)
+  expect(api.mock.calls.some(([path])=>path===base+'/source-candidates')).toBe(false)
+  fireEvent.change(screen.getByLabelText('反馈开放方式'),{target:{value:'IMMEDIATE'}})
+  fireEvent.click(screen.getByRole('button',{name:'冻结登记为草稿'}))
+  await screen.findByLabelText('冻结登记详情')
+  expect(api.mock.calls.find(([path])=>path.endsWith('/register'))![2].licenses).toEqual(pinnedLicenses)
+ })
+ it('refuses multiple grant conflicts before POST rather than replacing a pinned source asset',async()=>{
+  const conflicting={...options,units:[{...options.units[0],references:[{...options.units[0].references[0],licenses:[{resourceId:id(10),grantId:id(99)}]}]}]}
+  const {api}=setup(path=>path.endsWith('/content-choices')?conflicting:undefined);await prepare()
+  fireEvent.click(screen.getByRole('checkbox',{name:/approved-reference/}))
+  fireEvent.change(screen.getByLabelText('反馈开放方式'),{target:{value:'IMMEDIATE'}})
+  fireEvent.click(screen.getByRole('button',{name:'冻结登记为草稿'}))
+  expect(await screen.findByRole('alert')).toHaveTextContent('同一资源出现不同授权证明')
+  expect(api.mock.calls.some(([path])=>path.endsWith('/register'))).toBe(false)
+  expect(screen.getByRole('button',{name:'冻结登记为草稿'})).toBeEnabled()
+ })
+ it('disables unavailable sources and P/R without guessing missing authority',async()=>{
+  const unavailable={...source,sourceCompositeId:id(90),title:'缺许可来源',canPrepare:false,unavailableReason:'MISSING_DISTRIBUTION_AUTHORITY',licenses:[]}
+  setup(path=>path===base+'/source-candidates'?{list:[source,unavailable]}:path.endsWith('/content-choices')?{...options,units:[{...options.units[0],references:[{...options.units[0].references[0],selectable:false,unavailableReason:'MISSING_DISTRIBUTION_AUTHORITY',licenses:[],choices:[]}],reports:[{...options.units[0].reports[0],selectable:false,unavailableReason:'CONTENT_NOT_AVAILABLE',licenses:[],metricKeys:[]}]}]}:undefined)
+  await prepare()
+  expect(screen.getByRole('option',{name:/缺许可来源/})).toBeDisabled()
+  expect(screen.queryByRole('checkbox',{name:/approved-reference/})).not.toBeInTheDocument()
+  expect(screen.getByText(/参考 .*缺少必要分发许可/)).toBeInTheDocument()
+  expect(within(screen.getByLabelText('精确报告 R')).getByRole('option',{name:/批准报告/})).toBeDisabled()
+ })
+ it('submits NONE disclosure with stable readonly policy id and only original licenses when P/R are not selected',async()=>{
+  const {api}=setup();await prepare()
+  expect(screen.getByLabelText('披露政策编号（系统标识）')).toHaveAttribute('readonly')
+  fireEvent.change(screen.getByLabelText('本人披露'),{target:{value:'NONE'}})
+  fireEvent.change(screen.getByLabelText('反馈开放方式'),{target:{value:'IMMEDIATE'}})
+  fireEvent.click(screen.getByRole('button',{name:'冻结登记为草稿'}))
+  await screen.findByLabelText('冻结登记详情')
+  const payload=api.mock.calls.find(([path])=>path.endsWith('/register'))![2]
+  expect(payload.licenses).toEqual(pinnedLicenses)
+  expect(payload.reports).toEqual([])
+  expect(payload.references.units[0].choices).toEqual([])
+  expect(payload.disclosure.audiences.RESPONDENT).toMatchObject({mode:'NONE',metricKeys:[]})
+ })
+ it('clears an old source selection when the current source list refreshes',async()=>{
+  const {api}=setup();fireEvent.click(screen.getByRole('button',{name:'读取登记权限与资源'}))
+  const load=await screen.findByRole('button',{name:'读取获授权来源'});fireEvent.click(load)
+  await screen.findByRole('option',{name:/获授权来源/})
+  fireEvent.change(screen.getByLabelText('获授权来源'),{target:{value:id(2)}})
+  fireEvent.change(screen.getByLabelText('登记标题'),{target:{value:'新登记'}})
+  fireEvent.click(load)
+  await waitFor(()=>expect(screen.getByLabelText('获授权来源')).toHaveValue(''))
+  expect(screen.getByRole('button',{name:'准备独立教育版本'})).toBeDisabled()
   expect(api.mock.calls.some(([,method])=>method==='POST')).toBe(false)
  })
  it('cancels a pending permission read without late resurrection',async()=>{

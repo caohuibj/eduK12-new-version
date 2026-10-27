@@ -1,7 +1,7 @@
 import LocalDateTimeInput,{parseLocalDateTime} from '../LocalDateTimeInput'
 import {formatLocalTimestamp,localTimeZoneLabel} from '../../utils/dateTime'
 import {useEffect,useRef,useState} from 'react'
-import {educationAssessmentResourceClient,type EducationAssessmentDisclosure,type EducationAssessmentFamily,type EducationAssessmentPreparation,type EducationAssessmentRegistration} from './assessmentResourceClient'
+import {educationAssessmentResourceClient,mergeEducationAssessmentLicenses,type EducationAssessmentDisclosure,type EducationAssessmentFamily,type EducationAssessmentPreparation,type EducationAssessmentRegistration} from './assessmentResourceClient'
 import type {PrivateToolApi} from './privateToolClient'
 type Client=ReturnType<typeof educationAssessmentResourceClient>
 type Sources=Awaited<ReturnType<Client['sources']>>['list']
@@ -10,6 +10,7 @@ type Rows=Awaited<ReturnType<Client['list']>>['list']
 type Props={api:PrivateToolApi;organizationId:string;actorId:string;product:'SCHOOL'|'TEACHER'}
 const object=(value:unknown):Record<string,unknown>=>value&&typeof value==='object'&&!Array.isArray(value)?value as Record<string,unknown>:{}
 const text=(value:unknown,fallback='未返回')=>typeof value==='string'&&value?value:fallback
+const unavailableText=(reason:unknown)=>reason==='MISSING_DISTRIBUTION_AUTHORITY'?'缺少必要分发许可':reason==='SOURCE_NOT_AVAILABLE'?'来源当前不可用':reason==='CONTENT_NOT_AVAILABLE'?'内容当前不可用':'等待许可确认'
 const familyNames:Record<string,string>={BUNDLE:'组合测评',COGNITIVE:'认知测评',SITUATIONAL:'情境测评',SCALE:'量表',SJT:'情境测评'}
 const disclosureNames:Record<string,string>={NONE:'不展示反馈',COMPLETION_ONLY:'仅完成确认',INDIVIDUAL_SUMMARY:'已批准报告的本人摘要'}
 function FrozenRegistrationSummary({registration}:{registration:EducationAssessmentRegistration}){
@@ -43,23 +44,22 @@ function Panel({api,organizationId,actorId,product}:Props){
  const [open,setOpen]=useState(false),[authorized,setAuthorized]=useState(false),[busy,setBusy]=useState(false)
  const [error,setError]=useState(''),[notice,setNotice]=useState(''),[rows,setRows]=useState<Rows>([]),[cursor,setCursor]=useState<string|null>(null)
  const [sources,setSources]=useState<Sources>([]),[sourceId,setSourceId]=useState(''),[title,setTitle]=useState(''),[family,setFamily]=useState<EducationAssessmentFamily>('BUNDLE')
- const [licenseIds,setLicenseIds]=useState<string[]>([])
  const [resourceId,setResourceId]=useState(''),[preparation,setPreparation]=useState<EducationAssessmentPreparation|null>(null),[choices,setChoices]=useState<Choices|null>(null)
  const [selectedP,setP]=useState<Record<string,string[]>>({}),[selectedR,setR]=useState<Record<string,string>>({})
  const policyKey=resourceId?`education-assessment:${resourceId}:disclosure:v1`:''
  const [disclosure,setDisclosure]=useState<'NONE'|'COMPLETION_ONLY'|'INDIVIDUAL_SUMMARY'>('COMPLETION_ONLY')
  const [feedback,setFeedback]=useState<''|'IMMEDIATE'|'SCHEDULED'>(''),[releaseAt,setReleaseAt]=useState('')
  const [registration,setRegistration]=useState<EducationAssessmentRegistration|null>(null),[reason,setReason]=useState(''),[uncertain,setUncertain]=useState(false)
- const epoch=useRef(0),alive=useRef(true),locked=useRef(false),writing=useRef(false),context=useRef(api);context.current=api
+ const epoch=useRef(0),alive=useRef(true),locked=useRef(false),writing=useRef(false),mutationSent=useRef(false),context=useRef(api);context.current=api
  useEffect(()=>{alive.current=true;return()=>{alive.current=false;epoch.current++}},[])
  useEffect(()=>{epoch.current++;locked.current=false;setBusy(false);setAuthorized(false);setOpen(false);setPreparation(null);setRegistration(null);setSources([]);setRows([]);setChoices(null);setUncertain(writing.current);writing.current=false},[api])
  const perform=async(work:(valid:()=>boolean)=>Promise<void>,write=false)=>{
   if(locked.current)return
-  locked.current=true;writing.current=write;setBusy(true);setError('');setNotice('')
+  locked.current=true;mutationSent.current=false;writing.current=write;setBusy(true);setError('');setNotice('')
   const token=++epoch.current,transport=api,valid=()=>alive.current&&token===epoch.current&&context.current===transport
   try{await work(valid)}catch(cause){if(valid()){
    setError(cause instanceof Error?cause.message:'操作未完成');if([401,403].includes((cause as {status?:number}).status??0))setAuthorized(false)
-   if(write){setUncertain(true);setNotice('写入结果尚未确认，请用原登记编号回读核对，不要重复提交。')}
+   if(write&&mutationSent.current){setUncertain(true);setNotice('写入结果尚未确认，请用原登记编号回读核对，不要重复提交。')}
   }}finally{if(valid()){locked.current=false;writing.current=false;setBusy(false)}}
  }
  const load=()=>void perform(async valid=>{
@@ -73,32 +73,33 @@ function Panel({api,organizationId,actorId,product}:Props){
   try{const result=await client.read(resourceId);if(valid()){setRegistration(result);setPreparation(null);setChoices(null);setUncertain(false)}}
   catch(cause){
    if((cause as {status?:number}).status!==404)throw cause
-   const result=await client.preparation(resourceId),options=await client.choices(resourceId),available=await client.sources()
-   if(valid()){setPreparation(result);setChoices(options);setSources(available.list);setSourceId(result.sourceCompositeId);setLicenseIds(available.list.find(row=>row.sourceCompositeId===result.sourceCompositeId)?.grantedResourceIds??[]);setRegistration(null);setUncertain(false);setP({});setR({});setNotice('已回读准备状态；请核对原编号和精确版本后继续。')}
+   const result=await client.preparation(resourceId),options=await client.choices(resourceId)
+   if(valid()){setPreparation(result);setChoices(options);setSourceId(result.sourceCompositeId);setTitle(result.title);setFamily(result.family);setRegistration(null);setUncertain(false);setP({});setR({});setNotice('已回读准备状态；请核对原编号和精确版本后继续。')}
   }
  })
  const prepare=()=>void perform(async valid=>{
-  const source=sources.find(row=>row.sourceCompositeId===sourceId);if(!source)return
+  const source=sources.find(row=>row.sourceCompositeId===sourceId);if(!source?.canPrepare||!source.licenses?.length)return
   const id=resourceId||crypto.randomUUID();setResourceId(id)
+  mutationSent.current=true
   const result=await client.prepare({resourceId:id,sourceCompositeId:source.sourceCompositeId,title:title.trim(),family,
-   licenses:licenseIds.map(resourceId=>({resourceId,grantId:source.grantId}))})
+   licenses:source.licenses.map(({resourceId,grantId})=>({resourceId,grantId}))})
   if(!valid())return
   setPreparation(result)
   const options=await client.choices(id);if(valid()){setChoices(options);setP({});setR({})}
  },true)
  const register=()=>void perform(async valid=>{
   if(!preparation||!choices||!feedback||!policyKey.trim())return
-  const licenses=new Map<string,string>()
-  const source=sources.find(row=>row.sourceCompositeId===preparation.sourceCompositeId)
-  if(!source)throw Error('请重新读取获授权来源，以核对原分发授权。')
-  for(const id of licenseIds)licenses.set(id,source.grantId)
+  const licenseGroups=[preparation.licenses]
   const references={schemaVersion:1 as const,units:choices.units.map(unit=>({itemId:unit.itemId,choices:(selectedP[unit.itemId]??[]).map((key,priority)=>{
-   const [releaseId,entryKey]=JSON.parse(key) as [string,string];const ref=unit.references.find(row=>row.releaseId===releaseId)!
-   licenses.set(releaseId,ref.grantId);return {releaseId,entryKey,priority}
+   const [releaseId,entryKey]=JSON.parse(key) as [string,string];const ref=unit.references.find(row=>row.releaseId===releaseId)
+   if(!ref?.selectable||!ref.choices.some(choice=>choice.entryKey===entryKey))throw Error('所选参考已不可选，请重新读取准备内容。')
+   licenseGroups.push(ref.licenses);return {releaseId,entryKey,priority}
   })}))}
   const reports=choices.units.flatMap(unit=>{
-   const report=unit.reports.find(row=>row.releaseId===selectedR[unit.itemId]);if(!report)return []
-   licenses.set(report.releaseId,report.grantId);return [{itemId:unit.itemId,releaseId:report.releaseId}]
+   const selected=selectedR[unit.itemId];if(!selected)return []
+   const report=unit.reports.find(row=>row.releaseId===selected)
+   if(!report?.selectable)throw Error('所选报告已不可选，请重新读取准备内容。')
+   licenseGroups.push(report.licenses);return [{itemId:unit.itemId,releaseId:report.releaseId}]
   })
   const audiences=Object.fromEntries(['RESPONDENT','SUBJECT','TEACHER','PARENT','PROFESSIONAL','ORGANIZATION','RESEARCH'].map(audience=>[audience,{
    mode:audience==='RESPONDENT'?disclosure:'NONE',metricKeys:audience==='RESPONDENT'&&disclosure==='INDIVIDUAL_SUMMARY'?[...new Set(choices.units.flatMap(unit=>unit.reports.find(row=>row.releaseId===selectedR[unit.itemId])?.metricKeys??[]))]:[],longitudinalMetricKeys:[],
@@ -109,14 +110,17 @@ function Panel({api,organizationId,actorId,product}:Props){
    const date=parseLocalDateTime(releaseAt);if(!date||date.getTime()<=Date.now())throw Error('请选择有效的未来本地开放时间。')
    feedbackPolicy={schemaVersion:1,mode:'SCHEDULED',releaseAt:date.toISOString()}
   }else feedbackPolicy={schemaVersion:1,mode:'IMMEDIATE'}
+  const licenses=mergeEducationAssessmentLicenses(...licenseGroups)
+  mutationSent.current=true
   const result=await client.register(preparation.resourceId,{expectedPreparationHash:preparation.preparationHash,
-   disclosure:{schemaVersion:1,policyKey:policyKey.trim(),minimumRespondents:null,audiences},feedbackPolicy,references,reports,licenses:[...licenses].map(([resourceId,grantId])=>({resourceId,grantId}))})
+   disclosure:{schemaVersion:1,policyKey:policyKey.trim(),minimumRespondents:null,audiences},feedbackPolicy,references,reports,licenses})
   if(!valid())return
   setRegistration(result);setPreparation(null);setChoices(null)
   const frozen=await client.read(result.resourceId);if(valid())setRegistration(frozen)
  },true)
  const transition=(action:'review'|'publish'|'retire')=>void perform(async valid=>{
   if(!registration||!reason.trim())return
+  mutationSent.current=true
   await client.transition(registration.resourceId,action,{expectedEntryHash:registration.entryHash,reason:reason.trim()})
   if(!valid())return
   const frozen=await client.read(registration.resourceId);if(valid()){setRegistration(frozen);setReason('')}
@@ -131,17 +135,18 @@ function Panel({api,organizationId,actorId,product}:Props){
    <label>登记编号<input value={resourceId} onChange={e=>{setResourceId(e.target.value);setPreparation(null);setChoices(null);setRegistration(null)}}/></label>
    <button disabled={!resourceId} onClick={recover}>回读准备或冻结登记</button>
    {uncertain&&<p>先按原编号回读核对；不会自动重复提交。</p>}
-   <button disabled={uncertain} onClick={()=>void perform(async valid=>{const data=await client.sources();if(valid())setSources(data.list)})}>读取获授权来源</button>
-   <label>获授权来源<select disabled={!!preparation||!!registration||uncertain} value={sourceId} onChange={e=>{setSourceId(e.target.value);setLicenseIds(sources.find(row=>row.sourceCompositeId===e.target.value)?.grantedResourceIds??[])}}><option value="">请选择</option>{sources.map(row=><option key={row.sourceCompositeId} value={row.sourceCompositeId}>{row.title} · {row.sourceCompositeId}</option>)}</select></label>
-   {sourceId&&<fieldset disabled={!!registration||uncertain}><legend>本版本使用的来源、内容及素材授权</legend><p>只选本来源准备所需的授权集合；额外或缺失项均由服务器拒绝。</p>{(sources.find(row=>row.sourceCompositeId===sourceId)?.grantedResourceIds??[]).map(id=><label key={id}><input type="checkbox" checked={licenseIds.includes(id)} onChange={e=>setLicenseIds(old=>e.target.checked?[...old,id]:old.filter(value=>value!==id))}/>{id}</label>)}</fieldset>}
+   <button disabled={uncertain||!!preparation||!!registration} onClick={()=>void perform(async valid=>{const data=await client.sources();if(valid()){setSources(data.list);setSourceId('');setP({});setR({})}})}>读取获授权来源</button>
+   <label>获授权来源<select disabled={!!preparation||!!registration||uncertain} value={sourceId} onChange={e=>{setSourceId(e.target.value);setP({});setR({})}}><option value="">请选择</option>{sources.map(row=><option key={row.sourceCompositeId} value={row.sourceCompositeId} disabled={!row.canPrepare||!row.licenses?.length}>{row.title}{row.canPrepare?' · 可准备':' · '+unavailableText(row.unavailableReason)}</option>)}</select></label>
+   {sourceId&&!preparation&&<p>{sources.find(row=>row.sourceCompositeId===sourceId)?.canPrepare?'来源与必要许可已核对，准备时仍由服务器重新校验。':'该来源当前不可准备。'}</p>}
+   <details><summary>查看精确来源许可标识</summary><pre style={{maxWidth:'100%',overflowX:'auto'}}>{JSON.stringify(preparation?.licenses??sources.find(row=>row.sourceCompositeId===sourceId)?.licenses??[],null,2)}</pre></details>
    <label>登记标题<input disabled={!!preparation||!!registration||uncertain} value={title} onChange={e=>setTitle(e.target.value)} maxLength={200}/></label>
    <label>工具家族<select disabled={!!preparation||!!registration||uncertain} value={family} onChange={e=>setFamily(e.target.value as EducationAssessmentFamily)}><option value="BUNDLE">组合（含纯表单）</option><option value="COGNITIVE">认知</option><option value="SITUATIONAL">情境</option></select></label>
-   <button disabled={!sourceId||!title.trim()||!!preparation||!!registration||uncertain} onClick={prepare}>准备独立教育版本</button>
+   <button disabled={!sources.find(row=>row.sourceCompositeId===sourceId)?.canPrepare||!sources.find(row=>row.sourceCompositeId===sourceId)?.licenses?.length||!title.trim()||!!preparation||!!registration||uncertain} onClick={prepare}>准备独立教育版本</button>
    {preparation&&choices&&!registration&&<>
-    <p>准备 hash：{preparation.preparationHash}；尚未登记或发布。</p>
+    <p>准备 hash：{preparation.preparationHash}；尚未登记或发布。固定来源：{preparation.sourceCompositeId}。</p>
     {choices.units.map(unit=><section key={unit.itemId}><h3>{unit.family} · {unit.itemId}</h3><p>固定内容 C：{unit.measurement.releaseId} · {unit.measurement.contentHash}</p>
-     <fieldset><legend>精确参考 P（不选表示明确空）</legend>{unit.references.flatMap(ref=>ref.choices.map(choice=>{const key=JSON.stringify([ref.releaseId,choice.entryKey]);return <label key={key}><input type="checkbox" checked={(selectedP[unit.itemId]??[]).includes(key)} onChange={e=>setP(old=>({...old,[unit.itemId]:e.target.checked?[...(old[unit.itemId]??[]),key]:(old[unit.itemId]??[]).filter(value=>value!==key)}))}/>{ref.releaseId} · {ref.contentHash} · {choice.entryKey} · {choice.metricKey}</label>}))}</fieldset>
-     <label>精确报告 R<select value={selectedR[unit.itemId]??''} onChange={e=>setR(old=>({...old,[unit.itemId]:e.target.value}))}><option value="">明确未选报告</option>{unit.reports.map(row=><option key={row.releaseId} value={row.releaseId}>{row.title??row.releaseId} · {row.releaseId} · {row.contentHash}</option>)}</select></label>
+     <fieldset><legend>精确参考 P（不选表示明确空）</legend>{unit.references.flatMap(ref=>ref.choices.map(choice=>{const key=JSON.stringify([ref.releaseId,choice.entryKey]);return <label key={key}><input type="checkbox" disabled={!ref.selectable} checked={(selectedP[unit.itemId]??[]).includes(key)} onChange={e=>setP(old=>({...old,[unit.itemId]:e.target.checked?[...(old[unit.itemId]??[]),key]:(old[unit.itemId]??[]).filter(value=>value!==key)}))}/>{ref.releaseId} · {ref.contentHash} · {choice.entryKey} · {choice.metricKey}</label>}))}{unit.references.filter(ref=>!ref.selectable).map(ref=><p key={ref.releaseId}>参考 {ref.releaseId}：{unavailableText(ref.unavailableReason)}，不可选择。</p>)}</fieldset>
+     <label>精确报告 R<select value={selectedR[unit.itemId]??''} onChange={e=>setR(old=>({...old,[unit.itemId]:e.target.value}))}><option value="">明确未选报告</option>{unit.reports.map(row=><option key={row.releaseId} value={row.releaseId} disabled={!row.selectable}>{row.title??row.releaseId} · {row.releaseId} · {row.contentHash}{row.selectable?'':' · '+unavailableText(row.unavailableReason)}</option>)}</select></label>
     </section>)}
     <label>披露政策编号（系统标识）<input readOnly value={policyKey}/></label>
     <label>本人披露<select value={disclosure} onChange={e=>setDisclosure(e.target.value as typeof disclosure)}><option value="NONE">不展示反馈</option><option value="COMPLETION_ONLY">仅完成确认</option>{choices.units.length>0&&<option value="INDIVIDUAL_SUMMARY">已批准报告的本人摘要</option>}</select></label>

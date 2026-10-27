@@ -1,5 +1,7 @@
 # 共享资源登记管理界面
 
+后续 exact licenses 接线已完成，见 [精确授权接线记录](registration-exact-license-progress.md)；本文旧 pending/人工授权方案保留为历史状态，不代表当前实现。
+
 独立云端、原分支 `feat/pr363-education-management`，正常吸收 root `467baeb59a72e61a5e4104b5c0163b288b0c234e` 与反馈合同 `385277be09228ace5d9ff8da1bbd8934d86cd471`。本片只改共享 RegistrationPanel、现成 assessmentResourceClient 类型、两个 App 最小挂载及本片测试/证据，不修改 producer、来源权限、迁移或运行/报告。
 
 ## 已接入的真实流程
