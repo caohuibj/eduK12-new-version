@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "ierq20_zh_cn_research",
+  "instrumentVersion": "1.0.0",
+  "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4864994/",
+  "sourceSection": "Appendix I",
+  "itemCount": 20,
+  "responseType": "agreement_truth_degree_1_to_5",
+  "fixedOrder": true,
+  "reverseItemNumbers": [],
+  "scoringVersion": "1.0.0",
+  "facets": [
+    {
+      "key": "enhancing_positive_affect",
+      "originalName": "Enhancing Positive Affect",
+      "items": [
+        3,
+        6,
+        8,
+        13,
+        18
+      ],
+      "aggregation": "sum",
+      "range": [
+        5,
+        25
+      ]
+    },
+    {
+      "key": "perspective_taking",
+      "originalName": "Perspective Taking",
+      "items": [
+        2,
+        7,
+        10,
+        14,
+        17
+      ],
+      "aggregation": "sum",
+      "range": [
+        5,
+        25
+      ]
+    },
+    {
+      "key": "soothing",
+      "originalName": "Soothing",
+      "items": [
+        4,
+        9,
+        12,
+        16,
+        19
+      ],
+      "aggregation": "sum",
+      "range": [
+        5,
+        25
+      ]
+    },
+    {
+      "key": "social_modeling",
+      "originalName": "Social Modeling",
+      "items": [
+        1,
+        5,
+        11,
+        15,
+        20
+      ],
+      "aggregation": "sum",
+      "range": [
+        5,
+        25
+      ]
+    }
+  ],
+  "sourceToChinese": "independent_zh_CN_working_draft_no_existing_validation_inherited",
+  "licenseStatus": "author_contact_required",
+  "activation": "DRAFT_HIDDEN",
+  "runtimeChecked": false
+}

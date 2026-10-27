@@ -1,0 +1,1403 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "ierq20_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "下面是一些描述人们如何借助他人来调整自己情绪的陈述。请逐句判断这种描述在多大程度上符合你平时的实际情况。1表示完全不符合，5表示非常符合。没有标准答案，请按自己真实的习惯作答。",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "独立中文研究工作译稿；依据Hofmann等2016原论文Appendix I的施测说明，不复制任何现有正式中文版。"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "人际情绪调节问卷（IERQ，20题）— 中文研究工作译稿",
+      "abbreviation": "IERQ-20-ZH-WORKING",
+      "instrumentFamily": "Interpersonal Emotion Regulation Questionnaire (IERQ)"
+    },
+    "construct": {
+      "primaryDomain": "SOCIAL_EMOTIONAL",
+      "secondaryDomains": [
+        "SELF_REGULATION",
+        "WELL_BEING"
+      ],
+      "constructDefinition": "衡量个体通过他人帮助调节自身情绪的四种自陈倾向：共同增进积极情绪、获取他人提供的不同视角、寻求安慰、观察或学习他人的应对方式。不是调节别人情绪的工具，也不是能力、心理健康诊断或单一好坏总分。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "domain:emotion_regulation",
+        "domain:social_emotional",
+        "domain:interpersonal_relations",
+        "construct:interpersonal_emotion_regulation",
+        "construct:enhancing_positive_affect",
+        "construct:perspective_taking",
+        "construct:soothing",
+        "construct:social_modeling",
+        "construct:four_factors_five_items_each",
+        "construct:seeking_others_to_regulate_own_emotions",
+        "construct:no_total_score",
+        "orientation:interpersonal_emotion_regulation",
+        "orientation:social_support_processes",
+        "orientation:transdiagnostic_process",
+        "orientation:not_therapy_specific",
+        "population:adult_18_plus",
+        "population:original_english_adult_research",
+        "population:project_18_plus",
+        "population:chinese_working_translation_not_validated",
+        "population:not_k12_validated",
+        "population:do_not_inherit_2021_chinese_version",
+        "response:self",
+        "response:digital_self",
+        "response:20_items",
+        "response:five_point_1_to_5",
+        "response:degree_true_not_frequency",
+        "response:fixed_appendix1_item_order",
+        "response:no_reverse_items",
+        "response:four_facet_sums",
+        "response:no_fixed_recall_window",
+        "response:complete_facet_project_missing_policy",
+        "use:research",
+        "use:individual_reflection",
+        "use:score_only",
+        "use:not_diagnostic",
+        "use:not_selection",
+        "use:no_chinese_norms",
+        "use:no_clinical_cutoffs",
+        "license:author_contact_required",
+        "license:authorization_pending",
+        "license:redistribution_review_pending",
+        "license:publisher_copyright_2016",
+        "license:full_author_appendix_acquired",
+        "language_validation:original_english",
+        "language_validation:content_zh-CN",
+        "language_validation:independent_platform_working_translation",
+        "language_validation:expert_review_pending",
+        "language_validation:cognitive_debrief_pending",
+        "language_validation:local_validation_pending",
+        "language_validation:separate_from_existing_chinese_validation",
+        "人际情绪调节",
+        "情绪调节",
+        "积极情绪分享",
+        "他人视角",
+        "获得安慰",
+        "向他人学习",
+        "成人自评",
+        "20题",
+        "四维",
+        "中文研究工作稿",
+        "需联系作者",
+        "非诊断"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "原2016英文研究通过成人在线参与者进行多个阶段开发。保守项目限定18+自评；此独立中文译稿未做验证，不能把2021中国987大学生验证或2025中国特殊照护者验证直接继承。"
+    },
+    "administration": {
+      "itemCount": 20,
+      "estimatedMinutes": 5,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED"
+      ],
+      "timeFrame": "一般习惯描述，无作者规定的过去一周或其他固定回忆时间窗。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "固定Hofmann等2016 Appendix I的20题原序和1–5符合程度标签，不把选项换成发生频率。",
+        "五级标签分别为完全不符合、稍微符合、中等程度符合、比较符合、非常符合。",
+        "四维各5题按原作者题号相加，均为正向项：3/6/8/13/18、2/7/10/14/17、4/9/12/16/19、1/5/11/15/20；各维理论5–25，无总分。",
+        "如缺答，按本平台保守草稿规则：对应5题维度缺任何一题即不计；其余完整维度仍可呈现，不冒充原作者规定的缺答处理。",
+        "“让他人提醒还有人处境更困难”仅反映问卷中一种求助策略，报告不将其推荐为适用于所有人的安慰技巧。",
+        "原始作者论文版权、译稿权利及公开发布范围由管理员后续协调；开发时记录author_contact_required并保持DRAFT/HIDDEN。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "英文版开发研究支持原版四因子；平台独立简体中文稿未做人群验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "可用于理解自己偏好的人际情绪调节方式，不能当临床筛查、能力评价或干预疗效证明。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "ierq-hofmann2016-english-structural",
+        "evidenceType": "STRUCTURAL_VALIDITY",
+        "population": "原开发论文多个英文在线成人样本；当前记录未据作者单位猜测所有样本国家",
+        "locale": "en",
+        "territory": "ZZ",
+        "studyDesign": "多轮题目生成、探索与验证性因子分析，最终20题分四个5题因子；后续研究中四维内部一致性α约.89–.94，仅为原英文题本证据。",
+        "rating": "MIXED",
+        "citation": "Hofmann, S. G., Carpenter, J. K., & Curtiss, J. (2016). Interpersonal Emotion Regulation Questionnaire (IERQ): Scale Development and Psychometric Characteristics. Cognitive Therapy and Research, 40(3), 341–356. https://doi.org/10.1007/s10608-016-9756-2.",
+        "doi": "10.1007/s10608-016-9756-2",
+        "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4864994/",
+        "notes": "原样本结构、分析环节不能视为本平台工作译稿的信效度证据；未确认个人参考阈值。"
+      },
+      {
+        "evidenceId": "ierq-chen2021-cn-different-translation",
+        "evidenceType": "STRUCTURAL_VALIDITY",
+        "population": "中国大学生987人，对已有中文版进行验证，不是平台独立翻译",
+        "locale": "zh-CN",
+        "territory": "CN",
+        "sampleSize": 987,
+        "studyDesign": "中国大学生四维结构验证的独立译本研究；报告CFI=.94、RMSEA=.096等，不能宣称所有模型指标理想，也不能传递给本平台译稿。",
+        "rating": "MIXED",
+        "citation": "陈程等（2021）。人际情绪调节问卷在中国大学生中的信效度检验。中国健康心理学杂志，29(11)，1684–1688。",
+        "doi": "10.13342/j.cnki.cjhp.2021.11.018",
+        "url": "https://jkxl.cbpt.cnki.net/portal/journal/portal/client/paper/ae6bc7111f080610b5497517e0e7e23a",
+        "notes": "仅提供独立语言/人群文献线索，未验证本内容源。"
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Hofmann、Carpenter、Curtiss (2016) IERQ原始Appendix I 20题及计分，独立中文工作翻译；未复制2021中国大学生或2025照护者研究的中文译句。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "尚未经人审，未来若正式审校题文应递增对应测量内容和本地化版本。原中文已有独立验证不能继承到此稿。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "ierq20_zh_cn_research-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": [],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    }
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "ierq20_zh_cn_research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "ierq20_zh_cn_research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "translation",
+      "display"
+    ],
+    "notes": [
+      "原20题正式题文、五级作答锚点和题号-维度计分键取自 Hofmann、Carpenter、Curtiss (2016) 原论文 Appendix I；https://pmc.ncbi.nlm.nih.gov/articles/PMC4864994/。原版权注明 © Springer Science+Business Media New York 2016；PMC可免费阅读、原作者大学网页提供下载，不自动证明有CC BY、独立中文译稿或公开GitHub二次再分发许可。本源的中文题干和指导语为平台依据原意起草的独立工作译稿，未经作者批准、人工译审、认知访谈、中国验证。需要由管理员与作者/版权方确认目标系统电子施测、翻译改编、公开题本/源码再分发、商用、必要署名；未联系作者。现阶段只作为DRAFT/HIDDEN、非正式启用的研发内容，不伪造已授权事实。",
+      "管理员为最终权利协调及正式使用决策者；待联系作者/待确认许可不得冒充已授权，也不作为草稿开发自动门禁。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "IERQ (Hofmann et al. 2016), 20-item Appendix I; independently drafted Chinese research translation",
+        "citation": "Hofmann, S. G., Carpenter, J. K., & Curtiss, J. (2016). Interpersonal Emotion Regulation Questionnaire (IERQ): Scale Development and Psychometric Characteristics. Cognitive Therapy and Research, 40(3), 341–356. https://doi.org/10.1007/s10608-016-9756-2.",
+        "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4864994/",
+        "publicationYear": 2016
+      },
+      "license": {
+        "status": "unknown",
+        "redistribution": "restricted",
+        "note": "原20题正式题文、五级作答锚点和题号-维度计分键取自 Hofmann、Carpenter、Curtiss (2016) 原论文 Appendix I；https://pmc.ncbi.nlm.nih.gov/articles/PMC4864994/。原版权注明 © Springer Science+Business Media New York 2016；PMC可免费阅读、原作者大学网页提供下载，不自动证明有CC BY、独立中文译稿或公开GitHub二次再分发许可。本源的中文题干和指导语为平台依据原意起草的独立工作译稿，未经作者批准、人工译审、认知访谈、中国验证。需要由管理员与作者/版权方确认目标系统电子施测、翻译改编、公开题本/源码再分发、商用、必要署名；未联系作者。现阶段只作为DRAFT/HIDDEN、非正式启用的研发内容，不伪造已授权事实。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "ierq_degree_true_1_5",
+          "options": [
+            {
+              "value": "1",
+              "label": "完全不符合",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "稍微符合",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "中等程度符合",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "比较符合",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "非常符合",
+              "score": 5
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "IERQ20_01",
+          "content": "了解别人以前是怎样面对情绪的，会让我感觉好一些。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 0,
+          "responseSetKey": "ierq_degree_true_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IERQ20_02",
+          "content": "心情低落时，别人提醒我事情或许没有看起来那么糟，会帮助我缓过来。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 1,
+          "responseSetKey": "ierq_degree_true_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IERQ20_03",
+          "content": "非常高兴、想分享快乐的时候，我喜欢和其他人待在一起。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 2,
+          "responseSetKey": "ierq_degree_true_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IERQ20_04",
+          "content": "情绪不好的时候，我会寻找愿意理解和关怀我的人。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 3,
+          "responseSetKey": "ierq_degree_true_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IERQ20_05",
+          "content": "感到担忧时，听一听别人对如何处理事情的看法会帮助我。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 4,
+          "responseSetKey": "ierq_degree_true_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IERQ20_06",
+          "content": "特别开心的时候，和某些人在一起会让我感觉更愉快。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 5,
+          "responseSetKey": "ierq_degree_true_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IERQ20_07",
+          "content": "难受时，如果有人提醒我还有人处境更艰难，我会得到一些宽慰。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 6,
+          "responseSetKey": "ierq_degree_true_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IERQ20_08",
+          "content": "心情不错时，我喜欢和其他人待在一起，因为那会让我感觉更开心。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 7,
+          "responseSetKey": "ierq_degree_true_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IERQ20_09",
+          "content": "情绪低落时，我常常会去找愿意表达同情和理解的人。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 8,
+          "responseSetKey": "ierq_degree_true_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IERQ20_10",
+          "content": "不开心时，别人提醒我情况原本可能更糟，会让我感觉好些。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 9,
+          "responseSetKey": "ierq_degree_true_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IERQ20_11",
+          "content": "感到挫折时，了解别人会怎样处理相同处境，对我有帮助。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 10,
+          "responseSetKey": "ierq_degree_true_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IERQ20_12",
+          "content": "心里难受时，我会向其他人寻求安慰。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 11,
+          "responseSetKey": "ierq_degree_true_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IERQ20_13",
+          "content": "因为快乐可以相互感染，所以我开心时会主动去找别人。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 12,
+          "responseSetKey": "ierq_degree_true_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IERQ20_14",
+          "content": "感到烦躁时，别人劝我别太担心，能够帮助我平静下来。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 13,
+          "responseSetKey": "ierq_degree_true_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IERQ20_15",
+          "content": "难过时，听别人讲述他们怎样面对类似感受，对我有帮助。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 14,
+          "responseSetKey": "ierq_degree_true_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IERQ20_16",
+          "content": "心情非常低落时，我会去找人，希望确认自己是被爱着的。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 15,
+          "responseSetKey": "ierq_degree_true_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IERQ20_17",
+          "content": "焦虑时，别人告诉我不必过于担心，会让我慢慢平静下来。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 16,
+          "responseSetKey": "ierq_degree_true_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IERQ20_18",
+          "content": "特别兴奋和高兴时，我会去找其他人，也希望把快乐带给他们。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 17,
+          "responseSetKey": "ierq_degree_true_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IERQ20_19",
+          "content": "悲伤时，我会找人寻求宽慰。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 18,
+          "responseSetKey": "ierq_degree_true_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IERQ20_20",
+          "content": "心情不好时，我想知道别人处在我的情境里会怎么做。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 19,
+          "responseSetKey": "ierq_degree_true_1_5",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "itemRules": [
+          {
+            "itemCode": "IERQ20_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IERQ20_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IERQ20_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IERQ20_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IERQ20_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IERQ20_06",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IERQ20_07",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IERQ20_08",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IERQ20_09",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IERQ20_10",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IERQ20_11",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IERQ20_12",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IERQ20_13",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IERQ20_14",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IERQ20_15",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IERQ20_16",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IERQ20_17",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IERQ20_18",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IERQ20_19",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IERQ20_20",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "scores": [
+          {
+            "key": "enhancing_positive_affect",
+            "type": "dimension",
+            "label": "与人分享、增进积极情绪",
+            "description": "本维五道题按原作者题号原始值求和5–25分；仅描述自述的调节方式倾向，分数高不意味着更健康、更成熟或更有效。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "IERQ20_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IERQ20_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IERQ20_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IERQ20_13",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IERQ20_18",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "perspective_taking",
+            "type": "dimension",
+            "label": "借助他人重新看待处境",
+            "description": "本维五道题按原作者题号原始值求和5–25分；仅描述自述的调节方式倾向，分数高不意味着更健康、更成熟或更有效。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "IERQ20_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IERQ20_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IERQ20_10",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IERQ20_14",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IERQ20_17",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "soothing",
+            "type": "dimension",
+            "label": "从关系中获得安慰",
+            "description": "本维五道题按原作者题号原始值求和5–25分；仅描述自述的调节方式倾向，分数高不意味着更健康、更成熟或更有效。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "IERQ20_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IERQ20_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IERQ20_12",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IERQ20_16",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IERQ20_19",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "social_modeling",
+            "type": "dimension",
+            "label": "参考他人的应对经验",
+            "description": "本维五道题按原作者题号原始值求和5–25分；仅描述自述的调节方式倾向，分数高不意味着更健康、更成熟或更有效。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "IERQ20_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IERQ20_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IERQ20_11",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IERQ20_15",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IERQ20_20",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "enhancing_positive_affect",
+          "perspective_taking",
+          "soothing",
+          "social_modeling"
+        ],
+        "scoreOrder": [
+          "enhancing_positive_affect",
+          "perspective_taking",
+          "soothing",
+          "social_modeling"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "enhancing_positive_affect",
+            "headline": "与人分享、增进积极情绪",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这部分关注的是：当你心情愉快时，是否会主动找人分享，让好心情在相处中延续。有的人喜欢热闹的分享，有的人更愿意安静地享受快乐，这些差异没有优劣。分数较高只表示你较常认同借助他人增强积极感受的方式，并不意味着你的日常幸福感一定更高。你可以想想最近一次高兴的事情：当时想分享给谁？如果对方不方便，也可以用适合自己的方式留住这段经历。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "什么样的开心时刻，你最愿意和别人分享？"
+              },
+              {
+                "category": "strategy",
+                "text": "下次遇到值得纪念的小事，可以向一个愿意倾听的人说说，也可以先为自己记录下来。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "perspective_taking",
+            "headline": "借助他人重新看待处境",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这部分描述你难受或担心时，是否会因为别人提供不同角度、提醒事情可能并不那么严重，而获得一些缓和。较高分数表示你更认同这种人际调节方式，而不是抗压能力或成熟程度。提醒“还有人更困难”有时能帮助我们改变视角，有时也可能让当下真实的感受得不到理解；哪种方式合适，要看情境和关系。你可以回想一次别人安慰自己的经历，留意哪些说法有帮助，哪些更需要被倾听。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "别人怎样回应你的担心，会让你既感觉被理解，又得到新的视角？"
+              },
+              {
+                "category": "strategy",
+                "text": "需要帮助时，可以告诉对方：先听我说一会儿，再一起想想还有哪些看法。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "soothing",
+            "headline": "从关系中获得安慰",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "人在低落、烦躁或受挫时，有时最需要的不是立即解决问题，而是有人愿意关心和陪伴。这一部分关注你是否倾向于向他人寻求同情、安慰与关怀。分数较高不表示你更软弱、更加依赖别人，也不等同于实际得到的支持一定更好；分数较低也不能说明你不需要关心。可以思考哪些人、哪些回应让自己感到安全，以及在暂时找不到人时，是否还有其他照顾自己的办法。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "当你心情不好时，你最希望别人提供怎样的安慰？"
+              },
+              {
+                "category": "strategy",
+                "text": "挑一个合适的时机，向信任的人说清你此刻需要的是陪伴、倾听还是具体建议。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "social_modeling",
+            "headline": "参考他人的应对经验",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "遇到难题或困扰时，听听别人如何面对类似经历，可能为自己打开另一种思路。这部分关注你是否习惯借助他人的经验、想法和示范来调整情绪与处理处境。分数较高不代表每次都能找到更好的解决方案，也不说明你缺乏独立性；相似的事情在不同人身上可能需要不同做法。可以从他人的经历中选择适合自己的部分，而不必照搬别人的生活或应对方式。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "哪些他人的经历曾帮你理解自己的处境？"
+              },
+              {
+                "category": "strategy",
+                "text": "遇到困惑时，问一位可信任的人曾怎样处理类似事情，再评估那种方法是否适合自己。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "原版20题源自2016论文附录；本平台中文为独立工作译稿，未获作者认可、专业译审、认知访谈或中国人群验证，不能继承其他译本证据。",
+          "高分仅表示更认可特定人际情绪调节方式，不等于情绪调节能力更强、压力更小或心理健康更好。",
+          "原版四维各5题求和5–25，均为正向。没有作者验证的统一总分、诊断切点、中国成人常模或临床级别。",
+          "某维缺一题时本工作稿不计该维，不插补；其他完整维可显示。这是平台保守缺答策略，不是作者原版规则。",
+          "对处境比较的反应各人不同，不应把“别人更困难”作为普遍有效的建议。",
+          "中文词句与授权使用范围待管理员确认，DRAFT/HIDDEN不等于研究施测已上线。"
+        ],
+        "disclaimer": "人际情绪调节问卷IERQ：Hofmann、Carpenter、Curtiss（2016）原作者版权保留；此中文版为EDUK12.TOP独立未验证研究工作稿，未正式授权、发布、安装或激活。四维分数不可用于疾病诊断、个人价值判断、学校排名或高风险决策。"
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "ierq20",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "all_min",
+        "answers": [
+          {
+            "itemCode": "IERQ20_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IERQ20_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IERQ20_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IERQ20_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IERQ20_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IERQ20_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IERQ20_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IERQ20_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IERQ20_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IERQ20_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IERQ20_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IERQ20_12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IERQ20_13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IERQ20_14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IERQ20_15",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IERQ20_16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IERQ20_17",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IERQ20_18",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IERQ20_19",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IERQ20_20",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "enhancing_positive_affect": 5,
+            "perspective_taking": 5,
+            "soothing": 5,
+            "social_modeling": 5
+          },
+          "totalScoreKeys": [
+            "enhancing_positive_affect",
+            "perspective_taking",
+            "soothing",
+            "social_modeling"
+          ]
+        }
+      },
+      {
+        "name": "all_max",
+        "answers": [
+          {
+            "itemCode": "IERQ20_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IERQ20_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IERQ20_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IERQ20_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IERQ20_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IERQ20_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IERQ20_07",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IERQ20_08",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IERQ20_09",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IERQ20_10",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IERQ20_11",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IERQ20_12",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IERQ20_13",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IERQ20_14",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IERQ20_15",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IERQ20_16",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IERQ20_17",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IERQ20_18",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IERQ20_19",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IERQ20_20",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "enhancing_positive_affect": 25,
+            "perspective_taking": 25,
+            "soothing": 25,
+            "social_modeling": 25
+          },
+          "totalScoreKeys": [
+            "enhancing_positive_affect",
+            "perspective_taking",
+            "soothing",
+            "social_modeling"
+          ]
+        }
+      },
+      {
+        "name": "all_mid",
+        "answers": [
+          {
+            "itemCode": "IERQ20_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IERQ20_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IERQ20_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IERQ20_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IERQ20_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IERQ20_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IERQ20_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IERQ20_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IERQ20_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IERQ20_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IERQ20_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IERQ20_12",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IERQ20_13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IERQ20_14",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IERQ20_15",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IERQ20_16",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IERQ20_17",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IERQ20_18",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IERQ20_19",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IERQ20_20",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "enhancing_positive_affect": 15,
+            "perspective_taking": 15,
+            "soothing": 15,
+            "social_modeling": 15
+          },
+          "totalScoreKeys": [
+            "enhancing_positive_affect",
+            "perspective_taking",
+            "soothing",
+            "social_modeling"
+          ]
+        }
+      },
+      {
+        "name": "mixed_cycle_1_to_5",
+        "answers": [
+          {
+            "itemCode": "IERQ20_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IERQ20_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "IERQ20_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IERQ20_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "IERQ20_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IERQ20_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IERQ20_07",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "IERQ20_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IERQ20_09",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "IERQ20_10",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IERQ20_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IERQ20_12",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "IERQ20_13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IERQ20_14",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "IERQ20_15",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IERQ20_16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IERQ20_17",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "IERQ20_18",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IERQ20_19",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "IERQ20_20",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "enhancing_positive_affect": 13,
+            "perspective_taking": 15,
+            "soothing": 15,
+            "social_modeling": 17
+          },
+          "totalScoreKeys": [
+            "enhancing_positive_affect",
+            "perspective_taking",
+            "soothing",
+            "social_modeling"
+          ]
+        }
+      },
+      {
+        "name": "one_social_modeling_missing",
+        "answers": [
+          {
+            "itemCode": "IERQ20_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IERQ20_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IERQ20_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IERQ20_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IERQ20_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IERQ20_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IERQ20_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IERQ20_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IERQ20_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IERQ20_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IERQ20_12",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IERQ20_13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IERQ20_14",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IERQ20_15",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IERQ20_16",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IERQ20_17",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IERQ20_18",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IERQ20_19",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IERQ20_20",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "enhancing_positive_affect": 15,
+            "perspective_taking": 15,
+            "soothing": 15,
+            "social_modeling": null
+          },
+          "totalScoreKeys": [
+            "enhancing_positive_affect",
+            "perspective_taking",
+            "soothing",
+            "social_modeling"
+          ]
+        }
+      },
+      {
+        "name": "all_missing",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "enhancing_positive_affect": null,
+            "perspective_taking": null,
+            "soothing": null,
+            "social_modeling": null
+          },
+          "totalScoreKeys": [
+            "enhancing_positive_affect",
+            "perspective_taking",
+            "soothing",
+            "social_modeling"
+          ]
+        }
+      }
+    ]
+  }
+}
