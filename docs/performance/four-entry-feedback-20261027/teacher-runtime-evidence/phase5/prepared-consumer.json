@@ -35,7 +35,7 @@
   "files": [
     {
       "path": "server-version/e2e/pr363-fixture.cjs",
-      "sha256": "3e48735248ff471d8cc24c2ce079000a1533061f7a6517eb24cee4c4dc8f21f7"
+      "sha256": "92868f991f71de69f666eaf19af362e2e06a868a9c139af68e732270ecde9699"
     },
     {
       "path": "server-version/e2e/pr363-browser.cjs",

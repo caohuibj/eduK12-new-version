@@ -37,6 +37,7 @@ async function seed(){
    const title='PR363 '+product+' '+mode+' '+fixture.suffix,feedbackPolicy=mode==='IMMEDIATE'?{schemaVersion:1,mode}:{schemaVersion:1,mode,releaseAt:new Date(Date.now()+86400000).toISOString()}
    const delivery=await createDelivery(owner,product,{id:f.organizationId},issuer,reviewer,'BUNDLE',false,true,feedbackPolicy,false,false,author,title)
    stage='workflow-'+product+'-'+mode
+   assert.deepEqual(delivery.origin.feedbackPolicy,feedbackPolicy,'Read back the actual immutable producer policy before browser starts')
    let workflowId,runId
    if(product==='SCHOOL'){
     const activities=app('modules/campus/activity.service'),scope={actor,organizationId:f.organizationId}
