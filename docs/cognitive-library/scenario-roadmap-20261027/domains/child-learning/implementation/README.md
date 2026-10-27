@@ -76,3 +76,11 @@ limited：有完整机会，但未完成计划或有实际中断。公开 `summa
 沿18维/131稳定key的原设计映射，空缺推理/整数数列标签继续留空，`metadata.ts`单列实际候选状态与输入，不改写历史词表的source_research_only/not_frozen含义，不捏造后台标签持久化。复用已有注意、记忆、速度、矩阵与学习任务，不复制其他领域实现；心与花保留原负责人。
 
 此候选交付后，先由DOT亲自读取代码、报告及原件；共享注册、发布入口、真实宿主端口、最终集中测试与合并仍等用户通知，不自动启动。没有新CI、部署、激活或归档成功事实。
+
+## DOT 独审补充：教学语言一次冻结
+
+在首版 `471d29cdfd5f960e36d003453a8f81d7609b9825` 上，仅补教学语言原件追溯。`NumberSeriesContext.language` 必须为 `zh` 或 `en`；准备前复制、校验并冻结，随完整context进入现有digest及prepareLocalAttempt的bindingDigest。宿主原有准备端口须按contextKey一次保留完整context，后续原件通过同一contextKey追溯实际教学语言，不添加逐题语言副本或新的公共接口。
+
+React默认使用冻结语言；显式UI language不一致时，在显示教学／准备／题目曝光前阻断。同组件后续改变language或context仍沿现有身份变化阻断。StrictMode cleanup的microtask逻辑未改。题目、布局、输入、24/12次数、练习及协议/计分/报告版本均未改；旧缺失language的候选context明确拒绝，不推断旧记录曾用哪种教学语言。
+
+只执行新增语言行为2项，`frontend-language-freeze.json`：2通过、0失败、原有5项filtered；没有重跑题库或原完整旅程。`types-language-freeze.json`：前端7入口／57源码，0诊断。浏览器合成context及其生成脚本仅补`language: zh`，没有重新生成题目、报告或截图。首版原件及`evidence.json`保留其原始身份；本次输入摘要与边界见 `language-freeze-review.json`，不将首版hash改写为本次hash。未接入、待DOT继续独审。

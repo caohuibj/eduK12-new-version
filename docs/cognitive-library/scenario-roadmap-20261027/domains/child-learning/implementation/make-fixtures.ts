@@ -11,7 +11,7 @@ const examples=[]
 for(const profile of ['experience','research'] as const){const s=createNumberSeriesSnapshot(profile,'2026-10-27T00:00:00.000Z'),plan=numberSeriesPlan(s.config,seed),records=plan.map((p,i)=>raw(p,i%4!==0)),score=scoreNumberSeries({session:s,config:s.config,randomSeed:seed,trials:records.map(numberSeriesEnvelope)}),report=projectNumberSeriesReport(score)
  examples.push({profile,session:s,randomSeed:seed,manifestHash:sha256(plan),formalPlan:plan,records,score,publicReport:report})
  if(profile==='experience'){
-  const context={contextKey:'synthetic-browser-number-series:epoch1',snapshot:s,randomSeed:seed,manifestHash:sha256(plan)}
+  const context={contextKey:'synthetic-browser-number-series:epoch1',language:'zh',snapshot:s,randomSeed:seed,manifestHash:sha256(plan)}
   const limited=projectNumberSeriesReport(scoreNumberSeries({session:s,config:s.config,randomSeed:seed,trials:records.slice(0,1).map(numberSeriesEnvelope)})),invalid=projectNumberSeriesReport(scoreNumberSeries({session:s,config:s.config,randomSeed:seed,trials:[]}))
   writeFileSync(root+'/browser-fixture.json',JSON.stringify({synthetic:true,context,reports:{interpretable:report,limited,invalid}},null,2)+'\n')
   for(const language of ['zh','en'] as const)writeFileSync(root+'/synthetic-report-'+language+'.txt',numberSeriesReportText(report,language)+'\n')

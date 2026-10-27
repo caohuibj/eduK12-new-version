@@ -6,7 +6,7 @@ import {scoreNumberSeries,numberSeriesEnvelope} from '../../../../../../backend/
 import {projectNumberSeriesReport} from '../../../../../../backend/src/modules/cognitive/content-candidates/number-series/report'
 import {numberSeriesPlan,reviewNumberSeriesRaw,type NumberSeriesPlan} from './generated/protocol'
 import {numberSeriesReportText,numberSeriesTakeHomeSvg} from './generated/report'
-import {digest,numberSeriesManifest,type NumberSeriesContext,type NumberSeriesPorts,type NumberSeriesDraft,type NumberSeriesReceipt} from './contracts'
+import {digest,numberSeriesManifest,validateNumberSeriesContext,type NumberSeriesContext,type NumberSeriesPorts,type NumberSeriesDraft,type NumberSeriesReceipt} from './contracts'
 import {NumberSeriesCapture} from './capture'
 import {NumberSeriesSession} from './session'
 import {NumberSeriesTask} from './NumberSeriesTask'
@@ -15,7 +15,7 @@ import {NumberSeriesReport} from './NumberSeriesReport'
 const flush=async()=>{for(let i=0;i<20;i++)await Promise.resolve()}
 function fixture() {
   const snapshot=createNumberSeriesSnapshot('experience','2026-10-27T00:00:00.000Z'),randomSeed='synthetic-number-series'
-  const context:NumberSeriesContext={contextKey:'synthetic-session:epoch-1',snapshot,randomSeed,manifestHash:digest(numberSeriesPlan(snapshot.config,randomSeed))}
+  const context:NumberSeriesContext={contextKey:'synthetic-session:epoch-1',language:'zh',snapshot,randomSeed,manifestHash:digest(numberSeriesPlan(snapshot.config,randomSeed))}
   const stored=new Map<string,NumberSeriesDraft>()
   const ports:NumberSeriesPorts={
     prepareLocalAttempt:vi.fn(async(c,manifest,realm)=>({fresh:true as const,contextKey:c.contextKey,bindingDigest:digest({context:c,manifest,realm})})),
@@ -26,6 +26,37 @@ function fixture() {
 }
 afterEach(()=>{cleanup();vi.restoreAllMocks();vi.unstubAllGlobals()})
 describe('number-series candidate teaching, records and public feedback',()=>{
+  it('freezes teaching language in context and prepare acknowledgement without changing the item plan',async()=>{
+    const f=fixture(),english:NumberSeriesContext={...f.context,language:'en'}
+    expect(digest(english)).not.toBe(digest(f.context));expect(numberSeriesManifest(english)).toEqual(numberSeriesManifest(f.context))
+    const missing=structuredClone(f.context) as Partial<NumberSeriesContext>;delete missing.language
+    expect(()=>validateNumberSeriesContext(missing as NumberSeriesContext)).toThrow('teaching language')
+    expect(()=>validateNumberSeriesContext({...f.context,language:'fr'} as never)).toThrow('teaching language')
+    const s=new NumberSeriesSession(english,f.ports,()=>{})
+    english.language='zh'
+    await s.prepare()
+    expect(s.context.language).toBe('en');expect(Object.isFrozen(s.context)).toBe(true)
+    const frozen=vi.mocked(f.ports.prepareLocalAttempt).mock.calls[0][0]
+    expect(frozen.language).toBe('en');expect(s.view).toBe('practice-ready')
+    s.begin();s.expose(100);s.answer(s.activePlan!.correctIndex,'touch',null,101);await flush()
+    expect(f.stored.get('practice:0:0')?.contextKey).toBe(frozen.contextKey)
+    const borrowed=fixture()
+    borrowed.ports.prepareLocalAttempt=vi.fn(async(c,m,realm)=>({fresh:true as const,contextKey:c.contextKey,bindingDigest:digest({context:{...c,language:'zh'},manifest:m,realm})}))
+    const rejected=new NumberSeriesSession({...borrowed.context,language:'en'},borrowed.ports,()=>{})
+    await rejected.prepare();expect(rejected.view).toBe('blocked');expect(rejected.capture).toBeNull()
+  })
+  it('uses the frozen teaching language in React and rejects mismatched UI language before exposure',async()=>{
+    const f=fixture();f.context.language='en'
+    const v=render(<NumberSeriesTask context={f.context} ports={f.ports}/>);
+    expect(screen.getByRole('region',{name:'Complete instructions and three examples'})).toBeTruthy()
+    expect(screen.getByText('Example 3: gaps that grow step by step')).toBeTruthy()
+    fireEvent.click(screen.getByRole('button',{name:'Prepare practice'}));await screen.findByRole('button',{name:'Start practice'})
+    expect(vi.mocked(f.ports.prepareLocalAttempt).mock.calls[0][0].language).toBe('en')
+    v.rerender(<NumberSeriesTask context={f.context} ports={f.ports} language="zh"/>);expect(screen.getByRole('alert')).toBeTruthy();expect(screen.queryByRole('region')).toBeNull()
+    cleanup()
+    const wrong=fixture();render(<NumberSeriesTask context={wrong.context} ports={wrong.ports} language="en"/>)
+    expect(screen.getByRole('alert')).toBeTruthy();expect(screen.queryByRole('region')).toBeNull();expect(wrong.ports.prepareLocalAttempt).not.toHaveBeenCalled()
+  })
   it('locks the first input, retains real zero time and explicit skip null, and ignores held-key repeats',()=>{
     const f=fixture(),p=numberSeriesPlan(f.snapshot.config,f.context.randomSeed)[0],cap=new NumberSeriesCapture(p,100)
     cap.answer(p.correctIndex,'keyboard','Digit'+(p.correctIndex+1),100,true);expect(cap.done).toBe(false)

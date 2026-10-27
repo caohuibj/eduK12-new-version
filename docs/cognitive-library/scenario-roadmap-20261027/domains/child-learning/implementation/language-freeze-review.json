@@ -1,0 +1,88 @@
+{
+  "kind": "unsigned-targeted-development-check-not-CI",
+  "base": "471d29cdfd5f960e36d003453a8f81d7609b9825",
+  "recordedAtUtc": "2026-10-27T11:34:15.178872+00:00",
+  "scope": "freeze teaching language only in existing candidate context/digest/prepare acknowledgement; reject mismatched UI language before exposure",
+  "sourceBindings": [
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/number-series/contracts.ts",
+      "sha256": "c984c32a8b5e5de4d9e120f0febed2a31f97f585c8153b44c79fbf15188ab4f6"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/number-series/NumberSeriesTask.tsx",
+      "sha256": "db1fcc422d2beb01a2a5d770ba7c2e063a15a2f573afce6e77ad62b38c18802b"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/number-series/content.test.tsx",
+      "sha256": "96fd2c3232622a35506b86851ad0234e50531acf7d0f9e2cc10b6f9ee40b42b9"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/child-learning/implementation/browser-fixture.json",
+      "sha256": "79670180960169884aa9186c4e6583a0eb56efdc756df0fc93d18d4f0f901b95"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/child-learning/implementation/make-fixtures.ts",
+      "sha256": "3c523474d1215306b86a97d7de4cff39560ab445892cd0cc37cfb43b03fa024f"
+    }
+  ],
+  "tests": {
+    "file": "frontend-language-freeze.json",
+    "passed": 2,
+    "failed": 0,
+    "filtered": 5,
+    "cases": [
+      {
+        "name": "freezes teaching language in context and prepare acknowledgement without changing the item plan",
+        "status": "passed"
+      },
+      {
+        "name": "uses the frozen teaching language in React and rejects mismatched UI language before exposure",
+        "status": "passed"
+      },
+      {
+        "name": "locks the first input, retains real zero time and explicit skip null, and ignores held-key repeats",
+        "status": "skipped"
+      },
+      {
+        "name": "requires confirmed retention before exposure and full instructions before each of at most three practice rounds",
+        "status": "skipped"
+      },
+      {
+        "name": "runs actual React teaching/review, touch and keyboard choices, 12 formal items, same-draft and same-final retries",
+        "status": "skipped"
+      },
+      {
+        "name": "keeps interrupted/invalid public bodies, pictures and exports free of performance values and refuses changed report bindings",
+        "status": "skipped"
+      },
+      {
+        "name": "isolates a changed context from a pending old write and never sends the old record to new ports",
+        "status": "skipped"
+      }
+    ]
+  },
+  "types": {
+    "file": "types-language-freeze.json",
+    "roots": 7,
+    "sourceFiles": 57,
+    "diagnostics": 0
+  },
+  "strictModeCleanupUnchanged": true,
+  "browserFixtureOnlyAddedZhLanguage": true,
+  "recordTrace": "draft.contextKey -> complete context retained by existing prepareLocalAttempt, including actual teaching language",
+  "noNewPublicInterface": true,
+  "protocolParameterReportVersionsUnchanged": true,
+  "notPerformed": [
+    "original item-bank tests",
+    "original five journey tests",
+    "browser rerun",
+    "report regeneration",
+    "shared content branch writes",
+    "server or platform schema changes",
+    "COS",
+    "CI",
+    "merge",
+    "deploy"
+  ],
+  "status": "pending DOT review; not integrated"
+}

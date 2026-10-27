@@ -8,9 +8,9 @@ import {NumberSeriesReport} from './NumberSeriesReport'
 import './number-series.css'
 export interface NumberSeriesTaskProps {context:NumberSeriesContext;ports:NumberSeriesPorts;language?:Language}
 /** Independent candidate: the product host and its durable ports are deliberately not registered here. */
-export function NumberSeriesTask({context,ports,language='zh'}:NumberSeriesTaskProps) {
+export function NumberSeriesTask({context,ports,language=context.language}:NumberSeriesTaskProps) {
   const [,render]=useReducer(n=>n+1,0),alive=useRef(true),invalid=useRef(false),initial=useRef({context:digest(context),ports,language})
-  const [holder]=useState(()=>{try{return {session:new NumberSeriesSession(context,ports,()=>{if(alive.current)render()})}}catch{return {error:true as const}}})
+  const [holder]=useState(()=>{try{if(language!==context.language)throw Error('UI language differs from frozen teaching language');return {session:new NumberSeriesSession(context,ports,()=>{if(alive.current)render()})}}catch{return {error:true as const}}})
   const s=holder.session,en=language==='en',view=s?.view??'blocked',plan=s?.activePlan
   if(initial.current.context!==digest(context)||initial.current.ports!==ports||initial.current.language!==language)invalid.current=true
   useEffect(()=>{alive.current=true;return()=>{alive.current=false;queueMicrotask(()=>{if(!alive.current)s?.dispose()})}},[s])

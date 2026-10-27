@@ -2,6 +2,7 @@
   "synthetic": true,
   "context": {
     "contextKey": "synthetic-browser-number-series:epoch1",
+    "language": "zh",
     "snapshot": {
       "schemaVersion": 1,
       "frozenAt": "2026-10-27T00:00:00.000Z",
