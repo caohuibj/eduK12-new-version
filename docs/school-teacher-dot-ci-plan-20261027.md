@@ -277,3 +277,24 @@ image86d6ab63e8d173bd591a6102271356397f2dc6c9439449ad3fe2b6d2783d0ff4.
 Actual raw108PASS and original472 selection plus exactmanifest/component/scan
 are required; no old pre-focus image fallback, retest or rebuild. Only changed
 browser consumer and controls/SAST/final gate remain; original failures retained.
+
+## Await actual UI readiness, not an intermediate render (04:43 UTC)
+
+Run40450395873 at89fa39e4 kept both exact application qualifications PASS, but
+browser partial artifact12710012485 ZIP1ee0e14e00abad64ba2aeb4249838a68a070016b0b349d18a659139701051b2e
+again failed School form selection and an immediate Teacher Scale focus check.
+The preceding run's Scale FINAL/report success is retained, not retroactively
+revoked or presented as this run's pass. Stop blind retries and compare actual
+async control lifecycle: aria-pressed can change before the pending save unlocks
+the native button; the strict focus assertion now first waits for that SAME real
+connected control to become enabled, then still requires focus-visible on it.
+Sanitized keyboard diagnostics contain only booleans/tag, not answer or identity.
+
+For form selection, a GET response precedes replacement of the initial empty
+editor. Wait for the requested new question button to be attached, allow the
+actual ResizeObserver two animation frames, then open the current disclosure
+if needed. No forced click, arbitrary sleep, timeout extension, removed keyboard
+assertion, fake API or production-code change. This corrects the identified
+consumer readiness races; only a real next run can establish full UI success.
+The two-e2e-file repair4e19523d is skip-ci;12direct UI contractsPASS. Application
+components and complete qualification artifacts remain unchanged and reused.
