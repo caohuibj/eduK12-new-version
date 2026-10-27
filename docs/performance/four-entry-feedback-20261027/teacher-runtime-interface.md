@@ -124,3 +124,75 @@ Integration still required:
 See [the evidence index](teacher-runtime-evidence/README.md) for exact commands,
 exits, original failures and limitations. No CI, production build, merge,
 deployment, protection or credential change occurred.
+
+
+## Production integration follow-up (2026-10-27)
+
+This section supersedes the preceding phase-one dependency list. Root source
+commits `f46336cc45abaa21d4b946029cda2a0dfadec654` and
+`282e9fb353d3216d33a58306db2dbf9ae3d3d04a` were normally merged into this
+independent branch. Integration was never written. Follow-up product commit:
+`f299f7247a37a11a1cb53d99c4ead57eb5274d11`; tree:
+`3f31d61e2988f026ab3ef121c658e77c9e5d2131`.
+
+The backend now mounts the required-source router with
+`teacherAssessmentRuntimeSource`: the actual identity reader and exact original
+issuer proofs for NEW_USE. Bound/history access deliberately does not repeat
+issuer admission; current Teacher/organization/event/SELF/consent checks remain
+in the participant guard and canonical services. Root's transactional execution
+source fence and production Cognitive Composite adapter are the shared authority.
+The existing Teacher application now supplies `assessmentRuntime={{}}` to its
+inbox. A fresh parent COMPLETED state remains the only completion signal.
+`renderFeedback(completion)` and `onCompleted(completion)` remain available for
+the feedback worker; this worker has not copied report authorization.
+
+Actual disposable PostgreSQL 16.15 was created with all 240 candidate migrations,
+Prisma 5.22.0 and an independently verified restricted runtime role. The existing
+old test database and its original missing-column failure were preserved.
+The real router/auth/CSRF/source reader/original authority/START/FINAL/storage
+services ran without module mocks. Synthetic owner fixtures explicitly prepare
+source metadata and approve only local synthetic content; this is not proof of
+the production source producer, provenance approval workflow or real-tool release.
+
+The real tests exposed three small shared consumer gaps, included for root review:
+
+- `assessment-run/publish.ts`: permit the already authorized exact education
+  Cognitive source with a Composite launch target; retain the standalone bridge
+  rejection for every other Cognitive publication.
+- `assessment-runtime/typed-form.ts`: remove only the temporary undefined
+  `displayIf` property before canonical JSON/hash generation; preserve explicit
+  conditions. The shared Training flow consumer and actual mixed FINAL were tested.
+- `assessment-run/consent.ts`: use identity type SELF when an explicitly
+  consent-requiring Teacher SELF_REPORT has identical subject/respondent; retain
+  all existing observer scope and Parent/non-SELF rules. No default consent or
+  disclosure policy was changed.
+
+The Teacher child SQL now casts the PostgreSQL enum to text for the parameterized
+family comparison. The real wrong-session case had revealed enum=text (42883),
+which a mocked SQL construction test could not reveal.
+
+Reused implementations: shared FinalCompositeAssessment, embedded CognitiveRunner,
+SituationalRunner host transport, active slot encryption/hash/epoch, current-unit
+projection, consent lineage, image/video capability controllers, canonical FINAL,
+encrypted raw submission persistence and parent/Run completion reconciliation.
+Only Teacher realm/current actor/event/organization permission checks, media API
+transport, completion-only projections and inbox composition are new adaptations.
+No independent scoring, report, versioning or storage engine was added.
+
+Remaining integration obligations: production source authoring/publishing;
+independently authorized feedback injection; real Teacher browser participation;
+real object-store/video delivery; Redis session-revocation store; concurrent
+revocation/content races; root's independent review and selected formal CI.
+The PostgreSQL passes are separate targeted invocations, not a final full-suite
+or CI pass. Full commands, failures and boundaries are in
+[phase-two evidence](teacher-runtime-evidence/phase2/README.md).
+
+
+Root later announced source producer `8fcfadcadeb7fd09fd8e453aa6eb16d87d53e686`.
+It is read-only in this worker: `origin.distribution` is now required and needs
+exact original grants in root's NEW_USE/NEW_START consumer. The participant
+adapter does not infer this authorization from identity. The synthetic PG
+fixture requires corresponding real grant preparation and rehashed origin once
+that candidate is integrated. Current PG evidence is root282-bound and does not
+cover the new distribution contract. Source producer files and existing source
+18-case suite remain outside this worker's changes.

@@ -1,5 +1,9 @@
 # Teacher runtime local evidence
 
+This file preserves phase-one history. The subsequent actual integration and
+PostgreSQL results are recorded separately in [phase two](phase2/README.md).
+Phase-one limitations below describe that earlier snapshot.
+
 These are diagnostic local executions on the independent cloud node, Node
 24.21.0, Vitest 4.1.11, backend TypeScript 5.9.3 and frontend TypeScript 5.6.3.
 They are not signed CI evidence, formal
