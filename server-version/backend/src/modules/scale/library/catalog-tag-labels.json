@@ -387,6 +387,30 @@
     "label": "亲社会与情绪调节合并",
     "axis": "construct"
   },
+  "construct:sel_secds28_dimension_1": {
+    "label": "亲社会",
+    "axis": "construct"
+  },
+  "construct:sel_secds28_dimension_2": {
+    "label": "诚实",
+    "axis": "construct"
+  },
+  "construct:sel_secds28_dimension_3": {
+    "label": "自我发展",
+    "axis": "construct"
+  },
+  "construct:sel_secds28_dimension_4": {
+    "label": "自我控制",
+    "axis": "construct"
+  },
+  "construct:sel_secds28_dimension_5": {
+    "label": "学校中的尊重",
+    "axis": "construct"
+  },
+  "construct:sel_secds28_dimension_6": {
+    "label": "家中的尊重",
+    "axis": "construct"
+  },
   "construct:sel_secq25_relationship_management": {
     "label": "关系管理",
     "axis": "construct"
