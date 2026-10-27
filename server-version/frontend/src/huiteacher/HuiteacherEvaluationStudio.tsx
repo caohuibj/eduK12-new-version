@@ -1,6 +1,8 @@
 import {SchoolTaskHelp as ManagementHelp} from '../school/SchoolTaskHelp'
 import {SelectedToolOutline} from '../modules/assessment-core/composition/SelectedToolOutline'
 import {EducationPrivateScalePicker} from '../components/education-tools/EducationPrivateScalePicker'
+import {EducationAssessmentResourcePicker} from '../components/education-tools/EducationAssessmentResourcePicker'
+import type {EducationAssessmentResourceAdapter} from '../api/educationAssessmentResources'
 import {HuiteacherGrowthManager} from './HuiteacherGrowthManager'
 import { useCallback,useEffect,useRef,useState } from 'react'
 import { HuiteacherFieldManager } from './HuiteacherFieldManager'
@@ -38,7 +40,7 @@ function nextAction(event:Event,run?:Run){
     :'查看已有任务配置；如尚未创建，在活动草稿中建立评价任务。'
   if(run.status==='CANCELLED')return '评价任务已取消，活动状态仍独立保留。'
   if(run.status==='DRAFT')return (run.trackCount??0)<1
-    ?'加入已发布表单或本校获授权量表，再预览任务配置。'
+    ?'加入已发布表单或本校、本入口获授权的固定工具版本，再预览任务配置。'
     :event.status==='DRAFT'?'预览配置并开放活动，然后单独发布评价任务。'
     :event.status==='OPEN'?'活动已开放，但任务尚未发布；先预览配置，再发布任务。'
     :'查看任务配置与活动状态。'
@@ -48,8 +50,8 @@ function nextAction(event:Event,run?:Run){
     :'查看任务配置；群体报告是否可用由原有权限与隐私条件决定。'
   return '查看任务配置与当前活动状态。'
 }
-export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateTools=false,actorKey=''}:{
-  organizationId:string;api:Api;canAuthorPrivateTools?:boolean;actorKey?:string
+export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateTools=false,actorKey='',assessmentResources}:{
+  organizationId:string;api:Api;canAuthorPrivateTools?:boolean;actorKey?:string;assessmentResources?:EducationAssessmentResourceAdapter
 }){
   const base='/organizations/'+organizationId
   const scaleScope=useRef({base,api})
@@ -135,7 +137,7 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
       if(generation===scopeGeneration.current)setFormsError(error instanceof Error?error.message:'已发布表单读取失败')
     })
     return ()=>{scopeGeneration.current++}
-  },[base,api,loadTargets,loadEvents])
+  },[base,api,actorKey,loadTargets,loadEvents])
   useEffect(()=>{previewEpoch.current++;setPreviews({})},[actorKey])
   const actionPending=useRef(false)
   const perform=(fn:()=>Promise<void>)=>{
@@ -406,6 +408,10 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
         })()}
         <details><summary>任务技术详情</summary><p>Assessment Run：<code>{runMap[event.id].runId}</code> · {runMap[event.id].status} · Track 数量：{runMap[event.id].trackCount??0}</p></details>
         {runMap[event.id].status==='DRAFT'&&<>
+          <EducationAssessmentResourcePicker
+            scope={{product:'TEACHER',organizationId,actorKey,workflowId:event.id,runId:runMap[event.id].runId,expectedVersion:runMap[event.id].version}}
+            adapter={assessmentResources} disabled={working} onBusy={privateBusy}
+            onRefresh={async()=>{await fetchRun(event)}}/>
           {canAuthorPrivateTools&&actorKey&&<EducationPrivateScalePicker
             key={`private:${actorKey}:${organizationId}:${event.id}:${runMap[event.id].runId}`}
             entry="TEACHER" organizationId={organizationId} actorKey={actorKey} scopeKey={`${event.id}:${runMap[event.id].runId}`}

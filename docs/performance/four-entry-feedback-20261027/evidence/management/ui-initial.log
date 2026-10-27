@@ -1,0 +1,20 @@
+npm warn Unknown env config "jobs". This will stop working in the next major version of npm.
+npm warn Unknown env config "devdir". This will stop working in the next major version of npm.
+npm warn Unknown env config "nodedir". This will stop working in the next major version of npm.
+
+ RUN  v4.1.11 /workspace/eduK12-new-version/server-version/frontend
+
+ ✓ src/components/education-tools/EducationAssessmentResourcePicker.test.tsx (24 tests) 1626ms
+     ✓ sends only an exact personal track for each family in TEACHER  473ms
+ ✓ src/huiteacher/HuiteacherLibraryCatalog.test.tsx (6 tests) 1616ms
+     ✓ continues empty pages and preserves selection on failed pagination, then retries without duplicates  839ms
+ ✓ src/school/SchoolActivityCatalogPagination.test.tsx (2 tests) 874ms
+     ✓ continues empty pages, preserves selection after failure, retries and deduplicates only exact versions  571ms
+     ✓ discards pending resources after activity and run context changes  300ms
+
+ Test Files  3 passed (3)
+      Tests  32 passed (32)
+   Start at  08:47:02
+   Duration  6.64s (transform 2.76s, setup 858ms, import 3.32s, tests 4.12s, environment 2.49s)
+
+JSON report written to /tmp/pr363-education-management/ui-initial.json
