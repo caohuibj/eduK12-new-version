@@ -412,3 +412,34 @@ export type ArithverifyTrialPayload = {
   rtMs: number | null
   interrupted: boolean
 }
+
+/** Sizecongruity 冻结 config（与后端 sizecongruity.config schema 一致）。 */
+export interface SizecongruityConfig {
+  totalTrials: number
+  congruentRatio: number
+  minDigit: number
+  maxDigit: number
+  minGap: number
+  fontLargeRem: number
+  fontSmallRem: number
+  fixationMs: number
+  timeoutMs: number
+  validRtFloorMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+/** Sizecongruity 单 trial payload（与后端 sizecongruity.trial schema 一致）。 */
+export type SizecongruityTrialPayload = {
+  leftDigit: number
+  rightDigit: number
+  leftFontScale: 'large' | 'small'
+  rightFontScale: 'large' | 'small'
+  response: 'left' | 'right' | null
+  rtMs: number | null
+  interrupted: boolean
+}

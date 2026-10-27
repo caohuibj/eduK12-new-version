@@ -26,6 +26,7 @@ import { executionEntries as task23 } from '../tasks/lexicaldecision/package'
 import { executionEntries as task24 } from '../tasks/emotionrecognition/package'
 import { executionEntries as task25 } from '../tasks/numberline/package'
 import { executionEntries as task26 } from '../tasks/arithverify/package'
+import { executionEntries as task27 } from '../tasks/sizecongruity/package'
 export const cognitiveExecutionEntries = [
   task0[0],
   task1[0],
@@ -57,5 +58,6 @@ export const cognitiveExecutionEntries = [
   task24[0],
   task25[0],
   task26[0],
+  task27[0],
   task21[1],
 ]

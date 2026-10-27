@@ -203,6 +203,12 @@ const SCORING_DECLARATIONS: Record<string, CognitiveScoringContractDeclaration> 
     runtimeReconstructableFacts: ['操作数与呈现结果（seed/config）', '等式真伪（由操作数权威推导）'],
     serverDerivedFacts: ['等式真伪与正确性判定', 'metrics（accuracy/medianRtMs/problemSizeSlopeMs）', 'quality flags'],
   },
+  sizecongruity: {
+    testType: 'sizecongruity',
+    clientObservedFacts: ['左/右侧判断响应', 'raw RT', 'interrupted'],
+    runtimeReconstructableFacts: ['数字对与字号条件（seed/config）', '数值较大侧（由数字权威推导）'],
+    serverDerivedFacts: ['较大侧与一致性条件判定', 'metrics（sizeCongruityEffectMs/条件RT与正确率）', 'quality flags'],
+  },
 }
 
 // 当前通用事实（所有任务一致）：完整加密 trial payload、v2 trial envelope qualityEvents、
@@ -341,6 +347,11 @@ const RESEARCH_CAPTURE_DECLARATIONS: Record<string, CognitiveResearchCaptureDecl
   },
   arithverify: {
     testType: 'arithverify',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次响应与 raw RT'],
+    futureCaptureFacts: ['真实 input modality', 'device provenance', 'viewport/dpr'],
+  },
+  sizecongruity: {
+    testType: 'sizecongruity',
     currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次响应与 raw RT'],
     futureCaptureFacts: ['真实 input modality', 'device provenance', 'viewport/dpr'],
   },

@@ -26,4 +26,5 @@ import { participantPresentations as task23 } from '../tasks/lexicaldecision/par
 import { participantPresentations as task24 } from '../tasks/emotionrecognition/participant-presentation'
 import { participantPresentations as task25 } from '../tasks/numberline/participant-presentation'
 import { participantPresentations as task26 } from '../tasks/arithverify/participant-presentation'
-export const cognitivePresentations = [...task0, ...task1, ...task2, ...task3, ...task4, ...task5, ...task6, ...task7, ...task8, ...task9, ...task10, ...task11, ...task12, ...task13, ...task14, ...task15, ...task16, ...task17, ...task18, ...task19, ...task20, ...task21, ...task22, ...task23, ...task24, ...task25, ...task26]
+import { participantPresentations as task27 } from '../tasks/sizecongruity/participant-presentation'
+export const cognitivePresentations = [...task0, ...task1, ...task2, ...task3, ...task4, ...task5, ...task6, ...task7, ...task8, ...task9, ...task10, ...task11, ...task12, ...task13, ...task14, ...task15, ...task16, ...task17, ...task18, ...task19, ...task20, ...task21, ...task22, ...task23, ...task24, ...task25, ...task26, ...task27]
