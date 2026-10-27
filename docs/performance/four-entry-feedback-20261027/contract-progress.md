@@ -20,3 +20,9 @@
 将Teacher `addTeacherRunTrack` 的非FORM/SCALE一律拒绝，替换为复用精确源政策后的个人任务策略：认知、SJT、组合必须是TEACHER→本人TEACHER、SELF、SELF_REPORT、INDIVIDUAL_ONLY、无群体最小人数；来源必须有Composite目标，并通过原有政策不扩权断言。原Form群体逻辑、Scale独立许可、当前管理员和注册资源检查均保留。
 
 此策略不等于工具准入或报告授权，缺少已发布来源仍由上游资源解析拒绝；认知生产adapter尚未启用。12项策略正反例PASS；真实Express路由9项PASS（认证/业务服务mock，仅证明路由身份与分派，不冒充真实授权数据库验收），其中3项新增家族均保留管理员拒绝和路径身份。无PG/浏览器/正式CI。
+
+## 第三切片：教育资源来源草稿合同
+
+新增无副作用的精确来源草稿合同：独立教育runtime、product/organization身份、每单元C/P/R固定ID和hash、显式空参数/报告、重复/跨层冲突拒绝。复用既有关系条目和披露合同校验，只能产生DRAFT，不能通过HTTP布尔值成为PUBLISHED。7项初轮PASS；增加同ID跨层冲突断言后只补该项1PASS/6filtered。后端最终本地tsc exit0。该模块尚未接入持久化/发布消费者，不把它称为已可用资源登记。
+
+下一步必须由真实发布/授权服务读取并校验各层来源、许可、scope、受众、当前审批身份，再绑定到运行和报告；不能将本合同的结构校验当内容授权。正式CI/PG/浏览器仍未运行。
