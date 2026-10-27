@@ -9,9 +9,10 @@ import {HFReport} from './HFReport'
 import './hearts-flowers.css'
 export interface HeartsFlowersTaskProps {context:HFContext;ports:HFPorts;language?:'zh'|'en'}
 /** Content candidate only; all product entry, durable storage, API and archive adapters remain outside this candidate. */
-export function HeartsFlowersTask({context,ports,language='zh'}:HeartsFlowersTaskProps){const [,render]=useReducer(n=>n+1,0),alive=useRef(true),invalid=useRef(false),initial=useRef({context:digest(context),ports,language}),starting=useRef<number|null>(null),[holder]=useState(()=>{try{if(context.administration.language!==language)throw Error('Language mismatch');return {session:new HFSession(context,ports,()=>{if(alive.current)render()})}}catch{return {error:true as const}}}),s=holder.session,en=language==='en',view=s?.view??'blocked',cap=s?.capture,stage=cap?.raw.state.stage
+export function HeartsFlowersTask({context,ports,language='zh'}:HeartsFlowersTaskProps){const [,render]=useReducer(n=>n+1,0),alive=useRef(true),lifecycle=useRef(0),invalid=useRef(false),initial=useRef({context:digest(context),ports,language}),starting=useRef<number|null>(null),[holder]=useState(()=>{try{if(context.administration.language!==language)throw Error('Language mismatch');return {session:new HFSession(context,ports,()=>{if(alive.current)render()})}}catch{return {error:true as const}}}),s=holder.session,en=language==='en',view=s?.view??'blocked',cap=s?.capture,stage=cap?.raw.state.stage
  if(initial.current.context!==digest(context)||initial.current.ports!==ports||initial.current.language!==language)invalid.current=true
- useEffect(()=>{alive.current=true;return()=>{alive.current=false;if(starting.current!==null)cancelAnimationFrame(starting.current);s?.dispose()}},[s])
+ // StrictMode replays setup/cleanup synchronously. Pause immediately, dispose only if no matching setup follows.
+ useEffect(()=>{const generation=++lifecycle.current;alive.current=true;s?.resumeHost();return()=>{const stoppedAtMs=performance.now();alive.current=false;s?.suspendHost();if(starting.current!==null)cancelAnimationFrame(starting.current);queueMicrotask(()=>{if(lifecycle.current===generation&&!alive.current)s?.dispose(stoppedAtMs)})}},[s])
  useEffect(()=>{if(invalid.current)s?.dispose()},[s,context,ports,language])
  useEffect(()=>{if(!s)return
   const send=(kind:'down'|'up',side:Side,input:Input,token:string,key:string|null,repeat=false)=>{if(alive.current&&!invalid.current)s.input({kind,atMs:performance.now(),side,input,token,key,repeat})}

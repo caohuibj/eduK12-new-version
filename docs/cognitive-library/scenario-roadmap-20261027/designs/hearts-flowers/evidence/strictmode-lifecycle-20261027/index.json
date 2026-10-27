@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "status": "STRICTMODE_ENGINEERING_FIX_PENDING_DOT_REVIEW",
+  "parentReviewCommit": "2e26ed98e33a76546faffc88f045d7003eb913ff",
+  "sharedContentCommitNotUpdated": "072b2900d4295c7d741d5e55c9ce6cfbbf6f58d2",
+  "branch": "cognitive/review-hearts-flowers-20261027",
+  "changeClass": "host lifecycle engineering fix only; approved measurement protocol and frozen contracts unchanged",
+  "changedSources": [
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/HeartsFlowersTask.tsx",
+      "sha256": "6cc4d746af9c7af5ad7bc68b99a0705e15419e93d381bf9518305a5aab314125"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/session.ts",
+      "sha256": "d37a657ab5e89e67231e9624f6367f8f361f8d9523d5c47fa5556390f8111b53"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/content.test.tsx",
+      "sha256": "80eff88e7884319ded17703db1c64cfa7bf9fac331157cbcba9814d5eb810a48"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/IMPLEMENTATION.md",
+      "sha256": "9db083e2802b14450860bba0c6a2da75a304e881269d8ba4504054e8944e7220"
+    }
+  ],
+  "execution": {
+    "name": "frontend-strictmode-lifecycle-first",
+    "exit": 0,
+    "inputSHA256": "0cf069a8106f859c0505875e5e14121bef4f5dff7aedb01051a7765327c6cadd",
+    "command": [
+      "/tmp/cognitive-takeover-20261027/tools/node-v24.21.0-linux-x64/bin/node",
+      "node_modules/vitest/vitest.mjs",
+      "run",
+      "src/modules/cognitive/tasks/hearts-flowers/content.test.tsx",
+      "--maxWorkers=1",
+      "--testNamePattern=survives StrictMode effect replay|blocks an acknowledged local save",
+      "--reporter=json",
+      "--outputFile=/tmp/hearts-flowers-content-20261027/frontend-strictmode-lifecycle-first.vitest.json"
+    ],
+    "passed": 2,
+    "failed": 0,
+    "filtered": 4,
+    "cases": [
+      [
+        "Hearts and flowers candidate runner uses fresh first inputs and half-open deadlines, retains held baselines, and preserves a deadline window interrupted before a frame callback",
+        "skipped"
+      ],
+      [
+        "Hearts and flowers candidate runner requires 7/8 practice, keeps interrupted rounds distinct and connects a full 32-trial final to the authoritative scorer and matching immutable receipt",
+        "skipped"
+      ],
+      [
+        "Hearts and flowers candidate runner renders actual stimulus/blank stages and touch answers, repeats full teaching after 8 failed trials, and retries only the original failed draft",
+        "skipped"
+      ],
+      [
+        "Hearts and flowers candidate runner retains interrupted raw through the original frozen local port on disposal without duplicate writes or finalization, and rejects reused preparation",
+        "skipped"
+      ],
+      [
+        "Hearts and flowers candidate runner survives StrictMode effect replay, starts practice, and retains original interrupted raw on real unmount or context replacement",
+        "passed"
+      ],
+      [
+        "Hearts and flowers candidate runner blocks an acknowledged local save from advancing or finalizing while host cleanup awaits its disposal microtask",
+        "passed"
+      ]
+    ]
+  },
+  "artifacts": [
+    {
+      "path": "frontend-strictmode-lifecycle-first.execution.json",
+      "sha256": "da5a458068975fbf7e8928cdac6e4b50dbf421d50a68c2620aee50ca0033da7b",
+      "bytes": 13966
+    },
+    {
+      "path": "frontend-strictmode-lifecycle-first.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "frontend-strictmode-lifecycle-first.stdout.log",
+      "sha256": "b6185264160bb4a9e87a5954a388c5c388d63a21a7f6c8ee5b6c318a26185c0b",
+      "bytes": 108
+    },
+    {
+      "path": "frontend-strictmode-lifecycle-first.vitest.json",
+      "sha256": "4557ae9c390d8cae7eeb32efc40fbd2118dcf82b9033fecfee90442da257aa40",
+      "bytes": 3486
+    }
+  ],
+  "limits": [
+    "software clock/jsdom and synthetic memory ports only",
+    "last-item session fixture is not a full formal journey",
+    "no old suite/type/build/report check replay, application integration, device/DB/COS/CI, merge or deployment"
+  ],
+  "protectedWIPUnchanged": 25
+}

@@ -44,3 +44,12 @@ FINAL适配器必须核封存claim/实际记录一致，将claim.termination传�
 分类为未发布候选的报告文字/呈现修订：不改protocol、config、raw、scorer、公开投影结构或版本绑定。首屏仅从公开投影的心/花/混合三个互斥主条件相加，给出本次记录、答对、答错及未回应数，并逐条件描述实际次数；不把混合子条件重复相加，不对无记录条件作零能力判断。中英文同义；回应窗口、半开区间和计算依据在默认收起的技术说明中，未定义用时仍保留为原投影null，只在阅读层说明无记录。原始已过计分/运行器证据不重跑、不改写；仅检查新增报告文字及完整、部分、零正确、真实未回应、无条件记录和invalid gate分支。新增原件单列于evidence/report-reading-20261027/，原evidence/index.json及27文件历史摘要保持不动。
 
 此次仅运行新增HFReport.test.tsx：2项通过、0失败；未重跑旧4项前端或3项计分，也未重新声称旧类型结果覆盖新的报告源码。既有connected case只同步其报告文案断言，未重走32题旅程；新报告检查已覆盖32题全正确的相同阅读断言。
+
+
+## StrictMode宿主工程补充（2026-10-27，待DOT定向复核）
+
+原内容候选已由DOT独立复核并进入共享内容提交072b2900d4295c7d741d5e55c9ce6cfbbf6f58d2；仍未接入或上线。本次重新打开一个真实工程缺口：main.tsx使用React.StrictMode，其effect setup→cleanup→setup会被旧宿主误认为永久卸载。修复仅追加至独立评审分支，尚未汇入072b后的共享内容分支。
+
+宿主使用lifecycle generation和一轮微任务判断effect重放；cleanup同步关闭alive、暂停session并取消待启动帧，因而旧事件、保存回执与FINAL推进立即停止。相同挂载的同步setup恢复暂停并递增generation，使旧清理失效；真正卸载则以cleanup当时冻结的时间dispose原session，经原本机端口保留中断raw，不使用微任务稍后时刻冒充完整回应窗口。context/ports/language变化仍立即永久dispose；disposed不可通过resumeHost复活。原本机写可完成并保留，但暂停/销毁后不得继续题目或FINAL。没有改变图审刺激、布局、时序参数、输入、随机化、计分、raw/schema或冻结版本组合。
+
+只运行content.test.tsx中新加两项：2通过、0失败、4旧项过滤。实际React.StrictMode组件验证准备/开始与真实卸载、身份更换原端口隔离和原件摘要；另一个局部session夹具直接置于最后正式题，仅验证异步本机保存回执在cleanup暂停后不得进入旧FINAL，不声称完整正式旅程或新科研数据。没有重跑旧全组、报告检查、类型/构建、完整App、物理设备、DB/COS或CI。完整原命令/摘要/输出见evidence/strictmode-lifecycle-20261027/index.json；旧证据及其哈希保留原样。

@@ -52,4 +52,26 @@ describe('Hearts and flowers candidate runner',()=>{
   const pendingFixture=fixture();let resolveWrite:()=>void=()=>{};const delayed=new Promise<void>(resolve=>{resolveWrite=resolve}),baseSave=pendingFixture.ports.persistLocalDraft;pendingFixture.ports.persistLocalDraft=vi.fn(async record=>{await delayed;return baseSave(record)});const pending=pendingFixture.session();await pending.prepare();pending.begin(100);pending.tick(101);pending.input({kind:'activate',atMs:201,side:correctSide(pending.capture!.raw.plan.shape,pending.capture!.raw.plan.side),input:'assistive',token:'a',key:null,repeat:false});pendingFixture.clock=1201;pending.tick(1201);expect(pendingFixture.ports.persistLocalDraft).toHaveBeenCalledTimes(1);pending.dispose();resolveWrite();await flush();expect(pendingFixture.ports.persistLocalDraft).toHaveBeenCalledTimes(1);expect(pending.capture).toBeNull();expect(pendingFixture.ports.finalize).not.toHaveBeenCalled()
   const failedFixture=fixture();failedFixture.ports.persistLocalDraft=vi.fn(async()=>{throw Error('local write outcome unavailable')});const failed=failedFixture.session();await failed.prepare();failed.begin(100);failed.tick(101);failedFixture.clock=102;failed.dispose();await flush();expect(failed.retained).toHaveLength(1);expect(failedFixture.ports.persistLocalDraft).toHaveBeenCalledTimes(1);expect(failedFixture.ports.finalize).not.toHaveBeenCalled();expect(failed.receipt).toBeNull()
  })
+
+ it('survives StrictMode effect replay, starts practice, and retains original interrupted raw on real unmount or context replacement',async()=>{
+  let now=100,next=0;const frames=new Map<number,FrameRequestCallback>()
+  vi.spyOn(performance,'now').mockImplementation(()=>now);vi.stubGlobal('requestAnimationFrame',(cb:FrameRequestCallback)=>{frames.set(++next,cb);return next});vi.stubGlobal('cancelAnimationFrame',(id:number)=>frames.delete(id))
+  const frame=async()=>{now++;const callbacks=[...frames.values()];frames.clear();await act(async()=>{for(const cb of callbacks)cb(now);await flush()})}
+  const start=async(f:ReturnType<typeof fixture>)=>{fireEvent.click(screen.getByRole('button',{name:'准备练习'}));await screen.findByRole('button',{name:'开始'});expect(f.ports.prepareLocalAttempt).toHaveBeenCalledTimes(1);fireEvent.click(screen.getByRole('button',{name:'开始'}));await frame();await frame();expect(screen.getByRole('img').querySelector('svg')).toBeTruthy()}
+  const f=fixture(),first=render(<React.StrictMode><HeartsFlowersTask context={f.context} ports={f.ports}/></React.StrictMode>)
+  await act(async()=>{await flush()});await start(f);const stoppedAtMs=++now,staleFrames=[...frames.values()];first.unmount();now+=5000
+  await act(async()=>{for(const cb of staleFrames)cb(now);await flush()})
+  expect(f.ports.persistLocalDraft).toHaveBeenCalledTimes(1);const raw=vi.mocked(f.ports.persistLocalDraft).mock.calls[0][0];expect(raw.raw).toMatchObject({status:'interrupted',stopReason:'context-disposed',endedAtPerfMs:stoppedAtMs});expect(raw.raw.state.closedMs).toBeNull();const {recordDigest,...body}=raw;expect(recordDigest).toBe(digest(body));expect(f.ports.finalize).not.toHaveBeenCalled();expect(screen.queryByRole('img')).toBeNull()
+  const old=fixture(),replacement=fixture(),second=render(<React.StrictMode><HeartsFlowersTask context={old.context} ports={old.ports}/></React.StrictMode>)
+  await start(old);now++;second.rerender(<React.StrictMode><HeartsFlowersTask context={{...replacement.context,contextKey:'new-attempt'}} ports={replacement.ports}/></React.StrictMode>);await act(async()=>{await flush()})
+  expect(screen.getByRole('alert')).toBeTruthy();expect(old.ports.persistLocalDraft).toHaveBeenCalledTimes(1);expect(replacement.ports.persistLocalDraft).not.toHaveBeenCalled();expect(old.ports.finalize).not.toHaveBeenCalled();expect(replacement.ports.finalize).not.toHaveBeenCalled();second.unmount();await flush();expect(old.ports.persistLocalDraft).toHaveBeenCalledTimes(1)
+ })
+ it('blocks an acknowledged local save from advancing or finalizing while host cleanup awaits its disposal microtask',async()=>{
+  const f=fixture();let resolveWrite:()=>void=()=>{};const delayed=new Promise<void>(resolve=>{resolveWrite=resolve}),baseSave=f.ports.persistLocalDraft
+  f.ports.persistLocalDraft=vi.fn(async record=>{await delayed;return baseSave(record)});const s=f.session();await s.prepare()
+  // Place the session at the last formal item to exercise the actual post-save FINAL branch without replaying earlier trials.
+  s.phase='test';s.formalIndex=31;s.view='block-ready';s.begin(100);s.tick(101);s.input({kind:'activate',atMs:201,side:correctSide(s.capture!.raw.plan.shape,s.capture!.raw.plan.side),input:'assistive',token:'a',key:null,repeat:false});f.clock=1201;s.tick(1201)
+  expect(f.ports.persistLocalDraft).toHaveBeenCalledTimes(1);s.suspendHost();resolveWrite();await flush()
+  expect(s.formalIndex).toBe(31);expect(s.capture).toBeNull();expect(s.receipt).toBeNull();expect(f.ports.finalize).not.toHaveBeenCalled();s.dispose(1201);s.resumeHost();s.begin(1202);await s.retry();expect(s.capture).toBeNull();expect(f.ports.persistLocalDraft).toHaveBeenCalledTimes(1);expect(f.ports.finalize).not.toHaveBeenCalled();expect(s.retained).toHaveLength(1)
+ })
 })
