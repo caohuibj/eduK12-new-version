@@ -1,0 +1,690 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "psyflex6_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "下面是一些描述你近期状态的句子。\n\n请只根据你**过去七天**的真实经历来回答每一句，选择最符合你实际情况的程度。没有对错之分，不必反复斟酌，按你真实的感受和做法来选就好。",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "「过去七天」回顾期取自作者官方 Psy-Flex 英文问卷说明；作答引导语为平台独立撰写的中文工作稿。作者另发布官方中文版问卷，本译稿不复制其措辞。"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "心理灵活性问卷（Psy-Flex，6题）— 中文工作译稿",
+      "abbreviation": "PSYFLEX-6-ZH-WORKING",
+      "instrumentFamily": "Psy-Flex (Gloster et al. 2021)"
+    },
+    "construct": {
+      "primaryDomain": "SELF_REGULATION",
+      "secondaryDomains": [
+        "WELL_BEING"
+      ],
+      "constructDefinition": "过去七天内自述的心理灵活性：能否回到当下、容纳不舒服的经验、与妨碍性想法保持距离、保持稳定的自我感、按自己的价值决定精力投向、并投入有意义的事。六题分别对应 ACT 模型的六个核心过程，但**只输出一个总分**，不输出六个分量表（每题一过程，不足以构成可解释的分量表）。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "domain:selfreg_executive",
+        "domain:wellbeing_strength",
+        "construct:psychological_flexibility",
+        "construct:act_hexaflex",
+        "construct:present_moment_awareness",
+        "construct:acceptance",
+        "construct:defusion",
+        "construct:self_as_context",
+        "construct:values",
+        "construct:committed_action",
+        "construct:state_last_seven_days",
+        "construct:not_trait_measure",
+        "construct:not_diagnostic",
+        "construct:not_ability",
+        "orientation:ACT",
+        "orientation:contextual_behavioral_science",
+        "orientation:not_therapy_specific",
+        "orientation:not_dbt_specific",
+        "population:adult_project_18_plus",
+        "population:not_k12_validated",
+        "population:not_chinese_validated",
+        "response:self",
+        "response:6_items",
+        "response:five_point_1_to_5",
+        "response:seldom_to_very_often",
+        "response:no_reverse_items",
+        "response:single_total_sum_6_to_30",
+        "response:no_subscales",
+        "response:recall_window_last_seven_days",
+        "response:complete_required_project_proposal",
+        "use:research",
+        "use:individual_reflection",
+        "use:not_diagnostic",
+        "use:not_selection",
+        "use:no_chinese_norms",
+        "use:no_empirical_cutoffs",
+        "license:authorization_pending",
+        "license:author_contact_pending",
+        "license:risk_noted",
+        "license:official_chinese_version_exists_not_copied",
+        "language_validation:source_en",
+        "language_validation:content_zh-CN",
+        "language_validation:independent_work_translation",
+        "language_validation:expert_translation_review_pending",
+        "language_validation:cognitive_interviews_pending",
+        "language_validation:local_validation_pending",
+        "Psy-Flex",
+        "心理灵活性",
+        "ACT",
+        "接纳承诺疗法",
+        "活在当下",
+        "接纳",
+        "认知解离",
+        "价值",
+        "承诺行动",
+        "过去七天",
+        "中文工作译稿"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "原版面向成人（含大学生与社区/临床样本）。平台以18+作为保守项目边界；未建立中国人群验证，不外推中小学生。作答者即本人。"
+    },
+    "administration": {
+      "itemCount": 6,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED"
+      ],
+      "timeFrame": "过去七天；作者问卷说明明确要求围绕最近七天的经历作答。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "固定官方问卷的六题原序，不重排、不加注意力题。",
+        "五档频率：1 极少如此 到 5 总是如此，中间档保留数字与中文标签。",
+        "无反向题；单一总分 = 六题求和，范围 6–30，不输出六个分量表。",
+        "**高分表示心理灵活性更高**，不是能力高低或临床判断；报告不得写成“越高越好”的价值判断。",
+        "「过去七天」为作者规定的回顾期，必须在指导语中完整呈现，不得删除或改成长时窗。",
+        "作者已发布官方中文版问卷，本题文为独立工作译稿，不复制其措辞，也不继承其验证。",
+        "complete_required 为项目保守缺答约定：缺任一题总分为 null，不补零、不插补。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "原英语版报告单因子结构与良好信度；独立中文工作稿未验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "帮助成人回顾自己过去七天的心理灵活状态；不作诊断、能力评价或疗效判断。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "psyflex-gloster2021-en-structure",
+        "evidenceType": "STRUCTURAL_VALIDITY",
+        "population": "原版开发样本为成人（含大学生与社区／临床样本）",
+        "ageRange": "原报告未给出精确年龄边界；平台以18+作为保守边界",
+        "locale": "en",
+        "territory": "CH",
+        "studyDesign": "Gloster 等 2021 报告 Psy-Flex 为6题单因子，五点频率，求和范围6–30，越高表示心理灵活性越高；后续研究报告信度良好。",
+        "rating": "MIXED",
+        "citation": "Gloster, A. T., Block, V. J., Klotsche, J., Villanueva, J., Rinner, M. T. B., Benoy, C., Walter, M., Karekla, M., & Bader, K. (2021). Psy-Flex: A contextually sensitive measure of psychological flexibility. Journal of Contextual Behavioral Science, 22, 13–23. https://doi.org/10.1016/J.JCBS.2021.09.001",
+        "doi": "10.1016/J.JCBS.2021.09.001",
+        "url": "https://doi.org/10.1016/J.JCBS.2021.09.001",
+        "notes": "题文取自作者官方 Psy-Flex 英文问卷 PDF（巴塞尔大学），并与 PMC11274342、HKMU 研究方案书两个独立来源互证；计分说明原文：Sum all 6 answers. The higher the sum, the higher the psychological flexibility.评为 MIXED 是因为原版证据为初步，且本中文工作稿无中国人群验证。"
+      }
+    ]
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "作者官方 Psy-Flex 英文问卷 PDF（巴塞尔大学）六题原文与五档频率锚点。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "平台独立中文工作译稿。作者已发布官方中文版问卷，本译稿不复制其措辞、不继承其验证结果。专家审校 PENDING、认知访谈与中国人群验证 NOT_ESTABLISHED。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "psyflex6_zh_cn_research-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": [],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    }
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "psyflex6_zh_cn_research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "psyflex6_zh_cn_research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "translation",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "Gloster, A. T., Block, V. J., Klotsche, J., Villanueva, J., Rinner, M. T. B., Benoy, C., Walter, M., Karekla, M., & Bader, K. (2021). Journal of Contextual Behavioral Science, 22, 13–23. https://doi.org/10.1016/J.JCBS.2021.09.001. 作者官方问卷 PDF 仅标注 “English version by: Andrew Gloster (send feedback to: andrew.gloster@unibas.ch). Updated 10/2021.”，**未附任何明示许可文本**，未见再分发或商业使用授权。按项目政策（授权不作为入库门禁）记录为待授权，并因作者邀请反馈而同时列为待联系作者事项，明确不作已授权主张。作者已发布官方中文版问卷，本题文为 EDUK12.TOP 独立工作翻译／改编，不复制其措辞，报告为平台原创。改动包括语言转换、数字化、成人下限18+与完整作答项目约定。",
+      "事实标签只用于检索，不授予系统实际使用权。DRAFT/CANDIDATE不能据文件存在激活。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "Psy-Flex: A contextually sensitive measure of psychological flexibility (6-item)",
+        "citation": "Gloster, A. T., Block, V. J., Klotsche, J., Villanueva, J., Rinner, M. T. B., Benoy, C., Walter, M., Karekla, M., & Bader, K. (2021). Psy-Flex: A contextually sensitive measure of psychological flexibility. Journal of Contextual Behavioral Science, 22, 13–23.",
+        "url": "https://doi.org/10.1016/J.JCBS.2021.09.001",
+        "publicationYear": 2021
+      },
+      "license": {
+        "status": "unknown",
+        "redistribution": "restricted",
+        "note": "作者官方 PDF 未附明示许可，仅邀请反馈；未见再分发或商业使用授权。按项目政策记录为 authorization_pending + author_contact_pending，不作已授权主张，也不得据此商用。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "psyflex_frequency_1_5",
+          "options": [
+            {
+              "value": "1",
+              "score": 1,
+              "label": "极少如此"
+            },
+            {
+              "value": "2",
+              "score": 2,
+              "label": "很少如此"
+            },
+            {
+              "value": "3",
+              "score": 3,
+              "label": "有时如此"
+            },
+            {
+              "value": "4",
+              "score": 4,
+              "label": "经常如此"
+            },
+            {
+              "value": "5",
+              "score": 5,
+              "label": "总是如此"
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "PSYFLEX6_1",
+          "content": "即使我的心思飘到了别处，在重要的时刻，我仍然能把注意力放回到当下正在发生的事情上。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 0,
+          "responseSetKey": "psyflex_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PSYFLEX6_2",
+          "content": "如果有需要，我可以让不愉快的想法和经历就那样存在着，而不必马上去摆脱它们。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 1,
+          "responseSetKey": "psyflex_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PSYFLEX6_3",
+          "content": "我可以退一步看待那些妨碍我的想法，而不被它们牵着走。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 2,
+          "responseSetKey": "psyflex_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PSYFLEX6_4",
+          "content": "即使想法和经历让我感到混乱，我依然能感觉到自己内心有一个安稳的部分。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 3,
+          "responseSetKey": "psyflex_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PSYFLEX6_5",
+          "content": "我能自己决定什么对我重要，并决定要把精力用在哪些地方。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 4,
+          "responseSetKey": "psyflex_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PSYFLEX6_6",
+          "content": "我会全身心地投入到那些对我重要、有用或有意义的事情中。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 5,
+          "responseSetKey": "psyflex_frequency_1_5",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "PSYFLEX6_1",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PSYFLEX6_2",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PSYFLEX6_3",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PSYFLEX6_4",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PSYFLEX6_5",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PSYFLEX6_6",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "total",
+            "type": "total",
+            "label": "心理灵活性总分（6题）",
+            "description": "六题求和，范围 6–30。**分数越高表示过去七天自述的心理灵活性越高**，即越能在不舒服时仍朝向自己在意的方向行动。是状态描述，不是能力高低，也不是临床诊断。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "PSYFLEX6_1",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PSYFLEX6_2",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PSYFLEX6_3",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PSYFLEX6_4",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PSYFLEX6_5",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PSYFLEX6_6",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "total"
+        ],
+        "scoreOrder": [
+          "total"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "total",
+            "headline": "这一周，你能不能带着不舒服继续往前走",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这六句话描述的是你在过去七天里的状态：能否回到当下、能否让不舒服的感受停留一会儿、能否和那些妨碍你的想法保持一点距离、能否感觉到内心有个安稳的地方、能否自己决定什么重要，以及有没有投入对你有意义的事。把六题的答案加在一起，分数越高表示你这一周自述的心理灵活性越高，也就是越能在不舒服的时候仍然朝向自己在意的方向行动。它描述的是最近这一周的状态，不是你固定不变的性格，也不是能力或心理健康的评判。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "strategy",
+                "text": "回想这周里让你卡住的一件小事：当时身体有什么感觉？如果能带着那个感觉往前挪一小步，你会先做哪一步？"
+              },
+              {
+                "category": "reflection",
+                "text": "这只是过去七天的状态描述，会随着处境变化，不能据此判断你的性格、能力或心理健康状况，也不是治疗效果的判断。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这是独立中文工作译稿，尚未完成专家译审、认知访谈或中国人群验证。",
+          "原版面向成人样本，不外推中小学生。",
+          "没有中文常模、等级或百分位；本版本仅做 score_only 呈现，不给出切点。",
+          "高分只表示过去七天自述的心理灵活性更高，不代表能力、人格或心理健康水平。",
+          "作者官方 PDF 未附明示许可，授权状态未闭合，列为待办事项。"
+        ],
+        "disclaimer": "用于成人回顾过去七天的心理灵活状态，不作诊断、能力评价或疗效判断。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted fixed-source and plain-language preparation; not human expert review",
+            "reviewedAt": "2026-10-27T00:00:00.000Z",
+            "basis": "Psy-Flex official Basel English PDF; items cross-checked with PMC11274342 and an independent protocol paper; independent working translation."
+          }
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "psyflex6",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "PSYFLEX6_1",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PSYFLEX6_2",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PSYFLEX6_3",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PSYFLEX6_4",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PSYFLEX6_5",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PSYFLEX6_6",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 6
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "all_two",
+        "answers": [
+          {
+            "itemCode": "PSYFLEX6_1",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "PSYFLEX6_2",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "PSYFLEX6_3",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "PSYFLEX6_4",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "PSYFLEX6_5",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "PSYFLEX6_6",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 12
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "middle",
+        "answers": [
+          {
+            "itemCode": "PSYFLEX6_1",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSYFLEX6_2",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSYFLEX6_3",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSYFLEX6_4",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSYFLEX6_5",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PSYFLEX6_6",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 18
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "all_four",
+        "answers": [
+          {
+            "itemCode": "PSYFLEX6_1",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PSYFLEX6_2",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PSYFLEX6_3",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PSYFLEX6_4",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PSYFLEX6_5",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "PSYFLEX6_6",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 24
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "PSYFLEX6_1",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PSYFLEX6_2",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PSYFLEX6_3",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PSYFLEX6_4",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PSYFLEX6_5",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "PSYFLEX6_6",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 30
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      }
+    ]
+  }
+}
