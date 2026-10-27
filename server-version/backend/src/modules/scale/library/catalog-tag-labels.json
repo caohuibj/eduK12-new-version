@@ -367,6 +367,22 @@
     "label": "社会觉察",
     "axis": "construct"
   },
+  "construct:sel_sectrs14_emotion_regulation": {
+    "label": "情绪调节",
+    "axis": "construct"
+  },
+  "construct:sel_sectrs14_interpersonal": {
+    "label": "人际关系",
+    "axis": "construct"
+  },
+  "construct:sel_sectrs14_social_awareness": {
+    "label": "社会觉察",
+    "axis": "construct"
+  },
+  "construct:sel_sectrs14_teacher_student": {
+    "label": "师生关系",
+    "axis": "construct"
+  },
   "construct:sel_wcsd_seca_emotion_knowledge": {
     "label": "自我觉察：情绪知识",
     "axis": "construct"
@@ -815,6 +831,10 @@
     "label": "教师本人（目录范围）",
     "axis": "population"
   },
+  "population:teachers": {
+    "label": "教师",
+    "axis": "population"
+  },
   "response:digital_self": {
     "label": "数字自助作答",
     "axis": "response"
@@ -845,6 +865,10 @@
   },
   "response:teacher_report": {
     "label": "教师他评",
+    "axis": "response"
+  },
+  "response:teacher_self": {
+    "label": "教师自评",
     "axis": "response"
   },
   "use:course_research": {
