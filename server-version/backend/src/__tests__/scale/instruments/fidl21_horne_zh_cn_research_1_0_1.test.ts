@@ -9,13 +9,15 @@ const dimensions={"repetition":[7,11,13,14,15,19],"switching":[3,6,16,18,20],"pr
 const reverse=[3,6,16,18,20]
 const rawAll=(v:string)=>Array.from({length:21},(_,i)=>({itemCode:id(i+1),responseValue:v}))
 describe('Horne FIDL-21 original author appendix, independently translated Chinese DRAFT (NOTRUN)',()=>{
- it('preserves previous catalog-only identity, correct 21 new item IDs and pending language review',()=>{
+ it('preserves previous catalog-only identity, correct 21 new item IDs and user-approved wording review',()=>{
   expect(()=>defineScaleInstrumentSource(source)).not.toThrow()
   expect(source.identity.instrumentVersion).toBe('1.0.1')
   expect(catalogOnly.executable).toBeUndefined()
   expect(source.executable?.releaseStatus).toBe('DRAFT')
-  expect(source.catalog.catalogStatus).toBe('CANDIDATE')
-  expect(source.localization).toMatchObject({sourceLocale:'en',targetLocale:'zh-CN',expertReviewStatus:'PENDING',reviewStatus:'PENDING'})
+  expect(source.catalog.catalogStatus).toBe('REVIEWED')
+  expect(source.catalog.catalogManifestVersion).toBe(2)
+  expect(source.localization).toMatchObject({sourceLocale:'en',targetLocale:'zh-CN',expertReviewStatus:'PENDING',reviewStatus:'APPROVED'})
+  expect(source.localization?.reviewedAt).toBe('2026-10-27T09:09:27Z')
   expect(d.items.map(x=>x.itemCode)).toEqual(Array.from({length:21},(_,i)=>id(i+1)))
   expect(d.responseSets[0].options.map(x=>x.score)).toEqual([1,2,3,4,5])
   expect(source.instruction?.text).toContain('过去两周')

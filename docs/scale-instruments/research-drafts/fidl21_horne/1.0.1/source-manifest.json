@@ -306,6 +306,24 @@
     "CI": "NOTRUN",
     "database": "NOTRUN",
     "deployment": "NOTRUN",
-    "humanLanguageReview": "NOTRUN"
+    "humanLanguageReview": "APPROVED_BY_PROJECT_USER_2026_10_27"
+  },
+  "reviewDisposition": {
+    "scope": "FIDL-21 v1.0.1 independent zh-CN 21-item wording review",
+    "decision": "APPROVED_BY_PROJECT_USER",
+    "receivedAt": "2026-10-27T09:09:27Z",
+    "evidence": "EXPLICIT_CONFIRMATION_IN_CURRENT_CONVERSATION",
+    "approvedPriorSourceBlobSha": "c45ae737de81ffb4ff86567a97de58553a0f4b4e",
+    "reviewerName": "NOT_PROVIDED",
+    "actualReviewTime": "NOT_PROVIDED",
+    "independentExpertReview": "PENDING",
+    "psychometricValidation": "NOT_ESTABLISHED",
+    "measurementChanges": "NONE",
+    "scoringChanges": "NONE",
+    "goldenCaseChanges": "NONE",
+    "catalogStatus": "REVIEWED",
+    "catalogManifestVersion": 2,
+    "localizationReviewStatus": "APPROVED",
+    "scientificMaturity": "PILOT"
   }
 }

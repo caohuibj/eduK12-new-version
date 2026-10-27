@@ -13,8 +13,8 @@
   },
   "catalog": {
     "schemaVersion": 1,
-    "catalogManifestVersion": 1,
-    "catalogStatus": "CANDIDATE",
+    "catalogManifestVersion": 2,
+    "catalogStatus": "REVIEWED",
     "scientificMaturity": "PILOT",
     "identity": {
       "canonicalName": "日常生活灵活性量表 FIDL-21（原作者修订21题）— 简体中文研究工作稿",
@@ -159,8 +159,9 @@
     "expertReviewStatus": "PENDING",
     "cognitiveDebriefStatus": "NOT_ESTABLISHED",
     "localEvidenceRefs": [],
-    "reviewStatus": "PENDING",
-    "notes": "简体工作译稿逐题直接依据本次取得的官方Appendix S1英文21题与独立计分表，未借用37题或不同25题版、无人工专家审校、没有认知访谈、没有中国成人心理测量学验证。语言审校另交用户，保留需要联系作者及论文/附录权利确认。"
+    "reviewStatus": "APPROVED",
+    "notes": "经项目用户于2026-10-27在当前对话中明确确认：FIDL-21 v1.0.1 的21项简体中文题文审校通过。reviewedAt记录的是系统接收这次确认的时间，并非未经提供的实际审校时刻；审校人姓名或独立专家审校证据未提供，因此expertReviewStatus继续PENDING。本次仅确认既有简体题文，无题目、指导语、计分、GoldenCase、报告内容或科学适用范围变更。英文原题及五个反向键依用户提供的官方Appendix S1；中文版回译、成人认知访谈、中国心理测量效度及作者/出版方权利仍待落实。",
+    "reviewedAt": "2026-10-27T09:09:27Z"
   },
   "applicability": {
     "schemaVersion": 1,
