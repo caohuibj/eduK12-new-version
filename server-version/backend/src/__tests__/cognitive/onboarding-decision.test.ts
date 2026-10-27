@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   cognitiveBlockerV1Schema, cognitiveOnboardingDecisionV1Schema,
   composeCognitiveOnboardingDecision, formatCognitiveOnboardingDecision,
+  cognitiveOnboardingExitCode,
   normalizeCognitiveBlockers, serializeCognitiveOnboardingDecision,
   type CognitiveBlockerV1, type CognitiveOnboardingFactsV1,
 } from '../../modules/cognitive/onboarding/decision'
@@ -18,6 +19,19 @@ const facts = (): CognitiveOnboardingFactsV1 => ({
   scientific: { declaredMaturity: 'PILOT', maxEligibleMaturity: 'PILOT', blockersToNextTier: [] },
 })
 describe('Cognitive onboarding decision v1 contract', () => {
+  it('technical exit preserves unapproved scientific metadata without turning it into an admission gate',()=>{
+    const input=facts();input.scientific.declaredMaturity='RESEARCH_GRADE'
+    const decision=composeCognitiveOnboardingDecision(input),before=serializeCognitiveOnboardingDecision(decision)
+    expect(cognitiveOnboardingExitCode([decision])).toBe(0)
+    expect(decision.scientific.declarationValid).toBe(false)
+    expect(decision.scientific.maxEligibleMaturity).toBe('PILOT')
+    expect(serializeCognitiveOnboardingDecision(decision)).toBe(before)
+    expect(cognitiveOnboardingExitCode([])).toBe(1)
+    const invalid=facts();invalid.technicalBlockers=[blocker()]
+    expect(cognitiveOnboardingExitCode([decision,composeCognitiveOnboardingDecision(invalid)])).toBe(1)
+    const unfinished=facts();unfinished.pilotPublishBlockers=[blocker({gate:'PILOT_PUBLISH'})]
+    expect(cognitiveOnboardingExitCode([composeCognitiveOnboardingDecision(unfinished)])).toBe(1)
+  })
   it('keeps technical, Pilot publication and scientific eligibility independent', () => {
     const input = facts()
     input.scientific.blockersToNextTier = [blocker({domain:'SCIENTIFIC',gate:'RESEARCH_READY',code:'COG_RESEARCH_FOUNDATION_MISSING'})]
