@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-10-28",
+  "branch": "ACTcontents",
+  "baseCommit": "6203a829dc8d7de707e67f413acfa5a354a21e09",
+  "actualDatabaseImport": false,
+  "published": false,
+  "ciTriggered": false,
+  "dedupBaseline": {
+    "note": "新增工具前必须对照；ACT 直接构念已有以下精确版本，全部 DRAFT",
+    "directActVersions": [
+      {"instrumentKey": "mpfi24_zh_cn", "version": "1.0.0", "construct": "六过程多维心理灵活性/僵化（MPFI-24）", "sourceBranch": "main"},
+      {"instrumentKey": "aaq_us12_zh_cn_research", "version": "1.0.0", "construct": "大学生情境心理不灵活性（非AAQ-II）", "sourceBranch": "content/dot-local-scales-20261025", "rightsStatus": "HOLD-RESEARCH"},
+      {"instrumentKey": "act_sq6_zh_cn", "version": "1.0.0", "construct": "ACT治疗会谈六过程帮助感", "sourceBranch": "content/dot-local-scales-20261025"},
+      {"instrumentKey": "cfq7_zh_cn_research", "version": "1.0.0", "construct": "认知融合（成人7题单因子）", "sourceBranch": "content/dot-local-scales-20261025", "rightsStatus": "unknown/restricted"},
+      {"instrumentKey": "psyflex6_zh_cn_research", "version": "1.0.0", "construct": "心理灵活性六过程单总分（PsyFlex）", "sourceBranch": "content/dot-local-scales-20261025"},
+      {"instrumentKey": "csacs9_zh_cn", "version": "1.0.0", "construct": "自我作为背景（SACS，18-25大学生）", "sourceBranch": "content/dot-local-scales-20261025"}
+    ],
+    "adjacentNotAct": ["ffmq15_zh_cn_research", "chime_s24_zh_cn_research", "maia2_37_zh_cn_research", "erq10_zh_cn_research", "ders16_bjureberg_zh_cn_research", "ders_sf18_zh_cn_research", "erss19_zh_cn_research", "ccfq18_zh_cn", "cfsr12_zh_cn_research", "ebq16_zh_cn_research", "sop2_zh_cn_research"],
+    "distinctFromValueCost": "value_cost_* 为学业任务价值，与 ACT 价值澄清不同构念",
+    "references": [
+      "PR #365 docs/scale-library-structure-20261027/candidate-list.md",
+      "content/dot-local-scales-20261025: docs/scale-instruments/research-drafts/github-source-discovery-20261026.md",
+      "content/dot-local-scales-20261025: docs/scale-instruments/research-drafts/github-source-expansion-wave2-20261026.md"
+    ]
+  },
+  "plannedCandidates": [
+    {"family": "afq_y", "name": "AFQ-Y 青少年回避与融合问卷", "itemCount": 17, "rationale": "现有ACT工具样本均为大学生/成人，青少年版是K12最大空白"},
+    {"family": "vq", "name": "Valuing Questionnaire", "itemCount": 10, "rationale": "价值维度空白，需与学业价值value_cost区分"}
+  ],
+  "tools": []
+}
