@@ -15,3 +15,9 @@
 - P/R 的候选携带各自所需素材依赖的授权选择，登记合并必须保留固定 grant 并拒绝冲突，不能猜集合。
 
 上一片人工勾 UUID/单 grant 映射的方案不能处理独立 grant，**不能视为正确可用流程**。此片不把旧行为的新 mock 当作修复证据。新合同尚未收到，接线状态为 pending；没有接口写入被拒绝或结果不确定的外部操作。收到 source 的精确合同后，在同一分支继续替换旧映射，并只补受影响载荷与恢复测试。
+
+## Training 日期控件适配
+
+后续小片直接复用 Training 的 `LocalDateTimeInput` / `parseLocalDateTime` 及共享 `localTimeZoneLabel` / `formatLocalTimestamp`。输入按设备本地时区，保留原 DST/非法日期拒绝规则；提交仍为原合同规范 UTC ISO `releaseAt`。冻结读回显示本地时间及 UTC 偏移，没有新增时区库或转换框架。
+
+仅该载荷场景以 `TZ=Asia/Shanghai` 补验 1 PASS / 8 filtered，类型 exit0、两文件 lint exit0（1 个已有 ref warning）。原 Training 日期单测和无关面板成功用例没有复跑。原 reporter、日志、命令和后置源码观察在 `registration-local-time-evidence`；该单一 grant 合成场景不证明核心多 grant 接线完成。exact licenses 合同依赖仍为 pending。

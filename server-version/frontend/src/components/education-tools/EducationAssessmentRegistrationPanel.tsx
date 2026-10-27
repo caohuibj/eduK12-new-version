@@ -1,3 +1,5 @@
+import LocalDateTimeInput,{parseLocalDateTime} from '../LocalDateTimeInput'
+import {formatLocalTimestamp,localTimeZoneLabel} from '../../utils/dateTime'
 import {useEffect,useRef,useState} from 'react'
 import {educationAssessmentResourceClient,type EducationAssessmentDisclosure,type EducationAssessmentFamily,type EducationAssessmentPreparation,type EducationAssessmentRegistration} from './assessmentResourceClient'
 import type {PrivateToolApi} from './privateToolClient'
@@ -14,7 +16,7 @@ function FrozenRegistrationSummary({registration}:{registration:EducationAssessm
  const entry=object(registration.entry),origin=object(entry.educationOrigin),applicability=object(entry.applicability)
  const policy=object(origin.feedbackPolicy),audience=object(object(object(entry.resultDisclosure).audiences).RESPONDENT)
  const units=Array.isArray(origin.units)?origin.units:[]
- const scheduled=typeof policy.releaseAt==='string'&&Number.isFinite(Date.parse(policy.releaseAt))?new Date(policy.releaseAt).toISOString():null
+ const scheduled=typeof policy.releaseAt==='string'&&Number.isFinite(Date.parse(policy.releaseAt))?formatLocalTimestamp(policy.releaseAt):null
  return <div aria-label="冻结版本摘要">
   <h3>{text(entry.title,'等待完整冻结详情')}</h3>
   <dl><dt>工具家族</dt><dd>{familyNames[text(origin.family,text(applicability.resourceKind))]??'未返回'}</dd>
@@ -23,7 +25,7 @@ function FrozenRegistrationSummary({registration}:{registration:EducationAssessm
    <dt>创建者账号</dt><dd>{text(registration.createdBy)}</dd><dt>审核者账号</dt><dd>{text(registration.reviewedBy,'尚未独立审核')}</dd>
    <dt>本人披露</dt><dd>{disclosureNames[text(audience.mode)]??'未返回'}</dd>
    <dt>反馈开放方式</dt><dd>{policy.mode==='IMMEDIATE'?'完成后按权限开放':policy.mode==='SCHEDULED'?'按冻结时间开放':'未配置（保留原历史政策）'}</dd>
-   {policy.mode==='SCHEDULED'&&<><dt>开放时间（UTC）</dt><dd>{scheduled??'时间信息无效，请联系管理员核查'}</dd></>}
+   {policy.mode==='SCHEDULED'&&<><dt>开放时间（本地时区）</dt><dd>{scheduled??'时间信息无效，请联系管理员核查'}</dd></>}
   </dl>
   {units.length===0?<p>未列测量 C/P/R 单元；纯表单组合仅使用已冻结表单流程。</p>:<ol>{units.map((raw,index)=>{
    const unit=object(raw),measurement=object(unit.measurement),report=object(unit.report),references=Array.isArray(unit.references)?unit.references:[]
@@ -104,7 +106,7 @@ function Panel({api,organizationId,actorId,product}:Props){
   if(disclosure==='INDIVIDUAL_SUMMARY'&&!reports.length)throw Error('本人摘要需要明确选择已批准报告版本。')
   let feedbackPolicy:{schemaVersion:1;mode:'IMMEDIATE'}|{schemaVersion:1;mode:'SCHEDULED';releaseAt:string}
   if(feedback==='SCHEDULED'){
-   const date=new Date(releaseAt+'Z');if(!releaseAt||!Number.isFinite(date.getTime())||date.getTime()<=Date.now())throw Error('请选择未来的 UTC 开放时间。')
+   const date=parseLocalDateTime(releaseAt);if(!date||date.getTime()<=Date.now())throw Error('请选择有效的未来本地开放时间。')
    feedbackPolicy={schemaVersion:1,mode:'SCHEDULED',releaseAt:date.toISOString()}
   }else feedbackPolicy={schemaVersion:1,mode:'IMMEDIATE'}
   const result=await client.register(preparation.resourceId,{expectedPreparationHash:preparation.preparationHash,
@@ -143,8 +145,8 @@ function Panel({api,organizationId,actorId,product}:Props){
     </section>)}
     <label>披露政策编号（系统标识）<input readOnly value={policyKey}/></label>
     <label>本人披露<select value={disclosure} onChange={e=>setDisclosure(e.target.value as typeof disclosure)}><option value="NONE">不展示反馈</option><option value="COMPLETION_ONLY">仅完成确认</option>{choices.units.length>0&&<option value="INDIVIDUAL_SUMMARY">已批准报告的本人摘要</option>}</select></label>
-    <label>反馈开放方式<select value={feedback} onChange={e=>setFeedback(e.target.value as typeof feedback)}><option value="">请明确选择</option><option value="IMMEDIATE">完成后按权限开放</option><option value="SCHEDULED">按冻结 UTC 时间开放</option></select></label>
-    {feedback==='SCHEDULED'&&<label>开放时间（UTC）<input type="datetime-local" value={releaseAt} onChange={e=>setReleaseAt(e.target.value)}/></label>}
+    <label>反馈开放方式<select value={feedback} onChange={e=>setFeedback(e.target.value as typeof feedback)}><option value="">请明确选择</option><option value="IMMEDIATE">完成后按权限开放</option><option value="SCHEDULED">按冻结时间开放</option></select></label>
+    {feedback==='SCHEDULED'&&<label>开放时间（本地时区）<LocalDateTimeInput picker aria-label="开放时间（本地时区）" value={releaseAt} onChange={e=>setReleaseAt(e.target.value)}/><small>{localTimeZoneLabel()}；保存时转换为 UTC，冻结后不可原地修改。</small></label>}
     <button disabled={uncertain||!feedback||!policyKey.trim()} onClick={register}>冻结登记为草稿</button>
    </>}
    {registration&&<section aria-label="冻结登记详情"><FrozenRegistrationSummary registration={registration}/><details><summary>查看冻结技术详情</summary><pre style={{maxWidth:'100%',overflowX:'auto'}}>{JSON.stringify(registration.entry??registration,null,2)}</pre></details>
