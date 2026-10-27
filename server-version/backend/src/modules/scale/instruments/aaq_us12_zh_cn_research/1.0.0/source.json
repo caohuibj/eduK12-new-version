@@ -1,0 +1,1173 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "aaq_us12_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "请根据自己在大学学习过程中实际经历过的事情，判断下面每一句描述有多符合你。1表示从来不符合，7表示总是符合；其他数字表示中间程度。这里所说的学习包括大学课程、作业、课堂活动和考试。没有标准答案，请按真实经历作答，而不是按你希望自己做到的样子。",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "依据Levin等作者官网AAQ-US12英文DOC原指导语制作的独立中文工作稿；1..7为Never true..Always true。"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "大学生接纳与行动问卷（AAQ-US，12题）— 独立中文研究工作稿",
+      "abbreviation": "AAQ-US12-ZH-WORKING",
+      "instrumentFamily": "Acceptance and Action Questionnaire for University Students (Levin et al. 2019), not generic AAQ-II"
+    },
+    "construct": {
+      "primaryDomain": "SELF_REGULATION",
+      "secondaryDomains": [
+        "SOCIAL_EMOTIONAL",
+        "MOTIVATION"
+      ],
+      "constructDefinition": "原作者围绕大学情境开发的单因子12题心理不灵活性自评。关注想法/情绪如何阻碍课程作业、上课、考试和学习目标的行动；非普通AAQ-II，非考试焦虑诊断，也不将后续葡萄牙语二因子研究结果移植为原版分数。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "domain:psychological_inflexibility",
+        "domain:self_regulation",
+        "domain:academic_functioning",
+        "construct:academic_psychological_inflexibility",
+        "construct:academic_experiential_avoidance",
+        "construct:cognitive_fusion_in_study",
+        "construct:single_original_factor_12_items",
+        "construct:one_total_sum_not_aaq_ii",
+        "orientation:acceptance_commitment_therapy_related",
+        "orientation:academic_context",
+        "orientation:transdiagnostic",
+        "orientation:not_general_mental_disorder_screen",
+        "population:university_students",
+        "population:project_adult_18_plus",
+        "population:college_specific_wording",
+        "population:independent_zh_cn_unvalidated",
+        "population:not_k12_school_age",
+        "response:self",
+        "response:digital_self",
+        "response:12_items",
+        "response:seven_point_true_frequency_1_to_7",
+        "response:no_reverse_items",
+        "response:author_doc_order_not_paper_table",
+        "response:total_12_to_84",
+        "response:complete_required_platform_choice",
+        "use:research",
+        "use:individual_reflection",
+        "use:score_only",
+        "use:college_context_only",
+        "use:not_diagnostic",
+        "use:no_chinese_norms",
+        "use:no_clinical_cutoffs",
+        "license:author_contact_required",
+        "license:third_party_ccby_claim_unverified",
+        "license:full_author_doc_acquired",
+        "license:public_redistribution_review_pending",
+        "license:translation_review_pending",
+        "language_validation:source_en",
+        "language_validation:content_zh-CN",
+        "language_validation:independent_working_translation",
+        "language_validation:no_chinese_validation",
+        "language_validation:expert_review_pending",
+        "language_validation:local_validation_pending",
+        "大学生",
+        "大学学习",
+        "心理不灵活性",
+        "学业回避",
+        "认知融合",
+        "学业焦虑",
+        "学习投入",
+        "非诊断",
+        "中文工作稿",
+        "待联系作者"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "Levin等2019英语原版研究425位美国大学本科生，18–52岁；本工作稿仅保守适用18+大学学习情境，由实际研究流程核实是否在读大学生，不能把18岁自动当作大学生，也不将论文效度归到中国/K12人群。"
+    },
+    "administration": {
+      "itemCount": 12,
+      "estimatedMinutes": 5,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED"
+      ],
+      "timeFrame": "通常的大学学习体验，无作者明确规定的过去两周或过去四周回顾窗口。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "固定作者官网完整DOC的12道施测题序，**不要采用论文Table1或OpenScales表格行序**。作者DOC题序对论文Table1的行号为12/5/4/6/11/8/3/1/2/10/9/7；manifest逐题绑定这个映射。",
+        "原作者DOC七级描述符合程度：1 Never true,2 Very seldom true,3 Seldom true,4 Sometimes true,5 Frequently true,6 Almost always true,7 Always true；不可误用AAQ-II其他变体的题序或题项。",
+        "原2019开发研究为单因子，12题原分直接求和理论12–84，无反向或分量表；葡萄牙语适配文献的两因子不是本独立英语原版的正式替代。",
+        "原研究观察分布可到77，但77不是理论上限，也不是中国常模。此DRAFT报告无临床阈值、低中高、百分位和学业能力排名。",
+        "研究对象为真实大学生；现有instrument SELF+18岁并不能自动验证在读大学身份，须在研究筛选流程或上下文另核，不能公开开放成通用青少年版。",
+        "当前平台采用12项完整才算总分、不插补的保守规则；作者开发研究listwise deletion不是个人结果插补算法。",
+        "完整作者英文DOC已取得，公开题文和独立中文译文权利仍待管理员核查；不能将OpenScales第三方CC BY 4.0声称直接当作原作者提供的授权原件。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "英语大学研究有初始效度；独立中文工作译文无中国大学生验证，正式科研应用需另核测量等值。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "只用于帮助理解学业情境中被想法与情绪阻滞的感受，不能诊断或据此评判学业能力。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "aaq-us-levin2019-original",
+        "evidenceType": "CONTENT_VALIDITY",
+        "population": "英语原开发425位美国本科生，年龄18–52岁；非中国独立中文稿验证",
+        "locale": "en",
+        "territory": "US",
+        "studyDesign": "2019原始单因子版本12题，作者官网下载精确施测题本次序与论文Table1行次不同，按DOC施测顺序冻结；不继承2022葡语二因子。",
+        "rating": "UNKNOWN",
+        "citation": "Levin, M. E., Krafft, J., Pistorello, J., & Seeley, J. R. (2019). Assessing psychological inflexibility in university students: Development and validation of the acceptance and action questionnaire for university students (AAQ-US). Journal of Contextual Behavioral Science, 12, 199–206. https://doi.org/10.1016/j.jcbs.2018.03.004.",
+        "doi": "10.1016/j.jcbs.2018.03.004",
+        "url": "https://doi.org/10.1016/j.jcbs.2018.03.004"
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "作者研究组12题完整DOC https://www.utahact.com/uploads/5/1/3/4/51340265/aaq-us_1.doc，作者官网 https://www.utahact.com/measures-we-developed.html；本版本中文直接依据英文条目起草，未复制已有第三方中文译本。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "英文原DOC与原论文题序有差异，冻结DOC题序，不移用葡语两因子或K12学生模型；本站简体中文未做双语译审、认知访谈和目标人群信效度检验。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "aaq_us12_zh_cn_research-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    },
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "aaq_us12_zh_cn_research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "aaq_us12_zh_cn_research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "translation",
+      "display"
+    ],
+    "notes": [
+      "作者研究组网站提供12题AAQ-US英文DOC完整下载：https://www.utahact.com/uploads/5/1/3/4/51340265/aaq-us_1.doc，开发者列表：https://www.utahact.com/measures-we-developed.html。档案核验该文件48128字节/sha256 fe7dbbb9af0301b4ea2ae95dd1f758910d3f705c84c8100d7f26b7c6cff36452。OpenScales将其列为CC BY 4.0（据称来自Mike Levin个人通信），当前没有可独立核查的原始授权通信原件，因此不能把第三方摘要升级为作者直接批准完整中文翻译、商业使用或公开GitHub再分发。本站中文为依据英语含义编制的独立未验证工作稿，不继承葡萄牙语二因子结果，也不冒称中国大学生已验证。电子施测、翻译、再分发与商业范围交管理员联系原作者确认；缺少回复不构成研发门禁，但不可当作已获授权。",
+      "在读大学生身份的核实是研究任务/场景数据层问题，不通过未支持的硬编码阻止DRAFT构建。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "Acceptance and Action Questionnaire for University Students, original author DOC administration order, independent Chinese draft",
+        "citation": "Levin, M. E., Krafft, J., Pistorello, J., & Seeley, J. R. (2019). Assessing psychological inflexibility in university students: Development and validation of the acceptance and action questionnaire for university students (AAQ-US). Journal of Contextual Behavioral Science, 12, 199–206. https://doi.org/10.1016/j.jcbs.2018.03.004.",
+        "url": "https://www.utahact.com/uploads/5/1/3/4/51340265/aaq-us_1.doc",
+        "publicationYear": 2019
+      },
+      "license": {
+        "status": "unknown",
+        "redistribution": "restricted",
+        "note": "作者研究组网站提供12题AAQ-US英文DOC完整下载：https://www.utahact.com/uploads/5/1/3/4/51340265/aaq-us_1.doc，开发者列表：https://www.utahact.com/measures-we-developed.html。档案核验该文件48128字节/sha256 fe7dbbb9af0301b4ea2ae95dd1f758910d3f705c84c8100d7f26b7c6cff36452。OpenScales将其列为CC BY 4.0（据称来自Mike Levin个人通信），当前没有可独立核查的原始授权通信原件，因此不能把第三方摘要升级为作者直接批准完整中文翻译、商业使用或公开GitHub再分发。本站中文为依据英语含义编制的独立未验证工作稿，不继承葡萄牙语二因子结果，也不冒称中国大学生已验证。电子施测、翻译、再分发与商业范围交管理员联系原作者确认；缺少回复不构成研发门禁，但不可当作已获授权。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "aaq_us_true_1_7",
+          "options": [
+            {
+              "value": "1",
+              "label": "从不符合",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "极少符合",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "很少符合",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "有时符合",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "经常符合",
+              "score": 5
+            },
+            {
+              "value": "6",
+              "label": "几乎总是符合",
+              "score": 6
+            },
+            {
+              "value": "7",
+              "label": "总是符合",
+              "score": 7
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "AAQ_US12_01",
+          "content": "参加考试时，我会陷入担忧，以至于很难专注在试题本身。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 0,
+          "responseSetKey": "aaq_us_true_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "AAQ_US12_02",
+          "content": "觉得某项课程作业太困难或难以理解时，我会选择放弃。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 1,
+          "responseSetKey": "aaq_us_true_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "AAQ_US12_03",
+          "content": "当我感到焦虑或低落时，会发现自己在回避去上课。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 2,
+          "responseSetKey": "aaq_us_true_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "AAQ_US12_04",
+          "content": "在课堂上，我很难集中注意力听老师讲课。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 3,
+          "responseSetKey": "aaq_us_true_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "AAQ_US12_05",
+          "content": "我经常觉得自己不够聪明，不应该在大学或现在的专业学习。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 4,
+          "responseSetKey": "aaq_us_true_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "AAQ_US12_06",
+          "content": "担忧会妨碍我在大学里的学习表现。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 5,
+          "responseSetKey": "aaq_us_true_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "AAQ_US12_07",
+          "content": "与学业有关的各种想法常常让我感到纠结。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 6,
+          "responseSetKey": "aaq_us_true_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "AAQ_US12_08",
+          "content": "我心情不好的时候，会拖延需要完成的大学课程作业。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 7,
+          "responseSetKey": "aaq_us_true_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "AAQ_US12_09",
+          "content": "在学校时，我有时只是机械地走完程序，并没有真正投入。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 8,
+          "responseSetKey": "aaq_us_true_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "AAQ_US12_10",
+          "content": "当脑中有消极想法时，我很难从课堂上获得收获。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 9,
+          "responseSetKey": "aaq_us_true_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "AAQ_US12_11",
+          "content": "我的想法和感受会干扰学习。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 10,
+          "responseSetKey": "aaq_us_true_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "AAQ_US12_12",
+          "content": "想到即将到来的考试，我会担心得难以开始复习。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 11,
+          "responseSetKey": "aaq_us_true_1_7",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "itemRules": [
+          {
+            "itemCode": "AAQ_US12_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "AAQ_US12_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "AAQ_US12_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "AAQ_US12_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "AAQ_US12_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "AAQ_US12_06",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "AAQ_US12_07",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "AAQ_US12_08",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "AAQ_US12_09",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "AAQ_US12_10",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "AAQ_US12_11",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "AAQ_US12_12",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "scores": [
+          {
+            "key": "total",
+            "type": "total",
+            "label": "大学情境心理不灵活性总分",
+            "description": "十二题1–7原始分直接求和12–84；更多反映与学习相关的想法和感受更常妨碍学习行动，不是学习能力或精神障碍诊断。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "AAQ_US12_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "AAQ_US12_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "AAQ_US12_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "AAQ_US12_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "AAQ_US12_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "AAQ_US12_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "AAQ_US12_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "AAQ_US12_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "AAQ_US12_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "AAQ_US12_10",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "AAQ_US12_11",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "AAQ_US12_12",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "total"
+        ],
+        "scoreOrder": [
+          "total"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "total",
+            "headline": "学习中被想法和情绪牵住的时刻",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "大学学习不只有上课和完成作业，还会遇到担心考试、对专业选择不确定、觉得一项任务太困难，或者心情不好时难以开始行动的时候。这份问卷记录的是这样的想法和情绪在多大程度上妨碍了你的学习，而不是说你不努力、能力不足或者患有什么心理疾病。遇到类似情况时，重要的不一定是立即消除紧张或消极想法，也可以先辨认眼下对你有意义的一件小事，以及你可以做到的一小步。如果学习环境、资源或压力负担是实际困难，也值得考虑寻求同学、老师或学校支持。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近哪一件学习任务最容易被担忧或自我怀疑打断？"
+              },
+              {
+                "category": "strategy",
+                "text": "在允许感受存在的同时，为这件事情选一个具体、负担较小的开始动作。"
+              },
+              {
+                "category": "support",
+                "text": "若学习和睡眠持续受到影响，可以使用学校咨询或学业支持资源。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这是大学学习情境的AAQ-US12，不是一般AAQ-II7题或学校中小学生量表；不将英语美国大学生数据外推为中国高校常模。",
+          "严格按作者原DOC施测顺序，原论文Table1是研究呈现顺序；同一个完整题集但不能用行号混淆作答数据。",
+          "2019原研究为12题单因子且无反向题，总分12–84；葡萄牙语2022的二因子结构属于另一研究，不直接用于本站译文。",
+          "本工作简体中文没有经过专家翻译审校、认知访谈、语言测量等值或中国大学生科学验证，不能为个体生成临床cutoff、百分位和职业/学业能力标签。",
+          "项目保守约定12题齐全才形成总分，缺答不插补，原论文开发数据的listwise deletion不是个体结果缺失处理标准。",
+          "作者DOC可下载不等于独立翻译与GitHub公开再分发或商业电子系统已获全面许可；管理员需核定作者意见。"
+        ],
+        "disclaimer": "AAQ-US © Levin、Krafft、Pistorello、Seeley（2019）。该独立简体中文版本为未验证、待授权范围复核的研究工作稿；仅供非诊断性理解，不用于高风险评价。"
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "aaq_us12",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "all1",
+        "answers": [
+          {
+            "itemCode": "AAQ_US12_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "AAQ_US12_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "AAQ_US12_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "AAQ_US12_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "AAQ_US12_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "AAQ_US12_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "AAQ_US12_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "AAQ_US12_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "AAQ_US12_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "AAQ_US12_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "AAQ_US12_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "AAQ_US12_12",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 12
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "all7",
+        "answers": [
+          {
+            "itemCode": "AAQ_US12_01",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "AAQ_US12_02",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "AAQ_US12_03",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "AAQ_US12_04",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "AAQ_US12_05",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "AAQ_US12_06",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "AAQ_US12_07",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "AAQ_US12_08",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "AAQ_US12_09",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "AAQ_US12_10",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "AAQ_US12_11",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "AAQ_US12_12",
+            "responseValue": "7"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 84
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "all4",
+        "answers": [
+          {
+            "itemCode": "AAQ_US12_01",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AAQ_US12_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AAQ_US12_03",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AAQ_US12_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AAQ_US12_05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AAQ_US12_06",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AAQ_US12_07",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AAQ_US12_08",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AAQ_US12_09",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AAQ_US12_10",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AAQ_US12_11",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AAQ_US12_12",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 48
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "cyclic",
+        "answers": [
+          {
+            "itemCode": "AAQ_US12_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "AAQ_US12_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "AAQ_US12_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "AAQ_US12_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AAQ_US12_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "AAQ_US12_06",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "AAQ_US12_07",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "AAQ_US12_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "AAQ_US12_09",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "AAQ_US12_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "AAQ_US12_11",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AAQ_US12_12",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 43
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "alternating",
+        "answers": [
+          {
+            "itemCode": "AAQ_US12_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "AAQ_US12_02",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "AAQ_US12_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "AAQ_US12_04",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "AAQ_US12_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "AAQ_US12_06",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "AAQ_US12_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "AAQ_US12_08",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "AAQ_US12_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "AAQ_US12_10",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "AAQ_US12_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "AAQ_US12_12",
+            "responseValue": "7"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 48
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "low_first6_high_last6",
+        "answers": [
+          {
+            "itemCode": "AAQ_US12_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "AAQ_US12_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "AAQ_US12_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "AAQ_US12_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "AAQ_US12_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "AAQ_US12_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "AAQ_US12_07",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "AAQ_US12_08",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "AAQ_US12_09",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "AAQ_US12_10",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "AAQ_US12_11",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "AAQ_US12_12",
+            "responseValue": "7"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 48
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "low_last6_high_first6",
+        "answers": [
+          {
+            "itemCode": "AAQ_US12_01",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "AAQ_US12_02",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "AAQ_US12_03",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "AAQ_US12_04",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "AAQ_US12_05",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "AAQ_US12_06",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "AAQ_US12_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "AAQ_US12_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "AAQ_US12_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "AAQ_US12_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "AAQ_US12_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "AAQ_US12_12",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 48
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "missing_first",
+        "answers": [
+          {
+            "itemCode": "AAQ_US12_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AAQ_US12_03",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AAQ_US12_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AAQ_US12_05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AAQ_US12_06",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AAQ_US12_07",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AAQ_US12_08",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AAQ_US12_09",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AAQ_US12_10",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AAQ_US12_11",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AAQ_US12_12",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "total": null
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "missing_last",
+        "answers": [
+          {
+            "itemCode": "AAQ_US12_01",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AAQ_US12_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AAQ_US12_03",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AAQ_US12_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AAQ_US12_05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AAQ_US12_06",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AAQ_US12_07",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AAQ_US12_08",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AAQ_US12_09",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AAQ_US12_10",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AAQ_US12_11",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "total": null
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "all_missing",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "total": null
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      }
+    ]
+  }
+}

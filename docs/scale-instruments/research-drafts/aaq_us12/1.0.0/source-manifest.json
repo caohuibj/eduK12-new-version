@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "aaq_us12_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "source": {
+    "authorPage": "https://www.utahact.com/measures-we-developed.html",
+    "sourceDoc": "https://www.utahact.com/uploads/5/1/3/4/51340265/aaq-us_1.doc",
+    "sourceDocSha256": "fe7dbbb9af0301b4ea2ae95dd1f758910d3f705c84c8100d7f26b7c6cff36452",
+    "sourceDocBytes": 48128,
+    "publication": "Levin et al. 2019 JCBS 12:199-206",
+    "doi": "10.1016/j.jcbs.2018.03.004"
+  },
+  "mapping": [
+    {
+      "authorDocNumber": 1,
+      "sourcePaperTable1Row": 12,
+      "itemCode": "AAQ_US12_01"
+    },
+    {
+      "authorDocNumber": 2,
+      "sourcePaperTable1Row": 5,
+      "itemCode": "AAQ_US12_02"
+    },
+    {
+      "authorDocNumber": 3,
+      "sourcePaperTable1Row": 4,
+      "itemCode": "AAQ_US12_03"
+    },
+    {
+      "authorDocNumber": 4,
+      "sourcePaperTable1Row": 6,
+      "itemCode": "AAQ_US12_04"
+    },
+    {
+      "authorDocNumber": 5,
+      "sourcePaperTable1Row": 11,
+      "itemCode": "AAQ_US12_05"
+    },
+    {
+      "authorDocNumber": 6,
+      "sourcePaperTable1Row": 8,
+      "itemCode": "AAQ_US12_06"
+    },
+    {
+      "authorDocNumber": 7,
+      "sourcePaperTable1Row": 3,
+      "itemCode": "AAQ_US12_07"
+    },
+    {
+      "authorDocNumber": 8,
+      "sourcePaperTable1Row": 1,
+      "itemCode": "AAQ_US12_08"
+    },
+    {
+      "authorDocNumber": 9,
+      "sourcePaperTable1Row": 2,
+      "itemCode": "AAQ_US12_09"
+    },
+    {
+      "authorDocNumber": 10,
+      "sourcePaperTable1Row": 10,
+      "itemCode": "AAQ_US12_10"
+    },
+    {
+      "authorDocNumber": 11,
+      "sourcePaperTable1Row": 9,
+      "itemCode": "AAQ_US12_11"
+    },
+    {
+      "authorDocNumber": 12,
+      "sourcePaperTable1Row": 7,
+      "itemCode": "AAQ_US12_12"
+    }
+  ],
+  "response": {
+    "min": 1,
+    "max": 7,
+    "sourceEnglishAnchors": [
+      "Never true",
+      "Very seldom true",
+      "Seldom true",
+      "Sometimes true",
+      "Frequently true",
+      "Almost always true",
+      "Always true"
+    ]
+  },
+  "scoring": {
+    "version": "1.0.0",
+    "items": 12,
+    "reverse": [],
+    "aggregation": "sum",
+    "range": [
+      12,
+      84
+    ],
+    "noSubscales": true,
+    "missing": "complete_required_project_choice"
+  },
+  "axes": [
+    "domain",
+    "construct",
+    "orientation",
+    "population",
+    "response",
+    "use",
+    "license",
+    "language_validation"
+  ],
+  "validity": {
+    "originalEnglishDevelopmentCollegeSample": 425,
+    "platformChinese": false,
+    "needChineseValidation": true,
+    "existingPortugueseTwoFactorsNotUsed": true
+  },
+  "rights": {
+    "authorContactRequired": true,
+    "openScalesCcByClaim": "UNVERIFIED_THIRD_PARTY",
+    "publicGitHubDistribution": "UNKNOWN",
+    "commercial": "UNKNOWN"
+  },
+  "versions": {
+    "instrument": "1.0.0",
+    "scoring": "1.0.0",
+    "localization": "1.0.0",
+    "report": "1.0.0",
+    "reference": null
+  },
+  "checks": {
+    "goldenCases": 10,
+    "vitest": "NOTRUN",
+    "ci": "NOTRUN",
+    "db": "NOTRUN",
+    "activated": false
+  }
+}
