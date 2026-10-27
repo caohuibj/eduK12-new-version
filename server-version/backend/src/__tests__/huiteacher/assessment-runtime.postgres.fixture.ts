@@ -1,4 +1,7 @@
 import {randomUUID} from 'node:crypto'
+import {getContentRelease,publishContentRelease} from '../../modules/measurement-content/repository'
+import {DECLARATIVE_REPORT_GENERATOR} from '../../modules/measurement-content/report-renderer'
+import type {User} from '@prisma/client'
 import {Prisma,type PrismaClient} from '@prisma/client'
 import {publishAssignmentMeasurementRelease} from '../../modules/cognitive/assignment-measurement-release'
 import {freezeAssignmentProfile} from '../../modules/cognitive/profile-freeze'
@@ -18,7 +21,7 @@ import {testDisclosure} from '../assessment-policy/result-disclosure.fixture'
 /** Disposable database only: synthetic users/content setup followed by actual
  * exact grant issuance and prepare/register/independent review/publication.
  * No real tool, third-party content or external participant data is approved. */
-export async function teacherRuntimePgFixture(owner:PrismaClient,family:'BUNDLE'|'COGNITIVE'|'SITUATIONAL'='BUNDLE',consentRequired=false,includeOther=false){
+export async function teacherRuntimePgFixture(owner:PrismaClient,family:'BUNDLE'|'COGNITIVE'|'SITUATIONAL'='BUNDLE',consentRequired=false,includeOther=false,withReports=false){
  const user=async(label:string,accountDomain:'SCHOOL'|'TRAINING'='SCHOOL',system=false)=>owner.user.create({data:{
   username:'pr363_'+label+'_'+randomUUID(),passwordHash:'synthetic-not-login',accountDomain,role:system?'ADMIN':'TEACHER',teacherApproved:true,
   ...(system?{platformRole:'SYSTEM_ADMIN'}:{}),
@@ -35,7 +38,28 @@ export async function teacherRuntimePgFixture(owner:PrismaClient,family:'BUNDLE'
   if(actor.id===respondent.id)respondentMemberId=member.id
   if(actor.id===other.id)otherMemberId=member.id
  }
- const resourceId=randomUUID(),resourceKey=`education-assessment:TEACHER:${org.id}:${resourceId}`
+ const delivery=await runtimeDeliverySourceFixture(owner,'TEACHER',org,issuer,reviewer,family,consentRequired,withReports)
+ const {entry}=delivery
+ const target=await createHuiteacherTarget({organizationId:org.id,actorUserId:manager.id,kind:'ORGANIZATION',name:'Synthetic teachers'})
+ const event=await createHuiteacherEvent({organizationId:org.id,actorUserId:manager.id,targetId:target.id,kind:'ASSESSMENT',title:'Synthetic PR363 event'})
+ const scope={organizationId:org.id,actorUserId:manager.id,eventId:event.id}
+ const run=await createHuiteacherEventRunDraft({...scope,name:'Synthetic PR363 runtime'})
+ const a=entry.applicability
+ await addTeacherRunTrack({...scope,expectedRunId:run.runId,expectedVersion:1,resource:{family,key:delivery.resourceKey,version:'1.0.0'},subjectSelector:{kind:'MEMBERSHIP_IDS',membershipIds:includeOther?[respondentMemberId,otherMemberId]:[respondentMemberId]},
+  respondentSelector:{kind:'MEMBERSHIP_IDS',membershipIds:includeOther?[respondentMemberId,otherMemberId]:[respondentMemberId]},requestedPolicy:{subjectRoles:a.subjectRoles,respondentRoles:a.respondentRoles,
+   relationshipKinds:a.relationshipKinds,perspectives:a.perspectives,analysisMode:a.analysisMode,visibilityPolicyKey:a.visibilityPolicyKey,minimumRespondents:a.minimumRespondents}})
+ await transitionHuiteacherEvent({...scope,action:'OPEN',expectedVersion:1})
+ await publishTeacherRun({...scope,expectedVersion:2})
+ const [execution]=await owner.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT e.id FROM assessment_run_executions e
+  JOIN assessment_run_actor_snapshots respondent ON respondent.id=e.respondent_actor_snapshot_id
+  WHERE e.organization_id=${org.id} AND e.run_id=${run.runId} AND respondent.user_id=${respondent.id}`)
+ if(!execution)throw new Error('Real Teacher publication did not create the respondent execution')
+ const [otherExecution]=await owner.$queryRaw<Array<{id:string}>>`SELECT e.id FROM assessment_run_executions e JOIN assessment_run_actor_snapshots a ON a.id=e.respondent_actor_snapshot_id WHERE e.run_id=${run.runId} AND a.user_id=${other.id}`
+ return {otherExecutionId:otherExecution?.id,respondent,other,manager,issuer,reviewer,organizationId:org.id,eventId:event.id,runId:run.runId,executionId:execution.id,...delivery}
+}
+
+export async function runtimeDeliverySourceFixture(owner:PrismaClient,product:'TEACHER'|'SCHOOL',org:{id:string},issuer:User,reviewer:User,family:'BUNDLE'|'COGNITIVE'|'SITUATIONAL',consentRequired=false,withReports=false){
+ const resourceId=randomUUID(),resourceKey=`education-assessment:${product}:${org.id}:${resourceId}`
  const source=await owner.compositeAssessment.create({data:{code:'pr363-source-'+randomUUID(),name:'Synthetic actual source',createdBy:issuer.id,
   status:'PUBLISHED',publishedAt:new Date(),publicEnabled:false,copyable:false}})
  const runtime=source
@@ -69,33 +93,35 @@ export async function teacherRuntimePgFixture(owner:PrismaClient,family:'BUNDLE'
  const resourceIds=[source.id,...prepared.snapshot.units.map(unit=>unit.measurement.releaseId)]
  const distribution=await issueAdminContentRoot(issuer.id,proof,{requestId:randomUUID(),expectedVersion:0,
   reason:'Explicit target redistribution of synthetic disposable test content only',grant:{subjectId:issuer.id,
-   scope:{product:'TEACHER',scopeKind:'ORGANIZATION',scopeId:org.id,resourceKind:'material',resourceKeys:resourceIds},
+   scope:{product,scopeKind:'ORGANIZATION',scopeId:org.id,resourceKind:'material',resourceKeys:resourceIds},
    capabilities:['material.distribute'],delegableCapabilities:[],remainingDelegationDepth:0,
    validFrom:new Date(Date.now()-60_000).toISOString(),expiresAt:new Date(Date.now()+3600_000).toISOString()}})
- const context=(actor:typeof issuer)=>({product:'TEACHER' as const,organizationId:org.id,principal:{userId:actor.id,username:actor.username,
-  role:'ADMIN' as const,accountDomain:'TRAINING' as const,platformRole:'SYSTEM_ADMIN' as const,mustChangePassword:false,...proof}})
+ const context=(actor:typeof issuer)=>({product,organizationId:org.id,principal:{userId:actor.id,username:actor.username,
+  role:'ADMIN' as const,accountDomain:actor.accountDomain,platformRole:'SYSTEM_ADMIN' as const,mustChangePassword:false,...proof}})
  const licenses=resourceIds.map(resourceId=>({resourceId,grantId:distribution.grantId}))
  const preparation=await producer.prepareEducationAssessment(context(issuer),{resourceId,sourceCompositeId:source.id,title:'Synthetic '+family+' Teacher delivery',family,licenses})
+ const reports:Array<{itemId:string;releaseId:string}>=[],metricKeys:string[]=[]
+ if(withReports)for(const unit of preparation.units){
+  const measurement=await owner.$transaction(tx=>getContentRelease(tx,unit.measurement.releaseId))
+  if(!measurement||measurement.layer!=='MEASUREMENT')throw new Error('Actual C release required')
+  const metric=measurement.content.metrics[0].metricKey;metricKeys.push(metric)
+  const report=await owner.$transaction(tx=>publishContentRelease(tx,{family:unit.family,layer:'REPORT',key:'pr363-report-'+randomUUID(),version:'1.0.0',
+   scope:{kind:'PRIVATE',product,ownerId:issuer.id,resourceId:preparation.runtimeCompositeId},sourceReleaseId:null,provenance:{},assetRefs:[],
+   content:{projectionVersion:1,measurements:[{releaseId:measurement.releaseId,contentHash:measurement.contentHash}],metricKeys:[metric],
+    audience:product==='TEACHER'?'teacher':'student',language:'zh-CN',generatorVersion:DECLARATIVE_REPORT_GENERATOR,
+    template:{title:'Synthetic frozen report',blocks:[{type:'TEXT',text:'Synthetic software verification only'},{type:'METRIC',metricKey:metric,display:'RAW'}]}}},issuer.id))
+  const grant=await issueAdminContentRoot(issuer.id,proof,{requestId:randomUUID(),expectedVersion:0,reason:'Explicit synthetic report distribution',
+   grant:{subjectId:issuer.id,scope:{product,scopeKind:'ORGANIZATION',scopeId:org.id,resourceKind:'material',resourceKeys:[report.releaseId]},capabilities:['material.distribute'],
+    delegableCapabilities:[],remainingDelegationDepth:0,validFrom:new Date(Date.now()-60_000).toISOString(),expiresAt:new Date(Date.now()+3600_000).toISOString()}})
+  licenses.push({resourceId:report.releaseId,grantId:grant.grantId});reports.push({itemId:unit.itemId,releaseId:report.releaseId})
+ }
+ const disclosure={...testDisclosure(),...(consentRequired?{policyKey:'observer_private_respondent_v1'}:{})}
+ if(withReports)disclosure.audiences.RESPONDENT={mode:'INDIVIDUAL_SUMMARY',metricKeys:[...new Set(metricKeys)],longitudinalMetricKeys:[]}
  const registered=await producer.registerEducationAssessment(context(issuer),resourceId,{expectedPreparationHash:preparation.preparationHash,
-  disclosure:{...testDisclosure(),...(consentRequired?{policyKey:'observer_private_respondent_v1'}:{})},references:{schemaVersion:1,units:[]},reports:[],licenses})
+  disclosure,references:{schemaVersion:1,units:[]},reports,licenses})
  const reviewed=await producer.transitionEducationAssessment(context(reviewer),resourceId,'REVIEW',{expectedEntryHash:registered.entryHash,reason:'Independent synthetic runtime fixture review'})
  await producer.transitionEducationAssessment(context(reviewer),resourceId,'PUBLISH',{expectedEntryHash:reviewed.entryHash,reason:'Publish synthetic runtime fixture only'})
  const identity=await owner.$transaction(tx=>readEducationAssessmentDeliveryIdentity(tx,{resourceKey,version:'1.0.0',purpose:'NEW_USE'}))
  const entry=identity.entry,origin=identity.origin
- const target=await createHuiteacherTarget({organizationId:org.id,actorUserId:manager.id,kind:'ORGANIZATION',name:'Synthetic teachers'})
- const event=await createHuiteacherEvent({organizationId:org.id,actorUserId:manager.id,targetId:target.id,kind:'ASSESSMENT',title:'Synthetic PR363 event'})
- const scope={organizationId:org.id,actorUserId:manager.id,eventId:event.id}
- const run=await createHuiteacherEventRunDraft({...scope,name:'Synthetic PR363 runtime'})
- const a=entry.applicability
- await addTeacherRunTrack({...scope,expectedRunId:run.runId,expectedVersion:1,resource:{family,key:resourceKey,version:'1.0.0'},subjectSelector:{kind:'MEMBERSHIP_IDS',membershipIds:includeOther?[respondentMemberId,otherMemberId]:[respondentMemberId]},
-  respondentSelector:{kind:'MEMBERSHIP_IDS',membershipIds:includeOther?[respondentMemberId,otherMemberId]:[respondentMemberId]},requestedPolicy:{subjectRoles:a.subjectRoles,respondentRoles:a.respondentRoles,
-   relationshipKinds:a.relationshipKinds,perspectives:a.perspectives,analysisMode:a.analysisMode,visibilityPolicyKey:a.visibilityPolicyKey,minimumRespondents:a.minimumRespondents}})
- await transitionHuiteacherEvent({...scope,action:'OPEN',expectedVersion:1})
- await publishTeacherRun({...scope,expectedVersion:2})
- const [execution]=await owner.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT e.id FROM assessment_run_executions e
-  JOIN assessment_run_actor_snapshots respondent ON respondent.id=e.respondent_actor_snapshot_id
-  WHERE e.organization_id=${org.id} AND e.run_id=${run.runId} AND respondent.user_id=${respondent.id}`)
- if(!execution)throw new Error('Real Teacher publication did not create the respondent execution')
- const [otherExecution]=await owner.$queryRaw<Array<{id:string}>>`SELECT e.id FROM assessment_run_executions e JOIN assessment_run_actor_snapshots a ON a.id=e.respondent_actor_snapshot_id WHERE e.run_id=${run.runId} AND a.user_id=${other.id}`
- return {otherExecutionId:otherExecution?.id,respondent,other,manager,issuer,reviewer,organizationId:org.id,eventId:event.id,runId:run.runId,executionId:execution.id,resourceId,resourceKey,runtimeId:preparation.runtimeCompositeId,origin,distribution,proof}
+ return {resourceId,resourceKey,entry,origin,distribution,proof,runtimeId:preparation.runtimeCompositeId,reports}
 }
