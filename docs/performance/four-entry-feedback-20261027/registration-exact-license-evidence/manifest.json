@@ -1,0 +1,88 @@
+{
+  "kind": "unsigned local UI/API contract; post-execution source observation",
+  "base": "26c16c278320d9a4074b7d3a0e88ad7c0a356508",
+  "DTOAuthorityCommit": "b045751a29c080e6e52f67252fed7c875f007f7c (read-only, backend not merged or edited)",
+  "inputs": {
+    "server-version/frontend/src/components/education-tools/assessmentResourceClient.ts": "b861dcb9c5db146220e58bd83a39df09fa98febe05c1f3e158bd1404bf03c92c",
+    "server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.tsx": "923273b5fd74f7b875e032a704470dc15ae13aa66dedeb355adccb90b9fabee3",
+    "server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.test.tsx": "8062a63ab711a00ddc50edb73d7826860e9872518ed026965c3dd1cf93cefad2"
+  },
+  "artifacts": {
+    "lint-repaired-test.log.gz": {
+      "sha256": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec",
+      "decodedSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "ui-r2.json": {
+      "sha256": "d460a36ab2af3e243dd8583bc444a6ce2334180e8fbe906c7c2ff16e47fad502",
+      "decodedSHA256": "d460a36ab2af3e243dd8583bc444a6ce2334180e8fbe906c7c2ff16e47fad502"
+    },
+    "ui-r2.log.gz": {
+      "sha256": "495c848da201a74d4aca519363e56346da90012bdd469cf03b50c99cecdd743c",
+      "decodedSHA256": "9f4350f450ccc0843c80e334b1f80686ced04a37f5992d0fe26d8c8a43f7f26e"
+    },
+    "ui-r1.json": {
+      "sha256": "cdc3b1abf224910e1d9382d4bc88722d06b2bb5c775a823d08b6260d065add9f",
+      "decodedSHA256": "cdc3b1abf224910e1d9382d4bc88722d06b2bb5c775a823d08b6260d065add9f"
+    },
+    "ui-r1.log.gz": {
+      "sha256": "9f9d0cd9f2d1be877a203059c05ffac931098ac99384a07913506856ca09bbae",
+      "decodedSHA256": "57d11ade3f3487283d9b98f36bc18f6bae8552aa62a9457d4ffcc9b3432a6a0d"
+    },
+    "pr363-exact-licenses-types.log.gz": {
+      "sha256": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec",
+      "decodedSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "pr363-exact-licenses-lint.log.gz": {
+      "sha256": "0108007425af5b29b8d02746c3dbc2c072d09f8fb81b21f19e97e1e793013fe5",
+      "decodedSHA256": "fddb4ea03693e54ef15a7de5f9465950afba80a3e730ec32f87b3fe958a1fd4a"
+    },
+    "types-final.log.gz": {
+      "sha256": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec",
+      "decodedSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "commands": [
+    {
+      "cwd": "server-version/frontend",
+      "command": "TZ=Asia/Shanghai node node_modules/vitest/vitest.mjs run src/components/education-tools/EducationAssessmentRegistrationPanel.test.tsx -t 'freezes exact|requires an explicit|recovers an existing preparation|multiple grant|unavailable sources|NONE disclosure|source selection' --reporter=json",
+      "exit": 1,
+      "passed": 6,
+      "failed": 1,
+      "filtered": 6,
+      "report": "ui-r1.json",
+      "failure": "report-option locator also matched the disclosure option; actual report option disabled"
+    },
+    {
+      "cwd": "server-version/frontend",
+      "command": "TZ=Asia/Shanghai node node_modules/vitest/vitest.mjs run src/components/education-tools/EducationAssessmentRegistrationPanel.test.tsx -t 'disables unavailable sources' --reporter=json",
+      "exit": 0,
+      "passed": 1,
+      "filtered": 12,
+      "report": "ui-r2.json"
+    },
+    {
+      "command": "node node_modules/eslint/bin/eslint.js src/components/education-tools/assessmentResourceClient.ts src/components/education-tools/EducationAssessmentRegistrationPanel.tsx src/components/education-tools/EducationAssessmentRegistrationPanel.test.tsx",
+      "exit": 0,
+      "errors": 0,
+      "warnings": 1
+    },
+    {
+      "command": "node node_modules/eslint/bin/eslint.js src/components/education-tools/EducationAssessmentRegistrationPanel.test.tsx",
+      "exit": 0,
+      "errors": 0,
+      "warnings": 0
+    }
+  ],
+  "notExecuted": [
+    "source PG (4 upstream cases not repeated)",
+    "browser",
+    "build",
+    "CI",
+    "deploy"
+  ],
+  "finalTypes": {
+    "command": "node node_modules/typescript/bin/tsc -p tsconfig.app.json --noEmit",
+    "exit": 0,
+    "toolCompletion": "b7b240"
+  }
+}

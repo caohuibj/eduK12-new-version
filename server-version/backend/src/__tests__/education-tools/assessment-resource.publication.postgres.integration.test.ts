@@ -206,7 +206,7 @@ suite('Education resource producer with real isolated PostgreSQL, source engines
  it('projects only explicitly granted sources and exact approved educational C/P/R choices, and retries keep the same immutable registration',async()=>{
   const f=await fixture(),p=await f.prepare(),unit=p.units[0]
   const listed=await service.listEducationAssessmentSourceCandidates(f.creator.context)
-  expect(listed.list).toEqual([expect.objectContaining({sourceCompositeId:f.compositeId,grantId:f.distribution.grantId})])
+  expect(listed.list).toEqual([expect.objectContaining({sourceCompositeId:f.compositeId,canPrepare:true,licenses:[...f.licenses].sort((a,b)=>a.resourceId.localeCompare(b.resourceId))})])
   expect(await service.listEducationAssessmentSourceCandidates(f.reviewer.context)).toEqual({list:[]})
   const measurement=await db.$transaction(tx=>getContentRelease(tx,unit.measurement.releaseId))
   if(!measurement||measurement.layer!=='MEASUREMENT')throw new Error('Actual measurement missing')
@@ -218,7 +218,7 @@ suite('Education resource producer with real isolated PostgreSQL, source engines
    content:{projectionVersion:1,measurement:{releaseId:measurement.releaseId,contentHash:measurement.contentHash},entries:[{metricKey:metric,referenceKind:entry.referenceKind,definition:entry}],evidence:{method:'Synthetic theoretical range; no sample or normative claim'}}},f.system.id))
   const grant=await f.grant([reference.releaseId])
   const choices=await service.listEducationAssessmentContentChoices(f.creator.context,p.resourceId)
-  expect(choices.units[0].references[0]).toMatchObject({releaseId:reference.releaseId,grantId:grant.grantId,choices:[{entryKey:referenceEntryKey(entry),metricKey:metric,referenceKind:'theoretical_range'}]})
+  expect(choices.units[0].references[0]).toMatchObject({releaseId:reference.releaseId,selectable:true,licenses:[{resourceId:reference.releaseId,grantId:grant.grantId}],choices:[{entryKey:referenceEntryKey(entry),metricKey:metric,referenceKind:'theoretical_range'}]})
   const input={...registration(p,[...f.licenses,{resourceId:reference.releaseId,grantId:grant.grantId}]),references:{schemaVersion:1,units:[{itemId:unit.itemId,choices:[{releaseId:reference.releaseId,entryKey:referenceEntryKey(entry),priority:10}]}]}}
   const registered=await service.registerEducationAssessment(f.creator.context,p.resourceId,input)
   const missingMeasurement={...registered.entry.educationOrigin,distribution:{...registered.entry.educationOrigin.distribution,

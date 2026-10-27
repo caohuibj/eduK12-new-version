@@ -1,3 +1,4 @@
+import {EducationAssessmentRegistrationPanel} from '../components/education-tools/EducationAssessmentRegistrationPanel'
 import {SchoolTaskHelp as ManagementHelp} from '../school/SchoolTaskHelp'
 import {TeacherAssessmentProvider} from './TeacherAssessmentPage'
 import {EducationRosterManagement} from '../components/education-roster/EducationRosterManagement'
@@ -390,7 +391,7 @@ export default function HuiteacherApp(){
       <nav className="ht-workspace-tabs" aria-label="Teacher 工作台">
         <button type="button" aria-pressed={workspaceTab==='teacher'}
           onClick={()=>changeWorkspaceTab('teacher')}><BookOpen size={18} aria-hidden="true"/>教师成长</button>
-        {canAuthorPrivateTools&&<button type="button" aria-pressed={workspaceTab==='private-tools'} onClick={()=>changeWorkspaceTab('private-tools')}><FileText size={18} aria-hidden="true"/>我的工具</button>}
+        {me.role!=='STUDENT'&&<button type="button" aria-pressed={workspaceTab==='private-tools'} onClick={()=>changeWorkspaceTab('private-tools')}><FileText size={18} aria-hidden="true"/>我的工具</button>}
         {me.organizations.some(o=>o.productAdmin)&&<button type="button"
           aria-pressed={workspaceTab==='school'}
           onClick={()=>changeWorkspaceTab('school')}><UsersRound size={18} aria-hidden="true"/>学校改进</button>}
@@ -493,6 +494,7 @@ export default function HuiteacherApp(){
       {me.role==='STUDENT'?<HuiteacherMyFormTasks student api={teacherApi}/>:
       <>
 
+      {workspaceTab==='private-tools'&&selectedOrg&&<EducationAssessmentRegistrationPanel key={'registration:'+me.id+':'+selectedOrg} api={teacherApi} organizationId={selectedOrg} actorId={me.id} product="TEACHER"/>}
       {workspaceTab==='private-tools'&&(canAuthorPrivateTools?<><aside className="ht-panel" aria-label="学生测评编制入口提示"><p className="ht-muted">此处自编工具用于 Teacher 教师测评。心理教师为学生编制量表、表单及发布活动，请前往 School 的“我的工具”和活动管理。学校须已开通 School，并授予本人对应权限；使用同一教育账号单独登录，两个入口的私有草稿与固定版本不会自动互通。</p><a href={`https://${SCHOOL_HOST}/login`} target="_blank" rel="noopener noreferrer">前往 School 编制学生测评</a></aside><EducationPrivateToolStudio key={`TEACHER:${me.id}:${selectedOrg}`} api={teacherApi} organizationId={selectedOrg} entry="TEACHER" actorId={me.id} onDraftStateChange={setPrivateDraftState}/></>:<section className="ht-panel"><h2>我的工具</h2><p>当前账号或学校暂无私有量表与表单编制权限。</p></section>)}
       {workspaceTab==='teacher'&&<>
         <div className="ht-workspace-body">

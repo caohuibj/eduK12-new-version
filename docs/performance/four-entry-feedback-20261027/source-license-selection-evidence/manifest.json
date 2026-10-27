@@ -1,0 +1,128 @@
+{
+  "kind": "cloud-management-license-selection-not-CI",
+  "base": "41caf96cac175bafeccc4fd9e6c76111409767e6",
+  "environment": {
+    "node": "24.21.0",
+    "postgres": "16.15",
+    "database": "eduk12_pr363_publication_test",
+    "production": false
+  },
+  "commands": [
+    {
+      "name": "source-license-selection-r1",
+      "exitCode": 1,
+      "testResult": "3 failed",
+      "cause": "Synthetic Form label differed from actual definition prompt; original typed guard rejected fixture"
+    },
+    {
+      "name": "source-license-selection-r2",
+      "exitCode": 127,
+      "testResult": "not started",
+      "cause": "vitest backend-relative executable invoked from repository root"
+    },
+    {
+      "name": "source-license-selection-r3",
+      "command": "vitest run src/__tests__/education-tools/assessment-resource.license-selection.postgres.integration.test.ts --reporter=verbose",
+      "exitCode": 0,
+      "testResult": "4 real PostgreSQL cases passed"
+    },
+    {
+      "name": "source-license-types-r1",
+      "command": "tsc --noEmit",
+      "exitCode": 0
+    },
+    {
+      "name": "source-license-types-r2",
+      "command": "tsc --noEmit",
+      "exitCode": 0
+    },
+    {
+      "name": "source-license-types-r3",
+      "command": "tsc --noEmit",
+      "exitCode": 0,
+      "delta": "final legacy DTO assertion sorts exact selected resource IDs, production runtime unchanged"
+    }
+  ],
+  "receipts": [
+    {
+      "path": "pg-r1.input.ts.txt",
+      "sha256": "adb77b3aedc15f67f2561638dcc844b66432fda11edcf3d9bb9efd60afdb07b0"
+    },
+    {
+      "path": "pr363-source-license-selection-r1.exit",
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "path": "pr363-source-license-selection-r1.log",
+      "sha256": "611f0ebf96cc25344026080fbedee2260befe0707ec735119dabe9e146e8e983"
+    },
+    {
+      "path": "pr363-source-license-selection-r2.exit",
+      "sha256": "743c7850cccfba5e53a9002663ec1ddd1079315a98bdbfdde10e6044f56abefe"
+    },
+    {
+      "path": "pr363-source-license-selection-r2.log",
+      "sha256": "ebb38da99c176d41d3a3059cafbac142d32e8756d80a7d9447f5c388bcd557ff"
+    },
+    {
+      "path": "pr363-source-license-selection-r3.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "pr363-source-license-selection-r3.log",
+      "sha256": "7df91d88a3fbf27f564e4aa17abc39ba512d8206bfb362226f15091f47537e51"
+    },
+    {
+      "path": "pr363-source-license-types-r1.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "pr363-source-license-types-r1.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "pr363-source-license-types-r2.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "pr363-source-license-types-r2.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "pr363-source-license-types-r3.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "pr363-source-license-types-r3.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "service-r1.input.ts.txt",
+      "sha256": "6bf92092832fe3e458fca8c4e3bb0b1efd7c5358a9d1b5b7d12ab8b033a1c755"
+    }
+  ],
+  "sourceInputsAtCollection": [
+    {
+      "path": "server-version/backend/src/modules/education-tools/assessment-resource.service.ts",
+      "sha256": "b7a56aec57f62f9d5ee574f29f5a9edab6d0736de3bf30df5a561b7777c326a3",
+      "gitBlob": "3e4ff95ed22d5d21cc38c2cc5742468ca4b9bca0"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/education-tools/assessment-resource.license-selection.postgres.integration.test.ts",
+      "sha256": "9abc31878d434f27b3f709022c630c6c1eef30de12dd899df41791bc8e932959",
+      "gitBlob": "c16cd9d2d7896c656c906e5ad70fb0d3874b7c49"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/education-tools/assessment-resource.publication.postgres.integration.test.ts",
+      "sha256": "976ea85a8644f74678fb0214f49d1dc92830ed6974f6a579e51c88f1eb52636c",
+      "gitBlob": "e928739b1a8bef1f81f3d96925f4b526cfb63e55"
+    }
+  ],
+  "limitations": [
+    "Source hashes collected after execution, not a contemporaneous signed environment attestation.",
+    "Only four new cases; no rerun of ordinary18, marker5, feedback4 or root concurrency checks.",
+    "C is published by the original CognitiveAssignment measurement publisher; Composite/Form publication and StoredAsset metadata are explicitly synthetic DB fixtures.",
+    "No claim of object-storage bytes, browser, actual instrument licensing/approval, respondent execution/FINAL or general concurrency qualification.",
+    "No frontend/client changes: management owner must implement the documented new licenses DTO and conflict-detecting union."
+  ]
+}

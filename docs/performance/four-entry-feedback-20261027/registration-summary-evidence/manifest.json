@@ -1,0 +1,67 @@
+{
+  "kind": "unsigned local development evidence, post-execution source observation",
+  "base": "b6e30a68ec840c8dccf43a63e7a33049120ff65d",
+  "sourceSHA256": {
+    "server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.tsx": "23f3ace29fe578af50b6e2518748579ef836cae330aea4601e40e6c168e531dc",
+    "server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.test.tsx": "59c012148b1996bd7c266164040bf84703edd7965b487c681c91c2abdd932888"
+  },
+  "artifacts": {
+    "types-summary.log.gz": {
+      "sha256": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec",
+      "decodedSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "lint-summary.log.gz": {
+      "sha256": "f60f3aa55279232598d3c5453c05992b93dac4b9c6d600943ed4273372aefac6",
+      "decodedSHA256": "f7a01be32250caada22c5f121ca9d098d73481a5afe9cb8bd41e5fcc6838fac2"
+    },
+    "summary-r2.json": {
+      "sha256": "7b0554353a5a44235f51b12d1a7c9ccd9a51b8d9353652391d631b1a5caba575",
+      "decodedSHA256": "7b0554353a5a44235f51b12d1a7c9ccd9a51b8d9353652391d631b1a5caba575"
+    },
+    "summary-r2.log.gz": {
+      "sha256": "020d7d52f34a58810b5fb05994542fc66ae52af4df4b4fb57b3bc5a2c0b65b1b",
+      "decodedSHA256": "b7120d518367acd5a5d5fe08630fc270afb5f24d99d0d9c64dd07c058a3103b0"
+    },
+    "summary.log.gz": {
+      "sha256": "33c9384e11262a8b4f386365b84a253df6f10774f6cce3a2139d7d91ad6cdaab",
+      "decodedSHA256": "85972c5f582f65fd1696eea5b0eac512c612e9670e6c3cc4a6d890041738710c"
+    }
+  },
+  "commands": [
+    {
+      "command": "node node_modules/vitest/vitest.mjs run src/components/education-tools/EducationAssessmentRegistrationPanel.test.tsx -t 'presents readable frozen' --reporter=json",
+      "cwd": "repo root (wrong)",
+      "exit": 1,
+      "status": "runner failed before tests, MODULE_NOT_FOUND",
+      "log": "summary.log.gz"
+    },
+    {
+      "command": "node node_modules/vitest/vitest.mjs run src/components/education-tools/EducationAssessmentRegistrationPanel.test.tsx -t 'presents readable frozen' --reporter=json",
+      "cwd": "server-version/frontend",
+      "exit": 0,
+      "passed": 1,
+      "filtered": 8,
+      "report": "summary-r2.json"
+    },
+    {
+      "command": "node node_modules/typescript/bin/tsc -p tsconfig.app.json --noEmit",
+      "cwd": "server-version/frontend",
+      "exit": 0,
+      "completion": "caa2d5"
+    },
+    {
+      "command": "node node_modules/eslint/bin/eslint.js src/components/education-tools/EducationAssessmentRegistrationPanel.tsx src/components/education-tools/EducationAssessmentRegistrationPanel.test.tsx",
+      "exit": 0,
+      "warnings": 1,
+      "errors": 0
+    }
+  ],
+  "pending": "Exact source/preparation/P-R licenses DTO; legacy manual UUID/grant mapping not qualified as completed functionality",
+  "notExecuted": [
+    "PG",
+    "browser",
+    "build",
+    "CI",
+    "deploy"
+  ]
+}

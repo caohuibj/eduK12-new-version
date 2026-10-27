@@ -1,0 +1,20 @@
+{
+  "base": "96fb8f71bdc2028cf7e94b59f858db2080376f16",
+  "managementHead": "87a92c9248bed25afd91bffcce3e0ad1fc94799a",
+  "review": "Root read actual panel/client/tests, compared actual b045 server DTO now in base, verified source and artifact hashes. Latest seven affected UI cases preserved as six passes in failing invocation plus one isolated repaired case; not an all-file green claim. No browser or CI pass claimed.",
+  "integrationCheck": {
+    "command": "node node_modules/typescript/bin/tsc -p tsconfig.app.json --noEmit",
+    "cwd": "server-version/frontend",
+    "node": "24.22.1",
+    "exit": 0,
+    "log": "registration-integration-types.log",
+    "reason": "Merged App host includes newer runtime and feedback wiring than worker base; verify new combined type closure once."
+  },
+  "notExecuted": [
+    "UI cases repeated",
+    "PG repeated",
+    "browser",
+    "CI",
+    "deploy"
+  ]
+}

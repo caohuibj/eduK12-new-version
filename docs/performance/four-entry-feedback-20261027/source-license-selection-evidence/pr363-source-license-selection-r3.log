@@ -1,0 +1,13 @@
+
+ RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend
+
+ ✓ src/__tests__/education-tools/assessment-resource.license-selection.postgres.integration.test.ts > education management exact multi-grant selection with real isolated PostgreSQL > marks incomplete source/C/assets authority unavailable, then projects only the exact three independent grants 343ms
+ ✓ src/__tests__/education-tools/assessment-resource.license-selection.postgres.integration.test.ts > education management exact multi-grant selection with real isolated PostgreSQL > marks an invalid persisted source definition unavailable without exposing its source body 113ms
+ ✓ src/__tests__/education-tools/assessment-resource.license-selection.postgres.integration.test.ts > education management exact multi-grant selection with real isolated PostgreSQL > returns original preparation licenses on creation/replay/recovery and never substitutes a new grant after withdrawal 285ms
+ ✓ src/__tests__/education-tools/assessment-resource.license-selection.postgres.integration.test.ts > education management exact multi-grant selection with real isolated PostgreSQL > projects complete P/R asset selections, pins overlapping source assets and registers without leaking unrelated grant keys 456ms
+
+ Test Files  1 passed (1)
+      Tests  4 passed (4)
+   Start at  10:42:21
+   Duration  6.52s (transform 3.92s, setup 0ms, import 5.19s, tests 1.22s, environment 0ms)
+
