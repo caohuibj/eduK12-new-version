@@ -28,9 +28,9 @@ async function login(browser,product,user,privileged){
  const dist=fs.realpathSync(process.env.SCHOOL_TEACHER_FRONTEND_DIST||path.join(base.repo,'server-version/frontend/dist')),assetErrors=[],assetChecks=[]
  page.on('response',response=>{
   const responseUrl=new URL(response.url());if(responseUrl.origin!==url||responseUrl.pathname.startsWith('/api/')||responseUrl.pathname.startsWith('/uploads/'))return
-  assetChecks.push((async()=>{assert.equal(response.status(),200);const file=artifactResponseFile(dist,response.url(),response.request().resourceType()==='document');assert.equal(base.sha(await response.body()),base.sha(fs.readFileSync(file)),'Network document/asset must be actual official artifact bytes')})().catch(error=>assetErrors.push(base.sha(String(error)))))
+  let step='http';assetChecks.push((async()=>{assert.equal(response.status(),200);step='local-file';const file=artifactResponseFile(dist,response.url(),response.request().resourceType()==='document');step='response-body';const bytes=await response.body();step='bytes';assert.equal(base.sha(bytes),base.sha(fs.readFileSync(file)),'Network document/asset must be actual official artifact bytes')})().catch(error=>assetErrors.push({step,status:response.status(),resourceType:response.request().resourceType(),errorName:['Error','AssertionError'].includes(error?.name)?error.name:'UNKNOWN',errorCode:['ENOENT','ERR_ASSERTION'].includes(error?.code)?error.code:'UNKNOWN',digest:base.sha(String(error))})))
  })
- const verifyAssets=async()=>{await Promise.all(assetChecks);assert.deepEqual(assetErrors,[])}
+ const verifyAssets=async()=>{let observed=-1;while(observed!==assetChecks.length){observed=assetChecks.length;await Promise.all(assetChecks)}if(assetErrors.length){const error=new Error('Official artifact network verification failed');error.safeAssetErrors=assetErrors;throw error}}
  const response=await page.goto(url+'/login');assert.equal(response.status(),200);assert.ok(await response.securityDetails(),'Trusted TLS document required');const peer=await response.serverAddr();assert.ok(peer&&['127.0.0.1','::1'].includes(peer.ipAddress),'HTTPS must terminate in this isolated job')
  await page.getByLabel(product==='SCHOOL'?'用户名':'教育账号',{exact:true}).waitFor();await verifyAssets()
  await page.getByLabel(product==='SCHOOL'?'用户名':'教育账号',{exact:true}).fill(user.username)
@@ -43,11 +43,11 @@ async function login(browser,product,user,privileged){
  assert.equal((await api(page,prefix,'/auth/me')).id,user.id)
  const cookies=await context.cookies(url),session=cookies.find(c=>c.name===(product==='SCHOOL'?'huischool_session':'huiteacher_session'))
  assert.ok(session?.secure&&session?.httpOnly);assert.equal(cookies.some(c=>c.name==='ptool_session'),false)
- return {context,page,prefix,url,verifyAssets}
+ await verifyAssets();return {context,page,prefix,url,verifyAssets}
 }
-async function openCase(page,c,expectedParent){
+async function openCase(page,c,expectedParent,beforeNavigation=async()=>{}){
  const url=fixtureTools.origin(c.product)
- await page.goto(url+(c.product==='SCHOOL'?'/workspace/tasks':'/workspace#ht-personal-tasks'))
+ await beforeNavigation();await page.goto(url+(c.product==='SCHOOL'?'/workspace/tasks':'/workspace#ht-personal-tasks'))
  const card=page.locator('article').filter({hasText:c.title});await card.first().waitFor({state:'visible'});assert.equal(await card.count(),1,'Exact human-readable task title, never manual UUID selection')
  const button=card.getByRole('button',{name:c.product==='SCHOOL'?'开始／继续官方测评':/^(开始测评|继续测评)$/})
  if(c.product==='TEACHER'&&expectedParent){
@@ -175,8 +175,8 @@ async function run(){
     page.on('pageerror',e=>pageErrors.push(base.sha(String(e))))
     page.on('response',response=>{const request=response.request(),url=new URL(response.url());if(url.pathname.startsWith('/api/')&&!['GET','HEAD','OPTIONS'].includes(request.method()))mutations.push({path:url.pathname,status:response.status()})})
     try{
-     report.stage=product+'-'+c.mode+'-start-resume';const parentId=await openCase(page,c)
-     await page.reload();const resumedParentId=await openCase(page,c,parentId);assert.equal(resumedParentId,parentId,'Refresh must keep the actual durable parent')
+     report.stage=product+'-'+c.mode+'-start-resume';const parentId=await openCase(page,c,undefined,verifyAssets)
+     await verifyAssets();await page.reload();const resumedParentId=await openCase(page,c,parentId,verifyAssets);assert.equal(resumedParentId,parentId,'Refresh must keep the actual durable parent')
      report.stage=product+'-'+c.mode+'-cognitive';await reaction(page,step=>{report.stage=product+'-'+c.mode+'-cognitive-'+step});report.stage=product+'-'+c.mode+'-native';await native(page,step=>{report.stage=product+'-'+c.mode+'-native-'+step})
      report.stage=product+'-'+c.mode+'-form-report';await page.getByLabel('Synthetic note',{exact:false}).fill('Synthetic browser Form answer')
      const feedback=page.waitForResponse(r=>new URL(r.url()).pathname===prefix+'/assessment-reports/executions/'+c.executionId&&r.request().method()==='GET')
@@ -201,7 +201,7 @@ async function run(){
   fixtureTools.privateFile(root,'pr363-observed.json',observed)
   const checked=spawnSync(process.execPath,[path.join(__dirname,'pr363-fixture.cjs'),'verify'],{env:process.env,encoding:'utf8',maxBuffer:1024*1024});assert.equal(checked.status,0,'Persisted FINAL exact metric-key/value verification required')
   assertManagementReads(report.managementReads);report.status='PASS';report.stage='complete'
- }catch(error){report.status='FAILED';report.errorName=['TimeoutError','AssertionError','Error'].includes(error?.name)?error.name:'UNKNOWN';report.errorDigest=base.sha(String(error));if(error?.code==='ERR_ASSERTION')report.assertion={operator:['strictEqual','deepStrictEqual','=='].includes(error.operator)?error.operator:'OTHER',actualType:typeof error.actual,expectedType:typeof error.expected,actualCount:Array.isArray(error.actual)?error.actual.length:null,expectedCount:Array.isArray(error.expected)?error.expected.length:null};throw error}
+ }catch(error){report.status='FAILED';report.errorName=['TimeoutError','AssertionError','Error'].includes(error?.name)?error.name:'UNKNOWN';report.errorDigest=base.sha(String(error));if(error?.safeAssetErrors)report.safeAssetErrors=error.safeAssetErrors;if(error?.code==='ERR_ASSERTION')report.assertion={operator:['strictEqual','deepStrictEqual','=='].includes(error.operator)?error.operator:'OTHER',actualType:typeof error.actual,expectedType:typeof error.expected,actualCount:Array.isArray(error.actual)?error.actual.length:null,expectedCount:Array.isArray(error.expected)?error.expected.length:null};throw error}
  finally{if(browser)await browser.close();fs.writeFileSync(path.join(out,'browser.json'),JSON.stringify(report,null,2)+'\n')}
 }
 module.exports={api,login,openCase,reaction,native,artifactResponseFile,assertManagementReads,managementToolLink,nativeOptionLabel,readManagementSummary,selectNativeOption,run}

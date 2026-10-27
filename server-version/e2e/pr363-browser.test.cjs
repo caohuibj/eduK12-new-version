@@ -60,3 +60,12 @@ test('native single choice clicks once and awaits async checked state without re
  const page={getByRole(role,options){assert.equal(role,'radio');assert.equal(options.name,'Synthetic async option');assert.equal(options.exact,true);return {async click(){clicks++;assert.equal(checked,false)},async elementHandle(){return element}}},async waitForFunction(predicate,arg){assert.equal(clicks,1);assert.equal(predicate(arg),false);checked=true;assert.equal(predicate(arg),true)}};
  await selectNativeOption(page,'Synthetic async option');assert.equal(clicks,1);assert.equal(checked,true)
 })
+
+test('bound-parent navigation waits for pending artifact verification and refuses a failed drain',async()=>{
+ const {openCase}=require('./pr363-browser.cjs');let drained=false,navigated=false;
+ const response={url:()=> 'https://teacher.eduk12.top/api/huiteacher/assessment-composite-attempts/parent',request:()=>({method:()=> 'GET'}),status:()=>200,json:async()=>({data:{id:'parent',status:'IN_PROGRESS'}})};
+ const card={first(){return this},waitFor:async()=>{},count:async()=>1,getByRole:()=>({click:async()=>{}})};
+ const page={goto:async()=>{assert.equal(drained,true);navigated=true},locator:()=>({filter:()=>card}),on(){},off(){},waitForResponse:async()=>response};
+ await openCase(page,{product:'TEACHER',title:'Synthetic'},'parent',async()=>{await Promise.resolve();drained=true});assert.equal(navigated,true);navigated=false;
+ await assert.rejects(()=>openCase(page,{product:'TEACHER',title:'Synthetic'},'parent',async()=>{throw Error('verification failed')}));assert.equal(navigated,false)
+})
