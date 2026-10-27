@@ -20,7 +20,7 @@ describe('real Teacher host and FinalComposite assessment media',()=>{
    if(url===prefix+'/auth/me')return reply({id:'teacher',username:'教师',role:'TEACHER',mustChangePassword:false,organizations:[{organizationId:'school',organizationName:'学校',productAdmin:false}]})
    if(url===prefix+'/auth/csrf')return reply({csrfToken:'teacher-media-csrf'})
    if(url===prefix+'/my-scale-tasks')return reply({list:[{executionId:'exec',eventId:'event',eventTitle:'活动',runId:'run',organizationId:'school',status:'STARTED',runtimeBindingRef:id,resourceKey:'library-scale:one',title:'我的量表',runStatus:'PUBLISHED'}]})
-   if(url===prefix+'/composite-attempts/'+id)return reply(state(id))
+   if(url===prefix+'/composite-attempts/'+id+'?view=current-unit')return reply(state(id))
    if(url.endsWith('/scale/assets/image/content'))return {ok:true,status:200,blob:readBlob,json:()=>{throw Error('image parsed as JSON')}}
    if(url.endsWith('/scale/items/q/video-capability'))return reply(mode==='valid'?{videoUrl:'https://media.example.test/video.webm',expiresAt:1900000000000}:{videoUrl:7})
    if(options?.method==='POST')throw Error('Unexpected POST '+url)
@@ -48,8 +48,8 @@ describe('real Teacher host and FinalComposite assessment media',()=>{
   const request=vi.fn(async(url:string)=>{
    if(url===prefix+'/auth/me')return reply({id:'teacher',username:'教师',role:'TEACHER',mustChangePassword:false,organizations:[]})
    if(url===prefix+'/my-scale-tasks')return reply({list:['old','new'].map(id=>({executionId:id,eventId:'event',eventTitle:'活动',runId:'run',organizationId:'school',status:'STARTED',runtimeBindingRef:id,resourceKey:'library-scale:one',title:id,runStatus:'PUBLISHED'}))})
-   if(url===prefix+'/composite-attempts/old')return reply(state('old',false))
-   if(url===prefix+'/composite-attempts/new')return reply(state('new',false))
+   if(url===prefix+'/composite-attempts/old?view=current-unit')return reply(state('old',false))
+   if(url===prefix+'/composite-attempts/new?view=current-unit')return reply(state('new',false))
    if(url.includes('/old/items/unit/scale/assets/'))return {ok:true,status:200,blob:()=>late.promise}
    if(url.includes('/new/items/unit/scale/assets/'))return {ok:true,status:200,blob:async()=>current}
    return reply({list:[],canAuthor:false})

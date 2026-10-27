@@ -21,7 +21,7 @@ function setup(role:keyof typeof entryButtons,resume:boolean,rejectRead=false){
     if(path.startsWith('/my/'))return {list:[task],total:1,hasMore:false,truncated:false,page:1}
     if(path===prefix+'/consent/accept'&&method==='POST')return {}
     if(path===prefix+'/start'&&method==='POST')return {state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:'bound-attempt'}
-    if(path==='/composite-attempts/bound-attempt'){
+    if(path==='/composite-attempts/bound-attempt?view=current-unit'){
       if(rejectRead)throw Error('当前作答访问被拒绝')
       return {id:'bound-attempt',status:'IN_PROGRESS',deliveryMode:'FINAL_ONLY'}
     }
@@ -41,7 +41,7 @@ describe('School real inbox → runner consent sequence',()=>{
     fireEvent.click(screen.getByRole('button',{name:'开始或继续正式测评'}))
     await screen.findByText('已读取授权的原有作答')
     expect(api.mock.calls.filter(([path])=>!path.startsWith('/my/')).map(([path])=>path))
-      .toEqual([prefix+'/start','/composite-attempts/bound-attempt'])
+      .toEqual([prefix+'/start','/composite-attempts/bound-attempt?view=current-unit'])
   })
   it.each(['student','parent','teacher'] as const)('%s still requires explicit consent for new admission',async role=>{
     const api=setup(role,false)
@@ -51,7 +51,7 @@ describe('School real inbox → runner consent sequence',()=>{
     fireEvent.click(screen.getByRole('button',{name:'开始或继续正式测评'}))
     await screen.findByText('已读取授权的原有作答')
     expect(api.mock.calls.filter(([path])=>!path.startsWith('/my/')).map(([path])=>path))
-      .toEqual([prefix+'/consent/accept',prefix+'/start','/composite-attempts/bound-attempt'])
+      .toEqual([prefix+'/consent/accept',prefix+'/start','/composite-attempts/bound-attempt?view=current-unit'])
   })
   it('does not reopen or re-sign consent when protected continuation is rejected',async()=>{
     const api=setup('parent',true,true)
