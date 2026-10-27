@@ -15,6 +15,7 @@ describe('SWLS-5 independent Chinese DRAFT (tests authored; not executed during 
   expect(source.catalog.catalogStatus).toBe('CANDIDATE')
   expect(d.items.map(x=>x.itemCode)).toEqual([1,2,3,4,5].map(id))
   expect(d.responseSets[0].options.map(x=>x.score)).toEqual([1,2,3,4,5,6,7])
+  expect(d.responseSets[0].options[3].label).toBe('既不赞同也不反对')
   expect(source.instruction?.version).toBe('1.0.0')
  })
  it('scores one sum 5–35 without reversal, extra subscales or norms',()=>{
