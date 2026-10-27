@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { CUES,FLANKERS,INPUTS,antConfig,type AntConfig,type AntTrial } from './protocol'
+import { CUES,FLANKERS,INPUTS,antConfig,ANT_PRACTICE_POLICY,type AntLegacyConfig,type AntGuidedConfig,type AntTrial } from './protocol'
 const time=z.number().finite().nonnegative()
 export const antConfigSchema=z.object({
   profile:z.enum(['research','experience']),totalTrials:z.union([z.literal(288),z.literal(48)]),
@@ -26,5 +26,17 @@ export const antTrialSchema=z.object({
   interruptions:z.array(z.object({kind:z.enum(['visibility_lost','window_blur','viewport_changed',
     'render_failed','clock_discontinuity','runner_restart']),atPerfMs:time}).strict()).max(32),
 }).strict()
-export const parseAntConfig=(value:unknown):AntConfig=>antConfigSchema.parse(value) as AntConfig
+export const parseAntConfig=(value:unknown):AntLegacyConfig=>antConfigSchema.parse(value) as AntLegacyConfig
 export const parseAntTrial=(value:unknown):AntTrial=>antTrialSchema.parse(value) as AntTrial
+
+/** New teaching configuration is exact; the historical 24-practice schema remains unchanged. */
+export const antGuidedConfigSchema=z.object({...antConfigSchema.shape,practiceTrials:z.literal(8),practicePolicy:z.object({
+  version:z.literal(ANT_PRACTICE_POLICY.version),trials:z.literal(8),minimumCorrect:z.literal(7),maxRounds:z.literal(3),
+  responseWindowMs:z.literal(3500),trialIntervalMs:z.literal(6000),feedback:z.literal('per_trial'),
+  repeatInstructionsBeforeRetry:z.literal(true),randomizationAlgorithmVersion:z.literal('ant-guided-balanced-eight-v1'),
+}).strict()}).strict().superRefine((v,ctx)=>{
+  const expected=antConfig(v.profile,v.neutralVariant)
+  for(const key of ['totalTrials','blocks','repetitionsPerCellPerBlock'] as const)
+    if(v[key]!==expected[key])ctx.addIssue({code:'custom',path:[key],message:'ANT profile condition counts disagree'})
+})
+export const parseAntGuidedConfig=(value:unknown):AntGuidedConfig=>antGuidedConfigSchema.parse(value)

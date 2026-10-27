@@ -2,7 +2,7 @@ import type { RegistryEntry, CognitiveProfile, CognitiveProfileDefinition, Metri
 import type { TaskDefinition } from './v2/types'
 import { getCognitiveRegistryEntry, listCognitiveRegistryEntries } from './cognitive.registry'
 import { getNativeCognitiveTaskDefinition, listNativeCognitiveTaskDefinitions } from './content-candidates/native-registry/definitions'
-import { ANT_IDENTITY } from './content-candidates/ant/protocol'
+import { getAntIdentity } from './content-candidates/ant/protocol'
 import { getEnumerationIdentity, ENUMERATION_RECIPE_IDENTITY } from './content-candidates/enumeration/protocol'
 import { getMotReportBundle } from './content-candidates/mot/package'
 import { MOT_IDENTITY } from './content-candidates/mot/protocol'
@@ -22,8 +22,12 @@ export type CognitiveTaskResource = ResourceMetadata & (
   { kind: 'native'; definition: TaskDefinition<unknown, unknown>; configVersion: string }
 )
 const nativeVersionFacts = (d: TaskDefinition) => {
-  if (d.testType === 'ant') return { configVersion: ANT_IDENTITY.configVersion, profileDefinitionVersion: ANT_IDENTITY.configVersion,
-    metricDefinitionVersion: ANT_IDENTITY.metricDefinitionVersion, qualityDefinitionVersion: ANT_IDENTITY.qualityDefinitionVersion }
+  if (d.testType === 'ant') {
+    const id=getAntIdentity(d.engineVersion,d.scoringVersion)
+    if(!id)throw BAD_REQUEST('No exact ANT version metadata')
+    return {configVersion:id.configVersion,profileDefinitionVersion:id.configVersion,
+      metricDefinitionVersion:id.metricDefinitionVersion,qualityDefinitionVersion:id.qualityDefinitionVersion}
+  }
   if (d.testType === 'enumeration') {
     const identity = getEnumerationIdentity(d.engineVersion, d.scoringVersion)
     if (!identity) throw BAD_REQUEST('No exact enumeration version metadata')

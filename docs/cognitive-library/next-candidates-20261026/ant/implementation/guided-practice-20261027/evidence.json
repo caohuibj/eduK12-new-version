@@ -1,0 +1,197 @@
+{
+  "kind": "ANT_GUIDED_PRACTICE_DEVELOPMENT_CANDIDATE",
+  "createdAt": "2026-10-27T01:37:37.072472+00:00",
+  "baseHead": "0a6dc1615e77170f9ee129c2936d80ebff5bb5d8",
+  "sourceCaptureMeaning": "after targeted execution; source unchanged since final selected continuations except documentation; not signed execution provenance",
+  "identity": {
+    "testType": "ant",
+    "engineVersion": "1.1.0",
+    "scoringVersion": "1.1.0",
+    "configVersion": "1.1.0",
+    "metricDefinitionVersion": "1.1.0",
+    "qualityDefinitionVersion": "1.0.0",
+    "reportDefinitionVersion": "1.1.0",
+    "presentationVersion": "1.0.0",
+    "protocolKey": "ant/1.1.0/1.1.0",
+    "practicePolicyVersion": "ant-guided-practice-v1"
+  },
+  "historicalIdentityPreserved": {
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.1.0",
+    "configVersion": "1.0.0",
+    "practiceTrials": 24
+  },
+  "practice": {
+    "trialsPerRound": 8,
+    "minimumCorrect": 7,
+    "maxRounds": 3,
+    "responseWindowMs": 3500,
+    "trialIntervalMs": 6000,
+    "feedback": "per_trial",
+    "repeatInstructionsBeforeRetry": true,
+    "separateRoundKeys": true
+  },
+  "formal": {
+    "researchTrials": 288,
+    "experienceTrials": 48,
+    "responseWindowMs": 1700,
+    "trialIntervalMs": 4000,
+    "sameTruthAndScoringAsHistoricalVersion": true
+  },
+  "checks": {
+    "backendDistinctTargets": 6,
+    "frontendDistinctTargets": 9,
+    "backendFirstTwoInvocations": {
+      "executedCases": 0,
+      "reason": "Zod innerType unsupported; second intended correction did not apply due relative path error",
+      "notPass": true
+    },
+    "backendCompleted": {
+      "passed": 6,
+      "filtered": 15,
+      "raw": "backend-corrected.json"
+    },
+    "frontendCompleted": {
+      "passed": 9,
+      "filtered": 19,
+      "raw": "frontend-original.json"
+    },
+    "typeFixContinuation": {
+      "backendPassed": 2,
+      "backendFiltered": 3,
+      "frontendPassed": 1,
+      "frontendFiltered": 4,
+      "notAdditionalDistinctTargets": true
+    },
+    "types": {
+      "backend": {
+        "roots": 7,
+        "sources": 1006,
+        "diagnostics": 0
+      },
+      "frontend": {
+        "roots": 5,
+        "sources": 26,
+        "diagnostics": 0
+      }
+    },
+    "typeFailureHistory": "original reports retained: readonly CUES, missing native narrowing, missing frontend setup declarations, unsupported query options, and pre-existing untouched session-test mock-call typing; frontend continued closure covers changed production entries/new tests/setup rather than untouched historical test bodies",
+    "protocolTypeFix": "readonly annotation emits identical JS with comments removed; emission hash retained",
+    "projectionDrift": "ant-content.cjs --check PASS"
+  },
+  "sources": [
+    {
+      "path": "server-version/backend/src/__tests__/cognitive/v2-native-registry.test.ts",
+      "sha256": "0f5c7b79fb65a76379790bfed2dbfb794d968068500ef2070921b80ea96d8503"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/ant/package.ts",
+      "sha256": "2a6bcd16cdbe4955755b7a5b74113ce8b156902fff78d29a27a80726d3a69396"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/ant/protocol.ts",
+      "sha256": "ef7e19b75bd50c30c1805ebc41aac894b30cd923a42d2cae8339923cddb22acf"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/ant/schema.ts",
+      "sha256": "0390e42911355914e907f459024ea4e2067848dca1a16fc0ef740e1ae3c48f39"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/ant/scorer.ts",
+      "sha256": "856eb0f0303731ddcbfd327f9bef56c9d636ed8169221b95e1eafe5e3e2238eb"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/native-registry/definitions.ts",
+      "sha256": "a693f84b29cc49a181a69901119f201eb47da155227dd1e32b253a79f0e36050"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/native-registry/participant-presentations.ts",
+      "sha256": "67a23f0ff17d82373bfeb737e0163c1249b7219888e0834871cb111665bd89f2"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/task-resource.ts",
+      "sha256": "7de1db5a31274492f42fcd1649e4e8e82c6bc703cf7f8e052907d80527f59843"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/CognitiveV2ReportCard.tsx",
+      "sha256": "b418c0a0ad859576ce89b3b237338a0c3c317e840c71002638986d1b519777cc"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/ant/AntTask.tsx",
+      "sha256": "546175653a862ec89336ffb06f5208f2b8fb0d3e2e25232fd35ca3028fc1419a"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/ant/capture.ts",
+      "sha256": "5dcf90ce5e2c5618cca2b705c25ae6fd49f8e5a5594e3de52113c54e2a4839bd"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/ant/generated/protocol.ts",
+      "sha256": "fbe53bd18a8fbcfba54c3d11c7a330c3154c3cb06b193328cf8ba8fd017627a8"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/ant/generated/report.ts",
+      "sha256": "f59eef7b000367ba4bbb8455d3a7935a3bbf09de2f24236d5face555e8528fb6"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/ant/session.ts",
+      "sha256": "cc5395484bc65b64675bca52502965f491e0dea3a3511d2576a6fbe822637a37"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/cognitive/ant-guided-practice.test.ts",
+      "sha256": "2c0fa3ddd2437b25405adcb12a795a4160809b40b922030f64edd93f4ebe1150"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/ant/participant-presentation.ts",
+      "sha256": "dab61deaa1060d942a43b85358b670032e2ceb301b220746753c57c46a3f0361"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/ant/AntGuidedInstructions.tsx",
+      "sha256": "ba04806867fd8999d9e08826dc39012db47576be5e5d108bc06d5e5331c1ad2b"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/ant/guided-practice.test.tsx",
+      "sha256": "690c4f523eea45ee91ff2be0e4f092caeb229a9cf8cd9ed33b5407eb8a5454f0"
+    },
+    {
+      "path": "server-version/backend/tsconfig.json",
+      "sha256": "c79ccf595a80514e94936f1ffcd2fa09b57265f0c140d275c81770f494175143"
+    },
+    {
+      "path": "server-version/frontend/tsconfig.app.json",
+      "sha256": "97ed0e951ac068a9b2d08635b327932db8e41193f9c82e8291a919b7c68bd62e"
+    },
+    {
+      "path": "server-version/frontend/src/test/setup.ts",
+      "sha256": "6e40f95ed1a8c33a9142d1d1ceb9400abc38b6a8de2d5798f7fa3fe9984482f8"
+    },
+    {
+      "path": "server-version/backend/package-lock.json",
+      "sha256": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450"
+    },
+    {
+      "path": "server-version/frontend/package-lock.json",
+      "sha256": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe"
+    },
+    {
+      "path": "server-version/scripts/cognitive/ant-content.cjs",
+      "sha256": "121417e4cf98a0bde213814b388023e0a9d97c44a93eac6b00fb28d5e7b389b0"
+    }
+  ],
+  "execution": {
+    "location": "cloud",
+    "node": "24.21.0",
+    "dependencies": "existing installations; no reinstall; full byte-level node_modules provenance not claimed"
+  },
+  "notRun": [
+    "Database startup/seed",
+    "External COS",
+    "Full App/CSRF",
+    "Real mobile/tablet/Safari or physical timing",
+    "New real-browser journey/screenshots",
+    "Research288/practical48 browser journey",
+    "Product native runner admission/archive",
+    "Formal CI",
+    "Merge/deploy/activate"
+  ],
+  "schemaPermissionWorkflowChanges": false
+}

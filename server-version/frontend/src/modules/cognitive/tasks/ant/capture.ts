@@ -1,4 +1,4 @@
-import type { AntConfig,AntPlan,AntTrial,Direction,Input } from './generated/protocol'
+import type { AntCaptureTiming,AntPlan,AntTrial,Direction,Input } from './generated/protocol'
 import type { AntFrozenDisplay } from './display'
 export type AntStage='fixation'|'cue'|'postcue'|'target'|'hold'|'complete'
 export type AntCaptureCore=Omit<AntTrial,'phase'>&{phase:'practice'|'test'}
@@ -6,7 +6,8 @@ export interface AntRawRecord {
   schemaVersion:1;contextId:string;phase:'practice'|'test';key:string;
   core:AntCaptureCore;
   raw:{display:AntFrozenDisplay;frameTimesPerfMs:number[];frameOverflow:boolean;
-    diagnostics:{kind:string;observedAtPerfMs:number;markerAtPerfMs:number}[];fixture:boolean};
+    diagnostics:{kind:string;observedAtPerfMs:number;markerAtPerfMs:number}[];fixture:boolean;
+    practice?:{policyVersion:string;round:number;timing:AntCaptureTiming}};
 }
 /** Paint-owned clock: the host must synchronously draw each tick result in that same rAF callback. */
 export class AntCapture {
@@ -16,8 +17,8 @@ export class AntCapture {
   private frameOverflow=false
   private diagnostics:AntRawRecord['raw']['diagnostics']=[]
   private previous:number
-  constructor(readonly config:AntConfig,readonly plan:AntPlan,readonly display:AntFrozenDisplay,
-    readonly contextId:string,now:number,timeOrigin:number|null,readonly fixture=false){
+  constructor(readonly config:AntCaptureTiming,readonly plan:AntPlan,readonly display:AntFrozenDisplay,
+    readonly contextId:string,now:number,timeOrigin:number|null,readonly fixture=false,readonly practice?:{policyVersion:string;round:number}){
     if(!Number.isFinite(now)||now<0||!contextId)throw Error('ANT capture requires actual nonnegative clock/context')
     this.previous=now
     this.core={...plan,recordOrigin:fixture?'recovered_without_timing':'live',clock:{source:'performance',timeOriginUnixMs:timeOrigin},
@@ -71,8 +72,8 @@ export class AntCapture {
   private finish(now:number){this.core.endedAtPerfMs=now;this.previous=now;this.stage='complete'}
   record():AntRawRecord {
     if(this.stage!=='complete')throw Error('ANT exposure record is not complete')
-    return structuredClone({schemaVersion:1,contextId:this.contextId,phase:this.plan.phase,key:this.plan.phase+':'+this.plan.trialIndex,
+    return structuredClone({schemaVersion:1,contextId:this.contextId,phase:this.plan.phase,key:this.practice?`practice:${this.practice.round}:${this.plan.trialIndex}`:this.plan.phase+':'+this.plan.trialIndex,
       core:this.core,raw:{display:this.display,frameTimesPerfMs:this.frames,frameOverflow:this.frameOverflow,
-        diagnostics:this.diagnostics,fixture:this.fixture}})
+        diagnostics:this.diagnostics,fixture:this.fixture,...(this.practice?{practice:{...this.practice,timing:this.config}}:{})}})
   }
 }

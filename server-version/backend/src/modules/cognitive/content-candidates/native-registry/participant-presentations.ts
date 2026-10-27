@@ -1,4 +1,6 @@
 import type { CognitiveParticipantPresentationV1 } from '../../participant-presentation.types'
+import { ANT_GUIDED_IDENTITY } from '../ant/protocol'
+import { createAntGuidedPresentation } from '../ant/participant-presentation'
 import { ENUMERATION_RECIPE_IDENTITY } from '../enumeration/protocol'
 import { createEnumerationParticipantPresentation } from '../enumeration/participant-presentation'
 export interface NativePresentationIdentity {
@@ -13,7 +15,7 @@ const factories: Array<{ identity: NativePresentationIdentity; create: () => Cog
     configVersion: ENUMERATION_RECIPE_IDENTITY.configVersion,
   },
   create: createEnumerationParticipantPresentation,
-}]
+},{identity:ANT_GUIDED_IDENTITY,create:createAntGuidedPresentation}]
 /**
  * Exact tuple only, for native tasks that have no legacy RegistryEntry to read a presentation from.
  * An unregistered identity returns undefined and keeps the previous no-presentation behaviour.

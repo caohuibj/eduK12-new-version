@@ -1,8 +1,8 @@
 import type { TaskDefinition,MetricDefinition,QualityDefinition } from '../../v2/types'
 import { createSessionConfigSnapshot } from '../../v2/session-snapshot'
-import { ANT_IDENTITY,ANT_PROTOCOL,CUES,FLANKERS,antConfig,type AntConfig,type AntTrial,type AntProfile,type NeutralVariant } from './protocol'
-import { antConfigSchema,antTrialSchema } from './schema'
-import { scoreAnt } from './scorer'
+import { ANT_IDENTITY,ANT_PROTOCOL,ANT_GUIDED_IDENTITY,ANT_GUIDED_PROTOCOL,antGuidedConfig,type AntGuidedConfig,CUES,FLANKERS,antConfig,type AntConfig,type AntTrial,type AntProfile,type NeutralVariant } from './protocol'
+import { antConfigSchema,antGuidedConfigSchema,antTrialSchema } from './schema'
+import { scoreAnt,scoreAntGuided } from './scorer'
 const metric=(key:string,label:string,unit:MetricDefinition['unit'],role:MetricDefinition['role'],
   gates:string[]=[],valueType:MetricDefinition['valueType']='number'):MetricDefinition=>({
   key,label,category:'attention',construct:'cue_flanker_condition_record',description:label,unit,valueType,
@@ -86,3 +86,17 @@ export { antTrialEnvelope } from './protocol'
 export { projectAntReport } from './scorer'
 
 export { antContent } from './metadata'
+
+/** Guided practice is a new frozen identity, not a rewrite of the 24-practice candidate. */
+export const antGuidedDefinition:TaskDefinition<AntGuidedConfig,AntTrial>={
+  ...antDefinition,engineVersion:ANT_GUIDED_IDENTITY.engineVersion,configSchema:antGuidedConfigSchema,
+  protocol:ANT_GUIDED_PROTOCOL,scorer:scoreAntGuided,
+  profiles:{research:{estimatedMinutes:[21,30],configPatch:{...antGuidedConfig('research')},
+    reportCaveats:['科研版288正式；每轮8次较易练习，至少7次正确，最多3轮；说明、反馈、休息时间另计。研究结论按实际设计与适用证据说明。']},
+  experience:{estimatedMinutes:[5,10],configPatch:{...antGuidedConfig('experience')},
+    reportCaveats:['实用版48正式；每轮8次较易练习，至少7次正确，最多3轮；说明、反馈、休息时间另计。工作用途的精度与适用性仍需相应证据。']}},
+  publication:{status:'DRAFT',referenceRequired:false,evidenceNote:'新版教学练习内容候选；未开放产品宿主、seed或归档准入。'},
+}
+export const createAntGuidedSnapshot=(profile:AntProfile,neutralVariant:NeutralVariant='absent',frozenAt='2026-10-27T00:00:00.000Z')=>
+  createSessionConfigSnapshot({definition:antGuidedDefinition,configVersion:ANT_GUIDED_IDENTITY.configVersion,
+    config:antGuidedConfig(profile,neutralVariant),frozenAt:new Date(frozenAt)})

@@ -1,0 +1,253 @@
+{
+  "kind": "AFFECTED_ANT_ENTRY_CLOSURE",
+  "config": "tsconfig.app.json",
+  "roots": [
+    "src/modules/cognitive/tasks/ant/AntTask.tsx",
+    "src/modules/cognitive/tasks/ant/guided-practice.test.tsx",
+    "src/modules/cognitive/tasks/ant/session.test.ts",
+    "src/modules/cognitive/tasks/ant/AntTask.test.tsx",
+    "src/modules/cognitive/CognitiveV2ReportCard.tsx",
+    "src/vite-env.d.ts"
+  ],
+  "sources": [
+    {
+      "path": "src/modules/cognitive/tasks/ant/generated/protocol.ts",
+      "sha256": "813cb52007a406b1bd65638c5b6ecbb6319256d1bd8c622fe9be6a79bc494b5b"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/ant/display.ts",
+      "sha256": "6046840499f49662756f48c56a435deec06db6f892c4c9908e5a41c75498cd5a"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/ant/capture.ts",
+      "sha256": "5dcf90ce5e2c5618cca2b705c25ae6fd49f8e5a5594e3de52113c54e2a4839bd"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/ant/seal.ts",
+      "sha256": "5c0e39ea3cf60286ba37db5a89fcc21319f46ba980dd9f08b589ad595692b029"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/ant/local-save.ts",
+      "sha256": "ce23b298a385435a122bdc1992c21401490f4637ce7946fd9ba6ab9e3cba8219"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/ant/session.ts",
+      "sha256": "cc5395484bc65b64675bca52502965f491e0dea3a3511d2576a6fbe822637a37"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/ant/paint.ts",
+      "sha256": "d4a43342fa73c7e591901a7411d04304d7d5b70e63e85514035589ea86438ef3"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/ant/AntGuidedInstructions.tsx",
+      "sha256": "ba04806867fd8999d9e08826dc39012db47576be5e5d108bc06d5e5331c1ad2b"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/ant/AntTask.tsx",
+      "sha256": "546175653a862ec89336ffb06f5208f2b8fb0d3e2e25232fd35ca3028fc1419a"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/ant/test-fixtures.ts",
+      "sha256": "5f727f76b8249281d282354d6a913faab33ee173b01b9f54b01b077c9897acb4"
+    },
+    {
+      "path": "src/modules/cognitive/legacy-v2-presentation.ts",
+      "sha256": "28a9cb4a3a40e47d0880376a0f4be74c42d82a37a7c1af584d95edfbce0bb23d"
+    },
+    {
+      "path": "src/modules/reporting/ReportPrimitives.tsx",
+      "sha256": "da85f924d440dee5bcab93b1e053c8bdaeeb1f76aa83708e74db12f90419426b"
+    },
+    {
+      "path": "src/modules/assessment-media/types.ts",
+      "sha256": "518c50706279c5e1569a442cee8b5a747844ab1e134413c6ed8adf1e2adafb70"
+    },
+    {
+      "path": "src/services/persistence/cognitiveRawArchiveState.ts",
+      "sha256": "8403ffab818df9743e50a76ae3f32745b7120f5adf840d5472f8cf681514f908"
+    },
+    {
+      "path": "src/services/persistence/finalDraftStore.ts",
+      "sha256": "007bfcbe75134e424b306940d60001698595ef8499598f956cf509f7af6787ca"
+    },
+    {
+      "path": "src/training/training-cognitive-retention.ts",
+      "sha256": "b76e750e2d1c5526c1f8fce2e88762c3b14700597082b501c9718428700f679e"
+    },
+    {
+      "path": "src/modules/cognitive/types.ts",
+      "sha256": "07e70b71fc4f479e89056ea5004cfd20006dda7d5dc5445536b193ca17014df7"
+    },
+    {
+      "path": "src/modules/cognitive/CognitiveReportVisual.tsx",
+      "sha256": "40d69d9a352d6b90ce19edb41be901e534d29d3c03f771ab7a79f512bcc76dd8"
+    },
+    {
+      "path": "src/modules/cognitive/CognitiveReportReadingCard.tsx",
+      "sha256": "6fc4d32eee9651beeb7100154e33ed23bd852bb557dc466992fa77f5a0d66c4a"
+    },
+    {
+      "path": "src/modules/cognitive/report-record.ts",
+      "sha256": "da1dc38fa71d196ba4d8fe4c06b4497996694cd3e987eebb6f405448f67ecf59"
+    },
+    {
+      "path": "src/modules/cognitive/CognitiveReportRecord.tsx",
+      "sha256": "74c032455bc1189ccf43a22fdf4214c59ff2ceeb7b60c63088fba168a6924784"
+    },
+    {
+      "path": "src/modules/cognitive/CognitiveMagazineReport.tsx",
+      "sha256": "ff03d3c0a40cf629dd5194e81db4cbd9cc4efe1098bb41bbd092483ff01ba2bc"
+    },
+    {
+      "path": "src/modules/cognitive/CognitiveV2ReportCard.tsx",
+      "sha256": "b418c0a0ad859576ce89b3b237338a0c3c317e840c71002638986d1b519777cc"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/ant/guided-practice.test.tsx",
+      "sha256": "3442262e8f4a06e11fb6a0a2c4513fb63a7be29301a7ffba1064e26dbf325f7f"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/ant/session.test.ts",
+      "sha256": "c7f66c2dbeb694d898992d6da34a459cbe859a6ade7d0bdb6f7729d616483f2e"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/ant/generated/report.ts",
+      "sha256": "f59eef7b000367ba4bbb8455d3a7935a3bbf09de2f24236d5face555e8528fb6"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/ant/AntReportCard.tsx",
+      "sha256": "a1621625f4f92ff4e25445aef1e43ffc935cefd9d04d086be040ff97a05daddf"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/ant/AntTask.test.tsx",
+      "sha256": "995dc488f2b075c83b05a8b56cf11354f8e54fb134f6888d61dfa70d8dc1aa50"
+    },
+    {
+      "path": "src/vite-env.d.ts",
+      "sha256": "65996936fbb042915f7b74a200fcdde7e410f32a669b1ab9597cfaa4b0faddb5"
+    }
+  ],
+  "diagnostics": [
+    {
+      "file": "src/modules/cognitive/tasks/ant/AntTask.test.tsx",
+      "line": 32,
+      "message": "Property 'toHaveTextContent' does not exist on type 'Assertion<HTMLElement>'."
+    },
+    {
+      "file": "src/modules/cognitive/tasks/ant/AntTask.test.tsx",
+      "line": 35,
+      "message": "Property 'toHaveTextContent' does not exist on type 'Assertion<HTMLElement>'."
+    },
+    {
+      "file": "src/modules/cognitive/tasks/ant/AntTask.test.tsx",
+      "line": 40,
+      "message": "Property 'toHaveTextContent' does not exist on type 'Assertion<HTMLElement>'."
+    },
+    {
+      "file": "src/modules/cognitive/tasks/ant/AntTask.test.tsx",
+      "line": 43,
+      "message": "Property 'toHaveTextContent' does not exist on type 'Assertion<HTMLElement>'."
+    },
+    {
+      "file": "src/modules/cognitive/tasks/ant/AntTask.test.tsx",
+      "line": 51,
+      "message": "Property 'toHaveStyle' does not exist on type 'Assertion<HTMLElement>'."
+    },
+    {
+      "file": "src/modules/cognitive/tasks/ant/AntTask.test.tsx",
+      "line": 51,
+      "message": "Property 'toHaveStyle' does not exist on type 'Assertion<HTMLElement>'."
+    },
+    {
+      "file": "src/modules/cognitive/tasks/ant/AntTask.test.tsx",
+      "line": 56,
+      "message": "Property 'toBeInTheDocument' does not exist on type 'Assertion<HTMLElement>'."
+    },
+    {
+      "file": "src/modules/cognitive/tasks/ant/AntTask.test.tsx",
+      "line": 59,
+      "message": "Property 'toHaveTextContent' does not exist on type 'Assertion<HTMLElement>'."
+    },
+    {
+      "file": "src/modules/cognitive/tasks/ant/AntTask.test.tsx",
+      "line": 67,
+      "message": "Property 'toBeInTheDocument' does not exist on type 'Assertion<HTMLElement>'."
+    },
+    {
+      "file": "src/modules/cognitive/tasks/ant/AntTask.test.tsx",
+      "line": 82,
+      "message": "Property 'toBeInTheDocument' does not exist on type 'Assertion<HTMLElement>'."
+    },
+    {
+      "file": "src/modules/cognitive/tasks/ant/AntTask.test.tsx",
+      "line": 83,
+      "message": "Property 'toHaveTextContent' does not exist on type 'Assertion<HTMLElement>'."
+    },
+    {
+      "file": "src/modules/cognitive/tasks/ant/AntTask.test.tsx",
+      "line": 84,
+      "message": "Property 'toBeInTheDocument' does not exist on type 'Assertion<HTMLElement>'."
+    },
+    {
+      "file": "src/modules/cognitive/tasks/ant/AntTask.test.tsx",
+      "line": 100,
+      "message": "Property 'toBeInTheDocument' does not exist on type 'Assertion<HTMLElement>'."
+    },
+    {
+      "file": "src/modules/cognitive/tasks/ant/generated/protocol.ts",
+      "line": 106,
+      "message": "Argument of type 'readonly [\"none\", \"central\", \"double\", \"spatial_valid\"]' is not assignable to parameter of type 'unknown[]'.   The type 'readonly [\"none\", \"central\", \"double\", \"spatial_valid\"]' is 'readonly' and cannot be assigned to the mutable type 'unknown[]'."
+    },
+    {
+      "file": "src/modules/cognitive/tasks/ant/generated/protocol.ts",
+      "line": 107,
+      "message": "Type '{ phase: \"practice\"; trialIndex: number; blockIndex: number; cue: unknown; location: \"top\" | \"bottom\"; direction: \"left\" | \"right\"; flanker: Flanker; neutralVariant: NeutralVariant; plannedPreCueMs: number; }[]' is not assignable to type 'AntPlan[]'.   Type '{ phase: \"practice\"; trialIndex: number; blockIndex: number; cue: unknown; location: \"top\" | \"bottom\"; direction: \"left\" | \"right\"; flanker: Flanker; neutralVariant: NeutralVariant; plannedPreCueMs: number; }' is not assignable to type 'AntPlan'.     Types of property 'cue' are incompatible.       Type 'unknown' is not assignable to type '\"none\" | \"central\" | \"double\" | \"spatial_valid\"'."
+    },
+    {
+      "file": "src/modules/cognitive/tasks/ant/guided-practice.test.tsx",
+      "line": 66,
+      "message": "Property 'toBeInTheDocument' does not exist on type 'Assertion<HTMLElement>'."
+    },
+    {
+      "file": "src/modules/cognitive/tasks/ant/guided-practice.test.tsx",
+      "line": 67,
+      "message": "No overload matches this call.   Overload 1 of 2, '(role: ByRoleMatcher, options?: ByRoleOptions | undefined): HTMLElement', gave the following error.     Object literal may only specify known properties, and 'exact' does not exist in type 'ByRoleOptions'.   Overload 2 of 2, '(role: ByRoleMatcher, options?: ByRoleOptions | undefined): HTMLElement', gave the following error.     Object literal may only specify known properties, and 'exact' does not exist in type 'ByRoleOptions'."
+    },
+    {
+      "file": "src/modules/cognitive/tasks/ant/guided-practice.test.tsx",
+      "line": 73,
+      "message": "No overload matches this call.   Overload 1 of 2, '(role: ByRoleMatcher, options?: ByRoleOptions | undefined): HTMLElement', gave the following error.     Object literal may only specify known properties, and 'exact' does not exist in type 'ByRoleOptions'.   Overload 2 of 2, '(role: ByRoleMatcher, options?: ByRoleOptions | undefined): HTMLElement', gave the following error.     Object literal may only specify known properties, and 'exact' does not exist in type 'ByRoleOptions'."
+    },
+    {
+      "file": "src/modules/cognitive/tasks/ant/guided-practice.test.tsx",
+      "line": 78,
+      "message": "Property 'toBeInTheDocument' does not exist on type 'Assertion<HTMLElement>'."
+    },
+    {
+      "file": "src/modules/cognitive/tasks/ant/guided-practice.test.tsx",
+      "line": 80,
+      "message": "Property 'toBeInTheDocument' does not exist on type 'Assertion<HTMLElement>'."
+    },
+    {
+      "file": "src/modules/cognitive/tasks/ant/guided-practice.test.tsx",
+      "line": 87,
+      "message": "Property 'toBeInTheDocument' does not exist on type 'Assertion<HTMLElement>'."
+    },
+    {
+      "file": "src/modules/cognitive/tasks/ant/guided-practice.test.tsx",
+      "line": 90,
+      "message": "Property 'toBeInTheDocument' does not exist on type 'Assertion<HTMLElement>'."
+    },
+    {
+      "file": "src/modules/cognitive/tasks/ant/session.test.ts",
+      "line": 146,
+      "message": "Conversion of type 'undefined' to type 'AntCompletion' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first."
+    },
+    {
+      "file": "src/modules/cognitive/tasks/ant/session.test.ts",
+      "line": 146,
+      "message": "Tuple type '[]' of length '0' has no element at index '0'."
+    }
+  ],
+  "exitCode": 1
+}

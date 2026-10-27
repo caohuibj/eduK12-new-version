@@ -2,9 +2,9 @@ import type { AuthoritativeScorerInput,CognitiveScoreResult } from '../../v2/typ
 import { parseSessionConfigSnapshot } from '../../v2/session-snapshot'
 import { computeConfigSnapshotHash,computeProtocolSignature } from '../../v2/canonical'
 import { parseTrialEnvelope } from '../../v2/trial-envelope'
-import { ANT_IDENTITY,ANT_PROTOCOL,CUES,FLANKERS,INPUTS,antPlan,
+import { ANT_IDENTITY,ANT_PROTOCOL,ANT_GUIDED_IDENTITY,ANT_GUIDED_PROTOCOL,CUES,FLANKERS,INPUTS,antPlan,
   type AntConfig,type AntTrial,type Input,type Cue,type Flanker } from './protocol'
-import { parseAntConfig,parseAntTrial } from './schema'
+import { parseAntConfig,parseAntGuidedConfig,parseAntTrial } from './schema'
 
 interface Tally { observed:number; valid:number; correct:number }
 interface RtTally { count:number; sumMs:number; meanMs:number|null }
@@ -26,14 +26,15 @@ const record=<K extends string,V>(keys:readonly K[],value:()=>V):Record<K,V>=>
 const equalTime=(a:number,b:number)=>Math.abs(a-b)<0.001
 
 /** Pure descriptive scorer. No client-provided correctness, RT, score or aggregate is trusted. */
-export function scoreAnt(input:AuthoritativeScorerInput<AntConfig,AntTrial>):CognitiveScoreResult {
+function scoreAntIdentity(input:AuthoritativeScorerInput<AntConfig,AntTrial>,id:typeof ANT_IDENTITY|typeof ANT_GUIDED_IDENTITY,
+  protocol:typeof ANT_PROTOCOL,parseConfig:(value:unknown)=>AntConfig):CognitiveScoreResult {
   const session=parseSessionConfigSnapshot<AntConfig>(input.session)
-  if(session.testType!==ANT_IDENTITY.testType||session.engineVersion!==ANT_IDENTITY.engineVersion
-    ||session.scoringVersion!==ANT_IDENTITY.scoringVersion||session.configVersion!==ANT_IDENTITY.configVersion
-    ||session.protocolSignature!==computeProtocolSignature(ANT_PROTOCOL)||session.runtimeGeneration)
+  if(session.testType!==id.testType||session.engineVersion!==id.engineVersion
+    ||session.scoringVersion!==id.scoringVersion||session.configVersion!==id.configVersion
+    ||session.protocolSignature!==computeProtocolSignature(protocol)||session.runtimeGeneration)
     throw new Error('Unsupported frozen ANT identity/protocol/runtime')
-  const config=parseAntConfig(input.config)
-  parseAntConfig(session.config)
+  const config=parseConfig(input.config)
+  parseConfig(session.config)
   if(computeConfigSnapshotHash(config)!==computeConfigSnapshotHash(session.config))
     throw new Error('ANT input config differs from frozen session')
   const plan=antPlan(config,input.randomSeed)
@@ -143,7 +144,7 @@ export function scoreAnt(input:AuthoritativeScorerInput<AntConfig,AntTrial>):Cog
   const result:CognitiveScoreResult={metrics:{...metrics},quality:{state,flags,reasons:state==='invalid'
     ?['完整条件记录不足，本轮不提供表现结论。']:state==='limited'
       ?['部分条件、正确反应或输入来源不足以支持比较，受影响指标暂不展示。']:[]},
-    audit:{trialCount:input.trials.length,scorerVersion:ANT_IDENTITY.scoringVersion}}
+    audit:{trialCount:input.trials.length,scorerVersion:id.scoringVersion}}
   // Native report consumers need explicit scalar definitions; reuse the same gated projection.
   const publicReport=projectAntReport(result)
   for(const [group,keys,records,rows] of [
@@ -167,6 +168,12 @@ export function scoreAnt(input:AuthoritativeScorerInput<AntConfig,AntTrial>):Cog
   }
   return result
 }
+
+/** Exact identities are validated as received; neither entry relabels an older session. */
+export const scoreAnt=(input:AuthoritativeScorerInput<AntConfig,AntTrial>):CognitiveScoreResult=>
+  scoreAntIdentity(input,ANT_IDENTITY,ANT_PROTOCOL,parseAntConfig)
+export const scoreAntGuided=(input:AuthoritativeScorerInput<AntConfig,AntTrial>):CognitiveScoreResult=>
+  scoreAntIdentity(input,ANT_GUIDED_IDENTITY,ANT_GUIDED_PROTOCOL,parseAntGuidedConfig)
 
 /** Sole candidate user/report/export projection. Missing or raised gates always fail closed. */
 export function projectAntReport(result:CognitiveScoreResult) {
