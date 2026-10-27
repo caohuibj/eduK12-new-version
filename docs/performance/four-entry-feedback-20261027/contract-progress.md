@@ -14,3 +14,9 @@
 - 未运行PG、浏览器、正式CI、未合并或部署。没有数据库变更。
 
 下一切片：追踪教育产品源资源登记/冻结/组织授权的完整消费者，再接复用引擎的Teacher运行链，不能删拒绝条件后将Training资产直接跨域开放。
+
+## 第二切片：Teacher本人任务的家族策略
+
+将Teacher `addTeacherRunTrack` 的非FORM/SCALE一律拒绝，替换为复用精确源政策后的个人任务策略：认知、SJT、组合必须是TEACHER→本人TEACHER、SELF、SELF_REPORT、INDIVIDUAL_ONLY、无群体最小人数；来源必须有Composite目标，并通过原有政策不扩权断言。原Form群体逻辑、Scale独立许可、当前管理员和注册资源检查均保留。
+
+此策略不等于工具准入或报告授权，缺少已发布来源仍由上游资源解析拒绝；认知生产adapter尚未启用。12项策略正反例PASS；真实Express路由9项PASS（认证/业务服务mock，仅证明路由身份与分派，不冒充真实授权数据库验收），其中3项新增家族均保留管理员拒绝和路径身份。无PG/浏览器/正式CI。

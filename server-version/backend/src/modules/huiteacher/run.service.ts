@@ -1,3 +1,4 @@
+import {assertTeacherPersonalAssessmentPolicy} from './assessmentRunPolicy'
 import {addPrivateScaleRunTrack,addPrivateFormRunTrack} from '../education-tools/private-tool.run-adapter'
 import {listEducationLibraryResourcePage} from '../scale-library-governance/education-catalog'
 import {canonicalHash} from '../assessment-runtime/canonical'
@@ -92,7 +93,7 @@ export async function addTeacherRunTrack(input:Key&{
     ||input.requestedPolicy.analysisMode!=='INDIVIDUAL_ONLY'))
     fail('HUITEACHER_PERSONAL_SCALE_RELEASE_REQUIRED',403)
   if(!['FORM','SCALE'].includes(input.resource.family))
-    fail('HUITEACHER_RESOURCE_KIND_UNSUPPORTED',403)
+    assertTeacherPersonalAssessmentPolicy(policy,input.requestedPolicy)
   if(!policy.subjectRoles.includes('TEACHER')
     ||!input.requestedPolicy.subjectRoles.includes('TEACHER'))
     fail('HUITEACHER_RESOURCE_TARGET_UNSUPPORTED',403)
