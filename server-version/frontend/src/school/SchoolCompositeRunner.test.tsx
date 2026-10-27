@@ -208,3 +208,38 @@ it('uses the shared current-unit view and receipt-only scale transport within th
  await m.presentation.mock.lastCall![0].submitScale('parent-attempt-1','scale-item',payload)
  expect(api).toHaveBeenCalledWith(parentRead);expect(api).toHaveBeenCalledWith(parentPath+'/items/scale-item/scale/submit?response=receipt','POST',payload)
 })
+
+it.each([false,true])('emits automatic completion only for a loaded COMPLETED self parent (observer: %s)',async observer=>{
+ const complete=vi.fn(),api=vi.fn(async(path:string)=>path.endsWith('/start')?
+  {state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:'parent-attempt-1'}:
+  {id:'parent-attempt-1',deliveryMode:'FINAL_ONLY',status:'COMPLETED'})
+ render(<SchoolCompositeRunner api={api as unknown as SchoolApi} execution={execution} observer={observer}
+  onExit={vi.fn()} onFinished={vi.fn()} onParentCompleted={complete}/>)
+ fireEvent.click(screen.getByRole('button',{name:'开始或继续正式测评'}))
+ await screen.findByRole('heading',{name:'本次测评已完成'})
+ expect(complete).toHaveBeenCalledTimes(observer?0:1)
+})
+
+it('does not emit whole completion for an IN_PROGRESS parent with no current item',async()=>{
+ const complete=vi.fn(),api=vi.fn(async(path:string)=>path.endsWith('/start')?
+  {state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:'parent-attempt-1'}:
+  {id:'parent-attempt-1',deliveryMode:'FINAL_ONLY',status:'IN_PROGRESS',currentItem:null})
+ render(<SchoolCompositeRunner api={api as unknown as SchoolApi} execution={execution}
+  onExit={vi.fn()} onFinished={vi.fn()} onParentCompleted={complete}/>)
+ fireEvent.click(screen.getByRole('button',{name:'开始或继续正式测评'}))
+ await screen.findByRole('button',{name:'进入冻结认知子测评'})
+ expect(complete).not.toHaveBeenCalled()
+})
+
+it('does not convert a completion hint into a parent completion or feedback transition',async()=>{
+ const complete=vi.fn(),finished=vi.fn(),api=vi.fn(async(path:string)=>path.endsWith('/start')?
+  {state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:'parent-attempt-1'}:
+  {id:'parent-attempt-1',deliveryMode:'FINAL_ONLY',status:'IN_PROGRESS',currentItem:null})
+ render(<SchoolCompositeRunner api={api as unknown as SchoolApi} execution={execution}
+  onExit={vi.fn()} onFinished={finished} onParentCompleted={complete}/>)
+ fireEvent.click(screen.getByRole('button',{name:'开始或继续正式测评'}))
+ await screen.findByRole('button',{name:'进入冻结认知子测评'})
+ m.presentation.mock.calls[m.presentation.mock.calls.length-1][0].onCompleted()
+ expect(complete).not.toHaveBeenCalled();expect(finished).not.toHaveBeenCalled()
+ expect(screen.queryByRole('heading',{name:'本次测评已完成'})).not.toBeInTheDocument()
+})
