@@ -1,3 +1,4 @@
+import {pr363Plan,pr363Outputs} from './pr363-scope.mjs';
 import {reportPlanningPlan,reportPlanningOutputs} from './report-planning-scope.mjs';
 import {pr357Plan,pr357Outputs} from './pr357-scope.mjs';
 import {post356Plan,post356Outputs} from './post356-scope.mjs';
@@ -65,6 +66,7 @@ const acceptanceJobs = {
 
 export function requiredChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
+  if(scope.application_route==='pr363')return ['scope','pr363','codeql'];
   if(scope.application_route==='pr356')return requiredPr356Checks();
   if(scope.application_route==='report-planning')return ['scope','report-planning','codeql'];
   if(scope.application_route==='pr357')return ['scope','pr357','codeql'];
@@ -149,6 +151,10 @@ export function failedChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
   if(scope.application_route==='pr356')return failedPr356Checks(needs,draft);
   const failed = requiredChecks(needs, draft).filter(name => needs[name]?.result !== 'success');
+  if(scope.application_route==='pr363'){
+    try{const p=JSON.parse(scope.pr363_plan);if(draft||p.draft||p.postMerge!==false||p.route!=='pr363'||Object.entries(pr363Outputs(p)).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');}catch{failed.push('scope');}
+    return [...new Set(failed)];
+  }
   if(scope.application_route==='report-planning'){
     try{const p=JSON.parse(scope.report_planning_plan);if(draft||p.postMerge!==false||p.route!=='report-planning'||Object.entries(reportPlanningOutputs(p)).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');}catch{failed.push('scope');}
     return [...new Set(failed)];
@@ -465,6 +471,9 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   }
   const draft = process.env.IS_DRAFT === 'true';
   const failed = failedChecks(needs, draft);
+  if(needs.scope?.outputs?.application_route==='pr363'){
+    try{const {changedEntries}=await import('./content-scope.mjs');const {execFileSync}=await import('node:child_process');const p=JSON.parse(needs.scope.outputs.pr363_plan),head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();if(p.head!==head||JSON.stringify(pr363Plan(changedEntries(p.base,head),p.base,head))!==JSON.stringify(p))failed.push('recomputed-pr363-plan');}catch{failed.push('recomputed-pr363-plan');}
+  }
   if(needs.scope?.outputs?.application_route==='report-planning'){
     try{const {changedEntries}=await import('./content-scope.mjs');const {execFileSync}=await import('node:child_process');const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),p=JSON.parse(needs.scope.outputs.report_planning_plan);if(p.head!==head||p.base!==process.env.CI_BASE_SHA||JSON.stringify(reportPlanningPlan(changedEntries(p.base,head),p.base,head))!==JSON.stringify(p))failed.push('recomputed-report-planning-plan');}catch{failed.push('recomputed-report-planning-plan');}
   }

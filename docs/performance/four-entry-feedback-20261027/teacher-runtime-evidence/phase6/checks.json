@@ -1,0 +1,69 @@
+{
+  "recordKind": "unsigned targeted local PG observations, not formal CI",
+  "rootBaseline": "85e9ee0c66ada6a2b0550b9e11f3e31b96ab62ce",
+  "executionHead": "ab8bb47318810686b67db4dcb69619bca7e026c6",
+  "inputQuality": "fixture changed between r1/r2; final file hashes captured after r2, not contemporaneous full immutable candidate",
+  "node": "24.21.0",
+  "postgres": "16.15",
+  "prisma": "5.22.0",
+  "database": "pr363_runtime_test",
+  "restrictedRuntime": true,
+  "serviceMocks": false,
+  "acceptedFinalSeeding": false,
+  "browserExecuted": false,
+  "files": [
+    {
+      "path": "server-version/backend/src/__tests__/huiteacher/assessment-scale-marker-final.postgres.integration.test.ts",
+      "sha256": "4c87f9233e6da6adf4f43b18070d9201a1ef268ae8a946e0e5750aeda1635032"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/huiteacher/assessment-scale-marker.postgres.fixture.ts",
+      "sha256": "1ed565afd1053ded22589409634ae5fdc75848747e047053890f07953b4a1326"
+    }
+  ],
+  "checks": [
+    {
+      "archive": "pg-scale-markers-r1.log.gz",
+      "rawSha256": "9fd8081cb2c1d1879d2a941f9308611f89b70c9a36e531b5a8e3f3a33fffa3a1",
+      "archiveSha256": "eb4540e480890d9cc01753d2c2f9593ec7d0936bbf5872aa9d13c5e46af9b421",
+      "exit": 1,
+      "note": "both failed: required gradeLevel preflight and missing private author psychology capability",
+      "commandAfterNode": [
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/__tests__/huiteacher/assessment-scale-marker-final.postgres.integration.test.ts",
+        "--reporter=verbose"
+      ]
+    },
+    {
+      "archive": "pg-scale-markers-r2.log.gz",
+      "rawSha256": "72aff73d3c011669eae398639d9c6e6d3ea9a878e2180e65ac7f0591265b6b0c",
+      "archiveSha256": "1ab61b8e78fd4539eb62f7bc22d9afe7946a85b4451ee945afcc753a7d479c6e",
+      "exit": 0,
+      "note": "both passed: real Scale FINAL after target distribution withdrawal, parent completed and NONE report WITHHELD",
+      "commandAfterNode": [
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/__tests__/huiteacher/assessment-scale-marker-final.postgres.integration.test.ts",
+        "--reporter=verbose"
+      ]
+    },
+    {
+      "archive": "pg-scale-school-grade-r3.log.gz",
+      "exit": 0,
+      "passed": 1,
+      "filtered": 1,
+      "commandAfterNode": [
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/__tests__/huiteacher/assessment-scale-marker-final.postgres.integration.test.ts",
+        "-t",
+        "SCHOOL",
+        "--reporter=verbose"
+      ],
+      "note": "School-only incremental rerun after aligning synthetic organization grade label to collected grade7; Teacher not repeated",
+      "rawSha256": "32bb7b18ed746ea6012f5341922f4470d17f6ac3594884b373bdcc62c9fdd72b",
+      "archiveSha256": "347546306a6db7f21e30321f57a3a3a5ec86727227d35f0fb3d85a412981734f"
+    }
+  ]
+}

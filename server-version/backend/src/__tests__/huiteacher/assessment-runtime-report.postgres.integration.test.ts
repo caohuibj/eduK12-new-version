@@ -136,7 +136,11 @@ suite('Actual education producer to canonical FINAL to own frozen report',()=>{
     const [fact]=await loadStoredCanonicalUnitResults([stored.canonicalResultEncrypted!])
     const metrics=unit.rendered.blocks.filter((block:any)=>block.type==='METRIC')
     expect(metrics.length).toBeGreaterThan(0)
-    for(const metric of metrics)expect(fact.core.metrics.some(value=>value.value===metric.value&&typeof metric.value==='number')).toBe(true)
+    for(const metric of metrics){
+     const saved=fact.core.metrics.find(value=>value.key===metric.metricKey)
+     expect(saved,'exact saved metric key '+metric.metricKey).toBeDefined()
+     expect(typeof metric.value).toBe('number');expect(metric.value).toBe(saved!.value)
+    }
    }
   }
   expect((await request(endpoint,teacherCookie(f.issuer,'TRAINING'))).status).toBe(401)
