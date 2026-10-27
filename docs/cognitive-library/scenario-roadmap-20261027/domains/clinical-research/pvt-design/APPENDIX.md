@@ -1,12 +1,12 @@
-# PVT 图审附录 · 设计提案 0.1.0
+# PVT 图审附录 · 设计修订 0.1.1
 
-2026-10-27。`pvt` 唯一归属 clinical-research，DOT 已确认；用户未批准本项图审或开发。只含原创静态资料，无 runner、随机序列生成器、计分代码或测试入口。参数均待图审批准。
+2026-10-27。`pvt` 唯一归属 clinical-research，DOT 已确认；用户已认可界面图并要求练习缩为3次，随后讨论实用版120秒；用户明确要求暂不开发。120秒是本次修订方案，不声称取得开发授权。只含原创静态资料，无 runner、随机序列生成器、计分代码或测试入口。本次只修订设计，不启动开发。
 
 ## 来源与核验范围
 
 主要方法来源：[Basner, Mollicone & Dinges (2011), DOI 10.1016/j.actaastro.2011.07.015，作者实验室公开全文](https://www.med.upenn.edu/uep/assets/user-content/documents/Basner2011-ValidityandsensitivityofabriefPVT.pdf)。已读印刷页 950–952 的 §§2.1–2.4，并转图人工核看页951；本地 PDF SHA256 `0ca4776d8de0f18527ea7225a6ed40c80f2255bec0933049eb9047847b00ea1c`。此前 PMC 挑战未被绕过，此次从作者机构合法公开入口补核。
 
-原文核得：10分钟版随机等待2–10秒、PVT-B为3分钟及1–4秒，等待含1秒反应时间反馈；30秒无回应给信号并按30秒计入。无刺激按下或RT<100ms归提前按，RT≥500ms归lapse；355ms是PVT-B另作分析的阈值。原文不充分规定每次提前按后的等待重启、末次等待／已出现目标的时间终点细节，不能冒称这些已复刻。原实验是受控睡眠研究，不能给本项目临床效度背书。
+原文核得：10分钟版随机等待2–10秒、PVT-B为3分钟及1–4秒，等待含1秒反应时间反馈；30秒无回应给信号并按30秒计入。无刺激按下或RT<100ms归提前按，RT≥500ms归lapse；355ms是PVT-B另作分析的阈值。原文不充分规定每次提前按后的等待重启、末次等待／已出现目标的时间终点细节，不能冒称这些已复刻。原实验是受控睡眠研究，不能给本项目临床效度背书。引言亦提醒已有部分2分钟版本对睡眠不足不够敏感，因此120秒项目版不用于确认疲劳影响。
 
 补充核验：[Basner & Dinges (2011), DOI 10.1093/sleep/34.5.581](https://pubmed.ncbi.nlm.nih.gov/21532951/)的摘要支持将逐次RT倒数平均作为研究指标，未将中位RT当唯一警觉指标；此条只声称读摘要。[Matsangas et al. (2017), DOI 10.3758/s13428-016-0821-2](https://faculty.nps.edu/nlshattuck/docs/Matsangas%20et%20al%20%282017%29%20-%20Preliminary%20validation%20study%20of%20the%203-min%20wrist-worn%20psychomotor%20vigilance%20test.pdf)已读Methods与Table1，另确认设备与等待规则不可互换；不外推其设备验证。
 
@@ -22,7 +22,7 @@
 
 ## 两个profile与单次规则
 
-research正式时间600000ms，experience正式时间180000ms。两者使用同一界面与规则；本三分钟版是项目变式，名称不用PVT-B。目标次数由持续时间与真实行为产生，无固定目标数，未知次数不填0。上述全流程11–13／4–6分钟为预算，阅读和最多一次重练可能延长。
+research正式时间600000ms，experience正式时间120000ms。两者使用同一界面与规则；本两分钟版是项目变式，名称不用PVT-B；目标更少，对注意波动的描述更有限，用于简短观察，科研版仍保留600秒，不主张两分钟敏感性已验证。目标次数由持续时间与真实行为产生，无固定目标数，未知次数不填0。上述全流程11–13／3–5分钟为预算，阅读和最多一次重练可能延长。
 
 拟以毫秒粒度均匀抽取闭区间[2000,10000]的等待；“均匀／毫秒粒度”是项目参数提案，原论文只明确随机范围。等待从上一目标回应、超时或等待期提前按的结束事件开始计算，其中前1000ms为中性反馈，不另叠加一秒。第一段等待无前题反馈，同范围。尚无种子、随机清单或生成代码；未来批准后再冻结实际计划，不能预填“已生成”。
 
@@ -38,9 +38,9 @@ research正式时间600000ms，experience正式时间180000ms。两者使用同�
 
 例子：空心圆 → 继续等；白色实心圆 → 按一下并抬起。若提前按，屏幕会提醒等目标出现；下一次重新等待。按后会短暂显示“已记录”，不显示奖励或速度等级。目标出现后30秒仍未回应，会提示本次未答，再继续。需要停下时，可以选择“结束本次”。
 
-先练4次，没有速度合格线。4次都在目标出现后按过一次，就能进入正式；提前按或未完成时，会先重新显示这段说明与例子，再练一次。最多两组，仍未完成可以结束。练习记录与正式记录分开。
+先练3次，没有速度合格线。3次都在目标出现后按过一次，就能进入正式；提前按或未完成时，会先重新显示这段说明与例子，再练一次。最多两组，仍未完成可以结束。练习记录与正式记录分开。
 
-正式科研版持续10分钟，实用版持续3分钟，目标次数不固定。到时间时屏幕会停止：正在等待不会算漏答；刚出现但还没观察完的目标会单独注明。请按实际看到的目标回应，不用追求某种分数。
+正式科研版持续10分钟，实用版持续2分钟，目标次数不固定。到时间时屏幕会停止：正在等待不会算漏答；刚出现但还没观察完的目标会单独注明。请按实际看到的目标回应，不用追求某种分数。
 
 **English instruction proposal:**
 
@@ -48,11 +48,11 @@ Watch the circle in the centre. Wait while it is an outline. When it becomes a s
 
 Example: outline circle → wait; solid white circle → press once and release. An early press brings a reminder to wait, followed by a new wait. After a response, a short Recorded message appears; there is no reward or speed grade. If a target receives no response for 30 seconds, a No response recorded message appears before the next wait. Choose End this attempt whenever you need to stop.
 
-Practise four targets first. There is no speed pass mark. Respond after each of the four targets to continue. An early press or incomplete practice brings back these instructions and examples before one retry. There are at most two practice groups; you can finish without starting the main task. Practice records are separate.
+Practise three targets first. There is no speed pass mark. Respond after each of the three targets to continue. An early press or incomplete practice brings back these instructions and examples before one retry. There are at most two practice groups; you can finish without starting the main task. Practice records are separate.
 
-The research version lasts ten minutes and the practical version three minutes. The number of targets varies. At the time limit, the display stops. An unfinished wait is not a missed target. A target that has just appeared and could not be fully observed is listed separately. Respond to what you actually see rather than aiming for a score.
+The research version lasts ten minutes and the practical version two minutes. The number of targets varies. At the time limit, the display stops. An unfinished wait is not a missed target. A target that has just appeared and could not be fully observed is listed separately. Respond to what you actually see rather than aiming for a score.
 
-**练习参数提案：**每组4个目标，等待各为3／5／3／5秒，慢节奏中性反馈2秒且包含在下一等待中；练习无100ms判定线、不要求快，只须无提前按并在四个目标后各新按一次。每目标仍有30秒无回应上限；提前按、无回应、主动退出或未完成不算练习通过，重新显示完整说明与例子。最多两组，不无限重试，不把教学通过率解释为能力；没有另写示例生成器。
+**练习参数提案：**每组3个目标，等待各为3／5／3秒，慢节奏中性反馈2秒且包含在下一等待中；练习无100ms判定线、不要求快，只须无提前按并在三个目标后各新按一次。每目标仍有30秒无回应上限；提前按、无回应、主动退出或未完成不算练习通过，重新显示完整说明与例子。最多两组，不无限重试，不把教学通过率解释为能力；没有另写示例生成器。
 
 ## 提前按、未答、终点和中断：项目边界决定
 
@@ -66,7 +66,7 @@ The research version lasts ten minutes and the practical version three minutes. 
 | 达到正式时限T，仍在等待 | 结束等待、不出现新目标、不算未答。未执行目标不进任何目标分母；等待提前按事件保留真实次数 |
 | 达到T，目标已出现但未结束 | 将此目标列为scheduled-end-censored，RT=null，保留实际观察时长；不算timeout、正确或错误，不进完整目标分母，不延时补答 |
 | 目标的30秒窗口与T恰好同时结束 | 完整观察30秒则timeout成立；若不足则仅时限截断。输入仅在目标窗口与正式窗口交集的半开区间内接受；恰在目标30秒边界或T的按下不能成为迟到首答。事件的实际时间决定归属，不凭异步处理先后改写 |
-| 主动结束、页面离开／隐藏或异常停止 | 结束本次，不自动续跑或补齐时间；标明原因与实际观察时长。正在看的目标记interrupted而非timeout；等待没有目标则不增加目标分母。已有完整记录可以有限描述，不冒称完成600／180秒；尚未开始与中断分开 |
+| 主动结束、页面离开／隐藏或异常停止 | 结束本次，不自动续跑或补齐时间；标明原因与实际观察时长。正在看的目标记interrupted而非timeout；等待没有目标则不增加目标分母。已有完整记录可以有限描述，不冒称完成600／120秒；尚未开始与中断分开 |
 | 目标出现时仍持键／触摸 | 不把旧按住状态当新首答，不暂停或重置正式时间；必须释放后新的按下才回应。不能在结束时补造一次首答 |
 
 ## 研究指标、条件分母与缺失
@@ -81,7 +81,7 @@ The research version lasts ten minutes and the practical version three minutes. 
 
 ## 报告正文、图片和下载同一三态
 
-拟由相同公开投影供正文、图及下载使用；没有真实保存或后台接通。公开只用可追溯的目标、回应、提前按、未答及截断次数、实际时长，并解释其范围。没有个人测量数据时，不制造结果。图中仅用如下合成例子审阅排版：180秒；A=27、V=25、F=1、O=0、C=1、I=0、W=2，因此D=26。该数字不是生成器、scorer输出或参与者数据。
+拟由相同公开投影供正文、图及下载使用；没有真实保存或后台接通。公开只用可追溯的目标、回应、提前按、未答及截断次数、实际时长，并解释其范围。没有个人测量数据时，不制造结果。图中仅用如下合成例子审阅排版（次数不是本版预期次数）：120秒；A=27、V=25、F=1、O=0、C=1、I=0、W=2，因此D=26。该数字不是生成器、scorer输出或参与者数据。
 
 - interpretable：到达正式预算，结束原因和记录可核，完整观察目标分母有数据；正常终点截断已明确剔除并披露。允许描述这些实际次数；V=0只让响应速度为null，不因表现差将整份结果判无效。
 - limited：中断或部分记录，但有完整可解释目标。只显示这些目标的受支持次数和实际时长，明确未完成原profile；隐藏全程结论与受影响指标，不推断原因。
@@ -103,4 +103,4 @@ English: “Thank you for completing this period of waiting. Of 26 fully observe
 
 ## 静态交付边界
 
-沿本领域既有Notion简短介绍与仓内静态图风格；此前只读到Notion图片引用，没有其图片二进制，未冒称看到或复刻原图。本图完全原创，保留原WIP而不覆盖历史。只进行本HTML静态排版和交付字节核对，不运行实际测试，不新安装依赖，不增CI。提交仅本目录、`[skip ci]`、独立领域分支；DOT核图后发notice，用户图审批准前不开发。
+沿本领域既有Notion简短介绍与仓内静态图风格；此前只读到Notion图片引用，没有其图片二进制，未冒称看到或复刻原图。本图完全原创，保留原WIP而不覆盖历史。只进行本HTML静态排版和交付字节核对，不运行实际测试，不新安装依赖，不增CI。提交仅本目录、`[skip ci]`、独立领域分支；原界面已获用户认可；此轮仅按用户方向更新参数，用户明确要求开发暂停，不自行启动。
