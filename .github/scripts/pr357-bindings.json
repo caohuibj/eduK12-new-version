@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "base": "04a8d994207d7b831b874d4be4f5c31640466458",
-  "product": "d8fbd56b04cf73ddd715daea9935454d2820747b",
+  "product": "5fef016fdf6bb08f684345c9edf438d58a6e2f5a",
   "branch": "work/school-teacher-consolidated-20261027",
   "source": {
     "docs/evidence/school-teacher-review-20261027.json": {
@@ -456,7 +456,7 @@
       "oldMode": "100644",
       "newMode": "100644",
       "before": "a5113a9c4a58e7b598de78256a4497b4f0ca6664",
-      "after": "70e50f7a41d535a2e32d123f5233b6f0f3d8cb83",
+      "after": "119c564482f39b859effdef0cddd966a0f7965af",
       "status": "M"
     },
     "server-version/e2e/school-teacher-ui.test.cjs": {
@@ -711,11 +711,25 @@
       "after": "4e8c60f7b37f5a3df35a38ab9dd6e94ccf0091f4",
       "status": "M"
     },
+    "server-version/frontend/src/components/questionnaire/ScalePlayer.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "6a73067ae59dd17ccf419571125ccd8b318f3b1a",
+      "after": "f988062ee9af5bde281ab05c40938baeb73aa58d",
+      "status": "M"
+    },
     "server-version/frontend/src/components/questionnaire/__tests__/FormPlayer.test.tsx": {
       "oldMode": "100644",
       "newMode": "100644",
       "before": "4bfb49ab45fb4b9ce10a1cfd43f60fc1e9920f61",
       "after": "0e16f35033a47bc5a4cd0ca6f655ae69627ebe4c",
+      "status": "M"
+    },
+    "server-version/frontend/src/components/questionnaire/__tests__/ScalePlayer.test.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "82f1ba07aa2cc8d7a9b4094b1f0534022c269f48",
+      "after": "f63ce50417009e7f08f5642c95aff5fbdf2db183",
       "status": "M"
     },
     "server-version/frontend/src/hooks/useScaleAutoAdvance.ts": {
@@ -1685,7 +1699,7 @@
   ],
   "components": {
     "backend": "100ae07d90a1bf9fc53b1df0a610008571f565dd",
-    "frontend": "438a7e9db83feadaaa3ebf080cc3a11c7f685d44"
+    "frontend": "eff42512c7a727c347fabea865dbad281d698bb1"
   },
   "tests": {
     "backend": [

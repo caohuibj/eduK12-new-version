@@ -31,7 +31,7 @@ test('application SAST continuation requires exact completed original analysis, 
 });
 import {readFileSync} from 'node:fs';import {runInNewContext} from 'node:vm';
 test('actual database continuation validates original receipt before fixture work without lexical shadowing',async()=>{
- const source=readFileSync(new URL('./pr357-checks.mjs',import.meta.url),'utf8'),start=source.indexOf('async function database()'),end=source.indexOf('\nasync function main()',start);assert(start>=0&&end>start);const fn=source.slice(start,end),stop=new Error('fixture preparation boundary');let calls=0;
+ const source=readFileSync(new URL('./pr357-checks.mjs',import.meta.url),'utf8'),start=source.indexOf('async function database()'),end=source.indexOf('\nasync function ',start+1);assert(start>=0&&end>start);const fn=source.slice(start,end),stop=new Error('fixture preparation boundary');let calls=0;
  const context={assert,URL,original,process:{env:{DATABASE_URL:'postgresql://ptool:synthetic@127.0.0.1:5432/pr357_upgrade_ci_test',CI_POSTGRES_SERVICE_ID:'a'.repeat(64)}},testContinuation:async()=>({upgrade:{head:original.checkout,run:String(original.run),status:'PASS',oldUserPreserved:true,migrations:239}}),execFileSync:()=>JSON.stringify([{Config:{Image:'postgres:16.15-bookworm'},State:{Running:true},Mounts:[],NetworkSettings:{Ports:{'5432/tcp':[{HostPort:'5432'}]}}}]),save:()=>{},run:()=>{calls++;throw stop}};
  await assert.rejects(runInNewContext('('+fn+')',context)(),e=>e===stop);assert.equal(calls,1);
  calls=0;await assert.rejects(runInNewContext('('+fn.replaceAll('beforeRestore','original')+')',context)(),/Cannot access 'original' before initialization/);assert.equal(calls,0);
@@ -91,4 +91,11 @@ test('styled frontend reuse never falls back to the previous CSS artifact',()=>{
  assert.equal(verifyOriginalArtifact(m,'build',now,'style').id,a.id);
  assert.throws(()=>verifyOriginalArtifact({...m,id:deliveredArtifacts.build.id},'build',now,'style'));
  assert.throws(()=>verifyOriginalArtifact({...m,digest:'sha256:'+deliveredArtifacts.build.sha},'build',now,'style'));
+});
+import {selectUnchangedFrontend,focusConsumers} from './pr357-continuation.mjs';
+test('focus fix retains only unchanged passing files and requires all affected consumers plus the new regression',()=>{
+ const rows=binding.tests.frontend.map(file=>({name:'/app/'+file,status:'passed',assertionResults:[{status:'passed',fullName:file}]}));
+ const selected=selectUnchangedFrontend({reports:[{testResults:rows}]});assert.equal(selected.accepted.length,54);assert.equal(selected.fresh.length,11);assert(selected.fresh.includes('src/components/questionnaire/__tests__/ScalePlayer.test.tsx'));
+ const file=selected.accepted[0].file;const bad=structuredClone(rows);bad.find(r=>r.name.endsWith('/'+file)).assertionResults[0].status='failed';assert.throws(()=>selectUnchangedFrontend({reports:[{testResults:bad}]}));
+ assert(selected.accepted.every(r=>!focusConsumers.includes(r.file)));
 });

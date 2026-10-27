@@ -225,3 +225,30 @@ build12708916208 ZIPbf976a51b75625b185cbea2ed0d392e7070abaaae85b270c5d3992705c95
 image e8b25b9a1cfa3f9538828c4d92f9f4946920710f5e68adf52eb6ab207076b29d.
 No frontend rebuild/retest/rescan; backend remains complete-proof reuse. Only
 changed browser consumers, their control/SAST and final gates remain required.
+
+## Shared scale keyboard focus repair and precise affected checks (04:18 UTC)
+
+Run40447909023 at6c294e5c completed all nonbrowser jobs; Teacher real SCALE/FORM
+creation, save/discard, preview, freeze and4-execution publication passed. Browser
+artifact12709078364 ZIP5a94ec96e3482b465718d4a658ceeab6473a853de9113892c0ce6a56223c9c1a
+retains failure: School still waited on a return link deliberately hidden by the
+compact navigation CSS; use the visible workspace brand link, preserving keyboard
+and return-focus assertions. Teacher reached actual scale answering and failed
+'Keyboard focus remains visible' (exact sanitized error hash reproduced locally).
+
+A real shared ScalePlayer issue: a native button disabled during asynchronous
+save can lose keyboard focus. Restore only the same question's original keyboard
+button after it becomes enabled, only if focus fell to document.body; never steal
+another control's focus or override next-question heading focus. Local regression
+first needed accurate Chromium-blur simulation (jsdom disabled.blur is a no-op);
+then reproduced1FAIL/1PASS. Fix gives10/10 existing+new ScalePlayer casesPASS.
+Node24.22 local diagnostic is not claimed as formal Node24.21 qualification.
+Productfix5fef016f is pushedskip-ci, no backend change. Frontend noweff42512.
+
+Only exact fixed blobs of ScalePlayer and its test join the allowed CSS/fixture
+changes; arbitrary component drift still refuses. Reuse54 unchanged frontend
+files472cases from original exact reports; formally run11 affected consumers
+(10 existing files98cases plus ScalePlayer10), changed TS type/lint, one new
+frontend build/runtime scan, and real browser. Backend remains complete reuse.
+Fresh SAST includes the actual shared component/test and changed e2e consumer.
+This does not replay all570 earlier tests or drop the selected formal contracts.
