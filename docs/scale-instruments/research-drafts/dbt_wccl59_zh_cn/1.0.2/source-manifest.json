@@ -630,7 +630,11 @@
     "digitalDisplay": "ADMIN_REVIEW",
     "publicGitHubRedistribution": "ADMIN_REVIEW",
     "simplifiedTranslation": "ADMIN_REVIEW",
-    "translatorIdentity": "NOT_VERIFIED"
+    "translatorIdentity": "NOT_VERIFIED",
+    "nonCommercialTag": "license:noncommercial",
+    "chineseSearchTerm": "非商用",
+    "userVerifiedExpertLanguageReview": "APPROVED",
+    "translation": "ADMIN_REVIEW_LEGAL_SCOPE"
   },
   "checks": {
     "English59OfficialItems": "STATIC_VISUAL_AND_SCORING_PDF_REVIEWED",
@@ -638,7 +642,7 @@
     "scoringDiffFrom100": "UNCHANGED_STATIC",
     "goldenCases": 12,
     "responseAnchors": "STATIC_0_1_2_3",
-    "translationExpertReview": "NOTRUN",
+    "translationExpertReview": "APPROVED_USER_ATTESTED_NO_EXTERNAL_REPORT",
     "backTranslation": "NOTRUN",
     "cognitiveInterviews": "NOTRUN",
     "vitest": "NOTRUN",
@@ -654,10 +658,10 @@
     "scoringParityWith101": "STATIC_EQUAL",
     "policyVersions": "dbt_wccl59_zh_cn_research-1.0.2",
     "authorApproval": "NOTRUN",
-    "linguisticExpertReview": "NOTRUN"
+    "linguisticExpertReview": "APPROVED_USER_ATTESTED_NO_EXTERNAL_REPORT"
   },
   "translationReview": {
-    "status": "STATIC_BILINGUAL_REVIEW_DONE_EXPERT_PENDING",
+    "status": "USER_CONFIRMED_EXPERT_APPROVED",
     "anchorOriginal": "https://depts.washington.edu/uwbrtc/wp-content/uploads/DBT-WCCL.pdf",
     "scoringOriginal": "https://depts.washington.edu/uwbrtc/wp-content/uploads/Scoring-description-for-the-DBT-WCCL.pdf",
     "changedItemNumbers": [
@@ -684,9 +688,24 @@
       "original scoring parity",
       "no new clinical interpretation"
     ],
-    "translationExpertReview": "NOTRUN",
+    "translationExpertReview": "COMPLETED_USER_ATTESTATION",
     "backTranslation": "NOTRUN",
     "cognitiveDebriefing": "NOTRUN",
-    "scientificValidity": "NOTRUN"
+    "scientificValidity": "NOTRUN",
+    "reviewerIdentity": "NOT_PROVIDED",
+    "externalReviewDocument": "NOT_PROVIDED",
+    "actualReviewTime": "NOT_PROVIDED",
+    "approvalRecordedAt": "2026-10-27T06:53:22Z",
+    "attestedBy": "PROJECT_ADMIN_USER_CURRENT_CONVERSATION",
+    "distinction": "PILOT scientificMaturity retained; linguistic expert review approved does not imply psychometric validation"
+  },
+  "publicationPreparation": {
+    "packageReleaseStatus": "PUBLISHED",
+    "catalogStatus": "ACCEPTED",
+    "databasePublication": "NOTRUN",
+    "realProductAvailability": "NOTRUN",
+    "recordedAt": "2026-10-27T06:53:22Z",
+    "scope": "NON_COMMERCIAL_ONLY",
+    "note": "Publication-ready content status only; CI, installation, proofHash-based application publication and production deployment are separate"
   }
 }

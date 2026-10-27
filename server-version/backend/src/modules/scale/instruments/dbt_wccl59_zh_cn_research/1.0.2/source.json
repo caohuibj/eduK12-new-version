@@ -14,11 +14,11 @@
   "catalog": {
     "schemaVersion": 1,
     "catalogManifestVersion": 1,
-    "catalogStatus": "CANDIDATE",
+    "catalogStatus": "ACCEPTED",
     "scientificMaturity": "PILOT",
     "identity": {
-      "canonicalName": "辩证行为疗法应对方式清单59题（DBT-WCCL）——英文直译简体中文定稿候选",
-      "abbreviation": "DBT-WCCL59-ZH-CN-EN-DIRECT-REVIEW-CANDIDATE",
+      "canonicalName": "辩证行为疗法应对方式清单59题（DBT-WCCL）——英文直译简体中文版 v1.0.2",
+      "abbreviation": "DBT-WCCL59-ZH-CN-EN-DIRECT-REVIEWED",
       "instrumentFamily": "DBT Ways of Coping Checklist 59, Neacsiu et al. 2010: independent Simplified Chinese draft translated directly from official English"
     },
     "construct": {
@@ -77,20 +77,26 @@
         "无临床阈值",
         "population:zh_cn_translation_not_validated",
         "简体中文工作稿",
-        "简体中文语言审校",
         "大陆常用表达",
         "未验证译文",
         "language_validation:source_en_uw_official",
         "language_validation:direct_translation_en_to_zh-CN",
         "language_validation:zh_tw_not_used_as_translation_intermediary",
-        "language_validation:human_review_pending",
         "language_validation:cross_cultural_validation_pending",
         "construct:original59_item_order_preserved",
         "response:official_scoring_unchanged",
         "英文原版直译",
-        "人工语言审校待办",
         "英文直译简体中文",
-        "不经过繁体中间稿"
+        "不经过繁体中间稿",
+        "license:noncommercial",
+        "非商用",
+        "language_validation:expert_review_approved_user_attested",
+        "language_validation:local_psychometric_validation_pending",
+        "language_validation:cognitive_debrief_pending",
+        "language_validation:back_translation_pending",
+        "专家语言审校已确认",
+        "回译待开展",
+        "信效度研究待开展"
       ]
     },
     "population": {
@@ -170,11 +176,12 @@
     "localizationVersion": "1.0.2",
     "translationSource": "UW作者实验室官方英语完整版 DBT-WCCL.pdf（https://depts.washington.edu/uwbrtc/wp-content/uploads/DBT-WCCL.pdf）和英文原作者计分说明（https://depts.washington.edu/uwbrtc/wp-content/uploads/Scoring-description-for-the-DBT-WCCL.pdf），英语→简体中文独立直译。未以繁体中文译本/先前简体译稿作为翻译中介。",
     "adaptationMethod": "DIRECT_TRANSLATION",
-    "expertReviewStatus": "PENDING",
+    "expertReviewStatus": "COMPLETED",
     "cognitiveDebriefStatus": "NOT_ESTABLISHED",
     "localEvidenceRefs": [],
-    "reviewStatus": "PENDING",
-    "notes": "直译自UW英文正式59题，不经过繁体中间稿。经独立英文对照静态审核，对第6、10、20、22、24、29、31、33、38、40、48、49题作有限精确修订，其他47题保持1.0.1。专家双语语言审校、回译、成人认知访谈、内地目标样本心理测量验证、翻译权及再分发许可均待办；静态审查≠临床或科学正式验证。"
+    "reviewStatus": "APPROVED",
+    "notes": "本版本专家语言审校通过的状态来自项目管理员在2026-10-27当前对话的明确确认；审校人姓名、审校文档及实际审校时间未提供，reviewedAt 为系统接收和登记该确认的时间（非声称专家本人审校时刻）。此前的静态语言审查和本次用户确认不等于量表中文心理测量学效度研究、回译、认知访谈或原作者正式授权。 保留英语原版直译、目标中国内地成人心理测量验证待办，回译和认知访谈NOTRUN。",
+    "reviewedAt": "2026-10-27T06:53:22Z"
   },
   "applicability": {
     "schemaVersion": 1,
@@ -239,14 +246,14 @@
       "display"
     ],
     "notes": [
-      "以UW官方英语原题和原作者评分说明为准的1.0.2静态修订，未依赖繁体中间翻译，原英文59题顺序、DSS38/DCS115/DCS26和评分1.0.0不变。",
-      "本1.0.2简体内容为UW官方英文59题直接翻译并静态语言复核的DRAFT/CANDIDATE；独立保留1.0.0、1.0.1和UW繁体语言版本。UW明确免费允许非商业研究/临床/教育使用，并禁止商业用途；独立简体翻译、网上电子施测/展示、公开GitHub全文再分发与导出等权利由管理员确认。不得以已公开英语PDF或已完成静态校对推断取得作者全部授权。",
-      "作者正式各维最低有效数DSS30/38、DCS1 10/15、DCS2 4/6，本平台采用各维全部回答方计算的更严格complete_required规则。",
-      "正式人工翻译专家审校、回译、认知访谈及目标样本效度未完成，不能申报为官方中文版。"
+      "非商用（license:noncommercial）：限非商业研究、临床、教育用途；本标签是分类信息，不替代产品入口和实际业务授权。",
+      "本版本专家语言审校通过的状态来自项目管理员在2026-10-27当前对话的明确确认；审校人姓名、审校文档及实际审校时间未提供，reviewedAt 为系统接收和登记该确认的时间（非声称专家本人审校时刻）。此前的静态语言审查和本次用户确认不等于量表中文心理测量学效度研究、回译、认知访谈或原作者正式授权。",
+      "非商用是量表分类和使用范围说明，不是平台自动阻止商业调用的执行门禁；需由管理员落实实际使用约束。作者明示不得商业使用，但翻译、线上展示、公开GitHub全文再分发许可仍须分别联系核定。",
+      "评分与科学声明不变：DSS38、DCS1 15、DCS2 6项独立均值；评分版本1.0.0，三维各自完整回答为平台保守规则；无百分位、中文常模、诊断阈值或DBT疗效判定。"
     ]
   },
   "executable": {
-    "releaseStatus": "DRAFT",
+    "releaseStatus": "PUBLISHED",
     "contentLocale": "zh-CN",
     "references": [],
     "definition": {
@@ -261,7 +268,7 @@
       "license": {
         "status": "unknown",
         "redistribution": "restricted",
-        "note": "本1.0.2简体内容为UW官方英文59题直接翻译并静态语言复核的DRAFT/CANDIDATE；独立保留1.0.0、1.0.1和UW繁体语言版本。UW明确免费允许非商业研究/临床/教育使用，并禁止商业用途；独立简体翻译、网上电子施测/展示、公开GitHub全文再分发与导出等权利由管理员确认。不得以已公开英语PDF或已完成静态校对推断取得作者全部授权。"
+        "note": "UW作者实验室声明仅供非商业研究、临床、教育使用，商业使用不允许；本版本以「license:noncommercial／非商用」标注，并依据管理员于2026-10-27确认登记专家语言审校已通过（审校人身份及原始材料未附）。非商用是量表分类和使用范围说明，不是平台自动阻止商业调用的执行门禁；需由管理员落实实际使用约束。作者明示不得商业使用，但翻译、线上展示、公开GitHub全文再分发许可仍须分别联系核定。 本源码releaseStatus=PUBLISHED仅表示可执行内容包已提出发布，不代表数据库Scale完成安装、已经经过CI或在生产对外开放。license.status=unknown、redistribution=restricted保留。"
       },
       "display": {
         "randomizeItems": false
@@ -1540,14 +1547,14 @@
           }
         ],
         "limitations": [
-          "本简体中文1.0.2是UW官方英文59题直接翻译后的静态语言复核候选；保留早期两个简体草稿及UW繁体版。作者认可、正式专家语言审校、回译、认知访谈和中国目标样本信效度均尚未完成。",
+          "本简体中文1.0.2版以UW官方英文题本直接翻译。项目管理员已明确确认专家语言审校通过，并已按用户确认登记APPROVED（专家姓名/独立报告未附；reviewedAt是登记时间）。科学本地化效度、回译、认知访谈、常模仍未进行，不因此称为原作者官方中文版本。",
           "过去一个月自报三类应对的使用频率；DSS38题、DCS115题、DCS26题均值分别0–3。无反向题，无59题健康总分，不能视作技能能力证书或DBT疗效判定。",
           "作者英文SPSS最低有效题数：DSS 30/38、DCS1 10/15、DCS2 4/6。平台依旧为每维全部作答才能计算均值，此为平台技术策略而非作者缺失值规则。",
           "无本站简体中文常模、百分位或可支持的诊断及高低临床切点；不得用于分选、学校排名或重大风险决策。",
-          "UW免费许可限非商业研究、临床与教育用途，并禁止商业；翻译、独立网络施测及公开GitHub完整再分发授权范围由管理员分别确认。",
-          "本轮只做英文原文和静态版本/算术/内容校对，不声称运行Vitest、TypeScript、scoreScale、CI、数据库或人工科学评估。"
+          "非商用是量表分类和使用范围说明，不是平台自动阻止商业调用的执行门禁；需由管理员落实实际使用约束。作者明示不得商业使用，但翻译、线上展示、公开GitHub全文再分发许可仍须分别联系核定。",
+          "发布代码仍需通过定向技术资格验证，正式生产开放必须使用平台系统管理员的安装和proofHash发布流程；公开题本/简体翻译再分发权限待管理员核定。"
         ],
-        "disclaimer": "DBT-WCCL-59 英语原题直译简体中文 v1.0.2 定稿候选；已完成初步静态双语语义复核，独立专家语言审校、认知访谈和中国目标人群验证仍未完成；非诊断、非疗效认证，仅DRAFT研究准备。"
+        "disclaimer": "DBT-WCCL-59 英文直译简体中文 v1.0.2：专家语言审核经管理员确认通过；未完成本地心理测量学验证、常模建立或认知访谈。仅限非商业研究、临床、教育用途，非诊断、不用于选拔或DBT疗效认证。"
       },
       "referencePolicy": {
         "type": "none"

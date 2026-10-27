@@ -13,14 +13,14 @@ const originalFacets = {
   dcs2: [7,15,24,28,30,48],
 }
 describe('DBT-WCCL 59 direct-from-English zh-CN v1.0.2 content candidate', () => {
-  it('preserves 59 unique ordered identities, original 0–3 anchors and truthful draft states', () => {
+  it('preserves 59 unique ordered identities, original 0–3 anchors and confirmed review and published package (not DB publication)', () => {
     expect(() => defineScaleInstrumentSource(source)).not.toThrow()
     expect(source.identity.instrumentVersion).toBe('1.0.2')
-    expect(source.executable?.releaseStatus).toBe('DRAFT')
-    expect(source.catalog.catalogStatus).toBe('CANDIDATE')
+    expect(source.executable?.releaseStatus).toBe('PUBLISHED')
+    expect(source.catalog.catalogStatus).toBe('ACCEPTED')
     expect(source.localization).toMatchObject({
       sourceLocale:'en',targetLocale:'zh-CN',localizationVersion:'1.0.2',
-      reviewStatus:'PENDING',expertReviewStatus:'PENDING',
+      reviewStatus:'APPROVED',expertReviewStatus:'COMPLETED',
     })
     expect(definition.items.map(it => it.itemCode)).toEqual(Array.from({length:59},(_,i)=>itemCode(i+1)))
     expect(new Set(definition.items.map(it=>it.itemCode)).size).toBe(59)
@@ -50,8 +50,13 @@ describe('DBT-WCCL 59 direct-from-English zh-CN v1.0.2 content candidate', () =>
       expect(Object.fromEntries(actual.scores.map(x=>[x.key,x.value]))).toEqual(golden.expected.scores)
     }
   })
-  it('does not mistake noncommercial use for publication or local scientific approval', () => {
-    expect(source.localization?.reviewStatus).toBe('PENDING')
+  it('marks approved linguistic review without inventing scientific validation or redistribution rights', () => {
+    expect(source.localization?.reviewStatus).toBe('APPROVED')
+    expect(source.localization?.reviewedAt).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/)
+    expect(source.localization?.expertReviewStatus).toBe('COMPLETED')
+    expect(source.catalog.scientificMaturity).toBe('PILOT')
+    expect(source.catalog.construct.constructOverlapTags).toContain('license:noncommercial')
+    expect(source.catalog.construct.constructOverlapTags).toContain('非商用')
     expect(definition.license).toMatchObject({status:'unknown',redistribution:'restricted'})
     expect(definition.report.interpretations).toHaveLength(3)
     expect(definition.report.interpretations.every(x=>x.source.type==='score_only'&&x.bands.length===0)).toBe(true)
