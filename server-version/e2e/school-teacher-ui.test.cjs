@@ -191,3 +191,13 @@ test('compact form authoring and auto-advance checks use current labels and focu
  assert.match(source,/focusTarget: 'next-question'/);
  assert.doesNotMatch(source,/keyboardCheck\(s, player\(\).getByRole\('radio'/);
 });
+
+test('browser assertions wait for committed replacement controls and async save unlock',()=>{
+ const fs=require('node:fs'),path=require('node:path'),source=fs.readFileSync(path.join(__dirname,'school-teacher-browser.cjs'),'utf8');
+ const choose=source.slice(source.indexOf('const choose = async prompt'),source.indexOf("await choose('合成矩阵题')"));
+ assert(choose.indexOf("button.waitFor({ state: 'attached' })")<choose.indexOf('requestAnimationFrame'));
+ assert(choose.indexOf('requestAnimationFrame')<choose.indexOf('!await button.isVisible()'));
+ const keyboard=source.slice(source.indexOf('async function keyboardCheck'),source.indexOf('async function toolsPage'));
+ assert(keyboard.indexOf('!el.disabled')<keyboard.indexOf('Keyboard focus remains visible'));
+ assert.match(keyboard,/assert.equal\(focus.same && focus.visible, true/);
+});

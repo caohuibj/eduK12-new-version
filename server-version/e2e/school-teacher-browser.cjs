@@ -507,7 +507,12 @@ async function run() {
       await locator.focus(); await locator.press('Space')
       if (pressed) assert.equal(await locator.getAttribute('aria-pressed'), 'true', 'Keyboard Space selects the scale option')
       else assert.equal(await locator.isChecked(), true, 'Keyboard Space selects the native control')
-      assert.equal(await locator.evaluate(el => document.activeElement === el && el.matches(':focus-visible')), true, 'Keyboard focus remains visible')
+      // Selection can update aria-pressed before its asynchronous save unlocks
+      // the native control. Check final focus only after that real unlock.
+      await s.page.waitForFunction(el => el.isConnected && !el.disabled, await locator.elementHandle())
+      const focus = await locator.evaluate(el => ({ same: document.activeElement === el, visible: el.matches(':focus-visible'), disabled: el.disabled, activeTag: document.activeElement?.tagName }))
+      ;(report.keyboardDiagnostics ||= []).push({ product: s.product, pressed, ...focus })
+      assert.equal(focus.same && focus.visible, true, 'Keyboard focus remains visible')
       report.keyboard.push({ product: s.product, action: 'Space', control: pressed ? 'scale-option-button' : await locator.getAttribute('type'), selected: true, focusVisible: true })
     }
     async function toolsPage(s, f) {
@@ -547,8 +552,14 @@ async function run() {
       if (kind === 'FORM') {
         const outline = studio.getByRole('navigation', { name: s.product === 'SCHOOL' ? '表单分组与题目' : '表单区段与题目', exact: true })
         const choose = async prompt => {
-          if (s.product === 'SCHOOL' && !await outline.isVisible()) await studio.locator('details.education-private-directory-disclosure > summary').click()
-          await outline.getByRole('button', { name: '编辑题目：' + prompt, exact: true }).click()
+          const button = outline.getByRole('button', { name: '编辑题目：' + prompt, exact: true })
+          // The response can precede React's replacement of the empty editor.
+          // Wait for the actual new question, then let its ResizeObserver settle
+          // before opening the current disclosure rather than the old editor.
+          await button.waitFor({ state: 'attached' })
+          await p.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))))
+          if (s.product === 'SCHOOL' && !await button.isVisible()) await studio.locator('details.education-private-directory-disclosure > summary').click()
+          await button.click()
         }
         await choose('合成矩阵题')
         await shot(s, 'form-author-editor')
