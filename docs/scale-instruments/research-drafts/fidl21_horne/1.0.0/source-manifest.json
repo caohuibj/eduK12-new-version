@@ -4,7 +4,7 @@
     "instrumentKey": "fidl21_horne_zh_cn_research",
     "instrumentVersion": "1.0.0"
   },
-  "status": "SOURCE_KEY_PENDING_NOT_REGISTERED",
+  "status": "CATALOG_ONLY_SOURCE_KEY_PENDING",
   "source": {
     "authors": [
       "Kristina Horne",
@@ -14,9 +14,17 @@
     "doi": "10.1111/bjc.12505",
     "article": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12057328/",
     "requiredSupplement": "BJC-64-315-s001.docx",
-    "supplementStatus": "UNRETRIEVED",
+    "supplementStatus": "LINK_VERIFIED_BYTES_UNRETRIEVED",
     "originalLanguage": "en",
-    "citationYear": 2025
+    "citationYear": 2025,
+    "publisherAppendixName": "bjc12505-sup-0001-AppendixS1.docx",
+    "publisherLanding": "https://bpspsychub.onlinelibrary.wiley.com/doi/10.1111/bjc.12505",
+    "fullArticlePdfRead": "SUPPLEMENT_NOT_EMBEDDED",
+    "chinaStudyContrast": {
+      "doi": "10.2147/PRBM.S598045",
+      "year": 2026,
+      "scope": "2026 Chinese OCD revised 25-item three-factor EFA not equivalent to original 21-item five-factor form"
+    }
   },
   "form": {
     "candidateItemCount": 21,
@@ -97,6 +105,18 @@
     "typeScript": "NOTRUN",
     "CI": "NOTRUN",
     "database": "NOTRUN",
-    "deployment": "NOTRUN"
+    "deployment": "NOTRUN",
+    "registeredMetadata": "GIT_SOURCE_ONLY",
+    "exactItemTexts": "UNRETRIEVED",
+    "exactItemToFactorMap": "UNRETRIEVED",
+    "exactReverseKey": "UNRETRIEVED"
+  },
+  "catalogRegistration": {
+    "kind": "CATALOG_ONLY",
+    "registeredKey": "fidl21_horne_zh_cn_research",
+    "version": "1.0.0",
+    "executable": false,
+    "itemsRegistered": 0,
+    "intendedItems": 21
   }
 }

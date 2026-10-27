@@ -1,0 +1,145 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "fidl21_horne_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "FIDL-21 日常生活灵活性量表（仅目录，原始21题附录待核）",
+      "abbreviation": "FIDL-21 SOURCE-ONLY",
+      "instrumentFamily": "Flexibility in Daily Life (Horne et al.)"
+    },
+    "construct": {
+      "primaryDomain": "EXECUTIVE_FUNCTION",
+      "secondaryDomains": [
+        "SELF_REGULATION"
+      ],
+      "constructDefinition": "测量日常认知与行为灵活性相关的重复、任务切换、可预测/控制、规律与思想信念。现只从论文正文确认21题五维计数，不拥有完整逐题文本及反向计分键，不可施测、计算或报告个人得分。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "domain:cognitive_flexibility",
+        "domain:behavioural_flexibility",
+        "construct:fidl21_daily_life_inflexibility",
+        "construct:repetition",
+        "construct:switching",
+        "construct:predictability_control",
+        "construct:routine",
+        "construct:thoughts_beliefs",
+        "population:adult_19_to_78_original",
+        "population:zh_cn_not_validated",
+        "response:21_original_items_pending",
+        "response:self_1_5_past_2_weeks",
+        "response:reverse_key_missing",
+        "license:original_article_cc_by_4",
+        "license:author_contact_required",
+        "language_validation:zh_cn_not_translated",
+        "use:source_catalog_only",
+        "日常生活灵活性",
+        "认知灵活性",
+        "行为灵活性",
+        "来源待补",
+        "需要联系作者",
+        "不可施测"
+      ]
+    },
+    "population": {
+      "minAge": 19,
+      "maxAge": 78,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "原版验证N=295美国成年人，19–78岁。原版并非中国K12或临床诊断测验；无本站简体译稿。"
+    },
+    "administration": {
+      "itemCount": 21,
+      "estimatedMinutes": 8,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "过去两周",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "8分钟仅供系统目录的技术估算，不是作者报告的单独测量时间。",
+        "21题五因子计数为6/5/4/3/3，具体题号、题文与反向键必须从Appendix S1读取后另行复核。",
+        "五级频率1 Never至5 All the time；正向题需反向；高分表示更不灵活。",
+        "原2026中国OCD研究重新得到25题三因子，不能冒充Horne原21题五因子。",
+        "当前目录无executable，正式施测入口禁止开放。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "仅原版来源检索，不可实际实施。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "horne-chen-irish-fidl21-2024",
+        "evidenceType": "STRUCTURAL_VALIDITY",
+        "population": "US healthy adults ages 19–78; no Chinese validation",
+        "ageRange": "19–78",
+        "locale": "en",
+        "territory": "US",
+        "sampleSize": 295,
+        "studyDesign": "English original study: initial 37 items and final 21 items five factors. Full finalized questionnaire is in Appendix S1, not article text.",
+        "rating": "UNKNOWN",
+        "citation": "Horne K, Chen T, Irish M (2025). British Journal of Clinical Psychology, 64:315–329; online September 22 2024.",
+        "doi": "10.1111/bjc.12505",
+        "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12057328/",
+        "notes": "No item-number/factor/reversal map accessible from main paper; translated and clinical validity not inferred."
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "Flexibility in Daily Life, original 21-item five-factor scale",
+      "citation": "Horne, Chen & Irish (2025), BJCP 64:315–329",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12057328/",
+      "publicationYear": 2025
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "Repetition (6)",
+        "Switching (5)",
+        "Predictability/Control (4)",
+        "Routine (3)",
+        "Thoughts/Beliefs (3)"
+      ],
+      "limitations": [
+        "The 21 official item texts, item-to-factor mapping and positive/reverse keys are missing; no real scoring permitted.",
+        "Adult English original; no zh-CN translation or norms.",
+        "2026 Chinese OCD 25-item revision is not the official Horne 21-item version."
+      ],
+      "disclaimer": "CATALOG_ONLY source candidate. Not a 21-item executable scale or public assessment."
+    },
+    "blockers": [
+      "APPENDIX_S1_BYTES_MISSING",
+      "21_ITEM_TEXTS_UNVERIFIED",
+      "ITEM_TO_FACTOR_MAP_UNVERIFIED",
+      "REVERSE_ITEMS_UNVERIFIED",
+      "ZH_CN_TRANSLATION_NOT_STARTED",
+      "NO_EXECUTABLE_PACKAGE"
+    ]
+  }
+}
