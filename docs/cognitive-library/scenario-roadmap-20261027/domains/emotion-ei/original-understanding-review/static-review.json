@@ -1,0 +1,66 @@
+{
+  "kind": "STATIC_DESIGN_CAPTURE_NOT_RUNNER_VALIDATION",
+  "startedAtUTC": "2026-10-27T13:21:02.840Z",
+  "finishedAtUTC": "2026-10-27T13:21:03.801Z",
+  "browser": "151.0.7922.173",
+  "inputSha256": "7d6dba66358b1bb298191647cb812d3d67ba7ef963579cc19b8dc8c0751db3d0",
+  "captureScriptSha256": "a2b2b093a68deba937d81e81414b581674dc9b77e73664b18d7b8aafa8a9c124",
+  "layout": {
+    "scripts": 0,
+    "media": 0,
+    "forms": 0,
+    "screenBounds": [
+      {
+        "id": "phone-instructions",
+        "width": 390,
+        "height": 939.59375,
+        "horizontalOverflow": false
+      },
+      {
+        "id": "phone-zh",
+        "width": 390,
+        "height": 910,
+        "horizontalOverflow": false
+      },
+      {
+        "id": "tablet-en",
+        "width": 820,
+        "height": 949.84375,
+        "horizontalOverflow": false
+      }
+    ],
+    "textOverflow": []
+  },
+  "externalRequests": [],
+  "outputs": [
+    {
+      "file": "review.png",
+      "bytes": 481794,
+      "sha256": "82e0207f610c30fb9832345729af7ba4ec3d5b4cfc5819ba04fc33403b0578ef"
+    },
+    {
+      "file": "phone-zh.png",
+      "bytes": 61945,
+      "sha256": "bc8d6c6a045972d4ca277b99198c5d9edeba9418e3ff284cdbc3108ed7fd571d"
+    },
+    {
+      "file": "tablet-en.png",
+      "bytes": 79934,
+      "sha256": "890dda04a566c7c6d527aa89e62d750fe6e432743d7bec6d0d465b9ccc9b5b3c"
+    },
+    {
+      "file": "phone-instructions-zh.png",
+      "bytes": 99162,
+      "sha256": "b6f379d0d712899bfba617b259a1b53a4b9e9fdd985a9cea1f1409703cee7f95"
+    }
+  ],
+  "notExecuted": [
+    "test runner",
+    "stimulus sequence",
+    "scorer",
+    "participant records",
+    "backend",
+    "CI",
+    "real devices"
+  ]
+}

@@ -1,0 +1,94 @@
+{
+  "kind": "ORIGINAL_DESIGN_REVIEW_ONLY",
+  "dateAsiaTokyo": "2026-10-27",
+  "observedAtUTC": "2026-10-27T13:22:36.412181+00:00",
+  "baseHead": "215e9bbd96769064723b38d8f594c6b07c03fa4f",
+  "scope": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/original-understanding-review",
+  "status": "direction approved; detailed design pending user review; no implementation",
+  "counts": {
+    "research": 36,
+    "experience": 12,
+    "cells": 12,
+    "perCell": {
+      "research": 3,
+      "experience": 1
+    },
+    "practice": 3,
+    "maximumPracticeGroups": 2
+  },
+  "answerKey": null,
+  "accuracyOrAbilityScore": null,
+  "visualInspection": "Full board image read; Chinese instruction/task, English tablet task and all three report states legible; no clipping observed. Static layout only.",
+  "initialFailureRetained": "static-initial-failure.json",
+  "sourceRights": "Original bilingual design text and geometric UI only; no STEU items/keys/translations, audio, portraits, participant data or credentials bundled.",
+  "runtimeChanges": [],
+  "notExecuted": [
+    "test runner",
+    "stimulus sequence",
+    "scorer",
+    "participant records",
+    "backend",
+    "CI",
+    "real devices"
+  ],
+  "files": [
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/original-understanding-review/APPENDIX.md",
+      "bytes": 20722,
+      "sha256": "65b772b8c9cc576e9ceb57de07ed598265f282956c72f4f2bb785bafcfa2b267"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/original-understanding-review/README.md",
+      "bytes": 2967,
+      "sha256": "eeb3da9cc85ab165af89fb1522cbcb437941fd01f070400bb538e6ebdb2c2104"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/original-understanding-review/phone-instructions-zh.png",
+      "bytes": 99162,
+      "sha256": "b6f379d0d712899bfba617b259a1b53a4b9e9fdd985a9cea1f1409703cee7f95",
+      "width": 390,
+      "height": 941
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/original-understanding-review/phone-zh.png",
+      "bytes": 61945,
+      "sha256": "bc8d6c6a045972d4ca277b99198c5d9edeba9418e3ff284cdbc3108ed7fd571d",
+      "width": 390,
+      "height": 911
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/original-understanding-review/render-review.cjs",
+      "bytes": 2812,
+      "sha256": "a2b2b093a68deba937d81e81414b581674dc9b77e73664b18d7b8aafa8a9c124"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/original-understanding-review/review.html",
+      "bytes": 11799,
+      "sha256": "7d6dba66358b1bb298191647cb812d3d67ba7ef963579cc19b8dc8c0751db3d0"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/original-understanding-review/review.png",
+      "bytes": 481794,
+      "sha256": "82e0207f610c30fb9832345729af7ba4ec3d5b4cfc5819ba04fc33403b0578ef",
+      "width": 1712,
+      "height": 1848
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/original-understanding-review/static-initial-failure.json",
+      "bytes": 3426,
+      "sha256": "c7e652a65d3b549f91381a59337ade8aa32d88f6dcb191ef00e58bf2f458e974"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/original-understanding-review/static-review.json",
+      "bytes": 1680,
+      "sha256": "b814a053d640f89bf5bafcbe3b855b66b129fab9d69d6e2b1fdbee7164284386"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/original-understanding-review/tablet-en.png",
+      "bytes": 79934,
+      "sha256": "890dda04a566c7c6d527aa89e62d750fe6e432743d7bec6d0d465b9ccc9b5b3c",
+      "width": 820,
+      "height": 951
+    }
+  ]
+}
