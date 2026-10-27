@@ -4,7 +4,7 @@
   "readiness": "READY",
   "branch": "perf/four-entry-feedback-20261027",
   "base": "7e6d7da4a01e4a42b410cf2dbdcfa76f11759fdc",
-  "product": "e660863bcf7611d77a76ec2d6bbb1f9c613fc2e5",
+  "product": "8dfa43212f48b478ca3bbd01517610d9b07a5a6a",
   "components": {
     "backend": "857b09f27913b2d630a306d339a87ecec974e68e",
     "frontend": "361fcbf63584d4e07cef72192a47d27e9392e050"
@@ -2232,7 +2232,7 @@
     },
     "docs/performance/four-entry-feedback-20261027/teacher-sjt-start-correction/BROWSER-CONSUMER.md": {
       "before": null,
-      "after": "096e49061df5c25e16fcb8daade5b134a62ac96a"
+      "after": "98c76bd8d0d0234ec569ad8b9ef1712dbaa05d26"
     },
     "docs/performance/four-entry-feedback-20261027/teacher-sjt-start-correction/CI-CONTINUATION.md": {
       "before": null,
@@ -2708,11 +2708,11 @@
     },
     "server-version/e2e/pr363-browser.cjs": {
       "before": null,
-      "after": "6ec7dd668e07393f7e2c9251a42f112e69fab4d5"
+      "after": "7b0229bd0214e4a7f492c74295d4b4769a113311"
     },
     "server-version/e2e/pr363-browser.test.cjs": {
       "before": null,
-      "after": "35819931464aaf8b912088f6ce54fb5a0c231517"
+      "after": "7b709f45a9302408434ea869b426cc4f32694113"
     },
     "server-version/e2e/pr363-database.cjs": {
       "before": null,
@@ -2924,7 +2924,7 @@
     ".github/scripts/pr363-scope.mjs": null,
     ".github/workflows/ci.yml": "31c345639cc790249d0c6a51a284971890613572"
   },
-  "controlCheckpoint": "e660863bcf7611d77a76ec2d6bbb1f9c613fc2e5",
+  "controlCheckpoint": "8dfa43212f48b478ca3bbd01517610d9b07a5a6a",
   "protectedInputs": {
     "server-version/backend/Dockerfile": "8dfd85f6e843d964eb192cfdf52addffdc3c4132",
     "server-version/frontend/Dockerfile": "45dd87f6a8ed5a5bf45d3ea1e4126ce5e8d9f8b4",
@@ -11907,12 +11907,12 @@
         {
           "path": "server-version/e2e/pr363-browser.cjs",
           "mode": "100644",
-          "blob": "6ec7dd668e07393f7e2c9251a42f112e69fab4d5"
+          "blob": "7b0229bd0214e4a7f492c74295d4b4769a113311"
         },
         {
           "path": "server-version/e2e/pr363-browser.test.cjs",
           "mode": "100644",
-          "blob": "35819931464aaf8b912088f6ce54fb5a0c231517"
+          "blob": "7b709f45a9302408434ea869b426cc4f32694113"
         },
         {
           "path": "server-version/e2e/pr363-database.cjs",
