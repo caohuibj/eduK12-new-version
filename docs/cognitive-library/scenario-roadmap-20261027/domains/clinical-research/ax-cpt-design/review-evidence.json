@@ -1,0 +1,82 @@
+{
+  "artifactKind": "AX_CPT_STATIC_DESIGN_SOURCE_AND_LAYOUT_REVIEW_NOT_DEVELOPMENT_OR_VALIDITY",
+  "readAtUtc": "2026-10-27T14:48:23.309987+00:00",
+  "proposalVersion": "r1",
+  "approval": "pending user image review; no runner/sequence/scorer authorization",
+  "referencesObserved": {
+    "main": "7e6d7da4a01e4a42b410cf2dbdcfa76f11759fdc",
+    "core": "072b2900d4295c7d741d5e55c9ce6cfbbf6f58d2",
+    "child-learning": "d6d2c98122a0d3e6fdbdc63cc93779f8c3c32eed",
+    "emotion-ei": "fa022584f10bb109514b31023dfec781a21262ed",
+    "occupational": "855dda345831efee0e814bf39f6b8d6abad5e5d2",
+    "clinical-base": "5f5ffdee8c4d8bea25952e1aad4e926cedbbb816"
+  },
+  "existing24Plus11PreviouslyReadSourceBlobs": {
+    "currentCoreUnchanged": 108,
+    "changed": 0,
+    "notCurrentRuntimeAcceptance": true
+  },
+  "source": {
+    "doi": "10.1037/0021-843X.108.1.120",
+    "originalPdfSha256": "7ba6371be015593fb4fe4410bb46c767a209044b8299c0df95d7f18968ed6fd0",
+    "printedMethodsPageVisuallyRead": 123,
+    "originalProtocol": "target-only response, 400 trials, mixed delays; not the same protocol as two-button reference code",
+    "referenceRepoCommit": "49b8123f18b26d94dfc010bb8a6ec7458b265e2e",
+    "scriptBlob": "2a32b59456caf8d3957a12c301e768384415145e",
+    "licenseBlob": "7ef17fe706ce88195e18473069d561dd4910a5ee",
+    "license": "MIT (reference code only); static design is original",
+    "noOriginalPdfOrFigureIncluded": true
+  },
+  "proposed": {
+    "researchPairs": 120,
+    "researchConditionCounts": {
+      "AX": 84,
+      "AY": 12,
+      "BX": 12,
+      "BY": 12
+    },
+    "practicalPairs": 40,
+    "practicalConditionCounts": {
+      "AX": 28,
+      "AY": 4,
+      "BX": 4,
+      "BY": 4
+    },
+    "nominalMsPerPair": 8000,
+    "researchFormalMs": 960000,
+    "practicalFormalMs": 320000,
+    "practicePairs": 4,
+    "practiceKinds": "one of each; no sequence generated",
+    "practiceRoundsMaximum": 2,
+    "trialAndReportClaims": "proposal only"
+  },
+  "staticReview": "static-review.json",
+  "humanReview": "PNG visually read in this cloud session; no physical-device or task timing validation",
+  "scope": "Only clinical-research/ax-cpt-design. SART, PVT, original six WIP and other domains untouched. No dependency, shared schema, server, permissions, COS, CI, merge, deployment or product integration.",
+  "files": {
+    "APPENDIX.md": {
+      "bytes": 15743,
+      "sha256": "2453572435297047833e2fef15a57b53c14eb5d9133672e53ce63f2b09f629b8"
+    },
+    "REVIEW.md": {
+      "bytes": 2524,
+      "sha256": "6018cf71b03b4bcc8acb20bdd81d6a328f9f781eee7b93641ca45cf867d5dfda"
+    },
+    "ax-cpt-review.html": {
+      "bytes": 10755,
+      "sha256": "f176be7b52aca756d4c8f648231a9ee2632ba1e0b684a99f6fe07d73dff0f2de"
+    },
+    "ax-cpt-review.png": {
+      "bytes": 418284,
+      "sha256": "4c19bca0d3113ad23a830a2cba4a7fa8552fc3469465e18e3ffead1f5e7a8658"
+    },
+    "static-review.json": {
+      "bytes": 920,
+      "sha256": "9f5a3ac637ca86a856c7e7ebf08e4bff28b1004f06ea9ffacbbb39fd3a37390c"
+    },
+    "tags.research.json": {
+      "bytes": 1581,
+      "sha256": "85f193409e2a7c77b90e321ac3e58e2b63195f00463853e0ad049c9554b8ff64"
+    }
+  }
+}

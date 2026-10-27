@@ -1,0 +1,54 @@
+{
+  "artifactKind": "DESIGN_ONLY_NOT_RUNTIME_REGISTRATION",
+  "stableKeyProposal": "ax-cpt",
+  "taxonomyCommit": "22721e5c63dd78819e8c58921adf20157cdaa08c",
+  "tags": {
+    "cognitive_domain": [
+      "attention",
+      "executive_control"
+    ],
+    "target_process": null,
+    "paradigm": null,
+    "stimulus_form": null,
+    "input_upstream": null,
+    "input_proposed": [
+      "not_frozen"
+    ],
+    "key_metric": null,
+    "intended_use": [
+      "research_protocol_selection"
+    ],
+    "code_license": null,
+    "code_rights_disposition": null,
+    "asset_rights_disposition": null,
+    "asset_license_review": null,
+    "implementation_strategy": [
+      "literature_reimplementation"
+    ],
+    "maturity": [
+      "source_research_only"
+    ],
+    "evidence_limitations": [
+      "timing_device_unverified",
+      "protocol_variant_unvalidated",
+      "protocol_version_decision",
+      "cultural_language_burden",
+      "motor_burden"
+    ],
+    "baseline_relation": [
+      "new_family_candidate"
+    ],
+    "research_priority": [
+      "conditional_priority_finalize"
+    ],
+    "rule_type": [
+      "project_provisional",
+      "theoretical_reference"
+    ]
+  },
+  "notes": {
+    "unknowns": "No exact controlled AX-CPT/context-maintenance/letter-stimulus value; no invented value or runtime connection.",
+    "rights": "Upstream MIT verified; original static geometry/instructions; not copying code or paper figures.",
+    "ownership": "Original clinical-research AX-CPT WIP only; no duplicate implemented candidate found; this design is not user-approved."
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "kind": "AX_CPT_STATIC_DESIGN_LAYOUT_ONLY_NOT_TASK_RUN_OR_VALIDITY",
+  "browser": "151.0.7922.173",
+  "chromiumSandbox": false,
+  "executionContext": "Existing managed cloud process sandbox",
+  "htmlSha256": "f176be7b52aca756d4c8f648231a9ee2632ba1e0b684a99f6fe07d73dff0f2de",
+  "views": [
+    {
+      "viewport": 1480,
+      "documentWidth": 1480,
+      "height": 1848,
+      "scripts": 0,
+      "images": [],
+      "interactiveElements": 0,
+      "requests": []
+    },
+    {
+      "viewport": 390,
+      "documentWidth": 390,
+      "height": 4652,
+      "scripts": 0,
+      "images": [],
+      "interactiveElements": 0,
+      "requests": []
+    },
+    {
+      "viewport": 820,
+      "documentWidth": 820,
+      "height": 3486,
+      "scripts": 0,
+      "images": [],
+      "interactiveElements": 0,
+      "requests": []
+    }
+  ],
+  "pngSha256": "4c19bca0d3113ad23a830a2cba4a7fa8552fc3469465e18e3ffead1f5e7a8658"
+}
