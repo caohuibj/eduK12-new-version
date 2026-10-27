@@ -1,10 +1,11 @@
 import {beforeEach,describe,it,expect,vi} from 'vitest'
 import {canonicalHash} from '../../modules/assessment-runtime/canonical'
-const m=vi.hoisted(()=>({source:vi.fn(),issuer:vi.fn(),policy:vi.fn()}))
+const m=vi.hoisted(()=>({source:vi.fn(),issuer:vi.fn(),policy:vi.fn(),distribution:vi.fn()}))
 vi.mock('../../modules/education-tools/assessment-resource.repository',()=>({readEducationAssessmentDeliveryIdentity:m.source,
  EducationAssessmentSourceError:class extends Error{constructor(readonly code:string){super(code)}}}))
 vi.mock('../../modules/education-tools/assessment-resource.authority',()=>({assertEducationDeliveryIssuerCurrent:m.issuer}))
 vi.mock('../../modules/assessment-run/resourceAuthority',()=>({relationalEntryToRunPolicy:m.policy}))
+vi.mock('../../modules/education-tools/assessment-resource.distribution',()=>({assertEducationAssessmentDistributionCurrent:m.distribution}))
 import {assertEducationAssessmentExecutionSource} from '../../modules/assessment-run/educationAssessmentExecution'
 function fixture(){
  const policy={family:'COGNITIVE',key:'education-assessment:TEACHER:org:source',version:'1.0.0',runtimeLaunchTarget:{kind:'COMPOSITE',ref:'runtime'}}
@@ -15,7 +16,7 @@ function fixture(){
  const input={executionId:'execution',compositeId:'runtime',purpose:'NEW_START' as const}
  return {row,source,db,input,run:()=>assertEducationAssessmentExecutionSource(db as never,input)}
 }
-beforeEach(()=>vi.clearAllMocks())
+beforeEach(()=>{vi.clearAllMocks();m.distribution.mockReset().mockResolvedValue(undefined)})
 describe('education execution exact-source admission versus frozen continuation',()=>{
  it('checks source lifecycle and original issuer inside the supplied transaction before a new START',async()=>{
   const f=fixture();await expect(f.run()).resolves.toBe(f.source)
@@ -41,11 +42,17 @@ describe('education execution exact-source admission versus frozen continuation'
  it('keeps an actually bound parent identity without substituting a new issuer check',async()=>{
   const f=fixture();f.row.binding='attempt';f.row.boundComposite='runtime';m.issuer.mockRejectedValue(new Error('original grant revoked'))
   await expect(assertEducationAssessmentExecutionSource(f.db as never,{...f.input,purpose:'FROZEN'})).resolves.toBe(f.source)
-  expect(m.issuer).not.toHaveBeenCalled();expect(f.db.$queryRaw).toHaveBeenCalledTimes(1)
+  expect(m.issuer).not.toHaveBeenCalled();expect(m.distribution).not.toHaveBeenCalled();expect(f.db.$queryRaw).toHaveBeenCalledTimes(1)
  })
  it('does not grant frozen continuation to an unbound or different parent',async()=>{
   const f=fixture();await expect(assertEducationAssessmentExecutionSource(f.db as never,{...f.input,purpose:'FROZEN'})).rejects.toThrow('EXECUTION_BINDING')
   const g=fixture();g.row.binding='attempt';g.row.boundComposite='wrong'
   await expect(assertEducationAssessmentExecutionSource(g.db as never,{...g.input,purpose:'FROZEN'})).rejects.toThrow('EXECUTION_BINDING')
  })
+})
+
+it('rejects new START after its exact source distribution grant is revoked',async()=>{
+ const f=fixture();m.distribution.mockRejectedValue(new Error('CONTENT_AUTHORITY_DENIED'))
+ await expect(f.run()).rejects.toThrow('CONTENT_AUTHORITY_DENIED')
+ expect(m.distribution).toHaveBeenCalledWith(f.db,f.source.origin)
 })

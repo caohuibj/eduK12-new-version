@@ -12,6 +12,12 @@ export const educationDeliveryAuthoritySchema=z.discriminatedUnion('kind',[
  z.object({kind:z.literal('PSYCHOLOGY_STAFF'),actorId:id,membershipId:id,personaGrantId:id,capabilityGrantId:id}).strict(),
 ])
 export type EducationDeliveryAuthority=z.infer<typeof educationDeliveryAuthoritySchema>
+export const educationDistributionSchema=z.object({actorId:id,grants:z.array(z.object({
+ resourceId:id,grantId:id,version:z.number().int().positive(),
+}).strict()).min(1).max(1000)}).strict().superRefine((value,ctx)=>{
+ if(new Set(value.grants.map(grant=>grant.resourceId)).size!==value.grants.length)
+  ctx.addIssue({code:'custom',message:'Each distributed source requires one exact original grant'})
+})
 const pointer=z.object({releaseId:id,contentHash:digest}).strict()
 const unit=z.object({
   itemId:id,family:z.enum(['SCALE','COGNITIVE','SJT']),
@@ -27,6 +33,7 @@ export const educationAssessmentOriginSchema=z.object({
   product:z.enum(['SCHOOL','TEACHER']),organizationId:id,
   family:z.enum(['COGNITIVE','SITUATIONAL','BUNDLE']),
   sourceCompositeId:id,runtimeCompositeId:id,sourceSnapshotHash:digest,runtimeSnapshotHash:digest,runtimeDefinitionHash:digest,
+  distribution:educationDistributionSchema,
   units:z.array(unit).max(1000),
 }).strict().superRefine((origin,ctx)=>{
   const add=(message:string)=>ctx.addIssue({code:'custom',message})
@@ -61,6 +68,7 @@ export function draftEducationAssessmentEntry(input:{origin:unknown;title:string
   const disclosure=validateResultDisclosureContract(input.disclosure)
   if(origin.units.length===0&&!['NONE','COMPLETION_ONLY'].includes(disclosure.audiences.RESPONDENT.mode))throw new Error('Form-only delivery cannot invent measurement feedback')
   if(disclosure.minimumRespondents!==null)throw new Error('Personal delivery cannot imply group report authority')
+  if(disclosure.audiences.RESPONDENT.longitudinalMetricKeys.length)throw new Error('Personal delivery does not authorize longitudinal reports')
   const role=origin.product==='TEACHER'?'TEACHER':'STUDENT'
   // Other audiences require their own separately reviewed workflows, not
   // a side effect of assigning a personal cognitive/SJT/composite task.

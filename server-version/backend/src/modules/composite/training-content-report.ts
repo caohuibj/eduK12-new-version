@@ -65,7 +65,7 @@ export async function readTrainingContentReports(db:Prisma.TransactionClient,inp
   if(measurement.layer!=='MEASUREMENT'||report.layer!=='REPORT')fail()
   if(!await trainingMeasurementSourceScopeMatchesForConsumer(db,measurement,bound.source,
     {compositeId:parent.compositeAssessmentId,ownerId:parent.compositeAssessment.createdBy,itemId:bound.itemId}))fail()
-  if(bound.source.standardCombination)await validateTrainingReportPointer(db,{unit:bound,compositeId:parent.compositeAssessmentId,ownerId:parent.compositeAssessment.createdBy,
+  if(bound.source.standardCombination||report.scope.kind==='PLATFORM'||report.scope.kind==='PRIVATE'&&['SCHOOL','TEACHER'].includes(report.scope.product))await validateTrainingReportPointer(db,{unit:bound,compositeId:parent.compositeAssessmentId,ownerId:parent.compositeAssessment.createdBy,
     reportReleaseId:report.releaseId,contentHash:report.contentHash,publication:false,releases:cache})
   else if(report.scope.kind!=='PRIVATE'||report.scope.product!=='TRAINING'||report.scope.ownerId!==parent.compositeAssessment.createdBy||report.scope.resourceId!==parent.compositeAssessmentId)fail()
   if(measurement.family!==bound.family||measurement.content.measurementHash!==bound.measurement.measurementHash||report.family!==bound.family
