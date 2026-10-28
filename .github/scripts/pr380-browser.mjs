@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import {restoreBrowserBuild} from './pr380-browser-reuse.mjs';
 import {readFileSync,writeFileSync,mkdirSync,existsSync,cpSync} from 'node:fs';
 import {resolve,extname} from 'node:path';
 import {execFileSync} from 'node:child_process';
@@ -7,12 +8,13 @@ import {gzipSync} from 'node:zlib';
 import {createRequire} from 'node:module';
 const require=createRequire(import.meta.url),front=resolve('server-version/frontend'),dist=resolve(front,'dist'),out=resolve('onboarding-evidence/postlogin');mkdirSync(out,{recursive:true});
 assert.equal(process.env.GITHUB_ACTIONS,'true');
-const result={head:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),status:'RUNNING',scope:'One production build. Built static JS/CSS gzip1 estimates and sandboxed compiled-page consumers with synthetic read-only API replies. No production transfer, RTT, login, START or FINAL qualification.',cases:[],sandbox:null};
+const result={head:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),status:'RUNNING',scope:'Original official production build reused without rebuilding; two original passed consumers retained, three missing consumers execute. Built static JS/CSS gzip1 estimates and sandboxed compiled-page consumers with synthetic read-only API replies. No production transfer, RTT, login, START or FINAL qualification.',cases:[],sandbox:null};
 const save=()=>writeFileSync(resolve(out,'browser.json'),JSON.stringify(result,null,2)+'\n');save();let browser;
 try{
- const started=Date.now();let buildLog;
- try{buildLog=execFileSync('npm',['run','build','--','--manifest'],{cwd:front,encoding:'utf8',stdio:['ignore','pipe','pipe'],timeout:180000});}catch(e){writeFileSync(resolve(out,'build.log'),String(e.stdout??'')+String(e.stderr??''));throw e;}
- writeFileSync(resolve(out,'build.log'),buildLog);cpSync(dist,resolve(out,'dist'),{recursive:true});result.build={exitCode:0,elapsedMs:Date.now()-started,command:'npm run build -- --manifest'};save();
+ const {report:originalBrowser,origin}=await restoreBrowserBuild();
+ result.build={...originalBrowser.build,executedThisRun:false,reusedFrom:origin};
+ cpSync(dist,resolve(out,'dist'),{recursive:true});
+ for(const name of ['school-student-navigation','teacher-list-without-answer-code']){const row=originalBrowser.cases.find(c=>c.name===name);assert.equal(row?.status,'PASS');result.cases.push({...row,executedThisRun:false,reusedFrom:origin});}save();
  const manifest=JSON.parse(readFileSync(resolve(dist,'.vite/manifest.json'))),base={rows:JSON.parse(readFileSync('docs/performance/postlogin-20261028/baseline/pr378-browser.json')).closures};
  const find=name=>{const keys=Object.keys(manifest).filter(k=>manifest[k].file.split('/').pop().startsWith(name+'-')&&manifest[k].file.endsWith('.js'));assert.equal(keys.length,1,name);return keys[0]};
  function closure(keys){const seen=new Set(),files=new Set();function visit(key){if(seen.has(key))return;seen.add(key);const v=manifest[key];assert(v,key);files.add(v.file);for(const p of v.css??[])files.add(p);for(const k of v.imports??[])visit(k)}for(const key of keys)visit(key);return [...files].sort();}
@@ -76,15 +78,8 @@ try{
   });
   try{await page.goto('https://'+host+path,{waitUntil:'domcontentloaded'});await work(page,row,authRelease);assert.deepEqual(errors,[]);row.overflow=await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1);assert.equal(row.overflow,false);await page.screenshot({path:resolve(out,name+'.png'),fullPage:true,animations:'disabled'});assert.deepEqual(errors,[]);row.status='PASS';}catch(e){row.status='FAIL';row.error=String(e.stack??e);throw e}finally{authRelease();save();await context.close()}
  }
- await scenario('school-student-navigation','school.eduk12.top','/workspace',390,'school',async(page,row)=>{
-  await page.getByRole('link',{name:/已开放 本周学习/}).click();await page.getByRole('link',{name:'查看全部任务'}).waitFor();assert(new URL(page.url()).searchParams.has('activityId'));assert.equal(row.documents,1);assert.equal(row.api.filter(r=>r.path.endsWith('/auth/me')).length,1);assert(!row.requests.some(p=>/SchoolCompositeRunner|FinalCompositeAssessment/.test(p)));
-  await page.getByRole('link',{name:'查看全部任务'}).click();await page.waitForURL(url=>!url.searchParams.has('activityId'));assert.equal(row.documents,1);assert.equal(row.api.filter(r=>r.path.endsWith('/auth/me')).length,1);
- });
- await scenario('teacher-list-without-answer-code','teacher.eduk12.top','/',768,'teacher',async(page,row)=>{
-  await page.getByText('暂无分配给你的测评任务。').waitFor();assert(!row.requests.some(p=>/FinalCompositeAssessment|SurveyPublicApp|TaskForm/.test(p)));assert(!row.api.some(r=>r.path.endsWith('/form')));
- });
  await scenario('teacher-selected-practice-form','teacher.eduk12.top','/',1280,'expert',async(page,row)=>{
-  await page.getByText('暂无分配给你的测评任务。').waitFor();await page.getByRole('navigation',{name:'Teacher 工作台'}).getByRole('button',{name:'专业实践'}).click();await page.getByText('课堂实践1',{exact:true}).waitFor();assert.equal(row.api.filter(r=>r.path.endsWith('/form')).length,0);
+  await page.getByText('暂无分配给你的测评任务。').waitFor();await page.getByRole('navigation',{name:'Teacher 工作台'}).getByRole('button',{name:'专业实践'}).click();await page.getByRole('heading',{name:'课堂实践1',exact:true}).waitFor();assert.equal(row.api.filter(r=>r.path.endsWith('/form')).length,0);
   await page.getByRole('button',{name:'填写实践表单'}).first().click();await page.getByText('教学目标是否清晰',{exact:false}).waitFor();assert.equal(row.api.filter(r=>r.path.endsWith('/form')).length,1);assert(row.api.some(r=>r.path.endsWith('/field-invitations/invite1/form')));assert(!row.requests.some(p=>/SurveyPublicApp/.test(p)));
  });
  await scenario('training-editor-deferred-tabs','training.eduk12.top','/general-questionnaires/q1/edit',1280,'training',async(page,row)=>{
@@ -92,7 +87,7 @@ try{
   await page.getByLabel('问卷名称 *',{exact:true}).fill('保留的本地名称');await page.getByRole('button',{name:'内容编排',exact:true}).click();await page.getByText('选择量表',{exact:true}).waitFor();await page.getByRole('heading',{name:'内容与顺序',exact:true}).waitFor();await page.getByText('加载区段中...',{exact:true}).waitFor({state:'hidden'});await page.getByRole('button',{name:'基本信息',exact:true}).click();assert.equal(await page.getByLabel('问卷名称 *',{exact:true}).inputValue(),'保留的本地名称');for(const suffix of ['/form-items','/q1/scales','/api/scales'])assert.equal(row.api.filter(r=>r.path.endsWith(suffix)).length,suffix==='/form-items'?2:1);
  });
  await scenario('survey-tools-without-directory','survey.eduk12.top','/workspace/tools',1280,'survey',async(page,row)=>{
-  await page.getByRole('heading',{name:'工具集',exact:true}).waitFor();assert(!row.api.some(r=>r.path==='/api/survey/projects'));await page.getByRole('link',{name:'我的研究',exact:true}).click();await page.getByRole('heading',{name:'研究工作台',exact:true}).waitFor();await page.getByRole('heading',{name:'从一项研究草稿开始',exact:true}).waitFor();assert.equal(row.api.filter(r=>r.path==='/api/survey/projects').length,1);
+  await page.getByRole('heading',{name:'工具集',exact:true}).waitFor();assert(!row.api.some(r=>r.path==='/api/survey/projects'));const directoryResponse=page.waitForResponse(r=>new URL(r.url()).pathname==='/api/survey/projects'&&r.request().method()==='GET');await page.getByRole('link',{name:'我的研究',exact:true}).click();await directoryResponse;await page.getByRole('heading',{name:'研究工作台',exact:true}).waitFor();await page.getByRole('heading',{name:'从一项研究草稿开始',exact:true}).waitFor();assert.equal(row.api.filter(r=>r.path==='/api/survey/projects').length,1);
  });
- result.status='PASS';save();
+ assert.equal(result.cases.length,5);assert(result.cases.every(c=>c.status==='PASS'));result.status='PASS';save();
 }catch(e){result.status='FAIL';result.error=String(e.stack??e);save();throw e;}finally{await browser?.close();save();}

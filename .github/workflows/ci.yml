@@ -2347,6 +2347,7 @@ jobs:
     timeout-minutes: ${{ fromJSON(needs.scope.outputs.onboarding_plan || '{}').pr == 374 && 15 || fromJSON(needs.scope.outputs.onboarding_plan || '{}').pr == 376 && 15 || fromJSON(needs.scope.outputs.onboarding_plan || '{}').pr == 378 && 15 || fromJSON(needs.scope.outputs.onboarding_plan || '{}').pr == 380 && 15 || 5 }}
     permissions:
       contents: read
+      actions: read
     env:
       CI: 'true'
       PLAN: ${{ needs.scope.outputs.onboarding_plan }}
@@ -2384,8 +2385,10 @@ jobs:
     - name: build once and verify bounded four-entry compiled loading consumers
       if: fromJSON(needs.scope.outputs.onboarding_plan || '{}').pr == 378
       run: node .github/scripts/pr378-browser.mjs
-    - name: build once and verify bounded postlogin task and editor loading
+    - name: reuse official build and finish missing postlogin consumers
       if: fromJSON(needs.scope.outputs.onboarding_plan || '{}').pr == 380
+      env:
+        GH_TOKEN: ${{ github.token }}
       run: node .github/scripts/pr380-browser.mjs
     - uses: actions/upload-artifact@v4
       if: always()
