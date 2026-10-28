@@ -1,0 +1,13 @@
+{
+  "parameterPlanVersion": "1.0.0",
+  "status": "NONE_SCORE_ONLY",
+  "runtimeReferencePolicy": {
+    "type": "none"
+  },
+  "runtimeIndependentParameterVersionSupported": false,
+  "reason": "无适用的中国37题独立译稿常模或临床界值；不移植其他版本或外国参数。",
+  "contentVersion": "1.0.0",
+  "scoringVersion": "1.0.0",
+  "localizationVersion": "1.0.0",
+  "reportVersion": "1.0.0"
+}

@@ -1,0 +1,140 @@
+{
+  "schemaVersion": 1,
+  "sourceSHA": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "sourceKey": "maia2_37_zh_cn_research",
+  "originalVersion": "1.0.0",
+  "preparedVersion": "1.0.1",
+  "originalSource": "server-version/backend/src/modules/scale/instruments/maia2_37_zh_cn_research/1.0.0/source.json",
+  "preparedSource": "server-version/backend/src/modules/scale/instruments/maia2_37_zh_cn_research/1.0.1/source.json",
+  "originalSourceSHA256": "3d1fc6192db0261518b8d85c6bea2eed7219d7f3e7ca73a5e0010d7a3292c3cb",
+  "preparedSourceSHA256": "eb69bb29aacf58cc9fdf4fb728de99b4bd7ae34fe7994085ef50f521c9e56ae0",
+  "originalFiles": [
+    {
+      "path": "docs/scale-instruments/research-drafts/maia2_37/1.0.0/README.md",
+      "blob": "8ad6d7759b359dc025ecdf0bfd1d596457874c85",
+      "sha256": "4631ff6cbdf15c13b13c8ccd9eb7229fded51264a71fbc097d4f407b839bd250"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/maia2_37/1.0.0/administration-sidecar.prepared.json",
+      "blob": "c00214467dc850cca10d1b99c4ce53bb4da78256",
+      "sha256": "de515acb7ec634d6a2044a5291021edcd8da72d58ec0add3e60fdfd6827254a2"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/maia2_37/1.0.0/administration.md",
+      "blob": "74233455402502443a29ff54de83a0d2193247bc",
+      "sha256": "990aa55f3b9630f92a14e56ac193a8e01956e8f58a523b9cd040af242faf3471"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/maia2_37/1.0.0/bilingual-content.json",
+      "blob": "63099da94d3154c7e34d239b2cf234e2ce40d1ab",
+      "sha256": "f67920c515020571719992e450b2f32960460c42694b7c75f400644d6906ef45"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/maia2_37/1.0.0/parameter-plan.json",
+      "blob": "11179a06627bd60cbdd291110b6bc744419d7b88",
+      "sha256": "afffb0561d51a4118b295c0a7d08da4b327616fba8eff925a834a38db004220a"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/maia2_37/1.0.0/references.md",
+      "blob": "ffa84e29fc81e001dc9c0d4879c2065b6535a092",
+      "sha256": "a19c5e37d4db6f4ad0256b287fac13ade2896d9b8b3dc58ff6d237732c7bfee2"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/maia2_37/1.0.0/report-example.md",
+      "blob": "15a10b99f37c2fc440bbaad8bea91d8086ef7b09",
+      "sha256": "113b964c0cee25b6be431ae1ff1fb02fe37cd863b2ddc1250d672e6be5d424c1"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/maia2_37/1.0.0/report-results.synthetic.json",
+      "blob": "c38f8ca478d98123e466a17ff7eb7ee9d11319ec",
+      "sha256": "d75222729383898ab6e57239aa866c04fd1134864bff88d18ab5ebcf11dea485"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/maia2_37/1.0.0/scoring-and-parameters.md",
+      "blob": "feb8af2d17ce1398979c2e1dd78bd9328d4169dd",
+      "sha256": "37467946760c2e53743efa7375afae29dd0d54641fef25b89cebf4ef484bea02"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/maia2_37/1.0.0/validation.json",
+      "blob": "aa484acacf80d2b5f41fa6e352cf0edce9b8eb84",
+      "sha256": "e7d1eb9217f453cab8ea50c9b3bd24146aa1691905d3d694cdbd9942288929d6"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/maia2_37/1.0.0/validation.md",
+      "blob": "2a7616fb5e97430c784cda018cbe19374415ec31",
+      "sha256": "bf41a85245dbf60e066d82a7c6010ce2d9164d2779c0ee1d309bf0922cfb6e18"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/maia2_37_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+      "blob": "b033a24124d61b222d5cea9b7918573bf1b416ea",
+      "sha256": "510e3741e444b94d78a1114547b06cdc392cafd462eb0c88bed5ae4abec2a2c2"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/maia2_37_zh_cn_research/1.0.0/instrument.ts",
+      "blob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/maia2_37_zh_cn_research/1.0.0/source.json",
+      "blob": "1a90a50926821211bf865acf419b15bf9c7a0f15",
+      "sha256": "3d1fc6192db0261518b8d85c6bea2eed7219d7f3e7ca73a5e0010d7a3292c3cb"
+    }
+  ],
+  "jsonChanges": [
+    {
+      "op": "replace",
+      "path": "/executable/definition/scoring/scores/1/description",
+      "from": "更多表示本次自述在这一方面的体验或回应较常发生；不等同于身体健康、客观能力或人群高低。",
+      "value": "反向计分后，分数越高表示自述较少忽略、硬撑或转移对身体不适的注意；不等同于身体健康，也不意味着应忍受伤害。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/scoring/scores/2/description",
+      "from": "更多表示本次自述在这一方面的体验或回应较常发生；不等同于身体健康、客观能力或人群高低。",
+      "value": "计分后，分数越高表示自述面对身体不适或疼痛时较少担忧、较能保持平静；不等同于身体健康，也不意味着应忽视症状。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/releaseStatus",
+      "from": "DRAFT",
+      "value": "PUBLISHED"
+    },
+    {
+      "op": "replace",
+      "path": "/identity/instrumentVersion",
+      "from": "1.0.0",
+      "value": "1.0.1"
+    },
+    {
+      "op": "add",
+      "path": "/instruction",
+      "value": {
+        "schemaVersion": 1,
+        "text": "下面列出一些陈述。请根据一般日常生活中的情况，指出每项陈述符合你的频率，每行选择一个数字：0表示“从不”，5表示“总是”；中间选项保留数字1、2、3、4。",
+        "language": "zh-CN",
+        "version": "1.0.0",
+        "source": "docs/scale-instruments/research-drafts/maia2_37/1.0.0/bilingual-content.json#/administrationZh @ b92c69aefa2472775fa7ee86b9c208366886c908 (项目工作稿；非人工审批声明)"
+      }
+    }
+  ],
+  "audit": "audits/audit-maia2-37-batch3.json",
+  "patch": "patches/patch-maia2-37-batch3.json",
+  "versions": {
+    "instrument": "1.0.1",
+    "scoring": "1.0.0",
+    "report": "1.0.0",
+    "localization": "1.0.0",
+    "instruction": "1.0.0"
+  },
+  "states": {
+    "sourceRelease": "PUBLISHED candidate; no database publication",
+    "catalog": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "translation": "PENDING",
+    "scientificReview": null,
+    "databaseInstall": "NOT_EXECUTED",
+    "databasePublish": "NOT_EXECUTED",
+    "production": "NOT_TOUCHED"
+  },
+  "versionReason": "Original source identities are retained byte-for-byte. New item clarification/metadata/report/administration wording is explicit; formulas, anchors, directions, parameter data and scoringVersion are unchanged. Old report editorial timestamp is not reused as approval of revised wording."
+}
