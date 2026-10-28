@@ -1,0 +1,101 @@
+{
+  "scope": "same synthetic data; actual loopback HTTP gzip response bodies excluding headers; React/jsdom Node-fetch transport; individual timing/CPU/heap samples are retained but not interpreted as production gains",
+  "rows": [
+    {
+      "name": "/general-questionnaires/q",
+      "fixtureSha256": "2571671e20a5dea42b1a23f01c5b2be6d52802acf31b1aaf870c446888837b5d",
+      "getCount": {
+        "before": 3,
+        "after": 2
+      },
+      "gzipBodyBytes": {
+        "before": 2107,
+        "after": 1197,
+        "saved": 910
+      },
+      "requestPathsBefore": [
+        "/api/general-questionnaires/q/form-sections",
+        "/api/general-questionnaires/q/form-items",
+        "/api/general-questionnaires/q/content"
+      ],
+      "requestPathsAfter": [
+        "/api/general-questionnaires/q/form-sections",
+        "/api/general-questionnaires/q/content"
+      ]
+    },
+    {
+      "name": "/questionnaires/q",
+      "fixtureSha256": "2571671e20a5dea42b1a23f01c5b2be6d52802acf31b1aaf870c446888837b5d",
+      "getCount": {
+        "before": 3,
+        "after": 2
+      },
+      "gzipBodyBytes": {
+        "before": 2107,
+        "after": 1197,
+        "saved": 910
+      },
+      "requestPathsBefore": [
+        "/api/questionnaires/q/form-sections",
+        "/api/questionnaires/q/form-items",
+        "/api/questionnaires/q/content"
+      ],
+      "requestPathsAfter": [
+        "/api/questionnaires/q/form-sections",
+        "/api/questionnaires/q/content"
+      ]
+    },
+    {
+      "name": "/composite-assessments/q",
+      "fixtureSha256": "2273465748d0d7d7bef015418751dbad87f25da14ef6c0ad39cb19bb622b1880",
+      "getCount": {
+        "before": 3,
+        "after": 2
+      },
+      "gzipBodyBytes": {
+        "before": 2124,
+        "after": 1206,
+        "saved": 918
+      },
+      "requestPathsBefore": [
+        "/api/composite-assessments/q/form-sections",
+        "/api/composite-assessments/q/form-items",
+        "/api/composite-assessments/q/content"
+      ],
+      "requestPathsAfter": [
+        "/api/composite-assessments/q/form-sections",
+        "/api/composite-assessments/q/content"
+      ]
+    },
+    {
+      "name": "ordinary-editor-first-content",
+      "fixtureSha256": "2571671e20a5dea42b1a23f01c5b2be6d52802acf31b1aaf870c446888837b5d",
+      "getCount": {
+        "before": 7,
+        "after": 6
+      },
+      "gzipBodyBytes": {
+        "before": 3312,
+        "after": 2402,
+        "saved": 910
+      },
+      "requestPathsBefore": [
+        "/api/general-questionnaires/q",
+        "/api/general-questionnaires/q/form-items",
+        "/api/general-questionnaires/q/scales",
+        "/api/scales?status=PUBLISHED&page=1&pageSize=100",
+        "/api/general-questionnaires/q/form-sections",
+        "/api/general-questionnaires/q/form-items",
+        "/api/general-questionnaires/q/content"
+      ],
+      "requestPathsAfter": [
+        "/api/general-questionnaires/q",
+        "/api/general-questionnaires/q/form-items",
+        "/api/general-questionnaires/q/scales",
+        "/api/scales?status=PUBLISHED&page=1&pageSize=100",
+        "/api/general-questionnaires/q/form-sections",
+        "/api/general-questionnaires/q/content"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,80 @@
+{
+  "environment": "one isolated Codex Linux cloud node; Node 24.21.0 from /workspace/eduk12-cloud/activate.sh; no Mac",
+  "workingDirectory": "/workspace/eduK12-new-version/server-version/frontend",
+  "baselineSource": "c5c28f85085e53de1b7be4ed821489accaae7228",
+  "productSource": "ebf90d6dd7d22cc0a907d8a258f28e95d70f5e64",
+  "invocations": [
+    {
+      "name": "baseline measurement",
+      "command": "FORM_SECTION_MEASURE_LABEL=baseline FORM_SECTION_MEASURE_OUTPUT=/tmp/eduk12-form-section-baseline/measurements.jsonl node_modules/.bin/vitest run src/components/__tests__/FormSectionManager.http.test.tsx --maxWorkers=1 --testNamePattern='measures ' --reporter=json --outputFile=/tmp/eduk12-form-section-baseline/reporter.json",
+      "exitCode": 0,
+      "passed": 4,
+      "filtered": 7,
+      "reporter": "baseline/reporter.json",
+      "log": "baseline/component-http.log"
+    },
+    {
+      "name": "first candidate component checks and measurement",
+      "command": "FORM_SECTION_MEASURE_LABEL=candidate FORM_SECTION_MEASURE_OUTPUT=/tmp/eduk12-form-section-candidate/measurements.jsonl node_modules/.bin/vitest run src/components/__tests__/FormSectionManager.http.test.tsx src/components/__tests__/FormSectionManager.test.tsx src/pages/teacher/GeneralQuestionnaireEdit.deferred.test.tsx --maxWorkers=1 --reporter=json --outputFile=/tmp/eduk12-form-section-candidate/reporter.json",
+      "exitCode": 1,
+      "passed": 20,
+      "failed": 2,
+      "reporter": "candidate/reporter.json",
+      "log": "candidate/component-http.log"
+    },
+    {
+      "name": "two failed error expectations after correcting the sanitizer contract",
+      "command": "node_modules/.bin/vitest run src/components/__tests__/FormSectionManager.http.test.tsx --maxWorkers=1 --testNamePattern='keeps a failed' --reporter=json --outputFile=/tmp/eduk12-form-section-candidate/reporter-r2-errors.json",
+      "exitCode": 0,
+      "passed": 2,
+      "filtered": 9,
+      "reporter": "candidate/reporter-r2-errors.json",
+      "log": "candidate/errors-r2.log"
+    },
+    {
+      "name": "new nested DTO omission contract only",
+      "command": "node_modules/.bin/vitest run src/components/__tests__/FormSectionManager.http.test.tsx --maxWorkers=1 --testNamePattern='derives membership when' --reporter=json --outputFile=/tmp/eduk12-form-section-candidate/reporter-r3-nested.json",
+      "exitCode": 0,
+      "passed": 1,
+      "filtered": 11,
+      "reporter": "candidate/reporter-r3-nested.json",
+      "log": "candidate/nested-r3.log"
+    },
+    {
+      "name": "initial app types",
+      "command": "node_modules/.bin/tsc -p tsconfig.app.json --noEmit",
+      "exitCode": 0,
+      "log": "candidate/types-app.log",
+      "boundary": "before adding the final supplementary test; no claim of final-input qualification"
+    },
+    {
+      "name": "final app types",
+      "command": "node_modules/.bin/tsc -p tsconfig.app.json --noEmit",
+      "exitCode": 0,
+      "log": "candidate/types-app-final.log"
+    },
+    {
+      "name": "changed-file lint",
+      "command": "node_modules/.bin/eslint src/components/FormSectionManager.tsx src/components/__tests__/FormSectionManager.http.test.tsx",
+      "exitCode": 0,
+      "log": "candidate/lint.log"
+    },
+    {
+      "name": "final supplementary test lint",
+      "command": "node_modules/.bin/eslint src/components/__tests__/FormSectionManager.http.test.tsx",
+      "exitCode": 0,
+      "log": "candidate/lint-final-test.log"
+    },
+    {
+      "name": "browser launch preflight",
+      "workingDirectory": "/workspace/eduK12-new-version",
+      "command": "node -e 'const {chromium}=require(\"./server-version/backend/node_modules/playwright-core\"); (async()=>{let browser;try{browser=await chromium.launch({executablePath:\"/usr/bin/chromium\",headless:true,chromiumSandbox:true,timeout:15000});console.log(JSON.stringify({status:\"LAUNCHED\",version:browser.version()}));}finally{await browser?.close();}})().catch(e=>{console.error(e.message);process.exitCode=1})'",
+      "status": "BLOCKED",
+      "nodeExitCode": null,
+      "shellWrapperExitCode": 0,
+      "boundary": "launch rejected; original wrapper printed the log with cat and its 0 is not browser success; no separate launch exit receipt",
+      "log": "baseline/browser-preflight.log"
+    }
+  ],
+  "notRun": ["GitHub CI", "production build", "compiled browser journey", "backend or SQL measurements", "database writes", "production deployment", "merge"]
+}
