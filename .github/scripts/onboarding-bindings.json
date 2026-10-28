@@ -1,577 +1,102 @@
 {
-  "pr": 374,
+  "pr": 376,
   "enabled": true,
-  "base": "8774b1cf158dae1c5eb0f4950044c6ae6d6a18dd",
-  "product": "3ad550800119b87ad355b52b5268a6fc38a542b0",
-  "controlCheckpoint": "acbc1a3ede385033d448fd53cbcd0a66dbb81935",
+  "base": "90c0a9a5c0ba24a5a9d8cb8003279dfb668650ba",
+  "product": "bbd83b20ef9a0a98863458147858c3e7254f238d",
+  "controlCheckpoint": "44e508c2cc8105d9f3c09ed06a0711cb3a9d93f0",
   "source": {
-    "docs/performance/four-entry-scale-probe-20261028/CI-PLAN.md": {
+    "docs/performance/education-observer-journeys-20261028/CI-PLAN.md": {
       "before": null,
-      "after": "0bacd793ec91414764ae61d5b1e9b63fef8ccada"
+      "after": "bb29b510921cdba45be13968513028fd11dd7018"
     },
-    "docs/performance/four-entry-scale-probe-20261028/PLAN.md": {
+    "docs/performance/education-observer-journeys-20261028/REVIEW.md": {
       "before": null,
-      "after": "b04180895223fefd1e43fd33f4f77ec027ca8721"
+      "after": "ef8a6ea283bffb4c9009f78b5b2cd267a16b9fe8"
     },
-    "docs/performance/four-entry-scale-probe-20261028/QUALIFICATION.md": {
+    "docs/performance/education-observer-journeys-20261028/evidence/backend-types-r1.json": {
       "before": null,
-      "after": "7dc3e8846b60249fac704fae0fb6c096345a12ee"
+      "after": "d4bfa0b238689bea1a728510ed56b59c58987eab"
     },
-    "docs/performance/four-entry-scale-probe-20261028/ROOT-REVIEW.md": {
-      "before": null,
-      "after": "f39d200b4d70f5930c2d326c985a5ee20a25c03b"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/cloud-candidate.json": {
-      "before": null,
-      "after": "d52b5740c4d945d5284852e49bb183ddc51377ff"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/cloud-evidence-index.json": {
-      "before": null,
-      "after": "6f668874f1d520627601e0adfeb254562cb9ee48"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/cloud-index-correction.json": {
-      "before": null,
-      "after": "6828ea9acc1bb96e89b2d0fac966f6d16ed08ce6"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/cloud-redactions.json": {
-      "before": null,
-      "after": "6088fb7e9863f6a5a30fc7ce262cc364da70fcef"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence-index.json": {
-      "before": null,
-      "after": "b9661d7e4b2f2e85c2ba5fe0fce10f66a052a72d"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/assignment-report.json": {
-      "before": null,
-      "after": "8ced1e53104ba6603754cd955902de9ef5972f9f"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/backend-types-cloud-r1-receipt.json": {
-      "before": null,
-      "after": "3ac26eb417750fa0f376398836d321bea4bef8d6"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/backend-types-cloud-r1.log": {
+    "docs/performance/education-observer-journeys-20261028/evidence/backend-types-r1.log": {
       "before": null,
       "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
     },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/backend-types-cloud-r2-receipt.json": {
+    "docs/performance/education-observer-journeys-20261028/evidence/observer-expert-http-r1-execution.json": {
       "before": null,
-      "after": "89aafd8d19a866c0996322e434d72d4cbd91fce3"
+      "after": "5cb9e75bf8089c39454fdfa935269eb8d4c8a438"
     },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/backend-types-cloud-r2.log": {
+    "docs/performance/education-observer-journeys-20261028/evidence/observer-expert-http-r1.json": {
       "before": null,
-      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+      "after": "93e81f1e9581a507bd2341c968d62714d1bd457c"
     },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/backend-types-r1.log": {
+    "docs/performance/education-observer-journeys-20261028/evidence/observer-http-r1-execution.json": {
       "before": null,
-      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+      "after": "b3af98df6235c80b5bd4a7f8aca761f0d62234f4"
     },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/browser-availability-r2.log": {
+    "docs/performance/education-observer-journeys-20261028/evidence/observer-http-r1.json": {
       "before": null,
-      "after": "9e2def194a7c4237663ce9acd0c31b3fc843b56a"
+      "after": "99d2385152718ec9d4c636f72f55e1241a15eace"
     },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/browser-availability.log": {
+    "docs/performance/education-observer-journeys-20261028/evidence/observer-http-r2-execution.json": {
       "before": null,
-      "after": "32a627cd85b9d281d1766b00b82860177e11f62e"
+      "after": "8054772adda2049fb776af4ec6ee7d5524b9eeea"
     },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-api-r2.stderr.log": {
+    "docs/performance/education-observer-journeys-20261028/evidence/observer-http-r2.json": {
       "before": null,
-      "after": "93df143a0bcd4effc5db47477509b4e362e743c3"
+      "after": "5f3219c7b3cdb09dd20390aabb90f5f8ca43aca6"
     },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-api-r2.stdout.log": {
+    "docs/performance/education-observer-journeys-20261028/evidence/observer-http-r3-execution.json": {
       "before": null,
-      "after": "c8cd7b56a3d1243b33abbc026667a6fcae60d5b0"
+      "after": "ec437f42a24da2ed91487660cb97256ed79a19f3"
     },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-api-ready.json": {
+    "docs/performance/education-observer-journeys-20261028/evidence/observer-http-r3.json": {
       "before": null,
-      "after": "6844a6ed7d3194a173eb53afad13c1816d7ec20c"
+      "after": "e9465a4cc328ff81cd026c4a204735902911b8e7"
     },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-api.stderr.log": {
+    "docs/performance/education-observer-journeys-20261028/evidence/observer-http-r4-execution.json": {
       "before": null,
-      "after": "a56a29d9b0245386f8d2fa441b6db7b501ea632a"
+      "after": "69508aa5fe70c91a932dca603858c4bb9731ce6e"
     },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-api.stdout.log": {
+    "docs/performance/education-observer-journeys-20261028/evidence/observer-http-r4.json": {
       "before": null,
-      "after": "084e9ee3d9dbb480d84e6324cc080b207d5d38b0"
+      "after": "f93e6289382aca5843650fc8909ef1c161002980"
     },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-api.ts.txt": {
+    "docs/performance/education-observer-journeys-20261028/evidence/observer-pg-r1-execution.json": {
       "before": null,
-      "after": "c422c6df25050861291961da402eab6cc91c3357"
+      "after": "6d348f74bf55728db0965a64e18eee8b6b292953"
     },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-assign-execution.json": {
+    "docs/performance/education-observer-journeys-20261028/evidence/observer-pg-r1.json": {
       "before": null,
-      "after": "19f2a7235f899c5fe7d1a99169161512b08a49e6"
+      "after": "2a6cbe4920d342269417eeef10486337f8862d2d"
     },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-assign.log": {
+    "docs/performance/education-observer-journeys-20261028/input-index.json": {
       "before": null,
-      "after": "314925a741fc39c4fdb1f9424b6781bf75f4e9f7"
+      "after": "b4242f28ebbef30615259cd2293ec7956354dec4"
     },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-assign.ts.txt": {
+    "server-version/backend/src/__tests__/integration/educationObserverHttp.postgres.integration.test.ts": {
       "before": null,
-      "after": "805884499c69965df68195b5689935a06491e400"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-axis-execution.json": {
-      "before": null,
-      "after": "48ef8c008a1e3fc680d348de006a872f54a3944d"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-axis-r2-execution.json": {
-      "before": null,
-      "after": "fc1279a2f83a6c86bf146becbb7d6b8b14e9ceac"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-axis-r2.json": {
-      "before": null,
-      "after": "5cef284306168fbe349bf1a030e1ec6af9beda66"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-axis-r2.log": {
-      "before": null,
-      "after": "a813a6f231808526a3b890b53086f55f7bbbaa17"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-axis-r2.ts.txt": {
-      "before": null,
-      "after": "3725104335ca70d59d06f1eb2f8c7999e7e3dc7b"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-axis.json": {
-      "before": null,
-      "after": "79e6f8d702e187538d42958a3c0c1897abee5219"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-axis.log": {
-      "before": null,
-      "after": "84647d5a344ab6dfc0c8258a285d4b7ed355827a"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-axis.ts.txt": {
-      "before": null,
-      "after": "927305aa3164fec0fa3c64a8887dce5aafb2230d"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-browser-preflight-r2-execution.json": {
-      "before": null,
-      "after": "07db2d7ae91923c5ced76531afa639b69d084395"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-browser-preflight-r2.log": {
-      "before": null,
-      "after": "75953195ca8a2c93df0e82f4f69e38d06a6e16d5"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-browser-preflight.cjs.txt": {
-      "before": null,
-      "after": "7112c053f9cbf0add1afa136546644124adbefad"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-education-execution.json": {
-      "before": null,
-      "after": "ee0a7055a8eaf2c4a4e856c73544fdced55372e2"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-education.log": {
-      "before": null,
-      "after": "e6cd6affa81d19bf0a5f14956475f502cb230421"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-education.ts.txt": {
-      "before": null,
-      "after": "8e5802676e091a7fa5f3088135231c81d818a54f"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-environment.json": {
-      "before": null,
-      "after": "699eb54e92722ccb972e7ccca8f46ba66b9bdcf4"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-guards-execution.json": {
-      "before": null,
-      "after": "71269ec57efb33af8a37d8c0c05dc34abafd30c4"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-guards-r1.json": {
-      "before": null,
-      "after": "3c5253fca7b56e9439786a4e85c31483f52771da"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-guards-r2-execution.json": {
-      "before": null,
-      "after": "0e1565238fe818fef1d1f4572c85d34c29ae06ba"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-guards-r2.json": {
-      "before": null,
-      "after": "04e08d45d2f97f6062bbee958ed92bc20f3c28d1"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-guards-r2.log": {
-      "before": null,
-      "after": "fc3b998f96cb86f4ec35d6e533156d0a152cdb33"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-guards-r2.ts.txt": {
-      "before": null,
-      "after": "1a9260417774921394234c85a54d50917fd7bef0"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-guards.log": {
-      "before": null,
-      "after": "dfd0fb644439aca63e57485b30a9bc9ef952a00d"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-guards.ts.txt": {
-      "before": null,
-      "after": "31b512c3fc4ef352c7e6820d9e7678340be53a03"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-http-r1-execution.json": {
-      "before": null,
-      "after": "e64171997a2027646672b83e1366a2241b4d76bd"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-http-r1.json": {
-      "before": null,
-      "after": "5d1df0ed15912e3f3cc41cfbe5f248b0e2b8d469"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-http-r1.log": {
-      "before": null,
-      "after": "16ad33e26552bfeffa6ec1a14c0f0426277bf45a"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-http-r1.ts.txt": {
-      "before": null,
-      "after": "f6b0c8c0c50b9fe133b9dc5b5e03110d9f3e1b1e"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-http-r2-execution.json": {
-      "before": null,
-      "after": "ef61015bdcd8b2b0e39cca196f66b6b3f71edbb1"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-http-r2.json": {
-      "before": null,
-      "after": "cd029e175b6b3fab61e631dcdcfd2a7dbdfdb179"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-http-r2.log": {
-      "before": null,
-      "after": "0ce0ffa6fc5afc86bb7b974fdbf4fe9166384ef5"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-http-r2.ts.txt": {
-      "before": null,
-      "after": "4491d6519eeb73df42d02cfddf7deb0f6e9b17fc"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-http-r3-execution.json": {
-      "before": null,
-      "after": "d26f8b2eb5de17842e11ae93fb6372e86874b8e4"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-http-r3.json": {
-      "before": null,
-      "after": "7ecea6934c8543d4a65e7aa0aa1f33c72b0053ce"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-http-r3.log": {
-      "before": null,
-      "after": "e5606ef699f2f696db3f0e9598ada820d8d46551"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-http-r3.ts.txt": {
-      "before": null,
-      "after": "c6c73b795c69bb1f81f44125852ec0d9faec8cbf"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-load-c1.cjs.txt": {
-      "before": null,
-      "after": "818b509583a648b98dac515657b515acea217d50"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-more-execution.json": {
-      "before": null,
-      "after": "8cbe7d665a3fc1c09e889d463da8c7ec939f0d20"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-more-r1.json": {
-      "before": null,
-      "after": "b7ce2fb9d7ebf4dc3ba52fe8a78f7fc6c83676e5"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-more-r2-execution.json": {
-      "before": null,
-      "after": "ef8d7373d32b85a5f05d470838f75ce47016f5e1"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-more-r2.json": {
-      "before": null,
-      "after": "4ac8e5a4987caf70475e7d33601d0eb2dbb3c516"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-more-r2.log": {
-      "before": null,
-      "after": "0f1a846c217cbe46d66b67b298dceaa8bb72fa5a"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-more-r2.ts.txt": {
-      "before": null,
-      "after": "0db8c1d04c09c871e769aba5cfd7d7477b64fad3"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-more-r3-execution.json": {
-      "before": null,
-      "after": "21974249175bec8e3e729bc019ac4b7f8c7db62a"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-more-r3.json": {
-      "before": null,
-      "after": "6c2e4f99c6afdd3fde39b06facd9cc0aa4b00ca0"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-more-r3.log": {
-      "before": null,
-      "after": "7002f7593d53f449686019a627eb0cbf7a427870"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-more-r3.ts.txt": {
-      "before": null,
-      "after": "4934708c5b0d6fee97bb14bcbf89550610882549"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-more.log": {
-      "before": null,
-      "after": "02b59260f0ef1aa577007accebfeb85afb74bc9d"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-more.ts.txt": {
-      "before": null,
-      "after": "411cb39b723cc4678208bb986d4f33ed40df6356"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-prepare-execution.json": {
-      "before": null,
-      "after": "40c4f092457ca610895395c5fd7eb5edd6ffa8cf"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-prepare.log": {
-      "before": null,
-      "after": "9bd39464c796d5b9058b5e1d4e46838496cc7055"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-prepare.ts.txt": {
-      "before": null,
-      "after": "33e56117f96ca5c768db12c77d00cffef6e07590"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-run.py.txt": {
-      "before": null,
-      "after": "5cbe9cff1ecd108a4abe2d150ffb68ce5e22aab5"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-runtime-state.json": {
-      "before": null,
-      "after": "138312b8b8198b7cc886e917e1a9cf5dbc3cae93"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-schema-migrate.log": {
-      "before": null,
-      "after": "b40dab5ba422a828d4726a940ee61972b7e15059"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-services-pg.log": {
-      "before": null,
-      "after": "b1682d8228e704cb6f05803c3a86d2ae6251b8c6"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-services-redis.log": {
-      "before": null,
-      "after": "ae95c1d5080a6b90ec861948a1c58ad9e4767a27"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-setup.py.txt": {
-      "before": null,
-      "after": "5bd365c27943ed86a24a2cb60c616d6580e8cd78"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-teacher-new-execution.json": {
-      "before": null,
-      "after": "3b36ccafa532406cdddd6e03706d7934e63a4d7a"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-teacher-new-r2-execution.json": {
-      "before": null,
-      "after": "92d47d15c410b3ed58a43707d767c1f202a27fe1"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-teacher-new-r2.log": {
-      "before": null,
-      "after": "5069b7a639b191b8559ab6521f4fe13f44d085a1"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-teacher-new-r2.ts.txt": {
-      "before": null,
-      "after": "54e0bfbd8bd7e53f11454a3ca3ec1d3d7beb56d3"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-teacher-new.log": {
-      "before": null,
-      "after": "cd36bc7f79b9886d897eef70bbc9a1338594dbb0"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-teacher-new.ts.txt": {
-      "before": null,
-      "after": "803cfdb6029ecb13a8d49905816ef154896f2886"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/cloud-tools.json": {
-      "before": null,
-      "after": "b6d557101e8de78698946c5cb31976df70d3695b"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/database-setup.json": {
-      "before": null,
-      "after": "9d7bc130970d121fdda6d787bb7b4e4b66f4e5f4"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/education-continuation.json": {
-      "before": null,
-      "after": "44697c86cc943ce212031a73ab0c54862de90f32"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/frontend-types-r1-retrospective-receipt.json": {
-      "before": null,
-      "after": "f358102ff4b31c78424074ce6aed1bccf0f63385"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/frontend-types-r1.log": {
-      "before": null,
-      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/instruction-r1.json": {
-      "before": null,
-      "after": "abead48da2b7e68c7950d0ed20cafa9eb09a05a6"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/instruction-r1.log": {
-      "before": null,
-      "after": "045cdd095027d0978e19caf2af51fecafa67141d"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/labels-backend.json": {
-      "before": null,
-      "after": "631b9e5076664f0856dc53985501d5d27e8a58ab"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/labels-backend.log": {
-      "before": null,
-      "after": "6fa5029abd1f47b6c23875cad4f5419aedec398d"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/labels-frontend-r1.json": {
-      "before": null,
-      "after": "9744cee1ed79ac060418f5df9daf14314d0c150f"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/labels-frontend-r1.log": {
-      "before": null,
-      "after": "17e199f853e74738e354d8b7998d3db584cd18ac"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/labels-frontend-r2.json": {
-      "before": null,
-      "after": "4da0609934a1d114925f76ca93e59383f50f026f"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/labels-frontend-r2.log": {
-      "before": null,
-      "after": "eb2f86177cced9a48bf17065e4ea29ad7f29b266"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/prepare-report.json": {
-      "before": null,
-      "after": "7ae799723b264548cf43ffb9f698040757c4c769"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/run-target-report-pg.py.txt": {
-      "before": null,
-      "after": "f795801326b92164008895ac2c8b4f8a9573edd1"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/self-identity-legacy-r2.json": {
-      "before": null,
-      "after": "b02f972e8e3dcd99a35b016adcc226aaa2ff77d1"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/self-identity-legacy-r2.log": {
-      "before": null,
-      "after": "bf1e455fefd567d945699dd528832b49e345ccb7"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/self-identity-legacy.json": {
-      "before": null,
-      "after": "c6bf0e76114c75676cade90a0ab57148b8d71ab1"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/self-identity-legacy.log": {
-      "before": null,
-      "after": "e8ac448ebd51c5af40e4ab3d42f5f9401391dd7d"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/self-identity.json": {
-      "before": null,
-      "after": "55b47d76632a90cd8bd56ffa8bb33b0dda56fa45"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/self-identity.log": {
-      "before": null,
-      "after": "60a679149cb21b0d6b54b3d1317dd683f0c3304e"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/target-report-pg-migrate.log": {
-      "before": null,
-      "after": "733f13b4418a6ac0f587c33e54c61465993e85e4"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/target-report-pg-r1-execution.json": {
-      "before": null,
-      "after": "707ed82fd2ee5b1a30177d725fa24921a6c89fcb"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/target-report-pg-r1.json": {
-      "before": null,
-      "after": "bc8379f95fafd65dce81151b39718b93fc5949ec"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/target-report-pg-r1.log": {
-      "before": null,
-      "after": "ea95091c6cb62d978810c67f80f514de31e1fa57"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/target-report-pg-services.log": {
-      "before": null,
-      "after": "ed5eae33363999d95d2ce1e38f0fa6ed5bea7357"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/target-report-unit-r1.json": {
-      "before": null,
-      "after": "1fd92fff873b2726a1dfe63d7d7d3f9a2c118847"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/target-report-unit-r1.log": {
-      "before": null,
-      "after": "199df235897103ce30ac3af68a807a2ea401e3f2"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/target-report-unit-r2.json": {
-      "before": null,
-      "after": "1e68e7a2676353790a4bc4c2e746ed13a78a89e8"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/target-report-unit-r2.log": {
-      "before": null,
-      "after": "c5164f2de8c68c37d27c4b1120b79f47c4bc7b9c"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/teacher-new-assignment.json": {
-      "before": null,
-      "after": "3f18fc6b69e9411a13543a64d52bdb7bc3dcf22d"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/evidence/teacher-new-r2-assignment.json": {
-      "before": null,
-      "after": "ae97a3ff8d634c146fb0273f40ae48f40ff53de6"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/fixtures/c1-source.json": {
-      "before": null,
-      "after": "ad7f273512fae42aab9a129b319c04af7110d040"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/fixtures/manifest.json": {
-      "before": null,
-      "after": "7ce52e240ea63cc1cff17961ceb3d610bb9f8296"
-    },
-    "docs/performance/four-entry-scale-probe-20261028/root-review.json": {
-      "before": null,
-      "after": "4e71d2068a79736a14375953ee59ed618584056d"
-    },
-    "server-version/backend/src/__tests__/assessment-run/start-admission.test.ts": {
-      "before": "35299b2e0b946fb929794bdb7fa7539412425d95",
-      "after": "9ecc3362659fe9399d375ccc00d8f08af431a6c0"
-    },
-    "server-version/backend/src/__tests__/education-tools/assessment-resource.standard-marker.postgres.integration.test.ts": {
-      "before": "b932db1d53c3899ffae6a0ecb52f3f88ff56e5eb",
-      "after": "8db5039605547193526ed1563bb19d87a0002247"
-    },
-    "server-version/backend/src/__tests__/measurement-content/education-content-scope.test.ts": {
-      "before": "a5494c01b4e75cba15081ad8a4438e31ff9c2f7e",
-      "after": "090d0990a51d97aa52018993b9fb8cf937be2544"
-    },
-    "server-version/backend/src/__tests__/measurement-content/survey-participant-feedback.test.ts": {
-      "before": "4c0c920f06cefaf16dd5ddda2010c009de8b9651",
-      "after": "d09159b0c28c135dc25e0b5358c3936387d72342"
-    },
-    "server-version/backend/src/modules/assessment-run/startAdmission.ts": {
-      "before": "9532a7f31807c5327763ca4223464a55168c9fe5",
-      "after": "a64af731f588848668b2bdbeb4f4fc5bba6d7991"
-    },
-    "server-version/backend/src/modules/assessment-run/startExecution.ts": {
-      "before": "2c57e5935e521bddd71833150335db2634f9bbe9",
-      "after": "371f82dbc0380692d2512a05a09768a1bcc689ca"
-    },
-    "server-version/backend/src/modules/composite/training-report-selection.ts": {
-      "before": "c3a28dbdfef84dd12181583b150449506b248cb8",
-      "after": "ffaf688552c8ef49f68595593e3862a02576e55f"
-    },
-    "server-version/backend/src/modules/survey/participant-feedback.ts": {
-      "before": "88c286b5d6b30a22ee3ea12fcbac03729b3da276",
-      "after": "9e00f3821682b134dd5b4b0504aa2d3a34397929"
-    },
-    "server-version/frontend/src/components/FinalCompositeAssessment.tsx": {
-      "before": "23c1cd4834a2bcde961d44cbffe6790c5955a3e3",
-      "after": "399137382d9e454f0ee452838fa664d993ffc562"
-    },
-    "server-version/frontend/src/components/__tests__/FinalCompositeAssessment.test.tsx": {
-      "before": "156f5b079c663bdb2df89f707ae1a09d5a674526",
-      "after": "f12d02acc20f457a4b5cd22e298afb3934e0512a"
-    },
-    "server-version/frontend/src/modules/reporting/ScaleUnitReportCard.legacy.tsx": {
-      "before": "09275fba97785f08afb62b5ae89d99024faa7baf",
-      "after": "73a110b6b06bc08388216683d41846a748eccc2d"
+      "after": "f9b6dfa2b6fa7a10810de527a172226aae8bd343"
     },
     "server-version/frontend/src/modules/reporting/report-ui.css": {
-      "before": "d6b1d286d2a6f36b5cf438a8a61e78f823195290",
-      "after": "a876bba2f434287b0104c903ab871ec95da689c7"
-    },
-    "server-version/frontend/src/survey/SurveyPublicApp.final.test.tsx": {
-      "before": "a3fbe163cdacc08a440e1d0f05e8b5f0ab15c893",
-      "after": "91452b4b56f7c0dcbf0ed3b38bf4f6ee53cab397"
-    },
-    "server-version/frontend/src/survey/SurveyPublicApp.tsx": {
-      "before": "af6ac0694afe40fa866753099577d67d2f1f5e71",
-      "after": "29df78219154c147698e1221efdc72c11a7a641f"
+      "before": "a876bba2f434287b0104c903ab871ec95da689c7",
+      "after": "342a17528ce99369bc44ddeca98e65a8f0e34557"
     }
   },
   "controlBefore": {
     ".github/scripts/content-scope.mjs": "31a340af23927250b9a40f6097b3815d617c70ec",
     ".github/scripts/merge-gate.mjs": "985c744ac800aa425323db1c57010e64d0d69a8e",
-    ".github/scripts/onboarding-bindings.json": "5c8d59663b6678b0b2b755788e78587048e648f2",
-    ".github/scripts/onboarding-checks.mjs": "4957899eab13abedd2a409515f2fe133a973684f",
-    ".github/scripts/onboarding-controls.test.mjs": "24184d9c5f4df0fa64c9910a4b7c17402a4ad7c3",
-    ".github/scripts/onboarding-evidence.json": "b6f443683d7a67245675420c1bd3ac028365e900",
-    ".github/scripts/onboarding-scope.mjs": "0a6caf66f619076fc65ab5f4a5f43f7bea388ab9",
-    ".github/scripts/pr374-browser.mjs": null,
-    ".github/scripts/pr374-evidence.mjs": null,
-    ".github/workflows/ci.yml": "0a324bc5b6f4989f73b72e7ed444823d03bd40ea"
+    ".github/scripts/onboarding-bindings.json": "ad3ffbc86208cb050ca22fa092dae7a3740caadf",
+    ".github/scripts/onboarding-checks.mjs": "27f7a30c62a281b4c9bb7a13269071e98cebd7a8",
+    ".github/scripts/onboarding-controls.test.mjs": "265054ed0610d86c3a25ecbc1695c27a55d2a29e",
+    ".github/scripts/onboarding-evidence.json": "05a3e5f117f8e396bd1da502d2d8fc76caba0de8",
+    ".github/scripts/onboarding-scope.mjs": "4abe4f62ba1d2c7df6ed7d42ecf1ac193cab0358",
+    ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
+    ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
+    ".github/scripts/pr376-browser.mjs": null,
+    ".github/workflows/ci.yml": "ec2b0dfa45ad754aea9f16bf8aa2801128b71543"
   },
   "components": {
-    "backend": "6f6089b4aa3b4a98489e0fe7d8022cb7e689eb64",
-    "frontend": "562544f471ea6a7fbab998a5eea7ee2458a67eb8"
+    "backend": "e2812baf6d8ff641ff40f32443ee318a56e28563",
+    "frontend": "b2edc1c7d8d2b84866eb7a0096209c78e86bb105"
   }
 }
