@@ -1,0 +1,48 @@
+{
+  "mainSha": "c412baf",
+  "contentSha": null,
+  "mainExact": [],
+  "contentExact": [],
+  "related": [
+    {
+      "newFamily": "kims39",
+      "existing": "ffmq15_zh_cn_research",
+      "relation": "FFMQ-15（五因素正念）为候选清单中的正念家族工具；KIMS 是不同测量工具（四技能、39题），同属正念构念家族，不共享题本或计分，不能合并解读。"
+    },
+    {
+      "newFamily": "kims39",
+      "existing": "chime_s24_zh_cn_research",
+      "relation": "CHIME-SF24 也是正念相关候选；与 KIMS 分属不同工具家族，不得混用维度名或分数。"
+    },
+    {
+      "newFamily": "dts15",
+      "existing": "ders16_bjureberg_zh_cn_research",
+      "relation": "DERS-16 测量情绪调节困难（候选清单在库）；DTS 测量痛苦耐受评价。相邻但不同构念，不得互相替代或合成。"
+    },
+    {
+      "newFamily": "dts15",
+      "existing": "ders_sf18_zh_cn_research",
+      "relation": "DERS-SF18 与 DTS 相邻不同家族；理由同 DERS-16。"
+    },
+    {
+      "newFamily": "atq30",
+      "existing": "cross_domain_talent_beliefs_zh_cn",
+      "relation": "talent beliefs 测量稳定信念；ATQ 测量近一周自动思维频率。时间框架与构念层次不同，不得合并。"
+    },
+    {
+      "newFamily": "bsl23",
+      "existing": "dass21_zh_cn",
+      "relation": "DASS-21 为一般抑郁焦虑压力症状筛查（已在库）；BSL-23 为边缘型症状结局指标，面向成人临床研究，两者人群与用途不同，不得互推。"
+    },
+    {
+      "newFamily": "atq30",
+      "existing": "PLANNED:cats40",
+      "relation": "CATS（儿童自动思维量表）为计划中的儿童青少年版本；与 ATQ 成人版分属不同人群工具，中文路径未交付前不得混用。"
+    },
+    {
+      "newFamily": "dts15",
+      "existing": "PLANNED:dts_subscales",
+      "relation": "DTS 四因子（Tolerance/Absorption/Appraisal/Regulation）题项归属未经原论文核实；未核实前不得在产品中提供分量表分。"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-28",
+  "method": "每个家族的 golden cases 由 build_native.py 按其内嵌计分模型生成；scoring.py 为独立实现；test_scoring.py 断言两者一致（极值、逐题翻转、缺答、非法值、样例）。原生定义另做 JSON 结构断言（题数、反向集、分数键、golden 值）。TypeScript 编译与运行时引擎复算由集成方完成。",
+  "families": [
+    {
+      "family": "atq30",
+      "instrumentKey": "atq30@1.0.0",
+      "goldenCases": 4,
+      "testsPassed": true,
+      "expectedTotals": { "all-keyed-min": 30, "all-keyed-max": 150, "sample-nsne4-rest2": 74, "missing-total": null }
+    },
+    {
+      "family": "kims39",
+      "instrumentKey": "kims39@1.0.0",
+      "goldenCases": 4,
+      "testsPassed": true,
+      "expectedSubscales": {
+        "all-keyed-min": { "observe": 12, "describe": 8, "act_awareness": 10, "accept_without_judgment": 9 },
+        "all-keyed-max": { "observe": 60, "describe": 40, "act_awareness": 50, "accept_without_judgment": 45 },
+        "sample-observe4-rest3": { "observe": 48, "describe": 24, "act_awareness": 30, "accept_without_judgment": 27 },
+        "missing-describe": "invalid"
+      }
+    },
+    {
+      "family": "bsl23",
+      "instrumentKey": "bsl23@1.0.0",
+      "goldenCases": 4,
+      "testsPassed": true,
+      "expectedTotals": { "all-keyed-min": 0, "all-keyed-max": 92, "sample-odd1-even2": 34, "missing-total": null }
+    },
+    {
+      "family": "dts15",
+      "instrumentKey": "dts15@1.0.0",
+      "goldenCases": 4,
+      "testsPassed": true,
+      "expectedMeans": { "all-keyed-min": 5.0, "all-keyed-max": 1.0, "sample-234-bands": 3.0, "missing-total": null }
+    }
+  ],
+  "goldenCaseTotal": 16
+}

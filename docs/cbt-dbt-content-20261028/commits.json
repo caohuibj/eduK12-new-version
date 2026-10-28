@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-28",
+  "baselineMain": "c412baf",
+  "families": [
+    {
+      "family": "atq30",
+      "commit": "d6d1431",
+      "message": "content(scale): stage ATQ-30 en frequency draft with scoring, golden cases and report sample [skip ci]"
+    },
+    {
+      "family": "kims39",
+      "commit": "306d8df",
+      "message": "content(scale): stage KIMS-39 en draft with official subscale keys, golden cases and report sample [skip ci]"
+    },
+    {
+      "family": "bsl23",
+      "commit": "c6982f4",
+      "message": "content(scale): stage BSL-23 en research draft with official scoring letter key, golden cases and safety-focused report sample [skip ci]"
+    },
+    {
+      "family": "dts15",
+      "commit": "3bab5bb",
+      "message": "content(scale): stage DTS-15 en draft with uniform-reverse total mean, subscales pending verification, golden cases and report sample [skip ci]"
+    }
+  ]
+}

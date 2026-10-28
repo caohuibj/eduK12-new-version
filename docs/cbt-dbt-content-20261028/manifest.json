@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-10-28",
+  "actualDatabaseImport": false,
+  "published": false,
+  "ciTriggered": false,
+  "toolFamilies": 4,
+  "exactVersions": 4,
+  "executableDrafts": 4,
+  "catalogOnly": 0,
+  "nativeGoldenCases": 16,
+  "reportSamples": 4,
+  "tools": [
+    {
+      "family": "atq30",
+      "name": "ATQ-30",
+      "category": "CBT认知机制/自动思维频率自评",
+      "fullTextSource": "https://dradamvolungis.com/wp-content/uploads/2020/06/automatic-thoughts-questionnaire.pdf",
+      "wordingAndScoring": "PASS",
+      "report": "NATIVE_TEMPLATE_AND_STATIC_SAMPLE",
+      "commit": "d6d1431",
+      "versions": [
+        {
+          "key": "atq30",
+          "version": "1.0.0",
+          "itemCount": 30,
+          "locale": "en",
+          "executable": true
+        }
+      ]
+    },
+    {
+      "family": "kims39",
+      "name": "KIMS-39",
+      "category": "DBT正念技能自评（观察/描述/有觉知行动/不评判接纳）",
+      "fullTextSource": "https://www.ruthbaer.com/academics/KIMS.pdf",
+      "wordingAndScoring": "PASS",
+      "report": "NATIVE_TEMPLATE_AND_STATIC_SAMPLE",
+      "commit": "306d8df",
+      "versions": [
+        {
+          "key": "kims39",
+          "version": "1.0.0",
+          "itemCount": 39,
+          "locale": "en",
+          "executable": true
+        }
+      ]
+    },
+    {
+      "family": "bsl23",
+      "name": "BSL-23",
+      "category": "DBT临床症状结局（边缘型症状强度，成人临床研究用）",
+      "fullTextSource": "https://depts.washington.edu/uwbrtc/wp-content/uploads/Borderline-Symptom-List-BLS-23.pdf",
+      "wordingAndScoring": "PASS",
+      "report": "NATIVE_TEMPLATE_AND_STATIC_SAMPLE",
+      "commit": "c6982f4",
+      "versions": [
+        {
+          "key": "bsl23",
+          "version": "1.0.0",
+          "itemCount": 23,
+          "locale": "en",
+          "executable": true
+        }
+      ]
+    },
+    {
+      "family": "dts15",
+      "name": "DTS-15",
+      "category": "DBT心理机制/痛苦耐受评价自评",
+      "fullTextSource": "https://healccc.com/wp-content/uploads/2022/10/EEC_00_Distress-Tolerance-Scale.pdf",
+      "wordingAndScoring": "PASS_TOTAL_ONLY_SUBSCALES_PENDING",
+      "report": "NATIVE_TEMPLATE_AND_STATIC_SAMPLE",
+      "commit": "3bab5bb",
+      "versions": [
+        {
+          "key": "dts15",
+          "version": "1.0.0",
+          "itemCount": 15,
+          "locale": "en",
+          "executable": true
+        }
+      ]
+    }
+  ]
+}
