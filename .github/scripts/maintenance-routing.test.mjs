@@ -61,7 +61,9 @@ test('maintenance dependency assertion matches a complete needs item, never a su
 test('normal scheduler runs maintenance for pure attachment changes and keeps application checks for mixed changes',()=>{
   const ci=source('ci'),lane=source('ci-maintenance');
   assert.match(job(ci,'maintenance'),/outputs\.maintenance == 'true'/);
-  assert.match(job(ci,'merge-gate'),maintenanceNeeds);
+  // The current merge gate declares its needs as a multiline YAML sequence.
+  // Require the exact "maintenance" item after "scope"; suffixes still fail.
+  assert.match(job(ci,'merge-gate'), /^    needs:\n    - scope\n(?:    - [a-z][a-z0-9-]*\n)*    - maintenance\n/m);
   for(const name of ['pr-light-backend','pr-light-frontend','post-merge-smoke','backend',
     'backend-regression','frontend','docker','miniprogram'])
     assert.match(job(ci,name),/outputs\.maintenance != 'true'/,name);
