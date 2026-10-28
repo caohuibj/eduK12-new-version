@@ -37,11 +37,12 @@ describe('ANT guided practice frozen identity',()=>{
   expect(antGuidedConfigSchema.safeParse(antConfig('experience')).success).toBe(false)
   expect(antGuidedConfigSchema.safeParse({...config,practicePolicy:{...config.practicePolicy,minimumCorrect:1}}).success).toBe(false)
  })
- it.each(['research','experience'] as const)('freezes %s display names while leaving product delivery disabled',profile=>{
+ it.each(['research','experience'] as const)('freezes %s display names while admitting the implemented authenticated native transport only',profile=>{
   const resource=getCognitiveTaskResource('ant','1.1.0','1.1.0')!
   if(resource.kind!=='native')throw Error('Expected native definition')
   expect(resource.configVersion).toBe('1.1.0');expect(resource.definition).toBe(antGuidedDefinition)
-  expect(()=>assertNativeDeliverySupported(resource,'authenticated')).toThrow()
+  expect(()=>assertNativeDeliverySupported(resource,'authenticated')).not.toThrow()
+  expect(()=>assertNativeDeliverySupported(resource,'public')).toThrow()
   const frozen=freezeNativeAssignmentProfile({resource,profile,baseConfig:antGuidedConfig(profile)}),snapshot=readFrozenReport(frozen.resolvedReportSnapshotEncrypted)!
   const session=createAntGuidedSnapshot(profile),score=scoreAntGuided({session,config:session.config,randomSeed:seed,trials:records(session.config)})
   const report=projectThreeLayerReport({participantPresentation:snapshot.participantPresentation,testType:'ant',engineVersion:ANT_GUIDED_IDENTITY.engineVersion,

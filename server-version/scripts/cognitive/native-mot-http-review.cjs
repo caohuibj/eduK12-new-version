@@ -2,10 +2,10 @@
 // Cloud-only synthetic HTTP slice. Never starts production index, workers or external COS.
 const path=require('node:path'),{randomUUID,createHash}=require('node:crypto'),{createRequire}=require('node:module')
 const backend=path.resolve(__dirname,'../../backend'),requireBackend=createRequire(path.join(backend,'package.json'))
-async function createNativeMotHttpReview({port=18855}={}){
+async function createNativeMotHttpReview({port=18855,contentTestType}={}){
  const url=process.env.COGNITIVE_HTTP_DB_URL||'postgresql://postgres@127.0.0.1:15433/cognitive_native_test?schema=cognitive_http_20261026'
  const parsed=new URL(url)
- if(!['127.0.0.1','localhost'].includes(parsed.hostname)||parsed.port!=='15433'||parsed.pathname!=='/cognitive_native_test'||parsed.searchParams.get('schema')!=='cognitive_http_20261026')throw Error('Dedicated loopback HTTP fixture schema required')
+ if(!['127.0.0.1','localhost'].includes(parsed.hostname)||parsed.port!=='15433'||parsed.pathname!=='/cognitive_native_test'||!['cognitive_http_20261026',...(contentTestType?['batch3']:[])].includes(parsed.searchParams.get('schema')))throw Error('Dedicated loopback HTTP fixture schema required')
  requireBackend('dotenv').config=()=>({parsed:{}})
  Object.assign(process.env,{NODE_ENV:'test',DATABASE_URL:url,REDIS_URL:'redis://127.0.0.1:16380',DATA_ENCRYPTION_KEY:'a'.repeat(64),DATA_PSEUDONYM_KEY:'b'.repeat(64),JWT_SECRET:'synthetic-http-review-jwt-secret-at-least-32',ASSET_SIGNING_SECRET:'synthetic-http-review-asset-secret-at-least-32',COGNITIVE_MODULE_ENABLED:'true',BACKGROUND_WORKERS_ENABLED:'false'})
  requireBackend('tsx/cjs');requireBackend('tsx/esm/api').register()
@@ -19,7 +19,14 @@ async function createNativeMotHttpReview({port=18855}={}){
  for(const [actor,role] of [['teacher','TEACHER'],['student','STUDENT'],['publisher','ADMIN'],['outsider','STUDENT']])actorRows[actor]=await db.user.create({data:{username:prefix+'-'+actor,passwordHash:'synthetic-not-login',role,platformRole:role==='ADMIN'?'SYSTEM_ADMIN':'STANDARD',isActive:true,teacherApproved:true}})
  course=await db.course.create({data:{title:prefix,courseCode:randomUUID(),creatorId:actorRows.teacher.id}})
  await db.courseStudent.create({data:{courseId:course.id,studentId:actorRows.student.id,status:'ACTIVE'}})
- const seeded=await requireBackend(path.join(backend,'prisma/seeds/native-cognitive')).seedNativeMotConfig(db);configId=seeded.config.id;createdConfig=seeded.created
+ let seeded
+ if(contentTestType){
+  const seed=source('modules/cognitive/content-candidates/native-registry/config-seeds').nativeCognitiveConfigSeeds.find(s=>s.testType===contentTestType)
+  const bridge=seed&&source('modules/cognitive/content-candidates/native-registry/definitions').getNativeContentDefinition(seed.testType,seed.engineVersion,seed.scoringVersion)
+  if(!seed||!bridge)throw Error('Only exact bridged content fixtures are supported')
+  seeded={config:await db.cognitiveTestConfig.create({data:seed}),created:true}
+ }else seeded=await requireBackend(path.join(backend,'prisma/seeds/native-cognitive')).seedNativeMotConfig(db)
+ configId=seeded.config.id;createdConfig=seeded.created
  if(createdConfig)await source('modules/cognitive/release.service').publishCognitiveConfig(configId,actorRows.publisher.id)
  else if(seeded.config.status!=='PUBLISHED')throw Error('Existing dedicated HTTP seed is not published')
  const errors=[]
@@ -39,6 +46,7 @@ async function createNativeMotHttpReview({port=18855}={}){
  app.get('/__review/context',(_req,res)=>res.json({assignmentId:assignment.id,studentId:actorRows.student.id,courseId:course.id,profile:'experience',apiBase:'/api/cognitive',fixture:'synthetic-real-http-slice'}))
  app.get('/__review/login',(req,res)=>{const actor=String(req.query.actor||'student');if(!actorRows[actor]||actor==='publisher')return res.sendStatus(400);res.setHeader('Set-Cookie',cookie(actor)+'; Path=/; HttpOnly; SameSite=Lax');res.json({actor,id:actorRows[actor].id})})
  app.post('/__review/archive-mode',(req,res)=>{const n=req.body?.failUploads;if(!Number.isInteger(n)||n<0||n>10)return res.sendStatus(400);failUploads=n;res.json({failUploads})})
+ app.get('/__review/archived-fixture',(_req,res)=>res.json([...buffers.values()].map(buffer=>source('modules/cognitive/cognitive.security').decryptCognitivePayload(buffer.toString()))))
  app.get('/__review/archive-state',async(_req,res)=>res.json({calls,successes,failUploads,ownedAssetCount:await db.storedAsset.count({where:{id:{in:assetIds}}})}))
  app.get('/api/auth/me',authenticate,authController.me)
  app.use('/api/cognitive/sessions/:id/raw-archive',createCognitiveRawArchiveRouter({db,storeAsset:fakeStore,discardUnreferencedAsset:assets.discardUnreferencedAsset}))
@@ -59,8 +67,8 @@ async function createNativeMotHttpReview({port=18855}={}){
   const rel=[];await db.cognitiveSession.deleteMany({where:{assignmentId:assignment.id}});const ar=await db.cognitiveAssignment.findUnique({where:{id:assignment.id}});if(ar?.measurementReleaseId)rel.push(ar.measurementReleaseId)
   await db.cognitiveAssignment.delete({where:{id:assignment.id}})
   if(createdConfig){const cr=await db.cognitiveTestConfig.findUnique({where:{id:configId}});if(cr?.measurementReleaseId)rel.push(cr.measurementReleaseId);await db.cognitiveTestConfig.delete({where:{id:configId}})}
-  if(rel.length)await db.$executeRawUnsafe('DELETE FROM measurement_content_releases WHERE id = ANY($1::text[])',rel)
-  await db.courseStudent.deleteMany({where:{courseId:course.id}});await db.course.delete({where:{id:course.id}});await db.user.deleteMany({where:{id:{in:Object.values(actorRows).map(u=>u.id)}}});await cacheService.close();await db.$disconnect()
+  if(rel.length&&!contentTestType)await db.$executeRawUnsafe('DELETE FROM measurement_content_releases WHERE id = ANY($1::text[])',rel)
+  await db.courseStudent.deleteMany({where:{courseId:course.id}});await db.course.delete({where:{id:course.id}});if(!contentTestType)await db.user.deleteMany({where:{id:{in:Object.values(actorRows).map(u=>u.id)}}});await cacheService.close();await db.$disconnect()
  }
  return {server,baseUrl:'http://127.0.0.1:'+server.address().port,assignmentId:assignment.id,actors:actorRows,cookie,makeSubmission,buffers,db,errors,diagnoseStart,close}
 }
