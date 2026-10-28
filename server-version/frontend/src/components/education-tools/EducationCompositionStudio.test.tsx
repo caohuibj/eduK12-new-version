@@ -8,8 +8,8 @@ import type {PrivateToolApi} from './privateToolClient'
 const id=(n:number)=>`00000000-0000-4000-8000-${String(n).padStart(12,'0')}`,hash=(n:string)=>n.repeat(64)
 const org=id(1),base=`/organizations/${org}/private-tools`,scaleId=id(3),formId=id(4),scaleVersion=id(5),formVersion=id(6),rootId=id(7),rootVersion=id(8)
 const scaleSummary={id:scaleId,kind:'SCALE',title:'最新量表草稿',revision:90,contentHash:hash('a')},formSummary={id:formId,kind:'FORM',title:'表单草稿',revision:80,contentHash:hash('b')}
-const scaleRef={id:scaleVersion,toolId:scaleId,kind:'SCALE',title:'固定量表三',sourceRevision:3,contentHash:hash('c')}
-const formRef={id:formVersion,toolId:formId,kind:'FORM',title:'固定表单二',sourceRevision:2,contentHash:hash('d')}
+const scaleRef={id:scaleVersion,toolId:scaleId,kind:'SCALE',sourceProvider:'PRIVATE_VERSION',title:'固定量表三',sourceRevision:3,contentHash:hash('c')}
+const formRef={id:formVersion,toolId:formId,kind:'FORM',sourceProvider:'PRIVATE_VERSION',title:'固定表单二',sourceRevision:2,contentHash:hash('d')}
 const definition={schemaVersion:1,adapterVersion:'1.0.0',administration:{population:'TEACHER',responseMode:'SELF'},instruction:'',blocks:[] as any[]}
 
 describe('education ordinary questionnaire authoring and fixed task attachment',()=>{

@@ -2,7 +2,9 @@ import {useCallback,useEffect,useMemo,useRef,useState} from 'react'
 import {EducationPrivateVersionChooser} from './EducationPrivateVersionChooser'
 import {CompositionOutline} from '../../modules/assessment-core/composition/CompositionOutline'
 import {SchoolPrivateToolCollection,type SchoolPrivateToolControls} from '../../school/SchoolPrivateToolCollection'
-import {PrivateToolPreview} from './PrivateToolPreview'
+import {PrivateToolPreview,type PrivateToolPreviewValue} from './PrivateToolPreview'
+import {EducationPublicFormChooser} from './EducationPublicFormChooser'
+import {educationPublicFormPreviewMedia,publicFormPreviewPath} from './educationPublicFormClient'
 import {createEducationPrivateImageAdapter} from './educationPrivateImageAdapter'
 import {EducationMaterialPreview} from './EducationMaterialPicker'
 import {privateToolBase,privateToolError,type PrivateToolApi,type PrivateToolVersion,type PrivateTool,type PrivateDraftState} from './privateToolClient'
@@ -13,6 +15,8 @@ import './education-composition.css'
 
 type Props={api:PrivateToolApi;organizationId:string;actorId:string;entry:'SCHOOL'|'TEACHER';onDraftStateChange?:(value:PrivateDraftState)=>void}
 const merge=<T extends {id:string}>(old:T[],rows:T[])=>Array.from(new Map([...old,...rows].map(row=>[row.id,row])).values())
+const mergeReferences=(old:CompositionReference[],rows:CompositionReference[])=>Array.from(new Map([...old,...rows].map(row=>[row.sourceProvider+':'+row.id,row])).values())
+const referenceVersion=(reference:CompositionReference|undefined)=>reference?.sourceProvider==='PRIVATE_VERSION'?reference.sourceRevision:reference?.version??'已选'
 const fingerprint=(tool:CompositionTool)=>JSON.stringify({title:tool.title,definition:tool.definition})
 /** Product adapter: exact private versions and current entry authority stay
  * in the education API. The ordered editor and leaf preview are shared UI. */
@@ -31,7 +35,8 @@ function CompositionSession({api,organizationId,actorId,entry,onDraftStateChange
  const [references,setReferences]=useState<CompositionReference[]>([]),[versions,setVersions]=useState<PrivateToolVersion[]>([])
  const [versionsCursor,setVersionsCursor]=useState<string|null>(null),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('')
  const [uncertain,setUncertain]=useState(false),[preview,setPreview]=useState(false),[previewIndex,setPreviewIndex]=useState(0)
- const [previewTool,setPreviewTool]=useState<PrivateTool|null>(null),[previewError,setPreviewError]=useState('')
+ const [previewTool,setPreviewTool]=useState<PrivateToolPreviewValue|null>(null),[previewError,setPreviewError]=useState(''),[previewInstruction,setPreviewInstruction]=useState('')
+ const [sourceView,setSourceView]=useState<'PRIVATE'|'PUBLIC_FORM'>('PRIVATE')
  const [answers,setAnswers]=useState<Record<string,ProfessionalAnswer>>({})
  const mounted=useRef(true),epoch=useRef(0),locked=useRef(false)
  const dirty=tool?fingerprint(tool)!==saved:Boolean(title.trim()),dirtyRef=useRef(dirty);dirtyRef.current=dirty
@@ -88,25 +93,28 @@ function CompositionSession({api,organizationId,actorId,entry,onDraftStateChange
   setPreview(true);setPreviewIndex(0);setAnswers({});setPreviewTool(null);setPreviewError('')
  }
  const block=preview?tool?.definition.blocks[previewIndex]:undefined
- const reference=block?references.find(row=>row.id===block.source.versionId&&row.contentHash===block.source.contentHash):undefined
+ const reference=block?references.find(row=>row.sourceProvider===block.source.provider&&row.id===block.source.versionId&&row.contentHash===block.source.contentHash):undefined
  useEffect(()=>{
-  let current=true;setPreviewTool(null);setPreviewError('');setAnswers({})
-  if(block&&reference)void api<CompositionReference&{definition:PrivateTool['definition']}>(`${base}/${reference.toolId}/versions/${block.source.versionId}`)
+  let current=true;setPreviewTool(null);setPreviewError('');setPreviewInstruction('');setAnswers({})
+  if(block&&reference)void api<{id:string;kind:'SCALE'|'FORM';title:string;contentHash:string;definition:PrivateTool['definition'];instruction?:string}>(
+   reference.sourceProvider==='PUBLIC_FORM'?publicFormPreviewPath(organizationId,reference.id,reference.contentHash):`${base}/${reference.toolId}/versions/${block.source.versionId}`)
    .then(value=>{if(current){
     if(value.id!==block.source.versionId||value.contentHash!==block.source.contentHash||value.kind!==block.source.kind)throw new Error('固定工具身份已不匹配。')
-    setPreviewTool({id:reference.toolId,title:value.title,kind:value.kind,revision:value.sourceRevision,contentHash:value.contentHash,definition:value.definition})
+    setPreviewTool({id:reference.sourceProvider==='PRIVATE_VERSION'?reference.toolId:reference.id,title:value.title,kind:value.kind,definition:value.definition});setPreviewInstruction(value.instruction??'')
    }}).catch(reason=>{if(current)setPreviewError(privateToolError(reason))})
   return()=>{current=false}
- },[api,base,block,reference])
+ },[api,base,organizationId,block,reference])
  const previewToolId=previewTool?.id
- const imageAdapter=useMemo(()=>previewToolId?createEducationPrivateImageAdapter({api,entry,organizationId,toolId:previewToolId,actorId}):undefined,
-  [api,entry,organizationId,previewToolId,actorId])
+ const publicMedia=useMemo(()=>block?.source.provider==='PUBLIC_FORM'?educationPublicFormPreviewMedia({api,entry,organizationId,actorId,versionId:block.source.versionId,contentHash:block.source.contentHash}):undefined,
+  [api,entry,organizationId,actorId,block?.source.provider,block?.source.versionId,block?.source.contentHash])
+ const imageAdapter=useMemo(()=>publicMedia?.imageAdapter??(previewToolId?createEducationPrivateImageAdapter({api,entry,organizationId,toolId:previewToolId,actorId}):undefined),
+  [publicMedia,api,entry,organizationId,previewToolId,actorId])
  const moreVersions=()=>{if(!tool||!versionsCursor)return;void operate(async current=>{
   const page=await api<{list:PrivateToolVersion[];nextCursor:string|null}>(`${base}/${tool.id}/versions?cursor=${encodeURIComponent(versionsCursor)}`)
   if(current()){setVersions(old=>merge(old,page.list));setVersionsCursor(page.nextCursor)}
  })}
  return <section className={'education-private-tools education-private-tools--'+entry.toLowerCase()+' '+(entry==='SCHOOL'?'hs-panel':'ht-panel')+' education-composition-studio education-composition-studio--'+entry.toLowerCase()} aria-label="普通问卷编制">
-  <header className="education-private-heading"><div><h2>{tool?'普通问卷编制':'我的普通问卷'}</h2><p>将本人固定量表和表单编成一份{entry==='SCHOOL'?'学生':'教师'}自评问卷，各项保留独立计分与反馈。</p></div></header>
+  <header className="education-private-heading"><div><h2>{tool?'普通问卷编制':'我的普通问卷'}</h2><p>将本人固定量表和表单、获授权公共表单编成一份{entry==='SCHOOL'?'学生':'教师'}自评问卷，各项保留独立计分与反馈。</p></div></header>
   {error&&<p role="alert">{error}</p>}{notice&&<p role="status">{notice}</p>}
   {!tool?<>
    <form onSubmit={event=>{event.preventDefault();create()}}><label>问卷名称<input value={title} maxLength={200} onChange={event=>setTitle(event.target.value)} disabled={busy}/></label><button type="submit" disabled={busy||uncertain||!title.trim()}>新建普通问卷</button></form>
@@ -121,11 +129,16 @@ function CompositionSession({api,organizationId,actorId,entry,onDraftStateChange
    {dirty&&<p role="status">当前有未保存修改，请先保存后再预览或固定版本。</p>}
    <label>问卷名称<input value={tool.title} maxLength={200} disabled={busy} onChange={event=>change({title:event.target.value})}/></label>
    <label>问卷说明<textarea value={tool.definition.instruction} maxLength={16000} disabled={busy} onChange={event=>change({definition:{...tool.definition,instruction:event.target.value}})}/></label>
-   <div className="survey-composition-studio"><EducationPrivateVersionChooser key={tool.id} api={api} organizationId={organizationId} disabled={busy||tool.definition.blocks.length>=50}
-    onSelect={value=>{if(value.kind==='COMPOSITION')return;const leaf={...value,kind:value.kind};setReferences(old=>merge(old,[leaf]));change({definition:{...tool.definition,blocks:[...tool.definition.blocks,
-     {blockId:crypto.randomUUID(),instruction:'',source:{provider:'PRIVATE_VERSION',kind:value.kind,versionId:value.id,contentHash:value.contentHash}}]}})}}/>
+   <div className="survey-composition-studio"><div><nav aria-label="问卷工具来源"><button type="button" aria-pressed={sourceView==='PRIVATE'} onClick={()=>setSourceView('PRIVATE')}>本人固定工具</button><button type="button" aria-pressed={sourceView==='PUBLIC_FORM'} onClick={()=>setSourceView('PUBLIC_FORM')}>获授权公共表单</button></nav>
+    {sourceView==='PRIVATE'?<EducationPrivateVersionChooser key={tool.id} api={api} organizationId={organizationId} disabled={busy||tool.definition.blocks.length>=50}
+     onSelect={value=>{if(value.kind==='COMPOSITION')return;const leaf={...value,kind:value.kind,sourceProvider:'PRIVATE_VERSION' as const};setReferences(old=>mergeReferences(old,[leaf]));change({definition:{...tool.definition,blocks:[...tool.definition.blocks,
+      {blockId:crypto.randomUUID(),instruction:'',source:{provider:'PRIVATE_VERSION',kind:value.kind,versionId:value.id,contentHash:value.contentHash}}]}})}}/>:
+     <EducationPublicFormChooser api={api} entry={entry} organizationId={organizationId} actorId={actorId} disabled={busy||tool.definition.blocks.length>=50} onChoose={value=>{
+      setReferences(old=>mergeReferences(old,[{id:value.sourceId,sourceProvider:'PUBLIC_FORM',kind:'FORM',title:value.title,contentHash:value.contentHash,version:value.versions.content}]))
+      change({definition:{...tool.definition,blocks:[...tool.definition.blocks,{blockId:crypto.randomUUID(),instruction:'',source:{provider:'PUBLIC_FORM',kind:'FORM',versionId:value.sourceId,contentHash:value.contentHash}}]}})
+     }}/>}</div>
     <CompositionOutline items={tool.definition.blocks.map(row=>({id:row.blockId,title:compositionTitle(row,references),
-     detail:(row.source.kind==='SCALE'?'量表':'表单')+' · 固定版本 '+(references.find(ref=>ref.id===row.source.versionId)?.sourceRevision??'已选')}))} max={50} disabled={busy}
+     detail:(row.source.provider==='PUBLIC_FORM'?'公共表单':row.source.kind==='SCALE'?'量表':'表单')+' · 固定版本 '+referenceVersion(references.find(ref=>ref.sourceProvider===row.source.provider&&ref.id===row.source.versionId&&ref.contentHash===row.source.contentHash))}))} max={50} disabled={busy}
      onMove={(index,offset)=>{const blocks=[...tool.definition.blocks];[blocks[index],blocks[index+offset]]=[blocks[index+offset],blocks[index]];change({definition:{...tool.definition,blocks}})}}
      onRemove={index=>change({definition:{...tool.definition,blocks:tool.definition.blocks.filter((_,i)=>i!==index)}})}
      renderItemEditor={(_,index)=><label className="education-composition-block-instruction">工具衔接说明 {index+1}<textarea value={tool.definition.blocks[index].instruction} maxLength={16000} disabled={busy}
@@ -135,9 +148,9 @@ function CompositionSession({api,organizationId,actorId,entry,onDraftStateChange
    {preview&&<section aria-label="问卷内容预览"><h3>问卷内容预览</h3><p>试填仅保留在本页，不计分或保存为正式作答。</p><p>{tool.definition.instruction}</p>
     <div><button disabled={previewIndex===0} onClick={()=>setPreviewIndex(index=>index-1)}>上一工具</button><span>{previewIndex+1} / {tool.definition.blocks.length}</span>
      <button disabled={previewIndex===tool.definition.blocks.length-1} onClick={()=>setPreviewIndex(index=>index+1)}>下一工具</button></div>
-    <h4>{block?compositionTitle(block,references):''}</h4>{block?.instruction&&<p className="whitespace-pre-wrap">{block.instruction}</p>}{previewError?<p role="alert">{previewError}</p>:!reference?<p>当前固定工具不可读取，请重新核对来源。</p>:!previewTool?<p role="status">正在读取当前固定工具…</p>:
+    <h4>{block?compositionTitle(block,references):''}</h4>{block?.instruction&&<p className="whitespace-pre-wrap">{block.instruction}</p>}{previewInstruction&&<p className="whitespace-pre-wrap">{previewInstruction}</p>}{previewError?<p role="alert">{previewError}</p>:!reference?<p>当前固定工具不可读取，请重新核对来源。</p>:!previewTool?<p role="status">正在读取当前固定工具…</p>:
      <PrivateToolPreview tool={previewTool} answers={answers} onAnswer={(key,value)=>setAnswers(old=>({...old,[key]:value}))} imageAdapter={imageAdapter}
-      renderMaterials={items=>items?.map(item=><EducationMaterialPreview key={item.asset.assetId} api={api} organizationId={organizationId} toolId={previewTool.id} item={item}/>)}/>}
+      renderMaterials={items=>items?.map(item=><EducationMaterialPreview key={item.asset.assetId} api={api} organizationId={organizationId} toolId={previewTool.id} item={item} loadContent={publicMedia?.loadContent}/>)}/>}
    </section>}
    <details className="education-private-versions"><summary>固定问卷版本（{versions.length}）</summary><p>固定版本保持原有内容；后续编辑只改变草稿。发布任务需在评价活动中另外执行。</p>
     {versions.map(version=><p key={version.id}>{version.title} · 修订 {version.sourceRevision}</p>)}{versionsCursor&&<button disabled={busy} onClick={moreVersions}>加载更多固定版本</button>}

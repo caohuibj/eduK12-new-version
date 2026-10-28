@@ -4,15 +4,15 @@ import {educationPublicSourceKey} from './public-source.identity'
 
 export type EducationPublicSourceHeader={
  key:string;kind:EducationPublicSource['kind'];id:string;hash:string;title:string;language:string|null
- versions:{content:string;parameters:string|null;report:string|null}
+ versions:{content:string;parameters:string|null;report:string|null};applicability:unknown
 }
 export const educationStandardHeaderColumns=Prisma.sql`'education-source:STANDARD_SCALE:'||s.id||':'||s.combination_hash AS key,'STANDARD_SCALE' AS kind,s.id,s.combination_hash AS hash,s.snapshot->>'title' AS title,
- s.snapshot#>>'{parts,CONTENT,reference,metadata,executable,contentLocale}' AS language,
+ s.snapshot#>>'{parts,CONTENT,reference,metadata,executable,contentLocale}' AS language,NULL::jsonb AS applicability,
  jsonb_build_object('content',s.snapshot#>>'{parts,CONTENT,version}',
   'parameters',CASE WHEN s.snapshot#>'{parts,PARAMETERS,payload}'='null'::jsonb THEN NULL ELSE s.snapshot#>>'{parts,PARAMETERS,version}' END,
   'report',CASE WHEN s.snapshot#>'{parts,REPORT,payload}'='null'::jsonb THEN NULL ELSE s.snapshot#>>'{parts,REPORT,version}' END) AS versions`
 export const educationFormHeaderColumns=Prisma.sql`'education-source:FORM:'||t.id||':'||t.snapshot_hash AS key,'FORM' AS kind,t.id,t.snapshot_hash AS hash,t.title,
- t.reference#>>'{metadata,annotations,language}' AS language,
+ t.reference#>>'{metadata,annotations,language}' AS language,t.snapshot#>'{reference,metadata,annotations,educationApplicability}' AS applicability,
  jsonb_build_object('content',t.snapshot#>>'{unit,ref,sourceVersion}','parameters',NULL,'report',NULL) AS versions`
 /** Bounded discovery/action metadata. The source guards make approved contents
  * immutable; no source body/hash/compiler or runtime object is needed here.

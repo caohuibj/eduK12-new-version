@@ -5,13 +5,13 @@ import type {AssessmentMaterial,PublicMaterial} from '../../modules/assessment-m
 import {privateToolBase,type PrivateToolApi} from './privateToolClient'
 type Scope={api:PrivateToolApi;entry:'SCHOOL'|'TEACHER';actorId:string;organizationId:string;toolId:string}
 const base=(organizationId:string,toolId:string)=>`${privateToolBase(organizationId)}/${encodeURIComponent(toolId)}`
-export function EducationMaterialPreview({api,organizationId,toolId,item}:{api:PrivateToolApi;organizationId:string;toolId:string;item:PublicMaterial}){
+export function EducationMaterialPreview({api,organizationId,toolId,item,loadContent}:{api:PrivateToolApi;organizationId:string;toolId:string;item:PublicMaterial;loadContent?:(asset:PublicMaterial['asset'])=>Promise<Blob>}){
  const load=useCallback(async(asset:PublicMaterial['asset'],signal:AbortSignal)=>{
-  const blob=await api<Blob>(`${base(organizationId,toolId)}/assets/${encodeURIComponent(asset.assetId)}/content`,'GET',undefined,{responseType:'blob'})
+  const blob=await (loadContent?loadContent(asset):api<Blob>(`${base(organizationId,toolId)}/assets/${encodeURIComponent(asset.assetId)}/content`,'GET',undefined,{responseType:'blob'}))
   if(signal.aborted)throw Error('素材读取已取消')
   if(!(blob instanceof Blob))throw Error('素材响应无效')
   return new Response(blob,{headers:{'Content-Type':blob.type}})
- },[api,organizationId,toolId])
+ },[api,organizationId,toolId,loadContent])
  return <AssessmentMaterialDisplay item={item} load={load} appearance="training"/>
 }
 export function EducationMaterialPicker(props:Scope&{value?:AssessmentMaterial[];onChange:(items:AssessmentMaterial[])=>void;disabled?:boolean;label?:string;onBusy?:(busy:boolean)=>void}){

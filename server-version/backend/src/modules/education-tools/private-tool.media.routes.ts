@@ -9,6 +9,7 @@ import {materialSchema} from '../assessment-media/material'
 import {EducationPrivateToolError,privateToolId,type PrivateToolContext} from './private-tool.contracts'
 import {privateToolImageMaxBytes,privateToolImageMimeTypes,privateToolMaterialMimeTypes} from './private-tool.media-definition'
 import * as media from './private-tool.media'
+import {readEducationPublicFormPreviewAsset} from './public-source.preview'
 
 /** Parent owns product authentication; never mount on a generic asset router. */
 export function educationPrivateToolMediaRouter(context:(req:Request)=>PrivateToolContext){
@@ -24,6 +25,11 @@ export function educationPrivateToolMediaRouter(context:(req:Request)=>PrivateTo
    throw error
   }
  }
+ router.get('/public-sources/form/:versionId/assets/:assetId/content',asyncHandler((req,res)=>handle(res,async()=>{
+  const query=z.object({contentHash:z.string().regex(/^[a-f0-9]{64}$/)}).strict().parse(req.query)
+  const ref=await readEducationPublicFormPreviewAsset(context(req),privateToolId.parse(req.params.versionId),query.contentHash,privateToolId.parse(req.params.assetId))
+  return serveAssessmentMaterial(ref,res)
+ })))
  router.get('/:toolId/materials',asyncHandler((req,res)=>handle(res,async()=>success(res,await media.listPrivateToolMaterials(context(req),toolId(req),req.query)))))
  router.post('/:toolId/materials/register',asyncHandler((req,res)=>handle(res,async()=>success(res,await media.registerOwnedPrivateToolMaterial(context(req),toolId(req),req.body)))))
  router.post('/:toolId/materials',uploadPrincipalRateLimit,

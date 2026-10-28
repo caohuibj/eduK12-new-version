@@ -6,11 +6,12 @@ import {privateToolFail,type PrivateToolContext} from './private-tool.contracts'
 import {parseEducationPublicSourceKey} from './public-source.identity'
 import {educationStandardHeaderColumns,educationFormHeaderColumns,type EducationPublicSourceHeader} from './public-source.headers'
 import {assertContentGrantChain,type ContentGrant} from '../measurement-content/content-authority'
+import {educationApplicabilitySchema} from '../scale-library-governance/education-applicability'
 
 const key=z.string().max(240).refine(value=>parseEducationPublicSourceKey(value)!==null)
 export const educationPublicCatalogQuery=z.object({cursor:key.optional(),kind:z.enum(['SCALE','FORM']).optional(),q:z.string().trim().max(160).optional()}).strict()
 type GrantRow={id:string;subject_id:string;issuer_id:string;product:'SCHOOL'|'TEACHER';scope_id:string;resource_keys:string[];
- valid_from:Date;expires_at:Date;version:number;revoked_at:Date|null;parent_grant_id:string|null;ancestry:string[];
+ valid_from:Date;expires_at:Date;read_at:Date;version:number;revoked_at:Date|null;parent_grant_id:string|null;ancestry:string[];
  capabilities:ContentGrant['capabilities'];delegable_capabilities:ContentGrant['capabilities'];remaining_delegation_depth:number}
 const grantFromRow=(row:GrantRow):ContentGrant=>({id:row.id,subjectId:row.subject_id,issuerId:row.issuer_id,parentGrantId:row.parent_grant_id,
  scope:{product:row.product,scopeKind:'ORGANIZATION',scopeId:row.scope_id,resourceKind:'material',resourceKeys:row.resource_keys},
@@ -25,14 +26,17 @@ export async function readEducationPublicUse(tx:Prisma.TransactionClient,c:Priva
  const exact=[...new Set(keys)];if(exact.length>128||exact.some(value=>!key.safeParse(value).success))privateToolFail('PUBLIC_SOURCE_INPUT_INVALID',400)
  if(!exact.length)return new Map<string,{grantId:string;grantVersion:number;expiresAt:Date}>()
  const rows=await tx.$queryRaw<GrantRow[]>(Prisma.sql`SELECT g.id,g.subject_id,g.issuer_id,g.product,g.scope_id,g.resource_keys,
-  g.valid_from,g.expires_at,g.version,g.revoked_at,g.parent_grant_id,g.ancestry,g.capabilities,g.delegable_capabilities,g.remaining_delegation_depth
+  g.valid_from,g.expires_at,clock_timestamp() AS read_at,g.version,g.revoked_at,g.parent_grant_id,g.ancestry,g.capabilities,g.delegable_capabilities,g.remaining_delegation_depth
   FROM content_capability_grants g WHERE g.subject_id=${c.principal.userId} AND g.product=${c.entry} AND g.scope_kind='ORGANIZATION'
    AND g.scope_id=${c.organizationId} AND g.resource_kind='material' AND g.resource_keys&&${exact}::text[]
    AND g.capabilities=ARRAY['material.use']::text[] AND g.parent_grant_id IS NULL AND g.ancestry=ARRAY[g.id]::text[]
    AND g.remaining_delegation_depth=0 AND g.delegable_capabilities=ARRAY[]::text[] AND g.revoked_at IS NULL
   ORDER BY g.id ${lock?Prisma.sql`FOR SHARE OF g`:Prisma.empty}`)
- const [clock]=await tx.$queryRaw<Array<{now:Date}>>(Prisma.sql`SELECT clock_timestamp() AS now`)
  const allowed=new Map<string,{grantId:string;grantVersion:number;expiresAt:Date}>()
+ if(!rows.length)return allowed
+ // Only a protected write's SHARE locks can wait behind a revoke. Read-only
+ // preview/media calls reuse this statement's clock rather than another SQL.
+ const clock=lock?(await tx.$queryRaw<Array<{now:Date}>>(Prisma.sql`SELECT clock_timestamp() AS now`))[0]:{now:new Date(Math.max(...rows.map(row=>row.read_at.getTime())))}
  for(const row of rows){
   if(row.valid_from>clock.now||row.expires_at<=clock.now)continue
   const grant=assertContentGrantChain([grantFromRow(row)],row.id,clock.now)
@@ -72,10 +76,14 @@ export async function listEducationPublicSources(c:PrivateToolContext,raw:unknow
     AND (${input.q??''}='' OR strpos(lower(title),lower(${input.q??''}))>0)
    ORDER BY key COLLATE "C" LIMIT 41`)
   const selected=candidates.slice(0,40)
-  return {list:selected.map(header=>({
+  return {list:selected.map(header=>{
+   const declaration=header.kind==='FORM'?educationApplicabilitySchema.safeParse(header.applicability):null
+   const applicable=declaration?.success&&declaration.data.administrations.some(a=>a.population===(c.entry==='SCHOOL'?'STUDENT':'TEACHER')&&a.responseMode==='SELF')
+   return {
    catalogKey:header.key,kind:header.kind==='STANDARD_SCALE'?'SCALE':'FORM',sourceProvider:header.kind,sourceId:header.id,contentHash:header.hash,
    title:header.title,language:header.language,versions:header.versions,sourceLabel:'获授权公共固定版本',
-   allowedActions:[],runtimeStatus:'ADAPTER_PENDING',canEditOriginal:false,canDistribute:false,
-  })),nextCursor:candidates.length>40?selected.at(-1)!.key:null}
+   allowedActions:applicable?['REFERENCE_FIXED_VERSION']:[],runtimeStatus:header.kind==='FORM'?'CHECK_EXACT_FORM_AT_FREEZE':'ADAPTER_PENDING',canEditOriginal:false,canDistribute:false,
+   ...(header.kind==='FORM'&&!applicable?{unavailableReason:'该固定版本未声明适用于当前问卷的施测方式。'}:{}),
+  }}),nextCursor:candidates.length>40?selected.at(-1)!.key:null}
  },{isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted})
 }

@@ -17,6 +17,8 @@ import {initialPrivateToolDefinition,privateToolDefinition,validatePrivateToolDe
 import {compilePrivateComposition} from './private-tool.composition-compiler'
 import {sealPrivateComposition,readOwnedCompositionIdentity} from './private-tool.composition-runtime'
 import type {PrivateCompositionDefinition} from './private-tool.composition-contracts'
+import {readEducationPublicUse} from './public-source.catalog'
+import {educationPublicSourceKey} from './public-source.identity'
 
 type Tx=Prisma.TransactionClient
 const boundary={visibility:'AUTHOR_PRIVATE',snapshotOnly:true,canPublish:false,canShare:false,canReadParticipantReports:false} as const
@@ -75,10 +77,21 @@ export async function readPrivateTool(c:PrivateToolContext,id:string){
   await authorized(tx,c);const tool=await readOwned(tx,c,id)
   if(tool.kind!=='COMPOSITION')return {...tool,...boundary}
   const definition=tool.definition as unknown as PrivateCompositionDefinition
-  const ids=[...new Set(definition.blocks.map(block=>block.source.versionId))]
+  const ids=[...new Set(definition.blocks.filter(block=>block.source.provider==='PRIVATE_VERSION').map(block=>block.source.versionId))]
   const references=ids.length?await tx.educationPrivateToolVersion.findMany({where:{id:{in:ids},...scope(c),kind:{in:['SCALE','FORM']}},
    select:{id:true,toolId:true,kind:true,title:true,sourceRevision:true,contentHash:true}}):[]
-  return {...tool,references,...boundary}
+  const publicSources=definition.blocks.filter(block=>block.source.provider==='PUBLIC_FORM').map(block=>block.source)
+  const publicKey=(source:typeof publicSources[number])=>educationPublicSourceKey({kind:'FORM',id:source.versionId,hash:source.contentHash})
+  // A mutable draft may contain an as-yet unverified reference. It cannot be
+  // used as an oracle for another public source's title/version without U.
+  // Keep the owner's draft intact; resolve only currently authorized summaries.
+  const allowed=await readEducationPublicUse(tx,c,publicSources.map(publicKey))
+  const visibleSources=publicSources.filter(source=>allowed.has(publicKey(source)))
+  const publicReferences=visibleSources.length?await tx.$queryRaw<Array<{id:string;kind:'FORM';title:string;contentHash:string;version:string}>>(Prisma.sql`
+   SELECT id,'FORM' AS kind,title,snapshot_hash AS "contentHash",snapshot#>>'{unit,ref,sourceVersion}' AS version
+   FROM survey_governed_tools WHERE family='FORM' AND (id,snapshot_hash) IN (${Prisma.join(visibleSources.map(source=>Prisma.sql`(${source.versionId},${source.contentHash})`))}) ORDER BY id`):[]
+  return {...tool,references:[...references.map(ref=>({...ref,sourceProvider:'PRIVATE_VERSION' as const})),
+   ...publicReferences.map(ref=>({...ref,sourceProvider:'PUBLIC_FORM' as const}))],...boundary}
  })
 }
 export async function updatePrivateTool(c:PrivateToolContext,id:string,raw:unknown){

@@ -12,6 +12,7 @@ import type {EducationToolEntry} from './access'
 import {EducationPrivateToolError,privateToolId,privateToolKind,type PrivateToolContext} from './private-tool.contracts'
 import * as service from './private-tool.service'
 import {listEducationPublicSources,educationPublicCatalogQuery} from './public-source.catalog'
+import {readEducationPublicFormPreview} from './public-source.preview'
 
 /** Mounted under the matching product authentication middleware only. */
 export function educationPrivateToolRouter(entry:EducationToolEntry){
@@ -41,6 +42,10 @@ export function educationPrivateToolRouter(entry:EducationToolEntry){
  }))
  router.post('/',handle(req=>service.createPrivateTool(context(req),req.body)))
  router.get('/public-sources',handle(req=>listEducationPublicSources(context(req),educationPublicCatalogQuery.parse(req.query))))
+ router.get('/public-sources/form/:versionId',handle(req=>{
+  const query=z.object({contentHash:z.string().regex(/^[a-f0-9]{64}$/)}).strict().parse(req.query)
+  return readEducationPublicFormPreview(context(req),privateToolId.parse(req.params.versionId),query.contentHash)
+ }))
  router.get('/runtime-candidates',handle(req=>{
   const query=z.object({cursor:privateToolId.optional(),kind:z.enum(['SCALE','FORM']).default('SCALE')}).strict().parse(req.query)
   return (query.kind==='FORM'?service.listPrivateFormRuntimeCandidates:service.listPrivateScaleRuntimeCandidates)(context(req),query.cursor)
