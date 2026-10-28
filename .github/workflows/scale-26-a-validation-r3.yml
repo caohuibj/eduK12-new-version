@@ -1,0 +1,71 @@
+name: Scale 26 A scoped verification
+on:
+  push:
+    branches: [validation/scale-26-a-r3-20261028]
+    paths: [.github/workflows/scale-26-a-validation-r3.yml]
+permissions:
+  contents: read
+concurrency:
+  group: scale-26-a-${{ github.ref }}
+  cancel-in-progress: false
+env:
+  CI: 'true'
+  NODE_ENV: test
+  TZ: UTC
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+  JWT_SECRET: scale26-isolated-test-jwt-secret-12345678901234567890
+  DATA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+  DATA_PSEUDONYM_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
+jobs:
+  exact-source:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          persist-credentials: false
+      - name: enforce source commit and no business diff in validation branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD^)" = "5c680be4d121ecc3bf042a5b05da62cdd72866b0"
+          test "$(git diff --name-only 5c680be4d121ecc3bf042a5b05da62cdd72866b0 HEAD)" = ".github/workflows/scale-26-a-validation-r3.yml"
+          git checkout --detach "5c680be4d121ecc3bf042a5b05da62cdd72866b0"
+          test "$(git rev-parse HEAD)" = "5c680be4d121ecc3bf042a5b05da62cdd72866b0"
+          test "$(git rev-parse HEAD^{tree})" = "1249cc92858035166d01cf485500fd7fe334d3c8"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+          cache: npm
+          cache-dependency-path: |
+            server-version/backend/package-lock.json
+            server-version/frontend/package-lock.json
+      - name: install locked backend type and scoring dependencies
+        working-directory: server-version/backend
+        run: |
+          npm ci --ignore-scripts
+          npx prisma generate
+      - name: reproduce only nine previously failed intake and report tests
+        working-directory: server-version/backend
+        run: |
+          npx vitest run \
+            src/__tests__/scale/instruments/bps9-intake.test.ts \
+            src/__tests__/scale/instruments/ipip-batch-intake.test.ts \
+            src/__tests__/scale/instruments/dbt_wccl59_zh_cn_research_1_0_2.test.ts \
+            --testNamePattern='BPS9 existing instruction binding and selected intake|ipip_neo_c1_self_efficacy10 selected intake|ipip_neo_c5_self_discipline10 selected intake|ipip_nfc10 selected intake|marks approved linguistic review without inventing scientific validation' \
+            --no-file-parallelism --reporter=json --outputFile=/tmp/scale26-nine-failures.json
+          node -e 'const j=require("/tmp/scale26-nine-failures.json");const x={passed:j.numPassedTests,failed:j.numFailedTests,skipped:j.numPendingTests};console.log(JSON.stringify(x));if(x.passed!==9||x.failed!==0)process.exit(1)'
+      - name: backend TypeScript contract
+        working-directory: server-version/backend
+        run: npx tsc --noEmit
+      - name: install locked frontend dependencies
+        working-directory: server-version/frontend
+        run: npm ci
+      - name: frontend app TypeScript contract
+        working-directory: server-version/frontend
+        run: npx tsc -p tsconfig.app.json --noEmit
+      - name: report card visual and disclosure interaction regression
+        working-directory: server-version/frontend
+        run: npx vitest run src/modules/reporting/__tests__/ScaleUnitReportCard.metadata.test.tsx --maxWorkers=2
