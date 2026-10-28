@@ -1,6 +1,6 @@
 import type { ScaleInstrumentSourceV1 } from '../../../onboarding/types'
 import sourceJson from './source.json'
-import { SPANE_SCORER_KEY, spane12BalanceScorer } from './scorer'
+import { SPANE_SCORER_KEY, spane12BalanceScorer } from '../../../packages/spane12-balance-scorer'
 
 const base = sourceJson as unknown as ScaleInstrumentSourceV1
 /** The executable registry registers this versioned scorer before validating golden vectors. */

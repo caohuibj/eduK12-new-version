@@ -3,7 +3,7 @@
  * Instrument-local custom scorer; no shared scoring-engine or schema changes.
  * Every absent score is null; no zero filling or imputation.
  */
-import type { ScaleCustomScorer, ScaleScoreValue } from '../../../scale-scoring'
+import type { ScaleCustomScorer, ScaleScoreValue } from '../scale-scoring'
 
 export const SPANE_SCORER_KEY = 'spane12.balance.v1' as const
 
