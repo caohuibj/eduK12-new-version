@@ -1,0 +1,42 @@
+{
+  "componentPreviewOnly": true,
+  "sandbox": true,
+  "results": [
+    {
+      "name": "limited-zh-phone",
+      "lang": "zh",
+      "invalid": false,
+      "width": 390,
+      "height": 844,
+      "layout": {
+        "scrollWidth": 390,
+        "viewport": 390,
+        "charts": 1,
+        "tables": 4,
+        "body": "SYNTHETIC PREVIEW / 合成预览 · 未发布\n\n实用版\n\n查找与定位，分开看这次记录\n\n仅描述完整且有效的轮次；中断和未选择不补造。\n\n本次3个有效轮次中，你有2轮正确指出目标位置或确认没有目标。\n\n字母数量不同时，找对了多少\n单位：比例（%）\n10个字母\n0%\n20个字母\n—\n30个字母\n100%\n10个字母：答对0/1；20个字母：答对0/0；30个字母：答对2/2。只用实际完整轮次，不据此估计稳定搜索斜率。EDUK12.TOP\n查看图表数据\n条件\t正确 / 有效\t正确轮搜索中位\t正确轮定位中位\n10个字母\t0/1\t—\t—\n20个字母\t0/0\t—\t—\n30个字母\t2/2\t15 ms\t99,995 ms\n\n请把正确次数和速度一起看。搜索从字母阵列出现到“搜索完成”；定位从圆圈出现到选择，其中也包含位置记忆和手部操作。\n\n一个可用的提醒\n\n查找重要信息时，可以先明确目标的形状与颜色，找到后再核对位置。这是一般建议，不是现实工作能力预测。\n\n短版每个完整条件只有1次；按项目数汇总仍混合目标颜色与数量，不能据此建立稳定个体搜索斜率。\n\n设备、视力色觉、字母熟悉度和当时状态会影响本次记录；没有同龄常模、临床/学习困难诊断或招聘预测结论。\n\n颜色、目标数、全部条件与限制"
+      },
+      "sha256": "cca807c0e7b7715ef8068c5d5c403bb05d8580997b7e325db1ae9dc7e1494ab7",
+      "file": "docs/cognitive-library/onboarding-content-20261028/parallel-review/visual-search/screens/limited-zh-phone.png",
+      "success": true
+    },
+    {
+      "name": "excluded-en-phone",
+      "lang": "en",
+      "invalid": true,
+      "width": 390,
+      "height": 844,
+      "layout": {
+        "scrollWidth": 390,
+        "viewport": 390,
+        "charts": 0,
+        "tables": 0,
+        "body": "SYNTHETIC PREVIEW / 合成预览 · 未发布\n\nPractical version\n\nNo performance conclusion is available\n\nNo usable, fully completed search-and-location trials are available in this record. This does not mean poor attention.\n\nDevice, vision/colour perception, letter familiarity and current state affect this record. No age norms, clinical/learning diagnosis or recruitment prediction is provided.\n\nColour, target count, all conditions and limits"
+      },
+      "sha256": "048ecc54ad7a9d7224ed6df3c05fd2fc671ce7041845d27ba36a8b2f6e22e8fb",
+      "file": "docs/cognitive-library/onboarding-content-20261028/parallel-review/visual-search/screens/excluded-en-phone.png",
+      "success": true
+    }
+  ],
+  "errors": [],
+  "success": true
+}

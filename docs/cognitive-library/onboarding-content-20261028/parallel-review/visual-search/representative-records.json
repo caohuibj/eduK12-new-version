@@ -1,0 +1,4227 @@
+{
+  "synthetic": true,
+  "scope": "seven actual SearchCapture records, not a completed 36-trial attempt; markers are injected envelope inconsistencies, not task-generated timeouts",
+  "input": {
+    "session": {
+      "schemaVersion": 1,
+      "frozenAt": "2026-10-27T00:00:00.000Z",
+      "testType": "visual-search-two-stage",
+      "configVersion": "0.1.0",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "config": {
+        "profile": "experience",
+        "totalTrials": 36,
+        "blockTrials": 60,
+        "targetCharacters": [
+          "O",
+          "X"
+        ],
+        "targetColours": [
+          "#FFFFFF",
+          "#00FF00"
+        ],
+        "setSizes": [
+          10,
+          20,
+          30
+        ],
+        "targetCounts": [
+          0,
+          1,
+          5
+        ],
+        "previewMs": 800,
+        "stimulus": {
+          "width": 300,
+          "height": 360,
+          "background": "#000000",
+          "foilColour": "#FFFFFF",
+          "fontFamily": "EduVisualSearchLiberationSans",
+          "fontPx": 24,
+          "font": {
+            "file": "LiberationSans-Regular.ttf",
+            "sha256": "bade59d822652f76e6941aa87b40a87c13d1cc70db98ededb5011127efafd1d3",
+            "family": "Liberation Sans",
+            "license": "SIL-OFL-1.1",
+            "source": "Debian fonts-liberation; unmodified binary",
+            "version": "Version 2.1.5"
+          },
+          "columns": 6,
+          "rows": 6,
+          "cellWidth": 50,
+          "cellHeight": 60,
+          "jitterPx": 2,
+          "circleRadius": 16,
+          "hitRadius": 22
+        },
+        "targetReminder": "both-phases-text-v1",
+        "inputPolicy": "fresh-cycle-per-stage-v1",
+        "practice": {
+          "version": "search-easier-three-v1",
+          "trials": 3,
+          "setSize": 8,
+          "targetCounts": [
+            1,
+            0,
+            1
+          ],
+          "minimumCorrect": 3,
+          "maxRounds": 3,
+          "repeatInstructionsBeforeRetry": true
+        },
+        "profileDefinitionVersion": "0.1.0",
+        "metricDefinitionVersion": "0.1.0",
+        "qualityDefinitionVersion": "0.1.0",
+        "reportDefinitionVersion": "0.1.0",
+        "presentationVersion": "0.1.0"
+      },
+      "configHash": "77c9999593188962ebae2524ea8b96df0d60efeadfc5a0b8008251d3359735c4",
+      "protocol": {
+        "schemaVersion": 1,
+        "key": "visual-search-two-stage/0.1.0/0.1.0",
+        "version": "0.1.0",
+        "clock": "performance",
+        "randomizationAlgorithmVersion": "search-fnv1a-utf16-xorshift32-grid-jitter-balanced-v1",
+        "trialEnvelopeVersion": 1,
+        "phases": [
+          {
+            "key": "test",
+            "persists": true,
+            "required": true
+          }
+        ],
+        "measurementCriticalConfigPaths": [
+          "*"
+        ]
+      },
+      "protocolSignature": "83fda15215385e3a77b9937472f966693ef6909e8698317ed58b79f67dae90ba"
+    },
+    "config": {
+      "profile": "experience",
+      "totalTrials": 36,
+      "blockTrials": 60,
+      "targetCharacters": [
+        "O",
+        "X"
+      ],
+      "targetColours": [
+        "#FFFFFF",
+        "#00FF00"
+      ],
+      "setSizes": [
+        10,
+        20,
+        30
+      ],
+      "targetCounts": [
+        0,
+        1,
+        5
+      ],
+      "previewMs": 800,
+      "stimulus": {
+        "width": 300,
+        "height": 360,
+        "background": "#000000",
+        "foilColour": "#FFFFFF",
+        "fontFamily": "EduVisualSearchLiberationSans",
+        "fontPx": 24,
+        "font": {
+          "file": "LiberationSans-Regular.ttf",
+          "sha256": "bade59d822652f76e6941aa87b40a87c13d1cc70db98ededb5011127efafd1d3",
+          "family": "Liberation Sans",
+          "license": "SIL-OFL-1.1",
+          "source": "Debian fonts-liberation; unmodified binary",
+          "version": "Version 2.1.5"
+        },
+        "columns": 6,
+        "rows": 6,
+        "cellWidth": 50,
+        "cellHeight": 60,
+        "jitterPx": 2,
+        "circleRadius": 16,
+        "hitRadius": 22
+      },
+      "targetReminder": "both-phases-text-v1",
+      "inputPolicy": "fresh-cycle-per-stage-v1",
+      "practice": {
+        "version": "search-easier-three-v1",
+        "trials": 3,
+        "setSize": 8,
+        "targetCounts": [
+          1,
+          0,
+          1
+        ],
+        "minimumCorrect": 3,
+        "maxRounds": 3,
+        "repeatInstructionsBeforeRetry": true
+      },
+      "profileDefinitionVersion": "0.1.0",
+      "metricDefinitionVersion": "0.1.0",
+      "qualityDefinitionVersion": "0.1.0",
+      "reportDefinitionVersion": "0.1.0",
+      "presentationVersion": "0.1.0"
+    },
+    "randomSeed": "search-envelope-quality-review",
+    "trials": [
+      {
+        "schemaVersion": 1,
+        "trialIndex": 0,
+        "phase": "test",
+        "condition": "O/#00FF00/30/0",
+        "startedAtPerfMs": 100,
+        "endedAtPerfMs": 900,
+        "durationMs": 800,
+        "flags": {
+          "timeout": false,
+          "premature": false
+        },
+        "qualityEvents": [],
+        "payload": {
+          "plan": {
+            "targetCharacter": "O",
+            "targetColour": "#00FF00",
+            "setSize": 30,
+            "targetCount": 0,
+            "index": 0,
+            "phase": "test",
+            "round": 0,
+            "condition": "O/#00FF00/30/0",
+            "items": [
+              {
+                "id": "cell-0",
+                "x": 24.62863959092647,
+                "y": 30.457763321697712,
+                "letter": "G",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-1",
+                "x": 75.77804360259324,
+                "y": 28.93460994027555,
+                "letter": "C",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-2",
+                "x": 126.21632531005889,
+                "y": 29.60028614103794,
+                "letter": "U",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-3",
+                "x": 175.30636913701892,
+                "y": 30.57018827367574,
+                "letter": "D",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-4",
+                "x": 224.23096827045083,
+                "y": 28.730338321998715,
+                "letter": "G",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-5",
+                "x": 273.7710633305833,
+                "y": 29.26898644771427,
+                "letter": "D",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-6",
+                "x": 26.472641015425324,
+                "y": 91.5263031758368,
+                "letter": "Q",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-7",
+                "x": 76.0637133223936,
+                "y": 90.97518904693425,
+                "letter": "C",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-9",
+                "x": 175.53012226801366,
+                "y": 88.92469933070242,
+                "letter": "C",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-10",
+                "x": 225.22280941531062,
+                "y": 88.49821473192424,
+                "letter": "G",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-11",
+                "x": 275.9309074226767,
+                "y": 89.07220690697432,
+                "letter": "D",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-12",
+                "x": 23.25996182486415,
+                "y": 150.90131943207234,
+                "letter": "U",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-14",
+                "x": 125.81973171140999,
+                "y": 148.40999820362777,
+                "letter": "U",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-16",
+                "x": 224.32543947175145,
+                "y": 149.2194608738646,
+                "letter": "C",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-17",
+                "x": 274.7140657035634,
+                "y": 150.76974020898342,
+                "letter": "Q",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-20",
+                "x": 124.08479329012334,
+                "y": 209.05525107402354,
+                "letter": "C",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-21",
+                "x": 176.9202649788931,
+                "y": 209.65456612966955,
+                "letter": "G",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-22",
+                "x": 224.95445181522518,
+                "y": 210.4419519994408,
+                "letter": "U",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-23",
+                "x": 276.2397441845387,
+                "y": 208.07310734130442,
+                "letter": "U",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-24",
+                "x": 23.030900919809937,
+                "y": 269.64290049113333,
+                "letter": "Q",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-25",
+                "x": 76.07686833385378,
+                "y": 270.25083257071674,
+                "letter": "G",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-27",
+                "x": 175.82829267531633,
+                "y": 270.99328842479736,
+                "letter": "D",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-28",
+                "x": 223.6657141270116,
+                "y": 268.5883674826473,
+                "letter": "Q",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-29",
+                "x": 273.6725176014006,
+                "y": 268.11947156954557,
+                "letter": "D",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-30",
+                "x": 26.731733744964004,
+                "y": 329.06865768134594,
+                "letter": "D",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-31",
+                "x": 76.38009096775204,
+                "y": 328.426965364255,
+                "letter": "U",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-32",
+                "x": 125.12193781882524,
+                "y": 330.34164992906153,
+                "letter": "Q",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-33",
+                "x": 176.03419589810073,
+                "y": 330.0578150684014,
+                "letter": "Q",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-34",
+                "x": 224.58603289630264,
+                "y": 330.62165072374046,
+                "letter": "G",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-35",
+                "x": 276.915931369178,
+                "y": 328.01468983013183,
+                "letter": "C",
+                "colour": "#FFFFFF",
+                "target": false
+              }
+            ]
+          },
+          "startedAtPerfMs": 100,
+          "endedAtPerfMs": 900,
+          "status": "complete",
+          "stopReason": null,
+          "events": [
+            {
+              "kind": "reveal",
+              "atMs": 900
+            },
+            {
+              "kind": "down",
+              "atMs": 900,
+              "control": "done",
+              "token": "pointer:1",
+              "input": "touch",
+              "key": null,
+              "repeat": false,
+              "primary": true
+            },
+            {
+              "kind": "up",
+              "atMs": 900,
+              "control": "done",
+              "token": "pointer:1",
+              "input": "touch",
+              "key": null,
+              "repeat": false,
+              "primary": true
+            },
+            {
+              "kind": "down",
+              "atMs": 900,
+              "control": "none",
+              "token": "pointer:1",
+              "input": "touch",
+              "key": null,
+              "repeat": false,
+              "primary": true
+            },
+            {
+              "kind": "up",
+              "atMs": 900,
+              "control": "none",
+              "token": "pointer:1",
+              "input": "touch",
+              "key": null,
+              "repeat": false,
+              "primary": true
+            }
+          ],
+          "state": {
+            "stage": "complete",
+            "searchAtMs": 900,
+            "locateAtMs": 900,
+            "selectionAtMs": 900,
+            "selection": {
+              "kind": "none"
+            },
+            "searchInput": "touch",
+            "locateInput": "touch",
+            "focused": null,
+            "held": null,
+            "ignored": {
+              "early": 0,
+              "repeat": 0,
+              "multiple": 0,
+              "held": 0,
+              "crossStage": 0,
+              "outside": 0
+            }
+          },
+          "ignoredRepeatCount": 0,
+          "overflow": false
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "trialIndex": 1,
+        "phase": "test",
+        "condition": "X/#FFFFFF/10/1",
+        "startedAtPerfMs": 1000,
+        "endedAtPerfMs": 2800,
+        "durationMs": 1800,
+        "flags": {
+          "timeout": false,
+          "premature": false
+        },
+        "qualityEvents": [],
+        "payload": {
+          "plan": {
+            "targetCharacter": "X",
+            "targetColour": "#FFFFFF",
+            "setSize": 10,
+            "targetCount": 1,
+            "index": 1,
+            "phase": "test",
+            "round": 0,
+            "condition": "X/#FFFFFF/10/1",
+            "items": [
+              {
+                "id": "cell-1",
+                "x": 74.13493296410888,
+                "y": 31.9406185625121,
+                "letter": "U",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-2",
+                "x": 124.89964354876429,
+                "y": 28.90031037479639,
+                "letter": "C",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-6",
+                "x": 24.531796322204173,
+                "y": 91.76143002696335,
+                "letter": "Q",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-7",
+                "x": 75.42885802593082,
+                "y": 88.43088360875845,
+                "letter": "Q",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-10",
+                "x": 224.90022256597877,
+                "y": 88.27568537276238,
+                "letter": "X",
+                "colour": "#FFFFFF",
+                "target": true
+              },
+              {
+                "id": "cell-18",
+                "x": 26.7296627657488,
+                "y": 209.19300174247473,
+                "letter": "C",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-20",
+                "x": 123.1961504900828,
+                "y": 211.02027207892388,
+                "letter": "D",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-21",
+                "x": 176.52590082678944,
+                "y": 210.75145670212805,
+                "letter": "D",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-23",
+                "x": 273.97239531204104,
+                "y": 209.62950042728335,
+                "letter": "U",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-25",
+                "x": 75.59929136838764,
+                "y": 268.45250740647316,
+                "letter": "G",
+                "colour": "#FFFFFF",
+                "target": false
+              }
+            ]
+          },
+          "startedAtPerfMs": 1000,
+          "endedAtPerfMs": 2800,
+          "status": "complete",
+          "stopReason": null,
+          "events": [
+            {
+              "kind": "reveal",
+              "atMs": 1800
+            },
+            {
+              "kind": "down",
+              "atMs": 2100,
+              "control": "done",
+              "token": "pointer:1",
+              "input": "touch",
+              "key": null,
+              "repeat": false,
+              "primary": true
+            },
+            {
+              "kind": "up",
+              "atMs": 2100,
+              "control": "done",
+              "token": "pointer:1",
+              "input": "touch",
+              "key": null,
+              "repeat": false,
+              "primary": true
+            },
+            {
+              "kind": "down",
+              "atMs": 2800,
+              "control": "none",
+              "token": "pointer:1",
+              "input": "touch",
+              "key": null,
+              "repeat": false,
+              "primary": true
+            },
+            {
+              "kind": "up",
+              "atMs": 2800,
+              "control": "none",
+              "token": "pointer:1",
+              "input": "touch",
+              "key": null,
+              "repeat": false,
+              "primary": true
+            }
+          ],
+          "state": {
+            "stage": "complete",
+            "searchAtMs": 1800,
+            "locateAtMs": 2100,
+            "selectionAtMs": 2800,
+            "selection": {
+              "kind": "none"
+            },
+            "searchInput": "touch",
+            "locateInput": "touch",
+            "focused": null,
+            "held": null,
+            "ignored": {
+              "early": 0,
+              "repeat": 0,
+              "multiple": 0,
+              "held": 0,
+              "crossStage": 0,
+              "outside": 0
+            }
+          },
+          "ignoredRepeatCount": 0,
+          "overflow": false
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "trialIndex": 2,
+        "phase": "test",
+        "condition": "X/#00FF00/30/1",
+        "startedAtPerfMs": 2900,
+        "endedAtPerfMs": 3850,
+        "durationMs": 950,
+        "flags": {
+          "timeout": false,
+          "premature": false
+        },
+        "qualityEvents": [
+          "resume"
+        ],
+        "payload": {
+          "plan": {
+            "targetCharacter": "X",
+            "targetColour": "#00FF00",
+            "setSize": 30,
+            "targetCount": 1,
+            "index": 2,
+            "phase": "test",
+            "round": 0,
+            "condition": "X/#00FF00/30/1",
+            "items": [
+              {
+                "id": "cell-0",
+                "x": 24.872805749066174,
+                "y": 28.98938933108002,
+                "letter": "G",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-1",
+                "x": 73.24032311327755,
+                "y": 28.4533531377092,
+                "letter": "Q",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-3",
+                "x": 173.89713202230632,
+                "y": 28.84437817055732,
+                "letter": "Q",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-4",
+                "x": 225.32662760000676,
+                "y": 28.92458452936262,
+                "letter": "X",
+                "colour": "#00FF00",
+                "target": true
+              },
+              {
+                "id": "cell-5",
+                "x": 274.00617749243975,
+                "y": 28.799127308651805,
+                "letter": "Q",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-7",
+                "x": 74.2510578641668,
+                "y": 88.69679343048483,
+                "letter": "C",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-8",
+                "x": 125.90779525227845,
+                "y": 90.3453641179949,
+                "letter": "U",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-9",
+                "x": 176.30386947654188,
+                "y": 90.21771258115768,
+                "letter": "D",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-10",
+                "x": 226.29797014128417,
+                "y": 89.16248298250139,
+                "letter": "G",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-11",
+                "x": 275.8958672033623,
+                "y": 90.53231784049422,
+                "letter": "C",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-12",
+                "x": 23.820869382470846,
+                "y": 151.88550290744752,
+                "letter": "D",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-13",
+                "x": 73.97127701621503,
+                "y": 149.1822969224304,
+                "letter": "U",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-14",
+                "x": 124.56623182445765,
+                "y": 151.35502676665783,
+                "letter": "C",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-16",
+                "x": 223.2681915005669,
+                "y": 149.1137301772833,
+                "letter": "U",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-17",
+                "x": 273.7378281317651,
+                "y": 150.37052708026022,
+                "letter": "U",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-18",
+                "x": 24.67764389421791,
+                "y": 211.03064238186926,
+                "letter": "U",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-19",
+                "x": 73.30502613913268,
+                "y": 211.56012507900596,
+                "letter": "D",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-20",
+                "x": 126.52125501353294,
+                "y": 210.91543556377292,
+                "letter": "G",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-21",
+                "x": 176.4306305265054,
+                "y": 210.14579701889306,
+                "letter": "C",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-22",
+                "x": 226.00722446944565,
+                "y": 209.80387684423476,
+                "letter": "D",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-23",
+                "x": 275.32285457197577,
+                "y": 210.71411700360477,
+                "letter": "D",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-24",
+                "x": 26.108752585947514,
+                "y": 270.3168130554259,
+                "letter": "C",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-27",
+                "x": 174.51265397947282,
+                "y": 271.405611557886,
+                "letter": "C",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-28",
+                "x": 224.98044984601438,
+                "y": 270.4618932325393,
+                "letter": "D",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-30",
+                "x": 24.93556238617748,
+                "y": 328.18667723145336,
+                "letter": "Q",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-31",
+                "x": 73.76918706856668,
+                "y": 328.69351353961974,
+                "letter": "U",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-32",
+                "x": 126.66516122687608,
+                "y": 331.8945504222065,
+                "letter": "G",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-33",
+                "x": 175.41994101926684,
+                "y": 330.21646862477064,
+                "letter": "Q",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-34",
+                "x": 223.39867899380624,
+                "y": 330.0781198227778,
+                "letter": "Q",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-35",
+                "x": 274.2407314348966,
+                "y": 328.8395014507696,
+                "letter": "G",
+                "colour": "#FFFFFF",
+                "target": false
+              }
+            ]
+          },
+          "startedAtPerfMs": 2900,
+          "endedAtPerfMs": 3850,
+          "status": "interrupted",
+          "stopReason": "blur",
+          "events": [
+            {
+              "kind": "reveal",
+              "atMs": 3700
+            },
+            {
+              "kind": "down",
+              "atMs": 3800,
+              "control": "done",
+              "token": "pointer:1",
+              "input": "touch",
+              "key": null,
+              "repeat": false,
+              "primary": true
+            },
+            {
+              "kind": "up",
+              "atMs": 3800,
+              "control": "done",
+              "token": "pointer:1",
+              "input": "touch",
+              "key": null,
+              "repeat": false,
+              "primary": true
+            }
+          ],
+          "state": {
+            "stage": "locate",
+            "searchAtMs": 3700,
+            "locateAtMs": 3800,
+            "selectionAtMs": null,
+            "selection": null,
+            "searchInput": "touch",
+            "locateInput": null,
+            "focused": null,
+            "held": null,
+            "ignored": {
+              "early": 0,
+              "repeat": 0,
+              "multiple": 0,
+              "held": 0,
+              "crossStage": 0,
+              "outside": 0
+            }
+          },
+          "ignoredRepeatCount": 0,
+          "overflow": false
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "trialIndex": 3,
+        "phase": "test",
+        "condition": "O/#00FF00/10/1",
+        "startedAtPerfMs": 3950,
+        "endedAtPerfMs": 5250,
+        "durationMs": 1300,
+        "flags": {
+          "timeout": false,
+          "premature": true
+        },
+        "qualityEvents": [],
+        "payload": {
+          "plan": {
+            "targetCharacter": "O",
+            "targetColour": "#00FF00",
+            "setSize": 10,
+            "targetCount": 1,
+            "index": 3,
+            "phase": "test",
+            "round": 0,
+            "condition": "O/#00FF00/10/1",
+            "items": [
+              {
+                "id": "cell-3",
+                "x": 173.778749124147,
+                "y": 31.77615653257817,
+                "letter": "G",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-7",
+                "x": 74.56990435905755,
+                "y": 90.02904238924384,
+                "letter": "C",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-15",
+                "x": 175.28595309704542,
+                "y": 149.04351243097335,
+                "letter": "G",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-17",
+                "x": 275.6200905404985,
+                "y": 151.51070592552423,
+                "letter": "C",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-20",
+                "x": 125.09560248348862,
+                "y": 211.64707599580288,
+                "letter": "D",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-26",
+                "x": 123.87085072975606,
+                "y": 269.28795525990427,
+                "letter": "U",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-28",
+                "x": 226.1755682658404,
+                "y": 268.8479338530451,
+                "letter": "D",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-30",
+                "x": 24.47243693191558,
+                "y": 330.8249248880893,
+                "letter": "Q",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-31",
+                "x": 73.38317247759551,
+                "y": 328.56080228462815,
+                "letter": "O",
+                "colour": "#00FF00",
+                "target": true
+              },
+              {
+                "id": "cell-35",
+                "x": 274.61837482638657,
+                "y": 328.67902419995517,
+                "letter": "U",
+                "colour": "#FFFFFF",
+                "target": false
+              }
+            ]
+          },
+          "startedAtPerfMs": 3950,
+          "endedAtPerfMs": 5250,
+          "status": "complete",
+          "stopReason": null,
+          "events": [
+            {
+              "kind": "reveal",
+              "atMs": 4750
+            },
+            {
+              "kind": "down",
+              "atMs": 5150,
+              "control": "done",
+              "token": "pointer:1",
+              "input": "touch",
+              "key": null,
+              "repeat": false,
+              "primary": true
+            },
+            {
+              "kind": "up",
+              "atMs": 5150,
+              "control": "done",
+              "token": "pointer:1",
+              "input": "touch",
+              "key": null,
+              "repeat": false,
+              "primary": true
+            },
+            {
+              "kind": "down",
+              "atMs": 5250,
+              "control": "cell-31",
+              "token": "pointer:1",
+              "input": "touch",
+              "key": null,
+              "repeat": false,
+              "primary": true
+            },
+            {
+              "kind": "up",
+              "atMs": 5250,
+              "control": "cell-31",
+              "token": "pointer:1",
+              "input": "touch",
+              "key": null,
+              "repeat": false,
+              "primary": true
+            }
+          ],
+          "state": {
+            "stage": "complete",
+            "searchAtMs": 4750,
+            "locateAtMs": 5150,
+            "selectionAtMs": 5250,
+            "selection": {
+              "kind": "item",
+              "id": "cell-31"
+            },
+            "searchInput": "touch",
+            "locateInput": "touch",
+            "focused": null,
+            "held": null,
+            "ignored": {
+              "early": 0,
+              "repeat": 0,
+              "multiple": 0,
+              "held": 0,
+              "crossStage": 0,
+              "outside": 0
+            }
+          },
+          "ignoredRepeatCount": 0,
+          "overflow": false
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "trialIndex": 4,
+        "phase": "test",
+        "condition": "O/#00FF00/30/1",
+        "startedAtPerfMs": 5350,
+        "endedAtPerfMs": 206170,
+        "durationMs": 200820,
+        "flags": {
+          "timeout": false,
+          "premature": false
+        },
+        "qualityEvents": [],
+        "payload": {
+          "plan": {
+            "targetCharacter": "O",
+            "targetColour": "#00FF00",
+            "setSize": 30,
+            "targetCount": 1,
+            "index": 4,
+            "phase": "test",
+            "round": 0,
+            "condition": "O/#00FF00/30/1",
+            "items": [
+              {
+                "id": "cell-0",
+                "x": 26.526359725743532,
+                "y": 30.66532216221094,
+                "letter": "U",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-1",
+                "x": 76.52821316197515,
+                "y": 31.586494171991944,
+                "letter": "Q",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-4",
+                "x": 223.18881310801953,
+                "y": 28.758791357278824,
+                "letter": "D",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-5",
+                "x": 273.0804594028741,
+                "y": 30.418202416971326,
+                "letter": "Q",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-6",
+                "x": 26.632652865722775,
+                "y": 91.03631902765483,
+                "letter": "U",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-7",
+                "x": 76.46421115286648,
+                "y": 89.33747056405991,
+                "letter": "C",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-9",
+                "x": 175.9681331338361,
+                "y": 88.70952027756721,
+                "letter": "D",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-10",
+                "x": 225.10063629038632,
+                "y": 88.48129131738096,
+                "letter": "G",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-11",
+                "x": 275.0047819893807,
+                "y": 88.60706559568644,
+                "letter": "U",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-12",
+                "x": 23.469487129710615,
+                "y": 148.2976107019931,
+                "letter": "G",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-13",
+                "x": 76.06570997089148,
+                "y": 150.22168817650527,
+                "letter": "D",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-15",
+                "x": 176.03343629278243,
+                "y": 150.93002020195127,
+                "letter": "D",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-16",
+                "x": 225.63408127520233,
+                "y": 148.08977492246777,
+                "letter": "O",
+                "colour": "#00FF00",
+                "target": true
+              },
+              {
+                "id": "cell-17",
+                "x": 273.3246228946373,
+                "y": 148.55603353027254,
+                "letter": "C",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-19",
+                "x": 75.59819310158491,
+                "y": 209.3875162070617,
+                "letter": "G",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-20",
+                "x": 125.50611687917262,
+                "y": 211.18487462308258,
+                "letter": "D",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-21",
+                "x": 176.495725736022,
+                "y": 211.84805614780635,
+                "letter": "C",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-22",
+                "x": 226.4072363935411,
+                "y": 208.90326363500208,
+                "letter": "G",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-23",
+                "x": 275.67898154631257,
+                "y": 211.8131994139403,
+                "letter": "Q",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-24",
+                "x": 26.217156100086868,
+                "y": 269.1213968191296,
+                "letter": "D",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-25",
+                "x": 76.95475315488875,
+                "y": 270.8780936524272,
+                "letter": "U",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-26",
+                "x": 124.33587315119803,
+                "y": 271.6954972781241,
+                "letter": "Q",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-27",
+                "x": 173.0017031626776,
+                "y": 271.5277265915647,
+                "letter": "G",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-28",
+                "x": 223.10451477579772,
+                "y": 270.5246948422864,
+                "letter": "U",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-29",
+                "x": 274.60188278276473,
+                "y": 271.69830385781825,
+                "letter": "Q",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-30",
+                "x": 24.255905114114285,
+                "y": 330.82666747737676,
+                "letter": "G",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-31",
+                "x": 74.26380930282176,
+                "y": 328.0790137620643,
+                "letter": "C",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-32",
+                "x": 124.18469187710434,
+                "y": 331.9033883130178,
+                "letter": "Q",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-34",
+                "x": 225.32065237686038,
+                "y": 331.75319482944906,
+                "letter": "U",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-35",
+                "x": 273.4669237555936,
+                "y": 330.8059636037797,
+                "letter": "C",
+                "colour": "#FFFFFF",
+                "target": false
+              }
+            ]
+          },
+          "startedAtPerfMs": 5350,
+          "endedAtPerfMs": 206170,
+          "status": "complete",
+          "stopReason": null,
+          "events": [
+            {
+              "kind": "down",
+              "atMs": 5450,
+              "control": "done",
+              "token": "key:Space",
+              "input": "keyboard",
+              "key": "Space",
+              "repeat": false,
+              "primary": true
+            },
+            {
+              "kind": "reveal",
+              "atMs": 6150
+            },
+            {
+              "kind": "up",
+              "atMs": 6160,
+              "control": "done",
+              "token": "key:Space",
+              "input": "keyboard",
+              "key": "Space",
+              "repeat": false,
+              "primary": true
+            },
+            {
+              "kind": "down",
+              "atMs": 6170,
+              "control": "done",
+              "token": "key:Space",
+              "input": "keyboard",
+              "key": "Space",
+              "repeat": false,
+              "primary": true
+            },
+            {
+              "kind": "up",
+              "atMs": 6180,
+              "control": "done",
+              "token": "key:Space",
+              "input": "keyboard",
+              "key": "Space",
+              "repeat": false,
+              "primary": true
+            },
+            {
+              "kind": "up",
+              "atMs": 6181,
+              "control": "done",
+              "token": "key:Space",
+              "input": "keyboard",
+              "key": "Space",
+              "repeat": false,
+              "primary": true
+            },
+            {
+              "kind": "down",
+              "atMs": 6550,
+              "control": "cell-16",
+              "token": "pointer:1",
+              "input": "touch",
+              "key": null,
+              "repeat": false,
+              "primary": true
+            },
+            {
+              "kind": "down",
+              "atMs": 6560,
+              "control": "none",
+              "token": "pointer:2",
+              "input": "touch",
+              "key": null,
+              "repeat": false,
+              "primary": false
+            },
+            {
+              "kind": "up",
+              "atMs": 6570,
+              "control": "none",
+              "token": "pointer:2",
+              "input": "touch",
+              "key": null,
+              "repeat": false,
+              "primary": true
+            },
+            {
+              "kind": "up",
+              "atMs": 6580,
+              "control": "outside",
+              "token": "pointer:1",
+              "input": "touch",
+              "key": null,
+              "repeat": false,
+              "primary": true
+            },
+            {
+              "kind": "down",
+              "atMs": 206160,
+              "control": "cell-16",
+              "token": "pointer:1",
+              "input": "touch",
+              "key": null,
+              "repeat": false,
+              "primary": true
+            },
+            {
+              "kind": "up",
+              "atMs": 206170,
+              "control": "cell-16",
+              "token": "pointer:1",
+              "input": "touch",
+              "key": null,
+              "repeat": false,
+              "primary": true
+            }
+          ],
+          "state": {
+            "stage": "complete",
+            "searchAtMs": 6150,
+            "locateAtMs": 6180,
+            "selectionAtMs": 206170,
+            "selection": {
+              "kind": "item",
+              "id": "cell-16"
+            },
+            "searchInput": "keyboard",
+            "locateInput": "touch",
+            "focused": null,
+            "held": null,
+            "ignored": {
+              "early": 0,
+              "repeat": 0,
+              "multiple": 1,
+              "held": 0,
+              "crossStage": 1,
+              "outside": 1
+            }
+          },
+          "ignoredRepeatCount": 300,
+          "overflow": false
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "trialIndex": 5,
+        "phase": "test",
+        "condition": "X/#00FF00/10/5",
+        "startedAtPerfMs": 206270,
+        "endedAtPerfMs": 207670,
+        "durationMs": 1400,
+        "flags": {
+          "timeout": true,
+          "premature": false
+        },
+        "qualityEvents": [],
+        "payload": {
+          "plan": {
+            "targetCharacter": "X",
+            "targetColour": "#00FF00",
+            "setSize": 10,
+            "targetCount": 5,
+            "index": 5,
+            "phase": "test",
+            "round": 0,
+            "condition": "X/#00FF00/10/5",
+            "items": [
+              {
+                "id": "cell-7",
+                "x": 74.57514009345323,
+                "y": 89.99588275328279,
+                "letter": "X",
+                "colour": "#00FF00",
+                "target": true
+              },
+              {
+                "id": "cell-12",
+                "x": 23.83324841596186,
+                "y": 148.58813636098057,
+                "letter": "G",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-14",
+                "x": 123.17559552937746,
+                "y": 148.59633040986955,
+                "letter": "D",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-15",
+                "x": 175.86894130986184,
+                "y": 148.55501119513065,
+                "letter": "C",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-16",
+                "x": 226.18980361986905,
+                "y": 148.10958079062402,
+                "letter": "X",
+                "colour": "#00FF00",
+                "target": true
+              },
+              {
+                "id": "cell-19",
+                "x": 76.7511300938204,
+                "y": 210.71692171972245,
+                "letter": "X",
+                "colour": "#00FF00",
+                "target": true
+              },
+              {
+                "id": "cell-21",
+                "x": 174.97397635132074,
+                "y": 210.05178744718432,
+                "letter": "X",
+                "colour": "#00FF00",
+                "target": true
+              },
+              {
+                "id": "cell-23",
+                "x": 273.3739619553089,
+                "y": 211.21056284476072,
+                "letter": "X",
+                "colour": "#00FF00",
+                "target": true
+              },
+              {
+                "id": "cell-24",
+                "x": 23.68041893839836,
+                "y": 271.1570975733921,
+                "letter": "Q",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-29",
+                "x": 275.9378365445882,
+                "y": 270.0400048578158,
+                "letter": "U",
+                "colour": "#FFFFFF",
+                "target": false
+              }
+            ]
+          },
+          "startedAtPerfMs": 206270,
+          "endedAtPerfMs": 207670,
+          "status": "complete",
+          "stopReason": null,
+          "events": [
+            {
+              "kind": "reveal",
+              "atMs": 207070
+            },
+            {
+              "kind": "down",
+              "atMs": 207570,
+              "control": "done",
+              "token": "pointer:1",
+              "input": "touch",
+              "key": null,
+              "repeat": false,
+              "primary": true
+            },
+            {
+              "kind": "up",
+              "atMs": 207570,
+              "control": "done",
+              "token": "pointer:1",
+              "input": "touch",
+              "key": null,
+              "repeat": false,
+              "primary": true
+            },
+            {
+              "kind": "down",
+              "atMs": 207670,
+              "control": "cell-7",
+              "token": "pointer:1",
+              "input": "touch",
+              "key": null,
+              "repeat": false,
+              "primary": true
+            },
+            {
+              "kind": "up",
+              "atMs": 207670,
+              "control": "cell-7",
+              "token": "pointer:1",
+              "input": "touch",
+              "key": null,
+              "repeat": false,
+              "primary": true
+            }
+          ],
+          "state": {
+            "stage": "complete",
+            "searchAtMs": 207070,
+            "locateAtMs": 207570,
+            "selectionAtMs": 207670,
+            "selection": {
+              "kind": "item",
+              "id": "cell-7"
+            },
+            "searchInput": "touch",
+            "locateInput": "touch",
+            "focused": null,
+            "held": null,
+            "ignored": {
+              "early": 0,
+              "repeat": 0,
+              "multiple": 0,
+              "held": 0,
+              "crossStage": 0,
+              "outside": 0
+            }
+          },
+          "ignoredRepeatCount": 0,
+          "overflow": false
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "trialIndex": 6,
+        "phase": "test",
+        "condition": "O/#00FF00/20/1",
+        "startedAtPerfMs": 207770,
+        "endedAtPerfMs": 209120,
+        "durationMs": 1350,
+        "flags": {
+          "timeout": false,
+          "premature": false
+        },
+        "qualityEvents": [
+          "resume"
+        ],
+        "payload": {
+          "plan": {
+            "targetCharacter": "O",
+            "targetColour": "#00FF00",
+            "setSize": 20,
+            "targetCount": 1,
+            "index": 6,
+            "phase": "test",
+            "round": 0,
+            "condition": "O/#00FF00/20/1",
+            "items": [
+              {
+                "id": "cell-1",
+                "x": 73.0622630994767,
+                "y": 30.105733607895672,
+                "letter": "D",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-2",
+                "x": 125.23479790333658,
+                "y": 28.082242568954825,
+                "letter": "D",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-3",
+                "x": 173.41759915836155,
+                "y": 30.827625739388168,
+                "letter": "U",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-4",
+                "x": 225.37471114750952,
+                "y": 28.278236967511475,
+                "letter": "G",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-5",
+                "x": 274.8427403382957,
+                "y": 31.783060469664633,
+                "letter": "O",
+                "colour": "#00FF00",
+                "target": true
+              },
+              {
+                "id": "cell-6",
+                "x": 25.53502979595214,
+                "y": 91.7230246309191,
+                "letter": "G",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-7",
+                "x": 76.05948153883219,
+                "y": 89.09056766796857,
+                "letter": "C",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-9",
+                "x": 176.8504061298445,
+                "y": 90.70552110485733,
+                "letter": "Q",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-10",
+                "x": 226.59453134424984,
+                "y": 90.17168760951608,
+                "letter": "Q",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-11",
+                "x": 276.7615181738511,
+                "y": 90.6737718693912,
+                "letter": "D",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-12",
+                "x": 24.91068473737687,
+                "y": 150.07440916914493,
+                "letter": "Q",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-13",
+                "x": 73.09078452549875,
+                "y": 151.85207712557167,
+                "letter": "U",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-14",
+                "x": 125.30819901451468,
+                "y": 151.82772675622255,
+                "letter": "C",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-18",
+                "x": 25.538771661929786,
+                "y": 209.9077695272863,
+                "letter": "G",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-21",
+                "x": 175.76328054536134,
+                "y": 211.05685514491051,
+                "letter": "Q",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-23",
+                "x": 276.13555906526744,
+                "y": 210.96018136106431,
+                "letter": "C",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-27",
+                "x": 173.28932311292738,
+                "y": 271.4841252602637,
+                "letter": "G",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-29",
+                "x": 276.47730048093945,
+                "y": 271.2600834686309,
+                "letter": "D",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-30",
+                "x": 25.84622439928353,
+                "y": 329.18698973953724,
+                "letter": "U",
+                "colour": "#FFFFFF",
+                "target": false
+              },
+              {
+                "id": "cell-32",
+                "x": 124.2218319978565,
+                "y": 328.95309314318,
+                "letter": "U",
+                "colour": "#FFFFFF",
+                "target": false
+              }
+            ]
+          },
+          "startedAtPerfMs": 207770,
+          "endedAtPerfMs": 209120,
+          "status": "complete",
+          "stopReason": null,
+          "events": [
+            {
+              "kind": "reveal",
+              "atMs": 208570
+            },
+            {
+              "kind": "down",
+              "atMs": 209020,
+              "control": "done",
+              "token": "pointer:1",
+              "input": "touch",
+              "key": null,
+              "repeat": false,
+              "primary": true
+            },
+            {
+              "kind": "up",
+              "atMs": 209020,
+              "control": "done",
+              "token": "pointer:1",
+              "input": "touch",
+              "key": null,
+              "repeat": false,
+              "primary": true
+            },
+            {
+              "kind": "down",
+              "atMs": 209120,
+              "control": "cell-5",
+              "token": "pointer:1",
+              "input": "touch",
+              "key": null,
+              "repeat": false,
+              "primary": true
+            },
+            {
+              "kind": "up",
+              "atMs": 209120,
+              "control": "cell-5",
+              "token": "pointer:1",
+              "input": "touch",
+              "key": null,
+              "repeat": false,
+              "primary": true
+            }
+          ],
+          "state": {
+            "stage": "complete",
+            "searchAtMs": 208570,
+            "locateAtMs": 209020,
+            "selectionAtMs": 209120,
+            "selection": {
+              "kind": "item",
+              "id": "cell-5"
+            },
+            "searchInput": "touch",
+            "locateInput": "touch",
+            "focused": null,
+            "held": null,
+            "ignored": {
+              "early": 0,
+              "repeat": 0,
+              "multiple": 0,
+              "held": 0,
+              "crossStage": 0,
+              "outside": 0
+            }
+          },
+          "ignoredRepeatCount": 0,
+          "overflow": false
+        }
+      }
+    ]
+  },
+  "expected": [
+    {
+      "index": 0,
+      "correct": true,
+      "search": 0,
+      "locate": 0
+    },
+    {
+      "index": 1,
+      "correct": false,
+      "search": 300,
+      "locate": 700
+    },
+    {
+      "index": 4,
+      "correct": true,
+      "search": 30,
+      "locate": 199990
+    }
+  ],
+  "score": {
+    "metrics": {
+      "validTrialCount": 3,
+      "receivedTrialCount": 7,
+      "expectedTrialCount": 36,
+      "correctTrialCount": 2,
+      "accuracy": 0.6666666666666666,
+      "bySetSize": {
+        "10": {
+          "planned": 12,
+          "received": 3,
+          "valid": 1,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "20": {
+          "planned": 12,
+          "received": 1,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "30": {
+          "planned": 12,
+          "received": 3,
+          "valid": 2,
+          "correct": 2,
+          "correctRTCount": 2,
+          "medianSearchMs": 15,
+          "medianLocateMs": 99995
+        }
+      },
+      "byColour": {
+        "#00FF00": {
+          "planned": 18,
+          "received": 6,
+          "valid": 2,
+          "correct": 2,
+          "correctRTCount": 2,
+          "medianSearchMs": 15,
+          "medianLocateMs": 99995
+        },
+        "#FFFFFF": {
+          "planned": 18,
+          "received": 1,
+          "valid": 1,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        }
+      },
+      "byTargetCount": {
+        "0": {
+          "planned": 12,
+          "received": 1,
+          "valid": 1,
+          "correct": 1,
+          "correctRTCount": 1,
+          "medianSearchMs": 0,
+          "medianLocateMs": 0
+        },
+        "1": {
+          "planned": 12,
+          "received": 5,
+          "valid": 2,
+          "correct": 1,
+          "correctRTCount": 1,
+          "medianSearchMs": 30,
+          "medianLocateMs": 199990
+        },
+        "5": {
+          "planned": 12,
+          "received": 1,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        }
+      },
+      "conditions": {
+        "O/#00FF00/30/0": {
+          "planned": 1,
+          "received": 1,
+          "valid": 1,
+          "correct": 1,
+          "correctRTCount": 1,
+          "medianSearchMs": 0,
+          "medianLocateMs": 0
+        },
+        "X/#FFFFFF/10/1": {
+          "planned": 1,
+          "received": 1,
+          "valid": 1,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#00FF00/30/1": {
+          "planned": 1,
+          "received": 1,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#00FF00/10/1": {
+          "planned": 1,
+          "received": 1,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#00FF00/30/1": {
+          "planned": 1,
+          "received": 1,
+          "valid": 1,
+          "correct": 1,
+          "correctRTCount": 1,
+          "medianSearchMs": 30,
+          "medianLocateMs": 199990
+        },
+        "X/#00FF00/10/5": {
+          "planned": 1,
+          "received": 1,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#00FF00/20/1": {
+          "planned": 1,
+          "received": 1,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#FFFFFF/10/1": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#FFFFFF/30/1": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#FFFFFF/30/1": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#FFFFFF/20/0": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#FFFFFF/20/1": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#00FF00/10/5": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#00FF00/20/5": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#FFFFFF/30/5": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#00FF00/20/1": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#00FF00/30/0": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#FFFFFF/20/1": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#00FF00/20/0": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#00FF00/10/0": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#FFFFFF/30/5": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#FFFFFF/10/5": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#FFFFFF/20/0": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#FFFFFF/20/5": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#FFFFFF/10/5": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#00FF00/20/0": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#00FF00/10/1": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#00FF00/20/5": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#00FF00/10/0": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#FFFFFF/30/0": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#00FF00/30/5": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#FFFFFF/30/0": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#FFFFFF/10/0": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#FFFFFF/20/5": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#FFFFFF/10/0": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#00FF00/30/5": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        }
+      },
+      "phaseInputs": {
+        "search": {
+          "touch": 2,
+          "keyboard": 1
+        },
+        "locate": {
+          "touch": 3
+        }
+      },
+      "reportBinding": {
+        "testType": "visual-search-two-stage",
+        "engineVersion": "0.1.0",
+        "scoringVersion": "0.1.0",
+        "configVersion": "0.1.0",
+        "profile": "experience",
+        "configHash": "77c9999593188962ebae2524ea8b96df0d60efeadfc5a0b8008251d3359735c4",
+        "protocolSignature": "83fda15215385e3a77b9937472f966693ef6909e8698317ed58b79f67dae90ba",
+        "reportDefinitionVersion": "0.1.0"
+      }
+    },
+    "quality": {
+      "state": "limited",
+      "flags": {
+        "noValidTrials": false,
+        "incompleteRecords": true,
+        "technicalLoss": true
+      },
+      "reasons": [
+        "incompleteRecords",
+        "technicalLoss"
+      ]
+    },
+    "audit": {
+      "trialCount": 7,
+      "scorerVersion": "0.1.0"
+    }
+  },
+  "report": {
+    "testType": "visual-search-two-stage",
+    "engineVersion": "0.1.0",
+    "scoringVersion": "0.1.0",
+    "configVersion": "0.1.0",
+    "reportDefinitionVersion": "0.1.0",
+    "presentationVersion": "0.1.0",
+    "configHash": "77c9999593188962ebae2524ea8b96df0d60efeadfc5a0b8008251d3359735c4",
+    "protocolSignature": "83fda15215385e3a77b9937472f966693ef6909e8698317ed58b79f67dae90ba",
+    "profile": "experience",
+    "state": "limited",
+    "planned": 36,
+    "received": 7,
+    "valid": 3,
+    "correct": 2,
+    "bySetSize": {
+      "10": {
+        "planned": 12,
+        "received": 3,
+        "valid": 1,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "20": {
+        "planned": 12,
+        "received": 1,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "30": {
+        "planned": 12,
+        "received": 3,
+        "valid": 2,
+        "correct": 2,
+        "correctRTCount": 2,
+        "medianSearchMs": 15,
+        "medianLocateMs": 99995
+      }
+    },
+    "byColour": {
+      "#00FF00": {
+        "planned": 18,
+        "received": 6,
+        "valid": 2,
+        "correct": 2,
+        "correctRTCount": 2,
+        "medianSearchMs": 15,
+        "medianLocateMs": 99995
+      },
+      "#FFFFFF": {
+        "planned": 18,
+        "received": 1,
+        "valid": 1,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      }
+    },
+    "byTargetCount": {
+      "0": {
+        "planned": 12,
+        "received": 1,
+        "valid": 1,
+        "correct": 1,
+        "correctRTCount": 1,
+        "medianSearchMs": 0,
+        "medianLocateMs": 0
+      },
+      "1": {
+        "planned": 12,
+        "received": 5,
+        "valid": 2,
+        "correct": 1,
+        "correctRTCount": 1,
+        "medianSearchMs": 30,
+        "medianLocateMs": 199990
+      },
+      "5": {
+        "planned": 12,
+        "received": 1,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      }
+    },
+    "conditions": {
+      "O/#00FF00/30/0": {
+        "planned": 1,
+        "received": 1,
+        "valid": 1,
+        "correct": 1,
+        "correctRTCount": 1,
+        "medianSearchMs": 0,
+        "medianLocateMs": 0
+      },
+      "X/#FFFFFF/10/1": {
+        "planned": 1,
+        "received": 1,
+        "valid": 1,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#00FF00/30/1": {
+        "planned": 1,
+        "received": 1,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#00FF00/10/1": {
+        "planned": 1,
+        "received": 1,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#00FF00/30/1": {
+        "planned": 1,
+        "received": 1,
+        "valid": 1,
+        "correct": 1,
+        "correctRTCount": 1,
+        "medianSearchMs": 30,
+        "medianLocateMs": 199990
+      },
+      "X/#00FF00/10/5": {
+        "planned": 1,
+        "received": 1,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#00FF00/20/1": {
+        "planned": 1,
+        "received": 1,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#FFFFFF/10/1": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#FFFFFF/30/1": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#FFFFFF/30/1": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#FFFFFF/20/0": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#FFFFFF/20/1": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#00FF00/10/5": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#00FF00/20/5": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#FFFFFF/30/5": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#00FF00/20/1": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#00FF00/30/0": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#FFFFFF/20/1": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#00FF00/20/0": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#00FF00/10/0": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#FFFFFF/30/5": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#FFFFFF/10/5": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#FFFFFF/20/0": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#FFFFFF/20/5": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#FFFFFF/10/5": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#00FF00/20/0": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#00FF00/10/1": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#00FF00/20/5": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#00FF00/10/0": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#FFFFFF/30/0": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#00FF00/30/5": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#FFFFFF/30/0": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#FFFFFF/10/0": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#FFFFFF/20/5": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#FFFFFF/10/0": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#00FF00/30/5": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      }
+    },
+    "phaseInputs": {
+      "search": {
+        "touch": 2,
+        "keyboard": 1
+      },
+      "locate": {
+        "touch": 3
+      }
+    }
+  },
+  "zeroReport": {
+    "testType": "visual-search-two-stage",
+    "engineVersion": "0.1.0",
+    "scoringVersion": "0.1.0",
+    "configVersion": "0.1.0",
+    "reportDefinitionVersion": "0.1.0",
+    "presentationVersion": "0.1.0",
+    "configHash": "77c9999593188962ebae2524ea8b96df0d60efeadfc5a0b8008251d3359735c4",
+    "protocolSignature": "83fda15215385e3a77b9937472f966693ef6909e8698317ed58b79f67dae90ba",
+    "profile": "experience",
+    "state": "limited",
+    "planned": 36,
+    "received": 1,
+    "valid": 1,
+    "correct": 1,
+    "bySetSize": {
+      "10": {
+        "planned": 12,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "20": {
+        "planned": 12,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "30": {
+        "planned": 12,
+        "received": 1,
+        "valid": 1,
+        "correct": 1,
+        "correctRTCount": 1,
+        "medianSearchMs": 0,
+        "medianLocateMs": 0
+      }
+    },
+    "byColour": {
+      "#00FF00": {
+        "planned": 18,
+        "received": 1,
+        "valid": 1,
+        "correct": 1,
+        "correctRTCount": 1,
+        "medianSearchMs": 0,
+        "medianLocateMs": 0
+      },
+      "#FFFFFF": {
+        "planned": 18,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      }
+    },
+    "byTargetCount": {
+      "0": {
+        "planned": 12,
+        "received": 1,
+        "valid": 1,
+        "correct": 1,
+        "correctRTCount": 1,
+        "medianSearchMs": 0,
+        "medianLocateMs": 0
+      },
+      "1": {
+        "planned": 12,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "5": {
+        "planned": 12,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      }
+    },
+    "conditions": {
+      "O/#00FF00/30/0": {
+        "planned": 1,
+        "received": 1,
+        "valid": 1,
+        "correct": 1,
+        "correctRTCount": 1,
+        "medianSearchMs": 0,
+        "medianLocateMs": 0
+      },
+      "X/#FFFFFF/10/1": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#00FF00/30/1": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#00FF00/10/1": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#00FF00/30/1": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#00FF00/10/5": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#00FF00/20/1": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#FFFFFF/10/1": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#FFFFFF/30/1": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#FFFFFF/30/1": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#FFFFFF/20/0": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#FFFFFF/20/1": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#00FF00/10/5": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#00FF00/20/5": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#FFFFFF/30/5": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#00FF00/20/1": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#00FF00/30/0": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#FFFFFF/20/1": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#00FF00/20/0": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#00FF00/10/0": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#FFFFFF/30/5": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#FFFFFF/10/5": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#FFFFFF/20/0": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#FFFFFF/20/5": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#FFFFFF/10/5": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#00FF00/20/0": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#00FF00/10/1": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#00FF00/20/5": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#00FF00/10/0": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#FFFFFF/30/0": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#00FF00/30/5": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#FFFFFF/30/0": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#FFFFFF/10/0": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#FFFFFF/20/5": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#FFFFFF/10/0": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#00FF00/30/5": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      }
+    },
+    "phaseInputs": {
+      "search": {
+        "touch": 1
+      },
+      "locate": {
+        "touch": 1
+      }
+    }
+  },
+  "markedOnlyReport": {
+    "testType": "visual-search-two-stage",
+    "engineVersion": "0.1.0",
+    "scoringVersion": "0.1.0",
+    "configVersion": "0.1.0",
+    "reportDefinitionVersion": "0.1.0",
+    "presentationVersion": "0.1.0",
+    "configHash": "77c9999593188962ebae2524ea8b96df0d60efeadfc5a0b8008251d3359735c4",
+    "protocolSignature": "83fda15215385e3a77b9937472f966693ef6909e8698317ed58b79f67dae90ba",
+    "profile": "experience",
+    "state": "invalid",
+    "planned": 36,
+    "received": 1,
+    "valid": 0,
+    "correct": 0,
+    "bySetSize": {
+      "10": {
+        "planned": 12,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "20": {
+        "planned": 12,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "30": {
+        "planned": 12,
+        "received": 1,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      }
+    },
+    "byColour": {
+      "#00FF00": {
+        "planned": 18,
+        "received": 1,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "#FFFFFF": {
+        "planned": 18,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      }
+    },
+    "byTargetCount": {
+      "0": {
+        "planned": 12,
+        "received": 1,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "1": {
+        "planned": 12,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "5": {
+        "planned": 12,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      }
+    },
+    "conditions": {
+      "O/#00FF00/30/0": {
+        "planned": 1,
+        "received": 1,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#FFFFFF/10/1": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#00FF00/30/1": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#00FF00/10/1": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#00FF00/30/1": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#00FF00/10/5": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#00FF00/20/1": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#FFFFFF/10/1": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#FFFFFF/30/1": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#FFFFFF/30/1": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#FFFFFF/20/0": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#FFFFFF/20/1": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#00FF00/10/5": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#00FF00/20/5": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#FFFFFF/30/5": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#00FF00/20/1": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#00FF00/30/0": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#FFFFFF/20/1": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#00FF00/20/0": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#00FF00/10/0": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#FFFFFF/30/5": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#FFFFFF/10/5": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#FFFFFF/20/0": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#FFFFFF/20/5": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#FFFFFF/10/5": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#00FF00/20/0": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#00FF00/10/1": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#00FF00/20/5": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#00FF00/10/0": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#FFFFFF/30/0": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#00FF00/30/5": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#FFFFFF/30/0": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#FFFFFF/10/0": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#FFFFFF/20/5": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#FFFFFF/10/0": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#00FF00/30/5": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      }
+    },
+    "phaseInputs": {
+      "search": {},
+      "locate": {}
+    }
+  },
+  "emptyReport": {
+    "testType": "visual-search-two-stage",
+    "engineVersion": "0.1.0",
+    "scoringVersion": "0.1.0",
+    "configVersion": "0.1.0",
+    "reportDefinitionVersion": "0.1.0",
+    "presentationVersion": "0.1.0",
+    "configHash": "77c9999593188962ebae2524ea8b96df0d60efeadfc5a0b8008251d3359735c4",
+    "protocolSignature": "83fda15215385e3a77b9937472f966693ef6909e8698317ed58b79f67dae90ba",
+    "profile": "experience",
+    "state": "invalid",
+    "planned": 36,
+    "received": 0,
+    "valid": 0,
+    "correct": 0,
+    "bySetSize": {
+      "10": {
+        "planned": 12,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "20": {
+        "planned": 12,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "30": {
+        "planned": 12,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      }
+    },
+    "byColour": {
+      "#00FF00": {
+        "planned": 18,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "#FFFFFF": {
+        "planned": 18,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      }
+    },
+    "byTargetCount": {
+      "0": {
+        "planned": 12,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "1": {
+        "planned": 12,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "5": {
+        "planned": 12,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      }
+    },
+    "conditions": {
+      "O/#00FF00/30/0": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#FFFFFF/10/1": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#00FF00/30/1": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#00FF00/10/1": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#00FF00/30/1": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#00FF00/10/5": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#00FF00/20/1": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#FFFFFF/10/1": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#FFFFFF/30/1": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#FFFFFF/30/1": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#FFFFFF/20/0": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#FFFFFF/20/1": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#00FF00/10/5": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#00FF00/20/5": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#FFFFFF/30/5": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#00FF00/20/1": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#00FF00/30/0": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#FFFFFF/20/1": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#00FF00/20/0": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#00FF00/10/0": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#FFFFFF/30/5": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#FFFFFF/10/5": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#FFFFFF/20/0": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#FFFFFF/20/5": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#FFFFFF/10/5": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#00FF00/20/0": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#00FF00/10/1": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#00FF00/20/5": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#00FF00/10/0": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#FFFFFF/30/0": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#00FF00/30/5": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#FFFFFF/30/0": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#FFFFFF/10/0": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#FFFFFF/20/5": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "X/#FFFFFF/10/0": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      },
+      "O/#00FF00/30/5": {
+        "planned": 1,
+        "received": 0,
+        "valid": 0,
+        "correct": 0,
+        "correctRTCount": 0,
+        "medianSearchMs": null,
+        "medianLocateMs": null
+      }
+    },
+    "phaseInputs": {
+      "search": {},
+      "locate": {}
+    }
+  }
+}

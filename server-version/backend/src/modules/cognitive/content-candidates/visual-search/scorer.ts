@@ -16,8 +16,9 @@ export function scoreSearch(input:AuthoritativeScorerInput<SearchConfig,SearchRa
  for(const [index,value] of call.trials.entries()){const e=parseTrialEnvelope<SearchRaw>(value),raw=searchRawSchema.parse(e.payload)
   if(e.phase!=='test'||e.trialIndex!==index||e.condition!==plan[index].condition||e.startedAtPerfMs!==raw.startedAtPerfMs||e.endedAtPerfMs!==raw.endedAtPerfMs||e.durationMs!==raw.endedAtPerfMs-raw.startedAtPerfMs||(previousEnd!==null&&raw.startedAtPerfMs<previousEnd))throw Error('Search envelope/clock ownership mismatch');previousEnd=raw.endedAtPerfMs
   const row=reviewSearch(raw,plan[index],c),groups=[sizes[plan[index].setSize],colours[plan[index].targetColour],targets[plan[index].targetCount],cells[plan[index].condition]];for(const g of groups)g.received++
-  if(!row.valid||e.flags.timeout||e.flags.premature||e.qualityEvents.length)technical++
-  if(row.valid){valid++;for(const g of groups)g.valid++;phaseInputs.search[row.searchInput!]=(phaseInputs.search[row.searchInput!]??0)+1;phaseInputs.locate[row.locateInput!]=(phaseInputs.locate[row.locateInput!]??0)+1
+  const usable=row.valid&&!e.flags.timeout&&!e.flags.premature&&e.qualityEvents.length===0
+  if(!usable)technical++
+  if(usable){valid++;for(const g of groups)g.valid++;phaseInputs.search[row.searchInput!]=(phaseInputs.search[row.searchInput!]??0)+1;phaseInputs.locate[row.locateInput!]=(phaseInputs.locate[row.locateInput!]??0)+1
    if(row.correct){correct++;for(const g of groups){g.correct++;g.search.push(row.searchMs!);g.locate.push(row.locateMs!)}}}
  }
  const project=(object:Record<string,Acc>):Record<string,SearchGroup>=>Object.fromEntries(Object.entries(object).map(([key,g])=>[key,{planned:g.planned,received:g.received,valid:g.valid,correct:g.correct,correctRTCount:g.correct,medianSearchMs:medianSearch(g.search),medianLocateMs:medianSearch(g.locate)}]))

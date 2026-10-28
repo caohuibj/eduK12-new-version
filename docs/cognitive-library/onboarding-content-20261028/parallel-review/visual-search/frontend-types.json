@@ -1,0 +1,26 @@
+{
+  "node": "v24.21.0",
+  "roots": [
+    "src/modules/cognitive/tasks/visual-search/SearchReport.tsx",
+    "src/modules/cognitive/tasks/visual-search/envelope-quality-reading.test.tsx",
+    "src/vite-env.d.ts",
+    "src/test/setup.ts"
+  ],
+  "sources": {
+    "server-version/frontend/src/modules/assessment-media/types.ts": "518c50706279c5e1569a442cee8b5a747844ab1e134413c6ed8adf1e2adafb70",
+    "server-version/frontend/src/services/persistence/cognitiveRawArchiveState.ts": "8403ffab818df9743e50a76ae3f32745b7120f5adf840d5472f8cf681514f908",
+    "server-version/frontend/src/services/persistence/finalDraftStore.ts": "007bfcbe75134e424b306940d60001698595ef8499598f956cf509f7af6787ca",
+    "server-version/frontend/src/training/training-cognitive-retention.ts": "b76e750e2d1c5526c1f8fce2e88762c3b14700597082b501c9718428700f679e",
+    "server-version/frontend/src/modules/cognitive/types.ts": "39ec57664537a5488f93c77174b9669a32557d12961f00a38ff4173088956ff2",
+    "server-version/frontend/src/modules/cognitive/CognitiveReportVisual.tsx": "81d90a08a205ef5f963d9a308c830ec99e451df4ffd0ca83780e3a186e6a74a2",
+    "server-version/frontend/src/modules/cognitive/tasks/visual-search/generated/font.ts": "7630e19547ae299958c6ad4a45454d1a53e25e64327f8df6f106761a3ed431d6",
+    "server-version/frontend/src/modules/cognitive/tasks/visual-search/generated/protocol.ts": "75e057e6ed6012a5ed45ed886c90147a9b9943a2b5f324b46ecb1c51d3d9f84e",
+    "server-version/frontend/src/modules/cognitive/tasks/visual-search/generated/report.ts": "ccff04c76ff38a894bddad6bc38c5bb559051cae95ce778cd73fa5ba6337dbbb",
+    "server-version/frontend/src/modules/cognitive/tasks/visual-search/SearchReport.tsx": "648f94c46eb17f8b09ae590bedbec1768e86177401c19faf0310572ac6636074",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/visual-search/representative-records.json": "67f4034775af046c0f7f668907763bc8c483191011a4238904466d5c082a2be9",
+    "server-version/frontend/src/modules/cognitive/tasks/visual-search/envelope-quality-reading.test.tsx": "3a4016f7dd422cb07bba261f790323dffc811486033caa594cf30ed3a6dec670",
+    "server-version/frontend/src/vite-env.d.ts": "65996936fbb042915f7b74a200fcdde7e410f32a669b1ab9597cfaa4b0faddb5",
+    "server-version/frontend/src/test/setup.ts": "6e40f95ed1a8c33a9142d1d1ceb9400abc38b6a8de2d5798f7fa3fe9984482f8"
+  },
+  "diagnostics": []
+}

@@ -1,0 +1,20 @@
+{
+  "base": "a67f425269283d8281379fdf8234f9fd6b0acebc",
+  "recordedAt": "2026-10-28T03:15:13.805Z",
+  "node": "v24.21.0",
+  "nodePath": "/tmp/cognitive-node-env/node-v24.21.0-linux-x64/bin/node",
+  "dependencies": "existing source-worktree node_modules links; no install; not a complete dependency byte manifest",
+  "beforeScorerSHA256": "ef18fde61c353dfb9fe70d50fdd1ae78c1faa0b45bad25879523eba918b67d9c",
+  "sources": {
+    "server-version/backend/src/modules/cognitive/content-candidates/visual-search/scorer.ts": "5a5cb40f1a6662ce6ac542c1a863e8a93a04fd3ee2fe7b3be6b7b0c17c060944",
+    "server-version/backend/src/__tests__/cognitive/visual-search-envelope-quality.test.ts": "a662b3114d1586e2d1d4431af4f5275bcd17c7b049912673291448b18d4ee4e7",
+    "server-version/frontend/src/modules/cognitive/tasks/visual-search/SearchReport.tsx": "648f94c46eb17f8b09ae590bedbec1768e86177401c19faf0310572ac6636074",
+    "server-version/frontend/src/modules/cognitive/tasks/visual-search/envelope-quality-reading.test.tsx": "3a4016f7dd422cb07bba261f790323dffc811486033caa594cf30ed3a6dec670",
+    "server-version/frontend/src/modules/cognitive/tasks/visual-search/capture.ts": "ce6eabb657e046810c0470e8fb5746523d20cbb3e2c9af039c377b801bc1c0a6",
+    "server-version/backend/package-lock.json": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+    "server-version/frontend/package-lock.json": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/visual-search/representative-records.ts": "d706126ddf09427b0c473edf083c8b0c3c9be47ccc69f2965c87b4d7748c1326",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/visual-search/envelope-quality-initial.test.ts.txt": "7f8ef064646fa260679ae78557af5262e2499ec0a5cfd9ca40805ad4a617118d",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/visual-search/preview-report.cjs": "5c6d71d8b8b537e2833dd445c9b69a3453fbe5943aacc83ac340931875761ba6"
+  }
+}
