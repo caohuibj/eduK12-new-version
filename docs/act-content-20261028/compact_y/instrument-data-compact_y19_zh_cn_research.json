@@ -1,0 +1,271 @@
+{
+  "instrumentKey": "compact_y19_zh_cn_research",
+  "options": [
+    {
+      "value": "0",
+      "label_en_note": "开放论文给出两端锚点 0 = Strongly Disagree、6 = Strongly Agree；中间选项按仓库先例（SECQ-25）以数字标注，不猜测文字。",
+      "score": 0
+    },
+    {
+      "value": "1",
+      "label_en_note": "开放论文给出两端锚点 0 = Strongly Disagree、6 = Strongly Agree；中间选项按仓库先例（SECQ-25）以数字标注，不猜测文字。",
+      "score": 1
+    },
+    {
+      "value": "2",
+      "label_en_note": "开放论文给出两端锚点 0 = Strongly Disagree、6 = Strongly Agree；中间选项按仓库先例（SECQ-25）以数字标注，不猜测文字。",
+      "score": 2
+    },
+    {
+      "value": "3",
+      "label_en_note": "开放论文给出两端锚点 0 = Strongly Disagree、6 = Strongly Agree；中间选项按仓库先例（SECQ-25）以数字标注，不猜测文字。",
+      "score": 3
+    },
+    {
+      "value": "4",
+      "label_en_note": "开放论文给出两端锚点 0 = Strongly Disagree、6 = Strongly Agree；中间选项按仓库先例（SECQ-25）以数字标注，不猜测文字。",
+      "score": 4
+    },
+    {
+      "value": "5",
+      "label_en_note": "开放论文给出两端锚点 0 = Strongly Disagree、6 = Strongly Agree；中间选项按仓库先例（SECQ-25）以数字标注，不猜测文字。",
+      "score": 5
+    },
+    {
+      "value": "6",
+      "label_en_note": "开放论文给出两端锚点 0 = Strongly Disagree、6 = Strongly Agree；中间选项按仓库先例（SECQ-25）以数字标注，不猜测文字。",
+      "score": 6
+    }
+  ],
+  "items": [
+    {
+      "itemCode": "CY_01",
+      "en": "I can work out what matters to me in life and go after these things.",
+      "zh_working": "我能弄清楚生活中对自己重要的是什么，并去追求它们。",
+      "assignedScore": "valued_action"
+    },
+    {
+      "itemCode": "CY_02",
+      "en": "I try to distract myself to block out difficult thoughts and feelings.",
+      "zh_working": "我会设法让自己分心，把困难的想法和感受挡在外面。",
+      "assignedScore": "openness_to_experience"
+    },
+    {
+      "itemCode": "CY_03",
+      "en": "I rush through activities that are important to me, without really paying attention.",
+      "zh_working": "做对自己重要的事情时，我常常匆匆忙忙，没有真正留意。",
+      "assignedScore": "behavioural_awareness"
+    },
+    {
+      "itemCode": "CY_04",
+      "en": "I behave in ways that reflect what is important to me.",
+      "zh_working": "我的行为方式能反映出对我重要的东西。",
+      "assignedScore": "valued_action"
+    },
+    {
+      "itemCode": "CY_05",
+      "en": "I get so tangled up in my thoughts that I don't do the things that really matter to me.",
+      "zh_working": "我会被自己的想法缠住，以至于做不了真正重要的事。",
+      "assignedScore": "openness_to_experience"
+    },
+    {
+      "itemCode": "CY_06",
+      "en": "I find it hard to focus on the thing that I'm doing.",
+      "zh_working": "我很难把注意力放在正在做的事情上。",
+      "assignedScore": "behavioural_awareness"
+    },
+    {
+      "itemCode": "CY_07",
+      "en": "I choose to do what's important to me, even if it brings up difficult emotions.",
+      "zh_working": "即使会带来难受的情绪，我也选择去做对自己重要的事。",
+      "assignedScore": "valued_action"
+    },
+    {
+      "itemCode": "CY_08",
+      "en": "I tell myself it's wrong to have certain thoughts.",
+      "zh_working": "我告诉自己，有某些念头是不对的。",
+      "assignedScore": "openness_to_experience"
+    },
+    {
+      "itemCode": "CY_09",
+      "en": "Even when I'm doing things that are important to me, I find myself doing them without paying attention.",
+      "zh_working": "即使在做对自己重要的事情，我也会发现自己心不在焉。",
+      "assignedScore": "behavioural_awareness"
+    },
+    {
+      "itemCode": "CY_10",
+      "en": "I live my life in a way that matches what I care about.",
+      "zh_working": "我的生活方式和我在乎的东西是一致的。",
+      "assignedScore": "valued_action"
+    },
+    {
+      "itemCode": "CY_11",
+      "en": "I try to avoid situations that might bring up difficult thoughts or feelings.",
+      "zh_working": "如果可能带来难受的想法或感受，我会回避那些情境。",
+      "assignedScore": "openness_to_experience"
+    },
+    {
+      "itemCode": "CY_12",
+      "en": "I do things without being aware of what I'm doing.",
+      "zh_working": "我做事时意识不到自己在做什么。",
+      "assignedScore": "behavioural_awareness"
+    },
+    {
+      "itemCode": "CY_13",
+      "en": "I do things that matter to me, even when it is difficult.",
+      "zh_working": "即使困难，我也做对自己重要的事。",
+      "assignedScore": "valued_action"
+    },
+    {
+      "itemCode": "CY_14",
+      "en": "I try hard to block the feelings I don't want.",
+      "zh_working": "我会努力把不想要的感受挡住。",
+      "assignedScore": "openness_to_experience"
+    },
+    {
+      "itemCode": "CY_15",
+      "en": "I often seem to do things without much awareness of what I'm doing.",
+      "zh_working": "我好像经常在没什么觉察的情况下把事情做了。",
+      "assignedScore": "behavioural_awareness"
+    },
+    {
+      "itemCode": "CY_16",
+      "en": "I can stick with things that I care about, even when it's difficult.",
+      "zh_working": "即使困难，我也能坚持做自己在乎的事。",
+      "assignedScore": "valued_action"
+    },
+    {
+      "itemCode": "CY_17",
+      "en": "I avoid things that are important to me, if there is a risk that I will feel upset.",
+      "zh_working": "如果有可能难过，我会回避对自己重要的事。",
+      "assignedScore": "openness_to_experience"
+    },
+    {
+      "itemCode": "CY_18",
+      "en": "My values are really reflected in my behaviour.",
+      "zh_working": "我的价值观确实体现在我的行为里。",
+      "assignedScore": "valued_action"
+    },
+    {
+      "itemCode": "CY_19",
+      "en": "I can keep going with something when it is important to me.",
+      "zh_working": "只要对我很重要，我就能把一件事坚持做下去。",
+      "assignedScore": "valued_action"
+    }
+  ],
+  "reverseScored": [
+    "CY_02",
+    "CY_03",
+    "CY_05",
+    "CY_06",
+    "CY_08",
+    "CY_09",
+    "CY_11",
+    "CY_12",
+    "CY_14",
+    "CY_15",
+    "CY_17"
+  ],
+  "scores": [
+    {
+      "key": "total",
+      "label": "心理灵活性总分（19题）",
+      "items": [
+        "CY_01",
+        "CY_02",
+        "CY_03",
+        "CY_04",
+        "CY_05",
+        "CY_06",
+        "CY_07",
+        "CY_08",
+        "CY_09",
+        "CY_10",
+        "CY_11",
+        "CY_12",
+        "CY_13",
+        "CY_14",
+        "CY_15",
+        "CY_16",
+        "CY_17",
+        "CY_18",
+        "CY_19"
+      ],
+      "aggregation": "sum",
+      "reverse": [
+        "CY_02",
+        "CY_03",
+        "CY_05",
+        "CY_06",
+        "CY_08",
+        "CY_09",
+        "CY_11",
+        "CY_12",
+        "CY_14",
+        "CY_15",
+        "CY_17"
+      ],
+      "description": "11 个负向键题（OE、BA 全部）按 6−原始分反向后与 8 个正向键题相加，范围 0–138。分数越高表示越多报告心理灵活性。"
+    },
+    {
+      "key": "valued_action",
+      "label": "价值行动（VA，8题）",
+      "items": [
+        "CY_01",
+        "CY_04",
+        "CY_07",
+        "CY_10",
+        "CY_13",
+        "CY_16",
+        "CY_18",
+        "CY_19"
+      ],
+      "aggregation": "sum",
+      "reverse": [],
+      "description": "八个正向键题原始分求和，范围 0–48。分数越高表示越多报告：清楚什么重要，并按它行动。"
+    },
+    {
+      "key": "openness_to_experience",
+      "label": "对体验的开放（OE，6题反向后）",
+      "items": [
+        "CY_02",
+        "CY_05",
+        "CY_08",
+        "CY_11",
+        "CY_14",
+        "CY_17"
+      ],
+      "aggregation": "sum",
+      "reverse": [
+        "CY_02",
+        "CY_05",
+        "CY_08",
+        "CY_11",
+        "CY_14",
+        "CY_17"
+      ],
+      "description": "六个负向键题反向后求和，范围 0–36。分数越高表示越少报告分心、回避和压制感受。"
+    },
+    {
+      "key": "behavioural_awareness",
+      "label": "对行为的觉察（BA，5题反向后）",
+      "items": [
+        "CY_03",
+        "CY_06",
+        "CY_09",
+        "CY_12",
+        "CY_15"
+      ],
+      "aggregation": "sum",
+      "reverse": [
+        "CY_03",
+        "CY_06",
+        "CY_09",
+        "CY_12",
+        "CY_15"
+      ],
+      "description": "五个负向键题反向后求和，范围 0–30。分数越高表示越多报告做事时留意当下。"
+    }
+  ],
+  "missingPolicy": "complete_required；任一题缺失则该分数不计算，不插补、不补0。"
+}

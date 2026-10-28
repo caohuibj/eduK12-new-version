@@ -1,0 +1,1341 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "compact_y19_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "Comprehensive assessment of Acceptance and Commitment Therapy processes for Youth, 19-item (CompACT-Y)",
+      "abbreviation": "CompACT-Y",
+      "instrumentFamily": "CompACT-Y"
+    },
+    "construct": {
+      "primaryDomain": "SELF_REGULATION",
+      "secondaryDomains": [],
+      "constructDefinition": "基于 ACT 六过程框架的青少年多维心理灵活性自评：价值行动（VA）、对体验的开放（OE）、对行为的觉察（BA）三个维度及总分。正向与负向措辞题并存，负向题反向后计分；总分越高表示越多报告心理灵活性。",
+      "constructLevel": "BROAD_DOMAIN",
+      "constructOverlapTags": [
+        "domain:act",
+        "domain:self_regulation",
+        "population:k12",
+        "response:student_self",
+        "use:reflection",
+        "use:research",
+        "language_validation:chinese_working_translation",
+        "construct:act_valued_action",
+        "construct:act_openness",
+        "construct:act_behavioural_awareness",
+        "psychological_flexibility",
+        "self_report"
+      ]
+    },
+    "population": {
+      "populationNotes": "原验证样本为英国 6 所学校 334 名青少年；此中文工作译稿未经独立回译或本地验证。逐题顺序按开放论文 Table 3 登记顺序录入，正式施测版（23 题候选池与最终 19 题官方施测包）需向通讯作者索取，入库版本不冒称官方施测包。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "PARTIAL"
+    },
+    "administration": {
+      "itemCount": 19,
+      "estimatedMinutes": 6,
+      "administrationModes": [
+        "PAPER"
+      ],
+      "timeFrame": "一般情形，无指定回忆期",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保持官方作答量尺与题序；开放论文给出两端锚点 0 = Strongly Disagree、6 = Strongly Agree；中间选项按仓库先例（SECQ-25）以数字标注，不猜测文字。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "SUPPORTED",
+          "notes": "原文研究支持；中文工作译文尚未验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "反馈仅作普遍生活化反思，不推断个体能力或状态。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "morey-2024-compacty",
+        "evidenceType": "STRUCTURAL_VALIDITY",
+        "population": "334 adolescents across 6 UK schools",
+        "locale": "en",
+        "territory": "UK",
+        "studyDesign": "开放验证论文：19 题、0–6 分、三因子（VA 8 题、OE 6 题、BA 5 题，负向键反向），总分 0–138，高分=更多心理灵活性。",
+        "rating": "MIXED",
+        "citation": "Morey DP et al. (2024). JCPP Advances, 4(4), e12271.",
+        "doi": "10.1002/jcv2.12271",
+        "url": "https://doi.org/10.1002/jcv2.12271",
+        "notes": "以上证据均针对原语言版本，不外推到本中文工作译稿。"
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "Validation of the Comprehensive assessment of Acceptance and Commitment Therapy processes for Youth (CompACT-Y); open-access paper, CC BY 4.0, Table 3",
+        "citation": "Morey, D. P., et al. (2024). Validation of the comprehensive assessment of acceptance and commitment therapy processes for youth (CompACT-Y). JCPP Advances, 4(4), e12271.",
+        "url": "https://acamh.onlinelibrary.wiley.com/doi/10.1002/jcv2.12271",
+        "publicationYear": 2024
+      },
+      "license": {
+        "status": "unknown",
+        "redistribution": "unknown",
+        "note": "论文为 CC BY 4.0 开放获取（Crossref 核实），19 题逐题表、0–6 量尺与三因子结构随论文公开，可署名转载。作者说明正式 23 题候选版及最终 19 题官方施测包需联系通讯作者；本记录按论文 Table 3 逐题登记，不冒称官方施测包。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "compact_agree_0_6",
+          "options": [
+            {
+              "value": "0",
+              "label": "非常不同意",
+              "score": 0
+            },
+            {
+              "value": "1",
+              "label": "1",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "2",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "3",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "4",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "5",
+              "score": 5
+            },
+            {
+              "value": "6",
+              "label": "非常同意",
+              "score": 6
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "CY_01",
+          "content": "我能弄清楚生活中对自己重要的是什么，并去追求它们。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "compact_agree_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CY_02",
+          "content": "我会设法让自己分心，把困难的想法和感受挡在外面。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "compact_agree_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CY_03",
+          "content": "做对自己重要的事情时，我常常匆匆忙忙，没有真正留意。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "compact_agree_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CY_04",
+          "content": "我的行为方式能反映出对我重要的东西。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "compact_agree_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CY_05",
+          "content": "我会被自己的想法缠住，以至于做不了真正重要的事。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "compact_agree_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CY_06",
+          "content": "我很难把注意力放在正在做的事情上。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "compact_agree_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CY_07",
+          "content": "即使会带来难受的情绪，我也选择去做对自己重要的事。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "compact_agree_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CY_08",
+          "content": "我告诉自己，有某些念头是不对的。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "compact_agree_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CY_09",
+          "content": "即使在做对自己重要的事情，我也会发现自己心不在焉。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 8,
+          "responseSetKey": "compact_agree_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CY_10",
+          "content": "我的生活方式和我在乎的东西是一致的。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 9,
+          "responseSetKey": "compact_agree_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CY_11",
+          "content": "如果可能带来难受的想法或感受，我会回避那些情境。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 10,
+          "responseSetKey": "compact_agree_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CY_12",
+          "content": "我做事时意识不到自己在做什么。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 11,
+          "responseSetKey": "compact_agree_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CY_13",
+          "content": "即使困难，我也做对自己重要的事。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 12,
+          "responseSetKey": "compact_agree_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CY_14",
+          "content": "我会努力把不想要的感受挡住。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 13,
+          "responseSetKey": "compact_agree_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CY_15",
+          "content": "我好像经常在没什么觉察的情况下把事情做了。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 14,
+          "responseSetKey": "compact_agree_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CY_16",
+          "content": "即使困难，我也能坚持做自己在乎的事。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 15,
+          "responseSetKey": "compact_agree_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CY_17",
+          "content": "如果有可能难过，我会回避对自己重要的事。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 16,
+          "responseSetKey": "compact_agree_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CY_18",
+          "content": "我的价值观确实体现在我的行为里。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 17,
+          "responseSetKey": "compact_agree_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CY_19",
+          "content": "只要对我很重要，我就能把一件事坚持做下去。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 18,
+          "responseSetKey": "compact_agree_0_6",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "CY_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CY_02",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "CY_03",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "CY_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CY_05",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "CY_06",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "CY_07",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CY_08",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "CY_09",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "CY_10",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CY_11",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "CY_12",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "CY_13",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CY_14",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "CY_15",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "CY_16",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CY_17",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "CY_18",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CY_19",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "total",
+            "type": "total",
+            "label": "心理灵活性总分（19题）",
+            "description": "11 个负向键题（OE、BA 全部）按 6−原始分反向后与 8 个正向键题相加，范围 0–138。分数越高表示越多报告心理灵活性。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "CY_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CY_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CY_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CY_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CY_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CY_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CY_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CY_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CY_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CY_10",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CY_11",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CY_12",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CY_13",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CY_14",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CY_15",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CY_16",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CY_17",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CY_18",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CY_19",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "valued_action",
+            "type": "dimension",
+            "label": "价值行动（VA，8题）",
+            "description": "八个正向键题原始分求和，范围 0–48。分数越高表示越多报告：清楚什么重要，并按它行动。",
+            "direction": "higher_is_more",
+            "canonical": false,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "CY_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CY_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CY_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CY_10",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CY_13",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CY_16",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CY_18",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CY_19",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "openness_to_experience",
+            "type": "dimension",
+            "label": "对体验的开放（OE，6题反向后）",
+            "description": "六个负向键题反向后求和，范围 0–36。分数越高表示越少报告分心、回避和压制感受。",
+            "direction": "higher_is_more",
+            "canonical": false,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "CY_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CY_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CY_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CY_11",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CY_14",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CY_17",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "behavioural_awareness",
+            "type": "dimension",
+            "label": "对行为的觉察（BA，5题反向后）",
+            "description": "五个负向键题反向后求和，范围 0–30。分数越高表示越多报告做事时留意当下。",
+            "direction": "higher_is_more",
+            "canonical": false,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "CY_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CY_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CY_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CY_12",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CY_15",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "total",
+          "valued_action",
+          "openness_to_experience",
+          "behavioural_awareness"
+        ],
+        "scoreOrder": [
+          "total",
+          "valued_action",
+          "openness_to_experience",
+          "behavioural_awareness"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "total",
+            "headline": "心理灵活性总分",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "负向题反向后求和，分数越高表示越多报告“允许感受在场、留意当下、朝重要的事行动”。数字不是等级，也不定义你。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近一次“感觉不太好但还是做了重要的事”是什么时候？"
+              },
+              {
+                "category": "strategy",
+                "text": "下次感觉不好时，先给感受起个名字，再问一句“此刻重要的事是什么”，然后做一小步。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "valued_action",
+            "headline": "价值行动",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "分数越高，越多报告：清楚什么对自己重要，并把它体现在行动里。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "如果用一句话说“我在乎的事”，你会说什么？这周它出现在你的日程里了吗？"
+              },
+              {
+                "category": "strategy",
+                "text": "给在乎的事留一个固定的小时段，哪怕只有 10 分钟。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "openness_to_experience",
+            "headline": "对体验的开放（反向后）",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "本项由六个负向题反向计分：分数越高，表示越少报告分心、回避和压制感受；越低表示越多报告这些做法。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "你通常怎样对待不请自来的情绪——欢迎、忽略，还是赶走？"
+              },
+              {
+                "category": "strategy",
+                "text": "试着让一种感受“在场”10 秒钟，不赶它也不跟随它，只是留意它的位置和大小。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "behavioural_awareness",
+            "headline": "对行为的觉察（反向后）",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "本项由五个负向题反向计分：分数越高，表示越多报告做事时留意当下；越低表示越多报告“自动驾驶”。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "一天里哪个时刻你最容易“自动导航”？那时你在做什么？"
+              },
+              {
+                "category": "strategy",
+                "text": "挑一个常走神的活动，给它设一个“留意开关”：开始前深呼吸一次，提醒自己“现在开始留意”。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这是未经回译及本地验证的中文工作译稿，结果不可视作已验证中文测量结果。",
+          "逐题顺序按开放论文 Table 3 登记顺序录入；正式施测包需向原作者索取，本记录不冒称官方施测版。",
+          "OE、BA 各题字面为负向描述，已反向计分；不将未反向分呈现给被试。",
+          "该报告是单次自述；缺答不计分，不插补。"
+        ],
+        "disclaimer": "这些内容仅供一般自我反思，不用于诊断、筛查、选拔或排名。"
+      },
+      "referencePolicy": {
+        "type": "none"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "all_minimum",
+        "answers": [
+          {
+            "itemCode": "CY_01",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CY_02",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CY_03",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CY_04",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CY_05",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CY_06",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CY_07",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CY_08",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CY_09",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CY_10",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CY_11",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CY_12",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CY_13",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CY_14",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CY_15",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CY_16",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CY_17",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CY_18",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CY_19",
+            "responseValue": "0"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 66,
+            "valued_action": 0,
+            "openness_to_experience": 36,
+            "behavioural_awareness": 30
+          },
+          "totalScoreKeys": [
+            "total",
+            "valued_action",
+            "openness_to_experience",
+            "behavioural_awareness"
+          ]
+        }
+      },
+      {
+        "name": "all_maximum",
+        "answers": [
+          {
+            "itemCode": "CY_01",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CY_02",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CY_03",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CY_04",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CY_05",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CY_06",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CY_07",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CY_08",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CY_09",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CY_10",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CY_11",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CY_12",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CY_13",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CY_14",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CY_15",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CY_16",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CY_17",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CY_18",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CY_19",
+            "responseValue": "6"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 48,
+            "valued_action": 48,
+            "openness_to_experience": 0,
+            "behavioural_awareness": 0
+          },
+          "totalScoreKeys": [
+            "total",
+            "valued_action",
+            "openness_to_experience",
+            "behavioural_awareness"
+          ]
+        }
+      },
+      {
+        "name": "all_midpoint",
+        "answers": [
+          {
+            "itemCode": "CY_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CY_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CY_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CY_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CY_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CY_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CY_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CY_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CY_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CY_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CY_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CY_12",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CY_13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CY_14",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CY_15",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CY_16",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CY_17",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CY_18",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CY_19",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 57,
+            "valued_action": 24,
+            "openness_to_experience": 18,
+            "behavioural_awareness": 15
+          },
+          "totalScoreKeys": [
+            "total",
+            "valued_action",
+            "openness_to_experience",
+            "behavioural_awareness"
+          ]
+        }
+      },
+      {
+        "name": "mixed_pattern",
+        "answers": [
+          {
+            "itemCode": "CY_01",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CY_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CY_03",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CY_04",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CY_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CY_06",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CY_07",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CY_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CY_09",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CY_10",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CY_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CY_12",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CY_13",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CY_14",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CY_15",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CY_16",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CY_17",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CY_18",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CY_19",
+            "responseValue": "0"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 24,
+            "valued_action": 6,
+            "openness_to_experience": 18,
+            "behavioural_awareness": 0
+          },
+          "totalScoreKeys": [
+            "total",
+            "valued_action",
+            "openness_to_experience",
+            "behavioural_awareness"
+          ]
+        }
+      },
+      {
+        "name": "missing_first_item",
+        "answers": [
+          {
+            "itemCode": "CY_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CY_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CY_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CY_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CY_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CY_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CY_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CY_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CY_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CY_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CY_12",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CY_13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CY_14",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CY_15",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CY_16",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CY_17",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CY_18",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CY_19",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "total": null,
+            "valued_action": null,
+            "openness_to_experience": 18,
+            "behavioural_awareness": 15
+          },
+          "totalScoreKeys": [
+            "total",
+            "valued_action",
+            "openness_to_experience",
+            "behavioural_awareness"
+          ]
+        }
+      },
+      {
+        "name": "all_missing",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "total": null,
+            "valued_action": null,
+            "openness_to_experience": null,
+            "behavioural_awareness": null
+          },
+          "totalScoreKeys": [
+            "total",
+            "valued_action",
+            "openness_to_experience",
+            "behavioural_awareness"
+          ]
+        }
+      }
+    ]
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "compact-y19-v1",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "compact-y19-v1",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

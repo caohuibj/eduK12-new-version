@@ -1,0 +1,31 @@
+{
+  "note": "模拟数据，仅用于核对计分与报告样稿",
+  "answers": {
+    "CY_01": 3,
+    "CY_02": 0,
+    "CY_03": 6,
+    "CY_04": 3,
+    "CY_05": 0,
+    "CY_06": 6,
+    "CY_07": 3,
+    "CY_08": 0,
+    "CY_09": 6,
+    "CY_10": 3,
+    "CY_11": 0,
+    "CY_12": 6,
+    "CY_13": 3,
+    "CY_14": 0,
+    "CY_15": 6,
+    "CY_16": 3,
+    "CY_17": 0,
+    "CY_18": 6,
+    "CY_19": 3
+  },
+  "expectedScores": {
+    "total": 63,
+    "valued_action": 27,
+    "openness_to_experience": 36,
+    "behavioural_awareness": 0
+  },
+  "quality": "interpretable"
+}
