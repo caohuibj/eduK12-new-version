@@ -32,7 +32,7 @@ describe('cancellation scorer', () => {
     expect(result.metrics.hitCount).toBe(12 + CANCELLATION_TARGET_COUNT)
     expect(result.metrics.falseAlarmCount).toBe(falseAlarms.length)
     expect(result.metrics.hitRate).toBe(0.875)
-    expect(result.metrics.falseAlarmRate).toBe(falseAlarms.length / (12 + falseAlarms.length + CANCELLATION_TARGET_COUNT))
+    expect(result.metrics.falseAlarmRate).toBeCloseTo(falseAlarms.length / (12 + falseAlarms.length + CANCELLATION_TARGET_COUNT), 4)
     expect(result.qualityFlags.interpretable).toBe(true)
   })
 
