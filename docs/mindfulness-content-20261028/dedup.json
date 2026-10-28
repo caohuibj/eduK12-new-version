@@ -43,6 +43,16 @@
       "newFamily": "cams_r12",
       "existing": "ffmq15_zh_cn_research / ffmq39 / maas15",
       "relation": "CAMS-R 为单维总分特质正念工具，与 FFMQ 多侧面结构不同；同为特质层但结构不同，分数不互换比较。选项锚点差异已记录（GGSC 表未印锚点，OA 文献佐证 4 点）。"
+    },
+    {
+      "newFamily": "cmipq28_zh_cn",
+      "existing": "ffmq39 / maas15 / ffmq15_zh_cn_research",
+      "relation": "C-MIPQ 为家长正念养育自评（评价对象是家长与孩子的互动），与个体特质正念工具（FFMQ/MAAS）评价层次不同，分数不互换比较。"
+    },
+    {
+      "newFamily": "cmipq28_zh_cn",
+      "existing": "原版 MIPQ（McCaffrey et al., 2017，英文28题四点）",
+      "relation": "C-MIPQ 为经原作者授权的中文独立身份（四点施测版附录 vs 原版四点设计一致；论文 Methods/Table 4 的五点表述待作者确认）。两者题本、计分与证据互不通用；原版英文题文未在本仓复制。"
     }
   ]
 }

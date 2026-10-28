@@ -168,19 +168,19 @@
       ]
     },
     {
-      "family": "mipq",
-      "name": "MIPQ（正念教养问卷）",
-      "category": "家长正念教养自评",
-      "fullTextSource": "PENDING_TEXT_EXTRACTION（Front Psychol 2019, PMC6702300, DOI 10.3389/fpsyg.2019.01847, OA/CC BY）",
-      "wordingAndScoring": "PENDING_TEXT_EXTRACTION",
+      "family": "mipq28_zh_cn",
+      "name": "C-MIPQ（正念教养问卷中文版）",
+      "category": "家长正念教养自评（两维）",
+      "fullTextSource": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2019.01847/pdf",
+      "wordingAndScoring": "PENDING_SCALE_CONFLICT_RESOLUTION",
       "report": "NOT_STARTED",
-      "gap": "版本冲突已解决：原版 MIPQ（McCaffrey et al. 2017）28题两维为四点量表（infrequently–almost always），C-MIPQ 中文版28题为五点（never–almost always），两者为不同身份、各自自洽。拟导入 C-MIPQ（作者验证中文版，OA CC BY，n=1057，12–16岁家长）；唯一缺口：附录A1题文在期刊端为图片（fpsyg-10-01847-a001），当前网络无法取图转写，待网络恢复后下载图片逐题转写并复核。",
+      "gap": "题文已具备：28条中文题干自论文附录A1（400dpi渲染）逐题视转写并复核（第22题\"惩罚\"经放大确认），维度映射已登记（F1正念管教=题14–28、F2与孩子同在当下=题1–13；α=0.89/0.88，CFA两因子成立，n=1057）。唯一阻塞：作答点数三处不一致（施测附录四点[偶尔/有时/经常/总是] vs Methods文字五点 vs Table4统计Range 1–5），未裁定前不建可执行计分；建议联系作者确认或查后续使用文献。详见 docs/mindfulness-content-20261028/mipq28_zh_cn/source.md。",
       "versions": [
         {
-          "key": "mipq28",
+          "key": "cmipq28_zh_cn",
           "version": "1.0.0",
           "itemCount": 28,
-          "locale": null,
+          "locale": "zh-CN",
           "executable": false
         }
       ]

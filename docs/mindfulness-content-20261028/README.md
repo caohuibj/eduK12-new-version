@@ -16,7 +16,7 @@
 | 6 | [TMS-13](./tms13/) | 练习后即时状态正念（两维） | 通过；原生DRAFT | 原生模板＋图文样稿 | [来源](https://www.rotman-baycrest.on.ca/files/publicationmodule/@random45f5724eba2f8/pid3280.pdf)（Lau 2006 论文附录） |
 | 7 | FMI（Walach 原版14题） | 成人正念特质自评 | 未通过：仅找到中文 FMI-12（周仁来/陈思佚），非原版；原版题本仍无可验证来源 | 未开始 | 待核 |
 | 8 | MTS（教学正念） | 教师正念自评 | 未通过：原文付费墙，缺完整题文（锚点已核实：五级 1=Never true…5=Always true） | 未开始 | 待核 |
-| 9 | MIPQ（正念教养） | 家长正念教养自评 | 未通过：四级/五级版本冲突未解决 | 未开始 | 待裁定 |
+| 9 | [C-MIPQ](./mipq28_zh_cn/)（正念教养中文版） | 家长正念教养自评（两维） | 题文已具备（28题视转写+复核）；点数冲突（附录四点 vs Methods/Table4 五点）未裁定，catalog-only | 未开始 | [Front Psychol 2019](https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2019.01847/full)（OA CC BY） |
 | 10 | MEQ（正念饮食） | 成人进食觉察自评 | 未通过：官方要求联系作者取得许可 | 未开始 | [Fred Hutch](https://www.fredhutch.org/)（需许可） |
 
 ## 版本与计分核验
