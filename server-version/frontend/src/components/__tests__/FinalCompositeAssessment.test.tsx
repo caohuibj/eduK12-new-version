@@ -545,3 +545,22 @@ it('uses plain School page wording for submission, progress and required answers
  expect(view.container.textContent).not.toMatch(/区段|字段/)
  expect(submit).not.toHaveBeenCalled()
 })
+
+describe('durable acknowledgement before slow progress or feedback reload',()=>{
+ it.each(['FORM_SECTION','SCALE'] as const)('shows accepted %s immediately without submitting again while reload waits',async type=>{
+  const user=userEvent.setup()
+  let release!:()=>void
+  const gate=new Promise<void>(resolve=>{release=resolve})
+  const onReload=vi.fn(()=>gate),submit=vi.fn().mockResolvedValue({code:0,data:{completed:true,replayed:false}})
+  const item=type==='SCALE'?scaleItem:{...formItem,formAnswers:[],contextSection:false}
+  render(<FinalCompositeAssessment {...sharedProps} state={makeState(item)} onReload={onReload} submitScale={submit} submitFormSection={submit}/> )
+  try{
+   if(type==='SCALE')await user.click(await screen.findByRole('button',{name:'经常'}))
+   await user.click(await screen.findByRole('button',{name:type==='SCALE'?'提交整份量表':'确认并继续'}))
+   await waitFor(()=>expect(onReload).toHaveBeenCalledTimes(1))
+   expect(screen.getByText('服务器已确认当前单元的权威结果。')).toBeVisible()
+   expect(screen.queryByText('答案已锁定，正在提交当前单元的同一份 FINAL。')).not.toBeInTheDocument()
+   expect(submit).toHaveBeenCalledTimes(1)
+  }finally{await act(async()=>release())}
+ })
+})
