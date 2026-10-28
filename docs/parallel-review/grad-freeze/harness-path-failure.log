@@ -1,0 +1,9 @@
+
+ RUN  v4.1.11 /workspace/cognitive-review-spatial/server-version/frontend
+
+No test files found, exiting with code 1
+
+filter: src/modules/cognitive/core/__tests__/grad-freeze-independent.test.tsx
+include: src/**/*.test.{ts,tsx}
+exclude:  **/node_modules/**, **/.git/**
+

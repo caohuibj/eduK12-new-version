@@ -1,0 +1,37 @@
+{
+  "recordedAtUtc": "2026-10-28T04:07:37.150683+00:00",
+  "node": "v24.21.0",
+  "reviewBranchBase": "9de5e38b8323f282f8bb0e19327533bf02d96cb1",
+  "originalRootHead": "da5188c10173cc799b01b2a7666603dcdcf31066",
+  "correctedRootHead": "c4ea6d4481afab6ab671d40959e88d1b83d17628",
+  "sourceHashes": {
+    "server-version/frontend/src/modules/cognitive/core/native-content-port.ts": "cf81569111cc028ca18d82ee37b66e2cc132cf10d7183413bc648dfd99f0386c",
+    "server-version/frontend/src/services/persistence/finalDraftStore.ts": "007bfcbe75134e424b306940d60001698595ef8499598f956cf509f7af6787ca",
+    "server-version/frontend/src/modules/cognitive/core/useCognitiveSession.ts": "9c7a1d54197085aae91de04b6a024ec62cbbd50e686ef2334a1f73980bf6ddf5",
+    "server-version/backend/src/__tests__/cognitive/native-completion-fixture.test-support.ts": "3ba33b2fb7ad20cc4f46b31ded5861caea4525bcf24d48543f607333a966c1af",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/hearts-flowers/completion-claim-regression.json": "839a2a2aba88ca60e9200ec5338c589f478a4dc5bcb5691b5e67fef91947c0ea",
+    "server-version/frontend/src/modules/cognitive/core/__tests__/grad-freeze-independent.test.tsx": "f400cddf2db8c78686c104c58bd27b2753b1819cf9435000c44846f5fdc1893a"
+  },
+  "originalPortSha256": "6d9a2451cd427529829bfbc7cbb9b899f58ebf13a373bd9079d9c9c4e057d4ed",
+  "correctedPortSha256": "cf81569111cc028ca18d82ee37b66e2cc132cf10d7183413bc648dfd99f0386c",
+  "selection": "Existing nativeCompletionFixture raw records slice(0,1); mock host and public receipt; synthetic alternative wire strings, not gzip decoder or DB verification.",
+  "results": {
+    "original": {
+      "exit": 1,
+      "passed": 2,
+      "failed": 1
+    },
+    "correctedRaceOnly": {
+      "exit": 0,
+      "passed": 1,
+      "skipped": 2
+    },
+    "targetedTypes": {
+      "exit": 0,
+      "sources": 147,
+      "diagnostics": 0
+    }
+  },
+  "retainedOriginalTypeFailure": "Termination fixture widened to string; five diagnostics. Final test explicitly types existing aborted literal and adapter; runtime input unchanged.",
+  "harnessFailure": "First attempt wrote a repository-relative path from frontend cwd; no test found, exit1 preserved separately. Corrected working path before actual original reproduction."
+}
