@@ -1,0 +1,416 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "apq42_parent_global_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "source": {
+    "originalCitation": "Shelton, K. K., Frick, P. J., & Wootton, J. (1996). Assessment of parenting practices in families of elementary school-aged children. Journal of Clinical Child Psychology, 25(3), 317–329. https://doi.org/10.1207/s15374424jccp2503_8",
+    "doi": "10.1207/s15374424jccp2503_8",
+    "parentGlobalPDF": "https://faculty.lsu.edu/pfricklab/pdfs/alabamaparenting-pdfs/apg-parent-form.pdf",
+    "permissionPage": "https://faculty.lsu.edu/pfricklab/alabamaparenting.php",
+    "researchArchive": "https://app.notion.com/p/404d27635a3881109af5c634c9944862",
+    "language": "en",
+    "independentTranslation": "zh-CN",
+    "distinctFrom": [
+      "APQ Child Global",
+      "APQ telephone",
+      "APQ9",
+      "teacher report"
+    ]
+  },
+  "items": [
+    {
+      "number": 1,
+      "itemCode": "APQ42_01",
+      "dimension": "involvement",
+      "reverse": false
+    },
+    {
+      "number": 2,
+      "itemCode": "APQ42_02",
+      "dimension": "positive_parenting",
+      "reverse": false
+    },
+    {
+      "number": 3,
+      "itemCode": "APQ42_03",
+      "dimension": "inconsistent_discipline",
+      "reverse": false
+    },
+    {
+      "number": 4,
+      "itemCode": "APQ42_04",
+      "dimension": "involvement",
+      "reverse": false
+    },
+    {
+      "number": 5,
+      "itemCode": "APQ42_05",
+      "dimension": "positive_parenting",
+      "reverse": false
+    },
+    {
+      "number": 6,
+      "itemCode": "APQ42_06",
+      "dimension": "poor_monitoring",
+      "reverse": false
+    },
+    {
+      "number": 7,
+      "itemCode": "APQ42_07",
+      "dimension": "involvement",
+      "reverse": false
+    },
+    {
+      "number": 8,
+      "itemCode": "APQ42_08",
+      "dimension": "inconsistent_discipline",
+      "reverse": false
+    },
+    {
+      "number": 9,
+      "itemCode": "APQ42_09",
+      "dimension": "involvement",
+      "reverse": false
+    },
+    {
+      "number": 10,
+      "itemCode": "APQ42_10",
+      "dimension": "poor_monitoring",
+      "reverse": false
+    },
+    {
+      "number": 11,
+      "itemCode": "APQ42_11",
+      "dimension": "involvement",
+      "reverse": false
+    },
+    {
+      "number": 12,
+      "itemCode": "APQ42_12",
+      "dimension": "inconsistent_discipline",
+      "reverse": false
+    },
+    {
+      "number": 13,
+      "itemCode": "APQ42_13",
+      "dimension": "positive_parenting",
+      "reverse": false
+    },
+    {
+      "number": 14,
+      "itemCode": "APQ42_14",
+      "dimension": "involvement",
+      "reverse": false
+    },
+    {
+      "number": 15,
+      "itemCode": "APQ42_15",
+      "dimension": "involvement",
+      "reverse": false
+    },
+    {
+      "number": 16,
+      "itemCode": "APQ42_16",
+      "dimension": "positive_parenting",
+      "reverse": false
+    },
+    {
+      "number": 17,
+      "itemCode": "APQ42_17",
+      "dimension": "poor_monitoring",
+      "reverse": false
+    },
+    {
+      "number": 18,
+      "itemCode": "APQ42_18",
+      "dimension": "positive_parenting",
+      "reverse": false
+    },
+    {
+      "number": 19,
+      "itemCode": "APQ42_19",
+      "dimension": "poor_monitoring",
+      "reverse": false
+    },
+    {
+      "number": 20,
+      "itemCode": "APQ42_20",
+      "dimension": "involvement",
+      "reverse": false
+    },
+    {
+      "number": 21,
+      "itemCode": "APQ42_21",
+      "dimension": "poor_monitoring",
+      "reverse": false
+    },
+    {
+      "number": 22,
+      "itemCode": "APQ42_22",
+      "dimension": "inconsistent_discipline",
+      "reverse": false
+    },
+    {
+      "number": 23,
+      "itemCode": "APQ42_23",
+      "dimension": "involvement",
+      "reverse": false
+    },
+    {
+      "number": 24,
+      "itemCode": "APQ42_24",
+      "dimension": "poor_monitoring",
+      "reverse": false
+    },
+    {
+      "number": 25,
+      "itemCode": "APQ42_25",
+      "dimension": "inconsistent_discipline",
+      "reverse": false
+    },
+    {
+      "number": 26,
+      "itemCode": "APQ42_26",
+      "dimension": "involvement",
+      "reverse": false
+    },
+    {
+      "number": 27,
+      "itemCode": "APQ42_27",
+      "dimension": "positive_parenting",
+      "reverse": false
+    },
+    {
+      "number": 28,
+      "itemCode": "APQ42_28",
+      "dimension": "poor_monitoring",
+      "reverse": false
+    },
+    {
+      "number": 29,
+      "itemCode": "APQ42_29",
+      "dimension": "poor_monitoring",
+      "reverse": false
+    },
+    {
+      "number": 30,
+      "itemCode": "APQ42_30",
+      "dimension": "poor_monitoring",
+      "reverse": false
+    },
+    {
+      "number": 31,
+      "itemCode": "APQ42_31",
+      "dimension": "inconsistent_discipline",
+      "reverse": false
+    },
+    {
+      "number": 32,
+      "itemCode": "APQ42_32",
+      "dimension": "poor_monitoring",
+      "reverse": false
+    },
+    {
+      "number": 33,
+      "itemCode": "APQ42_33",
+      "dimension": "corporal_punishment",
+      "reverse": false
+    },
+    {
+      "number": 34,
+      "itemCode": "APQ42_34",
+      "dimension": "other_discipline_unscored",
+      "reverse": false
+    },
+    {
+      "number": 35,
+      "itemCode": "APQ42_35",
+      "dimension": "corporal_punishment",
+      "reverse": false
+    },
+    {
+      "number": 36,
+      "itemCode": "APQ42_36",
+      "dimension": "other_discipline_unscored",
+      "reverse": false
+    },
+    {
+      "number": 37,
+      "itemCode": "APQ42_37",
+      "dimension": "other_discipline_unscored",
+      "reverse": false
+    },
+    {
+      "number": 38,
+      "itemCode": "APQ42_38",
+      "dimension": "corporal_punishment",
+      "reverse": false
+    },
+    {
+      "number": 39,
+      "itemCode": "APQ42_39",
+      "dimension": "other_discipline_unscored",
+      "reverse": false
+    },
+    {
+      "number": 40,
+      "itemCode": "APQ42_40",
+      "dimension": "other_discipline_unscored",
+      "reverse": false
+    },
+    {
+      "number": 41,
+      "itemCode": "APQ42_41",
+      "dimension": "other_discipline_unscored",
+      "reverse": false
+    },
+    {
+      "number": 42,
+      "itemCode": "APQ42_42",
+      "dimension": "other_discipline_unscored",
+      "reverse": false
+    }
+  ],
+  "response": {
+    "min": 1,
+    "max": 5,
+    "original": [
+      "Never",
+      "Almost Never",
+      "Sometimes",
+      "Often",
+      "Always"
+    ]
+  },
+  "scoring": {
+    "version": "1.0.0",
+    "reverseItems": [],
+    "full42Total": null,
+    "dimensions": [
+      {
+        "key": "involvement",
+        "itemNumbers": [
+          1,
+          4,
+          7,
+          9,
+          11,
+          14,
+          15,
+          20,
+          23,
+          26
+        ],
+        "aggregation": "sum",
+        "range": [
+          10,
+          50
+        ]
+      },
+      {
+        "key": "positive_parenting",
+        "itemNumbers": [
+          2,
+          5,
+          13,
+          16,
+          18,
+          27
+        ],
+        "aggregation": "sum",
+        "range": [
+          6,
+          30
+        ]
+      },
+      {
+        "key": "poor_monitoring",
+        "itemNumbers": [
+          6,
+          10,
+          17,
+          19,
+          21,
+          24,
+          28,
+          29,
+          30,
+          32
+        ],
+        "aggregation": "sum",
+        "range": [
+          10,
+          50
+        ]
+      },
+      {
+        "key": "inconsistent_discipline",
+        "itemNumbers": [
+          3,
+          8,
+          12,
+          22,
+          25,
+          31
+        ],
+        "aggregation": "sum",
+        "range": [
+          6,
+          30
+        ]
+      },
+      {
+        "key": "corporal_punishment",
+        "itemNumbers": [
+          33,
+          35,
+          38
+        ],
+        "aggregation": "sum",
+        "range": [
+          3,
+          15
+        ]
+      }
+    ],
+    "otherDisciplineNumbers": [
+      34,
+      36,
+      37,
+      39,
+      40,
+      41,
+      42
+    ],
+    "missing": "per_dimension_complete_PLATFORM_RULE"
+  },
+  "versions": {
+    "measurement": "1.0.0",
+    "scoring": "1.0.0",
+    "localization": "1.0.0",
+    "report": "1.0.0",
+    "reference": null
+  },
+  "rights": {
+    "copyright": "AUTHOR_RETAINS",
+    "translation": "ADMIN_CONTACT",
+    "electronic": "ADMIN_CONTACT",
+    "commercial": "ADMIN_CONTACT",
+    "githubRedistribution": "ADMIN_CONTACT"
+  },
+  "checks": {
+    "staticGoldenCases": 15,
+    "sourceItemCount": 42,
+    "facets": 5,
+    "other": 7,
+    "vitest": "NOTRUN",
+    "typeScript": "NOTRUN",
+    "realScoring": "NOTRUN",
+    "CI": "NOTRUN",
+    "database": "NOTRUN",
+    "deployment": "NOTRUN",
+    "scientificReview": "NOTRUN"
+  }
+}

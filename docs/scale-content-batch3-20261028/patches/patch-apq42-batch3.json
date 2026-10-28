@@ -1,0 +1,111 @@
+{
+  "format": "reviewable-json-patch-proposal",
+  "source_commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "source": {
+    "path": "server-version/backend/src/modules/scale/instruments/apq42_parent_global_zh_cn_research/1.0.0/source.json",
+    "blob": "14ad739f89a99c41baddc8b31441704b18c3f850",
+    "sha256": "6ee31b0d77723f252dbbdab3c92465dfd817606d3f1756745a326103c2bce842"
+  },
+  "preconditions": "仅针对上述固定原件；不得就地覆盖既有1.0.0或自动发布。先确定可共存的新版本及其现有轴快照/安装路径，再由root应用。",
+  "operations": [
+    {
+      "op": "test",
+      "path": "/executable/definition/items/7/itemCode",
+      "value": "APQ42_08"
+    },
+    {
+      "op": "test",
+      "path": "/executable/definition/items/7/content",
+      "value": "孩子做错事后会说服你不要惩罚自己。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/items/7/content",
+      "value": "孩子做错事后会说服你不要惩罚孩子。"
+    },
+    {
+      "op": "test",
+      "path": "/executable/definition/report/interpretations/2/scoreKey",
+      "value": "poor_monitoring"
+    },
+    {
+      "op": "test",
+      "path": "/executable/definition/report/interpretations/2/summary",
+      "value": "孩子逐渐需要自主，也需要与年龄相适应的安全安排。这些回答描述你通常知道多少孩子的去向和作息，并不意味着所有家庭都应采用同一种管理方式。可以从一个常常误会的出行约定谈起。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/interpretations/2/summary",
+      "value": "孩子逐渐需要自主，也需要与年龄相适应的安全安排。这些回答描述你通常知道多少孩子的去向和作息，并不意味着所有家庭都应采用同一种管理方式。可以从一个常常误会的出行约定谈起。该维度分数越高，表示你报告这些监督不足相关情形出现得越频繁。"
+    }
+  ],
+  "changes": [
+    {
+      "path": "/executable/definition/items/7/content",
+      "old": "孩子做错事后会说服你不要惩罚自己。",
+      "new": "孩子做错事后会说服你不要惩罚孩子。",
+      "reason": "消除“自己”可能指向家长的歧义，使被惩罚对象为孩子。"
+    },
+    {
+      "path": "/executable/definition/report/interpretations/2/summary",
+      "old": "孩子逐渐需要自主，也需要与年龄相适应的安全安排。这些回答描述你通常知道多少孩子的去向和作息，并不意味着所有家庭都应采用同一种管理方式。可以从一个常常误会的出行约定谈起。",
+      "new": "孩子逐渐需要自主，也需要与年龄相适应的安全安排。这些回答描述你通常知道多少孩子的去向和作息，并不意味着所有家庭都应采用同一种管理方式。可以从一个常常误会的出行约定谈起。该维度分数越高，表示你报告这些监督不足相关情形出现得越频繁。",
+      "reason": "明确该反向方向维度中较高原始和表示相关监督不足情形自报更频繁，不作等级判断。"
+    }
+  ],
+  "version_and_hash_impact": {
+    "original": "保持原instrument/scoring/localization/report 1.0.0与历史快照；不可覆盖。",
+    "measurement": "题8内容变化：hashScaleDefinition包含items与versionAxes，measurement hash必然变化；应为内容/本地化新版本保留独立快照，具体版本号和共存部署由root协调。",
+    "scoring": "itemRules、维度、权重、锚点、缺失政策不变；scoringVersion原则上保留1.0.0但新内容版本须按既有轴策略核定。",
+    "report": "summary变化应使用新的reportVersion并保留旧报告轴，具体新版本由root确定；仅改report不会改变measurement hash，但本次另含题文故整体measurement hash改变。",
+    "installation": "materialize.ts按现有code/version与definition hash检查，可能报DEPLOYMENT_VERSION_CONFLICT或SCALE_DEFINITION_CONFLICT；不可直接覆盖或凭推断绕过，未验证部署机制。"
+  },
+  "schema_and_gate_static_findings": {
+    "references": [
+      {
+        "path": "server-version/backend/src/modules/scale/scale-definition.ts",
+        "blob": "4131d844d4c29d3813a5c5d1b55709825e1c437b",
+        "sha256": "35d9e51e53dc9fa5d1e2ff5539a82ec803a31b042a23e7cee952f8d24d3e0642"
+      },
+      {
+        "path": "server-version/backend/src/modules/scale/library/audience-report-gate.ts",
+        "blob": "d64805f97d3732111efd890196104985fb385460",
+        "sha256": "eae74de499e5710826bf9d65b203cbae6e3d9795652148a8a87136a371813ed6"
+      },
+      {
+        "path": "server-version/backend/src/modules/scale/onboarding/materialize.ts",
+        "blob": "1fa9e896065d97e317dc987fd3091fcc00805fed",
+        "sha256": "64ef5926d9c63b9c9895af9cd5466d17bf199ef4a48410d8e64dd6073cf25201"
+      }
+    ],
+    "audience_contract": {
+      "path": "/executable/definition/report/audienceContract",
+      "current": "missing",
+      "detail": "scale-definition.ts将该字段设为optional；但versionAxes存在时audience-report-gate.ts要求该合同且locale匹配。允许respondent=PARENT_REPORT、audience=parent、locale=zh-CN及qcReview必填。",
+      "recommendation": "由root补充与实际编辑审阅相符的合同及真实reviewer/time/basis；不能假称人工专家或科学审批。此处不拟造字段或写入patch。"
+    },
+    "summary_length": {
+      "current_utf16_lengths": {
+        "involvement": 94,
+        "positive_parenting": 70,
+        "poor_monitoring": 84,
+        "inconsistent_discipline": 81,
+        "corporal_punishment": 94
+      },
+      "detail": "audience-report-gate要求每个primary summary.length>=100，原五段均不足100；上述新增句仅针对poor_monitoring方向，并未试图填充其余段落。",
+      "recommendation": "如该既有校验适用，root处理其实际接纳路径；不得凭旧最低字数强迫改写内容或伪称该门已通过，本次未改系统。"
+    },
+    "respondent_type": {
+      "path": "/executable/definition/respondentType",
+      "current": "parent_global_report",
+      "detail": "scaleDefinitionSchema只要求非空字符串；catalog/applicability使用PARENT，现有定义另有parent_observer示例。静态看并非enum schema错误，运行角色映射是否认可该字符串未检查。",
+      "recommendation": "不擅自将其替换成其他语义；由root检查具体消费者并协调父母自报身份。"
+    },
+    "five_dimensions": {
+      "detail": "5项score均为dimension、且report keys均引用对应score。现有score schema允许dimension；未找到强制创建total的要求。未计分7题不得为填schema编入维度。"
+    }
+  },
+  "not_executed": [
+    "无仓库修改、无测试/系统/DB/CI/部署；以上为静态源码判读，不是完整schema通过声明。"
+  ]
+}

@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "sourceSHA": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "sourceKey": "apq42_parent_global_zh_cn_research",
+  "originalVersion": "1.0.0",
+  "preparedVersion": "1.0.1",
+  "originalSource": "server-version/backend/src/modules/scale/instruments/apq42_parent_global_zh_cn_research/1.0.0/source.json",
+  "preparedSource": "server-version/backend/src/modules/scale/instruments/apq42_parent_global_zh_cn_research/1.0.1/source.json",
+  "originalSourceSHA256": "6ee31b0d77723f252dbbdab3c92465dfd817606d3f1756745a326103c2bce842",
+  "preparedSourceSHA256": "09aeb534515274bc23c08d059069c3c195458c9d650432795d0c691cd514b998",
+  "originalFiles": [
+    {
+      "path": "docs/scale-instruments/research-drafts/apq42_parent_global/1.0.0/README.md",
+      "blob": "4a17d341e56d806c51bd8bc7ef220a62395310c4",
+      "sha256": "ffdaf15875544e368016dadee14aae33b4d3fca4db9c2e5e5f774844ab7462fb"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/apq42_parent_global/1.0.0/source-manifest.json",
+      "blob": "6f99297e1864eeb2f0eaaffc100d06957cdb2021",
+      "sha256": "dc180996bc81a41daee7b2f3eda84e8cee21e7d1d42ceb545593daa64a9c0bc0"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/apq42_parent_global_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+      "blob": "56e3117d4eedeb7c550efae8354aa6830fd3906d",
+      "sha256": "9a16158327a9ffca53f239e7fddc95e920b43a3e2676eb6d480fa4bfd516f9f7"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/apq42_parent_global_zh_cn_research/1.0.0/instrument.ts",
+      "blob": "0eed070bb879576339c5a71afdf34c0026591fd3",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/apq42_parent_global_zh_cn_research/1.0.0/source.json",
+      "blob": "14ad739f89a99c41baddc8b31441704b18c3f850",
+      "sha256": "6ee31b0d77723f252dbbdab3c92465dfd817606d3f1756745a326103c2bce842"
+    }
+  ],
+  "jsonChanges": [
+    {
+      "op": "replace",
+      "path": "/executable/definition/items/7/content",
+      "from": "孩子做错事后会说服你不要惩罚自己。",
+      "value": "孩子做错事后会说服你不要惩罚孩子。"
+    },
+    {
+      "op": "add",
+      "path": "/executable/definition/report/audienceContract",
+      "value": {
+        "schemaVersion": 1,
+        "respondent": "PARENT_REPORT",
+        "audience": "parent",
+        "locale": "zh-CN"
+      }
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/interpretations/2/summary",
+      "from": "孩子逐渐需要自主，也需要与年龄相适应的安全安排。这些回答描述你通常知道多少孩子的去向和作息，并不意味着所有家庭都应采用同一种管理方式。可以从一个常常误会的出行约定谈起。",
+      "value": "孩子逐渐需要自主，也需要与年龄相适应的安全安排。这些回答描述你通常知道多少孩子的去向和作息，并不意味着所有家庭都应采用同一种管理方式。可以从一个常常误会的出行约定谈起。该维度分数越高，表示你报告这些监督不足相关情形出现得越频繁。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/reportVersion",
+      "from": "1.0.0",
+      "value": "1.0.1"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/releaseStatus",
+      "from": "DRAFT",
+      "value": "PUBLISHED"
+    },
+    {
+      "op": "replace",
+      "path": "/identity/instrumentVersion",
+      "from": "1.0.0",
+      "value": "1.0.1"
+    }
+  ],
+  "audit": "audits/audit-apq42-batch3.json",
+  "patch": "patches/patch-apq42-batch3.json",
+  "versions": {
+    "instrument": "1.0.1",
+    "scoring": "1.0.0",
+    "report": "1.0.1",
+    "localization": "1.0.0",
+    "instruction": "1.0.0"
+  },
+  "states": {
+    "sourceRelease": "PUBLISHED candidate; no database publication",
+    "catalog": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "translation": "PENDING",
+    "scientificReview": null,
+    "databaseInstall": "NOT_EXECUTED",
+    "databasePublish": "NOT_EXECUTED",
+    "production": "NOT_TOUCHED"
+  },
+  "versionReason": "Original source identities are retained byte-for-byte. New item clarification/metadata/report/administration wording is explicit; formulas, anchors, directions, parameter data and scoringVersion are unchanged. Old report editorial timestamp is not reused as approval of revised wording."
+}
