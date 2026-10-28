@@ -257,6 +257,12 @@ const SCORING_DECLARATIONS: Record<string, CognitiveScoringContractDeclaration> 
     runtimeReconstructableFacts: ['目标间隔（seed/config 分层序列）', '复制时长上限（frozen config）'],
     serverDerivedFacts: ['相对误差与方向偏差', 'metrics（meanAbsErrorRatio/biasRatio/withinTwentyRate）', 'quality flags'],
   },
+  sharegame: {
+    testType: 'sharegame',
+    clientObservedFacts: ['各轮给出点数', '决策用时', 'interrupted'],
+    runtimeReconstructableFacts: ['各轮禀赋（frozen config）'],
+    serverDerivedFacts: ['给出合法性与偏好指标（givingRate/equalSplitCount/generousRate）', 'quality flags'],
+  },
 }
 
 // 当前通用事实（所有任务一致）：完整加密 trial payload、v2 trial envelope qualityEvents、
@@ -442,6 +448,11 @@ const RESEARCH_CAPTURE_DECLARATIONS: Record<string, CognitiveResearchCaptureDecl
     testType: 'timecopy',
     currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次复制时长'],
     futureCaptureFacts: ['策略自评（默数/节律）', 'device provenance', 'viewport/dpr'],
+  },
+  sharegame: {
+    testType: 'sharegame',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐轮给出点数与用时'],
+    futureCaptureFacts: ['真实接收者与真实激励', '决策前犹豫内指针轨迹', 'device provenance'],
   },
 }
 

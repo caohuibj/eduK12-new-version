@@ -640,3 +640,24 @@ export type TimecopyTrialPayload = {
   responseMs: number
   interrupted: boolean
 }
+
+/** Sharegame 冻结 config（与后端 sharegame.config schema 一致）。 */
+export interface SharegameConfig {
+  endowments: number[]
+  fixationMs: number
+  timeoutMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+/** Sharegame 单 trial payload（与后端 sharegame.trial schema 一致）。 */
+export type SharegameTrialPayload = {
+  endowment: number
+  given: number
+  rtMs: number | null
+  interrupted: boolean
+}

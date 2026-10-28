@@ -35,6 +35,7 @@ import { executionEntries as task32 } from '../tasks/sentencecheck/package'
 import { executionEntries as task33 } from '../tasks/lineangle/package'
 import { executionEntries as task34 } from '../tasks/seqlearn/package'
 import { executionEntries as task35 } from '../tasks/timecopy/package'
+import { executionEntries as task36 } from '../tasks/sharegame/package'
 export const cognitiveExecutionEntries = [
   task0[0],
   task1[0],
@@ -75,5 +76,6 @@ export const cognitiveExecutionEntries = [
   task33[0],
   task34[0],
   task35[0],
+  task36[0],
   task21[1],
 ]

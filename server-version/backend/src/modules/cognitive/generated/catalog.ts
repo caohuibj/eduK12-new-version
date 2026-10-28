@@ -34,6 +34,7 @@ import { catalog as task31 } from '../tasks/sentencecheck/governance'
 import { catalog as task32 } from '../tasks/lineangle/governance'
 import { catalog as task33 } from '../tasks/seqlearn/governance'
 import { catalog as task34 } from '../tasks/timecopy/governance'
+import { catalog as task35 } from '../tasks/sharegame/governance'
 export const cognitiveCatalog = {
   'reaction': task0,
   'memory': task1,
@@ -70,4 +71,5 @@ export const cognitiveCatalog = {
   'lineangle': task32,
   'seqlearn': task33,
   'timecopy': task34,
+  'sharegame': task35,
 }

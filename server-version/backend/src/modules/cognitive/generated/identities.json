@@ -198,6 +198,11 @@
       "scoringVersion": "1.0.0"
     },
     {
+      "testType": "sharegame",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0"
+    },
+    {
       "testType": "bart",
       "engineVersion": "1.0.0",
       "scoringVersion": "1.1.0"
@@ -346,6 +351,10 @@
     },
     {
       "testType": "timecopy",
+      "engineVersion": "1.0.0"
+    },
+    {
+      "testType": "sharegame",
       "engineVersion": "1.0.0"
     }
   ]

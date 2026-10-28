@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "sharegame",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0"
+  },
+  "provenance": "Computed with scoreSharegameV1 at task authoring time (2026-10-28); regenerate by rerunning the scorer on the committed inputs",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "config": {
+          "endowments": [
+            20,
+            50,
+            100
+          ],
+          "fixationMs": 400,
+          "timeoutMs": 20000,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "endowment": 20,
+              "given": 10,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "endowment": 50,
+              "given": 25,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "endowment": 100,
+              "given": 50,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 50,
+        "showProductIndex": false,
+        "metrics": {
+          "givingRate": 0.5,
+          "equalSplitCount": 3,
+          "generousRate": 1,
+          "givingRateSd": 0,
+          "medianDecisionMs": 500
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "endowments": [
+            20,
+            50,
+            100
+          ],
+          "fixationMs": 400,
+          "timeoutMs": 20000,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": []
+      },
+      "expectedError": "sharegame v1 expects exactly 3 trials, got 0"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "endowments": [
+            20,
+            50,
+            100
+          ],
+          "fixationMs": 400,
+          "timeoutMs": 20000,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "endowment": 20,
+              "given": 10,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expectedError": "sharegame v1 expects exactly 3 trials, got 1"
+    }
+  ]
+}
