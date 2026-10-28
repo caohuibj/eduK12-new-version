@@ -1,0 +1,29 @@
+{
+  "source": {
+    "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+    "path": "server-version/backend/src/modules/scale/instruments/djgls6_zh_cn_research/1.0.0/source.json",
+    "gitBlob": "38be96db91f579d42e57debe6b5814bd80e584be",
+    "sha256": "c07038b029b02c520ff0344434499358242145ee8122c7dd9ce1984f12c48a46"
+  },
+  "format": "operations 是针对 source.json 的 RFC 6902 JSON Patch，先校验原值再替换。",
+  "operations": [
+    {
+      "op": "test",
+      "path": "/executable/definition/report/interpretations/1/scoreKey",
+      "value": "emotional"
+    },
+    {
+      "op": "test",
+      "path": "/executable/definition/report/interpretations/1/summary",
+      "value": "这一部分关注空虚、缺少陪伴和被拒绝的感受。回答汇总越高，表示这些体验在本次回答中出现得更多，但它不说明别人一定不喜欢你，也不是对你社交能力的判断。有时经历搬家、关系变化或忙碌的一段时间，熟悉的亲近感会暂时变少。先承认自己想被理解、被接纳的需要，再看谁能提供一点合适的陪伴，往往比强迫自己立刻热闹起来更温和。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/interpretations/1/summary",
+      "value": "这一部分关注空虚、缺少陪伴和被拒绝的感受。回答汇总越高，表示本次回答中与这些体验有关的线索更多，但它不说明别人一定不喜欢你，也不是对你社交能力的判断。有时经历搬家、关系变化或忙碌的一段时间，熟悉的亲近感会暂时变少。先承认自己想被理解、被接纳的需要，再看谁能提供一点合适的陪伴，往往比强迫自己立刻热闹起来更温和。"
+    }
+  ],
+  "versionImpact": "报告正文改变，需要新 reportVersion；具体版本由集成方协调，1.0.0 保留原样。未更改 measurement 内容或计分公式。",
+  "unchanged": "两组二元编码及中档均记1、各维0–3、总分0–6、缺失规则均保持原样。",
+  "execution": "只生成建议；未修改仓库，未执行测试或系统、DB、CI 操作。"
+}
