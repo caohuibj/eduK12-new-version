@@ -54,3 +54,35 @@ alerting=−0.75ms、orienting=0.6666666666666288ms、conflict=−2.0625ms，与
 独立预期received6/valid4/excluded2、accuracy=2/4=.5；正确RT仅0号touch0ms及4号keyboard350ms。混合输入为true；因未完整覆盖任何提示条件，公开投影invalid并隐藏总体比例、条件RT及差值。原始count不等于获准公开结论。只执行6条合成记录，不冒充完成48正式。完整snapshot、原件、envelope、score及projection保存在JSON，原档案以路径和SHA256引用，没有复制或重写原48证据。
 
 未改旧1.0.0实现合同。历史报告只回读冻结snapshot；正式目标库/是否已有使用及最终上线组合仍由root核实。本节点无CI/Ready/push/合并/部署/schema/权限/凭据或安全设置动作。
+
+## ANT专属已保存报告消费者
+
+NativeContentReport原先只检查snapshot.testType与内部isNativeAntReport，随后把外层configHash/protocolSignature覆盖进AntReportCard的数据绑定。直接调用该导出消费者时，错误外层hash、protocol、state、呈现版本或旧engine/configVersion也会展示表现。
+
+**正常CognitiveV2ReportCard外层原已使用shared wrapper guard，未证明整页可绕过，更未声称真实用户已看到错配报告。** 本项是专属消费者合同缺口；其他8工具已在同一边界核对。修复复用isNativePublicReportSnapshot并限制精确guided1.1.0身份，数据侧保留内部原hash，禁止通过覆盖重新包装成bound。已保存legacyAnt组合（外层presentation1.0.0、内部未记presentationVersion）和当前独立双presentation1.0.0组合均保留，只读且不修改原字节；这不是开放旧engine1.0.0 native投放。
+
+frontend cwd命令（指定Node24.21.0）：
+
+```
+node_modules/vitest/vitest.mjs run src/modules/cognitive/tasks/ant/native-report-binding.test.tsx --reporter=json --outputFile=../../docs/cognitive-library/onboarding-content-20261028/parallel-review/ant/report-binding-before.json
+```
+
+修复前退出1，2正常通过/7反例失败；同输入修复后outputFile为`report-binding-after.json`，退出0，9通过。测试直接读旧冻结公开报告，没有重新运行计分。记录在 `report-binding-{before,after}.{json,log,exit}`。
+
+## 耐久启动marker与重开
+
+新增ANT专属最小重开用例，实际调用antNativePorts＋共享createNativeContentPort＋FinalDraftStore fixture：首次marker冻结完整context/display/manifest/realm；保存一条既有原件后，重新构造host port/realm并请求新曝光被拒，原binding和sealed record完整保留，未调用appendEnvelope或complete。命令（frontend cwd、指定Node24.21.0）：
+
+```
+node_modules/vitest/vitest.mjs run src/modules/cognitive/tasks/ant/native-attempt-marker.test.ts --reporter=json --outputFile=../../docs/cognitive-library/onboarding-content-20261028/parallel-review/ant/attempt-marker.json
+```
+
+退出0、1项通过。该测试显式mock requireCognitiveDurability允许测试存储fixture；不冒充新的生产IndexedDB/真实刷新证据。原浏览器真实耐久存储、8+48、丢归档ACK后保留/重试与正式core/report分离证据沿batch-3复用；未重跑该完整流程。原native-ant-port.test.tsx的精确lost-ACK/retry病例源码未变，保留原执行身份。
+
+前端局部类型命令为 `docs/cognitive-library/onboarding-content-20261028/parallel-review/ant/check-types.cjs frontend`（根目录、指定Node24.21.0），退出0、34源码、零诊断；源码闭包摘要和日志在 `frontend-types.*`。
+
+报告三态、条件完整性、混合输入门控与建议、符号显示组件未改。既有[48轮报告](../../batch-3/ant-browser/report-core-saved-archive-pending-390.png)及[200%截图](../../batch-3/ant-browser/report-200-percent.png)保留原身份；本次只加已有错误提示分支的绑定检查，正常报告视觉输出不变，没有为同输入重截图片。中英说明/例子、guided练习失败重呈说明、未完成练习不得解锁正式、首响应和timeout规则源码已独立读过，未强改已批准协议。
+
+本地没有denied/pending/uncertain动作；未执行的正式身份/库状态、四入口资格、独立审计与CI/投放由root负责。本次两个逻辑分别提交，不以本地结果冒充正式发布资格。
+
+收尾输入摘要在 `execution-inputs.json`，明确为检查后记录。摘要组装首轮因execFileSync的encoding参数格式错误而未写文件；原Node退出未单独采集，周围shell继续提交后退出0。该元数据错误保存在 `execution-inputs-original-error.json`；改为标准options对象后退出0，未因此重跑产品检查。生成报告去掉首行源码摘要后的正文与基线完全一致。

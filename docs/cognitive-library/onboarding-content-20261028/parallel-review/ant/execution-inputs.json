@@ -1,0 +1,25 @@
+{
+  "base": "a67f425269283d8281379fdf8234f9fd6b0acebc",
+  "node": "v24.21.0",
+  "nodePath": "/tmp/cognitive-node-env/node-v24.21.0-linux-x64/bin/node",
+  "recordedAt": "2026-10-28T03:29:46.345Z",
+  "recordedAfterChecks": true,
+  "beforeSHA256": {
+    "server-version/backend/src/modules/cognitive/content-candidates/ant/scorer.ts": "139b6dbe763a9d5c2d8d6845296450c0adf3a501fb9d617d9d6dc5666ce3cf54",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/NativeAntRunner.tsx": "bf0a1c21304779075caeb7faf91b3f439fdd36a41e4bb89f2f63ec3b0209f6c1"
+  },
+  "generatedReportBodyUnchanged": true,
+  "sha256": {
+    "server-version/backend/src/modules/cognitive/content-candidates/ant/protocol.ts": "86c0f782704286480684a0c2b169f4bea0b5f0ce9a55244602590f092049c311",
+    "server-version/backend/src/modules/cognitive/content-candidates/ant/scorer.ts": "b7ec3a612223a5b795c85ffb6bf0fb6c383c089ce9e8385f5c49f51ab65fa8b3",
+    "server-version/backend/src/__tests__/cognitive/ant-native-presentation-binding.test.ts": "c0413cf72c0cfa5d8f9fc895d935b322aa1138d3e67afdb24c6acdf7ce59aa9c",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/NativeAntRunner.tsx": "5dc448514d4c2be4977d0d80849c8148f05a12f269515e9018662f66f12bdc91",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/native-report-binding.test.tsx": "7bd04a27a6a39a2aeacaff36e13b1a2eb779a15d9237225b9d70dafa798d5107",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/native-attempt-marker.test.ts": "f759ca42b9077a0a066947d9c01891d2fb6fab23df69893297fe56a9bbfd0df7",
+    "server-version/backend/package-lock.json": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+    "server-version/frontend/package-lock.json": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/ant/representative-records.ts": "f39e6faf0a1e2da2a986fab75b9ed4a6736a746390d7d8c65a5c75fd756424e6",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/ant/check-types.cjs": "d86367561db59abff7308ea9e8b55fb52bd2d0015307dbafa4f57458b738df55",
+    "docs/cognitive-library/onboarding-content-20261028/batch-3/ant-browser/archived-fixture.json": "3fd58d07acc6189142f15e5983927a7351734d9b1baee5ba0ff263f2d4afaba4"
+  }
+}

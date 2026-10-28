@@ -1,0 +1,9 @@
+{
+  "kind": "metadata-assembly-only",
+  "recordedFrom": "preceding tool output",
+  "errorCode": "ERR_INVALID_ARG_TYPE",
+  "message": "The options argument must be of type object. Received type string (utf8)",
+  "cause": "execFileSync received encoding as a string instead of an options object",
+  "originalNodeExit": "not separately captured; surrounding shell continued and exited 0 after git commit",
+  "productChecksRerun": false
+}

@@ -1,6 +1,7 @@
 import React,{useEffect,useMemo,useState} from 'react'
 import type {CognitiveTaskProps} from '../../core/runner.types'
 import {createNativeContentRunner,nativeContentSnapshot} from '../../core/NativeContentRunner'
+import {isNativePublicReportSnapshot} from '../../core/native-public-report'
 import {finalDraftStore,assertFinalDraftWriteIdentity} from '../../../../services/persistence/finalDraftStore'
 import {cognitiveRawDigest as digest,requireCognitiveDurability} from '../../core/raw-archive'
 import {MotCalibration} from '../mot/MotCalibration'
@@ -46,6 +47,6 @@ function NativeAntGeneration(props:CognitiveTaskProps){
 export function NativeAntRunner(props:CognitiveTaskProps){const c=props.taskContext;try{nativeContentSnapshot(c)}catch{return <p role="alert">ANT 冻结设置尚未核对，请联系组织者。</p>}return <NativeAntGeneration key={JSON.stringify([c.sessionId,c.attemptEpoch,c.definitionHash,c.randomSeed])} {...props}/>}
 export function NativeContentReport({snapshot}:{snapshot:NativePublicReportSnapshot}){
  const r=snapshot.report
- if(snapshot.testType!=='ant'||!isNativeAntReport(r))return <p role="alert">已保存 ANT 报告暂时无法核对。</p>
- return <AntReportCard data={{contextId:String(r.contextId),configHash:snapshot.configHash,protocolSignature:snapshot.protocolSignature,projection:r.projection,qualityFlags:r.qualityFlags}} contextId={String(r.contextId)} configHash={snapshot.configHash} protocolSignature={snapshot.protocolSignature}/>
+ if(!isNativePublicReportSnapshot(snapshot)||snapshot.testType!==ANT_GUIDED_IDENTITY.testType||snapshot.engineVersion!==ANT_GUIDED_IDENTITY.engineVersion||snapshot.scoringVersion!==ANT_GUIDED_IDENTITY.scoringVersion||snapshot.configVersion!==ANT_GUIDED_IDENTITY.configVersion||!isNativeAntReport(r))return <p role="alert">已保存 ANT 报告暂时无法核对。</p>
+ return <AntReportCard data={{contextId:String(r.contextId),configHash:String(r.configHash),protocolSignature:String(r.protocolSignature),projection:r.projection,qualityFlags:r.qualityFlags}} contextId={String(r.contextId)} configHash={snapshot.configHash} protocolSignature={snapshot.protocolSignature}/>
 }
