@@ -567,3 +567,29 @@ export type SentencecheckTrialPayload = {
   rtMs: number | null
   interrupted: boolean
 }
+
+/** Lineangle 冻结 config（与后端 lineangle.config schema 一致）。 */
+export interface LineangleConfig {
+  totalTrials: number
+  angleStepDeg: number
+  optionCount: number
+  minAngleSepSteps: number
+  fixationMs: number
+  timeoutMs: number
+  validRtFloorMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+/** Lineangle 单 trial payload（与后端 lineangle.trial schema 一致）。 */
+export type LineangleTrialPayload = {
+  targetAngle: number
+  optionAngles: number[]
+  responseAngle: number | null
+  rtMs: number | null
+  interrupted: boolean
+}

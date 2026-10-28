@@ -31,6 +31,7 @@ import { catalog as task28 } from '../tasks/gamblingdeck/governance'
 import { catalog as task29 } from '../tasks/symbolmatch/governance'
 import { catalog as task30 } from '../tasks/runningspan/governance'
 import { catalog as task31 } from '../tasks/sentencecheck/governance'
+import { catalog as task32 } from '../tasks/lineangle/governance'
 export const cognitiveCatalog = {
   'reaction': task0,
   'memory': task1,
@@ -64,4 +65,5 @@ export const cognitiveCatalog = {
   'symbolmatch': task29,
   'runningspan': task30,
   'sentencecheck': task31,
+  'lineangle': task32,
 }

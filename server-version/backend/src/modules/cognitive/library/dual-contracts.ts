@@ -239,6 +239,12 @@ const SCORING_DECLARATIONS: Record<string, CognitiveScoringContractDeclaration> 
     runtimeReconstructableFacts: ['形状/颜色事实（seed/config）', '句式模板（frozen config 模板结构）'],
     serverDerivedFacts: ['陈述真伪与正确性判定', 'metrics（accuracy/negationPenaltyMs）', 'quality flags'],
   },
+  lineangle: {
+    testType: 'lineangle',
+    clientObservedFacts: ['选项角度选择', 'raw RT', 'interrupted'],
+    runtimeReconstructableFacts: ['目标与选项角度（seed/config）'],
+    serverDerivedFacts: ['选项合法性与正确性判定', 'metrics（accuracy/medianRtMs）', 'quality flags'],
+  },
 }
 
 // 当前通用事实（所有任务一致）：完整加密 trial payload、v2 trial envelope qualityEvents、
@@ -407,6 +413,11 @@ const RESEARCH_CAPTURE_DECLARATIONS: Record<string, CognitiveResearchCaptureDecl
   },
   sentencecheck: {
     testType: 'sentencecheck',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次响应与 raw RT'],
+    futureCaptureFacts: ['真实 input modality', 'device provenance', 'viewport/dpr'],
+  },
+  lineangle: {
+    testType: 'lineangle',
     currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次响应与 raw RT'],
     futureCaptureFacts: ['真实 input modality', 'device provenance', 'viewport/dpr'],
   },
