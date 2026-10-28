@@ -539,3 +539,31 @@ export type RunningspanTrialPayload = {
   responseDurationMs: number
   interrupted: boolean
 }
+
+/** Sentencecheck 冻结 config（与后端 sentencecheck.config schema 一致）。 */
+export interface SentencecheckConfig {
+  totalTrials: number
+  trueRatio: number
+  negationRatio: number
+  fixationMs: number
+  timeoutMs: number
+  validRtFloorMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+/** Sentencecheck 单 trial payload（与后端 sentencecheck.trial schema 一致）。 */
+export type SentencecheckTrialPayload = {
+  shape: 'circle' | 'square' | 'triangle'
+  color: 'red' | 'blue' | 'green' | 'yellow'
+  questionKind: 'shape' | 'color'
+  negated: boolean
+  askedValue: string
+  response: boolean | null
+  rtMs: number | null
+  interrupted: boolean
+}

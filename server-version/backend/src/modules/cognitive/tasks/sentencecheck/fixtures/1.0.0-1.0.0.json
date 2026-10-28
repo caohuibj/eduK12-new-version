@@ -1,0 +1,151 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "sentencecheck",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0"
+  },
+  "provenance": "Computed with scoreSentencecheckV1 at task authoring time (2026-10-28); regenerate by rerunning the scorer on the committed inputs",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "config": {
+          "totalTrials": 4,
+          "trueRatio": 0.5,
+          "negationRatio": 0.5,
+          "fixationMs": 500,
+          "timeoutMs": 8000,
+          "validRtFloorMs": 300,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "shape": "circle",
+              "color": "red",
+              "questionKind": "shape",
+              "negated": false,
+              "askedValue": "圆形",
+              "response": true,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "shape": "circle",
+              "color": "red",
+              "questionKind": "shape",
+              "negated": true,
+              "askedValue": "方形",
+              "response": true,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "shape": "circle",
+              "color": "red",
+              "questionKind": "color",
+              "negated": false,
+              "askedValue": "蓝色",
+              "response": true,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "shape": "circle",
+              "color": "red",
+              "questionKind": "color",
+              "negated": true,
+              "askedValue": "红色",
+              "response": true,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 50,
+        "metrics": {
+          "accuracy": 0.5,
+          "medianRtMs": 500,
+          "negationPenaltyMs": 0,
+          "errorCount": 2,
+          "timeoutCount": 0,
+          "validRtCount": 2
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "insufficientValidRt": false,
+          "lowAccuracy": false,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "totalTrials": 4,
+          "trueRatio": 0.5,
+          "negationRatio": 0.5,
+          "fixationMs": 500,
+          "timeoutMs": 8000,
+          "validRtFloorMs": 300,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": []
+      },
+      "expectedError": "sentencecheck v1 expects exactly 4 trials, got 0"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "totalTrials": 4,
+          "trueRatio": 0.5,
+          "negationRatio": 0.5,
+          "fixationMs": 500,
+          "timeoutMs": 8000,
+          "validRtFloorMs": 300,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "shape": "circle",
+              "color": "red",
+              "questionKind": "shape",
+              "negated": false,
+              "askedValue": "圆形",
+              "response": true,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expectedError": "sentencecheck v1 expects exactly 4 trials, got 1"
+    }
+  ]
+}
