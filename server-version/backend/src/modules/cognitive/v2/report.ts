@@ -9,7 +9,7 @@ import type {
 import { metricIsQualityGated } from './quality'
 import { resolveLegacyCognitiveProtocolPresentation } from '../legacy-protocol-presentation'
 import { legacyExperienceHeadline, legacyMetricAllowed, legacySuppressTips } from '../legacy-report-policy'
-import type { CognitiveMetricRowsFormat, CognitiveParticipantPresentationV1 } from '../participant-presentation.types'
+import type { CognitiveMetricRowsFormat, CognitiveMetricQuantityFormat, CognitiveParticipantPresentationV1 } from '../participant-presentation.types'
 import { buildReadingVisual, finiteMetric, readingMetricAllowed, type ReportReading } from './report-reading'
 
 export interface ReportMetricView {
@@ -88,8 +88,14 @@ const formatRows = (value: unknown[], format: CognitiveMetricRowsFormat): string
   return lines.length > 0 ? lines.join('；') : null
 }
 
-const formatMetric = (definition: MetricDefinition, value: unknown, format?: CognitiveMetricRowsFormat): string => {
+const formatMetric = (definition: MetricDefinition, value: unknown, format?: CognitiveMetricRowsFormat | CognitiveMetricQuantityFormat): string => {
   if (value === null || value === undefined || value === '') return '—'
+  if (format?.kind === 'quantity') {
+    if (definition.valueType !== 'object' || !value || typeof value !== 'object' || Array.isArray(value)) return '—'
+    const quantity = value as Record<string, unknown>
+    if (Object.keys(quantity).length !== 2 || quantity.unit !== format.unit || typeof quantity.value !== 'number' || !Number.isFinite(quantity.value)) return '—'
+    return cellText(quantity.value, format.suffix) ?? '—'
+  }
   if (definition.valueType === 'object') {
     if (typeof value !== 'object' || Array.isArray(value)) return '—'
     const entries = Object.entries(value as Record<string, unknown>)
@@ -98,7 +104,7 @@ const formatMetric = (definition: MetricDefinition, value: unknown, format?: Cog
     return entries.length > 0 ? entries.join('；') : '—'
   }
   if (definition.valueType === 'array') {
-    const readable = format && Array.isArray(value) ? formatRows(value, format) : null
+    const readable = format?.kind === 'rows' && Array.isArray(value) ? formatRows(value, format) : null
     return readable ?? JSON.stringify(value)
   }
   const number = Number(value)
