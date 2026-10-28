@@ -151,7 +151,7 @@ const ScaleUnitReportCard: React.FC<{ report: SafeScaleUnitReport; loadReportIma
   )
 
   return (
-    <div data-testid={`scale-unit-report-${report.itemId || report.scaleId}`} className="space-y-5">
+    <div data-testid={`scale-unit-report-${report.itemId || report.scaleId}`} className="scale-unit-report space-y-5">
       <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
         <span>{report.scaleName}</span>
         {report.method?.reportVersion && <span>报告版本 {report.method.reportVersion}</span>}
