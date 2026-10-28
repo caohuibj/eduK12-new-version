@@ -1,0 +1,51 @@
+{
+  "instrument": "Child and Adolescent Mindfulness Measure original 10-item",
+  "item_count": 10,
+  "options": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "dimensions": {
+    "mindful_awareness": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ]
+  },
+  "reverse_items": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "reverse_formula": "4-response",
+  "sum_ranges": {
+    "mindful_awareness": [
+      0,
+      40
+    ]
+  },
+  "mean_range": [
+    0,
+    4
+  ],
+  "missing_policy": "complete required per score, otherwise null; product convention",
+  "thresholds": null,
+  "source_note": "Official PDF scoring page: 'First reverse all scores by changing 0 to 4, 1 to 3, 3 to 1, and 4 to 0 (2 stays unchanged). Then sum all items. Higher scores correspond to higher levels of mindfulness.' CAMM is unidimensional; all 10 items are reverse-scored (4 - response) and summed to one total in 0-40, presented here as the single dimension mindful_awareness with no separate total key and no invented subscales."
+}
