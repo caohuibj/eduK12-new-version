@@ -1,0 +1,657 @@
+{
+  "instrument": "dbt_wccl59_zh_tw_official_research:1.0.0",
+  "sourceSHA": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "files": [
+    {
+      "path": "docs/scale-instruments/research-drafts/dbt_wccl59/1.0.0/README.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "4eb5f6661bf70998a5b554051f3c4f74c15685e4",
+      "sha256": "202be442555bcb329d3f56ad420a78e9f175f2c52a17b509bc578fbd42f5f0a4"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/dbt_wccl59/1.0.0/source-manifest.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "75fbac08e10537173bbf0236e0cb0e7f1db11b3a",
+      "sha256": "7cdae68e8a5a4fd944013da85c7c5eeb9e8572a734c74574e06bf119e81faf44"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.0/THIRD_PARTY_LICENSE.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "92d700b5ad8f8e5036f71cce67d2172291c75405",
+      "sha256": "cee5d0b6e31f51c57d3224b1fd43647bba3f5daad92846618450765b907e2b5c"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.0/instrument.ts",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "0eed070bb879576339c5a71afdf34c0026591fd3",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.0/source.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "e4ec1b8ae0051a2277e4d277179a39fc6daec43f",
+      "sha256": "c9ca1c13f8a397b1c302d3c3bbb1fa8856e27767c204cbe77a50038f1ae8b2ea"
+    }
+  ],
+  "originalEvidence": {
+    "officialTraditional": "https://depts.washington.edu/uwbrtc/wp-content/uploads/DBT-WCCL-Chinese.pdf",
+    "downloadedSHA256": "e4c896440b1787ac82560cc89e9c6e7ff3c81e5fcf16ca3e6f97ae2de6a69424",
+    "scoring": "https://depts.washington.edu/uwbrtc/wp-content/uploads/Scoring-description-for-the-DBT-WCCL.pdf",
+    "access": "本次读取UW官方繁体PDF全部59题及SPSS评分；行折叠逐条核对，23/27/37/40/44/49跨行视觉复核。"
+  },
+  "items": [
+    {
+      "code": "DBTWC01",
+      "traditional": "討價還價或作出讓步，以在該處境中獲益。",
+      "facet": "dss",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC02",
+      "traditional": "懂得感恩。",
+      "facet": "dss",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC03",
+      "traditional": "怪責自己。",
+      "facet": "dcs1",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC04",
+      "traditional": "專注於整件事情中可能發生的美好事情。",
+      "facet": "dss",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC05",
+      "traditional": "隱藏自己的感受。",
+      "facet": "dcs1",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC06",
+      "traditional": "確保我的回應不會讓別人感到被排擠。",
+      "facet": "dss",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC07",
+      "traditional": "找出應該歸咎誰。",
+      "facet": "dcs2",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC08",
+      "traditional": "希望奇蹟會發生。",
+      "facet": "dcs1",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC09",
+      "traditional": "採取任何行動之前先嘗試安定自己。",
+      "facet": "dss",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC10",
+      "traditional": "跟別人談論我的感受。",
+      "facet": "dss",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC11",
+      "traditional": "堅守自己的立場，爭取自己想要的。",
+      "facet": "dss",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC12",
+      "traditional": "拒絕相信事情已經發生。",
+      "facet": "dcs1",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC13",
+      "traditional": "用美食來獎勵自己。",
+      "facet": "dss",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC14",
+      "traditional": "批評自己或對自己訓話。",
+      "facet": "dcs1",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC15",
+      "traditional": "拿別人來發泄情緒。",
+      "facet": "dcs2",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC16",
+      "traditional": "為我的問題想出幾種不同的解決方案。",
+      "facet": "dss",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC17",
+      "traditional": "但願我是一個更堅強、更樂觀和有力量的人。",
+      "facet": "dcs1",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC18",
+      "traditional": "接受我的強烈感受，但不讓它們過於影響其他事情。",
+      "facet": "dss",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC19",
+      "traditional": "專注於我生命中美好的事物。",
+      "facet": "dss",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC20",
+      "traditional": "但願我可以改變自己的感受。",
+      "facet": "dcs1",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC21",
+      "traditional": "找出及觀看美麗的事物，讓自己感覺好一些。",
+      "facet": "dss",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC22",
+      "traditional": "改變某部分的自己，令我可以更好地應對這情況。",
+      "facet": "dss",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC23",
+      "traditional": "專注於我生活中美好的方面，並減少注意負面的想法或感受。",
+      "facet": "dss",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC24",
+      "traditional": "為引起問題的人或事而氣瘋了。",
+      "facet": "dcs2",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC25",
+      "traditional": "因為我不能避免問題而感到難受。",
+      "facet": "dcs1",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC26",
+      "traditional": "嘗試活躍起來以分散自己的注意力。",
+      "facet": "dss",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC27",
+      "traditional": "一直都清楚需要做到些什麼，所以已經加倍用功及更努力去辦妥事情。",
+      "facet": "dss",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC28",
+      "traditional": "覺得別人對我不公平。",
+      "facet": "dcs2",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC29",
+      "traditional": "以某種芳香包圍自己，來安撫自己。",
+      "facet": "dss",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC30",
+      "traditional": "怪罪別人。",
+      "facet": "dcs2",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC31",
+      "traditional": "聆聽或播放讓我感到放鬆的音樂。",
+      "facet": "dss",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC32",
+      "traditional": "假裝什麼也沒有發生般，繼續下去。",
+      "facet": "dcs1",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC33",
+      "traditional": "接受「退而求其次」。",
+      "facet": "dss",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC34",
+      "traditional": "告訴自己事情本可以更差 。",
+      "facet": "dss",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC35",
+      "traditional": "用其他東西填滿自己的思緒。",
+      "facet": "dss",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC36",
+      "traditional": "跟能夠就該問題做些具體事情的人傾談。",
+      "facet": "dss",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC37",
+      "traditional": "嘗試透過進食、飲酒、吸煙、服用藥物等讓自己好過些。",
+      "facet": "dcs1",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC38",
+      "traditional": "嘗試不太輕率或依賴自己的直覺行事。",
+      "facet": "dss",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC39",
+      "traditional": "改變一些東西令事情變得順利。",
+      "facet": "dss",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC40",
+      "traditional": "用一些在觸感上令自己舒服的東西來愛錫自己 (例如浸泡泡浴或擁抱)。",
+      "facet": "dss",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC41",
+      "traditional": "迴避別人。",
+      "facet": "dcs1",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC42",
+      "traditional": "想到我的處境已經比別人好多了。",
+      "facet": "dss",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC43",
+      "traditional": "做事時，一步一步來。",
+      "facet": "dss",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC44",
+      "traditional": "做一些事去經歷完全不同的情緒 (例如去看一部滑稽的電影)。",
+      "facet": "dss",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC45",
+      "traditional": "希望情況會過去或以某種方式結束。",
+      "facet": "dcs1",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC46",
+      "traditional": "不讓別人知道事情有多差勁。",
+      "facet": "dcs1",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC47",
+      "traditional": "將精力集中在幫助他人之上。",
+      "facet": "dss",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC48",
+      "traditional": "找出他人要負的責任。",
+      "facet": "dcs2",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC49",
+      "traditional": "確保照顧好自己的身體並保持健康，以減低情緒上的敏感度。",
+      "facet": "dss",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC50",
+      "traditional": "告訴自己，我已經做到了多少事。",
+      "facet": "dss",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC51",
+      "traditional": "確保我回應的方式讓我往後仍能尊重自己。",
+      "facet": "dss",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC52",
+      "traditional": "但願我可以改變已發生的事情。",
+      "facet": "dcs1",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC53",
+      "traditional": "制定行動計劃並遵循它。",
+      "facet": "dss",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC54",
+      "traditional": "與他人傾談以了解情況。",
+      "facet": "dss",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC55",
+      "traditional": "逃避我的問題。",
+      "facet": "dcs1",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC56",
+      "traditional": "退後一步，嘗試如實地看待事物。",
+      "facet": "dss",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC57",
+      "traditional": "將自己與其他更不幸的人相比。",
+      "facet": "dss",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC58",
+      "traditional": "增加我生活中愉悅的事物，讓我有更正面的看法。",
+      "facet": "dss",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    },
+    {
+      "code": "DBTWC59",
+      "traditional": "嘗試不自斷後路，而讓事情留有餘地。",
+      "facet": "dss",
+      "reverse": false,
+      "conclusion": "与UW官方繁体题本对应；PDF行折叠及空格不改变题意。"
+    }
+  ],
+  "threePartConclusions": {
+    "content": "59题顺序与官方繁体题本一致，仅合并换行；过去一个月使用频率0–3，与是否有效区分；无反向。官方繁体题文不混用简体版来源。",
+    "scoring": "DSS38、DCS1 15、DCS2 6项各等权均分0–3；作者SPSS最低有效题30/10/4，与平台每维complete_required分别记载；无59题总分，作者可选合并DCS未启用。无中国常模或阈值。",
+    "report": "report1.0.0三维表示使用频率非疗效、诊断或道德评判，反思建议可沿用；但source locale zh-TW，报告、分数label/description当前简体，需作繁体呈现修订。不能把官方繁体题文与简体版本混用。"
+  },
+  "instruction": {
+    "source": {
+      "path": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.0/source.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "e4ec1b8ae0051a2277e4d277179a39fc6daec43f",
+      "sha256": "c9ca1c13f8a397b1c302d3c3bbb1fa8856e27767c204cbe77a50038f1ae8b2ea"
+    },
+    "pointer": "/instruction",
+    "value": {
+      "schemaVersion": 1,
+      "text": "以下的句子代表您應對生活中壓力事件的可能方法。我們希望能夠了解，您有多經常運用以下的想法或行為去應對問題和壓力。請試回想你過往一個月的情況，然後根據你有多經常運用該想法或行為去圈出合適的數字：(0)從不運用、(1)很少運用、(2)有時運用、(3)經常運用（即每星期至少 4 至 5 次）。請不要以該方法看似是否有效減少壓力或解決問題為回答基準 -- 純粹以您有沒有運用該方法為回答基準。請您使用以下提供的選項，嘗試逐一回答每條題目。您的答案應盡量反映著你真實的情況。",
+      "language": "zh-TW",
+      "version": "1.0.0",
+      "source": "作者UW实验室官方Chinese繁体PDF：https://depts.washington.edu/uwbrtc/wp-content/uploads/DBT-WCCL-Chinese.pdf。仅合并PDF排版分行；内容未重新译为简体。"
+    },
+    "note": "官方繁体指导语已绑定，原PDF无内容重译，仅折叠版面。"
+  },
+  "ordinaryEdits": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.0/source.json",
+      "jsonPointer": "/executable/definition/scoring/scores/0/description",
+      "old": "过去一个月使用与DBT技能相关的应对办法的自报频率，不等于技能是否有效、水平或治疗认证。（原题均值0–3）；保留官方最少有效题数仅作来源说明，平台首版要求该维完整回答。",
+      "new": "過去一個月使用與DBT技能相關的應對辦法的自報頻率，不等於技能是否有效、水平或治療認證。（原題均值0–3）；保留官方最少有效題數僅作來源說明，平臺首版要求該維完整回答。",
+      "reason": "zh-TW受众呈现文字转繁体；机器转换建议需语言复核，不变官方繁体题文或计分。"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.0/source.json",
+      "jsonPointer": "/executable/definition/scoring/scores/1/label",
+      "old": "一般非建设性应对（DCS1）",
+      "new": "一般非建設性應對（DCS1）",
+      "reason": "zh-TW受众呈现文字转繁体；机器转换建议需语言复核，不变官方繁体题文或计分。"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.0/source.json",
+      "jsonPointer": "/executable/definition/scoring/scores/1/description",
+      "old": "面对压力时出现回避、自责及类似应对的频率，并非人格缺点或疾病诊断。（原题均值0–3）；保留官方最少有效题数仅作来源说明，平台首版要求该维完整回答。",
+      "new": "面對壓力時出現迴避、自責及類似應對的頻率，並非人格缺點或疾病診斷。（原題均值0–3）；保留官方最少有效題數僅作來源說明，平臺首版要求該維完整回答。",
+      "reason": "zh-TW受众呈现文字转繁体；机器转换建议需语言复核，不变官方繁体题文或计分。"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.0/source.json",
+      "jsonPointer": "/executable/definition/scoring/scores/2/label",
+      "old": "责怪他人相关应对（DCS2）",
+      "new": "責怪他人相關應對（DCS2）",
+      "reason": "zh-TW受众呈现文字转繁体；机器转换建议需语言复核，不变官方繁体题文或计分。"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.0/source.json",
+      "jsonPointer": "/executable/definition/scoring/scores/2/description",
+      "old": "面对压力时责怪他人或把责任归于外界的频率，不宜作为道德判断。（原题均值0–3）；保留官方最少有效题数仅作来源说明，平台首版要求该维完整回答。",
+      "new": "面對壓力時責怪他人或把責任歸於外界的頻率，不宜作為道德判斷。（原題均值0–3）；保留官方最少有效題數僅作來源說明，平臺首版要求該維完整回答。",
+      "reason": "zh-TW受众呈现文字转繁体；机器转换建议需语言复核，不变官方繁体题文或计分。"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.0/source.json",
+      "jsonPointer": "/executable/definition/report/interpretations/0/headline",
+      "old": "压力来时，你曾用过哪些应对工具",
+      "new": "壓力來時，你曾用過哪些應對工具",
+      "reason": "zh-TW受众呈现文字转繁体；机器转换建议需语言复核，不变官方繁体题文或计分。"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.0/source.json",
+      "jsonPointer": "/executable/definition/report/interpretations/0/summary",
+      "old": "当压力出现时，有时我们会尝试让自己平静、调整行动、寻求支持或照顾身体。这一组答案只告诉你，这些办法在过去一个月出现过多少，并不能证明当时一定有效，也不代表你已经完成DBT治疗或具备某项认证。你可以回想最近一次压力情境：哪种安全、实际的做法容易开始？哪种支持还不够？",
+      "new": "當壓力出現時，有時我們會嘗試讓自己平靜、調整行動、尋求支援或照顧身體。這一組答案只告訴你，這些辦法在過去一個月出現過多少，並不能證明當時一定有效，也不代表你已經完成DBT治療或具備某項認證。你可以回想最近一次壓力情境：哪種安全、實際的做法容易開始？哪種支援還不夠？",
+      "reason": "zh-TW受众呈现文字转繁体；机器转换建议需语言复核，不变官方繁体题文或计分。"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.0/source.json",
+      "jsonPointer": "/executable/definition/report/interpretations/0/guidance/0/text",
+      "old": "最近一次感到压力时，你做的哪一件小事曾帮助你撑过当下？",
+      "new": "最近一次感到壓力時，你做的哪一件小事曾幫助你撐過當下？",
+      "reason": "zh-TW受众呈现文字转繁体；机器转换建议需语言复核，不变官方繁体题文或计分。"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.0/source.json",
+      "jsonPointer": "/executable/definition/report/interpretations/0/guidance/1/text",
+      "old": "选一种安全、可以重复的小行动，在真正需要时试用。",
+      "new": "選一種安全、可以重複的小行動，在真正需要時試用。",
+      "reason": "zh-TW受众呈现文字转繁体；机器转换建议需语言复核，不变官方繁体题文或计分。"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.0/source.json",
+      "jsonPointer": "/executable/definition/report/interpretations/1/headline",
+      "old": "哪些应对可能让问题暂时被搁置",
+      "new": "哪些應對可能讓問題暫時被擱置",
+      "reason": "zh-TW受众呈现文字转繁体；机器转换建议需语言复核，不变官方繁体题文或计分。"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.0/source.json",
+      "jsonPointer": "/executable/definition/report/interpretations/1/summary",
+      "old": "压力特别大时，人可能会隐藏感受、责怪自己、盼望事情自动消失或回避眼前困难。这里记录这些方法是否出现，并不是说你做错了什么。某种做法也可能只是当时资源有限的反应。可以想想：哪些现实条件让你很难面对那件事？有没有一个足够小、并且安全的下一步？",
+      "new": "壓力特別大時，人可能會隱藏感受、責怪自己、盼望事情自動消失或迴避眼前困難。這裡記錄這些方法是否出現，並不是說你做錯了什麼。某種做法也可能只是當時資源有限的反應。可以想想：哪些現實條件讓你很難面對那件事？有沒有一個足夠小、並且安全的下一步？",
+      "reason": "zh-TW受众呈现文字转繁体；机器转换建议需语言复核，不变官方繁体题文或计分。"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.0/source.json",
+      "jsonPointer": "/executable/definition/report/interpretations/1/guidance/0/text",
+      "old": "最近一次想躲开某件事时，真正让你困难的是什么？",
+      "new": "最近一次想躲開某件事時，真正讓你困難的是什麼？",
+      "reason": "zh-TW受众呈现文字转繁体；机器转换建议需语言复核，不变官方繁体题文或计分。"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.0/source.json",
+      "jsonPointer": "/executable/definition/report/interpretations/1/guidance/1/text",
+      "old": "允许自己求助或休息，同时找一小步可改变的现实安排。",
+      "new": "允許自己求助或休息，同時找一小步可改變的現實安排。",
+      "reason": "zh-TW受众呈现文字转繁体；机器转换建议需语言复核，不变官方繁体题文或计分。"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.0/source.json",
+      "jsonPointer": "/executable/definition/report/interpretations/2/headline",
+      "old": "和他人的责任与冲突",
+      "new": "和他人的責任與衝突",
+      "reason": "zh-TW受众呈现文字转繁体；机器转换建议需语言复核，不变官方繁体题文或计分。"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.0/source.json",
+      "jsonPointer": "/executable/definition/report/interpretations/2/summary",
+      "old": "遇到压力时，我们有时会想知道谁应承担责任，或觉得被他人不公平对待。这些题反映这种应对的出现频率，而不是对你的品格、关系质量或事实责任的判决。试着把发生了什么、自己的感受、哪些部分可协商分开来看；必要时也可以请可信赖的人帮助梳理。",
+      "new": "遇到壓力時，我們有時會想知道誰應承擔責任，或覺得被他人不公平對待。這些題反映這種應對的出現頻率，而不是對你的品格、關係質量或事實責任的判決。試著把發生了什麼、自己的感受、哪些部分可協商分開來看；必要時也可以請可信賴的人幫助梳理。",
+      "reason": "zh-TW受众呈现文字转繁体；机器转换建议需语言复核，不变官方繁体题文或计分。"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.0/source.json",
+      "jsonPointer": "/executable/definition/report/interpretations/2/guidance/0/text",
+      "old": "冲突里有哪些已经确定的事实，哪些只是暂时的推测？",
+      "new": "衝突裡有哪些已經確定的事實，哪些只是暫時的推測？",
+      "reason": "zh-TW受众呈现文字转繁体；机器转换建议需语言复核，不变官方繁体题文或计分。"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.0/source.json",
+      "jsonPointer": "/executable/definition/report/interpretations/2/guidance/1/text",
+      "old": "在安全的情况下，找可靠的人商量边界、需求和可行行动。",
+      "new": "在安全的情況下，找可靠的人商量邊界、需求和可行行動。",
+      "reason": "zh-TW受众呈现文字转繁体；机器转换建议需语言复核，不变官方繁体题文或计分。"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.0/source.json",
+      "jsonPointer": "/executable/definition/report/limitations/0",
+      "old": "量表是UW作者实验室提供的官方繁体中文59题，不是未验证的简体中文版；不声称译者身份已确定。",
+      "new": "量表是UW作者實驗室提供的官方繁體中文59題，不是未驗證的簡體中文版；不聲稱譯者身份已確定。",
+      "reason": "zh-TW受众呈现文字转繁体；机器转换建议需语言复核，不变官方繁体题文或计分。"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.0/source.json",
+      "jsonPointer": "/executable/definition/report/limitations/1",
+      "old": "过去一个月自报使用频率，三个独立维度的均值各0–3：DSS38、DCS115、DCS26；无反向题及59题健康总分。",
+      "new": "過去一個月自報使用頻率，三個獨立維度的均值各0–3：DSS38、DCS115、DCS26；無反向題及59題健康總分。",
+      "reason": "zh-TW受众呈现文字转繁体；机器转换建议需语言复核，不变官方繁体题文或计分。"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.0/source.json",
+      "jsonPointer": "/executable/definition/report/limitations/2",
+      "old": "原作者正式SPSS有效题最低DSS30、DCS110、DCS24；本站全题完整才计算是更严格的技术选择，不能冒充原文的缺失策略。",
+      "new": "原作者正式SPSS有效題最低DSS30、DCS110、DCS24；本站全題完整才計算是更嚴格的技術選擇，不能冒充原文的缺失策略。",
+      "reason": "zh-TW受众呈现文字转繁体；机器转换建议需语言复核，不变官方繁体题文或计分。"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.0/source.json",
+      "jsonPointer": "/executable/definition/report/limitations/3",
+      "old": "没有中文常模、临床标准分、百分位、疗效认证或高低切点，也不应用于诊断、选拔或学校排名。",
+      "new": "沒有中文常模、臨床標準分、百分位、療效認證或高低切點，也不應用於診斷、選拔或學校排名。",
+      "reason": "zh-TW受众呈现文字转繁体；机器转换建议需语言复核，不变官方繁体题文或计分。"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.0/source.json",
+      "jsonPointer": "/executable/definition/report/limitations/4",
+      "old": "UW允许非商业研究/临床/教育用途，禁止商业；公开GitHub再分发及新译版不等于已获得授权。",
+      "new": "UW允許非商業研究/臨床/教育用途，禁止商業；公開GitHub再分發及新譯版不等於已獲得授權。",
+      "reason": "zh-TW受众呈现文字转繁体；机器转换建议需语言复核，不变官方繁体题文或计分。"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.0/source.json",
+      "jsonPointer": "/executable/definition/report/limitations/5",
+      "old": "华盛顿大学Behavioral Research & Therapy Clinics作者资源页明确免费允许research、clinical、educational非商业用途，并禁止commercial use，使用时必须注明原论文。原站提供英文及“Chinese”繁体译本，并未据此明确授予完整题文在公开GitHub仓库二次再分发或商用平台软件随包发行的权利。本DRAFT先保存官方繁体题文与独立报告说明，是否容许公开复制、下载/导出、公开托管、中文版译者署名以及以后独立简体中文转换均由管理员复核或联系作者；不伪称另外获得了电子施测、翻译、商用或Github再分发授权。",
+      "new": "華盛頓大學Behavioral Research & Therapy Clinics作者資源頁明確免費允許research、clinical、educational非商業用途，並禁止commercial use，使用時必須註明原論文。原站提供英文及“Chinese”繁體譯本，並未據此明確授予完整題文在公開GitHub倉庫二次再分發或商用平臺軟體隨包發行的權利。本DRAFT先儲存官方繁體題文與獨立報告說明，是否容許公開復制、下載/匯出、公開託管、中文版譯者署名以及以後獨立簡體中文轉換均由管理員複核或聯絡作者；不偽稱另外獲得了電子施測、翻譯、商用或Github再分發授權。",
+      "reason": "zh-TW受众呈现文字转繁体；机器转换建议需语言复核，不变官方繁体题文或计分。"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.0/source.json",
+      "jsonPointer": "/executable/definition/report/disclaimer",
+      "old": "仅非商业研究准备的官方繁体题本DRAFT版本。不得将任何应对均值解释为疾病诊断、治疗成功或个人能力等级。",
+      "new": "僅非商業研究準備的官方繁體題本DRAFT版本。不得將任何應對均值解釋為疾病診斷、治療成功或個人能力等級。",
+      "reason": "zh-TW受众呈现文字转繁体；机器转换建议需语言复核，不变官方繁体题文或计分。"
+    }
+  ],
+  "humanItems": [
+    "report/score文字繁体转换建议由OpenCC生成需语言复核，不是作者原文或专家批准；依既有版本轴处理。",
+    "官方繁体译者、适用证据与既有管理员使用范围事项维持；不扩张版权或改计分。"
+  ],
+  "notExecuted": [
+    "未改仓库、分支、系统、DB/CI，未执行测试或新科研版权调查。",
+    "简体DBT 1.0.2与PR362不在此审计范围，未覆盖。"
+  ]
+}

@@ -1,0 +1,222 @@
+{
+  "schemaVersion": 1,
+  "sourceSHA": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "sourceKey": "dbt_wccl59_zh_tw_official_research",
+  "originalVersion": "1.0.0",
+  "preparedVersion": "1.0.1",
+  "originalSource": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.0/source.json",
+  "preparedSource": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.1/source.json",
+  "originalSourceSHA256": "c9ca1c13f8a397b1c302d3c3bbb1fa8856e27767c204cbe77a50038f1ae8b2ea",
+  "preparedSourceSHA256": "0096799925876f0094d30edbc1637e0cb45f724f2bc6212c0a194531ca6e8b60",
+  "originalFiles": [
+    {
+      "path": "docs/scale-instruments/research-drafts/dbt_wccl59/1.0.0/README.md",
+      "blob": "4eb5f6661bf70998a5b554051f3c4f74c15685e4",
+      "sha256": "202be442555bcb329d3f56ad420a78e9f175f2c52a17b509bc578fbd42f5f0a4"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/dbt_wccl59/1.0.0/source-manifest.json",
+      "blob": "75fbac08e10537173bbf0236e0cb0e7f1db11b3a",
+      "sha256": "7cdae68e8a5a4fd944013da85c7c5eeb9e8572a734c74574e06bf119e81faf44"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.0/THIRD_PARTY_LICENSE.md",
+      "blob": "92d700b5ad8f8e5036f71cce67d2172291c75405",
+      "sha256": "cee5d0b6e31f51c57d3224b1fd43647bba3f5daad92846618450765b907e2b5c"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.0/instrument.ts",
+      "blob": "0eed070bb879576339c5a71afdf34c0026591fd3",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.0/source.json",
+      "blob": "e4ec1b8ae0051a2277e4d277179a39fc6daec43f",
+      "sha256": "c9ca1c13f8a397b1c302d3c3bbb1fa8856e27767c204cbe77a50038f1ae8b2ea"
+    }
+  ],
+  "jsonChanges": [
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/disclaimer",
+      "from": "仅非商业研究准备的官方繁体题本DRAFT版本。不得将任何应对均值解释为疾病诊断、治疗成功或个人能力等级。",
+      "value": "僅非商業研究準備的官方繁體題本DRAFT版本。不得將任何應對均值解釋為疾病診斷、治療成功或個人能力等級。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/interpretations/0/guidance/0/text",
+      "from": "最近一次感到压力时，你做的哪一件小事曾帮助你撑过当下？",
+      "value": "最近一次感到壓力時，你做的哪一件小事曾幫助你撐過當下？"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/interpretations/0/guidance/1/text",
+      "from": "选一种安全、可以重复的小行动，在真正需要时试用。",
+      "value": "選一種安全、可以重複的小行動，在真正需要時試用。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/interpretations/0/headline",
+      "from": "压力来时，你曾用过哪些应对工具",
+      "value": "壓力來時，你曾用過哪些應對工具"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/interpretations/0/summary",
+      "from": "当压力出现时，有时我们会尝试让自己平静、调整行动、寻求支持或照顾身体。这一组答案只告诉你，这些办法在过去一个月出现过多少，并不能证明当时一定有效，也不代表你已经完成DBT治疗或具备某项认证。你可以回想最近一次压力情境：哪种安全、实际的做法容易开始？哪种支持还不够？",
+      "value": "當壓力出現時，有時我們會嘗試讓自己平靜、調整行動、尋求支持或照顧身體。這組回答只描述這些方法在過去一個月使用的頻率，不能證明當時一定有效，也不代表你已經完成 DBT 治療或具備某項認證。你可以回想最近一次有壓力的情境：哪種安全、實際的做法容易開始？哪種支持還不夠？"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/interpretations/1/guidance/0/text",
+      "from": "最近一次想躲开某件事时，真正让你困难的是什么？",
+      "value": "最近一次想躲開某件事時，真正讓你困難的是什麼？"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/interpretations/1/guidance/1/text",
+      "from": "允许自己求助或休息，同时找一小步可改变的现实安排。",
+      "value": "允許自己求助或休息，同時找一小步可改變的現實安排。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/interpretations/1/headline",
+      "from": "哪些应对可能让问题暂时被搁置",
+      "value": "哪些應對可能讓問題暫時被擱置"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/interpretations/1/summary",
+      "from": "压力特别大时，人可能会隐藏感受、责怪自己、盼望事情自动消失或回避眼前困难。这里记录这些方法是否出现，并不是说你做错了什么。某种做法也可能只是当时资源有限的反应。可以想想：哪些现实条件让你很难面对那件事？有没有一个足够小、并且安全的下一步？",
+      "value": "壓力特別大時，人可能會隱藏感受、責怪自己、盼望事情自動消失或迴避眼前困難。這裡記錄這些方法出現的頻率，並不是說你做錯了什麼。某種做法也可能只是當時資源有限的反應。可以想想：哪些現實條件讓你很難面對那件事？有沒有一個足夠小、而且安全的下一步？"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/interpretations/2/guidance/0/text",
+      "from": "冲突里有哪些已经确定的事实，哪些只是暂时的推测？",
+      "value": "衝突裡有哪些已經確定的事實，哪些只是暫時的推測？"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/interpretations/2/guidance/1/text",
+      "from": "在安全的情况下，找可靠的人商量边界、需求和可行行动。",
+      "value": "在安全的情況下，找可靠的人商量邊界、需求和可行行動。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/interpretations/2/headline",
+      "from": "和他人的责任与冲突",
+      "value": "和他人的責任與衝突"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/interpretations/2/summary",
+      "from": "遇到压力时，我们有时会想知道谁应承担责任，或觉得被他人不公平对待。这些题反映这种应对的出现频率，而不是对你的品格、关系质量或事实责任的判决。试着把发生了什么、自己的感受、哪些部分可协商分开来看；必要时也可以请可信赖的人帮助梳理。",
+      "value": "遇到壓力時，我們有時會想知道誰應承擔責任，或覺得被他人不公平對待。這些題目反映這類應對方式的出現頻率，不是對你的品格、關係品質或實際責任的判決。試著把發生了什麼、自己的感受，以及哪些部分可以協商分開來看；必要時也可以請可信賴的人幫忙釐清。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/limitations/0",
+      "from": "量表是UW作者实验室提供的官方繁体中文59题，不是未验证的简体中文版；不声称译者身份已确定。",
+      "value": "量表是UW作者實驗室提供的官方繁體中文59題，不是未驗證的簡體中文版；不聲稱譯者身份已確定。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/limitations/1",
+      "from": "过去一个月自报使用频率，三个独立维度的均值各0–3：DSS38、DCS115、DCS26；无反向题及59题健康总分。",
+      "value": "過去一個月自述使用頻率，三個獨立維度的均分各為 0–3：DSS 38 題、DCS1 15 題、DCS2 6 題；無反向題，也沒有 59 題健康總分。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/limitations/2",
+      "from": "原作者正式SPSS有效题最低DSS30、DCS110、DCS24；本站全题完整才计算是更严格的技术选择，不能冒充原文的缺失策略。",
+      "value": "原作者 SPSS 計分所需的最低有效題數為 DSS 30 題、DCS1 10 題、DCS2 4 題；本站要求該維度全部作答才計算，是較嚴格的技術選擇，不是原作者的缺答策略。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/limitations/3",
+      "from": "没有中文常模、临床标准分、百分位、疗效认证或高低切点，也不应用于诊断、选拔或学校排名。",
+      "value": "沒有中文常模、臨床標準分、百分位、療效認證或高低切點，也不應用於診斷、選拔或學校排名。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/limitations/4",
+      "from": "UW允许非商业研究/临床/教育用途，禁止商业；公开GitHub再分发及新译版不等于已获得授权。",
+      "value": "UW允許非商業研究/臨床/教育用途，禁止商業；公開GitHub再分發及新譯版不等於已獲得授權。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/limitations/5",
+      "from": "华盛顿大学Behavioral Research & Therapy Clinics作者资源页明确免费允许research、clinical、educational非商业用途，并禁止commercial use，使用时必须注明原论文。原站提供英文及“Chinese”繁体译本，并未据此明确授予完整题文在公开GitHub仓库二次再分发或商用平台软件随包发行的权利。本DRAFT先保存官方繁体题文与独立报告说明，是否容许公开复制、下载/导出、公开托管、中文版译者署名以及以后独立简体中文转换均由管理员复核或联系作者；不伪称另外获得了电子施测、翻译、商用或Github再分发授权。",
+      "value": "華盛頓大學 Behavioral Research & Therapy Clinics 作者資源頁明確免費允許非商業研究、臨床及教育用途，並禁止商業使用；使用時必須註明原論文。原站提供英文及「Chinese」繁體譯本，但這並不明確授予完整題文在公開 GitHub 儲存庫二次再分發或隨商業平台軟體發行的權利。本 DRAFT 保存官方繁體題文與獨立報告說明；是否允許公開複製、下載或匯出、公開託管、中文版譯者署名及日後轉為獨立簡體中文版，均由管理員複核或聯絡作者；不聲稱另已獲電子施測、翻譯、商業使用或 GitHub 再分發授權。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/reportVersion",
+      "from": "1.0.0",
+      "value": "1.0.1"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/scoring/scores/0/description",
+      "from": "过去一个月使用与DBT技能相关的应对办法的自报频率，不等于技能是否有效、水平或治疗认证。（原题均值0–3）；保留官方最少有效题数仅作来源说明，平台首版要求该维完整回答。",
+      "value": "過去一個月使用與 DBT 技能相關的應對方法的自述頻率，不等於方法是否有效、技能水平或治療認證。原題均分為 0–3；官方最少有效題數僅作來源說明，平台首版要求該維度完整作答。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/scoring/scores/1/description",
+      "from": "面对压力时出现回避、自责及类似应对的频率，并非人格缺点或疾病诊断。（原题均值0–3）；保留官方最少有效题数仅作来源说明，平台首版要求该维完整回答。",
+      "value": "面對壓力時出現迴避、自責及類似應對方式的頻率，並非人格缺點或疾病診斷。原題均分為 0–3；官方最少有效題數僅作來源說明，平台首版要求該維度完整作答。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/scoring/scores/1/label",
+      "from": "一般非建设性应对（DCS1）",
+      "value": "一般非建設性應對（DCS1）"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/scoring/scores/2/description",
+      "from": "面对压力时责怪他人或把责任归于外界的频率，不宜作为道德判断。（原题均值0–3）；保留官方最少有效题数仅作来源说明，平台首版要求该维完整回答。",
+      "value": "面對壓力時責怪他人或把責任歸於外界的頻率，不宜用於道德判斷。原題均分為 0–3；官方最少有效題數僅作來源說明，平台首版要求該維度完整作答。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/scoring/scores/2/label",
+      "from": "责怪他人相关应对（DCS2）",
+      "value": "責怪他人相關應對（DCS2）"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/releaseStatus",
+      "from": "DRAFT",
+      "value": "PUBLISHED"
+    },
+    {
+      "op": "replace",
+      "path": "/identity/instrumentVersion",
+      "from": "1.0.0",
+      "value": "1.0.1"
+    }
+  ],
+  "audit": "audits/audit-dbt-wccl59-zh-tw-batch3.json",
+  "patch": "patches/patch-dbt-wccl59-zh-tw-batch3.json",
+  "versions": {
+    "instrument": "1.0.1",
+    "scoring": "1.0.0",
+    "report": "1.0.1",
+    "localization": "1.0.0",
+    "instruction": "1.0.0"
+  },
+  "states": {
+    "sourceRelease": "PUBLISHED candidate; no database publication",
+    "catalog": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "translation": "PENDING",
+    "scientificReview": null,
+    "databaseInstall": "NOT_EXECUTED",
+    "databasePublish": "NOT_EXECUTED",
+    "production": "NOT_TOUCHED"
+  },
+  "versionReason": "Original source identities are retained byte-for-byte. New item clarification/metadata/report/administration wording is explicit; formulas, anchors, directions, parameter data and scoringVersion are unchanged. Old report editorial timestamp is not reused as approval of revised wording."
+}
