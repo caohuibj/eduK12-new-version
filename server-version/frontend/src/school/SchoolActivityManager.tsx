@@ -126,7 +126,7 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
   const libraryTeacherReport=Boolean(resource?.key.startsWith('library-scale:')
     &&resource.subjectRoles.length===1&&resource.subjectRoles[0]==='STUDENT'
     &&resource.respondentRoles.length===1&&resource.respondentRoles[0]==='TEACHER'
-    &&resource.perspectives.length===1&&resource.perspectives[0]==='TEACHER_REPORT')
+    &&resource.perspectives.length===1&&resource.perspectives[0]==='OBSERVER_REPORT')
   const homeroomOnly=libraryTeacherReport&&!isAdmin&&selected?.capabilities?.ownPsychologyPublisher===true
   const targetModes=(resource?.allowedTargetModes??[]).filter(mode=>mode!=='COURSE_TEACHER'
     &&(!libraryTeacherReport||['HOMEROOM_TEACHER','ALL_CLASS_TEACHERS'].includes(mode))
