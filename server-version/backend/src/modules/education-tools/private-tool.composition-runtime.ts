@@ -12,6 +12,7 @@ import {educationCompositionBindingSchema,educationCompositionOriginSchema,educa
  type EducationCompositionOrigin,type EducationCompositionBinding} from './private-tool.composition-contracts'
 import type {CompiledPrivateComposition,CompositionLeaf} from './private-tool.composition-compiler'
 import {compositionLeafKey} from './private-tool.composition-compiler'
+import {materializeEducationLibraryScale} from './library-source.scale'
 
 type Tx=Prisma.TransactionClient
 const identitySelect={id:true,creationKey:true,creationHash:true,createdBy:true,status:true,publishedAt:true,productKind:true,
@@ -80,6 +81,10 @@ export async function sealPrivateComposition(tx:Tx,c:PrivateToolContext,version:
  const prior=await tx.compositeAssessment.findUnique({where:{creationKey:key},select:{id:true}})
  if(prior)return readOwnedCompositionIdentity(tx,c,version)
  const scaleLeaves=new Map<string,Awaited<ReturnType<typeof materializeScale>>>()
+ const libraryScales=new Map<string,Awaited<ReturnType<typeof materializeEducationLibraryScale>>>()
+ for(const leaf of [...compiled.leaves.values()].filter(leaf=>leaf.provider==='LIBRARY_SCALE').sort((a,b)=>a.version.id.localeCompare(b.version.id))){
+  libraryScales.set(leaf.version.id,await materializeEducationLibraryScale(tx,leaf.library))
+ }
  const standardContent=new Map<string,Awaited<ReturnType<typeof materializeStandardCombinationContent>>>()
  for(const leaf of [...compiled.leaves.values()].filter(leaf=>leaf.provider==='STANDARD_SCALE').sort((a,b)=>a.version.id.localeCompare(b.version.id))){
   const {row,measurement,descriptor}=leaf.standard
@@ -107,10 +112,12 @@ export async function sealPrivateComposition(tx:Tx,c:PrivateToolContext,version:
  for(const block of compiled.definition.blocks){
   const leaf=compiled.leaves.get(compositionLeafKey(block.source))!,itemIds:string[]=[],sectionIds:string[]=[]
   if(leaf.kind==='SCALE'){
-   const {scale,release}=leaf.provider==='STANDARD_SCALE'?{scale:leaf.standard.scale,release:leaf.standard.measurement}:scaleLeaves.get(leaf.version.id)!,itemId=randomUUID()
+   const {scale,release}=leaf.provider==='STANDARD_SCALE'?{scale:leaf.standard.scale,release:leaf.standard.measurement}:
+    leaf.provider==='LIBRARY_SCALE'?{scale:libraryScales.get(leaf.version.id)!,release:leaf.library.measurement}:scaleLeaves.get(leaf.version.id)!,itemId=randomUUID()
    itemIds.push(itemId);items.push({id:itemId,compositeAssessmentId:parent.id,type:'SCALE',position:items.length,required:true,scaleId:scale.id})
    const derived=leaf.provider==='STANDARD_SCALE'?standardContent.get(leaf.version.id)!:null
    units.push({itemId,family:'SCALE',source:leaf.provider==='STANDARD_SCALE'?{kind:'SCALE',id:scale.id,ownerId:scale.creatorId,educationStandard:leaf.standard.descriptor}:
+    leaf.provider==='LIBRARY_SCALE'?{kind:'SCALE',id:scale.id,ownerId:scale.creatorId,libraryEntryId:leaf.library.row.entryId,educationLibrary:leaf.library.descriptor}:
     {kind:'SCALE',id:scale.id,ownerId:leaf.version.ownerUserId,privateVersionId:leaf.version.id},
     measurement:{releaseId:release.releaseId,contentHash:release.contentHash,measurementHash:release.content.measurementHash},
     ...(derived?{referencePolicy:derived.referencePolicy,...(derived.report?{report:derived.report}:{})}:{})})
@@ -126,6 +133,7 @@ export async function sealPrivateComposition(tx:Tx,c:PrivateToolContext,version:
   }
   manifest.push({blockId:block.blockId,instruction:block.instruction,kind:leaf.kind,versionId:leaf.version.id,
    contentHash:leaf.version.contentHash,toolId:leaf.version.toolId,itemIds,sectionIds,sourceProvider:leaf.provider,
+   ...(leaf.provider==='LIBRARY_SCALE'&&leaf.library.row.snapshot.instruction?{sourceInstruction:leaf.library.row.snapshot.instruction}:{}),
    ...(leaf.provider==='PUBLIC_FORM'&&leaf.sourceInstruction?{sourceInstruction:leaf.sourceInstruction}:{})})
  }
  if(sections.length)await tx.compositeFormSection.createMany({data:sections})

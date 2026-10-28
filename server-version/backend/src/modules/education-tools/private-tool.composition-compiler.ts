@@ -16,9 +16,12 @@ import {governedMediaBlocker,governedMediaRefs} from '../survey/governed-tool.me
 import {compileEducationApplicability,educationApplicabilitySchema} from '../scale-library-governance/education-applicability'
 import {educationPublicSourceKey} from './public-source.identity'
 import {readEducationPublicUse} from './public-source.catalog'
+import {readEducationLibrarySources,type EducationLibraryLeaf} from './library-source.scale'
+import {readEducationLibrarySourceUses} from './library-source.catalog'
+import {readLockedEducationLibraryUses,type LockedEducationLibraryUses} from './library-source.use'
 import {assertAssessmentAssetReferencesReady} from '../assessment-media/assessment-asset'
 
-export type CompositionLeaf={provider:'STANDARD_SCALE';kind:'SCALE';version:Pick<EducationPrivateToolVersion,'id'|'toolId'|'title'|'contentHash'>;definition:ScaleDefinitionV2;standard:EducationStandardLeaf}|({provider:'PRIVATE_VERSION';version:EducationPrivateToolVersion}&(
+export type CompositionLeaf={provider:'LIBRARY_SCALE';kind:'SCALE';version:Pick<EducationPrivateToolVersion,'id'|'toolId'|'title'|'contentHash'>;definition:ScaleDefinitionV2;library:EducationLibraryLeaf}|{provider:'STANDARD_SCALE';kind:'SCALE';version:Pick<EducationPrivateToolVersion,'id'|'toolId'|'title'|'contentHash'>;definition:ScaleDefinitionV2;standard:EducationStandardLeaf}|({provider:'PRIVATE_VERSION';version:EducationPrivateToolVersion}&(
  {kind:'SCALE';definition:ScaleDefinitionV2}|{kind:'FORM';form:ReturnType<typeof compilePrivateFormRuntime>}))|
  {provider:'PUBLIC_FORM';kind:'FORM';version:Pick<EducationPrivateToolVersion,'id'|'toolId'|'title'|'contentHash'>;
   sourceInstruction?:string;form:ReturnType<typeof compilePrivateFormRuntime>}
@@ -27,12 +30,17 @@ export type CompiledPrivateComposition={definition:PrivateCompositionDefinition;
 
 /** Already-authorized request only. One bounded source read, one optional media
  * read; no draft/latest selection, runtime writes, cross-product API or cache. */
-export async function compilePrivateComposition(tx:Prisma.TransactionClient,c:PrivateToolContext,raw:unknown):Promise<CompiledPrivateComposition>{
+export async function compilePrivateComposition(tx:Prisma.TransactionClient,c:PrivateToolContext,raw:unknown,options:{purpose?:'FREEZE';libraryUses?:LockedEducationLibraryUses}={}):Promise<CompiledPrivateComposition>{
  const definition=privateCompositionDefinitionSchema.parse(raw)
  if(!definition.blocks.length)privateToolFail('PRIVATE_TOOL_DEFINITION_INCOMPLETE',400,[{path:'blocks',severity:'error',message:'请加入至少一个固定版本工具'}])
  if(definition.administration.population!==(c.entry==='SCHOOL'?'STUDENT':'TEACHER'))
   privateToolFail('PRIVATE_COMPOSITION_VARIANT_UNSUPPORTED',400)
- const publicSources=definition.blocks.filter(block=>block.source.provider!=='PRIVATE_VERSION').map(block=>block.source)
+ const librarySources=definition.blocks.filter(block=>block.source.provider==='LIBRARY_SCALE').map(block=>block.source)
+ const libraryIds=[...new Set(librarySources.map(source=>source.versionId))]
+ const libraryUses=libraryIds.length?(options.purpose==='FREEZE'?readLockedEducationLibraryUses(tx,c,options.libraryUses):
+  await readEducationLibrarySourceUses(tx,c,libraryIds)):new Map()
+ if(libraryIds.some(id=>!libraryUses.has(id)))privateToolFail('LIBRARY_SOURCE_USE_REQUIRED',403)
+ const publicSources=definition.blocks.filter(block=>['PUBLIC_FORM','STANDARD_SCALE'].includes(block.source.provider)).map(block=>block.source)
  const publicKeys=publicSources.map(source=>educationPublicSourceKey({kind:source.provider==='PUBLIC_FORM'?'FORM':'STANDARD_SCALE',id:source.versionId,hash:source.contentHash}))
  const publicUse=await readEducationPublicUse(tx,c,publicKeys,true)
  if(publicUse.size!==new Set(publicKeys).size)privateToolFail('PUBLIC_SOURCE_USE_REQUIRED',403)
@@ -57,6 +65,9 @@ export async function compilePrivateComposition(tx:Prisma.TransactionClient,c:Pr
  const standards=await readEducationStandardSources(tx,publicSources.filter(source=>source.provider==='STANDARD_SCALE'))
  for(const standard of standards.values())leaves.set('STANDARD_SCALE:'+standard.row.id,{provider:'STANDARD_SCALE',kind:'SCALE',standard,definition:standard.row.snapshot.definition,
   version:{id:standard.row.id,toolId:standard.row.id,title:standard.row.snapshot.title,contentHash:standard.row.combination_hash}})
+ const libraries=await readEducationLibrarySources(tx,c,librarySources)
+ for(const library of libraries.values())leaves.set('LIBRARY_SCALE:'+library.row.entryId,{provider:'LIBRARY_SCALE',kind:'SCALE',library,definition:library.definition,
+  version:{id:library.row.entryId,toolId:library.row.entryId,title:library.row.snapshot.title,contentHash:library.row.snapshotHash}})
  const formSources=publicSources.filter(source=>source.provider==='PUBLIC_FORM')
  const publicIds=[...new Set(formSources.map(source=>source.versionId))]
  const publicRows=publicIds.length?await tx.$queryRaw<Array<{id:string;title:string;snapshot_hash:string;snapshot:GovernedArtifact}>>(Prisma.sql`
@@ -114,5 +125,6 @@ export async function compilePrivateComposition(tx:Prisma.TransactionClient,c:Pr
   return n+(leaf.kind==='SCALE'?1:leaf.form.sections.reduce((sum,page)=>sum+page.items.length,0))
  },0)
  if(count>1000)privateToolFail('PRIVATE_COMPOSITION_RUNTIME_TOO_LARGE',400)
- return {definition,leaves,...(publicUse.size?{publicUseExpiresAt:new Date(Math.min(...[...publicUse.values()].map(use=>use.expiresAt.getTime())))}:{})}
+ const deadlines=[...[...publicUse.values()].map(use=>use.expiresAt),...[...libraryUses.values()].map(use=>use.expiresAt).filter((date):date is Date=>date instanceof Date)]
+ return {definition,leaves,...(deadlines.length?{publicUseExpiresAt:new Date(Math.min(...deadlines.map(date=>date.getTime())))}:{})}
 }

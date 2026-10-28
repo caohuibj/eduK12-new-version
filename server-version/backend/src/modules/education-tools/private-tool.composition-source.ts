@@ -18,7 +18,7 @@ const leafSummarySchema=z.array(z.object({blockId:z.string().guid(),versionId:z.
  kind:z.enum(['SCALE','FORM']),audience:z.string().nullable(),metricKeys:z.array(z.string()).max(100)}).strict()).min(1).max(50)
 type Row={id:string;key:string;creationHash:string;createdBy:string;status:string;publishedAt:Date|null;productKind:string;
  publicEnabled:boolean;copyable:boolean;manifestHash:string;versionId:string;toolId:string;entry:string;organizationId:string;
- ownerUserId:string;contentHash:string;title:string;leaves:unknown;available:boolean;releaseIds:string[];scaleIds:string[];publicKeys:string[]}
+ ownerUserId:string;contentHash:string;title:string;leaves:unknown;available:boolean;releaseIds:string[];scaleIds:string[];publicKeys:string[];libraryRuntimePending:boolean}
 export type PrivateCompositionRunSource={origin:EducationCompositionOrigin;compositeId:string;manifestHash:string;
  resourceEntry:RelationalProductEntryV1;policy:RunResourcePolicy;identityOnly:true;canPublish:false}
 
@@ -41,6 +41,7 @@ export async function readPrivateCompositionRunSources(tx:Tx,c:PrivateToolContex
   c.status,c.published_at AS "publishedAt",c.product_kind AS "productKind",c.public_enabled AS "publicEnabled",c.copyable,
   c.training_content_snapshot_hash AS "manifestHash",v.id AS "versionId",v.tool_id AS "toolId",v.entry,
   v.organization_id AS "organizationId",v.owner_user_id AS "ownerUserId",v.content_hash AS "contentHash",v.title,
+  EXISTS(SELECT 1 FROM jsonb_array_elements(c.training_content_snapshot#>'{educationBinding,manifest}') b WHERE b->>'sourceProvider'='LIBRARY_SCALE') AS "libraryRuntimePending",
   (SELECT jsonb_agg(jsonb_build_object('blockId',b->>'blockId','versionId',b->>'versionId','contentHash',b->>'contentHash','kind',b->>'kind',
     'audience',COALESCE(s.definition#>>'{report,audienceContract,audience}',std.snapshot#>>'{definition,report,audienceContract,audience}'),
     'metricKeys',CASE WHEN b->>'sourceProvider'='STANDARD_SCALE' THEN (SELECT COALESCE(jsonb_agg(score->>'key'),'[]') FROM jsonb_array_elements(std.snapshot#>'{definition,scoring,scores}') score) WHEN s.kind='SCALE' THEN (SELECT COALESCE(jsonb_agg(score->>'key'),'[]')
@@ -61,6 +62,9 @@ export async function readPrivateCompositionRunSources(tx:Tx,c:PrivateToolContex
    'education-composition:'||v.entry||':'||v.id||':'||CASE v.entry WHEN 'SCHOOL' THEN 'STUDENT' ELSE 'TEACHER' END||':SELF:1.0.0'
   WHERE c.creation_key IN (${Prisma.join(keys)}) AND v.kind='COMPOSITION' AND v.entry=${c.entry}
    AND v.organization_id=${c.organizationId} AND v.owner_user_id=${c.principal.userId}`)
+ // This commit seals original library content only. Its participant consumer
+ // lands in the next slice; a sealed DRAFT is never advertised as executable.
+ if(rows.some(row=>row.libraryRuntimePending))privateToolFail('PRIVATE_COMPOSITION_LIBRARY_RUNTIME_PENDING',409)
  if(options.lockForUse){
   const releases=[...new Set(rows.flatMap(row=>row.releaseIds))],scales=[...new Set(rows.flatMap(row=>row.scaleIds))]
   // Reuse the real emergency writer's identity locks, then read mutable status
