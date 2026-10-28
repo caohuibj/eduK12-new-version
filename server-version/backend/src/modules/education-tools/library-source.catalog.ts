@@ -10,7 +10,38 @@ import {ContentAuthorityError} from '../measurement-content/content-authority'
 
 export const educationLibraryCatalogQuery=z.object({cursor:z.string().guid().optional(),q:z.string().trim().max(160).optional()}).strict()
 type Header={entryId:string;releaseId:string;contentHash:string;snapshotHash:string;title:string;sourceProduct:string;version:string;
- language:string|null;dependencies:Array<{releaseId:string;contentHash:string;layer:string;version:string}>}
+ language:string|null;nativeReportVersion:string|null;compatible:boolean;dependencies:Array<{releaseId:string;contentHash:string;layer:string;version:string}>}
+const libraryHeaderFields=(entry:'SCHOOL'|'TEACHER')=>Prisma.sql`e.id AS "entryId",e.release_id AS "releaseId",m.content_hash AS "contentHash",
+ s.snapshot_hash AS "snapshotHash",s.snapshot->>'title' AS title,s.product AS "sourceProduct",m.version,
+ s.snapshot#>>'{compiledDefinition,versionAxes,locale}' AS language,s.snapshot#>>'{compiledDefinition,report,reportVersion}' AS "nativeReportVersion",
+ (cardinality(s.dependency_release_ids)=0 AND s.snapshot#>>'{compiledDefinition,referencePolicy,type}'='none'
+  AND EXISTS(SELECT 1 FROM jsonb_array_elements(s.snapshot#>'{educationApplicability,administrations}') a
+   WHERE a->>'population'=${entry==='SCHOOL'?'STUDENT':'TEACHER'} AND a->>'responseMode'='SELF')
+  AND NOT EXISTS(SELECT 1 FROM scales installed WHERE installed.library_entry_id=e.id AND installed.status<>'PUBLISHED')
+  AND NOT EXISTS(SELECT 1 FROM scale_library_emergency_stops stop WHERE stop.target_kind='RELEASE' AND stop.target_id=e.release_id
+   OR stop.target_kind='TRAINING_SCALE' AND EXISTS(SELECT 1 FROM scales installed WHERE installed.library_entry_id=e.id AND installed.id=stop.target_id))) AS compatible,
+ (SELECT COALESCE(jsonb_agg(jsonb_build_object('releaseId',dep.id,'contentHash',dep.content_hash,'layer',dep.layer,'version',dep.version) ORDER BY dep.id),'[]')
+  FROM measurement_content_releases dep WHERE dep.id=ANY(s.dependency_release_ids)) AS dependencies`
+const projectLibraryHeader=(row:Header)=>({catalogKey:`education-library-source:${row.entryId}:${row.snapshotHash}`,kind:'SCALE' as const,
+ sourceProvider:'LIBRARY_SCALE' as const,sourceId:row.entryId,contentHash:row.snapshotHash,measurement:{releaseId:row.releaseId,contentHash:row.contentHash},
+ title:row.title,sourceProduct:row.sourceProduct,language:row.language,versions:{content:row.version,
+  parameters:row.dependencies.filter(d=>d.layer==='REFERENCE').map(d=>d.version).join('、')||null,
+  report:row.dependencies.filter(d=>d.layer==='REPORT').map(d=>d.version).join('、')||row.nativeReportVersion},
+ sourceLabel:'获授权共用量表固定版本',canEditOriginal:false as const,canDistribute:false as const,
+ allowedActions:row.compatible?['REFERENCE_FIXED_VERSION']:[],runtimeStatus:row.compatible?'COMPOSITION_READY':'COMPOSITION_ADAPTER_UNAVAILABLE',
+ ...(!row.compatible?{unavailableReason:'该版本的参考／报告依赖、自评变体或当前停用状态尚不满足本入口普通问卷，原始内容保持不变。'}:{})})
+
+/** Draft reopening resolves only authorized exact headers, not source bodies. */
+export async function readEducationLibrarySourceSummaries(tx:Prisma.TransactionClient,c:PrivateToolContext,sources:readonly {versionId:string;contentHash:string}[]){
+ const ids=[...new Set(sources.map(source=>source.versionId))]
+ const uses=await readEducationLibrarySourceUses(tx,c,ids),visible=ids.filter(id=>uses.has(id))
+ if(!visible.length)return []
+ const rows=await tx.$queryRaw<Header[]>(Prisma.sql`SELECT ${libraryHeaderFields(c.entry)}
+  FROM scale_library_entries e JOIN scale_library_submissions s ON s.id=e.submission_id AND s.status='APPROVED'
+  JOIN measurement_content_releases m ON m.id=e.release_id AND m.status='PUBLISHED' AND m.layer='MEASUREMENT' AND m.family='SCALE'
+  WHERE e.id IN (${Prisma.join(visible)}) AND e.status='ACTIVE' ORDER BY e.id`)
+ return rows.filter(row=>sources.some(source=>source.versionId===row.entryId&&source.contentHash===row.snapshotHash)).map(projectLibraryHeader)
+}
 export type EducationLibrarySourceUse={id:string;entryId:string;releaseId:string;issuerId:string;authorityGrantId:string|null;version:number;scopeKind:'USER'|'ORGANIZATION';expiresAt?:Date|null}
 
 /** Already-authorized education author only, in this same transaction. Existing
@@ -91,11 +122,7 @@ export async function listEducationLibrarySources(c:PrivateToolContext,raw:unkno
  const input=educationLibraryCatalogQuery.parse(raw)
  return prisma.$transaction(async tx=>{
   await authorizePrivateTool(tx,c)
-  const rows=await tx.$queryRaw<Header[]>(Prisma.sql`SELECT e.id AS "entryId",e.release_id AS "releaseId",m.content_hash AS "contentHash",
-   s.snapshot_hash AS "snapshotHash",s.snapshot->>'title' AS title,s.product AS "sourceProduct",m.version,
-   s.snapshot#>>'{compiledDefinition,versionAxes,locale}' AS language,
-   (SELECT COALESCE(jsonb_agg(jsonb_build_object('releaseId',dep.id,'contentHash',dep.content_hash,'layer',dep.layer,'version',dep.version) ORDER BY dep.id),'[]')
-    FROM measurement_content_releases dep WHERE dep.id=ANY(s.dependency_release_ids)) AS dependencies
+  const rows=await tx.$queryRaw<Header[]>(Prisma.sql`SELECT ${libraryHeaderFields(c.entry)}
    FROM scale_library_entries e JOIN scale_library_submissions s ON s.id=e.submission_id AND s.status='APPROVED'
    JOIN measurement_content_releases m ON m.id=e.release_id AND m.layer='MEASUREMENT' AND m.family='SCALE' AND m.status='PUBLISHED'
    WHERE e.status='ACTIVE' AND (${input.cursor??null}::text IS NULL OR e.id>${input.cursor??null})
@@ -107,11 +134,7 @@ export async function listEducationLibrarySources(c:PrivateToolContext,raw:unkno
   const scanned=rows.slice(0,120),allowed=await readEducationLibrarySourceUses(tx,c,scanned.map(row=>row.entryId))
   const visible=scanned.filter(row=>allowed.has(row.entryId)),selected=visible.slice(0,40)
   const moreVisible=visible.length>40,moreCandidates=rows.length>120
-  return {list:selected.map(row=>({catalogKey:`education-library-source:${row.entryId}:${row.snapshotHash}`,kind:'SCALE' as const,
-   sourceProvider:'LIBRARY_SCALE' as const,sourceId:row.entryId,contentHash:row.snapshotHash,measurement:{releaseId:row.releaseId,contentHash:row.contentHash},
-   title:row.title,sourceProduct:row.sourceProduct,language:row.language,versions:{content:row.version,parameters:row.dependencies.filter(d=>d.layer==='REFERENCE').map(d=>d.version),report:row.dependencies.filter(d=>d.layer==='REPORT').map(d=>d.version)},
-   sourceLabel:'获授权共用量表固定版本',canEditOriginal:false,canDistribute:false,allowedActions:[],runtimeStatus:'COMPOSITION_ADAPTER_PENDING',
-   unavailableReason:'该来源的普通问卷执行适配正在接入，当前仅展示已获授权的固定版本。'})),
+  return {list:selected.map(projectLibraryHeader),
    nextCursor:moreVisible?selected.at(-1)!.entryId:moreCandidates?scanned.at(-1)!.entryId:null}
  },{isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted})
 }

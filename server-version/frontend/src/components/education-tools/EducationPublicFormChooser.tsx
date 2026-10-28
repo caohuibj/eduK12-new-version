@@ -3,25 +3,26 @@ import {useEffect,useRef,useState} from 'react'
 import {privateToolBase,privateToolError,type PrivateToolApi} from './privateToolClient'
 import type {EducationPublicFormSummary} from './educationPublicFormClient'
 
-type Props={api:PrivateToolApi;entry:'SCHOOL'|'TEACHER';organizationId:string;actorId:string;kind?:'FORM'|'SCALE';disabled?:boolean;onChoose:(source:EducationPublicFormSummary)=>void}
+type Props={api:PrivateToolApi;entry:'SCHOOL'|'TEACHER';organizationId:string;actorId:string;kind?:'FORM'|'SCALE';catalog?:'PUBLIC'|'LIBRARY';disabled?:boolean;onChoose:(source:EducationPublicFormSummary)=>void}
 export function EducationPublicFormChooser(props:Props){
  const scope=useRef({...props,epoch:0})
- if(scope.current.kind!==props.kind||scope.current.api!==props.api||scope.current.entry!==props.entry||scope.current.organizationId!==props.organizationId||scope.current.actorId!==props.actorId)scope.current={...props,epoch:scope.current.epoch+1}
+ if(scope.current.catalog!==props.catalog||scope.current.kind!==props.kind||scope.current.api!==props.api||scope.current.entry!==props.entry||scope.current.organizationId!==props.organizationId||scope.current.actorId!==props.actorId)scope.current={...props,epoch:scope.current.epoch+1}
  return <ChooserSession key={scope.current.epoch} {...props}/>
 }
-function ChooserSession({api,organizationId,disabled,onChoose,kind='FORM'}:Props){
- const label=kind==='FORM'?'公共表单':'公共量表'
+function ChooserSession({api,organizationId,disabled,onChoose,kind='FORM',catalog='PUBLIC'}:Props){
+ const label=catalog==='LIBRARY'?'共用量表':kind==='FORM'?'公共表单':'公共量表'
  const [query,setQuery]=useState(''),[search,setSearch]=useState(''),[cursor,setCursor]=useState<string|null>(null),[next,setNext]=useState<string|null>(null)
  const [rows,setRows]=useState<EducationPublicFormSummary[]>([]),[busy,setBusy]=useState(false),[error,setError]=useState('')
  useEffect(()=>{
   let current=true;setBusy(true);setError('')
-  const params=new URLSearchParams({kind,q:search});if(cursor)params.set('cursor',cursor)
-  void api<{list:EducationPublicFormSummary[];nextCursor:string|null}>(`${privateToolBase(organizationId)}/public-sources?${params}`)
+  const params=new URLSearchParams({q:search});if(catalog==='PUBLIC')params.set('kind',kind);if(cursor)params.set('cursor',cursor)
+  void api<{list:EducationPublicFormSummary[];nextCursor:string|null}>(`${privateToolBase(organizationId)}/${catalog==='LIBRARY'?'library-sources':'public-sources'}?${params}`)
    .then(value=>{if(current){setRows(old=>cursor?Array.from(new Map([...old,...value.list].map(row=>[row.catalogKey,row])).values()):value.list);setNext(value.nextCursor)}})
    .catch(reason=>{if(current)setError(privateToolError(reason))}).finally(()=>{if(current)setBusy(false)})
   return()=>{current=false}
- },[api,organizationId,search,cursor,kind])
+ },[api,organizationId,search,cursor,kind,catalog])
  return <section aria-label={'获授权'+label}><h4>获授权{label}</h4><p>引用原有固定版本；公共原版保持只读。</p>
+  {kind==='FORM'&&<p>保留原始页面与题目。同页条件已支持；跨页条件和表单全局素材暂未接入，固定时会明确拒绝，不会删减原版内容。</p>}
   <form onSubmit={event=>{event.preventDefault();const q=query.trim();if(q===search&&!cursor)return;setCursor(null);setRows([]);setSearch(q)}}><label>搜索{label}<input value={query} onChange={event=>setQuery(event.target.value)}/></label><button disabled={busy||disabled}>搜索</button></form>
   {error&&<p role="alert">{error}</p>}{busy&&<p role="status">正在读取{label}…</p>}
   {!busy&&!rows.length&&!error&&<p>当前没有获授权的{label}。</p>}

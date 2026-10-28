@@ -42,7 +42,7 @@ suite('Original Scale library U / ordinary author directory',()=>{
   expect(new Set(directory.data.list.map((row:any)=>row.sourceId))).toEqual(new Set([first.entryId,second.entryId]))
   expect(check).toHaveBeenCalledOnce()
   expect(new Set(check.mock.calls[0][2])).toEqual(new Set([first.release.releaseId,second.release.releaseId]))
-  for(const row of directory.data.list)expect(row).toMatchObject({kind:'SCALE',sourceProvider:'LIBRARY_SCALE',canEditOriginal:false,canDistribute:false,allowedActions:[],runtimeStatus:'COMPOSITION_ADAPTER_PENDING'})
+  for(const row of directory.data.list)expect(row).toMatchObject({kind:'SCALE',sourceProvider:'LIBRARY_SCALE',canEditOriginal:false,canDistribute:false,allowedActions:['REFERENCE_FIXED_VERSION'],runtimeStatus:'COMPOSITION_READY'})
   expect(JSON.stringify(directory.data)).not.toMatch(/Q1|本次支持体验|rawScoreFeedback|scoringDescription|issuerId|authorityGrantId|capabilities|educationBinding/)
   expect(await db.scale.count()).toBe(before.scales);expect(await db.compositeAssessment.count()).toBe(before.composites)
   expect((await read(first.organizationId,first.participantUserId)).status).toBe(403)

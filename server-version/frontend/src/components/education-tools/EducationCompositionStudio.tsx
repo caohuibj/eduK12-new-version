@@ -5,7 +5,7 @@ import {CompositionOutline} from '../../modules/assessment-core/composition/Comp
 import {SchoolPrivateToolCollection,type SchoolPrivateToolControls} from '../../school/SchoolPrivateToolCollection'
 import {PrivateToolPreview,type PrivateToolPreviewValue} from './PrivateToolPreview'
 import {EducationPublicFormChooser} from './EducationPublicFormChooser'
-import {educationPublicFormPreviewMedia,publicFormPreviewPath,publicStandardPreviewPath} from './educationPublicFormClient'
+import {educationPublicFormPreviewMedia,publicFormPreviewPath,publicStandardPreviewPath,libraryScalePreviewPath} from './educationPublicFormClient'
 import {createEducationPrivateImageAdapter} from './educationPrivateImageAdapter'
 import {EducationMaterialPreview} from './EducationMaterialPicker'
 import {privateToolBase,privateToolError,type PrivateToolApi,type PrivateToolVersion,type PrivateTool,type PrivateDraftState} from './privateToolClient'
@@ -37,7 +37,7 @@ function CompositionSession({api,organizationId,actorId,entry,onDraftStateChange
  const [versionsCursor,setVersionsCursor]=useState<string|null>(null),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('')
  const [uncertain,setUncertain]=useState(false),[preview,setPreview]=useState(false),[previewIndex,setPreviewIndex]=useState(0)
  const [previewTool,setPreviewTool]=useState<PrivateToolPreviewValue|null>(null),[previewError,setPreviewError]=useState(''),[previewInstruction,setPreviewInstruction]=useState('')
- const [sourceView,setSourceView]=useState<'PRIVATE'|'PUBLIC_FORM'|'STANDARD_SCALE'>('PRIVATE')
+ const [sourceView,setSourceView]=useState<'PRIVATE'|'PUBLIC_FORM'|'STANDARD_SCALE'|'LIBRARY_SCALE'>('PRIVATE')
  const [answers,setAnswers]=useState<Record<string,ProfessionalAnswer>>({})
  const mounted=useRef(true),epoch=useRef(0),locked=useRef(false)
  const dirty=tool?fingerprint(tool)!==saved:Boolean(title.trim()),dirtyRef=useRef(dirty);dirtyRef.current=dirty
@@ -98,7 +98,7 @@ function CompositionSession({api,organizationId,actorId,entry,onDraftStateChange
  useEffect(()=>{
   let current=true;setPreviewTool(null);setPreviewError('');setPreviewInstruction('');setAnswers({})
   if(block&&reference)void api<{id:string;kind:'SCALE'|'FORM';title:string;contentHash:string;definition:PrivateTool['definition'];instruction?:string}>(
-   reference.sourceProvider==='PRIVATE_VERSION'?`${base}/${reference.toolId}/versions/${block.source.versionId}`:reference.sourceProvider==='PUBLIC_FORM'?publicFormPreviewPath(organizationId,reference.id,reference.contentHash):publicStandardPreviewPath(organizationId,reference.id,reference.contentHash))
+   reference.sourceProvider==='PRIVATE_VERSION'?`${base}/${reference.toolId}/versions/${block.source.versionId}`:reference.sourceProvider==='PUBLIC_FORM'?publicFormPreviewPath(organizationId,reference.id,reference.contentHash):reference.sourceProvider==='LIBRARY_SCALE'?libraryScalePreviewPath(organizationId,reference.id,reference.contentHash):publicStandardPreviewPath(organizationId,reference.id,reference.contentHash))
    .then(value=>{if(current){
     if(value.id!==block.source.versionId||value.contentHash!==block.source.contentHash||value.kind!==block.source.kind)throw new Error('固定工具身份已不匹配。')
     setPreviewTool({id:reference.sourceProvider==='PRIVATE_VERSION'?reference.toolId:reference.id,title:value.title,kind:value.kind,definition:value.definition});setPreviewInstruction(value.instruction??'')
@@ -140,17 +140,17 @@ function CompositionSession({api,organizationId,actorId,entry,onDraftStateChange
      }}/>{labels[key]}</label>
     })}
    </fieldset>
-   <div className="survey-composition-studio"><div><nav aria-label="问卷工具来源"><button type="button" aria-pressed={sourceView==='PRIVATE'} onClick={()=>setSourceView('PRIVATE')}>本人固定工具</button><button type="button" aria-pressed={sourceView==='PUBLIC_FORM'} onClick={()=>setSourceView('PUBLIC_FORM')}>获授权公共表单</button><button type="button" aria-pressed={sourceView==='STANDARD_SCALE'} onClick={()=>setSourceView('STANDARD_SCALE')}>获授权公共量表</button></nav>
+   <div className="survey-composition-studio"><div><nav aria-label="问卷工具来源"><button type="button" aria-pressed={sourceView==='PRIVATE'} onClick={()=>setSourceView('PRIVATE')}>本人固定工具</button><button type="button" aria-pressed={sourceView==='PUBLIC_FORM'} onClick={()=>setSourceView('PUBLIC_FORM')}>获授权公共表单</button><button type="button" aria-pressed={sourceView==='STANDARD_SCALE'} onClick={()=>setSourceView('STANDARD_SCALE')}>获授权公共量表</button><button type="button" aria-pressed={sourceView==='LIBRARY_SCALE'} onClick={()=>setSourceView('LIBRARY_SCALE')}>获授权共用量表</button></nav>
     {sourceView==='PRIVATE'?<EducationPrivateVersionChooser key={tool.id} api={api} organizationId={organizationId} disabled={busy||tool.definition.blocks.length>=50}
      onSelect={value=>{if(value.kind==='COMPOSITION')return;const leaf={...value,kind:value.kind,sourceProvider:'PRIVATE_VERSION' as const};setReferences(old=>mergeReferences(old,[leaf]));change({definition:{...tool.definition,blocks:[...tool.definition.blocks,
       {blockId:crypto.randomUUID(),instruction:'',source:{provider:'PRIVATE_VERSION',kind:value.kind,versionId:value.id,contentHash:value.contentHash}}]}})}}/>:
-     <EducationPublicFormChooser key={sourceView} kind={sourceView==='STANDARD_SCALE'?'SCALE':'FORM'} api={api} entry={entry} organizationId={organizationId} actorId={actorId} disabled={busy||tool.definition.blocks.length>=50} onChoose={value=>{
-      const provider=value.kind==='SCALE'?'STANDARD_SCALE' as const:'PUBLIC_FORM' as const
+     <EducationPublicFormChooser key={sourceView} kind={sourceView==='PUBLIC_FORM'?'FORM':'SCALE'} catalog={sourceView==='LIBRARY_SCALE'?'LIBRARY':'PUBLIC'} api={api} entry={entry} organizationId={organizationId} actorId={actorId} disabled={busy||tool.definition.blocks.length>=50} onChoose={value=>{
+      const provider=value.sourceProvider==='LIBRARY_SCALE'?'LIBRARY_SCALE' as const:value.kind==='SCALE'?'STANDARD_SCALE' as const:'PUBLIC_FORM' as const
       setReferences(old=>mergeReferences(old,[{id:value.sourceId,sourceProvider:provider,kind:value.kind,title:value.title,contentHash:value.contentHash,version:value.versions.content,versions:value.versions,requiredContextKeys:value.requiredContextKeys}]))
-      change({definition:{...tool.definition,blocks:[...tool.definition.blocks,{blockId:crypto.randomUUID(),instruction:'',source:value.kind==='SCALE'?{provider:'STANDARD_SCALE',kind:'SCALE',versionId:value.sourceId,contentHash:value.contentHash}:{provider:'PUBLIC_FORM',kind:'FORM',versionId:value.sourceId,contentHash:value.contentHash}}]}})
+      change({definition:{...tool.definition,blocks:[...tool.definition.blocks,{blockId:crypto.randomUUID(),instruction:'',source:value.sourceProvider==='LIBRARY_SCALE'?{provider:'LIBRARY_SCALE',kind:'SCALE',versionId:value.sourceId,contentHash:value.contentHash}:value.kind==='SCALE'?{provider:'STANDARD_SCALE',kind:'SCALE',versionId:value.sourceId,contentHash:value.contentHash}:{provider:'PUBLIC_FORM',kind:'FORM',versionId:value.sourceId,contentHash:value.contentHash}}]}})
      }}/>}</div>
     <CompositionOutline items={tool.definition.blocks.map(row=>({id:row.blockId,title:compositionTitle(row,references),
-     detail:(row.source.provider==='STANDARD_SCALE'?'公共量表':row.source.provider==='PUBLIC_FORM'?'公共表单':row.source.kind==='SCALE'?'量表':'表单')+' · 固定版本 '+referenceVersion(references.find(ref=>ref.sourceProvider===row.source.provider&&ref.id===row.source.versionId&&ref.contentHash===row.source.contentHash))}))} max={50} disabled={busy}
+     detail:(row.source.provider==='LIBRARY_SCALE'?'共用量表':row.source.provider==='STANDARD_SCALE'?'公共量表':row.source.provider==='PUBLIC_FORM'?'公共表单':row.source.kind==='SCALE'?'量表':'表单')+' · 固定版本 '+referenceVersion(references.find(ref=>ref.sourceProvider===row.source.provider&&ref.id===row.source.versionId&&ref.contentHash===row.source.contentHash))}))} max={50} disabled={busy}
      onMove={(index,offset)=>{const blocks=[...tool.definition.blocks];[blocks[index],blocks[index+offset]]=[blocks[index+offset],blocks[index]];change({definition:{...tool.definition,blocks}})}}
      onRemove={index=>change({definition:{...tool.definition,blocks:tool.definition.blocks.filter((_,i)=>i!==index)}})}
      renderItemEditor={(_,index)=><label className="education-composition-block-instruction">工具衔接说明 {index+1}<textarea value={tool.definition.blocks[index].instruction} maxLength={16000} disabled={busy}
