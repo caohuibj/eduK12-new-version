@@ -1,0 +1,380 @@
+{
+  "base": "6203a829dc8d7de707e67f413acfa5a354a21e09",
+  "scope": "Read only remote scale/library branch metadata and instrument path identities; cognitive and SJT branches excluded. No branch was checked out or edited.",
+  "branches": [
+    {
+      "ref": "refs/heads/ci/scale-authoring-browser-diagnostic-20261021",
+      "sha": "8c56b5f7da3fdc16eca054fdf5f4c1612c421aea",
+      "ancestorOfIntegratedMain": true,
+      "sourceVersions": 57,
+      "notInMainPaths": []
+    },
+    {
+      "ref": "refs/heads/ci/scale-authoring-evidence-20261021",
+      "sha": "94923318dc89d6e7a9d5f2991111b9882690fe53",
+      "ancestorOfIntegratedMain": true,
+      "sourceVersions": 57,
+      "notInMainPaths": []
+    },
+    {
+      "ref": "refs/heads/ci/scale-authoring-feedback-20261021",
+      "sha": "312cfdc95e53b243b2de0bea9beb5ca3a3132a81",
+      "ancestorOfIntegratedMain": true,
+      "sourceVersions": 57,
+      "notInMainPaths": []
+    },
+    {
+      "ref": "refs/heads/ci/scale-content-fast-path",
+      "sha": "6737aae5cfdca3094d673ecff33bc1e37906c4c2",
+      "ancestorOfIntegratedMain": false,
+      "sourceVersions": 10,
+      "notInMainPaths": []
+    },
+    {
+      "ref": "refs/heads/content/dot-local-scales-20261025",
+      "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "ancestorOfIntegratedMain": false,
+      "sourceVersions": 142,
+      "notInMainPaths": [
+        "server-version/backend/src/modules/scale/instruments/aaq_us12_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/act_sq6_zh_cn/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/apq42_parent_global_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/ars30_2016_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/bads_sf9_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/bat23_2020_en/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/bps9_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/bpses5_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/brcs4_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/cbi_zh_cn/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/ccfq18_zh_cn/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/cesd10_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/cfq7_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/cfsr12_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/cfsr12_zh_cn_research/1.0.1/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/chime_s24_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/chime_s24_zh_cn_research/1.0.1/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/csacs9_zh_cn/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/curiosity_5dcr24_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_cn_research/1.0.1/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_cn_research/1.0.2/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/ders16_bjureberg_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/ders_sf18_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/djgls6_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/ebq16_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/ebq16_zh_cn_research/1.0.1/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/erq10_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/erss19_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/ffmq15_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/ffmq15_zh_cn_research/1.0.1/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/fidl21_horne_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/fidl21_horne_zh_cn_research/1.0.1/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/flourishing_fs8_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/gad7_zh_cn_research/1.1.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/gse3_asku_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/hse_msit_zh_cn/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/ie4_zh_cn_research/1.1.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/ierq20_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/ipip50_zh_cn_research/1.1.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/ipip_attending_emotions10_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/ipip_emotion_based_decision9_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/ipip_empathic_concern10_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/ipip_negative_expressivity10_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/ipip_neo_c1_self_efficacy10_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/ipip_neo_c5_self_discipline10_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/ipip_nfc10_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/ipip_opt10_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/ipip_positive_expressivity9_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/ipip_responsive_distress10_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/ipip_responsive_joy10_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/ips9_2021_zh_cn/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/jss8_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/k6_zh_cn_research/1.1.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/kseg6_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/kusiv3_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/l1_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/maia2_37_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/mpmi_s22_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/mslq_critical_thinking5_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/mspss12_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/mwq5_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/ofs10_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/orvis92_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/parental_stress_pss18_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/pba23_2018_zh_cn/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/phq4_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/prfq18_parent_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/psyflex6_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/res9_zh_cn/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/rses10_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/sas_sv10_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/sci8_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/scs_sf12_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/socs_s20_2023_zh_cn/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/sop2_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/srlo44_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/srq63_brown_miller_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/sswq16_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/swls5_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/tes12_general_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/tswq_zh_cn/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/wibps7_adolescent_zh_cn_research/1.0.0/instrument.ts"
+      ]
+    },
+    {
+      "ref": "refs/heads/content/scale-expansion",
+      "sha": "f3e12b551b6e8afa748b2f59f52d6439039d9924",
+      "ancestorOfIntegratedMain": true,
+      "sourceVersions": 10,
+      "notInMainPaths": []
+    },
+    {
+      "ref": "refs/heads/content/teacher-scale-batch-1",
+      "sha": "57909890479147f9840ad38a12ac026d762ac023",
+      "ancestorOfIntegratedMain": false,
+      "sourceVersions": 13,
+      "notInMainPaths": []
+    },
+    {
+      "ref": "refs/heads/content/teacher-scales-pilot-batch-1-v2",
+      "sha": "0a520e7e614043a2851ddc0e5369d1c2a9f54085",
+      "ancestorOfIntegratedMain": true,
+      "sourceVersions": 15,
+      "notInMainPaths": []
+    },
+    {
+      "ref": "refs/heads/feat/fe-03c-scale-reference-journey",
+      "sha": "3a800796a29bb14065cdf5478d5b88930646925b",
+      "ancestorOfIntegratedMain": true,
+      "sourceVersions": 0,
+      "notInMainPaths": []
+    },
+    {
+      "ref": "refs/heads/feat/media-2-scale-form-image-adapter",
+      "sha": "f8a2bae9578ae9d09a31963d75b3cd465443f1fb",
+      "ancestorOfIntegratedMain": true,
+      "sourceVersions": 0,
+      "notInMainPaths": []
+    },
+    {
+      "ref": "refs/heads/feat/media-6-scale-form-video-adapter",
+      "sha": "60c0339b97a37ce5f24bb3e5867ad0689c92ed18",
+      "ancestorOfIntegratedMain": true,
+      "sourceVersions": 0,
+      "notInMainPaths": []
+    },
+    {
+      "ref": "refs/heads/feat/scale-assessment-v2-foundation",
+      "sha": "305f8c3b946da840fdbce2600e0d0a3aaf18a879",
+      "ancestorOfIntegratedMain": true,
+      "sourceVersions": 0,
+      "notInMainPaths": []
+    },
+    {
+      "ref": "refs/heads/feat/scale-library-catalog-v1",
+      "sha": "af5e1cd934ae0054ea02526a7ffd0bfcf6845ed8",
+      "ancestorOfIntegratedMain": true,
+      "sourceVersions": 0,
+      "notInMainPaths": []
+    },
+    {
+      "ref": "refs/heads/feat/scale-library-pilot-governance-v1",
+      "sha": "e9fa178fe995e7f8735ce9b59e29b4a25b0fa9f3",
+      "ancestorOfIntegratedMain": true,
+      "sourceVersions": 0,
+      "notInMainPaths": []
+    },
+    {
+      "ref": "refs/heads/feat/scale-library-wave0-mvp",
+      "sha": "894c2040a479d140171160b0b004852faf9a73eb",
+      "ancestorOfIntegratedMain": true,
+      "sourceVersions": 0,
+      "notInMainPaths": []
+    },
+    {
+      "ref": "refs/heads/feat/scale-onboarding-closeout",
+      "sha": "59296d57a45e4fdfb462476498a130ab8d5c3544",
+      "ancestorOfIntegratedMain": true,
+      "sourceVersions": 10,
+      "notInMainPaths": []
+    },
+    {
+      "ref": "refs/heads/feat/scale-onboarding-pr2",
+      "sha": "3f74fb530d8db33bbd0990f18f98d210b7a20f12",
+      "ancestorOfIntegratedMain": true,
+      "sourceVersions": 0,
+      "notInMainPaths": []
+    },
+    {
+      "ref": "refs/heads/feat/scale-onboarding-pr3",
+      "sha": "1488d284aede8e42a001e57c1e3483c591d4df15",
+      "ancestorOfIntegratedMain": true,
+      "sourceVersions": 0,
+      "notInMainPaths": []
+    },
+    {
+      "ref": "refs/heads/feat/scale-onboarding-pr3-check",
+      "sha": "48306d72c0614a62b4dfe735194c1894e97ac0a2",
+      "ancestorOfIntegratedMain": true,
+      "sourceVersions": 0,
+      "notInMainPaths": []
+    },
+    {
+      "ref": "refs/heads/feat/scale-onboarding-pr4",
+      "sha": "4c5c6a1cba167f008750443487a4ed03ef181399",
+      "ancestorOfIntegratedMain": true,
+      "sourceVersions": 10,
+      "notInMainPaths": []
+    },
+    {
+      "ref": "refs/heads/feat/scale-response-device-provenance-v1",
+      "sha": "04e151075575bfaedbc5f57d044df80c0549ca5e",
+      "ancestorOfIntegratedMain": true,
+      "sourceVersions": 0,
+      "notInMainPaths": []
+    },
+    {
+      "ref": "refs/heads/feat/scale-wave1-content",
+      "sha": "80bb63c69927d2d52ef74a476ee23e433f834df4",
+      "ancestorOfIntegratedMain": true,
+      "sourceVersions": 57,
+      "notInMainPaths": []
+    },
+    {
+      "ref": "refs/heads/feat/scale-wave1-governance",
+      "sha": "bd41a3f962f911261a9ffefb738559d279da3ebd",
+      "ancestorOfIntegratedMain": true,
+      "sourceVersions": 21,
+      "notInMainPaths": []
+    },
+    {
+      "ref": "refs/heads/feat/scale-wave1-reports",
+      "sha": "8ab7309a1fc75a24c4d12daf37e4efba1a81d9ad",
+      "ancestorOfIntegratedMain": false,
+      "sourceVersions": 21,
+      "notInMainPaths": []
+    },
+    {
+      "ref": "refs/heads/feat/survey-timed-scale-20261012",
+      "sha": "0c685fe360f9580af32ce17cbee1b265de09f494",
+      "ancestorOfIntegratedMain": true,
+      "sourceVersions": 57,
+      "notInMainPaths": []
+    },
+    {
+      "ref": "refs/heads/fix/scale-auto-advance",
+      "sha": "76fa50ff801221411bda63c5021660d28d4303e3",
+      "ancestorOfIntegratedMain": false,
+      "sourceVersions": 0,
+      "notInMainPaths": []
+    },
+    {
+      "ref": "refs/heads/fix/scale-onboarding-extensible-regression",
+      "sha": "7d8bd1b4bff7574483b3eac583163d7500b37c1e",
+      "ancestorOfIntegratedMain": true,
+      "sourceVersions": 10,
+      "notInMainPaths": []
+    },
+    {
+      "ref": "refs/heads/fix/scale-onboarding-wave0-test-scope",
+      "sha": "5ba98b693407c7ce349bcd5ee9a8c32e6eaaf619",
+      "ancestorOfIntegratedMain": false,
+      "sourceVersions": 10,
+      "notInMainPaths": []
+    },
+    {
+      "ref": "refs/heads/frontend/product-convergence-scale-slice",
+      "sha": "774b34bdb8a93a73911d1f1fb8f844373d50446a",
+      "ancestorOfIntegratedMain": false,
+      "sourceVersions": 0,
+      "notInMainPaths": []
+    },
+    {
+      "ref": "refs/heads/integration/scale-onboarding-main",
+      "sha": "5ec9a8be2842957248e65dac6f0dc18126888485",
+      "ancestorOfIntegratedMain": true,
+      "sourceVersions": 10,
+      "notInMainPaths": []
+    },
+    {
+      "ref": "refs/heads/public-library/scales-20261022",
+      "sha": "fa355ff2dcd859b57a4bf2e8bddd77f8d428e3cf",
+      "ancestorOfIntegratedMain": false,
+      "sourceVersions": 62,
+      "notInMainPaths": [
+        "server-version/backend/src/modules/scale/instruments/gad7_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/ie4_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/ipip50_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/k6_zh_cn_research/1.0.0/instrument.ts",
+        "server-version/backend/src/modules/scale/instruments/phq9_zh_cn_research/1.0.0/instrument.ts"
+      ]
+    },
+    {
+      "ref": "refs/heads/refactor/scale-onboarding-pr1",
+      "sha": "06011969da7ca704c39397e14cb1a53724a25be9",
+      "ancestorOfIntegratedMain": true,
+      "sourceVersions": 0,
+      "notInMainPaths": []
+    },
+    {
+      "ref": "refs/heads/release/dbt-wccl59-v1-0-2-20261027",
+      "sha": "2612a9f5bf22c1370ec786f3d6feb50805003065",
+      "ancestorOfIntegratedMain": false,
+      "sourceVersions": 58,
+      "notInMainPaths": [
+        "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_cn_research/1.0.2/instrument.ts"
+      ]
+    },
+    {
+      "ref": "refs/heads/scale/zh-cn-sdq-texi-draft",
+      "sha": "11681a6977a1b1845089799be6afce7bc30fdb3f",
+      "ancestorOfIntegratedMain": false,
+      "sourceVersions": 0,
+      "notInMainPaths": []
+    },
+    {
+      "ref": "refs/heads/validation/scale-onboarding-pr2",
+      "sha": "9cd87e7f76833aafa50f2f0840975335d00b7a09",
+      "ancestorOfIntegratedMain": false,
+      "sourceVersions": 0,
+      "notInMainPaths": []
+    },
+    {
+      "ref": "refs/heads/validation/scale-onboarding-pr3",
+      "sha": "1488d284aede8e42a001e57c1e3483c591d4df15",
+      "ancestorOfIntegratedMain": true,
+      "sourceVersions": 0,
+      "notInMainPaths": []
+    },
+    {
+      "ref": "refs/heads/validation/scale-onboarding-pr4",
+      "sha": "4c5c6a1cba167f008750443487a4ed03ef181399",
+      "ancestorOfIntegratedMain": true,
+      "sourceVersions": 10,
+      "notInMainPaths": []
+    },
+    {
+      "ref": "refs/heads/work/library-management-next-20261025",
+      "sha": "fa0e6b40b75e0dd1651862ec5632419b3d8e56c0",
+      "ancestorOfIntegratedMain": true,
+      "sourceVersions": 57,
+      "notInMainPaths": []
+    },
+    {
+      "ref": "refs/heads/work/scale-authoring-feedback-20261021",
+      "sha": "60094809e02cd4383613d34b99aabd717cb9d177",
+      "ancestorOfIntegratedMain": true,
+      "sourceVersions": 57,
+      "notInMainPaths": []
+    },
+    {
+      "ref": "refs/heads/work/scale-library-governance-20261021",
+      "sha": "0d24f1e65d484f0b221b30424891680e9380f0e4",
+      "ancestorOfIntegratedMain": true,
+      "sourceVersions": 57,
+      "notInMainPaths": []
+    }
+  ]
+}

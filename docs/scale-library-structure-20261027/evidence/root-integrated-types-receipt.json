@@ -1,0 +1,18 @@
+{
+  "sourceHead": "8188745ca7134b38784717af384d72a730e47945",
+  "backendTree": "43e1ea8f2cf710ebfbeced06c0e49c2d4052afec",
+  "node": "v24.22.1",
+  "ciExecuted": false,
+  "originalSigned": false,
+  "scope": "Affected caller/query/cache paths after historical fixtures, not whole-library or PostgreSQL qualification",
+  "lockSHA256": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+  "argv": [
+    "node",
+    "node_modules/typescript/bin/tsc",
+    "--noEmit"
+  ],
+  "startedAt": "2026-10-28T00:23:59.037139+00:00",
+  "exitCode": 0,
+  "endedAt": "2026-10-28T00:24:33.141143+00:00",
+  "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

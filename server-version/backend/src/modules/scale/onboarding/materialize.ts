@@ -1,8 +1,9 @@
+import { resolveScaleAdmissionInstruction } from './instruction-admission'
 import { allowsScaleAxisRevision, freezeScaleAxisSnapshot } from './axis-snapshots'
 import { Prisma, type PrismaClient } from '@prisma/client'
 import { canonicalHash } from '../../assessment-runtime/canonical'
 import { hashScaleDefinition } from '../scale-definition'
-import { getScaleInstrumentSource } from './instrument-registry'
+import { getScaleInstrumentSource, getScaleInstrumentValidation } from './instrument-registry'
 
 type Db = PrismaClient | Prisma.TransactionClient
 
@@ -22,10 +23,13 @@ export const materializeScaleInstrumentContent = async (db: Db, input: {
 }) => {
   const source = getScaleInstrumentSource(input.instrumentKey, input.instrumentVersion)
   if (!source?.executable) throw new Error('Scale instrument source is not executable')
+  const errors = getScaleInstrumentValidation(input.instrumentKey, input.instrumentVersion)!.issues.filter(issue => issue.severity === 'error')
+  if (errors.length) throw new Error(`Scale materialization blocked: ${errors.map(issue => `${issue.path}:${issue.message}`).join('; ')}`)
   const executable = source.executable
   const definitionHash = hashScaleDefinition(executable.definition)
   const definitionCounts = counts(executable.definition)
   let scale = await db.scale.findUnique({ where: { code: input.instrumentKey } })
+  const instruction = resolveScaleAdmissionInstruction(source, scale)
   let created = false
   if (!scale) {
     scale = await db.scale.create({
@@ -44,7 +48,7 @@ export const materializeScaleInstrumentContent = async (db: Db, input: {
         estimatedTime: source.catalog.administration.estimatedMinutes,
         // STANDARD rows are platform-owned content: the source instruction is
         // the authoritative wording and is materialized with the definition.
-        instruction: source.instruction?.text ?? null,
+        instruction: instruction.binding?.text ?? null,
         creatorId: input.actorUserId,
         tags: [source.catalog.construct.primaryDomain],
       },
@@ -66,12 +70,12 @@ export const materializeScaleInstrumentContent = async (db: Db, input: {
           itemCount: definitionCounts.itemCount,
           dimensionCount: definitionCounts.dimensionCount,
           estimatedTime: source.catalog.administration.estimatedMinutes,
-          instruction: source.instruction?.text ?? null,
+          ...(source.instruction ? { instruction: source.instruction.text } : {}),
         },
       })
-    } else if ((scale.instruction??null)!==(source.instruction?.text??null)) {
+    } else if (source.instruction && (scale.instruction ?? null) !== source.instruction.text) {
       // Independent presentation revision: retain scoring definition and lifecycle.
-      scale=await db.scale.update({where:{id:scale.id},data:{instruction:source.instruction?.text??null}})
+      scale=await db.scale.update({where:{id:scale.id},data:{instruction:source.instruction.text}})
     }
   }
 
@@ -106,5 +110,5 @@ export const materializeScaleInstrumentContent = async (db: Db, input: {
     }
     referenceUnchanged.push(reference.referenceVersion)
   }
-  return { scale, created, definitionHash, referenceCreates, referenceUnchanged }
+  return { scale, created, definitionHash, referenceCreates, referenceUnchanged, instruction }
 }

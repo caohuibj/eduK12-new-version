@@ -1,0 +1,27 @@
+{
+  "sourceHead": "8188745ca7134b38784717af384d72a730e47945",
+  "backendTree": "43e1ea8f2cf710ebfbeced06c0e49c2d4052afec",
+  "node": "v24.22.1",
+  "ciExecuted": false,
+  "originalSigned": false,
+  "scope": "Affected caller/query/cache paths after historical fixtures, not whole-library or PostgreSQL qualification",
+  "lockSHA256": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+  "argv": [
+    "node",
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "src/__tests__/scale/admission-cache-and-instruction.test.ts",
+    "src/__tests__/scale/structural-admission.test.ts",
+    "src/__tests__/scale/structural-publication.test.ts",
+    "-t",
+    "executes each golden once|rechecks administrator changes|rechecks deployment identity|keeps a malformed report candidate|quarantines schema-invalid|retains unqualified research|continues to require real administrator",
+    "--maxWorkers=1",
+    "--reporter=default",
+    "--reporter=json",
+    "--outputFile.json=/workspace/scratch/5a77e8bdc1ae/scale-365-review/docs/scale-library-structure-20261027/evidence/root-affected.json"
+  ],
+  "startedAt": "2026-10-28T00:23:56.023323+00:00",
+  "exitCode": 0,
+  "endedAt": "2026-10-28T00:23:59.036743+00:00",
+  "logSHA256": "9118cef55a77f408028ec4c414e96307eab23af6e9d8f8766ee8e39767ab6c34"
+}

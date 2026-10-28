@@ -1,3 +1,4 @@
+import { parseScaleInstrumentSources } from './schema'
 import { getScaleCustomScorerKeys, registerScaleCustomScorer } from '../scale-scoring'
 import { GENERATED_EXECUTABLE_SCALE_PACKAGES, GENERATED_SCALE_SCORER_PLUGINS, GENERATED_SCALE_INSTRUMENT_SOURCES } from './instruments.generated'
 import type { ScalePackageV2, VersionedScorerRegistration } from './types'
@@ -33,10 +34,13 @@ const bootstrapScorerPlugins = (plugins: readonly VersionedScorerRegistration[])
   })
 }
 
-bootstrapScorerPlugins([...GENERATED_SCALE_SCORER_PLUGINS, ...GENERATED_SCALE_INSTRUMENT_SOURCES.flatMap(source => source.executable?.scorerPlugins ?? [])])
+const validIdentities = new Set(parseScaleInstrumentSources(GENERATED_SCALE_INSTRUMENT_SOURCES).sources.map(source => identityKey(source.identity.instrumentKey, source.identity.instrumentVersion)))
+// Select the original descriptors: schema defaults must not rewrite frozen package bytes.
+const schemaValidSources = GENERATED_SCALE_INSTRUMENT_SOURCES.filter(source => validIdentities.has(identityKey(source.identity.instrumentKey, source.identity.instrumentVersion)))
+bootstrapScorerPlugins([...GENERATED_SCALE_SCORER_PLUGINS, ...schemaValidSources.flatMap(source => source.executable?.scorerPlugins ?? [])])
 const executableByIdentity = buildExecutableRegistry([
   ...GENERATED_EXECUTABLE_SCALE_PACKAGES.map(pkg => ({ ...pkg, releaseStatus: 'PUBLISHED' as const })),
-  ...GENERATED_SCALE_INSTRUMENT_SOURCES.flatMap(source => source.executable ? [{
+  ...schemaValidSources.flatMap(source => source.executable ? [{
     key: source.identity.instrumentKey, instrumentVersion: source.identity.instrumentVersion,
     releaseStatus: source.executable.releaseStatus, definition: source.executable.definition,
     references: source.executable.references, goldenCases: source.executable.goldenCases,

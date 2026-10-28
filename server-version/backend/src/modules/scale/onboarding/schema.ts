@@ -111,3 +111,36 @@ export const scaleInstrumentSourceV1Schema = z.object({
 export const parseScaleInstrumentSourceSchema = (value: unknown): ScaleInstrumentSourceV1 => (
   scaleInstrumentSourceV1Schema.parse(value) as unknown as ScaleInstrumentSourceV1
 )
+
+export interface ScaleSourceSchemaDiagnostic {
+  instrumentKey: string | null
+  instrumentVersion: string | null
+  releaseStatus: string | null
+  issues: Array<{ path: string; message: string }>
+}
+
+/** Keep malformed candidates out of executable/catalog projections, with
+ * explicit diagnostics. Exact identity collisions remain fatal, even when one
+ * colliding envelope is malformed; no source can shadow another identity. */
+export const parseScaleInstrumentSources = (inputs: readonly ScaleInstrumentSourceV1[]) => {
+  const identities = new Set<string>()
+  const sources: ScaleInstrumentSourceV1[] = []
+  const diagnostics: ScaleSourceSchemaDiagnostic[] = []
+  for (const input of inputs) {
+    const identity = input?.identity
+    if (identity && typeof identity.instrumentKey === 'string' && typeof identity.instrumentVersion === 'string') {
+      const key = `${identity.instrumentKey}:${identity.instrumentVersion}`
+      if (identities.has(key)) throw new Error(`Duplicate ScaleInstrumentSource identity: ${key}`)
+      identities.add(key)
+    }
+    const result = scaleInstrumentSourceV1Schema.safeParse(input)
+    if (result.success) sources.push(result.data as unknown as ScaleInstrumentSourceV1)
+    else diagnostics.push({
+      instrumentKey: identity?.instrumentKey ?? null,
+      instrumentVersion: identity?.instrumentVersion ?? null,
+      releaseStatus: input?.executable?.releaseStatus ?? null,
+      issues: result.error.issues.map(issue => ({ path: issue.path.join('.'), message: issue.message })),
+    })
+  }
+  return { sources, diagnostics }
+}

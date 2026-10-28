@@ -1,0 +1,466 @@
+{
+  "ciExecuted": false,
+  "signedExecution": false,
+  "manifestContemporaneous": false,
+  "note": "Original raw reporters are retained. This index was generated after execution. Original failures and filtered cases do not become passing. The early failed shell invocation created no reporter; a later retry accidentally reran unchanged failing input after a path edit failed; both real reporters are retained. Backend types overlapping the main merge are not final integrated qualification.",
+  "invocations": [
+    {
+      "report": "executable-bytes-final.json",
+      "sha256": "8b0911f60d13a773da9082e0e2583aa9b304f4419d7144233e9f943bc5192e80",
+      "passed": 1,
+      "failed": 0,
+      "filteredOrPending": 5,
+      "invocationSuccess": true,
+      "cases": [
+        {
+          "fullName": "ScaleInstrumentSourceV1 registry preserves the six-package legacy API order and definition hashes",
+          "status": "passed"
+        },
+        {
+          "fullName": "ScaleInstrumentSourceV1 registry enumerates sources exactly once while allowing new content identities",
+          "status": "skipped"
+        },
+        {
+          "fullName": "ScaleInstrumentSourceV1 registry allows a catalog-only source but rejects a new executable without explicit policy",
+          "status": "skipped"
+        },
+        {
+          "fullName": "ScaleInstrumentSourceV1 registry rejects unknown source fields and duplicate exact identities",
+          "status": "skipped"
+        },
+        {
+          "fullName": "ScaleInstrumentSourceV1 registry rejects duplicate executable identities before Map overwrite",
+          "status": "skipped"
+        },
+        {
+          "fullName": "ScaleInstrumentSourceV1 registry rejects duplicate scorer descriptors and active-key version collisions",
+          "status": "skipped"
+        }
+      ]
+    },
+    {
+      "report": "manual-review-tests.json",
+      "sha256": "823eefa73ef190048448d6089c8af86f0c19195119cd4c4c4299cc8d256f9158",
+      "passed": 5,
+      "failed": 0,
+      "filteredOrPending": 1,
+      "invocationSuccess": true,
+      "cases": [
+        {
+          "fullName": "pending-audit content: review states, evidence records and next actions previews pending manual reviews without manufacturing an approval or blocking technical activation",
+          "status": "passed"
+        },
+        {
+          "fullName": "pending-audit content: review states, evidence records and next actions separates RETURNED from PENDING with revision guidance",
+          "status": "passed"
+        },
+        {
+          "fullName": "pending-audit content: review states, evidence records and next actions rejects reusing an old review record after a version change",
+          "status": "passed"
+        },
+        {
+          "fullName": "pending-audit content: review states, evidence records and next actions keeps the three legacy states deployable/regressable: approved formal translation, original source, pending draft",
+          "status": "passed"
+        },
+        {
+          "fullName": "pending-audit content: review states, evidence records and next actions an evidence-carrying approval passes parse when versions match",
+          "status": "passed"
+        },
+        {
+          "fullName": "standard onboarding status view reports distinct lifecycle states with next actions and never merges import with publication",
+          "status": "skipped"
+        }
+      ]
+    },
+    {
+      "report": "publication-tests.json",
+      "sha256": "8f767edcc864337c6bda60c16d016363c4d982d40d043dcbc0bdd631d89d8427",
+      "passed": 2,
+      "failed": 0,
+      "filteredOrPending": 0,
+      "invocationSuccess": true,
+      "cases": [
+        {
+          "fullName": "explicit STANDARD publication with manual scientific and rights diagnostics retains unqualified research and unknown/restricted rights in the preview proof without granting scientific approval",
+          "status": "passed"
+        },
+        {
+          "fullName": "explicit STANDARD publication with manual scientific and rights diagnostics continues to require real administrator authority and a current publication proof",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "report": "registry-final.json",
+      "sha256": "ac092c1329e2bb67724f1d54468048c12c85ce95a49d8e0bfeedbf4e344e5b36",
+      "passed": 10,
+      "failed": 1,
+      "filteredOrPending": 0,
+      "invocationSuccess": false,
+      "cases": [
+        {
+          "fullName": "ScaleInstrumentSourceV1 registry preserves the six-package legacy API order and definition hashes",
+          "status": "passed"
+        },
+        {
+          "fullName": "ScaleInstrumentSourceV1 registry enumerates sources exactly once while allowing new content identities",
+          "status": "passed"
+        },
+        {
+          "fullName": "ScaleInstrumentSourceV1 registry allows a catalog-only source but rejects a new executable without explicit policy",
+          "status": "passed"
+        },
+        {
+          "fullName": "ScaleInstrumentSourceV1 registry rejects unknown source fields and duplicate exact identities",
+          "status": "passed"
+        },
+        {
+          "fullName": "ScaleInstrumentSourceV1 registry rejects duplicate executable identities before Map overwrite",
+          "status": "passed"
+        },
+        {
+          "fullName": "ScaleInstrumentSourceV1 registry rejects duplicate scorer descriptors and active-key version collisions",
+          "status": "passed"
+        },
+        {
+          "fullName": "three-part structural admission consumes a short report with no editorial review or forced guidance categories",
+          "status": "passed"
+        },
+        {
+          "fullName": "three-part structural admission retains report language, respondent, metric coverage and duplicate-band structural failures",
+          "status": "passed"
+        },
+        {
+          "fullName": "three-part structural admission keeps a malformed report candidate discoverable while refusing its selected executable and runtime policy",
+          "status": "passed"
+        },
+        {
+          "fullName": "three-part structural admission quarantines schema-invalid candidates with original diagnostics and still rejects identity collisions",
+          "status": "failed"
+        },
+        {
+          "fullName": "three-part structural admission keeps scientific and translation statuses truthful as manual diagnostics with exact locale/version matching",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "report": "registry-fixture-retry.json",
+      "sha256": "069d923efc4be70b684204a62a3e3c6512e2b9e95330a5712dc635ffaf4b3b5c",
+      "passed": 1,
+      "failed": 0,
+      "filteredOrPending": 4,
+      "invocationSuccess": true,
+      "cases": [
+        {
+          "fullName": "three-part structural admission consumes a short report with no editorial review or forced guidance categories",
+          "status": "skipped"
+        },
+        {
+          "fullName": "three-part structural admission retains report language, respondent, metric coverage and duplicate-band structural failures",
+          "status": "skipped"
+        },
+        {
+          "fullName": "three-part structural admission keeps a malformed report candidate discoverable while refusing its selected executable and runtime policy",
+          "status": "skipped"
+        },
+        {
+          "fullName": "three-part structural admission quarantines schema-invalid candidates with original diagnostics and still rejects identity collisions",
+          "status": "passed"
+        },
+        {
+          "fullName": "three-part structural admission keeps scientific and translation statuses truthful as manual diagnostics with exact locale/version matching",
+          "status": "skipped"
+        }
+      ]
+    },
+    {
+      "report": "structure-corrected.json",
+      "sha256": "786187a4402dd832ff6ad9a8f930bcffc8ad19349e94747c498d03e814640965",
+      "passed": 13,
+      "failed": 0,
+      "filteredOrPending": 0,
+      "invocationSuccess": true,
+      "cases": [
+        {
+          "fullName": "V2 install remains an authorized operation without a license ledger plans an exact existing instrument without license storage or reads",
+          "status": "passed"
+        },
+        {
+          "fullName": "V2 install remains an authorized operation without a license ledger retains active system administrator authority: null",
+          "status": "passed"
+        },
+        {
+          "fullName": "V2 install remains an authorized operation without a license ledger retains active system administrator authority: {\"id\":\"admin\",\"platformRole\":\"USER\",\"isActive\":true,\"isFrozen\":false,\"expiresAt\":null}",
+          "status": "passed"
+        },
+        {
+          "fullName": "V2 install remains an authorized operation without a license ledger retains active system administrator authority: {\"id\":\"admin\",\"platformRole\":\"SYSTEM_ADMIN\",\"isActive\":false,\"isFrozen\":false,\"expiresAt\":null}",
+          "status": "passed"
+        },
+        {
+          "fullName": "V2 install remains an authorized operation without a license ledger retains active system administrator authority: {\"id\":\"admin\",\"platformRole\":\"SYSTEM_ADMIN\",\"isActive\":true,\"isFrozen\":true,\"expiresAt\":null}",
+          "status": "passed"
+        },
+        {
+          "fullName": "V2 install remains an authorized operation without a license ledger retains active system administrator authority: {\"id\":\"admin\",\"platformRole\":\"SYSTEM_ADMIN\",\"isActive\":true,\"isFrozen\":false,\"expiresAt\":\"2000-01-01T00:00:00.000Z\"}",
+          "status": "passed"
+        },
+        {
+          "fullName": "V2 install remains an authorized operation without a license ledger records scientific territory for manual review without turning it into installation authority",
+          "status": "passed"
+        },
+        {
+          "fullName": "V2 install remains an authorized operation without a license ledger rejects legacy V1 new writes before touching a database; backfill also requires V2",
+          "status": "passed"
+        },
+        {
+          "fullName": "V2 install remains an authorized operation without a license ledger persists a V2 deployment without writing the old authorization_refs column",
+          "status": "passed"
+        },
+        {
+          "fullName": "three-part structural admission consumes a short report with no editorial review or forced guidance categories",
+          "status": "passed"
+        },
+        {
+          "fullName": "three-part structural admission retains report language, respondent, metric coverage and duplicate-band structural failures",
+          "status": "passed"
+        },
+        {
+          "fullName": "three-part structural admission keeps a malformed report candidate discoverable while refusing its selected executable and runtime policy",
+          "status": "passed"
+        },
+        {
+          "fullName": "three-part structural admission keeps scientific and translation statuses truthful as manual diagnostics with exact locale/version matching",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "report": "structure-install-final.json",
+      "sha256": "9261123b08b7dd87915f541a6f1ac9b1ced3262aa97a0a5f939c97b0b648c30f",
+      "passed": 20,
+      "failed": 0,
+      "filteredOrPending": 0,
+      "invocationSuccess": true,
+      "cases": [
+        {
+          "fullName": "applies the audience report gate to direct publication as well as onboarding",
+          "status": "passed"
+        },
+        {
+          "fullName": "ScaleInstrumentSourceV1 registry preserves the six-package legacy API order and definition hashes",
+          "status": "passed"
+        },
+        {
+          "fullName": "ScaleInstrumentSourceV1 registry enumerates sources exactly once while allowing new content identities",
+          "status": "passed"
+        },
+        {
+          "fullName": "ScaleInstrumentSourceV1 registry allows a catalog-only source but rejects a new executable without explicit policy",
+          "status": "passed"
+        },
+        {
+          "fullName": "ScaleInstrumentSourceV1 registry rejects unknown source fields and duplicate exact identities",
+          "status": "passed"
+        },
+        {
+          "fullName": "ScaleInstrumentSourceV1 registry rejects duplicate executable identities before Map overwrite",
+          "status": "passed"
+        },
+        {
+          "fullName": "ScaleInstrumentSourceV1 registry rejects duplicate scorer descriptors and active-key version collisions",
+          "status": "passed"
+        },
+        {
+          "fullName": "V2 install remains an authorized operation without a license ledger plans an exact existing instrument without license storage or reads",
+          "status": "passed"
+        },
+        {
+          "fullName": "V2 install remains an authorized operation without a license ledger retains active system administrator authority: null",
+          "status": "passed"
+        },
+        {
+          "fullName": "V2 install remains an authorized operation without a license ledger retains active system administrator authority: {\"id\":\"admin\",\"platformRole\":\"USER\",\"isActive\":true,\"isFrozen\":false,\"expiresAt\":null}",
+          "status": "passed"
+        },
+        {
+          "fullName": "V2 install remains an authorized operation without a license ledger retains active system administrator authority: {\"id\":\"admin\",\"platformRole\":\"SYSTEM_ADMIN\",\"isActive\":false,\"isFrozen\":false,\"expiresAt\":null}",
+          "status": "passed"
+        },
+        {
+          "fullName": "V2 install remains an authorized operation without a license ledger retains active system administrator authority: {\"id\":\"admin\",\"platformRole\":\"SYSTEM_ADMIN\",\"isActive\":true,\"isFrozen\":true,\"expiresAt\":null}",
+          "status": "passed"
+        },
+        {
+          "fullName": "V2 install remains an authorized operation without a license ledger retains active system administrator authority: {\"id\":\"admin\",\"platformRole\":\"SYSTEM_ADMIN\",\"isActive\":true,\"isFrozen\":false,\"expiresAt\":\"2000-01-01T00:00:00.000Z\"}",
+          "status": "passed"
+        },
+        {
+          "fullName": "V2 install remains an authorized operation without a license ledger records scientific territory for manual review without turning it into installation authority",
+          "status": "passed"
+        },
+        {
+          "fullName": "V2 install remains an authorized operation without a license ledger rejects legacy V1 new writes before touching a database; backfill also requires V2",
+          "status": "passed"
+        },
+        {
+          "fullName": "V2 install remains an authorized operation without a license ledger persists a V2 deployment without writing the old authorization_refs column",
+          "status": "passed"
+        },
+        {
+          "fullName": "three-part structural admission consumes a short report with no editorial review or forced guidance categories",
+          "status": "passed"
+        },
+        {
+          "fullName": "three-part structural admission retains report language, respondent, metric coverage and duplicate-band structural failures",
+          "status": "passed"
+        },
+        {
+          "fullName": "three-part structural admission keeps a malformed report candidate discoverable while refusing its selected executable and runtime policy",
+          "status": "passed"
+        },
+        {
+          "fullName": "three-part structural admission keeps scientific and translation statuses truthful as manual diagnostics with exact locale/version matching",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "report": "structure-retry.json",
+      "sha256": "ce79a128b396efd7d39e943be58dbf110e5495184e90ce38b9651d0150746ec6",
+      "passed": 1,
+      "failed": 12,
+      "filteredOrPending": 0,
+      "invocationSuccess": false,
+      "cases": [
+        {
+          "fullName": "V2 install remains an authorized operation without a license ledger plans an exact existing instrument without license storage or reads",
+          "status": "failed"
+        },
+        {
+          "fullName": "V2 install remains an authorized operation without a license ledger retains active system administrator authority: null",
+          "status": "failed"
+        },
+        {
+          "fullName": "V2 install remains an authorized operation without a license ledger retains active system administrator authority: {\"id\":\"admin\",\"platformRole\":\"USER\",\"isActive\":true,\"isFrozen\":false,\"expiresAt\":null}",
+          "status": "failed"
+        },
+        {
+          "fullName": "V2 install remains an authorized operation without a license ledger retains active system administrator authority: {\"id\":\"admin\",\"platformRole\":\"SYSTEM_ADMIN\",\"isActive\":false,\"isFrozen\":false,\"expiresAt\":null}",
+          "status": "failed"
+        },
+        {
+          "fullName": "V2 install remains an authorized operation without a license ledger retains active system administrator authority: {\"id\":\"admin\",\"platformRole\":\"SYSTEM_ADMIN\",\"isActive\":true,\"isFrozen\":true,\"expiresAt\":null}",
+          "status": "failed"
+        },
+        {
+          "fullName": "V2 install remains an authorized operation without a license ledger retains active system administrator authority: {\"id\":\"admin\",\"platformRole\":\"SYSTEM_ADMIN\",\"isActive\":true,\"isFrozen\":false,\"expiresAt\":\"2000-01-01T00:00:00.000Z\"}",
+          "status": "failed"
+        },
+        {
+          "fullName": "V2 install remains an authorized operation without a license ledger records scientific territory for manual review without turning it into installation authority",
+          "status": "failed"
+        },
+        {
+          "fullName": "V2 install remains an authorized operation without a license ledger rejects legacy V1 new writes before touching a database; backfill also requires V2",
+          "status": "failed"
+        },
+        {
+          "fullName": "V2 install remains an authorized operation without a license ledger persists a V2 deployment without writing the old authorization_refs column",
+          "status": "failed"
+        },
+        {
+          "fullName": "three-part structural admission consumes a short report with no editorial review or forced guidance categories",
+          "status": "failed"
+        },
+        {
+          "fullName": "three-part structural admission retains report language, respondent, metric coverage and duplicate-band structural failures",
+          "status": "passed"
+        },
+        {
+          "fullName": "three-part structural admission keeps a malformed report candidate discoverable while refusing its selected executable and runtime policy",
+          "status": "failed"
+        },
+        {
+          "fullName": "three-part structural admission keeps scientific and translation statuses truthful as manual diagnostics with exact locale/version matching",
+          "status": "failed"
+        }
+      ]
+    },
+    {
+      "report": "structure-tests.json",
+      "sha256": "ce7a2d85103174d14d0c3604510ca832bb8ff1e38bff81bc9f0abe5d54a4743c",
+      "passed": 4,
+      "failed": 12,
+      "filteredOrPending": 0,
+      "invocationSuccess": false,
+      "cases": [
+        {
+          "fullName": "V2 install remains an authorized operation without a license ledger plans an exact existing instrument without license storage or reads",
+          "status": "failed"
+        },
+        {
+          "fullName": "V2 install remains an authorized operation without a license ledger retains active system administrator authority: null",
+          "status": "failed"
+        },
+        {
+          "fullName": "V2 install remains an authorized operation without a license ledger retains active system administrator authority: {\"id\":\"admin\",\"platformRole\":\"USER\",\"isActive\":true,\"isFrozen\":false,\"expiresAt\":null}",
+          "status": "failed"
+        },
+        {
+          "fullName": "V2 install remains an authorized operation without a license ledger retains active system administrator authority: {\"id\":\"admin\",\"platformRole\":\"SYSTEM_ADMIN\",\"isActive\":false,\"isFrozen\":false,\"expiresAt\":null}",
+          "status": "failed"
+        },
+        {
+          "fullName": "V2 install remains an authorized operation without a license ledger retains active system administrator authority: {\"id\":\"admin\",\"platformRole\":\"SYSTEM_ADMIN\",\"isActive\":true,\"isFrozen\":true,\"expiresAt\":null}",
+          "status": "failed"
+        },
+        {
+          "fullName": "V2 install remains an authorized operation without a license ledger retains active system administrator authority: {\"id\":\"admin\",\"platformRole\":\"SYSTEM_ADMIN\",\"isActive\":true,\"isFrozen\":false,\"expiresAt\":\"2000-01-01T00:00:00.000Z\"}",
+          "status": "failed"
+        },
+        {
+          "fullName": "V2 install remains an authorized operation without a license ledger records scientific territory for manual review without turning it into installation authority",
+          "status": "failed"
+        },
+        {
+          "fullName": "V2 install remains an authorized operation without a license ledger rejects legacy V1 new writes before touching a database; backfill also requires V2",
+          "status": "failed"
+        },
+        {
+          "fullName": "V2 install remains an authorized operation without a license ledger persists a V2 deployment without writing the old authorization_refs column",
+          "status": "failed"
+        },
+        {
+          "fullName": "three-part structural admission consumes a short report with no editorial review or forced guidance categories",
+          "status": "failed"
+        },
+        {
+          "fullName": "three-part structural admission retains report language, respondent, metric coverage and duplicate-band structural failures",
+          "status": "passed"
+        },
+        {
+          "fullName": "three-part structural admission keeps a malformed report candidate discoverable while refusing its selected executable and runtime policy",
+          "status": "failed"
+        },
+        {
+          "fullName": "three-part structural admission keeps scientific and translation statuses truthful as manual diagnostics with exact locale/version matching",
+          "status": "failed"
+        },
+        {
+          "fullName": "migrated WHO-5 / SDQ / TEXI source restrictions preserves WHO-5 items/scoring and non-commercial metadata without making it a license gate",
+          "status": "passed"
+        },
+        {
+          "fullName": "migrated WHO-5 / SDQ / TEXI source restrictions preserves SDQ executable content and exact locale independently of license records",
+          "status": "passed"
+        },
+        {
+          "fullName": "migrated WHO-5 / SDQ / TEXI source restrictions preserves TEXI scoring and pending manual localization without a technical gate",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}
