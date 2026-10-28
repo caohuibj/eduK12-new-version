@@ -1,0 +1,210 @@
+{
+  "identity": "spane12_zh_cn_research:1.0.0",
+  "sourceCommit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "sourceFiles": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.0/source.json",
+      "gitBlob": "410e10f564ec0020204d40956c320776253fd086",
+      "sha256": "a1a6428c9b50d08361d69639138579de8ced8d917d4edfc3dca5fa1ca4dd41a6"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.0/instrument.ts",
+      "gitBlob": "f9c63ff5f4e851663b58e01877df85af53699772",
+      "sha256": "1569f526ce1dae3869e666cca5b8d659ae3804dec91f38ce828c18cb96a1b98e"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.0/scorer.ts",
+      "gitBlob": "81b5a5b8b2c388432382d2deb15cfe2cb231b352",
+      "sha256": "1c2c65dba289e33aa968a9894e124fcfec94f18caa849445ded5e97a94a7ebf2"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+      "gitBlob": "f6b2d12726e0fbd8d7fc0cff4a591776f5304289",
+      "sha256": "6f418448781871dbafb7db481a828df6ab168032520a86fe256c13ea55b26ec0"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/spane12/1.0.0/README.md",
+      "gitBlob": "4ad9786115165fa0a59f6f1ed196627b85da4e5b",
+      "sha256": "888a9a0401eee12e7d8c8cc5199000e7ff1e5809fc90b54bfa47ba99a88d797b"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/spane12/1.0.0/source-manifest.json",
+      "gitBlob": "3ca22fb43d5a1553e083465ba62c2ec102654026",
+      "sha256": "20412661bb4306de637513d8a9ceeeb01ee883bb4c9a0e855935becddd0f2d03"
+    }
+  ],
+  "threePartConclusions": {
+    "content": "作者PDF十二词顺序、过去四周与1–5频率锚一致；中文词和运行时逐项吻合，系独立工作译稿。第3/4词译为感觉良好/不好；第10 joyful=欣喜，第12 contented=满足，需常规专家译审。没有反向题。",
+    "scoring": "积极1/3/5/7/10/12、消极2/4/6/8/9/11各六项原值等权求和6–30；平衡P−N为−24至24。静态scorer对两个域分别求和并求差，缺一域题则该域及平衡null，完整另一域仍可算；这是平台规则，无插补/均分分母。不可将12题直接合计或将消极反向。无常模和经验阈值，referencePolicy none。",
+    "report": "三项分别解释，强调正负感受可以共存、零差不代表无经历，并有适度反思与求助建议；非诊断、非排名。报告将轻松、担心列入测量例子，但实际词项为欣喜、害怕，建议精确替换。instrument/scoring/localization/report均1.0.0；成人独立中文未验证、源授权状态按原样保留。"
+  },
+  "items": [
+    {
+      "itemCode": "SPANE12_01",
+      "english": "Positive",
+      "chinese": "积极的",
+      "dimension": "P",
+      "key": "identity",
+      "assessment": "与固定清单、运行时及作者PDF顺序一致；中文待译审。"
+    },
+    {
+      "itemCode": "SPANE12_02",
+      "english": "Negative",
+      "chinese": "消极的",
+      "dimension": "N",
+      "key": "identity",
+      "assessment": "与固定清单、运行时及作者PDF顺序一致；中文待译审。"
+    },
+    {
+      "itemCode": "SPANE12_03",
+      "english": "Good",
+      "chinese": "感觉良好的",
+      "dimension": "P",
+      "key": "identity",
+      "assessment": "与固定清单、运行时及作者PDF顺序一致；中文待译审。"
+    },
+    {
+      "itemCode": "SPANE12_04",
+      "english": "Bad",
+      "chinese": "感觉不好的",
+      "dimension": "N",
+      "key": "identity",
+      "assessment": "与固定清单、运行时及作者PDF顺序一致；中文待译审。"
+    },
+    {
+      "itemCode": "SPANE12_05",
+      "english": "Pleasant",
+      "chinese": "愉快的",
+      "dimension": "P",
+      "key": "identity",
+      "assessment": "与固定清单、运行时及作者PDF顺序一致；中文待译审。"
+    },
+    {
+      "itemCode": "SPANE12_06",
+      "english": "Unpleasant",
+      "chinese": "不愉快的",
+      "dimension": "N",
+      "key": "identity",
+      "assessment": "与固定清单、运行时及作者PDF顺序一致；中文待译审。"
+    },
+    {
+      "itemCode": "SPANE12_07",
+      "english": "Happy",
+      "chinese": "开心的",
+      "dimension": "P",
+      "key": "identity",
+      "assessment": "与固定清单、运行时及作者PDF顺序一致；中文待译审。"
+    },
+    {
+      "itemCode": "SPANE12_08",
+      "english": "Sad",
+      "chinese": "悲伤的",
+      "dimension": "N",
+      "key": "identity",
+      "assessment": "与固定清单、运行时及作者PDF顺序一致；中文待译审。"
+    },
+    {
+      "itemCode": "SPANE12_09",
+      "english": "Afraid",
+      "chinese": "害怕的",
+      "dimension": "N",
+      "key": "identity",
+      "assessment": "与固定清单、运行时及作者PDF顺序一致；中文待译审。"
+    },
+    {
+      "itemCode": "SPANE12_10",
+      "english": "Joyful",
+      "chinese": "欣喜的",
+      "dimension": "P",
+      "key": "identity",
+      "assessment": "与固定清单、运行时及作者PDF顺序一致；中文待译审。"
+    },
+    {
+      "itemCode": "SPANE12_11",
+      "english": "Angry",
+      "chinese": "生气的",
+      "dimension": "N",
+      "key": "identity",
+      "assessment": "与固定清单、运行时及作者PDF顺序一致；中文待译审。"
+    },
+    {
+      "itemCode": "SPANE12_12",
+      "english": "Contented",
+      "chinese": "满足的",
+      "dimension": "P",
+      "key": "identity",
+      "assessment": "与固定清单、运行时及作者PDF顺序一致；中文待译审。"
+    }
+  ],
+  "anchors": [
+    {
+      "value": "1",
+      "label": "极少或从未出现",
+      "score": 1
+    },
+    {
+      "value": "2",
+      "label": "很少出现",
+      "score": 2
+    },
+    {
+      "value": "3",
+      "label": "有时出现",
+      "score": 3
+    },
+    {
+      "value": "4",
+      "label": "经常出现",
+      "score": 4
+    },
+    {
+      "value": "5",
+      "label": "非常经常或一直出现",
+      "score": 5
+    }
+  ],
+  "instruction": {
+    "file": {
+      "path": "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.0/source.json",
+      "gitBlob": "410e10f564ec0020204d40956c320776253fd086",
+      "sha256": "a1a6428c9b50d08361d69639138579de8ced8d917d4edfc3dca5fa1ca4dd41a6"
+    },
+    "field": "instruction",
+    "value": {
+      "schemaVersion": 1,
+      "language": "zh-CN",
+      "version": "1.0.0",
+      "text": "请回想过去四周你经历过的事情和情绪。下面每一项是一个感受词，请分别选出这种感受在过去四周出现的频率。1表示几乎没有或从未出现，5表示非常经常或一直出现。积极和消极感受都可以真实存在，不需要刻意让答案看起来更好。",
+      "source": "EDUK12.TOP依Diener与Biswas-Diener 2009官方SPANE英文过去四周说明独立起草的未审校中文指导语。"
+    },
+    "status": "顶层已声明过去四周项目工作指导语；不需另编。"
+  },
+  "sourceEvidence": [
+    {
+      "url": "https://eddiener.com/wp-content/uploads/2024/10/SPANE-Scale.pdf",
+      "finding": "十二词、过去四周、五点频率、P/N六词及P−N范围。"
+    }
+  ],
+  "ordinaryRevisions": [
+    {
+      "jsonPath": "executable.definition.report.interpretations[0].summary",
+      "old": "那些让你感觉不错、开心、轻松或满足的时刻",
+      "new": "那些让你感觉不错、开心、欣喜或满足的时刻",
+      "reason": "轻松不属12词，欣喜对应第10题；只修报告例子。"
+    },
+    {
+      "jsonPath": "executable.definition.report.interpretations[1].summary",
+      "old": "悲伤、生气、担心或不愉快",
+      "new": "悲伤、生气、害怕或不愉快",
+      "reason": "害怕对应第9题 afraid；担心并非列出的词。按既有报告轴与快照规则处理。"
+    }
+  ],
+  "manualPending": [
+    "独立中文工作译审、认知访谈与目标人群验证待完成，保留现有授权范围待办及其真实状态。",
+    "更改题意、频率锚、四周时间、分域、差值或缺失政策须记录原据和版本影响交root协调。"
+  ],
+  "notExecuted": [
+    "未运行golden、scorer、系统、数据库、CI或生产部署，静态代码阅读不等于运行通过。",
+    "固定材料历史静态检查只作来源记录，不伪称本次执行。"
+  ]
+}

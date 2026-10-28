@@ -1,0 +1,1238 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "spane12_zh_cn_research",
+    "instrumentVersion": "1.0.1"
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "text": "请回想过去四周你经历过的事情和情绪。下面每一项是一个感受词，请分别选出这种感受在过去四周出现的频率。1表示几乎没有或从未出现，5表示非常经常或一直出现。积极和消极感受都可以真实存在，不需要刻意让答案看起来更好。",
+    "source": "EDUK12.TOP依Diener与Biswas-Diener 2009官方SPANE英文过去四周说明独立起草的未审校中文指导语。"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "积极与消极体验量表（SPANE，12项）— 独立中文研究工作稿",
+      "abbreviation": "SPANE12-ZH-WORKING",
+      "instrumentFamily": "Scale of Positive and Negative Experience (SPANE)"
+    },
+    "construct": {
+      "primaryDomain": "WELL_BEING",
+      "secondaryDomains": [
+        "SOCIAL_EMOTIONAL"
+      ],
+      "constructDefinition": "基于最近四周的12个感受频率，区分六个积极感受词的原始总分SPANE-P、六个消极感受词的原始总分SPANE-N和两者之差SPANE-B。不是SWLS生活满意度、FS心理繁荣，也不是疾病诊断或人格归类。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "domain:wellbeing",
+        "domain:emotion",
+        "domain:subjective_wellbeing",
+        "construct:positive_negative_experience",
+        "construct:positive_feelings_six",
+        "construct:negative_feelings_six",
+        "construct:affect_balance_difference",
+        "construct:three_scores_no_global_happiness_sum",
+        "orientation:subjective_wellbeing",
+        "orientation:affective_wellbeing",
+        "orientation:positive_psychology",
+        "orientation:not_therapy_specific",
+        "population:adult_research",
+        "population:project_18_plus",
+        "population:self",
+        "population:not_k12_validated",
+        "population:not_chinese_translation_validated",
+        "response:self",
+        "response:digital_self",
+        "response:12_items",
+        "response:five_point_frequency_1_to_5",
+        "response:past_four_weeks",
+        "response:fixed_original_2009_order",
+        "response:no_reverse_items",
+        "response:positive_six_negative_six",
+        "response:balance_positive_minus_negative",
+        "response:complete_required_project_choice",
+        "use:research",
+        "use:individual_reflection",
+        "use:score_only",
+        "use:not_diagnostic",
+        "use:not_selection",
+        "use:no_chinese_norms",
+        "use:no_clinical_bands",
+        "license:noncommercial_only",
+        "license:author_contact_required",
+        "license:redistribution_review_pending",
+        "license:attribution_required",
+        "license:translation_review_pending",
+        "license:full_original_text_acquired",
+        "language_validation:source_en",
+        "language_validation:content_zh-CN",
+        "language_validation:independent_working_translation",
+        "language_validation:official_zh_not_claimed",
+        "language_validation:expert_review_pending",
+        "language_validation:cognitive_debrief_not_established",
+        "language_validation:local_validation_pending",
+        "积极情绪",
+        "消极情绪",
+        "情感平衡",
+        "过去四周",
+        "幸福感",
+        "体验频率",
+        "成人自评",
+        "非商业研究",
+        "非诊断",
+        "需要联系作者",
+        "独立中文工作稿"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "源英文版原研究涉及大学生等成人样本；平台独立中文研究工作稿未经过语言等值和中国人群验证。项目保守限定18岁以上成人自评，不将英语量表效度或任意中文译本自动迁移。"
+    },
+    "administration": {
+      "itemCount": 12,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED"
+      ],
+      "timeFrame": "原作者要求回顾过去四周（past four weeks），不能改写成过去一周、一般状态或最近两周。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "严格采用官网2009原文12词固定顺序：Positive, Negative, Good, Bad, Pleasant, Unpleasant, Happy, Sad, Afraid, Joyful, Angry, Contented。",
+        "原版频率锚1=Very Rarely or Never,2=Rarely,3=Sometimes,4=Often,5=Very Often or Always。全部五档各保留一条，不换成同意程度。",
+        "积极词题号1/3/5/7/10/12；消极词题号2/4/6/8/9/11，两域原始值分别求和6–30，无任何题反向。",
+        "平衡SPANE-B=SPANE-P−SPANE-N，范围−24到24，不能将消极项反向后和12题累加成为所谓幸福总分。",
+        "现行通用计分的源权重只能为正，故本工具独立注册版本化custom scorer，按同一合法输入得到三项分数；不修改共享引擎/通用schema。",
+        "本平台草稿保守缺答：某六题域未完整则该域null，平衡分需两个域都完整才计算；不插补、不误称原作者缺失处理说明。",
+        "无中国常模、临床截点或正负体验必然互斥假设；报告正负两个域分开解释。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "原英语版有原始文献，本独立中文版本尚未人工译审及本地信效度验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "描述过去四周积极与消极情绪出现频率，不能做诊断或按人群比较。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "spane-diener2010-original",
+        "evidenceType": "CONTENT_VALIDITY",
+        "population": "原英语版多地大学生等成人参与者；本条不推断平台中国样本",
+        "locale": "en",
+        "territory": "ZZ",
+        "studyDesign": "原始研究介绍12个情感体验词和积极/消极/平衡三种分数组合，具体效度不能自动归于平台未经审校中文稿。",
+        "rating": "UNKNOWN",
+        "citation": "Diener, E., Wirtz, D., Tov, W., Kim-Prieto, C., Choi, D. W., Oishi, S., & Biswas-Diener, R. (2010). New Well-being Measures: Short Scales to Assess Flourishing and Positive and Negative Feelings. Social Indicators Research, 97, 143–156. https://doi.org/10.1007/s11205-009-9493-y.",
+        "doi": "10.1007/s11205-009-9493-y",
+        "url": "https://doi.org/10.1007/s11205-009-9493-y"
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "官网2009正式英文12感受词及1–5频率、四周指导语：https://eddiener.com/wp-content/uploads/2024/10/SPANE-Scale.pdf；EDUK12.TOP独立中文工作稿，官网没有在SPANE页面列出确切中文官方版本。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "未取得确认的官方中文版；本译稿未经专家译审和中国人群验证，不借用其他量表的效度或常模。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "spane12_zh_cn_research-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": [],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    }
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "spane12_zh_cn_research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "spane12_zh_cn_research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "translation",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL"
+    ],
+    "notes": [
+      "© Ed Diener 与 Robert Biswas-Diener（2009）SPANE原版；官网许可：https://eddiener.com/scale-of-positive-and-negative-experience-spane/ 明确非商业研究使用、署名且不需逐项申请；官方英文12词和计分文件：https://eddiener.com/wp-content/uploads/2024/10/SPANE-Scale.pdf。并非CC BY或公共领域；独立中文翻译、商业使用、公开GitHub全文题本/译稿再分发及下游授权尚无可核实的统一许可，记录author_contact_required及redistribution_review_pending，交管理员决定。本包中文词汇、引导语及报告是EDUK12.TOP基于英语词义独立制作的未验证研究工作稿；不是官方中文版，也未获作者认可。",
+      "管理员决定许可、作者联系及实际使用；未授权或版权待复核状态并非本次草稿技术开发的自动门禁。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "PUBLISHED",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "SPANE English original (Diener & Biswas-Diener 2009), independent Chinese working translation",
+        "citation": "Diener, E., Wirtz, D., Tov, W., Kim-Prieto, C., Choi, D. W., Oishi, S., & Biswas-Diener, R. (2010). New Well-being Measures: Short Scales to Assess Flourishing and Positive and Negative Feelings. Social Indicators Research, 97, 143–156. https://doi.org/10.1007/s11205-009-9493-y.",
+        "url": "https://eddiener.com/wp-content/uploads/2024/10/SPANE-Scale.pdf",
+        "publicationYear": 2010
+      },
+      "license": {
+        "status": "unknown",
+        "redistribution": "restricted",
+        "note": "© Ed Diener 与 Robert Biswas-Diener（2009）SPANE原版；官网许可：https://eddiener.com/scale-of-positive-and-negative-experience-spane/ 明确非商业研究使用、署名且不需逐项申请；官方英文12词和计分文件：https://eddiener.com/wp-content/uploads/2024/10/SPANE-Scale.pdf。并非CC BY或公共领域；独立中文翻译、商业使用、公开GitHub全文题本/译稿再分发及下游授权尚无可核实的统一许可，记录author_contact_required及redistribution_review_pending，交管理员决定。本包中文词汇、引导语及报告是EDUK12.TOP基于英语词义独立制作的未验证研究工作稿；不是官方中文版，也未获作者认可。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "spane_frequency_1_5",
+          "options": [
+            {
+              "value": "1",
+              "label": "极少或从未出现",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "很少出现",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "有时出现",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "经常出现",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "非常经常或一直出现",
+              "score": 5
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "SPANE12_01",
+          "content": "积极的",
+          "type": "single",
+          "required": false,
+          "sortOrder": 0,
+          "responseSetKey": "spane_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SPANE12_02",
+          "content": "消极的",
+          "type": "single",
+          "required": false,
+          "sortOrder": 1,
+          "responseSetKey": "spane_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SPANE12_03",
+          "content": "感觉良好的",
+          "type": "single",
+          "required": false,
+          "sortOrder": 2,
+          "responseSetKey": "spane_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SPANE12_04",
+          "content": "感觉不好的",
+          "type": "single",
+          "required": false,
+          "sortOrder": 3,
+          "responseSetKey": "spane_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SPANE12_05",
+          "content": "愉快的",
+          "type": "single",
+          "required": false,
+          "sortOrder": 4,
+          "responseSetKey": "spane_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SPANE12_06",
+          "content": "不愉快的",
+          "type": "single",
+          "required": false,
+          "sortOrder": 5,
+          "responseSetKey": "spane_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SPANE12_07",
+          "content": "开心的",
+          "type": "single",
+          "required": false,
+          "sortOrder": 6,
+          "responseSetKey": "spane_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SPANE12_08",
+          "content": "悲伤的",
+          "type": "single",
+          "required": false,
+          "sortOrder": 7,
+          "responseSetKey": "spane_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SPANE12_09",
+          "content": "害怕的",
+          "type": "single",
+          "required": false,
+          "sortOrder": 8,
+          "responseSetKey": "spane_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SPANE12_10",
+          "content": "欣喜的",
+          "type": "single",
+          "required": false,
+          "sortOrder": 9,
+          "responseSetKey": "spane_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SPANE12_11",
+          "content": "生气的",
+          "type": "single",
+          "required": false,
+          "sortOrder": 10,
+          "responseSetKey": "spane_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SPANE12_12",
+          "content": "满足的",
+          "type": "single",
+          "required": false,
+          "sortOrder": 11,
+          "responseSetKey": "spane_frequency_1_5",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scorerKey": "spane12.balance.v1",
+        "itemRules": [
+          {
+            "itemCode": "SPANE12_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SPANE12_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SPANE12_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SPANE12_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SPANE12_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SPANE12_06",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SPANE12_07",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SPANE12_08",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SPANE12_09",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SPANE12_10",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SPANE12_11",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SPANE12_12",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "scores": [
+          {
+            "key": "spane_p",
+            "type": "dimension",
+            "label": "积极体验",
+            "description": "过去四周六个积极感受出现频率总和6–30；更高仅表示较多报告这类体验，不等于无困难。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "range": {
+              "min": 6,
+              "max": 30
+            },
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "SPANE12_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SPANE12_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SPANE12_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SPANE12_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SPANE12_10",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SPANE12_12",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "spane_n",
+            "type": "dimension",
+            "label": "消极体验",
+            "description": "过去四周六个消极感受出现频率总和6–30；更高只表示相应感受被报告得更频繁，不是疾病诊断。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "range": {
+              "min": 6,
+              "max": 30
+            },
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "SPANE12_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SPANE12_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SPANE12_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SPANE12_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SPANE12_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SPANE12_11",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "spane_b",
+            "type": "total",
+            "label": "积极与消极体验平衡",
+            "description": "SPANE-P减去SPANE-N，理论范围−24至24。平衡分不能代替两类体验，也不是临床幸福等级或中国常模。",
+            "direction": "bipolar",
+            "canonical": true,
+            "displayPrecision": 0,
+            "range": {
+              "min": -24,
+              "max": 24
+            },
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "scores",
+              "scores": [
+                {
+                  "scoreKey": "spane_p",
+                  "weight": 1
+                },
+                {
+                  "scoreKey": "spane_n",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.1",
+        "primaryScoreKeys": [
+          "spane_p",
+          "spane_n",
+          "spane_b"
+        ],
+        "scoreOrder": [
+          "spane_p",
+          "spane_n",
+          "spane_b"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "spane_p",
+            "headline": "值得被看见的愉快感受",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这组问题回顾过去四周那些让你感觉不错、开心、欣喜或满足的时刻。每个人的生活节奏和环境不同，所以这些感受出现的频率也会不同。较高的分数表示你更常记得自己有过这类体验，并不意味着困难已经消失，也不是对乐观性格的评价。回想一下最近一个让你心情稍微亮起来的片段，它与谁、什么活动或者什么环境有关？如果愿意，可以为这种对你有帮助的小事继续留一点空间，同时允许自己有不那么开心的日子。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "过去四周，哪些事情或相处方式曾给你带来愉快、满足或欣喜？"
+              },
+              {
+                "category": "strategy",
+                "text": "在条件允许时保留一种让自己感觉舒适、有意义或受到支持的小活动。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "spane_n",
+            "headline": "最近经历的难受时刻",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "过去四周如果出现悲伤、生气、害怕或不愉快，这些感受也值得被认真对待。分数较高只表示你较常报告这类感受，并不能据此判断你是否患有心理疾病，更不是你应该独自承担所有问题的证据。有些困难来自压力、关系或生活条件，并非只靠调整心情就能解决。可以想想，哪种情况最容易让你感到难受？当时有什么人或资源能给你一点帮助？如果持续受到困扰，寻求可信任的人或专业支持也是合理的选择。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近四周，哪一种处境最容易带来不舒服的感受？当时有哪些现实限制？"
+              },
+              {
+                "category": "support",
+                "text": "如果困扰持续影响生活，可以主动寻求可信任的人或适当的专业支持。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "spane_b",
+            "headline": "两类体验的相对差异",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这个数字是六项积极体验分数减去六项消极体验分数，并不是另一份独立的幸福能力测验。一个人可能同时经历开心和难受，所以即使平衡分接近零，也不代表四周里什么都没有发生；积极和消极两类体验都较多，和两类都较少，也可能得出相近的差值。阅读时建议把两个分量表一同查看，而不是只凭一个正负数字判断自己的状态。可以回想这段时间有哪些快乐需要珍惜，哪些困难需要帮助和调整。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "如果只看平衡分，会遗漏哪些你真正经历过的开心与困难？"
+              },
+              {
+                "category": "strategy",
+                "text": "分别回顾一件值得保留的积极体验，以及一件需要支持的困难。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "只测量过去四周自报的12类感受频率，不能诊断精神障碍、衡量人格价值或推定长期幸福水平。",
+          "SPANE-P与SPANE-N均为六题1–5求和，理论6–30；SPANE-B严格等于P−N，范围−24到24；未反向消极项，不合成所谓12题幸福总分。",
+          "本独立简体中文工作译稿未完成专家翻译审查、认知访谈或中国样本心理测量验证，不能继承源英文版和其他中文译本结论。",
+          "每个6题维度要求完整作答，平衡分需两者都完整；缺答不插补，是本平台保守项目规则而非作者已规定的个人缺答算法。",
+          "作者网站明确仅免费非商业研究使用并要求署名，独立翻译、公开GitHub再分发或商用范围需要管理员单独确认。"
+        ],
+        "disclaimer": "SPANE © Ed Diener、Robert Biswas-Diener（2009），原始研究2010。该中文文本和报告是EDUK12.TOP独立未验证研究工作稿，使用范围与作者联系交由管理员确认。结果不用于诊断、筛查、排名或高风险决策。"
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "spane12",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "all_rare",
+        "answers": [
+          {
+            "itemCode": "SPANE12_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SPANE12_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SPANE12_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SPANE12_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SPANE12_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SPANE12_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SPANE12_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SPANE12_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SPANE12_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SPANE12_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SPANE12_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SPANE12_12",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "spane_p": 6,
+            "spane_n": 6,
+            "spane_b": 0
+          },
+          "totalScoreKeys": [
+            "spane_p",
+            "spane_n",
+            "spane_b"
+          ]
+        }
+      },
+      {
+        "name": "all_often",
+        "answers": [
+          {
+            "itemCode": "SPANE12_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SPANE12_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SPANE12_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SPANE12_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SPANE12_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SPANE12_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SPANE12_07",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SPANE12_08",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SPANE12_09",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SPANE12_10",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SPANE12_11",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SPANE12_12",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "spane_p": 30,
+            "spane_n": 30,
+            "spane_b": 0
+          },
+          "totalScoreKeys": [
+            "spane_p",
+            "spane_n",
+            "spane_b"
+          ]
+        }
+      },
+      {
+        "name": "all_sometimes",
+        "answers": [
+          {
+            "itemCode": "SPANE12_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SPANE12_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SPANE12_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SPANE12_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SPANE12_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SPANE12_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SPANE12_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SPANE12_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SPANE12_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SPANE12_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SPANE12_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SPANE12_12",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "spane_p": 18,
+            "spane_n": 18,
+            "spane_b": 0
+          },
+          "totalScoreKeys": [
+            "spane_p",
+            "spane_n",
+            "spane_b"
+          ]
+        }
+      },
+      {
+        "name": "highest_balance",
+        "answers": [
+          {
+            "itemCode": "SPANE12_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SPANE12_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SPANE12_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SPANE12_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SPANE12_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SPANE12_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SPANE12_07",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SPANE12_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SPANE12_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SPANE12_10",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SPANE12_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SPANE12_12",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "spane_p": 30,
+            "spane_n": 6,
+            "spane_b": 24
+          },
+          "totalScoreKeys": [
+            "spane_p",
+            "spane_n",
+            "spane_b"
+          ]
+        }
+      },
+      {
+        "name": "lowest_balance",
+        "answers": [
+          {
+            "itemCode": "SPANE12_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SPANE12_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SPANE12_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SPANE12_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SPANE12_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SPANE12_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SPANE12_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SPANE12_08",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SPANE12_09",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SPANE12_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SPANE12_11",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SPANE12_12",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "spane_p": 6,
+            "spane_n": 30,
+            "spane_b": -24
+          },
+          "totalScoreKeys": [
+            "spane_p",
+            "spane_n",
+            "spane_b"
+          ]
+        }
+      },
+      {
+        "name": "mixed",
+        "answers": [
+          {
+            "itemCode": "SPANE12_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SPANE12_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SPANE12_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SPANE12_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SPANE12_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SPANE12_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SPANE12_07",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SPANE12_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SPANE12_09",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SPANE12_10",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SPANE12_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SPANE12_12",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "spane_p": 18,
+            "spane_n": 15,
+            "spane_b": 3
+          },
+          "totalScoreKeys": [
+            "spane_p",
+            "spane_n",
+            "spane_b"
+          ]
+        }
+      },
+      {
+        "name": "one_positive_missing",
+        "answers": [
+          {
+            "itemCode": "SPANE12_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SPANE12_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SPANE12_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SPANE12_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SPANE12_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SPANE12_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SPANE12_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SPANE12_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SPANE12_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SPANE12_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SPANE12_12",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "spane_p": null,
+            "spane_n": 18,
+            "spane_b": null
+          },
+          "totalScoreKeys": [
+            "spane_p",
+            "spane_n",
+            "spane_b"
+          ]
+        }
+      },
+      {
+        "name": "one_negative_missing",
+        "answers": [
+          {
+            "itemCode": "SPANE12_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SPANE12_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SPANE12_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SPANE12_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SPANE12_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SPANE12_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SPANE12_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SPANE12_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SPANE12_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SPANE12_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SPANE12_12",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "spane_p": 18,
+            "spane_n": null,
+            "spane_b": null
+          },
+          "totalScoreKeys": [
+            "spane_p",
+            "spane_n",
+            "spane_b"
+          ]
+        }
+      },
+      {
+        "name": "all_missing",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "spane_p": null,
+            "spane_n": null,
+            "spane_b": null
+          },
+          "totalScoreKeys": [
+            "spane_p",
+            "spane_n",
+            "spane_b"
+          ]
+        }
+      }
+    ]
+  }
+}
