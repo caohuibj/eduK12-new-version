@@ -1,0 +1,14 @@
+{
+  "instrumentKey": "ipip_empathic_concern10_zh_cn_research",
+  "instrumentVersion": "1.0.0",
+  "fromReportVersion": "1.0.0",
+  "toReportVersion": "1.0.1",
+  "sourceBase": "14b31f340008b1409d740ddc522592686e301650",
+  "previousSourceSha256": "d8fae0cdb000b3089f194b07636b22a5a3673a173193e3da26913a1b57370993",
+  "scope": "Report headline and one score-direction phrase only; item/scoring/parameter/instruction/catalog/rights unchanged.",
+  "beforeHeadline": "对他人处境的关切：从日常经历看自己的习惯",
+  "afterHeadline": "对他人处境的关切：你会怎样回应别人的困难",
+  "reason": "Replace repeated generic headings and technical phrasing with construct-specific everyday language; no norm or individualized inference added.",
+  "runtimeValidation": "PASS_CHANGED_REPORT_ONLY",
+  "evidence": "docs/scale-intake-batches/20261028-followup/report-validation.json"
+}

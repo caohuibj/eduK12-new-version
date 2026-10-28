@@ -1,0 +1,48 @@
+{
+  "reportVersion": "1.0.0",
+  "primaryScoreKeys": [
+    "ipip_negative_expressivity10"
+  ],
+  "scoreOrder": [
+    "ipip_negative_expressivity10"
+  ],
+  "interpretations": [
+    {
+      "scoreKey": "ipip_negative_expressivity10",
+      "headline": "消极情绪的外在表达：从日常经历看自己的习惯",
+      "source": {
+        "type": "score_only"
+      },
+      "summary": "这份回答关注的是：难过、害怕或生气时，别人有多容易看见你的感受。它不是在判断你是不是“情绪不好的人”。计分方向越高，表示这些感受越容易通过表情或行动流露；越少外露，也不等于更平静或更会调节。表达得多或少都没有统一的好坏答案。",
+      "bands": [],
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "想想最近一次不开心：你想让别人理解什么？你实际表达出来的内容，和心里想说的一样吗？"
+        },
+        {
+          "category": "strategy",
+          "text": "可以试着把“你怎么总这样”换成“刚才发生这件事时，我有些生气，我希望……”。表达感受不等于吼叫、威胁或伤害别人；情绪很强时，先暂停一下也可以。"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "中文研究译稿尚待人工审校与目标人群验证，目前仅供成人研究与自我了解。",
+    "习惯、文化、关系安全感和具体场合都会影响表达。这个中文工作译稿尚待审核与验证，没有诊断分界值，也不能据此判断情绪控制能力。",
+    "目前没有依据划分高低或人群排名；原英文研究的数据不是本中文版本的效度证明。",
+    "10题需完整回答；漏答不当作零分，也不代填。"
+  ],
+  "disclaimer": "仅供成人研究和描述性自我了解，不用于心理诊断、能力鉴定或高风险决策。",
+  "audienceContract": {
+    "schemaVersion": 1,
+    "respondent": "ADULT_SELF",
+    "audience": "student",
+    "locale": "zh-CN",
+    "qcReview": {
+      "reviewer": "AI-assisted local editorial check (not human expert review)",
+      "reviewedAt": "2026-10-25T17:05:00Z",
+      "basis": "AI editorial check only: descriptive adult reflection, no norms, diagnostic/ability/moral labels or therapy claims; not human expert translation or psychometric review."
+    }
+  }
+}

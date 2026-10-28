@@ -1,0 +1,16 @@
+{
+  "node": "v24.22.1",
+  "command": "node --import tsx .scale-report-followup-validation.ts",
+  "cwd": "server-version/backend",
+  "sourceScriptArchive": "report-validation.ts.txt",
+  "result": "4 changed reports PASS: unchanged non-report payload and measurement hashes; native scorer/report complete and invalid results verified.",
+  "exitCode": 0,
+  "firstAttempt": {
+    "status": "NOT_EXECUTED",
+    "error": "The file write used server-version/backend twice relative to the backend cwd; shell could not create the file, then Node reported missing entrypoint. No assertion or application code ran.",
+    "repair": "Created the script in the actual backend cwd, then executed once."
+  },
+  "dependencySource": "Existing DOT backend node_modules reused by a worktree-local symlink; no package installation or lockfile change.",
+  "formalCI": false,
+  "databaseTouched": false
+}

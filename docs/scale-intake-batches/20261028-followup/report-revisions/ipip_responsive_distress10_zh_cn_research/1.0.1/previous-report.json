@@ -1,0 +1,48 @@
+{
+  "reportVersion": "1.0.0",
+  "primaryScoreKeys": [
+    "ipip_responsive_distress10"
+  ],
+  "scoreOrder": [
+    "ipip_responsive_distress10"
+  ],
+  "interpretations": [
+    {
+      "scoreKey": "ipip_responsive_distress10",
+      "headline": "面对他人痛苦时的情绪反应：从日常经历看自己的习惯",
+      "source": {
+        "type": "score_only"
+      },
+      "summary": "这份回答像一张情绪观察便签：当你看到别人难过、动物受伤，或遇到紧张场面时，自己的心情会怎样跟着变化？计分方向越高，表示自己的情绪更容易被这些场景触动；保持平静不代表冷漠，容易难过也不自动代表更善良或更会帮助别人。",
+      "bands": [],
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "回想一次别人向你诉苦：你既听到了对方的需要，也留意到自己的感受了吗？你的反应是否让你更能陪伴对方？"
+        },
+        {
+          "category": "strategy",
+          "text": "下次听到难过的事情，可以先问一句“你希望我陪你听一听，还是一起想办法？”如果自己也被情绪淹没，允许短暂休息，再决定能提供什么帮助。"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "中文研究译稿尚待人工审校与目标人群验证，目前仅供成人研究与自我了解。",
+    "来源英文研究中，这组题回答的一致程度有限，因此更适合谨慎探索，不适合据此给个人贴标签或做重要决定。中文译稿尚待审核与验证，没有项目常模或诊断分界值。",
+    "目前没有依据划分高低或人群排名；原英文研究的数据不是本中文版本的效度证明。",
+    "10题需完整回答；漏答不当作零分，也不代填。"
+  ],
+  "disclaimer": "仅供成人研究和描述性自我了解，不用于心理诊断、能力鉴定或高风险决策。",
+  "audienceContract": {
+    "schemaVersion": 1,
+    "respondent": "ADULT_SELF",
+    "audience": "student",
+    "locale": "zh-CN",
+    "qcReview": {
+      "reviewer": "AI-assisted local editorial check (not human expert review)",
+      "reviewedAt": "2026-10-25T17:05:00Z",
+      "basis": "AI editorial check only: descriptive adult reflection, no norms, diagnostic/ability/moral labels or therapy claims; not human expert translation or psychometric review."
+    }
+  }
+}

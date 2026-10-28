@@ -1,0 +1,958 @@
+{
+  "base": "14b31f340008b1409d740ddc522592686e301650",
+  "node": "v24.22.1",
+  "scope": "Four changed reports: actual native schema, scorer, report builder and result parser; exact measurement identity unchanged; complete golden and missing response only. No DB/browser/formal CI.",
+  "results": [
+    {
+      "key": "ipip_empathic_concern10_zh_cn_research",
+      "version": "1.0.0",
+      "measurementHash": "1846f13b8e3c4c9c09b1cc519f782280aa5f634abdaa535a91a0b830375c662c",
+      "reportVersion": "1.0.1",
+      "fixture": "midpoint",
+      "status": "PASS",
+      "report": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "00000000-0000-4000-8000-000000000001",
+          "code": "ipip_empathic_concern10_zh_cn_research",
+          "name": "IPIP同情关怀10题（研究译稿）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "00000000-0000-4000-8000-000000000001",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.1",
+          "definitionHash": "1846f13b8e3c4c9c09b1cc519f782280aa5f634abdaa535a91a0b830375c662c",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "IPIP_EMPATHIC_CONCERN10_01",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_EMPATHIC_CONCERN10_02",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_EMPATHIC_CONCERN10_03",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_EMPATHIC_CONCERN10_04",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_EMPATHIC_CONCERN10_05",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_EMPATHIC_CONCERN10_06",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_EMPATHIC_CONCERN10_07",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_EMPATHIC_CONCERN10_08",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_EMPATHIC_CONCERN10_09",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_EMPATHIC_CONCERN10_10",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          }
+        ],
+        "scores": [
+          {
+            "key": "ipip_empathic_concern10",
+            "type": "total",
+            "label": "对他人处境的关切",
+            "description": "Self-reported sympathy and concern for others, including socially disadvantaged groups; not the Interpersonal Reactivity Index Empathic Concern subscale, not perspective-taking accuracy, helping behavior, morality or clinical empathy capacity.",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "value": 30,
+            "range": {
+              "min": 10,
+              "max": 50
+            },
+            "expectedItems": [
+              "IPIP_EMPATHIC_CONCERN10_01",
+              "IPIP_EMPATHIC_CONCERN10_02",
+              "IPIP_EMPATHIC_CONCERN10_03",
+              "IPIP_EMPATHIC_CONCERN10_04",
+              "IPIP_EMPATHIC_CONCERN10_05",
+              "IPIP_EMPATHIC_CONCERN10_06",
+              "IPIP_EMPATHIC_CONCERN10_07",
+              "IPIP_EMPATHIC_CONCERN10_08",
+              "IPIP_EMPATHIC_CONCERN10_09",
+              "IPIP_EMPATHIC_CONCERN10_10"
+            ],
+            "answeredItems": [
+              "IPIP_EMPATHIC_CONCERN10_01",
+              "IPIP_EMPATHIC_CONCERN10_02",
+              "IPIP_EMPATHIC_CONCERN10_03",
+              "IPIP_EMPATHIC_CONCERN10_04",
+              "IPIP_EMPATHIC_CONCERN10_05",
+              "IPIP_EMPATHIC_CONCERN10_06",
+              "IPIP_EMPATHIC_CONCERN10_07",
+              "IPIP_EMPATHIC_CONCERN10_08",
+              "IPIP_EMPATHIC_CONCERN10_09",
+              "IPIP_EMPATHIC_CONCERN10_10"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "ipip_empathic_concern10",
+            "headline": "对他人处境的关切：你会怎样回应别人的困难",
+            "label": null,
+            "interpretation": "看到别人处境艰难时，你通常会怎样回应？这份回答关注你表达的同情和关怀倾向，不是给一个人的善良程度打分。分数越高，表示你在这些题目中表达了更多关怀和同情。但回答也会受价值观、社会经历和措辞理解影响，不能据此判断你是否真正帮助过别人。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回想最近听到别人困难时的情景：你先注意到什么？哪些回应是对方真正需要、你也愿意提供的？"
+              },
+              {
+                "category": "strategy",
+                "text": "如果愿意，可以从一句不急着评判的询问开始：“你希望我听你说，还是一起想办法？”关心别人也可以保留自己的边界。"
+              }
+            ],
+            "limitations": [
+              "中文研究译稿尚待人工审校与目标人群验证，目前仅供成人研究与自我了解。",
+              "部分原题涉及犯罪、贫困与失业，可能带来不适或受到社会观念影响。它不是道德测验，也不是其他专有共情量表的中文版；中文译稿尚待审核验证，无可用项目常模或分界值，不用于诊断或人员筛选。",
+              "目前没有依据划分高低或人群排名；原英文研究的数据不是本中文版本的效度证明。",
+              "10题需完整回答；漏答不当作零分，也不代填。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "中文研究译稿尚待人工审校与目标人群验证，目前仅供成人研究与自我了解。",
+          "部分原题涉及犯罪、贫困与失业，可能带来不适或受到社会观念影响。它不是道德测验，也不是其他专有共情量表的中文版；中文译稿尚待审核验证，无可用项目常模或分界值，不用于诊断或人员筛选。",
+          "目前没有依据划分高低或人群排名；原英文研究的数据不是本中文版本的效度证明。",
+          "10题需完整回答；漏答不当作零分，也不代填。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "仅供成人研究和描述性自我了解，不用于心理诊断、能力鉴定或高风险决策。"
+      },
+      "missingReport": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "00000000-0000-4000-8000-000000000001",
+          "code": "ipip_empathic_concern10_zh_cn_research",
+          "name": "IPIP同情关怀10题（研究译稿）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "00000000-0000-4000-8000-000000000001",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.1",
+          "definitionHash": "1846f13b8e3c4c9c09b1cc519f782280aa5f634abdaa535a91a0b830375c662c",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "invalid",
+          "flags": [
+            "missing_items",
+            "score_not_calculable"
+          ]
+        },
+        "itemScores": [],
+        "scores": [
+          {
+            "key": "ipip_empathic_concern10",
+            "type": "total",
+            "label": "对他人处境的关切",
+            "description": "Self-reported sympathy and concern for others, including socially disadvantaged groups; not the Interpersonal Reactivity Index Empathic Concern subscale, not perspective-taking accuracy, helping behavior, morality or clinical empathy capacity.",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "value": null,
+            "range": {
+              "min": 10,
+              "max": 50
+            },
+            "expectedItems": [
+              "IPIP_EMPATHIC_CONCERN10_01",
+              "IPIP_EMPATHIC_CONCERN10_02",
+              "IPIP_EMPATHIC_CONCERN10_03",
+              "IPIP_EMPATHIC_CONCERN10_04",
+              "IPIP_EMPATHIC_CONCERN10_05",
+              "IPIP_EMPATHIC_CONCERN10_06",
+              "IPIP_EMPATHIC_CONCERN10_07",
+              "IPIP_EMPATHIC_CONCERN10_08",
+              "IPIP_EMPATHIC_CONCERN10_09",
+              "IPIP_EMPATHIC_CONCERN10_10"
+            ],
+            "answeredItems": [],
+            "status": "not_calculable",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [],
+        "caveats": [
+          "中文研究译稿尚待人工审校与目标人群验证，目前仅供成人研究与自我了解。",
+          "部分原题涉及犯罪、贫困与失业，可能带来不适或受到社会观念影响。它不是道德测验，也不是其他专有共情量表的中文版；中文译稿尚待审核验证，无可用项目常模或分界值，不用于诊断或人员筛选。",
+          "目前没有依据划分高低或人群排名；原英文研究的数据不是本中文版本的效度证明。",
+          "10题需完整回答；漏答不当作零分，也不代填。",
+          "至少一个 canonical score 无法计算，因此不提供解释或群体参考。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "仅供成人研究和描述性自我了解，不用于心理诊断、能力鉴定或高风险决策。"
+      }
+    },
+    {
+      "key": "ipip_emotion_based_decision9_zh_cn_research",
+      "version": "1.0.1",
+      "measurementHash": "a2c05ac0e02463c723cd986b0c7bbd9c514f35b455ba582c60988e30e6965c11",
+      "reportVersion": "1.0.1",
+      "fixture": "midpoint",
+      "status": "PASS",
+      "report": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "00000000-0000-4000-8000-000000000001",
+          "code": "ipip_emotion_based_decision9_zh_cn_research",
+          "name": "IPIP情绪导向决策9题（研究译稿）",
+          "instrumentVersion": "1.0.1"
+        },
+        "method": {
+          "scaleId": "00000000-0000-4000-8000-000000000001",
+          "instrumentVersion": "1.0.1",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.1",
+          "definitionHash": "a2c05ac0e02463c723cd986b0c7bbd9c514f35b455ba582c60988e30e6965c11",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_01",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_02",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_03",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_04",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_05",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_06",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_07",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_08",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_09",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          }
+        ],
+        "scores": [
+          {
+            "key": "ipip_emotion_based_decision9",
+            "type": "total",
+            "label": "感受与逻辑的决策偏好",
+            "description": "对做决定时相较于逻辑推理更依赖感受的自我描述；不衡量决策质量、冲动性、心理灵活性、情绪调节或情绪智力能力。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "value": 27,
+            "range": {
+              "min": 9,
+              "max": 45
+            },
+            "expectedItems": [
+              "IPIP_EMOTION_BASED_DECISION9_01",
+              "IPIP_EMOTION_BASED_DECISION9_02",
+              "IPIP_EMOTION_BASED_DECISION9_03",
+              "IPIP_EMOTION_BASED_DECISION9_04",
+              "IPIP_EMOTION_BASED_DECISION9_05",
+              "IPIP_EMOTION_BASED_DECISION9_06",
+              "IPIP_EMOTION_BASED_DECISION9_07",
+              "IPIP_EMOTION_BASED_DECISION9_08",
+              "IPIP_EMOTION_BASED_DECISION9_09"
+            ],
+            "answeredItems": [
+              "IPIP_EMOTION_BASED_DECISION9_01",
+              "IPIP_EMOTION_BASED_DECISION9_02",
+              "IPIP_EMOTION_BASED_DECISION9_03",
+              "IPIP_EMOTION_BASED_DECISION9_04",
+              "IPIP_EMOTION_BASED_DECISION9_05",
+              "IPIP_EMOTION_BASED_DECISION9_06",
+              "IPIP_EMOTION_BASED_DECISION9_07",
+              "IPIP_EMOTION_BASED_DECISION9_08",
+              "IPIP_EMOTION_BASED_DECISION9_09"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "ipip_emotion_based_decision9",
+            "headline": "做决定时，你会怎样参考感受与事实",
+            "label": null,
+            "interpretation": "做决定时，你更容易先问“我有什么感受”，还是“事实和理由是什么”？这份回答描述你通常偏向哪种参考方式，不评判哪种方式更聪明。分数越高，表示你越倾向依据感受做决定；较低则更倾向依据事实与逻辑。两者都可能提供有用信息，结果不是决策能力的好坏标签。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "想一想最近一次选择：当时有哪些事实？又有哪些感受或期待？它们是互相支持，还是指向不同方向？"
+              },
+              {
+                "category": "strategy",
+                "text": "下次面对一个日常小选择，可以分别写下“已知事实”和“我的感受”，再看看是否还有需要了解的信息。无需强迫自己只选一种依据。"
+              }
+            ],
+            "limitations": [
+              "中文研究译稿尚待人工审校与目标人群验证，目前仅供成人研究与自我了解。",
+              "不用于判断冲动性、情绪调节能力或临床风险。该中文工作译稿尚待审核与验证，没有可用的项目常模或分界值。",
+              "目前没有依据划分高低或人群排名；原英文研究的数据不是本中文版本的效度证明。",
+              "9题需完整回答；漏答不当作零分，也不代填。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "中文研究译稿尚待人工审校与目标人群验证，目前仅供成人研究与自我了解。",
+          "不用于判断冲动性、情绪调节能力或临床风险。该中文工作译稿尚待审核与验证，没有可用的项目常模或分界值。",
+          "目前没有依据划分高低或人群排名；原英文研究的数据不是本中文版本的效度证明。",
+          "9题需完整回答；漏答不当作零分，也不代填。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "仅供成人研究和描述性自我了解，不用于心理诊断、能力鉴定或高风险决策。"
+      },
+      "missingReport": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "00000000-0000-4000-8000-000000000001",
+          "code": "ipip_emotion_based_decision9_zh_cn_research",
+          "name": "IPIP情绪导向决策9题（研究译稿）",
+          "instrumentVersion": "1.0.1"
+        },
+        "method": {
+          "scaleId": "00000000-0000-4000-8000-000000000001",
+          "instrumentVersion": "1.0.1",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.1",
+          "definitionHash": "a2c05ac0e02463c723cd986b0c7bbd9c514f35b455ba582c60988e30e6965c11",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "invalid",
+          "flags": [
+            "missing_items",
+            "score_not_calculable"
+          ]
+        },
+        "itemScores": [],
+        "scores": [
+          {
+            "key": "ipip_emotion_based_decision9",
+            "type": "total",
+            "label": "感受与逻辑的决策偏好",
+            "description": "对做决定时相较于逻辑推理更依赖感受的自我描述；不衡量决策质量、冲动性、心理灵活性、情绪调节或情绪智力能力。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "value": null,
+            "range": {
+              "min": 9,
+              "max": 45
+            },
+            "expectedItems": [
+              "IPIP_EMOTION_BASED_DECISION9_01",
+              "IPIP_EMOTION_BASED_DECISION9_02",
+              "IPIP_EMOTION_BASED_DECISION9_03",
+              "IPIP_EMOTION_BASED_DECISION9_04",
+              "IPIP_EMOTION_BASED_DECISION9_05",
+              "IPIP_EMOTION_BASED_DECISION9_06",
+              "IPIP_EMOTION_BASED_DECISION9_07",
+              "IPIP_EMOTION_BASED_DECISION9_08",
+              "IPIP_EMOTION_BASED_DECISION9_09"
+            ],
+            "answeredItems": [],
+            "status": "not_calculable",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [],
+        "caveats": [
+          "中文研究译稿尚待人工审校与目标人群验证，目前仅供成人研究与自我了解。",
+          "不用于判断冲动性、情绪调节能力或临床风险。该中文工作译稿尚待审核与验证，没有可用的项目常模或分界值。",
+          "目前没有依据划分高低或人群排名；原英文研究的数据不是本中文版本的效度证明。",
+          "9题需完整回答；漏答不当作零分，也不代填。",
+          "至少一个 canonical score 无法计算，因此不提供解释或群体参考。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "仅供成人研究和描述性自我了解，不用于心理诊断、能力鉴定或高风险决策。"
+      }
+    },
+    {
+      "key": "ipip_negative_expressivity10_zh_cn_research",
+      "version": "1.0.1",
+      "measurementHash": "db881941217057cefaa71b9b19f9e137689997752b96224ecd2eb7d4aecfbaa7",
+      "reportVersion": "1.0.1",
+      "fixture": "midpoint",
+      "status": "PASS",
+      "report": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "00000000-0000-4000-8000-000000000001",
+          "code": "ipip_negative_expressivity10_zh_cn_research",
+          "name": "IPIP消极情绪表达10题（研究译稿）",
+          "instrumentVersion": "1.0.1"
+        },
+        "method": {
+          "scaleId": "00000000-0000-4000-8000-000000000001",
+          "instrumentVersion": "1.0.1",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.1",
+          "definitionHash": "db881941217057cefaa71b9b19f9e137689997752b96224ecd2eb7d4aecfbaa7",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_01",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_02",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_03",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_04",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_05",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_06",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_07",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_08",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_09",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_10",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          }
+        ],
+        "scores": [
+          {
+            "key": "ipip_negative_expressivity10",
+            "type": "total",
+            "label": "消极情绪的外在表达",
+            "description": "消极情绪更容易外露的自述倾向，不等于症状更严重，也没有统一的优劣方向。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "value": 30,
+            "range": {
+              "min": 10,
+              "max": 50
+            },
+            "expectedItems": [
+              "IPIP_NEGATIVE_EXPRESSIVITY10_01",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_02",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_03",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_04",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_05",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_06",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_07",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_08",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_09",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_10"
+            ],
+            "answeredItems": [
+              "IPIP_NEGATIVE_EXPRESSIVITY10_01",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_02",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_03",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_04",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_05",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_06",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_07",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_08",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_09",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_10"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "ipip_negative_expressivity10",
+            "headline": "难受的时候，别人有多容易看见你的感受",
+            "label": null,
+            "interpretation": "这份回答关注的是：难过、害怕或生气时，别人有多容易看见你的感受。它不是在判断你是不是“情绪不好的人”。分数越高，表示这些感受越容易通过表情或行动流露；越少外露，也不等于更平静或更会调节。表达得多或少都没有统一的好坏答案。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "想想最近一次不开心：你想让别人理解什么？你实际表达出来的内容，和心里想说的一样吗？"
+              },
+              {
+                "category": "strategy",
+                "text": "可以试着把“你怎么总这样”换成“刚才发生这件事时，我有些生气，我希望……”。表达感受不等于吼叫、威胁或伤害别人；情绪很强时，先暂停一下也可以。"
+              }
+            ],
+            "limitations": [
+              "中文研究译稿尚待人工审校与目标人群验证，目前仅供成人研究与自我了解。",
+              "习惯、文化、关系安全感和具体场合都会影响表达。这个中文工作译稿尚待审核与验证，没有诊断分界值，也不能据此判断情绪控制能力。",
+              "目前没有依据划分高低或人群排名；原英文研究的数据不是本中文版本的效度证明。",
+              "10题需完整回答；漏答不当作零分，也不代填。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "中文研究译稿尚待人工审校与目标人群验证，目前仅供成人研究与自我了解。",
+          "习惯、文化、关系安全感和具体场合都会影响表达。这个中文工作译稿尚待审核与验证，没有诊断分界值，也不能据此判断情绪控制能力。",
+          "目前没有依据划分高低或人群排名；原英文研究的数据不是本中文版本的效度证明。",
+          "10题需完整回答；漏答不当作零分，也不代填。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "仅供成人研究和描述性自我了解，不用于心理诊断、能力鉴定或高风险决策。"
+      },
+      "missingReport": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "00000000-0000-4000-8000-000000000001",
+          "code": "ipip_negative_expressivity10_zh_cn_research",
+          "name": "IPIP消极情绪表达10题（研究译稿）",
+          "instrumentVersion": "1.0.1"
+        },
+        "method": {
+          "scaleId": "00000000-0000-4000-8000-000000000001",
+          "instrumentVersion": "1.0.1",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.1",
+          "definitionHash": "db881941217057cefaa71b9b19f9e137689997752b96224ecd2eb7d4aecfbaa7",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "invalid",
+          "flags": [
+            "missing_items",
+            "score_not_calculable"
+          ]
+        },
+        "itemScores": [],
+        "scores": [
+          {
+            "key": "ipip_negative_expressivity10",
+            "type": "total",
+            "label": "消极情绪的外在表达",
+            "description": "消极情绪更容易外露的自述倾向，不等于症状更严重，也没有统一的优劣方向。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "value": null,
+            "range": {
+              "min": 10,
+              "max": 50
+            },
+            "expectedItems": [
+              "IPIP_NEGATIVE_EXPRESSIVITY10_01",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_02",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_03",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_04",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_05",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_06",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_07",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_08",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_09",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_10"
+            ],
+            "answeredItems": [],
+            "status": "not_calculable",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [],
+        "caveats": [
+          "中文研究译稿尚待人工审校与目标人群验证，目前仅供成人研究与自我了解。",
+          "习惯、文化、关系安全感和具体场合都会影响表达。这个中文工作译稿尚待审核与验证，没有诊断分界值，也不能据此判断情绪控制能力。",
+          "目前没有依据划分高低或人群排名；原英文研究的数据不是本中文版本的效度证明。",
+          "10题需完整回答；漏答不当作零分，也不代填。",
+          "至少一个 canonical score 无法计算，因此不提供解释或群体参考。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "仅供成人研究和描述性自我了解，不用于心理诊断、能力鉴定或高风险决策。"
+      }
+    },
+    {
+      "key": "ipip_responsive_distress10_zh_cn_research",
+      "version": "1.0.1",
+      "measurementHash": "5ad790661f6d1bd3d5ddeff28be876d4106b79fddcab9cbf14b2ce58f7114494",
+      "reportVersion": "1.0.1",
+      "fixture": "midpoint",
+      "status": "PASS",
+      "report": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "00000000-0000-4000-8000-000000000001",
+          "code": "ipip_responsive_distress10_zh_cn_research",
+          "name": "IPIP他人痛苦情绪反应10题（研究译稿）",
+          "instrumentVersion": "1.0.1"
+        },
+        "method": {
+          "scaleId": "00000000-0000-4000-8000-000000000001",
+          "instrumentVersion": "1.0.1",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.1",
+          "definitionHash": "5ad790661f6d1bd3d5ddeff28be876d4106b79fddcab9cbf14b2ce58f7114494",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_01",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_02",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_03",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_04",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_05",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_06",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_07",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_08",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_09",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_10",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          }
+        ],
+        "scores": [
+          {
+            "key": "ipip_responsive_distress10",
+            "type": "total",
+            "label": "面对他人痛苦时的情绪反应",
+            "description": "面对他人痛苦和紧张情境时自己情绪更容易受到触动的自述倾向，不是同理心、道德或实际帮助能力。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "value": 30,
+            "range": {
+              "min": 10,
+              "max": 50
+            },
+            "expectedItems": [
+              "IPIP_RESPONSIVE_DISTRESS10_01",
+              "IPIP_RESPONSIVE_DISTRESS10_02",
+              "IPIP_RESPONSIVE_DISTRESS10_03",
+              "IPIP_RESPONSIVE_DISTRESS10_04",
+              "IPIP_RESPONSIVE_DISTRESS10_05",
+              "IPIP_RESPONSIVE_DISTRESS10_06",
+              "IPIP_RESPONSIVE_DISTRESS10_07",
+              "IPIP_RESPONSIVE_DISTRESS10_08",
+              "IPIP_RESPONSIVE_DISTRESS10_09",
+              "IPIP_RESPONSIVE_DISTRESS10_10"
+            ],
+            "answeredItems": [
+              "IPIP_RESPONSIVE_DISTRESS10_01",
+              "IPIP_RESPONSIVE_DISTRESS10_02",
+              "IPIP_RESPONSIVE_DISTRESS10_03",
+              "IPIP_RESPONSIVE_DISTRESS10_04",
+              "IPIP_RESPONSIVE_DISTRESS10_05",
+              "IPIP_RESPONSIVE_DISTRESS10_06",
+              "IPIP_RESPONSIVE_DISTRESS10_07",
+              "IPIP_RESPONSIVE_DISTRESS10_08",
+              "IPIP_RESPONSIVE_DISTRESS10_09",
+              "IPIP_RESPONSIVE_DISTRESS10_10"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "ipip_responsive_distress10",
+            "headline": "别人的难处，会怎样触动你的心情",
+            "label": null,
+            "interpretation": "这份回答像一张情绪观察便签：当你看到别人难过、动物受伤，或遇到紧张场面时，自己的心情会怎样跟着变化？分数越高，表示自己的情绪更容易被这些场景触动；保持平静不代表冷漠，容易难过也不自动代表更善良或更会帮助别人。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回想一次别人向你诉苦：你既听到了对方的需要，也留意到自己的感受了吗？你的反应是否让你更能陪伴对方？"
+              },
+              {
+                "category": "strategy",
+                "text": "下次听到难过的事情，可以先问一句“你希望我陪你听一听，还是一起想办法？”如果自己也被情绪淹没，允许短暂休息，再决定能提供什么帮助。"
+              }
+            ],
+            "limitations": [
+              "中文研究译稿尚待人工审校与目标人群验证，目前仅供成人研究与自我了解。",
+              "来源英文研究中，这组题回答的一致程度有限，因此更适合谨慎探索，不适合据此给个人贴标签或做重要决定。中文译稿尚待审核与验证，没有项目常模或诊断分界值。",
+              "目前没有依据划分高低或人群排名；原英文研究的数据不是本中文版本的效度证明。",
+              "10题需完整回答；漏答不当作零分，也不代填。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "中文研究译稿尚待人工审校与目标人群验证，目前仅供成人研究与自我了解。",
+          "来源英文研究中，这组题回答的一致程度有限，因此更适合谨慎探索，不适合据此给个人贴标签或做重要决定。中文译稿尚待审核与验证，没有项目常模或诊断分界值。",
+          "目前没有依据划分高低或人群排名；原英文研究的数据不是本中文版本的效度证明。",
+          "10题需完整回答；漏答不当作零分，也不代填。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "仅供成人研究和描述性自我了解，不用于心理诊断、能力鉴定或高风险决策。"
+      },
+      "missingReport": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "00000000-0000-4000-8000-000000000001",
+          "code": "ipip_responsive_distress10_zh_cn_research",
+          "name": "IPIP他人痛苦情绪反应10题（研究译稿）",
+          "instrumentVersion": "1.0.1"
+        },
+        "method": {
+          "scaleId": "00000000-0000-4000-8000-000000000001",
+          "instrumentVersion": "1.0.1",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.1",
+          "definitionHash": "5ad790661f6d1bd3d5ddeff28be876d4106b79fddcab9cbf14b2ce58f7114494",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "invalid",
+          "flags": [
+            "missing_items",
+            "score_not_calculable"
+          ]
+        },
+        "itemScores": [],
+        "scores": [
+          {
+            "key": "ipip_responsive_distress10",
+            "type": "total",
+            "label": "面对他人痛苦时的情绪反应",
+            "description": "面对他人痛苦和紧张情境时自己情绪更容易受到触动的自述倾向，不是同理心、道德或实际帮助能力。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "value": null,
+            "range": {
+              "min": 10,
+              "max": 50
+            },
+            "expectedItems": [
+              "IPIP_RESPONSIVE_DISTRESS10_01",
+              "IPIP_RESPONSIVE_DISTRESS10_02",
+              "IPIP_RESPONSIVE_DISTRESS10_03",
+              "IPIP_RESPONSIVE_DISTRESS10_04",
+              "IPIP_RESPONSIVE_DISTRESS10_05",
+              "IPIP_RESPONSIVE_DISTRESS10_06",
+              "IPIP_RESPONSIVE_DISTRESS10_07",
+              "IPIP_RESPONSIVE_DISTRESS10_08",
+              "IPIP_RESPONSIVE_DISTRESS10_09",
+              "IPIP_RESPONSIVE_DISTRESS10_10"
+            ],
+            "answeredItems": [],
+            "status": "not_calculable",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [],
+        "caveats": [
+          "中文研究译稿尚待人工审校与目标人群验证，目前仅供成人研究与自我了解。",
+          "来源英文研究中，这组题回答的一致程度有限，因此更适合谨慎探索，不适合据此给个人贴标签或做重要决定。中文译稿尚待审核与验证，没有项目常模或诊断分界值。",
+          "目前没有依据划分高低或人群排名；原英文研究的数据不是本中文版本的效度证明。",
+          "10题需完整回答；漏答不当作零分，也不代填。",
+          "至少一个 canonical score 无法计算，因此不提供解释或群体参考。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "仅供成人研究和描述性自我了解，不用于心理诊断、能力鉴定或高风险决策。"
+      }
+    }
+  ]
+}

@@ -458,7 +458,7 @@
         ]
       },
       "report": {
-        "reportVersion": "1.0.0",
+        "reportVersion": "1.0.1",
         "primaryScoreKeys": [
           "ipip_responsive_distress10"
         ],
@@ -468,11 +468,11 @@
         "interpretations": [
           {
             "scoreKey": "ipip_responsive_distress10",
-            "headline": "面对他人痛苦时的情绪反应：从日常经历看自己的习惯",
+            "headline": "别人的难处，会怎样触动你的心情",
             "source": {
               "type": "score_only"
             },
-            "summary": "这份回答像一张情绪观察便签：当你看到别人难过、动物受伤，或遇到紧张场面时，自己的心情会怎样跟着变化？计分方向越高，表示自己的情绪更容易被这些场景触动；保持平静不代表冷漠，容易难过也不自动代表更善良或更会帮助别人。",
+            "summary": "这份回答像一张情绪观察便签：当你看到别人难过、动物受伤，或遇到紧张场面时，自己的心情会怎样跟着变化？分数越高，表示自己的情绪更容易被这些场景触动；保持平静不代表冷漠，容易难过也不自动代表更善良或更会帮助别人。",
             "bands": [],
             "guidance": [
               {

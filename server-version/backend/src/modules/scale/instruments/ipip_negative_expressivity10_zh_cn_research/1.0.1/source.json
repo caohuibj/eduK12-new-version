@@ -458,7 +458,7 @@
         ]
       },
       "report": {
-        "reportVersion": "1.0.0",
+        "reportVersion": "1.0.1",
         "primaryScoreKeys": [
           "ipip_negative_expressivity10"
         ],
@@ -468,11 +468,11 @@
         "interpretations": [
           {
             "scoreKey": "ipip_negative_expressivity10",
-            "headline": "消极情绪的外在表达：从日常经历看自己的习惯",
+            "headline": "难受的时候，别人有多容易看见你的感受",
             "source": {
               "type": "score_only"
             },
-            "summary": "这份回答关注的是：难过、害怕或生气时，别人有多容易看见你的感受。它不是在判断你是不是“情绪不好的人”。计分方向越高，表示这些感受越容易通过表情或行动流露；越少外露，也不等于更平静或更会调节。表达得多或少都没有统一的好坏答案。",
+            "summary": "这份回答关注的是：难过、害怕或生气时，别人有多容易看见你的感受。它不是在判断你是不是“情绪不好的人”。分数越高，表示这些感受越容易通过表情或行动流露；越少外露，也不等于更平静或更会调节。表达得多或少都没有统一的好坏答案。",
             "bands": [],
             "guidance": [
               {

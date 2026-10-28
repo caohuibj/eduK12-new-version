@@ -1,0 +1,28 @@
+import assert from 'node:assert/strict'
+import {readFileSync,writeFileSync} from 'node:fs'
+import {execFileSync} from 'node:child_process'
+import {scaleDefinitionSchema,hashScaleDefinition} from './src/modules/scale/scale-definition'
+import {buildScaleResult,parseScaleResultV2} from './src/modules/scale/scale-result'
+const root='../..',base='14b31f340008b1409d740ddc522592686e301650'
+const cases=[['ipip_empathic_concern10_zh_cn_research','1.0.0'],['ipip_emotion_based_decision9_zh_cn_research','1.0.1'],['ipip_negative_expressivity10_zh_cn_research','1.0.1'],['ipip_responsive_distress10_zh_cn_research','1.0.1']]
+const evidence=[]
+for(const [key,version] of cases){
+ const path=`server-version/backend/src/modules/scale/instruments/${key}/${version}/source.json`
+ const source=JSON.parse(readFileSync(`${root}/${path}`,'utf8'))
+ const old=JSON.parse(execFileSync('git',['show',`${base}:${path}`],{encoding:'utf8'}))
+ const definition=scaleDefinitionSchema.parse(source.executable.definition),prior=scaleDefinitionSchema.parse(old.executable.definition)
+ const restored=structuredClone(source);restored.executable.definition.report=old.executable.definition.report;assert.deepEqual(restored,old)
+ assert.equal(hashScaleDefinition(definition),hashScaleDefinition(prior));assert.notEqual(definition.report.reportVersion,prior.report.reportVersion)
+ const fixture=source.executable.goldenCases.find((c:any)=>c.expected.quality==='interpretable');assert(fixture)
+ const input={scaleId:'00000000-0000-4000-8000-000000000001',instrumentKey:key,instrumentVersion:version,name:source.catalog.identity.canonicalName,definition,referenceSets:[]}
+ const result=parseScaleResultV2(buildScaleResult({...input,answers:fixture.answers}))
+ for(const [scoreKey,value] of Object.entries(fixture.expected.scores))assert.equal(result.scores.find(s=>s.key===scoreKey)?.value,value)
+ assert.equal(result.method.reportVersion,definition.report.reportVersion)
+ assert.equal(result.interpretations[0].headline,definition.report.interpretations[0].headline)
+ assert.equal(result.interpretations[0].interpretation,definition.report.interpretations[0].summary)
+ const incomplete=parseScaleResultV2(buildScaleResult({...input,answers:[]}))
+ assert.equal(incomplete.quality.status,'invalid');assert.equal(incomplete.interpretations.length,0);assert(incomplete.scores.every(s=>s.value===null))
+ evidence.push({key,version,measurementHash:hashScaleDefinition(definition),reportVersion:definition.report.reportVersion,fixture:fixture.name,status:'PASS',report:result,missingReport:incomplete})
+}
+writeFileSync(`${root}/docs/scale-intake-batches/20261028-followup/report-validation.json`,JSON.stringify({base,node:process.version,scope:'Four changed reports: actual native schema, scorer, report builder and result parser; exact measurement identity unchanged; complete golden and missing response only. No DB/browser/formal CI.',results:evidence},null,2)+'\n')
+console.log('4 changed reports PASS: unchanged non-report payload and measurement hashes; native scorer/report complete and invalid results verified.')

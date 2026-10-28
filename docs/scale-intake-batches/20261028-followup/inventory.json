@@ -1,0 +1,736 @@
+{
+  "workflowVersion": "1.0.0",
+  "workflowCommit": "96918c6462382e15e813c8113cf06829dcc127ac",
+  "sourceHead": "14b31f340008b1409d740ddc522592686e301650",
+  "mainAtIntake": "9801107019d51a4af7ddb651789b674867539d24",
+  "sourcePrs": [
+    362,
+    367,
+    370,
+    371,
+    373,
+    375
+  ],
+  "aggregatePr": 379,
+  "uniqueNewestInstrumentCount": 26,
+  "notes": [
+    "This is a source inventory and bounded static check, not scorer execution or database installation.",
+    "The six source PRs are already aggregated by PR379; do not install them again as separate instruments.",
+    "Target real environment and authorized execution identity are pending confirmation."
+  ],
+  "records": [
+    {
+      "key": "ars30_2016_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ars30_2016_zh_cn_research/1.0.0/source.json",
+      "sourceGitBlob": "33c423f39f08ddb0706aa177ccc251554519c49c",
+      "sourceSha256": "6bd98d3462d23146ae258d171fc81ef7fa993f3493af2b5a7428b98ed9ef9477",
+      "itemCount": 30,
+      "scoreKeys": [
+        "adaptive_emotional_response",
+        "perseverance",
+        "reflection_help_seeking",
+        "total"
+      ],
+      "scoringVersion": "1.0.0",
+      "parameterPolicy": {
+        "type": "none"
+      },
+      "reportVersion": "1.0.0",
+      "goldenCaseCount": 5,
+      "limitedStaticChecks": {
+        "status": "PASS",
+        "issues": []
+      },
+      "currentRuntimeValidation": "NOT_RUN",
+      "databaseReadback": "NOT_QUERIED",
+      "installation": "UNKNOWN",
+      "publication": "UNKNOWN",
+      "reportEditorialReview": "READ_RETAIN_EXISTING"
+    },
+    {
+      "key": "bps9_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/bps9_zh_cn_research/1.0.0/source.json",
+      "sourceGitBlob": "9d76be4b760597a644f5af21f35e836baaa88a40",
+      "sourceSha256": "e6306dd5537786e28cd086aea62462ed7634627bc070f7c08d5c48df27c6dcb4",
+      "itemCount": 9,
+      "scoreKeys": [
+        "bedtime_procrastination"
+      ],
+      "scoringVersion": "1.0.0",
+      "parameterPolicy": {
+        "type": "none"
+      },
+      "reportVersion": "1.0.0",
+      "goldenCaseCount": 9,
+      "limitedStaticChecks": {
+        "status": "PASS",
+        "issues": []
+      },
+      "currentRuntimeValidation": "NOT_RUN",
+      "databaseReadback": "NOT_QUERIED",
+      "installation": "UNKNOWN",
+      "publication": "UNKNOWN",
+      "reportEditorialReview": "READ_RETAIN_EXISTING"
+    },
+    {
+      "key": "ipip_neo_c1_self_efficacy10_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_neo_c1_self_efficacy10_zh_cn_research/1.0.0/source.json",
+      "sourceGitBlob": "ad7f273512fae42aab9a129b319c04af7110d040",
+      "sourceSha256": "c1f67bc13ced80481a727d3321cdd3b94e4a8b363c5cf3c41e5689bf2b3b7294",
+      "itemCount": 10,
+      "scoreKeys": [
+        "ipip_neo_c1_self_efficacy10"
+      ],
+      "scoringVersion": "1.0.0",
+      "parameterPolicy": {
+        "type": "none"
+      },
+      "reportVersion": "1.0.1",
+      "goldenCaseCount": 3,
+      "limitedStaticChecks": {
+        "status": "PASS",
+        "issues": []
+      },
+      "currentRuntimeValidation": "NOT_RUN",
+      "databaseReadback": "NOT_QUERIED",
+      "installation": "UNKNOWN",
+      "publication": "UNKNOWN",
+      "reportEditorialReview": "READ_RETAIN_EXISTING"
+    },
+    {
+      "key": "ipip_neo_c5_self_discipline10_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_neo_c5_self_discipline10_zh_cn_research/1.0.0/source.json",
+      "sourceGitBlob": "e2c213b684891511ab5f45c25fb5ef1f789dc2bf",
+      "sourceSha256": "9225de562dc45d4fa58dc3da308a131d6c6bebd597d0b66092be62a0030ed0bf",
+      "itemCount": 10,
+      "scoreKeys": [
+        "task_self_discipline"
+      ],
+      "scoringVersion": "1.0.0",
+      "parameterPolicy": {
+        "type": "none"
+      },
+      "reportVersion": "1.0.0",
+      "goldenCaseCount": 3,
+      "limitedStaticChecks": {
+        "status": "PASS",
+        "issues": []
+      },
+      "currentRuntimeValidation": "NOT_RUN",
+      "databaseReadback": "NOT_QUERIED",
+      "installation": "UNKNOWN",
+      "publication": "UNKNOWN",
+      "reportEditorialReview": "READ_RETAIN_EXISTING"
+    },
+    {
+      "key": "ipip_nfc10_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_nfc10_zh_cn_research/1.0.0/source.json",
+      "sourceGitBlob": "fba466c4ed810047e4fe34d02a2da6343c07234b",
+      "sourceSha256": "435024c067dfe87775e0b310c58b5d955a9e939a1af3f800613171dd782fe60a",
+      "itemCount": 10,
+      "scoreKeys": [
+        "need_for_cognition"
+      ],
+      "scoringVersion": "1.0.0",
+      "parameterPolicy": {
+        "type": "none"
+      },
+      "reportVersion": "1.0.1",
+      "goldenCaseCount": 3,
+      "limitedStaticChecks": {
+        "status": "PASS",
+        "issues": []
+      },
+      "currentRuntimeValidation": "NOT_RUN",
+      "databaseReadback": "NOT_QUERIED",
+      "installation": "UNKNOWN",
+      "publication": "UNKNOWN",
+      "reportEditorialReview": "READ_RETAIN_EXISTING"
+    },
+    {
+      "key": "ipip_opt10_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_opt10_zh_cn_research/1.0.0/source.json",
+      "sourceGitBlob": "d040226fe053633fe57e8ef914974480d2594613",
+      "sourceSha256": "0d9042ad24058d0a7ccf1122df9c06ac365618295e8f6e75a0d2dc31257a3eb7",
+      "itemCount": 10,
+      "scoreKeys": [
+        "optimism"
+      ],
+      "scoringVersion": "1.0.0",
+      "parameterPolicy": {
+        "type": "none"
+      },
+      "reportVersion": "1.0.1",
+      "goldenCaseCount": 3,
+      "limitedStaticChecks": {
+        "status": "PASS",
+        "issues": []
+      },
+      "currentRuntimeValidation": "NOT_RUN",
+      "databaseReadback": "NOT_QUERIED",
+      "installation": "UNKNOWN",
+      "publication": "UNKNOWN",
+      "reportEditorialReview": "READ_RETAIN_EXISTING"
+    },
+    {
+      "key": "ipip_empathic_concern10_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_empathic_concern10_zh_cn_research/1.0.0/source.json",
+      "sourceGitBlob": "9aef0e98eea70423300a2fbbe22868f1f8547099",
+      "sourceSha256": "e696735b1eccf57e041a4c0a685a058781140093e019b7ec1064024b3061b075",
+      "itemCount": 10,
+      "scoreKeys": [
+        "ipip_empathic_concern10"
+      ],
+      "scoringVersion": "1.0.0",
+      "parameterPolicy": {
+        "type": "none"
+      },
+      "reportVersion": "1.0.1",
+      "goldenCaseCount": 5,
+      "limitedStaticChecks": {
+        "status": "PASS",
+        "issues": []
+      },
+      "currentRuntimeValidation": "PASS_CHANGED_REPORT_ONLY",
+      "databaseReadback": "NOT_QUERIED",
+      "installation": "UNKNOWN",
+      "publication": "UNKNOWN",
+      "reportEditorialReview": "REVISED_HEADLINE_AND_PLAIN_LANGUAGE",
+      "priorSourceSha256": "d8fae0cdb000b3089f194b07636b22a5a3673a173193e3da26913a1b57370993"
+    },
+    {
+      "key": "ipip_attending_emotions10_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_attending_emotions10_zh_cn_research/1.0.0/source.json",
+      "sourceGitBlob": "dd50cc0544cddc61c4b87627baf574689f0986a4",
+      "sourceSha256": "be11a371f14b101000fa7edd3413ad8c8de3da959326aa1537b3262404089808",
+      "itemCount": 10,
+      "scoreKeys": [
+        "ipip_attending_emotions10"
+      ],
+      "scoringVersion": "1.0.0",
+      "parameterPolicy": {
+        "type": "none"
+      },
+      "reportVersion": "1.0.1",
+      "goldenCaseCount": 3,
+      "limitedStaticChecks": {
+        "status": "PASS",
+        "issues": []
+      },
+      "currentRuntimeValidation": "NOT_RUN",
+      "databaseReadback": "NOT_QUERIED",
+      "installation": "UNKNOWN",
+      "publication": "UNKNOWN",
+      "reportEditorialReview": "READ_RETAIN_EXISTING"
+    },
+    {
+      "key": "apq42_parent_global_zh_cn_research",
+      "instrumentVersion": "1.0.1",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/apq42_parent_global_zh_cn_research/1.0.1/source.json",
+      "sourceGitBlob": "d02efb4fbfd47618675fa952ea0332c78e709417",
+      "sourceSha256": "13032dbb46a6bf895f4cb962b4cabddf7712e029881f8904e9981ff728c55563",
+      "itemCount": 42,
+      "scoreKeys": [
+        "corporal_punishment",
+        "inconsistent_discipline",
+        "involvement",
+        "poor_monitoring",
+        "positive_parenting"
+      ],
+      "scoringVersion": "1.0.0",
+      "parameterPolicy": {
+        "type": "none"
+      },
+      "reportVersion": "1.0.1",
+      "goldenCaseCount": 15,
+      "limitedStaticChecks": {
+        "status": "PASS",
+        "issues": []
+      },
+      "currentRuntimeValidation": "NOT_RUN",
+      "databaseReadback": "NOT_QUERIED",
+      "installation": "UNKNOWN",
+      "publication": "UNKNOWN",
+      "reportEditorialReview": "READ_RETAIN_EXISTING"
+    },
+    {
+      "key": "bpses5_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/bpses5_zh_cn_research/1.0.0/source.json",
+      "sourceGitBlob": "5b3090490f59c670939fcdb463cd8fcbcee3f762",
+      "sourceSha256": "db2b4fa65e75897ebb6f84e89f276c64bedf545912c2d9770ee5ba2dfa0b6220",
+      "itemCount": 5,
+      "scoreKeys": [
+        "total"
+      ],
+      "scoringVersion": "1.0.0",
+      "parameterPolicy": {
+        "type": "none"
+      },
+      "reportVersion": "1.0.0",
+      "goldenCaseCount": 7,
+      "limitedStaticChecks": {
+        "status": "PASS",
+        "issues": []
+      },
+      "currentRuntimeValidation": "NOT_RUN",
+      "databaseReadback": "NOT_QUERIED",
+      "installation": "UNKNOWN",
+      "publication": "UNKNOWN",
+      "reportEditorialReview": "READ_RETAIN_EXISTING"
+    },
+    {
+      "key": "brcs4_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/brcs4_zh_cn_research/1.0.0/source.json",
+      "sourceGitBlob": "61860ed9ba04e92218e83f3962fac6f1cd402369",
+      "sourceSha256": "2f371fcf26aa89d3bbbdff6fa8ee987cc54715375df27fee89b38a024aab45d9",
+      "itemCount": 4,
+      "scoreKeys": [
+        "resilient_coping"
+      ],
+      "scoringVersion": "1.0.0",
+      "parameterPolicy": {
+        "type": "none"
+      },
+      "reportVersion": "1.0.0",
+      "goldenCaseCount": 6,
+      "limitedStaticChecks": {
+        "status": "PASS",
+        "issues": []
+      },
+      "currentRuntimeValidation": "NOT_RUN",
+      "databaseReadback": "NOT_QUERIED",
+      "installation": "UNKNOWN",
+      "publication": "UNKNOWN",
+      "reportEditorialReview": "READ_RETAIN_EXISTING"
+    },
+    {
+      "key": "cfq7_zh_cn_research",
+      "instrumentVersion": "1.0.1",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/cfq7_zh_cn_research/1.0.1/source.json",
+      "sourceGitBlob": "c9755faefd6a9976a28b066c23cc8e67b172a38d",
+      "sourceSha256": "097a3dbbef82311542607538926310b64985ce17e3a124670bd6c4a4ab4ad052",
+      "itemCount": 7,
+      "scoreKeys": [
+        "total"
+      ],
+      "scoringVersion": "1.0.0",
+      "parameterPolicy": {
+        "type": "none"
+      },
+      "reportVersion": "1.0.1",
+      "goldenCaseCount": 5,
+      "limitedStaticChecks": {
+        "status": "PASS",
+        "issues": []
+      },
+      "currentRuntimeValidation": "NOT_RUN",
+      "databaseReadback": "NOT_QUERIED",
+      "installation": "UNKNOWN",
+      "publication": "UNKNOWN",
+      "reportEditorialReview": "READ_RETAIN_EXISTING"
+    },
+    {
+      "key": "dbt_wccl59_zh_tw_official_research",
+      "instrumentVersion": "1.0.1",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.1/source.json",
+      "sourceGitBlob": "4bc4ca86144ce287e750f2b91410c16b2beaf14d",
+      "sourceSha256": "cd7d66e49e3d22cb0a23fd947d18c6ea9069b5e6a86f436e11ea92fb660f5546",
+      "itemCount": 59,
+      "scoreKeys": [
+        "dcs1",
+        "dcs2",
+        "dss"
+      ],
+      "scoringVersion": "1.0.0",
+      "parameterPolicy": {
+        "type": "none"
+      },
+      "reportVersion": "1.0.1",
+      "goldenCaseCount": 12,
+      "limitedStaticChecks": {
+        "status": "PASS",
+        "issues": []
+      },
+      "currentRuntimeValidation": "NOT_RUN",
+      "databaseReadback": "NOT_QUERIED",
+      "installation": "UNKNOWN",
+      "publication": "UNKNOWN",
+      "reportEditorialReview": "READ_RETAIN_EXISTING"
+    },
+    {
+      "key": "djgls6_zh_cn_research",
+      "instrumentVersion": "1.0.1",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/djgls6_zh_cn_research/1.0.1/source.json",
+      "sourceGitBlob": "657f3a0ff5e2cadfa6f979667f1fb900ac45c602",
+      "sourceSha256": "b6b16ea4c28cccfb795af036ec675ad33143db868fc1f9c4912bc0ba04e337de",
+      "itemCount": 6,
+      "scoreKeys": [
+        "emotional",
+        "loneliness",
+        "social"
+      ],
+      "scoringVersion": "1.0.0",
+      "parameterPolicy": {
+        "type": "none"
+      },
+      "reportVersion": "1.0.1",
+      "goldenCaseCount": 5,
+      "limitedStaticChecks": {
+        "status": "PASS",
+        "issues": []
+      },
+      "currentRuntimeValidation": "NOT_RUN",
+      "databaseReadback": "NOT_QUERIED",
+      "installation": "UNKNOWN",
+      "publication": "UNKNOWN",
+      "reportEditorialReview": "READ_RETAIN_EXISTING"
+    },
+    {
+      "key": "ebq16_zh_cn_research",
+      "instrumentVersion": "1.0.2",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ebq16_zh_cn_research/1.0.2/source.json",
+      "sourceGitBlob": "37928b526c1d165bd949ba57f38cfe645c0ee8cd",
+      "sourceSha256": "fcf25fd4ed02e10d3f284344eb1b577afff45d176168bfd739ee525b395e48ec",
+      "itemCount": 16,
+      "scoreKeys": [
+        "general_controllability",
+        "general_usefulness",
+        "neg_controllability",
+        "neg_usefulness",
+        "pos_controllability",
+        "pos_usefulness",
+        "total"
+      ],
+      "scoringVersion": "1.0.0",
+      "parameterPolicy": {
+        "type": "none"
+      },
+      "reportVersion": "1.0.4",
+      "goldenCaseCount": 6,
+      "limitedStaticChecks": {
+        "status": "PASS",
+        "issues": []
+      },
+      "currentRuntimeValidation": "NOT_RUN",
+      "databaseReadback": "NOT_QUERIED",
+      "installation": "UNKNOWN",
+      "publication": "UNKNOWN",
+      "reportEditorialReview": "READ_RETAIN_EXISTING"
+    },
+    {
+      "key": "ipip_emotion_based_decision9_zh_cn_research",
+      "instrumentVersion": "1.0.1",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_emotion_based_decision9_zh_cn_research/1.0.1/source.json",
+      "sourceGitBlob": "b02e9513e63036e5be9b399e76ad45718c51cd80",
+      "sourceSha256": "d1d4c30638767c0bb85499c129dfe015d15e8d5f71c393f4b8cddd2b7efb044e",
+      "itemCount": 9,
+      "scoreKeys": [
+        "ipip_emotion_based_decision9"
+      ],
+      "scoringVersion": "1.0.0",
+      "parameterPolicy": {
+        "type": "none"
+      },
+      "reportVersion": "1.0.1",
+      "goldenCaseCount": 5,
+      "limitedStaticChecks": {
+        "status": "PASS",
+        "issues": []
+      },
+      "currentRuntimeValidation": "PASS_CHANGED_REPORT_ONLY",
+      "databaseReadback": "NOT_QUERIED",
+      "installation": "UNKNOWN",
+      "publication": "UNKNOWN",
+      "reportEditorialReview": "REVISED_HEADLINE_AND_PLAIN_LANGUAGE",
+      "priorSourceSha256": "fc35ef54f3d0ddb142cd63708b872568b42742551770f4f84b56e706a8e95d87"
+    },
+    {
+      "key": "ipip_negative_expressivity10_zh_cn_research",
+      "instrumentVersion": "1.0.1",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_negative_expressivity10_zh_cn_research/1.0.1/source.json",
+      "sourceGitBlob": "611345abdbbf24f9606a9746805a3aeebe3e8f48",
+      "sourceSha256": "b1c1e9c5ac4d0f4292e6c90e0311228750246861e6e7c11ab53199c1505cfc87",
+      "itemCount": 10,
+      "scoreKeys": [
+        "ipip_negative_expressivity10"
+      ],
+      "scoringVersion": "1.0.0",
+      "parameterPolicy": {
+        "type": "none"
+      },
+      "reportVersion": "1.0.1",
+      "goldenCaseCount": 5,
+      "limitedStaticChecks": {
+        "status": "PASS",
+        "issues": []
+      },
+      "currentRuntimeValidation": "PASS_CHANGED_REPORT_ONLY",
+      "databaseReadback": "NOT_QUERIED",
+      "installation": "UNKNOWN",
+      "publication": "UNKNOWN",
+      "reportEditorialReview": "REVISED_HEADLINE_AND_PLAIN_LANGUAGE",
+      "priorSourceSha256": "f999fd7b0690224f4abdd441d9560df6441c2bcc84471782b75b1e1a147905a4"
+    },
+    {
+      "key": "ipip_positive_expressivity9_zh_cn_research",
+      "instrumentVersion": "1.0.1",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_positive_expressivity9_zh_cn_research/1.0.1/source.json",
+      "sourceGitBlob": "9d04b97bc199d87d01856b25b7370f378f22bf70",
+      "sourceSha256": "95ebdfc943edd53639fa8adbd49718c60d7aee29c7f063085b33619fa57018f2",
+      "itemCount": 9,
+      "scoreKeys": [
+        "ipip_positive_expressivity9"
+      ],
+      "scoringVersion": "1.0.0",
+      "parameterPolicy": {
+        "type": "none"
+      },
+      "reportVersion": "1.0.1",
+      "goldenCaseCount": 5,
+      "limitedStaticChecks": {
+        "status": "PASS",
+        "issues": []
+      },
+      "currentRuntimeValidation": "NOT_RUN",
+      "databaseReadback": "NOT_QUERIED",
+      "installation": "UNKNOWN",
+      "publication": "UNKNOWN",
+      "reportEditorialReview": "READ_RETAIN_EXISTING"
+    },
+    {
+      "key": "ipip_responsive_distress10_zh_cn_research",
+      "instrumentVersion": "1.0.1",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_responsive_distress10_zh_cn_research/1.0.1/source.json",
+      "sourceGitBlob": "390e7d6750e0613b8f6cb9f5af07491b404006d8",
+      "sourceSha256": "f5b6e8e41fa8bfcd6be31e14c21febf82612adf7f3fb727aeb04f55441b13abf",
+      "itemCount": 10,
+      "scoreKeys": [
+        "ipip_responsive_distress10"
+      ],
+      "scoringVersion": "1.0.0",
+      "parameterPolicy": {
+        "type": "none"
+      },
+      "reportVersion": "1.0.1",
+      "goldenCaseCount": 5,
+      "limitedStaticChecks": {
+        "status": "PASS",
+        "issues": []
+      },
+      "currentRuntimeValidation": "PASS_CHANGED_REPORT_ONLY",
+      "databaseReadback": "NOT_QUERIED",
+      "installation": "UNKNOWN",
+      "publication": "UNKNOWN",
+      "reportEditorialReview": "REVISED_HEADLINE_AND_PLAIN_LANGUAGE",
+      "priorSourceSha256": "e9df843e53ef5761494bf07f4c4d448ae236ab84eb7b43a4105c32f6ec6ac139"
+    },
+    {
+      "key": "ipip_responsive_joy10_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_responsive_joy10_zh_cn_research/1.0.0/source.json",
+      "sourceGitBlob": "7c5fa6229db2debedeebe1377cf9d7fa01063717",
+      "sourceSha256": "bdc9e05a94bf4b9646cb2e3fab7ee379184da69782bfbcbca3e86f35d9c7c2e6",
+      "itemCount": 10,
+      "scoreKeys": [
+        "ipip_responsive_joy10"
+      ],
+      "scoringVersion": "1.0.0",
+      "parameterPolicy": {
+        "type": "none"
+      },
+      "reportVersion": "1.0.1",
+      "goldenCaseCount": 3,
+      "limitedStaticChecks": {
+        "status": "PASS",
+        "issues": []
+      },
+      "currentRuntimeValidation": "NOT_RUN",
+      "databaseReadback": "NOT_QUERIED",
+      "installation": "UNKNOWN",
+      "publication": "UNKNOWN",
+      "reportEditorialReview": "READ_RETAIN_EXISTING"
+    },
+    {
+      "key": "kseg6_zh_cn_research",
+      "instrumentVersion": "1.0.1",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/kseg6_zh_cn_research/1.0.1/source.json",
+      "sourceGitBlob": "0e135ec768b17af7ed1c331559be62ed123f5b87",
+      "sourceSha256": "c411659f3ecf355ee3c11204e9bd4c7ad5c571f44a4e03c24c3a5d32ee332dd8",
+      "itemCount": 6,
+      "scoreKeys": [
+        "negative_admission_raw",
+        "positive_endorsement"
+      ],
+      "scoringVersion": "1.0.0",
+      "parameterPolicy": {
+        "type": "none"
+      },
+      "reportVersion": "1.0.1",
+      "goldenCaseCount": 5,
+      "limitedStaticChecks": {
+        "status": "PASS",
+        "issues": []
+      },
+      "currentRuntimeValidation": "NOT_RUN",
+      "databaseReadback": "NOT_QUERIED",
+      "installation": "UNKNOWN",
+      "publication": "UNKNOWN",
+      "reportEditorialReview": "READ_RETAIN_EXISTING"
+    },
+    {
+      "key": "maia2_37_zh_cn_research",
+      "instrumentVersion": "1.0.1",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/maia2_37_zh_cn_research/1.0.1/source.json",
+      "sourceGitBlob": "af278ab324ed7bd18ee65b56f27736247c2c4855",
+      "sourceSha256": "eb69bb29aacf58cc9fdf4fb728de99b4bd7ae34fe7994085ef50f521c9e56ae0",
+      "itemCount": 37,
+      "scoreKeys": [
+        "attention_regulation",
+        "body_listening",
+        "emotional_awareness",
+        "not_distracting",
+        "not_worrying",
+        "noticing",
+        "self_regulation",
+        "trusting"
+      ],
+      "scoringVersion": "1.0.0",
+      "parameterPolicy": {
+        "type": "none"
+      },
+      "reportVersion": "1.0.0",
+      "goldenCaseCount": 8,
+      "limitedStaticChecks": {
+        "status": "PASS",
+        "issues": []
+      },
+      "currentRuntimeValidation": "NOT_RUN",
+      "databaseReadback": "NOT_QUERIED",
+      "installation": "UNKNOWN",
+      "publication": "UNKNOWN",
+      "reportEditorialReview": "READ_RETAIN_EXISTING"
+    },
+    {
+      "key": "psyflex6_zh_cn_research",
+      "instrumentVersion": "1.0.1",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/psyflex6_zh_cn_research/1.0.1/source.json",
+      "sourceGitBlob": "007ad1dfd5b3aeb606f22d447ac36b4a2c52b39c",
+      "sourceSha256": "778a1d7f4f181e9a25c4041767dfd79f21230620746f694cc75d7e9bf6386210",
+      "itemCount": 6,
+      "scoreKeys": [
+        "total"
+      ],
+      "scoringVersion": "1.0.0",
+      "parameterPolicy": {
+        "type": "none"
+      },
+      "reportVersion": "1.0.0",
+      "goldenCaseCount": 5,
+      "limitedStaticChecks": {
+        "status": "PASS",
+        "issues": []
+      },
+      "currentRuntimeValidation": "NOT_RUN",
+      "databaseReadback": "NOT_QUERIED",
+      "installation": "UNKNOWN",
+      "publication": "UNKNOWN",
+      "reportEditorialReview": "READ_RETAIN_EXISTING"
+    },
+    {
+      "key": "spane12_zh_cn_research",
+      "instrumentVersion": "1.0.1",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.1/source.json",
+      "sourceGitBlob": "c2cb9e5b4206443a0e1f44a6456358fb16fee65b",
+      "sourceSha256": "e250bbf45ccc05980494cfc8dc83f3cd15805a054ff2dbd59cbf094723025705",
+      "itemCount": 12,
+      "scoreKeys": [
+        "spane_b",
+        "spane_n",
+        "spane_p"
+      ],
+      "scoringVersion": "1.0.0",
+      "parameterPolicy": {
+        "type": "none"
+      },
+      "reportVersion": "1.0.1",
+      "goldenCaseCount": 9,
+      "limitedStaticChecks": {
+        "status": "PASS",
+        "issues": []
+      },
+      "currentRuntimeValidation": "NOT_RUN",
+      "databaseReadback": "NOT_QUERIED",
+      "installation": "UNKNOWN",
+      "publication": "UNKNOWN",
+      "reportEditorialReview": "READ_RETAIN_EXISTING"
+    },
+    {
+      "key": "sswq16_zh_cn_research",
+      "instrumentVersion": "1.0.1",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/sswq16_zh_cn_research/1.0.1/source.json",
+      "sourceGitBlob": "0e909b68004afa246aae3f41971bef90bce58970",
+      "sourceSha256": "d4256b5c0c3de791b85cd24c6392d99ce998705c1f4926ca39508d45f905a675",
+      "itemCount": 16,
+      "scoreKeys": [
+        "AE",
+        "EP",
+        "JL",
+        "SC",
+        "school_wellbeing"
+      ],
+      "scoringVersion": "1.0.0",
+      "parameterPolicy": {
+        "type": "none"
+      },
+      "reportVersion": "1.0.1",
+      "goldenCaseCount": 4,
+      "limitedStaticChecks": {
+        "status": "PASS",
+        "issues": []
+      },
+      "currentRuntimeValidation": "NOT_RUN",
+      "databaseReadback": "NOT_QUERIED",
+      "installation": "UNKNOWN",
+      "publication": "UNKNOWN",
+      "reportEditorialReview": "READ_RETAIN_EXISTING"
+    },
+    {
+      "key": "dbt_wccl59_zh_cn_research",
+      "instrumentVersion": "1.0.2",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_cn_research/1.0.2/source.json",
+      "sourceGitBlob": "65fa7348627e396ff8aa04331e05c66a6d084f69",
+      "sourceSha256": "7ae5b56cf1c59ee86620f58d17aca99820ef1fb097e4270b007255580c8765d3",
+      "itemCount": 59,
+      "scoreKeys": [
+        "dcs1",
+        "dcs2",
+        "dss"
+      ],
+      "scoringVersion": "1.0.0",
+      "parameterPolicy": {
+        "type": "none"
+      },
+      "reportVersion": "1.0.3",
+      "goldenCaseCount": 12,
+      "limitedStaticChecks": {
+        "status": "PASS",
+        "issues": []
+      },
+      "currentRuntimeValidation": "NOT_RUN",
+      "databaseReadback": "NOT_QUERIED",
+      "installation": "UNKNOWN",
+      "publication": "UNKNOWN",
+      "reportEditorialReview": "READ_RETAIN_EXISTING"
+    }
+  ]
+}

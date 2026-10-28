@@ -1,0 +1,48 @@
+{
+  "reportVersion": "1.0.0",
+  "primaryScoreKeys": [
+    "ipip_emotion_based_decision9"
+  ],
+  "scoreOrder": [
+    "ipip_emotion_based_decision9"
+  ],
+  "interpretations": [
+    {
+      "scoreKey": "ipip_emotion_based_decision9",
+      "headline": "感受与逻辑的决策偏好：从日常经历看自己的习惯",
+      "source": {
+        "type": "score_only"
+      },
+      "summary": "做决定时，你更容易先问“我有什么感受”，还是“事实和理由是什么”？这份回答描述你通常偏向哪种参考方式，不评判哪种方式更聪明。计分方向越高，表示你越倾向依据感受做决定；较低则更倾向依据事实与逻辑。两者都可能提供有用信息，结果不是决策能力的好坏标签。",
+      "bands": [],
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "想一想最近一次选择：当时有哪些事实？又有哪些感受或期待？它们是互相支持，还是指向不同方向？"
+        },
+        {
+          "category": "strategy",
+          "text": "下次面对一个日常小选择，可以分别写下“已知事实”和“我的感受”，再看看是否还有需要了解的信息。无需强迫自己只选一种依据。"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "中文研究译稿尚待人工审校与目标人群验证，目前仅供成人研究与自我了解。",
+    "不用于判断冲动性、情绪调节能力或临床风险。该中文工作译稿尚待审核与验证，没有可用的项目常模或分界值。",
+    "目前没有依据划分高低或人群排名；原英文研究的数据不是本中文版本的效度证明。",
+    "9题需完整回答；漏答不当作零分，也不代填。"
+  ],
+  "disclaimer": "仅供成人研究和描述性自我了解，不用于心理诊断、能力鉴定或高风险决策。",
+  "audienceContract": {
+    "schemaVersion": 1,
+    "respondent": "ADULT_SELF",
+    "audience": "student",
+    "locale": "zh-CN",
+    "qcReview": {
+      "reviewer": "AI-assisted local editorial check (not human expert review)",
+      "reviewedAt": "2026-10-25T16:18:00Z",
+      "basis": "AI editorial check only: descriptive adult reflection, no norms, diagnostic/ability/moral labels or therapy claims; not human expert translation or psychometric review."
+    }
+  }
+}
