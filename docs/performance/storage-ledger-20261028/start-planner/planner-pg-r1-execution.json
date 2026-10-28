@@ -1,0 +1,9 @@
+{
+  "exitCode": 0,
+  "seconds": 8.342306600010488,
+  "head": "01d61bddb7c306bfbe3e2f4eda2d792c784aec83",
+  "postgres": "17.11",
+  "redis": "8.0.2",
+  "node": "v24.22.1",
+  "scope": "New planner-bound source: two actual School/Teacher START/FINAL/report chains; HTTP identity and final image bytes mocked in original fixture, not browser/login acceptance"
+}

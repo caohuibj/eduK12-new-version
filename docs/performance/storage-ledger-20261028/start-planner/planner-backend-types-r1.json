@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "node",
+    "node_modules/typescript/bin/tsc",
+    "--noEmit"
+  ],
+  "actualInvocation": [
+    "./node_modules/.bin/tsc",
+    "--noEmit"
+  ],
+  "exitCode": 0,
+  "componentTree": "b7fe981eea351ebb94232571479894e921e53bcd",
+  "node": "v24.22.1",
+  "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "sourceAssociationBasis": "Retrospective exact source tree association after actual shell exit0. Compiler inputs unchanged since invocation. Original execution unsigned."
+}

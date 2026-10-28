@@ -1,0 +1,28 @@
+{
+  "scope": "Existing owned synthetic completed Teacher SELF record; current authority only, no START/FINAL/report replay; mutation branches explicitly roll back",
+  "cases": [
+    {
+      "name": "current authority and pooled setting restored",
+      "status": "PASS",
+      "before": {
+        "pid": 51,
+        "value": "8"
+      },
+      "after": {
+        "pid": 51,
+        "value": "8"
+      },
+      "ms": 44.80551000000003
+    },
+    {
+      "name": "expired-intake remains denied and diagnostic mutation rolled back",
+      "status": "PASS"
+    },
+    {
+      "name": "frozen-actor remains denied and diagnostic mutation rolled back",
+      "status": "PASS"
+    }
+  ],
+  "completed": true,
+  "immutableFinalCountUnchanged": 30
+}
