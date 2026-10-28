@@ -1,0 +1,3950 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "apq42_parent_global_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "请根据你家中通常出现的情形回答以下关于亲子相处的说法。1表示从不，2几乎从不，3有时，4经常，5总是。尽量回答全部问题；不存在正确或错误的答案。",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "LSU APQ Parent Global原文指导语的独立简体中文工作译稿，非作者核准中文版。"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "阿拉巴马教养问卷APQ父母Global 42题（简体中文研究工作稿）",
+      "abbreviation": "APQ42-PARENT-GLOBAL-ZH-WORKING",
+      "instrumentFamily": "Alabama Parenting Questionnaire Parent Global, not Child Global/Telephone/APQ9"
+    },
+    "construct": {
+      "primaryDomain": "PARENT_OBSERVATION",
+      "secondaryDomains": [
+        "SOCIAL_EMOTIONAL"
+      ],
+      "constructDefinition": "父母报告的五种教养行为维度：参与、积极教养、监督不足、管教不一致、体罚；其余7题为Other Discipline独立记录，不是第六维，也不生成42题总分。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "domain:parenting",
+        "domain:family_relationships",
+        "domain:parent_observation",
+        "construct:parenting_practices",
+        "construct:apq42_parent_global",
+        "construct:involvement",
+        "construct:positive_parenting",
+        "construct:poor_monitoring",
+        "construct:inconsistent_discipline",
+        "construct:corporal_punishment",
+        "construct:7_other_discipline_unscored",
+        "orientation:behavioral_parenting",
+        "orientation:not_therapy_specific",
+        "orientation:not_diagnostic",
+        "population:parent_caregiver",
+        "population:child_6_13_original_scope",
+        "population:parent_global_not_child_form",
+        "response:parent_report",
+        "response:42_items",
+        "response:fixed_original_order",
+        "response:five_point_frequency",
+        "response:five_scored_dimensions",
+        "response:no_reverse",
+        "response:no_total",
+        "response:complete_required_platform",
+        "use:research",
+        "use:parent_reflection",
+        "use:no_clinical_norm",
+        "use:no_selection",
+        "license:author_contact_required",
+        "license:copyrighted_original",
+        "license:translation_review_pending",
+        "license:electronic_format_review_pending",
+        "license:github_redistribution_pending",
+        "language_validation:en_original",
+        "language_validation:zh-CN_working",
+        "language_validation:expert_review_pending",
+        "language_validation:population_validation_pending",
+        "家长教养",
+        "父母报告",
+        "积极教养",
+        "亲子参与",
+        "监督不足",
+        "管教不一致",
+        "体罚",
+        "其他管教",
+        "五维",
+        "没有总分",
+        "未验证译本"
+      ]
+    },
+    "population": {
+      "minAge": 6,
+      "maxAge": 13,
+      "respondentTypes": [
+        "PARENT"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "原版开发涉及小学年龄儿童与家长。本站保守限定被评价儿童6–13岁，由其家长填写；新译文未经中国家庭或其他年龄验证。"
+    },
+    "administration": {
+      "itemCount": 42,
+      "estimatedMinutes": 10,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED"
+      ],
+      "timeFrame": "家庭通常的情况，原版无固定天数回顾窗",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "仅原作者Parent Global父母报告42题而不是儿童版、教师版或APQ9。",
+        "1 Never/2 Almost Never/3 Sometimes/4 Often/5 Always，不随机题序或选项。",
+        "五维按原题号求和，体罚第33、35、38题；第39题属Other Discipline，不用错误的网上39体罚键。",
+        "34/36/37/39/40/41/42是其他管教行为，不生成第六维、42题总分。",
+        "全维答完方计分是本站平台保守规则，非作者正式缺失阈值。",
+        "简体中文译文、电子实施格式、公开GitHub题文再分发由管理员核定。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "中文译文未经测量等值审查。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "用于理解日常教养实践，不做父母评级。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "apq-parent-global-1996",
+        "evidenceType": "CONTENT_VALIDITY",
+        "population": "原英语版小学年龄儿童家庭（非本站简体中文验证）",
+        "locale": "en",
+        "territory": "ZZ",
+        "studyDesign": "官方Parent Global42题原格式及五维题号与其他7题身份",
+        "rating": "UNKNOWN",
+        "citation": "Shelton, K. K., Frick, P. J., & Wootton, J. (1996). Assessment of parenting practices in families of elementary school-aged children. Journal of Clinical Child Psychology, 25(3), 317–329. https://doi.org/10.1207/s15374424jccp2503_8",
+        "doi": "10.1207/s15374424jccp2503_8",
+        "url": "https://faculty.lsu.edu/pfricklab/pdfs/alabamaparenting-pdfs/apg-parent-form.pdf"
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "官方Parent Global PDF：https://faculty.lsu.edu/pfricklab/pdfs/alabamaparenting-pdfs/apg-parent-form.pdf；本站独立简体中文研究工作稿。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "原作者要求英文原文不改动；当前翻译不是授权中文版，翻译权/研究电子化及格式审查待管理员处理。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "apq42_parent_global_zh_cn_research-1.0.0",
+    "respondentTypes": [
+      "PARENT"
+    ],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 72,
+        "maxInclusive": 167
+      }
+    },
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "apq42_parent_global_zh_cn_research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "apq42_parent_global_zh_cn_research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "translation",
+      "display"
+    ],
+    "notes": [
+      "原作者LSU公开供研究者免费取得原始42题父母Global版，但要求指导语、原英语题文措辞及答案格式不变。本平台独立制作的简体中文研究译稿不属于已经核准的原版或正式汉化；原版电子呈现是否改变format、翻译/译者许可、对被试展示与导出、商业场景和公开GitHub完整题文再分发须由管理员逐项向作者确认。已取得题本不等于获得全部许可，不伪称已获许可或已被禁止。",
+      "管理员处理授权，不能自动视为DRAFT开发门禁或正式施测许可。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "parent_global_report",
+      "source": {
+        "title": "APQ original Parent Global 42; independent simplified Chinese draft",
+        "citation": "Shelton, K. K., Frick, P. J., & Wootton, J. (1996). Assessment of parenting practices in families of elementary school-aged children. Journal of Clinical Child Psychology, 25(3), 317–329. https://doi.org/10.1207/s15374424jccp2503_8",
+        "url": "https://faculty.lsu.edu/pfricklab/pdfs/alabamaparenting-pdfs/apg-parent-form.pdf",
+        "publicationYear": 1996
+      },
+      "license": {
+        "status": "unknown",
+        "redistribution": "restricted",
+        "note": "原作者LSU公开供研究者免费取得原始42题父母Global版，但要求指导语、原英语题文措辞及答案格式不变。本平台独立制作的简体中文研究译稿不属于已经核准的原版或正式汉化；原版电子呈现是否改变format、翻译/译者许可、对被试展示与导出、商业场景和公开GitHub完整题文再分发须由管理员逐项向作者确认。已取得题本不等于获得全部许可，不伪称已获许可或已被禁止。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "apq42_1_5",
+          "options": [
+            {
+              "value": "1",
+              "label": "从不",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "几乎从不",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "有时",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "经常",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "总是",
+              "score": 5
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "APQ42_01",
+          "content": "你会和孩子友好地交谈。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 0,
+          "responseSetKey": "apq42_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "APQ42_02",
+          "content": "当孩子把某件事做得不错时，你会让孩子知道这一点。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 1,
+          "responseSetKey": "apq42_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "APQ42_03",
+          "content": "你威胁要惩罚孩子，但后来没有真的惩罚。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 2,
+          "responseSetKey": "apq42_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "APQ42_04",
+          "content": "你会主动协助孩子参加的特别活动（例如体育、童子军或青少年团体活动）。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 3,
+          "responseSetKey": "apq42_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "APQ42_05",
+          "content": "孩子听话或表现良好时，你会给予额外奖励或东西。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 4,
+          "responseSetKey": "apq42_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "APQ42_06",
+          "content": "孩子外出时没有留下字条或告诉你要去哪里。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 5,
+          "responseSetKey": "apq42_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "APQ42_07",
+          "content": "你会和孩子玩游戏，或一起做其他有趣的事情。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 6,
+          "responseSetKey": "apq42_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "APQ42_08",
+          "content": "孩子做错事后会说服你不要惩罚自己。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 7,
+          "responseSetKey": "apq42_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "APQ42_09",
+          "content": "你会问孩子当天在学校过得怎样。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 8,
+          "responseSetKey": "apq42_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "APQ42_10",
+          "content": "孩子晚上超过规定的时间才回家。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 9,
+          "responseSetKey": "apq42_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "APQ42_11",
+          "content": "你会帮助孩子做家庭作业。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 10,
+          "responseSetKey": "apq42_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "APQ42_12",
+          "content": "你认为让孩子服从你的要求太费劲，不值得这样做。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 11,
+          "responseSetKey": "apq42_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "APQ42_13",
+          "content": "孩子做得好时，你会称赞孩子。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 12,
+          "responseSetKey": "apq42_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "APQ42_14",
+          "content": "你会问孩子明天有什么计划。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 13,
+          "responseSetKey": "apq42_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "APQ42_15",
+          "content": "你会开车送孩子去参加某项特别活动。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 14,
+          "responseSetKey": "apq42_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "APQ42_16",
+          "content": "孩子表现好时，你会表扬孩子。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 15,
+          "responseSetKey": "apq42_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "APQ42_17",
+          "content": "孩子会和你不认识的朋友外出。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 16,
+          "responseSetKey": "apq42_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "APQ42_18",
+          "content": "孩子做得好时，你会拥抱或亲吻孩子。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 17,
+          "responseSetKey": "apq42_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "APQ42_19",
+          "content": "孩子外出时没有设定回家的时间。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 18,
+          "responseSetKey": "apq42_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "APQ42_20",
+          "content": "你会和孩子谈论孩子的朋友。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 19,
+          "responseSetKey": "apq42_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "APQ42_21",
+          "content": "天黑以后，孩子会在没有成年人陪同的情况下外出。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 20,
+          "responseSetKey": "apq42_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "APQ42_22",
+          "content": "你会提前结束对孩子的惩罚（例如提前解除原先规定的限制）。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 21,
+          "responseSetKey": "apq42_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "APQ42_23",
+          "content": "孩子会帮忙筹划家庭活动。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 22,
+          "responseSetKey": "apq42_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "APQ42_24",
+          "content": "你会忙到忘记孩子在哪里、正在做什么。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 23,
+          "responseSetKey": "apq42_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "APQ42_25",
+          "content": "孩子做错事后，没有受到惩罚。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 24,
+          "responseSetKey": "apq42_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "APQ42_26",
+          "content": "你会参加家长教师协会会议、家长会或孩子学校举办的其他会议。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 25,
+          "responseSetKey": "apq42_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "APQ42_27",
+          "content": "孩子帮忙做家务时，你会告诉孩子你喜欢这样的举动。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 26,
+          "responseSetKey": "apq42_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "APQ42_28",
+          "content": "你没有检查孩子是否按规定时间回家。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 27,
+          "responseSetKey": "apq42_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "APQ42_29",
+          "content": "你出门时不告诉孩子要去哪里。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 28,
+          "responseSetKey": "apq42_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "APQ42_30",
+          "content": "孩子放学回家，会比你预计的时间晚一个多小时。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 29,
+          "responseSetKey": "apq42_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "APQ42_31",
+          "content": "你给孩子的惩罚取决于你当时的心情。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 30,
+          "responseSetKey": "apq42_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "APQ42_32",
+          "content": "孩子在家时没有成年人监督。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 31,
+          "responseSetKey": "apq42_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "APQ42_33",
+          "content": "孩子做错事时，你会用手打孩子的屁股。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 32,
+          "responseSetKey": "apq42_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "APQ42_34",
+          "content": "孩子行为不当时，你会不理睬孩子。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 33,
+          "responseSetKey": "apq42_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "APQ42_35",
+          "content": "孩子做错事时，你会扇孩子耳光。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 34,
+          "responseSetKey": "apq42_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "APQ42_36",
+          "content": "你会通过取消孩子的某些权利或收走钱来惩罚孩子。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 35,
+          "responseSetKey": "apq42_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "APQ42_37",
+          "content": "你会让孩子回自己的房间，作为惩罚。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 36,
+          "responseSetKey": "apq42_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "APQ42_38",
+          "content": "孩子做错事时，你会用皮带、树枝或其他物品打孩子。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 37,
+          "responseSetKey": "apq42_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "APQ42_39",
+          "content": "孩子做错事时，你会对孩子大喊或尖叫。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 38,
+          "responseSetKey": "apq42_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "APQ42_40",
+          "content": "孩子行为不当时，你会平静地解释为什么那样做不对。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 39,
+          "responseSetKey": "apq42_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "APQ42_41",
+          "content": "你会用“暂停”（让孩子坐在或站在角落）作为惩罚。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 40,
+          "responseSetKey": "apq42_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "APQ42_42",
+          "content": "你会让孩子额外做家务，作为惩罚。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 41,
+          "responseSetKey": "apq42_1_5",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "itemRules": [
+          {
+            "itemCode": "APQ42_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "APQ42_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "APQ42_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "APQ42_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "APQ42_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "APQ42_06",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "APQ42_07",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "APQ42_08",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "APQ42_09",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "APQ42_10",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "APQ42_11",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "APQ42_12",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "APQ42_13",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "APQ42_14",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "APQ42_15",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "APQ42_16",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "APQ42_17",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "APQ42_18",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "APQ42_19",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "APQ42_20",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "APQ42_21",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "APQ42_22",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "APQ42_23",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "APQ42_24",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "APQ42_25",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "APQ42_26",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "APQ42_27",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "APQ42_28",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "APQ42_29",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "APQ42_30",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "APQ42_31",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "APQ42_32",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "APQ42_33",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "APQ42_34",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "APQ42_35",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "APQ42_36",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "APQ42_37",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "APQ42_38",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "APQ42_39",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "APQ42_40",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "APQ42_41",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "APQ42_42",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "scores": [
+          {
+            "key": "involvement",
+            "type": "dimension",
+            "label": "亲子参与",
+            "description": "亲子参与：10题，原始和分10–50；不是标准化等级。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "APQ42_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "APQ42_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "APQ42_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "APQ42_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "APQ42_11",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "APQ42_14",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "APQ42_15",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "APQ42_20",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "APQ42_23",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "APQ42_26",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "positive_parenting",
+            "type": "dimension",
+            "label": "积极教养",
+            "description": "积极教养：6题，原始和分6–30；不是标准化等级。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "APQ42_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "APQ42_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "APQ42_13",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "APQ42_16",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "APQ42_18",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "APQ42_27",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "poor_monitoring",
+            "type": "dimension",
+            "label": "监督不足",
+            "description": "监督不足：10题，原始和分10–50；不是标准化等级。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "APQ42_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "APQ42_10",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "APQ42_17",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "APQ42_19",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "APQ42_21",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "APQ42_24",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "APQ42_28",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "APQ42_29",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "APQ42_30",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "APQ42_32",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "inconsistent_discipline",
+            "type": "dimension",
+            "label": "管教不一致",
+            "description": "管教不一致：6题，原始和分6–30；不是标准化等级。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "APQ42_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "APQ42_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "APQ42_12",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "APQ42_22",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "APQ42_25",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "APQ42_31",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "corporal_punishment",
+            "type": "dimension",
+            "label": "体罚",
+            "description": "体罚：3题，原始和分3–15；不是标准化等级。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "APQ42_33",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "APQ42_35",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "APQ42_38",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "involvement",
+          "positive_parenting",
+          "poor_monitoring",
+          "inconsistent_discipline",
+          "corporal_punishment"
+        ],
+        "scoreOrder": [
+          "involvement",
+          "positive_parenting",
+          "poor_monitoring",
+          "inconsistent_discipline",
+          "corporal_punishment"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "involvement",
+            "headline": "和孩子一起度过的日常时刻",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "了解孩子并不总需要特别安排。一句对话、一次共同活动，都是能够观察的日常互动。这组题记录的是你们通常如何相处，而不是测试谁是合格家长。你可以想想，上一次双方都愿意继续聊下去的时刻发生了什么？",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近和孩子的一次轻松交流是什么？"
+              },
+              {
+                "category": "strategy",
+                "text": "挑一个不急于评价的短谈话时刻。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "positive_parenting",
+            "headline": "看见孩子努力的方式",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "肯定孩子不只是说“真棒”，也可以具体说出你注意到的努力。题目关注这种回应出现得多不多，不代表夸奖越多就一定越好。你希望孩子知道你看见了什么？",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "孩子最近哪件小事让你想表达肯定？"
+              },
+              {
+                "category": "strategy",
+                "text": "用具体、真实的话描述孩子的努力。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "poor_monitoring",
+            "headline": "了解孩子去向与生活安排",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "孩子逐渐需要自主，也需要与年龄相适应的安全安排。这些回答描述你通常知道多少孩子的去向和作息，并不意味着所有家庭都应采用同一种管理方式。可以从一个常常误会的出行约定谈起。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "外出与回家时间上最常出现什么误会？"
+              },
+              {
+                "category": "strategy",
+                "text": "和孩子商量一条现实、具体且清楚的安全约定。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "inconsistent_discipline",
+            "headline": "让家庭规则更容易预期",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "当规则随着成年人心情突然变化时，孩子也可能不知道该如何准备。这组题描述规则执行的频率，不是批评你的性格。你可以先选择一项真正重要而且能够坚持的规则，双方都说清楚。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "哪一项规则最容易今天和明天不一样？"
+              },
+              {
+                "category": "strategy",
+                "text": "先尝试解释清楚一项可实行的约定。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "corporal_punishment",
+            "headline": "冲突升级时优先保护安全",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这些题涉及打孩子等体罚行为。儿童安全比任何量表分数更重要；分数不能单独判断家庭风险，也不应用来责备谁。若冲突中已经出现伤害，成年人应停止可能伤害孩子的行为，并寻求现实的照护支持及专业帮助。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "哪些情景最容易让冲突升级？"
+              },
+              {
+                "category": "support",
+                "text": "准备一个暂停冲突并寻求可信支持的安全办法。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "五维分别求和且方向不同，不构造42题综合得分或第五之外的新维度。",
+          "原作者体罚第33、35、38题；七道Other Discipline 34、36、37、39、40、41、42不作为分维。",
+          "每个完整维度方算该维得分是平台规则，作者缺失规则未核实。",
+          "本站独立简体中文工作译稿没有常模、临床切点、百分位或测量等值审查。",
+          "原作者LSU公开供研究者免费取得原始42题父母Global版，但要求指导语、原英语题文措辞及答案格式不变。本平台独立制作的简体中文研究译稿不属于已经核准的原版或正式汉化；原版电子呈现是否改变format、翻译/译者许可、对被试展示与导出、商业场景和公开GitHub完整题文再分发须由管理员逐项向作者确认。已取得题本不等于获得全部许可，不伪称已获许可或已被禁止。"
+        ],
+        "disclaimer": "仅非正式简体中文研究工作译稿，非原作者核准的正式中文版；勿用于诊断、家长排名或重大决策。"
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "apq42_parent_global",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "all1",
+        "answers": [
+          {
+            "itemCode": "APQ42_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_15",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_17",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_18",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_19",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_20",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_21",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_22",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_23",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_24",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_25",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_26",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_27",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_28",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_29",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_30",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_31",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_32",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_33",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_34",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_35",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_36",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_37",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_38",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_39",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_40",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_41",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_42",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "involvement": 10,
+            "positive_parenting": 6,
+            "poor_monitoring": 10,
+            "inconsistent_discipline": 6,
+            "corporal_punishment": 3
+          },
+          "totalScoreKeys": [
+            "involvement",
+            "positive_parenting",
+            "poor_monitoring",
+            "inconsistent_discipline",
+            "corporal_punishment"
+          ]
+        }
+      },
+      {
+        "name": "all5",
+        "answers": [
+          {
+            "itemCode": "APQ42_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_07",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_08",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_09",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_10",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_11",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_12",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_13",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_14",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_15",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_16",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_17",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_18",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_19",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_20",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_21",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_22",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_23",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_24",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_25",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_26",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_27",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_28",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_29",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_30",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_31",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_32",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_33",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_34",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_35",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_36",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_37",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_38",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_39",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_40",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_41",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_42",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "involvement": 50,
+            "positive_parenting": 30,
+            "poor_monitoring": 50,
+            "inconsistent_discipline": 30,
+            "corporal_punishment": 15
+          },
+          "totalScoreKeys": [
+            "involvement",
+            "positive_parenting",
+            "poor_monitoring",
+            "inconsistent_discipline",
+            "corporal_punishment"
+          ]
+        }
+      },
+      {
+        "name": "all3",
+        "answers": [
+          {
+            "itemCode": "APQ42_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_12",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_14",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_15",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_16",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_17",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_18",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_19",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_20",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_21",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_22",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_23",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_24",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_25",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_26",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_27",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_28",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_29",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_30",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_31",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_32",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_33",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_34",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_35",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_36",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_37",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_38",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_39",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_40",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_41",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_42",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "involvement": 30,
+            "positive_parenting": 18,
+            "poor_monitoring": 30,
+            "inconsistent_discipline": 18,
+            "corporal_punishment": 9
+          },
+          "totalScoreKeys": [
+            "involvement",
+            "positive_parenting",
+            "poor_monitoring",
+            "inconsistent_discipline",
+            "corporal_punishment"
+          ]
+        }
+      },
+      {
+        "name": "facet_involvement_5",
+        "answers": [
+          {
+            "itemCode": "APQ42_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_07",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_09",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_11",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_14",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_15",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_17",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_18",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_19",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_20",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_21",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_22",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_23",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_24",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_25",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_26",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_27",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_28",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_29",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_30",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_31",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_32",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_33",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_34",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_35",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_36",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_37",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_38",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_39",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_40",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_41",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_42",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "involvement": 50,
+            "positive_parenting": 6,
+            "poor_monitoring": 10,
+            "inconsistent_discipline": 6,
+            "corporal_punishment": 3
+          },
+          "totalScoreKeys": [
+            "involvement",
+            "positive_parenting",
+            "poor_monitoring",
+            "inconsistent_discipline",
+            "corporal_punishment"
+          ]
+        }
+      },
+      {
+        "name": "facet_positive_parenting_5",
+        "answers": [
+          {
+            "itemCode": "APQ42_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_13",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_15",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_16",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_17",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_18",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_19",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_20",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_21",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_22",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_23",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_24",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_25",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_26",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_27",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_28",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_29",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_30",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_31",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_32",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_33",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_34",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_35",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_36",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_37",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_38",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_39",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_40",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_41",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_42",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "involvement": 10,
+            "positive_parenting": 30,
+            "poor_monitoring": 10,
+            "inconsistent_discipline": 6,
+            "corporal_punishment": 3
+          },
+          "totalScoreKeys": [
+            "involvement",
+            "positive_parenting",
+            "poor_monitoring",
+            "inconsistent_discipline",
+            "corporal_punishment"
+          ]
+        }
+      },
+      {
+        "name": "facet_poor_monitoring_5",
+        "answers": [
+          {
+            "itemCode": "APQ42_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_10",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_15",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_17",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_18",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_19",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_20",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_21",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_22",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_23",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_24",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_25",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_26",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_27",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_28",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_29",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_30",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_31",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_32",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_33",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_34",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_35",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_36",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_37",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_38",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_39",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_40",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_41",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_42",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "involvement": 10,
+            "positive_parenting": 6,
+            "poor_monitoring": 50,
+            "inconsistent_discipline": 6,
+            "corporal_punishment": 3
+          },
+          "totalScoreKeys": [
+            "involvement",
+            "positive_parenting",
+            "poor_monitoring",
+            "inconsistent_discipline",
+            "corporal_punishment"
+          ]
+        }
+      },
+      {
+        "name": "facet_inconsistent_discipline_5",
+        "answers": [
+          {
+            "itemCode": "APQ42_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_08",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_12",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_15",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_17",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_18",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_19",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_20",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_21",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_22",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_23",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_24",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_25",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_26",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_27",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_28",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_29",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_30",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_31",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_32",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_33",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_34",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_35",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_36",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_37",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_38",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_39",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_40",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_41",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_42",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "involvement": 10,
+            "positive_parenting": 6,
+            "poor_monitoring": 10,
+            "inconsistent_discipline": 30,
+            "corporal_punishment": 3
+          },
+          "totalScoreKeys": [
+            "involvement",
+            "positive_parenting",
+            "poor_monitoring",
+            "inconsistent_discipline",
+            "corporal_punishment"
+          ]
+        }
+      },
+      {
+        "name": "facet_corporal_punishment_5",
+        "answers": [
+          {
+            "itemCode": "APQ42_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_15",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_17",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_18",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_19",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_20",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_21",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_22",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_23",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_24",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_25",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_26",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_27",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_28",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_29",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_30",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_31",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_32",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_33",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_34",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_35",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_36",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_37",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_38",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_39",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_40",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_41",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_42",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "involvement": 10,
+            "positive_parenting": 6,
+            "poor_monitoring": 10,
+            "inconsistent_discipline": 6,
+            "corporal_punishment": 15
+          },
+          "totalScoreKeys": [
+            "involvement",
+            "positive_parenting",
+            "poor_monitoring",
+            "inconsistent_discipline",
+            "corporal_punishment"
+          ]
+        }
+      },
+      {
+        "name": "cycling",
+        "answers": [
+          {
+            "itemCode": "APQ42_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "APQ42_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "APQ42_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_07",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "APQ42_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_09",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "APQ42_10",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_12",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "APQ42_13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_14",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "APQ42_15",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_17",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "APQ42_18",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_19",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "APQ42_20",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_21",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_22",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "APQ42_23",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_24",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "APQ42_25",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_26",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_27",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "APQ42_28",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_29",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "APQ42_30",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_31",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_32",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "APQ42_33",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_34",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "APQ42_35",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_36",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_37",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "APQ42_38",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_39",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "APQ42_40",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "APQ42_41",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "APQ42_42",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "involvement": 30,
+            "positive_parenting": 16,
+            "poor_monitoring": 31,
+            "inconsistent_discipline": 16,
+            "corporal_punishment": 11
+          },
+          "totalScoreKeys": [
+            "involvement",
+            "positive_parenting",
+            "poor_monitoring",
+            "inconsistent_discipline",
+            "corporal_punishment"
+          ]
+        }
+      },
+      {
+        "name": "missing_involvement",
+        "answers": [
+          {
+            "itemCode": "APQ42_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_12",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_14",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_15",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_16",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_17",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_18",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_19",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_20",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_21",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_22",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_23",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_24",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_25",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_26",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_27",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_28",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_29",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_30",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_31",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_32",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_33",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_34",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_35",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_36",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_37",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_38",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_39",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_40",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_41",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_42",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "involvement": null,
+            "positive_parenting": 18,
+            "poor_monitoring": 30,
+            "inconsistent_discipline": 18,
+            "corporal_punishment": 9
+          },
+          "totalScoreKeys": [
+            "involvement",
+            "positive_parenting",
+            "poor_monitoring",
+            "inconsistent_discipline",
+            "corporal_punishment"
+          ]
+        }
+      },
+      {
+        "name": "missing_positive_parenting",
+        "answers": [
+          {
+            "itemCode": "APQ42_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_12",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_14",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_15",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_16",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_17",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_18",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_19",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_20",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_21",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_22",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_23",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_24",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_25",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_26",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_27",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_28",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_29",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_30",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_31",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_32",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_33",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_34",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_35",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_36",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_37",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_38",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_39",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_40",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_41",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_42",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "involvement": 30,
+            "positive_parenting": null,
+            "poor_monitoring": 30,
+            "inconsistent_discipline": 18,
+            "corporal_punishment": 9
+          },
+          "totalScoreKeys": [
+            "involvement",
+            "positive_parenting",
+            "poor_monitoring",
+            "inconsistent_discipline",
+            "corporal_punishment"
+          ]
+        }
+      },
+      {
+        "name": "missing_poor_monitoring",
+        "answers": [
+          {
+            "itemCode": "APQ42_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_12",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_14",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_15",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_16",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_17",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_18",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_19",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_20",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_21",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_22",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_23",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_24",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_25",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_26",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_27",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_28",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_29",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_30",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_31",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_32",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_33",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_34",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_35",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_36",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_37",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_38",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_39",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_40",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_41",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_42",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "involvement": 30,
+            "positive_parenting": 18,
+            "poor_monitoring": null,
+            "inconsistent_discipline": 18,
+            "corporal_punishment": 9
+          },
+          "totalScoreKeys": [
+            "involvement",
+            "positive_parenting",
+            "poor_monitoring",
+            "inconsistent_discipline",
+            "corporal_punishment"
+          ]
+        }
+      },
+      {
+        "name": "missing_inconsistent_discipline",
+        "answers": [
+          {
+            "itemCode": "APQ42_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_12",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_14",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_15",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_16",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_17",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_18",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_19",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_20",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_21",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_22",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_23",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_24",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_25",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_26",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_27",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_28",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_29",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_30",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_31",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_32",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_33",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_34",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_35",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_36",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_37",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_38",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_39",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_40",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_41",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_42",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "involvement": 30,
+            "positive_parenting": 18,
+            "poor_monitoring": 30,
+            "inconsistent_discipline": null,
+            "corporal_punishment": 9
+          },
+          "totalScoreKeys": [
+            "involvement",
+            "positive_parenting",
+            "poor_monitoring",
+            "inconsistent_discipline",
+            "corporal_punishment"
+          ]
+        }
+      },
+      {
+        "name": "missing_corporal_punishment",
+        "answers": [
+          {
+            "itemCode": "APQ42_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_12",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_14",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_15",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_16",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_17",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_18",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_19",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_20",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_21",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_22",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_23",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_24",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_25",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_26",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_27",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_28",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_29",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_30",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_31",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_32",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_34",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_35",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_36",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_37",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_38",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_39",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_40",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_41",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "APQ42_42",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "involvement": 30,
+            "positive_parenting": 18,
+            "poor_monitoring": 30,
+            "inconsistent_discipline": 18,
+            "corporal_punishment": null
+          },
+          "totalScoreKeys": [
+            "involvement",
+            "positive_parenting",
+            "poor_monitoring",
+            "inconsistent_discipline",
+            "corporal_punishment"
+          ]
+        }
+      },
+      {
+        "name": "none",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "involvement": null,
+            "positive_parenting": null,
+            "poor_monitoring": null,
+            "inconsistent_discipline": null,
+            "corporal_punishment": null
+          },
+          "totalScoreKeys": [
+            "involvement",
+            "positive_parenting",
+            "poor_monitoring",
+            "inconsistent_discipline",
+            "corporal_punishment"
+          ]
+        }
+      }
+    ]
+  }
+}

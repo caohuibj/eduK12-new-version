@@ -1,0 +1,17 @@
+{
+  "sourceSha256": "7c18445fa8a24e64f5acc46ba2c42036a85c8bf733ce91fe91920a694d232aa2",
+  "canonicalSourceHash": "8f93ad877f0c6704b3fbe2b2df8f910be86f1b9bd374056b2fadaabccd0a6e01",
+  "measurementHash": "5867644d1b4e8f3a62bb31513965dd94a8605c462070a3277e38df02ef4fd54f",
+  "checkedAt": "2026-10-25T16:22:20.520Z",
+  "validation": "strict source/package + actual synthetic reports",
+  "goldenCases": 5,
+  "dbWrites": false,
+  "toolTests": 15,
+  "testExitCode": 0,
+  "generatorExitCode": 0,
+  "typecheckStatus": "PASSED_BATCH",
+  "testEvidence": "local-test-output.txt",
+  "typecheckExitCode": 0,
+  "combinedTests": 75,
+  "batchEvidence": "../../ready-batch-20261025/validation.json"
+}

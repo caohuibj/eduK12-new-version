@@ -1,0 +1,69 @@
+{
+  "author2016.html": {
+    "requestedUrl": "https://link.springer.com/article/10.1186/s12955-016-0534-3",
+    "finalUrl": "https://link.springer.com/article/10.1186/s12955-016-0534-3?error=cookies_not_supported&code=d6fa99b4-f6a8-4ba5-ab12-5039fd53c458",
+    "httpStatus": 200,
+    "contentType": "text/html; charset=utf-8",
+    "bytes": 384076,
+    "sha256": "8941b6a1b6021faf0bd80c467b1dfb753e1619371c675b77697c463ca9000b2b",
+    "retrievedAt": "2026-10-26T05:53:44.938681+00:00"
+  },
+  "author2016-table6.html": {
+    "requestedUrl": "https://link.springer.com/article/10.1186/s12955-016-0534-3/tables/6",
+    "finalUrl": "https://link.springer.com/article/10.1186/s12955-016-0534-3/tables/6?error=cookies_not_supported&code=69fd9e62-00f6-4b0f-9b76-2e2385bd6128",
+    "httpStatus": 200,
+    "contentType": "text/html; charset=utf-8",
+    "bytes": 214420,
+    "sha256": "d7669ea73c0b2943e2137222e744ee23e6ca86ff219ca5ae5609542683cff8de",
+    "retrievedAt": "2026-10-26T05:53:46.210877+00:00"
+  },
+  "author2016.pdf": {
+    "requestedUrl": "https://link.springer.com/content/pdf/10.1186/s12955-016-0534-3.pdf",
+    "finalUrl": "https://link.springer.com/content/pdf/10.1186/s12955-016-0534-3.pdf?error=cookies_not_supported&code=d9161875-1c85-44d4-a224-eacdfaffc1e5",
+    "httpStatus": 200,
+    "contentType": "application/pdf",
+    "bytes": 652299,
+    "sha256": "65e415c77423e1c279ea341976f24a401fc74aa06525ef270e1b54606786a07d",
+    "retrievedAt": "2026-10-26T05:53:50.135949+00:00",
+    "classification": "Actual PDF signature and 8-page text checked; Table6 page7 is four-choice adaptation, wording reused under CC BY4.0 only"
+  },
+  "study2017.html": {
+    "requestedUrl": "https://link.springer.com/article/10.1186/s12955-017-0822-6",
+    "finalUrl": "https://link.springer.com/article/10.1186/s12955-017-0822-6?error=cookies_not_supported&code=86c1f340-b4c8-46a8-8204-747a7fa6f848",
+    "httpStatus": 200,
+    "contentType": "text/html; charset=utf-8",
+    "bytes": 357161,
+    "sha256": "d2095c95180658b9a553cddc5cd68b68d88517bbdfb2d86446a70930fb72199d",
+    "retrievedAt": "2026-10-26T05:53:52.266767+00:00"
+  },
+  "original2004-abstract.html": {
+    "requestedUrl": "https://pubmed.ncbi.nlm.nih.gov/14994958/",
+    "finalUrl": "https://pubmed.ncbi.nlm.nih.gov/14994958/",
+    "httpStatus": 203,
+    "contentType": "text/html; charset=utf-8",
+    "bytes": 5590,
+    "sha256": "c497e15976e185c20494096651be13b90cda8766c1b8e3d4953601bf0c9d53df",
+    "retrievedAt": "2026-10-26T05:53:52.500222+00:00",
+    "classification": "HTTP 203 response retained; not treated as obtained original full paper or citable full form"
+  },
+  "vanderbilt-old.pdf": {
+    "requestedUrl": "https://nursing.vanderbilt.edu/projects/wallstonk/pdf/brcs.pdf",
+    "finalUrl": "https://nursing.vanderbilt.edu/projects/wallstonk/pdf/brcs.pdf",
+    "httpStatus": 404,
+    "contentType": "text/html; charset=UTF-8",
+    "bytes": 119709,
+    "sha256": "927879daca7ddf2d820d36e7a9d664c974757fce5d29d05d1c2236ad8dfb1a57",
+    "retrievedAt": "2026-10-26T05:53:52.970689+00:00",
+    "classification": "HTTP 404 HTML, not a PDF"
+  },
+  "sage2004.pdf": {
+    "requestedUrl": "https://journals.sagepub.com/doi/pdf/10.1177/1073191103258144",
+    "finalUrl": "https://journals.sagepub.com/doi/pdf/10.1177/1073191103258144",
+    "httpStatus": 403,
+    "contentType": "text/html; charset=UTF-8",
+    "bytes": 6136,
+    "sha256": "e1428747e8da750345f0b52e90577a70f38b8f6ae738ffde1ac0a08609d9fd07",
+    "retrievedAt": "2026-10-26T05:53:53.066917+00:00",
+    "classification": "HTTP 403 HTML, not a PDF; no bypass"
+  }
+}

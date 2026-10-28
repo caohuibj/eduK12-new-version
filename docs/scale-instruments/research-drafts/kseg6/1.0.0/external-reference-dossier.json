@@ -1,0 +1,141 @@
+{
+  "activationStatus": "EXTERNAL_EVIDENCE_ONLY_NOT_BOUND",
+  "runtimeSelected": false,
+  "sourceSample": {
+    "fielding": "January 2018",
+    "mode": "self-administered online survey (CASI)",
+    "sampling": "heterogeneous quota samples by age, gender, education; respective-language native speakers; not Chinese norms",
+    "UK": {
+      "n": 468,
+      "retestN": 111
+    },
+    "Germany": {
+      "n": 474,
+      "retestN": 117
+    },
+    "ageRange": [
+      18,
+      69
+    ]
+  },
+  "parameters": [
+    {
+      "population": "UK adult quota sample",
+      "n": 468,
+      "subscale": "PQ_POSITIVE_ENDORSEMENT",
+      "mean": 3.55,
+      "sd": 0.73
+    },
+    {
+      "population": "Germany adult quota sample",
+      "n": 474,
+      "subscale": "PQ_POSITIVE_ENDORSEMENT",
+      "mean": 3.67,
+      "sd": 0.68
+    },
+    {
+      "population": "UK adult quota sample",
+      "n": 468,
+      "subscale": "NQ_NEGATIVE_ADMISSION_RAW",
+      "mean": 1.9,
+      "sd": 0.93
+    },
+    {
+      "population": "Germany adult quota sample",
+      "n": 474,
+      "subscale": "NQ_NEGATIVE_ADMISSION_RAW",
+      "mean": 2.12,
+      "sd": 0.89
+    }
+  ],
+  "parameterUse": "Supplementary Table S1 raw means, context only. Not honesty thresholds, cross-cultural norms, or exclusion criteria.",
+  "scoring": {
+    "type": "separate_unweighted_means",
+    "subscales": [
+      {
+        "id": "PQ_POSITIVE_ENDORSEMENT",
+        "originalName": "PQ+",
+        "itemIds": [
+          "1",
+          "2",
+          "3"
+        ],
+        "formula": "(q1+q2+q3)/3",
+        "range": [
+          1,
+          5
+        ],
+        "higherMeans": "Stronger agreement with always displaying positive conduct; not proof of exaggeration or dishonesty."
+      },
+      {
+        "id": "NQ_NEGATIVE_ADMISSION_RAW",
+        "originalName": "NQ−",
+        "itemIds": [
+          "4",
+          "5",
+          "6"
+        ],
+        "formula": "(q4+q5+q6)/3",
+        "range": [
+          1,
+          5
+        ],
+        "higherMeans": "More endorsement of the stated negative acts, NOT greater denial or minimization."
+      }
+    ],
+    "reverseItemIds": [],
+    "totalScore": null,
+    "directionWarning": "The author labels the second construct minimizing negative qualities, but publishes raw item/subscale means around 1.90/2.12 and instructs unweighted means without reversal. Preserve raw scoring; do not label a high raw mean as more concealment. Do not silently reverse to create a global desirability score.",
+    "originalGermanCodingWarning": "English 2019 uses 1–5; German 2014 used 0–4. Do not mix reference values or coding."
+  },
+  "thresholds": [],
+  "currentTranslationValidated": false,
+  "references": [
+    {
+      "authors": [
+        "Nießen, D.",
+        "Partsch, M. V.",
+        "Kemper, C. J.",
+        "Rammstedt, B."
+      ],
+      "year": 2019,
+      "title": "An English-Language Adaptation of the Social Desirability–Gamma Short Scale (KSE-G)",
+      "journal": "Measurement Instruments for the Social Sciences",
+      "volume": 1,
+      "article": 2,
+      "doi": "10.1186/s42409-018-0005-1",
+      "url": "https://link.springer.com/article/10.1186/s42409-018-0005-1"
+    },
+    {
+      "type": "GESIS documentation",
+      "doi": "10.6102/zis271_exz",
+      "url": "https://zis.gesis.org/s//skala/Nießen-Partsch-Kemper-Rammstedt-Social-Desirability-Gamma-Short-Scale-(KSE-G)?lang=en"
+    }
+  ],
+  "sourceFiles": [
+    {
+      "id": "KSEG6",
+      "kind": "article",
+      "url": "https://link.springer.com/article/10.1186/s42409-018-0005-1",
+      "path": "scale-source-packs-gesis-next-20261025/sources/KSEG6_article.html",
+      "sha256": "ed7c324cdb2a32c7b4ee227ddbc00caf8f580a03ac2646b56d793826057bf1ce",
+      "bytes": 450028
+    },
+    {
+      "id": "KSEG6",
+      "kind": "form",
+      "url": "https://media.springernature.com/original/springer-static/esm/art:10.1186%2Fs42409-018-0005-1/MediaObjects/42409_2018_5_MOESM1_ESM.pdf",
+      "path": "scale-source-packs-gesis-next-20261025/sources/KSEG6_form.pdf",
+      "sha256": "6f1336f7e30ee95c8be7678b0dab4817c2ddb7cad12c4ab142f526b401dd19bc",
+      "bytes": 159190
+    },
+    {
+      "id": "KSEG6",
+      "kind": "reference",
+      "url": "https://media.springernature.com/original/springer-static/esm/art:10.1186%2Fs42409-018-0005-1/MediaObjects/42409_2018_5_MOESM4_ESM.pdf",
+      "path": "scale-source-packs-gesis-next-20261025/sources/KSEG6_reference.pdf",
+      "sha256": "48fc7fe445cd7bf62c3557bb207df9f09428ade0b98db784e48530c6df63a46b",
+      "bytes": 175208
+    }
+  ]
+}

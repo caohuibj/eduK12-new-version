@@ -1,0 +1,112 @@
+{
+  "identity": {
+    "instrumentKey": "brcs4_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "sourceSha256": "68ae0f92da27333ee9b6b9f62bab7e4a98b6e2853910f8ad9fb9fafe2c972a66",
+  "validationScope": "BRCS-only static contracts, scoped strict types, and synthetic buildScaleResult; no DB/API/CI/production claim",
+  "subprocessExecutions": 5,
+  "originalFailedSubprocesses": 2,
+  "checks": [
+    {
+      "kind": "scoped-types",
+      "executions": 1,
+      "exitCode": 0,
+      "receipt": "types.receipt.json",
+      "reuseAfterMetadataFix": "Only qcReview.reviewedAt JSON string changed from +00:00 to Z; TypeScript structure, source code, test code and compiler inputs otherwise byte-identical. Original result retained, no repeat compile."
+    },
+    {
+      "kind": "unit",
+      "executions": 2,
+      "original": {
+        "exitCode": 1,
+        "passed": 7,
+        "failed": 11,
+        "reporter": "vitest.report.json"
+      },
+      "continuation": {
+        "exitCode": 0,
+        "passed": 11,
+        "failed": 0,
+        "skipped": 7,
+        "reporter": "vitest.attempt2.report.json"
+      },
+      "passedUnion": 18,
+      "disjointPassedSets": true,
+      "exhaustiveCombinationsWithinOneTest": 625,
+      "originalPassedNames": [
+        "brcs4 independent Chinese research adaptation preserves the complete four open-author items, ordered separately from instructions",
+        "brcs4 independent Chinese research adaptation uses the independently arranged five-point format, with numeric middle options",
+        "brcs4 independent Chinese research adaptation defines one equal-weight total and no reverse or imported Rasch conversion",
+        "brcs4 independent Chinese research adaptation applies a provisional adult-self boundary and never guesses missing age",
+        "brcs4 independent Chinese research adaptation keeps content, localization, scoring and report versions independently traceable",
+        "brcs4 independent Chinese research adaptation records rich factual eight-axis tags and pending local scientific work",
+        "brcs4 independent Chinese research adaptation binds reuse rights to open coauthor wording while excluding original-manual and norms claims"
+      ],
+      "continuedPassedNames": [
+        "brcs4 independent Chinese research adaptation validates a complete independent DRAFT source without claiming activation",
+        "brcs4 independent Chinese research adaptation scores pinned arithmetic minimum",
+        "brcs4 independent Chinese research adaptation scores pinned arithmetic maximum",
+        "brcs4 independent Chinese research adaptation scores pinned arithmetic midpoint_arithmetic_only",
+        "brcs4 independent Chinese research adaptation scores pinned arithmetic mixed_independent",
+        "brcs4 independent Chinese research adaptation scores pinned arithmetic missing_last",
+        "brcs4 independent Chinese research adaptation scores pinned arithmetic all_missing",
+        "brcs4 independent Chinese research adaptation checks every legal answer combination against independent addition",
+        "brcs4 independent Chinese research adaptation refuses interpretation for every single missing item without imputation",
+        "brcs4 independent Chinese research adaptation rejects illegal, duplicate and unknown values",
+        "brcs4 independent Chinese research adaptation builds actual plain-language reflection without norm labels or boundaries"
+      ]
+    },
+    {
+      "kind": "actual-synthetic-report",
+      "executions": 2,
+      "originalExitCode": 1,
+      "continuationExitCode": 0,
+      "answers": [
+        1,
+        4,
+        2,
+        5
+      ],
+      "actualTotal": 12,
+      "range": {
+        "min": 4,
+        "max": 20
+      },
+      "primarySummaryCharacters": 181,
+      "referenceCount": 0,
+      "definitionStatus": "DRAFT"
+    }
+  ],
+  "onlyInputChangedBetweenAttempts": [
+    "server-version/backend/src/modules/scale/instruments/brcs4_zh_cn_research/1.0.0/source.json"
+  ],
+  "inputManifestCount": 41,
+  "inputManifests": {
+    "original": {
+      "file": "direct-inputs.pre-run.json",
+      "sha256": "f70b544feacfacc56a320b0a9aacaace001a366d2c0d97a2cc397730a6a1dd19"
+    },
+    "continuation": {
+      "file": "direct-inputs.attempt2.json",
+      "sha256": "d8b4a97bde38e61ae2d2e31d1664ca015dab1c91d7a8fb7da9c66006338c84f2"
+    }
+  },
+  "privateEvidenceDirectory": "/workspace/eduk12-scale-evidence/20261026-parallel/brcs4",
+  "notExecuted": [
+    "global registry integration",
+    "database migrations or non-owner DB flows",
+    "API/E2E",
+    "CI",
+    "deployment"
+  ],
+  "remaining": [
+    "human translation review PENDING",
+    "cognitive debrief NOT_ESTABLISHED",
+    "validation of this Chinese adaptation NOT_ESTABLISHED",
+    "instruction sidecar PREPARED_NOT_RUNTIME_CONNECTED",
+    "none parameter independent runtime version field absent",
+    "original 2004 exact manual not retrieved; this source is explicitly an independent five-point adaptation of open wording"
+  ],
+  "reviewedAt": "2026-10-26T06:02:23.246310+00:00"
+}

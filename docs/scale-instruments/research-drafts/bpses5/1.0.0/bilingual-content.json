@@ -1,0 +1,97 @@
+{
+  "identity": {
+    "instrumentKey": "bpses5_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "status": "INDEPENDENT_CHINESE_WORKING_DERIVATIVE_NOT_2026_BPSES_C",
+  "sourceDoi": "10.1007/s10578-023-01583-0",
+  "onlineYear": 2023,
+  "issueYear": 2025,
+  "items": [
+    {
+      "finalNumber": 1,
+      "originalNumber": 1,
+      "itemCode": "BPSES_01",
+      "en": "Even though I may not always manage it, I know what I need to do with my child",
+      "originalArticleTextWithAnnotation": "Even though I may not always manage it, I know what I need to do with my child (Knowledge)",
+      "domainAnnotationNotSubscale": "Knowledge",
+      "zh": "即使我不一定总能做到，我也知道自己在与孩子相处时需要做什么。",
+      "reverse": false
+    },
+    {
+      "finalNumber": 2,
+      "originalNumber": 4,
+      "itemCode": "BPSES_02",
+      "en": "I am able to do the things that will improve my child's behaviour",
+      "originalArticleTextWithAnnotation": "I am able to do the things that will improve my child's behaviour (Ability)",
+      "domainAnnotationNotSubscale": "Ability",
+      "zh": "我能够做一些有助于改善孩子行为的事。",
+      "reverse": false
+    },
+    {
+      "finalNumber": 3,
+      "originalNumber": 5,
+      "itemCode": "BPSES_03",
+      "en": "I can make an important difference to my child",
+      "originalArticleTextWithAnnotation": "I can make an important difference to my child (Ability)",
+      "domainAnnotationNotSubscale": "Ability",
+      "zh": "我能对孩子产生重要的影响。",
+      "reverse": false
+    },
+    {
+      "finalNumber": 4,
+      "originalNumber": 8,
+      "itemCode": "BPSES_04",
+      "en": "In most situations I know what I should do to ensure my child behaves",
+      "originalArticleTextWithAnnotation": "In most situations I know what I should do to ensure my child behaves (Knowledge)",
+      "domainAnnotationNotSubscale": "Knowledge",
+      "zh": "在大多数情况下，我知道应该怎么做才能让孩子表现得当。",
+      "reverse": false
+    },
+    {
+      "finalNumber": 5,
+      "originalNumber": 9,
+      "itemCode": "BPSES_05",
+      "en": "The things I do make a difference to my child's behaviour",
+      "originalArticleTextWithAnnotation": "The things I do make a difference to my child's behaviour (Outcome)",
+      "domainAnnotationNotSubscale": "Outcome",
+      "zh": "我做的事情会对孩子的行为产生影响。",
+      "reverse": false
+    }
+  ],
+  "responseOptions": [
+    {
+      "value": "1",
+      "score": 1,
+      "en": "Strongly disagree",
+      "zh": "非常不同意"
+    },
+    {
+      "value": "2",
+      "score": 2,
+      "en": "Disagree",
+      "zh": "不同意"
+    },
+    {
+      "value": "3",
+      "score": 3,
+      "en": "Neutral",
+      "zh": "中立"
+    },
+    {
+      "value": "4",
+      "score": 4,
+      "en": "Agree",
+      "zh": "同意"
+    },
+    {
+      "value": "5",
+      "score": 5,
+      "en": "Strongly agree",
+      "zh": "非常同意"
+    }
+  ],
+  "instruction": "下面五句话描述你对自己引导孩子行为的信心。请阅读每句话，根据自己的情况选择同意程度，每题选择一项。这里请回答你对自身的看法。",
+  "instructionProvenance": "Platform Chinese adaptation of original article Methods, not CORC standalone instruction",
+  "recallPeriod": null
+}

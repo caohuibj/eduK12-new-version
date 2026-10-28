@@ -1,0 +1,11 @@
+{
+  "sourceSha256": "43dd9f3b1c0933a6e7ca25b1a6e9ba13f18be7de5981da0cfb0468f7a0048eae",
+  "validatedAt": "2026-10-25T15:20:00Z",
+  "node": "v24.22.1",
+  "toolTests": 16,
+  "combinedTests": 24,
+  "testExitCode": 0,
+  "typecheckExitCode": 0,
+  "generatorExitCode": 0,
+  "scope": "Strict local source/package; two separate raw means, synthetic report only. No DB writes."
+}

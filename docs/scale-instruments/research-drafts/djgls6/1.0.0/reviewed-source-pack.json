@@ -1,0 +1,336 @@
+{
+  "researched_at": "2026-10-25",
+  "artifact_kind": "research-sourcepack-not-runtime-ingestion",
+  "translation_status": "独立中译工作稿，未做认知访谈或中文版心理测量验证；不冒充已有验证中文版",
+  "publication_gate": [
+    "仅非商业用途；须保留作者、原来源、许可证链接和翻译修改说明",
+    "公共库可索引不等于获准任何商用入口；上线须正确限制用途",
+    "中文工作稿须明确研究用途，不能宣称诊断或验证完成"
+  ],
+  "report_disclaimer": "这是一份自我了解的线索，不是诊断，也不评价你这个人。结果需要结合你的生活处境来看。",
+  "id": "DJGLS6",
+  "name_zh": "De Jong Gierveld 简式孤独感量表（6题）",
+  "name_en": "De Jong Gierveld Short Loneliness Scale",
+  "version": "English items as published by original authors in 2010 article, grouped emotional then social",
+  "domains": [
+    "孤独与社会联结",
+    "亲近感",
+    "可依靠的支持"
+  ],
+  "tags": [
+    "孤独感",
+    "社会联结",
+    "情感联结",
+    "成人",
+    "老年人",
+    "自评",
+    "非商业",
+    "CC-BY-NC-2.0",
+    "独立中译待验证",
+    "非诊断"
+  ],
+  "license": {
+    "id": "CC-BY-NC-2.0",
+    "url": "https://creativecommons.org/licenses/by-nc/2.0/",
+    "authority_url": "https://link.springer.com/article/10.1007/s10433-010-0144-6",
+    "evidence_location": "Open Access / Rights and permissions explicitly CC Attribution Noncommercial; original developers publish all six English items in Measurements; no separate English-item credit exclusion identified",
+    "scope_note": "Use English items appearing in this original-author licensed paper, not third-party Chinese/Japanese translations. Article thanks Japanese GGP for Japanese items, so those are not included. This is narrower than claiming every edition/form of the instrument universally open.",
+    "noncommercial_only": true,
+    "conditions": [
+      "credit Jenny De Jong Gierveld and Theo Van Tilburg",
+      "link source and license",
+      "state independent Chinese translation and formatting modifications",
+      "no commercial reuse without further permission"
+    ]
+  },
+  "references": [
+    {
+      "citation": "De Jong Gierveld J, Van Tilburg T. The De Jong Gierveld short scales for emotional and social loneliness: tested on data from 7 countries in the UN generations and gender surveys. Eur J Ageing. 2010;7:121–130.",
+      "doi": "10.1007/s10433-010-0144-6",
+      "url": "https://link.springer.com/article/10.1007/s10433-010-0144-6",
+      "use": "English item wording, grouped order, scoring, missing rule, rights, adult validation"
+    },
+    {
+      "citation": "De Jong Gierveld J, Van Tilburg TG. A 6-item scale for overall, emotional, and social loneliness: confirmatory tests on survey data. Research on Aging. 2006;28:582–598.",
+      "url": "https://publ.nidi.nl/output/2006/roa-28-05-dejonggierveld.pdf",
+      "use": "Original development reference; not license basis for copied wording"
+    },
+    {
+      "citation": "Statistics Netherlands (CBS). Loneliness survey – technical explanation. 2019 Social cohesion & well-being survey, n=7398.",
+      "url": "https://www.cbs.nl/en-gb/news/2020/13/nearly-1-in-10-dutch-people-frequently-lonely-in-2019/loneliness-survey-technical-explanation",
+      "use": "Optional Dutch statistical bands, not clinical thresholds"
+    }
+  ],
+  "order_note": "2010 authors list emotional items together then social items; this sourcepack retains that published list order. Do not claim identical order to every standalone 2006/2019 form. Retain item identity if integration adopts a source-verified alternate order.",
+  "instructions_zh": "请根据你目前的情况，判断下面每句话与你的感受是否相符。没有标准答案。",
+  "instructions_note": "Project explanatory wording; source2010 does not specify a fixed past-week/month recall window, so none added.",
+  "chinese_existing_validation": {
+    "citation": "Leung GTY, De Jong Gierveld J, Lam LCW. Validation of the Chinese translation of the 6-item De Jong Gierveld loneliness scale in elderly Chinese. Int Psychogeriatr.2008;20:1262–1272.",
+    "note": "Cited by original2010 authors. Existing validated Chinese text not copied; our independent working translation is not that validated version."
+  },
+  "items": [
+    {
+      "id": 1,
+      "en": "I experience a general sense of emptiness",
+      "zh": "我感到一种空虚感。",
+      "dimension": "emotional",
+      "options": [
+        {
+          "key": "no",
+          "en": "no",
+          "zh": "不是这样",
+          "score": 0
+        },
+        {
+          "key": "middle",
+          "en": "more or less",
+          "zh": "或多或少是这样",
+          "score": 1
+        },
+        {
+          "key": "yes",
+          "en": "yes",
+          "zh": "是这样",
+          "score": 1
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "en": "I miss having people around",
+      "zh": "我想念有人在身边的感觉。",
+      "dimension": "emotional",
+      "options": [
+        {
+          "key": "no",
+          "en": "no",
+          "zh": "不是这样",
+          "score": 0
+        },
+        {
+          "key": "middle",
+          "en": "more or less",
+          "zh": "或多或少是这样",
+          "score": 1
+        },
+        {
+          "key": "yes",
+          "en": "yes",
+          "zh": "是这样",
+          "score": 1
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "en": "Often, I feel rejected",
+      "zh": "我常常感到被拒绝。",
+      "dimension": "emotional",
+      "options": [
+        {
+          "key": "no",
+          "en": "no",
+          "zh": "不是这样",
+          "score": 0
+        },
+        {
+          "key": "middle",
+          "en": "more or less",
+          "zh": "或多或少是这样",
+          "score": 1
+        },
+        {
+          "key": "yes",
+          "en": "yes",
+          "zh": "是这样",
+          "score": 1
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "en": "There are plenty of people that I can lean on in case of trouble",
+      "zh": "遇到困难时，我有很多可以依靠的人。",
+      "dimension": "social",
+      "options": [
+        {
+          "key": "no",
+          "en": "no",
+          "zh": "不是这样",
+          "score": 1
+        },
+        {
+          "key": "middle",
+          "en": "more or less",
+          "zh": "或多或少是这样",
+          "score": 1
+        },
+        {
+          "key": "yes",
+          "en": "yes",
+          "zh": "是这样",
+          "score": 0
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "en": "There are many people that I can count on completely",
+      "zh": "有很多人是我可以完全信赖的。",
+      "dimension": "social",
+      "options": [
+        {
+          "key": "no",
+          "en": "no",
+          "zh": "不是这样",
+          "score": 1
+        },
+        {
+          "key": "middle",
+          "en": "more or less",
+          "zh": "或多或少是这样",
+          "score": 1
+        },
+        {
+          "key": "yes",
+          "en": "yes",
+          "zh": "是这样",
+          "score": 0
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "en": "There are enough people that I feel close to",
+      "zh": "有足够多的人让我感到亲近。",
+      "dimension": "social",
+      "options": [
+        {
+          "key": "no",
+          "en": "no",
+          "zh": "不是这样",
+          "score": 1
+        },
+        {
+          "key": "middle",
+          "en": "more or less",
+          "zh": "或多或少是这样",
+          "score": 1
+        },
+        {
+          "key": "yes",
+          "en": "yes",
+          "zh": "是这样",
+          "score": 0
+        }
+      ]
+    }
+  ],
+  "scoring": {
+    "method": "sum binary recodes, not a three-point Likert sum",
+    "range": [
+      0,
+      6
+    ],
+    "higher_means": "more loneliness signals",
+    "subscales": {
+      "emotional": {
+        "items": [
+          1,
+          2,
+          3
+        ],
+        "range": [
+          0,
+          3
+        ]
+      },
+      "social": {
+        "items": [
+          4,
+          5,
+          6
+        ],
+        "range": [
+          0,
+          3
+        ]
+      }
+    },
+    "reverse_items_note": "Positive items4–6 use no=1,middle=1,yes=0. Never apply a simple 2-x transform; middle always1 on every item.",
+    "missing": "2010 source explicitly does not compute loneliness scale scores when item scores missing. Require all6 for total and corresponding3 for each subscale. No imputation.",
+    "parameters": [
+      {
+        "id": "continuous_primary",
+        "clinical_cutoff": null,
+        "note": "2010 original-author study establishes dimensional scores, not a universal clinical diagnosis cutoff."
+      },
+      {
+        "id": "CBS2019_descriptive_optional",
+        "bands": [
+          {
+            "min": 0,
+            "max": 1,
+            "code": "fewer_signals"
+          },
+          {
+            "min": 2,
+            "max": 4,
+            "code": "some_signals"
+          },
+          {
+            "min": 5,
+            "max": 6,
+            "code": "more_signals"
+          }
+        ],
+        "population": "Dutch 2019 Social cohesion & well-being survey n=7398; statistical descriptive categorization; not Chinese clinical norm",
+        "enabled_by_default": false,
+        "note": "CBS English never/sometimes/frequently are survey reporting labels, not added recall frequencies to the item wording. Local report uses non-diagnostic descriptions. Do not transfer 11-item thresholds."
+      }
+    ]
+  },
+  "validation_context": {
+    "age": "18–79 in seven-country GGS, Japan upper age69",
+    "countries": [
+      "France",
+      "Germany",
+      "Netherlands",
+      "Bulgaria",
+      "Georgia",
+      "Russia",
+      "Japan"
+    ],
+    "limitations": [
+      "cross-country factor loading invariance failed; do not claim all groups directly interchangeable",
+      "independent Chinese working translation unvalidated",
+      "not a measure of how many friends one objectively has",
+      "not a diagnosis"
+    ]
+  },
+  "reports": {
+    "general": {
+      "title": "你想要的联结，和眼下感受到的联结",
+      "body": "孤独感不只取决于身边有多少人：有时缺的是一位能说心里话的人，有时缺的是遇事可以依靠的支持。这份回答帮助你分清想补充的是哪一种联结，而不是给你贴上“不合群”的标签。",
+      "next_step": "可以从一个小动作开始：约一位信任的人聊近况，或者试着参加一项你愿意重复去的活动。重视关系的质量，不必给自己规定朋友数量。"
+    },
+    "fewer_signals": {
+      "title": "这次回答中的孤独线索较少",
+      "body": "你这次较少表达出联结不足的感受。留意那些让你感到被理解、能依靠的关系，继续给它们一点时间。结果不否定偶尔的孤独，也不是社交成绩单。"
+    },
+    "some_signals": {
+      "title": "有些联结需求可能还没被满足",
+      "body": "你的回答提示，某些时刻你可能想要更多陪伴或更可靠的支持。先看看你更想要的是“有人懂我”，还是“遇事有人可依靠”，再选择一个小行动。"
+    },
+    "more_signals": {
+      "title": "你可能希望得到更多陪伴与支持",
+      "body": "这次回答里，联结不足的感受比较突出。这不是你的过错，也不意味着以后都会这样。可以从一位信任的人开始，表达一个具体需要；如果这种感受持续让你很难受，也可以寻求专业支持。"
+    },
+    "incomplete": {
+      "title": "暂不判断",
+      "body": "有题目没有填写，暂不生成总结果。你可以补充，也可以不继续。"
+    },
+    "visual": "可选两张卡片：有人懂我 / 有人可依靠。用文字说明而非红绿危险等级，不把较少朋友等同孤独。",
+    "band_warning": "如未启用CBS外部描述参数，只使用general及维度叙述，不自动显示三档。"
+  }
+}

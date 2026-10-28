@@ -1,0 +1,690 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "kseg6_zh_cn_research",
+    "instrumentVersion": "1.0.1"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 2,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "自我呈现简表（KSE-G，6题）（中文研究译稿）",
+      "abbreviation": "KSE-G",
+      "instrumentFamily": "social-desirability-gamma"
+    },
+    "construct": {
+      "primaryDomain": "PERSONALITY",
+      "secondaryDomains": [],
+      "constructDefinition": "对正面行为及不理想行为的自我描述，原社会期许研究工具的两个独立方面；不是测谎或诚信测验。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "自我呈现",
+        "社会期许",
+        "成人",
+        "研究用途",
+        "中文工作译稿",
+        "CC BY 4.0",
+        "kseg6",
+        "adult_self_report",
+        "descriptive_report",
+        "non_diagnostic",
+        "domain:personality_self",
+        "construct:self_presentation",
+        "population:ages_18_unspecified",
+        "population:adult_research",
+        "response:self",
+        "response:digital_self",
+        "response:digital_supervised",
+        "response:paper",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:cc_by_4_0",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:translation_review_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    "population": {
+      "populationNotes": "原英德研究样本18–69岁成人，本中文仅成人研究与自我了解，尚无本地验证。ADULT_SELF/student为现有技术角色映射，不表示儿童适用。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "minAge": 18
+    },
+    "administration": {
+      "itemCount": 6,
+      "estimatedMinutes": 2,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "一般自我描述，无固定回忆时段",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保留作者英文版题序和1–5锚点；中文独立工作翻译。",
+        "2019英文版1–5，两组原始均分，全部不反向；不得混用原德语版0–4编码。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "当前中文译稿的心理测量属性未验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "本项目据作者英文题本独立翻译为中文工作稿，并编写通俗反馈；尚非经验证的中文版本。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "待人工译审、认知访谈和本地验证；英语适配及原德语研究证据不可作为当前中文常模。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "kseg6-zh-cn-research-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "kseg6-zh-cn-research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "kseg6-zh-cn-research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "An English-Language Adaptation of the Social Desirability–Gamma Short Scale (KSE-G) — Nießen, D., Partsch, M. V., Kemper, C. J., Rammstedt, B. (2019). CC BY 4.0. 中文工作翻译与反馈由本项目另行编写，原作者未背书。",
+      "https://creativecommons.org/licenses/by/4.0/",
+      "https://link.springer.com/article/10.1186/s42409-018-0005-1",
+      "CC BY 4.0，署名/许可链接/标明修改，无原作者认可；允许商业及非商业再使用，不把推荐研究用途误当NC版权限制。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "PUBLISHED",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "An English-Language Adaptation of the Social Desirability–Gamma Short Scale (KSE-G)",
+        "citation": "Nießen, D.; Partsch, M. V.; Kemper, C. J.; Rammstedt, B. (2019). An English-Language Adaptation of the Social Desirability–Gamma Short Scale (KSE-G). Measurement Instruments for the Social Sciences. DOI 10.1186/s42409-018-0005-1",
+        "url": "https://link.springer.com/article/10.1186/s42409-018-0005-1",
+        "publicationYear": 2019
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "An English-Language Adaptation of the Social Desirability–Gamma Short Scale (KSE-G) — Nießen, D., Partsch, M. V., Kemper, C. J., Rammstedt, B. (2019). CC BY 4.0. 中文工作翻译与反馈由本项目另行编写，原作者未背书。 https://creativecommons.org/licenses/by/4.0/ https://link.springer.com/article/10.1186/s42409-018-0005-1"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "kseg6_agreement_1_5",
+          "options": [
+            {
+              "value": "1",
+              "label": "完全不符合",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "有一点符合",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "有些符合",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "大体符合",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "完全符合",
+              "score": 5
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "KSEG6_01",
+          "content": "争论时，我总能保持客观、就事论事。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "kseg6_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "KSEG6_02",
+          "content": "即使感到压力，我也总是友好、有礼貌地对待别人。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "kseg6_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "KSEG6_03",
+          "content": "与人交谈时，我总是认真听对方说话。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "kseg6_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "KSEG6_04",
+          "content": "过去我曾占过别人的便宜。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "kseg6_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "KSEG6_05",
+          "content": "我偶尔曾在郊外或路上乱扔垃圾。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "kseg6_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "KSEG6_06",
+          "content": "有时，只有觉得会得到回报，我才帮助别人。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "kseg6_agreement_1_5",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "KSEG6_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "KSEG6_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "KSEG6_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "KSEG6_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "KSEG6_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "KSEG6_06",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "positive_endorsement",
+            "type": "dimension",
+            "label": "对正面表现的自我描述",
+            "description": "对正面表现的自我描述的回答均值；不是诚信、能力或风险等级。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "KSEG6_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "KSEG6_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "KSEG6_03",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "negative_admission_raw",
+            "type": "dimension",
+            "label": "对不理想行为的承认",
+            "description": "对不理想行为的承认的回答均值；不是诚信、能力或风险等级。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "KSEG6_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "KSEG6_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "KSEG6_06",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.1",
+        "primaryScoreKeys": [
+          "positive_endorsement",
+          "negative_admission_raw"
+        ],
+        "scoreOrder": [
+          "positive_endorsement",
+          "negative_admission_raw"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "positive_endorsement",
+            "headline": "你会怎样描述自己做得好的地方？",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这几道题问到争论时保持客观、压力下友好待人，以及认真听别人说话。你越同意这些说法，表示这次越认同自己始终有这些正面表现的描述，并不能据此断定你在夸大或说谎。比如，工作汇报时我们可能先想到顺利完成的部分，而和熟悉的人复盘时更容易讲到困难。描述自己会受到场合、心情和题目理解的影响；试着回到具体经历，比给自己一个笼统评价更有帮助。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回想一次争论或忙碌的场景：当时哪些表现做得不错，哪些地方和理想中的自己不一样？"
+              },
+              {
+                "category": "strategy",
+                "text": "下次复盘时，可以各写一件做得好的事和一件想改进的事，用具体经历代替“我总是”或“我从不”。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "negative_admission_raw",
+            "headline": "也给不完美的经历留一点位置",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这几道题涉及占便宜、乱扔垃圾，以及期待回报才帮助别人等不太理想的经历。回答越同意，只表示你越承认题目提到的行为，并不表示你越会隐瞒，也不能反过来把不同意当成不诚实。人们对这些情境的理解和回忆可能不同，愿不愿意谈及它们也受安全感影响。这不是一份好人或坏人的成绩单，更不能凭几道题决定别人的回答是否应该被丢弃。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "如果某句话让你想到具体经历，可以想想当时发生了什么，而不急着给自己贴标签。"
+              },
+              {
+                "category": "strategy",
+                "text": "选择一件自己愿意改进的小事，例如更清楚地表达期待、处理好垃圾或尊重别人的边界；不必为了证明诚实而勉强承认没有发生的事。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这是独立中文工作译稿，仍待人工审校和本地验证，仅供成人研究与自我了解。",
+          "英国和德国成人研究中的平均值仅作出处记录，不能当作中国人的标准答案；本报告不作高低分级、排名或风险判断。",
+          "六题都需完整回答才提供完整报告；两个方面分开看，不合成总体诚信分。漏答不补零、不猜测。",
+          "不能用于诊断、重要选拔、对个人诚信作结论或自动剔除研究参与者。"
+        ],
+        "disclaimer": "An English-Language Adaptation of the Social Desirability–Gamma Short Scale (KSE-G) — Nießen, D., Partsch, M. V., Kemper, C. J., Rammstedt, B. (2019). CC BY 4.0. 中文工作翻译与反馈由本项目另行编写，原作者未背书。 https://creativecommons.org/licenses/by/4.0/ 。仅供成人研究与自我了解，不用于心理诊断或诚信评价。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN"
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "kseg6",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "KSEG6_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "KSEG6_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "KSEG6_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "KSEG6_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "KSEG6_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "KSEG6_06",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "positive_endorsement": 1,
+            "negative_admission_raw": 1
+          },
+          "totalScoreKeys": [
+            "positive_endorsement",
+            "negative_admission_raw"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "KSEG6_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "KSEG6_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "KSEG6_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "KSEG6_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "KSEG6_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "KSEG6_06",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "positive_endorsement": 5,
+            "negative_admission_raw": 5
+          },
+          "totalScoreKeys": [
+            "positive_endorsement",
+            "negative_admission_raw"
+          ]
+        }
+      },
+      {
+        "name": "all-three",
+        "answers": [
+          {
+            "itemCode": "KSEG6_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "KSEG6_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "KSEG6_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "KSEG6_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "KSEG6_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "KSEG6_06",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "positive_endorsement": 3,
+            "negative_admission_raw": 3
+          },
+          "totalScoreKeys": [
+            "positive_endorsement",
+            "negative_admission_raw"
+          ]
+        }
+      },
+      {
+        "name": "all-one",
+        "answers": [
+          {
+            "itemCode": "KSEG6_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "KSEG6_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "KSEG6_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "KSEG6_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "KSEG6_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "KSEG6_06",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "positive_endorsement": 1,
+            "negative_admission_raw": 1
+          },
+          "totalScoreKeys": [
+            "positive_endorsement",
+            "negative_admission_raw"
+          ]
+        }
+      },
+      {
+        "name": "separate-directions",
+        "answers": [
+          {
+            "itemCode": "KSEG6_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "KSEG6_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "KSEG6_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "KSEG6_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "KSEG6_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "KSEG6_06",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "positive_endorsement": 5,
+            "negative_admission_raw": 1
+          },
+          "totalScoreKeys": [
+            "positive_endorsement",
+            "negative_admission_raw"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "下面这些说法与你的实际情况可能有不同程度的符合。请指出每句话与你有多符合。",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "docs/scale-instruments/research-drafts/kseg6/1.0.0/bilingual-content.json#instructions.zh @ b92c69aefa2472775fa7ee86b9c208366886c908 (项目工作稿；非人工审批声明)"
+  }
+}

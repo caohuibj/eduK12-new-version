@@ -1,0 +1,293 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "ebq16_zh_cn_research",
+    "instrumentVersion": "1.0.1"
+  },
+  "source": {
+    "citation": "Becerra, R., Preece, D. A., & Gross, J. J. (2020). Assessing beliefs about emotions: Development and validation of the Emotion Beliefs Questionnaire. PLOS ONE, 15(4), e0231395. https://doi.org/10.1371/journal.pone.0231395.",
+    "doi": "10.1371/journal.pone.0231395",
+    "paper": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0231395",
+    "authorPdf": "https://spldev.sites.stanford.edu/sites/g/files/sbiybj19321/files/media/file/ebq_questionnaire_and_scoring_instructions_042020.pdf",
+    "discoveryOsdBlob": "7e01b4a104c95203207f4296a4210e46428db225"
+  },
+  "translation": {
+    "targetLocale": "zh-CN",
+    "status": "PLATFORM_WORK_TRANSLATION",
+    "expertApproved": false,
+    "validatedInChina": false
+  },
+  "items": [
+    {
+      "itemNumber": 1,
+      "itemCode": "EBQ_01",
+      "sourceEnglish": "Once people are experiencing negative emotions, there is nothing they can do about modifying them.",
+      "workChinese": "人一旦开始体验负面情绪，就无法再做些什么来改变这种情绪。",
+      "scoreMinimum": 1,
+      "scoreMaximum": 7,
+      "dimension": "neg_controllability"
+    },
+    {
+      "itemNumber": 2,
+      "itemCode": "EBQ_02",
+      "sourceEnglish": "People cannot control their positive emotions.",
+      "workChinese": "人们无法控制自己的积极情绪。",
+      "scoreMinimum": 1,
+      "scoreMaximum": 7,
+      "dimension": "pos_controllability"
+    },
+    {
+      "itemNumber": 3,
+      "itemCode": "EBQ_03",
+      "sourceEnglish": "There is very little use for negative emotions.",
+      "workChinese": "负面情绪几乎没有什么用处。",
+      "scoreMinimum": 1,
+      "scoreMaximum": 7,
+      "dimension": "neg_usefulness"
+    },
+    {
+      "itemNumber": 4,
+      "itemCode": "EBQ_04",
+      "sourceEnglish": "Positive emotions are very unhelpful to people.",
+      "workChinese": "积极情绪对人们很没有帮助。",
+      "scoreMinimum": 1,
+      "scoreMaximum": 7,
+      "dimension": "pos_usefulness"
+    },
+    {
+      "itemNumber": 5,
+      "itemCode": "EBQ_05",
+      "sourceEnglish": "It doesn't matter how hard people try, they cannot change their negative emotions.",
+      "workChinese": "无论人们多么努力，都无法改变自己的负面情绪。",
+      "scoreMinimum": 1,
+      "scoreMaximum": 7,
+      "dimension": "neg_controllability"
+    },
+    {
+      "itemNumber": 6,
+      "itemCode": "EBQ_06",
+      "sourceEnglish": "People cannot learn techniques to effectively control their positive emotions.",
+      "workChinese": "人们无法学会有效调节积极情绪的方法。",
+      "scoreMinimum": 1,
+      "scoreMaximum": 7,
+      "dimension": "pos_controllability"
+    },
+    {
+      "itemNumber": 7,
+      "itemCode": "EBQ_07",
+      "sourceEnglish": "People don't need their negative emotions.",
+      "workChinese": "人们不需要自己的负面情绪。",
+      "scoreMinimum": 1,
+      "scoreMaximum": 7,
+      "dimension": "neg_usefulness"
+    },
+    {
+      "itemNumber": 8,
+      "itemCode": "EBQ_08",
+      "sourceEnglish": "There is very little use for positive emotions.",
+      "workChinese": "积极情绪几乎没有什么用处。",
+      "scoreMinimum": 1,
+      "scoreMaximum": 7,
+      "dimension": "pos_usefulness"
+    },
+    {
+      "itemNumber": 9,
+      "itemCode": "EBQ_09",
+      "sourceEnglish": "People cannot control their negative emotions.",
+      "workChinese": "人们无法控制自己的负面情绪。",
+      "scoreMinimum": 1,
+      "scoreMaximum": 7,
+      "dimension": "neg_controllability"
+    },
+    {
+      "itemNumber": 10,
+      "itemCode": "EBQ_10",
+      "sourceEnglish": "It doesn't matter how hard people try, they cannot change their positive emotions.",
+      "workChinese": "无论人们多么努力，都无法改变自己的积极情绪。",
+      "scoreMinimum": 1,
+      "scoreMaximum": 7,
+      "dimension": "pos_controllability"
+    },
+    {
+      "itemNumber": 11,
+      "itemCode": "EBQ_11",
+      "sourceEnglish": "Negative emotions are harmful.",
+      "workChinese": "负面情绪是有害的。",
+      "scoreMinimum": 1,
+      "scoreMaximum": 7,
+      "dimension": "neg_usefulness"
+    },
+    {
+      "itemNumber": 12,
+      "itemCode": "EBQ_12",
+      "sourceEnglish": "People don't need their positive emotions.",
+      "workChinese": "人们不需要自己的积极情绪。",
+      "scoreMinimum": 1,
+      "scoreMaximum": 7,
+      "dimension": "pos_usefulness"
+    },
+    {
+      "itemNumber": 13,
+      "itemCode": "EBQ_13",
+      "sourceEnglish": "People cannot learn techniques to effectively control their negative emotions.",
+      "workChinese": "人们无法学会有效调节负面情绪的方法。",
+      "scoreMinimum": 1,
+      "scoreMaximum": 7,
+      "dimension": "neg_controllability"
+    },
+    {
+      "itemNumber": 14,
+      "itemCode": "EBQ_14",
+      "sourceEnglish": "Once people are experiencing positive emotions, there is nothing they can do about modifying them.",
+      "workChinese": "人一旦开始体验积极情绪，就没有办法改变它。",
+      "scoreMinimum": 1,
+      "scoreMaximum": 7,
+      "dimension": "pos_controllability"
+    },
+    {
+      "itemNumber": 15,
+      "itemCode": "EBQ_15",
+      "sourceEnglish": "The presence of negative emotions is a bad thing for people.",
+      "workChinese": "出现负面情绪，对人们来说是一件坏事。",
+      "scoreMinimum": 1,
+      "scoreMaximum": 7,
+      "dimension": "neg_usefulness"
+    },
+    {
+      "itemNumber": 16,
+      "itemCode": "EBQ_16",
+      "sourceEnglish": "Positive emotions are harmful.",
+      "workChinese": "积极情绪是有害的。",
+      "scoreMinimum": 1,
+      "scoreMaximum": 7,
+      "dimension": "pos_usefulness"
+    }
+  ],
+  "options": {
+    "values": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "originalAnchors": {
+      "1": "Strongly disagree",
+      "4": "Neither agree nor disagree",
+      "7": "Strongly agree"
+    },
+    "chineseWorkAnchors": {
+      "1": "非常不同意",
+      "4": "既不同意也不反对",
+      "7": "非常同意"
+    }
+  },
+  "scores": [
+    {
+      "key": "neg_controllability",
+      "originalItemNumbers": [
+        1,
+        5,
+        9,
+        13
+      ],
+      "aggregation": "SUM",
+      "minimum": 4,
+      "maximum": 28
+    },
+    {
+      "key": "pos_controllability",
+      "originalItemNumbers": [
+        2,
+        6,
+        10,
+        14
+      ],
+      "aggregation": "SUM",
+      "minimum": 4,
+      "maximum": 28
+    },
+    {
+      "key": "neg_usefulness",
+      "originalItemNumbers": [
+        3,
+        7,
+        11,
+        15
+      ],
+      "aggregation": "SUM",
+      "minimum": 4,
+      "maximum": 28
+    },
+    {
+      "key": "pos_usefulness",
+      "originalItemNumbers": [
+        4,
+        8,
+        12,
+        16
+      ],
+      "aggregation": "SUM",
+      "minimum": 4,
+      "maximum": 28
+    },
+    {
+      "key": "general_controllability",
+      "originalItemNumbers": [
+        1,
+        2,
+        5,
+        6,
+        9,
+        10,
+        13,
+        14
+      ],
+      "aggregation": "SUM",
+      "minimum": 8,
+      "maximum": 56
+    },
+    {
+      "key": "general_usefulness",
+      "originalItemNumbers": [
+        3,
+        4,
+        7,
+        8,
+        11,
+        12,
+        15,
+        16
+      ],
+      "aggregation": "SUM",
+      "minimum": 8,
+      "maximum": 56
+    },
+    {
+      "key": "total",
+      "originalItemNumbers": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+      ],
+      "aggregation": "SUM",
+      "minimum": 16,
+      "maximum": 112
+    }
+  ]
+}

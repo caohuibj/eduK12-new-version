@@ -1,0 +1,319 @@
+{
+  "sourceAccessDate": "2026-10-25",
+  "status": "RESEARCH_CANDIDATE_NOT_IMPORTED",
+  "license": {
+    "status": "PUBLIC_DOMAIN",
+    "scope": "IPIP items/scales/inventories, commercial and noncommercial use; official homepage explicitly permits copying, editing and translation",
+    "permissionUrl": "https://ipip.ori.org/newPermission.htm",
+    "translationPermissionUrl": "https://ipip.ori.org/",
+    "note": "This applies to these exact IPIP items, not every proprietary measure with a similar name."
+  },
+  "sourceItemsUrl": "https://ipip.ori.org/newEmotionalIntelligenceKey.htm",
+  "scoringUrl": "https://ipip.ori.org/newScoringInstructions.htm",
+  "reliabilityUrl": "https://ipip.ori.org/newEmotionalIntelligenceTable.htm",
+  "translation": {
+    "language": "zh-CN",
+    "status": "AI_WORKING_TRANSLATION_REVIEW_PENDING",
+    "validatedChineseVersion": false,
+    "note": "No verified validated Chinese version of this exact item set located in this pass. Do not identify as an official Chinese edition.",
+    "item10Caution": "Wish I could more easily show my negative feelings is officially reverse-keyed despite its wish wording. Preserve as written; do not rewrite as ease of expression."
+  },
+  "administration": {
+    "responseMode": "ADULT_SELF",
+    "timeframe": "General self-description, not a specified recent-week recall period",
+    "instructionZh": "请描述你现在通常的真实情况，而不是你希望将来成为的样子。判断下面每句话与你的符合程度。没有标准答案。",
+    "responseOptions": [
+      {
+        "value": 1,
+        "en": "Very Inaccurate",
+        "zh": "非常不符合"
+      },
+      {
+        "value": 2,
+        "en": "Moderately Inaccurate",
+        "zh": "比较不符合"
+      },
+      {
+        "value": 3,
+        "en": "Neither Inaccurate nor Accurate",
+        "zh": "介于不符合与符合之间"
+      },
+      {
+        "value": 4,
+        "en": "Moderately Accurate",
+        "zh": "比较符合"
+      },
+      {
+        "value": 5,
+        "en": "Very Accurate",
+        "zh": "非常符合"
+      }
+    ],
+    "populationCaution": "Adult research-only is a conservative project use boundary, not proof of validation in Chinese adults, teachers or minors.",
+    "instructionSourceUrl": "https://ipip.ori.org/New_IPIP-50-item-scale.htm",
+    "instructionSourceNote": "Official administration sample is a suggestion, not a mandatory standardized instruction. General present self-description retained. Project wording does not repeat unsupported absolute confidentiality or require same-sex comparisons.",
+    "instructionEnExcerpt": "Describe yourself as you generally are now, not as you wish to be in the future."
+  },
+  "scoring": {
+    "method": "Sum keyed responses; positive=x, negative=6-x",
+    "min": 10,
+    "max": 50,
+    "missing": "Require all 10 integer responses in 1..5; no imputation. Conservative project rule, not an official missingness rule.",
+    "reverseItemPositions": [
+      6,
+      7,
+      8,
+      9,
+      10
+    ]
+  },
+  "empiricalThresholds": [],
+  "norms": {
+    "status": "NOT_ESTABLISHED_FOR_PROJECT",
+    "note": "No cutoffs, diagnostic bands, Chinese percentiles or school norms are supported by the reviewed official pages. Do not use response-range thirds as empirical thresholds."
+  },
+  "references": [
+    {
+      "author": "International Personality Item Pool",
+      "title": "The Items in Each of the IPIP Scales Measuring Seven Components Potentially Related to Emotional Intelligence (Barchard, 2001)",
+      "url": "https://ipip.ori.org/newEmotionalIntelligenceKey.htm",
+      "role": "Exact item text and positive/negative keys"
+    },
+    {
+      "author": "International Personality Item Pool",
+      "title": "Coefficient Alpha Reliability Estimates for the IPIP Scales Measuring Seven Components Potentially Related to Emotional Intelligence",
+      "url": "https://ipip.ori.org/newEmotionalIntelligenceTable.htm",
+      "role": "Official reliability table; women N=432, men N=317; sample age/population details not established from table"
+    },
+    {
+      "author": "International Personality Item Pool",
+      "title": "Converting IPIP Item Responses to Scale Scores",
+      "url": "https://ipip.ori.org/newScoringInstructions.htm",
+      "role": "Response anchors and scoring"
+    },
+    {
+      "author": "International Personality Item Pool",
+      "title": "Obtaining Permission",
+      "url": "https://ipip.ori.org/newPermission.htm",
+      "role": "Public-domain permission"
+    },
+    {
+      "author": "International Personality Item Pool",
+      "title": "Administering IPIP Measures, with a 50-item Sample Questionnaire",
+      "url": "https://ipip.ori.org/New_IPIP-50-item-scale.htm",
+      "role": "Suggested general self-description instruction; project adaptation explicitly documented"
+    }
+  ],
+  "candidateId": "IPIP_NEGATIVE_EXPRESSIVITY10",
+  "nameEn": "IPIP Negative Expressivity",
+  "nameZh": "IPIP消极情绪表达10题（研究译稿）",
+  "itemCount": 10,
+  "dimensionCount": 1,
+  "attribution": "Barchard (2001), as attributed by the official IPIP key; do not claim a complete emotional-intelligence battery.",
+  "items": [
+    {
+      "id": "q1",
+      "position": 1,
+      "en": "Shout or scream when I'm angry.",
+      "zh": "生气时，我会大喊大叫。",
+      "key": "positive"
+    },
+    {
+      "id": "q2",
+      "position": 2,
+      "en": "Can't help but look upset when something bad happens.",
+      "zh": "发生不好的事情时，我会不由自主地显露出难受的样子。",
+      "key": "positive"
+    },
+    {
+      "id": "q3",
+      "position": 3,
+      "en": "Show my fear.",
+      "zh": "我会把害怕的感受表现出来。",
+      "key": "positive"
+    },
+    {
+      "id": "q4",
+      "position": 4,
+      "en": "Suspect that my facial expressions give me away when I feel sad.",
+      "zh": "难过时，我觉得自己的表情会流露出这种感受。",
+      "key": "positive"
+    },
+    {
+      "id": "q5",
+      "position": 5,
+      "en": "Show my sadness.",
+      "zh": "我会把悲伤的感受表现出来。",
+      "key": "positive"
+    },
+    {
+      "id": "q6",
+      "position": 6,
+      "en": "Keep my feelings to myself, regardless of how unhappy I am.",
+      "zh": "不管有多不开心，我都把感受藏在心里。",
+      "key": "negative"
+    },
+    {
+      "id": "q7",
+      "position": 7,
+      "en": "Find it difficult showing people that I'm angry with them.",
+      "zh": "我很难向别人表现出我在生他们的气。",
+      "key": "negative"
+    },
+    {
+      "id": "q8",
+      "position": 8,
+      "en": "Keep my feelings to myself, regardless of how scared I am.",
+      "zh": "不管有多害怕，我都把感受藏在心里。",
+      "key": "negative"
+    },
+    {
+      "id": "q9",
+      "position": 9,
+      "en": "Rarely show my anger.",
+      "zh": "我很少表现出愤怒。",
+      "key": "negative"
+    },
+    {
+      "id": "q10",
+      "position": 10,
+      "en": "Wish I could more easily show my negative feelings.",
+      "zh": "我希望自己能更容易地表达消极情绪。",
+      "key": "negative"
+    }
+  ],
+  "reliability": {
+    "women": {
+      "n": 432,
+      "alpha": 0.75
+    },
+    "men": {
+      "n": 317,
+      "alpha": 0.74
+    },
+    "interpretation": "Official English-source group coefficients, women N=432 and men N=317; not evidence of Chinese reliability, individual accuracy or normative thresholds."
+  },
+  "tags": [
+    "情绪与人际",
+    "成人自评",
+    "研究译稿",
+    "非诊断",
+    "公共领域",
+    "IPIP"
+  ],
+  "construct": "Self-reported outward expression versus concealment of negative emotions; not symptom severity, aggression diagnosis, emotional regulation skill or a universally desirable direction.",
+  "feedback": {
+    "summary": "这份回答关注的是：难过、害怕或生气时，别人有多容易看见你的感受。它不是在判断你是不是“情绪不好的人”。",
+    "direction": "计分方向越高，表示这些感受越容易通过表情或行动流露；越少外露，也不等于更平静或更会调节。表达得多或少都没有统一的好坏答案。",
+    "reflection": "想想最近一次不开心：你想让别人理解什么？你实际表达出来的内容，和心里想说的一样吗？",
+    "action": "可以试着把“你怎么总这样”换成“刚才发生这件事时，我有些生气，我希望……”。表达感受不等于吼叫、威胁或伤害别人；情绪很强时，先暂停一下也可以。",
+    "limits": "习惯、文化、关系安全感和具体场合都会影响表达。这个中文工作译稿尚待审核与验证，没有诊断分界值，也不能据此判断情绪控制能力。"
+  },
+  "tagAxes": {
+    "domain": [
+      "情绪体验与表达",
+      "人际互动"
+    ],
+    "construct": [
+      "消极情绪表达",
+      "情绪外露"
+    ],
+    "orientation": [],
+    "population": [
+      "成人研究使用边界；非中文效度声明"
+    ],
+    "response": [
+      "成人自评",
+      "5点符合程度"
+    ],
+    "use": [
+      "研究探索",
+      "非诊断自我反思"
+    ],
+    "license": [
+      "公共领域",
+      "允许公开再分发",
+      "允许商业使用"
+    ],
+    "language_validation": [
+      "英文原题",
+      "中文工作译稿",
+      "中文效度待验证"
+    ]
+  },
+  "versionNote": "Current official 10-item key accessed 2026-10-25; retain exact item wording and official keys.",
+  "family": "IPIP scales measuring seven components potentially related to emotional intelligence (Barchard, 2001); this isolated component is not a full emotional-intelligence test and is not another proprietary instrument.",
+  "validationVectors": {
+    "allRaw1": 30,
+    "allRaw3": 30,
+    "allRaw5": 30,
+    "minimum": {
+      "responses": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        5,
+        5,
+        5,
+        5,
+        5
+      ],
+      "total": 10
+    },
+    "maximum": {
+      "responses": [
+        5,
+        5,
+        5,
+        5,
+        5,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "total": 50
+    },
+    "oneMissing": "reject/no-score (project rule)",
+    "outOfRange0": "reject",
+    "outOfRange6": "reject",
+    "nonInteger2_5": "reject"
+  },
+  "sourceFiles": [
+    {
+      "url": "https://ipip.ori.org/New_IPIP-50-item-scale.htm",
+      "file": "New_IPIP-50-item-scale.htm",
+      "sha256": "489d66de7a643d13e620ad2907285639f12e0bc083fbb4e68dc54128373e6f5a"
+    },
+    {
+      "url": "https://ipip.ori.org/newEmotionalIntelligenceKey.htm",
+      "file": "newEmotionalIntelligenceKey.htm",
+      "sha256": "debc79889cc789105f07d27c7f2ead5c5849d64f4cccdb522eb1885e463cfaca"
+    },
+    {
+      "url": "https://ipip.ori.org/newEmotionalIntelligenceTable.htm",
+      "file": "newEmotionalIntelligenceTable.htm",
+      "sha256": "ec4cd864168feacdaf4dcfc177507e68ed7b2d580ffeef90d97a1e0f2da363d9"
+    },
+    {
+      "url": "https://ipip.ori.org/newPermission.htm",
+      "file": "newPermission.htm",
+      "sha256": "15e3d162504ce920c1da2476941b2a538f2d06075b514324de8cbeab874cc198"
+    },
+    {
+      "url": "https://ipip.ori.org/newScoringInstructions.htm",
+      "file": "newScoringInstructions.htm",
+      "sha256": "9429ac6d94589173a704c1079afe62833f8fcc5d0fe48e6df595b9022373af87"
+    }
+  ],
+  "deduplication": {
+    "checkedDirectory": "docs/scale-instruments/research-drafts",
+    "sameCandidateKeyFound": false,
+    "exactEnglishItemOverlapFiles": [],
+    "note": "Also grep-checked repository keys and distinguishing first items; no matching instrument. Shared IPIP items do not mean duplicate complete scales.",
+    "instrumentSourceExactEnglishItemOverlapFiles": []
+  }
+}

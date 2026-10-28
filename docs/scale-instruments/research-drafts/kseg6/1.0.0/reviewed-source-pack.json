@@ -1,0 +1,336 @@
+{
+  "checkedAt": "2026-10-25",
+  "contentStatus": "RESEARCH_CANDIDATE",
+  "translationStatus": "PROJECT_WORKING_TRANSLATION_NOT_VALIDATED",
+  "expertReview": "PENDING",
+  "defaultAudience": "ADULT_SELF_18_69_REFERENCE_ONLY",
+  "k12Validated": false,
+  "thresholds": [],
+  "thresholdPolicy": "No validated diagnostic cutoff. No invented low/medium/high, percentile, risk, ability, honesty or suitability classifications. Reference means are not thresholds.",
+  "missingPolicy": {
+    "rule": "all items required; no imputation",
+    "source": "Author recommends aggregation only with no missing values"
+  },
+  "rights": {
+    "license": "CC-BY-4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "noncommercialOnly": false,
+    "copyTranslationDigitalRedistribution": "Permitted with attribution, license link and modification notice.",
+    "basis": "Author-developed English adaptation reproduced in an explicitly named author-supplied English Answer Sheet; full form inspected for exceptions. Published article licenses material under CC BY 4.0. No separate restrictive credit found in the named form. Not inferred from an unrelated open-access paper.",
+    "changesNotice": "本项目据作者英文题本独立翻译为中文工作稿，并编写通俗反馈；尚非经验证的中文版本。",
+    "caution": "Do not relabel CC BY as public domain or noncommercial-only. Do not imply original authors endorse translation or report."
+  },
+  "reportPolicy": {
+    "purpose": "自主了解与研究用途，非诊断",
+    "prohibited": [
+      "诊断",
+      "筛选/录取/能力排名",
+      "自动剔除研究参与者",
+      "测谎或诚信评价",
+      "中国人群百分位",
+      "儿童常模推断"
+    ],
+    "thresholdTrigger": "none; all response patterns receive the same neutral construct introduction and reflection actions",
+    "display": "面向普通人不显示标准分、信度、常模百分位；可在展开的技术说明显示原始均分及范围。"
+  },
+  "sampleContext": {
+    "fielding": "January 2018",
+    "mode": "self-administered online survey (CASI)",
+    "sampling": "heterogeneous quota samples by age, gender, education; respective-language native speakers; not Chinese norms",
+    "UK": {
+      "n": 468,
+      "retestN": 111
+    },
+    "Germany": {
+      "n": 474,
+      "retestN": 117
+    },
+    "ageRange": [
+      18,
+      69
+    ]
+  },
+  "dedup": {
+    "mainRegistry": "eduk12-main-review-20261025/server-version/backend/src/modules/scale/onboarding/instruments.generated.ts",
+    "exactAliasMatch": false,
+    "excluded": "Not IE4 (historical PR328 draft deferred); not existing GSE/ASKU or nine recent additions."
+  },
+  "id": "KSEG6",
+  "title": "自我呈现简表（KSE-G，6题）",
+  "family": "social-desirability-gamma",
+  "tags": [
+    "自我呈现",
+    "社会期许",
+    "成人",
+    "研究用途",
+    "中文工作译稿",
+    "CC BY 4.0"
+  ],
+  "references": [
+    {
+      "authors": [
+        "Nießen, D.",
+        "Partsch, M. V.",
+        "Kemper, C. J.",
+        "Rammstedt, B."
+      ],
+      "year": 2019,
+      "title": "An English-Language Adaptation of the Social Desirability–Gamma Short Scale (KSE-G)",
+      "journal": "Measurement Instruments for the Social Sciences",
+      "volume": 1,
+      "article": 2,
+      "doi": "10.1186/s42409-018-0005-1",
+      "url": "https://link.springer.com/article/10.1186/s42409-018-0005-1"
+    },
+    {
+      "type": "GESIS documentation",
+      "doi": "10.6102/zis271_exz",
+      "url": "https://zis.gesis.org/s//skala/Nießen-Partsch-Kemper-Rammstedt-Social-Desirability-Gamma-Short-Scale-(KSE-G)?lang=en"
+    }
+  ],
+  "instructions": {
+    "en": "The following statements may apply more or less to you personally. Please indicate to what extent they apply to you.",
+    "zh": "下面这些说法与你的实际情况可能有不同程度的符合。请指出每句话与你有多符合。"
+  },
+  "options": [
+    {
+      "value": 1,
+      "en": "doesn’t apply at all",
+      "zh": "完全不符合"
+    },
+    {
+      "value": 2,
+      "en": "applies a bit",
+      "zh": "有一点符合"
+    },
+    {
+      "value": 3,
+      "en": "applies somewhat",
+      "zh": "有些符合"
+    },
+    {
+      "value": 4,
+      "en": "applies mostly",
+      "zh": "大体符合"
+    },
+    {
+      "value": 5,
+      "en": "applies completely",
+      "zh": "完全符合"
+    }
+  ],
+  "items": [
+    {
+      "id": "1",
+      "en": "In an argument, I always remain objective and stick to the facts.",
+      "zh": "争论时，我总能保持客观、就事论事。",
+      "reverse": false,
+      "subscale": "PQ_POSITIVE_ENDORSEMENT"
+    },
+    {
+      "id": "2",
+      "en": "Even if I am feeling stressed, I am always friendly and polite to others.",
+      "zh": "即使感到压力，我也总是友好、有礼貌地对待别人。",
+      "reverse": false,
+      "subscale": "PQ_POSITIVE_ENDORSEMENT"
+    },
+    {
+      "id": "3",
+      "en": "When talking to someone, I always listen carefully to what the other person says.",
+      "zh": "与人交谈时，我总是认真听对方说话。",
+      "reverse": false,
+      "subscale": "PQ_POSITIVE_ENDORSEMENT"
+    },
+    {
+      "id": "4",
+      "en": "It has happened that I have taken advantage of someone in the past.",
+      "zh": "过去我曾占过别人的便宜。",
+      "reverse": false,
+      "subscale": "NQ_NEGATIVE_ADMISSION_RAW"
+    },
+    {
+      "id": "5",
+      "en": "I have occasionally thrown litter away in the countryside or on to the road.",
+      "zh": "我偶尔曾在郊外或路上乱扔垃圾。",
+      "reverse": false,
+      "subscale": "NQ_NEGATIVE_ADMISSION_RAW"
+    },
+    {
+      "id": "6",
+      "en": "Sometimes I only help people if I expect to get something in return.",
+      "zh": "有时，只有觉得会得到回报，我才帮助别人。",
+      "reverse": false,
+      "subscale": "NQ_NEGATIVE_ADMISSION_RAW"
+    }
+  ],
+  "scoring": {
+    "type": "separate_unweighted_means",
+    "subscales": [
+      {
+        "id": "PQ_POSITIVE_ENDORSEMENT",
+        "originalName": "PQ+",
+        "itemIds": [
+          "1",
+          "2",
+          "3"
+        ],
+        "formula": "(q1+q2+q3)/3",
+        "range": [
+          1,
+          5
+        ],
+        "higherMeans": "Stronger agreement with always displaying positive conduct; not proof of exaggeration or dishonesty."
+      },
+      {
+        "id": "NQ_NEGATIVE_ADMISSION_RAW",
+        "originalName": "NQ−",
+        "itemIds": [
+          "4",
+          "5",
+          "6"
+        ],
+        "formula": "(q4+q5+q6)/3",
+        "range": [
+          1,
+          5
+        ],
+        "higherMeans": "More endorsement of the stated negative acts, NOT greater denial or minimization."
+      }
+    ],
+    "reverseItemIds": [],
+    "totalScore": null,
+    "directionWarning": "The author labels the second construct minimizing negative qualities, but publishes raw item/subscale means around 1.90/2.12 and instructs unweighted means without reversal. Preserve raw scoring; do not label a high raw mean as more concealment. Do not silently reverse to create a global desirability score.",
+    "originalGermanCodingWarning": "English 2019 uses 1–5; German 2014 used 0–4. Do not mix reference values or coding."
+  },
+  "referenceParameters": [
+    {
+      "population": "UK adult quota sample",
+      "n": 468,
+      "subscale": "PQ_POSITIVE_ENDORSEMENT",
+      "mean": 3.55,
+      "sd": 0.73
+    },
+    {
+      "population": "Germany adult quota sample",
+      "n": 474,
+      "subscale": "PQ_POSITIVE_ENDORSEMENT",
+      "mean": 3.67,
+      "sd": 0.68
+    },
+    {
+      "population": "UK adult quota sample",
+      "n": 468,
+      "subscale": "NQ_NEGATIVE_ADMISSION_RAW",
+      "mean": 1.9,
+      "sd": 0.93
+    },
+    {
+      "population": "Germany adult quota sample",
+      "n": 474,
+      "subscale": "NQ_NEGATIVE_ADMISSION_RAW",
+      "mean": 2.12,
+      "sd": 0.89
+    }
+  ],
+  "referenceUse": "Supplementary Table S1 raw means, context only. Not honesty thresholds, cross-cultural norms, or exclusion criteria.",
+  "report": {
+    "title": "描述自己时，你看见了哪些面？",
+    "intro": "我们介绍自己时，往往更容易想到做得好的地方；有些不太理想的小事，也可能不容易承认。这份简表邀请你留意这种表达习惯，不是测谎仪，更不是“好人分数”。",
+    "explanation": "前半部分谈的是“我总能做到”的好表现，后半部分谈的是偶尔出现的不理想行为。它们分开看，不合成一张诚信成绩单。回答也会受到当时心情、题目理解和作答场合的影响。",
+    "lifeExample": "比如，工作汇报时你可能先说顺利完成的任务；和熟悉的朋友复盘时，却更容易提起一次拖延。这不一定是撒谎，场合和安全感也会影响我们怎样介绍自己。",
+    "actions": [
+      "看到“总是”这样的词时，想一个最近的具体例子，再问问自己有没有例外。",
+      "写下“这次做得不错的一件事”和“下次想改进的一件事”，让两种观察同时存在。",
+      "若需要和别人讨论结果，先说清楚：这不是判断诚实程度的证据，也不应该用来决定谁值得信任。"
+    ],
+    "caveat": "这份中文工作译稿尚未经过本土验证。不能据此认定隐瞒、撒谎或作答无效，也不能自动删除研究参与者的数据。"
+  },
+  "tests": [
+    {
+      "responses": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "expectedPQ": 1,
+      "expectedNQRaw": 1
+    },
+    {
+      "responses": [
+        5,
+        5,
+        5,
+        5,
+        5,
+        5
+      ],
+      "expectedPQ": 5,
+      "expectedNQRaw": 5
+    },
+    {
+      "responses": [
+        5,
+        5,
+        5,
+        1,
+        1,
+        1
+      ],
+      "expectedPQ": 5,
+      "expectedNQRaw": 1
+    },
+    {
+      "responses": [
+        1,
+        2,
+        3,
+        3,
+        4,
+        5
+      ],
+      "expectedPQ": 2,
+      "expectedNQRaw": 4
+    },
+    {
+      "responses": [
+        1,
+        2,
+        null,
+        3,
+        4,
+        5
+      ],
+      "expected": "NO_SCORE"
+    }
+  ],
+  "sourceFiles": [
+    {
+      "id": "KSEG6",
+      "kind": "article",
+      "url": "https://link.springer.com/article/10.1186/s42409-018-0005-1",
+      "path": "scale-source-packs-gesis-next-20261025/sources/KSEG6_article.html",
+      "sha256": "ed7c324cdb2a32c7b4ee227ddbc00caf8f580a03ac2646b56d793826057bf1ce",
+      "bytes": 450028
+    },
+    {
+      "id": "KSEG6",
+      "kind": "form",
+      "url": "https://media.springernature.com/original/springer-static/esm/art:10.1186%2Fs42409-018-0005-1/MediaObjects/42409_2018_5_MOESM1_ESM.pdf",
+      "path": "scale-source-packs-gesis-next-20261025/sources/KSEG6_form.pdf",
+      "sha256": "6f1336f7e30ee95c8be7678b0dab4817c2ddb7cad12c4ab142f526b401dd19bc",
+      "bytes": 159190
+    },
+    {
+      "id": "KSEG6",
+      "kind": "reference",
+      "url": "https://media.springernature.com/original/springer-static/esm/art:10.1186%2Fs42409-018-0005-1/MediaObjects/42409_2018_5_MOESM4_ESM.pdf",
+      "path": "scale-source-packs-gesis-next-20261025/sources/KSEG6_reference.pdf",
+      "sha256": "48fc7fe445cd7bf62c3557bb207df9f09428ade0b98db784e48530c6df63a46b",
+      "bytes": 175208
+    }
+  ],
+  "attribution": "An English-Language Adaptation of the Social Desirability–Gamma Short Scale (KSE-G) — Nießen, D., Partsch, M. V., Kemper, C. J., Rammstedt, B. (2019). CC BY 4.0. 中文工作翻译与反馈由本项目另行编写，原作者未背书。"
+}

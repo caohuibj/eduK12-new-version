@@ -1,0 +1,119 @@
+{
+  "status": "UNVALIDATED_WORKING_TRANSLATION",
+  "items": [
+    {
+      "code": "IPIP_NFC10_01",
+      "zh": "我喜欢解决复杂的问题。",
+      "en": "Like to solve complex problems.",
+      "reverse": false,
+      "dim": "need_for_cognition"
+    },
+    {
+      "code": "IPIP_NFC10_02",
+      "zh": "别人只需解释一次，我就能明白。",
+      "en": "Need things explained only once.",
+      "reverse": false,
+      "dim": "need_for_cognition"
+    },
+    {
+      "code": "IPIP_NFC10_03",
+      "zh": "我能处理大量信息。",
+      "en": "Can handle a lot of information.",
+      "reverse": false,
+      "dim": "need_for_cognition"
+    },
+    {
+      "code": "IPIP_NFC10_04",
+      "zh": "我喜欢想出做事的新方法。",
+      "en": "Love to think up new ways of doing things.",
+      "reverse": false,
+      "dim": "need_for_cognition"
+    },
+    {
+      "code": "IPIP_NFC10_05",
+      "zh": "我能很快理解事物。",
+      "en": "Am quick to understand things.",
+      "reverse": false,
+      "dim": "need_for_cognition"
+    },
+    {
+      "code": "IPIP_NFC10_06",
+      "zh": "我喜欢阅读有挑战性的材料。",
+      "en": "Love to read challenging material.",
+      "reverse": false,
+      "dim": "need_for_cognition"
+    },
+    {
+      "code": "IPIP_NFC10_07",
+      "zh": "我觉得抽象的观念很难理解。",
+      "en": "Have difficulty understanding abstract ideas.",
+      "reverse": true,
+      "dim": "need_for_cognition"
+    },
+    {
+      "code": "IPIP_NFC10_08",
+      "zh": "我会尽量避开复杂的人。",
+      "en": "Try to avoid complex people.",
+      "reverse": true,
+      "dim": "need_for_cognition"
+    },
+    {
+      "code": "IPIP_NFC10_09",
+      "zh": "我会避开难懂的阅读材料。",
+      "en": "Avoid difficult reading material.",
+      "reverse": true,
+      "dim": "need_for_cognition"
+    },
+    {
+      "code": "IPIP_NFC10_10",
+      "zh": "我会避开哲学性的讨论。",
+      "en": "Avoid philosophical discussions.",
+      "reverse": true,
+      "dim": "need_for_cognition"
+    }
+  ],
+  "anchors": [
+    {
+      "value": 1,
+      "en": "Very Inaccurate",
+      "zh": "很不符合"
+    },
+    {
+      "value": 2,
+      "en": "Moderately Inaccurate",
+      "zh": "比较不符合"
+    },
+    {
+      "value": 3,
+      "en": "Neither Inaccurate nor Accurate",
+      "zh": "介于不符合与符合之间"
+    },
+    {
+      "value": 4,
+      "en": "Moderately Accurate",
+      "zh": "比较符合"
+    },
+    {
+      "value": 5,
+      "en": "Very Accurate",
+      "zh": "很符合"
+    }
+  ],
+  "instructions": "请根据你通常的实际情况，判断下面的描述与你有多符合。请按真实情况作答，而不是你希望自己成为的样子。",
+  "rights": {
+    "type": "public_domain",
+    "source": "https://www.ipip.ori.org/",
+    "electronic_and_translation_source": "https://www.ipip.ori.org/New_IPIP-50-item-scale.htm",
+    "summary": "IPIP官方允许复制、编辑、翻译及任何用途，包括网上施测；仍保留来源署名。"
+  },
+  "references": {
+    "norms": {
+      "clinical_cutoffs": null,
+      "norm_percentiles": null,
+      "reference_status": "NO_VERIFIED_TARGET_POPULATION_NORMS",
+      "source": "https://www.ipip.ori.org/newNorms.htm",
+      "note": "IPIP官方不提供通用常模，提醒按适当样本建立本地参照。不能用量尺等分点或任意均值±SD冒称经验阈值；不移植所对应原版权量表常模。"
+    },
+    "keys": "https://www.ipip.ori.org/newSingleConstructsKey.htm"
+  }
+}

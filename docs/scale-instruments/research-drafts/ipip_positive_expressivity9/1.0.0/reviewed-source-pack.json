@@ -1,0 +1,243 @@
+{
+  "sourceAccessDate": "2026-10-25",
+  "status": "RESEARCH_CANDIDATE_NOT_IMPORTED",
+  "license": {
+    "status": "PUBLIC_DOMAIN",
+    "scope": "IPIP items/scales/inventories, commercial and noncommercial use; official homepage explicitly permits copying, editing and translation",
+    "permissionUrl": "https://ipip.ori.org/newPermission.htm",
+    "translationPermissionUrl": "https://ipip.ori.org/",
+    "note": "This applies to these exact IPIP items, not every proprietary measure with a similar name."
+  },
+  "sourceItemsUrl": "https://ipip.ori.org/newEmotionalIntelligenceKey.htm",
+  "scoringUrl": "https://ipip.ori.org/newScoringInstructions.htm",
+  "reliabilityUrl": "https://ipip.ori.org/newEmotionalIntelligenceTable.htm",
+  "translation": {
+    "language": "zh-CN",
+    "status": "AI_WORKING_TRANSLATION_REVIEW_PENDING",
+    "validatedChineseVersion": false,
+    "note": "No verified validated Chinese version of this exact item set located in this pass. Do not identify as an official Chinese edition."
+  },
+  "administration": {
+    "responseMode": "ADULT_SELF",
+    "timeframe": "General self-description, not a specified recent-week recall period",
+    "instructionZh": "请根据你通常的情况，判断以下说法与你的符合程度。没有标准答案，请按自己的真实感受作答。",
+    "responseOptions": [
+      {
+        "value": 1,
+        "en": "Very Inaccurate",
+        "zh": "非常不符合"
+      },
+      {
+        "value": 2,
+        "en": "Moderately Inaccurate",
+        "zh": "比较不符合"
+      },
+      {
+        "value": 3,
+        "en": "Neither Inaccurate nor Accurate",
+        "zh": "介于不符合与符合之间"
+      },
+      {
+        "value": 4,
+        "en": "Moderately Accurate",
+        "zh": "比较符合"
+      },
+      {
+        "value": 5,
+        "en": "Very Accurate",
+        "zh": "非常符合"
+      }
+    ],
+    "populationCaution": "Adult research-only is a conservative project use boundary, not proof of validation in Chinese adults, teachers or minors."
+  },
+  "scoring": {
+    "method": "Sum keyed responses; positive=x, negative=6-x",
+    "min": 9,
+    "max": 45,
+    "missing": "Require all 9 responses; no imputation. This is a project implementation choice, not a source-defined missingness rule.",
+    "reverseItemPositions": [
+      7,
+      8,
+      9
+    ]
+  },
+  "empiricalThresholds": [],
+  "norms": {
+    "status": "NOT_ESTABLISHED_FOR_PROJECT",
+    "note": "No cutoffs, diagnostic bands, Chinese percentiles or school norms are supported by the reviewed official pages. Do not use response-range thirds as empirical thresholds."
+  },
+  "references": [
+    {
+      "author": "International Personality Item Pool",
+      "title": "The Items in Each of the IPIP Scales Measuring Seven Components Potentially Related to Emotional Intelligence (Barchard, 2001)",
+      "url": "https://ipip.ori.org/newEmotionalIntelligenceKey.htm",
+      "role": "Exact item text and positive/negative keys"
+    },
+    {
+      "author": "International Personality Item Pool",
+      "title": "Coefficient Alpha Reliability Estimates for the IPIP Scales Measuring Seven Components Potentially Related to Emotional Intelligence",
+      "url": "https://ipip.ori.org/newEmotionalIntelligenceTable.htm",
+      "role": "Official reliability table; women N=432, men N=317; sample age/population details not established from table"
+    },
+    {
+      "author": "International Personality Item Pool",
+      "title": "Converting IPIP Item Responses to Scale Scores",
+      "url": "https://ipip.ori.org/newScoringInstructions.htm",
+      "role": "Response anchors and scoring"
+    },
+    {
+      "author": "International Personality Item Pool",
+      "title": "Obtaining Permission",
+      "url": "https://ipip.ori.org/newPermission.htm",
+      "role": "Public-domain permission"
+    }
+  ],
+  "candidateId": "IPIP_POSITIVE_EXPRESSIVITY9",
+  "nameEn": "IPIP Positive Expressivity",
+  "nameZh": "IPIP积极情绪表达9题（研究译稿）",
+  "itemCount": 9,
+  "dimensionCount": 1,
+  "attribution": "Barchard (2001), as attributed by the official IPIP key; do not claim a complete emotional-intelligence battery.",
+  "items": [
+    {
+      "id": "q1",
+      "position": 1,
+      "en": "Express my affection physically.",
+      "zh": "我会用身体接触来表达亲近和喜爱。",
+      "key": "positive"
+    },
+    {
+      "id": "q2",
+      "position": 2,
+      "en": "Laugh out loud if something is funny.",
+      "zh": "遇到有趣的事，我会放声笑出来。",
+      "key": "positive"
+    },
+    {
+      "id": "q3",
+      "position": 3,
+      "en": "Express my happiness in a childlike manner.",
+      "zh": "我会像孩子一样表达自己的快乐。",
+      "key": "positive"
+    },
+    {
+      "id": "q4",
+      "position": 4,
+      "en": "Sometimes laugh out loud when reading or watching TV.",
+      "zh": "看书或看电视时，我有时会放声笑出来。",
+      "key": "positive"
+    },
+    {
+      "id": "q5",
+      "position": 5,
+      "en": "Hug my close friends.",
+      "zh": "我会拥抱亲密的朋友。",
+      "key": "positive"
+    },
+    {
+      "id": "q6",
+      "position": 6,
+      "en": "Show my feelings when I'm happy.",
+      "zh": "开心时，我会把自己的感受表现出来。",
+      "key": "positive"
+    },
+    {
+      "id": "q7",
+      "position": 7,
+      "en": "Find it difficult showing people that I care about them.",
+      "zh": "我觉得很难向别人表达我在乎他们。",
+      "key": "negative"
+    },
+    {
+      "id": "q8",
+      "position": 8,
+      "en": "Have difficulty showing affection.",
+      "zh": "我难以表达亲近和喜爱。",
+      "key": "negative"
+    },
+    {
+      "id": "q9",
+      "position": 9,
+      "en": "Keep my happy feelings to myself.",
+      "zh": "我把开心的感受留在心里，不表现出来。",
+      "key": "negative"
+    }
+  ],
+  "reliability": {
+    "women": {
+      "n": 432,
+      "alpha": 0.81
+    },
+    "men": {
+      "n": 317,
+      "alpha": 0.79
+    },
+    "interpretation": "Official English-source group coefficients, women N=432 and men N=317; not evidence of Chinese reliability, individual accuracy or normative thresholds."
+  },
+  "tags": [
+    "情绪与人际",
+    "成人自评",
+    "研究译稿",
+    "非诊断",
+    "公共领域",
+    "IPIP"
+  ],
+  "construct": "Self-reported outward expression of positive feelings and affection; not happiness level, emotion-regulation ability, social competence or relationship quality.",
+  "feedback": {
+    "summary": "这份回答帮助你观察：开心和亲近的感受，通常会怎样被别人看见？它关注表达习惯，而不是你过得有多快乐。",
+    "direction": "计分方向越高，表示你越常通过笑声、表情或亲近动作表达积极感受；较少外露也不代表冷漠或不在乎。",
+    "reflection": "回想最近一次开心的事：你是笑出声、说出来，还是安静地享受？身边的人是否知道你的心情？",
+    "action": "选一个自己舒服、对方也愿意接受的方式，分享一件小开心或说一句感谢；表达亲近不必依赖拥抱或身体接触。",
+    "limits": "表达方式受文化、关系边界和情境影响。该中文译稿尚待审核与验证，无可用的项目常模或分界值；不能用于诊断、能力排名或考核。"
+  },
+  "tagAxes": {
+    "domain": [
+      "情绪体验与表达",
+      "人际互动"
+    ],
+    "construct": [
+      "积极情绪表达",
+      "亲近表达"
+    ],
+    "orientation": [],
+    "population": [
+      "成人研究使用边界；非中文效度声明"
+    ],
+    "response": [
+      "成人自评",
+      "5点符合程度"
+    ],
+    "use": [
+      "研究探索",
+      "非诊断自我反思"
+    ],
+    "license": [
+      "公共领域",
+      "允许公开再分发",
+      "允许商业使用"
+    ],
+    "language_validation": [
+      "英文原题",
+      "中文工作译稿",
+      "中文效度待验证"
+    ]
+  },
+  "versionNote": "Current official key as accessed 2026-10-25; not the old 10-item form.",
+  "family": "IPIP scales measuring seven components potentially related to emotional intelligence (Barchard, 2001); this isolated component is not a full emotional-intelligence test and is not another proprietary instrument.",
+  "validationVectors": {
+    "allRaw1": 21,
+    "allRaw3": 27,
+    "allRaw5": 33,
+    "minimum": {
+      "positiveRaw": 1,
+      "negativeRaw": 5,
+      "total": 9
+    },
+    "maximum": {
+      "positiveRaw": 5,
+      "negativeRaw": 1,
+      "total": 45
+    },
+    "oneMissing": "reject/no-score (project rule)"
+  }
+}

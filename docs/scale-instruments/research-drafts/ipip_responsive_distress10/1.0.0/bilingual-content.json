@@ -1,0 +1,120 @@
+{
+  "status": "AI_WORKING_TRANSLATION_REVIEW_PENDING",
+  "instructions": "请描述你现在通常的真实情况，而不是你希望将来成为的样子。判断下面每句话与你的符合程度。没有标准答案。",
+  "items": [
+    {
+      "id": "q1",
+      "position": 1,
+      "en": "Am deeply moved by others' misfortunes.",
+      "zh": "别人的不幸会深深触动我。",
+      "key": "positive",
+      "runtimeItemCode": "IPIP_RESPONSIVE_DISTRESS10_01"
+    },
+    {
+      "id": "q2",
+      "position": 2,
+      "en": "Am easily moved to tears.",
+      "zh": "我很容易被触动而流泪。",
+      "key": "positive",
+      "runtimeItemCode": "IPIP_RESPONSIVE_DISTRESS10_02"
+    },
+    {
+      "id": "q3",
+      "position": 3,
+      "en": "Suffer from others' sorrows.",
+      "zh": "别人的悲伤也会让我感到痛苦。",
+      "key": "positive",
+      "runtimeItemCode": "IPIP_RESPONSIVE_DISTRESS10_03"
+    },
+    {
+      "id": "q4",
+      "position": 4,
+      "en": "Am upset by the misfortunes of strangers.",
+      "zh": "陌生人的不幸也会让我难过。",
+      "key": "positive",
+      "runtimeItemCode": "IPIP_RESPONSIVE_DISTRESS10_04"
+    },
+    {
+      "id": "q5",
+      "position": 5,
+      "en": "Would be upset if I saw an injured animal.",
+      "zh": "如果看到受伤的动物，我会难过。",
+      "key": "positive",
+      "runtimeItemCode": "IPIP_RESPONSIVE_DISTRESS10_05"
+    },
+    {
+      "id": "q6",
+      "position": 6,
+      "en": "Am calm even in tense situations.",
+      "zh": "即使在紧张的情境中，我也很平静。",
+      "key": "negative",
+      "runtimeItemCode": "IPIP_RESPONSIVE_DISTRESS10_06"
+    },
+    {
+      "id": "q7",
+      "position": 7,
+      "en": "Am not easily disturbed by events.",
+      "zh": "发生的事情不容易使我心烦意乱。",
+      "key": "negative",
+      "runtimeItemCode": "IPIP_RESPONSIVE_DISTRESS10_07"
+    },
+    {
+      "id": "q8",
+      "position": 8,
+      "en": "Am unaffected by the suffering of others.",
+      "zh": "别人的痛苦不会影响我的情绪。",
+      "key": "negative",
+      "runtimeItemCode": "IPIP_RESPONSIVE_DISTRESS10_08"
+    },
+    {
+      "id": "q9",
+      "position": 9,
+      "en": "Rarely cry during sad movies.",
+      "zh": "看悲伤的电影时，我很少哭。",
+      "key": "negative",
+      "runtimeItemCode": "IPIP_RESPONSIVE_DISTRESS10_09"
+    },
+    {
+      "id": "q10",
+      "position": 10,
+      "en": "Remain calm during emergencies.",
+      "zh": "遇到紧急情况时，我保持平静。",
+      "key": "negative",
+      "runtimeItemCode": "IPIP_RESPONSIVE_DISTRESS10_10"
+    }
+  ],
+  "anchors": [
+    {
+      "value": 1,
+      "en": "Very Inaccurate",
+      "zh": "非常不符合"
+    },
+    {
+      "value": 2,
+      "en": "Moderately Inaccurate",
+      "zh": "比较不符合"
+    },
+    {
+      "value": 3,
+      "en": "Neither Inaccurate nor Accurate",
+      "zh": "介于不符合与符合之间"
+    },
+    {
+      "value": 4,
+      "en": "Moderately Accurate",
+      "zh": "比较符合"
+    },
+    {
+      "value": 5,
+      "en": "Very Accurate",
+      "zh": "非常符合"
+    }
+  ],
+  "license": {
+    "status": "PUBLIC_DOMAIN",
+    "scope": "IPIP items/scales/inventories, commercial and noncommercial use; official homepage explicitly permits copying, editing and translation",
+    "permissionUrl": "https://ipip.ori.org/newPermission.htm",
+    "translationPermissionUrl": "https://ipip.ori.org/",
+    "note": "This applies to these exact IPIP items, not every proprietary measure with a similar name."
+  }
+}
