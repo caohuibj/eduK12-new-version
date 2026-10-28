@@ -1,0 +1,336 @@
+{
+  "instrument": "ebq16_zh_cn_research:1.0.1",
+  "sourceSHA": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "files": [
+    {
+      "path": "docs/scale-instruments/research-drafts/ebq16/1.0.0/README.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "bbef351d4ecc5d389280290fe75d4555638323d1",
+      "sha256": "30d3f4b23b9c061c34369476a76cf782a6e63b81ddb593376410f188cb1df8e1"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ebq16/1.0.0/administration.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "28b22202cbeec4dd380434fcd113564035c68404",
+      "sha256": "7153816263dbc33c62373831449fdfd434846c53aedc42f3232ebca7d6d3dc77"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ebq16/1.0.0/bilingual-content.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "74133072e7d9a16a4fae545941ade9530b54578d",
+      "sha256": "68f6df0df528849d366648e013f6eb3d81007449f58491987b0250c5e9c40b49"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ebq16/1.0.0/references.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "38f3528726d2b81bd08013aabe4a1cffac20b4dd",
+      "sha256": "2d09ee56f302aef2b7447a0bbc75b6432d6e82c61104adb476856f4b3ed210a0"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ebq16/1.0.0/report-example.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "d922c910ef9d818cfd8a966ff36650219810db00",
+      "sha256": "75408fb627a04545ada4269db5707d730f3dbe37c7cda00a7b7d139be09d8628"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ebq16/1.0.0/scoring-and-thresholds.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "88a939dca23103bdac72a2e7435108b82a5a71f5",
+      "sha256": "cf4c9e9a2138fd31c2d7c875a4c94c92db34e06bb16e78447446d974daf6a61a"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ebq16/1.0.0/validation.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "85edd15dd5e5cbfc399a771f4a1671b28b0a6a14",
+      "sha256": "bf6ac269844322513d58d175ae2ca95ab8c07bfc6b6c422db2ec30f62a85c92a"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ebq16/1.0.1/README.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "79d0bf6860ab47d1b519c0cd5eedf8862dbc5820",
+      "sha256": "5b3676d87d2916f527dc446ec2e2bb610761cde8eff8c5404f87ed18019e9d96"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ebq16/1.0.1/bilingual-content.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "354a9bc6fb5eec89b1d3b0f5287e1478b50688bb",
+      "sha256": "ab6b25ad7bf4f2e188b64a970284990fa85aa8e6d84fc17852a3eea0e17c9c62"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ebq16/1.0.1/report-example.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "46601706618c00c9658065602c4860a56fc352e2",
+      "sha256": "ac4b0ed451a19cf88004ce2e24306484d761f5fda936199523601398032702a5"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ebq16/1.0.1/report-result.synthetic.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "ed2381eb7fb131b6fa82971d260ce554ab9f9165",
+      "sha256": "36f13a25cdefd4fca07eb15099fc07b690d0e172e82c365b33fd2c412a80284f"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ebq16/1.0.1/validation.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "a04f9779baee4d3d2cacacf90c70fcab4fa68c7e",
+      "sha256": "cfe524ab359b461a9cd13f3ed2c49ef3084cb9b6285fcf713112cbea7434bc43"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ebq16_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "6505ff700131dc7e95c5ccf3ba266a40faf39aa0",
+      "sha256": "17d3829591cabd94a1270910f46f2043974bdba9d0a1a2a6df01d092bd482c69"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ebq16_zh_cn_research/1.0.0/instrument.ts",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "0eed070bb879576339c5a71afdf34c0026591fd3",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ebq16_zh_cn_research/1.0.0/source.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "089151a95b5bc8d1b29fed649d185d4149bf630b",
+      "sha256": "ccfd11288222eadc4d514144680012318d51e05d6d6b85a42bf251304d1a769f"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ebq16_zh_cn_research/1.0.1/THIRD_PARTY_LICENSE.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "ad544c8923b75d44efaef4fca5d0dfe4cfd56e79",
+      "sha256": "efa16b82d2284b2ef1f2dafdf246fb558a61c83bf46221493d3939e673cb2dd8"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ebq16_zh_cn_research/1.0.1/instrument.ts",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "0eed070bb879576339c5a71afdf34c0026591fd3",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ebq16_zh_cn_research/1.0.1/source.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "7ad049de7927582b3e036d833cb0e2e7258b70f6",
+      "sha256": "b2b7bb41355511aaf2e5599155dd60d113177da5136649c28fd20f041a733834"
+    }
+  ],
+  "originalEvidence": {
+    "url": "https://spldev.sites.stanford.edu/sites/g/files/sbiybj19321/files/media/file/ebq_questionnaire_and_scoring_instructions_042020.pdf",
+    "access": "本次直接读取作者题本和7分数SUM键向。"
+  },
+  "items": [
+    {
+      "code": "EBQ_01",
+      "english": "Once people are experiencing negative emotions, there is nothing they can do about modifying them.",
+      "chinese": "人一旦开始体验负面情绪，就无法再做些什么来改变这种情绪。",
+      "dimension": "neg_controllability",
+      "key": "identity",
+      "conclusion": "与作者英文题及1.0.1双语材料对应；中文独立工作译稿待审。"
+    },
+    {
+      "code": "EBQ_02",
+      "english": "People cannot control their positive emotions.",
+      "chinese": "人们无法控制自己的积极情绪。",
+      "dimension": "pos_controllability",
+      "key": "identity",
+      "conclusion": "与作者英文题及1.0.1双语材料对应；中文独立工作译稿待审。"
+    },
+    {
+      "code": "EBQ_03",
+      "english": "There is very little use for negative emotions.",
+      "chinese": "负面情绪几乎没有什么用处。",
+      "dimension": "neg_usefulness",
+      "key": "identity",
+      "conclusion": "与作者英文题及1.0.1双语材料对应；中文独立工作译稿待审。"
+    },
+    {
+      "code": "EBQ_04",
+      "english": "Positive emotions are very unhelpful to people.",
+      "chinese": "积极情绪对人们很没有帮助。",
+      "dimension": "pos_usefulness",
+      "key": "identity",
+      "conclusion": "与作者英文题及1.0.1双语材料对应；中文独立工作译稿待审。"
+    },
+    {
+      "code": "EBQ_05",
+      "english": "It doesn't matter how hard people try, they cannot change their negative emotions.",
+      "chinese": "无论人们多么努力，都无法改变自己的负面情绪。",
+      "dimension": "neg_controllability",
+      "key": "identity",
+      "conclusion": "与作者英文题及1.0.1双语材料对应；中文独立工作译稿待审。"
+    },
+    {
+      "code": "EBQ_06",
+      "english": "People cannot learn techniques to effectively control their positive emotions.",
+      "chinese": "人们无法学会有效调节积极情绪的方法。",
+      "dimension": "pos_controllability",
+      "key": "identity",
+      "conclusion": "与作者英文题及1.0.1双语材料对应；中文独立工作译稿待审。"
+    },
+    {
+      "code": "EBQ_07",
+      "english": "People don't need their negative emotions.",
+      "chinese": "人们不需要自己的负面情绪。",
+      "dimension": "neg_usefulness",
+      "key": "identity",
+      "conclusion": "与作者英文题及1.0.1双语材料对应；中文独立工作译稿待审。"
+    },
+    {
+      "code": "EBQ_08",
+      "english": "There is very little use for positive emotions.",
+      "chinese": "积极情绪几乎没有什么用处。",
+      "dimension": "pos_usefulness",
+      "key": "identity",
+      "conclusion": "与作者英文题及1.0.1双语材料对应；中文独立工作译稿待审。"
+    },
+    {
+      "code": "EBQ_09",
+      "english": "People cannot control their negative emotions.",
+      "chinese": "人们无法控制自己的负面情绪。",
+      "dimension": "neg_controllability",
+      "key": "identity",
+      "conclusion": "与作者英文题及1.0.1双语材料对应；中文独立工作译稿待审。"
+    },
+    {
+      "code": "EBQ_10",
+      "english": "It doesn't matter how hard people try, they cannot change their positive emotions.",
+      "chinese": "无论人们多么努力，都无法改变自己的积极情绪。",
+      "dimension": "pos_controllability",
+      "key": "identity",
+      "conclusion": "与作者英文题及1.0.1双语材料对应；中文独立工作译稿待审。"
+    },
+    {
+      "code": "EBQ_11",
+      "english": "Negative emotions are harmful.",
+      "chinese": "负面情绪是有害的。",
+      "dimension": "neg_usefulness",
+      "key": "identity",
+      "conclusion": "与作者英文题及1.0.1双语材料对应；中文独立工作译稿待审。"
+    },
+    {
+      "code": "EBQ_12",
+      "english": "People don't need their positive emotions.",
+      "chinese": "人们不需要自己的积极情绪。",
+      "dimension": "pos_usefulness",
+      "key": "identity",
+      "conclusion": "与作者英文题及1.0.1双语材料对应；中文独立工作译稿待审。"
+    },
+    {
+      "code": "EBQ_13",
+      "english": "People cannot learn techniques to effectively control their negative emotions.",
+      "chinese": "人们无法学会有效调节负面情绪的方法。",
+      "dimension": "neg_controllability",
+      "key": "identity",
+      "conclusion": "与作者英文题及1.0.1双语材料对应；中文独立工作译稿待审。"
+    },
+    {
+      "code": "EBQ_14",
+      "english": "Once people are experiencing positive emotions, there is nothing they can do about modifying them.",
+      "chinese": "人一旦开始体验积极情绪，就没有办法改变它。",
+      "dimension": "pos_controllability",
+      "key": "identity",
+      "conclusion": "与作者英文题及1.0.1双语材料对应；中文独立工作译稿待审。"
+    },
+    {
+      "code": "EBQ_15",
+      "english": "The presence of negative emotions is a bad thing for people.",
+      "chinese": "出现负面情绪，对人们来说是一件坏事。",
+      "dimension": "neg_usefulness",
+      "key": "identity",
+      "conclusion": "与作者英文题及1.0.1双语材料对应；中文独立工作译稿待审。"
+    },
+    {
+      "code": "EBQ_16",
+      "english": "Positive emotions are harmful.",
+      "chinese": "积极情绪是有害的。",
+      "dimension": "pos_usefulness",
+      "key": "identity",
+      "conclusion": "与作者英文题及1.0.1双语材料对应；中文独立工作译稿待审。"
+    }
+  ],
+  "threePartConclusions": {
+    "content": "16题、顺序、1/4/7锚点与作者题表匹配，中文为工作译稿；1.0.1正确中点既不同意也不反对，保留1.0.0历史。",
+    "scoring": "全部identity、四个4题求和4–28、两个8题求和8–56、总16题求和16–112；七分数重叠不可相加。complete_required为项目规则，缺题相关分不可计，完整报告不可解释；无常模或阈值。分数高表示越认同不可控/无用，非更可控/有用。",
+    "report": "report1.0.3中文成人本人，七个score_only解释自然、反思可行，无诊断/排名；但正文七个问题式标题不明确高分方向，score.description虽提不可控/无用，建议每维追加一条对应方向，保留已有正文，不改测量或分档。"
+  },
+  "instruction": {
+    "source": {
+      "path": "docs/scale-instruments/research-drafts/ebq16/1.0.0/administration.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "28b22202cbeec4dd380434fcd113564035c68404",
+      "sha256": "7153816263dbc33c62373831449fdfd434846c53aedc42f3232ebca7d6d3dc77"
+    },
+    "pointer": "首段",
+    "text": "这份问卷询问你通常对情绪本身有什么看法，包括悲伤、担心、生气等不舒服情绪，以及快乐、愉快等积极情绪。请按你一般的想法回答每一句话，不必根据某一次事件猜测正确答案。",
+    "note": "1.0.0 administration旧中点锚词不适用于1.0.1；按1.0.1实际响应选项展示。原source无instruction。"
+  },
+  "ordinaryEdits": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ebq16_zh_cn_research/1.0.1/source.json",
+      "jsonPointer": "/instruction",
+      "old": "不存在",
+      "new": {
+        "schemaVersion": 1,
+        "text": "这份问卷询问你通常对情绪本身有什么看法，包括悲伤、担心、生气等不舒服情绪，以及快乐、愉快等积极情绪。请按你一般的想法回答每一句话，不必根据某一次事件猜测正确答案。",
+        "language": "zh-CN",
+        "version": "1.0.1",
+        "source": "docs/scale-instruments/research-drafts/ebq16/1.0.0/administration.md 首段 @ b92c69aefa2472775fa7ee86b9c208366886c908；1.0.1中点以该版本选项为准"
+      },
+      "reason": "绑定既有1.0.0研究指导语首段；不复制旧版错误中点，1.0.1实际选项已修正。"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ebq16_zh_cn_research/1.0.1/source.json",
+      "jsonPointer": "/executable/definition/report/interpretations/0/summary",
+      "old": "难过、担心或生气的时候，有人会觉得“这种感觉一来就没办法了”，也有人相信情绪会随着行动和环境慢慢变化。这组回答关注你通常怎么看待这件事，并不是检查你最近有没有控制住情绪。想法可能来自过去的经历，也可能随着新的体验改变。你可以回想一次情绪稍微松动的时刻，看看当时的休息、谈话或处境变化，是否给了你一点帮助。",
+      "new": "难过、担心或生气的时候，有人会觉得“这种感觉一来就没办法了”，也有人相信情绪会随着行动和环境慢慢变化。这组回答关注你通常怎么看待这件事，并不是检查你最近有没有控制住情绪。想法可能来自过去的经历，也可能随着新的体验改变。你可以回想一次情绪稍微松动的时刻，看看当时的休息、谈话或处境变化，是否给了你一点帮助。 分数越高，表示你越认同不舒服情绪难以改变的描述。",
+      "reason": "补足各结果的真实方向，不改变计分或引入等级。"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ebq16_zh_cn_research/1.0.1/source.json",
+      "jsonPointer": "/executable/definition/report/interpretations/1/summary",
+      "old": "开心、轻松或满足的感觉，有时来得自然，有时也会随着一天的经历起起落落。这组回答关注你认为这些感受是否能够发生变化，并不是在问你最近有多快乐。快乐不需要时时保持，暂时没有好心情也不是失败。可以留意一个让自己稍微舒服的日常片段，例如散步、听歌或和熟悉的人说说话，再看看什么条件让这样的片段更容易出现。",
+      "new": "开心、轻松或满足的感觉，有时来得自然，有时也会随着一天的经历起起落落。这组回答关注你认为这些感受是否能够发生变化，并不是在问你最近有多快乐。快乐不需要时时保持，暂时没有好心情也不是失败。可以留意一个让自己稍微舒服的日常片段，例如散步、听歌或和熟悉的人说说话，再看看什么条件让这样的片段更容易出现。 分数越高，表示你越认同愉快情绪难以改变的描述。",
+      "reason": "补足各结果的真实方向，不改变计分或引入等级。"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ebq16_zh_cn_research/1.0.1/source.json",
+      "jsonPointer": "/executable/definition/report/interpretations/2/summary",
+      "old": "不舒服的情绪有时像一盏提醒灯，让我们注意到一件在意的事、一个没有满足的需要，或一处需要调整的地方。这组回答关注你是否觉得这些情绪也可能有作用。看到作用，不代表必须喜欢难受，更不代表要一直忍着。你可以挑一个最近的感受，轻轻问自己：它在提醒我什么？有没有一个照顾自己的小行动，是现在就能尝试的？",
+      "new": "不舒服的情绪有时像一盏提醒灯，让我们注意到一件在意的事、一个没有满足的需要，或一处需要调整的地方。这组回答关注你是否觉得这些情绪也可能有作用。看到作用，不代表必须喜欢难受，更不代表要一直忍着。你可以挑一个最近的感受，轻轻问自己：它在提醒我什么？有没有一个照顾自己的小行动，是现在就能尝试的？ 分数越高，表示你越认同不舒服情绪没有用或有害的描述。",
+      "reason": "补足各结果的真实方向，不改变计分或引入等级。"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ebq16_zh_cn_research/1.0.1/source.json",
+      "jsonPointer": "/executable/definition/report/interpretations/3/summary",
+      "old": "高兴、愉悦或满足，有时会让人更愿意靠近他人、尝试一件事，或停下来享受当下。这组回答关注你怎样理解这些感受的作用。它们并不是越多越好，也不是只有开心才算生活得好。不同的情境里，感受可能带来不同的信息。可以回想一次让你觉得有意义的愉快经历，看看它帮助你注意到了什么，以及你是否愿意为类似的片段留一点空间。",
+      "new": "高兴、愉悦或满足，有时会让人更愿意靠近他人、尝试一件事，或停下来享受当下。这组回答关注你怎样理解这些感受的作用。它们并不是越多越好，也不是只有开心才算生活得好。不同的情境里，感受可能带来不同的信息。可以回想一次让你觉得有意义的愉快经历，看看它帮助你注意到了什么，以及你是否愿意为类似的片段留一点空间。 分数越高，表示你越认同愉快情绪没有用或有害的描述。",
+      "reason": "补足各结果的真实方向，不改变计分或引入等级。"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ebq16_zh_cn_research/1.0.1/source.json",
+      "jsonPointer": "/executable/definition/report/interpretations/4/summary",
+      "old": "这一部分把你对不同情绪能否改变的看法放在一起。它记录的是一种看法，而不是实际调节情绪的成功率。相信情绪可能变化，不等于必须立刻把它赶走；觉得某种感觉难改变，也不等于自己不够努力。你可以先看看眼前有哪些可以调整的小条件，例如睡一会儿、换个环境，或找一个愿意听你说话的人，再慢慢观察自己的体验。",
+      "new": "这一部分把你对不同情绪能否改变的看法放在一起。它记录的是一种看法，而不是实际调节情绪的成功率。相信情绪可能变化，不等于必须立刻把它赶走；觉得某种感觉难改变，也不等于自己不够努力。你可以先看看眼前有哪些可以调整的小条件，例如睡一会儿、换个环境，或找一个愿意听你说话的人，再慢慢观察自己的体验。 分数越高，表示你越认同不同情绪难以改变的描述。",
+      "reason": "补足各结果的真实方向，不改变计分或引入等级。"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ebq16_zh_cn_research/1.0.1/source.json",
+      "jsonPointer": "/executable/definition/report/interpretations/5/summary",
+      "old": "这一部分关注你怎样理解不同情绪在生活中的作用。舒服和不舒服的感受，都可能在某些时候传递信息，也都可能让人有些困惑。没有必要急着给情绪分成“有用”和“没用”两堆。可以回想最近的一件事，看看某种感受有没有让你更清楚自己在意什么，或者提醒你需要休息、沟通或改变做法。理解自己的体验，比给它打一个好坏标签更有帮助。",
+      "new": "这一部分关注你怎样理解不同情绪在生活中的作用。舒服和不舒服的感受，都可能在某些时候传递信息，也都可能让人有些困惑。没有必要急着给情绪分成“有用”和“没用”两堆。可以回想最近的一件事，看看某种感受有没有让你更清楚自己在意什么，或者提醒你需要休息、沟通或改变做法。理解自己的体验，比给它打一个好坏标签更有帮助。 分数越高，表示你越认同不同情绪没有用或有害的描述。",
+      "reason": "补足各结果的真实方向，不改变计分或引入等级。"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ebq16_zh_cn_research/1.0.1/source.json",
+      "jsonPointer": "/executable/definition/report/interpretations/6/summary",
+      "old": "把这些回答放在一起，可以看看你通常怎样理解情绪：它会不会改变，又可能给生活带来什么。这不是一张情绪能力成绩单，也不是对最近心情的判断。你不需要追求某个数字，更不必要求自己随时积极。可以把情绪想成提示灯，先看看它提醒了什么，再决定怎样回应。留意一条愿意重新想想的看法，从一个贴近日常的小体验开始就可以了。",
+      "new": "把这些回答放在一起，可以看看你通常怎样理解情绪：它会不会改变，又可能给生活带来什么。这不是一张情绪能力成绩单，也不是对最近心情的判断。你不需要追求某个数字，更不必要求自己随时积极。可以把情绪想成提示灯，先看看它提醒了什么，再决定怎样回应。留意一条愿意重新想想的看法，从一个贴近日常的小体验开始就可以了。 分数越高，表示你越认同情绪难以改变或没有用的描述。",
+      "reason": "补足各结果的真实方向，不改变计分或引入等级。"
+    }
+  ],
+  "humanItems": [
+    "专家译审、认知访谈、目标人群验证待完成；不得将AI编辑检查视为专家审核。",
+    "实质题义/锚点/评分变动须协调和版本化。"
+  ],
+  "notExecuted": [
+    "未修改仓库/分支、DB/CI或系统，未执行测试、新科研版权调查。",
+    "历史验证记录未当作新执行。"
+  ]
+}
