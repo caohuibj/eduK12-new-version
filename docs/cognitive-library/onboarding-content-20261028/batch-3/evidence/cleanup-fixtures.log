@@ -1,0 +1,16 @@
+{
+  node: 'v24.21.0',
+  mutable: {
+    configs: 0,
+    assignments: 0,
+    sessions: 0,
+    storedAssets: 0,
+    courses: 0
+  },
+  removedOnlyOwnedCourseCount: 3,
+  immutableReleaseCount: 40,
+  immutableReleasesRetained: true,
+  syntheticActorsRetainedUntilContainerRemoval: true,
+  globalSeed: false,
+  production: false
+}

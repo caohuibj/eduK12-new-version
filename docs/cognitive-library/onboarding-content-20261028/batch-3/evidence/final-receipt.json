@@ -1,0 +1,75 @@
+{
+  "sourceCommit": "870a9d2f1dfbbff1fb7bf7ed6342bbdfd4bf7f3c",
+  "main": "8774b1cf158dae1c5eb0f4950044c6ae6d6a18dd",
+  "finalRuntime": "v24.21.0",
+  "earlierRuntime": "v24.19.0",
+  "checks": [
+    {
+      "name": "backend-final-runtime",
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-3/evidence/backend-final-runtime.json",
+      "success": true,
+      "passed": 3,
+      "failed": 0,
+      "sha256": "494001a8869ec79a546a7a25da702b39ffef0971b973b5e0e9286e6c763b0d9c"
+    },
+    {
+      "name": "frontend-final-runtime",
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-3/evidence/frontend-final-runtime.json",
+      "success": true,
+      "passed": 4,
+      "failed": 0,
+      "sha256": "83360421f6e72ad82be63833361eb6db9cc7fd5cb1631d3f703b7da6585778bd"
+    },
+    {
+      "name": "frontend-ant-version-runtime",
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-3/evidence/frontend-ant-version-runtime.json",
+      "success": true,
+      "passed": 1,
+      "failed": 0,
+      "sha256": "31ebf9eaa290825636c1853836626f6b5ad2c784ed187c01be8989c8d730a67b"
+    },
+    {
+      "name": "presentation-binding",
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-3/evidence/presentation-binding.json",
+      "success": true,
+      "passed": 9,
+      "failed": 0,
+      "sha256": "ef0b7b008ddcaa6a4651b0b21a20d090692da7266f44f50cc627e51987276bc4"
+    },
+    {
+      "name": "horizon-integration",
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-3/evidence/horizon-integration.json",
+      "success": true,
+      "passed": 3,
+      "failed": 0,
+      "sha256": "4804bd80349b6895f10a1e639a8d0807c795f54c23b2d4804498be95d62ef341"
+    }
+  ],
+  "types": [
+    {
+      "component": "backend",
+      "diagnostics": 0,
+      "sourceCount": 1100
+    },
+    {
+      "component": "frontend",
+      "diagnostics": 0,
+      "sourceCount": 294
+    }
+  ],
+  "independentReview": {
+    "effort": "d92afb99e",
+    "horizon": [
+      "9333ca1bf",
+      "e0f55ddfd"
+    ],
+    "spatial": [
+      "dcbdb332e",
+      "c0efd66cd"
+    ],
+    "sharedVersionFix": "2217d0554"
+  },
+  "ciActivated": false,
+  "production": false,
+  "formalLibraryPublication": false
+}

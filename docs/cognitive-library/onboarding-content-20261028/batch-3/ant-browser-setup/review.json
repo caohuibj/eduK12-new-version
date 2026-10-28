@@ -1,0 +1,39 @@
+{
+  "kind": "REAL_NATIVE_FRONTEND_HTTP_SLICE_SYNTHETIC_CLOCK_AND_COS_UPLOADER",
+  "startedAt": "2026-10-28T02:32:20.477Z",
+  "api": [
+    {
+      "method": "GET",
+      "path": "/src/api/client.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/cognitive/sessions/296b39c2-abe7-454b-8da1-19598e324c2f",
+      "status": 200
+    }
+  ],
+  "pageErrors": [],
+  "checks": [
+    {
+      "name": "calibration_styled_and_actual_first_practice_target_software_clock",
+      "passed": true
+    }
+  ],
+  "notVerified": [
+    "External COS credentials/upload",
+    "Physical timing/refresh validity",
+    "Full product auth shell",
+    "Public/Survey/composite native delivery"
+  ],
+  "identity": {
+    "sessionId": "296b39c2-abe7-454b-8da1-19598e324c2f",
+    "attemptEpoch": 1,
+    "definitionHash": "9b70ddfe818ba46006802cbf6899729d1e0ad82c496b41bcc098e78e1309234b",
+    "protocolSignature": "d7a62cbbccb38f9983bbd860838c3f0843a2aef91c96a3ea120faea5d149c3d4",
+    "profile": "experience"
+  },
+  "status": "PASS",
+  "finishedAt": "2026-10-28T02:32:23.968Z",
+  "scriptSha256": "de25d7b03ef4122b62dc46d731625cd4928271c737499f43835cdba279d5058b"
+}

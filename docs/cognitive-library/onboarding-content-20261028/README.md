@@ -1,5 +1,7 @@
 # Cognitive content integration and structural audit
 
+> 最新进展与逐包状态见[第3批实际接线与并行修复](batch-3/README.md)。下文保留各早期阶段的原始快照与失败边界；不再把早期未接host状态当作当前结论。正式公共库发布/生产激活仍未执行。
+
 Base main: `642fda7ab754790686d6626efac62b73a332e663` (scale and cognitive onboarding mechanisms merged).
 Existing PR360 source: `072b2900d4295c7d741d5e55c9ce6cfbbf6f58d2`.
 This branch preserves existing content and implementation history rather than

@@ -1,0 +1,93 @@
+{
+  "roots": [
+    "src/modules/cognitive/unified-final-submit.service.ts",
+    "src/modules/cognitive/raw-archive.service.ts",
+    "src/modules/cognitive/task-resource.ts"
+  ],
+  "diagnostics": [
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/native-registry/definitions.ts",
+      "start": 4690,
+      "code": 2322,
+      "message": "Type 'NativeDefinitionRecord[]' is not assignable to type 'TaskDefinition<unknown, unknown>[]'.\n  Type 'NativeDefinitionRecord' is missing the following properties from type 'TaskDefinition<unknown, unknown>': schemaVersion, testType, name, category, and 13 more."
+    },
+    {
+      "file": "server-version/backend/src/modules/organization/access.ts",
+      "start": 9696,
+      "code": 2339,
+      "message": "Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'."
+    },
+    {
+      "file": "server-version/backend/src/modules/organization/access.ts",
+      "start": 9913,
+      "code": 2339,
+      "message": "Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'."
+    },
+    {
+      "file": "server-version/backend/src/modules/organization/access.ts",
+      "start": 10208,
+      "code": 2339,
+      "message": "Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'."
+    },
+    {
+      "file": "server-version/backend/src/modules/organization/access.ts",
+      "start": 10423,
+      "code": 2339,
+      "message": "Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'."
+    },
+    {
+      "file": "server-version/backend/src/modules/organization/access.ts",
+      "start": 11154,
+      "code": 2339,
+      "message": "Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'."
+    },
+    {
+      "file": "server-version/backend/src/modules/organization/access.ts",
+      "start": 11369,
+      "code": 2339,
+      "message": "Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'."
+    },
+    {
+      "file": "server-version/backend/src/modules/organization/access.ts",
+      "start": 11453,
+      "code": 2339,
+      "message": "Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'."
+    },
+    {
+      "file": "server-version/backend/src/modules/organization/access.ts",
+      "start": 11826,
+      "code": 2339,
+      "message": "Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'."
+    },
+    {
+      "file": "server-version/backend/src/modules/organization/access.ts",
+      "start": 12047,
+      "code": 2339,
+      "message": "Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'."
+    },
+    {
+      "file": "server-version/backend/src/modules/survey/admin-role.ts",
+      "start": 1221,
+      "code": 2339,
+      "message": "Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'."
+    },
+    {
+      "file": "server-version/backend/src/modules/survey/admin-role.ts",
+      "start": 1259,
+      "code": 2339,
+      "message": "Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'."
+    },
+    {
+      "file": "server-version/backend/src/modules/survey/admin-role.ts",
+      "start": 1282,
+      "code": 7006,
+      "message": "Parameter 'g' implicitly has an 'any' type."
+    },
+    {
+      "file": "server-version/backend/src/services/assetStorage.ts",
+      "start": 31148,
+      "code": 2339,
+      "message": "Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'."
+    }
+  ]
+}

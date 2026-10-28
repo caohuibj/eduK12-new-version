@@ -1,0 +1,112 @@
+{
+  "kind": "REAL_NATIVE_FRONTEND_HTTP_SLICE_SYNTHETIC_CLOCK_AND_COS_UPLOADER",
+  "startedAt": "2026-10-28T02:28:32.475Z",
+  "api": [
+    {
+      "method": "GET",
+      "path": "/src/api/client.ts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/cognitive/sessions/a4627309-523a-4873-8a6c-1cca38086ad5",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 404
+    },
+    {
+      "method": "POST",
+      "path": "/api/cognitive/sessions/a4627309-523a-4873-8a6c-1cca38086ad5/submit",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/cognitive/sessions/a4627309-523a-4873-8a6c-1cca38086ad5",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 404
+    },
+    {
+      "method": "POST",
+      "path": "/api/cognitive/sessions/a4627309-523a-4873-8a6c-1cca38086ad5/raw-archive",
+      "status": 503
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 404
+    },
+    {
+      "method": "POST",
+      "path": "/api/cognitive/sessions/a4627309-523a-4873-8a6c-1cca38086ad5/raw-archive",
+      "status": 200
+    }
+  ],
+  "pageErrors": [],
+  "checks": [
+    {
+      "name": "8_practice_48_formal_software_clock_actual_UI_keyboard_real_START_FINAL_report",
+      "passed": true
+    },
+    {
+      "name": "core_report_visible_before_fake_COS_confirmation_raw_retained_then_retry_confirmed",
+      "passed": true
+    }
+  ],
+  "notVerified": [
+    "External COS credentials/upload",
+    "Physical timing/refresh validity",
+    "Full product auth shell",
+    "Public/Survey/composite native delivery"
+  ],
+  "identity": {
+    "sessionId": "a4627309-523a-4873-8a6c-1cca38086ad5",
+    "attemptEpoch": 1,
+    "definitionHash": "9b70ddfe818ba46006802cbf6899729d1e0ad82c496b41bcc098e78e1309234b",
+    "protocolSignature": "d7a62cbbccb38f9983bbd860838c3f0843a2aef91c96a3ea120faea5d149c3d4",
+    "profile": "experience"
+  },
+  "afterFailedArchive": {
+    "status": "COMPLETED",
+    "submissionId": "7cfb10e2-9762-42c7-a153-e421d97988d2",
+    "coreSealed": true,
+    "raw": {
+      "coreSaved": true,
+      "archiveConfirmed": false,
+      "rawSha256": "5bad966a7e4962569d79ee176e6da36c58f88c87e53c4bfa64dba89207d04676",
+      "formal": 48,
+      "practice": 8,
+      "termination": "completed",
+      "inputs": [
+        "keyboard"
+      ]
+    }
+  },
+  "archiveAfterFailure": {
+    "calls": 1,
+    "successes": 0,
+    "failUploads": 0,
+    "ownedAssetCount": 0
+  },
+  "reportBeforeArchive": "合成联调示例：软件时钟；COS为测试替身，未访问外部存储\n\n返回我的课程\n\n作答已提交，报告已保存。\n\n完整记录仍保留在本设备，归档尚未确认。请保留本设备的浏览器数据；关闭页面后不会自动上传。\n\n完整记录归档尚未确认\n\n保存完整记录\n这次的线索与箭头记录\n本轮答对比例\n\n100.0%\n\n不同提示下的作答记录\n提示\t正确 / 有效\t正确平均用时\n无提示\n12 / 12\n265 ms\n12 次正确回应 · 键盘\n中央提示\n12 / 12\n269 ms\n12 次正确回应 · 键盘\n双位置提示\n12 / 12\n265 ms\n12 次正确回应 · 键盘\n空间提示\n12 / 12\n268 ms\n12 次正确回应 · 键盘\n看看两侧箭头不同时的记录\n看看不同条件下的用时差\n\n这里只描述本轮记录，条件差值不是能力等级；体验版不代表稳定的注意网络能力。\n\n下次可以把设备放稳、关闭通知，让视线留在中央注视点。\n\n方法与限制\nEDUK12.TOP",
+  "afterConfirmedArchive": null,
+  "archiveAfterRetry": {
+    "calls": 2,
+    "successes": 1,
+    "failUploads": 0,
+    "ownedAssetCount": 1
+  },
+  "reportOverflow200": {
+    "scroll": 820,
+    "client": 820
+  },
+  "status": "PASS",
+  "finishedAt": "2026-10-28T02:29:05.493Z",
+  "scriptSha256": "e0bbbd717b3a26243b4e845770b9ab8178617038bf46a93b04ce04762e1bcea8"
+}

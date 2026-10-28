@@ -1,0 +1,8 @@
+{
+  "url": "https://nodejs.org/dist/v24.21.0/node-v24.21.0-linux-x64.tar.xz",
+  "checksumsUrl": "https://nodejs.org/dist/v24.21.0/SHASUMS256.txt",
+  "expectedSha256": "fd8e59d5a511510f6a298afb548f18c7d2b1be404d8b4a27d94fbe49f56cb2d6",
+  "actualSha256": "fd8e59d5a511510f6a298afb548f18c7d2b1be404d8b4a27d94fbe49f56cb2d6",
+  "bytes": 31890184,
+  "scope": "Temporary cloud-only runtime; no project dependency/lock or global runtime changed"
+}
