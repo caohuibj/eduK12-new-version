@@ -1,0 +1,65 @@
+{
+  "node": "v24.21.0",
+  "nodeBinary": "/tmp/cognitive-node-env/node-v24.21.0-linux-x64/bin/node",
+  "databaseUrl": "postgresql://postgres@127.0.0.1:15433/cognitive_native_test?schema=batch3",
+  "redisUrl": "redis://127.0.0.1:16380",
+  "syntheticOnly": true,
+  "fullSeed": false,
+  "commands": [
+    {
+      "cwd": "server-version/backend",
+      "arguments": "node_modules/vitest/vitest.mjs run src/__tests__/cognitive/grad-wire.postgres.integration.test.ts --reporter=json --outputFile=<repo>/docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/backend-journey-original.json",
+      "env": "DATABASE_URL and COGNITIVE_INTEGRATION_DB_URL select the same dedicated loopback test schema; REDIS_URL loopback16380; NODE_ENV=test",
+      "exit": 0,
+      "tests": 1,
+      "report": "backend-journey-original.json"
+    },
+    {
+      "cwd": "server-version/frontend",
+      "arguments": "node_modules/vitest/vitest.mjs run src/modules/cognitive/core/__tests__/native-envelope-freeze.test.tsx --reporter=json --outputFile=<repo>/docs/cognitive-library/onboarding-content-20261028/parallel-review/integration/frontend-envelope-freeze-original.json",
+      "exit": 1,
+      "tests": 0,
+      "reason": "The shared imports preceded the worker-owned Gradwire commit. Module import failed; no assertion ran."
+    },
+    {
+      "cwd": "server-version/frontend",
+      "arguments": "node_modules/vitest/vitest.mjs run src/modules/cognitive/core/__tests__/native-envelope-freeze.test.tsx --reporter=json --outputFile=<repo>/docs/cognitive-library/onboarding-content-20261028/parallel-review/integration/frontend-envelope-freeze-corrected.json",
+      "exit": 0,
+      "tests": 1,
+      "report": "../integration/frontend-envelope-freeze-corrected.json"
+    },
+    {
+      "cwd": "repository",
+      "arguments": "docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/check-types.cjs backend",
+      "exit": 0,
+      "sourceCount": 1110,
+      "report": "backend-types.json"
+    },
+    {
+      "cwd": "repository",
+      "arguments": "docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/check-types.cjs frontend",
+      "exit": 0,
+      "sourceCount": 384,
+      "report": "frontend-types.json"
+    }
+  ],
+  "sourceScope": [
+    "task-owned wire retained in normalized canonical core",
+    "Grad-only raw/core decoded comparison during archive validation, no scorer/COS replay",
+    "optional async envelope and exact first frozen representation in existing FinalDraftStore",
+    "exact Grad transport tuple decoded for original-field raw exports; summary report stays frozen"
+  ],
+  "separateIndependentEvidence": "../../../../parallel-review/grad-freeze/README.md: first 2PASS/1FAIL; fixed race only1PASS/2filtered;147 source types0. This covers the later catch-only change; original positive input reused.",
+  "remainingBoundaries": [
+    "raw over8MiB or packed data beyond1472KiB remains explicitly unsupported and retained locally",
+    "CompressionStream needed for large raw; no global cap/security change",
+    "SAV fixed-width strings are not a lossless raw archive; use existing original JSON/research outputs",
+    "This is a synthetic actual-browser producer→real isolated DB→encrypted private asset adapter flow; it is not live COS delivery or physical timing qualification"
+  ],
+  "reports": {
+    "backend-journey-original.json": "f540a25a10faeaf5009d8af1a38a4b46bfcdfaa9665bfebb20cab46b364e0786",
+    "real-wire-result.json": "2fe4736012fc4f688e0cda19dd20a317c5a7f62f49df8f8971d8751e0edef331",
+    "backend-types.json": "af24b6983436014ff1cb733ca4f56c96da243d1e9d0fa1bea574e0b7591c1fb0",
+    "frontend-types.json": "fbee7b03bf819d9fed7c5f73b1f8b24cde489e12b86663ed5e8acf2bf3052c16"
+  }
+}

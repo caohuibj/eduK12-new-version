@@ -51,7 +51,7 @@ export function validateNativeContentArchive(value:unknown,authority:ContentArch
   if(!expected||!same(expected,inspected?.plan??raw.plan))throw Error('Native content archive record plan mismatch')
   if(phase==='test')formal.push(row);else practice.push(row)
  }
- if(formal.length!==a.trials.length||formal.some((r,i)=>{const e=adapter.envelope(r.raw);return e.trialIndex!==i||a.trials[i].trialIndex!==i||!same(e.payload,a.trials[i].payload)}))throw Error('Native content archive core mismatch')
+ if(formal.length!==a.trials.length||formal.some((r,i)=>{const e=adapter.envelope(r.raw);return e.trialIndex!==i||a.trials[i].trialIndex!==i||!(adapter.corePayloadMatchesRaw?adapter.corePayloadMatchesRaw(a.trials[i].payload,r.raw):same(e.payload,a.trials[i].payload))}))throw Error('Native content archive core mismatch')
  if(practice.length!==f.practiceCount||quizzes!==(f.quizCount??0)||(a.testType==='gradcpt'?(f.formalCaptureCount!==formal.length||f.presented!==a.presentedImageCount):f.formalCount!==formal.length))throw Error('Native content archive record counts mismatch')
  const definition=getNativeCognitiveTaskDefinition(a.testType,a.engineVersion,a.scoringVersion)!
  if(f.termination==='completed'&&(f.terminationReason!==null||formal.length!==resolveCognitiveFinalMaxTrials(definition,a.config)||formal.some(r=>(adapter.inspectArchiveRecord?.(r.raw)?.status??(r.raw as {status:string}).status)!=='complete')))

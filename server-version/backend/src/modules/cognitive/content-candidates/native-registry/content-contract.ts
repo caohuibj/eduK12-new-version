@@ -6,6 +6,7 @@ export interface NativeContentAdapter {
  manifest(config:unknown,seed:string):unknown
  manifestHash(config:unknown,seed:string):string
  envelope(raw:unknown):TrialEnvelope<unknown>
+ corePayloadMatchesRaw?(corePayload:unknown,originalRaw:unknown):boolean
  parseRaw(raw:unknown):void
  project(score:CognitiveScoreResult,binding?:Record<string,unknown>):unknown
  validateArchiveRecord?(raw:unknown,authority:{config:unknown;contextKey:string;recordKey:string;configHash:string;protocolSignature:string;administration:unknown}):void

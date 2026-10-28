@@ -11,7 +11,7 @@ import {projectDualReport,isDualReport} from '../dual-arrow/report'
 import {dualEnvelope} from '../dual-arrow/scorer'
 import {GRAD_IDENTITY,gradPlan,gradPracticePlans} from '../gradcpt/protocol'
 import {projectGradReport,isGradReport} from '../gradcpt/report'
-import {gradEnvelope} from '../gradcpt/scorer'
+import {gradSubmissionEnvelope,gradCoreMatchesRaw} from '../gradcpt/wire'
 import {HF_IDENTITY,hfPlan} from '../hearts-flowers/protocol'
 import {projectHFReport,isHFReport} from '../hearts-flowers/report'
 import {hfEnvelope} from '../hearts-flowers/scorer'
@@ -38,12 +38,17 @@ import { enumerationDefinition, enumerationRecipeDefinition } from '../enumerati
 import { recognitionDefinition,guidedRecognitionDefinition } from '../continuous-recognition/package'
 import { antDefinition,antGuidedDefinition } from '../ant/package'
 
+const gradNativeRecord=contentDefinition(gradDefinition,GRAD_IDENTITY.configVersion,
+ (c,s)=>({formal:gradPlan(c,s),practice:[0,1,2].map(round=>gradPracticePlans(c,s,round))}),
+ gradSubmissionEnvelope,projectGradReport,isGradReport)
+gradNativeRecord.content!.corePayloadMatchesRaw=gradCoreMatchesRaw
+
 /** Explicit native implementations, not RegistryEntry adapters or publication/lifecycle authority. */
 const nativeDefinitions:readonly NativeDefinitionRecord[]=[
   contentDefinition(blinkDefinition,BLINK_IDENTITY.configVersion,(c,s)=>({formal:blinkPlan(c,s),practice:[0,1,2].map(round=>blinkPlan(c,s,'practice',round))}),blinkEnvelope,projectBlinkReport,isBlinkReport),
   contentDefinition(balloonEffortDefinition,EFFORT_IDENTITY.configVersion,(c,s)=>({formal:effortPlan(c,s),practice:[0,1,2].map(round=>effortPlan(c,s,'practice',round)),quiz:EFFORT_QUIZ}),effortEnvelope,projectEffortReport,isEffortReport),
   contentDefinition(dualDefinition,DUAL_IDENTITY.configVersion,(c,s)=>({formal:dualPlan(c,s),practice:[0,1,2].map(round=>dualPlan(c,s,'practice',round))}),dualEnvelope,projectDualReport,isDualReport),
-  contentDefinition(gradDefinition,GRAD_IDENTITY.configVersion,(c,s)=>({formal:gradPlan(c,s),practice:[0,1,2].map(round=>gradPracticePlans(c,s,round))}),gradEnvelope,projectGradReport,isGradReport),
+  gradNativeRecord,
   contentDefinition(hfDefinition,HF_IDENTITY.configVersion,(c,s)=>({formal:hfPlan(c,s),practice:[0,1,2].map(round=>hfPlan(c,s,'practice',round))}),hfEnvelope,projectHFReport,isHFReport,'all'),
   contentDefinition(horizonDefinition,HORIZON_IDENTITY.configVersion,(c,s)=>({formal:horizonPlan(c,s),practice:[0,1,2].map(round=>horizonPlan(c,s,'practice',round))}),horizonEnvelope,projectHorizonReport,isHorizonReport),
   contentDefinition(spatialMemoryDefinition,SPATIAL_IDENTITY.configVersion,(c,s)=>[...spatialPlan(c,s),...[0,1,2].flatMap(round=>spatialPlan(c,s,'practice',round))],spatialEnvelope,projectSpatialReport,isSpatialReport),

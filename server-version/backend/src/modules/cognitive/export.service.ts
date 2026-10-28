@@ -1,3 +1,6 @@
+import {GRAD_IDENTITY} from './content-candidates/gradcpt/protocol'
+import {GRAD_WIRE_KIND} from './content-candidates/gradcpt/wire-format'
+import {decodeGradSubmission} from './content-candidates/gradcpt/wire'
 import { exportRoot } from '../../services/exportArtifactService'
 import { wideExportPackage } from '../../services/wideExportPackage'
 import * as fs from 'fs'
@@ -369,7 +372,16 @@ const decodeSessionTrials = (session: CognitiveExportSession): Array<{ trialInde
     if (payload.attemptEpoch !== session.attemptNo || payload.trials.length !== raw.trialCount) {
       throw new Error(`统一认知测评会话 ${session.id} 的原始提交元数据不一致`)
     }
-    return payload.trials.map((trial) => ({ trialIndex: trial.trialIndex, payload: trial.payload }))
+    return payload.trials.map((trial) => {
+      // Restore the original task fields for raw-data exports, without invoking a scorer.
+      // Only this exact transport tuple is understood; old raw values pass through unchanged.
+      const wire = trial.payload as {kind?: unknown} | null
+      const decoded = session.testType === GRAD_IDENTITY.testType
+        && session.engineVersion === GRAD_IDENTITY.engineVersion && session.scoringVersion === GRAD_IDENTITY.scoringVersion
+        && session.configVersion === GRAD_IDENTITY.configVersion && wire?.kind === GRAD_WIRE_KIND
+        ? decodeGradSubmission(trial.payload) : trial.payload
+      return { trialIndex: trial.trialIndex, payload: decoded }
+    })
   }
   return (session.trials || []).map((trial) => ({
     trialIndex: trial.trialIndex,

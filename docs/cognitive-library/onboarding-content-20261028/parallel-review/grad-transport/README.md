@@ -127,3 +127,14 @@ wire→FINAL/DB/归档验证，不能按各刷新率重复完整计分。
 freezeEnvelope接口，不复制共享文件或用断言隐藏接口差异。本工具代码/测试/浏览器
 实际执行、命令退出和摘要见[wire-execution.json](wire-execution.json)。剩余为root最终
 类型闭包和唯一大原件DB/归档消费者；无denied/uncertain操作。
+
+
+## Root共享集成与唯一大原件消费者
+
+实际 [结果原件](real-wire-result.json) 与 [命令/退出/类型输入](shared-integration.json)：使用保存的 Chrome 真实wire字节，没有再次压缩该消费者输入，也没有重复原来的300图浏览器任务。隔离START后，同一原件的旧提交3,668,003B被现有1536KiB界限拒绝；wire加结束声明284,415B通过。一次新增权威计分得presented300、interpretable；57,987帧每个原始数值SHA保持，原始帧导出还原，完整加密私有资产包4,420,645B。这里PRIVATE store适配为合成替身，真实PostgreSQL/加密/冻结结果/资产引用均实际执行，不冒充生产COS上传。
+
+共享native port现在只对声明freezeEnvelope的Grad适配异步生成并冻结exact提交原件；失败/重载复用同一artifact，不改其它工具的记录或引擎。独审找到两port竞争，修复后同recordDigest的第二port只读复用第一份合法编码，不覆盖不可变槽；跨epoch仍拒绝。见[原失败与定向续验](../../../../parallel-review/grad-freeze/README.md)。原正向1例、seal后重试/epoch边界原通过输入不变，均复用而非重跑。
+
+Backend adapter仅在本工具比较解码原件与已经提交core，不调用scorer修正报告。通用full/research原始字段导出按精确Grad tuple无损解码，summary仍读冻结报告；不是从COS回算。SAV固有字符串宽度不适合完整重建原件，此修复不改变该格式，也不把它声称为无损原件出口。
+
+最终本次共享直接闭包：backend1110、frontend384源码零诊断，未跑全平台构建。专用PostgreSQL/Redis停止并自动删除，初次stop后的瞬时Dead与最终移除观察分别保留；原有停止容器未动。超过原8MiB解码/现有packed范围、缺少压缩能力的浏览器仍明确保留本机原件待处理，不丢帧或假报保存完成。

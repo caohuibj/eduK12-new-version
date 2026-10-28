@@ -6,7 +6,8 @@ export interface NativeContentContext {contextKey:string;randomSeed:string;manif
 export interface NativeContentRecord {contextKey:string;recordKey:string;recordDigest:string;configHash:string;protocolSignature:string;manifestHash:string;realm:{timeOriginMs:number;pageInstanceId:string};raw:unknown}
 export interface NativeContentClaim {contextKey:string;configHash:string;protocolSignature:string;manifestHash:string;recordDigests:string[];finalPayloadDigest:string;practiceCount:number;termination:'completed'|'aborted';terminationReason:string|null}
 export interface NativeContentReceipt<P> {contextKey:string;finalPayloadDigest:string;finalSaved:true;receiptId:string;reportDigest:string;report:P}
-export interface NativePortAdapter<C,R,P>{manifest(context:C):unknown;envelope(raw:R):Record<string,unknown>;isReport(value:unknown):value is P}
+export interface NativePortAdapter<C,R,P>{manifest(context:C):unknown;envelope(raw:R):Record<string,unknown>|Promise<Record<string,unknown>>;freezeEnvelope?:true;isReport(value:unknown):value is P}
+const ENVELOPE='cognitive.native-envelope.'
 const OPEN='cognitive.native-content.open.v1',FINAL='cognitive.native-content.final.v1',PREFIX='cognitive.native-content.record.'
 const same=(a:unknown,b:unknown)=>digest(a)===digest(b)
 /** Recovery keeps the original administration metadata even when the current viewport changes. */
@@ -49,7 +50,24 @@ export function createNativeContentPort<C extends NativeContentContext,D extends
    if(!data.claim)await store.freezeInstrumentArtifact(owner,FINAL,input)
    await host.sealRaw({schemaVersion:1,kind:'COGNITIVE_NATIVE_CONTENT_V1',context:original,manifest,realm:data.binding.realm,records,claim:input})
    for(const [index,row] of formal.entries()){
-    const envelope=adapter.envelope(row.raw as R)
+    let envelope:Record<string,unknown>
+    if(adapter.freezeEnvelope){
+     const key=ENVELOPE+row.recordKey,meta=await read()
+     let saved=meta.frozenInstrumentArtifacts?.[key] as {recordDigest:string;envelopeDigest:string;envelope:Record<string,unknown>}|undefined
+     if(!saved){
+      const generated=await adapter.envelope(row.raw as R)
+      try{saved=(await store.freezeInstrumentArtifact(owner,key,{recordDigest:row.recordDigest,envelopeDigest:digest(generated),envelope:generated})).value}
+      catch(error){
+       // A second port may have frozen another lossless encoding while this one awaited compression.
+       // Reuse that winner exactly; a missing slot or a changed owner still rejects the operation.
+       const current=await read()
+       saved=current.frozenInstrumentArtifacts?.[key] as typeof saved
+       if(!saved)throw error
+      }
+     }
+     if(saved.recordDigest!==row.recordDigest||saved.envelopeDigest!==digest(saved.envelope))throw Error('已冻结提交数据与原件不一致')
+     envelope=structuredClone(saved.envelope)
+    }else envelope=await adapter.envelope(row.raw as R)
     if(envelope.trialIndex!==index||await host.appendEnvelope(envelope)===false)throw Error('正式作答原件次序尚未确认')
    }
    const receipt=await host.complete(),snapshot=receipt.nativeReport
