@@ -36,14 +36,12 @@ import '../assessment-ui/assessment-ui.css'
 import '../../training/paper-ink.css'
 import '../../training/training-workspace-refresh.css'
 import '../../training/training-subpages-refresh.css'
-import '../../pages/admin/admin-training.css'
 import '../../training/training-teacher-visual.css'
 import '../../training/training-assessment-visual.css'
 import '../../training/training-account.css'
 import '../../training/training-workspace-header.css'
 import '../../training/training-appearance.css'
 // The authentication-pending management frame also needs these startup styles.
-import '../../training/training-admin-workspace.css'
 import {educationEntry} from '../../pages/admin/education-entry'
 
 // Product-specific management frames are not needed for public Training entry.

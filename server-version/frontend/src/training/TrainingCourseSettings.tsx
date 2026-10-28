@@ -1,3 +1,4 @@
+import '../pages/admin/admin-training.css'
 import { useEffect, useState, type FormEvent } from 'react'
 import { ArrowRight, Users, BookOpen, UserPlus } from 'lucide-react'
 import { Link } from 'react-router-dom'
