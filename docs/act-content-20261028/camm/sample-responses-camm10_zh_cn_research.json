@@ -1,0 +1,19 @@
+{
+  "note": "模拟数据，仅用于核对计分与报告样稿",
+  "answers": {
+    "CAMM_01": 2,
+    "CAMM_02": 0,
+    "CAMM_03": 4,
+    "CAMM_04": 2,
+    "CAMM_05": 0,
+    "CAMM_06": 4,
+    "CAMM_07": 2,
+    "CAMM_08": 0,
+    "CAMM_09": 4,
+    "CAMM_10": 2
+  },
+  "expectedScores": {
+    "total": 20
+  },
+  "quality": "interpretable"
+}

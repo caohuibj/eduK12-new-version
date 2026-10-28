@@ -1,0 +1,749 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "camm10_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "Child and Adolescent Mindfulness Measure, 10-item",
+      "abbreviation": "CAMM",
+      "instrumentFamily": "CAMM"
+    },
+    "construct": {
+      "primaryDomain": "SELF_REGULATION",
+      "secondaryDomains": [],
+      "constructDefinition": "儿童青少年对当下体验的觉察与不评判接纳：留意眼前正在发生的事、允许想法和感受存在而不被其带走。是 ACT 相邻的正念测量，不是 ACT 专属过程量表，也不是注意能力测验。",
+      "constructLevel": "BROAD_DOMAIN",
+      "constructOverlapTags": [
+        "domain:act",
+        "domain:self_regulation",
+        "population:k12",
+        "response:student_self",
+        "use:reflection",
+        "use:research",
+        "language_validation:chinese_working_translation",
+        "construct:act_present_moment",
+        "construct:mindfulness_youth",
+        "mindfulness",
+        "present_moment_awareness",
+        "self_report"
+      ]
+    },
+    "population": {
+      "populationNotes": "原开发样本为美国儿童青少年；10 题版为删减内部缺失题后的正式版。此中文工作译稿未经独立回译或本地验证。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "PARTIAL"
+    },
+    "administration": {
+      "itemCount": 10,
+      "estimatedMinutes": 4,
+      "administrationModes": [
+        "PAPER"
+      ],
+      "timeFrame": "一般情形，无指定回忆期",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保持官方作答量尺与题序；英文锚点为 Never True / Rarely True / Sometimes True / Often True / Always True。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "SUPPORTED",
+          "notes": "原文研究支持；中文工作译文尚未验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "反馈仅作普遍生活化反思，不推断个体能力或状态。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "greco-2011-camm",
+        "evidenceType": "STRUCTURAL_VALIDITY",
+        "population": "US children and adolescents",
+        "locale": "en",
+        "territory": "US",
+        "studyDesign": "原作者论文与官方计分说明报告 10 题正式版：全部反向后求和，高分=更多正念。",
+        "rating": "MIXED",
+        "citation": "Greco L, Baer RA, Smith GT (2011). Psychological Assessment, 23, 606-614.",
+        "url": "https://ruthbaer.com/academics/CAMM.pdf",
+        "notes": "以上证据均针对原语言版本，不外推到本中文工作译稿。"
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "Child and Adolescent Mindfulness Measure (CAMM), official 10-item form and scoring instructions",
+        "citation": "Greco, L., Baer, R. A., & Smith, G. T. (2011). Assessing mindfulness in children and adolescents: Development and validation of the child and adolescent mindfulness measure (CAMM). Psychological Assessment, 23, 606-614.",
+        "url": "https://ruthbaer.com/academics/CAMM.pdf",
+        "publicationYear": 2011
+      },
+      "license": {
+        "status": "unknown",
+        "redistribution": "unknown",
+        "note": "题本由原作者之一（Ruth Baer）学术网站公开提供下载，计分说明随题本发布（先反向再求和）；页面未附使用许可条款，未查到明确再分发声明。按保守约定登记为 unknown。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "camm_freq_0_4",
+          "options": [
+            {
+              "value": "0",
+              "label": "从不如此",
+              "score": 0
+            },
+            {
+              "value": "1",
+              "label": "很少如此",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "有时如此",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "经常如此",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "总是如此",
+              "score": 4
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "CAMM_01",
+          "content": "我会为自己有一些说不通的情绪而生自己的气。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "camm_freq_0_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CAMM_02",
+          "content": "在学校里，我从一个教室走到另一个教室，却没留意自己在做什么。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "camm_freq_0_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CAMM_03",
+          "content": "我让自己忙个不停，好不去注意自己的想法或感受。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "camm_freq_0_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CAMM_04",
+          "content": "我告诉自己，我不应该有现在这种感受。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "camm_freq_0_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CAMM_05",
+          "content": "我把不喜欢的想法推开。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "camm_freq_0_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CAMM_06",
+          "content": "我很难一次只专注于一件事。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "camm_freq_0_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CAMM_07",
+          "content": "我会为自己有某些念头而生自己的气。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "camm_freq_0_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CAMM_08",
+          "content": "我总想着过去发生的事，而不是留意当下正在发生的事。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "camm_freq_0_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CAMM_09",
+          "content": "我觉得有些情绪是不好的，我不应该有它们。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 8,
+          "responseSetKey": "camm_freq_0_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CAMM_10",
+          "content": "我阻止自己产生不喜欢的情绪。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 9,
+          "responseSetKey": "camm_freq_0_4",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "CAMM_01",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "CAMM_02",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "CAMM_03",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "CAMM_04",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "CAMM_05",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "CAMM_06",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "CAMM_07",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "CAMM_08",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "CAMM_09",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "CAMM_10",
+            "transform": {
+              "type": "reverse"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "total",
+            "type": "total",
+            "label": "正念总分（10题，反向后）",
+            "description": "按官方规则先逐题反向（0↔4、1↔3、2 不变）再求和，范围 0–40。分数越高表示越多报告“留意当下、允许感受存在”；分数越低表示越多报告走神、评判自己或推开感受。方向与题目字面相反，解读时以本说明为准。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "CAMM_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CAMM_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CAMM_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CAMM_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CAMM_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CAMM_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CAMM_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CAMM_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CAMM_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CAMM_10",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "total"
+        ],
+        "scoreOrder": [
+          "total"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "total",
+            "headline": "留意当下的能力",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "反向计分后，分数越高表示你越多报告“留意当下、允许感受存在”；越低表示越多报告走神、评判自己或推开感受。这只是这一次作答的记录，不是能力评分。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "今天有没有一个时刻，你完全在注意眼前发生的事？那时你在做什么？"
+              },
+              {
+                "category": "strategy",
+                "text": "做一件日常小事（吃饭、走路、听歌）时，只留意它的声音、味道或身体感觉；走神了就轻轻拉回来，不用批评自己。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这是未经回译及本地验证的中文工作译稿，结果不可视作已验证中文测量结果。",
+          "全部题目按字面为负向描述，已按官方规则反向计分；不将原始未反向分呈现给被试。",
+          "该报告是单次自述；缺答不计分，不插补。"
+        ],
+        "disclaimer": "这些内容仅供一般自我反思，不用于诊断、筛查、选拔或排名。"
+      },
+      "referencePolicy": {
+        "type": "none"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "all_minimum",
+        "answers": [
+          {
+            "itemCode": "CAMM_01",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CAMM_02",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CAMM_03",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CAMM_04",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CAMM_05",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CAMM_06",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CAMM_07",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CAMM_08",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CAMM_09",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CAMM_10",
+            "responseValue": "0"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 40
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "all_maximum",
+        "answers": [
+          {
+            "itemCode": "CAMM_01",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CAMM_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CAMM_03",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CAMM_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CAMM_05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CAMM_06",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CAMM_07",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CAMM_08",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CAMM_09",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CAMM_10",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 0
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "all_midpoint",
+        "answers": [
+          {
+            "itemCode": "CAMM_01",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CAMM_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CAMM_03",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CAMM_04",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CAMM_05",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CAMM_06",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CAMM_07",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CAMM_08",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CAMM_09",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CAMM_10",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 20
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "mixed_pattern",
+        "answers": [
+          {
+            "itemCode": "CAMM_01",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CAMM_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CAMM_03",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CAMM_04",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CAMM_05",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CAMM_06",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CAMM_07",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CAMM_08",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CAMM_09",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CAMM_10",
+            "responseValue": "0"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 22
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "missing_first_item",
+        "answers": [
+          {
+            "itemCode": "CAMM_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CAMM_03",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CAMM_04",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CAMM_05",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CAMM_06",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CAMM_07",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CAMM_08",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CAMM_09",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CAMM_10",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "total": null
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "all_missing",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "total": null
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      }
+    ]
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "camm10-v1",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "camm10-v1",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

@@ -1,0 +1,130 @@
+{
+  "instrumentKey": "camm10_zh_cn_research",
+  "options": [
+    {
+      "value": "0",
+      "label_en_note": "英文锚点为 Never True / Rarely True / Sometimes True / Often True / Always True。",
+      "score": 0
+    },
+    {
+      "value": "1",
+      "label_en_note": "英文锚点为 Never True / Rarely True / Sometimes True / Often True / Always True。",
+      "score": 1
+    },
+    {
+      "value": "2",
+      "label_en_note": "英文锚点为 Never True / Rarely True / Sometimes True / Often True / Always True。",
+      "score": 2
+    },
+    {
+      "value": "3",
+      "label_en_note": "英文锚点为 Never True / Rarely True / Sometimes True / Often True / Always True。",
+      "score": 3
+    },
+    {
+      "value": "4",
+      "label_en_note": "英文锚点为 Never True / Rarely True / Sometimes True / Often True / Always True。",
+      "score": 4
+    }
+  ],
+  "items": [
+    {
+      "itemCode": "CAMM_01",
+      "en": "I get upset with myself for having feelings that don't make sense.",
+      "zh_working": "我会为自己有一些说不通的情绪而生自己的气。",
+      "assignedScore": "total"
+    },
+    {
+      "itemCode": "CAMM_02",
+      "en": "At school, I walk from class to class without noticing what I'm doing.",
+      "zh_working": "在学校里，我从一个教室走到另一个教室，却没留意自己在做什么。",
+      "assignedScore": "total"
+    },
+    {
+      "itemCode": "CAMM_03",
+      "en": "I keep myself busy so I don't notice my thoughts or feelings.",
+      "zh_working": "我让自己忙个不停，好不去注意自己的想法或感受。",
+      "assignedScore": "total"
+    },
+    {
+      "itemCode": "CAMM_04",
+      "en": "I tell myself that I shouldn't feel the way I'm feeling.",
+      "zh_working": "我告诉自己，我不应该有现在这种感受。",
+      "assignedScore": "total"
+    },
+    {
+      "itemCode": "CAMM_05",
+      "en": "I push away thoughts that I don't like.",
+      "zh_working": "我把不喜欢的想法推开。",
+      "assignedScore": "total"
+    },
+    {
+      "itemCode": "CAMM_06",
+      "en": "It's hard for me to pay attention to only one thing at a time.",
+      "zh_working": "我很难一次只专注于一件事。",
+      "assignedScore": "total"
+    },
+    {
+      "itemCode": "CAMM_07",
+      "en": "I get upset with myself for having certain thoughts.",
+      "zh_working": "我会为自己有某些念头而生自己的气。",
+      "assignedScore": "total"
+    },
+    {
+      "itemCode": "CAMM_08",
+      "en": "I think about things that have happened in the past instead of thinking about things that are happening right now.",
+      "zh_working": "我总想着过去发生的事，而不是留意当下正在发生的事。",
+      "assignedScore": "total"
+    },
+    {
+      "itemCode": "CAMM_09",
+      "en": "I think that some of my feelings are bad and that I shouldn't have them.",
+      "zh_working": "我觉得有些情绪是不好的，我不应该有它们。",
+      "assignedScore": "total"
+    },
+    {
+      "itemCode": "CAMM_10",
+      "en": "I stop myself from having feelings that I don't like.",
+      "zh_working": "我阻止自己产生不喜欢的情绪。",
+      "assignedScore": "total"
+    }
+  ],
+  "reverseScored": [
+    "a",
+    "l",
+    "l"
+  ],
+  "scores": [
+    {
+      "key": "total",
+      "label": "正念总分（10题，反向后）",
+      "items": [
+        "CAMM_01",
+        "CAMM_02",
+        "CAMM_03",
+        "CAMM_04",
+        "CAMM_05",
+        "CAMM_06",
+        "CAMM_07",
+        "CAMM_08",
+        "CAMM_09",
+        "CAMM_10"
+      ],
+      "aggregation": "sum",
+      "reverse": [
+        "CAMM_01",
+        "CAMM_02",
+        "CAMM_03",
+        "CAMM_04",
+        "CAMM_05",
+        "CAMM_06",
+        "CAMM_07",
+        "CAMM_08",
+        "CAMM_09",
+        "CAMM_10"
+      ],
+      "description": "按官方规则先逐题反向（0↔4、1↔3、2 不变）再求和，范围 0–40。分数越高表示越多报告“留意当下、允许感受存在”；分数越低表示越多报告走神、评判自己或推开感受。方向与题目字面相反，解读时以本说明为准。"
+    }
+  ],
+  "missingPolicy": "complete_required；任一题缺失则该分数不计算，不插补、不补0。"
+}
