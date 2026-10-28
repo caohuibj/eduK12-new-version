@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "sourceSHA": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "sourceKey": "ipip_responsive_joy10_zh_cn_research",
+  "originalVersion": "1.0.0",
+  "preparedVersion": "1.0.0",
+  "originalSource": "server-version/backend/src/modules/scale/instruments/ipip_responsive_joy10_zh_cn_research/1.0.0/source.json",
+  "preparedSource": "server-version/backend/src/modules/scale/instruments/ipip_responsive_joy10_zh_cn_research/1.0.0/source.json",
+  "originalSourceSHA256": "a7a3dcdea8fec952e5beb39c760542c34ad3b55e996fbc9d66d273067239c15c",
+  "preparedSourceSHA256": "bdc9e05a94bf4b9646cb2e3fab7ee379184da69782bfbcbca3e86f35d9c7c2e6",
+  "originalFiles": [
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_joy10/1.0.0/README.md",
+      "blob": "7210e447c11eba4a8662e8152c951a8711f28cec",
+      "sha256": "14944b54d6d5b7d6ddc832e0011dfffdd88acebe0f1c1a4de92c001006e96b02"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_joy10/1.0.0/bilingual-content.json",
+      "blob": "642b13baec786a82276479be0464db4745a9c890",
+      "sha256": "668803ac2f0b72e37be2a3ea4831dbf8fe28fea933af75cc37fa8a12d28ea771"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_joy10/1.0.0/local-validation.json",
+      "blob": "04ec68e1533d5d37dc2341db8e2e43d0a86d53fa",
+      "sha256": "e4aedd7c93500844eddb832065d68ae86647cabea11c47f12b4a769920cbc58a"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_joy10/1.0.0/references.md",
+      "blob": "fd5cfae2b437a99d0d23cd01070a93d0edff26e2",
+      "sha256": "a300fcc22e87731333c8f9b71fbf4c137a7569515a48dbe555d33251075b8543"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_joy10/1.0.0/report-example.md",
+      "blob": "e52c289a5f7dd5de040eb4cdae18695d90df1240",
+      "sha256": "103c6fc4b5a08111d7d19bf12b986d82bb425c8eb09e7fe09a9e6b67ffda8abc"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_joy10/1.0.0/report-revisions/1.0.1/change-record.json",
+      "blob": "9f70e163424b739d3ae99a9ff70e6673e0407d75",
+      "sha256": "d24ed4e50ff24e30876a1bd47f4d2931c8ed83be9bae77e849ddcc3979c4a718"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_joy10/1.0.0/report-revisions/1.0.1/previous-report-1.0.0.json",
+      "blob": "e70d5605a4521aa40fbc2a650f976bc820cd5bd9",
+      "sha256": "20c3211aaeefe6507279c5ff20f95305fefa7e7b00b57b6b5525dd93744281b3"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_joy10/1.0.0/report-revisions/1.0.1/previous-report-example.md",
+      "blob": "591c0f5a97394b3e737053fa73e932042b3649bf",
+      "sha256": "569f55e42abe93d456235d0ff9bcf217c53d9cee01cace2411421c8dc4191439"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_joy10/1.0.0/report-revisions/1.0.1/previous-synthetic-report-example.json",
+      "blob": "b81d16ca20a74aec3611544baf26513b4a26b273",
+      "sha256": "61d5727f312967b972aec0cb862a41aadb4c4f3d7ec13e1bbdf34a99328ad0f5"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_joy10/1.0.0/report-revisions/1.0.1/validation.json",
+      "blob": "be686fca69e953fd8d3d23b770c537809380cf3b",
+      "sha256": "168d18ad5648a0d54a1eabce54a9cf5c49e9a51aede0a0e33d5d4b5579a4b49c"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_joy10/1.0.0/reviewed-source-pack.json",
+      "blob": "8d29158a410b8cc00a7cddbea5cad09288ac5154",
+      "sha256": "847028d69c537d72ecc71910b3ad71aa303718758eba0d63e75016242a40e9fe"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_joy10/1.0.0/synthetic-report-example.json",
+      "blob": "84a7526a3c7545af3b31c8cd2b1125ad38bae829",
+      "sha256": "19efd8ece24459f8395395f553842af92e727d9ad8e69f3411e05669364c771a"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ipip_responsive_joy10_zh_cn_research/1.0.0/instrument.ts",
+      "blob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ipip_responsive_joy10_zh_cn_research/1.0.0/source.json",
+      "blob": "f145abdef6b23011a67273c12f03f51fe6c28e2f",
+      "sha256": "a7a3dcdea8fec952e5beb39c760542c34ad3b55e996fbc9d66d273067239c15c"
+    }
+  ],
+  "jsonChanges": [
+    {
+      "op": "replace",
+      "path": "/executable/releaseStatus",
+      "from": "DRAFT",
+      "value": "PUBLISHED"
+    },
+    {
+      "op": "add",
+      "path": "/instruction",
+      "value": {
+        "schemaVersion": 1,
+        "text": "请根据你通常的情况，判断以下说法与你的符合程度。没有标准答案，请按自己的真实感受作答。",
+        "language": "zh-CN",
+        "version": "1.0.0",
+        "source": "docs/scale-instruments/research-drafts/ipip_responsive_joy10/1.0.0/bilingual-content.json#/instructions @ b92c69aefa2472775fa7ee86b9c208366886c908 (项目工作稿；非人工审批声明)"
+      }
+    }
+  ],
+  "audit": "audits/audit-ipip-responsive-joy10-batch3.json",
+  "versions": {
+    "instrument": "1.0.0",
+    "scoring": "1.0.0",
+    "report": "1.0.1",
+    "localization": "1.0.0",
+    "instruction": "1.0.0"
+  },
+  "states": {
+    "sourceRelease": "PUBLISHED candidate, independent integration pending",
+    "catalog": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "translation": "PENDING",
+    "scientificReview": null,
+    "databaseInstall": "NOT_EXECUTED",
+    "databasePublish": "NOT_EXECUTED",
+    "production": "NOT_TOUCHED"
+  },
+  "versionReason": "Existing prepared instruction bound outside definition; measurement/formula/report unchanged."
+}

@@ -1,0 +1,262 @@
+{
+  "identity": "ipip_responsive_joy10_zh_cn_research:1.0.0",
+  "sourceCommit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "sourceBranch": "content/dot-local-scales-20261025",
+  "files": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ipip_responsive_joy10_zh_cn_research/1.0.0/source.json",
+      "gitBlob": "f145abdef6b23011a67273c12f03f51fe6c28e2f",
+      "sha256": "a7a3dcdea8fec952e5beb39c760542c34ad3b55e996fbc9d66d273067239c15c"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ipip_responsive_joy10_zh_cn_research/1.0.0/instrument.ts",
+      "gitBlob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_joy10/1.0.0/README.md",
+      "gitBlob": "7210e447c11eba4a8662e8152c951a8711f28cec",
+      "sha256": "14944b54d6d5b7d6ddc832e0011dfffdd88acebe0f1c1a4de92c001006e96b02"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_joy10/1.0.0/bilingual-content.json",
+      "gitBlob": "642b13baec786a82276479be0464db4745a9c890",
+      "sha256": "668803ac2f0b72e37be2a3ea4831dbf8fe28fea933af75cc37fa8a12d28ea771"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_joy10/1.0.0/reviewed-source-pack.json",
+      "gitBlob": "8d29158a410b8cc00a7cddbea5cad09288ac5154",
+      "sha256": "847028d69c537d72ecc71910b3ad71aa303718758eba0d63e75016242a40e9fe"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_joy10/1.0.0/references.md",
+      "gitBlob": "fd5cfae2b437a99d0d23cd01070a93d0edff26e2",
+      "sha256": "a300fcc22e87731333c8f9b71fbf4c137a7569515a48dbe555d33251075b8543"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_joy10/1.0.0/report-example.md",
+      "gitBlob": "e52c289a5f7dd5de040eb4cdae18695d90df1240",
+      "sha256": "103c6fc4b5a08111d7d19bf12b986d82bb425c8eb09e7fe09a9e6b67ffda8abc"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_joy10/1.0.0/synthetic-report-example.json",
+      "gitBlob": "84a7526a3c7545af3b31c8cd2b1125ad38bae829",
+      "sha256": "19efd8ece24459f8395395f553842af92e727d9ad8e69f3411e05669364c771a"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_joy10/1.0.0/local-validation.json",
+      "gitBlob": "04ec68e1533d5d37dc2341db8e2e43d0a86d53fa",
+      "sha256": "e4aedd7c93500844eddb832065d68ae86647cabea11c47f12b4a769920cbc58a"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_joy10/1.0.0/report-revisions/1.0.1/change-record.json",
+      "gitBlob": "9f70e163424b739d3ae99a9ff70e6673e0407d75",
+      "sha256": "d24ed4e50ff24e30876a1bd47f4d2931c8ed83be9bae77e849ddcc3979c4a718"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_joy10/1.0.0/report-revisions/1.0.1/previous-report-1.0.0.json",
+      "gitBlob": "e70d5605a4521aa40fbc2a650f976bc820cd5bd9",
+      "sha256": "20c3211aaeefe6507279c5ff20f95305fefa7e7b00b57b6b5525dd93744281b3"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_joy10/1.0.0/report-revisions/1.0.1/previous-report-example.md",
+      "gitBlob": "591c0f5a97394b3e737053fa73e932042b3649bf",
+      "sha256": "569f55e42abe93d456235d0ff9bcf217c53d9cee01cace2411421c8dc4191439"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_joy10/1.0.0/report-revisions/1.0.1/previous-synthetic-report-example.json",
+      "gitBlob": "b81d16ca20a74aec3611544baf26513b4a26b273",
+      "sha256": "61d5727f312967b972aec0cb862a41aadb4c4f3d7ec13e1bbdf34a99328ad0f5"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_joy10/1.0.0/report-revisions/1.0.1/validation.json",
+      "gitBlob": "be686fca69e953fd8d3d23b770c537809380cf3b",
+      "sha256": "168d18ad5648a0d54a1eabce54a9cf5c49e9a51aede0a0e33d5d4b5579a4b49c"
+    }
+  ],
+  "thirdPartyLicense": {
+    "path": "server-version/backend/src/modules/scale/instruments/ipip_responsive_joy10_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+    "status": "固定提交该量表包未包含此文件；source license、usageRequirements 和 research-drafts 引用官方声明"
+  },
+  "threePartConclusions": {
+    "content": "官方 Responsive Joy 十道英文题和顺序与双语材料及运行时逐题一致；1–6正、7–10反。中文基本表达原意，仍为AI辅助工作译稿；第3题“能”可能带能力色彩，留人工译审，不擅改题意。题1、10的儿童情境受生活文化经历影响，报告已提示。五点为符合度；第9题自身含频率，不将锚点误作频率。",
+    "scoring": "单一构念总分，正向 x、反向 6−x、10题等权求和，理论10–50，无均分分母。complete_required 为项目选择：缺一题不算分，不插补/补零，不能称作官方缺失标准。无经验阈值、诊断分档或群体排名，referencePolicy=none。",
+    "report": "report 1.0.1 越高越认可受他人快乐感染的描述，限定非整体共情、品格或能力。既有反思及询问具体问题建议温和可执行，不强求情绪表达；中文工作稿、情境限制、成人研究和非诊断界限已列出。instrument/scoring/localization=1.0.0，报告=1.0.1，受众 ADULT_SELF，student为技术映射；原始英文 alpha 是源样本统计，不是中文信度。"
+  },
+  "items": [
+    {
+      "position": 1,
+      "runtimeItemCode": "IPIP_RESPONSIVE_JOY10_01",
+      "en": "Like to watch children open presents.",
+      "zh": "我喜欢看孩子们拆礼物。",
+      "key": "positive",
+      "result": "官方英文、键向和运行时文本相符，含义基本对应；人工译审待定"
+    },
+    {
+      "position": 2,
+      "runtimeItemCode": "IPIP_RESPONSIVE_JOY10_02",
+      "en": "Usually end up laughing if the people around me are laughing.",
+      "zh": "如果周围的人在笑，我通常也会跟着笑起来。",
+      "key": "positive",
+      "result": "官方英文、键向和运行时文本相符，含义基本对应；人工译审待定"
+    },
+    {
+      "position": 3,
+      "runtimeItemCode": "IPIP_RESPONSIVE_JOY10_03",
+      "en": "Feel other people's joy.",
+      "zh": "我能感受到他人的喜悦。",
+      "key": "positive",
+      "result": "官方英文、键向和运行时文本相符，含义基本对应；人工译审待定；“能”有能力色彩，审阅语义是否等同"
+    },
+    {
+      "position": 4,
+      "runtimeItemCode": "IPIP_RESPONSIVE_JOY10_04",
+      "en": "Get caught up in the excitement when others are celebrating.",
+      "zh": "当他人庆祝时，我也会受到那种兴奋气氛的感染。",
+      "key": "positive",
+      "result": "官方英文、键向和运行时文本相符，含义基本对应；人工译审待定"
+    },
+    {
+      "position": 5,
+      "runtimeItemCode": "IPIP_RESPONSIVE_JOY10_05",
+      "en": "Am strongly influenced by the good moods of others.",
+      "zh": "他人的好心情会对我产生很大的影响。",
+      "key": "positive",
+      "result": "官方英文、键向和运行时文本相符，含义基本对应；人工译审待定"
+    },
+    {
+      "position": 6,
+      "runtimeItemCode": "IPIP_RESPONSIVE_JOY10_06",
+      "en": "Find it hard to stay in a bad mood if the people around me are happy.",
+      "zh": "如果周围的人很开心，我就很难一直保持坏心情。",
+      "key": "positive",
+      "result": "官方英文、键向和运行时文本相符，含义基本对应；人工译审待定"
+    },
+    {
+      "position": 7,
+      "runtimeItemCode": "IPIP_RESPONSIVE_JOY10_07",
+      "en": "Dislike being around happy people when I'm feeling sad.",
+      "zh": "当我感到难过时，我不喜欢待在开心的人身边。",
+      "key": "negative",
+      "result": "官方英文、键向和运行时文本相符，含义基本对应；人工译审待定"
+    },
+    {
+      "position": 8,
+      "runtimeItemCode": "IPIP_RESPONSIVE_JOY10_08",
+      "en": "Am unaffected by other people's happiness.",
+      "zh": "他人的快乐不会影响到我。",
+      "key": "negative",
+      "result": "官方英文、键向和运行时文本相符，含义基本对应；人工译审待定"
+    },
+    {
+      "position": 9,
+      "runtimeItemCode": "IPIP_RESPONSIVE_JOY10_09",
+      "en": "Rarely get caught up in the excitement.",
+      "zh": "我很少被兴奋的气氛所感染。",
+      "key": "negative",
+      "result": "官方英文、键向和运行时文本相符，含义基本对应；人工译审待定"
+    },
+    {
+      "position": 10,
+      "runtimeItemCode": "IPIP_RESPONSIVE_JOY10_10",
+      "en": "Dislike children's birthday parties.",
+      "zh": "我不喜欢孩子们的生日聚会。",
+      "key": "negative",
+      "result": "官方英文、键向和运行时文本相符，含义基本对应；人工译审待定"
+    }
+  ],
+  "anchors": [
+    {
+      "value": 1,
+      "en": "Very Inaccurate",
+      "zh": "非常不符合"
+    },
+    {
+      "value": 2,
+      "en": "Moderately Inaccurate",
+      "zh": "比较不符合"
+    },
+    {
+      "value": 3,
+      "en": "Neither Inaccurate nor Accurate",
+      "zh": "介于不符合与符合之间"
+    },
+    {
+      "value": 4,
+      "en": "Moderately Accurate",
+      "zh": "比较符合"
+    },
+    {
+      "value": 5,
+      "en": "Very Accurate",
+      "zh": "非常符合"
+    }
+  ],
+  "instruction": {
+    "text": "请根据你通常的情况，判断以下说法与你的符合程度。没有标准答案，请按自己的真实感受作答。",
+    "sources": [
+      {
+        "file": {
+          "path": "docs/scale-instruments/research-drafts/ipip_responsive_joy10/1.0.0/bilingual-content.json",
+          "gitBlob": "642b13baec786a82276479be0464db4745a9c890",
+          "sha256": "668803ac2f0b72e37be2a3ea4831dbf8fe28fea933af75cc37fa8a12d28ea771"
+        },
+        "field": "instructions"
+      },
+      {
+        "file": {
+          "path": "docs/scale-instruments/research-drafts/ipip_responsive_joy10/1.0.0/reviewed-source-pack.json",
+          "gitBlob": "8d29158a410b8cc00a7cddbea5cad09288ac5154",
+          "sha256": "847028d69c537d72ecc71910b3ad71aa303718758eba0d63e75016242a40e9fe"
+        },
+        "field": "administration.instructionZh"
+      }
+    ],
+    "sourceJson": "固定 source.json 顶层未声明 instruction；已有文档真实存在指导语。",
+    "proposedBinding": {
+      "schemaVersion": 1,
+      "text": "请根据你通常的情况，判断以下说法与你的符合程度。没有标准答案，请按自己的真实感受作答。",
+      "language": "zh-CN",
+      "version": "1.0.0",
+      "source": "docs/scale-instruments/research-drafts/ipip_responsive_joy10/1.0.0/bilingual-content.json#instructions"
+    },
+    "qualification": "映射版本为拟议适配版本，非专家批准证明；照原文接入既有机制。"
+  },
+  "officialEvidence": [
+    {
+      "url": "https://ipip.ori.org/newEmotionalIntelligenceKey.htm",
+      "finding": "Responsive Joy 6正4反，官方表述 Barchard (2001)，属于潜在情绪智能相关组分而非完整测验。"
+    },
+    {
+      "url": "https://ipip.ori.org/newEmotionalIntelligenceTable.htm",
+      "finding": "女性N=432 alpha=.73，男性N=317 alpha=.70，10项；不能推为本中文译本信度。"
+    },
+    {
+      "url": "https://ipip.ori.org/newScoringInstructions.htm",
+      "finding": "五点符合度、反向转换及求和。"
+    },
+    {
+      "url": "https://ipip.ori.org/newPermission.htm",
+      "finding": "IPIP题项和量表适用于商业与非商业用途。"
+    },
+    {
+      "url": "https://ipip.ori.org/",
+      "finding": "IPIP题项和量表可复制、编辑、翻译及任何用途。"
+    }
+  ],
+  "rights": "保留源包 verified/public domain 限于官方声明的 IPIP 材料；不扩大至类似名称的专有量表，不将许可视为译审或效度确认。",
+  "minimalCorrections": [
+    "建议用已有文本和来源绑定顶层指导语，保留来源与版本可追溯。",
+    "未发现必须修订的普通错字或报告文字；现有合格报告不为形式重写。"
+  ],
+  "manualPending": [
+    "中文专家译审、认知访谈及目标人群验证尚待完成；特别关注第3题及儿童场景的解释性和适用性。",
+    "仅限成人研究及描述性自我了解；不据技术 student 映射推定儿童适用。",
+    "如需实质更改题目、构念、锚点、算法或阈值，列出原依据及版本影响交 root 协调，勿静默改成熟版本。"
+  ],
+  "recommendation": "建议在保留现有内容及报告的基础上，最小接入已有指导语；保留 DRAFT/CANDIDATE/PILOT 和译审验证未完成状态。",
+  "notExecuted": [
+    "未执行golden、评分、截图、四入口、安装、幂等、全库、数据库、CI或生产操作，未修改仓库。",
+    "历史测试记录仅作为既存材料，无新执行或人类专家批准之声称。"
+  ]
+}
