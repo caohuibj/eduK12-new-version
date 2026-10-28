@@ -91,3 +91,30 @@ Next: independently freeze this tiny product change and its actual evidence,
 select only the necessary current source/SAST/admission checks, and keep broader
 storage/concurrency and true browser timing separate. Do not revive the old
 PR361 exact binding or silently trigger its old full build/database replay.
+
+## Bounded qualification plan
+
+Reuse the existing source/original-evidence/SAST/stable-gate jobs (historical
+internal route name `onboarding-structure`), with a new explicitly supported
+PR369 branch, exact source namespace, new base/product/control checkpoint and
+new manifest. This is not an old PR's green check or PR-number impersonation.
+Only the two reporting application/test files and this evidence directory are
+eligible. Unknown paths and source/merge drift fail closed.
+
+CI admits the actual one-case reporter, exact backend type receipt and separately
+identified PG17 planning/current-revocation observations. It preserves the
+original 36 filtered cases and unsigned/retrospective source limitations. The PG
+execution receipt names the base (the candidate was uncommitted during execution)
+and retains an inherited private-Scale scope label: the actual probe source and
+observation specify the multi-tool reader. Neither field is retrospectively
+rewritten. No observation is relabelled a Vitest test or GitHub PG16 execution.
+Performance numbers are not used as noisy pass/fail thresholds.
+
+Two new focused control cases check the PR-specific namespace and observation
+admission, including failure/missing/revocation/setting-restoration negatives.
+They are not rerun in Actions; its source job checks the actual immutable inputs.
+YAML parsed; installed actionlint reports the same four pre-existing
+`download-artifact@v4 artifact-ids` metadata warnings and no new error.
+Source/admission budget remains five minutes, CodeQL thirty minutes. No images,
+frontend, PG, types, benchmark or application test replay. All selected outcomes
+and actual SARIF findings must be independently checked before normal merge.

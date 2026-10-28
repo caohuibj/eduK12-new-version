@@ -1,6 +1,6 @@
 {
   "pr": 365,
-  "enabled": true,
+  "enabled": false,
   "base": "c412baf508a46278c265c20e71952a179813ef31",
   "product": "8188745ca7134b38784717af384d72a730e47945",
   "controlCheckpoint": "e4675a734983cbd42ec466f6d525aaa2e63e1760",
