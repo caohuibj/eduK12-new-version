@@ -1,0 +1,173 @@
+{
+  "scope": "Real current-candidate HTTP routes with actual authentication, authorization, canonical FINAL and database; fixture content is fixed PR371 C1 only. No browser claim.",
+  "startedAt": "2026-10-28T03:47:08.323Z",
+  "cases": [
+    {
+      "name": "Current REPORT_READ deny blocks an accepted Teacher report; distribution retirement is distinct",
+      "status": "PASS",
+      "currentReportReadDenied": true,
+      "managementBoundary": "Existing synthetic ORG_ADMIN business service fixture; not browser governance/MFA acceptance. Earlier material.distribute retirement preserves legal FINAL history by the existing HISTORY contract, not a REPORT_READ revocation."
+    },
+    {
+      "name": "Canonical readback continuation: generated release versions are hashes, original report axis remains 1.0.1",
+      "status": "PASS",
+      "acceptedPriorScaleReadback": {
+        "file": "cloud-guards-r1.json",
+        "completedScaleFinals": 4,
+        "assessmentIds": [
+          "1639315e-665f-4b80-98fe-cc5615f286dc",
+          "4bb7d87b-0287-433b-851b-7170481830cc",
+          "5d815298-25f2-4d34-9037-e8acc3ab8720",
+          "6268fec9-36b8-4324-a2f1-8fe3f849aefe",
+          "040a605a-43ec-473a-8c53-2254928c54a7"
+        ],
+        "sourceStatus": {
+          "catalogStatus": "CANDIDATE",
+          "scientificMaturity": "PILOT",
+          "localizationReview": "PENDING",
+          "scientificReview": null
+        }
+      },
+      "reportTemplateHash": "a5b37c5a8faabd94f4ec04530b3c3b02af513311458edcb1d80d8814fae97292",
+      "trainingReports": [
+        {
+          "attemptId": "a84401ce-b07b-49c3-b151-d1bfc3f8e767",
+          "releaseId": "c53e8832-618c-4622-a98f-84c9a8967639",
+          "contentHash": "d07ec75e7fb1cdd9ea375d954a61beb04afbfdf0decff6e77b7b418362329849",
+          "version": "da584438487e1e0800694b62f15ffb688110cee5371ecb82abfa4623bf4c7b92",
+          "audience": "teacher",
+          "templateHash": "a5b37c5a8faabd94f4ec04530b3c3b02af513311458edcb1d80d8814fae97292"
+        },
+        {
+          "attemptId": "7b2f8fe8-b5f2-4b19-83b7-d38aadf607b7",
+          "releaseId": "c53e8832-618c-4622-a98f-84c9a8967639",
+          "contentHash": "d07ec75e7fb1cdd9ea375d954a61beb04afbfdf0decff6e77b7b418362329849",
+          "version": "da584438487e1e0800694b62f15ffb688110cee5371ecb82abfa4623bf4c7b92",
+          "audience": "teacher",
+          "templateHash": "a5b37c5a8faabd94f4ec04530b3c3b02af513311458edcb1d80d8814fae97292"
+        }
+      ],
+      "acceptedPriorReportPointers": [
+        {
+          "attemptId": "d0300f43-5a09-4630-ad8a-d125dafd92a1",
+          "releaseId": "e08ceb6c-f8b6-47e6-afa4-54103e98f324",
+          "contentHash": "e51a24b34da525e2e8c49d71a955cb6d5a1be664c0192d3da9f8c099a47de853",
+          "version": "1.0.1",
+          "audience": "student",
+          "templateHash": "a5b37c5a8faabd94f4ec04530b3c3b02af513311458edcb1d80d8814fae97292"
+        },
+        {
+          "attemptId": "17bc64c4-d2bb-4965-a063-9f23036cabb6",
+          "releaseId": "1b5f5ec1-918c-4e3c-938c-3fa2e857f493",
+          "contentHash": "d07ec75e7fb1cdd9ea375d954a61beb04afbfdf0decff6e77b7b418362329849",
+          "version": "1.0.1",
+          "audience": "teacher",
+          "templateHash": "a5b37c5a8faabd94f4ec04530b3c3b02af513311458edcb1d80d8814fae97292"
+        }
+      ],
+      "surveyFinals": [
+        {
+          "attemptId": "667e55f8-ae60-4f63-97af-725691f8911c",
+          "finalId": "580d46ce-409b-465b-b2b1-2f6c7f6d6684",
+          "mode": "SINGLE_UNLINKED",
+          "score": 30,
+          "sourceFinalHash": "ef97ba612e4518af7b462b3e353808d015d8a0745ff1789b1388b15c0c00fefe",
+          "reportRelease": {
+            "releaseId": "7eacb226-dd74-4969-9b24-bfc533c78255",
+            "contentHash": "88802d61aa6f7047c34a137d9b453491e8a28a6ebc1d26ebd1151c685da376b8"
+          },
+          "templateHash": "a5b37c5a8faabd94f4ec04530b3c3b02af513311458edcb1d80d8814fae97292",
+          "releaseVersion": "da584438487e1e0800694b62f15ffb688110cee5371ecb82abfa4623bf4c7b92"
+        },
+        {
+          "attemptId": "15330175-820a-4236-83e3-aef61abea1db",
+          "finalId": "c90ef83c-b0b9-49eb-a6ad-965b460903a5",
+          "mode": "LINKED_WAVES",
+          "score": 30,
+          "sourceFinalHash": "da637188d642e5fdcf77b75a53bde650d2c3d459d0312f22aa9491059ac271cd",
+          "reportRelease": {
+            "releaseId": "b84092af-5d79-4971-a07a-e8cd8425abf5",
+            "contentHash": "592955b86970c8c5a9bc2b9a80544b46aec7cd7343356299cd69ce9594cb4a34"
+          },
+          "templateHash": "a5b37c5a8faabd94f4ec04530b3c3b02af513311458edcb1d80d8814fae97292",
+          "releaseVersion": "da584438487e1e0800694b62f15ffb688110cee5371ecb82abfa4623bf4c7b92"
+        },
+        {
+          "attemptId": "e0646ca0-2b1b-4aa4-970c-ec36b0169ef1",
+          "finalId": "3c70c1f6-1880-4e51-a30c-55c3ae134087",
+          "mode": "LINKED_WAVES",
+          "score": 30,
+          "sourceFinalHash": "4c2fa359e5953386a7d274ae4bce719d7e16e98e67c26fdc0b9434bcfaf1f95b",
+          "reportRelease": {
+            "releaseId": "b84092af-5d79-4971-a07a-e8cd8425abf5",
+            "contentHash": "592955b86970c8c5a9bc2b9a80544b46aec7cd7343356299cd69ce9594cb4a34"
+          },
+          "templateHash": "a5b37c5a8faabd94f4ec04530b3c3b02af513311458edcb1d80d8814fae97292",
+          "releaseVersion": "da584438487e1e0800694b62f15ffb688110cee5371ecb82abfa4623bf4c7b92"
+        }
+      ],
+      "savedScores": [
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30
+      ],
+      "originalTeacherFailure": {
+        "attemptId": "9591e94d-e4d0-41cf-9ece-f73a355c6c5d",
+        "status": "IN_PROGRESS",
+        "respondentType": "TEACHER",
+        "preserved": true
+      }
+    }
+  ],
+  "requests": [
+    {
+      "product": "teacher",
+      "method": "GET",
+      "path": "/api/huiteacher/auth/csrf",
+      "status": 200,
+      "durationMs": 31,
+      "body": {
+        "code": 0,
+        "message": "操作成功",
+        "data": {
+          "csrfToken": "[PRIVATE SYNTHETIC CAPABILITY]"
+        }
+      }
+    },
+    {
+      "product": "teacher",
+      "method": "POST",
+      "path": "/api/huiteacher/auth/login",
+      "status": 200,
+      "durationMs": 21,
+      "body": {
+        "code": 0,
+        "message": "登录成功",
+        "data": {
+          "user": {
+            "id": "c9394796-ad73-4cd3-bb49-b15ab18084fe",
+            "username": "sysprobe_teacher_0b5a76",
+            "role": "TEACHER"
+          },
+          "product": "HUITEACHER"
+        }
+      }
+    },
+    {
+      "product": "teacher",
+      "method": "GET",
+      "path": "/api/huiteacher/assessment-reports/executions/66945ea5-619c-40c1-8044-c71b4078f20c",
+      "status": 404,
+      "durationMs": 15,
+      "body": {
+        "text": ""
+      }
+    }
+  ],
+  "failures": [],
+  "endedAt": "2026-10-28T03:47:09.749Z"
+}

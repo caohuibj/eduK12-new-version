@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "files": [
+    {
+      "path": "evidence/cloud-more-r1.json",
+      "originalSHA256": "d945754df221c0f391ba8db2ef41dcb133566246a74fcdd154905e7f3d49fef3",
+      "publishedSHA256": "84d80654161df8bcaff053f070ae2b6e5494440c4aff44d3fab0170f6ad183cd",
+      "reason": "Exact private synthetic credential/capability only; original retained outside Git. Original execution receipt logSHA256 is not rewritten."
+    },
+    {
+      "path": "evidence/cloud-more-r2.json",
+      "originalSHA256": "a950da0f4f6e7c3cb0281f9ea52988ac67ad5faaa76dfb16812ffb41fd57c0a6",
+      "publishedSHA256": "3fb504d6fcd19d141f7c730112862eaeb58d8c29294eed13f2a40fc00b6f2936",
+      "reason": "Exact private synthetic credential/capability only; original retained outside Git. Original execution receipt logSHA256 is not rewritten."
+    }
+  ],
+  "scope": "Credential-only transport redaction, not removal of failed outcomes."
+}

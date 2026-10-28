@@ -1,0 +1,10 @@
+prisma:error 
+Invalid `tx.huiteacherEvaluationTarget.create()` invocation in
+/workspace/eduK12-new-version/server-version/backend/src/modules/huiteacher/evaluation.service.ts:56:54
+
+  53 // An unregistered teacher is a stable but UNCLAIMED target. Later account
+  54 // binding requires a separate identity proof and must never match by name.
+  55 const id=randomUUID()
+→ 56 const target=await tx.huiteacherEvaluationTarget.create(
+Unique constraint failed on the fields: (`organization_id`,`subject_user_id`)
+TEACHER P2002

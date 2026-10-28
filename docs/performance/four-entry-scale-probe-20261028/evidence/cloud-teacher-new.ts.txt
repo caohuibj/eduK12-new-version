@@ -1,0 +1,30 @@
+import {createRequire} from 'node:module'
+import {randomUUID,randomBytes} from 'node:crypto'
+import {readFileSync,writeFileSync,chmodSync} from 'node:fs'
+require('/tmp/pr374-cloud/load-c1.cjs')
+const root='/workspace/eduK12-new-version',b=root+'/server-version/backend',out=root+'/docs/performance/four-entry-scale-probe-20261028/evidence',req=createRequire(b+'/package.json'),{prisma:db}=req(b+'/src/config/database.ts'),pvt=JSON.parse(readFileSync('/tmp/pr374-cloud/accounts.json','utf8'))
+const report:any={startedAt:new Date().toISOString(),scope:'Actual existing assignment/run APIs; only one C1 resource per product; all persons/organization/class fixtures synthetic adult technical roles',stages:[],failures:[],fixturePreconditions:[]}
+function save(){writeFileSync(out+'/teacher-new-assignment.json',JSON.stringify(report,(_k,v)=>typeof v==='bigint'?v.toString():v,2)+'\n');writeFileSync('/tmp/pr374-cloud/accounts.json',JSON.stringify(pvt,null,2));chmodSync('/tmp/pr374-cloud/accounts.json',0o600)}
+async function step(name:string,fn:()=>Promise<any>){try{const result=await fn();report.stages.push({name,outcome:'RESOLVED',result});save();console.log(name,'RESOLVED');return result}catch(e:any){report.stages.push({name,outcome:'REJECTED',code:e.code,message:e.message});report.failures.push({name,code:e.code,message:e.message,stack:e.stack});save();throw e}}
+const principal=(a:any)=>({userId:a.id,username:a.username,role:'TEACHER',platformRole:'STANDARD',accountDomain:'SCHOOL',tokenVersion:0,mustChangePassword:false})
+async function main(){
+ pvt.teacherPriorFailed={...pvt.teacher};
+ const org=pvt.organizationId
+ const persona=async(userId:string,persona:string)=>{const m=await db.organizationMembership.findFirstOrThrow({where:{organizationId:org,userId}});if(!await db.organizationPersonaGrant.findFirst({where:{membershipId:m.id,persona}}))await db.organizationPersonaGrant.create({data:{id:randomUUID(),organizationId:org,membershipId:m.id,persona,grantedByUserId:pvt.accounts.system.id}});return m.id}
+ const teacherMember=await persona(pvt.accounts.teacher.id,'TEACHER')
+ await persona(pvt.accounts.teacher_creator.id,'TEACHER')
+ try{
+ const c=pvt.teacher,ev=req(b+'/src/modules/huiteacher/evaluation.service.ts'),scope={organizationId:org,actorUserId:pvt.accounts.teacher_creator.id}
+ const target=await step('TEACHER-target',()=>ev.createHuiteacherTarget({...scope,kind:'PERSON',name:'合成成人本人',subjectUserId:pvt.accounts.teacher.id}))
+ const event=await step('TEACHER-event',()=>ev.createHuiteacherEvent({...scope,targetId:target.id,kind:'ASSESSMENT',title:'C1单量表系统验收'}))
+ const run=await step('TEACHER-run-draft',()=>ev.createHuiteacherEventRunDraft({...scope,eventId:event.id,name:'C1本人测评'}))
+ const a=c.entry.applicability;await step('TEACHER-add-exact-track',()=>req(b+'/src/modules/huiteacher/run.service.ts').addTeacherRunTrack({...scope,eventId:event.id,expectedRunId:run.runId,expectedVersion:1,resource:{family:'BUNDLE',key:c.resourceKey,version:'1.0.0'},subjectSelector:{kind:'MEMBERSHIP_IDS',membershipIds:[teacherMember]},respondentSelector:{kind:'MEMBERSHIP_IDS',membershipIds:[teacherMember]},requestedPolicy:{subjectRoles:a.subjectRoles,respondentRoles:a.respondentRoles,relationshipKinds:a.relationshipKinds,perspectives:a.perspectives,analysisMode:a.analysisMode,visibilityPolicyKey:a.visibilityPolicyKey,minimumRespondents:a.minimumRespondents}}))
+ await step('TEACHER-event-open',()=>ev.transitionHuiteacherEvent({...scope,eventId:event.id,action:'OPEN',expectedVersion:1}))
+ await step('TEACHER-run-publish',()=>req(b+'/src/modules/huiteacher/run.service.ts').publishTeacherRun({...scope,eventId:event.id,expectedVersion:2}))
+ const [execution]=await db.$queryRawUnsafe('SELECT e.id FROM assessment_run_executions e JOIN assessment_run_actor_snapshots r ON r.id=e.respondent_actor_snapshot_id WHERE e.run_id=$1 AND r.user_id=$2',run.runId,pvt.accounts.teacher.id)
+ if(!execution)throw Error('Teacher actual run has no respondent execution')
+ Object.assign(pvt.teacher,{runId:run.runId,eventId:event.id,executionId:execution.id,stage:'ASSIGNED_READY_FOR_REAL_BROWSER'});save()
+ }catch(e:any){console.error('TEACHER',e.code??e.message)}
+ report.endedAt=new Date().toISOString();save();if(report.failures.length)process.exitCode=1
+}
+main().catch(e=>{console.error(e.message);process.exitCode=1}).finally(()=>db.$disconnect())

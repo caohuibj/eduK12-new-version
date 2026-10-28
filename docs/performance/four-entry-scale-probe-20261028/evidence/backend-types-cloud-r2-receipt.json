@@ -1,0 +1,29 @@
+{
+  "argv": [
+    "node",
+    "node_modules/typescript/bin/tsc",
+    "--noEmit"
+  ],
+  "sourceHead": "3ad550800119b87ad355b52b5268a6fc38a542b0",
+  "componentTree": "6f6089b4aa3b4a98489e0fe7d8022cb7e689eb64",
+  "startedAt": "2026-10-28T03:48:28.664616+00:00",
+  "before": {
+    "package.json": "d629185584fcd679ca367c2d536c6c7783f7a9fe23363a8cd870964a47b2990a",
+    "package-lock.json": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+    "tsconfig.json": "c79ccf595a80514e94936f1ffcd2fa09b57265f0c140d275c81770f494175143",
+    "prisma/schema.prisma": "3bea3c07159f95eadce9257207648658bc8f10e5996f594667cb6c877a84b515",
+    "node_modules/.prisma/client/schema.prisma": "dd81fe6c3581a8d650e188b371a01b927e8e2a5aaf19c47a00ae0c6a5d3e0f15"
+  },
+  "node": "v24.19.0",
+  "originalExecutionSigned": false,
+  "exitCode": 0,
+  "endedAt": "2026-10-28T03:48:55.411987+00:00",
+  "after": {
+    "package.json": "d629185584fcd679ca367c2d536c6c7783f7a9fe23363a8cd870964a47b2990a",
+    "package-lock.json": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+    "tsconfig.json": "c79ccf595a80514e94936f1ffcd2fa09b57265f0c140d275c81770f494175143",
+    "prisma/schema.prisma": "3bea3c07159f95eadce9257207648658bc8f10e5996f594667cb6c877a84b515",
+    "node_modules/.prisma/client/schema.prisma": "dd81fe6c3581a8d650e188b371a01b927e8e2a5aaf19c47a00ae0c6a5d3e0f15"
+  },
+  "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

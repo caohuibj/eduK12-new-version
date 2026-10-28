@@ -1,0 +1,12 @@
+import pathlib,subprocess,json,sys,datetime,hashlib,os
+root=pathlib.Path('/workspace/eduK12-new-version');work=pathlib.Path('/tmp/pr374-cloud');out=root/'docs/performance/four-entry-scale-probe-20261028/evidence';b=root/'server-version/backend'
+name=sys.argv[1];script=work/(name+'.ts');env=json.loads((work/'environment.json').read_text())
+env['PATH']='/workspace/eduk12-cloud/tools/node_modules/.bin:'+env['PATH']
+argv=['node','node_modules/tsx/dist/cli.mjs',str(script)]
+receipt={'argv':argv,'startedAt':datetime.datetime.now(datetime.UTC).isoformat(),'head':subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip(),'scriptSHA256':hashlib.sha256(script.read_bytes()).hexdigest(),'fixtureSHA256':hashlib.sha256((out.parent/'fixtures/c1-source.json').read_bytes()).hexdigest()}
+with (out/('cloud-'+name+'.log')).open('wb') as stream:p=subprocess.run(argv,cwd=b,env=env,stdout=stream,stderr=subprocess.STDOUT)
+receipt.update(exitCode=p.returncode,endedAt=datetime.datetime.now(datetime.UTC).isoformat(),logSHA256=hashlib.sha256((out/('cloud-'+name+'.log')).read_bytes()).hexdigest())
+(out/('cloud-'+name+'-execution.json')).write_text(json.dumps(receipt,indent=2)+'\n')
+(out/('cloud-'+name+'.ts.txt')).write_bytes(script.read_bytes())
+print(json.dumps({'name':name,'exitCode':p.returncode,'log':str(out/('cloud-'+name+'.log'))}),flush=True)
+sys.exit(p.returncode)

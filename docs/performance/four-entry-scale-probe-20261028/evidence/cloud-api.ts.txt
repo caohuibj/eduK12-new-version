@@ -1,0 +1,1 @@
+require('/tmp/pr374-cloud/load-c1.cjs');require('/workspace/eduK12-new-version/server-version/backend/src/index.ts');

@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "node",
+    "node_modules/tsx/dist/cli.mjs",
+    "/tmp/pr374-cloud/more-r2.ts"
+  ],
+  "startedAt": "2026-10-28T03:42:34.706823+00:00",
+  "head": "3ad550800119b87ad355b52b5268a6fc38a542b0",
+  "scriptSHA256": "c1f272b62ad519e8b89f0e1d707df1145d53e0042e1ace5ead96271bf575b545",
+  "fixtureSHA256": "c1f67bc13ced80481a727d3321cdd3b94e4a8b363c5cf3c41e5689bf2b3b7294",
+  "exitCode": 1,
+  "endedAt": "2026-10-28T03:42:37.133826+00:00",
+  "logSHA256": "74802cf23e1bfb89d3de2f8f2c389fc90c075d5d084cc05c157e3222a76156e3"
+}

@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "node",
+    "node_modules/tsx/dist/cli.mjs",
+    "/tmp/pr374-cloud/axis.ts"
+  ],
+  "startedAt": "2026-10-28T03:48:57.244173+00:00",
+  "head": "3ad550800119b87ad355b52b5268a6fc38a542b0",
+  "scriptSHA256": "01723ebd057045428637313f431868d1b85b849d1d7d47abba90805d42cc44d6",
+  "fixtureSHA256": "c1f67bc13ced80481a727d3321cdd3b94e4a8b363c5cf3c41e5689bf2b3b7294",
+  "exitCode": 1,
+  "endedAt": "2026-10-28T03:48:58.641242+00:00",
+  "logSHA256": "ee03706512873c1e3c2eb2bfaf9023ce07fa04d81facf5842680b9e3e9aedfe6"
+}
