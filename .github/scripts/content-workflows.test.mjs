@@ -442,5 +442,9 @@ test('light test-only route never starts unrelated builds, scans or platform smo
     assert.equal(platformReachable,true,name+' must still admit its ordinary platform work');
   }
   assert.match(job(ci,'frontend'),/scenario == 'frontend-test'/);
-  assert.match(job(ci,'merge-gate'),/needs: .*frontend.*browser.*docker/);
+  const gateNeeds=jobNeeds(job(ci,'merge-gate'));
+  for(const dep of ['scope','frontend','browser','docker'])
+    assert.ok(gateNeeds.includes(dep),'merge-gate must retain exact dependency: '+dep);
+  for(const fake of ['fake-frontend','frontend-extra','fake-browser','docker-extra'])
+    assert.equal(gateNeeds.includes(fake),false,'similar-looking job is not a required dependency');
 });
