@@ -1,0 +1,605 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-28T00:56:41.880514+00:00",
+  "applicationHead": "e6f8b5052617ad8128df54d9359121a83e782d68",
+  "kind": "READ_ONLY_QUALITY_REVIEW_NOT_NEW_VALIDATION_GATE",
+  "scope": "ARS30 item/scoring/report/chart review; no new scoring execution, golden replay, browser or database operations",
+  "primarySource": {
+    "url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2016.01787/full",
+    "doi": "10.3389/fpsyg.2016.01787",
+    "readVia": "web tool, 2026-10-28",
+    "sections": [
+      "Methods ARS-30",
+      "Table 2 item wording",
+      "Factor Structure/Table 3",
+      "Table 5 ranges"
+    ],
+    "retention": "No full article copy or new license decision; existing carrier attribution retained."
+  },
+  "items": {
+    "reviewed": 30,
+    "rows": [
+      {
+        "number": 1,
+        "itemCode": "ARS30_2016_01",
+        "bilingualReference": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/bilingual-content.json#items[0]",
+        "currentTextEqualsExistingChineseDraft": true,
+        "declaredDimension": "perseverance",
+        "currentDimensionMatches": true,
+        "declaredTransform": "x",
+        "currentTransform": "identity",
+        "transformMatchesDeclaredDesign": true,
+        "ordinaryTypoOrReferenceCorrection": "NONE_IDENTIFIED_IN_THIS_READ",
+        "humanTranslationReview": "PENDING; this engineering/content read is not expert sign-off"
+      },
+      {
+        "number": 2,
+        "itemCode": "ARS30_2016_02",
+        "bilingualReference": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/bilingual-content.json#items[1]",
+        "currentTextEqualsExistingChineseDraft": true,
+        "declaredDimension": "perseverance",
+        "currentDimensionMatches": true,
+        "declaredTransform": "6-x",
+        "currentTransform": "reverse",
+        "transformMatchesDeclaredDesign": true,
+        "ordinaryTypoOrReferenceCorrection": "NONE_IDENTIFIED_IN_THIS_READ",
+        "humanTranslationReview": "PENDING; this engineering/content read is not expert sign-off"
+      },
+      {
+        "number": 3,
+        "itemCode": "ARS30_2016_03",
+        "bilingualReference": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/bilingual-content.json#items[2]",
+        "currentTextEqualsExistingChineseDraft": true,
+        "declaredDimension": "perseverance",
+        "currentDimensionMatches": true,
+        "declaredTransform": "x",
+        "currentTransform": "identity",
+        "transformMatchesDeclaredDesign": true,
+        "ordinaryTypoOrReferenceCorrection": "NONE_IDENTIFIED_IN_THIS_READ",
+        "humanTranslationReview": "PENDING; this engineering/content read is not expert sign-off"
+      },
+      {
+        "number": 4,
+        "itemCode": "ARS30_2016_04",
+        "bilingualReference": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/bilingual-content.json#items[3]",
+        "currentTextEqualsExistingChineseDraft": true,
+        "declaredDimension": "perseverance",
+        "currentDimensionMatches": true,
+        "declaredTransform": "6-x",
+        "currentTransform": "reverse",
+        "transformMatchesDeclaredDesign": true,
+        "ordinaryTypoOrReferenceCorrection": "NONE_IDENTIFIED_IN_THIS_READ",
+        "humanTranslationReview": "PENDING; this engineering/content read is not expert sign-off"
+      },
+      {
+        "number": 5,
+        "itemCode": "ARS30_2016_05",
+        "bilingualReference": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/bilingual-content.json#items[4]",
+        "currentTextEqualsExistingChineseDraft": true,
+        "declaredDimension": "perseverance",
+        "currentDimensionMatches": true,
+        "declaredTransform": "x",
+        "currentTransform": "identity",
+        "transformMatchesDeclaredDesign": true,
+        "ordinaryTypoOrReferenceCorrection": "NONE_IDENTIFIED_IN_THIS_READ",
+        "humanTranslationReview": "PENDING; this engineering/content read is not expert sign-off"
+      },
+      {
+        "number": 6,
+        "itemCode": "ARS30_2016_06",
+        "bilingualReference": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/bilingual-content.json#items[5]",
+        "currentTextEqualsExistingChineseDraft": true,
+        "declaredDimension": "adaptive_emotional_response",
+        "currentDimensionMatches": true,
+        "declaredTransform": "x",
+        "currentTransform": "identity",
+        "transformMatchesDeclaredDesign": true,
+        "ordinaryTypoOrReferenceCorrection": "NONE_IDENTIFIED_IN_THIS_READ",
+        "humanTranslationReview": "PENDING; this engineering/content read is not expert sign-off"
+      },
+      {
+        "number": 7,
+        "itemCode": "ARS30_2016_07",
+        "bilingualReference": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/bilingual-content.json#items[6]",
+        "currentTextEqualsExistingChineseDraft": true,
+        "declaredDimension": "adaptive_emotional_response",
+        "currentDimensionMatches": true,
+        "declaredTransform": "x",
+        "currentTransform": "identity",
+        "transformMatchesDeclaredDesign": true,
+        "ordinaryTypoOrReferenceCorrection": "NONE_IDENTIFIED_IN_THIS_READ",
+        "humanTranslationReview": "PENDING; this engineering/content read is not expert sign-off"
+      },
+      {
+        "number": 8,
+        "itemCode": "ARS30_2016_08",
+        "bilingualReference": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/bilingual-content.json#items[7]",
+        "currentTextEqualsExistingChineseDraft": true,
+        "declaredDimension": "perseverance",
+        "currentDimensionMatches": true,
+        "declaredTransform": "6-x",
+        "currentTransform": "reverse",
+        "transformMatchesDeclaredDesign": true,
+        "ordinaryTypoOrReferenceCorrection": "NONE_IDENTIFIED_IN_THIS_READ",
+        "humanTranslationReview": "PENDING; this engineering/content read is not expert sign-off"
+      },
+      {
+        "number": 9,
+        "itemCode": "ARS30_2016_09",
+        "bilingualReference": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/bilingual-content.json#items[8]",
+        "currentTextEqualsExistingChineseDraft": true,
+        "declaredDimension": "perseverance",
+        "currentDimensionMatches": true,
+        "declaredTransform": "6-x",
+        "currentTransform": "reverse",
+        "transformMatchesDeclaredDesign": true,
+        "ordinaryTypoOrReferenceCorrection": "NONE_IDENTIFIED_IN_THIS_READ",
+        "humanTranslationReview": "PENDING; this engineering/content read is not expert sign-off"
+      },
+      {
+        "number": 10,
+        "itemCode": "ARS30_2016_10",
+        "bilingualReference": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/bilingual-content.json#items[9]",
+        "currentTextEqualsExistingChineseDraft": true,
+        "declaredDimension": "perseverance",
+        "currentDimensionMatches": true,
+        "declaredTransform": "6-x",
+        "currentTransform": "reverse",
+        "transformMatchesDeclaredDesign": true,
+        "ordinaryTypoOrReferenceCorrection": "NONE_IDENTIFIED_IN_THIS_READ",
+        "humanTranslationReview": "PENDING; this engineering/content read is not expert sign-off"
+      },
+      {
+        "number": 11,
+        "itemCode": "ARS30_2016_11",
+        "bilingualReference": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/bilingual-content.json#items[10]",
+        "currentTextEqualsExistingChineseDraft": true,
+        "declaredDimension": "perseverance",
+        "currentDimensionMatches": true,
+        "declaredTransform": "6-x",
+        "currentTransform": "reverse",
+        "transformMatchesDeclaredDesign": true,
+        "ordinaryTypoOrReferenceCorrection": "NONE_IDENTIFIED_IN_THIS_READ",
+        "humanTranslationReview": "PENDING; this engineering/content read is not expert sign-off"
+      },
+      {
+        "number": 12,
+        "itemCode": "ARS30_2016_12",
+        "bilingualReference": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/bilingual-content.json#items[11]",
+        "currentTextEqualsExistingChineseDraft": true,
+        "declaredDimension": "adaptive_emotional_response",
+        "currentDimensionMatches": true,
+        "declaredTransform": "x",
+        "currentTransform": "identity",
+        "transformMatchesDeclaredDesign": true,
+        "ordinaryTypoOrReferenceCorrection": "NONE_IDENTIFIED_IN_THIS_READ",
+        "humanTranslationReview": "PENDING; this engineering/content read is not expert sign-off"
+      },
+      {
+        "number": 13,
+        "itemCode": "ARS30_2016_13",
+        "bilingualReference": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/bilingual-content.json#items[12]",
+        "currentTextEqualsExistingChineseDraft": true,
+        "declaredDimension": "perseverance",
+        "currentDimensionMatches": true,
+        "declaredTransform": "6-x",
+        "currentTransform": "reverse",
+        "transformMatchesDeclaredDesign": true,
+        "ordinaryTypoOrReferenceCorrection": "NONE_IDENTIFIED_IN_THIS_READ",
+        "humanTranslationReview": "PENDING; this engineering/content read is not expert sign-off"
+      },
+      {
+        "number": 14,
+        "itemCode": "ARS30_2016_14",
+        "bilingualReference": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/bilingual-content.json#items[13]",
+        "currentTextEqualsExistingChineseDraft": true,
+        "declaredDimension": "adaptive_emotional_response",
+        "currentDimensionMatches": true,
+        "declaredTransform": "x",
+        "currentTransform": "identity",
+        "transformMatchesDeclaredDesign": true,
+        "ordinaryTypoOrReferenceCorrection": "NONE_IDENTIFIED_IN_THIS_READ",
+        "humanTranslationReview": "PENDING; this engineering/content read is not expert sign-off"
+      },
+      {
+        "number": 15,
+        "itemCode": "ARS30_2016_15",
+        "bilingualReference": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/bilingual-content.json#items[14]",
+        "currentTextEqualsExistingChineseDraft": true,
+        "declaredDimension": "perseverance",
+        "currentDimensionMatches": true,
+        "declaredTransform": "x",
+        "currentTransform": "identity",
+        "transformMatchesDeclaredDesign": true,
+        "ordinaryTypoOrReferenceCorrection": "NONE_IDENTIFIED_IN_THIS_READ",
+        "humanTranslationReview": "PENDING; this engineering/content read is not expert sign-off"
+      },
+      {
+        "number": 16,
+        "itemCode": "ARS30_2016_16",
+        "bilingualReference": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/bilingual-content.json#items[15]",
+        "currentTextEqualsExistingChineseDraft": true,
+        "declaredDimension": "perseverance",
+        "currentDimensionMatches": true,
+        "declaredTransform": "6-x",
+        "currentTransform": "reverse",
+        "transformMatchesDeclaredDesign": true,
+        "ordinaryTypoOrReferenceCorrection": "NONE_IDENTIFIED_IN_THIS_READ",
+        "humanTranslationReview": "PENDING; this engineering/content read is not expert sign-off"
+      },
+      {
+        "number": 17,
+        "itemCode": "ARS30_2016_17",
+        "bilingualReference": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/bilingual-content.json#items[16]",
+        "currentTextEqualsExistingChineseDraft": true,
+        "declaredDimension": "perseverance",
+        "currentDimensionMatches": true,
+        "declaredTransform": "6-x",
+        "currentTransform": "reverse",
+        "transformMatchesDeclaredDesign": true,
+        "ordinaryTypoOrReferenceCorrection": "NONE_IDENTIFIED_IN_THIS_READ",
+        "humanTranslationReview": "PENDING; this engineering/content read is not expert sign-off"
+      },
+      {
+        "number": 18,
+        "itemCode": "ARS30_2016_18",
+        "bilingualReference": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/bilingual-content.json#items[17]",
+        "currentTextEqualsExistingChineseDraft": true,
+        "declaredDimension": "reflection_help_seeking",
+        "currentDimensionMatches": true,
+        "declaredTransform": "6-x",
+        "currentTransform": "reverse",
+        "transformMatchesDeclaredDesign": true,
+        "ordinaryTypoOrReferenceCorrection": "NONE_IDENTIFIED_IN_THIS_READ",
+        "humanTranslationReview": "PENDING; this engineering/content read is not expert sign-off"
+      },
+      {
+        "number": 19,
+        "itemCode": "ARS30_2016_19",
+        "bilingualReference": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/bilingual-content.json#items[18]",
+        "currentTextEqualsExistingChineseDraft": true,
+        "declaredDimension": "adaptive_emotional_response",
+        "currentDimensionMatches": true,
+        "declaredTransform": "x",
+        "currentTransform": "identity",
+        "transformMatchesDeclaredDesign": true,
+        "ordinaryTypoOrReferenceCorrection": "NONE_IDENTIFIED_IN_THIS_READ",
+        "humanTranslationReview": "PENDING; this engineering/content read is not expert sign-off"
+      },
+      {
+        "number": 20,
+        "itemCode": "ARS30_2016_20",
+        "bilingualReference": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/bilingual-content.json#items[19]",
+        "currentTextEqualsExistingChineseDraft": true,
+        "declaredDimension": "reflection_help_seeking",
+        "currentDimensionMatches": true,
+        "declaredTransform": "6-x",
+        "currentTransform": "reverse",
+        "transformMatchesDeclaredDesign": true,
+        "ordinaryTypoOrReferenceCorrection": "NONE_IDENTIFIED_IN_THIS_READ",
+        "humanTranslationReview": "PENDING; this engineering/content read is not expert sign-off"
+      },
+      {
+        "number": 21,
+        "itemCode": "ARS30_2016_21",
+        "bilingualReference": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/bilingual-content.json#items[20]",
+        "currentTextEqualsExistingChineseDraft": true,
+        "declaredDimension": "reflection_help_seeking",
+        "currentDimensionMatches": true,
+        "declaredTransform": "6-x",
+        "currentTransform": "reverse",
+        "transformMatchesDeclaredDesign": true,
+        "ordinaryTypoOrReferenceCorrection": "NONE_IDENTIFIED_IN_THIS_READ",
+        "humanTranslationReview": "PENDING; this engineering/content read is not expert sign-off"
+      },
+      {
+        "number": 22,
+        "itemCode": "ARS30_2016_22",
+        "bilingualReference": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/bilingual-content.json#items[21]",
+        "currentTextEqualsExistingChineseDraft": true,
+        "declaredDimension": "reflection_help_seeking",
+        "currentDimensionMatches": true,
+        "declaredTransform": "6-x",
+        "currentTransform": "reverse",
+        "transformMatchesDeclaredDesign": true,
+        "ordinaryTypoOrReferenceCorrection": "NONE_IDENTIFIED_IN_THIS_READ",
+        "humanTranslationReview": "PENDING; this engineering/content read is not expert sign-off"
+      },
+      {
+        "number": 23,
+        "itemCode": "ARS30_2016_23",
+        "bilingualReference": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/bilingual-content.json#items[22]",
+        "currentTextEqualsExistingChineseDraft": true,
+        "declaredDimension": "adaptive_emotional_response",
+        "currentDimensionMatches": true,
+        "declaredTransform": "6-x",
+        "currentTransform": "reverse",
+        "transformMatchesDeclaredDesign": true,
+        "ordinaryTypoOrReferenceCorrection": "NONE_IDENTIFIED_IN_THIS_READ",
+        "humanTranslationReview": "PENDING; this engineering/content read is not expert sign-off"
+      },
+      {
+        "number": 24,
+        "itemCode": "ARS30_2016_24",
+        "bilingualReference": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/bilingual-content.json#items[23]",
+        "currentTextEqualsExistingChineseDraft": true,
+        "declaredDimension": "reflection_help_seeking",
+        "currentDimensionMatches": true,
+        "declaredTransform": "6-x",
+        "currentTransform": "reverse",
+        "transformMatchesDeclaredDesign": true,
+        "ordinaryTypoOrReferenceCorrection": "NONE_IDENTIFIED_IN_THIS_READ",
+        "humanTranslationReview": "PENDING; this engineering/content read is not expert sign-off"
+      },
+      {
+        "number": 25,
+        "itemCode": "ARS30_2016_25",
+        "bilingualReference": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/bilingual-content.json#items[24]",
+        "currentTextEqualsExistingChineseDraft": true,
+        "declaredDimension": "reflection_help_seeking",
+        "currentDimensionMatches": true,
+        "declaredTransform": "6-x",
+        "currentTransform": "reverse",
+        "transformMatchesDeclaredDesign": true,
+        "ordinaryTypoOrReferenceCorrection": "NONE_IDENTIFIED_IN_THIS_READ",
+        "humanTranslationReview": "PENDING; this engineering/content read is not expert sign-off"
+      },
+      {
+        "number": 26,
+        "itemCode": "ARS30_2016_26",
+        "bilingualReference": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/bilingual-content.json#items[25]",
+        "currentTextEqualsExistingChineseDraft": true,
+        "declaredDimension": "reflection_help_seeking",
+        "currentDimensionMatches": true,
+        "declaredTransform": "6-x",
+        "currentTransform": "reverse",
+        "transformMatchesDeclaredDesign": true,
+        "ordinaryTypoOrReferenceCorrection": "NONE_IDENTIFIED_IN_THIS_READ",
+        "humanTranslationReview": "PENDING; this engineering/content read is not expert sign-off"
+      },
+      {
+        "number": 27,
+        "itemCode": "ARS30_2016_27",
+        "bilingualReference": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/bilingual-content.json#items[26]",
+        "currentTextEqualsExistingChineseDraft": true,
+        "declaredDimension": "reflection_help_seeking",
+        "currentDimensionMatches": true,
+        "declaredTransform": "6-x",
+        "currentTransform": "reverse",
+        "transformMatchesDeclaredDesign": true,
+        "ordinaryTypoOrReferenceCorrection": "NONE_IDENTIFIED_IN_THIS_READ",
+        "humanTranslationReview": "PENDING; this engineering/content read is not expert sign-off"
+      },
+      {
+        "number": 28,
+        "itemCode": "ARS30_2016_28",
+        "bilingualReference": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/bilingual-content.json#items[27]",
+        "currentTextEqualsExistingChineseDraft": true,
+        "declaredDimension": "adaptive_emotional_response",
+        "currentDimensionMatches": true,
+        "declaredTransform": "x",
+        "currentTransform": "identity",
+        "transformMatchesDeclaredDesign": true,
+        "ordinaryTypoOrReferenceCorrection": "NONE_IDENTIFIED_IN_THIS_READ",
+        "humanTranslationReview": "PENDING; this engineering/content read is not expert sign-off"
+      },
+      {
+        "number": 29,
+        "itemCode": "ARS30_2016_29",
+        "bilingualReference": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/bilingual-content.json#items[28]",
+        "currentTextEqualsExistingChineseDraft": true,
+        "declaredDimension": "reflection_help_seeking",
+        "currentDimensionMatches": true,
+        "declaredTransform": "6-x",
+        "currentTransform": "reverse",
+        "transformMatchesDeclaredDesign": true,
+        "ordinaryTypoOrReferenceCorrection": "NONE_IDENTIFIED_IN_THIS_READ",
+        "humanTranslationReview": "PENDING; this engineering/content read is not expert sign-off"
+      },
+      {
+        "number": 30,
+        "itemCode": "ARS30_2016_30",
+        "bilingualReference": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/bilingual-content.json#items[29]",
+        "currentTextEqualsExistingChineseDraft": true,
+        "declaredDimension": "perseverance",
+        "currentDimensionMatches": true,
+        "declaredTransform": "6-x",
+        "currentTransform": "reverse",
+        "transformMatchesDeclaredDesign": true,
+        "ordinaryTypoOrReferenceCorrection": "NONE_IDENTIFIED_IN_THIS_READ",
+        "humanTranslationReview": "PENDING; this engineering/content read is not expert sign-off"
+      }
+    ],
+    "responseAnchors": {
+      "raw1": "很可能",
+      "raw5": "不太可能",
+      "raw2to4": "numeric labels only, no invented agree/disagree anchors",
+      "assessment": "Same declared likelihood design, not the separate 2015 agreement form; exact Chinese linguistic equivalence remains pending human review."
+    },
+    "specialItems": [
+      {
+        "number": 17,
+        "finding": "Negative phrasing does not imply identity transform: preserving long-term goals remains a reverse item under the declared design."
+      },
+      {
+        "number": 23,
+        "finding": "Belongs to factor 3 but remains reverse; source and original Methods direction align."
+      },
+      {
+        "number": 29,
+        "finding": "Preserved measurement item, not an instruction to self-punish; report explicitly separates this from advice."
+      }
+    ],
+    "decision": "No ordinary typo, broken item binding or obvious anchor swap identified; do not rewrite mature item meaning. Not expert/scientific approval."
+  },
+  "scoring": {
+    "currentDesign": "Five raw likelihood values, positive/adaptive responses 6-x, equally weighted sums; source design and implementation read together.",
+    "reverseItemNumbers": [
+      2,
+      4,
+      8,
+      9,
+      10,
+      11,
+      13,
+      16,
+      17,
+      18,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      29,
+      30
+    ],
+    "groups": {
+      "total": 30,
+      "perseverance": 14,
+      "reflection_help_seeking": 9,
+      "adaptive_emotional_response": 7
+    },
+    "rangeByMetric": {
+      "total": [
+        30,
+        150
+      ],
+      "perseverance": [
+        14,
+        70
+      ],
+      "reflection_help_seeking": [
+        9,
+        45
+      ],
+      "adaptive_emotional_response": [
+        7,
+        35
+      ]
+    },
+    "referencePolicy": "none",
+    "thresholds": "none; no new norm/percentile/cutoff",
+    "missingRule": "complete_required per score: incomplete total and affected facet null; other complete facets may have scores; no zero fill, imputation or denominator substitution. Global invalid suppresses interpretation/reference.",
+    "historicalDocMismatch": "Existing scoring-and-parameters.md is an earlier draft that broadly says no subscale after any missing item. Actual source/runtime uses per-score policy; retain original file as history and explicitly clarify here, rather than relabel its old future-tense text as current execution.",
+    "scoreDirection": "All four transformed metrics point toward more adaptive hypothesized responses; factor3 higher is less distress/panic in the declared model, not more negative affect.",
+    "decision": "No implementation discrepancy found in this read; reuse retained scoring/report/golden evidence, no new scorer runs."
+  },
+  "report": {
+    "reviewedMetricKeys": [
+      "total",
+      "perseverance",
+      "reflection_help_seeking",
+      "adaptive_emotional_response"
+    ],
+    "strengths": [
+      "Acknowledges difficulty without declaring strong/weak personality or illness.",
+      "Uses concrete small actions: one ten-minute feedback task, separate goal from method, one question to a teacher/peer, a pause and naming a feeling.",
+      "Explicitly limits transfer from hypothetical responses to real behavior/future grades.",
+      "No invented cutoff, ranking, norm, validation or author endorsement."
+    ],
+    "limitations": [
+      "Same reflection prose is used across raw scores; actual value/range is displayed separately. This is not score-adaptive narrative or a validated intervention.",
+      "Dimension3 score label can be read as amount of distress; its source description gives correct direction, but common dimension cards do not display that description."
+    ],
+    "decision": "Retain current warm practical copy; do not change frozen report1.0.0 merely to demonstrate editing. Further wording revisions need a new report/source axis and root-coordinated scope."
+  },
+  "charts": {
+    "actualComponents": [
+      "ScaleUnitReportCard -> ScaleUnitReportCard.legacy -> ReportRangeTrack",
+      "report-ui.css responsive range grid"
+    ],
+    "observed": [
+      "Existing shared range tracks display actual numeric value and explicit theoretical endpoints; no reference overlay for ARS because references empty.",
+      "Marker uses (value-min)/(max-min) only as graphical position; no percentile/ability-rank claim.",
+      "Null value has no marker and displays dash/not-calculable; global invalid hides interpretation/reference.",
+      "reportKind unavailable/completion/educational keeps distinct disclosure branches.",
+      "CSS selects one column below640px, minmax(0,1fr), wrap-capable headings; this is a static observation only."
+    ],
+    "gaps": [
+      {
+        "id": "ARS-Q01",
+        "finding": "Common card does not render expectedItems/answeredItems counts. Range endpoints are not an item-response denominator.",
+        "minimalProposal": "When audience-safe score metadata provides both arrays, render answeredItems.length / expectedItems.length and missing count; if metadata absent/withheld, state unavailable rather than invent counts. Never render item identifiers.",
+        "files": [
+          "server-version/frontend/src/modules/reporting/ScaleUnitReportCard.legacy.tsx"
+        ],
+        "status": "PENDING_ROOT_SHARED_SCOPE_REVIEW; not a new installation or publication gate"
+      },
+      {
+        "id": "ARS-Q02",
+        "finding": "Per-dimension cards omit score.description, so factor3 directional clarification is hidden on this surface.",
+        "minimalProposal": "Reuse existing description field beside each dimension result or pass an optional description to the existing range primitive; no score, norm or axis changes.",
+        "files": [
+          "server-version/frontend/src/modules/reporting/ScaleUnitReportCard.legacy.tsx",
+          "server-version/frontend/src/modules/reporting/ReportPrimitives.tsx (only if optional prop is selected)"
+        ],
+        "status": "PENDING_ROOT_SHARED_SCOPE_REVIEW; no source1.0.0 rewrite"
+      },
+      {
+        "id": "ARS-Q03",
+        "finding": "Mobile/tablet rendering and real restricted/invalid disclosure transport were not executed in this review.",
+        "minimalProposal": "After shared scope is agreed, use existing components with synthetic complete/missing/restricted views and selected phone/tablet widths; do not add a parallel report system or rerun backend scoring.",
+        "files": [
+          "server-version/frontend/src/modules/reporting/report-ui.css (inspect first; no change proposed yet)"
+        ],
+        "status": "NOT_EXECUTED; no visual PASS claimed"
+      }
+    ],
+    "decision": "Reuse existing components; two concrete shared presentation improvements require root coordination before edits. No frontend file changed."
+  },
+  "nonGates": [
+    "No text-length, editorial score, expert-signature or new research/copyright automatic admission requirement introduced."
+  ],
+  "inputs": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ars30_2016_zh_cn_research/1.0.0/source.json",
+      "blob": "33c423f39f08ddb0706aa177ccc251554519c49c",
+      "sha256": "6bd98d3462d23146ae258d171fc81ef7fa993f3493af2b5a7428b98ed9ef9477"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/bilingual-content.json",
+      "blob": "55d4a0321b671246a8eb6b870de865837d5d2170",
+      "sha256": "09500f801faf632ef0b8e73218b8b1df4cc732402e745b790600e6d400a3f436"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/scale-scoring.ts",
+      "blob": "ce315802e4d6fdffb494c54658d4bb5ac019781d",
+      "sha256": "74e3526c81b86a15e84d35b7dbbb0a112562a6e78254928640762615aecef2ba"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/scale-result.ts",
+      "blob": "9f59bde7913ef0696389713e7f8db7d4b9921b9a",
+      "sha256": "eb88e9bd0f90e4a1fd93bf7f62b71238fa747bcc692a42e9e28a5cadf5bab1ac"
+    },
+    {
+      "path": "server-version/frontend/src/modules/reporting/ScaleUnitReportCard.tsx",
+      "blob": "52a6857e02a3f7839aa6027c10673199d5634776",
+      "sha256": "94c23beeab1f53e96923c83b28291d79defbfafb99946622077fd5825837c0c6"
+    },
+    {
+      "path": "server-version/frontend/src/modules/reporting/ScaleUnitReportCard.legacy.tsx",
+      "blob": "09275fba97785f08afb62b5ae89d99024faa7baf",
+      "sha256": "c6ab1206d97ec80213e8ebe85ca48f76f1aa1f570cab0e1a4bd75a862a329cb6"
+    },
+    {
+      "path": "server-version/frontend/src/modules/reporting/ReportPrimitives.tsx",
+      "blob": "bed51f8516f9c84465589cffd89a0183edec8751",
+      "sha256": "da85f924d440dee5bcab93b1e053c8bdaeeb1f76aa83708e74db12f90419426b"
+    },
+    {
+      "path": "server-version/frontend/src/modules/reporting/report-ui.css",
+      "blob": "d6b1d286d2a6f36b5cf438a8a61e78f823195290",
+      "sha256": "043340caa080d471d0faf2fc5fd69eec41ad8b87ba2ae71f4a1fa18b9aa42eec"
+    },
+    {
+      "path": "server-version/frontend/src/modules/reporting/types.ts",
+      "blob": "06414415bb7891ac73362a22554a764284efa885",
+      "sha256": "a18e133272e475f60d8f798f96107319bd5a8de04b0e1008698c694d42b8886e"
+    }
+  ],
+  "checksRerun": [],
+  "databaseWritesDuringThisQualityReview": false
+}

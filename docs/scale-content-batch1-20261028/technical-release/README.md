@@ -1,5 +1,8 @@
 # ARS-30 技术发布与隔离库单包入库
 
+用户后续新增题目、计分设计、报告润色与图表审计要求；本包的逐项只读结果和精确
+输入 hash 另见 [quality-review.json](quality-review.json)。未因新增审查重跑已完成检查。
+
 在 root 独立读取 source、计分/报告、测试和 17 文件原件后，按本任务明确批准，
 仅将 ARS-30 `executable.releaseStatus` 从 DRAFT 改为 PUBLISHED。
 这是技术内容发布，不是科研批准、译审通过、版权新增授权或生产公共发布。
@@ -97,3 +100,29 @@ scale_library_use_grants、education_assessment_deliveries、assessments 均为 
 原 SHA 不变；原 diff-check 失败与其外层退出区别保留，转运后 diff-check 实际退出 0。
 这些是本次云端原件，是否接纳由 root 独立复核；没有运行 CI、全量测试、
 tsc、build、SAST 或生产步骤。迁移仅为建立本次空库 schema，不是平台迁移验收。
+
+## 新增质量审查的具体结论
+
+依据 [2016 原论文 Methods / Table2 / Table3 / Table5](https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2016.01787/full)
+及固定双语稿逐题阅读，保留原可能性选项锚点、三维归属与转换设计；未发现应直接修正的
+普通错字、绑定错误或实现与声明不符。中文等值仍待人工审校，不以此次阅读冒充通过。
+第17题虽有否定句仍是反向题、第23题归第三维但同样反向，均已保持；第29题的
+自我奖惩是原测量题，报告没有把它当行动建议。没有变更成熟量表含义。
+
+原报告已有温暖的情境解释、具体的小行动和使用限制，暂不为形式改写。
+它是固定 score_only 反思文本，不是随分数分档的个性化建议；不得宣称已有阈值。
+旧 scoring-and-parameters.md 是早期文档，其“缺一题不出分量表”概括过宽：当前实际
+策略按每个 score 的 complete_required 执行，未完成总分及所属维度为 null，其他完整
+维度可保留分数；全局 invalid 时不解释或给参考。此处明确现行行为，原文件保留历史。
+
+图表已复用共用 range track，显示真实值/理论范围，无本包常模覆盖；null 无定位点，
+无效时隐藏解释/参考，受限 disclosure 有独立分支。仍有两项具体呈现优化：
+
+- `ScaleUnitReportCard.legacy.tsx` 尚未显示已答/应答题数；应仅从允许披露的 metadata
+  计算数量，缺字段时不编造分母、不显示题号。
+- 同文件的维度卡片未显示 source description，第三维“高分表示较少慌乱”的方向
+  说明不够显眼；可复用现有 description 字段，或在 `ReportPrimitives.tsx` 加可选说明。
+
+上述均是影响其他量表的共用呈现文件，按任务边界先交 root 协调，未擅自修改。
+手机/平板目前只读到响应式 CSS，**未运行浏览器验收**，不能声称视觉 PASS。
+这些待办不是新增自动入库门禁，不撤销已记录的技术结构和隔离库实际结果。
