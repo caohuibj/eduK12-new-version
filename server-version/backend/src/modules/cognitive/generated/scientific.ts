@@ -30,4 +30,5 @@ import { scientificGovernance as task27 } from '../tasks/sizecongruity/scientifi
 import { scientificGovernance as task28 } from '../tasks/delaydiscount/scientific'
 import { scientificGovernance as task29 } from '../tasks/gamblingdeck/scientific'
 import { scientificGovernance as task30 } from '../tasks/symbolmatch/scientific'
-export const cognitiveGovernance = [...task0, ...task1, ...task2, ...task3, ...task4, ...task5, ...task6, ...task7, ...task8, ...task9, ...task10, ...task11, ...task12, ...task13, ...task14, ...task15, ...task16, ...task17, ...task18, ...task19, ...task20, ...task21, ...task22, ...task23, ...task24, ...task25, ...task26, ...task27, ...task28, ...task29, ...task30]
+import { scientificGovernance as task31 } from '../tasks/runningspan/scientific'
+export const cognitiveGovernance = [...task0, ...task1, ...task2, ...task3, ...task4, ...task5, ...task6, ...task7, ...task8, ...task9, ...task10, ...task11, ...task12, ...task13, ...task14, ...task15, ...task16, ...task17, ...task18, ...task19, ...task20, ...task21, ...task22, ...task23, ...task24, ...task25, ...task26, ...task27, ...task28, ...task29, ...task30, ...task31]

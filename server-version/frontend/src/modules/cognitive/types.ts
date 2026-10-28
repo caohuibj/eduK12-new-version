@@ -515,3 +515,27 @@ export type SymbolmatchTrialPayload = {
   rtMs: number | null
   interrupted: boolean
 }
+
+/** Runningspan 冻结 config（与后端 runningspan.config schema 一致）。 */
+export interface RunningspanConfig {
+  totalTrials: number
+  listLengthMin: number
+  listLengthMax: number
+  recallLength: number
+  stimulusMs: number
+  isiMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+/** Runningspan 单 trial payload（与后端 runningspan.trial schema 一致）。 */
+export type RunningspanTrialPayload = {
+  sequence: string[]
+  response: string[]
+  responseDurationMs: number
+  interrupted: boolean
+}

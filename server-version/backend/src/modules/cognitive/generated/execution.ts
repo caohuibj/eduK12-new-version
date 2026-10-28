@@ -30,6 +30,7 @@ import { executionEntries as task27 } from '../tasks/sizecongruity/package'
 import { executionEntries as task28 } from '../tasks/delaydiscount/package'
 import { executionEntries as task29 } from '../tasks/gamblingdeck/package'
 import { executionEntries as task30 } from '../tasks/symbolmatch/package'
+import { executionEntries as task31 } from '../tasks/runningspan/package'
 export const cognitiveExecutionEntries = [
   task0[0],
   task1[0],
@@ -65,5 +66,6 @@ export const cognitiveExecutionEntries = [
   task28[0],
   task29[0],
   task30[0],
+  task31[0],
   task21[1],
 ]

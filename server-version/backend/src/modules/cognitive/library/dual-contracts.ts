@@ -227,6 +227,12 @@ const SCORING_DECLARATIONS: Record<string, CognitiveScoringContractDeclaration> 
     runtimeReconstructableFacts: ['符号序列（seed/config 均匀生成）', '符号-数字映射（frozen config）'],
     serverDerivedFacts: ['正确性判定', 'metrics（accuracy/medianRtMs）', 'quality flags'],
   },
+  runningspan: {
+    testType: 'runningspan',
+    clientObservedFacts: ['按序回忆的字母序列', '回忆用时', 'interrupted'],
+    runtimeReconstructableFacts: ['呈现序列（seed/config）与呈现时序（frozen config）'],
+    serverDerivedFacts: ['目标窗口与串行正确性', 'metrics（runningSpanAccuracy/intrusionRate）', 'quality flags'],
+  },
 }
 
 // 当前通用事实（所有任务一致）：完整加密 trial payload、v2 trial envelope qualityEvents、
@@ -387,6 +393,11 @@ const RESEARCH_CAPTURE_DECLARATIONS: Record<string, CognitiveResearchCaptureDecl
     testType: 'symbolmatch',
     currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次响应与 raw RT'],
     futureCaptureFacts: ['真实 input modality', 'device provenance', 'viewport/dpr'],
+  },
+  runningspan: {
+    testType: 'runningspan',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次回忆序列与用时'],
+    futureCaptureFacts: ['逐字母回忆选择时序', '真实 input modality', 'device provenance'],
   },
 }
 
