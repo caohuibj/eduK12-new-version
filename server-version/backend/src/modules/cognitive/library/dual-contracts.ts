@@ -221,6 +221,12 @@ const SCORING_DECLARATIONS: Record<string, CognitiveScoringContractDeclaration> 
     runtimeReconstructableFacts: ['每箱计划内位置（由选择序列权威推导）', '奖惩计划（scoringVersion 钉死）'],
     serverDerivedFacts: ['逐试次净结果', 'metrics（advantageousChoiceRate/netScore/blockTrendSlope/deckChoiceRates）', 'quality flags'],
   },
+  symbolmatch: {
+    testType: 'symbolmatch',
+    clientObservedFacts: ['数字选择', 'raw RT', 'interrupted'],
+    runtimeReconstructableFacts: ['符号序列（seed/config 均匀生成）', '符号-数字映射（frozen config）'],
+    serverDerivedFacts: ['正确性判定', 'metrics（accuracy/medianRtMs）', 'quality flags'],
+  },
 }
 
 // 当前通用事实（所有任务一致）：完整加密 trial payload、v2 trial envelope qualityEvents、
@@ -376,6 +382,11 @@ const RESEARCH_CAPTURE_DECLARATIONS: Record<string, CognitiveResearchCaptureDecl
     testType: 'gamblingdeck',
     currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次箱选择'],
     futureCaptureFacts: ['选择前犹豫内的指针轨迹', '真实激励', 'device provenance', 'viewport/dpr'],
+  },
+  symbolmatch: {
+    testType: 'symbolmatch',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次响应与 raw RT'],
+    futureCaptureFacts: ['真实 input modality', 'device provenance', 'viewport/dpr'],
   },
 }
 

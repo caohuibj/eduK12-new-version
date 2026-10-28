@@ -29,6 +29,7 @@ import { seeds as task26 } from '../tasks/arithverify/seeds'
 import { seeds as task27 } from '../tasks/sizecongruity/seeds'
 import { seeds as task28 } from '../tasks/delaydiscount/seeds'
 import { seeds as task29 } from '../tasks/gamblingdeck/seeds'
+import { seeds as task30 } from '../tasks/symbolmatch/seeds'
 export const cognitiveSeeds = [
   task0[0],
   task1[0],
@@ -63,5 +64,6 @@ export const cognitiveSeeds = [
   task27[0],
   task28[0],
   task29[0],
+  task30[0],
   task21[1],
 ]

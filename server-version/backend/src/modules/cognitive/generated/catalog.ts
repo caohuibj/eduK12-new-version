@@ -28,6 +28,7 @@ import { catalog as task25 } from '../tasks/arithverify/governance'
 import { catalog as task26 } from '../tasks/sizecongruity/governance'
 import { catalog as task27 } from '../tasks/delaydiscount/governance'
 import { catalog as task28 } from '../tasks/gamblingdeck/governance'
+import { catalog as task29 } from '../tasks/symbolmatch/governance'
 export const cognitiveCatalog = {
   'reaction': task0,
   'memory': task1,
@@ -58,4 +59,5 @@ export const cognitiveCatalog = {
   'sizecongruity': task26,
   'delaydiscount': task27,
   'gamblingdeck': task28,
+  'symbolmatch': task29,
 }

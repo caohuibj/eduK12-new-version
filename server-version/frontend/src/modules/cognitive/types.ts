@@ -492,3 +492,26 @@ export type GamblingdeckTrialPayload = {
 }
 
 export type GamblingdeckDeck = GamblingdeckTrialPayload['deck']
+
+/** Symbolmatch 冻结 config（与后端 symbolmatch.config schema 一致）。 */
+export interface SymbolmatchConfig {
+  totalTrials: number
+  symbolDigitMap: Array<[string, number]>
+  fixationMs: number
+  timeoutMs: number
+  validRtFloorMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+/** Symbolmatch 单 trial payload（与后端 symbolmatch.trial schema 一致）。 */
+export type SymbolmatchTrialPayload = {
+  symbol: string
+  response: number | null
+  rtMs: number | null
+  interrupted: boolean
+}
