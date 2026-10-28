@@ -20,7 +20,14 @@ export function verifyOriginalReport(report,review){
   assert.equal(passed.length,report.numPassedTests);
   assert.equal(cases.filter(c=>['pending','skipped'].includes(c.status)).length,report.numPendingTests);
   assert.equal(cases.length,report.numPassedTests+report.numPendingTests);
-  return passed.map(c=>c.fullName);
+  const names=passed.map(c=>c.fullName);
+  if(review.selectedCases!==undefined){
+    assert(Array.isArray(review.selectedCases)&&review.selectedCases.length,'Explicit selection must not be empty');
+    assert.equal(new Set(review.selectedCases).size,review.selectedCases.length,'Duplicate selected cases');
+    for(const name of review.selectedCases)assert(names.includes(name),'Selected case did not pass in original report');
+    return review.selectedCases;
+  }
+  return names;
 }
 export function verifyTypeReceipt(receipt,review,readBytes,currentBackend){
   assert.equal(receipt[review.exitField],0);assert.deepEqual(receipt.argv??receipt.command,['node','node_modules/typescript/bin/tsc','--noEmit']);

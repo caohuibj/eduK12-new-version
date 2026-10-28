@@ -1,0 +1,11 @@
+
+ RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend
+
+ ✓ src/__tests__/scale/admission-cache-and-instruction.test.ts (6 tests | 5 skipped) 28ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 5 skipped (6)
+   Start at  23:22:43
+   Duration  1.13s (transform 666ms, setup 0ms, import 989ms, tests 28ms, environment 0ms)
+
+JSON report written to /workspace/eduK12-new-version/docs/scale-library-structure-20261027/evidence/cache-runner-exit-diagnostic.json

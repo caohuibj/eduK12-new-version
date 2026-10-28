@@ -1,12 +1,13 @@
+import { resolveScaleAdmissionInstruction } from './instruction-admission'
 import { allowsScaleAxisRevision } from './axis-snapshots'
 import { withSerializableScaleTransaction } from '../deployment/transactions'
-import { scaleLocalizationReasons } from '../policy/localization'
+import { scaleLocalizationReasons, scaleLocalizationManualIssues } from '../policy/localization'
 import { randomUUID } from 'node:crypto'
 import { Prisma, type PrismaClient } from '@prisma/client'
 import { canonicalHash } from '../../assessment-runtime/canonical'
 import { hashScaleDefinition } from '../scale-definition'
 import { materializeScaleInstrumentContent } from './materialize'
-import { getScaleInstrumentRuntimePolicy, getScaleInstrumentSource } from './instrument-registry'
+import { getScaleInstrumentRuntimePolicy, getScaleInstrumentSource, getScaleInstrumentValidation } from './instrument-registry'
 import {
   evaluateScaleDeployment,
   hashScaleDeploymentPolicy,
@@ -41,6 +42,8 @@ export interface InstallScaleInstrumentPlan {
   referenceUnchanged: string[]
   allowActivation: boolean
   blockers: string[]
+  instruction: ReturnType<typeof resolveScaleAdmissionInstruction>
+  manualReview: { localization: string[]; scientificReview: unknown; rights: unknown; reportQc: unknown }
 }
 
 const definitionCounts = (definition: { items: unknown[]; scoring: { scores: Array<{ type: string }> } }) => ({
@@ -57,9 +60,11 @@ const resolvePlan = async (
   if (!source?.executable || !runtimePolicy) throw new Error('Scale instrument is not executable or has no compiled runtime policy')
 
   const deploymentPolicy = scaleDeploymentPolicySchema.parse(input.deploymentPolicy)
-  const blockers: string[] = scaleLocalizationReasons(source, deploymentPolicy)
-  // Retain scientific scope and caller authority independently of retired licenses.
-  if (source.catalog.scientificMaturity !== 'PILOT' && source.scientificReview?.territory !== deploymentPolicy.territory) blockers.push('SCIENTIFIC_DEPLOYMENT_SCOPE_MISMATCH')
+  const blockers: string[] = [
+    ...scaleLocalizationReasons(source, deploymentPolicy),
+    ...getScaleInstrumentValidation(input.instrumentKey, input.instrumentVersion)!.issues.filter(issue => issue.severity === 'error').map(issue => `${issue.path}:${issue.message}`),
+  ]
+  // Caller authority and exact deployment identity remain mandatory.
   const actor = await db.user.findUnique({ where: { id: input.actorUserId } })
   if (!actor || actor.platformRole !== 'SYSTEM_ADMIN' || !actor.isActive || actor.isFrozen
     || (actor.expiresAt && actor.expiresAt <= new Date())) blockers.push('SYSTEM_ADMIN_REQUIRED')
@@ -74,8 +79,9 @@ const resolvePlan = async (
 
   const scale = await db.scale.findUnique({
     where: { code: input.instrumentKey },
-    select: { id: true, instrumentClass: true, instrumentVersion: true, definitionHash: true, definition: true, status: true },
+    select: { id: true, instrumentClass: true, instrumentVersion: true, definitionHash: true, definition: true, status: true, instruction: true },
   })
+  const instruction = resolveScaleAdmissionInstruction(source, scale)
   if (scale) {
     if (scale.instrumentClass !== 'STANDARD') blockers.push('SCALE_CODE_OWNED_BY_CUSTOM_INSTRUMENT')
     if (scale.instrumentVersion !== input.instrumentVersion) blockers.push('DEPLOYMENT_VERSION_CONFLICT')
@@ -142,6 +148,8 @@ const resolvePlan = async (
     referenceUnchanged,
     allowActivation: [...new Set(blockers)].length === 0,
     blockers: [...new Set(blockers)].sort(),
+    instruction,
+    manualReview: { localization: scaleLocalizationManualIssues(source), scientificReview: source.scientificReview ?? null, rights: source.executable.definition.license, reportQc: source.executable.definition.report.audienceContract?.qcReview ?? null },
   }
 }
 

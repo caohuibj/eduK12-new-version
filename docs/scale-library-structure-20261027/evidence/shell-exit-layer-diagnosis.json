@@ -1,0 +1,51 @@
+{
+  "scope": "Synthetic process/shell controls only; no application test was rerun by this diagnostic.",
+  "originalInvocations": [
+    "cache-instruction-tests",
+    "cache-instruction-state-supplement"
+  ],
+  "originalOuterExit": 1,
+  "originalStatusesRetained": true,
+  "observations": [
+    {
+      "login": true,
+      "command": "set -e\ntrap 'scale_shell_exit=$?; printf \"recorded-shell-exit=%s\\n\" \"$scale_shell_exit\"' EXIT\nsource /workspace/eduk12-cloud/load-local-env.sh\nnode -e 'process.exitCode=0'\nscale_check_exit=$?\nprintf 'recorded-child-exit=%s\\n' \"$scale_check_exit\"\nexit \"$scale_check_exit\"",
+      "result": {
+        "chunk_id": "1db3a3",
+        "wall_time_seconds": 4.5704e-05,
+        "exit_code": 1,
+        "original_token_count": 11,
+        "output": "recorded-child-exit=0\nrecorded-shell-exit=1\n"
+      }
+    },
+    {
+      "login": false,
+      "command": "set -e\ntrap 'scale_shell_exit=$?; printf \"recorded-shell-exit=%s\\n\" \"$scale_shell_exit\"' EXIT\nsource /workspace/eduk12-cloud/load-local-env.sh\nnode -e 'process.exitCode=0'\nscale_check_exit=$?\nprintf 'recorded-child-exit=%s\\n' \"$scale_check_exit\"\nexit \"$scale_check_exit\"",
+      "result": {
+        "chunk_id": "ced1ff",
+        "wall_time_seconds": 4.7336e-05,
+        "exit_code": 0,
+        "original_token_count": 11,
+        "output": "recorded-child-exit=0\nrecorded-shell-exit=0\n"
+      }
+    },
+    {
+      "login": true,
+      "control": "clear_console in the same noninteractive cloud login shell",
+      "result": {
+        "chunk_id": "38b9d0",
+        "wall_time_seconds": 5.7678e-05,
+        "exit_code": 0,
+        "original_token_count": 8,
+        "output": "clear-console-exit=1\nSHLVL=1\n"
+      }
+    }
+  ],
+  "conclusion": "The synthetic check exits 0 in both cases. The login shell's explicit exit invokes ~/.bash_logout; its SHLVL=1 clear_console -q returns 1 with no console, and errexit makes the shell exit 1. Non-login shell records child=0, shell=0 and tool exit=0. This isolates the outer failure to login-shell cleanup. Historical child exit was not separately persisted; its successful progress past a standalone check under set -e and its real reporters are retained, not retroactively rewritten.",
+  "logoutFile": {
+    "path": "$HOME/.bash_logout",
+    "sha256": "26882b79471c25f945c970f8233d8ce29d54e9d5eedcd2884f88affa84a18f56",
+    "contents": "# ~/.bash_logout: executed by bash(1) when login shell exits.\n\n# when leaving the console clear the screen to increase privacy\n\nif [ \"$SHLVL\" = 1 ]; then\n    [ -x /usr/bin/clear_console ] && /usr/bin/clear_console -q\nfi\n",
+    "modifiedByTask": false
+  }
+}

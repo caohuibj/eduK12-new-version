@@ -137,7 +137,7 @@ export type ScaleInterpretationDefinition = z.infer<typeof interpretationSchema>
 
 export const scaleReportDefinitionSchema = z.object({
   rawScoreFeedback: rawScoreFeedbackSchema.optional(),
-  audienceContract: z.object({ schemaVersion: z.literal(1), respondent: z.enum(['STUDENT_SELF','ADULT_SELF','PARENT_REPORT','TEACHER_REPORT','OBSERVER_REPORT']), audience: z.enum(['student','parent','teacher']), locale: z.string().min(1), qcReview: z.object({ reviewer: z.string().min(1), reviewedAt: z.string().datetime(), basis: z.string().min(1) }).strict() }).strict().optional(),
+  audienceContract: z.object({ schemaVersion: z.literal(1), respondent: z.enum(['STUDENT_SELF','ADULT_SELF','PARENT_REPORT','TEACHER_REPORT','OBSERVER_REPORT']), audience: z.enum(['student','parent','teacher']), locale: z.string().min(1), qcReview: z.object({ reviewer: z.string().min(1), reviewedAt: z.string().datetime(), basis: z.string().min(1) }).strict().optional() }).strict().optional(),
   reportVersion: z.string().min(1),
   primaryScoreKeys: z.array(z.string().min(1)).min(1),
   scoreOrder: z.array(z.string().min(1)).min(1),

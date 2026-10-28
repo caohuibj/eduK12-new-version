@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { approveInstrumentAuthorization, createInstrumentAuthorizationDraft } from '../../modules/assessment-authorization'
 import { getScaleInstrumentSource, getScaleInstrumentRuntimePolicy, getScaleInstrumentLocalization } from '../../modules/scale/onboarding/instrument-registry'
 import { evaluateScaleDeployment, type ScaleDeploymentPolicyV1 } from '../../modules/scale/policy/deployment'
-import { scaleLocalizationReasons } from '../../modules/scale/policy/localization'
+import { scaleLocalizationReasons, scaleLocalizationManualIssues } from '../../modules/scale/policy/localization'
 import { getScalePackage, validateScalePackage } from '../../modules/scale/scale-package.registry'
 import { scoreScale } from '../../modules/scale/scale-scoring'
 
@@ -52,13 +52,14 @@ describe('migrated WHO-5 / SDQ / TEXI source restrictions', () => {
     expect(scaleLocalizationReasons(teacherSource, policy('sdq_teacher_zh_cn', 'zh-CN'))).toContain('DEPLOYMENT_CONTENT_LOCALE_MISMATCH')
   })
 
-  it('preserves TEXI scoring and fails closed through generic PENDING localization', () => {
+  it('preserves TEXI scoring and pending manual localization without a technical gate', () => {
     const pkg = getScalePackage('texi_parent_zh_cn', '1.0.0')!
     expect(validateScalePackage(pkg).valid).toBe(true)
     const scored = scoreScale(pkg.definition, pkg.definition.items.map(item => ({ itemCode: item.itemCode, responseValue: '3' })))
     expect(scored.scores.find(row => row.key === 'working_memory')?.value).toBe(3)
     const source = getScaleInstrumentSource('texi_parent_zh_cn', '1.0.0')!
     expect(source.localization?.reviewStatus).toBe('PENDING')
-    expect(scaleLocalizationReasons(source, policy('texi_parent_zh_cn', 'en'))).toContain('LOCALIZATION_REVIEW_PENDING')
+    expect(scaleLocalizationReasons(source, policy('texi_parent_zh_cn', 'en'))).toEqual([])
+    expect(scaleLocalizationManualIssues(source)).toContain('LOCALIZATION_REVIEW_PENDING')
   })
 })

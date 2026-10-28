@@ -1,3 +1,4 @@
+import { scaleLocalizationManualIssues } from '../policy/localization'
 import {approveToolEntryPolicies,exactToolEntryProducts} from '../../assessment-governance/tool-entry-policy'
 import {scaleSourcePolicyIdentity} from './source-snapshot'
 import { publishScaleMeasurement } from '../../measurement-content/scale'
@@ -5,15 +6,12 @@ import { randomUUID } from 'node:crypto'
 import { Prisma, type PrismaClient } from '@prisma/client'
 import { z } from 'zod'
 import { canonicalHash } from '../../assessment-runtime/canonical'
-import { qualificationAllowsScientificMaturity } from '../../assessment-governance/scientific-qualification'
-import { evaluateScaleProductReadiness } from '../library/product-readiness'
-import { projectScalePackage } from './define-instrument'
 import { evaluateScaleSourceScientificQualification } from '../library/scientific-qualification'
 import { readActiveScaleDeployment } from '../deployment/repository'
 import { withSerializableScaleTransaction } from '../deployment/transactions'
-import { getScaleInstrumentSource } from './instrument-registry'
+import { getScaleInstrumentSource, getScaleInstrumentValidation } from './instrument-registry'
 import { planScaleInstrumentInstall } from './install'
-import { validateScaleInstrumentSource } from './validate-instrument'
+import { resolveScaleAdmissionInstruction } from './instruction-admission'
 import { hashScaleDefinition } from '../scale-definition'
 import { publishedScaleMediaOwner, retainScaleAssessmentImages } from '../scale-image.adapter'
 
@@ -34,18 +32,17 @@ export const planStandardScalePublication = async (db: Db, value: Input) => {
     || (actor.expiresAt && actor.expiresAt <= new Date())) blockers.push('SYSTEM_ADMIN_REQUIRED')
   const source = getScaleInstrumentSource(input.instrumentKey, input.instrumentVersion)
   if (!source?.executable) throw new Error('EXECUTABLE_SOURCE_MISSING')
-  blockers.push(...validateScaleInstrumentSource(source).issues.filter(row => row.severity === 'error').map(row => `${row.path}:${row.message}`))
-  const readiness = evaluateScaleProductReadiness(projectScalePackage(source)!)
-  if (!readiness.ready) blockers.push('PRODUCT_NOT_READY')
+  const validation = getScaleInstrumentValidation(input.instrumentKey, input.instrumentVersion)!
+  blockers.push(...validation.issues.filter(row => row.severity === 'error').map(row => `${row.path}:${row.message}`))
+  if (validation.issues.some(row => row.path === 'productReadiness' && row.severity === 'error')) blockers.push('PRODUCT_NOT_READY')
   const qualification = evaluateScaleSourceScientificQualification(source)
-  if (!qualificationAllowsScientificMaturity(source.catalog.scientificMaturity, qualification)) blockers.push('SCIENTIFIC_CLAIM_NOT_QUALIFIED')
   const scale = await db.scale.findUnique({ where: { code: input.instrumentKey } })
+  const instruction = resolveScaleAdmissionInstruction(source, scale)
   const active = scale ? await readActiveScaleDeployment(db, scale.id) : null
   if (!scale) blockers.push('SCALE_NOT_INSTALLED')
   if (!active) blockers.push('DEPLOYMENT_BINDING_MISSING')
   if (scale && (scale.definitionHash !== hashScaleDefinition(source.executable.definition) || !scale.definition)) blockers.push('SCALE_DEFINITION_CONFLICT')
   if (active) {
-    if (source.catalog.scientificMaturity !== 'PILOT' && source.scientificReview?.territory !== active.policy.territory) blockers.push('SCIENTIFIC_DEPLOYMENT_SCOPE_MISMATCH')
     const install = await planScaleInstrumentInstall(db, { ...input, deploymentPolicy: active.policy })
     blockers.push(...install.blockers)
     if (install.referenceCreates.length) blockers.push('REFERENCES_NOT_INSTALLED')
@@ -55,6 +52,8 @@ export const planStandardScalePublication = async (db: Db, value: Input) => {
     definitionHash: hashScaleDefinition(source.executable.definition), sourceHash: canonicalHash({ ...source, executable: { ...source.executable, scorerPlugins: source.executable.scorerPlugins?.map(({ key, version }) => ({ key, version })) ?? [] } }),
     deploymentPolicyHash: active?.policyHash ?? null, deploymentRevision: active?.revision ?? null,
     scientificMaturity: source.catalog.scientificMaturity, qualification,
+    instruction: instruction.binding, instructionDiagnostics: instruction.diagnostics,
+    manualReview: { localization: scaleLocalizationManualIssues(source), rights: source.executable.definition.license, reportQc: source.executable.definition.report.audienceContract?.qcReview ?? null },
     ...(input.allowedProducts?{allowedProducts:exactToolEntryProducts(input.allowedProducts)}:{}),visibility: input.visibility, previousStatus: scale?.status ?? null, previousVisibility: scale?.visibility ?? null,
   }
   const proofHash = canonicalHash(proof)

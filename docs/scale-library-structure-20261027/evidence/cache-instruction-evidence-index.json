@@ -1,0 +1,184 @@
+{
+  "recordedAt": "2026-10-27T23:27:25.400880+00:00",
+  "previousHead": "ed7315aeafa9f1ab94b7aef1f4daaf0607325713",
+  "ciExecuted": false,
+  "databaseWrites": "MOCK_ONLY",
+  "realDatabaseAccess": false,
+  "executionBinding": "Test source hashes collected after execution. Original reporters and shell failures remain original; not signed or automatically admissible. Types receipt captured actual before/after source hashes.",
+  "invocations": [
+    {
+      "report": "cache-instruction-tests.json",
+      "sha256": "1e232da8b2bb05b78d5d3992129439e321c2fbf8c69e9d4fd872fee07d0a91e6",
+      "outerCommandExit": 1,
+      "caseReporterSuccess": true,
+      "passed": 5,
+      "failed": 0,
+      "filtered": 0,
+      "cases": [
+        {
+          "fullName": "selected immutable scale admission contract and live row instruction executes each golden once through real install/materialize/publication layers and reuses frozen validation",
+          "status": "passed"
+        },
+        {
+          "fullName": "selected immutable scale admission contract and live row instruction reuses a failed immutable contract without promoting it or replaying golden scorers",
+          "status": "passed"
+        },
+        {
+          "fullName": "selected immutable scale admission contract and live row instruction rechecks administrator changes inside the transaction despite a cached valid source",
+          "status": "passed"
+        },
+        {
+          "fullName": "selected immutable scale admission contract and live row instruction preserves exact legacy text, binds it into proof and rejects stale/empty or mismatched row fallbacks",
+          "status": "passed"
+        },
+        {
+          "fullName": "selected immutable scale admission contract and live row instruction does not treat PUBLISHED package status or unreviewed materials as a formal instruction for a new install",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "report": "cache-instruction-runner-diagnostic.json",
+      "sha256": "600b46ed790143df24770c414127b07dbde0c3d274868acfcad22f310347a2b7",
+      "outerCommandExit": 0,
+      "caseReporterSuccess": true,
+      "passed": 1,
+      "failed": 0,
+      "filtered": 4,
+      "cases": [
+        {
+          "fullName": "selected immutable scale admission contract and live row instruction executes each golden once through real install/materialize/publication layers and reuses frozen validation",
+          "status": "passed"
+        },
+        {
+          "fullName": "selected immutable scale admission contract and live row instruction reuses a failed immutable contract without promoting it or replaying golden scorers",
+          "status": "skipped"
+        },
+        {
+          "fullName": "selected immutable scale admission contract and live row instruction rechecks administrator changes inside the transaction despite a cached valid source",
+          "status": "skipped"
+        },
+        {
+          "fullName": "selected immutable scale admission contract and live row instruction preserves exact legacy text, binds it into proof and rejects stale/empty or mismatched row fallbacks",
+          "status": "skipped"
+        },
+        {
+          "fullName": "selected immutable scale admission contract and live row instruction does not treat PUBLISHED package status or unreviewed materials as a formal instruction for a new install",
+          "status": "skipped"
+        }
+      ]
+    },
+    {
+      "report": "cache-instruction-state-supplement.json",
+      "sha256": "c2ec8ae4a601085c44728fddd9c6bc9cdf318fb593104225a21352ac5892409c",
+      "outerCommandExit": 1,
+      "caseReporterSuccess": true,
+      "passed": 2,
+      "failed": 0,
+      "filtered": 11,
+      "cases": [
+        {
+          "fullName": "selected immutable scale admission contract and live row instruction executes each golden once through real install/materialize/publication layers and reuses frozen validation",
+          "status": "skipped"
+        },
+        {
+          "fullName": "selected immutable scale admission contract and live row instruction reuses a failed immutable contract without promoting it or replaying golden scorers",
+          "status": "skipped"
+        },
+        {
+          "fullName": "selected immutable scale admission contract and live row instruction rechecks administrator changes inside the transaction despite a cached valid source",
+          "status": "skipped"
+        },
+        {
+          "fullName": "selected immutable scale admission contract and live row instruction rechecks deployment identity, installed version and reference data without replaying immutable scoring",
+          "status": "passed"
+        },
+        {
+          "fullName": "selected immutable scale admission contract and live row instruction preserves exact legacy text, binds it into proof and rejects stale/empty or mismatched row fallbacks",
+          "status": "skipped"
+        },
+        {
+          "fullName": "selected immutable scale admission contract and live row instruction does not treat PUBLISHED package status or unreviewed materials as a formal instruction for a new install",
+          "status": "skipped"
+        },
+        {
+          "fullName": "frozen scale instruction content contract freezes the versioned source instruction into the runtime snapshot and parses it back",
+          "status": "skipped"
+        },
+        {
+          "fullName": "frozen scale instruction content contract keeps legacy snapshots without an instruction valid and falls back to the live Scale field",
+          "status": "skipped"
+        },
+        {
+          "fullName": "frozen scale instruction content contract resolves teacher-authored and source-less rows through the Scale field only",
+          "status": "skipped"
+        },
+        {
+          "fullName": "frozen scale instruction content contract projects identical frozen text/empty in resume and completed, retaining the legacy missing-field fallback",
+          "status": "skipped"
+        },
+        {
+          "fullName": "frozen scale instruction content contract updates declared instruction alone and preserves exact legacy text when source instruction is absent",
+          "status": "passed"
+        },
+        {
+          "fullName": "frozen scale instruction content contract materializes the source instruction onto the Scale row and keeps it through axis revision",
+          "status": "skipped"
+        },
+        {
+          "fullName": "global registry instruction availability does not leak the synthetic fixture into the production registry",
+          "status": "skipped"
+        }
+      ]
+    },
+    {
+      "report": "cache-runner-exit-diagnostic.json",
+      "sha256": "a99ec15ddc09950a3d868e0a4e5b9edc5eeb82eaa29f17bc4e389a87f7fc082f",
+      "outerCommandExit": 0,
+      "caseReporterSuccess": true,
+      "passed": 1,
+      "failed": 0,
+      "filtered": 5,
+      "cases": [
+        {
+          "fullName": "selected immutable scale admission contract and live row instruction executes each golden once through real install/materialize/publication layers and reuses frozen validation",
+          "status": "skipped"
+        },
+        {
+          "fullName": "selected immutable scale admission contract and live row instruction reuses a failed immutable contract without promoting it or replaying golden scorers",
+          "status": "skipped"
+        },
+        {
+          "fullName": "selected immutable scale admission contract and live row instruction rechecks administrator changes inside the transaction despite a cached valid source",
+          "status": "skipped"
+        },
+        {
+          "fullName": "selected immutable scale admission contract and live row instruction rechecks deployment identity, installed version and reference data without replaying immutable scoring",
+          "status": "passed"
+        },
+        {
+          "fullName": "selected immutable scale admission contract and live row instruction preserves exact legacy text, binds it into proof and rejects stale/empty or mismatched row fallbacks",
+          "status": "skipped"
+        },
+        {
+          "fullName": "selected immutable scale admission contract and live row instruction does not treat PUBLISHED package status or unreviewed materials as a formal instruction for a new install",
+          "status": "skipped"
+        }
+      ]
+    }
+  ],
+  "currentInputHashes": {
+    "server-version/backend/src/__tests__/scale/instruction-freeze.test.ts": "7fef17edbbd20a19f7b9250c6f5256900b0e2c54b8eed1bd4d4750e07dba27a6",
+    "server-version/backend/src/modules/scale/onboarding/install.ts": "72987afadf20781e2ff5318d42891ff158ea76ac33d3a3854a5db5868eef321d",
+    "server-version/backend/src/modules/scale/onboarding/instrument-registry.ts": "6469dd05aeca1f786fc898509b921a3733be761a6391c7f4a7120e077167142e",
+    "server-version/backend/src/modules/scale/onboarding/materialize.ts": "4bd0109bdbb61a1a3a8e70b940c6abedfc560c76b1060ca1b3faf730a4825cd5",
+    "server-version/backend/src/modules/scale/onboarding/preview.ts": "bb4402a821678cb31afd59cbb439e4001c4c39fa1d1f79f14205e5e48196dc80",
+    "server-version/backend/src/modules/scale/onboarding/publish.ts": "5e292b2bff29d743da09076f7b15a2bf38ce3ba3afc827dc9e94f9c013c74b57",
+    "server-version/backend/src/modules/scale/onboarding/status.ts": "3a5f43ec93631b8a1049f49ace540f1e60d2c60b847f1f4ab6e91e59aea84f4c",
+    "server-version/backend/src/modules/scale/onboarding/validate-instrument.ts": "667e27831adcb987f8dd116e9d8d2f391a7cd4d44371b788d26fc61193d00264",
+    "server-version/backend/src/modules/scale/onboarding/instruction-admission.ts": "a3f9ed43f68fe43395c9cfd1ef1a51a5a177ad279759996d49ca9a2bba5bea26",
+    "server-version/backend/src/__tests__/scale/admission-cache-and-instruction.test.ts": "db7bb146723c4f5b0688daf823244ebf2135fa1857eff1fa1914c6bb4b119a69"
+  },
+  "priorInventoryReexecution": false,
+  "priorFailurePreservation": true
+}

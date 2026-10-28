@@ -15,6 +15,7 @@ export async function seedScalePackages(prisma: PrismaClient, adminId: string): 
       instrumentVersion: source.identity.instrumentVersion,
       actorUserId: adminId,
     })
+    if (result.instruction.diagnostics.length) console.warn(`Scale instruction ${source.identity.instrumentKey}@${source.identity.instrumentVersion}: ${result.instruction.diagnostics.join(',')}`)
     console.log(`Scale source ${source.identity.instrumentKey}@${source.identity.instrumentVersion}: ${result.created ? 'created DRAFT/HIDDEN' : 'verified'}`)
   }
 }

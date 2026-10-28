@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "base": "5c427f2bfe646def2200162bab449a0711a6e133",
+  "sources": [
+    {
+      "ref": "origin/main",
+      "sha": "5c427f2bfe646def2200162bab449a0711a6e133",
+      "ancestorOfMain": true
+    },
+    {
+      "ref": "origin/content/dot-local-scales-20261025",
+      "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "ancestorOfMain": false
+    },
+    {
+      "ref": "origin/pr328",
+      "sha": "fa355ff2dcd859b57a4bf2e8bddd77f8d428e3cf",
+      "ancestorOfMain": false
+    },
+    {
+      "ref": "origin/pr362",
+      "sha": "2612a9f5bf22c1370ec786f3d6feb50805003065",
+      "ancestorOfMain": false
+    },
+    {
+      "ref": "origin/content/scale-expansion",
+      "sha": "f3e12b551b6e8afa748b2f59f52d6439039d9924",
+      "ancestorOfMain": true
+    },
+    {
+      "ref": "origin/content/student-traits-pilot-batch-2",
+      "sha": "afec8395927de44195b8b8b70b013a3608d21a54",
+      "ancestorOfMain": false
+    },
+    {
+      "ref": "origin/content/teacher-scale-batch-1",
+      "sha": "57909890479147f9840ad38a12ac026d762ac023",
+      "ancestorOfMain": false
+    },
+    {
+      "ref": "origin/content/teacher-scales-pilot-batch-1-v2",
+      "sha": "0a520e7e614043a2851ddc0e5369d1c2a9f54085",
+      "ancestorOfMain": true
+    },
+    {
+      "ref": "origin/content/tipi-standard-pilot",
+      "sha": "fe18fb4ab209b6f5b4babd044c28051220f41cdc",
+      "ancestorOfMain": false
+    },
+    {
+      "ref": "origin/scale/zh-cn-sdq-texi-draft",
+      "sha": "11681a6977a1b1845089799be6afce7bc30fdb3f",
+      "ancestorOfMain": false
+    }
+  ],
+  "integratedMain": "6203a829dc8d7de707e67f413acfa5a354a21e09",
+  "note": "Inventory retains its original exact base. PR364 changed no scale catalog source or scale-engine input."
+}
