@@ -564,3 +564,21 @@ describe('durable acknowledgement before slow progress or feedback reload',()=>{
   }finally{await act(async()=>release())}
  })
 })
+
+
+describe('frozen scale instruction in the shared unit player',()=>{
+ it.each(['training','education','public'] as const)('shows the frozen scale instruction before questions for %s without inventing text',async host=>{
+  trainingPresentation.enabled=host==='training'
+  const instruction='请根据最近一周的实际感受作答。\n没有对错，请选择最符合自己的选项。'
+  const item={...scaleItem,scale:{...scaleItem.scale!,instruction}}
+  const props={...sharedProps,submitScale:vi.fn(),submitFormSection:vi.fn(),campusMode:host==='education',publicMode:host==='public'}
+  const view=render(<FinalCompositeAssessment {...props} state={makeState(item)}/>)
+  const panel=await screen.findByRole('region',{name:'本量表作答说明'})
+  expect(panel.textContent).toBe(instruction)
+  const question=await screen.findByRole('heading',{name:/综合量表第一题/})
+  expect(panel.compareDocumentPosition(question)&Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  view.rerender(<FinalCompositeAssessment {...props} state={makeState(scaleItem)}/>)
+  expect(screen.queryByRole('region',{name:'本量表作答说明'})).not.toBeInTheDocument()
+  expect(props.submitScale).not.toHaveBeenCalled()
+ })
+})

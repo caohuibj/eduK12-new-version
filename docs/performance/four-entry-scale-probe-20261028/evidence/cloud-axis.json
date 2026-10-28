@@ -1,0 +1,25 @@
+{
+  "scope": "Real current-candidate HTTP routes with actual authentication, authorization, canonical FINAL and database; fixture content is fixed PR371 C1 only. No browser claim.",
+  "startedAt": "2026-10-28T03:48:57.659Z",
+  "cases": [
+    {
+      "name": "Exact immutable semantic axes and report templates across all seven current finals",
+      "status": "FAIL",
+      "error": {
+        "name": "AssertionError",
+        "message": "Expected values to be strictly equal:\n\n'1.0.0' !== '1.0.1'\n"
+      }
+    }
+  ],
+  "requests": [],
+  "failures": [
+    {
+      "name": "Exact immutable semantic axes and report templates across all seven current finals",
+      "error": {
+        "name": "AssertionError",
+        "message": "Expected values to be strictly equal:\n\n'1.0.0' !== '1.0.1'\n"
+      }
+    }
+  ],
+  "endedAt": "2026-10-28T03:48:58.613Z"
+}

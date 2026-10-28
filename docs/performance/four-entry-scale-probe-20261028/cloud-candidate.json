@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "base": "8774b1cf158dae1c5eb0f4950044c6ae6d6a18dd",
+  "productHead": "3ad550800119b87ad355b52b5268a6fc38a542b0",
+  "productTree": "fdf6a76ed46d36fd64813ee9c82abb5ff7fd0044",
+  "components": {
+    "backend": "6f6089b4aa3b4a98489e0fe7d8022cb7e689eb64",
+    "frontend": "562544f471ea6a7fbab998a5eea7ee2458a67eb8"
+  },
+  "applicationDiff": {
+    "server-version/backend/src/__tests__/assessment-run/start-admission.test.ts": {
+      "before": "35299b2e0b946fb929794bdb7fa7539412425d95",
+      "after": "9ecc3362659fe9399d375ccc00d8f08af431a6c0",
+      "mode": "100644"
+    },
+    "server-version/backend/src/__tests__/education-tools/assessment-resource.standard-marker.postgres.integration.test.ts": {
+      "before": "b932db1d53c3899ffae6a0ecb52f3f88ff56e5eb",
+      "after": "8db5039605547193526ed1563bb19d87a0002247",
+      "mode": "100644"
+    },
+    "server-version/backend/src/__tests__/measurement-content/education-content-scope.test.ts": {
+      "before": "a5494c01b4e75cba15081ad8a4438e31ff9c2f7e",
+      "after": "090d0990a51d97aa52018993b9fb8cf937be2544",
+      "mode": "100644"
+    },
+    "server-version/backend/src/__tests__/measurement-content/survey-participant-feedback.test.ts": {
+      "before": "4c0c920f06cefaf16dd5ddda2010c009de8b9651",
+      "after": "d09159b0c28c135dc25e0b5358c3936387d72342",
+      "mode": "100644"
+    },
+    "server-version/backend/src/modules/assessment-run/startAdmission.ts": {
+      "before": "9532a7f31807c5327763ca4223464a55168c9fe5",
+      "after": "a64af731f588848668b2bdbeb4f4fc5bba6d7991",
+      "mode": "100644"
+    },
+    "server-version/backend/src/modules/assessment-run/startExecution.ts": {
+      "before": "2c57e5935e521bddd71833150335db2634f9bbe9",
+      "after": "371f82dbc0380692d2512a05a09768a1bcc689ca",
+      "mode": "100644"
+    },
+    "server-version/backend/src/modules/composite/training-report-selection.ts": {
+      "before": "c3a28dbdfef84dd12181583b150449506b248cb8",
+      "after": "ffaf688552c8ef49f68595593e3862a02576e55f",
+      "mode": "100644"
+    },
+    "server-version/backend/src/modules/survey/participant-feedback.ts": {
+      "before": "88c286b5d6b30a22ee3ea12fcbac03729b3da276",
+      "after": "9e00f3821682b134dd5b4b0504aa2d3a34397929",
+      "mode": "100644"
+    },
+    "server-version/frontend/src/components/FinalCompositeAssessment.tsx": {
+      "before": "23c1cd4834a2bcde961d44cbffe6790c5955a3e3",
+      "after": "399137382d9e454f0ee452838fa664d993ffc562",
+      "mode": "100644"
+    },
+    "server-version/frontend/src/components/__tests__/FinalCompositeAssessment.test.tsx": {
+      "before": "156f5b079c663bdb2df89f707ae1a09d5a674526",
+      "after": "f12d02acc20f457a4b5cd22e298afb3934e0512a",
+      "mode": "100644"
+    },
+    "server-version/frontend/src/modules/reporting/ScaleUnitReportCard.legacy.tsx": {
+      "before": "09275fba97785f08afb62b5ae89d99024faa7baf",
+      "after": "73a110b6b06bc08388216683d41846a748eccc2d",
+      "mode": "100644"
+    },
+    "server-version/frontend/src/modules/reporting/report-ui.css": {
+      "before": "d6b1d286d2a6f36b5cf438a8a61e78f823195290",
+      "after": "a876bba2f434287b0104c903ab871ec95da689c7",
+      "mode": "100644"
+    },
+    "server-version/frontend/src/survey/SurveyPublicApp.final.test.tsx": {
+      "before": "a3fbe163cdacc08a440e1d0f05e8b5f0ab15c893",
+      "after": "91452b4b56f7c0dcbf0ed3b38bf4f6ee53cab397",
+      "mode": "100644"
+    },
+    "server-version/frontend/src/survey/SurveyPublicApp.tsx": {
+      "before": "af6ac0694afe40fa866753099577d67d2f1f5e71",
+      "after": "29df78219154c147698e1221efdc72c11a7a641f",
+      "mode": "100644"
+    }
+  },
+  "protectedInputs": {
+    "server-version/backend/prisma": {
+      "base": "b19739abaa3aa85f66d3cc1ed37129c8b27ae6b4",
+      "product": "b19739abaa3aa85f66d3cc1ed37129c8b27ae6b4"
+    },
+    "server-version/backend/package.json": {
+      "base": "3157b4edaaecd9c495458434ab4cfd1bd5fcdfaf",
+      "product": "3157b4edaaecd9c495458434ab4cfd1bd5fcdfaf"
+    },
+    "server-version/backend/package-lock.json": {
+      "base": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6",
+      "product": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6"
+    },
+    "server-version/frontend/package.json": {
+      "base": "41eaa68acf3f387f2e6ecbdfa697947232fe1fda",
+      "product": "41eaa68acf3f387f2e6ecbdfa697947232fe1fda"
+    },
+    "server-version/frontend/package-lock.json": {
+      "base": "38d624d2dd610673f9392a89af7290682862e2b0",
+      "product": "38d624d2dd610673f9392a89af7290682862e2b0"
+    }
+  },
+  "ciActivated": false,
+  "reviewState": "PENDING_DOT_INDEPENDENT_REVIEW",
+  "ciPlanImplementation": "NOT_IMPLEMENTED; do not mark Ready: current bounded binding is still PR372",
+  "knownPending": [
+    "Actual browser display/contrast/overflow",
+    "Explicit PR374 bounded routing/admission and browser controls",
+    "DOT exact-candidate release",
+    "Actual Actions qualification and SARIF disposition"
+  ]
+}

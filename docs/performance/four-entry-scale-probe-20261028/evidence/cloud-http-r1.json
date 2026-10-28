@@ -1,0 +1,1068 @@
+{
+  "scope": "Real current-candidate HTTP routes with actual authentication, authorization, canonical FINAL and database; fixture content is fixed PR371 C1 only. No browser claim.",
+  "startedAt": "2026-10-28T03:35:55.274Z",
+  "cases": [
+    {
+      "name": "School authenticated approved student: exact target R -> START/resume/FINAL/replay/report",
+      "status": "FAIL",
+      "attemptId": "d0300f43-5a09-4630-ad8a-d125dafd92a1",
+      "identity": {
+        "respondentType": null
+      },
+      "frozenInstructionExact": true,
+      "resume": true,
+      "final": {
+        "submissionId": "c650c4d9-d187-42a7-8f06-3b8248213451",
+        "payloadHash": "a64cb4225a81ef1f6ede4d1e5edd038b0a685bd0e41233802f67fa086e441879",
+        "replayed": false,
+        "completed": true,
+        "feedbackDeferred": true
+      },
+      "sameSubmissionReplay": true,
+      "changedReplayDenied": true,
+      "reopenedCompleted": true,
+      "error": {
+        "name": "PrismaClientValidationError",
+        "message": "\nInvalid `db.assessment.findMany()` invocation in\n/tmp/pr374-cloud/http.ts:39:40\n\n  36 const replay=await client.ok('POST',path+'/items/'+item.id+'/scale/submit',submission,extra);assert.equal(replay.replayed,true);row.sameSubmissionReplay=true\n  37 const changed=await client.raw('POST',path+'/items/'+item.id+'/scale/submit',{...submission,answers:submission.answers.map((a:any,i:number)=>i? a:{...a,responseValue:'4'})},extra);assert.equal(changed.status,409);row.changedReplayDenied=true\n  38 const reopened=await client.ok('GET',path+'?view=current-unit',undefined,extra);assert.equal(reopened.status,'COMPLETED');row.reopenedCompleted=true\n→ 39 const assessments=await db.assessment.findMany({\n       where: {\n         compositeAttemptId: \"d0300f43-5a09-4630-ad8a-d125dafd92a1\"\n       },\n       select: {\n         id: true,\n         status: true,\n         results: true,\n         ~~~~~~~\n         submissionId: true,\n     ?   timingEncrypted?: true,\n     ?   scaleId?: true,\n     ?   userId?: true,\n     ?   deliveryMode?: true,\n     ?   runtimeGeneration?: true,\n     ?   attemptEpoch?: true,\n     ?   submissionPayloadHash?: true,\n     ?   submissionCompletedAt?: true,\n     ?   answers?: true,\n     ?   answersRevision?: true,\n     ?   result?: true,\n     ?   runtimeSnapshotEncrypted?: true,\n     ?   compiledRuntimeHash?: true,\n     ?   frozenAdmissionSnapshotEncrypted?: true,\n     ?   frozenAdmissionSnapshotHash?: true,\n     ?   progress?: true,\n     ?   startedAt?: true,\n     ?   completedAt?: true,\n     ?   totalTime?: true,\n     ?   questionnaireAssessmentId?: true,\n     ?   compositeAttemptId?: true,\n     ?   compositeItemId?: true,\n     ?   subjectUserId?: true,\n     ?   respondentUserId?: true,\n     ?   respondentType?: true,\n     ?   episodeId?: true,\n     ?   assignmentRef?: true,\n     ?   consentId?: true,\n     ?   contextSnapshotRef?: true,\n     ?   resultFacts?: true,\n     ?   scale?: true,\n     ?   user?: true,\n     ?   episode?: true,\n     ?   consent?: true,\n     ?   questionnaireAssessment?: true,\n     ?   compositeAttempt?: true,\n     ?   compositeItem?: true,\n     ?   _count?: true\n       }\n     })\n\nUnknown field `results` for select statement on model `Assessment`. Available options are marked with ?."
+      }
+    },
+    {
+      "name": "Teacher authenticated same-person SELF: exact target R -> START/resume/FINAL/replay/report",
+      "status": "FAIL",
+      "attemptId": "9591e94d-e4d0-41cf-9ece-f73a355c6c5d",
+      "error": {
+        "name": "AssertionError",
+        "message": "GET /api/huiteacher/assessment-composite-attempts/9591e94d-e4d0-41cf-9ece-f73a355c6c5d?view=current-unit {\"code\":\"STALE_ATTEMPT\",\"message\":\"ELIGIBILITY_INELIGIBLE:RESPONDENT_TYPE_NOT_ALLOWED\",\"data\":null}\n\n409 !== 200\n"
+      }
+    }
+  ],
+  "requests": [
+    {
+      "product": "school",
+      "method": "GET",
+      "path": "/api/campus/auth/csrf",
+      "status": 200,
+      "durationMs": 33,
+      "body": {
+        "code": 0,
+        "message": "操作成功",
+        "data": {
+          "csrfToken": "[PRIVATE SYNTHETIC CAPABILITY]"
+        }
+      }
+    },
+    {
+      "product": "school",
+      "method": "POST",
+      "path": "/api/campus/auth/login",
+      "status": 200,
+      "durationMs": 147,
+      "body": {
+        "code": 0,
+        "message": "登录成功",
+        "data": {
+          "user": {
+            "id": "a18bc320-77ad-49c2-be7c-5aac0ab893d8",
+            "username": "sysprobe_enrolled_ca4719",
+            "role": "STUDENT",
+            "accountDomain": "SCHOOL"
+          }
+        }
+      }
+    },
+    {
+      "product": "school",
+      "method": "POST",
+      "path": "/api/campus/organizations/67563cf7-ccd5-4d4b-b622-f62886ea5c11/activities/682e3245-809d-42d7-ada7-0531dcde1d1c/runs/c933f629-899f-48f3-b22c-ea929073788f/executions/d751641a-4506-40f4-b4fc-efcb0c154d64/start",
+      "status": 200,
+      "durationMs": 459,
+      "body": {
+        "code": 0,
+        "message": "操作成功",
+        "data": {
+          "state": "STARTED",
+          "runtimeBindingKind": "COMPOSITE",
+          "runtimeBindingRef": "d0300f43-5a09-4630-ad8a-d125dafd92a1",
+          "replayed": false
+        }
+      }
+    },
+    {
+      "product": "school",
+      "method": "GET",
+      "path": "/api/campus/composite-attempts/d0300f43-5a09-4630-ad8a-d125dafd92a1?view=current-unit",
+      "status": 200,
+      "durationMs": 118,
+      "body": {
+        "code": 0,
+        "message": "操作成功",
+        "data": {
+          "id": "d0300f43-5a09-4630-ad8a-d125dafd92a1",
+          "assessmentId": "9923e999-463e-486d-9b97-c16453309df0",
+          "name": "合成C1系统验收 · SCHOOL",
+          "instruction": null,
+          "status": "IN_PROGRESS",
+          "taskSatisfaction": null,
+          "taskSatisfied": false,
+          "deliveryMode": "FINAL_ONLY",
+          "attemptEpoch": 1,
+          "definitionHash": "c2b199ddf5a01d8795513473b750aa3126f2345d69e54e8545f779221a7d1225",
+          "contextSnapshotHash": null,
+          "progress": 0,
+          "completedItems": 0,
+          "totalItems": 1,
+          "currentIndex": 0,
+          "startedAt": "2026-10-28T03:35:55.892Z",
+          "lastSavedAt": "2026-10-28T03:35:55.892Z",
+          "completedAt": null,
+          "anonymousCode": null,
+          "context": {
+            "status": "collecting",
+            "frozenAt": null,
+            "snapshotHash": null
+          },
+          "items": [
+            {
+              "id": "c6e0da32-8c67-46b0-9b8e-fe808079d124",
+              "type": "SCALE",
+              "position": 0,
+              "label": "一般任务自我效能感（IPIP-NEO C1 中文研究译稿）",
+              "completed": false,
+              "index": 0
+            }
+          ],
+          "units": [
+            {
+              "id": "c6e0da32-8c67-46b0-9b8e-fe808079d124",
+              "type": "SCALE",
+              "position": 0,
+              "required": true,
+              "label": "一般任务自我效能感（IPIP-NEO C1 中文研究译稿）",
+              "completed": false,
+              "index": 0,
+              "itemId": "c6e0da32-8c67-46b0-9b8e-fe808079d124"
+            }
+          ],
+          "currentItem": {
+            "id": "c6e0da32-8c67-46b0-9b8e-fe808079d124",
+            "type": "SCALE",
+            "position": 0,
+            "required": true,
+            "scaleAssessmentId": "1639315e-665f-4b80-98fe-cc5615f286dc",
+            "definitionHash": "99c88b01aa596875b10b95a65aa43dc10c4c3ad73bdffdf0546e21d327b7ff2c",
+            "presentationMode": "ONE_BY_ONE",
+            "answers": [],
+            "scale": {
+              "id": "e1c12e61-f884-4c62-af9e-f017e81ffebd",
+              "name": "一般任务自我效能感（IPIP-NEO C1 中文研究译稿）",
+              "instruction": "请根据你目前通常的情况，而不是希望将来成为的样子，判断下面各句话与你的实际情况有多符合。",
+              "description": "Public-domain IPIP representation, not proprietary NEO-PI-R items; standalone facet, not full NEO profile. Not equivalent to GSE or domain-specific academic self-efficacy.",
+              "instrumentVersion": "1.0.0",
+              "definition": {
+                "schemaVersion": 2,
+                "respondentType": "participant_self_report",
+                "display": {
+                  "randomizeItems": false
+                },
+                "items": [
+                  {
+                    "itemCode": "IPIP_NEO_C1_SELF_EFFICACY10_01",
+                    "content": "我能成功完成任务。",
+                    "type": "single",
+                    "required": true,
+                    "sortOrder": 0,
+                    "responseSetKey": "ipip_neo_c1_self_efficacy10_responses",
+                    "randomizeOptions": false,
+                    "options": [
+                      {
+                        "value": "1",
+                        "label": "很不符合"
+                      },
+                      {
+                        "value": "2",
+                        "label": "比较不符合"
+                      },
+                      {
+                        "value": "3",
+                        "label": "介于不符合与符合之间"
+                      },
+                      {
+                        "value": "4",
+                        "label": "比较符合"
+                      },
+                      {
+                        "value": "5",
+                        "label": "很符合"
+                      }
+                    ]
+                  },
+                  {
+                    "itemCode": "IPIP_NEO_C1_SELF_EFFICACY10_02",
+                    "content": "我在所做的事情上表现出色。",
+                    "type": "single",
+                    "required": true,
+                    "sortOrder": 1,
+                    "responseSetKey": "ipip_neo_c1_self_efficacy10_responses",
+                    "randomizeOptions": false,
+                    "options": [
+                      {
+                        "value": "1",
+                        "label": "很不符合"
+                      },
+                      {
+                        "value": "2",
+                        "label": "比较不符合"
+                      },
+                      {
+                        "value": "3",
+                        "label": "介于不符合与符合之间"
+                      },
+                      {
+                        "value": "4",
+                        "label": "比较符合"
+                      },
+                      {
+                        "value": "5",
+                        "label": "很符合"
+                      }
+                    ]
+                  },
+                  {
+                    "itemCode": "IPIP_NEO_C1_SELF_EFFICACY10_03",
+                    "content": "我能顺利处理任务。",
+                    "type": "single",
+                    "required": true,
+                    "sortOrder": 2,
+                    "responseSetKey": "ipip_neo_c1_self_efficacy10_responses",
+                    "randomizeOptions": false,
+                    "options": [
+                      {
+                        "value": "1",
+                        "label": "很不符合"
+                      },
+                      {
+                        "value": "2",
+                        "label": "比较不符合"
+                      },
+                      {
+                        "value": "3",
+                        "label": "介于不符合与符合之间"
+                      },
+                      {
+                        "value": "4",
+                        "label": "比较符合"
+                      },
+                      {
+                        "value": "5",
+                        "label": "很符合"
+                      }
+                    ]
+                  },
+                  {
+                    "itemCode": "IPIP_NEO_C1_SELF_EFFICACY10_04",
+                    "content": "我对自己的判断有把握。",
+                    "type": "single",
+                    "required": true,
+                    "sortOrder": 3,
+                    "responseSetKey": "ipip_neo_c1_self_efficacy10_responses",
+                    "randomizeOptions": false,
+                    "options": [
+                      {
+                        "value": "1",
+                        "label": "很不符合"
+                      },
+                      {
+                        "value": "2",
+                        "label": "比较不符合"
+                      },
+                      {
+                        "value": "3",
+                        "label": "介于不符合与符合之间"
+                      },
+                      {
+                        "value": "4",
+                        "label": "比较符合"
+                      },
+                      {
+                        "value": "5",
+                        "label": "很符合"
+                      }
+                    ]
+                  },
+                  {
+                    "itemCode": "IPIP_NEO_C1_SELF_EFFICACY10_05",
+                    "content": "我能想出好的解决办法。",
+                    "type": "single",
+                    "required": true,
+                    "sortOrder": 4,
+                    "responseSetKey": "ipip_neo_c1_self_efficacy10_responses",
+                    "randomizeOptions": false,
+                    "options": [
+                      {
+                        "value": "1",
+                        "label": "很不符合"
+                      },
+                      {
+                        "value": "2",
+                        "label": "比较不符合"
+                      },
+                      {
+                        "value": "3",
+                        "label": "介于不符合与符合之间"
+                      },
+                      {
+                        "value": "4",
+                        "label": "比较符合"
+                      },
+                      {
+                        "value": "5",
+                        "label": "很符合"
+                      }
+                    ]
+                  },
+                  {
+                    "itemCode": "IPIP_NEO_C1_SELF_EFFICACY10_06",
+                    "content": "我知道怎样把事情办好。",
+                    "type": "single",
+                    "required": true,
+                    "sortOrder": 5,
+                    "responseSetKey": "ipip_neo_c1_self_efficacy10_responses",
+                    "randomizeOptions": false,
+                    "options": [
+                      {
+                        "value": "1",
+                        "label": "很不符合"
+                      },
+                      {
+                        "value": "2",
+                        "label": "比较不符合"
+                      },
+                      {
+                        "value": "3",
+                        "label": "介于不符合与符合之间"
+                      },
+                      {
+                        "value": "4",
+                        "label": "比较符合"
+                      },
+                      {
+                        "value": "5",
+                        "label": "很符合"
+                      }
+                    ]
+                  },
+                  {
+                    "itemCode": "IPIP_NEO_C1_SELF_EFFICACY10_07",
+                    "content": "我会误判情况。",
+                    "type": "single",
+                    "required": true,
+                    "sortOrder": 6,
+                    "responseSetKey": "ipip_neo_c1_self_efficacy10_responses",
+                    "randomizeOptions": false,
+                    "options": [
+                      {
+                        "value": "1",
+                        "label": "很不符合"
+                      },
+                      {
+                        "value": "2",
+                        "label": "比较不符合"
+                      },
+                      {
+                        "value": "3",
+                        "label": "介于不符合与符合之间"
+                      },
+                      {
+                        "value": "4",
+                        "label": "比较符合"
+                      },
+                      {
+                        "value": "5",
+                        "label": "很符合"
+                      }
+                    ]
+                  },
+                  {
+                    "itemCode": "IPIP_NEO_C1_SELF_EFFICACY10_08",
+                    "content": "我弄不明白事情。",
+                    "type": "single",
+                    "required": true,
+                    "sortOrder": 7,
+                    "responseSetKey": "ipip_neo_c1_self_efficacy10_responses",
+                    "randomizeOptions": false,
+                    "options": [
+                      {
+                        "value": "1",
+                        "label": "很不符合"
+                      },
+                      {
+                        "value": "2",
+                        "label": "比较不符合"
+                      },
+                      {
+                        "value": "3",
+                        "label": "介于不符合与符合之间"
+                      },
+                      {
+                        "value": "4",
+                        "label": "比较符合"
+                      },
+                      {
+                        "value": "5",
+                        "label": "很符合"
+                      }
+                    ]
+                  },
+                  {
+                    "itemCode": "IPIP_NEO_C1_SELF_EFFICACY10_09",
+                    "content": "我能作出的贡献很少。",
+                    "type": "single",
+                    "required": true,
+                    "sortOrder": 8,
+                    "responseSetKey": "ipip_neo_c1_self_efficacy10_responses",
+                    "randomizeOptions": false,
+                    "options": [
+                      {
+                        "value": "1",
+                        "label": "很不符合"
+                      },
+                      {
+                        "value": "2",
+                        "label": "比较不符合"
+                      },
+                      {
+                        "value": "3",
+                        "label": "介于不符合与符合之间"
+                      },
+                      {
+                        "value": "4",
+                        "label": "比较符合"
+                      },
+                      {
+                        "value": "5",
+                        "label": "很符合"
+                      }
+                    ]
+                  },
+                  {
+                    "itemCode": "IPIP_NEO_C1_SELF_EFFICACY10_10",
+                    "content": "我看不出事情会带来什么后果。",
+                    "type": "single",
+                    "required": true,
+                    "sortOrder": 9,
+                    "responseSetKey": "ipip_neo_c1_self_efficacy10_responses",
+                    "randomizeOptions": false,
+                    "options": [
+                      {
+                        "value": "1",
+                        "label": "很不符合"
+                      },
+                      {
+                        "value": "2",
+                        "label": "比较不符合"
+                      },
+                      {
+                        "value": "3",
+                        "label": "介于不符合与符合之间"
+                      },
+                      {
+                        "value": "4",
+                        "label": "比较符合"
+                      },
+                      {
+                        "value": "5",
+                        "label": "很符合"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "product": "school",
+      "method": "GET",
+      "path": "/api/campus/composite-attempts/d0300f43-5a09-4630-ad8a-d125dafd92a1?view=current-unit",
+      "status": 200,
+      "durationMs": 42,
+      "body": {
+        "code": 0,
+        "message": "操作成功",
+        "data": {
+          "id": "d0300f43-5a09-4630-ad8a-d125dafd92a1",
+          "assessmentId": "9923e999-463e-486d-9b97-c16453309df0",
+          "name": "合成C1系统验收 · SCHOOL",
+          "instruction": null,
+          "status": "IN_PROGRESS",
+          "taskSatisfaction": null,
+          "taskSatisfied": false,
+          "deliveryMode": "FINAL_ONLY",
+          "attemptEpoch": 1,
+          "definitionHash": "c2b199ddf5a01d8795513473b750aa3126f2345d69e54e8545f779221a7d1225",
+          "contextSnapshotHash": null,
+          "progress": 0,
+          "completedItems": 0,
+          "totalItems": 1,
+          "currentIndex": 0,
+          "startedAt": "2026-10-28T03:35:55.892Z",
+          "lastSavedAt": "2026-10-28T03:35:55.892Z",
+          "completedAt": null,
+          "anonymousCode": null,
+          "context": {
+            "status": "collecting",
+            "frozenAt": null,
+            "snapshotHash": null
+          },
+          "items": [
+            {
+              "id": "c6e0da32-8c67-46b0-9b8e-fe808079d124",
+              "type": "SCALE",
+              "position": 0,
+              "label": "一般任务自我效能感（IPIP-NEO C1 中文研究译稿）",
+              "completed": false,
+              "index": 0
+            }
+          ],
+          "units": [
+            {
+              "id": "c6e0da32-8c67-46b0-9b8e-fe808079d124",
+              "type": "SCALE",
+              "position": 0,
+              "required": true,
+              "label": "一般任务自我效能感（IPIP-NEO C1 中文研究译稿）",
+              "completed": false,
+              "index": 0,
+              "itemId": "c6e0da32-8c67-46b0-9b8e-fe808079d124"
+            }
+          ],
+          "currentItem": {
+            "id": "c6e0da32-8c67-46b0-9b8e-fe808079d124",
+            "type": "SCALE",
+            "position": 0,
+            "required": true,
+            "scaleAssessmentId": "1639315e-665f-4b80-98fe-cc5615f286dc",
+            "definitionHash": "99c88b01aa596875b10b95a65aa43dc10c4c3ad73bdffdf0546e21d327b7ff2c",
+            "presentationMode": "ONE_BY_ONE",
+            "answers": [],
+            "scale": {
+              "id": "e1c12e61-f884-4c62-af9e-f017e81ffebd",
+              "name": "一般任务自我效能感（IPIP-NEO C1 中文研究译稿）",
+              "instruction": "请根据你目前通常的情况，而不是希望将来成为的样子，判断下面各句话与你的实际情况有多符合。",
+              "description": "Public-domain IPIP representation, not proprietary NEO-PI-R items; standalone facet, not full NEO profile. Not equivalent to GSE or domain-specific academic self-efficacy.",
+              "instrumentVersion": "1.0.0",
+              "definition": {
+                "schemaVersion": 2,
+                "respondentType": "participant_self_report",
+                "display": {
+                  "randomizeItems": false
+                },
+                "items": [
+                  {
+                    "itemCode": "IPIP_NEO_C1_SELF_EFFICACY10_01",
+                    "content": "我能成功完成任务。",
+                    "type": "single",
+                    "required": true,
+                    "sortOrder": 0,
+                    "responseSetKey": "ipip_neo_c1_self_efficacy10_responses",
+                    "randomizeOptions": false,
+                    "options": [
+                      {
+                        "value": "1",
+                        "label": "很不符合"
+                      },
+                      {
+                        "value": "2",
+                        "label": "比较不符合"
+                      },
+                      {
+                        "value": "3",
+                        "label": "介于不符合与符合之间"
+                      },
+                      {
+                        "value": "4",
+                        "label": "比较符合"
+                      },
+                      {
+                        "value": "5",
+                        "label": "很符合"
+                      }
+                    ]
+                  },
+                  {
+                    "itemCode": "IPIP_NEO_C1_SELF_EFFICACY10_02",
+                    "content": "我在所做的事情上表现出色。",
+                    "type": "single",
+                    "required": true,
+                    "sortOrder": 1,
+                    "responseSetKey": "ipip_neo_c1_self_efficacy10_responses",
+                    "randomizeOptions": false,
+                    "options": [
+                      {
+                        "value": "1",
+                        "label": "很不符合"
+                      },
+                      {
+                        "value": "2",
+                        "label": "比较不符合"
+                      },
+                      {
+                        "value": "3",
+                        "label": "介于不符合与符合之间"
+                      },
+                      {
+                        "value": "4",
+                        "label": "比较符合"
+                      },
+                      {
+                        "value": "5",
+                        "label": "很符合"
+                      }
+                    ]
+                  },
+                  {
+                    "itemCode": "IPIP_NEO_C1_SELF_EFFICACY10_03",
+                    "content": "我能顺利处理任务。",
+                    "type": "single",
+                    "required": true,
+                    "sortOrder": 2,
+                    "responseSetKey": "ipip_neo_c1_self_efficacy10_responses",
+                    "randomizeOptions": false,
+                    "options": [
+                      {
+                        "value": "1",
+                        "label": "很不符合"
+                      },
+                      {
+                        "value": "2",
+                        "label": "比较不符合"
+                      },
+                      {
+                        "value": "3",
+                        "label": "介于不符合与符合之间"
+                      },
+                      {
+                        "value": "4",
+                        "label": "比较符合"
+                      },
+                      {
+                        "value": "5",
+                        "label": "很符合"
+                      }
+                    ]
+                  },
+                  {
+                    "itemCode": "IPIP_NEO_C1_SELF_EFFICACY10_04",
+                    "content": "我对自己的判断有把握。",
+                    "type": "single",
+                    "required": true,
+                    "sortOrder": 3,
+                    "responseSetKey": "ipip_neo_c1_self_efficacy10_responses",
+                    "randomizeOptions": false,
+                    "options": [
+                      {
+                        "value": "1",
+                        "label": "很不符合"
+                      },
+                      {
+                        "value": "2",
+                        "label": "比较不符合"
+                      },
+                      {
+                        "value": "3",
+                        "label": "介于不符合与符合之间"
+                      },
+                      {
+                        "value": "4",
+                        "label": "比较符合"
+                      },
+                      {
+                        "value": "5",
+                        "label": "很符合"
+                      }
+                    ]
+                  },
+                  {
+                    "itemCode": "IPIP_NEO_C1_SELF_EFFICACY10_05",
+                    "content": "我能想出好的解决办法。",
+                    "type": "single",
+                    "required": true,
+                    "sortOrder": 4,
+                    "responseSetKey": "ipip_neo_c1_self_efficacy10_responses",
+                    "randomizeOptions": false,
+                    "options": [
+                      {
+                        "value": "1",
+                        "label": "很不符合"
+                      },
+                      {
+                        "value": "2",
+                        "label": "比较不符合"
+                      },
+                      {
+                        "value": "3",
+                        "label": "介于不符合与符合之间"
+                      },
+                      {
+                        "value": "4",
+                        "label": "比较符合"
+                      },
+                      {
+                        "value": "5",
+                        "label": "很符合"
+                      }
+                    ]
+                  },
+                  {
+                    "itemCode": "IPIP_NEO_C1_SELF_EFFICACY10_06",
+                    "content": "我知道怎样把事情办好。",
+                    "type": "single",
+                    "required": true,
+                    "sortOrder": 5,
+                    "responseSetKey": "ipip_neo_c1_self_efficacy10_responses",
+                    "randomizeOptions": false,
+                    "options": [
+                      {
+                        "value": "1",
+                        "label": "很不符合"
+                      },
+                      {
+                        "value": "2",
+                        "label": "比较不符合"
+                      },
+                      {
+                        "value": "3",
+                        "label": "介于不符合与符合之间"
+                      },
+                      {
+                        "value": "4",
+                        "label": "比较符合"
+                      },
+                      {
+                        "value": "5",
+                        "label": "很符合"
+                      }
+                    ]
+                  },
+                  {
+                    "itemCode": "IPIP_NEO_C1_SELF_EFFICACY10_07",
+                    "content": "我会误判情况。",
+                    "type": "single",
+                    "required": true,
+                    "sortOrder": 6,
+                    "responseSetKey": "ipip_neo_c1_self_efficacy10_responses",
+                    "randomizeOptions": false,
+                    "options": [
+                      {
+                        "value": "1",
+                        "label": "很不符合"
+                      },
+                      {
+                        "value": "2",
+                        "label": "比较不符合"
+                      },
+                      {
+                        "value": "3",
+                        "label": "介于不符合与符合之间"
+                      },
+                      {
+                        "value": "4",
+                        "label": "比较符合"
+                      },
+                      {
+                        "value": "5",
+                        "label": "很符合"
+                      }
+                    ]
+                  },
+                  {
+                    "itemCode": "IPIP_NEO_C1_SELF_EFFICACY10_08",
+                    "content": "我弄不明白事情。",
+                    "type": "single",
+                    "required": true,
+                    "sortOrder": 7,
+                    "responseSetKey": "ipip_neo_c1_self_efficacy10_responses",
+                    "randomizeOptions": false,
+                    "options": [
+                      {
+                        "value": "1",
+                        "label": "很不符合"
+                      },
+                      {
+                        "value": "2",
+                        "label": "比较不符合"
+                      },
+                      {
+                        "value": "3",
+                        "label": "介于不符合与符合之间"
+                      },
+                      {
+                        "value": "4",
+                        "label": "比较符合"
+                      },
+                      {
+                        "value": "5",
+                        "label": "很符合"
+                      }
+                    ]
+                  },
+                  {
+                    "itemCode": "IPIP_NEO_C1_SELF_EFFICACY10_09",
+                    "content": "我能作出的贡献很少。",
+                    "type": "single",
+                    "required": true,
+                    "sortOrder": 8,
+                    "responseSetKey": "ipip_neo_c1_self_efficacy10_responses",
+                    "randomizeOptions": false,
+                    "options": [
+                      {
+                        "value": "1",
+                        "label": "很不符合"
+                      },
+                      {
+                        "value": "2",
+                        "label": "比较不符合"
+                      },
+                      {
+                        "value": "3",
+                        "label": "介于不符合与符合之间"
+                      },
+                      {
+                        "value": "4",
+                        "label": "比较符合"
+                      },
+                      {
+                        "value": "5",
+                        "label": "很符合"
+                      }
+                    ]
+                  },
+                  {
+                    "itemCode": "IPIP_NEO_C1_SELF_EFFICACY10_10",
+                    "content": "我看不出事情会带来什么后果。",
+                    "type": "single",
+                    "required": true,
+                    "sortOrder": 9,
+                    "responseSetKey": "ipip_neo_c1_self_efficacy10_responses",
+                    "randomizeOptions": false,
+                    "options": [
+                      {
+                        "value": "1",
+                        "label": "很不符合"
+                      },
+                      {
+                        "value": "2",
+                        "label": "比较不符合"
+                      },
+                      {
+                        "value": "3",
+                        "label": "介于不符合与符合之间"
+                      },
+                      {
+                        "value": "4",
+                        "label": "比较符合"
+                      },
+                      {
+                        "value": "5",
+                        "label": "很符合"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "product": "school",
+      "method": "POST",
+      "path": "/api/campus/composite-attempts/d0300f43-5a09-4630-ad8a-d125dafd92a1/items/c6e0da32-8c67-46b0-9b8e-fe808079d124/scale/submit",
+      "status": 200,
+      "durationMs": 108,
+      "body": {
+        "code": 0,
+        "message": "量表提交成功",
+        "data": {
+          "submissionId": "c650c4d9-d187-42a7-8f06-3b8248213451",
+          "payloadHash": "a64cb4225a81ef1f6ede4d1e5edd038b0a685bd0e41233802f67fa086e441879",
+          "replayed": false,
+          "completed": true,
+          "feedbackDeferred": true
+        }
+      }
+    },
+    {
+      "product": "school",
+      "method": "POST",
+      "path": "/api/campus/composite-attempts/d0300f43-5a09-4630-ad8a-d125dafd92a1/items/c6e0da32-8c67-46b0-9b8e-fe808079d124/scale/submit",
+      "status": 200,
+      "durationMs": 33,
+      "body": {
+        "code": 0,
+        "message": "量表提交已确认",
+        "data": {
+          "submissionId": "c650c4d9-d187-42a7-8f06-3b8248213451",
+          "payloadHash": "a64cb4225a81ef1f6ede4d1e5edd038b0a685bd0e41233802f67fa086e441879",
+          "replayed": true,
+          "completed": true,
+          "feedbackDeferred": true
+        }
+      }
+    },
+    {
+      "product": "school",
+      "method": "POST",
+      "path": "/api/campus/composite-attempts/d0300f43-5a09-4630-ad8a-d125dafd92a1/items/c6e0da32-8c67-46b0-9b8e-fe808079d124/scale/submit",
+      "status": 409,
+      "durationMs": 30,
+      "body": {
+        "code": "SUBMISSION_PAYLOAD_CONFLICT",
+        "message": "submissionId 已用于其他提交内容",
+        "data": null
+      }
+    },
+    {
+      "product": "school",
+      "method": "GET",
+      "path": "/api/campus/composite-attempts/d0300f43-5a09-4630-ad8a-d125dafd92a1?view=current-unit",
+      "status": 200,
+      "durationMs": 128,
+      "body": {
+        "code": 0,
+        "message": "操作成功",
+        "data": {
+          "id": "d0300f43-5a09-4630-ad8a-d125dafd92a1",
+          "assessmentId": "9923e999-463e-486d-9b97-c16453309df0",
+          "name": "合成C1系统验收 · SCHOOL",
+          "instruction": null,
+          "status": "COMPLETED",
+          "taskSatisfaction": null,
+          "taskSatisfied": false,
+          "deliveryMode": "FINAL_ONLY",
+          "attemptEpoch": 1,
+          "definitionHash": "c2b199ddf5a01d8795513473b750aa3126f2345d69e54e8545f779221a7d1225",
+          "contextSnapshotHash": null,
+          "progress": 100,
+          "completedItems": 1,
+          "totalItems": 1,
+          "currentIndex": 1,
+          "startedAt": "2026-10-28T03:35:55.892Z",
+          "lastSavedAt": "2026-10-28T03:35:55.892Z",
+          "completedAt": "2026-10-28T03:35:56.139Z",
+          "anonymousCode": null,
+          "context": {
+            "status": "collecting",
+            "frozenAt": null,
+            "snapshotHash": null
+          },
+          "items": [
+            {
+              "id": "c6e0da32-8c67-46b0-9b8e-fe808079d124",
+              "type": "SCALE",
+              "position": 0,
+              "label": "一般任务自我效能感（IPIP-NEO C1 中文研究译稿）",
+              "completed": true,
+              "index": 0
+            }
+          ],
+          "units": [
+            {
+              "id": "c6e0da32-8c67-46b0-9b8e-fe808079d124",
+              "type": "SCALE",
+              "position": 0,
+              "required": true,
+              "label": "一般任务自我效能感（IPIP-NEO C1 中文研究译稿）",
+              "completed": true,
+              "index": 0,
+              "itemId": "c6e0da32-8c67-46b0-9b8e-fe808079d124"
+            }
+          ],
+          "currentItem": null
+        }
+      }
+    },
+    {
+      "product": "teacher",
+      "method": "GET",
+      "path": "/api/huiteacher/auth/csrf",
+      "status": 200,
+      "durationMs": 3,
+      "body": {
+        "code": 0,
+        "message": "操作成功",
+        "data": {
+          "csrfToken": "[PRIVATE SYNTHETIC CAPABILITY]"
+        }
+      }
+    },
+    {
+      "product": "teacher",
+      "method": "POST",
+      "path": "/api/huiteacher/auth/login",
+      "status": 200,
+      "durationMs": 8,
+      "body": {
+        "code": 0,
+        "message": "登录成功",
+        "data": {
+          "user": {
+            "id": "c9394796-ad73-4cd3-bb49-b15ab18084fe",
+            "username": "sysprobe_teacher_0b5a76",
+            "role": "TEACHER"
+          },
+          "product": "HUITEACHER"
+        }
+      }
+    },
+    {
+      "product": "teacher",
+      "method": "POST",
+      "path": "/api/huiteacher/run-executions/c4b220a7-a698-44a9-a9a5-1b3a9b3429c3/start-assessment",
+      "status": 200,
+      "durationMs": 483,
+      "body": {
+        "code": 0,
+        "message": "操作成功",
+        "data": {
+          "state": "STARTED",
+          "runtimeBindingKind": "COMPOSITE",
+          "runtimeBindingRef": "9591e94d-e4d0-41cf-9ece-f73a355c6c5d",
+          "replayed": false
+        }
+      }
+    },
+    {
+      "product": "teacher",
+      "method": "GET",
+      "path": "/api/huiteacher/assessment-composite-attempts/9591e94d-e4d0-41cf-9ece-f73a355c6c5d?view=current-unit",
+      "status": 409,
+      "durationMs": 175,
+      "body": {
+        "code": "STALE_ATTEMPT",
+        "message": "ELIGIBILITY_INELIGIBLE:RESPONDENT_TYPE_NOT_ALLOWED",
+        "data": null
+      }
+    }
+  ],
+  "failures": [
+    {
+      "name": "School authenticated approved student: exact target R -> START/resume/FINAL/replay/report",
+      "error": {
+        "name": "PrismaClientValidationError",
+        "message": "\nInvalid `db.assessment.findMany()` invocation in\n/tmp/pr374-cloud/http.ts:39:40\n\n  36 const replay=await client.ok('POST',path+'/items/'+item.id+'/scale/submit',submission,extra);assert.equal(replay.replayed,true);row.sameSubmissionReplay=true\n  37 const changed=await client.raw('POST',path+'/items/'+item.id+'/scale/submit',{...submission,answers:submission.answers.map((a:any,i:number)=>i? a:{...a,responseValue:'4'})},extra);assert.equal(changed.status,409);row.changedReplayDenied=true\n  38 const reopened=await client.ok('GET',path+'?view=current-unit',undefined,extra);assert.equal(reopened.status,'COMPLETED');row.reopenedCompleted=true\n→ 39 const assessments=await db.assessment.findMany({\n       where: {\n         compositeAttemptId: \"d0300f43-5a09-4630-ad8a-d125dafd92a1\"\n       },\n       select: {\n         id: true,\n         status: true,\n         results: true,\n         ~~~~~~~\n         submissionId: true,\n     ?   timingEncrypted?: true,\n     ?   scaleId?: true,\n     ?   userId?: true,\n     ?   deliveryMode?: true,\n     ?   runtimeGeneration?: true,\n     ?   attemptEpoch?: true,\n     ?   submissionPayloadHash?: true,\n     ?   submissionCompletedAt?: true,\n     ?   answers?: true,\n     ?   answersRevision?: true,\n     ?   result?: true,\n     ?   runtimeSnapshotEncrypted?: true,\n     ?   compiledRuntimeHash?: true,\n     ?   frozenAdmissionSnapshotEncrypted?: true,\n     ?   frozenAdmissionSnapshotHash?: true,\n     ?   progress?: true,\n     ?   startedAt?: true,\n     ?   completedAt?: true,\n     ?   totalTime?: true,\n     ?   questionnaireAssessmentId?: true,\n     ?   compositeAttemptId?: true,\n     ?   compositeItemId?: true,\n     ?   subjectUserId?: true,\n     ?   respondentUserId?: true,\n     ?   respondentType?: true,\n     ?   episodeId?: true,\n     ?   assignmentRef?: true,\n     ?   consentId?: true,\n     ?   contextSnapshotRef?: true,\n     ?   resultFacts?: true,\n     ?   scale?: true,\n     ?   user?: true,\n     ?   episode?: true,\n     ?   consent?: true,\n     ?   questionnaireAssessment?: true,\n     ?   compositeAttempt?: true,\n     ?   compositeItem?: true,\n     ?   _count?: true\n       }\n     })\n\nUnknown field `results` for select statement on model `Assessment`. Available options are marked with ?."
+      }
+    },
+    {
+      "name": "Teacher authenticated same-person SELF: exact target R -> START/resume/FINAL/replay/report",
+      "error": {
+        "name": "AssertionError",
+        "message": "GET /api/huiteacher/assessment-composite-attempts/9591e94d-e4d0-41cf-9ece-f73a355c6c5d?view=current-unit {\"code\":\"STALE_ATTEMPT\",\"message\":\"ELIGIBILITY_INELIGIBLE:RESPONDENT_TYPE_NOT_ALLOWED\",\"data\":null}\n\n409 !== 200\n"
+      }
+    }
+  ],
+  "endedAt": "2026-10-28T03:35:57.075Z"
+}

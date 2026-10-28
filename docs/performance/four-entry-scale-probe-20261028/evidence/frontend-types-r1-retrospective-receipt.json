@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "node",
+    "node_modules/typescript/bin/tsc",
+    "-p",
+    "tsconfig.app.json",
+    "--noEmit"
+  ],
+  "exitCode": 0,
+  "node": "v24.22.1",
+  "componentTree": "562544f471ea6a7fbab998a5eea7ee2458a67eb8",
+  "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "sourceAssociationBasis": "Retrospective root association: original exec command output recorded exit=0; frontend files did not change between that execution and b27868e. No contemporaneous signed input receipt was captured.",
+  "originalExecutionSigned": false,
+  "receiptReconstructedAfterExecution": true
+}

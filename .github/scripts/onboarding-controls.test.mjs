@@ -88,3 +88,20 @@ test('first-feedback scope permits only reviewed mixed components and scans both
  assert.throws(()=>onboardingPlan(f.entries,base,head,read,f.env,f.b));
  const yaml=readFileSync('.github/workflows/ci.yml','utf8');assert(yaml.includes(".pr == 372 && 'paths: [server-version/backend/src/modules/survey, server-version/frontend/src/survey,"));
 });
+
+
+test('PR374 binds its own mixed source and keeps browser qualification inside the required admission job',()=>{
+ const f=fixture(),path='server-version/backend/src/modules/assessment-run/startExecution.ts',b={...f.b,pr:374,source:{[path]:{before:null,after:blob}}};
+ const entries=f.entries.map(e=>Object.hasOwn(f.b.source,e.file)?{...e,file:path}:e),env={...f.env,CI_PR_NUMBER:'374',CI_HEAD_REF:BRANCHES[374]};
+ const read=(cmd,a,...r)=>cmd==='rev-parse'&&a===base+':server-version/frontend'?h('9'):f.read(cmd,a,...r);
+ assert.equal(onboardingPlan(entries,base,head,read,env,b).pr,374);
+ assert.throws(()=>onboardingPlan(entries,base,head,read,{...env,CI_HEAD_REF:BRANCHES[372]},b));
+ const yaml=readFileSync('.github/workflows/ci.yml','utf8'),job=yaml.slice(yaml.indexOf('  onboarding-structure:\n'),yaml.indexOf('  report-planning:\n'));
+ assert(job.includes('node .github/scripts/pr374-browser.mjs'));assert(job.includes("pr == 374"));assert(job.includes('registry=https://registry.npmjs.org'));
+ assert.deepEqual(requiredChecks({scope:{outputs:{application_route:'onboarding-structure'}}},false),['scope','onboarding-structure','codeql']);
+ const browser=readFileSync('.github/scripts/pr374-browser.mjs','utf8');assert(browser.includes('chromiumSandbox:true'));assert(browser.includes('verifyChromeSandbox(browser)'));assert(!browser.includes('--no-sandbox'));assert(browser.includes('No simulated FINAL'));
+});
+
+test('PR374 reviewed HTTP source refuses an unreviewed original index',async()=>{
+ const {verifyPr374Observations}=await import('./pr374-evidence.mjs');assert.throws(()=>verifyPr374Observations({indexSHA256:'0'.repeat(64)}));
+});

@@ -6,7 +6,7 @@ import { canonicalHash } from '../assessment-runtime/canonical'
 import { getContentRelease } from '../measurement-content/repository'
 import { ContentReleaseError, prepareRelease } from '../measurement-content/release'
 import type { TrainingContentSnapshot } from './training-content-binding'
-import {validateTrainingStandardDerivedContent} from './training-standard-content'
+import {validateTrainingStandardDerivedContent,readTrainingStandardContentIdentity} from './training-standard-content'
 
 type Stored = NonNullable<Awaited<ReturnType<typeof getContentRelease>>>
 export const trainingReportSelectionSchema = z.object({schemaVersion:z.literal(1),units:z.array(z.object({
@@ -24,7 +24,7 @@ export async function validateTrainingReportPointer(db:Prisma.TransactionClient,
 }) {
   let report=input.releases.get(input.reportReleaseId)
   if(!report){const loaded=await getContentRelease(db,input.reportReleaseId,true);if(!loaded)fail();report=loaded;input.releases.set(report.releaseId,report)}
-  if(input.unit.source.standardCombination){
+  if(input.unit.source.standardCombination&&!input.unit.source.educationBinding){
     if(report.layer!=='REPORT'||input.contentHash!==undefined&&report.contentHash!==input.contentHash||input.publication&&report.status!=='PUBLISHED')fail()
     await validateTrainingStandardDerivedContent(db,input.unit,report,{compositeId:input.compositeId,ownerId:input.ownerId})
     return {releaseId:report.releaseId,contentHash:report.contentHash}
@@ -33,6 +33,10 @@ export async function validateTrainingReportPointer(db:Prisma.TransactionClient,
   if(scope.kind==='PLATFORM'||scope.kind==='PRIVATE'&&['SCHOOL','TEACHER'].includes(scope.product)){
     if(report.layer!=='REPORT'||report.family!==input.unit.family||input.publication&&report.status!=='PUBLISHED'
       ||input.contentHash!==undefined&&report.contentHash!==input.contentHash)fail()
+    // Education publication can explicitly select a separately authorized target
+    // report. Retain the original approved STANDARD measurement/axis identity,
+    // then require this exact persisted education target and its audience.
+    if(input.unit.source.standardCombination)await readTrainingStandardContentIdentity(db,input.unit,{compositeId:input.compositeId,ownerId:input.ownerId})
     const source=await assertEducationRuntimeContentScope(db,{...input,release:report})
     const measurement=input.releases.get(input.unit.measurement.releaseId)??source.releases.get(input.unit.measurement.releaseId)
     if(!measurement||measurement.layer!=='MEASUREMENT'||measurement.contentHash!==input.unit.measurement.contentHash
@@ -42,6 +46,7 @@ export async function validateTrainingReportPointer(db:Prisma.TransactionClient,
       ||report.content.metricKeys.some(key=>!measurement.content.metrics.some(metric=>metric.metricKey===key)))fail()
     return {releaseId:report.releaseId,contentHash:report.contentHash}
   }
+  if(input.unit.source.standardCombination)fail()
   if(report.layer!=='REPORT'||report.family!==input.unit.family||scope.kind!=='PRIVATE'||scope.product!=='TRAINING'
     ||scope.ownerId!==input.ownerId||scope.resourceId!==input.compositeId||input.publication&&report.status!=='PUBLISHED'
     ||input.contentHash!==undefined&&report.contentHash!==input.contentHash||prepareRelease({layer:report.layer,family:report.family,key:report.key,version:report.version,scope:report.scope,assetRefs:report.assetRefs,sourceReleaseId:report.sourceReleaseId,provenance:report.provenance,content:report.content}).contentHash!==report.contentHash)fail()

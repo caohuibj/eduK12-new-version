@@ -1,0 +1,10 @@
+Teacher foreign organization and recipient withdrawal keep current report authorization The expression evaluated to a falsy value:
+
+  assert.ok([403,404].includes(revoked.status))
+
+Canonical readback: same C1/source/scoring/report axes, seven saved 30s, original failed attempt preserved Expected values to be strictly equal:
++ actual - expected
+
++ 'da584438487e1e0800694b62f15ffb688110cee5371ecb82abfa4623bf4c7b92'
+- '1.0.1'
+

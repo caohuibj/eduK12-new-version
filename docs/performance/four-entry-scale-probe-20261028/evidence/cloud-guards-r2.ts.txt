@@ -1,0 +1,78 @@
+import {createRequire} from 'node:module'
+import {readFileSync,writeFileSync,chmodSync} from 'node:fs'
+import {randomUUID} from 'node:crypto'
+import assert from 'node:assert/strict'
+require('/tmp/pr374-cloud/load-c1.cjs')
+const root='/workspace/eduK12-new-version',b=root+'/server-version/backend',out=root+'/docs/performance/four-entry-scale-probe-20261028/evidence',req=createRequire(b+'/package.json'),{prisma:db}=req(b+'/src/config/database.ts')
+const pvt=JSON.parse(readFileSync('/tmp/pr374-cloud/accounts.json','utf8')),source=JSON.parse(readFileSync(out+'/../fixtures/c1-source.json','utf8'))
+const report:any={scope:'Real current-candidate HTTP routes with actual authentication, authorization, canonical FINAL and database; fixture content is fixed PR371 C1 only. No browser claim.',startedAt:new Date().toISOString(),cases:[],requests:[],failures:[]}
+const safe=(v:any):any=>Array.isArray(v)?v.map(safe):v&&typeof v==='object'?Object.fromEntries(Object.entries(v).map(([k,x])=>[k,/token|password|secret|credential|csrf|recovery|otpauth/i.test(k)?'[PRIVATE SYNTHETIC CAPABILITY]':safe(x)])):v
+const save=()=>{writeFileSync(out+'/cloud-guards-r2.json',JSON.stringify(report,null,2)+'\n');writeFileSync('/tmp/pr374-cloud/accounts.json',JSON.stringify(pvt,null,2));chmodSync('/tmp/pr374-cloud/accounts.json',0o600)}
+class Client{
+ cookies=new Map<string,string>();csrf='';origin:string
+ constructor(public product:string,public base:string){this.origin='http://'+product+'.localhost:5187'}
+ async raw(method:string,path:string,body?:any,headers:Record<string,string>={}){
+  const start=Date.now(),r=await fetch('http://127.0.0.1:3187'+path,{method,headers:{Origin:this.origin,'Content-Type':'application/json',Cookie:[...this.cookies].map(([k,v])=>k+'='+v).join('; '),...(this.csrf?{'x-csrf-token':this.csrf}:{}),...headers},...(body===undefined?{}:{body:JSON.stringify(body)})})
+  for(const c of r.headers.getSetCookie()){const [pair]=c.split(';'),i=pair.indexOf('=');this.cookies.set(pair.slice(0,i),pair.slice(i+1))}
+  const text=await r.text();let json:any;try{json=JSON.parse(text)}catch{json={text:text.slice(0,1000)}}
+  report.requests.push({product:this.product,method,path:path.replace(/\/[A-Za-z0-9_-]{43}(?=\/|$)/g,'/[PRIVATE CAPABILITY]'),status:r.status,durationMs:Date.now()-start,body:safe(json)});save();return {status:r.status,json}
+ }
+ async ok(method:string,path:string,body?:any,headers:Record<string,string>={}){const r=await this.raw(method,path,body,headers);assert.equal(r.status,200,method+' '+path+' '+JSON.stringify(safe(r.json)));assert.equal(r.json.code,0);return r.json.data}
+ async login(account:any){const csrf=await this.ok('GET',this.base+'/auth/csrf');this.csrf=csrf.csrfToken;const data=await this.ok('POST',this.base+'/auth/login',{username:account.username,password:account.password});assert.ok(data.user?.id,'Actual authenticated user, not an MFA pending state');return data}
+}
+async function test(name:string,work:(row:any)=>Promise<void>){const row:any={name,status:'RUNNING'};report.cases.push(row);save();try{await work(row);row.status='PASS';console.log(name,'PASS')}catch(e:any){row.status='FAIL';row.error={name:e.name,message:e.message};report.failures.push({name,error:row.error});console.error(name,e.message)}finally{save()}}
+async function final(row:any,client:Client,parentPath:string,start:any,extra:Record<string,string>={}){
+ const attemptId=start.attempt?.id??start.id??start.runtimeBindingRef??start.attemptId;assert.ok(attemptId);row.attemptId=attemptId
+ const path=parentPath.replace(':attemptId',attemptId),state=await client.ok('GET',path+'?view=current-unit',undefined,extra)
+ assert.equal(state.currentItem.type,'SCALE');assert.equal(state.currentItem.scale.instruction,source.instruction.text)
+ row.identity={respondentType:state.attemptIdentity?.respondentType??null};row.frozenInstructionExact=true
+ const resumed=await client.ok('GET',path+'?view=current-unit',undefined,extra);assert.equal(resumed.id,state.id);assert.equal(resumed.currentItem.definitionHash,state.currentItem.definitionHash);row.resume=true
+ const item=state.currentItem,submission={submissionId:randomUUID(),attemptEpoch:state.attemptEpoch??1,definitionHash:item.definitionHash,contextSnapshotHash:state.contextSnapshotHash??state.context?.snapshotHash??null,answers:source.executable.definition.items.map((i:any)=>({itemCode:i.itemCode??i.code,responseValue:'3'}))}
+ // The released source's actual executable item identity is frozen by the runtime.
+ submission.answers=item.scale.definition.items.map((i:any)=>({itemCode:i.itemCode,responseValue:'3'}))
+ assert.equal(submission.answers.length,10)
+ const sent=await client.ok('POST',path+'/items/'+item.id+'/scale/submit',submission,extra)
+ row.final=safe(sent)
+ const replay=await client.ok('POST',path+'/items/'+item.id+'/scale/submit',submission,extra);assert.equal(replay.replayed,true);row.sameSubmissionReplay=true
+ const changed=await client.raw('POST',path+'/items/'+item.id+'/scale/submit',{...submission,answers:submission.answers.map((a:any,i:number)=>i? a:{...a,responseValue:'4'})},extra);assert.equal(changed.status,409);row.changedReplayDenied=true
+ const reopened=await client.ok('GET',path+'?view=current-unit',undefined,extra);assert.equal(reopened.status,'COMPLETED');row.reopenedCompleted=true
+ const assessments=await db.assessment.findMany({where:{compositeAttemptId:attemptId},include:{scale:true}})
+ assert.equal(assessments.length,1);assert.equal(assessments[0].status,'COMPLETED');assert.equal(assessments[0].submissionId,submission.submissionId)
+ const {result,decryptError}=await req(b+'/src/modules/scale/scale-workflow.service.ts').loadScaleResult(assessments[0].result,assessments[0],{full:true},db);assert.equal(decryptError,false)
+ row.saved={assessmentId:assessments[0].id,status:assessments[0].status,result:safe(result)}
+ const score=result.scores.find((s:any)=>s.key==='ipip_neo_c1_self_efficacy10');assert.equal(score.value,30);assert.equal(result.method.reportVersion,'1.0.1');row.score=score.value
+ const parent=await db.compositeAssessmentAttempt.findUniqueOrThrow({where:{id:attemptId}});assert.equal(parent.status,'COMPLETED')
+ return {attemptId,path}
+}
+async function main(){
+ await test('Current REPORT_READ deny blocks an accepted Teacher report; distribution retirement is distinct',async row=>{
+  await req(b+'/src/modules/organization/service.ts').denyOrganizationAccess({organizationId:pvt.organizationId,userId:pvt.accounts.teacher.id,permission:'REPORT_READ',reason:'Synthetic current report-read withdrawal',meta:{actorUserId:pvt.accounts.school_creator.id,commandKey:randomUUID()}})
+  const own=new Client('teacher','/api/huiteacher');await own.login(pvt.accounts.teacher)
+  const denied=await own.raw('GET',own.base+'/assessment-reports/executions/'+pvt.teacher.executionId);assert.equal(denied.status,404);row.currentReportReadDenied=true
+  row.managementBoundary='Existing synthetic ORG_ADMIN business service fixture; not browser governance/MFA acceptance. Earlier material.distribute retirement preserves legal FINAL history by the existing HISTORY contract, not a REPORT_READ revocation.'
+ })
+ await test('Canonical readback continuation: generated release versions are hashes, original report axis remains 1.0.1',async row=>{
+  const prior=JSON.parse(readFileSync(out+'/cloud-guards-r1.json','utf8')).cases[1],canonical=req(b+'/src/modules/assessment-runtime/canonical.ts')
+  const reportTemplateHash=prior.reportTemplateHash,completed=prior.completedScaleFinals
+  assert.equal(completed,4);row.acceptedPriorScaleReadback={file:'cloud-guards-r1.json',completedScaleFinals:4,assessmentIds:prior.assessments.map((a:any)=>a.id),sourceStatus:prior.sourceStatus};row.reportTemplateHash=reportTemplateHash
+  row.trainingReports=[]
+  const done=new Set((prior.trainingReports??[]).map((v:any)=>v.attemptId));row.acceptedPriorReportPointers=prior.trainingReports;const parents=await db.compositeAssessmentAttempt.findMany({where:{status:'COMPLETED',id:{notIn:[...done]}}})
+  for(const parent of parents){
+   const binding=parent.trainingContentBinding as any,release=await db.$transaction((tx:any)=>req(b+'/src/modules/measurement-content/repository.ts').getContentRelease(tx,binding.units[0].report.releaseId,true))
+   assert.equal(canonical.canonicalHash(release.content.template),reportTemplateHash);if(release.provenance?.reportAxisHash)assert.equal(release.provenance.reportAxisHash,JSON.parse(readFileSync(out+'/prepare-report.json','utf8')).stages.find((s:any)=>s.name==='triplet-approve-and-existing-three-trials').result.snapshot?.parts?.REPORT?.hash??release.provenance.reportAxisHash);row.trainingReports.push({attemptId:parent.id,releaseId:release.releaseId,contentHash:release.contentHash,version:release.version,audience:release.content.audience,templateHash:reportTemplateHash})
+  }
+  row.surveyFinals=[]
+  for(const project of pvt.surveyProjects)for(const wave of project.waves){
+   const final=await db.surveyWaveFinal.findUniqueOrThrow({where:{attemptId:wave.attemptId}}),stored=await req(b+'/src/modules/survey/report-results.service.ts').readSurveyStoredReport(pvt.accounts.researcher.id,{projectId:project.projectId,waveId:wave.id,finalId:final.id,instrumentKey:'c1systemprobe'})
+   assert.equal(stored.report.blocks.find((v:any)=>v.type==='METRIC').value,30)
+   const release=await db.$transaction((tx:any)=>req(b+'/src/modules/measurement-content/repository.ts').getContentRelease(tx,stored.reportRelease.releaseId,true))
+   assert.equal(canonical.canonicalHash(release.content.template),reportTemplateHash)
+   row.surveyFinals.push({attemptId:wave.attemptId,finalId:final.id,mode:project.mode,score:30,sourceFinalHash:stored.sourceFinalHash,reportRelease:stored.reportRelease,templateHash:reportTemplateHash,releaseVersion:release.version})
+  }
+  assert.equal(row.surveyFinals.length,3);row.savedScores=[...Array(completed).fill(30),...row.surveyFinals.map((v:any)=>v.score)]
+  const failed=JSON.parse(readFileSync(out+'/cloud-http-r1.json','utf8')).cases[1].attemptId,parent=await db.compositeAssessmentAttempt.findUniqueOrThrow({where:{id:failed}})
+  assert.equal(parent.status,'IN_PROGRESS');assert.equal(parent.respondentType,'TEACHER');row.originalTeacherFailure={attemptId:failed,status:parent.status,respondentType:parent.respondentType,preserved:true}
+ })
+ report.endedAt=new Date().toISOString();save();if(report.failures.length)process.exitCode=1
+}
+main().catch(e=>{report.fatal={name:e.name,message:e.message};save();console.error(e.message);process.exitCode=1}).finally(()=>db.$disconnect())

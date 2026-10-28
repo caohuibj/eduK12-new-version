@@ -2,8 +2,9 @@ import {validateTrainingReferenceRelease} from '../../modules/composite/training
 import {beforeEach,describe,it,expect,vi} from 'vitest'
 import {prepareRelease} from '../../modules/measurement-content/release'
 import type {StoredRelease} from '../../modules/measurement-content/repository'
-const m=vi.hoisted(()=>({source:vi.fn()}))
+const m=vi.hoisted(()=>({source:vi.fn(),standardIdentity:vi.fn(),standardDerived:vi.fn()}))
 vi.mock('../../modules/education-tools/assessment-resource.repository',()=>({readEducationAssessmentDeliveryIdentity:m.source}))
+vi.mock('../../modules/composite/training-standard-content',()=>({readTrainingStandardContentIdentity:m.standardIdentity,validateTrainingStandardDerivedContent:m.standardDerived}))
 import {validateTrainingReportPointer} from '../../modules/composite/training-report-selection'
 import {assertEducationRuntimeContentScope} from '../../modules/composite/education-content-scope'
 const id=(n:number)=>`00000000-0000-4000-8000-${String(n).padStart(12,'0')}`
@@ -60,4 +61,28 @@ it('connects a private education reference to the existing selector without turn
  const result=await validateTrainingReferenceRelease(f.db as never,{unit:f.unit,ownerId:id(3),compositeId:id(4),releaseId:reference.releaseId,contentHash:reference.contentHash,purpose:'HISTORY',releases:f.source.releases})
  expect(result).toMatchObject({releaseId:reference.releaseId,contentHash:reference.contentHash,measurementReleaseId:measurement.releaseId})
  expect(result.entries[0].referenceKind).toBe('theoretical_range')
+})
+
+
+describe('explicit education target report on an approved STANDARD measurement',()=>{
+ it.each(['SCHOOL','TEACHER'] as const)('uses persisted %s target report while retaining original standard identity and target fences',async product=>{
+  const f=fixture()
+  const release={...f.release,...prepareRelease({layer:'REPORT',key:f.release.key,version:f.release.version,assetRefs:f.release.assetRefs,sourceReleaseId:f.release.sourceReleaseId,provenance:f.release.provenance,family:'SCALE',scope:{kind:'PRIVATE',product,ownerId:id(3),resourceId:id(4)},content:{...(f.release as any).content,audience:product==='SCHOOL'?'student':'teacher'}} as any)} as StoredRelease
+  const unit={...f.unit,family:'SCALE' as const,source:{kind:'SCALE' as const,id:id(7),ownerId:id(3),standardCombination:{} as any,educationBinding:{} as any},report:{releaseId:release.releaseId,contentHash:release.contentHash}}
+  const source={...f.source,origin:{product,units:[{...unit,references:[]}]},releases:new Map<string,StoredRelease>([[release.releaseId,release],[measurement.releaseId,{releaseId:measurement.releaseId,layer:'MEASUREMENT',family:'SCALE',contentHash:measurement.contentHash,content:{metrics:[{metricKey:'latency'}]}} as StoredRelease]])}
+  f.db.$queryRaw.mockResolvedValue([{id:id(9),product,organization_id:id(10)}] as any)
+  m.source.mockResolvedValue(source);m.standardIdentity.mockResolvedValue({verified:true})
+  const input={unit,compositeId:id(4),ownerId:id(3),reportReleaseId:release.releaseId,contentHash:release.contentHash,publication:false,releases:source.releases}
+  await expect(validateTrainingReportPointer(f.db as never,input)).resolves.toEqual(unit.report)
+  expect(m.standardIdentity).toHaveBeenCalledWith(f.db,unit,{compositeId:id(4),ownerId:id(3)})
+  expect(m.standardDerived).not.toHaveBeenCalled()
+  source.origin.units[0].report={releaseId:id(99),contentHash:release.contentHash}
+  await expect(validateTrainingReportPointer(f.db as never,input)).rejects.toThrow('SCOPE_DENIED')
+ })
+ it('retains exact derived-report enforcement for non-education STANDARD Training',async()=>{
+  const f=fixture(),unit={...f.unit,source:{...f.unit.source,standardCombination:{} as any}}
+  m.standardDerived.mockRejectedValueOnce(new Error('CONTENT_STANDARD_DERIVED_RELEASE_IDENTITY_MISMATCH'))
+  await expect(validateTrainingReportPointer(f.db as never,{unit,compositeId:id(4),ownerId:id(3),reportReleaseId:f.release.releaseId,contentHash:f.release.contentHash,publication:false,releases:f.source.releases})).rejects.toThrow('DERIVED_RELEASE_IDENTITY_MISMATCH')
+  expect(m.standardDerived).toHaveBeenCalledOnce();expect(m.source).not.toHaveBeenCalled();expect(m.standardIdentity).not.toHaveBeenCalled()
+ })
 })

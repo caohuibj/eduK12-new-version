@@ -158,6 +158,7 @@ const startTransactionalComposite = async (input: {
       userId: true,
       subjectUserId: true,
       respondentUserId: true,
+      respondentType: true,
       episodeId: true,
       assignmentRef: true,
       consentId: true,
@@ -169,6 +170,7 @@ const startTransactionalComposite = async (input: {
       || existing.userId !== input.actorUserId
       || existing.subjectUserId !== admission.attemptIdentity.subjectUserId
       || existing.respondentUserId !== admission.attemptIdentity.respondentUserId
+      || existing.respondentType !== admission.attemptIdentity.respondentType
       || existing.episodeId !== admission.attemptIdentity.episodeId
       || existing.assignmentRef !== admission.attemptIdentity.assignmentRef
       || existing.consentId !== admission.attemptIdentity.consentId
@@ -220,6 +222,14 @@ const startTransactionalComposite = async (input: {
   const repository = createSqlRelationalAssignmentRepository(tx as any)
   const relational = createRelationalAssessmentService(repository)
   const started = await relational.start({ assignmentId: admission.assignment.assignmentId, actorUserId: input.actorUserId })
+  // The claim freezes runtime identity before this transaction. The relational
+  // transition still checks current assignment/consent authority, but its legacy
+  // occupational respondent mapping must not replace that admitted identity.
+  for (const key of ['subjectUserId', 'respondentUserId', 'episodeId', 'assignmentRef', 'consentId'] as const) {
+    if (started.attemptIdentity[key] !== admission.attemptIdentity[key]) {
+      throw new RunStartExecutionError('RUN_RUNTIME_BINDING_MISMATCH', 'current assignment or consent differs from frozen Run admission', 409)
+    }
+  }
   const nowRows = await tx.$queryRaw<Array<{ now: Date }>>`SELECT transaction_timestamp() AS "now"`
   const now = nowRows[0].now
   const dispatched = await tx.$executeRaw`
@@ -232,7 +242,7 @@ const startTransactionalComposite = async (input: {
   const attempt = await startRelationalCompositeAttemptInTransaction(tx as any, {
     compositeAssessmentId: input.launch.runtimeTargetRef,
     respondentUserId: input.actorUserId,
-    attemptIdentity: started.attemptIdentity,
+    attemptIdentity: admission.attemptIdentity,
     educationStart: educationSource?.startProof,
   })
   const changed = await tx.$executeRaw`

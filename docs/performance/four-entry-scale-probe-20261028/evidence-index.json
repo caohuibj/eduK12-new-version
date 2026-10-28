@@ -1,0 +1,156 @@
+{
+  "base": "8774b1cf158dae1c5eb0f4950044c6ae6d6a18dd",
+  "applicationHead": "b27868e73adc023e59a9e4e862d669e5112adaf9",
+  "postgresTestBlob": "8db5039605547193526ed1563bb19d87a0002247",
+  "sourceAssociation": "Application changes unchanged since b27868e. New PG test ran uncommitted; exact source blob is indexed, not falsely included in the original execution HEAD. Earlier test source associations are retrospective; failed invocations and filtered tests retained.",
+  "backendTypes": "Original r1 exit0 observed, but new target-report tests were added later. No final-backend-tree type qualification claimed.",
+  "frontendTypes": "Actual exit0 observed; unchanged frontend tree associated retrospectively in the explicit receipt.",
+  "browser": "No browser PASS. Default local launch failed; escalation wrapper failed; separate cloud browser cannot reach local host and data URLs are denied. No security configuration changed.",
+  "files": [
+    {
+      "path": "evidence/backend-types-r1.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/browser-availability-r2.log",
+      "sha256": "21b9432a43972c1e5ee33d160ef624844c512cd32e1b75e05c4efc5a38a24d59",
+      "bytes": 269
+    },
+    {
+      "path": "evidence/browser-availability.log",
+      "sha256": "63ee970d0e41da866e6b2db29bd2588390ed90e3d1389de1601b56f4b89a5b85",
+      "bytes": 377
+    },
+    {
+      "path": "evidence/frontend-types-r1-retrospective-receipt.json",
+      "sha256": "d2c8e76c9f5005ece84103b07610faf6bfd6da4843848717c976266830f53ab7",
+      "bytes": 617
+    },
+    {
+      "path": "evidence/frontend-types-r1.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/instruction-r1.json",
+      "sha256": "1e71309c5a62325a8ed8068f52b32a4245fb4568238a2621a46733b7fb3dc4cc",
+      "bytes": 12669
+    },
+    {
+      "path": "evidence/instruction-r1.log",
+      "sha256": "72ef489477489641f58914dd855f2442e6cdf0191d514e160184bea7eadf579a",
+      "bytes": 102
+    },
+    {
+      "path": "evidence/labels-backend.json",
+      "sha256": "c1fcac5d451ad807179cd3fe51ed783f3f158bde56697a58d4ec39bb58b55e06",
+      "bytes": 8410
+    },
+    {
+      "path": "evidence/labels-backend.log",
+      "sha256": "98d3a118d66416ace3f283533f525bb08091ead3698080d9936c96a2505c0cf9",
+      "bytes": 102
+    },
+    {
+      "path": "evidence/labels-frontend-r1.json",
+      "sha256": "604cdbd4131053964c6235f196e965f5e22a66572b48c5a4c19509eca6f999f1",
+      "bytes": 50635
+    },
+    {
+      "path": "evidence/labels-frontend-r1.log",
+      "sha256": "befbffc130cb3925f7b08da2fa7d2a95af87afeeaf52c2b7030f01f40b166610",
+      "bytes": 106
+    },
+    {
+      "path": "evidence/labels-frontend-r2.json",
+      "sha256": "f3c0ef1d2b4dfecb7c3e6921666fc1cd3a6b630fc06847dcd9c523f82a49ed77",
+      "bytes": 20448
+    },
+    {
+      "path": "evidence/labels-frontend-r2.log",
+      "sha256": "9cfe5bc9a1f6805b34fd8c0f145b7b4594f6ab607f1abfeebf818d0b8932d880",
+      "bytes": 106
+    },
+    {
+      "path": "evidence/run-target-report-pg.py.txt",
+      "sha256": "cdb29f212c69ea73a293084d36ef7793aa44f1487f27fe766d4b7d09ae0172df",
+      "bytes": 4671
+    },
+    {
+      "path": "evidence/self-identity-legacy-r2.json",
+      "sha256": "9ae4d3556ab1810f8305932303fb474892bfa472fe745a58ae96396852b5c33f",
+      "bytes": 4174
+    },
+    {
+      "path": "evidence/self-identity-legacy-r2.log",
+      "sha256": "1359a54b3b47ae2f15327abd9348a33b8ba4614ba5c0f014c8bbe9c16344fb86",
+      "bytes": 111
+    },
+    {
+      "path": "evidence/self-identity-legacy.json",
+      "sha256": "0af34c23cb45114ab6d6b48d0fce54e624d0da37a99a3bf41bf8ee71d0d63573",
+      "bytes": 3869
+    },
+    {
+      "path": "evidence/self-identity-legacy.log",
+      "sha256": "0f9a53a9b8f1c67ebd4967d155f83bdb481b7293ee4c7c53bde61946b48839b1",
+      "bytes": 108
+    },
+    {
+      "path": "evidence/self-identity.json",
+      "sha256": "1d23bfb06d89a4499a5311894a17204bbd87c7346c827eb07d6f7ca7e3200666",
+      "bytes": 3960
+    },
+    {
+      "path": "evidence/self-identity.log",
+      "sha256": "1aa14863f4faeae925fa88b05aad0faa3af8c83bfbab564f5f4e31f9d62fcc44",
+      "bytes": 101
+    },
+    {
+      "path": "evidence/target-report-pg-migrate.log",
+      "sha256": "c1fcb2a5b1f950ca4826f478a226be50d97bbd2842d853909474fda159eccea0",
+      "bytes": 34107
+    },
+    {
+      "path": "evidence/target-report-pg-r1-execution.json",
+      "sha256": "832f6d9693040834db06bd111db8de24063bd6a5ee0a2f6ae11a63e2d3be07f9",
+      "bytes": 342
+    },
+    {
+      "path": "evidence/target-report-pg-r1.json",
+      "sha256": "73b8e1a33c9b1eb916c07e511d2807bf045b1c1ca4d3c7249d7ca6c4282d5ff5",
+      "bytes": 2574
+    },
+    {
+      "path": "evidence/target-report-pg-r1.log",
+      "sha256": "a7b620b17002d070b42b3fc3dd6d8ae2f709da23695546a8c213722043dba523",
+      "bytes": 107
+    },
+    {
+      "path": "evidence/target-report-pg-services.log",
+      "sha256": "ee47a0d9ca8a68323131bf6bc983f0f509c58a19a9567ea7ef36f092ab0f2f84",
+      "bytes": 22037
+    },
+    {
+      "path": "evidence/target-report-unit-r1.json",
+      "sha256": "1b8e8a62c2c70faea1da5545d327d09c07e65112bdc1d38bcc21812b654a7894",
+      "bytes": 8110
+    },
+    {
+      "path": "evidence/target-report-unit-r1.log",
+      "sha256": "3b3f735de9964fc4ee31a1bd962da3b3df8beff80890fb93f9085f1c78beb8e6",
+      "bytes": 109
+    },
+    {
+      "path": "evidence/target-report-unit-r2.json",
+      "sha256": "1376572e606bd1ea70649962c8795d3d245c37cb40e1666e4bdb54e8ad07df13",
+      "bytes": 4607
+    },
+    {
+      "path": "evidence/target-report-unit-r2.log",
+      "sha256": "4a1ff4b9a910d5d3d11a8095b4ea69317a4f2cb75a6d1a1dee5682042e5647dd",
+      "bytes": 109
+    }
+  ]
+}

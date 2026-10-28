@@ -1,0 +1,347 @@
+The files belonging to this database system will be owned by user "agent".
+This user must also own the server process.
+
+The database cluster will be initialized with locale "C".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+creating directory /workspace/scratch/5a77e8bdc1ae/scale-probe-fixes-evidence/pgdata-target-report ... ok
+creating subdirectories ... ok
+selecting dynamic shared memory implementation ... posix
+selecting default "max_connections" ... 100
+selecting default "shared_buffers" ... 128MB
+selecting default time zone ... UTC
+creating configuration files ... ok
+running bootstrap script ... ok
+performing post-bootstrap initialization ... ok
+syncing data to disk ... ok
+
+Success. You can now start the database server using:
+
+    /workspace/scratch/5a77e8bdc1ae/four-entry-v2-evidence/tooling/root/usr/lib/postgresql/17/bin/pg_ctl -D /workspace/scratch/5a77e8bdc1ae/scale-probe-fixes-evidence/pgdata-target-report -l logfile start
+
+21:C 28 Oct 2026 03:24:24.635 # WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. Being disabled, it can also cause failures without low memory condition, see https://github.com/jemalloc/jemalloc/issues/1328. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+21:C 28 Oct 2026 03:24:24.635 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+21:C 28 Oct 2026 03:24:24.635 * Redis version=8.0.2, bits=64, commit=00000000, modified=0, pid=21, just started
+21:C 28 Oct 2026 03:24:24.635 * Configuration loaded
+21:M 28 Oct 2026 03:24:24.635 * monotonic clock: POSIX clock_gettime
+21:M 28 Oct 2026 03:24:24.636 * Running mode=standalone, port=56380.
+21:M 28 Oct 2026 03:24:24.636 * Server initialized
+21:M 28 Oct 2026 03:24:24.636 * Ready to accept connections tcp
+2026-10-28 03:24:24.642 UTC [20] LOG:  starting PostgreSQL 17.11 (Debian 17.11-0+deb13u1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+2026-10-28 03:24:24.642 UTC [20] LOG:  listening on IPv4 address "127.0.0.1", port 55433
+2026-10-28 03:24:24.644 UTC [30] LOG:  database system was shut down at 2026-10-28 03:24:24 UTC
+2026-10-28 03:24:24.647 UTC [20] LOG:  database system is ready to accept connections
+2026-10-28 03:24:24.740 UTC [35] FATAL:  database "v2_synthetic_owner" does not exist
+CREATE ROLE
+REVOKE
+REVOKE
+GRANT
+GRANT
+BEGIN
+SET
+SET
+          set_config          
+------------------------------
+ education_target_report_test
+(1 row)
+
+     set_config     
+--------------------
+ v2_synthetic_owner
+(1 row)
+
+      set_config      
+----------------------
+ v2_synthetic_runtime
+(1 row)
+
+                            set_config                            
+------------------------------------------------------------------
+ {                                                               +
+   "schemaVersion": 1,                                           +
+   "tables": {                                                   +
+     "_legacy_import_batches": "OPERATOR_ONLY",                  +
+     "_legacy_import_id_map": "OPERATOR_ONLY",                   +
+     "_prisma_migrations": "MIGRATION_LEDGER",                   +
+     "admin_authorization_audits": "RUNTIME_RW",                 +
+     "admin_entry_grants": "RUNTIME_RW",                         +
+     "admin_security_challenges": "RUNTIME_RW",                  +
+     "admin_security_keys": "RUNTIME_RW",                        +
+     "admin_totp_credentials": "RUNTIME_RW",                     +
+     "anonymous_studies": "RUNTIME_RW",                          +
+     "anonymous_study_attempts": "RUNTIME_RW",                   +
+     "anonymous_study_codes": "RUNTIME_RW",                      +
+     "anonymous_study_participants": "RUNTIME_RW",               +
+     "anonymous_study_participation_events": "RUNTIME_RW",       +
+     "anonymous_study_waves": "RUNTIME_RW",                      +
+     "assessment_attempt_consents": "RUNTIME_RW",                +
+     "assessment_composition_templates": "RUNTIME_RW",           +
+     "assessment_episodes": "RUNTIME_RW",                        +
+     "assessment_frozen_bindings": "RUNTIME_RW",                 +
+     "assessment_management_events": "RUNTIME_RW",               +
+     "assessment_public_templates": "RUNTIME_RW",                +
+     "assessment_reference_sets": "RUNTIME_RW",                  +
+     "assessment_result_facts": "RUNTIME_RW",                    +
+     "assessment_run_actor_snapshots": "RUNTIME_RW",             +
+     "assessment_run_execution_start_claims": "RUNTIME_RW",      +
+     "assessment_run_executions": "RUNTIME_RW",                  +
+     "assessment_run_relationship_snapshots": "RUNTIME_RW",      +
+     "assessment_run_tracks": "RUNTIME_RW",                      +
+     "assessment_runs": "RUNTIME_RW",                            +
+     "assessment_runtime_artifacts": "RUNTIME_RW",               +
+     "assessment_unit_snapshots": "RUNTIME_RW",                  +
+     "assessments": "RUNTIME_RW",                                +
+     "asset_references": "RUNTIME_RW",                           +
+     "assignments": "RUNTIME_RW",                                +
+     "bundle_analyses": "RUNTIME_RW",                            +
+     "bundle_instances": "RUNTIME_RW",                           +
+     "bundle_package_releases": "RUNTIME_RW",                    +
+     "campus_accounts": "RUNTIME_RW",                            +
+     "campus_activation_codes": "RUNTIME_RW",                    +
+     "campus_activities": "RUNTIME_RW",                          +
+     "campus_activity_allocation_receipts": "RUNTIME_RW",        +
+     "campus_activity_collaborators": "RUNTIME_RW",              +
+     "campus_activity_participants": "RUNTIME_RW",               +
+     "campus_activity_runs": "RUNTIME_RW",                       +
+     "campus_admission_incidents": "RUNTIME_RW",                 +
+     "campus_class_admissions": "RUNTIME_RW",                    +
+     "campus_mfa_challenges": "RUNTIME_RW",                      +
+     "campus_mfa_credentials": "RUNTIME_RW",                     +
+     "campus_mfa_recovery_codes": "RUNTIME_RW",                  +
+     "campus_mfa_reset_requests": "RUNTIME_RW",                  +
+     "campus_parent_registrations": "RUNTIME_RW",                +
+     "campus_peer_assignments": "RUNTIME_RW",                    +
+     "campus_peer_consents": "RUNTIME_RW",                       +
+     "campus_personnel": "RUNTIME_RW",                           +
+     "campus_personnel_import_batches": "RUNTIME_RW",            +
+     "campus_personnel_assignments": "RUNTIME_RW",               +
+     "campus_personnel_credentials": "RUNTIME_RW",               +
+     "campus_staff_invitations": "RUNTIME_RW",                   +
+     "campus_student_eligibilities": "RUNTIME_RW",               +
+     "campus_student_enrollments": "RUNTIME_RW",                 +
+     "campus_student_recoveries": "RUNTIME_RW",                  +
+     "checkin_access_tokens": "RUNTIME_RW",                      +
+     "checkin_schedules": "RUNTIME_RW",                          +
+     "checkin_submission_idempotency_receipts": "RUNTIME_RW",    +
+     "checkin_submissions": "RUNTIME_RW",                        +
+     "checkins": "RUNTIME_RW",                                   +
+     "classroom_answers": "RUNTIME_RW",                          +
+     "classroom_end_summaries": "RUNTIME_RW",                    +
+     "classroom_questions": "RUNTIME_RW",                        +
+     "classroom_sessions": "RUNTIME_RW",                         +
+     "classrooms": "RUNTIME_RW",                                 +
+     "cognitive_access_tokens": "RUNTIME_RW",                    +
+     "cognitive_assignments": "RUNTIME_RW",                      +
+     "cognitive_raw_submissions": "RUNTIME_RW",                  +
+     "cognitive_sessions": "RUNTIME_RW",                         +
+     "cognitive_test_configs": "RUNTIME_RW",                     +
+     "cognitive_trials": "RUNTIME_RW",                           +
+     "composite_analysis_snapshots": "RUNTIME_RW",               +
+     "composite_assessment_access_tokens": "RUNTIME_RW",         +
+     "composite_assessment_attempts": "RUNTIME_RW",              +
+     "composite_assessment_items": "RUNTIME_RW",                 +
+     "composite_assessments": "RUNTIME_RW",                      +
+     "composite_form_answers": "RUNTIME_RW",                     +
+     "composite_form_section_attempts": "RUNTIME_RW",            +
+     "composite_form_sections": "RUNTIME_RW",                    +
+     "composite_report_jobs": "RUNTIME_RW",                      +
+     "composite_report_queue_budget": "RUNTIME_RW",              +
+     "course_questionnaires": "RUNTIME_RW",                      +
+     "course_scales": "RUNTIME_RW",                              +
+     "course_shares": "RUNTIME_RW",                              +
+     "course_students": "RUNTIME_RW",                            +
+     "courses": "RUNTIME_RW",                                    +
+     "documents": "RUNTIME_RW",                                  +
+     "education_product_entitlements": "RUNTIME_RW",             +
+     "education_private_tool_versions": "RUNTIME_RW",            +
+     "education_private_tools": "RUNTIME_RW",                    +
+     "education_product_role_grants": "RUNTIME_RW",              +
+     "education_report_policy_snapshots": "RUNTIME_RW",          +
+     "education_report_privacy_preferences": "RUNTIME_RW",       +
+     "education_report_release_records": "RUNTIME_RW",           +
+     "education_teacher_scale_licenses": "RUNTIME_RW",           +
+     "education_teacher_staff_invitations": "RUNTIME_RW",        +
+     "education_teacher_student_invitations": "RUNTIME_RW",      +
+     "export_artifacts": "RUNTIME_RW",                           +
+     "export_batches": "RUNTIME_RW",                             +
+     "huiteacher_evaluation_events": "RUNTIME_RW",               +
+     "huiteacher_evaluation_run_links": "RUNTIME_RW",            +
+     "huiteacher_evaluation_targets": "RUNTIME_RW",              +
+     "huiteacher_external_expert_invites": "RUNTIME_RW",         +
+     "huiteacher_field_consensus_approvals": "RUNTIME_RW",       +
+     "huiteacher_field_consensus_sources": "RUNTIME_RW",         +
+     "huiteacher_field_consensuses": "RUNTIME_RW",               +
+     "huiteacher_field_event_forms": "RUNTIME_RW",               +
+     "huiteacher_field_feedback_releases": "RUNTIME_RW",         +
+     "huiteacher_field_form_evidence": "RUNTIME_RW",             +
+     "huiteacher_form_attempts": "RUNTIME_RW",                   +
+     "huiteacher_form_finals": "RUNTIME_RW",                     +
+     "huiteacher_form_instruments": "RUNTIME_RW",                +
+     "huiteacher_group_disclosure_ledgers": "RUNTIME_RW",        +
+     "huiteacher_improvement_actions": "RUNTIME_RW",             +
+     "huiteacher_improvement_reassessments": "RUNTIME_RW",       +
+     "huiteacher_observation_records": "RUNTIME_RW",             +
+     "huiteacher_observer_grants": "RUNTIME_RW",                 +
+     "huiteacher_personal_scale_attempts": "RUNTIME_RW",         +
+     "huiteacher_personal_scale_grants": "RUNTIME_RW",           +
+     "huiteacher_student_disclosure_ledgers": "RUNTIME_RW",      +
+     "huiteacher_student_eval_configs": "RUNTIME_RW",            +
+     "instrument_authorization_audits": "RUNTIME_RW",            +
+     "instrument_authorizations": "RUNTIME_RW",                  +
+     "material_grants": "RUNTIME_RW",                            +
+     "organization_access_denies": "RUNTIME_RW",                 +
+     "organization_assessment_delivery_grants": "RUNTIME_RW",    +
+     "organization_capability_grants": "RUNTIME_RW",             +
+     "organization_classification_dimensions": "RUNTIME_RW",     +
+     "organization_command_receipts": "RUNTIME_RW",              +
+     "organization_counselor_client_relationships": "RUNTIME_RW",+
+     "organization_episode_allocations": "RUNTIME_RW",           +
+     "organization_governance_audits": "RUNTIME_RW",             +
+     "organization_label_assignments": "RUNTIME_RW",             +
+     "organization_labels": "RUNTIME_RW",                        +
+     "organization_member_invitations": "RUNTIME_RW",            +
+     "organization_memberships": "RUNTIME_RW",                   +
+     "organization_persona_grants": "RUNTIME_RW",                +
+     "organization_staff_class_assignments": "RUNTIME_RW",       +
+     "organization_student_class_assignments": "RUNTIME_RW",     +
+     "organization_units": "RUNTIME_RW",                         +
+     "organizations": "RUNTIME_RW",                              +
+     "parent_invite_codes": "RUNTIME_RW",                        +
+     "parent_portal_audit": "RUNTIME_RW",                        +
+     "parent_report_consents": "RUNTIME_RW",                     +
+     "parent_report_disclosure_grants": "RUNTIME_RW",            +
+     "parent_report_publication_heads": "RUNTIME_RW",            +
+     "parent_report_publications": "RUNTIME_RW",                 +
+     "parent_student_relationships": "RUNTIME_RW",               +
+     "parent_tool_disclosure_policies": "RUNTIME_RW",            +
+     "parent_tool_disclosure_policy_events": "RUNTIME_RW",       +
+     "questionnaire_access_tokens": "RUNTIME_RW",                +
+     "questionnaire_assessments": "RUNTIME_RW",                  +
+     "questionnaire_course_deliveries": "RUNTIME_RW",            +
+     "questionnaire_form_answers": "RUNTIME_RW",                 +
+     "questionnaire_form_items": "RUNTIME_RW",                   +
+     "questionnaire_form_section_attempts": "RUNTIME_RW",        +
+     "questionnaire_form_sections": "RUNTIME_RW",                +
+     "questionnaire_scales": "RUNTIME_RW",                       +
+     "questionnaires": "RUNTIME_RW",                             +
+     "registered_assessment_resources": "RUNTIME_RW",            +
+     "education_assessment_deliveries": "RUNTIME_RW",            +
+     "relational_analysis_snapshots": "RUNTIME_RW",              +
+     "relational_assessment_assignments": "RUNTIME_RW",          +
+     "reporting_analysis_artifact_waves": "RUNTIME_RW",          +
+     "reporting_analysis_artifacts": "RUNTIME_RW",               +
+     "reporting_analysis_specs": "RUNTIME_RW",                   +
+     "reporting_cohort_snapshots": "RUNTIME_RW",                 +
+     "reporting_export_tickets": "RUNTIME_RW",                   +
+     "reporting_series": "RUNTIME_RW",                           +
+     "reporting_series_waves": "RUNTIME_RW",                     +
+     "safety_case_events": "RUNTIME_RW",                         +
+     "safety_cases": "RUNTIME_RW",                               +
+     "safety_policy_templates": "RUNTIME_RW",                    +
+     "safety_wakeup_ledger": "RUNTIME_RW",                       +
+     "scale_axis_snapshots": "RUNTIME_RW",                       +
+     "scale_deployment_policies": "RUNTIME_RW",                  +
+     "scale_publication_audits": "RUNTIME_RW",                   +
+     "scales": "RUNTIME_RW",                                     +
+     "situational_attempts": "RUNTIME_RW",                       +
+     "situational_raw_submissions": "RUNTIME_RW",                +
+     "sjt_author_audits": "RUNTIME_RW",                          +
+     "sjt_author_drafts": "RUNTIME_RW",                          +
+     "sjt_author_releases": "RUNTIME_RW",                        +
+     "sjt_release_grant_audits": "RUNTIME_RW",                   +
+     "sjt_release_grants": "RUNTIME_RW",                         +
+     "stored_assets": "RUNTIME_RW",                              +
+     "submission_histories": "RUNTIME_RW",                       +
+     "submission_idempotency_receipts": "RUNTIME_RW",            +
+     "submissions": "RUNTIME_RW",                                +
+     "survey_admin_data_audits": "RUNTIME_RW",                   +
+     "survey_system_export_grants": "RUNTIME_RW",                +
+     "survey_tool_policies": "RUNTIME_RW",                       +
+     "survey_accounts": "RUNTIME_RW",                            +
+     "survey_attempt_checkpoints": "RUNTIME_RW",                 +
+     "survey_cognitive_results": "RUNTIME_RW",                   +
+     "survey_cognitive_sessions": "RUNTIME_RW",                  +
+     "survey_consents": "RUNTIME_RW",                            +
+     "survey_entry_tokens": "RUNTIME_RW",                        +
+     "survey_events": "RUNTIME_RW",                              +
+     "survey_experiment_quota_buckets": "RUNTIME_RW",            +
+     "survey_export_tickets": "RUNTIME_RW",                      +
+     "survey_instrument_drafts": "RUNTIME_RW",                   +
+     "survey_invitations": "RUNTIME_RW",                         +
+     "survey_mfa_challenges": "RUNTIME_RW",                      +
+     "survey_mfa_credentials": "RUNTIME_RW",                     +
+     "survey_mfa_recovery_codes": "RUNTIME_RW",                  +
+     "survey_participants": "RUNTIME_RW",                        +
+     "survey_projects": "RUNTIME_RW",                            +
+     "survey_publications": "RUNTIME_RW",                        +
+     "survey_researcher_grants": "RUNTIME_RW",                   +
+     "survey_sample_reviews": "RUNTIME_RW",                      +
+     "survey_wave_attempts": "RUNTIME_RW",                       +
+     "survey_wave_finals": "RUNTIME_RW",                         +
+     "survey_waves": "RUNTIME_RW",                               +
+     "teacher_codes": "RUNTIME_RW",                              +
+     "users": "RUNTIME_RW",                                      +
+     "videos": "RUNTIME_RW",                                     +
+     "survey_tool_grants": "RUNTIME_RW",                         +
+     "training_analysis_quality": "RUNTIME_RW",                  +
+     "training_analysis_quality_audit": "RUNTIME_RW",            +
+     "anonymous_study_consent_versions": "RUNTIME_RW",           +
+     "anonymous_study_consent_acceptances": "RUNTIME_RW",        +
+     "anonymous_study_research_states": "RUNTIME_RW",            +
+     "anonymous_study_research_audit": "RUNTIME_RW",             +
+     "training_material_experiments": "RUNTIME_RW",              +
+     "training_material_subject_bindings": "RUNTIME_RW",         +
+     "training_material_quota_buckets": "RUNTIME_RW",            +
+     "training_material_allocation_claims": "RUNTIME_RW",        +
+     "training_public_rounds": "RUNTIME_RW",                     +
+     "training_attempt_checkpoints": "RUNTIME_RW",               +
+     "content_capability_grants": "RUNTIME_RW",                  +
+     "measurement_content_release_events": "RUNTIME_RW",         +
+     "measurement_content_releases": "RUNTIME_RW",               +
+     "measurement_reference_candidates": "RUNTIME_RW",           +
+     "measurement_reference_reviews": "RUNTIME_RW",              +
+     "static_sjt_measurement_mappings": "RUNTIME_RW",            +
+     "survey_interpretation_artifacts": "RUNTIME_RW",            +
+     "survey_reference_requests": "RUNTIME_RW",                  +
+     "survey_report_drafts": "RUNTIME_RW",                       +
+     "training_reference_requests": "RUNTIME_RW",                +
+     "training_report_drafts": "RUNTIME_RW",                     +
+     "training_interpretation_artifacts": "RUNTIME_RW",          +
+     "scale_library_submissions": "RUNTIME_RW",                  +
+     "scale_library_entries": "RUNTIME_RW",                      +
+     "scale_library_use_grants": "RUNTIME_RW",                   +
+     "scale_library_events": "RUNTIME_RW",                       +
+     "scale_library_emergency_stops": "RUNTIME_RW",              +
+     "scale_library_media": "RUNTIME_RW",                        +
+     "survey_tool_templates": "RUNTIME_RW",                      +
+     "survey_tool_selections": "RUNTIME_RW",                     +
+     "survey_participant_codes": "RUNTIME_RW",                   +
+     "survey_standard_versions": "RUNTIME_RW",                   +
+     "survey_standard_releases": "RUNTIME_RW",                   +
+     "survey_standard_trials": "RUNTIME_RW",                     +
+     "survey_governed_tools": "RUNTIME_RW",                      +
+     "survey_governed_trials": "RUNTIME_RW",                     +
+     "survey_package_grants": "RUNTIME_RW",                      +
+     "survey_package_imports": "RUNTIME_RW",                     +
+     "survey_package_members": "RUNTIME_RW",                     +
+     "survey_package_report_artifacts": "RUNTIME_RW",            +
+     "education_roster_import_jobs": "RUNTIME_RW",               +
+     "education_roster_import_parts": "RUNTIME_RW"               +
+   }                                                             +
+ }                                                               +
+ 
+(1 row)
+
+DO
+COMMIT
+21:signal-handler (1793157875) Received SIGTERM scheduling shutdown...
+21:M 28 Oct 2026 03:24:35.181 * User requested shutdown...
+21:M 28 Oct 2026 03:24:35.181 # Redis is now ready to exit, bye bye...
+2026-10-28 03:24:35.214 UTC [20] LOG:  received smart shutdown request
+2026-10-28 03:24:35.216 UTC [20] LOG:  background worker "logical replication launcher" (PID 33) exited with exit code 1
+2026-10-28 03:24:35.217 UTC [28] LOG:  shutting down
+2026-10-28 03:24:35.218 UTC [28] LOG:  checkpoint starting: shutdown immediate
+2026-10-28 03:24:35.843 UTC [28] LOG:  checkpoint complete: wrote 2109 buffers (25.7%); 0 WAL file(s) added, 0 removed, 1 recycled; write=0.013 s, sync=0.611 s, total=0.627 s; sync files=2027, longest=0.004 s, average=0.001 s; distance=17275 kB, estimate=17275 kB; lsn=0/25E9A10, redo lsn=0/25E9A10
+2026-10-28 03:24:35.850 UTC [20] LOG:  database system is shut down

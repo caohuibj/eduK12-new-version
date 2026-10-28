@@ -1,0 +1,10 @@
+{
+  "sourceCommit": "75b956cbd4c45f75beee606fb53257494adc1ca0",
+  "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_neo_c1_self_efficacy10_zh_cn_research/1.0.0/source.json",
+  "sourceGitBlob": "ad7f273512fae42aab9a129b319c04af7110d040",
+  "sha256": "c1f67bc13ced80481a727d3321cdd3b94e4a8b363c5cf3c41e5689bf2b3b7294",
+  "bytes": 22346,
+  "fixtureOnly": true,
+  "loadMethod": "Append this exact parsed source to the generated source array in this isolated Node process before importing the actual registry/install/publication/runtime modules; no permission, scoring or persistence mock. Tracked generated registry remains unchanged.",
+  "scientificStatus": "Preserve CANDIDATE/PILOT, localization PENDING, no scientificReview; synthetic adult technical roles only."
+}

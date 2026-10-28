@@ -1,0 +1,14 @@
+Training authenticated student current FINAL/resume/replay The expression evaluated to a falsy value:
+
+  assert.ok(attemptId)
+
+Training anonymous token and recovery credential are an independent FINAL path The expression evaluated to a falsy value:
+
+  assert.ok(attemptId)
+
+Survey genuine researcher password/TOTP enrollment and project preparation 跨波次研究需先确认已明确告知研究编号会关联历次作答
+Survey SINGLE_UNLINKED real FINAL, saved metric, recovery and current feedback POST /api/public/survey/r/fed812c0-519a-451d-a2ed-57b99b7d2020/attempts/667e55f8-ae60-4f63-97af-725691f8911c/final {"code":-1,"message":"answers.i_0：研究量表必须完整选择有效的响应选项","data":null}
+
+400 !== 200
+
+Survey LINKED_WAVES real FINAL, saved metric, recovery and current feedback Cannot read properties of undefined (reading 'id')

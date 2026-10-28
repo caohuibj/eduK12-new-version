@@ -1,0 +1,1543 @@
+{
+  "scope": "Real current-candidate HTTP routes with actual authentication, authorization, canonical FINAL and database; fixture content is fixed PR371 C1 only. No browser claim.",
+  "startedAt": "2026-10-28T03:43:39.517Z",
+  "cases": [
+    {
+      "name": "Survey SINGLE_UNLINKED real FINAL, saved metric, recovery and current feedback",
+      "status": "PASS",
+      "waves": [
+        {
+          "attemptId": "667e55f8-ae60-4f63-97af-725691f8911c",
+          "finalId": "580d46ce-409b-465b-b2b1-2f6c7f6d6684",
+          "release": "AFTER_FINAL",
+          "feedback": {
+            "text": "Synthetic result saved.",
+            "disclaimer": "本研究反馈仅作一般说明，不提供未经验证的常模、诊断或个体能力等级。",
+            "completedAt": "2026-10-28T03:43:39.640Z",
+            "kind": "DESCRIPTIVE",
+            "measurements": [
+              {
+                "feedbackKind": "RAW_METRICS",
+                "pending": false,
+                "instrumentKey": "c1systemprobe",
+                "title": "C1 synthetic exact source",
+                "measurementReleaseId": "de43c55b-78a6-4e66-bba7-0781dd3e81f2",
+                "metrics": [
+                  {
+                    "key": "ipip_neo_c1_self_efficacy10",
+                    "label": "一般任务自我效能感",
+                    "value": 30,
+                    "unit": null,
+                    "status": "OK"
+                  }
+                ],
+                "quality": "interpretable"
+              }
+            ],
+            "pending": false
+          },
+          "stored": {
+            "accessAudience": "researcher",
+            "intendedAudience": "researcher",
+            "sourceFinalHash": "ef97ba612e4518af7b462b3e353808d015d8a0745ff1789b1388b15c0c00fefe",
+            "contentBindingHash": "12de7c7c9199ac9062473f8c06a235336db8cb5e9497906b16909ea4d911c444",
+            "reportRelease": {
+              "releaseId": "7eacb226-dd74-4969-9b24-bfc533c78255",
+              "contentHash": "88802d61aa6f7047c34a137d9b453491e8a28a6ebc1d26ebd1151c685da376b8"
+            },
+            "interpretationSemantics": "SAVED_AT_FINAL_NO_RECALCULATION",
+            "lifecycleNotices": [],
+            "report": {
+              "generatorVersion": "DECLARATIVE_REPORT_V1",
+              "title": "一般任务自我效能感（IPIP-NEO C1 中文研究译稿）",
+              "blocks": [
+                {
+                  "type": "METRIC",
+                  "metricKey": "ipip_neo_c1_self_efficacy10",
+                  "label": "一般任务自我效能感",
+                  "display": "RAW",
+                  "unit": "points",
+                  "value": 30,
+                  "status": "INTERPRETABLE"
+                },
+                {
+                  "type": "TEXT",
+                  "text": "任务自我效能：遇到事情时，你有多少把握\n这一项关注你对完成任务、判断情况和寻找办法的信心。分数越高，表示这次更认可“我能处理好”的描述。开始一件熟悉的事和面对全新任务时，把握可能不同。信心与实际能力有关，但并不相等；这个分数也不评价个人价值。"
+                },
+                {
+                  "type": "TEXT",
+                  "text": "回想最近一次有把握完成的任务：信心来自经验、充分准备，还是知道可以向谁求助？"
+                },
+                {
+                  "type": "TEXT",
+                  "text": "把一件想做的事拆出一个能开始的小步骤，并写下可能用到的信息或支持。做完后记录具体做法，给下一次留下可参考的经验。"
+                }
+              ],
+              "limitations": [
+                "这份中文研究译稿仍待专家审校和适用人群验证，目前只供成人研究和自我了解。",
+                "目前没有可靠依据划分高低或排名；信心不等于实际能力，也不代表个人价值。",
+                "这是IPIP的一项独立工具，并非完整人格评估；不能借用其他自我效能量表的分界。原英文研究的数据不能证明本中文版本已经验证。",
+                "10题都需完整回答；漏答不当作零分，也不代填。不用于诊断、学生筛选或教师考核。"
+              ],
+              "disclaimer": "仅供成人研究与描述性自我了解，不用于心理诊断、高风险选拔或个人价值判定。本工具是独立IPIP-NEO C1表征，非完整NEO人格评估。"
+            }
+          },
+          "replay": true,
+          "changedReplayDenied": true
+        }
+      ],
+      "timingProvenance": "Supported recovered-without-clock markers from the actual shared sealer; no browser timing invented or UI PASS claimed"
+    },
+    {
+      "name": "Survey LINKED_WAVES real FINAL, saved metric, recovery and current feedback",
+      "status": "PASS",
+      "waves": [
+        {
+          "attemptId": "15330175-820a-4236-83e3-aef61abea1db",
+          "finalId": "c90ef83c-b0b9-49eb-a6ad-965b460903a5",
+          "release": "AFTER_FINAL",
+          "feedback": {
+            "text": "Synthetic result saved.",
+            "disclaimer": "本研究反馈仅作一般说明，不提供未经验证的常模、诊断或个体能力等级。",
+            "completedAt": "2026-10-28T03:43:40.915Z",
+            "kind": "DESCRIPTIVE",
+            "measurements": [
+              {
+                "feedbackKind": "RAW_METRICS",
+                "pending": false,
+                "instrumentKey": "c1systemprobe",
+                "title": "C1 synthetic exact source",
+                "measurementReleaseId": "d9d73822-9706-4b9c-bdf9-217ec0d24b95",
+                "metrics": [
+                  {
+                    "key": "ipip_neo_c1_self_efficacy10",
+                    "label": "一般任务自我效能感",
+                    "value": 30,
+                    "unit": null,
+                    "status": "OK"
+                  }
+                ],
+                "quality": "interpretable"
+              }
+            ],
+            "pending": false
+          },
+          "stored": {
+            "accessAudience": "researcher",
+            "intendedAudience": "researcher",
+            "sourceFinalHash": "da637188d642e5fdcf77b75a53bde650d2c3d459d0312f22aa9491059ac271cd",
+            "contentBindingHash": "f6168ce93a8d066887c3fc1690e8ffcf1ea430b0efc83ea42cf81038b87312a1",
+            "reportRelease": {
+              "releaseId": "b84092af-5d79-4971-a07a-e8cd8425abf5",
+              "contentHash": "592955b86970c8c5a9bc2b9a80544b46aec7cd7343356299cd69ce9594cb4a34"
+            },
+            "interpretationSemantics": "SAVED_AT_FINAL_NO_RECALCULATION",
+            "lifecycleNotices": [],
+            "report": {
+              "generatorVersion": "DECLARATIVE_REPORT_V1",
+              "title": "一般任务自我效能感（IPIP-NEO C1 中文研究译稿）",
+              "blocks": [
+                {
+                  "type": "METRIC",
+                  "metricKey": "ipip_neo_c1_self_efficacy10",
+                  "label": "一般任务自我效能感",
+                  "display": "RAW",
+                  "unit": "points",
+                  "value": 30,
+                  "status": "INTERPRETABLE"
+                },
+                {
+                  "type": "TEXT",
+                  "text": "任务自我效能：遇到事情时，你有多少把握\n这一项关注你对完成任务、判断情况和寻找办法的信心。分数越高，表示这次更认可“我能处理好”的描述。开始一件熟悉的事和面对全新任务时，把握可能不同。信心与实际能力有关，但并不相等；这个分数也不评价个人价值。"
+                },
+                {
+                  "type": "TEXT",
+                  "text": "回想最近一次有把握完成的任务：信心来自经验、充分准备，还是知道可以向谁求助？"
+                },
+                {
+                  "type": "TEXT",
+                  "text": "把一件想做的事拆出一个能开始的小步骤，并写下可能用到的信息或支持。做完后记录具体做法，给下一次留下可参考的经验。"
+                }
+              ],
+              "limitations": [
+                "这份中文研究译稿仍待专家审校和适用人群验证，目前只供成人研究和自我了解。",
+                "目前没有可靠依据划分高低或排名；信心不等于实际能力，也不代表个人价值。",
+                "这是IPIP的一项独立工具，并非完整人格评估；不能借用其他自我效能量表的分界。原英文研究的数据不能证明本中文版本已经验证。",
+                "10题都需完整回答；漏答不当作零分，也不代填。不用于诊断、学生筛选或教师考核。"
+              ],
+              "disclaimer": "仅供成人研究与描述性自我了解，不用于心理诊断、高风险选拔或个人价值判定。本工具是独立IPIP-NEO C1表征，非完整NEO人格评估。"
+            }
+          },
+          "replay": true,
+          "changedReplayDenied": true
+        },
+        {
+          "attemptId": "e0646ca0-2b1b-4aa4-970c-ec36b0169ef1",
+          "finalId": "3c70c1f6-1880-4e51-a30c-55c3ae134087",
+          "release": "AFTER_COLLECTION",
+          "feedback": {
+            "text": "Synthetic result saved.",
+            "disclaimer": "本研究反馈仅作一般说明，不提供未经验证的常模、诊断或个体能力等级。",
+            "completedAt": "2026-10-28T03:43:41.124Z",
+            "kind": "DESCRIPTIVE",
+            "measurements": [],
+            "pending": true
+          },
+          "stored": {
+            "accessAudience": "researcher",
+            "intendedAudience": "researcher",
+            "sourceFinalHash": "4c2fa359e5953386a7d274ae4bce719d7e16e98e67c26fdc0b9434bcfaf1f95b",
+            "contentBindingHash": "0390fb92b4fc84bd22aae82fbc89b481e9d1bfdc4ea983984e86b26803a324cc",
+            "reportRelease": {
+              "releaseId": "b84092af-5d79-4971-a07a-e8cd8425abf5",
+              "contentHash": "592955b86970c8c5a9bc2b9a80544b46aec7cd7343356299cd69ce9594cb4a34"
+            },
+            "interpretationSemantics": "SAVED_AT_FINAL_NO_RECALCULATION",
+            "lifecycleNotices": [],
+            "report": {
+              "generatorVersion": "DECLARATIVE_REPORT_V1",
+              "title": "一般任务自我效能感（IPIP-NEO C1 中文研究译稿）",
+              "blocks": [
+                {
+                  "type": "METRIC",
+                  "metricKey": "ipip_neo_c1_self_efficacy10",
+                  "label": "一般任务自我效能感",
+                  "display": "RAW",
+                  "unit": "points",
+                  "value": 30,
+                  "status": "INTERPRETABLE"
+                },
+                {
+                  "type": "TEXT",
+                  "text": "任务自我效能：遇到事情时，你有多少把握\n这一项关注你对完成任务、判断情况和寻找办法的信心。分数越高，表示这次更认可“我能处理好”的描述。开始一件熟悉的事和面对全新任务时，把握可能不同。信心与实际能力有关，但并不相等；这个分数也不评价个人价值。"
+                },
+                {
+                  "type": "TEXT",
+                  "text": "回想最近一次有把握完成的任务：信心来自经验、充分准备，还是知道可以向谁求助？"
+                },
+                {
+                  "type": "TEXT",
+                  "text": "把一件想做的事拆出一个能开始的小步骤，并写下可能用到的信息或支持。做完后记录具体做法，给下一次留下可参考的经验。"
+                }
+              ],
+              "limitations": [
+                "这份中文研究译稿仍待专家审校和适用人群验证，目前只供成人研究和自我了解。",
+                "目前没有可靠依据划分高低或排名；信心不等于实际能力，也不代表个人价值。",
+                "这是IPIP的一项独立工具，并非完整人格评估；不能借用其他自我效能量表的分界。原英文研究的数据不能证明本中文版本已经验证。",
+                "10题都需完整回答；漏答不当作零分，也不代填。不用于诊断、学生筛选或教师考核。"
+              ],
+              "disclaimer": "仅供成人研究与描述性自我了解，不用于心理诊断、高风险选拔或个人价值判定。本工具是独立IPIP-NEO C1表征，非完整NEO人格评估。"
+            }
+          },
+          "replay": true,
+          "changedReplayDenied": true
+        }
+      ],
+      "timingProvenance": "Supported recovered-without-clock markers from the actual shared sealer; no browser timing invented or UI PASS claimed",
+      "revocationDenied": true
+    }
+  ],
+  "requests": [
+    {
+      "product": "survey",
+      "method": "POST",
+      "path": "/api/public/survey/r/fed812c0-519a-451d-a2ed-57b99b7d2020/attempts/667e55f8-ae60-4f63-97af-725691f8911c/task",
+      "status": 200,
+      "durationMs": 61,
+      "body": {
+        "code": 0,
+        "message": "操作成功",
+        "data": {
+          "attemptId": "667e55f8-ae60-4f63-97af-725691f8911c",
+          "waveId": "3c9a8d2f-3308-459a-8662-d048bfe4d471",
+          "status": "STARTED",
+          "definitionDigest": "9ba846907b33fb29c5fa9acd8933b19573cd04a0ddc1d3b58b67da8c0eee996e",
+          "reportMode": "DESCRIPTIVE",
+          "units": [
+            {
+              "kind": "SCALE",
+              "instrumentKey": "c1systemprobe",
+              "title": "C1 synthetic exact source",
+              "instruction": "请根据你目前通常的情况，而不是希望将来成为的样子，判断下面各句话与你的实际情况有多符合。",
+              "presentationMode": "ONE_BY_ONE",
+              "responseOptions": [
+                {
+                  "optionKey": "o_0",
+                  "label": "很不符合"
+                },
+                {
+                  "optionKey": "o_1",
+                  "label": "比较不符合"
+                },
+                {
+                  "optionKey": "o_2",
+                  "label": "介于不符合与符合之间"
+                },
+                {
+                  "optionKey": "o_3",
+                  "label": "比较符合"
+                },
+                {
+                  "optionKey": "o_4",
+                  "label": "很符合"
+                }
+              ],
+              "items": [
+                {
+                  "itemKey": "i_0",
+                  "prompt": "我能成功完成任务。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_1",
+                  "prompt": "我在所做的事情上表现出色。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_2",
+                  "prompt": "我能顺利处理任务。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_3",
+                  "prompt": "我对自己的判断有把握。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_4",
+                  "prompt": "我能想出好的解决办法。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_5",
+                  "prompt": "我知道怎样把事情办好。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_6",
+                  "prompt": "我会误判情况。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_7",
+                  "prompt": "我弄不明白事情。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_8",
+                  "prompt": "我能作出的贡献很少。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_9",
+                  "prompt": "我看不出事情会带来什么后果。",
+                  "required": true
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "product": "survey",
+      "method": "POST",
+      "path": "/api/public/survey/r/fed812c0-519a-451d-a2ed-57b99b7d2020/attempts/667e55f8-ae60-4f63-97af-725691f8911c/task",
+      "status": 200,
+      "durationMs": 17,
+      "body": {
+        "code": 0,
+        "message": "操作成功",
+        "data": {
+          "attemptId": "667e55f8-ae60-4f63-97af-725691f8911c",
+          "waveId": "3c9a8d2f-3308-459a-8662-d048bfe4d471",
+          "status": "STARTED",
+          "definitionDigest": "9ba846907b33fb29c5fa9acd8933b19573cd04a0ddc1d3b58b67da8c0eee996e",
+          "reportMode": "DESCRIPTIVE",
+          "units": [
+            {
+              "kind": "SCALE",
+              "instrumentKey": "c1systemprobe",
+              "title": "C1 synthetic exact source",
+              "instruction": "请根据你目前通常的情况，而不是希望将来成为的样子，判断下面各句话与你的实际情况有多符合。",
+              "presentationMode": "ONE_BY_ONE",
+              "responseOptions": [
+                {
+                  "optionKey": "o_0",
+                  "label": "很不符合"
+                },
+                {
+                  "optionKey": "o_1",
+                  "label": "比较不符合"
+                },
+                {
+                  "optionKey": "o_2",
+                  "label": "介于不符合与符合之间"
+                },
+                {
+                  "optionKey": "o_3",
+                  "label": "比较符合"
+                },
+                {
+                  "optionKey": "o_4",
+                  "label": "很符合"
+                }
+              ],
+              "items": [
+                {
+                  "itemKey": "i_0",
+                  "prompt": "我能成功完成任务。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_1",
+                  "prompt": "我在所做的事情上表现出色。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_2",
+                  "prompt": "我能顺利处理任务。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_3",
+                  "prompt": "我对自己的判断有把握。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_4",
+                  "prompt": "我能想出好的解决办法。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_5",
+                  "prompt": "我知道怎样把事情办好。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_6",
+                  "prompt": "我会误判情况。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_7",
+                  "prompt": "我弄不明白事情。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_8",
+                  "prompt": "我能作出的贡献很少。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_9",
+                  "prompt": "我看不出事情会带来什么后果。",
+                  "required": true
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "product": "survey",
+      "method": "POST",
+      "path": "/api/public/survey/r/fed812c0-519a-451d-a2ed-57b99b7d2020/attempts/667e55f8-ae60-4f63-97af-725691f8911c/final",
+      "status": 200,
+      "durationMs": 41,
+      "body": {
+        "code": 0,
+        "message": "操作成功",
+        "data": {
+          "attemptId": "667e55f8-ae60-4f63-97af-725691f8911c",
+          "receiptId": "580d46ce-409b-465b-b2b1-2f6c7f6d6684",
+          "completedAt": "2026-10-28T03:43:39.640Z",
+          "status": "COMPLETED",
+          "idempotent": false,
+          "generalText": "Synthetic result saved.",
+          "generalReceipt": {
+            "text": "Synthetic result saved.",
+            "disclaimer": "本研究反馈仅作一般说明，不提供未经验证的常模、诊断或个体能力等级。",
+            "completedAt": "2026-10-28T03:43:39.640Z"
+          },
+          "participantFeedbackReceipt": {
+            "text": "Synthetic result saved.",
+            "disclaimer": "本研究反馈仅作一般说明，不提供未经验证的常模、诊断或个体能力等级。",
+            "completedAt": "2026-10-28T03:43:39.640Z",
+            "kind": "DESCRIPTIVE",
+            "measurements": [
+              {
+                "feedbackKind": "RAW_METRICS",
+                "pending": false,
+                "instrumentKey": "c1systemprobe",
+                "title": "C1 synthetic exact source",
+                "measurementReleaseId": "de43c55b-78a6-4e66-bba7-0781dd3e81f2",
+                "metrics": [
+                  {
+                    "key": "ipip_neo_c1_self_efficacy10",
+                    "label": "一般任务自我效能感",
+                    "value": 30,
+                    "unit": null,
+                    "status": "OK"
+                  }
+                ],
+                "quality": "interpretable"
+              }
+            ],
+            "pending": false
+          }
+        }
+      }
+    },
+    {
+      "product": "survey",
+      "method": "POST",
+      "path": "/api/public/survey/r/fed812c0-519a-451d-a2ed-57b99b7d2020/attempts/667e55f8-ae60-4f63-97af-725691f8911c/final",
+      "status": 200,
+      "durationMs": 16,
+      "body": {
+        "code": 0,
+        "message": "操作成功",
+        "data": {
+          "attemptId": "667e55f8-ae60-4f63-97af-725691f8911c",
+          "receiptId": "580d46ce-409b-465b-b2b1-2f6c7f6d6684",
+          "completedAt": "2026-10-28T03:43:39.640Z",
+          "status": "COMPLETED",
+          "idempotent": true,
+          "generalText": "Synthetic result saved."
+        }
+      }
+    },
+    {
+      "product": "survey",
+      "method": "POST",
+      "path": "/api/public/survey/r/fed812c0-519a-451d-a2ed-57b99b7d2020/attempts/667e55f8-ae60-4f63-97af-725691f8911c/final",
+      "status": 409,
+      "durationMs": 27,
+      "body": {
+        "code": -1,
+        "message": "此波次已有不同的正式 FINAL，不能再次覆盖",
+        "data": null
+      }
+    },
+    {
+      "product": "survey",
+      "method": "POST",
+      "path": "/api/public/survey/r/fed812c0-519a-451d-a2ed-57b99b7d2020/attempts/667e55f8-ae60-4f63-97af-725691f8911c/general",
+      "status": 200,
+      "durationMs": 21,
+      "body": {
+        "code": 0,
+        "message": "操作成功",
+        "data": {
+          "text": "Synthetic result saved.",
+          "disclaimer": "本研究反馈仅作一般说明，不提供未经验证的常模、诊断或个体能力等级。",
+          "completedAt": "2026-10-28T03:43:39.640Z",
+          "kind": "DESCRIPTIVE",
+          "measurements": [
+            {
+              "feedbackKind": "RAW_METRICS",
+              "pending": false,
+              "instrumentKey": "c1systemprobe",
+              "title": "C1 synthetic exact source",
+              "measurementReleaseId": "de43c55b-78a6-4e66-bba7-0781dd3e81f2",
+              "metrics": [
+                {
+                  "key": "ipip_neo_c1_self_efficacy10",
+                  "label": "一般任务自我效能感",
+                  "value": 30,
+                  "unit": null,
+                  "status": "OK"
+                }
+              ],
+              "quality": "interpretable"
+            }
+          ],
+          "pending": false
+        }
+      }
+    },
+    {
+      "product": "survey",
+      "method": "POST",
+      "path": "/api/public/survey/r/fed812c0-519a-451d-a2ed-57b99b7d2020/attempts/667e55f8-ae60-4f63-97af-725691f8911c/task",
+      "status": 200,
+      "durationMs": 10,
+      "body": {
+        "code": 0,
+        "message": "操作成功",
+        "data": {
+          "attemptId": "667e55f8-ae60-4f63-97af-725691f8911c",
+          "waveId": "3c9a8d2f-3308-459a-8662-d048bfe4d471",
+          "status": "COMPLETED",
+          "definitionDigest": "9ba846907b33fb29c5fa9acd8933b19573cd04a0ddc1d3b58b67da8c0eee996e",
+          "reportMode": "DESCRIPTIVE",
+          "units": [
+            {
+              "kind": "SCALE",
+              "instrumentKey": "c1systemprobe",
+              "title": "C1 synthetic exact source",
+              "instruction": "请根据你目前通常的情况，而不是希望将来成为的样子，判断下面各句话与你的实际情况有多符合。",
+              "presentationMode": "ONE_BY_ONE",
+              "responseOptions": [
+                {
+                  "optionKey": "o_0",
+                  "label": "很不符合"
+                },
+                {
+                  "optionKey": "o_1",
+                  "label": "比较不符合"
+                },
+                {
+                  "optionKey": "o_2",
+                  "label": "介于不符合与符合之间"
+                },
+                {
+                  "optionKey": "o_3",
+                  "label": "比较符合"
+                },
+                {
+                  "optionKey": "o_4",
+                  "label": "很符合"
+                }
+              ],
+              "items": [
+                {
+                  "itemKey": "i_0",
+                  "prompt": "我能成功完成任务。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_1",
+                  "prompt": "我在所做的事情上表现出色。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_2",
+                  "prompt": "我能顺利处理任务。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_3",
+                  "prompt": "我对自己的判断有把握。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_4",
+                  "prompt": "我能想出好的解决办法。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_5",
+                  "prompt": "我知道怎样把事情办好。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_6",
+                  "prompt": "我会误判情况。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_7",
+                  "prompt": "我弄不明白事情。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_8",
+                  "prompt": "我能作出的贡献很少。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_9",
+                  "prompt": "我看不出事情会带来什么后果。",
+                  "required": true
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "product": "survey",
+      "method": "POST",
+      "path": "/api/public/survey/r/7a520a2d-eff7-4e18-8b95-0f7a9854af7f/waves/087b4a00-302c-4e44-9e34-33062a458373/start",
+      "status": 200,
+      "durationMs": 21,
+      "body": {
+        "code": 0,
+        "message": "操作成功",
+        "data": {
+          "attemptId": "15330175-820a-4236-83e3-aef61abea1db",
+          "waveId": "087b4a00-302c-4e44-9e34-33062a458373",
+          "status": "STARTED",
+          "recovered": true
+        }
+      }
+    },
+    {
+      "product": "survey",
+      "method": "POST",
+      "path": "/api/public/survey/r/7a520a2d-eff7-4e18-8b95-0f7a9854af7f/attempts/15330175-820a-4236-83e3-aef61abea1db/task",
+      "status": 200,
+      "durationMs": 10,
+      "body": {
+        "code": 0,
+        "message": "操作成功",
+        "data": {
+          "attemptId": "15330175-820a-4236-83e3-aef61abea1db",
+          "waveId": "087b4a00-302c-4e44-9e34-33062a458373",
+          "status": "STARTED",
+          "definitionDigest": "5749819e4657e68dc36f85904a7b488bb212981544bfb8007f9cc82e3cad9c23",
+          "reportMode": "DESCRIPTIVE",
+          "units": [
+            {
+              "kind": "SCALE",
+              "instrumentKey": "c1systemprobe",
+              "title": "C1 synthetic exact source",
+              "instruction": "请根据你目前通常的情况，而不是希望将来成为的样子，判断下面各句话与你的实际情况有多符合。",
+              "presentationMode": "ONE_BY_ONE",
+              "responseOptions": [
+                {
+                  "optionKey": "o_0",
+                  "label": "很不符合"
+                },
+                {
+                  "optionKey": "o_1",
+                  "label": "比较不符合"
+                },
+                {
+                  "optionKey": "o_2",
+                  "label": "介于不符合与符合之间"
+                },
+                {
+                  "optionKey": "o_3",
+                  "label": "比较符合"
+                },
+                {
+                  "optionKey": "o_4",
+                  "label": "很符合"
+                }
+              ],
+              "items": [
+                {
+                  "itemKey": "i_0",
+                  "prompt": "我能成功完成任务。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_1",
+                  "prompt": "我在所做的事情上表现出色。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_2",
+                  "prompt": "我能顺利处理任务。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_3",
+                  "prompt": "我对自己的判断有把握。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_4",
+                  "prompt": "我能想出好的解决办法。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_5",
+                  "prompt": "我知道怎样把事情办好。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_6",
+                  "prompt": "我会误判情况。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_7",
+                  "prompt": "我弄不明白事情。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_8",
+                  "prompt": "我能作出的贡献很少。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_9",
+                  "prompt": "我看不出事情会带来什么后果。",
+                  "required": true
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "product": "survey",
+      "method": "POST",
+      "path": "/api/public/survey/r/7a520a2d-eff7-4e18-8b95-0f7a9854af7f/attempts/15330175-820a-4236-83e3-aef61abea1db/task",
+      "status": 200,
+      "durationMs": 10,
+      "body": {
+        "code": 0,
+        "message": "操作成功",
+        "data": {
+          "attemptId": "15330175-820a-4236-83e3-aef61abea1db",
+          "waveId": "087b4a00-302c-4e44-9e34-33062a458373",
+          "status": "STARTED",
+          "definitionDigest": "5749819e4657e68dc36f85904a7b488bb212981544bfb8007f9cc82e3cad9c23",
+          "reportMode": "DESCRIPTIVE",
+          "units": [
+            {
+              "kind": "SCALE",
+              "instrumentKey": "c1systemprobe",
+              "title": "C1 synthetic exact source",
+              "instruction": "请根据你目前通常的情况，而不是希望将来成为的样子，判断下面各句话与你的实际情况有多符合。",
+              "presentationMode": "ONE_BY_ONE",
+              "responseOptions": [
+                {
+                  "optionKey": "o_0",
+                  "label": "很不符合"
+                },
+                {
+                  "optionKey": "o_1",
+                  "label": "比较不符合"
+                },
+                {
+                  "optionKey": "o_2",
+                  "label": "介于不符合与符合之间"
+                },
+                {
+                  "optionKey": "o_3",
+                  "label": "比较符合"
+                },
+                {
+                  "optionKey": "o_4",
+                  "label": "很符合"
+                }
+              ],
+              "items": [
+                {
+                  "itemKey": "i_0",
+                  "prompt": "我能成功完成任务。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_1",
+                  "prompt": "我在所做的事情上表现出色。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_2",
+                  "prompt": "我能顺利处理任务。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_3",
+                  "prompt": "我对自己的判断有把握。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_4",
+                  "prompt": "我能想出好的解决办法。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_5",
+                  "prompt": "我知道怎样把事情办好。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_6",
+                  "prompt": "我会误判情况。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_7",
+                  "prompt": "我弄不明白事情。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_8",
+                  "prompt": "我能作出的贡献很少。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_9",
+                  "prompt": "我看不出事情会带来什么后果。",
+                  "required": true
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "product": "survey",
+      "method": "POST",
+      "path": "/api/public/survey/r/7a520a2d-eff7-4e18-8b95-0f7a9854af7f/attempts/15330175-820a-4236-83e3-aef61abea1db/final",
+      "status": 200,
+      "durationMs": 33,
+      "body": {
+        "code": 0,
+        "message": "操作成功",
+        "data": {
+          "attemptId": "15330175-820a-4236-83e3-aef61abea1db",
+          "receiptId": "c90ef83c-b0b9-49eb-a6ad-965b460903a5",
+          "completedAt": "2026-10-28T03:43:40.915Z",
+          "status": "COMPLETED",
+          "idempotent": false,
+          "generalText": "Synthetic result saved.",
+          "generalReceipt": {
+            "text": "Synthetic result saved.",
+            "disclaimer": "本研究反馈仅作一般说明，不提供未经验证的常模、诊断或个体能力等级。",
+            "completedAt": "2026-10-28T03:43:40.915Z"
+          },
+          "participantFeedbackReceipt": {
+            "text": "Synthetic result saved.",
+            "disclaimer": "本研究反馈仅作一般说明，不提供未经验证的常模、诊断或个体能力等级。",
+            "completedAt": "2026-10-28T03:43:40.915Z",
+            "kind": "DESCRIPTIVE",
+            "measurements": [
+              {
+                "feedbackKind": "RAW_METRICS",
+                "pending": false,
+                "instrumentKey": "c1systemprobe",
+                "title": "C1 synthetic exact source",
+                "measurementReleaseId": "d9d73822-9706-4b9c-bdf9-217ec0d24b95",
+                "metrics": [
+                  {
+                    "key": "ipip_neo_c1_self_efficacy10",
+                    "label": "一般任务自我效能感",
+                    "value": 30,
+                    "unit": null,
+                    "status": "OK"
+                  }
+                ],
+                "quality": "interpretable"
+              }
+            ],
+            "pending": false
+          }
+        }
+      }
+    },
+    {
+      "product": "survey",
+      "method": "POST",
+      "path": "/api/public/survey/r/7a520a2d-eff7-4e18-8b95-0f7a9854af7f/attempts/15330175-820a-4236-83e3-aef61abea1db/final",
+      "status": 200,
+      "durationMs": 16,
+      "body": {
+        "code": 0,
+        "message": "操作成功",
+        "data": {
+          "attemptId": "15330175-820a-4236-83e3-aef61abea1db",
+          "receiptId": "c90ef83c-b0b9-49eb-a6ad-965b460903a5",
+          "completedAt": "2026-10-28T03:43:40.915Z",
+          "status": "COMPLETED",
+          "idempotent": true,
+          "generalText": "Synthetic result saved."
+        }
+      }
+    },
+    {
+      "product": "survey",
+      "method": "POST",
+      "path": "/api/public/survey/r/7a520a2d-eff7-4e18-8b95-0f7a9854af7f/attempts/15330175-820a-4236-83e3-aef61abea1db/final",
+      "status": 409,
+      "durationMs": 18,
+      "body": {
+        "code": -1,
+        "message": "此波次已有不同的正式 FINAL，不能再次覆盖",
+        "data": null
+      }
+    },
+    {
+      "product": "survey",
+      "method": "POST",
+      "path": "/api/public/survey/r/7a520a2d-eff7-4e18-8b95-0f7a9854af7f/attempts/15330175-820a-4236-83e3-aef61abea1db/general",
+      "status": 200,
+      "durationMs": 19,
+      "body": {
+        "code": 0,
+        "message": "操作成功",
+        "data": {
+          "text": "Synthetic result saved.",
+          "disclaimer": "本研究反馈仅作一般说明，不提供未经验证的常模、诊断或个体能力等级。",
+          "completedAt": "2026-10-28T03:43:40.915Z",
+          "kind": "DESCRIPTIVE",
+          "measurements": [
+            {
+              "feedbackKind": "RAW_METRICS",
+              "pending": false,
+              "instrumentKey": "c1systemprobe",
+              "title": "C1 synthetic exact source",
+              "measurementReleaseId": "d9d73822-9706-4b9c-bdf9-217ec0d24b95",
+              "metrics": [
+                {
+                  "key": "ipip_neo_c1_self_efficacy10",
+                  "label": "一般任务自我效能感",
+                  "value": 30,
+                  "unit": null,
+                  "status": "OK"
+                }
+              ],
+              "quality": "interpretable"
+            }
+          ],
+          "pending": false
+        }
+      }
+    },
+    {
+      "product": "survey",
+      "method": "POST",
+      "path": "/api/public/survey/r/7a520a2d-eff7-4e18-8b95-0f7a9854af7f/attempts/15330175-820a-4236-83e3-aef61abea1db/task",
+      "status": 200,
+      "durationMs": 12,
+      "body": {
+        "code": 0,
+        "message": "操作成功",
+        "data": {
+          "attemptId": "15330175-820a-4236-83e3-aef61abea1db",
+          "waveId": "087b4a00-302c-4e44-9e34-33062a458373",
+          "status": "COMPLETED",
+          "definitionDigest": "5749819e4657e68dc36f85904a7b488bb212981544bfb8007f9cc82e3cad9c23",
+          "reportMode": "DESCRIPTIVE",
+          "units": [
+            {
+              "kind": "SCALE",
+              "instrumentKey": "c1systemprobe",
+              "title": "C1 synthetic exact source",
+              "instruction": "请根据你目前通常的情况，而不是希望将来成为的样子，判断下面各句话与你的实际情况有多符合。",
+              "presentationMode": "ONE_BY_ONE",
+              "responseOptions": [
+                {
+                  "optionKey": "o_0",
+                  "label": "很不符合"
+                },
+                {
+                  "optionKey": "o_1",
+                  "label": "比较不符合"
+                },
+                {
+                  "optionKey": "o_2",
+                  "label": "介于不符合与符合之间"
+                },
+                {
+                  "optionKey": "o_3",
+                  "label": "比较符合"
+                },
+                {
+                  "optionKey": "o_4",
+                  "label": "很符合"
+                }
+              ],
+              "items": [
+                {
+                  "itemKey": "i_0",
+                  "prompt": "我能成功完成任务。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_1",
+                  "prompt": "我在所做的事情上表现出色。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_2",
+                  "prompt": "我能顺利处理任务。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_3",
+                  "prompt": "我对自己的判断有把握。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_4",
+                  "prompt": "我能想出好的解决办法。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_5",
+                  "prompt": "我知道怎样把事情办好。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_6",
+                  "prompt": "我会误判情况。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_7",
+                  "prompt": "我弄不明白事情。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_8",
+                  "prompt": "我能作出的贡献很少。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_9",
+                  "prompt": "我看不出事情会带来什么后果。",
+                  "required": true
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "product": "survey",
+      "method": "POST",
+      "path": "/api/public/survey/r/7a520a2d-eff7-4e18-8b95-0f7a9854af7f/waves/c3b72e54-1e2f-4a6a-af96-03094d8e3e22/start",
+      "status": 200,
+      "durationMs": 34,
+      "body": {
+        "code": 0,
+        "message": "操作成功",
+        "data": {
+          "attemptId": "e0646ca0-2b1b-4aa4-970c-ec36b0169ef1",
+          "waveId": "c3b72e54-1e2f-4a6a-af96-03094d8e3e22",
+          "status": "STARTED",
+          "recovered": false
+        }
+      }
+    },
+    {
+      "product": "survey",
+      "method": "POST",
+      "path": "/api/public/survey/r/7a520a2d-eff7-4e18-8b95-0f7a9854af7f/attempts/e0646ca0-2b1b-4aa4-970c-ec36b0169ef1/task",
+      "status": 200,
+      "durationMs": 11,
+      "body": {
+        "code": 0,
+        "message": "操作成功",
+        "data": {
+          "attemptId": "e0646ca0-2b1b-4aa4-970c-ec36b0169ef1",
+          "waveId": "c3b72e54-1e2f-4a6a-af96-03094d8e3e22",
+          "status": "STARTED",
+          "definitionDigest": "bc50fffc7ea3ab802e116123515ef059c6ab43a83cebc0f99b5e2706c62d2b96",
+          "reportMode": "DESCRIPTIVE",
+          "units": [
+            {
+              "kind": "SCALE",
+              "instrumentKey": "c1systemprobe",
+              "title": "C1 synthetic exact source",
+              "instruction": "请根据你目前通常的情况，而不是希望将来成为的样子，判断下面各句话与你的实际情况有多符合。",
+              "presentationMode": "ONE_BY_ONE",
+              "responseOptions": [
+                {
+                  "optionKey": "o_0",
+                  "label": "很不符合"
+                },
+                {
+                  "optionKey": "o_1",
+                  "label": "比较不符合"
+                },
+                {
+                  "optionKey": "o_2",
+                  "label": "介于不符合与符合之间"
+                },
+                {
+                  "optionKey": "o_3",
+                  "label": "比较符合"
+                },
+                {
+                  "optionKey": "o_4",
+                  "label": "很符合"
+                }
+              ],
+              "items": [
+                {
+                  "itemKey": "i_0",
+                  "prompt": "我能成功完成任务。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_1",
+                  "prompt": "我在所做的事情上表现出色。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_2",
+                  "prompt": "我能顺利处理任务。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_3",
+                  "prompt": "我对自己的判断有把握。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_4",
+                  "prompt": "我能想出好的解决办法。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_5",
+                  "prompt": "我知道怎样把事情办好。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_6",
+                  "prompt": "我会误判情况。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_7",
+                  "prompt": "我弄不明白事情。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_8",
+                  "prompt": "我能作出的贡献很少。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_9",
+                  "prompt": "我看不出事情会带来什么后果。",
+                  "required": true
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "product": "survey",
+      "method": "POST",
+      "path": "/api/public/survey/r/7a520a2d-eff7-4e18-8b95-0f7a9854af7f/attempts/e0646ca0-2b1b-4aa4-970c-ec36b0169ef1/task",
+      "status": 200,
+      "durationMs": 11,
+      "body": {
+        "code": 0,
+        "message": "操作成功",
+        "data": {
+          "attemptId": "e0646ca0-2b1b-4aa4-970c-ec36b0169ef1",
+          "waveId": "c3b72e54-1e2f-4a6a-af96-03094d8e3e22",
+          "status": "STARTED",
+          "definitionDigest": "bc50fffc7ea3ab802e116123515ef059c6ab43a83cebc0f99b5e2706c62d2b96",
+          "reportMode": "DESCRIPTIVE",
+          "units": [
+            {
+              "kind": "SCALE",
+              "instrumentKey": "c1systemprobe",
+              "title": "C1 synthetic exact source",
+              "instruction": "请根据你目前通常的情况，而不是希望将来成为的样子，判断下面各句话与你的实际情况有多符合。",
+              "presentationMode": "ONE_BY_ONE",
+              "responseOptions": [
+                {
+                  "optionKey": "o_0",
+                  "label": "很不符合"
+                },
+                {
+                  "optionKey": "o_1",
+                  "label": "比较不符合"
+                },
+                {
+                  "optionKey": "o_2",
+                  "label": "介于不符合与符合之间"
+                },
+                {
+                  "optionKey": "o_3",
+                  "label": "比较符合"
+                },
+                {
+                  "optionKey": "o_4",
+                  "label": "很符合"
+                }
+              ],
+              "items": [
+                {
+                  "itemKey": "i_0",
+                  "prompt": "我能成功完成任务。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_1",
+                  "prompt": "我在所做的事情上表现出色。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_2",
+                  "prompt": "我能顺利处理任务。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_3",
+                  "prompt": "我对自己的判断有把握。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_4",
+                  "prompt": "我能想出好的解决办法。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_5",
+                  "prompt": "我知道怎样把事情办好。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_6",
+                  "prompt": "我会误判情况。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_7",
+                  "prompt": "我弄不明白事情。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_8",
+                  "prompt": "我能作出的贡献很少。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_9",
+                  "prompt": "我看不出事情会带来什么后果。",
+                  "required": true
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "product": "survey",
+      "method": "POST",
+      "path": "/api/public/survey/r/7a520a2d-eff7-4e18-8b95-0f7a9854af7f/attempts/e0646ca0-2b1b-4aa4-970c-ec36b0169ef1/final",
+      "status": 200,
+      "durationMs": 45,
+      "body": {
+        "code": 0,
+        "message": "操作成功",
+        "data": {
+          "attemptId": "e0646ca0-2b1b-4aa4-970c-ec36b0169ef1",
+          "receiptId": "3c70c1f6-1880-4e51-a30c-55c3ae134087",
+          "completedAt": "2026-10-28T03:43:41.124Z",
+          "status": "COMPLETED",
+          "idempotent": false,
+          "generalText": "Synthetic result saved.",
+          "generalReceipt": {
+            "text": "Synthetic result saved.",
+            "disclaimer": "本研究反馈仅作一般说明，不提供未经验证的常模、诊断或个体能力等级。",
+            "completedAt": "2026-10-28T03:43:41.124Z"
+          },
+          "participantFeedbackReceipt": {
+            "text": "Synthetic result saved.",
+            "disclaimer": "本研究反馈仅作一般说明，不提供未经验证的常模、诊断或个体能力等级。",
+            "completedAt": "2026-10-28T03:43:41.124Z",
+            "kind": "DESCRIPTIVE",
+            "measurements": [],
+            "pending": true
+          }
+        }
+      }
+    },
+    {
+      "product": "survey",
+      "method": "POST",
+      "path": "/api/public/survey/r/7a520a2d-eff7-4e18-8b95-0f7a9854af7f/attempts/e0646ca0-2b1b-4aa4-970c-ec36b0169ef1/final",
+      "status": 200,
+      "durationMs": 33,
+      "body": {
+        "code": 0,
+        "message": "操作成功",
+        "data": {
+          "attemptId": "e0646ca0-2b1b-4aa4-970c-ec36b0169ef1",
+          "receiptId": "3c70c1f6-1880-4e51-a30c-55c3ae134087",
+          "completedAt": "2026-10-28T03:43:41.124Z",
+          "status": "COMPLETED",
+          "idempotent": true,
+          "generalText": "Synthetic result saved."
+        }
+      }
+    },
+    {
+      "product": "survey",
+      "method": "POST",
+      "path": "/api/public/survey/r/7a520a2d-eff7-4e18-8b95-0f7a9854af7f/attempts/e0646ca0-2b1b-4aa4-970c-ec36b0169ef1/final",
+      "status": 409,
+      "durationMs": 16,
+      "body": {
+        "code": -1,
+        "message": "此波次已有不同的正式 FINAL，不能再次覆盖",
+        "data": null
+      }
+    },
+    {
+      "product": "survey",
+      "method": "POST",
+      "path": "/api/public/survey/r/7a520a2d-eff7-4e18-8b95-0f7a9854af7f/attempts/e0646ca0-2b1b-4aa4-970c-ec36b0169ef1/general",
+      "status": 200,
+      "durationMs": 16,
+      "body": {
+        "code": 0,
+        "message": "操作成功",
+        "data": {
+          "text": "Synthetic result saved.",
+          "disclaimer": "本研究反馈仅作一般说明，不提供未经验证的常模、诊断或个体能力等级。",
+          "completedAt": "2026-10-28T03:43:41.124Z",
+          "kind": "DESCRIPTIVE",
+          "measurements": [],
+          "pending": true
+        }
+      }
+    },
+    {
+      "product": "survey",
+      "method": "POST",
+      "path": "/api/public/survey/r/7a520a2d-eff7-4e18-8b95-0f7a9854af7f/attempts/e0646ca0-2b1b-4aa4-970c-ec36b0169ef1/task",
+      "status": 200,
+      "durationMs": 10,
+      "body": {
+        "code": 0,
+        "message": "操作成功",
+        "data": {
+          "attemptId": "e0646ca0-2b1b-4aa4-970c-ec36b0169ef1",
+          "waveId": "c3b72e54-1e2f-4a6a-af96-03094d8e3e22",
+          "status": "COMPLETED",
+          "definitionDigest": "bc50fffc7ea3ab802e116123515ef059c6ab43a83cebc0f99b5e2706c62d2b96",
+          "reportMode": "DESCRIPTIVE",
+          "units": [
+            {
+              "kind": "SCALE",
+              "instrumentKey": "c1systemprobe",
+              "title": "C1 synthetic exact source",
+              "instruction": "请根据你目前通常的情况，而不是希望将来成为的样子，判断下面各句话与你的实际情况有多符合。",
+              "presentationMode": "ONE_BY_ONE",
+              "responseOptions": [
+                {
+                  "optionKey": "o_0",
+                  "label": "很不符合"
+                },
+                {
+                  "optionKey": "o_1",
+                  "label": "比较不符合"
+                },
+                {
+                  "optionKey": "o_2",
+                  "label": "介于不符合与符合之间"
+                },
+                {
+                  "optionKey": "o_3",
+                  "label": "比较符合"
+                },
+                {
+                  "optionKey": "o_4",
+                  "label": "很符合"
+                }
+              ],
+              "items": [
+                {
+                  "itemKey": "i_0",
+                  "prompt": "我能成功完成任务。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_1",
+                  "prompt": "我在所做的事情上表现出色。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_2",
+                  "prompt": "我能顺利处理任务。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_3",
+                  "prompt": "我对自己的判断有把握。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_4",
+                  "prompt": "我能想出好的解决办法。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_5",
+                  "prompt": "我知道怎样把事情办好。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_6",
+                  "prompt": "我会误判情况。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_7",
+                  "prompt": "我弄不明白事情。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_8",
+                  "prompt": "我能作出的贡献很少。",
+                  "required": true
+                },
+                {
+                  "itemKey": "i_9",
+                  "prompt": "我看不出事情会带来什么后果。",
+                  "required": true
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "product": "survey",
+      "method": "POST",
+      "path": "/api/public/survey/r/7a520a2d-eff7-4e18-8b95-0f7a9854af7f/attempts/15330175-820a-4236-83e3-aef61abea1db/general",
+      "status": 403,
+      "durationMs": 8,
+      "body": {
+        "code": -1,
+        "message": "研究身份或进入凭证无效",
+        "data": null
+      }
+    },
+    {
+      "product": "survey",
+      "method": "POST",
+      "path": "/api/public/survey/r/7a520a2d-eff7-4e18-8b95-0f7a9854af7f/revoke-access",
+      "status": 200,
+      "durationMs": 9,
+      "body": {
+        "code": 0,
+        "message": "操作成功",
+        "data": {
+          "revoked": true
+        }
+      }
+    },
+    {
+      "product": "survey",
+      "method": "POST",
+      "path": "/api/public/survey/r/7a520a2d-eff7-4e18-8b95-0f7a9854af7f/attempts/15330175-820a-4236-83e3-aef61abea1db/general",
+      "status": 403,
+      "durationMs": 8,
+      "body": {
+        "code": -1,
+        "message": "研究身份或进入凭证无效",
+        "data": null
+      }
+    }
+  ],
+  "failures": [],
+  "endedAt": "2026-10-28T03:43:41.283Z"
+}

@@ -1,0 +1,11 @@
+Training authenticated student current FINAL/resume/replay PASS
+Training anonymous token and recovery credential are an independent FINAL path PASS
+Survey LINKED_WAVES continuation: explicit linkage notice, exact draft, two frozen waves PASS
+Survey SINGLE_UNLINKED real FINAL, saved metric, recovery and current feedback POST /api/public/survey/r/fed812c0-519a-451d-a2ed-57b99b7d2020/attempts/667e55f8-ae60-4f63-97af-725691f8911c/final {"code":-1,"message":"itemTimings：逐题施测必须提供每题计时状态","data":null}
+
+400 !== 200
+
+Survey LINKED_WAVES real FINAL, saved metric, recovery and current feedback POST /api/public/survey/r/7a520a2d-eff7-4e18-8b95-0f7a9854af7f/attempts/15330175-820a-4236-83e3-aef61abea1db/final {"code":-1,"message":"itemTimings：逐题施测必须提供每题计时状态","data":null}
+
+400 !== 200
+

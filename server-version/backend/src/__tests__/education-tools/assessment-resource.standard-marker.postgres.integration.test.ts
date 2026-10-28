@@ -1,4 +1,5 @@
 import {randomUUID} from 'node:crypto'
+import {getContentRelease,publishContentRelease} from '../../modules/measurement-content/repository'
 import {beforeAll,afterAll,describe,it,expect} from 'vitest'
 import {prisma as db} from '../../config/database'
 import {integrationDatabaseUrl,requireIsolatedReleaseDatabase} from '../integration/integration-env'
@@ -118,4 +119,45 @@ suite('Education exact standard marker real approved source',()=>{
    await validateTrainingReportPointer(tx,{unit,ownerId:author.principal.userId,compositeId:runtime.id,reportReleaseId:unit.report.releaseId,publication:false,releases})
   })
  })
+ it('continues published exact education target reports through real STANDARD attempt binding for both products',async()=>{
+  const resourceId=completedResourceId??process.env.EDUCATION_STANDARD_MARKER_RESOURCE_ID
+  if(!resourceId)throw new Error('A separately prepared isolated STANDARD source is required')
+  const [prior]=await db.$queryRaw<Array<{source_composite_id:string;entry:any}>>`SELECT source_composite_id,entry FROM education_assessment_deliveries WHERE id=${resourceId}`
+  const original=await db.compositeAssessment.findUniqueOrThrow({where:{id:prior.source_composite_id}})
+  const sourceUnit=(original.trainingContentSnapshot as any).units[0]
+  const grantRoot=await db.contentCapabilityGrant.findUniqueOrThrow({where:{id:prior.entry.educationOrigin.distribution.grants[0].grantId}})
+  const systemId=grantRoot.issuerId
+  const originalReport=await db.$transaction(tx=>getContentRelease(tx,sourceUnit.report.releaseId,true))
+  if(!originalReport||originalReport.layer!=='REPORT')throw new Error('Exact approved original report required')
+  for(const product of ['SCHOOL','TEACHER'] as const){
+   const organizationId=randomUUID(),entry=product==='SCHOOL'?'HUISCHOOL':'HUITEACHER'
+   await db.organization.create({data:{id:organizationId,name:'Synthetic exact target report '+product,productDomain:'SCHOOL',createdByUserId:systemId}})
+   await db.educationProductEntitlement.create({data:{organizationId,product:entry,grantedByUserId:systemId}})
+   const actor=async()=>{
+    const user=await db.user.create({data:{username:'target-report-'+randomUUID(),passwordHash:'synthetic-only',accountDomain:'SCHOOL',role:'TEACHER',teacherApproved:true}})
+    const membershipId=randomUUID();await db.organizationMembership.create({data:{id:membershipId,organizationId,userId:user.id}})
+    await db.educationProductRoleGrant.create({data:{id:randomUUID(),organizationId,membershipId,product:entry,role:'PRODUCT_ADMIN',grantedByUserId:systemId}})
+    return {product,organizationId,principal:{userId:user.id,username:user.username,role:'TEACHER',platformRole:'STANDARD',accountDomain:'SCHOOL',tokenVersion:0,mustChangePassword:false}} as EducationAssessmentContext
+   }
+   const author=await actor(),reviewer=await actor()
+   const grant=async(ids:string[])=>{
+    const root=await issueAdminContentRoot(systemId,{tokenVersion:0,adminSessionId:'synthetic-proof',adminVerifiedAt:Date.now()/1000},{requestId:randomUUID(),expectedVersion:0,reason:'Exact synthetic target report authorization',grant:{subjectId:author.principal.userId,scope:{product,scopeKind:'ORGANIZATION',scopeId:organizationId,resourceKind:'material',resourceKeys:ids},capabilities:['material.distribute'],delegableCapabilities:[],remainingDelegationDepth:0,validFrom:new Date(Date.now()-60000).toISOString(),expiresAt:new Date(Date.now()+3600000).toISOString()}})
+    return ids.map(resourceId=>({resourceId,grantId:root.grantId}))
+   }
+   const baseLicenses=await grant([original.id,sourceUnit.measurement.releaseId])
+   const preparation=await service.prepareEducationAssessment(author,{resourceId:randomUUID(),sourceCompositeId:original.id,title:'Authorized target '+product,family:'BUNDLE',licenses:baseLicenses})
+   const target=await db.$transaction(tx=>publishContentRelease(tx,{layer:'REPORT',family:'SCALE',key:'synthetic-target:'+preparation.resourceId,version:'1.0.0',scope:{kind:'PRIVATE',product,ownerId:author.principal.userId,resourceId:preparation.runtimeCompositeId},assetRefs:originalReport.assetRefs,sourceReleaseId:originalReport.releaseId,provenance:{sourceReportHash:originalReport.contentHash,syntheticTarget:true},content:{...originalReport.content,audience:product==='SCHOOL'?'student':'teacher'}},author.principal.userId))
+   const licenses=[...baseLicenses,...await grant([target.releaseId])],itemId=preparation.units[0].itemId
+   const registered=await service.registerEducationAssessment(author,preparation.resourceId,{expectedPreparationHash:preparation.preparationHash,disclosure:testDisclosure(),feedbackPolicy:{schemaVersion:1,mode:'IMMEDIATE'},references:{schemaVersion:1,units:[]},reports:[{itemId,releaseId:target.releaseId}],licenses})
+   await service.transitionEducationAssessment(reviewer,preparation.resourceId,'REVIEW',{expectedEntryHash:registered.entryHash,reason:'Independent target report review'})
+   await service.transitionEducationAssessment(reviewer,preparation.resourceId,'PUBLISH',{expectedEntryHash:registered.entryHash,reason:'Exact target report publication'})
+   const runtime=await db.compositeAssessment.findUniqueOrThrow({where:{id:preparation.runtimeCompositeId},include:{items:{include:{scale:true}}}})
+   const bound=await db.$transaction(tx=>prepareTrainingContentAttemptBinding(tx,{compositeId:runtime.id,attemptId:randomUUID(),epoch:1,snapshot:runtime.trainingContentSnapshot,snapshotHash:runtime.trainingContentSnapshotHash,composite:runtime,resolvedSituational:new Map()}))
+   expect(bound?.binding.units[0].report).toEqual({releaseId:target.releaseId,contentHash:target.contentHash})
+   expect(bound?.binding.units[0].measurement).toEqual(sourceUnit.measurement)
+   const unit=(runtime.trainingContentSnapshot as any).units[0]
+   await expect(db.$transaction(tx=>validateTrainingReportPointer(tx,{unit,compositeId:runtime.id,ownerId:author.principal.userId,reportReleaseId:originalReport.releaseId,publication:false,releases:new Map()}))).rejects.toThrow('SCOPE_DENIED')
+  }
+ })
+
 })

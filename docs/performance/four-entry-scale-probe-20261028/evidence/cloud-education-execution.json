@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "node",
+    "node_modules/tsx/dist/cli.mjs",
+    "/tmp/pr374-cloud/education.ts"
+  ],
+  "startedAt": "2026-10-28T03:34:38.581839+00:00",
+  "head": "dece996eba527ed51c41e7488100c75fe55ff280",
+  "scriptSHA256": "773fb95e2cd7972f1dc0c0a82baa2829efbb8c8c37ca68d958966e6c09cb0185",
+  "fixtureSHA256": "c1f67bc13ced80481a727d3321cdd3b94e4a8b363c5cf3c41e5689bf2b3b7294",
+  "exitCode": 0,
+  "endedAt": "2026-10-28T03:34:40.695375+00:00",
+  "logSHA256": "0a91409e28d5717c455d88659a2ba6119b78e81400f0986a7ea3f90795e6bac4"
+}

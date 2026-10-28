@@ -1,0 +1,24 @@
+{
+  "node": "v24.19.0",
+  "npm": "11.9.0",
+  "versions": {
+    "typescript": "5.9.3",
+    "prisma": "5.22.0",
+    "@prisma/client": "5.22.0",
+    "playwright-core": "1.62.1"
+  },
+  "featureFlags": {
+    "BACKGROUND_WORKERS_ENABLED": "false",
+    "VIDEO_PROCESSING_ENABLED": "false",
+    "HEAVY_PROCESSING_ENABLED": "false",
+    "SURVEY_WORKSPACE_ENABLED": "true",
+    "SURVEY_PUBLICATION_ENABLED": "true",
+    "HUITEACHER_WORKSPACE_ENABLED": "true"
+  },
+  "nodeEnv": "test",
+  "production": false,
+  "limitations": [
+    "No claim that this installed dependency directory equals DOT original environment byte-for-byte.",
+    "The runtime fixture only appends exact C1 to the generated source list in memory."
+  ]
+}

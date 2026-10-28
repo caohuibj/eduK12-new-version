@@ -1,0 +1,27 @@
+import os,json,subprocess,secrets,time,pathlib,datetime,hashlib
+root=pathlib.Path('/workspace/eduK12-new-version'); work=pathlib.Path('/tmp/pr374-cloud')
+out=root/'docs/performance/four-entry-scale-probe-20261028/evidence';out.mkdir(exist_ok=True)
+backend=root/'server-version/backend'
+runid='pr374-'+secrets.token_hex(4)
+env=dict(os.environ)
+env.update(json.loads(subprocess.check_output(['node','-e',"console.log(JSON.stringify(require('./node_modules/dotenv').parse(require('fs').readFileSync('/workspace/eduk12-cloud/local.env'))))"],cwd=backend)))
+password=secrets.token_urlsafe(24); database=runid.replace('-','_')
+env.update(DATABASE_URL=f'postgresql://probe:{password}@127.0.0.1:55541/{database}?schema=public',REDIS_URL='redis://127.0.0.1:56389/0',NODE_ENV='test',PORT='3187',BACKGROUND_WORKERS_ENABLED='false',VIDEO_PROCESSING_ENABLED='false',HEAVY_PROCESSING_ENABLED='false',SURVEY_WORKSPACE_ENABLED='true',SURVEY_PUBLICATION_ENABLED='true',HUITEACHER_WORKSPACE_ENABLED='true',CAMPUS_ELIGIBILITY_HMAC_KEY=secrets.token_hex(32),UPLOAD_DIR=str(work/'uploads'),EXPORT_DIR=str(work/'exports'))
+private=work/'environment.json';private.write_text(json.dumps(env));private.chmod(0o600)
+pg_env=work/'postgres.env';pg_env.write_text(f'POSTGRES_USER=probe\nPOSTGRES_PASSWORD={password}\nPOSTGRES_DB={database}\n');pg_env.chmod(0o600)
+meta={'runid':runid,'database':database,'containers':[runid+'-pg',runid+'-redis'],'createdAt':datetime.datetime.now(datetime.UTC).isoformat(),'production':False,'pgImage':'postgres:16.15-bookworm@sha256:efedf3595f1d6f415c08568ba171029bf54052e754cc9f030e3f2412b21f3d67','redisImage':'redis:7.4.11-bookworm@sha256:c6eabf748fc7a61dbb5a705c78bcf3d6377b1127a97d0ce965c11c44ba46896f'}
+(work/'meta.json').write_text(json.dumps(meta,indent=2)+'\n')
+def run(args,log):
+ p=subprocess.run(args,cwd=backend,env=env,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+ (out/log).write_bytes(p.stdout)
+ print(log,p.returncode,flush=True)
+ if p.returncode: raise RuntimeError(log+' failed; preserved output')
+run(['docker','run','-d','--name',meta['containers'][0],'--label','purpose=pr374-synthetic','--env-file',str(pg_env),'-p','127.0.0.1:55541:5432','--tmpfs','/var/lib/postgresql/data',meta['pgImage']],'cloud-services-pg.log')
+run(['docker','run','-d','--name',meta['containers'][1],'--label','purpose=pr374-synthetic','-p','127.0.0.1:56389:6379',meta['redisImage']],'cloud-services-redis.log')
+for i in range(30):
+ p=subprocess.run(['docker','exec',meta['containers'][0],'pg_isready','-U','probe','-d',database],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+ if p.returncode==0:break
+ time.sleep(.5)
+else:raise RuntimeError('Own PG not ready')
+run(['node','node_modules/prisma/build/index.js','migrate','deploy'],'cloud-schema-migrate.log')
+(out/'cloud-environment.json').write_text(json.dumps(meta,indent=2)+'\n')

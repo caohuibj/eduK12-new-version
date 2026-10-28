@@ -180,3 +180,15 @@ it('reads only required disclosure fields while retaining current identity and r
   expect(mocks.final.mock.calls[0][0].select).toEqual({definitionDigest:true,resultsCipher:true,resultsHash:true,completedAt:true})
   expect(JSON.stringify(response)).not.toContain('private-')
 })
+
+
+it.each(['SCALE','SJT'] as const)('uses frozen %s display labels only for already permitted saved metrics',kind=>{
+ const u=unit(kind),definition=u.compiledDefinition as any
+ definition.scoring[kind==='SCALE'?'scores':'publishedMetrics']=[{key:'safe',label:'本次自我效能'},{key:'private',label:'不可公开的指标'}]
+ const feedback=rawParticipantFeedback(u,stored(kind),true)
+ expect(feedback).toMatchObject({metrics:[{key:'safe',label:'本次自我效能',value:7,unit:null,status:'OK'}]})
+ expect(JSON.stringify(feedback)).not.toContain('不可公开的指标')
+ definition.scoring[kind==='SCALE'?'scores':'publishedMetrics'][0].label=' '
+ expect(rawParticipantFeedback(u,stored(kind),true)).toMatchObject({metrics:[{key:'safe',label:'safe'}]})
+ expect(rawParticipantFeedback({...u,participantFeedback:{...policy(),release:'AFTER_COLLECTION'}},stored(kind),false)).toEqual({pending:true})
+})

@@ -1,0 +1,12 @@
+{
+  "runid": "pr374-df46abf6",
+  "database": "pr374_df46abf6",
+  "containers": [
+    "pr374-df46abf6-pg",
+    "pr374-df46abf6-redis"
+  ],
+  "createdAt": "2026-10-28T03:33:33.453471+00:00",
+  "production": false,
+  "pgImage": "postgres:16.15-bookworm@sha256:efedf3595f1d6f415c08568ba171029bf54052e754cc9f030e3f2412b21f3d67",
+  "redisImage": "redis:7.4.11-bookworm@sha256:c6eabf748fc7a61dbb5a705c78bcf3d6377b1127a97d0ce965c11c44ba46896f"
+}

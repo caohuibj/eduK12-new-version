@@ -1,0 +1,116 @@
+{
+  "startedAt": "2026-10-28T03:38:05.960Z",
+  "scope": "Actual existing assignment/run APIs; only one C1 resource per product; all persons/organization/class fixtures synthetic adult technical roles",
+  "stages": [
+    {
+      "name": "TEACHER-existing-target-read",
+      "outcome": "RESOLVED",
+      "result": {
+        "id": "bc7315e0-e5f3-4de8-8a9f-aa6a89a47552",
+        "organizationId": "67563cf7-ccd5-4d4b-b622-f62886ea5c11",
+        "kind": "PERSON",
+        "subjectUserId": "c9394796-ad73-4cd3-bb49-b15ab18084fe",
+        "name": "合成成人本人",
+        "status": "ACTIVE",
+        "createdByUserId": "b8aa179a-9895-429e-b215-17d5cb68d3d4",
+        "createdAt": "2026-10-28T03:34:42.272Z",
+        "updatedAt": "2026-10-28T03:34:42.272Z"
+      }
+    },
+    {
+      "name": "TEACHER-event",
+      "outcome": "RESOLVED",
+      "result": {
+        "id": "31eb4ccf-a813-47ae-9dcc-522bfa1c36ad",
+        "organizationId": "67563cf7-ccd5-4d4b-b622-f62886ea5c11",
+        "targetId": "bc7315e0-e5f3-4de8-8a9f-aa6a89a47552",
+        "kind": "ASSESSMENT",
+        "title": "C1单量表系统验收",
+        "notes": null,
+        "status": "DRAFT",
+        "version": 1,
+        "scheduledAt": null,
+        "openedAt": null,
+        "closedAt": null,
+        "createdByUserId": "b8aa179a-9895-429e-b215-17d5cb68d3d4",
+        "createdAt": "2026-10-28T03:38:07.016Z",
+        "updatedAt": "2026-10-28T03:38:07.016Z"
+      }
+    },
+    {
+      "name": "TEACHER-run-draft",
+      "outcome": "RESOLVED",
+      "result": {
+        "eventId": "31eb4ccf-a813-47ae-9dcc-522bfa1c36ad",
+        "runId": "42b51d2f-cd43-46b4-9687-dbf76ba12a6a",
+        "status": "DRAFT",
+        "version": 1
+      }
+    },
+    {
+      "name": "TEACHER-add-exact-track",
+      "outcome": "RESOLVED",
+      "result": {
+        "id": "f7d40f38-49f7-4691-b5d6-ef176c5dc78c",
+        "organizationId": "67563cf7-ccd5-4d4b-b622-f62886ea5c11",
+        "runId": "42b51d2f-cd43-46b4-9687-dbf76ba12a6a",
+        "resourceFamily": "BUNDLE",
+        "resourceKey": "education-assessment:TEACHER:67563cf7-ccd5-4d4b-b622-f62886ea5c11:5cd438f9-e7f9-48ba-a52b-4e8be0ee6447",
+        "resourceVersion": "1.0.0",
+        "subjectSelector": {
+          "kind": "MEMBERSHIP_IDS",
+          "membershipIds": [
+            "9c160e04-0549-4209-91d8-b1777b053adb"
+          ]
+        },
+        "respondentSelector": {
+          "kind": "MEMBERSHIP_IDS",
+          "membershipIds": [
+            "9c160e04-0549-4209-91d8-b1777b053adb"
+          ]
+        },
+        "requestedPolicy": {
+          "analysisMode": "INDIVIDUAL_ONLY",
+          "perspectives": [
+            "SELF_REPORT"
+          ],
+          "subjectRoles": [
+            "TEACHER"
+          ],
+          "respondentRoles": [
+            "TEACHER"
+          ],
+          "relationshipKinds": [
+            "SELF"
+          ],
+          "minimumRespondents": null,
+          "visibilityPolicyKey": "synthetic-one-scale-respondent-only"
+        },
+        "frozenResourcePolicy": null,
+        "resourcePolicyHash": null
+      }
+    },
+    {
+      "name": "TEACHER-event-open",
+      "outcome": "RESOLVED",
+      "result": {
+        "id": "31eb4ccf-a813-47ae-9dcc-522bfa1c36ad",
+        "status": "OPEN",
+        "version": 2
+      }
+    },
+    {
+      "name": "TEACHER-run-publish",
+      "outcome": "RESOLVED",
+      "result": {
+        "runId": "42b51d2f-cd43-46b4-9687-dbf76ba12a6a",
+        "version": 3,
+        "trackCount": 1,
+        "executionCount": 1
+      }
+    }
+  ],
+  "failures": [],
+  "fixturePreconditions": [],
+  "endedAt": "2026-10-28T03:38:07.236Z"
+}

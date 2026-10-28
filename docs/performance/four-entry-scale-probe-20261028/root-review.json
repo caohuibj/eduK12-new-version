@@ -1,0 +1,23 @@
+{
+  "reviewedHead": "bf0553c6c52e22aca7927332fafc9acdffdfc9ff",
+  "reviewer": "root dot",
+  "result": {
+    "kind": "reviewed-http-database-phases",
+    "supportedModes": 6,
+    "canonicalFinals": 7,
+    "score": 30,
+    "currentFirstFeedbackReadEquality": 3,
+    "ciExecuted": false,
+    "originalExecutionSigned": false,
+    "originalFailedInvocationsRetained": true,
+    "scope": "HTTP/DB with synthetic management bootstrap; no browser or production claim",
+    "indexSHA256": "38a245297f23d90236e944c91eb8f1ab880f0cca04ac6bdb62158359179c5260"
+  },
+  "limitations": [
+    "Original observations unsigned; root directly read code, scripts and all120indexed bytes.",
+    "School failed helper phases combined with separate successful current readback remain explicitly partial originals.",
+    "PR372 ACK-before-reload code and old fixtures unchanged except separate instruction rendering; original2cases can be reused.",
+    "Current3SurveyfirstFINALfeedbackequalsindependentGeneralread from actual captured responses, no new API replay.",
+    "Browser consumer checks still required; no complete UI/Actions/merge/deployment claim."
+  ]
+}

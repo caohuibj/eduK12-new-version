@@ -1,0 +1,5 @@
+School continuation: read completed canonical result and current permitted report only PASS
+Teacher authenticated same-person SELF: exact target R -> START/resume/FINAL/replay/report GET /api/huiteacher/assessment-composite-attempts/9591e94d-e4d0-41cf-9ece-f73a355c6c5d?view=current-unit {"code":"STALE_ATTEMPT","message":"ELIGIBILITY_INELIGIBLE:RESPONDENT_TYPE_NOT_ALLOWED","data":null}
+
+409 !== 200
+

@@ -1,0 +1,22 @@
+{
+  "startedAt": "2026-10-28T03:37:10.162Z",
+  "scope": "Actual existing assignment/run APIs; only one C1 resource per product; all persons/organization/class fixtures synthetic adult technical roles",
+  "stages": [
+    {
+      "name": "TEACHER-target",
+      "outcome": "REJECTED",
+      "code": "P2002",
+      "message": "\nInvalid `tx.huiteacherEvaluationTarget.create()` invocation in\n/workspace/eduK12-new-version/server-version/backend/src/modules/huiteacher/evaluation.service.ts:56:54\n\n  53 // An unregistered teacher is a stable but UNCLAIMED target. Later account\n  54 // binding requires a separate identity proof and must never match by name.\n  55 const id=randomUUID()\n→ 56 const target=await tx.huiteacherEvaluationTarget.create(\nUnique constraint failed on the fields: (`organization_id`,`subject_user_id`)"
+    }
+  ],
+  "failures": [
+    {
+      "name": "TEACHER-target",
+      "code": "P2002",
+      "message": "\nInvalid `tx.huiteacherEvaluationTarget.create()` invocation in\n/workspace/eduK12-new-version/server-version/backend/src/modules/huiteacher/evaluation.service.ts:56:54\n\n  53 // An unregistered teacher is a stable but UNCLAIMED target. Later account\n  54 // binding requires a separate identity proof and must never match by name.\n  55 const id=randomUUID()\n→ 56 const target=await tx.huiteacherEvaluationTarget.create(\nUnique constraint failed on the fields: (`organization_id`,`subject_user_id`)",
+      "stack": "PrismaClientKnownRequestError: \nInvalid `tx.huiteacherEvaluationTarget.create()` invocation in\n/workspace/eduK12-new-version/server-version/backend/src/modules/huiteacher/evaluation.service.ts:56:54\n\n  53 // An unregistered teacher is a stable but UNCLAIMED target. Later account\n  54 // binding requires a separate identity proof and must never match by name.\n  55 const id=randomUUID()\n→ 56 const target=await tx.huiteacherEvaluationTarget.create(\nUnique constraint failed on the fields: (`organization_id`,`subject_user_id`)\n    at $n.handleRequestError (/workspace/eduK12-new-version/server-version/backend/node_modules/@prisma/client/runtime/library.js:121:7315)\n    at $n.handleAndLogRequestError (/workspace/eduK12-new-version/server-version/backend/node_modules/@prisma/client/runtime/library.js:121:6623)\n    at $n.request (/workspace/eduK12-new-version/server-version/backend/node_modules/@prisma/client/runtime/library.js:121:6307)\n    at async l (/workspace/eduK12-new-version/server-version/backend/node_modules/@prisma/client/runtime/library.js:130:9633)\n    at async <anonymous> (/workspace/eduK12-new-version/server-version/backend/src/config/database.ts:43:14)\n    at async <anonymous> (/workspace/eduK12-new-version/server-version/backend/src/modules/huiteacher/evaluation.service.ts:56:18)\n    at async Proxy._transactionWithCallback (/workspace/eduK12-new-version/server-version/backend/node_modules/@prisma/client/runtime/library.js:130:8000)\n    at async step (/tmp/pr374-cloud/teacher-new.ts:8:71)\n    at async main (/tmp/pr374-cloud/teacher-new.ts:18:15)"
+    }
+  ],
+  "fixturePreconditions": [],
+  "endedAt": "2026-10-28T03:37:11.229Z"
+}

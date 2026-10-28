@@ -4,6 +4,7 @@ import {execFileSync} from 'node:child_process';
 import {readFileSync,writeFileSync,mkdirSync} from 'node:fs';
 import {pathToFileURL} from 'node:url';
 import {onboardingPlan,binding} from './onboarding-scope.mjs';
+import {verifyPr374Observations} from './pr374-evidence.mjs';
 import {changedEntries} from './content-scope.mjs';
 
 const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
@@ -111,7 +112,7 @@ function admit(){
   verifyFailureContinuations(review.reports,admitted);
   const types=(Array.isArray(review.types)?review.types:[review.types]).map(record=>verifyTypeReceipt(readOriginal(record),record,path=>readFileSync(path),p.components[record.component??'backend']));
   assert(types.length);
-  if(p.pr===372)assert.deepEqual(types.map(t=>t.component).sort(),['backend','frontend']);
+  if([372,374].includes(p.pr))assert.deepEqual(types.map(t=>t.component).sort(),['backend','frontend']);
   const observations=[];
   if(p.pr===369){
     assert.equal(review.reportPlanningObservations?.length,1);
@@ -121,6 +122,8 @@ function admit(){
       originalObservationSHA256:record.sha256,originalExecutionSHA256:record.execution.sha256,
       sourceAssociationBasis:record.sourceAssociationBasis,limitations:record.limitations});
   }else assert(!review.reportPlanningObservations);
+  if(p.pr===374)observations.push(verifyPr374Observations(review.pr374));
+  else assert(!review.pr374);
   mkdirSync('onboarding-evidence',{recursive:true});
   writeFileSync('onboarding-evidence/admission.json',JSON.stringify({schemaVersion:1,source:p,runId:process.env.GITHUB_RUN_ID,attempt:process.env.GITHUB_RUN_ATTEMPT,admitted,types,observations,environment:review.environment,testsExecutedInCI:false,rootReviewAuthentication:'Immutable reviewed Git record, not a signed original execution'},null,2)+'\n');
 }

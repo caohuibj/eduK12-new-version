@@ -1,0 +1,46 @@
+[2026-10-28T03:35:01.420Z] [INFO] [Upload] Upload directories configured {
+  imagesDir: '/tmp/pr374-cloud/uploads/images',
+  videosDir: '/tmp/pr374-cloud/uploads/videos'
+}
+[2026-10-28T03:35:01.422Z] [INFO] [Upload] Created upload root directory { uploadDir: '/tmp/pr374-cloud/uploads' }
+[2026-10-28T03:35:01.422Z] [INFO] [Upload] Created images directory { imagesDir: '/tmp/pr374-cloud/uploads/images' }
+[2026-10-28T03:35:01.422Z] [INFO] [Upload] Created videos directory { videosDir: '/tmp/pr374-cloud/uploads/videos' }
+[2026-10-28T03:35:01.966Z] [INFO] [Server] Static files configured { uploadDir: '/tmp/pr374-cloud/uploads' }
+[2026-10-28T03:35:02.034Z] [INFO] Redis Adapter 已配置 - 支持 PM2 集群模式
+[2026-10-28T03:35:02.034Z] [INFO] Socket.IO 服务已初始化
+[2026-10-28T03:35:02.034Z] [INFO] 课堂命名空间: /classroom
+[2026-10-28T03:35:02.034Z] [INFO] Socket最大连接数限制已启用
+[2026-10-28T03:35:02.034Z] [INFO] 课堂 Socket.IO 事件处理器已初始化
+[2026-10-28T03:35:02.034Z] [INFO] 课堂 Socket.IO 事件处理器已初始化
+[2026-10-28T03:35:02.060Z] [INFO] [CacheService] Redis缓存服务初始化完成
+[2026-10-28T03:35:02.061Z] [INFO] Effective runtime resource config {
+  heapLimitMiB: 4288,
+  prismaConnectionLimit: '10',
+  prismaPoolTimeoutSeconds: '30',
+  admissionOverrides: '[REDACTED]',
+  videoConcurrency: 2,
+  imageConcurrency: 2,
+  exportConcurrency: 1,
+  imageTimeoutSeconds: 30,
+  videoTimeoutSeconds: 1800,
+  exportTimeoutSeconds: 1800,
+  workerShutdownTimeoutSeconds: 30,
+  videoLowPowerMode: true,
+  videoResolution: '480p',
+  videoPreset: 'veryfast',
+  videoCrf: 26,
+  videoBitrate: '800k',
+  videoAudioBitrate: '96k',
+  videoSmartCompression: true
+}
+[2026-10-28T03:35:02.061Z] [INFO] Background media/export workers are disabled for this process
+[2026-10-28T03:35:02.064Z] [INFO] 🚀 Server running on port 3187
+[2026-10-28T03:35:02.064Z] [INFO] 📁 Upload directory: /tmp/pr374-cloud/uploads
+[2026-10-28T03:35:02.065Z] [INFO] 📁 Upload directory absolute: /tmp/pr374-cloud/uploads
+[2026-10-28T03:35:02.065Z] [INFO] 🌐 Environment: test
+[2026-10-28T03:35:02.065Z] [INFO] 🔌 Socket.IO enabled
+[2026-10-28T03:37:26.820Z] [INFO] SIGTERM signal received: closing HTTP server
+[2026-10-28T03:37:26.820Z] [INFO] HTTP server closed
+[2026-10-28T03:37:26.823Z] [INFO] Socket.IO 服务已关闭
+[2026-10-28T03:37:26.824Z] [INFO] [CacheService] Redis连接已关闭
+[2026-10-28T03:37:26.825Z] [INFO] 队列已关闭
