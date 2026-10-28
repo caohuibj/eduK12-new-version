@@ -86,7 +86,7 @@ test('gate refuses Training impersonation, performance execution, changed plans 
 test('workflows preserve ordinary jobs, refuse manual fallback and pass the distinct administrator plan',()=>{
   const ci=workflow('ci'),backend=workflow('ci-backend'),browser=workflow('ci-browser');
   for(const name of ['scope','probe-backend','probe-perf','probe-browser','merge-gate'])
-    assert.match(job(ci,name),/!\(github\.event_name == 'workflow_dispatch' && github\.ref == 'refs\/heads\/admin-permissions\/a01-a07-20261020'\)/,name);
+    assert.match(job(ci,name),/!\(github\.event_name == 'workflow_dispatch'\s*&& github\.ref == 'refs\/heads\/admin-permissions\/a01-a07-20261020'\)/,name);
   assert.match(job(ci,'known-admin-functional-manual-refusal'),/throw new Error/);
   assert.match(job(ci,'scope'),/CI_ADMIN_FUNCTIONAL_REQUIRED:/);
   assert.match(job(ci,'scope'),/admin_permissions_functional_plan: \$\{\{ steps\.scope\.outputs\.admin_permissions_functional_plan \}\}/);
