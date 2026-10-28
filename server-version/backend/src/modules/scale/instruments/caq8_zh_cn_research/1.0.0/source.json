@@ -1,0 +1,816 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "caq8_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "Committed Action Questionnaire - 8-item (CAQ-8)",
+      "abbreviation": "CAQ-8",
+      "instrumentFamily": "CAQ"
+    },
+    "construct": {
+      "primaryDomain": "SELF_REGULATION",
+      "secondaryDomains": [],
+      "constructDefinition": "承诺行动：以价值为方向、在遇到困难时仍能坚持并灵活调整目标导向行为。正向键四题测价值坚持，负向键四题测困难面前的松懈式放弃。不是执行力测验，也不是疗效承诺书。",
+      "constructLevel": "BROAD_DOMAIN",
+      "constructOverlapTags": [
+        "domain:act",
+        "domain:self_regulation",
+        "population:adolescent_adult",
+        "response:student_self",
+        "use:reflection",
+        "use:research",
+        "language_validation:chinese_working_translation",
+        "construct:act_committed_action",
+        "committed_action",
+        "values_action",
+        "self_report"
+      ]
+    },
+    "population": {
+      "populationNotes": "原开发样本为慢性疼痛成人患者；中文大学生验证样本见开放文献。此中文工作译稿未经独立回译或本地验证，K12 低龄适用性未确立。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "PARTIAL"
+    },
+    "administration": {
+      "itemCount": 8,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "PAPER"
+      ],
+      "timeFrame": "一般情形，无指定回忆期",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保持官方作答量尺与题序；开放验证文献仅给出两端锚点 0 = never true、6 = always true；中间选项按仓库先例（SECQ-25）以数字标注，不猜测文字。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "SUPPORTED",
+          "notes": "原文研究支持；中文工作译文尚未验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "反馈仅作普遍生活化反思，不推断个体能力或状态。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "mccracken-2015-caq8",
+        "evidenceType": "STRUCTURAL_VALIDITY",
+        "population": "Adults with chronic pain (original); Chinese college students (open validation)",
+        "locale": "en",
+        "territory": "UK/CN",
+        "studyDesign": "原版论文报告 8 题短版；开放验证论文 Table 3 给出八题原文与两因子（values persistence 1–4 正向键；non-reactive behavior 5–8 负向键），总分 0–48、子量表各 0–24。",
+        "rating": "MIXED",
+        "citation": "McCracken LM, Chilcot J, Norton S (2015). European Journal of Pain, 19, 677-685; Li Y et al. (2021). Frontiers in Psychology, 12, 655518.",
+        "doi": "10.1002/ejp.589",
+        "url": "https://doi.org/10.1002/ejp.589",
+        "notes": "以上证据均针对原语言版本，不外推到本中文工作译稿。"
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "Committed Action Questionnaire - 8 item (CAQ-8); items verified in open-access validation (CC BY)",
+        "citation": "原版: McCracken, L. M., Chilcot, J., & Norton, S. (2015). Further development in the assessment of psychological flexibility: A shortened Committed Action Questionnaire (CAQ-8). European Journal of Pain, 19, 677-685. 题本核实来源: Li, Y., et al. (2021). Validation of the Committed Action Questionnaire-8 and its mediating role... Frontiers in Psychology, 12, 655518 (CC BY 4.0, Table 3 八题及因子归属).",
+        "url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2021.655518/full",
+        "publicationYear": 2015
+      },
+      "license": {
+        "status": "unknown",
+        "redistribution": "unknown",
+        "note": "原版论文（Wiley EJP）付费，未直接取得其附录；八题原文取自 Frontiers 开放获取（CC BY 4.0）中文验证论文的逐题表并逐题核对。开放论文的 CC BY 许可覆盖其刊登内容；原始题文的潜在第三方权利边界随原版论文保留。按仓库先例（BES-20/Delaware 用公开印刷来源）登记为 executable DRAFT，权利状态 unknown/待原版权利确认。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "caq_truth_0_6",
+          "options": [
+            {
+              "value": "0",
+              "label": "从不如此",
+              "score": 0
+            },
+            {
+              "value": "1",
+              "label": "1",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "2",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "3",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "4",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "5",
+              "score": 5
+            },
+            {
+              "value": "6",
+              "label": "总是如此",
+              "score": 6
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "CAQ8_01",
+          "content": "即使有时没能达成目标，我仍然能坚持自己的目标。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "caq_truth_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CAQ8_02",
+          "content": "当目标难以达成时，我能一步一步小步前进。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "caq_truth_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CAQ8_03",
+          "content": "我更愿意换一种方法去接近目标，而不是放弃。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "caq_truth_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CAQ8_04",
+          "content": "即使进展缓慢，我也能坚持执行自己的长期计划。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "caq_truth_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CAQ8_05",
+          "content": "除非感到事情是成功的，否则我很难把一件事继续做下去。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "caq_truth_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CAQ8_06",
+          "content": "当我感到痛苦或泄气时，我会让自己的承诺松懈下来。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "caq_truth_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CAQ8_07",
+          "content": "我会陷在自己的想法或情绪里，以至于做不了对我重要的事。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "caq_truth_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CAQ8_08",
+          "content": "如果不能按自己的方式做一件事，我就干脆不做。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "caq_truth_0_6",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "CAQ8_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CAQ8_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CAQ8_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CAQ8_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CAQ8_05",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "CAQ8_06",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "CAQ8_07",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "CAQ8_08",
+            "transform": {
+              "type": "reverse"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "committed_action_total",
+            "type": "total",
+            "label": "承诺行动总分（8题，负向键反向后）",
+            "description": "第 5–8 题（负向键）按 6−原始分反向后与第 1–4 题相加，范围 0–48。分数越高表示越多报告：即使困难或进展缓慢，仍朝自己看重的目标行动。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "CAQ8_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CAQ8_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CAQ8_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CAQ8_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CAQ8_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CAQ8_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CAQ8_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CAQ8_08",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "values_persistence",
+            "type": "dimension",
+            "label": "目标坚持（第1–4题）",
+            "description": "四个正向键题原始分求和，范围 0–24。分数越高表示越多报告为目标坚持、小步前进、换方法而不放弃。",
+            "direction": "higher_is_more",
+            "canonical": false,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "CAQ8_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CAQ8_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CAQ8_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CAQ8_04",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "negative_committed_action_raw",
+            "type": "dimension",
+            "label": "困难时的坚持（第5–8题反向后）",
+            "description": "四个负向键题按 6−原始分反向后求和，范围 0–24。分数越高表示越少报告“不成功就放弃、被想法缠住就不做了”式的反应，与“目标坚持”同向。开放验证论文以原始分报告该子量表；本实现按引擎题级反向规则统一方向，解读以本说明为准。",
+            "direction": "higher_is_more",
+            "canonical": false,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "CAQ8_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CAQ8_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CAQ8_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CAQ8_08",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "committed_action_total",
+          "values_persistence",
+          "negative_committed_action_raw"
+        ],
+        "scoreOrder": [
+          "committed_action_total",
+          "values_persistence",
+          "negative_committed_action_raw"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "committed_action_total",
+            "headline": "承诺行动总分",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "反向计分后求和，分数越高表示越多报告：即使遇到困难或进展缓慢，仍然朝自己看重的目标行动。数字不是能力等级。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回想一个进展缓慢、但你没有放弃的目标——是什么让你继续走？"
+              },
+              {
+                "category": "strategy",
+                "text": "把一个大目标拆成这周能完成的三个小步骤；每完成一步，记下你做了什么。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "values_persistence",
+            "headline": "目标坚持",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "四个正向键题的原始分求和：分数越高，越多报告“难达成也小步走、换方法不放弃”。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近一次“换一种办法试试”是什么时候？效果如何？"
+              },
+              {
+                "category": "strategy",
+                "text": "选一个卡住的目标，写下另一种可以试的路径，哪怕只试一次。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "negative_committed_action_raw",
+            "headline": "困难时的坚持（反向后）",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这一项由第 5–8 题反向计分后求和：分数越高，表示越少报告“不成功就放弃、被想法缠住就不做了”式的反应。它与“目标坚持”同向，三项都越高越表示更多报告坚持。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "什么时候你最容易“算了，不做了”？那时通常发生了什么？"
+              },
+              {
+                "category": "strategy",
+                "text": "下次想放弃时，先等 10 分钟再决定；10 分钟后你仍可以选择放弃，也可以再走一小步。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这是未经回译及本地验证的中文工作译稿，结果不可视作已验证中文测量结果。",
+          "原版开发样本为慢性疼痛成人；用于一般学生群体时只作生活化反思，不作疼痛或临床解释。",
+          "开放验证论文将第 5–8 题作为负向键并以原始分报告；本实现按引擎的题级反向规则统一在题目层反向，所有分数方向一致（越高越表示更多坚持），与原始文献的差异已在记录中说明。",
+          "该报告是单次自述；缺答不计分，不插补。"
+        ],
+        "disclaimer": "这些内容仅供一般自我反思，不用于诊断、筛查、选拔或排名。"
+      },
+      "referencePolicy": {
+        "type": "none"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "all_minimum",
+        "answers": [
+          {
+            "itemCode": "CAQ8_01",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CAQ8_02",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CAQ8_03",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CAQ8_04",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CAQ8_05",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CAQ8_06",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CAQ8_07",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CAQ8_08",
+            "responseValue": "0"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "committed_action_total": 24,
+            "values_persistence": 0,
+            "negative_committed_action_raw": 24
+          },
+          "totalScoreKeys": [
+            "committed_action_total",
+            "values_persistence",
+            "negative_committed_action_raw"
+          ]
+        }
+      },
+      {
+        "name": "all_maximum",
+        "answers": [
+          {
+            "itemCode": "CAQ8_01",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CAQ8_02",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CAQ8_03",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CAQ8_04",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CAQ8_05",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CAQ8_06",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CAQ8_07",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CAQ8_08",
+            "responseValue": "6"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "committed_action_total": 24,
+            "values_persistence": 24,
+            "negative_committed_action_raw": 0
+          },
+          "totalScoreKeys": [
+            "committed_action_total",
+            "values_persistence",
+            "negative_committed_action_raw"
+          ]
+        }
+      },
+      {
+        "name": "all_midpoint",
+        "answers": [
+          {
+            "itemCode": "CAQ8_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CAQ8_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CAQ8_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CAQ8_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CAQ8_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CAQ8_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CAQ8_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CAQ8_08",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "committed_action_total": 24,
+            "values_persistence": 12,
+            "negative_committed_action_raw": 12
+          },
+          "totalScoreKeys": [
+            "committed_action_total",
+            "values_persistence",
+            "negative_committed_action_raw"
+          ]
+        }
+      },
+      {
+        "name": "mixed_pattern",
+        "answers": [
+          {
+            "itemCode": "CAQ8_01",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CAQ8_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CAQ8_03",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CAQ8_04",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CAQ8_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CAQ8_06",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CAQ8_07",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CAQ8_08",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "committed_action_total": 21,
+            "values_persistence": 9,
+            "negative_committed_action_raw": 12
+          },
+          "totalScoreKeys": [
+            "committed_action_total",
+            "values_persistence",
+            "negative_committed_action_raw"
+          ]
+        }
+      },
+      {
+        "name": "missing_first_item",
+        "answers": [
+          {
+            "itemCode": "CAQ8_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CAQ8_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CAQ8_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CAQ8_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CAQ8_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CAQ8_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CAQ8_08",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "committed_action_total": null,
+            "values_persistence": null,
+            "negative_committed_action_raw": 12
+          },
+          "totalScoreKeys": [
+            "committed_action_total",
+            "values_persistence",
+            "negative_committed_action_raw"
+          ]
+        }
+      },
+      {
+        "name": "all_missing",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "committed_action_total": null,
+            "values_persistence": null,
+            "negative_committed_action_raw": null
+          },
+          "totalScoreKeys": [
+            "committed_action_total",
+            "values_persistence",
+            "negative_committed_action_raw"
+          ]
+        }
+      }
+    ]
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "caq8-v1",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "caq8-v1",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

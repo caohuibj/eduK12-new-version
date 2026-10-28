@@ -1,0 +1,19 @@
+{
+  "note": "模拟数据，仅用于核对计分与报告样稿",
+  "answers": {
+    "CAQ8_01": 3,
+    "CAQ8_02": 0,
+    "CAQ8_03": 6,
+    "CAQ8_04": 3,
+    "CAQ8_05": 0,
+    "CAQ8_06": 6,
+    "CAQ8_07": 3,
+    "CAQ8_08": 0
+  },
+  "expectedScores": {
+    "committed_action_total": 27,
+    "values_persistence": 12,
+    "negative_committed_action_raw": 15
+  },
+  "quality": "interpretable"
+}
