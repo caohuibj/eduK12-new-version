@@ -8,6 +8,40 @@ vi.mock('./HuiteacherMyScaleTasks',()=>({HuiteacherMyScaleTasks:()=>null}))
 vi.mock('./HuiteacherClassRelationships',()=>({HuiteacherClassRelationships:()=>null}))
 const reply=(data:unknown)=>({ok:true,json:async()=>({code:0,message:'成功',data})})
 afterEach(()=>{cleanup();vi.restoreAllMocks();vi.unstubAllGlobals()})
+it.each(['TEACHER','ADMIN'])('keeps %s participants outside authoring when this school has no Teacher admin grant',async role=>{
+ const requests=vi.fn(async(url:string)=>{
+  if(url.endsWith('/auth/me'))return reply({id:'participant',username:'Participant',role,mustChangePassword:false,organizations:[{organizationId:'a',organizationName:'学校 a',productAdmin:false}]})
+  if(url.endsWith('/auth/csrf'))return reply({csrfToken:'test-csrf'})
+  // Even a stale/incorrect hint cannot replace the selected school's current
+  // product-admin membership in the product navigation adapter.
+  if(url.endsWith('/tool-authoring-capabilities'))return reply({canAuthor:true,authorableToolKinds:['SCALE','FORM']})
+  return reply({list:[]})
+ })
+ vi.stubGlobal('fetch',requests)
+ render(<HuiteacherApp/> )
+ await screen.findByRole('button',{name:'教师成长'})
+ expect(screen.queryByRole('button',{name:'我的工具'})).not.toBeInTheDocument()
+ expect(requests.mock.calls.some(([url])=>url.includes('/tool-authoring-capabilities')||url.includes('/private-tools')||url.includes('/assessment-resource-registrations'))).toBe(false)
+ fireEvent.click(screen.getByRole('link',{name:'个人测评'}))
+ expect(await screen.findByText('本人个人测评')).toBeInTheDocument()
+})
+it('drops the authoring capability on a school change before loading private data for the next school',async()=>{
+ const requests=vi.fn(async(url:string)=>{
+  if(url.endsWith('/auth/me'))return reply({id:'manager',username:'Manager',role:'TEACHER',mustChangePassword:false,organizations:['a','b'].map(id=>({organizationId:id,organizationName:'学校 '+id,productAdmin:true}))})
+  if(url.endsWith('/auth/csrf'))return reply({csrfToken:'test-csrf'})
+  if(url.endsWith('/tool-authoring-capabilities'))return reply({canAuthor:url.includes('/a/'),authorableToolKinds:url.includes('/a/')?['SCALE','FORM']:[]})
+  return reply({list:[],nextCursor:null})
+ })
+ vi.stubGlobal('fetch',requests)
+ render(<HuiteacherApp/> )
+ fireEvent.click(await screen.findByRole('button',{name:'我的工具'}))
+ await screen.findByLabelText('工具名称')
+ fireEvent.change(screen.getByLabelText('当前学校管理范围'),{target:{value:'b'}})
+ await screen.findByText('当前账号或学校暂无私有量表与表单编制权限。')
+ expect(screen.queryByRole('button',{name:'我的工具'})).not.toBeInTheDocument()
+ expect(screen.queryByLabelText('工具名称')).not.toBeInTheDocument()
+ expect(requests.mock.calls.some(([url])=>url.includes('/organizations/b/private-tools')||url.includes('/organizations/b/assessment-resource-registrations'))).toBe(false)
+})
 it('protects private drafts on Teacher tab and school changes, including pending writes',async()=>{
  const draft={id:'p1',kind:'SCALE',title:'私有量表',revision:1,contentHash:'hash',definition:emptyDefinition()}
  let resolveSave!:(value:unknown)=>void

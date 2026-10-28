@@ -15,8 +15,13 @@ async function fixture(tx: Prisma.TransactionClient) {
   await tx.educationProductEntitlement.create({ data: { organizationId: org.id, product: 'HUITEACHER', status: 'ACTIVE', grantedByUserId: user.id } })
   const persona = await tx.organizationPersonaGrant.create({ data: { id: randomUUID(), organizationId: org.id, membershipId: member.id, persona: 'COUNSELOR', grantedByUserId: user.id } })
   const capability = await tx.organizationCapabilityGrant.create({ data: { id: randomUUID(), organizationId: org.id, membershipId: member.id, capability: 'PSYCHOLOGY_STAFF', grantedByUserId: user.id } })
+  const administrator = await tx.educationProductRoleGrant.create({ data: { id: randomUUID(), organizationId: org.id, membershipId: member.id, product: 'HUITEACHER', role: 'PRODUCT_ADMIN', grantedByUserId: user.id } })
   const input = { principal: { userId: user.id, accountDomain: 'SCHOOL' as const }, organizationId: org.id, entry: 'TEACHER' as const }
-  return { user, org, member, persona, capability, input }
+  return { user, org, member, persona, capability, administrator, input }
+}
+async function schoolInput(tx: Prisma.TransactionClient, f: Awaited<ReturnType<typeof fixture>>) {
+  await tx.educationProductEntitlement.create({ data: { organizationId: f.org.id, product: 'HUISCHOOL', status: 'ACTIVE', grantedByUserId: f.user.id } })
+  return { ...f.input, entry: 'SCHOOL' as const }
 }
 // Every fixture lives only inside an isolated, rolled-back test transaction.
 async function check(run: (tx: Prisma.TransactionClient, f: Awaited<ReturnType<typeof fixture>>) => Promise<void>) {
@@ -38,41 +43,62 @@ suite('School/Teacher authoring current PostgreSQL authority', () => {
     await tx.educationProductEntitlement.create({ data: { organizationId: f.org.id, product: 'HUISCHOOL', status: 'ACTIVE', grantedByUserId: f.user.id } })
     expect(await resolveEducationToolAuthoringContext({ ...f.input, entry: 'SCHOOL' }, tx)).toMatchObject({ product: 'HUISCHOOL' })
   }))
-  it.each(['persona', 'capability'] as const)('rejects revoked %s without changing ordinary member access', kind => check(async (tx, f) => {
+  it.each(['persona', 'capability'] as const)('keeps School dependent on its %s without restricting Teacher administration or participant membership', kind => check(async (tx, f) => {
+    const school = await schoolInput(tx, f)
     // PostgreSQL retains microseconds; JavaScript Date truncation may equal
     // granted_at and violate the strict grant interval constraint.
     if (kind === 'persona') await tx.$executeRaw`UPDATE organization_persona_grants SET revoked_at=clock_timestamp() WHERE id=${f.persona.id}`
     else await tx.$executeRaw`UPDATE organization_capability_grants SET revoked_at=clock_timestamp() WHERE id=${f.capability.id}`
-    expect(await resolveEducationToolAuthoringContext(f.input, tx)).toBeNull()
+    expect(await resolveEducationToolAuthoringContext(school, tx)).toBeNull()
+    expect(await resolveEducationToolAuthoringContext(f.input, tx)).not.toBeNull()
     expect(await resolveEducationProductMemberScope({ actorUserId: f.user.id, organizationId: f.org.id, product: 'HUITEACHER' }, tx)).not.toBeNull()
   }))
-  it.each(['*', 'EDUCATION_ACCESS', 'HUITEACHER_ACCESS', 'PSYCHOLOGY_STAFF'])('honors explicit %s deny even for administrators', permission => check(async (tx, f) => {
+  it.each(['*', 'EDUCATION_ACCESS', 'HUITEACHER_ACCESS', 'HUITEACHER_ADMIN'])('honors explicit %s deny even for Teacher administrators', permission => check(async (tx, f) => {
     await tx.user.update({ where: { id: f.user.id }, data: { role: 'ADMIN', platformRole: 'SYSTEM_ADMIN' } })
     await tx.organizationMembership.update({ where: { id: f.member.id }, data: { orgRole: 'ORG_ADMIN' } })
     await tx.organizationAccessDeny.create({ data: { id: randomUUID(), organizationId: f.org.id, userId: f.user.id, permission, reason: 'Synthetic deny', deniedByUserId: f.user.id } })
     expect(await resolveEducationToolAuthoringContext(f.input, tx)).toBeNull()
   }))
-  it('does not turn platform, organization or product administration into authoring authority', () => check(async (tx, f) => {
+  it('does not replace School professional authority with administration or Teacher administration with global, organization or School roles', () => check(async (tx, f) => {
+    const school = await schoolInput(tx, f)
     await tx.user.update({ where: { id: f.user.id }, data: { role: 'ADMIN', platformRole: 'SYSTEM_ADMIN' } })
     await tx.organizationMembership.update({ where: { id: f.member.id }, data: { orgRole: 'ORG_ADMIN' } })
-    await tx.educationProductRoleGrant.create({ data: { id: randomUUID(), organizationId: f.org.id, membershipId: f.member.id, product: 'HUITEACHER', role: 'PRODUCT_ADMIN', grantedByUserId: f.user.id } })
+    await tx.educationProductRoleGrant.create({ data: { id: randomUUID(), organizationId: f.org.id, membershipId: f.member.id, product: 'HUISCHOOL', role: 'PRODUCT_ADMIN', grantedByUserId: f.user.id } })
     await tx.$executeRaw`UPDATE organization_capability_grants SET revoked_at=clock_timestamp() WHERE id=${f.capability.id}`
     expect(await resolveEducationProductMemberScope({ actorUserId: f.user.id, organizationId: f.org.id, product: 'HUITEACHER' }, tx)).toMatchObject({ productAdmin: true })
+    expect(await resolveEducationToolAuthoringContext(f.input, tx)).not.toBeNull()
+    expect(await resolveEducationToolAuthoringContext(school, tx)).toBeNull()
+    await tx.$executeRaw`UPDATE education_product_role_grants SET revoked_at=clock_timestamp() WHERE id=${f.administrator.id}`
     expect(await resolveEducationToolAuthoringContext(f.input, tx)).toBeNull()
   }))
+  it('rejects a Teacher psychology author after product administration is revoked, retaining ordinary participant membership', () => check(async (tx, f) => {
+    await tx.$executeRaw`UPDATE education_product_role_grants SET revoked_at=clock_timestamp() WHERE id=${f.administrator.id}`
+    expect(await resolveEducationToolAuthoringContext(f.input, tx)).toBeNull()
+    expect(await resolveEducationProductMemberScope({ actorUserId: f.user.id, organizationId: f.org.id, product: 'HUITEACHER' }, tx)).toMatchObject({ productAdmin: false })
+    expect(await resolveEducationToolAuthoringContext(await schoolInput(tx, f), tx)).not.toBeNull()
+  }))
+  it('keeps School psychology deny separate from Teacher product administration', () => check(async (tx, f) => {
+    const school = await schoolInput(tx, f)
+    await tx.organizationAccessDeny.create({ data: { id: randomUUID(), organizationId: f.org.id, userId: f.user.id, permission: 'PSYCHOLOGY_STAFF', reason: 'Synthetic deny', deniedByUserId: f.user.id } })
+    expect(await resolveEducationToolAuthoringContext(school, tx)).toBeNull()
+    expect(await resolveEducationToolAuthoringContext(f.input, tx)).not.toBeNull()
+  }))
   it('cannot combine a counselor persona here with a psychology capability in another school', () => check(async (tx, f) => {
+    const school = await schoolInput(tx, f)
     const other = await fixture(tx)
+    await schoolInput(tx, other)
     await tx.$executeRaw`UPDATE organization_capability_grants SET revoked_at=clock_timestamp() WHERE id=${f.capability.id}`
     const otherMembership = await tx.organizationMembership.create({ data: { id: randomUUID(), organizationId: other.org.id, userId: f.user.id } })
     await tx.organizationCapabilityGrant.create({ data: { id: randomUUID(), organizationId: other.org.id, membershipId: otherMembership.id, capability: 'PSYCHOLOGY_STAFF', grantedByUserId: f.user.id } })
-    expect(await resolveEducationToolAuthoringContext(f.input, tx)).toBeNull()
+    expect(await resolveEducationToolAuthoringContext(school, tx)).toBeNull()
+    expect(await resolveEducationToolAuthoringContext({ ...school, organizationId: other.org.id }, tx)).toBeNull()
     expect(await resolveEducationToolAuthoringContext({ ...f.input, organizationId: other.org.id }, tx)).toBeNull()
   }))
   it('does not apply an unrelated School-product deny to Teacher', () => check(async (tx, f) => {
     await tx.organizationAccessDeny.create({ data: { id: randomUUID(), organizationId: f.org.id, userId: f.user.id, permission: 'HUISCHOOL_ACCESS', reason: 'Synthetic deny', deniedByUserId: f.user.id } })
     expect(await resolveEducationToolAuthoringContext(f.input, tx)).not.toBeNull()
   }))
-  it.each([{ isActive: false }, { isFrozen: true }, { mustChangePassword: true }, { expiresAt: new Date('2000-01-01') }, { accountDomain: 'SURVEY' as const }])('rejects current account restrictions %j', patch => check(async (tx, f) => {
+  it.each([{ isActive: false }, { isFrozen: true }, { mustChangePassword: true }, { teacherApproved: false }, { expiresAt: new Date('2000-01-01') }, { accountDomain: 'SURVEY' as const }])('rejects current Teacher account restrictions %j', patch => check(async (tx, f) => {
     if ('accountDomain' in patch) {
       // Account domains are immutable. Test a mismatched authenticated
       // principal without illegally changing the persisted SCHOOL account.

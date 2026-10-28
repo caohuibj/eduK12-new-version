@@ -101,13 +101,13 @@ suite('Private Form real preview and atomic fixed-version publication, before ta
     await unchanged(x, before)
     if (product === 'TEACHER') {
       const member = await db.organizationMembership.findFirstOrThrow({ where: { organizationId: x.f.organizationId, userId: x.f.managerUserId, validUntil: null } })
-      const author = await db.organizationPersonaGrant.findFirstOrThrow({ where: { membershipId: member.id, persona: 'COUNSELOR', revokedAt: null } })
-      await db.organizationPersonaGrant.update({ where: { id: author.id }, data: { revokedAt: new Date() } })
-      await expect(x.preview()).rejects.toThrow('PRIVATE_TOOL_AUTHOR_REQUIRED')
-      await expect(x.publish()).rejects.toThrow('PRIVATE_TOOL_AUTHOR_REQUIRED')
+      const author = await db.educationProductRoleGrant.findFirstOrThrow({ where: { membershipId: member.id, product: 'HUITEACHER', role: 'PRODUCT_ADMIN', revokedAt: null } })
+      await db.$executeRaw`UPDATE education_product_role_grants SET revoked_at=clock_timestamp() WHERE id=${author.id}`
+      await expect(x.preview()).rejects.toThrow('HUITEACHER_RUN_ADMIN_REQUIRED')
+      await expect(x.publish()).rejects.toThrow('HUITEACHER_RUN_ADMIN_REQUIRED')
       await unchanged(x, before)
-      expect(await db.educationProductRoleGrant.count({ where: { membershipId: member.id, product: 'HUITEACHER', role: 'PRODUCT_ADMIN', revokedAt: null } })).toBe(1)
-      await db.organizationPersonaGrant.update({ where: { id: author.id }, data: { revokedAt: null } })
+      expect(await db.educationProductRoleGrant.count({ where: { membershipId: member.id, product: 'HUITEACHER', role: 'PRODUCT_ADMIN', revokedAt: null } })).toBe(0)
+      await db.educationProductRoleGrant.create({ data: { id: randomUUID(), organizationId: x.f.organizationId, membershipId: member.id, product: 'HUITEACHER', role: 'PRODUCT_ADMIN', grantedByUserId: x.f.managerUserId } })
     }
     await x.preview(); await unchanged(x, before); await x.publish()
     const sealed = await parent(x.track.resourceKey)

@@ -47,7 +47,7 @@ describe('Private scale preview answer error boundary',()=>{
  })
  beforeEach(()=>{
   vi.clearAllMocks()
-  m.query.mockResolvedValue([{organizationId:org,organizationName:'Synthetic',membershipId:'member',orgRole:'MEMBER',productAdmin:false}])
+  m.query.mockResolvedValue([{organizationId:org,organizationName:'Synthetic',membershipId:'member',orgRole:'MEMBER',productAdmin:true}])
   m.images.mockResolvedValue([])
   m.find.mockImplementation(async({where}:{where:Record<string,string>})=>Object.entries(where).every(([key,value])=>stored[key as keyof typeof stored]===value)?stored:null)
  })

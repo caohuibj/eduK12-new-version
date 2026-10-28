@@ -47,9 +47,12 @@ export async function resolveEducationToolAuthoringContext(
     actorUserId: input.principal.userId,
     organizationId: input.organizationId,
     product,
-    requiredCapability: 'PSYCHOLOGY_STAFF',
+    // School professional authority and Teacher product administration are
+    // different entry policies. A Teacher administrator needs no psychology
+    // grant; an administrator must never bypass School's professional filter.
+    ...(input.entry === 'SCHOOL' ? { requiredCapability: 'PSYCHOLOGY_STAFF' as const } : {}),
   }, db)
-  if (!member) return null
+  if (!member || (input.entry === 'TEACHER' && !member.productAdmin)) return null
   const entry: EntryContext = input.entry === 'SCHOOL'
     ? { entry: 'SCHOOL', product: 'HUISCHOOL' }
     : { entry: 'TEACHER', product: 'HUITEACHER' }
