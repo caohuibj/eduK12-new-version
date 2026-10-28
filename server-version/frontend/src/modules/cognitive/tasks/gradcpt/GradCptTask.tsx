@@ -5,6 +5,7 @@ import {digest,type GradContext,type GradPorts} from './contracts'
 import {loadGradAssets,type GradLoadedAssets} from './asset-loader'
 import {GradInstructions} from './GradInstructions'
 import {GradReport} from './GradReport'
+import {gradTransportFailureMessage} from './transport-error'
 import type {GradInput} from './generated/protocol'
 import cityExample from './assets/city1.png'
 import mountainExample from './assets/mountain1.png'
@@ -39,7 +40,7 @@ export function GradCptTask({context,ports,language='zh'}:GradCptTaskProps){cons
  {view==='feedback'&&<><h1>{en?'Practice feedback':'练习反馈'}</h1><p role="status">{s.lastCorrect?(en?'This picture was answered correctly.':'这张图片答对了。'):(en?'City: press once. Mountain: do not press.':'再看规则：城市按一下，山景不按。')}</p><p>{en?`${s.correct}/${s.practiceIndex} correct; at least 7 of 8 required.`:`目前答对${s.correct}/${s.practiceIndex}张，需要至少7/8。`}</p>
  {s.practiceIndex<8?<button onClick={()=>s.nextPractice(performance.now())}>{en?'Next practice picture':'下一张练习'}</button>:s.practicePassed?<button onClick={()=>s.acceptPractice()}>{en?'Prepare formal sequence':'准备正式序列'}</button>:s.canRetryPractice?<button onClick={()=>s.reviewInstructions()}>{en?'Read instructions and examples again':'重新查看说明与例子'}</button>:<p>{en?'Three rounds are complete; you can finish and ask the organiser for help.':'已完成3轮，可以先结束并向组织者询问。'}</p>}<button className="grad-end" onClick={()=>s.endPractice()}>{en?'End practice':'结束练习'}</button></>}
  {['preparing','saving-item','saving-final'].includes(view)&&<p role="status">{en?'Confirming your record was saved…':'正在确认记录已保存…'}</p>}
- {view==='retry'&&<><h1>{en?'Presentation has stopped':'呈现已停止'}</h1><p>{en?'Keep this page open and retry saving the same records. Pictures will not replay. Report saving and full raw archival are separate; closing does not guarantee a background upload.':'请保留本页，重试保存同一份记录，不重放图片。报告保存和完整原件归档分别处理，关页不保证后台上传。'}</p><button onClick={()=>void s.retry()}>{en?'Retry saving':'重试保存'}</button></>}
+ {view==='retry'&&<><h1>{en?'Presentation has stopped':'呈现已停止'}</h1>{s.transportFailure&&<p role="status">{gradTransportFailureMessage(s.transportFailure,language)}</p>}<p>{en?'Keep this page open and retry saving the same records. Pictures will not replay. Report saving and full raw archival are separate; closing does not guarantee a background upload.':'请保留本页，重试保存同一份记录，不重放图片。报告保存和完整原件归档分别处理，关页不保证后台上传。'}</p><button onClick={()=>void s.retry()}>{en?'Retry saving':'重试保存'}</button></>}
  {view==='stopped'&&<><h1>{en?'Practice has ended':'本次练习已结束'}</h1><p>{en?'No formal sequence was completed. This is not an attention judgement.':'尚未完成正式序列，这不是注意力判断。'}</p></>}
  {view==='blocked'&&<p role="alert">{en?'A fresh durable attempt could not be confirmed. No picture sequence was started.':'尚未确认新的本机耐久作答身份，没有开始图片序列。'}</p>}
  <footer className="grad-attribution">TMB GradCPT City/Mountain Images — Esterman &amp; DeGutis · <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC-BY-SA 4.0</a> · <a href="https://github.com/manybrainsproject/TestMyBrainCodeRepo/tree/ec09ea0d35779bb39997131313dfd1380ee34922/TMB_Tests/TMB_GradCPT">{en?'Source and adapted rules':'图片与适配规则来源'}</a>{en?' · Original images; project layout/input variant.':' · 图片原件，项目布局/输入变式。'}</footer>

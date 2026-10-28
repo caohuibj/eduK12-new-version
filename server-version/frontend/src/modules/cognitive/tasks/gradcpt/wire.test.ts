@@ -24,6 +24,6 @@ describe('GradCPT browser-side envelope packer (Node CompressionStream compatibi
  it('leaves an over-8MiB raw unsupported rather than dropping frames or raising the decoded limit',async()=>{
   const raw=JSON.parse(gunzipSync(readFileSync(resolve(dir,'schema-max-raw.json.gz'))).toString('utf8'))
   expect(new TextEncoder().encode(gradWireCanonicalJson(raw)).byteLength).toBeGreaterThan(GRAD_WIRE_MAX_DECODED_BYTES)
-  await expect(packGradEnvelope(raw)).rejects.toThrow('8MiB')
+  await expect(packGradEnvelope(raw)).rejects.toMatchObject({name:'GradTransportError',code:'DECODED_LIMIT'})
  })
 })

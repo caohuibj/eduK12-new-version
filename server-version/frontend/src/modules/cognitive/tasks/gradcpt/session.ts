@@ -1,11 +1,12 @@
 import {GradCapture} from './capture'
 import {reviewGrad} from './generated/analysis'
 import {isGradReport} from './generated/report'
+import {GradTransportError,isGradTransportFailure,type GradTransportFailure} from './transport-error'
 import {digest,gradManifest,validateGradContext,type GradContext,type GradPorts,type GradDraft,type GradFinal,type GradReceipt} from './contracts'
 export type GradView='intro'|'preparing'|'practice-ready'|'running'|'saving-item'|'feedback'|'practice-instructions'|'formal-ready'|'retry'|'saving-final'|'report'|'stopped'|'blocked'
 export class GradSession {
  readonly context:GradContext;readonly manifest:ReturnType<typeof gradManifest>;readonly realm={timeOriginMs:performance.timeOrigin,pageInstanceId:crypto.randomUUID()}
- view:GradView='intro';capture:GradCapture|null=null;receipt:GradReceipt|null=null;phase:'practice'|'test'='practice';round=0;practiceIndex=0;correct=0;lastCorrect:boolean|null=null;reason=''
+ view:GradView='intro';capture:GradCapture|null=null;receipt:GradReceipt|null=null;phase:'practice'|'test'='practice';round=0;practiceIndex=0;correct=0;lastCorrect:boolean|null=null;reason='';transportFailure:GradTransportFailure|null=null
  private opened=false;private disposed=false;private aborted=false;private busy=false;private records:GradDraft[]=[];private pending:GradDraft|null=null;private final:GradFinal|null=null;private ports:GradPorts
  constructor(context:GradContext,ports:GradPorts,private changed:()=>void,private now=()=>performance.now()){this.context=validateGradContext(context);this.manifest=gradManifest(this.context);this.ports={prepareLocalAttempt:ports.prepareLocalAttempt.bind(ports),persistLocalDraft:ports.persistLocalDraft.bind(ports),finalize:ports.finalize.bind(ports)}}
  get retained(){return structuredClone([...this.records,...this.pending?[this.pending]:[]])}
@@ -35,11 +36,11 @@ export class GradSession {
  stop(reason:string,now:number){if(this.disposed||!['running','saving-item','formal-ready'].includes(this.view))return;this.aborted=true;if(!this.reason)this.reason=reason
   if(this.capture){this.capture.interrupt(reason,now);this.captureDone()}else if(this.view==='saving-item')return;else{this.view='stopped';this.changed()}}
  async retry(){if(this.disposed||this.busy||this.view!=='retry')return;if(this.pending)await this.persist();else await this.finish()}
- private async finish(){if(this.disposed||this.busy||this.pending||this.phase!=='test')return;this.busy=true;this.view='saving-final';this.changed()
+ private async finish(){if(this.disposed||this.busy||this.pending||this.phase!=='test')return;this.busy=true;this.transportFailure=null;this.view='saving-final';this.changed()
   try{if(!this.final){const raw=this.records.find(r=>r.phase==='test')!.raw,review=reviewGrad(raw,this.manifest.formal),claim={contextKey:this.context.contextKey,configHash:this.context.snapshot.configHash,protocolSignature:this.context.snapshot.protocolSignature,manifestHash:this.context.manifestHash,formalCaptureCount:1,presented:review.presented,practiceCount:this.records.filter(r=>r.phase==='practice').length,termination:(!this.aborted&&raw.status==='complete'?'completed':'aborted') as 'completed'|'aborted',terminationReason:this.reason||null,recordDigests:this.records.map(r=>r.recordDigest)};this.final={...claim,finalPayloadDigest:digest(claim)}}
    const receipt=await this.ports.finalize(structuredClone(this.final));if(this.disposed)return
    if(receipt.finalSaved!==true||receipt.contextKey!==this.context.contextKey||receipt.finalPayloadDigest!==this.final.finalPayloadDigest||!receipt.receiptId||!isGradReport(receipt.report,{configHash:this.context.snapshot.configHash,protocolSignature:this.context.snapshot.protocolSignature,profile:this.context.snapshot.config.profile,presented:this.final.presented}))throw Error('Matching saved gradCPT report receipt required')
    this.receipt=structuredClone(receipt);this.view='report';this.changed()
-  }catch{if(!this.disposed){if(!this.reason)this.reason='final-save-not-confirmed';this.view='retry';this.changed()}}finally{this.busy=false}}
+  }catch(error){if(!this.disposed){this.transportFailure=error instanceof GradTransportError&&isGradTransportFailure(error.code)?error.code:null;if(!this.reason)this.reason='final-save-not-confirmed';this.view='retry';this.changed()}}finally{this.busy=false}}
  dispose(){if(this.capture&&this.view==='running')this.stop('context-disposed',this.now());this.disposed=true}
 }

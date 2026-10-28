@@ -138,3 +138,28 @@ freezeEnvelope接口，不复制共享文件或用断言隐藏接口差异。本
 Backend adapter仅在本工具比较解码原件与已经提交core，不调用scorer修正报告。通用full/research原始字段导出按精确Grad tuple无损解码，summary仍读冻结报告；不是从COS回算。SAV固有字符串宽度不适合完整重建原件，此修复不改变该格式，也不把它声称为无损原件出口。
 
 最终本次共享直接闭包：backend1110、frontend384源码零诊断，未跑全平台构建。专用PostgreSQL/Redis停止并自动删除，初次stop后的瞬时Dead与最终移除观察分别保留；原有停止容器未动。超过原8MiB解码/现有packed范围、缺少压缩能力的浏览器仍明确保留本机原件待处理，不丢帧或假报保存完成。
+
+## 直接相关的保存失败说明补全
+
+随后实际确认`GradSession.finish`的catch吞掉packer友好错误，原retry页只显示通用提示。
+本工具新增固定code的`GradTransportError`，仅公开“不支持压缩、超过解码范围、压缩后
+仍超范围”三种原因。Session只保留真正该错误类且属于白名单的code；UI用固定中英
+文案解释原件仍在本机、保留页面/联系组织者、无需重做，绝不直接显示error.message。
+未知异常仍用原通用提示，下一次重试先清除旧原因。正常报告与原封存claim均不变。
+
+新增一个实际React＋Session病例，8个必要短练习后立即中断正式prefix（不跑100/300
+正式流程、不调用scorer/大wire），模拟已知packer错误：原1失败，修后1通过。
+同病例随后改成含内部敏感占位文字的未知异常，证实内部文字及旧已知原因不显示、
+通用提示保留、两次finalize收到同一claim、9份原件与prepare次数不变。
+见[原失败](transport-message-original.json)、[修后结果](transport-message-fixed.json)。
+新mock初次类型检查仅有fresh literal推断1诊断，已加类型标注；擦除类型后的JS完全
+一致，保留[原类型](transport-message-types-original.json)和
+[同运行码证明](transport-message-type-proof.json)，未重跑相同病例。
+新受影响组件/Session闭包73份源码最终0诊断，范围不包括root尚未集成的共享接口。
+完整命令、退出与最终源码摘要见[transport-message-receipt.json](transport-message-receipt.json)。
+参与者大小提示采用“这份完整记录暂时超过当前可保存的大小。”，8MiB工程细节只留
+文档。原wire边界用例曾硬断言8MiB文案，现改断言稳定`DECODED_LIMIT`错误code，
+保留原超限原件大小及拒绝断言；仅该直接受影响项续验1通过/2过滤，见
+[transport-limit-fixed.json](transport-limit-fixed.json)。未重复其余wire/bomb/browserpack/
+完整正式流程，没有改core或安全设置。最后两句静态copy修订发生在类型检查之后，
+只改string值、不改键/类型/控制流；原类型记录保持当时源哈希，不冒称重新执行。
