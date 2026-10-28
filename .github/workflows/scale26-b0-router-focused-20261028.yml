@@ -1,0 +1,38 @@
+name: B0 Scale 26 CI router one-failure verification
+on:
+  push:
+    branches: [validation/scale26-b0-router-20261028]
+    paths: [.github/workflows/scale26-b0-router-focused-20261028.yml]
+permissions:
+  contents: read
+env:
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+jobs:
+  focused:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          persist-credentials: false
+      - name: verify exactly one workflow file then detach to frozen PR head
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD^)" = "14b31f340008b1409d740ddc522592686e301650"
+          test "$(git diff --name-only 14b31f340008b1409d740ddc522592686e301650 HEAD)" = ".github/workflows/scale26-b0-router-focused-20261028.yml"
+          git checkout --detach "14b31f340008b1409d740ddc522592686e301650"
+          test "$(git rev-parse HEAD^{tree})" = "320b76d983ad7f2fb387c25a30bf7b0297e91854"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: install existing locked CI control tool dependencies
+        run: npm ci --ignore-scripts --prefix .github/release-tools
+      - name: re-evaluate only previously failed exact-gate-dependency check
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --test --test-name-pattern='light test-only route never starts unrelated builds, scans or platform smoke' .github/scripts/content-workflows.test.mjs | tee /tmp/scale26-b0-targeted-route.tap
+          node -e 'const s=require("fs").readFileSync("/tmp/scale26-b0-targeted-route.tap","utf8");if(!/^# pass 1$/m.test(s)||!/^# fail 0$/m.test(s))throw Error("Focused route case must run and pass exactly once");console.log("FOCUSED_ROUTER_1_OF_1_PASS")'
