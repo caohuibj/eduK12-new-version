@@ -40,8 +40,10 @@ export const validateTaskDefinition = <TConfig, TTrial>(definition: TaskDefiniti
   if (definition.protocol.phases.length === 0 || !definition.protocol.phases.some((phase) => phase.persists && phase.required)) {
     issues.push(issue('protocol.phases', 'at least one required persisted phase is needed'))
   }
-  if (definition.profiles.standard === undefined) {
-    issues.push(issue('profiles', 'standard profile is required'))
+  // A task may deliberately offer research/experience without a third,
+  // invented "standard" protocol. Validate only its explicitly declared modes.
+  if (Object.keys(definition.profiles).length === 0) {
+    issues.push(issue('profiles', 'at least one declared profile is required'))
   }
 
   for (const [profile, value] of Object.entries(definition.profiles)) {

@@ -5,6 +5,7 @@ import {
   composeCognitiveOnboardingDecision,
   serializeCognitiveOnboardingDecision,
   formatCognitiveOnboardingDecision,
+  cognitiveOnboardingExitCode,
   type CognitiveBlockerV1,
 } from '../modules/cognitive/onboarding/decision'
 const manifests = require('../../../scripts/cognitive/manifests.cjs')
@@ -295,12 +296,12 @@ async function main() {
         )
         if (governance.length !== 1)
           local.push(
-            add(
+            {...add(
               'COG_GOVERNANCE_IDENTITY_INVALID',
               'GOVERNANCE',
-              'Exactly one governance record is required.',
+              'Scientific metadata needs human review: expected one exact identity record; technical admission is evaluated separately.',
               selected.scientificFile,
-            ),
+            ),severity:'WARNING'},
           )
         const scientific = evaluateCognitiveScientificQualification(definition)
         decisions.push(
@@ -356,12 +357,7 @@ async function main() {
         ? serializeCognitiveOnboardingDecision(d)
         : formatCognitiveOnboardingDecision(d),
     )
-  if (
-    decisions.some(
-      (d) => !d.pilotPublish.ready || !d.scientific.declarationValid,
-    )
-  )
-    process.exitCode = 1
+  process.exitCode = cognitiveOnboardingExitCode(decisions)
 }
 void main().catch((error) => {
   process.stderr.write(String(error) + '\n')

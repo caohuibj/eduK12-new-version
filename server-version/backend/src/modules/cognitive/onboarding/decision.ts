@@ -158,6 +158,16 @@ export const serializeCognitiveOnboardingDecision = (decision: CognitiveOnboardi
   return canonicalJson(parsed) + '\n'
 }
 
+/** Technical admission is not a scientific endorsement. Keep unsupported
+ * scientific declarations visible for human review without blocking structurally
+ * executable content or silently upgrading its maturity. Empty results fail. */
+export const cognitiveOnboardingExitCode = (decisions: readonly CognitiveOnboardingDecisionV1[]): 0 | 1 => (
+  decisions.length > 0 && decisions.every(decision => {
+    const parsed = cognitiveOnboardingDecisionV1Schema.parse(decision)
+    return parsed.technical.ready && parsed.pilotPublish.ready
+  }) ? 0 : 1
+)
+
 /** Text and JSON render the same decision; technical and scientific gates stay separate. */
 export const formatCognitiveOnboardingDecision = (decision: CognitiveOnboardingDecisionV1): string => {
   const parsed = JSON.parse(serializeCognitiveOnboardingDecision(decision)) as CognitiveOnboardingDecisionV1
