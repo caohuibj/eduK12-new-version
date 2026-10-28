@@ -1,0 +1,431 @@
+{
+  "baseline": "a67f425269283d8281379fdf8234f9fd6b0acebc",
+  "node": "v24.21.0",
+  "nodeExecutable": "/tmp/cognitive-node-env/node-v24.21.0-linux-x64/bin/node",
+  "seed": "grad-transport-structure-20261028",
+  "limits": {
+    "canonical": 1572864,
+    "jsonHTTP": 2097152,
+    "archiveDetail": 8388608,
+    "archiveHTTP": 12582912,
+    "archivePackage": 12582912
+  },
+  "scope": "Structure/schema/JSON sizes only. Actual Capture is used only for two-transition prefixes. Full schedules are synthetic; no scoreGrad/reviewGrad/full product flow/browser/HTTP/DB/COS execution.",
+  "prefixChecks": [
+    {
+      "profile": "experience",
+      "hz": 60,
+      "actualCaptureFrames": 97,
+      "actualCaptureSlots": 3,
+      "matchingSyntheticFramePrefix": true,
+      "file": "capture-prefix-experience-60.json"
+    },
+    {
+      "profile": "experience",
+      "hz": 120,
+      "actualCaptureFrames": 193,
+      "actualCaptureSlots": 3,
+      "matchingSyntheticFramePrefix": true,
+      "file": "capture-prefix-experience-120.json"
+    },
+    {
+      "profile": "experience",
+      "hz": 144,
+      "actualCaptureFrames": 233,
+      "actualCaptureSlots": 3,
+      "matchingSyntheticFramePrefix": true,
+      "file": "capture-prefix-experience-144.json"
+    },
+    {
+      "profile": "experience",
+      "hz": 240,
+      "actualCaptureFrames": 385,
+      "actualCaptureSlots": 3,
+      "matchingSyntheticFramePrefix": true,
+      "file": "capture-prefix-experience-240.json"
+    },
+    {
+      "profile": "research",
+      "hz": 60,
+      "actualCaptureFrames": 97,
+      "actualCaptureSlots": 3,
+      "matchingSyntheticFramePrefix": true,
+      "file": "capture-prefix-research-60.json"
+    },
+    {
+      "profile": "research",
+      "hz": 120,
+      "actualCaptureFrames": 193,
+      "actualCaptureSlots": 3,
+      "matchingSyntheticFramePrefix": true,
+      "file": "capture-prefix-research-120.json"
+    },
+    {
+      "profile": "research",
+      "hz": 144,
+      "actualCaptureFrames": 233,
+      "actualCaptureSlots": 3,
+      "matchingSyntheticFramePrefix": true,
+      "file": "capture-prefix-research-144.json"
+    },
+    {
+      "profile": "research",
+      "hz": 240,
+      "actualCaptureFrames": 385,
+      "actualCaptureSlots": 3,
+      "matchingSyntheticFramePrefix": true,
+      "file": "capture-prefix-research-240.json"
+    }
+  ],
+  "results": [
+    {
+      "profile": "experience",
+      "hz": 60,
+      "synthetic": true,
+      "completeSchemaOnly": true,
+      "scorerInvocations": 0,
+      "images": 100,
+      "slots": 102,
+      "frames": 4897,
+      "events": 180,
+      "durationMs": 81600,
+      "measurements": {
+        "canonicalBytes": 331155,
+        "framesOnlyCanonicalBytes": 305636,
+        "httpJSONBytes": 331393,
+        "archiveDetailBytes": 462987,
+        "archiveHTTPBytes": 463230,
+        "archiveFullPackageLowerBoundBytes": 794285
+      },
+      "overBytes": {
+        "canonical": -1241709,
+        "jsonHTTP": -1765759,
+        "archiveDetail": -7925621,
+        "archiveHTTP": -12119682,
+        "archiveFullPackageLowerBound": -11788627
+      },
+      "canonicalGuard": "accepted",
+      "proposalOnly": {
+        "tuplesCanonicalBytes": 189142,
+        "gzipBytes": 29623,
+        "base64JSONBytes": 39663,
+        "roundtripBytesIdentical": true
+      },
+      "artifact": {
+        "file": "experience-60-archive.json.gz",
+        "canonicalSHA256": "eb792794a59cbf369022ef347b8c8528bcc95e02ea014e9d1043450d36e24efc",
+        "gzipSHA256": "93b43cd4978b2956b794027291de04d6fe4d2c4c53fccafd416f8b3621be47f3",
+        "gzipBytes": 47221
+      }
+    },
+    {
+      "profile": "experience",
+      "hz": 120,
+      "synthetic": true,
+      "completeSchemaOnly": true,
+      "scorerInvocations": 0,
+      "images": 100,
+      "slots": 102,
+      "frames": 9793,
+      "events": 180,
+      "durationMs": 81600,
+      "measurements": {
+        "canonicalBytes": 626362,
+        "framesOnlyCanonicalBytes": 600841,
+        "httpJSONBytes": 626600,
+        "archiveDetailBytes": 862568,
+        "archiveHTTPBytes": 862811,
+        "archiveFullPackageLowerBoundBytes": 1489073
+      },
+      "overBytes": {
+        "canonical": -946502,
+        "jsonHTTP": -1470552,
+        "archiveDetail": -7526040,
+        "archiveHTTP": -11720101,
+        "archiveFullPackageLowerBound": -11093839
+      },
+      "canonicalGuard": "accepted",
+      "proposalOnly": {
+        "tuplesCanonicalBytes": 342365,
+        "gzipBytes": 57740,
+        "base64JSONBytes": 77151,
+        "roundtripBytesIdentical": true
+      },
+      "artifact": {
+        "file": "experience-120-archive.json.gz",
+        "canonicalSHA256": "6c5ad65ba33c42463490250219590d761d641ee996c03b0c4c9a13bb754b2a5c",
+        "gzipSHA256": "a77a8bf8006196d7161908b072988b77dfafee5eed66156eaec0de554b7df05d",
+        "gzipBytes": 87009
+      }
+    },
+    {
+      "profile": "experience",
+      "hz": 144,
+      "synthetic": true,
+      "completeSchemaOnly": true,
+      "scorerInvocations": 0,
+      "images": 100,
+      "slots": 102,
+      "frames": 11833,
+      "events": 180,
+      "durationMs": 82166.66666666667,
+      "measurements": {
+        "canonicalBytes": 760242,
+        "framesOnlyCanonicalBytes": 734765,
+        "httpJSONBytes": 760480,
+        "archiveDetailBytes": 1040572,
+        "archiveHTTPBytes": 1040815,
+        "archiveFullPackageLowerBoundBytes": 1800957
+      },
+      "overBytes": {
+        "canonical": -812622,
+        "jsonHTTP": -1336672,
+        "archiveDetail": -7348036,
+        "archiveHTTP": -11542097,
+        "archiveFullPackageLowerBound": -10781955
+      },
+      "canonicalGuard": "accepted",
+      "proposalOnly": {
+        "tuplesCanonicalBytes": 417085,
+        "gzipBytes": 72919,
+        "base64JSONBytes": 97391,
+        "roundtripBytesIdentical": true
+      },
+      "artifact": {
+        "file": "experience-144-archive.json.gz",
+        "canonicalSHA256": "7503fa53b0530bb5fca4d4da4a64292d1bfd762f6608e93ca33f7bd6d4088a20",
+        "gzipSHA256": "fec3f43aa913dc1ca82cb157111a9e17d4af050ba0cac44a33ea88ecb213642e",
+        "gzipBytes": 109466
+      }
+    },
+    {
+      "profile": "experience",
+      "hz": 240,
+      "synthetic": true,
+      "completeSchemaOnly": true,
+      "scorerInvocations": 0,
+      "images": 100,
+      "slots": 102,
+      "frames": 19585,
+      "events": 180,
+      "durationMs": 81600,
+      "measurements": {
+        "canonicalBytes": 1218867,
+        "framesOnlyCanonicalBytes": 1193348,
+        "httpJSONBytes": 1219105,
+        "archiveDetailBytes": 1660745,
+        "archiveHTTPBytes": 1660988,
+        "archiveFullPackageLowerBoundBytes": 2879755
+      },
+      "overBytes": {
+        "canonical": -353997,
+        "jsonHTTP": -878047,
+        "archiveDetail": -6727863,
+        "archiveHTTP": -10921924,
+        "archiveFullPackageLowerBound": -9703157
+      },
+      "canonicalGuard": "accepted",
+      "proposalOnly": {
+        "tuplesCanonicalBytes": 650902,
+        "gzipBytes": 114948,
+        "base64JSONBytes": 153428,
+        "roundtripBytesIdentical": true
+      },
+      "artifact": {
+        "file": "experience-240-archive.json.gz",
+        "canonicalSHA256": "4c359708e4c2bb32c6ded8ddfd24953bd18ef896c9fa170429c299fc4b03f943",
+        "gzipSHA256": "1bf390fd09a55253e7a7a808ee950599413df126847ae5783fc748c7c40ffe1e",
+        "gzipBytes": 169852
+      }
+    },
+    {
+      "profile": "research",
+      "hz": 60,
+      "synthetic": true,
+      "completeSchemaOnly": true,
+      "scorerInvocations": 0,
+      "images": 300,
+      "slots": 302,
+      "frames": 14499,
+      "events": 536,
+      "durationMs": 241633.33333333334,
+      "measurements": {
+        "canonicalBytes": 995066,
+        "framesOnlyCanonicalBytes": 918781,
+        "httpJSONBytes": 995304,
+        "archiveDetailBytes": 1140084,
+        "archiveHTTPBytes": 1140327,
+        "archiveFullPackageLowerBoundBytes": 2135293
+      },
+      "overBytes": {
+        "canonical": -577798,
+        "jsonHTTP": -1101848,
+        "archiveDetail": -7248524,
+        "archiveHTTP": -11442585,
+        "archiveFullPackageLowerBound": -10447619
+      },
+      "canonicalGuard": "accepted",
+      "proposalOnly": {
+        "tuplesCanonicalBytes": 574595,
+        "gzipBytes": 85495,
+        "base64JSONBytes": 114159,
+        "roundtripBytesIdentical": true
+      },
+      "artifact": {
+        "file": "research-60-archive.json.gz",
+        "canonicalSHA256": "90bdc0f7300135935aaa63ecc649db11766cefbb62afe56edc55bd8f19a33b71",
+        "gzipSHA256": "8659108bd1a6d0c3343802d7a692a014fbf0cd49290da98f123afe7cd67b3933",
+        "gzipBytes": 103715
+      }
+    },
+    {
+      "profile": "research",
+      "hz": 120,
+      "synthetic": true,
+      "completeSchemaOnly": true,
+      "scorerInvocations": 0,
+      "images": 300,
+      "slots": 302,
+      "frames": 28994,
+      "events": 536,
+      "durationMs": 241608.33333333334,
+      "measurements": {
+        "canonicalBytes": 1887830,
+        "framesOnlyCanonicalBytes": 1811256,
+        "httpJSONBytes": 1888068,
+        "archiveDetailBytes": 2137221,
+        "archiveHTTPBytes": 2137464,
+        "archiveFullPackageLowerBoundBytes": 4025194
+      },
+      "overBytes": {
+        "canonical": 314966,
+        "jsonHTTP": -209084,
+        "archiveDetail": -6251387,
+        "archiveHTTP": -10445448,
+        "archiveFullPackageLowerBound": -8557718
+      },
+      "canonicalGuard": "SUBMISSION_PAYLOAD_TOO_LARGE",
+      "proposalOnly": {
+        "tuplesCanonicalBytes": 1047004,
+        "gzipBytes": 166260,
+        "base64JSONBytes": 221844,
+        "roundtripBytesIdentical": true
+      },
+      "artifact": {
+        "file": "research-120-archive.json.gz",
+        "canonicalSHA256": "adc5d3779f10037235fa223894fb31e1d02c9d2c206ef9fc9bb94cf0a63fed79",
+        "gzipSHA256": "1d8937bf225683a723df3b943d02750f9baae53612981b9498f6fed459e3ffde",
+        "gzipBytes": 197251
+      }
+    },
+    {
+      "profile": "research",
+      "hz": 144,
+      "synthetic": true,
+      "completeSchemaOnly": true,
+      "scorerInvocations": 0,
+      "images": 300,
+      "slots": 302,
+      "frames": 35033,
+      "events": 536,
+      "durationMs": 243277.77777777775,
+      "measurements": {
+        "canonicalBytes": 2287088,
+        "framesOnlyCanonicalBytes": 2210674,
+        "httpJSONBytes": 2287326,
+        "archiveDetailBytes": 2580614,
+        "archiveHTTPBytes": 2580857,
+        "archiveFullPackageLowerBoundBytes": 4867845
+      },
+      "overBytes": {
+        "canonical": 714224,
+        "jsonHTTP": 190174,
+        "archiveDetail": -5807994,
+        "archiveHTTP": -10002055,
+        "archiveFullPackageLowerBound": -7715067
+      },
+      "canonicalGuard": "SUBMISSION_PAYLOAD_TOO_LARGE",
+      "proposalOnly": {
+        "tuplesCanonicalBytes": 1271131,
+        "gzipBytes": 210225,
+        "base64JSONBytes": 280464,
+        "roundtripBytesIdentical": true
+      },
+      "artifact": {
+        "file": "research-144-archive.json.gz",
+        "canonicalSHA256": "66e169ecf7b8559c357e1d77ae134bca561f7f7f8b47c1a0eb159bbbcff33990",
+        "gzipSHA256": "b58369478da82d112e7ad89bcb2093f9de084bfc62da5cfba86caf29d16091a0",
+        "gzipBytes": 247606
+      }
+    },
+    {
+      "profile": "research",
+      "hz": 240,
+      "synthetic": true,
+      "completeSchemaOnly": true,
+      "scorerInvocations": 0,
+      "images": 300,
+      "slots": 302,
+      "frames": 57987,
+      "events": 536,
+      "durationMs": 241608.33333333334,
+      "measurements": {
+        "canonicalBytes": 3667529,
+        "framesOnlyCanonicalBytes": 3591244,
+        "httpJSONBytes": 3667767,
+        "archiveDetailBytes": 4122593,
+        "archiveHTTPBytes": 4122836,
+        "archiveFullPackageLowerBoundBytes": 7790265
+      },
+      "overBytes": {
+        "canonical": 2094665,
+        "jsonHTTP": 1570615,
+        "archiveDetail": -4266015,
+        "archiveHTTP": -8460076,
+        "archiveFullPackageLowerBound": -4792647
+      },
+      "canonicalGuard": "SUBMISSION_PAYLOAD_TOO_LARGE",
+      "proposalOnly": {
+        "tuplesCanonicalBytes": 1985906,
+        "gzipBytes": 333986,
+        "base64JSONBytes": 445480,
+        "roundtripBytesIdentical": true
+      },
+      "artifact": {
+        "file": "research-240-archive.json.gz",
+        "canonicalSHA256": "58a7f600ec4f9def2cde500a68c2f41d1551445d711c708deb29b716703455a4",
+        "gzipSHA256": "2c6ff2998506e1bcb10f2315720c84b723728b4405934538295468aceb0a4c7b",
+        "gzipBytes": 390308
+      }
+    }
+  ],
+  "schemaBound": {
+    "description": "Schema-admitted 120000-frame/8192-event raw only; not a practice-qualified session or refreshed physical-device run.",
+    "frames": 120000,
+    "events": 8192,
+    "rawBytes": 8596833,
+    "canonicalBytes": 8597213,
+    "proposalOnly": {
+      "gzipBytes": 540849,
+      "base64JSONBytes": 721296,
+      "roundtripBytesIdentical": true
+    },
+    "file": "schema-max-raw.json.gz",
+    "canonicalRawSHA256": "0b1c7c8fa5b1d6d67126b5a3679ccfc1c8f0668cfe8db5efe5d0ff1353b34b29",
+    "gzipSHA256": "55bf048faaa0c990af3a6901662096391e602c6865af15e6d6aa46a520c8413a"
+  },
+  "sourceSHA256": {
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/capture.ts": "e3a253cabff7a645d8c07dcff8ecbc3f3a437086ae28dbc1da4f42014698f402",
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/generated/envelope.ts": "3bf703eb2dc3d767c13552ff75eca8faa294a3aeb9ceed23a98ae9a8b3eb270b",
+    "server-version/backend/src/modules/cognitive/content-candidates/gradcpt/protocol.ts": "6e4b4f8d8ee7e9c347778dffae60f599745594102f399886e3ab32b85ac837ce",
+    "server-version/backend/src/modules/cognitive/content-candidates/gradcpt/schema.ts": "03c17f1e00e84298dee31814799a0376e0f7f3b59624357cd5d35eaf16ce2bae",
+    "server-version/backend/src/modules/cognitive/unified-final-submit.service.ts": "42decdb27516368049e84d3a0036d00dc28191542eaa584011f189596bb752c3",
+    "server-version/backend/src/services/instrumentFinalSubmit.ts": "abdd778dbb2df0883f5b975b240155ca0158fd0cd075b72a7c11c94adf72ce51",
+    "server-version/backend/src/index.ts": "f02a79da10eff1b29e03fcfb44b1e2f186766c2b8f2114018eacc301152c942c",
+    "server-version/backend/src/modules/cognitive/raw-archive.routes.ts": "632e43ccfe113dfc2995eb43e3110ea30e63ca942cfea463468c1070a8e5cd8b",
+    "server-version/backend/src/modules/cognitive/raw-archive.service.ts": "6177455eaaf01eb566c9aa27ad26f758a5959c1eed08de891af30ddf6e808d2b",
+    "server-version/backend/src/modules/assessment-runtime/compact-field-codec.ts": "61fede51c449e1f2a84a2bcc5485ec5fdd149cc72e70f5ecd0d0c2c24bfb24c7",
+    "server-version/backend/src/modules/assessment-runtime/control-reference-codec.ts": "e57e4e7366e800947bd06cc81851ef5d45b32abc7b50cf6abf450900ef7f7e38",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/size-records.cjs": "74eef9ada6104cd8bbf23affa06e7fc557139dcf0fe24f4ee9d4edeb23b6d6a1"
+  }
+}
