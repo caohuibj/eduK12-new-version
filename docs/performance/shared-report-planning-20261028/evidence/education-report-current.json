@@ -1,0 +1,67 @@
+{
+  "scope": "real service completion plus actual authenticated report HTTP; no browser, not full application middleware or capacity",
+  "flags": {
+    "compactFacts": false,
+    "sharedControl": false
+  },
+  "rows": [
+    {
+      "product": "SCHOOL",
+      "phase": "service-start-final-parent-completion",
+      "elapsedMs": 435.92537100000027,
+      "cpuMs": 341.44,
+      "sqlEvents": 195
+    },
+    {
+      "product": "SCHOOL",
+      "phase": "first-report-read",
+      "elapsedMs": 69.20833299999958,
+      "cpuMs": 51.04,
+      "sqlEvents": 21,
+      "queryEventDurationMs": 18,
+      "responseBytes": 1655,
+      "rssBytes": 380735488,
+      "verified": true
+    },
+    {
+      "product": "SCHOOL",
+      "phase": "repeat-report-read",
+      "elapsedMs": 42.305969000000005,
+      "cpuMs": 26.369,
+      "sqlEvents": 21,
+      "queryEventDurationMs": 13,
+      "responseBytes": 1655,
+      "rssBytes": 380866560,
+      "verified": true
+    },
+    {
+      "product": "TEACHER",
+      "phase": "service-start-final-parent-completion",
+      "elapsedMs": 222.85133399999995,
+      "cpuMs": 133.225,
+      "sqlEvents": 195
+    },
+    {
+      "product": "TEACHER",
+      "phase": "first-report-read",
+      "elapsedMs": 44.290735999999924,
+      "cpuMs": 35.164,
+      "sqlEvents": 20,
+      "queryEventDurationMs": 16,
+      "responseBytes": 1655,
+      "rssBytes": 385470464,
+      "verified": true
+    },
+    {
+      "product": "TEACHER",
+      "phase": "repeat-report-read",
+      "elapsedMs": 40.4837779999998,
+      "cpuMs": 24.822,
+      "sqlEvents": 20,
+      "queryEventDurationMs": 14,
+      "responseBytes": 1655,
+      "rssBytes": 385470464,
+      "verified": true
+    }
+  ]
+}
