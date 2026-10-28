@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { SCALE_INSTRUMENT_SOURCE as source } from '../../../modules/scale/instruments/dbt_wccl59_zh_cn_research/1.0.2/instrument'
 import { defineScaleInstrumentSource, projectScalePackage } from '../../../modules/scale/onboarding/define-instrument'
 import { scoreScale } from '../../../modules/scale/scale-scoring'
+import { scaleDefinitionSchema } from '../../../modules/scale/scale-definition'
 
 const pkg = projectScalePackage(source)!
 const definition = pkg.definition
@@ -62,7 +63,9 @@ describe('DBT-WCCL 59 direct-from-English zh-CN v1.0.2 content candidate', () =>
     expect(definition.report.reportVersion).toBe('1.0.3')
     expect(definition.report.audienceContract).toMatchObject({schemaVersion:1,respondent:'ADULT_SELF',audience:'student',locale:'zh-CN'})
     expect(definition.report.interpretations.map(x => x.scoreKey)).toEqual(['dss','dcs1','dcs2'])
-    expect(definition.report.interpretations.every(x=>x.source.type==='score_only'&&x.bands.length===0)).toBe(true)
+    // The runtime schema supplies default score_only and empty bands; raw source JSON omits them.
+    const effectiveReport = scaleDefinitionSchema.parse(definition).report
+    expect(effectiveReport.interpretations.every(x=>x.source.type==='score_only'&&x.bands.length===0)).toBe(true)
     expect(source.applicability?.policyVersion).toBe('dbt_wccl59_zh_cn_research-1.0.2')
   })
 })

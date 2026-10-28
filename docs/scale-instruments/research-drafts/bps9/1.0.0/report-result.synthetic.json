@@ -1,0 +1,164 @@
+{
+  "kind": "ACTUAL_BUILD_SCALE_RESULT_SYNTHETIC_EXAMPLE",
+  "sourceSha256": "4b0af6464233bdcbba61a57b65dfe3e68bac358bcd816d53d9e9e24f434d9510",
+  "measurementHash": "ba0b97ac92dc665dcabc3ffc660433bb79a84457d8bfc9e695a316337262dc2c",
+  "fixture": "mixed_independent",
+  "result": {
+    "schemaVersion": 2,
+    "instrument": {
+      "scaleId": "synthetic-batch-bps9_zh_cn_research",
+      "code": "bps9_zh_cn_research",
+      "name": "上床拖延问卷（BPS成人9题，中文工作稿）",
+      "instrumentVersion": "1.0.0"
+    },
+    "method": {
+      "scaleId": "synthetic-batch-bps9_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "definitionHash": "ba0b97ac92dc665dcabc3ffc660433bb79a84457d8bfc9e695a316337262dc2c",
+      "referenceVersions": [],
+      "assessmentContext": null,
+      "reportAudience": "student",
+      "localizationVersion": "1.0.0"
+    },
+    "quality": {
+      "status": "interpretable",
+      "flags": []
+    },
+    "itemScores": [
+      {
+        "itemCode": "BPS_01",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "BPS_02",
+        "responseValue": "4",
+        "baseScore": 4,
+        "score": 2
+      },
+      {
+        "itemCode": "BPS_03",
+        "responseValue": "2",
+        "baseScore": 2,
+        "score": 4
+      },
+      {
+        "itemCode": "BPS_04",
+        "responseValue": "5",
+        "baseScore": 5,
+        "score": 5
+      },
+      {
+        "itemCode": "BPS_05",
+        "responseValue": "3",
+        "baseScore": 3,
+        "score": 3
+      },
+      {
+        "itemCode": "BPS_06",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "BPS_07",
+        "responseValue": "4",
+        "baseScore": 4,
+        "score": 2
+      },
+      {
+        "itemCode": "BPS_08",
+        "responseValue": "2",
+        "baseScore": 2,
+        "score": 2
+      },
+      {
+        "itemCode": "BPS_09",
+        "responseValue": "5",
+        "baseScore": 5,
+        "score": 1
+      }
+    ],
+    "scores": [
+      {
+        "key": "bedtime_procrastination",
+        "type": "total",
+        "label": "上床前的收尾习惯",
+        "description": "9题反向后等权均分1–5，更多表示自述更常拖延上床。",
+        "direction": "higher_is_more",
+        "canonical": true,
+        "displayPrecision": 2,
+        "value": 2.3333333333333335,
+        "range": {
+          "min": 1,
+          "max": 5
+        },
+        "expectedItems": [
+          "BPS_01",
+          "BPS_02",
+          "BPS_03",
+          "BPS_04",
+          "BPS_05",
+          "BPS_06",
+          "BPS_07",
+          "BPS_08",
+          "BPS_09"
+        ],
+        "answeredItems": [
+          "BPS_01",
+          "BPS_02",
+          "BPS_03",
+          "BPS_04",
+          "BPS_05",
+          "BPS_06",
+          "BPS_07",
+          "BPS_08",
+          "BPS_09"
+        ],
+        "status": "calculated",
+        "prorated": false
+      }
+    ],
+    "references": [],
+    "interpretations": [
+      {
+        "scoreKey": "bedtime_procrastination",
+        "headline": "上床前的收尾习惯",
+        "label": null,
+        "interpretation": "这份回答关注的是从“还想再做一会儿”到“准备上床”之间的那段时间。有时我们已经想休息，却被一件小事接着另一件小事拖住。它不是在给自律打分，也不能说明睡不着的原因。工作、照护责任和生活安排都可能影响上床时间。可以回想一个常见的晚上，找出最容易让自己停不下来的环节，再选一个负担很小的收尾动作。一次回答不必变成对自己的评价。",
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "最近一次比打算更晚上床，拖住你的是必须完成的事，还是可以留到明天的事？"
+          },
+          {
+            "category": "strategy",
+            "text": "今晚试着设一个收尾信号：把还想做的事记下来，再开始原本打算的睡前准备。"
+          },
+          {
+            "category": "environment",
+            "text": "让收尾动作尽量省事，例如提前准备好明早要用的物品；是否有帮助，过后再看。"
+          }
+        ],
+        "limitations": [
+          "这份结果整理的是你对平时习惯的描述，不能代替对实际生活安排的了解。",
+          "不能仅凭回答判断失眠、身体健康、自律程度或一个人的价值。",
+          "中文题目为平台工作译稿，目前不适合用来给人与人之间排高低。",
+          "没有回答的题目不会算成最低分；题目不完整时，本次结果不作解释。"
+        ],
+        "referenceVersion": null
+      }
+    ],
+    "caveats": [
+      "这份结果整理的是你对平时习惯的描述，不能代替对实际生活安排的了解。",
+      "不能仅凭回答判断失眠、身体健康、自律程度或一个人的价值。",
+      "中文题目为平台工作译稿，目前不适合用来给人与人之间排高低。",
+      "没有回答的题目不会算成最低分；题目不完整时，本次结果不作解释。",
+      "未提供群体参考。"
+    ],
+    "disclaimer": "供成年人回顾上床习惯；不是睡眠疾病检查，也不是自律考试。中文为平台工作译稿。"
+  }
+}
