@@ -2,7 +2,8 @@ import {ClipboardList,Compass,NotebookPen} from 'lucide-react'
 import {SchoolTaskHelp as PracticeHelp} from '../school/SchoolTaskHelp'
 import {TeacherAssessmentPage} from './TeacherAssessmentPage'
 import { useCallback,useEffect,useRef,useState } from 'react'
-import { TaskForm } from '../survey/SurveyPublicApp'
+import {deferredPage} from '../components/page-loading/deferredPage'
+const TaskForm=deferredPage(async()=>({default:(await import('../survey/TaskForm')).TaskForm}))
 import { sanitizeFormAnswers,visibleFormKeys } from '../survey/form-visibility'
 import type {FormDraft} from '../survey/builder.types'
 import type {ProfessionalAnswer} from '../survey/ProfessionalFormAnswer'
@@ -20,7 +21,8 @@ export function HuiteacherFieldWorkspace({api,onDraftStateChange}:{api:Api;onDra
   const [invitations,setInvitations]=useState<Invite[]>([])
   const [notes,setNotes]=useState<Note[]>([])
   const [text,setText]=useState<Record<string,string>>({})
-  const [fieldForms,setFieldForms]=useState<Record<string,FieldForm|null>>({})
+  const [formState,setFormState]=useState<{api:Api;forms:Record<string,FieldForm|null>;errors:Record<string,string>}>({api,forms:{},errors:{}})
+  const [loadedSource,setLoadedSource]=useState<{api:Api}|null>(null)
   const [formAnswers,setFormAnswers]=useState<Record<string,Record<string,ProfessionalAnswer>>>({})
   const [formPages,setFormPages]=useState<Record<string,number>>({})
   const [newEvent,setNewEvent]=useState('')
@@ -28,7 +30,6 @@ export function HuiteacherFieldWorkspace({api,onDraftStateChange}:{api:Api;onDra
   const [kind,setKind]=useState<Kind>('FACT')
   const [opened,setOpened]=useState(false)
   const [activeNoteId,setActiveNoteId]=useState('')
-  const [formErrors,setFormErrors]=useState<Record<string,string>>({})
   const [formReload,setFormReload]=useState(0)
   const [busy,setBusy]=useState(false)
   const [notice,setNotice]=useState('')
@@ -48,7 +49,7 @@ export function HuiteacherFieldWorkspace({api,onDraftStateChange}:{api:Api;onDra
       api<{list:Invite[]}>('/my-field-invitations'),
       api<{list:Note[]}>('/my-field-notes'),
     ])
-    setInvitations(inv.list);setNotes(note.list)
+    setInvitations(inv.list);setNotes(note.list);setLoadedSource({api})
     setText(old=>{
       const merged={...old}
       for(const row of note.list)if(!(row.id in merged))merged[row.id]=row.content
@@ -62,36 +63,50 @@ export function HuiteacherFieldWorkspace({api,onDraftStateChange}:{api:Api;onDra
       api<{list:Note[]}>('/my-field-notes'),
     ]).then(([inv,note])=>{
       if(!mounted)return
-      setInvitations(inv.list);setNotes(note.list)
+      setInvitations(inv.list);setNotes(note.list);setLoadedSource({api})
       setText(Object.fromEntries(note.list.map(x=>[x.id,x.content])))
     }).catch(e=>{if(mounted)setNotice(e instanceof Error?e.message:'受邀观察记录读取失败')})
     return()=>{mounted=false}
   },[api])
-  useEffect(()=>{
-    let active=true
-    setFieldForms({});setFormErrors({})
-    for(const invite of invitations.filter(i=>i.status==='ACCEPTED')){
-      void api<FieldForm|null>('/field-invitations/'+invite.invitationId+'/form')
-        .then(form=>{if(active)setFieldForms(old=>({...old,[invite.eventId]:form}))})
-        .catch(error=>{if(active)setFormErrors(old=>({...old,[invite.eventId]:error instanceof Error?error.message:'实践表单读取失败'}))})
-    }
-    return()=>{active=false}
-  },[invitations,api,formReload])
   const currentNote=notes.find(note=>note.id===activeNoteId)
   const currentInvite=invitations.find(invite=>currentNote?invite.eventId===currentNote.eventId:invite.invitationId===newEvent)
   const currentKind=currentNote?.kind??kind
   const recordKey=currentNote?.id??('new:'+newEvent+':'+kind)
   const content=text[recordKey]??currentNote?.content??''
   const eventId=currentNote?.eventId??currentInvite?.eventId??''
+  const fieldForms=formState.api===api?formState.forms:{}
   const bound=fieldForms[eventId]
   const answers=formAnswers[recordKey]??{}
-  const formError=formErrors[eventId]
+  const formError=formState.api===api?formState.errors[eventId]:undefined
   const formLoaded=Object.prototype.hasOwnProperty.call(fieldForms,eventId)
   const submittedFeedback=(event:string)=>notes.find(note=>note.eventId===event&&note.kind==='FORMAL_FEEDBACK'&&note.status==='SUBMITTED')
   const formal=currentKind==='FORMAL_FEEDBACK'
   const alreadySubmitted=formal&&!!submittedFeedback(eventId)
   const editable=currentNote?.status!=='SUBMITTED'&&currentInvite?.status==='ACCEPTED'&&!alreadySubmitted
   const ready=editable&&(!formal||!!bound)
+  // Read only the selected editable record's frozen event binding. Returning to
+  // a previously visited activity reuses that definition and its local answers;
+  // unrelated list refreshes must not replace a draft's definition underneath it.
+  const formInvitation=opened&&formal&&currentNote?.status!=='SUBMITTED'
+    &&currentInvite?.status==='ACCEPTED'&&loadedSource?.api===api?currentInvite.invitationId:''
+  useEffect(()=>{
+    if(!formInvitation||formLoaded)return
+    let current=true
+    setFormState(old=>({api,forms:old.api===api?old.forms:{},errors:{
+      ...(old.api===api?old.errors:{}),[eventId]:'',
+    }}))
+    void api<FieldForm|null>('/field-invitations/'+formInvitation+'/form')
+      .then(form=>{
+        if(current)setFormState(old=>({api,forms:{...(old.api===api?old.forms:{}),[eventId]:form},errors:old.api===api?old.errors:{}}))
+      })
+      .catch(error=>{
+        if(current)setFormState(old=>({api,forms:old.api===api?old.forms:{},errors:{
+          ...(old.api===api?old.errors:{}),[eventId]:error instanceof Error?error.message:'实践表单读取失败',
+        }}))
+      })
+    // Back/another activity/API scope invalidates this reader, not the drafts.
+    return()=>{current=false}
+  },[api,eventId,formInvitation,formLoaded,formReload])
   const openActivity=(invite:Invite)=>{
     const existing=submittedFeedback(invite.eventId)??notes.find(note=>note.eventId===invite.eventId&&note.kind==='FORMAL_FEEDBACK'&&note.status==='DRAFT')
     setNewEvent(invite.invitationId);setKind('FORMAL_FEEDBACK');setActiveNoteId(existing?.id??'');setOpened(true);setNotice('')
