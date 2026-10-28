@@ -34,15 +34,8 @@ async function fixture(product: 'SCHOOL' | 'TEACHER', mixed = false) {
   const f = await setupEducationLibraryRuntimeFixture({ db, product, trackCount: mixed ? 1 : 0, publish: false })
   const context: PrivateToolContext = { entry: product, organizationId: f.organizationId,
     principal: { userId: f.managerUserId, accountDomain: 'SCHOOL' } }
-  if (product === 'TEACHER') {
-    // Event admin is not an implicit private-tool author.
-    await expect(tools.createPrivateTool(context, { kind: 'FORM', title: 'Not an author' })).rejects.toThrow('PRIVATE_TOOL_AUTHOR_REQUIRED')
-    const member = await db.organizationMembership.findFirstOrThrow({ where: { organizationId: f.organizationId, userId: f.managerUserId, validUntil: null } })
-    await db.organizationPersonaGrant.create({ data: { id: randomUUID(), organizationId: f.organizationId,
-      membershipId: member.id, persona: 'COUNSELOR', grantedByUserId: f.managerUserId } })
-    await db.organizationCapabilityGrant.create({ data: { id: randomUUID(), organizationId: f.organizationId,
-      membershipId: member.id, capability: 'PSYCHOLOGY_STAFF', grantedByUserId: f.managerUserId } })
-  }
+  // The Teacher fixture already grants this school's PRODUCT_ADMIN. Do not
+  // require or manufacture School psychology authority for Teacher authoring.
   const source = await frozen(context)
   const target = { organizationId: f.organizationId, runId: f.runId, actorUserId: f.managerUserId,
     parent: { kind: product === 'SCHOOL' ? 'SCHOOL_ACTIVITY' as const : 'TEACHER_EVENT' as const, id: f.workflow.id } }
@@ -102,7 +95,7 @@ suite('Private Form real preview and atomic fixed-version publication, before ta
     if (product === 'TEACHER') {
       const member = await db.organizationMembership.findFirstOrThrow({ where: { organizationId: x.f.organizationId, userId: x.f.managerUserId, validUntil: null } })
       const author = await db.educationProductRoleGrant.findFirstOrThrow({ where: { membershipId: member.id, product: 'HUITEACHER', role: 'PRODUCT_ADMIN', revokedAt: null } })
-      await db.$executeRaw`UPDATE education_product_role_grants SET revoked_at=clock_timestamp() WHERE id=${author.id}`
+      await db.$executeRaw`UPDATE education_product_role_grants SET revoked_at=clock_timestamp(),revoked_by_user_id=${x.f.managerUserId} WHERE id=${author.id}`
       await expect(x.preview()).rejects.toThrow('HUITEACHER_RUN_ADMIN_REQUIRED')
       await expect(x.publish()).rejects.toThrow('HUITEACHER_RUN_ADMIN_REQUIRED')
       await unchanged(x, before)

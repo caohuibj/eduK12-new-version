@@ -46,7 +46,7 @@ export async function createPrivateTool(c:PrivateToolContext,raw:unknown){
  const input=createPrivateToolInput.parse(raw)
  const definition=privateToolDefinition(input.kind,initialPrivateToolDefinition(input.kind,c.entry))
  return transact(async tx=>{
-  await authorized(tx,c,true)
+  await authorized(tx,c,{kind:input.kind})
   const row=await tx.educationPrivateTool.create({data:{id:randomUUID(),...scope(c),...input,
    definition:definition as Prisma.InputJsonValue,contentHash:privateToolContentHash(input.kind,input.title,definition)}})
   return {...row,...boundary}
@@ -75,7 +75,7 @@ export async function readPrivateTool(c:PrivateToolContext,id:string){
 export async function updatePrivateTool(c:PrivateToolContext,id:string,raw:unknown){
  const input=updatePrivateToolInput.parse(raw)
  return transact(async tx=>{
-  await authorized(tx,c,true)
+  await authorized(tx,c,{toolId:id})
   const row=await readOwned(tx,c,id,true)
   if(row.revision!==input.expectedRevision)privateToolFail('PRIVATE_TOOL_REVISION_CONFLICT')
   const definition=privateToolDefinition(row.kind as PrivateToolKind,input.definition)
@@ -133,7 +133,7 @@ export async function previewPrivateTool(c:PrivateToolContext,id:string,raw:unkn
 export async function freezePrivateTool(c:PrivateToolContext,id:string,raw:unknown){
  const input=freezePrivateToolInput.parse(raw)
  return transact(async tx=>{
-  await authorized(tx,c,true)
+  await authorized(tx,c,{toolId:id})
   const row=await readOwned(tx,c,id,true)
   const prior=await tx.educationPrivateToolVersion.findFirst({where:{toolId:id,...scope(c),sourceRevision:input.expectedRevision}})
   if(prior){

@@ -68,11 +68,11 @@ suite('School/Teacher authoring current PostgreSQL authority', () => {
     expect(await resolveEducationProductMemberScope({ actorUserId: f.user.id, organizationId: f.org.id, product: 'HUITEACHER' }, tx)).toMatchObject({ productAdmin: true })
     expect(await resolveEducationToolAuthoringContext(f.input, tx)).not.toBeNull()
     expect(await resolveEducationToolAuthoringContext(school, tx)).toBeNull()
-    await tx.$executeRaw`UPDATE education_product_role_grants SET revoked_at=clock_timestamp() WHERE id=${f.administrator.id}`
+    await tx.$executeRaw`UPDATE education_product_role_grants SET revoked_at=clock_timestamp(),revoked_by_user_id=${f.user.id} WHERE id=${f.administrator.id}`
     expect(await resolveEducationToolAuthoringContext(f.input, tx)).toBeNull()
   }))
   it('rejects a Teacher psychology author after product administration is revoked, retaining ordinary participant membership', () => check(async (tx, f) => {
-    await tx.$executeRaw`UPDATE education_product_role_grants SET revoked_at=clock_timestamp() WHERE id=${f.administrator.id}`
+    await tx.$executeRaw`UPDATE education_product_role_grants SET revoked_at=clock_timestamp(),revoked_by_user_id=${f.user.id} WHERE id=${f.administrator.id}`
     expect(await resolveEducationToolAuthoringContext(f.input, tx)).toBeNull()
     expect(await resolveEducationProductMemberScope({ actorUserId: f.user.id, organizationId: f.org.id, product: 'HUITEACHER' }, tx)).toMatchObject({ productAdmin: false })
     expect(await resolveEducationToolAuthoringContext(await schoolInput(tx, f), tx)).not.toBeNull()
