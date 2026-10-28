@@ -1,0 +1,22 @@
+node:fs:483
+    return binding.readFileUtf8(path, stringToFlags(options.flag));
+                   ^
+
+Error: ENOENT: no such file or directory, open '/workspace/cognitive-review-spatial/docs/next-candidates-20261026/enumeration/implementation/recipe-config-20261026/legacy-descriptors-and-snapshots.json'
+    at Object.readFileSync (node:fs:483:20)
+    at fs (/workspace/cognitive-review-spatial/docs/cognitive-library/onboarding-content-20261028/parallel-review/enumeration/representative-records.ts:40:32)
+    at Object.<anonymous> (/workspace/cognitive-review-spatial/docs/cognitive-library/onboarding-content-20261028/parallel-review/enumeration/representative-records.ts:45:257)
+    at Module._compile (node:internal/modules/cjs/loader:1929:14)
+    at Object.transformer (/workspace/eduK12-new-version/server-version/backend/node_modules/tsx/dist/register-C557imBs.cjs:9:3619)
+    at Module.load (node:internal/modules/cjs/loader:1651:32)
+    at Module._load (node:internal/modules/cjs/loader:1443:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+    at loadCJSModuleWithModuleLoad (node:internal/modules/esm/translators:372:15)
+    at ModuleWrap.<anonymous> (node:internal/modules/esm/translators:244:9) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/workspace/cognitive-review-spatial/docs/next-candidates-20261026/enumeration/implementation/recipe-config-20261026/legacy-descriptors-and-snapshots.json'
+}
+
+Node.js v24.21.0

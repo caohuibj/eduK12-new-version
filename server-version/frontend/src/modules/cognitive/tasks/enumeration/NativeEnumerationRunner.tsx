@@ -1,18 +1,20 @@
 import React,{useEffect,useRef,useState} from 'react'
 import type {CognitiveTaskProps,CognitiveTaskContext} from '../../core/runner.types'
+import {nativeContentSnapshot} from '../../core/NativeContentRunner'
 import {finalDraftStore,type FinalDraftMeta} from '../../../../services/persistence/finalDraftStore'
 import {nativeEnumerationDraftKey} from '../../core/native-enumeration-draft-key'
 import {requireCognitiveDurability} from '../../core/raw-archive'
-import {ENUMERATION_RECIPE_IDENTITY,enumerationConfigEqual,enumerationRecipeConfig,type EnumerationRecipeConfig} from './generated/protocol'
+import {ENUMERATION_RECIPE_IDENTITY,ENUMERATION_PROTOCOL,enumerationConfigEqual,enumerationRecipeConfig,type EnumerationRecipeConfig} from './generated/protocol'
 import {enumerationArtifact,enumerationPageOrigin,type EnumerationArtifact,type EnumerationContext} from './display'
 import {freezeEnumerationArtifact,readFrozenEnumerationArtifact} from './local-artifact'
 import {createNativeEnumerationPort,type NativeEnumerationPort} from './native-port'
 import {EnumerationCalibration} from './EnumerationCalibration'
 import {EnumerationTask} from './EnumerationTask'
 export function nativeEnumerationConfig(context:CognitiveTaskContext):EnumerationRecipeConfig {
+ nativeContentSnapshot(context)
  const id=ENUMERATION_RECIPE_IDENTITY,s=context.sessionSnapshot,c=context.config
  if(!context.nativeTask||!s||context.testType!==id.testType||context.engineVersion!==id.engineVersion||context.scoringVersion!==id.scoringVersion
-  ||context.configVersion!==id.configVersion||context.attemptEpoch!==context.attemptNo||!Number.isSafeInteger(context.attemptEpoch)
+  ||context.configVersion!==id.configVersion||!enumerationConfigEqual(s?.protocol,ENUMERATION_PROTOCOL)||context.attemptEpoch!==context.attemptNo||!Number.isSafeInteger(context.attemptEpoch)
   ||(context.sessionEpoch!==undefined&&context.sessionEpoch!==context.attemptEpoch)||s.protocol.key!==id.protocolKey
   ||s.testType!==id.testType||s.engineVersion!==id.engineVersion||s.scoringVersion!==id.scoringVersion||s.configVersion!==id.configVersion
   ||s.configHash!==context.definitionHash||!['research','experience'].includes(String(c.profile))

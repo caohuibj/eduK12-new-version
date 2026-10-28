@@ -1,16 +1,11 @@
-import type { AuthoritativeScorerInput, CognitiveScoreResult, ProtocolDefinition } from '../../v2/types'
+import type { AuthoritativeScorerInput, CognitiveScoreResult } from '../../v2/types'
 import { computeConfigSnapshotHash, computeProtocolSignature } from '../../v2/canonical'
 import { parseTrialEnvelope } from '../../v2/trial-envelope'
 import { parseSessionConfigSnapshot } from '../../v2/session-snapshot'
-import { ENUMERATION_IDENTITY, ENUMERATION_RECIPE_IDENTITY, ENUMERATION_QUANTITIES, enumerationPlan, enumerationRecipePlan, assertEnumerationSeed,
+import { ENUMERATION_IDENTITY, ENUMERATION_RECIPE_IDENTITY, ENUMERATION_PROTOCOL, ENUMERATION_QUANTITIES, enumerationPlan, enumerationRecipePlan, assertEnumerationSeed,
   type EnumerationConfig, type EnumerationRecipeConfig, type EnumerationIdentity, type EnumerationPlan, type EnumerationTrial } from './protocol'
 import { parseEnumerationConfig, parseEnumerationRecipeConfig, parseEnumerationTrial } from './schema'
-export const ENUMERATION_PROTOCOL: ProtocolDefinition = {
-  schemaVersion: 1, key: ENUMERATION_IDENTITY.protocolKey, version: '0.1.0', clock: 'performance',
-  randomizationAlgorithmVersion: ENUMERATION_IDENTITY.randomizationAlgorithmVersion,
-  trialEnvelopeVersion: 1, phases: [{ key: 'test', persists: true, required: true }],
-  measurementCriticalConfigPaths: ['*'],
-}
+export { ENUMERATION_PROTOCOL } from './protocol'
 function median(values: number[]): number | null {
   if (!values.length) return null
   const sorted = [...values].sort((a, b) => a - b), middle = Math.floor(sorted.length / 2)

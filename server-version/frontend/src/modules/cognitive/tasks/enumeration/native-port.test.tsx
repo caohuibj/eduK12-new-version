@@ -3,6 +3,7 @@ import {describe,it,expect,vi,afterEach} from 'vitest'
 import {render,fireEvent,screen,waitFor,cleanup} from '@testing-library/react'
 import {createFinalDraftStore,createFinalDraftMeta} from '../../../../services/persistence/finalDraftStore'
 import type {CognitiveNativeHost,CognitiveTaskContext} from '../../core/runner.types'
+import {cognitiveRawDigest} from '../../core/raw-archive'
 import {enumerationArtifact,enumerationDigest,enumerationContextPlan,type EnumerationContext,type EnumerationCalibration as Calibration} from './display'
 import {enumerationRecipeConfig,ENUMERATION_RECIPE_IDENTITY} from './generated/protocol'
 import {enumerationFixtureContext} from './fixtures.test-support'
@@ -90,7 +91,7 @@ describe('native enumeration task port',()=>{
  })
  it('native identity accepts the exact new tuple and opaque protocol literal while rejecting old tuple/config drift',()=>{
   const id=ENUMERATION_RECIPE_IDENTITY,config=enumerationRecipeConfig('experience'),protocol={schemaVersion:1 as const,key:id.protocolKey,version:'0.1.0',clock:'performance' as const,randomizationAlgorithmVersion:id.randomizationAlgorithmVersion,trialEnvelopeVersion:1 as const,phases:[{key:'test' as const,persists:true,required:true}],measurementCriticalConfigPaths:['*']}
-  const context:CognitiveTaskContext={sessionId:'session',testType:id.testType,engineVersion:id.engineVersion,scoringVersion:id.scoringVersion,configVersion:id.configVersion,attemptNo:1,attemptEpoch:1,nativeTask:true,definitionHash:'a'.repeat(64),config:{...config},randomSeed:'actual-seed',sessionSnapshot:{schemaVersion:1,frozenAt:'2026-10-26T00:00:00Z',testType:id.testType,engineVersion:id.engineVersion,scoringVersion:id.scoringVersion,configVersion:id.configVersion,config:{...config},configHash:'a'.repeat(64),protocolSignature:'b'.repeat(64),protocol}}
+  const context:CognitiveTaskContext={sessionId:'session',testType:id.testType,engineVersion:id.engineVersion,scoringVersion:id.scoringVersion,configVersion:id.configVersion,attemptNo:1,attemptEpoch:1,nativeTask:true,definitionHash:cognitiveRawDigest(config),config:{...config},randomSeed:'actual-seed',sessionSnapshot:{schemaVersion:1,frozenAt:'2026-10-26T00:00:00Z',testType:id.testType,engineVersion:id.engineVersion,scoringVersion:id.scoringVersion,configVersion:id.configVersion,config:{...config},configHash:cognitiveRawDigest(config),protocolSignature:cognitiveRawDigest(protocol),protocol}}
   expect(nativeEnumerationConfig(context)).toEqual(config);expect(id.protocolKey).toBe('enumeration/0.1.0/0.1.0')
   expect(()=>nativeEnumerationConfig({...context,engineVersion:'0.1.0'})).toThrow();expect(()=>nativeEnumerationConfig({...context,config:{...config,totalTrials:100}})).toThrow()
  })

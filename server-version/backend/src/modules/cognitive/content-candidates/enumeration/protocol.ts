@@ -10,6 +10,13 @@ export const ENUMERATION_IDENTITY = Object.freeze({
 /** New complete-recipe configuration; historical exports above deliberately keep their frozen tuple. */
 export const ENUMERATION_RECIPE_IDENTITY = Object.freeze({ ...ENUMERATION_IDENTITY,
   engineVersion: '0.2.0', configVersion: '0.3.0' })
+/** Same frozen protocol for both historical and complete-recipe identities; shared with the browser consumer. */
+export const ENUMERATION_PROTOCOL = {
+  schemaVersion: 1 as const, key: ENUMERATION_IDENTITY.protocolKey, version: '0.1.0', clock: 'performance' as const,
+  randomizationAlgorithmVersion: ENUMERATION_IDENTITY.randomizationAlgorithmVersion,
+  trialEnvelopeVersion: 1 as const, phases: [{ key: 'test' as const, persists: true, required: true }],
+  measurementCriticalConfigPaths: ['*'],
+}
 export type EnumerationIdentity = typeof ENUMERATION_IDENTITY | typeof ENUMERATION_RECIPE_IDENTITY
 export function getEnumerationIdentity(engineVersion: string, scoringVersion: string, configVersion?: string): EnumerationIdentity | undefined {
   return [ENUMERATION_IDENTITY, ENUMERATION_RECIPE_IDENTITY].find(id => id.engineVersion === engineVersion
