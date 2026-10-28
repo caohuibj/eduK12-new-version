@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "task": "embeddedfigures",
+  "order": 120,
+  "identities": [
+    {
+      "testType": "embeddedfigures",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "order": 120
+    }
+  ],
+  "backend": {
+    "file": "package.ts",
+    "export": "executionEntries"
+  },
+  "frontend": [
+    {
+      "testType": "embeddedfigures",
+      "engineVersion": "1.0.0",
+      "file": "server-version/frontend/src/modules/cognitive/tasks/embeddedfigures/embeddedfigures.registry.ts",
+      "export": "embeddedfiguresRegistryEntry"
+    }
+  ],
+  "catalog": {
+    "file": "governance.ts",
+    "export": "catalog"
+  },
+  "seeds": {
+    "file": "seeds.ts",
+    "export": "seeds",
+    "orders": [
+      120
+    ]
+  },
+  "presentation": {
+    "file": "participant-presentation.ts",
+    "export": "participantPresentations"
+  },
+  "scientific": {
+    "file": "scientific.ts",
+    "export": "scientificGovernance"
+  },
+  "acceptance": {
+    "frontendSuites": [
+      "src/modules/cognitive/tasks/embeddedfigures/__tests__/EmbeddedfiguresTask.test.tsx",
+      "src/modules/cognitive/tasks/embeddedfigures/__tests__/generator.test.ts"
+    ]
+  }
+}

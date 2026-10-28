@@ -311,6 +311,12 @@ const SCORING_DECLARATIONS: Record<string, CognitiveScoringContractDeclaration> 
     runtimeReconstructableFacts: ['提议序列（frozen config）'],
     serverDerivedFacts: ['公平划分判定与接受率', 'metrics（acceptanceRate/unfairAcceptanceRate）', 'quality flags'],
   },
+  embeddedfigures: {
+    testType: 'embeddedfigures',
+    clientObservedFacts: ['点击的多边形 id', '查找用时', 'interrupted'],
+    runtimeReconstructableFacts: ['几何场与目标 id（冻结题库前 4 题 + seed 生成器重建）'],
+    serverDerivedFacts: ['正确性判定', 'metrics（accuracy/medianRtMs）', 'quality flags'],
+  },
 }
 
 // 当前通用事实（所有任务一致）：完整加密 trial payload、v2 trial envelope qualityEvents、
@@ -541,6 +547,11 @@ const RESEARCH_CAPTURE_DECLARATIONS: Record<string, CognitiveResearchCaptureDecl
     testType: 'trustgame',
     currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐轮选择与用时'],
     futureCaptureFacts: ['真实接收者与真实激励', '真实 input modality', '决策前犹豫内指针轨迹'],
+  },
+  embeddedfigures: {
+    testType: 'embeddedfigures',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次点击与用时'],
+    futureCaptureFacts: ['搜索注视轨迹', '真实 input modality', 'device provenance'],
   },
 }
 

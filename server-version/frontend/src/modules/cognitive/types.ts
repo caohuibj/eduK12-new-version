@@ -842,3 +842,26 @@ export type TrustgameTrialPayload = {
   rtMs: number | null
   interrupted: boolean
 }
+
+/** Embeddedfigures 冻结 config（与后端 embeddedfigures.config schema 一致）。 */
+export interface EmbeddedfiguresConfig {
+  totalTrials: number
+  stimulusSetVersion: string
+  showTargetMs: number
+  timeoutMs: number
+  validRtFloorMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+/** Embeddedfigures 单 trial payload（与后端 embeddedfigures.trial schema 一致）。 */
+export type EmbeddedfiguresTrialPayload = {
+  itemIndex: number
+  clickedShapeId: string | null
+  rtMs: number | null
+  interrupted: boolean
+}

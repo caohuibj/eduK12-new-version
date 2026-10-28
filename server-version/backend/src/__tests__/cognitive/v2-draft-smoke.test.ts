@@ -59,6 +59,7 @@ const payloadFor = (testType: string): { phase: 'test' | 'learning'; payload: un
     case 'icarmatrix': return { phase: 'test', payload: { itemIndex: 0, responseIndex: 1, rtMs: 300, interrupted: false } }
     case 'cancellation': return { phase: 'test', payload: { scanIndex: 0, selectedCells: [3, 17], responseDurationMs: 100, interrupted: false } }
     case 'trustgame': return { phase: 'test', payload: { roundIndex: 0, offerToSelf: 50, response: 'accept', rtMs: 300, interrupted: false } }
+    case 'embeddedfigures': return { phase: 'test', payload: { itemIndex: 0, clickedShapeId: 's0', rtMs: 300, interrupted: false } }
     default: throw new Error(`No cognitive smoke payload for ${testType}`)
   }
 }

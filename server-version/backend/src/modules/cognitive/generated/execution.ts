@@ -44,6 +44,7 @@ import { executionEntries as task41 } from '../tasks/wordproblem/package'
 import { executionEntries as task42 } from '../tasks/icarmatrix/package'
 import { executionEntries as task43 } from '../tasks/cancellation/package'
 import { executionEntries as task44 } from '../tasks/trustgame/package'
+import { executionEntries as task45 } from '../tasks/embeddedfigures/package'
 export const cognitiveExecutionEntries = [
   task0[0],
   task1[0],
@@ -93,5 +94,6 @@ export const cognitiveExecutionEntries = [
   task42[0],
   task43[0],
   task44[0],
+  task45[0],
   task21[1],
 ]
