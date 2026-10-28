@@ -52,3 +52,21 @@ installation. Original test histories stay in the source branch.
 Full integration CI has not run. The inherited PR365 exact CI binding is not a
 valid binding for this new content branch; no Ready or activation is requested.
 Only this batch's directly affected structural check has run on this candidate.
+
+## 接续首批：共享 native 配置与隔离安装
+
+逐包事实与范围见 [batch-queue.md](batch-queue.md)。原有 MOT 与点数判断配置
+工厂移入 src 的既有 native-registry 区域，Prisma 保持重导出；selected installer
+由同一精确来源解析，未复制配置或改动注册/生命周期/权限 guard。原配置哈希不变。
+
+本节点新建隔离 PostgreSQL（无全量 seed）实际安装这两个 DRAFT/GRANT 配置，
+两 profile 分别冻结而不增配置行；重复安装保留原行、仅两条审计；没有发布指针或
+assignment。冲突保留、不覆盖。原失败夹具及仅失败用例续验均留存，详见
+[evidence/native-install-receipt.json](evidence/native-install-receipt.json) 和
+[evidence/native-postgres.json](evidence/native-postgres.json)。实际 CLI preview 读取
+同一隔离库，MOT 为 ALREADY_PRESENT、被夹具故意改名且 RETIRED 的点数判断为
+IMMUTABLE_CONFIG_CONFLICT，预期退出 2；不是一次新的失败安装或正式库结果。
+
+源码可选安装、隔离库已安装、正式公共库发布、真实四入口可用是四件不同的事。
+后两项未执行；原件 composite/access-token guard 未动，School/Teacher 适配仍待
+root 协调。没有新增科研/版权审查门禁，也没有将现有候选重算为新开发。

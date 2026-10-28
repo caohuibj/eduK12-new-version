@@ -1,0 +1,51 @@
+{
+  "baseHead": "969d793896de6b67f4746119b942602abe99326e",
+  "node": "v24.19.0",
+  "inputs": {
+    "server-version/backend/prisma/seeds/native-cognitive.ts": "f370e46e424c48cf2e902d31d0429910e53e43ad2d157be7a48e8125fe7bb41b",
+    "server-version/backend/src/modules/cognitive/content-candidates/native-registry/config-seeds.ts": "29831e9ab36eaa379ca7124931f252c8a52d7b1e234c6c3e74833566002e9ff7",
+    "server-version/backend/src/modules/cognitive/onboarding/install.ts": "24563c978b743f8430335b1fe145435145bbf63c8d05098a62cc23deaffe7365",
+    "server-version/backend/src/__tests__/cognitive/native-onboarding-install.test.ts": "30ccd5ca3cdfe0062ea58d4620f4bf4bfe371a45b510b0f4ad033bebfb0baf51",
+    "server-version/backend/src/__tests__/cognitive/native-onboarding-install.postgres.integration.test.ts": "04843085cbd01c7f38d09c5e8afa9274fe249d245ecf3693c0f8e1066fe46f0a",
+    "server-version/backend/package-lock.json": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+    "server-version/backend/prisma/schema.prisma": "3bea3c07159f95eadce9257207648658bc8f10e5996f594667cb6c877a84b515"
+  },
+  "executions": [
+    {
+      "command": "COGNITIVE_MODULE_ENABLED=true node_modules/.bin/vitest run src/__tests__/cognitive/native-onboarding-install.test.ts --reporter=json --outputFile=../../../docs/cognitive-library/onboarding-content-20261028/evidence/native-selection.json",
+      "cwd": "server-version/backend",
+      "exit": 1,
+      "report": "native-selection-original.json",
+      "result": "1 passed, 1 failed; fixture combined mismatched engine with duplicate same config key; source/guard correct. Original fixture retained."
+    },
+    {
+      "command": "COGNITIVE_MODULE_ENABLED=true node_modules/.bin/vitest run src/__tests__/cognitive/native-onboarding-install.test.ts -t 'never falls back' --reporter=json --outputFile=../../docs/cognitive-library/onboarding-content-20261028/evidence/native-selection-corrected.json",
+      "cwd": "server-version/backend",
+      "exit": 0,
+      "report": "native-selection-corrected.json",
+      "result": "1 passed, 1 filtered; split mismatched engine into separate selection; no product change after original execution"
+    },
+    {
+      "command": "DATABASE_URL=<fresh isolated loopback database> node_modules/.bin/prisma migrate deploy",
+      "cwd": "server-version/backend",
+      "exit": 0,
+      "log": "isolated-migrations.log",
+      "result": "fresh schema only, no seed; generated Prisma client refreshed locally to checked schema"
+    },
+    {
+      "command": "COGNITIVE_MODULE_ENABLED=true DATABASE_URL=<fresh isolated loopback database> COGNITIVE_NATIVE_INSTALL_TEST_DATABASE_URL=<same URL> DATA_ENCRYPTION_KEY=<synthetic 32-byte key> node_modules/.bin/vitest run src/__tests__/cognitive/native-onboarding-install.postgres.integration.test.ts --reporter=json --outputFile=../../docs/cognitive-library/onboarding-content-20261028/evidence/native-postgres.json",
+      "cwd": "server-version/backend",
+      "exit": 0,
+      "report": "native-postgres.json",
+      "result": "1 passed: two real selected identities, preview/no-write, restricted drafts, profile snapshots, exact repeat, two audits, no release pointer, no assignments, conflict retained"
+    }
+  ],
+  "limits": [
+    "No whole scorer suite or full platform tests",
+    "No new native scorer/stimulus/profile/report definition bytes",
+    "No formal CI qualification, Ready, merge, production access or deployment",
+    "Source registration and isolated drafts only; public library and four entry/raw archive gaps remain"
+  ],
+  "factoryMove": "Same function bodies; canonical hashes incl DRAFT identity unchanged from pre-edit probe and asserted in original passed case",
+  "prismaSchemaSourceHash": "3bea3c07159f95eadce9257207648658bc8f10e5996f594667cb6c877a84b515"
+}

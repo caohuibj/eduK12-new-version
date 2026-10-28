@@ -1,18 +1,7 @@
 import { Prisma, type PrismaClient } from '@prisma/client'
 import { canonicalHash } from '../../src/modules/assessment-runtime/canonical'
-import { MOT_IDENTITY, motConfig } from '../../src/modules/cognitive/content-candidates/mot/protocol'
-import { ENUMERATION_RECIPE_IDENTITY, enumerationRecipeConfig } from '../../src/modules/cognitive/content-candidates/enumeration/protocol'
-/** One base configuration plus the exact native task's two profile patches, never two duplicate version rows. */
-export function nativeMotConfigSeed() {
-  return { testType: MOT_IDENTITY.testType, configVersion: MOT_IDENTITY.configVersion,
-    name: '多目标追踪', engineVersion: MOT_IDENTITY.engineVersion, scoringVersion: MOT_IDENTITY.scoringVersion,
-    config: motConfig('experience'), status: 'DRAFT' as const }
-}
-export function nativeEnumerationConfigSeed() {
-  return { testType: ENUMERATION_RECIPE_IDENTITY.testType, configVersion: ENUMERATION_RECIPE_IDENTITY.configVersion,
-    name: '短时点数判断', engineVersion: ENUMERATION_RECIPE_IDENTITY.engineVersion, scoringVersion: ENUMERATION_RECIPE_IDENTITY.scoringVersion,
-    config: enumerationRecipeConfig('experience'), status: 'DRAFT' as const }
-}
+import { nativeMotConfigSeed, nativeEnumerationConfigSeed } from '../../src/modules/cognitive/content-candidates/native-registry/config-seeds'
+export { nativeMotConfigSeed, nativeEnumerationConfigSeed } from '../../src/modules/cognitive/content-candidates/native-registry/config-seeds'
 /** Explicit registration only. Never publish, retire, mutate a version or create accounts/grants. */
 async function seedNativeConfig(db: Pick<PrismaClient, 'cognitiveTestConfig'>,
   expected: ReturnType<typeof nativeMotConfigSeed> | ReturnType<typeof nativeEnumerationConfigSeed>) {

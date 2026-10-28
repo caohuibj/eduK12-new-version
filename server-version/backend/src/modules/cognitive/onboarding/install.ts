@@ -2,6 +2,7 @@ import { Prisma, type PrismaClient } from '@prisma/client'
 import { z } from 'zod'
 import { canonicalHash } from '../../assessment-runtime/canonical'
 import { cognitiveSeeds } from '../generated/seeds'
+import { nativeCognitiveConfigSeeds } from '../content-candidates/native-registry/config-seeds'
 import { getCognitiveV2TaskDefinition } from '../v2/registry'
 import { evaluateCognitiveProductReadiness } from '../library/product-readiness'
 import { assertCognitiveProductEligible } from '../product-eligibility'
@@ -31,7 +32,7 @@ function resolveSources(selection:Selection){
   const counts=new Map<string,number>()
   selection.items.forEach(item=>counts.set(key(item),(counts.get(key(item))??0)+1))
   return selection.items.map(item=>{
-    const reasons:string[]=[],matches=cognitiveSeeds.filter(seed=>seed.testType===item.testType&&seed.configVersion===item.configVersion)
+    const reasons:string[]=[],matches=[...cognitiveSeeds,...nativeCognitiveConfigSeeds].filter(seed=>seed.testType===item.testType&&seed.configVersion===item.configVersion)
     if(counts.get(key(item))!==1)reasons.push('DUPLICATE_CONFIG_SELECTION')
     if(matches.length!==1)reasons.push(matches.length?'AMBIGUOUS_REGISTERED_SEED':'CONFIG_SEED_NOT_REGISTERED')
     const seed=matches.length===1?matches[0]:undefined
