@@ -36,4 +36,5 @@ import { scientificGovernance as task33 } from '../tasks/lineangle/scientific'
 import { scientificGovernance as task34 } from '../tasks/seqlearn/scientific'
 import { scientificGovernance as task35 } from '../tasks/timecopy/scientific'
 import { scientificGovernance as task36 } from '../tasks/sharegame/scientific'
-export const cognitiveGovernance = [...task0, ...task1, ...task2, ...task3, ...task4, ...task5, ...task6, ...task7, ...task8, ...task9, ...task10, ...task11, ...task12, ...task13, ...task14, ...task15, ...task16, ...task17, ...task18, ...task19, ...task20, ...task21, ...task22, ...task23, ...task24, ...task25, ...task26, ...task27, ...task28, ...task29, ...task30, ...task31, ...task32, ...task33, ...task34, ...task35, ...task36]
+import { scientificGovernance as task37 } from '../tasks/letternumseries/scientific'
+export const cognitiveGovernance = [...task0, ...task1, ...task2, ...task3, ...task4, ...task5, ...task6, ...task7, ...task8, ...task9, ...task10, ...task11, ...task12, ...task13, ...task14, ...task15, ...task16, ...task17, ...task18, ...task19, ...task20, ...task21, ...task22, ...task23, ...task24, ...task25, ...task26, ...task27, ...task28, ...task29, ...task30, ...task31, ...task32, ...task33, ...task34, ...task35, ...task36, ...task37]

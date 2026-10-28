@@ -1,0 +1,150 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "letternumseries",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0"
+  },
+  "provenance": "Computed with scoreLetternumseriesV1 at task authoring time (2026-10-28); regenerate by rerunning the scorer on the committed inputs",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "config": {
+          "totalTrials": 2,
+          "lettersPerTrial": 3,
+          "digitsPerTrial": 2,
+          "stimulusMs": 700,
+          "isiMs": 300,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "sequence": [
+                "T",
+                "4",
+                "M",
+                "9",
+                "H"
+              ],
+              "lettersResponse": [
+                "H",
+                "M",
+                "T"
+              ],
+              "digitsResponse": [
+                "4",
+                "9"
+              ],
+              "responseDurationMs": 1000,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "sequence": [
+                "B",
+                "2",
+                "K",
+                "7",
+                "D"
+              ],
+              "lettersResponse": [
+                "B",
+                "D",
+                "K"
+              ],
+              "digitsResponse": [
+                "7",
+                "2"
+              ],
+              "responseDurationMs": 1000,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 80,
+        "metrics": {
+          "overallAccuracy": 0.8,
+          "lettersAccuracy": 1,
+          "digitsAccuracy": 0.5,
+          "emptyRecallCount": 0,
+          "medianResponseMs": 1000
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "emptyRecallExcess": false,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "totalTrials": 2,
+          "lettersPerTrial": 3,
+          "digitsPerTrial": 2,
+          "stimulusMs": 700,
+          "isiMs": 300,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": []
+      },
+      "expectedError": "letternumseries v1 expects exactly 2 trials, got 0"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "totalTrials": 2,
+          "lettersPerTrial": 3,
+          "digitsPerTrial": 2,
+          "stimulusMs": 700,
+          "isiMs": 300,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "sequence": [
+                "T",
+                "4",
+                "M",
+                "9",
+                "H"
+              ],
+              "lettersResponse": [
+                "H",
+                "M",
+                "T"
+              ],
+              "digitsResponse": [
+                "4",
+                "9"
+              ],
+              "responseDurationMs": 1000,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expectedError": "letternumseries v1 expects exactly 2 trials, got 1"
+    }
+  ]
+}

@@ -263,6 +263,12 @@ const SCORING_DECLARATIONS: Record<string, CognitiveScoringContractDeclaration> 
     runtimeReconstructableFacts: ['各轮禀赋（frozen config）'],
     serverDerivedFacts: ['给出合法性与偏好指标（givingRate/equalSplitCount/generousRate）', 'quality flags'],
   },
+  letternumseries: {
+    testType: 'letternumseries',
+    clientObservedFacts: ['两段按序回忆输入', '回忆用时', 'interrupted'],
+    runtimeReconstructableFacts: ['呈现序列（seed/config）与呈现时序（frozen config）'],
+    serverDerivedFacts: ['字母序/数字序串行正确性', 'metrics（overallAccuracy/lettersAccuracy/digitsAccuracy）', 'quality flags'],
+  },
 }
 
 // 当前通用事实（所有任务一致）：完整加密 trial payload、v2 trial envelope qualityEvents、
@@ -453,6 +459,11 @@ const RESEARCH_CAPTURE_DECLARATIONS: Record<string, CognitiveResearchCaptureDecl
     testType: 'sharegame',
     currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐轮给出点数与用时'],
     futureCaptureFacts: ['真实接收者与真实激励', '真实 input modality', '决策前犹豫内指针轨迹', 'device provenance', 'viewport/dpr'],
+  },
+  letternumseries: {
+    testType: 'letternumseries',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次两段回忆输入与用时'],
+    futureCaptureFacts: ['逐项回忆选择时序', '真实 input modality', 'device provenance'],
   },
 }
 

@@ -661,3 +661,27 @@ export type SharegameTrialPayload = {
   rtMs: number | null
   interrupted: boolean
 }
+
+/** Letternumseries 冻结 config（与后端 letternumseries.config schema 一致）。 */
+export interface LetternumseriesConfig {
+  totalTrials: number
+  lettersPerTrial: number
+  digitsPerTrial: number
+  stimulusMs: number
+  isiMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+/** Letternumseries 单 trial payload（与后端 letternumseries.trial schema 一致）。 */
+export type LetternumseriesTrialPayload = {
+  sequence: string[]
+  lettersResponse: string[]
+  digitsResponse: string[]
+  responseDurationMs: number
+  interrupted: boolean
+}
