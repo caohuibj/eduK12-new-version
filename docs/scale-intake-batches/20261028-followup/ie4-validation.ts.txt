@@ -1,0 +1,14 @@
+import {readFileSync,writeFileSync} from 'node:fs'
+import assert from 'node:assert/strict'
+import {scaleInstrumentSourceV1Schema} from './src/modules/scale/onboarding/schema'
+import {validateScaleInstrumentSource} from './src/modules/scale/onboarding/validate-instrument'
+import {buildScaleResult,parseScaleResultV2} from './src/modules/scale/scale-result'
+const s=scaleInstrumentSourceV1Schema.parse(JSON.parse(readFileSync('src/modules/scale/instruments/ie4_zh_cn_research/1.0.0/source.json','utf8')))
+const check=validateScaleInstrumentSource(s as any,{requireInstruction:true,executeGoldenCases:false});assert.equal(check.valid,true,JSON.stringify(check.issues))
+const run=(answers:any[])=>parseScaleResultV2(buildScaleResult({scaleId:'00000000-0000-4000-8000-000000000004',instrumentKey:s.identity.instrumentKey,instrumentVersion:s.identity.instrumentVersion,name:s.catalog.identity.canonicalName,definition:s.executable!.definition,answers,referenceSets:[]}))
+const complete=run(s.executable!.goldenCases.find(c=>c.name==='independent_means')!.answers)
+assert.deepEqual(complete.scores.map(s=>s.value),[2.5,3.5]);assert.equal(complete.interpretations.length,2);assert.equal(complete.method.reportVersion,'1.0.0');assert.equal(complete.references.length,0)
+const partial=run(s.executable!.goldenCases.find(c=>c.name==='partial')!.answers)
+assert.deepEqual(partial.scores.map(s=>s.value),[null,3.5]);assert.equal(partial.quality.status,'invalid');assert.equal(partial.interpretations.length,0)
+const output={sourceValidation:check,priorGoldenExecution:{command:'validateScaleInstrumentSource(parsed,{requireInstruction:true})',result:'valid=true; issues=[]; five golden cases executed once before catalog domain correction',scope:'Only later change PERSONALITY domain and explanatory tag; measurement/scoring/report/golden inputs unchanged.'},complete,partial,notRun:['database install/publish','browser','formal CI','human translation or scientific approval']}
+writeFileSync('../../docs/scale-intake-batches/20261028-followup/ie4-validation.json',JSON.stringify(output,null,2)+'\n');console.log('IE4 source PASS, previous 5 golden cases reused; actual complete and partial report PASS; no DB or UI claims.')

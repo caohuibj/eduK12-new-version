@@ -1,0 +1,285 @@
+{
+  "sourceValidation": {
+    "valid": true,
+    "issues": []
+  },
+  "priorGoldenExecution": {
+    "command": "validateScaleInstrumentSource(parsed,{requireInstruction:true})",
+    "result": "valid=true; issues=[]; five golden cases executed once before catalog domain correction",
+    "scope": "Only later change PERSONALITY domain and explanatory tag; measurement/scoring/report/golden inputs unchanged."
+  },
+  "complete": {
+    "schemaVersion": 2,
+    "instrument": {
+      "scaleId": "00000000-0000-4000-8000-000000000004",
+      "code": "ie4_zh_cn_research",
+      "name": "内外控制信念简式量表（IE-4，独立中文研究工作稿）",
+      "instrumentVersion": "1.0.0"
+    },
+    "method": {
+      "scaleId": "00000000-0000-4000-8000-000000000004",
+      "instrumentVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "definitionHash": "21fa33a7985fdd27d36ff8886ae9f7298a24ff8cc8d49932f2194c11427ba789",
+      "referenceVersions": [],
+      "assessmentContext": null,
+      "reportAudience": "student",
+      "localizationVersion": "1.0.0"
+    },
+    "quality": {
+      "status": "interpretable",
+      "flags": []
+    },
+    "itemScores": [
+      {
+        "itemCode": "IE4_01",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IE4_02",
+        "responseValue": "4",
+        "baseScore": 4,
+        "score": 4
+      },
+      {
+        "itemCode": "IE4_03",
+        "responseValue": "5",
+        "baseScore": 5,
+        "score": 5
+      },
+      {
+        "itemCode": "IE4_04",
+        "responseValue": "2",
+        "baseScore": 2,
+        "score": 2
+      }
+    ],
+    "scores": [
+      {
+        "key": "internal",
+        "type": "dimension",
+        "label": "你怎样看待自己行动的影响",
+        "description": "两题1–5原值均分，越高表示越认可该类控制来源信念；不是能力、排名或诊断。",
+        "direction": "higher_is_more",
+        "canonical": true,
+        "displayPrecision": 1,
+        "value": 2.5,
+        "range": {
+          "min": 1,
+          "max": 5
+        },
+        "expectedItems": [
+          "IE4_01",
+          "IE4_02"
+        ],
+        "answeredItems": [
+          "IE4_01",
+          "IE4_02"
+        ],
+        "status": "calculated",
+        "prorated": false
+      },
+      {
+        "key": "external",
+        "type": "dimension",
+        "label": "你怎样看待外部条件的影响",
+        "description": "两题1–5原值均分，越高表示越认可该类控制来源信念；不是能力、排名或诊断。",
+        "direction": "higher_is_more",
+        "canonical": true,
+        "displayPrecision": 1,
+        "value": 3.5,
+        "range": {
+          "min": 1,
+          "max": 5
+        },
+        "expectedItems": [
+          "IE4_03",
+          "IE4_04"
+        ],
+        "answeredItems": [
+          "IE4_03",
+          "IE4_04"
+        ],
+        "status": "calculated",
+        "prorated": false
+      }
+    ],
+    "references": [],
+    "interpretations": [
+      {
+        "scoreKey": "internal",
+        "headline": "你怎样看待自己行动的影响",
+        "label": null,
+        "interpretation": "这两题关注你是否觉得自己能够作主，以及努力可能带来什么。分数越高，表示这次更认可自己的行动能够影响结果。它不是一张能力成绩单，也不意味着遇到困难就是努力不够；机会、资源和他人的支持同样重要。可以想想最近一件你能做一点改变的事，把注意力放在一个具体、可行的小步骤上。",
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "最近一次自己作主时，哪些条件帮助了你？"
+          },
+          {
+            "category": "strategy",
+            "text": "选一件可掌握的小事，写出下一步需要的时间、材料或帮助。"
+          }
+        ],
+        "limitations": [
+          "只有四题，结果描述本次看法，不代表实际控制能力、人格好坏或成功概率。",
+          "两组得分分别呈现，不相减、不合成总分，也没有适用本中文稿的常模或等级。",
+          "中文为独立研究工作译稿，尚未完成专家译审、认知访谈和中文人群验证。",
+          "研究对量表结构有不同解释；保留2022英文版双均分以便追溯，不宣称两个无争议独立特质。",
+          "每组须两题完整才能计分；缺失不补零。任一主要维度不完整时，本次不提供解释。"
+        ],
+        "referenceVersion": null
+      },
+      {
+        "scoreKey": "external",
+        "headline": "你怎样看待外部条件的影响",
+        "label": null,
+        "interpretation": "这两题关注你觉得别人、命运或环境在多大程度上影响自己的安排。分数越高，表示这次更认可外部力量的影响。现实限制确实可能存在，承认它们并不等于消极或放弃。可以把眼前的事分成“可以商量的”“需要支持的”和“暂时无法改变的”，不要求自己控制一切。",
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "最近有什么安排受到了他人或环境影响？哪些限制是真实存在的？"
+          },
+          {
+            "category": "strategy",
+            "text": "先找一个能沟通或能获得支持的环节；暂时无法改变的部分，不必全归到自己身上。"
+          }
+        ],
+        "limitations": [
+          "只有四题，结果描述本次看法，不代表实际控制能力、人格好坏或成功概率。",
+          "两组得分分别呈现，不相减、不合成总分，也没有适用本中文稿的常模或等级。",
+          "中文为独立研究工作译稿，尚未完成专家译审、认知访谈和中文人群验证。",
+          "研究对量表结构有不同解释；保留2022英文版双均分以便追溯，不宣称两个无争议独立特质。",
+          "每组须两题完整才能计分；缺失不补零。任一主要维度不完整时，本次不提供解释。"
+        ],
+        "referenceVersion": null
+      }
+    ],
+    "caveats": [
+      "只有四题，结果描述本次看法，不代表实际控制能力、人格好坏或成功概率。",
+      "两组得分分别呈现，不相减、不合成总分，也没有适用本中文稿的常模或等级。",
+      "中文为独立研究工作译稿，尚未完成专家译审、认知访谈和中文人群验证。",
+      "研究对量表结构有不同解释；保留2022英文版双均分以便追溯，不宣称两个无争议独立特质。",
+      "每组须两题完整才能计分；缺失不补零。任一主要维度不完整时，本次不提供解释。",
+      "未提供群体参考。"
+    ],
+    "disclaimer": "仅供成人研究与自我反思，不作诊断、选拔、责任判断或能力预测。© Nießen et al. (2022)，CC BY 4.0；中文与报告为独立改编。"
+  },
+  "partial": {
+    "schemaVersion": 2,
+    "instrument": {
+      "scaleId": "00000000-0000-4000-8000-000000000004",
+      "code": "ie4_zh_cn_research",
+      "name": "内外控制信念简式量表（IE-4，独立中文研究工作稿）",
+      "instrumentVersion": "1.0.0"
+    },
+    "method": {
+      "scaleId": "00000000-0000-4000-8000-000000000004",
+      "instrumentVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "definitionHash": "21fa33a7985fdd27d36ff8886ae9f7298a24ff8cc8d49932f2194c11427ba789",
+      "referenceVersions": [],
+      "assessmentContext": null,
+      "reportAudience": "student",
+      "localizationVersion": "1.0.0"
+    },
+    "quality": {
+      "status": "invalid",
+      "flags": [
+        "missing_items",
+        "score_not_calculable"
+      ]
+    },
+    "itemScores": [
+      {
+        "itemCode": "IE4_01",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IE4_03",
+        "responseValue": "5",
+        "baseScore": 5,
+        "score": 5
+      },
+      {
+        "itemCode": "IE4_04",
+        "responseValue": "2",
+        "baseScore": 2,
+        "score": 2
+      }
+    ],
+    "scores": [
+      {
+        "key": "internal",
+        "type": "dimension",
+        "label": "你怎样看待自己行动的影响",
+        "description": "两题1–5原值均分，越高表示越认可该类控制来源信念；不是能力、排名或诊断。",
+        "direction": "higher_is_more",
+        "canonical": true,
+        "displayPrecision": 1,
+        "value": null,
+        "range": {
+          "min": 1,
+          "max": 5
+        },
+        "expectedItems": [
+          "IE4_01",
+          "IE4_02"
+        ],
+        "answeredItems": [
+          "IE4_01"
+        ],
+        "status": "not_calculable",
+        "prorated": false
+      },
+      {
+        "key": "external",
+        "type": "dimension",
+        "label": "你怎样看待外部条件的影响",
+        "description": "两题1–5原值均分，越高表示越认可该类控制来源信念；不是能力、排名或诊断。",
+        "direction": "higher_is_more",
+        "canonical": true,
+        "displayPrecision": 1,
+        "value": 3.5,
+        "range": {
+          "min": 1,
+          "max": 5
+        },
+        "expectedItems": [
+          "IE4_03",
+          "IE4_04"
+        ],
+        "answeredItems": [
+          "IE4_03",
+          "IE4_04"
+        ],
+        "status": "calculated",
+        "prorated": false
+      }
+    ],
+    "references": [],
+    "interpretations": [],
+    "caveats": [
+      "只有四题，结果描述本次看法，不代表实际控制能力、人格好坏或成功概率。",
+      "两组得分分别呈现，不相减、不合成总分，也没有适用本中文稿的常模或等级。",
+      "中文为独立研究工作译稿，尚未完成专家译审、认知访谈和中文人群验证。",
+      "研究对量表结构有不同解释；保留2022英文版双均分以便追溯，不宣称两个无争议独立特质。",
+      "每组须两题完整才能计分；缺失不补零。任一主要维度不完整时，本次不提供解释。",
+      "至少一个 canonical score 无法计算，因此不提供解释或群体参考。",
+      "未提供群体参考。"
+    ],
+    "disclaimer": "仅供成人研究与自我反思，不作诊断、选拔、责任判断或能力预测。© Nießen et al. (2022)，CC BY 4.0；中文与报告为独立改编。"
+  },
+  "notRun": [
+    "database install/publish",
+    "browser",
+    "formal CI",
+    "human translation or scientific approval"
+  ]
+}

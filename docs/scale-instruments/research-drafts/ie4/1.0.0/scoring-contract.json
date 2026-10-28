@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "input": "Four item IDs1–4; integer responses1–5 or explicitmissingnull; reject duplicates,unknownIDs,booleans,nonintegers,out-of-range",
+  "subscales": [
+    {
+      "key": "internal",
+      "itemIds": [
+        1,
+        2
+      ],
+      "range": [
+        1,
+        5
+      ]
+    },
+    {
+      "key": "external",
+      "itemIds": [
+        3,
+        4
+      ],
+      "range": [
+        1,
+        5
+      ]
+    }
+  ],
+  "formula": "Arithmetic mean of both raw responses separately; no reverse coding",
+  "totalScore": null,
+  "norms": null,
+  "clinicalCutoffs": null,
+  "missing": "If either member missing, that subscale is null. Other complete subscale can display with overall INCOMPLETE notice. No automatic imputation.",
+  "authorVersusPlatform": "Two-complete-items aggregation is author guidance. Partial-display status and malformed-input rejection are proposed platform rules, not newly claimed author rules.",
+  "researchImputation": "MI/FIML recommendations concern research data modeling, not filling a person’s missing answers.",
+  "structuralEvidence": {
+    "source_contract": "2022英文版：1、2题内控均分，3、4题外控均分；不反向，不合计。",
+    "counterevidence_2026": "德国代表性成人样本N=2522，支持包含默许应答倾向方法因子的单内容潜因子模型；普通单因子模型拟合不佳。不是简单四题合计或普通单因子得到支持。",
+    "no_transfer": "2022 UK/DE仅metric而非scalar invariance，不能据此比较跨国均值，也不能转移为英中等值。",
+    "interpretation": "为保持2022英文版计分可追溯性保留双均分，2026德语研究提出应答倾向解释，不能宣称两个无争议独立特质。",
+    "source_url": "https://link.springer.com/article/10.1186/s40359-026-05101-4"
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "key": "ie4_zh_cn_research",
+  "instrumentVersion": "1.0.0",
+  "sourceSha256": "d5c1aa62d6f09523e0758b3a14932097ff00ce7fff9004e98fed44ab0754a35a",
+  "originPr": 328,
+  "originCommit": "fa355ff2dcd859b57a4bf2e8bddd77f8d428e3cf",
+  "workflowCommit": "96918c6462382e15e813c8113cf06829dcc127ac",
+  "officialInstrument": "https://access.gesis.org/zis/1259",
+  "primaryScoringSource": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0271289",
+  "verification": "Official PDF pages2-3 and original article measure section re-read 2026-10-28; four original items/options match retained draft, two separate complete-pair means.",
+  "versions": {
+    "measurement": "1.0.0",
+    "scoring": "1.0.0",
+    "report": "1.0.0",
+    "parameters": "none"
+  },
+  "changes": [
+    "Converted existing PR328 working material into current executable source and static registry.",
+    "Wrote two construct-specific plain-language report sections and reflection/action suggestions.",
+    "Uses original 1-5 scales; no combined score or invented norm; 1-minute catalog duration is explicitly estimated.",
+    "Actual platform report status suppresses all interpretations if a canonical dimension is incomplete; complete other dimension raw score retained. This is conservative platform display behavior, not an invented author missing-data rule."
+  ],
+  "preserved": [
+    "Four Chinese draft items/options and source instruction",
+    "Unknown translation/scientific validation state",
+    "CC BY 4.0 attribution and separate historic structural evidence"
+  ],
+  "validation": {
+    "source": "PASS",
+    "goldenCases": 5,
+    "reportConsumer": "PASS complete and partial",
+    "registryGeneratorCheck": "PASS",
+    "browser": "NOT_RUN",
+    "formalCI": "NOT_RUN"
+  },
+  "database": {
+    "target": "PENDING_CONFIRMATION",
+    "install": "NOT_RUN",
+    "public": "NOT_RUN"
+  },
+  "remainingLegacyKeys": [
+    "5dcr_zh_cn_research",
+    "gad7_zh_cn_research",
+    "ipip50_zh_cn_research",
+    "k6_zh_cn_research",
+    "phq9_zh_cn_research"
+  ]
+}

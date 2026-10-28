@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "frozenReviewPackageSha256": "3085d235de800b06db3bc92d2806618244cabbe0189ed43a97cdd4da3426619d",
+  "sourcePackage": "/workspace/scratch/5a77e8bdc1ae/library-research/scales/review-packages/ie4_review_package.json",
+  "instrumentLicense": {
+    "license": "CC BY 4.0",
+    "url": "https://creativecommons.org/licenses/by/4.0/",
+    "official_instrument_url": "https://access.gesis.org/zis/1259",
+    "evidence_locator": "Instrument PDF page 2 Terms of use; full original form page 3",
+    "quotation": "licensed under a Creative Commons Attribution 4.0 International License.",
+    "permissions": [
+      "copy",
+      "redistribute",
+      "translate/adapt with changes disclosed",
+      "commercial reuse subject to attribution"
+    ],
+    "required_attribution": "Nießen, D., Schmidt, I., Groskurth, K., Rammstedt, B., & Lechner, C. M. (2022). Internal–External Locus of Control Short Scale–4 (IE-4). DOI 10.6102/zis323_exz; original validation DOI 10.1371/journal.pone.0271289. CC BY 4.0.",
+    "scope_resolution": "Specific GESIS standalone instrument PDF includes its own CC BY terms; not inferred from third-party scale directory or generic repository OA. Landing page says Standard License; preserve that observation, but the delivered instrument-specific file is explicit.",
+    "original_2012_dissertation": "CC BY-NC4 per SSOAR cover; link only, not treated as permissive license for all historic versions."
+  },
+  "copyrightStatus": "CLEAR for pinned English CC BY4 instrument; not public domain",
+  "scientificUseLimit": "Separate from copyright: authors recommend research self-report use, not individual diagnostics. Copyright permission does not establish suitability.",
+  "originalLiterature": [
+    {
+      "role": "exact English version validation; full text readable and redistributable CC BY4",
+      "doi": "10.1371/journal.pone.0271289",
+      "url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0271289",
+      "pdf": "https://journals.plos.org/plosone/article/file?id=10.1371%2Fjournal.pone.0271289&type=printable"
+    },
+    {
+      "role": "official complete technical documentation, CC BY4",
+      "doi": "10.6102/zis323_exz",
+      "url": "https://access.gesis.org/zis/1278"
+    },
+    {
+      "role": "German original development thesis, readable; CC BY-NC4, link only",
+      "doi": "10.21241/ssoar.37119",
+      "url": "https://www.ssoar.info/ssoar/bitstream/handle/document/37119/ssoar-2012-kovaleva-The_IE-4_Construction_and_Validation.pdf"
+    },
+    {
+      "role": "2026 contradictory dimensionality evidence; read publisher fulltext; not adopted silently",
+      "doi": "10.1186/s40359-026-05101-4",
+      "url": "https://link.springer.com/article/10.1186/s40359-026-05101-4",
+      "finding": "German representative N2522 study favors single latent dimension with acquiescence method factor. Does not authorize simple four-item total; source2022 dual-score contract kept explicit pending independent scientific review."
+    }
+  ],
+  "sourceFiles": [
+    {
+      "filename": "ie4_2022_original_article.pdf",
+      "sha256": "200b562c912ba78e70e0fb6fccdbb6c7290b8de8508a05cf951d41652e5e3e4b",
+      "bytes": 698513,
+      "license": "CC BY4"
+    },
+    {
+      "filename": "ie4_official_documentation.pdf",
+      "sha256": "2f4ed60a36900bf071a923165e8455766c7c4cdae06e4cedbed0bde04d9525a9",
+      "bytes": 592426,
+      "license": "CC BY4"
+    },
+    {
+      "filename": "ie4_official_english_instrument.pdf",
+      "sha256": "a3a3f0fcaefe208d5a032c5c2b835782ce8d3138962cc1cae78fb911b803a2e7",
+      "bytes": 213105,
+      "license": "CC BY4"
+    }
+  ],
+  "validation": {
+    "study": "2022 English adaptation validation",
+    "population": "UK and German native-speaking adult online quota samples, ages18–69; not youth/student-specific",
+    "UK_n": 468,
+    "DE_n": 474,
+    "UK_retest_n": 111,
+    "DE_retest_n": 117,
+    "invariance": "Metric, not scalar, supported across UK/DE; do not claim cross-national mean equivalence or transfer to Chinese.",
+    "reliability_summary": "Official overview McDonald omega >=.59, retest >=.64; very short subscales limit precision.",
+    "use_boundary": "Authors recommend research self-report surveys with severe time constraints, not individual diagnostics."
+  },
+  "structuralEvidence": {
+    "source_contract": "2022英文版：1、2题内控均分，3、4题外控均分；不反向，不合计。",
+    "counterevidence_2026": "德国代表性成人样本N=2522，支持包含默许应答倾向方法因子的单内容潜因子模型；普通单因子模型拟合不佳。不是简单四题合计或普通单因子得到支持。",
+    "no_transfer": "2022 UK/DE仅metric而非scalar invariance，不能据此比较跨国均值，也不能转移为英中等值。",
+    "interpretation": "为保持2022英文版计分可追溯性保留双均分，2026德语研究提出应答倾向解释，不能宣称两个无争议独立特质。",
+    "source_url": "https://link.springer.com/article/10.1186/s40359-026-05101-4"
+  },
+  "notionUrl": "https://app.notion.com/p/400d27635a38819fa720d594d24fbd9d?pvs=204",
+  "attachments": "Existing3 hosted PDFs retained; no new upload or replacement needed.",
+  "reviewStatus": "Parent reported source independent review GO on2026-10-21; this is not a human-review or Chinese psychometric validation claim.",
+  "derivedChanges": [
+    "Added responsibility/control-capacity boundary notice",
+    "Clarified2026 method-factor result and2022 metric-only invariance",
+    "Source English/Chinese items and anchors unchanged"
+  ]
+}
