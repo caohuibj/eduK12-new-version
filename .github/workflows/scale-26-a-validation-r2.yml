@@ -1,0 +1,131 @@
+name: Scale 26 A scoped verification
+on:
+  push:
+    branches: [validation/scale-26-a-r2-20261028]
+    paths: [.github/workflows/scale-26-a-validation-r2.yml]
+permissions:
+  contents: read
+concurrency:
+  group: scale-26-a-${{ github.ref }}
+  cancel-in-progress: false
+env:
+  CI: 'true'
+  NODE_ENV: test
+  TZ: UTC
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+  JWT_SECRET: scale26-isolated-test-jwt-secret-12345678901234567890
+  DATA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+  DATA_PSEUDONYM_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
+jobs:
+  exact-source:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          persist-credentials: false
+      - name: enforce source commit and no business diff in validation branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD^)" = "21b66c1843927103367217375aa9fc5dcaef7e63"
+          test "$(git diff --name-only 21b66c1843927103367217375aa9fc5dcaef7e63 HEAD)" = ".github/workflows/scale-26-a-validation-r2.yml"
+          git checkout --detach "21b66c1843927103367217375aa9fc5dcaef7e63"
+          test "$(git rev-parse HEAD)" = "21b66c1843927103367217375aa9fc5dcaef7e63"
+          test "$(git rev-parse HEAD^{tree})" = "5ab2494a0eb63d53534f016f3e870ea0e59ae083"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+          cache: npm
+          cache-dependency-path: |
+            server-version/backend/package-lock.json
+            server-version/frontend/package-lock.json
+      - name: install locked backend type and scoring dependencies
+        working-directory: server-version/backend
+        run: |
+          npm ci --ignore-scripts
+          npx prisma generate
+      - name: reuse indexed paths evidence; recheck changed SPANE scorer boundary
+        working-directory: server-version/backend
+        run: |
+          test "$(git hash-object src/modules/scale/onboarding/instruments.generated.ts)" = "de1f0d395c1ef6b712f89c5516642eccc139adcd"
+          npm run scale:onboarding:check
+      - name: execute 26 registered sources and all golden vectors using production scoreScale
+        working-directory: server-version/backend
+        run: |
+          cat > scripts/scale26-a-runtime-check.ts <<'TS'
+          import { readFileSync, writeFileSync } from 'node:fs'
+          import { getScaleInstrumentSource, getScaleInstrumentValidation } from '../src/modules/scale/onboarding/instrument-registry'
+          import { getExecutableScalePackage } from '../src/modules/scale/onboarding/executable-registry'
+          import { scoreScale } from '../src/modules/scale/scale-scoring'
+          import { GENERATED_SCALE_INSTRUMENT_SOURCES } from '../src/modules/scale/onboarding/instruments.generated'
+
+          const source = '21b66c1843927103367217375aa9fc5dcaef7e63'
+          const ledger = readFileSync('../../docs/scale-26-readiness-20261028/README.md','utf8')
+          const entries = [...ledger.matchAll(/^\| `([^`]+)` \| ([0-9.]+) \| (\d+) \|/gm)]
+            .map(match => ({ key: match[1], version: match[2], count: Number(match[3]) }))
+          if (entries.length !== 26 || new Set(entries.map(item => item.key)).size !== 26) throw new Error('Expected 26 distinct instrument keys')
+          if (GENERATED_SCALE_INSTRUMENT_SOURCES.length !== 98) throw new Error('Generated registry count is not 98')
+
+          let cases = 0
+          let passed = 0
+          const instruments = []
+          for (const item of entries) {
+            const instrument = getScaleInstrumentSource(item.key,item.version)
+            if (!instrument?.executable) throw new Error('Missing executable: ' + item.key)
+            const pkg = getExecutableScalePackage(item.key,item.version)
+            if (!pkg || pkg.releaseStatus !== 'PUBLISHED') throw new Error('Executable not PUBLISHED: ' + item.key)
+            const errors = getScaleInstrumentValidation(item.key,item.version)?.issues.filter(issue => issue.severity === 'error') ?? []
+            if (errors.length) throw new Error(item.key + ' invalid: ' + JSON.stringify(errors))
+            const def = pkg.definition
+            if (def.items.length !== item.count || instrument.catalog.administration.itemCount !== item.count) throw new Error('Item count mismatch: ' + item.key)
+            if (!instrument.instruction?.text || instrument.instruction.language !== instrument.executable.contentLocale) throw new Error('Instruction mismatch: ' + item.key)
+            if (!def.report.audienceContract || def.report.audienceContract.locale !== instrument.executable.contentLocale) throw new Error('Report audience mismatch: ' + item.key)
+            if (def.report.interpretations.length !== def.scoring.scores.length) throw new Error('Report coverage mismatch: ' + item.key)
+            if (new Set(def.report.interpretations.map(value => value.scoreKey)).size !== def.scoring.scores.length) throw new Error('Report duplicate score: ' + item.key)
+            for (const score of def.scoring.scores) if (!def.report.interpretations.some(value => value.scoreKey === score.key)) throw new Error('Missing report score: ' + item.key + '/' + score.key)
+            for (const test of pkg.goldenCases) {
+              cases++
+              const output = scoreScale(def,test.answers)
+              if (output.quality.status !== test.expected.quality) throw new Error(item.key + '/' + test.name + ': quality mismatch')
+              if (JSON.stringify(output.scores.map(score => score.key)) !== JSON.stringify(test.expected.totalScoreKeys)) throw new Error(item.key + '/' + test.name + ': score keys mismatch')
+              for (const [key,expected] of Object.entries(test.expected.scores)) {
+                const actual = output.scores.find(score => score.key===key)?.value ?? null
+                if (actual !== expected) throw new Error(item.key + '/' + test.name + '/' + key + ': ' + actual + ' !== ' + expected)
+              }
+              passed++
+            }
+            instruments.push({ key:item.key,version:item.version,cases:pkg.goldenCases.length,report:def.report.reportVersion })
+          }
+          if (cases !== 156 || passed !== 156) throw new Error('Golden case count unexpected: ' + cases + '/' + passed)
+          const receipt = {source,engine:'production-scoreScale',registeredSources:GENERATED_SCALE_INSTRUMENT_SOURCES.length,instruments:instruments.length,cases,passed,details:instruments}
+          writeFileSync('/tmp/scale26-native-runtime.json',JSON.stringify(receipt,null,2))
+          console.log(JSON.stringify({source,scales:instruments.length,goldenPass:passed,registeredSources:98}))
+          TS
+          npx tsx scripts/scale26-a-runtime-check.ts
+      - name: existing bounded backend scorer and intake regression
+        working-directory: server-version/backend
+        run: |
+          npx vitest run             src/__tests__/scale/instruments/ars30-registered-content.test.ts             src/__tests__/scale/instruments/bps9-intake.test.ts             src/__tests__/scale/instruments/ipip-batch-intake.test.ts             src/__tests__/scale/instruments/dbt_wccl59_zh_cn_research_1_0_2.test.ts             src/__tests__/scale/instrument-source.test.ts             src/__tests__/scale/scale-scorer-registry.test.ts             --no-file-parallelism
+      - name: backend TypeScript contract
+        working-directory: server-version/backend
+        run: npx tsc --noEmit
+      - name: install locked frontend dependencies
+        working-directory: server-version/frontend
+        run: npm ci
+      - name: frontend app TypeScript contract
+        working-directory: server-version/frontend
+        run: npx tsc -p tsconfig.app.json --noEmit
+      - name: report card visual and disclosure interaction regression
+        working-directory: server-version/frontend
+        run: npx vitest run src/modules/reporting/__tests__/ScaleUnitReportCard.metadata.test.tsx --maxWorkers=2
+      - name: preserve native score verification receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scale-26-a-native-score
+          path: /tmp/scale26-native-runtime.json
+          if-no-files-found: warn
+          retention-days: 7
