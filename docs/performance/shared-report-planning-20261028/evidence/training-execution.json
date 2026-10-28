@@ -1,0 +1,9 @@
+{
+  "exitCode": 0,
+  "seconds": 4.578933897020761,
+  "head": "642fda7ab754790686d6626efac62b73a332e663",
+  "postgres": "17.11",
+  "redis": "8.0.2",
+  "node": "v24.22.1",
+  "scope": "Current-main Training prepared whole ACK/replay/real worker/authorized report, not publication START or browser or sustained capacity"
+}

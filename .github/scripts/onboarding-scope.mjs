@@ -3,15 +3,16 @@ import {execFileSync} from 'node:child_process';
 import {readFileSync} from 'node:fs';
 import {participantAccessOutputs} from './participant-access-scope.mjs';
 
-export const BRANCHES={'365':'scale-library-structure-20261027','366':'feat/cognitive-onboarding-structure-20261028'};
+export const BRANCHES={'365':'scale-library-structure-20261027','366':'feat/cognitive-onboarding-structure-20261028','369':'perf/four-entry-feedback-baseline-20261028'};
 export const MARKER='.github/scripts/onboarding-bindings.json';
 export const CONTROLS=Object.freeze([MARKER,'.github/scripts/onboarding-evidence.json','.github/scripts/onboarding-scope.mjs','.github/scripts/onboarding-checks.mjs','.github/scripts/onboarding-controls.test.mjs','.github/scripts/content-scope.mjs','.github/scripts/merge-gate.mjs','.github/workflows/ci.yml'].sort());
 export const binding=JSON.parse(readFileSync(new URL('./onboarding-bindings.json',import.meta.url),'utf8'));
 const git=(...args)=>execFileSync('git',args,{encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
 const sha=value=>assert.match(value??'',/^[a-f0-9]{40}$/);
 
-/** One reviewed backend onboarding patch. Unknown changes never select a broad fallback. */
+/** One reviewed backend patch; route name retained for existing consumers. Unknown changes never select a broad fallback. */
 export function allowedSourcePath(path,pr){
+ if(pr==='369')return ['server-version/backend/src/modules/reporting/education-assessment-personal-report.service.ts','server-version/backend/src/__tests__/reporting/education-assessment-personal-report.service.test.ts'].includes(path)||path.startsWith('docs/performance/shared-report-planning-20261028/');
  if(pr==='366')return path.startsWith('server-version/backend/src/modules/cognitive/')||path.startsWith('server-version/backend/src/__tests__/cognitive/')||['server-version/backend/src/scripts/cognitive-onboarding-check.ts','server-version/backend/src/scripts/install-cognitive-configs.ts'].includes(path)||path.startsWith('docs/cognitive-library/onboarding-structure-20261028/');
  return path.startsWith('server-version/backend/src/modules/scale/')||path.startsWith('server-version/backend/src/__tests__/scale/')||['server-version/backend/prisma/seeds/scales.ts','server-version/backend/scripts/audit-scale-candidate-structure.ts','server-version/backend/scripts/check-scale-source-qualification.ts'].includes(path)||path.startsWith('docs/scale-library-structure-20261027/');
 }

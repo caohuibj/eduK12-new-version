@@ -40,6 +40,21 @@ export function verifyTypeReceipt(receipt,review,readBytes,currentBackend){
   if(receipt.logSHA256)assert.equal(hash(readBytes(safePath(review.log))),receipt.logSHA256);
   return {originalExitCode:0,originalNode:receipt.node??null,originalSigned:false,currentBackend,coverage:review.backendTree?'exact-backend-tree':'recorded-before-after-source-files'};
 }
+export function verifyReportPlanningObservation(observation,execution){
+  assert.equal(execution.exitCode,0);assert.match(execution.head,/^[a-f0-9]{40}$/);
+  assert.equal(observation.scope,'Current real education assessment report service using synthetic accepted FINAL facts; no START/FINAL/browser or capacity claim');
+  assert.equal(observation.rows.length,2);assert.deepEqual(observation.rows.map(r=>r.product).sort(),['SCHOOL','TEACHER']);
+  for(const row of observation.rows){
+    assert.equal(row.phase,'PLAN_AND_REVOCATION');assert.equal(row.metricVerified,true);assert.equal(row.revocationVerified,true);
+    assert.equal(row.plannerBefore.setting,'8');assert.equal(row.plannerAfter.setting,'8');assert.equal(row.plannerBefore.pid,row.plannerAfter.pid);
+    assert(Number.isInteger(row.plannerBefore.pid)&&row.plannerBefore.pid>0);
+  }
+  const plans=observation.rows.find(r=>r.product==='SCHOOL').queryPlan;
+  assert.deepEqual(plans.map(p=>p.limit),[8,1]);
+  for(const p of plans){assert.equal(p.actualRows,1);for(const key of ['planningMs','executionMs'])assert(Number.isFinite(p[key])&&p[key]>=0);}
+  // Observed timings are evidence, never a flaky CI performance threshold.
+  return {products:['SCHOOL','TEACHER'],metricVerified:true,revocationVerified:true,pooledSettingRestored:true,ciExecuted:false};
+}
 export function requireOnboardingOutcomes(needs){
   for(const key of ['scope','onboarding-structure','codeql'])assert.equal(needs[key]?.result,'success',key+' not successful');
 }
@@ -70,8 +85,17 @@ function admit(){
   assert(admitted.length&&new Set(admitted.flatMap(r=>r.caseNames)).size===admitted.flatMap(r=>r.caseNames).length);
   const types=(Array.isArray(review.types)?review.types:[review.types]).map(record=>verifyTypeReceipt(readOriginal(record),record,path=>readFileSync(path),p.components.backend));
   assert(types.length);
+  const observations=[];
+  if(p.pr===369){
+    assert.equal(review.reportPlanningObservations?.length,1);
+    const record=review.reportPlanningObservations[0];
+    assert.equal(record.reviewedProduct,p.product);assert(record.sourceAssociationBasis&&record.limitations?.length);
+    observations.push({...verifyReportPlanningObservation(readOriginal(record),readOriginal(record.execution)),
+      originalObservationSHA256:record.sha256,originalExecutionSHA256:record.execution.sha256,
+      sourceAssociationBasis:record.sourceAssociationBasis,limitations:record.limitations});
+  }else assert(!review.reportPlanningObservations);
   mkdirSync('onboarding-evidence',{recursive:true});
-  writeFileSync('onboarding-evidence/admission.json',JSON.stringify({schemaVersion:1,source:p,runId:process.env.GITHUB_RUN_ID,attempt:process.env.GITHUB_RUN_ATTEMPT,admitted,types,environment:review.environment,testsExecutedInCI:false,rootReviewAuthentication:'Immutable reviewed Git record, not a signed original execution'},null,2)+'\n');
+  writeFileSync('onboarding-evidence/admission.json',JSON.stringify({schemaVersion:1,source:p,runId:process.env.GITHUB_RUN_ID,attempt:process.env.GITHUB_RUN_ATTEMPT,admitted,types,observations,environment:review.environment,testsExecutedInCI:false,rootReviewAuthentication:'Immutable reviewed Git record, not a signed original execution'},null,2)+'\n');
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
   if(process.argv[2]==='admit')admit();
