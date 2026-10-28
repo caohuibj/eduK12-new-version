@@ -323,6 +323,12 @@ const SCORING_DECLARATIONS: Record<string, CognitiveScoringContractDeclaration> 
     runtimeReconstructableFacts: ['中心图形与周边位置（seed+trialIndex 重建）'],
     serverDerivedFacts: ['中心正确性/周边正确性/双重正确性', 'metrics（dualCorrectRate/centralAccuracy/peripheralAccuracy）', 'quality flags'],
   },
+  logicdeduce: {
+    testType: 'logicdeduce',
+    clientObservedFacts: ['选项选择', 'raw RT', 'interrupted'],
+    runtimeReconstructableFacts: ['题目内容与正确项（frozen bank + seed 抽题顺序）'],
+    serverDerivedFacts: ['正确性判定', 'metrics（accuracy/medianRtMs）', 'quality flags'],
+  },
 }
 
 // 当前通用事实（所有任务一致）：完整加密 trial payload、v2 trial envelope qualityEvents、
@@ -563,6 +569,11 @@ const RESEARCH_CAPTURE_DECLARATIONS: Record<string, CognitiveResearchCaptureDecl
     testType: 'ufov',
     currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次两项响应与用时'],
     futureCaptureFacts: ['自适应偏心率轨迹', '眼动数据', '真实 input modality', 'device provenance'],
+  },
+  logicdeduce: {
+    testType: 'logicdeduce',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次响应与 raw RT'],
+    futureCaptureFacts: ['真实 input modality', 'device provenance', 'viewport/dpr'],
   },
 }
 

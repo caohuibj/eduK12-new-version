@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "task": "logicdeduce",
+  "order": 122,
+  "identities": [
+    {
+      "testType": "logicdeduce",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "order": 122
+    }
+  ],
+  "backend": {
+    "file": "package.ts",
+    "export": "executionEntries"
+  },
+  "frontend": [
+    {
+      "testType": "logicdeduce",
+      "engineVersion": "1.0.0",
+      "file": "server-version/frontend/src/modules/cognitive/tasks/logicdeduce/logicdeduce.registry.ts",
+      "export": "logicdeduceRegistryEntry"
+    }
+  ],
+  "catalog": {
+    "file": "governance.ts",
+    "export": "catalog"
+  },
+  "seeds": {
+    "file": "seeds.ts",
+    "export": "seeds",
+    "orders": [
+      113
+    ]
+  },
+  "presentation": {
+    "file": "participant-presentation.ts",
+    "export": "participantPresentations"
+  },
+  "scientific": {
+    "file": "scientific.ts",
+    "export": "scientificGovernance"
+  },
+  "acceptance": {
+    "frontendSuites": [
+      "src/modules/cognitive/tasks/logicdeduce/__tests__/LogicdeduceTask.test.tsx",
+      "src/modules/cognitive/tasks/logicdeduce/__tests__/prng.test.ts"
+    ]
+  }
+}

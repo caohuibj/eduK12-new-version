@@ -46,4 +46,5 @@ import { cancellationRegistryEntry as task43 } from '../tasks/cancellation/cance
 import { trustgameRegistryEntry as task44 } from '../tasks/trustgame/trustgame.registry'
 import { embeddedfiguresRegistryEntry as task45 } from '../tasks/embeddedfigures/embeddedfigures.registry'
 import { ufovRegistryEntry as task46 } from '../tasks/ufov/ufov.registry'
-export const cognitiveRunnerEntries = [task0, task1, task2, task3, task4, task5, task6, task7, task8, task9, task10, task11, task12, task13, task14, task15, task16, task17, task18, task19, task20, task21, task22, task23, task24, task25, task26, task27, task28, task29, task30, task31, task32, task33, task34, task35, task36, task37, task38, task39, task40, task41, task42, task43, task44, task45, task46]
+import { logicdeduceRegistryEntry as task47 } from '../tasks/logicdeduce/logicdeduce.registry'
+export const cognitiveRunnerEntries = [task0, task1, task2, task3, task4, task5, task6, task7, task8, task9, task10, task11, task12, task13, task14, task15, task16, task17, task18, task19, task20, task21, task22, task23, task24, task25, task26, task27, task28, task29, task30, task31, task32, task33, task34, task35, task36, task37, task38, task39, task40, task41, task42, task43, task44, task45, task46, task47]

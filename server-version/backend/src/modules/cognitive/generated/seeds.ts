@@ -46,6 +46,7 @@ import { seeds as task43 } from '../tasks/cancellation/seeds'
 import { seeds as task44 } from '../tasks/trustgame/seeds'
 import { seeds as task45 } from '../tasks/embeddedfigures/seeds'
 import { seeds as task46 } from '../tasks/ufov/seeds'
+import { seeds as task47 } from '../tasks/logicdeduce/seeds'
 export const cognitiveSeeds = [
   task0[0],
   task1[0],
@@ -88,6 +89,7 @@ export const cognitiveSeeds = [
   task35[0],
   task36[0],
   task37[0],
+  task47[0],
   task38[0],
   task39[0],
   task41[0],

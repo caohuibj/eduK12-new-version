@@ -889,3 +889,26 @@ export type UfovTrialPayload = {
   rtMs: number | null
   interrupted: boolean
 }
+
+/** Logicdeduce 冻结 config（与后端 logicdeduce.config schema 一致）。 */
+export interface LogicdeduceConfig {
+  totalTrials: number
+  stimulusSetVersion: string
+  fixationMs: number
+  timeoutMs: number
+  validRtFloorMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+/** Logicdeduce 单 trial payload（与后端 logicdeduce.trial schema 一致）。 */
+export type LogicdeduceTrialPayload = {
+  itemId: string
+  responseIndex: number | null
+  rtMs: number | null
+  interrupted: boolean
+}
