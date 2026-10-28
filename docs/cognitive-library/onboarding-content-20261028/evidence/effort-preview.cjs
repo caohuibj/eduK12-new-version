@@ -1,0 +1,28 @@
+const fs=require('node:fs'),path=require('node:path'),http=require('node:http'),crypto=require('node:crypto');
+const root=path.resolve(__dirname,'../../../..'),front=path.join(root,'server-version/frontend'),backend=path.join(root,'server-version/backend'),out=__dirname;
+const temp=path.join(root,'.cognitive-onboarding-preview');fs.mkdirSync(temp,{recursive:true});
+require(path.join(backend,'node_modules/tsx/dist/cjs/index.cjs'));
+const fixtures=require(path.join(front,'src/modules/cognitive/tasks/balloon-effort/report-fixtures.test-support.ts')).effortReportFixtures();
+fs.writeFileSync(path.join(out,'effort-synthetic-public-reports.json'),JSON.stringify({synthetic:true,source:'real capture/scorer/projector; never participant data',complete:fixtures.complete,limited:fixtures.limited,invalid:fixtures.invalid},null,2));
+fs.writeFileSync(path.join(out,'effort-synthetic-raw.json'),JSON.stringify({synthetic:true,records:fixtures.raws}));
+fs.writeFileSync(path.join(temp,'entry.tsx'),`import React from 'react';import {createRoot} from 'react-dom/client';import {EffortInstructions} from '../server-version/frontend/src/modules/cognitive/tasks/balloon-effort/EffortInstructions';import {EffortReport} from '../server-version/frontend/src/modules/cognitive/tasks/balloon-effort/EffortReport';import '../server-version/frontend/src/modules/cognitive/tasks/balloon-effort/effort.css';import data from '../docs/cognitive-library/onboarding-content-20261028/evidence/effort-synthetic-public-reports.json';const q=new URLSearchParams(location.search),en=q.get('lang')==='en',kind=q.get('state')||'complete';createRoot(document.getElementById('root')!).render(<><p style={{font:'14px sans-serif',padding:'8px',margin:0}}>SYNTHETIC PREVIEW / 合成记录预览 · 未发布</p>{q.has('intro')?<main className="effort-task effort-reading"><EffortInstructions language={en?'en':'zh'} profile="experience"/></main>:<EffortReport language={en?'en':'zh'} report={data[kind] as any}/>}</>);`);
+const esbuild=require(path.join(front,'node_modules/esbuild'));
+esbuild.buildSync({entryPoints:[path.join(temp,'entry.tsx')],bundle:true,outdir:temp,format:'iife',jsx:'automatic',nodePaths:[path.join(front,'node_modules')],logLevel:'silent'});
+fs.writeFileSync(path.join(temp,'index.html'),'<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="entry.css"><div id="root"></div><script src="entry.js"></script>');
+const {chromium}=require('/opt/codex/runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
+(async()=>{let browser,server;const shots=[],errors=[];try{
+ server=http.createServer((req,res)=>{const name=new URL(req.url,'http://localhost').pathname.slice(1)||'index.html';if(!['entry.js','entry.css','index.html'].includes(name)){res.writeHead(404);res.end();return}res.setHeader('Content-Type',name.endsWith('.js')?'text/javascript':name.endsWith('.css')?'text/css':'text/html');res.end(fs.readFileSync(path.join(temp,name)))}).listen(5198,'127.0.0.1');await new Promise(r=>server.once('listening',r));
+ browser=await chromium.launch({executablePath:'/usr/bin/chromium',headless:true,chromiumSandbox:true,args:['--disable-dev-shm-usage']});
+ for(const spec of [
+  ['intro-zh-phone',390,844,'?intro',1],['intro-en-tablet',820,1000,'?intro&lang=en',1],
+  ['report-zh-phone',390,844,'',1],['report-en-tablet',820,1000,'?lang=en',1],
+  ['report-limited-en-phone',390,844,'?state=limited&lang=en',1],['report-invalid-zh-phone',390,844,'?state=invalid',1],
+  ['intro-en-200pct',780,1000,'?intro&lang=en',2],['report-en-200pct',780,1000,'?lang=en',2],
+ ].filter(spec=>!process.argv.includes('--reports-only')||spec[0].startsWith('report'))){const [name,width,height,query,zoom]=spec,context=await browser.newContext({viewport:{width,height}});await context.route('**/*',route=>new URL(route.request().url()).hostname==='127.0.0.1'?route.continue():route.abort());const page=await context.newPage();page.on('pageerror',e=>errors.push({name,error:e.message}));await page.goto('http://127.0.0.1:5198/'+query);await page.evaluate(z=>document.documentElement.style.zoom=String(z),zoom);await page.evaluate(()=>document.fonts.ready);await page.locator('h1').waitFor();
+  const measurements=await page.evaluate(()=>({viewport:innerWidth,scroll:document.documentElement.scrollWidth,body:document.body.scrollWidth,images:[...document.querySelectorAll('svg')].map(s=>({width:s.getBoundingClientRect().width,height:s.getBoundingClientRect().height,label:s.getAttribute('aria-labelledby')})),headings:[...document.querySelectorAll('h1,h2')].map(h=>h.textContent)}));
+  if(measurements.scroll>width+1)throw Error(name+' horizontal overflow '+JSON.stringify(measurements));
+  if(name.includes('invalid')&&measurements.images.length)throw Error('invalid report has performance chart');
+  const file=path.join(out,name+'.png');await page.screenshot({path:file,fullPage:true});shots.push({name,viewport:{width,height},cssZoom:zoom,measurements,file:path.relative(root,file),sha256:crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex')});await context.close();
+ }
+ if(errors.length)throw Error(JSON.stringify(errors));fs.writeFileSync(path.join(out,'effort-browser.json'),JSON.stringify({success:true,synthetic:true,build:'single esbuild component preview, not deployable application artifact',zoomNote:'200% screenshots use CSS zoom=2 at 780px viewport; not native browser/device equivalence',shots,errors},null,2));
+}finally{await browser?.close();server?.close();fs.rmSync(temp,{recursive:true,force:true})}})().catch(e=>{fs.writeFileSync(path.join(out,'effort-browser-failure.txt'),String(e.stack||e));console.error(e);process.exitCode=1});

@@ -1,0 +1,113 @@
+{
+  "baseHead": "969d793896de6b67f4746119b942602abe99326e",
+  "node": "v24.19.0",
+  "sourceSHA256": {
+    "server-version/frontend/src/modules/cognitive/CognitiveReportVisual.tsx": "81d90a08a205ef5f963d9a308c830ec99e451df4ffd0ca83780e3a186e6a74a2",
+    "server-version/frontend/src/modules/cognitive/tasks/balloon-effort/EffortReport.tsx": "a205bc2e5a96ba56c23e288a35e04ad9945842a9d1523c611fcf7df024367a5e",
+    "server-version/frontend/src/modules/cognitive/tasks/balloon-effort/EffortInstructions.tsx": "1b462cf1f7ca9553a97b741d48288d75324454c3b3477d3d2dcc067b754a5b7d",
+    "server-version/frontend/src/modules/cognitive/tasks/balloon-effort/effort.css": "8e24225dcaa60a529dc729c66b7fbacedc2015fecbca0fba683aec8447f4e1fb",
+    "server-version/frontend/src/modules/cognitive/tasks/balloon-effort/report-fixtures.test-support.ts": "6ed78ec254f3884aeb0900097a7411c499475ce521b07eac0ee126f487b95f1d",
+    "server-version/frontend/src/modules/cognitive/tasks/balloon-effort/report-presentation.test.tsx": "48ee615b40573d1d4e03640977424d00f27f877689b73fe3d94ca17c01be0e39",
+    "server-version/frontend/package-lock.json": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe"
+  },
+  "scope": "Presentation only. Existing pure public report guard/projection, scorer, measurement protocol and frozen copy/version fields unchanged. Shared visual gets optional English/missing labels, English word wrap, and an explicit dash at missing bars; Chinese defaults otherwise retained.",
+  "syntheticExamples": {
+    "command": "node evidence/effort-preview.cjs",
+    "construction": "real EffortCapture -> exact seed/config -> scoreBalloonEffort -> projectEffortReport",
+    "raw": "effort-synthetic-raw.json",
+    "reports": "effort-synthetic-public-reports.json",
+    "example": "18/18 choices: 50 baseline 6/6, 100 baseline 0/6, 200 baseline 4/6; limited uses actual first trial only; invalid uses no trials. Never participant data."
+  },
+  "executions": [
+    {
+      "command": "vitest run .../report-presentation.test.tsx (all two original new cases)",
+      "exit": 1,
+      "report": "effort-report-original.json",
+      "completedCases": 0,
+      "reason": "fixture execution tick 10ms before preparation ended; nonmonotonic clock correctly refused"
+    },
+    {
+      "command": "same exact two-case command after fixture clock correction",
+      "exit": 1,
+      "report": "effort-report-attempt2.json",
+      "completedCases": 0,
+      "reason": "fixture filtered scattered trials; exact seeded prefix guard refused; changed to first trial only"
+    },
+    {
+      "command": "same exact two-case command after prefix correction",
+      "exit": 1,
+      "report": "effort-report-attempt3.json",
+      "passedCase": "keeps the existing shared chart Chinese defaults and supports English without changing signed values",
+      "reason": "synthetic keyboard tokens were not valid Q/P keys; changed fixture tokens only. Invalid projection correctly withheld conclusions."
+    },
+    {
+      "command": "vitest run .../report-presentation.test.tsx -t 'uses exact public denominators'",
+      "exit": 0,
+      "report": "effort-report-presentation.json",
+      "passed": 1,
+      "filtered": 1,
+      "note": "Only failed case retried. Original default/signed-value case retained, not replayed. Later word-wrap affects English label layout only; fresh browser and label case below verify it."
+    },
+    {
+      "command": "vitest run .../report-presentation.test.tsx -t 'wraps English baseline labels'",
+      "exit": 0,
+      "report": "effort-label-wrap-desktop.json",
+      "passed": 1,
+      "filtered": 2,
+      "note": "Initial added wrap case had default width; strengthened fixture to invoke actual ResizeObserver compact path"
+    },
+    {
+      "command": "vitest run .../report-presentation.test.tsx -t 'wraps English baseline labels'",
+      "exit": 0,
+      "report": "effort-label-wrap.json",
+      "passed": 1,
+      "filtered": 2,
+      "note": "Exact new compact fixture; successful existing assertions not replayed"
+    },
+    {
+      "command": "node evidence/presentation-types.cjs",
+      "exit": 1,
+      "report": "presentation-types-original.json",
+      "reason": "Test matcher type setup root omitted; no application diagnostics. Added existing src/test/setup.ts to roots."
+    },
+    {
+      "command": "node evidence/presentation-types.cjs",
+      "exit": 0,
+      "report": "presentation-types-before-wrap.json",
+      "note": "Direct changed roots and transitive dependencies only, no full app typecheck"
+    },
+    {
+      "command": "node evidence/presentation-types.cjs",
+      "exit": 0,
+      "report": "presentation-types.json",
+      "note": "Final changed shared word-wrap and compact fixture inputs; zero diagnostics"
+    },
+    {
+      "command": "node evidence/effort-preview.cjs",
+      "exit": 1,
+      "log": "effort-browser-sandbox.log",
+      "reason": "Execution filesystem sandbox could not run native Chromium setuid sandbox helper. No browser security flags disabled."
+    },
+    {
+      "command": "node evidence/effort-preview.cjs (approved execution outside outer sandbox; Chromium sandbox true)",
+      "exit": 0,
+      "report": "before-label-wrap/effort-browser.json",
+      "note": "8 initial component preview screens. Original raw screenshot bytes retained under before-label-wrap for reports; instruction screenshots unchanged in evidence root."
+    },
+    {
+      "command": "node evidence/effort-preview.cjs --reports-only (same approved context; Chromium sandbox true)",
+      "exit": 0,
+      "report": "effort-browser.json",
+      "note": "5 affected report screens after observed English word splitting and too-small chart text; instruction screenshots reused. No page errors or horizontal overflow."
+    }
+  ],
+  "limitations": [
+    "Pure synthetic component preview, no deployment artifact and no four-entry identity proof",
+    "200% screenshots use CSS zoom=2 at 780px; no native browser or device equivalence claim",
+    "No new download path introduced; existing projection remains sole input",
+    "No CI/Ready/merge/schema/credentials/security-setting/production changes",
+    "No scorer replay suite, full application build or timing study"
+  ],
+  "earlierNonExecution": "effort-report-no-tests.log retained: initial shell used a doubled path and Vitest found no tests; exit1, zero cases. Not a passed invocation.",
+  "providerRead": "github.fetch_pr for PR368 returned Transport closed; branch push and exact head readback use git. No claim to fresh live PR metadata from that failed read."
+}

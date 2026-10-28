@@ -70,3 +70,47 @@ IMMUTABLE_CONFIG_CONFLICT，预期退出 2；不是一次新的失败安装或�
 源码可选安装、隔离库已安装、正式公共库发布、真实四入口可用是四件不同的事。
 后两项未执行；原件 composite/access-token guard 未动，School/Teacher 适配仍待
 root 协调。没有新增科研/版权审查门禁，也没有将现有候选重算为新开发。
+
+## 接续首批：气球努力说明与报告
+
+- 说明页已补中英文三步操作路线与“完成正式轮次＋收到保存确认”的区别。保持原
+  规则、例子、时长范围、练习数量/门槛、输入和关键时序。
+- 报告复用 `CognitiveReportVisual`，仅消费通过 `isEffortReport` 的公开冻结投影。
+  一张条件比较小图＋真实次数表，图注列 high/valid 及未选择；0/6 为真实 0%，
+  无有效选择为 —，invalid 完全不画表现图。原冻结报告文字、协议、计分与版本
+  身份未改；没有制造常模/能力分，也没有读取内部科研字段或增加下载引擎。
+- 共享图表增加可选英文/缺失文案、英文按单词换行；缺失条形额外显示 —。
+  既有中文默认和有符号数值保持，图形之外仍有文字和数据列表。
+
+可直接查看：[手机说明](evidence/intro-zh-phone.png)、
+[手机报告](evidence/report-zh-phone.png)、
+[英文受限报告](evidence/report-limited-en-phone.png)、
+[无效报告](evidence/report-invalid-zh-phone.png)、
+[平板英文报告](evidence/report-en-tablet.png)。均明确标注合成预览/未发布。
+[200%示例](evidence/report-en-200pct.png) 是 CSS zoom 压力预览，不冒充原生设备验收。
+
+报告示例来自真实 capture/scorer/公开投影的合成记录，完整输入与逐条件结果可读：
+[raw](evidence/effort-synthetic-raw.json)、
+[public reports](evidence/effort-synthetic-public-reports.json)。18次示例中，
+50次基准为6/6、100次基准为0/6、200次基准为4/6；缺失与真实零不同。
+新增断言实际通过合计3项（分次原始报告，不冒称整条失败命令成功），最终直接类型
+检查零诊断；最终5张受影响报告截图＋3张复用说明截图无横向溢出。原夹具失败、
+原命令/退出、类型夹具漏项与浏览器外层沙箱限制均留存，见
+[完整回执](evidence/effort-presentation-receipt.json)。没有重跑原scorer整套或全平台。
+
+## 本阶段剩余项与交给 root 的最小建议
+
+1. 独审上述三项提交、实际配置哈希、PostgreSQL断言、合成计分输入与最终截图。
+   PR365 的旧 CI pin 不能用于 PR368；本节点没有激活 CI、Ready、merge 或部署。
+2. 正式运行库目标和安装身份待 root 协调；此处仅隔离 DRAFT，不能当作公共发布。
+3. 保留 `raw-archive.service.ts` 对 composite/access-token/无 userId 的拒绝，
+   `assertNativeDeliverySupported` 对 public/未支持身份的拒绝；不能用 Training
+   cookie 冒称 School/Teacher/Survey 成功。先明确各入口原件端口与真实身份范围，
+   再做相应最小适配；权限/schema改变另给 root 建议，本批不做。
+4. 连续图像再认／ANT 是“已有后端定义、产品宿主未接”，另外8包是“已有独立候选、
+   未注册产品入口”。下一批复用既有实现，核精确配置与原件端口后逐项接线，不重做。
+   剩余各包说明/报告的结构审阅和呈现优化仍在逐包队列，未被本批的单工具截图代替。
+5. 科研质量、人群、译审、素材版权状态仍按原记录人工处理，未新增为自动准入门禁。
+
+GitHub 连接器的 PR 读取两次返回 Transport closed；实际 push 和分支精确 SHA 由
+Git 成功读回。没有把连接器失败读数当成当前 PR metadata 或 CI 绿灯。

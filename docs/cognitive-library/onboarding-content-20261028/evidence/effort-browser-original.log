@@ -1,0 +1,17 @@
+/workspace/eduK12-new-version/server-version/frontend/src/modules/cognitive/tasks/balloon-effort/capture.ts:8
+ private clock(now:number){if(!Number.isFinite(now)||now<this.last)throw Error('Nonmonotonic effort clock');this.last=now}
+                                                                   ^
+
+Error: Nonmonotonic effort clock
+    at EffortCapture.clock (/workspace/eduK12-new-version/server-version/frontend/src/modules/cognitive/tasks/balloon-effort/capture.ts:8:74)
+    at EffortCapture.tick (/workspace/eduK12-new-version/server-version/frontend/src/modules/cognitive/tasks/balloon-effort/capture.ts:11:58)
+    at <anonymous> (/workspace/eduK12-new-version/server-version/frontend/src/modules/cognitive/tasks/balloon-effort/report-fixtures.test-support.ts:21:7)
+    at Array.map (<anonymous>)
+    at Object.effortReportFixtures (/workspace/eduK12-new-version/server-version/frontend/src/modules/cognitive/tasks/balloon-effort/report-fixtures.test-support.ts:11:31)
+    at Object.<anonymous> (/workspace/eduK12-new-version/docs/cognitive-library/onboarding-content-20261028/evidence/effort-preview.cjs:5:119)
+    at Module._compile (node:internal/modules/cjs/loader:1872:14)
+    at Object.<anonymous> (node:internal/modules/cjs/loader:2003:10)
+    at Module.load (node:internal/modules/cjs/loader:1594:32)
+    at Module._load (node:internal/modules/cjs/loader:1396:12)
+
+Node.js v24.19.0
