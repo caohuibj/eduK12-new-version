@@ -203,11 +203,11 @@ const ScaleUnitReportCard: React.FC<{ report: SafeScaleUnitReport; loadReportIma
       </div>
 
       <ReportSection
-        title={dimensionScores.length > 0 ? '结果概览' : '实际得分'}
-        eyebrow="分数层"
+        title={dimensionScores.length > 0 ? '这次回答的概览' : '本次得分'}
+        eyebrow="我的回答"
         description={dimensionScores.length > 0
-          ? '总体结果与各维度分别展示。请结合各自的量尺范围阅读，不同量表的条形长度不能直接比较。'
-          : '查看本次得分及其原始量尺范围。'}
+          ? '下面的图只显示你在这份问卷计分范围里的位置，不代表在人群中的排名；不同方面的分数也不宜直接比较。'
+          : '查看你这次的得分和问卷本身的分数范围。刻度不是人群排名。'}
         testId="scale-score-layer"
       >
         {scores.length === 0 ? (
@@ -216,7 +216,7 @@ const ScaleUnitReportCard: React.FC<{ report: SafeScaleUnitReport; loadReportIma
           <div className="space-y-5">
             {totalScores.length > 0 && (
               <div>
-                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">总体结果</p>
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">整体情况</p>
                 {totalScores.length === 1 ? (
                   <div className="report-primary-score space-y-2">
                     {rangeTrack(totalScores[0])}
@@ -229,7 +229,7 @@ const ScaleUnitReportCard: React.FC<{ report: SafeScaleUnitReport; loadReportIma
 
             {dimensionScores.length > 0 && (
               <div>
-                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">维度结果</p>
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">不同方面</p>
                 <div className="report-range-grid">{dimensionScores.map(rangeTrack)}</div>
               </div>
             )}
@@ -282,11 +282,16 @@ const ScaleUnitReportCard: React.FC<{ report: SafeScaleUnitReport; loadReportIma
       )}
 
       {(report.caveats || []).length > 0 && (
-        <ReportSection title="阅读提示" eyebrow="限制" headingLevel={3}>
-          <ul className="list-disc space-y-1 pl-5 text-sm text-amber-700" data-testid="scale-caveats">
-            {report.caveats.map((caveat) => <li key={caveat}>{caveat}</li>)}
-          </ul>
-        </ReportSection>
+        <div className="space-y-2">
+          <p className="text-sm text-gray-500">
+            这份结果只反映本次回答，不能单独作为诊断或重要决定的依据。需要了解适用范围时，可展开以下说明。
+          </p>
+          <ReportDetails title="进一步了解：问卷的适用范围与限制" testId="scale-caveats-layer">
+            <ul className="list-disc space-y-1 pl-5 text-sm text-amber-700" data-testid="scale-caveats">
+              {report.caveats!.map((caveat) => <li key={caveat}>{caveat}</li>)}
+            </ul>
+          </ReportDetails>
+        </div>
       )}
 
       {report.disclaimer && <ReportDisclaimer testId="scale-disclaimer">{report.disclaimer}</ReportDisclaimer>}
