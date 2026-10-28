@@ -708,3 +708,26 @@ export type WordanalogyTrialPayload = {
   rtMs: number | null
   interrupted: boolean
 }
+
+/** Wordmeaning 冻结 config（与后端 wordmeaning.config schema 一致）。 */
+export interface WordmeaningConfig {
+  totalTrials: number
+  stimulusSetVersion: string
+  fixationMs: number
+  timeoutMs: number
+  validRtFloorMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+/** Wordmeaning 单 trial payload（与后端 wordmeaning.trial schema 一致）。 */
+export type WordmeaningTrialPayload = {
+  itemId: string
+  responseIndex: number | null
+  rtMs: number | null
+  interrupted: boolean
+}

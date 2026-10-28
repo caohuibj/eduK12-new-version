@@ -38,6 +38,7 @@ import { seeds as task35 } from '../tasks/timecopy/seeds'
 import { seeds as task36 } from '../tasks/sharegame/seeds'
 import { seeds as task37 } from '../tasks/letternumseries/seeds'
 import { seeds as task38 } from '../tasks/wordanalogy/seeds'
+import { seeds as task39 } from '../tasks/wordmeaning/seeds'
 export const cognitiveSeeds = [
   task0[0],
   task1[0],
@@ -81,5 +82,6 @@ export const cognitiveSeeds = [
   task36[0],
   task37[0],
   task38[0],
+  task39[0],
   task21[1],
 ]
