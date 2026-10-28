@@ -1,0 +1,112 @@
+{
+  "status": "AI_WORKING_TRANSLATION_REVIEW_PENDING",
+  "instructions": "请根据你通常的情况，判断以下说法与你的符合程度。没有标准答案，请按自己的真实感受作答。",
+  "items": [
+    {
+      "id": "q1",
+      "position": 1,
+      "en": "Listen to my feelings when making important decisions.",
+      "zh": "做重要决定时，我会听从自己的感受。",
+      "key": "positive",
+      "runtimeItemCode": "IPIP_EMOTION_BASED_DECISION9_01"
+    },
+    {
+      "id": "q2",
+      "position": 2,
+      "en": "Base my goals in life on inspiration, rather than logic.",
+      "zh": "我设定人生目标时，依据的是灵感，而不是逻辑。",
+      "key": "positive",
+      "runtimeItemCode": "IPIP_EMOTION_BASED_DECISION9_02"
+    },
+    {
+      "id": "q3",
+      "position": 3,
+      "en": "Plan my life based on how I feel.",
+      "zh": "我会根据自己的感受规划生活。",
+      "key": "positive",
+      "runtimeItemCode": "IPIP_EMOTION_BASED_DECISION9_03"
+    },
+    {
+      "id": "q4",
+      "position": 4,
+      "en": "Believe emotions give direction to life.",
+      "zh": "我相信情绪能为生活指引方向。",
+      "key": "positive",
+      "runtimeItemCode": "IPIP_EMOTION_BASED_DECISION9_04"
+    },
+    {
+      "id": "q5",
+      "position": 5,
+      "en": "Listen to my heart rather than my brain.",
+      "zh": "相比理性思考，我更听从内心的感受。",
+      "key": "positive",
+      "runtimeItemCode": "IPIP_EMOTION_BASED_DECISION9_05"
+    },
+    {
+      "id": "q6",
+      "position": 6,
+      "en": "Plan my life logically.",
+      "zh": "我会按照逻辑规划自己的生活。",
+      "key": "negative",
+      "runtimeItemCode": "IPIP_EMOTION_BASED_DECISION9_06"
+    },
+    {
+      "id": "q7",
+      "position": 7,
+      "en": "Believe important decisions should be based on logical reasoning.",
+      "zh": "我认为重要决定应当以逻辑推理为依据。",
+      "key": "negative",
+      "runtimeItemCode": "IPIP_EMOTION_BASED_DECISION9_07"
+    },
+    {
+      "id": "q8",
+      "position": 8,
+      "en": "Listen to my brain rather than my heart.",
+      "zh": "相比内心感受，我更听从理性思考。",
+      "key": "negative",
+      "runtimeItemCode": "IPIP_EMOTION_BASED_DECISION9_08"
+    },
+    {
+      "id": "q9",
+      "position": 9,
+      "en": "Make decisions based on facts, not feelings.",
+      "zh": "我依据事实而不是感受做决定。",
+      "key": "negative",
+      "runtimeItemCode": "IPIP_EMOTION_BASED_DECISION9_09"
+    }
+  ],
+  "anchors": [
+    {
+      "value": 1,
+      "en": "Very Inaccurate",
+      "zh": "非常不符合"
+    },
+    {
+      "value": 2,
+      "en": "Moderately Inaccurate",
+      "zh": "比较不符合"
+    },
+    {
+      "value": 3,
+      "en": "Neither Inaccurate nor Accurate",
+      "zh": "介于不符合与符合之间"
+    },
+    {
+      "value": 4,
+      "en": "Moderately Accurate",
+      "zh": "比较符合"
+    },
+    {
+      "value": 5,
+      "en": "Very Accurate",
+      "zh": "非常符合"
+    }
+  ],
+  "license": {
+    "status": "PUBLIC_DOMAIN",
+    "scope": "IPIP items/scales/inventories, commercial and noncommercial use; official homepage explicitly permits copying, editing and translation",
+    "permissionUrl": "https://ipip.ori.org/newPermission.htm",
+    "translationPermissionUrl": "https://ipip.ori.org/",
+    "note": "This applies to these exact IPIP items, not every proprietary measure with a similar name."
+  }
+}

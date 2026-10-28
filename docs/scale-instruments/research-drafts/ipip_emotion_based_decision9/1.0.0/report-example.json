@@ -1,0 +1,985 @@
+{
+  "generatedBy": "actual buildScaleResult + parseScaleResultV2, synthetic answers only",
+  "reports": [
+    {
+      "fixture": "midpoint",
+      "synthetic": true,
+      "answers": [
+        {
+          "itemCode": "IPIP_EMOTION_BASED_DECISION9_01",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "IPIP_EMOTION_BASED_DECISION9_02",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "IPIP_EMOTION_BASED_DECISION9_03",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "IPIP_EMOTION_BASED_DECISION9_04",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "IPIP_EMOTION_BASED_DECISION9_05",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "IPIP_EMOTION_BASED_DECISION9_06",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "IPIP_EMOTION_BASED_DECISION9_07",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "IPIP_EMOTION_BASED_DECISION9_08",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "IPIP_EMOTION_BASED_DECISION9_09",
+          "responseValue": "3"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-local-only",
+          "code": "ipip_emotion_based_decision9_zh_cn_research",
+          "name": "IPIP情绪导向决策9题（研究译稿）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "synthetic-local-only",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "5867644d1b4e8f3a62bb31513965dd94a8605c462070a3277e38df02ef4fd54f",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_01",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_02",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_03",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_04",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_05",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_06",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_07",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_08",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_09",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          }
+        ],
+        "scores": [
+          {
+            "key": "ipip_emotion_based_decision9",
+            "type": "total",
+            "label": "感受与逻辑的决策偏好",
+            "description": "Self-reported preference for feelings rather than logical reasoning in decision-making; not decision quality, impulsivity, psychological flexibility, emotion regulation or emotional-intelligence ability.",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "value": 27,
+            "range": {
+              "min": 9,
+              "max": 45
+            },
+            "expectedItems": [
+              "IPIP_EMOTION_BASED_DECISION9_01",
+              "IPIP_EMOTION_BASED_DECISION9_02",
+              "IPIP_EMOTION_BASED_DECISION9_03",
+              "IPIP_EMOTION_BASED_DECISION9_04",
+              "IPIP_EMOTION_BASED_DECISION9_05",
+              "IPIP_EMOTION_BASED_DECISION9_06",
+              "IPIP_EMOTION_BASED_DECISION9_07",
+              "IPIP_EMOTION_BASED_DECISION9_08",
+              "IPIP_EMOTION_BASED_DECISION9_09"
+            ],
+            "answeredItems": [
+              "IPIP_EMOTION_BASED_DECISION9_01",
+              "IPIP_EMOTION_BASED_DECISION9_02",
+              "IPIP_EMOTION_BASED_DECISION9_03",
+              "IPIP_EMOTION_BASED_DECISION9_04",
+              "IPIP_EMOTION_BASED_DECISION9_05",
+              "IPIP_EMOTION_BASED_DECISION9_06",
+              "IPIP_EMOTION_BASED_DECISION9_07",
+              "IPIP_EMOTION_BASED_DECISION9_08",
+              "IPIP_EMOTION_BASED_DECISION9_09"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "ipip_emotion_based_decision9",
+            "headline": "感受与逻辑的决策偏好：从日常经历看自己的习惯",
+            "label": null,
+            "interpretation": "做决定时，你更容易先问“我有什么感受”，还是“事实和理由是什么”？这份回答描述你通常偏向哪种参考方式，不评判哪种方式更聪明。计分方向越高，表示你越倾向依据感受做决定；较低则更倾向依据事实与逻辑。两者都可能提供有用信息，结果不是决策能力的好坏标签。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "想一想最近一次选择：当时有哪些事实？又有哪些感受或期待？它们是互相支持，还是指向不同方向？"
+              },
+              {
+                "category": "strategy",
+                "text": "下次面对一个日常小选择，可以分别写下“已知事实”和“我的感受”，再看看是否还有需要了解的信息。无需强迫自己只选一种依据。"
+              }
+            ],
+            "limitations": [
+              "中文研究译稿尚待人工审校与目标人群验证，目前仅供成人研究与自我了解。",
+              "不用于判断冲动性、情绪调节能力或临床风险。该中文工作译稿尚待审核与验证，没有可用的项目常模或分界值。",
+              "目前没有依据划分高低或人群排名；原英文研究的数据不是本中文版本的效度证明。",
+              "9题需完整回答；漏答不当作零分，也不代填。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "中文研究译稿尚待人工审校与目标人群验证，目前仅供成人研究与自我了解。",
+          "不用于判断冲动性、情绪调节能力或临床风险。该中文工作译稿尚待审核与验证，没有可用的项目常模或分界值。",
+          "目前没有依据划分高低或人群排名；原英文研究的数据不是本中文版本的效度证明。",
+          "9题需完整回答；漏答不当作零分，也不代填。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "仅供成人研究和描述性自我了解，不用于心理诊断、能力鉴定或高风险决策。"
+      }
+    },
+    {
+      "fixture": "keyed-minimum",
+      "synthetic": true,
+      "answers": [
+        {
+          "itemCode": "IPIP_EMOTION_BASED_DECISION9_01",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_EMOTION_BASED_DECISION9_02",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_EMOTION_BASED_DECISION9_03",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_EMOTION_BASED_DECISION9_04",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_EMOTION_BASED_DECISION9_05",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_EMOTION_BASED_DECISION9_06",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_EMOTION_BASED_DECISION9_07",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_EMOTION_BASED_DECISION9_08",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_EMOTION_BASED_DECISION9_09",
+          "responseValue": "5"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-local-only",
+          "code": "ipip_emotion_based_decision9_zh_cn_research",
+          "name": "IPIP情绪导向决策9题（研究译稿）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "synthetic-local-only",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "5867644d1b4e8f3a62bb31513965dd94a8605c462070a3277e38df02ef4fd54f",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_01",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_02",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_03",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_04",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_05",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_06",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_07",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_08",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_09",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 1
+          }
+        ],
+        "scores": [
+          {
+            "key": "ipip_emotion_based_decision9",
+            "type": "total",
+            "label": "感受与逻辑的决策偏好",
+            "description": "Self-reported preference for feelings rather than logical reasoning in decision-making; not decision quality, impulsivity, psychological flexibility, emotion regulation or emotional-intelligence ability.",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "value": 9,
+            "range": {
+              "min": 9,
+              "max": 45
+            },
+            "expectedItems": [
+              "IPIP_EMOTION_BASED_DECISION9_01",
+              "IPIP_EMOTION_BASED_DECISION9_02",
+              "IPIP_EMOTION_BASED_DECISION9_03",
+              "IPIP_EMOTION_BASED_DECISION9_04",
+              "IPIP_EMOTION_BASED_DECISION9_05",
+              "IPIP_EMOTION_BASED_DECISION9_06",
+              "IPIP_EMOTION_BASED_DECISION9_07",
+              "IPIP_EMOTION_BASED_DECISION9_08",
+              "IPIP_EMOTION_BASED_DECISION9_09"
+            ],
+            "answeredItems": [
+              "IPIP_EMOTION_BASED_DECISION9_01",
+              "IPIP_EMOTION_BASED_DECISION9_02",
+              "IPIP_EMOTION_BASED_DECISION9_03",
+              "IPIP_EMOTION_BASED_DECISION9_04",
+              "IPIP_EMOTION_BASED_DECISION9_05",
+              "IPIP_EMOTION_BASED_DECISION9_06",
+              "IPIP_EMOTION_BASED_DECISION9_07",
+              "IPIP_EMOTION_BASED_DECISION9_08",
+              "IPIP_EMOTION_BASED_DECISION9_09"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "ipip_emotion_based_decision9",
+            "headline": "感受与逻辑的决策偏好：从日常经历看自己的习惯",
+            "label": null,
+            "interpretation": "做决定时，你更容易先问“我有什么感受”，还是“事实和理由是什么”？这份回答描述你通常偏向哪种参考方式，不评判哪种方式更聪明。计分方向越高，表示你越倾向依据感受做决定；较低则更倾向依据事实与逻辑。两者都可能提供有用信息，结果不是决策能力的好坏标签。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "想一想最近一次选择：当时有哪些事实？又有哪些感受或期待？它们是互相支持，还是指向不同方向？"
+              },
+              {
+                "category": "strategy",
+                "text": "下次面对一个日常小选择，可以分别写下“已知事实”和“我的感受”，再看看是否还有需要了解的信息。无需强迫自己只选一种依据。"
+              }
+            ],
+            "limitations": [
+              "中文研究译稿尚待人工审校与目标人群验证，目前仅供成人研究与自我了解。",
+              "不用于判断冲动性、情绪调节能力或临床风险。该中文工作译稿尚待审核与验证，没有可用的项目常模或分界值。",
+              "目前没有依据划分高低或人群排名；原英文研究的数据不是本中文版本的效度证明。",
+              "9题需完整回答；漏答不当作零分，也不代填。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "中文研究译稿尚待人工审校与目标人群验证，目前仅供成人研究与自我了解。",
+          "不用于判断冲动性、情绪调节能力或临床风险。该中文工作译稿尚待审核与验证，没有可用的项目常模或分界值。",
+          "目前没有依据划分高低或人群排名；原英文研究的数据不是本中文版本的效度证明。",
+          "9题需完整回答；漏答不当作零分，也不代填。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "仅供成人研究和描述性自我了解，不用于心理诊断、能力鉴定或高风险决策。"
+      }
+    },
+    {
+      "fixture": "keyed-maximum",
+      "synthetic": true,
+      "answers": [
+        {
+          "itemCode": "IPIP_EMOTION_BASED_DECISION9_01",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_EMOTION_BASED_DECISION9_02",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_EMOTION_BASED_DECISION9_03",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_EMOTION_BASED_DECISION9_04",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_EMOTION_BASED_DECISION9_05",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_EMOTION_BASED_DECISION9_06",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_EMOTION_BASED_DECISION9_07",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_EMOTION_BASED_DECISION9_08",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_EMOTION_BASED_DECISION9_09",
+          "responseValue": "1"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-local-only",
+          "code": "ipip_emotion_based_decision9_zh_cn_research",
+          "name": "IPIP情绪导向决策9题（研究译稿）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "synthetic-local-only",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "5867644d1b4e8f3a62bb31513965dd94a8605c462070a3277e38df02ef4fd54f",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_01",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_02",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_03",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_04",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_05",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_06",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_07",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_08",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_09",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 5
+          }
+        ],
+        "scores": [
+          {
+            "key": "ipip_emotion_based_decision9",
+            "type": "total",
+            "label": "感受与逻辑的决策偏好",
+            "description": "Self-reported preference for feelings rather than logical reasoning in decision-making; not decision quality, impulsivity, psychological flexibility, emotion regulation or emotional-intelligence ability.",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "value": 45,
+            "range": {
+              "min": 9,
+              "max": 45
+            },
+            "expectedItems": [
+              "IPIP_EMOTION_BASED_DECISION9_01",
+              "IPIP_EMOTION_BASED_DECISION9_02",
+              "IPIP_EMOTION_BASED_DECISION9_03",
+              "IPIP_EMOTION_BASED_DECISION9_04",
+              "IPIP_EMOTION_BASED_DECISION9_05",
+              "IPIP_EMOTION_BASED_DECISION9_06",
+              "IPIP_EMOTION_BASED_DECISION9_07",
+              "IPIP_EMOTION_BASED_DECISION9_08",
+              "IPIP_EMOTION_BASED_DECISION9_09"
+            ],
+            "answeredItems": [
+              "IPIP_EMOTION_BASED_DECISION9_01",
+              "IPIP_EMOTION_BASED_DECISION9_02",
+              "IPIP_EMOTION_BASED_DECISION9_03",
+              "IPIP_EMOTION_BASED_DECISION9_04",
+              "IPIP_EMOTION_BASED_DECISION9_05",
+              "IPIP_EMOTION_BASED_DECISION9_06",
+              "IPIP_EMOTION_BASED_DECISION9_07",
+              "IPIP_EMOTION_BASED_DECISION9_08",
+              "IPIP_EMOTION_BASED_DECISION9_09"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "ipip_emotion_based_decision9",
+            "headline": "感受与逻辑的决策偏好：从日常经历看自己的习惯",
+            "label": null,
+            "interpretation": "做决定时，你更容易先问“我有什么感受”，还是“事实和理由是什么”？这份回答描述你通常偏向哪种参考方式，不评判哪种方式更聪明。计分方向越高，表示你越倾向依据感受做决定；较低则更倾向依据事实与逻辑。两者都可能提供有用信息，结果不是决策能力的好坏标签。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "想一想最近一次选择：当时有哪些事实？又有哪些感受或期待？它们是互相支持，还是指向不同方向？"
+              },
+              {
+                "category": "strategy",
+                "text": "下次面对一个日常小选择，可以分别写下“已知事实”和“我的感受”，再看看是否还有需要了解的信息。无需强迫自己只选一种依据。"
+              }
+            ],
+            "limitations": [
+              "中文研究译稿尚待人工审校与目标人群验证，目前仅供成人研究与自我了解。",
+              "不用于判断冲动性、情绪调节能力或临床风险。该中文工作译稿尚待审核与验证，没有可用的项目常模或分界值。",
+              "目前没有依据划分高低或人群排名；原英文研究的数据不是本中文版本的效度证明。",
+              "9题需完整回答；漏答不当作零分，也不代填。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "中文研究译稿尚待人工审校与目标人群验证，目前仅供成人研究与自我了解。",
+          "不用于判断冲动性、情绪调节能力或临床风险。该中文工作译稿尚待审核与验证，没有可用的项目常模或分界值。",
+          "目前没有依据划分高低或人群排名；原英文研究的数据不是本中文版本的效度证明。",
+          "9题需完整回答；漏答不当作零分，也不代填。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "仅供成人研究和描述性自我了解，不用于心理诊断、能力鉴定或高风险决策。"
+      }
+    },
+    {
+      "fixture": "all-one",
+      "synthetic": true,
+      "answers": [
+        {
+          "itemCode": "IPIP_EMOTION_BASED_DECISION9_01",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_EMOTION_BASED_DECISION9_02",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_EMOTION_BASED_DECISION9_03",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_EMOTION_BASED_DECISION9_04",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_EMOTION_BASED_DECISION9_05",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_EMOTION_BASED_DECISION9_06",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_EMOTION_BASED_DECISION9_07",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_EMOTION_BASED_DECISION9_08",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_EMOTION_BASED_DECISION9_09",
+          "responseValue": "1"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-local-only",
+          "code": "ipip_emotion_based_decision9_zh_cn_research",
+          "name": "IPIP情绪导向决策9题（研究译稿）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "synthetic-local-only",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "5867644d1b4e8f3a62bb31513965dd94a8605c462070a3277e38df02ef4fd54f",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_01",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_02",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_03",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_04",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_05",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_06",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_07",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_08",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_09",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 5
+          }
+        ],
+        "scores": [
+          {
+            "key": "ipip_emotion_based_decision9",
+            "type": "total",
+            "label": "感受与逻辑的决策偏好",
+            "description": "Self-reported preference for feelings rather than logical reasoning in decision-making; not decision quality, impulsivity, psychological flexibility, emotion regulation or emotional-intelligence ability.",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "value": 25,
+            "range": {
+              "min": 9,
+              "max": 45
+            },
+            "expectedItems": [
+              "IPIP_EMOTION_BASED_DECISION9_01",
+              "IPIP_EMOTION_BASED_DECISION9_02",
+              "IPIP_EMOTION_BASED_DECISION9_03",
+              "IPIP_EMOTION_BASED_DECISION9_04",
+              "IPIP_EMOTION_BASED_DECISION9_05",
+              "IPIP_EMOTION_BASED_DECISION9_06",
+              "IPIP_EMOTION_BASED_DECISION9_07",
+              "IPIP_EMOTION_BASED_DECISION9_08",
+              "IPIP_EMOTION_BASED_DECISION9_09"
+            ],
+            "answeredItems": [
+              "IPIP_EMOTION_BASED_DECISION9_01",
+              "IPIP_EMOTION_BASED_DECISION9_02",
+              "IPIP_EMOTION_BASED_DECISION9_03",
+              "IPIP_EMOTION_BASED_DECISION9_04",
+              "IPIP_EMOTION_BASED_DECISION9_05",
+              "IPIP_EMOTION_BASED_DECISION9_06",
+              "IPIP_EMOTION_BASED_DECISION9_07",
+              "IPIP_EMOTION_BASED_DECISION9_08",
+              "IPIP_EMOTION_BASED_DECISION9_09"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "ipip_emotion_based_decision9",
+            "headline": "感受与逻辑的决策偏好：从日常经历看自己的习惯",
+            "label": null,
+            "interpretation": "做决定时，你更容易先问“我有什么感受”，还是“事实和理由是什么”？这份回答描述你通常偏向哪种参考方式，不评判哪种方式更聪明。计分方向越高，表示你越倾向依据感受做决定；较低则更倾向依据事实与逻辑。两者都可能提供有用信息，结果不是决策能力的好坏标签。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "想一想最近一次选择：当时有哪些事实？又有哪些感受或期待？它们是互相支持，还是指向不同方向？"
+              },
+              {
+                "category": "strategy",
+                "text": "下次面对一个日常小选择，可以分别写下“已知事实”和“我的感受”，再看看是否还有需要了解的信息。无需强迫自己只选一种依据。"
+              }
+            ],
+            "limitations": [
+              "中文研究译稿尚待人工审校与目标人群验证，目前仅供成人研究与自我了解。",
+              "不用于判断冲动性、情绪调节能力或临床风险。该中文工作译稿尚待审核与验证，没有可用的项目常模或分界值。",
+              "目前没有依据划分高低或人群排名；原英文研究的数据不是本中文版本的效度证明。",
+              "9题需完整回答；漏答不当作零分，也不代填。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "中文研究译稿尚待人工审校与目标人群验证，目前仅供成人研究与自我了解。",
+          "不用于判断冲动性、情绪调节能力或临床风险。该中文工作译稿尚待审核与验证，没有可用的项目常模或分界值。",
+          "目前没有依据划分高低或人群排名；原英文研究的数据不是本中文版本的效度证明。",
+          "9题需完整回答；漏答不当作零分，也不代填。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "仅供成人研究和描述性自我了解，不用于心理诊断、能力鉴定或高风险决策。"
+      }
+    },
+    {
+      "fixture": "all-five",
+      "synthetic": true,
+      "answers": [
+        {
+          "itemCode": "IPIP_EMOTION_BASED_DECISION9_01",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_EMOTION_BASED_DECISION9_02",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_EMOTION_BASED_DECISION9_03",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_EMOTION_BASED_DECISION9_04",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_EMOTION_BASED_DECISION9_05",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_EMOTION_BASED_DECISION9_06",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_EMOTION_BASED_DECISION9_07",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_EMOTION_BASED_DECISION9_08",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_EMOTION_BASED_DECISION9_09",
+          "responseValue": "5"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-local-only",
+          "code": "ipip_emotion_based_decision9_zh_cn_research",
+          "name": "IPIP情绪导向决策9题（研究译稿）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "synthetic-local-only",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "5867644d1b4e8f3a62bb31513965dd94a8605c462070a3277e38df02ef4fd54f",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_01",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_02",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_03",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_04",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_05",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_06",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_07",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_08",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_EMOTION_BASED_DECISION9_09",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 1
+          }
+        ],
+        "scores": [
+          {
+            "key": "ipip_emotion_based_decision9",
+            "type": "total",
+            "label": "感受与逻辑的决策偏好",
+            "description": "Self-reported preference for feelings rather than logical reasoning in decision-making; not decision quality, impulsivity, psychological flexibility, emotion regulation or emotional-intelligence ability.",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "value": 29,
+            "range": {
+              "min": 9,
+              "max": 45
+            },
+            "expectedItems": [
+              "IPIP_EMOTION_BASED_DECISION9_01",
+              "IPIP_EMOTION_BASED_DECISION9_02",
+              "IPIP_EMOTION_BASED_DECISION9_03",
+              "IPIP_EMOTION_BASED_DECISION9_04",
+              "IPIP_EMOTION_BASED_DECISION9_05",
+              "IPIP_EMOTION_BASED_DECISION9_06",
+              "IPIP_EMOTION_BASED_DECISION9_07",
+              "IPIP_EMOTION_BASED_DECISION9_08",
+              "IPIP_EMOTION_BASED_DECISION9_09"
+            ],
+            "answeredItems": [
+              "IPIP_EMOTION_BASED_DECISION9_01",
+              "IPIP_EMOTION_BASED_DECISION9_02",
+              "IPIP_EMOTION_BASED_DECISION9_03",
+              "IPIP_EMOTION_BASED_DECISION9_04",
+              "IPIP_EMOTION_BASED_DECISION9_05",
+              "IPIP_EMOTION_BASED_DECISION9_06",
+              "IPIP_EMOTION_BASED_DECISION9_07",
+              "IPIP_EMOTION_BASED_DECISION9_08",
+              "IPIP_EMOTION_BASED_DECISION9_09"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "ipip_emotion_based_decision9",
+            "headline": "感受与逻辑的决策偏好：从日常经历看自己的习惯",
+            "label": null,
+            "interpretation": "做决定时，你更容易先问“我有什么感受”，还是“事实和理由是什么”？这份回答描述你通常偏向哪种参考方式，不评判哪种方式更聪明。计分方向越高，表示你越倾向依据感受做决定；较低则更倾向依据事实与逻辑。两者都可能提供有用信息，结果不是决策能力的好坏标签。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "想一想最近一次选择：当时有哪些事实？又有哪些感受或期待？它们是互相支持，还是指向不同方向？"
+              },
+              {
+                "category": "strategy",
+                "text": "下次面对一个日常小选择，可以分别写下“已知事实”和“我的感受”，再看看是否还有需要了解的信息。无需强迫自己只选一种依据。"
+              }
+            ],
+            "limitations": [
+              "中文研究译稿尚待人工审校与目标人群验证，目前仅供成人研究与自我了解。",
+              "不用于判断冲动性、情绪调节能力或临床风险。该中文工作译稿尚待审核与验证，没有可用的项目常模或分界值。",
+              "目前没有依据划分高低或人群排名；原英文研究的数据不是本中文版本的效度证明。",
+              "9题需完整回答；漏答不当作零分，也不代填。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "中文研究译稿尚待人工审校与目标人群验证，目前仅供成人研究与自我了解。",
+          "不用于判断冲动性、情绪调节能力或临床风险。该中文工作译稿尚待审核与验证，没有可用的项目常模或分界值。",
+          "目前没有依据划分高低或人群排名；原英文研究的数据不是本中文版本的效度证明。",
+          "9题需完整回答；漏答不当作零分，也不代填。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "仅供成人研究和描述性自我了解，不用于心理诊断、能力鉴定或高风险决策。"
+      }
+    }
+  ]
+}

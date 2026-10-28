@@ -1,0 +1,48 @@
+{
+  "activationStatus": "EXTERNAL_EVIDENCE_ONLY_NOT_BOUND",
+  "runtimeSelected": false,
+  "parameters": [],
+  "sourceReliability": {
+    "women": {
+      "n": 432,
+      "alpha": 0.73
+    },
+    "men": {
+      "n": 317,
+      "alpha": 0.67
+    },
+    "interpretation": "Official English-source group coefficients, women N=432 and men N=317; not evidence of Chinese reliability, individual accuracy or normative thresholds."
+  },
+  "thresholds": [],
+  "norms": {
+    "status": "NOT_ESTABLISHED_FOR_PROJECT",
+    "note": "No cutoffs, diagnostic bands, Chinese percentiles or school norms are supported by the reviewed official pages. Do not use response-range thirds as empirical thresholds."
+  },
+  "references": [
+    {
+      "author": "International Personality Item Pool",
+      "title": "The Items in Each of the IPIP Scales Measuring Seven Components Potentially Related to Emotional Intelligence (Barchard, 2001)",
+      "url": "https://ipip.ori.org/newEmotionalIntelligenceKey.htm",
+      "role": "Exact item text and positive/negative keys"
+    },
+    {
+      "author": "International Personality Item Pool",
+      "title": "Coefficient Alpha Reliability Estimates for the IPIP Scales Measuring Seven Components Potentially Related to Emotional Intelligence",
+      "url": "https://ipip.ori.org/newEmotionalIntelligenceTable.htm",
+      "role": "Official reliability table; women N=432, men N=317; sample age/population details not established from table"
+    },
+    {
+      "author": "International Personality Item Pool",
+      "title": "Converting IPIP Item Responses to Scale Scores",
+      "url": "https://ipip.ori.org/newScoringInstructions.htm",
+      "role": "Response anchors and scoring"
+    },
+    {
+      "author": "International Personality Item Pool",
+      "title": "Obtaining Permission",
+      "url": "https://ipip.ori.org/newPermission.htm",
+      "role": "Public-domain permission"
+    }
+  ],
+  "currentTranslationValidated": false
+}

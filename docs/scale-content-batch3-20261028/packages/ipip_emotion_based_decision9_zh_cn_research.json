@@ -1,0 +1,140 @@
+{
+  "schemaVersion": 1,
+  "sourceSHA": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "sourceKey": "ipip_emotion_based_decision9_zh_cn_research",
+  "originalVersion": "1.0.0",
+  "preparedVersion": "1.0.1",
+  "originalSource": "server-version/backend/src/modules/scale/instruments/ipip_emotion_based_decision9_zh_cn_research/1.0.0/source.json",
+  "preparedSource": "server-version/backend/src/modules/scale/instruments/ipip_emotion_based_decision9_zh_cn_research/1.0.1/source.json",
+  "originalSourceSHA256": "7c18445fa8a24e64f5acc46ba2c42036a85c8bf733ce91fe91920a694d232aa2",
+  "preparedSourceSHA256": "fc35ef54f3d0ddb142cd63708b872568b42742551770f4f84b56e706a8e95d87",
+  "originalFiles": [
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_emotion_based_decision9/1.0.0/README.md",
+      "blob": "2b7b0961b2cf6a7b0b75532076c87cebe836d950",
+      "sha256": "2200f4b1b515404237c124b06f10994ba8b0c93d944fc0c6b04b810346cb0b22"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_emotion_based_decision9/1.0.0/bilingual-content.json",
+      "blob": "eab7716241d34fb14f06c56126a93c807199ea1b",
+      "sha256": "553fa576e9496ac6766e6f89aa4b5b3ebc007ac7c57e003cc4c6b02639cdd5f3"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_emotion_based_decision9/1.0.0/external-reference-dossier.json",
+      "blob": "9500f8b7ad9625c195696ad8c9c7c16009234f7c",
+      "sha256": "a506e2dd2b4e1d099850af415dbc6091ae4bdfb7271cf699be650aad05297cb5"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_emotion_based_decision9/1.0.0/local-test-output.txt",
+      "blob": "c8b37f605ddf82c3bd4b64885eb032088af98b26",
+      "sha256": "dbae946d34f2fd03e6e5363c4caf4bda49dd140a224f9b9030f8c1f870505289"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_emotion_based_decision9/1.0.0/local-validation.json",
+      "blob": "5e5e9c22545ecf91efe777201cc5f51abab6771c",
+      "sha256": "b81365982f5ea2ba1de594869a297d02506413e57ee10a77742c41da5aa1fb30"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_emotion_based_decision9/1.0.0/references.md",
+      "blob": "2176600b839da53dd8da415c37bfed6936af4965",
+      "sha256": "1f148e6c6b7674c2a02ea6e440f28447adf9def9d9a36aef2c1a81aff8c33e76"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_emotion_based_decision9/1.0.0/report-example.json",
+      "blob": "cd5a10b0f811a913445e16e80c9ff9c93a12f8d8",
+      "sha256": "88edd8ef11bf7174022a4ea5b5f6fd8e3b8e78894fcedcbf442cc56094290cd7"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_emotion_based_decision9/1.0.0/report-example.md",
+      "blob": "f4b66998c010dff874478992fa8b0e6d7b164349",
+      "sha256": "69babf296da7e5cf8173cb66132fdeb2b1ca6da2d4dd36f3ff39ca639d796758"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_emotion_based_decision9/1.0.0/reviewed-source-pack.json",
+      "blob": "f2defa40b8cb9ff0f9a95d23af38afe7b233b011",
+      "sha256": "1c28dd19900fdd4129b721d8dbf8716700566538ba68d8f57462de5db94a39fa"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_emotion_based_decision9/1.0.0/runtime-check.json",
+      "blob": "46a1e0537041bdd3d695a23026df4855a83461a2",
+      "sha256": "24bc975aab11abec3537006ef371ac82df547a53ef5f54e330393f50ca1d53a5"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_emotion_based_decision9/1.0.0/scoring-and-thresholds.md",
+      "blob": "19ade596d9b044f45a1f9055f0ad27b93aa7454b",
+      "sha256": "7d6671763e95d27fcf776f3461681ea2115d3a1ce35f82d2eb357d44e461df38"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ipip_emotion_based_decision9_zh_cn_research/1.0.0/instrument.ts",
+      "blob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ipip_emotion_based_decision9_zh_cn_research/1.0.0/source.json",
+      "blob": "e07e872eaf084f099cb49eed57c0a9893f9f67ef",
+      "sha256": "7c18445fa8a24e64f5acc46ba2c42036a85c8bf733ce91fe91920a694d232aa2"
+    }
+  ],
+  "jsonChanges": [
+    {
+      "op": "replace",
+      "path": "/catalog/catalogManifestVersion",
+      "from": 1,
+      "value": 2
+    },
+    {
+      "op": "replace",
+      "path": "/catalog/construct/constructDefinition",
+      "from": "Self-reported preference for feelings rather than logical reasoning in decision-making; not decision quality, impulsivity, psychological flexibility, emotion regulation or emotional-intelligence ability.",
+      "value": "对做决定时相较于逻辑推理更依赖感受的自我描述；不衡量决策质量、冲动性、心理灵活性、情绪调节或情绪智力能力。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/scoring/scores/0/description",
+      "from": "Self-reported preference for feelings rather than logical reasoning in decision-making; not decision quality, impulsivity, psychological flexibility, emotion regulation or emotional-intelligence ability.",
+      "value": "对做决定时相较于逻辑推理更依赖感受的自我描述；不衡量决策质量、冲动性、心理灵活性、情绪调节或情绪智力能力。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/releaseStatus",
+      "from": "DRAFT",
+      "value": "PUBLISHED"
+    },
+    {
+      "op": "replace",
+      "path": "/identity/instrumentVersion",
+      "from": "1.0.0",
+      "value": "1.0.1"
+    },
+    {
+      "op": "add",
+      "path": "/instruction",
+      "value": {
+        "schemaVersion": 1,
+        "text": "请根据你通常的情况，判断以下说法与你的符合程度。没有标准答案，请按自己的真实感受作答。",
+        "language": "zh-CN",
+        "version": "1.0.1",
+        "source": "docs/scale-instruments/research-drafts/ipip_emotion_based_decision9/1.0.0/bilingual-content.json#/instructions @ b92c69aefa2472775fa7ee86b9c208366886c908 (项目工作稿；非人工审批声明)"
+      }
+    }
+  ],
+  "audit": "audits/audit-ipip-emotion-based-decision9-batch3.json",
+  "versions": {
+    "instrument": "1.0.1",
+    "scoring": "1.0.0",
+    "report": "1.0.0",
+    "localization": "1.0.0",
+    "instruction": "1.0.1"
+  },
+  "states": {
+    "sourceRelease": "PUBLISHED candidate, independent integration pending",
+    "catalog": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "translation": "PENDING",
+    "scientificReview": null,
+    "databaseInstall": "NOT_EXECUTED",
+    "databasePublish": "NOT_EXECUTED",
+    "production": "NOT_TOUCHED"
+  },
+  "versionReason": "Original 1.0.0 source is retained byte-for-byte as DRAFT where a new 1.0.1 definition identity is introduced; same-identity existing rows must conflict, never overwrite. Description translation and instruction extraction do not change formulas, item meaning or options. Report-only wording has an explicit report revision."
+}
