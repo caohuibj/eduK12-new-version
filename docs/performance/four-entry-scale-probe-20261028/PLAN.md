@@ -55,3 +55,25 @@ passed for School and Teacher. Real database/START continuation remains pending.
 
 All changes are draft local engineering until GitHub readback/qualification is
 recorded. No merge, activation, production database change or deployment here.
+
+## Real target-R binding continuation and handoff
+
+On 2026-10-28 the isolated PG17 invocation completed with 2 passed / 0 failed /
+2 filtered: the fresh real approved STANDARD preparation, then actual separately
+registered/reviewed/published School and Teacher target R bindings. Both bindings
+preserve the original measurement and reject a substituted original-report
+pointer. This uses the existing biology self-concept tool as a focused runtime
+contract fixture, not the promised same-C1 four-entry flow and not HTTP/browser
+qualification. No skipped revocation case is represented as newly passed.
+
+The original execution HEAD is b27868e; the additional PG test was uncommitted,
+with its exact blob indexed separately. Local services stopped normally. The
+frontend type receipt is explicitly reconstructed from the observed original
+zero exit and unchanged source, not a fabricated contemporaneous signature.
+Backend final typing remains for the added test inputs.
+
+User requested a dedicated Codex cloud task for testing/push/merge, while DOT
+continues its separate local optimization line. After this evidence commit,
+that task owns this branch. DOT reviews each exact CI plan before activation.
+Root no longer edits it concurrently. The same authorized Scale mode matrix is
+still the completion condition; these small contracts do not replace it.
