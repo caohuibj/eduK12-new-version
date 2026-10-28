@@ -1,0 +1,14 @@
+{
+  "instrument": "Reasons for Living Scale (RFL-48)",
+  "item_count": 48,
+  "options": [1, 2, 3, 4, 5, 6],
+  "dimensions": {},
+  "reverse_items": [],
+  "sum_ranges": {
+    "total": [48, 288]
+  },
+  "mean_range": [1, 6],
+  "missing_policy": "complete required per score, otherwise null; product convention",
+  "thresholds": null,
+  "source_note": "Total score only in this draft: sum (48-288) and mean (1-6) of all 48 items, no reverse items. The six published subscales (Survival and Coping Beliefs; Responsibility to Family; Child-Related Concerns; Fear of Suicide; Fear of Social Disapproval; Moral Objections; Linehan et al., 1983) are NOT implemented: their item-to-subscale assignment could not be verified from an authoritative open source. Verify against the original paper before adding subscale scores."
+}
