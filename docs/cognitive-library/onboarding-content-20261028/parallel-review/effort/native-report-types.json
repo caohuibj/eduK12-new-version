@@ -1,0 +1,37 @@
+{
+  "roots": [
+    "src/modules/cognitive/tasks/balloon-effort/native-report.test.tsx",
+    "src/vite-env.d.ts",
+    "src/test/setup.ts"
+  ],
+  "configSHA256": "97ed0e951ac068a9b2d08635b327932db8e41193f9c82e8291a919b7c68bd62e",
+  "sources": {
+    "server-version/frontend/src/services/persistence/cognitiveRawArchiveState.ts": "8403ffab818df9743e50a76ae3f32745b7120f5adf840d5472f8cf681514f908",
+    "server-version/frontend/src/services/persistence/finalDraftStore.ts": "007bfcbe75134e424b306940d60001698595ef8499598f956cf509f7af6787ca",
+    "server-version/frontend/src/modules/cognitive/core/raw-archive.ts": "9b3b4a11179c471ff4e91938ba9b9ae31cdc481c28190535d4cfddd42844c0fb",
+    "server-version/frontend/src/modules/assessment-media/types.ts": "518c50706279c5e1569a442cee8b5a747844ab1e134413c6ed8adf1e2adafb70",
+    "server-version/frontend/src/training/training-cognitive-retention.ts": "b76e750e2d1c5526c1f8fce2e88762c3b14700597082b501c9718428700f679e",
+    "server-version/frontend/src/modules/cognitive/types.ts": "7cfd0e5a1a0ae4109023a8b2df553f65647e0b7a87742dc890f246e5ccf3535f",
+    "server-version/frontend/src/modules/cognitive/core/administration-provenance.ts": "b85adf8d4a0702ebb85d861f33d88f3343bb99d7e4d712213d45aaf134a3aa84",
+    "server-version/frontend/src/modules/cognitive/core/runner.types.ts": "06fc608ca8e450bc930046996f1537424347e2f3a845ca34871fbf0f636da531",
+    "server-version/frontend/src/modules/cognitive/core/native-public-report.ts": "7b92d7e257f09de07715a1b65bc1214009cc5ea72d5a7d9a75b9e4928883285b",
+    "server-version/frontend/src/modules/cognitive/core/native-content-port.ts": "5bd8c90f039538f1ee51a5b09d107a8f19eb19115c5e8ec4119d7edb0334b618",
+    "server-version/frontend/src/modules/cognitive/core/NativeContentRunner.tsx": "7e9fa07fde25bac0dc5a150aa984a056ee4891932ece645fa1f04ee2648b6c12",
+    "server-version/frontend/src/modules/cognitive/tasks/balloon-effort/generated/protocol.ts": "1760cb0f6b2b5a130aed5a3199b45ab0592f6094700d290c4a8de4f7f4b64fb8",
+    "server-version/frontend/src/modules/cognitive/tasks/balloon-effort/generated/report.ts": "c13992f24acf3e1a1856c80ca75c8aeac6d0ee4b7ceb5d65f6a52e5068c1ba7d",
+    "server-version/frontend/src/modules/cognitive/tasks/balloon-effort/capture.ts": "228c62b062e86df06d287ab3ca2862de7b7fab21cb9ee97d50a5ae4e5c85d689",
+    "server-version/frontend/src/modules/cognitive/tasks/balloon-effort/contracts.ts": "c397e6bcf022cdf065f3a0e12734a24f083f170fb13a8a83a03483c3029b802c",
+    "server-version/frontend/src/modules/cognitive/tasks/balloon-effort/session.ts": "4b8dd708c9edb8725973cd3c3e5110016b3fea8ab3f75f3983961b694ac0987b",
+    "server-version/frontend/src/modules/cognitive/tasks/balloon-effort/EffortInstructions.tsx": "1b462cf1f7ca9553a97b741d48288d75324454c3b3477d3d2dcc067b754a5b7d",
+    "server-version/frontend/src/modules/cognitive/CognitiveReportVisual.tsx": "81d90a08a205ef5f963d9a308c830ec99e451df4ffd0ca83780e3a186e6a74a2",
+    "server-version/frontend/src/modules/cognitive/tasks/balloon-effort/EffortReport.tsx": "a205bc2e5a96ba56c23e288a35e04ad9945842a9d1523c611fcf7df024367a5e",
+    "server-version/frontend/src/modules/cognitive/tasks/balloon-effort/BalloonEffortTask.tsx": "150152cdbe817b9bc30152d06cdd48d31b228520100f6f5ad6135829a921309a",
+    "server-version/frontend/src/modules/cognitive/tasks/balloon-effort/generated/envelope.ts": "9ed0c3cda6cc526224e0235b7b1555731d59834badc2cfc2b06230ea1e029426",
+    "server-version/frontend/src/modules/cognitive/tasks/balloon-effort/NativeEffortRunner.tsx": "060b92f1dcf415fa5dcbf662665b718eaa0cc4248e61d2ec43d74bc57d15fdab",
+    "docs/cognitive-library/onboarding-content-20261028/evidence/effort-synthetic-public-reports.json": "d63dd81bab2fffac96d82fe834f3d2c20438052750fd24b60a48d8ff8e0cfcc5",
+    "server-version/frontend/src/modules/cognitive/tasks/balloon-effort/native-report.test.tsx": "97d0e3fe4b7deafbd33f2a93f55d9b25a4af5137c35395b18980eb9b8dc57d58",
+    "server-version/frontend/src/vite-env.d.ts": "65996936fbb042915f7b74a200fcdde7e410f32a669b1ab9597cfaa4b0faddb5",
+    "server-version/frontend/src/test/setup.ts": "6e40f95ed1a8c33a9142d1d1ceb9400abc38b6a8de2d5798f7fa3fe9984482f8"
+  },
+  "diagnostics": []
+}

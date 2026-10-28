@@ -1,0 +1,68 @@
+{
+  "success": true,
+  "caseCount": 6,
+  "randomSeed": "independent-effort-7",
+  "formula": "5 × 80 / 100 = 4; 5 × 120 / 100 = 6",
+  "cases": [
+    {
+      "kind": "80-presses",
+      "state": "limited",
+      "valid": 1,
+      "high": 1,
+      "noChoice": 0,
+      "executionCount": 1,
+      "totalPresses": 80,
+      "knownTaskPoints": 4
+    },
+    {
+      "kind": "120-presses",
+      "state": "limited",
+      "valid": 1,
+      "high": 1,
+      "noChoice": 0,
+      "executionCount": 1,
+      "totalPresses": 120,
+      "knownTaskPoints": 6
+    },
+    {
+      "kind": "true-zero",
+      "state": "limited",
+      "valid": 1,
+      "high": 1,
+      "noChoice": 0,
+      "executionCount": 1,
+      "totalPresses": 0,
+      "knownTaskPoints": 0
+    },
+    {
+      "kind": "no-choice",
+      "state": "invalid",
+      "valid": 0,
+      "high": 0,
+      "noChoice": 1,
+      "executionCount": 0,
+      "totalPresses": null,
+      "knownTaskPoints": null
+    },
+    {
+      "kind": "interrupted-after-choice",
+      "state": "limited",
+      "valid": 1,
+      "high": 1,
+      "noChoice": 0,
+      "executionCount": 0,
+      "totalPresses": null,
+      "knownTaskPoints": null
+    },
+    {
+      "kind": "one-frame-late",
+      "state": "limited",
+      "valid": 1,
+      "high": 1,
+      "noChoice": 0,
+      "executionCount": 1,
+      "totalPresses": 80,
+      "knownTaskPoints": 4
+    }
+  ]
+}

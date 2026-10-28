@@ -1,0 +1,4412 @@
+{
+  "synthetic": true,
+  "base": "fdc72a9739df7cafc2b238ae45f7d976b3c985f2",
+  "node": "v24.19.0",
+  "cases": [
+    {
+      "kind": "80-presses",
+      "input": {
+        "session": {
+          "schemaVersion": 1,
+          "frozenAt": "2026-10-27T00:00:00.000Z",
+          "testType": "balloon-effort",
+          "configVersion": "0.1.0",
+          "engineVersion": "0.1.0",
+          "scoringVersion": "0.1.0",
+          "config": {
+            "profile": "experience",
+            "totalTrials": 18,
+            "blockTrials": 18,
+            "highGoals": [
+              50,
+              100,
+              200
+            ],
+            "highRewards": [
+              3,
+              5,
+              7
+            ],
+            "probabilities": [
+              1,
+              0.5
+            ],
+            "lowGoal": 20,
+            "lowReward": 1,
+            "timing": {
+              "iti": 1000,
+              "probability": 1000,
+              "frame": 700,
+              "offers": 1500,
+              "choice": 6500,
+              "prepare": 3000,
+              "execution": 25000,
+              "feedback": 1000,
+              "cumulative": 1000
+            },
+            "inputPolicy": "one-full-down-up-selected-side-v1",
+            "incentive": "task-points-only-no-cash-promise",
+            "stimulus": {
+              "width": 300,
+              "height": 180,
+              "background": "#F2F2F2",
+              "lowColour": "#1D4ED8",
+              "highColour": "#009E73",
+              "lowRx": 30,
+              "lowRy": 38,
+              "lowY": 105,
+              "highRx": 36,
+              "highRy": 46,
+              "highY": 94,
+              "growthMaxPx": 16
+            },
+            "practice": {
+              "version": "effort-two-demos-three-questions-v1",
+              "trials": 2,
+              "lowGoal": 5,
+              "highGoal": 10,
+              "highReward": 2,
+              "executionMs": 5000,
+              "quizCount": 3,
+              "minimumCorrect": 3,
+              "maxRounds": 3,
+              "repeatInstructionsBeforeRetry": true
+            },
+            "profileDefinitionVersion": "0.1.0",
+            "metricDefinitionVersion": "0.1.0",
+            "qualityDefinitionVersion": "0.1.0",
+            "reportDefinitionVersion": "0.1.0",
+            "presentationVersion": "0.1.0"
+          },
+          "configHash": "cfdc3889455de69c0e42ba35cd0250836bda9fbfaeaea7b86448062fc5058ec2",
+          "protocol": {
+            "schemaVersion": 1,
+            "key": "balloon-effort/0.1.0/0.1.0",
+            "version": "0.1.0",
+            "clock": "performance",
+            "randomizationAlgorithmVersion": "effort-fnv1a-utf16-xorshift32-balanced-v1",
+            "trialEnvelopeVersion": 1,
+            "phases": [
+              {
+                "key": "test",
+                "persists": true,
+                "required": true
+              }
+            ],
+            "measurementCriticalConfigPaths": [
+              "*"
+            ]
+          },
+          "protocolSignature": "17cb14bedc5ce4c7fcf7d3a3da1f975e911f45931cd30bae951dbd0b73ba1794"
+        },
+        "config": {
+          "profile": "experience",
+          "totalTrials": 18,
+          "blockTrials": 18,
+          "highGoals": [
+            50,
+            100,
+            200
+          ],
+          "highRewards": [
+            3,
+            5,
+            7
+          ],
+          "probabilities": [
+            1,
+            0.5
+          ],
+          "lowGoal": 20,
+          "lowReward": 1,
+          "timing": {
+            "iti": 1000,
+            "probability": 1000,
+            "frame": 700,
+            "offers": 1500,
+            "choice": 6500,
+            "prepare": 3000,
+            "execution": 25000,
+            "feedback": 1000,
+            "cumulative": 1000
+          },
+          "inputPolicy": "one-full-down-up-selected-side-v1",
+          "incentive": "task-points-only-no-cash-promise",
+          "stimulus": {
+            "width": 300,
+            "height": 180,
+            "background": "#F2F2F2",
+            "lowColour": "#1D4ED8",
+            "highColour": "#009E73",
+            "lowRx": 30,
+            "lowRy": 38,
+            "lowY": 105,
+            "highRx": 36,
+            "highRy": 46,
+            "highY": 94,
+            "growthMaxPx": 16
+          },
+          "practice": {
+            "version": "effort-two-demos-three-questions-v1",
+            "trials": 2,
+            "lowGoal": 5,
+            "highGoal": 10,
+            "highReward": 2,
+            "executionMs": 5000,
+            "quizCount": 3,
+            "minimumCorrect": 3,
+            "maxRounds": 3,
+            "repeatInstructionsBeforeRetry": true
+          },
+          "profileDefinitionVersion": "0.1.0",
+          "metricDefinitionVersion": "0.1.0",
+          "qualityDefinitionVersion": "0.1.0",
+          "reportDefinitionVersion": "0.1.0",
+          "presentationVersion": "0.1.0"
+        },
+        "randomSeed": "independent-effort-7",
+        "trials": [
+          {
+            "schemaVersion": 1,
+            "trialIndex": 0,
+            "phase": "test",
+            "condition": "100/5/1",
+            "startedAtPerfMs": 100,
+            "endedAtPerfMs": 34410,
+            "durationMs": 34310,
+            "flags": {
+              "timeout": false,
+              "premature": false
+            },
+            "qualityEvents": [],
+            "payload": {
+              "plan": {
+                "index": 0,
+                "phase": "test",
+                "round": 0,
+                "conditionKey": "100/5/1",
+                "highGoal": 100,
+                "highReward": 5,
+                "probability": 1,
+                "highSide": "left",
+                "rewardAvailable": true,
+                "lowGoal": 20,
+                "lowReward": 1,
+                "executionMs": 25000,
+                "forced": null
+              },
+              "status": "complete",
+              "stopReason": null,
+              "startedAtPerfMs": 100,
+              "endedAtPerfMs": 34410,
+              "onsets": {
+                "iti": 100,
+                "probability": 1100,
+                "frame": 2100,
+                "offers": 2800,
+                "choice": 4300,
+                "prepare": 4410,
+                "execution": 7410,
+                "feedback": 32410,
+                "cumulative": 33410
+              },
+              "choiceEndMs": 4410,
+              "choice": {
+                "side": "left",
+                "input": "keyboard",
+                "key": "key:KeyQ",
+                "downAtMs": 4400,
+                "upAtMs": 4410
+              },
+              "choiceOutcome": "selected",
+              "executionEndMs": 32410,
+              "executionResult": "window_elapsed",
+              "presses": [
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 8410,
+                  "upAtMs": 8435
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 8460,
+                  "upAtMs": 8485
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 8510,
+                  "upAtMs": 8535
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 8560,
+                  "upAtMs": 8585
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 8610,
+                  "upAtMs": 8635
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 8660,
+                  "upAtMs": 8685
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 8710,
+                  "upAtMs": 8735
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 8760,
+                  "upAtMs": 8785
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 8810,
+                  "upAtMs": 8835
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 8860,
+                  "upAtMs": 8885
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 8910,
+                  "upAtMs": 8935
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 8960,
+                  "upAtMs": 8985
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9010,
+                  "upAtMs": 9035
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9060,
+                  "upAtMs": 9085
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9110,
+                  "upAtMs": 9135
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9160,
+                  "upAtMs": 9185
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9210,
+                  "upAtMs": 9235
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9260,
+                  "upAtMs": 9285
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9310,
+                  "upAtMs": 9335
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9360,
+                  "upAtMs": 9385
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9410,
+                  "upAtMs": 9435
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9460,
+                  "upAtMs": 9485
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9510,
+                  "upAtMs": 9535
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9560,
+                  "upAtMs": 9585
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9610,
+                  "upAtMs": 9635
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9660,
+                  "upAtMs": 9685
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9710,
+                  "upAtMs": 9735
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9760,
+                  "upAtMs": 9785
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9810,
+                  "upAtMs": 9835
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9860,
+                  "upAtMs": 9885
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9910,
+                  "upAtMs": 9935
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9960,
+                  "upAtMs": 9985
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10010,
+                  "upAtMs": 10035
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10060,
+                  "upAtMs": 10085
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10110,
+                  "upAtMs": 10135
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10160,
+                  "upAtMs": 10185
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10210,
+                  "upAtMs": 10235
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10260,
+                  "upAtMs": 10285
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10310,
+                  "upAtMs": 10335
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10360,
+                  "upAtMs": 10385
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10410,
+                  "upAtMs": 10435
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10460,
+                  "upAtMs": 10485
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10510,
+                  "upAtMs": 10535
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10560,
+                  "upAtMs": 10585
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10610,
+                  "upAtMs": 10635
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10660,
+                  "upAtMs": 10685
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10710,
+                  "upAtMs": 10735
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10760,
+                  "upAtMs": 10785
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10810,
+                  "upAtMs": 10835
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10860,
+                  "upAtMs": 10885
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10910,
+                  "upAtMs": 10935
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10960,
+                  "upAtMs": 10985
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11010,
+                  "upAtMs": 11035
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11060,
+                  "upAtMs": 11085
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11110,
+                  "upAtMs": 11135
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11160,
+                  "upAtMs": 11185
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11210,
+                  "upAtMs": 11235
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11260,
+                  "upAtMs": 11285
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11310,
+                  "upAtMs": 11335
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11360,
+                  "upAtMs": 11385
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11410,
+                  "upAtMs": 11435
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11460,
+                  "upAtMs": 11485
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11510,
+                  "upAtMs": 11535
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11560,
+                  "upAtMs": 11585
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11610,
+                  "upAtMs": 11635
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11660,
+                  "upAtMs": 11685
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11710,
+                  "upAtMs": 11735
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11760,
+                  "upAtMs": 11785
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11810,
+                  "upAtMs": 11835
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11860,
+                  "upAtMs": 11885
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11910,
+                  "upAtMs": 11935
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11960,
+                  "upAtMs": 11985
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 12010,
+                  "upAtMs": 12035
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 12060,
+                  "upAtMs": 12085
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 12110,
+                  "upAtMs": 12135
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 12160,
+                  "upAtMs": 12185
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 12210,
+                  "upAtMs": 12235
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 12260,
+                  "upAtMs": 12285
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 12310,
+                  "upAtMs": 12335
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 12360,
+                  "upAtMs": 12385
+                }
+              ],
+              "reward": 4,
+              "ignored": {
+                "early": 0,
+                "held": 0,
+                "wrongSide": 0,
+                "late": 0,
+                "multiplePointer": 0
+              },
+              "eventOverflow": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "state": "limited",
+        "valid": 1,
+        "high": 1,
+        "noChoice": 0,
+        "executionCount": 1,
+        "totalPresses": 80,
+        "knownTaskPoints": 4
+      },
+      "report": {
+        "testType": "balloon-effort",
+        "engineVersion": "0.1.0",
+        "scoringVersion": "0.1.0",
+        "configVersion": "0.1.0",
+        "reportDefinitionVersion": "0.1.0",
+        "presentationVersion": "0.1.0",
+        "configHash": "cfdc3889455de69c0e42ba35cd0250836bda9fbfaeaea7b86448062fc5058ec2",
+        "protocolSignature": "17cb14bedc5ce4c7fcf7d3a3da1f975e911f45931cd30bae951dbd0b73ba1794",
+        "profile": "experience",
+        "incentive": "task-points-only-no-cash-promise",
+        "state": "limited",
+        "planned": 18,
+        "received": 1,
+        "valid": 1,
+        "high": 1,
+        "noChoice": 0,
+        "technical": 0,
+        "executionCount": 1,
+        "totalPresses": 80,
+        "knownTaskPoints": 4,
+        "byEffort": {
+          "50": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "100": {
+            "valid": 1,
+            "high": 1,
+            "noChoice": 0
+          },
+          "200": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          }
+        },
+        "byReward": {
+          "3": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "5": {
+            "valid": 1,
+            "high": 1,
+            "noChoice": 0
+          },
+          "7": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          }
+        },
+        "byProbability": {
+          "1": {
+            "valid": 1,
+            "high": 1,
+            "noChoice": 0
+          },
+          "0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          }
+        },
+        "conditions": {
+          "100/5/1": {
+            "valid": 1,
+            "high": 1,
+            "noChoice": 0
+          },
+          "100/7/1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "50/5/1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "50/7/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "100/3/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "100/7/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "200/3/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "200/7/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "50/7/1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "100/3/1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "200/5/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "50/5/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "50/3/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "50/3/1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "200/7/1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "100/5/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "200/3/1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "200/5/1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          }
+        },
+        "executionByInput": {
+          "keyboard": {
+            "trials": 1,
+            "presses": 80,
+            "seconds": 25,
+            "pressesPerSecond": 3.2
+          }
+        }
+      }
+    },
+    {
+      "kind": "120-presses",
+      "input": {
+        "session": {
+          "schemaVersion": 1,
+          "frozenAt": "2026-10-27T00:00:00.000Z",
+          "testType": "balloon-effort",
+          "configVersion": "0.1.0",
+          "engineVersion": "0.1.0",
+          "scoringVersion": "0.1.0",
+          "config": {
+            "profile": "experience",
+            "totalTrials": 18,
+            "blockTrials": 18,
+            "highGoals": [
+              50,
+              100,
+              200
+            ],
+            "highRewards": [
+              3,
+              5,
+              7
+            ],
+            "probabilities": [
+              1,
+              0.5
+            ],
+            "lowGoal": 20,
+            "lowReward": 1,
+            "timing": {
+              "iti": 1000,
+              "probability": 1000,
+              "frame": 700,
+              "offers": 1500,
+              "choice": 6500,
+              "prepare": 3000,
+              "execution": 25000,
+              "feedback": 1000,
+              "cumulative": 1000
+            },
+            "inputPolicy": "one-full-down-up-selected-side-v1",
+            "incentive": "task-points-only-no-cash-promise",
+            "stimulus": {
+              "width": 300,
+              "height": 180,
+              "background": "#F2F2F2",
+              "lowColour": "#1D4ED8",
+              "highColour": "#009E73",
+              "lowRx": 30,
+              "lowRy": 38,
+              "lowY": 105,
+              "highRx": 36,
+              "highRy": 46,
+              "highY": 94,
+              "growthMaxPx": 16
+            },
+            "practice": {
+              "version": "effort-two-demos-three-questions-v1",
+              "trials": 2,
+              "lowGoal": 5,
+              "highGoal": 10,
+              "highReward": 2,
+              "executionMs": 5000,
+              "quizCount": 3,
+              "minimumCorrect": 3,
+              "maxRounds": 3,
+              "repeatInstructionsBeforeRetry": true
+            },
+            "profileDefinitionVersion": "0.1.0",
+            "metricDefinitionVersion": "0.1.0",
+            "qualityDefinitionVersion": "0.1.0",
+            "reportDefinitionVersion": "0.1.0",
+            "presentationVersion": "0.1.0"
+          },
+          "configHash": "cfdc3889455de69c0e42ba35cd0250836bda9fbfaeaea7b86448062fc5058ec2",
+          "protocol": {
+            "schemaVersion": 1,
+            "key": "balloon-effort/0.1.0/0.1.0",
+            "version": "0.1.0",
+            "clock": "performance",
+            "randomizationAlgorithmVersion": "effort-fnv1a-utf16-xorshift32-balanced-v1",
+            "trialEnvelopeVersion": 1,
+            "phases": [
+              {
+                "key": "test",
+                "persists": true,
+                "required": true
+              }
+            ],
+            "measurementCriticalConfigPaths": [
+              "*"
+            ]
+          },
+          "protocolSignature": "17cb14bedc5ce4c7fcf7d3a3da1f975e911f45931cd30bae951dbd0b73ba1794"
+        },
+        "config": {
+          "profile": "experience",
+          "totalTrials": 18,
+          "blockTrials": 18,
+          "highGoals": [
+            50,
+            100,
+            200
+          ],
+          "highRewards": [
+            3,
+            5,
+            7
+          ],
+          "probabilities": [
+            1,
+            0.5
+          ],
+          "lowGoal": 20,
+          "lowReward": 1,
+          "timing": {
+            "iti": 1000,
+            "probability": 1000,
+            "frame": 700,
+            "offers": 1500,
+            "choice": 6500,
+            "prepare": 3000,
+            "execution": 25000,
+            "feedback": 1000,
+            "cumulative": 1000
+          },
+          "inputPolicy": "one-full-down-up-selected-side-v1",
+          "incentive": "task-points-only-no-cash-promise",
+          "stimulus": {
+            "width": 300,
+            "height": 180,
+            "background": "#F2F2F2",
+            "lowColour": "#1D4ED8",
+            "highColour": "#009E73",
+            "lowRx": 30,
+            "lowRy": 38,
+            "lowY": 105,
+            "highRx": 36,
+            "highRy": 46,
+            "highY": 94,
+            "growthMaxPx": 16
+          },
+          "practice": {
+            "version": "effort-two-demos-three-questions-v1",
+            "trials": 2,
+            "lowGoal": 5,
+            "highGoal": 10,
+            "highReward": 2,
+            "executionMs": 5000,
+            "quizCount": 3,
+            "minimumCorrect": 3,
+            "maxRounds": 3,
+            "repeatInstructionsBeforeRetry": true
+          },
+          "profileDefinitionVersion": "0.1.0",
+          "metricDefinitionVersion": "0.1.0",
+          "qualityDefinitionVersion": "0.1.0",
+          "reportDefinitionVersion": "0.1.0",
+          "presentationVersion": "0.1.0"
+        },
+        "randomSeed": "independent-effort-7",
+        "trials": [
+          {
+            "schemaVersion": 1,
+            "trialIndex": 0,
+            "phase": "test",
+            "condition": "100/5/1",
+            "startedAtPerfMs": 100,
+            "endedAtPerfMs": 34410,
+            "durationMs": 34310,
+            "flags": {
+              "timeout": false,
+              "premature": false
+            },
+            "qualityEvents": [],
+            "payload": {
+              "plan": {
+                "index": 0,
+                "phase": "test",
+                "round": 0,
+                "conditionKey": "100/5/1",
+                "highGoal": 100,
+                "highReward": 5,
+                "probability": 1,
+                "highSide": "left",
+                "rewardAvailable": true,
+                "lowGoal": 20,
+                "lowReward": 1,
+                "executionMs": 25000,
+                "forced": null
+              },
+              "status": "complete",
+              "stopReason": null,
+              "startedAtPerfMs": 100,
+              "endedAtPerfMs": 34410,
+              "onsets": {
+                "iti": 100,
+                "probability": 1100,
+                "frame": 2100,
+                "offers": 2800,
+                "choice": 4300,
+                "prepare": 4410,
+                "execution": 7410,
+                "feedback": 32410,
+                "cumulative": 33410
+              },
+              "choiceEndMs": 4410,
+              "choice": {
+                "side": "left",
+                "input": "keyboard",
+                "key": "key:KeyQ",
+                "downAtMs": 4400,
+                "upAtMs": 4410
+              },
+              "choiceOutcome": "selected",
+              "executionEndMs": 32410,
+              "executionResult": "window_elapsed",
+              "presses": [
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 8410,
+                  "upAtMs": 8435
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 8460,
+                  "upAtMs": 8485
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 8510,
+                  "upAtMs": 8535
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 8560,
+                  "upAtMs": 8585
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 8610,
+                  "upAtMs": 8635
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 8660,
+                  "upAtMs": 8685
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 8710,
+                  "upAtMs": 8735
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 8760,
+                  "upAtMs": 8785
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 8810,
+                  "upAtMs": 8835
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 8860,
+                  "upAtMs": 8885
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 8910,
+                  "upAtMs": 8935
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 8960,
+                  "upAtMs": 8985
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9010,
+                  "upAtMs": 9035
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9060,
+                  "upAtMs": 9085
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9110,
+                  "upAtMs": 9135
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9160,
+                  "upAtMs": 9185
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9210,
+                  "upAtMs": 9235
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9260,
+                  "upAtMs": 9285
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9310,
+                  "upAtMs": 9335
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9360,
+                  "upAtMs": 9385
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9410,
+                  "upAtMs": 9435
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9460,
+                  "upAtMs": 9485
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9510,
+                  "upAtMs": 9535
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9560,
+                  "upAtMs": 9585
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9610,
+                  "upAtMs": 9635
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9660,
+                  "upAtMs": 9685
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9710,
+                  "upAtMs": 9735
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9760,
+                  "upAtMs": 9785
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9810,
+                  "upAtMs": 9835
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9860,
+                  "upAtMs": 9885
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9910,
+                  "upAtMs": 9935
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9960,
+                  "upAtMs": 9985
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10010,
+                  "upAtMs": 10035
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10060,
+                  "upAtMs": 10085
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10110,
+                  "upAtMs": 10135
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10160,
+                  "upAtMs": 10185
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10210,
+                  "upAtMs": 10235
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10260,
+                  "upAtMs": 10285
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10310,
+                  "upAtMs": 10335
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10360,
+                  "upAtMs": 10385
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10410,
+                  "upAtMs": 10435
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10460,
+                  "upAtMs": 10485
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10510,
+                  "upAtMs": 10535
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10560,
+                  "upAtMs": 10585
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10610,
+                  "upAtMs": 10635
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10660,
+                  "upAtMs": 10685
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10710,
+                  "upAtMs": 10735
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10760,
+                  "upAtMs": 10785
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10810,
+                  "upAtMs": 10835
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10860,
+                  "upAtMs": 10885
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10910,
+                  "upAtMs": 10935
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10960,
+                  "upAtMs": 10985
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11010,
+                  "upAtMs": 11035
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11060,
+                  "upAtMs": 11085
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11110,
+                  "upAtMs": 11135
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11160,
+                  "upAtMs": 11185
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11210,
+                  "upAtMs": 11235
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11260,
+                  "upAtMs": 11285
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11310,
+                  "upAtMs": 11335
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11360,
+                  "upAtMs": 11385
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11410,
+                  "upAtMs": 11435
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11460,
+                  "upAtMs": 11485
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11510,
+                  "upAtMs": 11535
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11560,
+                  "upAtMs": 11585
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11610,
+                  "upAtMs": 11635
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11660,
+                  "upAtMs": 11685
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11710,
+                  "upAtMs": 11735
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11760,
+                  "upAtMs": 11785
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11810,
+                  "upAtMs": 11835
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11860,
+                  "upAtMs": 11885
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11910,
+                  "upAtMs": 11935
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11960,
+                  "upAtMs": 11985
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 12010,
+                  "upAtMs": 12035
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 12060,
+                  "upAtMs": 12085
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 12110,
+                  "upAtMs": 12135
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 12160,
+                  "upAtMs": 12185
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 12210,
+                  "upAtMs": 12235
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 12260,
+                  "upAtMs": 12285
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 12310,
+                  "upAtMs": 12335
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 12360,
+                  "upAtMs": 12385
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 12410,
+                  "upAtMs": 12435
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 12460,
+                  "upAtMs": 12485
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 12510,
+                  "upAtMs": 12535
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 12560,
+                  "upAtMs": 12585
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 12610,
+                  "upAtMs": 12635
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 12660,
+                  "upAtMs": 12685
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 12710,
+                  "upAtMs": 12735
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 12760,
+                  "upAtMs": 12785
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 12810,
+                  "upAtMs": 12835
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 12860,
+                  "upAtMs": 12885
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 12910,
+                  "upAtMs": 12935
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 12960,
+                  "upAtMs": 12985
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 13010,
+                  "upAtMs": 13035
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 13060,
+                  "upAtMs": 13085
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 13110,
+                  "upAtMs": 13135
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 13160,
+                  "upAtMs": 13185
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 13210,
+                  "upAtMs": 13235
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 13260,
+                  "upAtMs": 13285
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 13310,
+                  "upAtMs": 13335
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 13360,
+                  "upAtMs": 13385
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 13410,
+                  "upAtMs": 13435
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 13460,
+                  "upAtMs": 13485
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 13510,
+                  "upAtMs": 13535
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 13560,
+                  "upAtMs": 13585
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 13610,
+                  "upAtMs": 13635
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 13660,
+                  "upAtMs": 13685
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 13710,
+                  "upAtMs": 13735
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 13760,
+                  "upAtMs": 13785
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 13810,
+                  "upAtMs": 13835
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 13860,
+                  "upAtMs": 13885
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 13910,
+                  "upAtMs": 13935
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 13960,
+                  "upAtMs": 13985
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 14010,
+                  "upAtMs": 14035
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 14060,
+                  "upAtMs": 14085
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 14110,
+                  "upAtMs": 14135
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 14160,
+                  "upAtMs": 14185
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 14210,
+                  "upAtMs": 14235
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 14260,
+                  "upAtMs": 14285
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 14310,
+                  "upAtMs": 14335
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 14360,
+                  "upAtMs": 14385
+                }
+              ],
+              "reward": 6,
+              "ignored": {
+                "early": 0,
+                "held": 0,
+                "wrongSide": 0,
+                "late": 0,
+                "multiplePointer": 0
+              },
+              "eventOverflow": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "state": "limited",
+        "valid": 1,
+        "high": 1,
+        "noChoice": 0,
+        "executionCount": 1,
+        "totalPresses": 120,
+        "knownTaskPoints": 6
+      },
+      "report": {
+        "testType": "balloon-effort",
+        "engineVersion": "0.1.0",
+        "scoringVersion": "0.1.0",
+        "configVersion": "0.1.0",
+        "reportDefinitionVersion": "0.1.0",
+        "presentationVersion": "0.1.0",
+        "configHash": "cfdc3889455de69c0e42ba35cd0250836bda9fbfaeaea7b86448062fc5058ec2",
+        "protocolSignature": "17cb14bedc5ce4c7fcf7d3a3da1f975e911f45931cd30bae951dbd0b73ba1794",
+        "profile": "experience",
+        "incentive": "task-points-only-no-cash-promise",
+        "state": "limited",
+        "planned": 18,
+        "received": 1,
+        "valid": 1,
+        "high": 1,
+        "noChoice": 0,
+        "technical": 0,
+        "executionCount": 1,
+        "totalPresses": 120,
+        "knownTaskPoints": 6,
+        "byEffort": {
+          "50": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "100": {
+            "valid": 1,
+            "high": 1,
+            "noChoice": 0
+          },
+          "200": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          }
+        },
+        "byReward": {
+          "3": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "5": {
+            "valid": 1,
+            "high": 1,
+            "noChoice": 0
+          },
+          "7": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          }
+        },
+        "byProbability": {
+          "1": {
+            "valid": 1,
+            "high": 1,
+            "noChoice": 0
+          },
+          "0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          }
+        },
+        "conditions": {
+          "100/5/1": {
+            "valid": 1,
+            "high": 1,
+            "noChoice": 0
+          },
+          "100/7/1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "50/5/1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "50/7/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "100/3/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "100/7/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "200/3/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "200/7/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "50/7/1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "100/3/1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "200/5/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "50/5/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "50/3/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "50/3/1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "200/7/1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "100/5/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "200/3/1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "200/5/1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          }
+        },
+        "executionByInput": {
+          "keyboard": {
+            "trials": 1,
+            "presses": 120,
+            "seconds": 25,
+            "pressesPerSecond": 4.8
+          }
+        }
+      }
+    },
+    {
+      "kind": "true-zero",
+      "input": {
+        "session": {
+          "schemaVersion": 1,
+          "frozenAt": "2026-10-27T00:00:00.000Z",
+          "testType": "balloon-effort",
+          "configVersion": "0.1.0",
+          "engineVersion": "0.1.0",
+          "scoringVersion": "0.1.0",
+          "config": {
+            "profile": "experience",
+            "totalTrials": 18,
+            "blockTrials": 18,
+            "highGoals": [
+              50,
+              100,
+              200
+            ],
+            "highRewards": [
+              3,
+              5,
+              7
+            ],
+            "probabilities": [
+              1,
+              0.5
+            ],
+            "lowGoal": 20,
+            "lowReward": 1,
+            "timing": {
+              "iti": 1000,
+              "probability": 1000,
+              "frame": 700,
+              "offers": 1500,
+              "choice": 6500,
+              "prepare": 3000,
+              "execution": 25000,
+              "feedback": 1000,
+              "cumulative": 1000
+            },
+            "inputPolicy": "one-full-down-up-selected-side-v1",
+            "incentive": "task-points-only-no-cash-promise",
+            "stimulus": {
+              "width": 300,
+              "height": 180,
+              "background": "#F2F2F2",
+              "lowColour": "#1D4ED8",
+              "highColour": "#009E73",
+              "lowRx": 30,
+              "lowRy": 38,
+              "lowY": 105,
+              "highRx": 36,
+              "highRy": 46,
+              "highY": 94,
+              "growthMaxPx": 16
+            },
+            "practice": {
+              "version": "effort-two-demos-three-questions-v1",
+              "trials": 2,
+              "lowGoal": 5,
+              "highGoal": 10,
+              "highReward": 2,
+              "executionMs": 5000,
+              "quizCount": 3,
+              "minimumCorrect": 3,
+              "maxRounds": 3,
+              "repeatInstructionsBeforeRetry": true
+            },
+            "profileDefinitionVersion": "0.1.0",
+            "metricDefinitionVersion": "0.1.0",
+            "qualityDefinitionVersion": "0.1.0",
+            "reportDefinitionVersion": "0.1.0",
+            "presentationVersion": "0.1.0"
+          },
+          "configHash": "cfdc3889455de69c0e42ba35cd0250836bda9fbfaeaea7b86448062fc5058ec2",
+          "protocol": {
+            "schemaVersion": 1,
+            "key": "balloon-effort/0.1.0/0.1.0",
+            "version": "0.1.0",
+            "clock": "performance",
+            "randomizationAlgorithmVersion": "effort-fnv1a-utf16-xorshift32-balanced-v1",
+            "trialEnvelopeVersion": 1,
+            "phases": [
+              {
+                "key": "test",
+                "persists": true,
+                "required": true
+              }
+            ],
+            "measurementCriticalConfigPaths": [
+              "*"
+            ]
+          },
+          "protocolSignature": "17cb14bedc5ce4c7fcf7d3a3da1f975e911f45931cd30bae951dbd0b73ba1794"
+        },
+        "config": {
+          "profile": "experience",
+          "totalTrials": 18,
+          "blockTrials": 18,
+          "highGoals": [
+            50,
+            100,
+            200
+          ],
+          "highRewards": [
+            3,
+            5,
+            7
+          ],
+          "probabilities": [
+            1,
+            0.5
+          ],
+          "lowGoal": 20,
+          "lowReward": 1,
+          "timing": {
+            "iti": 1000,
+            "probability": 1000,
+            "frame": 700,
+            "offers": 1500,
+            "choice": 6500,
+            "prepare": 3000,
+            "execution": 25000,
+            "feedback": 1000,
+            "cumulative": 1000
+          },
+          "inputPolicy": "one-full-down-up-selected-side-v1",
+          "incentive": "task-points-only-no-cash-promise",
+          "stimulus": {
+            "width": 300,
+            "height": 180,
+            "background": "#F2F2F2",
+            "lowColour": "#1D4ED8",
+            "highColour": "#009E73",
+            "lowRx": 30,
+            "lowRy": 38,
+            "lowY": 105,
+            "highRx": 36,
+            "highRy": 46,
+            "highY": 94,
+            "growthMaxPx": 16
+          },
+          "practice": {
+            "version": "effort-two-demos-three-questions-v1",
+            "trials": 2,
+            "lowGoal": 5,
+            "highGoal": 10,
+            "highReward": 2,
+            "executionMs": 5000,
+            "quizCount": 3,
+            "minimumCorrect": 3,
+            "maxRounds": 3,
+            "repeatInstructionsBeforeRetry": true
+          },
+          "profileDefinitionVersion": "0.1.0",
+          "metricDefinitionVersion": "0.1.0",
+          "qualityDefinitionVersion": "0.1.0",
+          "reportDefinitionVersion": "0.1.0",
+          "presentationVersion": "0.1.0"
+        },
+        "randomSeed": "independent-effort-7",
+        "trials": [
+          {
+            "schemaVersion": 1,
+            "trialIndex": 0,
+            "phase": "test",
+            "condition": "100/5/1",
+            "startedAtPerfMs": 100,
+            "endedAtPerfMs": 34410,
+            "durationMs": 34310,
+            "flags": {
+              "timeout": false,
+              "premature": false
+            },
+            "qualityEvents": [],
+            "payload": {
+              "plan": {
+                "index": 0,
+                "phase": "test",
+                "round": 0,
+                "conditionKey": "100/5/1",
+                "highGoal": 100,
+                "highReward": 5,
+                "probability": 1,
+                "highSide": "left",
+                "rewardAvailable": true,
+                "lowGoal": 20,
+                "lowReward": 1,
+                "executionMs": 25000,
+                "forced": null
+              },
+              "status": "complete",
+              "stopReason": null,
+              "startedAtPerfMs": 100,
+              "endedAtPerfMs": 34410,
+              "onsets": {
+                "iti": 100,
+                "probability": 1100,
+                "frame": 2100,
+                "offers": 2800,
+                "choice": 4300,
+                "prepare": 4410,
+                "execution": 7410,
+                "feedback": 32410,
+                "cumulative": 33410
+              },
+              "choiceEndMs": 4410,
+              "choice": {
+                "side": "left",
+                "input": "keyboard",
+                "key": "key:KeyQ",
+                "downAtMs": 4400,
+                "upAtMs": 4410
+              },
+              "choiceOutcome": "selected",
+              "executionEndMs": 32410,
+              "executionResult": "window_elapsed",
+              "presses": [],
+              "reward": 0,
+              "ignored": {
+                "early": 0,
+                "held": 0,
+                "wrongSide": 0,
+                "late": 0,
+                "multiplePointer": 0
+              },
+              "eventOverflow": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "state": "limited",
+        "valid": 1,
+        "high": 1,
+        "noChoice": 0,
+        "executionCount": 1,
+        "totalPresses": 0,
+        "knownTaskPoints": 0
+      },
+      "report": {
+        "testType": "balloon-effort",
+        "engineVersion": "0.1.0",
+        "scoringVersion": "0.1.0",
+        "configVersion": "0.1.0",
+        "reportDefinitionVersion": "0.1.0",
+        "presentationVersion": "0.1.0",
+        "configHash": "cfdc3889455de69c0e42ba35cd0250836bda9fbfaeaea7b86448062fc5058ec2",
+        "protocolSignature": "17cb14bedc5ce4c7fcf7d3a3da1f975e911f45931cd30bae951dbd0b73ba1794",
+        "profile": "experience",
+        "incentive": "task-points-only-no-cash-promise",
+        "state": "limited",
+        "planned": 18,
+        "received": 1,
+        "valid": 1,
+        "high": 1,
+        "noChoice": 0,
+        "technical": 0,
+        "executionCount": 1,
+        "totalPresses": 0,
+        "knownTaskPoints": 0,
+        "byEffort": {
+          "50": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "100": {
+            "valid": 1,
+            "high": 1,
+            "noChoice": 0
+          },
+          "200": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          }
+        },
+        "byReward": {
+          "3": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "5": {
+            "valid": 1,
+            "high": 1,
+            "noChoice": 0
+          },
+          "7": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          }
+        },
+        "byProbability": {
+          "1": {
+            "valid": 1,
+            "high": 1,
+            "noChoice": 0
+          },
+          "0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          }
+        },
+        "conditions": {
+          "100/5/1": {
+            "valid": 1,
+            "high": 1,
+            "noChoice": 0
+          },
+          "100/7/1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "50/5/1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "50/7/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "100/3/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "100/7/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "200/3/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "200/7/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "50/7/1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "100/3/1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "200/5/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "50/5/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "50/3/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "50/3/1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "200/7/1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "100/5/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "200/3/1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "200/5/1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          }
+        },
+        "executionByInput": {
+          "unknown": {
+            "trials": 1,
+            "presses": 0,
+            "seconds": 25,
+            "pressesPerSecond": 0
+          }
+        }
+      }
+    },
+    {
+      "kind": "no-choice",
+      "input": {
+        "session": {
+          "schemaVersion": 1,
+          "frozenAt": "2026-10-27T00:00:00.000Z",
+          "testType": "balloon-effort",
+          "configVersion": "0.1.0",
+          "engineVersion": "0.1.0",
+          "scoringVersion": "0.1.0",
+          "config": {
+            "profile": "experience",
+            "totalTrials": 18,
+            "blockTrials": 18,
+            "highGoals": [
+              50,
+              100,
+              200
+            ],
+            "highRewards": [
+              3,
+              5,
+              7
+            ],
+            "probabilities": [
+              1,
+              0.5
+            ],
+            "lowGoal": 20,
+            "lowReward": 1,
+            "timing": {
+              "iti": 1000,
+              "probability": 1000,
+              "frame": 700,
+              "offers": 1500,
+              "choice": 6500,
+              "prepare": 3000,
+              "execution": 25000,
+              "feedback": 1000,
+              "cumulative": 1000
+            },
+            "inputPolicy": "one-full-down-up-selected-side-v1",
+            "incentive": "task-points-only-no-cash-promise",
+            "stimulus": {
+              "width": 300,
+              "height": 180,
+              "background": "#F2F2F2",
+              "lowColour": "#1D4ED8",
+              "highColour": "#009E73",
+              "lowRx": 30,
+              "lowRy": 38,
+              "lowY": 105,
+              "highRx": 36,
+              "highRy": 46,
+              "highY": 94,
+              "growthMaxPx": 16
+            },
+            "practice": {
+              "version": "effort-two-demos-three-questions-v1",
+              "trials": 2,
+              "lowGoal": 5,
+              "highGoal": 10,
+              "highReward": 2,
+              "executionMs": 5000,
+              "quizCount": 3,
+              "minimumCorrect": 3,
+              "maxRounds": 3,
+              "repeatInstructionsBeforeRetry": true
+            },
+            "profileDefinitionVersion": "0.1.0",
+            "metricDefinitionVersion": "0.1.0",
+            "qualityDefinitionVersion": "0.1.0",
+            "reportDefinitionVersion": "0.1.0",
+            "presentationVersion": "0.1.0"
+          },
+          "configHash": "cfdc3889455de69c0e42ba35cd0250836bda9fbfaeaea7b86448062fc5058ec2",
+          "protocol": {
+            "schemaVersion": 1,
+            "key": "balloon-effort/0.1.0/0.1.0",
+            "version": "0.1.0",
+            "clock": "performance",
+            "randomizationAlgorithmVersion": "effort-fnv1a-utf16-xorshift32-balanced-v1",
+            "trialEnvelopeVersion": 1,
+            "phases": [
+              {
+                "key": "test",
+                "persists": true,
+                "required": true
+              }
+            ],
+            "measurementCriticalConfigPaths": [
+              "*"
+            ]
+          },
+          "protocolSignature": "17cb14bedc5ce4c7fcf7d3a3da1f975e911f45931cd30bae951dbd0b73ba1794"
+        },
+        "config": {
+          "profile": "experience",
+          "totalTrials": 18,
+          "blockTrials": 18,
+          "highGoals": [
+            50,
+            100,
+            200
+          ],
+          "highRewards": [
+            3,
+            5,
+            7
+          ],
+          "probabilities": [
+            1,
+            0.5
+          ],
+          "lowGoal": 20,
+          "lowReward": 1,
+          "timing": {
+            "iti": 1000,
+            "probability": 1000,
+            "frame": 700,
+            "offers": 1500,
+            "choice": 6500,
+            "prepare": 3000,
+            "execution": 25000,
+            "feedback": 1000,
+            "cumulative": 1000
+          },
+          "inputPolicy": "one-full-down-up-selected-side-v1",
+          "incentive": "task-points-only-no-cash-promise",
+          "stimulus": {
+            "width": 300,
+            "height": 180,
+            "background": "#F2F2F2",
+            "lowColour": "#1D4ED8",
+            "highColour": "#009E73",
+            "lowRx": 30,
+            "lowRy": 38,
+            "lowY": 105,
+            "highRx": 36,
+            "highRy": 46,
+            "highY": 94,
+            "growthMaxPx": 16
+          },
+          "practice": {
+            "version": "effort-two-demos-three-questions-v1",
+            "trials": 2,
+            "lowGoal": 5,
+            "highGoal": 10,
+            "highReward": 2,
+            "executionMs": 5000,
+            "quizCount": 3,
+            "minimumCorrect": 3,
+            "maxRounds": 3,
+            "repeatInstructionsBeforeRetry": true
+          },
+          "profileDefinitionVersion": "0.1.0",
+          "metricDefinitionVersion": "0.1.0",
+          "qualityDefinitionVersion": "0.1.0",
+          "reportDefinitionVersion": "0.1.0",
+          "presentationVersion": "0.1.0"
+        },
+        "randomSeed": "independent-effort-7",
+        "trials": [
+          {
+            "schemaVersion": 1,
+            "trialIndex": 0,
+            "phase": "test",
+            "condition": "100/5/1",
+            "startedAtPerfMs": 100,
+            "endedAtPerfMs": 12800,
+            "durationMs": 12700,
+            "flags": {
+              "timeout": false,
+              "premature": false
+            },
+            "qualityEvents": [],
+            "payload": {
+              "plan": {
+                "index": 0,
+                "phase": "test",
+                "round": 0,
+                "conditionKey": "100/5/1",
+                "highGoal": 100,
+                "highReward": 5,
+                "probability": 1,
+                "highSide": "left",
+                "rewardAvailable": true,
+                "lowGoal": 20,
+                "lowReward": 1,
+                "executionMs": 25000,
+                "forced": null
+              },
+              "status": "complete",
+              "stopReason": null,
+              "startedAtPerfMs": 100,
+              "endedAtPerfMs": 12800,
+              "onsets": {
+                "iti": 100,
+                "probability": 1100,
+                "frame": 2100,
+                "offers": 2800,
+                "choice": 4300,
+                "prepare": null,
+                "execution": null,
+                "feedback": 10800,
+                "cumulative": 11800
+              },
+              "choiceEndMs": 10800,
+              "choice": null,
+              "choiceOutcome": "no_response",
+              "executionEndMs": null,
+              "executionResult": null,
+              "presses": [],
+              "reward": null,
+              "ignored": {
+                "early": 0,
+                "held": 0,
+                "wrongSide": 0,
+                "late": 0,
+                "multiplePointer": 0
+              },
+              "eventOverflow": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "state": "invalid",
+        "valid": 0,
+        "high": 0,
+        "noChoice": 1,
+        "executionCount": 0,
+        "totalPresses": null,
+        "knownTaskPoints": null
+      },
+      "report": {
+        "testType": "balloon-effort",
+        "engineVersion": "0.1.0",
+        "scoringVersion": "0.1.0",
+        "configVersion": "0.1.0",
+        "reportDefinitionVersion": "0.1.0",
+        "presentationVersion": "0.1.0",
+        "configHash": "cfdc3889455de69c0e42ba35cd0250836bda9fbfaeaea7b86448062fc5058ec2",
+        "protocolSignature": "17cb14bedc5ce4c7fcf7d3a3da1f975e911f45931cd30bae951dbd0b73ba1794",
+        "profile": "experience",
+        "incentive": "task-points-only-no-cash-promise",
+        "state": "invalid",
+        "planned": 18,
+        "received": 1,
+        "valid": 0,
+        "high": 0,
+        "noChoice": 1,
+        "technical": 0,
+        "executionCount": 0,
+        "totalPresses": null,
+        "knownTaskPoints": null,
+        "byEffort": {
+          "50": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "100": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 1
+          },
+          "200": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          }
+        },
+        "byReward": {
+          "3": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 1
+          },
+          "7": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          }
+        },
+        "byProbability": {
+          "1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 1
+          },
+          "0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          }
+        },
+        "conditions": {
+          "100/5/1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 1
+          },
+          "100/7/1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "50/5/1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "50/7/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "100/3/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "100/7/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "200/3/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "200/7/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "50/7/1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "100/3/1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "200/5/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "50/5/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "50/3/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "50/3/1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "200/7/1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "100/5/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "200/3/1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "200/5/1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          }
+        },
+        "executionByInput": {}
+      }
+    },
+    {
+      "kind": "interrupted-after-choice",
+      "input": {
+        "session": {
+          "schemaVersion": 1,
+          "frozenAt": "2026-10-27T00:00:00.000Z",
+          "testType": "balloon-effort",
+          "configVersion": "0.1.0",
+          "engineVersion": "0.1.0",
+          "scoringVersion": "0.1.0",
+          "config": {
+            "profile": "experience",
+            "totalTrials": 18,
+            "blockTrials": 18,
+            "highGoals": [
+              50,
+              100,
+              200
+            ],
+            "highRewards": [
+              3,
+              5,
+              7
+            ],
+            "probabilities": [
+              1,
+              0.5
+            ],
+            "lowGoal": 20,
+            "lowReward": 1,
+            "timing": {
+              "iti": 1000,
+              "probability": 1000,
+              "frame": 700,
+              "offers": 1500,
+              "choice": 6500,
+              "prepare": 3000,
+              "execution": 25000,
+              "feedback": 1000,
+              "cumulative": 1000
+            },
+            "inputPolicy": "one-full-down-up-selected-side-v1",
+            "incentive": "task-points-only-no-cash-promise",
+            "stimulus": {
+              "width": 300,
+              "height": 180,
+              "background": "#F2F2F2",
+              "lowColour": "#1D4ED8",
+              "highColour": "#009E73",
+              "lowRx": 30,
+              "lowRy": 38,
+              "lowY": 105,
+              "highRx": 36,
+              "highRy": 46,
+              "highY": 94,
+              "growthMaxPx": 16
+            },
+            "practice": {
+              "version": "effort-two-demos-three-questions-v1",
+              "trials": 2,
+              "lowGoal": 5,
+              "highGoal": 10,
+              "highReward": 2,
+              "executionMs": 5000,
+              "quizCount": 3,
+              "minimumCorrect": 3,
+              "maxRounds": 3,
+              "repeatInstructionsBeforeRetry": true
+            },
+            "profileDefinitionVersion": "0.1.0",
+            "metricDefinitionVersion": "0.1.0",
+            "qualityDefinitionVersion": "0.1.0",
+            "reportDefinitionVersion": "0.1.0",
+            "presentationVersion": "0.1.0"
+          },
+          "configHash": "cfdc3889455de69c0e42ba35cd0250836bda9fbfaeaea7b86448062fc5058ec2",
+          "protocol": {
+            "schemaVersion": 1,
+            "key": "balloon-effort/0.1.0/0.1.0",
+            "version": "0.1.0",
+            "clock": "performance",
+            "randomizationAlgorithmVersion": "effort-fnv1a-utf16-xorshift32-balanced-v1",
+            "trialEnvelopeVersion": 1,
+            "phases": [
+              {
+                "key": "test",
+                "persists": true,
+                "required": true
+              }
+            ],
+            "measurementCriticalConfigPaths": [
+              "*"
+            ]
+          },
+          "protocolSignature": "17cb14bedc5ce4c7fcf7d3a3da1f975e911f45931cd30bae951dbd0b73ba1794"
+        },
+        "config": {
+          "profile": "experience",
+          "totalTrials": 18,
+          "blockTrials": 18,
+          "highGoals": [
+            50,
+            100,
+            200
+          ],
+          "highRewards": [
+            3,
+            5,
+            7
+          ],
+          "probabilities": [
+            1,
+            0.5
+          ],
+          "lowGoal": 20,
+          "lowReward": 1,
+          "timing": {
+            "iti": 1000,
+            "probability": 1000,
+            "frame": 700,
+            "offers": 1500,
+            "choice": 6500,
+            "prepare": 3000,
+            "execution": 25000,
+            "feedback": 1000,
+            "cumulative": 1000
+          },
+          "inputPolicy": "one-full-down-up-selected-side-v1",
+          "incentive": "task-points-only-no-cash-promise",
+          "stimulus": {
+            "width": 300,
+            "height": 180,
+            "background": "#F2F2F2",
+            "lowColour": "#1D4ED8",
+            "highColour": "#009E73",
+            "lowRx": 30,
+            "lowRy": 38,
+            "lowY": 105,
+            "highRx": 36,
+            "highRy": 46,
+            "highY": 94,
+            "growthMaxPx": 16
+          },
+          "practice": {
+            "version": "effort-two-demos-three-questions-v1",
+            "trials": 2,
+            "lowGoal": 5,
+            "highGoal": 10,
+            "highReward": 2,
+            "executionMs": 5000,
+            "quizCount": 3,
+            "minimumCorrect": 3,
+            "maxRounds": 3,
+            "repeatInstructionsBeforeRetry": true
+          },
+          "profileDefinitionVersion": "0.1.0",
+          "metricDefinitionVersion": "0.1.0",
+          "qualityDefinitionVersion": "0.1.0",
+          "reportDefinitionVersion": "0.1.0",
+          "presentationVersion": "0.1.0"
+        },
+        "randomSeed": "independent-effort-7",
+        "trials": [
+          {
+            "schemaVersion": 1,
+            "trialIndex": 0,
+            "phase": "test",
+            "condition": "100/5/1",
+            "startedAtPerfMs": 100,
+            "endedAtPerfMs": 4411,
+            "durationMs": 4311,
+            "flags": {
+              "timeout": false,
+              "premature": false
+            },
+            "qualityEvents": [
+              "resume"
+            ],
+            "payload": {
+              "plan": {
+                "index": 0,
+                "phase": "test",
+                "round": 0,
+                "conditionKey": "100/5/1",
+                "highGoal": 100,
+                "highReward": 5,
+                "probability": 1,
+                "highSide": "left",
+                "rewardAvailable": true,
+                "lowGoal": 20,
+                "lowReward": 1,
+                "executionMs": 25000,
+                "forced": null
+              },
+              "status": "interrupted",
+              "stopReason": "participant-ended",
+              "startedAtPerfMs": 100,
+              "endedAtPerfMs": 4411,
+              "onsets": {
+                "iti": 100,
+                "probability": 1100,
+                "frame": 2100,
+                "offers": 2800,
+                "choice": 4300,
+                "prepare": 4410,
+                "execution": null,
+                "feedback": null,
+                "cumulative": null
+              },
+              "choiceEndMs": 4410,
+              "choice": {
+                "side": "left",
+                "input": "keyboard",
+                "key": "key:KeyQ",
+                "downAtMs": 4400,
+                "upAtMs": 4410
+              },
+              "choiceOutcome": "selected",
+              "executionEndMs": null,
+              "executionResult": null,
+              "presses": [],
+              "reward": null,
+              "ignored": {
+                "early": 0,
+                "held": 0,
+                "wrongSide": 0,
+                "late": 0,
+                "multiplePointer": 0
+              },
+              "eventOverflow": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "state": "limited",
+        "valid": 1,
+        "high": 1,
+        "noChoice": 0,
+        "executionCount": 0,
+        "totalPresses": null,
+        "knownTaskPoints": null
+      },
+      "report": {
+        "testType": "balloon-effort",
+        "engineVersion": "0.1.0",
+        "scoringVersion": "0.1.0",
+        "configVersion": "0.1.0",
+        "reportDefinitionVersion": "0.1.0",
+        "presentationVersion": "0.1.0",
+        "configHash": "cfdc3889455de69c0e42ba35cd0250836bda9fbfaeaea7b86448062fc5058ec2",
+        "protocolSignature": "17cb14bedc5ce4c7fcf7d3a3da1f975e911f45931cd30bae951dbd0b73ba1794",
+        "profile": "experience",
+        "incentive": "task-points-only-no-cash-promise",
+        "state": "limited",
+        "planned": 18,
+        "received": 1,
+        "valid": 1,
+        "high": 1,
+        "noChoice": 0,
+        "technical": 1,
+        "executionCount": 0,
+        "totalPresses": null,
+        "knownTaskPoints": null,
+        "byEffort": {
+          "50": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "100": {
+            "valid": 1,
+            "high": 1,
+            "noChoice": 0
+          },
+          "200": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          }
+        },
+        "byReward": {
+          "3": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "5": {
+            "valid": 1,
+            "high": 1,
+            "noChoice": 0
+          },
+          "7": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          }
+        },
+        "byProbability": {
+          "1": {
+            "valid": 1,
+            "high": 1,
+            "noChoice": 0
+          },
+          "0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          }
+        },
+        "conditions": {
+          "100/5/1": {
+            "valid": 1,
+            "high": 1,
+            "noChoice": 0
+          },
+          "100/7/1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "50/5/1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "50/7/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "100/3/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "100/7/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "200/3/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "200/7/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "50/7/1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "100/3/1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "200/5/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "50/5/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "50/3/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "50/3/1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "200/7/1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "100/5/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "200/3/1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "200/5/1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          }
+        },
+        "executionByInput": {}
+      }
+    },
+    {
+      "kind": "one-frame-late",
+      "input": {
+        "session": {
+          "schemaVersion": 1,
+          "frozenAt": "2026-10-27T00:00:00.000Z",
+          "testType": "balloon-effort",
+          "configVersion": "0.1.0",
+          "engineVersion": "0.1.0",
+          "scoringVersion": "0.1.0",
+          "config": {
+            "profile": "experience",
+            "totalTrials": 18,
+            "blockTrials": 18,
+            "highGoals": [
+              50,
+              100,
+              200
+            ],
+            "highRewards": [
+              3,
+              5,
+              7
+            ],
+            "probabilities": [
+              1,
+              0.5
+            ],
+            "lowGoal": 20,
+            "lowReward": 1,
+            "timing": {
+              "iti": 1000,
+              "probability": 1000,
+              "frame": 700,
+              "offers": 1500,
+              "choice": 6500,
+              "prepare": 3000,
+              "execution": 25000,
+              "feedback": 1000,
+              "cumulative": 1000
+            },
+            "inputPolicy": "one-full-down-up-selected-side-v1",
+            "incentive": "task-points-only-no-cash-promise",
+            "stimulus": {
+              "width": 300,
+              "height": 180,
+              "background": "#F2F2F2",
+              "lowColour": "#1D4ED8",
+              "highColour": "#009E73",
+              "lowRx": 30,
+              "lowRy": 38,
+              "lowY": 105,
+              "highRx": 36,
+              "highRy": 46,
+              "highY": 94,
+              "growthMaxPx": 16
+            },
+            "practice": {
+              "version": "effort-two-demos-three-questions-v1",
+              "trials": 2,
+              "lowGoal": 5,
+              "highGoal": 10,
+              "highReward": 2,
+              "executionMs": 5000,
+              "quizCount": 3,
+              "minimumCorrect": 3,
+              "maxRounds": 3,
+              "repeatInstructionsBeforeRetry": true
+            },
+            "profileDefinitionVersion": "0.1.0",
+            "metricDefinitionVersion": "0.1.0",
+            "qualityDefinitionVersion": "0.1.0",
+            "reportDefinitionVersion": "0.1.0",
+            "presentationVersion": "0.1.0"
+          },
+          "configHash": "cfdc3889455de69c0e42ba35cd0250836bda9fbfaeaea7b86448062fc5058ec2",
+          "protocol": {
+            "schemaVersion": 1,
+            "key": "balloon-effort/0.1.0/0.1.0",
+            "version": "0.1.0",
+            "clock": "performance",
+            "randomizationAlgorithmVersion": "effort-fnv1a-utf16-xorshift32-balanced-v1",
+            "trialEnvelopeVersion": 1,
+            "phases": [
+              {
+                "key": "test",
+                "persists": true,
+                "required": true
+              }
+            ],
+            "measurementCriticalConfigPaths": [
+              "*"
+            ]
+          },
+          "protocolSignature": "17cb14bedc5ce4c7fcf7d3a3da1f975e911f45931cd30bae951dbd0b73ba1794"
+        },
+        "config": {
+          "profile": "experience",
+          "totalTrials": 18,
+          "blockTrials": 18,
+          "highGoals": [
+            50,
+            100,
+            200
+          ],
+          "highRewards": [
+            3,
+            5,
+            7
+          ],
+          "probabilities": [
+            1,
+            0.5
+          ],
+          "lowGoal": 20,
+          "lowReward": 1,
+          "timing": {
+            "iti": 1000,
+            "probability": 1000,
+            "frame": 700,
+            "offers": 1500,
+            "choice": 6500,
+            "prepare": 3000,
+            "execution": 25000,
+            "feedback": 1000,
+            "cumulative": 1000
+          },
+          "inputPolicy": "one-full-down-up-selected-side-v1",
+          "incentive": "task-points-only-no-cash-promise",
+          "stimulus": {
+            "width": 300,
+            "height": 180,
+            "background": "#F2F2F2",
+            "lowColour": "#1D4ED8",
+            "highColour": "#009E73",
+            "lowRx": 30,
+            "lowRy": 38,
+            "lowY": 105,
+            "highRx": 36,
+            "highRy": 46,
+            "highY": 94,
+            "growthMaxPx": 16
+          },
+          "practice": {
+            "version": "effort-two-demos-three-questions-v1",
+            "trials": 2,
+            "lowGoal": 5,
+            "highGoal": 10,
+            "highReward": 2,
+            "executionMs": 5000,
+            "quizCount": 3,
+            "minimumCorrect": 3,
+            "maxRounds": 3,
+            "repeatInstructionsBeforeRetry": true
+          },
+          "profileDefinitionVersion": "0.1.0",
+          "metricDefinitionVersion": "0.1.0",
+          "qualityDefinitionVersion": "0.1.0",
+          "reportDefinitionVersion": "0.1.0",
+          "presentationVersion": "0.1.0"
+        },
+        "randomSeed": "independent-effort-7",
+        "trials": [
+          {
+            "schemaVersion": 1,
+            "trialIndex": 0,
+            "phase": "test",
+            "condition": "100/5/1",
+            "startedAtPerfMs": 100,
+            "endedAtPerfMs": 34427,
+            "durationMs": 34327,
+            "flags": {
+              "timeout": false,
+              "premature": false
+            },
+            "qualityEvents": [],
+            "payload": {
+              "plan": {
+                "index": 0,
+                "phase": "test",
+                "round": 0,
+                "conditionKey": "100/5/1",
+                "highGoal": 100,
+                "highReward": 5,
+                "probability": 1,
+                "highSide": "left",
+                "rewardAvailable": true,
+                "lowGoal": 20,
+                "lowReward": 1,
+                "executionMs": 25000,
+                "forced": null
+              },
+              "status": "complete",
+              "stopReason": null,
+              "startedAtPerfMs": 100,
+              "endedAtPerfMs": 34427,
+              "onsets": {
+                "iti": 100,
+                "probability": 1100,
+                "frame": 2100,
+                "offers": 2800,
+                "choice": 4300,
+                "prepare": 4410,
+                "execution": 7410,
+                "feedback": 32427,
+                "cumulative": 33427
+              },
+              "choiceEndMs": 4410,
+              "choice": {
+                "side": "left",
+                "input": "keyboard",
+                "key": "key:KeyQ",
+                "downAtMs": 4400,
+                "upAtMs": 4410
+              },
+              "choiceOutcome": "selected",
+              "executionEndMs": 32427,
+              "executionResult": "window_elapsed",
+              "presses": [
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 8410,
+                  "upAtMs": 8435
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 8460,
+                  "upAtMs": 8485
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 8510,
+                  "upAtMs": 8535
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 8560,
+                  "upAtMs": 8585
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 8610,
+                  "upAtMs": 8635
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 8660,
+                  "upAtMs": 8685
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 8710,
+                  "upAtMs": 8735
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 8760,
+                  "upAtMs": 8785
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 8810,
+                  "upAtMs": 8835
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 8860,
+                  "upAtMs": 8885
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 8910,
+                  "upAtMs": 8935
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 8960,
+                  "upAtMs": 8985
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9010,
+                  "upAtMs": 9035
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9060,
+                  "upAtMs": 9085
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9110,
+                  "upAtMs": 9135
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9160,
+                  "upAtMs": 9185
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9210,
+                  "upAtMs": 9235
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9260,
+                  "upAtMs": 9285
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9310,
+                  "upAtMs": 9335
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9360,
+                  "upAtMs": 9385
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9410,
+                  "upAtMs": 9435
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9460,
+                  "upAtMs": 9485
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9510,
+                  "upAtMs": 9535
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9560,
+                  "upAtMs": 9585
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9610,
+                  "upAtMs": 9635
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9660,
+                  "upAtMs": 9685
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9710,
+                  "upAtMs": 9735
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9760,
+                  "upAtMs": 9785
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9810,
+                  "upAtMs": 9835
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9860,
+                  "upAtMs": 9885
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9910,
+                  "upAtMs": 9935
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 9960,
+                  "upAtMs": 9985
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10010,
+                  "upAtMs": 10035
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10060,
+                  "upAtMs": 10085
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10110,
+                  "upAtMs": 10135
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10160,
+                  "upAtMs": 10185
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10210,
+                  "upAtMs": 10235
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10260,
+                  "upAtMs": 10285
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10310,
+                  "upAtMs": 10335
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10360,
+                  "upAtMs": 10385
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10410,
+                  "upAtMs": 10435
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10460,
+                  "upAtMs": 10485
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10510,
+                  "upAtMs": 10535
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10560,
+                  "upAtMs": 10585
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10610,
+                  "upAtMs": 10635
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10660,
+                  "upAtMs": 10685
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10710,
+                  "upAtMs": 10735
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10760,
+                  "upAtMs": 10785
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10810,
+                  "upAtMs": 10835
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10860,
+                  "upAtMs": 10885
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10910,
+                  "upAtMs": 10935
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 10960,
+                  "upAtMs": 10985
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11010,
+                  "upAtMs": 11035
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11060,
+                  "upAtMs": 11085
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11110,
+                  "upAtMs": 11135
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11160,
+                  "upAtMs": 11185
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11210,
+                  "upAtMs": 11235
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11260,
+                  "upAtMs": 11285
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11310,
+                  "upAtMs": 11335
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11360,
+                  "upAtMs": 11385
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11410,
+                  "upAtMs": 11435
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11460,
+                  "upAtMs": 11485
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11510,
+                  "upAtMs": 11535
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11560,
+                  "upAtMs": 11585
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11610,
+                  "upAtMs": 11635
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11660,
+                  "upAtMs": 11685
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11710,
+                  "upAtMs": 11735
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11760,
+                  "upAtMs": 11785
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11810,
+                  "upAtMs": 11835
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11860,
+                  "upAtMs": 11885
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11910,
+                  "upAtMs": 11935
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 11960,
+                  "upAtMs": 11985
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 12010,
+                  "upAtMs": 12035
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 12060,
+                  "upAtMs": 12085
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 12110,
+                  "upAtMs": 12135
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 12160,
+                  "upAtMs": 12185
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 12210,
+                  "upAtMs": 12235
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 12260,
+                  "upAtMs": 12285
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 12310,
+                  "upAtMs": 12335
+                },
+                {
+                  "side": "left",
+                  "input": "keyboard",
+                  "key": "key:KeyQ",
+                  "downAtMs": 12360,
+                  "upAtMs": 12385
+                }
+              ],
+              "reward": 4,
+              "ignored": {
+                "early": 0,
+                "held": 0,
+                "wrongSide": 0,
+                "late": 0,
+                "multiplePointer": 0
+              },
+              "eventOverflow": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "state": "limited",
+        "valid": 1,
+        "high": 1,
+        "noChoice": 0,
+        "executionCount": 1,
+        "totalPresses": 80,
+        "knownTaskPoints": 4
+      },
+      "report": {
+        "testType": "balloon-effort",
+        "engineVersion": "0.1.0",
+        "scoringVersion": "0.1.0",
+        "configVersion": "0.1.0",
+        "reportDefinitionVersion": "0.1.0",
+        "presentationVersion": "0.1.0",
+        "configHash": "cfdc3889455de69c0e42ba35cd0250836bda9fbfaeaea7b86448062fc5058ec2",
+        "protocolSignature": "17cb14bedc5ce4c7fcf7d3a3da1f975e911f45931cd30bae951dbd0b73ba1794",
+        "profile": "experience",
+        "incentive": "task-points-only-no-cash-promise",
+        "state": "limited",
+        "planned": 18,
+        "received": 1,
+        "valid": 1,
+        "high": 1,
+        "noChoice": 0,
+        "technical": 0,
+        "executionCount": 1,
+        "totalPresses": 80,
+        "knownTaskPoints": 4,
+        "byEffort": {
+          "50": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "100": {
+            "valid": 1,
+            "high": 1,
+            "noChoice": 0
+          },
+          "200": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          }
+        },
+        "byReward": {
+          "3": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "5": {
+            "valid": 1,
+            "high": 1,
+            "noChoice": 0
+          },
+          "7": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          }
+        },
+        "byProbability": {
+          "1": {
+            "valid": 1,
+            "high": 1,
+            "noChoice": 0
+          },
+          "0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          }
+        },
+        "conditions": {
+          "100/5/1": {
+            "valid": 1,
+            "high": 1,
+            "noChoice": 0
+          },
+          "100/7/1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "50/5/1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "50/7/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "100/3/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "100/7/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "200/3/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "200/7/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "50/7/1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "100/3/1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "200/5/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "50/5/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "50/3/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "50/3/1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "200/7/1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "100/5/0.5": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "200/3/1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          },
+          "200/5/1": {
+            "valid": 0,
+            "high": 0,
+            "noChoice": 0
+          }
+        },
+        "executionByInput": {
+          "keyboard": {
+            "trials": 1,
+            "presses": 80,
+            "seconds": 25.017,
+            "pressesPerSecond": 3.1978254786745013
+          }
+        }
+      }
+    }
+  ]
+}
