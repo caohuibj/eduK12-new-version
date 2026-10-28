@@ -1,106 +1,182 @@
 {
-  "pr": 376,
+  "pr": 377,
   "enabled": true,
-  "base": "90c0a9a5c0ba24a5a9d8cb8003279dfb668650ba",
-  "product": "301b1d0cc051d06ed571e9db820dd30e9f42362e",
-  "controlCheckpoint": "b9e8122a040f20b53658afc11f1257000b56bd9f",
+  "base": "93235b6c6a61cefb30fd525eea13ee9c6d4cc0fe",
+  "product": "086ab229fd35e12b05c83372843aaa3653e23f87",
+  "controlCheckpoint": "d19ff30f670398c2e1ff8933bd6d2ef86b7ace37",
   "source": {
-    "docs/performance/education-observer-journeys-20261028/CI-PLAN.md": {
+    "docs/performance/storage-ledger-20261028/CI-PLAN.md": {
       "before": null,
-      "after": "bb29b510921cdba45be13968513028fd11dd7018"
+      "after": "ba1080f0d2357d6d7826498b1fc79ebdba786fb5"
     },
-    "docs/performance/education-observer-journeys-20261028/REVIEW.md": {
+    "docs/performance/storage-ledger-20261028/LIFECYCLE.md": {
       "before": null,
-      "after": "eed1449d01a275337b5a787b145ee08835e9a72e"
+      "after": "bc230903994fff0c33ec18b9ba7e16b7460986d0"
     },
-    "docs/performance/education-observer-journeys-20261028/evidence/backend-types-r1.json": {
+    "docs/performance/storage-ledger-20261028/README.md": {
       "before": null,
-      "after": "d4bfa0b238689bea1a728510ed56b59c58987eab"
+      "after": "5a404635974d69a1252dd2f91a962c646bc3d2b6"
     },
-    "docs/performance/education-observer-journeys-20261028/evidence/backend-types-r1.log": {
+    "docs/performance/storage-ledger-20261028/START-PLANNER.md": {
+      "before": null,
+      "after": "92859eacfddce96db76c0984e66d6cb620bf9855"
+    },
+    "docs/performance/storage-ledger-20261028/evidence-index.json": {
+      "before": null,
+      "after": "af1229d0ee738c7acc3208ddda5eaa29d139548d"
+    },
+    "docs/performance/storage-ledger-20261028/evidence/observer-completed-ledger.json": {
+      "before": null,
+      "after": "5059300068b877626f6947a959f0cf8bfe3de083"
+    },
+    "docs/performance/storage-ledger-20261028/lifecycle/comparison-r2.json": {
+      "before": null,
+      "after": "44e91cb01d10332ec823afd9f6a34758dd74fb90"
+    },
+    "docs/performance/storage-ledger-20261028/lifecycle/index.json": {
+      "before": null,
+      "after": "c2e06be5782ee2d3028454ade1e7ffe3311ee0f1"
+    },
+    "docs/performance/storage-ledger-20261028/lifecycle/legacy-r1-execution.json": {
+      "before": null,
+      "after": "b54b1918319d35cbe31816e910b92aba4b45c377"
+    },
+    "docs/performance/storage-ledger-20261028/lifecycle/legacy-r1.json": {
+      "before": null,
+      "after": "ba28397b9ba3b91899c89fab19c11a2570a85f98"
+    },
+    "docs/performance/storage-ledger-20261028/lifecycle/legacy-r1.log": {
+      "before": null,
+      "after": "dd00675bc4f92d3871c2d5067f6b68a870565f98"
+    },
+    "docs/performance/storage-ledger-20261028/lifecycle/legacy-r2-execution.json": {
+      "before": null,
+      "after": "74213d2d4c5c3412181a05e392fdc498995ef2be"
+    },
+    "docs/performance/storage-ledger-20261028/lifecycle/legacy-r2.json": {
+      "before": null,
+      "after": "d14773414899587e21ac3af4452b7b2cd80d17c0"
+    },
+    "docs/performance/storage-ledger-20261028/lifecycle/measure-lifecycle-r1.mts": {
+      "before": null,
+      "after": "e1750417c66ec81f0f1fd1ba284bb43d79f4192d"
+    },
+    "docs/performance/storage-ledger-20261028/lifecycle/measure-lifecycle.mts": {
+      "before": null,
+      "after": "c26ddb75474d99ff6e58bf6f46fb20277040b751"
+    },
+    "docs/performance/storage-ledger-20261028/lifecycle/run-lifecycle-r1.py": {
+      "before": null,
+      "after": "d90c584c5bc2250e51bd12ad18e55079348dd94d"
+    },
+    "docs/performance/storage-ledger-20261028/lifecycle/run-lifecycle-r2.py": {
+      "before": null,
+      "after": "8b2dd4344233f8a81124ef4c0f7f29aeffe794b9"
+    },
+    "docs/performance/storage-ledger-20261028/lifecycle/shared-compact-r2-execution.json": {
+      "before": null,
+      "after": "8ed9e5e4c4744a7569b7c8cd75bb0fecd0fa2bec"
+    },
+    "docs/performance/storage-ledger-20261028/lifecycle/shared-compact-r2.json": {
+      "before": null,
+      "after": "67938a8ce0bd674ce6a42e20852dac786662f3f7"
+    },
+    "docs/performance/storage-ledger-20261028/read-existing-ledger.py": {
+      "before": null,
+      "after": "e05d5613dfac56b5e95258718b49c8a7062bca39"
+    },
+    "docs/performance/storage-ledger-20261028/start-planner/authority-profile-r1-execution.json": {
+      "before": null,
+      "after": "f183e9600cc143549855c2c8e94a1526ed03f0c9"
+    },
+    "docs/performance/storage-ledger-20261028/start-planner/authority-profile-r1.json.gz": {
+      "before": null,
+      "after": "2bf72c6e5c1094b5322126782c0260d40de137b7"
+    },
+    "docs/performance/storage-ledger-20261028/start-planner/authority-profile-r1.log": {
+      "before": null,
+      "after": "0d37b0fa89ee2c515b07ee5c945190570740de8e"
+    },
+    "docs/performance/storage-ledger-20261028/start-planner/authority-profile-summary.json": {
+      "before": null,
+      "after": "0aad6cad0eafb71a58e9ac3363052f007ec3e3de"
+    },
+    "docs/performance/storage-ledger-20261028/start-planner/index.json": {
+      "before": null,
+      "after": "dc77d8101d906c8da52c54816ebd6ac33c5dfd09"
+    },
+    "docs/performance/storage-ledger-20261028/start-planner/planner-backend-types-r1.json": {
+      "before": null,
+      "after": "977ea34a042afac747c8dc3f6c9930f9e657e71f"
+    },
+    "docs/performance/storage-ledger-20261028/start-planner/planner-backend-types-r1.log": {
       "before": null,
       "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
     },
-    "docs/performance/education-observer-journeys-20261028/evidence/ci-r1-browser.json": {
+    "docs/performance/storage-ledger-20261028/start-planner/planner-pg-r1-execution.json": {
       "before": null,
-      "after": "0a5dca87c8e0dc87590f22801fc3f6058ac98b68"
+      "after": "591a566e8af8db4c138ac590ba0d2da801013fcd"
     },
-    "docs/performance/education-observer-journeys-20261028/evidence/observer-expert-http-r1-execution.json": {
+    "docs/performance/storage-ledger-20261028/start-planner/planner-pg-r1.json": {
       "before": null,
-      "after": "5cb9e75bf8089c39454fdfa935269eb8d4c8a438"
+      "after": "4901f772f7365f0d51e60604cfd0c1426654024a"
     },
-    "docs/performance/education-observer-journeys-20261028/evidence/observer-expert-http-r1.json": {
+    "docs/performance/storage-ledger-20261028/start-planner/planner-validation-r1-execution.json": {
       "before": null,
-      "after": "93e81f1e9581a507bd2341c968d62714d1bd457c"
+      "after": "4e1d57873b5da30d56fbb083ba2bd27125da1444"
     },
-    "docs/performance/education-observer-journeys-20261028/evidence/observer-http-r1-execution.json": {
+    "docs/performance/storage-ledger-20261028/start-planner/planner-validation-r1.json": {
       "before": null,
-      "after": "b3af98df6235c80b5bd4a7f8aca761f0d62234f4"
+      "after": "ee97a6c761840bed5a761ee3b1ff0a662d26c625"
     },
-    "docs/performance/education-observer-journeys-20261028/evidence/observer-http-r1.json": {
+    "docs/performance/storage-ledger-20261028/start-planner/profile-start-authority.mts": {
       "before": null,
-      "after": "99d2385152718ec9d4c636f72f55e1241a15eace"
+      "after": "6c1baa6914aadad37a62a42e8f5723817cabd9f2"
     },
-    "docs/performance/education-observer-journeys-20261028/evidence/observer-http-r2-execution.json": {
+    "docs/performance/storage-ledger-20261028/start-planner/run-authority-profile.py": {
       "before": null,
-      "after": "8054772adda2049fb776af4ec6ee7d5524b9eeea"
+      "after": "b6b4940ff3cdd087152c76089fb14446ae733320"
     },
-    "docs/performance/education-observer-journeys-20261028/evidence/observer-http-r2.json": {
+    "docs/performance/storage-ledger-20261028/start-planner/run-planner-pg.py": {
       "before": null,
-      "after": "5f3219c7b3cdb09dd20390aabb90f5f8ca43aca6"
+      "after": "42c0b1735e339241e4f0712535eeb399831e9b19"
     },
-    "docs/performance/education-observer-journeys-20261028/evidence/observer-http-r3-execution.json": {
+    "docs/performance/storage-ledger-20261028/start-planner/run-planner-validation.py": {
       "before": null,
-      "after": "ec437f42a24da2ed91487660cb97256ed79a19f3"
+      "after": "de6a6b861b0eae7c881b32f52781ff424c2f5d50"
     },
-    "docs/performance/education-observer-journeys-20261028/evidence/observer-http-r3.json": {
+    "docs/performance/storage-ledger-20261028/start-planner/start-planner-unit-r1.json": {
       "before": null,
-      "after": "e9465a4cc328ff81cd026c4a204735902911b8e7"
+      "after": "9c3c826c6c9d47029fc1643d18859ea067bb3422"
     },
-    "docs/performance/education-observer-journeys-20261028/evidence/observer-http-r4-execution.json": {
+    "docs/performance/storage-ledger-20261028/start-planner/validate-start-planner.mts": {
       "before": null,
-      "after": "69508aa5fe70c91a932dca603858c4bb9731ce6e"
+      "after": "3b5e062884a5c4f103a02a615cf0d2e7d9dce964"
     },
-    "docs/performance/education-observer-journeys-20261028/evidence/observer-http-r4.json": {
-      "before": null,
-      "after": "f93e6289382aca5843650fc8909ef1c161002980"
+    "server-version/backend/src/__tests__/scale-library-governance/education-execution-authority.test.ts": {
+      "before": "6fbf9217629702e12ea1ffcf763cb148af61cf0a",
+      "after": "fa42bdf314561b4365ad6514a5b47924d16327c0"
     },
-    "docs/performance/education-observer-journeys-20261028/evidence/observer-pg-r1-execution.json": {
-      "before": null,
-      "after": "6d348f74bf55728db0965a64e18eee8b6b292953"
-    },
-    "docs/performance/education-observer-journeys-20261028/evidence/observer-pg-r1.json": {
-      "before": null,
-      "after": "2a6cbe4920d342269417eeef10486337f8862d2d"
-    },
-    "docs/performance/education-observer-journeys-20261028/input-index.json": {
-      "before": null,
-      "after": "b4242f28ebbef30615259cd2293ec7956354dec4"
-    },
-    "server-version/backend/src/__tests__/integration/educationObserverHttp.postgres.integration.test.ts": {
-      "before": null,
-      "after": "f9b6dfa2b6fa7a10810de527a172226aae8bd343"
-    },
-    "server-version/frontend/src/modules/reporting/report-ui.css": {
-      "before": "a876bba2f434287b0104c903ab871ec95da689c7",
-      "after": "4edbb1550c510e32034d296df62d80fd09420445"
+    "server-version/backend/src/modules/assessment-run/startAuthority.ts": {
+      "before": "ab946c097650f977fbcd1e264d0cd13d3c338855",
+      "after": "dada40dbf8a0a305aea3067f61d2361a4723668e"
     }
   },
   "controlBefore": {
     ".github/scripts/content-scope.mjs": "31a340af23927250b9a40f6097b3815d617c70ec",
     ".github/scripts/merge-gate.mjs": "985c744ac800aa425323db1c57010e64d0d69a8e",
-    ".github/scripts/onboarding-bindings.json": "ad3ffbc86208cb050ca22fa092dae7a3740caadf",
+    ".github/scripts/onboarding-bindings.json": "70a0bc585fc65f26bb7920f8fb34fab04cc860a8",
     ".github/scripts/onboarding-checks.mjs": "27f7a30c62a281b4c9bb7a13269071e98cebd7a8",
-    ".github/scripts/onboarding-controls.test.mjs": "265054ed0610d86c3a25ecbc1695c27a55d2a29e",
-    ".github/scripts/onboarding-evidence.json": "05a3e5f117f8e396bd1da502d2d8fc76caba0de8",
-    ".github/scripts/onboarding-scope.mjs": "4abe4f62ba1d2c7df6ed7d42ecf1ac193cab0358",
+    ".github/scripts/onboarding-controls.test.mjs": "31af571d4641c9676487e4f2da033bd85b4270cf",
+    ".github/scripts/onboarding-evidence.json": "3ae31a623b4acc23cf57f3dcac402e5b4ebdeb35",
+    ".github/scripts/onboarding-scope.mjs": "4176bb688bc4d6703cfac87fdc298c0d1b4e3a50",
     ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
     ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
-    ".github/scripts/pr376-browser.mjs": null,
-    ".github/workflows/ci.yml": "ec2b0dfa45ad754aea9f16bf8aa2801128b71543"
+    ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
+    ".github/workflows/ci.yml": "71ee6d10921c5c9bb27a00c8112a04f2d2351187"
   },
   "components": {
-    "backend": "e2812baf6d8ff641ff40f32443ee318a56e28563",
+    "backend": "b7fe981eea351ebb94232571479894e921e53bcd",
     "frontend": "41f956f8c717c1e6829998bfab896bd1a4e50af1"
   }
 }
