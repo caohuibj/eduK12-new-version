@@ -1,0 +1,69 @@
+import {createRequire} from 'node:module'
+import {randomUUID,randomBytes,createHash} from 'node:crypto'
+import {readFileSync,writeFileSync,chmodSync} from 'node:fs'
+const root='/workspace/eduK12-new-version',b=root+'/server-version/backend',out=root+'/docs/scale-system-probe-20261028/evidence',req=createRequire(b+'/package.json')
+const {prisma:db}=req(b+'/src/config/database.ts')
+const {canonicalHash}=req(b+'/src/modules/assessment-runtime/canonical.ts')
+const key='ipip_neo_c1_self_efficacy10_zh_cn_research',version='1.0.0'
+const report:any={schemaVersion:1,scope:'One selected STANDARD scale, real business APIs, synthetic cloud only; management proofs are fixture inputs, not browser admin MFA acceptance',startedAt:new Date().toISOString(),stages:[],failures:[],entries:{},fixturePreconditions:[],identity:{instrumentKey:key,instrumentVersion:version},completed:false}
+const privateData:any={accounts:{},database:JSON.parse(readFileSync(out+'/database-setup.json','utf8')).database}
+function save(){writeFileSync(out+'/prepare-report.json',JSON.stringify(report,(_k,v)=>typeof v==='bigint'?v.toString():v,2)+'\n');writeFileSync('/tmp/scale-system-accounts.json',JSON.stringify(privateData,null,2));chmodSync('/tmp/scale-system-accounts.json',0o600)}
+async function step(name:string,fn:()=>Promise<any>){const start=new Date().toISOString();try{const value=await fn();report.stages.push({name,startedAt:start,endedAt:new Date().toISOString(),outcome:'RESOLVED',result:value});save();console.log(name,'RESOLVED');return value}catch(e:any){report.failures.push({stage:name,name:e.name,code:e.code,message:e.message,stack:e.stack});report.stages.push({name,startedAt:start,endedAt:new Date().toISOString(),outcome:'REJECTED',code:e.code,message:e.message});save();throw e}}
+async function make(name:string,domain='TRAINING',role='STUDENT',platformRole='STANDARD'){
+ const username='sysprobe_'+name+'_'+randomBytes(3).toString('hex'),password='Probe!'+randomBytes(12).toString('base64url')
+ const user=await db.user.create({data:{username,passwordHash:await req('bcryptjs').hash(password,4),role,platformRole,accountDomain:domain,teacherApproved:role==='TEACHER',mustChangePassword:false,isActive:true,isFrozen:false}})
+ if(domain==='SCHOOL')await db.campusAccount.create({data:{userId:user.id,loginName:username,normalizedLogin:username}})
+ if(domain==='SURVEY')await db.surveyAccount.create({data:{userId:user.id,loginName:username,normalizedLogin:username}})
+ privateData.accounts[name]={id:user.id,username,password};report.fixturePreconditions.push({syntheticUserId:user.id,name,domain,role,platformRole,loginSecret:'private /tmp only, never committed'});save();return user
+}
+async function main(){
+ const [meta]=await db.$queryRawUnsafe('SELECT current_database() AS database');if(meta.database!==privateData.database||!meta.database.startsWith('eduk12_system_'))throw Error('Exact own isolated DB required')
+ if(await db.user.count()||await db.scale.count())throw Error('Fresh schema required; will never reset retained fixture')
+ const system=await make('system','TRAINING','ADMIN','SYSTEM_ADMIN'),trainingAdmin=await make('training_admin','TRAINING','ADMIN'),surveyAdmin=await make('survey_admin','TRAINING','ADMIN'),author=await make('author','TRAINING','TEACHER'),learner=await make('learner'),researcher=await make('researcher','SURVEY'),schoolStudent=await make('school_student','SCHOOL'),teacher=await make('teacher','SCHOOL','TEACHER')
+ await db.adminEntryGrant.createMany({data:[{id:randomUUID(),userId:trainingAdmin.id,entry:'TRAINING',grantedBy:system.id},{id:randomUUID(),userId:surveyAdmin.id,entry:'SURVEY',grantedBy:system.id}]})
+ await db.surveyResearcherGrant.create({data:{userId:researcher.id,status:'ACTIVE',grantedBy:surveyAdmin.id}})
+ // A real enrollment/login through the public MFA APIs is performed later; no enabled/fake credential is inserted.
+ const registry=req(b+'/src/modules/scale/onboarding/instrument-registry.ts'),source=registry.getScaleInstrumentSource(key,version),policy=registry.getScaleInstrumentRuntimePolicy(key,version)
+ const install=req(b+'/src/modules/scale/onboarding/install.ts'),pub=req(b+'/src/modules/scale/onboarding/publish.ts')
+ const input={instrumentKey:key,instrumentVersion:version,actorUserId:system.id,deploymentPolicy:{schemaVersion:2,revision:1,locale:'zh-CN',territory:'CN',deploymentModes:['STANDALONE','COMPOSITE','QUESTIONNAIRE'],runtimePolicyHash:policy.runtimePolicyHash,localizationVersion:version,inFlightCompletion:'FROZEN_DEADLINE'}}
+ await step('install-preview',()=>install.planScaleInstrumentInstall(db,input))
+ const installed=await step('install-apply',()=>install.installScaleInstrument(db,input));privateData.scaleId=installed.scaleId;save()
+ const publication={instrumentKey:key,instrumentVersion:version,actorUserId:system.id,visibility:'PUBLIC',allowedProducts:['TRAINING','SURVEY']}
+ const plan=await step('publication-preview',()=>pub.planStandardScalePublication(db,publication));if(!plan.allowPublish)throw Error(JSON.stringify(plan.blockers))
+ await step('publication-apply',()=>pub.publishStandardScale(db,{...publication,expectedProofHash:plan.proofHash}))
+ const trip=req(b+'/src/modules/survey/standard-triplet.service.ts'),detail=await step('triplet-parts',()=>trip.standardTripletDetail(system.id,key,version)),preview=await step('triplet-preview',()=>trip.previewStandardTriplet(db,system.id,detail.selection))
+ if(preview.blockers.length)throw Error('Triplet blockers: '+preview.blockers.join(','))
+ const approved=await step('triplet-approve-and-existing-three-trials',()=>trip.approveStandardTriplet(system.id,{...detail.selection,requestId:randomUUID(),expectedCombinationHash:preview.combinationHash,reason:'Synthetic one-scale system acceptance, no expert or scientific approval implied',allowedProducts:['TRAINING','SURVEY']}))
+ if(approved.state!=='ONLINE')throw Error('Actual triplet not online: '+JSON.stringify(approved))
+ privateData.combination={releaseId:approved.id,combinationHash:approved.combinationHash};save()
+ await step('training-exact-use-grant',()=>req(b+'/src/modules/measurement-content/standard-combination-use.ts').grantTrainingStandardCombinationUse(trainingAdmin.id,approved.id,{requestId:randomUUID(),userId:author.id,combinationHash:approved.combinationHash}))
+ const course=await db.course.create({data:{creatorId:author.id,title:'合成成人学习系统验收',courseCode:randomUUID(),courseType:'TRAINING_COURSE',status:'PUBLISHED'}})
+ await db.courseStudent.create({data:{courseId:course.id,studentId:learner.id,status:'ACTIVE'}})
+ report.fixturePreconditions.push({kind:'synthetic existing active course/membership, not course lifecycle acceptance',courseId:course.id,adultSyntheticAccountsOnly:true})
+ const original=await db.compositeAssessment.create({data:{code:randomUUID(),name:'单量表系统探针：C1',createdBy:author.id,productKind:'QUESTIONNAIRE',questionnaireType:'COURSE',questionnaireCourses:{create:{courseId:course.id}},items:{create:{type:'SCALE',scaleId:installed.scaleId,required:true,position:0}}},include:{questionnaireCourses:true,items:{include:{scale:true}}}})
+ const marker=await step('training-exact-marker',()=>db.$transaction((tx:any)=>req(b+'/src/modules/composite/training-standard-combination.ts').prepareTrainingStandardItemSource(tx,author.id,original,{id:original.items[0].id,scaleId:installed.scaleId},privateData.combination)))
+ await db.compositeAssessmentItem.update({where:{id:original.items[0].id},data:{standardCombinationSource:{reference:marker.reference,referenceHash:marker.referenceHash}}})
+ await step('training-composite-business-publish',()=>req(b+'/src/modules/composite/composite.service.ts').publishComposite(author.id,'TEACHER',original.id))
+ report.entries.TRAINING={stage:'READY_FOR_BROWSER',scaleId:installed.scaleId,courseId:course.id,compositeId:original.id};privateData.training=report.entries.TRAINING;save()
+ // Prepare real exact distribution through the existing education producer; no registered status UPDATE bypass.
+ const orgId=randomUUID();await db.organization.create({data:{id:orgId,name:'合成成人系统验收组织',productDomain:'SCHOOL',createdByUserId:system.id}})
+ await db.educationProductEntitlement.createMany({data:['HUISCHOOL','HUITEACHER'].map(product=>({organizationId:orgId,product,grantedByUserId:system.id}))})
+ for(const u of [schoolStudent,teacher])await db.organizationMembership.create({data:{id:randomUUID(),organizationId:orgId,userId:u.id}})
+ privateData.organizationId=orgId
+ for(const product of ['SCHOOL','TEACHER']){
+  try{
+   const actor=async(name:string)=>{const user=await make(name,'SCHOOL','TEACHER');const membershipId=randomUUID();await db.organizationMembership.create({data:{id:membershipId,organizationId:orgId,userId:user.id}});await db.educationProductRoleGrant.create({data:{id:randomUUID(),organizationId:orgId,membershipId,product:product==='SCHOOL'?'HUISCHOOL':'HUITEACHER',role:'PRODUCT_ADMIN',grantedByUserId:system.id}});return {product,organizationId:orgId,principal:{userId:user.id,username:user.username,role:'TEACHER',platformRole:'STANDARD',accountDomain:'SCHOOL',tokenVersion:0,mustChangePassword:false}}}
+   const creator=await actor(product.toLowerCase()+'_creator'),reviewer=await actor(product.toLowerCase()+'_reviewer'),ids=[original.id,marker.reference.measurement.releaseId]
+   const grant=await step(product+'-exact-distribution-authority',()=>req(b+'/src/modules/measurement-content/admin-authority.service.ts').issueAdminContentRoot(system.id,{tokenVersion:0,adminSessionId:'synthetic-fixture-business-proof',adminVerifiedAt:Date.now()/1000},{requestId:randomUUID(),expectedVersion:0,reason:'Synthetic exact one-scale system test, no real principal rights',grant:{subjectId:creator.principal.userId,scope:{product,scopeKind:'ORGANIZATION',scopeId:orgId,resourceKind:'material',resourceKeys:ids},capabilities:['material.distribute'],delegableCapabilities:[],remainingDelegationDepth:0,validFrom:new Date(Date.now()-60000).toISOString(),expiresAt:new Date(Date.now()+3600000).toISOString()}}))
+   const licenses=ids.map(resourceId=>({resourceId,grantId:grant.grantId})),svc=req(b+'/src/modules/education-tools/assessment-resource.service.ts')
+   const p=await step(product+'-prepare-exact-source',()=>svc.prepareEducationAssessment(creator,{resourceId:randomUUID(),sourceCompositeId:original.id,title:'合成C1系统验收 · '+product,family:'BUNDLE',licenses}))
+   const disclosure=req(b+'/src/__tests__/assessment-policy/result-disclosure.fixture.ts').testDisclosure();for(const audience of ['RESPONDENT','SUBJECT'])disclosure.audiences[audience]={mode:'INDIVIDUAL_SUMMARY',metricKeys:[source.executable.definition.scoring.scores[0].key],longitudinalMetricKeys:[]};disclosure.policyKey='synthetic-one-scale-self-only'
+   const registered=await step(product+'-register',()=>svc.registerEducationAssessment(creator,p.resourceId,{expectedPreparationHash:p.preparationHash,disclosure,feedbackPolicy:{schemaVersion:1,mode:'IMMEDIATE'},references:{schemaVersion:1,units:[]},reports:[],licenses}))
+   await step(product+'-independent-business-review',()=>svc.transitionEducationAssessment(reviewer,p.resourceId,'REVIEW',{expectedEntryHash:registered.entryHash,reason:'Synthetic independent technical review, not scientific source approval'}))
+   await step(product+'-business-publish',()=>svc.transitionEducationAssessment(reviewer,p.resourceId,'PUBLISH',{expectedEntryHash:registered.entryHash,reason:'Synthetic one-scale runtime publication'}))
+   report.entries[product]={stage:'RESOURCE_PUBLISHED_PENDING_ASSIGNMENT',resourceId:p.resourceId,runtimeCompositeId:p.runtimeCompositeId,entryHash:registered.entryHash,organizationId:orgId};privateData[product.toLowerCase()]={...report.entries[product],creator,reviewer};save()
+  }catch(e:any){report.entries[product]={stage:'BLOCKED',code:e.code,message:e.message};save()}
+ }
+ report.completed=true;report.endedAt=new Date().toISOString();save();console.log(JSON.stringify({database:privateData.database,entries:report.entries,failures:report.failures.map((f:any)=>({stage:f.stage,code:f.code,message:f.message}))}))
+}
+main().catch((e:any)=>{report.completed=false;report.endedAt=new Date().toISOString();save();console.error(e.message);process.exitCode=1}).finally(()=>db.$disconnect())

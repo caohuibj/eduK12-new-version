@@ -1,0 +1,147 @@
+{
+  "startedAt": "2026-10-28T02:42:45.778Z",
+  "scope": "One C1 package: actual existing four-host app, real authentication/assignment/final/report; Training existing completed same attempt read-only; other entries one actual final each",
+  "entries": [
+    {
+      "product": "teacher",
+      "outcome": "FAILED",
+      "assigned": {
+        "file": "teacher-exact-assigned-390.png",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "scrollWidth": 390,
+        "text": "跳到主要内容\n教师成长\n我的工具\n专业实践\n退出\n我的教育发展空间\n\n欢迎，sysprobe_teacher_ca1704\n\n参与测评\n个人测评\n参与测评\n2 项\n合成C1精确原R · TEACHER\n待完成\n\nC1精确原R系统验收\n\n开始测评\n合成C1系统验收 · TEACHER\n待完成\n\nC1单量表系统验收\n\n开始测评\n当前学校管理范围\n合成成人系统验收组织\nTeacher · 教师发展与学校改进"
+      },
+      "failure": {
+        "name": "TimeoutError",
+        "message": "locator.waitFor: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByText('我能成功完成任务。', { exact: true }) to be visible\u001b[22m\n",
+        "url": "http://teacher.localhost:5187/login",
+        "text": "跳到主要内容\n退出\n测评作答\n返回任务列表\n\nELIGIBILITY_INELIGIBLE:RESPONDENT_TYPE_NOT_ALLOWED\n\n合成C1精确原R · TEACHER\n开始或继续测评\nTeacher · 教师发展与学校改进",
+        "buttons": [
+          "",
+          "",
+          "退出",
+          "",
+          "返回任务列表",
+          "开始或继续测评"
+        ]
+      }
+    }
+  ],
+  "api": [
+    {
+      "product": "teacher",
+      "path": "/api/huiteacher/auth/me",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "product": "teacher",
+      "path": "/api/huiteacher/auth/me",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "product": "teacher",
+      "path": "/api/huiteacher/personal-scale/catalog",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "product": "teacher",
+      "path": "/api/huiteacher/organizations/f2085294-ee09-41eb-a8c0-011854a0b6f6/tool-authoring-capabilities",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "product": "teacher",
+      "path": "/api/huiteacher/organizations/f2085294-ee09-41eb-a8c0-011854a0b6f6/units",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "product": "teacher",
+      "path": "/api/huiteacher/personal-scale/assessments",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "product": "teacher",
+      "path": "/api/huiteacher/my-form-tasks",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "product": "teacher",
+      "path": "/api/huiteacher/personal-scale/catalog",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "product": "teacher",
+      "path": "/api/huiteacher/my-private-form-tasks",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "product": "teacher",
+      "path": "/api/huiteacher/personal-scale/assessments",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "product": "teacher",
+      "path": "/api/huiteacher/my-form-tasks",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "product": "teacher",
+      "path": "/api/huiteacher/my-private-form-tasks",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "product": "teacher",
+      "path": "/api/huiteacher/my-scale-tasks",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "product": "teacher",
+      "path": "/api/huiteacher/my-assessment-tasks",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "product": "teacher",
+      "path": "/api/huiteacher/my-assessment-tasks",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "product": "teacher",
+      "path": "/api/huiteacher/my-scale-tasks",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "product": "teacher",
+      "path": "/api/huiteacher/run-executions/166772e6-31b1-4445-af37-c2cb5d0835d4/start-assessment",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "product": "teacher",
+      "path": "/api/huiteacher/assessment-composite-attempts/7738fbf3-bbff-4662-a537-0d1ce3a48f37",
+      "method": "GET",
+      "status": 409
+    }
+  ],
+  "errors": [],
+  "completed": true,
+  "browserVersion": "151.0.7922.173",
+  "endedAt": "2026-10-28T02:43:03.995Z"
+}

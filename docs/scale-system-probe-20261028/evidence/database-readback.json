@@ -1,0 +1,257 @@
+{
+  "scope": "Read-only own isolated database after actual UI operations; no rescoring, no mutation",
+  "observedAt": "2026-10-28T02:39:50.922Z",
+  "database": "eduk12_system_b3e9809fe6",
+  "sourceManual": {
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "localization": {
+      "schemaVersion": 1,
+      "sourceLocale": "en",
+      "targetLocale": "zh-CN",
+      "localizationVersion": "1.0.0",
+      "translationSource": "项目独立AI辅助中文工作译稿；未复制未经许可的中文验证版。",
+      "adaptationMethod": "DIRECT_TRANSLATION",
+      "expertReviewStatus": "PENDING",
+      "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+      "localEvidenceRefs": [],
+      "reviewStatus": "PENDING",
+      "notes": "专家译审、认知访谈与目标人群效度待完成。不声称是专有NEO-PI-R、GSE或学科自我效能量表。"
+    },
+    "scientificReview": null
+  },
+  "scales": [
+    {
+      "id": "0120f618-0da3-4b9b-8774-9b6ebece5217",
+      "code": "ipip_neo_c1_self_efficacy10_zh_cn_research",
+      "status": "PUBLISHED",
+      "visibility": "PUBLIC",
+      "instrumentVersion": "1.0.0",
+      "definitionHash": "99c88b01aa596875b10b95a65aa43dc10c4c3ad73bdffdf0546e21d327b7ff2c",
+      "instruction": "请根据你目前通常的情况，而不是希望将来成为的样子，判断下面各句话与你的实际情况有多符合。",
+      "measurementReleaseId": "0731bed6-5557-4dcd-9fab-45cf451fba83"
+    }
+  ],
+  "axes": [
+    {
+      "scale_id": "0120f618-0da3-4b9b-8774-9b6ebece5217",
+      "axis_hash": "5c4b8ccc9ff8d9c5847471de0a4fd35cfd474e7d2141400f3d042180d4ee1590",
+      "source_hash": "b04261c5a8e4ec59b108901e05c55e09ec1ba18ba44c99b829a9df58b97d2c32"
+    }
+  ],
+  "publicationAudits": [
+    {
+      "id": "7acdf213-1f30-46e3-aa47-bf80ab738b08",
+      "scaleId": "0120f618-0da3-4b9b-8774-9b6ebece5217",
+      "actorUserId": "b0897100-8587-4287-b3bc-c8b9169d6478",
+      "proofHash": "95708acb4a1c6c3b338c6125a2901d67d3b055819d2e3001b24bdc4bf0f7ed10"
+    }
+  ],
+  "assessments": [
+    {
+      "id": "2dcef2bb-0c80-4ddd-abfa-1de768a6dcba",
+      "status": "COMPLETED",
+      "compositeAttemptId": "45ec3127-256d-4f24-b9d7-8377e845274a",
+      "scaleCode": "ipip_neo_c1_self_efficacy10_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "epoch": 1,
+      "submissionId": "3aadf3e2-7b73-499c-b0e7-8fee33f3e51f",
+      "completedAt": "2026-10-28T02:30:21.752Z",
+      "resultDecryptError": false,
+      "result": {
+        "method": {
+          "scaleId": "0120f618-0da3-4b9b-8774-9b6ebece5217",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.1",
+          "definitionHash": "99c88b01aa596875b10b95a65aa43dc10c4c3ad73bdffdf0546e21d327b7ff2c",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "scores": [
+          {
+            "key": "ipip_neo_c1_self_efficacy10",
+            "type": "total",
+            "label": "一般任务自我效能感",
+            "description": "一般任务自我效能感的自述；较高分表示相关信心更强，不代表客观能力或道德价值更高。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "value": 30,
+            "range": {
+              "min": 10,
+              "max": 50
+            },
+            "expectedItems": [
+              "IPIP_NEO_C1_SELF_EFFICACY10_01",
+              "IPIP_NEO_C1_SELF_EFFICACY10_02",
+              "IPIP_NEO_C1_SELF_EFFICACY10_03",
+              "IPIP_NEO_C1_SELF_EFFICACY10_04",
+              "IPIP_NEO_C1_SELF_EFFICACY10_05",
+              "IPIP_NEO_C1_SELF_EFFICACY10_06",
+              "IPIP_NEO_C1_SELF_EFFICACY10_07",
+              "IPIP_NEO_C1_SELF_EFFICACY10_08",
+              "IPIP_NEO_C1_SELF_EFFICACY10_09",
+              "IPIP_NEO_C1_SELF_EFFICACY10_10"
+            ],
+            "answeredItems": [
+              "IPIP_NEO_C1_SELF_EFFICACY10_01",
+              "IPIP_NEO_C1_SELF_EFFICACY10_02",
+              "IPIP_NEO_C1_SELF_EFFICACY10_03",
+              "IPIP_NEO_C1_SELF_EFFICACY10_04",
+              "IPIP_NEO_C1_SELF_EFFICACY10_05",
+              "IPIP_NEO_C1_SELF_EFFICACY10_06",
+              "IPIP_NEO_C1_SELF_EFFICACY10_07",
+              "IPIP_NEO_C1_SELF_EFFICACY10_08",
+              "IPIP_NEO_C1_SELF_EFFICACY10_09",
+              "IPIP_NEO_C1_SELF_EFFICACY10_10"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "ipip_neo_c1_self_efficacy10",
+            "headline": "任务自我效能：遇到事情时，你有多少把握",
+            "label": null,
+            "interpretation": "这一项关注你对完成任务、判断情况和寻找办法的信心。分数越高，表示这次更认可“我能处理好”的描述。开始一件熟悉的事和面对全新任务时，把握可能不同。信心与实际能力有关，但并不相等；这个分数也不评价个人价值。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回想最近一次有把握完成的任务：信心来自经验、充分准备，还是知道可以向谁求助？"
+              },
+              {
+                "category": "strategy",
+                "text": "把一件想做的事拆出一个能开始的小步骤，并写下可能用到的信息或支持。做完后记录具体做法，给下一次留下可参考的经验。"
+              }
+            ],
+            "limitations": [
+              "这份中文研究译稿仍待专家审校和适用人群验证，目前只供成人研究和自我了解。",
+              "目前没有可靠依据划分高低或排名；信心不等于实际能力，也不代表个人价值。",
+              "这是IPIP的一项独立工具，并非完整人格评估；不能借用其他自我效能量表的分界。原英文研究的数据不能证明本中文版本已经验证。",
+              "10题都需完整回答；漏答不当作零分，也不代填。不用于诊断、学生筛选或教师考核。"
+            ],
+            "referenceVersion": null
+          }
+        ]
+      },
+      "frozenInstruction": {
+        "text": "请根据你目前通常的情况，而不是希望将来成为的样子，判断下面各句话与你的实际情况有多符合。",
+        "language": "zh-CN",
+        "version": "1.0.0",
+        "origin": "INSTRUMENT_SOURCE"
+      },
+      "frozenInstructionEqualsExactSource": true
+    }
+  ],
+  "parents": [
+    {
+      "id": "45ec3127-256d-4f24-b9d7-8377e845274a",
+      "compositeAssessmentId": "5fdd2f20-f1ba-47ce-9573-dd812bca81c7",
+      "status": "COMPLETED",
+      "attemptEpoch": 1,
+      "userId": "b0249c6f-9a06-41fd-8f7c-0f00d6bc7f2d",
+      "completedAt": "2026-10-28T02:30:21.752Z"
+    }
+  ],
+  "executions": [
+    {
+      "id": "ddaf0f08-751c-4938-a4a5-b00ae31381be",
+      "status": "ASSIGNED",
+      "runtime_binding_ref": null,
+      "run_id": "06abbbfa-85e8-4163-924d-a7a0d31594ab"
+    },
+    {
+      "id": "f3905f32-02f7-408a-abb8-1d2bf95b6997",
+      "status": "ASSIGNED",
+      "runtime_binding_ref": null,
+      "run_id": "1c1905a1-3c1e-4825-8474-eb00efedb2e3"
+    }
+  ],
+  "surveyAttempts": [
+    {
+      "id": "43f747ee-770e-4df6-a18d-2794f70bfac0",
+      "status": "COMPLETED",
+      "waveId": "cb558b55-e311-462a-a1cd-61dd26cc3f05",
+      "completedAt": "2026-10-28T02:38:35.725Z"
+    },
+    {
+      "id": "760ccac9-0011-4c5a-bd4d-9e58288762cb",
+      "status": "STARTED",
+      "waveId": "cb558b55-e311-462a-a1cd-61dd26cc3f05",
+      "completedAt": null
+    }
+  ],
+  "finals": [
+    {
+      "id": "1d405859-4eec-4260-9367-c53fdc90ea7d",
+      "attemptId": "43f747ee-770e-4df6-a18d-2794f70bfac0",
+      "waveId": "cb558b55-e311-462a-a1cd-61dd26cc3f05",
+      "completedAt": "2026-10-28T02:38:35.725Z"
+    }
+  ],
+  "surveyReports": [
+    {
+      "finalId": "1d405859-4eec-4260-9367-c53fdc90ea7d",
+      "stored": {
+        "accessAudience": "researcher",
+        "intendedAudience": "researcher",
+        "sourceFinalHash": "1b62ce23ba593b1da34b6bddd5740d24bd6dc7e77e6a3bbf3111e71c58cbf5a7",
+        "contentBindingHash": "598a4edaf19e0fa561d08b0a214c468a0f92a3a787ab33734c50ad2d603f9136",
+        "reportRelease": {
+          "releaseId": "085fc66d-469b-4581-b80f-0f992fd30849",
+          "contentHash": "0243b5e2c8aaaa4a141197491ee540de8458494630e87485a1bd8127218d7272"
+        },
+        "interpretationSemantics": "SAVED_AT_FINAL_NO_RECALCULATION",
+        "lifecycleNotices": [],
+        "report": {
+          "generatorVersion": "DECLARATIVE_REPORT_V1",
+          "title": "一般任务自我效能感（IPIP-NEO C1 中文研究译稿）",
+          "blocks": [
+            {
+              "type": "METRIC",
+              "metricKey": "ipip_neo_c1_self_efficacy10",
+              "label": "一般任务自我效能感",
+              "display": "RAW",
+              "unit": "points",
+              "value": 30,
+              "status": "INTERPRETABLE"
+            },
+            {
+              "type": "TEXT",
+              "text": "任务自我效能：遇到事情时，你有多少把握\n这一项关注你对完成任务、判断情况和寻找办法的信心。分数越高，表示这次更认可“我能处理好”的描述。开始一件熟悉的事和面对全新任务时，把握可能不同。信心与实际能力有关，但并不相等；这个分数也不评价个人价值。"
+            },
+            {
+              "type": "TEXT",
+              "text": "回想最近一次有把握完成的任务：信心来自经验、充分准备，还是知道可以向谁求助？"
+            },
+            {
+              "type": "TEXT",
+              "text": "把一件想做的事拆出一个能开始的小步骤，并写下可能用到的信息或支持。做完后记录具体做法，给下一次留下可参考的经验。"
+            }
+          ],
+          "limitations": [
+            "这份中文研究译稿仍待专家审校和适用人群验证，目前只供成人研究和自我了解。",
+            "目前没有可靠依据划分高低或排名；信心不等于实际能力，也不代表个人价值。",
+            "这是IPIP的一项独立工具，并非完整人格评估；不能借用其他自我效能量表的分界。原英文研究的数据不能证明本中文版本已经验证。",
+            "10题都需完整回答；漏答不当作零分，也不代填。不用于诊断、学生筛选或教师考核。"
+          ],
+          "disclaimer": "仅供成人研究与描述性自我了解，不用于心理诊断、高风险选拔或个人价值判定。本工具是独立IPIP-NEO C1表征，非完整NEO人格评估。"
+        }
+      }
+    }
+  ],
+  "limits": [
+    "Registered education target report identities accepted at publication were rejected at start; no fake COMPLETED attempt is inserted.",
+    "First Survey synthetic participant remains IN_PROGRESS after harness lost volatile session; only second real UI participant final is completed.",
+    "No production or real persons."
+  ]
+}

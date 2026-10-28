@@ -1,0 +1,56 @@
+{
+  "scope": "Read-only exact Teacher continuation and original-R audience; old Training/Survey checks not rerun",
+  "observedAt": "2026-10-28T02:45:14.435Z",
+  "database": "eduk12_system_b3e9809fe6",
+  "parents": [
+    {
+      "id": "7738fbf3-bbff-4662-a537-0d1ce3a48f37",
+      "status": "IN_PROGRESS",
+      "subjectUserId": "39029578-0fe6-4d60-9dc0-91d26b0950ae",
+      "respondentUserId": "39029578-0fe6-4d60-9dc0-91d26b0950ae",
+      "respondentType": "TEACHER",
+      "attemptEpoch": 1,
+      "completedAt": null
+    }
+  ],
+  "children": [
+    {
+      "id": "8d6899de-da86-4c6e-b24c-1e86d0bc73e2",
+      "status": "IN_PROGRESS",
+      "respondentType": "TEACHER",
+      "subjectUserId": "39029578-0fe6-4d60-9dc0-91d26b0950ae",
+      "respondentUserId": "39029578-0fe6-4d60-9dc0-91d26b0950ae",
+      "frozenApplicability": {
+        "schemaVersion": 1,
+        "policyVersion": "ipip_neo_c1_self_efficacy10-zh-cn-research-1.0.0",
+        "respondentTypes": [
+          "SELF"
+        ],
+        "requiredContextKeys": []
+      },
+      "frozenInstruction": {
+        "text": "请根据你目前通常的情况，而不是希望将来成为的样子，判断下面各句话与你的实际情况有多符合。",
+        "language": "zh-CN",
+        "version": "1.0.0",
+        "origin": "INSTRUMENT_SOURCE"
+      },
+      "interpretation": "Exact same person but persisted TEACHER, selected frozen source permits SELF only; do not broaden source to bypass"
+    }
+  ],
+  "executions": [
+    {
+      "id": "166772e6-31b1-4445-af37-c2cb5d0835d4",
+      "status": "STARTED",
+      "runtime_binding_ref": "7738fbf3-bbff-4662-a537-0d1ce3a48f37",
+      "run_id": "22faba7e-9fe7-4522-8b54-c10a0e302209"
+    }
+  ],
+  "originalReport": {
+    "releaseId": "194380c0-f2f0-47cf-aa50-24e029224828",
+    "key": "standard-combination-report:5a2c5b49-29b3-4a10-ba29-f5c68ca07101",
+    "version": "da584438487e1e0800694b62f15ffb688110cee5371ecb82abfa4623bf4c7b92",
+    "contentHash": "bde43020971a8444e0ca90b8bb9d2ecae8cae5470271552066bb803f16752128",
+    "audience": "teacher"
+  },
+  "schoolReportContract": "assessment-resource.service.ts requires student audience for SCHOOL; original standard-combination derived report is teacher audience; accepting a fresh scoped report at publication then rejecting it at runtime is inconsistent."
+}

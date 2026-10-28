@@ -1,0 +1,120 @@
+{
+  "kind": "POST_RUN_INDEX_OF_RETAINED_ORIGINALS_NOT_NEW_EXECUTIONS",
+  "originalRawTimestamps": "UTC; browser rendered UTC; user-facing dates use Asia/Tokyo",
+  "observedOuterExits": [
+    {
+      "label": "schema-create-and-migrate",
+      "outerExitCode": 0,
+      "receiptOrReport": "evidence/database-setup.json",
+      "pathResolution": "If gzip transported, use transport.json originalPath mapping"
+    },
+    {
+      "label": "start-local-apps",
+      "outerExitCode": 0,
+      "receiptOrReport": null,
+      "pathResolution": "If gzip transported, use transport.json originalPath mapping"
+    },
+    {
+      "label": "prepare",
+      "outerExitCode": 0,
+      "receiptOrReport": "evidence/prepare-receipt.json",
+      "pathResolution": "If gzip transported, use transport.json originalPath mapping"
+    },
+    {
+      "label": "education-continue",
+      "outerExitCode": 0,
+      "receiptOrReport": "evidence/education-continue-receipt.json",
+      "pathResolution": "If gzip transported, use transport.json originalPath mapping"
+    },
+    {
+      "label": "browser-login",
+      "outerExitCode": 1,
+      "receiptOrReport": "evidence/browser-login.json",
+      "pathResolution": "If gzip transported, use transport.json originalPath mapping"
+    },
+    {
+      "label": "assignment",
+      "outerExitCode": 1,
+      "receiptOrReport": "evidence/assignment-receipt.json",
+      "pathResolution": "If gzip transported, use transport.json originalPath mapping"
+    },
+    {
+      "label": "training-flow",
+      "outerExitCode": 1,
+      "receiptOrReport": "evidence/training-flow.json",
+      "pathResolution": "If gzip transported, use transport.json originalPath mapping"
+    },
+    {
+      "label": "restart-own-api-with-campus-config-and-school-continuation",
+      "outerExitCode": 0,
+      "receiptOrReport": "evidence/school-assignment-continue-receipt.json",
+      "pathResolution": "If gzip transported, use transport.json originalPath mapping"
+    },
+    {
+      "label": "training-flow-finish",
+      "outerExitCode": 1,
+      "receiptOrReport": "evidence/training-flow-finish.json",
+      "pathResolution": "If gzip transported, use transport.json originalPath mapping"
+    },
+    {
+      "label": "survey-prepare",
+      "outerExitCode": 0,
+      "receiptOrReport": "evidence/survey-prepare-receipt.json",
+      "pathResolution": "If gzip transported, use transport.json originalPath mapping"
+    },
+    {
+      "label": "four-flow",
+      "outerExitCode": 1,
+      "receiptOrReport": "evidence/four-flow.json",
+      "pathResolution": "If gzip transported, use transport.json originalPath mapping"
+    },
+    {
+      "label": "survey-flow-finish",
+      "outerExitCode": 0,
+      "receiptOrReport": "evidence/survey-flow-finish.json",
+      "pathResolution": "If gzip transported, use transport.json originalPath mapping"
+    },
+    {
+      "label": "readback",
+      "outerExitCode": 1,
+      "receiptOrReport": "evidence/readback-receipt.json",
+      "pathResolution": "If gzip transported, use transport.json originalPath mapping"
+    },
+    {
+      "label": "readback-retry",
+      "outerExitCode": 0,
+      "receiptOrReport": "evidence/readback-retry-receipt.json",
+      "pathResolution": "If gzip transported, use transport.json originalPath mapping"
+    },
+    {
+      "label": "teacher-exact",
+      "outerExitCode": 0,
+      "receiptOrReport": "evidence/teacher-exact-receipt.json",
+      "pathResolution": "If gzip transported, use transport.json originalPath mapping"
+    },
+    {
+      "label": "teacher-exact-flow",
+      "outerExitCode": 1,
+      "receiptOrReport": "evidence/teacher-exact-flow.json",
+      "pathResolution": "If gzip transported, use transport.json originalPath mapping"
+    },
+    {
+      "label": "training-contrast",
+      "outerExitCode": 0,
+      "receiptOrReport": "evidence/training-contrast.json",
+      "pathResolution": "If gzip transported, use transport.json originalPath mapping"
+    },
+    {
+      "label": "teacher-final-readback",
+      "outerExitCode": 0,
+      "receiptOrReport": "evidence/teacher-final-readback-receipt.json",
+      "pathResolution": "If gzip transported, use transport.json originalPath mapping"
+    }
+  ],
+  "limits": [
+    "Outer exits transcribed from actual exec/write_stdin completions; not signed historical attestation. Do not infer successful command from internal completed=true.",
+    "TypeScript API runners recorded source/tool hashes and pre/post source snapshots; browser invocations did not record complete contemporaneous dependency bytes or pre/post manifests. Fixed front/back Git sources and retained actual harness identify their inputs.",
+    "One browser helper used check() against auto-advancing radios, losing its original volatile unlinked credential; that synthetic attempt remains STARTED. Corrected click() invocation creates one other synthetic participant with ten observed selections and one actual final.",
+    "Management setup used real business functions with synthetic fixture principals and direct local fixture bootstrap grants. It does not prove browser system-admin WebAuthn/MFA or every management screen. Researcher TOTP and participant/education/Training UI authentication were real."
+  ]
+}

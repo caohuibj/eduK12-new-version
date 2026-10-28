@@ -1,0 +1,19 @@
+{
+  "observedAt": "2026-10-28T02:46:02.899855+00:00",
+  "applicationProcesses": [
+    {
+      "name": "api",
+      "result": "OWN_GROUP_STOPPED",
+      "signal": "SIGTERM"
+    },
+    {
+      "name": "frontend",
+      "result": "OWN_GROUP_STOPPED",
+      "signal": "SIGTERM"
+    }
+  ],
+  "database": "RETAINED_SYNTHETIC_AUDIT",
+  "redis": "shared local container retained, no flush",
+  "browser": "each harness closes its own browser in finally",
+  "production": "NOT_ACCESSED"
+}

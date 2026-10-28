@@ -1,0 +1,332 @@
+{
+  "scope": "Correct Teacher source selection only: immutable original approved combination R, no custom target report, no previous frozen resource overwrite. Earlier invalid accepted target remains preserved.",
+  "startedAt": "2026-10-28T02:42:03.542Z",
+  "stages": [
+    {
+      "name": "issue-exact-original-C-and-R-distribution",
+      "outcome": "RESOLVED",
+      "result": {
+        "grantId": "2749397e-8bd9-4b54-bf49-97f326cc913b",
+        "version": 1,
+        "changed": true
+      }
+    },
+    {
+      "name": "prepare-fresh-exact-R-resource",
+      "outcome": "RESOLVED",
+      "result": {
+        "resourceId": "3824d310-78d1-45c7-b4da-c036fdd0441e",
+        "product": "TEACHER",
+        "organizationId": "f2085294-ee09-41eb-a8c0-011854a0b6f6",
+        "family": "BUNDLE",
+        "sourceCompositeId": "5fdd2f20-f1ba-47ce-9573-dd812bca81c7",
+        "runtimeCompositeId": "6b747abd-0d97-4430-a3d0-d4a1710d699a",
+        "preparationHash": "b126ea09f0c68b757d200d3491a042171414032b5eb1f9a7d8723f957b0175b9",
+        "title": "合成C1精确原R · TEACHER",
+        "licenses": [
+          {
+            "resourceId": "5fdd2f20-f1ba-47ce-9573-dd812bca81c7",
+            "grantId": "2749397e-8bd9-4b54-bf49-97f326cc913b"
+          },
+          {
+            "resourceId": "d221e4f2-70c2-447e-9912-dcc08e8a20bd",
+            "grantId": "2749397e-8bd9-4b54-bf49-97f326cc913b"
+          }
+        ],
+        "created": true,
+        "units": [
+          {
+            "itemId": "dec52d24-5bb3-44fd-b719-ca6fe9ba346c",
+            "family": "SCALE",
+            "measurement": {
+              "releaseId": "d221e4f2-70c2-447e-9912-dcc08e8a20bd",
+              "contentHash": "e1fff29249e3264fc133122321d7403d6920587f4cd4cb8e3c7002243b882ab2",
+              "measurementHash": "87379a92bd916b30a5f2f32f8ad716b6d0430fabd43909a602a0061e51e56f31"
+            }
+          }
+        ],
+        "canPublish": false
+      }
+    },
+    {
+      "name": "register-original-R",
+      "outcome": "RESOLVED",
+      "result": {
+        "resourceId": "3824d310-78d1-45c7-b4da-c036fdd0441e",
+        "resourceKey": "education-assessment:TEACHER:f2085294-ee09-41eb-a8c0-011854a0b6f6:3824d310-78d1-45c7-b4da-c036fdd0441e",
+        "version": "1.0.0",
+        "status": "DRAFT",
+        "entryHash": "2048bf9cc56868e6a8572288b75c0aa984219b791209904938a60eb26d55a9b8",
+        "entry": {
+          "title": "合成C1精确原R · TEACHER",
+          "description": null,
+          "releaseStatus": "DRAFT",
+          "scienceMaturity": "PILOT",
+          "applicability": {
+            "schemaVersion": 1,
+            "resourceKind": "BUNDLE",
+            "resourceKey": "education-assessment:TEACHER:f2085294-ee09-41eb-a8c0-011854a0b6f6:3824d310-78d1-45c7-b4da-c036fdd0441e",
+            "resourceVersion": "1.0.0",
+            "subjectRoles": [
+              "TEACHER"
+            ],
+            "respondentRoles": [
+              "TEACHER"
+            ],
+            "relationshipKinds": [
+              "SELF"
+            ],
+            "perspectives": [
+              "SELF_REPORT"
+            ],
+            "analysisMode": "INDIVIDUAL_ONLY",
+            "visibilityPolicyKey": "synthetic-original-R-respondent-only",
+            "minimumRespondents": null
+          },
+          "initiationModes": [
+            "ORG_ASSIGN",
+            "CLASS_ASSIGN"
+          ],
+          "subjectReportMode": "NONE",
+          "resultDisclosure": {
+            "schemaVersion": 1,
+            "policyKey": "synthetic-original-R-respondent-only",
+            "minimumRespondents": null,
+            "audiences": {
+              "RESPONDENT": {
+                "mode": "INDIVIDUAL_SUMMARY",
+                "metricKeys": [
+                  "ipip_neo_c1_self_efficacy10"
+                ],
+                "longitudinalMetricKeys": []
+              },
+              "SUBJECT": {
+                "mode": "NONE",
+                "metricKeys": [],
+                "longitudinalMetricKeys": []
+              },
+              "TEACHER": {
+                "mode": "NONE",
+                "metricKeys": [],
+                "longitudinalMetricKeys": []
+              },
+              "PARENT": {
+                "mode": "NONE",
+                "metricKeys": [],
+                "longitudinalMetricKeys": []
+              },
+              "PROFESSIONAL": {
+                "mode": "NONE",
+                "metricKeys": [],
+                "longitudinalMetricKeys": []
+              },
+              "ORGANIZATION": {
+                "mode": "NONE",
+                "metricKeys": [],
+                "longitudinalMetricKeys": []
+              },
+              "RESEARCH": {
+                "mode": "NONE",
+                "metricKeys": [],
+                "longitudinalMetricKeys": []
+              }
+            }
+          },
+          "cohortAnalysisPolicy": null,
+          "launchTarget": {
+            "runtime": "COMPOSITE",
+            "compositeAssessmentId": "6b747abd-0d97-4430-a3d0-d4a1710d699a"
+          },
+          "educationOrigin": {
+            "schemaVersion": 1,
+            "adapterVersion": "1.0.0",
+            "resourceId": "3824d310-78d1-45c7-b4da-c036fdd0441e",
+            "product": "TEACHER",
+            "organizationId": "f2085294-ee09-41eb-a8c0-011854a0b6f6",
+            "family": "BUNDLE",
+            "sourceCompositeId": "5fdd2f20-f1ba-47ce-9573-dd812bca81c7",
+            "runtimeCompositeId": "6b747abd-0d97-4430-a3d0-d4a1710d699a",
+            "sourceSnapshotHash": "b26a4f0cd34a3d26cd4bb52f8a77d214839fd25c8115ab4cb0ac2886827ec077",
+            "runtimeSnapshotHash": "c42f60c3c3a895e976af6f4a147f61d22ea607048619a3efc99516b000747fbe",
+            "runtimeDefinitionHash": "712947275913a88c23cf6ed166c714f102cebcccfccdfbb23b97ab519a7cedd0",
+            "distribution": {
+              "actorId": "ee5847e7-a2d8-4f7c-881b-943c323e5c46",
+              "grants": [
+                {
+                  "resourceId": "194380c0-f2f0-47cf-aa50-24e029224828",
+                  "grantId": "2749397e-8bd9-4b54-bf49-97f326cc913b",
+                  "version": 1
+                },
+                {
+                  "resourceId": "5fdd2f20-f1ba-47ce-9573-dd812bca81c7",
+                  "grantId": "2749397e-8bd9-4b54-bf49-97f326cc913b",
+                  "version": 1
+                },
+                {
+                  "resourceId": "d221e4f2-70c2-447e-9912-dcc08e8a20bd",
+                  "grantId": "2749397e-8bd9-4b54-bf49-97f326cc913b",
+                  "version": 1
+                }
+              ]
+            },
+            "feedbackPolicy": {
+              "schemaVersion": 1,
+              "mode": "IMMEDIATE"
+            },
+            "units": [
+              {
+                "itemId": "dec52d24-5bb3-44fd-b719-ca6fe9ba346c",
+                "family": "SCALE",
+                "measurement": {
+                  "releaseId": "d221e4f2-70c2-447e-9912-dcc08e8a20bd",
+                  "contentHash": "e1fff29249e3264fc133122321d7403d6920587f4cd4cb8e3c7002243b882ab2",
+                  "measurementHash": "87379a92bd916b30a5f2f32f8ad716b6d0430fabd43909a602a0061e51e56f31"
+                },
+                "references": [],
+                "report": {
+                  "releaseId": "194380c0-f2f0-47cf-aa50-24e029224828",
+                  "contentHash": "bde43020971a8444e0ca90b8bb9d2ecae8cae5470271552066bb803f16752128"
+                }
+              }
+            ]
+          },
+          "educationOriginHash": "f25340633ab104a2820ee5264d1222be8859ce01fc7cc27e578eacfeee063421"
+        }
+      }
+    },
+    {
+      "name": "independent-review-original-R",
+      "outcome": "RESOLVED",
+      "result": {
+        "resourceId": "3824d310-78d1-45c7-b4da-c036fdd0441e",
+        "resourceKey": "education-assessment:TEACHER:f2085294-ee09-41eb-a8c0-011854a0b6f6:3824d310-78d1-45c7-b4da-c036fdd0441e",
+        "version": "1.0.0",
+        "status": "REVIEWED",
+        "entryHash": "2048bf9cc56868e6a8572288b75c0aa984219b791209904938a60eb26d55a9b8"
+      }
+    },
+    {
+      "name": "publish-original-R",
+      "outcome": "RESOLVED",
+      "result": {
+        "resourceId": "3824d310-78d1-45c7-b4da-c036fdd0441e",
+        "resourceKey": "education-assessment:TEACHER:f2085294-ee09-41eb-a8c0-011854a0b6f6:3824d310-78d1-45c7-b4da-c036fdd0441e",
+        "version": "1.0.0",
+        "status": "PUBLISHED",
+        "entryHash": "0484d82266e5354418098a6190f11b0098680cec33b82942d0419db2b43bf576"
+      }
+    },
+    {
+      "name": "exact-R-event",
+      "outcome": "RESOLVED",
+      "result": {
+        "id": "930acf1d-1742-4519-b9fb-12e7b30aebfa",
+        "organizationId": "f2085294-ee09-41eb-a8c0-011854a0b6f6",
+        "targetId": "36392534-8bfc-49fe-a09c-5b87cac10efa",
+        "kind": "ASSESSMENT",
+        "title": "C1精确原R系统验收",
+        "notes": null,
+        "status": "DRAFT",
+        "version": 1,
+        "scheduledAt": null,
+        "openedAt": null,
+        "closedAt": null,
+        "createdByUserId": "ee5847e7-a2d8-4f7c-881b-943c323e5c46",
+        "createdAt": "2026-10-28T02:42:05.615Z",
+        "updatedAt": "2026-10-28T02:42:05.615Z"
+      }
+    },
+    {
+      "name": "exact-R-run-draft",
+      "outcome": "RESOLVED",
+      "result": {
+        "eventId": "930acf1d-1742-4519-b9fb-12e7b30aebfa",
+        "runId": "22faba7e-9fe7-4522-8b54-c10a0e302209",
+        "status": "DRAFT",
+        "version": 1
+      }
+    },
+    {
+      "name": "exact-R-add-track",
+      "outcome": "RESOLVED",
+      "result": {
+        "id": "37f45556-0a5a-4a5e-ac12-f026b8c16ef6",
+        "organizationId": "f2085294-ee09-41eb-a8c0-011854a0b6f6",
+        "runId": "22faba7e-9fe7-4522-8b54-c10a0e302209",
+        "resourceFamily": "BUNDLE",
+        "resourceKey": "education-assessment:TEACHER:f2085294-ee09-41eb-a8c0-011854a0b6f6:3824d310-78d1-45c7-b4da-c036fdd0441e",
+        "resourceVersion": "1.0.0",
+        "subjectSelector": {
+          "kind": "MEMBERSHIP_IDS",
+          "membershipIds": [
+            "ad95d355-7049-4106-a85f-ac411ac143b0"
+          ]
+        },
+        "respondentSelector": {
+          "kind": "MEMBERSHIP_IDS",
+          "membershipIds": [
+            "ad95d355-7049-4106-a85f-ac411ac143b0"
+          ]
+        },
+        "requestedPolicy": {
+          "analysisMode": "INDIVIDUAL_ONLY",
+          "perspectives": [
+            "SELF_REPORT"
+          ],
+          "subjectRoles": [
+            "TEACHER"
+          ],
+          "respondentRoles": [
+            "TEACHER"
+          ],
+          "relationshipKinds": [
+            "SELF"
+          ],
+          "minimumRespondents": null,
+          "visibilityPolicyKey": "synthetic-original-R-respondent-only"
+        },
+        "frozenResourcePolicy": null,
+        "resourcePolicyHash": null
+      }
+    },
+    {
+      "name": "exact-R-event-open",
+      "outcome": "RESOLVED",
+      "result": {
+        "id": "930acf1d-1742-4519-b9fb-12e7b30aebfa",
+        "status": "OPEN",
+        "version": 2
+      }
+    },
+    {
+      "name": "exact-R-run-publish",
+      "outcome": "RESOLVED",
+      "result": {
+        "runId": "22faba7e-9fe7-4522-8b54-c10a0e302209",
+        "version": 3,
+        "trackCount": 1,
+        "executionCount": 1
+      }
+    }
+  ],
+  "failures": [],
+  "source": {
+    "measurement": {
+      "releaseId": "d221e4f2-70c2-447e-9912-dcc08e8a20bd",
+      "contentHash": "e1fff29249e3264fc133122321d7403d6920587f4cd4cb8e3c7002243b882ab2",
+      "measurementHash": "87379a92bd916b30a5f2f32f8ad716b6d0430fabd43909a602a0061e51e56f31"
+    },
+    "report": {
+      "releaseId": "194380c0-f2f0-47cf-aa50-24e029224828",
+      "contentHash": "bde43020971a8444e0ca90b8bb9d2ecae8cae5470271552066bb803f16752128"
+    },
+    "audience": "teacher",
+    "key": "standard-combination-report:5a2c5b49-29b3-4a10-ba29-f5c68ca07101",
+    "version": "da584438487e1e0800694b62f15ffb688110cee5371ecb82abfa4623bf4c7b92",
+    "scope": {
+      "kind": "PLATFORM",
+      "ownerId": "b0897100-8587-4287-b3bc-c8b9169d6478"
+    }
+  },
+  "endedAt": "2026-10-28T02:42:05.821Z"
+}

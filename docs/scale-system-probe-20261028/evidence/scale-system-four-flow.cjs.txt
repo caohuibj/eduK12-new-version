@@ -1,0 +1,38 @@
+const fs=require('node:fs'),assert=require('node:assert/strict'),{chromium}=require('/workspace/eduK12-new-version/server-version/backend/node_modules/playwright-core')
+const root='/workspace/eduK12-new-version',out=root+'/docs/scale-system-probe-20261028/evidence',pvt=JSON.parse(fs.readFileSync('/tmp/scale-system-accounts.json')),source=JSON.parse(fs.readFileSync(root+'/server-version/backend/src/modules/scale/instruments/ipip_neo_c1_self_efficacy10_zh_cn_research/1.0.0/source.json'))
+const report={startedAt:new Date().toISOString(),scope:'One C1 package: actual existing four-host app, real authentication/assignment/final/report; Training existing completed same attempt read-only; other entries one actual final each',entries:[],api:[],errors:[],completed:false};let browser
+const save=()=>fs.writeFileSync(out+'/four-flow.json',JSON.stringify(report,null,2)+'\n')
+async function shot(page,name){await page.evaluate(()=>document.fonts.ready);await page.screenshot({path:out+'/'+name+'.png',fullPage:true});return {file:name+'.png',viewport:page.viewportSize(),scrollWidth:await page.evaluate(()=>document.documentElement.scrollWidth),text:(await page.locator('body').innerText()).slice(0,20000)}}
+async function fillScale(page,row){
+ await page.getByText(source.executable.definition.items[0].content,{exact:true}).waitFor();row.instruction={sourceText:source.instruction.text,nodes:await page.getByText(source.instruction.text,{exact:true}).count(),bodyContains:(await page.locator('body').innerText()).includes(source.instruction.text)};row.answering=await shot(page,row.product+'-answering-390');save()
+ row.answers=[]
+ for(let i=0;i<10;i++){
+ const prompt=source.executable.definition.items[i].content;await page.getByText(prompt,{exact:true}).waitFor();const radios=page.getByRole('radio',{name:'介于不符合与符合之间',exact:true});if(await radios.count())await radios.first().check();else await page.getByRole('button',{name:'介于不符合与符合之间',exact:true}).click();row.answers.push({item:i+1,value:'3'});save();await page.waitForTimeout(350)
+ if(i<9&&await page.getByText(prompt,{exact:true}).isVisible())await page.getByRole('button',{name:'下一题',exact:true}).click()
+ }
+ const finish=page.getByRole('button',{name:/^(提交整份量表|提交本轮正式回答|完成量表|完成测评)$/});await finish.first().click();row.submittedVia='actual visible UI control';save()
+}
+async function login(page,product,account){const origin='http://'+product+'.localhost:5187';await page.goto(origin+'/login');await page.locator('input[type="password"]:visible').waitFor();await page.locator('input:not([type="password"]):not([type="checkbox"]):not([type="hidden"]):visible').first().fill(account.username);await page.locator('input[type="password"]:visible').fill(account.password);const path='/api/'+(product==='teacher'?'huiteacher':'campus')+'/auth/login';const response=page.waitForResponse(r=>new URL(r.url()).pathname===path&&r.request().method()==='POST');await page.locator('form').getByRole('button',{name:'登录',exact:true}).click();const res=await response;assert.equal(res.status(),200);assert.equal((await res.json()).code,0);await page.getByRole('button',{name:'退出',exact:true}).waitFor()}
+async function main(){browser=await chromium.launch({executablePath:'/usr/bin/chromium',headless:true,args:['--no-sandbox','--disable-dev-shm-usage'],env:{PATH:process.env.PATH,LANG:'C.UTF-8'}});report.browserVersion=browser.version();save()
+for(const product of ['training','teacher','school','survey']){
+ const row={product,outcome:'RUNNING'},context=await browser.newContext({...(product==='training'?{storageState:'/tmp/system-probe-training-state.json'}:{}),viewport:{width:390,height:844},locale:'zh-CN',serviceWorkers:'block'}),page=await context.newPage();page.setDefaultTimeout(15000);report.entries.push(row);save()
+ page.on('pageerror',e=>{report.errors.push({product,message:e.message});save()});page.on('response',r=>{const u=new URL(r.url());if(u.pathname.startsWith('/api'))report.api.push({product,path:u.pathname,method:r.request().method(),status:r.status()})})
+ try{
+ if(product==='training'){
+  await page.goto('http://training.localhost:5187/student/composite/attempts/45ec3127-256d-4f24-b9d7-8377e845274a/report');await page.locator('.scale-score-count').waitFor();row.report=await shot(page,'training-final-report-390');assert.ok(row.report.text.includes('30')&&row.report.text.includes('报告版本 1.0.1'));assert.equal(row.report.scrollWidth,390);await page.setViewportSize({width:820,height:1180});row.tablet=await shot(page,'common-report-820');assert.equal(row.tablet.scrollWidth,820);row.outcome='SAVED_FINAL_REPORT_CONFIRMED';save();continue
+ }
+ if(product==='teacher'){
+  await login(page,product,pvt.accounts.teacher);await page.getByRole('button',{name:'开始测评',exact:true}).waitFor();row.assigned=await shot(page,'teacher-assigned-390');await page.getByRole('button',{name:'开始测评',exact:true}).click();await page.getByRole('button',{name:'开始或继续测评',exact:true}).click();await fillScale(page,row);await page.getByText('本次测评已完成',{exact:true}).waitFor();row.report=await shot(page,'teacher-final-report-390');row.outcome='UI_FINAL_AND_FEEDBACK_VISIBLE'
+ }
+ if(product==='school'){
+  await login(page,product,pvt.accounts.school_enrolled);await page.goto('http://school.localhost:5187/workspace/tasks');await page.getByRole('button',{name:'开始／继续官方测评',exact:true}).waitFor();row.assigned=await shot(page,'school-assigned-390');await page.getByRole('button',{name:'开始／继续官方测评',exact:true}).click();await page.getByRole('button',{name:'开始或继续正式测评',exact:true}).click();await fillScale(page,row);await page.getByText(/已收到正式完成确认/).waitFor();const back=page.getByRole('button',{name:'返回我的校园活动',exact:true});if(await back.count())await back.click();await page.getByRole('button',{name:'查看我的测评反馈',exact:true}).waitFor();await page.getByRole('button',{name:'查看我的测评反馈',exact:true}).click();await page.waitForTimeout(800);row.report=await shot(page,'school-final-report-390');row.outcome='UI_FINAL_AND_FEEDBACK_VISIBLE'
+ }
+ if(product==='survey'){
+  const origin='http://survey.localhost:5187',s=pvt.survey;await page.goto(origin+'/r/'+s.publicId+'#entry='+s.entrySecret);await page.getByRole('checkbox').first().waitFor();await page.getByRole('checkbox').first().check();await page.getByRole('button',{name:'开始填写问卷',exact:true}).click();await fillScale(page,row);await page.getByRole('heading',{name:'感谢参与，问卷已提交'}).waitFor();await page.waitForTimeout(500);row.report=await shot(page,'survey-final-feedback-390');row.outcome='UI_FINAL_AND_EXPLICIT_METRIC_FEEDBACK_VISIBLE'
+ }
+ assert.equal(row.report.scrollWidth,390,product+' report phone overflow');assert.ok(row.report.text.includes('30'),product+' exact saved result visible');save();console.log(product,row.outcome)
+ }catch(e){row.outcome='FAILED';row.failure={name:e.name,message:e.message,url:new URL(page.url()).origin+new URL(page.url()).pathname,text:(await page.locator('body').innerText()).slice(0,7000),buttons:await page.getByRole('button').allTextContents()};save();console.error(product,e.message);process.exitCode=1}
+ finally{await context.storageState({path:'/tmp/system-probe-'+product+'-flow-state.json'});fs.chmodSync('/tmp/system-probe-'+product+'-flow-state.json',0o600);await context.close()}
+}
+report.completed=true;report.endedAt=new Date().toISOString();save()}
+main().catch(e=>{report.fatal={name:e.name,message:e.message};save();console.error(e.message);process.exitCode=1}).finally(async()=>{if(browser)await browser.close();save()})

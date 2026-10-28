@@ -1,0 +1,31 @@
+{
+  "scope": "Read-only measurements of the actually rendered existing completed Training report; no new attempt/submit/scoring",
+  "observedAt": "2026-10-28T02:43:16.436Z",
+  "theme": "dark",
+  "elements": [
+    {
+      "text": "原始范围 10–50",
+      "color": "rgb(167, 178, 165)",
+      "fontSize": "12px",
+      "background": {
+        "color": "rgb(251, 253, 255)",
+        "tag": "ARTICLE",
+        "className": "report-range"
+      },
+      "contrastRatio": 2.1556113787101028
+    },
+    {
+      "text": "30",
+      "color": "rgb(229, 233, 223)",
+      "fontSize": "24px",
+      "background": {
+        "color": "rgb(251, 253, 255)",
+        "tag": "ARTICLE",
+        "className": "report-range"
+      },
+      "contrastRatio": 1.207782045555938
+    }
+  ],
+  "finding": "Dark Training theme assigns pale text while report surfaces remain pale; actual result and headings lack contrast. This is a common theme integration defect, not package wording.",
+  "limits": "Computed sRGB text/surface ratios only; not a general accessibility suite or every UI state."
+}

@@ -1,0 +1,21 @@
+import {createRequire}from'node:module';import{randomUUID}from'node:crypto';import{readFileSync,writeFileSync,chmodSync}from'node:fs'
+const root='/workspace/eduK12-new-version',b=root+'/server-version/backend',out=root+'/docs/scale-system-probe-20261028/evidence',req=createRequire(b+'/package.json'),{prisma:db}=req(b+'/src/config/database.ts'),pvt=JSON.parse(readFileSync('/tmp/scale-system-accounts.json','utf8')),report:any={startedAt:new Date().toISOString(),stages:[],failures:[]}
+const safe=(v:any):any=>Array.isArray(v)?v.map(safe):v&&typeof v==='object'?Object.fromEntries(Object.entries(v).map(([k,x])=>[k,/entrySecret|entryToken|accessCredential|researchUrl|recoveryCode|password|secret/i.test(k)?'REDACTED_PRIVATE_SYNTHETIC_CAPABILITY':safe(x)])):v
+const save=()=>{writeFileSync(out+'/survey-prepare.json',JSON.stringify(report,null,2)+'\n');writeFileSync('/tmp/scale-system-accounts.json',JSON.stringify(pvt,null,2));chmodSync('/tmp/scale-system-accounts.json',0o600)}
+async function step(name:string,fn:()=>Promise<any>){try{const v=await fn();report.stages.push({name,outcome:'RESOLVED',result:safe(v)});save();console.log(name,'RESOLVED');return v}catch(e:any){report.stages.push({name,outcome:'REJECTED',code:e.code,message:e.message});report.failures.push({name,code:e.code,message:e.message,stack:e.stack});save();throw e}}
+async function main(){
+ const cookies=JSON.parse(readFileSync('/tmp/system-probe-survey-state.json','utf8')).cookies,cookie=cookies.map((c:any)=>c.name+'='+c.value).join('; '),csrf=cookies.find((c:any)=>c.name==='huisurvey_research_csrf').value
+ const pid=randomUUID(),owner=pvt.accounts.researcher.id,body={requestId:pid,title:'C1单量表系统验收研究',description:'合成成人技术验证，无真实被试，无科研批准声明',collectionMode:'SINGLE_UNLINKED'}
+ await step('SURVEY-project-create-authenticated-HTTP',async()=>{const r=await fetch('http://127.0.0.1:3107/api/survey/projects',{method:'POST',headers:{Cookie:cookie,'x-csrf-token':csrf,Origin:'http://survey.localhost:5187','Content-Type':'application/json'},body:JSON.stringify(body)}),d:any=await r.json();if(r.status!==200||d.code!==0)throw Error('project HTTP '+r.status+': '+d.message);return d.data})
+ pvt.survey={projectId:pid};save()
+ const grant=await step('SURVEY-exact-entry-admin-use-grant',()=>req(b+'/src/modules/survey/catalog.service.ts').grantCatalogSource(pvt.accounts.survey_admin.id,owner,{kind:'SCALE',sourceId:'survey-standard:'+pvt.combination.releaseId,sourceVersion:pvt.combination.combinationHash}))
+ const draft=await step('SURVEY-import-approved-C1',()=>req(b+'/src/modules/survey/builder.service.ts').importCatalogDraft(owner,pid,grant.id,{requestId:randomUUID(),instrumentKey:'c1systemprobe',title:'一般任务自我效能感 · 系统探针'}))
+ await step('SURVEY-publish-measurement',()=>req(b+'/src/modules/survey/measurement-publication.service.ts').publishSurveyMeasurementDraft(owner,pid,draft.id,draft.revision))
+ const svc=req(b+'/src/modules/survey/waves.service.ts'),pub=req(b+'/src/modules/survey/waves.publish.ts')
+ const wave=await step('SURVEY-wave-create',()=>svc.createWave(owner,pid,{requestId:randomUUID(),title:'C1成人合成验收波次',consentText:'本研究仅为隔离环境中的合成技术验证，不接收真实个人作答，不作诊断或高风险决策。',generalText:'合成系统验证已保存。',instrumentIds:[draft.id],allowNewParticipants:true}))
+ const metric='ipip_neo_c1_self_efficacy10'
+ await step('SURVEY-wave-freeze-with-explicit-self-feedback',()=>pub.prepareWave(owner,pid,wave.id,wave.revision,undefined,[{instrumentId:draft.id,feedback:{policyVersion:'SURVEY_RAW_METRICS_V1',mode:'DESCRIPTIVE',metricKeys:[metric],release:'AFTER_FINAL'}}]))
+ const frozen=await svc.getWave(owner,pid,wave.id),opened=await step('SURVEY-wave-open',()=>pub.openWave(owner,pid,wave.id,frozen.revision))
+ Object.assign(pvt.survey,{waveId:wave.id,draftId:draft.id,publicId:opened.publicId,entrySecret:opened.entrySecret,stage:'OPEN_READY_FOR_REAL_PUBLIC_BROWSER'});report.endedAt=new Date().toISOString();save()
+}
+main().catch(e=>{console.error(e.message);process.exitCode=1}).finally(()=>db.$disconnect())

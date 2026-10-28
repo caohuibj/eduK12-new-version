@@ -1,0 +1,87 @@
+[
+  {
+    "id": "SYS-SCALE-01",
+    "priority": "blocking exact path",
+    "title": "Teacher self-assessment persisted as TEACHER observer type",
+    "observed": "Exact original R removes earlier 500; actual start succeeds then own attempt read returns409 ELIGIBILITY_INELIGIBLE:RESPONDENT_TYPE_NOT_ALLOWED. Same subject/respondent user, frozen source permits SELF. Parent/child IN_PROGRESS, execution STARTED; no final fabricated.",
+    "evidence": [
+      "evidence/teacher-exact-flow.json",
+      "evidence/teacher-final-readback.json"
+    ],
+    "files": [
+      "server-version/backend/src/modules/assessment-run/startAdmission.ts:49",
+      "server-version/backend/src/modules/scale/scale-admission.service.ts:266"
+    ],
+    "minimalProposal": "In respondentTypeFor, derive SELF from a verified SELF assignment with equal subject/respondent identity before treating TEACHER role as observer. Preserve asymmetric teacher/parent observers and frozen historical identity. Shared identity code: coordinate root before mutation; do not add TEACHER to this SELF-only package.",
+    "targetedFollowupOnly": "Same retained Teacher attempt identity must not be rewritten. Verify new correct admission plus an asymmetric observer rejection after root-approved fix, not full four-entry replay."
+  },
+  {
+    "id": "SYS-SCALE-02",
+    "priority": "blocking exact path",
+    "title": "Education publication accepts a target R which exact-standard runtime rejects later",
+    "observed": "Actual School and Teacher target resources register/review/publish with explicit immutable report grants, but real UI START returns500 CONTENT_STANDARD_DERIVED_RELEASE_IDENTITY_MISMATCH. Both first executions remain ASSIGNED/null binding. Original standard R is teacher audience; School selectedContent requires student.",
+    "evidence": [
+      "evidence/education-continuation.json",
+      "evidence/four-flow.json",
+      "evidence/api-campus-config.stderr.log",
+      "evidence/teacher-final-readback.json"
+    ],
+    "files": [
+      "server-version/backend/src/modules/education-tools/assessment-resource.service.ts:174",
+      "server-version/backend/src/modules/composite/training-report-selection.ts:25",
+      "server-version/backend/src/modules/measurement-content/standard-combination-content.ts:13"
+    ],
+    "minimalProposal": "First align publication preflight with exact runtime validation and return a located409 before publishing an unusable resource. Decide explicitly with root whether/how an exact education target R can be derived from the approved original R; keep immutable original identity and existing grants. Do not bypass standard-derived validation, reclassify STANDARD as custom, or rewrite frozen resources.",
+    "targetedFollowupOnly": "Only exact target-R acceptance/rejection and the affected School/Teacher START boundary after approved change; do not repeat completed Training/Survey flow."
+  },
+  {
+    "id": "SYS-SCALE-03",
+    "priority": "visible administration omission",
+    "title": "Per-unit Scale instruction missing in FinalCompositeAssessment",
+    "observed": "Training initial real UI text omits the exact source instruction; authoritative completed child runtime freezes identical instruction. CompositeScale already exposes instruction. Shared SCALE render branch never renders item.scale.instruction. Survey same text is visible.",
+    "evidence": [
+      "evidence/browser-login.json",
+      "evidence/database-readback.json",
+      "evidence/survey-flow-finish.json"
+    ],
+    "files": [
+      "server-version/frontend/src/components/FinalCompositeAssessment.tsx:693",
+      "server-version/frontend/src/modules/composite/types.ts:51"
+    ],
+    "minimalProposal": "Render the already-public frozen item.scale.instruction as a normal multiline note below Scale heading, only if present. No DTO/source/engine change. Shared container touches several products: exact one-branch change for root review, no cognitive logic changes.",
+    "targetedFollowupOnly": "One existing Scale render fixture with instruction and absent instruction; no scoring/installation replay."
+  },
+  {
+    "id": "SYS-SCALE-04",
+    "priority": "report readability",
+    "title": "Training dark theme leaves pale result text on pale cards",
+    "observed": "Actual completed report390 and820 has no horizontal overflow, but numeric30 color rgb229,233,223 on rgb251,253,255 is contrast1.2078. Original range caption contrast2.1556. Visual read confirmed. Earlier neutral component previews did not cover actual Training theme.",
+    "evidence": [
+      "evidence/training-contrast.json",
+      "evidence/training-final-report-390.png",
+      "evidence/common-report-820.png"
+    ],
+    "files": [
+      "server-version/frontend/src/modules/reporting/report-ui.css:128",
+      "server-version/frontend/src/training/training-appearance.css:113"
+    ],
+    "minimalProposal": "Use a coherent text/surface token pair for Scale report cards in Training dark context, scoped to Scale consumer where possible. No numeric/range or chart coordinate change. Shared report/theme code must be coordinated with root.",
+    "targetedFollowupOnly": "Reopen this same completed report in affected dark mode and check result/heading contrast; no new answer or full responsive suite."
+  },
+  {
+    "id": "SYS-SCALE-05",
+    "priority": "participant wording",
+    "title": "Survey feedback uses internal metric key as label",
+    "observed": "Actual final+feedback200 and stored score30; participant sees ipip_neo_c1_self_efficacy10:30(OK) and interpretable. rawParticipantFeedback currently creates label:key despite frozen scoring metadata having a Chinese label.",
+    "evidence": [
+      "evidence/survey-flow-finish.json",
+      "evidence/survey-final-feedback-390.png"
+    ],
+    "files": [
+      "server-version/backend/src/modules/survey/participant-feedback.ts:67",
+      "server-version/frontend/src/survey/SurveyPublicApp.tsx:1318"
+    ],
+    "minimalProposal": "Project an existing authorized saved/frozen metric label for the already-allowlisted score; keep value/status canonical, map display status to plain Chinese in existing UI. No live registry lookup, research-data widening, norms or ranks. Shared projection requires root coordination.",
+    "targetedFollowupOnly": "Selected saved/frozen label projection and current final feedback read; no new Survey participant or full project workflow."
+  }
+]

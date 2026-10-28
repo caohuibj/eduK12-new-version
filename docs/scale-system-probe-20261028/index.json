@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "selectedInstrument": "ipip_neo_c1_self_efficacy10_zh_cn_research:1.0.0",
+  "selectedVersions": {
+    "instrument": "1.0.0",
+    "instruction": "1.0.0",
+    "scoring": "1.0.0",
+    "report": "1.0.1",
+    "localization": "1.0.0",
+    "reference": "none"
+  },
+  "backendSourceHead": "4db7fdff3624e4e7d7fbc784d360d013c48d29fe",
+  "frontendSourceHead": "fccc98c43ba42947052875f5cbbe5caf359e3de6",
+  "frontendMode": "Actual Vite app from existing detached PR367 source with actual API proxy, not component mock or deployable build",
+  "database": "eduk12_system_b3e9809fe6",
+  "redisLogicalDatabase": 9,
+  "production": "NOT_ACCESSED",
+  "executions": "execution-index.json",
+  "artifacts": "artifacts.json",
+  "transport": "transport.json",
+  "redactions": "redactions.json",
+  "findings": "findings.json",
+  "entries": {
+    "TRAINING": {
+      "state": "REAL_FINAL_AND_REPORT_READ",
+      "canonicalAssessmentId": "2dcef2bb-0c80-4ddd-abfa-1de768a6dcba",
+      "parentAttemptId": "45ec3127-256d-4f24-b9d7-8377e845274a",
+      "score": 30,
+      "reportVersion": "1.0.1",
+      "counts": "10/10",
+      "issues": [
+        "SYS-SCALE-03",
+        "SYS-SCALE-04"
+      ]
+    },
+    "SURVEY": {
+      "state": "REAL_FINAL_AND_AUTHORIZED_FEEDBACK_READ",
+      "finalId": "1d405859-4eec-4260-9367-c53fdc90ea7d",
+      "attemptId": "43f747ee-770e-4df6-a18d-2794f70bfac0",
+      "score": 30,
+      "savedResearchReportRead": true,
+      "issues": [
+        "SYS-SCALE-05"
+      ],
+      "retainedEarlierSyntheticAttempt": "760ccac9-0011-4c5a-bd4d-9e58288762cb remains STARTED after helper lost volatile credentials, no final"
+    },
+    "SCHOOL": {
+      "state": "ASSIGNED_START500",
+      "executionId": "f3905f32-02f7-408a-abb8-1d2bf95b6997",
+      "runtimeBinding": null,
+      "final": "NOTRUN_BLOCKED",
+      "reportRendering": "NOTRUN_BLOCKED",
+      "issues": [
+        "SYS-SCALE-02"
+      ]
+    },
+    "TEACHER": {
+      "initialTargetReportPath": "ASSIGNED_START500 SYS-SCALE-02",
+      "correctOriginalReportPath": "START200 then OWN_ATTEMPT_READ409 SYS-SCALE-01",
+      "executionId": "166772e6-31b1-4445-af37-c2cb5d0835d4",
+      "parentAttemptId": "7738fbf3-bbff-4662-a537-0d1ce3a48f37",
+      "final": "NOTRUN_BLOCKED",
+      "reportRendering": "NOTRUN_BLOCKED",
+      "issues": [
+        "SYS-SCALE-01",
+        "SYS-SCALE-02"
+      ]
+    }
+  },
+  "manualStates": "CANDIDATE/PILOT, original localization/expert PENDING and no scientificReview preserved",
+  "changedProductSourceFiles": [],
+  "rootCoordination": "All five proposed minimal changes remain unapplied; exact shared paths listed in findings.json. No source applicability or report identity protections weakened.",
+  "cleanup": "evidence/cleanup.json",
+  "notRun": [
+    "CI/Ready/merge/deploy/production writes",
+    "Full package/platform suites, build, tsc, SAST",
+    "Other scales/four cognitive tasks",
+    "Successful School/Teacher final/report or browser system-admin strong-auth flow"
+  ],
+  "evidenceMeaning": "Single system probe authorized after ordinary per-package repeated display/entry testing was removed. Not a new admission requirement for each scale."
+}
