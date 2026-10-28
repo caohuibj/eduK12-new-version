@@ -1,5 +1,7 @@
 # 第3批：补齐真实运行、报告与原件链路
 
+> 当前继续进展见 [滚动补全队列](../parallel-review/README.md)。下文c0efd源码冻结是该批历史快照，后续修复独立列证据；GradCPT高刷新记录存在实际传输超限，正在修复，不能当作科研版全链路已完成。
+
 已完成9个既有候选的产品接线：8个同类任务＋用户确认几何后的 ANT。
 沿用原任务、scorer、public projector、FinalDraftStore、FINAL、DB及私有资产归档；
 没有重建任务或另造引擎。源码基线为 `fe9afe7ca`，当前业务源码冻结于
@@ -62,7 +64,7 @@
 
 ## 留给root的真实剩余项
 
-- 连续再认：需要真实可解析、可冻结的图片池及素材状态。两profile共需184正式＋6独立练习图；先做体验版则74正式＋6独立练习图。不能拿合成占位图或未知权利冒充正式素材。
+- 连续再认：现有backend/独立界面可复用；native宿主、专属原件适配、素材冻结/选中安装均未完成。需要真实可解析、可冻结的图片池及素材状态。两profile共需184正式＋6独立练习图；先做体验版则74正式＋6独立练习图。不能拿合成占位图或未知权利冒充正式素材。
 - 正式运行库目标、发布权限、真实业务激活仍为pending，由root协调；本节点没有请求生产操作，没有部署或给真实人员授权。
 - authenticated standalone/course native已接；public/access-token/composite仍拒绝，`survey/survey-cognitive-api.ts`只有survey scope的read/final，未提供archiveRaw；
   `modules/cognitive/core/useCognitiveSession.ts:215`拒绝native在aggregateOnly/localDraftScope/无archiveRaw路径运行。
