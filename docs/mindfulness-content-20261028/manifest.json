@@ -156,7 +156,7 @@
       "fullTextSource": "PENDING",
       "wordingAndScoring": "PENDING_FULL_CONTENT_IN_SOURCE",
       "report": "NOT_STARTED",
-      "gap": "原文 Frank, Jennings, & Greenberg (2016), Mindfulness 7(1), 155-163 为付费墙；已核实作答方式为五级（1=Never true … 5=Always true，2024 应用论文转述，SHA ed5aee74…）；中文版 MTS-C（Li et al., 2019, PubMed 31284595）存在。缺完整可验证题文，待取得原文或 MTS-C 附录后导入。",
+      "gap": "原文 Frank, Jennings, & Greenberg (2016), Mindfulness 7(1), 155-163 为付费墙；MTS-C 论文（Li et al., 2019, PMC6651434, OA）核实为14题、五级（1=Never true…5=Always true）并经回译流程，但正文只印2个例题、无完整题表；土耳其版适配论文（hrpub）当前网络不可达。缺完整可验证题文，待取得原文或适配论文附录后导入。",
       "versions": [
         {
           "key": "mts_teacher14",
@@ -171,10 +171,10 @@
       "family": "mipq",
       "name": "MIPQ（正念教养问卷）",
       "category": "家长正念教养自评",
-      "fullTextSource": "PENDING_VERSION_CONFLICT",
-      "wordingAndScoring": "PENDING_VERSION_CONFLICT",
+      "fullTextSource": "PENDING_TEXT_EXTRACTION（Front Psychol 2019, PMC6702300, DOI 10.3389/fpsyg.2019.01847, OA/CC BY）",
+      "wordingAndScoring": "PENDING_TEXT_EXTRACTION",
       "report": "NOT_STARTED",
-      "gap": "中文版 PDF 附录为28题、四级选项，同一论文方法部分描述为五级量表；版本不一致须在正式入库前解决。",
+      "gap": "版本冲突已解决：原版 MIPQ（McCaffrey et al. 2017）28题两维为四点量表（infrequently–almost always），C-MIPQ 中文版28题为五点（never–almost always），两者为不同身份、各自自洽。拟导入 C-MIPQ（作者验证中文版，OA CC BY，n=1057，12–16岁家长）；唯一缺口：附录A1题文在期刊端为图片（fpsyg-10-01847-a001），当前网络无法取图转写，待网络恢复后下载图片逐题转写并复核。",
       "versions": [
         {
           "key": "mipq28",
