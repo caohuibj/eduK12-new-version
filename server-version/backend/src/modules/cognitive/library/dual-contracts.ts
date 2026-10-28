@@ -452,7 +452,7 @@ const RESEARCH_CAPTURE_DECLARATIONS: Record<string, CognitiveResearchCaptureDecl
   sharegame: {
     testType: 'sharegame',
     currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐轮给出点数与用时'],
-    futureCaptureFacts: ['真实接收者与真实激励', '决策前犹豫内指针轨迹', 'device provenance'],
+    futureCaptureFacts: ['真实接收者与真实激励', '真实 input modality', '决策前犹豫内指针轨迹', 'device provenance', 'viewport/dpr'],
   },
 }
 

@@ -39,6 +39,18 @@ const payloadFor = (testType: string): { phase: 'test' | 'learning'; payload: un
     case 'wordlist': return { phase: 'learning', payload: { listId: 'wordlist-01', stimulusSetVersion: 'chinese-wordlist-v1.0.0', phase: 'learning', responses: ['学校'], responseDurationMs: 100, interrupted: false } }
     case 'lexicaldecision': return { phase: 'test', payload: { stimulusId: 'zh-real-2-ab-001', stimulusVersion: 'zh-lexical-v1.0.0', lexicality: 'real', wordLength: 2, frequencyBand: 'high', pseudowordGeneratorVersion: 'zh-pseudoword-generator-v1.0.0', response: 'word', rtMs: 300, interrupted: false } }
     case 'emotionrecognition': return { phase: 'test', payload: { stimulusId: 'emotion-identity-01-happy', stimulusVersion: 'emotion-faces-ai-zh-v1.0.0', responseEmotion: 'happy', rtMs: 300, interrupted: false } }
+    case 'numberline': return { phase: 'test', payload: { targetNumber: 50, responsePosition: 0.5, rtMs: 300, interrupted: false } }
+    case 'arithverify': return { phase: 'test', payload: { leftOperand: 3, rightOperand: 4, displayedResult: 7, response: true, rtMs: 300, interrupted: false } }
+    case 'sizecongruity': return { phase: 'test', payload: { leftDigit: 7, rightDigit: 3, leftFontScale: 'large', rightFontScale: 'small', response: 'left', rtMs: 300, interrupted: false } }
+    case 'delaydiscount': return { phase: 'test', payload: { delayDays: 30, delayedAmount: 100, immediateAmount: 50, choice: 'later', rtMs: 300, interrupted: false } }
+    case 'gamblingdeck': return { phase: 'test', payload: { deck: 'C', rtMs: 300, interrupted: false } }
+    case 'symbolmatch': return { phase: 'test', payload: { symbol: '●', response: 1, rtMs: 300, interrupted: false } }
+    case 'runningspan': return { phase: 'test', payload: { sequence: ['B', 'C', 'D', 'F'], response: ['D', 'F'], responseDurationMs: 100, interrupted: false } }
+    case 'sentencecheck': return { phase: 'test', payload: { shape: 'circle', color: 'red', questionKind: 'shape', negated: false, askedValue: '圆形', response: true, rtMs: 300, interrupted: false } }
+    case 'lineangle': return { phase: 'test', payload: { targetAngle: 60, optionAngles: [30, 60, 105], responseAngle: 60, rtMs: 300, interrupted: false } }
+    case 'seqlearn': return { phase: 'test', payload: { position: 3, response: 3, rtMs: 300, interrupted: false } }
+    case 'timecopy': return { phase: 'test', payload: { targetMs: 1500, responseMs: 1620, interrupted: false } }
+    case 'sharegame': return { phase: 'test', payload: { endowment: 20, given: 5, rtMs: 300, interrupted: false } }
     default: throw new Error(`No cognitive smoke payload for ${testType}`)
   }
 }

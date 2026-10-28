@@ -12,7 +12,7 @@ export const seeds: CognitiveSeed[] = [
     testType: 'gamblingdeck',
     configVersion: '1.0.0',
     name: 'Gambling Deck (IGT-structured) v1.0.0 (60 trials, block 20)',
-    status: 'PUBLISHED',
+    status: 'DRAFT',
     engineVersion: '1.0.0',
     scoringVersion: '1.0.0',
     config: { totalTrials: 60, blockSize: 20, fixationMs: 400, feedbackMs: 1200, report: SIMULATED_REPORT_V1 },

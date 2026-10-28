@@ -14,7 +14,7 @@ export const seeds: CognitiveSeed[] = [
     testType: 'symbolmatch',
     configVersion: '1.0.0',
     name: 'Symbol-Digit Matching v1.0.0 (5-pair map, 40 trials)',
-    status: 'PUBLISHED',
+    status: 'DRAFT',
     engineVersion: '1.0.0',
     scoringVersion: '1.0.0',
     config: { totalTrials: 40, symbolDigitMap: SYMBOL_DIGIT_MAP, fixationMs: 400, timeoutMs: 8000, validRtFloorMs: 250, report: SIMULATED_REPORT_V1 },

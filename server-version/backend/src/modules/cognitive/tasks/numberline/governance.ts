@@ -6,7 +6,7 @@ export const catalog: CognitiveLibraryCatalogEntry = {
   plainAbilityHint: '把数字放到数轴上的估计能力',
   interactionFamily: 'position_selection',
   rtSensitivity: 'low',
-  fineMotorSensitivity: 'medium',
+  fineMotorSensitivity: 'moderate',
   adminScientificNotes: '数字线估计范式（0-N 位置估计）；主要构念为数值表征的线性度；PAE 与方向偏差须同读，偏差为有符号量。被试人群变体（儿童/青少年/成人）通过独立 configVersion 承载难度差异（lineMax、totalTrials、maxResponseMs），不得改动 scoringVersion 阈值或 presentationVersion 文案。',
   knownLimitations: [
     '点击精度与设备屏幕尺寸影响位置记录。',
