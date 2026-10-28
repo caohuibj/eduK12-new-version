@@ -1,3 +1,4 @@
+import * as standardRuntime from '../../modules/composite/training-standard-combination'
 import {educationPrivateToolRouter} from '../../modules/education-tools/private-tool.routes'
 import {authenticateSchool} from '../../middleware/auth'
 import {randomUUID} from 'node:crypto'
@@ -64,7 +65,7 @@ suite('Exact approved Standard C/P/R in an ordinary education questionnaire',()=
   server=app.listen(0,'127.0.0.1');await new Promise<void>(resolve=>server.once('listening',resolve));base='http://127.0.0.1:'+(server.address() as {port:number}).port
  },60000)
  afterAll(async()=>{if(server){server.closeAllConnections();await new Promise<void>(resolve=>server.close(()=>resolve()))}vi.unstubAllEnvs();await db.$disconnect()})
- it('School SELF mixes native and exact declared reports; freezes P/R once, keeps same score keys separate, and fences new U after entry',async()=>{
+ it('School SELF preserves independent native/declared blocks and freezes a repeated exact Standard source once per START',async()=>{
   const f=await setupEducationLibraryRuntimeFixture({db,product:'SCHOOL',trackCount:0,publish:false,publisher:'PSYCHOLOGY'})
   const c:PrivateToolContext={entry:'SCHOOL',organizationId:f.organizationId,principal:{userId:f.managerUserId,accountDomain:'SCHOOL'}}
   const publicSource={provider:'STANDARD_SCALE',kind:'SCALE',versionId:standardId,contentHash:standardHash}
@@ -90,7 +91,7 @@ suite('Exact approved Standard C/P/R in an ordinary education questionnaire',()=
   const contextFields=[{contextKey:'gradeLevel',formType:'single_choice',formLabel:'年级',formOptions:[{value:'7',label:'七年级'}]},
    {contextKey:'primaryLanguage',formType:'single_choice',formLabel:'主要语言',formOptions:[{value:'zh-CN',label:'中文'}]}]
   const fixed=await freeze(c,'COMPOSITION','Native and declared precise questionnaire',{...definition,contextFields,blocks:[
-   {blockId:randomUUID(),instruction:'Native transition',source:{provider:'PRIVATE_VERSION',kind:'SCALE',versionId:leaf.id,contentHash:leaf.contentHash}},...definition.blocks]})
+   {blockId:randomUUID(),instruction:'Native transition',source:{provider:'PRIVATE_VERSION',kind:'SCALE',versionId:leaf.id,contentHash:leaf.contentHash}},...definition.blocks,{...definition.blocks[0],blockId:randomUUID(),instruction:'Second independent same-source block'}]})
   const second=await freeze(c,'COMPOSITION','Awaiting another admission',{...definition,contextFields})
   if(!('runtime'in fixed)||!fixed.runtime||!('runtime'in second)||!second.runtime)throw new Error('Missing sealed source')
   const stored=await db.compositeAssessment.findUniqueOrThrow({where:{id:fixed.runtime.compositeId}}),snapshot=stored.trainingContentSnapshot as any
@@ -106,14 +107,16 @@ suite('Exact approved Standard C/P/R in an ordinary education questionnaire',()=
   const execution=(id:string)=>`/organizations/${f.organizationId}/activities/${f.workflow.id}/runs/${f.runId}/executions/${id}`
   const actor=await db.user.findUniqueOrThrow({where:{id:user}}),tasks=await listCampusStudentTasks({userId:user,username:actor.username,role:actor.role,accountDomain:'SCHOOL',tokenVersion:actor.tokenVersion},{page:1,pageSize:20,activityId:f.workflow.id})
   for(const id of [first,next])if(tasks.list.find((task:any)=>(task.executionId??task.id)===id)?.consentRequired)expect((await request('SCHOOL',user,execution(id)+'/consent/accept',{})).status).toBe(200)
+  const freezeSpy=vi.spyOn(standardRuntime,'freezeExactStandardScaleDefinition')
   const entered=await request('SCHOOL',user,execution(first)+'/start',{});expect(entered.status,JSON.stringify(entered.value)).toBe(200)
+  expect(freezeSpy).toHaveBeenCalledOnce();freezeSpy.mockRestore()
   const attempt=entered.data.runtimeBindingRef,path='/composite-attempts/'+attempt
   await revokeAdminContentGrant(system,proof(),grant.grantId,{expectedVersion:1,reason:'No new Standard admission'})
   expect((await request('SCHOOL',user,execution(first)+'/start',{})).data).toMatchObject({runtimeBindingRef:attempt,replayed:true})
   const denied=await request('SCHOOL',user,execution(next)+'/start',{});expect(denied.status,JSON.stringify(denied.value)).toBe(403)
-  for(let index=0;index<3;index++){
+  for(let index=0;index<4;index++){
    const state=await request('SCHOOL',user,path+'?view=current-unit');expect(state.status,JSON.stringify(state.value)).toBe(200)
-   const item=state.data.currentItem;expect(state.data.totalItems).toBe(3)
+   const item=state.data.currentItem;expect(state.data.totalItems).toBe(4)
    const common={submissionId:randomUUID(),attemptEpoch:state.data.attemptEpoch,definitionHash:item.definitionHash,contextSnapshotHash:state.data.contextSnapshotHash}
    const answers=index===0?item.answers.map((q:any)=>({formItemId:q.formItemId,value:q.contextKey==='gradeLevel'?'7':'zh-CN'})):item.scale.definition.items.map((q:any)=>({itemCode:q.itemCode,responseValue:index===1?'yes':'3'}))
    const endpoint=path+(index===0?`/form-sections/${item.formSectionId}/submit`:`/items/${item.id}/scale/submit`)
@@ -122,10 +125,12 @@ suite('Exact approved Standard C/P/R in an ordinary education questionnaire',()=
   }
   const finished=await request('SCHOOL',user,path);expect(finished.data.status).toBe('COMPLETED')
   const feedback=await request('SCHOOL',user,`/run-executions/${first}/feedback`);expect(feedback.status,JSON.stringify(feedback.value)).toBe(200)
-  expect(feedback.data.units).toHaveLength(2)
+  expect(feedback.data.units).toHaveLength(3)
   expect(feedback.data.units[0]).toMatchObject({state:'READY',nativeScaleUnits:expect.any(Array)})
   expect(feedback.data.units[1]).toMatchObject({state:'READY',declaredReport:{blocks:expect.any(Array)}})
   expect(feedback.data.units[1].nativeScaleUnits).toBeUndefined()
+  expect(feedback.data.units[2]).toMatchObject({state:'READY',declaredReport:feedback.data.units[1].declaredReport})
+  expect(feedback.data.units[2].blockId).not.toBe(feedback.data.units[1].blockId)
   expect(JSON.stringify(feedback.data)).not.toMatch(/trainingContent|referencePolicy|combinationHash|ownerId|sampleIds|canonicalResult|template/)
   const parent=await db.compositeAssessmentAttempt.findUniqueOrThrow({where:{id:attempt}}),binding=parent.trainingContentBinding as any
   expect(binding.units[1].source.educationStandard).toEqual(exact.source.educationStandard)

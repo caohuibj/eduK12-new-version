@@ -142,8 +142,13 @@ export async function freezeTrainingStandardScaleRuntime(tx:Prisma.TransactionCl
 export async function freezeExactStandardScaleRuntime(tx:Prisma.TransactionClient,t:import('../survey/standard-triplet.model').Triplet){
  // Standard combinations freeze the versioned source instruction with the
  // exact approved tool version (presentation content, outside the P/R hash).
- const frozen=await freezeScaleRuntimeAtAttemptStart(tx,{instrumentKey:t.toolKey,instrumentVersion:t.instrumentVersion,definition:t.definition,requestedMode:'COMPOSITE',
-  instruction:frozenTripletInstruction(t)})
+ return freezeExactStandardScaleDefinition(tx,{...t,instruction:frozenTripletInstruction(t)})
+}
+
+/** Pure native seam for an independently authorized immutable source. Instruction
+ * provenance is validated by that source's seal, not reconstructed on resume. */
+export async function freezeExactStandardScaleDefinition(tx:Prisma.TransactionClient,t:Pick<import('../survey/standard-triplet.model').Triplet,'toolKey'|'instrumentVersion'|'definition'|'references'>&{instruction:import('../assessment-runtime/frozen-scale-instruction').FrozenScaleInstruction|null}){
+ const frozen=await freezeScaleRuntimeAtAttemptStart(tx,{instrumentKey:t.toolKey,instrumentVersion:t.instrumentVersion,definition:t.definition,requestedMode:'COMPOSITE',instruction:t.instruction})
  assertNativeParameters(t.references,frozen.referenceBindings)
  return frozen
 }
