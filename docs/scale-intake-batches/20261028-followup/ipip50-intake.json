@@ -1,0 +1,39 @@
+{
+  "key": "ipip50_zh_cn_research",
+  "instrumentVersion": "1.0.0",
+  "sourceSha256": "ec529c4a4e0a71ec5157dd874daf71c4841d1f3817665bf2fee129ad0930ceb4",
+  "originPr": 328,
+  "originCommit": "fa355ff2dcd859b57a4bf2e8bddd77f8d428e3cf",
+  "workflowCommit": "96918c6462382e15e813c8113cf06829dcc127ac",
+  "officialSources": [
+    "https://ipip.ori.org/newPermission.htm",
+    "https://ipip.ori.org/New_IPIP-50-item-scale.htm",
+    "https://ipip.ori.org/newBigFive5broadKey.htm"
+  ],
+  "sourceReadAt": "2026-10-28",
+  "versions": {
+    "measurement": "1.0.0",
+    "scoring": "1.0.0",
+    "parameters": "none",
+    "report": "1.0.0"
+  },
+  "changes": [
+    "Current standard source and static registry added.",
+    "Retains 50 Chinese items and previously disclosed platform instruction adaptation; no absolute confidentiality promise.",
+    "Five original construct-specific plain-language reports and actionable reflections; no personality total, norm, ranking or diagnostic conclusions.",
+    "Original key: emotional stability higher is more stable, not same-direction neuroticism; intellect/imagination is not IQ.",
+    "Canonical dimension missing causes overall invalid and no interpretations in current report engine; other complete raw scores remain."
+  ],
+  "validation": {
+    "nativeSourceAnd5Goldens": "PASS",
+    "actualCompleteAndPartialReports": "PASS",
+    "originalItemsAndInstructionMatch": "PASS",
+    "registryGeneratorCheck": "PASS",
+    "formalCI": "NOT_RUN"
+  },
+  "database": {
+    "target": "PENDING_CONFIRMATION",
+    "install": "NOT_RUN",
+    "public": "NOT_RUN"
+  }
+}

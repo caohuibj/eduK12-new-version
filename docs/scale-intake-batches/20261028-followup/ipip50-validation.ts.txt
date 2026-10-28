@@ -1,0 +1,17 @@
+import {readFileSync,writeFileSync} from 'node:fs'
+import assert from 'node:assert/strict'
+import {scaleInstrumentSourceV1Schema} from './src/modules/scale/onboarding/schema'
+import {validateScaleInstrumentSource} from './src/modules/scale/onboarding/validate-instrument'
+import {buildScaleResult,parseScaleResultV2} from './src/modules/scale/scale-result'
+const s=scaleInstrumentSourceV1Schema.parse(JSON.parse(readFileSync('src/modules/scale/instruments/ipip50_zh_cn_research/1.0.0/source.json','utf8')))
+const check=validateScaleInstrumentSource(s as any,{requireInstruction:true});assert.equal(check.valid,true,JSON.stringify(check.issues))
+const original=JSON.parse(readFileSync('../../docs/scale-instruments/research-drafts/ipip50/1.0.0/content-draft.json','utf8'))
+assert.deepEqual(s.executable!.definition.items.map(i=>i.content),original.chineseWorkingTranslation.items.map((i:any)=>i.text))
+assert.equal(s.instruction!.text,original.platformInstructionsNotOriginalItems.instructions)
+const run=(answers:any[])=>parseScaleResultV2(buildScaleResult({scaleId:'00000000-0000-4000-8000-000000000050',instrumentKey:s.identity.instrumentKey,instrumentVersion:s.identity.instrumentVersion,name:s.catalog.identity.canonicalName,definition:s.executable!.definition,answers,referenceSets:[]}))
+const complete=run(s.executable!.goldenCases.find(c=>c.name==='all_raw_one')!.answers)
+assert.deepEqual(complete.scores.map(s=>s.value),[30,26,26,42,22]);assert.equal(complete.interpretations.length,5);assert(complete.scores.every(s=>s.range?.min===10&&s.range?.max===50));assert.equal(complete.references.length,0)
+const partial=run(s.executable!.goldenCases.find(c=>c.name==='one_missing')!.answers)
+assert.deepEqual(partial.scores.map(s=>s.value),[null,30,30,30,30]);assert.equal(partial.quality.status,'invalid');assert.equal(partial.interpretations.length,0)
+const output={sourceValidation:check,goldenCases:5,originalItemsAndInstructionsUnchanged:true,complete,partial,notRun:['database install/publish','browser','formal CI','human translation or scientific approval']}
+writeFileSync('../../docs/scale-intake-batches/20261028-followup/ipip50-validation.json',JSON.stringify(output,null,2)+'\n');console.log('IPIP50 PASS: source plus five golden cases; original 50 items/instruction preserved; actual complete/partial reports verified; no total or norms.')

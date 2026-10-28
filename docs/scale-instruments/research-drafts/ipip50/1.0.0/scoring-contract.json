@@ -1,0 +1,214 @@
+{
+  "schemaVersion": "ipip50-research-scoring-contract-v1",
+  "status": "SPECIFICATION_ONLY_NOT_REGISTERED",
+  "allowedValues": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "requireNumericIntegerWithoutCoercion": true,
+  "formula": "Positive raw r; negative 6-r. Sum ten keyed values independently for each dimension.",
+  "dimensions": [
+    {
+      "name": "Extraversion",
+      "items": [
+        1,
+        6,
+        11,
+        16,
+        21,
+        26,
+        31,
+        36,
+        41,
+        46
+      ],
+      "positive": [
+        1,
+        11,
+        21,
+        31,
+        41
+      ],
+      "negative": [
+        6,
+        16,
+        26,
+        36,
+        46
+      ],
+      "sum_range": [
+        10,
+        50
+      ],
+      "mean_range": [
+        1,
+        5
+      ]
+    },
+    {
+      "name": "Agreeableness",
+      "items": [
+        2,
+        7,
+        12,
+        17,
+        22,
+        27,
+        32,
+        37,
+        42,
+        47
+      ],
+      "positive": [
+        7,
+        17,
+        27,
+        37,
+        42,
+        47
+      ],
+      "negative": [
+        2,
+        12,
+        22,
+        32
+      ],
+      "sum_range": [
+        10,
+        50
+      ],
+      "mean_range": [
+        1,
+        5
+      ]
+    },
+    {
+      "name": "Conscientiousness",
+      "items": [
+        3,
+        8,
+        13,
+        18,
+        23,
+        28,
+        33,
+        38,
+        43,
+        48
+      ],
+      "positive": [
+        3,
+        13,
+        23,
+        33,
+        43,
+        48
+      ],
+      "negative": [
+        8,
+        18,
+        28,
+        38
+      ],
+      "sum_range": [
+        10,
+        50
+      ],
+      "mean_range": [
+        1,
+        5
+      ]
+    },
+    {
+      "name": "Emotional Stability",
+      "items": [
+        4,
+        9,
+        14,
+        19,
+        24,
+        29,
+        34,
+        39,
+        44,
+        49
+      ],
+      "positive": [
+        9,
+        19
+      ],
+      "negative": [
+        4,
+        14,
+        24,
+        29,
+        34,
+        39,
+        44,
+        49
+      ],
+      "sum_range": [
+        10,
+        50
+      ],
+      "mean_range": [
+        1,
+        5
+      ]
+    },
+    {
+      "name": "Intellect/Imagination",
+      "items": [
+        5,
+        10,
+        15,
+        20,
+        25,
+        30,
+        35,
+        40,
+        45,
+        50
+      ],
+      "positive": [
+        5,
+        15,
+        25,
+        35,
+        40,
+        45,
+        50
+      ],
+      "negative": [
+        10,
+        20,
+        30
+      ],
+      "sum_range": [
+        10,
+        50
+      ],
+      "mean_range": [
+        1,
+        5
+      ]
+    }
+  ],
+  "grandTotal": null,
+  "grandTotalProhibited": true,
+  "optionalMean": "Dimension sum/10; not norm or percentile.",
+  "missingPolicy": {
+    "status": "PRODUCT_PROPOSAL_NOT_AUTHOR_RULE",
+    "rule": "If any of ten items absent/invalid, suppress that dimension score; other complete dimensions may be shown with incomplete-profile notice. No imputation or grand total. Platform proposal, not author rule."
+  },
+  "authorMissingRule": "No universal missing-value rule located on selected official scoring page.",
+  "invalidPolicy": "Reject entire scoring request for duplicate/unknown item IDs, strings, booleans, fractions, explicit null, arrays and outside1..5. An absent item suppresses only its dimension. No coercion/imputation.",
+  "emotionalStability": "Higher means more self-reported emotional stability, opposite direction to Neuroticism. Do not relabel without reversing and separate version review.",
+  "intellect": "Intellect/Imagination self-reported tendency, not measured intelligence or cognitive ability.",
+  "clinicalLabels": [],
+  "bands": [],
+  "norms": null
+}
