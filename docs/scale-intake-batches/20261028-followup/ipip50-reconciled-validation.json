@@ -1,0 +1,1222 @@
+{
+  "source": "3eec3407c125d24527def08ab53d10b26e1163b6",
+  "activeInstrumentVersion": "1.1.0",
+  "measurementHash": "14b1bbfb3d5df508e2cc08ff71f93941a88e95e83c50ee801261400198677277",
+  "sourceValidation": {
+    "valid": true,
+    "issues": []
+  },
+  "goldenCases": 3,
+  "unchanged": "All original measurement/scoring/localization/applicability/disclosure/usage fields; only report/presentation/source release status revised.",
+  "complete": {
+    "schemaVersion": 2,
+    "instrument": {
+      "scaleId": "00000000-0000-4000-8000-000000000050",
+      "code": "ipip50_zh_cn_research",
+      "name": "IPIP 50题大五因素标记 简体中文研究工作译稿（未验证）",
+      "instrumentVersion": "1.1.0"
+    },
+    "method": {
+      "scaleId": "00000000-0000-4000-8000-000000000050",
+      "instrumentVersion": "1.1.0",
+      "scoringVersion": "1.1.0",
+      "reportVersion": "1.1.1",
+      "definitionHash": "14b1bbfb3d5df508e2cc08ff71f93941a88e95e83c50ee801261400198677277",
+      "referenceVersions": [],
+      "assessmentContext": null,
+      "reportAudience": "student",
+      "localizationVersion": "1.1.0"
+    },
+    "quality": {
+      "status": "interpretable",
+      "flags": []
+    },
+    "itemScores": [
+      {
+        "itemCode": "IPIP50-01",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IPIP50-02",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 5
+      },
+      {
+        "itemCode": "IPIP50-03",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IPIP50-04",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 5
+      },
+      {
+        "itemCode": "IPIP50-05",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IPIP50-06",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 5
+      },
+      {
+        "itemCode": "IPIP50-07",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IPIP50-08",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 5
+      },
+      {
+        "itemCode": "IPIP50-09",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IPIP50-10",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 5
+      },
+      {
+        "itemCode": "IPIP50-11",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IPIP50-12",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 5
+      },
+      {
+        "itemCode": "IPIP50-13",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IPIP50-14",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 5
+      },
+      {
+        "itemCode": "IPIP50-15",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IPIP50-16",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 5
+      },
+      {
+        "itemCode": "IPIP50-17",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IPIP50-18",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 5
+      },
+      {
+        "itemCode": "IPIP50-19",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IPIP50-20",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 5
+      },
+      {
+        "itemCode": "IPIP50-21",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IPIP50-22",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 5
+      },
+      {
+        "itemCode": "IPIP50-23",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IPIP50-24",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 5
+      },
+      {
+        "itemCode": "IPIP50-25",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IPIP50-26",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 5
+      },
+      {
+        "itemCode": "IPIP50-27",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IPIP50-28",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 5
+      },
+      {
+        "itemCode": "IPIP50-29",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 5
+      },
+      {
+        "itemCode": "IPIP50-30",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 5
+      },
+      {
+        "itemCode": "IPIP50-31",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IPIP50-32",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 5
+      },
+      {
+        "itemCode": "IPIP50-33",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IPIP50-34",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 5
+      },
+      {
+        "itemCode": "IPIP50-35",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IPIP50-36",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 5
+      },
+      {
+        "itemCode": "IPIP50-37",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IPIP50-38",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 5
+      },
+      {
+        "itemCode": "IPIP50-39",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 5
+      },
+      {
+        "itemCode": "IPIP50-40",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IPIP50-41",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IPIP50-42",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IPIP50-43",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IPIP50-44",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 5
+      },
+      {
+        "itemCode": "IPIP50-45",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IPIP50-46",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 5
+      },
+      {
+        "itemCode": "IPIP50-47",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IPIP50-48",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IPIP50-49",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 5
+      },
+      {
+        "itemCode": "IPIP50-50",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      }
+    ],
+    "scores": [
+      {
+        "key": "extraversion",
+        "type": "dimension",
+        "label": "外向性",
+        "description": "独立10题原始分；不与其他维度求总分。",
+        "direction": "higher_is_more",
+        "canonical": true,
+        "displayPrecision": 0,
+        "value": 30,
+        "range": {
+          "min": 10,
+          "max": 50
+        },
+        "expectedItems": [
+          "IPIP50-01",
+          "IPIP50-06",
+          "IPIP50-11",
+          "IPIP50-16",
+          "IPIP50-21",
+          "IPIP50-26",
+          "IPIP50-31",
+          "IPIP50-36",
+          "IPIP50-41",
+          "IPIP50-46"
+        ],
+        "answeredItems": [
+          "IPIP50-01",
+          "IPIP50-06",
+          "IPIP50-11",
+          "IPIP50-16",
+          "IPIP50-21",
+          "IPIP50-26",
+          "IPIP50-31",
+          "IPIP50-36",
+          "IPIP50-41",
+          "IPIP50-46"
+        ],
+        "status": "calculated",
+        "prorated": false
+      },
+      {
+        "key": "agreeableness",
+        "type": "dimension",
+        "label": "宜人性",
+        "description": "独立10题原始分；不与其他维度求总分。",
+        "direction": "higher_is_more",
+        "canonical": true,
+        "displayPrecision": 0,
+        "value": 26,
+        "range": {
+          "min": 10,
+          "max": 50
+        },
+        "expectedItems": [
+          "IPIP50-02",
+          "IPIP50-07",
+          "IPIP50-12",
+          "IPIP50-17",
+          "IPIP50-22",
+          "IPIP50-27",
+          "IPIP50-32",
+          "IPIP50-37",
+          "IPIP50-42",
+          "IPIP50-47"
+        ],
+        "answeredItems": [
+          "IPIP50-02",
+          "IPIP50-07",
+          "IPIP50-12",
+          "IPIP50-17",
+          "IPIP50-22",
+          "IPIP50-27",
+          "IPIP50-32",
+          "IPIP50-37",
+          "IPIP50-42",
+          "IPIP50-47"
+        ],
+        "status": "calculated",
+        "prorated": false
+      },
+      {
+        "key": "conscientiousness",
+        "type": "dimension",
+        "label": "尽责性",
+        "description": "独立10题原始分；不与其他维度求总分。",
+        "direction": "higher_is_more",
+        "canonical": true,
+        "displayPrecision": 0,
+        "value": 26,
+        "range": {
+          "min": 10,
+          "max": 50
+        },
+        "expectedItems": [
+          "IPIP50-03",
+          "IPIP50-08",
+          "IPIP50-13",
+          "IPIP50-18",
+          "IPIP50-23",
+          "IPIP50-28",
+          "IPIP50-33",
+          "IPIP50-38",
+          "IPIP50-43",
+          "IPIP50-48"
+        ],
+        "answeredItems": [
+          "IPIP50-03",
+          "IPIP50-08",
+          "IPIP50-13",
+          "IPIP50-18",
+          "IPIP50-23",
+          "IPIP50-28",
+          "IPIP50-33",
+          "IPIP50-38",
+          "IPIP50-43",
+          "IPIP50-48"
+        ],
+        "status": "calculated",
+        "prorated": false
+      },
+      {
+        "key": "emotional_stability",
+        "type": "dimension",
+        "label": "情绪稳定性",
+        "description": "独立10题原始分；不与其他维度求总分。",
+        "direction": "higher_is_more",
+        "canonical": true,
+        "displayPrecision": 0,
+        "value": 42,
+        "range": {
+          "min": 10,
+          "max": 50
+        },
+        "expectedItems": [
+          "IPIP50-04",
+          "IPIP50-09",
+          "IPIP50-14",
+          "IPIP50-19",
+          "IPIP50-24",
+          "IPIP50-29",
+          "IPIP50-34",
+          "IPIP50-39",
+          "IPIP50-44",
+          "IPIP50-49"
+        ],
+        "answeredItems": [
+          "IPIP50-04",
+          "IPIP50-09",
+          "IPIP50-14",
+          "IPIP50-19",
+          "IPIP50-24",
+          "IPIP50-29",
+          "IPIP50-34",
+          "IPIP50-39",
+          "IPIP50-44",
+          "IPIP50-49"
+        ],
+        "status": "calculated",
+        "prorated": false
+      },
+      {
+        "key": "intellect_imagination",
+        "type": "dimension",
+        "label": "智性/想象力",
+        "description": "独立10题原始分；不与其他维度求总分。",
+        "direction": "higher_is_more",
+        "canonical": true,
+        "displayPrecision": 0,
+        "value": 22,
+        "range": {
+          "min": 10,
+          "max": 50
+        },
+        "expectedItems": [
+          "IPIP50-05",
+          "IPIP50-10",
+          "IPIP50-15",
+          "IPIP50-20",
+          "IPIP50-25",
+          "IPIP50-30",
+          "IPIP50-35",
+          "IPIP50-40",
+          "IPIP50-45",
+          "IPIP50-50"
+        ],
+        "answeredItems": [
+          "IPIP50-05",
+          "IPIP50-10",
+          "IPIP50-15",
+          "IPIP50-20",
+          "IPIP50-25",
+          "IPIP50-30",
+          "IPIP50-35",
+          "IPIP50-40",
+          "IPIP50-45",
+          "IPIP50-50"
+        ],
+        "status": "calculated",
+        "prorated": false
+      }
+    ],
+    "references": [],
+    "interpretations": [
+      {
+        "scoreKey": "extraversion",
+        "headline": "你与人相处时的活跃程度",
+        "label": null,
+        "interpretation": "这一部分关注你在社交中是否愿意开口、主动接近别人或成为关注的焦点。分数越高，表示这次更认可活跃、外向的描述。安静与热闹都可能适合不同的人和场合；它不能判断你是否受欢迎，也不是沟通能力考试。想一想，怎样的相处节奏既让你自在，也能照顾重要的关系。",
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "哪些场合让你愿意多说一点，哪些时候你更需要安静？"
+          },
+          {
+            "category": "strategy",
+            "text": "为一段重要关系选择一种适合自己的联系方式，不必勉强自己变得热闹。"
+          }
+        ],
+        "limitations": [
+          "此简体中文是独立AI辅助工作译稿，尚未验证；非已验证中文版本，不声称原作者认可。",
+          "仅限18岁及以上成人研究和描述性自我反思，不外推K12、其他年龄或群体。",
+          "五个维度各10题、原始分10–50，不合成人格总分，无常模、百分位、等级、临床阈值或人格好坏评价。",
+          "缺失使所属维度不计分，其余完整维度保留原始分；现有引擎将整份结果标为invalid并抑制全部解释文本。不补值、不折算。非法选项、未知题号或重复题号拒绝计分。此为平台保守策略，不是作者规定的缺失规则。",
+          "情绪稳定性不是同方向的神经质；智性/想象力不是IQ或能力测验。",
+          "结果受自我认识、作答情境和反应方式影响，不能用于诊断、招聘、升学、排名或其他高风险决策。",
+          "不承诺绝对保密；实际施测前必须落实真实的数据用途、访问范围、保存期限与退出说明。"
+        ],
+        "referenceVersion": null
+      },
+      {
+        "scoreKey": "agreeableness",
+        "headline": "你回应他人感受的习惯",
+        "label": null,
+        "interpretation": "这一部分关注你是否留意别人的感受、愿意关心或给对方留出时间。分数越高，表示这次更认可这些倾向。关怀不等于必须答应所有要求，保留边界也不等于冷漠。这份回答无法判断一个人的善良程度；具体情境、双方需要和可用精力都值得一起考虑。",
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "最近一次关心别人时，你也照顾到自己的需要了吗？"
+          },
+          {
+            "category": "strategy",
+            "text": "试着问一句“你希望我听你说，还是一起想办法？”并说明自己能提供的支持。"
+          }
+        ],
+        "limitations": [
+          "此简体中文是独立AI辅助工作译稿，尚未验证；非已验证中文版本，不声称原作者认可。",
+          "仅限18岁及以上成人研究和描述性自我反思，不外推K12、其他年龄或群体。",
+          "五个维度各10题、原始分10–50，不合成人格总分，无常模、百分位、等级、临床阈值或人格好坏评价。",
+          "缺失使所属维度不计分，其余完整维度保留原始分；现有引擎将整份结果标为invalid并抑制全部解释文本。不补值、不折算。非法选项、未知题号或重复题号拒绝计分。此为平台保守策略，不是作者规定的缺失规则。",
+          "情绪稳定性不是同方向的神经质；智性/想象力不是IQ或能力测验。",
+          "结果受自我认识、作答情境和反应方式影响，不能用于诊断、招聘、升学、排名或其他高风险决策。",
+          "不承诺绝对保密；实际施测前必须落实真实的数据用途、访问范围、保存期限与退出说明。"
+        ],
+        "referenceVersion": null
+      },
+      {
+        "scoreKey": "conscientiousness",
+        "headline": "你安排和落实事情的习惯",
+        "label": null,
+        "interpretation": "这一部分关注准备、整理、按计划行动和完成职责的习惯。分数越高，表示这次更认可有条理、能落实事情的描述。忙乱或拖延可能与任务不清、疲劳及现实资源有关，不能简单等同于懒惰。比起责备自己，找出一个能让行动更省力的安排往往更有用。",
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "最近一件顺利完成的事，哪些准备或环境安排帮了忙？"
+          },
+          {
+            "category": "strategy",
+            "text": "把眼前任务拆出一个清楚的小动作，提前准备好所需材料。"
+          }
+        ],
+        "limitations": [
+          "此简体中文是独立AI辅助工作译稿，尚未验证；非已验证中文版本，不声称原作者认可。",
+          "仅限18岁及以上成人研究和描述性自我反思，不外推K12、其他年龄或群体。",
+          "五个维度各10题、原始分10–50，不合成人格总分，无常模、百分位、等级、临床阈值或人格好坏评价。",
+          "缺失使所属维度不计分，其余完整维度保留原始分；现有引擎将整份结果标为invalid并抑制全部解释文本。不补值、不折算。非法选项、未知题号或重复题号拒绝计分。此为平台保守策略，不是作者规定的缺失规则。",
+          "情绪稳定性不是同方向的神经质；智性/想象力不是IQ或能力测验。",
+          "结果受自我认识、作答情境和反应方式影响，不能用于诊断、招聘、升学、排名或其他高风险决策。",
+          "不承诺绝对保密；实际施测前必须落实真实的数据用途、访问范围、保存期限与退出说明。"
+        ],
+        "referenceVersion": null
+      },
+      {
+        "scoreKey": "emotional_stability",
+        "headline": "你描述的情绪起伏",
+        "label": null,
+        "interpretation": "这一部分关注你通常怎样描述紧张、烦躁、担心和心情变化。按本量表的计分方向，分数越高表示更认可较平稳、较少受到扰动的描述；不是“神经质越高”。它不能诊断心理疾病，也不要求你始终平静。有情绪并不是失败，需要支持时可以认真对待自己的处境。",
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "最近让你起伏较大的事是什么？当时有哪些现实压力？"
+          },
+          {
+            "category": "strategy",
+            "text": "留意一个能让自己稍微缓过来的条件，例如休息、调整安排或与信任的人聊聊。"
+          }
+        ],
+        "limitations": [
+          "此简体中文是独立AI辅助工作译稿，尚未验证；非已验证中文版本，不声称原作者认可。",
+          "仅限18岁及以上成人研究和描述性自我反思，不外推K12、其他年龄或群体。",
+          "五个维度各10题、原始分10–50，不合成人格总分，无常模、百分位、等级、临床阈值或人格好坏评价。",
+          "缺失使所属维度不计分，其余完整维度保留原始分；现有引擎将整份结果标为invalid并抑制全部解释文本。不补值、不折算。非法选项、未知题号或重复题号拒绝计分。此为平台保守策略，不是作者规定的缺失规则。",
+          "情绪稳定性不是同方向的神经质；智性/想象力不是IQ或能力测验。",
+          "结果受自我认识、作答情境和反应方式影响，不能用于诊断、招聘、升学、排名或其他高风险决策。",
+          "不承诺绝对保密；实际施测前必须落实真实的数据用途、访问范围、保存期限与退出说明。"
+        ],
+        "referenceVersion": null
+      },
+      {
+        "scoreKey": "intellect_imagination",
+        "headline": "你对想法和想象的兴趣",
+        "label": null,
+        "interpretation": "这一部分关注你对抽象想法、词语、反思和想象的兴趣及自我感受。分数越高，表示这次更认可这类描述。它不是智商测验，也不能判断你是否聪明、适合什么专业或职业。阅读经历、兴趣和接触机会都会影响回答；你可以从真正想弄明白的一件事开始探索。",
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "最近哪个问题让你愿意多想一会儿？你想弄明白哪一点？"
+          },
+          {
+            "category": "strategy",
+            "text": "选一个感兴趣的小问题，找一条新信息，再写下自己的发现。"
+          }
+        ],
+        "limitations": [
+          "此简体中文是独立AI辅助工作译稿，尚未验证；非已验证中文版本，不声称原作者认可。",
+          "仅限18岁及以上成人研究和描述性自我反思，不外推K12、其他年龄或群体。",
+          "五个维度各10题、原始分10–50，不合成人格总分，无常模、百分位、等级、临床阈值或人格好坏评价。",
+          "缺失使所属维度不计分，其余完整维度保留原始分；现有引擎将整份结果标为invalid并抑制全部解释文本。不补值、不折算。非法选项、未知题号或重复题号拒绝计分。此为平台保守策略，不是作者规定的缺失规则。",
+          "情绪稳定性不是同方向的神经质；智性/想象力不是IQ或能力测验。",
+          "结果受自我认识、作答情境和反应方式影响，不能用于诊断、招聘、升学、排名或其他高风险决策。",
+          "不承诺绝对保密；实际施测前必须落实真实的数据用途、访问范围、保存期限与退出说明。"
+        ],
+        "referenceVersion": null
+      }
+    ],
+    "caveats": [
+      "此简体中文是独立AI辅助工作译稿，尚未验证；非已验证中文版本，不声称原作者认可。",
+      "仅限18岁及以上成人研究和描述性自我反思，不外推K12、其他年龄或群体。",
+      "五个维度各10题、原始分10–50，不合成人格总分，无常模、百分位、等级、临床阈值或人格好坏评价。",
+      "缺失使所属维度不计分，其余完整维度保留原始分；现有引擎将整份结果标为invalid并抑制全部解释文本。不补值、不折算。非法选项、未知题号或重复题号拒绝计分。此为平台保守策略，不是作者规定的缺失规则。",
+      "情绪稳定性不是同方向的神经质；智性/想象力不是IQ或能力测验。",
+      "结果受自我认识、作答情境和反应方式影响，不能用于诊断、招聘、升学、排名或其他高风险决策。",
+      "不承诺绝对保密；实际施测前必须落实真实的数据用途、访问范围、保存期限与退出说明。",
+      "未提供群体参考。"
+    ],
+    "disclaimer": "仅供成人研究与自我反思。IPIP原题为公共领域，本中文及报告为独立改编；不推断敏感身份，不用于高风险筛选。"
+  },
+  "partial": {
+    "schemaVersion": 2,
+    "instrument": {
+      "scaleId": "00000000-0000-4000-8000-000000000050",
+      "code": "ipip50_zh_cn_research",
+      "name": "IPIP 50题大五因素标记 简体中文研究工作译稿（未验证）",
+      "instrumentVersion": "1.1.0"
+    },
+    "method": {
+      "scaleId": "00000000-0000-4000-8000-000000000050",
+      "instrumentVersion": "1.1.0",
+      "scoringVersion": "1.1.0",
+      "reportVersion": "1.1.1",
+      "definitionHash": "14b1bbfb3d5df508e2cc08ff71f93941a88e95e83c50ee801261400198677277",
+      "referenceVersions": [],
+      "assessmentContext": null,
+      "reportAudience": "student",
+      "localizationVersion": "1.1.0"
+    },
+    "quality": {
+      "status": "invalid",
+      "flags": [
+        "missing_items",
+        "score_not_calculable"
+      ]
+    },
+    "itemScores": [
+      {
+        "itemCode": "IPIP50-02",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 5
+      },
+      {
+        "itemCode": "IPIP50-03",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IPIP50-04",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 5
+      },
+      {
+        "itemCode": "IPIP50-05",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IPIP50-06",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 5
+      },
+      {
+        "itemCode": "IPIP50-07",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IPIP50-08",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 5
+      },
+      {
+        "itemCode": "IPIP50-09",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IPIP50-10",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 5
+      },
+      {
+        "itemCode": "IPIP50-11",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IPIP50-12",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 5
+      },
+      {
+        "itemCode": "IPIP50-13",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IPIP50-14",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 5
+      },
+      {
+        "itemCode": "IPIP50-15",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IPIP50-16",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 5
+      },
+      {
+        "itemCode": "IPIP50-17",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IPIP50-18",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 5
+      },
+      {
+        "itemCode": "IPIP50-19",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IPIP50-20",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 5
+      },
+      {
+        "itemCode": "IPIP50-21",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IPIP50-22",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 5
+      },
+      {
+        "itemCode": "IPIP50-23",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IPIP50-24",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 5
+      },
+      {
+        "itemCode": "IPIP50-25",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IPIP50-26",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 5
+      },
+      {
+        "itemCode": "IPIP50-27",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IPIP50-28",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 5
+      },
+      {
+        "itemCode": "IPIP50-29",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 5
+      },
+      {
+        "itemCode": "IPIP50-30",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 5
+      },
+      {
+        "itemCode": "IPIP50-31",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IPIP50-32",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 5
+      },
+      {
+        "itemCode": "IPIP50-33",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IPIP50-34",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 5
+      },
+      {
+        "itemCode": "IPIP50-35",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IPIP50-36",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 5
+      },
+      {
+        "itemCode": "IPIP50-37",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IPIP50-38",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 5
+      },
+      {
+        "itemCode": "IPIP50-39",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 5
+      },
+      {
+        "itemCode": "IPIP50-40",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IPIP50-41",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IPIP50-42",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IPIP50-43",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IPIP50-44",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 5
+      },
+      {
+        "itemCode": "IPIP50-45",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IPIP50-46",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 5
+      },
+      {
+        "itemCode": "IPIP50-47",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IPIP50-48",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IPIP50-49",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 5
+      },
+      {
+        "itemCode": "IPIP50-50",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      }
+    ],
+    "scores": [
+      {
+        "key": "extraversion",
+        "type": "dimension",
+        "label": "外向性",
+        "description": "独立10题原始分；不与其他维度求总分。",
+        "direction": "higher_is_more",
+        "canonical": true,
+        "displayPrecision": 0,
+        "value": null,
+        "range": {
+          "min": 10,
+          "max": 50
+        },
+        "expectedItems": [
+          "IPIP50-01",
+          "IPIP50-06",
+          "IPIP50-11",
+          "IPIP50-16",
+          "IPIP50-21",
+          "IPIP50-26",
+          "IPIP50-31",
+          "IPIP50-36",
+          "IPIP50-41",
+          "IPIP50-46"
+        ],
+        "answeredItems": [
+          "IPIP50-06",
+          "IPIP50-11",
+          "IPIP50-16",
+          "IPIP50-21",
+          "IPIP50-26",
+          "IPIP50-31",
+          "IPIP50-36",
+          "IPIP50-41",
+          "IPIP50-46"
+        ],
+        "status": "not_calculable",
+        "prorated": false
+      },
+      {
+        "key": "agreeableness",
+        "type": "dimension",
+        "label": "宜人性",
+        "description": "独立10题原始分；不与其他维度求总分。",
+        "direction": "higher_is_more",
+        "canonical": true,
+        "displayPrecision": 0,
+        "value": 26,
+        "range": {
+          "min": 10,
+          "max": 50
+        },
+        "expectedItems": [
+          "IPIP50-02",
+          "IPIP50-07",
+          "IPIP50-12",
+          "IPIP50-17",
+          "IPIP50-22",
+          "IPIP50-27",
+          "IPIP50-32",
+          "IPIP50-37",
+          "IPIP50-42",
+          "IPIP50-47"
+        ],
+        "answeredItems": [
+          "IPIP50-02",
+          "IPIP50-07",
+          "IPIP50-12",
+          "IPIP50-17",
+          "IPIP50-22",
+          "IPIP50-27",
+          "IPIP50-32",
+          "IPIP50-37",
+          "IPIP50-42",
+          "IPIP50-47"
+        ],
+        "status": "calculated",
+        "prorated": false
+      },
+      {
+        "key": "conscientiousness",
+        "type": "dimension",
+        "label": "尽责性",
+        "description": "独立10题原始分；不与其他维度求总分。",
+        "direction": "higher_is_more",
+        "canonical": true,
+        "displayPrecision": 0,
+        "value": 26,
+        "range": {
+          "min": 10,
+          "max": 50
+        },
+        "expectedItems": [
+          "IPIP50-03",
+          "IPIP50-08",
+          "IPIP50-13",
+          "IPIP50-18",
+          "IPIP50-23",
+          "IPIP50-28",
+          "IPIP50-33",
+          "IPIP50-38",
+          "IPIP50-43",
+          "IPIP50-48"
+        ],
+        "answeredItems": [
+          "IPIP50-03",
+          "IPIP50-08",
+          "IPIP50-13",
+          "IPIP50-18",
+          "IPIP50-23",
+          "IPIP50-28",
+          "IPIP50-33",
+          "IPIP50-38",
+          "IPIP50-43",
+          "IPIP50-48"
+        ],
+        "status": "calculated",
+        "prorated": false
+      },
+      {
+        "key": "emotional_stability",
+        "type": "dimension",
+        "label": "情绪稳定性",
+        "description": "独立10题原始分；不与其他维度求总分。",
+        "direction": "higher_is_more",
+        "canonical": true,
+        "displayPrecision": 0,
+        "value": 42,
+        "range": {
+          "min": 10,
+          "max": 50
+        },
+        "expectedItems": [
+          "IPIP50-04",
+          "IPIP50-09",
+          "IPIP50-14",
+          "IPIP50-19",
+          "IPIP50-24",
+          "IPIP50-29",
+          "IPIP50-34",
+          "IPIP50-39",
+          "IPIP50-44",
+          "IPIP50-49"
+        ],
+        "answeredItems": [
+          "IPIP50-04",
+          "IPIP50-09",
+          "IPIP50-14",
+          "IPIP50-19",
+          "IPIP50-24",
+          "IPIP50-29",
+          "IPIP50-34",
+          "IPIP50-39",
+          "IPIP50-44",
+          "IPIP50-49"
+        ],
+        "status": "calculated",
+        "prorated": false
+      },
+      {
+        "key": "intellect_imagination",
+        "type": "dimension",
+        "label": "智性/想象力",
+        "description": "独立10题原始分；不与其他维度求总分。",
+        "direction": "higher_is_more",
+        "canonical": true,
+        "displayPrecision": 0,
+        "value": 22,
+        "range": {
+          "min": 10,
+          "max": 50
+        },
+        "expectedItems": [
+          "IPIP50-05",
+          "IPIP50-10",
+          "IPIP50-15",
+          "IPIP50-20",
+          "IPIP50-25",
+          "IPIP50-30",
+          "IPIP50-35",
+          "IPIP50-40",
+          "IPIP50-45",
+          "IPIP50-50"
+        ],
+        "answeredItems": [
+          "IPIP50-05",
+          "IPIP50-10",
+          "IPIP50-15",
+          "IPIP50-20",
+          "IPIP50-25",
+          "IPIP50-30",
+          "IPIP50-35",
+          "IPIP50-40",
+          "IPIP50-45",
+          "IPIP50-50"
+        ],
+        "status": "calculated",
+        "prorated": false
+      }
+    ],
+    "references": [],
+    "interpretations": [],
+    "caveats": [
+      "此简体中文是独立AI辅助工作译稿，尚未验证；非已验证中文版本，不声称原作者认可。",
+      "仅限18岁及以上成人研究和描述性自我反思，不外推K12、其他年龄或群体。",
+      "五个维度各10题、原始分10–50，不合成人格总分，无常模、百分位、等级、临床阈值或人格好坏评价。",
+      "缺失使所属维度不计分，其余完整维度保留原始分；现有引擎将整份结果标为invalid并抑制全部解释文本。不补值、不折算。非法选项、未知题号或重复题号拒绝计分。此为平台保守策略，不是作者规定的缺失规则。",
+      "情绪稳定性不是同方向的神经质；智性/想象力不是IQ或能力测验。",
+      "结果受自我认识、作答情境和反应方式影响，不能用于诊断、招聘、升学、排名或其他高风险决策。",
+      "不承诺绝对保密；实际施测前必须落实真实的数据用途、访问范围、保存期限与退出说明。",
+      "至少一个 canonical score 无法计算，因此不提供解释或群体参考。",
+      "未提供群体参考。"
+    ],
+    "disclaimer": "仅供成人研究与自我反思。IPIP原题为公共领域，本中文及报告为独立改编；不推断敏感身份，不用于高风险筛选。"
+  },
+  "database": "NOT_RUN"
+}

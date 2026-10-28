@@ -1,0 +1,250 @@
+{
+  "source": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "sourceValidation": {
+    "valid": true,
+    "issues": []
+  },
+  "goldenCases": 6,
+  "originalMeasurementChange": "Only original Q1 instruction prefix moved to independent field, new instrument1.2.0; item wording, options, scoring and policies preserved.",
+  "complete": {
+    "schemaVersion": 2,
+    "instrument": {
+      "scaleId": "00000000-0000-4000-8000-000000000004",
+      "code": "ie4_zh_cn_research",
+      "name": "内外控制点简表（4题）（中文研究工作稿）",
+      "instrumentVersion": "1.2.0"
+    },
+    "method": {
+      "scaleId": "00000000-0000-4000-8000-000000000004",
+      "instrumentVersion": "1.2.0",
+      "scoringVersion": "1.0.0",
+      "reportVersion": "1.0.1",
+      "definitionHash": "a1d2bfbc1d0c0433d996968241d4f7585a2791bf037a01406ae7e2a35ca84597",
+      "referenceVersions": [],
+      "assessmentContext": null,
+      "reportAudience": "student",
+      "localizationVersion": "1.1.0"
+    },
+    "quality": {
+      "status": "interpretable",
+      "flags": []
+    },
+    "itemScores": [
+      {
+        "itemCode": "IE4_01",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IE4_02",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IE4_03",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "IE4_04",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      }
+    ],
+    "scores": [
+      {
+        "key": "internal",
+        "type": "dimension",
+        "label": "自己的行动与结果",
+        "description": "这一组关注您是否觉得自己的决定和努力能影响结果。它不测量实际能力，也不保证只要努力就一定成功。",
+        "direction": "higher_is_more",
+        "canonical": true,
+        "displayPrecision": 2,
+        "value": 1,
+        "range": {
+          "min": 1,
+          "max": 5
+        },
+        "expectedItems": [
+          "IE4_01",
+          "IE4_02"
+        ],
+        "answeredItems": [
+          "IE4_01",
+          "IE4_02"
+        ],
+        "status": "calculated",
+        "prorated": false
+      },
+      {
+        "key": "external",
+        "type": "dimension",
+        "label": "外部力量与结果",
+        "description": "这一组关注您是否觉得他人的决定、命运或机遇影响结果。承认限制不等于懒惰、推卸责任或失败；有些障碍确实需要支持和制度层面的改变。",
+        "direction": "higher_is_more",
+        "canonical": true,
+        "displayPrecision": 2,
+        "value": 1,
+        "range": {
+          "min": 1,
+          "max": 5
+        },
+        "expectedItems": [
+          "IE4_03",
+          "IE4_04"
+        ],
+        "answeredItems": [
+          "IE4_03",
+          "IE4_04"
+        ],
+        "status": "calculated",
+        "prorated": false
+      }
+    ],
+    "references": [],
+    "interpretations": [
+      {
+        "scoreKey": "internal",
+        "headline": "你怎样看待自己行动的影响",
+        "label": null,
+        "interpretation": "这两题关注你是否觉得自己能够作主，以及努力可能带来什么。分数越高，表示这次更认可自己的行动能够影响结果。它不是一张能力成绩单，也不意味着遇到困难就是努力不够；机会、资源和他人的支持同样重要。可以想想最近一件你能做一点改变的事，把注意力放在一个具体、可行的小步骤上。",
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "最近一次自己作主时，哪些条件帮助了你？"
+          },
+          {
+            "category": "strategy",
+            "text": "选一件可掌握的小事，写出下一步需要的时间、材料或帮助。"
+          }
+        ],
+        "limitations": [
+          "中文目前是未经验证的研究工作译稿，仅供成人研究中的解释和反思，不提供诊断、能力判定、人格优劣或升学就业建议。两组内容分开描述，不合并排名，也不能用来认定成功或困境是谁的责任。",
+          "每组只有2题，英语原样本内部一致性有限；中文工作稿尚未验证。2026德语研究提示同意式作答影响，不能把两组均分当作两个无争议独立特质。",
+          "UK与德国均值和标准差只作外部来源记录；跨国未支持标量不变性，不能将均值差异直接解释为人群差异，更不能当中文常模。",
+          "两题任一缺失就不计算该维度，未答不代填为0；项目完整报告要求4题全答。研究群体分析的插补建议不适用于个人报告。"
+        ],
+        "referenceVersion": null
+      },
+      {
+        "scoreKey": "external",
+        "headline": "你怎样看待外部条件的影响",
+        "label": null,
+        "interpretation": "这两题关注你觉得别人、命运或环境在多大程度上影响自己的安排。分数越高，表示这次更认可外部力量的影响。现实限制确实可能存在，承认它们并不等于消极或放弃。可以把眼前的事分成“可以商量的”“需要支持的”和“暂时无法改变的”，不要求自己控制一切。",
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "最近有什么安排受到了他人或环境影响？哪些限制是真实存在的？"
+          },
+          {
+            "category": "strategy",
+            "text": "先找一个能沟通或能获得支持的环节；暂时无法改变的部分，不必全归到自己身上。"
+          }
+        ],
+        "limitations": [
+          "中文目前是未经验证的研究工作译稿，仅供成人研究中的解释和反思，不提供诊断、能力判定、人格优劣或升学就业建议。两组内容分开描述，不合并排名，也不能用来认定成功或困境是谁的责任。",
+          "每组只有2题，英语原样本内部一致性有限；中文工作稿尚未验证。2026德语研究提示同意式作答影响，不能把两组均分当作两个无争议独立特质。",
+          "UK与德国均值和标准差只作外部来源记录；跨国未支持标量不变性，不能将均值差异直接解释为人群差异，更不能当中文常模。",
+          "两题任一缺失就不计算该维度，未答不代填为0；项目完整报告要求4题全答。研究群体分析的插补建议不适用于个人报告。"
+        ],
+        "referenceVersion": null
+      }
+    ],
+    "caveats": [
+      "中文目前是未经验证的研究工作译稿，仅供成人研究中的解释和反思，不提供诊断、能力判定、人格优劣或升学就业建议。两组内容分开描述，不合并排名，也不能用来认定成功或困境是谁的责任。",
+      "每组只有2题，英语原样本内部一致性有限；中文工作稿尚未验证。2026德语研究提示同意式作答影响，不能把两组均分当作两个无争议独立特质。",
+      "UK与德国均值和标准差只作外部来源记录；跨国未支持标量不变性，不能将均值差异直接解释为人群差异，更不能当中文常模。",
+      "两题任一缺失就不计算该维度，未答不代填为0；项目完整报告要求4题全答。研究群体分析的插补建议不适用于个人报告。",
+      "未提供群体参考。"
+    ],
+    "disclaimer": "仅供成人研究与自我反思，不作诊断、选拔、责任判断或能力预测。© Nießen et al. (2022)，CC BY 4.0；中文与报告为独立改编。"
+  },
+  "missing": {
+    "schemaVersion": 2,
+    "instrument": {
+      "scaleId": "00000000-0000-4000-8000-000000000004",
+      "code": "ie4_zh_cn_research",
+      "name": "内外控制点简表（4题）（中文研究工作稿）",
+      "instrumentVersion": "1.2.0"
+    },
+    "method": {
+      "scaleId": "00000000-0000-4000-8000-000000000004",
+      "instrumentVersion": "1.2.0",
+      "scoringVersion": "1.0.0",
+      "reportVersion": "1.0.1",
+      "definitionHash": "a1d2bfbc1d0c0433d996968241d4f7585a2791bf037a01406ae7e2a35ca84597",
+      "referenceVersions": [],
+      "assessmentContext": null,
+      "reportAudience": "student",
+      "localizationVersion": "1.1.0"
+    },
+    "quality": {
+      "status": "invalid",
+      "flags": [
+        "missing_items",
+        "score_not_calculable"
+      ]
+    },
+    "itemScores": [],
+    "scores": [
+      {
+        "key": "internal",
+        "type": "dimension",
+        "label": "自己的行动与结果",
+        "description": "这一组关注您是否觉得自己的决定和努力能影响结果。它不测量实际能力，也不保证只要努力就一定成功。",
+        "direction": "higher_is_more",
+        "canonical": true,
+        "displayPrecision": 2,
+        "value": null,
+        "range": {
+          "min": 1,
+          "max": 5
+        },
+        "expectedItems": [
+          "IE4_01",
+          "IE4_02"
+        ],
+        "answeredItems": [],
+        "status": "not_calculable",
+        "prorated": false
+      },
+      {
+        "key": "external",
+        "type": "dimension",
+        "label": "外部力量与结果",
+        "description": "这一组关注您是否觉得他人的决定、命运或机遇影响结果。承认限制不等于懒惰、推卸责任或失败；有些障碍确实需要支持和制度层面的改变。",
+        "direction": "higher_is_more",
+        "canonical": true,
+        "displayPrecision": 2,
+        "value": null,
+        "range": {
+          "min": 1,
+          "max": 5
+        },
+        "expectedItems": [
+          "IE4_03",
+          "IE4_04"
+        ],
+        "answeredItems": [],
+        "status": "not_calculable",
+        "prorated": false
+      }
+    ],
+    "references": [],
+    "interpretations": [],
+    "caveats": [
+      "中文目前是未经验证的研究工作译稿，仅供成人研究中的解释和反思，不提供诊断、能力判定、人格优劣或升学就业建议。两组内容分开描述，不合并排名，也不能用来认定成功或困境是谁的责任。",
+      "每组只有2题，英语原样本内部一致性有限；中文工作稿尚未验证。2026德语研究提示同意式作答影响，不能把两组均分当作两个无争议独立特质。",
+      "UK与德国均值和标准差只作外部来源记录；跨国未支持标量不变性，不能将均值差异直接解释为人群差异，更不能当中文常模。",
+      "两题任一缺失就不计算该维度，未答不代填为0；项目完整报告要求4题全答。研究群体分析的插补建议不适用于个人报告。",
+      "至少一个 canonical score 无法计算，因此不提供解释或群体参考。",
+      "未提供群体参考。"
+    ],
+    "disclaimer": "仅供成人研究与自我反思，不作诊断、选拔、责任判断或能力预测。© Nießen et al. (2022)，CC BY 4.0；中文与报告为独立改编。"
+  },
+  "database": "NOT_RUN"
+}

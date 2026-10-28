@@ -1,0 +1,633 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "ie4_zh_cn_research",
+    "instrumentVersion": "1.2.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 2,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "内外控制点简表（4题）（中文研究工作稿）",
+      "abbreviation": "IE-4",
+      "instrumentFamily": "locus-of-control"
+    },
+    "construct": {
+      "primaryDomain": "PERSONALITY",
+      "secondaryDomains": [],
+      "constructDefinition": "对自己的行动以及他人、命运对结果影响的信念；不是实际能力、责任归属或两个无争议独立特质。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "ie4_zh_cn_research",
+        "domain:personality_self",
+        "construct:locus_of_control",
+        "construct:internal_control_beliefs",
+        "construct:external_control_beliefs",
+        "population:adult_research",
+        "response:self",
+        "response:digital_self",
+        "response:paper",
+        "use:research",
+        "use:not_diagnostic",
+        "license:cc_by_4_0",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:translation_review_pending",
+        "language_validation:local_validation_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    "population": {
+      "populationNotes": "成人自评研究；原英语UK468/德语474在线配额样本18–69岁不代表中国或未成年人常模。中文工作稿未验证，不用于个体诊断；ADULT_SELF/student是技术映射，不表示K12适用。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "minAge": 18
+    },
+    "administration": {
+      "itemCount": 4,
+      "estimatedMinutes": 1,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "一般信念，无固定回忆窗口",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保留原4题顺序及完整五档锚点；原指导语工作译文置于首题前，是数字版呈现调整而非原版版式验证。",
+        "两组各两题完整后求不加权均分，无反向、无总分；全4题完整才出解释。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "作者仅推荐时间有限的自评研究；当前中文工作译稿未验证。反馈是项目解释材料，不是个体评估或已验证干预。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.1.0",
+    "translationSource": "本项目依据2022年作者英文版独立制作中文研究工作译稿，并新增通俗反馈；未经独立语言审校或中文心理测量验证，不是作者认可的官方中文版。保留原题顺序、两组均分与各题原方向。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "独立工作译稿待人工审校、认知访谈与本地验证。原总体说明置于首题之前，题序和题干含义不改，不声称原版版式验证。接续历史PR328同key1.0.0候选，不覆盖或推断其部署。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "ie4_zh_cn_research-1.1.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "ie4_zh_cn_research-1.1.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "ie4_zh_cn_research-1.1.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "Nießen, D., Schmidt, I., Groskurth, K., Rammstedt, B., & Lechner, C. M. (2022). Internal–External Locus of Control Short Scale–4 (IE-4). ZIS. https://access.gesis.org/zis/1259 https://creativecommons.org/licenses/by/4.0/ © 2022 Nießen et al. 本项目依据2022年作者英文版独立制作中文研究工作译稿，并新增通俗反馈；未经独立语言审校或中文心理测量验证，不是作者认可的官方中文版。保留原题顺序、两组均分与各题原方向。",
+      "具体英文题本1259第2页明确CC BY4，可署名再分发/翻译及商业使用；不是公共领域或非商业专用。",
+      "Authors recommend self-report research surveys with severe time constraints, not individual diagnostics. Reflective feedback is project-authored explanatory support, not a validated personal assessment or intervention."
+    ]
+  },
+  "executable": {
+    "releaseStatus": "PUBLISHED",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "Internal–External Locus of Control Short Scale–4 (2022 English adaptation)",
+        "citation": "Nießen, D., Schmidt, I., Groskurth, K., Rammstedt, B., & Lechner, C. M. (2022). Internal–External Locus of Control Short Scale–4 (IE-4). ZIS.",
+        "url": "https://access.gesis.org/zis/1259"
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "Nießen, D., Schmidt, I., Groskurth, K., Rammstedt, B., & Lechner, C. M. (2022). Internal–External Locus of Control Short Scale–4 (IE-4). ZIS. https://access.gesis.org/zis/1259 https://creativecommons.org/licenses/by/4.0/ © 2022 Nießen et al. 本项目依据2022年作者英文版独立制作中文研究工作译稿，并新增通俗反馈；未经独立语言审校或中文心理测量验证，不是作者认可的官方中文版。保留原题顺序、两组均分与各题原方向。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "ie4_response",
+          "options": [
+            {
+              "value": "1",
+              "label": "完全不符合",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "有一点符合",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "有些符合",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "大体符合",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "完全符合",
+              "score": 5
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "IE4_01",
+          "content": "我自己做主。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "ie4_response",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IE4_02",
+          "content": "如果我努力，就会成功。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "ie4_response",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IE4_03",
+          "content": "无论是在工作中还是在私人生活中，我做什么主要由别人决定。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "ie4_response",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IE4_04",
+          "content": "命运常常阻碍我的计划。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "ie4_response",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "IE4_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IE4_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IE4_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IE4_04",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "internal",
+            "type": "dimension",
+            "label": "自己的行动与结果",
+            "description": "这一组关注您是否觉得自己的决定和努力能影响结果。它不测量实际能力，也不保证只要努力就一定成功。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "IE4_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IE4_02",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "external",
+            "type": "dimension",
+            "label": "外部力量与结果",
+            "description": "这一组关注您是否觉得他人的决定、命运或机遇影响结果。承认限制不等于懒惰、推卸责任或失败；有些障碍确实需要支持和制度层面的改变。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "IE4_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IE4_04",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.1",
+        "primaryScoreKeys": [
+          "internal",
+          "external"
+        ],
+        "scoreOrder": [
+          "internal",
+          "external"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "internal",
+            "headline": "你怎样看待自己行动的影响",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这两题关注你是否觉得自己能够作主，以及努力可能带来什么。分数越高，表示这次更认可自己的行动能够影响结果。它不是一张能力成绩单，也不意味着遇到困难就是努力不够；机会、资源和他人的支持同样重要。可以想想最近一件你能做一点改变的事，把注意力放在一个具体、可行的小步骤上。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近一次自己作主时，哪些条件帮助了你？"
+              },
+              {
+                "category": "strategy",
+                "text": "选一件可掌握的小事，写出下一步需要的时间、材料或帮助。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "external",
+            "headline": "你怎样看待外部条件的影响",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这两题关注你觉得别人、命运或环境在多大程度上影响自己的安排。分数越高，表示这次更认可外部力量的影响。现实限制确实可能存在，承认它们并不等于消极或放弃。可以把眼前的事分成“可以商量的”“需要支持的”和“暂时无法改变的”，不要求自己控制一切。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近有什么安排受到了他人或环境影响？哪些限制是真实存在的？"
+              },
+              {
+                "category": "strategy",
+                "text": "先找一个能沟通或能获得支持的环节；暂时无法改变的部分，不必全归到自己身上。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "中文目前是未经验证的研究工作译稿，仅供成人研究中的解释和反思，不提供诊断、能力判定、人格优劣或升学就业建议。两组内容分开描述，不合并排名，也不能用来认定成功或困境是谁的责任。",
+          "每组只有2题，英语原样本内部一致性有限；中文工作稿尚未验证。2026德语研究提示同意式作答影响，不能把两组均分当作两个无争议独立特质。",
+          "UK与德国均值和标准差只作外部来源记录；跨国未支持标量不变性，不能将均值差异直接解释为人群差异，更不能当中文常模。",
+          "两题任一缺失就不计算该维度，未答不代填为0；项目完整报告要求4题全答。研究群体分析的插补建议不适用于个人报告。"
+        ],
+        "disclaimer": "仅供成人研究与自我反思，不作诊断、选拔、责任判断或能力预测。© Nießen et al. (2022)，CC BY 4.0；中文与报告为独立改编。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted local editorial check (not human expert review)",
+            "reviewedAt": "2026-10-25T17:49:00Z",
+            "basis": "AI editorial review only; adult self-report research, no ability, blame, clinical or success prediction; expert translation review pending."
+          }
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "ie4",
+        "locale": "zh-CN",
+        "localizationVersion": "1.1.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "IE4_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IE4_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IE4_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IE4_04",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "internal": 1.0,
+            "external": 1.0
+          },
+          "totalScoreKeys": [
+            "internal",
+            "external"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "IE4_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IE4_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IE4_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IE4_04",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "internal": 5.0,
+            "external": 5.0
+          },
+          "totalScoreKeys": [
+            "internal",
+            "external"
+          ]
+        }
+      },
+      {
+        "name": "midpoint",
+        "answers": [
+          {
+            "itemCode": "IE4_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IE4_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IE4_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IE4_04",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "internal": 3.0,
+            "external": 3.0
+          },
+          "totalScoreKeys": [
+            "internal",
+            "external"
+          ]
+        }
+      },
+      {
+        "name": "half-point",
+        "answers": [
+          {
+            "itemCode": "IE4_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IE4_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "IE4_03",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "IE4_04",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "internal": 1.5,
+            "external": 4.5
+          },
+          "totalScoreKeys": [
+            "internal",
+            "external"
+          ]
+        }
+      },
+      {
+        "name": "both-endorsed",
+        "answers": [
+          {
+            "itemCode": "IE4_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IE4_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "IE4_03",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "IE4_04",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "internal": 4.5,
+            "external": 4.5
+          },
+          "totalScoreKeys": [
+            "internal",
+            "external"
+          ]
+        }
+      },
+      {
+        "name": "opposite",
+        "answers": [
+          {
+            "itemCode": "IE4_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IE4_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IE4_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IE4_04",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "internal": 5.0,
+            "external": 1.0
+          },
+          "totalScoreKeys": [
+            "internal",
+            "external"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "以下陈述可能在不同程度上符合您的情况。您觉得每条陈述在多大程度上符合您本人？",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "原1.1.0首题内前缀迁移至正式独立指导语字段；来源b92c69aefa2472775fa7ee86b9c208366886c908，不改原指导语文字。"
+  }
+}

@@ -1,0 +1,16 @@
+import {readFileSync,writeFileSync} from 'node:fs'
+import assert from 'node:assert/strict'
+import {execFileSync} from 'node:child_process'
+import {scaleInstrumentSourceV1Schema} from './src/modules/scale/onboarding/schema'
+import {validateScaleInstrumentSource} from './src/modules/scale/onboarding/validate-instrument'
+import {buildScaleResult,parseScaleResultV2} from './src/modules/scale/scale-result'
+const s=scaleInstrumentSourceV1Schema.parse(JSON.parse(readFileSync('src/modules/scale/instruments/ie4_zh_cn_research/1.2.0/source.json','utf8')))
+const old=JSON.parse(execFileSync('git',['show','b92c69ae:server-version/backend/src/modules/scale/instruments/ie4_zh_cn_research/1.1.0/source.json'],{encoding:'utf8'}))
+const check=validateScaleInstrumentSource(s as any,{requireInstruction:true});assert.equal(check.valid,true,JSON.stringify(check.issues))
+assert.deepEqual(s.executable!.definition.scoring,old.executable.definition.scoring);assert.deepEqual(s.executable!.definition.responseSets,old.executable.definition.responseSets)
+for(const k of ['localization','applicability','disclosure','usageRequirements'])assert.deepEqual((s as any)[k],old[k])
+const before=structuredClone(old.executable.definition.items);const prefix=before[0].content.split('\n\n');before[0].content=prefix[1];assert.equal(s.instruction!.text,prefix[0]);assert.deepEqual(s.executable!.definition.items,before)
+const input={scaleId:'00000000-0000-4000-8000-000000000004',instrumentKey:s.identity.instrumentKey,instrumentVersion:s.identity.instrumentVersion,name:s.catalog.identity.canonicalName,definition:s.executable!.definition,referenceSets:[]}
+const complete=parseScaleResultV2(buildScaleResult({...input,answers:s.executable!.goldenCases.find(c=>c.expected.quality==='interpretable')!.answers}));assert.equal(complete.interpretations.length,2);assert.equal(complete.method.reportVersion,'1.0.1');assert.equal(complete.method.instrumentVersion,'1.2.0')
+const missing=parseScaleResultV2(buildScaleResult({...input,answers:[]}));assert.equal(missing.quality.status,'invalid');assert.equal(missing.interpretations.length,0)
+writeFileSync('../../docs/scale-intake-batches/20261028-followup/ie4-reconciled-validation.json',JSON.stringify({source:'b92c69aefa2472775fa7ee86b9c208366886c908',sourceValidation:check,goldenCases:s.executable!.goldenCases.length,originalMeasurementChange:'Only original Q1 instruction prefix moved to independent field, new instrument1.2.0; item wording, options, scoring and policies preserved.',complete,missing,database:'NOT_RUN'},null,2)+'\n');console.log('IE4 reconciled PASS: original six goldens; only original instruction separated, item wording/scoring/options preserved; actual reports verified.')

@@ -1,0 +1,135 @@
+{
+  "reportVersion": "1.1.0",
+  "audienceContract": {
+    "schemaVersion": 1,
+    "respondent": "ADULT_SELF",
+    "audience": "student",
+    "locale": "zh-CN",
+    "qcReview": {
+      "reviewer": "OpenAI AI-assisted editorial and contract review (not human scientific review)",
+      "reviewedAt": "2026-10-23T16:40:00.000Z",
+      "basis": "Adult wording; student is the existing respondent report channel, not a child population. No scientific approval claimed."
+    }
+  },
+  "primaryScoreKeys": [
+    "extraversion",
+    "agreeableness",
+    "conscientiousness",
+    "emotional_stability",
+    "intellect_imagination"
+  ],
+  "scoreOrder": [
+    "extraversion",
+    "agreeableness",
+    "conscientiousness",
+    "emotional_stability",
+    "intellect_imagination"
+  ],
+  "interpretations": [
+    {
+      "scoreKey": "extraversion",
+      "headline": "外向性",
+      "source": {
+        "type": "score_only"
+      },
+      "summary": "描述在社交互动中主动表达和参与的自陈倾向。较高原始分表示本次更认可主动交谈、参与互动等描述；较低分表示更少认可这些描述，可能偏好安静或较少表达。本维度仅呈现10–50的原始分，没有人群参照，不能将某个分数定为高或低等级，也不能与其他维度直接比较。中文工作译稿尚未验证，两端不是优劣判断。",
+      "bands": [],
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "可以回想近期哪些具体情境与描述相符、哪些不相符，把结果作为讨论线索而非固定标签。"
+        },
+        {
+          "category": "strategy",
+          "text": "如希望进一步了解自己，可记录不同情境下的实际体验，再结合自己的目标反思；不依据本分数作重要决定。"
+        }
+      ]
+    },
+    {
+      "scoreKey": "agreeableness",
+      "headline": "宜人性",
+      "source": {
+        "type": "score_only"
+      },
+      "summary": "描述在与人互动中关注、体谅他人感受的自陈倾向。较高原始分表示本次更认可关心他人的描述；较低分表示较少认可这些描述，不能据此判断一个人的善恶或道德品质。本维度仅呈现10–50的原始分，没有人群参照，不能将某个分数定为高或低等级，也不能与其他维度直接比较。中文工作译稿尚未验证，两端不是优劣判断。",
+      "bands": [],
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "可以回想近期哪些具体情境与描述相符、哪些不相符，把结果作为讨论线索而非固定标签。"
+        },
+        {
+          "category": "strategy",
+          "text": "如希望进一步了解自己，可记录不同情境下的实际体验，再结合自己的目标反思；不依据本分数作重要决定。"
+        }
+      ]
+    },
+    {
+      "scoreKey": "conscientiousness",
+      "headline": "尽责性",
+      "source": {
+        "type": "score_only"
+      },
+      "summary": "描述对计划、条理、细节和履行任务的自陈倾向。较高原始分表示本次更认可有条理和按计划行动等描述；较低分表示较少认可这些描述，并不等同于工作能力或学习表现。本维度仅呈现10–50的原始分，没有人群参照，不能将某个分数定为高或低等级，也不能与其他维度直接比较。中文工作译稿尚未验证，两端不是优劣判断。",
+      "bands": [],
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "可以回想近期哪些具体情境与描述相符、哪些不相符，把结果作为讨论线索而非固定标签。"
+        },
+        {
+          "category": "strategy",
+          "text": "如希望进一步了解自己，可记录不同情境下的实际体验，再结合自己的目标反思；不依据本分数作重要决定。"
+        }
+      ]
+    },
+    {
+      "scoreKey": "emotional_stability",
+      "headline": "情绪稳定性",
+      "source": {
+        "type": "score_only"
+      },
+      "summary": "描述在日常压力和情绪波动中保持平静的自陈倾向。较高原始分表示本次更认可平静、较少情绪波动等描述；较低分表示较少认可这些描述，不能据此诊断心理问题，亦不能同向改称神经质。本维度仅呈现10–50的原始分，没有人群参照，不能将某个分数定为高或低等级，也不能与其他维度直接比较。中文工作译稿尚未验证，两端不是优劣判断。",
+      "bands": [],
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "可以回想近期哪些具体情境与描述相符、哪些不相符，把结果作为讨论线索而非固定标签。"
+        },
+        {
+          "category": "strategy",
+          "text": "如希望进一步了解自己，可记录不同情境下的实际体验，再结合自己的目标反思；不依据本分数作重要决定。"
+        }
+      ]
+    },
+    {
+      "scoreKey": "intellect_imagination",
+      "headline": "智性/想象力",
+      "source": {
+        "type": "score_only"
+      },
+      "summary": "描述对想法、抽象概念、词汇和想象的自陈倾向。较高原始分表示本次更认可此类活动相关描述；较低分表示较少认可这些描述。本维度不是IQ、能力成绩或天赋评价。本维度仅呈现10–50的原始分，没有人群参照，不能将某个分数定为高或低等级，也不能与其他维度直接比较。中文工作译稿尚未验证，两端不是优劣判断。",
+      "bands": [],
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "可以回想近期哪些具体情境与描述相符、哪些不相符，把结果作为讨论线索而非固定标签。"
+        },
+        {
+          "category": "strategy",
+          "text": "如希望进一步了解自己，可记录不同情境下的实际体验，再结合自己的目标反思；不依据本分数作重要决定。"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "此简体中文是独立AI辅助工作译稿，尚未验证；非已验证中文版本，不声称原作者认可。",
+    "仅限18岁及以上成人研究和描述性自我反思，不外推K12、其他年龄或群体。",
+    "五个维度各10题、原始分10–50，不合成人格总分，无常模、百分位、等级、临床阈值或人格好坏评价。",
+    "缺失使所属维度不计分，其余完整维度保留原始分；现有引擎将整份结果标为invalid并抑制全部解释文本。不补值、不折算。非法选项、未知题号或重复题号拒绝计分。此为平台保守策略，不是作者规定的缺失规则。",
+    "情绪稳定性不是同方向的神经质；智性/想象力不是IQ或能力测验。",
+    "结果受自我认识、作答情境和反应方式影响，不能用于诊断、招聘、升学、排名或其他高风险决策。",
+    "不承诺绝对保密；实际施测前必须落实真实的数据用途、访问范围、保存期限与退出说明。"
+  ],
+  "disclaimer": "成人研究准备候选；独立中文工作译稿未验证。仅描述本次自陈倾向，不用于诊断、能力或品德评价、高风险选拔或固定人格定型。"
+}

@@ -35,5 +35,7 @@
     "target": "PENDING_CONFIRMATION",
     "install": "NOT_RUN",
     "public": "NOT_RUN"
-  }
+  },
+  "status": "SUPERSEDED_NOT_FOR_INSTALL",
+  "supersededBy": "ipip50-reconciliation.json"
 }

@@ -1,0 +1,18 @@
+{
+  "status": "SUPERSEDES_NEW_1_0_0_ATTEMPT",
+  "reason": "Notion history revealed an existing non-PR branch after the initial main/open-PR-only comparison. Restore its 1.0.0 catalog source byte-for-byte; reuse existing 1.1.0 executable measurement rather than duplicate/reassign identity.",
+  "existingBranch": "work/ipip50-ready-20261023",
+  "existingCommit": "3eec3407c125d24527def08ab53d10b26e1163b6",
+  "supersededCommit": "2af3f2309c72acf54d0dc9d184c843a1f5e33824",
+  "activeInstrumentVersion": "1.1.0",
+  "activeScoringVersion": "1.1.0",
+  "activeReportVersion": "1.1.1",
+  "catalogVersion": 2,
+  "changes": [
+    "Original measurement, scoring, localization, applicability, disclosures and golden fixtures preserved.",
+    "Report-only plain-language rewrite and independent instruction field added; catalog construct no longer used as instruction storage.",
+    "Executable source releaseStatus promoted for the prepared content only; no database publication."
+  ],
+  "priorEvidence": "ipip50-validation.json refers only to the superseded implementation, not this corrected identity.",
+  "database": "No installation occurred for either identity; target environment still pending."
+}

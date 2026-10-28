@@ -1,3 +1,5 @@
+> 本候选已停用，未曾安装。请使用从既有1.1.0修订的1.2.0，见批次 ie4-reconciliation.json。下文为旧准备记录。
+
 # IE-4 中文研究工作稿
 
 由 PR328 的既有四题材料转换；不是重新验证的官方中文版。官方英文题本 https://access.gesis.org/zis/1259 明示 CC BY 4.0；计分依据 https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0271289 的测量段落。

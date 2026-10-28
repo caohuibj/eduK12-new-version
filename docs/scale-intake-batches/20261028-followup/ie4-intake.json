@@ -44,5 +44,7 @@
     "ipip50_zh_cn_research",
     "k6_zh_cn_research",
     "phq9_zh_cn_research"
-  ]
+  ],
+  "status": "SUPERSEDED_NOT_FOR_INSTALL",
+  "supersededBy": "ie4-reconciliation.json"
 }

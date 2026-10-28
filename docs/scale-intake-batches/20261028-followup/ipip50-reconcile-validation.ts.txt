@@ -1,0 +1,20 @@
+import {readFileSync,writeFileSync} from 'node:fs'
+import assert from 'node:assert/strict'
+import {scaleInstrumentSourceV1Schema} from './src/modules/scale/onboarding/schema'
+import {validateScaleInstrumentSource} from './src/modules/scale/onboarding/validate-instrument'
+import {hashScaleDefinition} from './src/modules/scale/scale-definition'
+import {buildScaleResult,parseScaleResultV2} from './src/modules/scale/scale-result'
+import {execFileSync} from 'node:child_process'
+const sourcePath='src/modules/scale/instruments/ipip50_zh_cn_research/1.1.0/source.json'
+const source=JSON.parse(readFileSync(sourcePath,'utf8'))
+const old=JSON.parse(execFileSync('git',['show','3eec3407:server-version/backend/'+sourcePath],{encoding:'utf8'}))
+const s=scaleInstrumentSourceV1Schema.parse(source)
+const stripped=(d:any)=>{const {report,...measurement}=d;return measurement}
+assert.deepEqual(stripped(source.executable.definition),stripped(old.executable.definition));assert.equal(hashScaleDefinition(source.executable.definition),hashScaleDefinition(old.executable.definition))
+for(const k of ['localization','applicability','disclosure','usageRequirements'])assert.deepEqual(source[k],old[k])
+const check=validateScaleInstrumentSource(s as any,{requireInstruction:true});assert.equal(check.valid,true,JSON.stringify(check.issues))
+const run=(answers:any[])=>parseScaleResultV2(buildScaleResult({scaleId:'00000000-0000-4000-8000-000000000050',instrumentKey:s.identity.instrumentKey,instrumentVersion:s.identity.instrumentVersion,name:s.catalog.identity.canonicalName,definition:s.executable!.definition,answers,referenceSets:[]}))
+const complete=run(s.executable!.goldenCases[0].answers);assert.equal(complete.interpretations.length,5);assert.equal(complete.method.reportVersion,'1.1.1');assert.equal(complete.method.instrumentVersion,'1.1.0');assert.equal(complete.method.scoringVersion,'1.1.0')
+assert.equal(complete.interpretations[0].interpretation,s.executable!.definition.report.interpretations[0].summary)
+const partial=run(s.executable!.goldenCases[0].answers.slice(1));assert.equal(partial.quality.status,'invalid');assert.equal(partial.interpretations.length,0);assert.equal(partial.scores[0].value,null)
+writeFileSync('../../docs/scale-intake-batches/20261028-followup/ipip50-reconciled-validation.json',JSON.stringify({source:'3eec3407c125d24527def08ab53d10b26e1163b6',activeInstrumentVersion:'1.1.0',measurementHash:hashScaleDefinition(source.executable.definition),sourceValidation:check,goldenCases:s.executable!.goldenCases.length,unchanged:'All original measurement/scoring/localization/applicability/disclosure/usage fields; only report/presentation/source release status revised.',complete,partial,database:'NOT_RUN'},null,2)+'\n');console.log('IPIP50 reconciled PASS: exact original 1.1.0 measurement, scoring, permissions and localization preserved; 3 original goldens and native report consumer verified.')

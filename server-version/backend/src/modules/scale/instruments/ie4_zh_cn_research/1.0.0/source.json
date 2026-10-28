@@ -185,7 +185,7 @@
     "source": "https://access.gesis.org/zis/1259 p3；中文沿用 PR328 fa355ff2dcd859b57a4bf2e8bddd77f8d428e3cf content-draft.json"
   },
   "executable": {
-    "releaseStatus": "PUBLISHED",
+    "releaseStatus": "RETIRED",
     "contentLocale": "zh-CN",
     "references": [],
     "definition": {

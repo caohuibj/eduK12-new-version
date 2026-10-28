@@ -1,0 +1,17 @@
+{
+  "status": "SUPERSEDES_NEW_1_0_0_ATTEMPT",
+  "existingBranch": "content/dot-local-scales-20261025",
+  "existingCommit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "existingVersion": "1.1.0",
+  "activeVersion": "1.2.0",
+  "reportVersion": "1.0.1",
+  "supersededCommit": "c2778ea05d111df5575dc476ce5bd802566fcb17",
+  "scope": [
+    "Preserve existing 1.1.0 source exactly.",
+    "Retire this followup premature 1.0.0 executable; it was never installed.",
+    "Build 1.2.0 from real 1.1.0; only separate original Q1 instruction into supported instruction slot, retaining actual item wording (including 如果, not the older草稿只要).",
+    "Keep existing scoring, response options, missing policy, applicable populations and disclosure; improve report text on R1.0.1."
+  ],
+  "historicalEvidence": "ie4-validation.json is only for the superseded1.0.0; use reconciled evidence for1.2.0.",
+  "database": "NOT_RUN"
+}
