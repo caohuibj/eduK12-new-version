@@ -1,0 +1,6 @@
+{
+  "formattedTokensEqualIgnoringComments": true,
+  "sourceSHA256": "3bea3c07159f95eadce9257207648658bc8f10e5996f594667cb6c877a84b515",
+  "generatedSchemaSHA256": "a93a9dad4178a28c903bed4e6fb54c71f7c2fb349d242d082f3fb2f237d93936",
+  "note": "Initial byte equality check stopped before launching services. Official Prisma format on isolated copy leaves only two additional SQL-owned-table comments; token streams match. Optional @prisma/internals not installed. No product source/client regeneration or app validation rerun."
+}

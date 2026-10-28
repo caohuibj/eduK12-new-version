@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {BRANCHES,CONTROLS,MARKER,onboardingPlan,onboardingOutputs} from './onboarding-scope.mjs';
-import {verifyOriginalReport,verifyTypeReceipt} from './onboarding-checks.mjs';
+import {verifyOriginalReport,verifyTypeReceipt,verifyReportPlanningObservation} from './onboarding-checks.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 const h=c=>c.repeat(40),base=h('a'),head=h('b'),source=h('c'),tree=h('d'),blob=h('e');
 function fixture(){
@@ -38,4 +38,23 @@ test('stable gate still requires admission and SAST success and rejects Draft or
  assert.deepEqual(requiredChecks(needs,false),['scope','onboarding-structure','codeql']);assert.deepEqual(failedChecks(needs,false),[]);assert(failedChecks(needs,true).length);
  for(const result of ['skipped','failure','cancelled',undefined])assert(failedChecks({...needs,'onboarding-structure':{result}},false).length);
  const yaml=readFileSync('.github/workflows/ci.yml','utf8');assert(yaml.includes('    - onboarding-structure\n'));assert(yaml.includes('      onboarding_plan:'));assert(yaml.includes('node .github/scripts/onboarding-checks.mjs admit'));
+});
+
+test('report planner observation admits both actual product checks without inventing a speed threshold',()=>{
+ const row=product=>({product,phase:'PLAN_AND_REVOCATION',metricVerified:true,revocationVerified:true,plannerBefore:{pid:10,setting:'8'},plannerAfter:{pid:10,setting:'8'},queryPlan:product==='SCHOOL'?[{limit:8,actualRows:1,planningMs:10,executionMs:1},{limit:1,actualRows:1,planningMs:20,executionMs:2}]:null});
+ const observation={scope:'Current real education assessment report service using synthetic accepted FINAL facts; no START/FINAL/browser or capacity claim',rows:[row('SCHOOL'),row('TEACHER')]},execution={exitCode:0,head:h('a')};
+ assert.equal(verifyReportPlanningObservation(observation,execution).ciExecuted,false);
+ assert.throws(()=>verifyReportPlanningObservation(observation,{...execution,exitCode:1}));
+ for(const mutate of [v=>v.rows.pop(),v=>v.rows[0].revocationVerified=false,v=>v.rows[1].plannerAfter.setting='1',v=>v.rows[0].queryPlan[1].actualRows=0]){const bad=structuredClone(observation);mutate(bad);assert.throws(()=>verifyReportPlanningObservation(bad,execution));}
+});
+test('shared planner branch reuses bounded admission with a distinct exact source namespace',()=>{
+ const f=fixture(),path='server-version/backend/src/modules/reporting/education-assessment-personal-report.service.ts';
+ const b={...f.b,pr:369,source:{[path]:{before:null,after:blob}}};
+ const entries=f.entries.map(e=>Object.hasOwn(f.b.source,e.file)?{...e,file:path}:e);
+ const env={...f.env,CI_PR_NUMBER:'369',CI_HEAD_REF:BRANCHES[369]};
+ assert.equal(onboardingPlan(entries,base,head,f.read,env,b).pr,369);
+ const outside='server-version/backend/src/modules/reporting/other.ts';
+ assert.throws(()=>onboardingPlan(entries.map(e=>e.file===path?{...e,file:outside}:e),base,head,f.read,env,{...b,source:{[outside]:{before:null,after:blob}}}));
+ assert.throws(()=>onboardingPlan(entries,base,head,f.read,{...env,CI_HEAD_REF:BRANCHES[365]},b));
+ const yaml=readFileSync('.github/workflows/ci.yml','utf8');assert(yaml.includes(".pr == 369 && 'paths: [server-version/backend/src/modules/reporting,"));
 });

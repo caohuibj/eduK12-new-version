@@ -1,0 +1,9 @@
+{
+  "exitCode": 0,
+  "seconds": 13.223544225969817,
+  "head": "642fda7ab754790686d6626efac62b73a332e663",
+  "postgres": "17.11",
+  "redis": "8.0.2",
+  "node": "v24.22.1",
+  "scope": "Current-main Survey first/warm API resource observation; not browser latency, four-entry capacity or production"
+}
