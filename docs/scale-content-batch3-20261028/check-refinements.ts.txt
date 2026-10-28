@@ -1,0 +1,61 @@
+import assert from 'node:assert/strict'
+import { readFileSync, readdirSync, writeFileSync } from 'node:fs'
+import { execFileSync } from 'node:child_process'
+import { createHash } from 'node:crypto'
+import { SCALE_INSTRUMENT_REGISTRY } from '../../server-version/backend/src/modules/scale/onboarding/instrument-registry'
+import { hashScaleDefinition } from '../../server-version/backend/src/modules/scale/scale-definition'
+
+const dir = 'docs/scale-content-batch3-20261028'
+const result: any = { scope: 'only newly prepared content identities; existing registry readiness, no independent golden replay', cases: [] }
+const sha = (b: Buffer) => createHash('sha256').update(b).digest('hex')
+const withoutDescriptions = (value: any): any => Array.isArray(value) ? value.map(withoutDescriptions) : value && typeof value === 'object' ? Object.fromEntries(Object.entries(value).filter(([k]) => k !== 'description' && k !== 'label').map(([k,v]) => [k,withoutDescriptions(v)])) : value
+for (const file of readdirSync(`${dir}/packages`).sort()) {
+  const record = JSON.parse(readFileSync(`${dir}/packages/${file}`, 'utf8'))
+  if (!record.patch) continue
+  const {sourceKey:key, preparedVersion:version} = record
+  const entry: any = {fullName:`${key}:${version} source content contract`,status:'failed'}
+  try {
+    const oldBytes = execFileSync('git',['show',`${record.sourceSHA}:${record.originalSource}`])
+    const old = JSON.parse(oldBytes.toString())
+    const bytes = readFileSync(record.preparedSource)
+    assert.equal(sha(oldBytes),record.originalSourceSHA256)
+    assert.equal(sha(bytes),record.preparedSourceSHA256)
+    const source = SCALE_INSTRUMENT_REGISTRY.getSource(key,version)!
+    assert.ok(source,'prepared identity is registered')
+    assert.equal(source.instruction?.language,source.executable!.contentLocale)
+    assert.ok(source.instruction?.text.trim())
+    assert.deepEqual(source.executable!.definition.responseSets,old.executable.definition.responseSets,'response anchors unchanged')
+    assert.deepEqual(withoutDescriptions(source.executable!.definition.scoring),withoutDescriptions(old.executable.definition.scoring),'all formulas, directions, keys, missing rules and scoring version unchanged')
+    assert.deepEqual(source.executable!.references,old.executable.references)
+    assert.deepEqual(source.executable!.goldenCases,old.executable.goldenCases)
+    if(version!==record.originalVersion) {
+      assert.deepEqual(readFileSync(record.originalSource),oldBytes,'original identity preserved byte-for-byte')
+      const original = SCALE_INSTRUMENT_REGISTRY.getSource(key,record.originalVersion)!
+      assert.equal(original.executable!.releaseStatus,'DRAFT')
+    }
+    const oldFirst=old.executable.definition.items[0].content
+    if(source.executable!.definition.items[0].content!==oldFirst) {
+      assert.equal(source.instruction!.text+'\n\n'+source.executable!.definition.items[0].content,oldFirst,'only exact administration prefix removed, not item wording')
+      assert.deepEqual(source.executable!.definition.items.slice(1),old.executable.definition.items.slice(1))
+    } else if(key==='apq42_parent_global_zh_cn_research') {
+      const expected=structuredClone(old.executable.definition.items)
+      assert.equal(expected[7].content,'孩子做错事后会说服你不要惩罚自己。')
+      expected[7].content='孩子做错事后会说服你不要惩罚孩子。'
+      assert.deepEqual(source.executable!.definition.items,expected)
+    } else assert.deepEqual(source.executable!.definition.items,old.executable.definition.items)
+    for(const part of ['localization','applicability','disclosure','usageRequirements','scientificReview'] as const) assert.deepEqual(source[part],old[part])
+    const validation = SCALE_INSTRUMENT_REGISTRY.getValidation(key,version)!
+    assert.equal(validation.valid,true,JSON.stringify(validation.issues))
+    entry.status='passed';entry.issues=validation.issues
+    entry.originalMeasurementHash=hashScaleDefinition(old.executable.definition)
+    entry.preparedMeasurementHash=hashScaleDefinition(source.executable!.definition)
+    entry.goldenCasesConsumedOnce=source.executable!.goldenCases.map(x=>x.name)
+    entry.reportVersion=source.executable!.definition.report.reportVersion
+  } catch(error) { entry.error=error instanceof Error ? error.stack : String(error) }
+  result.cases.push(entry)
+}
+result.passed=result.cases.filter((x:any)=>x.status==='passed').length
+result.failed=result.cases.length-result.passed
+writeFileSync(`${dir}/evidence/refinements-content.json`,JSON.stringify(result,null,2)+'\n')
+console.log(JSON.stringify(result))
+process.exitCode=result.failed?1:0

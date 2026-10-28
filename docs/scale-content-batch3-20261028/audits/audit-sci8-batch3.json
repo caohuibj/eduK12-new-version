@@ -1,0 +1,622 @@
+{
+  "instrument": "sci8_zh_cn_research:1.0.0",
+  "source_commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "source_files": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/sci8_zh_cn_research/1.0.0/source.json",
+      "blob": "d60c559d8e3752e120e8fd392cea6f8c6352d19e",
+      "sha256": "9a8e7c669cd1df9b9a6279de208029555bafa8a1c5e939187e0a64780cb7a540"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/sci8_zh_cn_research/1.0.0/instrument.ts",
+      "blob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/sci8/1.0.0/README.md",
+      "blob": "3f5efb2e77f671e88bed439283c566c9a6ad060f",
+      "sha256": "8424075ec7e128fb7150bce6b1ca3f6c5bc6c7f63dc3510c9f323c3f3915330a"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/sci8/1.0.0/bilingual-content.json",
+      "blob": "4612e57aabc133648d397e4844b9ea6834812d83",
+      "sha256": "281574fd608a4793db371e6955db291c7f94e672931b6598790bc1ef552296da"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/sci8/1.0.0/reviewed-source-pack.json",
+      "blob": "54ba642945cf198fabd6598e03e632b5747bb1c5",
+      "sha256": "5b5d5c788a59f24115a7cf8108405cfcf9899e15848b0dc83cff3869170cb24b"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/sci8/1.0.0/scoring-and-thresholds.md",
+      "blob": "e4084ed924605d5be5d99d1d163fd069a10f3fcb",
+      "sha256": "1a7ca191ccd168208752e823880be4d20faf00f1656a3943805d3c941d64ee23"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/sci8/1.0.0/report-example.md",
+      "blob": "6f3473d77e582a8a82959cd43ae0f97426c9d4f2",
+      "sha256": "7080295786ab1870b06964ac72b8d0a073dbec7c213ef146e5b55a5a5aaf1b00"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/sci8/1.0.0/references.md",
+      "blob": "5cd972e56919edfcba59986855f69806d72a788a",
+      "sha256": "ef7b87b21d105c4e124737f4062a71f49665344634577551d80cc5aeedcfbafc"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/sci8/1.0.0/external-reference-dossier.json",
+      "blob": "d455db332982cff286a527929017d7470a09fe37",
+      "sha256": "abf4b722a9b1f4d7aea5bcb87904657ae325fe2817ef93ad743bf857218e4ff8"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/sci8/1.0.0/local-validation.json",
+      "blob": "8a29d89a0e4e59a3e763409f04ea729387955524",
+      "sha256": "f4b0fe92e30fe444c67dfcbcebfe1fe8d5c964339b8fb23d75bdef8491ebc7a9"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/sci8/1.0.0/synthetic-report-example.json",
+      "blob": "4435276d19e7ed006b57cc76e947fe57854f1cba",
+      "sha256": "858e48c541b2fdcb835186239c4252b662d73d54587de743ed0b3d45ecb9ebda"
+    }
+  ],
+  "three_parts": {
+    "items_instruction": {
+      "items": [
+        {
+          "number": 1,
+          "code": "SCI8_01",
+          "english": "… how long does it take you to fall asleep?",
+          "chinese": "想一想过去一个月通常一晚的情况：你需要多长时间才能入睡？",
+          "original_stem": "Thinking about a typical night in the last month …",
+          "options_source": [
+            {
+              "en": "0–15 min",
+              "zh": "0—15分钟",
+              "score": 4
+            },
+            {
+              "en": "16–30 min",
+              "zh": "16—30分钟",
+              "score": 3
+            },
+            {
+              "en": "31–45 min",
+              "zh": "31—45分钟",
+              "score": 2
+            },
+            {
+              "en": "46–60 min",
+              "zh": "46—60分钟",
+              "score": 1
+            },
+            {
+              "en": "≥61 min",
+              "zh": "61分钟或更久",
+              "score": 0
+            }
+          ],
+          "runtime_options": [
+            {
+              "value": "4",
+              "label": "0—15分钟",
+              "score": 4
+            },
+            {
+              "value": "3",
+              "label": "16—30分钟",
+              "score": 3
+            },
+            {
+              "value": "2",
+              "label": "31—45分钟",
+              "score": 2
+            },
+            {
+              "value": "1",
+              "label": "46—60分钟",
+              "score": 1
+            },
+            {
+              "value": "0",
+              "label": "61分钟或更久",
+              "score": 0
+            }
+          ],
+          "transform": "identity",
+          "review": "工作中文保留题意、回忆时段与选项方向；需人工译审。"
+        },
+        {
+          "number": 2,
+          "code": "SCI8_02",
+          "english": "… if you then wake up during the night … how long are you awake for in total? (add all the wakenings up)",
+          "chinese": "想一想过去一个月通常一晚的情况：如果你在夜里醒来，醒着的时间加起来一共有多长？（把各次醒着的时间相加）",
+          "original_stem": "Thinking about a typical night in the last month …",
+          "options_source": [
+            {
+              "en": "0–15 min",
+              "zh": "0—15分钟",
+              "score": 4
+            },
+            {
+              "en": "16–30 min",
+              "zh": "16—30分钟",
+              "score": 3
+            },
+            {
+              "en": "31–45 min",
+              "zh": "31—45分钟",
+              "score": 2
+            },
+            {
+              "en": "46–60 min",
+              "zh": "46—60分钟",
+              "score": 1
+            },
+            {
+              "en": "≥61 min",
+              "zh": "61分钟或更久",
+              "score": 0
+            }
+          ],
+          "runtime_options": [
+            {
+              "value": "4",
+              "label": "0—15分钟",
+              "score": 4
+            },
+            {
+              "value": "3",
+              "label": "16—30分钟",
+              "score": 3
+            },
+            {
+              "value": "2",
+              "label": "31—45分钟",
+              "score": 2
+            },
+            {
+              "value": "1",
+              "label": "46—60分钟",
+              "score": 1
+            },
+            {
+              "value": "0",
+              "label": "61分钟或更久",
+              "score": 0
+            }
+          ],
+          "transform": "identity",
+          "review": "工作中文保留题意、回忆时段与选项方向；需人工译审。"
+        },
+        {
+          "number": 3,
+          "code": "SCI8_03",
+          "english": "… how many nights a week do you have a problem with your sleep?",
+          "chinese": "想一想过去一个月通常一晚的情况：你每周有几个晚上遇到睡眠问题？",
+          "original_stem": "Thinking about a typical night in the last month …",
+          "options_source": [
+            {
+              "en": "0–1",
+              "zh": "0—1晚",
+              "score": 4
+            },
+            {
+              "en": "2",
+              "zh": "2晚",
+              "score": 3
+            },
+            {
+              "en": "3",
+              "zh": "3晚",
+              "score": 2
+            },
+            {
+              "en": "4",
+              "zh": "4晚",
+              "score": 1
+            },
+            {
+              "en": "5–7",
+              "zh": "5—7晚",
+              "score": 0
+            }
+          ],
+          "runtime_options": [
+            {
+              "value": "4",
+              "label": "0—1晚",
+              "score": 4
+            },
+            {
+              "value": "3",
+              "label": "2晚",
+              "score": 3
+            },
+            {
+              "value": "2",
+              "label": "3晚",
+              "score": 2
+            },
+            {
+              "value": "1",
+              "label": "4晚",
+              "score": 1
+            },
+            {
+              "value": "0",
+              "label": "5—7晚",
+              "score": 0
+            }
+          ],
+          "transform": "identity",
+          "review": "工作中文保留题意、回忆时段与选项方向；需人工译审。"
+        },
+        {
+          "number": 4,
+          "code": "SCI8_04",
+          "english": "… how would you rate your sleep quality?",
+          "chinese": "想一想过去一个月通常一晚的情况：你觉得自己的睡眠质量怎么样？",
+          "original_stem": "Thinking about a typical night in the last month …",
+          "options_source": [
+            {
+              "en": "Very good",
+              "zh": "很好",
+              "score": 4
+            },
+            {
+              "en": "Good",
+              "zh": "好",
+              "score": 3
+            },
+            {
+              "en": "Average",
+              "zh": "一般",
+              "score": 2
+            },
+            {
+              "en": "Poor",
+              "zh": "差",
+              "score": 1
+            },
+            {
+              "en": "Very poor",
+              "zh": "很差",
+              "score": 0
+            }
+          ],
+          "runtime_options": [
+            {
+              "value": "4",
+              "label": "很好",
+              "score": 4
+            },
+            {
+              "value": "3",
+              "label": "好",
+              "score": 3
+            },
+            {
+              "value": "2",
+              "label": "一般",
+              "score": 2
+            },
+            {
+              "value": "1",
+              "label": "差",
+              "score": 1
+            },
+            {
+              "value": "0",
+              "label": "很差",
+              "score": 0
+            }
+          ],
+          "transform": "identity",
+          "review": "工作中文保留题意、回忆时段与选项方向；需人工译审。"
+        },
+        {
+          "number": 5,
+          "code": "SCI8_05",
+          "english": "… affected your mood, energy, or relationships?",
+          "chinese": "回想过去一个月：睡眠不好在多大程度上影响了你的心情、精力或人际关系？",
+          "original_stem": "Thinking about the past month, to what extent has poor sleep …",
+          "options_source": [
+            {
+              "en": "Not at all",
+              "zh": "完全没有",
+              "score": 4
+            },
+            {
+              "en": "A little",
+              "zh": "一点点",
+              "score": 3
+            },
+            {
+              "en": "Somewhat",
+              "zh": "有一些",
+              "score": 2
+            },
+            {
+              "en": "Much",
+              "zh": "很大",
+              "score": 1
+            },
+            {
+              "en": "Very much",
+              "zh": "非常大",
+              "score": 0
+            }
+          ],
+          "runtime_options": [
+            {
+              "value": "4",
+              "label": "完全没有",
+              "score": 4
+            },
+            {
+              "value": "3",
+              "label": "一点点",
+              "score": 3
+            },
+            {
+              "value": "2",
+              "label": "有一些",
+              "score": 2
+            },
+            {
+              "value": "1",
+              "label": "很大",
+              "score": 1
+            },
+            {
+              "value": "0",
+              "label": "非常大",
+              "score": 0
+            }
+          ],
+          "transform": "identity",
+          "review": "工作中文保留题意、回忆时段与选项方向；需人工译审。"
+        },
+        {
+          "number": 6,
+          "code": "SCI8_06",
+          "english": "… affected your concentration, productivity, or ability to stay awake",
+          "chinese": "回想过去一个月：睡眠不好在多大程度上影响了你集中注意、做事的效率或保持清醒的能力？",
+          "original_stem": "Thinking about the past month, to what extent has poor sleep …",
+          "options_source": [
+            {
+              "en": "Not at all",
+              "zh": "完全没有",
+              "score": 4
+            },
+            {
+              "en": "A little",
+              "zh": "一点点",
+              "score": 3
+            },
+            {
+              "en": "Somewhat",
+              "zh": "有一些",
+              "score": 2
+            },
+            {
+              "en": "Much",
+              "zh": "很大",
+              "score": 1
+            },
+            {
+              "en": "Very much",
+              "zh": "非常大",
+              "score": 0
+            }
+          ],
+          "runtime_options": [
+            {
+              "value": "4",
+              "label": "完全没有",
+              "score": 4
+            },
+            {
+              "value": "3",
+              "label": "一点点",
+              "score": 3
+            },
+            {
+              "value": "2",
+              "label": "有一些",
+              "score": 2
+            },
+            {
+              "value": "1",
+              "label": "很大",
+              "score": 1
+            },
+            {
+              "value": "0",
+              "label": "非常大",
+              "score": 0
+            }
+          ],
+          "transform": "identity",
+          "review": "工作中文保留题意、回忆时段与选项方向；需人工译审。"
+        },
+        {
+          "number": 7,
+          "code": "SCI8_07",
+          "english": "… troubled you in general",
+          "chinese": "回想过去一个月：总的来说，睡眠不好给你带来了多大困扰？",
+          "original_stem": "Thinking about the past month, to what extent has poor sleep …",
+          "options_source": [
+            {
+              "en": "Not at all",
+              "zh": "完全没有",
+              "score": 4
+            },
+            {
+              "en": "A little",
+              "zh": "一点点",
+              "score": 3
+            },
+            {
+              "en": "Somewhat",
+              "zh": "有一些",
+              "score": 2
+            },
+            {
+              "en": "Much",
+              "zh": "很大",
+              "score": 1
+            },
+            {
+              "en": "Very much",
+              "zh": "非常大",
+              "score": 0
+            }
+          ],
+          "runtime_options": [
+            {
+              "value": "4",
+              "label": "完全没有",
+              "score": 4
+            },
+            {
+              "value": "3",
+              "label": "一点点",
+              "score": 3
+            },
+            {
+              "value": "2",
+              "label": "有一些",
+              "score": 2
+            },
+            {
+              "value": "1",
+              "label": "很大",
+              "score": 1
+            },
+            {
+              "value": "0",
+              "label": "非常大",
+              "score": 0
+            }
+          ],
+          "transform": "identity",
+          "review": "工作中文保留题意、回忆时段与选项方向；需人工译审。"
+        },
+        {
+          "number": 8,
+          "code": "SCI8_08",
+          "english": "… how long have you had a problem with your sleep?",
+          "chinese": "最后，你的睡眠问题持续多久了？",
+          "original_stem": "Finally …",
+          "options_source": [
+            {
+              "en": "I don’t have a problem/<1 mo",
+              "zh": "没有睡眠问题，或不足1个月",
+              "score": 4
+            },
+            {
+              "en": "1–2 mo",
+              "zh": "1—2个月",
+              "score": 3
+            },
+            {
+              "en": "3–6 mo",
+              "zh": "3—6个月",
+              "score": 2
+            },
+            {
+              "en": "7–12 mo",
+              "zh": "7—12个月",
+              "score": 1
+            },
+            {
+              "en": ">1 yr",
+              "zh": "超过1年",
+              "score": 0
+            }
+          ],
+          "runtime_options": [
+            {
+              "value": "4",
+              "label": "没有睡眠问题，或不足1个月",
+              "score": 4
+            },
+            {
+              "value": "3",
+              "label": "1—2个月",
+              "score": 3
+            },
+            {
+              "value": "2",
+              "label": "3—6个月",
+              "score": 2
+            },
+            {
+              "value": "1",
+              "label": "7—12个月",
+              "score": 1
+            },
+            {
+              "value": "0",
+              "label": "超过1年",
+              "score": 0
+            }
+          ],
+          "transform": "identity",
+          "review": "持续时间单独询问，未错误限定过去一个月。"
+        }
+      ],
+      "basis": "依据固定双语与研究包对照2014附录；本次未另核原始论文。",
+      "instruction": {
+        "sources": [
+          {
+            "path": "docs/scale-instruments/research-drafts/sci8/1.0.0/bilingual-content.json",
+            "blob": "4612e57aabc133648d397e4844b9ea6834812d83",
+            "sha256": "281574fd608a4793db371e6955db291c7f94e672931b6598790bc1ef552296da",
+            "field": "/instructions"
+          },
+          {
+            "path": "docs/scale-instruments/research-drafts/sci8/1.0.0/reviewed-source-pack.json",
+            "blob": "54ba642945cf198fabd6598e03e632b5747bb1c5",
+            "sha256": "5b5d5c788a59f24115a7cf8108405cfcf9899e15848b0dc83cff3869170cb24b",
+            "field": "/instructions_zh"
+          }
+        ],
+        "text": "第1—4题，请想一想过去一个月里通常一晚的睡眠情况。第5—7题，请回想过去一个月睡眠不好对你的影响。最后一题询问睡眠问题持续了多久。",
+        "runtime": "source无顶层instruction；题1–4各有过去一个月通常一晚，5–7各有过去一个月，8单独询问持续时间。",
+        "suggested_binding": {
+          "path": "server-version/backend/src/modules/scale/instruments/sci8_zh_cn_research/1.0.0/source.json#/instruction",
+          "old": null,
+          "new": {
+            "schemaVersion": 1,
+            "text": "第1—4题，请想一想过去一个月里通常一晚的睡眠情况。第5—7题，请回想过去一个月睡眠不好对你的影响。最后一题询问睡眠问题持续了多久。",
+            "language": "zh-CN",
+            "version": "1.0.0",
+            "source": "固定双语研究材料独立中文工作稿"
+          }
+        },
+        "note": "绑定时保留既有逐题时段文本，避免修改定义hash与丢失时间语境；是否重复呈现由root统筹。"
+      }
+    },
+    "scoring": {
+      "formula": "每题选项直接预编码0–4、所有itemRules identity；8项等权总分0–32，较高表示较好睡眠；不要再反向。",
+      "missing": "complete_required且题项required，任一缺失不计算总分；项目保守选择，不补零。",
+      "parameter": "研究包保留原英文<=16研究筛查参考，但referencePolicy none、references空、报告无bands；不作为此中文版本诊断或自动分档。"
+    },
+    "report": {
+      "review": "描述睡眠状况方向、生活具体影响和寻求支持，非自律判断或诊断，高分不排除困扰；已合格，无需强改。",
+      "versions": "内容、计分、报告、本地化1.0.0；成人自答student是技术角色。"
+    }
+  },
+  "ordinary_suggestions": [
+    "可按固定文档原文绑定独立指导语，保留各题时间前缀与第8题持续时间；无必须改写报告。"
+  ],
+  "substantive_coordination": [
+    "任何题目、锚点、计分或外部阈值启用需人工科研/版本协调。"
+  ],
+  "human_status": "独立中文工作稿人工译审与本地验证待完成；权利声明维持原资料记录，不新增自动门禁。",
+  "not_executed": [
+    "未运行测试、系统、DB或CI，未修改仓库；历史证据不是本次结果。"
+  ],
+  "conclusion": "固定源题目、原始选项预编码、总分及报告一致；指导语可按已记录原文接入。"
+}

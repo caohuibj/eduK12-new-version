@@ -1,0 +1,166 @@
+{
+  "identity": "ie4_zh_cn_research:1.1.0",
+  "sourceCommit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "sourceFiles": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ie4_zh_cn_research/1.1.0/source.json",
+      "gitBlob": "31d1850fc1f53b09702ecdf4d007a3b781b0a038",
+      "sha256": "b3ec87226d5030dccb59e1f362b8da4372fb3dda43ea0559d7998ce45539bca3"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ie4_zh_cn_research/1.1.0/instrument.ts",
+      "gitBlob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ie4_zh_cn_research/1.1.0/README.md",
+      "gitBlob": "6df0974e4039b1f9eed6b21f5620e6b4082e4cd9",
+      "sha256": "23ca79f30c2ba8e506738238f98a6412fcabf2ff7700567fdaf7ef64b3a6ac78"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ie4_zh_cn_research/1.1.0/bilingual-content.json",
+      "gitBlob": "0c71c771dacff5d59fd3cd33d1fc2c69c9f25903",
+      "sha256": "ccdd76c413ce2826c46987f64bb1168930ee3f8b59390f0f25146a6416fdde10"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ie4_zh_cn_research/1.1.0/reviewed-source-pack.json",
+      "gitBlob": "502c76464561f25ca10d1c8fddfb518b4ed377a6",
+      "sha256": "710ff561d0749ab1b5acc126197496e8cb2a43e8177712edf4a29e8cc5b176f8"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ie4_zh_cn_research/1.1.0/external-reference-dossier.json",
+      "gitBlob": "da833b436724d696d9afb1fd85905958c6b13023",
+      "sha256": "d70674896e261822f2a98bcc3f88fcb1845bfcbf9c0eb3aa6463b9a30830f238"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ie4_zh_cn_research/1.1.0/references.md",
+      "gitBlob": "5276b4e4a9a14a2f6f9547f374e4450398095bbe",
+      "sha256": "20e4d25ff76b524fbdc668f9aadf9c39ec600b99db6bf12c2e7d69c35976fdfd"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ie4_zh_cn_research/1.1.0/report-example.md",
+      "gitBlob": "bb91c282dae230049604107eb88a94e5c7c9ad3d",
+      "sha256": "4b2e1747b4064b84167b48ed86b5f67e639499e4c5c48bf680621a2af4254792"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ie4_zh_cn_research/1.1.0/report-example.json",
+      "gitBlob": "fcc6b8faa6a0c59824bb3278002e617c84a7b693",
+      "sha256": "2bd78587a092bba945ec8df1f5a383f6f8a49a8e6009d2a7db061550b3b5f2a0"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ie4_zh_cn_research/1.1.0/scoring-and-thresholds.md",
+      "gitBlob": "d320f799ae52bac910ce05652c81a701051d3fd0",
+      "sha256": "ea100023b5ed9cf46b6ba538623d137c2578aba6d42a817197c3da8329bc06f8"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ie4_zh_cn_research/1.1.0/local-validation.json",
+      "gitBlob": "7f0b99649e5a2a44adceb61611580d41e3540437",
+      "sha256": "305734eae0105516dffec1cff6334ed161360ec127ef7364b08361405a2542e6"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ie4_zh_cn_research/1.1.0/runtime-check.json",
+      "gitBlob": "455f23a968cf95a27db4456e278a8305e119727c",
+      "sha256": "f316bd0604cc39780426c26bf758d664e2a2518941c7dcf81fa3681df4430563"
+    }
+  ],
+  "threePartConclusions": {
+    "content": "四题对应固定英文和中文工作译稿；1/2为内控、3/4为外控，均保留原值正向、非互相反向。五点符合度无中立表述或回忆期。中文译审及目标人群验证待完成。",
+    "scoring": "内控=(1+2)/2、外控=(3+4)/2；各范围1–5、分母2，两个均分不合总分、不互相反向；项目各维2题完整才计算，完整报告需四题，无个人插补。英国/德国均值仅原样本材料，不作为中文常模或阈值；跨国未支持标量不变性、应答偏差提醒保留。",
+    "report": "1.0.0两维不当作非此即彼，不把努力等同必然成功或把外部因素等同懒惰；提供自愿行动、求助及不可控事项三栏，无临床/人格等级。成人工作译稿，instrument/localization1.1.0、scoring/report1.0.0。"
+  },
+  "items": [
+    {
+      "number": 1,
+      "itemCode": "IE4_01",
+      "en": "I’m my own boss.",
+      "zh": "我自己做主。",
+      "dimension": "internal",
+      "key": "identity",
+      "assessment": "双语与运行时对应；首题前含指导语；译审待完成。"
+    },
+    {
+      "number": 2,
+      "itemCode": "IE4_02",
+      "en": "If I work hard, I will succeed.",
+      "zh": "如果我努力，就会成功。",
+      "dimension": "internal",
+      "key": "identity",
+      "assessment": "双语与运行时对应；首题前含指导语；译审待完成。"
+    },
+    {
+      "number": 3,
+      "itemCode": "IE4_03",
+      "en": "Whether at work or in my private life: What I do is mainly determined by others.",
+      "zh": "无论是在工作中还是在私人生活中，我做什么主要由别人决定。",
+      "dimension": "external",
+      "key": "identity",
+      "assessment": "双语与运行时对应；首题前含指导语；译审待完成。"
+    },
+    {
+      "number": 4,
+      "itemCode": "IE4_04",
+      "en": "Fate often gets in the way of my plans.",
+      "zh": "命运常常阻碍我的计划。",
+      "dimension": "external",
+      "key": "identity",
+      "assessment": "双语与运行时对应；首题前含指导语；译审待完成。"
+    }
+  ],
+  "anchors": [
+    {
+      "value": 1,
+      "en": "does not apply at all",
+      "zh": "完全不符合"
+    },
+    {
+      "value": 2,
+      "en": "applies a bit",
+      "zh": "有一点符合"
+    },
+    {
+      "value": 3,
+      "en": "applies somewhat",
+      "zh": "有些符合"
+    },
+    {
+      "value": 4,
+      "en": "applies mostly",
+      "zh": "大体符合"
+    },
+    {
+      "value": 5,
+      "en": "applies completely",
+      "zh": "完全符合"
+    }
+  ],
+  "instruction": {
+    "text": "以下陈述可能在不同程度上符合您的情况。您觉得每条陈述在多大程度上符合您本人？",
+    "sources": [
+      {
+        "file": {
+          "path": "docs/scale-instruments/research-drafts/ie4_zh_cn_research/1.1.0/bilingual-content.json",
+          "gitBlob": "0c71c771dacff5d59fd3cd33d1fc2c69c9f25903",
+          "sha256": "ccdd76c413ce2826c46987f64bb1168930ee3f8b59390f0f25146a6416fdde10"
+        },
+        "field": "instructions.zh"
+      },
+      {
+        "file": {
+          "path": "server-version/backend/src/modules/scale/instruments/ie4_zh_cn_research/1.1.0/source.json",
+          "gitBlob": "31d1850fc1f53b09702ecdf4d007a3b781b0a038",
+          "sha256": "b3ec87226d5030dccb59e1f362b8da4372fb3dda43ea0559d7998ce45539bca3"
+        },
+        "field": "executable.definition.items[0].content首段"
+      }
+    ],
+    "qualification": "项目译文已嵌首题；独立绑定时避免重复，改变冻结题干需版本协调。"
+  },
+  "ordinaryRevisions": [],
+  "manualPending": [
+    "中文译审和目标人群验证尚待完成。",
+    "任何实质改题、键向、两维均分或阈值需列原依据及版本影响协调。"
+  ],
+  "notExecuted": [
+    "未运行golden、评分、系统、DB、CI；未做新科研或版权调查。"
+  ]
+}

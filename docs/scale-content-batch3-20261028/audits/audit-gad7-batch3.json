@@ -1,0 +1,181 @@
+{
+  "identity": "gad7_zh_cn_research:1.1.0",
+  "sourceCommit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "sourceFiles": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/gad7_zh_cn_research/1.1.0/source.json",
+      "gitBlob": "8cef5680c1d576fb5f463a0f8990e86cad4788f9",
+      "sha256": "93019ebbe52aecbf3d3acff87c346fdb8bd20daf81f0d60ace594681ee5b161e"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/gad7_zh_cn_research/1.1.0/instrument.ts",
+      "gitBlob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/gad7/1.1.0/README.md",
+      "gitBlob": "8ce9919c82940e15d21673adc87f35ff9a064c83",
+      "sha256": "ba38f111326575c514dfe9eace13cde06151e335cc5733d323e45a03cb8989ca"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/gad7/1.1.0/bilingual-content.json",
+      "gitBlob": "3ac5de4b7b70792274229b6e9cc546d73463a788",
+      "sha256": "f58e3264de7c8ce2f112b8fd83f5fc255d0caefb8a9ba3203f7911845ac22bf2"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/gad7/1.1.0/reviewed-source-pack.json",
+      "gitBlob": "8c911c904892887a0045fd6a3374909f53e7b2b4",
+      "sha256": "d4cd7ed0c760edffec83e25eb929167ef65c0c29d43294b2f75fc3324480622c"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/gad7/1.1.0/external-reference-dossier.json",
+      "gitBlob": "4b1929f821edd5deb255650e88bb7a8f2b4ff4f1",
+      "sha256": "115015bb5704094a6aecca8a19fea6127b5af7de99512d98422123707a61c018"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/gad7/1.1.0/references.md",
+      "gitBlob": "5d9467d753d9b02abb76c6dca1869ccad2447ee5",
+      "sha256": "1ae314af0b4672f1da96c03005678ae8568b9c28e4ab723bfeeed22c672dcab1"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/gad7/1.1.0/report-example.md",
+      "gitBlob": "17d7b8363e85f3a70d278baba4e26245499e0a0c",
+      "sha256": "35a8eeb59483319ae2cfd3ad377fabd1b04d5d3c44cf3d0d2450445d4453d65a"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/gad7/1.1.0/report-example.json",
+      "gitBlob": "12d922fede50c1689b6820014d4ef6947cd5aa25",
+      "sha256": "7dbf2246790191f1babacd1f228b58f07284109813adf0d8692a7e4e11d0fe12"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/gad7/1.1.0/scoring-and-thresholds.md",
+      "gitBlob": "22281dd9053c79826777d429a69f775a06de5ffa",
+      "sha256": "0dd4d63e5d2291980cbeb4660058d8c8415ebe52649a93b7f867a4840dd4f5c3"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/gad7/1.1.0/local-validation.json",
+      "gitBlob": "60c3474902cfaf820025a790951bf777657975c9",
+      "sha256": "2a69231087e804b63758e0605102bcf670f1976209cdd4b67889191272278c1c"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/gad7/1.1.0/runtime-check.json",
+      "gitBlob": "596ea7e115d03e2f7d50fc31968ca72bf9c9dae0",
+      "sha256": "704db288cf8124c337f9cc103f3a96c8e9d1b09d4dafd7dd28d0e84257ac80d5"
+    }
+  ],
+  "threePartConclusions": {
+    "content": "原七症状与固定双语稿逐题对应，全部正向；过去两周，0–3天数频率。每个运行题均重复既有指导语；官方中文题本未取得，独立中文不冒称验证译本，原额外功能困难题不在七题计分中。",
+    "scoring": "七题等权原值之和0–21，无反向，项目complete_required缺一不给总分且不补零。外部档案0–4/5–9/10–14/15–21及≥10筛查证据属原美国成人初保样本，仅供研究、未绑定；两周症状不等于诊断所需持续期。",
+    "report": "report1.0.0为非诊断描述，低分不排除支持需要，明确静态安全说明无人实时监测；不套用外部分档。instrument1.1.0、scoring/report1.0.0，成人研究中文待审。"
+  },
+  "items": [
+    {
+      "id": "GAD7-01",
+      "itemCode": "GAD7_01",
+      "en": "Feeling nervous, anxious or on edge",
+      "zh": "感到紧张、焦虑或绷紧了神经",
+      "key": "positive",
+      "assessment": "固定双语与运行时对应；待人工译审。"
+    },
+    {
+      "id": "GAD7-02",
+      "itemCode": "GAD7_02",
+      "en": "Not being able to stop or control worrying",
+      "zh": "无法停止或控制担忧",
+      "key": "positive",
+      "assessment": "固定双语与运行时对应；待人工译审。"
+    },
+    {
+      "id": "GAD7-03",
+      "itemCode": "GAD7_03",
+      "en": "Worrying too much about different things",
+      "zh": "对各种事情担忧过多",
+      "key": "positive",
+      "assessment": "固定双语与运行时对应；待人工译审。"
+    },
+    {
+      "id": "GAD7-04",
+      "itemCode": "GAD7_04",
+      "en": "Trouble relaxing",
+      "zh": "难以放松",
+      "key": "positive",
+      "assessment": "固定双语与运行时对应；待人工译审。"
+    },
+    {
+      "id": "GAD7-05",
+      "itemCode": "GAD7_05",
+      "en": "Being so restless that it is hard to sit still",
+      "zh": "坐立不安，以至于难以安静地坐着",
+      "key": "positive",
+      "assessment": "固定双语与运行时对应；待人工译审。"
+    },
+    {
+      "id": "GAD7-06",
+      "itemCode": "GAD7_06",
+      "en": "Becoming easily annoyed or irritable",
+      "zh": "变得容易恼火或烦躁",
+      "key": "positive",
+      "assessment": "固定双语与运行时对应；待人工译审。"
+    },
+    {
+      "id": "GAD7-07",
+      "itemCode": "GAD7_07",
+      "en": "Feeling afraid as if something awful might happen",
+      "zh": "感到害怕，好像可能会有很糟糕的事情发生",
+      "key": "positive",
+      "assessment": "固定双语与运行时对应；待人工译审。"
+    }
+  ],
+  "anchors": [
+    {
+      "value": 0,
+      "en": "Not at all",
+      "zh_draft": "完全没有"
+    },
+    {
+      "value": 1,
+      "en": "Several days",
+      "zh_draft": "有几天"
+    },
+    {
+      "value": 2,
+      "en": "More than half the days",
+      "zh_draft": "超过一半的天数"
+    },
+    {
+      "value": 3,
+      "en": "Nearly every day",
+      "zh_draft": "几乎每天"
+    }
+  ],
+  "instruction": {
+    "text": "过去两周里，以下问题困扰您的频率是多少？",
+    "sources": [
+      {
+        "file": {
+          "path": "docs/scale-instruments/research-drafts/gad7/1.1.0/bilingual-content.json",
+          "gitBlob": "3ac5de4b7b70792274229b6e9cc546d73463a788",
+          "sha256": "f58e3264de7c8ce2f112b8fd83f5fc255d0caefb8a9ba3203f7911845ac22bf2"
+        },
+        "field": "instructions"
+      },
+      {
+        "file": {
+          "path": "server-version/backend/src/modules/scale/instruments/gad7_zh_cn_research/1.1.0/source.json",
+          "gitBlob": "8cef5680c1d576fb5f463a0f8990e86cad4788f9",
+          "sha256": "93019ebbe52aecbf3d3acff87c346fdb8bd20daf81f0d60ace594681ee5b161e"
+        },
+        "field": "executable.definition.items[*].content 首行"
+      }
+    ],
+    "qualification": "原回忆期说明重复在各题，若独立绑定应避免重复；修改题干影响冻结定义需协调。"
+  },
+  "ordinaryRevisions": [],
+  "manualPending": [
+    "官方中文题本不可得，不能伪称官方译本；中文译审和目标人群验证待完成。",
+    "切点、题目、时间窗或评分变化须来源/人群匹配及版本协调。"
+  ],
+  "notExecuted": [
+    "未运行golden、评分、系统、DB、CI；未做新临床研究或版权调查。"
+  ]
+}

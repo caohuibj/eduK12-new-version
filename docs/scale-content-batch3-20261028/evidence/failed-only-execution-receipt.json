@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "base": "8774b1cf158dae1c5eb0f4950044c6ae6d6a18dd",
+  "contentHead": "89f62735384019bd7eb38a1ff708a11aaf426a5b",
+  "node": {
+    "path": "/workspace/eduk12-cloud/tools/node_modules/.bin/node",
+    "version": "v24.21.0",
+    "sha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c"
+  },
+  "environmentLimit": "input manifest conservatively records backend source and lock/config; historical/full node_modules byte inventory not captured; not an attestation of every dependency byte",
+  "checks": [
+    {
+      "id": "refinements-failed-only",
+      "cwd": "/workspace/eduK12-new-version",
+      "argv": [
+        "/workspace/eduk12-cloud/tools/node_modules/.bin/node",
+        "/workspace/eduK12-new-version/server-version/backend/node_modules/tsx/dist/cli.mjs",
+        "/workspace/eduK12-new-version/docs/scale-content-batch3-20261028/check-failed-only.ts"
+      ],
+      "startedAt": "2026-10-28T03:49:17.435322+00:00",
+      "endedAt": "2026-10-28T03:49:18.038275+00:00",
+      "processExitCode": 1,
+      "beforeAfterIdentical": true,
+      "inputManifest": "refinements-failed-only.inputs.json.gz",
+      "inputManifestUncompressedSHA256": "90a4182a1e80e9c2f1c3304fa308d046750bd50ecbd890de077ed0ed418624a3",
+      "logs": {
+        "stdout": {
+          "path": "refinements-failed-only.stdout.log",
+          "bytes": 2266,
+          "sha256": "1f0a1f114135f061024509b75bdba8b11780847eb1fad64db0436b1a07e5459f"
+        },
+        "stderr": {
+          "path": "refinements-failed-only.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    }
+  ],
+  "outerInvocation": {
+    "argv": [
+      "python3",
+      "/tmp/run-failed-only-batch3-checks.py"
+    ],
+    "cwd": "/workspace/eduK12-new-version",
+    "shellLogin": false,
+    "processExitCode": 1,
+    "executionToolChunk": "88a159",
+    "sourceCopy": "../commands/run-failed-only-batch3-checks.py.txt",
+    "note": "Observed outer unified-exec exit, independent of individual cases; failed invocation is not relabelled success."
+  },
+  "plannedButNotExecuted": [
+    "generated-index check skipped after preceding command failed"
+  ]
+}

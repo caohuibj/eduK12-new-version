@@ -1,0 +1,115 @@
+{
+  "scope": "only newly prepared content identities; existing registry readiness, no independent golden replay",
+  "cases": [
+    {
+      "fullName": "apq42_parent_global_zh_cn_research:1.0.1 source content contract",
+      "status": "failed",
+      "error": "AssertionError [ERR_ASSERTION]: prepared identity is registered\n    at assert (/workspace/eduK12-new-version/docs/scale-content-batch3-20261028/check-refinements.ts:24:12)\n    at Object.<anonymous> (/workspace/eduK12-new-version/docs/scale-content-batch3-20261028/check-refinements.ts:61:34)\n    at Module._compile (node:internal/modules/cjs/loader:1929:14)\n    at Object.transformer (/workspace/eduK12-new-version/server-version/backend/node_modules/tsx/dist/register-C557imBs.cjs:9:3619)\n    at Module.load (node:internal/modules/cjs/loader:1651:32)\n    at Module._load (node:internal/modules/cjs/loader:1443:12)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)\n    at loadCJSModuleWithModuleLoad (node:internal/modules/esm/translators:372:15)\n    at ModuleWrap.<anonymous> (node:internal/modules/esm/translators:244:9)\n    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)"
+    },
+    {
+      "fullName": "cfq7_zh_cn_research:1.0.1 source content contract",
+      "status": "passed",
+      "issues": [],
+      "originalMeasurementHash": "7882f8b3cb47f768e66dc346e017870ec689e30f1a833c50a014113ffde7807c",
+      "preparedMeasurementHash": "7882f8b3cb47f768e66dc346e017870ec689e30f1a833c50a014113ffde7807c",
+      "goldenCasesConsumedOnce": [
+        "minimum",
+        "middle",
+        "maximum",
+        "all_low_2",
+        "all_high_6"
+      ],
+      "reportVersion": "1.0.1"
+    },
+    {
+      "fullName": "dbt_wccl59_zh_tw_official_research:1.0.1 source content contract",
+      "status": "failed",
+      "error": "AssertionError [ERR_ASSERTION]: [{\"path\":\"report.audienceContract\",\"message\":\"AUDIENCE_LANGUAGE_QC_REQUIRED\",\"severity\":\"error\"},{\"path\":\"productReadiness\",\"message\":\"SCALE_PACKAGE_INVALID:report.audienceContract: AUDIENCE_LANGUAGE_QC_REQUIRED\",\"severity\":\"error\"}]\n\nfalse !== true\n\n    at assert (/workspace/eduK12-new-version/docs/scale-content-batch3-20261028/check-refinements.ts:48:12)\n    at Object.<anonymous> (/workspace/eduK12-new-version/docs/scale-content-batch3-20261028/check-refinements.ts:61:34)\n    at Module._compile (node:internal/modules/cjs/loader:1929:14)\n    at Object.transformer (/workspace/eduK12-new-version/server-version/backend/node_modules/tsx/dist/register-C557imBs.cjs:9:3619)\n    at Module.load (node:internal/modules/cjs/loader:1651:32)\n    at Module._load (node:internal/modules/cjs/loader:1443:12)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)\n    at loadCJSModuleWithModuleLoad (node:internal/modules/esm/translators:372:15)\n    at ModuleWrap.<anonymous> (node:internal/modules/esm/translators:244:9)\n    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)"
+    },
+    {
+      "fullName": "djgls6_zh_cn_research:1.0.1 source content contract",
+      "status": "passed",
+      "issues": [],
+      "originalMeasurementHash": "43b8ce04ab1d9702859fa1063ecbd374ff9d492ec31fa0e7125068574381f892",
+      "preparedMeasurementHash": "43b8ce04ab1d9702859fa1063ecbd374ff9d492ec31fa0e7125068574381f892",
+      "goldenCasesConsumedOnce": [
+        "minimum",
+        "maximum",
+        "all-middle",
+        "all-no",
+        "all-yes"
+      ],
+      "reportVersion": "1.0.1"
+    },
+    {
+      "fullName": "ebq16_zh_cn_research:1.0.2 source content contract",
+      "status": "passed",
+      "issues": [],
+      "originalMeasurementHash": "af6ac774906ea6595d6a29f05a098c603f780211f813569bfb03a18e6d127c22",
+      "preparedMeasurementHash": "af6ac774906ea6595d6a29f05a098c603f780211f813569bfb03a18e6d127c22",
+      "goldenCasesConsumedOnce": [
+        "minimum",
+        "maximum",
+        "midpoint",
+        "mixed_independent",
+        "missing_first",
+        "all_missing"
+      ],
+      "reportVersion": "1.0.4"
+    },
+    {
+      "fullName": "kseg6_zh_cn_research:1.0.1 source content contract",
+      "status": "passed",
+      "issues": [],
+      "originalMeasurementHash": "0e267be459d2be7784dfe4c7f556f3b04e4c169ae275a4e39d61d1199c2c65fe",
+      "preparedMeasurementHash": "0e267be459d2be7784dfe4c7f556f3b04e4c169ae275a4e39d61d1199c2c65fe",
+      "goldenCasesConsumedOnce": [
+        "minimum",
+        "maximum",
+        "all-three",
+        "all-one",
+        "separate-directions"
+      ],
+      "reportVersion": "1.0.1"
+    },
+    {
+      "fullName": "maia2_37_zh_cn_research:1.0.1 source content contract",
+      "status": "passed",
+      "issues": [],
+      "originalMeasurementHash": "3c5c551f2b9a7f5b45b6af44ea75269272913134f40f2956a3231d1dd1652b41",
+      "preparedMeasurementHash": "6defef555ccbee2ff15fa49651239f6623f249248dbdb9a5e971e4c9a0337788",
+      "goldenCasesConsumedOnce": [
+        "minimum",
+        "maximum",
+        "raw_zero",
+        "raw_five",
+        "midpoint",
+        "mixed",
+        "missing_not_distracting",
+        "empty"
+      ],
+      "reportVersion": "1.0.0"
+    },
+    {
+      "fullName": "spane12_zh_cn_research:1.0.1 source content contract",
+      "status": "failed",
+      "error": "AssertionError [ERR_ASSERTION]: [{\"path\":\"report.audienceContract\",\"message\":\"AUDIENCE_LANGUAGE_QC_REQUIRED\",\"severity\":\"error\"},{\"path\":\"productReadiness\",\"message\":\"SCALE_PACKAGE_INVALID:report.audienceContract: AUDIENCE_LANGUAGE_QC_REQUIRED\",\"severity\":\"error\"}]\n\nfalse !== true\n\n    at assert (/workspace/eduK12-new-version/docs/scale-content-batch3-20261028/check-refinements.ts:48:12)\n    at Object.<anonymous> (/workspace/eduK12-new-version/docs/scale-content-batch3-20261028/check-refinements.ts:61:34)\n    at Module._compile (node:internal/modules/cjs/loader:1929:14)\n    at Object.transformer (/workspace/eduK12-new-version/server-version/backend/node_modules/tsx/dist/register-C557imBs.cjs:9:3619)\n    at Module.load (node:internal/modules/cjs/loader:1651:32)\n    at Module._load (node:internal/modules/cjs/loader:1443:12)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)\n    at loadCJSModuleWithModuleLoad (node:internal/modules/esm/translators:372:15)\n    at ModuleWrap.<anonymous> (node:internal/modules/esm/translators:244:9)\n    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)"
+    },
+    {
+      "fullName": "sswq16_zh_cn_research:1.0.1 source content contract",
+      "status": "passed",
+      "issues": [],
+      "originalMeasurementHash": "651b20917021d8cbb0ad46bcd15d943671b4fb338ddeb4fcc4f0ed4c6e7107c0",
+      "preparedMeasurementHash": "651b20917021d8cbb0ad46bcd15d943671b4fb338ddeb4fcc4f0ed4c6e7107c0",
+      "goldenCasesConsumedOnce": [
+        "minimum",
+        "maximum",
+        "all-two",
+        "distinct-four-domains"
+      ],
+      "reportVersion": "1.0.1"
+    }
+  ],
+  "passed": 6,
+  "failed": 3
+}

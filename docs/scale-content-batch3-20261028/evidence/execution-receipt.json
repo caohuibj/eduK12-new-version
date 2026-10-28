@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "base": "8774b1cf158dae1c5eb0f4950044c6ae6d6a18dd",
+  "contentHead": "4d64682ef120f30f5c90d02e9671a853f737546a",
+  "node": {
+    "path": "/workspace/eduk12-cloud/tools/node_modules/.bin/node",
+    "version": "v24.21.0",
+    "sha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c"
+  },
+  "environmentLimit": "input manifest conservatively records backend source and lock/config; historical/full node_modules byte inventory not captured; not an attestation of every dependency byte",
+  "checks": [
+    {
+      "id": "selected-content",
+      "cwd": "/workspace/eduK12-new-version",
+      "argv": [
+        "/workspace/eduk12-cloud/tools/node_modules/.bin/node",
+        "/workspace/eduK12-new-version/server-version/backend/node_modules/tsx/dist/cli.mjs",
+        "/workspace/eduK12-new-version/docs/scale-content-batch3-20261028/check-content.ts"
+      ],
+      "startedAt": "2026-10-28T03:30:57.210427+00:00",
+      "endedAt": "2026-10-28T03:30:57.947844+00:00",
+      "processExitCode": 0,
+      "beforeAfterIdentical": true,
+      "inputManifest": "selected-content.inputs.json.gz",
+      "inputManifestUncompressedSHA256": "73f001b5b82f410920c999f203521a72fbf5fc6962de64ea0c0eec1b892f0460",
+      "logs": {
+        "stdout": {
+          "path": "selected-content.stdout.log",
+          "bytes": 3055,
+          "sha256": "8951853232b0f9491eb0b275e63c3e09cea6cedcc3da0cf8318871242ddd9a9b"
+        },
+        "stderr": {
+          "path": "selected-content.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "id": "generated-index",
+      "cwd": "/workspace/eduK12-new-version/server-version/backend",
+      "argv": [
+        "/workspace/eduk12-cloud/tools/node_modules/.bin/node",
+        "/workspace/eduK12-new-version/server-version/backend/node_modules/tsx/dist/cli.mjs",
+        "scripts/generate-scale-instruments.ts",
+        "--check"
+      ],
+      "startedAt": "2026-10-28T03:30:58.346380+00:00",
+      "endedAt": "2026-10-28T03:30:58.479227+00:00",
+      "processExitCode": 0,
+      "beforeAfterIdentical": true,
+      "inputManifest": "generated-index.inputs.json.gz",
+      "inputManifestUncompressedSHA256": "73f001b5b82f410920c999f203521a72fbf5fc6962de64ea0c0eec1b892f0460",
+      "logs": {
+        "stdout": {
+          "path": "generated-index.stdout.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "path": "generated-index.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    }
+  ],
+  "outerInvocation": {
+    "argv": [
+      "python3",
+      "/tmp/run-content-batch3-checks.py"
+    ],
+    "cwd": "/workspace/eduK12-new-version",
+    "shellLogin": false,
+    "processExitCode": 0,
+    "executionToolChunk": "d552be",
+    "sourceCopy": "../commands/run-content-batch3-checks.py.txt",
+    "note": "Observed outer unified-exec exit, independent of individual cases; failed invocation is not relabelled success."
+  },
+  "plannedButNotExecuted": []
+}

@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "base": "8774b1cf158dae1c5eb0f4950044c6ae6d6a18dd",
+  "contentHead": "89f62735384019bd7eb38a1ff708a11aaf426a5b",
+  "node": {
+    "path": "/workspace/eduk12-cloud/tools/node_modules/.bin/node",
+    "version": "v24.21.0",
+    "sha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c"
+  },
+  "environmentLimit": "input manifest conservatively records backend source and lock/config; historical/full node_modules byte inventory not captured; not an attestation of every dependency byte",
+  "checks": [
+    {
+      "id": "apq-final",
+      "cwd": "/workspace/eduK12-new-version",
+      "argv": [
+        "/workspace/eduk12-cloud/tools/node_modules/.bin/node",
+        "/workspace/eduK12-new-version/server-version/backend/node_modules/tsx/dist/cli.mjs",
+        "/workspace/eduK12-new-version/docs/scale-content-batch3-20261028/check-apq-final.ts"
+      ],
+      "startedAt": "2026-10-28T03:50:06.347390+00:00",
+      "endedAt": "2026-10-28T03:50:06.911414+00:00",
+      "processExitCode": 0,
+      "beforeAfterIdentical": true,
+      "inputManifest": "apq-final.inputs.json.gz",
+      "inputManifestUncompressedSHA256": "e49a7a3f7aa90d3320523301fd68e05db891e5ec781e43b58282f3cc7dbcdded",
+      "logs": {
+        "stdout": {
+          "path": "apq-final.stdout.log",
+          "bytes": 809,
+          "sha256": "c55950560191424d6499278ad733f9b7d200f5bdbbbb2e0b459bd5ab91d995ec"
+        },
+        "stderr": {
+          "path": "apq-final.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "id": "generated-index-final-success",
+      "cwd": "/workspace/eduK12-new-version/server-version/backend",
+      "argv": [
+        "/workspace/eduk12-cloud/tools/node_modules/.bin/node",
+        "/workspace/eduK12-new-version/server-version/backend/node_modules/tsx/dist/cli.mjs",
+        "scripts/generate-scale-instruments.ts",
+        "--check"
+      ],
+      "startedAt": "2026-10-28T03:50:07.291768+00:00",
+      "endedAt": "2026-10-28T03:50:07.423884+00:00",
+      "processExitCode": 0,
+      "beforeAfterIdentical": true,
+      "inputManifest": "generated-index-final-success.inputs.json.gz",
+      "inputManifestUncompressedSHA256": "e49a7a3f7aa90d3320523301fd68e05db891e5ec781e43b58282f3cc7dbcdded",
+      "logs": {
+        "stdout": {
+          "path": "generated-index-final-success.stdout.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "path": "generated-index-final-success.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    }
+  ],
+  "outerInvocation": {
+    "argv": [
+      "python3",
+      "/tmp/run-apq-final-batch3-checks.py"
+    ],
+    "cwd": "/workspace/eduK12-new-version",
+    "shellLogin": false,
+    "processExitCode": 0,
+    "executionToolChunk": "3be1c8",
+    "sourceCopy": "../commands/run-apq-final-batch3-checks.py.txt",
+    "note": "Observed outer unified-exec exit, independent of individual cases; failed invocation is not relabelled success."
+  },
+  "plannedButNotExecuted": []
+}

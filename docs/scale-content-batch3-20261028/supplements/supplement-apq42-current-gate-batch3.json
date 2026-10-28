@@ -1,0 +1,42 @@
+{
+  "purpose": "更正旧APQ补丁中的报告门定位；不覆盖原审计或补丁",
+  "current_main": "8774b1cf158dae1c5eb0f4950044c6ae6d6a18dd",
+  "source_commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "source": {
+    "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+    "path": "server-version/backend/src/modules/scale/instruments/apq42_parent_global_zh_cn_research/1.0.0/source.json",
+    "blob": "14ad739f89a99c41baddc8b31441704b18c3f850",
+    "sha256": "6ee31b0d77723f252dbbdab3c92465dfd817606d3f1756745a326103c2bce842"
+  },
+  "current_rules": [
+    {
+      "commit": "8774b1cf158dae1c5eb0f4950044c6ae6d6a18dd",
+      "path": "server-version/backend/src/modules/scale/library/audience-report-gate.ts",
+      "blob": "3c5c5dc106ad1bf50cccc64d56501ef7d5bf75f0",
+      "sha256": "b6599f505932b01b3881ffe05f92306df728bff6ec15de3d026f36fdf9e1994b"
+    },
+    {
+      "commit": "8774b1cf158dae1c5eb0f4950044c6ae6d6a18dd",
+      "path": "server-version/backend/src/modules/scale/scale-definition.ts",
+      "blob": "23a1edce1ddcc3a14c1b938f5319e1f5f1a2d7c0",
+      "sha256": "9d6b157a131839eaa932dddb82a85089283422ba3dab421a0fada55b24715854"
+    }
+  ],
+  "correction": "此前以b92旧gate所称摘要必须100字及qcReview必填，不能作为main 877当前阻碍；当前gate只检查audienceContract及locale、limitations非空、主score解释唯一覆盖、bands key不重复。当前schema将qcReview设为optional，缺少它不构成schema必填错误。",
+  "actual_source": "source catalog.population.respondentTypes和applicability.respondentTypes均PARENT，definition为parent_global_report，versionAxes.locale=zh-CN；report.audienceContract缺失。",
+  "minimal_audience_contract": {
+    "path": "/executable/definition/report/audienceContract",
+    "old": null,
+    "new": {
+      "schemaVersion": 1,
+      "respondent": "PARENT_REPORT",
+      "audience": "parent",
+      "locale": "zh-CN"
+    },
+    "note": "结构元数据据父母自报及语言字段提供；不附qcReview，不伪造人工审校或科研审批。"
+  },
+  "version_note": "补元数据属于报告呈现轴，按root选定新report版本保留旧快照；不声称运行验证或自动通过。",
+  "not_executed": [
+    "未改仓库、未运行测试、DB、CI或系统。"
+  ]
+}

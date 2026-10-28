@@ -1,0 +1,1098 @@
+{
+  "files": [
+    {
+      "path": "docs/scale-instruments/research-drafts/apq42_parent_global/1.0.0/README.md",
+      "originalSHA256": "ffdaf15875544e368016dadee14aae33b4d3fca4db9c2e5e5f774844ab7462fb",
+      "currentSHA256": "ffdaf15875544e368016dadee14aae33b4d3fca4db9c2e5e5f774844ab7462fb",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/apq42_parent_global/1.0.0/source-manifest.json",
+      "originalSHA256": "dc180996bc81a41daee7b2f3eda84e8cee21e7d1d42ceb545593daa64a9c0bc0",
+      "currentSHA256": "dc180996bc81a41daee7b2f3eda84e8cee21e7d1d42ceb545593daa64a9c0bc0",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/apq42_parent_global_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+      "originalSHA256": "9a16158327a9ffca53f239e7fddc95e920b43a3e2676eb6d480fa4bfd516f9f7",
+      "currentSHA256": "9a16158327a9ffca53f239e7fddc95e920b43a3e2676eb6d480fa4bfd516f9f7",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/apq42_parent_global_zh_cn_research/1.0.0/instrument.ts",
+      "originalSHA256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+      "currentSHA256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/apq42_parent_global_zh_cn_research/1.0.0/source.json",
+      "originalSHA256": "6ee31b0d77723f252dbbdab3c92465dfd817606d3f1756745a326103c2bce842",
+      "currentSHA256": "6ee31b0d77723f252dbbdab3c92465dfd817606d3f1756745a326103c2bce842",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bpses5/1.0.0/README.md",
+      "originalSHA256": "4428f5acc64ba8d734c636e2732f462a257f8f682d91538ae1171d00cdfb6724",
+      "currentSHA256": "4428f5acc64ba8d734c636e2732f462a257f8f682d91538ae1171d00cdfb6724",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bpses5/1.0.0/administration-sidecar.prepared.json",
+      "originalSHA256": "4327a93d42349cc958e2c059a3a4411f8b6b833b54820be976f908acc9860f8b",
+      "currentSHA256": "4327a93d42349cc958e2c059a3a4411f8b6b833b54820be976f908acc9860f8b",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bpses5/1.0.0/administration.md",
+      "originalSHA256": "42f4110481181983478def8a0f884f1e42039edfa2551c018fb959a60d51e553",
+      "currentSHA256": "42f4110481181983478def8a0f884f1e42039edfa2551c018fb959a60d51e553",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bpses5/1.0.0/bilingual-content.json",
+      "originalSHA256": "5abd2b64636bb4da65d08172b72335cb7b6f37a6e0ad1bd12f0761d28ebc0186",
+      "currentSHA256": "5abd2b64636bb4da65d08172b72335cb7b6f37a6e0ad1bd12f0761d28ebc0186",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bpses5/1.0.0/parameter-plan.json",
+      "originalSHA256": "eb5de64ce360af884c67e9e8a3e01db3ecd31d68127686f8a4b48040ec6239a1",
+      "currentSHA256": "eb5de64ce360af884c67e9e8a3e01db3ecd31d68127686f8a4b48040ec6239a1",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bpses5/1.0.0/references.md",
+      "originalSHA256": "d616ffb412a2b2870bff55a98371cbc75a1affb562f646c40888904a501748d5",
+      "currentSHA256": "d616ffb412a2b2870bff55a98371cbc75a1affb562f646c40888904a501748d5",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bpses5/1.0.0/report-example.md",
+      "originalSHA256": "5798313f62d9e19c1cd1bbc838a74a3e072ac1150f65f1f30d08751f384fa529",
+      "currentSHA256": "5798313f62d9e19c1cd1bbc838a74a3e072ac1150f65f1f30d08751f384fa529",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bpses5/1.0.0/report-results.synthetic.json",
+      "originalSHA256": "9dd373bc10085aaa4bfeb6b54933f27d95ba3991f96de399ed8253ddf9b3dd5d",
+      "currentSHA256": "9dd373bc10085aaa4bfeb6b54933f27d95ba3991f96de399ed8253ddf9b3dd5d",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bpses5/1.0.0/scoring-and-parameters.md",
+      "originalSHA256": "0214593594c64001b48979b9936ffa961a0f0553a32c2e53473accb6e6b7b387",
+      "currentSHA256": "0214593594c64001b48979b9936ffa961a0f0553a32c2e53473accb6e6b7b387",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bpses5/1.0.0/source-audit.json",
+      "originalSHA256": "03c177e4b4e5ca12c3cefb58dcabe74cb5daddbc7293f73c0c151817f2d211be",
+      "currentSHA256": "03c177e4b4e5ca12c3cefb58dcabe74cb5daddbc7293f73c0c151817f2d211be",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bpses5/1.0.0/validation.json",
+      "originalSHA256": "8141ac79478b2f4203de2830bf06eb5f030be53d909ea18448a2db0a235fa727",
+      "currentSHA256": "8141ac79478b2f4203de2830bf06eb5f030be53d909ea18448a2db0a235fa727",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bpses5/1.0.0/validation.md",
+      "originalSHA256": "2edd2d5a0b344e814a0aac38f4b03cde916208de7379954667dbfbe6491ae87c",
+      "currentSHA256": "2edd2d5a0b344e814a0aac38f4b03cde916208de7379954667dbfbe6491ae87c",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/bpses5_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+      "originalSHA256": "9e1c1a925bc860a6ad3245954b139fcf7e2193f34891ccb76cbd8b6fac13bed8",
+      "currentSHA256": "9e1c1a925bc860a6ad3245954b139fcf7e2193f34891ccb76cbd8b6fac13bed8",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/bpses5_zh_cn_research/1.0.0/instrument.ts",
+      "originalSHA256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+      "currentSHA256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/bpses5_zh_cn_research/1.0.0/source.json",
+      "originalSHA256": "8fa89e6acfcd1041940f5b502fce0f0b19436eab7fb39bb1ac9df751f06e7755",
+      "currentSHA256": "db2b4fa65e75897ebb6f84e89f276c64bedf545912c2d9770ee5ba2dfa0b6220",
+      "unchanged": false
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/brcs4/1.0.0/README.md",
+      "originalSHA256": "207d1502d6fc1bd1e3c9aa84343ac0aa1eac8e25f9f4c62e9911204695ae9e67",
+      "currentSHA256": "207d1502d6fc1bd1e3c9aa84343ac0aa1eac8e25f9f4c62e9911204695ae9e67",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/brcs4/1.0.0/administration.md",
+      "originalSHA256": "e996bd19aedc49c6dc1a9e5938abd2d755d1bef2c06e5ce68d92ec20b2819b48",
+      "currentSHA256": "e996bd19aedc49c6dc1a9e5938abd2d755d1bef2c06e5ce68d92ec20b2819b48",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/brcs4/1.0.0/bilingual-content.json",
+      "originalSHA256": "705d246d0c52f762e0335d72d6ddb1a1e93ac59d7e4ab1feb7cfdc27f17467bd",
+      "currentSHA256": "705d246d0c52f762e0335d72d6ddb1a1e93ac59d7e4ab1feb7cfdc27f17467bd",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/brcs4/1.0.0/instruction.for-pr356.json",
+      "originalSHA256": "1699553aa894eac0e267b6026a8b0d29da7b9a7e883f2c3970ae1165423d7773",
+      "currentSHA256": "1699553aa894eac0e267b6026a8b0d29da7b9a7e883f2c3970ae1165423d7773",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/brcs4/1.0.0/references.md",
+      "originalSHA256": "306c078b8501f51767af127c74fc68673ae22c859555f0281f2955e1d1b02a1f",
+      "currentSHA256": "306c078b8501f51767af127c74fc68673ae22c859555f0281f2955e1d1b02a1f",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/brcs4/1.0.0/report-example.md",
+      "originalSHA256": "c5972c9dbb46a2a4eaf8bbad0f2ed337a003a0545dcaf007ed249cb1907c11c4",
+      "currentSHA256": "c5972c9dbb46a2a4eaf8bbad0f2ed337a003a0545dcaf007ed249cb1907c11c4",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/brcs4/1.0.0/report-result.synthetic.json",
+      "originalSHA256": "47d7461a984cb0186943d6523d01ed09e486b5970c3035bb95155c14e5919fee",
+      "currentSHA256": "47d7461a984cb0186943d6523d01ed09e486b5970c3035bb95155c14e5919fee",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/brcs4/1.0.0/scoring-and-parameters.md",
+      "originalSHA256": "59969fd03347f94862802254cba2700017271dea3983952d8832143ec95c1ee7",
+      "currentSHA256": "59969fd03347f94862802254cba2700017271dea3983952d8832143ec95c1ee7",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/brcs4/1.0.0/source-verification.json",
+      "originalSHA256": "94bc9b9468d3f5c71338b1a632954a4917d33eab1128a3d3b5ee578fae19ee64",
+      "currentSHA256": "94bc9b9468d3f5c71338b1a632954a4917d33eab1128a3d3b5ee578fae19ee64",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/brcs4/1.0.0/take-home-message.md",
+      "originalSHA256": "4e1417823a36fd1408ae96d83458fada46495607ce84a7185127fb608d3eba4a",
+      "currentSHA256": "4e1417823a36fd1408ae96d83458fada46495607ce84a7185127fb608d3eba4a",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/brcs4/1.0.0/validation.json",
+      "originalSHA256": "bf99d9d019b13d1f779f1692c764d53b88732cd83d3807e5fbc4015d3dfd6936",
+      "currentSHA256": "bf99d9d019b13d1f779f1692c764d53b88732cd83d3807e5fbc4015d3dfd6936",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/brcs4/1.0.0/validation.md",
+      "originalSHA256": "44ceceb566070d6ae30f31ec1de5c79b6b1f030a8e370a9184247bd148abb3ab",
+      "currentSHA256": "44ceceb566070d6ae30f31ec1de5c79b6b1f030a8e370a9184247bd148abb3ab",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/brcs4_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+      "originalSHA256": "177be711c4ef5f98700f1dcebb1a0814609981117134a0665be7e2b20cc9a40f",
+      "currentSHA256": "177be711c4ef5f98700f1dcebb1a0814609981117134a0665be7e2b20cc9a40f",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/brcs4_zh_cn_research/1.0.0/instrument.ts",
+      "originalSHA256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+      "currentSHA256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/brcs4_zh_cn_research/1.0.0/source.json",
+      "originalSHA256": "68ae0f92da27333ee9b6b9f62bab7e4a98b6e2853910f8ad9fb9fafe2c972a66",
+      "currentSHA256": "2f371fcf26aa89d3bbbdff6fa8ee987cc54715375df27fee89b38a024aab45d9",
+      "unchanged": false
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/cfq7/1.0.0/README.md",
+      "originalSHA256": "53392e0e5c982b7b9576dbd4241040255550f5fefc755bb857262605e4e5b49e",
+      "currentSHA256": "53392e0e5c982b7b9576dbd4241040255550f5fefc755bb857262605e4e5b49e",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/cfq7/1.0.0/THIRD_PARTY_LICENSE.md",
+      "originalSHA256": "1f6014944ac3fc5752c5215fecf68b5f5e7ed674e3a585375f8673fa442d0afb",
+      "currentSHA256": "1f6014944ac3fc5752c5215fecf68b5f5e7ed674e3a585375f8673fa442d0afb",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/cfq7/1.0.0/bilingual-content.json",
+      "originalSHA256": "b5f4575f8c3baaad69b3fd49e93b9e849f4fa8908cc0549c1e9bdf0a648d77fe",
+      "currentSHA256": "b5f4575f8c3baaad69b3fd49e93b9e849f4fa8908cc0549c1e9bdf0a648d77fe",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/cfq7_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+      "originalSHA256": "1f6014944ac3fc5752c5215fecf68b5f5e7ed674e3a585375f8673fa442d0afb",
+      "currentSHA256": "1f6014944ac3fc5752c5215fecf68b5f5e7ed674e3a585375f8673fa442d0afb",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/cfq7_zh_cn_research/1.0.0/instrument.ts",
+      "originalSHA256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+      "currentSHA256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/cfq7_zh_cn_research/1.0.0/source.json",
+      "originalSHA256": "c820e9d08b01114985e420c240c9a873e742c95f0c99058b058736ada6966fab",
+      "currentSHA256": "c820e9d08b01114985e420c240c9a873e742c95f0c99058b058736ada6966fab",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/dbt_wccl59/1.0.0/README.md",
+      "originalSHA256": "202be442555bcb329d3f56ad420a78e9f175f2c52a17b509bc578fbd42f5f0a4",
+      "currentSHA256": "202be442555bcb329d3f56ad420a78e9f175f2c52a17b509bc578fbd42f5f0a4",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/dbt_wccl59/1.0.0/source-manifest.json",
+      "originalSHA256": "7cdae68e8a5a4fd944013da85c7c5eeb9e8572a734c74574e06bf119e81faf44",
+      "currentSHA256": "7cdae68e8a5a4fd944013da85c7c5eeb9e8572a734c74574e06bf119e81faf44",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.0/THIRD_PARTY_LICENSE.md",
+      "originalSHA256": "cee5d0b6e31f51c57d3224b1fd43647bba3f5daad92846618450765b907e2b5c",
+      "currentSHA256": "cee5d0b6e31f51c57d3224b1fd43647bba3f5daad92846618450765b907e2b5c",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.0/instrument.ts",
+      "originalSHA256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+      "currentSHA256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.0/source.json",
+      "originalSHA256": "c9ca1c13f8a397b1c302d3c3bbb1fa8856e27767c204cbe77a50038f1ae8b2ea",
+      "currentSHA256": "c9ca1c13f8a397b1c302d3c3bbb1fa8856e27767c204cbe77a50038f1ae8b2ea",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/djgls6/1.0.0/README.md",
+      "originalSHA256": "7b666f87b3ef505a9693f8d0377b23a74d1aca270c42f709f43186cf6ca3a470",
+      "currentSHA256": "7b666f87b3ef505a9693f8d0377b23a74d1aca270c42f709f43186cf6ca3a470",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/djgls6/1.0.0/bilingual-content.json",
+      "originalSHA256": "e95070a5a38b07cfa9ac4800ae87e00cbc4005476735adba7892166e7a330257",
+      "currentSHA256": "e95070a5a38b07cfa9ac4800ae87e00cbc4005476735adba7892166e7a330257",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/djgls6/1.0.0/external-reference-dossier.json",
+      "originalSHA256": "a2609812405f27ccc514ae940e179d695c6ef14d14859f90f2ed1a17a2455dfb",
+      "currentSHA256": "a2609812405f27ccc514ae940e179d695c6ef14d14859f90f2ed1a17a2455dfb",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/djgls6/1.0.0/local-validation.json",
+      "originalSHA256": "3edd912650c29ec3f133af4e658001f0957012d7113516928a701e4bbe7a4129",
+      "currentSHA256": "3edd912650c29ec3f133af4e658001f0957012d7113516928a701e4bbe7a4129",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/djgls6/1.0.0/references.md",
+      "originalSHA256": "62ee7838edff47f378d433eb77534d5f127f3df07ff46a03eba09d098bc7ed51",
+      "currentSHA256": "62ee7838edff47f378d433eb77534d5f127f3df07ff46a03eba09d098bc7ed51",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/djgls6/1.0.0/report-example.md",
+      "originalSHA256": "bc2f3e662bdc5c9b07d79e6036e5b8d928c98dd7940951b3d220aba86a869385",
+      "currentSHA256": "bc2f3e662bdc5c9b07d79e6036e5b8d928c98dd7940951b3d220aba86a869385",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/djgls6/1.0.0/reviewed-source-pack.json",
+      "originalSHA256": "f5ba39b28a8a0dd753d4980491633cfce958805dafdea2767990fdf04d629a0a",
+      "currentSHA256": "f5ba39b28a8a0dd753d4980491633cfce958805dafdea2767990fdf04d629a0a",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/djgls6/1.0.0/scoring-and-thresholds.md",
+      "originalSHA256": "5434a913bcbf44e38954cce5ef8c137d761fa7836d0b905618343b0efbdc6fb4",
+      "currentSHA256": "5434a913bcbf44e38954cce5ef8c137d761fa7836d0b905618343b0efbdc6fb4",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/djgls6/1.0.0/synthetic-report-example.json",
+      "originalSHA256": "bb0509c83f3898f2a683bed75b42ff12e0f81fdc1b598e0dac56899f6956ffaf",
+      "currentSHA256": "bb0509c83f3898f2a683bed75b42ff12e0f81fdc1b598e0dac56899f6956ffaf",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/djgls6_zh_cn_research/1.0.0/instrument.ts",
+      "originalSHA256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+      "currentSHA256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/djgls6_zh_cn_research/1.0.0/source.json",
+      "originalSHA256": "c07038b029b02c520ff0344434499358242145ee8122c7dd9ce1984f12c48a46",
+      "currentSHA256": "c07038b029b02c520ff0344434499358242145ee8122c7dd9ce1984f12c48a46",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ebq16/1.0.0/README.md",
+      "originalSHA256": "30d3f4b23b9c061c34369476a76cf782a6e63b81ddb593376410f188cb1df8e1",
+      "currentSHA256": "30d3f4b23b9c061c34369476a76cf782a6e63b81ddb593376410f188cb1df8e1",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ebq16/1.0.0/administration.md",
+      "originalSHA256": "7153816263dbc33c62373831449fdfd434846c53aedc42f3232ebca7d6d3dc77",
+      "currentSHA256": "7153816263dbc33c62373831449fdfd434846c53aedc42f3232ebca7d6d3dc77",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ebq16/1.0.0/bilingual-content.json",
+      "originalSHA256": "68f6df0df528849d366648e013f6eb3d81007449f58491987b0250c5e9c40b49",
+      "currentSHA256": "68f6df0df528849d366648e013f6eb3d81007449f58491987b0250c5e9c40b49",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ebq16/1.0.0/references.md",
+      "originalSHA256": "2d09ee56f302aef2b7447a0bbc75b6432d6e82c61104adb476856f4b3ed210a0",
+      "currentSHA256": "2d09ee56f302aef2b7447a0bbc75b6432d6e82c61104adb476856f4b3ed210a0",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ebq16/1.0.0/report-example.md",
+      "originalSHA256": "75408fb627a04545ada4269db5707d730f3dbe37c7cda00a7b7d139be09d8628",
+      "currentSHA256": "75408fb627a04545ada4269db5707d730f3dbe37c7cda00a7b7d139be09d8628",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ebq16/1.0.0/scoring-and-thresholds.md",
+      "originalSHA256": "cf4c9e9a2138fd31c2d7c875a4c94c92db34e06bb16e78447446d974daf6a61a",
+      "currentSHA256": "cf4c9e9a2138fd31c2d7c875a4c94c92db34e06bb16e78447446d974daf6a61a",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ebq16/1.0.0/validation.md",
+      "originalSHA256": "bf6ac269844322513d58d175ae2ca95ab8c07bfc6b6c422db2ec30f62a85c92a",
+      "currentSHA256": "bf6ac269844322513d58d175ae2ca95ab8c07bfc6b6c422db2ec30f62a85c92a",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ebq16/1.0.1/README.md",
+      "originalSHA256": "5b3676d87d2916f527dc446ec2e2bb610761cde8eff8c5404f87ed18019e9d96",
+      "currentSHA256": "5b3676d87d2916f527dc446ec2e2bb610761cde8eff8c5404f87ed18019e9d96",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ebq16/1.0.1/bilingual-content.json",
+      "originalSHA256": "ab6b25ad7bf4f2e188b64a970284990fa85aa8e6d84fc17852a3eea0e17c9c62",
+      "currentSHA256": "ab6b25ad7bf4f2e188b64a970284990fa85aa8e6d84fc17852a3eea0e17c9c62",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ebq16/1.0.1/report-example.md",
+      "originalSHA256": "ac4b0ed451a19cf88004ce2e24306484d761f5fda936199523601398032702a5",
+      "currentSHA256": "ac4b0ed451a19cf88004ce2e24306484d761f5fda936199523601398032702a5",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ebq16/1.0.1/report-result.synthetic.json",
+      "originalSHA256": "36f13a25cdefd4fca07eb15099fc07b690d0e172e82c365b33fd2c412a80284f",
+      "currentSHA256": "36f13a25cdefd4fca07eb15099fc07b690d0e172e82c365b33fd2c412a80284f",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ebq16/1.0.1/validation.md",
+      "originalSHA256": "cfe524ab359b461a9cd13f3ed2c49ef3084cb9b6285fcf713112cbea7434bc43",
+      "currentSHA256": "cfe524ab359b461a9cd13f3ed2c49ef3084cb9b6285fcf713112cbea7434bc43",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ebq16_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+      "originalSHA256": "17d3829591cabd94a1270910f46f2043974bdba9d0a1a2a6df01d092bd482c69",
+      "currentSHA256": "17d3829591cabd94a1270910f46f2043974bdba9d0a1a2a6df01d092bd482c69",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ebq16_zh_cn_research/1.0.0/instrument.ts",
+      "originalSHA256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+      "currentSHA256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ebq16_zh_cn_research/1.0.0/source.json",
+      "originalSHA256": "ccfd11288222eadc4d514144680012318d51e05d6d6b85a42bf251304d1a769f",
+      "currentSHA256": "ccfd11288222eadc4d514144680012318d51e05d6d6b85a42bf251304d1a769f",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ebq16_zh_cn_research/1.0.1/THIRD_PARTY_LICENSE.md",
+      "originalSHA256": "efa16b82d2284b2ef1f2dafdf246fb558a61c83bf46221493d3939e673cb2dd8",
+      "currentSHA256": "efa16b82d2284b2ef1f2dafdf246fb558a61c83bf46221493d3939e673cb2dd8",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ebq16_zh_cn_research/1.0.1/instrument.ts",
+      "originalSHA256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+      "currentSHA256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ebq16_zh_cn_research/1.0.1/source.json",
+      "originalSHA256": "b2b7bb41355511aaf2e5599155dd60d113177da5136649c28fd20f041a733834",
+      "currentSHA256": "b2b7bb41355511aaf2e5599155dd60d113177da5136649c28fd20f041a733834",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_emotion_based_decision9/1.0.0/README.md",
+      "originalSHA256": "2200f4b1b515404237c124b06f10994ba8b0c93d944fc0c6b04b810346cb0b22",
+      "currentSHA256": "2200f4b1b515404237c124b06f10994ba8b0c93d944fc0c6b04b810346cb0b22",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_emotion_based_decision9/1.0.0/bilingual-content.json",
+      "originalSHA256": "553fa576e9496ac6766e6f89aa4b5b3ebc007ac7c57e003cc4c6b02639cdd5f3",
+      "currentSHA256": "553fa576e9496ac6766e6f89aa4b5b3ebc007ac7c57e003cc4c6b02639cdd5f3",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_emotion_based_decision9/1.0.0/external-reference-dossier.json",
+      "originalSHA256": "a506e2dd2b4e1d099850af415dbc6091ae4bdfb7271cf699be650aad05297cb5",
+      "currentSHA256": "a506e2dd2b4e1d099850af415dbc6091ae4bdfb7271cf699be650aad05297cb5",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_emotion_based_decision9/1.0.0/local-test-output.txt",
+      "originalSHA256": "dbae946d34f2fd03e6e5363c4caf4bda49dd140a224f9b9030f8c1f870505289",
+      "currentSHA256": "dbae946d34f2fd03e6e5363c4caf4bda49dd140a224f9b9030f8c1f870505289",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_emotion_based_decision9/1.0.0/local-validation.json",
+      "originalSHA256": "b81365982f5ea2ba1de594869a297d02506413e57ee10a77742c41da5aa1fb30",
+      "currentSHA256": "b81365982f5ea2ba1de594869a297d02506413e57ee10a77742c41da5aa1fb30",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_emotion_based_decision9/1.0.0/references.md",
+      "originalSHA256": "1f148e6c6b7674c2a02ea6e440f28447adf9def9d9a36aef2c1a81aff8c33e76",
+      "currentSHA256": "1f148e6c6b7674c2a02ea6e440f28447adf9def9d9a36aef2c1a81aff8c33e76",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_emotion_based_decision9/1.0.0/report-example.json",
+      "originalSHA256": "88edd8ef11bf7174022a4ea5b5f6fd8e3b8e78894fcedcbf442cc56094290cd7",
+      "currentSHA256": "88edd8ef11bf7174022a4ea5b5f6fd8e3b8e78894fcedcbf442cc56094290cd7",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_emotion_based_decision9/1.0.0/report-example.md",
+      "originalSHA256": "69babf296da7e5cf8173cb66132fdeb2b1ca6da2d4dd36f3ff39ca639d796758",
+      "currentSHA256": "69babf296da7e5cf8173cb66132fdeb2b1ca6da2d4dd36f3ff39ca639d796758",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_emotion_based_decision9/1.0.0/reviewed-source-pack.json",
+      "originalSHA256": "1c28dd19900fdd4129b721d8dbf8716700566538ba68d8f57462de5db94a39fa",
+      "currentSHA256": "1c28dd19900fdd4129b721d8dbf8716700566538ba68d8f57462de5db94a39fa",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_emotion_based_decision9/1.0.0/runtime-check.json",
+      "originalSHA256": "24bc975aab11abec3537006ef371ac82df547a53ef5f54e330393f50ca1d53a5",
+      "currentSHA256": "24bc975aab11abec3537006ef371ac82df547a53ef5f54e330393f50ca1d53a5",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_emotion_based_decision9/1.0.0/scoring-and-thresholds.md",
+      "originalSHA256": "7d6671763e95d27fcf776f3461681ea2115d3a1ce35f82d2eb357d44e461df38",
+      "currentSHA256": "7d6671763e95d27fcf776f3461681ea2115d3a1ce35f82d2eb357d44e461df38",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ipip_emotion_based_decision9_zh_cn_research/1.0.0/instrument.ts",
+      "originalSHA256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+      "currentSHA256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ipip_emotion_based_decision9_zh_cn_research/1.0.0/source.json",
+      "originalSHA256": "7c18445fa8a24e64f5acc46ba2c42036a85c8bf733ce91fe91920a694d232aa2",
+      "currentSHA256": "7c18445fa8a24e64f5acc46ba2c42036a85c8bf733ce91fe91920a694d232aa2",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_negative_expressivity10/1.0.0/README.md",
+      "originalSHA256": "6d09bdc6db4ab78f5b80199d9eb14c7ae0b865978cda616ae5f5c32be5b7af5b",
+      "currentSHA256": "6d09bdc6db4ab78f5b80199d9eb14c7ae0b865978cda616ae5f5c32be5b7af5b",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_negative_expressivity10/1.0.0/bilingual-content.json",
+      "originalSHA256": "7306c5f5874ee46255f55bfa048e31c830e94d57e11e2c0890f6200c03c08627",
+      "currentSHA256": "7306c5f5874ee46255f55bfa048e31c830e94d57e11e2c0890f6200c03c08627",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_negative_expressivity10/1.0.0/external-reference-dossier.json",
+      "originalSHA256": "b06cb26b9354c49e0df4ecc9e649759295743d44eaa72253a61e1d7d92fd23e8",
+      "currentSHA256": "b06cb26b9354c49e0df4ecc9e649759295743d44eaa72253a61e1d7d92fd23e8",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_negative_expressivity10/1.0.0/local-test-output.txt",
+      "originalSHA256": "eb425e5abde4f76ba69dfb2c41d7e96c5fc7f74b89f9d5a87a0f321abb475d68",
+      "currentSHA256": "eb425e5abde4f76ba69dfb2c41d7e96c5fc7f74b89f9d5a87a0f321abb475d68",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_negative_expressivity10/1.0.0/local-validation.json",
+      "originalSHA256": "7dabb845cf522ef6d4127f9ee9e9adccb8fa850045bb5b3168969346891c72de",
+      "currentSHA256": "7dabb845cf522ef6d4127f9ee9e9adccb8fa850045bb5b3168969346891c72de",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_negative_expressivity10/1.0.0/references.md",
+      "originalSHA256": "42eb4683461faea9d8d1cc2dae4da0a96aa0fc0e4a5f7166a48654332925b105",
+      "currentSHA256": "42eb4683461faea9d8d1cc2dae4da0a96aa0fc0e4a5f7166a48654332925b105",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_negative_expressivity10/1.0.0/report-example.json",
+      "originalSHA256": "e7ae98b6ff8df33db5959dfabfcb68622eb1957f763a5e13be0424639879bb88",
+      "currentSHA256": "e7ae98b6ff8df33db5959dfabfcb68622eb1957f763a5e13be0424639879bb88",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_negative_expressivity10/1.0.0/report-example.md",
+      "originalSHA256": "a6da072a06bf9094ebf21163a3bedcd87fcc19627424dd1d6db0653587ee01c6",
+      "currentSHA256": "a6da072a06bf9094ebf21163a3bedcd87fcc19627424dd1d6db0653587ee01c6",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_negative_expressivity10/1.0.0/reviewed-source-pack.json",
+      "originalSHA256": "4e9ddaa296679710dd193156cc2654e963c564e2fb090ea0f7157bf5130f2c8e",
+      "currentSHA256": "4e9ddaa296679710dd193156cc2654e963c564e2fb090ea0f7157bf5130f2c8e",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_negative_expressivity10/1.0.0/runtime-check.json",
+      "originalSHA256": "19caeb1b74f4129d0994cf4008c5225de3378b0a4611006f8987b8b19f79cbd3",
+      "currentSHA256": "19caeb1b74f4129d0994cf4008c5225de3378b0a4611006f8987b8b19f79cbd3",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_negative_expressivity10/1.0.0/scoring-and-thresholds.md",
+      "originalSHA256": "d316030cce6275dab27bc1e14d1780eb6b7d61401f44a7336cf55b49ff86bfcf",
+      "currentSHA256": "d316030cce6275dab27bc1e14d1780eb6b7d61401f44a7336cf55b49ff86bfcf",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ipip_negative_expressivity10_zh_cn_research/1.0.0/instrument.ts",
+      "originalSHA256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+      "currentSHA256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ipip_negative_expressivity10_zh_cn_research/1.0.0/source.json",
+      "originalSHA256": "c8f4646ebba0e7dc345c010f0cbf36d0852e59b3fc677ccb88fb81231931ee5e",
+      "currentSHA256": "c8f4646ebba0e7dc345c010f0cbf36d0852e59b3fc677ccb88fb81231931ee5e",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_positive_expressivity9/1.0.0/README.md",
+      "originalSHA256": "7c8e075e09a7f0b213dd50d0dfeed0d69cc57f00ab5f0f7f8cfd049ea69143f0",
+      "currentSHA256": "7c8e075e09a7f0b213dd50d0dfeed0d69cc57f00ab5f0f7f8cfd049ea69143f0",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_positive_expressivity9/1.0.0/bilingual-content.json",
+      "originalSHA256": "4ea8e3ef0698679587ee0ffdf2a4b7817efc38f67af2cd6b162aa00d7bd5a343",
+      "currentSHA256": "4ea8e3ef0698679587ee0ffdf2a4b7817efc38f67af2cd6b162aa00d7bd5a343",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_positive_expressivity9/1.0.0/external-reference-dossier.json",
+      "originalSHA256": "232a5fbebbd7209cb38ea0282cae726f14b79eadf85d86e10df522bb0063ac0c",
+      "currentSHA256": "232a5fbebbd7209cb38ea0282cae726f14b79eadf85d86e10df522bb0063ac0c",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_positive_expressivity9/1.0.0/local-validation.json",
+      "originalSHA256": "68d5a615e073f2ae8b281be7fa1dc151d0b5504272bd412a95bcf1151a265421",
+      "currentSHA256": "68d5a615e073f2ae8b281be7fa1dc151d0b5504272bd412a95bcf1151a265421",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_positive_expressivity9/1.0.0/references.md",
+      "originalSHA256": "1f148e6c6b7674c2a02ea6e440f28447adf9def9d9a36aef2c1a81aff8c33e76",
+      "currentSHA256": "1f148e6c6b7674c2a02ea6e440f28447adf9def9d9a36aef2c1a81aff8c33e76",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_positive_expressivity9/1.0.0/report-example.json",
+      "originalSHA256": "cb049d9c32d80b749dfa6da71c32a3bb32317da1e81c5cf4f51d974568a7b97f",
+      "currentSHA256": "cb049d9c32d80b749dfa6da71c32a3bb32317da1e81c5cf4f51d974568a7b97f",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_positive_expressivity9/1.0.0/report-example.md",
+      "originalSHA256": "6c2d446d26aeab0433f3e7a2032aa850d1b1b0eac3834db990a63fb1629cbfd7",
+      "currentSHA256": "6c2d446d26aeab0433f3e7a2032aa850d1b1b0eac3834db990a63fb1629cbfd7",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_positive_expressivity9/1.0.0/reviewed-source-pack.json",
+      "originalSHA256": "4d2d8d79a0092c03475908bc519f624fd3b3ed14327b0192f191e83394516891",
+      "currentSHA256": "4d2d8d79a0092c03475908bc519f624fd3b3ed14327b0192f191e83394516891",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_positive_expressivity9/1.0.0/runtime-check.json",
+      "originalSHA256": "26286d3c81e6affe2943f4f32dcb73f2a421ad72ee389da37e28564bfcb6a9cc",
+      "currentSHA256": "26286d3c81e6affe2943f4f32dcb73f2a421ad72ee389da37e28564bfcb6a9cc",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_positive_expressivity9/1.0.0/scoring-and-thresholds.md",
+      "originalSHA256": "ce7538817932cc4e933bfae94735b3671f80532f98fc24376f8eb1d1d97cafce",
+      "currentSHA256": "ce7538817932cc4e933bfae94735b3671f80532f98fc24376f8eb1d1d97cafce",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ipip_positive_expressivity9_zh_cn_research/1.0.0/instrument.ts",
+      "originalSHA256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+      "currentSHA256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ipip_positive_expressivity9_zh_cn_research/1.0.0/source.json",
+      "originalSHA256": "c9c348aed9a5596aa774d5eae074e63555bd50b379084bcde04f2165c9d2051a",
+      "currentSHA256": "c9c348aed9a5596aa774d5eae074e63555bd50b379084bcde04f2165c9d2051a",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_distress10/1.0.0/README.md",
+      "originalSHA256": "9e85cf9b81406b0cabbfb20af1af756a7ca3cbdf7e73c6dbd983f7786874c517",
+      "currentSHA256": "9e85cf9b81406b0cabbfb20af1af756a7ca3cbdf7e73c6dbd983f7786874c517",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_distress10/1.0.0/bilingual-content.json",
+      "originalSHA256": "d796b46d0a3cf82bca3ba989b63ed9861bad8fd83720ae18285169051e78857b",
+      "currentSHA256": "d796b46d0a3cf82bca3ba989b63ed9861bad8fd83720ae18285169051e78857b",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_distress10/1.0.0/external-reference-dossier.json",
+      "originalSHA256": "e23468e315f6e6b2c55866a013781fe71ff416f6c7d4f07b1f8fd8ba2b657c37",
+      "currentSHA256": "e23468e315f6e6b2c55866a013781fe71ff416f6c7d4f07b1f8fd8ba2b657c37",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_distress10/1.0.0/local-test-output.txt",
+      "originalSHA256": "eb425e5abde4f76ba69dfb2c41d7e96c5fc7f74b89f9d5a87a0f321abb475d68",
+      "currentSHA256": "eb425e5abde4f76ba69dfb2c41d7e96c5fc7f74b89f9d5a87a0f321abb475d68",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_distress10/1.0.0/local-validation.json",
+      "originalSHA256": "bc970916ba5cdfdfed947ab6522900cb729a335fd9c4d98c37b4b8d8b25360bd",
+      "currentSHA256": "bc970916ba5cdfdfed947ab6522900cb729a335fd9c4d98c37b4b8d8b25360bd",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_distress10/1.0.0/references.md",
+      "originalSHA256": "42eb4683461faea9d8d1cc2dae4da0a96aa0fc0e4a5f7166a48654332925b105",
+      "currentSHA256": "42eb4683461faea9d8d1cc2dae4da0a96aa0fc0e4a5f7166a48654332925b105",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_distress10/1.0.0/report-example.json",
+      "originalSHA256": "7aaa4fc74fa954f16be250d675248f4b1b545335520ddfb41dc731bbd06d9146",
+      "currentSHA256": "7aaa4fc74fa954f16be250d675248f4b1b545335520ddfb41dc731bbd06d9146",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_distress10/1.0.0/report-example.md",
+      "originalSHA256": "7114a0f0c0181b0fe4aab0631243bdfc159a09c52d47c9aa0fb7a8f98cefd07c",
+      "currentSHA256": "7114a0f0c0181b0fe4aab0631243bdfc159a09c52d47c9aa0fb7a8f98cefd07c",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_distress10/1.0.0/reviewed-source-pack.json",
+      "originalSHA256": "f2e03734e8130390a7d49677499efe674e576193074f9fe3a6ced1513bbfa6bb",
+      "currentSHA256": "f2e03734e8130390a7d49677499efe674e576193074f9fe3a6ced1513bbfa6bb",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_distress10/1.0.0/runtime-check.json",
+      "originalSHA256": "f5739a294814ff1d7fbe5568f6e0d300a8ee04edd0ebae69cc9bc92551880d7d",
+      "currentSHA256": "f5739a294814ff1d7fbe5568f6e0d300a8ee04edd0ebae69cc9bc92551880d7d",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_distress10/1.0.0/scoring-and-thresholds.md",
+      "originalSHA256": "d316030cce6275dab27bc1e14d1780eb6b7d61401f44a7336cf55b49ff86bfcf",
+      "currentSHA256": "d316030cce6275dab27bc1e14d1780eb6b7d61401f44a7336cf55b49ff86bfcf",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ipip_responsive_distress10_zh_cn_research/1.0.0/instrument.ts",
+      "originalSHA256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+      "currentSHA256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ipip_responsive_distress10_zh_cn_research/1.0.0/source.json",
+      "originalSHA256": "4d0a1c876f786abd7f7572fa4c9a956e0734744fe3fee428cdc1aefe0b5e8fd0",
+      "currentSHA256": "4d0a1c876f786abd7f7572fa4c9a956e0734744fe3fee428cdc1aefe0b5e8fd0",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_joy10/1.0.0/README.md",
+      "originalSHA256": "14944b54d6d5b7d6ddc832e0011dfffdd88acebe0f1c1a4de92c001006e96b02",
+      "currentSHA256": "14944b54d6d5b7d6ddc832e0011dfffdd88acebe0f1c1a4de92c001006e96b02",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_joy10/1.0.0/bilingual-content.json",
+      "originalSHA256": "668803ac2f0b72e37be2a3ea4831dbf8fe28fea933af75cc37fa8a12d28ea771",
+      "currentSHA256": "668803ac2f0b72e37be2a3ea4831dbf8fe28fea933af75cc37fa8a12d28ea771",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_joy10/1.0.0/local-validation.json",
+      "originalSHA256": "e4aedd7c93500844eddb832065d68ae86647cabea11c47f12b4a769920cbc58a",
+      "currentSHA256": "e4aedd7c93500844eddb832065d68ae86647cabea11c47f12b4a769920cbc58a",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_joy10/1.0.0/references.md",
+      "originalSHA256": "a300fcc22e87731333c8f9b71fbf4c137a7569515a48dbe555d33251075b8543",
+      "currentSHA256": "a300fcc22e87731333c8f9b71fbf4c137a7569515a48dbe555d33251075b8543",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_joy10/1.0.0/report-example.md",
+      "originalSHA256": "103c6fc4b5a08111d7d19bf12b986d82bb425c8eb09e7fe09a9e6b67ffda8abc",
+      "currentSHA256": "103c6fc4b5a08111d7d19bf12b986d82bb425c8eb09e7fe09a9e6b67ffda8abc",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_joy10/1.0.0/report-revisions/1.0.1/change-record.json",
+      "originalSHA256": "d24ed4e50ff24e30876a1bd47f4d2931c8ed83be9bae77e849ddcc3979c4a718",
+      "currentSHA256": "d24ed4e50ff24e30876a1bd47f4d2931c8ed83be9bae77e849ddcc3979c4a718",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_joy10/1.0.0/report-revisions/1.0.1/previous-report-1.0.0.json",
+      "originalSHA256": "20c3211aaeefe6507279c5ff20f95305fefa7e7b00b57b6b5525dd93744281b3",
+      "currentSHA256": "20c3211aaeefe6507279c5ff20f95305fefa7e7b00b57b6b5525dd93744281b3",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_joy10/1.0.0/report-revisions/1.0.1/previous-report-example.md",
+      "originalSHA256": "569f55e42abe93d456235d0ff9bcf217c53d9cee01cace2411421c8dc4191439",
+      "currentSHA256": "569f55e42abe93d456235d0ff9bcf217c53d9cee01cace2411421c8dc4191439",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_joy10/1.0.0/report-revisions/1.0.1/previous-synthetic-report-example.json",
+      "originalSHA256": "61d5727f312967b972aec0cb862a41aadb4c4f3d7ec13e1bbdf34a99328ad0f5",
+      "currentSHA256": "61d5727f312967b972aec0cb862a41aadb4c4f3d7ec13e1bbdf34a99328ad0f5",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_joy10/1.0.0/report-revisions/1.0.1/validation.json",
+      "originalSHA256": "168d18ad5648a0d54a1eabce54a9cf5c49e9a51aede0a0e33d5d4b5579a4b49c",
+      "currentSHA256": "168d18ad5648a0d54a1eabce54a9cf5c49e9a51aede0a0e33d5d4b5579a4b49c",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_joy10/1.0.0/reviewed-source-pack.json",
+      "originalSHA256": "847028d69c537d72ecc71910b3ad71aa303718758eba0d63e75016242a40e9fe",
+      "currentSHA256": "847028d69c537d72ecc71910b3ad71aa303718758eba0d63e75016242a40e9fe",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_joy10/1.0.0/synthetic-report-example.json",
+      "originalSHA256": "19efd8ece24459f8395395f553842af92e727d9ad8e69f3411e05669364c771a",
+      "currentSHA256": "19efd8ece24459f8395395f553842af92e727d9ad8e69f3411e05669364c771a",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ipip_responsive_joy10_zh_cn_research/1.0.0/instrument.ts",
+      "originalSHA256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+      "currentSHA256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ipip_responsive_joy10_zh_cn_research/1.0.0/source.json",
+      "originalSHA256": "a7a3dcdea8fec952e5beb39c760542c34ad3b55e996fbc9d66d273067239c15c",
+      "currentSHA256": "bdc9e05a94bf4b9646cb2e3fab7ee379184da69782bfbcbca3e86f35d9c7c2e6",
+      "unchanged": false
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/kseg6/1.0.0/README.md",
+      "originalSHA256": "ede351047a0af13eaf5342637f9004b1f6535967bdf9b151aa116e62eb3ec922",
+      "currentSHA256": "ede351047a0af13eaf5342637f9004b1f6535967bdf9b151aa116e62eb3ec922",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/kseg6/1.0.0/bilingual-content.json",
+      "originalSHA256": "25a61ff3cf0349956a020f6a83a6129bc2a0c47e5ab22cb4f42bac5698ca9a21",
+      "currentSHA256": "25a61ff3cf0349956a020f6a83a6129bc2a0c47e5ab22cb4f42bac5698ca9a21",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/kseg6/1.0.0/external-reference-dossier.json",
+      "originalSHA256": "4b0637f27f10977a7975a47f8476f21b46a5ac182e23f98c0d10f4a056c7e270",
+      "currentSHA256": "4b0637f27f10977a7975a47f8476f21b46a5ac182e23f98c0d10f4a056c7e270",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/kseg6/1.0.0/local-validation.json",
+      "originalSHA256": "40a6b517187c18e2124be0451e7b47a76bd943f7f9034e176152442ece0031a4",
+      "currentSHA256": "40a6b517187c18e2124be0451e7b47a76bd943f7f9034e176152442ece0031a4",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/kseg6/1.0.0/references.md",
+      "originalSHA256": "fa33f989103ca4e608469e69a2cf7d56c71383615be332389777a77f6762e8e8",
+      "currentSHA256": "fa33f989103ca4e608469e69a2cf7d56c71383615be332389777a77f6762e8e8",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/kseg6/1.0.0/report-example.md",
+      "originalSHA256": "92df00b83fc1392688d158a62af961655ba8adf23a504e5d507a4fdeb43c8fb2",
+      "currentSHA256": "92df00b83fc1392688d158a62af961655ba8adf23a504e5d507a4fdeb43c8fb2",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/kseg6/1.0.0/reviewed-source-pack.json",
+      "originalSHA256": "43aa3d86ef42abd08dfe73802b6641cdbfa0a4feb19101d1d3fc2cc0095a13cb",
+      "currentSHA256": "43aa3d86ef42abd08dfe73802b6641cdbfa0a4feb19101d1d3fc2cc0095a13cb",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/kseg6/1.0.0/scoring-and-thresholds.md",
+      "originalSHA256": "2c17a9703f284bb9e4df1b2faead3b4ad0bff20e5c3316fe60c1545c29d0e1b7",
+      "currentSHA256": "2c17a9703f284bb9e4df1b2faead3b4ad0bff20e5c3316fe60c1545c29d0e1b7",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/kseg6/1.0.0/synthetic-report-example.json",
+      "originalSHA256": "1a8223cc22f87b5bf666b2124dca3867c9e1c7c19e484447b24f735bb52c03e1",
+      "currentSHA256": "1a8223cc22f87b5bf666b2124dca3867c9e1c7c19e484447b24f735bb52c03e1",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/kseg6_zh_cn_research/1.0.0/instrument.ts",
+      "originalSHA256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+      "currentSHA256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/kseg6_zh_cn_research/1.0.0/source.json",
+      "originalSHA256": "e7bb632b8da7b942e46777d4d3f55b9c3212b63e8fc6b52a42d9b4772f304dfc",
+      "currentSHA256": "e7bb632b8da7b942e46777d4d3f55b9c3212b63e8fc6b52a42d9b4772f304dfc",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/maia2_37/1.0.0/README.md",
+      "originalSHA256": "4631ff6cbdf15c13b13c8ccd9eb7229fded51264a71fbc097d4f407b839bd250",
+      "currentSHA256": "4631ff6cbdf15c13b13c8ccd9eb7229fded51264a71fbc097d4f407b839bd250",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/maia2_37/1.0.0/administration-sidecar.prepared.json",
+      "originalSHA256": "de515acb7ec634d6a2044a5291021edcd8da72d58ec0add3e60fdfd6827254a2",
+      "currentSHA256": "de515acb7ec634d6a2044a5291021edcd8da72d58ec0add3e60fdfd6827254a2",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/maia2_37/1.0.0/administration.md",
+      "originalSHA256": "990aa55f3b9630f92a14e56ac193a8e01956e8f58a523b9cd040af242faf3471",
+      "currentSHA256": "990aa55f3b9630f92a14e56ac193a8e01956e8f58a523b9cd040af242faf3471",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/maia2_37/1.0.0/bilingual-content.json",
+      "originalSHA256": "f67920c515020571719992e450b2f32960460c42694b7c75f400644d6906ef45",
+      "currentSHA256": "f67920c515020571719992e450b2f32960460c42694b7c75f400644d6906ef45",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/maia2_37/1.0.0/parameter-plan.json",
+      "originalSHA256": "afffb0561d51a4118b295c0a7d08da4b327616fba8eff925a834a38db004220a",
+      "currentSHA256": "afffb0561d51a4118b295c0a7d08da4b327616fba8eff925a834a38db004220a",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/maia2_37/1.0.0/references.md",
+      "originalSHA256": "a19c5e37d4db6f4ad0256b287fac13ade2896d9b8b3dc58ff6d237732c7bfee2",
+      "currentSHA256": "a19c5e37d4db6f4ad0256b287fac13ade2896d9b8b3dc58ff6d237732c7bfee2",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/maia2_37/1.0.0/report-example.md",
+      "originalSHA256": "113b964c0cee25b6be431ae1ff1fb02fe37cd863b2ddc1250d672e6be5d424c1",
+      "currentSHA256": "113b964c0cee25b6be431ae1ff1fb02fe37cd863b2ddc1250d672e6be5d424c1",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/maia2_37/1.0.0/report-results.synthetic.json",
+      "originalSHA256": "d75222729383898ab6e57239aa866c04fd1134864bff88d18ab5ebcf11dea485",
+      "currentSHA256": "d75222729383898ab6e57239aa866c04fd1134864bff88d18ab5ebcf11dea485",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/maia2_37/1.0.0/scoring-and-parameters.md",
+      "originalSHA256": "37467946760c2e53743efa7375afae29dd0d54641fef25b89cebf4ef484bea02",
+      "currentSHA256": "37467946760c2e53743efa7375afae29dd0d54641fef25b89cebf4ef484bea02",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/maia2_37/1.0.0/validation.json",
+      "originalSHA256": "e7d1eb9217f453cab8ea50c9b3bd24146aa1691905d3d694cdbd9942288929d6",
+      "currentSHA256": "e7d1eb9217f453cab8ea50c9b3bd24146aa1691905d3d694cdbd9942288929d6",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/maia2_37/1.0.0/validation.md",
+      "originalSHA256": "bf41a85245dbf60e066d82a7c6010ce2d9164d2779c0ee1d309bf0922cfb6e18",
+      "currentSHA256": "bf41a85245dbf60e066d82a7c6010ce2d9164d2779c0ee1d309bf0922cfb6e18",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/maia2_37_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+      "originalSHA256": "510e3741e444b94d78a1114547b06cdc392cafd462eb0c88bed5ae4abec2a2c2",
+      "currentSHA256": "510e3741e444b94d78a1114547b06cdc392cafd462eb0c88bed5ae4abec2a2c2",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/maia2_37_zh_cn_research/1.0.0/instrument.ts",
+      "originalSHA256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+      "currentSHA256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/maia2_37_zh_cn_research/1.0.0/source.json",
+      "originalSHA256": "3d1fc6192db0261518b8d85c6bea2eed7219d7f3e7ca73a5e0010d7a3292c3cb",
+      "currentSHA256": "3d1fc6192db0261518b8d85c6bea2eed7219d7f3e7ca73a5e0010d7a3292c3cb",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/spane12/1.0.0/README.md",
+      "originalSHA256": "888a9a0401eee12e7d8c8cc5199000e7ff1e5809fc90b54bfa47ba99a88d797b",
+      "currentSHA256": "888a9a0401eee12e7d8c8cc5199000e7ff1e5809fc90b54bfa47ba99a88d797b",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/spane12/1.0.0/source-manifest.json",
+      "originalSHA256": "20412661bb4306de637513d8a9ceeeb01ee883bb4c9a0e855935becddd0f2d03",
+      "currentSHA256": "20412661bb4306de637513d8a9ceeeb01ee883bb4c9a0e855935becddd0f2d03",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+      "originalSHA256": "6f418448781871dbafb7db481a828df6ab168032520a86fe256c13ea55b26ec0",
+      "currentSHA256": "6f418448781871dbafb7db481a828df6ab168032520a86fe256c13ea55b26ec0",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.0/instrument.ts",
+      "originalSHA256": "1569f526ce1dae3869e666cca5b8d659ae3804dec91f38ce828c18cb96a1b98e",
+      "currentSHA256": "1569f526ce1dae3869e666cca5b8d659ae3804dec91f38ce828c18cb96a1b98e",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.0/scorer.ts",
+      "originalSHA256": "1c2c65dba289e33aa968a9894e124fcfec94f18caa849445ded5e97a94a7ebf2",
+      "currentSHA256": "1c2c65dba289e33aa968a9894e124fcfec94f18caa849445ded5e97a94a7ebf2",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.0/source.json",
+      "originalSHA256": "a1a6428c9b50d08361d69639138579de8ced8d917d4edfc3dca5fa1ca4dd41a6",
+      "currentSHA256": "a1a6428c9b50d08361d69639138579de8ced8d917d4edfc3dca5fa1ca4dd41a6",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/sswq16/1.0.0/README.md",
+      "originalSHA256": "268fc16a4083f0c9aaba16bb6df4e95a70c68fcb10c65205c541e7ea0871ff34",
+      "currentSHA256": "268fc16a4083f0c9aaba16bb6df4e95a70c68fcb10c65205c541e7ea0871ff34",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/sswq16/1.0.0/bilingual-content.json",
+      "originalSHA256": "6b3b1ae64974e8cc5d12a91982b8c939f904b0dc27f8ae19e6f64a9c3223ec6c",
+      "currentSHA256": "6b3b1ae64974e8cc5d12a91982b8c939f904b0dc27f8ae19e6f64a9c3223ec6c",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/sswq16/1.0.0/external-reference-dossier.json",
+      "originalSHA256": "dd38edc797336288b4f8dc5a0c112894eb633de4df112745bd22b1f8f7dfe4c0",
+      "currentSHA256": "dd38edc797336288b4f8dc5a0c112894eb633de4df112745bd22b1f8f7dfe4c0",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/sswq16/1.0.0/local-validation.json",
+      "originalSHA256": "4f0e8fa3a41127263ce0f34cc81a402ca8c29d636eee77e61f50608a929bf0e8",
+      "currentSHA256": "4f0e8fa3a41127263ce0f34cc81a402ca8c29d636eee77e61f50608a929bf0e8",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/sswq16/1.0.0/references.md",
+      "originalSHA256": "2f9659cf239a35aec1055f2d8200703092e1b331090c82d260a971a368d5d9cb",
+      "currentSHA256": "2f9659cf239a35aec1055f2d8200703092e1b331090c82d260a971a368d5d9cb",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/sswq16/1.0.0/report-example.md",
+      "originalSHA256": "61ab6c4caa2e2450cbabe7912051bbe15fc4357e2b126dc681ffba4fbb424be6",
+      "currentSHA256": "61ab6c4caa2e2450cbabe7912051bbe15fc4357e2b126dc681ffba4fbb424be6",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/sswq16/1.0.0/reviewed-source-pack.json",
+      "originalSHA256": "b25f19387163e7835370ec49c3bcf960b982942d15d55891a5c6abe040bb3f57",
+      "currentSHA256": "b25f19387163e7835370ec49c3bcf960b982942d15d55891a5c6abe040bb3f57",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/sswq16/1.0.0/scoring-and-thresholds.md",
+      "originalSHA256": "f4cdf3fe63500d065b0b767c8e4e12f82e78a4287fd727e88d90eb43c24b343f",
+      "currentSHA256": "f4cdf3fe63500d065b0b767c8e4e12f82e78a4287fd727e88d90eb43c24b343f",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/sswq16/1.0.0/synthetic-report-example.json",
+      "originalSHA256": "335b8b84017fc82bbeca53bbac1025de6659d7d816e9928c8e0ecd42b5f72486",
+      "currentSHA256": "335b8b84017fc82bbeca53bbac1025de6659d7d816e9928c8e0ecd42b5f72486",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/sswq16_zh_cn_research/1.0.0/instrument.ts",
+      "originalSHA256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+      "currentSHA256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/sswq16_zh_cn_research/1.0.0/source.json",
+      "originalSHA256": "cf23dcb15ece5b40af0d58e48d9c43edac0d9eea8058dcd35b343636820b66b7",
+      "currentSHA256": "cf23dcb15ece5b40af0d58e48d9c43edac0d9eea8058dcd35b343636820b66b7",
+      "unchanged": true
+    }
+  ],
+  "count": 182,
+  "note": "Only existing uninstalled candidate source bindings/release preparation changed in place; every version that received substantive presentation/definition changes has a new identity and unchanged original bytes."
+}

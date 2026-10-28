@@ -1,0 +1,171 @@
+{
+  "identity": "kusiv3_zh_cn_research:1.0.0",
+  "sourceCommit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "sourceFiles": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/kusiv3_zh_cn_research/1.0.0/source.json",
+      "gitBlob": "17a180cb1afd8b84b9ea3cb778ff39449be43978",
+      "sha256": "fb8189a4d0c422f6f4c231cef0a1a5c6e8edf664eff4cb921dba3f3bb0f708f2"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/kusiv3_zh_cn_research/1.0.0/instrument.ts",
+      "gitBlob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/kusiv3/1.0.0/README.md",
+      "gitBlob": "5233b907999d616481c4acc23ef7d7d81c9bc57d",
+      "sha256": "a4420d3e4d4ead7b04378b5d8ece2715e12ea48440e245c451c4d1c1e898e74d"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/kusiv3/1.0.0/bilingual-content.json",
+      "gitBlob": "9df3513b1824ec1aa82998ab5ea6e812b225a113",
+      "sha256": "db0cbd15d8a10032e6f026a769a1b84280487913f56378ff0b6269ceac70f90c"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/kusiv3/1.0.0/reviewed-source-pack.json",
+      "gitBlob": "2358ac84b56d26edd4d591c0a47b4e8e38992db8",
+      "sha256": "dee13590848933211f1eb4d8e78de8b88e1c983ef62db15be0e142d0e91b0aa3"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/kusiv3/1.0.0/external-reference-dossier.json",
+      "gitBlob": "4fff93f534d389825593f5949a448201ea2ae44f",
+      "sha256": "bcf1cb0852c45f3b8695250eede92cf57e97630b5a5d478e5ddf3e8f839cfc69"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/kusiv3/1.0.0/references.md",
+      "gitBlob": "549cc4dd39f2dbb8999f3fee21af8b7c605310d9",
+      "sha256": "cb2437a1cad6e095590ecb17695d1f772d5ab9915b94a7aee996a1538c4e64c7"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/kusiv3/1.0.0/report-example.md",
+      "gitBlob": "70f0cc253cf609183b7a4d021e4cedb645399ad2",
+      "sha256": "34d2ae717b6af592ebb5515af4b2eebf0d71be519a15d91b52b72f7aa833a6e7"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/kusiv3/1.0.0/scoring-and-thresholds.md",
+      "gitBlob": "7a92c4611ef04e70c83580ca86e15ae46163a6ab",
+      "sha256": "45f1d92e560a441e76c53a59b4e6b2e631122a3f5bfd1151dca317de404e1e12"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/kusiv3/1.0.0/synthetic-report-example.json",
+      "gitBlob": "ee24510c9854413ca937549f6f7e144a534ef644",
+      "sha256": "e7193948fd539b6dac8f686e38c894339617ff11e555bfce3459d22acc8cec27"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/kusiv3/1.0.0/local-validation.json",
+      "gitBlob": "3379ac6598a21b5e396eb89b2eb18fe60cf42d63",
+      "sha256": "d65dfb165c6cdd083e6030cb25b59f45f24a6dc120c17f699c509a649fcc05c5"
+    }
+  ],
+  "threePartConclusions": {
+    "content": "固定来源三道英文题及译稿与运行时逐项一致，第1/3正向、第2反向；中文基本对应，待人工译审。五点同意度中3为“有些同意”，并非中立；无指定回忆时段。",
+    "scoring": "单一总分均值=(第1题+6−第2题+第3题)/3，等权、范围1–5；complete_required，缺一不聚合、不插补、不变分母，研究材料记录作者建议。无临床阈值、高中低档及中国常模；英国/德国样本均值仅背景，referencePolicy none。",
+    "report": "1.0.0报告方向为更倾向相信他人通常可信，不推定具体对象安全、不评价诚信。反思和循序合作、核实信息及保留拒绝权的建议具体且不道德化；成人自评，student仅技术映射，中文独立译稿待验证。引用及instrument/scoring/localization/report 1.0.0保留。"
+  },
+  "items": [
+    {
+      "position": 1,
+      "runtimeItemCode": "KUSIV3_01",
+      "en": "I am convinced that most people have good intentions.",
+      "zh": "我相信大多数人都怀有善意。",
+      "key": "positive",
+      "assessment": "固定双语及运行时一致，中文大意相符；待人工译审。"
+    },
+    {
+      "position": 2,
+      "runtimeItemCode": "KUSIV3_02",
+      "en": "You can’t rely on anyone these days.",
+      "zh": "如今谁都靠不住。",
+      "key": "reverse",
+      "assessment": "固定双语及运行时一致，中文大意相符；待人工译审。"
+    },
+    {
+      "position": 3,
+      "runtimeItemCode": "KUSIV3_03",
+      "en": "In general, people can be trusted.",
+      "zh": "总的来说，人们是可以信任的。",
+      "key": "positive",
+      "assessment": "固定双语及运行时一致，中文大意相符；待人工译审。"
+    }
+  ],
+  "anchors": [
+    {
+      "value": 1,
+      "en": "do not agree at all",
+      "zh": "完全不同意"
+    },
+    {
+      "value": 2,
+      "en": "hardly agree",
+      "zh": "不太同意"
+    },
+    {
+      "value": 3,
+      "en": "somewhat agree",
+      "zh": "有些同意"
+    },
+    {
+      "value": 4,
+      "en": "mostly agree",
+      "zh": "大体同意"
+    },
+    {
+      "value": 5,
+      "en": "completely agree",
+      "zh": "完全同意"
+    }
+  ],
+  "instruction": {
+    "text": "下面我们想了解你对其他人的看法。请指出你对以下每句话的同意或不同意程度。",
+    "sources": [
+      {
+        "file": {
+          "path": "docs/scale-instruments/research-drafts/kusiv3/1.0.0/bilingual-content.json",
+          "gitBlob": "9df3513b1824ec1aa82998ab5ea6e812b225a113",
+          "sha256": "db0cbd15d8a10032e6f026a769a1b84280487913f56378ff0b6269ceac70f90c"
+        },
+        "field": "instructions.zh"
+      },
+      {
+        "file": {
+          "path": "docs/scale-instruments/research-drafts/kusiv3/1.0.0/reviewed-source-pack.json",
+          "gitBlob": "2358ac84b56d26edd4d591c0a47b4e8e38992db8",
+          "sha256": "dee13590848933211f1eb4d8e78de8b88e1c983ef62db15be0e142d0e91b0aa3"
+        },
+        "field": "instructions.zh"
+      }
+    ],
+    "proposedBinding": {
+      "schemaVersion": 1,
+      "text": "下面我们想了解你对其他人的看法。请指出你对以下每句话的同意或不同意程度。",
+      "language": "zh-CN",
+      "version": "1.0.0",
+      "source": "docs/scale-instruments/research-drafts/kusiv3/1.0.0/bilingual-content.json#instructions.zh"
+    },
+    "qualification": "现有作者英文指导语的项目中文工作译文；绑定版本为拟议标识，不声称人工审校。"
+  },
+  "ordinaryRevisions": [
+    {
+      "jsonPath": "executable.definition.report.interpretations[0].guidance[1].text",
+      "old": "下一次合作先说清楚任务、时间和边界，用实际表现慢慢积累信任。 遇到借钱、隐私或安全问题，核实信息和保留拒绝权始终重要。",
+      "new": "下一次合作先说清楚任务、时间和边界，用实际表现慢慢积累信任。遇到借钱、隐私或安全问题，核实信息和保留拒绝权始终重要。",
+      "reason": "仅删除中文句间多余空格，保留实际建议，按报告版本规则处理。"
+    },
+    {
+      "jsonPath": "executable.definition.report.disclaimer",
+      "old": "https://creativecommons.org/licenses/by/4.0/ 。",
+      "new": "https://creativecommons.org/licenses/by/4.0/。",
+      "reason": "删除URL与中文句号间多余空格；保留引用和署名。"
+    }
+  ],
+  "manualPending": [
+    "独立中文工作译稿的专家译审、认知访谈与目标人群效度待完成；18–69原研究样本不构成中文/未成年人验证。",
+    "变更题意、锚点、反向、均分分母或阈值须给出原据及版本影响，由root协调。",
+    "保留固定来源既有许可和引用状态，未做新版权研究。"
+  ],
+  "notExecuted": [
+    "未运行golden、评分、截图、四入口、系统、DB、CI，未写仓库。",
+    "既有历史验证/合成结果不声称本次执行；未开展新科研或版权调查。"
+  ]
+}

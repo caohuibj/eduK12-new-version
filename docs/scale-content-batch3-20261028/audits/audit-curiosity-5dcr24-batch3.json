@@ -1,0 +1,476 @@
+{
+  "instrument": "curiosity_5dcr24_zh_cn_research:1.0.0",
+  "source_commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "source_files": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/curiosity_5dcr24_zh_cn_research/1.0.0/source.json",
+      "blob": "143ad706d355718b34e8c20bfeba402bb96c6719",
+      "sha256": "fa3ec5f120acf82649c291949129205362cad9a28e2f9de736a2912bd34fdc95"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/curiosity_5dcr24_zh_cn_research/1.0.0/instrument.ts",
+      "blob": "0eed070bb879576339c5a71afdf34c0026591fd3",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/curiosity_5dcr24_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+      "blob": "9ffd1da3a558ba6fd2f73d2695ec1fa4a6a027d5",
+      "sha256": "cb248df7de41f35cbe534de602e30230d5e2b82a51adfd7b3b3fc9a72022290b"
+    }
+  ],
+  "three_parts": {
+    "items_instruction": {
+      "items": [
+        {
+          "number": 1,
+          "code": "DCR5_01",
+          "chinese": "我把有挑战的情境看作成长和学习的机会。",
+          "transform": "identity",
+          "source_comparison": "固定提交未发现本工具逐题英文manifest；本次只能检查中文结构、键和归属，未逐题核实英文原意。"
+        },
+        {
+          "number": 2,
+          "code": "DCR5_02",
+          "chinese": "我会主动寻找可能需要深入思考某件事的情境。",
+          "transform": "identity",
+          "source_comparison": "固定提交未发现本工具逐题英文manifest；本次只能检查中文结构、键和归属，未逐题核实英文原意。"
+        },
+        {
+          "number": 3,
+          "code": "DCR5_03",
+          "chinese": "我喜欢学习自己不熟悉的主题。",
+          "transform": "identity",
+          "source_comparison": "固定提交未发现本工具逐题英文manifest；本次只能检查中文结构、键和归属，未逐题核实英文原意。"
+        },
+        {
+          "number": 4,
+          "code": "DCR5_04",
+          "chinese": "我觉得学习新信息很有吸引力。",
+          "transform": "identity",
+          "source_comparison": "固定提交未发现本工具逐题英文manifest；本次只能检查中文结构、键和归属，未逐题核实英文原意。"
+        },
+        {
+          "number": 5,
+          "code": "DCR5_05",
+          "chinese": "思考困难的概念性问题的解法，可能会让我夜里睡不着。",
+          "transform": "identity",
+          "source_comparison": "固定提交未发现本工具逐题英文manifest；本次只能检查中文结构、键和归属，未逐题核实英文原意。"
+        },
+        {
+          "number": 6,
+          "code": "DCR5_06",
+          "chinese": "我可能在一个问题上花上好几个小时，因为不知道答案就无法安心。",
+          "transform": "identity",
+          "source_comparison": "固定提交未发现本工具逐题英文manifest；本次只能检查中文结构、键和归属，未逐题核实英文原意。"
+        },
+        {
+          "number": 7,
+          "code": "DCR5_07",
+          "chinese": "如果想不出问题的解法，我会感到受挫，所以会更加努力地解决它。",
+          "transform": "identity",
+          "source_comparison": "固定提交未发现本工具逐题英文manifest；本次只能检查中文结构、键和归属，未逐题核实英文原意。"
+        },
+        {
+          "number": 8,
+          "code": "DCR5_08",
+          "chinese": "对于我觉得必须解决的问题，我会坚持不懈地钻研。",
+          "transform": "identity",
+          "source_comparison": "固定提交未发现本工具逐题英文manifest；本次只能检查中文结构、键和归属，未逐题核实英文原意。"
+        },
+        {
+          "number": 9,
+          "code": "DCR5_09",
+          "chinese": "哪怕一点点疑虑，也能让我不再寻求新的体验。",
+          "transform": "reverse",
+          "source_comparison": "固定提交未发现本工具逐题英文manifest；本次只能检查中文结构、键和归属，未逐题核实英文原意。"
+        },
+        {
+          "number": 10,
+          "code": "DCR5_10",
+          "chinese": "我无法应对进入不确定情境所带来的压力。",
+          "transform": "reverse",
+          "source_comparison": "固定提交未发现本工具逐题英文manifest；本次只能检查中文结构、键和归属，未逐题核实英文原意。"
+        },
+        {
+          "number": 11,
+          "code": "DCR5_11",
+          "chinese": "当我对自己的能力缺乏信心时，我觉得很难探索新的地方。",
+          "transform": "reverse",
+          "source_comparison": "固定提交未发现本工具逐题英文manifest；本次只能检查中文结构、键和归属，未逐题核实英文原意。"
+        },
+        {
+          "number": 12,
+          "code": "DCR5_12",
+          "chinese": "当有可能发生令我措手不及的事情时，我很难集中注意力。",
+          "transform": "reverse",
+          "source_comparison": "固定提交未发现本工具逐题英文manifest；本次只能检查中文结构、键和归属，未逐题核实英文原意。"
+        },
+        {
+          "number": 13,
+          "code": "DCR5_13",
+          "chinese": "我喜欢弄清楚人们为什么会那样行事。",
+          "transform": "identity",
+          "source_comparison": "固定提交未发现本工具逐题英文manifest；本次只能检查中文结构、键和归属，未逐题核实英文原意。"
+        },
+        {
+          "number": 14,
+          "code": "DCR5_14",
+          "chinese": "我会问很多问题，以了解其他人对什么感兴趣。",
+          "transform": "identity",
+          "source_comparison": "固定提交未发现本工具逐题英文manifest；本次只能检查中文结构、键和归属，未逐题核实英文原意。"
+        },
+        {
+          "number": 15,
+          "code": "DCR5_15",
+          "chinese": "和一个兴奋的人交谈时，我会好奇是什么让对方兴奋。",
+          "transform": "identity",
+          "source_comparison": "固定提交未发现本工具逐题英文manifest；本次只能检查中文结构、键和归属，未逐题核实英文原意。"
+        },
+        {
+          "number": 16,
+          "code": "DCR5_16",
+          "chinese": "与人交谈时，我会尝试发现对方身上一些有趣的细节。",
+          "transform": "identity",
+          "source_comparison": "固定提交未发现本工具逐题英文manifest；本次只能检查中文结构、键和归属，未逐题核实英文原意。"
+        },
+        {
+          "number": 17,
+          "code": "DCR5_17",
+          "chinese": "其他人在交谈时，我喜欢弄清楚他们在谈什么。",
+          "transform": "identity",
+          "source_comparison": "固定提交未发现本工具逐题英文manifest；本次只能检查中文结构、键和归属，未逐题核实英文原意。"
+        },
+        {
+          "number": 18,
+          "code": "DCR5_18",
+          "chinese": "和其他人在一起时，我喜欢听他们的交谈。",
+          "transform": "identity",
+          "source_comparison": "固定提交未发现本工具逐题英文manifest；本次只能检查中文结构、键和归属，未逐题核实英文原意。"
+        },
+        {
+          "number": 19,
+          "code": "DCR5_19",
+          "chinese": "人们争吵时，我喜欢知道发生了什么。",
+          "transform": "identity",
+          "source_comparison": "固定提交未发现本工具逐题英文manifest；本次只能检查中文结构、键和归属，未逐题核实英文原意。"
+        },
+        {
+          "number": 20,
+          "code": "DCR5_20",
+          "chinese": "我会寻求有关我生活中那些人的私生活的信息。",
+          "transform": "identity",
+          "source_comparison": "固定提交未发现本工具逐题英文manifest；本次只能检查中文结构、键和归属，未逐题核实英文原意。"
+        },
+        {
+          "number": 21,
+          "code": "DCR5_21",
+          "chinese": "冒险让我感到兴奋。",
+          "transform": "identity",
+          "source_comparison": "固定提交未发现本工具逐题英文manifest；本次只能检查中文结构、键和归属，未逐题核实英文原意。"
+        },
+        {
+          "number": 22,
+          "code": "DCR5_22",
+          "chinese": "有空闲时间时，我想做一些有点吓人的事情。",
+          "transform": "identity",
+          "source_comparison": "固定提交未发现本工具逐题英文manifest；本次只能检查中文结构、键和归属，未逐题核实英文原意。"
+        },
+        {
+          "number": 23,
+          "code": "DCR5_23",
+          "chinese": "比起事先安排好的冒险，我觉得在过程中即兴展开的冒险要吸引人得多。",
+          "transform": "identity",
+          "source_comparison": "固定提交未发现本工具逐题英文manifest；本次只能检查中文结构、键和归属，未逐题核实英文原意。"
+        },
+        {
+          "number": 24,
+          "code": "DCR5_24",
+          "chinese": "我更喜欢那些让人感到兴奋、难以预测的朋友。",
+          "transform": "identity",
+          "source_comparison": "固定提交未发现本工具逐题英文manifest；本次只能检查中文结构、键和归属，未逐题核实英文原意。"
+        }
+      ],
+      "options": [
+        {
+          "key": "dcr5_describes_1_7",
+          "options": [
+            {
+              "value": "1",
+              "label": "完全不符合我",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "几乎不符合我",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "有些符合我",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "中立",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "总体上符合我",
+              "score": 5
+            },
+            {
+              "value": "6",
+              "label": "大部分符合我",
+              "score": 6
+            },
+            {
+              "value": "7",
+              "label": "完全符合我",
+              "score": 7
+            }
+          ]
+        }
+      ],
+      "limitation": "固定提交目标包及research-drafts未找到24项原英文逐题材料；GESIS原页面本次未读取，中文译意与选项英文等值尚不能宣称逐项核对。",
+      "instruction": {
+        "path": "server-version/backend/src/modules/scale/instruments/curiosity_5dcr24_zh_cn_research/1.0.0/source.json",
+        "blob": "143ad706d355718b34e8c20bfeba402bb96c6719",
+        "sha256": "fa3ec5f120acf82649c291949129205362cad9a28e2f9de736a2912bd34fdc95",
+        "field": "/instruction",
+        "value": {
+          "schemaVersion": 1,
+          "text": "下面是一些人们常用来描述自己的陈述。请使用下列选项，指出这些陈述在多大程度上准确地描述了您。答案没有对错。",
+          "language": "zh-CN",
+          "version": "1.0.0",
+          "source": "GESIS ZIS 2022英文施测说明的独立中文工作译稿，取自PR328材料包r2；未经作者认可或人工译审。"
+        }
+      },
+      "audience": "成人自报，独立中文工作译稿。"
+    },
+    "scoring": {
+      "scores": [
+        {
+          "key": "joyous_exploration",
+          "type": "dimension",
+          "label": "愉悦探索",
+          "description": "本维四题作答完整时计算1–7分均值，只描述自报好奇倾向，不作为学习能力、人格优劣、临床状态或群体排名。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "DCR5_01",
+                "weight": 1
+              },
+              {
+                "itemCode": "DCR5_02",
+                "weight": 1
+              },
+              {
+                "itemCode": "DCR5_03",
+                "weight": 1
+              },
+              {
+                "itemCode": "DCR5_04",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        },
+        {
+          "key": "deprivation_sensitivity",
+          "type": "dimension",
+          "label": "匮乏敏感性",
+          "description": "本维四题作答完整时计算1–7分均值，只描述自报好奇倾向，不作为学习能力、人格优劣、临床状态或群体排名。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "DCR5_05",
+                "weight": 1
+              },
+              {
+                "itemCode": "DCR5_06",
+                "weight": 1
+              },
+              {
+                "itemCode": "DCR5_07",
+                "weight": 1
+              },
+              {
+                "itemCode": "DCR5_08",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        },
+        {
+          "key": "stress_tolerance",
+          "type": "dimension",
+          "label": "面对不确定性的耐受",
+          "description": "本维四题作答完整时计算1–7分均值，只描述自报好奇倾向，不作为学习能力、人格优劣、临床状态或群体排名。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "DCR5_09",
+                "weight": 1
+              },
+              {
+                "itemCode": "DCR5_10",
+                "weight": 1
+              },
+              {
+                "itemCode": "DCR5_11",
+                "weight": 1
+              },
+              {
+                "itemCode": "DCR5_12",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        },
+        {
+          "key": "social_curiosity_general",
+          "type": "dimension",
+          "label": "一般社会好奇心",
+          "description": "本维四题作答完整时计算1–7分均值，只描述自报好奇倾向，不作为学习能力、人格优劣、临床状态或群体排名。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "DCR5_13",
+                "weight": 1
+              },
+              {
+                "itemCode": "DCR5_14",
+                "weight": 1
+              },
+              {
+                "itemCode": "DCR5_15",
+                "weight": 1
+              },
+              {
+                "itemCode": "DCR5_16",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        },
+        {
+          "key": "social_curiosity_covert",
+          "type": "dimension",
+          "label": "间接了解他人的好奇心",
+          "description": "本维四题作答完整时计算1–7分均值，只描述自报好奇倾向，不作为学习能力、人格优劣、临床状态或群体排名。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "DCR5_17",
+                "weight": 1
+              },
+              {
+                "itemCode": "DCR5_18",
+                "weight": 1
+              },
+              {
+                "itemCode": "DCR5_19",
+                "weight": 1
+              },
+              {
+                "itemCode": "DCR5_20",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        },
+        {
+          "key": "thrill_seeking",
+          "type": "dimension",
+          "label": "寻求新鲜与刺激",
+          "description": "本维四题作答完整时计算1–7分均值，只描述自报好奇倾向，不作为学习能力、人格优劣、临床状态或群体排名。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "DCR5_21",
+                "weight": 1
+              },
+              {
+                "itemCode": "DCR5_22",
+                "weight": 1
+              },
+              {
+                "itemCode": "DCR5_23",
+                "weight": 1
+              },
+              {
+                "itemCode": "DCR5_24",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        }
+      ],
+      "method": "6维各4题等权均分1–7；9–12反向8−x，其余identity，无总体分；完整每维才计算。",
+      "parameters": "referencePolicy none，无常模、诊断或排序阈值。"
+    },
+    "report": {
+      "review": "六维引用对应，社会好奇尊重隐私、刺激建议安全可退出，非能力或人格评价；可保留。",
+      "version": "内容/计分/本地化/报告1.0.0。"
+    }
+  },
+  "ordinary_suggestions": [],
+  "substantive_coordination": [
+    "七点中文第3档“有些符合我”处于第4“中立”之前，可能产生方向理解歧义；需对照GESIS原锚点并译审，不能擅改。",
+    "须以可读原始英文逐题核对题意与键，尤其9–12反向；未获取依据不能假称审查完成。"
+  ],
+  "human_status": "AI辅助译稿，人工专家译审、认知访谈和中文验证待完成。",
+  "not_executed": [
+    "未改仓库/DB/CI，未运行测试或系统；未读取英文原始题本。"
+  ],
+  "conclusion": "计分与内部结构静态可审；英文逐题及锚点等值尚有资料缺口，需root后续协调，不声称完整原意审计。"
+}

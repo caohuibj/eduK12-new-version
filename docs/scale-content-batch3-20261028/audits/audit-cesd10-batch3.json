@@ -1,0 +1,204 @@
+{
+  "identity": "cesd10_zh_cn_research:1.0.0",
+  "sourceCommit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "sourceFiles": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/cesd10_zh_cn_research/1.0.0/source.json",
+      "gitBlob": "d50d0a0698fbc8ebaf9c502a9fa54a7e881af703",
+      "sha256": "5c2cd9214a45ed735d058f9617418ef4dc1ccc6e27f999d38d2512c3d26ff476"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/cesd10_zh_cn_research/1.0.0/instrument.ts",
+      "gitBlob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/cesd10/1.0.0/README.md",
+      "gitBlob": "9849d90c0632b7f3ce95993c56f8cad2fda21e94",
+      "sha256": "47d5d4f26d88923c59791abe7fa608e376045f124a6c9717053c987fd1985485"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/cesd10/1.0.0/bilingual-content.json",
+      "gitBlob": "321939a53d99f749f7e5da0daa7f090bccfc7ff9",
+      "sha256": "dafcd1a88c5df6a503e87bf9f995f3ee320d62d00eb723ff68b0554890ccb7bd"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/cesd10/1.0.0/reviewed-source-pack.json",
+      "gitBlob": "0bda12419e0346b34009998bc34143ca665dfcd0",
+      "sha256": "600588b9eeb016f96250f62724c988276b3b71f306dace6531349f128e6ed5fa"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/cesd10/1.0.0/external-reference-dossier.json",
+      "gitBlob": "4b3a30c56bf478ccc8f40f3bd21d967fa0478cb2",
+      "sha256": "4cdbf513ce03f811438f0892d833742ae21acf88391311b2b307f61df5da0159"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/cesd10/1.0.0/references.md",
+      "gitBlob": "9a9132b0c9d35cad2a2f4762b0e1dbbcacefa29f",
+      "sha256": "6424dafe8513856c65710e825a72b2df87dc18f35920cb1bdb464e4d84016e55"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/cesd10/1.0.0/report-example.md",
+      "gitBlob": "62022a730867b0b08a693deae0107b327d44102d",
+      "sha256": "c93a0509f827fdd5a2dc125e4873c071db6ef7384f1aba20c9050ce700e3a40c"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/cesd10/1.0.0/scoring-and-thresholds.md",
+      "gitBlob": "b2f7b88d645c6a11802ad4e896f3bacf763ad09e",
+      "sha256": "b9466452a44f363401d461b49baf48d97e4315b4075403b18dd9d25624c7eae9"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/cesd10/1.0.0/synthetic-report-example.json",
+      "gitBlob": "4343cf2c321a41ba33fe5ed6931ded6bf58027c5",
+      "sha256": "cf797bdb8e3d35dce76ad6aaf72d3b85ec495650ff99b4d603492f274b0fb364"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/cesd10/1.0.0/local-validation.json",
+      "gitBlob": "5f05999ccbd6d571b4d81c012d25f1ea6e788d97",
+      "sha256": "72a25ffa3fbe42546b1a78885409ed9612fb61f9450be872dd42ade800c34b11"
+    }
+  ],
+  "threePartConclusions": {
+    "content": "Andresen/CMU十题按固定英文/中文对照，最近一周四点频率0–3，正向症状及5/8正面题反向。访谈原版改自填是适配、独立中文待审。sourcepack第5题旧文与当前bilingual/运行源不一致，需区分。",
+    "scoring": "原列号1–4转换0–3，5/8反向3−x，其余原值，十题等权求和0–30；完整才算、不补零或代填是项目规则，不将不知道/拒答算0。≥10来自健康老年人对20题筛查基准一致性、≥12来自精神科转介中国60+样本且仅摘要核对，均未启用、非中文工作稿诊断阈值。",
+    "report": "1.0.0为过去一周体验，提供记录和支持建议，指出非诊断、低分不能证明安全；成人工作稿未验证，student为技术角色。"
+  },
+  "items": [
+    {
+      "number": 1,
+      "itemCode": "CESD10_01",
+      "en": "I was bothered by things that don't usually bother me.",
+      "zh": "一些平时不会让我烦恼的事，也让我感到烦恼。",
+      "key": "positive",
+      "assessment": "固定双语与运行时一致，中文及自填适配待审。"
+    },
+    {
+      "number": 2,
+      "itemCode": "CESD10_02",
+      "en": "I had trouble keeping my mind on what I was doing.",
+      "zh": "我很难集中注意力做正在做的事。",
+      "key": "positive",
+      "assessment": "固定双语与运行时一致，中文及自填适配待审。"
+    },
+    {
+      "number": 3,
+      "itemCode": "CESD10_03",
+      "en": "I felt depressed.",
+      "zh": "我感到情绪低落。",
+      "key": "positive",
+      "assessment": "固定双语与运行时一致，中文及自填适配待审。"
+    },
+    {
+      "number": 4,
+      "itemCode": "CESD10_04",
+      "en": "I felt that everything I did was an effort.",
+      "zh": "我觉得做什么事都很费力。",
+      "key": "positive",
+      "assessment": "固定双语与运行时一致，中文及自填适配待审。"
+    },
+    {
+      "number": 5,
+      "itemCode": "CESD10_05",
+      "en": "I felt hopeful about the future.",
+      "zh": "我对未来抱有希望。",
+      "key": "reverse",
+      "assessment": "固定双语与运行时一致，中文及自填适配待审。"
+    },
+    {
+      "number": 6,
+      "itemCode": "CESD10_06",
+      "en": "I felt fearful.",
+      "zh": "我感到害怕。",
+      "key": "positive",
+      "assessment": "固定双语与运行时一致，中文及自填适配待审。"
+    },
+    {
+      "number": 7,
+      "itemCode": "CESD10_07",
+      "en": "My sleep was restless.",
+      "zh": "我睡得不安稳。",
+      "key": "positive",
+      "assessment": "固定双语与运行时一致，中文及自填适配待审。"
+    },
+    {
+      "number": 8,
+      "itemCode": "CESD10_08",
+      "en": "I was happy.",
+      "zh": "我感到快乐。",
+      "key": "reverse",
+      "assessment": "固定双语与运行时一致，中文及自填适配待审。"
+    },
+    {
+      "number": 9,
+      "itemCode": "CESD10_09",
+      "en": "I felt lonely.",
+      "zh": "我感到孤独。",
+      "key": "positive",
+      "assessment": "固定双语与运行时一致，中文及自填适配待审。"
+    },
+    {
+      "number": 10,
+      "itemCode": "CESD10_10",
+      "en": "I could not get \"going\".",
+      "zh": "我提不起劲开始做事。",
+      "key": "positive",
+      "assessment": "固定双语与运行时一致，中文及自填适配待审。"
+    }
+  ],
+  "anchors": [
+    {
+      "value": 0,
+      "zh": "很少或没有（少于1天）"
+    },
+    {
+      "value": 1,
+      "zh": "有些时候（1–2天）"
+    },
+    {
+      "value": 2,
+      "zh": "较多时候（3–4天）"
+    },
+    {
+      "value": 3,
+      "zh": "大部分时候（5–7天）"
+    }
+  ],
+  "instruction": {
+    "text": "请回想过去一周，选择以下情况出现的频率。没有标准答案。",
+    "sources": [
+      {
+        "file": {
+          "path": "docs/scale-instruments/research-drafts/cesd10/1.0.0/bilingual-content.json",
+          "gitBlob": "321939a53d99f749f7e5da0daa7f090bccfc7ff9",
+          "sha256": "dafcd1a88c5df6a503e87bf9f995f3ee320d62d00eb723ff68b0554890ccb7bd"
+        },
+        "field": "instructions"
+      },
+      {
+        "file": {
+          "path": "docs/scale-instruments/research-drafts/cesd10/1.0.0/reviewed-source-pack.json",
+          "gitBlob": "0bda12419e0346b34009998bc34143ca665dfcd0",
+          "sha256": "600588b9eeb016f96250f62724c988276b3b71f306dace6531349f128e6ed5fa"
+        },
+        "field": "instructions_zh"
+      }
+    ],
+    "qualification": "项目自填工作说明；source顶层无指导语。"
+  },
+  "ordinaryRevisions": [
+    {
+      "path": "docs/scale-instruments/research-drafts/cesd10/1.0.0/reviewed-source-pack.json",
+      "jsonPath": "items[4].zh_draft",
+      "old": "我对未来充满希望。",
+      "new": "我对未来抱有希望。",
+      "reason": "与当前bilingual-content/source统一；保留旧文如作为历史，应标明历史而不覆写证据。"
+    }
+  ],
+  "manualPending": [
+    "中文译审、认知访谈及自填等值待审；改变题意或阈值需原据、人群与版本协调。",
+    "Cheng 2005仅原摘要核对，未取得完整译文，不能迁移阈值。"
+  ],
+  "notExecuted": [
+    "未运行golden、评分、系统、DB、CI；未开展新科研/版权调查。"
+  ]
+}

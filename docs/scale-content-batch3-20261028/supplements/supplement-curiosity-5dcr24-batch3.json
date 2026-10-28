@@ -1,0 +1,403 @@
+{
+  "identity": "curiosity_5dcr24_zh_cn_research:1.0.0",
+  "sourceCommit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "researchCommit": "fa355ff2dcd859b57a4bf2e8bddd77f8d428e3cf",
+  "files": [
+    {
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "path": "server-version/backend/src/modules/scale/instruments/curiosity_5dcr24_zh_cn_research/1.0.0/source.json",
+      "gitBlob": "143ad706d355718b34e8c20bfeba402bb96c6719",
+      "sha256": "fa3ec5f120acf82649c291949129205362cad9a28e2f9de736a2912bd34fdc95"
+    },
+    {
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "path": "server-version/backend/src/modules/scale/instruments/curiosity_5dcr24_zh_cn_research/1.0.0/instrument.ts",
+      "gitBlob": "0eed070bb879576339c5a71afdf34c0026591fd3",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "commit": "fa355ff2dcd859b57a4bf2e8bddd77f8d428e3cf",
+      "path": "docs/scale-instruments/research-drafts/5dcr/1.0.0/README.md",
+      "gitBlob": "177d6f1910da27b84f97209725f649c5ad147fd0",
+      "sha256": "6bede79900c1bac6afd6821c7dda8acca08ecfe7b73e72713767eaea24bb3cf9"
+    },
+    {
+      "commit": "fa355ff2dcd859b57a4bf2e8bddd77f8d428e3cf",
+      "path": "docs/scale-instruments/research-drafts/5dcr/1.0.0/content-draft.json",
+      "gitBlob": "3b1da725ac41c2ed0b91ebbed8455afd0332c33d",
+      "sha256": "1d86488844689c09c4d306baa5a458e8ed86162552dbb89300d051b8e1d6bbc6"
+    },
+    {
+      "commit": "fa355ff2dcd859b57a4bf2e8bddd77f8d428e3cf",
+      "path": "docs/scale-instruments/research-drafts/5dcr/1.0.0/source-and-rights.json",
+      "gitBlob": "2f6e0a05b17bacbba6d6cc3d59b2c55bc7cfd426",
+      "sha256": "f38ccafcaeb929a8040f52c0567c4e759d0ff6d2389c6255230dd2412b75e1a2"
+    },
+    {
+      "commit": "fa355ff2dcd859b57a4bf2e8bddd77f8d428e3cf",
+      "path": "docs/scale-instruments/research-drafts/5dcr/1.0.0/scoring-contract.json",
+      "gitBlob": "64054701dd3ca242be7d1d56f494d42e86d37869",
+      "sha256": "65d26facc15be1056c2f8d51db189264185b658e594fa3ebab5e0b1fbfa46b8a"
+    }
+  ],
+  "conclusion": "PR328 content-draft保存24题英文、对应中文、题向及七个锚点；24条中文与b92按相同位置逐字一致，足够进行逐题内容对照，但未验证中文等值。2020原始论文与GESIS 2022顺序不同，此对照仅针对GESIS序。",
+  "itemComparisons": [
+    {
+      "number": 1,
+      "english": "I view challenging situations as an opportunity to grow and learn.",
+      "priorChinese": "我把有挑战的情境看作成长和学习的机会。",
+      "sourceChinese": "我把有挑战的情境看作成长和学习的机会。",
+      "itemCode": "DCR5_01",
+      "chineseExactMatch": true,
+      "facet": "Joyous exploration",
+      "priorReverse": false,
+      "sourceTransform": "identity",
+      "assessment": "工作译稿逐字一致，可对照原题含义；不等于经专家验证"
+    },
+    {
+      "number": 2,
+      "english": "I seek out situations where it is likely that I will have to think in depth about something.",
+      "priorChinese": "我会主动寻找可能需要深入思考某件事的情境。",
+      "sourceChinese": "我会主动寻找可能需要深入思考某件事的情境。",
+      "itemCode": "DCR5_02",
+      "chineseExactMatch": true,
+      "facet": "Joyous exploration",
+      "priorReverse": false,
+      "sourceTransform": "identity",
+      "assessment": "工作译稿逐字一致，可对照原题含义；不等于经专家验证"
+    },
+    {
+      "number": 3,
+      "english": "I enjoy learning about subjects that are unfamiliar to me.",
+      "priorChinese": "我喜欢学习自己不熟悉的主题。",
+      "sourceChinese": "我喜欢学习自己不熟悉的主题。",
+      "itemCode": "DCR5_03",
+      "chineseExactMatch": true,
+      "facet": "Joyous exploration",
+      "priorReverse": false,
+      "sourceTransform": "identity",
+      "assessment": "工作译稿逐字一致，可对照原题含义；不等于经专家验证"
+    },
+    {
+      "number": 4,
+      "english": "I find it fascinating to learn new information.",
+      "priorChinese": "我觉得学习新信息很有吸引力。",
+      "sourceChinese": "我觉得学习新信息很有吸引力。",
+      "itemCode": "DCR5_04",
+      "chineseExactMatch": true,
+      "facet": "Joyous exploration",
+      "priorReverse": false,
+      "sourceTransform": "identity",
+      "assessment": "工作译稿逐字一致，可对照原题含义；不等于经专家验证"
+    },
+    {
+      "number": 5,
+      "english": "Thinking about solutions of difficult conceptual problems can keep me awake at night.",
+      "priorChinese": "思考困难的概念性问题的解法，可能会让我夜里睡不着。",
+      "sourceChinese": "思考困难的概念性问题的解法，可能会让我夜里睡不着。",
+      "itemCode": "DCR5_05",
+      "chineseExactMatch": true,
+      "facet": "Deprivation sensitivity",
+      "priorReverse": false,
+      "sourceTransform": "identity",
+      "assessment": "工作译稿逐字一致，可对照原题含义；不等于经专家验证"
+    },
+    {
+      "number": 6,
+      "english": "I can spend hours on a single problem because I just can’t rest without knowing the answer.",
+      "priorChinese": "我可能在一个问题上花上好几个小时，因为不知道答案就无法安心。",
+      "sourceChinese": "我可能在一个问题上花上好几个小时，因为不知道答案就无法安心。",
+      "itemCode": "DCR5_06",
+      "chineseExactMatch": true,
+      "facet": "Deprivation sensitivity",
+      "priorReverse": false,
+      "sourceTransform": "identity",
+      "assessment": "工作译稿逐字一致，可对照原题含义；不等于经专家验证"
+    },
+    {
+      "number": 7,
+      "english": "I feel frustrated if I can’t figure out the solution to a problem, so I work even harder to solve it.",
+      "priorChinese": "如果想不出问题的解法，我会感到受挫，所以会更加努力地解决它。",
+      "sourceChinese": "如果想不出问题的解法，我会感到受挫，所以会更加努力地解决它。",
+      "itemCode": "DCR5_07",
+      "chineseExactMatch": true,
+      "facet": "Deprivation sensitivity",
+      "priorReverse": false,
+      "sourceTransform": "identity",
+      "assessment": "工作译稿逐字一致，可对照原题含义；不等于经专家验证"
+    },
+    {
+      "number": 8,
+      "english": "I work relentlessly at problems that I feel must be solved.",
+      "priorChinese": "对于我觉得必须解决的问题，我会坚持不懈地钻研。",
+      "sourceChinese": "对于我觉得必须解决的问题，我会坚持不懈地钻研。",
+      "itemCode": "DCR5_08",
+      "chineseExactMatch": true,
+      "facet": "Deprivation sensitivity",
+      "priorReverse": false,
+      "sourceTransform": "identity",
+      "assessment": "工作译稿逐字一致，可对照原题含义；不等于经专家验证"
+    },
+    {
+      "number": 9,
+      "english": "The smallest doubt can stop me from seeking out new experiences.",
+      "priorChinese": "哪怕一点点疑虑，也能让我不再寻求新的体验。",
+      "sourceChinese": "哪怕一点点疑虑，也能让我不再寻求新的体验。",
+      "itemCode": "DCR5_09",
+      "chineseExactMatch": true,
+      "facet": "Stress tolerance",
+      "priorReverse": true,
+      "sourceTransform": "reverse",
+      "assessment": "工作译稿逐字一致，可对照原题含义；不等于经专家验证"
+    },
+    {
+      "number": 10,
+      "english": "I cannot handle the stress that comes from entering uncertain situations.",
+      "priorChinese": "我无法应对进入不确定情境所带来的压力。",
+      "sourceChinese": "我无法应对进入不确定情境所带来的压力。",
+      "itemCode": "DCR5_10",
+      "chineseExactMatch": true,
+      "facet": "Stress tolerance",
+      "priorReverse": true,
+      "sourceTransform": "reverse",
+      "assessment": "工作译稿逐字一致，可对照原题含义；不等于经专家验证"
+    },
+    {
+      "number": 11,
+      "english": "I find it hard to explore new places when I lack confidence in my abilities.",
+      "priorChinese": "当我对自己的能力缺乏信心时，我觉得很难探索新的地方。",
+      "sourceChinese": "当我对自己的能力缺乏信心时，我觉得很难探索新的地方。",
+      "itemCode": "DCR5_11",
+      "chineseExactMatch": true,
+      "facet": "Stress tolerance",
+      "priorReverse": true,
+      "sourceTransform": "reverse",
+      "assessment": "工作译稿逐字一致，可对照原题含义；不等于经专家验证"
+    },
+    {
+      "number": 12,
+      "english": "It is difficult to concentrate when there is a possibility that I will be taken by surprise.",
+      "priorChinese": "当有可能发生令我措手不及的事情时，我很难集中注意力。",
+      "sourceChinese": "当有可能发生令我措手不及的事情时，我很难集中注意力。",
+      "itemCode": "DCR5_12",
+      "chineseExactMatch": true,
+      "facet": "Stress tolerance",
+      "priorReverse": true,
+      "sourceTransform": "reverse",
+      "assessment": "工作译稿逐字一致，可对照原题含义；不等于经专家验证"
+    },
+    {
+      "number": 13,
+      "english": "I like finding out why people behave the way they do.",
+      "priorChinese": "我喜欢弄清楚人们为什么会那样行事。",
+      "sourceChinese": "我喜欢弄清楚人们为什么会那样行事。",
+      "itemCode": "DCR5_13",
+      "chineseExactMatch": true,
+      "facet": "Social curiosity general",
+      "priorReverse": false,
+      "sourceTransform": "identity",
+      "assessment": "工作译稿逐字一致，可对照原题含义；不等于经专家验证"
+    },
+    {
+      "number": 14,
+      "english": "I ask a lot of questions to figure out what interests other people.",
+      "priorChinese": "我会问很多问题，以了解其他人对什么感兴趣。",
+      "sourceChinese": "我会问很多问题，以了解其他人对什么感兴趣。",
+      "itemCode": "DCR5_14",
+      "chineseExactMatch": true,
+      "facet": "Social curiosity general",
+      "priorReverse": false,
+      "sourceTransform": "identity",
+      "assessment": "工作译稿逐字一致，可对照原题含义；不等于经专家验证"
+    },
+    {
+      "number": 15,
+      "english": "When talking to someone who is excited, I am curious to find out why.",
+      "priorChinese": "和一个兴奋的人交谈时，我会好奇是什么让对方兴奋。",
+      "sourceChinese": "和一个兴奋的人交谈时，我会好奇是什么让对方兴奋。",
+      "itemCode": "DCR5_15",
+      "chineseExactMatch": true,
+      "facet": "Social curiosity general",
+      "priorReverse": false,
+      "sourceTransform": "identity",
+      "assessment": "工作译稿逐字一致，可对照原题含义；不等于经专家验证"
+    },
+    {
+      "number": 16,
+      "english": "When talking to someone, I try to discover interesting details about them.",
+      "priorChinese": "与人交谈时，我会尝试发现对方身上一些有趣的细节。",
+      "sourceChinese": "与人交谈时，我会尝试发现对方身上一些有趣的细节。",
+      "itemCode": "DCR5_16",
+      "chineseExactMatch": true,
+      "facet": "Social curiosity general",
+      "priorReverse": false,
+      "sourceTransform": "identity",
+      "assessment": "工作译稿逐字一致，可对照原题含义；不等于经专家验证"
+    },
+    {
+      "number": 17,
+      "english": "When other people are having a conversation, I like to find out what it’s about.",
+      "priorChinese": "其他人在交谈时，我喜欢弄清楚他们在谈什么。",
+      "sourceChinese": "其他人在交谈时，我喜欢弄清楚他们在谈什么。",
+      "itemCode": "DCR5_17",
+      "chineseExactMatch": true,
+      "facet": "Social curiosity covert",
+      "priorReverse": false,
+      "sourceTransform": "identity",
+      "assessment": "工作译稿逐字一致，可对照原题含义；不等于经专家验证"
+    },
+    {
+      "number": 18,
+      "english": "When around other people, I like listening to their conversations.",
+      "priorChinese": "和其他人在一起时，我喜欢听他们的交谈。",
+      "sourceChinese": "和其他人在一起时，我喜欢听他们的交谈。",
+      "itemCode": "DCR5_18",
+      "chineseExactMatch": true,
+      "facet": "Social curiosity covert",
+      "priorReverse": false,
+      "sourceTransform": "identity",
+      "assessment": "工作译稿逐字一致，可对照原题含义；不等于经专家验证"
+    },
+    {
+      "number": 19,
+      "english": "When people quarrel, I like to know what’s going on.",
+      "priorChinese": "人们争吵时，我喜欢知道发生了什么。",
+      "sourceChinese": "人们争吵时，我喜欢知道发生了什么。",
+      "itemCode": "DCR5_19",
+      "chineseExactMatch": true,
+      "facet": "Social curiosity covert",
+      "priorReverse": false,
+      "sourceTransform": "identity",
+      "assessment": "工作译稿逐字一致，可对照原题含义；不等于经专家验证"
+    },
+    {
+      "number": 20,
+      "english": "I seek out information about the private lives of people in my life.",
+      "priorChinese": "我会寻求有关我生活中那些人的私生活的信息。",
+      "sourceChinese": "我会寻求有关我生活中那些人的私生活的信息。",
+      "itemCode": "DCR5_20",
+      "chineseExactMatch": true,
+      "facet": "Social curiosity covert",
+      "priorReverse": false,
+      "sourceTransform": "identity",
+      "assessment": "工作译稿逐字一致，可对照原题含义；不等于经专家验证"
+    },
+    {
+      "number": 21,
+      "english": "Risk-taking is exciting to me.",
+      "priorChinese": "冒险让我感到兴奋。",
+      "sourceChinese": "冒险让我感到兴奋。",
+      "itemCode": "DCR5_21",
+      "chineseExactMatch": true,
+      "facet": "Thrill seeking",
+      "priorReverse": false,
+      "sourceTransform": "identity",
+      "assessment": "工作译稿逐字一致，可对照原题含义；不等于经专家验证"
+    },
+    {
+      "number": 22,
+      "english": "When I have free time, I want to do things that are a little scary.",
+      "priorChinese": "有空闲时间时，我想做一些有点吓人的事情。",
+      "sourceChinese": "有空闲时间时，我想做一些有点吓人的事情。",
+      "itemCode": "DCR5_22",
+      "chineseExactMatch": true,
+      "facet": "Thrill seeking",
+      "priorReverse": false,
+      "sourceTransform": "identity",
+      "assessment": "工作译稿逐字一致，可对照原题含义；不等于经专家验证"
+    },
+    {
+      "number": 23,
+      "english": "Creating an adventure as I go is much more appealing than a planned adventure.",
+      "priorChinese": "比起事先安排好的冒险，我觉得在过程中即兴展开的冒险要吸引人得多。",
+      "sourceChinese": "比起事先安排好的冒险，我觉得在过程中即兴展开的冒险要吸引人得多。",
+      "itemCode": "DCR5_23",
+      "chineseExactMatch": true,
+      "facet": "Thrill seeking",
+      "priorReverse": false,
+      "sourceTransform": "identity",
+      "assessment": "工作译稿逐字一致，可对照原题含义；不等于经专家验证"
+    },
+    {
+      "number": 24,
+      "english": "I prefer friends who are excitingly unpredictable.",
+      "priorChinese": "我更喜欢那些让人感到兴奋、难以预测的朋友。",
+      "sourceChinese": "我更喜欢那些让人感到兴奋、难以预测的朋友。",
+      "itemCode": "DCR5_24",
+      "chineseExactMatch": true,
+      "facet": "Thrill seeking",
+      "priorReverse": false,
+      "sourceTransform": "identity",
+      "assessment": "工作译稿逐字一致，可对照原题含义；不等于经专家验证"
+    }
+  ],
+  "anchors": [
+    {
+      "value": 1,
+      "english": "does not describe me at all",
+      "priorChinese": "完全不符合我",
+      "sourceChinese": "完全不符合我",
+      "match": true
+    },
+    {
+      "value": 2,
+      "english": "barely describes me",
+      "priorChinese": "几乎不符合我",
+      "sourceChinese": "几乎不符合我",
+      "match": true
+    },
+    {
+      "value": 3,
+      "english": "somewhat describes me",
+      "priorChinese": "有些符合我",
+      "sourceChinese": "有些符合我",
+      "match": true
+    },
+    {
+      "value": 4,
+      "english": "neutral",
+      "priorChinese": "中立",
+      "sourceChinese": "中立",
+      "match": true
+    },
+    {
+      "value": 5,
+      "english": "generally describes me",
+      "priorChinese": "总体上符合我",
+      "sourceChinese": "总体上符合我",
+      "match": true
+    },
+    {
+      "value": 6,
+      "english": "mostly describes me",
+      "priorChinese": "大部分符合我",
+      "sourceChinese": "大部分符合我",
+      "match": true
+    },
+    {
+      "value": 7,
+      "english": "completely describes me",
+      "priorChinese": "完全符合我",
+      "sourceChinese": "完全符合我",
+      "match": true
+    }
+  ],
+  "thirdAnchor": {
+    "officialEnglish": "somewhat describes me",
+    "researchChinese": "有些符合我",
+    "b92Chinese": "有些符合我",
+    "fourthOfficial": "neutral",
+    "finding": "实际GESIS英文第三档确为 somewhat describes me，第四档为 neutral；PR328及b92一致，不能把第三档误称“有些不符合我”。但此顺序在语义上看似非单调，属于原载体呈现本身，不单凭直觉修订；如拟修改锚点需原依据、版本影响和用户协调。",
+    "officialUrl": "https://access.gesis.org/zis/1218",
+    "officialPage": "PDF第3页，printed page 1",
+    "officialPriorRecordedSha256": "db3de44c0f136a554992bff7c6307697a358c81468515249002ecc608de1e641",
+    "qualification": "本次网页读取官方PDF，未重新下载并校验此历史SHA；不可称本次哈希验证。"
+  },
+  "gaps": [
+    "对照对象为工作译稿，不证明中文专家译审或心理测量等值。",
+    "原2020论文附录非同一排列，不将原论文题序混作GESIS序。"
+  ],
+  "notExecuted": [
+    "未运行测试或修改仓库、DB、CI及题目/规则。"
+  ]
+}

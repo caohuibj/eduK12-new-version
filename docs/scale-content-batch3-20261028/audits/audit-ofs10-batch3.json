@@ -1,0 +1,257 @@
+{
+  "instrument": "ofs10_zh_cn_research:1.0.0",
+  "source_commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "source_files": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ofs10_zh_cn_research/1.0.0/source.json",
+      "blob": "1879b6e7b7e413cc2b03f41ebf2c1c3a3ce83691",
+      "sha256": "18e787244051ad737921fe3b9aba6df3bdd251d7cd3b8e8e88cd1e1f5bd97a4f"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ofs10_zh_cn_research/1.0.0/instrument.ts",
+      "blob": "0eed070bb879576339c5a71afdf34c0026591fd3",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ofs10_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+      "blob": "155b88b9ceed50e19cee1f64645721e33feacd39",
+      "sha256": "91cfc76c9b03d5305e47607ac3478561c1ad344c6cd6d61025db888aa65c9372"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ofs10/1.0.0/README.md",
+      "blob": "ad5bc7c44487640ac4bfc5b44946bcaf1bbcc9c9",
+      "sha256": "d8d408c095ec08d78e2047798c908f205cfaa5928006f5d9b53cde02ecd2fc69"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ofs10/1.0.0/bilingual-content.json",
+      "blob": "2bbff80f224bec2e52e5bad3cb0540b21bfe0083",
+      "sha256": "25d8a5d9463241b3e76e166a59a2b61201f64c99f271c1454e50caf572242fc6"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ofs10/1.0.0/administration-sidecar.prepared.json",
+      "blob": "a907aad07df8aa3313a68c1aafe6601fbb8fb984",
+      "sha256": "2a33f3102338fe8fa3be05a99f85d41069f1ae6e1a64eb2776f28f219ab6044b"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ofs10/1.0.0/administration.md",
+      "blob": "078ec5839932b99414c3d584dea54e73c7558df2",
+      "sha256": "cc79974acf61cab63588b87fd0caa1e8d0865ff40851b6b0a9298199bef33443"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ofs10/1.0.0/scoring-and-parameters.md",
+      "blob": "3c961e831d6ee9bba236adf3b5849fffc5ba7b85",
+      "sha256": "69c0f5ba461421333d7180393cba839c0e5774b09b0cf1ad1543644cee4679c9"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ofs10/1.0.0/parameter-plan.json",
+      "blob": "bab138741b9ea39c60a795aadcdac5d2bbd3b551",
+      "sha256": "2eb0596a81d95fab3cb8958bdd94380b286c325bcaba94e02861dd5d8603c814"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ofs10/1.0.0/references.md",
+      "blob": "aca786026a83422f15e8cc9c4da89902fdab5f3d",
+      "sha256": "e8b98a16e436639ecc1f10e81d58c0bb8ab78c63d10303f73543e3c2ff58b90e"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ofs10/1.0.0/report-example.md",
+      "blob": "c3a3caf3dd4cc5688bd0d1a0b293a77574d25a3b",
+      "sha256": "d43cbbace4790db93c195af049cdd0ef827ace7a1d56ba7adcd72fe500e03a31"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ofs10/1.0.0/report-results.synthetic.json",
+      "blob": "476163ab33d99b15594a264e7b16f30251e44b08",
+      "sha256": "ff0bb0085a39dd48665d64f9ab63ea28097d06ee6861a28db0874b4f48ce13fb"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ofs10/1.0.0/validation.json",
+      "blob": "12588d6cb295a635201e5e97fba63252624a215f",
+      "sha256": "2d0f38bbec0dda2f4dca3cdf56816b06d486d0d5c9d4fcc77c6f92c5af3f37f9"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ofs10/1.0.0/validation.md",
+      "blob": "4c5231b1a013c8f946b03089e9dfb60a57bf6ba7",
+      "sha256": "c66954e81d6138967c754c6f3dbee326a866ccbf8ed5ebd5e32614514f67f321"
+    }
+  ],
+  "three_parts": {
+    "items_instruction": {
+      "items": [
+        {
+          "number": 1,
+          "code": "OFS_01",
+          "english": "When I make plans, I am sure I will be able to carry them out.",
+          "spanish": "Cuando hago planes, estoy seguro de que conseguiré llevarlos a cabo.",
+          "chinese": "制定计划时，我确信自己能够完成这些计划。",
+          "runtime_matches": true,
+          "reverse": false,
+          "transform": "identity",
+          "review": "保留英文原题核心意思；独立中文工作稿须人工译审。"
+        },
+        {
+          "number": 2,
+          "code": "OFS_02",
+          "english": "I usually trust that things will work out",
+          "spanish": "Suelo confiar en que las cosas saldrán bien.",
+          "chinese": "我通常相信事情会有好的结果。",
+          "runtime_matches": true,
+          "reverse": false,
+          "transform": "identity",
+          "review": "保留英文原题核心意思；独立中文工作稿须人工译审。"
+        },
+        {
+          "number": 3,
+          "code": "OFS_03",
+          "english": "I think I have enough control over the direction my life takes.",
+          "spanish": "Creo que tengo bastante control sobre el rumbo que toma mi vida.",
+          "chinese": "我觉得自己对人生的走向有足够的掌控。",
+          "runtime_matches": true,
+          "reverse": false,
+          "transform": "identity",
+          "review": "保留英文原题核心意思；独立中文工作稿须人工译审。"
+        },
+        {
+          "number": 4,
+          "code": "OFS_04",
+          "english": "I am very excited about future opportunities and challenges",
+          "spanish": "Los desafíos y los retos hacia el futuro me resultan muy estimulantes.",
+          "chinese": "未来的机会和挑战让我很振奋。",
+          "runtime_matches": true,
+          "reverse": false,
+          "transform": "identity",
+          "review": "英文包含future opportunities and challenges，采用英文的机会和挑战；西语仅强调未来挑战/考验。"
+        },
+        {
+          "number": 5,
+          "code": "OFS_05",
+          "english": "I have a lot of illusions and future plans.",
+          "spanish": "Tengo un montón de planes y de ilusiones.",
+          "chinese": "我对未来有许多憧憬和计划。",
+          "runtime_matches": true,
+          "reverse": false,
+          "transform": "identity",
+          "review": "illusiones消歧为对未来的憧憬/期待，不把英文illusions译为病理性幻觉；本稿固定为“憧憬”。"
+        },
+        {
+          "number": 6,
+          "code": "OFS_06",
+          "english": "Sometimes I get scared and feel that I’m losing control when I think about what life may bring",
+          "spanish": "A veces me asusto y siento que pierdo el control cuando pienso en lo que podrá depararme la vida.",
+          "chinese": "有时，一想到生活可能带来什么，我就会害怕，觉得自己正在失去掌控。",
+          "runtime_matches": true,
+          "reverse": true,
+          "transform": "reverse",
+          "review": "保留英文原题核心意思；独立中文工作稿须人工译审。"
+        },
+        {
+          "number": 7,
+          "code": "OFS_07",
+          "english": "I calmly accept that good and bad things will happen to me in life",
+          "spanish": "Acepto con tranquilidad que en la vida me van a ocurrir cosas buenas y malas.",
+          "chinese": "我能平静地接受生活中会有好事，也会有坏事。",
+          "runtime_matches": true,
+          "reverse": false,
+          "transform": "identity",
+          "review": "保留英文原题核心意思；独立中文工作稿须人工译审。"
+        },
+        {
+          "number": 8,
+          "code": "OFS_08",
+          "english": "I know I can overcome the obstacles I encounter in life.",
+          "spanish": "Sé que la vida me presentará obstáculos, pero confío en que podré superarlos.",
+          "chinese": "我知道自己能克服生活中遇到的障碍。",
+          "runtime_matches": true,
+          "reverse": false,
+          "transform": "identity",
+          "review": "英文是“知道能克服生活中遇到的障碍”，西语先承认生活会出现障碍再表达相信能克服；本稿冻结英文题意，不拼接西语前半句。"
+        },
+        {
+          "number": 9,
+          "code": "OFS_09",
+          "english": "For me: every day is a new day.",
+          "spanish": "Estoy de acuerdo con la afirmación: cada día es un nuevo día.",
+          "chinese": "对我来说，每一天都是新的一天。",
+          "runtime_matches": true,
+          "reverse": false,
+          "transform": "identity",
+          "review": "保留英文For me: every day is a new day，不把平台行动建议加入题意。"
+        },
+        {
+          "number": 10,
+          "code": "OFS_10",
+          "english": "I feel hopeful about what the future may bring.",
+          "spanish": "Tengo esperanza por lo que pueda traer el futuro.",
+          "chinese": "对于未来可能带来的事情，我心怀希望。",
+          "runtime_matches": true,
+          "reverse": false,
+          "transform": "identity",
+          "review": "保留英文原题核心意思；独立中文工作稿须人工译审。"
+        }
+      ],
+      "basis": "固定双语材料标注2018原英文附件及西班牙文；本次对照研究材料与运行source，未重跑附件核验。",
+      "anchors": "五点：非常不同意、有些不同意、既不同意也不反对、有些同意、非常同意，依次1–5；第三项“反对”是否充分表达disagree供人工译审，不静默改变。",
+      "instruction": {
+        "sources": [
+          {
+            "path": "docs/scale-instruments/research-drafts/ofs10/1.0.0/administration-sidecar.prepared.json",
+            "blob": "a907aad07df8aa3313a68c1aafe6601fbb8fb984",
+            "sha256": "2a33f3102338fe8fa3be05a99f85d41069f1ae6e1a64eb2776f28f219ab6044b",
+            "field": "/instructions"
+          },
+          {
+            "path": "docs/scale-instruments/research-drafts/ofs10/1.0.0/bilingual-content.json",
+            "blob": "2bbff80f224bec2e52e5bad3cb0540b21bfe0083",
+            "sha256": "25d8a5d9463241b3e76e166a59a2b61201f64c99f271c1454e50caf572242fc6",
+            "field": "/instructions/platformChinese"
+          },
+          {
+            "path": "docs/scale-instruments/research-drafts/ofs10/1.0.0/administration.md",
+            "blob": "078ec5839932b99414c3d584dea54e73c7558df2",
+            "sha256": "cc79974acf61cab63588b87fd0caa1e8d0865ff40851b6b0a9298199bef33443",
+            "field": "正文三段"
+          }
+        ],
+        "text": [
+          "下面是一些陈述，你可能会在不同程度上认同它们。请根据以下选项，选择你对每项陈述的同意或不同意程度。",
+          "选项为：1＝非常不同意，2＝有些不同意，3＝既不同意也不反对，4＝有些同意，5＝非常同意。",
+          "答案没有对错，重要的是你的想法。不必花很长时间琢磨句子的确切意思，请选择第一时间最符合你想法的答案。"
+        ],
+        "status": "PREPARED_NOT_RUNTIME_CONNECTED；固定source无顶层instruction，原件无固定回顾期。",
+        "minimal_binding": {
+          "path": "server-version/backend/src/modules/scale/instruments/ofs10_zh_cn_research/1.0.0/source.json#/instruction",
+          "old": null,
+          "new": {
+            "schemaVersion": 1,
+            "text": "下面是一些陈述，你可能会在不同程度上认同它们。请根据以下选项，选择你对每项陈述的同意或不同意程度。\n\n选项为：1＝非常不同意，2＝有些不同意，3＝既不同意也不反对，4＝有些同意，5＝非常同意。\n\n答案没有对错，重要的是你的想法。不必花很长时间琢磨句子的确切意思，请选择第一时间最符合你想法的答案。",
+            "language": "zh-CN",
+            "version": "1.0.0",
+            "source": "项目中文工作译稿，见固定administration-sidecar.prepared.json与bilingual-content.json"
+          }
+        }
+      }
+    },
+    "scoring": {
+      "method": "10项等权求和，单一total openness_to_future；第6题reverse 6−x，其余identity，总分10–50。",
+      "missing": "全部required及complete_required，缺任一题不补零、插补或比例调整；项目保守选择。",
+      "parameters": "西班牙研究ROC界点仅保留档案；referencePolicy none，无中文分档、常模或诊断阈值。",
+      "direction": "高分为本次回答较积极面向未来，不代表未来成功、健康或固定能力。"
+    },
+    "report": {
+      "review": "既有报告尊重困境、给可选小行动和支持，避免强迫乐观、预测、排名及诊断；可保留。",
+      "versions": "instrument、scoring、localization、report1.0.0；无运行参考集；adult_self、student为技术受众。",
+      "optional_direction": "总分description已有方向；若希望报告正文也更易理解，可添加“分数越高，表示本次回答更倾向积极面向未来”，非必须改写。"
+    }
+  },
+  "ordinary_suggestions": [
+    "使用现有三段原文绑定顶层instruction；不塞入第一题，不改题目及计分。",
+    "报告无需按长度强改。"
+  ],
+  "substantive_coordination": [
+    "第3锚点“既不同意也不反对”与原neither agree nor disagree的等值需人工译审；任何锚点、题意、算法或阈值调整需版本和科研协调。",
+    "已记录第5题西语消歧及第8题采用英文，不重新混合版本。"
+  ],
+  "human_status": "专家译审PENDING，认知访谈与中国人群验证待完成；保留已有权利和来源说明。",
+  "not_executed": [
+    "未改仓库、DB、CI、分支；未运行任何测试/系统/浏览器。既有合成报告是历史材料，非本次新执行。"
+  ],
+  "conclusion": "可用现有指导语原文接入；量表和报告可保留，人工审校与验证状态如实保留。"
+}

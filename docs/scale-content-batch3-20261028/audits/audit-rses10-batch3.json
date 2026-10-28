@@ -1,0 +1,197 @@
+{
+  "identity": "rses10_zh_cn_research:1.0.0",
+  "sourceCommit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "sourceFiles": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/rses10_zh_cn_research/1.0.0/source.json",
+      "gitBlob": "1a6e1eb66b6e6494154b23e99ca8e12fc67b18d3",
+      "sha256": "82e4e486da2ead626d28e3bc34a74616618c82b2a5bd4e024dc16195faf9cc45"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/rses10_zh_cn_research/1.0.0/instrument.ts",
+      "gitBlob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/rses10/1.0.0/README.md",
+      "gitBlob": "1d5fb10b0ad3cbfb59d26f087b66cd62c3ed65f1",
+      "sha256": "f70796511f534acd9828cbcd93b4113632960b94a033b40924d8fe6ca1fe023c"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/rses10/1.0.0/bilingual-content.json",
+      "gitBlob": "8acf87ec273b5e40261caaffb35dd24be6f87030",
+      "sha256": "38e31638d029a39d40c9d8673f64ad2d5bc0ee94682e9e221cd064a299dbe31f"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/rses10/1.0.0/reviewed-source-pack.json",
+      "gitBlob": "a79b5e066c19103e0ade93a9f1f29e9ba5e25a26",
+      "sha256": "5b31df9f20a20a86e15d80e521065c6ee0c56726b0ec4ceeb92c71a9fd033285"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/rses10/1.0.0/references.md",
+      "gitBlob": "818c8f1a6be0d1704c01250fb269463c1b21e7a9",
+      "sha256": "31f7e5ea04213fad449c35f29d38d4c1f9bca92bab6d7b051aa4518b1ac7f8f3"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/rses10/1.0.0/report-example.md",
+      "gitBlob": "cae4532ee19f73fb86d6480562b3ff59e5dc19fe",
+      "sha256": "fb961373c20b10d783ae67af9775fbad7f5686e82a31ac5e6ffd76fb0ef361e5"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/rses10/1.0.0/synthetic-report-example.json",
+      "gitBlob": "d007c38bdfac0ed6f665e8d87821c3b7e69c6e77",
+      "sha256": "b68b8c13a57aed727ba5d92bf9ac0c0161e84a99c8105226552ef21bcdc561d6"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/rses10/1.0.0/local-validation.json",
+      "gitBlob": "68b8683fb6e1be6da30feb10e5bdca299a956757",
+      "sha256": "9a45715f712d783c2702723c2492ab5429bb8c18400791612008f05c34b92433"
+    }
+  ],
+  "threePartConclusions": {
+    "content": "按PhenX顺序十题，中文工作译稿与源英语和运行时基本对应；正向1/2/4/6/7，反向3/5/8/9/10。四点同意选项0–3，与1–4或另一顺序版不可混用；第8题语义保留反向，需译审而非自行改键。",
+    "scoring": "单总分，正向原值、反向3−x，等权求和0–30；缺任一complete_required为项目政策，无插补或均分分母。无经验证中国常模/临床界值或通用分档，referencePolicy none。",
+    "report": "报告1.0.1方向正确，解释为自述而非客观价值，具体建议聚焦具体事件和真实的小事实，不诊断或排名。成人自评，student是技术角色；instrument/scoring/localization=1.0.0，report=1.0.1。"
+  },
+  "items": [
+    {
+      "number": 1,
+      "itemCode": "RSES10_01",
+      "en": "I feel that I'm a person of worth, at least on an equal plane with others.",
+      "zh": "我觉得自己是一个有价值的人，至少与其他人同样有价值。",
+      "key": "positive",
+      "assessment": "固定双语与运行时一致，含义基本对应；待译审。"
+    },
+    {
+      "number": 2,
+      "itemCode": "RSES10_02",
+      "en": "I feel that I have a number of good qualities.",
+      "zh": "我觉得自己有不少好的品质。",
+      "key": "positive",
+      "assessment": "固定双语与运行时一致，含义基本对应；待译审。"
+    },
+    {
+      "number": 3,
+      "itemCode": "RSES10_03",
+      "en": "All in all, I am inclined to feel that I am a failure.",
+      "zh": "总的来说，我倾向于觉得自己是个失败者。",
+      "key": "reverse",
+      "assessment": "固定双语与运行时一致，含义基本对应；待译审。"
+    },
+    {
+      "number": 4,
+      "itemCode": "RSES10_04",
+      "en": "I am able to do things as well as most other people.",
+      "zh": "我做事情能和大多数其他人做得一样好。",
+      "key": "positive",
+      "assessment": "固定双语与运行时一致，含义基本对应；待译审。"
+    },
+    {
+      "number": 5,
+      "itemCode": "RSES10_05",
+      "en": "I feel I do not have much to be proud of.",
+      "zh": "我觉得自己没有多少值得自豪的地方。",
+      "key": "reverse",
+      "assessment": "固定双语与运行时一致，含义基本对应；待译审。"
+    },
+    {
+      "number": 6,
+      "itemCode": "RSES10_06",
+      "en": "I take a positive attitude toward myself.",
+      "zh": "我对自己持积极的态度。",
+      "key": "positive",
+      "assessment": "固定双语与运行时一致，含义基本对应；待译审。"
+    },
+    {
+      "number": 7,
+      "itemCode": "RSES10_07",
+      "en": "On the whole, I am satisfied with myself.",
+      "zh": "总体而言，我对自己感到满意。",
+      "key": "positive",
+      "assessment": "固定双语与运行时一致，含义基本对应；待译审。"
+    },
+    {
+      "number": 8,
+      "itemCode": "RSES10_08",
+      "en": "I wish I could have more respect for myself.",
+      "zh": "我希望自己能更尊重自己一些。",
+      "key": "reverse",
+      "assessment": "固定双语与运行时一致，含义基本对应；待译审。"
+    },
+    {
+      "number": 9,
+      "itemCode": "RSES10_09",
+      "en": "I certainly feel useless at times.",
+      "zh": "有时候，我确实觉得自己没有用。",
+      "key": "reverse",
+      "assessment": "固定双语与运行时一致，含义基本对应；待译审。"
+    },
+    {
+      "number": 10,
+      "itemCode": "RSES10_10",
+      "en": "At times I think I am no good at all.",
+      "zh": "有时候，我觉得自己一无是处。",
+      "key": "reverse",
+      "assessment": "固定双语与运行时一致，含义基本对应；待译审。"
+    }
+  ],
+  "anchors": [
+    {
+      "value": 0,
+      "en": "Strongly Disagree",
+      "zh": "很不同意"
+    },
+    {
+      "value": 1,
+      "en": "Disagree",
+      "zh": "不同意"
+    },
+    {
+      "value": 2,
+      "en": "Agree",
+      "zh": "同意"
+    },
+    {
+      "value": 3,
+      "en": "Strongly Agree",
+      "zh": "很同意"
+    }
+  ],
+  "instruction": {
+    "text": "下面是一些关于你对自己总体感受的陈述。请根据你的实际感受，选择你对每句话的同意程度。",
+    "sources": [
+      {
+        "file": {
+          "path": "docs/scale-instruments/research-drafts/rses10/1.0.0/bilingual-content.json",
+          "gitBlob": "8acf87ec273b5e40261caaffb35dd24be6f87030",
+          "sha256": "38e31638d029a39d40c9d8673f64ad2d5bc0ee94682e9e221cd064a299dbe31f"
+        },
+        "field": "instructions"
+      },
+      {
+        "file": {
+          "path": "docs/scale-instruments/research-drafts/rses10/1.0.0/reviewed-source-pack.json",
+          "gitBlob": "a79b5e066c19103e0ade93a9f1f29e9ba5e25a26",
+          "sha256": "5b31df9f20a20a86e15d80e521065c6ee0c56726b0ec4ceeb92c71a9fd033285"
+        },
+        "field": "instructionZh"
+      }
+    ],
+    "proposedBinding": {
+      "schemaVersion": 1,
+      "text": "下面是一些关于你对自己总体感受的陈述。请根据你的实际感受，选择你对每句话的同意程度。",
+      "language": "zh-CN",
+      "version": "1.0.0",
+      "source": "docs/scale-instruments/research-drafts/rses10/1.0.0/bilingual-content.json#instructions"
+    },
+    "qualification": "项目现有中文工作指导语；版本为拟议绑定，不代表人类审校。"
+  },
+  "ordinaryRevisions": [],
+  "manualPending": [
+    "中文独立译审、认知访谈、目标人群验证待完成；第8题语义及键向保留原记录。",
+    "实质改题、计分或阈值须列原依据及版本影响交root协调；原身份和权利状态不升级。"
+  ],
+  "notExecuted": [
+    "未运行golden、评分、系统、DB、CI或部署；历史记录不算本次运行。"
+  ]
+}

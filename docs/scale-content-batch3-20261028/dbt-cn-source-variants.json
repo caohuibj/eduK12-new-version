@@ -1,0 +1,243 @@
+{
+  "identity": "dbt_wccl59_zh_cn_research:1.0.2",
+  "variants": [
+    {
+      "sourceCommit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "path": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_cn_research/1.0.2/source.json",
+      "blob": "f3f14b4d0bb73d722ac457acd3d6ae887fe0f1f1",
+      "sha256": "c494dac541c9be067070b069b45d1d8b4cbd8fcbf875d8b05d00bb7382220357"
+    },
+    {
+      "sourceCommit": "2612a9f5bf22c1370ec786f3d6feb50805003065",
+      "path": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_cn_research/1.0.2/source.json",
+      "blob": "c776043d94820063948cb5e101187d165ca157f0",
+      "sha256": "7bc99549956347ac874bbe8d72c5e07f3a251dc85b8a7a1b618ec7c8349a5f26"
+    }
+  ],
+  "sameItemContent": true,
+  "differences": [
+    {
+      "path": "/executable/releaseStatus",
+      "before": "DRAFT",
+      "after": "PUBLISHED"
+    },
+    {
+      "path": "/executable/definition/license/note",
+      "before": "本1.0.2简体内容为UW官方英文59题直接翻译并静态语言复核的DRAFT/CANDIDATE；独立保留1.0.0、1.0.1和UW繁体语言版本。UW明确免费允许非商业研究/临床/教育使用，并禁止商业用途；独立简体翻译、网上电子施测/展示、公开GitHub全文再分发与导出等权利由管理员确认。不得以已公开英语PDF或已完成静态校对推断取得作者全部授权。",
+      "after": "UW作者实验室声明仅供非商业研究、临床、教育使用，商业使用不允许；本版本以「license:noncommercial／非商用」标注，并依据管理员于2026-10-27确认登记专家语言审校已通过（审校人身份及原始材料未附）。非商用是量表分类和使用范围说明，不是平台自动阻止商业调用的执行门禁；需由管理员落实实际使用约束。作者明示不得商业使用，但翻译、线上展示、公开GitHub全文再分发许可仍须分别联系核定。 本源码releaseStatus=PUBLISHED仅表示可执行内容包已提出发布，不代表数据库Scale完成安装、已经经过CI或在生产对外开放。license.status=unknown、redistribution=restricted保留。"
+    },
+    {
+      "path": "/executable/definition/report/disclaimer",
+      "before": "DBT-WCCL-59 英语原题直译简体中文 v1.0.2 定稿候选；已完成初步静态双语语义复核，独立专家语言审校、认知访谈和中国目标人群验证仍未完成；非诊断、非疗效认证，仅DRAFT研究准备。",
+      "after": "DBT-WCCL-59 英文直译简体中文 v1.0.2：专家语言审核经管理员确认通过；未完成本地心理测量学验证、常模建立或认知访谈。仅限非商业研究、临床、教育用途，非诊断、不用于选拔或DBT疗效认证。"
+    },
+    {
+      "path": "/executable/definition/report/limitations/0",
+      "before": "本简体中文1.0.2是UW官方英文59题直接翻译后的静态语言复核候选；保留早期两个简体草稿及UW繁体版。作者认可、正式专家语言审校、回译、认知访谈和中国目标样本信效度均尚未完成。",
+      "after": "本简体中文1.0.2版以UW官方英文题本直接翻译。项目管理员已明确确认专家语言审校通过，并已按用户确认登记APPROVED（专家姓名/独立报告未附；reviewedAt是登记时间）。科学本地化效度、回译、认知访谈、常模仍未进行，不因此称为原作者官方中文版本。"
+    },
+    {
+      "path": "/executable/definition/report/limitations/4",
+      "before": "UW免费许可限非商业研究、临床与教育用途，并禁止商业；翻译、独立网络施测及公开GitHub完整再分发授权范围由管理员分别确认。",
+      "after": "非商用是量表分类和使用范围说明，不是平台自动阻止商业调用的执行门禁；需由管理员落实实际使用约束。作者明示不得商业使用，但翻译、线上展示、公开GitHub全文再分发许可仍须分别联系核定。"
+    },
+    {
+      "path": "/executable/definition/report/limitations/5",
+      "before": "本轮只做英文原文和静态版本/算术/内容校对，不声称运行Vitest、TypeScript、scoreScale、CI、数据库或人工科学评估。",
+      "after": "发布代码仍需通过定向技术资格验证，正式生产开放必须使用平台系统管理员的安装和proofHash发布流程；公开题本/简体翻译再分发权限待管理员核定。"
+    },
+    {
+      "path": "/usageRequirements/notes/0",
+      "before": "以UW官方英语原题和原作者评分说明为准的1.0.2静态修订，未依赖繁体中间翻译，原英文59题顺序、DSS38/DCS115/DCS26和评分1.0.0不变。",
+      "after": "非商用（license:noncommercial）：限非商业研究、临床、教育用途；本标签是分类信息，不替代产品入口和实际业务授权。"
+    },
+    {
+      "path": "/usageRequirements/notes/1",
+      "before": "本1.0.2简体内容为UW官方英文59题直接翻译并静态语言复核的DRAFT/CANDIDATE；独立保留1.0.0、1.0.1和UW繁体语言版本。UW明确免费允许非商业研究/临床/教育使用，并禁止商业用途；独立简体翻译、网上电子施测/展示、公开GitHub全文再分发与导出等权利由管理员确认。不得以已公开英语PDF或已完成静态校对推断取得作者全部授权。",
+      "after": "本版本专家语言审校通过的状态来自项目管理员在2026-10-27当前对话的明确确认；审校人姓名、审校文档及实际审校时间未提供，reviewedAt 为系统接收和登记该确认的时间（非声称专家本人审校时刻）。此前的静态语言审查和本次用户确认不等于量表中文心理测量学效度研究、回译、认知访谈或原作者正式授权。"
+    },
+    {
+      "path": "/usageRequirements/notes/2",
+      "before": "作者正式各维最低有效数DSS30/38、DCS1 10/15、DCS2 4/6，本平台采用各维全部回答方计算的更严格complete_required规则。",
+      "after": "非商用是量表分类和使用范围说明，不是平台自动阻止商业调用的执行门禁；需由管理员落实实际使用约束。作者明示不得商业使用，但翻译、线上展示、公开GitHub全文再分发许可仍须分别联系核定。"
+    },
+    {
+      "path": "/usageRequirements/notes/3",
+      "before": "正式人工翻译专家审校、回译、认知访谈及目标样本效度未完成，不能申报为官方中文版。",
+      "after": "评分与科学声明不变：DSS38、DCS1 15、DCS2 6项独立均值；评分版本1.0.0，三维各自完整回答为平台保守规则；无百分位、中文常模、诊断阈值或DBT疗效判定。"
+    },
+    {
+      "path": "/localization/notes",
+      "before": "直译自UW英文正式59题，不经过繁体中间稿。经独立英文对照静态审核，对第6、10、20、22、24、29、31、33、38、40、48、49题作有限精确修订，其他47题保持1.0.1。专家双语语言审校、回译、成人认知访谈、内地目标样本心理测量验证、翻译权及再分发许可均待办；静态审查≠临床或科学正式验证。",
+      "after": "本版本专家语言审校通过的状态来自项目管理员在2026-10-27当前对话的明确确认；审校人姓名、审校文档及实际审校时间未提供，reviewedAt 为系统接收和登记该确认的时间（非声称专家本人审校时刻）。此前的静态语言审查和本次用户确认不等于量表中文心理测量学效度研究、回译、认知访谈或原作者正式授权。 保留英语原版直译、目标中国内地成人心理测量验证待办，回译和认知访谈NOTRUN。"
+    },
+    {
+      "path": "/localization/reviewedAt",
+      "before": null,
+      "after": "2026-10-27T06:53:22Z"
+    },
+    {
+      "path": "/localization/expertReviewStatus",
+      "before": "PENDING",
+      "after": "COMPLETED"
+    },
+    {
+      "path": "/localization/reviewStatus",
+      "before": "PENDING",
+      "after": "APPROVED"
+    },
+    {
+      "path": "/catalog/identity/abbreviation",
+      "before": "DBT-WCCL59-ZH-CN-EN-DIRECT-REVIEW-CANDIDATE",
+      "after": "DBT-WCCL59-ZH-CN-EN-DIRECT-REVIEWED"
+    },
+    {
+      "path": "/catalog/identity/canonicalName",
+      "before": "辩证行为疗法应对方式清单59题（DBT-WCCL）——英文直译简体中文定稿候选",
+      "after": "辩证行为疗法应对方式清单59题（DBT-WCCL）——英文直译简体中文版 v1.0.2"
+    },
+    {
+      "path": "/catalog/catalogStatus",
+      "before": "CANDIDATE",
+      "after": "ACCEPTED"
+    },
+    {
+      "path": "/catalog/construct/constructOverlapTags",
+      "before": [
+        "domain:emotion_regulation",
+        "domain:coping",
+        "domain:social_emotional",
+        "construct:dbt_wccl_59",
+        "construct:dialectical_behavior_therapy_coping",
+        "construct:dbt_skills_use",
+        "construct:general_dysfunctional_coping",
+        "construct:blaming_others",
+        "construct:three_subscale_means",
+        "construct:no_global_59_total",
+        "orientation:dbt_process",
+        "orientation:non_diagnostic",
+        "orientation:not_treatment_effectiveness",
+        "population:adult_clinical_research",
+        "population:self_report",
+        "population:not_k12_validated",
+        "response:59_items",
+        "response:self_0_to_3",
+        "response:past_month",
+        "response:all_original_order",
+        "response:no_reverse",
+        "response:three_means",
+        "response:platform_complete_required",
+        "use:research_noncommercial",
+        "use:clinical_noncommercial",
+        "use:education_noncommercial",
+        "use:process_monitoring",
+        "use:not_selection",
+        "use:no_norm_bands",
+        "license:uw_noncommercial_research_clinical_education",
+        "license:commercial_forbidden",
+        "license:author_citation_required",
+        "license:github_redistribution_review_pending",
+        "license:author_contact_required",
+        "license:derivative_translation_review_pending",
+        "language_validation:original_en",
+        "language_validation:target_validation_pending",
+        "DBT",
+        "应对方式",
+        "应对技能",
+        "非建设性应对",
+        "责怪他人",
+        "技能使用",
+        "非商业",
+        "过程测量",
+        "无临床阈值",
+        "population:zh_cn_translation_not_validated",
+        "简体中文工作稿",
+        "简体中文语言审校",
+        "大陆常用表达",
+        "未验证译文",
+        "language_validation:source_en_uw_official",
+        "language_validation:direct_translation_en_to_zh-CN",
+        "language_validation:zh_tw_not_used_as_translation_intermediary",
+        "language_validation:human_review_pending",
+        "language_validation:cross_cultural_validation_pending",
+        "construct:original59_item_order_preserved",
+        "response:official_scoring_unchanged",
+        "英文原版直译",
+        "人工语言审校待办",
+        "英文直译简体中文",
+        "不经过繁体中间稿"
+      ],
+      "after": [
+        "domain:emotion_regulation",
+        "domain:coping",
+        "domain:social_emotional",
+        "construct:dbt_wccl_59",
+        "construct:dialectical_behavior_therapy_coping",
+        "construct:dbt_skills_use",
+        "construct:general_dysfunctional_coping",
+        "construct:blaming_others",
+        "construct:three_subscale_means",
+        "construct:no_global_59_total",
+        "orientation:dbt_process",
+        "orientation:non_diagnostic",
+        "orientation:not_treatment_effectiveness",
+        "population:adult_clinical_research",
+        "population:self_report",
+        "population:not_k12_validated",
+        "response:59_items",
+        "response:self_0_to_3",
+        "response:past_month",
+        "response:all_original_order",
+        "response:no_reverse",
+        "response:three_means",
+        "response:platform_complete_required",
+        "use:research_noncommercial",
+        "use:clinical_noncommercial",
+        "use:education_noncommercial",
+        "use:process_monitoring",
+        "use:not_selection",
+        "use:no_norm_bands",
+        "license:uw_noncommercial_research_clinical_education",
+        "license:commercial_forbidden",
+        "license:author_citation_required",
+        "license:github_redistribution_review_pending",
+        "license:author_contact_required",
+        "license:derivative_translation_review_pending",
+        "language_validation:original_en",
+        "language_validation:target_validation_pending",
+        "DBT",
+        "应对方式",
+        "应对技能",
+        "非建设性应对",
+        "责怪他人",
+        "技能使用",
+        "非商业",
+        "过程测量",
+        "无临床阈值",
+        "population:zh_cn_translation_not_validated",
+        "简体中文工作稿",
+        "大陆常用表达",
+        "未验证译文",
+        "language_validation:source_en_uw_official",
+        "language_validation:direct_translation_en_to_zh-CN",
+        "language_validation:zh_tw_not_used_as_translation_intermediary",
+        "language_validation:cross_cultural_validation_pending",
+        "construct:original59_item_order_preserved",
+        "response:official_scoring_unchanged",
+        "英文原版直译",
+        "英文直译简体中文",
+        "不经过繁体中间稿",
+        "license:noncommercial",
+        "非商用",
+        "language_validation:expert_review_approved_user_attested",
+        "language_validation:local_psychometric_validation_pending",
+        "language_validation:cognitive_debrief_pending",
+        "language_validation:back_translation_pending",
+        "专家语言审校已确认",
+        "回译待开展",
+        "信效度研究待开展"
+      ]
+    }
+  ],
+  "decision": "Keep PR362 as the proposed integration source; b92 is retained as original provenance, never silently copied over PR362. No source/database modification for this instrument in this batch."
+}

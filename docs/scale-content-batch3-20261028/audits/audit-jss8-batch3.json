@@ -1,0 +1,238 @@
+{
+  "instrument": "jss8_zh_cn_research:1.0.0",
+  "sourceSHA": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "files": [
+    {
+      "path": "docs/scale-instruments/research-drafts/jss8/1.0.0/README.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "gitBlob": "54f51a744bc739ad4c44e4b3f26ed74a2d7565db",
+      "sha256": "80ab7d7086ab5b055a861f64d5512024f6f742bbedc1cb64d020a513379b584b"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/jss8/1.0.0/bilingual-content.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "gitBlob": "de2dc0dc97fb51585f7e3a47d6c35d455be59814",
+      "sha256": "3925707be66cb39fc28890c969a1e0a5d5499f4ff7a8246abad081e6c450a76a"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/jss8/1.0.0/external-reference-dossier.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "gitBlob": "70d4a0ae2a0b664b1dd7e9d088761c30f147a560",
+      "sha256": "6001b347a3edf7472eca91a24ec88461e7c0b94da8eba673642b2fc853a6fb37"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/jss8/1.0.0/local-test-output-r2.txt",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "gitBlob": "5df945fd9faa3ebfad18264eb6d16e81e45b3a7a",
+      "sha256": "538f02d7852d2a48eb0084c04bd3a7c4881d9ecaf035f04f27325074dbf4883b"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/jss8/1.0.0/local-test-output.txt",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "gitBlob": "af726b685aa613692dfc8eabd9d247cf70781bb8",
+      "sha256": "858c29807c0696c0d5cd5b1405f0f70a8c0a865738d7f77c40a76fab61d36299"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/jss8/1.0.0/local-validation.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "gitBlob": "668e402b4eb455ba72c4a8c2fde868fb7ea26206",
+      "sha256": "a85c88fe7e51949ab7bacf486fdb1705b119e4d0b6f3c1b17867bd11c4a4a6ae"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/jss8/1.0.0/references.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "gitBlob": "ae70a30384c54b73493b77a56a08dff4c650698c",
+      "sha256": "a8737e6cc771827795815bb246d39cf6db348e60403ec3ed8f6ad9fca6119d47"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/jss8/1.0.0/report-example.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "gitBlob": "471e8b6d8edfe429eaff261dc314a9ebd506e5f5",
+      "sha256": "3fe685c6601bb876a12c1183256621277deb066c64e8612ddf257561e3e219cc"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/jss8/1.0.0/report-example.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "gitBlob": "546031281a9a7c832d16cc15ac69133dde9469b3",
+      "sha256": "1f038602e33832e1f6f3d6b8297c35271f28bca2040ed99fc8dcdcf43311653b"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/jss8/1.0.0/reviewed-source-pack.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "gitBlob": "b5c9f00fe50d24af151cdaf5baf5a1fbe2d88462",
+      "sha256": "3b4e43a81de67adfba33b558f56e95a947d7225dc0bd0c9bb8e1b315f564b07f"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/jss8/1.0.0/runtime-check.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "gitBlob": "4f35a83b436e58cf389d25c281cbe80abaf51956",
+      "sha256": "e52790e1bb5fbf964224fe812046b97c5d016b09beedb32e832a8999cd4a3799"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/jss8/1.0.0/scoring-and-thresholds.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "gitBlob": "102babdc2114d997fcada53eb63600efb3716bd4",
+      "sha256": "8142afc4bc1657c329f2a31570b4b606a5ce2c45ccb891f1293ba237d2d58c64"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/scale/instruments/jss8_zh_cn_research.test.ts",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "gitBlob": "3fbfd479baa1303b1abd0c563a67f36479b64972",
+      "sha256": "ebeb45c254e5461e316acfcc4f5bc3b5d7850397e3f6fb6b5073e687385b2ef9"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/jss8_zh_cn_research/1.0.0/instrument.ts",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "gitBlob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/jss8_zh_cn_research/1.0.0/source.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "gitBlob": "c2839fec588419175c1198820604cd0ea2d42226",
+      "sha256": "aa46e5e52852230d83410c04315cf8a9173a4795388ffce2f2f6ce8d22eab3db"
+    }
+  ],
+  "originalEvidence": {
+    "url": "https://access.gesis.org/zis/1396",
+    "access": "本次读取作者ZIS说明书PDF第4–5页（PDF页索引3–4），核对题文、六点锚点、四视角、无反向及两题均分和缺失要求。"
+  },
+  "items": [
+    {
+      "number": 1,
+      "code": "JSS8_01",
+      "english": "It makes me angry when others are undeservingly better off than me.",
+      "chinese": "当别人没有正当理由却比我过得更好时，我会生气。",
+      "subscale": "victim",
+      "key": "identity",
+      "conclusion": "与作者说明书英文题目、顺序、维度及键向一致；工作中译基本保留原意，待独立译审。"
+    },
+    {
+      "number": 2,
+      "code": "JSS8_02",
+      "english": "It worries me when I have to work hard for things that come easily to others.",
+      "chinese": "当别人轻易就能得到的东西，我却必须付出很大努力时，我会感到困扰。",
+      "subscale": "victim",
+      "key": "identity",
+      "conclusion": "与作者说明书英文题目、顺序、维度及键向一致；工作中译基本保留原意，待独立译审。"
+    },
+    {
+      "number": 3,
+      "code": "JSS8_03",
+      "english": "I am upset when someone is undeservingly worse off than others.",
+      "chinese": "当有人没有正当理由却比别人处境更差时，我会感到难受。",
+      "subscale": "observer",
+      "key": "identity",
+      "conclusion": "与作者说明书英文题目、顺序、维度及键向一致；工作中译基本保留原意，待独立译审。"
+    },
+    {
+      "number": 4,
+      "code": "JSS8_04",
+      "english": "It worries me when someone has to work hard for things that come easily to others.",
+      "chinese": "当别人轻易就能得到的东西，有人却必须付出很大努力时，我会感到困扰。",
+      "subscale": "observer",
+      "key": "identity",
+      "conclusion": "与作者说明书英文题目、顺序、维度及键向一致；工作中译基本保留原意，待独立译审。"
+    },
+    {
+      "number": 5,
+      "code": "JSS8_05",
+      "english": "I feel guilty when I am better off than others for no reason.",
+      "chinese": "当我没有什么理由却比别人过得更好时，我会感到内疚。",
+      "subscale": "beneficiary",
+      "key": "identity",
+      "conclusion": "与作者说明书英文题目、顺序、维度及键向一致；工作中译基本保留原意，待独立译审。"
+    },
+    {
+      "number": 6,
+      "code": "JSS8_06",
+      "english": "It bothers me when things come easily to me that others have to work hard for.",
+      "chinese": "当别人必须付出很大努力才能得到的东西，我却能轻易得到时，我会感到不安。",
+      "subscale": "beneficiary",
+      "key": "identity",
+      "conclusion": "与作者说明书英文题目、顺序、维度及键向一致；工作中译基本保留原意，待独立译审。"
+    },
+    {
+      "number": 7,
+      "code": "JSS8_07",
+      "english": "I feel guilty when I enrich myself at the cost of others.",
+      "chinese": "当我以牺牲他人为代价使自己获利时，我会感到内疚。",
+      "subscale": "perpetrator",
+      "key": "identity",
+      "conclusion": "与作者说明书英文题目、顺序、维度及键向一致；工作中译基本保留原意，待独立译审。"
+    },
+    {
+      "number": 8,
+      "code": "JSS8_08",
+      "english": "It bothers me when I use tricks to achieve something while others have to struggle for it.",
+      "chinese": "当别人必须努力争取的东西，我却靠耍手段得到时，我会感到不安。",
+      "subscale": "perpetrator",
+      "key": "identity",
+      "conclusion": "与作者说明书英文题目、顺序、维度及键向一致；工作中译基本保留原意，待独立译审。"
+    }
+  ],
+  "threePartConclusions": {
+    "content": "8题作者说明书次序及四组情境、均为正向与研究包一致；1完全不符合至6完全符合，2–5仅数字，六点无中性中点，符合原版。总体指导语置首题，角色前导语重复嵌每题，属项目数字版改编而非原版样式验证。",
+    "scoring": "victim 01–02、observer 03–04、beneficiary 05–06、perpetrator 07–08；每维等权均分，两题分母2，范围1–6；不计算总分符合作者不建议合并视角。作者规定两题不缺才能形成维度均分，项目完整报告要求全部8题回答，不把其他可计算维度视作有效完整报告。references=[]、referencePolicy none，无个体临床阈值或中文常模。",
+    "report": "报告1.0.0、zh-CN、ADULT_SELF/student技术角色；各视角higher_is_more即更认同相应反应，不等于行为或道德优劣。各score_only、bands空；提供生活反思与具体沟通建议，现有文本可沿用。"
+  },
+  "instruction": {
+    "overallText": "人们面对不公平的情境时，反应很不一样。下面想了解您在这类情境中会如何反应。请阅读各项陈述，选择它们与您相符的程度。如果您从未亲身遇到某种情境，请试着想象自己遇到时会如何反应。",
+    "existingSource": {
+      "path": "server-version/backend/src/modules/scale/instruments/jss8_zh_cn_research/1.0.0/source.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "gitBlob": "c2839fec588419175c1198820604cd0ea2d42226",
+      "sha256": "aa46e5e52852230d83410c04315cf8a9173a4795388ffce2f2f6ce8d22eab3db"
+    },
+    "existingPointer": "/executable/definition/items/0/content",
+    "bilingualSource": {
+      "path": "docs/scale-instruments/research-drafts/jss8/1.0.0/bilingual-content.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "gitBlob": "de2dc0dc97fb51585f7e3a47d6c35d455be59814",
+      "sha256": "3925707be66cb39fc28890c969a1e0a5d5499f4ff7a8246abad081e6c450a76a"
+    },
+    "bilingualPointer": "/instructions/zh",
+    "corroboratingSource": {
+      "path": "docs/scale-instruments/research-drafts/jss8/1.0.0/reviewed-source-pack.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "gitBlob": "b5c9f00fe50d24af151cdaf5baf5a1fbe2d88462",
+      "sha256": "3b4e43a81de67adfba33b558f56e95a947d7225dc0bd0c9bb8e1b315f564b07f"
+    },
+    "corroboratingPointer": "/instructions/zh",
+    "sections": [
+      {
+        "beforeItem": 1,
+        "en": "First, we will look at situations to the advantage of others and to your own disadvantage.",
+        "zh": "首先，请想象对别人有利、对您不利的情境。"
+      },
+      {
+        "beforeItem": 3,
+        "en": "Now, we will look at situations in which you notice or learn that someone else is being treated unfairly, put at a disadvantage, or used.",
+        "zh": "接下来，请想象您发现或得知某个人受到不公平对待、被置于不利地位或被利用的情境。"
+      },
+      {
+        "beforeItem": 5,
+        "en": "Now, we will look at situations that turn out to your advantage and to the disadvantage of others.",
+        "zh": "接下来，请想象结果对您有利、对别人不利的情境。"
+      },
+      {
+        "beforeItem": 7,
+        "en": "Finally, we look at situations in which you treat someone else unfairly, discriminate against someone or exploit them.",
+        "zh": "最后，请想象您不公平地对待、歧视或利用他人的情境。"
+      }
+    ],
+    "sectionPointer": "/sections",
+    "note": "总体指导语已嵌入首题，每一角色前导语嵌于其两题；source.instruction缺失。直接新增总体指导语会重复，迁移时须评估题本定义、版本及情境呈现，不静默删改。"
+  },
+  "minimalOrdinaryEdits": [],
+  "humanItems": [
+    "中文专家独立译审、认知访谈和本地证据仍待完成；AI编辑检查不是专家批准。",
+    "迁移指导语须协调确保四段前导语和题目语境保留并评估版本；不自行改变题义、锚点、计分或阈值。",
+    "作者说明书英德样本不构成本中文版常模或未成年人适用证据。"
+  ],
+  "eligibility": "现有DRAFT/CANDIDATE/PILOT成人研究候选，无虚构人群阈值，报告可沿用；不构成中文验证或授权生产。",
+  "notExecuted": [
+    "未改仓库、切分支或操作DB/CI；未执行测试、golden或系统检查。",
+    "未开展新版权或科研调查；历史测试只是历史记录。"
+  ]
+}

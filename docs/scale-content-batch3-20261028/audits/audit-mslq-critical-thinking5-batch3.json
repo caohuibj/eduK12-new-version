@@ -1,0 +1,199 @@
+{
+  "identity": "mslq_critical_thinking5_zh_cn_research:1.0.0",
+  "sourceCommit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "sourceFiles": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/mslq_critical_thinking5_zh_cn_research/1.0.0/source.json",
+      "gitBlob": "c2fefe260276288b87ca7f29ff567aab751521fa",
+      "sha256": "549556bd24ee7aefb28130abe0e5b6b08cba242c536965c17825d89eab02cc3c"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/mslq_critical_thinking5_zh_cn_research/1.0.0/instrument.ts",
+      "gitBlob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/mslq_critical_thinking5/1.0.0/README.md",
+      "gitBlob": "a277ec8965c63e7724f3c8e3bf01809a6561d33a",
+      "sha256": "26acf7154c57bf450967c0ce24d6277cd78209aec068077854d962200318f8bf"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/mslq_critical_thinking5/1.0.0/bilingual-content.json",
+      "gitBlob": "a741fda604ff171f66511b8831ff8f28b0e3287c",
+      "sha256": "6f6edc9cb763c9e5be9b8866ee88015c9697320ec7b8a79bc455d12b59c66b1a"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/mslq_critical_thinking5/1.0.0/reviewed-source-pack.json",
+      "gitBlob": "29d13ac810f5de64a65f97da8df322872a0cc4f0",
+      "sha256": "08824be589cd9def6268f0f9e9049a9c6289a340754bc0f5b1d30986f74dd758"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/mslq_critical_thinking5/1.0.0/external-reference-dossier.json",
+      "gitBlob": "a6b3c14a5b396b949eb19e38b597b685257304e8",
+      "sha256": "595b0f5ccabb1bdf6229a9091496951346e1a5f923dd9c4d783fe600007f6998"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/mslq_critical_thinking5/1.0.0/references.md",
+      "gitBlob": "e8296c654887ab522a70448694da82e2ab3847ff",
+      "sha256": "aa113aa3143c6b46a954eccc3cf2697151d74fb781adbafc18782af1fce2c1a0"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/mslq_critical_thinking5/1.0.0/report-example.md",
+      "gitBlob": "524607bf206cb4cf519d5b5fb3a1b7c5c4c32e53",
+      "sha256": "2e5d2a50ccc9d4277454d8f6f69b8d4f5cfff4aadf562487a864876eeaa0dc07"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/mslq_critical_thinking5/1.0.0/report-example.json",
+      "gitBlob": "1d9aa292007741223a5c3c9209c99f6612018126",
+      "sha256": "b1c3f3642d1c18a8e6e3120780a91b2a7e1a8993e85d2fb10504b47692121479"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/mslq_critical_thinking5/1.0.0/scoring-and-thresholds.md",
+      "gitBlob": "5922236e3b1a037fab800585f3540ee432f4ca31",
+      "sha256": "2b0dcd082ac608c10fbd7b2e34ff233a47b22b823e82263f497a695d3b57b70d"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/mslq_critical_thinking5/1.0.0/local-validation.json",
+      "gitBlob": "9ea7ef9e1c042723eb87c77e8b462efac9f27ae9",
+      "sha256": "f6008bf37b0a281a32f8c89a0ac70bae9a1cb0b32c1c88bfee38dc5adf3944cc"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/mslq_critical_thinking5/1.0.0/runtime-check.json",
+      "gitBlob": "cea505602cbc940ca6a24653618092ea95eca186",
+      "sha256": "5007589200afcdef2d53693eaaaef2f0dd7b040ccfe8c34c1789975907496002"
+    }
+  ],
+  "threePartConclusions": {
+    "content": "完整课程批判性思考模块原题38/47/51/66/71；五题中文与来源大意相符，04“play around”译为灵活琢磨、05 alternatives 译为其他解释有解释性，待译审。1–7符合度，中间2–6为数字，无虚构文字档。题1前含项目指导语，其内容已保留课程限定。",
+    "scoring": "五题正向、等权均分1–7，分母5，complete_required为项目选择，缺答不补零/估算；无整份MSLQ总分、课程间通用常模或能力阈值。",
+    "report": "1.0.0为课程特定自述而非能力测验，具体建议查看证据并思考替代解释，未分档；未固定同一门课程不宜解释。成人大学研究，student技术受众，中文工作译稿待验证。报告“更多做法”可改为“更符合描述”，对应符合度锚。"
+  },
+  "items": [
+    {
+      "position": 1,
+      "originalNumber": 38,
+      "itemCode": "MSLQ_CT_38",
+      "en": "I often find myself questioning things I hear or read in this course to decide if I find them convincing.",
+      "zh": "我常常会质疑在这门课上听到或读到的内容，以判断它们是否让我信服。",
+      "key": "positive",
+      "assessment": "运行时题干与固定译文一致；题干前已有同文指导语；待译审。"
+    },
+    {
+      "position": 2,
+      "originalNumber": 47,
+      "itemCode": "MSLQ_CT_47",
+      "en": "When a theory, interpretation, or conclusion is presented in class or in the readings, I try to decide if there is good supporting evidence.",
+      "zh": "当课堂或阅读材料中提出一种理论、解释或结论时，我会尝试判断它是否有充分的证据支持。",
+      "key": "positive",
+      "assessment": "运行时题干与固定译文一致；待译审。"
+    },
+    {
+      "position": 3,
+      "originalNumber": 51,
+      "itemCode": "MSLQ_CT_51",
+      "en": "I treat the course material as a starting point and try to develop my own ideas about it.",
+      "zh": "我把课程材料当作起点，并尝试在此基础上形成自己的想法。",
+      "key": "positive",
+      "assessment": "运行时题干与固定译文一致；待译审。"
+    },
+    {
+      "position": 4,
+      "originalNumber": 66,
+      "itemCode": "MSLQ_CT_66",
+      "en": "I try to play around with ideas of my own related to what I am learning in this course.",
+      "zh": "我会尝试对这门课所学内容产生自己的想法，并灵活地琢磨这些想法。",
+      "key": "positive",
+      "assessment": "运行时题干与固定译文一致；待译审。"
+    },
+    {
+      "position": 5,
+      "originalNumber": 71,
+      "itemCode": "MSLQ_CT_71",
+      "en": "Whenever I read or hear an assertion or conclusion in this class, I think about possible alternatives.",
+      "zh": "每当在这门课上读到或听到一个论断或结论时，我会思考其他可能的解释。",
+      "key": "positive",
+      "assessment": "运行时题干与固定译文一致；待译审。"
+    }
+  ],
+  "anchors": [
+    {
+      "value": 1,
+      "en": "not at all true of me",
+      "zh": "完全不符合我",
+      "anchorProvenance": "original endpoint"
+    },
+    {
+      "value": 2,
+      "en": "2",
+      "zh": "2",
+      "anchorProvenance": "unlabeled numeric position in original; do not invent verbal intermediate anchors"
+    },
+    {
+      "value": 3,
+      "en": "3",
+      "zh": "3",
+      "anchorProvenance": "unlabeled numeric position in original; do not invent verbal intermediate anchors"
+    },
+    {
+      "value": 4,
+      "en": "4",
+      "zh": "4",
+      "anchorProvenance": "unlabeled numeric position in original; do not invent verbal intermediate anchors"
+    },
+    {
+      "value": 5,
+      "en": "5",
+      "zh": "5",
+      "anchorProvenance": "unlabeled numeric position in original; do not invent verbal intermediate anchors"
+    },
+    {
+      "value": 6,
+      "en": "6",
+      "zh": "6",
+      "anchorProvenance": "unlabeled numeric position in original; do not invent verbal intermediate anchors"
+    },
+    {
+      "value": 7,
+      "en": "very true of me",
+      "zh": "非常符合我",
+      "anchorProvenance": "original endpoint"
+    }
+  ],
+  "instruction": {
+    "text": "请先选定一门具体课程，所有问题都围绕同一门课程回答。按每句话与您的实际情况相符的程度作答，1表示“完全不符合我”，7表示“非常符合我”。",
+    "sources": [
+      {
+        "file": {
+          "path": "docs/scale-instruments/research-drafts/mslq_critical_thinking5/1.0.0/bilingual-content.json",
+          "gitBlob": "a741fda604ff171f66511b8831ff8f28b0e3287c",
+          "sha256": "6f6edc9cb763c9e5be9b8866ee88015c9697320ec7b8a79bc455d12b59c66b1a"
+        },
+        "field": "instructions.zh"
+      },
+      {
+        "file": {
+          "path": "server-version/backend/src/modules/scale/instruments/mslq_critical_thinking5_zh_cn_research/1.0.0/source.json",
+          "gitBlob": "c2fefe260276288b87ca7f29ff567aab751521fa",
+          "sha256": "549556bd24ee7aefb28130abe0e5b6b08cba242c536965c17825d89eab02cc3c"
+        },
+        "field": "executable.definition.items[0].content 的首段"
+      }
+    ],
+    "qualification": "固定源指导语已嵌题1；如新绑定独立字段，不要重复呈现；去除原嵌入文本会改变定义，须按版本及冻结规则处理，且不能假称系统已记录课程。"
+  },
+  "ordinaryRevisions": [
+    {
+      "jsonPath": "executable.definition.report.interpretations[0].summary",
+      "old": "平均分越高，表示您在这门课中报告了更多这类做法。",
+      "new": "平均分越高，表示您认为这些做法在这门课中更符合自己的情况。",
+      "reason": "表述与符合度锚点对齐，不断言行为数量；沿报告版本轴处理。"
+    }
+  ],
+  "manualPending": [
+    "同一课程须由施测者选定并记录，不能把指导语等同系统自动绑定；未固定时不解释。",
+    "中文译审及目标人群验证待完成；实质改题/锚点/算法需原据和版本影响交root协调。"
+  ],
+  "notExecuted": [
+    "未运行golden、评分、系统、DB、CI或部署；固定历史记录不声称本次执行。"
+  ]
+}

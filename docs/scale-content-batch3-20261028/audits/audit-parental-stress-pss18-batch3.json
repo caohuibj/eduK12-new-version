@@ -1,0 +1,229 @@
+{
+  "instrument": "parental_stress_pss18_zh_cn_research:1.0.0",
+  "source_commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "source_files": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/parental_stress_pss18_zh_cn_research/1.0.0/source.json",
+      "blob": "f2fbaa377cd3e6b242c266fe0f1eec6f09a67793",
+      "sha256": "3d4ebb6c72f2cfbe4d81905b947b32bda8f71d81b55e603e87fd132f1165d492"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/parental_stress_pss18_zh_cn_research/1.0.0/instrument.ts",
+      "blob": "0eed070bb879576339c5a71afdf34c0026591fd3",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/parental_stress_pss18_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+      "blob": "7b7b9734826cb5db807c3289b9f326feb480851e",
+      "sha256": "4f6106dbb0c6070cffcd13926a7933c73f6ce67c4a57a75c228f45a2a9102d69"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/parental_pss18/1.0.0/README.md",
+      "blob": "f5c86fba2c4120b945fb24f4f7ad3735325fdd7b",
+      "sha256": "e0f97c5db0eb9542ef205b7b97bf38fe475248f26b4a1b797a4a5a2ad94852fc"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/parental_pss18/1.0.0/source-manifest.json",
+      "blob": "fdd0f59caa6966e51bef48bf4a2a24f6b126918a",
+      "sha256": "1370a3ba27635aa96ba4ea6d36e87ac9c5160ac6194259e2c279188198372401"
+    }
+  ],
+  "original_form": {
+    "url": "https://www.corc.uk.net/media/2764/parent-stress-scale-fillable-pdf.pdf",
+    "sha256": "5ab81fd714a3793ca52e57618cd08eabf1a5f182498bb9566eda831900b87fef",
+    "scope": "本次对照英文题本和题序；评分键依据固定研究manifest。"
+  },
+  "three_parts": {
+    "items_instruction": {
+      "items": [
+        {
+          "number": 1,
+          "code": "PSS18_01",
+          "original_meaning": "作为父母快乐",
+          "chinese": "作为父母，我感到快乐。",
+          "transform": "reverse",
+          "review": "核心意思与CORC英文载体相符。"
+        },
+        {
+          "number": 2,
+          "code": "PSS18_02",
+          "original_meaning": "必要时愿为孩子做几乎任何事",
+          "chinese": "只要孩子确实需要，几乎没有什么事是我不愿意为孩子做的。",
+          "transform": "reverse",
+          "review": "核心意思与CORC英文载体相符。"
+        },
+        {
+          "number": 3,
+          "code": "PSS18_03",
+          "original_meaning": "照护所需时间精力超过可付出",
+          "chinese": "照顾孩子有时需要的时间和精力，超过了我能够付出的程度。",
+          "transform": "identity",
+          "review": "核心意思与CORC英文载体相符。"
+        },
+        {
+          "number": 4,
+          "code": "PSS18_04",
+          "original_meaning": "担心做得不够",
+          "chinese": "我有时会担心自己为孩子做得还不够。",
+          "transform": "identity",
+          "review": "核心意思与CORC英文载体相符。"
+        },
+        {
+          "number": 5,
+          "code": "PSS18_05",
+          "original_meaning": "亲近孩子",
+          "chinese": "我觉得自己与孩子很亲近。",
+          "transform": "reverse",
+          "review": "核心意思与CORC英文载体相符。"
+        },
+        {
+          "number": 6,
+          "code": "PSS18_06",
+          "original_meaning": "享受陪伴",
+          "chinese": "我享受与孩子在一起的时光。",
+          "transform": "reverse",
+          "review": "核心意思与CORC英文载体相符。"
+        },
+        {
+          "number": 7,
+          "code": "PSS18_07",
+          "original_meaning": "孩子是情感来源",
+          "chinese": "我的孩子是我获得关爱的重要来源。",
+          "transform": "reverse",
+          "review": "核心意思与CORC英文载体相符。"
+        },
+        {
+          "number": 8,
+          "code": "PSS18_08",
+          "original_meaning": "孩子使未来更确定乐观",
+          "chinese": "有孩子让我对未来感到更加有把握，也更加乐观。",
+          "transform": "reverse",
+          "review": "核心意思与CORC英文载体相符。"
+        },
+        {
+          "number": 9,
+          "code": "PSS18_09",
+          "original_meaning": "孩子是主要压力来源",
+          "chinese": "我生活中主要的压力来源是孩子。",
+          "transform": "identity",
+          "review": "核心意思与CORC英文载体相符。"
+        },
+        {
+          "number": 10,
+          "code": "PSS18_10",
+          "original_meaning": "孩子使时间和灵活性减少",
+          "chinese": "养育孩子让我生活中留给其他事情的时间和灵活安排空间很少。",
+          "transform": "identity",
+          "review": "核心意思与CORC英文载体相符。"
+        },
+        {
+          "number": 11,
+          "code": "PSS18_11",
+          "original_meaning": "经济负担",
+          "chinese": "养育孩子给我带来了经济负担。",
+          "transform": "identity",
+          "review": "核心意思与CORC英文载体相符。"
+        },
+        {
+          "number": 12,
+          "code": "PSS18_12",
+          "original_meaning": "孩子导致难平衡责任",
+          "chinese": "由于要照顾孩子，我很难平衡生活中不同方面的责任。",
+          "transform": "identity",
+          "review": "核心意思与CORC英文载体相符。"
+        },
+        {
+          "number": 13,
+          "code": "PSS18_13",
+          "original_meaning": "孩子行为常令人难堪或有压力",
+          "chinese": "孩子的行为经常让我感到难堪或者很有压力。",
+          "transform": "identity",
+          "review": "核心意思与CORC英文载体相符。"
+        },
+        {
+          "number": 14,
+          "code": "PSS18_14",
+          "original_meaning": "重选可能不要孩子",
+          "chinese": "如果有机会重新作出决定，我可能会选择不要孩子。",
+          "transform": "identity",
+          "review": "核心意思与CORC英文载体相符。"
+        },
+        {
+          "number": 15,
+          "code": "PSS18_15",
+          "original_meaning": "父母责任使我不堪重负",
+          "chinese": "承担父母的责任有时让我感到不堪重负。",
+          "transform": "identity",
+          "review": "英文无sometimes，中文增加“有时”限定频率；属潜在题意改变，交译审及版本协调。"
+        },
+        {
+          "number": 16,
+          "code": "PSS18_16",
+          "original_meaning": "孩子带来太少选择和控制",
+          "chinese": "有了孩子以后，我觉得自己能做的选择太少，对生活的掌控也太少。",
+          "transform": "identity",
+          "review": "核心意思与CORC英文载体相符。"
+        },
+        {
+          "number": 17,
+          "code": "PSS18_17",
+          "original_meaning": "父母角色满意",
+          "chinese": "作为父母，我对自己感到满意。",
+          "transform": "reverse",
+          "review": "核心意思与CORC英文载体相符。"
+        },
+        {
+          "number": 18,
+          "code": "PSS18_18",
+          "original_meaning": "觉得孩子带来乐趣",
+          "chinese": "我觉得孩子给我的生活带来了乐趣。",
+          "transform": "reverse",
+          "review": "核心意思与CORC英文载体相符。"
+        }
+      ],
+      "anchors": "1非常不同意、2不同意、3不确定、4同意、5非常同意；与英文一致。",
+      "instruction": {
+        "path": "server-version/backend/src/modules/scale/instruments/parental_stress_pss18_zh_cn_research/1.0.0/source.json",
+        "blob": "f2fbaa377cd3e6b242c266fe0f1eec6f09a67793",
+        "sha256": "3d4ebb6c72f2cfbe4d81905b947b32bda8f71d81b55e603e87fd132f1165d492",
+        "field": "/instruction",
+        "value": {
+          "schemaVersion": 1,
+          "text": "下面的18句话描述人们作为父母或照护者时可能产生的感受和想法。请根据你与孩子（或家中孩子们）通常的相处经历，逐句判断自己是否同意。1表示非常不同意，2不同意，3不确定，4同意，5非常同意。没有正确答案；照顾孩子可能同时带来满足和压力，可以如实表达两方面感受。",
+          "language": "zh-CN",
+          "version": "1.0.0",
+          "source": "依据Berry & Jones 1995原版及CORC发布完整英文18题PDF指导语独立起草的中文研究工作指引；固定家长/照护者自评，非Cohen感知压力表。"
+        }
+      },
+      "audience": "家长或照护者自陈，考虑与孩子或多个孩子的通常关系；无固定回忆时窗。"
+    },
+    "scoring": {
+      "reverse": [
+        1,
+        2,
+        5,
+        6,
+        7,
+        8,
+        17,
+        18
+      ],
+      "method": "反向6−x，18项等权总和18–90；高分更多自报亲职压力。",
+      "missing": "全部题required=false，总分complete_required；缺一不插补或按答题数外推，为项目选择。",
+      "parameters": "无中文常模、切点或统计验证子维；referencePolicy none。"
+    },
+    "report": {
+      "review": "支持性解释同时承认压力与爱、生活资源影响，提出具体分担与支持，未道德化或诊断；已有方向说明于limitations，报告可保留。",
+      "version": "内容/计分/本地化/报告1.0.0；原始Parental Stress Scale非Cohen PSS。"
+    }
+  },
+  "ordinary_suggestions": [],
+  "substantive_coordination": [
+    "第15题英文无“有时”，工作中文添加频率限定；请独立译审，若改题按版本治理。"
+  ],
+  "human_status": "独立译审、认知访谈及中国家长验证待完成；保留既有授权待核，不新增自动门禁。",
+  "not_executed": [
+    "未写仓库、分支、DB、CI或生产，未运行测试或系统检查。"
+  ],
+  "conclusion": "总分方向、反向和缺失政策与固定研究资料一致；第15题译意待协调，指导语和报告可保留。"
+}

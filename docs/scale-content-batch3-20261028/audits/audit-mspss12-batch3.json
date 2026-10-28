@@ -1,0 +1,213 @@
+{
+  "identity": "mspss12_zh_cn_research:1.0.0",
+  "sourceCommit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "sourceFiles": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/mspss12_zh_cn_research/1.0.0/source.json",
+      "gitBlob": "950346d27b105a295184e9e7f34f8eb1fa09b9dc",
+      "sha256": "016e6a0f24d900d8dff12e75062ab6681714a9adcc77950933d9543441e1a90d"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/mspss12_zh_cn_research/1.0.0/instrument.ts",
+      "gitBlob": "0eed070bb879576339c5a71afdf34c0026591fd3",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/mspss12_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+      "gitBlob": "4cb866db6b40b3c1f051b1ddef4b9040ccc4fa88",
+      "sha256": "a18f9800c5da6b725690813712212e40a73a6716202db3b8372d61c6ed0261aa"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/mspss12/1.0.0/README.md",
+      "gitBlob": "06b9c3e27dc0e18b69e2e0d0cb9f6ef453f5413a",
+      "sha256": "1790dcd934c216f947c7710362ed174cc77005a76f242144e523e44ba21f09bc"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/mspss12/1.0.0/source-manifest.json",
+      "gitBlob": "5b25bf09f53c60c67830f17c525c1250d6ba76a0",
+      "sha256": "a40ebd55958e0c396f6b8aa49c9eb4a5c0b4f067871b66b7d3af0399b77a1383"
+    }
+  ],
+  "threePartConclusions": {
+    "content": "官方英文12题顺序与固定中文一一对应、无反向；7级同意从非常强烈不同意到非常强烈同意。第1题中文加“愿意”，第8/12题problems译“困难”可能窄化，需人工译审而非静默改题。重要他人不只伴侣。",
+    "scoring": "总分12题均值，重要他人1/2/5/10、家人3/4/8/11、朋友6/7/9/12各4题均值；全部范围1–7且同向，分母分别12或4。题目可留空；各域完整才算域分，12题齐全才算总分，缺失不插补属项目规则。无绑定常模、诊断界值或等级。",
+    "report": "四个输出为一个总分和三个维度，报告尊重关系差异、非客观帮助次数或价值评价，提供具体自愿联系建议。成人工作译稿待译审/本地验证；内容、计分、本地化、指导语、报告1.0.0。"
+  },
+  "items": [
+    {
+      "number": 1,
+      "itemCode": "MSPSS12_01",
+      "englishConcept": "special person around in need",
+      "zh": "当我需要帮助时，有一位对我很重要的人愿意陪在我身边。",
+      "dimension": "significant_other",
+      "key": "positive",
+      "assessment": "固定题序和维度与英文表一致，译文大意对应，待译审；“愿意”增加意愿"
+    },
+    {
+      "number": 2,
+      "itemCode": "MSPSS12_02",
+      "englishConcept": "special person share joys and sorrows",
+      "zh": "我有一位特别重要的人，可以和他／她分享快乐和难过。",
+      "dimension": "significant_other",
+      "key": "positive",
+      "assessment": "固定题序和维度与英文表一致，译文大意对应，待译审"
+    },
+    {
+      "number": 3,
+      "itemCode": "MSPSS12_03",
+      "englishConcept": "family tries to help",
+      "zh": "我的家人确实会尽力帮助我。",
+      "dimension": "family",
+      "key": "positive",
+      "assessment": "固定题序和维度与英文表一致，译文大意对应，待译审"
+    },
+    {
+      "number": 4,
+      "itemCode": "MSPSS12_04",
+      "englishConcept": "family emotional help and support",
+      "zh": "我能从家人那里得到自己需要的情感帮助和支持。",
+      "dimension": "family",
+      "key": "positive",
+      "assessment": "固定题序和维度与英文表一致，译文大意对应，待译审"
+    },
+    {
+      "number": 5,
+      "itemCode": "MSPSS12_05",
+      "englishConcept": "special person source of comfort",
+      "zh": "有一位对我很重要的人，能够真正安慰我。",
+      "dimension": "significant_other",
+      "key": "positive",
+      "assessment": "固定题序和维度与英文表一致，译文大意对应，待译审"
+    },
+    {
+      "number": 6,
+      "itemCode": "MSPSS12_06",
+      "englishConcept": "friends try to help",
+      "zh": "我的朋友确实会尽力帮助我。",
+      "dimension": "friends",
+      "key": "positive",
+      "assessment": "固定题序和维度与英文表一致，译文大意对应，待译审"
+    },
+    {
+      "number": 7,
+      "itemCode": "MSPSS12_07",
+      "englishConcept": "count on friends when things go wrong",
+      "zh": "当事情不顺利时，我能够依靠朋友。",
+      "dimension": "friends",
+      "key": "positive",
+      "assessment": "固定题序和维度与英文表一致，译文大意对应，待译审"
+    },
+    {
+      "number": 8,
+      "itemCode": "MSPSS12_08",
+      "englishConcept": "talk about problems with family",
+      "zh": "我可以向家人谈论自己遇到的困难。",
+      "dimension": "family",
+      "key": "positive",
+      "assessment": "固定题序和维度与英文表一致，译文大意对应，待译审；problems译为困难范围或有缩窄"
+    },
+    {
+      "number": 9,
+      "itemCode": "MSPSS12_09",
+      "englishConcept": "friends share joys and sorrows",
+      "zh": "我有朋友可以一起分享快乐和难过。",
+      "dimension": "friends",
+      "key": "positive",
+      "assessment": "固定题序和维度与英文表一致，译文大意对应，待译审"
+    },
+    {
+      "number": 10,
+      "itemCode": "MSPSS12_10",
+      "englishConcept": "special person cares about feelings",
+      "zh": "在我的生活中，有一位特别重要的人会在意我的感受。",
+      "dimension": "significant_other",
+      "key": "positive",
+      "assessment": "固定题序和维度与英文表一致，译文大意对应，待译审"
+    },
+    {
+      "number": 11,
+      "itemCode": "MSPSS12_11",
+      "englishConcept": "family willing to help make decisions",
+      "zh": "当我需要做决定时，家人愿意帮助我。",
+      "dimension": "family",
+      "key": "positive",
+      "assessment": "固定题序和维度与英文表一致，译文大意对应，待译审"
+    },
+    {
+      "number": 12,
+      "itemCode": "MSPSS12_12",
+      "englishConcept": "talk about problems with friends",
+      "zh": "我可以向朋友谈论自己遇到的困难。",
+      "dimension": "friends",
+      "key": "positive",
+      "assessment": "固定题序和维度与英文表一致，译文大意对应，待译审；problems译为困难范围或有缩窄"
+    }
+  ],
+  "anchors": [
+    {
+      "score": 1,
+      "label": "非常强烈地不同意"
+    },
+    {
+      "score": 2,
+      "label": "强烈不同意"
+    },
+    {
+      "score": 3,
+      "label": "略不同意"
+    },
+    {
+      "score": 4,
+      "label": "既不赞同也不反对"
+    },
+    {
+      "score": 5,
+      "label": "略同意"
+    },
+    {
+      "score": 6,
+      "label": "强烈同意"
+    },
+    {
+      "score": 7,
+      "label": "非常强烈地同意"
+    }
+  ],
+  "instruction": {
+    "file": {
+      "path": "server-version/backend/src/modules/scale/instruments/mspss12_zh_cn_research/1.0.0/source.json",
+      "gitBlob": "950346d27b105a295184e9e7f34f8eb1fa09b9dc",
+      "sha256": "016e6a0f24d900d8dff12e75062ab6681714a9adcc77950933d9543441e1a90d"
+    },
+    "field": "instruction",
+    "value": {
+      "schemaVersion": 1,
+      "language": "zh-CN",
+      "version": "1.0.0",
+      "text": "下面有12句话，涉及你感受到的来自家人、朋友和对你特别重要的人的支持。请根据自己现在的真实感受，分别判断同意程度。1表示非常强烈地不同意，7表示非常强烈地同意。没有正确或错误的答案，“特别重要的人”不限定为伴侣，可以是你认为重要的任何人。",
+      "source": "按Zimet等1988原版12题和Shirley Ryan AbilityLab英语施测表独立编写的简体中文指导语；不复制现有中文5级工具说明。"
+    },
+    "status": "固定源顶层已有独立指导语，不需要另造；“重要他人”不限定伴侣。"
+  },
+  "sourceEvidence": [
+    {
+      "url": "https://www.sralab.org/sites/default/files/2017-07/socsupp.pdf",
+      "finding": "原英文12题及七级锚、三个支持来源。"
+    }
+  ],
+  "ordinaryRevisions": [
+    {
+      "path": "docs/scale-instruments/research-drafts/mspss12/1.0.0/README.md",
+      "old": "三种支持来源：重要他人题1/2/5/10、家庭3/4/8/11、朋友6/7/9/12，四维全部取均分1–7。",
+      "new": "三种支持来源：重要他人题1/2/5/10、家庭3/4/8/11、朋友6/7/9/12；三个维度及整体均分均为1–7。",
+      "reason": "纠正三维加总分被误称四维，源JSON评分结构正确。"
+    }
+  ],
+  "manualPending": [
+    "第1/8/12题译法及其余题目待人工译审、认知访谈及目标人群验证；修改题意或评分须按版本协调。",
+    "保留原始权利/分发状态和管理员事项，不伪造完成；不把人工状态变为新自动门禁。"
+  ],
+  "notExecuted": [
+    "未运行golden、评分、系统、DB、CI、生产；固定历史静态检查不视为本次执行。"
+  ]
+}

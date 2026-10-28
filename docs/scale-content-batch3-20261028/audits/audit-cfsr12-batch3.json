@@ -1,0 +1,254 @@
+{
+  "instrument": "cfsr12_zh_cn_research:1.0.1",
+  "sourceSHA": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "files": [
+    {
+      "path": "docs/scale-instruments/research-drafts/cfsr12/1.0.0/README.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "ddce8905835bb65d238114154dedc6338012ff86",
+      "sha256": "68429d1415c6b6c95eba5479ab66236d64d7bf55ba42ef81d18943bcaa1d3907"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/cfsr12/1.0.0/administration.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "2589b321020b21f36c4023e94a3c6413dbea6d5b",
+      "sha256": "caead253d866dfbad5aa0b47daded2f56e431af72f812198c5fd24e60a793ab4"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/cfsr12/1.0.0/bilingual-content.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "9e28109d0d43b1c211825a7dc8396aca66ee9220",
+      "sha256": "c6aacb21761dc154618d2d49e84830f97b04234fd1416813921ef60efdaba3ac"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/cfsr12/1.0.0/references.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "39e5bcca3e1e681ef9d72535985a7382f753e5a5",
+      "sha256": "1ddff6422188c16c4613ad0872aed28815c6759e506951bee8b5d8f139f725dd"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/cfsr12/1.0.0/report-example.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "e8c5b33fdb484857afac765398d77825d9e0add2",
+      "sha256": "c28485dffa8c9279f4821436e0d9033e1baf7d95625279b8f094e1859665d05c"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/cfsr12/1.0.0/scoring-and-thresholds.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "32f102d512497f0ce7537c3742acc392fb6d7f6e",
+      "sha256": "4a15107e77fb106caf412eec98a52c3dea2230ecad677afb461180def4086f54"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/cfsr12/1.0.0/validation.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "cc4d3be1f3c931dfdabd552ca750c81309436dbd",
+      "sha256": "2540678701d285e73a8d930a193b0c633fa1f230dd4489e70131a8afd334ed45"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/cfsr12/1.0.1/README.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "b9925b149e03f8b2508921aa1dd1050d27f55f29",
+      "sha256": "3f3041d12878527b5bee5abc4f3d30bb2416eef767c8d8a73bb7fb2446d3abeb"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/cfsr12/1.0.1/bilingual-content.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "9d0ecf5798f7cdd6eba888632bfde36d45ac9939",
+      "sha256": "af1d8fb25068f158ca8b0bf83f96f1152e4781ffb511503825a47cf05ddb540a"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/cfsr12/1.0.1/report-example.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "bd4dd76dd182c677d395194bb84bc9045204d755",
+      "sha256": "f713d0f900e45367e897c954289dc8a90d1e2c0ccad653048e97b3195dca85f8"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/cfsr12/1.0.1/report-result.synthetic.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "b2e2b0c5e3cfde9bdbe109f84cc6a611d78b13cb",
+      "sha256": "77c0320dd16eac60b1054ee7a8ffb96ac7820bf0aebe246b1c905d13b3176d64"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/cfsr12/1.0.1/validation.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "4d04c647732064c7017c08e59dc20407a52b0491",
+      "sha256": "d478ae5d002d0f381135bf5f62bb200a093072e5c702c1f98176522431bced58"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/cfsr12_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "6a35ed555a814f43d322b467c60dddb87a4eff7f",
+      "sha256": "a0244209ce6977583e31ddb28e1778bd69d8732ef920637a9f9ec14be8605f73"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/cfsr12_zh_cn_research/1.0.0/instrument.ts",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "0eed070bb879576339c5a71afdf34c0026591fd3",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/cfsr12_zh_cn_research/1.0.0/source.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "c9ad3dd4f193592e422b1448e82d56d9b882b6a7",
+      "sha256": "09337dac6463e43e8840542e301a2885c0637293a0d6c06261aef0932996cce4"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/cfsr12_zh_cn_research/1.0.1/THIRD_PARTY_LICENSE.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "fddd8c4818269169a7111f994c10926ad433476e",
+      "sha256": "b14ea7611d4852b831082a09dfaecf070b7af2005c841c46dd2a26fca7e28287"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/cfsr12_zh_cn_research/1.0.1/instrument.ts",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "0eed070bb879576339c5a71afdf34c0026591fd3",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/cfsr12_zh_cn_research/1.0.1/source.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "8d03c05142d780574ac015eb04ded81404da4c43",
+      "sha256": "7953e7125b692d33721a2dc1ad54ef07c95df781c08ec63e7f1813d9c8b9a796"
+    }
+  ],
+  "originalEvidence": {
+    "url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2020.561731/full",
+    "access": "本次直接读取作者论文Table1及0–3锚点；英文为作者发表呈现，原研究日语施测。"
+  },
+  "items": [
+    {
+      "code": "CFSR_01",
+      "english": "I can stop using a coping strategy that has made the situation worse.",
+      "chinese": "如果一种应对方式让情况变得更糟，我能够停止使用它。",
+      "dimension": "abandonment",
+      "key": "identity",
+      "conclusion": "与作者论文Table 1英文呈现及1.0.1双语记录对应；原研究施测为日语，独立中文尚待译审。"
+    },
+    {
+      "code": "CFSR_02",
+      "english": "I can stop using a failed coping strategy.",
+      "chinese": "如果某种应对方式已经失败，我能够停止使用它。",
+      "dimension": "abandonment",
+      "key": "identity",
+      "conclusion": "与作者论文Table 1英文呈现及1.0.1双语记录对应；原研究施测为日语，独立中文尚待译审。"
+    },
+    {
+      "code": "CFSR_03",
+      "english": "I do not repeat using a coping strategy that made the situation worse.",
+      "chinese": "我不会反复使用曾让情况变得更糟的应对方式。",
+      "dimension": "abandonment",
+      "key": "identity",
+      "conclusion": "与作者论文Table 1英文呈现及1.0.1双语记录对应；原研究施测为日语，独立中文尚待译审。"
+    },
+    {
+      "code": "CFSR_04",
+      "english": "I can stop using a coping strategy that has been ineffective.",
+      "chinese": "如果一种应对方式没有效果，我能够停止使用它。",
+      "dimension": "abandonment",
+      "key": "identity",
+      "conclusion": "与作者论文Table 1英文呈现及1.0.1双语记录对应；原研究施测为日语，独立中文尚待译审。"
+    },
+    {
+      "code": "CFSR_05",
+      "english": "If the situation has not improved, I consider a different coping strategy.",
+      "chinese": "如果情况没有改善，我会考虑换一种应对方式。",
+      "dimension": "recoping",
+      "key": "identity",
+      "conclusion": "与作者论文Table 1英文呈现及1.0.1双语记录对应；原研究施测为日语，独立中文尚待译审。"
+    },
+    {
+      "code": "CFSR_06",
+      "english": "If I did not cope well, I use an alternative coping strategy.",
+      "chinese": "如果之前应对得不好，我会使用另一种应对方式。",
+      "dimension": "recoping",
+      "key": "identity",
+      "conclusion": "与作者论文Table 1英文呈现及1.0.1双语记录对应；原研究施测为日语，独立中文尚待译审。"
+    },
+    {
+      "code": "CFSR_07",
+      "english": "Even if the stressful situation has worsened, I can cope by using another strategy.",
+      "chinese": "即使压力情境变得更糟，我也能换一种方式来应对。",
+      "dimension": "recoping",
+      "key": "identity",
+      "conclusion": "与作者论文Table 1英文呈现及1.0.1双语记录对应；原研究施测为日语，独立中文尚待译审。"
+    },
+    {
+      "code": "CFSR_08",
+      "english": "Even if I fail to cope with stress, I can come up with a new coping strategy.",
+      "chinese": "即使没能应对好压力，我也能够想出新的应对办法。",
+      "dimension": "recoping",
+      "key": "identity",
+      "conclusion": "与作者论文Table 1英文呈现及1.0.1双语记录对应；原研究施测为日语，独立中文尚待译审。"
+    },
+    {
+      "code": "CFSR_09",
+      "english": "I know which coping strategies are effective and which strategies are ineffective.",
+      "chinese": "我知道哪些应对方式有效，哪些没有效果。",
+      "dimension": "metacoping",
+      "key": "identity",
+      "conclusion": "与作者论文Table 1英文呈现及1.0.1双语记录对应；原研究施测为日语，独立中文尚待译审。"
+    },
+    {
+      "code": "CFSR_10",
+      "english": "I know if a coping strategy has been successful or unsuccessful.",
+      "chinese": "我能判断一种应对方式是否成功。",
+      "dimension": "metacoping",
+      "key": "identity",
+      "conclusion": "与作者论文Table 1英文呈现及1.0.1双语记录对应；原研究施测为日语，独立中文尚待译审。"
+    },
+    {
+      "code": "CFSR_11",
+      "english": "I cope with stress by establishing clear objectives.",
+      "chinese": "我通过确立清晰的目标来应对压力。",
+      "dimension": "metacoping",
+      "key": "identity",
+      "conclusion": "与作者论文Table 1英文呈现及1.0.1双语记录对应；原研究施测为日语，独立中文尚待译审。"
+    },
+    {
+      "code": "CFSR_12",
+      "english": "I can grasp if a coping strategy that I have used has been working well.",
+      "chinese": "我能够判断自己用过的应对方式是否起了作用。",
+      "dimension": "metacoping",
+      "key": "identity",
+      "conclusion": "与作者论文Table 1英文呈现及1.0.1双语记录对应；原研究施测为日语，独立中文尚待译审。"
+    }
+  ],
+  "threePartConclusions": {
+    "content": "12题按论文Table1分组、四点0–3锚点对应，所有题正向；1.0.1第6及11题恢复原文意，保留1.0.0历史。",
+    "scoring": "三维01–04/05–08/09–12各4题等权求和0–12，无反向、无总分；论文表列0–16与四题每题0–3不一致，0–12为明确算术范围，非掩盖原表冲突。每维完整与整体报告不足不解释为项目策略；无常模/阈值。",
+    "report": "report1.0.2、中文成人SELF/student技术角色；高分更认同对应自述倾向，非实际能力或成效。三段温和解释与具体步骤可沿用，不创造分档。"
+  },
+  "instruction": {
+    "source": {
+      "path": "docs/scale-instruments/research-drafts/cfsr12/1.0.0/administration.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "2589b321020b21f36c4023e94a3c6413dbea6d5b",
+      "sha256": "caead253d866dfbad5aa0b47daded2f56e431af72f812198c5fd24e60a793ab4"
+    },
+    "pointer": "首段",
+    "text": "请想一想，你平常遇到有压力的事情时，是否会有下列做法。对每个说法选择一个与你通常情况相符的程度。没有正确答案；你可以按照真实体验回答。",
+    "note": "已存在1.0.0平台指导语；1.0.1题本未嵌入，独立字段可绑定，四个选项由现有响应集呈现。"
+  },
+  "ordinaryEdits": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/cfsr12_zh_cn_research/1.0.1/source.json",
+      "jsonPointer": "/instruction",
+      "old": "不存在",
+      "new": {
+        "schemaVersion": 1,
+        "text": "请想一想，你平常遇到有压力的事情时，是否会有下列做法。对每个说法选择一个与你通常情况相符的程度。没有正确答案；你可以按照真实体验回答。",
+        "language": "zh-CN",
+        "version": "1.0.0",
+        "source": "docs/scale-instruments/research-drafts/cfsr12/1.0.0/administration.md 首段 @ b92c69aefa2472775fa7ee86b9c208366886c908；项目中文工作指导语"
+      },
+      "reason": "绑定既有项目指导语，不改变题文及计分。"
+    }
+  ],
+  "humanItems": [
+    "中文专家审校、认知访谈与目标人群效度待完成；已发表其他中文版本不自动适用于本稿。",
+    "论文0–16与0–3×4数学冲突保留原据；任何算法、锚点或题义实质调整需协调版本。"
+  ],
+  "notExecuted": [
+    "未修改仓库/分支、系统、DB/CI；未执行测试或新科研版权调查。"
+  ]
+}

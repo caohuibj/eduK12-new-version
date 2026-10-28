@@ -1,0 +1,32 @@
+{
+  "scope": "only newly prepared content identities; existing registry readiness, no independent golden replay",
+  "cases": [
+    {
+      "fullName": "apq42_parent_global_zh_cn_research:1.0.1 source content contract",
+      "status": "failed",
+      "error": "TypeError: Cannot read properties of undefined (reading 'executable')\n    at assert (/workspace/eduK12-new-version/docs/scale-content-batch3-20261028/check-failed-only.ts:36:29)\n    at Object.<anonymous> (/workspace/eduK12-new-version/docs/scale-content-batch3-20261028/check-failed-only.ts:74:34)\n    at Module._compile (node:internal/modules/cjs/loader:1929:14)\n    at Object.transformer (/workspace/eduK12-new-version/server-version/backend/node_modules/tsx/dist/register-C557imBs.cjs:9:3619)\n    at Module.load (node:internal/modules/cjs/loader:1651:32)\n    at Module._load (node:internal/modules/cjs/loader:1443:12)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)\n    at loadCJSModuleWithModuleLoad (node:internal/modules/esm/translators:372:15)\n    at ModuleWrap.<anonymous> (node:internal/modules/esm/translators:244:9)\n    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)"
+    },
+    {
+      "fullName": "dbt_wccl59_zh_tw_official_research:1.0.1 source content contract",
+      "status": "passed",
+      "reusedScoringEvidence": "refinements-content.json failed case: complete validator traversed all unchanged golden fixtures with only audience errors; source, fixture and measurement inputs proven unchanged",
+      "issues": [],
+      "originalMeasurementHash": "002282f2faf418f1ce20092005b1ff100fa3d9395e3b272c5ca9ebb86086c62a",
+      "preparedMeasurementHash": "192d440d78b73a739da6b23ef5465eec727b2eb3164b299f654c5f9702646a8e",
+      "goldenCasesExecutedNow": [],
+      "reportVersion": "1.0.1"
+    },
+    {
+      "fullName": "spane12_zh_cn_research:1.0.1 source content contract",
+      "status": "passed",
+      "reusedScoringEvidence": "refinements-content.json failed case: complete validator traversed all unchanged golden fixtures with only audience errors; source, fixture and measurement inputs proven unchanged",
+      "issues": [],
+      "originalMeasurementHash": "9fd4f215dbbeca321dbab2dbef43d98848c6f9cd4b07977d4817560f2d260e33",
+      "preparedMeasurementHash": "9fd4f215dbbeca321dbab2dbef43d98848c6f9cd4b07977d4817560f2d260e33",
+      "goldenCasesExecutedNow": [],
+      "reportVersion": "1.0.1"
+    }
+  ],
+  "passed": 2,
+  "failed": 1
+}

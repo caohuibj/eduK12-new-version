@@ -1,0 +1,370 @@
+{
+  "instrument": "chime_s24_zh_cn_research:1.0.1",
+  "sourceSHA": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "files": [
+    {
+      "path": "docs/scale-instruments/research-drafts/chime_s24/1.0.0/README.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "75e761860c9f37acec13e14e0ddd8022a93422f6",
+      "sha256": "9962893e5e61be19cfe350f843769000f42337a17dae92720a8430f126e358fc"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/chime_s24/1.0.0/administration-sidecar.prepared.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "4e1a3b19346c4a2843f87e24b2acb27dee567f12",
+      "sha256": "73573d3ea3814ef011cdcb330db5a9587c670f3b7f0ea0230eafa57a368ba600"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/chime_s24/1.0.0/administration.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "7342857eb400b1a8a934fdb9bdb4f87ce32f1d58",
+      "sha256": "27ad4ffc71588814a2d240307632c12173bd242799dba8e95ad87c04401426e0"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/chime_s24/1.0.0/bilingual-content.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "db4f50063a4a283be3b5d1b1dd1b38e595ac3f49",
+      "sha256": "f108684ff20ecfe2ad630185927860ed3aff7ac3f6b2909ace51fead552a74b8"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/chime_s24/1.0.0/parameter-plan.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "aae25319eaf8b0a764334269cee602587bd664c4",
+      "sha256": "af940fd95c98b914fc92f278b28b2d8e90e2df67fecf4c32e5eb4e5885f032f0"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/chime_s24/1.0.0/references.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "61449a0df97fccd378309fa90ebdb6b898f11d88",
+      "sha256": "ce153ea792dd70d64ce14c202cfc8a4c859b1e0fd3bb067e64dc10e6f27539a7"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/chime_s24/1.0.0/report-example.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "5c0eae84cc40a4b101d3890f1da45fb0b91a8993",
+      "sha256": "2db24df5cc0dd97a19d19c9f01813171b12cdda1e5374f805eff6750158715b1"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/chime_s24/1.0.0/report-results.synthetic.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "3ecb76e97c0b8de6e77719024b8b8ef27259e1dd",
+      "sha256": "11163bf4c152f5594fb8ff54c9eff015aa0005b15d748a5d290eb0d08691bc61"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/chime_s24/1.0.0/scoring-and-parameters.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "88726a0badeab947e813f3753cd04d054c30c760",
+      "sha256": "64125a0a8604dc9b382121fc426615253153ca86e2571182f144d3c0a3f108db"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/chime_s24/1.0.0/validation.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "b7461a3ebb92c0c1e61f3e5a4fe9b4e4fd534107",
+      "sha256": "ba40d7f688180055afa7c82cd66f18c88648085d32f859c0da19c903a326b084"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/chime_s24/1.0.0/validation.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "693609b66497e6df39fd38b5a972a440922d7ba6",
+      "sha256": "58bdaa4d1c7e98df7a1d8ea4077c0b688350bf92555922c960aae7b8227f4c79"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/chime_s24/1.0.1/CHANGES.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "426437b34f6977e35ea923109685a5fd50db398f",
+      "sha256": "a2ac4662d16937393cde95fb70dc40bd06382cca41536c6b6ba4b065f707da3e"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/chime_s24/1.0.1/report-result.mixed.synthetic.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "af97d14d53a2607de0f32dc55c3591ab41f4a868",
+      "sha256": "3fbf6e71fbf4da68d890b7b9946ab4bb1b8c7a9cafe2effe265d18ebe8b8728e"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/chime_s24/1.0.1/validation.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "36b88db8916aca5251dea899773e9bedcac61eb1",
+      "sha256": "917fc8c57c2d05df51a00ab38202f20bcb23d5b629c23ec0e9205be2bf1745e3"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/chime_s24_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "95679b6a6a0739aafc80d9fc5b0faabbbd32ecbd",
+      "sha256": "7bbf33ae85aa6623ef5880ecf5dae35f6b1976e60e545567331f0534226a9e77"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/chime_s24_zh_cn_research/1.0.0/instrument.ts",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/chime_s24_zh_cn_research/1.0.0/source.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "6b19a6a1c67bc6103c63d4b6ef90c9f66cc72c46",
+      "sha256": "6917748d9ac9a5c32f0deebd4c8793f2eda5b976269ac14cecaae1afadc0eb64"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/chime_s24_zh_cn_research/1.0.1/THIRD_PARTY_LICENSE.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "95679b6a6a0739aafc80d9fc5b0faabbbd32ecbd",
+      "sha256": "7bbf33ae85aa6623ef5880ecf5dae35f6b1976e60e545567331f0534226a9e77"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/chime_s24_zh_cn_research/1.0.1/instrument.ts",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/chime_s24_zh_cn_research/1.0.1/source.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "530fbc0b622b42e4da3ca702180c4922d57cf4c6",
+      "sha256": "1c5de416222b8ae41574e28239959220affaabb51ddfbec939aaac9ba33e2bfe"
+    }
+  ],
+  "originalEvidence": {
+    "url": "https://media.springernature.com/original/springer-static/esm/art%3A10.1007%2Fs12671-024-02302-z/MediaObjects/12671_2024_2302_MOESM1_ESM.docx",
+    "recordedSourceSHA256": "cb5093b7aeab12a5262cc2e54dff27b8af53ccc1816458849ff91ee5582c231e",
+    "access": "固定研究材料记录S1英文原文及DOCX SHA256；本次未取得并重读原DOCX，逐题对照依固定双语记录。"
+  },
+  "items": [
+    {
+      "code": "CHIMES_01",
+      "english": "I notice details in nature, such as colors, shapes, and textures.",
+      "chinese": "我会注意到大自然中的细节，比如颜色、形状和质地。",
+      "facet": "external_awareness",
+      "reverse": false,
+      "conclusion": "固定S1双语记录与运行源一致；本次未重读原DOCX字节，原文一致性基于既有固定来源记录。"
+    },
+    {
+      "code": "CHIMES_02",
+      "english": "I pay attention to sensations, such as the wind in my hair or sunshine on my face.",
+      "chinese": "我会留意身体感受到的事物，比如风吹过头发或阳光照在脸上。",
+      "facet": "external_awareness",
+      "reverse": false,
+      "conclusion": "固定S1双语记录与运行源一致；本次未重读原DOCX字节，原文一致性基于既有固定来源记录。"
+    },
+    {
+      "code": "CHIMES_03",
+      "english": "I notice sounds in my environment, such as birds chirping or cars passing.",
+      "chinese": "我会注意到周围环境中的声音，比如鸟叫声或汽车驶过的声音。",
+      "facet": "external_awareness",
+      "reverse": false,
+      "conclusion": "固定S1双语记录与运行源一致；本次未重读原DOCX字节，原文一致性基于既有固定来源记录。"
+    },
+    {
+      "code": "CHIMES_04",
+      "english": "When my mood changes, I notice it right away.",
+      "chinese": "当我的心情发生变化时，我会马上注意到。",
+      "facet": "internal_awareness",
+      "reverse": false,
+      "conclusion": "固定S1双语记录与运行源一致；本次未重读原DOCX字节，原文一致性基于既有固定来源记录。"
+    },
+    {
+      "code": "CHIMES_05",
+      "english": "When I talk to other people, I notice what feelings I am experiencing.",
+      "chinese": "当我和别人交谈时，我会注意到自己正在体验什么感受。",
+      "facet": "internal_awareness",
+      "reverse": false,
+      "conclusion": "固定S1双语记录与运行源一致；本次未重读原DOCX字节，原文一致性基于既有固定来源记录。"
+    },
+    {
+      "code": "CHIMES_06",
+      "english": "I am usually aware of how I am feeling at any given time.",
+      "chinese": "通常，无论什么时候，我都能觉察到自己当时的感受。",
+      "facet": "internal_awareness",
+      "reverse": false,
+      "conclusion": "固定S1双语记录与运行源一致；本次未重读原DOCX字节，原文一致性基于既有固定来源记录。"
+    },
+    {
+      "code": "CHIMES_07",
+      "english": "It is easy for me to stay focused on what I am doing.",
+      "chinese": "我很容易把注意力保持在自己正在做的事情上。",
+      "facet": "acting_awareness",
+      "reverse": false,
+      "conclusion": "固定S1双语记录与运行源一致；本次未重读原DOCX字节，原文一致性基于既有固定来源记录。"
+    },
+    {
+      "code": "CHIMES_08",
+      "english": "In everyday life, I get distracted by many memories, images, or daydreams. (R)",
+      "chinese": "在日常生活中，许多回忆、画面或白日梦会让我分心。",
+      "facet": "acting_awareness",
+      "reverse": true,
+      "conclusion": "固定S1双语记录与运行源一致；本次未重读原DOCX字节，原文一致性基于既有固定来源记录。"
+    },
+    {
+      "code": "CHIMES_09",
+      "english": "When I read, I have to reread paragraphs because I was thinking of something else. (R)",
+      "chinese": "阅读时，我会因为刚才想着别的事情，而不得不重新读一遍段落。",
+      "facet": "acting_awareness",
+      "reverse": true,
+      "conclusion": "固定S1双语记录与运行源一致；本次未重读原DOCX字节，原文一致性基于既有固定来源记录。"
+    },
+    {
+      "code": "CHIMES_10",
+      "english": "In everyday life, I realize my thoughts are not always facts.",
+      "chinese": "在日常生活中，我会意识到自己的想法并不总是事实。",
+      "facet": "thoughts_relativity",
+      "reverse": false,
+      "conclusion": "固定S1双语记录与运行源一致；本次未重读原DOCX字节，原文一致性基于既有固定来源记录。"
+    },
+    {
+      "code": "CHIMES_11",
+      "english": "In everyday life, I am aware that my view on things is not always based on facts.",
+      "chinese": "在日常生活中，我能觉察到自己对事物的看法并不总是基于事实。",
+      "facet": "thoughts_relativity",
+      "reverse": false,
+      "conclusion": "固定S1双语记录与运行源一致；本次未重读原DOCX字节，原文一致性基于既有固定来源记录。"
+    },
+    {
+      "code": "CHIMES_12",
+      "english": "I am aware that even my strongly held opinions may change over time.",
+      "chinese": "我知道，即使是自己坚信的观点，也可能随时间改变。",
+      "facet": "thoughts_relativity",
+      "reverse": false,
+      "conclusion": "固定S1双语记录与运行源一致；本次未重读原DOCX字节，原文一致性基于既有固定来源记录。"
+    },
+    {
+      "code": "CHIMES_13",
+      "english": "I am able to smile when I notice myself seeing things as more complicated than they actually are.",
+      "chinese": "当我注意到自己把事情看得比实际更复杂时，我能会心一笑。",
+      "facet": "insightful_understanding",
+      "reverse": false,
+      "conclusion": "固定S1双语记录与运行源一致；本次未重读原DOCX字节，原文一致性基于既有固定来源记录。"
+    },
+    {
+      "code": "CHIMES_14",
+      "english": "When I have needlessly given myself a hard time, I can see it with humor.",
+      "chinese": "当我无端为难自己时，我能以幽默的眼光看待这件事。",
+      "facet": "insightful_understanding",
+      "reverse": false,
+      "conclusion": "固定S1双语记录与运行源一致；本次未重读原DOCX字节，原文一致性基于既有固定来源记录。"
+    },
+    {
+      "code": "CHIMES_15",
+      "english": "I am able to smile to myself when I notice I have made a big deal out of a small problem.",
+      "chinese": "当我注意到自己把小问题看得过于严重时，我能对自己笑一笑。",
+      "facet": "insightful_understanding",
+      "reverse": false,
+      "conclusion": "固定S1双语记录与运行源一致；本次未重读原DOCX字节，原文一致性基于既有固定来源记录。"
+    },
+    {
+      "code": "CHIMES_16",
+      "english": "In the ups and downs of life, I am kind to myself.",
+      "chinese": "面对生活中的起起落落，我会善待自己。",
+      "facet": "nonjudgmental_acceptance",
+      "reverse": false,
+      "conclusion": "固定S1双语记录与运行源一致；本次未重读原DOCX字节，原文一致性基于既有固定来源记录。"
+    },
+    {
+      "code": "CHIMES_17",
+      "english": "I see my mistakes and difficulties without judging myself.",
+      "chinese": "我能看见自己的错误和困难，而不评判自己。",
+      "facet": "nonjudgmental_acceptance",
+      "reverse": false,
+      "conclusion": "固定S1双语记录与运行源一致；本次未重读原DOCX字节，原文一致性基于既有固定来源记录。"
+    },
+    {
+      "code": "CHIMES_18",
+      "english": "Even when I make a big mistake, I treat myself with kindness and understanding.",
+      "chinese": "即使犯了大错，我仍会以善意和理解对待自己。",
+      "facet": "nonjudgmental_acceptance",
+      "reverse": false,
+      "conclusion": "固定S1双语记录与运行源一致；本次未重读原DOCX字节，原文一致性基于既有固定来源记录。"
+    },
+    {
+      "code": "CHIMES_19",
+      "english": "When caught in thoughts and emotions, I am able to “step back” and quickly notice the thought or image without getting taken over by it.",
+      "chinese": "当我陷入想法和情绪时，我能“退后一步”，迅速觉察到那个想法或画面，而不被它支配。",
+      "facet": "nonreactive_decentering",
+      "reverse": false,
+      "conclusion": "固定S1双语记录与运行源一致；本次未重读原DOCX字节，原文一致性基于既有固定来源记录。"
+    },
+    {
+      "code": "CHIMES_20",
+      "english": "I am able to notice my thoughts and feelings without getting tangled up in them.",
+      "chinese": "我能注意到自己的想法和感受，而不被它们缠住。",
+      "facet": "nonreactive_decentering",
+      "reverse": false,
+      "conclusion": "固定S1双语记录与运行源一致；本次未重读原DOCX字节，原文一致性基于既有固定来源记录。"
+    },
+    {
+      "code": "CHIMES_21",
+      "english": "I notice my thoughts and feelings and can also “step back” and observe them from a distance.",
+      "chinese": "我注意到自己的想法和感受，也能“退后一步”，从一定距离观察它们。",
+      "facet": "nonreactive_decentering",
+      "reverse": false,
+      "conclusion": "固定S1双语记录与运行源一致；本次未重读原DOCX字节，原文一致性基于既有固定来源记录。"
+    },
+    {
+      "code": "CHIMES_22",
+      "english": "I try to distract myself when I feel unpleasant emotions. (R)",
+      "chinese": "当我感到不愉快的情绪时，我会试着分散自己的注意力。",
+      "facet": "openness",
+      "reverse": true,
+      "conclusion": "固定S1双语记录与运行源一致；本次未重读原DOCX字节，原文一致性基于既有固定来源记录。"
+    },
+    {
+      "code": "CHIMES_23",
+      "english": "I do not like it when I am angry or fearful and I try to get rid of these feelings. (R)",
+      "chinese": "我不喜欢自己生气或害怕时的状态，并会努力摆脱这些感受。",
+      "facet": "openness",
+      "reverse": true,
+      "conclusion": "固定S1双语记录与运行源一致；本次未重读原DOCX字节，原文一致性基于既有固定来源记录。"
+    },
+    {
+      "code": "CHIMES_24",
+      "english": "When I am in pain, I try to avoid this sensation as much as possible. (R)",
+      "chinese": "当我感到疼痛时，我会尽可能避开这种感觉。",
+      "facet": "openness",
+      "reverse": true,
+      "conclusion": "固定S1双语记录与运行源一致；本次未重读原DOCX字节，原文一致性基于既有固定来源记录。"
+    }
+  ],
+  "threePartConclusions": {
+    "content": "24题与固定S1双语记录一致，六点频率锚点及08/09/22/23/24反向均一致；中文独立译稿未经专家译审。",
+    "scoring": "八维每组3题反向后均值、总分24题均值，范围均1–6，反向7−x；完整维分母3、总分24；complete_required为平台规则。1.0.1修正openness反向方向说明并保留1.0.0历史，无常模分档。",
+    "report": "report1.0.0中文成人自评，开放维明确反向不等于忍受伤害，生活反思建议可沿用。acting_awareness计分说明旧通用句可能把反向分误读为分心更常，建议仅明确方向。"
+  },
+  "instruction": {
+    "text": "请阅读下面的每一项陈述，从以下选项中选择最适合你的回答：1＝几乎从不，2＝很少，3＝较少，4＝较常，5＝经常，6＝几乎总是。",
+    "source": {
+      "path": "docs/scale-instruments/research-drafts/chime_s24/1.0.0/bilingual-content.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "db4f50063a4a283be3b5d1b1dd1b38e595ac3f49",
+      "sha256": "f108684ff20ecfe2ad630185927860ed3aff7ac3f6b2909ace51fead552a74b8"
+    },
+    "pointer": "/administrationInstructionZh",
+    "note": "已有工作指导语尚未绑定source，1.0.1可按现行schema绑定。"
+  },
+  "ordinaryEdits": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/chime_s24_zh_cn_research/1.0.1/source.json",
+      "jsonPointer": "/instruction",
+      "old": "不存在",
+      "new": {
+        "schemaVersion": 1,
+        "text": "请阅读下面的每一项陈述，从以下选项中选择最适合你的回答：1＝几乎从不，2＝很少，3＝较少，4＝较常，5＝经常，6＝几乎总是。",
+        "language": "zh-CN",
+        "version": "1.0.0",
+        "source": "docs/scale-instruments/research-drafts/chime_s24/1.0.0/bilingual-content.json#/administrationInstructionZh @ b92c69aefa2472775fa7ee86b9c208366886c908"
+      },
+      "reason": "绑定已准备原指导语项目工作译文。"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/chime_s24_zh_cn_research/1.0.1/source.json",
+      "jsonPointer": "/executable/definition/scoring/scores/2/description",
+      "old": "更多表示本次自述相关体验较常发生；不作人群高低或临床判断。",
+      "new": "反向题转换后，较高分表示更认同专注当前活动、较少受回忆或其他念头分心的描述；不作人群高低或临床判断。",
+      "reason": "避免将反向分数误读为分心更多；保持题目、算法与人工状态，依版本轴处理。"
+    }
+  ],
+  "humanItems": [
+    "中文独立译审和目标人群验证待完成；原DOCX未本次重读。",
+    "实质改变题义、锚点或算法须协调版本。"
+  ],
+  "notExecuted": [
+    "未修改仓库、分支、系统、DB/CI，未执行测试或新科研版权调查。"
+  ]
+}

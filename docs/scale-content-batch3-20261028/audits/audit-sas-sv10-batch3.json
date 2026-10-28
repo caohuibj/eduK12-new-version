@@ -1,0 +1,217 @@
+{
+  "identity": "sas_sv10_zh_cn_research:1.0.0",
+  "sourceCommit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "sourceFiles": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/sas_sv10_zh_cn_research/1.0.0/source.json",
+      "gitBlob": "141d9107370508cd2ff46ca59d5409dc70b97438",
+      "sha256": "db270c80d2a1086f0adce5ef0005c6acad294aeb396ad05f9d70987e251fe0a1"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/sas_sv10_zh_cn_research/1.0.0/instrument.ts",
+      "gitBlob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/sas_sv10/1.0.0/README.md",
+      "gitBlob": "c039ecda05824c731fa527c971c17b738b57f75b",
+      "sha256": "b88b5fd0b43a1b60324144765cf043f4f1756239d818a6056c8ee79f16383d9f"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/sas_sv10/1.0.0/bilingual-content.json",
+      "gitBlob": "df14827aa541c342e1af9adb04bd1a042cb9ec48",
+      "sha256": "2e22856c6a777a92e0fea7823b8beca7be2d655e79728c2d84c3172f9e7306be"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/sas_sv10/1.0.0/reviewed-source-pack.json",
+      "gitBlob": "bcc6f4763c77ee170aab62b32560e3abd466d3a2",
+      "sha256": "028c0b35266090edc7e56c78a64da8adcf92411cd7d314f06b3065e8458ff8b3"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/sas_sv10/1.0.0/external-reference-dossier.json",
+      "gitBlob": "f460ca100ef735fb91dbb718a4ba9d584afb618d",
+      "sha256": "b880b3a6a5ae5a4fa04442969f9733c21b85a5e379cbe1a2d58e0f98f11b0af6"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/sas_sv10/1.0.0/references.md",
+      "gitBlob": "1139728e22cd56758ce3e5fce7f41fab883681e8",
+      "sha256": "00d8c7c913d8493e5d3b7269af84216668dd4906e724788635f3ba2a0540a4bc"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/sas_sv10/1.0.0/report-example.md",
+      "gitBlob": "dd192ae7310c9eef4bdbef4929b9208ce91527f5",
+      "sha256": "d759c3623bb33efbab90ae8979c9a407ad99068588d51728816db78af5a9eddb"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/sas_sv10/1.0.0/scoring-and-thresholds.md",
+      "gitBlob": "798a334d285adf0a737fc2d9adaf2c32056b0f43",
+      "sha256": "7b013e2c4daed9e151da1c7d7c16023b5d918ab15a1851e467835ece6de084a2"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/sas_sv10/1.0.0/synthetic-report-example.json",
+      "gitBlob": "b8de9ae2a056d877d44535019cdb4d658b6d9d5d",
+      "sha256": "88c1c9effe15548e851ee7f165b8214e24497744ae8a9584b3cf71fd3acce5cd"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/sas_sv10/1.0.0/local-validation.json",
+      "gitBlob": "cc119d7dc5dfe011559b11a96dc0324f6e24df0f",
+      "sha256": "e808a44e1714f2243df68e4069312f1149304c3f2da47ec543734645cf8a7f73"
+    }
+  ],
+  "threePartConclusions": {
+    "content": "2013英文附录十题与固定双语/运行时一一对应，项目中文工作稿尚未验证；第8题保留Twitter/Facebook原例有时代与文化限制，不能默换平台冒称原版。六点同意度1–6，无固定回忆天数。",
+    "scoring": "十题均正向、等权求和10–60，无33题长版六因素；缺一不算、不插补为项目规则。韩国初二样本男31、女33的ROC值仅外部档案，不能迁移中文八年级、自动按性别分支或诊断。",
+    "report": "1.0.0以生活习惯及小实验讨论，非诊断、处分或排名；提醒原平台例子不适用不代表无困扰，适合既定八年级研究。现有指导语使用“符合”而选项为同意，且第二句为来源元信息，可在独立绑定时作明确说明。"
+  },
+  "items": [
+    {
+      "number": 1,
+      "itemCode": "SAS_SV10_01",
+      "en": "Missing planned work due to smartphone use",
+      "zh": "因为使用智能手机而耽误原先计划好的事情。",
+      "key": "positive",
+      "assessment": "固定英文、中文与运行时对应；中文译审待完成。"
+    },
+    {
+      "number": 2,
+      "itemCode": "SAS_SV10_02",
+      "en": "Having a hard time concentrating in class, while doing assignments, or while working due to smartphone use",
+      "zh": "因为使用智能手机，在上课、做作业或工作时很难集中注意力。",
+      "key": "positive",
+      "assessment": "固定英文、中文与运行时对应；中文译审待完成。"
+    },
+    {
+      "number": 3,
+      "itemCode": "SAS_SV10_03",
+      "en": "Feeling pain in the wrists or at the back of the neck while using a smartphone",
+      "zh": "使用智能手机时，手腕或后颈会疼痛。",
+      "key": "positive",
+      "assessment": "固定英文、中文与运行时对应；中文译审待完成。"
+    },
+    {
+      "number": 4,
+      "itemCode": "SAS_SV10_04",
+      "en": "Won’t be able to stand not having a smartphone",
+      "zh": "我会无法忍受没有智能手机。",
+      "key": "positive",
+      "assessment": "固定英文、中文与运行时对应；中文译审待完成。"
+    },
+    {
+      "number": 5,
+      "itemCode": "SAS_SV10_05",
+      "en": "Feeling impatient and fretful when I am not holding my smartphone",
+      "zh": "手里没有拿着智能手机时，我会感到不耐烦、烦躁不安。",
+      "key": "positive",
+      "assessment": "固定英文、中文与运行时对应；中文译审待完成。"
+    },
+    {
+      "number": 6,
+      "itemCode": "SAS_SV10_06",
+      "en": "Having my smartphone in my mind even when I am not using it",
+      "zh": "即使没有在使用智能手机，我也会想着它。",
+      "key": "positive",
+      "assessment": "固定英文、中文与运行时对应；中文译审待完成。"
+    },
+    {
+      "number": 7,
+      "itemCode": "SAS_SV10_07",
+      "en": "I will never give up using my smartphone even when my daily life is already greatly affected by it.",
+      "zh": "即使日常生活已经受到很大影响，我也绝不会放弃使用智能手机。",
+      "key": "positive",
+      "assessment": "固定英文、中文与运行时对应；中文译审待完成。"
+    },
+    {
+      "number": 8,
+      "itemCode": "SAS_SV10_08",
+      "en": "Constantly checking my smartphone so as not to miss conversations between other people on Twitter or Facebook",
+      "zh": "我不停地查看智能手机，以免错过其他人在 Twitter 或 Facebook 上的对话。",
+      "key": "positive",
+      "assessment": "固定英文、中文与运行时对应；中文译审待完成。"
+    },
+    {
+      "number": 9,
+      "itemCode": "SAS_SV10_09",
+      "en": "Using my smartphone longer than I had intended",
+      "zh": "我使用智能手机的时间比原先打算的更长。",
+      "key": "positive",
+      "assessment": "固定英文、中文与运行时对应；中文译审待完成。"
+    },
+    {
+      "number": 10,
+      "itemCode": "SAS_SV10_10",
+      "en": "The people around me tell me that I use my smartphone too much.",
+      "zh": "身边的人说我使用智能手机太多了。",
+      "key": "positive",
+      "assessment": "固定英文、中文与运行时对应；中文译审待完成。"
+    }
+  ],
+  "anchors": [
+    {
+      "en": "Strongly disagree",
+      "zh": "非常不同意",
+      "score": 1
+    },
+    {
+      "en": "Disagree",
+      "zh": "不同意",
+      "score": 2
+    },
+    {
+      "en": "Weakly disagree",
+      "zh": "有些不同意",
+      "score": 3
+    },
+    {
+      "en": "Weakly agree",
+      "zh": "有些同意",
+      "score": 4
+    },
+    {
+      "en": "Agree",
+      "zh": "同意",
+      "score": 5
+    },
+    {
+      "en": "Strongly agree",
+      "zh": "非常同意",
+      "score": 6
+    }
+  ],
+  "instruction": {
+    "text": "请按这些说法与你实际情况的符合程度作答。原题本没有固定回顾天数，不另加“过去两周”等时间窗。",
+    "sources": [
+      {
+        "file": {
+          "path": "docs/scale-instruments/research-drafts/sas_sv10/1.0.0/bilingual-content.json",
+          "gitBlob": "df14827aa541c342e1af9adb04bd1a042cb9ec48",
+          "sha256": "2e22856c6a777a92e0fea7823b8beca7be2d655e79728c2d84c3172f9e7306be"
+        },
+        "field": "instructions"
+      },
+      {
+        "file": {
+          "path": "docs/scale-instruments/research-drafts/sas_sv10/1.0.0/reviewed-source-pack.json",
+          "gitBlob": "bcc6f4763c77ee170aab62b32560e3abd466d3a2",
+          "sha256": "028c0b35266090edc7e56c78a64da8adcf92411cd7d314f06b3065e8458ff8b3"
+        },
+        "field": "instructions_zh"
+      }
+    ],
+    "qualification": "项目编辑性说明，原附录无独立指导语；不得在绑定时增设固定回忆时间。"
+  },
+  "ordinaryRevisions": [
+    {
+      "jsonPath": "拟议顶层 instruction.text（原文为研究文档 instructions）",
+      "old": "请按这些说法与你实际情况的符合程度作答。原题本没有固定回顾天数，不另加“过去两周”等时间窗。",
+      "new": "请按你对以下每句话的同意程度作答。",
+      "reason": "与实际六个同意度锚点一致，并将无固定回顾期的来源元信息保留在研究档案；不额外引入时间窗。修改既有指导语需记录来源/版本。"
+    }
+  ],
+  "manualPending": [
+    "中文译审、认知访谈及本地验证待完成；原第8题文化语境需审，实质替换需新版本协调。",
+    "任何阈值、评分或题意变更须原依据、匹配人群及版本协调。"
+  ],
+  "notExecuted": [
+    "未运行golden、评分、系统、DB、CI；未开展新科研或版权调查。"
+  ]
+}

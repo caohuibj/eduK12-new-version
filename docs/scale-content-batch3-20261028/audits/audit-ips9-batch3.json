@@ -1,0 +1,218 @@
+{
+  "instrument": "ips9_2021_zh_cn:1.0.0",
+  "source_commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "source_files": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ips9_2021_zh_cn/1.0.0/source.json",
+      "blob": "064471f0cc5d7c62d5b07a12385b2034bc29f945",
+      "sha256": "f1f15cd10886356261fab9fb64b715a8ff7e6c34879bd82d60368a702941227c"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ips9_2021_zh_cn/1.0.0/instrument.ts",
+      "blob": "353ef328bcde676cf7e00cb31e2a90814ce67b13",
+      "sha256": "aaa30b052fb5917e6b49b49468cfa3b6f2f52ba438ae38d84362dc427e913fd2"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ips9_2021_zh_cn/1.0.0/THIRD_PARTY_LICENSE.md",
+      "blob": "727c9b44a3a1ba872cbb35c833592405f36b13f8",
+      "sha256": "3917263d35e9e823ba8d4f7312adead14274c3954da41ada6aa2a90355103585"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ips9_2021/1.0.0/README.md",
+      "blob": "88f987fb423aa06be451235c69fa025f3533844d",
+      "sha256": "5cfef58289d96e6bde32dcdbf22f9f7065ecfc0862ad28194a0b733984d077a6"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ips9_2021/1.0.0/administration.md",
+      "blob": "2cba9bd48dda2ffde0af901b27946052aba4a9fa",
+      "sha256": "cebd1ad57ff608dd4989a9e9ef4f3050e754974d52b9966eb898d5df45781d34"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ips9_2021/1.0.0/bilingual-content.json",
+      "blob": "439af4277c3b849baf931d7a5d6c8e1dfe714bba",
+      "sha256": "c80d2d695d90dd1d002650bd82632e795bedf056d8261762a6fbb9895d6aef6b"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ips9_2021/1.0.0/scoring-and-parameters.md",
+      "blob": "8c43d0f9416023ff0709a40e03adbb14884f1858",
+      "sha256": "179d232bee3e9485339fe6f4febce6336309a0b8884234bb55fc232580a7b1b1"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ips9_2021/1.0.0/references.md",
+      "blob": "0217476b7f66e86a1844a98376af0a49e43d34d1",
+      "sha256": "736533fc3b20da981ae2f9d3cefc3e1e2713e2e820b34472fbc62ede60894d23"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ips9_2021/1.0.0/report-example.md",
+      "blob": "5725ce4d4dae7464c4d876b958604be6e8a94e23",
+      "sha256": "154caa0b0e578f280593ffd06d6aefd4f66223c0ec8a856f00a4cf0e3a0f428b"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ips9_2021/1.0.0/validation.md",
+      "blob": "21d360e2b3c77c8bb4fd33a77531263031e00cc5",
+      "sha256": "81a0f308ead00aef8f39f2c4221008a4fd3aadf59fa7ecccdb26574f41ce1cf6"
+    }
+  ],
+  "three_parts": {
+    "items_instruction": {
+      "items": [
+        {
+          "number": 1,
+          "code": "IPS_01",
+          "english": "I put things off so long that my well-being or efficiency unnecessarily suffers",
+          "published_chinese": "我把事情拖得太久, 以至于我的幸福感或效率受到了不必要的负面影响",
+          "runtime": "我把事情拖得太久, 以至于我的幸福感或效率受到了不必要的负面影响",
+          "exact": true,
+          "transform": "identity"
+        },
+        {
+          "number": 2,
+          "code": "IPS_02",
+          "english": "If there is something I should do, I get to it before attending to lesser tasks",
+          "published_chinese": "如果有我该做的事情, 我会先去做这件事, 然后再去处理其它次要的任务",
+          "runtime": "如果有我该做的事情, 我会先去做这件事, 然后再去处理其它次要的任务",
+          "exact": true,
+          "transform": "reverse"
+        },
+        {
+          "number": 3,
+          "code": "IPS_03",
+          "english": "My life would be better if I did some activities or tasks earlier",
+          "published_chinese": "如果我早点儿开始做某些活动或任务的话, 我的生活会更好",
+          "runtime": "如果我早点儿开始做某些活动或任务的话, 我的生活会更好",
+          "exact": true,
+          "transform": "identity"
+        },
+        {
+          "number": 4,
+          "code": "IPS_04",
+          "english": "When I should be doing one thing, I will do another",
+          "published_chinese": "当我应该做某件事情时, 我反而会去做另一件事",
+          "runtime": "当我应该做某件事情时, 我反而会去做另一件事",
+          "exact": true,
+          "transform": "identity"
+        },
+        {
+          "number": 5,
+          "code": "IPS_05",
+          "english": "At the end of the day, I know I could have spent the time better",
+          "published_chinese": "回顾当天, 我知道我本可以更好地使用我的时间",
+          "runtime": "回顾当天, 我知道我本可以更好地使用我的时间",
+          "exact": true,
+          "transform": "identity"
+        },
+        {
+          "number": 6,
+          "code": "IPS_06",
+          "english": "I spend my time wisely",
+          "published_chinese": "我明智地利用我的时间",
+          "runtime": "我明智地利用我的时间",
+          "exact": true,
+          "transform": "reverse"
+        },
+        {
+          "number": 7,
+          "code": "IPS_07",
+          "english": "I delay tasks beyond what is reasonable",
+          "published_chinese": "我拖延任务的时间超出了合理范围",
+          "runtime": "我拖延任务的时间超出了合理范围",
+          "exact": true,
+          "transform": "identity"
+        },
+        {
+          "number": 8,
+          "code": "IPS_08",
+          "english": "I procrastinate",
+          "published_chinese": "我拖延",
+          "runtime": "我拖延",
+          "exact": true,
+          "transform": "identity"
+        },
+        {
+          "number": 9,
+          "code": "IPS_09",
+          "english": "I do everything when I believe it needs to be done",
+          "published_chinese": "只要我认为某件事情需要完成, 我就会去做它",
+          "runtime": "只要我认为某件事情需要完成, 我就会去做它",
+          "exact": true,
+          "transform": "reverse"
+        }
+      ],
+      "basis": "固定双语材料为2021已发表中文题干，source逐项比对，不将其标为平台新译或其他版本。",
+      "options": [
+        {
+          "key": "ips9_2021_true_1_5",
+          "options": [
+            {
+              "value": "1",
+              "label": "极少如此／不符合我",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "2",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "3",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "4",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "非常经常如此／符合我",
+              "score": 5
+            }
+          ]
+        }
+      ],
+      "instruction": {
+        "source": {
+          "path": "docs/scale-instruments/research-drafts/ips9_2021/1.0.0/administration.md",
+          "blob": "2cba9bd48dda2ffde0af901b27946052aba4a9fa",
+          "sha256": "cebd1ad57ff608dd4989a9e9ef4f3050e754974d52b9966eb898d5df45781d34",
+          "field": "正文：请根据你一般情况下…及1–5选项说明"
+        },
+        "text": "请根据你一般情况下处理日常任务的习惯，判断每句话有多符合你。请想到自己的实际生活，而不是理想中的做法。这里没有正确或错误答案；有些延期有实际原因，也请按你对句子的理解作答。每题选一个最合适的选项。\n\n1＝极少如此／不符合我；2；3；4；5＝非常经常如此／符合我。",
+        "status": "PREPARED，source顶层instruction缺失；平台新增说明和中文端点待复核。",
+        "suggested_binding": {
+          "path": "server-version/backend/src/modules/scale/instruments/ips9_2021_zh_cn/1.0.0/source.json#/instruction",
+          "old": null,
+          "new": {
+            "schemaVersion": 1,
+            "text": "请根据你一般情况下处理日常任务的习惯，判断每句话有多符合你。请想到自己的实际生活，而不是理想中的做法。这里没有正确或错误答案；有些延期有实际原因，也请按你对句子的理解作答。每题选一个最合适的选项。\n\n1＝极少如此／不符合我；2；3；4；5＝非常经常如此／符合我。",
+            "language": "zh-CN",
+            "version": "1.0.0",
+            "source": "固定administration.md平台新增工作说明，非2021作者原文"
+          }
+        }
+      },
+      "audience": "18至未满23岁大学生自评；大学生身份不能仅凭年龄推定。"
+    },
+    "scoring": {
+      "method": "9题，2/6/9反向6−x，其余identity，等权和9–45，高分更多自报拖延；无维度。",
+      "missing": "complete_required、9题齐答，不插补；平台政策。",
+      "parameters": "referencePolicy none，无常模/等级/诊断切点。"
+    },
+    "report": {
+      "review": "具体建议及支持性措辞，不将拖延道德化；说明一般习惯且不声称每次推迟不合理，可保留。",
+      "version": "instrument/scoring/localization/report均1.0.0。"
+    }
+  },
+  "ordinary_suggestions": [
+    "按固定文档原文绑定指导语，标明平台新增工作说明；不更改已发表中文题干。"
+  ],
+  "substantive_coordination": [
+    "题项/选项/反向/总分变更需人工审校和版本协调，不混2017均分或删题版本。"
+  ],
+  "human_status": "2021中文题项已有原研究，平台新增说明/端点/电子呈现仍待人工复核，不夸大验证。",
+  "not_executed": [
+    "未写仓库、DB、CI、分支或系统，未运行测试。"
+  ],
+  "conclusion": "固定中文题干与计分一致，指导语可绑定；限定年龄及大学生对象须如实保留。"
+}

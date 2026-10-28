@@ -1,0 +1,168 @@
+{
+  "instrument": "scs_sf12_zh_cn_research:1.0.0",
+  "sourceSHA": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "files": [
+    {
+      "path": "docs/scale-instruments/research-drafts/scs_sf12/1.0.0/README.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "cd73f2949ef55e1bce783ffa2d93532adcf445b6",
+      "sha256": "78f9301dafbd0274951d309058d7ea906e5594870a1217568c1f198ca18ddd8f"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/scs_sf12/1.0.0/source-manifest.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "7004b21769b1ab2d970e8c09b20e684d680b442b",
+      "sha256": "93904e030747ccef6f9c4750db46ffd1fac80b77cfbbc5b2cc054abc8cfbac6f"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/scs_sf12_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "b29764756d91662e42fdf3b47e08d679bc8c8ff9",
+      "sha256": "a9aa14fc8d078417abec88fbb043278998c06c8ab12297d1a7b87db88bb27ef6"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/scs_sf12_zh_cn_research/1.0.0/instrument.ts",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "0eed070bb879576339c5a71afdf34c0026591fd3",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/scs_sf12_zh_cn_research/1.0.0/source.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "f0afe5d3c40549502b75fa00769f0f07500b2724",
+      "sha256": "fa8c8d5340efcb9a7485a0c0f4c1cc0d2782741b75027bbf27e7f0ad2a7c4995"
+    }
+  ],
+  "originalEvidence": {
+    "url": "https://self-compassion.org/wp-content/uploads/2021/03/SCS-SF-information.pdf",
+    "access": "本次直接读取12题、反向键及2021均值公式。"
+  },
+  "items": [
+    {
+      "code": "SCS_SF12_01",
+      "englishMeaning": "feeling inadequate after important failure",
+      "chinese": "当我在一件对自己很重要的事情上失败时，我会被“自己不够好”的感觉深深困住。",
+      "group": "over_identification",
+      "reverse": true,
+      "conclusion": "原作者2021题本对应顺序与键向；中文工作译稿待译审。"
+    },
+    {
+      "code": "SCS_SF12_02",
+      "englishMeaning": "patient acceptance of disliked personality traits",
+      "chinese": "对于自己性格中不喜欢的部分，我会尽量抱着理解和耐心对待。",
+      "group": "self_kindness",
+      "reverse": false,
+      "conclusion": "原作者2021题本对应顺序与键向；中文工作译稿待译审。"
+    },
+    {
+      "code": "SCS_SF12_03",
+      "englishMeaning": "balanced perspective in painful circumstances",
+      "chinese": "发生让自己痛苦的事时，我会努力用比较平衡的角度来看待。",
+      "group": "mindfulness",
+      "reverse": false,
+      "conclusion": "原作者2021题本对应顺序与键向；中文工作译稿待译审。"
+    },
+    {
+      "code": "SCS_SF12_04",
+      "englishMeaning": "assuming others happier when down",
+      "chinese": "心情低落时，我常觉得其他人大概都比我过得快乐。",
+      "group": "isolation",
+      "reverse": true,
+      "conclusion": "原作者2021题本对应顺序与键向；中文工作译稿待译审。"
+    },
+    {
+      "code": "SCS_SF12_05",
+      "englishMeaning": "failings as common human experience",
+      "chinese": "我会试着把自己的不足看作每个人都可能有的经历。",
+      "group": "common_humanity",
+      "reverse": false,
+      "conclusion": "原作者2021题本对应顺序与键向；中文工作译稿待译审。"
+    },
+    {
+      "code": "SCS_SF12_06",
+      "englishMeaning": "giving oneself care in very difficult times",
+      "chinese": "经历很困难的时刻时，我会给自己需要的关心与温柔对待。",
+      "group": "self_kindness",
+      "reverse": false,
+      "conclusion": "原作者2021题本对应顺序与键向；中文工作译稿待译审。"
+    },
+    {
+      "code": "SCS_SF12_07",
+      "englishMeaning": "maintaining emotional balance when upset",
+      "chinese": "遇到令人难受的事时，我会努力让自己的情绪保持平衡。",
+      "group": "mindfulness",
+      "reverse": false,
+      "conclusion": "原作者2021题本对应顺序与键向；中文工作译稿待译审。"
+    },
+    {
+      "code": "SCS_SF12_08",
+      "englishMeaning": "feeling alone in important failure",
+      "chinese": "在一件对自己重要的事情上失败时，我常觉得只有自己经历了这样的失败。",
+      "group": "isolation",
+      "reverse": true,
+      "conclusion": "原作者2021题本对应顺序与键向；中文工作译稿待译审。"
+    },
+    {
+      "code": "SCS_SF12_09",
+      "englishMeaning": "fixation on wrong things when down",
+      "chinese": "心情低落时，我容易不断纠结眼前所有不顺利的事情。",
+      "group": "over_identification",
+      "reverse": true,
+      "conclusion": "原作者2021题本对应顺序与键向；中文工作译稿待译审。"
+    },
+    {
+      "code": "SCS_SF12_10",
+      "englishMeaning": "inadequacy shared with other people",
+      "chinese": "觉得自己在某方面不够好时，我会提醒自己：很多人也有类似的不足感。",
+      "group": "common_humanity",
+      "reverse": false,
+      "conclusion": "原作者2021题本对应顺序与键向；中文工作译稿待译审。"
+    },
+    {
+      "code": "SCS_SF12_11",
+      "englishMeaning": "self-judgment of flaws",
+      "chinese": "面对自己的缺点或不足，我经常会批评和否定自己。",
+      "group": "self_judgment",
+      "reverse": true,
+      "conclusion": "原作者2021题本对应顺序与键向；中文工作译稿待译审。 译文“常常”原题未明确表达频率，留待独立译审，不静默改题。"
+    },
+    {
+      "code": "SCS_SF12_12",
+      "englishMeaning": "impatience with disliked personality aspects",
+      "chinese": "对于自己性格中不喜欢的部分，我常常缺乏耐心，难以接纳。",
+      "group": "self_judgment",
+      "reverse": true,
+      "conclusion": "原作者2021题本对应顺序与键向；中文工作译稿待译审。 译文“常常”原题未明确表达频率，留待独立译审，不静默改题。"
+    }
+  ],
+  "threePartConclusions": {
+    "content": "12题原序、1/5两端和中间数字对应；反向01/04/08/09/11/12。11/12中文“常常”原英文未明确表达，须专家译审并依版本规则协调。",
+    "scoring": "反向6−x后12题均分1–5，分母12，完整时等价六个两题均分再平均；与2011总和口径区分，不输出六维；全答项目策略，无中文经验等级。",
+    "report": "report1.0.0成人SELF；非诊断、不评价值及可行反思建议可沿用。分数说明higher_is_more；无报告受众合同，不能称其已存在。"
+  },
+  "instruction": {
+    "source": {
+      "path": "server-version/backend/src/modules/scale/instruments/scs_sf12_zh_cn_research/1.0.0/source.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "f0afe5d3c40549502b75fa00769f0f07500b2724",
+      "sha256": "fa8c8d5340efcb9a7485a0c0f4c1cc0d2782741b75027bbf27e7f0ad2a7c4995"
+    },
+    "pointer": "/instruction",
+    "value": {
+      "schemaVersion": 1,
+      "language": "zh-CN",
+      "version": "1.0.0",
+      "text": "下面这些话描述人遇到困难、受挫或对自己不满意时，通常怎样对待自己。请逐句想一想，这种描述在你平时有多常见，并从1到5选择一个数字。1表示几乎从不，5表示几乎总是；中间数字表示出现得逐渐更多。答案没有对错，不需要为自己的感受或反应责备自己。",
+      "source": "依据Raes等2011 SCS-SF及Kristin Neff官网2021英文正式指导语独立起草中文工作稿；未添加过去两周等原作者没有规定的回忆窗。"
+    },
+    "note": "已独立绑定项目工作指导语。"
+  },
+  "ordinaryEdits": [],
+  "humanItems": [
+    "11/12译文频率细节、中文独立专家译审及验证待完成；题意改变须协调版本。",
+    "官网ad hoc高低建议非临床常模，现不移植。"
+  ],
+  "notExecuted": [
+    "未改仓库或执行系统、DB、CI、测试及新科研版权调查。"
+  ]
+}

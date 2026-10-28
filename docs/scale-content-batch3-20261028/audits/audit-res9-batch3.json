@@ -1,0 +1,224 @@
+{
+  "identity": "res9_zh_cn:1.0.0",
+  "sourceCommit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "sourceFiles": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/res9_zh_cn/1.0.0/source.json",
+      "gitBlob": "b05afbf46fb9484cc7fac550b4517c6c2bcf744a",
+      "sha256": "97e209e223ddae28fd81ce0b9727b3ab0c85c972d7db7b0b7cc288f3a9e0221b"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/res9_zh_cn/1.0.0/instrument.ts",
+      "gitBlob": "0eed070bb879576339c5a71afdf34c0026591fd3",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/res9_zh_cn/1.0.0/THIRD_PARTY_LICENSE.md",
+      "gitBlob": "8aad954844762ba1402df7301bb078574fd34760",
+      "sha256": "f7a0282b7b1d6ba8cad3e78c2b0ce38aa52690d984e10ac2a8d361a8fe8b79ac"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/res9_zh_cn/1.0.0/README.md",
+      "gitBlob": "bc198b81f54bf8e62d0e76442bfa5878e295c993",
+      "sha256": "f94cdcfb0fb5d5a98214d58c03e18d24a990f0ce9377731648a410642b5acc1c"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/res9_zh_cn/1.0.0/administration.md",
+      "gitBlob": "e50144596b42d7052215f96b3f010664f35b4928",
+      "sha256": "206d5680c2014d230715aeb9bbef180ba81e6fe23c115d960f8255f0a744e278"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/res9_zh_cn/1.0.0/bilingual-content.json",
+      "gitBlob": "53551388a8778888b7240e60c8a6cce26b7697d5",
+      "sha256": "72e6eacea2ab17e4c6047c13f1f612c9585e800e094e9f4957dcc753de3892f8"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/res9_zh_cn/1.0.0/scoring-and-thresholds.md",
+      "gitBlob": "745633abff21cbf83818bb52205bacf37e778006",
+      "sha256": "41fa2b07f5a42625659b755498df39b330accbf3152c48a5117d066c9371bcc0"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/res9_zh_cn/1.0.0/report-example.md",
+      "gitBlob": "061b4f40dff4318c79da328c79ef253b34f6c4a7",
+      "sha256": "0eec18052e9ba02fa65876011e7b89ea98d0411f27dbaf9ff574c3d40ba03ba7"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/res9_zh_cn/1.0.0/report-example.json",
+      "gitBlob": "a8ab84602799471402be3754d653a5ff4b2b0e80",
+      "sha256": "33f9862093a5c1b6e5a0edfb58a9a190d18c8dabace4c459047c62336e579bab"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/res9_zh_cn/1.0.0/references.md",
+      "gitBlob": "673cdf59ae83ef4328840d7125b231bba9a7ccb4",
+      "sha256": "1eb513c398f846705d6bf96e7dc2b2446709e78ea091db072374901efdf28e85"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/res9_zh_cn/1.0.0/reviewed-source-pack.md",
+      "gitBlob": "0993cbd5fa3e8f35dc86c648648ded458753bca8",
+      "sha256": "c0f34ef202f49a9bec1bff80457d130c28e732315d003b7424161d3b6c1c0e73"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/res9_zh_cn/1.0.0/external-reference-dossier.json",
+      "gitBlob": "7f7a478002e5478a931506247859602132b54a66",
+      "sha256": "1d53b6285dc375197230ab5e3a3f65a59c466b25b237737652bd3d672f96ded5"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/res9_zh_cn/1.0.0/research-handoff.json",
+      "gitBlob": "e694faf03474bd00579c89ce53a083a73ab9ee16",
+      "sha256": "5f8434ddce0e17677cb8403ece69c6a22d86bb35b9ce80a321e540e9c4d61807"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/res9_zh_cn/1.0.0/local-validation.json",
+      "gitBlob": "6ea26c51a214afaeabe9faea66d033e5d36936c3",
+      "sha256": "a297f4aacbbd5909148ca63b483ef21fada20cd5d926e35899f6eecb33e93f9c"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/res9_zh_cn/1.0.0/verification-20261026.md",
+      "gitBlob": "d73ac1f57ebf51fb56f93375aeb91b0a2beeafe5",
+      "sha256": "02ea203dc9a89135518346cfa3b050c3a9b5d61b33b8940e40c09493f40d3ab1"
+    }
+  ],
+  "threePartConclusions": {
+    "content": "固定包保留Qing等2022 Table 2 九题发表中文，逐字与运行时一致，全部正向；中文选项与指导语为平台工作翻译，并非已发表中文施测页原文。五点0–4同意度，中立为2。第6题“很好的”语法通常为“很好地”，但它是发表中文逐字文，不能静默更改已冻结版本。",
+    "scoring": "单一总分，九题0–4等权相加0–36，没反向或均分分母；九题齐答才能算，complete_required为项目规则不冒充源作者缺失方案。没有适用的诊断阈值、等级、百分位或最小重要差异；484人样本均值不是常模，referencePolicy none。",
+    "report": "1.0.0方向为更同意自评应对资源，明确不预测结局或评判坚强；提议回顾帮助的小事、拆小任务及寻求支持，温和具体。成人非商业研究，student技术角色；已发表题干研究与平台施测呈现待审区分真实保留。"
+  },
+  "items": [
+    {
+      "number": 1,
+      "itemCode": "RES_01",
+      "enReference": "I have confidence in myself",
+      "zh": "我对自己有信心",
+      "key": "positive",
+      "assessment": "发表中文逐字与运行时一致；平台选项及施测文本待审核。"
+    },
+    {
+      "number": 2,
+      "itemCode": "RES_02",
+      "enReference": "I can easily adjust in a difficult situation",
+      "zh": "我可以很容易就适应困境",
+      "key": "positive",
+      "assessment": "发表中文逐字与运行时一致；平台选项及施测文本待审核。"
+    },
+    {
+      "number": 3,
+      "itemCode": "RES_03",
+      "enReference": "I am able to persevere",
+      "zh": "我有毅力",
+      "key": "positive",
+      "assessment": "发表中文逐字与运行时一致；平台选项及施测文本待审核。"
+    },
+    {
+      "number": 4,
+      "itemCode": "RES_04",
+      "enReference": "After setbacks, I can easily pick up where I left off",
+      "zh": "遇到挫折后我可以很容易地继续下去",
+      "key": "positive",
+      "assessment": "发表中文逐字与运行时一致；平台选项及施测文本待审核。"
+    },
+    {
+      "number": 5,
+      "itemCode": "RES_05",
+      "enReference": "I am resilient",
+      "zh": "我很有韧性",
+      "key": "positive",
+      "assessment": "发表中文逐字与运行时一致；平台选项及施测文本待审核。"
+    },
+    {
+      "number": 6,
+      "itemCode": "RES_06",
+      "enReference": "I can cope well with unexpected problems",
+      "zh": "我能很好的应对突发问题",
+      "key": "positive",
+      "assessment": "发表中文逐字与运行时一致；平台选项及施测文本待审核。 原文“很好的”保留，不默改。"
+    },
+    {
+      "number": 7,
+      "itemCode": "RES_07",
+      "enReference": "I appreciate myself",
+      "zh": "我欣赏我自己",
+      "key": "positive",
+      "assessment": "发表中文逐字与运行时一致；平台选项及施测文本待审核。"
+    },
+    {
+      "number": 8,
+      "itemCode": "RES_08",
+      "enReference": "I can handle a lot at the same time",
+      "zh": "我可以同时处理很多事情",
+      "key": "positive",
+      "assessment": "发表中文逐字与运行时一致；平台选项及施测文本待审核。"
+    },
+    {
+      "number": 9,
+      "itemCode": "RES_09",
+      "enReference": "I believe in myself",
+      "zh": "我相信我自己",
+      "key": "positive",
+      "assessment": "发表中文逐字与运行时一致；平台选项及施测文本待审核。"
+    }
+  ],
+  "anchors": [
+    {
+      "value": 0,
+      "label_zh_cn": "完全不同意",
+      "label_en": "completely disagree"
+    },
+    {
+      "value": 1,
+      "label_zh_cn": "不同意",
+      "label_en": "disagree"
+    },
+    {
+      "value": 2,
+      "label_zh_cn": "中立",
+      "label_en": "neutral"
+    },
+    {
+      "value": 3,
+      "label_zh_cn": "同意",
+      "label_en": "agree"
+    },
+    {
+      "value": 4,
+      "label_zh_cn": "完全同意",
+      "label_en": "completely agree"
+    }
+  ],
+  "instruction": {
+    "text": "请根据自己通常如何应对困难情境，选择你对以下每项陈述的同意程度。",
+    "sources": [
+      {
+        "file": {
+          "path": "docs/scale-instruments/research-drafts/res9_zh_cn/1.0.0/bilingual-content.json",
+          "gitBlob": "53551388a8778888b7240e60c8a6cce26b7697d5",
+          "sha256": "72e6eacea2ab17e4c6047c13f1f612c9585e800e094e9f4957dcc753de3892f8"
+        },
+        "field": "instructions.implementation_zh_cn_working_text"
+      },
+      {
+        "file": {
+          "path": "docs/scale-instruments/research-drafts/res9_zh_cn/1.0.0/administration.md",
+          "gitBlob": "e50144596b42d7052215f96b3f010664f35b4928",
+          "sha256": "206d5680c2014d230715aeb9bbef180ba81e6fe23c115d960f8255f0a744e278"
+        },
+        "field": "平台指导语段落"
+      }
+    ],
+    "proposedBinding": {
+      "schemaVersion": 1,
+      "text": "请根据自己通常如何应对困难情境，选择你对以下每项陈述的同意程度。",
+      "language": "zh-CN",
+      "version": "1.0.0",
+      "source": "docs/scale-instruments/research-drafts/res9_zh_cn/1.0.0/bilingual-content.json#instructions.implementation_zh_cn_working_text"
+    },
+    "qualification": "平台工作翻译，非作者验证中文指导语；版本为拟议绑定，不代表审校。"
+  },
+  "ordinaryRevisions": [],
+  "manualPending": [
+    "第6题“很好的”语法可拟议“很好地”，但现载体明确逐字保留发表原文；如决定编辑需公开标注改动、评估版本及译文证据后由root协调，不能静默改变既有版本。",
+    "平台选项、指导语、数字呈现及反馈仍待审；源中文研究不能自动证明完整施测页及所有人群。"
+  ],
+  "notExecuted": [
+    "未运行golden、评分、系统、DB、CI或部署；历史验证仅作固定材料不声称本次执行。"
+  ]
+}

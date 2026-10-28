@@ -1,0 +1,147 @@
+{
+  "identity": "phq4_zh_cn_research:1.0.0",
+  "sourceCommit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "sourceFiles": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/phq4_zh_cn_research/1.0.0/source.json",
+      "gitBlob": "10fe9a5c868f9c21d1e2159aa11f7382a758a7e3",
+      "sha256": "3ec151119973c2349d90f001d265f6d868b959517bef5fa8f0103f9bb870d531"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/phq4_zh_cn_research/1.0.0/instrument.ts",
+      "gitBlob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/phq4/1.0.0/README.md",
+      "gitBlob": "5d17ffb4555e836d7ebeaf7ca0e5f0cebd3ef7f7",
+      "sha256": "746058dac69d54d1b8e2852aa237eb218c73b678929156b742ad2fd25f1fe5f9"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/phq4/1.0.0/bilingual-content.json",
+      "gitBlob": "f30583ddaf1c254700f5736cc486f986cad7f49e",
+      "sha256": "12cf0f0c2b486ac1b2754205c19e6b7eaf7c8967f4df3d1923ef7a7943c7aeec"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/phq4/1.0.0/reviewed-source-pack.json",
+      "gitBlob": "ef36559637138e6d4e74f7f449ca37ff32a3ae06",
+      "sha256": "90c6114ebf6b8e5353b461051fd2d1b9d557244d65725b07b80c78de53285566"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/phq4/1.0.0/external-reference-dossier.json",
+      "gitBlob": "358af28e218d65a0886055b67fbda6ece7b77f44",
+      "sha256": "6e6bfc986edef68248260a9414dab8d4d6e2a1f5ed9e6c6388f17b85971a56c2"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/phq4/1.0.0/references.md",
+      "gitBlob": "38af6f589fb9b958ae8aac72641db7233cfe5dd6",
+      "sha256": "8b0e766318548f312dff61fcedf4790f848276a904f9b5a5630287e916cfc573"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/phq4/1.0.0/report-example.md",
+      "gitBlob": "08deeee62bcc73f3cab4ddf9d427ad6cfecbd9b4",
+      "sha256": "e25ea675789f2f8d6e0905797090d0d04b55e2564952625ea697fcbd9b3af8c0"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/phq4/1.0.0/synthetic-report-example.json",
+      "gitBlob": "3202ef8c4eb74fb68e2a33c7094d9ab9afa38cfb",
+      "sha256": "bad8bc127174e85518dc7ea33e982d6c1a1a4b3c1c01f83a27213ea2479acd4c"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/phq4/1.0.0/local-validation.json",
+      "gitBlob": "0869a2451747ab2e7e19e8a778c4eef9783b5bf0",
+      "sha256": "8c05f4df8b6853ad620cee94e1e7023c26fb08bb3ab748dc7f340bcd14a1eb33"
+    }
+  ],
+  "threePartConclusions": {
+    "content": "A1/A2/D2/D1四题中文与固定原英文记录逐项对应，均正向；过去两周，0–3困扰天数频率，中文为待审核工作译稿。",
+    "scoring": "总分0–12，GAD2和PHQ2各0–6，同向等权求和；对应分量表需两题完整、总分需四题完整，不插补，项目规则而非原作者缺失标准。外部美国成人初保研究分档及子量表≥3保留研究档案未绑定；2025中国青少年候选材料尚待全文方法核实不可移植；referencePolicy none。",
+    "report": "报告1.0.1分别解释总分与两类体验，说明筛查非诊断、低分不排除困扰且不评估自杀风险，建议持续或影响生活时求专业支持；成人研究工作译稿与实际报告版本保留。"
+  },
+  "items": [
+    {
+      "id": "PHQ4_A1",
+      "en": "Feeling nervous, anxious or on edge",
+      "zh": "感到紧张、焦虑或坐立不安",
+      "dimension": "GAD2",
+      "key": "positive",
+      "assessment": "固定双语与运行时一致；中文独立工作译稿待人工审核。"
+    },
+    {
+      "id": "PHQ4_A2",
+      "en": "Not being able to stop or control worrying",
+      "zh": "不能停止或控制担忧",
+      "dimension": "GAD2",
+      "key": "positive",
+      "assessment": "固定双语与运行时一致；中文独立工作译稿待人工审核。"
+    },
+    {
+      "id": "PHQ4_D2",
+      "en": "Feeling down, depressed, or hopeless",
+      "zh": "感到情绪低落、沮丧或绝望",
+      "dimension": "PHQ2",
+      "key": "positive",
+      "assessment": "固定双语与运行时一致；中文独立工作译稿待人工审核。"
+    },
+    {
+      "id": "PHQ4_D1",
+      "en": "Little interest or pleasure in doing things",
+      "zh": "做事时少有兴趣或乐趣",
+      "dimension": "PHQ2",
+      "key": "positive",
+      "assessment": "固定双语与运行时一致；中文独立工作译稿待人工审核。"
+    }
+  ],
+  "anchors": [
+    {
+      "value": 0,
+      "en": "Not at all",
+      "zh_draft": "完全没有"
+    },
+    {
+      "value": 1,
+      "en": "Several days",
+      "zh_draft": "有几天"
+    },
+    {
+      "value": 2,
+      "en": "More than half the days",
+      "zh_draft": "超过一半的天数"
+    },
+    {
+      "value": 3,
+      "en": "Nearly every day",
+      "zh_draft": "几乎每天"
+    }
+  ],
+  "instruction": {
+    "text": "过去两周里，以下问题困扰你的频率如何？",
+    "sources": [
+      {
+        "file": {
+          "path": "docs/scale-instruments/research-drafts/phq4/1.0.0/bilingual-content.json",
+          "gitBlob": "f30583ddaf1c254700f5736cc486f986cad7f49e",
+          "sha256": "12cf0f0c2b486ac1b2754205c19e6b7eaf7c8967f4df3d1923ef7a7943c7aeec"
+        },
+        "field": "instructions"
+      },
+      {
+        "file": {
+          "path": "docs/scale-instruments/research-drafts/phq4/1.0.0/reviewed-source-pack.json",
+          "gitBlob": "ef36559637138e6d4e74f7f449ca37ff32a3ae06",
+          "sha256": "90c6114ebf6b8e5353b461051fd2d1b9d557244d65725b07b80c78de53285566"
+        },
+        "field": "instructions_zh"
+      }
+    ],
+    "qualification": "两周项目工作指导语，source无顶层指导语；绑定保留来源及版本。"
+  },
+  "ordinaryRevisions": [],
+  "manualPending": [
+    "中文译审及适用人群验证待完成；实质更改题意、时窗、缺失、切点须原证据、目标人群及版本协调。",
+    "源称优先对齐经核实的现有PHQ9/GAD7译文，仍需人工处理；不把美国成人或待审青少年切点默认迁移。"
+  ],
+  "notExecuted": [
+    "未运行golden、评分、系统、DB、CI；未开展新临床验证或额外科研审核。"
+  ]
+}

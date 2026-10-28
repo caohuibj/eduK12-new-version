@@ -1,0 +1,129 @@
+{
+  "instrument": "flourishing_fs8_zh_cn_research:1.0.0",
+  "sourceSHA": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "files": [
+    {
+      "path": "docs/scale-instruments/research-drafts/flourishing_fs8/1.0.0/README.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "b08187a71ab82b0ecba73921a22d56d1b91c5ab1",
+      "sha256": "f242479c26b6ab7bfdfb853c7bbb1e7c02c195f8ff8969c692be39690201a077"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/flourishing_fs8/1.0.0/source-manifest.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "4788f6ba656b6e03ced4aadbaa6bb4edc855c894",
+      "sha256": "f38db214f3c1cdb6f1523b5017c5f884ef746c8e0c2a6b3d7b233e3a4b679432"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/flourishing_fs8_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "c43086aef89349b4d1da67c76a6f2771d75a4e8c",
+      "sha256": "0c8ce774287e5e346d3f860ebf66a041463b513f7bd91bb2eed16c3dc5701b73"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/flourishing_fs8_zh_cn_research/1.0.0/instrument.ts",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "0eed070bb879576339c5a71afdf34c0026591fd3",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/flourishing_fs8_zh_cn_research/1.0.0/source.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "7d4788cf20174462d9e3fb32f3a92cb9fc29e7e9",
+      "sha256": "b91f042a3d83df53bc0cb7aa65d0f54582a93fb69c304d14a66db89ed425e8de"
+    }
+  ],
+  "originalEvidence": {
+    "url": "https://eddiener.com/wp-content/uploads/2024/09/Flourishing-Scale.pdf",
+    "access": "本次直接读取官方原表八题、七级锚点及8–56求和。"
+  },
+  "items": [
+    {
+      "code": "FS8_01",
+      "english": "I lead a purposeful and meaningful life",
+      "chinese": "我能感到自己的生活有目标，也有值得追求的意义。",
+      "key": "identity",
+      "conclusion": "与官方原表对应，项目独立工作译稿未完成专家译审。"
+    },
+    {
+      "code": "FS8_02",
+      "english": "My social relationships are supportive and rewarding",
+      "chinese": "我拥有能给我支持、也让我有所收获的人际关系。",
+      "key": "identity",
+      "conclusion": "与官方原表对应，项目独立工作译稿未完成专家译审。"
+    },
+    {
+      "code": "FS8_03",
+      "english": "I am engaged and interested in my daily activities",
+      "chinese": "我会投入日常所做的活动，并且对这些活动保持兴趣。",
+      "key": "identity",
+      "conclusion": "与官方原表对应，项目独立工作译稿未完成专家译审。"
+    },
+    {
+      "code": "FS8_04",
+      "english": "I actively contribute to the happiness and well-being of others",
+      "chinese": "我会主动做一些事，为他人的快乐和生活福祉贡献自己的力量。",
+      "key": "identity",
+      "conclusion": "与官方原表对应，项目独立工作译稿未完成专家译审。"
+    },
+    {
+      "code": "FS8_05",
+      "english": "I am competent and capable in the activities that are important to me",
+      "chinese": "面对自己看重的事情，我相信自己有能力把它们做好。",
+      "key": "identity",
+      "conclusion": "与官方原表对应，项目独立工作译稿未完成专家译审。 原文自评competent/capable，译文“相信自己”属措辞细节供独立译审，不静默改题。"
+    },
+    {
+      "code": "FS8_06",
+      "english": "I am a good person and live a good life",
+      "chinese": "我认为自己是个好人，并且过着一种好的生活。",
+      "key": "identity",
+      "conclusion": "与官方原表对应，项目独立工作译稿未完成专家译审。"
+    },
+    {
+      "code": "FS8_07",
+      "english": "I am optimistic about my future",
+      "chinese": "我对未来抱有乐观的期待。",
+      "key": "identity",
+      "conclusion": "与官方原表对应，项目独立工作译稿未完成专家译审。"
+    },
+    {
+      "code": "FS8_08",
+      "english": "People respect me",
+      "chinese": "我感受到周围的人对我的尊重。",
+      "key": "identity",
+      "conclusion": "与官方原表对应，项目独立工作译稿未完成专家译审。 “周围的人”较原文people多限定，供独立译审。"
+    }
+  ],
+  "threePartConclusions": {
+    "content": "八题顺序及七点同意锚点匹配官方原表，全部正向。05“相信”、08“周围的人”有译文细节，应独立译审；不静默更改题义。",
+    "scoring": "8题等权相加、8–56，不设八个子维度或均分分母。完整八题才算分且不插补是项目选择；references空、referencePolicy none，不造常模/阈值。",
+    "report": "report1.0.0，单总分higher_is_more表示更多认可积极体验，不等于人格、能力或临床评价；反思与小步骤可行，沿用原文。成人SELF；未配置report.audienceContract，不声称该技术合同。"
+  },
+  "instruction": {
+    "value": {
+      "schemaVersion": 1,
+      "language": "zh-CN",
+      "version": "1.0.0",
+      "text": "以下八句话涉及生活中不同方面的体验。请根据自己现在的真实想法判断，你在多大程度上同意每句话。请选择1到7中的一个数字，1表示完全不同意，7表示非常同意；请按自己的实际感受作答，不需要追求任何所谓的正确答案。",
+      "source": "根据Ed Diener等2009年官方英文Flourishing Scale施测说明独立撰写的中文研究工作指导语，不复制官网HKBU繁体译本。"
+    },
+    "source": {
+      "path": "server-version/backend/src/modules/scale/instruments/flourishing_fs8_zh_cn_research/1.0.0/source.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "7d4788cf20174462d9e3fb32f3a92cb9fc29e7e9",
+      "sha256": "b91f042a3d83df53bc0cb7aa65d0f54582a93fb69c304d14a66db89ed425e8de"
+    },
+    "jsonPointer": "/instruction",
+    "note": "已独立绑定项目工作指导语，不需新增或伪称原文中文。"
+  },
+  "ordinaryEdits": [],
+  "humanItems": [
+    "中文独立译审、认知访谈和目标人群效度待完成；题05、08译法细节供审阅。",
+    "按既有记录保留unknown/restricted、非商业研究及独立译文和再分发待管理员核查；不假装获得许可，也不设新自动门禁。",
+    "实质修改题义、锚点或规则需协调版本。"
+  ],
+  "notExecuted": [
+    "未修改仓库、系统、DB或CI，未执行测试。"
+  ]
+}

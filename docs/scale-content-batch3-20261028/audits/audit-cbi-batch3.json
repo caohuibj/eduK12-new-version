@@ -1,0 +1,494 @@
+{
+  "instrument": "cbi_zh_cn:1.0.0",
+  "source_commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "source_files": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/cbi_zh_cn/1.0.0/source.json",
+      "blob": "f95611fd69f92276f0e2aae39edcd09a582af0ee",
+      "sha256": "0980f8e86e840623e151cde0af06365ddd30f7b765854285100093d106ca9902"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/cbi_zh_cn/1.0.0/instrument.ts",
+      "blob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/cbi_zh_cn/1.0.0/README.md",
+      "blob": "03ee13c813deb41c712e0776fe80f2b8630dc0ce",
+      "sha256": "b8ac6ba38f119026833696b636d43d20b2a5e57516792d9fd8ef19fc630fd6a0"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/cbi_zh_cn/1.0.0/bilingual-content.json",
+      "blob": "9a778623850bdd5e038a9f80c101b3214b80b9d0",
+      "sha256": "a891d226d066e5abf2d38ef9d2b5e413251e9235a17db0f79f8db60d39d57b4a"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/cbi_zh_cn/1.0.0/reviewed-source-pack.json",
+      "blob": "4603836bfb4f837114f006038dc60df91f5738cb",
+      "sha256": "e1a403513142e9287fd986731c541aa0b0ded2e9ed84b3af53dab76741ee2b26"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/cbi_zh_cn/1.0.0/scoring-and-thresholds.md",
+      "blob": "5bf25a5d2a3a7a3ea6a48425db2ad8fb7685d956",
+      "sha256": "07f692e26f7d05a8fbc11ab020f0c1a5270aaca7a080357d1a07bb2cc7d6b852"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/cbi_zh_cn/1.0.0/references.md",
+      "blob": "a6ea0688d60366dcea4bbcebe83670fdfb997b98",
+      "sha256": "83c4c4a13ae58bd306a4b0d01dfc4058918eb4c6f47d9868cc0137b7ed5dcaa3"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/cbi_zh_cn/1.0.0/report-example.md",
+      "blob": "9707e2d35430420738711055beb6eed792014b98",
+      "sha256": "eb8cb9bd1ce720bee13a78e273654692fdf8e0716b2eb4e9745f4087a0e098f5"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/cbi_zh_cn/1.0.0/local-validation.json",
+      "blob": "bf5b64bd2b7e1e51b306938184c514d655919c43",
+      "sha256": "a46324dd494bbdd836bad3c22c8bfb771195258389e2669b37ab10d4505ab94b"
+    }
+  ],
+  "three_parts": {
+    "items_instruction": {
+      "items": [
+        {
+          "number": 1,
+          "code": "CBI-P1",
+          "english": "How often do you feel tired?",
+          "chinese": "你多久会感到疲倦？",
+          "runtime": "请结合自己的实际感受作答。前两部分关注整体疲惫和工作相关疲惫；第三部分关注与服务对象互动带来的疲惫。在学校情境中，服务对象可以指学生。各部分的选项不同，请留意选项文字。\n\n你多久会感到疲倦？",
+          "responseSetKey": "cbi_frequency",
+          "transform": "identity",
+          "review": "“多久”可被理解为时长而非频率，供译审。"
+        },
+        {
+          "number": 2,
+          "code": "CBI-P2",
+          "english": "How often are you physically exhausted?",
+          "chinese": "你多久会感到身体精疲力竭？",
+          "runtime": "你多久会感到身体精疲力竭？",
+          "responseSetKey": "cbi_frequency",
+          "transform": "identity",
+          "review": "“多久”可被理解为时长而非频率，供译审。"
+        },
+        {
+          "number": 3,
+          "code": "CBI-P3",
+          "english": "How often are you emotionally exhausted?",
+          "chinese": "你多久会感到情绪上精疲力竭？",
+          "runtime": "你多久会感到情绪上精疲力竭？",
+          "responseSetKey": "cbi_frequency",
+          "transform": "identity",
+          "review": "“多久”可被理解为时长而非频率，供译审。"
+        },
+        {
+          "number": 4,
+          "code": "CBI-P4",
+          "english": "How often do you think: “I can’t take it anymore”?",
+          "chinese": "你多久会觉得：“我再也撑不下去了”？",
+          "runtime": "你多久会觉得：“我再也撑不下去了”？",
+          "responseSetKey": "cbi_frequency",
+          "transform": "identity",
+          "review": "“多久”可被理解为时长而非频率，供译审。"
+        },
+        {
+          "number": 5,
+          "code": "CBI-P5",
+          "english": "How often do you feel worn out?",
+          "chinese": "你多久会感到筋疲力尽？",
+          "runtime": "你多久会感到筋疲力尽？",
+          "responseSetKey": "cbi_frequency",
+          "transform": "identity",
+          "review": "“多久”可被理解为时长而非频率，供译审。"
+        },
+        {
+          "number": 6,
+          "code": "CBI-P6",
+          "english": "How often do you feel weak and susceptible to illness?",
+          "chinese": "你多久会感到虚弱、容易生病？",
+          "runtime": "你多久会感到虚弱、容易生病？",
+          "responseSetKey": "cbi_frequency",
+          "transform": "identity",
+          "review": "“多久”可被理解为时长而非频率，供译审。"
+        },
+        {
+          "number": 7,
+          "code": "CBI-W1",
+          "english": "Is your work emotionally exhausting?",
+          "chinese": "你的工作在多大程度上让你情绪耗竭？",
+          "runtime": "你的工作在多大程度上让你情绪耗竭？",
+          "responseSetKey": "cbi_degree",
+          "transform": "identity",
+          "review": "题意及对应程度选项与固定双语材料一致，待人工译审。"
+        },
+        {
+          "number": 8,
+          "code": "CBI-W2",
+          "english": "Do you feel burnt out because of your work?",
+          "chinese": "你在多大程度上因工作而感到身心耗竭？",
+          "runtime": "你在多大程度上因工作而感到身心耗竭？",
+          "responseSetKey": "cbi_degree",
+          "transform": "identity",
+          "review": "题意及对应程度选项与固定双语材料一致，待人工译审。"
+        },
+        {
+          "number": 9,
+          "code": "CBI-W3",
+          "english": "Does your work frustrate you?",
+          "chinese": "你的工作在多大程度上让你感到挫败？",
+          "runtime": "你的工作在多大程度上让你感到挫败？",
+          "responseSetKey": "cbi_degree",
+          "transform": "identity",
+          "review": "题意及对应程度选项与固定双语材料一致，待人工译审。"
+        },
+        {
+          "number": 10,
+          "code": "CBI-W4",
+          "english": "Do you feel worn out at the end of the working day?",
+          "chinese": "一天工作结束时，你多久会感到筋疲力尽？",
+          "runtime": "一天工作结束时，你多久会感到筋疲力尽？",
+          "responseSetKey": "cbi_frequency",
+          "transform": "identity",
+          "review": "“多久”可被理解为时长而非频率，供译审。"
+        },
+        {
+          "number": 11,
+          "code": "CBI-W5",
+          "english": "Are you exhausted in the morning at the thought of another day at work?",
+          "chinese": "早上想到又要工作一天时，你多久会感到精疲力竭？",
+          "runtime": "早上想到又要工作一天时，你多久会感到精疲力竭？",
+          "responseSetKey": "cbi_frequency",
+          "transform": "identity",
+          "review": "“多久”可被理解为时长而非频率，供译审。"
+        },
+        {
+          "number": 12,
+          "code": "CBI-W6",
+          "english": "Do you feel that every working hour is tiring for you?",
+          "chinese": "你多久会觉得工作中的每一个小时都很累？",
+          "runtime": "你多久会觉得工作中的每一个小时都很累？",
+          "responseSetKey": "cbi_frequency",
+          "transform": "identity",
+          "review": "“多久”可被理解为时长而非频率，供译审。"
+        },
+        {
+          "number": 13,
+          "code": "CBI-W7",
+          "english": "Do you have enough energy for family and friends during leisure time?",
+          "chinese": "在闲暇时间，你多久有足够的精力陪伴家人和朋友？",
+          "runtime": "在闲暇时间，你多久有足够的精力陪伴家人和朋友？",
+          "responseSetKey": "cbi_frequency",
+          "transform": "reverse",
+          "review": "“多久”可被理解为时长而非频率，供译审。"
+        },
+        {
+          "number": 14,
+          "code": "CBI-C1",
+          "english": "Do you find it hard to work with clients?",
+          "chinese": "你在多大程度上觉得与服务对象一起工作很困难？",
+          "runtime": "你在多大程度上觉得与服务对象一起工作很困难？",
+          "responseSetKey": "cbi_degree",
+          "transform": "identity",
+          "review": "题意及对应程度选项与固定双语材料一致，待人工译审。"
+        },
+        {
+          "number": 15,
+          "code": "CBI-C2",
+          "english": "Do you find it frustrating to work with clients?",
+          "chinese": "你在多大程度上觉得与服务对象一起工作令人挫败？",
+          "runtime": "你在多大程度上觉得与服务对象一起工作令人挫败？",
+          "responseSetKey": "cbi_degree",
+          "transform": "identity",
+          "review": "题意及对应程度选项与固定双语材料一致，待人工译审。"
+        },
+        {
+          "number": 16,
+          "code": "CBI-C3",
+          "english": "Does it drain your energy to work with clients?",
+          "chinese": "与服务对象一起工作在多大程度上消耗你的精力？",
+          "runtime": "与服务对象一起工作在多大程度上消耗你的精力？",
+          "responseSetKey": "cbi_degree",
+          "transform": "identity",
+          "review": "题意及对应程度选项与固定双语材料一致，待人工译审。"
+        },
+        {
+          "number": 17,
+          "code": "CBI-C4",
+          "english": "Do you feel that you give more than you get back when you work with clients?",
+          "chinese": "与服务对象一起工作时，你在多大程度上觉得自己的付出多于得到的回报？",
+          "runtime": "与服务对象一起工作时，你在多大程度上觉得自己的付出多于得到的回报？",
+          "responseSetKey": "cbi_degree",
+          "transform": "identity",
+          "review": "题意及对应程度选项与固定双语材料一致，待人工译审。"
+        },
+        {
+          "number": 18,
+          "code": "CBI-C5",
+          "english": "Are you tired of working with clients?",
+          "chinese": "你多久会对与服务对象一起工作感到厌倦？",
+          "runtime": "你多久会对与服务对象一起工作感到厌倦？",
+          "responseSetKey": "cbi_frequency",
+          "transform": "identity",
+          "review": "“多久”可被理解为时长而非频率，供译审。"
+        },
+        {
+          "number": 19,
+          "code": "CBI-C6",
+          "english": "Do you sometimes wonder how long you will be able to continue working with clients?",
+          "chinese": "你多久会想，自己还能继续与服务对象一起工作多长时间？",
+          "runtime": "你多久会想，自己还能继续与服务对象一起工作多长时间？",
+          "responseSetKey": "cbi_frequency",
+          "transform": "identity",
+          "review": "“多久”可被理解为时长而非频率，供译审。"
+        }
+      ],
+      "options": [
+        {
+          "key": "cbi_frequency",
+          "options": [
+            {
+              "value": "always",
+              "label": "总是",
+              "score": 100
+            },
+            {
+              "value": "often",
+              "label": "经常",
+              "score": 75
+            },
+            {
+              "value": "sometimes",
+              "label": "有时",
+              "score": 50
+            },
+            {
+              "value": "seldom",
+              "label": "很少",
+              "score": 25
+            },
+            {
+              "value": "never_almost_never",
+              "label": "从不或几乎从不",
+              "score": 0
+            }
+          ]
+        },
+        {
+          "key": "cbi_degree",
+          "options": [
+            {
+              "value": "very_high",
+              "label": "程度非常高",
+              "score": 100
+            },
+            {
+              "value": "high",
+              "label": "程度较高",
+              "score": 75
+            },
+            {
+              "value": "somewhat",
+              "label": "有一些",
+              "score": 50
+            },
+            {
+              "value": "low",
+              "label": "程度较低",
+              "score": 25
+            },
+            {
+              "value": "very_low",
+              "label": "程度非常低",
+              "score": 0
+            }
+          ]
+        }
+      ],
+      "instruction": {
+        "sources": [
+          {
+            "path": "docs/scale-instruments/research-drafts/cbi_zh_cn/1.0.0/bilingual-content.json",
+            "blob": "9a778623850bdd5e038a9f80c101b3214b80b9d0",
+            "sha256": "a891d226d066e5abf2d38ef9d2b5e413251e9235a17db0f79f8db60d39d57b4a",
+            "field": "/administration/instructionsZh"
+          },
+          {
+            "path": "server-version/backend/src/modules/scale/instruments/cbi_zh_cn/1.0.0/source.json",
+            "blob": "f95611fd69f92276f0e2aae39edcd09a582af0ee",
+            "sha256": "0980f8e86e840623e151cde0af06365ddd30f7b765854285100093d106ca9902",
+            "field": "/executable/definition/items/0/content",
+            "note": "首题前缀"
+          }
+        ],
+        "text": "请结合自己的实际感受作答。前两部分关注整体疲惫和工作相关疲惫；第三部分关注与服务对象互动带来的疲惫。在学校情境中，服务对象可以指学生。各部分的选项不同，请留意选项文字。",
+        "status": "工作指导语已拼入第1题，source顶层instruction缺失。",
+        "minimal_binding": {
+          "path": "server-version/backend/src/modules/scale/instruments/cbi_zh_cn/1.0.0/source.json#/instruction",
+          "old": null,
+          "new": {
+            "schemaVersion": 1,
+            "text": "请结合自己的实际感受作答。前两部分关注整体疲惫和工作相关疲惫；第三部分关注与服务对象互动带来的疲惫。在学校情境中，服务对象可以指学生。各部分的选项不同，请留意选项文字。",
+            "language": "zh-CN",
+            "version": "1.0.0",
+            "source": "固定双语材料平台中文工作稿"
+          }
+        },
+        "version_impact": "从题1删除同文前缀涉及definition hash，需按版本及安装冲突治理；不可直接覆盖成熟定义。"
+      },
+      "scope": "成人工作者，教师报告技术角色；服务对象可指学生，不假定所有人均有服务对象。"
+    },
+    "scoring": {
+      "scores": [
+        {
+          "key": "personal_burnout",
+          "type": "dimension",
+          "label": "整体的身体与情绪疲惫",
+          "description": "关注的不只是上班累不累，也包括整体的身体和情绪疲惫。它不会告诉你疲惫一定来自哪里。",
+          "direction": "higher_is_worse",
+          "canonical": true,
+          "displayPrecision": 1,
+          "missingPolicy": {
+            "type": "prorate_if_min_answered",
+            "minimumAnswered": 3
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "CBI-P1",
+                "weight": 1
+              },
+              {
+                "itemCode": "CBI-P2",
+                "weight": 1
+              },
+              {
+                "itemCode": "CBI-P3",
+                "weight": 1
+              },
+              {
+                "itemCode": "CBI-P4",
+                "weight": 1
+              },
+              {
+                "itemCode": "CBI-P5",
+                "weight": 1
+              },
+              {
+                "itemCode": "CBI-P6",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        },
+        {
+          "key": "work_related_burnout",
+          "type": "dimension",
+          "label": "工作带来的消耗",
+          "description": "看看工作是否正在挤占恢复空间。感到耗竭不等于你不够努力，也不等于教学能力差。",
+          "direction": "higher_is_worse",
+          "canonical": true,
+          "displayPrecision": 1,
+          "missingPolicy": {
+            "type": "prorate_if_min_answered",
+            "minimumAnswered": 4
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "CBI-W1",
+                "weight": 1
+              },
+              {
+                "itemCode": "CBI-W2",
+                "weight": 1
+              },
+              {
+                "itemCode": "CBI-W3",
+                "weight": 1
+              },
+              {
+                "itemCode": "CBI-W4",
+                "weight": 1
+              },
+              {
+                "itemCode": "CBI-W5",
+                "weight": 1
+              },
+              {
+                "itemCode": "CBI-W6",
+                "weight": 1
+              },
+              {
+                "itemCode": "CBI-W7",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        },
+        {
+          "key": "client_related_burnout",
+          "type": "dimension",
+          "label": "与服务对象互动时的消耗",
+          "description": "长期面对他人的需求也会消耗精力。这描述互动体验，不是在评价学生或责怪任何人。",
+          "direction": "higher_is_worse",
+          "canonical": true,
+          "displayPrecision": 1,
+          "missingPolicy": {
+            "type": "prorate_if_min_answered",
+            "minimumAnswered": 3
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "CBI-C1",
+                "weight": 1
+              },
+              {
+                "itemCode": "CBI-C2",
+                "weight": 1
+              },
+              {
+                "itemCode": "CBI-C3",
+                "weight": 1
+              },
+              {
+                "itemCode": "CBI-C4",
+                "weight": 1
+              },
+              {
+                "itemCode": "CBI-C5",
+                "weight": 1
+              },
+              {
+                "itemCode": "CBI-C6",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        }
+      ],
+      "method": "频率和程度选项预编码100/75/50/25/0，唯一W7按100−x反向；个人6题至少3、工作7题至少4、服务6题至少3，以已答题均值计算0–100，不做19题总分。",
+      "missing": "维度prorate_if_min_answered覆盖默认complete_required；不足该维不计算，不将缺失记0。实际整体质量未执行验证。",
+      "thresholds": "外部参数未绑定；无本地常模/等级。"
+    },
+    "report": {
+      "review": "三维内容对齐，具体建议尊重工作条件和服务对象，非诊断和绩效判断；无需强改。",
+      "version": "内容/计分/报告/本地化1.0.0。"
+    }
+  },
+  "substantive_coordination": [
+    "多道频率题“多久”可能被理解为持续时间而不是频率；译审可考虑，题目变更需版本协调。",
+    "服务对象适用性、维度最低答题数量和W7反向不可擅改。"
+  ],
+  "human_status": "中文工作稿人工译审及本地验证待完成；保留既有来源状态。",
+  "not_executed": [
+    "未改仓库、DB、CI、分支或系统；未运行测试。"
+  ],
+  "conclusion": "依据固定双语材料，维度计分与报告一致；指导语前缀拆分需协调定义版本。"
+}

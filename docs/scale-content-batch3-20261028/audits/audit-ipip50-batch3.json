@@ -1,0 +1,535 @@
+{
+  "instrument": "ipip50_zh_cn_research:1.1.0",
+  "sourceSHA": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "files": [
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip50/1.1.0/README.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "a1f4f90ae0ae46038a28345ab58e5348e2763932",
+      "sha256": "6cad1f032fa2146f2dd4ef56857a1279e8708b2f3093bdd9a413d63c339b33a6"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip50/1.1.0/bilingual-content.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "71813673931b624a4931784ccdd8eb08582ff74b",
+      "sha256": "544e011de859a9afd3c66b6f93cc386b5bd21411eed8648238550a82e66f7293"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip50/1.1.0/local-validation.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "4c4ce2fbf9422c67c4241fa1309dabcc326d762e",
+      "sha256": "4001dac70f4ac2fd6ca8c480767f7e806d41e273e3483b82ce7d51bfbfc20977"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip50/1.1.0/references.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "ffbfc3de080f61fdf37e3797d3b8cf0cbc822dd5",
+      "sha256": "46bffbf8ce5762363a7062fad1f26437facfaf1e81895035b7c5a55e42e5c8b0"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip50/1.1.0/report-example.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "0eef763ba7203220c6ac35b892f46e3dc5a09f8f",
+      "sha256": "ccfeedddc224dd43fb1aa3945a5a7225f624187035737d9d33214389e3f75c64"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip50/1.1.0/report-revisions/1.0.1/change-record.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "7e871971da216dc4d01bc6e35e25b6bd14c7e3ef",
+      "sha256": "0e90068879688623e2a0ae700bc33819ec305a9a4055233b7275b2e22f4429a6"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip50/1.1.0/report-revisions/1.0.1/previous-report-1.0.0.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "c801402f5d53469610eb4d8b6cc18f15ce496c84",
+      "sha256": "54136ba05ce8ff526513e1c70b7e92d26316396e4ba3ebacf4914aeb406097c4"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip50/1.1.0/report-revisions/1.0.1/previous-report-example.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "1181a3996d8f553d184e5a25bbbc8e8ffb371d4d",
+      "sha256": "55775a42e146dd5ec71d4e2ab674b360cc91e6ac269b164022fd0fadf03ccfc7"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip50/1.1.0/report-revisions/1.0.1/previous-synthetic-report-example.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "f238b0d238a3e2b98b51d4e8c017b94c16d9d7f1",
+      "sha256": "2910fa5c099f65a2bad3846fcffa4d260fd4b10aa117c28df396f800dfeb3197"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip50/1.1.0/report-revisions/1.0.1/validation.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "98bcb4a5a8b6909041299a04ab6b60a3ebf564d4",
+      "sha256": "2fba0594eb96f7bf13653dd0bdb407aeff976b5b056836430e4217ae83be13d6"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip50/1.1.0/synthetic-report-example.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "9d46f19290193eea1c6aa488392c78a20c5e717d",
+      "sha256": "192b12cb0d34cc1d8f409163a07d9311cb097f9b7f21e0a820b3cb2f1cfe8d72"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip50/1.1.0/upstream-pr328-content.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "dff13f56d95de83bd2772c631dd89739073a3dad",
+      "sha256": "9896befacfd50d42d5883a5b8c49d0379ac7eb9effa2b27346b6b33bd14c777c"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ipip50_zh_cn_research/1.1.0/instrument.ts",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "0eed070bb879576339c5a71afdf34c0026591fd3",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ipip50_zh_cn_research/1.1.0/source.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "26de489548e4caa55839ae460db4318089dad1d1",
+      "sha256": "6cc56383060babff5d7774c313063e71769fd62c46fdf3709cf80c7f65e6dc45"
+    }
+  ],
+  "originalEvidence": {
+    "questionnaire": "https://ipip.ori.org/New_IPIP-50-item-scale.htm",
+    "keys": "https://ipip.ori.org/newBigFive5broadKey.htm",
+    "access": "本次读取官方50题示例及五维键；题序为示例，非官方唯一固定程序。"
+  },
+  "items": [
+    {
+      "code": "IPIP50-01",
+      "english": "Am the life of the party.",
+      "chinese": "我是聚会中活跃气氛的人。",
+      "dimension": "extraversion",
+      "reverse": false,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    },
+    {
+      "code": "IPIP50-02",
+      "english": "Feel little concern for others.",
+      "chinese": "我很少关心别人。",
+      "dimension": "agreeableness",
+      "reverse": true,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    },
+    {
+      "code": "IPIP50-03",
+      "english": "Am always prepared.",
+      "chinese": "我总是做好准备。",
+      "dimension": "conscientiousness",
+      "reverse": false,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    },
+    {
+      "code": "IPIP50-04",
+      "english": "Get stressed out easily.",
+      "chinese": "我容易感到压力很大。",
+      "dimension": "emotional_stability",
+      "reverse": true,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    },
+    {
+      "code": "IPIP50-05",
+      "english": "Have a rich vocabulary.",
+      "chinese": "我的词汇丰富。",
+      "dimension": "intellect_imagination",
+      "reverse": false,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    },
+    {
+      "code": "IPIP50-06",
+      "english": "Don't talk a lot.",
+      "chinese": "我的话不多。",
+      "dimension": "extraversion",
+      "reverse": true,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    },
+    {
+      "code": "IPIP50-07",
+      "english": "Am interested in people.",
+      "chinese": "我对他人感兴趣。",
+      "dimension": "agreeableness",
+      "reverse": false,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    },
+    {
+      "code": "IPIP50-08",
+      "english": "Leave my belongings around.",
+      "chinese": "我把自己的东西随处放。",
+      "dimension": "conscientiousness",
+      "reverse": true,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    },
+    {
+      "code": "IPIP50-09",
+      "english": "Am relaxed most of the time.",
+      "chinese": "我大多数时候都很放松。",
+      "dimension": "emotional_stability",
+      "reverse": false,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    },
+    {
+      "code": "IPIP50-10",
+      "english": "Have difficulty understanding abstract ideas.",
+      "chinese": "我理解抽象概念有困难。",
+      "dimension": "intellect_imagination",
+      "reverse": true,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    },
+    {
+      "code": "IPIP50-11",
+      "english": "Feel comfortable around people.",
+      "chinese": "和他人在一起时，我感到自在。",
+      "dimension": "extraversion",
+      "reverse": false,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    },
+    {
+      "code": "IPIP50-12",
+      "english": "Insult people.",
+      "chinese": "我会侮辱别人。",
+      "dimension": "agreeableness",
+      "reverse": true,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    },
+    {
+      "code": "IPIP50-13",
+      "english": "Pay attention to details.",
+      "chinese": "我留意细节。",
+      "dimension": "conscientiousness",
+      "reverse": false,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    },
+    {
+      "code": "IPIP50-14",
+      "english": "Worry about things.",
+      "chinese": "我会为各种事情担忧。",
+      "dimension": "emotional_stability",
+      "reverse": true,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    },
+    {
+      "code": "IPIP50-15",
+      "english": "Have a vivid imagination.",
+      "chinese": "我的想象力很生动。",
+      "dimension": "intellect_imagination",
+      "reverse": false,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    },
+    {
+      "code": "IPIP50-16",
+      "english": "Keep in the background.",
+      "chinese": "我保持低调，不让自己引人注目。",
+      "dimension": "extraversion",
+      "reverse": true,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    },
+    {
+      "code": "IPIP50-17",
+      "english": "Sympathize with others' feelings.",
+      "chinese": "我体谅他人的感受。",
+      "dimension": "agreeableness",
+      "reverse": false,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    },
+    {
+      "code": "IPIP50-18",
+      "english": "Make a mess of things.",
+      "chinese": "我把事情弄得一团糟。",
+      "dimension": "conscientiousness",
+      "reverse": true,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    },
+    {
+      "code": "IPIP50-19",
+      "english": "Seldom feel blue.",
+      "chinese": "我很少感到低落。",
+      "dimension": "emotional_stability",
+      "reverse": false,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    },
+    {
+      "code": "IPIP50-20",
+      "english": "Am not interested in abstract ideas.",
+      "chinese": "我对抽象概念不感兴趣。",
+      "dimension": "intellect_imagination",
+      "reverse": true,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    },
+    {
+      "code": "IPIP50-21",
+      "english": "Start conversations.",
+      "chinese": "我主动开始交谈。",
+      "dimension": "extraversion",
+      "reverse": false,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    },
+    {
+      "code": "IPIP50-22",
+      "english": "Am not interested in other people's problems.",
+      "chinese": "我对别人的问题不感兴趣。",
+      "dimension": "agreeableness",
+      "reverse": true,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    },
+    {
+      "code": "IPIP50-23",
+      "english": "Get chores done right away.",
+      "chinese": "我会马上做完日常杂务。",
+      "dimension": "conscientiousness",
+      "reverse": false,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    },
+    {
+      "code": "IPIP50-24",
+      "english": "Am easily disturbed.",
+      "chinese": "我很容易心神不宁。",
+      "dimension": "emotional_stability",
+      "reverse": true,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    },
+    {
+      "code": "IPIP50-25",
+      "english": "Have excellent ideas.",
+      "chinese": "我有很棒的想法。",
+      "dimension": "intellect_imagination",
+      "reverse": false,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    },
+    {
+      "code": "IPIP50-26",
+      "english": "Have little to say.",
+      "chinese": "我没什么话可说。",
+      "dimension": "extraversion",
+      "reverse": true,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    },
+    {
+      "code": "IPIP50-27",
+      "english": "Have a soft heart.",
+      "chinese": "我心肠软。",
+      "dimension": "agreeableness",
+      "reverse": false,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    },
+    {
+      "code": "IPIP50-28",
+      "english": "Often forget to put things back in their proper place.",
+      "chinese": "我常忘记把东西放回它们应放的位置。",
+      "dimension": "conscientiousness",
+      "reverse": true,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    },
+    {
+      "code": "IPIP50-29",
+      "english": "Get upset easily.",
+      "chinese": "我容易心烦。",
+      "dimension": "emotional_stability",
+      "reverse": true,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    },
+    {
+      "code": "IPIP50-30",
+      "english": "Do not have a good imagination.",
+      "chinese": "我的想象力不太好。",
+      "dimension": "intellect_imagination",
+      "reverse": true,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    },
+    {
+      "code": "IPIP50-31",
+      "english": "Talk to a lot of different people at parties.",
+      "chinese": "在聚会上，我会和许多不同的人交谈。",
+      "dimension": "extraversion",
+      "reverse": false,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    },
+    {
+      "code": "IPIP50-32",
+      "english": "Am not really interested in others.",
+      "chinese": "我并不怎么对他人感兴趣。",
+      "dimension": "agreeableness",
+      "reverse": true,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    },
+    {
+      "code": "IPIP50-33",
+      "english": "Like order.",
+      "chinese": "我喜欢井然有序。",
+      "dimension": "conscientiousness",
+      "reverse": false,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    },
+    {
+      "code": "IPIP50-34",
+      "english": "Change my mood a lot.",
+      "chinese": "我的情绪经常变化。",
+      "dimension": "emotional_stability",
+      "reverse": true,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    },
+    {
+      "code": "IPIP50-35",
+      "english": "Am quick to understand things.",
+      "chinese": "我理解事情很快。",
+      "dimension": "intellect_imagination",
+      "reverse": false,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    },
+    {
+      "code": "IPIP50-36",
+      "english": "Don't like to draw attention to myself.",
+      "chinese": "我不喜欢让别人注意到我。",
+      "dimension": "extraversion",
+      "reverse": true,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    },
+    {
+      "code": "IPIP50-37",
+      "english": "Take time out for others.",
+      "chinese": "我会抽出时间给别人。",
+      "dimension": "agreeableness",
+      "reverse": false,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    },
+    {
+      "code": "IPIP50-38",
+      "english": "Shirk my duties.",
+      "chinese": "我逃避自己的职责。",
+      "dimension": "conscientiousness",
+      "reverse": true,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    },
+    {
+      "code": "IPIP50-39",
+      "english": "Have frequent mood swings.",
+      "chinese": "我的情绪常常起伏不定。",
+      "dimension": "emotional_stability",
+      "reverse": true,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    },
+    {
+      "code": "IPIP50-40",
+      "english": "Use difficult words.",
+      "chinese": "我使用难懂的词语。",
+      "dimension": "intellect_imagination",
+      "reverse": false,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    },
+    {
+      "code": "IPIP50-41",
+      "english": "Don't mind being the center of attention.",
+      "chinese": "我不介意成为众人关注的焦点。",
+      "dimension": "extraversion",
+      "reverse": false,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    },
+    {
+      "code": "IPIP50-42",
+      "english": "Feel others' emotions.",
+      "chinese": "我能感受到他人的情绪。",
+      "dimension": "agreeableness",
+      "reverse": false,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    },
+    {
+      "code": "IPIP50-43",
+      "english": "Follow a schedule.",
+      "chinese": "我按日程安排做事。",
+      "dimension": "conscientiousness",
+      "reverse": false,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    },
+    {
+      "code": "IPIP50-44",
+      "english": "Get irritated easily.",
+      "chinese": "我容易烦躁。",
+      "dimension": "emotional_stability",
+      "reverse": true,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    },
+    {
+      "code": "IPIP50-45",
+      "english": "Spend time reflecting on things.",
+      "chinese": "我会花时间反思事情。",
+      "dimension": "intellect_imagination",
+      "reverse": false,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    },
+    {
+      "code": "IPIP50-46",
+      "english": "Am quiet around strangers.",
+      "chinese": "在陌生人面前，我很安静。",
+      "dimension": "extraversion",
+      "reverse": true,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    },
+    {
+      "code": "IPIP50-47",
+      "english": "Make people feel at ease.",
+      "chinese": "我让人感到自在。",
+      "dimension": "agreeableness",
+      "reverse": false,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    },
+    {
+      "code": "IPIP50-48",
+      "english": "Am exacting in my work.",
+      "chinese": "我对自己的工作要求严格。",
+      "dimension": "conscientiousness",
+      "reverse": false,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    },
+    {
+      "code": "IPIP50-49",
+      "english": "Often feel blue.",
+      "chinese": "我经常感到低落。",
+      "dimension": "emotional_stability",
+      "reverse": true,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    },
+    {
+      "code": "IPIP50-50",
+      "english": "Am full of ideas.",
+      "chinese": "我有很多想法。",
+      "dimension": "intellect_imagination",
+      "reverse": false,
+      "conclusion": "与IPIP官方50题示例顺序/五维键及固定双语材料对应；中文工作译稿须独立译审。"
+    }
+  ],
+  "threePartConclusions": {
+    "content": "50题与固定双语、官方样表的题序与五维键向对应；1–5符合度锚点中3为既不符合也不不符合，非不知道；中文未经独立译审。",
+    "scoring": "五维各10题等权SUM10–50，负向6−x，无人格总分；每维完整及整体缺失不解释为项目政策。referencePolicy none，无中国常模或临床阈值。",
+    "report": "report1.0.1成人SELF/student技术受众，五维方向与情绪稳定反向区分明确，不将智性当智力、不作人格好坏排名；各维有反思与小建议，沿用。"
+  },
+  "instruction": {
+    "source": {
+      "path": "docs/scale-instruments/research-drafts/ipip50/1.1.0/bilingual-content.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "71813673931b624a4931784ccdd8eb08582ff74b",
+      "sha256": "544e011de859a9afd3c66b6f93cc386b5bd21411eed8648238550a82e66f7293"
+    },
+    "pointer": "/instructions/instructions",
+    "text": "请描述您目前通常的样子，而不是您希望将来成为的样子。请如实判断每项描述与自己的符合程度。",
+    "note": "独立平台说明，省略官方示例中的同年龄/性别比较与绝对保密；不是原版完全等价，已在双语材料明确适配。"
+  },
+  "ordinaryEdits": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ipip50_zh_cn_research/1.1.0/source.json",
+      "jsonPointer": "/instruction",
+      "old": "不存在",
+      "new": {
+        "schemaVersion": 1,
+        "text": "请描述您目前通常的样子，而不是您希望将来成为的样子。请如实判断每项描述与自己的符合程度。",
+        "language": "zh-CN",
+        "version": "1.0.0",
+        "source": "docs/scale-instruments/research-drafts/ipip50/1.1.0/bilingual-content.json#/instructions/instructions @ b92c69aefa2472775fa7ee86b9c208366886c908；项目平台适配指导语"
+      },
+      "reason": "绑定已有平台适配指导语并明确出处。"
+    }
+  ],
+  "humanItems": [
+    "中文独立专家译审、认知访谈和目标人群证据待完成。",
+    "不借用原英文常模或将非诊断人格自述作选择与排名。"
+  ],
+  "notExecuted": [
+    "未改仓库、测试系统、DB/CI或新科研版权调查。"
+  ]
+}

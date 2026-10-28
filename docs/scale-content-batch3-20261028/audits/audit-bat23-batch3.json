@@ -1,0 +1,608 @@
+{
+  "instrument": "bat23_2020_en:1.0.0",
+  "source_commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "source_files": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/bat23_2020_en/1.0.0/source.json",
+      "blob": "abe02fe4d7876c0cf00fb400160305389b911bea",
+      "sha256": "de5a26557659539d3f94caa049efeb7a467d42e83c7357f833c5b89f6a55e89f"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/bat23_2020_en/1.0.0/instrument.ts",
+      "blob": "0eed070bb879576339c5a71afdf34c0026591fd3",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/bat23_2020_en/1.0.0/THIRD_PARTY_LICENSE.md",
+      "blob": "9c28cc9a07b9e80f0cbc2f2624264cc89c20c9de",
+      "sha256": "f16a74b94ce26930c3747b3cc12c83602319cf37c95013101575214638c5b2b2"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bat23_2020_en/1.0.0/README.md",
+      "blob": "5420f11b2a55ac42a33848fea1ad6b186d738124",
+      "sha256": "4e502b9a0f6c49be5281858cd5f2b7cf45d284d3f336f5c2a468413281ebf613"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bat23_2020_en/1.0.0/content-manifest.json",
+      "blob": "c5ed0ad927691a560252252497205beced64d320",
+      "sha256": "6d3fa794c6f0c89961a3ac5bf675189d2dd28231cf32bbef92c71342d86afd97"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bat23_2020_en/1.0.0/administration-sidecar.prepared.json",
+      "blob": "c7525e9dcf456fcde269c671ae247134a3b4663e",
+      "sha256": "5911639d19516927de415c47a076a1766635e99cab548abaf3869efcc2aa1646"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bat23_2020_en/1.0.0/scoring-and-parameters.md",
+      "blob": "3e1f0bb9146f86f5776681a1ff0ed75e967e86a6",
+      "sha256": "7be01806e5080b2439ac73ee293094a9cdc1e563adf3c45147f786edfc393a2a"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bat23_2020_en/1.0.0/references.md",
+      "blob": "24ba5e5b4990df5197f229fbd251a36ce642e70d",
+      "sha256": "98c5fe52d24d87bc9e513abdf74dd83f58bf2130ff68fbd5430599c8bca0e6d5"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bat23_2020_en/1.0.0/report-example.md",
+      "blob": "a13d8babc39042fe60b2f83d74bfe3b66e51c408",
+      "sha256": "98aa881300b4cbb6b0eccadfa0363662c4bb5dc35c0135213731f769ac4cfe61"
+    }
+  ],
+  "three_parts": {
+    "items_instruction": {
+      "items": [
+        {
+          "number": 1,
+          "code": "BAT_01",
+          "source_text": "At work, I feel mentally exhausted",
+          "runtime_text": "At work, I feel mentally exhausted",
+          "exact": true,
+          "dimension": "exhaustion",
+          "transform": "identity"
+        },
+        {
+          "number": 2,
+          "code": "BAT_02",
+          "source_text": "Everything I do at work requires a great deal of effort",
+          "runtime_text": "Everything I do at work requires a great deal of effort",
+          "exact": true,
+          "dimension": "exhaustion",
+          "transform": "identity"
+        },
+        {
+          "number": 3,
+          "code": "BAT_03",
+          "source_text": "After a day at work, I find it hard to recover my energy",
+          "runtime_text": "After a day at work, I find it hard to recover my energy",
+          "exact": true,
+          "dimension": "exhaustion",
+          "transform": "identity"
+        },
+        {
+          "number": 4,
+          "code": "BAT_04",
+          "source_text": "At work, I feel physically exhausted",
+          "runtime_text": "At work, I feel physically exhausted",
+          "exact": true,
+          "dimension": "exhaustion",
+          "transform": "identity"
+        },
+        {
+          "number": 5,
+          "code": "BAT_05",
+          "source_text": "When I get up in the morning, I lack the energy to start a new day at work",
+          "runtime_text": "When I get up in the morning, I lack the energy to start a new day at work",
+          "exact": true,
+          "dimension": "exhaustion",
+          "transform": "identity"
+        },
+        {
+          "number": 6,
+          "code": "BAT_06",
+          "source_text": "I want to be active at work, but somehow, I am unable to manage",
+          "runtime_text": "I want to be active at work, but somehow, I am unable to manage",
+          "exact": true,
+          "dimension": "exhaustion",
+          "transform": "identity"
+        },
+        {
+          "number": 7,
+          "code": "BAT_07",
+          "source_text": "When I exert myself at work, I quickly get tired",
+          "runtime_text": "When I exert myself at work, I quickly get tired",
+          "exact": true,
+          "dimension": "exhaustion",
+          "transform": "identity"
+        },
+        {
+          "number": 8,
+          "code": "BAT_08",
+          "source_text": "At the end of my working day, I feel mentally exhausted and drained",
+          "runtime_text": "At the end of my working day, I feel mentally exhausted and drained",
+          "exact": true,
+          "dimension": "exhaustion",
+          "transform": "identity"
+        },
+        {
+          "number": 9,
+          "code": "BAT_09",
+          "source_text": "I struggle to find any enthusiasm for my work",
+          "runtime_text": "I struggle to find any enthusiasm for my work",
+          "exact": true,
+          "dimension": "mental_distance",
+          "transform": "identity"
+        },
+        {
+          "number": 10,
+          "code": "BAT_10",
+          "source_text": "At work, I do not think much about what I am doing and I function on autopilot",
+          "runtime_text": "At work, I do not think much about what I am doing and I function on autopilot",
+          "exact": true,
+          "dimension": "mental_distance",
+          "transform": "identity"
+        },
+        {
+          "number": 11,
+          "code": "BAT_11",
+          "source_text": "I feel a strong aversion towards my job",
+          "runtime_text": "I feel a strong aversion towards my job",
+          "exact": true,
+          "dimension": "mental_distance",
+          "transform": "identity"
+        },
+        {
+          "number": 12,
+          "code": "BAT_12",
+          "source_text": "I feel indifferent about my job",
+          "runtime_text": "I feel indifferent about my job",
+          "exact": true,
+          "dimension": "mental_distance",
+          "transform": "identity"
+        },
+        {
+          "number": 13,
+          "code": "BAT_13",
+          "source_text": "I’m cynical about what my work means to others",
+          "runtime_text": "I’m cynical about what my work means to others",
+          "exact": true,
+          "dimension": "mental_distance",
+          "transform": "identity"
+        },
+        {
+          "number": 14,
+          "code": "BAT_14",
+          "source_text": "At work, I have trouble staying focused",
+          "runtime_text": "At work, I have trouble staying focused",
+          "exact": true,
+          "dimension": "cognitive_impairment",
+          "transform": "identity"
+        },
+        {
+          "number": 15,
+          "code": "BAT_15",
+          "source_text": "At work I struggle to think clearly",
+          "runtime_text": "At work I struggle to think clearly",
+          "exact": true,
+          "dimension": "cognitive_impairment",
+          "transform": "identity"
+        },
+        {
+          "number": 16,
+          "code": "BAT_16",
+          "source_text": "I’m forgetful and distracted at work",
+          "runtime_text": "I’m forgetful and distracted at work",
+          "exact": true,
+          "dimension": "cognitive_impairment",
+          "transform": "identity"
+        },
+        {
+          "number": 17,
+          "code": "BAT_17",
+          "source_text": "When I’m working, I have trouble concentrating",
+          "runtime_text": "When I’m working, I have trouble concentrating",
+          "exact": true,
+          "dimension": "cognitive_impairment",
+          "transform": "identity"
+        },
+        {
+          "number": 18,
+          "code": "BAT_18",
+          "source_text": "I make mistakes in my work because I have my mind on other things",
+          "runtime_text": "I make mistakes in my work because I have my mind on other things",
+          "exact": true,
+          "dimension": "cognitive_impairment",
+          "transform": "identity"
+        },
+        {
+          "number": 19,
+          "code": "BAT_19",
+          "source_text": "At work, I feel unable to control my emotions",
+          "runtime_text": "At work, I feel unable to control my emotions",
+          "exact": true,
+          "dimension": "emotional_impairment",
+          "transform": "identity"
+        },
+        {
+          "number": 20,
+          "code": "BAT_20",
+          "source_text": "I do not recognize myself in the way I react emotionally at work",
+          "runtime_text": "I do not recognize myself in the way I react emotionally at work",
+          "exact": true,
+          "dimension": "emotional_impairment",
+          "transform": "identity"
+        },
+        {
+          "number": 21,
+          "code": "BAT_21",
+          "source_text": "During my work I become irritable when things don’t go my way",
+          "runtime_text": "During my work I become irritable when things don’t go my way",
+          "exact": true,
+          "dimension": "emotional_impairment",
+          "transform": "identity"
+        },
+        {
+          "number": 22,
+          "code": "BAT_22",
+          "source_text": "I get upset or sad at work without knowing why",
+          "runtime_text": "I get upset or sad at work without knowing why",
+          "exact": true,
+          "dimension": "emotional_impairment",
+          "transform": "identity"
+        },
+        {
+          "number": 23,
+          "code": "BAT_23",
+          "source_text": "At work I may overreact unintentionally",
+          "runtime_text": "At work I may overreact unintentionally",
+          "exact": true,
+          "dimension": "emotional_impairment",
+          "transform": "identity"
+        }
+      ],
+      "basis": "逐题比对固定原英文manifest与source，含第6题原标点；未另复核原论文。",
+      "options": [
+        {
+          "key": "bat_frequency_1_5",
+          "options": [
+            {
+              "value": "1",
+              "label": "Never",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "Rarely",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "Sometimes",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "Often",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "Always",
+              "score": 5
+            }
+          ]
+        }
+      ],
+      "instruction": {
+        "sources": [
+          {
+            "path": "docs/scale-instruments/research-drafts/bat23_2020_en/1.0.0/content-manifest.json",
+            "blob": "c5ed0ad927691a560252252497205beced64d320",
+            "sha256": "6d3fa794c6f0c89961a3ac5bf675189d2dd28231cf32bbef92c71342d86afd97",
+            "field": "/instructionEnglish"
+          },
+          {
+            "path": "docs/scale-instruments/research-drafts/bat23_2020_en/1.0.0/administration-sidecar.prepared.json",
+            "blob": "c7525e9dcf456fcde269c671ae247134a3b4663e",
+            "sha256": "5911639d19516927de415c47a076a1766635e99cab548abaf3869efcc2aa1646",
+            "field": "/instruction"
+          }
+        ],
+        "text": "The following statements are related to your work situation and how you experience this situation. Please state how often each statement applies to you.",
+        "status": "PREPARED_NOT_RUNTIME_CONNECTED，source顶层不存在。",
+        "suggested_binding": {
+          "path": "server-version/backend/src/modules/scale/instruments/bat23_2020_en/1.0.0/source.json#/instruction",
+          "old": null,
+          "new": {
+            "schemaVersion": 1,
+            "text": "The following statements are related to your work situation and how you experience this situation. Please state how often each statement applies to you.",
+            "language": "en",
+            "version": "1.0.0",
+            "source": "2020 Appendix B Table A2; unchanged original standalone instruction"
+          }
+        }
+      },
+      "audience": "英文题干与选项；成人工作者，报告英文主文附中文对照，不称已验证中文版。"
+    },
+    "scoring": {
+      "scores": [
+        {
+          "key": "exhaustion",
+          "type": "dimension",
+          "label": "工作中的耗竭体验",
+          "description": "本维题目等权均分1–5。",
+          "direction": "higher_is_more",
+          "canonical": false,
+          "displayPrecision": 2,
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "BAT_01",
+                "weight": 1
+              },
+              {
+                "itemCode": "BAT_02",
+                "weight": 1
+              },
+              {
+                "itemCode": "BAT_03",
+                "weight": 1
+              },
+              {
+                "itemCode": "BAT_04",
+                "weight": 1
+              },
+              {
+                "itemCode": "BAT_05",
+                "weight": 1
+              },
+              {
+                "itemCode": "BAT_06",
+                "weight": 1
+              },
+              {
+                "itemCode": "BAT_07",
+                "weight": 1
+              },
+              {
+                "itemCode": "BAT_08",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        },
+        {
+          "key": "mental_distance",
+          "type": "dimension",
+          "label": "与工作的距离感",
+          "description": "本维题目等权均分1–5。",
+          "direction": "higher_is_more",
+          "canonical": false,
+          "displayPrecision": 2,
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "BAT_09",
+                "weight": 1
+              },
+              {
+                "itemCode": "BAT_10",
+                "weight": 1
+              },
+              {
+                "itemCode": "BAT_11",
+                "weight": 1
+              },
+              {
+                "itemCode": "BAT_12",
+                "weight": 1
+              },
+              {
+                "itemCode": "BAT_13",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        },
+        {
+          "key": "cognitive_impairment",
+          "type": "dimension",
+          "label": "工作中的注意与思路",
+          "description": "本维题目等权均分1–5。",
+          "direction": "higher_is_more",
+          "canonical": false,
+          "displayPrecision": 2,
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "BAT_14",
+                "weight": 1
+              },
+              {
+                "itemCode": "BAT_15",
+                "weight": 1
+              },
+              {
+                "itemCode": "BAT_16",
+                "weight": 1
+              },
+              {
+                "itemCode": "BAT_17",
+                "weight": 1
+              },
+              {
+                "itemCode": "BAT_18",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        },
+        {
+          "key": "emotional_impairment",
+          "type": "dimension",
+          "label": "工作中的情绪体验",
+          "description": "本维题目等权均分1–5。",
+          "direction": "higher_is_more",
+          "canonical": false,
+          "displayPrecision": 2,
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "BAT_19",
+                "weight": 1
+              },
+              {
+                "itemCode": "BAT_20",
+                "weight": 1
+              },
+              {
+                "itemCode": "BAT_21",
+                "weight": 1
+              },
+              {
+                "itemCode": "BAT_22",
+                "weight": 1
+              },
+              {
+                "itemCode": "BAT_23",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        },
+        {
+          "key": "burnout_core",
+          "type": "total",
+          "label": "整体工作体验",
+          "description": "全部23题等权均分1–5；不是四维均分的简单平均。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "BAT_01",
+                "weight": 1
+              },
+              {
+                "itemCode": "BAT_02",
+                "weight": 1
+              },
+              {
+                "itemCode": "BAT_03",
+                "weight": 1
+              },
+              {
+                "itemCode": "BAT_04",
+                "weight": 1
+              },
+              {
+                "itemCode": "BAT_05",
+                "weight": 1
+              },
+              {
+                "itemCode": "BAT_06",
+                "weight": 1
+              },
+              {
+                "itemCode": "BAT_07",
+                "weight": 1
+              },
+              {
+                "itemCode": "BAT_08",
+                "weight": 1
+              },
+              {
+                "itemCode": "BAT_09",
+                "weight": 1
+              },
+              {
+                "itemCode": "BAT_10",
+                "weight": 1
+              },
+              {
+                "itemCode": "BAT_11",
+                "weight": 1
+              },
+              {
+                "itemCode": "BAT_12",
+                "weight": 1
+              },
+              {
+                "itemCode": "BAT_13",
+                "weight": 1
+              },
+              {
+                "itemCode": "BAT_14",
+                "weight": 1
+              },
+              {
+                "itemCode": "BAT_15",
+                "weight": 1
+              },
+              {
+                "itemCode": "BAT_16",
+                "weight": 1
+              },
+              {
+                "itemCode": "BAT_17",
+                "weight": 1
+              },
+              {
+                "itemCode": "BAT_18",
+                "weight": 1
+              },
+              {
+                "itemCode": "BAT_19",
+                "weight": 1
+              },
+              {
+                "itemCode": "BAT_20",
+                "weight": 1
+              },
+              {
+                "itemCode": "BAT_21",
+                "weight": 1
+              },
+              {
+                "itemCode": "BAT_22",
+                "weight": 1
+              },
+              {
+                "itemCode": "BAT_23",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        }
+      ],
+      "method": "四维分别8/5/5/5题均分；23题等权总均分1–5，非四维等权均分；全部identity，越高相关困扰经历越多。",
+      "missing": "complete_required，缺答不插补；平台保守策略。",
+      "parameters": "referencePolicy none，不用常模、分档、诊断或排名。"
+    },
+    "report": {
+      "review": "整体及四维scoreKey与定义对应，英中说明具体、尊重工作与生活条件；未断言诊断或能力，现有报告可保留。",
+      "versions": "内容/计分/报告1.0.0，语言en、报告英中。"
+    }
+  },
+  "ordinary_suggestions": [
+    "按记录的精确英文原指导语绑定顶层instruction，不放入首题，不改测量定义。"
+  ],
+  "substantive_coordination": [
+    "任何题意、锚点、聚合或阈值变更交root版本和科学协调。"
+  ],
+  "human_status": "保留英语理解、目标人群与既有审核状态；不新增授权或自动门禁。",
+  "not_executed": [
+    "未修改仓库、DB、CI或系统，未运行测试。"
+  ],
+  "conclusion": "23项与固定原文manifest一致，分数/报告可保留；已有原始英文指导语可绑定。"
+}

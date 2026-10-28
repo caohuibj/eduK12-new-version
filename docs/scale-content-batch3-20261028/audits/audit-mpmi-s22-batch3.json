@@ -1,0 +1,316 @@
+{
+  "instrument": "mpmi_s22_zh_cn_research:1.0.0",
+  "sourceSHA": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "files": [
+    {
+      "path": "docs/scale-instruments/research-drafts/mpmi_s22/1.0.0/README.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "4736f4a03cf943444f00c2b2370ed7ddb8409c24",
+      "sha256": "825e1e83bb95eeb51ac72f326423ba5f7e2927b9fccf8519821d6b9e230a971a"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/mpmi_s22/1.0.0/administration.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "1f7a943089836196626855db654844dd3a0b0b63",
+      "sha256": "c38d5d14ff7965864fb253cfd27ca4a71fcf7c35b72154031f5aa5858136d801"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/mpmi_s22/1.0.0/assets/take-home-v1.png",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "17a3fe8f119687717dadfa9dfb3f158c614543ce",
+      "sha256": "eed3128d7aa5031d5735d4c6b3d9ebe9fa6b9e56a63f8c2863e48b27fd83c9e2"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/mpmi_s22/1.0.0/bilingual-content.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "51cd6605e98aab0108d753538baceaf26b724ebe",
+      "sha256": "0ae78f9651662d0e61658610ea23116ca506130b05b82b56da8eaa5309647ccd"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/mpmi_s22/1.0.0/instruction.for-pr356.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "6c9b27da7b8b0792c130bc841b1563cafb9f22c9",
+      "sha256": "ad67109bde02a2b49437385a84e8300788f0d440452f427eb067cd5a8b88526d"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/mpmi_s22/1.0.0/references.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "c2047b8ce28991addaece9f82996ce234a8fe13a",
+      "sha256": "1b697fdd31d0428616f54de56db9d46517392c77df3f67c3bc53c38cdfde1454"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/mpmi_s22/1.0.0/report-example.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "713b52724381b11f5cb17909269c1096eb12d47c",
+      "sha256": "ab5d797517fd7fddd7280d252721f6e88b968633e19b5aa4d8303b92e70e8d27"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/mpmi_s22/1.0.0/report-result.synthetic.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "20e844ab5b43fc2f20a3ad1d0f980ce836831a3d",
+      "sha256": "c85b88ca624601cd1bffc8f9d837bfde7e27dbb5a021e8ae815891b3cfcf5dc1"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/mpmi_s22/1.0.0/scoring-and-parameters.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "dbed3afc1947de81706179ff7d458703f397d10f",
+      "sha256": "6b38267cbcff5bd2d25daaa36ec4e99f5808f6b6daf3e3907f0851fb8e0dbec2"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/mpmi_s22/1.0.0/take-home-card.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "bf40fb1431f71915ef0f1af112aea46d076a1f80",
+      "sha256": "8ebfd86d36f2d3ffd6a245b231a25b6dab20981e4bd843de292e372f9ac7d608"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/mpmi_s22/1.0.0/take-home-message.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "c4a0de223ea9b65cb0b6c13372398c5dfcf441f0",
+      "sha256": "8c651e02126f73e4b7786f8ee22283a27b02b030e090c53665950b9a1e4918a1"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/mpmi_s22/1.0.0/validation.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "f956f91a4e4134e215828f1a0b747a595b0eee96",
+      "sha256": "f401b610a3379cac43c6ef02abc2a1db4037bfed4caacd554ba00d64886900c4"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/mpmi_s22_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "28f00b964b3563793395c222380b72738c66c60e",
+      "sha256": "ab58d3ec8e6f67c51ce4a3cdd51e9f4227a2cf620b6beeba2eacfb8f7d408141"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/mpmi_s22_zh_cn_research/1.0.0/instrument.ts",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/mpmi_s22_zh_cn_research/1.0.0/source.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "573a618b8a609632391df4f1e60663d71cd2adb9",
+      "sha256": "edb6d9f9a8da1995a92674a4520d6cafd45896f31312b878d9435df88d1e2879"
+    }
+  ],
+  "originalEvidence": {
+    "url": "https://zis.gesis.org/s//skala/Rummel-Danner-Kuhlmann-The-short-version-of-the-Meta-cognitive-Prospective-Memory-Inventory-(MPMI-s)?lang=en",
+    "access": "本次可读作者英文22题、锚点、计分与最多一题缺答规则；2019原附录PDF本次不可读。原论文正文各组8项与题本8/7/7矛盾记录保留。"
+  },
+  "items": [
+    {
+      "code": "MPMI_01",
+      "english": "I forget to cancel contracts on time, like trial subscriptions for newspapers.",
+      "chinese": "我会忘记在截止日期前取消合约，比如报纸的试订服务。",
+      "facet": "pma",
+      "reverse": true,
+      "conclusion": "与作者英文公开题目及固定双语记录一致，中文为待译审独立工作稿。"
+    },
+    {
+      "code": "MPMI_02",
+      "english": "I remember to run errands that need to be completed within a specific timeframe, like picking up my laundry from the dry cleaner before it closes.",
+      "chinese": "我会记得在规定时间内办好事情，比如在干洗店关门前取回衣物。",
+      "facet": "pma",
+      "reverse": false,
+      "conclusion": "与作者英文公开题目及固定双语记录一致，中文为待译审独立工作稿。"
+    },
+    {
+      "code": "MPMI_03",
+      "english": "If I´ve borrowed something from someone for a while, I remember to give it back to that person the next time we see each other.",
+      "chinese": "如果向别人借东西有一段时间了，下次见面时我会记得还给对方。",
+      "facet": "pma",
+      "reverse": false,
+      "conclusion": "与作者英文公开题目及固定双语记录一致，中文为待译审独立工作稿。"
+    },
+    {
+      "code": "MPMI_04",
+      "english": "I forget to call a friend again after I couldn´t reach him or her on the first try.",
+      "chinese": "第一次没打通朋友的电话后，我会忘记再打一次。",
+      "facet": "pma",
+      "reverse": true,
+      "conclusion": "与作者英文公开题目及固定双语记录一致，中文为待译审独立工作稿。"
+    },
+    {
+      "code": "MPMI_05",
+      "english": "I receive overdue notifications because I forget to pay bills on time.",
+      "chinese": "我会因为忘记按时支付账单而收到催缴通知。",
+      "facet": "pma",
+      "reverse": true,
+      "conclusion": "与作者英文公开题目及固定双语记录一致，中文为待译审独立工作稿。"
+    },
+    {
+      "code": "MPMI_06",
+      "english": "I am able to remind myself of phone calls I need to make, such as calling a friend on his or her birthday.",
+      "chinese": "我能够自己想起还没打的电话，比如今天需要给过生日的朋友打电话。",
+      "facet": "pma",
+      "reverse": false,
+      "conclusion": "与作者英文公开题目及固定双语记录一致，中文为待译审独立工作稿。"
+    },
+    {
+      "code": "MPMI_07",
+      "english": "I remember my appointments which are coming up in a few days without writing them down.",
+      "chinese": "即使没有写下来，我也会及时想起这几天要赴的约。",
+      "facet": "pma",
+      "reverse": false,
+      "conclusion": "与作者英文公开题目及固定双语记录一致，中文为待译审独立工作稿。"
+    },
+    {
+      "code": "MPMI_08",
+      "english": "I don´t send e-mails or letters on time, even when I wrote myself a reminder to do so.",
+      "chinese": "即使已经写下提醒，我还是没能按时发出该发的邮件或信件。",
+      "facet": "pma",
+      "reverse": true,
+      "conclusion": "与作者英文公开题目及固定双语记录一致，中文为待译审独立工作稿。"
+    },
+    {
+      "code": "MPMI_09",
+      "english": "Even when I´m busy doing other things, I deliberately try to keep unfinished tasks in mind so that I don´t forget them.",
+      "chinese": "即使正在忙别的事，我也会有意识地反复想着还没做完的事情，以免忘记。",
+      "facet": "pmsi",
+      "reverse": false,
+      "conclusion": "与作者英文公开题目及固定双语记录一致，中文为待译审独立工作稿。"
+    },
+    {
+      "code": "MPMI_10",
+      "english": "In the morning, I go through the day‘s tasks in my head so that I don´t forget to remember something.",
+      "chinese": "早上我会在脑中把当天要做的事情过一遍，以免忘记。",
+      "facet": "pmsi",
+      "reverse": false,
+      "conclusion": "与作者英文公开题目及固定双语记录一致，中文为待译审独立工作稿。"
+    },
+    {
+      "code": "MPMI_11",
+      "english": "When I have to complete steps in a specific order, such as when I am baking, I visualize the sequence of steps before starting.",
+      "chinese": "如果有几件事需要按顺序完成，比如烘焙，我会在开始前想象整个步骤。",
+      "facet": "pmsi",
+      "reverse": false,
+      "conclusion": "与作者英文公开题目及固定双语记录一致，中文为待译审独立工作稿。"
+    },
+    {
+      "code": "MPMI_12",
+      "english": "After completing a task, I check once again whether I took care of everything, like turning off the stove after cooking.",
+      "chinese": "做完一件事后，我会再检查是否都处理好了，比如做完饭后是否关了炉灶。",
+      "facet": "pmsi",
+      "reverse": false,
+      "conclusion": "与作者英文公开题目及固定双语记录一致，中文为待译审独立工作稿。"
+    },
+    {
+      "code": "MPMI_13",
+      "english": "In my mind, I make a list of things that I still have to complete.",
+      "chinese": "我会在脑中列一份还有哪些事情没做的清单。",
+      "facet": "pmsi",
+      "reverse": false,
+      "conclusion": "与作者英文公开题目及固定双语记录一致，中文为待译审独立工作稿。"
+    },
+    {
+      "code": "MPMI_14",
+      "english": "I think of my to-do list while I am busy doing something else, like washing dishes or working out.",
+      "chinese": "忙着做其他事情时，比如洗碗或运动，我会在脑中回想待办清单。",
+      "facet": "pmsi",
+      "reverse": false,
+      "conclusion": "与作者英文公开题目及固定双语记录一致，中文为待译审独立工作稿。"
+    },
+    {
+      "code": "MPMI_15",
+      "english": "Before I go shopping, I picture where the products I need are located in the store, so that I don´t forget to pick them up when I walk through the aisles.",
+      "chinese": "购物前，我会想象需要的商品在店里的什么位置，以免经过货架时忘记拿。",
+      "facet": "pmsi",
+      "reverse": false,
+      "conclusion": "与作者英文公开题目及固定双语记录一致，中文为待译审独立工作稿。"
+    },
+    {
+      "code": "MPMI_16",
+      "english": "I write myself a to-do list to remind me of things that I still need to accomplish.",
+      "chinese": "我会写一份待办清单，提醒自己还有哪些事情要做。",
+      "facet": "pmse",
+      "reverse": false,
+      "conclusion": "与作者英文公开题目及固定双语记录一致，中文为待译审独立工作稿。"
+    },
+    {
+      "code": "MPMI_17",
+      "english": "I write shopping lists.",
+      "chinese": "我会写购物清单。",
+      "facet": "pmse",
+      "reverse": false,
+      "conclusion": "与作者英文公开题目及固定双语记录一致，中文为待译审独立工作稿。"
+    },
+    {
+      "code": "MPMI_18",
+      "english": "When I have to take something with me the next morning, like a letter or a library book, I put it in my bag the evening before so that I won´t forget it the next day.",
+      "chinese": "第二天早上要带的东西，比如信件或借的图书，我会在前一晚放进包里，以免早上忘记。",
+      "facet": "pmse",
+      "reverse": false,
+      "conclusion": "与作者英文公开题目及固定双语记录一致，中文为待译审独立工作稿。"
+    },
+    {
+      "code": "MPMI_19",
+      "english": "I keep a calendar with all of my appointments.",
+      "chinese": "我会用日历记下所有约定和安排。",
+      "facet": "pmse",
+      "reverse": false,
+      "conclusion": "与作者英文公开题目及固定双语记录一致，中文为待译审独立工作稿。"
+    },
+    {
+      "code": "MPMI_20",
+      "english": "To help me remember to do things, I stick \"Post-It \" notes in obvious places.",
+      "chinese": "我会把写有待办事项的便条贴在显眼的地方，提醒自己。",
+      "facet": "pmse",
+      "reverse": false,
+      "conclusion": "与作者英文公开题目及固定双语记录一致，中文为待译审独立工作稿。"
+    },
+    {
+      "code": "MPMI_21",
+      "english": "I put things in prominent places so that I´m reminded of tasks I need to do (for example, putting a full trash bag in front of the door so I don´t forget to take it out).",
+      "chinese": "我会把物品放在显眼的位置，提醒自己要做的事，比如把装满的垃圾袋放在门口，以免忘记拿出去。",
+      "facet": "pmse",
+      "reverse": false,
+      "conclusion": "与作者英文公开题目及固定双语记录一致，中文为待译审独立工作稿。"
+    },
+    {
+      "code": "MPMI_22",
+      "english": "For things that I need to do on a regular basis, I plan to do them at the same time each day (for example, always taking my medication in the evening before brushing my teeth).",
+      "chinese": "对于需要定期做的事情，我会安排在每天同一时间做，比如每天晚上刷牙前服药。",
+      "facet": "pmse",
+      "reverse": false,
+      "conclusion": "与作者英文公开题目及固定双语记录一致，中文为待译审独立工作稿。"
+    }
+  ],
+  "threePartConclusions": {
+    "content": "22题与固定双语材料及作者公开英文项目对应；三组8/7/7、01/04/05/08反向。正文各组8项与22题现有表冲突，不补题。",
+    "scoring": "PMA 1–8、PMSi 9–15、PMSe 16–22，各自已答有效题平均1–5；每维最多缺1题，分母分别完整8/7/7或缺一7/6/6，反向6−x，不加总，作者说明书支持；技术prorate标记不等于补值，超阈值不可算。无中文常模。",
+    "report": "报告1.0.0成人SELF/student技术角色，三个习惯分score_only，不作客观记忆能力或疾病诊断，有温和建议；漏答依据和限制如实，可沿用。"
+  },
+  "instruction": {
+    "source": {
+      "path": "docs/scale-instruments/research-drafts/mpmi_s22/1.0.0/administration.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "1f7a943089836196626855db654844dd3a0b0b63",
+      "sha256": "c38d5d14ff7965864fb253cfd27ca4a71fcf7c35b72154031f5aa5858136d801"
+    },
+    "pointer": "首段",
+    "text": "请根据自己的日常情况，判断下面的说法多常符合你。想想一般的生活习惯，不必只回忆某一天。请选择最接近自己情况的选项，没有标准答案。",
+    "note": "既有中文工作指导语未绑定source。"
+  },
+  "ordinaryEdits": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/mpmi_s22_zh_cn_research/1.0.0/source.json",
+      "jsonPointer": "/instruction",
+      "old": "不存在",
+      "new": {
+        "schemaVersion": 1,
+        "text": "请根据自己的日常情况，判断下面的说法多常符合你。想想一般的生活习惯，不必只回忆某一天。请选择最接近自己情况的选项，没有标准答案。",
+        "language": "zh-CN",
+        "version": "1.0.0",
+        "source": "docs/scale-instruments/research-drafts/mpmi_s22/1.0.0/administration.md @ b92c69aefa2472775fa7ee86b9c208366886c908；项目中文工作指导语"
+      },
+      "reason": "绑定既有项目指导语。"
+    }
+  ],
+  "humanItems": [
+    "中文独立专家译审、认知访谈和目标人群验证待完成。",
+    "原作者8/7/7表与正文各8项差异保留，实质改题和缺失算法需协调版本。"
+  ],
+  "notExecuted": [
+    "未改仓库、系统、DB/CI或测试；未做新科研版权研究。"
+  ]
+}
