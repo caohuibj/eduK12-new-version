@@ -1,0 +1,49 @@
+/* Scale-only context for already-disclosed score metadata. */
+.scale-score-card {
+  min-width: 0;
+  break-inside: avoid;
+}
+
+.scale-score-card > .report-range {
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.scale-score-context {
+  padding: 0 16px 16px;
+  border: 1px solid var(--report-line, #dde7f0);
+  border-top: 0;
+  border-radius: 0 0 13px 13px;
+  background: var(--report-soft, #f8fbff);
+  color: var(--report-muted, #64748b);
+  font-size: 13px;
+  line-height: 1.75;
+  overflow-wrap: anywhere;
+}
+
+.scale-score-count {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 4px;
+  margin: 0;
+  padding-top: 10px;
+}
+
+.scale-score-count strong {
+  color: var(--report-ink, #14304a);
+  font-variant-numeric: tabular-nums;
+}
+
+.scale-score-count > span {
+  margin-left: 8px;
+}
+
+.scale-score-explanation {
+  margin: 8px 0 0;
+}
+
+.scale-score-explanation > span {
+  color: var(--report-ink, #14304a);
+  font-weight: 600;
+}

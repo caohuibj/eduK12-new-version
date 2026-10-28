@@ -1,0 +1,24 @@
+import datetime,gzip,hashlib,json,os,pathlib,subprocess,sys
+repo=pathlib.Path('/workspace/eduK12-new-version'); backend=repo/'server-version/frontend'; out=repo/'docs/scale-content-batch1-20261028/presentation/evidence'
+def sha(p): return hashlib.sha256(p.read_bytes()).hexdigest()
+def snapshot():
+ paths=set(p for p in (backend/'src').rglob('*') if p.is_file())
+ for f in ['package.json','package-lock.json','tsconfig.json','vitest.config.ts','prisma/schema.prisma','scripts/generate-scale-instruments.ts','node_modules/.prisma/client/index.js','node_modules/.prisma/client/schema.prisma','node_modules/vitest/vitest.mjs','node_modules/typescript/lib/typescript.js','node_modules/tsx/dist/cli.mjs']:
+  p=backend/f
+  if p.is_file(): paths.add(p)
+ return {str(p.relative_to(repo)):sha(p) for p in sorted(paths)}
+node=subprocess.check_output(['which','node'],text=True).strip()
+commands=[('scale-metadata-direct', [node,'node_modules/vitest/vitest.mjs','run','src/modules/reporting/__tests__/ScaleUnitReportCard.metadata.test.tsx','src/modules/reporting/__tests__/ScaleUnitReportCard.multidimensional.test.tsx','src/modules/reporting/__tests__/ScaleUnitReportCard.projection.test.tsx','src/modules/reporting/__tests__/ScaleUnitReportCard.test.tsx','--maxWorkers=2','--reporter=json','--outputFile='+str(out/'scale-metadata-direct.json')])]
+receipt={'schemaVersion':1,'base':subprocess.check_output(['git','rev-parse','HEAD'],cwd=repo,text=True).strip(),'node':{'executable':node,'version':subprocess.check_output([node,'--version'],text=True).strip(),'sha256':sha(pathlib.Path(node))},'execution':'cloud isolated process; no database or HTTP writes; login:false outer shell','checks':[],'scope':'Six new Scale report metadata assertions and six directly affected existing report assertions; no backend/DB/full suite/build/CI','environment':{'testEnvironment':'jsdom, frontend Vitest config','credentials':'not retained; env values not printed'},'limits':['Source/config/tool hashes are contemporaneous; full installed dependency package bytes and process environment are not enumerated.','Snapshots include other backend source files solely as input evidence, not assertions that they executed.']}
+failed=False
+for label,cmd in commands:
+ before=snapshot();start=datetime.datetime.now(datetime.timezone.utc).isoformat()
+ result=subprocess.run(cmd,cwd=backend,capture_output=True)
+ end=datetime.datetime.now(datetime.timezone.utc).isoformat();after=snapshot()
+ for name,data in [('stdout',result.stdout),('stderr',result.stderr)]: (out/(label+'.'+name+'.log')).write_bytes(data)
+ manifest=json.dumps({'before':before,'after':after},sort_keys=True,indent=2).encode()+b'\n';gz=gzip.compress(manifest,mtime=0);(out/(label+'.inputs.json.gz')).write_bytes(gz)
+ row={'id':label,'cwd':str(backend),'argv':cmd,'startedAt':start,'endedAt':end,'processExitCode':result.returncode,'inputs':{'manifest':label+'.inputs.json.gz','compressedSha256':hashlib.sha256(gz).hexdigest(),'uncompressedSha256':hashlib.sha256(manifest).hexdigest(),'uncompressedBytes':len(manifest),'count':len(before),'beforeAfterIdentical':before==after},'logs':{name:{'path':label+'.'+name+'.log','sha256':hashlib.sha256(data).hexdigest(),'bytes':len(data)} for name,data in [('stdout',result.stdout),('stderr',result.stderr)]}}
+ receipt['checks'].append(row);print(label,'exit',result.returncode,'inputsStable',before==after,flush=True)
+ if result.returncode: print(result.stdout.decode(errors='replace')[-6000:]+result.stderr.decode(errors='replace')[-3000:]);failed=True
+(out/'execution-receipt.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2)+'\n')
+sys.exit(1 if failed else 0)

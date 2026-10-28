@@ -1,0 +1,33 @@
+const fs=require('node:fs'),path=require('node:path'),{pathToFileURL}=require('node:url'),assert=require('node:assert/strict'),crypto=require('node:crypto')
+const repo='/workspace/eduK12-new-version',front=repo+'/server-version/frontend',out=repo+'/docs/scale-content-batch1-20261028/presentation/evidence'
+const {chromium}=require(repo+'/server-version/backend/node_modules/playwright-core')
+const report={schemaVersion:1,kind:'REAL_CHROMIUM_COMPONENT_PREVIEW_SYNTHETIC_DATA',scope:'Existing React Scale report components and actual CSS; no API/backend/session/participant workflow; no production build',screenshots:[],assertions:[],browserErrors:[],unexpectedRequests:[],completed:false}
+const fixture=front+'/scale-metadata-preview-367.tsx';let server,browser
+function save(){fs.writeFileSync(out+'/browser-report.json',JSON.stringify(report,null,2)+'\n')}
+function check(name,condition){report.assertions.push({name,passed:!!condition});save();assert.ok(condition,name)}
+async function main(){
+ assert.ok(!fs.existsSync(fixture),'temporary preview path must be unused');fs.copyFileSync('/tmp/scale-metadata-preview.tsx',fixture)
+ const {createServer}=await import(pathToFileURL(front+'/node_modules/vite/dist/node/index.js').href)
+ server=await createServer({root:front,configFile:front+'/vite.config.ts',appType:'custom',server:{host:'127.0.0.1',port:0,strictPort:false,hmr:false,fs:{allow:[repo]}}})
+ server.middlewares.use(async(req,res,next)=>{if(!req.url.startsWith('/__scale-preview'))return next();try{const html=await server.transformIndexHtml(req.url,'<!doctype html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Scale presentation preview</title><style>body{font-family:system-ui,"Noto Sans CJK SC",sans-serif}</style></head><body><div id="root"></div><script type="module" src="/scale-metadata-preview-367.tsx"></script></body></html>');res.setHeader('Content-Type','text/html');res.end(html)}catch(e){res.statusCode=500;res.end(String(e))}})
+ await server.listen();const origin='http://127.0.0.1:'+server.httpServer.address().port;report.origin=origin;report.launchOptions={executablePath:'/usr/bin/chromium',headless:true,chromiumSandbox:true};save()
+ browser=await chromium.launch(report.launchOptions)
+ report.browserVersion=browser.version();save()
+ const context=await browser.newContext({viewport:{width:390,height:844},locale:'zh-CN',deviceScaleFactor:1,serviceWorkers:'block'})
+ await context.route('**/*',route=>{const u=new URL(route.request().url());if(u.origin===origin&&!u.pathname.startsWith('/api'))return route.continue();report.unexpectedRequests.push(route.request().url());return route.abort()})
+ const page=await context.newPage();page.on('pageerror',e=>{report.browserErrors.push(e.message);save()})
+ for(const [state,width,height] of [['complete',390,844],['complete',820,1180],['invalid',390,844],['invalid',820,1180],['restricted',390,844],['unknown',820,1180]]){
+  await page.setViewportSize({width,height});await page.goto(origin+'/__scale-preview?state='+state);await page.waitForSelector(state==='restricted'?'[data-testid="scale-report-unavailable"]':'.scale-score-context');await page.evaluate(()=>document.fonts.ready)
+  const observation=await page.evaluate(()=>({width:innerWidth,scrollWidth:document.documentElement.scrollWidth,text:document.body.innerText,counts:[...document.querySelectorAll('.scale-score-count')].map(e=>e.textContent),gridColumns:getComputedStyle(document.querySelector('.report-range-grid')||document.body).gridTemplateColumns,explanationFonts:[...document.querySelectorAll('.scale-score-explanation')].map(e=>getComputedStyle(e).fontSize),markerCount:document.querySelectorAll('.report-range__marker').length}))
+  check(state+' '+width+' has no horizontal overflow',observation.scrollWidth<=width)
+  check(state+' '+width+' does not disclose item identifiers',!observation.text.includes('ARS30_2016_01'))
+  if(state==='complete'){check(state+' '+width+' shows actual counts and dimension direction',observation.counts.some(x=>/30.*30/.test(x))&&observation.text.includes('更少意料之外的慌乱'));check(state+' '+width+' retains four real-range markers',observation.markerCount===4)}
+  if(state==='invalid'){check(state+' '+width+' preserves missing counts and null markers',observation.counts.some(x=>/29.*30/.test(x))&&observation.markerCount===2);check(state+' '+width+' has no individual feedback',!(await page.locator('[data-testid="scale-core-feedback"]').count()))}
+  if(state==='restricted')check('restricted disclosure has no score metadata',observation.counts.length===0&&observation.markerCount===0)
+  if(state==='unknown')check('absent metadata stays unknown',observation.text.includes('作答数量未提供')&&observation.text.includes('计分方向未提供'))
+  const file=state+'-'+width+'.png';await page.screenshot({path:path.join(out,file),fullPage:true});const bytes=fs.readFileSync(path.join(out,file));report.screenshots.push({file,state,width,height,sha256:crypto.createHash('sha256').update(bytes).digest('hex'),observation});save()
+ }
+ check('component preview made no API or external requests',report.unexpectedRequests.length===0);check('component preview has no page errors',report.browserErrors.length===0)
+ report.completed=true;save();console.log(JSON.stringify({completed:true,browserVersion:report.browserVersion,screenshots:report.screenshots.map(x=>x.file),assertions:report.assertions.length}))
+}
+main().catch(e=>{report.failure={name:e.name,message:e.message,stack:e.stack};save();console.error(e.message);process.exitCode=1}).finally(async()=>{if(browser)await browser.close();if(server)await server.close();if(fs.existsSync(fixture))fs.unlinkSync(fixture)})

@@ -1,4 +1,5 @@
 import React from 'react'
+import './ScaleUnitReportCard.css'
 import { TrainingRawScoreFeedback, type MatchedRawScoreFeedback } from './TrainingRawScoreFeedback'
 import {
   ReportCoreSummary,
@@ -63,6 +64,47 @@ const qualityStatusLabel = (status: string): string => ({
   limited: '仅支持有限解释',
   invalid: '当前结果不可解释',
 }[status] ?? status)
+
+// Use only already-disclosed result metadata. Never recover counts from a live
+// instrument, the score range, labels or internal item-score/answer payloads.
+const responseCounts = (score: ExternalScaleScoreValue): { answered: number; expected: number } | null => {
+  const expected = score.expectedItems
+  const answered = score.answeredItems
+  if (!Array.isArray(expected) || !Array.isArray(answered) || expected.length === 0) return null
+  const validCodes = (codes: string[]) => codes.every(code => typeof code === 'string' && code.trim().length > 0)
+    && new Set(codes).size === codes.length
+  if (!validCodes(expected) || !validCodes(answered)) return null
+  const expectedSet = new Set(expected)
+  if (answered.some(code => !expectedSet.has(code))) return null
+  return { answered: answered.length, expected: expected.length }
+}
+
+const directionExplanation = (score: ExternalScaleScoreValue): string => {
+  // Preserve the saved version's authored meaning, including reversed constructs.
+  if (typeof score.description === 'string' && score.description.trim()) return score.description
+  switch (score.direction) {
+    case 'higher_is_better': return '按本量表定义，高分表示更有利的结果，不代表人群排名。'
+    case 'higher_is_worse': return '按本量表定义，高分表示更不利的结果，不代表人群排名。'
+    case 'lower_is_better': return '按本量表定义，低分表示更有利的结果，不代表人群排名。'
+    case 'higher_is_more': return '高分表示所测特征较多，不直接代表更好或排名更靠前。'
+    case 'bipolar': return '本维度有两个方向，不能只凭分数高低判断好坏。'
+    case 'descriptive': return '本维度用于描述本次作答，不作好坏或排名判断。'
+    default: return '计分方向未提供，请结合量表说明阅读。'
+  }
+}
+
+const ScoreContext: React.FC<{ score: ExternalScaleScoreValue }> = ({ score }) => {
+  const counts = responseCounts(score)
+  return <div className="scale-score-context">
+    <p className="scale-score-count" aria-label={`${score.label}作答数量`}>
+      {counts
+        ? <>已答 <strong>{counts.answered}</strong> / 共 <strong>{counts.expected}</strong> 题
+          <span>未答 {counts.expected - counts.answered} 题</span></>
+        : '作答数量未提供'}
+    </p>
+    <p className="scale-score-explanation"><span>分数说明：</span>{directionExplanation(score)}</p>
+  </div>
+}
 
 const renderReferenceDetails = (reference: ScaleReferenceValue) => {
   if (reference.status !== 'available') {
@@ -139,15 +181,17 @@ const ScaleUnitReportCard: React.FC<{ report: SafeScaleUnitReport; loadReportIma
   const unclassifiedScores = scores.filter((score) => score.type !== 'total' && score.type !== 'dimension')
 
   const rangeTrack = (score: ExternalScaleScoreValue) => (
-    <ReportRangeTrack
-      key={score.key}
-      label={score.label}
-      value={score.value}
-      formattedValue={formatNumber(score.value, score.displayPrecision)}
-      range={score.range}
-      reference={overlayFor(score, references)}
-      status={scoreStatusLabel(score)}
-    />
+    <div className="scale-score-card" key={score.key}>
+      <ReportRangeTrack
+        label={score.label}
+        value={score.value}
+        formattedValue={formatNumber(score.value, score.displayPrecision)}
+        range={score.range}
+        reference={overlayFor(score, references)}
+        status={scoreStatusLabel(score)}
+      />
+      <ScoreContext score={score} />
+    </div>
   )
 
   return (
@@ -176,7 +220,6 @@ const ScaleUnitReportCard: React.FC<{ report: SafeScaleUnitReport; loadReportIma
                 {totalScores.length === 1 ? (
                   <div className="report-primary-score space-y-2">
                     {rangeTrack(totalScores[0])}
-                    {totalScores[0].description && <p className="text-sm text-gray-600">{totalScores[0].description}</p>}
                   </div>
                 ) : (
                   <div className="report-range-grid">{totalScores.map(rangeTrack)}</div>
