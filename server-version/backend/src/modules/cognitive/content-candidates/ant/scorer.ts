@@ -44,9 +44,17 @@ function scoreAntIdentity(input:AuthoritativeScorerInput<AntConfig,AntTrial>,id:
   const cues=record(CUES,tally),flankers=record(FLANKERS,tally)
   const byInput=record(INPUTS,()=>({cue:record(CUES,rt),flanker:record(FLANKERS,rt)}))
   const observedInputs=new Set<Input>(),exclusions:Record<string,string[]>={}
+  let presentationBinding:AntTrial['presentationBinding']
   let previous:AntTrial|undefined,valid=0,correct=0
   for(let index=0;index<input.trials.length;index++) {
     const envelope=parseTrialEnvelope<AntTrial>(input.trials[index]),trial=parseAntTrial(envelope.payload)
+    if(session.runtimeGeneration==='UNIFIED_V1'&&id.engineVersion===ANT_GUIDED_IDENTITY.engineVersion){
+      const binding=trial.presentationBinding
+      if(!binding)throw Error('ANT native presentation binding is missing')
+      if(presentationBinding&&(binding.geometryVersion!==presentationBinding.geometryVersion||binding.geometryHash!==presentationBinding.geometryHash||binding.displayHash!==presentationBinding.displayHash))
+        throw Error('ANT native presentation binding changed within attempt')
+      presentationBinding=binding
+    }
     if(envelope.phase!=='test'||envelope.trialIndex!==index||trial.trialIndex!==index)
       throw new Error('ANT requires contiguous formal records; practice is separate')
     for(const key of Object.keys(plan[index]) as (keyof typeof plan[number])[])

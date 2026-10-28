@@ -1,4 +1,4 @@
-// Pure ANT protocol projection. Backend SHA256: ef7e19b75bd50c30c1805ebc41aac894b30cd923a42d2cae8339923cddb22acf
+// Pure ANT protocol projection. Backend SHA256: 86c0f782704286480684a0c2b169f4bea0b5f0ce9a55244602590f092049c311
 type ProtocolDefinition={schemaVersion:1;key:string;version:string;clock:'performance';randomizationAlgorithmVersion:string;trialEnvelopeVersion:1;phases:{key:'test'|'learning'|'delayed';persists:boolean;required:boolean}[];measurementCriticalConfigPaths:string[]}
 type TrialEnvelope<T>={schemaVersion:1;trialIndex:number;phase:'test'|'learning'|'delayed';startedAtPerfMs:number;endedAtPerfMs:number;durationMs:number;flags:{timeout:boolean;premature:boolean};qualityEvents:('visibility_lost'|'window_blur'|'runner_restart')[];payload:T}
 
@@ -65,6 +65,7 @@ export interface AntResponseEvent {
   direction:Direction; input:Input; atPerfMs:number; repeat:boolean; held:boolean;
 }
 export interface AntTrial extends AntPlan {
+  presentationBinding?:{schemaVersion:1;geometryVersion:'ant-calibrated-geometry-v1';geometryHash:string;displayHash:string};
   phase:'test'; recordOrigin:'live'|'recovered_without_timing';
   clock:{source:'performance'; timeOriginUnixMs:number|null};
   startedAtPerfMs:number; cueOnsetPerfMs:number|null; cueOffsetPerfMs:number|null;

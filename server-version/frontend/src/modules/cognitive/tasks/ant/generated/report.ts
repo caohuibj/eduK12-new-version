@@ -1,4 +1,4 @@
-// Exact ANT report projection, no scorer/runtime imports. Backend SHA256: 139b6dbe763a9d5c2d8d6845296450c0adf3a501fb9d617d9d6dc5666ce3cf54
+// Exact ANT report projection, no scorer/runtime imports. Backend SHA256: b7ec3a612223a5b795c85ffb6bf0fb6c383c089ce9e8385f5c49f51ab65fa8b3
 import { CUES,FLANKERS,INPUTS,type Cue,type Flanker,type Input } from './protocol'
 export type AntScoreResult={metrics:Record<string,unknown>;quality:{state:'interpretable'|'limited'|'invalid';flags:Record<string,boolean>;reasons:string[]};audit:{trialCount:number;scorerVersion:string}}
 type CognitiveScoreResult=AntScoreResult

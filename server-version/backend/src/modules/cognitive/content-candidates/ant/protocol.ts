@@ -62,6 +62,7 @@ export interface AntResponseEvent {
   direction:Direction; input:Input; atPerfMs:number; repeat:boolean; held:boolean;
 }
 export interface AntTrial extends AntPlan {
+  presentationBinding?:{schemaVersion:1;geometryVersion:'ant-calibrated-geometry-v1';geometryHash:string;displayHash:string};
   phase:'test'; recordOrigin:'live'|'recovered_without_timing';
   clock:{source:'performance'; timeOriginUnixMs:number|null};
   startedAtPerfMs:number; cueOnsetPerfMs:number|null; cueOffsetPerfMs:number|null;
