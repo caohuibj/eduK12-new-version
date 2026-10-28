@@ -4,6 +4,11 @@ export function EffortInstructions({language,profile}:{language:'zh'|'en';profil
  return <section aria-label={en?'Instructions and examples':'操作说明与例子'}><h1>{en?'How many presses would you choose this round?':'这轮，你愿意按多少次？'}</h1>
  <p>{en?`The ${research?'research version has 72 trials, about 20–55 minutes':'practical version has 18 trials, about 7–17 minutes'}. Estimates include first instructions, practice and short breaks; retries add roughly 1–3 minutes.`:`${research?'科研版72轮，预计20–55分钟':'实用版18轮，预计7–17分钟'}，包含首次说明、练习与短休息。每次重练另约1–3分钟；均为设计估算，实际可能更长。`}</p>
  <p>{en?'Each round asks you to choose fewer or more presses, then perform the selected option. The payout probability is the same for both sides this round. Offers, not diligence, determine what may be worth doing.':'每轮先在较少按压和较多按压之间选择，再实际执行所选方案。本轮两边的兑现概率相同；我们观察取舍，不评价是否勤奋。'}</p>
+ <h2>{en?'Your route through each round':'每轮照这三步做'}</h2><ol>
+ <li>{en?'Read the offer: look at the presses, points and payout chance on both sides. Wait until the choice buttons appear.':'先看方案：看清两边需要按多少次、点数和兑现概率，等选择按钮出现。'}</li>
+ <li>{en?'Choose, then release: tap a side or use Q / P within the choice window. Wait through the preparation screen.':'选好并松手：选择时间内点一侧，或按Q／P；松开后等待准备画面结束。'}</li>
+ <li>{en?'Press only when execution starts: repeatedly press and release the side you chose. Then read the feedback and continue.':'开始执行再连按：反复按下并松开刚选的一侧，随后看本轮反馈，再进入下一轮。'}</li>
+ </ol><p>{en?`Normal completion means finishing all ${research?72:18} formal rounds and receiving the saved-record confirmation. Practice is separate. If you stop early, we keep that as an unfinished record; if saving fails, keep this page open and retry.`:`正常完成是做完${research?72:18}轮正式任务，并看到记录保存成功的确认；练习另计。提前结束会保留为未完成记录。若保存失败，请保留本页并重试。`}</p>
  <h2>{en?'Understand the points':'先看懂怎样计点'}</h2><ul>
  <li>{en?'The fewer-press option requires 20 presses. It ends when you reach 20; it pays 1 point only if completed and this round pays out. Unfinished work has no partial points.':'较少按压固定20次，按够即结束；完成且本轮兑现时给1点，未完成没有部分点数。'}</li>
  <li>{en?'The more-press option uses a 50, 100 or 200 press baseline worth 3, 5 or 7 points. You have 25 seconds. If this round pays out, points equal baseline points × actual presses / baseline presses. You may earn less or more than the baseline.':'较多按压以50、100或200次为基准，对应3、5或7点，有25秒。若本轮兑现，点数＝基准点数×实际按压/按压基准，可以少于或超过基准点数。'}</li>

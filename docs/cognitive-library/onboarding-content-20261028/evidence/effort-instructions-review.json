@@ -1,0 +1,77 @@
+{
+  "sourceSHA256": "1b462cf1f7ca9553a97b741d48288d75324454c3b3477d3d2dcc067b754a5b7d",
+  "change": "Bilingual three-step route and completion/save confirmation. No instruction examples, practice rules, counts, timing, inputs or estimates changed.",
+  "screenshots": [
+    {
+      "name": "intro-zh-phone",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "cssZoom": 1,
+      "measurements": {
+        "viewport": 390,
+        "scroll": 390,
+        "body": 390,
+        "images": [],
+        "headings": [
+          "这轮，你愿意按多少次？",
+          "每轮照这三步做",
+          "先看懂怎样计点",
+          "操作和时间",
+          "先熟悉规则，不评价偏好"
+        ]
+      },
+      "file": "docs/cognitive-library/onboarding-content-20261028/evidence/intro-zh-phone.png",
+      "sha256": "a977e00cf256b6f637ab85b47c410adc3649c6e543ccad0a1b500a370ccc3dbe"
+    },
+    {
+      "name": "intro-en-tablet",
+      "viewport": {
+        "width": 820,
+        "height": 1000
+      },
+      "cssZoom": 1,
+      "measurements": {
+        "viewport": 820,
+        "scroll": 820,
+        "body": 820,
+        "images": [],
+        "headings": [
+          "How many presses would you choose this round?",
+          "Your route through each round",
+          "Understand the points",
+          "Controls and timing",
+          "Easier practice, without judging your preference"
+        ]
+      },
+      "file": "docs/cognitive-library/onboarding-content-20261028/evidence/intro-en-tablet.png",
+      "sha256": "5ec711d9c21eb45f044f5c4f46bd51323e8de63af77939c3ea72378e2962266e"
+    },
+    {
+      "name": "intro-en-200pct",
+      "viewport": {
+        "width": 780,
+        "height": 1000
+      },
+      "cssZoom": 2,
+      "measurements": {
+        "viewport": 780,
+        "scroll": 390,
+        "body": 780,
+        "images": [],
+        "headings": [
+          "How many presses would you choose this round?",
+          "Your route through each round",
+          "Understand the points",
+          "Controls and timing",
+          "Easier practice, without judging your preference"
+        ]
+      },
+      "file": "docs/cognitive-library/onboarding-content-20261028/evidence/intro-en-200pct.png",
+      "sha256": "0285408229213a6530214e66abb82e861a48fea24444fefc5921bcbdfc656915"
+    }
+  ],
+  "validation": "Same component preview, local synthetic page, no horizontal overflow; source visually reviewed. Types consumed exact source; original missing test matcher type setup retained.",
+  "limitations": "200% uses CSS zoom, no native device equivalence. Existing practice retry runtime unchanged and original evidence reused."
+}
