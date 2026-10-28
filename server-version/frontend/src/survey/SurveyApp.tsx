@@ -188,10 +188,19 @@ function SurveyApplication(){
     if('q' in patch&&patch.q)projectSearchTimer.current=setTimeout(()=>void loadProjects(1,options).catch(()=>{}),250)
     else void loadProjects(1,options).catch(()=>{})
   }
+  const directoryOwner=useRef<string|null>(null)
+  useEffect(()=>{
+    if(!user){directoryOwner.current=null;projectListEpoch.current++;return}
+    if(loading||screen!=='work'||user.mustChangePassword||researchArea!=='studies'||editorOpen)return
+    if(directoryOwner.current===user.id)return
+    directoryOwner.current=user.id
+    void loadProjects().catch(()=>{})
+  },[user,loading,screen,researchArea,editorOpen,loadProjects])
   const refresh=useCallback(async(openWorkspace=false)=>{
     const restoreEpoch=++studyRestoreEpoch.current
     try{
       const me=await api<Researcher>('/auth/me')
+      if(restoreEpoch!==studyRestoreEpoch.current)return
       setUser(me)
       if(!openWorkspace&&['home','feature','claim','reset'].includes(initial))setScreen(initial)
       else {
@@ -200,7 +209,6 @@ function SurveyApplication(){
         setScreen('work')
         // A project read failure does not invalidate an already verified session.
         if(!me.mustChangePassword){
-          await loadProjects().catch(()=>{})
           if(initialStudy.id){
             try{
               const project=await api<Project>('/projects/'+encodeURIComponent(initialStudy.id))
@@ -217,7 +225,7 @@ function SurveyApplication(){
       }
     }catch{setUser(null);if(initial==='login')setScreen('login')}
     finally{setLoading(false)}
-  },[initial,initialStudy,loadProjects])
+  },[initial,initialStudy])
   useEffect(()=>{
     document.title=activeFeature?activeFeature.title+' | Research':'Research';void refresh()
     return cancelStudyRestore
