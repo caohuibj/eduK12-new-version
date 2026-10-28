@@ -58,7 +58,7 @@ export interface CognitiveV2ReportMetricView extends CognitiveReportMetricView {
 
 export interface NativePublicReportSnapshot {
  schemaVersion:1;testType:string;engineVersion:string;scoringVersion:string;configVersion:string;
- configHash:string;protocolSignature:string;reportDefinitionVersion:string;presentationVersion:string;
+ configHash:string;protocolSignature:string;reportDefinitionVersion:string;presentationVersion:string;participantPresentationVersion?:string;
  profile:'experience'|'research';state:'interpretable'|'limited'|'invalid';report:unknown
 }
 export interface CognitiveV2Report {

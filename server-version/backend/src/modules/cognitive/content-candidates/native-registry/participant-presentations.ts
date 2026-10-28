@@ -45,3 +45,11 @@ export function resolveNativeParticipantPresentation(identity: NativePresentatio
     && item.identity.configVersion === identity.configVersion)
   return entry ? entry.create() : undefined
 }
+
+/** Only known frozen presentation combinations; validation never substitutes current wording into an old result. */
+export function supportsNativeParticipantPresentationVersion(identity:NativePresentationIdentity,version:string):boolean{
+ const current=resolveNativeParticipantPresentation(identity)
+ if(current?.presentationVersion===version)return true
+ // Original spatial scalar formatting remains readable alongside the opt-in degree formatter.
+ return identity.testType===SPATIAL_IDENTITY.testType&&identity.engineVersion===SPATIAL_IDENTITY.engineVersion&&identity.scoringVersion===SPATIAL_IDENTITY.scoringVersion&&identity.configVersion===SPATIAL_IDENTITY.configVersion&&version==='0.1.0'
+}
