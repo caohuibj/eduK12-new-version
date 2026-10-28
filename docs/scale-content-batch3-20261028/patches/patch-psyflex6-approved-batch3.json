@@ -1,0 +1,119 @@
+{
+  "identity": "psyflex6_zh_cn_research:1.0.0 → 1.0.1",
+  "sourceCommit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "source": {
+    "path": "server-version/backend/src/modules/scale/instruments/psyflex6_zh_cn_research/1.0.0/source.json",
+    "gitBlob": "c887b6529869f2c7467a61e02c460abe3436d10d",
+    "sha256": "f0d7e20eab0a65684f24b6cc4bcf859d14299a8ec2e59a1b2897a02ffbcfde5d"
+  },
+  "format": "RFC6902",
+  "patch": [
+    {
+      "op": "test",
+      "path": "/identity/instrumentVersion",
+      "value": "1.0.0"
+    },
+    {
+      "op": "replace",
+      "path": "/identity/instrumentVersion",
+      "value": "1.0.1"
+    },
+    {
+      "op": "test",
+      "path": "/executable/definition/responseSets/0/key",
+      "value": "psyflex_frequency_1_5"
+    },
+    {
+      "op": "test",
+      "path": "/executable/definition/responseSets/0/options/4",
+      "value": {
+        "value": "5",
+        "score": 5,
+        "label": "总是如此"
+      }
+    },
+    {
+      "op": "test",
+      "path": "/executable/definition/responseSets/0/options/4/label",
+      "value": "总是如此"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/responseSets/0/options/4/label",
+      "value": "非常经常"
+    },
+    {
+      "op": "test",
+      "path": "/catalog/administration/layoutConstraints/1",
+      "value": "五档频率：1 极少如此 到 5 总是如此，中间档保留数字与中文标签。"
+    },
+    {
+      "op": "replace",
+      "path": "/catalog/administration/layoutConstraints/1",
+      "value": "五档频率：1 极少如此 到 5 非常经常，中间档保留数字与中文标签。"
+    },
+    {
+      "op": "test",
+      "path": "/localization/localizationVersion",
+      "value": "1.0.0"
+    },
+    {
+      "op": "replace",
+      "path": "/localization/localizationVersion",
+      "value": "1.0.1"
+    },
+    {
+      "op": "test",
+      "path": "/executable/definition/versionAxes/localizationVersion",
+      "value": "1.0.0"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/versionAxes/localizationVersion",
+      "value": "1.0.1"
+    },
+    {
+      "op": "test",
+      "path": "/localization/notes",
+      "value": "平台独立中文工作译稿。作者已发布官方中文版问卷，本译稿不复制其措辞、不继承其验证结果。专家审校 PENDING、认知访谈与中国人群验证 NOT_ESTABLISHED。"
+    },
+    {
+      "op": "replace",
+      "path": "/localization/notes",
+      "value": "平台独立中文工作译稿。作者已发布官方中文版问卷，本译稿不复制其措辞、不继承其验证结果。专家审校 PENDING、认知访谈与中国人群验证 NOT_ESTABLISHED。 1.0.1将最高频率中文选项由“总是如此”纠正为“非常经常”，对应原英文 very often；题文未改。"
+    },
+    {
+      "op": "test",
+      "path": "/executable/definition/scoring/scoringVersion",
+      "value": "1.0.0"
+    },
+    {
+      "op": "test",
+      "path": "/executable/definition/report/reportVersion",
+      "value": "1.0.0"
+    },
+    {
+      "op": "test",
+      "path": "/instruction",
+      "value": {
+        "schemaVersion": 1,
+        "text": "下面是一些描述你近期状态的句子。\n\n请只根据你**过去七天**的真实经历来回答每一句，选择最符合你实际情况的程度。没有对错之分，不必反复斟酌，按你真实的感受和做法来选就好。",
+        "language": "zh-CN",
+        "version": "1.0.0",
+        "source": "「过去七天」回顾期取自作者官方 Psy-Flex 英文问卷说明；作答引导语为平台独立撰写的中文工作稿。作者另发布官方中文版问卷，本译稿不复制其措辞。"
+      }
+    }
+  ],
+  "bindingFindings": {
+    "responseSet": "psyflex_frequency_1_5：value=\"5\" score=5 保持，label从总是如此改为非常经常；其他选项和题文不变。",
+    "layoutConstraint": "catalog.administration.layoutConstraints[1] 重复旧最高锚，随新版本同步；不影响计分。",
+    "instruction": "instruction.text 不包含总是如此或最高锚文字；过去七天及版本1.0.0不变。",
+    "localization": "顶层localization.localizationVersion和definition.versionAxes.localizationVersion必须同步到1.0.1；新增备注只记录已批准锚点纠正，不声称专家审核。",
+    "policyVersions": "applicability/disclosure/usageRequirements 的policyVersion为1.0.0；其策略内容不随选项用语更改，不推定须改为工具版本。",
+    "scoringAndReport": "scoringVersion和reportVersion均1.0.0，公式和报告内容不变，无须硬升报告版本。"
+  },
+  "application": "将原1.0.0复制为1.0.1新包后对副本应用本补丁；原文件和冻结快照保留。按现有静态注册及版本流程处理，执行后由root定向验证。",
+  "notExecuted": [
+    "未修改仓库，未运行测试、系统、DB或CI；保留人工译审与授权状态。"
+  ]
+}
