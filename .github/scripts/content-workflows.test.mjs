@@ -46,9 +46,25 @@ test('Bundle JSON does not duplicate independent browser workflows; mixed trigge
 });
 const source = name => fs.readFileSync(new URL(`../workflows/${name}.yml`, import.meta.url), 'utf8');
 const job = (text, name) => text.split(`  ${name}:\n`)[1]?.split(/\n  [a-z][a-z0-9-]*:\n/)[0] ?? '';
+// Interpret the actual job dependencies, not whether they are inline YAML or a
+// multiline sequence. Reject suffix lookalikes such as "fake-frontend".
+const jobNeeds = block => {
+  const lines=block.split('\n');
+  const index=lines.findIndex(line=>/^    needs:(?: \[[^\]]*\])?$/.test(line));
+  if(index<0)return [];
+  const inline=lines[index].match(/^    needs: \[([^\]]*)\]$/);
+  if(inline)return inline[1].split(',').map(name=>name.trim()).filter(Boolean);
+  const values=[];
+  for(let i=index+1;i<lines.length;i++){
+    const dep=lines[i].match(/^    - ([a-z][a-z0-9-]*)$/);
+    if(!dep)break;
+    values.push(dep[1]);
+  }
+  return values;
+};
 test('Bundle validation is mandatory on content and platform routes with stable aggregate', () => {
   const ci = source('ci'), content = source('scale-onboarding-boundary');
-  assert.match(job(ci, 'merge-gate'), /name: merge gate \/ ready PR/);
+  assert.match(job(ci, 'merge-gate'), /name: \$\{\{[\s\S]*'PR356 \/ no merge eligibility' \|\| 'merge gate \/ ready PR' \}\}/);
   assert.match(job(ci, 'scope'), /bundle: \$\{\{ steps.scope.outputs.bundle/);
   assert.match(job(ci, 'content'), /bundle: \$\{\{ needs.scope.outputs.bundle/);
   for (const name of ['backend', 'pr-light-backend', 'post-merge-smoke']) {
@@ -297,7 +313,13 @@ test('different component probes have independent concurrency groups while same-
   const ci=source('ci');
   assert.match(ci,/group:.*inputs\.step_probe \|\| 'none'/);
   assert.match(ci,/group:.*inputs\.step_probe == 'images' && inputs\.probe_frontend_only && 'frontend' \|\| 'all'/);
-  assert.match(ci,/cancel-in-progress: true/);
+  const expression=ci.match(/^  cancel-in-progress: \$\{\{ (.+) \}\}$/m)?.[1];
+  assert.ok(expression,'ordinary updates must have an explicit cancellation condition');
+  const permits=new Function('github',`return (${expression});`);
+  const github=(head,ref)=>({event:{pull_request:{head:{ref:head}}},ref_name:ref});
+  assert.equal(permits(github('feature/test','feature/test')),true);
+  assert.equal(permits(github('fix/runtime-time-and-validation-20261025','feature/test')),false);
+  assert.equal(permits(github('feature/test','fix/runtime-time-and-validation-20261025')),false);
 });
 
 test('all versioned jobs are pinned to hosted Ubuntu and cannot accept local runner overrides',()=>{
@@ -349,7 +371,7 @@ test('test-only UI code runs frontend regression without production/backend buil
   assert.match(frontend,/scenario == 'frontend-test'/);
   assert.match(job(ci,'scope'),/frontend_test: \$\{\{ steps\.scope\.outputs\.frontend_test \}\}/);
   assert.match(frontend,/uses: \.\/\.github\/workflows\/ci-frontend\.yml/);
-  assert.match(job(ci,'merge-gate'),/needs: .*frontend/);
+  assert.ok(jobNeeds(job(ci,'merge-gate')).includes('frontend'),'frontend regression must be an exact gate dependency');
   const scope=fs.readFileSync(new URL('./content-scope.mjs',import.meta.url),'utf8');
   const gate=fs.readFileSync(new URL('./merge-gate.mjs',import.meta.url),'utf8');
   assert.match(scope,/frontendTestOnly/);
@@ -386,7 +408,11 @@ test('browser scenario matrix partitions every former acceptance, isolates datab
   assert.match(part,/ci-artifact\.mjs\" verify frontend/);
   assert.match(part,/timeout -k 10s 180s sudo -n apt-get install/);
   assert.match(job(source('ci'),'browser'),/uses: \.\/\.github\/workflows\/ci-browser\.yml/);
-  assert.match(job(source('ci'),'merge-gate'),/backend-regression.*frontend-build.*frontend.*browser.*docker/);
+  const dependencies=jobNeeds(job(source('ci'),'merge-gate'));
+  for(const name of ['scope','backend-regression','frontend-build','frontend','browser','docker'])
+    assert.ok(dependencies.includes(name),'merge-gate must explicitly depend on '+name);
+  for(const forbidden of ['fake-frontend','frontend-extra','fake-backend-regression'])
+    assert.equal(dependencies.includes(forbidden),false);
 });
 
 test('light test-only route never starts unrelated builds, scans or platform smoke',()=>{
@@ -405,7 +431,10 @@ test('light test-only route never starts unrelated builds, scans or platform smo
       for(const force of ['false','true']) for(const frontend of ['false','true']) {
         const outputs={application_route:'legacy',scenario:'frontend-test',documentation:'false',
           maintenance:'false',content:'false',frontend,presentation:'false'};
-        const github={event_name:event,event:{pull_request:{draft}}},vars={CI_FORCE_FULL:force};
+        const github={event_name:event,ref_name:'feature/ci-synthetic',ref:'refs/heads/feature/ci-synthetic',
+          repository:'caohuibj/eduK12-new-version',
+          event:{pull_request:{draft,number:379,head:{ref:'feature/ci-synthetic',
+            repo:{full_name:'caohuibj/eduK12-new-version'}}}}},vars={CI_FORCE_FULL:force};
         assert.equal(allowed({scope:{outputs}},github,vars,()=>false),false,
           name+' must exclude frontend-test for every event/draft/force/frontend context');
         platformReachable||=allowed({scope:{outputs:{...outputs,scenario:'platform'}}},github,vars,()=>false);
