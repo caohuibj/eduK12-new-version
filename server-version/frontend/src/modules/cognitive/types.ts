@@ -593,3 +593,29 @@ export type LineangleTrialPayload = {
   rtMs: number | null
   interrupted: boolean
 }
+
+/** Seqlearn 冻结 config（与后端 seqlearn.config schema 一致）。 */
+export interface SeqlearnConfig {
+  totalTrials: number
+  trialsPerBlock: number
+  patternSequence: number[]
+  randomBlockIndices: number[]
+  fixationMs: number
+  stimulusMs: number
+  timeoutMs: number
+  validRtFloorMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+/** Seqlearn 单 trial payload（与后端 seqlearn.trial schema 一致）。 */
+export type SeqlearnTrialPayload = {
+  position: number
+  response: number | null
+  rtMs: number | null
+  interrupted: boolean
+}

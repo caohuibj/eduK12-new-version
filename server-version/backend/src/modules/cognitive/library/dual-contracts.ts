@@ -245,6 +245,12 @@ const SCORING_DECLARATIONS: Record<string, CognitiveScoringContractDeclaration> 
     runtimeReconstructableFacts: ['目标与选项角度（seed/config）'],
     serverDerivedFacts: ['选项合法性与正确性判定', 'metrics（accuracy/medianRtMs）', 'quality flags'],
   },
+  seqlearn: {
+    testType: 'seqlearn',
+    clientObservedFacts: ['位置按键选择', 'raw RT', 'interrupted'],
+    runtimeReconstructableFacts: ['冻结重复序列与随机块位置（config）', '模式块位置（由序列权威推导）'],
+    serverDerivedFacts: ['模式块位置校验与正确性', 'metrics（srtPatternAdvantageMs/条件RT）', 'quality flags'],
+  },
 }
 
 // 当前通用事实（所有任务一致）：完整加密 trial payload、v2 trial envelope qualityEvents、
@@ -420,6 +426,11 @@ const RESEARCH_CAPTURE_DECLARATIONS: Record<string, CognitiveResearchCaptureDecl
     testType: 'lineangle',
     currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次响应与 raw RT'],
     futureCaptureFacts: ['真实 input modality', 'device provenance', 'viewport/dpr'],
+  },
+  seqlearn: {
+    testType: 'seqlearn',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次响应与 raw RT'],
+    futureCaptureFacts: ['显性觉察自评', '真实 input modality', 'device provenance'],
   },
 }
 
