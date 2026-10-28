@@ -161,3 +161,10 @@ it is not a self-approved admission. First review the added dispatch repair,
 raw continuations, source compatibility and unresolved UI scope. After bounded
 control preparation, freeze a new exact control checkpoint for DOT before any
 activation. No full CI fallback or fabricated signatures are authorized.
+
+Initial evidence packaging verification failed for the two API-r2 service logs
+that appended graceful-shutdown output after indexing. The first Draft push
+45e76c379 retained that stale index because the shell did not fail fast.
+`cloud-index-correction.json` preserves the failure and before/after hashes; the
+continuation freezes the stopped process logs without rewriting them or rerunning
+application checks. Raw log whitespace warnings are retained as original bytes.

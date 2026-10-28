@@ -11,15 +11,21 @@
     },
     {
       "path": "QUALIFICATION.md",
-      "bytes": 11740,
-      "sha256": "6337a41ba66bcc97e7eb74b5356ec7415b94e7f4031a9c852cd1a4cc372b0b94",
-      "gitBlob": "efa37a9029b0b63561dd01ab7a03f3966dbdd298"
+      "bytes": 12212,
+      "sha256": "005590b91314a9daf0e081afc1fe30dd304cbbad0012a1ccfadbf859a06e63fd",
+      "gitBlob": "7dc3e8846b60249fac704fae0fb6c096345a12ee"
     },
     {
       "path": "cloud-candidate.json",
       "bytes": 4938,
       "sha256": "0c5d8c2c84caf87458918a34c7c80f8f797ba727d9ef260365557e392e0a6221",
       "gitBlob": "d52b5740c4d945d5284852e49bb183ddc51377ff"
+    },
+    {
+      "path": "cloud-index-correction.json",
+      "bytes": 1095,
+      "sha256": "db202d9c178ceeba3e3ee86ac533cf54dfcc0def567d42623ac5d710e6e53170",
+      "gitBlob": "6828ea9acc1bb96e89b2d0fac966f6d16ed08ce6"
     },
     {
       "path": "cloud-redactions.json",
@@ -77,15 +83,15 @@
     },
     {
       "path": "evidence/cloud-api-r2.stderr.log",
-      "bytes": 0,
-      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "gitBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+      "bytes": 73,
+      "sha256": "59b568d5accbf7cb3caedfe0808ff8d13ee6281cece820e77aba6c3762619113",
+      "gitBlob": "93df143a0bcd4effc5db47477509b4e362e743c3"
     },
     {
       "path": "evidence/cloud-api-r2.stdout.log",
-      "bytes": 2012,
-      "sha256": "4dfacf0e072843fee86125c3bd67afacfc65205425f726f721a23be61d68dd66",
-      "gitBlob": "59be7f9d2b0a823b81c35026a22acb0e924b3f45"
+      "bytes": 2132,
+      "sha256": "c17a7d566b02112509ab9c827b2990d168d7800350866f2e44bc112510e2b6c9",
+      "gitBlob": "c8cd7b56a3d1243b33abbc026667a6fcae60d5b0"
     },
     {
       "path": "evidence/cloud-api-ready.json",
