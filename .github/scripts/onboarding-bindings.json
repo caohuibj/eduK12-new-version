@@ -3,7 +3,7 @@
   "enabled": true,
   "base": "ec19f532b7a962ff9027ba5558d1412bf886a3c4",
   "product": "2b417daa8a02d1103948e0918af10238aa7685b8",
-  "controlCheckpoint": "de780935132d4fc905fb23dcd82d8a48d62ec21b",
+  "controlCheckpoint": "914c88518b1a56540abee353a559d5429b062482",
   "source": {
     "docs/performance/postlogin-20261028/README.md": {
       "before": null,
@@ -219,7 +219,9 @@
     ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
     ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
     ".github/scripts/pr380-browser.mjs": null,
-    ".github/workflows/ci.yml": "e1e110efc0559c229fec876e432cd0187318d7d4"
+    ".github/workflows/ci.yml": "e1e110efc0559c229fec876e432cd0187318d7d4",
+    ".github/scripts/pr380-browser-reuse.mjs": null,
+    ".github/scripts/pr380-browser-reuse.test.mjs": null
   },
   "components": {
     "backend": "b7fe981eea351ebb94232571479894e921e53bcd",
