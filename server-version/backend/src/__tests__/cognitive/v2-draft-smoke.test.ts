@@ -63,6 +63,7 @@ const payloadFor = (testType: string): { phase: 'test' | 'learning'; payload: un
     case 'ufov': return { phase: 'test', payload: { centralTarget: 'circle', peripheralPosition: 0, centralResponse: 0, peripheralResponse: 0, rtMs: 300, interrupted: false } }
     case 'logicdeduce': return { phase: 'test', payload: { itemId: 'ld-01', responseIndex: 0, rtMs: 300, interrupted: false } }
     case 'seriescomplete': return { phase: 'test', payload: { itemId: 'sc-01', responseIndex: 0, rtMs: 300, interrupted: false } }
+    case 'pursuitrotor': return { phase: 'test', payload: { trialIndex: 0, timeOnTargetMs: 12000, totalTrackMs: 20000, interrupted: false } }
     default: throw new Error(`No cognitive smoke payload for ${testType}`)
   }
 }

@@ -335,6 +335,12 @@ const SCORING_DECLARATIONS: Record<string, CognitiveScoringContractDeclaration> 
     runtimeReconstructableFacts: ['题目内容与正确项（frozen bank + seed 抽题顺序）'],
     serverDerivedFacts: ['正确性判定', 'metrics（accuracy/medianRtMs）', 'quality flags'],
   },
+  pursuitrotor: {
+    testType: 'pursuitrotor',
+    clientObservedFacts: ['在目标上时间', '总追踪时长', 'interrupted'],
+    runtimeReconstructableFacts: ['轨道参数（frozen config 圆轨恒速）'],
+    serverDerivedFacts: ['追踪时间比换算', 'metrics（onTargetRate）', 'quality flags'],
+  },
 }
 
 // 当前通用事实（所有任务一致）：完整加密 trial payload、v2 trial envelope qualityEvents、
@@ -585,6 +591,11 @@ const RESEARCH_CAPTURE_DECLARATIONS: Record<string, CognitiveResearchCaptureDecl
     testType: 'seriescomplete',
     currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次响应与 raw RT'],
     futureCaptureFacts: ['真实 input modality', 'device provenance', 'viewport/dpr'],
+  },
+  pursuitrotor: {
+    testType: 'pursuitrotor',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐轮追踪时间与用时'],
+    futureCaptureFacts: ['指针轨迹采样', '采样率与延迟', 'device provenance'],
   },
 }
 

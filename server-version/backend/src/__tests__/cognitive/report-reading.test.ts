@@ -147,7 +147,7 @@ describe('versioned participant report interpretation', () => {
       expect(report.reading!.professional!.metrics.some(m => definition.metrics[m.key].role === 'research_only')).toBe(false)
       expect(report.reading!.professional!.withheld.some(m => definition.metrics[m.key].role === 'research_only')).toBe(false)
     }
-    expect(families.size).toBe(48)
+    expect(families.size).toBe(49)
   })
   it('keeps specialist explanations separate from the popular voice and withholds professional numeric estimates too', () => {
     const input = reactionInput(5)

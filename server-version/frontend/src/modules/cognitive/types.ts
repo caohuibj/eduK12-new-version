@@ -935,3 +935,24 @@ export type SeriescompleteTrialPayload = {
   rtMs: number | null
   interrupted: boolean
 }
+
+/** Pursuitrotor 冻结 config（与后端 pursuitrotor.config schema 一致）。 */
+export interface PursuitrotorConfig {
+  totalTrials: number
+  trackMs: number
+  revolutionMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+/** Pursuitrotor 单 trial payload（与后端 pursuitrotor.trial schema 一致）。 */
+export type PursuitrotorTrialPayload = {
+  trialIndex: number
+  timeOnTargetMs: number
+  totalTrackMs: number
+  interrupted: boolean
+}
