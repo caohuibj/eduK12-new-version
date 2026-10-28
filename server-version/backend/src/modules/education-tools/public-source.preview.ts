@@ -75,7 +75,8 @@ export async function readEducationPublicStandardPreviewAsset(c:PrivateToolConte
   await authorizePrivateTool(tx,c)
   const key=educationPublicSourceKey({kind:'STANDARD_SCALE',id:versionId,hash:contentHash})
   if(!(await readEducationPublicUse(tx,c,[key])).has(key))privateToolFail('PUBLIC_SOURCE_USE_REQUIRED',403)
-  const [row]=await tx.$queryRaw<Array<{reference:unknown}>>(Prisma.sql`SELECT ref AS reference FROM survey_standard_releases s
+  const [row]=await tx.$queryRaw<Array<{reference:unknown}>>(Prisma.sql`SELECT jsonb_build_object('assetId',ref->>'assetId',
+   'contentHash',ref->>'sha256','mimeType',ref->>'mediaType') AS reference FROM survey_standard_releases s
    JOIN measurement_content_releases m ON m.id=s.measurement_release->>'releaseId'
    CROSS JOIN LATERAL jsonb_array_elements(m.asset_refs) ref
    WHERE s.id=${versionId} AND s.combination_hash=${contentHash} AND s.state='ONLINE' AND m.status='PUBLISHED'
