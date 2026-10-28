@@ -1,0 +1,99 @@
+{
+  "status": "UNVALIDATED_WORKING_TRANSLATION",
+  "items": [
+    {
+      "id": "IPIP_OPT10_01",
+      "en": "Just know that I will be a success.",
+      "zh_draft": "我确信自己会取得成功。",
+      "reverse": false
+    },
+    {
+      "id": "IPIP_OPT10_02",
+      "en": "Feel comfortable with myself.",
+      "zh_draft": "我对自己感到自在。",
+      "reverse": false
+    },
+    {
+      "id": "IPIP_OPT10_03",
+      "en": "Seldom feel blue.",
+      "zh_draft": "我很少感到情绪低落。",
+      "reverse": false
+    },
+    {
+      "id": "IPIP_OPT10_04",
+      "en": "Look at the bright side of life.",
+      "zh_draft": "我会看到生活中积极的一面。",
+      "reverse": false
+    },
+    {
+      "id": "IPIP_OPT10_05",
+      "en": "Have a dark outlook on the future.",
+      "zh_draft": "我对未来的看法很悲观。",
+      "reverse": true
+    },
+    {
+      "id": "IPIP_OPT10_06",
+      "en": "Feel that my life lacks direction.",
+      "zh_draft": "我觉得自己的生活缺少方向。",
+      "reverse": true
+    },
+    {
+      "id": "IPIP_OPT10_07",
+      "en": "Dislike myself.",
+      "zh_draft": "我不喜欢自己。",
+      "reverse": true
+    },
+    {
+      "id": "IPIP_OPT10_08",
+      "en": "Often feel blue.",
+      "zh_draft": "我常常感到情绪低落。",
+      "reverse": true
+    },
+    {
+      "id": "IPIP_OPT10_09",
+      "en": "See difficulties everywhere.",
+      "zh_draft": "我觉得处处都是困难。",
+      "reverse": true
+    },
+    {
+      "id": "IPIP_OPT10_10",
+      "en": "Am often in a bad mood.",
+      "zh_draft": "我经常心情不好。",
+      "reverse": true
+    }
+  ],
+  "anchors": [
+    {
+      "value": 1,
+      "en": "Very Inaccurate",
+      "zh": "很不符合"
+    },
+    {
+      "value": 2,
+      "en": "Moderately Inaccurate",
+      "zh": "比较不符合"
+    },
+    {
+      "value": 3,
+      "en": "Neither Inaccurate nor Accurate",
+      "zh": "介于不符合与符合之间"
+    },
+    {
+      "value": 4,
+      "en": "Moderately Accurate",
+      "zh": "比较符合"
+    },
+    {
+      "value": 5,
+      "en": "Very Accurate",
+      "zh": "很符合"
+    }
+  ],
+  "instructions": "请根据你通常的实际情况，判断下面的描述与你有多符合。请按真实情况作答，而不是你希望自己成为的样子。",
+  "rights": {
+    "type": "public_domain",
+    "source": "https://www.ipip.ori.org/",
+    "electronic_and_translation_source": "https://www.ipip.ori.org/New_IPIP-50-item-scale.htm",
+    "summary": "IPIP官方允许复制、编辑、翻译及任何用途，包括网上施测；仍保留来源署名。"
+  }
+}

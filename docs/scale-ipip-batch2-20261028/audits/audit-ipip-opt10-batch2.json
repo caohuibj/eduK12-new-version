@@ -1,0 +1,252 @@
+{
+  "identity": "ipip_opt10_zh_cn_research:1.0.0",
+  "sourceCommit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "sourceBranch": "content/dot-local-scales-20261025",
+  "specifiedMain": "8774b1cf158dae1c5eb0f4950044c6ae6d6a18dd",
+  "files": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ipip_opt10_zh_cn_research/1.0.0/source.json",
+      "gitBlob": "666bb410051d1caa22a042abb5f43af4a7b0d2a8",
+      "sha256": "1327accb2a02d8909fbac4512e7cc8323f4388073256f7e9e9a23d6f77f97cf0"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ipip_opt10_zh_cn_research/1.0.0/instrument.ts",
+      "gitBlob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_opt10/1.0.0/README.md",
+      "gitBlob": "657297ec0fe7482dfcd4a4a81113e90dbdd21f9b",
+      "sha256": "1e507277999eb36366da4141561cb2a05a5ffa8261a3304d15d5655525d80bf3"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_opt10/1.0.0/bilingual-content.json",
+      "gitBlob": "a6ee7796aeea8eddef49f6c6cd0d3907ac154066",
+      "sha256": "6e3620fd45f239c29e9344b3c89d96f069d7f9d902057d8c5207f38cebcb7f74"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_opt10/1.0.0/reviewed-source-pack.json",
+      "gitBlob": "2d9fb6c2a88bc1f77a53a626c9c9e3d5cca50e4b",
+      "sha256": "4164b663bfa2ed1d05b554e6b3441551fe4576779cc48ecdf811e9b5ccfbac8f"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_opt10/1.0.0/references.md",
+      "gitBlob": "65db9179608e429efb7f50340ed6ca3581cf645e",
+      "sha256": "1738bd95b7210779eaf2f1e6b66c9ab2306674dd86819d54796a49bc344541af"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_opt10/1.0.0/report-example.md",
+      "gitBlob": "33f2d82a29ece3d75b0372ddc8f9577706abe609",
+      "sha256": "88c48112b33c35153ea954237392f8d169d26bf8ac28e3ef64458a303bef7876"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_opt10/1.0.0/synthetic-report-example.json",
+      "gitBlob": "4f3c6c3cd2bf75abae2cececb0cf0bce241edcec",
+      "sha256": "6198a57f7eff46ecbdc692fe5cbcb59759f213bb8607ef821c4f785b99ed5212"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_opt10/1.0.0/local-validation.json",
+      "gitBlob": "bfd9872f5b6f2b2e31e60380ba3f6799dcaecf45",
+      "sha256": "39a05f8a8063bcf0e127994c7dbb97f0412f119c693ec09c92412f9c3c83176b"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_opt10/1.0.0/report-revisions/1.0.1/change-record.json",
+      "gitBlob": "bd843b2f7a8f376ba9b7a68151c83f11e06e5b0d",
+      "sha256": "42ec9cf710cab13be466378ce72352453257e34f81d0fd0262577faa9ecea28b"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_opt10/1.0.0/report-revisions/1.0.1/previous-report-1.0.0.json",
+      "gitBlob": "b21b565bc3d5bddc1d7a4de1f048b8726ca3692d",
+      "sha256": "6951305e232b4fa9a0ad544080065b8c096aa22ea250d08e5cd5dc6cd29097ab"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_opt10/1.0.0/report-revisions/1.0.1/validation.json",
+      "gitBlob": "60b60ab463a55228e396e9ad85bf326c8a895be5",
+      "sha256": "25f7b5778125cc83d69092d9bfccebcba940968255fd1197bec6e2a655dbdf13"
+    }
+  ],
+  "thirdPartyLicense": {
+    "path": "server-version/backend/src/modules/scale/instruments/ipip_opt10_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+    "status": "absent at fixed commit; source.json and references document the official IPIP public-domain declaration"
+  },
+  "threePartConclusions": {
+    "content": "IPIP 单一构念键表 Optimism 项下十道英文题及顺序与来源逐项一致，4正6反；中文固定源与双语稿逐项相同，语义基本对应。五点锚是符合度而非额外的频率量表；第3、8、10题语句自带频率。中文是未验证工作译稿。",
+    "scoring": "单一总分，1–4 正向，5–10 反向 6−x；等权求和，理论范围10–50，越高表示自报更偏向积极预期。项目 complete_required 缺任一则不计算，不补零或推算；这是项目规则，不能声称官方缺失规则。研究包备选题均分 sum/10 是1–5，当前定义只输出总分，不应凭草稿添加。无临床阈值、常模或分档。",
+    "report": "报告版本1.0.1方向一致，提供温和的现实检视和可执行的小行动，不要求永远积极，不作抑郁判断。明确覆盖心情、自我感受及生活方向，不能与LOT-R混同；未生成排名、常模或等级。成人自评、zh-CN；student是技术受众角色。instrument/scoring/localization 1.0.0，report 1.0.1，referencePolicy none。"
+  },
+  "items": [
+    {
+      "number": 1,
+      "id": "IPIP_OPT10_01",
+      "english": "Just know that I will be a success.",
+      "chinese": "我确信自己会取得成功。",
+      "key": "positive",
+      "assessment": "对应官方英文、键向与固定运行时文本；中文含义基本一致，仍待独立译审。"
+    },
+    {
+      "number": 2,
+      "id": "IPIP_OPT10_02",
+      "english": "Feel comfortable with myself.",
+      "chinese": "我对自己感到自在。",
+      "key": "positive",
+      "assessment": "对应官方英文、键向与固定运行时文本；中文含义基本一致，仍待独立译审。"
+    },
+    {
+      "number": 3,
+      "id": "IPIP_OPT10_03",
+      "english": "Seldom feel blue.",
+      "chinese": "我很少感到情绪低落。",
+      "key": "positive",
+      "assessment": "对应官方英文、键向与固定运行时文本；中文含义基本一致，仍待独立译审。"
+    },
+    {
+      "number": 4,
+      "id": "IPIP_OPT10_04",
+      "english": "Look at the bright side of life.",
+      "chinese": "我会看到生活中积极的一面。",
+      "key": "positive",
+      "assessment": "对应官方英文、键向与固定运行时文本；中文含义基本一致，仍待独立译审。"
+    },
+    {
+      "number": 5,
+      "id": "IPIP_OPT10_05",
+      "english": "Have a dark outlook on the future.",
+      "chinese": "我对未来的看法很悲观。",
+      "key": "reverse",
+      "assessment": "对应官方英文、键向与固定运行时文本；中文含义基本一致，仍待独立译审。"
+    },
+    {
+      "number": 6,
+      "id": "IPIP_OPT10_06",
+      "english": "Feel that my life lacks direction.",
+      "chinese": "我觉得自己的生活缺少方向。",
+      "key": "reverse",
+      "assessment": "对应官方英文、键向与固定运行时文本；中文含义基本一致，仍待独立译审。"
+    },
+    {
+      "number": 7,
+      "id": "IPIP_OPT10_07",
+      "english": "Dislike myself.",
+      "chinese": "我不喜欢自己。",
+      "key": "reverse",
+      "assessment": "对应官方英文、键向与固定运行时文本；中文含义基本一致，仍待独立译审。"
+    },
+    {
+      "number": 8,
+      "id": "IPIP_OPT10_08",
+      "english": "Often feel blue.",
+      "chinese": "我常常感到情绪低落。",
+      "key": "reverse",
+      "assessment": "对应官方英文、键向与固定运行时文本；中文含义基本一致，仍待独立译审。"
+    },
+    {
+      "number": 9,
+      "id": "IPIP_OPT10_09",
+      "english": "See difficulties everywhere.",
+      "chinese": "我觉得处处都是困难。",
+      "key": "reverse",
+      "assessment": "对应官方英文、键向与固定运行时文本；中文含义基本一致，仍待独立译审。"
+    },
+    {
+      "number": 10,
+      "id": "IPIP_OPT10_10",
+      "english": "Am often in a bad mood.",
+      "chinese": "我经常心情不好。",
+      "key": "reverse",
+      "assessment": "对应官方英文、键向与固定运行时文本；中文含义基本一致，仍待独立译审。"
+    }
+  ],
+  "anchors": [
+    {
+      "value": 1,
+      "en": "Very Inaccurate",
+      "zh": "很不符合"
+    },
+    {
+      "value": 2,
+      "en": "Moderately Inaccurate",
+      "zh": "比较不符合"
+    },
+    {
+      "value": 3,
+      "en": "Neither Inaccurate nor Accurate",
+      "zh": "介于不符合与符合之间"
+    },
+    {
+      "value": 4,
+      "en": "Moderately Accurate",
+      "zh": "比较符合"
+    },
+    {
+      "value": 5,
+      "en": "Very Accurate",
+      "zh": "很符合"
+    }
+  ],
+  "instruction": {
+    "text": "请根据你通常的实际情况，判断下面的描述与你有多符合。请按真实情况作答，而不是你希望自己成为的样子。",
+    "sources": [
+      {
+        "file": {
+          "path": "docs/scale-instruments/research-drafts/ipip_opt10/1.0.0/bilingual-content.json",
+          "gitBlob": "a6ee7796aeea8eddef49f6c6cd0d3907ac154066",
+          "sha256": "6e3620fd45f239c29e9344b3c89d96f069d7f9d902057d8c5207f38cebcb7f74"
+        },
+        "field": "instructions"
+      },
+      {
+        "file": {
+          "path": "docs/scale-instruments/research-drafts/ipip_opt10/1.0.0/reviewed-source-pack.json",
+          "gitBlob": "2d9fb6c2a88bc1f77a53a626c9c9e3d5cca50e4b",
+          "sha256": "4164b663bfa2ed1d05b554e6b3441551fe4576779cc48ecdf811e9b5ccfbac8f"
+        },
+        "field": "instructions_zh"
+      }
+    ],
+    "sourceJson": "固定 source.json 无顶层 instruction，不代表缺少既有指导语。",
+    "proposedBinding": {
+      "schemaVersion": 1,
+      "text": "请根据你通常的实际情况，判断下面的描述与你有多符合。请按真实情况作答，而不是你希望自己成为的样子。",
+      "language": "zh-CN",
+      "version": "1.0.0",
+      "source": "docs/scale-instruments/research-drafts/ipip_opt10/1.0.0/bilingual-content.json#instructions"
+    },
+    "qualification": "version 是拟议接入标识，不代表历史专家审校；使用现有指导语和可追溯来源。"
+  },
+  "rights": {
+    "declaration": "原 source 的 verified/public domain 针对 IPIP 材料保持；官方主页明确可复制、编辑、翻译和任何目的，许可页列商业与非商业。",
+    "sources": [
+      "https://ipip.ori.org/",
+      "https://ipip.ori.org/newPermission.htm"
+    ],
+    "boundary": "不扩大至 LOT-R 或其他第三方材料；不将许可视为中文审校或心理测量验证。"
+  },
+  "officialEvidence": [
+    {
+      "url": "https://ipip.ori.org/newSingleConstructsKey.htm",
+      "finding": "Optimism (Scheier, Carver, & Bridges, 1994) 10题四正六反，官方报告 alpha .86；此统计不能作为该中文版本信度。"
+    },
+    {
+      "url": "https://ipip.ori.org/newScoringInstructions.htm",
+      "finding": "五点符合度、反向计分及求和。"
+    },
+    {
+      "url": "https://ipip.ori.org/newNorms.htm",
+      "finding": "IPIP网站不提供常模；本中文版本不移植无关群体参数。"
+    }
+  ],
+  "ordinaryContentRevisionSuggestions": [
+    "可在 reviewed-source-pack.json 的 report 草稿处标明题均分仅为备选研究方案、当前运行时不输出；README 已有同一限制，属于澄清草稿与实际定义，不改变计分或报告。也可不改：当前可执行报告及示例均未声称题均分。",
+    "无需为形式重写当前1.0.1报告；引用保留官方单一构念键页及其标示的 Scheier, Carver, & Bridges (1994) 关联，避免声称本IPIP条目为LOT-R原题。"
+  ],
+  "manualPending": [
+    "独立中文译审、认知访谈与适用人群效度仍待完成；保留 DRAFT/CANDIDATE/PILOT、PENDING/NOT_ESTABLISHED。",
+    "成人研究与自我了解；未成年人适用性未建立。",
+    "若拟更改题意、锚点、公式、分数、阈值或构念，列出原依据和影响交 root 协调用户，不改成熟版本。"
+  ],
+  "recommendation": "建议本批沿用已有报告与固定内容，并绑定既有指导语；原有译审、验证和受众边界仍待人工工作，不升级为新的自动准入条件。",
+  "notExecuted": [
+    "未执行UI、浏览器、四入口、安装、幂等、数据库、CI、全库检查、golden或运行时评分；未修改共享仓库、切分支、提交或推送。",
+    "未进行新效度研究，未声称人工审校或将历史验证记录视为本次运行。"
+  ]
+}

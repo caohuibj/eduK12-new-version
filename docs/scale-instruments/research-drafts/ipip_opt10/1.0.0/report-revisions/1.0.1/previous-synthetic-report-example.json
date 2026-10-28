@@ -1,0 +1,164 @@
+{
+  "schemaVersion": 2,
+  "instrument": {
+    "scaleId": "synthetic-local-only",
+    "code": "ipip_opt10_zh_cn_research",
+    "name": "乐观倾向（IPIP 10题表征版） — 中文研究工作译稿",
+    "instrumentVersion": "1.0.0"
+  },
+  "method": {
+    "scaleId": "synthetic-local-only",
+    "instrumentVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "reportVersion": "1.0.0",
+    "reportAudience": "student",
+    "localizationVersion": "1.0.0",
+    "definitionHash": "925c9bc83a091c84098ced9cd5332cd826f5e77f77f4de1c397ca4d7d6b88792",
+    "referenceVersions": [],
+    "assessmentContext": null
+  },
+  "quality": {
+    "status": "interpretable",
+    "flags": []
+  },
+  "itemScores": [
+    {
+      "itemCode": "IPIP_OPT10_01",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_OPT10_02",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_OPT10_03",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_OPT10_04",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_OPT10_05",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_OPT10_06",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_OPT10_07",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_OPT10_08",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_OPT10_09",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_OPT10_10",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    }
+  ],
+  "scores": [
+    {
+      "key": "optimism",
+      "type": "total",
+      "label": "乐观倾向",
+      "description": "本量表反映你对未来、生活积极面及自身状态的整体看法。得分较高表示你的回答更偏向积极预期；它不是抑郁筛查，也不代表你必须一直保持积极。",
+      "direction": "higher_is_more",
+      "canonical": true,
+      "displayPrecision": 0,
+      "value": 30,
+      "range": {
+        "min": 10,
+        "max": 50
+      },
+      "expectedItems": [
+        "IPIP_OPT10_01",
+        "IPIP_OPT10_02",
+        "IPIP_OPT10_03",
+        "IPIP_OPT10_04",
+        "IPIP_OPT10_05",
+        "IPIP_OPT10_06",
+        "IPIP_OPT10_07",
+        "IPIP_OPT10_08",
+        "IPIP_OPT10_09",
+        "IPIP_OPT10_10"
+      ],
+      "answeredItems": [
+        "IPIP_OPT10_01",
+        "IPIP_OPT10_02",
+        "IPIP_OPT10_03",
+        "IPIP_OPT10_04",
+        "IPIP_OPT10_05",
+        "IPIP_OPT10_06",
+        "IPIP_OPT10_07",
+        "IPIP_OPT10_08",
+        "IPIP_OPT10_09",
+        "IPIP_OPT10_10"
+      ],
+      "status": "calculated",
+      "prorated": false
+    }
+  ],
+  "references": [],
+  "interpretations": [
+    {
+      "scoreKey": "optimism",
+      "headline": "乐观倾向：描述性反馈",
+      "label": null,
+      "interpretation": "本量表反映你对未来、生活积极面及自身状态的整体看法。得分较高表示你的回答更偏向积极预期；它不是抑郁筛查，也不代表你必须一直保持积极。 该IPIP表征含情绪低落、自我感受和生活方向等内容，不是LOT-R原版；不得移用LOT-R分数阈值或替代专业评估。 当前没有与你的人群和中文版本匹配的可靠常模，不提供高／中／低等级、百分位或临床阈值。10–50仅为理论分数范围；30不是人群平均值。",
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "想一想你最近一次对未来抱有期待或担忧的情境：哪些想法与现实支持影响了你？"
+        },
+        {
+          "category": "strategy",
+          "text": "可以把一个当前担忧分为“我能做一点什么”与“我暂时无法控制什么”，选择一个小行动，同时允许难受的感受存在。分数只是一种反思线索，不是对性格好坏的评价。"
+        }
+      ],
+      "limitations": [
+        "中文工作译稿未经本地验证，未完成专家译审或认知访谈。",
+        "没有适用于当前中文版本及目标人群的常模或临床cut-off；30仅是理论中点。",
+        "该IPIP表征含情绪低落、自我感受和生活方向等内容，不是LOT-R原版；不得移用LOT-R分数阈值或替代专业评估。",
+        "全部10题有效作答才计分；不插补、不将漏答当零。缺失时报告invalid。",
+        "不得用于诊断、高风险选拔或对个人价值作评价。"
+      ],
+      "referenceVersion": null
+    }
+  ],
+  "caveats": [
+    "中文工作译稿未经本地验证，未完成专家译审或认知访谈。",
+    "没有适用于当前中文版本及目标人群的常模或临床cut-off；30仅是理论中点。",
+    "该IPIP表征含情绪低落、自我感受和生活方向等内容，不是LOT-R原版；不得移用LOT-R分数阈值或替代专业评估。",
+    "全部10题有效作答才计分；不插补、不将漏答当零。缺失时报告invalid。",
+    "不得用于诊断、高风险选拔或对个人价值作评价。",
+    "未提供群体参考。"
+  ],
+  "disclaimer": "仅供研究与描述性自我了解，不用于心理诊断。乐观分数不是人格好坏或必须保持积极的要求。"
+}
