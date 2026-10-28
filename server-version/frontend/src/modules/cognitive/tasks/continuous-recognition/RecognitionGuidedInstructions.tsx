@@ -18,5 +18,5 @@ export function RecognitionGuidedInstructions({language='zh',profile}:{language?
     <p>{en?'If practice is not passed, read these instructions and examples again before retrying. Up to 3 rounds; you may stop. This checks understanding of the controls, not your memory ability.':'未通过时，重练前会重新呈现这份说明和例子。最多3轮，也可以结束；这是操作理解规则，不是记忆能力标准。'}</p>
     <p>{en?`Formal pictures last 0.75 seconds plus 0.8 seconds of +, without feedback or pauses between pictures. The stream takes about ${profile==='research'?'6 minutes 43 seconds':'2 minutes 35 seconds'}, plus instructions, practice and preparation. Practice is separate from formal results.`:`正式图片显示0.75秒加0.8秒“+”，连续呈现，没有逐题反馈；图片流约${profile==='research'?'6分43秒':'2分35秒'}，另加说明、练习及准备时间。练习不计入正式结果。`}</p>
     <p>{en?'Keep your device still and turn off notifications. If interrupted, the stream stops; saving retries retain existing records and do not show them again.':'请放稳设备、关闭通知。中断后停止呈现；保存重试会保留原记录，不重新展示图片。'}</p>
-  </section>
+  <h2>{en?'When you are finished':'怎样算完成'}</h2><p>{en?`Finish all ${formal} formal pictures and wait for the saved-record confirmation. Practice is separate. If you end early, the unfinished part stays missing; if saving fails, keep this page open and retry the same record.`:`做完${formal}张图片正式任务后，等待记录保存成功的确认；练习另计。提前结束时，未完成部分保留缺失。保存失败请保留本页，只重试原记录。`}</p></section>
 }

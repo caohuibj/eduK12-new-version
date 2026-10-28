@@ -53,3 +53,14 @@ pointer，见 [installation-continued.json](evidence/installation-continued.json
 直接后端类型首轮发现 plain-object config 的三处 interface 兼容错误，已定向修正，
 保留原诊断；最终 [backend-direct-types.json](evidence/backend-direct-types.json)
 零诊断。没有全量 seed、全平台 CI、全库计分、权限或 schema 修改。
+
+## 九份说明的完成与保存提示
+
+九份现有说明在完整规则/例子之后增加中英文“怎样算完成”：按该协议真实正式次数
+结束，并等保存确认；练习另计，提前结束不补造后续结果，失败只重试同一记录。
+没有增加时间估计、练习轮次、输入门槛或更改刺激/时序；原本的完整重练说明继续
+由同一组件重呈。
+
+[说明审阅索引](evidence/instruction-review.json) 包含源码哈希及27张实际预览：
+手机中文、平板英文和 CSS 200% 压力预览。都是组件级预览，不冒充真实四入口或
+原生设备计时验证。完整截图夹具及其首轮标题定位失败会在报告呈现提交保留。
