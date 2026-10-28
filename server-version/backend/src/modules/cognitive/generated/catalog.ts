@@ -46,6 +46,7 @@ import { catalog as task43 } from '../tasks/trustgame/governance'
 import { catalog as task44 } from '../tasks/embeddedfigures/governance'
 import { catalog as task45 } from '../tasks/ufov/governance'
 import { catalog as task46 } from '../tasks/logicdeduce/governance'
+import { catalog as task47 } from '../tasks/seriescomplete/governance'
 export const cognitiveCatalog = {
   'reaction': task0,
   'memory': task1,
@@ -94,4 +95,5 @@ export const cognitiveCatalog = {
   'embeddedfigures': task44,
   'ufov': task45,
   'logicdeduce': task46,
+  'seriescomplete': task47,
 }

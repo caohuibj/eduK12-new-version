@@ -912,3 +912,26 @@ export type LogicdeduceTrialPayload = {
   rtMs: number | null
   interrupted: boolean
 }
+
+/** Seriescomplete 冻结 config（与后端 seriescomplete.config schema 一致）。 */
+export interface SeriescompleteConfig {
+  totalTrials: number
+  stimulusSetVersion: string
+  fixationMs: number
+  timeoutMs: number
+  validRtFloorMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+/** Seriescomplete 单 trial payload（与后端 seriescomplete.trial schema 一致）。 */
+export type SeriescompleteTrialPayload = {
+  itemId: string
+  responseIndex: number | null
+  rtMs: number | null
+  interrupted: boolean
+}
