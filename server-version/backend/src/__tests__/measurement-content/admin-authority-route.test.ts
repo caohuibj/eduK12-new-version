@@ -1,4 +1,5 @@
 import {beforeEach,describe,it,expect,vi} from 'vitest'
+import express from 'express'
 const mocks=vi.hoisted(()=>({issue:vi.fn(),revoke:vi.fn(),read:vi.fn(),prepareStatic:vi.fn(),publishStatic:vi.fn(),authenticate:vi.fn((_req:any,_res:any,next:any)=>next()),
  system:vi.fn((_req:any,_res:any,next:any)=>next()),recent:vi.fn((_req:any,_res:any,next:any)=>next()),limit:vi.fn((_req:any,_res:any,next:any)=>next())}))
 vi.mock('../../modules/situational/static-measurement-admin.service',()=>({prepareAdminStaticSjtMapping:mocks.prepareStatic,publishAdminStaticSjtMeasurement:mocks.publishStatic}))
@@ -12,17 +13,17 @@ import {AdminPermissionError} from '../../modules/admin-permissions/service'
 const grantId='00000000-0000-4000-8000-000000000001'
 const principal={userId:'authenticated-system',tokenVersion:7,adminSessionId:'existing-session',adminVerifiedAt:123}
 async function invoke(path='/content-grants',origin='https://admin.example.test'){
- const req:any={method:'POST',body:{requestId:grantId},params:{id:grantId},user:principal,get:(key:string)=>key==='Origin'?origin:undefined}
- const res:any={status:vi.fn(),json:vi.fn()};res.status.mockReturnValue(res);res.json.mockReturnValue(res)
- const stack=(adminPermissionsRouter as any).stack
- let stopped=false
- for(const layer of stack.filter((layer:any)=>!layer.route)){
-  let next=false;await layer.handle(req,res,()=>{next=true});if(!next){stopped=true;break}
- }
- if(!stopped)for(const layer of stack.find((layer:any)=>layer.route?.path===path).route.stack){
-  let next=false;await layer.handle(req,res,(error?:Error)=>{if(error)res.status(500);else next=true});if(!next)break
- }
- return {req,res,status:res.status.mock.calls[0]?.[0]??200}
+ // Let Express match mounted middleware. Manually executing every non-route
+ // layer also ran both unrelated education mounts and counted three step-ups.
+ const app=express();app.use(express.json());app.use((req,_res,next)=>{req.user=principal as any;next()})
+ app.use('/api/admin/permissions',adminPermissionsRouter)
+ const server=app.listen(0,'127.0.0.1');await new Promise<void>(resolve=>server.once('listening',resolve))
+ try{
+  const method=path==='/content-grants/:id'?'GET':'POST'
+  const response=await fetch('http://127.0.0.1:'+(server.address() as {port:number}).port+'/api/admin/permissions'+path.replace(':id',grantId),
+   {method,headers:{Origin:origin,'content-type':'application/json'},...(method==='POST'?{body:JSON.stringify({requestId:grantId})}:{})})
+  return {status:response.status,value:await response.json()}
+ }finally{server.closeAllConnections();await new Promise<void>(resolve=>server.close(()=>resolve()))}
 }
 beforeEach(()=>{vi.clearAllMocks();mocks.issue.mockResolvedValue({grantId,version:1});mocks.revoke.mockResolvedValue({grantId,version:2})})
 describe('system content grant routes reuse real management router boundaries',()=>{

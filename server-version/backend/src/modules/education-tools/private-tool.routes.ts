@@ -11,6 +11,7 @@ import {ScaleAnswerValidationError} from '../scale/scale-scoring'
 import type {EducationToolEntry} from './access'
 import {EducationPrivateToolError,privateToolId,privateToolKind,type PrivateToolContext} from './private-tool.contracts'
 import * as service from './private-tool.service'
+import {listEducationPublicSources,educationPublicCatalogQuery} from './public-source.catalog'
 
 /** Mounted under the matching product authentication middleware only. */
 export function educationPrivateToolRouter(entry:EducationToolEntry){
@@ -39,6 +40,7 @@ export function educationPrivateToolRouter(entry:EducationToolEntry){
   return service.listPrivateTools(context(req),query.cursor,query.kind)
  }))
  router.post('/',handle(req=>service.createPrivateTool(context(req),req.body)))
+ router.get('/public-sources',handle(req=>listEducationPublicSources(context(req),educationPublicCatalogQuery.parse(req.query))))
  router.get('/runtime-candidates',handle(req=>{
   const query=z.object({cursor:privateToolId.optional(),kind:z.enum(['SCALE','FORM']).default('SCALE')}).strict().parse(req.query)
   return (query.kind==='FORM'?service.listPrivateFormRuntimeCandidates:service.listPrivateScaleRuntimeCandidates)(context(req),query.cursor)
