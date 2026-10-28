@@ -1,0 +1,23 @@
+{
+  "instrument": "Automatic Thoughts Questionnaire, 30-item frequency version",
+  "item_count": 30,
+  "options": [1, 2, 3, 4, 5],
+  "dimensions": {
+    "pmdc": [7, 10, 14, 20, 26],
+    "nsne": [2, 3, 9, 21, 23, 24, 28],
+    "lse": [17, 18],
+    "helplessness": [29, 30]
+  },
+  "reverse_items": [],
+  "sum_ranges": {
+    "pmdc": [5, 25],
+    "nsne": [7, 35],
+    "lse": [2, 10],
+    "helplessness": [2, 10],
+    "total": [30, 150]
+  },
+  "mean_range": [1, 5],
+  "missing_policy": "complete required per score, otherwise null; product convention",
+  "thresholds": null,
+  "source_note": "Factor keys as printed in the source form's scoring note (PMDC 7/10/14/20/26; NSNE 2/3/9/21/23/24/28; LSE 17/18; Helplessness 29/30). Factors cover only their assigned items; no reverse items. ATQ-B belief column not implemented."
+}
