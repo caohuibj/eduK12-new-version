@@ -1,3 +1,5 @@
+import {getNativeContentDefinition} from './content-candidates/native-registry/definitions'
+import {nativeContentArchiveSchema,validateNativeContentArchive} from './content-candidates/native-registry/archive-detail'
 import { createHash } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { z } from 'zod'
@@ -61,7 +63,8 @@ async function loadAuthority(db:Db,input:CognitiveRawArchiveIdentity,actor:Cogni
     fail('CORE_NOT_COMMITTED',409,'请先确认本次作答提交成功')
   if(session.attemptNo!==input.attemptEpoch||session.submissionId!==input.submissionId)
     fail('ARCHIVE_IDENTITY_CONFLICT',409,'归档与已保存作答身份不一致')
-  if(session.testType!=='mot'&&(session.testType!==ENUMERATION_RECIPE_IDENTITY.testType
+  const content=getNativeContentDefinition(session.testType,session.engineVersion,session.scoringVersion)
+  if(!(content&&content.configVersion===session.configVersion)&&session.testType!=='mot'&&(session.testType!==ENUMERATION_RECIPE_IDENTITY.testType
     ||session.engineVersion!==ENUMERATION_RECIPE_IDENTITY.engineVersion||session.scoringVersion!==ENUMERATION_RECIPE_IDENTITY.scoringVersion
     ||session.configVersion!==ENUMERATION_RECIPE_IDENTITY.configVersion))fail('UNSUPPORTED_ARCHIVE_SCOPE',422,'此任务暂不支持归档')
   const raw=await db.cognitiveRawSubmission.findUnique({where:{sessionId_attemptEpoch:{sessionId:session.id,attemptEpoch:input.attemptEpoch}}})
@@ -171,9 +174,10 @@ export async function archiveCognitiveRawSubmission(inputValue:CognitiveRawArchi
   uploadValue:CognitiveRawArchiveUpload,override:Partial<CognitiveRawArchiveDependencies>={}):Promise<CognitiveRawArchiveReceipt>{
   const input=parseIdentity(inputValue),original=originalUploadSchema.safeParse(uploadValue)
   if(!original.success)fail('INVALID_ARCHIVE_PAYLOAD',400,'归档内容无效')
+  const isContent=nativeContentArchiveSchema.safeParse(original.data.rawPayload).success
   const isEnumeration=Boolean(original.data.rawPayload&&typeof original.data.rawPayload==='object'&&'artifact' in original.data.rawPayload)
   // Preserve the historical MOT parser. Enumeration validators never replace original nested objects.
-  const parsed=isEnumeration?original:uploadSchema.safeParse(uploadValue)
+  const parsed=isEnumeration||isContent?original:uploadSchema.safeParse(uploadValue)
   if(!parsed.success||(isEnumeration&&!cognitiveEnumerationArchiveDetailSchema.safeParse(original.data.rawPayload).success))
     fail('INVALID_ARCHIVE_PAYLOAD',400,'归档内容无效')
   const upload=parsed.data!,rawBytes=canonicalJsonBytes(upload.rawPayload)
@@ -182,7 +186,13 @@ export async function archiveCognitiveRawSubmission(inputValue:CognitiveRawArchi
   const deps=dependencies(override),a=await loadAuthority(deps.db,input,actor)
   if(upload.expectedCoreHash&&upload.expectedCoreHash!==a.session.submissionPayloadHash)
     fail('ARCHIVE_IDENTITY_CONFLICT',409,'已提交核心校验不一致')
-  if(isEnumeration){
+  if(isContent){
+    try{validateNativeContentArchive(upload.rawPayload,{sessionId:a.session.id,attemptEpoch:input.attemptEpoch,randomSeed:a.session.randomSeed,testType:a.session.testType,
+      engineVersion:a.session.engineVersion,scoringVersion:a.session.scoringVersion,configVersion:a.session.configVersion,
+      config:a.authority.configSnapshot.config,protocol:a.authority.configSnapshot.protocol,configHash:a.authority.configSnapshot.configHash,protocolSignature:a.authority.configSnapshot.protocolSignature,
+      trials:a.core.trials,presentedImageCount:a.authority.resultSnapshot.metrics.presentedImageCount})}
+    catch{fail('ARCHIVE_IDENTITY_CONFLICT',409,'完整原件与已保存任务记录不一致')}
+  }else if(isEnumeration){
     const detail=upload.rawPayload as CognitiveEnumerationArchiveDetail,A=detail.artifact,C=A.context
     if(a.session.testType!==ENUMERATION_RECIPE_IDENTITY.testType||C.attemptId!==JSON.stringify([a.session.id,input.attemptEpoch])
       ||C.randomSeed!==a.session.randomSeed||canonicalHash(C.config)!==canonicalHash(a.authority.configSnapshot.config)

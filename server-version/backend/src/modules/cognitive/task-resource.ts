@@ -2,7 +2,7 @@ import {nativeCognitiveConfigSeeds} from './content-candidates/native-registry/c
 import type { RegistryEntry, CognitiveProfile, CognitiveProfileDefinition, MetricDefinition, QualityDefinition, SingleTaskReportDefinition } from './cognitive.types'
 import type { TaskDefinition } from './v2/types'
 import { getCognitiveRegistryEntry, listCognitiveRegistryEntries } from './cognitive.registry'
-import { getNativeCognitiveTaskDefinition, listNativeCognitiveTaskDefinitions } from './content-candidates/native-registry/definitions'
+import { getNativeCognitiveTaskDefinition, listNativeCognitiveTaskDefinitions, getNativeContentDefinition } from './content-candidates/native-registry/definitions'
 import { getAntIdentity } from './content-candidates/ant/protocol'
 import { getEnumerationIdentity, ENUMERATION_RECIPE_IDENTITY } from './content-candidates/enumeration/protocol'
 import { getMotReportBundle } from './content-candidates/mot/package'
@@ -87,7 +87,8 @@ export function assertNativeDeliverySupported(resource: CognitiveTaskResource, p
     && resource.engineVersion === ENUMERATION_RECIPE_IDENTITY.engineVersion
     && resource.scoringVersion === ENUMERATION_RECIPE_IDENTITY.scoringVersion
     && resource.configVersion === ENUMERATION_RECIPE_IDENTITY.configVersion
-  if (purpose !== 'authenticated' || (resource.testType !== 'mot' && !enumeration))
+  const content=getNativeContentDefinition(resource.testType,resource.engineVersion,resource.scoringVersion)
+  if (purpose !== 'authenticated' || (resource.testType !== 'mot' && !enumeration && content?.configVersion!==resource.configVersion))
     throw BAD_REQUEST('This native Cognitive identity is not enabled for this delivery path')
 }
 

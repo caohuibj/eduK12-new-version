@@ -1,5 +1,6 @@
 import {describe,it,expect,vi} from 'vitest'
 vi.mock('dotenv',()=>({default:{config:()=>({parsed:{}})}}))
+import {getNativeContentDefinition} from '../../modules/cognitive/content-candidates/native-registry/definitions'
 import {nativeCognitiveConfigSeeds} from '../../modules/cognitive/content-candidates/native-registry/config-seeds'
 import {getCognitiveV2TaskDefinition} from '../../modules/cognitive/v2/registry'
 import {getCognitiveTaskResource,assertNativeDeliverySupported} from '../../modules/cognitive/task-resource'
@@ -15,7 +16,8 @@ describe('remaining existing candidates in exact native registration',()=>{
    const resource=getCognitiveTaskResource(seed.testType,seed.engineVersion,seed.scoringVersion)!
    expect(resource.kind).toBe('native');expect(resource).toMatchObject({configVersion:seed.configVersion})
    // Registration never silently opens previously unsupported delivery scopes.
-   expect(()=>assertNativeDeliverySupported(resource,'authenticated')).toThrow()
+   if(getNativeContentDefinition(seed.testType,seed.engineVersion,seed.scoringVersion))expect(()=>assertNativeDeliverySupported(resource,'authenticated')).not.toThrow()
+   else expect(()=>assertNativeDeliverySupported(resource,'authenticated')).toThrow()
    expect(()=>assertNativeDeliverySupported(resource,'public')).toThrow()
   }
   expect(getCognitiveV2TaskDefinition('ant','1.0.0','1.1.0')).toBeDefined()
