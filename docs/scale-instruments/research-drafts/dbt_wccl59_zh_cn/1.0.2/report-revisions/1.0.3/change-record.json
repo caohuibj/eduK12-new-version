@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "dbt_wccl59_zh_cn_research",
+    "instrumentVersion": "1.0.2"
+  },
+  "reportVersionBefore": "1.0.2",
+  "reportVersionAfter": "1.0.3",
+  "catalogManifestVersionBefore": 1,
+  "catalogManifestVersionAfter": 2,
+  "sourceBefore": {
+    "commit": "2612a9f5bf22c1370ec786f3d6feb50805003065",
+    "blob": "c776043d94820063948cb5e101187d165ca157f0"
+  },
+  "sourceAfter": {
+    "commit": "6ad41a1cee7ddf9baf49dc7995b36d523cc50430",
+    "blob": "65fa7348627e396ff8aa04331e05c66a6d084f69"
+  },
+  "changes": [
+    "Add independently versioned audienceContract ADULT_SELF/student/zh-CN",
+    "Rewrite 3 participant headlines/summaries/action prompts in ordinary language without diagnostic or norm claims",
+    "Add three discovery-only labels use:research, use:not_diagnostic, license:redistribution_restricted"
+  ],
+  "unchanged": [
+    "instrument identity/version",
+    "59 items and response options",
+    "instruction and localization versions",
+    "scoringVersion 1.0.0; 38/15/6 subscores and score keys",
+    "referencePolicy none; no bands",
+    "12 golden cases",
+    "administrator-attested expert review and scientific PILOT",
+    "source/rights notes and actual permissions"
+  ],
+  "checks": "Static JSON item count, score-key, schema shape and key preservation checked in Chat; no TypeScript/build/CI/database/deploy executed",
+  "outstanding": [
+    "Independent code/schema/type/golden check for exact commit",
+    "Real installation and publication remain separate tasks",
+    "Rights contact remains administrative metadata, not a newly added technical gate"
+  ]
+}
