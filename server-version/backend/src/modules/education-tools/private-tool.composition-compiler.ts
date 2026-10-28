@@ -1,4 +1,4 @@
-import type {EducationPrivateToolVersion,Prisma} from '@prisma/client'
+import {Prisma,type EducationPrivateToolVersion} from '@prisma/client'
 import {privateCompositionDefinitionSchema,type PrivateCompositionDefinition} from './private-tool.composition-contracts'
 import {privateToolFail,type PrivateToolContext} from './private-tool.contracts'
 import {privateToolScope} from './private-tool.access'
@@ -7,10 +7,20 @@ import {privateToolImageReferences} from './private-tool.media-definition'
 import {compilePrivateFormRuntime} from './private-tool.form-runtime-adapter'
 import {assessmentAssetSelect,validateAssessmentAssetCatalog} from '../assessment-media/assessment-asset'
 import type {ScaleDefinitionV2} from '../scale/scale-definition'
+import {canonicalHash} from '../assessment-runtime/canonical'
+import type {GovernedArtifact} from '../survey/governed-tool.model'
+import {governedMediaBlocker,governedMediaRefs} from '../survey/governed-tool.media'
+import {compileEducationApplicability,educationApplicabilitySchema} from '../scale-library-governance/education-applicability'
+import {educationPublicSourceKey} from './public-source.identity'
+import {readEducationPublicUse} from './public-source.catalog'
+import {assertAssessmentAssetReferencesReady} from '../assessment-media/assessment-asset'
 
-export type CompositionLeaf={version:EducationPrivateToolVersion}&(
- {kind:'SCALE';definition:ScaleDefinitionV2}|{kind:'FORM';form:ReturnType<typeof compilePrivateFormRuntime>})
-export type CompiledPrivateComposition={definition:PrivateCompositionDefinition;leaves:Map<string,CompositionLeaf>}
+export type CompositionLeaf=({provider:'PRIVATE_VERSION';version:EducationPrivateToolVersion}&(
+ {kind:'SCALE';definition:ScaleDefinitionV2}|{kind:'FORM';form:ReturnType<typeof compilePrivateFormRuntime>}))|
+ {provider:'PUBLIC_FORM';kind:'FORM';version:Pick<EducationPrivateToolVersion,'id'|'toolId'|'title'|'contentHash'>;
+  sourceInstruction?:string;form:ReturnType<typeof compilePrivateFormRuntime>}
+export const compositionLeafKey=(source:{provider:string;versionId:string})=>source.provider+':'+source.versionId
+export type CompiledPrivateComposition={definition:PrivateCompositionDefinition;leaves:Map<string,CompositionLeaf>;publicUseExpiresAt?:Date}
 
 /** Already-authorized request only. One bounded source read, one optional media
  * read; no draft/latest selection, runtime writes, cross-product API or cache. */
@@ -19,24 +29,60 @@ export async function compilePrivateComposition(tx:Prisma.TransactionClient,c:Pr
  if(!definition.blocks.length)privateToolFail('PRIVATE_TOOL_DEFINITION_INCOMPLETE',400,[{path:'blocks',severity:'error',message:'请加入至少一个固定版本工具'}])
  if(definition.administration.population!==(c.entry==='SCHOOL'?'STUDENT':'TEACHER'))
   privateToolFail('PRIVATE_COMPOSITION_VARIANT_UNSUPPORTED',400)
- const ids=[...new Set(definition.blocks.map(block=>block.source.versionId))]
- const rows=await tx.educationPrivateToolVersion.findMany({where:{id:{in:ids},...privateToolScope(c),kind:{in:['SCALE','FORM']}}})
+ const publicSources=definition.blocks.filter(block=>block.source.provider==='PUBLIC_FORM').map(block=>block.source)
+ const publicKeys=publicSources.map(source=>educationPublicSourceKey({kind:'FORM',id:source.versionId,hash:source.contentHash}))
+ const publicUse=await readEducationPublicUse(tx,c,publicKeys,true)
+ if(publicUse.size!==new Set(publicKeys).size)privateToolFail('PUBLIC_SOURCE_USE_REQUIRED',403)
+ const ids=[...new Set(definition.blocks.filter(block=>block.source.provider==='PRIVATE_VERSION').map(block=>block.source.versionId))]
+ const rows=ids.length?await tx.educationPrivateToolVersion.findMany({where:{id:{in:ids},...privateToolScope(c),kind:{in:['SCALE','FORM']}}}):[]
  const byId=new Map(rows.map(row=>[row.id,row])),leaves=new Map<string,CompositionLeaf>()
- for(const block of definition.blocks){
+ for(const block of definition.blocks.filter(block=>block.source.provider==='PRIVATE_VERSION')){
   const row=byId.get(block.source.versionId)
   if(!row||row.kind!==block.source.kind||row.contentHash!==block.source.contentHash)
    privateToolFail('PRIVATE_COMPOSITION_SOURCE_NOT_FOUND',404)
-  if(leaves.has(row.id))continue
+  const key=compositionLeafKey(block.source)
+  if(leaves.has(key))continue
   if(row.contentHash!==privateToolContentHash(block.source.kind,row.title,row.definition))privateToolFail('PRIVATE_TOOL_HASH_MISMATCH')
   if(row.kind==='SCALE'){
    const checked=validatePrivateToolDefinition('SCALE',row.definition)
    if(!checked.valid||!checked.definition)privateToolFail('PRIVATE_TOOL_DEFINITION_INCOMPLETE',400,checked.issues)
    const scale=checked.definition as ScaleDefinitionV2
    if(scale.referencePolicy.type!=='none')privateToolFail('PRIVATE_TOOL_RUNTIME_REFERENCE_UNSUPPORTED')
-   leaves.set(row.id,{version:row,kind:'SCALE',definition:scale})
-  }else leaves.set(row.id,{version:row,kind:'FORM',form:compilePrivateFormRuntime(row.definition)})
+   leaves.set(key,{provider:'PRIVATE_VERSION',version:row,kind:'SCALE',definition:scale})
+  }else leaves.set(key,{provider:'PRIVATE_VERSION',version:row,kind:'FORM',form:compilePrivateFormRuntime(row.definition)})
  }
- const references=[...leaves.values()].map(leaf=>({versionId:leaf.version.id,
+ const publicIds=[...new Set(publicSources.map(source=>source.versionId))]
+ const publicRows=publicIds.length?await tx.$queryRaw<Array<{id:string;title:string;snapshot_hash:string;snapshot:GovernedArtifact}>>(Prisma.sql`
+  SELECT id,title,snapshot_hash,snapshot FROM survey_governed_tools WHERE id IN (${Prisma.join(publicIds)}) AND family='FORM' AND state='ONLINE' ORDER BY id FOR SHARE`):[]
+ const publicMedia:Array<{id:string;refs:ReturnType<typeof governedMediaRefs>}>=[]
+ for(const source of publicSources){
+  const key=compositionLeafKey(source)
+  const row=publicRows.find(row=>row.id===source.versionId)
+  if(!row||row.snapshot_hash!==source.contentHash||canonicalHash(row.snapshot)!==source.contentHash||row.snapshot.family!=='FORM'
+   ||!row.snapshot.unit||row.snapshot.unit.ref.kind!=='FORM')privateToolFail('PUBLIC_FORM_SOURCE_UNAVAILABLE',404)
+  if(leaves.has(key))continue
+  const declared=educationApplicabilitySchema.safeParse(row.snapshot.reference.metadata.annotations&&
+   (row.snapshot.reference.metadata.annotations as Record<string,unknown>).educationApplicability)
+  if(!declared.success)privateToolFail('PUBLIC_FORM_APPLICABILITY_REQUIRED',400)
+  const declaration=compileEducationApplicability(declared.data)
+  if(!declaration.variants.some(variant=>variant.population===definition.administration.population&&variant.responseMode===definition.administration.responseMode))
+   privateToolFail('PUBLIC_FORM_VARIANT_UNSUPPORTED',400)
+  const unit=row.snapshot.unit
+  if(governedMediaBlocker(unit))privateToolFail('PUBLIC_FORM_MEDIA_NOT_SHARED',403)
+  const refs=governedMediaRefs(unit)
+  if(refs.length)publicMedia.push({id:row.id,refs})
+  leaves.set(key,{provider:'PUBLIC_FORM',kind:'FORM',version:{id:row.id,toolId:row.id,title:row.title,contentHash:row.snapshot_hash},
+   ...(unit.instruction?{sourceInstruction:unit.instruction}:{}),form:compilePrivateFormRuntime(unit.displayDefinition)})
+ }
+ if(publicMedia.length){
+  const refs=[...new Map(publicMedia.flatMap(row=>row.refs).map(ref=>[ref.assetId,ref])).values()]
+  const pins=await tx.assetReference.findMany({where:{entityType:'SurveyGovernedTool',entityId:{in:publicMedia.map(row=>row.id)},field:'media',assetId:{in:refs.map(ref=>ref.assetId)}},select:{entityId:true,assetId:true}})
+  if(publicMedia.some(row=>row.refs.some(ref=>!pins.some(pin=>pin.entityId===row.id&&pin.assetId===ref.assetId))))privateToolFail('PUBLIC_FORM_MEDIA_NOT_SHARED',403)
+  await assertAssessmentAssetReferencesReady(refs,tx)
+ }
+ // U was checked before loading public bodies; its SHARE locks remain through
+ // freeze. Only interval expiry needs a final post-materialization clock check.
+ const references=[...leaves.values()].filter(leaf=>leaf.provider==='PRIVATE_VERSION').map(leaf=>({versionId:leaf.version.id,
   refs:privateToolImageReferences(leaf.kind,leaf.kind==='SCALE'?leaf.definition:leaf.form.definition)}))
  const assets=[...new Set(references.flatMap(row=>row.refs.all.map(ref=>ref.assetId)))]
  if(assets.length){
@@ -50,9 +96,9 @@ export async function compilePrivateComposition(tx:Prisma.TransactionClient,c:Pr
   }
  }
  const count=definition.blocks.reduce((n,block)=>{
-  const leaf=leaves.get(block.source.versionId)!
+  const leaf=leaves.get(compositionLeafKey(block.source))!
   return n+(leaf.kind==='SCALE'?1:leaf.form.sections.reduce((sum,page)=>sum+page.items.length,0))
  },0)
  if(count>1000)privateToolFail('PRIVATE_COMPOSITION_RUNTIME_TOO_LARGE',400)
- return {definition,leaves}
+ return {definition,leaves,...(publicUse.size?{publicUseExpiresAt:new Date(Math.min(...[...publicUse.values()].map(use=>use.expiresAt.getTime())))}:{})}
 }

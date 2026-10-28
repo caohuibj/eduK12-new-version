@@ -10,6 +10,7 @@ import {privateToolFail,type PrivateToolContext} from './private-tool.contracts'
 import {educationCompositionBindingSchema,educationCompositionOriginSchema,educationCompositionKey,
  type EducationCompositionOrigin,type EducationCompositionBinding} from './private-tool.composition-contracts'
 import type {CompiledPrivateComposition,CompositionLeaf} from './private-tool.composition-compiler'
+import {compositionLeafKey} from './private-tool.composition-compiler'
 
 type Tx=Prisma.TransactionClient
 const identitySelect={id:true,creationKey:true,creationHash:true,createdBy:true,status:true,publishedAt:true,productKind:true,
@@ -88,7 +89,7 @@ export async function sealPrivateComposition(tx:Tx,c:PrivateToolContext,version:
  const sections:Prisma.CompositeFormSectionCreateManyInput[]=[],items:Prisma.CompositeAssessmentItemCreateManyInput[]=[]
  const units:Array<Prisma.JsonObject>=[],manifest:EducationCompositionBinding['manifest']=[]
  for(const block of compiled.definition.blocks){
-  const leaf=compiled.leaves.get(block.source.versionId)!,itemIds:string[]=[],sectionIds:string[]=[]
+  const leaf=compiled.leaves.get(compositionLeafKey(block.source))!,itemIds:string[]=[],sectionIds:string[]=[]
   if(leaf.kind==='SCALE'){
    const {scale,release}=scaleLeaves.get(leaf.version.id)!,itemId=randomUUID()
    itemIds.push(itemId);items.push({id:itemId,compositeAssessmentId:parent.id,type:'SCALE',position:items.length,required:true,scaleId:scale.id})
@@ -105,13 +106,20 @@ export async function sealPrivateComposition(tx:Tx,c:PrivateToolContext,version:
    }
   }
   manifest.push({blockId:block.blockId,instruction:block.instruction,kind:leaf.kind,versionId:leaf.version.id,
-   contentHash:leaf.version.contentHash,toolId:leaf.version.toolId,itemIds,sectionIds})
+   contentHash:leaf.version.contentHash,toolId:leaf.version.toolId,itemIds,sectionIds,sourceProvider:leaf.provider,
+   ...(leaf.provider==='PUBLIC_FORM'&&leaf.sourceInstruction?{sourceInstruction:leaf.sourceInstruction}:{})})
  }
  if(sections.length)await tx.compositeFormSection.createMany({data:sections})
  await tx.compositeAssessmentItem.createMany({data:items})
  const snapshot=trainingContentSnapshotSchema.parse({schemaVersion:1,compositeId:parent.id,units,
   educationBinding:educationCompositionBindingSchema.parse({schemaVersion:1,origin,sealed:true,manifest})})
  const manifestHash=canonicalHash(snapshot)
+ if(compiled.publicUseExpiresAt){
+  // Only time can change after the grant SHARE locks. Scale materialization or
+  // source-key waits may outlive the interval; no grant/body chain is reread.
+  const [clock]=await tx.$queryRaw<Array<{now:Date}>>(Prisma.sql`SELECT clock_timestamp() AS now`)
+  if(clock.now>=compiled.publicUseExpiresAt)privateToolFail('PUBLIC_SOURCE_USE_EXPIRED',403)
+ }
  // DB guard verifies exact immutable sources, complete actual children, scope,
  // mapping and hash. Only this final write attaches the sealed namespace.
  await tx.compositeAssessment.update({where:{id:parent.id},data:{code:key,creationKey:key,creationHash:canonicalHash(origin),

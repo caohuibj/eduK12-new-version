@@ -264,8 +264,9 @@ export async function prepareTrainingContentAttemptBinding(db:Prisma.Transaction
     const presentation=new Map<string,EducationSlotPresentation>(),orderedSlots:string[]=[]
     for(const block of snapshot.educationBinding.manifest){
       const keys=block.kind==='SCALE'?block.itemIds.map(id=>'scale:'+id):block.sectionIds.map(id=>'form-section:'+id)
+      const instruction=[block.instruction,block.sourceInstruction].filter(Boolean).join('\n\n')
       for(const [index,key] of keys.entries()){
-        orderedSlots.push(key);presentation.set(key,{blockId:block.blockId,...(index===0&&block.instruction?{instruction:block.instruction}:{})})
+        orderedSlots.push(key);presentation.set(key,{blockId:block.blockId,...(index===0&&instruction?{instruction}:{})})
       }
     }
     return {binding,bindingHash:canonicalHash(binding),educationUnitOrder:new Map(orderedSlots.map((key,index)=>[key,index])),

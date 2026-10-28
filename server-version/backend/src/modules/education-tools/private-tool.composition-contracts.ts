@@ -4,8 +4,10 @@ import {resultAudiencePolicySchema} from '../assessment-policy/result-disclosure
 const id=z.string().guid(),hash=z.string().regex(/^[a-f0-9]{64}$/)
 // P1 consumes immutable author-private leaves. Public/native providers are added
 // by their own resolver adapters; neither a package nor a composition is a leaf.
-export const privateCompositionSourceSchema=z.object({provider:z.literal('PRIVATE_VERSION'),
- kind:z.enum(['SCALE','FORM']),versionId:id,contentHash:hash}).strict()
+export const privateCompositionSourceSchema=z.discriminatedUnion('provider',[
+ z.object({provider:z.literal('PRIVATE_VERSION'),kind:z.enum(['SCALE','FORM']),versionId:id,contentHash:hash}).strict(),
+ z.object({provider:z.literal('PUBLIC_FORM'),kind:z.literal('FORM'),versionId:id,contentHash:hash}).strict(),
+])
 export const privateCompositionDefinitionSchema=z.object({schemaVersion:z.literal(1),adapterVersion:z.literal('1.0.0'),
  administration:z.object({population:z.enum(['STUDENT','TEACHER']),responseMode:z.literal('SELF')}).strict(),
  instruction:z.string().max(16000),blocks:z.array(z.object({blockId:id,instruction:z.string().max(16000),
@@ -21,6 +23,7 @@ export const educationCompositionOriginSchema=z.object({schemaVersion:z.literal(
  versionId:id,contentHash:hash,variantKey:z.enum(['STUDENT:SELF','TEACHER:SELF'])}).strict()
 export const educationCompositionBindingSchema=z.object({schemaVersion:z.literal(1),origin:educationCompositionOriginSchema,
  sealed:z.literal(true),manifest:z.array(z.object({blockId:id,instruction:z.string().max(16000),kind:z.enum(['SCALE','FORM']),versionId:id,contentHash:hash,
+  sourceProvider:z.enum(['PRIVATE_VERSION','PUBLIC_FORM']),sourceInstruction:z.string().max(16000).optional(),
   toolId:id,itemIds:z.array(id).min(1).max(1000),sectionIds:z.array(id).max(500)}).strict()).min(1).max(50),
 }).strict().superRefine((binding,ctx)=>{
  const {origin,manifest}=binding
@@ -32,6 +35,7 @@ export const educationCompositionBindingSchema=z.object({schemaVersion:z.literal
  }
  if(manifest.some(block=>block.kind==='SCALE'?(block.itemIds.length!==1||block.sectionIds.length!==0):block.sectionIds.length===0))
   ctx.addIssue({code:'custom',message:'工具映射与原始类型不匹配'})
+ if(manifest.some(block=>block.sourceProvider==='PUBLIC_FORM'&&block.kind!=='FORM'))ctx.addIssue({code:'custom',message:'公共表单不能冒充计分工具'})
  if(manifest.reduce((sum,block)=>sum+block.itemIds.length,0)>1000)
   ctx.addIssue({code:'custom',message:'问卷运行单元过多'})
 })

@@ -23,7 +23,7 @@ const grantFromRow=(row:GrantRow):ContentGrant=>({id:row.id,subjectId:row.subjec
  * no per-card ancestry reads or persistent authorization cache. */
 export async function readEducationPublicUse(tx:Prisma.TransactionClient,c:PrivateToolContext,keys:readonly string[],lock=false){
  const exact=[...new Set(keys)];if(exact.length>128||exact.some(value=>!key.safeParse(value).success))privateToolFail('PUBLIC_SOURCE_INPUT_INVALID',400)
- if(!exact.length)return new Map<string,{grantId:string;grantVersion:number}>()
+ if(!exact.length)return new Map<string,{grantId:string;grantVersion:number;expiresAt:Date}>()
  const rows=await tx.$queryRaw<GrantRow[]>(Prisma.sql`SELECT g.id,g.subject_id,g.issuer_id,g.product,g.scope_id,g.resource_keys,
   g.valid_from,g.expires_at,g.version,g.revoked_at,g.parent_grant_id,g.ancestry,g.capabilities,g.delegable_capabilities,g.remaining_delegation_depth
   FROM content_capability_grants g WHERE g.subject_id=${c.principal.userId} AND g.product=${c.entry} AND g.scope_kind='ORGANIZATION'
@@ -32,11 +32,11 @@ export async function readEducationPublicUse(tx:Prisma.TransactionClient,c:Priva
    AND g.remaining_delegation_depth=0 AND g.delegable_capabilities=ARRAY[]::text[] AND g.revoked_at IS NULL
   ORDER BY g.id ${lock?Prisma.sql`FOR SHARE OF g`:Prisma.empty}`)
  const [clock]=await tx.$queryRaw<Array<{now:Date}>>(Prisma.sql`SELECT clock_timestamp() AS now`)
- const allowed=new Map<string,{grantId:string;grantVersion:number}>()
+ const allowed=new Map<string,{grantId:string;grantVersion:number;expiresAt:Date}>()
  for(const row of rows){
   if(row.valid_from>clock.now||row.expires_at<=clock.now)continue
   const grant=assertContentGrantChain([grantFromRow(row)],row.id,clock.now)
-  for(const resourceKey of grant.scope.resourceKeys)if(exact.includes(resourceKey)&&!allowed.has(resourceKey))allowed.set(resourceKey,{grantId:row.id,grantVersion:row.version})
+  for(const resourceKey of grant.scope.resourceKeys)if(exact.includes(resourceKey)&&!allowed.has(resourceKey))allowed.set(resourceKey,{grantId:row.id,grantVersion:row.version,expiresAt:row.expires_at})
  }
  return allowed
 }

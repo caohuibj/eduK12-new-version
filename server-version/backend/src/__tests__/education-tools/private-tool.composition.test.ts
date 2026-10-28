@@ -48,8 +48,8 @@ describe('Private ordinary composition definition and scoped compilation',()=>{
  it('batch loads exact immutable sources once and preserves original ordered definitions and pages',async()=>{
   const raw=definition(),before=structuredClone(raw),compiled=await compilePrivateComposition(tx,context,raw)
   expect(compiled.definition).toEqual(before)
-  expect(compiled.leaves.get(a.id)).toMatchObject({kind:'SCALE',definition:a.definition})
-  expect(compiled.leaves.get(b.id)).toMatchObject({kind:'FORM',form:{definition:form,sections:[{title:'A page',items:[{formDefinition:form.pages[0].questions[0]}]}]}})
+  expect(compiled.leaves.get('PRIVATE_VERSION:'+a.id)).toMatchObject({kind:'SCALE',definition:a.definition})
+  expect(compiled.leaves.get('PRIVATE_VERSION:'+b.id)).toMatchObject({kind:'FORM',form:{definition:form,sections:[{title:'A page',items:[{formDefinition:form.pages[0].questions[0]}]}]}})
   expect(m.findMany).toHaveBeenCalledExactlyOnceWith({where:{id:{in:[a.id,b.id]},entry:'TEACHER',organizationId:id(1),ownerUserId:id(2),kind:{in:['SCALE','FORM']}}})
   expect(m.assets).not.toHaveBeenCalled();expect(raw).toEqual(before)
  })
@@ -104,7 +104,7 @@ describe('Sealed education identity is a header bound to an independent anchor',
   const old={schemaVersion:1,compositeId:id(32),units:[]}
   expect(trainingContentSnapshotSchema.parse(old)).toEqual(old)
   const binding={schemaVersion:1,origin,sealed:true,manifest:[{blockId:id(20),instruction:'',kind:'SCALE',versionId:a.id,
-   contentHash:a.contentHash,toolId:a.toolId,itemIds:[id(40)],sectionIds:[]}]}
+   contentHash:a.contentHash,toolId:a.toolId,sourceProvider:'PRIVATE_VERSION',itemIds:[id(40)],sectionIds:[]}]}
   expect(trainingContentSnapshotSchema.safeParse({...old,educationBinding:binding}).success).toBe(true)
   expect(educationCompositionBindingSchema.safeParse({...binding,sealed:false}).success).toBe(false)
   expect(educationCompositionBindingSchema.safeParse({...binding,origin:{...origin,mode:'PACKAGE_REFERENCE'}}).success).toBe(false)

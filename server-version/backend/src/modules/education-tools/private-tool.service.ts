@@ -115,7 +115,7 @@ export async function previewPrivateTool(c:PrivateToolContext,id:string,raw:unkn
    if(input.answers!==undefined||input.rawScores!==undefined)privateToolFail('PRIVATE_TOOL_PREVIEW_INPUT_INVALID',400)
    const compiled=await compilePrivateComposition(tx,c,row.definition)
    return {result:{kind:'COMPOSITION_PREVIEW',instruction:compiled.definition.instruction,blocks:compiled.definition.blocks.map(block=>{
-    const leaf=compiled.leaves.get(block.source.versionId)!
+    const leaf=compiled.leaves.get(block.source.provider+':'+block.source.versionId)!
     return {blockId:block.blockId,instruction:block.instruction,kind:leaf.kind,title:leaf.version.title,
      definition:leaf.kind==='SCALE'?leaf.definition:leaf.form.definition}
    })},previewOnly:true,persistedAnswers:false,contentHash:row.contentHash,...boundary}
