@@ -41,6 +41,7 @@ import { executionEntries as task38 } from '../tasks/wordanalogy/package'
 import { executionEntries as task39 } from '../tasks/wordmeaning/package'
 import { executionEntries as task40 } from '../tasks/semanticfluency/package'
 import { executionEntries as task41 } from '../tasks/wordproblem/package'
+import { executionEntries as task42 } from '../tasks/icarmatrix/package'
 export const cognitiveExecutionEntries = [
   task0[0],
   task1[0],
@@ -87,5 +88,6 @@ export const cognitiveExecutionEntries = [
   task39[0],
   task40[0],
   task41[0],
+  task42[0],
   task21[1],
 ]

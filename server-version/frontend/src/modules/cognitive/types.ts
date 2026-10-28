@@ -775,3 +775,26 @@ export type WordproblemTrialPayload = {
   rtMs: number | null
   interrupted: boolean
 }
+
+/** Icarmatrix 冻结 config（与后端 icarmatrix.config schema 一致）。 */
+export interface IcarmatrixConfig {
+  totalTrials: number
+  stimulusSetVersion: string
+  fixationMs: number
+  timeoutMs: number
+  validRtFloorMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+/** Icarmatrix 单 trial payload（与后端 icarmatrix.trial schema 一致）。 */
+export type IcarmatrixTrialPayload = {
+  itemIndex: number
+  responseIndex: number | null
+  rtMs: number | null
+  interrupted: boolean
+}

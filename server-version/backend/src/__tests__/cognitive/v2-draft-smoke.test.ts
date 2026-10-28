@@ -56,6 +56,7 @@ const payloadFor = (testType: string): { phase: 'test' | 'learning'; payload: un
     case 'wordmeaning': return { phase: 'test', payload: { itemId: 'wm-01', responseIndex: 0, rtMs: 300, interrupted: false } }
     case 'semanticfluency': return { phase: 'test', payload: { category: 'animals', responses: ['猫', '狗'], responseDurationMs: 100, interrupted: false } }
     case 'wordproblem': return { phase: 'test', payload: { itemId: 'wp-01', responseIndex: 0, rtMs: 300, interrupted: false } }
+    case 'icarmatrix': return { phase: 'test', payload: { itemIndex: 0, responseIndex: 1, rtMs: 300, interrupted: false } }
     default: throw new Error(`No cognitive smoke payload for ${testType}`)
   }
 }

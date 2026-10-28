@@ -28,7 +28,7 @@ describe('read-only report rollout inventory', () => {
   })
   it('checks every real exact identity and declared profile can freeze a two-audience policy', () => {
     const entries = listCognitiveRegistryEntries().filter(entry => entry.testType !== 'fake')
-    expect(entries).toHaveLength(45)
+    expect(entries).toHaveLength(46)
     for (const entry of entries) {
       const seed = cognitiveSeeds.find(seed => seed.testType === entry.testType && seed.engineVersion === entry.engineVersion && seed.scoringVersion === entry.scoringVersion)!
       expect(seed, entry.testType).toBeDefined()

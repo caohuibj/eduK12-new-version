@@ -293,6 +293,12 @@ const SCORING_DECLARATIONS: Record<string, CognitiveScoringContractDeclaration> 
     runtimeReconstructableFacts: ['题目内容与正确项（frozen bank + seed 抽题顺序）'],
     serverDerivedFacts: ['正确性判定', 'metrics（accuracy/medianRtMs）', 'quality flags'],
   },
+  icarmatrix: {
+    testType: 'icarmatrix',
+    clientObservedFacts: ['选项选择', 'raw RT', 'interrupted'],
+    runtimeReconstructableFacts: ['题目内容与正确项（冻结题库前 8 题 + seed 生成器重建）'],
+    serverDerivedFacts: ['正确性判定', 'metrics（accuracy/medianRtMs）', 'quality flags'],
+  },
 }
 
 // 当前通用事实（所有任务一致）：完整加密 trial payload、v2 trial envelope qualityEvents、
@@ -506,6 +512,11 @@ const RESEARCH_CAPTURE_DECLARATIONS: Record<string, CognitiveResearchCaptureDecl
   },
   wordproblem: {
     testType: 'wordproblem',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次响应与 raw RT'],
+    futureCaptureFacts: ['真实 input modality', 'device provenance', 'viewport/dpr'],
+  },
+  icarmatrix: {
+    testType: 'icarmatrix',
     currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次响应与 raw RT'],
     futureCaptureFacts: ['真实 input modality', 'device provenance', 'viewport/dpr'],
   },
