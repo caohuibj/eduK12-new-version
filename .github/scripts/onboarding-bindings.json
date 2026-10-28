@@ -1,182 +1,247 @@
 {
-  "pr": 377,
+  "pr": 378,
   "enabled": true,
-  "base": "93235b6c6a61cefb30fd525eea13ee9c6d4cc0fe",
-  "product": "086ab229fd35e12b05c83372843aaa3653e23f87",
-  "controlCheckpoint": "d19ff30f670398c2e1ff8933bd6d2ef86b7ace37",
+  "base": "b7909cbf05d5ba0092c59853f20c86491ab38137",
+  "product": "10a32d20a1ef767791d5d1f03b7e582a1bb6c772",
+  "controlCheckpoint": "389cad71ea386744eb11651e42e39b8141925fcf",
   "source": {
-    "docs/performance/storage-ledger-20261028/CI-PLAN.md": {
+    "docs/performance/page-loading-20261028/IMPLEMENTATION.md": {
       "before": null,
-      "after": "ba1080f0d2357d6d7826498b1fc79ebdba786fb5"
+      "after": "2b2e933a2a9fb736ef73836508c509ea89924cc0"
     },
-    "docs/performance/storage-ledger-20261028/LIFECYCLE.md": {
+    "docs/performance/page-loading-20261028/REVIEW.md": {
       "before": null,
-      "after": "bc230903994fff0c33ec18b9ba7e16b7460986d0"
+      "after": "a175d5ed0f211f3df569fb525a1060038d32be77"
     },
-    "docs/performance/storage-ledger-20261028/README.md": {
+    "docs/performance/page-loading-20261028/evidence/analyze-manifest.py": {
       "before": null,
-      "after": "5a404635974d69a1252dd2f91a962c646bc3d2b6"
+      "after": "29b4859274bef217646e0baf49714d94e8a2cd51"
     },
-    "docs/performance/storage-ledger-20261028/START-PLANNER.md": {
+    "docs/performance/page-loading-20261028/evidence/build-main.log": {
       "before": null,
-      "after": "92859eacfddce96db76c0984e66d6cb620bf9855"
+      "after": "9ed5f30f0795413961132dfeae095fcd9bc3d0ee"
     },
-    "docs/performance/storage-ledger-20261028/evidence-index.json": {
+    "docs/performance/page-loading-20261028/evidence/build-receipt.json": {
       "before": null,
-      "after": "af1229d0ee738c7acc3208ddda5eaa29d139548d"
+      "after": "27bc3cc64f41686b442f1f9f3f2b16f66cd77565"
     },
-    "docs/performance/storage-ledger-20261028/evidence/observer-completed-ledger.json": {
+    "docs/performance/page-loading-20261028/evidence/index.json": {
       "before": null,
-      "after": "5059300068b877626f6947a959f0cf8bfe3de083"
+      "after": "31eda55bb32cb5b48d35c42ec4bf5deda76a5986"
     },
-    "docs/performance/storage-ledger-20261028/lifecycle/comparison-r2.json": {
+    "docs/performance/page-loading-20261028/evidence/main-entry-closures.json": {
       "before": null,
-      "after": "44e91cb01d10332ec823afd9f6a34758dd74fb90"
+      "after": "f19cb2592b27e2ac7ce42da1bafd0ba9fd81585b"
     },
-    "docs/performance/storage-ledger-20261028/lifecycle/index.json": {
+    "docs/performance/page-loading-20261028/evidence/vite-manifest.json.gz": {
       "before": null,
-      "after": "c2e06be5782ee2d3028454ade1e7ffe3311ee0f1"
+      "after": "6a5218bcb6def56a8264371c71b0a33fb2e803ec"
     },
-    "docs/performance/storage-ledger-20261028/lifecycle/legacy-r1-execution.json": {
+    "docs/performance/page-loading-20261028/implementation-evidence/affected-final-r1.json.gz": {
       "before": null,
-      "after": "b54b1918319d35cbe31816e910b92aba4b45c377"
+      "after": "888dc14297254c9d25606eddc9ceff9a31c45446"
     },
-    "docs/performance/storage-ledger-20261028/lifecycle/legacy-r1.json": {
+    "docs/performance/page-loading-20261028/implementation-evidence/affected-final-r1.log.gz": {
       "before": null,
-      "after": "ba28397b9ba3b91899c89fab19c11a2570a85f98"
+      "after": "5269e086916f81f983e215d5dc090886f67cc915"
     },
-    "docs/performance/storage-ledger-20261028/lifecycle/legacy-r1.log": {
+    "docs/performance/page-loading-20261028/implementation-evidence/affected-final-r2.exit.gz": {
       "before": null,
-      "after": "dd00675bc4f92d3871c2d5067f6b68a870565f98"
+      "after": "c9168d7f64e4266e40f8f7946a354cc86bf104c2"
     },
-    "docs/performance/storage-ledger-20261028/lifecycle/legacy-r2-execution.json": {
+    "docs/performance/page-loading-20261028/implementation-evidence/affected-final-r2.json": {
       "before": null,
-      "after": "74213d2d4c5c3412181a05e392fdc498995ef2be"
+      "after": "8c5b0006bff4a9acacc363e71fa0439151bd362e"
     },
-    "docs/performance/storage-ledger-20261028/lifecycle/legacy-r2.json": {
+    "docs/performance/page-loading-20261028/implementation-evidence/affected-final-r2.log.gz": {
       "before": null,
-      "after": "d14773414899587e21ac3af4452b7b2cd80d17c0"
+      "after": "d67a2177977a9f892375aa3b35564b1aa3261f9a"
     },
-    "docs/performance/storage-ledger-20261028/lifecycle/measure-lifecycle-r1.mts": {
+    "docs/performance/page-loading-20261028/implementation-evidence/control-r1.log": {
       "before": null,
-      "after": "e1750417c66ec81f0f1fd1ba284bb43d79f4192d"
+      "after": "3927eafc1f2eb2a9d26e84d371f23890e20b8e39"
     },
-    "docs/performance/storage-ledger-20261028/lifecycle/measure-lifecycle.mts": {
+    "docs/performance/page-loading-20261028/implementation-evidence/debug-tab.log.gz": {
       "before": null,
-      "after": "c26ddb75474d99ff6e58bf6f46fb20277040b751"
+      "after": "a9a3efab0248b58b5b81c2b4c64035230f595e4b"
     },
-    "docs/performance/storage-ledger-20261028/lifecycle/run-lifecycle-r1.py": {
+    "docs/performance/page-loading-20261028/implementation-evidence/directory-r2.exit.gz": {
       "before": null,
-      "after": "d90c584c5bc2250e51bd12ad18e55079348dd94d"
+      "after": "c9168d7f64e4266e40f8f7946a354cc86bf104c2"
     },
-    "docs/performance/storage-ledger-20261028/lifecycle/run-lifecycle-r2.py": {
+    "docs/performance/page-loading-20261028/implementation-evidence/directory-r2.json": {
       "before": null,
-      "after": "8b2dd4344233f8a81124ef4c0f7f29aeffe794b9"
+      "after": "ae6669559fe4d637ce7966d037d298973a34f98c"
     },
-    "docs/performance/storage-ledger-20261028/lifecycle/shared-compact-r2-execution.json": {
+    "docs/performance/page-loading-20261028/implementation-evidence/directory-r2.log.gz": {
       "before": null,
-      "after": "8ed9e5e4c4744a7569b7c8cd75bb0fecd0fa2bec"
+      "after": "7ecff35b28247a2cbd40297d729cb1c59364687e"
     },
-    "docs/performance/storage-ledger-20261028/lifecycle/shared-compact-r2.json": {
+    "docs/performance/page-loading-20261028/implementation-evidence/lint-final.log": {
       "before": null,
-      "after": "67938a8ce0bd674ce6a42e20852dac786662f3f7"
+      "after": "04d2311d87743cd108d0234a11ae0f6a4a97878f"
     },
-    "docs/performance/storage-ledger-20261028/read-existing-ledger.py": {
+    "docs/performance/page-loading-20261028/implementation-evidence/lint-r1.exit.gz": {
       "before": null,
-      "after": "e05d5613dfac56b5e95258718b49c8a7062bca39"
+      "after": "c9168d7f64e4266e40f8f7946a354cc86bf104c2"
     },
-    "docs/performance/storage-ledger-20261028/start-planner/authority-profile-r1-execution.json": {
+    "docs/performance/page-loading-20261028/implementation-evidence/lint-r1.log": {
       "before": null,
-      "after": "f183e9600cc143549855c2c8e94a1526ed03f0c9"
+      "after": "d448cb03674628bd6e262f32ee562fb8e0203b31"
     },
-    "docs/performance/storage-ledger-20261028/start-planner/authority-profile-r1.json.gz": {
+    "docs/performance/page-loading-20261028/implementation-evidence/loading-r1.json.gz": {
       "before": null,
-      "after": "2bf72c6e5c1094b5322126782c0260d40de137b7"
+      "after": "dc05f34fac5787002478dc84c62062294c9acf74"
     },
-    "docs/performance/storage-ledger-20261028/start-planner/authority-profile-r1.log": {
+    "docs/performance/page-loading-20261028/implementation-evidence/loading-r1.log.gz": {
       "before": null,
-      "after": "0d37b0fa89ee2c515b07ee5c945190570740de8e"
+      "after": "078e374b2f03959c7261a89c3dc0fa2c9bd0348a"
     },
-    "docs/performance/storage-ledger-20261028/start-planner/authority-profile-summary.json": {
+    "docs/performance/page-loading-20261028/implementation-evidence/navigation-failed-r2.json.gz": {
       "before": null,
-      "after": "0aad6cad0eafb71a58e9ac3363052f007ec3e3de"
+      "after": "b2fa6392b8e04d4a7648982d044e12796ceff65b"
     },
-    "docs/performance/storage-ledger-20261028/start-planner/index.json": {
+    "docs/performance/page-loading-20261028/implementation-evidence/navigation-failed-r2.log.gz": {
       "before": null,
-      "after": "dc77d8101d906c8da52c54816ebd6ac33c5dfd09"
+      "after": "a1c26b7f1f4fed288115edd576a4442064c7fb5a"
     },
-    "docs/performance/storage-ledger-20261028/start-planner/planner-backend-types-r1.json": {
+    "docs/performance/page-loading-20261028/implementation-evidence/navigation-failed-r3.json.gz": {
       "before": null,
-      "after": "977ea34a042afac747c8dc3f6c9930f9e657e71f"
+      "after": "8b2454fe3cc15f16ae2eec4e9124732b436718d5"
     },
-    "docs/performance/storage-ledger-20261028/start-planner/planner-backend-types-r1.log": {
+    "docs/performance/page-loading-20261028/implementation-evidence/navigation-failed-r3.log.gz": {
       "before": null,
-      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+      "after": "69307fe04277a54e166ba9a71713718ff38b926d"
     },
-    "docs/performance/storage-ledger-20261028/start-planner/planner-pg-r1-execution.json": {
+    "docs/performance/page-loading-20261028/implementation-evidence/navigation-failed-r4.json.gz": {
       "before": null,
-      "after": "591a566e8af8db4c138ac590ba0d2da801013fcd"
+      "after": "f6ae9fa40c8653e6bd0f4b5c61bba3f53c334bf2"
     },
-    "docs/performance/storage-ledger-20261028/start-planner/planner-pg-r1.json": {
+    "docs/performance/page-loading-20261028/implementation-evidence/navigation-failed-r4.log.gz": {
       "before": null,
-      "after": "4901f772f7365f0d51e60604cfd0c1426654024a"
+      "after": "b420e228409606f470eb4b86c5692e234018380f"
     },
-    "docs/performance/storage-ledger-20261028/start-planner/planner-validation-r1-execution.json": {
+    "docs/performance/page-loading-20261028/implementation-evidence/navigation-r1.json.gz": {
       "before": null,
-      "after": "4e1d57873b5da30d56fbb083ba2bd27125da1444"
+      "after": "29ea7a107ef75e8e8c875afbc14b1d0221b70514"
     },
-    "docs/performance/storage-ledger-20261028/start-planner/planner-validation-r1.json": {
+    "docs/performance/page-loading-20261028/implementation-evidence/navigation-r1.log.gz": {
       "before": null,
-      "after": "ee97a6c761840bed5a761ee3b1ff0a662d26c625"
+      "after": "84f76b4b8c3b06fd32607a8885a575100088c98d"
     },
-    "docs/performance/storage-ledger-20261028/start-planner/profile-start-authority.mts": {
+    "docs/performance/page-loading-20261028/implementation-evidence/typecheck-final.exit.gz": {
       "before": null,
-      "after": "6c1baa6914aadad37a62a42e8f5723817cabd9f2"
+      "after": "c9168d7f64e4266e40f8f7946a354cc86bf104c2"
     },
-    "docs/performance/storage-ledger-20261028/start-planner/run-authority-profile.py": {
+    "docs/performance/page-loading-20261028/implementation-evidence/typecheck-final.log": {
       "before": null,
-      "after": "b6b4940ff3cdd087152c76089fb14446ae733320"
+      "after": "6468b2bdda2b66848185523c6d2d4bbd2b3d099d"
     },
-    "docs/performance/storage-ledger-20261028/start-planner/run-planner-pg.py": {
+    "docs/performance/page-loading-20261028/implementation-evidence/typecheck-r1.exit.gz": {
       "before": null,
-      "after": "42c0b1735e339241e4f0712535eeb399831e9b19"
+      "after": "01fc1b734d99f74e7c52ffa9c9cf11ef40dddcd8"
     },
-    "docs/performance/storage-ledger-20261028/start-planner/run-planner-validation.py": {
+    "docs/performance/page-loading-20261028/implementation-evidence/typecheck-r1.log.gz": {
       "before": null,
-      "after": "de6a6b861b0eae7c881b32f52781ff424c2f5d50"
+      "after": "fc32bfafe43238373ef06008f75b7dd27dc35dcd"
     },
-    "docs/performance/storage-ledger-20261028/start-planner/start-planner-unit-r1.json": {
+    "docs/performance/page-loading-20261028/implementation-evidence/typecheck-r2.exit.gz": {
       "before": null,
-      "after": "9c3c826c6c9d47029fc1643d18859ea067bb3422"
+      "after": "c9168d7f64e4266e40f8f7946a354cc86bf104c2"
     },
-    "docs/performance/storage-ledger-20261028/start-planner/validate-start-planner.mts": {
+    "docs/performance/page-loading-20261028/implementation-evidence/typecheck-r2.log.gz": {
       "before": null,
-      "after": "3b5e062884a5c4f103a02a615cf0d2e7d9dce964"
+      "after": "9979d1853cc2d48d40cf3526216d1411697c198b"
     },
-    "server-version/backend/src/__tests__/scale-library-governance/education-execution-authority.test.ts": {
-      "before": "6fbf9217629702e12ea1ffcf763cb148af61cf0a",
-      "after": "fa42bdf314561b4365ad6514a5b47924d16327c0"
+    "docs/performance/page-loading-20261028/implementation-evidence/typecheck-receipt.json": {
+      "before": null,
+      "after": "64407dbc59fe70e197c4ea82d61112fdf385d197"
     },
-    "server-version/backend/src/modules/assessment-run/startAuthority.ts": {
-      "before": "ab946c097650f977fbcd1e264d0cd13d3c338855",
-      "after": "dada40dbf8a0a305aea3067f61d2361a4723668e"
+    "server-version/frontend/src/components/app-shell/AppShell.tsx": {
+      "before": "0f5f349943e8ee065642315863c36dc50de17b9e",
+      "after": "97e2dc02a9af7f30d6899d7864fc8c10b5b0d2ff"
+    },
+    "server-version/frontend/src/components/page-loading/deferredPage.test.tsx": {
+      "before": null,
+      "after": "c5cdbc7a6531ddc8b7de163690b58325169afaa1"
+    },
+    "server-version/frontend/src/components/page-loading/deferredPage.tsx": {
+      "before": null,
+      "after": "b0c1a3e5293a915d0425d33d2095c05af667f0a7"
+    },
+    "server-version/frontend/src/components/page-loading/entryLoading.test.tsx": {
+      "before": null,
+      "after": "1f6360f2a00cbc51a9246621f463ef5f04ca59d6"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherApp.tsx": {
+      "before": "2b4c98b080f1d4598419ab395a0b55ff0f3713de",
+      "after": "6033eb6def65c3a9d4d8591d4dd85c12829be404"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherMyAssessmentTasks.tsx": {
+      "before": "9757f9de8c7b6931e6a6fa75bb8d28e1d9a5be14",
+      "after": "e27ece7645c1816e840410e77d2ebb3696faa08e"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherPrivateToolNavigation.test.tsx": {
+      "before": "801a585efb3682af2b7b09b79389572cd1fd62bf",
+      "after": "6a87368db2af4f77ad24f6ace077e3035c63956e"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherWorkspaceFlow.test.tsx": {
+      "before": "86904c6a21b523a59306a7d6ef864c20abfcc4fb",
+      "after": "d443a992c5bfcb545abb4eb81ff58971a4961086"
+    },
+    "server-version/frontend/src/pages/UserList.tsx": {
+      "before": "5221a5892a9c885621415f29c0908a0e367ac337",
+      "after": "e19a6ff6d5f414190809f8aebecad2f2ae2691a1"
+    },
+    "server-version/frontend/src/pages/admin/MaterialGrants.tsx": {
+      "before": "e9d99a789ecd6244ef4429089f6a25e7b0bfec83",
+      "after": "0ebae2c7faf374f31b524a62593418eb1be0c447"
+    },
+    "server-version/frontend/src/school/SchoolApp.tsx": {
+      "before": "eca3dfafbb9878ac54803b0a6888b83e40e05b56",
+      "after": "c980a1a28ab94398985bead8d444dc162d68b6cf"
+    },
+    "server-version/frontend/src/school/SchoolCompositeRunner.tsx": {
+      "before": "e37c66d37c6e14410e9b395d243fa6ae46e14605",
+      "after": "7eab3e01834514845fcb1bd807037ee107c6457f"
+    },
+    "server-version/frontend/src/survey/SurveyPublicApp.tsx": {
+      "before": "29df78219154c147698e1221efdc72c11a7a641f",
+      "after": "44eca309a26626cf1b48da1075c1e03eba184060"
+    },
+    "server-version/frontend/src/training/TrainingAdminShell.tsx": {
+      "before": "17f93f3c23ce7919ad4b227878d43374bc4ec07f",
+      "after": "0aad15ffc05d30d766b016aacf59e036991dea42"
+    },
+    "server-version/frontend/src/training/TrainingCourseSettings.tsx": {
+      "before": "08f6b243e2e81b7c70056270b564aec786aaa8e5",
+      "after": "cc41c2f4cde68a9948393a49a4fb8b94fee38883"
+    },
+    "server-version/frontend/src/training/training-admin-workspace.css": {
+      "before": "5e320a03effb6634f250f5e9e2738fbf789a6cbc",
+      "after": "d88b632ce515d024142247d04f3b6e0b821e795b"
+    },
+    "server-version/frontend/src/training/training-management-loading.css": {
+      "before": null,
+      "after": "18a56c26d7e811106a06c4041d1975c92cd1fdc2"
     }
   },
   "controlBefore": {
     ".github/scripts/content-scope.mjs": "31a340af23927250b9a40f6097b3815d617c70ec",
     ".github/scripts/merge-gate.mjs": "985c744ac800aa425323db1c57010e64d0d69a8e",
-    ".github/scripts/onboarding-bindings.json": "70a0bc585fc65f26bb7920f8fb34fab04cc860a8",
-    ".github/scripts/onboarding-checks.mjs": "27f7a30c62a281b4c9bb7a13269071e98cebd7a8",
-    ".github/scripts/onboarding-controls.test.mjs": "31af571d4641c9676487e4f2da033bd85b4270cf",
-    ".github/scripts/onboarding-evidence.json": "3ae31a623b4acc23cf57f3dcac402e5b4ebdeb35",
-    ".github/scripts/onboarding-scope.mjs": "4176bb688bc4d6703cfac87fdc298c0d1b4e3a50",
+    ".github/scripts/onboarding-bindings.json": "3f11795c5c7117caf709c91008e68a2feccd74c5",
+    ".github/scripts/onboarding-checks.mjs": "d1b15bfccfefbac297eedee90c79e64e6d693848",
+    ".github/scripts/onboarding-controls.test.mjs": "ce9a33a85f88e5cbd35beb1f8722b4bc8fbf3c84",
+    ".github/scripts/onboarding-evidence.json": "df6ab3cf296c324aa921ca193331d9310b5cb266",
+    ".github/scripts/onboarding-scope.mjs": "43d833e427245bb68bbe7670ce2109f7f6dc300f",
     ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
     ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
     ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
-    ".github/workflows/ci.yml": "71ee6d10921c5c9bb27a00c8112a04f2d2351187"
+    ".github/scripts/pr378-browser.mjs": null,
+    ".github/workflows/ci.yml": "4f71d0c5d72ea97fd0098424ea8f4c62a916877d"
   },
   "components": {
     "backend": "b7fe981eea351ebb94232571479894e921e53bcd",
-    "frontend": "41f956f8c717c1e6829998bfab896bd1a4e50af1"
+    "frontend": "77babf45b8eba4b14e0f22be9a6c3ffd523b6e00"
   }
 }
