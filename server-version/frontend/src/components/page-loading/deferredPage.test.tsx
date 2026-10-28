@@ -33,3 +33,21 @@ it('does not mount a pending page after its owner navigates away',async()=>{
  await act(async()=>resolve({default:()=>{mounted();return <p>过期页面</p>}}))
  expect(mounted).not.toHaveBeenCalled();expect(screen.queryByText('过期页面')).not.toBeInTheDocument()
 })
+
+it('offers optional cancellation while pending but not after the page has loaded',async()=>{
+ let resolve!:(module:{default:(props:{onExit:()=>void})=>React.ReactNode})=>void
+ const cancel=vi.fn(),PageView=deferredPage(()=>new Promise<{default:(props:{onExit:()=>void})=>React.ReactNode}>(done=>{resolve=done}),{label:'取消打开',run:props=>props.onExit()})
+ render(<PageView onExit={cancel}/>)
+ fireEvent.click(screen.getByRole('button',{name:'取消打开'}));expect(cancel).toHaveBeenCalledTimes(1)
+ await act(async()=>{await Promise.resolve();resolve({default:()=> <p>可保存的作答页面</p>})})
+ await screen.findByText('可保存的作答页面')
+ expect(screen.queryByRole('button',{name:'取消打开'})).not.toBeInTheDocument()
+})
+it('keeps optional cancellation available after a failed chunk without replacing its retry',async()=>{
+ const cancel=vi.fn()
+ const PageView=deferredPage<{onExit:()=>void}>(async()=>{throw Error('synthetic offline')},{label:'取消打开',run:props=>props.onExit()})
+ render(<PageView onExit={cancel}/>)
+ await screen.findByRole('alert')
+ expect(screen.getByRole('button',{name:'重试页面内容'})).toBeInTheDocument()
+ fireEvent.click(screen.getByRole('button',{name:'取消打开'}));expect(cancel).toHaveBeenCalledTimes(1)
+})

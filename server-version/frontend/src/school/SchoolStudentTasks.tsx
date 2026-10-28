@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type MouseEvent } from 'react'
 import { BookOpen, CalendarCheck2, ClipboardList, FileText, RefreshCw, ArrowLeft, Clock3 } from 'lucide-react'
 import { createEducationAssessmentFeedback } from '../components/education-tools/educationAssessmentFeedbackAdapter'
 import { EducationTaskFeedback, type EducationFeedbackData } from '../components/education-tools/EducationTaskFeedback'
@@ -6,7 +6,12 @@ import {SchoolCollectionControls,type SchoolCollectionView} from './SchoolCollec
 import {schoolSearchText,schoolDeadline} from './school-collection'
 import {workspaceHref} from './school-navigation'
 import type { SchoolApi } from './SchoolRecovery'
-import { SchoolCompositeRunner,type CampusExecutionRef } from './SchoolCompositeRunner'
+import {deferredPage} from '../components/page-loading/deferredPage'
+import type {CampusExecutionRef} from './SchoolCompositeRunner'
+
+const SchoolCompositeRunner=deferredPage(async()=>({default:(await import('./SchoolCompositeRunner')).SchoolCompositeRunner}),{
+ label:'返回任务列表',run:props=>props.onExit(),
+})
 
 export type SchoolTask={
   id:string;activityId:string;activityTitle:string
@@ -30,7 +35,11 @@ const kinds:Record<SchoolTask['kind'],string>={
   ASSIGNMENT:'活动练习',READING:'阅读材料',CHECKIN:'活动记录',MEASUREMENT:'正式测评',
 }
 
-export function SchoolStudentTasks({api,activityId}: {api:SchoolApi;activityId?:string}) {
+export function SchoolStudentTasks({api,activityId,onNavigate}: {api:SchoolApi;activityId?:string;onNavigate?:(page:string,activityId?:string)=>void}) {
+  const navigate=(event:MouseEvent<HTMLAnchorElement>,page:string)=>{
+    if(!onNavigate||event.defaultPrevented||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return
+    event.preventDefault();onNavigate(page)
+  }
   const [query,setQuery]=useState(''),[sort,setSort]=useState('recommended'),[view,setView]=useState<SchoolCollectionView>('list')
   const [page,setPage]=useState(1)
   const [items,setItems]=useState<TaskPage|null>(null)
@@ -145,7 +154,7 @@ export function SchoolStudentTasks({api,activityId}: {api:SchoolApi;activityId?:
     {selected&&<button type="button" className="hs-student-detail-back" disabled={busy} onClick={()=>{setDetails(null);setSelected(null)}}><ArrowLeft size={17} aria-hidden="true"/>返回活动</button>}
     <details className="hs-task-inbox" open={!(selected||visibleExecution||visibleFeedback)}>
     <summary hidden={!(selected||visibleExecution||visibleFeedback)}>查看任务列表</summary>
-    <div className="hs-student-task-trail"><a href={workspaceHref('overview')}><ArrowLeft size={16} aria-hidden="true"/>返回概览</a>{activityId&&<a href={workspaceHref('tasks')}>查看全部任务</a>}</div>
+    <div className="hs-student-task-trail"><a href={workspaceHref('overview')} onClick={event=>navigate(event,'overview')}><ArrowLeft size={16} aria-hidden="true"/>返回概览</a>{activityId&&<a href={workspaceHref('tasks')} onClick={event=>navigate(event,'tasks')}>查看全部任务</a>}</div>
     <header className="hs-student-task-heading"><div><h1 ref={inboxTitle} tabIndex={-1}>我的校园任务</h1><p>{activityId&&items?.list[0]?.activityTitle?items.list[0].activityTitle:'学校已开放的活动任务'}</p></div>
     {items?<SchoolCollectionControls query={query} onQuery={setQuery} sort={sort} onSort={setSort} view={view} onView={setView} searchLabel={partial?'检索本页任务':'检索任务'} placeholder="搜索任务名称或活动名称" sorts={[{value:'recommended',label:'默认顺序'},{value:'deadline',label:'截止时间优先'},{value:'title',label:'任务名称 A–Z'}]} actions={<button type="button" disabled={busy||loading} onClick={()=>void load(listError?retryPage:page)} aria-label={loading?'正在读取…':listError?'重试读取待办':'刷新待办'} title="刷新待办"><RefreshCw size={18} aria-hidden="true"/></button>}/>:<button type="button" disabled={busy||loading} onClick={()=>void load(listError?retryPage:page)} aria-label={loading?'正在读取…':listError?'重试读取待办':'刷新待办'} title="刷新待办"><RefreshCw size={18} aria-hidden="true"/></button>}</header>
 

@@ -54,9 +54,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const renderEpoch = authEpochRef.current
   const notifySessionChanged = () => {
     // Only a change nonce is shared: never credentials, identity or tokens.
-    sessionChannel.current?.postMessage(AUTH_SESSION_SIGNAL)
+    let nonce: string
+    try { nonce = crypto.randomUUID() } catch {
+      sessionChannel.current?.postMessage(AUTH_SESSION_SIGNAL)
+      return
+    }
+    sessionChannel.current?.postMessage({type: AUTH_SESSION_SIGNAL, nonce})
     try {
-      localStorage.setItem(AUTH_SESSION_SIGNAL, crypto.randomUUID())
+      localStorage.setItem(AUTH_SESSION_SIGNAL, nonce)
     } catch {
       /* Focus revalidation remains available. */
     }
@@ -206,11 +211,17 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         if (alive && sequence === validation) setIsLoading(false)
       }
     }
-    const changed = () => {
+    const seenChanges = new Set<string>()
+    const changed = (nonce?: string) => {
+      if (nonce) {
+        if (seenChanges.has(nonce)) return
+        seenChanges.add(nonce)
+        if (seenChanges.size > 32) seenChanges.delete(seenChanges.values().next().value!)
+      }
       void validateSession(true)
     }
     const storageChanged = (event: StorageEvent) => {
-      if (event.key === AUTH_SESSION_SIGNAL) changed()
+      if (event.key === AUTH_SESSION_SIGNAL) changed(event.newValue || undefined)
     }
     const focus = () => {
       void validateSession()
@@ -222,6 +233,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       sessionChannel.current = new BroadcastChannel(AUTH_SESSION_SIGNAL)
       sessionChannel.current.onmessage = (event) => {
         if (event.data === AUTH_SESSION_SIGNAL) changed()
+        else if (event.data?.type === AUTH_SESSION_SIGNAL && typeof event.data.nonce === 'string' && event.data.nonce.length > 0 && event.data.nonce.length <= 128) changed(event.data.nonce)
       }
     }
     window.addEventListener('storage', storageChanged)

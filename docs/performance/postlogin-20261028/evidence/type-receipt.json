@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "npm",
+    "run",
+    "typecheck"
+  ],
+  "exitCode": 0,
+  "node": "v24.22.1",
+  "componentTree": "2c12784be9807b9d653dcee5bc781be279aaac9c",
+  "logSHA256": "89d936b1e284745728636af39debf47c45965c6310d8b51eebfd32cc0fa079fc"
+}

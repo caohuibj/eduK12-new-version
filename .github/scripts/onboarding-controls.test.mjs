@@ -112,7 +112,7 @@ test('observer follow-up admits only its HTTP test, scoped CSS and evidence; bro
  const read=(cmd,a,...r)=>cmd==='rev-parse'&&a===base+':server-version/frontend'?h('9'):f.read(cmd,a,...r);
  assert.equal(onboardingPlan(entries,base,head,read,env,b).pr,376);
  for(const outside of ['server-version/backend/src/middleware/auth.ts','server-version/backend/prisma/schema.prisma'])assert.throws(()=>onboardingPlan(entries.map(e=>e.file===path?{...e,file:outside}:e),base,head,read,env,{...b,source:{[outside]:{before:null,after:blob}}}));
- const yaml=readFileSync('.github/workflows/ci.yml','utf8');assert(yaml.includes('node .github/scripts/pr376-browser.mjs'));assert(yaml.includes("contains(fromJSON('[374,376,378]')"));
+ const yaml=readFileSync('.github/workflows/ci.yml','utf8');assert(yaml.includes('node .github/scripts/pr376-browser.mjs'));assert(yaml.includes("contains(fromJSON('[374,376,378,380]')"));
  const script=readFileSync('.github/scripts/pr376-browser.mjs','utf8');assert(script.includes('chromiumSandbox:true'));assert(script.includes('verifyChromeSandbox'));assert(script.includes('results.cases.length,6'));assert(script.includes('row.warning.ratio>=4.5'));assert(script.includes('Display fixture forbids simulated writes'));
 });
 test('observer display retry keeps failed report and narrows execution without weakening contrast',()=>{
@@ -139,4 +139,12 @@ test('PR378 keeps frontend-only scope, exact npm type receipt and compiled loadi
  assert.equal(verifyTypeReceipt(receipt,review,()=>Buffer.from(''),h('3')).originalExitCode,0);assert.throws(()=>verifyTypeReceipt({...receipt,argv:['npm','run','build']},review,()=>Buffer.from(''),h('3')));
  const yaml=readFileSync('.github/workflows/ci.yml','utf8'),script=readFileSync('.github/scripts/pr378-browser.mjs','utf8');assert(yaml.includes('node .github/scripts/pr378-browser.mjs'));assert(yaml.includes(".pr == 378 && 'paths: [server-version/frontend/src"));assert(script.includes("['run','build','--','--manifest']"));assert(script.includes('chromiumSandbox:true'));assert(script.includes('verifyChromeSandbox'));assert(!script.includes('--no-sandbox'));assert(script.includes("request.method()!=='GET'"));
  assert.deepEqual(requiredChecks({scope:{outputs:{application_route:'onboarding-structure'}}},false),['scope','onboarding-structure','codeql']);
+});
+
+
+test('PR380 admits only its frontend delta and requires one compiled postlogin consumer',()=>{
+ const f=fixture(),path='server-version/frontend/src/survey/TaskForm.tsx',b={...f.b,pr:380,source:{[path]:{before:null,after:blob}}};
+ const entries=f.entries.map(e=>Object.hasOwn(f.b.source,e.file)?{...e,file:path}:e),env={...f.env,CI_PR_NUMBER:'380',CI_HEAD_REF:BRANCHES[380]};assert.equal(onboardingPlan(entries,base,head,f.read,env,b).pr,380);
+ const outside='server-version/backend/src/modules/campus/auth.routes.ts';assert.throws(()=>onboardingPlan(entries.map(e=>e.file===path?{...e,file:outside}:e),base,head,f.read,env,{...b,source:{[outside]:{before:null,after:blob}}}));
+ const yaml=readFileSync('.github/workflows/ci.yml','utf8'),script=readFileSync('.github/scripts/pr380-browser.mjs','utf8');assert(yaml.includes('node .github/scripts/pr380-browser.mjs'));assert(yaml.includes(".pr == 380 && 'paths: [server-version/frontend/src"));assert(script.includes('chromiumSandbox:true'));assert(script.includes('verifyChromeSandbox'));assert(!script.includes('--no-sandbox'));assert(script.includes("request.method()!=='GET'"));assert(script.includes("cpSync(dist,resolve(out,'dist')"));assert(script.includes("restoreBrowserBuild"));assert(script.includes("executedThisRun:false"));assert(script.includes("assert.equal(result.cases.length,5)"));assert.deepEqual(requiredChecks({scope:{outputs:{application_route:'onboarding-structure'}}},false),['scope','onboarding-structure','codeql']);
 });

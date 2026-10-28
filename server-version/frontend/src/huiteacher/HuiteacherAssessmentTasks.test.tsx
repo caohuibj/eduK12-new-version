@@ -2,7 +2,7 @@ import {createEducationAssessmentFeedback} from '../components/education-tools/e
 import {act,cleanup,fireEvent,render,screen,within,waitFor} from '@testing-library/react'
 import {afterEach,describe,expect,it,vi} from 'vitest'
 import {HuiteacherAssessmentTasks} from './HuiteacherAssessmentTasks'
-vi.mock('../survey/SurveyPublicApp',()=>({TaskForm:()=> <input aria-label="测评答案"/>}))
+vi.mock('../survey/TaskForm',()=>({TaskForm:()=> <input aria-label="测评答案"/>}))
 vi.mock('../components/FinalCompositeAssessment',()=>({default:()=> <p>原有授权作答界面</p>}))
 afterEach(cleanup)
 type Api=Parameters<typeof HuiteacherAssessmentTasks>[0]['api']

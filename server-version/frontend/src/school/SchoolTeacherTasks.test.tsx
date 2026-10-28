@@ -23,7 +23,7 @@ describe('Huischool teacher observation inbox',()=>{
     expect(await screen.findByText('林-123456789ABC')).toBeInTheDocument()
     expect(document.body.textContent).not.toContain('PRIVATE_LOGIN_NAME')
     fireEvent.click(screen.getByRole('button',{name:'开始／继续教师观察测评'}))
-    expect(screen.getByRole('region',{name:'official campus runner'})).toHaveTextContent('exec-1')
+    expect(await screen.findByRole('region',{name:'official campus runner'})).toHaveTextContent('exec-1')
     await waitFor(()=>expect(api).toHaveBeenCalledWith('/my/teacher-run-tasks?organizationId=school-a'))
   })
   it('does not invent work when no authorized tasks are returned',async()=>{
@@ -49,7 +49,7 @@ it('filters and sorts only returned tasks, retaining execution identity after ch
   expect(screen.getAllByRole('article')).toHaveLength(1)
   expect(screen.getByText(/检索和排序仅作用于当前已加载任务/)).toBeInTheDocument()
   fireEvent.click(screen.getByRole('button',{name:'开始／继续教师观察测评'}))
-  expect(screen.getByRole('region',{name:'official campus runner'})).toHaveTextContent('exec-z')
+  expect(await screen.findByRole('region',{name:'official campus runner'})).toHaveTextContent('exec-z')
   expect(api).toHaveBeenCalledTimes(1)
 })
 

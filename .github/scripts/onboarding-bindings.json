@@ -1,247 +1,230 @@
 {
-  "pr": 378,
+  "pr": 380,
   "enabled": true,
-  "base": "b7909cbf05d5ba0092c59853f20c86491ab38137",
-  "product": "10a32d20a1ef767791d5d1f03b7e582a1bb6c772",
-  "controlCheckpoint": "389cad71ea386744eb11651e42e39b8141925fcf",
+  "base": "ec19f532b7a962ff9027ba5558d1412bf886a3c4",
+  "product": "2b417daa8a02d1103948e0918af10238aa7685b8",
+  "controlCheckpoint": "914c88518b1a56540abee353a559d5429b062482",
   "source": {
-    "docs/performance/page-loading-20261028/IMPLEMENTATION.md": {
+    "docs/performance/postlogin-20261028/README.md": {
       "before": null,
-      "after": "2b2e933a2a9fb736ef73836508c509ea89924cc0"
+      "after": "1b60c4bf8e9cb35f9a3a62f6bbe0155ac388817f"
     },
-    "docs/performance/page-loading-20261028/REVIEW.md": {
+    "docs/performance/postlogin-20261028/baseline/authenticated-closures.json": {
       "before": null,
-      "after": "a175d5ed0f211f3df569fb525a1060038d32be77"
+      "after": "ffcb3f114943afdfab906e18f678341d135b0bae"
     },
-    "docs/performance/page-loading-20261028/evidence/analyze-manifest.py": {
+    "docs/performance/postlogin-20261028/baseline/pr378-browser.json": {
       "before": null,
-      "after": "29b4859274bef217646e0baf49714d94e8a2cd51"
+      "after": "c0da1005da41fc70fac52fe98d2b00dbace4cf79"
     },
-    "docs/performance/page-loading-20261028/evidence/build-main.log": {
+    "docs/performance/postlogin-20261028/evidence/editor-03.report.json": {
       "before": null,
-      "after": "9ed5f30f0795413961132dfeae095fcd9bc3d0ee"
+      "after": "ee7315ab1a7d432c1b07d6b4b05845ddb276fd25"
     },
-    "docs/performance/page-loading-20261028/evidence/build-receipt.json": {
+    "docs/performance/postlogin-20261028/evidence/education-cancel-01.json": {
       "before": null,
-      "after": "27bc3cc64f41686b442f1f9f3f2b16f66cd77565"
+      "after": "2f27c1c7f9057bff92162b4581e413ce257463e1"
     },
-    "docs/performance/page-loading-20261028/evidence/index.json": {
+    "docs/performance/postlogin-20261028/evidence/education-school-cancel-01.json": {
       "before": null,
-      "after": "31eda55bb32cb5b48d35c42ec4bf5deda76a5986"
+      "after": "605a6c02f93157f8081847d217fd1bc3d3bd3afd"
     },
-    "docs/performance/page-loading-20261028/evidence/main-entry-closures.json": {
+    "docs/performance/postlogin-20261028/evidence/education-targeted-01.json": {
       "before": null,
-      "after": "f19cb2592b27e2ac7ce42da1bafd0ba9fd81585b"
+      "after": "4d3c5151b6972c18f275b8911694857c4bd246e3"
     },
-    "docs/performance/page-loading-20261028/evidence/vite-manifest.json.gz": {
+    "docs/performance/postlogin-20261028/evidence/education-targeted-02.json": {
       "before": null,
-      "after": "6a5218bcb6def56a8264371c71b0a33fb2e803ec"
+      "after": "d60fdc449938642b88fd187abfcd80344101f3c3"
     },
-    "docs/performance/page-loading-20261028/implementation-evidence/affected-final-r1.json.gz": {
+    "docs/performance/postlogin-20261028/evidence/form-direct-consumers.json": {
       "before": null,
-      "after": "888dc14297254c9d25606eddc9ceff9a31c45446"
+      "after": "779bd8d8fefb33575821f82c3d2d6804f88d1292"
     },
-    "docs/performance/page-loading-20261028/implementation-evidence/affected-final-r1.log.gz": {
+    "docs/performance/postlogin-20261028/evidence/form-practice-pagination.json": {
       "before": null,
-      "after": "5269e086916f81f983e215d5dc090886f67cc915"
+      "after": "a4c9d5f546f3527ed3a590dcce9dcb42577ee539"
     },
-    "docs/performance/page-loading-20261028/implementation-evidence/affected-final-r2.exit.gz": {
+    "docs/performance/postlogin-20261028/evidence/frontend-typecheck-02.log": {
       "before": null,
-      "after": "c9168d7f64e4266e40f8f7946a354cc86bf104c2"
+      "after": "c1159c59a15f916d3674258293c6a7c8ad9e5691"
     },
-    "docs/performance/page-loading-20261028/implementation-evidence/affected-final-r2.json": {
+    "docs/performance/postlogin-20261028/evidence/original-history.json.gz": {
       "before": null,
-      "after": "8c5b0006bff4a9acacc363e71fa0439151bd362e"
+      "after": "e907e30851395e4cb80b53759fef669a08193969"
     },
-    "docs/performance/page-loading-20261028/implementation-evidence/affected-final-r2.log.gz": {
+    "docs/performance/postlogin-20261028/evidence/root-navigation-01.json": {
       "before": null,
-      "after": "d67a2177977a9f892375aa3b35564b1aa3261f9a"
+      "after": "5a6420612ef7043c2eedaac74330b71438c88a12"
     },
-    "docs/performance/page-loading-20261028/implementation-evidence/control-r1.log": {
+    "docs/performance/postlogin-20261028/evidence/root-navigation-02.json": {
       "before": null,
-      "after": "3927eafc1f2eb2a9d26e84d371f23890e20b8e39"
+      "after": "4ef816dbca1dea9ec6081f9eb4360153eb7f451d"
     },
-    "docs/performance/page-loading-20261028/implementation-evidence/debug-tab.log.gz": {
+    "docs/performance/postlogin-20261028/evidence/type-receipt.json": {
       "before": null,
-      "after": "a9a3efab0248b58b5b81c2b4c64035230f595e4b"
-    },
-    "docs/performance/page-loading-20261028/implementation-evidence/directory-r2.exit.gz": {
-      "before": null,
-      "after": "c9168d7f64e4266e40f8f7946a354cc86bf104c2"
-    },
-    "docs/performance/page-loading-20261028/implementation-evidence/directory-r2.json": {
-      "before": null,
-      "after": "ae6669559fe4d637ce7966d037d298973a34f98c"
-    },
-    "docs/performance/page-loading-20261028/implementation-evidence/directory-r2.log.gz": {
-      "before": null,
-      "after": "7ecff35b28247a2cbd40297d729cb1c59364687e"
-    },
-    "docs/performance/page-loading-20261028/implementation-evidence/lint-final.log": {
-      "before": null,
-      "after": "04d2311d87743cd108d0234a11ae0f6a4a97878f"
-    },
-    "docs/performance/page-loading-20261028/implementation-evidence/lint-r1.exit.gz": {
-      "before": null,
-      "after": "c9168d7f64e4266e40f8f7946a354cc86bf104c2"
-    },
-    "docs/performance/page-loading-20261028/implementation-evidence/lint-r1.log": {
-      "before": null,
-      "after": "d448cb03674628bd6e262f32ee562fb8e0203b31"
-    },
-    "docs/performance/page-loading-20261028/implementation-evidence/loading-r1.json.gz": {
-      "before": null,
-      "after": "dc05f34fac5787002478dc84c62062294c9acf74"
-    },
-    "docs/performance/page-loading-20261028/implementation-evidence/loading-r1.log.gz": {
-      "before": null,
-      "after": "078e374b2f03959c7261a89c3dc0fa2c9bd0348a"
-    },
-    "docs/performance/page-loading-20261028/implementation-evidence/navigation-failed-r2.json.gz": {
-      "before": null,
-      "after": "b2fa6392b8e04d4a7648982d044e12796ceff65b"
-    },
-    "docs/performance/page-loading-20261028/implementation-evidence/navigation-failed-r2.log.gz": {
-      "before": null,
-      "after": "a1c26b7f1f4fed288115edd576a4442064c7fb5a"
-    },
-    "docs/performance/page-loading-20261028/implementation-evidence/navigation-failed-r3.json.gz": {
-      "before": null,
-      "after": "8b2454fe3cc15f16ae2eec4e9124732b436718d5"
-    },
-    "docs/performance/page-loading-20261028/implementation-evidence/navigation-failed-r3.log.gz": {
-      "before": null,
-      "after": "69307fe04277a54e166ba9a71713718ff38b926d"
-    },
-    "docs/performance/page-loading-20261028/implementation-evidence/navigation-failed-r4.json.gz": {
-      "before": null,
-      "after": "f6ae9fa40c8653e6bd0f4b5c61bba3f53c334bf2"
-    },
-    "docs/performance/page-loading-20261028/implementation-evidence/navigation-failed-r4.log.gz": {
-      "before": null,
-      "after": "b420e228409606f470eb4b86c5692e234018380f"
-    },
-    "docs/performance/page-loading-20261028/implementation-evidence/navigation-r1.json.gz": {
-      "before": null,
-      "after": "29ea7a107ef75e8e8c875afbc14b1d0221b70514"
-    },
-    "docs/performance/page-loading-20261028/implementation-evidence/navigation-r1.log.gz": {
-      "before": null,
-      "after": "84f76b4b8c3b06fd32607a8885a575100088c98d"
-    },
-    "docs/performance/page-loading-20261028/implementation-evidence/typecheck-final.exit.gz": {
-      "before": null,
-      "after": "c9168d7f64e4266e40f8f7946a354cc86bf104c2"
-    },
-    "docs/performance/page-loading-20261028/implementation-evidence/typecheck-final.log": {
-      "before": null,
-      "after": "6468b2bdda2b66848185523c6d2d4bbd2b3d099d"
-    },
-    "docs/performance/page-loading-20261028/implementation-evidence/typecheck-r1.exit.gz": {
-      "before": null,
-      "after": "01fc1b734d99f74e7c52ffa9c9cf11ef40dddcd8"
-    },
-    "docs/performance/page-loading-20261028/implementation-evidence/typecheck-r1.log.gz": {
-      "before": null,
-      "after": "fc32bfafe43238373ef06008f75b7dd27dc35dcd"
-    },
-    "docs/performance/page-loading-20261028/implementation-evidence/typecheck-r2.exit.gz": {
-      "before": null,
-      "after": "c9168d7f64e4266e40f8f7946a354cc86bf104c2"
-    },
-    "docs/performance/page-loading-20261028/implementation-evidence/typecheck-r2.log.gz": {
-      "before": null,
-      "after": "9979d1853cc2d48d40cf3526216d1411697c198b"
-    },
-    "docs/performance/page-loading-20261028/implementation-evidence/typecheck-receipt.json": {
-      "before": null,
-      "after": "64407dbc59fe70e197c4ea82d61112fdf385d197"
-    },
-    "server-version/frontend/src/components/app-shell/AppShell.tsx": {
-      "before": "0f5f349943e8ee065642315863c36dc50de17b9e",
-      "after": "97e2dc02a9af7f30d6899d7864fc8c10b5b0d2ff"
+      "after": "efbb04ba53cd0e130d6bc206dcc6ca2ec5396ffb"
     },
     "server-version/frontend/src/components/page-loading/deferredPage.test.tsx": {
-      "before": null,
-      "after": "c5cdbc7a6531ddc8b7de163690b58325169afaa1"
+      "before": "c5cdbc7a6531ddc8b7de163690b58325169afaa1",
+      "after": "765093761618d9dae0836d9fed1b8d1e83730b12"
     },
     "server-version/frontend/src/components/page-loading/deferredPage.tsx": {
-      "before": null,
-      "after": "b0c1a3e5293a915d0425d33d2095c05af667f0a7"
+      "before": "b0c1a3e5293a915d0425d33d2095c05af667f0a7",
+      "after": "d6d8753769eeb29062e770750c521cab88b1b53e"
     },
-    "server-version/frontend/src/components/page-loading/entryLoading.test.tsx": {
+    "server-version/frontend/src/components/page-loading/taskRunnerLoading.test.tsx": {
       "before": null,
-      "after": "1f6360f2a00cbc51a9246621f463ef5f04ca59d6"
+      "after": "3a6e752ff00b80361023edcdb6ab29c18fb8358d"
     },
-    "server-version/frontend/src/huiteacher/HuiteacherApp.tsx": {
-      "before": "2b4c98b080f1d4598419ab395a0b55ff0f3713de",
-      "after": "6033eb6def65c3a9d4d8591d4dd85c12829be404"
+    "server-version/frontend/src/contexts/AuthContext.tsx": {
+      "before": "0668d733b7eeb2f4b864033677677b0937e80d9c",
+      "after": "de8ca03ef3f652b6fb56719aeba799cfa2c994ab"
+    },
+    "server-version/frontend/src/contexts/__tests__/AuthContext.test.tsx": {
+      "before": "2f8c7fa80a4426f16ca162c816e329d2e463443c",
+      "after": "cdd1b491f57b002e5ecaf3a0864233c800b9b7a4"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherAssessmentTasks.test.tsx": {
+      "before": "1928e89bbab253f794f021909a03004704468dfa",
+      "after": "ffce8ac1cc58985daa210d9156bb7986103846ba"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherFieldWorkspace.tsx": {
+      "before": "e40ea048fe206c3750fb32d8c582d494e56c289e",
+      "after": "9889a53ddbcfd49ae64a4fee61959e8b8caffbbb"
     },
     "server-version/frontend/src/huiteacher/HuiteacherMyAssessmentTasks.tsx": {
-      "before": "9757f9de8c7b6931e6a6fa75bb8d28e1d9a5be14",
-      "after": "e27ece7645c1816e840410e77d2ebb3696faa08e"
+      "before": "e27ece7645c1816e840410e77d2ebb3696faa08e",
+      "after": "341862329d725e273088dd0573d5bb464e48011e"
     },
-    "server-version/frontend/src/huiteacher/HuiteacherPrivateToolNavigation.test.tsx": {
-      "before": "801a585efb3682af2b7b09b79389572cd1fd62bf",
-      "after": "6a87368db2af4f77ad24f6ace077e3035c63956e"
+    "server-version/frontend/src/huiteacher/HuiteacherMyFormTasks.tsx": {
+      "before": "975f08ad9d84f97de72232c42d60a734e498258d",
+      "after": "7e5cd6a1c774fb8197ddd1083322f4a8e674f5cd"
     },
-    "server-version/frontend/src/huiteacher/HuiteacherWorkspaceFlow.test.tsx": {
-      "before": "86904c6a21b523a59306a7d6ef864c20abfcc4fb",
-      "after": "d443a992c5bfcb545abb4eb81ff58971a4961086"
+    "server-version/frontend/src/huiteacher/HuiteacherMyPrivateFormTasks.tsx": {
+      "before": "02aea9b8c6c5887884a3e0c2250364e227c6dfc0",
+      "after": "557940f604c9cf2ac3761d4b079cc3d66b78eb6d"
     },
-    "server-version/frontend/src/pages/UserList.tsx": {
-      "before": "5221a5892a9c885621415f29c0908a0e367ac337",
-      "after": "e19a6ff6d5f414190809f8aebecad2f2ae2691a1"
+    "server-version/frontend/src/huiteacher/HuiteacherMyScaleTasks.test.tsx": {
+      "before": "a75794aaa1b2e6fc20ceaa1b0abadb7dfaeb1ab2",
+      "after": "5393fc697b78f6d9cd68cbc31760b0106daad83e"
     },
-    "server-version/frontend/src/pages/admin/MaterialGrants.tsx": {
-      "before": "e9d99a789ecd6244ef4429089f6a25e7b0bfec83",
-      "after": "0ebae2c7faf374f31b524a62593418eb1be0c447"
+    "server-version/frontend/src/huiteacher/HuiteacherMyScaleTasks.tsx": {
+      "before": "fdf470f2ffbc9fb063f1634160f25b609f61ddcb",
+      "after": "67e996f49ce24a43bd32afa0464900454bff8599"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherPracticePages.test.tsx": {
+      "before": "4ff786df0033e179721d06a00db50036941bb0e1",
+      "after": "bc4b2434b14fcbcb7c83e95ba765b64a8adc0a4a"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherTaskListStates.test.tsx": {
+      "before": "d17cb9df4b786893bc07a39505934a60d434aafc",
+      "after": "3d6e113cbec03e0cadcfce13567578ac8632875d"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherTaskLoadingCancel.test.tsx": {
+      "before": null,
+      "after": "53d918e3a73fad11b1e62061c7f6feb30a2da9cf"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherTaskSectionReads.test.tsx": {
+      "before": null,
+      "after": "e5b9675ee5e9606328795f4f98fbf10af5db7db2"
+    },
+    "server-version/frontend/src/huiteacher/TeacherAssessmentPages.test.tsx": {
+      "before": "f3c8922ffb694966a0048e41d734bf67cb1f1709",
+      "after": "ce1275baf97b2a6063162ab882694771b298079c"
+    },
+    "server-version/frontend/src/pages/__tests__/QuestionnaireEditors.guard.test.tsx": {
+      "before": "a5cfdb3b2adc3332969eb7c89eda73d596ae3368",
+      "after": "a3090ee94c4cfb1317b97448a3727ffad1c66ba5"
+    },
+    "server-version/frontend/src/pages/teacher/GeneralQuestionnaireEdit.deferred.test.tsx": {
+      "before": null,
+      "after": "4823102350bf3d2230bed21a903eed4a333484b9"
+    },
+    "server-version/frontend/src/pages/teacher/GeneralQuestionnaireEdit.tsx": {
+      "before": "93cf604681b8f4740341e17854d2a5f63b10de53",
+      "after": "e1abaded9a19c57bd4c01799e8e771fc49b2b118"
     },
     "server-version/frontend/src/school/SchoolApp.tsx": {
-      "before": "eca3dfafbb9878ac54803b0a6888b83e40e05b56",
-      "after": "c980a1a28ab94398985bead8d444dc162d68b6cf"
+      "before": "c980a1a28ab94398985bead8d444dc162d68b6cf",
+      "after": "2ddaf6b1420606d2484049b908eb1a1fbff8f5af"
     },
-    "server-version/frontend/src/school/SchoolCompositeRunner.tsx": {
-      "before": "e37c66d37c6e14410e9b395d243fa6ae46e14605",
-      "after": "7eab3e01834514845fcb1bd807037ee107c6457f"
+    "server-version/frontend/src/school/SchoolLearnerHome.tsx": {
+      "before": "80f09cc1ef9006d8296dba4abb1d7f93477cc767",
+      "after": "34e21b5024563546597efaf376121b0144549d4f"
+    },
+    "server-version/frontend/src/school/SchoolLearnerNavigation.test.tsx": {
+      "before": null,
+      "after": "18ec969d018d4fb0eb3286c0863c37a0cfa8046f"
+    },
+    "server-version/frontend/src/school/SchoolParentTasks.test.tsx": {
+      "before": "83dc8eb77ff15b538cfef2ac32135d4ff12e91ab",
+      "after": "1724e0870d48f42e1301617fba26936384dd5987"
+    },
+    "server-version/frontend/src/school/SchoolParentTasks.tsx": {
+      "before": "bce3b5c9519cd4c03f2283e5524dfa72feb5ca8d",
+      "after": "569ae7819227de50a38753c5ebafcb0ea4daadcb"
+    },
+    "server-version/frontend/src/school/SchoolStudentTasks.test.tsx": {
+      "before": "5c5c2188406e28042a6fa8655775120adf032947",
+      "after": "23a62c8d76c5c295589fa2c51669e17051d8d8df"
+    },
+    "server-version/frontend/src/school/SchoolStudentTasks.tsx": {
+      "before": "9ada2ffce9f6c50fe8eb64b157d0b908329930f8",
+      "after": "9b9e0c953214bdeee7d9d8810c24d70adf2f197e"
+    },
+    "server-version/frontend/src/school/SchoolTaskLoadingCancel.test.tsx": {
+      "before": null,
+      "after": "425eb721d3912b99297d230c95de6c1bfca17a82"
+    },
+    "server-version/frontend/src/school/SchoolTeacherTasks.test.tsx": {
+      "before": "9b2c2a361a4ee9efa88def3135349fef5a609e9b",
+      "after": "5924fe63cc981541a69fea59775e481eb3c544b6"
+    },
+    "server-version/frontend/src/school/SchoolTeacherTasks.tsx": {
+      "before": "e2895d629645b93a5ce2363152cd058d76c89b7b",
+      "after": "42a0cb18fa2f782ec6057356fc2314b459a4ed49"
+    },
+    "server-version/frontend/src/survey/SurveyApp.leave-risk.test.tsx": {
+      "before": "592b0584e28586c532906d3fb6e99a3b7c38e3fd",
+      "after": "dd8d461e359dfb26e6e8a503bece5e306a26a4f8"
+    },
+    "server-version/frontend/src/survey/SurveyApp.tsx": {
+      "before": "7e309807aabf3d72b6c6fc2eef90c92744cd62a1",
+      "after": "a0c9b50e663afb37c3e1befda33a5d8e9fb2cc86"
     },
     "server-version/frontend/src/survey/SurveyPublicApp.tsx": {
-      "before": "29df78219154c147698e1221efdc72c11a7a641f",
-      "after": "44eca309a26626cf1b48da1075c1e03eba184060"
+      "before": "44eca309a26626cf1b48da1075c1e03eba184060",
+      "after": "624c9659c0cc31f33b72afafae68916029cb0c11"
     },
-    "server-version/frontend/src/training/TrainingAdminShell.tsx": {
-      "before": "17f93f3c23ce7919ad4b227878d43374bc4ec07f",
-      "after": "0aad15ffc05d30d766b016aacf59e036991dea42"
-    },
-    "server-version/frontend/src/training/TrainingCourseSettings.tsx": {
-      "before": "08f6b243e2e81b7c70056270b564aec786aaa8e5",
-      "after": "cc41c2f4cde68a9948393a49a4fb8b94fee38883"
-    },
-    "server-version/frontend/src/training/training-admin-workspace.css": {
-      "before": "5e320a03effb6634f250f5e9e2738fbf789a6cbc",
-      "after": "d88b632ce515d024142247d04f3b6e0b821e795b"
-    },
-    "server-version/frontend/src/training/training-management-loading.css": {
+    "server-version/frontend/src/survey/SurveyWorkspaceLoading.test.tsx": {
       "before": null,
-      "after": "18a56c26d7e811106a06c4041d1975c92cd1fdc2"
+      "after": "82d23c3421b4a4d31bda1444092b68c2028b9f00"
+    },
+    "server-version/frontend/src/survey/TaskForm.tsx": {
+      "before": null,
+      "after": "f467a2e67b9ba1d88f2791f1e63e5d76a115d7ba"
     }
   },
   "controlBefore": {
     ".github/scripts/content-scope.mjs": "31a340af23927250b9a40f6097b3815d617c70ec",
     ".github/scripts/merge-gate.mjs": "985c744ac800aa425323db1c57010e64d0d69a8e",
-    ".github/scripts/onboarding-bindings.json": "3f11795c5c7117caf709c91008e68a2feccd74c5",
-    ".github/scripts/onboarding-checks.mjs": "d1b15bfccfefbac297eedee90c79e64e6d693848",
-    ".github/scripts/onboarding-controls.test.mjs": "ce9a33a85f88e5cbd35beb1f8722b4bc8fbf3c84",
-    ".github/scripts/onboarding-evidence.json": "df6ab3cf296c324aa921ca193331d9310b5cb266",
-    ".github/scripts/onboarding-scope.mjs": "43d833e427245bb68bbe7670ce2109f7f6dc300f",
+    ".github/scripts/onboarding-bindings.json": "ae16ea3bef7ad8462b94ec18ca767fbe5ea779a9",
+    ".github/scripts/onboarding-checks.mjs": "9e87c249dde03a009b8286c31141ede3df1ee66e",
+    ".github/scripts/onboarding-controls.test.mjs": "cdfd882585b402cc094f8bde58d84c99b3569eb9",
+    ".github/scripts/onboarding-evidence.json": "1629ba9bdfb800fddb6a0fd742ad20ce4e96cd75",
+    ".github/scripts/onboarding-scope.mjs": "ac35d2fd42d4a9675d427085d0435a044bb7ff79",
     ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
     ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
     ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
-    ".github/scripts/pr378-browser.mjs": null,
-    ".github/workflows/ci.yml": "4f71d0c5d72ea97fd0098424ea8f4c62a916877d"
+    ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
+    ".github/scripts/pr380-browser.mjs": null,
+    ".github/workflows/ci.yml": "e1e110efc0559c229fec876e432cd0187318d7d4",
+    ".github/scripts/pr380-browser-reuse.mjs": null,
+    ".github/scripts/pr380-browser-reuse.test.mjs": null
   },
   "components": {
     "backend": "b7fe981eea351ebb94232571479894e921e53bcd",
-    "frontend": "77babf45b8eba4b14e0f22be9a6c3ffd523b6e00"
+    "frontend": "2c12784be9807b9d653dcee5bc781be279aaac9c"
   }
 }

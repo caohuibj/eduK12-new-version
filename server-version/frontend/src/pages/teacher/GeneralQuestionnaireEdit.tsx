@@ -3,15 +3,13 @@ import { useLatestRequest, requestError } from '../../components/shared-ui/useLa
 import { useStaffFeedback } from '../../components/staff-ui/useStaffFeedback'
 import ModalSurface from '../../components/shared-ui/ModalSurface'
 import { useEditorGuard } from '../../components/shared-ui/useEditorGuard'
-import { PublicDeliveryManager } from '../../components/PublicDeliveryManager'
-import React, { useState, useEffect } from 'react'
+import { deferredPage, KeepMountedOnVisit } from '../../components/page-loading/deferredPage'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import apiClient from '../../api/client'
-import { Save, Plus, Trash2, ChevronLeft, GripVertical, Layers, FileText, Edit3 } from 'lucide-react'
-import { ScaleSelector } from '../../components/ScaleSelector'
+import { Save, Trash2, ChevronLeft, GripVertical, FileText, Edit3 } from 'lucide-react'
 import type { Scale } from '../../components/ScaleSelector/types'
 import { contextOptionsForKey, contextValueHint } from '../../modules/assessment-context/options'
-import FormSectionManager from '../../components/FormSectionManager'
 import { ProductButton, ProductPage, ProductStatus } from '../../components/product-ui'
 
 // 表单题目类型
@@ -51,6 +49,11 @@ interface ContentItem {
   data: FormItem | QuestionnaireScale
 }
 
+interface QuestionnaireContent {
+  formItems: FormItem[]
+  scales: QuestionnaireScale[]
+}
+
 interface Questionnaire {
   id: string
   code: string
@@ -61,12 +64,26 @@ interface Questionnaire {
   estimatedTime: number | null
 }
 
+const ScaleSelector = deferredPage(async () => ({ default: (await import('../../components/ScaleSelector')).ScaleSelector }))
+const PublicDeliveryManager = deferredPage(async () => ({ default: (await import('../../components/PublicDeliveryManager')).PublicDeliveryManager }))
+const FormSectionManager = deferredPage(() => import('../../components/FormSectionManager'))
+
 const basicValue = (value: Questionnaire) => ({ name: value.name, description: value.description || '', instruction: value.instruction || '', estimatedTime: value.estimatedTime })
 
+// A route identity owns its drafts and requests; late responses cannot enter a new editor.
 const GeneralQuestionnaireEdit: React.FC = () => {
   const { id } = useParams<{ id: string }>()
+  return <GeneralQuestionnaireEditor key={id} id={id} />
+}
+
+const GeneralQuestionnaireEditor: React.FC<{ id: string | undefined }> = ({ id }) => {
 
   const { loading, error: loadError, run: runLoad, invalidate: invalidateLoad } = useLatestRequest()
+  const { loading: contentLoading, error: contentError, run: runContent } = useLatestRequest(false)
+  const { loading: scalesLoading, error: scalesError, run: runScales } = useLatestRequest(false)
+  const contentRequest = useRef<Promise<QuestionnaireContent | undefined> | null>(null)
+  const [contentReady, setContentReady] = useState(false)
+  const [scalesReady, setScalesReady] = useState(false)
   const { feedback, success, error: showError, info, clear } = useStaffFeedback()
   const showMessage = (message: unknown) => info('操作提示', String(message || '操作完成'))
   const [activeTab, setActiveTab] = useState<'basic' | 'content' | 'tokens'>('basic')
@@ -121,10 +138,8 @@ const GeneralQuestionnaireEdit: React.FC = () => {
 
   useEffect(() => {
     if (id) {
-      fetchQuestionnaire()
-      fetchContent()
+      void fetchQuestionnaire()
     }
-    fetchAvailableScales()
     return invalidateLoad
   }, [id])
 
@@ -137,36 +152,45 @@ const GeneralQuestionnaireEdit: React.FC = () => {
     pageGuard.reset(basicValue(data))
   }, '问卷加载失败，请重试')
 
-  const fetchContent = async () => {
-    try {
+  const fetchContent = useCallback((refresh = true) => {
+    // A publish during the first content load shares that validation request.
+    // Mutations and explicit retries still start a new latest-only refresh.
+    if (!refresh && contentRequest.current) return contentRequest.current
+    let loaded: QuestionnaireContent | undefined
+    const request = runContent(async () => {
       const [formRes, scalesRes] = await Promise.all([
         apiClient.get<{ list: FormItem[] }>(`/general-questionnaires/${id}/form-items`),
         apiClient.get<{ list: QuestionnaireScale[] }>(`/general-questionnaires/${id}/scales`),
       ])
+      if (formRes.code !== 0) throw new Error(formRes.message || '表单题目加载失败')
+      if (scalesRes.code !== 0) throw new Error(scalesRes.message || '问卷量表加载失败')
+      return { formItems: formRes.data.list, scales: scalesRes.data.list }
+    }, data => {
+      loaded = data
+      setFormItems(data.formItems)
+      setQuestionnaireScales(data.scales)
+      setSelectedScaleIds(data.scales.map(qs => qs.scaleId))
+      setContentReady(true)
+    }, '问卷内容加载失败，请重试').then(() => loaded)
+    contentRequest.current = request
+    void request.then(() => { if (contentRequest.current === request) contentRequest.current = null })
+    return request
+  }, [id, runContent])
 
-      if (formRes.code === 0) {
-        setFormItems(formRes.data.list)
-      }
-      if (scalesRes.code === 0) {
-        setQuestionnaireScales(scalesRes.data.list)
-        // 同步到穿梭框选中状态
-        setSelectedScaleIds(scalesRes.data.list.map((qs: QuestionnaireScale) => qs.scaleId))
-      }
-    } catch (err) {
-      console.error('获取内容列表失败', err)
-    }
-  }
+  const fetchAvailableScales = useCallback(() => runScales(async () => {
+    const response = await apiClient.get<{ list: Scale[] }>('/scales?status=PUBLISHED&page=1&pageSize=100')
+    if (response.code !== 0) throw new Error(response.message || '可用量表加载失败')
+    return response.data.list.filter(s => s.status === 'PUBLISHED')
+  }, data => {
+    setAvailableScales(data)
+    setScalesReady(true)
+  }, '可用量表加载失败，请重试'), [runScales])
 
-  const fetchAvailableScales = async () => {
-    try {
-      const response = await apiClient.get<{ list: Scale[] }>('/scales?status=PUBLISHED&page=1&pageSize=100')
-      if (response.code === 0) {
-        setAvailableScales(response.data.list.filter(s => s.status === 'PUBLISHED'))
-      }
-    } catch (err) {
-      console.error('获取量表列表失败', err)
-    }
-  }
+  useEffect(() => {
+    if (activeTab !== 'content') return
+    if (!contentReady && !contentLoading && !contentError) void fetchContent(false)
+    if (!scalesReady && !scalesLoading && !scalesError) void fetchAvailableScales()
+  }, [activeTab, contentReady, contentLoading, contentError, fetchContent, scalesReady, scalesLoading, scalesError, fetchAvailableScales])
 
   const handleSaveBasic = async () => {
     if (!questionnaire.name.trim()) {
@@ -311,13 +335,19 @@ const GeneralQuestionnaireEdit: React.FC = () => {
   // 发布问卷
   const handlePublish = async () => {
     if (pageGuard.dirty) { showError('请先保存修改', '保存基本信息后再发布问卷。'); return }
-    if (questionnaireScales.length === 0 && formItems.length === 0) {
-      showError('无法发布', '问卷必须包含至少一个量表或表单题目')
-      return
-    }
     if (!pageGuard.begin()) return
     clear()
     try {
+      // Publishing from basic still validates real content, without loading the catalog or tabs.
+      const content = contentReady ? { formItems, scales: questionnaireScales } : await fetchContent(false)
+      if (!content) {
+        showError('无法发布', '问卷内容加载失败，请重试发布或在内容编排中重试。')
+        return
+      }
+      if (content.scales.length === 0 && content.formItems.length === 0) {
+        showError('无法发布', '问卷必须包含至少一个量表或表单题目')
+        return
+      }
       const response = await apiClient.post(`/general-questionnaires/${id}/publish`)
       if (response.code !== 0) throw new Error(response.message || '发布失败')
       setQuestionnaire(current => ({ ...current, status: 'PUBLISHED' }))
@@ -493,18 +523,25 @@ const GeneralQuestionnaireEdit: React.FC = () => {
       )}
 
       {/* Content Tab */}
-      {activeTab === 'content' && (
+      <div hidden={activeTab !== 'content'}>
+        <KeepMountedOnVisit active={activeTab === 'content'}>
         <div className="space-y-6">
+          {contentLoading && !contentReady && <ProductStatus kind="pending" title="正在加载问卷内容" announce="polite">正在读取表单题目和量表。</ProductStatus>}
+          {contentError && <ProductStatus kind="error" title="问卷内容加载失败" announce="assertive" actions={<ProductButton onClick={() => void fetchContent()}>重试问卷内容</ProductButton>}>{contentError}</ProductStatus>}
+          {contentReady && <>
+
           {/* 量表选择 */}
           <section className="staff-panel">
             <header className="staff-panel__header"><div><h2>选择量表</h2><p>从可用量表中选择问卷需要包含的测评内容。</p></div></header>
             <div className="staff-panel__body">
-            <ScaleSelector
+            {scalesLoading && !scalesReady && <ProductStatus kind="pending" title="正在加载可用量表" announce="polite">正在读取可选量表。</ProductStatus>}
+            {scalesError && <ProductStatus kind="error" title="可用量表加载失败" announce="assertive" actions={<ProductButton onClick={() => void fetchAvailableScales()}>重试可用量表</ProductButton>}>{scalesError}</ProductStatus>}
+            {scalesReady && <ScaleSelector
               scales={availableScales}
               selected={selectedScaleIds}
               onChange={handleScaleChange}
-              loading={false}
-            />
+              loading={scalesLoading}
+            />}
             </div>
           </section>
 
@@ -608,10 +645,16 @@ const GeneralQuestionnaireEdit: React.FC = () => {
               readOnly={questionnaire.status !== 'DRAFT'}
             />
           )}
+          </>}
         </div>
-      )}
+        </KeepMountedOnVisit>
+      </div>
 
-      {activeTab === 'tokens' && id && <PublicDeliveryManager key={id} family="QUESTIONNAIRE" resourceId={id} canCreate={questionnaire.status === 'PUBLISHED'} />}
+      <div hidden={activeTab !== 'tokens'}>
+        <KeepMountedOnVisit active={activeTab === 'tokens'}>
+          {id && <PublicDeliveryManager family="QUESTIONNAIRE" resourceId={id} canCreate={questionnaire.status === 'PUBLISHED'} />}
+        </KeepMountedOnVisit>
+      </div>
 
       {/* 表单题目编辑弹窗 */}
       {showFormItemModal && (

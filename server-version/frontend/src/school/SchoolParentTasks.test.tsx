@@ -1,5 +1,5 @@
 import {describe,it,expect,vi} from 'vitest'
-import {render,screen,fireEvent,within} from '@testing-library/react'
+import {render,screen,fireEvent,within,waitFor} from '@testing-library/react'
 import {SchoolParentTasks} from './SchoolParentTasks'
 import type {SchoolApi} from './SchoolRecovery'
 const runner=vi.hoisted(()=>vi.fn())
@@ -28,7 +28,7 @@ describe('School parent observation collection',()=>{
   const api=vi.fn(async()=>({list:[{...task,status:'STARTED',canResumeExisting:true}]}))
   render(<SchoolParentTasks api={api as SchoolApi}/>)
   fireEvent.click(await screen.findByRole('button',{name:/继续作答/}))
-  expect(runner).toHaveBeenLastCalledWith(expect.objectContaining({observer:true,observerRole:'parent',observerTaskTitle:task.runTitle,execution:{organizationId:'school',courseId:'activity',runId:'run',executionId:'e1',resumeExisting:true,consentRequired:true,consentPurpose:'教育观察',consentVisibility:'PRIVATE_RESPONDENT'}}))
+  await waitFor(()=>expect(runner).toHaveBeenLastCalledWith(expect.objectContaining({observer:true,observerRole:'parent',observerTaskTitle:task.runTitle,execution:{organizationId:'school',courseId:'activity',runId:'run',executionId:'e1',resumeExisting:true,consentRequired:true,consentPurpose:'教育观察',consentVisibility:'PRIVATE_RESPONDENT'}})))
   fireEvent.click(screen.getByRole('button',{name:'返回任务'}))
   expect(screen.queryByRole('region',{name:'测试作答页'})).not.toBeInTheDocument()
   expect(screen.getByRole('heading',{name:'乙观察任务'})).toBeInTheDocument()
