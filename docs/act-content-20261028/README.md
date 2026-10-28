@@ -2,7 +2,7 @@
 
 本分支从 `main@6203a829dc8d7de707e67f413acfa5a354a21e09` 切出，用于补充接纳承诺疗法（ACT）相关测量工具。沿用 `SELcontents` 分支确立的模式：每个工具家族一个独立提交；全部为内容草稿，不导入生产数据库、不发布、不创建 PR、不触发 CI、不合并。
 
-本轮由原始来源逐题核验后入库 6 个工具家族、7 个精确版本（6 个 executable DRAFT + 1 个 catalog-only），36 组 golden cases 全部通过算术独立复核，6 个家族的 Python 参考计分测试本地全部通过。
+两轮共由原始来源逐题核验后入库 9 个工具家族、10 个精确版本（8 个 executable DRAFT + 2 个 catalog-only），48 组 golden cases 全部通过算术独立复核，8 个家族的 Python 参考计分测试本地全部通过。
 
 ## 工具清单
 
@@ -47,3 +47,18 @@
 2. CompACT 官方成人 23 题版与 CompACT-Y 官方施测包：联系作者。
 3. AFQ-Y 与 CAMM 的中文回译与专家译审；AAQ-II 在 K12 低龄段的适用性证据核对。
 4. 教师版 ACT 工具（TAAQ 等）与 Bull's-Eye 等价值工具的来源核查。
+
+## 第二批（2026-10-28 追加）：MPFI-24 工作译稿、CompACT 成人版、TAAQ
+
+| 家族 | 工具 | 评价层次 | 题文与计分 | 报告 | 题本来源 |
+|---|---|---|---|---|---|
+| 7 | [MPFI-24 工作译稿](./mpfi24_research/) | 学生/成人自评（六过程灵活性+僵化，14 个分数） | 通过；原生DRAFT | 原生模板＋图文样稿 | [Rogge 团队官方题本（内附 free for research and clinical use 许可声明）](https://couples-research.com/wp-content/uploads/2017/06/MPFI.docx) |
+| 8 | [CompACT 成人 23 题](./compact23/) | 学生/成人自评（OE/BA/VA 三过程） | 通过；原生DRAFT | 原生模板＋图文样稿 | [Christopher et al. 2025（CC BY 4.0）逐题表](https://pmc.ncbi.nlm.nih.gov/articles/PMC13344365/)；归属以 Hsu 2023 交叉核实 |
+| 9 | [TAAQ 教师版](./taaq/) | 教师自评 | **未通过：原始题文未获得** | 仅占位样稿 | 法语原版无公开题文（ACBS 日语版页已失效、原版付费） |
+
+说明：
+
+- 原候选清单中的“MPFI-12 短版”经官方题本核对**并不作为独立施测表存在**：官方口径是 MPFI-24（每个子量表前两题）加两个 12 题全局合成分。本批按官方口径登记 `mpfi24_zh_cn_research`（工作译稿，executable DRAFT），与 main 上中文验证版 `mpfi24_zh_cn`（catalog-only，Fang 2024）同家族不同本地化，两者不混合。
+- CompACT 的子量表归属在开放文献间存在排印冲突（Christopher 2025 Table 2 把第 17、21 题误标入 BA，其正文自述 BA=5/VA=8）；本记录以 Hsu et al. 2023（Psychological Assessment）Table 1 为准：OE=10（2,4,6,8,11,13,15,18,20,22）、BA=5（3,9,12,16,19）、VA=8（1,5,7,10,14,17,21,23），反向题 12 个（2,3,4,6,8,9,11,12,15,16,18,19），总分 0–138。
+- TAAQ 按 ERQ-CA/CCNES-T 先例登记 catalog-only；题数（10 题）按 TAAQ-PT/日语版二手文献转述并在记录中标注未核实。取得法语原版或授权后按升级路径补题文。
+- MPFI 题本内附明确许可声明（freely available for research and clinical use），是本批权利基础最完整的工具。

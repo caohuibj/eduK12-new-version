@@ -4,12 +4,12 @@
   "actualDatabaseImport": false,
   "published": false,
   "ciTriggered": false,
-  "toolFamilies": 6,
-  "exactVersions": 7,
-  "executableDrafts": 6,
-  "catalogOnly": 1,
-  "nativeGoldenCases": 36,
-  "reportSamples": 7,
+  "toolFamilies": 9,
+  "exactVersions": 10,
+  "executableDrafts": 8,
+  "catalogOnly": 2,
+  "nativeGoldenCases": 48,
+  "reportSamples": 10,
   "tools": [
     {
       "family": "aaq_ii",
@@ -113,6 +113,57 @@
       "versions": [
         {
           "key": "vq10_zh_cn_research",
+          "version": "1.0.0",
+          "itemCount": 10,
+          "locale": "zh-CN",
+          "executable": false
+        }
+      ]
+    },
+    {
+      "family": "mpfi",
+      "name": "MPFI-24（官方短版，工作译稿）",
+      "category": "学生/成人自评（六过程灵活性+僵化）",
+      "fullTextSource": "https://couples-research.com/wp-content/uploads/2017/06/MPFI.docx",
+      "wordingAndScoring": "PASS",
+      "report": "NATIVE_TEMPLATE_AND_STATIC_SAMPLE",
+      "versions": [
+        {
+          "key": "mpfi24_zh_cn_research",
+          "version": "1.0.0",
+          "itemCount": 24,
+          "locale": "zh-CN",
+          "executable": true
+        }
+      ]
+    },
+    {
+      "family": "compact",
+      "name": "CompACT（成人23题）",
+      "category": "学生/成人自评（三过程）",
+      "fullTextSource": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13344365/",
+      "wordingAndScoring": "PASS",
+      "report": "NATIVE_TEMPLATE_AND_STATIC_SAMPLE",
+      "versions": [
+        {
+          "key": "compact23_zh_cn_research",
+          "version": "1.0.0",
+          "itemCount": 23,
+          "locale": "zh-CN",
+          "executable": true
+        }
+      ]
+    },
+    {
+      "family": "taaq",
+      "name": "TAAQ（教师版）",
+      "category": "教师自评（教学情境经验性回避）",
+      "fullTextSource": "https://www.researchgate.net/publication/341327844",
+      "wordingAndScoring": "PENDING_FULL_CONTENT_IN_SOURCE",
+      "report": "STATIC_SAMPLE_ONLY",
+      "versions": [
+        {
+          "key": "taaq10_zh_cn_research",
           "version": "1.0.0",
           "itemCount": 10,
           "locale": "zh-CN",

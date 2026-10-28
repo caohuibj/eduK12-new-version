@@ -85,6 +85,9 @@ import { SCALE_INSTRUMENT_SOURCE as source80 } from '../instruments/camm10_zh_cn
 import { SCALE_INSTRUMENT_SOURCE as source81 } from '../instruments/caq8_zh_cn_research/1.0.0/instrument'
 import { SCALE_INSTRUMENT_SOURCE as source82 } from '../instruments/compact_y19_zh_cn_research/1.0.0/instrument'
 import { SCALE_INSTRUMENT_SOURCE as source83 } from '../instruments/vq10_zh_cn_research/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source84 } from '../instruments/mpfi24_zh_cn_research/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source85 } from '../instruments/compact23_zh_cn_research/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source86 } from '../instruments/taaq10_zh_cn_research/1.0.0/instrument'
 
 /** Legacy descriptor arrays are intentionally empty after PR-4 source migration. */
 export const GENERATED_EXECUTABLE_SCALE_PACKAGES: readonly ScalePackageV2[] = []
@@ -174,5 +177,8 @@ export const GENERATED_SCALE_INSTRUMENT_SOURCES: readonly ScaleInstrumentSourceV
   source80,
   source81,
   source82,
-  source83,
+  source83,,
+  source84,
+  source85,
+  source86,
 ]
