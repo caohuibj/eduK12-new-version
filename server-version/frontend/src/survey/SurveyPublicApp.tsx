@@ -63,7 +63,7 @@ type ParticipantFeedback=ParticipantFeedbackBase&(
   |{feedbackKind?:undefined;measurementDigest:string;maturity:'PILOT';metrics:{key:string;label:string;value:number|null;unit:'ratio'|'ms';status:string}[]})
 type General={kind:'GENERAL_ONLY'|'DESCRIPTIVE';text:string;disclaimer:string;completedAt:string;pending?:boolean;measurements?:ParticipantFeedback[]}
 type FinalResponse={status:string;attemptId?:string;receiptId?:string;completedAt?:string;
-  idempotent?:boolean;generalReceipt?:unknown}
+  idempotent?:boolean;generalReceipt?:unknown;participantFeedbackReceipt?:unknown}
 // Only the first, unambiguous committed FINAL may supply this submission-time
 // receipt. Older servers or malformed payloads fall back to the GENERAL route.
 function firstFinalGeneral(result:FinalResponse,attemptId:string):General|null {
@@ -77,6 +77,40 @@ function firstFinalGeneral(result:FinalResponse,attemptId:string):General|null {
     ||typeof receipt.completedAt!=='string'||receipt.completedAt!==result.completedAt
     ||!Number.isFinite(Date.parse(receipt.completedAt)))return null
   return {kind:'GENERAL_ONLY',text:receipt.text,disclaimer:receipt.disclaimer,completedAt:receipt.completedAt}
+}
+// Accept only a fresh, bound server projection. Old/malformed replies and
+// replay/refresh still use the independently authorized reader.
+function firstFinalParticipantFeedback(result:FinalResponse,attemptId:string):General|null {
+  const general=firstFinalGeneral(result,attemptId),value=result.participantFeedbackReceipt
+  if(!general||!value||typeof value!=='object'||Array.isArray(value))return null
+  const receipt=value as Record<string,unknown>
+  if(receipt.text!==general.text||receipt.disclaimer!==general.disclaimer||receipt.completedAt!==general.completedAt)return null
+  if(receipt.kind==='GENERAL_ONLY')return Object.keys(receipt).sort().join(',')==='completedAt,disclaimer,kind,text'?general:null
+  if(receipt.kind!=='DESCRIPTIVE'||Object.keys(receipt).sort().join(',')!=='completedAt,disclaimer,kind,measurements,pending,text'
+    ||typeof receipt.pending!=='boolean'||!Array.isArray(receipt.measurements))return null
+  const valid=receipt.measurements.every(value=>{
+    if(!value||typeof value!=='object'||Array.isArray(value))return false
+    const item=value as Record<string,unknown>,raw=item.feedbackKind==='RAW_METRICS'
+    if(typeof item.instrumentKey!=='string'||typeof item.title!=='string'||typeof item.quality!=='string'
+      ||(raw?typeof item.measurementReleaseId!=='string':item.feedbackKind!==undefined||item.maturity!=='PILOT'||typeof item.measurementDigest!=='string')
+      ||!Array.isArray(item.metrics))return false
+    if(!item.metrics.every(value=>{
+      if(!value||typeof value!=='object'||Array.isArray(value))return false
+      const metric=value as Record<string,unknown>
+      return typeof metric.key==='string'&&typeof metric.label==='string'&&typeof metric.status==='string'
+        &&(metric.value===null||typeof metric.value==='number'&&Number.isFinite(metric.value))
+        &&(raw?metric.unit===null:metric.unit==='ratio'||metric.unit==='ms')
+    }))return false
+    if(item.rawScoreFeedback!==undefined&&(!Array.isArray(item.rawScoreFeedback)||!item.rawScoreFeedback.every(value=>{
+      if(!value||typeof value!=='object'||Array.isArray(value))return false
+      const feedback=value as Record<string,unknown>
+      return typeof feedback.scoreKey==='string'&&typeof feedback.text==='string'
+        &&(feedback.rangeKey===null||typeof feedback.rangeKey==='string')
+        &&(feedback.images===undefined||Array.isArray(feedback.images))&&(feedback.materials===undefined||Array.isArray(feedback.materials))
+    })))return false
+    return true
+  })
+  return valid?{...general,kind:'DESCRIPTIVE',pending:receipt.pending,measurements:receipt.measurements as ParticipantFeedback[]}:null
 }
 type SingleResume={attemptId:string;accessCredential:string;createdAt:number}
 const singleStorageKey=(id:string)=>'huisurvey:v1:single:'+id
@@ -975,8 +1009,10 @@ export default function SurveyPublicApp(){
       accessCredential:accessCredential.trim(),
     }
     markCompleted(attemptId,proof)
-    const receipt=firstRequest?firstFinalGeneral(final,attemptId):null
-    if(receipt&&task.reportMode!=='DESCRIPTIVE'&&!task.units.some(u=>u.kind==='COGNITIVE'&&u.feedback?.mode==='DESCRIPTIVE')){
+    const inline=firstRequest?firstFinalParticipantFeedback(final,attemptId):null
+    const requiresDescription=task.reportMode==='DESCRIPTIVE'||task.units.some(u=>u.kind==='COGNITIVE'&&u.feedback?.mode==='DESCRIPTIVE')
+    const receipt=inline??(firstRequest&&!requiresDescription?firstFinalGeneral(final,attemptId):null)
+    if(receipt){
       // In-memory display only. Refresh/reopen and explicit reads reauthorize.
       setCompletionOptionsOpen(false);setGeneral(receipt)
       setNotice('')
