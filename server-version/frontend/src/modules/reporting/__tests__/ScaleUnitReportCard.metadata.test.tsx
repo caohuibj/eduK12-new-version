@@ -78,4 +78,16 @@ describe('Scale report saved public score metadata', () => {
       expect(screen.queryByTestId('scale-score-layer')).not.toBeInTheDocument()
     }
   })
+  it('keeps the original-scale graphic visible and places technical limits in an optional disclosure', () => {
+    const value = { ...report(), caveats: ['该语言版本尚无本地人群常模。'] }
+    render(<ScaleUnitReportCard report={value} />)
+    expect(screen.getByTestId('scale-score-layer')).toHaveTextContent('这次回答的概览')
+    expect(screen.getByRole('img', { name: /范围 7 到 35，本次结果 21/ })).toBeInTheDocument()
+    const extra = screen.getByTestId('scale-caveats-layer')
+    expect(extra).not.toHaveAttribute('open')
+    expect(extra.querySelector('summary')).toHaveTextContent('问卷的适用范围与限制')
+    expect(screen.getByTestId('scale-caveats')).toHaveTextContent('该语言版本尚无本地人群常模')
+    expect(screen.getByTestId('scale-disclaimer')).toHaveTextContent('不是人群排名')
+  })
+
 })
