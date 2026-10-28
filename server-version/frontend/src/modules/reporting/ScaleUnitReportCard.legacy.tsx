@@ -1,4 +1,5 @@
 import React from 'react'
+import './ScaleUnitReportCard.css'
 import { TrainingRawScoreFeedback, type MatchedRawScoreFeedback } from './TrainingRawScoreFeedback'
 import {
   ReportCoreSummary,
@@ -63,6 +64,47 @@ const qualityStatusLabel = (status: string): string => ({
   limited: '仅支持有限解释',
   invalid: '当前结果不可解释',
 }[status] ?? status)
+
+// Use only already-disclosed result metadata. Never recover counts from a live
+// instrument, the score range, labels or internal item-score/answer payloads.
+const responseCounts = (score: ExternalScaleScoreValue): { answered: number; expected: number } | null => {
+  const expected = score.expectedItems
+  const answered = score.answeredItems
+  if (!Array.isArray(expected) || !Array.isArray(answered) || expected.length === 0) return null
+  const validCodes = (codes: string[]) => codes.every(code => typeof code === 'string' && code.trim().length > 0)
+    && new Set(codes).size === codes.length
+  if (!validCodes(expected) || !validCodes(answered)) return null
+  const expectedSet = new Set(expected)
+  if (answered.some(code => !expectedSet.has(code))) return null
+  return { answered: answered.length, expected: expected.length }
+}
+
+const directionExplanation = (score: ExternalScaleScoreValue): string => {
+  // Preserve the saved version's authored meaning, including reversed constructs.
+  if (typeof score.description === 'string' && score.description.trim()) return score.description
+  switch (score.direction) {
+    case 'higher_is_better': return '按本量表定义，高分表示更有利的结果，不代表人群排名。'
+    case 'higher_is_worse': return '按本量表定义，高分表示更不利的结果，不代表人群排名。'
+    case 'lower_is_better': return '按本量表定义，低分表示更有利的结果，不代表人群排名。'
+    case 'higher_is_more': return '高分表示所测特征较多，不直接代表更好或排名更靠前。'
+    case 'bipolar': return '本维度有两个方向，不能只凭分数高低判断好坏。'
+    case 'descriptive': return '本维度用于描述本次作答，不作好坏或排名判断。'
+    default: return '计分方向未提供，请结合量表说明阅读。'
+  }
+}
+
+const ScoreContext: React.FC<{ score: ExternalScaleScoreValue }> = ({ score }) => {
+  const counts = responseCounts(score)
+  return <div className="scale-score-context">
+    <p className="scale-score-count" aria-label={`${score.label}作答数量`}>
+      {counts
+        ? <>已答 <strong>{counts.answered}</strong> / 共 <strong>{counts.expected}</strong> 题
+          <span>未答 {counts.expected - counts.answered} 题</span></>
+        : '作答数量未提供'}
+    </p>
+    <p className="scale-score-explanation"><span>分数说明：</span>{directionExplanation(score)}</p>
+  </div>
+}
 
 const renderReferenceDetails = (reference: ScaleReferenceValue) => {
   if (reference.status !== 'available') {
@@ -139,15 +181,17 @@ const ScaleUnitReportCard: React.FC<{ report: SafeScaleUnitReport; loadReportIma
   const unclassifiedScores = scores.filter((score) => score.type !== 'total' && score.type !== 'dimension')
 
   const rangeTrack = (score: ExternalScaleScoreValue) => (
-    <ReportRangeTrack
-      key={score.key}
-      label={score.label}
-      value={score.value}
-      formattedValue={formatNumber(score.value, score.displayPrecision)}
-      range={score.range}
-      reference={overlayFor(score, references)}
-      status={scoreStatusLabel(score)}
-    />
+    <div className="scale-score-card" key={score.key}>
+      <ReportRangeTrack
+        label={score.label}
+        value={score.value}
+        formattedValue={formatNumber(score.value, score.displayPrecision)}
+        range={score.range}
+        reference={overlayFor(score, references)}
+        status={scoreStatusLabel(score)}
+      />
+      <ScoreContext score={score} />
+    </div>
   )
 
   return (
@@ -159,11 +203,11 @@ const ScaleUnitReportCard: React.FC<{ report: SafeScaleUnitReport; loadReportIma
       </div>
 
       <ReportSection
-        title={dimensionScores.length > 0 ? '结果概览' : '实际得分'}
-        eyebrow="分数层"
+        title={dimensionScores.length > 0 ? '这次回答的概览' : '本次得分'}
+        eyebrow="我的回答"
         description={dimensionScores.length > 0
-          ? '总体结果与各维度分别展示。请结合各自的量尺范围阅读，不同量表的条形长度不能直接比较。'
-          : '查看本次得分及其原始量尺范围。'}
+          ? '下面的图只显示你在这份问卷计分范围里的位置，不代表在人群中的排名；不同方面的分数也不宜直接比较。'
+          : '查看你这次的得分和问卷本身的分数范围。刻度不是人群排名。'}
         testId="scale-score-layer"
       >
         {scores.length === 0 ? (
@@ -172,11 +216,10 @@ const ScaleUnitReportCard: React.FC<{ report: SafeScaleUnitReport; loadReportIma
           <div className="space-y-5">
             {totalScores.length > 0 && (
               <div>
-                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">总体结果</p>
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">整体情况</p>
                 {totalScores.length === 1 ? (
                   <div className="report-primary-score space-y-2">
                     {rangeTrack(totalScores[0])}
-                    {totalScores[0].description && <p className="text-sm text-gray-600">{totalScores[0].description}</p>}
                   </div>
                 ) : (
                   <div className="report-range-grid">{totalScores.map(rangeTrack)}</div>
@@ -186,7 +229,7 @@ const ScaleUnitReportCard: React.FC<{ report: SafeScaleUnitReport; loadReportIma
 
             {dimensionScores.length > 0 && (
               <div>
-                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">维度结果</p>
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">不同方面</p>
                 <div className="report-range-grid">{dimensionScores.map(rangeTrack)}</div>
               </div>
             )}
@@ -239,11 +282,16 @@ const ScaleUnitReportCard: React.FC<{ report: SafeScaleUnitReport; loadReportIma
       )}
 
       {(report.caveats || []).length > 0 && (
-        <ReportSection title="阅读提示" eyebrow="限制" headingLevel={3}>
-          <ul className="list-disc space-y-1 pl-5 text-sm text-amber-700" data-testid="scale-caveats">
-            {report.caveats.map((caveat) => <li key={caveat}>{caveat}</li>)}
-          </ul>
-        </ReportSection>
+        <div className="space-y-2">
+          <p className="text-sm text-gray-500">
+            这份结果只反映本次回答，不能单独作为诊断或重要决定的依据。需要了解适用范围时，可展开以下说明。
+          </p>
+          <ReportDetails title="进一步了解：问卷的适用范围与限制" testId="scale-caveats-layer">
+            <ul className="list-disc space-y-1 pl-5 text-sm text-amber-700" data-testid="scale-caveats">
+              {report.caveats!.map((caveat) => <li key={caveat}>{caveat}</li>)}
+            </ul>
+          </ReportDetails>
+        </div>
       )}
 
       {report.disclaimer && <ReportDisclaimer testId="scale-disclaimer">{report.disclaimer}</ReportDisclaimer>}
