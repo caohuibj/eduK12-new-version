@@ -1,0 +1,727 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "cfq7_zh_cn_research",
+    "instrumentVersion": "1.0.1"
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "下面是一些描述你与自己想法之间关系的句子。\n\n请仔细阅读每一句，根据自己的真实经验，选择这种情况出现的频率。没有对错之分。",
+    "language": "zh-CN",
+    "version": "1.0.1",
+    "source": "指导语为平台依据 Gillanders 等 2014 原文作答说明撰写的独立中文工作稿；题文与七档频率锚点取自公开可得的 CFQ-7 题本载体，并经多源交叉核对。；本批平台说明按现有频率选项校对，删除无据第一反应准确断言；非作者或专家审批"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "认知融合问卷（CFQ-7，7题）— 中文工作译稿",
+      "abbreviation": "CFQ-7-ZH-WORKING",
+      "instrumentFamily": "Cognitive Fusion Questionnaire (CFQ)"
+    },
+    "construct": {
+      "primaryDomain": "SELF_REGULATION",
+      "secondaryDomains": [
+        "WELL_BEING"
+      ],
+      "constructDefinition": "认知融合：个体被自己的想法“钩住”的程度，即把想法当作必须服从的命令或确凿事实，而非仅仅是脑中出现的事件。7题单一因子，不输出子量表。测量的是与想法的关系方式，不是想法的内容、不是思维能力强弱，也不是临床诊断。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "domain:selfreg_executive",
+        "domain:wellbeing_strength",
+        "construct:cognitive_fusion",
+        "construct:act_hexaflex_process",
+        "construct:relation_to_thoughts",
+        "construct:not_thought_content",
+        "construct:not_ability_or_intelligence",
+        "construct:not_defusion_skill_measure",
+        "orientation:ACT",
+        "orientation:contextual_behavioral_science",
+        "orientation:not_therapy_specific",
+        "orientation:not_dbt_specific",
+        "population:adult_18_plus",
+        "population:original_adult_and_student_samples",
+        "population:not_k12_validated",
+        "population:not_chinese_validated",
+        "response:self",
+        "response:7_items",
+        "response:seven_point_1_to_7",
+        "response:never_to_always_frequency",
+        "response:no_reverse_items",
+        "response:single_total_sum_7_to_49",
+        "response:no_subscales",
+        "response:no_fixed_recall_period",
+        "response:complete_required_project_proposal",
+        "use:research",
+        "use:individual_reflection",
+        "use:not_diagnostic",
+        "use:not_selection",
+        "use:no_chinese_norms",
+        "use:no_empirical_cutoffs",
+        "license:authorization_pending",
+        "license:author_contact_pending",
+        "license:risk_noted",
+        "license:acbs_non_commercial_statement",
+        "license:existing_chinese_version_must_not_be_copied",
+        "language_validation:source_en",
+        "language_validation:content_zh-CN",
+        "language_validation:independent_work_translation",
+        "language_validation:expert_translation_review_pending",
+        "language_validation:cognitive_interviews_pending",
+        "language_validation:local_validation_pending",
+        "CFQ-7",
+        "Cognitive Fusion Questionnaire",
+        "认知融合",
+        "认知解离",
+        "ACT",
+        "接纳承诺疗法",
+        "被想法钩住",
+        "中文工作译稿",
+        "非诊断"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "原版开发与验证主要在成人及大学生样本完成。平台以18+作为保守项目边界；未建立中国人群验证，也不外推中小学生。作答者即本人，非代理报告。"
+    },
+    "administration": {
+      "itemCount": 7,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED"
+      ],
+      "timeFrame": "描述一般倾向，无固定回顾时窗；原版作答说明不指定回忆期。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "固定 CFQ-7 七题原序，平台不重排、不加注意力题、不并入 CFQ-13 的其余题目。",
+        "七档频率：1 从不如此 到 7 总是如此，中间档保留数字与中文标签。",
+        "无反向题；单一总分 = 七题求和，范围 7–49。",
+        "**高分表示认知融合更多**（更容易被想法钩住），不是“越好”；报告不得写成越高越好。",
+        "不与 CFQ-13 的 4 题解离分量表混用，也不输出任何子量表。",
+        "complete_required 为项目保守缺答约定：缺任一题总分为 null，不补零、不插补。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "原英语版有初步结构证据；独立中文工作稿未验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "帮助成人回顾自己与想法的关系；不作诊断、能力评价或疗效判断。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "cfq7-gillanders2014-en-structure",
+        "evidenceType": "STRUCTURAL_VALIDITY",
+        "population": "原开发样本为成人，含临床与非临床；后续多国译本以大学生与成人为主",
+        "ageRange": "原报告未给出精确年龄边界；平台以18+作为保守边界",
+        "locale": "en",
+        "territory": "GB",
+        "studyDesign": "Gillanders 等 2014 报告 CFQ 的开发与初步验证，7题版为单一因子；总分7–49，越高表示认知融合越多。原报告样本量未从本次可得载体确认，故不填写，不以估计值充数。",
+        "rating": "MIXED",
+        "citation": "Gillanders, D. T., Bolderston, H., Bond, F. W., Dempster, M., Flaxman, P. E., Campbell, L., Kerr, S., Tansey, L., Noel, P., Ferenbach, C., Masley, S., Roach, L., Lloyd, J., May, L., Clarke, S., & Remington, B. (2014). The development and initial validation of the Cognitive Fusion Questionnaire. Behavior Therapy, 45(1), 83–101. https://doi.org/10.1016/j.beth.2013.09.001",
+        "doi": "10.1016/j.beth.2013.09.001",
+        "url": "https://doi.org/10.1016/j.beth.2013.09.001",
+        "notes": "题文经四个独立载体交叉核对一致（APPI 官方 PDF、MDPI Life 13:803、Open Psychology Journal 马来版验证附录、psytests.org.ru）。评为 MIXED 是因为原版证据为初步，且本中文工作稿无任何中国人群验证。"
+      }
+    ]
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "CFQ-7 七题英文原文与七档频率锚点，经多源交叉核对；ACBS 页面载有作者许可声明，题本另由公开 PDF 载体取得。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "平台独立中文工作译稿。ACBS 明确列出已有 Chinese 译本，并请拟译者先联系 David Gillanders 确认；本译稿不复制任何已出版中文版的措辞。专家审校 PENDING、认知访谈与中国人群验证 NOT_ESTABLISHED。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "cfq7_zh_cn_research-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": [],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    }
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "cfq7_zh_cn_research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "cfq7_zh_cn_research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "translation",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "Gillanders, D. T., et al. (2014). Behavior Therapy, 45(1), 83–101. https://doi.org/10.1016/j.beth.2013.09.001. ACBS 页面许可声明原文：「The CFQ is free to use for non-commercial educational, clinical and research purposes, permission is not needed.」。该声明限非商业用途；本条目按项目政策记录为授权待办，不作已授权主张。ACBS 同时列出已有 Chinese 译本，并请拟译者先联系 David Gillanders；本平台禁止主动联系作者，故该项列为待联系作者事项。中文题文与指导语为 EDUK12.TOP 独立工作翻译／改编，不复制任何已出版中文版；报告为平台原创。改动包括语言转换、数字化、成人下限18+与完整作答项目约定。按项目政策，授权状态不作为入库门禁，但也不得据此声称已获授权或可商用。",
+      "事实标签只用于检索，不授予系统实际使用权。DRAFT/CANDIDATE不能据文件存在激活。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "PUBLISHED",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "The Cognitive Fusion Questionnaire (CFQ-7), Gillanders et al. 2014",
+        "citation": "Gillanders, D. T., Bolderston, H., Bond, F. W., Dempster, M., Flaxman, P. E., Campbell, L., Kerr, S., Tansey, L., Noel, P., Ferenbach, C., Masley, S., Roach, L., Lloyd, J., May, L., Clarke, S., & Remington, B. (2014). The development and initial validation of the Cognitive Fusion Questionnaire. Behavior Therapy, 45(1), 83–101.",
+        "url": "https://doi.org/10.1016/j.beth.2013.09.001",
+        "publicationYear": 2014
+      },
+      "license": {
+        "status": "unknown",
+        "redistribution": "restricted",
+        "note": "ACBS 声明限非商业的教育／临床／研究用途；商业使用未获明确授权。按项目政策记录为 authorization_pending + author_contact_pending，不作已授权主张，也不得据此商用。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "cfq7_frequency_1_7",
+          "options": [
+            {
+              "value": "1",
+              "score": 1,
+              "label": "从不如此"
+            },
+            {
+              "value": "2",
+              "score": 2,
+              "label": "极少如此"
+            },
+            {
+              "value": "3",
+              "score": 3,
+              "label": "很少如此"
+            },
+            {
+              "value": "4",
+              "score": 4,
+              "label": "有时如此"
+            },
+            {
+              "value": "5",
+              "score": 5,
+              "label": "经常如此"
+            },
+            {
+              "value": "6",
+              "score": 6,
+              "label": "几乎总是如此"
+            },
+            {
+              "value": "7",
+              "score": 7,
+              "label": "总是如此"
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "CFQ7_01",
+          "content": "我的想法让我感到痛苦或情绪上的难受。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 0,
+          "responseSetKey": "cfq7_frequency_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CFQ7_02",
+          "content": "我太陷入自己的想法，以至于无法去做自己最想做的事。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 1,
+          "responseSetKey": "cfq7_frequency_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CFQ7_03",
+          "content": "我会过度分析某些情况，到了对自己反而没有帮助的地步。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 2,
+          "responseSetKey": "cfq7_frequency_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CFQ7_04",
+          "content": "我和自己的想法较劲。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 3,
+          "responseSetKey": "cfq7_frequency_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CFQ7_05",
+          "content": "我会因为自己有某些想法而生自己的气。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 4,
+          "responseSetKey": "cfq7_frequency_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CFQ7_06",
+          "content": "我很容易深陷在自己的想法里。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 5,
+          "responseSetKey": "cfq7_frequency_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CFQ7_07",
+          "content": "即使我知道放下会有帮助，要放下那些令人难受的想法仍然非常困难。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 6,
+          "responseSetKey": "cfq7_frequency_1_7",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "CFQ7_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CFQ7_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CFQ7_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CFQ7_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CFQ7_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CFQ7_06",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CFQ7_07",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "total",
+            "type": "total",
+            "label": "认知融合总分（7题）",
+            "description": "七题求和，范围 7–49。**分数越高表示认知融合越多**，即越容易被自己的想法钩住；不是能力高低，也不是临床诊断。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "CFQ7_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CFQ7_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CFQ7_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CFQ7_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CFQ7_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CFQ7_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CFQ7_07",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.1",
+        "primaryScoreKeys": [
+          "total"
+        ],
+        "scoreOrder": [
+          "total"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "total",
+            "headline": "想法有多容易把你带走",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这七句话描述的是你和自己的想法之间的关系：想法有多容易把你带走、让你停下来，或者让你感到难受。分数越高，表示这次回答中，题目所描述的被想法牵住的体验报告得更频繁；分数越低，表示这次报告这些体验的频率较低。结果只是这些题项的自我描述，不是对能力好坏或心理疾病的判断。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "strategy",
+                "text": "下次被某个念头困住时，试着在心里说一句「我注意到我有一个想法：……」，然后看看这个说法会不会让那句话离你远一点。不需要把想法赶走。"
+              },
+              {
+                "category": "reflection",
+                "text": "这只是你对自己习惯的描述，不是评分，也不能判断你是否健康。如果你经常因为这些想法感到很痛苦，找一位可信的专业人士聊聊会有帮助。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这是独立中文工作译稿，尚未完成专家译审、认知访谈或中国人群验证。",
+          "原版主要在成人及大学生样本中验证，不外推中小学生。",
+          "没有中文常模、等级或百分位；本版本仅做 score_only 呈现，不给出切点。",
+          "高分表示认知融合更多（更易被想法钩住），不代表能力、品格或心理健康水平。",
+          "ACBS 声明限非商业用途；商业使用授权未闭合，列为待办事项。"
+        ],
+        "disclaimer": "用于成人回顾自己与想法之间的关系，不作诊断、能力评价或疗效判断。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN"
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "cfq7",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "CFQ7_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CFQ7_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CFQ7_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CFQ7_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CFQ7_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CFQ7_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CFQ7_07",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 7
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "middle",
+        "answers": [
+          {
+            "itemCode": "CFQ7_01",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CFQ7_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CFQ7_03",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CFQ7_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CFQ7_05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CFQ7_06",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CFQ7_07",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 28
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "CFQ7_01",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "CFQ7_02",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "CFQ7_03",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "CFQ7_04",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "CFQ7_05",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "CFQ7_06",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "CFQ7_07",
+            "responseValue": "7"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 49
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "all_low_2",
+        "answers": [
+          {
+            "itemCode": "CFQ7_01",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CFQ7_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CFQ7_03",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CFQ7_04",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CFQ7_05",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CFQ7_06",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CFQ7_07",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 14
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "all_high_6",
+        "answers": [
+          {
+            "itemCode": "CFQ7_01",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CFQ7_02",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CFQ7_03",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CFQ7_04",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CFQ7_05",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CFQ7_06",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CFQ7_07",
+            "responseValue": "6"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 42
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      }
+    ]
+  }
+}

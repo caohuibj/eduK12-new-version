@@ -1,0 +1,161 @@
+{
+  "instrument": "cfq7_zh_cn_research:1.0.0",
+  "source_commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "source_files": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/cfq7_zh_cn_research/1.0.0/source.json",
+      "blob": "239584a258419880e4a99b078d430ab403f8f7e9",
+      "sha256": "c820e9d08b01114985e420c240c9a873e742c95f0c99058b058736ada6966fab"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/cfq7_zh_cn_research/1.0.0/instrument.ts",
+      "blob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/cfq7_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+      "blob": "3082d17690dadfbe6e879949852346364c3ea2da",
+      "sha256": "1f6014944ac3fc5752c5215fecf68b5f5e7ed674e3a585375f8673fa442d0afb"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/cfq7/1.0.0/README.md",
+      "blob": "0a175e774efabb3ac197bd744959e576067a8828",
+      "sha256": "53392e0e5c982b7b9576dbd4241040255550f5fefc755bb857262605e4e5b49e"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/cfq7/1.0.0/bilingual-content.json",
+      "blob": "cf5eb97446085f51163ef59edcc3259fb1d11f15",
+      "sha256": "b5f4575f8c3baaad69b3fd49e93b9e849f4fa8908cc0549c1e9bdf0a648d77fe"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/cfq7/1.0.0/THIRD_PARTY_LICENSE.md",
+      "blob": "3082d17690dadfbe6e879949852346364c3ea2da",
+      "sha256": "1f6014944ac3fc5752c5215fecf68b5f5e7ed674e3a585375f8673fa442d0afb"
+    }
+  ],
+  "three_parts": {
+    "items_administration": {
+      "items": [
+        {
+          "number": 1,
+          "code": "CFQ7_01",
+          "english": "My thoughts cause me distress or emotional pain.",
+          "chinese": "我的想法让我感到痛苦或情绪上的难受。",
+          "runtime_matches": true,
+          "transform": "identity",
+          "review": "想法导致痛苦或情绪难受，原意一致。"
+        },
+        {
+          "number": 2,
+          "code": "CFQ7_02",
+          "english": "I get so caught up in my thoughts that I am unable to do the things that I most want to do.",
+          "chinese": "我太陷入自己的想法，以至于无法去做自己最想做的事。",
+          "runtime_matches": true,
+          "transform": "identity",
+          "review": "陷入想法而无法做最想做的事，原意一致。"
+        },
+        {
+          "number": 3,
+          "code": "CFQ7_03",
+          "english": "I overanalyze situations to the point where it's unhelpful to me.",
+          "chinese": "我会过度分析某些情况，到了对自己反而没有帮助的地步。",
+          "runtime_matches": true,
+          "transform": "identity",
+          "review": "过度分析达到无助程度，原意一致。"
+        },
+        {
+          "number": 4,
+          "code": "CFQ7_04",
+          "english": "I struggle with my thoughts.",
+          "chinese": "我和自己的想法较劲。",
+          "runtime_matches": true,
+          "transform": "identity",
+          "review": "与想法较劲，保留struggle。"
+        },
+        {
+          "number": 5,
+          "code": "CFQ7_05",
+          "english": "I get upset with myself for having certain thoughts.",
+          "chinese": "我会因为自己有某些想法而生自己的气。",
+          "runtime_matches": true,
+          "transform": "identity",
+          "review": "英文upset可以是不安、难过或生气；中文“生自己的气”可能缩窄情绪范围，人工译审和版本协调。"
+        },
+        {
+          "number": 6,
+          "code": "CFQ7_06",
+          "english": "I tend to get very entangled in my thoughts.",
+          "chinese": "我很容易深陷在自己的想法里。",
+          "runtime_matches": true,
+          "transform": "identity",
+          "review": "容易深陷想法，保留纠缠倾向。"
+        },
+        {
+          "number": 7,
+          "code": "CFQ7_07",
+          "english": "It's such a struggle to let go of upsetting thoughts even when I know that letting go would be helpful.",
+          "chinese": "即使我知道放下会有帮助，要放下那些令人难受的想法仍然非常困难。",
+          "runtime_matches": true,
+          "transform": "identity",
+          "review": "知道放下有益仍难以放下令人难受的想法，原意一致。"
+        }
+      ],
+      "original_basis": "Gillanders et al. (2014), DOI https://doi.org/10.1016/j.beth.2013.09.001；本次依固定双语材料的原文静态对照，未独立重跑来源交叉核对。",
+      "anchors": "1从不如此、2极少如此、3很少如此、4有时如此、5经常如此、6几乎总是如此、7总是如此；2与3较近，需人工理解度审查。",
+      "instruction": {
+        "source_path": "server-version/backend/src/modules/scale/instruments/cfq7_zh_cn_research/1.0.0/source.json",
+        "field": "/instruction",
+        "blob": "239584a258419880e4a99b078d430ab403f8f7e9",
+        "sha256": "c820e9d08b01114985e420c240c9a873e742c95f0c99058b058736ada6966fab",
+        "value": {
+          "schemaVersion": 1,
+          "text": "下面是一些描述你与自己想法之间关系的句子。\n\n请仔细阅读每一句，并根据你自己的真实经验，判断它在多大程度上符合你。没有对错之分，也不必反复斟酌——你的第一反应通常最准确。",
+          "language": "zh-CN",
+          "version": "1.0.0",
+          "source": "指导语为平台依据 Gillanders 等 2014 原文作答说明撰写的独立中文工作稿；题文与七档频率锚点取自公开可得的 CFQ-7 题本载体，并经多源交叉核对。"
+        },
+        "second_source": {
+          "path": "docs/scale-instruments/research-drafts/cfq7/1.0.0/bilingual-content.json",
+          "blob": "cf5eb97446085f51163ef59edcc3259fb1d11f15",
+          "sha256": "b5f4575f8c3baaad69b3fd49e93b9e849f4fa8908cc0549c1e9bdf0a648d77fe",
+          "field": "/instructions/platformChinese",
+          "note": "措辞相同，仅换行排版不同"
+        },
+        "review": "原文问how often，七选项也是频率；工作指导语“多大程度符合”有程度/频率不匹配，并断言第一反应通常最准确，固定材料未提供其证据。",
+        "minimal_proposal": "用“判断每句话符合你的情况出现得有多频繁”并去掉“第一反应通常最准确”及依赖其的匆忙要求；保留没有对错和真实经验。指导语系项目改编，改动须协调指导语版本及译审，不声称作者批准。"
+      },
+      "audience": "成人18+本人自陈，student为技术受众；无固定回忆窗口，中文独立工作译稿。"
+    },
+    "scoring": {
+      "method": "七题均identity，不反向，各权重1求和形成唯一total；7–49，无子量表。",
+      "missing": "所有题required=false，但总分complete_required；缺任一项不算总分，不补零、不插补、不按已答数折算，是项目保守政策。未运行计分。",
+      "thresholds": "无常模、经验切点、等级及百分位；referencePolicy none，不把理论中点当人群标准。",
+      "direction": "higher_is_more认知融合的自述倾向更多，不代表更好或疾病。"
+    },
+    "report": {
+      "direction_review": "高分把想法当必须服从命令的措辞超出七题可单独支持的个人断言；低分直接说更能不被想法支配会误称已建立解离能力。",
+      "minimal_proposal": {
+        "path": "server-version/backend/src/modules/scale/instruments/cfq7_zh_cn_research/1.0.0/source.json",
+        "field": "/executable/definition/report/interpretations/0/summary",
+        "text": "建议以“分数越高，表示本次回答更常描述陷入想法、与想法较劲或难以放下；分数较低表示这些描述在回答中出现得较少”替代确定性能力断言，并以“一般的自我描述”代替“此刻”。其他温暖具体建议保留。",
+        "version": "报告文字变更遵循现有report版本治理，不增阈值或诊断。"
+      },
+      "guidance": "现有注意到想法的小练习及困扰时寻求可信专业支持具体且温和。",
+      "references": "原作者、2014论文和DOI在definition.source；references空、referencePolicy none；不宣称本地常模。",
+      "versions": "instrument/scoring/localization/report均1.0.0，18+为保守边界。"
+    }
+  },
+  "ordinary_suggestions": [
+    "调整指导语与频率锚点对应，删除未经证实的第一反应准确断言；按指导语版本和人工译审处理。",
+    "报告总结使用自报倾向语言并移除无固定回忆窗的“此刻”，原建议可保留。"
+  ],
+  "substantive_coordination": [
+    "第5题upset译为生气可能偏窄；2与3锚点区别有待人工访谈。任何题文、锚点、计分或构念变更需协调版本及科学影响，不静默改动。"
+  ],
+  "human_status": "expertReviewStatus PENDING；认知访谈NOT_ESTABLISHED；中文人群验证待完成。保留源内授权pending及非商业声明，不新增版权审查或自动门禁。",
+  "not_executed": [
+    "未修改仓库、分支或数据库，未运行golden、系统、CI或浏览器。",
+    "历史检查与四源交叉核对仅为材料既有声明，非本次新执行。"
+  ],
+  "conclusion": "交root协调指导语与报告的最小修订；中文题文/锚点人工译审待完成，不声称验证或授权已闭合。"
+}
