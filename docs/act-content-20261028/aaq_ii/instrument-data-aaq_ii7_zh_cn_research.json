@@ -1,0 +1,104 @@
+{
+  "instrumentKey": "aaq_ii7_zh_cn_research",
+  "options": [
+    {
+      "value": "1",
+      "label_en_note": "英文锚点为 never true / very seldom true / seldom true / sometimes true / frequently true / almost always true / always true。",
+      "score": 1
+    },
+    {
+      "value": "2",
+      "label_en_note": "英文锚点为 never true / very seldom true / seldom true / sometimes true / frequently true / almost always true / always true。",
+      "score": 2
+    },
+    {
+      "value": "3",
+      "label_en_note": "英文锚点为 never true / very seldom true / seldom true / sometimes true / frequently true / almost always true / always true。",
+      "score": 3
+    },
+    {
+      "value": "4",
+      "label_en_note": "英文锚点为 never true / very seldom true / seldom true / sometimes true / frequently true / almost always true / always true。",
+      "score": 4
+    },
+    {
+      "value": "5",
+      "label_en_note": "英文锚点为 never true / very seldom true / seldom true / sometimes true / frequently true / almost always true / always true。",
+      "score": 5
+    },
+    {
+      "value": "6",
+      "label_en_note": "英文锚点为 never true / very seldom true / seldom true / sometimes true / frequently true / almost always true / always true。",
+      "score": 6
+    },
+    {
+      "value": "7",
+      "label_en_note": "英文锚点为 never true / very seldom true / seldom true / sometimes true / frequently true / almost always true / always true。",
+      "score": 7
+    }
+  ],
+  "items": [
+    {
+      "itemCode": "AAQ2_01",
+      "en": "My painful experiences and memories make it difficult for me to live a life that I would value.",
+      "zh_working": "痛苦的经历和记忆让我难以过上自己看重的生活。",
+      "assignedScore": "total"
+    },
+    {
+      "itemCode": "AAQ2_02",
+      "en": "I'm afraid of my feelings.",
+      "zh_working": "我害怕自己的情绪。",
+      "assignedScore": "total"
+    },
+    {
+      "itemCode": "AAQ2_03",
+      "en": "I worry about not being able to control my worries and feelings.",
+      "zh_working": "我担心自己控制不住这些担忧和情绪。",
+      "assignedScore": "total"
+    },
+    {
+      "itemCode": "AAQ2_04",
+      "en": "My painful memories prevent me from having a fulfilling life.",
+      "zh_working": "痛苦的记忆让我无法拥有充实的生活。",
+      "assignedScore": "total"
+    },
+    {
+      "itemCode": "AAQ2_05",
+      "en": "Emotions cause problems in my life.",
+      "zh_working": "情绪给我的生活带来麻烦。",
+      "assignedScore": "total"
+    },
+    {
+      "itemCode": "AAQ2_06",
+      "en": "It seems like most people are handling their lives better than I am.",
+      "zh_working": "看起来大多数人把自己的生活过得比我好。",
+      "assignedScore": "total"
+    },
+    {
+      "itemCode": "AAQ2_07",
+      "en": "Worries get in the way of my success.",
+      "zh_working": "担忧妨碍了我的成功。",
+      "assignedScore": "total"
+    }
+  ],
+  "reverseScored": [],
+  "scores": [
+    {
+      "key": "total",
+      "label": "心理不灵活性总分（7题）",
+      "items": [
+        "AAQ2_01",
+        "AAQ2_02",
+        "AAQ2_03",
+        "AAQ2_04",
+        "AAQ2_05",
+        "AAQ2_06",
+        "AAQ2_07"
+      ],
+      "aggregation": "sum",
+      "reverse": [],
+      "description": "七题求和，范围 7–49。分数越高表示越多报告心理不灵活性/经验性回避：被困难想法与感受缠住、并因此干扰行动。不是症状诊断，也不是能力高低。"
+    }
+  ],
+  "missingPolicy": "complete_required；任一题缺失则该分数不计算，不插补、不补0。"
+}

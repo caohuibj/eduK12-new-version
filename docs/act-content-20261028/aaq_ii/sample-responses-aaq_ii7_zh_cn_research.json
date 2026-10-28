@@ -1,0 +1,16 @@
+{
+  "note": "模拟数据，仅用于核对计分与报告样稿",
+  "answers": {
+    "AAQ2_01": 4,
+    "AAQ2_02": 1,
+    "AAQ2_03": 7,
+    "AAQ2_04": 4,
+    "AAQ2_05": 1,
+    "AAQ2_06": 7,
+    "AAQ2_07": 4
+  },
+  "expectedScores": {
+    "total": 28
+  },
+  "quality": "interpretable"
+}

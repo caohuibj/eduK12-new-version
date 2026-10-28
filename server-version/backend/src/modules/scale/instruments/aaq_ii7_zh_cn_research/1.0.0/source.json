@@ -1,0 +1,642 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "aaq_ii7_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "Acceptance and Action Questionnaire - II, 7-item",
+      "abbreviation": "AAQ-II",
+      "instrumentFamily": "AAQ"
+    },
+    "construct": {
+      "primaryDomain": "SELF_REGULATION",
+      "secondaryDomains": [],
+      "constructDefinition": "单因子七题自评，测量心理不灵活性/经验性回避：个体被困难想法与感受缠住、并因此干扰价值导向行动的程度。测的是与内心体验的关系方式，不是想法内容，也不是症状诊断。",
+      "constructLevel": "BROAD_DOMAIN",
+      "constructOverlapTags": [
+        "domain:act",
+        "domain:self_regulation",
+        "population:adolescent_adult",
+        "response:student_self",
+        "use:reflection",
+        "use:research",
+        "language_validation:chinese_working_translation",
+        "construct:act_experiential_avoidance",
+        "construct:act_psychological_inflexibility",
+        "psychological_inflexibility",
+        "experiential_avoidance",
+        "self_report"
+      ]
+    },
+    "population": {
+      "populationNotes": "原开发样本为各国成人大学生与社区样本；此中文工作译稿未经独立回译或本地验证，K12 低龄适用性未确立。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "PARTIAL"
+    },
+    "administration": {
+      "itemCount": 7,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "PAPER"
+      ],
+      "timeFrame": "一般情形，无指定回忆期",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保持官方作答量尺与题序；英文锚点为 never true / very seldom true / seldom true / sometimes true / frequently true / almost always true / always true。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "SUPPORTED",
+          "notes": "原文研究支持；中文工作译文尚未验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "反馈仅作普遍生活化反思，不推断个体能力或状态。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "bond-2011-aaq2",
+        "evidenceType": "STRUCTURAL_VALIDITY",
+        "population": "Adult community and student samples",
+        "locale": "en",
+        "territory": "US/UK",
+        "studyDesign": "原作者论文报告七题单因子结构与计分（求和，高分=更多不灵活性）；官方计分说明页同样注明。本记录仅数字化官方题本与计分说明。",
+        "rating": "MIXED",
+        "citation": "Bond FW, Hayes SC, Baer RA, et al. (2011). Behavior Therapy, 42, 676-688.",
+        "url": "https://ruthbaer.com/academics/AAQ-II.pdf",
+        "notes": "以上证据均针对原语言版本，不外推到本中文工作译稿。"
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "Acceptance and Action Questionnaire - II (AAQ-II), official form and scoring instructions",
+        "citation": "Bond, F. W., Hayes, S. C., Baer, R. A., et al. (2011). Preliminary psychometric properties of the Acceptance and Action Questionnaire - II: A revised measure of psychological inflexibility and experiential avoidance. Behavior Therapy, 42, 676-688.",
+        "url": "https://ruthbaer.com/academics/AAQ-II.pdf",
+        "publicationYear": 2011
+      },
+      "license": {
+        "status": "unknown",
+        "redistribution": "unknown",
+        "note": "题本由原作者之一（Ruth Baer）学术网站公开提供下载，计分说明随题本发布；页面未附使用许可条款，未查到明确再分发声明。文献中常见'可免费使用'的说法仅见于二手引用，未在原始出处核实。按保守约定登记为 unknown，后续取得明确许可或原文声明后再升级。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "aaq_truth_1_7",
+          "options": [
+            {
+              "value": "1",
+              "label": "完全不符合",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "几乎从不符合",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "很少符合",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "有时符合",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "经常符合",
+              "score": 5
+            },
+            {
+              "value": "6",
+              "label": "几乎总是符合",
+              "score": 6
+            },
+            {
+              "value": "7",
+              "label": "总是符合",
+              "score": 7
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "AAQ2_01",
+          "content": "痛苦的经历和记忆让我难以过上自己看重的生活。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "aaq_truth_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "AAQ2_02",
+          "content": "我害怕自己的情绪。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "aaq_truth_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "AAQ2_03",
+          "content": "我担心自己控制不住这些担忧和情绪。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "aaq_truth_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "AAQ2_04",
+          "content": "痛苦的记忆让我无法拥有充实的生活。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "aaq_truth_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "AAQ2_05",
+          "content": "情绪给我的生活带来麻烦。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "aaq_truth_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "AAQ2_06",
+          "content": "看起来大多数人把自己的生活过得比我好。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "aaq_truth_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "AAQ2_07",
+          "content": "担忧妨碍了我的成功。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "aaq_truth_1_7",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "AAQ2_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "AAQ2_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "AAQ2_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "AAQ2_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "AAQ2_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "AAQ2_06",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "AAQ2_07",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "total",
+            "type": "total",
+            "label": "心理不灵活性总分（7题）",
+            "description": "七题求和，范围 7–49。分数越高表示越多报告心理不灵活性/经验性回避：被困难想法与感受缠住、并因此干扰行动。不是症状诊断，也不是能力高低。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "AAQ2_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "AAQ2_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "AAQ2_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "AAQ2_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "AAQ2_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "AAQ2_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "AAQ2_07",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "total"
+        ],
+        "scoreOrder": [
+          "total"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "total",
+            "headline": "想法和感受的拉扯",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这个总分反映你此刻有多少报告：痛苦的想法和感受似乎挡住了你在乎的生活。数字越高只说明这类报告越多，没有好坏标准，也不定义你是什么样的人。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近有没有一个时刻，一个念头（比如“我做不到”）让你停下了本来想做的事？当时你还注意到什么？"
+              },
+              {
+                "category": "strategy",
+                "text": "下次留意到“我必须先摆脱这种感受才能行动”时，试着在前面加一句“我注意到我在想……”，然后做一小步原本要做的事。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这是未经回译及本地验证的中文工作译稿，结果不可视作已验证中文测量结果。",
+          "AAQ-II 总分与一般心理痛苦指标相关较高，与痛苦量表高度重合的问题在文献中有争议；不能当作独立的“心理灵活性诊断”。",
+          "该报告是单次自述；缺答不计分，不插补。"
+        ],
+        "disclaimer": "这些内容仅供一般自我反思，不用于诊断、筛查、选拔或排名。"
+      },
+      "referencePolicy": {
+        "type": "none"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "all_minimum",
+        "answers": [
+          {
+            "itemCode": "AAQ2_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "AAQ2_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "AAQ2_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "AAQ2_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "AAQ2_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "AAQ2_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "AAQ2_07",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 7
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "all_maximum",
+        "answers": [
+          {
+            "itemCode": "AAQ2_01",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "AAQ2_02",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "AAQ2_03",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "AAQ2_04",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "AAQ2_05",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "AAQ2_06",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "AAQ2_07",
+            "responseValue": "7"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 49
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "all_midpoint",
+        "answers": [
+          {
+            "itemCode": "AAQ2_01",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AAQ2_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AAQ2_03",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AAQ2_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AAQ2_05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AAQ2_06",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AAQ2_07",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 28
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "mixed_pattern",
+        "answers": [
+          {
+            "itemCode": "AAQ2_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "AAQ2_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AAQ2_03",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "AAQ2_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "AAQ2_05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AAQ2_06",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "AAQ2_07",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 25
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "missing_first_item",
+        "answers": [
+          {
+            "itemCode": "AAQ2_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AAQ2_03",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AAQ2_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AAQ2_05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AAQ2_06",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AAQ2_07",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "total": null
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "all_missing",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "total": null
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      }
+    ]
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "aaq-ii7-v1",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "aaq-ii7-v1",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
