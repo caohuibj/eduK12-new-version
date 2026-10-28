@@ -1,5 +1,9 @@
 # BPS-9：固定指导语绑定与单包隔离入库
 
+后续已完成真实 Chromium 390px/820px 的 BPS9 报告截图补验，见
+[visual-supplement.json](visual-supplement.json)。它复用 PR367 的现有呈现组件，
+没有重跑计分/数据库；下面首次准备阶段的 NOTRUN 保留为原执行历史。
+
 基线 main `642fda7ab754790686d6626efac62b73a332e663`，独立分支
 `content/scale-bps9-intake-20261028`；不修改 PR367、其他量表、前端、共享引擎、
 schema 或 CI。精确清单、版本、命令/退出/原件入口见 [index.json](index.json)。
