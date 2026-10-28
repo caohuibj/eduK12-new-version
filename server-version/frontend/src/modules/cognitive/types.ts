@@ -819,3 +819,26 @@ export type CancellationTrialPayload = {
   responseDurationMs: number
   interrupted: boolean
 }
+
+/** Trustgame 冻结 config（与后端 trustgame.config schema 一致）。 */
+export interface TrustgameConfig {
+  offers: number[]
+  potTotal: number
+  fixationMs: number
+  timeoutMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+/** Trustgame 单 trial payload（与后端 trustgame.trial schema 一致）。 */
+export type TrustgameTrialPayload = {
+  roundIndex: number
+  offerToSelf: number
+  response: 'accept' | 'reject' | null
+  rtMs: number | null
+  interrupted: boolean
+}

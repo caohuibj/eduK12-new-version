@@ -305,6 +305,12 @@ const SCORING_DECLARATIONS: Record<string, CognitiveScoringContractDeclaration> 
     runtimeReconstructableFacts: ['符号网格与目标集（seed+scan 重建）'],
     serverDerivedFacts: ['命中/漏报/误报求交判定', 'metrics（hitRate/falseAlarmRate）', 'quality flags'],
   },
+  trustgame: {
+    testType: 'trustgame',
+    clientObservedFacts: ['接受/拒绝选择', '决策用时', 'interrupted'],
+    runtimeReconstructableFacts: ['提议序列（frozen config）'],
+    serverDerivedFacts: ['公平划分判定与接受率', 'metrics（acceptanceRate/unfairAcceptanceRate）', 'quality flags'],
+  },
 }
 
 // 当前通用事实（所有任务一致）：完整加密 trial payload、v2 trial envelope qualityEvents、
@@ -530,6 +536,11 @@ const RESEARCH_CAPTURE_DECLARATIONS: Record<string, CognitiveResearchCaptureDecl
     testType: 'cancellation',
     currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐轮选中格子集与用时'],
     futureCaptureFacts: ['逐格点击时序', '真实 input modality', 'device provenance'],
+  },
+  trustgame: {
+    testType: 'trustgame',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐轮选择与用时'],
+    futureCaptureFacts: ['真实接收者与真实激励', '真实 input modality', '决策前犹豫内指针轨迹'],
   },
 }
 
