@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 1,
+  "sourceSHA": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "sourceKey": "ipip_responsive_distress10_zh_cn_research",
+  "originalVersion": "1.0.0",
+  "preparedVersion": "1.0.1",
+  "originalSource": "server-version/backend/src/modules/scale/instruments/ipip_responsive_distress10_zh_cn_research/1.0.0/source.json",
+  "preparedSource": "server-version/backend/src/modules/scale/instruments/ipip_responsive_distress10_zh_cn_research/1.0.1/source.json",
+  "originalSourceSHA256": "4d0a1c876f786abd7f7572fa4c9a956e0734744fe3fee428cdc1aefe0b5e8fd0",
+  "preparedSourceSHA256": "e9df843e53ef5761494bf07f4c4d448ae236ab84eb7b43a4105c32f6ec6ac139",
+  "originalFiles": [
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_distress10/1.0.0/README.md",
+      "blob": "d93cd9c46fcc35045d5b3c3e3061c0a88348cb10",
+      "sha256": "9e85cf9b81406b0cabbfb20af1af756a7ca3cbdf7e73c6dbd983f7786874c517"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_distress10/1.0.0/bilingual-content.json",
+      "blob": "746a9555de83b5fa1dbc4328792cb44e722f179a",
+      "sha256": "d796b46d0a3cf82bca3ba989b63ed9861bad8fd83720ae18285169051e78857b"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_distress10/1.0.0/external-reference-dossier.json",
+      "blob": "d8f0155cff5794148e6c2877a41f1636b5d2798a",
+      "sha256": "e23468e315f6e6b2c55866a013781fe71ff416f6c7d4f07b1f8fd8ba2b657c37"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_distress10/1.0.0/local-test-output.txt",
+      "blob": "1319aee8c4163f01ee5eed5b5a57b95c9975d4ad",
+      "sha256": "eb425e5abde4f76ba69dfb2c41d7e96c5fc7f74b89f9d5a87a0f321abb475d68"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_distress10/1.0.0/local-validation.json",
+      "blob": "96f5bbea82f1ddf12dbb2e6fcd386f06a6b73d66",
+      "sha256": "bc970916ba5cdfdfed947ab6522900cb729a335fd9c4d98c37b4b8d8b25360bd"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_distress10/1.0.0/references.md",
+      "blob": "8eb0e65b2e1893151a4109539e0bcbc5105f4327",
+      "sha256": "42eb4683461faea9d8d1cc2dae4da0a96aa0fc0e4a5f7166a48654332925b105"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_distress10/1.0.0/report-example.json",
+      "blob": "60dac25c2196415d69febf3e859b813b0e051002",
+      "sha256": "7aaa4fc74fa954f16be250d675248f4b1b545335520ddfb41dc731bbd06d9146"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_distress10/1.0.0/report-example.md",
+      "blob": "8ac7c9f9c155c44e753ee36e9d4a4be60bea2ba4",
+      "sha256": "7114a0f0c0181b0fe4aab0631243bdfc159a09c52d47c9aa0fb7a8f98cefd07c"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_distress10/1.0.0/reviewed-source-pack.json",
+      "blob": "45df4d83e3eedda1ab9c7323b8dbbacfd60e882c",
+      "sha256": "f2e03734e8130390a7d49677499efe674e576193074f9fe3a6ced1513bbfa6bb"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_distress10/1.0.0/runtime-check.json",
+      "blob": "34be99ba1dfbcfddc574de8dd8351f285c532fd5",
+      "sha256": "f5739a294814ff1d7fbe5568f6e0d300a8ee04edd0ebae69cc9bc92551880d7d"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_distress10/1.0.0/scoring-and-thresholds.md",
+      "blob": "b9a1d049eda38b870bbfbfd6cdc27c2d0fa08315",
+      "sha256": "d316030cce6275dab27bc1e14d1780eb6b7d61401f44a7336cf55b49ff86bfcf"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ipip_responsive_distress10_zh_cn_research/1.0.0/instrument.ts",
+      "blob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ipip_responsive_distress10_zh_cn_research/1.0.0/source.json",
+      "blob": "649accbe3c5325d0f6c5bbe6be634445ce19f7b8",
+      "sha256": "4d0a1c876f786abd7f7572fa4c9a956e0734744fe3fee428cdc1aefe0b5e8fd0"
+    }
+  ],
+  "jsonChanges": [
+    {
+      "op": "replace",
+      "path": "/executable/definition/items/0/content",
+      "from": "请描述你现在通常的真实情况，而不是你希望将来成为的样子。判断下面每句话与你的符合程度。没有标准答案。\n\n别人的不幸会深深触动我。",
+      "value": "别人的不幸会深深触动我。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/releaseStatus",
+      "from": "DRAFT",
+      "value": "PUBLISHED"
+    },
+    {
+      "op": "replace",
+      "path": "/identity/instrumentVersion",
+      "from": "1.0.0",
+      "value": "1.0.1"
+    },
+    {
+      "op": "add",
+      "path": "/instruction",
+      "value": {
+        "schemaVersion": 1,
+        "text": "请描述你现在通常的真实情况，而不是你希望将来成为的样子。判断下面每句话与你的符合程度。没有标准答案。",
+        "language": "zh-CN",
+        "version": "1.0.1",
+        "source": "server-version/backend/src/modules/scale/instruments/ipip_responsive_distress10_zh_cn_research/1.0.0/source.json#/executable/definition/items/0/content (既有指导语前缀原文拆分，题干原文保留) @ b92c69aefa2472775fa7ee86b9c208366886c908 (项目工作稿；非人工审批声明)"
+      }
+    }
+  ],
+  "audit": "audits/audit-ipip-responsive-distress10-batch3.json",
+  "versions": {
+    "instrument": "1.0.1",
+    "scoring": "1.0.0",
+    "report": "1.0.0",
+    "localization": "1.0.0",
+    "instruction": "1.0.1"
+  },
+  "states": {
+    "sourceRelease": "PUBLISHED candidate, independent integration pending",
+    "catalog": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "translation": "PENDING",
+    "scientificReview": null,
+    "databaseInstall": "NOT_EXECUTED",
+    "databasePublish": "NOT_EXECUTED",
+    "production": "NOT_TOUCHED"
+  },
+  "versionReason": "Original 1.0.0 source is retained byte-for-byte as DRAFT where a new 1.0.1 definition identity is introduced; same-identity existing rows must conflict, never overwrite. Description translation and instruction extraction do not change formulas, item meaning or options. Report-only wording has an explicit report revision."
+}
