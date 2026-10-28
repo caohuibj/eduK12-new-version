@@ -1,0 +1,19 @@
+{
+  "success": false,
+  "node": "v24.21.0",
+  "sourceCount": 77,
+  "diagnostics": [
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/attentional-blink/review.test.tsx",
+      "start": 3130,
+      "code": 2322,
+      "message": "Type 'Mock<(c: any, manifest: any, realm: any) => Promise<{ fresh: boolean; contextKey: any; bindingDigest: string; }>>' is not assignable to type '(context: BlinkContext, manifest: { formal: BlinkPlan[]; practice: BlinkPlan[][]; }, realm: { timeOriginMs: number; pageInstanceId: string; }) => Promise<{ fresh: true; contextKey: string; bindingDigest: string; }>'.\n  Type 'Promise<{ fresh: boolean; contextKey: any; bindingDigest: string; }>' is not assignable to type 'Promise<{ fresh: true; contextKey: string; bindingDigest: string; }>'.\n    Type '{ fresh: boolean; contextKey: any; bindingDigest: string; }' is not assignable to type '{ fresh: true; contextKey: string; bindingDigest: string; }'.\n      Types of property 'fresh' are incompatible.\n        Type 'boolean' is not assignable to type 'true'."
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/attentional-blink/review.test.tsx",
+      "start": 3270,
+      "code": 2322,
+      "message": "Type 'Mock<(r: any) => Promise<{ retained: boolean; contextKey: any; recordKey: any; recordDigest: any; }>>' is not assignable to type '(record: BlinkDraft) => Promise<{ retained: true; contextKey: string; recordKey: string; recordDigest: string; }>'.\n  Type 'Promise<{ retained: boolean; contextKey: any; recordKey: any; recordDigest: any; }>' is not assignable to type 'Promise<{ retained: true; contextKey: string; recordKey: string; recordDigest: string; }>'.\n    Type '{ retained: boolean; contextKey: any; recordKey: any; recordDigest: any; }' is not assignable to type '{ retained: true; contextKey: string; recordKey: string; recordDigest: string; }'.\n      Types of property 'retained' are incompatible.\n        Type 'boolean' is not assignable to type 'true'."
+    }
+  ]
+}

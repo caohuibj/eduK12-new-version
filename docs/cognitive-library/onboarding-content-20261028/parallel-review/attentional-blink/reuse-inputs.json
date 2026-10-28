@@ -1,0 +1,181 @@
+{
+  "base": "a67f425269283d8281379fdf8234f9fd6b0acebc",
+  "node": "v24.21.0",
+  "unchanged": [
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/attentional-blink/protocol.ts",
+      "priorSHA256": "138e5083cad7d220a5afb95f9890836f25733c9081531e2c4dbf9a91a3660073",
+      "currentSHA256": "138e5083cad7d220a5afb95f9890836f25733c9081531e2c4dbf9a91a3660073",
+      "identical": true
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/attentional-blink/report.ts",
+      "priorSHA256": "2f7c38450c995af8e548211d8f846df8d6a5fbaf8bcb7aad7ffd4a4b1d6dcaac",
+      "currentSHA256": "2f7c38450c995af8e548211d8f846df8d6a5fbaf8bcb7aad7ffd4a4b1d6dcaac",
+      "identical": true
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/attentional-blink/schema.ts",
+      "priorSHA256": "98852ba94b2e6d7a3b90dd772b00c90475fd45e8b7359c59c88814e4431adcd4",
+      "currentSHA256": "98852ba94b2e6d7a3b90dd772b00c90475fd45e8b7359c59c88814e4431adcd4",
+      "identical": true
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/attentional-blink/scorer.ts",
+      "priorSHA256": "294fe4ec916563bf7101c96947a5f1e1b5a6b7e37047ad22197ac3b0758728c2",
+      "currentSHA256": "294fe4ec916563bf7101c96947a5f1e1b5a6b7e37047ad22197ac3b0758728c2",
+      "identical": true
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/attentional-blink/capture.ts",
+      "priorSHA256": "2789d07d46be161b0cfff1dc72a8fbce3ab98136c78284c7759e216576de8a76",
+      "currentSHA256": "2789d07d46be161b0cfff1dc72a8fbce3ab98136c78284c7759e216576de8a76",
+      "identical": true
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/attentional-blink/contracts.ts",
+      "priorSHA256": "e7a96687d8bdfd6a02ac937264212cc7cb56a8d3d410203688591e774c852bd5",
+      "currentSHA256": "e7a96687d8bdfd6a02ac937264212cc7cb56a8d3d410203688591e774c852bd5",
+      "identical": true
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/attentional-blink/font-loader.ts",
+      "priorSHA256": "aabd5db782bb0e03b04ef9dd2337cbdd17e3b1bccf9918c75517d089f2bcc755",
+      "currentSHA256": "aabd5db782bb0e03b04ef9dd2337cbdd17e3b1bccf9918c75517d089f2bcc755",
+      "identical": true
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/attentional-blink/generated/protocol.ts",
+      "priorSHA256": "6b5e90dc15d570a6743035122cabf13826c75b30ae98b339c981c591d4a069b0",
+      "currentSHA256": "6b5e90dc15d570a6743035122cabf13826c75b30ae98b339c981c591d4a069b0",
+      "identical": true
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/attentional-blink/generated/report.ts",
+      "priorSHA256": "cb144b8fb62ec66ba174b5b6265f732e7c2a39c87bbd4049ffd18d315ec6bc3c",
+      "currentSHA256": "cb144b8fb62ec66ba174b5b6265f732e7c2a39c87bbd4049ffd18d315ec6bc3c",
+      "identical": true
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/attentional-blink/session.ts",
+      "priorSHA256": "d0c70acefd37f049a07e60ea80547f551537bb3fb8d47107cccdce46166b5692",
+      "currentSHA256": "d0c70acefd37f049a07e60ea80547f551537bb3fb8d47107cccdce46166b5692",
+      "identical": true
+    }
+  ],
+  "originals": [
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/attentional-blink/implementation/backend-original.json",
+      "sha256": "7538521b07472cdcc44c783f7574897e7bf457beca5430969f1100bcb59a5818",
+      "success": true,
+      "blinkAssertions": [
+        {
+          "fullName": "attentional blink minimal content contracts freezes all 25 conditions in 200/50 profiles, seed replay, no repeated stream letters and six easier trials",
+          "status": "passed"
+        },
+        {
+          "fullName": "attentional blink minimal content contracts uses T1-correct denominators, exact order and signed position errors, keeping explicit forgotten answers distinct from incomplete trials",
+          "status": "passed"
+        },
+        {
+          "fullName": "attentional blink minimal content contracts refuses missing exposures, target/frame tampering, unconfirmed or forged answers and unknown report identities",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/attentional-blink/implementation/frontend-original.json",
+      "sha256": "7bcd412646e589c2e25d40fdb62de2113215128766489a11b25696ed525a2b28",
+      "success": true,
+      "blinkAssertions": [
+        {
+          "fullName": "blink minimal candidate flows exposes every letter/cue once in order, ignores early/repeated answers and keeps explicit null plus unlimited response time",
+          "status": "passed"
+        },
+        {
+          "fullName": "blink minimal candidate flows completes six practice and 50 formal trials with actual scorer receipts, immutable retry claims and report gating",
+          "status": "passed"
+        },
+        {
+          "fullName": "blink minimal candidate flows runs real React touch answers, repeats the entire guide after failure, and retries a retained draft without replay",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/attentional-blink/implementation/frontend-affected.json",
+      "sha256": "40c54363ed1fa86fa974422e2059f12ee127d56478c70429b280fc2479670e53",
+      "success": true,
+      "blinkAssertions": [
+        {
+          "fullName": "blink minimal candidate flows exposes every letter/cue once in order, ignores early/repeated answers and keeps explicit null plus unlimited response time",
+          "status": "skipped"
+        },
+        {
+          "fullName": "blink minimal candidate flows completes six practice and 50 formal trials with actual scorer receipts, immutable retry claims and report gating",
+          "status": "passed"
+        },
+        {
+          "fullName": "blink minimal candidate flows runs real React touch answers, repeats the entire guide after failure, and retries a retained draft without replay",
+          "status": "skipped"
+        }
+      ]
+    },
+    {
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-3/evidence/frontend-port.json",
+      "sha256": "0da463609c8b60487a134b8a75bb0800e51b8595f3edb88726338395fc0e6702",
+      "success": true,
+      "blinkAssertions": [
+        {
+          "fullName": "real native content host adapters 'attentional-blink' persists immutable records, retries the same final and reads the stored public report",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-3/evidence/frontend-readiness.json",
+      "sha256": "98b1462393467644a052bba3140c33105467eaff6c9a10aa7a72326f1bc752c9",
+      "success": true,
+      "blinkAssertions": [
+        {
+          "fullName": "task-owned native runner readiness 'attentional-blink' mounts the real instructions with the frozen context and its generated envelope matches the backend",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "docs/cognitive-library/onboarding-content-20261028/batch-3/evidence/backend-bridge.json",
+      "sha256": "eaf08e2e7701108ee83e818de83f0c2a1158cb151391ac68e097a4acdbfd8245",
+      "success": true,
+      "blinkAssertions": [
+        {
+          "fullName": "existing native content reaches frozen public reports and archive contracts 'attentional-blink' binds one actual scorer prefix, saves its public projection and validates exact original records",
+          "status": "passed"
+        }
+      ]
+    }
+  ],
+  "changed": [
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/attentional-blink/analysis.ts",
+      "sha256": "c69105151818fa6f76617c3d5aed0201cf9a348c258c2a9c57e9eaa5b5cae604"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/cognitive/attentional-blink-input-review.test.ts",
+      "sha256": "ac759bd0751e9a22380f0421e28a176ea8ce35e643e89ba2994f784da3a4bd49"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/attentional-blink/generated/analysis.ts",
+      "sha256": "94f0bd8083c2b55230ae1d999b65b7c74a8dbd6c3ad71c775ab1966cd43bef30"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/attentional-blink/content.test.tsx",
+      "sha256": "0c2b364b4e38595102f16911592df0097177f2143b0600424e0b70f3cdcb0f10"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/attentional-blink/review.test.tsx",
+      "sha256": "3f0c29258bfe068f40ec3450c8583e81278a36b49b3c89e746a33903347e2e26"
+    }
+  ],
+  "scope": "Keyboard action binding changed in analysis and its generated copy. Prior touch-only formula/timing/practice/immutable retry evidence is reused for unchanged paths; fresh targeted checks cover the changed keyboard path. This is not complete new artifact or CI qualification."
+}

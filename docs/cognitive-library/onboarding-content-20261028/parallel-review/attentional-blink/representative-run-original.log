@@ -1,0 +1,180 @@
+{
+  "success": true,
+  "node": "v24.21.0",
+  "modes": [
+    {
+      "mode": "t1-only",
+      "valid": true,
+      "t1": true,
+      "t2": false,
+      "both": false,
+      "forgot": 0,
+      "t1Offset": 0,
+      "t2Offset": -18,
+      "ignored": {
+        "early": 1,
+        "repeat": 1,
+        "unready": 0
+      }
+    },
+    {
+      "mode": "both",
+      "valid": true,
+      "t1": true,
+      "t2": true,
+      "both": true,
+      "forgot": 0,
+      "t1Offset": 0,
+      "t2Offset": 0,
+      "ignored": {
+        "early": 1,
+        "repeat": 1,
+        "unready": 0
+      }
+    },
+    {
+      "mode": "t2-only",
+      "valid": true,
+      "t1": false,
+      "t2": true,
+      "both": false,
+      "forgot": 0,
+      "t1Offset": -9,
+      "t2Offset": 0,
+      "ignored": {
+        "early": 1,
+        "repeat": 1,
+        "unready": 0
+      }
+    },
+    {
+      "mode": "explicit-forget",
+      "valid": true,
+      "t1": false,
+      "t2": false,
+      "both": false,
+      "forgot": 2,
+      "t1Offset": null,
+      "t2Offset": null,
+      "ignored": {
+        "early": 1,
+        "repeat": 1,
+        "unready": 0
+      }
+    },
+    {
+      "mode": "reversed",
+      "valid": true,
+      "t1": false,
+      "t2": false,
+      "both": false,
+      "forgot": 0,
+      "t1Offset": 8,
+      "t2Offset": -8,
+      "ignored": {
+        "early": 1,
+        "repeat": 1,
+        "unready": 0
+      }
+    },
+    {
+      "mode": "unconfirmed",
+      "valid": false,
+      "t1": null,
+      "t2": null,
+      "both": false,
+      "forgot": 0,
+      "t1Offset": null,
+      "t2Offset": null,
+      "ignored": {
+        "early": 1,
+        "repeat": 1,
+        "unready": 0
+      }
+    },
+    {
+      "mode": "stream-interrupted",
+      "valid": false,
+      "t1": null,
+      "t2": null,
+      "both": false,
+      "forgot": 0,
+      "t1Offset": null,
+      "t2Offset": null,
+      "ignored": {
+        "early": 1,
+        "repeat": 0,
+        "unready": 0
+      }
+    },
+    {
+      "mode": "one-frame-late",
+      "valid": true,
+      "t1": true,
+      "t2": true,
+      "both": true,
+      "forgot": 0,
+      "t1Offset": 0,
+      "t2Offset": 0,
+      "ignored": {
+        "early": 1,
+        "repeat": 1,
+        "unready": 0
+      }
+    }
+  ],
+  "totals": {
+    "valid": 6,
+    "t1": 3,
+    "t2": 3,
+    "both": 2,
+    "t2GivenT1": 0.6666666666666666
+  },
+  "byLag": {
+    "1": {
+      "planned": 10,
+      "received": 1,
+      "valid": 1,
+      "t1Correct": 0,
+      "t2Correct": 1,
+      "bothCorrect": 0,
+      "t2GivenT1": null
+    },
+    "2": {
+      "planned": 10,
+      "received": 3,
+      "valid": 1,
+      "t1Correct": 1,
+      "t2Correct": 1,
+      "bothCorrect": 1,
+      "t2GivenT1": 1
+    },
+    "5": {
+      "planned": 10,
+      "received": 0,
+      "valid": 0,
+      "t1Correct": 0,
+      "t2Correct": 0,
+      "bothCorrect": 0,
+      "t2GivenT1": null
+    },
+    "8": {
+      "planned": 10,
+      "received": 2,
+      "valid": 2,
+      "t1Correct": 1,
+      "t2Correct": 1,
+      "bothCorrect": 1,
+      "t2GivenT1": 1
+    },
+    "10": {
+      "planned": 10,
+      "received": 2,
+      "valid": 2,
+      "t1Correct": 1,
+      "t2Correct": 0,
+      "bothCorrect": 0,
+      "t2GivenT1": 0
+    }
+  }
+}

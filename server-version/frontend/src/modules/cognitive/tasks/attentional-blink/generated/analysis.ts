@@ -1,6 +1,14 @@
-// Exact pure content projection. Backend SHA256: 163e40ed2e6c363c6554bfe0cf894285ce9cfffb1c739851ec452c0a6db3e3d9
-import {same,emptyBlinkAnswers,applyBlinkAction,type BlinkRaw,type BlinkPlan,type BlinkConfig} from './protocol'
+// Exact pure content projection. Backend SHA256: c69105151818fa6f76617c3d5aed0201cf9a348c258c2a9c57e9eaa5b5cae604
+import {same,emptyBlinkAnswers,applyBlinkAction,type BlinkRaw,type BlinkPlan,type BlinkConfig,type BlinkAction} from './protocol'
 const near=(a:number,b:number)=>Math.abs(a-b)<1e-6
+/** Match the existing global decoder and focused-button activation, without inferring a keyboard layout. */
+function keyboardActionMatches(a:BlinkAction){
+ const key=a.key;if(key===null)return false
+ const letter=/^Key[A-Z]$/.test(key)?key.slice(3):/^[A-Za-z]$/.test(key)?key.toUpperCase():null
+ if(letter!==null)return a.kind==='letter'&&a.letter===letter
+ if(key==='Backspace')return a.kind==='clear'
+ return ['Space',' ','Enter','NumpadEnter'].includes(key)
+}
 /** Protocol review, not a frame-rate quality threshold. All actual exposures must exist; ordinary callback overshoot is retained. */
 export function reviewBlink(raw:BlinkRaw,plan:BlinkPlan,c:BlinkConfig){
  if(!same(raw.plan,plan)||raw.endedAtPerfMs<raw.startedAtPerfMs||raw.exposures.length>plan.stream.length)throw Error('Blink plan/clock mismatch')
@@ -18,7 +26,8 @@ export function reviewBlink(raw:BlinkRaw,plan:BlinkPlan,c:BlinkConfig){
  }
  if(raw.frames[0].stage!=='pre'||!near(raw.frames[0].atMs,raw.startedAtPerfMs))throw Error('Missing initial blink paint')
  const answer=emptyBlinkAnswers();let actionAt=raw.responseAtMs??Infinity
- for(const a of raw.actions){if(raw.responseAtMs===null||a.atMs<actionAt||a.atMs>raw.endedAtPerfMs||(a.input==='keyboard'?a.key===null:a.key!==null)||!applyBlinkAction(answer,a))throw Error('Blink answer action mismatch');actionAt=a.atMs}
+ for(const a of raw.actions){if(a.input==='keyboard'&&!keyboardActionMatches(a))throw Error('Blink keyboard action mismatch')
+  if(raw.responseAtMs===null||a.atMs<actionAt||a.atMs>raw.endedAtPerfMs||(a.input==='keyboard'?a.key===null:a.key!==null)||!applyBlinkAction(answer,a))throw Error('Blink answer action mismatch');actionAt=a.atMs}
  if(!same(answer,raw.answer))throw Error('Blink answers differ from actions')
  const executed=raw.responseAtMs!==null&&ordinal===2+2*plan.stream.length,confirmed=answer.confirmedAtMs!==null
  if(raw.status==='complete'&&(!executed||!confirmed||raw.stopReason!==null||raw.overflow||!near(raw.endedAtPerfMs,answer.confirmedAtMs!)))throw Error('Unexecuted blink trial claimed complete')
