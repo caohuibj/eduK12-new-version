@@ -1,0 +1,323 @@
+{
+  "kind": "RETAINED_SYNTHETIC_REPORTS_PUBLIC_METADATA_COMPONENT_FIXTURE",
+  "inputs": [
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_neo_c1_self_efficacy10/1.0.0/synthetic-report-example.json",
+      "sha256": "9e7a9c2548e8bf668b8e1aea6d66b55d54c0b0fbf7ce493088f5ecc60a512748",
+      "noRescore": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_neo_c5_self_discipline10/1.0.0/synthetic-report-example.json",
+      "sha256": "6e6ff030943ee6b38019a39a5cd859073ec52c1353a606bc789623e2a5f028f3",
+      "noRescore": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_nfc10/1.0.0/synthetic-report-example.json",
+      "sha256": "f774c13cf0fdc61d00bd4cdef5be225475db24c7a5059952c3809a2e8f1c4b4a",
+      "noRescore": true
+    }
+  ],
+  "limits": "Not a live API, saved person, authorization or scoring execution; fields projected using current actual public serialization; component fixture is full-disclosure adult self shape.",
+  "reports": {
+    "ipip_neo_c1_self_efficacy10": {
+      "itemId": "synthetic-ipip_neo_c1_self_efficacy10",
+      "type": "SCALE",
+      "kind": "scale",
+      "reportKind": "full",
+      "scaleName": "一般任务自我效能感（IPIP-NEO C1 中文研究译稿）",
+      "scaleCode": "ipip_neo_c1_self_efficacy10_zh_cn_research",
+      "result": null,
+      "quality": {
+        "status": "interpretable",
+        "flags": []
+      },
+      "scores": [
+        {
+          "key": "ipip_neo_c1_self_efficacy10",
+          "label": "一般任务自我效能感",
+          "value": 30,
+          "type": "total",
+          "description": "一般任务自我效能感的自述；较高分表示相关信心更强，不代表客观能力或道德价值更高。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 0,
+          "range": {
+            "min": 10,
+            "max": 50
+          },
+          "expectedItems": [
+            "IPIP_NEO_C1_SELF_EFFICACY10_01",
+            "IPIP_NEO_C1_SELF_EFFICACY10_02",
+            "IPIP_NEO_C1_SELF_EFFICACY10_03",
+            "IPIP_NEO_C1_SELF_EFFICACY10_04",
+            "IPIP_NEO_C1_SELF_EFFICACY10_05",
+            "IPIP_NEO_C1_SELF_EFFICACY10_06",
+            "IPIP_NEO_C1_SELF_EFFICACY10_07",
+            "IPIP_NEO_C1_SELF_EFFICACY10_08",
+            "IPIP_NEO_C1_SELF_EFFICACY10_09",
+            "IPIP_NEO_C1_SELF_EFFICACY10_10"
+          ],
+          "answeredItems": [
+            "IPIP_NEO_C1_SELF_EFFICACY10_01",
+            "IPIP_NEO_C1_SELF_EFFICACY10_02",
+            "IPIP_NEO_C1_SELF_EFFICACY10_03",
+            "IPIP_NEO_C1_SELF_EFFICACY10_04",
+            "IPIP_NEO_C1_SELF_EFFICACY10_05",
+            "IPIP_NEO_C1_SELF_EFFICACY10_06",
+            "IPIP_NEO_C1_SELF_EFFICACY10_07",
+            "IPIP_NEO_C1_SELF_EFFICACY10_08",
+            "IPIP_NEO_C1_SELF_EFFICACY10_09",
+            "IPIP_NEO_C1_SELF_EFFICACY10_10"
+          ],
+          "status": "calculated",
+          "prorated": false
+        }
+      ],
+      "references": [],
+      "interpretations": [
+        {
+          "scoreKey": "ipip_neo_c1_self_efficacy10",
+          "headline": "任务自我效能：遇到事情时，你有多少把握",
+          "label": null,
+          "interpretation": "这一项关注你对完成任务、判断情况和寻找办法的信心。分数越高，表示这次更认可“我能处理好”的描述。开始一件熟悉的事和面对全新任务时，把握可能不同。信心与实际能力有关，但并不相等；这个分数也不评价个人价值。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "回想最近一次有把握完成的任务：信心来自经验、充分准备，还是知道可以向谁求助？"
+            },
+            {
+              "category": "strategy",
+              "text": "把一件想做的事拆出一个能开始的小步骤，并写下可能用到的信息或支持。做完后记录具体做法，给下一次留下可参考的经验。"
+            }
+          ],
+          "limitations": [
+            "这份中文研究译稿仍待专家审校和适用人群验证，目前只供成人研究和自我了解。",
+            "目前没有可靠依据划分高低或排名；信心不等于实际能力，也不代表个人价值。",
+            "这是IPIP的一项独立工具，并非完整人格评估；不能借用其他自我效能量表的分界。原英文研究的数据不能证明本中文版本已经验证。",
+            "10题都需完整回答；漏答不当作零分，也不代填。不用于诊断、学生筛选或教师考核。"
+          ],
+          "referenceVersion": null
+        }
+      ],
+      "caveats": [
+        "这份中文研究译稿仍待专家审校和适用人群验证，目前只供成人研究和自我了解。",
+        "目前没有可靠依据划分高低或排名；信心不等于实际能力，也不代表个人价值。",
+        "这是IPIP的一项独立工具，并非完整人格评估；不能借用其他自我效能量表的分界。原英文研究的数据不能证明本中文版本已经验证。",
+        "10题都需完整回答；漏答不当作零分，也不代填。不用于诊断、学生筛选或教师考核。",
+        "未提供群体参考。"
+      ],
+      "disclaimer": "仅供成人研究与描述性自我了解，不用于心理诊断、高风险选拔或个人价值判定。本工具是独立IPIP-NEO C1表征，非完整NEO人格评估。",
+      "method": {
+        "scaleId": "synthetic-local-only",
+        "instrumentVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "reportVersion": "1.0.1",
+        "definitionHash": "99c88b01aa596875b10b95a65aa43dc10c4c3ad73bdffdf0546e21d327b7ff2c",
+        "referenceVersions": [],
+        "assessmentContext": null
+      },
+      "completedAt": null,
+      "totalTime": null
+    },
+    "ipip_neo_c5_self_discipline10": {
+      "itemId": "synthetic-ipip_neo_c5_self_discipline10",
+      "type": "SCALE",
+      "kind": "scale",
+      "reportKind": "full",
+      "scaleName": "任务启动与自律（IPIP-NEO C5 中文研究译稿）",
+      "scaleCode": "ipip_neo_c5_self_discipline10_zh_cn_research",
+      "result": null,
+      "quality": {
+        "status": "interpretable",
+        "flags": []
+      },
+      "scores": [
+        {
+          "key": "task_self_discipline",
+          "label": "任务启动与执行习惯",
+          "value": 30,
+          "type": "total",
+          "description": "开始任务、准备和执行计划习惯的自我描述；不是道德评价或客观能力分数。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 0,
+          "range": {
+            "min": 10,
+            "max": 50
+          },
+          "expectedItems": [
+            "IPIP_NEO_C5_SELF_DISCIPLINE10_01",
+            "IPIP_NEO_C5_SELF_DISCIPLINE10_02",
+            "IPIP_NEO_C5_SELF_DISCIPLINE10_03",
+            "IPIP_NEO_C5_SELF_DISCIPLINE10_04",
+            "IPIP_NEO_C5_SELF_DISCIPLINE10_05",
+            "IPIP_NEO_C5_SELF_DISCIPLINE10_06",
+            "IPIP_NEO_C5_SELF_DISCIPLINE10_07",
+            "IPIP_NEO_C5_SELF_DISCIPLINE10_08",
+            "IPIP_NEO_C5_SELF_DISCIPLINE10_09",
+            "IPIP_NEO_C5_SELF_DISCIPLINE10_10"
+          ],
+          "answeredItems": [
+            "IPIP_NEO_C5_SELF_DISCIPLINE10_01",
+            "IPIP_NEO_C5_SELF_DISCIPLINE10_02",
+            "IPIP_NEO_C5_SELF_DISCIPLINE10_03",
+            "IPIP_NEO_C5_SELF_DISCIPLINE10_04",
+            "IPIP_NEO_C5_SELF_DISCIPLINE10_05",
+            "IPIP_NEO_C5_SELF_DISCIPLINE10_06",
+            "IPIP_NEO_C5_SELF_DISCIPLINE10_07",
+            "IPIP_NEO_C5_SELF_DISCIPLINE10_08",
+            "IPIP_NEO_C5_SELF_DISCIPLINE10_09",
+            "IPIP_NEO_C5_SELF_DISCIPLINE10_10"
+          ],
+          "status": "calculated",
+          "prorated": false
+        }
+      ],
+      "references": [],
+      "interpretations": [
+        {
+          "scoreKey": "task_self_discipline",
+          "headline": "从“想做”到“开始做”：你的日常节奏",
+          "label": null,
+          "interpretation": "这一项关注你怎样开始任务、做好准备并落实计划。分数越高，表示这次更认可容易开始、较少拖延的描述。比如，同样是整理资料，第一步清楚时可能很快动手，任务含糊或疲惫时则可能卡住。结果不能把你分成勤快或懒惰的人，也不能判断是否有注意力或执行功能方面的障碍；理解当时的任务和支持条件更有帮助。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "想一件最近容易开始的事和一件拖着没做的事：第一步是否清楚？材料、时间、体力或情绪有什么不同？"
+            },
+            {
+              "category": "strategy",
+              "text": "为眼前一件事写一个小到可以立即着手的动作，比如“打开文档，写下标题”，并提前放好所需材料。观察哪种安排更容易开始，不拿问卷分数责备自己。"
+            }
+          ],
+          "limitations": [
+            "这份中文研究译稿仍待人工审校和适用人群验证，目前只供成人研究和自我了解。",
+            "没有可靠依据划分高低或排名，也不能借用Grit、BSCS或其他工具的分界。",
+            "任务不清楚、疲劳、情绪和可用支持都可能影响回答；不能据此评价人品、努力程度或做临床诊断。",
+            "10题都需完整回答；漏答不当作零分，也不代填。不用于学生筛选、教师考核或重要选拔。"
+          ],
+          "referenceVersion": null
+        }
+      ],
+      "caveats": [
+        "这份中文研究译稿仍待人工审校和适用人群验证，目前只供成人研究和自我了解。",
+        "没有可靠依据划分高低或排名，也不能借用Grit、BSCS或其他工具的分界。",
+        "任务不清楚、疲劳、情绪和可用支持都可能影响回答；不能据此评价人品、努力程度或做临床诊断。",
+        "10题都需完整回答；漏答不当作零分，也不代填。不用于学生筛选、教师考核或重要选拔。",
+        "未提供群体参考。"
+      ],
+      "disclaimer": "仅供成人研究与描述性自我了解，不用于心理诊断、道德评价或高风险选择。本工具是独立IPIP-NEO C5公共领域表征，不是专有NEO-PI-R或完整人格评估。",
+      "method": {
+        "scaleId": "synthetic-local-only",
+        "instrumentVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "reportVersion": "1.0.0",
+        "definitionHash": "b1e223884fe39aae725ff26a363814f0c882f472c5862bce892d513c57d782be",
+        "referenceVersions": [],
+        "assessmentContext": null
+      },
+      "completedAt": null,
+      "totalTime": null
+    },
+    "ipip_nfc10": {
+      "itemId": "synthetic-ipip_nfc10",
+      "type": "SCALE",
+      "kind": "scale",
+      "reportKind": "full",
+      "scaleName": "认知需求（IPIP 10题表征版） — 中文研究工作译稿",
+      "scaleCode": "ipip_nfc10_zh_cn_research",
+      "result": null,
+      "quality": {
+        "status": "interpretable",
+        "flags": []
+      },
+      "scores": [
+        {
+          "key": "need_for_cognition",
+          "label": "认知需求",
+          "value": 30,
+          "type": "total",
+          "description": "本量表反映你对复杂思考、挑战性阅读以及理解信息的自我描述。得分较高表示你更倾向认可这些描述；它不是智力测验，也不能用来判断一个人聪不聪明。 回想最近一次愿意认真思考的问题：是兴趣、任务意义，还是足够的时间与支持帮助了你？可以选一项略有挑战但可完成的任务，记录尝试过程，而不只看是否答对。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 0,
+          "range": {
+            "min": 10,
+            "max": 50
+          },
+          "expectedItems": [
+            "IPIP_NFC10_01",
+            "IPIP_NFC10_02",
+            "IPIP_NFC10_03",
+            "IPIP_NFC10_04",
+            "IPIP_NFC10_05",
+            "IPIP_NFC10_06",
+            "IPIP_NFC10_07",
+            "IPIP_NFC10_08",
+            "IPIP_NFC10_09",
+            "IPIP_NFC10_10"
+          ],
+          "answeredItems": [
+            "IPIP_NFC10_01",
+            "IPIP_NFC10_02",
+            "IPIP_NFC10_03",
+            "IPIP_NFC10_04",
+            "IPIP_NFC10_05",
+            "IPIP_NFC10_06",
+            "IPIP_NFC10_07",
+            "IPIP_NFC10_08",
+            "IPIP_NFC10_09",
+            "IPIP_NFC10_10"
+          ],
+          "status": "calculated",
+          "prorated": false
+        }
+      ],
+      "references": [],
+      "interpretations": [
+        {
+          "scoreKey": "need_for_cognition",
+          "headline": "认知需求：什么会让你愿意多想一会儿",
+          "label": null,
+          "interpretation": "这一项关注你对复杂思考、挑战性阅读和理解信息的兴趣与自我感受。分数越高，表示这次更认可这些描述。比如，遇到一个有趣的问题时，有的人想追根究底，有的人更想先找到够用的答案。这里不评判谁更聪明，时间、疲劳和任务意义都值得一起考虑。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "回想一个让你自愿认真思考的问题：吸引你的是内容本身、解决问题的用途，还是找到答案的过程？"
+            },
+            {
+              "category": "strategy",
+              "text": "选一个你真正在意的小问题，先写下自己的猜想，再找一条支持或修正它的信息。把重点放在发现了什么，而不是答得多快。"
+            }
+          ],
+          "limitations": [
+            "这份中文研究译稿仍待专家审校和适用人群验证，目前只供成人研究和自我了解。",
+            "目前没有足够依据把这个中文版本的结果划分高低或与别人比较。",
+            "题目也涉及阅读习惯和对理解能力的自我感受；它不测智力，不能单凭结果判断学习动机或潜力。",
+            "10题都需完整回答；漏答不当作零分，也不代填。不用于诊断、学生筛选、考核或排名。"
+          ],
+          "referenceVersion": null
+        }
+      ],
+      "caveats": [
+        "这份中文研究译稿仍待专家审校和适用人群验证，目前只供成人研究和自我了解。",
+        "目前没有足够依据把这个中文版本的结果划分高低或与别人比较。",
+        "题目也涉及阅读习惯和对理解能力的自我感受；它不测智力，不能单凭结果判断学习动机或潜力。",
+        "10题都需完整回答；漏答不当作零分，也不代填。不用于诊断、学生筛选、考核或排名。",
+        "未提供群体参考。"
+      ],
+      "disclaimer": "仅供研究内容审查与描述性自我了解，不用于心理诊断、智力鉴定或高风险决策。公有领域不等于本译稿已经得到原作者认可。",
+      "method": {
+        "scaleId": "synthetic-local-only",
+        "instrumentVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "reportVersion": "1.0.1",
+        "definitionHash": "12d62646f9e28fb576a8aaa4f677b8c5ab2964c379a6d956fea1cbf13de384a3",
+        "referenceVersions": [],
+        "assessmentContext": null
+      },
+      "completedAt": null,
+      "totalTime": null
+    }
+  }
+}

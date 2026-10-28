@@ -1,0 +1,12 @@
+import React from 'react'
+import { createRoot } from 'react-dom/client'
+import ScaleUnitReportCard, { type SafeScaleUnitReport } from './src/modules/reporting/ScaleUnitReportCard'
+import './src/index.css'
+import data from '/@fs/workspace/eduK12-new-version/docs/scale-ipip-batch1-20261028/presentation/preview-data.json'
+const state = new URLSearchParams(location.search).get('state') || 'ipip_nfc10'
+const reports = data.reports as unknown as Record<string, SafeScaleUnitReport>
+createRoot(document.getElementById('root')!).render(<main style={{ maxWidth: 960, margin: '0 auto', padding: 16 }}>
+  <header style={{ marginBottom: 24 }}><h1 style={{ fontSize: 22, fontWeight: 700 }}>{reports[state].scaleName}</h1>
+    <p style={{ fontSize: 14, marginTop: 8, color: '#52667b' }}>合成报告 · 成人自我了解 · 仅用于组件呈现核对</p></header>
+  <ScaleUnitReportCard report={reports[state]} />
+</main>)

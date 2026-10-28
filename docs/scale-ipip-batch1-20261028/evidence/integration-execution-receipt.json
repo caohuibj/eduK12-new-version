@@ -1,0 +1,40 @@
+{
+  "argv": [
+    "/workspace/eduk12-cloud/tools/node_modules/.bin/node",
+    "node_modules/tsx/dist/cli.mjs",
+    "/tmp/ipip-isolated-business.ts"
+  ],
+  "cwd": "/workspace/eduK12-new-version/server-version/backend",
+  "database": "eduk12_ipip_0cd9fe6030",
+  "startedAt": "2026-10-28T02:03:46.122378+00:00",
+  "endedAt": "2026-10-28T02:03:48.851350+00:00",
+  "processExitCode": 0,
+  "node": {
+    "version": "v24.21.0",
+    "sha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c"
+  },
+  "inputs": {
+    "path": "integration.inputs.json.gz",
+    "count": 2932,
+    "sha256": "03dcaff46494b4a83642a65dc22cd94ba31d8258112f443499b9273e1039497e",
+    "uncompressedSHA256": "77a5393fece55a86305ee04403f22be89652cb9750087c68a078ffe1154db96c",
+    "beforeAfterIdentical": true
+  },
+  "harnessSHA256": "80d26b26ae4d781b82f503f4420115f207e034668c064e2790b9b3c255e98f82",
+  "logs": {
+    "stdout": {
+      "path": "integration.stdout.log",
+      "sha256": "2e32f8ed2c894bfcf03e6f067cb467c5d487e6991ec1de19999f4f8e989e085a",
+      "bytes": 1783
+    },
+    "stderr": {
+      "path": "integration.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  },
+  "limits": [
+    "No full dependency directory or process environment byte manifest; protected database credentials not logged.",
+    "Business API invocations have their own inputs/outcomes and before-after business snapshots in isolation-report.json."
+  ]
+}

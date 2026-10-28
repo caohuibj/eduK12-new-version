@@ -1,0 +1,13 @@
+import { createRequire } from 'node:module'
+import { readFileSync,writeFileSync } from 'node:fs'
+import { createHash } from 'node:crypto'
+const root='/workspace/eduK12-new-version',backend=root+'/server-version/backend',req=createRequire(backend+'/package.json')
+const {projectExternalScaleScores,projectExternalScaleMethod,projectExternalScaleQuality}=req(backend+'/src/modules/scale/projection/serialization.ts')
+const {parseScaleResultV2}=req(backend+'/src/modules/scale/scale-result.ts')
+const packages=JSON.parse(readFileSync(root+'/docs/scale-ipip-batch1-20261028/packages.json','utf8')),reports:any={},inputs:any=[]
+for(const p of packages){
+ const short=p.key.replace('_zh_cn_research',''),path='docs/scale-instruments/research-drafts/'+short+'/1.0.0/synthetic-report-example.json',bytes=readFileSync(root+'/'+path),result=parseScaleResultV2(JSON.parse(bytes.toString()))
+ reports[short]={itemId:'synthetic-'+short,type:'SCALE',kind:'scale',reportKind:'full',scaleName:result.instrument.name,scaleCode:result.instrument.code,result:null,quality:projectExternalScaleQuality(result.quality),scores:projectExternalScaleScores(result.scores),references:result.references,interpretations:result.interpretations,caveats:result.caveats,disclaimer:result.disclaimer,method:projectExternalScaleMethod(result.method),completedAt:null,totalTime:null}
+ inputs.push({path,sha256:createHash('sha256').update(bytes).digest('hex'),noRescore:true})
+}
+writeFileSync(root+'/docs/scale-ipip-batch1-20261028/presentation/preview-data.json',JSON.stringify({kind:'RETAINED_SYNTHETIC_REPORTS_PUBLIC_METADATA_COMPONENT_FIXTURE',inputs,limits:'Not a live API, saved person, authorization or scoring execution; fields projected using current actual public serialization; component fixture is full-disclosure adult self shape.',reports},null,2)+'\n')

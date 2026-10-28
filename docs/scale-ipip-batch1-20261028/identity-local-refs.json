@@ -1,0 +1,70 @@
+{
+  "scope": "Locally available origin refs, selected three identity paths only. Fixed PR328/362 heads re-read through authorized GitHub connector; candidate branch live remote b92 unchanged. Not a claim of every remote branch current inventory.",
+  "observedAt": "2026-10-28T02:05:06.476915+00:00",
+  "localRefs": 238,
+  "packages": [
+    {
+      "key": "ipip_neo_c1_self_efficacy10_zh_cn_research",
+      "path": "server-version/backend/src/modules/scale/instruments/ipip_neo_c1_self_efficacy10_zh_cn_research/1.0.0/source.json",
+      "distinctBlobs": [
+        {
+          "blob": "9c74ef87a6f1833264f553c0f08aa778ee4146a5",
+          "sha256": "22ddbb0f7d0a94240c21d56eb5a807306688158bb70a83a228a3857d565acac9",
+          "identity": {
+            "instrumentKey": "ipip_neo_c1_self_efficacy10_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "matches": [
+            {
+              "ref": "refs/remotes/origin/content/dot-local-scales-20261025",
+              "sha": "b92c69aefa2472775fa7ee86b9c208366886c908"
+            }
+          ],
+          "equalsFixedSource": true
+        }
+      ]
+    },
+    {
+      "key": "ipip_neo_c5_self_discipline10_zh_cn_research",
+      "path": "server-version/backend/src/modules/scale/instruments/ipip_neo_c5_self_discipline10_zh_cn_research/1.0.0/source.json",
+      "distinctBlobs": [
+        {
+          "blob": "916ca9491b04d6d8001d44ac1e9b9e09c6e87270",
+          "sha256": "7f3a2d36a86d3f2a8cd6a35991e35d1ac1bebbc9f9ebfbc87d54ea07a95c6bfa",
+          "identity": {
+            "instrumentKey": "ipip_neo_c5_self_discipline10_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "matches": [
+            {
+              "ref": "refs/remotes/origin/content/dot-local-scales-20261025",
+              "sha": "b92c69aefa2472775fa7ee86b9c208366886c908"
+            }
+          ],
+          "equalsFixedSource": true
+        }
+      ]
+    },
+    {
+      "key": "ipip_nfc10_zh_cn_research",
+      "path": "server-version/backend/src/modules/scale/instruments/ipip_nfc10_zh_cn_research/1.0.0/source.json",
+      "distinctBlobs": [
+        {
+          "blob": "bcfb7c053f7b7b565da35bde11e530174ef99d67",
+          "sha256": "fd6b9f4a40cd10729e339d01eacaa0c9b2a64ff13b9413856a888eeb7f59fb5f",
+          "identity": {
+            "instrumentKey": "ipip_nfc10_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "matches": [
+            {
+              "ref": "refs/remotes/origin/content/dot-local-scales-20261025",
+              "sha": "b92c69aefa2472775fa7ee86b9c208366886c908"
+            }
+          ],
+          "equalsFixedSource": true
+        }
+      ]
+    }
+  ]
+}
