@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
+import {gunzipSync} from 'node:zlib';
 import {execFileSync} from 'node:child_process';
 import {readFileSync,writeFileSync,mkdirSync} from 'node:fs';
 import {pathToFileURL} from 'node:url';
@@ -76,6 +77,14 @@ export function verifyReportPlanningObservation(observation,execution){
   // Observed timings are evidence, never a flaky CI performance threshold.
   return {products:['SCHOOL','TEACHER'],metricVerified:true,revocationVerified:true,pooledSettingRestored:true,ciExecuted:false};
 }
+export function verifyRunStartPlanningObservation(profile,validation,execution){
+ assert.equal(profile.completed,true);assert.equal(validation.completed,true);assert.equal(execution.exitCode,0);
+ assert.equal(profile.queries.length,7);assert.equal(validation.immutableFinalCountUnchanged,30);
+ assert.deepEqual(validation.cases.map(c=>c.name),['current authority and pooled setting restored','expired-intake remains denied and diagnostic mutation rolled back','frozen-actor remains denied and diagnostic mutation rolled back']);
+ assert(validation.cases.every(c=>c.status==='PASS'));const first=validation.cases[0];assert.equal(first.before.value,'8');assert.deepEqual(first.before,first.after);assert(Number.isInteger(first.before.pid));
+ for(const q of profile.queries){assert.match(q.hash,/^[a-f0-9]{64}$/);assert.deepEqual(q.plans.map(p=>p.joinCollapse),[8,1]);assert.equal(q.plans[0].actualRows,q.plans[1].actualRows);for(const p of q.plans)for(const key of ['planningMs','executionMs'])assert(Number.isFinite(p[key])&&p[key]>=0);}
+ return {scope:'Actual current-authority query plans plus same-PID setting restoration and rolled-back negative branches',selectedQueries:7,pooledSettingRestored:true,immutableFinalCountUnchanged:30,ciExecuted:false};
+}
 export function requireOnboardingOutcomes(needs){
   for(const key of ['scope','onboarding-structure','codeql'])assert.equal(needs[key]?.result,'success',key+' not successful');
 }
@@ -122,6 +131,9 @@ function admit(){
       originalObservationSHA256:record.sha256,originalExecutionSHA256:record.execution.sha256,
       sourceAssociationBasis:record.sourceAssociationBasis,limitations:record.limitations});
   }else assert(!review.reportPlanningObservations);
+  if(p.pr===377){
+    const record=review.runStartPlanning;assert(record?.sourceAssociationBasis);const profile=readOriginal(record.profile),compressed=readFileSync(safePath(record.fullProfile.path));assert.equal(hash(compressed),record.fullProfile.sha256);const full=gunzipSync(compressed);assert.equal(hash(full),profile.fullOriginalSHA256);const original=JSON.parse(full);assert.equal(original.completed,true);assert.deepEqual(profile.queries,original.queries.map(({sql,plans,...q})=>({...q,plans:plans.map(({plan,...p})=>p)})));observations.push(verifyRunStartPlanningObservation(profile,readOriginal(record.validation),readOriginal(record.execution)));
+  }else assert(!review.runStartPlanning);
   if(p.pr===374)observations.push(verifyPr374Observations(review.pr374));
   else assert(!review.pr374);
   mkdirSync('onboarding-evidence',{recursive:true});

@@ -1,0 +1,50 @@
+{
+  "comparison-r2.json": {
+    "bytes": 3423,
+    "sha256": "e16e21a40abe65433e6677c103c9f0d2dd71fad3792da147d3642b9846b28b5a"
+  },
+  "legacy-r1-execution.json": {
+    "bytes": 403,
+    "sha256": "7dc8b463197c9a1cc33db222fab215fad0803a5af7d8aa9d586586679a18b3b0"
+  },
+  "legacy-r1.json": {
+    "bytes": 717,
+    "sha256": "842746bf52234ae40b8104ec2208ab54bacd2094b7b517836a5a28f7b7f65693"
+  },
+  "legacy-r1.log": {
+    "bytes": 12389,
+    "sha256": "450e20163b492a353492ccef6f47d5d19bfe5712cbc8a0b039e2beb04b2ed71e"
+  },
+  "legacy-r2-execution.json": {
+    "bytes": 404,
+    "sha256": "3714874338a9a94603a10f1fb8f9ac182968df19bf16b16e2e612a60d739894e"
+  },
+  "legacy-r2.json": {
+    "bytes": 80027,
+    "sha256": "0c53721af1bbc8d8dea57c6191b0e7f4df7bd51c41ebd31b53383777a1ddf598"
+  },
+  "measure-lifecycle-r1.mts": {
+    "bytes": 8569,
+    "sha256": "bbfb249b462eb80caa5d7bfc08c5711045013d6e36c8eb216d3c9f66aa981b82"
+  },
+  "measure-lifecycle.mts": {
+    "bytes": 8605,
+    "sha256": "2444f718c3babef0a57ee0e6edb5996c8dc635fda7b9875234371ec6f13dcf52"
+  },
+  "run-lifecycle-r1.py": {
+    "bytes": 4821,
+    "sha256": "3327f3c137b9c088156f005386997241741ef94b5a2b931ea11bb688f59048e1"
+  },
+  "run-lifecycle-r2.py": {
+    "bytes": 4821,
+    "sha256": "6a9c76649db265c884650b43e91abf9a1e9a68e8ccc4d92eb71fc928d5f1d097"
+  },
+  "shared-compact-r2-execution.json": {
+    "bytes": 412,
+    "sha256": "6ca9e1eeb6f396275de90d23c651c655cebda6939b1a74db423d4fc018785d9a"
+  },
+  "shared-compact-r2.json": {
+    "bytes": 80105,
+    "sha256": "913ab27a46eca157b97dc1d80d9284746664479c61668054b26dbae21dff07f8"
+  }
+}

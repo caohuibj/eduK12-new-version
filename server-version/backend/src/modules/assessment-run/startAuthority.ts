@@ -190,6 +190,10 @@ export const assertCurrentRunStartAuthority = async (tx: Prisma.TransactionClien
   // A separate statement is essential here: statement_timestamp() is fixed at
   // the beginning of its statement, not the end of a lock wait. All authority
   // fences are now held; this is the time-window admission decision.
+  // Reuse the existing education-report planner bound for this exact-ID
+  // population gate. Transaction-local only; current authority and time checks
+  // remain fresh, and PostgreSQL restores the pooled setting on transaction end.
+  await tx.$executeRaw`SET LOCAL join_collapse_limit = 1`
   const windows = await tx.$queryRaw<Array<{ intakeOpen: boolean; accountsCurrent: boolean; populationCurrent: boolean }>>`
     SELECT ${currentRunPopulationAuthoritySql(Prisma.sql`e."id"`)} AS "populationCurrent", (r."intake_deadline" IS NULL OR r."intake_deadline" > statement_timestamp()) AS "intakeOpen",
       NOT EXISTS (

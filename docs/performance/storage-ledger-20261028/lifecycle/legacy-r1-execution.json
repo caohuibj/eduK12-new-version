@@ -1,0 +1,11 @@
+{
+  "exitCode": 1,
+  "seconds": 4.026456688996404,
+  "head": "ef04691f35a1420854f2b2c00b6f06da81eba351",
+  "postgres": "17.11",
+  "redis": "8.0.2",
+  "node": "v24.22.1",
+  "scope": "Actual synthetic Teacher SELF START/FINAL/report storage lifecycle; sequential mode comparison, not CI or browser",
+  "mode": "legacy",
+  "probeSHA256": "bbfb249b462eb80caa5d7bfc08c5711045013d6e36c8eb216d3c9f66aa981b82"
+}

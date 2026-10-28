@@ -1,0 +1,10 @@
+{
+  "evidence/observer-completed-ledger.json": {
+    "bytes": 17392,
+    "sha256": "74879b200c84942f33306840bab3a1829400b1906b7da0751237f5f4b1247c1d"
+  },
+  "read-existing-ledger.py": {
+    "bytes": 4565,
+    "sha256": "ee167a5dbf17860ce48fa235097e44f0878fd6b072a1a66af1ef1f456d08145c"
+  }
+}
