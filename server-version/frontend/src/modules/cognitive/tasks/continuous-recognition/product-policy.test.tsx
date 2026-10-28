@@ -14,9 +14,10 @@ describe('recognition descriptive product projection',()=>{
   expect(isNativeRecognitionProjection(r,{...bound,configHash:'d'.repeat(64)})).toBe(false)
  })
  it('renders HR/FAR/CRR and actual denominator, including signed negative difference',()=>{
-  const r=report();render(<RecognitionReport report={r}/>);expect(screen.getByText('本轮20张重复图片中，你认出了16张。')).toBeTruthy();expect(screen.getByText('80% · 16/20')).toBeTruthy();cleanup()
+  const r=report();render(<RecognitionReport report={r}/>);expect(screen.getByText('本轮纳入计分的20张目标重复图片中，你认出了16张。')).toBeTruthy();expect(screen.getByText('目标重复图片识别率')).toBeTruthy();expect(screen.getByText('80% · 16/20')).toBeTruthy();expect(screen.getByText(/填充图及其短间隔重复单独记录，不进入这两个分母/)).toBeTruthy();cleanup()
   r.targetHits=6;r.targetFalseAlarms=10;r.hitRate=.3;r.falseAlarmRate=.5;r.correctedRecognitionRate=-.2
   render(<RecognitionReport report={r}/>);expect(screen.getByText('-20 个百分点')).toBeTruthy();cleanup()
+  render(<RecognitionReport report={r} language="en"/>);expect(screen.getByText('Repeated target pictures identified')).toBeTruthy();expect(screen.getByText(/Filler pictures and their short-gap repeats are recorded separately and excluded from these two denominators/)).toBeTruthy();expect(screen.getByText('-20 percentage points')).toBeTruthy();cleanup()
  })
  it.each(['bad-rate','old-version','partial','missing-binding'])('does not expose inconsistent %s metrics',(kind)=>{
   const r=report();if(kind==='bad-rate')r.hitRate=.99;if(kind==='old-version')(r as any).scoringVersion='0.1.0';if(kind==='partial')r.completeTargetPairs=19;if(kind==='missing-binding')r.assetManifestHash=null
@@ -24,6 +25,6 @@ describe('recognition descriptive product projection',()=>{
  })
  it('limited/invalid retains null and hides performance without inventing zero',()=>{
   const r=report();r.state='limited';r.hitRate=null;r.falseAlarmRate=null;r.correctedRecognitionRate=null;r.targetHits=null;r.targetFalseAlarms=null;r.denominator=null;r.reasons=['incomplete-records']
-  expect(isNativeRecognitionProjection(r)).toBe(true);render(<RecognitionReport report={r}/>);expect(screen.queryByText('重复图片识别率')).toBeNull();cleanup()
+  expect(isNativeRecognitionProjection(r)).toBe(true);render(<RecognitionReport report={r}/>);expect(screen.queryByText('目标重复图片识别率')).toBeNull();cleanup()
  })
 })

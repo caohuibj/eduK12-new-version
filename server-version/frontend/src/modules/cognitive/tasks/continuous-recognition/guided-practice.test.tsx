@@ -87,6 +87,6 @@ describe('recognition guided participant component',()=>{
     const report:NativeReport={state:'interpretable',profile:'experience',reportVersion:'0.2.0',scoringVersion:'0.2.0',qualityRule:'product-session-descriptive-0.2.0',configHash:'a'.repeat(64),protocolSignature:'b'.repeat(64),assetManifestHash:'c'.repeat(64),hitRate:.8,falseAlarmRate:.25,correctedRecognitionRate:.55,targetHits:16,targetFalseAlarms:5,denominator:20,completeTargetPairs:20,plannedTargetPairs:20,receivedTrialCount:100,expectedTrialCount:100,reasons:[],canGenerateTakeHomeImage:false,logo:'EDUK12.TOP',interpretationScope:'this-session-descriptive-only'}
     const view=render(<RecognitionReport report={report} guidedPractice/>);expect(screen.getByText('实用版')).toBeTruthy();expect(screen.queryByText(/体验版记录/)).toBeNull()
     view.rerender(<RecognitionReport report={report}/>);expect(screen.getByText(/体验版记录/)).toBeTruthy()
-    view.rerender(<RecognitionReport report={{...report,state:'limited',hitRate:null,falseAlarmRate:null,correctedRecognitionRate:null,targetHits:null,targetFalseAlarms:null,denominator:null}} guidedPractice/>);expect(screen.queryByText('重复图片识别率')).toBeNull()
+    view.rerender(<RecognitionReport report={{...report,state:'limited',hitRate:null,falseAlarmRate:null,correctedRecognitionRate:null,targetHits:null,targetFalseAlarms:null,denominator:null}} guidedPractice/>);expect(screen.queryByText('目标重复图片识别率')).toBeNull()
   })
 })

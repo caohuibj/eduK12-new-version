@@ -1,0 +1,22 @@
+{
+  "node": "v24.21.0",
+  "kind": "ACTUAL_COMPONENT_STATIC_PREVIEW_NOT_ASSET_OR_BROWSER_QUALIFICATION",
+  "files": [
+    {
+      "file": "report-negative-zh.html",
+      "text": "  合成报告示例 · 非正式结果  这次，哪些图片让你觉得见过？  本轮纳入计分的20张目标重复图片中，你认出了6张。   目标重复图片识别率  30% · 6/20  目标图片首次出现时的误认率  50% · 10/20  识别率减误认率  -20 个百分点   这些数字只描述本轮图片识别，不代表你的日常记忆能力。  实用版  实用版测量次数较少，用于工作中的观察与交流时，请同时考虑该用途所需的精度与适用证据。  已记录呈现：100 / 100  下次可以把设备放稳、关闭通知，减少中断。   关于这份记录  两个比例使用同一组完整的目标图片配对；填充图及其短间隔重复单独记录，不进入这两个分母，练习另计。差值可以为负，不提供同龄排名、诊断或能力总分。   "
+    },
+    {
+      "file": "report-negative-en.html",
+      "text": "  Synthetic report example — not a formal result  Which pictures felt familiar this time?  Among the 20 repeated target pictures included in scoring, you identified 6.   Repeated target pictures identified  30% · 6/20  First-time target pictures marked Seen  50% · 10/20  Identification rate minus false-alarm rate  -20 percentage points   These are records from this run, not a rating of your everyday memory.  Practical version  The practical version has fewer observations. Consider the precision and evidence needed for your intended work use.  Recorded presentations：100 / 100  For next time, keep your device still and turn off notifications.   About this record  Both rates use the same complete target pairs. Filler pictures and their short-gap repeats are recorded separately and excluded from these two denominators. Practice is separate. The difference may be negative. No age ranking, diagnosis or overall ability score is provided.   "
+    },
+    {
+      "file": "report-limited-zh.html",
+      "text": "  合成报告示例 · 非正式结果  本次记录已保留  关键记录或图片条件尚不完整，因此这次不展示表现结论。这不代表你做得不好。  已记录呈现：32 / 100  下次可以把设备放稳、关闭通知，减少中断。   关于这份记录  两个比例使用同一组完整的目标图片配对；填充图及其短间隔重复单独记录，不进入这两个分母，练习另计。差值可以为负，不提供同龄排名、诊断或能力总分。   "
+    },
+    {
+      "file": "report-invalid-en.html",
+      "text": "  Synthetic report example — not a formal result  This record is not ready to interpret  Some key records or picture requirements are incomplete, so performance conclusions are hidden. This does not mean you performed poorly.  For next time, keep your device still and turn off notifications.   About this record  Both rates use the same complete target pairs. Filler pictures and their short-gap repeats are recorded separately and excluded from these two denominators. Practice is separate. The difference may be negative. No age ranking, diagnosis or overall ability score is provided.   "
+    }
+  ]
+}

@@ -1,0 +1,93 @@
+{
+  "node": "v24.21.0",
+  "base": "a67f425269283d8281379fdf8234f9fd6b0acebc",
+  "checks": [
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/continuous-recognition/native.ts",
+      "priorSHA256": "3c3a7a83a5b4987b2bdb1c307d0db2524756c98d324dd794e94ec6ba7f05efac",
+      "currentSHA256": "3c3a7a83a5b4987b2bdb1c307d0db2524756c98d324dd794e94ec6ba7f05efac",
+      "identical": true
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/continuous-recognition/practice.ts",
+      "priorSHA256": "7bfd58de5c55f1e0d3242c75c8d300ff4fd0c9055709808d08be0b472c79a0bb",
+      "currentSHA256": "7bfd58de5c55f1e0d3242c75c8d300ff4fd0c9055709808d08be0b472c79a0bb",
+      "identical": true
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/RecognitionGuidedInstructions.tsx",
+      "priorSHA256": "cf52cb4f42303c5900808e12351544b312f554625119903a6b244c0a9cac9feb",
+      "currentSHA256": "c5641fffb67311dd35aa3a4edb2acf6a2cea5fa7edbb8de4be57707b5a454993",
+      "identical": false
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/assets.ts",
+      "priorSHA256": "c53a3ff75770d1a5b2f41227a0c54a596bf12c6c64c23ac5677bfa41576759f4",
+      "currentSHA256": "c53a3ff75770d1a5b2f41227a0c54a596bf12c6c64c23ac5677bfa41576759f4",
+      "identical": true
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/capture.ts",
+      "priorSHA256": "f53ec7bb9709379d0d794733990fde91279f10525e6403bac957dcf7fe7644bf",
+      "currentSHA256": "f53ec7bb9709379d0d794733990fde91279f10525e6403bac957dcf7fe7644bf",
+      "identical": true
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/contracts.ts",
+      "priorSHA256": "e06469ce9b3f8b6a3330c5aa944d48f117fd7c49f3d08009894f254f56c402d4",
+      "currentSHA256": "e06469ce9b3f8b6a3330c5aa944d48f117fd7c49f3d08009894f254f56c402d4",
+      "identical": true
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/generated/practice.ts",
+      "priorSHA256": "a2a7b9ec6f92d8ba6ca6f27e5dce041293edc7cb04ebbd4574fa44e985220cc5",
+      "currentSHA256": "a2a7b9ec6f92d8ba6ca6f27e5dce041293edc7cb04ebbd4574fa44e985220cc5",
+      "identical": true
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/session.ts",
+      "priorSHA256": "6612e6ddca969813513938babee996da1f6e46d6c544eeeffc5a8e7b20e0ef58",
+      "currentSHA256": "6612e6ddca969813513938babee996da1f6e46d6c544eeeffc5a8e7b20e0ef58",
+      "identical": true
+    }
+  ],
+  "originals": [
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/guided-practice-20261027/backend-original.json",
+      "sha256": "66a68516d56044364e730261b21534a08457bebbefaa49db08b28a904bf8c2d4"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/guided-practice-20261027/backend-corrected-cases.json",
+      "sha256": "caa1a7117ab79ac9e41183388482463a3ded0def76fc57c95fbe22b35a71d564"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/guided-practice-20261027/frontend-original.json",
+      "sha256": "e83582e0d2a701c3b3211c683a8b6b54d52d4a6cdad1a412e6cd001f882c01ec"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/vitest.json",
+      "sha256": "0bcac8822cd2f9e20aeabb44b025686c98c9ccc24eb4e68b957ab6757a89ab6e"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/receipt-vitest.json",
+      "sha256": "2a47aff4be7643d13c76bff2164459459148a17d735d59e1615f98010bf5679a"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/lifecycle-vitest.json",
+      "sha256": "51d5aa3aa7d87b489cf25d5905973ca50783153a3694eb3ec6c868b8d4348db3"
+    }
+  ],
+  "scope": "Only report wording and corresponding assertions changed. Existing full-sequence/practice/persistence and mathematical contracts are reused for unchanged sources; no complete 100/260 replay, real image loading, installation or native-host qualification.",
+  "laterInstructionEvidence": {
+    "file": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/instruction-review.json",
+    "sha256": "4ab1b8da1e0b6c796437cc7b998a2468fc14b856b384a071783c81427196d2c3",
+    "reason": "The earlier guided teaching hash predates the existing completion/save-confirmation paragraph. Current instruction bytes match the later batch-2 evidence.",
+    "sources": [
+      {
+        "file": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/RecognitionGuidedInstructions.tsx",
+        "sha256": "c5641fffb67311dd35aa3a4edb2acf6a2cea5fa7edbb8de4be57707b5a454993",
+        "currentSHA256": "c5641fffb67311dd35aa3a4edb2acf6a2cea5fa7edbb8de4be57707b5a454993"
+      }
+    ]
+  }
+}

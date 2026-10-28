@@ -1,0 +1,28 @@
+{
+  "success": true,
+  "node": "v24.21.0",
+  "prefixLength": 32,
+  "cases": [
+    {
+      "name": "negative-same-pair-denominator",
+      "pairs": 3,
+      "hits": 1,
+      "firstFalseAlarms": 3,
+      "hitRate": 0.3333333333333333,
+      "falseAlarmRate": 1,
+      "difference": -0.6666666666666667,
+      "publicState": "limited"
+    },
+    {
+      "name": "last-repeat-interrupted",
+      "pairs": 2,
+      "hits": 1,
+      "firstFalseAlarms": 2,
+      "hitRate": 0.5,
+      "falseAlarmRate": 1,
+      "difference": -0.5,
+      "publicState": "limited"
+    }
+  ],
+  "coarseBoundaryPreserved": true
+}
