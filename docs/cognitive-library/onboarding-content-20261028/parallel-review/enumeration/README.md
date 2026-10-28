@@ -51,3 +51,34 @@ node_modules/vitest/vitest.mjs run src/modules/cognitive/tasks/enumeration/nativ
 首响应、mask/实际客户端呈现、数字确认、epoch/context及完整原件消费者已独立读过；capture/display/persistence/native-port原件格式和哈希方案未变。报告只走既有白名单public projector，三态保持，未新增图表/下载或直接展示research map。
 
 无CI/Ready/push/merge/deploy、数据库或安全设置动作。正式库状态/运行资格/最终独立审核由root处理；无本地denied/pending/uncertain阻塞。
+
+## 未完成练习沿既定暂停策略结束，并重呈完整说明
+
+既有协议没有练习正确率门槛：3/4/5各一次，错答只对照实际点数与报告数。现有设计已明确visibility/blur/viewport/卸载等中断结束同attempt。本批未新增正确门槛、额外练习或缩短/延长曝光。
+
+发现Canvas上下文不可用的完成分支仅保存interrupted原件，没有调用endAttempt，反馈层仍允许显式重试；capture因有界缓冲终止的其他非confirmed分支也会经同一路径遗漏结束。修复在统一finish入口对非confirmed原件调用既有endAttempt，继续保存完整原件，禁用当前attempt再曝光；已调用结束的visibility等路径保持幂等。确认完成的错答不被当作技术中断。
+
+完整中英说明抽到本工具单一EnumerationInstructions：保留原规则，补3点/4点的具体操作例子、等待mask结束、随机初值/确认前调整、完成正式后等待提交确认、失败只重试原记录。时长只取既有package的research6–12/experience2–5分钟设计范围，不称实测。首次说明、错答反馈和未完成反馈复用同一正文；未完成attempt依然停止，显示说明不授予重新曝光权限。
+
+指定Node24.21.0、frontend cwd：
+
+```
+node_modules/vitest/vitest.mjs run src/modules/cognitive/tasks/enumeration/incomplete-practice.test.tsx --reporter=json --outputFile=../../docs/cognitive-library/onboarding-content-20261028/parallel-review/enumeration/incomplete-practice-before.json
+```
+
+首轮退出1，中英两项均失败，原endAttempt调用0次；修复后同两项改outputFile为 `incomplete-practice-after.json`，退出0、2通过。只触发无Canvas的单条练习预约/中断保存，不重跑完整流程。随后新增“错答仍确认完成、重呈说明后推进下一练习”的单独病例，只用 `-t 'confirmed wrong'`执行新增1项，退出0、旧2项过滤，原件 `wrong-practice.*`；没有重新声称整文件3项在末次一起执行。
+
+既有真实组件visibility中断病例受finish入口影响，只复查 `enumeration-candidate.test.tsx -t 'does not score an interrupted practice'`，退出0、1通过/16过滤，原件 `existing-interruption.*`。其余同输入已完成检查复用，不执行完整3+25或全套计时/计分。
+
+局部直接类型检查（根目录、指定Node24.21.0）：
+
+```
+docs/cognitive-library/onboarding-content-20261028/parallel-review/enumeration/check-types.cjs backend
+docs/cognitive-library/onboarding-content-20261028/parallel-review/enumeration/check-types.cjs frontend
+```
+
+两端均退出0、零诊断，分别48／78份源码。实际roots、传递源码摘要及stdout/exit见 `backend-types.*` / `frontend-types.*`。
+
+仅对变动的教学组件截图：根目录指定Node执行 `docs/cognitive-library/onboarding-content-20261028/parallel-review/enumeration/preview-instructions.cjs`，退出0、两张成功，无横向溢出或pageerror。浏览器沿既有获批外层执行路线、Chromium自身sandbox=true、仅localhost；无安全设置变化。亲看[中文手机](screens/instructions-zh-phone.png)及[英文200%](screens/instructions-en-200pct.png)，均标注合成教学预览/未发布。CSS zoom2不代表原生设备等效；没有把说明截图说成新施测、校准或完整反馈旅程证据。
+
+输入摘要在 `execution-inputs.json`，为检查后记录。所有原失败和退出保留；这两项工程纠错与教学补全没有重写历史结果或冻结原件。

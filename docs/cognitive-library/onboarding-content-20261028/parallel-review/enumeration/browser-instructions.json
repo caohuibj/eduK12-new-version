@@ -1,0 +1,39 @@
+{
+  "componentPreviewOnly": true,
+  "sandbox": true,
+  "cssZoomNotDeviceEquivalence": true,
+  "results": [
+    {
+      "name": "instructions-zh-phone",
+      "lang": "zh",
+      "width": 390,
+      "height": 844,
+      "zoom": 1,
+      "layout": {
+        "scrollWidth": 390,
+        "viewport": 390,
+        "body": "SYNTHETIC TEACHING PREVIEW / 合成教学预览 · 未发布\n\n刚才有几个点？\n\n请注视画面中央。白色圆点会在中灰背景上短暂出现，随后画面变成黑白纹理。请报告刚才看到的点数。\n\n等黑白纹理消失、滑杆可以操作后，拖动1–15整数滑杆，再点击一次确认。每轮初值随机变化，它不是答案提示；确认前可以调整。\n\n例1：刚才看到3个点，就把滑杆调到3，再确认。\n\n例2：滑杆初值是8，但你看到4个点，应先调到4再确认，不能把初值当答案。\n\n先完成3次独立练习，对照实际点数与自己的报告数。本次体验版共25轮正式作答，正式阶段不提示对错。\n\n现有设计估计2–5分钟，这是规划范围，不是实测或答题截止。\n\n键盘操作与屏幕设置\n\n完成25轮正式作答后，等待提交成功的确认，练习另计。保存尚未确认时，请保留本页并重试保存同一份记录，不重新呈现点阵。\n\n仅供内部审阅，暂不用于正式施测；仅描述本次作答，物理时序与人群效度尚未验证。"
+      },
+      "sha256": "b689ac164b91c7b05d95bfa70c0699e20c25512acdc974d998efbbf45299fffc",
+      "file": "docs/cognitive-library/onboarding-content-20261028/parallel-review/enumeration/screens/instructions-zh-phone.png",
+      "success": true
+    },
+    {
+      "name": "instructions-en-200pct",
+      "lang": "en",
+      "width": 780,
+      "height": 1000,
+      "zoom": 2,
+      "layout": {
+        "scrollWidth": 390,
+        "viewport": 780,
+        "body": "SYNTHETIC TEACHING PREVIEW / 合成教学预览 · 未发布\n\nHow many dots did you see?\n\nKeep looking at the centre. White dots briefly appear on a mid-grey background, followed by a black-and-white pattern. Report how many dots you saw.\n\nWait for the pattern to disappear and the slider to become available. Use the integer slider from 1 to 15, then confirm once. Its initial value changes each trial; it is not a hint. You can adjust before confirming.\n\nExample 1: you saw 3 dots. Set the slider to 3 and confirm.\n\nExample 2: the slider starts at 8, but you saw 4 dots. Change it to 4 before confirming. The starting number is not the answer.\n\nFirst complete 3 separate practice trials and compare the actual dot count with your report. The practical version has 25 formal trials without correctness feedback.\n\nThe existing design estimate is 2–5 minutes. This is a planning range, not a measured time limit.\n\nKeyboard and screen setup\n\nFinish all 25 formal trials, then wait for submission confirmation. Practice is separate. If saving is not confirmed, keep this page open and retry saving the same records; do not replay the dots.\n\nThis version is for internal review only, not formal assessment. It describes this attempt only; physical timing and population validity are unverified."
+      },
+      "sha256": "4dd576feddb3b6f6b5a013da6bc454fd973c4c6d535215c39bb615c7b25d4244",
+      "file": "docs/cognitive-library/onboarding-content-20261028/parallel-review/enumeration/screens/instructions-en-200pct.png",
+      "success": true
+    }
+  ],
+  "errors": [],
+  "success": true
+}

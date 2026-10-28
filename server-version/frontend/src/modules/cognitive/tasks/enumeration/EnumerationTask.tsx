@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { type EnumerationInput } from './generated/protocol'
 import type { EnumerationPublicResult, EnumerationStoredSnapshot } from './generated/report'
 import { EnumerationReport } from './EnumerationReport'
+import { EnumerationInstructions } from './EnumerationInstructions'
 import { enumerationArtifact, enumerationDigest, enumerationGeometry, enumerationStartBlock,
   readEnumerationViewport, validateEnumerationContext, enumerationContextPlan, type EnumerationContext } from './display'
 import { EnumerationCapture, drawEnumerationFrame, type EnumerationRecord, type EnumerationStage } from './capture'
@@ -117,7 +118,11 @@ function EnumerationSession({ context: incoming, persistence: incomingPort, resu
     } finally { busy.current = false }
   }
   const finish = useRef<(value: EnumerationCapture) => void>(() => {})
-  finish.current = value => { if (!busy.current && alive.current) void saveRecord(value.record()) }
+  finish.current = value => { if (!busy.current && alive.current) {
+    const record=value.record()
+    if(record.raw.completion!=='confirmed'){gate.current?.end('capture_incomplete');setBlock('attempt_ended')}
+    void saveRecord(record)
+  } }
   async function start() {
     if (busy.current || !alive.current) return
     const reason = readBlock(); setBlock(reason)
@@ -183,13 +188,7 @@ function EnumerationSession({ context: incoming, persistence: incomingPort, resu
     onKeyDownCapture={event => { if (['Enter', ' ', 'ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) premature('keyboard') }}>
     <div className="enum-badge">{synthetic ? (en ? 'Actual interface · Synthetic setup · Internal review only' : '实际界面 · 合成设置演示 · 仅供内部审阅')
       : (en ? 'Internal review version · Not for formal use' : '内部审阅版 · 暂不用于正式施测')}</div>
-    {view === 'intro' && <section className="enum-reading"><h1>{en ? 'How many dots did you see?' : '刚才有几个点？'}</h1>
-      <p>{en ? 'Keep looking at the centre. White dots briefly appear on a mid-grey background, followed by a black-and-white pattern. Report how many dots you saw.' : '请注视画面中央。白色圆点会在中灰背景上短暂出现，随后画面变成黑白纹理。请报告刚才看到的点数。'}</p>
-      <p>{en ? 'Use the integer slider from 1 to 15, then confirm. Its initial value changes each trial; it is not a hint.' : '拖动1–15整数滑杆，再点击确认。每轮初值随机变化，它不是答案提示。'}</p>
-      <p>{en ? `First complete 3 practice trials. This ${context.config.profile} version has ${context.config.totalTrials} assessment trials. You will not receive correctness feedback during the assessment.`
-        : `先完成3次练习。本次${formal ? '测验' : context.config.profile === 'research' ? '文献对照版' : '体验版'}共${context.config.totalTrials}轮作答，作答阶段不提示对错。`}</p>
-      <details><summary>{en ? 'Keyboard and screen setup' : '键盘操作与屏幕设置'}</summary><p>{en ? 'Arrow keys adjust the slider; Home and End select 1 and 15. Tab to Confirm and press Enter or Space. Keep the screen and viewing distance consistent with your setup. This internal review version still needs further validation.' : '方向键调整滑杆，Home/End选择1/15；Tab切到确认后按回车或空格。请保持设置时的屏幕和观看距离。本内部审阅版仍待进一步验证。'}</p></details>
-      <p className="enum-notice">{en ? 'This version is for internal review only, not formal assessment. It describes this attempt only; physical timing and population validity are unverified.' : '仅供内部审阅，暂不用于正式施测；仅描述本次作答，物理时序与人群效度尚未验证。'}</p>
+    {view === 'intro' && <section className="enum-reading"><EnumerationInstructions en={en} config={context.config}/>
       <div className="enum-actions"><button onClick={() => setView('ready')}>{en ? 'Review readiness' : '查看准备状态'}</button></div></section>}
     {view === 'ready' && <section className="enum-reading"><h1>{formal ? ((formalIndex > 0 && formalIndex % 25 === 0) ? (en ? 'Take a short break' : '休息一下') : (en ? 'Ready for the next trial' : '准备开始下一轮')) : (en ? 'Try the practice' : '先来练习')}</h1>
       <p>{formal ? `${formalIndex + 1} / ${context.config.totalTrials}` : `${practiceIndex + 1} / 3`}</p>
@@ -213,6 +212,7 @@ function EnumerationSession({ context: incoming, persistence: incomingPort, resu
     {view === 'feedback' && <section className="enum-reading"><h1>{en ? 'Practice record' : '练习记录'}</h1>
       {practiceConfirmed ? <p>{en ? `There were ${lastPractice!.core.plan.targetValue} dots. You reported ${lastPractice!.core.responseValue}.` : `刚才有${lastPractice!.core.plan.targetValue}个点，你报告了${lastPractice!.core.responseValue}个。`}</p>
         : <p>{en ? 'This practice was interrupted. No correctness judgment is given.' : '这轮练习中断了，不判断对错，也不算作已完成练习。'}</p>}
+      {(!practiceConfirmed||lastPractice!.core.responseValue!==lastPractice!.core.plan.targetValue)&&<EnumerationInstructions en={en} config={context.config} headingLevel={2}/>}
       <div className="enum-actions"><button disabled={practiceRepeat >= 11 || gate.current?.attemptEnded} onClick={() => {
         if (!practiceConfirmed) { setPracticeRepeat(value => value + 1); setView('ready') }
         else if (practiceIndex < 2) { setPracticeIndex(value => value + 1); setPracticeRepeat(0); setView('ready') }
