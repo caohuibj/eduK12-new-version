@@ -1,0 +1,134 @@
+{
+  "schemaVersion": 1,
+  "sourceSHA": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "sourceKey": "sswq16_zh_cn_research",
+  "originalVersion": "1.0.0",
+  "preparedVersion": "1.0.1",
+  "originalSource": "server-version/backend/src/modules/scale/instruments/sswq16_zh_cn_research/1.0.0/source.json",
+  "preparedSource": "server-version/backend/src/modules/scale/instruments/sswq16_zh_cn_research/1.0.1/source.json",
+  "originalSourceSHA256": "cf23dcb15ece5b40af0d58e48d9c43edac0d9eea8058dcd35b343636820b66b7",
+  "preparedSourceSHA256": "d4256b5c0c3de791b85cd24c6392d99ce998705c1f4926ca39508d45f905a675",
+  "originalFiles": [
+    {
+      "path": "docs/scale-instruments/research-drafts/sswq16/1.0.0/README.md",
+      "blob": "f5e389f1a09901ac523bbfec3ac6a5762461ba63",
+      "sha256": "268fc16a4083f0c9aaba16bb6df4e95a70c68fcb10c65205c541e7ea0871ff34"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/sswq16/1.0.0/bilingual-content.json",
+      "blob": "31a46bc3c8b345e456df70b5ce8538c1294c9d9a",
+      "sha256": "6b3b1ae64974e8cc5d12a91982b8c939f904b0dc27f8ae19e6f64a9c3223ec6c"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/sswq16/1.0.0/external-reference-dossier.json",
+      "blob": "c0e3b5dcfdc048c9d97911287c97feb47248ae72",
+      "sha256": "dd38edc797336288b4f8dc5a0c112894eb633de4df112745bd22b1f8f7dfe4c0"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/sswq16/1.0.0/local-validation.json",
+      "blob": "f457a505486500e75481ec987d76c5aff5370825",
+      "sha256": "4f0e8fa3a41127263ce0f34cc81a402ca8c29d636eee77e61f50608a929bf0e8"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/sswq16/1.0.0/references.md",
+      "blob": "3ee4504a1fab71d49a105ed92761ba24d71a333f",
+      "sha256": "2f9659cf239a35aec1055f2d8200703092e1b331090c82d260a971a368d5d9cb"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/sswq16/1.0.0/report-example.md",
+      "blob": "09ae2bcf03bef1049508908a38c8d54d12298654",
+      "sha256": "61ab6c4caa2e2450cbabe7912051bbe15fc4357e2b126dc681ffba4fbb424be6"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/sswq16/1.0.0/reviewed-source-pack.json",
+      "blob": "9126c63ef7eb4f58116e57e4eea4b73561efd385",
+      "sha256": "b25f19387163e7835370ec49c3bcf960b982942d15d55891a5c6abe040bb3f57"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/sswq16/1.0.0/scoring-and-thresholds.md",
+      "blob": "e7be168b9c8a43ad0985c3a87762ef8f4674f745",
+      "sha256": "f4cdf3fe63500d065b0b767c8e4e12f82e78a4287fd727e88d90eb43c24b343f"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/sswq16/1.0.0/synthetic-report-example.json",
+      "blob": "a59887db8ff913b93d789b8f18dc043d89522b4f",
+      "sha256": "335b8b84017fc82bbeca53bbac1025de6659d7d816e9928c8e0ecd42b5f72486"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/sswq16_zh_cn_research/1.0.0/instrument.ts",
+      "blob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/sswq16_zh_cn_research/1.0.0/source.json",
+      "blob": "b015e1ded86691216ad5d9e4825967fce3c5eff0",
+      "sha256": "cf23dcb15ece5b40af0d58e48d9c43edac0d9eea8058dcd35b343636820b66b7"
+    }
+  ],
+  "jsonChanges": [
+    {
+      "op": "remove",
+      "path": "/executable/definition/report/audienceContract/qcReview",
+      "from": {
+        "reviewer": "AI-assisted local editorial check (not human expert review)",
+        "reviewedAt": "2026-10-25T15:13:00Z",
+        "basis": "AI editorial check for student-readable, non-ranking and non-stigmatizing feedback, no objective ability claims; not human expert or localization validation."
+      }
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/interpretations/4/summary",
+      "from": "这一部分记录你对完成学习任务和课堂表现的看法，不是一次能力测验，也不能代替实际成绩、老师反馈或你付出的努力。比如，一次作业卡住，可能和题目难度、方法、时间或需要的帮助有关，并不说明你什么都做不好。回答越常肯定这些体验，表示最近你对自己的学习表现越有把握。把一个笼统的感觉拆成具体任务，更容易看见已经做到的部分和还需要的支持。",
+      "value": "这一部分记录你对完成学习任务和课堂表现的看法，不是一次能力测验，也不能代替实际成绩、老师反馈或你付出的努力。比如，一次作业卡住，可能和题目难度、方法、时间或需要的帮助有关，并不说明你什么都做不好。回答越常肯定这些体验，表示过去一个月你越常描述自己在学习任务和成绩方面表现良好。把一个笼统的感觉拆成具体任务，更容易看见已经做到的部分和还需要的支持。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/reportVersion",
+      "from": "1.0.0",
+      "value": "1.0.1"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/releaseStatus",
+      "from": "DRAFT",
+      "value": "PUBLISHED"
+    },
+    {
+      "op": "replace",
+      "path": "/identity/instrumentVersion",
+      "from": "1.0.0",
+      "value": "1.0.1"
+    },
+    {
+      "op": "add",
+      "path": "/instruction",
+      "value": {
+        "schemaVersion": 1,
+        "text": "下面的问题涉及你在学校的想法、感受和行为。请阅读每句话，选择最符合你过去一个月情况的答案。",
+        "language": "zh-CN",
+        "version": "1.0.0",
+        "source": "docs/scale-instruments/research-drafts/sswq16/1.0.0/bilingual-content.json#instructions @ b92c69aefa2472775fa7ee86b9c208366886c908 (项目工作稿；非人工审批声明)"
+      }
+    }
+  ],
+  "audit": "audits/audit-sswq16-batch3.json",
+  "patch": "patches/patch-sswq16-batch3.json",
+  "versions": {
+    "instrument": "1.0.1",
+    "scoring": "1.0.0",
+    "report": "1.0.1",
+    "localization": "1.0.0",
+    "instruction": "1.0.0"
+  },
+  "states": {
+    "sourceRelease": "PUBLISHED candidate; no database publication",
+    "catalog": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "translation": "PENDING",
+    "scientificReview": null,
+    "databaseInstall": "NOT_EXECUTED",
+    "databasePublish": "NOT_EXECUTED",
+    "production": "NOT_TOUCHED"
+  },
+  "versionReason": "Original source identities are retained byte-for-byte. New item clarification/metadata/report/administration wording is explicit; formulas, anchors, directions, parameter data and scoringVersion are unchanged. Old report editorial timestamp is not reused as approval of revised wording."
+}

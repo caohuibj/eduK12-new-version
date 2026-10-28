@@ -1,0 +1,107 @@
+{
+  "activationStatus": "EXTERNAL_EVIDENCE_ONLY_NOT_BOUND",
+  "runtimeSelected": false,
+  "originalValidation": {
+    "original": {
+      "reference": "Renshaw TL, Long ACJ, Cook CR. (2015). Assessing adolescents’ positive psychological functioning at school: Development and validation of the Student Subjective Wellbeing Questionnaire. School Psychology Quarterly,30(4),534–552.",
+      "doi": "10.1037/spq0000088",
+      "population": "1002 students in Grades6–8",
+      "source": "https://doi.org/10.1037/spq0000088",
+      "verified": "Author-linked publisher preview abstract; online-first2014, issue2015"
+    },
+    "chinese": "No validated Chinese item wording or local norm verified in this sourcepack. Independent draft must not be represented as validated. CSSWQ Chinese university evidence is a DIFFERENT scale and cannot be attached here."
+  },
+  "scoring": {
+    "reverse_keys": [],
+    "subscales": [
+      {
+        "id": "JL",
+        "name": "学习乐趣",
+        "items": [
+          1,
+          5,
+          9,
+          13
+        ]
+      },
+      {
+        "id": "SC",
+        "name": "学校归属",
+        "items": [
+          2,
+          6,
+          10,
+          14
+        ]
+      },
+      {
+        "id": "EP",
+        "name": "学习意义",
+        "items": [
+          3,
+          7,
+          11,
+          15
+        ]
+      },
+      {
+        "id": "AE",
+        "name": "学习表现体验",
+        "items": [
+          4,
+          8,
+          12,
+          16
+        ]
+      }
+    ],
+    "subscale_sum_range": [
+      4,
+      16
+    ],
+    "total_sum_range": [
+      16,
+      64
+    ],
+    "total": "sum of all16 responses",
+    "mean_range": [
+      1,
+      4
+    ],
+    "mean": "sum divided by number of items; 4 for each subscale,16 for total",
+    "missing": "Require all16 for report; no imputation. Conservative implementation rule, not validated author missingness algorithm."
+  },
+  "interpretation": {
+    "diagnostic_cutoffs": [],
+    "population_norms_enabled": false,
+    "guide_evidence": "2020 guide explicitly reports no large-scale normative data; recommends local norming. It supports response-anchor interpretation: subscale8/4=2 means sometimes; total56/16=3.5 means often to almost always.",
+    "anchor_logic": [
+      {
+        "exact_mean": 1,
+        "label": "几乎从不"
+      },
+      {
+        "exact_mean": 2,
+        "label": "有时"
+      },
+      {
+        "exact_mean": 3,
+        "label": "经常"
+      },
+      {
+        "exact_mean": 4,
+        "label": "几乎总是"
+      }
+    ],
+    "between_anchors": "Report between adjacent response anchors without rounding to a new severity category; e.g. 2.5 means 在“有时”和“经常”之间. These are descriptive response frequencies, not empirical clinical thresholds.",
+    "do_not_use": [
+      "全国百分位",
+      "低中高风险标签",
+      "将学校幸福感等同于没有心理困扰",
+      "把学习表现体验作为客观能力或成绩评判"
+    ]
+  },
+  "sourceEdition": "2020-03-22",
+  "current2025DownloadBytesVerified": false,
+  "currentTranslationValidated": false
+}

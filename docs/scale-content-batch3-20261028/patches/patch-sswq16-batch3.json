@@ -1,0 +1,45 @@
+{
+  "format": "reviewable-json-patch-proposal",
+  "source_commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "source": {
+    "path": "server-version/backend/src/modules/scale/instruments/sswq16_zh_cn_research/1.0.0/source.json",
+    "blob": "b015e1ded86691216ad5d9e4825967fce3c5eff0",
+    "sha256": "cf23dcb15ece5b40af0d58e48d9c43edac0d9eea8058dcd35b343636820b66b7"
+  },
+  "audit": "/tmp/audit-sswq16-batch3.json",
+  "preconditions": "固定源AE scoreKey及原summary须完全匹配；保留已有报告快照。",
+  "operations": [
+    {
+      "op": "test",
+      "path": "/executable/definition/report/interpretations/4/scoreKey",
+      "value": "AE"
+    },
+    {
+      "op": "test",
+      "path": "/executable/definition/report/interpretations/4/summary",
+      "value": "这一部分记录你对完成学习任务和课堂表现的看法，不是一次能力测验，也不能代替实际成绩、老师反馈或你付出的努力。比如，一次作业卡住，可能和题目难度、方法、时间或需要的帮助有关，并不说明你什么都做不好。回答越常肯定这些体验，表示最近你对自己的学习表现越有把握。把一个笼统的感觉拆成具体任务，更容易看见已经做到的部分和还需要的支持。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/interpretations/4/summary",
+      "value": "这一部分记录你对完成学习任务和课堂表现的看法，不是一次能力测验，也不能代替实际成绩、老师反馈或你付出的努力。比如，一次作业卡住，可能和题目难度、方法、时间或需要的帮助有关，并不说明你什么都做不好。回答越常肯定这些体验，表示过去一个月你越常描述自己在学习任务和成绩方面表现良好。把一个笼统的感觉拆成具体任务，更容易看见已经做到的部分和还需要的支持。"
+    }
+  ],
+  "changes": [
+    {
+      "scoreKey": "AE",
+      "path": "/executable/definition/report/interpretations/4/summary",
+      "old": "这一部分记录你对完成学习任务和课堂表现的看法，不是一次能力测验，也不能代替实际成绩、老师反馈或你付出的努力。比如，一次作业卡住，可能和题目难度、方法、时间或需要的帮助有关，并不说明你什么都做不好。回答越常肯定这些体验，表示最近你对自己的学习表现越有把握。把一个笼统的感觉拆成具体任务，更容易看见已经做到的部分和还需要的支持。",
+      "new": "这一部分记录你对完成学习任务和课堂表现的看法，不是一次能力测验，也不能代替实际成绩、老师反馈或你付出的努力。比如，一次作业卡住，可能和题目难度、方法、时间或需要的帮助有关，并不说明你什么都做不好。回答越常肯定这些体验，表示过去一个月你越常描述自己在学习任务和成绩方面表现良好。把一个笼统的感觉拆成具体任务，更容易看见已经做到的部分和还需要的支持。",
+      "reason": "将“越有把握”的能力信心推断改成过去一个月对任务和成绩表现的频率自述。"
+    }
+  ],
+  "version_impact": {
+    "report": "原reportVersion 1.0.0；使用独立新报告版本并保留原快照，具体版本由root核定，本补丁不硬编码。",
+    "measurement": "仅报告summary变更，题项、响应、计分及versionAxes不变，measurement hash不变。",
+    "scope": "6–8年级、过去一个月、计分及缺失/阈值全部不变；第4/8/9/16题不改。"
+  },
+  "not_executed": [
+    "未写仓库、DB、CI或分支，未运行测试/系统。"
+  ]
+}

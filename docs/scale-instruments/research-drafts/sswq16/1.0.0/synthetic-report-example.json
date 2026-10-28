@@ -1,0 +1,414 @@
+{
+  "schemaVersion": 2,
+  "instrument": {
+    "scaleId": "synthetic-local-only",
+    "code": "sswq16_zh_cn_research",
+    "name": "学生学校幸福感问卷（SSWQ16 中文研究译稿）",
+    "instrumentVersion": "1.0.0"
+  },
+  "method": {
+    "scaleId": "synthetic-local-only",
+    "instrumentVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "reportVersion": "1.0.0",
+    "reportAudience": "student",
+    "localizationVersion": "1.0.0",
+    "definitionHash": "651b20917021d8cbb0ad46bcd15d943671b4fb338ddeb4fcc4f0ed4c6e7107c0",
+    "referenceVersions": [],
+    "assessmentContext": null
+  },
+  "quality": {
+    "status": "interpretable",
+    "flags": []
+  },
+  "itemScores": [
+    {
+      "itemCode": "SSWQ16_01",
+      "responseValue": "2",
+      "baseScore": 2,
+      "score": 2
+    },
+    {
+      "itemCode": "SSWQ16_02",
+      "responseValue": "2",
+      "baseScore": 2,
+      "score": 2
+    },
+    {
+      "itemCode": "SSWQ16_03",
+      "responseValue": "2",
+      "baseScore": 2,
+      "score": 2
+    },
+    {
+      "itemCode": "SSWQ16_04",
+      "responseValue": "2",
+      "baseScore": 2,
+      "score": 2
+    },
+    {
+      "itemCode": "SSWQ16_05",
+      "responseValue": "2",
+      "baseScore": 2,
+      "score": 2
+    },
+    {
+      "itemCode": "SSWQ16_06",
+      "responseValue": "2",
+      "baseScore": 2,
+      "score": 2
+    },
+    {
+      "itemCode": "SSWQ16_07",
+      "responseValue": "2",
+      "baseScore": 2,
+      "score": 2
+    },
+    {
+      "itemCode": "SSWQ16_08",
+      "responseValue": "2",
+      "baseScore": 2,
+      "score": 2
+    },
+    {
+      "itemCode": "SSWQ16_09",
+      "responseValue": "2",
+      "baseScore": 2,
+      "score": 2
+    },
+    {
+      "itemCode": "SSWQ16_10",
+      "responseValue": "2",
+      "baseScore": 2,
+      "score": 2
+    },
+    {
+      "itemCode": "SSWQ16_11",
+      "responseValue": "2",
+      "baseScore": 2,
+      "score": 2
+    },
+    {
+      "itemCode": "SSWQ16_12",
+      "responseValue": "2",
+      "baseScore": 2,
+      "score": 2
+    },
+    {
+      "itemCode": "SSWQ16_13",
+      "responseValue": "2",
+      "baseScore": 2,
+      "score": 2
+    },
+    {
+      "itemCode": "SSWQ16_14",
+      "responseValue": "2",
+      "baseScore": 2,
+      "score": 2
+    },
+    {
+      "itemCode": "SSWQ16_15",
+      "responseValue": "2",
+      "baseScore": 2,
+      "score": 2
+    },
+    {
+      "itemCode": "SSWQ16_16",
+      "responseValue": "2",
+      "baseScore": 2,
+      "score": 2
+    }
+  ],
+  "scores": [
+    {
+      "key": "school_wellbeing",
+      "type": "total",
+      "label": "最近的学校体验",
+      "description": "最近的学校体验的自述频率汇总；不是风险或能力等级。",
+      "direction": "higher_is_more",
+      "canonical": true,
+      "displayPrecision": 0,
+      "value": 32,
+      "range": {
+        "min": 16,
+        "max": 64
+      },
+      "expectedItems": [
+        "SSWQ16_01",
+        "SSWQ16_02",
+        "SSWQ16_03",
+        "SSWQ16_04",
+        "SSWQ16_05",
+        "SSWQ16_06",
+        "SSWQ16_07",
+        "SSWQ16_08",
+        "SSWQ16_09",
+        "SSWQ16_10",
+        "SSWQ16_11",
+        "SSWQ16_12",
+        "SSWQ16_13",
+        "SSWQ16_14",
+        "SSWQ16_15",
+        "SSWQ16_16"
+      ],
+      "answeredItems": [
+        "SSWQ16_01",
+        "SSWQ16_02",
+        "SSWQ16_03",
+        "SSWQ16_04",
+        "SSWQ16_05",
+        "SSWQ16_06",
+        "SSWQ16_07",
+        "SSWQ16_08",
+        "SSWQ16_09",
+        "SSWQ16_10",
+        "SSWQ16_11",
+        "SSWQ16_12",
+        "SSWQ16_13",
+        "SSWQ16_14",
+        "SSWQ16_15",
+        "SSWQ16_16"
+      ],
+      "status": "calculated",
+      "prorated": false
+    },
+    {
+      "key": "JL",
+      "type": "dimension",
+      "label": "学习乐趣",
+      "description": "学习乐趣的自述频率汇总；不是风险或能力等级。",
+      "direction": "higher_is_more",
+      "canonical": true,
+      "displayPrecision": 0,
+      "value": 8,
+      "range": {
+        "min": 4,
+        "max": 16
+      },
+      "expectedItems": [
+        "SSWQ16_01",
+        "SSWQ16_05",
+        "SSWQ16_09",
+        "SSWQ16_13"
+      ],
+      "answeredItems": [
+        "SSWQ16_01",
+        "SSWQ16_05",
+        "SSWQ16_09",
+        "SSWQ16_13"
+      ],
+      "status": "calculated",
+      "prorated": false
+    },
+    {
+      "key": "SC",
+      "type": "dimension",
+      "label": "学校归属",
+      "description": "学校归属的自述频率汇总；不是风险或能力等级。",
+      "direction": "higher_is_more",
+      "canonical": true,
+      "displayPrecision": 0,
+      "value": 8,
+      "range": {
+        "min": 4,
+        "max": 16
+      },
+      "expectedItems": [
+        "SSWQ16_02",
+        "SSWQ16_06",
+        "SSWQ16_10",
+        "SSWQ16_14"
+      ],
+      "answeredItems": [
+        "SSWQ16_02",
+        "SSWQ16_06",
+        "SSWQ16_10",
+        "SSWQ16_14"
+      ],
+      "status": "calculated",
+      "prorated": false
+    },
+    {
+      "key": "EP",
+      "type": "dimension",
+      "label": "学习意义",
+      "description": "学习意义的自述频率汇总；不是风险或能力等级。",
+      "direction": "higher_is_more",
+      "canonical": true,
+      "displayPrecision": 0,
+      "value": 8,
+      "range": {
+        "min": 4,
+        "max": 16
+      },
+      "expectedItems": [
+        "SSWQ16_03",
+        "SSWQ16_07",
+        "SSWQ16_11",
+        "SSWQ16_15"
+      ],
+      "answeredItems": [
+        "SSWQ16_03",
+        "SSWQ16_07",
+        "SSWQ16_11",
+        "SSWQ16_15"
+      ],
+      "status": "calculated",
+      "prorated": false
+    },
+    {
+      "key": "AE",
+      "type": "dimension",
+      "label": "学习表现体验",
+      "description": "学习表现体验的自述频率汇总；不是风险或能力等级。",
+      "direction": "higher_is_more",
+      "canonical": true,
+      "displayPrecision": 0,
+      "value": 8,
+      "range": {
+        "min": 4,
+        "max": 16
+      },
+      "expectedItems": [
+        "SSWQ16_04",
+        "SSWQ16_08",
+        "SSWQ16_12",
+        "SSWQ16_16"
+      ],
+      "answeredItems": [
+        "SSWQ16_04",
+        "SSWQ16_08",
+        "SSWQ16_12",
+        "SSWQ16_16"
+      ],
+      "status": "calculated",
+      "prorated": false
+    }
+  ],
+  "references": [],
+  "interpretations": [
+    {
+      "scoreKey": "school_wellbeing",
+      "headline": "回顾最近的学校生活",
+      "label": null,
+      "interpretation": "这份回顾关注你过去一个月在学校的感受：学习有没有乐趣、能不能安心做自己、所学的东西有没有意义，以及你怎样看待自己的学习表现。这不是考试，也不会把你分成好学生或差学生。比如，同一个月里，你可能很喜欢某门课，却不太敢在同学面前发言；不同方面的体验可以同时存在。把它们分开看看，比只盯着一个总数更能帮助你找到想保留或改变的事情。",
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "最近一个月，学校里有哪些时刻让你轻松一些？又有什么最想改变？"
+        },
+        {
+          "category": "strategy",
+          "text": "选一个最想改善的小方面，与信任的人一起想一个可行的下一步。"
+        }
+      ],
+      "limitations": [
+        "这是独立中文研究译稿，尚待人工审校和本地验证；当前仅限6–8年级学生研究，不用于排名、筛选、诊断或评价老师。",
+        "回答记录的是过去一个月，不是永久的性格或能力；学校体验较积极也不代表没有其他困扰。",
+        "四个方面关注不同体验，不按分数高低排好坏；目前没有适用于本译稿的全国常模或风险分界。",
+        "16题都需完整回答才提供报告，漏答不补零、不猜测。"
+      ],
+      "referenceVersion": null
+    },
+    {
+      "scoreKey": "JL",
+      "headline": "学习中有没有好奇和乐趣",
+      "label": null,
+      "interpretation": "这一部分关注你对学习活动的兴趣和享受，而不是你有没有每次都拿到好成绩。有时，一个想弄明白的问题、一项动手项目，或一次终于理解的瞬间，就能带来乐趣；忙碌和疲惫也可能暂时盖过这种感觉。回答越常肯定这些体验，表示最近学习中的积极感受越常出现。暂时缺少兴趣并不等于你不爱学习，也可能是内容、节奏或支持方式还不适合你。",
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "最近哪次学习让你愿意多问一个问题或多试一次？"
+        },
+        {
+          "category": "strategy",
+          "text": "从一个感兴趣的小问题、一次动手尝试或喜欢的主题开始，看看哪种方式更能吸引你。"
+        }
+      ],
+      "limitations": [
+        "这是独立中文研究译稿，尚待人工审校和本地验证；当前仅限6–8年级学生研究，不用于排名、筛选、诊断或评价老师。",
+        "回答记录的是过去一个月，不是永久的性格或能力；学校体验较积极也不代表没有其他困扰。",
+        "四个方面关注不同体验，不按分数高低排好坏；目前没有适用于本译稿的全国常模或风险分界。",
+        "16题都需完整回答才提供报告，漏答不补零、不猜测。"
+      ],
+      "referenceVersion": null
+    },
+    {
+      "scoreKey": "SC",
+      "headline": "在学校能不能安心做自己",
+      "label": null,
+      "interpretation": "这一部分关注你在学校是否感到被接纳、被关心和受到尊重，也包括能不能真实地做自己。比如，有人认真听你说话、遇到困难时知道可以找谁，都会影响这种感受。回答越常肯定这些体验，表示最近被接纳的感受越常出现。归属感不是只靠你努力就能决定的，同伴和学校环境同样重要；觉得不舒服不是你的错，也不需要独自承担。",
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "学校里有没有一个让你比较安心的人或地方？什么让你觉得被尊重？"
+        },
+        {
+          "category": "support",
+          "text": "若常感到被排斥或不被尊重，可以向信任的老师、家人或学校支持人员讲述具体经历，一起寻找支持。"
+        }
+      ],
+      "limitations": [
+        "这是独立中文研究译稿，尚待人工审校和本地验证；当前仅限6–8年级学生研究，不用于排名、筛选、诊断或评价老师。",
+        "回答记录的是过去一个月，不是永久的性格或能力；学校体验较积极也不代表没有其他困扰。",
+        "四个方面关注不同体验，不按分数高低排好坏；目前没有适用于本译稿的全国常模或风险分界。",
+        "16题都需完整回答才提供报告，漏答不补零、不猜测。"
+      ],
+      "referenceVersion": null
+    },
+    {
+      "scoreKey": "EP",
+      "headline": "学习和你关心的事有什么联系",
+      "label": null,
+      "interpretation": "这一部分关注你是否觉得学校生活和所学内容有意义，而不是要求你喜欢每一门课。有人会想到未来想做的事，有人重视解决眼前的问题，也有人还在寻找自己的理由。回答越常肯定这些体验，表示最近你越常感受到学校学习的价值。暂时看不到某项学习的用处，并不代表你不够努力；把抽象内容和自己的兴趣或生活联系起来，有时更容易找到方向。",
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "最近学到的哪件事，和你关心的人、问题或未来愿望有一点联系？"
+        },
+        {
+          "category": "strategy",
+          "text": "挑一项学习内容，试着找一个生活中的用途；也可以请老师举一个具体例子，而不是逼自己立刻喜欢它。"
+        }
+      ],
+      "limitations": [
+        "这是独立中文研究译稿，尚待人工审校和本地验证；当前仅限6–8年级学生研究，不用于排名、筛选、诊断或评价老师。",
+        "回答记录的是过去一个月，不是永久的性格或能力；学校体验较积极也不代表没有其他困扰。",
+        "四个方面关注不同体验，不按分数高低排好坏；目前没有适用于本译稿的全国常模或风险分界。",
+        "16题都需完整回答才提供报告，漏答不补零、不猜测。"
+      ],
+      "referenceVersion": null
+    },
+    {
+      "scoreKey": "AE",
+      "headline": "你怎样看待自己的学习表现",
+      "label": null,
+      "interpretation": "这一部分记录你对完成学习任务和课堂表现的看法，不是一次能力测验，也不能代替实际成绩、老师反馈或你付出的努力。比如，一次作业卡住，可能和题目难度、方法、时间或需要的帮助有关，并不说明你什么都做不好。回答越常肯定这些体验，表示最近你对自己的学习表现越有把握。把一个笼统的感觉拆成具体任务，更容易看见已经做到的部分和还需要的支持。",
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "最近完成过哪件让你有一点成就感的学习任务？当时用了什么办法？"
+        },
+        {
+          "category": "strategy",
+          "text": "选一个可以完成的小目标，并向老师询问具体建议。遇到困难可以请求支持，问卷结果不代表你的能力上限。"
+        }
+      ],
+      "limitations": [
+        "这是独立中文研究译稿，尚待人工审校和本地验证；当前仅限6–8年级学生研究，不用于排名、筛选、诊断或评价老师。",
+        "回答记录的是过去一个月，不是永久的性格或能力；学校体验较积极也不代表没有其他困扰。",
+        "四个方面关注不同体验，不按分数高低排好坏；目前没有适用于本译稿的全国常模或风险分界。",
+        "16题都需完整回答才提供报告，漏答不补零、不猜测。"
+      ],
+      "referenceVersion": null
+    }
+  ],
+  "caveats": [
+    "这是独立中文研究译稿，尚待人工审校和本地验证；当前仅限6–8年级学生研究，不用于排名、筛选、诊断或评价老师。",
+    "回答记录的是过去一个月，不是永久的性格或能力；学校体验较积极也不代表没有其他困扰。",
+    "四个方面关注不同体验，不按分数高低排好坏；目前没有适用于本译稿的全国常模或风险分界。",
+    "16题都需完整回答才提供报告，漏答不补零、不猜测。",
+    "未提供群体参考。"
+  ],
+  "disclaimer": "依据 Tyler L. Renshaw (2020) SSWQ，CC BY 4.0（https://creativecommons.org/licenses/by/4.0/），来源 https://osf.io/k25yf/ 。本中文翻译与线上排版为独立改编，非作者审定或认可；仅供6–8年级学生研究与自我了解，不用于心理诊断。"
+}

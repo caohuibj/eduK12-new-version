@@ -1,0 +1,286 @@
+{
+  "id": "SSWQ16",
+  "name_zh": "学生学校幸福感问卷",
+  "version": "Author measure and user guide v.03-22-20; current 2025 author webpage confirms same 16-item identity and CC BY 4.0; current OSF download could not be retrieved",
+  "dedup": "2026-10-25 local instruments directory has TSWQ only; SSWQ/CESD/CSSWQ absent",
+  "license": {
+    "id": "CC-BY-4.0",
+    "url": "https://creativecommons.org/licenses/by/4.0/",
+    "authority_url": "https://www.tyrenshaw.org/User-Guide-for-the-Student-Subjective-Wellbeing-Questionnaire-26e7ff8c2ebd806c81c7d9f5c9355090",
+    "authority_last_updated": "2025-09-24",
+    "permissions": [
+      "copy",
+      "share",
+      "translate/adapt",
+      "online administration",
+      "redistribute in software with attribution",
+      "commercial or noncommercial reuse"
+    ],
+    "conditions": [
+      "Credit Tyler L. Renshaw and source",
+      "Link license",
+      "Identify Chinese translation and online formatting as modifications",
+      "No endorsement claim",
+      "Do not impose additional restrictions inconsistent with license"
+    ],
+    "noncommercial_only": false
+  },
+  "source": {
+    "original_project": "https://osf.io/k25yf/",
+    "current_download_link": "https://osf.io/48av7",
+    "author_2020_guide_mirror": "https://bradfordatrpartnership.co.uk/Resources/3%20Resilience/Student%20and%20Teacher%20Well-being%20Scales/Student%20Wellbeing%20Questionnaire.pdf",
+    "evidence_note": "Author-written 3-page guide fully extracted with web tool; source mirror is not the licensor. Rights independently confirmed on current author website. Download to local filesystem failed HTTP403; no claim current OSF file bytes were verified.",
+    "reference": "Renshaw, T. L. (2020). Student Subjective Wellbeing Questionnaire (SSWQ): Measure and user guide. Open Science Framework. https://osf.io/k25yf/"
+  },
+  "tags": [
+    "学校幸福感",
+    "学习乐趣",
+    "学校归属",
+    "学习意义",
+    "学习表现体验",
+    "青少年",
+    "自评",
+    "CC-BY-4.0",
+    "独立中译待验证",
+    "非诊断"
+  ],
+  "instructions_zh": "下面的问题涉及你在学校的想法、感受和行为。请阅读每句话，选择最符合你过去一个月情况的答案。",
+  "response_options": [
+    {
+      "value": 1,
+      "en": "Almost Never",
+      "zh": "几乎从不"
+    },
+    {
+      "value": 2,
+      "en": "Sometimes",
+      "zh": "有时"
+    },
+    {
+      "value": 3,
+      "en": "Often",
+      "zh": "经常"
+    },
+    {
+      "value": 4,
+      "en": "Almost Always",
+      "zh": "几乎总是"
+    }
+  ],
+  "items": [
+    {
+      "id": 1,
+      "en": "I get excited about learning new things in class.",
+      "zh_draft": "在课堂上学到新东西让我感到兴奋。",
+      "reverse": false
+    },
+    {
+      "id": 2,
+      "en": "I feel like I belong at my school.",
+      "zh_draft": "我觉得自己是学校的一分子。",
+      "reverse": false
+    },
+    {
+      "id": 3,
+      "en": "I feel like the things I do at school are important.",
+      "zh_draft": "我觉得自己在学校做的事情很重要。",
+      "reverse": false
+    },
+    {
+      "id": 4,
+      "en": "I am a successful student.",
+      "zh_draft": "我觉得自己是一名表现出色的学生。",
+      "reverse": false
+    },
+    {
+      "id": 5,
+      "en": "I am really interested in the things I am doing at school.",
+      "zh_draft": "我对自己在学校做的事情很感兴趣。",
+      "reverse": false
+    },
+    {
+      "id": 6,
+      "en": "I can really be myself at school.",
+      "zh_draft": "在学校，我能够真实地做自己。",
+      "reverse": false
+    },
+    {
+      "id": 7,
+      "en": "I think school matters and should be taken seriously.",
+      "zh_draft": "我认为学校生活很重要，应该认真对待。",
+      "reverse": false
+    },
+    {
+      "id": 8,
+      "en": "I do good work at school.",
+      "zh_draft": "我能把学校里的学习任务做好。",
+      "reverse": false
+    },
+    {
+      "id": 9,
+      "en": "I enjoy working on class projects and assignments.",
+      "zh_draft": "我喜欢完成课堂项目和作业。",
+      "reverse": false
+    },
+    {
+      "id": 10,
+      "en": "I feel like people at my school care about me.",
+      "zh_draft": "我觉得学校里的人关心我。",
+      "reverse": false
+    },
+    {
+      "id": 11,
+      "en": "I feel it is important to do well in my classes.",
+      "zh_draft": "我觉得在课堂学习中表现好很重要。",
+      "reverse": false
+    },
+    {
+      "id": 12,
+      "en": "I do well on my class assignments.",
+      "zh_draft": "我能很好地完成课堂作业。",
+      "reverse": false
+    },
+    {
+      "id": 13,
+      "en": "I feel happy when I am working and learning at school.",
+      "zh_draft": "在学校做事和学习时，我感到快乐。",
+      "reverse": false
+    },
+    {
+      "id": 14,
+      "en": "I am treated with respect at my school.",
+      "zh_draft": "在学校，我受到尊重。",
+      "reverse": false
+    },
+    {
+      "id": 15,
+      "en": "I believe the things I learn at school will help me in my life.",
+      "zh_draft": "我相信在学校学到的东西会对我的生活有帮助。",
+      "reverse": false
+    },
+    {
+      "id": 16,
+      "en": "I get good grades in my classes.",
+      "zh_draft": "我各门课的成绩不错。",
+      "reverse": false
+    }
+  ],
+  "scoring": {
+    "reverse_keys": [],
+    "subscales": [
+      {
+        "id": "JL",
+        "name": "学习乐趣",
+        "items": [
+          1,
+          5,
+          9,
+          13
+        ]
+      },
+      {
+        "id": "SC",
+        "name": "学校归属",
+        "items": [
+          2,
+          6,
+          10,
+          14
+        ]
+      },
+      {
+        "id": "EP",
+        "name": "学习意义",
+        "items": [
+          3,
+          7,
+          11,
+          15
+        ]
+      },
+      {
+        "id": "AE",
+        "name": "学习表现体验",
+        "items": [
+          4,
+          8,
+          12,
+          16
+        ]
+      }
+    ],
+    "subscale_sum_range": [
+      4,
+      16
+    ],
+    "total_sum_range": [
+      16,
+      64
+    ],
+    "total": "sum of all16 responses",
+    "mean_range": [
+      1,
+      4
+    ],
+    "mean": "sum divided by number of items; 4 for each subscale,16 for total",
+    "missing": "Require all16 for report; no imputation. Conservative implementation rule, not validated author missingness algorithm."
+  },
+  "interpretation": {
+    "diagnostic_cutoffs": [],
+    "population_norms_enabled": false,
+    "guide_evidence": "2020 guide explicitly reports no large-scale normative data; recommends local norming. It supports response-anchor interpretation: subscale8/4=2 means sometimes; total56/16=3.5 means often to almost always.",
+    "anchor_logic": [
+      {
+        "exact_mean": 1,
+        "label": "几乎从不"
+      },
+      {
+        "exact_mean": 2,
+        "label": "有时"
+      },
+      {
+        "exact_mean": 3,
+        "label": "经常"
+      },
+      {
+        "exact_mean": 4,
+        "label": "几乎总是"
+      }
+    ],
+    "between_anchors": "Report between adjacent response anchors without rounding to a new severity category; e.g. 2.5 means 在“有时”和“经常”之间. These are descriptive response frequencies, not empirical clinical thresholds.",
+    "do_not_use": [
+      "全国百分位",
+      "低中高风险标签",
+      "将学校幸福感等同于没有心理困扰",
+      "把学习表现体验作为客观能力或成绩评判"
+    ]
+  },
+  "validation": {
+    "original": {
+      "reference": "Renshaw TL, Long ACJ, Cook CR. (2015). Assessing adolescents’ positive psychological functioning at school: Development and validation of the Student Subjective Wellbeing Questionnaire. School Psychology Quarterly,30(4),534–552.",
+      "doi": "10.1037/spq0000088",
+      "population": "1002 students in Grades6–8",
+      "source": "https://doi.org/10.1037/spq0000088",
+      "verified": "Author-linked publisher preview abstract; online-first2014, issue2015"
+    },
+    "chinese": "No validated Chinese item wording or local norm verified in this sourcepack. Independent draft must not be represented as validated. CSSWQ Chinese university evidence is a DIFFERENT scale and cannot be attached here."
+  },
+  "report": {
+    "intro": "这份回顾关注你过去一个月在学校的感受，包括学习是否有乐趣、是否感到被接纳、学习是否有意义，以及对自己学习表现的看法。它不是考试，也不会给你贴上“好学生”或“差学生”的标签。",
+    "dimension_template": "在【维度】方面，你的回答整体介于【相邻频率词】。可以看看哪些具体经历让你有这样的感受。",
+    "suggestions": {
+      "JL": "想一想最近哪次学习让你有兴趣，可以从一个小问题、一次动手尝试或喜欢的主题开始。",
+      "SC": "留意学校里让你感到安心的人。如果常觉得被排斥或不被尊重，可以和信任的老师、家人或学校支持人员谈谈。",
+      "EP": "试着把一项学习内容和你关心的事情联系起来；暂时看不到意义，也不代表你不够努力。",
+      "AE": "选择一个可以完成的小目标，并向老师询问具体建议。遇到困难可以请求支持，问卷结果不代表你的能力上限。"
+    },
+    "close": "你也可以选择一个最想改善的方面，与信任的人一起讨论。学校体验会变化，这次回答只是最近一个月的记录。",
+    "report_numbers": "Default hide raw scores/means/Greek symbols. Technical detail panel may show calculation and sources."
+  },
+  "translation": {
+    "validated": false,
+    "language": "zh-CN",
+    "kind": "independent translation draft",
+    "attribution": "中文为依据 Renshaw (2020) SSWQ 的独立翻译和线上排版改编，依据 CC BY 4.0 使用；非作者审定中文版。"
+  }
+}
