@@ -1,0 +1,45 @@
+import {createHash} from 'node:crypto'
+import {readFileSync,writeFileSync,statSync} from 'node:fs'
+import {execFileSync} from 'node:child_process'
+import {createRequire} from 'node:module'
+const root=process.env.PROBE_BACKEND_ROOT!,out=process.env.STORAGE_OBSERVATION_OUTPUT!
+const require=createRequire(root+'/package.json'),{Client}=require('pg')
+const {encryptUnifiedRuntimePayload,decryptUnifiedRuntimePayload}=await import(root+'/src/modules/assessment-runtime/security.ts')
+const {canonicalHash}=await import(root+'/src/modules/assessment-runtime/canonical.ts')
+const u=new URL(process.env.DATABASE_URL!)
+if(u.hostname!=='127.0.0.1'||u.port!=='55435'||u.pathname!=='/dot_storage_fields_test'||process.env.NODE_ENV!=='test')throw Error('Only this owned isolated observation database is permitted')
+const fixture=JSON.parse(readFileSync(process.env.STORAGE_OBSERVATION_FIXTURE!,'utf8'))
+const payloads={saved_scale_result:fixture.assessments[0].result,tiny_control:{schemaVersion:1,status:'COMPLETED',attemptEpoch:1}}
+const db=new Client({connectionString:u.toString()});await db.connect()
+const rows:any[]=[]
+try{
+ for(const [name,value] of Object.entries(payloads))for(const compact of [false,true]){
+  const table='observation_'+name+'_'+(compact?'compact':'legacy')
+  await db.query(`CREATE TABLE ${table} (id bigint PRIMARY KEY,payload text NOT NULL)`)
+  const sizes=async()=>{const r=await db.query('SELECT pg_total_relation_size($1::regclass)::text AS total,pg_relation_size($1::regclass)::text AS heap,pg_indexes_size($1::regclass)::text AS indexes', [table]);return Object.fromEntries(Object.entries(r.rows[0]).map(([k,v])=>[k,Number(v)]))}
+  const empty=await sizes();let prior=0,cipherBytes=0,codecWallMs=0,codecCpuUs=0
+  const startLsn=(await db.query('SELECT pg_current_wal_insert_lsn()::text AS lsn')).rows[0].lsn
+  process.env.ASSESSMENT_COMPACT_FACTS_ENABLED=String(compact)
+  for(const n of [1,100,1000]){
+   for(let at=prior;at<n;at+=100){
+    const ids:number[]=[],ciphertexts:string[]=[]
+    for(let i=at;i<Math.min(n,at+100);i++){
+     const cpu=process.cpuUsage(),t=performance.now(),cipher=encryptUnifiedRuntimePayload(value)
+     codecWallMs+=performance.now()-t;const used=process.cpuUsage(cpu);codecCpuUs+=used.user+used.system
+     if(canonicalHash(decryptUnifiedRuntimePayload(cipher))!==canonicalHash(value))throw Error('Actual codec roundtrip differs')
+     cipherBytes+=Buffer.byteLength(cipher);ids.push(i+1);ciphertexts.push(cipher)
+    }
+    await db.query(`INSERT INTO ${table}(id,payload) SELECT * FROM unnest($1::bigint[],$2::text[])`,[ids,ciphertexts])
+   }
+   const stored=(await db.query(`SELECT count(*)::text AS count,sum(octet_length(payload))::text AS logical,sum(pg_column_size(payload))::text AS datum FROM ${table}`)).rows[0]
+   if(Number(stored.count)!==n||Number(stored.logical)!==cipherBytes)throw Error('Stored count/bytes differ')
+   const wal=(await db.query('SELECT pg_wal_lsn_diff(pg_current_wal_insert_lsn(),$1::pg_lsn)::text AS bytes',[startLsn])).rows[0].bytes
+   const physical=await sizes(),dump=out+'.'+table+'.'+n+'.dump'
+   execFileSync(process.env.PG_DUMP!,['--host=127.0.0.1','--port=55435','--username=storage_observer','--dbname=dot_storage_fields_test','--format=custom','--compress=6','--table='+table,'--file='+dump],{stdio:['ignore','pipe','pipe']})
+   rows.push({payload:name,codec:compact?'existing_compact':'existing_legacy',n,plaintextBytes:Buffer.byteLength(JSON.stringify({schemaVersion:1,value})),logicalCipherBytes:cipherBytes,storedDatumBytes:Number(stored.datum),physicalBytes:physical,emptyPhysicalBytes:empty,physicalIncrementBytes:physical.total-empty.total,observedWalBytes:Number(wal),customDumpBytes:statSync(dump).size,codecWallMs,codecCpuMs:codecCpuUs/1000,allRoundtripsEqual:true})
+   prior=n
+  }
+ }
+ writeFileSync(out,JSON.stringify({scope:'Isolated encrypted-field storage observation, not full application lifecycle/storage, production, recovery or concurrency qualification',sourceHead:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),fixtureSha256:createHash('sha256').update(readFileSync(process.env.STORAGE_OBSERVATION_FIXTURE!)).digest('hex'),node:process.version,postgres:(await db.query('SELECT version() AS v')).rows[0].v,rows,limitations:['Measurement tables contain id and ciphertext with a primary key only; not application schema/FKs/templates/whole receipt accounting.','Same saved synthetic C1 result repeated; random authenticated encryption produces distinct ciphertext. Tiny control is a stated synthetic comparator.','Single local sequence, fixed order, no p95 or production capacity/CPU improvement claim. WAL includes background effects in the isolated database.','pg_dump is local compressed archive size only; no restoration, encryption recovery or COS upload qualification. Ephemeral encryption key is not retained.','Feature flags changed only in this measurement process; no production setting changed.']},null,2))
+ console.log('Encrypted field observation complete: '+rows.length+' rows')
+}finally{await db.end()}

@@ -1,0 +1,304 @@
+{
+  "scope": "Isolated encrypted-field storage observation, not full application lifecycle/storage, production, recovery or concurrency qualification",
+  "sourceHead": "8774b1cf158dae1c5eb0f4950044c6ae6d6a18dd",
+  "fixtureSha256": "77ec3ae99f60410903a6f173bd012047c3c963b407b2da6b7e2da6d9dc5fda52",
+  "node": "v24.22.1",
+  "postgres": "PostgreSQL 17.11 (Debian 17.11-0+deb13u1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit",
+  "rows": [
+    {
+      "payload": "saved_scale_result",
+      "codec": "existing_legacy",
+      "n": 1,
+      "plaintextBytes": 2887,
+      "logicalCipherBytes": 5840,
+      "storedDatumBytes": 5840,
+      "physicalBytes": {
+        "total": 49152,
+        "heap": 8192,
+        "indexes": 16384
+      },
+      "emptyPhysicalBytes": {
+        "total": 16384,
+        "heap": 0,
+        "indexes": 8192
+      },
+      "physicalIncrementBytes": 32768,
+      "observedWalBytes": 6648,
+      "customDumpBytes": 5436,
+      "codecWallMs": 0.6290750000000003,
+      "codecCpuMs": 0.671,
+      "allRoundtripsEqual": true
+    },
+    {
+      "payload": "saved_scale_result",
+      "codec": "existing_legacy",
+      "n": 100,
+      "plaintextBytes": 2887,
+      "logicalCipherBytes": 584000,
+      "storedDatumBytes": 584000,
+      "physicalBytes": {
+        "total": 679936,
+        "heap": 8192,
+        "indexes": 16384
+      },
+      "emptyPhysicalBytes": {
+        "total": 16384,
+        "heap": 0,
+        "indexes": 8192
+      },
+      "physicalIncrementBytes": 663552,
+      "observedWalBytes": 641344,
+      "customDumpBytes": 336246,
+      "codecWallMs": 5.507686999999635,
+      "codecCpuMs": 8.193,
+      "allRoundtripsEqual": true
+    },
+    {
+      "payload": "saved_scale_result",
+      "codec": "existing_legacy",
+      "n": 1000,
+      "plaintextBytes": 2887,
+      "logicalCipherBytes": 5840000,
+      "storedDatumBytes": 5840000,
+      "physicalBytes": {
+        "total": 6389760,
+        "heap": 65536,
+        "indexes": 40960
+      },
+      "emptyPhysicalBytes": {
+        "total": 16384,
+        "heap": 0,
+        "indexes": 8192
+      },
+      "physicalIncrementBytes": 6373376,
+      "observedWalBytes": 6419136,
+      "customDumpBytes": 3339618,
+      "codecWallMs": 31.751759000000334,
+      "codecCpuMs": 38.928,
+      "allRoundtripsEqual": true
+    },
+    {
+      "payload": "saved_scale_result",
+      "codec": "existing_compact",
+      "n": 1,
+      "plaintextBytes": 2887,
+      "logicalCipherBytes": 2247,
+      "storedDatumBytes": 2247,
+      "physicalBytes": {
+        "total": 49152,
+        "heap": 8192,
+        "indexes": 16384
+      },
+      "emptyPhysicalBytes": {
+        "total": 16384,
+        "heap": 0,
+        "indexes": 8192
+      },
+      "physicalIncrementBytes": 32768,
+      "observedWalBytes": 2896,
+      "customDumpBytes": 3815,
+      "codecWallMs": 1.8795749999999316,
+      "codecCpuMs": 1.894,
+      "allRoundtripsEqual": true
+    },
+    {
+      "payload": "saved_scale_result",
+      "codec": "existing_compact",
+      "n": 100,
+      "plaintextBytes": 2887,
+      "logicalCipherBytes": 224700,
+      "storedDatumBytes": 224700,
+      "physicalBytes": {
+        "total": 344064,
+        "heap": 8192,
+        "indexes": 16384
+      },
+      "emptyPhysicalBytes": {
+        "total": 16384,
+        "heap": 0,
+        "indexes": 8192
+      },
+      "physicalIncrementBytes": 327680,
+      "observedWalBytes": 267464,
+      "customDumpBytes": 165921,
+      "codecWallMs": 13.655228999999736,
+      "codecCpuMs": 14.861,
+      "allRoundtripsEqual": true
+    },
+    {
+      "payload": "saved_scale_result",
+      "codec": "existing_compact",
+      "n": 1000,
+      "plaintextBytes": 2887,
+      "logicalCipherBytes": 2247000,
+      "storedDatumBytes": 2247000,
+      "physicalBytes": {
+        "total": 2957312,
+        "heap": 65536,
+        "indexes": 40960
+      },
+      "emptyPhysicalBytes": {
+        "total": 16384,
+        "heap": 0,
+        "indexes": 8192
+      },
+      "physicalIncrementBytes": 2940928,
+      "observedWalBytes": 2677928,
+      "customDumpBytes": 1639976,
+      "codecWallMs": 102.26909499999942,
+      "codecCpuMs": 117.263,
+      "allRoundtripsEqual": true
+    },
+    {
+      "payload": "tiny_control",
+      "codec": "existing_legacy",
+      "n": 1,
+      "plaintextBytes": 85,
+      "logicalCipherBytes": 236,
+      "storedDatumBytes": 240,
+      "physicalBytes": {
+        "total": 32768,
+        "heap": 8192,
+        "indexes": 16384
+      },
+      "emptyPhysicalBytes": {
+        "total": 16384,
+        "heap": 0,
+        "indexes": 8192
+      },
+      "physicalIncrementBytes": 16384,
+      "observedWalBytes": 504,
+      "customDumpBytes": 2156,
+      "codecWallMs": 0.3426249999999982,
+      "codecCpuMs": 0.539,
+      "allRoundtripsEqual": true
+    },
+    {
+      "payload": "tiny_control",
+      "codec": "existing_legacy",
+      "n": 100,
+      "plaintextBytes": 85,
+      "logicalCipherBytes": 23600,
+      "storedDatumBytes": 24000,
+      "physicalBytes": {
+        "total": 81920,
+        "heap": 32768,
+        "indexes": 16384
+      },
+      "emptyPhysicalBytes": {
+        "total": 16384,
+        "heap": 0,
+        "indexes": 8192
+      },
+      "physicalIncrementBytes": 65536,
+      "observedWalBytes": 37072,
+      "customDumpBytes": 16155,
+      "codecWallMs": 2.244959000001927,
+      "codecCpuMs": 3.451,
+      "allRoundtripsEqual": true
+    },
+    {
+      "payload": "tiny_control",
+      "codec": "existing_legacy",
+      "n": 1000,
+      "plaintextBytes": 85,
+      "logicalCipherBytes": 236000,
+      "storedDatumBytes": 240000,
+      "physicalBytes": {
+        "total": 360448,
+        "heap": 286720,
+        "indexes": 40960
+      },
+      "emptyPhysicalBytes": {
+        "total": 16384,
+        "heap": 0,
+        "indexes": 8192
+      },
+      "physicalIncrementBytes": 344064,
+      "observedWalBytes": 371192,
+      "customDumpBytes": 142000,
+      "codecWallMs": 13.495051999996804,
+      "codecCpuMs": 17.889,
+      "allRoundtripsEqual": true
+    },
+    {
+      "payload": "tiny_control",
+      "codec": "existing_compact",
+      "n": 1,
+      "plaintextBytes": 85,
+      "logicalCipherBytes": 245,
+      "storedDatumBytes": 249,
+      "physicalBytes": {
+        "total": 32768,
+        "heap": 8192,
+        "indexes": 16384
+      },
+      "emptyPhysicalBytes": {
+        "total": 16384,
+        "heap": 0,
+        "indexes": 8192
+      },
+      "physicalIncrementBytes": 16384,
+      "observedWalBytes": 512,
+      "customDumpBytes": 2235,
+      "codecWallMs": 0.223404999999957,
+      "codecCpuMs": 0.231,
+      "allRoundtripsEqual": true
+    },
+    {
+      "payload": "tiny_control",
+      "codec": "existing_compact",
+      "n": 100,
+      "plaintextBytes": 85,
+      "logicalCipherBytes": 24500,
+      "storedDatumBytes": 24900,
+      "physicalBytes": {
+        "total": 81920,
+        "heap": 32768,
+        "indexes": 16384
+      },
+      "emptyPhysicalBytes": {
+        "total": 16384,
+        "heap": 0,
+        "indexes": 8192
+      },
+      "physicalIncrementBytes": 65536,
+      "observedWalBytes": 37872,
+      "customDumpBytes": 14056,
+      "codecWallMs": 4.3162059999992834,
+      "codecCpuMs": 6.603,
+      "allRoundtripsEqual": true
+    },
+    {
+      "payload": "tiny_control",
+      "codec": "existing_compact",
+      "n": 1000,
+      "plaintextBytes": 85,
+      "logicalCipherBytes": 245000,
+      "storedDatumBytes": 249000,
+      "physicalBytes": {
+        "total": 385024,
+        "heap": 311296,
+        "indexes": 40960
+      },
+      "emptyPhysicalBytes": {
+        "total": 16384,
+        "heap": 0,
+        "indexes": 8192
+      },
+      "physicalIncrementBytes": 368640,
+      "observedWalBytes": 379216,
+      "customDumpBytes": 122040,
+      "codecWallMs": 28.066053999997393,
+      "codecCpuMs": 35.864,
+      "allRoundtripsEqual": true
+    }
+  ],
+  "limitations": [
+    "Measurement tables contain id and ciphertext with a primary key only; not application schema/FKs/templates/whole receipt accounting.",
+    "Same saved synthetic C1 result repeated; random authenticated encryption produces distinct ciphertext. Tiny control is a stated synthetic comparator.",
+    "Single local sequence, fixed order, no p95 or production capacity/CPU improvement claim. WAL includes background effects in the isolated database.",
+    "pg_dump is local compressed archive size only; no restoration, encryption recovery or COS upload qualification. Ephemeral encryption key is not retained.",
+    "Feature flags changed only in this measurement process; no production setting changed."
+  ]
+}

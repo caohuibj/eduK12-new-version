@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "sourceHead": "8774b1cf158dae1c5eb0f4950044c6ae6d6a18dd",
+  "fixtureGitHead": "75b956cbd4c45f75beee606fb53257494adc1ca0",
+  "fixtureGitPath": "docs/scale-system-probe-20261028/evidence/database-readback.json",
+  "files": [
+    {
+      "path": "execution-r2.json",
+      "sha256": "13d86127761810a6fb3952a5db98b19b1661e1f8d5faf18e4d334fdf712dbb43",
+      "bytes": 190
+    },
+    {
+      "path": "execution.json",
+      "sha256": "d146b0dc5fb5869b1f077ae023730e92a7c2354645caa4f1385c69d2b040ad92",
+      "bytes": 192
+    },
+    {
+      "path": "fields-r2.json",
+      "sha256": "54150178ac28afa359f7ca3bdd261fd03101874d7796d747c6971e2696af9f96",
+      "bytes": 8582
+    },
+    {
+      "path": "fields-r2.log",
+      "sha256": "0cfa50f9baf22d3c1b427826beb3d33a312db59ad56a551d4b29379735a3bfb1",
+      "bytes": 46
+    },
+    {
+      "path": "fields.log",
+      "sha256": "a242e788da7f9d27cec7daa64fb1fbc6a7766b5a85dbe356423834dd7e28533a",
+      "bytes": 2029
+    },
+    {
+      "path": "measure-fields.mts.txt",
+      "sha256": "48e3ae78144bd395a2247f0d33a9d21c66a54b373ca82a3dfc21b720f2b6c7ea",
+      "bytes": 5054
+    },
+    {
+      "path": "measure-fields.ts.txt",
+      "sha256": "48e3ae78144bd395a2247f0d33a9d21c66a54b373ca82a3dfc21b720f2b6c7ea",
+      "bytes": 5054
+    },
+    {
+      "path": "run-fields-r2.py.txt",
+      "sha256": "61066d56ad47ce8e99bc5257cf2c1e4e07248f9bcd154dc00ea8fc6ae7816439",
+      "bytes": 2295
+    },
+    {
+      "path": "run-fields.py.txt",
+      "sha256": "f051f70621f3d9a29d357847aa936927a0ea27e57dffeffd7c4b735aa4af240a",
+      "bytes": 2278
+    }
+  ],
+  "notIncluded": "Local compressed synthetic dumps retained in observation workspace; not needed in Git and not a verified backup/restore artifact."
+}
