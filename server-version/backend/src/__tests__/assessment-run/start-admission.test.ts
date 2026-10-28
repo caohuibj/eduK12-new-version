@@ -118,3 +118,31 @@ describe('Private runtime retains actual respondent and consent admission',()=>{
   expect(assignments.findById).not.toHaveBeenCalled()
  })
 })
+
+
+describe('verified self report precedes occupational respondent role',()=>{
+ it.each(['TEACHER','PARENT'] as const)('binds %s same-person SELF without changing consent lineage',async role=>{
+  const resolveAcceptedConsent=vi.fn().mockResolvedValue({consentId:'accepted-self',acceptedAt:new Date(1000).toISOString()})
+  const identity=await buildRunAttemptIdentity(assignment({subjectUserId:'self-1',respondentUserId:'self-1',subjectRole:role,respondentRole:role,relationshipKind:'SELF',perspective:'SELF_REPORT'}),{resolveAcceptedConsent})
+  expect(identity).toMatchObject({subjectUserId:'self-1',respondentUserId:'self-1',respondentType:'SELF',consentId:'accepted-self'})
+  expect(resolveAcceptedConsent).toHaveBeenCalledOnce()
+ })
+ it('does not turn teacher observation or mismatched identities into SELF',async()=>{
+  const resolveAcceptedConsent=vi.fn().mockResolvedValue({consentId:'accepted-observer',acceptedAt:new Date(1000).toISOString()})
+  for(const extra of [{relationshipKind:'CLASS_TEACHER_STUDENT',perspective:'OBSERVER_REPORT'},{relationshipKind:'SELF',perspective:'SELF_REPORT'}] as const){
+   const identity=await buildRunAttemptIdentity(assignment({...extra,respondentRole:'TEACHER',subjectUserId:'student-1',respondentUserId:'teacher-1'}),{resolveAcceptedConsent})
+   expect(identity.respondentType).toBe('TEACHER')
+  }
+ })
+})
+
+
+it('preserves persisted legacy self identity without rewriting or widening its runtime',async()=>{
+ const frozen={subjectUserId:'teacher-1',respondentUserId:'teacher-1',respondentType:'TEACHER',episodeId:'episode-1',assignmentRef:'assignment-1',consentId:'accepted-old'}
+ const execution={executionId:'execution-1',organizationId:'org-1',runId:'run-1',trackId:'track-1',executionStatus:'STARTED',runStatus:'PUBLISHED',relationalAssignmentId:'assignment-1',policyDomain:'ORGANIZATION_RUN',respondentUserId:'teacher-1',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:'attempt-old'}
+ const tx={$queryRaw:vi.fn().mockResolvedValueOnce([execution]).mockResolvedValueOnce([{attemptIdentity:frozen}])} as any
+ const assignments={findById:vi.fn().mockResolvedValue(assignment({subjectUserId:'teacher-1',respondentUserId:'teacher-1',subjectRole:'TEACHER',respondentRole:'TEACHER',relationshipKind:'SELF',perspective:'SELF_REPORT'})),resolveAcceptedConsent:vi.fn()}
+ const admitted=await loadRunExecutionStartAdmission({tx,executionId:'execution-1',actorUserId:'teacher-1',assignments,admitted:true})
+ expect(admitted.attemptIdentity).toEqual(frozen)
+ expect(assignments.resolveAcceptedConsent).not.toHaveBeenCalled()
+})

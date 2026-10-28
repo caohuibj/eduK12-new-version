@@ -46,11 +46,17 @@ export interface RunStartAdmission {
   attemptIdentity: RunAttemptIdentityBinding
 }
 
-const respondentTypeFor = (assignment: RelationalAssignmentRecordV1): RespondentTypeV1 | null => {
+const legacyRespondentTypeFor = (assignment: RelationalAssignmentRecordV1): RespondentTypeV1 | null => {
   if (assignment.respondentRole === 'PARENT') return 'PARENT'
   if (assignment.respondentRole === 'TEACHER') return 'TEACHER'
   if (assignment.relationshipKind === 'SELF') return 'SELF'
   return null
+}
+const respondentTypeFor = (assignment: RelationalAssignmentRecordV1): RespondentTypeV1 | null => {
+  // A verified same-person self report is SELF regardless of occupational role.
+  if (assignment.relationshipKind === 'SELF' && assignment.perspective === 'SELF_REPORT'
+    && assignment.subjectUserId === assignment.respondentUserId) return 'SELF'
+  return legacyRespondentTypeFor(assignment)
 }
 
 const parseAdmittedAttemptIdentity = (value: unknown): RunAttemptIdentityBinding => {
@@ -96,7 +102,10 @@ const assertFrozenIdentityMatchesAssignment = (
   if (
     frozen.subjectUserId !== assignment.subjectUserId
     || frozen.respondentUserId !== assignment.respondentUserId
-    || frozen.respondentType !== respondentTypeFor(assignment)
+    // Persisted admission stays authoritative; retain its old role-first type
+    // without rewriting runtime identity or widening tool applicability.
+    || (frozen.respondentType !== respondentTypeFor(assignment)
+      && frozen.respondentType !== legacyRespondentTypeFor(assignment))
     || frozen.episodeId !== assignment.episodeId
     || frozen.assignmentRef !== assignment.assignmentId
   ) {
