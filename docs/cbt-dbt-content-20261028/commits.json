@@ -22,6 +22,21 @@
       "family": "dts15",
       "commit": "3bab5bb",
       "message": "content(scale): stage DTS-15 en draft with uniform-reverse total mean, subscales pending verification, golden cases and report sample [skip ci]"
+    },
+    {
+      "family": "dasa40",
+      "commit": "7560b10",
+      "message": "content(scale): stage DAS-A 40-item en draft with official functional-item key, golden cases and report sample [skip ci]"
+    },
+    {
+      "family": "rfl48",
+      "commit": "12e063d",
+      "message": "content(scale): stage RFL-48 en research draft with total/mean scores, subscales pending verification, golden cases and safety-focused report sample [skip ci]"
+    },
+    {
+      "family": "cats40",
+      "commit": "60589e0",
+      "message": "content(scale): stage CATS-40 child self-report en draft with official subscale keys, golden cases and report sample [skip ci]"
     }
   ]
 }

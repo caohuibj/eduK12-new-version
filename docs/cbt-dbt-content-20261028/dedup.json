@@ -40,6 +40,31 @@
       "relation": "CATS（儿童自动思维量表）为计划中的儿童青少年版本；与 ATQ 成人版分属不同人群工具，中文路径未交付前不得混用。"
     },
     {
+      "newFamily": "cats40",
+      "existing": "atq30",
+      "relation": "CATS-40（7–16岁儿童青少年自评，四维）与 ATQ-30（成人，30题）同为自动思维频率工具但分属不同人群版本；题本、因子结构与适用年龄不同，不合并计分或互推。"
+    },
+    {
+      "newFamily": "dasa40",
+      "existing": "atq30",
+      "relation": "DAS-A 测量较稳定的失调态度（一般时点），ATQ 测量近一周自动思维频率；同属 CBT 认知机制但层次不同（信念 vs 思维），不合并。"
+    },
+    {
+      "newFamily": "dasa40",
+      "existing": "PLANNED:das_b40",
+      "relation": "DAS-B 为 DAS-A 的平行表（官方计分表已在手，其中 #12/#30 与 A 表共用条目号）；两表是平行版本，不构成独立构念，入库时各立精确 key 且不合并总分。"
+    },
+    {
+      "newFamily": "rfl48",
+      "existing": "bsl23",
+      "relation": "RFL-48 测量保护因素（生存理由），BSL-23 测量症状强度；两者同为临床研究情境工具但方向相反，不得互相替代或合成风险判断。"
+    },
+    {
+      "newFamily": "cats40",
+      "existing": "PLANNED:cats_zh_cn",
+      "relation": "麦考瑞官网另有简体中文版 CATS 表单（第三方核对提示可见繁体字形）；中文路径须核对语种、翻译验证后立新版本，不得与英文版混用。"
+    },
+    {
       "newFamily": "dts15",
       "existing": "PLANNED:dts_subscales",
       "relation": "DTS 四因子（Tolerance/Absorption/Appraisal/Regulation）题项归属未经原论文核实；未核实前不得在产品中提供分量表分。"

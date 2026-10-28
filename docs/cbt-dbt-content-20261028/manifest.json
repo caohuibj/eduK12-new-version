@@ -4,12 +4,12 @@
   "actualDatabaseImport": false,
   "published": false,
   "ciTriggered": false,
-  "toolFamilies": 4,
-  "exactVersions": 4,
-  "executableDrafts": 4,
+  "toolFamilies": 7,
+  "exactVersions": 7,
+  "executableDrafts": 7,
   "catalogOnly": 0,
-  "nativeGoldenCases": 16,
-  "reportSamples": 4,
+  "nativeGoldenCases": 28,
+  "reportSamples": 7,
   "tools": [
     {
       "family": "atq30",
@@ -78,6 +78,60 @@
           "key": "dts15",
           "version": "1.0.0",
           "itemCount": 15,
+          "locale": "en",
+          "executable": true
+        }
+      ]
+    },
+    {
+      "family": "dasa40",
+      "name": "DAS-A",
+      "category": "CBT认知机制/失调态度自评",
+      "fullTextSource": "https://beckinstitute.org/wp-content/uploads/2021/06/DAS-Full-Documents-1.pdf",
+      "wordingAndScoring": "PASS",
+      "report": "NATIVE_TEMPLATE_AND_STATIC_SAMPLE",
+      "commit": "7560b10",
+      "versions": [
+        {
+          "key": "dasa40",
+          "version": "1.0.0",
+          "itemCount": 40,
+          "locale": "en",
+          "executable": true
+        }
+      ]
+    },
+    {
+      "family": "rfl48",
+      "name": "RFL-48",
+      "category": "DBT临床研究/生存理由（保护因素）",
+      "fullTextSource": "https://depts.washington.edu/uwbrtc/wp-content/uploads/Reasons-for-Living-Scale-short-form-48-items.pdf",
+      "wordingAndScoring": "PASS_TOTAL_ONLY_SUBSCALES_PENDING",
+      "report": "NATIVE_TEMPLATE_AND_STATIC_SAMPLE",
+      "commit": "12e063d",
+      "versions": [
+        {
+          "key": "rfl48",
+          "version": "1.0.0",
+          "itemCount": 48,
+          "locale": "en",
+          "executable": true
+        }
+      ]
+    },
+    {
+      "family": "cats40",
+      "name": "CATS-40 儿童自评",
+      "category": "CBT认知机制/儿童青少年自动思维频率",
+      "fullTextSource": "https://www.mq.edu.au/__data/assets/pdf_file/0007/520099/CATS_ChildReport_copyright_2015.pdf",
+      "wordingAndScoring": "PASS",
+      "report": "NATIVE_TEMPLATE_AND_STATIC_SAMPLE",
+      "commit": "60589e0",
+      "versions": [
+        {
+          "key": "cats40",
+          "version": "1.0.0",
+          "itemCount": 40,
           "locale": "en",
           "executable": true
         }

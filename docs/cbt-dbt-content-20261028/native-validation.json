@@ -35,7 +35,28 @@
       "goldenCases": 4,
       "testsPassed": true,
       "expectedMeans": { "all-keyed-min": 5.0, "all-keyed-max": 1.0, "sample-234-bands": 3.0, "missing-total": null }
+    },
+    {
+      "family": "dasa40",
+      "instrumentKey": "dasa40@1.0.0",
+      "goldenCases": 4,
+      "testsPassed": true,
+      "expectedTotals": { "all-keyed-min": 40, "all-keyed-max": 280, "sample-rev3-rest5": 200, "missing-total": null }
+    },
+    {
+      "family": "rfl48",
+      "instrumentKey": "rfl48@1.0.0",
+      "goldenCases": 4,
+      "testsPassed": true,
+      "expectedTotals": { "all-keyed-min": 48, "all-keyed-max": 288, "sample-odd3-even4": 168, "missing-total": null }
+    },
+    {
+      "family": "cats40",
+      "instrumentKey": "cats40@1.0.0",
+      "goldenCases": 4,
+      "testsPassed": true,
+      "expectedTotals": { "all-keyed-min": 0, "all-keyed-max": 160, "sample-social2-rest1": 50, "missing-social": null }
     }
   ],
-  "goldenCaseTotal": 16
+  "goldenCaseTotal": 28
 }
