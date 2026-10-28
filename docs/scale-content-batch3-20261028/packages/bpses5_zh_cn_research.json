@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 1,
+  "sourceSHA": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "sourceKey": "bpses5_zh_cn_research",
+  "originalVersion": "1.0.0",
+  "preparedVersion": "1.0.0",
+  "originalSource": "server-version/backend/src/modules/scale/instruments/bpses5_zh_cn_research/1.0.0/source.json",
+  "preparedSource": "server-version/backend/src/modules/scale/instruments/bpses5_zh_cn_research/1.0.0/source.json",
+  "originalSourceSHA256": "8fa89e6acfcd1041940f5b502fce0f0b19436eab7fb39bb1ac9df751f06e7755",
+  "preparedSourceSHA256": "db2b4fa65e75897ebb6f84e89f276c64bedf545912c2d9770ee5ba2dfa0b6220",
+  "originalFiles": [
+    {
+      "path": "docs/scale-instruments/research-drafts/bpses5/1.0.0/README.md",
+      "blob": "a3c99bfa62e715249a62e053efc1c4d333ba493c",
+      "sha256": "4428f5acc64ba8d734c636e2732f462a257f8f682d91538ae1171d00cdfb6724"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bpses5/1.0.0/administration-sidecar.prepared.json",
+      "blob": "6d455b8be237da392752e0b6c50a31a8047121a8",
+      "sha256": "4327a93d42349cc958e2c059a3a4411f8b6b833b54820be976f908acc9860f8b"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bpses5/1.0.0/administration.md",
+      "blob": "a9982ced1265e59ee43212a03a59318136707325",
+      "sha256": "42f4110481181983478def8a0f884f1e42039edfa2551c018fb959a60d51e553"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bpses5/1.0.0/bilingual-content.json",
+      "blob": "16795ba626955358005558ea7e6e1f5644e1e940",
+      "sha256": "5abd2b64636bb4da65d08172b72335cb7b6f37a6e0ad1bd12f0761d28ebc0186"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bpses5/1.0.0/parameter-plan.json",
+      "blob": "7f7debbd3fe771493347d8b9f9b34fa7d29e42c6",
+      "sha256": "eb5de64ce360af884c67e9e8a3e01db3ecd31d68127686f8a4b48040ec6239a1"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bpses5/1.0.0/references.md",
+      "blob": "57f30ebaabf6124ead1afda9544572522b3b2453",
+      "sha256": "d616ffb412a2b2870bff55a98371cbc75a1affb562f646c40888904a501748d5"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bpses5/1.0.0/report-example.md",
+      "blob": "7f2af0e8072cfc60368419832b331c7f9e088dc9",
+      "sha256": "5798313f62d9e19c1cd1bbc838a74a3e072ac1150f65f1f30d08751f384fa529"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bpses5/1.0.0/report-results.synthetic.json",
+      "blob": "97b4d3906d5f0af09d6773bac3a969e0716e4e57",
+      "sha256": "9dd373bc10085aaa4bfeb6b54933f27d95ba3991f96de399ed8253ddf9b3dd5d"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bpses5/1.0.0/scoring-and-parameters.md",
+      "blob": "e98634b3b08c8744552ea3c5c5ad87cf2a8e0327",
+      "sha256": "0214593594c64001b48979b9936ffa961a0f0553a32c2e53473accb6e6b7b387"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bpses5/1.0.0/source-audit.json",
+      "blob": "75efc8db369b1cbc375967fef8e5ab7cb10bc244",
+      "sha256": "03c177e4b4e5ca12c3cefb58dcabe74cb5daddbc7293f73c0c151817f2d211be"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bpses5/1.0.0/validation.json",
+      "blob": "09edbd0331117b4d1cd6a6ed2bd466087742da2e",
+      "sha256": "8141ac79478b2f4203de2830bf06eb5f030be53d909ea18448a2db0a235fa727"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bpses5/1.0.0/validation.md",
+      "blob": "72866803de47f92fd39fa9d92cfce8ee24c5a05b",
+      "sha256": "2edd2d5a0b344e814a0aac38f4b03cde916208de7379954667dbfbe6491ae87c"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/bpses5_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+      "blob": "e1dceed81be5834c48852e88cf5b10b2f79a203c",
+      "sha256": "9e1c1a925bc860a6ad3245954b139fcf7e2193f34891ccb76cbd8b6fac13bed8"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/bpses5_zh_cn_research/1.0.0/instrument.ts",
+      "blob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/bpses5_zh_cn_research/1.0.0/source.json",
+      "blob": "6f6f52ddb27e23dde3d5b02f731842ed2fcfabb6",
+      "sha256": "8fa89e6acfcd1041940f5b502fce0f0b19436eab7fb39bb1ac9df751f06e7755"
+    }
+  ],
+  "jsonChanges": [
+    {
+      "op": "replace",
+      "path": "/executable/releaseStatus",
+      "from": "DRAFT",
+      "value": "PUBLISHED"
+    },
+    {
+      "op": "add",
+      "path": "/instruction",
+      "value": {
+        "schemaVersion": 1,
+        "text": "下面五句话描述你对自己引导孩子行为的信心。请阅读每句话，根据自己的情况选择同意程度，每题选择一项。这里请回答你对自身的看法。",
+        "language": "zh-CN",
+        "version": "1.0.0",
+        "source": "docs/scale-instruments/research-drafts/bpses5/1.0.0/administration-sidecar.prepared.json#instructions[0] @ b92c69aefa2472775fa7ee86b9c208366886c908 (项目工作稿；非人工审批声明)"
+      }
+    }
+  ],
+  "audit": "audits/audit-bpses5-batch3.json",
+  "versions": {
+    "instrument": "1.0.0",
+    "scoring": "1.0.0",
+    "report": "1.0.0",
+    "localization": "1.0.0",
+    "instruction": "1.0.0"
+  },
+  "states": {
+    "sourceRelease": "PUBLISHED candidate, independent integration pending",
+    "catalog": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "translation": "PENDING",
+    "scientificReview": null,
+    "databaseInstall": "NOT_EXECUTED",
+    "databasePublish": "NOT_EXECUTED",
+    "production": "NOT_TOUCHED"
+  },
+  "versionReason": "Existing prepared instruction bound outside definition; measurement/formula/report unchanged."
+}

@@ -1,0 +1,719 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "bpses5_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "简明父母自我效能量表（BPSES，5题独立中文工作稿）",
+      "abbreviation": "BPSES-5-ZH-WORKING",
+      "instrumentFamily": "Brief Parental Self Efficacy Scale (BPSES)"
+    },
+    "construct": {
+      "primaryDomain": "SELF_EFFICACY",
+      "secondaryDomains": [
+        "SOCIAL_EMOTIONAL"
+      ],
+      "constructDefinition": "描述父母/照顾者对自身有效且支持性引导孩子行为的领域特定效能信念。测量对象是作答成人自身的信心，不是儿童特质、家长代儿童作答、实际教养技能或一般育儿能力；最终五题为单一因子，不输出知识/能力/结果三个分量表。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "domain:parental_self_efficacy",
+        "domain:self_efficacy",
+        "domain:family_interaction",
+        "domain:social_emotional",
+        "construct:domain_specific_parental_belief",
+        "construct:supportive_disciplining_confidence",
+        "construct:effective_disciplining_confidence",
+        "construct:perceived_knowledge_ability_outcome",
+        "construct:single_factor_final_scale",
+        "construct:not_observed_parenting_skill",
+        "construct:not_child_trait_proxy",
+        "construct:distinct_from_parental_burnout",
+        "construct:distinct_from_psoc",
+        "orientation:self_efficacy_research",
+        "orientation:parenting_intervention_research",
+        "orientation:domain_specific_efficacy",
+        "orientation:not_therapy_specific",
+        "orientation:not_act_specific",
+        "orientation:not_dbt_specific",
+        "population:adult_project_18_plus",
+        "population:parents_and_carers",
+        "population:respondent_is_subject",
+        "population:source_uk_intervention_samples",
+        "population:source_child_ages_2_1_to_18",
+        "population:parent_age_bounds_unreported",
+        "population:not_child_self_report",
+        "population:not_general_parent_validation",
+        "response:self",
+        "response:five_items",
+        "response:five_point_agreement_1_to_5",
+        "response:fixed_order",
+        "response:no_reverse_items",
+        "response:single_total_sum_5_to_25",
+        "response:no_subscales",
+        "response:no_fixed_recall_period",
+        "response:complete_required_project_policy",
+        "use:research",
+        "use:individual_reflection",
+        "use:not_diagnostic",
+        "use:not_parent_blame",
+        "use:no_child_change_guarantee",
+        "use:no_cutoffs",
+        "use:no_population_ranking",
+        "license:cc_by_4_0",
+        "license:attribution_required",
+        "license:adaptation_allowed",
+        "license:commercial_reuse_allowed",
+        "license:changes_indicated",
+        "license:article_carrier_not_corc_layout",
+        "language_validation:source_english",
+        "language_validation:independent_zh_cn_working_translation",
+        "language_validation:distinct_from_2026_bpses_c",
+        "language_validation:china_validation_not_established",
+        "language_validation:expert_review_pending",
+        "BPSES",
+        "Brief Parental Self Efficacy Scale",
+        "父母自我效能",
+        "育儿信心",
+        "管教信心",
+        "照顾者自评",
+        "成人自评",
+        "独立中文工作译稿",
+        "单一总分",
+        "非诊断"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "原英语研究汇合英国四种育儿/家庭干预情境父母和照顾者Nmax=355，目标子女年龄2.1–18岁（分组摘要有四舍五入），作答家长自身精确年龄上下限未报告。平台18+是保守项目边界，subject为作答成人本人，不能将子女年龄写成被试年龄；子女信息仅作背景。独立中文未验证，也不外推所有家长或所有育儿能力。"
+    },
+    "administration": {
+      "itemCount": 5,
+      "estimatedMinutes": 5,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "一般自我效能信念，无固定回顾时窗；原论文Methods明确不要求回顾特定时期。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "固定原作者Table1加粗最终原1/4/5/8/9，平台按最终顺序编号1–5；括号Knowledge/Ability/Outcome为领域注记，另档保留，不塞入题干。",
+        "五档同意程度，原值1–5；所有五项正向，无反向，不将初始9项的反向3/6/7带回。",
+        "最终仅一个总和5–25，无三维输出、无均分替换；CORC明确sum与原论文最终范围互证，Methods三个triad求和属于初始9项，不冒称最终公式原话。",
+        "成人SELF；量表中的subject为作答父母/照顾者本人，子女年龄不是eligibility的subject年龄。现政策只核年龄，照顾者情境由施测组织者确认，不冒称自动核验照顾者身份。",
+        "complete_required为项目保守缺失约定：缺任何一题总分null，不补零、不插补、不改变分母；论文EM/pairwise处理是研究统计，不是个人施测规则。",
+        "独立指导语采用论文Methods的中文平台改编，见administration.md/PREPARED sidecar；旧schema无instruction字段，不拼入第一题，未声称运行消费者已经接入。",
+        "5分钟采用CORC所述5–10分钟的下界作保守展示估计，不声称平台新实测。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "原英语最终5项在育儿/家庭干预样本有初步证据；独立中文工作稿未验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "帮助成人父母/照顾者回顾自身引导孩子行为的信心；不评价孩子或实际教养能力，不归咎家长。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "bpses-woolgar2023-en-structure",
+        "evidenceType": "STRUCTURAL_VALIDITY",
+        "population": "英国四种育儿/家庭干预情境的父母/照顾者；作答者为自身效能信念主体",
+        "ageRange": "作答家长年龄未报告；目标子女2.1–18岁，不能替作答者年龄",
+        "locale": "en",
+        "territory": "GB",
+        "sampleSize": 355,
+        "studyDesign": "Nmax355汇合HCA189、SAFE91、TLC18、CPG57；初始9项/三因子不佳后保留原1/4/5/8/9，正式最终单因子。",
+        "rating": "MIXED",
+        "citation": "Woolgar, M., Humayun, S., Scott, S., & Dadds, M. R. (2023 online; 2025 issue). I Know What to Do; I Can Do It; It Will Work: The Brief Parental Self Efficacy Scale (BPSES) for Parenting Interventions. Child Psychiatry & Human Development, 56(3), 619–628. https://doi.org/10.1007/s10578-023-01583-0.",
+        "doi": "10.1007/s10578-023-01583-0",
+        "url": "https://link.springer.com/article/10.1007/s10578-023-01583-0",
+        "notes": "五项模型CFI=.960/RMSEA=.094；分SLT/FFT组结构同形成立，metric不变性不成立（p=.03），不得声称年龄/严重程度组可直接比较；不是本中文稿证据。"
+      },
+      {
+        "evidenceId": "bpses-woolgar2023-en-consistency",
+        "evidenceType": "INTERNAL_CONSISTENCY",
+        "population": "英国四种育儿/家庭干预情境的父母/照顾者；作答者为自身效能信念主体",
+        "ageRange": "作答家长年龄未报告；目标子女2.1–18岁，不能替作答者年龄",
+        "locale": "en",
+        "territory": "GB",
+        "sampleSize": 355,
+        "studyDesign": "原最终五题单一总分α=.75，可能范围与观察范围均5–25。",
+        "rating": "MIXED",
+        "citation": "Woolgar, M., Humayun, S., Scott, S., & Dadds, M. R. (2023 online; 2025 issue). I Know What to Do; I Can Do It; It Will Work: The Brief Parental Self Efficacy Scale (BPSES) for Parenting Interventions. Child Psychiatry & Human Development, 56(3), 619–628. https://doi.org/10.1007/s10578-023-01583-0.",
+        "doi": "10.1007/s10578-023-01583-0",
+        "url": "https://link.springer.com/article/10.1007/s10578-023-01583-0",
+        "notes": "内部一致性不能替代实际教养技能、诊断、因果或疗效证据；不将样本均值转成中国常模。"
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Woolgar/Humayun/Scott/Dadds原2023在线/2025卷期开发论文Table1作者加粗保留原1/4/5/8/9，论文Methods同意度与无固定回顾说明。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "平台独立中文工作译稿；不是Wang等2026 BPSES-C现成中文，未取其文字或继承其ASD儿童父母验证。专家审校PENDING、认知访谈及中国验证NOT_ESTABLISHED。原题领域注记作为映射信息另存；独立指导语从开放论文Methods改编，不复制CORC独立题表指导语。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "bpses5_zh_cn_research-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": [],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    }
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "bpses5_zh_cn_research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "bpses5_zh_cn_research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "translation",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "© The Author(s) 2023: Matt Woolgar, Sajid Humayun, Stephen Scott, Mark R. Dadds. Woolgar, M., Humayun, S., Scott, S., & Dadds, M. R. (2023 online; 2025 issue). I Know What to Do; I Can Do It; It Will Work: The Brief Parental Self Efficacy Scale (BPSES) for Parenting Interventions. Child Psychiatry & Human Development, 56(3), 619–628. https://doi.org/10.1007/s10578-023-01583-0. 原作者开发论文Table1加粗保留的原1/4/5/8/9为正式最终5项；题文与Methods施测描述采用CC BY 4.0（https://creativecommons.org/licenses/by/4.0/），未发现Table1单独排除。本文2023-08-25在线和Version of Record，2025年卷期，属同一版本。中文题文、选项及独立指导语为EDUK12.TOP独立工作翻译/改编，报告为平台原创；改动包括去除题干末的领域注记、最终五题重编号、语言转换、数字化、成人下限与完整作答项目约定。不是2026 BPSES-C译本，不继承其验证。指导语基于论文Methods独立改编，不复制CORC未单独开放许可的整张表格版式或其独立指导语。CORC为原作者指定获取站，其网页sum规则仅用作计分事实核对，不将free to use扩成整表CC许可。署名、来源、许可链接与改动说明随再分发保留；无作者背书，系统启用仍需真实授权治理。",
+      "事实标签只用于检索，不授予系统实际使用权。DRAFT/CANDIDATE不能据文件存在激活。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "PUBLISHED",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "BPSES original final five selected items, Table1 (Woolgar et al., 2023 online/2025 issue); independent Chinese working derivative",
+        "citation": "Woolgar, M., Humayun, S., Scott, S., & Dadds, M. R. (2023 online; 2025 issue). I Know What to Do; I Can Do It; It Will Work: The Brief Parental Self Efficacy Scale (BPSES) for Parenting Interventions. Child Psychiatry & Human Development, 56(3), 619–628. https://doi.org/10.1007/s10578-023-01583-0.",
+        "url": "https://link.springer.com/article/10.1007/s10578-023-01583-0",
+        "publicationYear": 2023
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "© The Author(s) 2023: Matt Woolgar, Sajid Humayun, Stephen Scott, Mark R. Dadds. Woolgar, M., Humayun, S., Scott, S., & Dadds, M. R. (2023 online; 2025 issue). I Know What to Do; I Can Do It; It Will Work: The Brief Parental Self Efficacy Scale (BPSES) for Parenting Interventions. Child Psychiatry & Human Development, 56(3), 619–628. https://doi.org/10.1007/s10578-023-01583-0. 原作者开发论文Table1加粗保留的原1/4/5/8/9为正式最终5项；题文与Methods施测描述采用CC BY 4.0（https://creativecommons.org/licenses/by/4.0/），未发现Table1单独排除。本文2023-08-25在线和Version of Record，2025年卷期，属同一版本。中文题文、选项及独立指导语为EDUK12.TOP独立工作翻译/改编，报告为平台原创；改动包括去除题干末的领域注记、最终五题重编号、语言转换、数字化、成人下限与完整作答项目约定。不是2026 BPSES-C译本，不继承其验证。指导语基于论文Methods独立改编，不复制CORC未单独开放许可的整张表格版式或其独立指导语。CORC为原作者指定获取站，其网页sum规则仅用作计分事实核对，不将free to use扩成整表CC许可。署名、来源、许可链接与改动说明随再分发保留；无作者背书，系统启用仍需真实授权治理。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "bpses_agreement_1_5",
+          "options": [
+            {
+              "value": "1",
+              "score": 1,
+              "label": "非常不同意"
+            },
+            {
+              "value": "2",
+              "score": 2,
+              "label": "不同意"
+            },
+            {
+              "value": "3",
+              "score": 3,
+              "label": "中立"
+            },
+            {
+              "value": "4",
+              "score": 4,
+              "label": "同意"
+            },
+            {
+              "value": "5",
+              "score": 5,
+              "label": "非常同意"
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "BPSES_01",
+          "content": "即使我不一定总能做到，我也知道自己在与孩子相处时需要做什么。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 0,
+          "responseSetKey": "bpses_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BPSES_02",
+          "content": "我能够做一些有助于改善孩子行为的事。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 1,
+          "responseSetKey": "bpses_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BPSES_03",
+          "content": "我能对孩子产生重要的影响。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 2,
+          "responseSetKey": "bpses_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BPSES_04",
+          "content": "在大多数情况下，我知道应该怎么做才能让孩子表现得当。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 3,
+          "responseSetKey": "bpses_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BPSES_05",
+          "content": "我做的事情会对孩子的行为产生影响。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 4,
+          "responseSetKey": "bpses_agreement_1_5",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "BPSES_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "BPSES_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "BPSES_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "BPSES_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "BPSES_05",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "total",
+            "type": "total",
+            "label": "引导孩子行为的自述信心",
+            "description": "总和越大表示本次更认同自身管教效能信念，不等于实际教养能力或孩子一定改变；不分高低等级。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "BPSES_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BPSES_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BPSES_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BPSES_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BPSES_05",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "total"
+        ],
+        "scoreOrder": [
+          "total"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "total",
+            "headline": "理解自己引导孩子行为的信心",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这五个回答整理你对引导孩子行为的信心，包括是否觉得自己知道该怎么做、能否付诸行动，以及相信自己的做法能够带来影响。这是你对自身的描述，不能凭此判断实际教养能力，也不能把孩子的表现归因于家长是否足够有信心。压力、支持条件和孩子当时的需要，都可能影响回答。可以回想一次相处较顺利的场景，留意当时你做了什么、有哪些支持。若你愿意，下次选一件可掌握的小事，例如在平静时用一句简短的话说明一项约定，再观察它是否适合你们；遇到困难时也可以和可信任的人商量。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回想一次相处较顺利的场景：当时你做了什么，又得到了哪些支持？"
+              },
+              {
+                "category": "strategy",
+                "text": "若你愿意，在平静时用一句简短的话说明一项约定，之后看看是否适合你们。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "回答描述父母或照顾者对自身的信心，不能判断实际教养能力，也不能把孩子的表现归咎于家长。",
+          "原英语证据来自英国育儿及家庭干预情境，目标子女年龄不等于作答家长年龄，也不代表所有育儿能力。",
+          "中文为独立工作译稿，尚未完成专家审校或中国人群验证，不继承2026现成中文译本的证据。",
+          "总分仅整理五个回答，没有常模、临床界值、高低分段或人群排名。",
+          "五题需完整作答才计算总分；漏答不补零，不用其余题目代替。"
+        ],
+        "disclaimer": "用于成人父母或照顾者回顾自身引导孩子行为的信心，不作诊断、家长评价或孩子改变的保证。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted fixed-source and plain-language preparation; not human expert approval",
+            "reviewedAt": "2026-10-26T10:08:15.255Z",
+            "basis": "2023 original-development Table1 author-selected final five items; original Methods response/recall facts and CORC sum statement. Independent Chinese adult SELF derivative; one nonjudgmental confidence report. Technical student audience slot does not mean child respondent."
+          }
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "bpses5",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "BPSES_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BPSES_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BPSES_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BPSES_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BPSES_05",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 5
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "BPSES_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BPSES_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BPSES_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BPSES_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BPSES_05",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 25
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "middle",
+        "answers": [
+          {
+            "itemCode": "BPSES_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BPSES_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BPSES_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BPSES_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BPSES_05",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 15
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "mixed",
+        "answers": [
+          {
+            "itemCode": "BPSES_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BPSES_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BPSES_03",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "BPSES_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "BPSES_05",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 15
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "asymmetric",
+        "answers": [
+          {
+            "itemCode": "BPSES_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BPSES_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BPSES_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BPSES_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BPSES_05",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 9
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "missing_first",
+        "answers": [
+          {
+            "itemCode": "BPSES_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BPSES_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BPSES_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BPSES_05",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "total": null
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "empty",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "total": null
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "下面五句话描述你对自己引导孩子行为的信心。请阅读每句话，根据自己的情况选择同意程度，每题选择一项。这里请回答你对自身的看法。",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "docs/scale-instruments/research-drafts/bpses5/1.0.0/administration-sidecar.prepared.json#instructions[0] @ b92c69aefa2472775fa7ee86b9c208366886c908 (项目工作稿；非人工审批声明)"
+  }
+}

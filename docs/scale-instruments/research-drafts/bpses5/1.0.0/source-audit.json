@@ -1,0 +1,117 @@
+{
+  "instrumentKey": "bpses5_zh_cn_research",
+  "version": "1.0.0",
+  "status": "RESEARCH_DRAFT_INDEPENDENT_CHINESE",
+  "fixedCarrier": "Original development article Table1 author-bold final1/4/5/8/9, Methods administration facts",
+  "originalDoi": "10.1007/s10578-023-01583-0",
+  "onlinePublished": "2023-08-25",
+  "issueYear": 2025,
+  "authors": [
+    "Matt Woolgar",
+    "Sajid Humayun",
+    "Stephen Scott",
+    "Mark R. Dadds"
+  ],
+  "items": [
+    {
+      "finalNumber": 1,
+      "originalNumber": 1,
+      "itemCode": "BPSES_01",
+      "en": "Even though I may not always manage it, I know what I need to do with my child",
+      "originalArticleTextWithAnnotation": "Even though I may not always manage it, I know what I need to do with my child (Knowledge)",
+      "domainAnnotationNotSubscale": "Knowledge",
+      "zh": "即使我不一定总能做到，我也知道自己在与孩子相处时需要做什么。",
+      "reverse": false
+    },
+    {
+      "finalNumber": 2,
+      "originalNumber": 4,
+      "itemCode": "BPSES_02",
+      "en": "I am able to do the things that will improve my child's behaviour",
+      "originalArticleTextWithAnnotation": "I am able to do the things that will improve my child's behaviour (Ability)",
+      "domainAnnotationNotSubscale": "Ability",
+      "zh": "我能够做一些有助于改善孩子行为的事。",
+      "reverse": false
+    },
+    {
+      "finalNumber": 3,
+      "originalNumber": 5,
+      "itemCode": "BPSES_03",
+      "en": "I can make an important difference to my child",
+      "originalArticleTextWithAnnotation": "I can make an important difference to my child (Ability)",
+      "domainAnnotationNotSubscale": "Ability",
+      "zh": "我能对孩子产生重要的影响。",
+      "reverse": false
+    },
+    {
+      "finalNumber": 4,
+      "originalNumber": 8,
+      "itemCode": "BPSES_04",
+      "en": "In most situations I know what I should do to ensure my child behaves",
+      "originalArticleTextWithAnnotation": "In most situations I know what I should do to ensure my child behaves (Knowledge)",
+      "domainAnnotationNotSubscale": "Knowledge",
+      "zh": "在大多数情况下，我知道应该怎么做才能让孩子表现得当。",
+      "reverse": false
+    },
+    {
+      "finalNumber": 5,
+      "originalNumber": 9,
+      "itemCode": "BPSES_05",
+      "en": "The things I do make a difference to my child's behaviour",
+      "originalArticleTextWithAnnotation": "The things I do make a difference to my child's behaviour (Outcome)",
+      "domainAnnotationNotSubscale": "Outcome",
+      "zh": "我做的事情会对孩子的行为产生影响。",
+      "reverse": false
+    }
+  ],
+  "sourceFiles": [
+    {
+      "filename": "author-development.pdf",
+      "url": "https://kclpure.kcl.ac.uk/ws/portalfiles/portal/326518933/s10578-023-01583-0.pdf",
+      "bytes": 485045,
+      "sha256": "965daea949372e9349459d8944565b87e2664917d595ee8b8f0fc0084b4d490a"
+    },
+    {
+      "filename": "original-fulltext.xml",
+      "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC12095401/fullTextXML",
+      "bytes": 99428,
+      "sha256": "91eae0b591374228724a09c9cc43e1faa0eb9694b24227324a4238dea5829452"
+    },
+    {
+      "filename": "original-table1.xml",
+      "url": "Derived verbatim from original-fulltext.xml",
+      "bytes": 1919,
+      "sha256": "08d94deaa73235935be525f78a2df583235cbd23d2a3a508c2bb1ed06d0bb57e"
+    },
+    {
+      "filename": "original-license.xml",
+      "url": "Derived verbatim from original-fulltext.xml",
+      "bytes": 1135,
+      "sha256": "9029bdb65a07d2f31abd2d2f6eb187fbdd23c07543095a95a2725a63664642d0"
+    },
+    {
+      "filename": "corc-directory.html",
+      "url": "https://www.corc.uk.net/outcome-measures-guidance/directory-of-outcome-measures/brief-parental-self-efficacy-scale-bpses/",
+      "bytes": 51312,
+      "sha256": "5848eae3a93615c6c7ca73894b6f333fa5144a06e699b21dca41d2ecc2d6b28d"
+    }
+  ],
+  "license": "CC BY4.0 on original article; Table1 no exclusion; attribution/license/change notice required",
+  "changes": [
+    "Selected only author-final bold five (not investigator selection)",
+    "Removed domain annotations from displayed stems and recorded mapping",
+    "Independent Chinese working translation and option translation",
+    "Independent Chinese instructions adapted from article Methods, not CORC standalone form",
+    "Platform original report; adult18+ and complete_required project policies"
+  ],
+  "corcBoundary": "Only factual scoring statement used; no copied standalone instruction or form layout, no unsupported CC claim over standalone PDF",
+  "existingChinese2026": "Not used as translation carrier or scientific authority for this derivative; full exact five-item published Chinese carrier remains incomplete in candidate research",
+  "population": "English UK parent/carer intervention samples Nmax355, parent age bounds unreported; target children2.1–18 are background, not subject age",
+  "scientificLimit": "Final one factor; configural supported but metric invariance failed across SLT/FFT; independent Chinese unvalidated",
+  "review": "Expert and governance PENDING; no scientificReview approval",
+  "runtimeLimits": [
+    "PREPARED instructions not connected",
+    "Current none policy has no separate runtime parameter version",
+    "Caregiver role not automatically verified by age-only applicability"
+  ]
+}

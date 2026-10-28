@@ -1,0 +1,14 @@
+{
+  "status": "PREPARED_NOT_RUNTIME_CONNECTED",
+  "instrumentKey": "bpses5_zh_cn_research",
+  "instrumentVersion": "1.0.0",
+  "locale": "zh-CN",
+  "instructions": [
+    "下面五句话描述你对自己引导孩子行为的信心。请阅读每句话，根据自己的情况选择同意程度，每题选择一项。这里请回答你对自身的看法。"
+  ],
+  "recallPeriod": null,
+  "instructionSource": "Platform adaptation of CC BY4 original article Methods",
+  "subject": "Adult respondent parent/carer reflecting on own disciplining self-efficacy; not the target child",
+  "itemOrderLocked": true,
+  "consumerStatus": "旧schema无instruction字段；独立指导语未接入运行消费者，不放在第一题。"
+}
