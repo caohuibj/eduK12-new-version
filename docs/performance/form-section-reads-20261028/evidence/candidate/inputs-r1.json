@@ -1,0 +1,6 @@
+{
+  "server-version/frontend/src/components/FormSectionManager.tsx": "b63232f9790d3a23bf72cf48fbf9d9adf8696504f82f6a259285e154d6b651ba",
+  "server-version/frontend/src/components/__tests__/FormSectionManager.http.test.tsx": "393e1b519eede8932379837f34c2ed96afcffd511ed58e72a91451adc46a87f1",
+  "server-version/frontend/src/components/__tests__/FormSectionManager.test.tsx": "fc3979ef567cc335e7eaba82c5490736ae64c5606cfb38fb17b12df578ea3ab3",
+  "server-version/frontend/src/pages/teacher/GeneralQuestionnaireEdit.deferred.test.tsx": "0b2780e43940cef1222f697090ce5386c04ee25fcc825e64569507b3fc599555"
+}

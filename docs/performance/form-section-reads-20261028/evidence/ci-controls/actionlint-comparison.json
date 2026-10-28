@@ -1,0 +1,18 @@
+{
+  "tool": "official actionlint v1.7.12; archive verified against official GitHub asset digest",
+  "rows": [
+    {
+      "input": "base",
+      "inputSHA256": "98afbe8c557729f466dc5e6bd9d37a4d840f0f4fc0eb6c26710f67925377e5ef",
+      "exitCode": 0,
+      "diagnostics": []
+    },
+    {
+      "input": "candidate",
+      "inputSHA256": "2847995c12b9ac92eae2e29729d9bf3a1468a2085b84a54f46af18a7d324127a",
+      "exitCode": 0,
+      "diagnostics": []
+    }
+  ],
+  "newCandidateDiagnostics": []
+}

@@ -1,0 +1,11 @@
+{
+  "kind": "UNSIGNED_ORIGINAL_TOOL_RESULT_COPY",
+  "context": "Tool response copied from the actual completed syntax/actionlint command; no business tests, type checks, lint or browser execution",
+  "toolResult": {
+    "chunk_id": "164a80",
+    "wall_time_seconds": 0.178600893,
+    "exit_code": 0,
+    "original_token_count": 89,
+    "output": "[\n  {\n    \"input\": \"base\",\n    \"inputSHA256\": \"98afbe8c557729f466dc5e6bd9d37a4d840f0f4fc0eb6c26710f67925377e5ef\",\n    \"exitCode\": 0,\n    \"diagnostics\": []\n  },\n  {\n    \"input\": \"candidate\",\n    \"inputSHA256\": \"2847995c12b9ac92eae2e29729d9bf3a1468a2085b84a54f46af18a7d324127a\",\n    \"exitCode\": 0,\n    \"diagnostics\": []\n  }\n]\n{'newCandidateDiagnostics': []}\n"
+  }
+}

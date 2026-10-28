@@ -1,0 +1,27 @@
+{
+  "recordedAtUtc": "2026-10-28T10:50:21Z",
+  "source": "c5c28f85085e53de1b7be4ed821489accaae7228",
+  "tree": "e85f04bc9c6e7411dcd0d0a189feafc4c1eeacbb",
+  "scope": "baseline recorded before product edit; uncommitted measurement harness is listed by hash; synthetic loopback HTTP gzip1, Node fetch transport, jsdom; no DB, flags, browser or production traffic",
+  "files": {
+    "server-version/frontend/package.json": "ba3959e4e7935cb3b60b8391f590a2622990397b1b33b99a545c45867d51e49f",
+    "server-version/frontend/package-lock.json": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+    "server-version/backend/package-lock.json": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+    "server-version/backend/prisma/schema.prisma": "3bea3c07159f95eadce9257207648658bc8f10e5996f594667cb6c877a84b515",
+    "server-version/frontend/vitest.config.ts": "3d757d2b1cee6c1c09a3ec7016b296aa159c938f83365e2370a1d423f29917db",
+    "server-version/frontend/src/test/setup.ts": "6e40f95ed1a8c33a9142d1d1ceb9400abc38b6a8de2d5798f7fa3fe9984482f8",
+    "server-version/frontend/src/components/__tests__/FormSectionManager.http.test.tsx": "393e1b519eede8932379837f34c2ed96afcffd511ed58e72a91451adc46a87f1",
+    "server-version/frontend/src/components/FormSectionManager.tsx": "19689087383ca9d04293870596bf02b2b0105b40119fe637dd16786ba8d55dfa",
+    "server-version/frontend/src/pages/teacher/GeneralQuestionnaireEdit.tsx": "466fc8d8a25809a1b740d392a92691705370ae532a2d36f00cdd21fb1483b0c8"
+  },
+  "installed": {
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-router-dom": "7.18.3",
+    "axios": "1.20.0",
+    "vite": "6.4.4",
+    "vitest": "4.1.11",
+    "typescript": "5.6.3",
+    "jsdom": "25.0.1"
+  }
+}
