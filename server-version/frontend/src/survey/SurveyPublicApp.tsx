@@ -112,6 +112,8 @@ function firstFinalParticipantFeedback(result:FinalResponse,attemptId:string):Ge
   })
   return valid?{...general,kind:'DESCRIPTIVE',pending:receipt.pending,measurements:receipt.measurements as ParticipantFeedback[]}:null
 }
+const feedbackQualityText=(value:string)=>({interpretable:'本次结果可作参考',limited:'本次结果仅供有限参考',invalid:'本次作答不足以形成有效解释'} as Record<string,string>)[value]??'本次结果暂无法解释'
+const feedbackMetricStatusText=(value:string)=>({OK:'已计算',calculated:'已计算',INSUFFICIENT_DATA:'有效作答不足',insufficient_data:'有效作答不足',INVALID:'本次数据无效',invalid:'本次数据无效',not_calculable:'暂无法计算',limited:'仅供有限参考'} as Record<string,string>)[value]??'暂无法说明'
 type SingleResume={attemptId:string;accessCredential:string;createdAt:number}
 const singleStorageKey=(id:string)=>'huisurvey:v1:single:'+id
 const readSingleResume=(id:string):SingleResume|null=>{
@@ -1353,8 +1355,8 @@ export default function SurveyPublicApp(){
           {general.pending&&<p role="status">部分反馈将在问卷收集结束后开放。</p>}
           {general.measurements?.map(measurement=><article key={measurement.instrumentKey} className="space-y-2">
             <h4 className="font-medium">{measurement.title}</h4>
-            <p className="text-xs">{measurement.feedbackKind==='RAW_METRICS'?'受控原始指标':'试点测量'} · 质量状态：{measurement.quality}。仅反映本次条件下的表现。</p>
-            {measurement.metrics.map(metric=><p key={metric.key}>{metric.label}：{metric.value===null?'不可计算':measurement.feedbackKind==='RAW_METRICS'?String(metric.value):metric.unit==='ratio'?(metric.value*100).toFixed(1)+'%':metric.unit==='ms'?metric.value+' ms':String(metric.value)}（{metric.status}）</p>)}
+            <p className="text-xs">{measurement.feedbackKind==='RAW_METRICS'?feedbackQualityText(measurement.quality):'试点测量 · 质量状态：'+measurement.quality}。仅反映本次条件下的表现。</p>
+            {measurement.metrics.map(metric=><p key={metric.key}>{metric.label}：{metric.value===null?'不可计算':measurement.feedbackKind==='RAW_METRICS'?String(metric.value):metric.unit==='ratio'?(metric.value*100).toFixed(1)+'%':metric.unit==='ms'?metric.value+' ms':String(metric.value)}（{measurement.feedbackKind==='RAW_METRICS'?feedbackMetricStatusText(metric.status):metric.status}）</p>)}
             {measurement.feedbackKind==='RAW_METRICS'&&measurement.rawScoreFeedback?.map((feedback,index)=><section className="border-l-2 border-slate-300 pl-3 space-y-2" key={feedback.scoreKey+':'+index} aria-label="原始分描述性反馈">
               <p className="whitespace-pre-wrap text-sm">{feedback.text}</p>
               {completion&&feedback.materials?.map(item=><SurveyMaterialDisplay key={item.asset.assetId} item={item} purpose="report" proof={{publicId,attemptId:completion.attemptId,...completion.proof}}/>)}

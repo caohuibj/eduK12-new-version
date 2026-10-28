@@ -670,9 +670,9 @@ describe('participant stored raw feedback display',()=>{
       metrics:[{key:'total',label:'原始总分',value:7,unit:null,status:'OK'}],rawScoreFeedback:[{scoreKey:'total',rangeKey:'r',text:'服务器冻结匹配的区间说明'}],
     }]})
     render(<SurveyPublicApp/>);fireEvent.click(await screen.findByRole('button',{name:'恢复本次作答／查看已完成回执'}))
-    expect(await screen.findByText('原始总分：7（OK）')).toBeInTheDocument()
+    expect(await screen.findByText('原始总分：7（已计算）')).toBeInTheDocument()
     expect(screen.getByText('服务器冻结匹配的区间说明')).toBeInTheDocument()
-    expect(screen.getByText(/受控原始指标 · 质量状态/)).toBeInTheDocument()
+    expect(screen.getByText(/本次结果可作参考/)).toBeInTheDocument()
     expect(screen.queryByText(/7 ms|试点测量/)).toBeNull()
     expect(generalCalls()).toHaveLength(1)
   })
@@ -700,7 +700,7 @@ it('fetches currently authorized raw feedback on first successful FINAL instead 
     metrics:[{key:'total',label:'原始总分',value:7,unit:null,status:'OK'}],
   }]})
   await openTask();fireEvent.click(screen.getByRole('radio',{name:'同意'}));submit()
-  expect(await screen.findByText('原始总分：7（OK）')).toBeInTheDocument()
+  expect(await screen.findByText('原始总分：7（已计算）')).toBeInTheDocument()
   expect(generalCalls()).toHaveLength(1)
   expect(screen.queryByText(receiptText)).toBeNull()
 })
@@ -728,11 +728,13 @@ describe('first committed descriptive feedback receipt',()=>{
  it('shows permitted first feedback without GET and reauthorizes after reopening',async()=>{
   taskOverrides={reportMode:'DESCRIPTIVE'};finalReply=()=>response(firstSuccess({participantFeedbackReceipt:receipt()}))
   const view=await openTask();fireEvent.click(screen.getByRole('radio',{name:'同意'}));submit()
-  expect(await screen.findByText('原始总分：7（OK）')).toBeInTheDocument();expect(generalCalls()).toHaveLength(0)
+  expect(await screen.findByText('原始总分：7（已计算）')).toBeInTheDocument();expect(generalCalls()).toHaveLength(0)
+  expect(screen.getByText('本次结果可作参考。仅反映本次条件下的表现。')).toBeInTheDocument()
+  expect(screen.queryByText(/质量状态：interpretable/)).toBeNull()
   expect(JSON.stringify(sessionStorage)).not.toContain('原始总分')
   view.unmount();taskValue={...taskValue,status:'COMPLETED'};generalReply=()=>response(null,403,'研究身份已失效')
   render(<SurveyPublicApp/>);fireEvent.click(await screen.findByRole('button',{name:'恢复本次作答／查看已完成回执'}))
-  await screen.findByText('研究身份已失效');expect(screen.queryByText('原始总分：7（OK）')).toBeNull();expect(generalCalls()).toHaveLength(1)
+  await screen.findByText('研究身份已失效');expect(screen.queryByText('原始总分：7（已计算）')).toBeNull();expect(generalCalls()).toHaveLength(1)
  })
  it('keeps deferred feedback pending rather than loading hidden metrics',async()=>{
   taskOverrides={reportMode:'DESCRIPTIVE'};finalReply=()=>response(firstSuccess({participantFeedbackReceipt:receipt(true)}))
