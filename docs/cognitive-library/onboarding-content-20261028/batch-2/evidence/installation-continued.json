@@ -1,0 +1,110 @@
+{
+  "success": true,
+  "mode": "targeted continuation in original isolated database; preview/create not replayed",
+  "rows": [
+    {
+      "testType": "attentional-blink",
+      "configVersion": "0.1.0",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "action": "ALREADY_PRESENT",
+      "reasons": [],
+      "configId": "c2895a77-4c33-4d33-b5d2-fa704ad8b0ce",
+      "status": "DRAFT",
+      "sourceHash": "3ef57cf71a9ccf5072b94a4f72f430194dff058d9bceae9db5d54c04b6aa7a45"
+    },
+    {
+      "testType": "balloon-effort",
+      "configVersion": "0.1.0",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "action": "ALREADY_PRESENT",
+      "reasons": [],
+      "configId": "ef4ffe9e-b00d-4a7e-870a-f64e2ad76af7",
+      "status": "DRAFT",
+      "sourceHash": "4e14b4ab66762cc04e35d37f886ab8c055fa947c52da39e819643074b2c6f032"
+    },
+    {
+      "testType": "dual-arrow",
+      "configVersion": "0.1.0",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "action": "ALREADY_PRESENT",
+      "reasons": [],
+      "configId": "f66bef93-f8b8-452c-af45-cbf74e27768c",
+      "status": "DRAFT",
+      "sourceHash": "f5a623f397198f9c7cf73174253fa5c48258a3d19342887edcabf704d57800ca"
+    },
+    {
+      "testType": "gradcpt",
+      "configVersion": "0.1.0",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "action": "ALREADY_PRESENT",
+      "reasons": [],
+      "configId": "5f8f6b3f-1590-4339-89c1-40a476932a4a",
+      "status": "DRAFT",
+      "sourceHash": "a98ae1bfd1035245810580f4365a97ae11f448727e1b9bb4653ab12e1aadae09"
+    },
+    {
+      "testType": "hearts-flowers",
+      "configVersion": "0.1.0",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "action": "ALREADY_PRESENT",
+      "reasons": [],
+      "configId": "6b2ab6fe-806f-49b9-9d7e-dd84bbc4bb6b",
+      "status": "DRAFT",
+      "sourceHash": "4b45feed6f5150defaba945300dbd325d088e47b7e621785b7abc3009707b985"
+    },
+    {
+      "testType": "horizon-exploration",
+      "configVersion": "0.1.0",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "action": "ALREADY_PRESENT",
+      "reasons": [],
+      "configId": "4985d3a9-bcd3-4705-b798-267803564929",
+      "status": "DRAFT",
+      "sourceHash": "d1160648b0e566a1f79bc8bc811ca991821cc193ab1d58d39e2b3f37ea724bae"
+    },
+    {
+      "testType": "precision-working-memory",
+      "configVersion": "0.1.0",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "action": "ALREADY_PRESENT",
+      "reasons": [],
+      "configId": "3b8569e9-aee3-4520-bd29-cbbbda7139ce",
+      "status": "DRAFT",
+      "sourceHash": "ca8135dc866ea2d2e69adc5c643b952b0acfff8c676563d4f7bacec6c4f19e33"
+    },
+    {
+      "testType": "visual-search-two-stage",
+      "configVersion": "0.1.0",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "action": "ALREADY_PRESENT",
+      "reasons": [],
+      "configId": "afdfa42b-1b12-4ba8-9c94-5defc73860f9",
+      "status": "DRAFT",
+      "sourceHash": "23251f0754b34bfe80dd1afca31f09e2852ad817029da352def298d6f81dd1c2"
+    },
+    {
+      "testType": "ant",
+      "configVersion": "1.1.0",
+      "engineVersion": "1.1.0",
+      "scoringVersion": "1.1.0",
+      "action": "ALREADY_PRESENT",
+      "reasons": [],
+      "configId": "fd634d8f-159b-4b69-823a-a805f682a734",
+      "status": "DRAFT",
+      "sourceHash": "485c3bcb9a7318c66d71c3e3625e2e6fca393f626d07a055b2f99e69a2b96111"
+    }
+  ],
+  "audits": 9,
+  "assignments": 0,
+  "published": 0,
+  "releasePointers": 0,
+  "unchangedRows": true
+}

@@ -3,12 +3,13 @@ import {PrismaClient} from '@prisma/client'
 import {afterAll,beforeAll,describe,expect,it,vi} from 'vitest'
 vi.mock('dotenv',()=>({default:{config:()=>({parsed:{}})}}))
 import {integrationDatabaseUrl,requireIsolatedReleaseDatabase} from '../integration/integration-env'
-import {nativeCognitiveConfigSeeds} from '../../modules/cognitive/content-candidates/native-registry/config-seeds'
+import {nativeCognitiveConfigSeeds as registeredSeeds} from '../../modules/cognitive/content-candidates/native-registry/config-seeds'
 import {planCognitiveConfigInstall,installCognitiveConfigs} from '../../modules/cognitive/onboarding/install'
 import {freezeNativeAssignmentProfile,readFrozenReport} from '../../modules/cognitive/profile-freeze'
 import {getCognitiveTaskResource} from '../../modules/cognitive/task-resource'
 import {decryptCognitivePayload} from '../../modules/cognitive/cognitive.security'
 
+const nativeCognitiveConfigSeeds=registeredSeeds.filter(seed=>['mot','enumeration'].includes(seed.testType))
 const url=integrationDatabaseUrl('COGNITIVE_NATIVE_INSTALL_TEST_DATABASE_URL'),suite=url?describe:describe.skip
 suite('selected native configurations with isolated PostgreSQL',()=>{
  let db:PrismaClient

@@ -1,3 +1,4 @@
+import {nativeCognitiveConfigSeeds} from './content-candidates/native-registry/config-seeds'
 import type { RegistryEntry, CognitiveProfile, CognitiveProfileDefinition, MetricDefinition, QualityDefinition, SingleTaskReportDefinition } from './cognitive.types'
 import type { TaskDefinition } from './v2/types'
 import { getCognitiveRegistryEntry, listCognitiveRegistryEntries } from './cognitive.registry'
@@ -41,6 +42,9 @@ const nativeVersionFacts = (d: TaskDefinition) => {
     if(!id)throw BAD_REQUEST('No exact recognition version metadata')
     return {configVersion:id.configVersion,profileDefinitionVersion:id.configVersion,metricDefinitionVersion:id.scoringVersion,qualityDefinitionVersion:id.scoringVersion}
   }
+  const seed=nativeCognitiveConfigSeeds.find(value=>value.testType===d.testType&&value.engineVersion===d.engineVersion&&value.scoringVersion===d.scoringVersion)
+  if(seed)return {configVersion:seed.configVersion,profileDefinitionVersion:seed.configVersion,
+    metricDefinitionVersion:d.scoringVersion,qualityDefinitionVersion:d.scoringVersion}
   throw BAD_REQUEST('No exact native version metadata')
 }
 const nativeResource = (definition: TaskDefinition<unknown, unknown>): CognitiveTaskResource => ({

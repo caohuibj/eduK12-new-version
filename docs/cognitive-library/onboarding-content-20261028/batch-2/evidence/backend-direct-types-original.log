@@ -1,0 +1,27 @@
+[
+  {
+    file: 'server-version/backend/src/modules/cognitive/content-candidates/native-registry/config-seeds.ts',
+    start: 2690,
+    code: 2322,
+    message: `Type '{ testType: "mot"; configVersion: "1.0.0"; name: string; engineVersion: "1.1.1"; scoringVersion: "1.1.0"; config: MotConfig; status: "DRAFT"; }' is not assignable to type 'CognitiveSeed'.\n` +
+      "  Types of property 'config' are incompatible.\n" +
+      "    Type 'MotConfig' is not assignable to type 'Record<string, unknown>'.\n" +
+      "      Index signature for type 'string' is missing in type 'MotConfig'."
+  },
+  {
+    file: 'server-version/backend/src/modules/cognitive/content-candidates/native-registry/config-seeds.ts',
+    start: 2713,
+    code: 2322,
+    message: `Type '{ testType: "enumeration"; configVersion: "0.3.0"; name: string; engineVersion: "0.2.0"; scoringVersion: "0.2.0"; config: EnumerationRecipeConfig; status: "DRAFT"; }' is not assignable to type 'CognitiveSeed'.\n` +
+      "  Types of property 'config' are incompatible.\n" +
+      "    Type 'EnumerationRecipeConfig' is not assignable to type 'Record<string, unknown>'.\n" +
+      "      Index signature for type 'string' is missing in type 'EnumerationRecipeConfig'."
+  },
+  {
+    file: 'server-version/backend/src/modules/cognitive/content-candidates/native-registry/config-seeds.ts',
+    start: 3461,
+    code: 2345,
+    message: "Argument of type 'AntGuidedConfig' is not assignable to parameter of type 'Record<string, unknown>'.\n" +
+      "  Index signature for type 'string' is missing in type 'AntGuidedConfig'."
+  }
+]

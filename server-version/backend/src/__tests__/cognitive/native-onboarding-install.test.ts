@@ -1,10 +1,11 @@
 import {describe,expect,it,vi} from 'vitest'
 vi.mock('dotenv',()=>({default:{config:()=>({parsed:{}})}}))
 import {canonicalHash} from '../../modules/assessment-runtime/canonical'
-import {nativeCognitiveConfigSeeds} from '../../modules/cognitive/content-candidates/native-registry/config-seeds'
+import {nativeCognitiveConfigSeeds as registeredSeeds} from '../../modules/cognitive/content-candidates/native-registry/config-seeds'
 import {nativeMotConfigSeed,nativeEnumerationConfigSeed} from '../../../prisma/seeds/native-cognitive'
 import {planCognitiveConfigInstall} from '../../modules/cognitive/onboarding/install'
 
+const nativeCognitiveConfigSeeds=registeredSeeds.filter(seed=>['mot','enumeration'].includes(seed.testType))
 const identity=(seed:typeof nativeCognitiveConfigSeeds[number])=>({testType:seed.testType,configVersion:seed.configVersion,engineVersion:seed.engineVersion,scoringVersion:seed.scoringVersion})
 describe('existing native configurations in selected installation',()=>{
  it('shares unchanged exact factories with Prisma and previews both real definitions without writes',async()=>{
