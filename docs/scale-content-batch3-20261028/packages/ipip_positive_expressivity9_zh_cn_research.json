@@ -7,7 +7,7 @@
   "originalSource": "server-version/backend/src/modules/scale/instruments/ipip_positive_expressivity9_zh_cn_research/1.0.0/source.json",
   "preparedSource": "server-version/backend/src/modules/scale/instruments/ipip_positive_expressivity9_zh_cn_research/1.0.1/source.json",
   "originalSourceSHA256": "c9c348aed9a5596aa774d5eae074e63555bd50b379084bcde04f2165c9d2051a",
-  "preparedSourceSHA256": "9911b8349f96191b0f738eec125e71a48339796a57fe57df0fcf1a478f1c23d2",
+  "preparedSourceSHA256": "95ebdfc943edd53639fa8adbd49718c60d7aee29c7f063085b33619fa57018f2",
   "originalFiles": [
     {
       "path": "docs/scale-instruments/research-drafts/ipip_positive_expressivity9/1.0.0/README.md",
@@ -111,6 +111,15 @@
         "version": "1.0.1",
         "source": "docs/scale-instruments/research-drafts/ipip_positive_expressivity9/1.0.0/bilingual-content.json#/instructions @ b92c69aefa2472775fa7ee86b9c208366886c908 (项目工作稿；非人工审批声明)"
       }
+    },
+    {
+      "op": "remove",
+      "path": "/executable/definition/report/audienceContract/qcReview",
+      "from": {
+        "reviewer": "AI-assisted local editorial check (not human expert review)",
+        "reviewedAt": "2026-10-25T16:18:00Z",
+        "basis": "AI editorial check only: descriptive adult reflection, no norms, diagnostic/ability/moral labels or therapy claims; not human expert translation or psychometric review."
+      }
     }
   ],
   "audit": "audits/audit-ipip-positive-expressivity9-batch3.json",
@@ -131,5 +140,6 @@
     "databasePublish": "NOT_EXECUTED",
     "production": "NOT_TOUCHED"
   },
-  "versionReason": "Original 1.0.0 source is retained byte-for-byte as DRAFT where a new 1.0.1 definition identity is introduced; same-identity existing rows must conflict, never overwrite. Description translation and instruction extraction do not change formulas, item meaning or options. Report-only wording has an explicit report revision."
+  "versionReason": "Original 1.0.0 source is retained byte-for-byte as DRAFT where a new 1.0.1 definition identity is introduced; same-identity existing rows must conflict, never overwrite. Description translation and instruction extraction do not change formulas, item meaning or options. Report-only wording has an explicit report revision.",
+  "reviewProvenance": "Original 1.0.0 retains its historical AI editorial qcReview. Revised report 1.0.1 does not reuse that prior timestamp/reviewer as approval of new wording; current content audit is separately preserved."
 }

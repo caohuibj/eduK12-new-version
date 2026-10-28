@@ -478,12 +478,7 @@
           "schemaVersion": 1,
           "respondent": "ADULT_SELF",
           "audience": "student",
-          "locale": "zh-CN",
-          "qcReview": {
-            "reviewer": "AI-assisted local editorial check (not human expert review)",
-            "reviewedAt": "2026-10-25T16:18:00Z",
-            "basis": "AI editorial check only: descriptive adult reflection, no norms, diagnostic/ability/moral labels or therapy claims; not human expert translation or psychometric review."
-          }
+          "locale": "zh-CN"
         }
       },
       "referencePolicy": {
