@@ -83,7 +83,7 @@ describe('School/Teacher read-only tool authoring capability routes', () => {
     const response = await request(prefix, entry, org, `?entry=${other}&product=TRAINING&organizationId=other&userId=other&canAuthor=true`)
     expect(response.status).toBe(200)
     expect(response.headers.get('cache-control')).toBe('no-store')
-    expect((await response.json()).data).toEqual({ canAuthor: true, authorableToolKinds: ['SCALE', 'FORM'] })
+    expect((await response.json()).data).toEqual({ canAuthor: true, authorableToolKinds: ['SCALE', 'FORM', 'COMPOSITION'] })
     expect(m.query).toHaveBeenCalledTimes(1)
     const sql = m.query.mock.calls[0][0]
     expect(sql.values).toContain(product)
@@ -129,8 +129,15 @@ describe('School/Teacher read-only tool authoring capability routes', () => {
     })
     expect(response.status).toBe(200)
     expect(m.query).toHaveBeenCalledTimes(1)
-    expect(m.tools).toHaveBeenCalledWith(expect.objectContaining({ where: { entry: 'TEACHER', organizationId: org, ownerUserId: 'actor' }, take: 51 }))
+    expect(m.tools).toHaveBeenCalledWith(expect.objectContaining({ where: { entry: 'TEACHER', organizationId: org, ownerUserId: 'actor', kind: { in: ['SCALE', 'FORM'] } }, take: 51 }))
     expect((await response.json()).data.list).toEqual([])
+    const questionnaire = await fetch(`${origin}/huiteacher/organizations/${org}/private-tools?kind=COMPOSITION`, {
+      headers: { 'x-session-entry': 'TEACHER', cookie: 'huiteacher_session=fixture' },
+    })
+    expect(questionnaire.status).toBe(200)
+    expect(m.query).toHaveBeenCalledTimes(2) // one current authority read per request
+    expect(m.tools).toHaveBeenLastCalledWith(expect.objectContaining({ where: { entry: 'TEACHER', organizationId: org, ownerUserId: 'actor', kind: 'COMPOSITION' }, take: 51 }))
+    expect((await questionnaire.json()).data.list).toEqual([])
   })
   it.each(endpoints)('%s rejects invalid IDs before SQL and does not swallow database failures', async (entry, prefix) => {
     expect((await request(prefix, entry, 'invalid')).status).toBe(400)

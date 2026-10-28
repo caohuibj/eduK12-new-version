@@ -4,7 +4,7 @@ import type { AuthenticatedPrincipal } from '../../types'
 import { resolveEducationProductMemberScope } from '../organization/educationProductAccess'
 
 export type EducationToolEntry = 'SCHOOL' | 'TEACHER'
-export type EducationAuthorableToolKind = 'SCALE' | 'FORM'
+export type EducationAuthorableToolKind = 'SCALE' | 'FORM' | 'COMPOSITION'
 
 // AccountDomain.SCHOOL is shared identity, not a product selector. Entries are
 // server-selected by their authenticated router, never by a request body.
@@ -19,7 +19,7 @@ export type EducationToolAuthoringContext = EntryContext & {
   membershipId: string
   ownerUserId: string
   defaultVisibility: 'AUTHOR_PRIVATE'
-  authorableToolKinds: readonly ['SCALE', 'FORM']
+  authorableToolKinds: readonly ['SCALE', 'FORM', 'COMPOSITION']
 }
 
 type Input = {
@@ -62,7 +62,7 @@ export async function resolveEducationToolAuthoringContext(
     membershipId: member.membershipId,
     ownerUserId: input.principal.userId,
     defaultVisibility: 'AUTHOR_PRIVATE',
-    authorableToolKinds: ['SCALE', 'FORM'],
+    authorableToolKinds: ['SCALE', 'FORM', 'COMPOSITION'],
   }
 }
 

@@ -9,7 +9,7 @@ import {success} from '../../utils/response'
 import {FormAnswerValidationError} from '../assessment-core/form/answers'
 import {ScaleAnswerValidationError} from '../scale/scale-scoring'
 import type {EducationToolEntry} from './access'
-import {EducationPrivateToolError,privateToolId,type PrivateToolContext} from './private-tool.contracts'
+import {EducationPrivateToolError,privateToolId,privateToolKind,type PrivateToolContext} from './private-tool.contracts'
 import * as service from './private-tool.service'
 
 /** Mounted under the matching product authentication middleware only. */
@@ -34,7 +34,10 @@ export function educationPrivateToolRouter(entry:EducationToolEntry){
  })
  router.use(educationPrivateToolMediaRouter(context))
  router.use(privateToolSharingRouter(context))
- router.get('/',handle(req=>service.listPrivateTools(context(req),cursor(req))))
+ router.get('/',handle(req=>{
+  const query=z.object({cursor:privateToolId.optional(),kind:privateToolKind.optional()}).strict().parse(req.query)
+  return service.listPrivateTools(context(req),query.cursor,query.kind)
+ }))
  router.post('/',handle(req=>service.createPrivateTool(context(req),req.body)))
  router.get('/runtime-candidates',handle(req=>{
   const query=z.object({cursor:privateToolId.optional(),kind:z.enum(['SCALE','FORM']).default('SCALE')}).strict().parse(req.query)

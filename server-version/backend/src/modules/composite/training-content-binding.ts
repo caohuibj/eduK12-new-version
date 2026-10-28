@@ -1,4 +1,5 @@
 import {educationMarkerBindingSchema} from '../education-tools/assessment-resource.marker-contract'
+import {educationCompositionBindingSchema} from '../education-tools/private-tool.composition-contracts'
 import {readEducationMarkerSource} from '../education-tools/assessment-resource.marker'
 import {readPrivateRuntimeScaleSource,assertPrivateRuntimeCompositeIdentity} from '../education-tools/private-tool.runtime-source'
 import {readLibraryScaleMeasurementSource} from '../scale-library-governance/training-source'
@@ -34,7 +35,8 @@ const sourceSchema=z.object({kind:z.enum(['SCALE','COGNITIVE_CONFIG','SJT_AUTHOR
 })
 const unitSchema=z.object({itemId:text,family:z.enum(['SCALE','COGNITIVE','SJT']),source:sourceSchema,
   measurement:z.object({releaseId:z.string().guid(),contentHash:digest,measurementHash:digest}).strict(),referencePolicy:trainingReferencePolicySchema.optional(),report:z.object({releaseId:z.string().guid(),contentHash:digest}).strict().optional()}).strict()
-export const trainingContentSnapshotSchema=z.object({schemaVersion:z.literal(1),compositeId:text,units:z.array(unitSchema).max(1000)}).strict()
+export const trainingContentSnapshotSchema=z.object({schemaVersion:z.literal(1),compositeId:text,units:z.array(unitSchema).max(1000),
+ educationBinding:educationCompositionBindingSchema.optional()}).strict()
 export type TrainingContentSnapshot=z.infer<typeof trainingContentSnapshotSchema>
 type Unit=TrainingContentSnapshot['units'][number]
 type Stored=NonNullable<Awaited<ReturnType<typeof getContentRelease>>>

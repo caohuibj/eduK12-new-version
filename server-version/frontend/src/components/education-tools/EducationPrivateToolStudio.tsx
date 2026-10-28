@@ -88,6 +88,7 @@ function PrivateToolSession({api,organizationId,entry,actorId='session',onDraftS
   void operate(async current=>{
    const value=await api<PrivateTool>(`${base}/${id}`)
    if(!current())return
+   if(value.kind!=='SCALE'&&value.kind!=='FORM')throw new Error('请从普通问卷编制入口打开这份问卷。')
    apply(value);setVersions([]);setVersionsCursor(null)
    const history=await api<{list:PrivateToolVersion[];nextCursor?:string|null}>(`${base}/${id}/versions`)
    if(current()){setVersions(mergeById([],history.list));setVersionsCursor(history.nextCursor??null)}

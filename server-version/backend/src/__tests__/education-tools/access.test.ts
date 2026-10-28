@@ -13,7 +13,7 @@ describe('education tool authoring capability contract', () => {
     mocks.query.mockResolvedValue([{ ...row, productAdmin: entry === 'TEACHER' }])
     expect(await resolveEducationToolAuthoringContext({ ...input(), entry })).toEqual({
       entry, product, organizationId: 'school', membershipId: 'member', ownerUserId: 'actor',
-      defaultVisibility: 'AUTHOR_PRIVATE', authorableToolKinds: ['SCALE', 'FORM'],
+      defaultVisibility: 'AUTHOR_PRIVATE', authorableToolKinds: ['SCALE', 'FORM', 'COMPOSITION'],
     })
     expect(mocks.query).toHaveBeenCalledTimes(1)
     const query = mocks.query.mock.calls[0][0]
@@ -58,7 +58,7 @@ describe('education tool authoring capability contract', () => {
     expect(mocks.query).not.toHaveBeenCalled()
   })
   it('returns no school details or broader permissions in navigation hints', async () => {
-    expect(await resolveEducationToolAuthoringCapabilities(input())).toEqual({ canAuthor: true, authorableToolKinds: ['SCALE', 'FORM'] })
+    expect(await resolveEducationToolAuthoringCapabilities(input())).toEqual({ canAuthor: true, authorableToolKinds: ['SCALE', 'FORM', 'COMPOSITION'] })
     mocks.query.mockResolvedValue([])
     expect(await resolveEducationToolAuthoringCapabilities(input())).toEqual({ canAuthor: false, authorableToolKinds: [] })
   })

@@ -12,8 +12,10 @@ import {normalizeFormAnswers} from '../assessment-core/form/runtime'
 import {parseAnswerMap} from '../assessment-core/form/answers'
 import type {FormDraft} from '../assessment-core/form/definition'
 import type {ScaleDefinitionV2} from '../scale/scale-definition'
-import {createPrivateToolInput,updatePrivateToolInput,freezePrivateToolInput,previewPrivateToolInput,privateToolId,privateToolFail,type PrivateToolContext} from './private-tool.contracts'
+import {createPrivateToolInput,updatePrivateToolInput,freezePrivateToolInput,previewPrivateToolInput,privateToolId,privateToolFail,type PrivateToolContext,type PrivateToolKind} from './private-tool.contracts'
 import {initialPrivateToolDefinition,privateToolDefinition,validatePrivateToolDefinition,privateToolContentHash} from './private-tool.definition'
+import {compilePrivateComposition} from './private-tool.composition-compiler'
+import {sealPrivateComposition,readOwnedCompositionIdentity} from './private-tool.composition-runtime'
 
 type Tx=Prisma.TransactionClient
 const boundary={visibility:'AUTHOR_PRIVATE',snapshotOnly:true,canPublish:false,canShare:false,canReadParticipantReports:false} as const
@@ -37,12 +39,12 @@ async function readOwned(tx:Tx,c:PrivateToolContext,id:string,lock=false){
   AND organization_id=${c.organizationId} AND owner_user_id=${c.principal.userId} FOR UPDATE`)
  const row=await tx.educationPrivateTool.findFirst({where:{id,...scope(c)}})
  if(!row)privateToolFail('PRIVATE_TOOL_NOT_FOUND',404)
- if(row.contentHash!==privateToolContentHash(row.kind as 'SCALE'|'FORM',row.title,row.definition))privateToolFail('PRIVATE_TOOL_HASH_MISMATCH')
+ if(row.contentHash!==privateToolContentHash(row.kind as PrivateToolKind,row.title,row.definition))privateToolFail('PRIVATE_TOOL_HASH_MISMATCH')
  return row
 }
 export async function createPrivateTool(c:PrivateToolContext,raw:unknown){
  const input=createPrivateToolInput.parse(raw)
- const definition=privateToolDefinition(input.kind,initialPrivateToolDefinition(input.kind))
+ const definition=privateToolDefinition(input.kind,initialPrivateToolDefinition(input.kind,c.entry))
  return transact(async tx=>{
   await authorized(tx,c,true)
   const row=await tx.educationPrivateTool.create({data:{id:randomUUID(),...scope(c),...input,
@@ -50,15 +52,18 @@ export async function createPrivateTool(c:PrivateToolContext,raw:unknown){
   return {...row,...boundary}
  },false,true)
 }
-export async function listPrivateTools(c:PrivateToolContext,cursor?:string){
+export async function listPrivateTools(c:PrivateToolContext,cursor?:string,kind?:PrivateToolKind){
  if(cursor)privateToolId.parse(cursor)
  return transact(async tx=>{
   await authorized(tx,c)
-  if(cursor&&!await tx.educationPrivateTool.findFirst({where:{id:cursor,...scope(c)},select:{id:true}}))
+  // Existing Scale/Form cards retain their leaf editors. The questionnaire
+  // adapter explicitly requests COMPOSITION; it cannot enter the Form editor.
+  const where={...scope(c),kind:kind??{in:['SCALE','FORM']}}
+  if(cursor&&!await tx.educationPrivateTool.findFirst({where:{id:cursor,...where},select:{id:true}}))
    privateToolFail('PRIVATE_TOOL_CURSOR_INVALID',400)
   // Use the database's native compound cursor: JS Date would truncate the
   // microseconds in created_at. Immutable createdAt keeps edits from shifting pages.
-  const rows=await tx.educationPrivateTool.findMany({where:scope(c),
+  const rows=await tx.educationPrivateTool.findMany({where,
    orderBy:[{createdAt:'desc'},{id:'desc'}],...(cursor?{cursor:{id:cursor},skip:1}:{}),take:51,
    select:{id:true,kind:true,title:true,revision:true,contentHash:true,createdAt:true,updatedAt:true}})
   return {list:rows.slice(0,50),nextCursor:rows.length>50?rows[49].id:null,...boundary}
@@ -73,9 +78,9 @@ export async function updatePrivateTool(c:PrivateToolContext,id:string,raw:unkno
   await authorized(tx,c,true)
   const row=await readOwned(tx,c,id,true)
   if(row.revision!==input.expectedRevision)privateToolFail('PRIVATE_TOOL_REVISION_CONFLICT')
-  const definition=privateToolDefinition(row.kind as 'SCALE'|'FORM',input.definition)
-  const media=await assertPrivateToolImages(tx,c,id,row.kind as 'SCALE'|'FORM',definition)
-  const contentHash=privateToolContentHash(row.kind as 'SCALE'|'FORM',input.title,definition)
+  const definition=privateToolDefinition(row.kind as PrivateToolKind,input.definition)
+  const media=await assertPrivateToolImages(tx,c,id,row.kind as PrivateToolKind,definition)
+  const contentHash=privateToolContentHash(row.kind as PrivateToolKind,input.title,definition)
   const result=await tx.educationPrivateTool.updateMany({where:{id,...scope(c),revision:input.expectedRevision},
    data:{title:input.title,definition:definition as Prisma.InputJsonValue,contentHash,revision:{increment:1}}})
   if(result.count!==1)privateToolFail('PRIVATE_TOOL_REVISION_CONFLICT')
@@ -86,8 +91,9 @@ export async function updatePrivateTool(c:PrivateToolContext,id:string,raw:unkno
 export async function validatePrivateTool(c:PrivateToolContext,id:string){
  return transact(async tx=>{
   await authorized(tx,c);const row=await readOwned(tx,c,id)
-  await assertPrivateToolImages(tx,c,id,row.kind as 'SCALE'|'FORM',row.definition)
-  const {valid,issues}=validatePrivateToolDefinition(row.kind as 'SCALE'|'FORM',row.definition)
+  await assertPrivateToolImages(tx,c,id,row.kind as PrivateToolKind,row.definition)
+  const {valid,issues}=validatePrivateToolDefinition(row.kind as PrivateToolKind,row.definition)
+  if(row.kind==='COMPOSITION'&&valid)await compilePrivateComposition(tx,c,row.definition)
   return {valid,issues,revision:row.revision,contentHash:row.contentHash,validationScope:'PRIVATE_TECHNICAL_SNAPSHOT',...boundary}
  })
 }
@@ -96,8 +102,17 @@ export async function previewPrivateTool(c:PrivateToolContext,id:string,raw:unkn
  const input=previewPrivateToolInput.parse(raw)
  return transact(async tx=>{
   await authorized(tx,c);const row=await readOwned(tx,c,id)
-  await assertPrivateToolImages(tx,c,id,row.kind as 'SCALE'|'FORM',row.definition)
-  const checked=validatePrivateToolDefinition(row.kind as 'SCALE'|'FORM',row.definition)
+  if(row.kind==='COMPOSITION'){
+   if(input.answers!==undefined||input.rawScores!==undefined)privateToolFail('PRIVATE_TOOL_PREVIEW_INPUT_INVALID',400)
+   const compiled=await compilePrivateComposition(tx,c,row.definition)
+   return {result:{kind:'COMPOSITION_PREVIEW',instruction:compiled.definition.instruction,blocks:compiled.definition.blocks.map(block=>{
+    const leaf=compiled.leaves.get(block.source.versionId)!
+    return {blockId:block.blockId,instruction:block.instruction,kind:leaf.kind,title:leaf.version.title,
+     definition:leaf.kind==='SCALE'?leaf.definition:leaf.form.definition}
+   })},previewOnly:true,persistedAnswers:false,contentHash:row.contentHash,...boundary}
+  }
+  await assertPrivateToolImages(tx,c,id,row.kind as PrivateToolKind,row.definition)
+  const checked=validatePrivateToolDefinition(row.kind as PrivateToolKind,row.definition)
   if(!checked.valid||!checked.definition)privateToolFail('PRIVATE_TOOL_DEFINITION_INCOMPLETE',400,checked.issues)
   let result:unknown
   if(row.kind==='SCALE'){
@@ -123,10 +138,18 @@ export async function freezePrivateTool(c:PrivateToolContext,id:string,raw:unkno
   const prior=await tx.educationPrivateToolVersion.findFirst({where:{toolId:id,...scope(c),sourceRevision:input.expectedRevision}})
   if(prior){
    if(prior.contentHash!==input.expectedContentHash)privateToolFail('PRIVATE_TOOL_FREEZE_CONFLICT')
+   if(prior.kind==='COMPOSITION')return {...prior,runtime:await readOwnedCompositionIdentity(tx,c,prior),state:'PRIVATE_SNAPSHOT',created:false,...boundary}
    await assertPrivateToolImages(tx,c,id,prior.kind as 'SCALE'|'FORM',prior.definition)
    return {...prior,state:'PRIVATE_SNAPSHOT',created:false,...boundary}
   }
   if(row.revision!==input.expectedRevision||row.contentHash!==input.expectedContentHash)privateToolFail('PRIVATE_TOOL_REVISION_CONFLICT')
+  if(row.kind==='COMPOSITION'){
+   const compiled=await compilePrivateComposition(tx,c,row.definition)
+   const version=await tx.educationPrivateToolVersion.create({data:{id:randomUUID(),toolId:id,...scope(c),kind:row.kind,
+    sourceRevision:row.revision,title:row.title,definition:row.definition as Prisma.InputJsonValue,contentHash:row.contentHash}})
+   const runtime=await sealPrivateComposition(tx,c,version,compiled)
+   return {...version,runtime,state:'PRIVATE_SNAPSHOT',created:true,...boundary}
+  }
   const media=await assertPrivateToolImages(tx,c,id,row.kind as 'SCALE'|'FORM',row.definition)
   const checked=validatePrivateToolDefinition(row.kind as 'SCALE'|'FORM',row.definition)
   if(!checked.valid)privateToolFail('PRIVATE_TOOL_DEFINITION_INCOMPLETE',400,checked.issues)
@@ -154,7 +177,7 @@ export async function readPrivateToolVersion(c:PrivateToolContext,id:string,vers
   await authorized(tx,c);await readOwned(tx,c,id)
   const version=await tx.educationPrivateToolVersion.findFirst({where:{id:versionId,toolId:id,...scope(c)}})
   if(!version)privateToolFail('PRIVATE_TOOL_VERSION_NOT_FOUND',404)
-  if(version.contentHash!==privateToolContentHash(version.kind as 'SCALE'|'FORM',version.title,version.definition))privateToolFail('PRIVATE_TOOL_HASH_MISMATCH')
+  if(version.contentHash!==privateToolContentHash(version.kind as PrivateToolKind,version.title,version.definition))privateToolFail('PRIVATE_TOOL_HASH_MISMATCH')
   return {...version,state:'PRIVATE_SNAPSHOT',...boundary}
  })
 }
