@@ -1,0 +1,170 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "vq10_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "Valuing Questionnaire, 10-item (VQ)",
+      "abbreviation": "VQ",
+      "instrumentFamily": "VQ"
+    },
+    "construct": {
+      "primaryDomain": "SELF_REGULATION",
+      "secondaryDomains": [],
+      "constructDefinition": "过去一周（含今天）价值导向生活的两个独立方面：Progress（在最在乎的领域取得进展）与 Obstruction（困难的想法、感受或记忆妨碍价值行动）。两个分量表分别求和，不合成总分。",
+      "constructLevel": "BROAD_DOMAIN",
+      "constructOverlapTags": [
+        "domain:act",
+        "domain:self_regulation",
+        "population:adolescent_adult",
+        "response:student_self",
+        "use:reflection",
+        "use:research",
+        "language_validation:chinese_working_translation",
+        "construct:act_valued_living_progress",
+        "construct:act_valued_living_obstruction",
+        "valued_living",
+        "values",
+        "self_report"
+      ]
+    },
+    "population": {
+      "populationNotes": "原开发样本为澳大利亚大学生（N=630）与临床成人（N=285）；此中文工作译稿未经独立回译或本地验证。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "PARTIAL"
+    },
+    "administration": {
+      "itemCount": 10,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "PAPER"
+      ],
+      "timeFrame": "过去一周，包括今天",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "官方附录给两端锚点 0 = Not at all true、6 = Completely true；中间选项以数字标注。",
+        "作答参照系为过去一周，包括今天。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "SUPPORTED",
+          "notes": "原文研究支持；中文工作译文尚未验证，且题文尚未入库。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "反馈仅作普遍生活化反思。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "smout-2014-vq",
+        "evidenceType": "STRUCTURAL_VALIDITY",
+        "population": "Australian undergraduates (N=630) and clinical adults (N=285)",
+        "locale": "en",
+        "territory": "AU",
+        "studyDesign": "原论文：两因子（Progress/Obstruction 各5题）、0–6 分、过去一周参照系；两分量表分别求和（各 0–30），不合成总分。分量表归属另经开放验证文献（Ruiz et al. 2022, PMC8743007）交叉核对。",
+        "rating": "MIXED",
+        "citation": "Smout M, Davies M, Burns N, Christie A (2014). Journal of Contextual Behavioral Science, 3, 164-172.",
+        "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8743007/",
+        "notes": "以上证据均针对原语言版本，不外推到本中文工作译稿。"
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "本记录未复制题文；样稿仅在报告设计中示意维度名称与模拟分数。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "可核实的全文来源是 Elsevier 作者稿（经 ACBS 站点、Web Archive 存档取回），文件首页明确注明：仅供作者内部非商业研究与教学使用，禁止复制分发及在第三方网站发布。按 SECDS-28 先例，题文不入库；本记录只登记主题索引、计分归属与报告设计。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "vq10-v1",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "vq10-v1",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "vq10-v1",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL"
+    ],
+    "notes": [
+      "可核实的全文来源是 Elsevier 作者稿（经 ACBS 站点、Web Archive 存档取回），文件首页明确注明：仅供作者内部非商业研究与教学使用，禁止复制分发及在第三方网站发布。按 SECDS-28 先例，题文不入库；本记录只登记主题索引、计分归属与报告设计。",
+      "取得原版权利人的明确再分发或施测许可后，才可将完整题文补入可执行源码并升级为 executable。"
+    ]
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "Development of the Valuing Questionnaire (VQ), Appendix 1 官方题表",
+      "url": "https://contextualscience.org/sites/default/files/Smout%20et%202014%20development%20of%20VQ%20published.pdf"
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "朝重要方向的前进",
+        "挡在路上的东西"
+      ],
+      "limitations": [
+        "这是未经回译及本地验证的中文工作译稿，结果不可视作已验证中文测量结果。",
+        "两个分量表方向不同：进展越高越好解读为“更多前进”，受阻越高表示“越多妨碍”；两者不合成总分。",
+        "该报告是单次自述；缺答不计分，不插补。"
+      ],
+      "disclaimer": "结果用于个人反思，不用于诊断或排名。"
+    }
+  }
+}

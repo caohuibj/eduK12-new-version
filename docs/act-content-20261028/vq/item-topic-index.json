@@ -1,0 +1,111 @@
+{
+  "instrumentKey": "vq10_zh_cn_research",
+  "topics": [
+    {
+      "itemCode": "VQ_01",
+      "topic": "沉溺过去或未来，而非投入重要活动",
+      "subscale": "obstruction"
+    },
+    {
+      "itemCode": "VQ_02",
+      "topic": "大部分时间处于“自动驾驶”",
+      "subscale": "obstruction"
+    },
+    {
+      "itemCode": "VQ_03",
+      "topic": "没有动力仍朝目标努力",
+      "subscale": "progress"
+    },
+    {
+      "itemCode": "VQ_04",
+      "topic": "为自己的生活感到自豪",
+      "subscale": "progress"
+    },
+    {
+      "itemCode": "VQ_05",
+      "topic": "在最在乎的领域取得进展",
+      "subscale": "progress"
+    },
+    {
+      "itemCode": "VQ_06",
+      "topic": "困难想法/感受/记忆妨碍想做的事",
+      "subscale": "obstruction"
+    },
+    {
+      "itemCode": "VQ_07",
+      "topic": "继续成为想成为的人",
+      "subscale": "progress"
+    },
+    {
+      "itemCode": "VQ_08",
+      "topic": "计划落空时轻易放弃",
+      "subscale": "obstruction"
+    },
+    {
+      "itemCode": "VQ_09",
+      "topic": "感到生活有目标",
+      "subscale": "progress"
+    },
+    {
+      "itemCode": "VQ_10",
+      "topic": "像“走过场”而非专注重要之事",
+      "subscale": "obstruction"
+    }
+  ],
+  "scores": [
+    {
+      "key": "progress",
+      "label": "进展（Progress，5题）",
+      "items": [
+        "VQ_03",
+        "VQ_04",
+        "VQ_05",
+        "VQ_07",
+        "VQ_09"
+      ],
+      "range": "0–30"
+    },
+    {
+      "key": "obstruction",
+      "label": "受阻（Obstruction，5题）",
+      "items": [
+        "VQ_01",
+        "VQ_02",
+        "VQ_06",
+        "VQ_08",
+        "VQ_10"
+      ],
+      "range": "0–30"
+    }
+  ],
+  "options": [
+    {
+      "value": "0",
+      "score": 0
+    },
+    {
+      "value": "1",
+      "score": 1
+    },
+    {
+      "value": "2",
+      "score": 2
+    },
+    {
+      "value": "3",
+      "score": 3
+    },
+    {
+      "value": "4",
+      "score": 4
+    },
+    {
+      "value": "5",
+      "score": 5
+    },
+    {
+      "value": "6",
+      "score": 6
+    }
+  ]
+}
