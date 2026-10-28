@@ -299,6 +299,12 @@ const SCORING_DECLARATIONS: Record<string, CognitiveScoringContractDeclaration> 
     runtimeReconstructableFacts: ['题目内容与正确项（冻结题库前 8 题 + seed 生成器重建）'],
     serverDerivedFacts: ['正确性判定', 'metrics（accuracy/medianRtMs）', 'quality flags'],
   },
+  cancellation: {
+    testType: 'cancellation',
+    clientObservedFacts: ['最终选中的格子集合', '扫描用时', 'interrupted'],
+    runtimeReconstructableFacts: ['符号网格与目标集（seed+scan 重建）'],
+    serverDerivedFacts: ['命中/漏报/误报求交判定', 'metrics（hitRate/falseAlarmRate）', 'quality flags'],
+  },
 }
 
 // 当前通用事实（所有任务一致）：完整加密 trial payload、v2 trial envelope qualityEvents、
@@ -519,6 +525,11 @@ const RESEARCH_CAPTURE_DECLARATIONS: Record<string, CognitiveResearchCaptureDecl
     testType: 'icarmatrix',
     currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次响应与 raw RT'],
     futureCaptureFacts: ['真实 input modality', 'device provenance', 'viewport/dpr'],
+  },
+  cancellation: {
+    testType: 'cancellation',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐轮选中格子集与用时'],
+    futureCaptureFacts: ['逐格点击时序', '真实 input modality', 'device provenance'],
   },
 }
 

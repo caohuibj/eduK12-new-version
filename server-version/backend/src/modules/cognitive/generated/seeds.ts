@@ -42,6 +42,7 @@ import { seeds as task39 } from '../tasks/wordmeaning/seeds'
 import { seeds as task40 } from '../tasks/semanticfluency/seeds'
 import { seeds as task41 } from '../tasks/wordproblem/seeds'
 import { seeds as task42 } from '../tasks/icarmatrix/seeds'
+import { seeds as task43 } from '../tasks/cancellation/seeds'
 export const cognitiveSeeds = [
   task0[0],
   task1[0],
@@ -89,5 +90,6 @@ export const cognitiveSeeds = [
   task41[0],
   task40[0],
   task42[0],
+  task43[0],
   task21[1],
 ]

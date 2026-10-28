@@ -798,3 +798,24 @@ export type IcarmatrixTrialPayload = {
   rtMs: number | null
   interrupted: boolean
 }
+
+/** Cancellation 冻结 config（与后端 cancellation.config schema 一致）。 */
+export interface CancellationConfig {
+  totalTrials: number
+  durationMs: number
+  stimulusSetVersion: string
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+/** Cancellation 单 trial payload（与后端 cancellation.trial schema 一致）。 */
+export type CancellationTrialPayload = {
+  scanIndex: number
+  selectedCells: number[]
+  responseDurationMs: number
+  interrupted: boolean
+}

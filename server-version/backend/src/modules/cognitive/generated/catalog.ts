@@ -41,6 +41,7 @@ import { catalog as task38 } from '../tasks/wordmeaning/governance'
 import { catalog as task39 } from '../tasks/semanticfluency/governance'
 import { catalog as task40 } from '../tasks/wordproblem/governance'
 import { catalog as task41 } from '../tasks/icarmatrix/governance'
+import { catalog as task42 } from '../tasks/cancellation/governance'
 export const cognitiveCatalog = {
   'reaction': task0,
   'memory': task1,
@@ -84,4 +85,5 @@ export const cognitiveCatalog = {
   'semanticfluency': task39,
   'wordproblem': task40,
   'icarmatrix': task41,
+  'cancellation': task42,
 }
