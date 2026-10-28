@@ -4,11 +4,11 @@
   "actualDatabaseImport": false,
   "published": false,
   "ciTriggered": false,
-  "toolFamilies": 17,
-  "exactVersions": 21,
-  "executableDrafts": 17,
-  "catalogOnly": 3,
-  "nativeGoldenCases": 70,
+  "toolFamilies": 23,
+  "exactVersions": 28,
+  "executableDrafts": 20,
+  "catalogOnly": 7,
+  "nativeGoldenCases": 82,
   "reportSamples": 20,
   "tools": [
     {
@@ -341,6 +341,121 @@
           "version": "1.0.0",
           "itemCount": 23,
           "locale": null,
+          "executable": false
+        }
+      ]
+    },
+    {
+      "family": "emque_ca",
+      "name": "EmQue-CA",
+      "category": "学生能力/相关策略自评",
+      "fullTextSource": "https://doi.org/10.3389/fpsyg.2017.00870",
+      "wordingAndScoring": "PASS",
+      "report": "NATIVE_TEMPLATE_AND_STATIC_SAMPLE",
+      "commit": "ebeb5be283ebd72e04adaf0366c50829368b257b",
+      "versions": [
+        {
+          "key": "emque_ca_student_en",
+          "version": "1.0.0",
+          "itemCount": 14,
+          "locale": "en",
+          "executable": true
+        }
+      ]
+    },
+    {
+      "family": "emque_preschool",
+      "name": "EmQue 家长评定 20/13",
+      "category": "家长对儿童的观察",
+      "fullTextSource": "https://doi.org/10.1177/01650254211022852",
+      "wordingAndScoring": "PASS",
+      "report": "NATIVE_TEMPLATE_AND_STATIC_SAMPLE",
+      "commit": "16aad177516124415d171354033515b7b9ba2209",
+      "versions": [
+        {
+          "key": "emque_preschool_parent_en",
+          "version": "1.0.0",
+          "itemCount": 20,
+          "locale": "en",
+          "executable": true
+        },
+        {
+          "key": "emque_preschool_13_parent_en",
+          "version": "1.0.0",
+          "itemCount": 13,
+          "locale": "en",
+          "executable": true
+        }
+      ]
+    },
+    {
+      "family": "sehs_s",
+      "name": "SEHS-S 2020",
+      "category": "学生积极发展自评",
+      "fullTextSource": "https://files.eric.ed.gov/fulltext/ED600109.pdf",
+      "wordingAndScoring": "PENDING_SCORING_MAP_VERIFICATION",
+      "report": "NONE",
+      "commit": "2eb290b80b496c1b49cd2945f00ee0a76cc7c4c9",
+      "versions": [
+        {
+          "key": "sehs_s_2020",
+          "version": "1.0.0",
+          "itemCount": 36,
+          "locale": "en",
+          "executable": false
+        }
+      ]
+    },
+    {
+      "family": "tsec22",
+      "name": "TSEC-22 教师社会情感能力量表",
+      "category": "教师个人能力自评",
+      "fullTextSource": "https://link.springer.com/article/10.1007/s12144-026-09348-3",
+      "wordingAndScoring": "PENDING_REDISTRIBUTION_PERMISSION",
+      "report": "NONE",
+      "commit": "ba801b3c181a9d155a478a19b1d494dbdc759269",
+      "versions": [
+        {
+          "key": "tsec_22_zh_cn",
+          "version": "1.0.0",
+          "itemCount": 22,
+          "locale": "zh-CN",
+          "executable": false
+        }
+      ]
+    },
+    {
+      "family": "iri28",
+      "name": "IRI 人际反应指数量表",
+      "category": "学生/成人自评（相邻构念）",
+      "fullTextSource": "https://www.ucdenver.edu/docs/librariesprovider54/wellbeing-documents/interpersonalreactivityindex.pdf",
+      "wordingAndScoring": "PENDING_LICENSE_VERIFICATION",
+      "report": "NONE",
+      "commit": "e624d04c6e840fde291d59a53e54dc8ae98b8b9d",
+      "versions": [
+        {
+          "key": "iri28_en",
+          "version": "1.0.0",
+          "itemCount": 28,
+          "locale": "en",
+          "executable": false
+        }
+      ]
+    },
+    {
+      "family": "calschls_sehm",
+      "name": "CalSCHLS 社会情绪健康模块 2025–26",
+      "category": "学校调查模块（混合）",
+      "fullTextSource": "https://calschls.org/site/assets/files/1103/mshs-sehm-2526_final_watermarked.pdf",
+      "wordingAndScoring": "PENDING_SCORING_AND_REDISTRIBUTION",
+      "report": "NONE",
+      "commit": "29f113a7b9f1bd45b39ace5a9f2ce4f3b443a6f4",
+      "versions": [
+        {
+          "key": "calschls_sehm_en",
+          "version": "1.0.0",
+          "itemCount": 43,
+          "locale": "en",
           "executable": false
         }
       ]

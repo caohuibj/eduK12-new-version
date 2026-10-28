@@ -983,6 +983,153 @@
           }
         }
       ]
+    },
+    {
+      "file": "server-version/backend/src/modules/scale/instruments/emque_ca_student_en/1.0.0/instrument.ts",
+      "key": "emque_ca_student_en",
+      "executable": true,
+      "valid": true,
+      "issues": [],
+      "goldens": [
+        {
+          "name": "minimum-keyed",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "affective_empathy": 1,
+            "cognitive_empathy": 1,
+            "intention_to_comfort": 1
+          }
+        },
+        {
+          "name": "maximum-keyed",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "affective_empathy": 3,
+            "cognitive_empathy": 3,
+            "intention_to_comfort": 3
+          }
+        },
+        {
+          "name": "sample-mixed",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "affective_empathy": 2.5,
+            "cognitive_empathy": 2,
+            "intention_to_comfort": 2.6
+          }
+        },
+        {
+          "name": "missing-subscale-item",
+          "passed": true,
+          "quality": "invalid",
+          "scores": {
+            "affective_empathy": 2.5,
+            "cognitive_empathy": null,
+            "intention_to_comfort": 2.6
+          }
+        }
+      ]
+    },
+    {
+      "file": "server-version/backend/src/modules/scale/instruments/emque_preschool_parent_en/1.0.0/instrument.ts",
+      "key": "emque_preschool_parent_en",
+      "executable": true,
+      "valid": true,
+      "issues": [],
+      "goldens": [
+        {
+          "name": "minimum-keyed",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "emotional_contagion": 0,
+            "attention_to_others_feelings": 0,
+            "prosocial_actions": 0
+          }
+        },
+        {
+          "name": "maximum-keyed",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "emotional_contagion": 2,
+            "attention_to_others_feelings": 2,
+            "prosocial_actions": 2
+          }
+        },
+        {
+          "name": "sample-mixed",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "emotional_contagion": 0.7142857142857143,
+            "attention_to_others_feelings": 1.2857142857142858,
+            "prosocial_actions": 1.1666666666666667
+          }
+        },
+        {
+          "name": "missing-subscale-item",
+          "passed": true,
+          "quality": "invalid",
+          "scores": {
+            "emotional_contagion": 0.7142857142857143,
+            "attention_to_others_feelings": null,
+            "prosocial_actions": 1.1666666666666667
+          }
+        }
+      ]
+    },
+    {
+      "file": "server-version/backend/src/modules/scale/instruments/emque_preschool_13_parent_en/1.0.0/instrument.ts",
+      "key": "emque_preschool_13_parent_en",
+      "executable": true,
+      "valid": true,
+      "issues": [],
+      "goldens": [
+        {
+          "name": "minimum-keyed",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "emotional_contagion": 0,
+            "attention_to_others_feelings": 0,
+            "prosocial_actions": 0
+          }
+        },
+        {
+          "name": "maximum-keyed",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "emotional_contagion": 2,
+            "attention_to_others_feelings": 2,
+            "prosocial_actions": 2
+          }
+        },
+        {
+          "name": "sample-mixed",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "emotional_contagion": 0.5,
+            "attention_to_others_feelings": 1.4,
+            "prosocial_actions": 1.5
+          }
+        },
+        {
+          "name": "missing-subscale-item",
+          "passed": true,
+          "quality": "invalid",
+          "scores": {
+            "emotional_contagion": 0.5,
+            "attention_to_others_feelings": null,
+            "prosocial_actions": 1.5
+          }
+        }
+      ]
     }
   ]
 }

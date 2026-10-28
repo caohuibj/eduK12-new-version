@@ -18,6 +18,26 @@
       "newFamily": "erq_ca",
       "existing": "ierq20_zh_cn_research",
       "relation": "IERQ测量人际情绪调节；与ERQ-CA个体认知重评和表达抑制不同。"
+    },
+    {
+      "newFamily": "emque_ca",
+      "existing": "bes20",
+      "relation": "EmQue-CA(情感/认知共情、安慰意向)与BES-20(认知/情感共情)相邻但不同家族；题本、维度与年龄带不同，不合并计分。"
+    },
+    {
+      "newFamily": "emque_preschool",
+      "existing": "emque_ca",
+      "relation": "同属EmQue家族：家长评定1–6岁(20/13题)与学生自评10–15岁(14题)为不同年龄段工具；不共享题本、计分或常模。"
+    },
+    {
+      "newFamily": "iri28",
+      "existing": "bes20",
+      "relation": "IRI四维(观点采择/共情关注/想象/个人痛苦)与BES-20相邻但独立家族；IRI四维不合成总分，也不与BES-20互换。"
+    },
+    {
+      "newFamily": "emque_ca",
+      "existing": "eaq30_rieffe_zh_cn",
+      "relation": "EmQue-CA验证研究中与EAQ并列作效度参照，两者为不同构念家族(共情 vs 情绪觉察)；EAQ已在库内。"
     }
   ]
 }

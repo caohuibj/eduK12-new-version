@@ -103,5 +103,35 @@
     "family": "bessi45",
     "sha": "809cdd81b7da62a5462ccba5a89555b35b587218",
     "tree": "f7b281d2e9308a32341e5e5108ad9aab120ad2f8"
+  },
+  {
+    "family": "emque_ca",
+    "sha": "ebeb5be283ebd72e04adaf0366c50829368b257b",
+    "tree": "89301f11d84c2e16f50009cef2c21d33c82fef77"
+  },
+  {
+    "family": "emque_preschool",
+    "sha": "16aad177516124415d171354033515b7b9ba2209",
+    "tree": "1c705cec938d2aa90e61a9be907e95d65af70446"
+  },
+  {
+    "family": "sehs_s",
+    "sha": "2eb290b80b496c1b49cd2945f00ee0a76cc7c4c9",
+    "tree": "b0c9ce8851c19e9589a42d738be0004157bd2fa2"
+  },
+  {
+    "family": "tsec22",
+    "sha": "ba801b3c181a9d155a478a19b1d494dbdc759269",
+    "tree": "d8f78125e41e6c5b484ef3c7368bd7f81071d90d"
+  },
+  {
+    "family": "iri28",
+    "sha": "e624d04c6e840fde291d59a53e54dc8ae98b8b9d",
+    "tree": "3e1b47aabc794d19e71594fdcb74dfd0f07c2640"
+  },
+  {
+    "family": "calschls_sehm",
+    "sha": "29f113a7b9f1bd45b39ace5a9f2ce4f3b443a6f4",
+    "tree": "7c23d3bdf5b073516338f823e3d48ec63db755a3"
   }
 ]

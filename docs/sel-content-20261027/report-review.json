@@ -253,5 +253,41 @@
     "action": true,
     "browserVisualReview": "NOT_COMPLETED_POLICY_BLOCKED",
     "staticContentAccepted": true
+  },
+  {
+    "family": "emque_ca",
+    "file": "docs/sel-content-20261027/emque_ca/report_sample.html",
+    "title": "感同身受的三种样子 · EmQue-CA 模拟报告",
+    "textCharacters": 865,
+    "graph": true,
+    "syntheticDisclosure": true,
+    "reflection": true,
+    "action": true,
+    "browserVisualReview": "NOT_COMPLETED_POLICY_BLOCKED",
+    "staticContentAccepted": true
+  },
+  {
+    "family": "emque_preschool",
+    "file": "docs/sel-content-20261027/emque_preschool/report.html",
+    "title": "看见孩子心里的 radar · EmQue 家长模拟报告",
+    "textCharacters": 903,
+    "graph": true,
+    "syntheticDisclosure": true,
+    "reflection": true,
+    "action": true,
+    "browserVisualReview": "NOT_COMPLETED_POLICY_BLOCKED",
+    "staticContentAccepted": true
+  },
+  {
+    "family": "emque_preschool",
+    "file": "docs/sel-content-20261027/emque_preschool/report_13.html",
+    "title": "看见孩子心里的 radar · EmQue 短版模拟报告",
+    "textCharacters": 887,
+    "graph": true,
+    "syntheticDisclosure": true,
+    "reflection": true,
+    "action": true,
+    "browserVisualReview": "NOT_COMPLETED_POLICY_BLOCKED",
+    "staticContentAccepted": true
   }
 ]
