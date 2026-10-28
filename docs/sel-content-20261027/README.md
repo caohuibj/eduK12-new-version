@@ -1,6 +1,6 @@
 # SEL 内容入库与验收记录｜2026-10-27
 
-23 个工具家族已登记，形成 28 个精确版本：16 个家族、20 个版本具备完整原生 DRAFT；另外 7 个家族（SECDS-28、AIR、CASEL 量规、SEHS-S、TSEC-22、IRI、CalSCHLS SEHM）保留 catalog-only，其完整题文、计分或行为锚点尚未写入可执行源码，不能施测。不得把目录登记当作工具入库完成。2026-10-28 第二轮补入 ERICA-16、ERQ-CA、CCNES-T 与 BESSI-45 英文自评版；第三轮对照外部推荐清单补入 EmQue-CA、EmQue 家长评定（20/13 题）原生版，并登记 SEHS-S、TSEC-22、IRI、CalSCHLS SEHM 四个候选，分别见下方两节记录。
+23 个工具家族已登记，形成 28 个精确版本：17 个家族、21 个版本具备完整原生 DRAFT；另外 6 个家族（SECDS-28、AIR、CASEL 量规、SEHS-S、IRI、CalSCHLS SEHM）保留 catalog-only，其完整题文、计分或行为锚点尚未写入可执行源码，不能施测。不得把目录登记当作工具入库完成。2026-10-28 第二轮补入 ERICA-16、ERQ-CA、CCNES-T 与 BESSI-45 英文自评版；第三轮对照外部推荐清单补入 EmQue-CA、EmQue 家长评定（20/13 题）原生版，并登记 SEHS-S、TSEC-22、IRI、CalSCHLS SEHM 四个候选，分别见下方两节记录。
 
 由 3 个 gpt-6.1-terra / xhigh 子任务逐份处理，主 agent 负责题文与计分、报告完整性两项验收。每工具家族一个独立提交；语言、长短版和报告者版本不重复计为独立构念。全部为内容草稿，没有导入生产数据库、发布、PR、CI、合并或部署。
 
@@ -28,13 +28,13 @@
 | 18 | [EmQue-CA](./emque_ca/) | 学生能力/相关策略自评（共情专项） | 通过；原生DRAFT | 原生模板＋图文样稿 | [来源](https://doi.org/10.3389/fpsyg.2017.00870) |
 | 19 | [EmQue 家长评定 20/13](./emque_preschool/) | 家长对儿童的观察（1–6 岁） | 通过；原生DRAFT | 原生模板＋图文样稿 | [来源](https://doi.org/10.1177/01650254211022852) |
 | 20 | [SEHS-S 2020](./sehs_s/) | 学生积极发展自评 | 计分映射待核；未誊录题文 | 无（登记阶段） | [来源](https://files.eric.ed.gov/fulltext/ED600109.pdf) |
-| 21 | [TSEC-22](./tsec22/) | 教师个人能力自评 | 再分发许可待确认；未誊录题文 | 无（登记阶段） | [来源](https://link.springer.com/article/10.1007/s12144-026-09348-3) |
+| 21 | [TSEC-22](./tsec22/) | 教师个人能力自评（中文施测原版） | 通过；原生DRAFT | 原生模板＋图文样稿 | [来源](https://link.springer.com/article/10.1007/s12144-026-09348-3) |
 | 22 | [IRI](./iri28/) | 学生/成人自评（相邻构念） | 许可待核；未誊录题文 | 无（登记阶段） | [来源](https://www.ucdenver.edu/docs/librariesprovider54/wellbeing-documents/interpersonalreactivityindex.pdf) |
 | 23 | [CalSCHLS SEHM](./calschls_sehm/) | 学校调查模块（混合） | 计分与再分发待核 | 无（登记阶段） | [来源](https://calschls.org/site/assets/files/1103/mshs-sehm-2526_final_watermarked.pdf) |
 
 ## 版本与计分核验
 
-20 个可执行版本的 82 组原生 golden cases 全部通过，28 个源记录通过 SourceV1 schema 和来源级校验。注册索引保留 main 的 57 个源，新增 20 个精确版本，合计77；未运行与本次内容无关的全仓构建或数据库测试。
+21 个可执行版本的 86 组原生 golden cases 全部通过，28 个源记录通过 SourceV1 schema 和来源级校验。注册索引保留 main 的 57 个源，新增 20 个精确版本，合计77；未运行与本次内容无关的全仓构建或数据库测试。
 
 - WCSD：40题八维；17题主要给总体反馈，八个话题不冒充稳定分量表。两种版本独立报告。
 - DSECS：20题五维和总体均值；题号以学生实表为准，保留手册冲突说明。
@@ -51,7 +51,7 @@
 
 ## 报告验收
 
-20 份 HTML 样稿均有原始分图或水平分布图、非学术反馈、反思问题及可尝试行动。数值为明确标注的模拟数据。20个原生定义同时提供实际结果解释与建议，系统现有 ReportRangeTrack 用真实分数绘图；未引入新的报告渲染框架或外部图片依赖。7项候选中4项（SEHS-S、TSEC-22、IRI、CalSCHLS）本轮无样稿（登记阶段），4项第一轮候选只有样稿，均不能据此声称已能生成实际被试报告。
+20 份 HTML 样稿均有原始分图或水平分布图、非学术反馈、反思问题及可尝试行动。数值为明确标注的模拟数据。21个原生定义同时提供实际结果解释与建议，系统现有 ReportRangeTrack 用真实分数绘图；未引入新的报告渲染框架或外部图片依赖。6项候选中3项（SEHS-S、IRI、CalSCHLS）处于登记阶段无样稿，4项第一轮候选只有样稿，均不能据此声称已能生成实际被试报告。
 
 浏览器安全策略阻止本地file预览，独立浏览器进程也未能启动。因此本次只完成静态内容、分数和配图结构核验，未通过实际浏览器视觉/交互验收；不得把本记录用作UI上线证据。
 
@@ -236,6 +236,15 @@ SECDS-28（Emerald 论文标注许可后复用）、AIR 教师工具（末页 al
 6. **CalSCHLS SEHM**（`calschls_sehm_en@1.0.0`；commit `29f113a`）：catalog-only 登记。官方水印问卷公开，但模块计分与再分发条款未核；定位为混合学校调查模块，非纯 SEC。
 
 查重补充：`dedup.json` 新增 4 条相邻关系（emque_ca↔bes20、emque_preschool↔emque_ca 同家族、iri28↔bes20、emque_ca↔eaq30 参照关系）。清单第三部分（OECD SSES、CORE、MATSEC-27、TRUST、DESSA、SSIS SEL、SEARS、SEMS-IT-19、TSELCS-22、Massachusetts SELIS）均为 C 级（需申请/付费/待提取），本轮不登记，待材料到位后按同一标准逐项处理。
+
+## 2026-10-28 第四轮：TSEC-22 凭确认许可升级原生
+
+库负责人确认已获得 TSEC-22 作者/出版社的再分发许可（凭证与范围由库负责人归档）。本轮将 `tsec_22_zh_cn@1.0.0` 从 catalog-only 升级为可执行 DRAFT（commit 见 `commits.json`）：
+
+- **中文施测原版直接入库**（22 题逐字誊自论文公开附录；`contentLocale: zh-CN`）——库内第一个以中文原版施测（非工作译文）的教师 SEC 工具，无需翻译验证；发表用英文对照保留在 `docs/sel-content-20261027/tsec22/source.md` 供研究参考。
+- 三维均值计分（自我情绪驾驭 6 题 / 专业关系建设 8 题 / 专业事务责任 8 题，1–7），无反向题、不提供总分；论文正文的计分细节待与订阅全文核对，如不一致以论文为准。
+- license 记为 `authorized/allowed`；商业部署范围以归档许可为准。原样本为职前教师，在职教师适用性需另行验证。
+- 4 组 golden cases 与参考 scoring.py 及运行时精确浮点语义一致；资料包含计分参考、回归测试与静态报告样稿。
 
 ## 查重与适配
 

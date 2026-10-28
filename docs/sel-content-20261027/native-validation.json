@@ -1130,6 +1130,55 @@
           }
         }
       ]
+    },
+    {
+      "file": "server-version/backend/src/modules/scale/instruments/tsec_22_zh_cn/1.0.0/instrument.ts",
+      "key": "tsec_22_zh_cn",
+      "executable": true,
+      "valid": true,
+      "issues": [],
+      "goldens": [
+        {
+          "name": "minimum-keyed",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "self_emotional_mastery": 1,
+            "professional_relationship_building": 1,
+            "professional_affairs_responsibility": 1
+          }
+        },
+        {
+          "name": "maximum-keyed",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "self_emotional_mastery": 7,
+            "professional_relationship_building": 7,
+            "professional_affairs_responsibility": 7
+          }
+        },
+        {
+          "name": "sample-mixed",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "self_emotional_mastery": 4.5,
+            "professional_relationship_building": 5,
+            "professional_affairs_responsibility": 5.875
+          }
+        },
+        {
+          "name": "missing-subscale-item",
+          "passed": true,
+          "quality": "invalid",
+          "scores": {
+            "self_emotional_mastery": 4.5,
+            "professional_relationship_building": null,
+            "professional_affairs_responsibility": 5.875
+          }
+        }
+      ]
     }
   ]
 }

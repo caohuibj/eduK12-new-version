@@ -133,5 +133,10 @@
     "family": "calschls_sehm",
     "sha": "29f113a7b9f1bd45b39ace5a9f2ce4f3b443a6f4",
     "tree": "7c23d3bdf5b073516338f823e3d48ec63db755a3"
+  },
+  {
+    "family": "tsec22",
+    "sha": "6f7c9decd28aa852ff4a24211d0b88df1cd9612c",
+    "tree": "b9827245bc94c210fd58f47b5052f9a7fe7e5186"
   }
 ]

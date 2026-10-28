@@ -289,5 +289,17 @@
     "action": true,
     "browserVisualReview": "NOT_COMPLETED_POLICY_BLOCKED",
     "staticContentAccepted": true
+  },
+  {
+    "family": "tsec22",
+    "file": "docs/sel-content-20261027/tsec22/report_sample.html",
+    "title": "教师的三条成长线 · TSEC-22 模拟报告",
+    "textCharacters": 887,
+    "graph": true,
+    "syntheticDisclosure": true,
+    "reflection": true,
+    "action": true,
+    "browserVisualReview": "NOT_COMPLETED_POLICY_BLOCKED",
+    "staticContentAccepted": true
   }
 ]

@@ -6,9 +6,9 @@
   "ciTriggered": false,
   "toolFamilies": 23,
   "exactVersions": 28,
-  "executableDrafts": 20,
-  "catalogOnly": 7,
-  "nativeGoldenCases": 82,
+  "executableDrafts": 21,
+  "catalogOnly": 6,
+  "nativeGoldenCases": 86,
   "reportSamples": 20,
   "tools": [
     {
@@ -411,16 +411,16 @@
       "name": "TSEC-22 教师社会情感能力量表",
       "category": "教师个人能力自评",
       "fullTextSource": "https://link.springer.com/article/10.1007/s12144-026-09348-3",
-      "wordingAndScoring": "PENDING_REDISTRIBUTION_PERMISSION",
-      "report": "NONE",
-      "commit": "ba801b3c181a9d155a478a19b1d494dbdc759269",
+      "wordingAndScoring": "PASS",
+      "report": "NATIVE_TEMPLATE_AND_STATIC_SAMPLE",
+      "commit": "6f7c9decd28aa852ff4a24211d0b88df1cd9612c",
       "versions": [
         {
           "key": "tsec_22_zh_cn",
           "version": "1.0.0",
           "itemCount": 22,
           "locale": "zh-CN",
-          "executable": false
+          "executable": true
         }
       ]
     },
