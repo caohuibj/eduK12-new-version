@@ -1,3 +1,4 @@
+import {assertArchivedNativeCompletion,type NativeCompletion} from './native-completion'
 import {getNativeContentDefinition} from './content-candidates/native-registry/definitions'
 import {nativeContentArchiveSchema,validateNativeContentArchive} from './content-candidates/native-registry/archive-detail'
 import { createHash } from 'node:crypto'
@@ -84,7 +85,7 @@ async function loadAuthority(db:Db,input:CognitiveRawArchiveIdentity,actor:Cogni
     ||admission.cognitive.engineVersion!==session.engineVersion||admission.cognitive.scoringVersion!==session.scoringVersion
     ||admission.cognitive.configHash!==snapshot.configHash)
     fail('ARCHIVE_IDENTITY_CONFLICT',409,'归档准入身份不一致')
-  const core=decryptUnifiedRuntimePayload<{schemaVersion:number;attemptEpoch:number;trials:Array<{trialIndex:number;payload:unknown}>}>(raw.payloadEncrypted)
+  const core=decryptUnifiedRuntimePayload<{schemaVersion:number;attemptEpoch:number;nativeCompletion?:NativeCompletion;trials:Array<{trialIndex:number;payload:unknown}>}>(raw.payloadEncrypted)
   if(core.schemaVersion!==1||core.attemptEpoch!==input.attemptEpoch||!Array.isArray(core.trials)||core.trials.length!==raw.trialCount)
     fail('ARCHIVE_IDENTITY_CONFLICT',409,'已保存核心原件不一致')
   const authority={schemaVersion:1,session:{id:session.id,attemptEpoch:session.attemptNo,submissionId:session.submissionId,
@@ -192,6 +193,7 @@ export async function archiveCognitiveRawSubmission(inputValue:CognitiveRawArchi
       config:a.authority.configSnapshot.config,protocol:a.authority.configSnapshot.protocol,configHash:a.authority.configSnapshot.configHash,protocolSignature:a.authority.configSnapshot.protocolSignature,
       trials:a.core.trials,presentedImageCount:a.authority.resultSnapshot.metrics.presentedImageCount})}
     catch{fail('ARCHIVE_IDENTITY_CONFLICT',409,'完整原件与已保存任务记录不一致')}
+    try{assertArchivedNativeCompletion((upload.rawPayload as {claim:unknown}).claim,a.core.nativeCompletion)}catch{fail('ARCHIVE_IDENTITY_CONFLICT',409,'原件结束声明与已保存核心不一致')}
   }else if(isEnumeration){
     const detail=upload.rawPayload as CognitiveEnumerationArchiveDetail,A=detail.artifact,C=A.context
     if(a.session.testType!==ENUMERATION_RECIPE_IDENTITY.testType||C.attemptId!==JSON.stringify([a.session.id,input.attemptEpoch])

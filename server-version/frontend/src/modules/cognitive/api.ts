@@ -1,3 +1,4 @@
+import type {NativeCompletion} from './core/native-completion'
 import apiClient, { sessionFetch } from '../../api/client'
 import type { AssessmentVideoCapabilitySources } from '../assessment-media/types'
 import type { CognitiveAssignmentSummary, CognitiveHistoryPage, CognitiveSession, CognitiveV2Report } from './types'
@@ -22,6 +23,7 @@ export interface CognitiveSessionApi {
     definitionHash: string
     contextSnapshotHash?: string | null
     trials: unknown[]
+    nativeCompletion?: NativeCompletion
     administrationProvenance?: AdministrationProvenanceV1
   }) => ReturnType<typeof apiClient.post<any>>
 }

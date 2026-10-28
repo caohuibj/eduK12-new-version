@@ -1,0 +1,1 @@
+The initial cp used repo-relative path from backend cwd and failed (cannot stat). The following Python edit and targeted Vitest command still executed. The retained source snapshot reconstructs exactly the two reverted identifier replacements; this is not a contemporaneous copy. No source or evidence was lost.

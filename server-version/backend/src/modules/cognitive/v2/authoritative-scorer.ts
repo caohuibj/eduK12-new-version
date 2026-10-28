@@ -27,6 +27,7 @@ export type PreparedAuthoritativeScorerContext<TConfig, TTrial> = Readonly<{
   config: TConfig
   trials: TrialEnvelope<TTrial>[]
   randomSeed: string
+  termination?: 'completed'|'aborted'
 }>
 
 const preparedScorerContexts = new WeakSet<object>()
@@ -61,6 +62,7 @@ export const prepareAuthoritativeScorerContext = <TConfig, TTrial>(input: {
   config: TConfig
   trials: TrialEnvelope<TTrial>[]
   randomSeed: string
+  termination?: 'completed'|'aborted'
 }): PreparedAuthoritativeScorerContext<TConfig, TTrial> => {
   if (input.session.testType !== input.definition.testType
     || input.session.engineVersion !== input.definition.engineVersion
@@ -73,6 +75,7 @@ export const prepareAuthoritativeScorerContext = <TConfig, TTrial>(input: {
     config: input.config,
     trials: validatePreparedTrialEnvelopes(input),
     randomSeed: input.randomSeed,
+    ...(input.termination?{termination:input.termination}:{}),
   }
   preparedScorerContexts.add(context)
   return context
@@ -84,12 +87,13 @@ export const runPreparedAuthoritativeScorer = <TConfig, TTrial>(
   if (!context || typeof context !== 'object' || !preparedScorerContexts.has(context)) {
     throw new Error('Prepared Cognitive scorer context must be created by the trusted preparation boundary')
   }
-  const result = context.definition.scorer({
+  const invocation = {
     config: context.config,
     session: context.session,
     trials: context.trials,
     randomSeed: context.randomSeed,
-  })
+  }
+  const result = context.termination===undefined?context.definition.scorer(invocation):context.definition.scorer(invocation,context.termination)
   if (!result || typeof result !== 'object' || !result.quality || !result.metrics) {
     throw new Error('Authoritative scorer returned an invalid result')
   }
@@ -106,6 +110,7 @@ export const runAuthoritativeScorer = <TConfig, TTrial>(input: {
   /** Internal legacy/final-only callers may already have parsed trial payloads. */
   preparedTrials?: TrialEnvelope<TTrial>[]
   randomSeed: string
+  termination?: 'completed'|'aborted'
 }): CognitiveScoreResult => {
   validateSessionConfigSnapshot(input.session)
   const trials = input.preparedTrials
@@ -118,5 +123,6 @@ export const runAuthoritativeScorer = <TConfig, TTrial>(input: {
     config,
     trials,
     randomSeed: input.randomSeed,
+    ...(input.termination?{termination:input.termination}:{}),
   }))
 }

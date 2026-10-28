@@ -1,0 +1,97 @@
+{
+  "environment": {
+    "node": "v24.21.0",
+    "nodeBinary": "/tmp/cognitive-node-env/node-v24.21.0-linux-x64/bin/node",
+    "databaseUrl": "postgresql://postgres@127.0.0.1:15433/cognitive_native_test?schema=batch3",
+    "redisUrl": "redis://127.0.0.1:16380",
+    "syntheticOnly": true,
+    "noFullSeed": true,
+    "testEnv": {
+      "NODE_ENV": "test",
+      "COGNITIVE_MODULE_ENABLED": "true",
+      "encryptionKeys": "synthetic a/b repeated 64 hex; no real key"
+    }
+  },
+  "commands": [
+    {
+      "id": "backend-completion-original",
+      "command": "/tmp/cognitive-node-env/node-v24.21.0-linux-x64/bin/node node_modules/vitest/vitest.mjs run src/__tests__/cognitive/native-completion.postgres.integration.test.ts",
+      "cwd": "server-version/backend",
+      "exit": 1,
+      "reason": "New prepareRuntime used child instead of its session parameter; corrected only those two accesses.",
+      "report": "backend-completion-original.json",
+      "log": "backend-completion-original.log",
+      "reportSha256": "f60de49f18431cf3575248cf766a31421ced7244be083ba2b298652e6d5de7a2"
+    },
+    {
+      "id": "backend-completion-corrected",
+      "command": "/tmp/cognitive-node-env/node-v24.21.0-linux-x64/bin/node node_modules/vitest/vitest.mjs run src/__tests__/cognitive/native-completion.postgres.integration.test.ts",
+      "cwd": "server-version/backend",
+      "exit": 1,
+      "reason": "Disposable retry setup attempted duplicate exact config; reuse existing row without overwriting.",
+      "report": "backend-completion-corrected.json",
+      "log": "backend-completion-corrected.log",
+      "reportSha256": "22c208e72f92b04271ceab5bd167c76bb08a0a96e63fdd3be31d68c3cca5174c"
+    },
+    {
+      "id": "backend-completion-fixture-corrected",
+      "command": "/tmp/cognitive-node-env/node-v24.21.0-linux-x64/bin/node node_modules/vitest/vitest.mjs run src/__tests__/cognitive/native-completion.postgres.integration.test.ts",
+      "cwd": "server-version/backend",
+      "exit": 1,
+      "reason": "Disposable retry attempted PUBLISHED->PUBLISHED; only publish DRAFT.",
+      "report": "backend-completion-fixture-corrected.json",
+      "log": "backend-completion-fixture-corrected.log",
+      "reportSha256": "8209a92db428550485c76367c8d9dd5c51c3529f8f3dda911600e06f633c01e3"
+    },
+    {
+      "id": "backend-completion-final",
+      "command": "/tmp/cognitive-node-env/node-v24.21.0-linux-x64/bin/node node_modules/vitest/vitest.mjs run src/__tests__/cognitive/native-completion.postgres.integration.test.ts",
+      "cwd": "server-version/backend",
+      "exit": 0,
+      "passed": 1,
+      "report": "backend-completion-final.json",
+      "log": "backend-completion-final.log",
+      "reportSha256": "77e705eae64676b13ebca511f3cfebf8a6786b7dfc923626b3abab6c804f8581"
+    },
+    {
+      "id": "backend-compatibility",
+      "command": "/tmp/cognitive-node-env/node-v24.21.0-linux-x64/bin/node node_modules/vitest/vitest.mjs run src/__tests__/cognitive/native-completion-compatibility.test.ts",
+      "cwd": "server-version/backend",
+      "exit": 0,
+      "passed": 2,
+      "report": "backend-compatibility.json",
+      "log": "backend-compatibility.log",
+      "reportSha256": "d9f6b9e69a1729eeaedeff2af18a49723242b0bc920932055e3bc9a9e7cf2a6b"
+    },
+    {
+      "id": "frontend-completion-original",
+      "command": "/tmp/cognitive-node-env/node-v24.21.0-linux-x64/bin/node node_modules/vitest/vitest.mjs run src/modules/cognitive/core/__tests__/native-completion.test.tsx",
+      "cwd": "server-version/frontend",
+      "exit": 0,
+      "passed": 2,
+      "report": "frontend-completion-original.json",
+      "log": "frontend-completion-original.log",
+      "reportSha256": "4e9a8db4232e94ad42fe0d95c54a4302321d286cf29ecd9dda6af6dbd4f9790f"
+    }
+  ],
+  "types": {
+    "backend-original": {
+      "exit": 1,
+      "report": "backend-types-original.json",
+      "notes": "two product identifier errors, fixture JSON/optional/union types, missing existing Express declaration root; original retained"
+    },
+    "backend-final": {
+      "exit": 0,
+      "sourceCount": 1110,
+      "report": "backend-types.json",
+      "command": "/tmp/cognitive-node-env/node-v24.21.0-linux-x64/bin/node docs/cognitive-library/onboarding-content-20261028/parallel-review/integration/check-types.cjs backend"
+    },
+    "frontend": {
+      "exit": 0,
+      "sourceCount": 379,
+      "report": "frontend-types.json",
+      "command": "/tmp/cognitive-node-env/node-v24.21.0-linux-x64/bin/node docs/cognitive-library/onboarding-content-20261028/parallel-review/integration/check-types.cjs frontend"
+    }
+  },
+  "reuse": "All earlier per-tool source/scoring/timing/browser evidence remains historical. This new check covers only changed completion/FINAL/archive consumers. No report was regenerated from archived COS data."
+}

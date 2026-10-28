@@ -1,3 +1,4 @@
+import {nativeCompletionSchema} from './native-completion'
 import { z } from 'zod'
 
 export const cognitiveProfessionalReportsQuerySchema = z.object({ offset: z.coerce.number().int().min(0).max(100000).default(0), collectionId: z.string().guid().optional() }).strict()
@@ -153,10 +154,11 @@ export const finalCognitiveSubmitSchema = z.object({
   definitionHash: z.string().min(1).max(200),
   contextSnapshotHash: z.string().min(1).max(200).nullable().optional(),
   trials: z.array(z.unknown()).min(1).max(1000),
+  nativeCompletion: nativeCompletionSchema.optional(),
   administrationProvenance: administrationProvenanceV1Schema.optional(),
 }).strict()
 
-export const finalCognitivePublicSubmitSchema = finalCognitiveSubmitSchema.extend({
+export const finalCognitivePublicSubmitSchema = finalCognitiveSubmitSchema.omit({nativeCompletion:true}).extend({
   recoveryToken: z.string().min(20).max(200),
 }).strict()
 

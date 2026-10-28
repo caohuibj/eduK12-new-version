@@ -1,3 +1,4 @@
+import type {NativeCompletion} from './native-completion'
 import { nativeFinalActorMatches } from './native-final-receipt'
 import { requireCognitiveTaskResource,assertNativeDeliverySupported } from './task-resource'
 import { getNativeCognitiveTaskDefinition } from './content-candidates/native-registry/definitions'
@@ -49,6 +50,7 @@ export type FinalCognitiveSubmitInput = {
   definitionHash: string
   contextSnapshotHash?: string | null
   trials: unknown[]
+  nativeCompletion?: NativeCompletion
   administrationProvenance?: AdministrationProvenanceV1
   userId?: string | null
   recoveryTokenHash?: string
@@ -310,6 +312,9 @@ const submitWithPrincipalImpl = async (input: FinalCognitiveSubmitInput) => {
     assertNativeDeliverySupported(requireCognitiveTaskResource(child.testType,child.engineVersion,child.scoringVersion),'authenticated')
     if(!nativeFinalActorMatches(child,input.userId))
       throw new InstrumentFinalSubmitError('STALE_ATTEMPT','此原生测评尚未开放此作答范围',403)
+  }
+  if (input.nativeCompletion !== undefined && child.runtimeGeneration !== 'UNIFIED_V1') {
+    throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', '此冻结版本不接收原生结束声明', 400)
   }
   if (child.runtimeGeneration === 'UNIFIED_V1') {
     return {

@@ -1,3 +1,4 @@
+import {nativeCompletionFromArchive} from './native-completion'
 import { useCallback, useEffect, useReducer, useRef } from 'react'
 import { cognitiveApi, type CognitiveSessionApi } from '../api'
 import { resolveRunner } from '../registry'
@@ -494,6 +495,7 @@ export function useCognitiveSession(
         }
         const sealed = await checked(finalDraftStore.sealForSubmission(draftKey, (snapshot) => {
           if (snapshot.trials.length === 0) throw new Error('尚未记录任何认知试次')
+          const nativeCompletion=session.nativeTask?nativeCompletionFromArchive(snapshot.meta.cognitiveRawArchive?.rawPayload):undefined
           const finalProvenance = readCognitiveAdministrationProvenance(snapshot.meta.instrumentMetadata)
             ?? sealProvenance
           return {
@@ -502,6 +504,7 @@ export function useCognitiveSession(
             definitionHash: snapshot.meta.definitionHash,
             contextSnapshotHash: snapshot.meta.contextSnapshotHash,
             trials: snapshot.trials.map((trial) => trial.payload),
+            ...(nativeCompletion?{nativeCompletion}:{}),
             ...(finalProvenance ? { administrationProvenance: finalProvenance } : {}),
           }
         },nativeGuard?.expected))

@@ -1,3 +1,5 @@
+import {getNativeContentDefinition} from './content-candidates/native-registry/definitions'
+import {validateNativeCompletion,type NativeCompletion} from './native-completion'
 import {projectNativeContentReport} from './content-candidates/native-registry/public-report'
 import {assertCurrentStudyPrincipal} from '../anonymous-study/admission-principal'
 import { lockTrainingFlowFinalAdmission, requiresTrainingFlowFinalLock } from '../composite/training-variant-child-scope'
@@ -68,6 +70,7 @@ export type UnifiedCognitiveFinalSubmitInput = {
   definitionHash: string
   contextSnapshotHash?: string | null
   trials: unknown[]
+  nativeCompletion?: NativeCompletion
   administrationProvenance?: AdministrationProvenanceV1
   userId?: string | null
   recoveryTokenHash?: string
@@ -274,9 +277,27 @@ const prepareRuntime = async (
   // Preserve historical replay hashes exactly when provenance is absent.
   // New clients bind provenance into the canonical submission identity so the
   // same submissionId cannot silently replay with different cohort metadata.
-  const payload = input.administrationProvenance
-    ? { trials, administrationProvenance: input.administrationProvenance }
-    : { trials }
+  let nativeCompletion: NativeCompletion | undefined
+  if (input.nativeCompletion !== undefined) {
+    const nativeContent = getNativeContentDefinition(snapshot.testType, snapshot.engineVersion, snapshot.scoringVersion)
+    try {
+      nativeCompletion = validateNativeCompletion(input.nativeCompletion, {
+        sessionId: session.id, attemptEpoch: input.attemptEpoch,
+        configHash: snapshot.configHash, protocolSignature: snapshot.protocolSignature,
+        trialCount: trials.length, maxTrials,
+        expectedManifestHash: nativeContent?.configVersion === snapshot.configVersion
+          ? nativeContent.manifestHash(validatedConfig, session.randomSeed) : null,
+      })
+    } catch (error) {
+      throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT',
+        error instanceof Error ? error.message : '原生测评结束声明无效', 400)
+    }
+  }
+  const payload = {
+    trials,
+    ...(input.administrationProvenance ? { administrationProvenance: input.administrationProvenance } : {}),
+    ...(nativeCompletion ? { nativeCompletion } : {}),
+  }
   const canonical = measureRequestPhaseSync('final_submit_serialization', () => {
     const bytes = canonicalJsonBytes(payload)
     const payloadHash = measureRequestPhaseSync(
@@ -297,6 +318,7 @@ const prepareRuntime = async (
     validatedConfig,
     trials,
     payloadHash: canonical.payloadHash,
+    nativeCompletion,
   }
 }
 
@@ -345,6 +367,7 @@ export const submitUnifiedCognitiveSessionFinal = async (
       config: prepared.validatedConfig,
       trials: prepared.trials,
       randomSeed: child.randomSeed,
+      ...(prepared.nativeCompletion?{termination:prepared.nativeCompletion.termination}:{}),
     })
     scored = await measureRequestPhase(
       'final_submit_scoring',
@@ -434,6 +457,7 @@ export const submitUnifiedCognitiveSessionFinal = async (
     rawSubmission: encryptUnifiedRuntimePayload(createUnifiedCognitiveRawSubmissionPayload({
       attemptEpoch: input.attemptEpoch,
       trials: prepared.trials,
+      ...(prepared.nativeCompletion?{nativeCompletion:prepared.nativeCompletion}:{}),
       ...(input.administrationProvenance
         ? { administrationProvenance: input.administrationProvenance }
         : {}),
