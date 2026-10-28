@@ -1,0 +1,692 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "ipip_nfc10_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 2,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "认知需求（IPIP 10题表征版） — 中文研究工作译稿",
+      "abbreviation": "IPIP-NFC10",
+      "instrumentFamily": "International Personality Item Pool"
+    },
+    "construct": {
+      "primaryDomain": "PERSONALITY",
+      "secondaryDomains": [
+        "MOTIVATION"
+      ],
+      "constructDefinition": "部分条目同时涉及自评理解能力和阅读习惯，不能将总分等同于纯粹学习动机、实际认知能力或学业潜力。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "ipip",
+        "public_domain",
+        "self_report",
+        "non_diagnostic",
+        "working_translation",
+        "need_for_cognition",
+        "adult_self_report",
+        "research",
+        "individual_reflection",
+        "descriptive_report",
+        "no_verified_norms",
+        "domain:motivation_learning",
+        "construct:need_for_cognition",
+        "population:adult_research",
+        "response:self",
+        "response:digital_self",
+        "response:digital_supervised",
+        "response:paper",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:public_domain",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:translation_review_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    "population": {
+      "populationNotes": "成人本人自陈研究与自我了解；ADULT_SELF / student 中 student 为现有报告技术受众角色，不表示未成年人。中文工作译稿尚无目标人群效度证据，不据此推定青少年适用性。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN"
+    },
+    "administration": {
+      "itemCount": 10,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "目前通常的状态；无固定回忆时段",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保留题序与五点符合度锚点；反向计分不向答题者标示。",
+        "指导语为单独平台适配说明，见双语材料；不得承诺绝对保密。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "当前中文译稿的心理测量属性未验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "项目 AI 辅助中文工作译稿；IPIP 公有领域原文。非既有经验证中文版。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "待独立译审、目标人群认知访谈及本地证据；不声明专家已完成审核。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "ipip_nfc10_zh_cn_research-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "ipip_nfc10_zh_cn_research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "ipip_nfc10_zh_cn_research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "IPIP 官方声明题项公有领域，可复制、改编、翻译及电子施测；权利许可不代表此中文译稿已经验证。",
+      "https://ipip.ori.org/newPermission.htm"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "PUBLISHED",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "认知需求（IPIP 10题表征版） — 中文研究工作译稿",
+        "citation": "International Personality Item Pool (IPIP), official items and scoring keys.",
+        "url": "https://www.ipip.ori.org/newSingleConstructsKey.htm"
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "IPIP public domain: https://ipip.ori.org/newPermission.htm ; translation remains unvalidated."
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "ipip_accuracy_1_5",
+          "options": [
+            {
+              "value": "1",
+              "label": "很不符合",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "比较不符合",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "介于不符合与符合之间",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "比较符合",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "很符合",
+              "score": 5
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "IPIP_NFC10_01",
+          "content": "我喜欢解决复杂的问题。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_NFC10_02",
+          "content": "别人只需解释一次，我就能明白。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_NFC10_03",
+          "content": "我能处理大量信息。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_NFC10_04",
+          "content": "我喜欢想出做事的新方法。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_NFC10_05",
+          "content": "我能很快理解事物。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_NFC10_06",
+          "content": "我喜欢阅读有挑战性的材料。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_NFC10_07",
+          "content": "我觉得抽象的观念很难理解。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_NFC10_08",
+          "content": "我会尽量避开复杂的人。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_NFC10_09",
+          "content": "我会避开难懂的阅读材料。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 8,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_NFC10_10",
+          "content": "我会避开哲学性的讨论。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 9,
+          "responseSetKey": "ipip_accuracy_1_5",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "IPIP_NFC10_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP_NFC10_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP_NFC10_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP_NFC10_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP_NFC10_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP_NFC10_06",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP_NFC10_07",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP_NFC10_08",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP_NFC10_09",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP_NFC10_10",
+            "transform": {
+              "type": "reverse"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "need_for_cognition",
+            "type": "total",
+            "label": "认知需求",
+            "description": "本量表反映你对复杂思考、挑战性阅读以及理解信息的自我描述。得分较高表示你更倾向认可这些描述；它不是智力测验，也不能用来判断一个人聪不聪明。 回想最近一次愿意认真思考的问题：是兴趣、任务意义，还是足够的时间与支持帮助了你？可以选一项略有挑战但可完成的任务，记录尝试过程，而不只看是否答对。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "IPIP_NFC10_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_NFC10_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_NFC10_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_NFC10_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_NFC10_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_NFC10_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_NFC10_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_NFC10_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_NFC10_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_NFC10_10",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.1",
+        "primaryScoreKeys": [
+          "need_for_cognition"
+        ],
+        "scoreOrder": [
+          "need_for_cognition"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "need_for_cognition",
+            "headline": "认知需求：什么会让你愿意多想一会儿",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这一项关注你对复杂思考、挑战性阅读和理解信息的兴趣与自我感受。分数越高，表示这次更认可这些描述。比如，遇到一个有趣的问题时，有的人想追根究底，有的人更想先找到够用的答案。这里不评判谁更聪明，时间、疲劳和任务意义都值得一起考虑。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回想一个让你自愿认真思考的问题：吸引你的是内容本身、解决问题的用途，还是找到答案的过程？"
+              },
+              {
+                "category": "strategy",
+                "text": "选一个你真正在意的小问题，先写下自己的猜想，再找一条支持或修正它的信息。把重点放在发现了什么，而不是答得多快。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这份中文研究译稿仍待专家审校和适用人群验证，目前只供成人研究和自我了解。",
+          "目前没有足够依据把这个中文版本的结果划分高低或与别人比较。",
+          "题目也涉及阅读习惯和对理解能力的自我感受；它不测智力，不能单凭结果判断学习动机或潜力。",
+          "10题都需完整回答；漏答不当作零分，也不代填。不用于诊断、学生筛选、考核或排名。"
+        ],
+        "disclaimer": "仅供研究内容审查与描述性自我了解，不用于心理诊断、智力鉴定或高风险决策。公有领域不等于本译稿已经得到原作者认可。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted local editorial check (not human expert review)",
+            "reviewedAt": "2026-10-25T14:03:00Z",
+            "basis": "Checked non-stigmatizing adult self-reflection wording, bounds, no unsupported norms and separate reflection/action suggestions; NOT psychometric validation or localization approval."
+          }
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "ipip_nfc10",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "midpoint",
+        "answers": [
+          {
+            "itemCode": "IPIP_NFC10_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_NFC10_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_NFC10_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_NFC10_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_NFC10_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_NFC10_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_NFC10_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_NFC10_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_NFC10_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_NFC10_10",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "need_for_cognition": 30
+          },
+          "totalScoreKeys": [
+            "need_for_cognition"
+          ]
+        }
+      },
+      {
+        "name": "keyed-maximum",
+        "answers": [
+          {
+            "itemCode": "IPIP_NFC10_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_NFC10_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_NFC10_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_NFC10_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_NFC10_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_NFC10_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_NFC10_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_NFC10_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_NFC10_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_NFC10_10",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "need_for_cognition": 50
+          },
+          "totalScoreKeys": [
+            "need_for_cognition"
+          ]
+        }
+      },
+      {
+        "name": "keyed-minimum",
+        "answers": [
+          {
+            "itemCode": "IPIP_NFC10_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_NFC10_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_NFC10_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_NFC10_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_NFC10_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_NFC10_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_NFC10_07",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_NFC10_08",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_NFC10_09",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_NFC10_10",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "need_for_cognition": 10
+          },
+          "totalScoreKeys": [
+            "need_for_cognition"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "请根据你通常的实际情况，判断下面的描述与你有多符合。请按真实情况作答，而不是你希望自己成为的样子。",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "docs/scale-instruments/research-drafts/ipip_nfc10/1.0.0/bilingual-content.json#/instructions (项目平台适配工作译稿；b92c69aefa2472775fa7ee86b9c208366886c908；非人工审批声明)"
+  }
+}

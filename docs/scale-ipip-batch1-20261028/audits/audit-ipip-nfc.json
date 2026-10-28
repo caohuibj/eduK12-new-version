@@ -1,0 +1,232 @@
+{
+  "instrument": "ipip_nfc10_zh_cn_research:1.0.0",
+  "sourceSHA": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "mainSHA": "aa774983db8edd85b3c1617aef7218f71664746d",
+  "files": [
+    {
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "path": "server-version/backend/src/modules/scale/instruments/ipip_nfc10_zh_cn_research/1.0.0/source.json",
+      "gitBlob": "bcfb7c053f7b7b565da35bde11e530174ef99d67",
+      "sha256": "fd6b9f4a40cd10729e339d01eacaa0c9b2a64ff13b9413856a888eeb7f59fb5f"
+    },
+    {
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "path": "server-version/backend/src/modules/scale/instruments/ipip_nfc10_zh_cn_research/1.0.0/instrument.ts",
+      "gitBlob": "0eed070bb879576339c5a71afdf34c0026591fd3",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "path": "docs/scale-instruments/research-drafts/ipip_nfc10/1.0.0/README.md",
+      "gitBlob": "7c19264764c981331ced05eacdca0544f7540cba",
+      "sha256": "93b97cfbb2de439483ec81d282425604a09ee3d8de72475b015bdd1c59de5a1c"
+    },
+    {
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "path": "docs/scale-instruments/research-drafts/ipip_nfc10/1.0.0/bilingual-content.json",
+      "gitBlob": "5de9b98a2d9fb8b773c3603cb728ad68eaf9b44b",
+      "sha256": "1938f91056fbea074262f8f986d821a4ec2d78bcf59afe1ff8a8f6645dc657ba"
+    },
+    {
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "path": "docs/scale-instruments/research-drafts/ipip_nfc10/1.0.0/reviewed-source-pack.json",
+      "gitBlob": "43aaf1fe8b1b0efa83a87079d5c27696ec64bcd5",
+      "sha256": "f52bb04b5584ed3b0e10331ef1cd5770b89c3a3126f25fa7f649a74160cd470f"
+    },
+    {
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "path": "docs/scale-instruments/research-drafts/ipip_nfc10/1.0.0/references.md",
+      "gitBlob": "35fd12e3959c33266f7ad9b90c9060266c056a05",
+      "sha256": "c07ec5e77f46d3c3fbabe783c92f8dbaaa2b3e36495069ebe568239302686e41"
+    },
+    {
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "path": "docs/scale-instruments/research-drafts/ipip_nfc10/1.0.0/report-example.md",
+      "gitBlob": "595b4f56d6a59cfba47318f6c462fd672aa01a9c",
+      "sha256": "34cdfefbeef8328ad5745eb04db452321839fc1ef167a423a669221fa9934484"
+    },
+    {
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "path": "docs/scale-instruments/research-drafts/ipip_nfc10/1.0.0/synthetic-report-example.json",
+      "gitBlob": "3a3b75856a90b0b395cadfb272df85601fa7db47",
+      "sha256": "f774c13cf0fdc61d00bd4cdef5be225475db24c7a5059952c3809a2e8f1c4b4a"
+    },
+    {
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "path": "docs/scale-instruments/research-drafts/ipip_nfc10/1.0.0/report-revisions/1.0.1/change-record.json",
+      "gitBlob": "0cf826b237207514e979bb132cab5fd3aa00c6fe",
+      "sha256": "65058ad61b6f41e70a964bbb4742b3cf8f7a4f2a49d905a1dc0059b92c52681c"
+    },
+    {
+      "commit": "aa774983db8edd85b3c1617aef7218f71664746d",
+      "path": "server-version/backend/src/modules/scale/onboarding/types.ts",
+      "gitBlob": "ceed5febc6b2e67496ff4b47a87aeba5d289132b",
+      "sha256": "7e6b6b4c69114a7480dde09581402ed637bc0fb22eab282ae4c13176aa0d1974"
+    },
+    {
+      "commit": "aa774983db8edd85b3c1617aef7218f71664746d",
+      "path": "server-version/backend/src/modules/scale/onboarding/instruction-admission.ts",
+      "gitBlob": "33bccbfaa0b391f7ef423ada5fa3b55c194563ce",
+      "sha256": "ab717382e2d2b6616c3c58de27f35d18dfba52722ced1d22eb2b910c132aa0b7"
+    },
+    {
+      "commit": "aa774983db8edd85b3c1617aef7218f71664746d",
+      "path": "server-version/backend/src/modules/scale/onboarding/materialize.ts",
+      "gitBlob": "2292d7d622098715d0e582f50caad10aea0a02ee",
+      "sha256": "eb8af6bf0a9ca8134f35220a733d5c6cede1f7411232c465aa543ebe5478d2c2"
+    },
+    {
+      "commit": "aa774983db8edd85b3c1617aef7218f71664746d",
+      "path": "server-version/backend/src/modules/scale/scale-scoring.ts",
+      "gitBlob": "ce315802e4d6fdffb494c54658d4bb5ac019781d",
+      "sha256": "74e3526c81b86a15e84d35b7dbbb0a112562a6e78254928640762615aecef2ba"
+    },
+    {
+      "commit": "aa774983db8edd85b3c1617aef7218f71664746d",
+      "path": "server-version/backend/src/modules/scale/projection/serialization.ts",
+      "gitBlob": "cf8de17eb4bdc1686702674e063b7ba98bd43ce5",
+      "sha256": "c4e53db7a326cb59bfc8866b596f9fa9b6e7e2c3d1fa7e72653b536232f23a13"
+    }
+  ],
+  "license": {
+    "path": "server-version/backend/src/modules/scale/instruments/ipip_nfc10_zh_cn_research/1.0.0/source.json#/executable/definition/license",
+    "separateInstrumentLicenseFile": "该固定源未见本量表单独 THIRD_PARTY_LICENSE 文件",
+    "official": "https://ipip.ori.org/newPermission.htm",
+    "scope": "官方对 IPIP items/scales/inventories 声明公有领域及商业/非商业用途；不替独立第三方材料或中文译稿背书、许可或验证。"
+  },
+  "items": [
+    {
+      "code": "IPIP_NFC10_01",
+      "english": "Like to solve complex problems.",
+      "chinese": "我喜欢解决复杂的问题。",
+      "key": "identity",
+      "conclusion": "与官方原文和键向一致；中文基本保留含义，属于待独立译审的工作译稿。"
+    },
+    {
+      "code": "IPIP_NFC10_02",
+      "english": "Need things explained only once.",
+      "chinese": "别人只需解释一次，我就能明白。",
+      "key": "identity",
+      "conclusion": "与官方原文和键向一致；中文基本保留含义，属于待独立译审的工作译稿。"
+    },
+    {
+      "code": "IPIP_NFC10_03",
+      "english": "Can handle a lot of information.",
+      "chinese": "我能处理大量信息。",
+      "key": "identity",
+      "conclusion": "与官方原文和键向一致；中文基本保留含义，属于待独立译审的工作译稿。"
+    },
+    {
+      "code": "IPIP_NFC10_04",
+      "english": "Love to think up new ways of doing things.",
+      "chinese": "我喜欢想出做事的新方法。",
+      "key": "identity",
+      "conclusion": "与官方原文和键向一致；中文基本保留含义，属于待独立译审的工作译稿。"
+    },
+    {
+      "code": "IPIP_NFC10_05",
+      "english": "Am quick to understand things.",
+      "chinese": "我能很快理解事物。",
+      "key": "identity",
+      "conclusion": "与官方原文和键向一致；中文基本保留含义，属于待独立译审的工作译稿。"
+    },
+    {
+      "code": "IPIP_NFC10_06",
+      "english": "Love to read challenging material.",
+      "chinese": "我喜欢阅读有挑战性的材料。",
+      "key": "identity",
+      "conclusion": "与官方原文和键向一致；中文基本保留含义，属于待独立译审的工作译稿。"
+    },
+    {
+      "code": "IPIP_NFC10_07",
+      "english": "Have difficulty understanding abstract ideas.",
+      "chinese": "我觉得抽象的观念很难理解。",
+      "key": "reverse",
+      "conclusion": "与官方原文和键向一致；中文基本保留含义，属于待独立译审的工作译稿。"
+    },
+    {
+      "code": "IPIP_NFC10_08",
+      "english": "Try to avoid complex people.",
+      "chinese": "我会尽量避开复杂的人。",
+      "key": "reverse",
+      "conclusion": "与官方原文和键向一致；中文基本保留含义，属于待独立译审的工作译稿。 原文确为复杂的人，保留歧义，不擅自改成问题。"
+    },
+    {
+      "code": "IPIP_NFC10_09",
+      "english": "Avoid difficult reading material.",
+      "chinese": "我会避开难懂的阅读材料。",
+      "key": "reverse",
+      "conclusion": "与官方原文和键向一致；中文基本保留含义，属于待独立译审的工作译稿。"
+    },
+    {
+      "code": "IPIP_NFC10_10",
+      "english": "Avoid philosophical discussions.",
+      "chinese": "我会避开哲学性的讨论。",
+      "key": "reverse",
+      "conclusion": "与官方原文和键向一致；中文基本保留含义，属于待独立译审的工作译稿。"
+    }
+  ],
+  "threePartConclusions": {
+    "content": "10题及顺序、前6正向后4反向与IPIP官方单构念键表一致。五点 1–5 精确匹配官方锚点含义，中点不是不知道；题02、03、05、07等含自评理解能力，08涉及复杂的人；不能将总分等同智力、学习动机或能力。未发现须静默修改的实质题义。",
+    "scoring": "1–5，反向6−x，10个等权求和理论10–50；不是均分，完整10题是本项目保守选择，任一缺失不可计，非官方缺失规则。研究包提到sum/10是可选/旧报告意向，当前执行只有总分，README已澄清。",
+    "report": "报告1.0.1 成人本人/zh-CN，student是技术受众映射；score_only、无bands，referencePolicy none、references空；方向higher_is_more，说明不是智力或排名，生活化、包含反思及可执行小步骤，不虚构常模阈值。source score description 与 interpretation 为公开文本，direction 来自 score definition，expectedItems 来自score.source.items，answeredItems来自实际有效计分项；range由各题选项及反向与权重聚合推导10–50，公开序列化透传，不把30说成人群均值。"
+  },
+  "instruction": {
+    "existingText": "请根据你通常的实际情况，判断下面的描述与你有多符合。请按真实情况作答，而不是你希望自己成为的样子。",
+    "source": {
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "path": "docs/scale-instruments/research-drafts/ipip_nfc10/1.0.0/bilingual-content.json",
+      "gitBlob": "5de9b98a2d9fb8b773c3603cb728ad68eaf9b44b",
+      "sha256": "1938f91056fbea074262f8f986d821a4ec2d78bcf59afe1ff8a8f6645dc657ba"
+    },
+    "corroboratingSource": {
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "path": "docs/scale-instruments/research-drafts/ipip_nfc10/1.0.0/reviewed-source-pack.json",
+      "gitBlob": "43aaf1fe8b1b0efa83a87079d5c27696ec64bcd5",
+      "sha256": "f52bb04b5584ed3b0e10331ef1cd5770b89c3a3126f25fa7f649a74160cd470f"
+    },
+    "provenance": "项目单独平台适配指导语，不冒称官方原文或人工审批。",
+    "schemaMapping": {
+      "field": "source.instruction",
+      "value": {
+        "schemaVersion": 1,
+        "text": "请根据你通常的实际情况，判断下面的描述与你有多符合。请按真实情况作答，而不是你希望自己成为的样子。",
+        "language": "zh-CN",
+        "version": "1.0.0",
+        "source": "docs/scale-instruments/research-drafts/ipip_nfc10/1.0.0/bilingual-content.json#/instructions (项目平台适配工作译稿；b92c69aefa2472775fa7ee86b9c208366886c908)"
+      },
+      "note": "main types.ts 的 ScaleInstructionSourceV1；materialize 将 text 保存到 scale.instruction；仅表示准确来源与呈现版本，不表示专家审核。原字段缺失为诊断而非新增自动内容门禁。"
+    },
+    "existingState": "固定源无 instruction；main admission 无匹配既存行时给 INSTRUCTION_NOT_DECLARED 且 binding null，不自动阻断。"
+  },
+  "minimalAdaptations": [
+    {
+      "action": "将已存项目指导语原文按主干 schema 加入独立 source.instruction，标注精确路径和固定提交；不修改题目、评分、构念或人工审核状态。",
+      "reason": "当前固定源仅在研究材料留存指导语而无运行源绑定。"
+    },
+    {
+      "action": "可将 reviewed-source-pack.json 的 report 中题均分/显示条件标记为历史或可选意向，指向 README 和现行 report 1.0.1 的仅总分；不将题均分加入运行。",
+      "reason": "旧研究包与现行输出不一致，README已明确，仅文档消歧。"
+    }
+  ],
+  "humanItems": [
+    "中文独立译审、目标人群认知访谈和本地证据仍待完成；不得声称专家批准或效度已验证。",
+    "若拟更改题08的“复杂的人”、强度词、锚点、计分或构念，须报告用户确认及依既有版本规则处理；本审计不作实质变更。",
+    "研究/自我反思限成人；青少年适用性无证据。"
+  ],
+  "batchEligibility": {
+    "contentAudit": "可作为本批 DRAFT/CANDIDATE/PILOT 内容候选，前提是 root 按现行 schema 合并指导语绑定及统一检查/隔离入库；不构成上线、人工审核、研究级成熟或临床/筛选授权。",
+    "blockingScientificChange": "未识别需要立即更改的明确实质题义、锚点或算法；工作译稿现有未验证限制持续有效。",
+    "instruction": "原缺字段依主干仅诊断，本次最小修订可解决来源绑定，不设额外自动门禁。"
+  },
+  "notExecuted": [
+    "未运行评分、golden、全库或CI检查；root统一选择验证。",
+    "未操作数据库、CI、生产，未更改共享仓库、分支、commit或push。",
+    "未开展新效度研究，未假设人工批准；未对第三方材料扩展版权声明。"
+  ],
+  "officialSources": [
+    "https://ipip.ori.org/newSingleConstructsKey.htm",
+    "https://ipip.ori.org/newScoringInstructions.htm",
+    "https://ipip.ori.org/newPermission.htm"
+  ]
+}
