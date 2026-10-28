@@ -1,0 +1,3335 @@
+{
+  "schemaVersion": 1,
+  "mode": "legacy",
+  "scope": "Owned synthetic actual Teacher SELF START/FINAL/report; one-item scale; sequential storage lifecycle, not concurrency or HTTP/browser qualification",
+  "flags": {
+    "ASSESSMENT_COMPACT_FACTS_ENABLED": "false",
+    "ASSESSMENT_SHARED_RUNTIME_STORAGE_ENABLED": "false",
+    "ASSESSMENT_SHARED_CONTROL_ENABLED": "false"
+  },
+  "stages": [
+    {
+      "name": "source-and-approval-setup",
+      "status": "PASS",
+      "ms": 238.7589660000001,
+      "cpuMicros": {
+        "user": 146652,
+        "system": 29177
+      },
+      "heapDelta": 20274800,
+      "sqlCount": 200,
+      "sqlMs": 33
+    },
+    {
+      "name": "real-run-publication",
+      "status": "PASS",
+      "ms": 311.1012990000004,
+      "cpuMicros": {
+        "user": 208227,
+        "system": 51691
+      },
+      "heapDelta": -31405384,
+      "sqlCount": 411,
+      "sqlMs": 29
+    },
+    {
+      "name": "1:START",
+      "status": "PASS",
+      "ms": 219.99677999999994,
+      "cpuMicros": {
+        "user": 68815,
+        "system": 28981
+      },
+      "heapDelta": 10106112,
+      "sqlCount": 115,
+      "sqlMs": 98
+    },
+    {
+      "name": "1:FINAL",
+      "status": "PASS",
+      "ms": 102.99631399999998,
+      "cpuMicros": {
+        "user": 99816,
+        "system": 5416
+      },
+      "heapDelta": 9941488,
+      "sqlCount": 51,
+      "sqlMs": 5
+    },
+    {
+      "name": "1:parent-completion",
+      "status": "PASS",
+      "ms": 215.60286199999973,
+      "cpuMicros": {
+        "user": 294155,
+        "system": 19256
+      },
+      "heapDelta": -20527264,
+      "sqlCount": 29,
+      "sqlMs": 6
+    },
+    {
+      "name": "1:authorized-report",
+      "status": "PASS",
+      "ms": 55.025251000000026,
+      "cpuMicros": {
+        "user": 33704,
+        "system": 6
+      },
+      "heapDelta": 4348760,
+      "sqlCount": 21,
+      "sqlMs": 19
+    },
+    {
+      "name": "2:START",
+      "status": "PASS",
+      "ms": 171.77452600000015,
+      "cpuMicros": {
+        "user": 65104,
+        "system": 12851
+      },
+      "heapDelta": 9093416,
+      "sqlCount": 115,
+      "sqlMs": 72
+    },
+    {
+      "name": "2:FINAL",
+      "status": "PASS",
+      "ms": 55.63241500000004,
+      "cpuMicros": {
+        "user": 24817,
+        "system": 19338
+      },
+      "heapDelta": 5057184,
+      "sqlCount": 51,
+      "sqlMs": 3
+    },
+    {
+      "name": "2:parent-completion",
+      "status": "PASS",
+      "ms": 24.743654000000333,
+      "cpuMicros": {
+        "user": 19470,
+        "system": 1
+      },
+      "heapDelta": 2435784,
+      "sqlCount": 29,
+      "sqlMs": 1
+    },
+    {
+      "name": "2:authorized-report",
+      "status": "PASS",
+      "ms": 42.33093400000007,
+      "cpuMicros": {
+        "user": 18102,
+        "system": 4280
+      },
+      "heapDelta": 3955640,
+      "sqlCount": 21,
+      "sqlMs": 17
+    },
+    {
+      "name": "3:START",
+      "status": "PASS",
+      "ms": 154.64864499999976,
+      "cpuMicros": {
+        "user": 59687,
+        "system": 6335
+      },
+      "heapDelta": 9100616,
+      "sqlCount": 115,
+      "sqlMs": 62
+    },
+    {
+      "name": "3:FINAL",
+      "status": "PASS",
+      "ms": 46.2805070000004,
+      "cpuMicros": {
+        "user": 29382,
+        "system": 7269
+      },
+      "heapDelta": 5096712,
+      "sqlCount": 51,
+      "sqlMs": 1
+    },
+    {
+      "name": "3:parent-completion",
+      "status": "PASS",
+      "ms": 26.584269000000404,
+      "cpuMicros": {
+        "user": 24036,
+        "system": 2
+      },
+      "heapDelta": 2473168,
+      "sqlCount": 29,
+      "sqlMs": 1
+    },
+    {
+      "name": "3:authorized-report",
+      "status": "PASS",
+      "ms": 41.496128999999655,
+      "cpuMicros": {
+        "user": 26395,
+        "system": 0
+      },
+      "heapDelta": -46332520,
+      "sqlCount": 21,
+      "sqlMs": 16
+    },
+    {
+      "name": "4:START",
+      "status": "PASS",
+      "ms": 157.20195300000023,
+      "cpuMicros": {
+        "user": 64448,
+        "system": 7529
+      },
+      "heapDelta": 9058824,
+      "sqlCount": 115,
+      "sqlMs": 64
+    },
+    {
+      "name": "4:FINAL",
+      "status": "PASS",
+      "ms": 44.71145299999989,
+      "cpuMicros": {
+        "user": 30538,
+        "system": 4274
+      },
+      "heapDelta": 5043840,
+      "sqlCount": 51,
+      "sqlMs": 0
+    },
+    {
+      "name": "4:parent-completion",
+      "status": "PASS",
+      "ms": 23.265615000000253,
+      "cpuMicros": {
+        "user": 9341,
+        "system": 8839
+      },
+      "heapDelta": 2431856,
+      "sqlCount": 29,
+      "sqlMs": 0
+    },
+    {
+      "name": "4:authorized-report",
+      "status": "PASS",
+      "ms": 37.80502900000056,
+      "cpuMicros": {
+        "user": 20171,
+        "system": 4109
+      },
+      "heapDelta": 3692392,
+      "sqlCount": 21,
+      "sqlMs": 14
+    },
+    {
+      "name": "5:START",
+      "status": "PASS",
+      "ms": 85.53483599999981,
+      "cpuMicros": {
+        "user": 48459,
+        "system": 13322
+      },
+      "heapDelta": 9055592,
+      "sqlCount": 115,
+      "sqlMs": 6
+    },
+    {
+      "name": "5:FINAL",
+      "status": "PASS",
+      "ms": 39.25925599999937,
+      "cpuMicros": {
+        "user": 31321,
+        "system": 0
+      },
+      "heapDelta": 5403616,
+      "sqlCount": 51,
+      "sqlMs": 0
+    },
+    {
+      "name": "5:parent-completion",
+      "status": "PASS",
+      "ms": 23.916501000000608,
+      "cpuMicros": {
+        "user": 20091,
+        "system": 0
+      },
+      "heapDelta": 2582560,
+      "sqlCount": 29,
+      "sqlMs": 1
+    },
+    {
+      "name": "5:authorized-report",
+      "status": "PASS",
+      "ms": 41.232020000000375,
+      "cpuMicros": {
+        "user": 21904,
+        "system": 0
+      },
+      "heapDelta": 3786720,
+      "sqlCount": 21,
+      "sqlMs": 17
+    },
+    {
+      "name": "6:START",
+      "status": "PASS",
+      "ms": 96.6573099999996,
+      "cpuMicros": {
+        "user": 65694,
+        "system": 7066
+      },
+      "heapDelta": -43300232,
+      "sqlCount": 115,
+      "sqlMs": 5
+    },
+    {
+      "name": "6:FINAL",
+      "status": "PASS",
+      "ms": 40.37079100000028,
+      "cpuMicros": {
+        "user": 30794,
+        "system": 3428
+      },
+      "heapDelta": 4945800,
+      "sqlCount": 51,
+      "sqlMs": 0
+    },
+    {
+      "name": "6:parent-completion",
+      "status": "PASS",
+      "ms": 24.061698000000433,
+      "cpuMicros": {
+        "user": 18033,
+        "system": 126
+      },
+      "heapDelta": 2374624,
+      "sqlCount": 29,
+      "sqlMs": 0
+    },
+    {
+      "name": "6:authorized-report",
+      "status": "PASS",
+      "ms": 38.01033700000062,
+      "cpuMicros": {
+        "user": 19652,
+        "system": 2
+      },
+      "heapDelta": 3586880,
+      "sqlCount": 21,
+      "sqlMs": 16
+    },
+    {
+      "name": "7:START",
+      "status": "PASS",
+      "ms": 91.05529500000011,
+      "cpuMicros": {
+        "user": 58339,
+        "system": 6460
+      },
+      "heapDelta": 8872096,
+      "sqlCount": 115,
+      "sqlMs": 5
+    },
+    {
+      "name": "7:FINAL",
+      "status": "PASS",
+      "ms": 45.2490229999994,
+      "cpuMicros": {
+        "user": 34019,
+        "system": 462
+      },
+      "heapDelta": 4900696,
+      "sqlCount": 51,
+      "sqlMs": 2
+    },
+    {
+      "name": "7:parent-completion",
+      "status": "PASS",
+      "ms": 27.191711000000396,
+      "cpuMicros": {
+        "user": 20546,
+        "system": 1
+      },
+      "heapDelta": 2382184,
+      "sqlCount": 29,
+      "sqlMs": 1
+    },
+    {
+      "name": "7:authorized-report",
+      "status": "PASS",
+      "ms": 38.26777800000036,
+      "cpuMicros": {
+        "user": 26647,
+        "system": 2813
+      },
+      "heapDelta": 3593992,
+      "sqlCount": 21,
+      "sqlMs": 15
+    },
+    {
+      "name": "8:START",
+      "status": "PASS",
+      "ms": 92.30866499999956,
+      "cpuMicros": {
+        "user": 59953,
+        "system": 9691
+      },
+      "heapDelta": 8804784,
+      "sqlCount": 115,
+      "sqlMs": 5
+    },
+    {
+      "name": "8:FINAL",
+      "status": "PASS",
+      "ms": 42.87875100000019,
+      "cpuMicros": {
+        "user": 32972,
+        "system": 2110
+      },
+      "heapDelta": 4861224,
+      "sqlCount": 51,
+      "sqlMs": 1
+    },
+    {
+      "name": "8:parent-completion",
+      "status": "PASS",
+      "ms": 23.007399000000078,
+      "cpuMicros": {
+        "user": 16705,
+        "system": 578
+      },
+      "heapDelta": 2364976,
+      "sqlCount": 29,
+      "sqlMs": 0
+    },
+    {
+      "name": "8:authorized-report",
+      "status": "PASS",
+      "ms": 41.578097999999954,
+      "cpuMicros": {
+        "user": 20467,
+        "system": 4494
+      },
+      "heapDelta": -48285568,
+      "sqlCount": 21,
+      "sqlMs": 16
+    },
+    {
+      "name": "9:START",
+      "status": "PASS",
+      "ms": 95.16570299999967,
+      "cpuMicros": {
+        "user": 61045,
+        "system": 12141
+      },
+      "heapDelta": 8996040,
+      "sqlCount": 115,
+      "sqlMs": 6
+    },
+    {
+      "name": "9:FINAL",
+      "status": "PASS",
+      "ms": 42.790711999999985,
+      "cpuMicros": {
+        "user": 33898,
+        "system": 1679
+      },
+      "heapDelta": 5450928,
+      "sqlCount": 51,
+      "sqlMs": 0
+    },
+    {
+      "name": "9:parent-completion",
+      "status": "PASS",
+      "ms": 24.172809000000598,
+      "cpuMicros": {
+        "user": 17288,
+        "system": 3125
+      },
+      "heapDelta": 2533008,
+      "sqlCount": 29,
+      "sqlMs": 0
+    },
+    {
+      "name": "9:authorized-report",
+      "status": "PASS",
+      "ms": 42.639501000000564,
+      "cpuMicros": {
+        "user": 22364,
+        "system": 1
+      },
+      "heapDelta": 3601720,
+      "sqlCount": 21,
+      "sqlMs": 20
+    },
+    {
+      "name": "10:START",
+      "status": "PASS",
+      "ms": 92.23064900000008,
+      "cpuMicros": {
+        "user": 48984,
+        "system": 15910
+      },
+      "heapDelta": 8777112,
+      "sqlCount": 115,
+      "sqlMs": 4
+    },
+    {
+      "name": "10:FINAL",
+      "status": "PASS",
+      "ms": 44.037459000000126,
+      "cpuMicros": {
+        "user": 29852,
+        "system": 3815
+      },
+      "heapDelta": 4836168,
+      "sqlCount": 51,
+      "sqlMs": 0
+    },
+    {
+      "name": "10:parent-completion",
+      "status": "PASS",
+      "ms": 25.432530000000042,
+      "cpuMicros": {
+        "user": 14383,
+        "system": 5190
+      },
+      "heapDelta": 2353048,
+      "sqlCount": 29,
+      "sqlMs": 0
+    },
+    {
+      "name": "10:authorized-report",
+      "status": "PASS",
+      "ms": 41.339114000000336,
+      "cpuMicros": {
+        "user": 16543,
+        "system": 3322
+      },
+      "heapDelta": 3514488,
+      "sqlCount": 21,
+      "sqlMs": 17
+    },
+    {
+      "name": "11:START",
+      "status": "PASS",
+      "ms": 174.0471719999996,
+      "cpuMicros": {
+        "user": 77637,
+        "system": 4
+      },
+      "heapDelta": -43093992,
+      "sqlCount": 115,
+      "sqlMs": 74
+    },
+    {
+      "name": "11:FINAL",
+      "status": "PASS",
+      "ms": 47.36563099999967,
+      "cpuMicros": {
+        "user": 35263,
+        "system": 0
+      },
+      "heapDelta": 4824088,
+      "sqlCount": 51,
+      "sqlMs": 1
+    },
+    {
+      "name": "11:parent-completion",
+      "status": "PASS",
+      "ms": 24.9854090000008,
+      "cpuMicros": {
+        "user": 11373,
+        "system": 6448
+      },
+      "heapDelta": 2351584,
+      "sqlCount": 29,
+      "sqlMs": 1
+    },
+    {
+      "name": "11:authorized-report",
+      "status": "PASS",
+      "ms": 38.375044000000344,
+      "cpuMicros": {
+        "user": 13693,
+        "system": 3870
+      },
+      "heapDelta": 3487632,
+      "sqlCount": 21,
+      "sqlMs": 17
+    },
+    {
+      "name": "12:START",
+      "status": "PASS",
+      "ms": 154.36906699999963,
+      "cpuMicros": {
+        "user": 55705,
+        "system": 12856
+      },
+      "heapDelta": 8751176,
+      "sqlCount": 115,
+      "sqlMs": 62
+    },
+    {
+      "name": "12:FINAL",
+      "status": "PASS",
+      "ms": 48.16099699999995,
+      "cpuMicros": {
+        "user": 34955,
+        "system": 7622
+      },
+      "heapDelta": 4843168,
+      "sqlCount": 51,
+      "sqlMs": 1
+    },
+    {
+      "name": "12:parent-completion",
+      "status": "PASS",
+      "ms": 23.81782800000019,
+      "cpuMicros": {
+        "user": 13294,
+        "system": 4319
+      },
+      "heapDelta": 2340664,
+      "sqlCount": 29,
+      "sqlMs": 0
+    },
+    {
+      "name": "12:authorized-report",
+      "status": "PASS",
+      "ms": 40.17038499999944,
+      "cpuMicros": {
+        "user": 17815,
+        "system": 4628
+      },
+      "heapDelta": 3515464,
+      "sqlCount": 21,
+      "sqlMs": 16
+    },
+    {
+      "name": "13:START",
+      "status": "PASS",
+      "ms": 154.28724899999997,
+      "cpuMicros": {
+        "user": 56332,
+        "system": 11365
+      },
+      "heapDelta": 8736216,
+      "sqlCount": 115,
+      "sqlMs": 63
+    },
+    {
+      "name": "13:FINAL",
+      "status": "PASS",
+      "ms": 42.88317200000074,
+      "cpuMicros": {
+        "user": 24910,
+        "system": 7768
+      },
+      "heapDelta": 4802584,
+      "sqlCount": 51,
+      "sqlMs": 1
+    },
+    {
+      "name": "13:parent-completion",
+      "status": "PASS",
+      "ms": 24.99993699999959,
+      "cpuMicros": {
+        "user": 15269,
+        "system": 3068
+      },
+      "heapDelta": 2342408,
+      "sqlCount": 29,
+      "sqlMs": 0
+    },
+    {
+      "name": "13:authorized-report",
+      "status": "PASS",
+      "ms": 42.098047999999835,
+      "cpuMicros": {
+        "user": 20778,
+        "system": 4621
+      },
+      "heapDelta": -49025664,
+      "sqlCount": 21,
+      "sqlMs": 18
+    },
+    {
+      "name": "14:START",
+      "status": "PASS",
+      "ms": 105.1105120000002,
+      "cpuMicros": {
+        "user": 63521,
+        "system": 9284
+      },
+      "heapDelta": 8725696,
+      "sqlCount": 115,
+      "sqlMs": 11
+    },
+    {
+      "name": "14:FINAL",
+      "status": "PASS",
+      "ms": 42.927153000000544,
+      "cpuMicros": {
+        "user": 31083,
+        "system": 1316
+      },
+      "heapDelta": 4801088,
+      "sqlCount": 51,
+      "sqlMs": 1
+    },
+    {
+      "name": "14:parent-completion",
+      "status": "PASS",
+      "ms": 23.657505999999557,
+      "cpuMicros": {
+        "user": 14016,
+        "system": 3994
+      },
+      "heapDelta": 2343096,
+      "sqlCount": 29,
+      "sqlMs": 1
+    },
+    {
+      "name": "14:authorized-report",
+      "status": "PASS",
+      "ms": 39.43516400000044,
+      "cpuMicros": {
+        "user": 18802,
+        "system": 0
+      },
+      "heapDelta": 3485224,
+      "sqlCount": 21,
+      "sqlMs": 17
+    },
+    {
+      "name": "15:START",
+      "status": "PASS",
+      "ms": 86.46498499999961,
+      "cpuMicros": {
+        "user": 41074,
+        "system": 18860
+      },
+      "heapDelta": 8708552,
+      "sqlCount": 115,
+      "sqlMs": 5
+    },
+    {
+      "name": "15:FINAL",
+      "status": "PASS",
+      "ms": 39.27897600000051,
+      "cpuMicros": {
+        "user": 28801,
+        "system": 3523
+      },
+      "heapDelta": 4815680,
+      "sqlCount": 51,
+      "sqlMs": 0
+    },
+    {
+      "name": "15:parent-completion",
+      "status": "PASS",
+      "ms": 32.99395800000002,
+      "cpuMicros": {
+        "user": 11934,
+        "system": 12397
+      },
+      "heapDelta": 2336696,
+      "sqlCount": 29,
+      "sqlMs": 3
+    },
+    {
+      "name": "15:authorized-report",
+      "status": "PASS",
+      "ms": 41.25984100000005,
+      "cpuMicros": {
+        "user": 18715,
+        "system": 0
+      },
+      "heapDelta": 3483896,
+      "sqlCount": 21,
+      "sqlMs": 18
+    },
+    {
+      "name": "16:START",
+      "status": "PASS",
+      "ms": 94.72051699999975,
+      "cpuMicros": {
+        "user": 59528,
+        "system": 6766
+      },
+      "heapDelta": 8709496,
+      "sqlCount": 115,
+      "sqlMs": 5
+    },
+    {
+      "name": "16:FINAL",
+      "status": "PASS",
+      "ms": 49.67330100000072,
+      "cpuMicros": {
+        "user": 38498,
+        "system": 5126
+      },
+      "heapDelta": -47173888,
+      "sqlCount": 51,
+      "sqlMs": 1
+    },
+    {
+      "name": "16:parent-completion",
+      "status": "PASS",
+      "ms": 28.20993399999952,
+      "cpuMicros": {
+        "user": 19866,
+        "system": 4599
+      },
+      "heapDelta": 2342512,
+      "sqlCount": 29,
+      "sqlMs": 1
+    },
+    {
+      "name": "16:authorized-report",
+      "status": "PASS",
+      "ms": 47.53110900000047,
+      "cpuMicros": {
+        "user": 19683,
+        "system": 8432
+      },
+      "heapDelta": 3466608,
+      "sqlCount": 21,
+      "sqlMs": 23
+    },
+    {
+      "name": "17:START",
+      "status": "PASS",
+      "ms": 113.67541299999993,
+      "cpuMicros": {
+        "user": 59248,
+        "system": 21931
+      },
+      "heapDelta": 8706184,
+      "sqlCount": 115,
+      "sqlMs": 13
+    },
+    {
+      "name": "17:FINAL",
+      "status": "PASS",
+      "ms": 54.798360000000685,
+      "cpuMicros": {
+        "user": 32008,
+        "system": 4934
+      },
+      "heapDelta": 4762552,
+      "sqlCount": 51,
+      "sqlMs": 8
+    },
+    {
+      "name": "17:parent-completion",
+      "status": "PASS",
+      "ms": 35.743350000000646,
+      "cpuMicros": {
+        "user": 22450,
+        "system": 1674
+      },
+      "heapDelta": 2295736,
+      "sqlCount": 29,
+      "sqlMs": 10
+    },
+    {
+      "name": "17:authorized-report",
+      "status": "PASS",
+      "ms": 38.93924200000038,
+      "cpuMicros": {
+        "user": 17800,
+        "system": 1
+      },
+      "heapDelta": 3461560,
+      "sqlCount": 21,
+      "sqlMs": 17
+    },
+    {
+      "name": "18:START",
+      "status": "PASS",
+      "ms": 89.96532800000023,
+      "cpuMicros": {
+        "user": 62459,
+        "system": 4700
+      },
+      "heapDelta": 8708360,
+      "sqlCount": 115,
+      "sqlMs": 2
+    },
+    {
+      "name": "18:FINAL",
+      "status": "PASS",
+      "ms": 41.325894999999946,
+      "cpuMicros": {
+        "user": 31600,
+        "system": 3186
+      },
+      "heapDelta": 4748168,
+      "sqlCount": 51,
+      "sqlMs": 0
+    },
+    {
+      "name": "18:parent-completion",
+      "status": "PASS",
+      "ms": 41.019405999999435,
+      "cpuMicros": {
+        "user": 21839,
+        "system": 10046
+      },
+      "heapDelta": 2332744,
+      "sqlCount": 29,
+      "sqlMs": 6
+    },
+    {
+      "name": "18:authorized-report",
+      "status": "PASS",
+      "ms": 40.331968000000415,
+      "cpuMicros": {
+        "user": 20730,
+        "system": 2
+      },
+      "heapDelta": 3475192,
+      "sqlCount": 21,
+      "sqlMs": 17
+    },
+    {
+      "name": "19:START",
+      "status": "PASS",
+      "ms": 94.14883699999973,
+      "cpuMicros": {
+        "user": 70601,
+        "system": 1979
+      },
+      "heapDelta": -43212720,
+      "sqlCount": 115,
+      "sqlMs": 2
+    },
+    {
+      "name": "19:FINAL",
+      "status": "PASS",
+      "ms": 39.07835999999952,
+      "cpuMicros": {
+        "user": 27272,
+        "system": 4454
+      },
+      "heapDelta": 4767056,
+      "sqlCount": 51,
+      "sqlMs": 0
+    },
+    {
+      "name": "19:parent-completion",
+      "status": "PASS",
+      "ms": 25.436815999999453,
+      "cpuMicros": {
+        "user": 17439,
+        "system": 1
+      },
+      "heapDelta": 2294776,
+      "sqlCount": 29,
+      "sqlMs": 2
+    },
+    {
+      "name": "19:authorized-report",
+      "status": "PASS",
+      "ms": 39.25174799999968,
+      "cpuMicros": {
+        "user": 18046,
+        "system": 0
+      },
+      "heapDelta": 3461344,
+      "sqlCount": 21,
+      "sqlMs": 17
+    },
+    {
+      "name": "20:START",
+      "status": "PASS",
+      "ms": 99.03623200000038,
+      "cpuMicros": {
+        "user": 55325,
+        "system": 15367
+      },
+      "heapDelta": 8705848,
+      "sqlCount": 115,
+      "sqlMs": 5
+    },
+    {
+      "name": "20:FINAL",
+      "status": "PASS",
+      "ms": 47.18874499999947,
+      "cpuMicros": {
+        "user": 30423,
+        "system": 5907
+      },
+      "heapDelta": 4744200,
+      "sqlCount": 51,
+      "sqlMs": 2
+    },
+    {
+      "name": "20:parent-completion",
+      "status": "PASS",
+      "ms": 23.867991999999504,
+      "cpuMicros": {
+        "user": 14090,
+        "system": 3818
+      },
+      "heapDelta": 2294472,
+      "sqlCount": 29,
+      "sqlMs": 0
+    },
+    {
+      "name": "20:authorized-report",
+      "status": "PASS",
+      "ms": 37.68679599999996,
+      "cpuMicros": {
+        "user": 17007,
+        "system": 748
+      },
+      "heapDelta": 3449064,
+      "sqlCount": 21,
+      "sqlMs": 17
+    },
+    {
+      "name": "21:START",
+      "status": "PASS",
+      "ms": 95.75533300000006,
+      "cpuMicros": {
+        "user": 39613,
+        "system": 25543
+      },
+      "heapDelta": 8697048,
+      "sqlCount": 115,
+      "sqlMs": 8
+    },
+    {
+      "name": "21:FINAL",
+      "status": "PASS",
+      "ms": 47.22753200000079,
+      "cpuMicros": {
+        "user": 27866,
+        "system": 11844
+      },
+      "heapDelta": -47461384,
+      "sqlCount": 51,
+      "sqlMs": 1
+    },
+    {
+      "name": "21:parent-completion",
+      "status": "PASS",
+      "ms": 24.432691999999406,
+      "cpuMicros": {
+        "user": 8744,
+        "system": 8943
+      },
+      "heapDelta": 2294448,
+      "sqlCount": 29,
+      "sqlMs": 1
+    },
+    {
+      "name": "21:authorized-report",
+      "status": "PASS",
+      "ms": 38.12962500000049,
+      "cpuMicros": {
+        "user": 17376,
+        "system": 35
+      },
+      "heapDelta": 3452800,
+      "sqlCount": 21,
+      "sqlMs": 18
+    },
+    {
+      "name": "22:START",
+      "status": "PASS",
+      "ms": 100.09114499999941,
+      "cpuMicros": {
+        "user": 57755,
+        "system": 12712
+      },
+      "heapDelta": 8685088,
+      "sqlCount": 115,
+      "sqlMs": 10
+    },
+    {
+      "name": "22:FINAL",
+      "status": "PASS",
+      "ms": 41.17363900000055,
+      "cpuMicros": {
+        "user": 33270,
+        "system": 585
+      },
+      "heapDelta": 4769464,
+      "sqlCount": 51,
+      "sqlMs": 0
+    },
+    {
+      "name": "22:parent-completion",
+      "status": "PASS",
+      "ms": 26.14803100000063,
+      "cpuMicros": {
+        "user": 16688,
+        "system": 2701
+      },
+      "heapDelta": 2302904,
+      "sqlCount": 29,
+      "sqlMs": 2
+    },
+    {
+      "name": "22:authorized-report",
+      "status": "PASS",
+      "ms": 41.45487999999932,
+      "cpuMicros": {
+        "user": 17099,
+        "system": 5602
+      },
+      "heapDelta": 3478424,
+      "sqlCount": 21,
+      "sqlMs": 17
+    },
+    {
+      "name": "23:START",
+      "status": "PASS",
+      "ms": 83.81799200000023,
+      "cpuMicros": {
+        "user": 54551,
+        "system": 6449
+      },
+      "heapDelta": 8759592,
+      "sqlCount": 115,
+      "sqlMs": 3
+    },
+    {
+      "name": "23:FINAL",
+      "status": "PASS",
+      "ms": 40.56797499999993,
+      "cpuMicros": {
+        "user": 28235,
+        "system": 3435
+      },
+      "heapDelta": 4747584,
+      "sqlCount": 51,
+      "sqlMs": 0
+    },
+    {
+      "name": "23:parent-completion",
+      "status": "PASS",
+      "ms": 25.175484999999753,
+      "cpuMicros": {
+        "user": 12073,
+        "system": 7383
+      },
+      "heapDelta": 2303952,
+      "sqlCount": 29,
+      "sqlMs": 1
+    },
+    {
+      "name": "23:authorized-report",
+      "status": "PASS",
+      "ms": 40.820293999999194,
+      "cpuMicros": {
+        "user": 15579,
+        "system": 5981
+      },
+      "heapDelta": 3463984,
+      "sqlCount": 21,
+      "sqlMs": 16
+    },
+    {
+      "name": "24:START",
+      "status": "PASS",
+      "ms": 113.18324500000017,
+      "cpuMicros": {
+        "user": 76955,
+        "system": 12969
+      },
+      "heapDelta": -43322672,
+      "sqlCount": 115,
+      "sqlMs": 9
+    },
+    {
+      "name": "24:FINAL",
+      "status": "PASS",
+      "ms": 47.437096999999994,
+      "cpuMicros": {
+        "user": 32351,
+        "system": 4078
+      },
+      "heapDelta": 4732104,
+      "sqlCount": 51,
+      "sqlMs": 1
+    },
+    {
+      "name": "24:parent-completion",
+      "status": "PASS",
+      "ms": 29.04706299999998,
+      "cpuMicros": {
+        "user": 17541,
+        "system": 5061
+      },
+      "heapDelta": 2287304,
+      "sqlCount": 29,
+      "sqlMs": 0
+    },
+    {
+      "name": "24:authorized-report",
+      "status": "PASS",
+      "ms": 46.85354799999914,
+      "cpuMicros": {
+        "user": 28161,
+        "system": 3
+      },
+      "heapDelta": 3453248,
+      "sqlCount": 21,
+      "sqlMs": 21
+    },
+    {
+      "name": "25:START",
+      "status": "PASS",
+      "ms": 103.08192100000088,
+      "cpuMicros": {
+        "user": 60444,
+        "system": 11546
+      },
+      "heapDelta": 8652272,
+      "sqlCount": 115,
+      "sqlMs": 8
+    },
+    {
+      "name": "25:FINAL",
+      "status": "PASS",
+      "ms": 47.6520470000014,
+      "cpuMicros": {
+        "user": 35593,
+        "system": 3423
+      },
+      "heapDelta": 4741536,
+      "sqlCount": 51,
+      "sqlMs": 1
+    },
+    {
+      "name": "25:parent-completion",
+      "status": "PASS",
+      "ms": 29.752964999999676,
+      "cpuMicros": {
+        "user": 8323,
+        "system": 11976
+      },
+      "heapDelta": 2286744,
+      "sqlCount": 29,
+      "sqlMs": 5
+    },
+    {
+      "name": "25:authorized-report",
+      "status": "PASS",
+      "ms": 46.99375700000019,
+      "cpuMicros": {
+        "user": 17462,
+        "system": 2509
+      },
+      "heapDelta": 3448736,
+      "sqlCount": 21,
+      "sqlMs": 20
+    },
+    {
+      "name": "26:START",
+      "status": "PASS",
+      "ms": 96.81427000000076,
+      "cpuMicros": {
+        "user": 69396,
+        "system": 9254
+      },
+      "heapDelta": 8679936,
+      "sqlCount": 115,
+      "sqlMs": 8
+    },
+    {
+      "name": "26:FINAL",
+      "status": "PASS",
+      "ms": 53.16764300000068,
+      "cpuMicros": {
+        "user": 41163,
+        "system": 890
+      },
+      "heapDelta": 4721624,
+      "sqlCount": 51,
+      "sqlMs": 1
+    },
+    {
+      "name": "26:parent-completion",
+      "status": "PASS",
+      "ms": 30.516653000000588,
+      "cpuMicros": {
+        "user": 18488,
+        "system": 5219
+      },
+      "heapDelta": -49639504,
+      "sqlCount": 29,
+      "sqlMs": 2
+    },
+    {
+      "name": "26:authorized-report",
+      "status": "PASS",
+      "ms": 39.44552900000053,
+      "cpuMicros": {
+        "user": 15086,
+        "system": 3351
+      },
+      "heapDelta": 3438120,
+      "sqlCount": 21,
+      "sqlMs": 18
+    },
+    {
+      "name": "27:START",
+      "status": "PASS",
+      "ms": 99.29974100000072,
+      "cpuMicros": {
+        "user": 42970,
+        "system": 27546
+      },
+      "heapDelta": 8653936,
+      "sqlCount": 115,
+      "sqlMs": 9
+    },
+    {
+      "name": "27:FINAL",
+      "status": "PASS",
+      "ms": 46.05555800000002,
+      "cpuMicros": {
+        "user": 36146,
+        "system": 3
+      },
+      "heapDelta": 4715368,
+      "sqlCount": 51,
+      "sqlMs": 1
+    },
+    {
+      "name": "27:parent-completion",
+      "status": "PASS",
+      "ms": 29.453395999998975,
+      "cpuMicros": {
+        "user": 13107,
+        "system": 11282
+      },
+      "heapDelta": 2290816,
+      "sqlCount": 29,
+      "sqlMs": 2
+    },
+    {
+      "name": "27:authorized-report",
+      "status": "PASS",
+      "ms": 46.82678300000043,
+      "cpuMicros": {
+        "user": 23098,
+        "system": 2594
+      },
+      "heapDelta": 3455232,
+      "sqlCount": 21,
+      "sqlMs": 20
+    },
+    {
+      "name": "28:START",
+      "status": "PASS",
+      "ms": 103.30499799999961,
+      "cpuMicros": {
+        "user": 59666,
+        "system": 14672
+      },
+      "heapDelta": 8648968,
+      "sqlCount": 115,
+      "sqlMs": 6
+    },
+    {
+      "name": "28:FINAL",
+      "status": "PASS",
+      "ms": 45.26807899999949,
+      "cpuMicros": {
+        "user": 15217,
+        "system": 20970
+      },
+      "heapDelta": 4715168,
+      "sqlCount": 51,
+      "sqlMs": 0
+    },
+    {
+      "name": "28:parent-completion",
+      "status": "PASS",
+      "ms": 23.284998999999516,
+      "cpuMicros": {
+        "user": 14248,
+        "system": 3031
+      },
+      "heapDelta": 2286424,
+      "sqlCount": 29,
+      "sqlMs": 0
+    },
+    {
+      "name": "28:authorized-report",
+      "status": "PASS",
+      "ms": 39.80678099999932,
+      "cpuMicros": {
+        "user": 13653,
+        "system": 4328
+      },
+      "heapDelta": 3442944,
+      "sqlCount": 21,
+      "sqlMs": 17
+    },
+    {
+      "name": "29:START",
+      "status": "PASS",
+      "ms": 118.32950800000071,
+      "cpuMicros": {
+        "user": 77148,
+        "system": 11357
+      },
+      "heapDelta": -43688376,
+      "sqlCount": 115,
+      "sqlMs": 15
+    },
+    {
+      "name": "29:FINAL",
+      "status": "PASS",
+      "ms": 41.02370300000075,
+      "cpuMicros": {
+        "user": 28523,
+        "system": 4109
+      },
+      "heapDelta": 4720976,
+      "sqlCount": 51,
+      "sqlMs": 0
+    },
+    {
+      "name": "29:parent-completion",
+      "status": "PASS",
+      "ms": 24.95099300000038,
+      "cpuMicros": {
+        "user": 19018,
+        "system": 0
+      },
+      "heapDelta": 2303384,
+      "sqlCount": 29,
+      "sqlMs": 0
+    },
+    {
+      "name": "29:authorized-report",
+      "status": "PASS",
+      "ms": 43.130746999999246,
+      "cpuMicros": {
+        "user": 20589,
+        "system": 0
+      },
+      "heapDelta": 3438624,
+      "sqlCount": 21,
+      "sqlMs": 18
+    },
+    {
+      "name": "30:START",
+      "status": "PASS",
+      "ms": 105.64272999999957,
+      "cpuMicros": {
+        "user": 54777,
+        "system": 28341
+      },
+      "heapDelta": 8660616,
+      "sqlCount": 115,
+      "sqlMs": 13
+    },
+    {
+      "name": "30:FINAL",
+      "status": "PASS",
+      "ms": 41.76914899999974,
+      "cpuMicros": {
+        "user": 29097,
+        "system": 3385
+      },
+      "heapDelta": 4716160,
+      "sqlCount": 51,
+      "sqlMs": 0
+    },
+    {
+      "name": "30:parent-completion",
+      "status": "PASS",
+      "ms": 35.27554600000076,
+      "cpuMicros": {
+        "user": 23776,
+        "system": 373
+      },
+      "heapDelta": 2275576,
+      "sqlCount": 29,
+      "sqlMs": 4
+    },
+    {
+      "name": "30:authorized-report",
+      "status": "PASS",
+      "ms": 44.46806999999899,
+      "cpuMicros": {
+        "user": 22056,
+        "system": 1
+      },
+      "heapDelta": 3437832,
+      "sqlCount": 21,
+      "sqlMs": 19
+    }
+  ],
+  "records": [
+    {
+      "index": 1,
+      "score": 3,
+      "semanticHash": "413de7a0fa2cabc7ca5ab549a544e78b82066e36a669cfbfc023af9a7f71a5e8",
+      "reportBytes": 1559,
+      "status": "COMPLETED"
+    },
+    {
+      "index": 2,
+      "score": 3,
+      "semanticHash": "413de7a0fa2cabc7ca5ab549a544e78b82066e36a669cfbfc023af9a7f71a5e8",
+      "reportBytes": 1558,
+      "status": "COMPLETED"
+    },
+    {
+      "index": 3,
+      "score": 3,
+      "semanticHash": "413de7a0fa2cabc7ca5ab549a544e78b82066e36a669cfbfc023af9a7f71a5e8",
+      "reportBytes": 1558,
+      "status": "COMPLETED"
+    },
+    {
+      "index": 4,
+      "score": 3,
+      "semanticHash": "413de7a0fa2cabc7ca5ab549a544e78b82066e36a669cfbfc023af9a7f71a5e8",
+      "reportBytes": 1558,
+      "status": "COMPLETED"
+    },
+    {
+      "index": 5,
+      "score": 3,
+      "semanticHash": "413de7a0fa2cabc7ca5ab549a544e78b82066e36a669cfbfc023af9a7f71a5e8",
+      "reportBytes": 1558,
+      "status": "COMPLETED"
+    },
+    {
+      "index": 6,
+      "score": 3,
+      "semanticHash": "413de7a0fa2cabc7ca5ab549a544e78b82066e36a669cfbfc023af9a7f71a5e8",
+      "reportBytes": 1558,
+      "status": "COMPLETED"
+    },
+    {
+      "index": 7,
+      "score": 3,
+      "semanticHash": "413de7a0fa2cabc7ca5ab549a544e78b82066e36a669cfbfc023af9a7f71a5e8",
+      "reportBytes": 1558,
+      "status": "COMPLETED"
+    },
+    {
+      "index": 8,
+      "score": 3,
+      "semanticHash": "413de7a0fa2cabc7ca5ab549a544e78b82066e36a669cfbfc023af9a7f71a5e8",
+      "reportBytes": 1558,
+      "status": "COMPLETED"
+    },
+    {
+      "index": 9,
+      "score": 3,
+      "semanticHash": "413de7a0fa2cabc7ca5ab549a544e78b82066e36a669cfbfc023af9a7f71a5e8",
+      "reportBytes": 1558,
+      "status": "COMPLETED"
+    },
+    {
+      "index": 10,
+      "score": 3,
+      "semanticHash": "413de7a0fa2cabc7ca5ab549a544e78b82066e36a669cfbfc023af9a7f71a5e8",
+      "reportBytes": 1558,
+      "status": "COMPLETED"
+    },
+    {
+      "index": 11,
+      "score": 3,
+      "semanticHash": "413de7a0fa2cabc7ca5ab549a544e78b82066e36a669cfbfc023af9a7f71a5e8",
+      "reportBytes": 1558,
+      "status": "COMPLETED"
+    },
+    {
+      "index": 12,
+      "score": 3,
+      "semanticHash": "413de7a0fa2cabc7ca5ab549a544e78b82066e36a669cfbfc023af9a7f71a5e8",
+      "reportBytes": 1558,
+      "status": "COMPLETED"
+    },
+    {
+      "index": 13,
+      "score": 3,
+      "semanticHash": "413de7a0fa2cabc7ca5ab549a544e78b82066e36a669cfbfc023af9a7f71a5e8",
+      "reportBytes": 1558,
+      "status": "COMPLETED"
+    },
+    {
+      "index": 14,
+      "score": 3,
+      "semanticHash": "413de7a0fa2cabc7ca5ab549a544e78b82066e36a669cfbfc023af9a7f71a5e8",
+      "reportBytes": 1558,
+      "status": "COMPLETED"
+    },
+    {
+      "index": 15,
+      "score": 3,
+      "semanticHash": "413de7a0fa2cabc7ca5ab549a544e78b82066e36a669cfbfc023af9a7f71a5e8",
+      "reportBytes": 1558,
+      "status": "COMPLETED"
+    },
+    {
+      "index": 16,
+      "score": 3,
+      "semanticHash": "413de7a0fa2cabc7ca5ab549a544e78b82066e36a669cfbfc023af9a7f71a5e8",
+      "reportBytes": 1558,
+      "status": "COMPLETED"
+    },
+    {
+      "index": 17,
+      "score": 3,
+      "semanticHash": "413de7a0fa2cabc7ca5ab549a544e78b82066e36a669cfbfc023af9a7f71a5e8",
+      "reportBytes": 1558,
+      "status": "COMPLETED"
+    },
+    {
+      "index": 18,
+      "score": 3,
+      "semanticHash": "413de7a0fa2cabc7ca5ab549a544e78b82066e36a669cfbfc023af9a7f71a5e8",
+      "reportBytes": 1558,
+      "status": "COMPLETED"
+    },
+    {
+      "index": 19,
+      "score": 3,
+      "semanticHash": "413de7a0fa2cabc7ca5ab549a544e78b82066e36a669cfbfc023af9a7f71a5e8",
+      "reportBytes": 1558,
+      "status": "COMPLETED"
+    },
+    {
+      "index": 20,
+      "score": 3,
+      "semanticHash": "413de7a0fa2cabc7ca5ab549a544e78b82066e36a669cfbfc023af9a7f71a5e8",
+      "reportBytes": 1558,
+      "status": "COMPLETED"
+    },
+    {
+      "index": 21,
+      "score": 3,
+      "semanticHash": "413de7a0fa2cabc7ca5ab549a544e78b82066e36a669cfbfc023af9a7f71a5e8",
+      "reportBytes": 1558,
+      "status": "COMPLETED"
+    },
+    {
+      "index": 22,
+      "score": 3,
+      "semanticHash": "413de7a0fa2cabc7ca5ab549a544e78b82066e36a669cfbfc023af9a7f71a5e8",
+      "reportBytes": 1558,
+      "status": "COMPLETED"
+    },
+    {
+      "index": 23,
+      "score": 3,
+      "semanticHash": "413de7a0fa2cabc7ca5ab549a544e78b82066e36a669cfbfc023af9a7f71a5e8",
+      "reportBytes": 1558,
+      "status": "COMPLETED"
+    },
+    {
+      "index": 24,
+      "score": 3,
+      "semanticHash": "413de7a0fa2cabc7ca5ab549a544e78b82066e36a669cfbfc023af9a7f71a5e8",
+      "reportBytes": 1558,
+      "status": "COMPLETED"
+    },
+    {
+      "index": 25,
+      "score": 3,
+      "semanticHash": "413de7a0fa2cabc7ca5ab549a544e78b82066e36a669cfbfc023af9a7f71a5e8",
+      "reportBytes": 1558,
+      "status": "COMPLETED"
+    },
+    {
+      "index": 26,
+      "score": 3,
+      "semanticHash": "413de7a0fa2cabc7ca5ab549a544e78b82066e36a669cfbfc023af9a7f71a5e8",
+      "reportBytes": 1558,
+      "status": "COMPLETED"
+    },
+    {
+      "index": 27,
+      "score": 3,
+      "semanticHash": "413de7a0fa2cabc7ca5ab549a544e78b82066e36a669cfbfc023af9a7f71a5e8",
+      "reportBytes": 1558,
+      "status": "COMPLETED"
+    },
+    {
+      "index": 28,
+      "score": 3,
+      "semanticHash": "413de7a0fa2cabc7ca5ab549a544e78b82066e36a669cfbfc023af9a7f71a5e8",
+      "reportBytes": 1558,
+      "status": "COMPLETED"
+    },
+    {
+      "index": 29,
+      "score": 3,
+      "semanticHash": "413de7a0fa2cabc7ca5ab549a544e78b82066e36a669cfbfc023af9a7f71a5e8",
+      "reportBytes": 1558,
+      "status": "COMPLETED"
+    },
+    {
+      "index": 30,
+      "score": 3,
+      "semanticHash": "413de7a0fa2cabc7ca5ab549a544e78b82066e36a669cfbfc023af9a7f71a5e8",
+      "reportBytes": 1558,
+      "status": "COMPLETED"
+    }
+  ],
+  "snapshots": [
+    {
+      "label": "published-before-start",
+      "lsn": "0/25D7228",
+      "tables": [
+        {
+          "table": "assessments",
+          "rows": 0,
+          "relationBytes": "114688",
+          "tableBytes": "8192",
+          "indexesBytes": "106496",
+          "fields": [
+            {
+              "column": "answers",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "result",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "runtime_snapshot_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "frozen_admission_snapshot_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "timing_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "assessment_result_facts",
+          "rows": 0,
+          "relationBytes": "32768",
+          "tableBytes": "8192",
+          "indexesBytes": "24576",
+          "fields": [
+            {
+              "column": "facts_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "raw_answers_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "assessment_unit_snapshots",
+          "rows": 0,
+          "relationBytes": "65536",
+          "tableBytes": "8192",
+          "indexesBytes": "57344",
+          "fields": [
+            {
+              "column": "canonical_result_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "collection_facts_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "assessment_runtime_artifacts",
+          "rows": 0,
+          "relationBytes": "16384",
+          "tableBytes": "8192",
+          "indexesBytes": "8192",
+          "fields": [
+            {
+              "column": "payload_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "assessment_public_templates",
+          "rows": 0,
+          "relationBytes": "16384",
+          "tableBytes": "8192",
+          "indexesBytes": "8192",
+          "fields": [
+            {
+              "column": "payload_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "assessment_frozen_bindings",
+          "rows": 0,
+          "relationBytes": "40960",
+          "tableBytes": "8192",
+          "indexesBytes": "32768",
+          "fields": [
+            {
+              "column": "payload_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "composite_assessment_attempts",
+          "rows": 0,
+          "relationBytes": "90112",
+          "tableBytes": "8192",
+          "indexesBytes": "81920",
+          "fields": [
+            {
+              "column": "context_snapshot_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "frozen_active_slot_set_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "training_variant_allocation_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "training_flow_snapshot_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "training_flow_path_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "training_content_interpretation_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "composite_assessments",
+          "rows": 1,
+          "relationBytes": "172032",
+          "tableBytes": "16384",
+          "indexesBytes": "155648",
+          "fields": [
+            {
+              "column": "analysis_protocol_snapshot_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "report_package_snapshot_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "composite_assessment_items",
+          "rows": 1,
+          "relationBytes": "114688",
+          "tableBytes": "16384",
+          "indexesBytes": "98304",
+          "fields": []
+        },
+        {
+          "table": "composite_report_jobs",
+          "rows": 0,
+          "relationBytes": "40960",
+          "tableBytes": "8192",
+          "indexesBytes": "32768",
+          "fields": [
+            {
+              "column": "report_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "whole_answers_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "whole_validation_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "assessment_run_executions",
+          "rows": 30,
+          "relationBytes": "139264",
+          "tableBytes": "49152",
+          "indexesBytes": "90112",
+          "fields": []
+        },
+        {
+          "table": "assessment_run_tracks",
+          "rows": 2,
+          "relationBytes": "98304",
+          "tableBytes": "32768",
+          "indexesBytes": "65536",
+          "fields": []
+        },
+        {
+          "table": "assessment_run_actor_snapshots",
+          "rows": 30,
+          "relationBytes": "131072",
+          "tableBytes": "57344",
+          "indexesBytes": "73728",
+          "fields": []
+        },
+        {
+          "table": "relational_assessment_assignments",
+          "rows": 30,
+          "relationBytes": "196608",
+          "tableBytes": "65536",
+          "indexesBytes": "131072",
+          "fields": []
+        },
+        {
+          "table": "assessment_attempt_consents",
+          "rows": 0,
+          "relationBytes": "40960",
+          "tableBytes": "8192",
+          "indexesBytes": "32768",
+          "fields": []
+        },
+        {
+          "table": "scales",
+          "rows": 2,
+          "relationBytes": "139264",
+          "tableBytes": "32768",
+          "indexesBytes": "106496",
+          "fields": []
+        },
+        {
+          "table": "measurement_content_releases",
+          "rows": 1,
+          "relationBytes": "65536",
+          "tableBytes": "16384",
+          "indexesBytes": "49152",
+          "fields": []
+        },
+        {
+          "table": "scale_library_entries",
+          "rows": 1,
+          "relationBytes": "65536",
+          "tableBytes": "16384",
+          "indexesBytes": "49152",
+          "fields": []
+        }
+      ]
+    },
+    {
+      "label": "first-real-start",
+      "lsn": "0/25DE930",
+      "tables": [
+        {
+          "table": "assessments",
+          "rows": 1,
+          "relationBytes": "270336",
+          "tableBytes": "65536",
+          "indexesBytes": "204800",
+          "fields": [
+            {
+              "column": "answers",
+              "nonNull": 1,
+              "textBytes": "72"
+            },
+            {
+              "column": "result",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "runtime_snapshot_encrypted",
+              "nonNull": 1,
+              "textBytes": "10950"
+            },
+            {
+              "column": "frozen_admission_snapshot_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "timing_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "assessment_result_facts",
+          "rows": 0,
+          "relationBytes": "32768",
+          "tableBytes": "8192",
+          "indexesBytes": "24576",
+          "fields": [
+            {
+              "column": "facts_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "raw_answers_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "assessment_unit_snapshots",
+          "rows": 0,
+          "relationBytes": "65536",
+          "tableBytes": "8192",
+          "indexesBytes": "57344",
+          "fields": [
+            {
+              "column": "canonical_result_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "collection_facts_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "assessment_runtime_artifacts",
+          "rows": 0,
+          "relationBytes": "16384",
+          "tableBytes": "8192",
+          "indexesBytes": "8192",
+          "fields": [
+            {
+              "column": "payload_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "assessment_public_templates",
+          "rows": 0,
+          "relationBytes": "16384",
+          "tableBytes": "8192",
+          "indexesBytes": "8192",
+          "fields": [
+            {
+              "column": "payload_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "assessment_frozen_bindings",
+          "rows": 0,
+          "relationBytes": "40960",
+          "tableBytes": "8192",
+          "indexesBytes": "32768",
+          "fields": [
+            {
+              "column": "payload_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "composite_assessment_attempts",
+          "rows": 1,
+          "relationBytes": "196608",
+          "tableBytes": "32768",
+          "indexesBytes": "163840",
+          "fields": [
+            {
+              "column": "context_snapshot_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "frozen_active_slot_set_encrypted",
+              "nonNull": 1,
+              "textBytes": "1422"
+            },
+            {
+              "column": "training_variant_allocation_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "training_flow_snapshot_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "training_flow_path_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "training_content_interpretation_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "composite_assessments",
+          "rows": 1,
+          "relationBytes": "172032",
+          "tableBytes": "16384",
+          "indexesBytes": "155648",
+          "fields": [
+            {
+              "column": "analysis_protocol_snapshot_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "report_package_snapshot_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "composite_assessment_items",
+          "rows": 1,
+          "relationBytes": "114688",
+          "tableBytes": "16384",
+          "indexesBytes": "98304",
+          "fields": []
+        },
+        {
+          "table": "composite_report_jobs",
+          "rows": 0,
+          "relationBytes": "40960",
+          "tableBytes": "8192",
+          "indexesBytes": "32768",
+          "fields": [
+            {
+              "column": "report_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "whole_answers_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "whole_validation_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "assessment_run_executions",
+          "rows": 30,
+          "relationBytes": "147456",
+          "tableBytes": "49152",
+          "indexesBytes": "98304",
+          "fields": []
+        },
+        {
+          "table": "assessment_run_tracks",
+          "rows": 2,
+          "relationBytes": "98304",
+          "tableBytes": "32768",
+          "indexesBytes": "65536",
+          "fields": []
+        },
+        {
+          "table": "assessment_run_actor_snapshots",
+          "rows": 30,
+          "relationBytes": "131072",
+          "tableBytes": "57344",
+          "indexesBytes": "73728",
+          "fields": []
+        },
+        {
+          "table": "relational_assessment_assignments",
+          "rows": 30,
+          "relationBytes": "196608",
+          "tableBytes": "65536",
+          "indexesBytes": "131072",
+          "fields": []
+        },
+        {
+          "table": "assessment_attempt_consents",
+          "rows": 0,
+          "relationBytes": "40960",
+          "tableBytes": "8192",
+          "indexesBytes": "32768",
+          "fields": []
+        },
+        {
+          "table": "scales",
+          "rows": 2,
+          "relationBytes": "139264",
+          "tableBytes": "32768",
+          "indexesBytes": "106496",
+          "fields": []
+        },
+        {
+          "table": "measurement_content_releases",
+          "rows": 1,
+          "relationBytes": "65536",
+          "tableBytes": "16384",
+          "indexesBytes": "49152",
+          "fields": []
+        },
+        {
+          "table": "scale_library_entries",
+          "rows": 1,
+          "relationBytes": "65536",
+          "tableBytes": "16384",
+          "indexesBytes": "49152",
+          "fields": []
+        }
+      ]
+    },
+    {
+      "label": "first-accepted-final",
+      "lsn": "0/25E3930",
+      "tables": [
+        {
+          "table": "assessments",
+          "rows": 1,
+          "relationBytes": "278528",
+          "tableBytes": "73728",
+          "indexesBytes": "204800",
+          "fields": [
+            {
+              "column": "answers",
+              "nonNull": 1,
+              "textBytes": "160"
+            },
+            {
+              "column": "result",
+              "nonNull": 1,
+              "textBytes": "3568"
+            },
+            {
+              "column": "runtime_snapshot_encrypted",
+              "nonNull": 1,
+              "textBytes": "10950"
+            },
+            {
+              "column": "frozen_admission_snapshot_encrypted",
+              "nonNull": 1,
+              "textBytes": "1946"
+            },
+            {
+              "column": "timing_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "assessment_result_facts",
+          "rows": 0,
+          "relationBytes": "32768",
+          "tableBytes": "8192",
+          "indexesBytes": "24576",
+          "fields": [
+            {
+              "column": "facts_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "raw_answers_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "assessment_unit_snapshots",
+          "rows": 1,
+          "relationBytes": "147456",
+          "tableBytes": "32768",
+          "indexesBytes": "114688",
+          "fields": [
+            {
+              "column": "canonical_result_encrypted",
+              "nonNull": 1,
+              "textBytes": "3170"
+            },
+            {
+              "column": "collection_facts_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "assessment_runtime_artifacts",
+          "rows": 0,
+          "relationBytes": "16384",
+          "tableBytes": "8192",
+          "indexesBytes": "8192",
+          "fields": [
+            {
+              "column": "payload_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "assessment_public_templates",
+          "rows": 0,
+          "relationBytes": "16384",
+          "tableBytes": "8192",
+          "indexesBytes": "8192",
+          "fields": [
+            {
+              "column": "payload_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "assessment_frozen_bindings",
+          "rows": 0,
+          "relationBytes": "40960",
+          "tableBytes": "8192",
+          "indexesBytes": "32768",
+          "fields": [
+            {
+              "column": "payload_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "composite_assessment_attempts",
+          "rows": 1,
+          "relationBytes": "196608",
+          "tableBytes": "32768",
+          "indexesBytes": "163840",
+          "fields": [
+            {
+              "column": "context_snapshot_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "frozen_active_slot_set_encrypted",
+              "nonNull": 1,
+              "textBytes": "1422"
+            },
+            {
+              "column": "training_variant_allocation_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "training_flow_snapshot_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "training_flow_path_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "training_content_interpretation_encrypted",
+              "nonNull": 1,
+              "textBytes": "1534"
+            }
+          ]
+        },
+        {
+          "table": "composite_assessments",
+          "rows": 1,
+          "relationBytes": "172032",
+          "tableBytes": "16384",
+          "indexesBytes": "155648",
+          "fields": [
+            {
+              "column": "analysis_protocol_snapshot_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "report_package_snapshot_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "composite_assessment_items",
+          "rows": 1,
+          "relationBytes": "114688",
+          "tableBytes": "16384",
+          "indexesBytes": "98304",
+          "fields": []
+        },
+        {
+          "table": "composite_report_jobs",
+          "rows": 0,
+          "relationBytes": "40960",
+          "tableBytes": "8192",
+          "indexesBytes": "32768",
+          "fields": [
+            {
+              "column": "report_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "whole_answers_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "whole_validation_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "assessment_run_executions",
+          "rows": 30,
+          "relationBytes": "147456",
+          "tableBytes": "49152",
+          "indexesBytes": "98304",
+          "fields": []
+        },
+        {
+          "table": "assessment_run_tracks",
+          "rows": 2,
+          "relationBytes": "98304",
+          "tableBytes": "32768",
+          "indexesBytes": "65536",
+          "fields": []
+        },
+        {
+          "table": "assessment_run_actor_snapshots",
+          "rows": 30,
+          "relationBytes": "131072",
+          "tableBytes": "57344",
+          "indexesBytes": "73728",
+          "fields": []
+        },
+        {
+          "table": "relational_assessment_assignments",
+          "rows": 30,
+          "relationBytes": "196608",
+          "tableBytes": "65536",
+          "indexesBytes": "131072",
+          "fields": []
+        },
+        {
+          "table": "assessment_attempt_consents",
+          "rows": 0,
+          "relationBytes": "40960",
+          "tableBytes": "8192",
+          "indexesBytes": "32768",
+          "fields": []
+        },
+        {
+          "table": "scales",
+          "rows": 2,
+          "relationBytes": "139264",
+          "tableBytes": "32768",
+          "indexesBytes": "106496",
+          "fields": []
+        },
+        {
+          "table": "measurement_content_releases",
+          "rows": 1,
+          "relationBytes": "65536",
+          "tableBytes": "16384",
+          "indexesBytes": "49152",
+          "fields": []
+        },
+        {
+          "table": "scale_library_entries",
+          "rows": 1,
+          "relationBytes": "65536",
+          "tableBytes": "16384",
+          "indexesBytes": "49152",
+          "fields": []
+        }
+      ]
+    },
+    {
+      "label": "readable-report-1",
+      "lsn": "0/25E3AA8",
+      "tables": [
+        {
+          "table": "assessments",
+          "rows": 1,
+          "relationBytes": "278528",
+          "tableBytes": "73728",
+          "indexesBytes": "204800",
+          "fields": [
+            {
+              "column": "answers",
+              "nonNull": 1,
+              "textBytes": "160"
+            },
+            {
+              "column": "result",
+              "nonNull": 1,
+              "textBytes": "3568"
+            },
+            {
+              "column": "runtime_snapshot_encrypted",
+              "nonNull": 1,
+              "textBytes": "10950"
+            },
+            {
+              "column": "frozen_admission_snapshot_encrypted",
+              "nonNull": 1,
+              "textBytes": "1946"
+            },
+            {
+              "column": "timing_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "assessment_result_facts",
+          "rows": 0,
+          "relationBytes": "32768",
+          "tableBytes": "8192",
+          "indexesBytes": "24576",
+          "fields": [
+            {
+              "column": "facts_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "raw_answers_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "assessment_unit_snapshots",
+          "rows": 1,
+          "relationBytes": "147456",
+          "tableBytes": "32768",
+          "indexesBytes": "114688",
+          "fields": [
+            {
+              "column": "canonical_result_encrypted",
+              "nonNull": 1,
+              "textBytes": "3170"
+            },
+            {
+              "column": "collection_facts_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "assessment_runtime_artifacts",
+          "rows": 0,
+          "relationBytes": "16384",
+          "tableBytes": "8192",
+          "indexesBytes": "8192",
+          "fields": [
+            {
+              "column": "payload_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "assessment_public_templates",
+          "rows": 0,
+          "relationBytes": "16384",
+          "tableBytes": "8192",
+          "indexesBytes": "8192",
+          "fields": [
+            {
+              "column": "payload_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "assessment_frozen_bindings",
+          "rows": 0,
+          "relationBytes": "40960",
+          "tableBytes": "8192",
+          "indexesBytes": "32768",
+          "fields": [
+            {
+              "column": "payload_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "composite_assessment_attempts",
+          "rows": 1,
+          "relationBytes": "196608",
+          "tableBytes": "32768",
+          "indexesBytes": "163840",
+          "fields": [
+            {
+              "column": "context_snapshot_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "frozen_active_slot_set_encrypted",
+              "nonNull": 1,
+              "textBytes": "1422"
+            },
+            {
+              "column": "training_variant_allocation_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "training_flow_snapshot_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "training_flow_path_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "training_content_interpretation_encrypted",
+              "nonNull": 1,
+              "textBytes": "1534"
+            }
+          ]
+        },
+        {
+          "table": "composite_assessments",
+          "rows": 1,
+          "relationBytes": "172032",
+          "tableBytes": "16384",
+          "indexesBytes": "155648",
+          "fields": [
+            {
+              "column": "analysis_protocol_snapshot_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "report_package_snapshot_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "composite_assessment_items",
+          "rows": 1,
+          "relationBytes": "114688",
+          "tableBytes": "16384",
+          "indexesBytes": "98304",
+          "fields": []
+        },
+        {
+          "table": "composite_report_jobs",
+          "rows": 0,
+          "relationBytes": "40960",
+          "tableBytes": "8192",
+          "indexesBytes": "32768",
+          "fields": [
+            {
+              "column": "report_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "whole_answers_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "whole_validation_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "assessment_run_executions",
+          "rows": 30,
+          "relationBytes": "147456",
+          "tableBytes": "49152",
+          "indexesBytes": "98304",
+          "fields": []
+        },
+        {
+          "table": "assessment_run_tracks",
+          "rows": 2,
+          "relationBytes": "98304",
+          "tableBytes": "32768",
+          "indexesBytes": "65536",
+          "fields": []
+        },
+        {
+          "table": "assessment_run_actor_snapshots",
+          "rows": 30,
+          "relationBytes": "131072",
+          "tableBytes": "57344",
+          "indexesBytes": "73728",
+          "fields": []
+        },
+        {
+          "table": "relational_assessment_assignments",
+          "rows": 30,
+          "relationBytes": "196608",
+          "tableBytes": "65536",
+          "indexesBytes": "131072",
+          "fields": []
+        },
+        {
+          "table": "assessment_attempt_consents",
+          "rows": 0,
+          "relationBytes": "40960",
+          "tableBytes": "8192",
+          "indexesBytes": "32768",
+          "fields": []
+        },
+        {
+          "table": "scales",
+          "rows": 2,
+          "relationBytes": "139264",
+          "tableBytes": "32768",
+          "indexesBytes": "106496",
+          "fields": []
+        },
+        {
+          "table": "measurement_content_releases",
+          "rows": 1,
+          "relationBytes": "65536",
+          "tableBytes": "16384",
+          "indexesBytes": "49152",
+          "fields": []
+        },
+        {
+          "table": "scale_library_entries",
+          "rows": 1,
+          "relationBytes": "65536",
+          "tableBytes": "16384",
+          "indexesBytes": "49152",
+          "fields": []
+        }
+      ]
+    },
+    {
+      "label": "readable-report-10",
+      "lsn": "0/264D1C8",
+      "tables": [
+        {
+          "table": "assessments",
+          "rows": 10,
+          "relationBytes": "466944",
+          "tableBytes": "262144",
+          "indexesBytes": "204800",
+          "fields": [
+            {
+              "column": "answers",
+              "nonNull": 10,
+              "textBytes": "1600"
+            },
+            {
+              "column": "result",
+              "nonNull": 10,
+              "textBytes": "35680"
+            },
+            {
+              "column": "runtime_snapshot_encrypted",
+              "nonNull": 10,
+              "textBytes": "109500"
+            },
+            {
+              "column": "frozen_admission_snapshot_encrypted",
+              "nonNull": 10,
+              "textBytes": "19460"
+            },
+            {
+              "column": "timing_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "assessment_result_facts",
+          "rows": 0,
+          "relationBytes": "32768",
+          "tableBytes": "8192",
+          "indexesBytes": "24576",
+          "fields": [
+            {
+              "column": "facts_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "raw_answers_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "assessment_unit_snapshots",
+          "rows": 10,
+          "relationBytes": "204800",
+          "tableBytes": "90112",
+          "indexesBytes": "114688",
+          "fields": [
+            {
+              "column": "canonical_result_encrypted",
+              "nonNull": 10,
+              "textBytes": "31700"
+            },
+            {
+              "column": "collection_facts_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "assessment_runtime_artifacts",
+          "rows": 0,
+          "relationBytes": "16384",
+          "tableBytes": "8192",
+          "indexesBytes": "8192",
+          "fields": [
+            {
+              "column": "payload_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "assessment_public_templates",
+          "rows": 0,
+          "relationBytes": "16384",
+          "tableBytes": "8192",
+          "indexesBytes": "8192",
+          "fields": [
+            {
+              "column": "payload_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "assessment_frozen_bindings",
+          "rows": 0,
+          "relationBytes": "40960",
+          "tableBytes": "8192",
+          "indexesBytes": "32768",
+          "fields": [
+            {
+              "column": "payload_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "composite_assessment_attempts",
+          "rows": 10,
+          "relationBytes": "303104",
+          "tableBytes": "139264",
+          "indexesBytes": "163840",
+          "fields": [
+            {
+              "column": "context_snapshot_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "frozen_active_slot_set_encrypted",
+              "nonNull": 10,
+              "textBytes": "14220"
+            },
+            {
+              "column": "training_variant_allocation_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "training_flow_snapshot_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "training_flow_path_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "training_content_interpretation_encrypted",
+              "nonNull": 10,
+              "textBytes": "15340"
+            }
+          ]
+        },
+        {
+          "table": "composite_assessments",
+          "rows": 1,
+          "relationBytes": "172032",
+          "tableBytes": "16384",
+          "indexesBytes": "155648",
+          "fields": [
+            {
+              "column": "analysis_protocol_snapshot_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "report_package_snapshot_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "composite_assessment_items",
+          "rows": 1,
+          "relationBytes": "114688",
+          "tableBytes": "16384",
+          "indexesBytes": "98304",
+          "fields": []
+        },
+        {
+          "table": "composite_report_jobs",
+          "rows": 0,
+          "relationBytes": "40960",
+          "tableBytes": "8192",
+          "indexesBytes": "32768",
+          "fields": [
+            {
+              "column": "report_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "whole_answers_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "whole_validation_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "assessment_run_executions",
+          "rows": 30,
+          "relationBytes": "155648",
+          "tableBytes": "57344",
+          "indexesBytes": "98304",
+          "fields": []
+        },
+        {
+          "table": "assessment_run_tracks",
+          "rows": 2,
+          "relationBytes": "98304",
+          "tableBytes": "32768",
+          "indexesBytes": "65536",
+          "fields": []
+        },
+        {
+          "table": "assessment_run_actor_snapshots",
+          "rows": 30,
+          "relationBytes": "131072",
+          "tableBytes": "57344",
+          "indexesBytes": "73728",
+          "fields": []
+        },
+        {
+          "table": "relational_assessment_assignments",
+          "rows": 30,
+          "relationBytes": "221184",
+          "tableBytes": "73728",
+          "indexesBytes": "147456",
+          "fields": []
+        },
+        {
+          "table": "assessment_attempt_consents",
+          "rows": 0,
+          "relationBytes": "40960",
+          "tableBytes": "8192",
+          "indexesBytes": "32768",
+          "fields": []
+        },
+        {
+          "table": "scales",
+          "rows": 2,
+          "relationBytes": "139264",
+          "tableBytes": "32768",
+          "indexesBytes": "106496",
+          "fields": []
+        },
+        {
+          "table": "measurement_content_releases",
+          "rows": 1,
+          "relationBytes": "65536",
+          "tableBytes": "16384",
+          "indexesBytes": "49152",
+          "fields": []
+        },
+        {
+          "table": "scale_library_entries",
+          "rows": 1,
+          "relationBytes": "65536",
+          "tableBytes": "16384",
+          "indexesBytes": "49152",
+          "fields": []
+        }
+      ]
+    },
+    {
+      "label": "readable-report-30",
+      "lsn": "0/27359C0",
+      "tables": [
+        {
+          "table": "assessments",
+          "rows": 30,
+          "relationBytes": "827392",
+          "tableBytes": "622592",
+          "indexesBytes": "204800",
+          "fields": [
+            {
+              "column": "answers",
+              "nonNull": 30,
+              "textBytes": "4800"
+            },
+            {
+              "column": "result",
+              "nonNull": 30,
+              "textBytes": "107040"
+            },
+            {
+              "column": "runtime_snapshot_encrypted",
+              "nonNull": 30,
+              "textBytes": "328500"
+            },
+            {
+              "column": "frozen_admission_snapshot_encrypted",
+              "nonNull": 30,
+              "textBytes": "58380"
+            },
+            {
+              "column": "timing_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "assessment_result_facts",
+          "rows": 0,
+          "relationBytes": "32768",
+          "tableBytes": "8192",
+          "indexesBytes": "24576",
+          "fields": [
+            {
+              "column": "facts_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "raw_answers_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "assessment_unit_snapshots",
+          "rows": 30,
+          "relationBytes": "319488",
+          "tableBytes": "204800",
+          "indexesBytes": "114688",
+          "fields": [
+            {
+              "column": "canonical_result_encrypted",
+              "nonNull": 30,
+              "textBytes": "95100"
+            },
+            {
+              "column": "collection_facts_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "assessment_runtime_artifacts",
+          "rows": 0,
+          "relationBytes": "16384",
+          "tableBytes": "8192",
+          "indexesBytes": "8192",
+          "fields": [
+            {
+              "column": "payload_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "assessment_public_templates",
+          "rows": 0,
+          "relationBytes": "16384",
+          "tableBytes": "8192",
+          "indexesBytes": "8192",
+          "fields": [
+            {
+              "column": "payload_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "assessment_frozen_bindings",
+          "rows": 0,
+          "relationBytes": "40960",
+          "tableBytes": "8192",
+          "indexesBytes": "32768",
+          "fields": [
+            {
+              "column": "payload_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "composite_assessment_attempts",
+          "rows": 30,
+          "relationBytes": "450560",
+          "tableBytes": "286720",
+          "indexesBytes": "163840",
+          "fields": [
+            {
+              "column": "context_snapshot_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "frozen_active_slot_set_encrypted",
+              "nonNull": 30,
+              "textBytes": "42660"
+            },
+            {
+              "column": "training_variant_allocation_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "training_flow_snapshot_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "training_flow_path_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "training_content_interpretation_encrypted",
+              "nonNull": 30,
+              "textBytes": "46020"
+            }
+          ]
+        },
+        {
+          "table": "composite_assessments",
+          "rows": 1,
+          "relationBytes": "172032",
+          "tableBytes": "16384",
+          "indexesBytes": "155648",
+          "fields": [
+            {
+              "column": "analysis_protocol_snapshot_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "report_package_snapshot_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "composite_assessment_items",
+          "rows": 1,
+          "relationBytes": "114688",
+          "tableBytes": "16384",
+          "indexesBytes": "98304",
+          "fields": []
+        },
+        {
+          "table": "composite_report_jobs",
+          "rows": 0,
+          "relationBytes": "40960",
+          "tableBytes": "8192",
+          "indexesBytes": "32768",
+          "fields": [
+            {
+              "column": "report_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "whole_answers_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            },
+            {
+              "column": "whole_validation_encrypted",
+              "nonNull": 0,
+              "textBytes": "0"
+            }
+          ]
+        },
+        {
+          "table": "assessment_run_executions",
+          "rows": 30,
+          "relationBytes": "163840",
+          "tableBytes": "65536",
+          "indexesBytes": "98304",
+          "fields": []
+        },
+        {
+          "table": "assessment_run_tracks",
+          "rows": 2,
+          "relationBytes": "98304",
+          "tableBytes": "32768",
+          "indexesBytes": "65536",
+          "fields": []
+        },
+        {
+          "table": "assessment_run_actor_snapshots",
+          "rows": 30,
+          "relationBytes": "131072",
+          "tableBytes": "57344",
+          "indexesBytes": "73728",
+          "fields": []
+        },
+        {
+          "table": "relational_assessment_assignments",
+          "rows": 30,
+          "relationBytes": "229376",
+          "tableBytes": "73728",
+          "indexesBytes": "155648",
+          "fields": []
+        },
+        {
+          "table": "assessment_attempt_consents",
+          "rows": 0,
+          "relationBytes": "40960",
+          "tableBytes": "8192",
+          "indexesBytes": "32768",
+          "fields": []
+        },
+        {
+          "table": "scales",
+          "rows": 2,
+          "relationBytes": "139264",
+          "tableBytes": "32768",
+          "indexesBytes": "106496",
+          "fields": []
+        },
+        {
+          "table": "measurement_content_releases",
+          "rows": 1,
+          "relationBytes": "65536",
+          "tableBytes": "16384",
+          "indexesBytes": "49152",
+          "fields": []
+        },
+        {
+          "table": "scale_library_entries",
+          "rows": 1,
+          "relationBytes": "65536",
+          "tableBytes": "16384",
+          "indexesBytes": "49152",
+          "fields": []
+        }
+      ]
+    }
+  ],
+  "completed": true
+}

@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "mode": "legacy",
+  "scope": "Owned synthetic actual Teacher SELF START/FINAL/report; one-item scale; sequential storage lifecycle, not concurrency or HTTP/browser qualification",
+  "flags": {
+    "ASSESSMENT_COMPACT_FACTS_ENABLED": "false",
+    "ASSESSMENT_SHARED_RUNTIME_STORAGE_ENABLED": "false",
+    "ASSESSMENT_SHARED_CONTROL_ENABLED": "false"
+  },
+  "stages": [
+    {
+      "name": "source-and-approval-setup",
+      "status": "PASS",
+      "ms": 204.00625100000025,
+      "cpuMicros": {
+        "user": 130465,
+        "system": 21677
+      },
+      "heapDelta": 20308752,
+      "sqlCount": 200,
+      "sqlMs": 20
+    }
+  ],
+  "records": [],
+  "snapshots": [],
+  "completed": false
+}
