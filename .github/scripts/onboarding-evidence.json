@@ -1,144 +1,743 @@
 {
   "schemaVersion": 1,
-  "product": "086ab229fd35e12b05c83372843aaa3653e23f87",
+  "product": "10a32d20a1ef767791d5d1f03b7e582a1bb6c772",
   "reviewer": "root dot",
   "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
   "ciExecuted": false,
   "originalExecutionSigned": false,
   "environment": {
+    "node": "v24.22.1",
     "limitations": [
-      "Original local results unsigned; source associations retrospective; no complete installed-dependency byte manifest.",
-      "Four selected unit cases and two fresh real PG School/Teacher START/FINAL/report cases; filtered rows remain filtered. Original PG HTTP identity and image bytes mocked, not browser/login acceptance.",
-      "Separate existing-record planner validation uses temporary synthetic negative mutations and rolls them back. Not read-only for those negative transactions.",
-      "Storage lifecycle observations are fixed-order single-sequence measurements, not production p95/capacity or full four-entry qualification. No flags enabled in production.",
-      "Frontend/schema/locks unchanged; no browser, build, repeated application/PG/compiler or 60-answer lifecycle replay in CI."
+      "Original local execution is unsigned; Git tree association reviewed after execution.",
+      "Dependencies reuse existing dot workspace installation with unchanged locks; no complete installed-byte provenance.",
+      "Original failed test and type attempts preserved as compressed raw files, not admitted.",
+      "DOM tests do not prove browser timing or live permissions. Fresh compiled browser uses explicit synthetic read-only API fixtures; no production deployment."
     ]
   },
   "reports": [
     {
-      "id": "current-authority-unit",
-      "path": "docs/performance/storage-ledger-20261028/start-planner/start-planner-unit-r1.json",
-      "sha256": "d9561e00e72bdcc1067cc75c0242050d5aab0ebed8703ee77d974fd270ce8311",
-      "originalSourceAssociation": "086ab229fd35e12b05c83372843aaa3653e23f87",
+      "id": "affected-final-r2",
+      "path": "docs/performance/page-loading-20261028/implementation-evidence/affected-final-r2.json",
+      "sha256": "6c961550b2eb24919dfd0f6590363046d510222fdc5f3afdafa7e268d0db34e9",
+      "originalSourceAssociation": "3e8377b56aeef82574ca5d8d065583748ad79dc1",
       "sourceRoots": [
-        "server-version/backend"
+        "server-version/frontend"
       ],
-      "sourceAssociationBasis": "Root retrospective source association to exact final backend tree; original checks ran while four-line patch and direct test changes were uncommitted. No signed-execution claim.",
-      "reviewedUnrelatedSourceDelta": [],
-      "deltaRationale": "No backend input changes after the recorded checks; documentation only.",
+      "reviewedUnrelatedSourceDelta": [
+        "server-version/frontend/src/components/app-shell/AppShell.tsx",
+        "server-version/frontend/src/components/page-loading/entryLoading.test.tsx",
+        "server-version/frontend/src/huiteacher/HuiteacherApp.tsx",
+        "server-version/frontend/src/pages/UserList.tsx",
+        "server-version/frontend/src/pages/admin/MaterialGrants.tsx",
+        "server-version/frontend/src/training/training-admin-workspace.css",
+        "server-version/frontend/src/training/training-management-loading.css"
+      ],
+      "deltaRationale": "Later directory-state changes are covered by the disjoint directory-r2 selection. Remaining original cases use unchanged School/Survey/runtime/helper or student paths; CSS import ownership has no DOM-test semantics and receives fresh compiled browser validation. No hidden-page eager mount requirement is restored.",
+      "sourceAssociationBasis": "Root directly executed the retained reporter; original execution unsigned, source association reviewed retrospectively.",
       "cases": [
         {
-          "fullName": "education execution purpose and account-lock boundary keeps default collection denies and rejects School Training fallback",
-          "status": "skipped"
-        },
-        {
-          "fullName": "education execution purpose and account-lock boundary report history uses current report denies, not collection denies or School legacy collection policy",
-          "status": "skipped"
-        },
-        {
-          "fullName": "education execution purpose and account-lock boundary default caller keeps its existing user SHARE fence",
-          "status": "skipped"
-        },
-        {
-          "fullName": "education execution purpose and account-lock boundary actual library metadata permits query-time accounts without a post-org user lock",
-          "status": "skipped"
-        },
-        {
-          "fullName": "education execution purpose and account-lock boundary requesting detection cannot remove legacy user locks when no actual library track exists",
-          "status": "skipped"
-        },
-        {
-          "fullName": "education execution purpose and account-lock boundary private source qualification joins the immutable version and real workflow before changing account-lock mode",
-          "status": "skipped"
-        },
-        {
-          "fullName": "education execution purpose and account-lock boundary cannot use bound FINAL intake semantics for an unverified legacy/public source",
-          "status": "skipped"
-        },
-        {
-          "fullName": "education execution purpose and account-lock boundary only DB-bound FORM FINAL may finish after the new-intake deadline (final=false)",
+          "fullName": "Teacher participant host with synthetic runtime DTOs runs Cognitive, SJT, Scale and Form transports and completes only after a fresh parent COMPLETED",
           "status": "passed"
         },
         {
-          "fullName": "education execution purpose and account-lock boundary only DB-bound FORM FINAL may finish after the new-intake deadline (final=true)",
+          "fullName": "Teacher participant host with synthetic runtime DTOs does not treat a child completion hint or missing current item as parent completion",
           "status": "passed"
         },
         {
-          "fullName": "education execution purpose and account-lock boundary planner bound preserves current accountsCurrent refusal",
+          "fullName": "Teacher participant host with synthetic runtime DTOs preserves durable completion when list refresh fails and emits each completion once",
           "status": "passed"
         },
         {
-          "fullName": "education execution purpose and account-lock boundary planner bound preserves current populationCurrent refusal",
+          "fullName": "Teacher participant host with synthetic runtime DTOs collects the actual assigned consent before first canonical START",
+          "status": "passed"
+        },
+        {
+          "fullName": "Teacher participant host with synthetic runtime DTOs rejects a late completed response after exit and after account replacement",
+          "status": "passed"
+        },
+        {
+          "fullName": "Teacher participant host with synthetic runtime DTOs does not revive an old task on a new API identity",
+          "status": "passed"
+        },
+        {
+          "fullName": "Teacher participant host with synthetic runtime DTOs keeps a recoverable error when child progress cannot be read; it never re-submits FINAL",
+          "status": "passed"
+        },
+        {
+          "fullName": "protects private drafts on Teacher tab and school changes, including pending writes",
+          "status": "passed"
+        },
+        {
+          "fullName": "Teacher student task presentation opens a student answer page after an in-place identity switch from personal-self",
+          "status": "passed"
+        },
+        {
+          "fullName": "Teacher student task presentation shows student-only tasks, localized states and privacy help without extra reads or writes",
+          "status": "passed"
+        },
+        {
+          "fullName": "Teacher student task presentation avoids repeating an activity name that is identical to the form title",
+          "status": "passed"
+        },
+        {
+          "fullName": "Teacher student task presentation keeps read errors separate from a successful empty task list and retries only the student list",
+          "status": "passed"
+        },
+        {
+          "fullName": "Teacher evaluation workspace paging loads only requested pages, deduplicates IDs and retains rows and cursor after failure",
+          "status": "passed"
+        },
+        {
+          "fullName": "Teacher evaluation workspace paging ignores a pending page from a previous school",
+          "status": "passed"
+        },
+        {
+          "fullName": "Teacher evaluation workspace paging separates open activity from unpublished task without automatically publishing",
+          "status": "passed"
+        },
+        {
+          "fullName": "Teacher form draft navigation cancelling new form preserves the active draft and performs no creation",
+          "status": "passed"
+        },
+        {
+          "fullName": "Teacher form draft navigation warns before unloading unsaved new titles and removes the guard on unmount",
+          "status": "passed"
+        },
+        {
+          "fullName": "Teacher form draft navigation allows leaving during an ordinary form detail read",
+          "status": "passed"
+        },
+        {
+          "fullName": "Teacher form draft navigation protects tab and school changes and blocks leaving while a write is pending",
+          "status": "passed"
+        },
+        {
+          "fullName": "real Huischool CognitiveRunner in a SCHOOL Composite parent (no Cognitive mock) START → frozen image/video route → REAL trial draft → exactly one FINAL → parent completion",
+          "status": "passed"
+        },
+        {
+          "fullName": "real Huischool CognitiveRunner in a SCHOOL Composite parent (no Cognitive mock) refreshes an unsealed mid-task draft fail-closed without redoing exposed trials or inventing a FINAL",
+          "status": "passed"
+        },
+        {
+          "fullName": "Huischool Cognitive task uses only school-bound Composite FINAL endpoints loads existing frozen slot and returns to parent after FINAl without training credentials",
+          "status": "passed"
+        },
+        {
+          "fullName": "Huischool Cognitive task uses only school-bound Composite FINAL endpoints does not start a child when the frozen session binding is absent",
+          "status": "passed"
+        },
+        {
+          "fullName": "returns without promising to save or sending a submission",
+          "status": "passed"
+        },
+        {
+          "fullName": "opts student FORM_SECTION into compact instructions without altering transport",
+          "status": "passed"
+        },
+        {
+          "fullName": "opts student SCALE into compact instructions without altering transport",
+          "status": "passed"
+        },
+        {
+          "fullName": "keeps observer preparation concise without hiding required consent or starting automatically",
+          "status": "passed"
+        },
+        {
+          "fullName": "scopes observer FORM_SECTION answer presentation without changing transport",
+          "status": "passed"
+        },
+        {
+          "fullName": "scopes observer SCALE answer presentation without changing transport",
+          "status": "passed"
+        },
+        {
+          "fullName": "scopes observer COGNITIVE answer presentation without changing transport",
+          "status": "passed"
+        },
+        {
+          "fullName": "shows a single plain-language observer completion with one return action",
+          "status": "passed"
+        },
+        {
+          "fullName": "presents the existing observer consent scope PRIVATE_RESPONDENT readably without accepting it",
+          "status": "passed"
+        },
+        {
+          "fullName": "presents the existing observer consent scope ASSIGNING_TEACHER readably without accepting it",
+          "status": "passed"
+        },
+        {
+          "fullName": "presents the existing observer consent scope SHARED_COURSE_LEAD readably without accepting it",
+          "status": "passed"
+        },
+        {
+          "fullName": "preserves unfamiliar consent wording instead of guessing its permissions",
+          "status": "passed"
+        },
+        {
+          "fullName": "labels parent observer preparation correctly and preserves the unchecked consent gate",
+          "status": "passed"
+        },
+        {
+          "fullName": "uses the shared current-unit view and receipt-only scale transport within the School endpoint",
+          "status": "passed"
+        },
+        {
+          "fullName": "emits automatic completion only for a loaded COMPLETED self parent (observer: false)",
+          "status": "passed"
+        },
+        {
+          "fullName": "emits automatic completion only for a loaded COMPLETED self parent (observer: true)",
+          "status": "passed"
+        },
+        {
+          "fullName": "does not emit whole completion for an IN_PROGRESS parent with no current item",
+          "status": "passed"
+        },
+        {
+          "fullName": "does not convert a completion hint into a parent completion or feedback transition",
+          "status": "passed"
+        },
+        {
+          "fullName": "preserves a new private tool name when School navigation or school change is cancelled",
+          "status": "passed"
+        },
+        {
+          "fullName": "does not grant private authoring from the TEACHER account role alone",
+          "status": "passed"
+        },
+        {
+          "fullName": "does not grant private authoring from the ADMIN account role alone",
+          "status": "passed"
+        },
+        {
+          "fullName": "keeps teacher task panels unique when organization context loads",
+          "status": "passed"
+        },
+        {
+          "fullName": "does not mount activity configuration or request activity data for an ordinary teacher deep link",
+          "status": "passed"
+        },
+        {
+          "fullName": "shows direct parent tabs and only available report entries (reports=false)",
+          "status": "passed"
+        },
+        {
+          "fullName": "shows direct parent tabs and only available report entries (reports=true)",
+          "status": "passed"
+        },
+        {
+          "fullName": "mounts the counselor grouped home without legacy navigation or requesting report contents",
+          "status": "passed"
+        },
+        {
+          "fullName": "preserves class scope across counselor tabs and clears it when changing schools without writes",
+          "status": "passed"
+        },
+        {
+          "fullName": "retains existing grade and class controls for school governors (ADMIN)",
+          "status": "passed"
+        },
+        {
+          "fullName": "retains existing grade and class controls for school governors (TEACHER)",
+          "status": "passed"
+        },
+        {
+          "fullName": "uses grouped navigation and preserves governor forms for a school administrator (ADMIN)",
+          "status": "passed"
+        },
+        {
+          "fullName": "uses grouped navigation and preserves governor forms for a school administrator (TEACHER)",
+          "status": "passed"
+        },
+        {
+          "fullName": "does not request personnel data for an unauthorized STUDENT deep link",
+          "status": "passed"
+        },
+        {
+          "fullName": "does not request personnel data for an unauthorized PARENT deep link",
+          "status": "passed"
+        },
+        {
+          "fullName": "does not request personnel data for an unauthorized TEACHER deep link",
+          "status": "passed"
+        },
+        {
+          "fullName": "does not request personnel data for an unauthorized COUNSELOR deep link",
+          "status": "passed"
+        },
+        {
+          "fullName": "Survey first-success GENERAL receipt consumption shows frozen instructions on the default one-by-one recovery path without adding an answer field",
+          "status": "passed"
+        },
+        {
+          "fullName": "Survey first-success GENERAL receipt consumption blocks all-at-once image answers and FINAL until actual decode, and keeps restored choices through failure/retry",
+          "status": "passed"
+        },
+        {
+          "fullName": "Survey first-success GENERAL receipt consumption renders the controlled first-success receipt without another HTTP request or persisting it",
+          "status": "passed"
+        },
+        {
+          "fullName": "Survey first-success GENERAL receipt consumption uses current-authorized GENERAL for legacy server",
+          "status": "passed"
+        },
+        {
+          "fullName": "Survey first-success GENERAL receipt consumption uses current-authorized GENERAL for idempotent response",
+          "status": "passed"
+        },
+        {
+          "fullName": "Survey first-success GENERAL receipt consumption uses current-authorized GENERAL for missing first-commit marker",
+          "status": "passed"
+        },
+        {
+          "fullName": "Survey first-success GENERAL receipt consumption uses current-authorized GENERAL for different attempt",
+          "status": "passed"
+        },
+        {
+          "fullName": "Survey first-success GENERAL receipt consumption uses current-authorized GENERAL for different completion time",
+          "status": "passed"
+        },
+        {
+          "fullName": "Survey first-success GENERAL receipt consumption uses current-authorized GENERAL for missing disclaimer",
+          "status": "passed"
+        },
+        {
+          "fullName": "Survey first-success GENERAL receipt consumption uses current-authorized GENERAL for invalid completion time",
+          "status": "passed"
+        },
+        {
+          "fullName": "Survey first-success GENERAL receipt consumption uses current-authorized GENERAL for uncontrolled result fields",
+          "status": "passed"
+        },
+        {
+          "fullName": "Survey first-success GENERAL receipt consumption reauthorizes GENERAL after an ambiguous retry even if that retry creates the first FINAL",
+          "status": "passed"
+        },
+        {
+          "fullName": "Survey first-success GENERAL receipt consumption does not display receipt data from a rejected FINAL (400)",
+          "status": "passed"
+        },
+        {
+          "fullName": "Survey first-success GENERAL receipt consumption does not display receipt data from a rejected FINAL (403)",
+          "status": "passed"
+        },
+        {
+          "fullName": "Survey first-success GENERAL receipt consumption does not display receipt data from a rejected FINAL (409)",
+          "status": "passed"
+        },
+        {
+          "fullName": "Survey first-success GENERAL receipt consumption does not display receipt data from a rejected FINAL (503)",
+          "status": "passed"
+        },
+        {
+          "fullName": "Survey first-success GENERAL receipt consumption clears the embedded receipt and recovery state on explicit withdrawal",
+          "status": "passed"
+        },
+        {
+          "fullName": "Survey first-success GENERAL receipt consumption reauthorizes GENERAL for a restored sealed retry instead of using its embedded receipt",
+          "status": "passed"
+        },
+        {
+          "fullName": "Survey first-success GENERAL receipt consumption does not reuse a first-success receipt after refresh when current GENERAL authorization is denied",
+          "status": "passed"
+        },
+        {
+          "fullName": "Survey authoritative FINAL and timing lifecycle returns to the exact earlier Flow Form after a validation rejection and permits correction",
+          "status": "passed"
+        },
+        {
+          "fullName": "Survey authoritative FINAL and timing lifecycle reveals the earlier Form when a sequential timed Wave rejects one of its answers",
+          "status": "passed"
+        },
+        {
+          "fullName": "Survey authoritative FINAL and timing lifecycle never reopens server-frozen prerequisites after a definitive FINAL rejection",
+          "status": "passed"
+        },
+        {
+          "fullName": "Survey authoritative FINAL and timing lifecycle reconciles a committed screen-out after a lost response and reload without replaying answers",
+          "status": "passed"
+        },
+        {
+          "fullName": "Survey authoritative FINAL and timing lifecycle dismisses the same-tab restored notice without changing recovered answers",
+          "status": "passed"
+        },
+        {
+          "fullName": "Survey authoritative FINAL and timing lifecycle announces recovery while the task request is pending",
+          "status": "passed"
+        },
+        {
+          "fullName": "Survey authoritative FINAL and timing lifecycle focuses the missing SJT question using the existing required rule",
+          "status": "passed"
+        },
+        {
+          "fullName": "Survey authoritative FINAL and timing lifecycle returns to the first missing timed item without discarding other answers",
+          "status": "passed"
+        },
+        {
+          "fullName": "Survey authoritative FINAL and timing lifecycle keeps optional timed items optional when locating incomplete answers",
+          "status": "passed"
+        },
+        {
+          "fullName": "Survey authoritative FINAL and timing lifecycle prepares answers and timings only for the first FINAL, not its immutable retry",
+          "status": "passed"
+        },
+        {
+          "fullName": "Survey authoritative FINAL and timing lifecycle restores a completed projection without draft parsing, fresh submission identity, or duplicate cleanup",
+          "status": "passed"
+        },
+        {
+          "fullName": "Survey authoritative FINAL and timing lifecycle retries exact sealed answers and timing after an uncertain response",
+          "status": "passed"
+        },
+        {
+          "fullName": "Survey authoritative FINAL and timing lifecycle explains native network failure Failed to fetch while retaining the exact sealed retry",
+          "status": "passed"
+        },
+        {
+          "fullName": "Survey authoritative FINAL and timing lifecycle explains native network failure Load failed while retaining the exact sealed retry",
+          "status": "passed"
+        },
+        {
+          "fullName": "Survey authoritative FINAL and timing lifecycle explains native network failure NetworkError when attempting to fetch resource. while retaining the exact sealed retry",
+          "status": "passed"
+        },
+        {
+          "fullName": "Survey authoritative FINAL and timing lifecycle keeps completion authoritative when General fails and retries only the receipt",
+          "status": "passed"
+        },
+        {
+          "fullName": "Survey authoritative FINAL and timing lifecycle writes the live foreground interval and interruption synchronously on pagehide",
+          "status": "passed"
+        },
+        {
+          "fullName": "Survey authoritative FINAL and timing lifecycle unseals a rejected validation request and submits corrected answers with continued timing",
+          "status": "passed"
+        },
+        {
+          "fullName": "Survey authoritative FINAL and timing lifecycle blocks answer edits and duplicate form submits while FINAL is in flight",
+          "status": "passed"
+        },
+        {
+          "fullName": "Survey authoritative FINAL and timing lifecycle does not reopen an already completed task when its receipt cannot load",
+          "status": "passed"
+        },
+        {
+          "fullName": "Survey authoritative FINAL and timing lifecycle preserves observed unanswered exposure and interruption through same-tab recovery",
+          "status": "passed"
+        },
+        {
+          "fullName": "Survey authoritative FINAL and timing lifecycle retains the exact sealed request through background events and a STARTED reload",
+          "status": "passed"
+        },
+        {
+          "fullName": "Survey authoritative FINAL and timing lifecycle reconciles an uncertain submission as completed on reload without another FINAL",
+          "status": "passed"
+        },
+        {
+          "fullName": "Survey authoritative FINAL and timing lifecycle keeps legitimate answer edits before the first FINAL",
+          "status": "passed"
+        },
+        {
+          "fullName": "Survey authoritative FINAL and timing lifecycle does not count hidden time twice across visibilitychange and pagehide",
+          "status": "passed"
+        },
+        {
+          "fullName": "Survey authoritative FINAL and timing lifecycle makes the sealed retry reachable after a multi-tool reload resets navigation",
+          "status": "passed"
+        },
+        {
+          "fullName": "Survey authoritative FINAL and timing lifecycle returns to linked waves and starts a different attempt without the previous seal",
+          "status": "passed"
+        },
+        {
+          "fullName": "Survey authoritative FINAL and timing lifecycle clears the completed receipt state when linked future access is revoked",
+          "status": "passed"
+        },
+        {
+          "fullName": "Survey authoritative FINAL and timing lifecycle keeps the foreground clock running when beforeunload does not actually leave the page",
+          "status": "passed"
+        },
+        {
+          "fullName": "participant stored raw feedback display renders /general SCALE raw metrics without milliseconds or pilot labeling",
+          "status": "passed"
+        },
+        {
+          "fullName": "participant stored raw feedback display renders /general SJT raw metrics without milliseconds or pilot labeling",
+          "status": "passed"
+        },
+        {
+          "fullName": "participant stored raw feedback display preserves cognitive ratio percent, millisecond units and existing pilot labeling",
+          "status": "passed"
+        },
+        {
+          "fullName": "fetches currently authorized raw feedback on first successful FINAL instead of the general receipt shortcut",
+          "status": "passed"
+        },
+        {
+          "fullName": "keeps an unfinished native SJT mounted before a timed scale until its server receipt is verified",
+          "status": "passed"
+        },
+        {
+          "fullName": "first committed descriptive feedback receipt shows permitted first feedback without GET and reauthorizes after reopening",
+          "status": "passed"
+        },
+        {
+          "fullName": "first committed descriptive feedback receipt keeps deferred feedback pending rather than loading hidden metrics",
+          "status": "passed"
+        },
+        {
+          "fullName": "first committed descriptive feedback receipt falls back to the authorized reader for malformed inline metric values",
+          "status": "passed"
+        },
+        {
+          "fullName": "loads only on first visit and preserves the mounted draft on hide/revisit",
+          "status": "passed"
+        },
+        {
+          "fullName": "keeps surrounding navigation available and retries a rejected chunk without reloading the app",
+          "status": "passed"
+        },
+        {
+          "fullName": "does not mount a pending page after its owner navigates away",
+          "status": "passed"
+        },
+        {
+          "fullName": "School public home renders before session resolution, but login remains gated",
+          "status": "passed"
+        },
+        {
+          "fullName": "Teacher public home renders before session resolution, but login remains gated",
+          "status": "passed"
+        },
+        {
+          "fullName": "School protected deep link waits for session without loading public hero",
+          "status": "passed"
+        },
+        {
+          "fullName": "Teacher defers directory and untouched sections, and refresh requests each directory only once",
+          "status": "passed"
+        },
+        {
+          "fullName": "Teacher discards old-school directory responses and distinguishes failure from an empty list",
           "status": "passed"
         }
       ],
       "summary": {
         "success": true,
-        "numPassedTests": 4,
+        "numPassedTests": 122,
         "numFailedTests": 0,
-        "numPendingTests": 7
-      }
+        "numPendingTests": 0
+      },
+      "selectedCases": [
+        "Teacher participant host with synthetic runtime DTOs runs Cognitive, SJT, Scale and Form transports and completes only after a fresh parent COMPLETED",
+        "Teacher participant host with synthetic runtime DTOs does not treat a child completion hint or missing current item as parent completion",
+        "Teacher participant host with synthetic runtime DTOs preserves durable completion when list refresh fails and emits each completion once",
+        "Teacher participant host with synthetic runtime DTOs collects the actual assigned consent before first canonical START",
+        "Teacher participant host with synthetic runtime DTOs rejects a late completed response after exit and after account replacement",
+        "Teacher participant host with synthetic runtime DTOs does not revive an old task on a new API identity",
+        "Teacher participant host with synthetic runtime DTOs keeps a recoverable error when child progress cannot be read; it never re-submits FINAL",
+        "Teacher student task presentation opens a student answer page after an in-place identity switch from personal-self",
+        "Teacher student task presentation shows student-only tasks, localized states and privacy help without extra reads or writes",
+        "Teacher student task presentation avoids repeating an activity name that is identical to the form title",
+        "Teacher student task presentation keeps read errors separate from a successful empty task list and retries only the student list",
+        "real Huischool CognitiveRunner in a SCHOOL Composite parent (no Cognitive mock) START → frozen image/video route → REAL trial draft → exactly one FINAL → parent completion",
+        "real Huischool CognitiveRunner in a SCHOOL Composite parent (no Cognitive mock) refreshes an unsealed mid-task draft fail-closed without redoing exposed trials or inventing a FINAL",
+        "Huischool Cognitive task uses only school-bound Composite FINAL endpoints loads existing frozen slot and returns to parent after FINAl without training credentials",
+        "Huischool Cognitive task uses only school-bound Composite FINAL endpoints does not start a child when the frozen session binding is absent",
+        "returns without promising to save or sending a submission",
+        "opts student FORM_SECTION into compact instructions without altering transport",
+        "opts student SCALE into compact instructions without altering transport",
+        "keeps observer preparation concise without hiding required consent or starting automatically",
+        "scopes observer FORM_SECTION answer presentation without changing transport",
+        "scopes observer SCALE answer presentation without changing transport",
+        "scopes observer COGNITIVE answer presentation without changing transport",
+        "shows a single plain-language observer completion with one return action",
+        "presents the existing observer consent scope PRIVATE_RESPONDENT readably without accepting it",
+        "presents the existing observer consent scope ASSIGNING_TEACHER readably without accepting it",
+        "presents the existing observer consent scope SHARED_COURSE_LEAD readably without accepting it",
+        "preserves unfamiliar consent wording instead of guessing its permissions",
+        "labels parent observer preparation correctly and preserves the unchecked consent gate",
+        "uses the shared current-unit view and receipt-only scale transport within the School endpoint",
+        "emits automatic completion only for a loaded COMPLETED self parent (observer: false)",
+        "emits automatic completion only for a loaded COMPLETED self parent (observer: true)",
+        "does not emit whole completion for an IN_PROGRESS parent with no current item",
+        "does not convert a completion hint into a parent completion or feedback transition",
+        "preserves a new private tool name when School navigation or school change is cancelled",
+        "does not grant private authoring from the TEACHER account role alone",
+        "does not grant private authoring from the ADMIN account role alone",
+        "keeps teacher task panels unique when organization context loads",
+        "does not mount activity configuration or request activity data for an ordinary teacher deep link",
+        "shows direct parent tabs and only available report entries (reports=false)",
+        "shows direct parent tabs and only available report entries (reports=true)",
+        "mounts the counselor grouped home without legacy navigation or requesting report contents",
+        "preserves class scope across counselor tabs and clears it when changing schools without writes",
+        "retains existing grade and class controls for school governors (ADMIN)",
+        "retains existing grade and class controls for school governors (TEACHER)",
+        "uses grouped navigation and preserves governor forms for a school administrator (ADMIN)",
+        "uses grouped navigation and preserves governor forms for a school administrator (TEACHER)",
+        "does not request personnel data for an unauthorized STUDENT deep link",
+        "does not request personnel data for an unauthorized PARENT deep link",
+        "does not request personnel data for an unauthorized TEACHER deep link",
+        "does not request personnel data for an unauthorized COUNSELOR deep link",
+        "Survey first-success GENERAL receipt consumption shows frozen instructions on the default one-by-one recovery path without adding an answer field",
+        "Survey first-success GENERAL receipt consumption blocks all-at-once image answers and FINAL until actual decode, and keeps restored choices through failure/retry",
+        "Survey first-success GENERAL receipt consumption renders the controlled first-success receipt without another HTTP request or persisting it",
+        "Survey first-success GENERAL receipt consumption uses current-authorized GENERAL for legacy server",
+        "Survey first-success GENERAL receipt consumption uses current-authorized GENERAL for idempotent response",
+        "Survey first-success GENERAL receipt consumption uses current-authorized GENERAL for missing first-commit marker",
+        "Survey first-success GENERAL receipt consumption uses current-authorized GENERAL for different attempt",
+        "Survey first-success GENERAL receipt consumption uses current-authorized GENERAL for different completion time",
+        "Survey first-success GENERAL receipt consumption uses current-authorized GENERAL for missing disclaimer",
+        "Survey first-success GENERAL receipt consumption uses current-authorized GENERAL for invalid completion time",
+        "Survey first-success GENERAL receipt consumption uses current-authorized GENERAL for uncontrolled result fields",
+        "Survey first-success GENERAL receipt consumption reauthorizes GENERAL after an ambiguous retry even if that retry creates the first FINAL",
+        "Survey first-success GENERAL receipt consumption does not display receipt data from a rejected FINAL (400)",
+        "Survey first-success GENERAL receipt consumption does not display receipt data from a rejected FINAL (403)",
+        "Survey first-success GENERAL receipt consumption does not display receipt data from a rejected FINAL (409)",
+        "Survey first-success GENERAL receipt consumption does not display receipt data from a rejected FINAL (503)",
+        "Survey first-success GENERAL receipt consumption clears the embedded receipt and recovery state on explicit withdrawal",
+        "Survey first-success GENERAL receipt consumption reauthorizes GENERAL for a restored sealed retry instead of using its embedded receipt",
+        "Survey first-success GENERAL receipt consumption does not reuse a first-success receipt after refresh when current GENERAL authorization is denied",
+        "Survey authoritative FINAL and timing lifecycle returns to the exact earlier Flow Form after a validation rejection and permits correction",
+        "Survey authoritative FINAL and timing lifecycle reveals the earlier Form when a sequential timed Wave rejects one of its answers",
+        "Survey authoritative FINAL and timing lifecycle never reopens server-frozen prerequisites after a definitive FINAL rejection",
+        "Survey authoritative FINAL and timing lifecycle reconciles a committed screen-out after a lost response and reload without replaying answers",
+        "Survey authoritative FINAL and timing lifecycle dismisses the same-tab restored notice without changing recovered answers",
+        "Survey authoritative FINAL and timing lifecycle announces recovery while the task request is pending",
+        "Survey authoritative FINAL and timing lifecycle focuses the missing SJT question using the existing required rule",
+        "Survey authoritative FINAL and timing lifecycle returns to the first missing timed item without discarding other answers",
+        "Survey authoritative FINAL and timing lifecycle keeps optional timed items optional when locating incomplete answers",
+        "Survey authoritative FINAL and timing lifecycle prepares answers and timings only for the first FINAL, not its immutable retry",
+        "Survey authoritative FINAL and timing lifecycle restores a completed projection without draft parsing, fresh submission identity, or duplicate cleanup",
+        "Survey authoritative FINAL and timing lifecycle retries exact sealed answers and timing after an uncertain response",
+        "Survey authoritative FINAL and timing lifecycle explains native network failure Failed to fetch while retaining the exact sealed retry",
+        "Survey authoritative FINAL and timing lifecycle explains native network failure Load failed while retaining the exact sealed retry",
+        "Survey authoritative FINAL and timing lifecycle explains native network failure NetworkError when attempting to fetch resource. while retaining the exact sealed retry",
+        "Survey authoritative FINAL and timing lifecycle keeps completion authoritative when General fails and retries only the receipt",
+        "Survey authoritative FINAL and timing lifecycle writes the live foreground interval and interruption synchronously on pagehide",
+        "Survey authoritative FINAL and timing lifecycle unseals a rejected validation request and submits corrected answers with continued timing",
+        "Survey authoritative FINAL and timing lifecycle blocks answer edits and duplicate form submits while FINAL is in flight",
+        "Survey authoritative FINAL and timing lifecycle does not reopen an already completed task when its receipt cannot load",
+        "Survey authoritative FINAL and timing lifecycle preserves observed unanswered exposure and interruption through same-tab recovery",
+        "Survey authoritative FINAL and timing lifecycle retains the exact sealed request through background events and a STARTED reload",
+        "Survey authoritative FINAL and timing lifecycle reconciles an uncertain submission as completed on reload without another FINAL",
+        "Survey authoritative FINAL and timing lifecycle keeps legitimate answer edits before the first FINAL",
+        "Survey authoritative FINAL and timing lifecycle does not count hidden time twice across visibilitychange and pagehide",
+        "Survey authoritative FINAL and timing lifecycle makes the sealed retry reachable after a multi-tool reload resets navigation",
+        "Survey authoritative FINAL and timing lifecycle returns to linked waves and starts a different attempt without the previous seal",
+        "Survey authoritative FINAL and timing lifecycle clears the completed receipt state when linked future access is revoked",
+        "Survey authoritative FINAL and timing lifecycle keeps the foreground clock running when beforeunload does not actually leave the page",
+        "participant stored raw feedback display renders /general SCALE raw metrics without milliseconds or pilot labeling",
+        "participant stored raw feedback display renders /general SJT raw metrics without milliseconds or pilot labeling",
+        "participant stored raw feedback display preserves cognitive ratio percent, millisecond units and existing pilot labeling",
+        "fetches currently authorized raw feedback on first successful FINAL instead of the general receipt shortcut",
+        "keeps an unfinished native SJT mounted before a timed scale until its server receipt is verified",
+        "first committed descriptive feedback receipt shows permitted first feedback without GET and reauthorizes after reopening",
+        "first committed descriptive feedback receipt keeps deferred feedback pending rather than loading hidden metrics",
+        "first committed descriptive feedback receipt falls back to the authorized reader for malformed inline metric values",
+        "loads only on first visit and preserves the mounted draft on hide/revisit",
+        "keeps surrounding navigation available and retries a rejected chunk without reloading the app",
+        "does not mount a pending page after its owner navigates away"
+      ]
     },
     {
-      "id": "real-start-final-report",
-      "path": "docs/performance/storage-ledger-20261028/start-planner/planner-pg-r1.json",
-      "sha256": "3fa8e06526289ec9eba43a4ce4912dd371a61a05af48355ce5ccc7abf508bbda",
-      "originalSourceAssociation": "086ab229fd35e12b05c83372843aaa3653e23f87",
+      "id": "directory-r2",
+      "path": "docs/performance/page-loading-20261028/implementation-evidence/directory-r2.json",
+      "sha256": "013c6b2ba0ea41a6c85fb1df3883d6c7dbd5b54842ca710ec5bdf4e7f5292cdb",
+      "originalSourceAssociation": "10a32d20a1ef767791d5d1f03b7e582a1bb6c772",
       "sourceRoots": [
-        "server-version/backend"
+        "server-version/frontend"
       ],
-      "sourceAssociationBasis": "Root retrospective source association to exact final backend tree; original checks ran while four-line patch and direct test changes were uncommitted. No signed-execution claim.",
       "reviewedUnrelatedSourceDelta": [],
-      "deltaRationale": "No backend input changes after the recorded checks; documentation only.",
+      "deltaRationale": "Later directory-state changes are covered by the disjoint directory-r2 selection. Remaining original cases use unchanged School/Survey/runtime/helper or student paths; CSS import ownership has no DOM-test semantics and receives fresh compiled browser validation. No hidden-page eager mount requirement is restored.",
+      "sourceAssociationBasis": "Root directly executed the retained reporter; original execution unsigned, source association reviewed retrospectively.",
       "cases": [
         {
-          "fullName": "Education library real START→FINAL→personal report and image authorization reads SCHOOL self feedback from real FINAL and enforces identical current image access",
+          "fullName": "protects private drafts on Teacher tab and school changes, including pending writes",
           "status": "passed"
         },
         {
-          "fullName": "Education library real START→FINAL→personal report and image authorization reads TEACHER self feedback from real FINAL and enforces identical current image access",
+          "fullName": "Teacher evaluation workspace paging loads only requested pages, deduplicates IDs and retains rows and cursor after failure",
           "status": "passed"
         },
         {
-          "fullName": "Education library real START→FINAL→personal report and image authorization does not invent personal text or image rights for a version with no content audience",
-          "status": "skipped"
+          "fullName": "Teacher evaluation workspace paging ignores a pending page from a previous school",
+          "status": "passed"
+        },
+        {
+          "fullName": "Teacher evaluation workspace paging separates open activity from unpublished task without automatically publishing",
+          "status": "passed"
+        },
+        {
+          "fullName": "Teacher form draft navigation cancelling new form preserves the active draft and performs no creation",
+          "status": "passed"
+        },
+        {
+          "fullName": "Teacher form draft navigation warns before unloading unsaved new titles and removes the guard on unmount",
+          "status": "passed"
+        },
+        {
+          "fullName": "Teacher form draft navigation allows leaving during an ordinary form detail read",
+          "status": "passed"
+        },
+        {
+          "fullName": "Teacher form draft navigation protects tab and school changes and blocks leaving while a write is pending",
+          "status": "passed"
+        },
+        {
+          "fullName": "School public home renders before session resolution, but login remains gated",
+          "status": "passed"
+        },
+        {
+          "fullName": "Teacher public home renders before session resolution, but login remains gated",
+          "status": "passed"
+        },
+        {
+          "fullName": "School protected deep link waits for session without loading public hero",
+          "status": "passed"
+        },
+        {
+          "fullName": "Teacher defers directory and untouched sections, and refresh requests each directory only once",
+          "status": "passed"
+        },
+        {
+          "fullName": "Teacher discards old-school directory responses and distinguishes failure from an empty list",
+          "status": "passed"
         }
       ],
       "summary": {
         "success": true,
-        "numPassedTests": 2,
+        "numPassedTests": 13,
         "numFailedTests": 0,
-        "numPendingTests": 1
-      }
+        "numPendingTests": 0
+      },
+      "selectedCases": [
+        "protects private drafts on Teacher tab and school changes, including pending writes",
+        "Teacher evaluation workspace paging loads only requested pages, deduplicates IDs and retains rows and cursor after failure",
+        "Teacher evaluation workspace paging ignores a pending page from a previous school",
+        "Teacher evaluation workspace paging separates open activity from unpublished task without automatically publishing",
+        "Teacher form draft navigation cancelling new form preserves the active draft and performs no creation",
+        "Teacher form draft navigation warns before unloading unsaved new titles and removes the guard on unmount",
+        "Teacher form draft navigation allows leaving during an ordinary form detail read",
+        "Teacher form draft navigation protects tab and school changes and blocks leaving while a write is pending",
+        "School public home renders before session resolution, but login remains gated",
+        "Teacher public home renders before session resolution, but login remains gated",
+        "School protected deep link waits for session without loading public hero",
+        "Teacher defers directory and untouched sections, and refresh requests each directory only once",
+        "Teacher discards old-school directory responses and distinguishes failure from an empty list"
+      ]
     }
   ],
   "types": [
     {
-      "component": "backend",
-      "path": "docs/performance/storage-ledger-20261028/start-planner/planner-backend-types-r1.json",
-      "sha256": "24bfa88a00e4bb32d43fc9bb9d48da2f3ec9d0995504bc68fe0ce6c215f09b94",
-      "exitField": "exitCode",
-      "componentTree": "b7fe981eea351ebb94232571479894e921e53bcd",
-      "log": "docs/performance/storage-ledger-20261028/start-planner/planner-backend-types-r1.log"
+      "component": "frontend",
+      "componentTree": "77babf45b8eba4b14e0f22be9a6c3ffd523b6e00",
+      "path": "docs/performance/page-loading-20261028/implementation-evidence/typecheck-receipt.json",
+      "sha256": "fec2e9dafae779e4b71b2f869feab080e179d48eaff4a28016ffcf18c0e9a7fa",
+      "log": "docs/performance/page-loading-20261028/implementation-evidence/typecheck-final.log",
+      "exitField": "exitCode"
     }
-  ],
-  "runStartPlanning": {
-    "validation": {
-      "path": "docs/performance/storage-ledger-20261028/start-planner/planner-validation-r1.json",
-      "sha256": "752b3593d4201a758d96b7e9582dd9c6050c6c2b2fb14160b56d6c492558b67e"
-    },
-    "execution": {
-      "path": "docs/performance/storage-ledger-20261028/start-planner/planner-validation-r1-execution.json",
-      "sha256": "8f68c068ff93652c62f6a29c4c48a27529edae3a327eb1206bd6e6059c2050dd"
-    },
-    "profile": {
-      "path": "docs/performance/storage-ledger-20261028/start-planner/authority-profile-summary.json",
-      "sha256": "24d69ca055127a8153771b326eec3fda86ac016a4041eeaeb6662bfdb9ea3265"
-    },
-    "fullProfile": {
-      "path": "docs/performance/storage-ledger-20261028/start-planner/authority-profile-r1.json.gz",
-      "sha256": "2aa0f9e828f52bb5d173797c948a8bf8b3e330291d7e4050a4bf0677248705a3"
-    },
-    "sourceAssociationBasis": "Original planner SELECT statements unchanged by SET LOCAL addition; actual raw diagnostic and same-PID restore/negative rollback verified by root."
-  }
+  ]
 }

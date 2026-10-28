@@ -49,7 +49,7 @@ export function verifyFailureContinuations(reports,admitted){
 }
 export function verifyTypeReceipt(receipt,review,readBytes,currentTree){
   const component=review.component??'backend';assert(['backend','frontend'].includes(component));
-  const argv=component==='frontend'?['node','node_modules/typescript/bin/tsc','-p','tsconfig.app.json','--noEmit']:['node','node_modules/typescript/bin/tsc','--noEmit'];
+  const argv=component==='frontend'&&receipt.argv?.[0]==='npm'?['npm','run','typecheck']:component==='frontend'?['node','node_modules/typescript/bin/tsc','-p','tsconfig.app.json','--noEmit']:['node','node_modules/typescript/bin/tsc','--noEmit'];
   assert.equal(receipt[review.exitField],0);assert.deepEqual(receipt.argv??receipt.command,argv);
   const tree=review.componentTree??review.backendTree;
   if(tree){assert.equal(receipt.componentTree??receipt.backendTree,tree);assert.equal(currentTree,tree);}
