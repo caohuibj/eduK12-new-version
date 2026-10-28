@@ -2,6 +2,7 @@ import {SchoolActivityCollection} from './SchoolActivityCollection'
 import './school-activity-collection.css'
 import './school-activity-configuration.css'
 import {SelectedToolOutline} from '../modules/assessment-core/composition/SelectedToolOutline'
+import {EducationCompositionRunPicker} from '../components/education-tools/EducationCompositionRunPicker'
 import {EducationPrivateScalePicker} from '../components/education-tools/EducationPrivateScalePicker'
 import {EducationAssessmentResourcePicker} from '../components/education-tools/EducationAssessmentResourcePicker'
 import type {EducationAssessmentResourceAdapter} from '../api/educationAssessmentResources'
@@ -23,7 +24,7 @@ type Activity={
   version:number;participantCount:number;runCount:number
 }
 type ActivityPage={list:Activity[];hasMore?:boolean;page?:number}
-type RunTrackSummary={id:string;resourceFamily:string;resourceKey:string;resourceVersion:string}
+type RunTrackSummary={id:string;resourceFamily:string;resourceKey:string;resourceVersion:string;title?:string;sourceRevision?:number}
 type Run={id:string;name:string;status:string;version:number;tracks?:RunTrackSummary[]}
 type RunDetail={run:Run;tracks?:RunTrackSummary[]}
 type ActivityCapabilities={canSubmit:boolean;canOpen:boolean;canPause:boolean;canResume:boolean;canClose:boolean;canPublishRun:boolean;ownPsychologyPublisher:boolean}
@@ -439,9 +440,10 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
         <h3 className={compact?'hs-visually-hidden':undefined}>测评批次：{activeRun.name}（{schoolRunStatusText(activeRun.status)}）</h3>
         <details><summary>技术详情</summary><p>Run ID：{activeRun.id} · 状态：{activeRun.status} · 版本：{activeRun.version}</p>{compact&&<ul className="hs-activity-track-identifiers">{activeRun.tracks?.map(track=><li key={track.id}>{track.resourceFamily} · {track.resourceKey} · 固定版本：{track.resourceVersion}</li>)}</ul>}</details>
         <SelectedToolOutline className="hs-selected-tool-outline" heading={compact?'已配置测评项目':'已选工具大纲'} items={activeRun.tracks?.map((track,index)=>({
-          id:track.id,kind:compact?(resourceFamilyText[track.resourceFamily]??track.resourceFamily):track.resourceFamily,version:track.resourceVersion,
-          title:resources.find(resource=>resource.family===track.resourceFamily&&resource.key===track.resourceKey
-            &&resource.version===track.resourceVersion)?.title??(compact?`${resourceFamilyText[track.resourceFamily]??'测评项目'} ${index+1}`:track.resourceKey),
+          id:track.id,kind:track.resourceKey.startsWith('education-composition:')?'普通问卷':compact?(resourceFamilyText[track.resourceFamily]??track.resourceFamily):track.resourceFamily,
+          version:track.sourceRevision?'修订 '+track.sourceRevision:track.resourceKey.startsWith('education-composition:')?'固定问卷':track.resourceVersion,
+          title:track.title??resources.find(resource=>resource.family===track.resourceFamily&&resource.key===track.resourceKey
+            &&resource.version===track.resourceVersion)?.title??(track.resourceKey.startsWith('education-composition:')?`普通问卷 ${index+1}`:compact?`${resourceFamilyText[track.resourceFamily]??'测评项目'} ${index+1}`:track.resourceKey),
         }))}/>
         {selected.status==='DRAFT'&&activeRun.status==='DRAFT'&&<>
           <EducationAssessmentResourcePicker
@@ -473,7 +475,12 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
               const data=await api<RunDetail>(path+'/runs/'+activeRun.id)
               if(resourceContext.current.scope===context.scope&&resourceContext.current.api===context.api){setActiveRun({...data.run,tracks:data.tracks});setPreview(null)}
             }}/>}
-          </ActivityLayout>
+          {canAuthorPrivateTools&&actorKey&&<EducationCompositionRunPicker key={`composition:${actorKey}:${organizationId}:${selected.courseId}:${activeRun.id}`}
+            api={api} entry="SCHOOL" organizationId={organizationId} actorKey={actorKey} endpoint={path+'/runs/'+activeRun.id+'/tracks'} expectedVersion={activeRun.version}
+            disabled={busy} onBusy={setBusy} onRefresh={async()=>{
+              const context=resourceContext.current,data=await api<RunDetail>(path+'/runs/'+activeRun.id)
+              if(resourceContext.current.scope===context.scope&&resourceContext.current.api===context.api){setActiveRun({...data.run,tracks:data.tracks});setPreview(null)}
+            }}/>}</ActivityLayout>
           <button disabled={busy||resourceLoading} onClick={()=>void showResources()}>查看已发布、受授权的测评资源</button>
           {resourceLoading&&<p role="status">正在读取授权测评资源…</p>}
           {resourceError&&<div><p role="alert">{resourceError} 已配置的测评项目不受影响。</p>

@@ -97,6 +97,10 @@ suite('School psychological author / ordinary questionnaire real HTTP execution'
   expect(await db.compositeAssessment.count({where:{createdBy:f.managerUserId}})).toBe(before)
   const added=await request(path+'/tracks',f.managerUserId,f.body)
   expect(added.status,JSON.stringify(added.value)).toBe(200)
+  const detail=await request(path,f.managerUserId)
+  expect(detail.status,JSON.stringify(detail.value)).toBe(200)
+  expect(detail.data.tracks[0]).toMatchObject({title:f.fixed.title,sourceRevision:f.fixed.sourceRevision})
+  expect(detail.data.tracks[0]).not.toHaveProperty('definition')
   expect((await request(path+'/tracks',f.managerUserId,f.body)).status).toBe(409)
   const version=f.expectedVersion+1
   const preview=await request(path+'/preview',f.managerUserId,{expectedVersion:version})

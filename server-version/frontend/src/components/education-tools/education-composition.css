@@ -1,6 +1,8 @@
 .education-private-studio-modes{display:flex;gap:.5rem;margin:1rem 0;flex-wrap:wrap}
 .education-private-studio-modes button[aria-pressed=true]{border-color:var(--ht-copper,#a34f2e);color:var(--ht-copper,#a34f2e)}
+.education-private-studio-modes--school button[aria-pressed=true]{border-color:var(--hs-primary,#356957);color:var(--hs-primary,#356957)}
 .education-composition-studio{--survey-brand-line:var(--ht-line,#e5dbd0);--survey-brand-ink:var(--ht-ink,#493d34);--survey-brand-muted:var(--ht-quiet,#73675e);--survey-brand-subtle:var(--ht-bg,#fcfaf6);--survey-brand-canvas:var(--ht-paper,#fffefb);--survey-brand-accent:var(--ht-copper,#a34f2e);--survey-brand-accent-strong:var(--ht-copper,#a34f2e);--survey-brand-border:var(--ht-line,#e5dbd0);--survey-brand-soft:#f7eee7}
+.education-composition-studio--school{--survey-brand-line:var(--hs-border,#cbded1);--survey-brand-ink:var(--hs-ink,#1d3a31);--survey-brand-muted:#587766;--survey-brand-subtle:var(--hs-bg,#f3f7f1);--survey-brand-canvas:white;--survey-brand-accent:var(--hs-primary,#356957);--survey-brand-accent-strong:var(--hs-primary,#356957);--survey-brand-border:var(--hs-border,#cbded1);--survey-brand-soft:#e9f2e9}
 .education-composition-studio>label,.education-composition-studio form>label{display:grid;gap:.35rem;margin:.75rem 0;max-width:56rem}
 .education-composition-studio .survey-composition-outline-actions button{display:grid;place-items:center;min-width:32px;min-height:32px;padding:.25rem;color:var(--ht-quiet,#73675e)}
 .education-composition-studio .survey-composition-candidates article{flex-wrap:wrap}

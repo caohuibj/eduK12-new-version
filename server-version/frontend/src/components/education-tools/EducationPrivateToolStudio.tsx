@@ -31,12 +31,11 @@ export function EducationPrivateToolStudio(props:Props){
   if(next===mode||draft.current.writing||draft.current.dirty&&!window.confirm('当前草稿尚未保存，确定放弃修改并切换吗？'))return
   setMode(next)
  }
- if(props.entry==='SCHOOL')return <PrivateToolSession key={`SCHOOL:${props.actorId??'session'}:${props.organizationId}`} {...props}/>
- return <><nav className="education-private-studio-modes" aria-label="工具编制类型">
+ return <><nav className={'education-private-studio-modes education-private-studio-modes--'+props.entry.toLowerCase()} aria-label="工具编制类型">
   <button type="button" aria-pressed={mode==='TOOLS'} onClick={()=>switchMode('TOOLS')}>量表与表单</button>
   <button type="button" aria-pressed={mode==='COMPOSITIONS'} onClick={()=>switchMode('COMPOSITIONS')}>普通问卷</button>
- </nav>{mode==='TOOLS'?<PrivateToolSession key={`TEACHER:${props.actorId??'session'}:${props.organizationId}`} {...props} onDraftStateChange={onDraftStateChange}/>
-  :<EducationCompositionStudio api={props.api} organizationId={props.organizationId} actorId={props.actorId??'session'} onDraftStateChange={onDraftStateChange}/>}</>
+ </nav>{mode==='TOOLS'?<PrivateToolSession key={`${props.entry}:${props.actorId??'session'}:${props.organizationId}`} {...props} onDraftStateChange={onDraftStateChange}/>
+  :<EducationCompositionStudio api={props.api} entry={props.entry} organizationId={props.organizationId} actorId={props.actorId??'session'} onDraftStateChange={onDraftStateChange}/>}</>
 }
 function PrivateToolSession({api,organizationId,entry,actorId='session',onDraftStateChange}:Props){
  const {hasPending:bulkPending,onPendingChange,clear:clearPending}=useFormPendingBuffers()

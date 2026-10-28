@@ -11,19 +11,20 @@ import type {ProfessionalAnswer} from '../../modules/assessment-core/form/types'
 import '../../survey/survey-composition-studio.css'
 import './education-composition.css'
 
-type Props={api:PrivateToolApi;organizationId:string;actorId:string;onDraftStateChange?:(value:PrivateDraftState)=>void}
+type Props={api:PrivateToolApi;organizationId:string;actorId:string;entry:'SCHOOL'|'TEACHER';onDraftStateChange?:(value:PrivateDraftState)=>void}
 const merge=<T extends {id:string}>(old:T[],rows:T[])=>Array.from(new Map([...old,...rows].map(row=>[row.id,row])).values())
 const fingerprint=(tool:CompositionTool)=>JSON.stringify({title:tool.title,definition:tool.definition})
-/** Product adapter: exact private versions and current Teacher authority stay
+/** Product adapter: exact private versions and current entry authority stay
  * in the education API. The ordered editor and leaf preview are shared UI. */
 export function EducationCompositionStudio(props:Props){
- const scope=useRef({api:props.api,actorId:props.actorId,organizationId:props.organizationId,epoch:0})
- if(scope.current.api!==props.api||scope.current.actorId!==props.actorId||scope.current.organizationId!==props.organizationId)
+ const scope=useRef({api:props.api,actorId:props.actorId,organizationId:props.organizationId,entry:props.entry,epoch:0})
+ if(scope.current.api!==props.api||scope.current.actorId!==props.actorId||scope.current.organizationId!==props.organizationId||scope.current.entry!==props.entry)
   scope.current={...props,epoch:scope.current.epoch+1}
  return <CompositionSession key={scope.current.epoch} {...props}/>
 }
-function CompositionSession({api,organizationId,actorId,onDraftStateChange}:Props){
+function CompositionSession({api,organizationId,actorId,entry,onDraftStateChange}:Props){
  const base=privateToolBase(organizationId)
+ const population=entry==='SCHOOL'?'STUDENT':'TEACHER'
  const [rows,setRows]=useState<CompositionSummary[]>([]),[cursor,setCursor]=useState<string|null>(null)
  const [controls,setControls]=useState<SchoolPrivateToolControls>({query:'',sort:'updated',view:'list'})
  const [tool,setTool]=useState<CompositionTool|null>(null),[saved,setSaved]=useState(''),[title,setTitle]=useState('')
@@ -58,7 +59,7 @@ function CompositionSession({api,organizationId,actorId,onDraftStateChange}:Prop
   void operate(async current=>{
    const value=await api<CompositionTool>(`${base}/${encodeURIComponent(id)}`)
    if(!current())return
-   if(value.kind!=='COMPOSITION'||value.definition.administration.population!=='TEACHER')throw new Error('这份问卷不属于当前教师自评编制入口。')
+   if(value.kind!=='COMPOSITION'||value.definition.administration.population!==population)throw new Error('这份问卷不属于当前'+(entry==='SCHOOL'?'学生':'教师')+'自评编制入口。')
    apply(value);setVersions([]);setVersionsCursor(null)
    const history=await api<{list:PrivateToolVersion[];nextCursor:string|null}>(`${base}/${id}/versions`)
    if(current()){setVersions(history.list);setVersionsCursor(history.nextCursor)}
@@ -77,7 +78,7 @@ function CompositionSession({api,organizationId,actorId,onDraftStateChange}:Prop
  })}
  const freeze=()=>{if(!tool||dirty||!tool.definition.blocks.length)return;void operate(async current=>{
   const value=await api<PrivateToolVersion>(`${base}/${tool.id}/freeze`,'POST',{expectedRevision:tool.revision,expectedContentHash:tool.contentHash})
-  if(current()){setVersions(old=>merge([value],old));setNotice('问卷版本已固定。请在学校改进的评价活动中选用本版本，再预览并发布任务。')}
+  if(current()){setVersions(old=>merge([value],old));setNotice('问卷版本已固定。请在'+(entry==='SCHOOL'?'本人学校活动的测评批次':'学校改进的评价活动')+'中选用本版本，再预览并发布任务。')}
  })}
  // A preview renders the saved local revision's exact immutable leaves. Do not
  // first call the legacy whole-composition preview (all bodies + compilation)
@@ -98,14 +99,14 @@ function CompositionSession({api,organizationId,actorId,onDraftStateChange}:Prop
   return()=>{current=false}
  },[api,base,block,reference])
  const previewToolId=previewTool?.id
- const imageAdapter=useMemo(()=>previewToolId?createEducationPrivateImageAdapter({api,entry:'TEACHER',organizationId,toolId:previewToolId,actorId}):undefined,
-  [api,organizationId,previewToolId,actorId])
+ const imageAdapter=useMemo(()=>previewToolId?createEducationPrivateImageAdapter({api,entry,organizationId,toolId:previewToolId,actorId}):undefined,
+  [api,entry,organizationId,previewToolId,actorId])
  const moreVersions=()=>{if(!tool||!versionsCursor)return;void operate(async current=>{
   const page=await api<{list:PrivateToolVersion[];nextCursor:string|null}>(`${base}/${tool.id}/versions?cursor=${encodeURIComponent(versionsCursor)}`)
   if(current()){setVersions(old=>merge(old,page.list));setVersionsCursor(page.nextCursor)}
  })}
- return <section className="education-private-tools education-private-tools--teacher ht-panel education-composition-studio" aria-label="普通问卷编制">
-  <header className="education-private-heading"><div><h2>{tool?'普通问卷编制':'我的普通问卷'}</h2><p>将本人固定量表和表单编成一份教师自评问卷，各项保留独立计分与反馈。</p></div></header>
+ return <section className={'education-private-tools education-private-tools--'+entry.toLowerCase()+' '+(entry==='SCHOOL'?'hs-panel':'ht-panel')+' education-composition-studio education-composition-studio--'+entry.toLowerCase()} aria-label="普通问卷编制">
+  <header className="education-private-heading"><div><h2>{tool?'普通问卷编制':'我的普通问卷'}</h2><p>将本人固定量表和表单编成一份{entry==='SCHOOL'?'学生':'教师'}自评问卷，各项保留独立计分与反馈。</p></div></header>
   {error&&<p role="alert">{error}</p>}{notice&&<p role="status">{notice}</p>}
   {!tool?<>
    <form onSubmit={event=>{event.preventDefault();create()}}><label>问卷名称<input value={title} maxLength={200} onChange={event=>setTitle(event.target.value)} disabled={busy}/></label><button type="submit" disabled={busy||uncertain||!title.trim()}>新建普通问卷</button></form>

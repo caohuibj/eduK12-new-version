@@ -3,7 +3,7 @@ import {describe,it,expect,vi} from 'vitest'
 import {createEducationAssessmentFeedback} from './educationAssessmentFeedbackAdapter'
 import type {EducationReportApi} from './EducationScalePersonalReport'
 describe('shared education application feedback adapter',()=>{
- it('uses ordinary execution feedback and renders each block without exposing an injected NONE same-key result',async()=>{
+ it.each(['SCHOOL','TEACHER'] as const)('%s uses ordinary execution feedback and renders each block without exposing an injected NONE same-key result',async entry=>{
   const unit={itemId:'visible',type:'SCALE',kind:'scale',scaleName:'允许块',scaleCode:'private',caveats:[],disclaimer:'仅描述性反馈',completedAt:null,totalTime:0,
    rawScoreFeedback:[{scoreKey:'total',rangeKey:'r',text:'允许块固定解释'}]}
   const api=vi.fn().mockResolvedValue({schemaVersion:1,kind:'EDUCATION_FEEDBACK',mode:'COMPOSITION',state:'READY',units:[
@@ -11,7 +11,7 @@ describe('shared education application feedback adapter',()=>{
    {blockId:'b',kind:'SCALE',title:'未开放块',state:'WITHHELD',nativeScaleUnits:[{...unit,itemId:'hidden',rawScoreFeedback:[{scoreKey:'total',rangeKey:'r',text:'不得显示的同名分数解释'}]}]},
    {blockId:'c',kind:'FORM',title:'无分数表单',state:'COMPLETION_ONLY'},
   ]})
-  const renderer=createEducationAssessmentFeedback({api:api as EducationReportApi,entry:'TEACHER'})
+  const renderer=createEducationAssessmentFeedback({api:api as EducationReportApi,entry})
   render(<>{renderer({executionId:'own-ordinary',attemptId:'not-authority',mode:'COMPOSITION'})}</>)
   expect(await screen.findByText('允许块固定解释')).toBeInTheDocument()
   expect(screen.getByText('本工具未开放个人反馈。')).toBeInTheDocument()

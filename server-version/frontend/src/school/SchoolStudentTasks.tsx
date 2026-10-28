@@ -18,6 +18,7 @@ export type SchoolTask={
   kind:'ASSIGNMENT'|'READING'|'CHECKIN'|'MEASUREMENT'
   title:string;status:'PENDING'|'COMPLETED'|'EXPIRED'|'IN_PROGRESS'|'UNAVAILABLE'
   deadline:string|null;href:string|null;resourceFamily?:string;feedbackNamespace?:'EDUCATION_ASSESSMENT'
+  feedbackMode?:'COMPOSITION'
   canResumeExisting?:boolean
   consentRequired?:boolean;consentPurpose?:string|null;consentVisibility?:string|null
 }
@@ -211,7 +212,7 @@ export function SchoolStudentTasks({api,activityId,onNavigate}: {api:SchoolApi;a
     </div>
     {!selected&&(visibleExecution||visibleFeedback)&&error&&<p className="hs-alert" role="alert">{error}</p>}
     {visibleFeedback&&(visibleFeedback.task.feedbackNamespace==='EDUCATION_ASSESSMENT'?
-      renderAssessmentFeedback({executionId:visibleFeedback.task.id,title:visibleFeedback.task.title,onClose:()=>setFeedback(null)}):
+      renderAssessmentFeedback({executionId:visibleFeedback.task.id,title:visibleFeedback.task.title,mode:visibleFeedback.task.feedbackMode,onClose:()=>setFeedback(null)}):
       <EducationTaskFeedback key={visibleFeedback.task.id} entry="SCHOOL"
       executionId={visibleFeedback.task.id} title={visibleFeedback.task.title} api={api}
       loadFeedback={readFeedback} onClose={()=>setFeedback(null)}/>)}

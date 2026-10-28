@@ -7,7 +7,7 @@ export function EducationAssessmentFeedback({api,entry,executionId,title='本次
   api:EducationReportApi;entry:'SCHOOL'|'TEACHER'
 }&EducationAssessmentCompletion){
   const [closed,setClosed]=useState(false)
-  const read=useCallback(()=>api<EducationFeedbackData>(entry==='TEACHER'&&mode==='COMPOSITION'
+  const read=useCallback(()=>api<EducationFeedbackData>(mode==='COMPOSITION'
     ?'/run-executions/'+encodeURIComponent(executionId)+'/feedback':'/assessment-reports/executions/'+encodeURIComponent(executionId)),[api,executionId,entry,mode])
   if(closed)return <button type="button" onClick={()=>setClosed(false)}>重新查看获准反馈</button>
   return <EducationTaskFeedback api={api} entry={entry} executionId={executionId} title={title}

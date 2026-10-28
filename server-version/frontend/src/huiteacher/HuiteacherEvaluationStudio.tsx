@@ -435,7 +435,7 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
               if(generation===scopeGeneration.current&&scaleScope.current.base===base&&scaleScope.current.api===api)setRunMap(old=>({...old,[event.id]:run}))
             }}/>}
           {canAuthorPrivateTools&&actorKey&&<EducationCompositionRunPicker
-            key={`composition:${actorKey}:${organizationId}:${event.id}:${runMap[event.id].runId}`} api={api}
+            key={`composition:${actorKey}:${organizationId}:${event.id}:${runMap[event.id].runId}`} api={api} entry="TEACHER"
             organizationId={organizationId} actorKey={actorKey} endpoint={base+'/evaluation-events/'+event.id+'/run/tracks'}
             expectedVersion={runMap[event.id].version} disabled={working} onBusy={privateBusy} onRefresh={async()=>{await fetchRun(event)}}/>}
           <div className="ht-inline"><button disabled={working||scaleLoading[event.id]} onClick={()=>void reloadScales(event)}>
