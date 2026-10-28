@@ -1,0 +1,671 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "afq_y8_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "Avoidance and Fusion Questionnaire for Youth, 8-item short form",
+      "abbreviation": "AFQ-Y8",
+      "instrumentFamily": "AFQ-Y"
+    },
+    "construct": {
+      "primaryDomain": "SELF_REGULATION",
+      "secondaryDomains": [],
+      "constructDefinition": "儿童青少年自评的心理不灵活性：被想法与感受“钩住”（认知融合）、回避不想要的内心体验，并因此干扰学校、友谊等重要活动的程度。测与内心体验的关系方式，不测想法真假，也不是诊断。 本版本为官方八题短版，与十七题版同家族、独立施测，不与长版分数混合。",
+      "constructLevel": "BROAD_DOMAIN",
+      "constructOverlapTags": [
+        "domain:act",
+        "domain:self_regulation",
+        "population:k12",
+        "response:student_self",
+        "use:reflection",
+        "use:research",
+        "language_validation:chinese_working_translation",
+        "construct:act_experiential_avoidance",
+        "construct:act_cognitive_fusion_youth",
+        "psychological_inflexibility",
+        "experiential_avoidance",
+        "self_report"
+      ]
+    },
+    "population": {
+      "populationNotes": "原开发样本为美国 8–18 岁儿童青少年；此中文工作译稿未经独立回译或本地验证。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "PARTIAL"
+    },
+    "administration": {
+      "itemCount": 8,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "PAPER"
+      ],
+      "timeFrame": "一般情形，无指定回忆期",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保持官方作答量尺与题序；英文锚点为 Not at all True / A little True / Pretty True / True / Very True。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "SUPPORTED",
+          "notes": "原文研究支持；中文工作译文尚未验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "反馈仅作普遍生活化反思，不推断个体能力或状态。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "greco-2008-afqy",
+        "evidenceType": "STRUCTURAL_VALIDITY",
+        "population": "US children and adolescents aged 8-18",
+        "locale": "en",
+        "territory": "US",
+        "studyDesign": "原作者论文报告 17 题单因子结构；官方计分说明注明总分求和 0–68，短版 AFQ-Y8 求和 0–32。",
+        "rating": "MIXED",
+        "citation": "Greco LA, Lambert W, Baer RA (2008). Psychological Assessment, 20, 93-102.",
+        "url": "https://www.ruthbaer.com/academics/AFQ-Y.pdf",
+        "notes": "以上证据均针对原语言版本，不外推到本中文工作译稿。"
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "Avoidance and Fusion Questionnaire for Youth (AFQ-Y), official 17-item form and scoring instructions",
+        "citation": "Greco, L. A., Lambert, W., & Baer, R. A. (2008). Psychological inflexibility in childhood and adolescence: Development and evaluation of the Avoidance and Fusion Questionnaire for Youth. Psychological Assessment, 20, 93-102.",
+        "url": "https://www.ruthbaer.com/academics/AFQ-Y.pdf",
+        "publicationYear": 2008
+      },
+      "license": {
+        "status": "unknown",
+        "redistribution": "unknown",
+        "note": "题本由原作者之一（Ruth Baer）学术网站公开提供下载，17 题版、8 题短版与计分说明同文件发布；页面未附使用许可条款，未查到明确再分发声明。按保守约定登记为 unknown。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "afq_truth_0_4",
+          "options": [
+            {
+              "value": "0",
+              "label": "完全不真实",
+              "score": 0
+            },
+            {
+              "value": "1",
+              "label": "有一点真实",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "比较真实",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "真实",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "非常真实",
+              "score": 4
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "AFQY8_01",
+          "content": "除非我感到开心，否则我的生活不会好。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "afq_truth_0_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "AFQY8_02",
+          "content": "我的想法和感受把我的生活搞得一团糟。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "afq_truth_0_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "AFQY8_03",
+          "content": "我对自己想的那些坏话一定是真的。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "afq_truth_0_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "AFQY8_04",
+          "content": "如果心跳变快，一定是我出了问题。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "afq_truth_0_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "AFQY8_05",
+          "content": "一感觉不好，我就停下对我重要的事。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "afq_truth_0_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "AFQY8_06",
+          "content": "当我有让我难过的想法时，我在学校表现得更差。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "afq_truth_0_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "AFQY8_07",
+          "content": "我害怕自己的感受。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "afq_truth_0_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "AFQY8_08",
+          "content": "当我心烦意乱时，我没办法做好朋友。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "afq_truth_0_4",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "AFQY8_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "AFQY8_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "AFQY8_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "AFQY8_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "AFQY8_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "AFQY8_06",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "AFQY8_07",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "AFQY8_08",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "total",
+            "type": "total",
+            "label": "心理不灵活性总分（8题）",
+            "description": "八题求和，范围 0–32。分数越高表示越多报告被想法与感受缠住并因此影响重要活动。与 17 题长版分别施测、分别解读，不合成跨版本总分。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "AFQY8_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "AFQY8_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "AFQY8_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "AFQY8_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "AFQY8_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "AFQY8_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "AFQY8_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "AFQY8_08",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "total"
+        ],
+        "scoreOrder": [
+          "total"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "total",
+            "headline": "被想法和感受“接管”的时刻",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这个总分反映你有多少报告：想法和感受好像在指挥你的行动。每个青少年都会有这样的时刻；数字越高只说明这类报告越多，不说明你不好。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "什么时候你发现，为了躲开一种难受的感觉，你放下了本来想做的事？"
+              },
+              {
+                "category": "strategy",
+                "text": "选一件小小的、对你有点重要的事，即使有点紧张也试着做完；做完后留意一下，感受发生了什么变化。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这是未经回译及本地验证的中文工作译稿，结果不可视作已验证中文测量结果。",
+          "原工具用于 8–18 岁人群的一般自评；不用作临床诊断、筛查或班级排名。",
+          "该报告是单次自述；缺答不计分，不插补。"
+        ],
+        "disclaimer": "这些内容仅供一般自我反思，不用于诊断、筛查、选拔或排名。"
+      },
+      "referencePolicy": {
+        "type": "none"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "all_minimum",
+        "answers": [
+          {
+            "itemCode": "AFQY8_01",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "AFQY8_02",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "AFQY8_03",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "AFQY8_04",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "AFQY8_05",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "AFQY8_06",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "AFQY8_07",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "AFQY8_08",
+            "responseValue": "0"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 0
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "all_maximum",
+        "answers": [
+          {
+            "itemCode": "AFQY8_01",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AFQY8_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AFQY8_03",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AFQY8_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AFQY8_05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AFQY8_06",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AFQY8_07",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AFQY8_08",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 32
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "all_midpoint",
+        "answers": [
+          {
+            "itemCode": "AFQY8_01",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "AFQY8_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "AFQY8_03",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "AFQY8_04",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "AFQY8_05",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "AFQY8_06",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "AFQY8_07",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "AFQY8_08",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 16
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "mixed_pattern",
+        "answers": [
+          {
+            "itemCode": "AFQY8_01",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "AFQY8_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "AFQY8_03",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AFQY8_04",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "AFQY8_05",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "AFQY8_06",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "AFQY8_07",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "AFQY8_08",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 14
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "missing_first_item",
+        "answers": [
+          {
+            "itemCode": "AFQY8_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "AFQY8_03",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "AFQY8_04",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "AFQY8_05",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "AFQY8_06",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "AFQY8_07",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "AFQY8_08",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "total": null
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "all_missing",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "total": null
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      }
+    ]
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "afq-y8-v1",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "afq-y8-v1",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

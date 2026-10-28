@@ -1,0 +1,17 @@
+{
+  "note": "模拟数据，仅用于核对计分与报告样稿",
+  "answers": {
+    "AFQY8_01": 2,
+    "AFQY8_02": 0,
+    "AFQY8_03": 4,
+    "AFQY8_04": 2,
+    "AFQY8_05": 0,
+    "AFQY8_06": 4,
+    "AFQY8_07": 2,
+    "AFQY8_08": 0
+  },
+  "expectedScores": {
+    "total": 14
+  },
+  "quality": "interpretable"
+}

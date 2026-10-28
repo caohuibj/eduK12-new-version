@@ -1,0 +1,164 @@
+{
+  "instrumentKey": "afq_y17_zh_cn_research",
+  "options": [
+    {
+      "value": "0",
+      "label_en_note": "英文锚点为 Not at all True / A little True / Pretty True / True / Very True。",
+      "score": 0
+    },
+    {
+      "value": "1",
+      "label_en_note": "英文锚点为 Not at all True / A little True / Pretty True / True / Very True。",
+      "score": 1
+    },
+    {
+      "value": "2",
+      "label_en_note": "英文锚点为 Not at all True / A little True / Pretty True / True / Very True。",
+      "score": 2
+    },
+    {
+      "value": "3",
+      "label_en_note": "英文锚点为 Not at all True / A little True / Pretty True / True / Very True。",
+      "score": 3
+    },
+    {
+      "value": "4",
+      "label_en_note": "英文锚点为 Not at all True / A little True / Pretty True / True / Very True。",
+      "score": 4
+    }
+  ],
+  "items": [
+    {
+      "itemCode": "AFQY_01",
+      "en": "My life won't be good until I feel happy.",
+      "zh_working": "除非我感到开心，否则我的生活不会好。",
+      "assignedScore": "total"
+    },
+    {
+      "itemCode": "AFQY_02",
+      "en": "My thoughts and feelings mess up my life.",
+      "zh_working": "我的想法和感受把我的生活搞得一团糟。",
+      "assignedScore": "total"
+    },
+    {
+      "itemCode": "AFQY_03",
+      "en": "If I feel sad or afraid, then something must be wrong with me.",
+      "zh_working": "如果我感到难过或害怕，那一定是我出了问题。",
+      "assignedScore": "total"
+    },
+    {
+      "itemCode": "AFQY_04",
+      "en": "The bad things I think about myself must be true.",
+      "zh_working": "我对自己想的那些坏话一定是真的。",
+      "assignedScore": "total"
+    },
+    {
+      "itemCode": "AFQY_05",
+      "en": "I don't try out new things if I'm afraid of messing up.",
+      "zh_working": "如果害怕搞砸，我就不去尝试新事物。",
+      "assignedScore": "total"
+    },
+    {
+      "itemCode": "AFQY_06",
+      "en": "I must get rid of my worries and fears so I can have a good life.",
+      "zh_working": "我必须摆脱担忧和恐惧，才能过上好日子。",
+      "assignedScore": "total"
+    },
+    {
+      "itemCode": "AFQY_07",
+      "en": "I do all I can to make sure I don't look dumb in front of other people.",
+      "zh_working": "我会竭尽所能，确保自己不在别人面前出丑。",
+      "assignedScore": "total"
+    },
+    {
+      "itemCode": "AFQY_08",
+      "en": "I try hard to erase hurtful memories from my mind.",
+      "zh_working": "我努力把伤人的记忆从脑子里抹掉。",
+      "assignedScore": "total"
+    },
+    {
+      "itemCode": "AFQY_09",
+      "en": "I can't stand to feel pain or hurt in my body.",
+      "zh_working": "我受不了身体上的疼痛或难受。",
+      "assignedScore": "total"
+    },
+    {
+      "itemCode": "AFQY_10",
+      "en": "If my heart beats fast, there must be something wrong with me.",
+      "zh_working": "如果心跳变快，一定是我出了问题。",
+      "assignedScore": "total"
+    },
+    {
+      "itemCode": "AFQY_11",
+      "en": "I push away thoughts and feelings that I don't like.",
+      "zh_working": "我把不喜欢的想法和感受推开。",
+      "assignedScore": "total"
+    },
+    {
+      "itemCode": "AFQY_12",
+      "en": "I stop doing things that are important to me whenever I feel bad.",
+      "zh_working": "一感觉不好，我就停下对我重要的事。",
+      "assignedScore": "total"
+    },
+    {
+      "itemCode": "AFQY_13",
+      "en": "I do worse in school when I have thoughts that make me feel sad.",
+      "zh_working": "当我有让我难过的想法时，我在学校表现得更差。",
+      "assignedScore": "total"
+    },
+    {
+      "itemCode": "AFQY_14",
+      "en": "I say things to make me sound cool.",
+      "zh_working": "我说一些让自己显得很酷的话。",
+      "assignedScore": "total"
+    },
+    {
+      "itemCode": "AFQY_15",
+      "en": "I wish I could wave a magic wand to make all my sadness go away.",
+      "zh_working": "我希望自己能挥一挥魔法棒，让所有悲伤都消失。",
+      "assignedScore": "total"
+    },
+    {
+      "itemCode": "AFQY_16",
+      "en": "I am afraid of my feelings.",
+      "zh_working": "我害怕自己的感受。",
+      "assignedScore": "total"
+    },
+    {
+      "itemCode": "AFQY_17",
+      "en": "I can't be a good friend when I feel upset.",
+      "zh_working": "当我心烦意乱时，我没办法做好朋友。",
+      "assignedScore": "total"
+    }
+  ],
+  "reverseScored": [],
+  "scores": [
+    {
+      "key": "total",
+      "label": "心理不灵活性总分（17题）",
+      "items": [
+        "AFQY_01",
+        "AFQY_02",
+        "AFQY_03",
+        "AFQY_04",
+        "AFQY_05",
+        "AFQY_06",
+        "AFQY_07",
+        "AFQY_08",
+        "AFQY_09",
+        "AFQY_10",
+        "AFQY_11",
+        "AFQY_12",
+        "AFQY_13",
+        "AFQY_14",
+        "AFQY_15",
+        "AFQY_16",
+        "AFQY_17"
+      ],
+      "aggregation": "sum",
+      "reverse": [],
+      "description": "十七题求和，范围 0–68。分数越高表示越多报告被想法与感受缠住、回避内心体验并因此影响重要活动。不是诊断，也不给学生贴标签。"
+    }
+  ],
+  "missingPolicy": "complete_required；任一题缺失则该分数不计算，不插补、不补0。"
+}
