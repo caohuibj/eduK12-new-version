@@ -1,0 +1,249 @@
+{
+  "identity": "ipip_neo_c1_self_efficacy10_zh_cn_research:1.0.0",
+  "sourceCommit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "sourceBranch": "content/dot-local-scales-20261025",
+  "specifiedMain": "aa774983db8edd85b3c1617aef7218f71664746d",
+  "observedWorkingHead": "fccc98c43ba42947052875f5cbbe5caf359e3de6",
+  "sourceFiles": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ipip_neo_c1_self_efficacy10_zh_cn_research/1.0.0/source.json",
+      "gitBlob": "9c74ef87a6f1833264f553c0f08aa778ee4146a5",
+      "sha256": "22ddbb0f7d0a94240c21d56eb5a807306688158bb70a83a228a3857d565acac9"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ipip_neo_c1_self_efficacy10_zh_cn_research/1.0.0/instrument.ts",
+      "gitBlob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_neo_c1_self_efficacy10/1.0.0/README.md",
+      "gitBlob": "b953722c62d6053e6e8cc5ff7be0782db875a3b3",
+      "sha256": "7c97d50ee33de22b4a3cf87fbd0c3805aba8bc7998632411a5f5bff7d84314f7"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_neo_c1_self_efficacy10/1.0.0/bilingual-content.json",
+      "gitBlob": "7a40cd4f72bd0d430ea9b13a370fe70a544b3e55",
+      "sha256": "3dc91a92ab875f34aa0b83033153619009cbe175eae503146f8449f9673452d8"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_neo_c1_self_efficacy10/1.0.0/reviewed-source-pack.json",
+      "gitBlob": "a5b4c5c8fb2a5eb21374543ace173d259d8b5394",
+      "sha256": "94d40441102535b29b06391bd091e0b0fffa4731fbd721d4ad41c412409a5a67"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_neo_c1_self_efficacy10/1.0.0/references.md",
+      "gitBlob": "ae029b013d8eca03f81d0b202472ea42b71ba4fd",
+      "sha256": "ea955c2a59917bb79c407f95085f8072f2f449a30c9a2e4705179595fcc0a056"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_neo_c1_self_efficacy10/1.0.0/report-example.md",
+      "gitBlob": "773cfc46cb90d8629aaea11f93db15828b4bca66",
+      "sha256": "fb98873daf16105bc507b4c5b531ddd38a3d67cbd905121ba67f6bc77c5e83e6"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_neo_c1_self_efficacy10/1.0.0/synthetic-report-example.json",
+      "gitBlob": "f89cb42eb7bf940894a73e5df9eb8aff675c93be",
+      "sha256": "9e7a9c2548e8bf668b8e1aea6d66b55d54c0b0fbf7ce493088f5ecc60a512748"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_neo_c1_self_efficacy10/1.0.0/local-validation.json",
+      "gitBlob": "c1fb5d07b5f16243254dde05e0c2d0968e85454c",
+      "sha256": "88f323641fc4e4c7df112f1717d72b826ca1235867fb91f1e8e9701432f1d3cf"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_neo_c1_self_efficacy10/1.0.0/report-revisions/1.0.1/change-record.json",
+      "gitBlob": "0901240b9f9eb7176eeabb10d1b6381e53e34ddb",
+      "sha256": "3fe4be071ba0d8d17b3b8922ce79a3cabad321ee3c382fc99428ba4c1553402a"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_neo_c1_self_efficacy10/1.0.0/report-revisions/1.0.1/validation.json",
+      "gitBlob": "dba6740de2458e0d7bdcd729f0b6fecbc321f510",
+      "sha256": "e57292edc024c8f79ee1c25896cc67434967f6fedae5ad3b63b38b7071b099bc"
+    }
+  ],
+  "thirdPartyLicense": {
+    "status": "absent_at_fixed_source",
+    "path": "server-version/backend/src/modules/scale/instruments/ipip_neo_c1_self_efficacy10_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+    "details": "固定树中该包和对应 research-drafts 均无 THIRD_PARTY_LICENSE；source.json 的 definition.license、usageRequirements 和文档 references 记载 IPIP 声明。不得声称读到不存在的文件。"
+  },
+  "threePartConclusions": {
+    "content": "官方 C1 十题顺序、英文及六正四反一致。中文逐题与研究包一致，语义基本对应，4 的 idiom 译为对判断有把握属于解释性翻译，留待人工译审，不自行更改。五点为符合度而非频率。项目一般现况指导语已存在且与锚点一致。",
+    "scoring": "单一 C1 总分，1–6 正向，7–10 反向 6−x，等权求和，理论 10–50，越高表示自报任务效能倾向越强。complete_required 是项目缺失政策：缺任一不计总分，不补零或插补，无均分分母。官方仅规定反向和求和，不将项目缺失政策伪称为官方规则。",
+    "report": "report 1.0.1 的方向、温和反思与具体可选行动合理；无阈值/等级、虚构常模或排名。区别主观信心与客观能力。报告限定成人自评，student 是技术受众映射。版本、参考及译审状态应原样保留。"
+  },
+  "items": [
+    {
+      "number": 1,
+      "en": "Complete tasks successfully.",
+      "zh": "我能成功完成任务。",
+      "runtimeItemCode": "IPIP_NEO_C1_SELF_EFFICACY10_01",
+      "key": "positive",
+      "result": "符合原题大意及固定源实现；中文待人工译审"
+    },
+    {
+      "number": 2,
+      "en": "Excel in what I do.",
+      "zh": "我在所做的事情上表现出色。",
+      "runtimeItemCode": "IPIP_NEO_C1_SELF_EFFICACY10_02",
+      "key": "positive",
+      "result": "符合原题大意及固定源实现；中文待人工译审"
+    },
+    {
+      "number": 3,
+      "en": "Handle tasks smoothly.",
+      "zh": "我能顺利处理任务。",
+      "runtimeItemCode": "IPIP_NEO_C1_SELF_EFFICACY10_03",
+      "key": "positive",
+      "result": "符合原题大意及固定源实现；中文待人工译审"
+    },
+    {
+      "number": 4,
+      "en": "Am sure of my ground.",
+      "zh": "我对自己的判断有把握。",
+      "runtimeItemCode": "IPIP_NEO_C1_SELF_EFFICACY10_04",
+      "key": "positive",
+      "result": "符合原题大意及固定源实现；中文待人工译审；idiom 为解释性译法，待审"
+    },
+    {
+      "number": 5,
+      "en": "Come up with good solutions.",
+      "zh": "我能想出好的解决办法。",
+      "runtimeItemCode": "IPIP_NEO_C1_SELF_EFFICACY10_05",
+      "key": "positive",
+      "result": "符合原题大意及固定源实现；中文待人工译审"
+    },
+    {
+      "number": 6,
+      "en": "Know how to get things done.",
+      "zh": "我知道怎样把事情办好。",
+      "runtimeItemCode": "IPIP_NEO_C1_SELF_EFFICACY10_06",
+      "key": "positive",
+      "result": "符合原题大意及固定源实现；中文待人工译审"
+    },
+    {
+      "number": 7,
+      "en": "Misjudge situations.",
+      "zh": "我会误判情况。",
+      "runtimeItemCode": "IPIP_NEO_C1_SELF_EFFICACY10_07",
+      "key": "reverse",
+      "result": "符合原题大意及固定源实现；中文待人工译审"
+    },
+    {
+      "number": 8,
+      "en": "Don't understand things.",
+      "zh": "我弄不明白事情。",
+      "runtimeItemCode": "IPIP_NEO_C1_SELF_EFFICACY10_08",
+      "key": "reverse",
+      "result": "符合原题大意及固定源实现；中文待人工译审"
+    },
+    {
+      "number": 9,
+      "en": "Have little to contribute.",
+      "zh": "我能作出的贡献很少。",
+      "runtimeItemCode": "IPIP_NEO_C1_SELF_EFFICACY10_09",
+      "key": "reverse",
+      "result": "符合原题大意及固定源实现；中文待人工译审"
+    },
+    {
+      "number": 10,
+      "en": "Don't see the consequences of things.",
+      "zh": "我看不出事情会带来什么后果。",
+      "runtimeItemCode": "IPIP_NEO_C1_SELF_EFFICACY10_10",
+      "key": "reverse",
+      "result": "符合原题大意及固定源实现；中文待人工译审"
+    }
+  ],
+  "anchors": [
+    {
+      "value": 1,
+      "en": "Very Inaccurate",
+      "zh": "很不符合"
+    },
+    {
+      "value": 2,
+      "en": "Moderately Inaccurate",
+      "zh": "比较不符合"
+    },
+    {
+      "value": 3,
+      "en": "Neither Inaccurate nor Accurate",
+      "zh": "介于不符合与符合之间"
+    },
+    {
+      "value": 4,
+      "en": "Moderately Accurate",
+      "zh": "比较符合"
+    },
+    {
+      "value": 5,
+      "en": "Very Accurate",
+      "zh": "很符合"
+    }
+  ],
+  "instruction": {
+    "text": "请根据你目前通常的情况，而不是希望将来成为的样子，判断下面各句话与你的实际情况有多符合。",
+    "timeframe": "一般当前自述，无固定回忆时段",
+    "evidence": [
+      {
+        "file": {
+          "path": "docs/scale-instruments/research-drafts/ipip_neo_c1_self_efficacy10/1.0.0/bilingual-content.json",
+          "gitBlob": "7a40cd4f72bd0d430ea9b13a370fe70a544b3e55",
+          "sha256": "3dc91a92ab875f34aa0b83033153619009cbe175eae503146f8449f9673452d8"
+        },
+        "field": "instructions"
+      },
+      {
+        "file": {
+          "path": "docs/scale-instruments/research-drafts/ipip_neo_c1_self_efficacy10/1.0.0/reviewed-source-pack.json",
+          "gitBlob": "a5b4c5c8fb2a5eb21374543ace173d259d8b5394",
+          "sha256": "94d40441102535b29b06391bd091e0b0fffa4731fbd721d4ad41c412409a5a67"
+        },
+        "field": "instructionZh"
+      }
+    ],
+    "existingSourceField": "固定 source.json 没有顶层 instruction；缺字段不等于缺已有指导语。",
+    "suggestedMapping": {
+      "schemaVersion": 1,
+      "text": "请根据你目前通常的情况，而不是希望将来成为的样子，判断下面各句话与你的实际情况有多符合。",
+      "language": "zh-CN",
+      "version": "1.0.0",
+      "source": "docs/scale-instruments/research-drafts/ipip_neo_c1_self_efficacy10/1.0.0/bilingual-content.json#instructions"
+    },
+    "mappingQualification": "text 与语言源自既有文档；version 1.0.0 是拟议适配版本标识，并非原文中的审批证明；source 引用为可追溯字段映射。接入现有 instruction schema/静态注册安装发布路径，由 root 决定实施。"
+  },
+  "rights": {
+    "status": "原包 verified/public domain 保持；仅指 IPIP 来源声明范围",
+    "officialSources": [
+      {
+        "url": "https://ipip.ori.org/newPermission.htm",
+        "finding": "IPIP 题项、量表、问卷可用于任何商业或非商业用途"
+      },
+      {
+        "url": "https://ipip.ori.org/",
+        "finding": "IPIP 题项及量表可复制、编辑、翻译、用于任何目的"
+      }
+    ],
+    "limits": "不将此声明扩大到专有 NEO-PI-R、其他工具、额外第三方内容或将翻译视为已验证；项目反馈的版权不由该官方声明单独证明。"
+  },
+  "metadata": {
+    "source": "catalog.administration.itemCount=10；definition response mappings/scoring items 可推导 10–50。",
+    "result": "历史合成结果 scores[].range={min:10,max:50}, expectedItems 与 answeredItems 为题号数组；当前 backend scale-scoring.ts 构造这些字段，projection/serialization.ts 的 projectExternalScaleScore 显式投影它们，前端 reporting/types.ts 有对应字段；可用数组长度显示应答数/题数与 range 显示理论范围，无需将原始答题或题目得分公开。",
+    "qualification": "静态代码及固定源历史合成结果证据；尚未运行当前端到端或验证实际每个报告页面已呈现。不得把理论范围表述为常模。"
+  },
+  "minimalEngineeringAdaptations": [
+    "通过既有 ScaleInstrumentSourceV1.instruction 可选字段注入上述已有文本，保留溯源、现有 install/publish、定义冻结及对应兼容性规则；不构造审校。",
+    "如目标报告 UI 尚未展示，复用已投影的 scores[].expectedItems.length、answeredItems.length 和 range；标注理论范围，保留缺失 null/status，检查真实消费者；不新造计分引擎或 CSV 覆盖 STANDARD。",
+    "不改变题目、锚点、评分、阈值、构念及已冻结快照；报告 revision 使用既有版本轴机制。"
+  ],
+  "manualMatters": [
+    "中文专家译审、认知访谈及目标人群验证仍 PENDING/NOT_ESTABLISHED；第4题 idiom 特别列供审阅。",
+    "成人研究自评范围；未成年人使用需要单独适用性审查。",
+    "若要求实质改题、锚点、算法、阈值或构念，交 root 协调用户，保留成熟版本；不将这些原有状态转成自动准入门禁。"
+  ],
+  "recommendation": "建议进入本批的最小指导语与报告元数据适配：现有指导语来源明确，静态计分、报告方向和官方 IPIP 权利声明一致。保留中文译审和人群效度待决；若本批目标要求已验证中文版或扩展到未成年人，则该扩展保留待决。",
+  "notExecuted": [
+    "既有计分/golden/全库检查、类型检查、CI、DB、生产及部署均未执行；本工作只读固定 Git 对象与源代码，未修改仓库。",
+    "未验证现存 DB 行/真实报告显示；未进行新效度研究或声称新的人类审校。"
+  ],
+  "historicalEvidence": "local-validation.json 为 2026-10-25 历史自述，仅列来源，不视为本次执行或正式门禁。"
+}
