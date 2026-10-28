@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "base": "642fda7ab754790686d6626efac62b73a332e663",
+  "scope": "Bounded local synthetic resource observations and reused shared planner setting. Not browser latency, sustained capacity, publication or production deployment.",
+  "postgres": "17.11",
+  "redis": "8.0.2",
+  "node": "v24.22.1",
+  "postgresConfig": {
+    "shared_buffers": "64MB",
+    "max_connections": 20,
+    "jit": "off"
+  },
+  "compactFacts": false,
+  "sharedControl": false,
+  "artifactBinding": "Collected after each original execution; no claim of signed execution. Exact source/probe and original exit receipts retained.",
+  "files": [
+    {
+      "path": "evidence/survey-first-warm-02-results.json",
+      "sha256": "07749a8fbcb38da0833d56c4fa91c9d0591e97d47d50dba5afb1c8e2f1f141cf"
+    },
+    {
+      "path": "evidence/survey-first-warm-02-source.json",
+      "sha256": "ccf2d3dc2eebe15c9da6a98c67a93a1a3ec1392a4f43cfab217f52e49774b6ee"
+    },
+    {
+      "path": "evidence/execution-02.json",
+      "sha256": "0db985b55d6d6d2054d2bb3a73c491070a1e4161c13c67703162cdef92b356a0"
+    },
+    {
+      "path": "evidence/education-report-current.json",
+      "sha256": "9e76c8296405a3ced81d36350e4db3e802abb3d20aed186fcc0017bdd90fbdd1"
+    },
+    {
+      "path": "evidence/education-current-execution.json",
+      "sha256": "5ede523581f098f3e7931738dde360cad2082d5b30f995397492fbff28f2f953"
+    },
+    {
+      "path": "evidence/training-whole-probe.json",
+      "sha256": "8e6e0684486062b3fcc5e513c6dcfad437804ad072dc814f505a039be1f2b2c9"
+    },
+    {
+      "path": "evidence/training-execution.json",
+      "sha256": "1aeb340883273b9a0b9c1098db8130241aee135f0fbac300405f9da2f335f7cf"
+    },
+    {
+      "path": "evidence/education-assessment-current.json",
+      "sha256": "f248ca07d7b816b58fe592a348082ac5f1aa77701704fe0f9cf91d56ecf6b3bb"
+    },
+    {
+      "path": "evidence/education-assessment-current-execution.json",
+      "sha256": "5ede523581f098f3e7931738dde360cad2082d5b30f995397492fbff28f2f953"
+    },
+    {
+      "path": "evidence/education-assessment-candidate.json",
+      "sha256": "dfdef64b201094a88e106ae321c23ccd2f01d790999c67d1dd3651743cd19ffe"
+    },
+    {
+      "path": "evidence/education-assessment-candidate-execution.json",
+      "sha256": "5ede523581f098f3e7931738dde360cad2082d5b30f995397492fbff28f2f953"
+    },
+    {
+      "path": "evidence/education-assessment-plans.json",
+      "sha256": "59bad9739abaf4c37cad1d25e57a0803f719fe1700991fc98a71dd11c5a9fc84"
+    },
+    {
+      "path": "evidence/education-assessment-plans-execution.json",
+      "sha256": "5ede523581f098f3e7931738dde360cad2082d5b30f995397492fbff28f2f953"
+    },
+    {
+      "path": "evidence/shared-planning-contract.json",
+      "sha256": "60285f1e013cb8a46a6899e18fa075229191b41e4d0655eeb86ed0d0d2376835"
+    },
+    {
+      "path": "evidence/shared-planning-contract.log",
+      "sha256": "b7b47cc4ee9f85404b3b78eb44c72be918157e9a74de43acc8e3b75726a5e1fc"
+    },
+    {
+      "path": "evidence/prisma-source-check.json",
+      "sha256": "ae758613fef4d6b4c51e9c3f5b2757dd27fbe7ccea797726907c8f77e943e5c5"
+    },
+    {
+      "path": "evidence/education-assessment-current.ts.txt",
+      "sha256": "027457998f08f054687167d8a9b4708c0305124398ab9dc7a12ceb95b009e1eb"
+    },
+    {
+      "path": "evidence/education-assessment-candidate.ts.txt",
+      "sha256": "36d0834fce2843c998986f1699ea50f607562e68edca76929f3dc5a9c39d6eb5"
+    },
+    {
+      "path": "evidence/education-assessment-plans.ts.txt",
+      "sha256": "ac98584c61cc559f6a4948800e541bf98da8b72e61b20c920596af0109da7d75"
+    }
+  ]
+}

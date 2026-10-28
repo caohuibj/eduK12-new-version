@@ -1,367 +1,123 @@
 {
-  "pr": 365,
+  "pr": 369,
   "enabled": true,
-  "base": "c412baf508a46278c265c20e71952a179813ef31",
-  "product": "8188745ca7134b38784717af384d72a730e47945",
-  "controlCheckpoint": "e4675a734983cbd42ec466f6d525aaa2e63e1760",
+  "base": "642fda7ab754790686d6626efac62b73a332e663",
+  "product": "dca8865ce2f71797ca41264789d9098fbf54e68a",
+  "controlCheckpoint": "2f5bc2081aee41116ed3bacbdfca0dbd004f8cd9",
   "source": {
-    "docs/scale-library-structure-20261027/README.md": {
+    "docs/performance/shared-report-planning-20261028/README.md": {
       "before": null,
-      "after": "f759bd4bb9d0d96506ced1358c11981d23bd5b89"
+      "after": "6038726fc07b53a97738bd17b1b60c2f529242fa"
     },
-    "docs/scale-library-structure-20261027/candidate-list.md": {
+    "docs/performance/shared-report-planning-20261028/evidence/education-assessment-candidate-execution.json": {
       "before": null,
-      "after": "63fd894024d2d6c5d9f40ab85ba1ede7667aff6f"
+      "after": "446152e290fd447ddf198cdd248b07c466c48e25"
     },
-    "docs/scale-library-structure-20261027/candidates.json": {
+    "docs/performance/shared-report-planning-20261028/evidence/education-assessment-candidate.json": {
       "before": null,
-      "after": "90522879a59eb53c760ab42f77b5741082dbf8cc"
+      "after": "35141c6b38306cd68ace89f0639c4e53d2efd89a"
     },
-    "docs/scale-library-structure-20261027/evidence/backend-types-final.log": {
+    "docs/performance/shared-report-planning-20261028/evidence/education-assessment-candidate.ts.txt": {
       "before": null,
-      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+      "after": "574c65fa6530098994ff04a0fc26a2dfb3699926"
     },
-    "docs/scale-library-structure-20261027/evidence/backend-types-integrated.log": {
+    "docs/performance/shared-report-planning-20261028/evidence/education-assessment-current-execution.json": {
       "before": null,
-      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+      "after": "446152e290fd447ddf198cdd248b07c466c48e25"
     },
-    "docs/scale-library-structure-20261027/evidence/backend-types-registry-final.log": {
+    "docs/performance/shared-report-planning-20261028/evidence/education-assessment-current.json": {
       "before": null,
-      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+      "after": "7ac8b3dbf79a7b5a3ef2727dc3b33a6616e7a168"
     },
-    "docs/scale-library-structure-20261027/evidence/backend-types.log": {
+    "docs/performance/shared-report-planning-20261028/evidence/education-assessment-current.ts.txt": {
       "before": null,
-      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+      "after": "0096139f0aa0a380e6a5804a1c49c6569b83bf28"
     },
-    "docs/scale-library-structure-20261027/evidence/cache-instruction-evidence-index.json": {
+    "docs/performance/shared-report-planning-20261028/evidence/education-assessment-plans-execution.json": {
       "before": null,
-      "after": "2dad84cde2ebf4620cdad6e3338bbd7671ad047b"
+      "after": "446152e290fd447ddf198cdd248b07c466c48e25"
     },
-    "docs/scale-library-structure-20261027/evidence/cache-instruction-runner-diagnostic.json": {
+    "docs/performance/shared-report-planning-20261028/evidence/education-assessment-plans.json": {
       "before": null,
-      "after": "f07c414bf7e81a9b4b889ba949bbcb47ea45268f"
+      "after": "6ac587e0b94912f33f205301f2feca068cd77b51"
     },
-    "docs/scale-library-structure-20261027/evidence/cache-instruction-runner-diagnostic.log": {
+    "docs/performance/shared-report-planning-20261028/evidence/education-assessment-plans.ts.txt": {
       "before": null,
-      "after": "81f4b25a80132b00130972e1a44295df7c0d2a04"
+      "after": "f214488482e75d07554e0a9e1067e16b37bc9cec"
     },
-    "docs/scale-library-structure-20261027/evidence/cache-instruction-state-supplement.json": {
+    "docs/performance/shared-report-planning-20261028/evidence/education-current-execution.json": {
       "before": null,
-      "after": "1ae638e340da458d696266faab3913a17fb12f4b"
+      "after": "446152e290fd447ddf198cdd248b07c466c48e25"
     },
-    "docs/scale-library-structure-20261027/evidence/cache-instruction-state-supplement.log": {
+    "docs/performance/shared-report-planning-20261028/evidence/education-report-current.json": {
       "before": null,
-      "after": "6e789cbc092ed441b429471792f7cac3adcb7912"
+      "after": "9c30ae6d032808f93a90aea379e8f7ad93335bcd"
     },
-    "docs/scale-library-structure-20261027/evidence/cache-instruction-tests.json": {
+    "docs/performance/shared-report-planning-20261028/evidence/execution-02.json": {
       "before": null,
-      "after": "e4fd57a70ee45b88968987b6cda988b1aed9696a"
+      "after": "00a76e8098a03769113bd36220a96175cdcbf32f"
     },
-    "docs/scale-library-structure-20261027/evidence/cache-instruction-tests.log": {
+    "docs/performance/shared-report-planning-20261028/evidence/prisma-source-check.json": {
       "before": null,
-      "after": "2b874fba07b805e1043fa944e42061bc6c663842"
+      "after": "200cab0a5af51cbe9514c14044d70020e283c430"
     },
-    "docs/scale-library-structure-20261027/evidence/cache-instruction-types-receipt.json": {
+    "docs/performance/shared-report-planning-20261028/evidence/report-planning-types-receipt.json": {
       "before": null,
-      "after": "d05501c8ece67c0c22ca48d9590b5e147cdb2881"
+      "after": "4899b44859da230bcecaf56a497190386864f975"
     },
-    "docs/scale-library-structure-20261027/evidence/cache-instruction-types.log": {
-      "before": null,
-      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
-    },
-    "docs/scale-library-structure-20261027/evidence/cache-runner-exit-diagnostic-receipt.json": {
-      "before": null,
-      "after": "d425e9df4a4dcebc43b5a8e5f695d06ec582d313"
-    },
-    "docs/scale-library-structure-20261027/evidence/cache-runner-exit-diagnostic.json": {
-      "before": null,
-      "after": "0a5a08b6b6b77d24e677e8159ebc2c6e4598ea43"
-    },
-    "docs/scale-library-structure-20261027/evidence/cache-runner-exit-diagnostic.log": {
-      "before": null,
-      "after": "23d21b5ba695c23938a7ca896e91888a833c8e00"
-    },
-    "docs/scale-library-structure-20261027/evidence/check-scale-conflict-once.ts.txt": {
-      "before": null,
-      "after": "8fb1024ed6e8a176748861c83abe9850d5090f50"
-    },
-    "docs/scale-library-structure-20261027/evidence/dbt-conflict.json": {
-      "before": null,
-      "after": "0e49743fa5d635f59edbb64157ceefe92e88db92"
-    },
-    "docs/scale-library-structure-20261027/evidence/dbt-conflict.log": {
-      "before": null,
-      "after": "08e5811598dcbae2c87e92cfef235be67cf7f97f"
-    },
-    "docs/scale-library-structure-20261027/evidence/executable-bytes-final.json": {
-      "before": null,
-      "after": "592e87f6d976790823a512309a57fee729194427"
-    },
-    "docs/scale-library-structure-20261027/evidence/executable-bytes-final.log": {
-      "before": null,
-      "after": "2d9dd6ec4a8b57dc32126b7525a1707ec04de94e"
-    },
-    "docs/scale-library-structure-20261027/evidence/integrated-types-receipt.json": {
-      "before": null,
-      "after": "ebad3a40eb717875ea94339852f07ce4feb82d43"
-    },
-    "docs/scale-library-structure-20261027/evidence/inventory-defaults-failure.log": {
-      "before": null,
-      "after": "99618fc308360e1576d4bbcc42da375854502317"
-    },
-    "docs/scale-library-structure-20261027/evidence/inventory-empty-path-failure.log": {
-      "before": null,
-      "after": "d042945ed5dc16d8f2f1707376ebf00d76f46f3b"
-    },
-    "docs/scale-library-structure-20261027/evidence/inventory-final.log": {
-      "before": null,
-      "after": "f5422d3b2d255f97a4fa510b2af6e102cb549edd"
-    },
-    "docs/scale-library-structure-20261027/evidence/inventory-receipt.json": {
-      "before": null,
-      "after": "ffa88803e0e8dbe90db7fc3e90c9bb66889124de"
-    },
-    "docs/scale-library-structure-20261027/evidence/inventory.log": {
-      "before": null,
-      "after": "0f1606339913a548dc34759fc2eefc9b048b32a2"
-    },
-    "docs/scale-library-structure-20261027/evidence/main-instruction-field-inventory.json": {
-      "before": null,
-      "after": "c5aa6df64f3e3f869df3e7a85e540f5df6b79bb1"
-    },
-    "docs/scale-library-structure-20261027/evidence/manual-review-tests.json": {
-      "before": null,
-      "after": "ac91a9f57aca8584de2b320cd111b4f0cb670f6e"
-    },
-    "docs/scale-library-structure-20261027/evidence/manual-review-tests.log": {
-      "before": null,
-      "after": "877e5dd08f65cf99bd86406751e39e52befa1457"
-    },
-    "docs/scale-library-structure-20261027/evidence/publication-tests.json": {
-      "before": null,
-      "after": "034e8570c2254cbaa6d9e1055d54fb70d490903d"
-    },
-    "docs/scale-library-structure-20261027/evidence/publication-tests.log": {
-      "before": null,
-      "after": "d9e567aa0576c4d5b9a4613e2ecf3bdcfc6a217b"
-    },
-    "docs/scale-library-structure-20261027/evidence/registry-final.json": {
-      "before": null,
-      "after": "af1eaa87dc4f57ce83edd0fd7864a4a0af248481"
-    },
-    "docs/scale-library-structure-20261027/evidence/registry-final.log": {
-      "before": null,
-      "after": "0bf5b38b13d912f5de7de8ed6a32702dea3ee75f"
-    },
-    "docs/scale-library-structure-20261027/evidence/registry-fixture-retry.json": {
-      "before": null,
-      "after": "8490ee1ac09ba566686453d46d5f1372daa10e98"
-    },
-    "docs/scale-library-structure-20261027/evidence/registry-fixture-retry.log": {
-      "before": null,
-      "after": "aca24000191dcdf89d07bea77fe5e18a80248cc8"
-    },
-    "docs/scale-library-structure-20261027/evidence/root-affected-receipt.json": {
-      "before": null,
-      "after": "d370fd99541f9ee2bb07a36ddc64e58956a52f42"
-    },
-    "docs/scale-library-structure-20261027/evidence/root-affected.json": {
-      "before": null,
-      "after": "9d2b11f979944ce5b60fcf872389559d3c1fa1bf"
-    },
-    "docs/scale-library-structure-20261027/evidence/root-affected.log": {
-      "before": null,
-      "after": "6137ef59655c10a2eab2b56b462c5eaa98221021"
-    },
-    "docs/scale-library-structure-20261027/evidence/root-integrated-types-receipt.json": {
-      "before": null,
-      "after": "d619d7c2001e43cf42089c4b31f878d74cebe4ca"
-    },
-    "docs/scale-library-structure-20261027/evidence/root-integrated-types.log": {
+    "docs/performance/shared-report-planning-20261028/evidence/report-planning-types.log": {
       "before": null,
       "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
     },
-    "docs/scale-library-structure-20261027/evidence/seed-compatibility-types-receipt.json": {
+    "docs/performance/shared-report-planning-20261028/evidence/shared-planning-contract.json": {
       "before": null,
-      "after": "0874dfd182c89c60b9c5d0dc5c880c2320ac09ad"
+      "after": "45ddfcb4bd1f5e6802b1fcdf0ab15cbc02377ef0"
     },
-    "docs/scale-library-structure-20261027/evidence/seed-compatibility-types.log": {
+    "docs/performance/shared-report-planning-20261028/evidence/shared-planning-contract.log": {
       "before": null,
-      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+      "after": "e9df4e0b68444bcce31d3817c26803bfcb443cd1"
     },
-    "docs/scale-library-structure-20261027/evidence/seed-instruction-compatibility-receipt.json": {
+    "docs/performance/shared-report-planning-20261028/evidence/survey-first-warm-02-results.json": {
       "before": null,
-      "after": "c64e9527a7f041023b2619cf91e3ca31a2930dc7"
+      "after": "c84d423d8b80efb888333b605bd7e67f02e93b19"
     },
-    "docs/scale-library-structure-20261027/evidence/seed-instruction-compatibility.json": {
+    "docs/performance/shared-report-planning-20261028/evidence/survey-first-warm-02-source.json": {
       "before": null,
-      "after": "b79d1a59f06b05da9e70add5fd6d57a003c66eca"
+      "after": "6ece944a29ee4c2ee4eb11cff0e52505ca922b04"
     },
-    "docs/scale-library-structure-20261027/evidence/seed-instruction-compatibility.log.gz": {
+    "docs/performance/shared-report-planning-20261028/evidence/training-execution.json": {
       "before": null,
-      "after": "12851b076adcba3569bd2f4cf5a9c2d5d8b64dd7"
+      "after": "28deb47f6c75dbb653b990f4d933431926b983d6"
     },
-    "docs/scale-library-structure-20261027/evidence/shell-exit-layer-diagnosis.json": {
+    "docs/performance/shared-report-planning-20261028/evidence/training-whole-probe.json": {
       "before": null,
-      "after": "72e9667e01f4dada209d45aa3ecda224f115bf0a"
+      "after": "a7803de18e629b8cdb9852958dce1ff070c6d6ed"
     },
-    "docs/scale-library-structure-20261027/evidence/structure-corrected.json": {
+    "docs/performance/shared-report-planning-20261028/manifest.json": {
       "before": null,
-      "after": "785d74a727f0516a67bfd867051400375b27f099"
+      "after": "465c67895ec554ad56273bf116849559ea549077"
     },
-    "docs/scale-library-structure-20261027/evidence/structure-corrected.log": {
-      "before": null,
-      "after": "901392fd7f5ae0fa048a9fc8c4737821d6d5cc2f"
+    "server-version/backend/src/__tests__/reporting/education-assessment-personal-report.service.test.ts": {
+      "before": "fd5496f3c39ea3e1254b35e1ff1d30f63605d0be",
+      "after": "d35c6a4ec22b5231905fc282e4d9588ee3349b05"
     },
-    "docs/scale-library-structure-20261027/evidence/structure-install-final.json": {
-      "before": null,
-      "after": "59e265fb4cb619196d3736fde5e826992df3cf07"
-    },
-    "docs/scale-library-structure-20261027/evidence/structure-install-final.log": {
-      "before": null,
-      "after": "acfc65552d67b24933fac66cc83e1420f8fb4336"
-    },
-    "docs/scale-library-structure-20261027/evidence/structure-retry.json": {
-      "before": null,
-      "after": "6d2a52a60c2c5ef96ceb0797b5735e9d90cd065f"
-    },
-    "docs/scale-library-structure-20261027/evidence/structure-retry.log": {
-      "before": null,
-      "after": "3de610e4481f44d96b8f6844f20b0f3b1bce8fa8"
-    },
-    "docs/scale-library-structure-20261027/evidence/structure-tests.json": {
-      "before": null,
-      "after": "c22d9194237201dc252ff679b34a57d7277b002a"
-    },
-    "docs/scale-library-structure-20261027/evidence/structure-tests.log": {
-      "before": null,
-      "after": "cb6ca15145b68dcde156888f462ecd11a6d4d988"
-    },
-    "docs/scale-library-structure-20261027/evidence/test-index.json": {
-      "before": null,
-      "after": "6f4a093bd299c465ade4b3b036110cd137b30f15"
-    },
-    "docs/scale-library-structure-20261027/integration.json": {
-      "before": null,
-      "after": "658a6118671cac253d60301065d2892ca601f0ec"
-    },
-    "docs/scale-library-structure-20261027/remote-scale-branches.json": {
-      "before": null,
-      "after": "5bca206221f3997ba05fe6a4b6d4112d4a2631b6"
-    },
-    "docs/scale-library-structure-20261027/sources.json": {
-      "before": null,
-      "after": "2b2729391d443369ca12e7c2e62b619f1788c8cb"
-    },
-    "server-version/backend/prisma/seeds/scales.ts": {
-      "before": "693da39ca3784f57969255ad3660e0338804ca6d",
-      "after": "8dd2c511e515c067232a619d48d2daf9e5f52783"
-    },
-    "server-version/backend/scripts/audit-scale-candidate-structure.ts": {
-      "before": null,
-      "after": "ab77b926beb441605625342cf31824d23d82f84c"
-    },
-    "server-version/backend/scripts/check-scale-source-qualification.ts": {
-      "before": "2833d0642ef9f6c2ff4223ce0cb38eb16b8db66f",
-      "after": "12b2de90cb3e4b7924359583f2a89ca18c3185ab"
-    },
-    "server-version/backend/src/__tests__/scale/admission-cache-and-instruction.test.ts": {
-      "before": null,
-      "after": "fefd026a708d0838bf15a5b454c5281148e28d11"
-    },
-    "server-version/backend/src/__tests__/scale/instruction-freeze.test.ts": {
-      "before": "96f9f24a180c81e0331aa01e4f2d6dfe3cbe9798",
-      "after": "888b28e15fd587aed24c4c7365a876ea75781b8e"
-    },
-    "server-version/backend/src/__tests__/scale/license-retirement-install.test.ts": {
-      "before": "8e09365813dba9572a34ad5d8e8990466936c891",
-      "after": "77c72dbd5a3e636525d56cdeb38200bd498e92ae"
-    },
-    "server-version/backend/src/__tests__/scale/pending-review-path.test.ts": {
-      "before": "cd11dc301b1acdef6135ef5e9929f57f75e4cc89",
-      "after": "67b1ddb8531de3afa6a525ec2e48191824ba2998"
-    },
-    "server-version/backend/src/__tests__/scale/structural-admission.test.ts": {
-      "before": null,
-      "after": "dbf69ab0612137233e4ca2e5f0f681968bc89b55"
-    },
-    "server-version/backend/src/__tests__/scale/structural-publication.test.ts": {
-      "before": null,
-      "after": "0d2b37e6bab84b1c96c5169feb83cdf7d2e7736e"
-    },
-    "server-version/backend/src/__tests__/scale/who5-sdq-texi-gates.test.ts": {
-      "before": "0458241c82068becf16803bd1488ad2aa47bf75c",
-      "after": "717196fd926aee904631f422f6f3806c49055eb2"
-    },
-    "server-version/backend/src/modules/scale/library/audience-report-gate.ts": {
-      "before": "d64805f97d3732111efd890196104985fb385460",
-      "after": "3c5c5dc106ad1bf50cccc64d56501ef7d5bf75f0"
-    },
-    "server-version/backend/src/modules/scale/library/pilot-publication-gate.ts": {
-      "before": "f66ea54829772bf561dabe2dfcd03051279a323c",
-      "after": "1f21dc5856dab2ba41ca8e823199d0ab486cd6ab"
-    },
-    "server-version/backend/src/modules/scale/onboarding/executable-registry.ts": {
-      "before": "603b04e60316af947005ef232c69a0b5677c8c5d",
-      "after": "0f99ea0ae6aa97778b6295939dcd9123a2c8a744"
-    },
-    "server-version/backend/src/modules/scale/onboarding/install.ts": {
-      "before": "fbbc8901d66e90bb3ba64113c3e1a9aa2ea6d844",
-      "after": "6fd6f2ed3e612e36f7f473ae8a95b0e9fc02f97b"
-    },
-    "server-version/backend/src/modules/scale/onboarding/instruction-admission.ts": {
-      "before": null,
-      "after": "33bccbfaa0b391f7ef423ada5fa3b55c194563ce"
-    },
-    "server-version/backend/src/modules/scale/onboarding/instrument-registry.ts": {
-      "before": "97528fb467ae38bf52f9d7a2f816f7342f92b82a",
-      "after": "0663353bd5a9dfb2a39d08cfbfaff6b1f72d365b"
-    },
-    "server-version/backend/src/modules/scale/onboarding/materialize.ts": {
-      "before": "1fa9e896065d97e317dc987fd3091fcc00805fed",
-      "after": "2292d7d622098715d0e582f50caad10aea0a02ee"
-    },
-    "server-version/backend/src/modules/scale/onboarding/preview.ts": {
-      "before": "7092e834dbae5b4315b3c3a3edbf5b71a07d96c9",
-      "after": "9b0a727aff4c81afb127450130cddb3c14b4d2e3"
-    },
-    "server-version/backend/src/modules/scale/onboarding/publish.ts": {
-      "before": "d236786dcf8896a4ab43578aec92a96b31a5a6f3",
-      "after": "9925d94c3a969ae0f5c9a29fc730b9162342ae5e"
-    },
-    "server-version/backend/src/modules/scale/onboarding/schema.ts": {
-      "before": "a4a2e493e5fa246a213583bf5a641ed64b7f427e",
-      "after": "52e040a80bcef13394f867c66ebc4fe58fbb60d3"
-    },
-    "server-version/backend/src/modules/scale/onboarding/status.ts": {
-      "before": "ad807700f45d6d9959a73124c41eff40d35a2cc4",
-      "after": "87d01e9feccf0eb52634169730e4795d042309de"
-    },
-    "server-version/backend/src/modules/scale/onboarding/validate-instrument.ts": {
-      "before": "2581c7c116bd9b43746e4e34a3beddc76e315f8a",
-      "after": "f7c60d3c512d810d68f913af8bc09659a658eaf1"
-    },
-    "server-version/backend/src/modules/scale/policy/localization.ts": {
-      "before": "f4c5bc896adacd9bfb4ba0e2d0bb6cb0ec0f0453",
-      "after": "f47021e15a9d22f2eb9bd3c828366ccd91f94487"
-    },
-    "server-version/backend/src/modules/scale/scale-definition.ts": {
-      "before": "4131d844d4c29d3813a5c5d1b55709825e1c437b",
-      "after": "23a1edce1ddcc3a14c1b938f5319e1f5f1a2d7c0"
+    "server-version/backend/src/modules/reporting/education-assessment-personal-report.service.ts": {
+      "before": "368a93a592944897a21f5936073395069473519c",
+      "after": "48d968e8e0442c88de15cbd324a133cbcc0ee180"
     }
   },
   "controlBefore": {
     ".github/scripts/content-scope.mjs": "31a340af23927250b9a40f6097b3815d617c70ec",
     ".github/scripts/merge-gate.mjs": "985c744ac800aa425323db1c57010e64d0d69a8e",
-    ".github/scripts/onboarding-bindings.json": "f80cff666ef13c88f04f037993404f66a1e373d9",
-    ".github/scripts/onboarding-checks.mjs": "a08281f7f34054cc863f100cc6822db9c908d0f5",
-    ".github/scripts/onboarding-controls.test.mjs": "fe50ace278f68f4e3dd836dd4b76503203178dc3",
-    ".github/scripts/onboarding-evidence.json": "42874d215890206478623a87735d739a6b8e33ed",
+    ".github/scripts/onboarding-bindings.json": "6bb7349e659ae0d6e0f7f9fc170f79794da7818f",
+    ".github/scripts/onboarding-checks.mjs": "28d36aeab7961578a9d642dab4b38491b1c77ce2",
+    ".github/scripts/onboarding-controls.test.mjs": "4696fb42b34d7cc9ffba0c44aad7ae3cd267dab4",
+    ".github/scripts/onboarding-evidence.json": "5cf67575b5b47dd1aee900ddeaa6f2c068974aa9",
     ".github/scripts/onboarding-scope.mjs": "2e16cbb12ff48f7b23976b39477168d590c95acf",
     ".github/workflows/ci.yml": "ded3ee19c9659b0f161c610a59c1e45d5020561e"
   },
   "components": {
-    "backend": "43e1ea8f2cf710ebfbeced06c0e49c2d4052afec",
+    "backend": "c1af3b336b5c1d90f2ff0334bdc7af9c6c9cb570",
     "frontend": "08e007747668fcf67cfd44d323a70daf8dc1ab9e"
   }
 }

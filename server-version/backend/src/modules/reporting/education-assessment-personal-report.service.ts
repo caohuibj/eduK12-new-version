@@ -74,6 +74,10 @@ async function readOwn(tx:Prisma.TransactionClient,input:EducationAssessmentRepo
  * Inject the root's exact identity + current source authority readers at wiring. */
 export function createEducationAssessmentReportReader<Source extends EducationAssessmentReportIdentity>(deps:EducationAssessmentReportDependencies<Source>){
   return async(input:EducationAssessmentReportInput)=>prisma.$transaction(async tx=>{
+    // As in the Scale self-report reader, the exact execution anchors these
+    // explicit joins. Bound planning in this transaction only; keep both
+    // current-authority reads and restore the pooled setting on exit.
+    await tx.$executeRaw`SET LOCAL join_collapse_limit = 1`
     const own=await readOwn(tx,input)
     if(!own)return null
     if(canonicalHash(own.policy)!==own.policyHash)hidden()
