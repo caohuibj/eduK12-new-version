@@ -133,6 +133,8 @@ export const freezeCompositeActiveSlotSet = (input: {
   cognitive: CognitiveSlotInput[]
   formSections: FormSlotInput[]
   situational?: SituationalSlotInput[]
+  /** Ordinary education source order, frozen once without altering its source. */
+  unitOrder?: ReadonlyMap<string,number>
 }): FrozenActiveSlotSetV1 => createFrozenActiveSlotSet({
   schemaVersion: 1,
   runtimeGeneration: 'UNIFIED_V1',
@@ -142,7 +144,12 @@ export const freezeCompositeActiveSlotSet = (input: {
     ...input.cognitive.map(cognitiveSlot),
     ...input.formSections.map(formSlot),
     ...(input.situational ?? []).map(situationalSlot),
-  ].sort(compareSlotKeys),
+  ].sort(compareSlotKeys).map(slot=>{
+    if(!input.unitOrder)return slot
+    const order=input.unitOrder.get(slot.slotKey)
+    if(order===undefined)throw new Error('Education composition slot order is incomplete')
+    return {...slot,sourceBinding:{...slot.sourceBinding,educationOrder:order}}
+  }),
 })
 
 export const sourceDefinitionHashForScale = (definition: unknown): string => canonicalHash(definition)

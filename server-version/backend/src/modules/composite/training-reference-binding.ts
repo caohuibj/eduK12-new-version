@@ -5,7 +5,7 @@ import {assessmentContextHashMatches,decryptAssessmentContext,type AssessmentCon
 import type {ReferenceContext} from '../assessment-reference/reference'
 import {selectFrozenReferencePolicy,type VerifiedReferenceForSelection} from '../measurement-content/reference-policy'
 import type {StoredRelease} from '../measurement-content/repository'
-import {trainingContentSnapshotSchema} from './training-content-binding'
+import {trainingContentAttemptBindingSchema} from './training-content-binding'
 import {trainingReferenceKindSchema,trainingReferenceFail,validateTrainingReferenceRelease} from './training-reference-selection'
 const text=z.string().min(1).max(240),hash=z.string().regex(/^[a-f0-9]{64}$/)
 const slotBase={metricKey:text,referenceKind:trainingReferenceKindSchema}
@@ -15,7 +15,7 @@ export const trainingSelectedReferenceSchema=z.discriminatedUnion('status',[
 ])
 export const trainingReferenceBindingSchema=z.object({schemaVersion:z.literal(1),attemptId:text,epoch:z.number().int().positive(),
  contentBindingHash:hash,contextHash:hash.nullable(),units:z.array(z.object({itemId:text,references:z.array(trainingSelectedReferenceSchema).max(100)}).strict()).max(1000)}).strict()
-const contentBindingSchema=trainingContentSnapshotSchema.extend({attemptId:text,epoch:z.number().int().positive(),publicationHash:hash}).strict()
+const contentBindingSchema=trainingContentAttemptBindingSchema
 export type TrainingReferenceBinding=z.infer<typeof trainingReferenceBindingSchema>
 export type TrainingReferenceParent={id:string;attemptEpoch:number;compositeAssessmentId:string;trainingContentBinding:unknown;trainingContentBindingHash:string|null;
  trainingReferenceBinding?:unknown;trainingReferenceBindingHash?:string|null;contextSnapshotEncrypted?:string|null;contextSnapshotHash?:string|null}

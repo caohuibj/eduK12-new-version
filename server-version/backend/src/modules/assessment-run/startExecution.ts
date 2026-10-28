@@ -1,5 +1,6 @@
 import {assertEducationAssessmentExecutionSource} from './educationAssessmentExecution'
 import {readPrivateFormExecutionSource} from './educationPrivateFormExecution'
+import {admitCompositionStart} from './educationCompositionExecution'
 import { assertEducationLibraryExecutionSource } from './educationLibraryExecution'
 import {assertTrainingPrivateReferenceAdmissionCurrent} from '../composite/training-private-reference-use'
 import { Prisma } from '@prisma/client'
@@ -208,6 +209,8 @@ const startTransactionalComposite = async (input: {
     await assertEducationLibraryExecutionSource(tx, {executionId: input.executionId, compositeId: input.launch.runtimeTargetRef})
   }
   const educationSource=admission.assignment.resourceKey.startsWith('education-assessment:')?await assertEducationAssessmentExecutionSource(tx,{executionId:input.executionId,compositeId:input.launch.runtimeTargetRef,purpose:'NEW_START'}):undefined
+  const compositionStart=admission.assignment.resourceKey.startsWith('education-composition:')?await admitCompositionStart(tx,{
+    executionId:input.executionId,compositeId:input.launch.runtimeTargetRef,actorUserId:input.actorUserId}):undefined
   if(admission.assignment.resourceKey.startsWith('private-form:'))await readPrivateFormExecutionSource(tx,{executionId:input.executionId,compositeId:input.launch.runtimeTargetRef,actorUserId:input.actorUserId})
   const state=await tx.$queryRaw<Array<{runStatus:string}>>`
     SELECT r."status" AS "runStatus"
@@ -243,7 +246,7 @@ const startTransactionalComposite = async (input: {
     compositeAssessmentId: input.launch.runtimeTargetRef,
     respondentUserId: input.actorUserId,
     attemptIdentity: admission.attemptIdentity,
-    educationStart: educationSource?.startProof,
+    educationStart: compositionStart??educationSource?.startProof,
   })
   const changed = await tx.$executeRaw`
     UPDATE "assessment_run_executions"

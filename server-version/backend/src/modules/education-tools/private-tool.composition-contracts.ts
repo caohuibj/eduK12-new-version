@@ -48,3 +48,5 @@ export const educationCompositionPolicyBindingSchema=z.object({origin:educationC
  unitReports:z.array(z.object({blockId:id,versionId:id,contentHash:hash,respondent:resultAudiencePolicySchema}).strict()).max(50),
 }).strict()
 export type EducationCompositionPolicyBinding=z.infer<typeof educationCompositionPolicyBindingSchema>
+export const educationCompositionRuntimeAnchorSchema=educationCompositionPolicyBindingSchema.pick({origin:true,manifestHash:true})
+export type EducationCompositionRuntimeAnchor=z.infer<typeof educationCompositionRuntimeAnchorSchema>

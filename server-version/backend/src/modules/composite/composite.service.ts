@@ -1,4 +1,4 @@
-import {readVerifiedEducationStart,bindVerifiedEducationAttempt,type VerifiedEducationStart,type VerifiedEducationAttempt} from '../assessment-run/education-start-context'
+import {readVerifiedEducationStart,readVerifiedCompositionStart,bindVerifiedEducationAttempt,type VerifiedEducationStart,type VerifiedEducationAttempt} from '../assessment-run/education-start-context'
 import {resolveEducationAssessmentSituationalItems} from '../education-tools/assessment-resource.source'
 import { emptyOptionalReportRelations, OPTIONAL_REPORT_RELATION_COUNTS } from './composite-report-read-plan'
 import { lockAuthenticatedAdmission } from './authenticated-admission-lock'
@@ -2713,6 +2713,8 @@ const createAttempt = async (
 ) => {
   assertSupportedComposite(composite)
   const educationProduct=educationStart?readVerifiedEducationStart(educationStart,{tx:db,compositeId:composite.id,assignmentRef:relationalIdentity?.assignmentRef??'',respondentUserId:userId??''}):undefined
+  const educationComposition=readVerifiedCompositionStart(educationStart,{tx:db,compositeId:composite.id,
+    assignmentRef:relationalIdentity?.assignmentRef??'',respondentUserId:userId??''})
   if(educationProduct&&(composite.productKind!=='ORGANIZATION_RESOURCE'||!relationalIdentity||relationalIdentity.subjectUserId!==userId||relationalIdentity.respondentUserId!==userId))throw compositeForbidden('教育测评准入上下文不匹配')
   // Parent START and publication stop/archive serialize on the same row. Child
   // progression later consumes the already-admitted immutable runtime plan.
@@ -2726,11 +2728,13 @@ const createAttempt = async (
   let feedbackBinding: TrainingFeedbackBinding | null = null
   let persistenceBinding: { publicationIdentity: Record<string, unknown>; courseId: string; roundId: string | null; cutoffs: Array<Date | null> } | null = null
   if(composite.items.some((item:any)=>item.formPolicy!=null) && (composite.productKind!=='QUESTIONNAIRE' || composite.deliveryMode==='LEGACY' || relationalIdentity || composite.reportPackageKey || composite.analysisProtocolKey)) {
-    if(composite.productKind!=='ORGANIZATION_RESOURCE'||!composite.creationKey?.startsWith('private-form:')||!relationalIdentity||!userId
+    if(composite.productKind!=='ORGANIZATION_RESOURCE'||!(educationComposition||composite.creationKey?.startsWith('private-form:'))||!relationalIdentity||!userId
       ||composite.deliveryMode==='LEGACY'||composite.reportPackageKey||composite.analysisProtocolKey)
       throw compositeBadRequest('Form V3 只支持普通问卷的统一 FINAL 运行时')
-    const {readPrivateFormExecutionSource}=await import('../assessment-run/educationPrivateFormExecution')
-    await readPrivateFormExecutionSource(db as Prisma.TransactionClient,{assignmentRef:relationalIdentity.assignmentRef,compositeId:composite.id,actorUserId:userId})
+    if(!educationComposition){
+      const {readPrivateFormExecutionSource}=await import('../assessment-run/educationPrivateFormExecution')
+      await readPrivateFormExecutionSource(db as Prisma.TransactionClient,{assignmentRef:relationalIdentity.assignmentRef,compositeId:composite.id,actorUserId:userId})
+    }
   }
   if (['QUESTIONNAIRE', 'ASSESSMENT_BUNDLE'].includes(composite.productKind)) {
     // A shared publication lock still fences archive, while independent
@@ -2930,7 +2934,7 @@ const createAttempt = async (
   const contentCandidate=await prepareTrainingContentAttemptBinding(db as Prisma.TransactionClient,{
     compositeId:composite.id,attemptId:newAttemptId,epoch:attemptEpoch,
     snapshot:composite.trainingContentSnapshot,snapshotHash:composite.trainingContentSnapshotHash,
-    composite,resolvedSituational:situationalReleases,
+    composite,resolvedSituational:situationalReleases,educationComposition,
   })
   let variantAllocation: ReturnType<typeof createWeightedVariantAllocation> | null = null
   if (variantEnabled) {
@@ -3036,6 +3040,7 @@ const createAttempt = async (
   if (finalOnly) {
     const frozenActiveSlotSet = freezeCompositeActiveSlotSet({
       attemptEpoch,
+      unitOrder:contentCandidate&&'educationUnitOrder' in contentCandidate?contentCandidate.educationUnitOrder:undefined,
       scales: runtime.scales,
       cognitive: runtime.cognitive,
       situational: runtime.situational,
@@ -3917,7 +3922,11 @@ const getUnifiedCompositeAttemptState = async (
       .filter((item: any) => item.type !== 'FORM' && item.required)
       .map((item: any) => ({ id: item.id, type: item.type, position: item.position, required: item.required, item })),
     ...sections.map((section: any) => ({ id: section.id, type: 'FORM_SECTION', position: section.position, required: true, section })),
-  ].sort((left: any, right: any) => left.position - right.position || left.id.localeCompare(right.id))
+  ].sort((left: any, right: any) => {
+    const key=(unit:any)=>unit.type==='FORM_SECTION'?formSectionSlotKey(unit.id):compositeItemSlotKey(unit.id,unit.type)
+    const l=slotsByKey.get(key(left))?.sourceBinding.educationOrder,r=slotsByKey.get(key(right))?.sourceBinding.educationOrder
+    return typeof l==='number'&&typeof r==='number'?l-r:left.position-right.position||left.id.localeCompare(right.id)
+  })
   const unitCompleted = (unit: any) => unit.type === 'FORM_SECTION'
     ? completedSlot(formSectionSlotKey(unit.id))
     : completedItem(unit.item)

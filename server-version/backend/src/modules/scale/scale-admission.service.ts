@@ -60,7 +60,9 @@ export const UNIFIED_SCALE_CHILD_ADMISSION_SELECT = {
   questionnaireAssessmentId: true,
   compositeAttemptId: true,
   compositeItemId: true,
-  compositeAttempt: { select: TRAINING_VARIANT_PARENT_MARKER_SELECT },
+  compositeAttempt: { select: {...TRAINING_VARIANT_PARENT_MARKER_SELECT,compositeAssessment:{select:{
+    ...TRAINING_VARIANT_PARENT_MARKER_SELECT.compositeAssessment.select,creationKey:true,
+  }}} },
   scaleId: true,
   subjectUserId: true,
   respondentUserId: true,

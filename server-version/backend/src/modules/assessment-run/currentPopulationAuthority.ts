@@ -1,4 +1,5 @@
 import {privateFormTrackIdentitySql} from './educationPrivateFormIdentitySql'
+import {educationCompositionTrackIdentitySql} from './educationCompositionIdentitySql'
 import {privateScaleRegistryIdentitySql} from './educationPrivateScaleIdentitySql'
 import { Prisma } from '@prisma/client'
 import { currentRunActorAuthoritySql, currentWindowSql, type RunAuthorityPurpose } from './currentActorAuthority'
@@ -90,6 +91,10 @@ export const currentRunPopulationAuthoritySql = (executionId: Prisma.Sql, purpos
         (relation.relationship_kind='SELF'
         AND subject.actor_role='TEACHER' AND respondent.actor_role='TEACHER'
         AND subject.user_id=respondent.user_id
+        AND NOT EXISTS(SELECT 1 FROM assessment_run_tracks ordinary_track WHERE ordinary_track.id=x.track_id
+         AND ordinary_track.organization_id=x.organization_id AND ordinary_track.run_id=x.run_id
+         AND ordinary_track.resource_key LIKE 'education-composition:%'
+         AND NOT ${educationCompositionTrackIdentitySql({track:Prisma.sql`ordinary_track`,organizationId:Prisma.sql`org.id`,product:'TEACHER'})})
         AND NOT EXISTS(SELECT 1 FROM assessment_run_tracks private_form_track
           WHERE private_form_track.id=x.track_id AND private_form_track.organization_id=x.organization_id
            AND private_form_track.run_id=x.run_id AND private_form_track.resource_key LIKE 'private-form:%'

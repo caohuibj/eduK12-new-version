@@ -1,4 +1,5 @@
 import {ContentAuthorityError} from '../measurement-content/content-authority'
+import {readTeacherOrdinaryFeedback} from '../reporting/education-ordinary-feedback.service'
 import {Router,type Request,type Response,type NextFunction,type RequestHandler} from 'express'
 import {z,ZodError} from 'zod'
 import {prisma} from '../../config/database'
@@ -77,7 +78,7 @@ export function createTeacherAssessmentRuntimeRouter<Identity extends TeacherSou
  // Authentication itself validates the HUITEACHER credential audience; this
  // separate current-account check prevents an accidental non-Teacher mount.
  router.use(['/my-assessment-tasks','/run-executions/:executionId/assessment-consent/accept',
-  '/run-executions/:executionId/start-assessment','/assessment-composite-attempts/:attemptId'],authenticateHuiteacher,(req,res,next)=>{
+  '/run-executions/:executionId/start-assessment','/run-executions/:executionId/feedback','/assessment-composite-attempts/:attemptId'],authenticateHuiteacher,(req,res,next)=>{
   if(req.user?.accountDomain!=='SCHOOL'||!['TEACHER','ADMIN'].includes(req.user.role))
    return runtimeError(new TeacherAssessmentRuntimeError(),res,next)
   next()
@@ -102,6 +103,10 @@ export function createTeacherAssessmentRuntimeRouter<Identity extends TeacherSou
   }).then(()=>next()).catch(error=>runtimeError(error,res,next))
  }
  router.get('/my-assessment-tasks',wrapped(req=>access.page(req.user!.userId,req.query)))
+ router.get('/run-executions/:executionId/feedback',wrapped(req=>{
+  if(Object.keys(req.query).length)throw new TeacherAssessmentRuntimeError()
+  return readTeacherOrdinaryFeedback({executionId:uuid.parse(req.params.executionId),actorUserId:req.user!.userId})
+ }))
  router.post('/run-executions/:executionId/assessment-consent/accept',wrapped(async req=>{
   const executionId=uuid.parse(req.params.executionId),proof=await access.own(req.user!.userId,{executionId})
   if(proof.task.status!=='ASSIGNED'||!proof.task.consentRequired)throw new TeacherAssessmentRuntimeError()
