@@ -1,0 +1,23 @@
+{
+  "instrument": "Children's Automatic Thoughts Scale (CATS), 40-item child report",
+  "item_count": 40,
+  "options": [0, 1, 2, 3, 4],
+  "dimensions": {
+    "physical_threat": [4, 7, 9, 12, 16, 20, 24, 33, 36, 39],
+    "social_threat": [1, 6, 8, 14, 18, 21, 25, 29, 31, 32],
+    "personal_failure": [3, 11, 13, 17, 23, 26, 28, 30, 34, 38],
+    "hostile_intent": [2, 5, 10, 15, 19, 22, 27, 35, 37, 40]
+  },
+  "reverse_items": [],
+  "sum_ranges": {
+    "physical_threat": [0, 40],
+    "social_threat": [0, 40],
+    "personal_failure": [0, 40],
+    "hostile_intent": [0, 40],
+    "total": [0, 160]
+  },
+  "mean_range": [0, 4],
+  "missing_policy": "complete required per score, otherwise null; product convention",
+  "thresholds": null,
+  "source_note": "Subscale keys per the official 'Instructions for Scoring CATS' distributed with the form (Centre for Emotional Health, Macquarie University). Official clinical cut-offs printed on that sheet (Physical >=16, Social >=20, Personal Failure >=18, Hostile Intent >=23, Total >=70) are recorded here for research reference only and are NOT applied in product feedback: no bands, labels or risk tiers are derived from scores. Each subscale 0-40; total = sum of all 40 items (0-160)."
+}
