@@ -619,3 +619,24 @@ export type SeqlearnTrialPayload = {
   rtMs: number | null
   interrupted: boolean
 }
+
+/** Timecopy 冻结 config（与后端 timecopy.config schema 一致）。 */
+export interface TimecopyConfig {
+  totalTrials: number
+  targetMinMs: number
+  targetMaxMs: number
+  maxResponseMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+/** Timecopy 单 trial payload（与后端 timecopy.trial schema 一致）。 */
+export type TimecopyTrialPayload = {
+  targetMs: number
+  responseMs: number
+  interrupted: boolean
+}

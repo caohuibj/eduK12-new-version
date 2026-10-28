@@ -251,6 +251,12 @@ const SCORING_DECLARATIONS: Record<string, CognitiveScoringContractDeclaration> 
     runtimeReconstructableFacts: ['冻结重复序列与随机块位置（config）', '模式块位置（由序列权威推导）'],
     serverDerivedFacts: ['模式块位置校验与正确性', 'metrics（srtPatternAdvantageMs/条件RT）', 'quality flags'],
   },
+  timecopy: {
+    testType: 'timecopy',
+    clientObservedFacts: ['复制起止按键时长', 'interrupted'],
+    runtimeReconstructableFacts: ['目标间隔（seed/config 分层序列）', '复制时长上限（frozen config）'],
+    serverDerivedFacts: ['相对误差与方向偏差', 'metrics（meanAbsErrorRatio/biasRatio/withinTwentyRate）', 'quality flags'],
+  },
 }
 
 // 当前通用事实（所有任务一致）：完整加密 trial payload、v2 trial envelope qualityEvents、
@@ -431,6 +437,11 @@ const RESEARCH_CAPTURE_DECLARATIONS: Record<string, CognitiveResearchCaptureDecl
     testType: 'seqlearn',
     currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次响应与 raw RT'],
     futureCaptureFacts: ['显性觉察自评', '真实 input modality', 'device provenance'],
+  },
+  timecopy: {
+    testType: 'timecopy',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次复制时长'],
+    futureCaptureFacts: ['策略自评（默数/节律）', 'device provenance', 'viewport/dpr'],
   },
 }
 

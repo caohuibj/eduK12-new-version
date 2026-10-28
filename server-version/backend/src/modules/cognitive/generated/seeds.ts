@@ -34,6 +34,7 @@ import { seeds as task31 } from '../tasks/runningspan/seeds'
 import { seeds as task32 } from '../tasks/sentencecheck/seeds'
 import { seeds as task33 } from '../tasks/lineangle/seeds'
 import { seeds as task34 } from '../tasks/seqlearn/seeds'
+import { seeds as task35 } from '../tasks/timecopy/seeds'
 export const cognitiveSeeds = [
   task0[0],
   task1[0],
@@ -73,5 +74,6 @@ export const cognitiveSeeds = [
   task32[0],
   task33[0],
   task34[0],
+  task35[0],
   task21[1],
 ]
