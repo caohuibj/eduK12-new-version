@@ -1,0 +1,213 @@
+{
+  "identity": "brcs4_zh_cn_research:1.0.0",
+  "sourceCommit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "sourceFiles": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/brcs4_zh_cn_research/1.0.0/source.json",
+      "gitBlob": "2875ba303bc65abe15a6ef4a239d37502bab5f8b",
+      "sha256": "68ae0f92da27333ee9b6b9f62bab7e4a98b6e2853910f8ad9fb9fafe2c972a66"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/brcs4_zh_cn_research/1.0.0/instrument.ts",
+      "gitBlob": "0eed070bb879576339c5a71afdf34c0026591fd3",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/brcs4_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+      "gitBlob": "056c853e8b0136ef684b230ddc50b7d4611fe0c4",
+      "sha256": "177be711c4ef5f98700f1dcebb1a0814609981117134a0665be7e2b20cc9a40f"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/brcs4/1.0.0/README.md",
+      "gitBlob": "6dee792da009af7d46ef71ec16c7ccd873fe9564",
+      "sha256": "207d1502d6fc1bd1e3c9aa84343ac0aa1eac8e25f9f4c62e9911204695ae9e67"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/brcs4/1.0.0/administration.md",
+      "gitBlob": "3c875c6392e59be1d2c1eea434735988409a9a9e",
+      "sha256": "e996bd19aedc49c6dc1a9e5938abd2d755d1bef2c06e5ce68d92ec20b2819b48"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/brcs4/1.0.0/bilingual-content.json",
+      "gitBlob": "bc2f293fc006557fd0ba63b0f1dd05f95347ca37",
+      "sha256": "705d246d0c52f762e0335d72d6ddb1a1e93ac59d7e4ab1feb7cfdc27f17467bd"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/brcs4/1.0.0/instruction.for-pr356.json",
+      "gitBlob": "bcabef24e591f65e588fbcf6b4e5e09ed18c79b5",
+      "sha256": "1699553aa894eac0e267b6026a8b0d29da7b9a7e883f2c3970ae1165423d7773"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/brcs4/1.0.0/references.md",
+      "gitBlob": "78ba152f82b96c9dd08fec06790e22b2a5347ae8",
+      "sha256": "306c078b8501f51767af127c74fc68673ae22c859555f0281f2955e1d1b02a1f"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/brcs4/1.0.0/report-example.md",
+      "gitBlob": "796083d3faa265a1934c431c2ae22501583ecfbe",
+      "sha256": "c5972c9dbb46a2a4eaf8bbad0f2ed337a003a0545dcaf007ed249cb1907c11c4"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/brcs4/1.0.0/report-result.synthetic.json",
+      "gitBlob": "4b19e33e5b4ac801e66a05d7435af6444b02d9c9",
+      "sha256": "47d7461a984cb0186943d6523d01ed09e486b5970c3035bb95155c14e5919fee"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/brcs4/1.0.0/scoring-and-parameters.md",
+      "gitBlob": "3895442a78359d5acd8c511553021a2e5f4c2292",
+      "sha256": "59969fd03347f94862802254cba2700017271dea3983952d8832143ec95c1ee7"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/brcs4/1.0.0/source-verification.json",
+      "gitBlob": "1f95aacc95deaf3c17bf8d78d79e4ae6c346984f",
+      "sha256": "94bc9b9468d3f5c71338b1a632954a4917d33eab1128a3d3b5ee578fae19ee64"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/brcs4/1.0.0/take-home-message.md",
+      "gitBlob": "656705d2025d474606b0193705c398b2474ea135",
+      "sha256": "4e1417823a36fd1408ae96d83458fada46495607ce84a7185127fb608d3eba4a"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/brcs4/1.0.0/validation.json",
+      "gitBlob": "ee7660eba334fe47684fcb99779364c75e935629",
+      "sha256": "bf99d9d019b13d1f779f1692c764d53b88732cd83d3807e5fbc4015d3dfd6936"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/brcs4/1.0.0/validation.md",
+      "gitBlob": "7a5848b7c65f0f51c8d3b59cc012188cb560d828",
+      "sha256": "44ceceb566070d6ae30f31ec1de5c79b6b1f030a8e370a9184247bd148abb3ab"
+    }
+  ],
+  "threePartConclusions": {
+    "content": "四题与2017论文同序英文及双语材料一致，中文基本对应；第2题控制自己反应，第3题保留相信成长，第4题 replace losses 译为弥补，均不扩张为客观能力。该版本是独立中文五点编排，仅端点文字，中间为数字；不同于2016附录删中间档的四点，且不宣称已取得2004精确题本。",
+    "scoring": "单一总分，4题均正向且权重1，1–5求和为4–20；没有平均分及缺失分母。complete_required为项目选择，不是原作者已验证缺失规则；缺任一不出总分和解释。referencePolicy none，无本中文稿适用经验阈值、常模和排名，12仅算术中点。2017德国常模是真实他国样本资料，不适用于该独立中文稿。",
+    "report": "report 1.0.0关注自述应对做法及处境资源，说明休息与求助的价值，温和地建议收集信息、尝试办法或找人商量；不迫使从损失中积极成长，不作诊断、韧性等级或能力判断。成人自评，student为技术受众；内容、计分、本地化、报告均1.0.0。"
+  },
+  "items": [
+    {
+      "itemCode": "BRCS_01",
+      "en": "I look for creative ways to alter difficult situations.",
+      "zh": "我会寻找有创意的办法来改变困难的处境。",
+      "key": "positive",
+      "weight": 1,
+      "assessment": "与2017原文同序及固定运行时一致，中文基本表达原意；翻译待人工审校。",
+      "note": "creative保留创造性办法，不改成“我总能解决”。"
+    },
+    {
+      "itemCode": "BRCS_02",
+      "en": "Regardless of what happens to me, I believe I can control my reaction to it.",
+      "zh": "无论遇到什么事，我相信自己能够控制对这件事的反应。",
+      "key": "positive",
+      "weight": 1,
+      "assessment": "与2017原文同序及固定运行时一致，中文基本表达原意；翻译待人工审校。",
+      "note": "control修饰自身反应，不改写成控制外界结果。"
+    },
+    {
+      "itemCode": "BRCS_03",
+      "en": "I believe that I can grow in positive ways by dealing with difficult situations.",
+      "zh": "我相信，通过应对困难的处境，我能获得积极的成长。",
+      "key": "positive",
+      "weight": 1,
+      "assessment": "与2017原文同序及固定运行时一致，中文基本表达原意；翻译待人工审校。",
+      "note": "grow不暗示必须从苦难获益；that保留在英文追溯文本。"
+    },
+    {
+      "itemCode": "BRCS_04",
+      "en": "I actively look for ways to replace the losses I encounter in life.",
+      "zh": "面对生活中遇到的损失，我会积极寻找办法来作出弥补。",
+      "key": "positive",
+      "weight": 1,
+      "assessment": "与2017原文同序及固定运行时一致，中文基本表达原意；翻译待人工审校。",
+      "note": "replace losses译为弥补损失，不理解成抹去经历或要求马上恢复。"
+    }
+  ],
+  "anchors": [
+    {
+      "value": "1",
+      "label": "完全不符合我",
+      "score": 1
+    },
+    {
+      "value": "2",
+      "label": "2",
+      "score": 2
+    },
+    {
+      "value": "3",
+      "label": "3",
+      "score": 3
+    },
+    {
+      "value": "4",
+      "label": "4",
+      "score": 4
+    },
+    {
+      "value": "5",
+      "label": "非常符合我",
+      "score": 5
+    }
+  ],
+  "instruction": {
+    "text": "请想一想自己通常面对困难时的行为和做法，再判断下面的说法有多符合自己。选项从1（完全不符合我）到5（非常符合我），2、3、4表示两端之间逐渐增加的符合程度。请根据自己的实际情况作答，没有对错。",
+    "sources": [
+      {
+        "file": {
+          "path": "docs/scale-instruments/research-drafts/brcs4/1.0.0/bilingual-content.json",
+          "gitBlob": "bc2f293fc006557fd0ba63b0f1dd05f95347ca37",
+          "sha256": "705d246d0c52f762e0335d72d6ddb1a1e93ac59d7e4ab1feb7cfdc27f17467bd"
+        },
+        "field": "platformChineseInstruction"
+      },
+      {
+        "file": {
+          "path": "docs/scale-instruments/research-drafts/brcs4/1.0.0/instruction.for-pr356.json",
+          "gitBlob": "bcabef24e591f65e588fbcf6b4e5e09ed18c79b5",
+          "sha256": "1699553aa894eac0e267b6026a8b0d29da7b9a7e883f2c3970ae1165423d7773"
+        },
+        "field": "instruction.text"
+      },
+      {
+        "file": {
+          "path": "docs/scale-instruments/research-drafts/brcs4/1.0.0/administration.md",
+          "gitBlob": "3c875c6392e59be1d2c1eea434735988409a9a9e",
+          "sha256": "e996bd19aedc49c6dc1a9e5938abd2d755d1bef2c06e5ce68d92ec20b2819b48"
+        },
+        "field": "正文第1段"
+      }
+    ],
+    "preparedStatus": "PREPARED_NOT_RUNTIME_CONNECTED；平台独立译写，非英文逐字译本。",
+    "proposedBinding": {
+      "schemaVersion": 1,
+      "text": "请想一想自己通常面对困难时的行为和做法，再判断下面的说法有多符合自己。选项从1（完全不符合我）到5（非常符合我），2、3、4表示两端之间逐渐增加的符合程度。请根据自己的实际情况作答，没有对错。",
+      "language": "zh-CN",
+      "version": "1.0.0",
+      "source": "docs/scale-instruments/research-drafts/brcs4/1.0.0/instruction.for-pr356.json#instruction.text"
+    },
+    "qualification": "文本和版本来自预备指导语，连接现有字段前不得声称已投影；不塞入题1。"
+  },
+  "sources": [
+    {
+      "url": "https://doi.org/10.1186/s12955-017-0822-6",
+      "finding": "原始论文列四题、1–5两端、4–20总分；德国群体统计不能迁移为本译本常模。"
+    },
+    {
+      "url": "https://doi.org/10.1186/s12955-016-0534-3",
+      "finding": "固定研究包记载作者共同发表开放论文附录题文及删中档改编；本文本任务不将该四点参数赋给五点稿。"
+    }
+  ],
+  "minimalCorrections": [
+    "无必须修正的明确题目、计分或报告问题；现有报告无需形式重写。",
+    "可选清理 report.audienceContract.qcReview.basis 中连续中文标点“。；”为“；”，属于普通错字；按既有报告轴和快照规则处理，不虚构审校。"
+  ],
+  "manualPending": [
+    "独立译审、认知访谈与目标人群验证 PENDING；受众保守成人自评，不能据德国或其他中文版本统计认定本稿已验证。",
+    "2016与本包响应形式不同；若调整题意、锚点、计分或阈值，列原始依据、受影响版本和解释边界交 root 协调，不静默更改成熟版。",
+    "现有来源记录许可和署名/改编要求予以保留；不添加版权或审批声明。"
+  ],
+  "recommendation": "保留现有题目与报告；可接入已准备指导语。保留研究状态和四点来源/五点独立编排差异。",
+  "notExecuted": [
+    "未运行golden、计分、系统、截图、四入口、安装、DB或CI；未编辑共享仓库。",
+    "历史测试与合成报告只是固定来源既存证据，不声称本次执行或新审核。"
+  ]
+}

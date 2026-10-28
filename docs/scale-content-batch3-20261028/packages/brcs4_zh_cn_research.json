@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 1,
+  "sourceSHA": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "sourceKey": "brcs4_zh_cn_research",
+  "originalVersion": "1.0.0",
+  "preparedVersion": "1.0.0",
+  "originalSource": "server-version/backend/src/modules/scale/instruments/brcs4_zh_cn_research/1.0.0/source.json",
+  "preparedSource": "server-version/backend/src/modules/scale/instruments/brcs4_zh_cn_research/1.0.0/source.json",
+  "originalSourceSHA256": "68ae0f92da27333ee9b6b9f62bab7e4a98b6e2853910f8ad9fb9fafe2c972a66",
+  "preparedSourceSHA256": "2f371fcf26aa89d3bbbdff6fa8ee987cc54715375df27fee89b38a024aab45d9",
+  "originalFiles": [
+    {
+      "path": "docs/scale-instruments/research-drafts/brcs4/1.0.0/README.md",
+      "blob": "6dee792da009af7d46ef71ec16c7ccd873fe9564",
+      "sha256": "207d1502d6fc1bd1e3c9aa84343ac0aa1eac8e25f9f4c62e9911204695ae9e67"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/brcs4/1.0.0/administration.md",
+      "blob": "3c875c6392e59be1d2c1eea434735988409a9a9e",
+      "sha256": "e996bd19aedc49c6dc1a9e5938abd2d755d1bef2c06e5ce68d92ec20b2819b48"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/brcs4/1.0.0/bilingual-content.json",
+      "blob": "bc2f293fc006557fd0ba63b0f1dd05f95347ca37",
+      "sha256": "705d246d0c52f762e0335d72d6ddb1a1e93ac59d7e4ab1feb7cfdc27f17467bd"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/brcs4/1.0.0/instruction.for-pr356.json",
+      "blob": "bcabef24e591f65e588fbcf6b4e5e09ed18c79b5",
+      "sha256": "1699553aa894eac0e267b6026a8b0d29da7b9a7e883f2c3970ae1165423d7773"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/brcs4/1.0.0/references.md",
+      "blob": "78ba152f82b96c9dd08fec06790e22b2a5347ae8",
+      "sha256": "306c078b8501f51767af127c74fc68673ae22c859555f0281f2955e1d1b02a1f"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/brcs4/1.0.0/report-example.md",
+      "blob": "796083d3faa265a1934c431c2ae22501583ecfbe",
+      "sha256": "c5972c9dbb46a2a4eaf8bbad0f2ed337a003a0545dcaf007ed249cb1907c11c4"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/brcs4/1.0.0/report-result.synthetic.json",
+      "blob": "4b19e33e5b4ac801e66a05d7435af6444b02d9c9",
+      "sha256": "47d7461a984cb0186943d6523d01ed09e486b5970c3035bb95155c14e5919fee"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/brcs4/1.0.0/scoring-and-parameters.md",
+      "blob": "3895442a78359d5acd8c511553021a2e5f4c2292",
+      "sha256": "59969fd03347f94862802254cba2700017271dea3983952d8832143ec95c1ee7"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/brcs4/1.0.0/source-verification.json",
+      "blob": "1f95aacc95deaf3c17bf8d78d79e4ae6c346984f",
+      "sha256": "94bc9b9468d3f5c71338b1a632954a4917d33eab1128a3d3b5ee578fae19ee64"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/brcs4/1.0.0/take-home-message.md",
+      "blob": "656705d2025d474606b0193705c398b2474ea135",
+      "sha256": "4e1417823a36fd1408ae96d83458fada46495607ce84a7185127fb608d3eba4a"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/brcs4/1.0.0/validation.json",
+      "blob": "ee7660eba334fe47684fcb99779364c75e935629",
+      "sha256": "bf99d9d019b13d1f779f1692c764d53b88732cd83d3807e5fbc4015d3dfd6936"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/brcs4/1.0.0/validation.md",
+      "blob": "7a5848b7c65f0f51c8d3b59cc012188cb560d828",
+      "sha256": "44ceceb566070d6ae30f31ec1de5c79b6b1f030a8e370a9184247bd148abb3ab"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/brcs4_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+      "blob": "056c853e8b0136ef684b230ddc50b7d4611fe0c4",
+      "sha256": "177be711c4ef5f98700f1dcebb1a0814609981117134a0665be7e2b20cc9a40f"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/brcs4_zh_cn_research/1.0.0/instrument.ts",
+      "blob": "0eed070bb879576339c5a71afdf34c0026591fd3",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/brcs4_zh_cn_research/1.0.0/source.json",
+      "blob": "2875ba303bc65abe15a6ef4a239d37502bab5f8b",
+      "sha256": "68ae0f92da27333ee9b6b9f62bab7e4a98b6e2853910f8ad9fb9fafe2c972a66"
+    }
+  ],
+  "jsonChanges": [
+    {
+      "op": "replace",
+      "path": "/executable/releaseStatus",
+      "from": "DRAFT",
+      "value": "PUBLISHED"
+    },
+    {
+      "op": "add",
+      "path": "/instruction",
+      "value": {
+        "schemaVersion": 1,
+        "text": "请想一想自己通常面对困难时的行为和做法，再判断下面的说法有多符合自己。选项从1（完全不符合我）到5（非常符合我），2、3、4表示两端之间逐渐增加的符合程度。请根据自己的实际情况作答，没有对错。",
+        "language": "zh-CN",
+        "version": "1.0.0",
+        "source": "docs/scale-instruments/research-drafts/brcs4/1.0.0/instruction.for-pr356.json#instruction.text @ b92c69aefa2472775fa7ee86b9c208366886c908 (项目工作稿；非人工审批声明)"
+      }
+    }
+  ],
+  "audit": "audits/audit-brcs4-batch3.json",
+  "versions": {
+    "instrument": "1.0.0",
+    "scoring": "1.0.0",
+    "report": "1.0.0",
+    "localization": "1.0.0",
+    "instruction": "1.0.0"
+  },
+  "states": {
+    "sourceRelease": "PUBLISHED candidate, independent integration pending",
+    "catalog": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "translation": "PENDING",
+    "scientificReview": null,
+    "databaseInstall": "NOT_EXECUTED",
+    "databasePublish": "NOT_EXECUTED",
+    "production": "NOT_TOUCHED"
+  },
+  "versionReason": "Existing prepared instruction bound outside definition; measurement/formula/report unchanged."
+}
