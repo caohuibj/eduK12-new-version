@@ -69,26 +69,30 @@ export async function assertCompositionCollection(tx:Tx,identity:FrozenCompositi
  * does not repeat that query or confer those rights. */
 export async function readCompositionExecutionSource(tx:Tx,input:{executionId?:string;assignmentRef?:string;actorUserId?:string;compositeId?:string;parentAttemptId?:string}){
  const [row]=await tx.$queryRaw<Array<{executionId:string;organizationId:string;key:string;version:string;policy:RunResourcePolicy;policyHash:string;
-  assignmentRef:string;subjectUserId:string;respondentUserId:string;bindingKind:string|null;bindingRef:string|null;status:string;runStatus:string;assignmentStatus:string}>>(Prisma.sql`
+  assignmentRef:string;subjectUserId:string;respondentUserId:string;bindingKind:string|null;bindingRef:string|null;status:string;runStatus:string;assignmentStatus:string;product:'SCHOOL'|'TEACHER'}>>(Prisma.sql`
   SELECT e.id AS "executionId",e.organization_id AS "organizationId",t.resource_key AS key,t.resource_version AS version,
    t.frozen_resource_policy AS policy,t.resource_policy_hash AS "policyHash",a.id AS "assignmentRef",a.subject_user_id AS "subjectUserId",
    a.respondent_user_id AS "respondentUserId",e.runtime_binding_kind AS "bindingKind",e.runtime_binding_ref AS "bindingRef",e.status,
-   r.status AS "runStatus",a.status AS "assignmentStatus"
+   r.status AS "runStatus",a.status AS "assignmentStatus",CASE WHEN school.run_id IS NOT NULL THEN 'SCHOOL' ELSE 'TEACHER' END AS product
   FROM assessment_run_executions e JOIN assessment_runs r ON r.id=e.run_id AND r.organization_id=e.organization_id
   JOIN assessment_run_tracks t ON t.id=e.track_id AND t.run_id=e.run_id AND t.organization_id=e.organization_id
   JOIN relational_assessment_assignments a ON a.id=e.relational_assignment_id AND a.policy_domain='ORGANIZATION_RUN'
    AND a.resource_kind=t.resource_family AND a.resource_key=t.resource_key AND a.resource_version=t.resource_version
-   AND a.subject_user_id=a.respondent_user_id AND a.subject_role='TEACHER' AND a.respondent_role='TEACHER'
+   AND a.subject_user_id=a.respondent_user_id
    AND a.relationship_kind='SELF' AND a.perspective='SELF_REPORT' AND a.analysis_mode='INDIVIDUAL_ONLY'
-  JOIN huiteacher_evaluation_run_links link ON link.organization_id=e.organization_id AND link.run_id=e.run_id
+  LEFT JOIN huiteacher_evaluation_run_links teacher ON teacher.organization_id=e.organization_id AND teacher.run_id=e.run_id
+  LEFT JOIN campus_activity_runs school ON school.organization_id=e.organization_id AND school.run_id=e.run_id
   WHERE ${input.executionId?Prisma.sql`e.id=${input.executionId}`:Prisma.sql`a.id=${input.assignmentRef??''}`}
-   AND t.resource_family='BUNDLE' AND t.resource_key LIKE 'education-composition:TEACHER:%'
-   AND NOT EXISTS(SELECT 1 FROM campus_activity_runs school WHERE school.organization_id=e.organization_id AND school.run_id=e.run_id)`)
+   AND t.resource_family='BUNDLE'
+   AND ((school.run_id IS NOT NULL AND teacher.run_id IS NULL AND a.subject_role='STUDENT' AND a.respondent_role='STUDENT'
+     AND t.resource_key LIKE 'education-composition:SCHOOL:%')
+    OR (teacher.run_id IS NOT NULL AND school.run_id IS NULL AND a.subject_role='TEACHER' AND a.respondent_role='TEACHER'
+     AND t.resource_key LIKE 'education-composition:TEACHER:%'))`)
  if(!row||!['PUBLISHED','CLOSED'].includes(row.runStatus)||!['ASSIGNED','STARTED','COMPLETED'].includes(row.status)
   ||!['OPEN','STARTED','COMPLETED'].includes(row.assignmentStatus)||(input.actorUserId!==undefined&&input.actorUserId!==row.respondentUserId))
   privateToolFail('PRIVATE_COMPOSITION_EXECUTION_INVALID')
  const identity=await readFrozenCompositionIdentity(tx,row)
- if(identity.origin.entry!=='TEACHER'||input.compositeId!==undefined&&identity.compositeId!==input.compositeId)
+ if(identity.origin.entry!==row.product||input.compositeId!==undefined&&identity.compositeId!==input.compositeId)
   privateToolFail('PRIVATE_COMPOSITION_EXECUTION_INVALID')
  if(input.parentAttemptId!==undefined){
   const parent=await tx.compositeAssessmentAttempt.findUnique({where:{id:input.parentAttemptId},select:{userId:true,subjectUserId:true,respondentUserId:true,assignmentRef:true,compositeAssessmentId:true}})
@@ -101,7 +105,7 @@ export async function readCompositionExecutionSource(tx:Tx,input:{executionId?:s
 export async function admitCompositionStart(tx:Tx,input:{executionId:string;compositeId:string;actorUserId:string}){
  const source=await readCompositionExecutionSource(tx,input)
  await assertCompositionCollection(tx,source.identity,'NEW_START',true)
- return issueVerifiedEducationStart({tx,product:'TEACHER',compositeId:source.identity.compositeId,assignmentRef:source.assignmentRef,
+ return issueVerifiedEducationStart({tx,product:source.product,compositeId:source.identity.compositeId,assignmentRef:source.assignmentRef,
   respondentUserId:source.respondentUserId,composition:source.identity.binding})
 }
 

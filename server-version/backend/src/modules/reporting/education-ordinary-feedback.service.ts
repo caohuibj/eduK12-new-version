@@ -10,7 +10,9 @@ import {reportingFail} from './types'
 
 function hidden():never{return reportingFail('REPORT_NOT_FOUND','reporting resource not found',404)}
 type Input={executionId:string;actorUserId:string}
-async function readOwn(tx:Prisma.TransactionClient,input:Input){
+type ScopedInput=Input&{entry:'SCHOOL'|'TEACHER'}
+async function readOwn(tx:Prisma.TransactionClient,input:ScopedInput){
+ const population=input.entry==='SCHOOL'?'STUDENT':'TEACHER'
  const [row]=await tx.$queryRaw<Array<{organizationId:string;key:string;version:string;policy:RunResourcePolicy;policyHash:string;status:string;
   parentId:string|null;parentStatus:string|null;attemptEpoch:number|null;contextSnapshotHash:string|null;frozenSlots:string|null;frozenSlotsHash:string|null}>>(Prisma.sql`
   SELECT e.organization_id AS "organizationId",t.resource_key AS key,t.resource_version AS version,t.frozen_resource_policy AS policy,
@@ -18,16 +20,14 @@ async function readOwn(tx:Prisma.TransactionClient,input:Input){
    p.context_snapshot_hash AS "contextSnapshotHash",p.frozen_active_slot_set_encrypted AS "frozenSlots",p.frozen_active_slot_set_hash AS "frozenSlotsHash"
   FROM assessment_run_executions e JOIN assessment_runs r ON r.id=e.run_id AND r.organization_id=e.organization_id AND r.status IN ('PUBLISHED','CLOSED')
   JOIN assessment_run_tracks t ON t.id=e.track_id AND t.run_id=e.run_id AND t.organization_id=e.organization_id
-   AND t.resource_family='BUNDLE' AND t.resource_key LIKE 'education-composition:TEACHER:%'
-  JOIN huiteacher_evaluation_run_links link ON link.run_id=e.run_id AND link.organization_id=e.organization_id
-  JOIN huiteacher_evaluation_events event ON event.id=link.event_id AND event.organization_id=e.organization_id AND event.status IN ('OPEN','CLOSED')
+   AND t.resource_family='BUNDLE' AND t.resource_key LIKE ${'education-composition:'+input.entry+':%'}
   JOIN assessment_run_actor_snapshots subject ON subject.id=e.subject_actor_snapshot_id AND subject.organization_id=e.organization_id
-   AND subject.run_id=e.run_id AND subject.user_id=${input.actorUserId} AND subject.actor_role='TEACHER'
+   AND subject.run_id=e.run_id AND subject.user_id=${input.actorUserId} AND subject.actor_role=${population}
   JOIN assessment_run_actor_snapshots respondent ON respondent.id=e.respondent_actor_snapshot_id AND respondent.organization_id=e.organization_id
-   AND respondent.run_id=e.run_id AND respondent.user_id=${input.actorUserId} AND respondent.actor_role='TEACHER'
+   AND respondent.run_id=e.run_id AND respondent.user_id=${input.actorUserId} AND respondent.actor_role=${population}
   JOIN relational_assessment_assignments a ON a.id=e.relational_assignment_id AND a.policy_domain='ORGANIZATION_RUN'
    AND a.resource_kind=t.resource_family AND a.resource_key=t.resource_key AND a.resource_version=t.resource_version
-   AND a.subject_user_id=${input.actorUserId} AND a.respondent_user_id=${input.actorUserId} AND a.subject_role='TEACHER' AND a.respondent_role='TEACHER'
+   AND a.subject_user_id=${input.actorUserId} AND a.respondent_user_id=${input.actorUserId} AND a.subject_role=${population} AND a.respondent_role=${population}
    AND a.relationship_kind='SELF' AND a.perspective='SELF_REPORT'
   LEFT JOIN composite_assessment_attempts p ON p.id=e.runtime_binding_ref AND e.runtime_binding_kind='COMPOSITE'
    AND p.assignment_ref=a.id AND p.episode_id=a.episode_id AND p.user_id=${input.actorUserId}
@@ -36,7 +36,14 @@ async function readOwn(tx:Prisma.TransactionClient,input:Input){
    AND p.delivery_mode='FINAL_ONLY' AND p.runtime_generation='UNIFIED_V1'
   WHERE e.id=${input.executionId} AND ((e.status='COMPLETED' AND a.status='COMPLETED' AND p.status='COMPLETED')
     OR e.status IN ('ASSIGNED','STARTED') AND a.status IN ('OPEN','STARTED'))
-   AND NOT EXISTS(SELECT 1 FROM campus_activity_runs school WHERE school.organization_id=e.organization_id AND school.run_id=e.run_id)
+   AND ${input.entry==='TEACHER'?Prisma.sql`EXISTS(SELECT 1 FROM huiteacher_evaluation_run_links link
+     JOIN huiteacher_evaluation_events event ON event.id=link.event_id AND event.organization_id=link.organization_id
+      AND event.status IN ('OPEN','CLOSED') WHERE link.organization_id=e.organization_id AND link.run_id=e.run_id)
+    AND NOT EXISTS(SELECT 1 FROM campus_activity_runs school WHERE school.organization_id=e.organization_id AND school.run_id=e.run_id)`:
+    Prisma.sql`EXISTS(SELECT 1 FROM campus_activity_runs link JOIN campus_activities activity
+     ON activity.course_id=link.course_id AND activity.organization_id=link.organization_id AND activity.status IN ('OPEN','PAUSED','CLOSED')
+     WHERE link.organization_id=e.organization_id AND link.run_id=e.run_id)
+    AND NOT EXISTS(SELECT 1 FROM huiteacher_evaluation_run_links teacher WHERE teacher.organization_id=e.organization_id AND teacher.run_id=e.run_id)`}
    AND ${currentRunPopulationAuthoritySql(Prisma.sql`e.id`,'REPORT_READ')}
    AND NOT EXISTS(SELECT 1 FROM organization_access_denies deny WHERE deny.organization_id=e.organization_id AND deny.user_id=${input.actorUserId}
     AND deny.lifted_at IS NULL AND deny.permission IN ('*','REPORT_READ','PARTICIPANT_REPORT_READ'))`)
@@ -45,13 +52,15 @@ async function readOwn(tx:Prisma.TransactionClient,input:Input){
 /** Respondent report rights are independent from authorship. Read stored FINAL
  * facts once; each immutable block's own ceiling controls its native projector.
  * No overall score, Form score/norm, raw answers or internal receipt is exposed. */
-export async function readTeacherOrdinaryFeedback(input:Input){
+export const readTeacherOrdinaryFeedback=(input:Input)=>readOrdinaryFeedback({...input,entry:'TEACHER'})
+export const readSchoolOrdinaryFeedback=(input:Input)=>readOrdinaryFeedback({...input,entry:'SCHOOL'})
+async function readOrdinaryFeedback(input:ScopedInput){
  return prisma.$transaction(async tx=>{
   await tx.$executeRaw`SET LOCAL join_collapse_limit = 1`
   const own=await readOwn(tx,input)
   if(!own)hidden()
   const identity=await readFrozenCompositionIdentity(tx,own)
-  if(identity.origin.entry!=='TEACHER')hidden()
+  if(identity.origin.entry!==input.entry)hidden()
   if(own.status!=='COMPLETED')return {schemaVersion:1 as const,kind:'EDUCATION_FEEDBACK' as const,mode:'COMPOSITION' as const,state:'IN_PROGRESS' as const,title:identity.title,units:[]}
   if(!own.parentId||own.parentStatus!=='COMPLETED'||!own.attemptEpoch)hidden()
   const sources:NativeEducationFeedbackSource[]=[]

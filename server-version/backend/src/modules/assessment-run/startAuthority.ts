@@ -15,12 +15,15 @@ export const assertCurrentRunStartAuthority = async (tx: Prisma.TransactionClien
   // tracks retain the old lock even when a caller requests detection.
   const library = options?.accountMode === 'DETECT_EDUCATION_LIBRARY' ? await tx.$queryRaw<Array<{id:string;privateForm:boolean}>>`
     SELECT e.id,((t.resource_family='FORM' AND t.resource_key LIKE 'private-form:%') OR
-     t.resource_key LIKE 'education-composition:TEACHER:%') AS "privateForm" FROM assessment_run_executions e JOIN assessment_run_tracks t
+     t.resource_key LIKE 'education-composition:%') AS "privateForm" FROM assessment_run_executions e JOIN assessment_run_tracks t
       ON t.id=e.track_id AND t.organization_id=e.organization_id AND t.run_id=e.run_id
     LEFT JOIN registered_assessment_resources r ON r.resource_key=t.resource_key AND r.resource_version=t.resource_version
     WHERE e.id=${executionId} AND ((${educationCompositionTrackIdentitySql({track:Prisma.sql`t`,organizationId:Prisma.sql`e.organization_id`,product:'TEACHER'})}
       AND EXISTS(SELECT 1 FROM huiteacher_evaluation_run_links h WHERE h.organization_id=e.organization_id AND h.run_id=e.run_id)
-      AND NOT EXISTS(SELECT 1 FROM campus_activity_runs c WHERE c.organization_id=e.organization_id AND c.run_id=e.run_id)) OR EXISTS(
+      AND NOT EXISTS(SELECT 1 FROM campus_activity_runs c WHERE c.organization_id=e.organization_id AND c.run_id=e.run_id))
+      OR (${educationCompositionTrackIdentitySql({track:Prisma.sql`t`,organizationId:Prisma.sql`e.organization_id`,product:'SCHOOL'})}
+       AND EXISTS(SELECT 1 FROM campus_activity_runs c WHERE c.organization_id=e.organization_id AND c.run_id=e.run_id)
+       AND NOT EXISTS(SELECT 1 FROM huiteacher_evaluation_run_links h WHERE h.organization_id=e.organization_id AND h.run_id=e.run_id)) OR EXISTS(
       SELECT 1 FROM education_assessment_deliveries delivery
       WHERE delivery.organization_id=e.organization_id AND delivery.family=t.resource_family
        AND t.resource_version='1.0.0'

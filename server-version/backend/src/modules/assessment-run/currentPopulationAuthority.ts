@@ -189,6 +189,10 @@ export const currentRunPopulationAuthoritySql = (executionId: Prisma.Sql, purpos
    ) OR (
     NOT EXISTS(SELECT 1 FROM huiteacher_evaluation_run_links h
       WHERE h.organization_id=org.id AND h.run_id=x.run_id)
+    AND NOT EXISTS(SELECT 1 FROM assessment_run_tracks school_ordinary
+      WHERE school_ordinary.id=x.track_id AND school_ordinary.organization_id=x.organization_id
+       AND school_ordinary.run_id=x.run_id AND school_ordinary.resource_key LIKE 'education-composition:%'
+       AND NOT ${educationCompositionTrackIdentitySql({track:Prisma.sql`school_ordinary`,organizationId:Prisma.sql`org.id`,product:'SCHOOL'})})
     AND ${purpose === 'REPORT_READ' ? Prisma.sql`TRUE` : Prisma.sql`NOT EXISTS (
       SELECT 1 FROM assessment_run_tracks school_scale
       WHERE school_scale.id=x.track_id AND school_scale.organization_id=x.organization_id

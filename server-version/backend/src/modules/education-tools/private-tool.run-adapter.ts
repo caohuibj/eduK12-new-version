@@ -16,15 +16,15 @@ type PrivateRunAttachmentContext={organizationId:string;runId:string;actorUserId
 export const addPrivateScaleRunTrack=(input:PrivateRunAttachmentContext,raw:unknown)=>addPrivateToolRunTrack(input,raw,'SCALE')
 export const addPrivateFormRunTrack=(input:PrivateRunAttachmentContext,raw:unknown)=>addPrivateToolRunTrack(input,raw,'FORM')
 /** No preparation/materialization here. The repository resolves the exact
- * sealed source under the actual Teacher workflow/editor and draft CAS. */
+ * sealed source under the actual product workflow/editor and draft CAS. */
 export async function addPrivateCompositionRunTrack(input:PrivateRunAttachmentContext,raw:unknown){
  const selected=privateCompositionRunTrackInput.parse(raw)
- if(input.parent.kind!=='TEACHER_EVENT')privateToolFail('PRIVATE_COMPOSITION_TEACHER_SELF_REQUIRED',403)
+ const product=input.parent.kind==='SCHOOL_ACTIVITY'?'SCHOOL':'TEACHER',population=product==='SCHOOL'?'STUDENT':'TEACHER'
  return addAssessmentRunTrackDraft({...input,expectedVersion:selected.expectedVersion,expectedRunId:input.runId,
-  educationWorkflow:{product:'TEACHER',id:input.parent.id},privateComposition:selected.privateComposition,
-  resource:{family:'BUNDLE',key:`education-composition:TEACHER:${selected.privateComposition.versionId}:TEACHER:SELF:1.0.0`,version:'1.0.0'},
+  educationWorkflow:{product,id:input.parent.id},privateComposition:selected.privateComposition,
+  resource:{family:'BUNDLE',key:`education-composition:${product}:${selected.privateComposition.versionId}:${population}:SELF:1.0.0`,version:'1.0.0'},
   subjectSelector:selected.subjectSelector,respondentSelector:selected.respondentSelector,
-  requestedPolicy:{subjectRoles:['TEACHER'],respondentRoles:['TEACHER'],relationshipKinds:['SELF'],perspectives:['SELF_REPORT'],
+  requestedPolicy:{subjectRoles:[population],respondentRoles:[population],relationshipKinds:['SELF'],perspectives:['SELF_REPORT'],
    analysisMode:'INDIVIDUAL_ONLY',visibilityPolicyKey:'EDUCATION_PRIVATE_COMPOSITION_V1',minimumRespondents:null}})
 }
 async function addPrivateToolRunTrack(input:PrivateRunAttachmentContext,raw:unknown,kind:'SCALE'|'FORM'){
