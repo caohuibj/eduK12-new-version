@@ -1,3 +1,4 @@
+import {projectNativeContentReport} from './content-candidates/native-registry/public-report'
 import {assertCurrentStudyPrincipal} from '../anonymous-study/admission-principal'
 import { lockTrainingFlowFinalAdmission, requiresTrainingFlowFinalLock } from '../composite/training-variant-child-scope'
 import { encryptCompactCognitivePayload } from './cognitive.security'
@@ -396,6 +397,11 @@ export const submitUnifiedCognitiveSessionFinal = async (
     metricDefinitions: freeze.frozenReport?.v2MetricDefinitions ?? prepared.definition.metrics,
     qualityDefinitions: freeze.frozenReport?.v2QualityDefinitions ?? prepared.definition.quality,
   })
+  const nativeReport=projectNativeContentReport({testType:prepared.snapshot.testType,engineVersion:prepared.snapshot.engineVersion,
+    scoringVersion:prepared.snapshot.scoringVersion,configVersion:prepared.snapshot.configVersion,configHash:prepared.snapshot.configHash,
+    protocolSignature:prepared.snapshot.protocolSignature,reportDefinitionVersion:freeze.frozenReport?.reportDefinitionVersion??prepared.definition.report.version,
+    presentationVersion:freeze.frozenReport?.presentationVersion??'',profile:freeze.profile,score:scored})
+  if(nativeReport)report.nativeReport=nativeReport
   const resultSnapshot = parseCognitiveResultSnapshot({
     schemaVersion: 1,
     completedAt: new Date().toISOString(),

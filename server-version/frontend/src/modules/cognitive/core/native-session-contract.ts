@@ -1,3 +1,4 @@
+import {isNativePublicReportSnapshot} from './native-public-report'
 import type { CognitiveSession } from '../types'
 import type { FinalDraftMeta } from '../../../services/persistence/finalDraftStore'
 import type { CognitiveCoreSavedReceipt } from './runner.types'
@@ -16,6 +17,15 @@ export function assertNativeSession(session:CognitiveSession){
   throw Error('测验设置尚未准备好，请联系发布者')
  return s
 }
+function savedNativeReport(session:CognitiveSession,report:unknown){
+ const wrapper=(report as {nativeReport?:unknown}|undefined)?.nativeReport
+ if(wrapper===undefined)return {}
+ const snapshot=assertNativeSession(session)
+ if(!isNativePublicReportSnapshot(wrapper)||wrapper.testType!==session.testType||wrapper.engineVersion!==session.engineVersion||wrapper.scoringVersion!==session.scoringVersion
+  ||wrapper.state!==(report as {qualityState?:unknown}).qualityState||wrapper.configVersion!==session.configVersion||wrapper.configHash!==snapshot.configHash||wrapper.protocolSignature!==snapshot.protocolSignature||wrapper.profile!==snapshot.config.profile)
+  throw Error('已保存公开报告与冻结测验不一致')
+ return {nativeReport:structuredClone(wrapper)}
+}
 export function nativeCoreReceipt(session:CognitiveSession,meta:FinalDraftMeta,value:unknown):CognitiveCoreSavedReceipt {
  assertNativeSession(session)
  const v=value as Record<string,any>,r=v?.response??v
@@ -24,7 +34,7 @@ export function nativeCoreReceipt(session:CognitiveSession,meta:FinalDraftMeta,v
   ||v.submissionId!==meta.submissionId||v.definitionHash!==meta.definitionHash||!hex(v.payloadHash)
   ||r?.status!=='COMPLETED'||r.sessionId!==session.sessionId)throw Error('服务器尚未确认本次提交成功')
  return {coreSaved:true,sessionId:session.sessionId,attemptEpoch:session.attemptEpoch!,submissionId:meta.submissionId,
-  definitionHash:meta.definitionHash,payloadHash:v.payloadHash}
+  definitionHash:meta.definitionHash,payloadHash:v.payloadHash,...savedNativeReport(session,r.result?.report??r.report)}
 }
 export function nativeCompletedReceipt(session:CognitiveSession,meta:FinalDraftMeta):CognitiveCoreSavedReceipt {
  assertNativeSession(session)
@@ -32,5 +42,5 @@ export function nativeCompletedReceipt(session:CognitiveSession,meta:FinalDraftM
   ||session.definitionHash!==meta.definitionHash||session.submissionId!==meta.submissionId||!hex(session.submissionPayloadHash))
   throw Error('服务器尚未确认本次提交成功')
  return {coreSaved:true,sessionId:session.sessionId,attemptEpoch:meta.attemptEpoch,submissionId:meta.submissionId,
-  definitionHash:meta.definitionHash,payloadHash:session.submissionPayloadHash}
+  definitionHash:meta.definitionHash,payloadHash:session.submissionPayloadHash,...savedNativeReport(session,session.result?.report)}
 }

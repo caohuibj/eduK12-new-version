@@ -48,6 +48,7 @@ export interface CognitiveFrontendRegistryEntry {
   /** 与后端 registry key 对齐；前端不权威评分，仅透传。 */
   scoringVersion: string
   RunnerComponent: React.ComponentType<CognitiveTaskProps>
+  NativeReportComponent?: React.ComponentType<{snapshot:import('./types').NativePublicReportSnapshot}>
   /** Exact task implementation only; prepared before starting its frozen trials. */
   prepareRunner?: () => Promise<React.ComponentType<CognitiveTaskProps> | void>
   metricDefinitions: MetricDefinition[]

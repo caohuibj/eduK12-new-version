@@ -26,6 +26,7 @@ export interface ReportMetricView {
 }
 
 export interface ThreeLayerReport {
+  nativeReport?: import('../content-candidates/native-registry/public-report').NativePublicReportSnapshot
   schemaVersion?: 2
   reading?: ReportReading
   title: string

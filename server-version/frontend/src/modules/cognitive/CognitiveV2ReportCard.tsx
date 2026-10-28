@@ -1,3 +1,5 @@
+import {resolveRunner} from './registry'
+import {isNativePublicReportSnapshot} from './core/native-public-report'
 import { LEGACY_LABELS, LEGACY_EXPLANATIONS } from './legacy-v2-presentation'
 import React from 'react'
 import {
@@ -45,6 +47,14 @@ const CognitiveV2ReportCard: React.FC<{
   finishedAt?: string | null
   anonymousCode?: string | null
 }> = ({ report, references = [], attemptNo, finishedAt, anonymousCode }) => {
+  if(report.nativeReport!==undefined){
+    const snapshot=report.nativeReport,entry=resolveRunner(report.method.testType,report.method.engineVersion)
+    if(!isNativePublicReportSnapshot(snapshot)||!entry?.NativeReportComponent||snapshot.testType!==report.method.testType||snapshot.engineVersion!==report.method.engineVersion
+      ||snapshot.scoringVersion!==report.method.scoringVersion||snapshot.configVersion!==report.method.configVersion||snapshot.protocolSignature!==report.method.protocolSignature||snapshot.profile!==report.method.profile||snapshot.state!==report.qualityState)
+      return <p role="alert">已保存报告与本次冻结身份不一致，请联系组织者。</p>
+    const NativeReport=entry.NativeReportComponent
+    return <NativeReport snapshot={snapshot}/>
+  }
   if (report.schemaVersion === 2 && report.reading?.popular && report.reading?.professional) {
     return <CognitiveMagazineReport report={report} references={references} attemptNo={attemptNo} finishedAt={finishedAt} anonymousCode={anonymousCode} />
   }

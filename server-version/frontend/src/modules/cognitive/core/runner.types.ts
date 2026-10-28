@@ -29,6 +29,7 @@ export interface CognitiveTaskContext {
 }
 
 export interface CognitiveCoreSavedReceipt {
+  nativeReport?: import('../types').NativePublicReportSnapshot
   coreSaved: true
   sessionId: string
   attemptEpoch: number
@@ -37,6 +38,7 @@ export interface CognitiveCoreSavedReceipt {
   payloadHash: string
 }
 export interface CognitiveNativeHost {
+  getDraftIdentity?: () => Promise<import('../../../services/persistence/finalDraftStore').FinalDraftWriteIdentity>
   appendEnvelope: (envelope: Record<string, unknown>) => Promise<boolean>
   sealRaw: (rawPayload: unknown) => Promise<void>
   complete: (provenance?: import('./administration-provenance').AdministrationProvenanceV1) => Promise<CognitiveCoreSavedReceipt>

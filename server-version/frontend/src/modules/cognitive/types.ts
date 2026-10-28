@@ -56,7 +56,13 @@ export interface CognitiveV2ReportMetricView extends CognitiveReportMetricView {
   direction: 'higher_is_better' | 'lower_is_better' | 'target_range' | 'descriptive' | 'signed'
 }
 
+export interface NativePublicReportSnapshot {
+ schemaVersion:1;testType:string;engineVersion:string;scoringVersion:string;configVersion:string;
+ configHash:string;protocolSignature:string;reportDefinitionVersion:string;presentationVersion:string;
+ profile:'experience'|'research';state:'interpretable'|'limited'|'invalid';report:unknown
+}
 export interface CognitiveV2Report {
+  nativeReport?: NativePublicReportSnapshot
   schemaVersion?: 2
   reading?: CognitiveReportReading
   profileLabel?: string | null
