@@ -1,0 +1,180 @@
+{
+  "note": "Read-only identity comparison against historical verification, not a new run or blanket qualification of changed consumers.",
+  "historicalReceipt": "docs/cognitive-library/next-candidates-20261026/horizon-exploration/implementation/verification.json",
+  "items": [
+    {
+      "path": "server-version/backend/src/__tests__/cognitive/horizon-content.test.ts",
+      "oldSHA256": "f3722748bedd401378ed47e0f9a8fc938a999e92b511ba64dfafc9870d91d806",
+      "currentSHA256": "f3722748bedd401378ed47e0f9a8fc938a999e92b511ba64dfafc9870d91d806",
+      "matches": true
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/horizon-exploration/analysis.ts",
+      "oldSHA256": "b591ca218ed6cd64030101ea3893a369df4c47dd46d0e3ca0c342fc90f47827f",
+      "currentSHA256": "b591ca218ed6cd64030101ea3893a369df4c47dd46d0e3ca0c342fc90f47827f",
+      "matches": true
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/horizon-exploration/metadata.ts",
+      "oldSHA256": "a99b5f0f9cc1555ba331fd9b9f68bedcd229e04f17e8f12f653aee2cc4ab93a2",
+      "currentSHA256": "a99b5f0f9cc1555ba331fd9b9f68bedcd229e04f17e8f12f653aee2cc4ab93a2",
+      "matches": true
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/horizon-exploration/package.ts",
+      "oldSHA256": "a481ef4c63d338681f4e742c82178d85e9b59d7adf350c657c17f7a0fa3a9f87",
+      "currentSHA256": "6d32ccdc8ed67ea8bf06b03ab5eff676ac8e08da0c32b98ff995b3c2419c6164",
+      "matches": false
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/horizon-exploration/participant-presentation.ts",
+      "oldSHA256": "2fd78ea12e23c89dfd4bc9a5acd14a013f0d99f047781b41a0b3469e2423bd8b",
+      "currentSHA256": "2fd78ea12e23c89dfd4bc9a5acd14a013f0d99f047781b41a0b3469e2423bd8b",
+      "matches": true
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/horizon-exploration/protocol.ts",
+      "oldSHA256": "a303f7ba29c0b9b859cf325ac3dd6bda939079ae6e70f386df0c950dcca31feb",
+      "currentSHA256": "a303f7ba29c0b9b859cf325ac3dd6bda939079ae6e70f386df0c950dcca31feb",
+      "matches": true
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/horizon-exploration/report.ts",
+      "oldSHA256": "728ebc3fac70046bfb5d8cfda485c058d1da4221a68e6ce62db7fbd7c61968d6",
+      "currentSHA256": "728ebc3fac70046bfb5d8cfda485c058d1da4221a68e6ce62db7fbd7c61968d6",
+      "matches": true
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/horizon-exploration/schema.ts",
+      "oldSHA256": "8a7bef4eaa1fccd705af0eca44d0f01ca968627ac063e4a2e5511ed403486127",
+      "currentSHA256": "8a7bef4eaa1fccd705af0eca44d0f01ca968627ac063e4a2e5511ed403486127",
+      "matches": true
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/horizon-exploration/scorer.ts",
+      "oldSHA256": "160609b5962e26f7e8c321cd8b3369af814065e8cae58faea948c09f153bc7cb",
+      "currentSHA256": "160609b5962e26f7e8c321cd8b3369af814065e8cae58faea948c09f153bc7cb",
+      "matches": true
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/horizon-exploration/HorizonInstructions.tsx",
+      "oldSHA256": "bb59ec6498d34b8cfca17c2cf2be25c5aef048ce180e0f2ba394333a0222acaa",
+      "currentSHA256": "103f374c5f9fd8988fe42e46a95eb3e385937ace72e14ab48e81e322e13bd1ad",
+      "matches": false
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/horizon-exploration/HorizonReport.tsx",
+      "oldSHA256": "d38e614da06748be1ba8a7724f2171517d93e98d296f28c0c522b4a2153638d3",
+      "currentSHA256": "6ad6147210f6fe571b7bc4a9255d9fa58661dbdbcdbbd15f09842880d2f909de",
+      "matches": false
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/horizon-exploration/HorizonTask.tsx",
+      "oldSHA256": "543f527c0d3f900a5a6116c34ab39ae38802ba2fc4562f1beaa0383160a277c3",
+      "currentSHA256": "543f527c0d3f900a5a6116c34ab39ae38802ba2fc4562f1beaa0383160a277c3",
+      "matches": true
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/horizon-exploration/capture.ts",
+      "oldSHA256": "cc501438b14840bae222744a6b6acfdbf76eb661623ecc4b01b8e759c32f8c29",
+      "currentSHA256": "cc501438b14840bae222744a6b6acfdbf76eb661623ecc4b01b8e759c32f8c29",
+      "matches": true
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/horizon-exploration/content.test.tsx",
+      "oldSHA256": "a7864b41d0b6cf8fb657a6f32047cd41df40b2270df2d2243e6df6df7e6cb69f",
+      "currentSHA256": "a7864b41d0b6cf8fb657a6f32047cd41df40b2270df2d2243e6df6df7e6cb69f",
+      "matches": true
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/horizon-exploration/contracts.ts",
+      "oldSHA256": "8a6dc56e617ec5ad669f92a2001e8354e5bbd2b2303e29dd8e3e2379f38ef422",
+      "currentSHA256": "8a6dc56e617ec5ad669f92a2001e8354e5bbd2b2303e29dd8e3e2379f38ef422",
+      "matches": true
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/horizon-exploration/generated/analysis.ts",
+      "oldSHA256": "9147b0aecd9efac024346f2da040d14bfc5066484c14c30d106e7ed93a8a44c3",
+      "currentSHA256": "9147b0aecd9efac024346f2da040d14bfc5066484c14c30d106e7ed93a8a44c3",
+      "matches": true
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/horizon-exploration/generated/protocol.ts",
+      "oldSHA256": "5a79a323a57527bab81c8ff2bf97414b2aac006f763c95fec09aedd270d8ae15",
+      "currentSHA256": "5a79a323a57527bab81c8ff2bf97414b2aac006f763c95fec09aedd270d8ae15",
+      "matches": true
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/horizon-exploration/generated/report.ts",
+      "oldSHA256": "badf45f31a2c183780d5ab36c8d64fd0371875ca326bdbdc9fd4caae3a32e509",
+      "currentSHA256": "badf45f31a2c183780d5ab36c8d64fd0371875ca326bdbdc9fd4caae3a32e509",
+      "matches": true
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/horizon-exploration/horizon.css",
+      "oldSHA256": "bbfa1063cbf5896c69f077c88f517c2674eeb82b7c1de99605fbf6e9d5d3f695",
+      "currentSHA256": "bbfa1063cbf5896c69f077c88f517c2674eeb82b7c1de99605fbf6e9d5d3f695",
+      "matches": true
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/horizon-exploration/session.ts",
+      "oldSHA256": "8940499a7b2d708af688f7492672b286307f5dca3dec3ca8379e5f7d39e98703",
+      "currentSHA256": "8940499a7b2d708af688f7492672b286307f5dca3dec3ca8379e5f7d39e98703",
+      "matches": true
+    },
+    {
+      "path": "server-version/scripts/cognitive/horizon-content.cjs",
+      "oldSHA256": "a772dffe1821f924ef26dff2e9b6776b5ef8fc7fec14d03504576e04c81802f1",
+      "currentSHA256": "9845d321d0b5d9aea8c65afc8247cd819dc5237ec52982f944345848db0bf64b",
+      "matches": false
+    },
+    {
+      "path": "server-version/backend/tsconfig.json",
+      "oldSHA256": "c79ccf595a80514e94936f1ffcd2fa09b57265f0c140d275c81770f494175143",
+      "currentSHA256": "c79ccf595a80514e94936f1ffcd2fa09b57265f0c140d275c81770f494175143",
+      "matches": true
+    },
+    {
+      "path": "server-version/backend/vitest.config.ts",
+      "oldSHA256": "26b98b70914617771d41657be8cdf6d7b6d7024c81d1c8a49aeae6a9220cf93b",
+      "currentSHA256": "26b98b70914617771d41657be8cdf6d7b6d7024c81d1c8a49aeae6a9220cf93b",
+      "matches": true
+    },
+    {
+      "path": "server-version/backend/package.json",
+      "oldSHA256": "d629185584fcd679ca367c2d536c6c7783f7a9fe23363a8cd870964a47b2990a",
+      "currentSHA256": "d629185584fcd679ca367c2d536c6c7783f7a9fe23363a8cd870964a47b2990a",
+      "matches": true
+    },
+    {
+      "path": "server-version/backend/package-lock.json",
+      "oldSHA256": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+      "currentSHA256": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+      "matches": true
+    },
+    {
+      "path": "server-version/frontend/tsconfig.app.json",
+      "oldSHA256": "97ed0e951ac068a9b2d08635b327932db8e41193f9c82e8291a919b7c68bd62e",
+      "currentSHA256": "97ed0e951ac068a9b2d08635b327932db8e41193f9c82e8291a919b7c68bd62e",
+      "matches": true
+    },
+    {
+      "path": "server-version/frontend/vitest.config.ts",
+      "oldSHA256": "3d757d2b1cee6c1c09a3ec7016b296aa159c938f83365e2370a1d423f29917db",
+      "currentSHA256": "3d757d2b1cee6c1c09a3ec7016b296aa159c938f83365e2370a1d423f29917db",
+      "matches": true
+    },
+    {
+      "path": "server-version/frontend/package.json",
+      "oldSHA256": "ba3959e4e7935cb3b60b8391f590a2622990397b1b33b99a545c45867d51e49f",
+      "currentSHA256": "ba3959e4e7935cb3b60b8391f590a2622990397b1b33b99a545c45867d51e49f",
+      "matches": true
+    },
+    {
+      "path": "server-version/frontend/package-lock.json",
+      "oldSHA256": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+      "currentSHA256": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+      "matches": true
+    }
+  ]
+}

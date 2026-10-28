@@ -1,0 +1,82 @@
+{
+  "synthetic": true,
+  "baseline": "fdc72a9739df7cafc2b238ae45f7d976b3c985f2",
+  "command": "node docs/cognitive-library/onboarding-content-20261028/parallel-review/horizon/audit-records.cjs",
+  "checks": [
+    {
+      "name": "empty",
+      "state": "invalid",
+      "received": 0,
+      "completed": 0,
+      "validFirstChoices": 0,
+      "totalChoices": 0,
+      "zeroRTResponses": 0,
+      "totalReward": 0,
+      "longMinusShortLessSampledRate": null
+    },
+    {
+      "name": "beforeFirst",
+      "state": "invalid",
+      "received": 1,
+      "completed": 0,
+      "validFirstChoices": 0,
+      "totalChoices": 4,
+      "zeroRTResponses": 4,
+      "totalReward": 174,
+      "longMinusShortLessSampledRate": null
+    },
+    {
+      "name": "afterFirst",
+      "state": "limited",
+      "received": 1,
+      "completed": 0,
+      "validFirstChoices": 1,
+      "totalChoices": 5,
+      "zeroRTResponses": 5,
+      "totalReward": 214,
+      "longMinusShortLessSampledRate": null
+    },
+    {
+      "name": "signedComparison",
+      "state": "limited",
+      "received": 12,
+      "completed": 11,
+      "validFirstChoices": 12,
+      "totalChoices": 105,
+      "zeroRTResponses": 105,
+      "totalReward": 5027,
+      "longMinusShortLessSampledRate": -1
+    }
+  ],
+  "identityFinding": {
+    "status": "reproduced-baseline-gap-awaiting-parent-shared-fix",
+    "normalAccepted": true,
+    "unknownOuterPresentationAccepted": true,
+    "outerPresentationVersion": "next",
+    "innerTaskPresentationVersion": "0.1.0",
+    "expectation": "Horizon 0.1.0 task presentation must remain frozen; arbitrary next must not be accepted as its saved native presentation. Parent will resolve generic participantPresentation versus native task presentation semantics in shared code."
+  },
+  "configHash": "a0f9a3fbb53776b039230ca18bdc364bb96e36fa652ad9f43f31855866818f57",
+  "protocolSignature": "ad57db3c96d148c831f666a8035b8aec6f8043d577ca4800ada07398e2a43a18",
+  "sourceSHA256": {
+    "server-version/backend/src/modules/cognitive/content-candidates/horizon-exploration/analysis.ts": "b591ca218ed6cd64030101ea3893a369df4c47dd46d0e3ca0c342fc90f47827f",
+    "server-version/backend/src/modules/cognitive/content-candidates/horizon-exploration/metadata.ts": "a99b5f0f9cc1555ba331fd9b9f68bedcd229e04f17e8f12f653aee2cc4ab93a2",
+    "server-version/backend/src/modules/cognitive/content-candidates/horizon-exploration/package.ts": "6d32ccdc8ed67ea8bf06b03ab5eff676ac8e08da0c32b98ff995b3c2419c6164",
+    "server-version/backend/src/modules/cognitive/content-candidates/horizon-exploration/participant-presentation.ts": "2fd78ea12e23c89dfd4bc9a5acd14a013f0d99f047781b41a0b3469e2423bd8b",
+    "server-version/backend/src/modules/cognitive/content-candidates/horizon-exploration/protocol.ts": "a303f7ba29c0b9b859cf325ac3dd6bda939079ae6e70f386df0c950dcca31feb",
+    "server-version/backend/src/modules/cognitive/content-candidates/horizon-exploration/report.ts": "728ebc3fac70046bfb5d8cfda485c058d1da4221a68e6ce62db7fbd7c61968d6",
+    "server-version/backend/src/modules/cognitive/content-candidates/horizon-exploration/schema.ts": "8a7bef4eaa1fccd705af0eca44d0f01ca968627ac063e4a2e5511ed403486127",
+    "server-version/backend/src/modules/cognitive/content-candidates/horizon-exploration/scorer.ts": "160609b5962e26f7e8c321cd8b3369af814065e8cae58faea948c09f153bc7cb",
+    "server-version/frontend/src/modules/cognitive/tasks/horizon-exploration/HorizonInstructions.tsx": "103f374c5f9fd8988fe42e46a95eb3e385937ace72e14ab48e81e322e13bd1ad",
+    "server-version/frontend/src/modules/cognitive/tasks/horizon-exploration/HorizonReport.tsx": "6ad6147210f6fe571b7bc4a9255d9fa58661dbdbcdbbd15f09842880d2f909de",
+    "server-version/frontend/src/modules/cognitive/tasks/horizon-exploration/HorizonTask.tsx": "543f527c0d3f900a5a6116c34ab39ae38802ba2fc4562f1beaa0383160a277c3",
+    "server-version/frontend/src/modules/cognitive/tasks/horizon-exploration/NativeHorizonRunner.tsx": "f875a773bf01f22f8e578e3ea9f613948e46ecb356d0fc696a57b0ed569faef5",
+    "server-version/frontend/src/modules/cognitive/tasks/horizon-exploration/capture.ts": "cc501438b14840bae222744a6b6acfdbf76eb661623ecc4b01b8e759c32f8c29",
+    "server-version/frontend/src/modules/cognitive/tasks/horizon-exploration/content.test.tsx": "a7864b41d0b6cf8fb657a6f32047cd41df40b2270df2d2243e6df6df7e6cb69f",
+    "server-version/frontend/src/modules/cognitive/tasks/horizon-exploration/contracts.ts": "8a6dc56e617ec5ad669f92a2001e8354e5bbd2b2303e29dd8e3e2379f38ef422",
+    "server-version/frontend/src/modules/cognitive/tasks/horizon-exploration/horizon.css": "bbfa1063cbf5896c69f077c88f517c2674eeb82b7c1de99605fbf6e9d5d3f695",
+    "server-version/frontend/src/modules/cognitive/tasks/horizon-exploration/session.ts": "8940499a7b2d708af688f7492672b286307f5dca3dec3ca8379e5f7d39e98703",
+    "server-version/backend/src/modules/cognitive/content-candidates/native-registry/public-report.ts": "7178c8609039f38409484a073d47b4f2103246a49c7f611692e1b9db9c5296cc",
+    "server-version/frontend/src/modules/cognitive/core/native-public-report.ts": "7b92d7e257f09de07715a1b65bc1214009cc5ea72d5a7d9a75b9e4928883285b"
+  }
+}

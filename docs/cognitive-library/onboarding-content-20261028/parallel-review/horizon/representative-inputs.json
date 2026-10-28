@@ -1,0 +1,5228 @@
+{
+  "synthetic": true,
+  "sessionJourney": false,
+  "note": "Four independent representative scorer inputs; not a claim that a stopped session may resume. Prefix uses original actual plans, capture/reducer, and authoritative scorer/public projector.",
+  "inputs": {
+    "empty": {
+      "session": {
+        "schemaVersion": 1,
+        "frozenAt": "2026-10-27T00:00:00.000Z",
+        "testType": "horizon-exploration",
+        "configVersion": "0.1.0",
+        "engineVersion": "0.1.0",
+        "scoringVersion": "0.1.0",
+        "config": {
+          "profile": "experience",
+          "totalGames": 40,
+          "gamesPerBlock": 40,
+          "profileDefinitionVersion": "0.1.0",
+          "metricDefinitionVersion": "0.1.0",
+          "qualityDefinitionVersion": "0.1.0",
+          "reportDefinitionVersion": "0.1.0",
+          "presentationVersion": "0.1.0",
+          "randomizationAlgorithmVersion": "horizon-fnv1a-utf16-xorshift32-boxmuller-balanced-v1",
+          "feedbackMs": 300,
+          "rewardSD": 8,
+          "rewardBounds": [
+            1,
+            100
+          ],
+          "meanDifferences": [
+            4,
+            8,
+            12,
+            20,
+            30
+          ],
+          "practice": {
+            "games": 3,
+            "maximumGroups": 3,
+            "criterion": "complete-guided-games-not-choice-correctness"
+          }
+        },
+        "configHash": "a0f9a3fbb53776b039230ca18bdc364bb96e36fa652ad9f43f31855866818f57",
+        "protocol": {
+          "schemaVersion": 1,
+          "key": "horizon-exploration/0.1.0/0.1.0",
+          "version": "0.1.0",
+          "clock": "performance",
+          "randomizationAlgorithmVersion": "horizon-fnv1a-utf16-xorshift32-boxmuller-balanced-v1",
+          "trialEnvelopeVersion": 1,
+          "phases": [
+            {
+              "key": "test",
+              "persists": true,
+              "required": true
+            }
+          ],
+          "measurementCriticalConfigPaths": [
+            "*"
+          ]
+        },
+        "protocolSignature": "ad57db3c96d148c831f666a8035b8aec6f8043d577ca4800ada07398e2a43a18"
+      },
+      "config": {
+        "profile": "experience",
+        "totalGames": 40,
+        "gamesPerBlock": 40,
+        "profileDefinitionVersion": "0.1.0",
+        "metricDefinitionVersion": "0.1.0",
+        "qualityDefinitionVersion": "0.1.0",
+        "reportDefinitionVersion": "0.1.0",
+        "presentationVersion": "0.1.0",
+        "randomizationAlgorithmVersion": "horizon-fnv1a-utf16-xorshift32-boxmuller-balanced-v1",
+        "feedbackMs": 300,
+        "rewardSD": 8,
+        "rewardBounds": [
+          1,
+          100
+        ],
+        "meanDifferences": [
+          4,
+          8,
+          12,
+          20,
+          30
+        ],
+        "practice": {
+          "games": 3,
+          "maximumGroups": 3,
+          "criterion": "complete-guided-games-not-choice-correctness"
+        }
+      },
+      "randomSeed": "independent-horizon-review-20261028",
+      "trials": []
+    },
+    "beforeFirst": {
+      "session": {
+        "schemaVersion": 1,
+        "frozenAt": "2026-10-27T00:00:00.000Z",
+        "testType": "horizon-exploration",
+        "configVersion": "0.1.0",
+        "engineVersion": "0.1.0",
+        "scoringVersion": "0.1.0",
+        "config": {
+          "profile": "experience",
+          "totalGames": 40,
+          "gamesPerBlock": 40,
+          "profileDefinitionVersion": "0.1.0",
+          "metricDefinitionVersion": "0.1.0",
+          "qualityDefinitionVersion": "0.1.0",
+          "reportDefinitionVersion": "0.1.0",
+          "presentationVersion": "0.1.0",
+          "randomizationAlgorithmVersion": "horizon-fnv1a-utf16-xorshift32-boxmuller-balanced-v1",
+          "feedbackMs": 300,
+          "rewardSD": 8,
+          "rewardBounds": [
+            1,
+            100
+          ],
+          "meanDifferences": [
+            4,
+            8,
+            12,
+            20,
+            30
+          ],
+          "practice": {
+            "games": 3,
+            "maximumGroups": 3,
+            "criterion": "complete-guided-games-not-choice-correctness"
+          }
+        },
+        "configHash": "a0f9a3fbb53776b039230ca18bdc364bb96e36fa652ad9f43f31855866818f57",
+        "protocol": {
+          "schemaVersion": 1,
+          "key": "horizon-exploration/0.1.0/0.1.0",
+          "version": "0.1.0",
+          "clock": "performance",
+          "randomizationAlgorithmVersion": "horizon-fnv1a-utf16-xorshift32-boxmuller-balanced-v1",
+          "trialEnvelopeVersion": 1,
+          "phases": [
+            {
+              "key": "test",
+              "persists": true,
+              "required": true
+            }
+          ],
+          "measurementCriticalConfigPaths": [
+            "*"
+          ]
+        },
+        "protocolSignature": "ad57db3c96d148c831f666a8035b8aec6f8043d577ca4800ada07398e2a43a18"
+      },
+      "config": {
+        "profile": "experience",
+        "totalGames": 40,
+        "gamesPerBlock": 40,
+        "profileDefinitionVersion": "0.1.0",
+        "metricDefinitionVersion": "0.1.0",
+        "qualityDefinitionVersion": "0.1.0",
+        "reportDefinitionVersion": "0.1.0",
+        "presentationVersion": "0.1.0",
+        "randomizationAlgorithmVersion": "horizon-fnv1a-utf16-xorshift32-boxmuller-balanced-v1",
+        "feedbackMs": 300,
+        "rewardSD": 8,
+        "rewardBounds": [
+          1,
+          100
+        ],
+        "meanDifferences": [
+          4,
+          8,
+          12,
+          20,
+          30
+        ],
+        "practice": {
+          "games": 3,
+          "maximumGroups": 3,
+          "criterion": "complete-guided-games-not-choice-correctness"
+        }
+      },
+      "randomSeed": "independent-horizon-review-20261028",
+      "trials": [
+        {
+          "schemaVersion": 1,
+          "trialIndex": 0,
+          "phase": "test",
+          "condition": "unequal:6",
+          "startedAtPerfMs": 100,
+          "endedAtPerfMs": 1001,
+          "durationMs": 901,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [
+            "resume"
+          ],
+          "payload": {
+            "plan": {
+              "index": 0,
+              "phase": "test",
+              "round": 0,
+              "blockIndex": 0,
+              "cellId": "1:1:1:1:1",
+              "freeChoices": 6,
+              "totalSteps": 10,
+              "information": "unequal",
+              "lessSampledSide": "right",
+              "higherMeanSide": "right",
+              "absoluteMeanDifference": 8,
+              "anchorMean": 40,
+              "anchorSide": "left",
+              "means": {
+                "left": 40,
+                "right": 48
+              },
+              "forced": [
+                "left",
+                "left",
+                "right",
+                "left"
+              ],
+              "rewards": {
+                "left": [
+                  31,
+                  40,
+                  52,
+                  40,
+                  27,
+                  34,
+                  39,
+                  31,
+                  49,
+                  32
+                ],
+                "right": [
+                  51,
+                  58,
+                  42,
+                  26,
+                  43,
+                  52,
+                  41,
+                  57,
+                  32,
+                  47
+                ]
+              }
+            },
+            "startedAtPerfMs": 100,
+            "endedAtPerfMs": 1001,
+            "status": "interrupted",
+            "stopReason": "participant-ended",
+            "events": [
+              {
+                "kind": "down",
+                "atMs": 100,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 101,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 400
+              },
+              {
+                "kind": "down",
+                "atMs": 400,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 401,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 700
+              },
+              {
+                "kind": "down",
+                "atMs": 700,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 701,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 1000
+              },
+              {
+                "kind": "down",
+                "atMs": 1000,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 1001,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              }
+            ],
+            "state": {
+              "stage": "feedback",
+              "choices": [
+                {
+                  "step": 0,
+                  "side": "left",
+                  "atMs": 100,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 31,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 1,
+                  "side": "left",
+                  "atMs": 400,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 40,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 2,
+                  "side": "right",
+                  "atMs": 700,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 51,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 3,
+                  "side": "left",
+                  "atMs": 1000,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 52,
+                  "forced": true,
+                  "firstFree": false
+                }
+              ],
+              "readyAtMs": 1300,
+              "completeAtMs": null,
+              "held": [],
+              "ignored": {
+                "early": 0,
+                "held": 0,
+                "wrongForced": 0,
+                "inactive": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        }
+      ]
+    },
+    "afterFirst": {
+      "session": {
+        "schemaVersion": 1,
+        "frozenAt": "2026-10-27T00:00:00.000Z",
+        "testType": "horizon-exploration",
+        "configVersion": "0.1.0",
+        "engineVersion": "0.1.0",
+        "scoringVersion": "0.1.0",
+        "config": {
+          "profile": "experience",
+          "totalGames": 40,
+          "gamesPerBlock": 40,
+          "profileDefinitionVersion": "0.1.0",
+          "metricDefinitionVersion": "0.1.0",
+          "qualityDefinitionVersion": "0.1.0",
+          "reportDefinitionVersion": "0.1.0",
+          "presentationVersion": "0.1.0",
+          "randomizationAlgorithmVersion": "horizon-fnv1a-utf16-xorshift32-boxmuller-balanced-v1",
+          "feedbackMs": 300,
+          "rewardSD": 8,
+          "rewardBounds": [
+            1,
+            100
+          ],
+          "meanDifferences": [
+            4,
+            8,
+            12,
+            20,
+            30
+          ],
+          "practice": {
+            "games": 3,
+            "maximumGroups": 3,
+            "criterion": "complete-guided-games-not-choice-correctness"
+          }
+        },
+        "configHash": "a0f9a3fbb53776b039230ca18bdc364bb96e36fa652ad9f43f31855866818f57",
+        "protocol": {
+          "schemaVersion": 1,
+          "key": "horizon-exploration/0.1.0/0.1.0",
+          "version": "0.1.0",
+          "clock": "performance",
+          "randomizationAlgorithmVersion": "horizon-fnv1a-utf16-xorshift32-boxmuller-balanced-v1",
+          "trialEnvelopeVersion": 1,
+          "phases": [
+            {
+              "key": "test",
+              "persists": true,
+              "required": true
+            }
+          ],
+          "measurementCriticalConfigPaths": [
+            "*"
+          ]
+        },
+        "protocolSignature": "ad57db3c96d148c831f666a8035b8aec6f8043d577ca4800ada07398e2a43a18"
+      },
+      "config": {
+        "profile": "experience",
+        "totalGames": 40,
+        "gamesPerBlock": 40,
+        "profileDefinitionVersion": "0.1.0",
+        "metricDefinitionVersion": "0.1.0",
+        "qualityDefinitionVersion": "0.1.0",
+        "reportDefinitionVersion": "0.1.0",
+        "presentationVersion": "0.1.0",
+        "randomizationAlgorithmVersion": "horizon-fnv1a-utf16-xorshift32-boxmuller-balanced-v1",
+        "feedbackMs": 300,
+        "rewardSD": 8,
+        "rewardBounds": [
+          1,
+          100
+        ],
+        "meanDifferences": [
+          4,
+          8,
+          12,
+          20,
+          30
+        ],
+        "practice": {
+          "games": 3,
+          "maximumGroups": 3,
+          "criterion": "complete-guided-games-not-choice-correctness"
+        }
+      },
+      "randomSeed": "independent-horizon-review-20261028",
+      "trials": [
+        {
+          "schemaVersion": 1,
+          "trialIndex": 0,
+          "phase": "test",
+          "condition": "unequal:6",
+          "startedAtPerfMs": 100,
+          "endedAtPerfMs": 1301,
+          "durationMs": 1201,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [
+            "resume"
+          ],
+          "payload": {
+            "plan": {
+              "index": 0,
+              "phase": "test",
+              "round": 0,
+              "blockIndex": 0,
+              "cellId": "1:1:1:1:1",
+              "freeChoices": 6,
+              "totalSteps": 10,
+              "information": "unequal",
+              "lessSampledSide": "right",
+              "higherMeanSide": "right",
+              "absoluteMeanDifference": 8,
+              "anchorMean": 40,
+              "anchorSide": "left",
+              "means": {
+                "left": 40,
+                "right": 48
+              },
+              "forced": [
+                "left",
+                "left",
+                "right",
+                "left"
+              ],
+              "rewards": {
+                "left": [
+                  31,
+                  40,
+                  52,
+                  40,
+                  27,
+                  34,
+                  39,
+                  31,
+                  49,
+                  32
+                ],
+                "right": [
+                  51,
+                  58,
+                  42,
+                  26,
+                  43,
+                  52,
+                  41,
+                  57,
+                  32,
+                  47
+                ]
+              }
+            },
+            "startedAtPerfMs": 100,
+            "endedAtPerfMs": 1301,
+            "status": "interrupted",
+            "stopReason": "participant-ended",
+            "events": [
+              {
+                "kind": "down",
+                "atMs": 100,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 101,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 400
+              },
+              {
+                "kind": "down",
+                "atMs": 400,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 401,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 700
+              },
+              {
+                "kind": "down",
+                "atMs": 700,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 701,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 1000
+              },
+              {
+                "kind": "down",
+                "atMs": 1000,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 1001,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 1300
+              },
+              {
+                "kind": "down",
+                "atMs": 1300,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 1301,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              }
+            ],
+            "state": {
+              "stage": "feedback",
+              "choices": [
+                {
+                  "step": 0,
+                  "side": "left",
+                  "atMs": 100,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 31,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 1,
+                  "side": "left",
+                  "atMs": 400,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 40,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 2,
+                  "side": "right",
+                  "atMs": 700,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 51,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 3,
+                  "side": "left",
+                  "atMs": 1000,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 52,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 4,
+                  "side": "left",
+                  "atMs": 1300,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 40,
+                  "forced": false,
+                  "firstFree": true
+                }
+              ],
+              "readyAtMs": 1600,
+              "completeAtMs": null,
+              "held": [],
+              "ignored": {
+                "early": 0,
+                "held": 0,
+                "wrongForced": 0,
+                "inactive": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        }
+      ]
+    },
+    "signedComparison": {
+      "session": {
+        "schemaVersion": 1,
+        "frozenAt": "2026-10-27T00:00:00.000Z",
+        "testType": "horizon-exploration",
+        "configVersion": "0.1.0",
+        "engineVersion": "0.1.0",
+        "scoringVersion": "0.1.0",
+        "config": {
+          "profile": "experience",
+          "totalGames": 40,
+          "gamesPerBlock": 40,
+          "profileDefinitionVersion": "0.1.0",
+          "metricDefinitionVersion": "0.1.0",
+          "qualityDefinitionVersion": "0.1.0",
+          "reportDefinitionVersion": "0.1.0",
+          "presentationVersion": "0.1.0",
+          "randomizationAlgorithmVersion": "horizon-fnv1a-utf16-xorshift32-boxmuller-balanced-v1",
+          "feedbackMs": 300,
+          "rewardSD": 8,
+          "rewardBounds": [
+            1,
+            100
+          ],
+          "meanDifferences": [
+            4,
+            8,
+            12,
+            20,
+            30
+          ],
+          "practice": {
+            "games": 3,
+            "maximumGroups": 3,
+            "criterion": "complete-guided-games-not-choice-correctness"
+          }
+        },
+        "configHash": "a0f9a3fbb53776b039230ca18bdc364bb96e36fa652ad9f43f31855866818f57",
+        "protocol": {
+          "schemaVersion": 1,
+          "key": "horizon-exploration/0.1.0/0.1.0",
+          "version": "0.1.0",
+          "clock": "performance",
+          "randomizationAlgorithmVersion": "horizon-fnv1a-utf16-xorshift32-boxmuller-balanced-v1",
+          "trialEnvelopeVersion": 1,
+          "phases": [
+            {
+              "key": "test",
+              "persists": true,
+              "required": true
+            }
+          ],
+          "measurementCriticalConfigPaths": [
+            "*"
+          ]
+        },
+        "protocolSignature": "ad57db3c96d148c831f666a8035b8aec6f8043d577ca4800ada07398e2a43a18"
+      },
+      "config": {
+        "profile": "experience",
+        "totalGames": 40,
+        "gamesPerBlock": 40,
+        "profileDefinitionVersion": "0.1.0",
+        "metricDefinitionVersion": "0.1.0",
+        "qualityDefinitionVersion": "0.1.0",
+        "reportDefinitionVersion": "0.1.0",
+        "presentationVersion": "0.1.0",
+        "randomizationAlgorithmVersion": "horizon-fnv1a-utf16-xorshift32-boxmuller-balanced-v1",
+        "feedbackMs": 300,
+        "rewardSD": 8,
+        "rewardBounds": [
+          1,
+          100
+        ],
+        "meanDifferences": [
+          4,
+          8,
+          12,
+          20,
+          30
+        ],
+        "practice": {
+          "games": 3,
+          "maximumGroups": 3,
+          "criterion": "complete-guided-games-not-choice-correctness"
+        }
+      },
+      "randomSeed": "independent-horizon-review-20261028",
+      "trials": [
+        {
+          "schemaVersion": 1,
+          "trialIndex": 0,
+          "phase": "test",
+          "condition": "unequal:6",
+          "startedAtPerfMs": 100,
+          "endedAtPerfMs": 3100,
+          "durationMs": 3000,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 0,
+              "phase": "test",
+              "round": 0,
+              "blockIndex": 0,
+              "cellId": "1:1:1:1:1",
+              "freeChoices": 6,
+              "totalSteps": 10,
+              "information": "unequal",
+              "lessSampledSide": "right",
+              "higherMeanSide": "right",
+              "absoluteMeanDifference": 8,
+              "anchorMean": 40,
+              "anchorSide": "left",
+              "means": {
+                "left": 40,
+                "right": 48
+              },
+              "forced": [
+                "left",
+                "left",
+                "right",
+                "left"
+              ],
+              "rewards": {
+                "left": [
+                  31,
+                  40,
+                  52,
+                  40,
+                  27,
+                  34,
+                  39,
+                  31,
+                  49,
+                  32
+                ],
+                "right": [
+                  51,
+                  58,
+                  42,
+                  26,
+                  43,
+                  52,
+                  41,
+                  57,
+                  32,
+                  47
+                ]
+              }
+            },
+            "startedAtPerfMs": 100,
+            "endedAtPerfMs": 3100,
+            "status": "complete",
+            "stopReason": null,
+            "events": [
+              {
+                "kind": "down",
+                "atMs": 100,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 101,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 400
+              },
+              {
+                "kind": "down",
+                "atMs": 400,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 401,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 700
+              },
+              {
+                "kind": "down",
+                "atMs": 700,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 701,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 1000
+              },
+              {
+                "kind": "down",
+                "atMs": 1000,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 1001,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 1300
+              },
+              {
+                "kind": "down",
+                "atMs": 1300,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 1301,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 1600
+              },
+              {
+                "kind": "down",
+                "atMs": 1600,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 1601,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 1900
+              },
+              {
+                "kind": "down",
+                "atMs": 1900,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 1901,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 2200
+              },
+              {
+                "kind": "down",
+                "atMs": 2200,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 2201,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 2500
+              },
+              {
+                "kind": "down",
+                "atMs": 2500,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 2501,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 2800
+              },
+              {
+                "kind": "down",
+                "atMs": 2800,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 2801,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 3100
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "choices": [
+                {
+                  "step": 0,
+                  "side": "left",
+                  "atMs": 100,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 31,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 1,
+                  "side": "left",
+                  "atMs": 400,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 40,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 2,
+                  "side": "right",
+                  "atMs": 700,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 51,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 3,
+                  "side": "left",
+                  "atMs": 1000,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 52,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 4,
+                  "side": "left",
+                  "atMs": 1300,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 40,
+                  "forced": false,
+                  "firstFree": true
+                },
+                {
+                  "step": 5,
+                  "side": "left",
+                  "atMs": 1600,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 27,
+                  "forced": false,
+                  "firstFree": false
+                },
+                {
+                  "step": 6,
+                  "side": "left",
+                  "atMs": 1900,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 34,
+                  "forced": false,
+                  "firstFree": false
+                },
+                {
+                  "step": 7,
+                  "side": "left",
+                  "atMs": 2200,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 39,
+                  "forced": false,
+                  "firstFree": false
+                },
+                {
+                  "step": 8,
+                  "side": "left",
+                  "atMs": 2500,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 31,
+                  "forced": false,
+                  "firstFree": false
+                },
+                {
+                  "step": 9,
+                  "side": "left",
+                  "atMs": 2800,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 49,
+                  "forced": false,
+                  "firstFree": false
+                }
+              ],
+              "readyAtMs": 3100,
+              "completeAtMs": 3100,
+              "held": [],
+              "ignored": {
+                "early": 0,
+                "held": 0,
+                "wrongForced": 0,
+                "inactive": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 1,
+          "phase": "test",
+          "condition": "equal:6",
+          "startedAtPerfMs": 3101,
+          "endedAtPerfMs": 6101,
+          "durationMs": 3000,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 1,
+              "phase": "test",
+              "round": 0,
+              "blockIndex": 0,
+              "cellId": "1:0:2:1:1",
+              "freeChoices": 6,
+              "totalSteps": 10,
+              "information": "equal",
+              "lessSampledSide": null,
+              "higherMeanSide": "right",
+              "absoluteMeanDifference": 12,
+              "anchorMean": 40,
+              "anchorSide": "left",
+              "means": {
+                "left": 40,
+                "right": 52
+              },
+              "forced": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ],
+              "rewards": {
+                "left": [
+                  56,
+                  32,
+                  39,
+                  38,
+                  49,
+                  40,
+                  24,
+                  46,
+                  40,
+                  38
+                ],
+                "right": [
+                  60,
+                  32,
+                  36,
+                  70,
+                  60,
+                  53,
+                  49,
+                  43,
+                  51,
+                  44
+                ]
+              }
+            },
+            "startedAtPerfMs": 3101,
+            "endedAtPerfMs": 6101,
+            "status": "complete",
+            "stopReason": null,
+            "events": [
+              {
+                "kind": "down",
+                "atMs": 3101,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 3102,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 3401
+              },
+              {
+                "kind": "down",
+                "atMs": 3401,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 3402,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 3701
+              },
+              {
+                "kind": "down",
+                "atMs": 3701,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 3702,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 4001
+              },
+              {
+                "kind": "down",
+                "atMs": 4001,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 4002,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 4301
+              },
+              {
+                "kind": "down",
+                "atMs": 4301,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 4302,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 4601
+              },
+              {
+                "kind": "down",
+                "atMs": 4601,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 4602,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 4901
+              },
+              {
+                "kind": "down",
+                "atMs": 4901,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 4902,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 5201
+              },
+              {
+                "kind": "down",
+                "atMs": 5201,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 5202,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 5501
+              },
+              {
+                "kind": "down",
+                "atMs": 5501,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 5502,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 5801
+              },
+              {
+                "kind": "down",
+                "atMs": 5801,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 5802,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 6101
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "choices": [
+                {
+                  "step": 0,
+                  "side": "right",
+                  "atMs": 3101,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 60,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 1,
+                  "side": "left",
+                  "atMs": 3401,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 56,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 2,
+                  "side": "left",
+                  "atMs": 3701,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 32,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 3,
+                  "side": "right",
+                  "atMs": 4001,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 32,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 4,
+                  "side": "left",
+                  "atMs": 4301,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 39,
+                  "forced": false,
+                  "firstFree": true
+                },
+                {
+                  "step": 5,
+                  "side": "left",
+                  "atMs": 4601,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 38,
+                  "forced": false,
+                  "firstFree": false
+                },
+                {
+                  "step": 6,
+                  "side": "left",
+                  "atMs": 4901,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 49,
+                  "forced": false,
+                  "firstFree": false
+                },
+                {
+                  "step": 7,
+                  "side": "left",
+                  "atMs": 5201,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 40,
+                  "forced": false,
+                  "firstFree": false
+                },
+                {
+                  "step": 8,
+                  "side": "left",
+                  "atMs": 5501,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 24,
+                  "forced": false,
+                  "firstFree": false
+                },
+                {
+                  "step": 9,
+                  "side": "left",
+                  "atMs": 5801,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 46,
+                  "forced": false,
+                  "firstFree": false
+                }
+              ],
+              "readyAtMs": 6101,
+              "completeAtMs": 6101,
+              "held": [],
+              "ignored": {
+                "early": 0,
+                "held": 0,
+                "wrongForced": 0,
+                "inactive": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 2,
+          "phase": "test",
+          "condition": "equal:1",
+          "startedAtPerfMs": 6102,
+          "endedAtPerfMs": 7602,
+          "durationMs": 1500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 2,
+              "phase": "test",
+              "round": 0,
+              "blockIndex": 0,
+              "cellId": "0:0:0:0:1",
+              "freeChoices": 1,
+              "totalSteps": 5,
+              "information": "equal",
+              "lessSampledSide": null,
+              "higherMeanSide": "left",
+              "absoluteMeanDifference": 4,
+              "anchorMean": 40,
+              "anchorSide": "right",
+              "means": {
+                "left": 44,
+                "right": 40
+              },
+              "forced": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ],
+              "rewards": {
+                "left": [
+                  49,
+                  34,
+                  54,
+                  34,
+                  38
+                ],
+                "right": [
+                  53,
+                  49,
+                  33,
+                  46,
+                  32
+                ]
+              }
+            },
+            "startedAtPerfMs": 6102,
+            "endedAtPerfMs": 7602,
+            "status": "complete",
+            "stopReason": null,
+            "events": [
+              {
+                "kind": "down",
+                "atMs": 6102,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 6103,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 6402
+              },
+              {
+                "kind": "down",
+                "atMs": 6402,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 6403,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 6702
+              },
+              {
+                "kind": "down",
+                "atMs": 6702,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 6703,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 7002
+              },
+              {
+                "kind": "down",
+                "atMs": 7002,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 7003,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 7302
+              },
+              {
+                "kind": "down",
+                "atMs": 7302,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 7303,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 7602
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "choices": [
+                {
+                  "step": 0,
+                  "side": "right",
+                  "atMs": 6102,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 53,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 1,
+                  "side": "left",
+                  "atMs": 6402,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 49,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 2,
+                  "side": "left",
+                  "atMs": 6702,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 34,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 3,
+                  "side": "right",
+                  "atMs": 7002,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 49,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 4,
+                  "side": "left",
+                  "atMs": 7302,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 54,
+                  "forced": false,
+                  "firstFree": true
+                }
+              ],
+              "readyAtMs": 7602,
+              "completeAtMs": 7602,
+              "held": [],
+              "ignored": {
+                "early": 0,
+                "held": 0,
+                "wrongForced": 0,
+                "inactive": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 3,
+          "phase": "test",
+          "condition": "unequal:6",
+          "startedAtPerfMs": 7603,
+          "endedAtPerfMs": 10603,
+          "durationMs": 3000,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 3,
+              "phase": "test",
+              "round": 0,
+              "blockIndex": 0,
+              "cellId": "1:1:2:1:0",
+              "freeChoices": 6,
+              "totalSteps": 10,
+              "information": "unequal",
+              "lessSampledSide": "left",
+              "higherMeanSide": "right",
+              "absoluteMeanDifference": 12,
+              "anchorMean": 40,
+              "anchorSide": "left",
+              "means": {
+                "left": 40,
+                "right": 52
+              },
+              "forced": [
+                "right",
+                "right",
+                "left",
+                "right"
+              ],
+              "rewards": {
+                "left": [
+                  28,
+                  43,
+                  32,
+                  52,
+                  54,
+                  43,
+                  35,
+                  35,
+                  44,
+                  44
+                ],
+                "right": [
+                  69,
+                  49,
+                  52,
+                  64,
+                  56,
+                  51,
+                  56,
+                  64,
+                  56,
+                  50
+                ]
+              }
+            },
+            "startedAtPerfMs": 7603,
+            "endedAtPerfMs": 10603,
+            "status": "complete",
+            "stopReason": null,
+            "events": [
+              {
+                "kind": "down",
+                "atMs": 7603,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 7604,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 7903
+              },
+              {
+                "kind": "down",
+                "atMs": 7903,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 7904,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 8203
+              },
+              {
+                "kind": "down",
+                "atMs": 8203,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 8204,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 8503
+              },
+              {
+                "kind": "down",
+                "atMs": 8503,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 8504,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 8803
+              },
+              {
+                "kind": "down",
+                "atMs": 8803,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 8804,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 9103
+              },
+              {
+                "kind": "down",
+                "atMs": 9103,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 9104,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 9403
+              },
+              {
+                "kind": "down",
+                "atMs": 9403,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 9404,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 9703
+              },
+              {
+                "kind": "down",
+                "atMs": 9703,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 9704,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 10003
+              },
+              {
+                "kind": "down",
+                "atMs": 10003,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 10004,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 10303
+              },
+              {
+                "kind": "down",
+                "atMs": 10303,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 10304,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 10603
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "choices": [
+                {
+                  "step": 0,
+                  "side": "right",
+                  "atMs": 7603,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 69,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 1,
+                  "side": "right",
+                  "atMs": 7903,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 49,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 2,
+                  "side": "left",
+                  "atMs": 8203,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 28,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 3,
+                  "side": "right",
+                  "atMs": 8503,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 52,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 4,
+                  "side": "right",
+                  "atMs": 8803,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 64,
+                  "forced": false,
+                  "firstFree": true
+                },
+                {
+                  "step": 5,
+                  "side": "right",
+                  "atMs": 9103,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 56,
+                  "forced": false,
+                  "firstFree": false
+                },
+                {
+                  "step": 6,
+                  "side": "right",
+                  "atMs": 9403,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 51,
+                  "forced": false,
+                  "firstFree": false
+                },
+                {
+                  "step": 7,
+                  "side": "right",
+                  "atMs": 9703,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 56,
+                  "forced": false,
+                  "firstFree": false
+                },
+                {
+                  "step": 8,
+                  "side": "right",
+                  "atMs": 10003,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 64,
+                  "forced": false,
+                  "firstFree": false
+                },
+                {
+                  "step": 9,
+                  "side": "right",
+                  "atMs": 10303,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 56,
+                  "forced": false,
+                  "firstFree": false
+                }
+              ],
+              "readyAtMs": 10603,
+              "completeAtMs": 10603,
+              "held": [],
+              "ignored": {
+                "early": 0,
+                "held": 0,
+                "wrongForced": 0,
+                "inactive": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 4,
+          "phase": "test",
+          "condition": "equal:6",
+          "startedAtPerfMs": 10604,
+          "endedAtPerfMs": 13604,
+          "durationMs": 3000,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 4,
+              "phase": "test",
+              "round": 0,
+              "blockIndex": 0,
+              "cellId": "1:0:4:1:1",
+              "freeChoices": 6,
+              "totalSteps": 10,
+              "information": "equal",
+              "lessSampledSide": null,
+              "higherMeanSide": "right",
+              "absoluteMeanDifference": 30,
+              "anchorMean": 60,
+              "anchorSide": "left",
+              "means": {
+                "left": 60,
+                "right": 90
+              },
+              "forced": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ],
+              "rewards": {
+                "left": [
+                  58,
+                  55,
+                  74,
+                  58,
+                  59,
+                  60,
+                  78,
+                  59,
+                  58,
+                  58
+                ],
+                "right": [
+                  83,
+                  94,
+                  81,
+                  86,
+                  100,
+                  81,
+                  80,
+                  100,
+                  100,
+                  97
+                ]
+              }
+            },
+            "startedAtPerfMs": 10604,
+            "endedAtPerfMs": 13604,
+            "status": "complete",
+            "stopReason": null,
+            "events": [
+              {
+                "kind": "down",
+                "atMs": 10604,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 10605,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 10904
+              },
+              {
+                "kind": "down",
+                "atMs": 10904,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 10905,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 11204
+              },
+              {
+                "kind": "down",
+                "atMs": 11204,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 11205,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 11504
+              },
+              {
+                "kind": "down",
+                "atMs": 11504,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 11505,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 11804
+              },
+              {
+                "kind": "down",
+                "atMs": 11804,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 11805,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 12104
+              },
+              {
+                "kind": "down",
+                "atMs": 12104,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 12105,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 12404
+              },
+              {
+                "kind": "down",
+                "atMs": 12404,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 12405,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 12704
+              },
+              {
+                "kind": "down",
+                "atMs": 12704,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 12705,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 13004
+              },
+              {
+                "kind": "down",
+                "atMs": 13004,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 13005,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 13304
+              },
+              {
+                "kind": "down",
+                "atMs": 13304,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 13305,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 13604
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "choices": [
+                {
+                  "step": 0,
+                  "side": "right",
+                  "atMs": 10604,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 83,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 1,
+                  "side": "left",
+                  "atMs": 10904,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 58,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 2,
+                  "side": "left",
+                  "atMs": 11204,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 55,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 3,
+                  "side": "right",
+                  "atMs": 11504,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 94,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 4,
+                  "side": "left",
+                  "atMs": 11804,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 74,
+                  "forced": false,
+                  "firstFree": true
+                },
+                {
+                  "step": 5,
+                  "side": "left",
+                  "atMs": 12104,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 58,
+                  "forced": false,
+                  "firstFree": false
+                },
+                {
+                  "step": 6,
+                  "side": "left",
+                  "atMs": 12404,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 59,
+                  "forced": false,
+                  "firstFree": false
+                },
+                {
+                  "step": 7,
+                  "side": "left",
+                  "atMs": 12704,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 60,
+                  "forced": false,
+                  "firstFree": false
+                },
+                {
+                  "step": 8,
+                  "side": "left",
+                  "atMs": 13004,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 78,
+                  "forced": false,
+                  "firstFree": false
+                },
+                {
+                  "step": 9,
+                  "side": "left",
+                  "atMs": 13304,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 59,
+                  "forced": false,
+                  "firstFree": false
+                }
+              ],
+              "readyAtMs": 13604,
+              "completeAtMs": 13604,
+              "held": [],
+              "ignored": {
+                "early": 0,
+                "held": 0,
+                "wrongForced": 0,
+                "inactive": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 5,
+          "phase": "test",
+          "condition": "unequal:6",
+          "startedAtPerfMs": 13605,
+          "endedAtPerfMs": 16605,
+          "durationMs": 3000,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 5,
+              "phase": "test",
+              "round": 0,
+              "blockIndex": 0,
+              "cellId": "1:1:3:0:0",
+              "freeChoices": 6,
+              "totalSteps": 10,
+              "information": "unequal",
+              "lessSampledSide": "left",
+              "higherMeanSide": "left",
+              "absoluteMeanDifference": 20,
+              "anchorMean": 60,
+              "anchorSide": "right",
+              "means": {
+                "left": 80,
+                "right": 60
+              },
+              "forced": [
+                "right",
+                "right",
+                "right",
+                "left"
+              ],
+              "rewards": {
+                "left": [
+                  81,
+                  77,
+                  62,
+                  73,
+                  75,
+                  80,
+                  91,
+                  70,
+                  71,
+                  69
+                ],
+                "right": [
+                  62,
+                  66,
+                  54,
+                  49,
+                  60,
+                  61,
+                  57,
+                  57,
+                  61,
+                  54
+                ]
+              }
+            },
+            "startedAtPerfMs": 13605,
+            "endedAtPerfMs": 16605,
+            "status": "complete",
+            "stopReason": null,
+            "events": [
+              {
+                "kind": "down",
+                "atMs": 13605,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 13606,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 13905
+              },
+              {
+                "kind": "down",
+                "atMs": 13905,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 13906,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 14205
+              },
+              {
+                "kind": "down",
+                "atMs": 14205,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 14206,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 14505
+              },
+              {
+                "kind": "down",
+                "atMs": 14505,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 14506,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 14805
+              },
+              {
+                "kind": "down",
+                "atMs": 14805,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 14806,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 15105
+              },
+              {
+                "kind": "down",
+                "atMs": 15105,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 15106,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 15405
+              },
+              {
+                "kind": "down",
+                "atMs": 15405,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 15406,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 15705
+              },
+              {
+                "kind": "down",
+                "atMs": 15705,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 15706,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 16005
+              },
+              {
+                "kind": "down",
+                "atMs": 16005,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 16006,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 16305
+              },
+              {
+                "kind": "down",
+                "atMs": 16305,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 16306,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 16605
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "choices": [
+                {
+                  "step": 0,
+                  "side": "right",
+                  "atMs": 13605,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 62,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 1,
+                  "side": "right",
+                  "atMs": 13905,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 66,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 2,
+                  "side": "right",
+                  "atMs": 14205,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 54,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 3,
+                  "side": "left",
+                  "atMs": 14505,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 81,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 4,
+                  "side": "right",
+                  "atMs": 14805,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 49,
+                  "forced": false,
+                  "firstFree": true
+                },
+                {
+                  "step": 5,
+                  "side": "right",
+                  "atMs": 15105,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 60,
+                  "forced": false,
+                  "firstFree": false
+                },
+                {
+                  "step": 6,
+                  "side": "right",
+                  "atMs": 15405,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 61,
+                  "forced": false,
+                  "firstFree": false
+                },
+                {
+                  "step": 7,
+                  "side": "right",
+                  "atMs": 15705,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 57,
+                  "forced": false,
+                  "firstFree": false
+                },
+                {
+                  "step": 8,
+                  "side": "right",
+                  "atMs": 16005,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 57,
+                  "forced": false,
+                  "firstFree": false
+                },
+                {
+                  "step": 9,
+                  "side": "right",
+                  "atMs": 16305,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 61,
+                  "forced": false,
+                  "firstFree": false
+                }
+              ],
+              "readyAtMs": 16605,
+              "completeAtMs": 16605,
+              "held": [],
+              "ignored": {
+                "early": 0,
+                "held": 0,
+                "wrongForced": 0,
+                "inactive": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 6,
+          "phase": "test",
+          "condition": "unequal:6",
+          "startedAtPerfMs": 16606,
+          "endedAtPerfMs": 19606,
+          "durationMs": 3000,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 6,
+              "phase": "test",
+              "round": 0,
+              "blockIndex": 0,
+              "cellId": "1:1:4:1:0",
+              "freeChoices": 6,
+              "totalSteps": 10,
+              "information": "unequal",
+              "lessSampledSide": "left",
+              "higherMeanSide": "right",
+              "absoluteMeanDifference": 30,
+              "anchorMean": 40,
+              "anchorSide": "right",
+              "means": {
+                "left": 10,
+                "right": 40
+              },
+              "forced": [
+                "left",
+                "right",
+                "right",
+                "right"
+              ],
+              "rewards": {
+                "left": [
+                  6,
+                  17,
+                  18,
+                  1,
+                  6,
+                  14,
+                  20,
+                  32,
+                  8,
+                  2
+                ],
+                "right": [
+                  20,
+                  40,
+                  29,
+                  55,
+                  34,
+                  34,
+                  49,
+                  36,
+                  20,
+                  47
+                ]
+              }
+            },
+            "startedAtPerfMs": 16606,
+            "endedAtPerfMs": 19606,
+            "status": "complete",
+            "stopReason": null,
+            "events": [
+              {
+                "kind": "down",
+                "atMs": 16606,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 16607,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 16906
+              },
+              {
+                "kind": "down",
+                "atMs": 16906,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 16907,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 17206
+              },
+              {
+                "kind": "down",
+                "atMs": 17206,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 17207,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 17506
+              },
+              {
+                "kind": "down",
+                "atMs": 17506,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 17507,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 17806
+              },
+              {
+                "kind": "down",
+                "atMs": 17806,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 17807,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 18106
+              },
+              {
+                "kind": "down",
+                "atMs": 18106,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 18107,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 18406
+              },
+              {
+                "kind": "down",
+                "atMs": 18406,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 18407,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 18706
+              },
+              {
+                "kind": "down",
+                "atMs": 18706,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 18707,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 19006
+              },
+              {
+                "kind": "down",
+                "atMs": 19006,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 19007,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 19306
+              },
+              {
+                "kind": "down",
+                "atMs": 19306,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 19307,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 19606
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "choices": [
+                {
+                  "step": 0,
+                  "side": "left",
+                  "atMs": 16606,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 6,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 1,
+                  "side": "right",
+                  "atMs": 16906,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 20,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 2,
+                  "side": "right",
+                  "atMs": 17206,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 40,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 3,
+                  "side": "right",
+                  "atMs": 17506,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 29,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 4,
+                  "side": "right",
+                  "atMs": 17806,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 55,
+                  "forced": false,
+                  "firstFree": true
+                },
+                {
+                  "step": 5,
+                  "side": "right",
+                  "atMs": 18106,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 34,
+                  "forced": false,
+                  "firstFree": false
+                },
+                {
+                  "step": 6,
+                  "side": "right",
+                  "atMs": 18406,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 34,
+                  "forced": false,
+                  "firstFree": false
+                },
+                {
+                  "step": 7,
+                  "side": "right",
+                  "atMs": 18706,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 49,
+                  "forced": false,
+                  "firstFree": false
+                },
+                {
+                  "step": 8,
+                  "side": "right",
+                  "atMs": 19006,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 36,
+                  "forced": false,
+                  "firstFree": false
+                },
+                {
+                  "step": 9,
+                  "side": "right",
+                  "atMs": 19306,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 20,
+                  "forced": false,
+                  "firstFree": false
+                }
+              ],
+              "readyAtMs": 19606,
+              "completeAtMs": 19606,
+              "held": [],
+              "ignored": {
+                "early": 0,
+                "held": 0,
+                "wrongForced": 0,
+                "inactive": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 7,
+          "phase": "test",
+          "condition": "equal:6",
+          "startedAtPerfMs": 19607,
+          "endedAtPerfMs": 22607,
+          "durationMs": 3000,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 7,
+              "phase": "test",
+              "round": 0,
+              "blockIndex": 0,
+              "cellId": "1:0:1:0:1",
+              "freeChoices": 6,
+              "totalSteps": 10,
+              "information": "equal",
+              "lessSampledSide": null,
+              "higherMeanSide": "left",
+              "absoluteMeanDifference": 8,
+              "anchorMean": 60,
+              "anchorSide": "right",
+              "means": {
+                "left": 68,
+                "right": 60
+              },
+              "forced": [
+                "right",
+                "left",
+                "right",
+                "left"
+              ],
+              "rewards": {
+                "left": [
+                  67,
+                  63,
+                  65,
+                  57,
+                  81,
+                  57,
+                  61,
+                  82,
+                  68,
+                  82
+                ],
+                "right": [
+                  49,
+                  55,
+                  68,
+                  64,
+                  64,
+                  74,
+                  56,
+                  73,
+                  46,
+                  68
+                ]
+              }
+            },
+            "startedAtPerfMs": 19607,
+            "endedAtPerfMs": 22607,
+            "status": "complete",
+            "stopReason": null,
+            "events": [
+              {
+                "kind": "down",
+                "atMs": 19607,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 19608,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 19907
+              },
+              {
+                "kind": "down",
+                "atMs": 19907,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 19908,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 20207
+              },
+              {
+                "kind": "down",
+                "atMs": 20207,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 20208,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 20507
+              },
+              {
+                "kind": "down",
+                "atMs": 20507,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 20508,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 20807
+              },
+              {
+                "kind": "down",
+                "atMs": 20807,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 20808,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 21107
+              },
+              {
+                "kind": "down",
+                "atMs": 21107,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 21108,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 21407
+              },
+              {
+                "kind": "down",
+                "atMs": 21407,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 21408,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 21707
+              },
+              {
+                "kind": "down",
+                "atMs": 21707,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 21708,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 22007
+              },
+              {
+                "kind": "down",
+                "atMs": 22007,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 22008,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 22307
+              },
+              {
+                "kind": "down",
+                "atMs": 22307,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 22308,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 22607
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "choices": [
+                {
+                  "step": 0,
+                  "side": "right",
+                  "atMs": 19607,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 49,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 1,
+                  "side": "left",
+                  "atMs": 19907,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 67,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 2,
+                  "side": "right",
+                  "atMs": 20207,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 55,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 3,
+                  "side": "left",
+                  "atMs": 20507,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 63,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 4,
+                  "side": "left",
+                  "atMs": 20807,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 65,
+                  "forced": false,
+                  "firstFree": true
+                },
+                {
+                  "step": 5,
+                  "side": "left",
+                  "atMs": 21107,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 57,
+                  "forced": false,
+                  "firstFree": false
+                },
+                {
+                  "step": 6,
+                  "side": "left",
+                  "atMs": 21407,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 81,
+                  "forced": false,
+                  "firstFree": false
+                },
+                {
+                  "step": 7,
+                  "side": "left",
+                  "atMs": 21707,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 57,
+                  "forced": false,
+                  "firstFree": false
+                },
+                {
+                  "step": 8,
+                  "side": "left",
+                  "atMs": 22007,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 61,
+                  "forced": false,
+                  "firstFree": false
+                },
+                {
+                  "step": 9,
+                  "side": "left",
+                  "atMs": 22307,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 82,
+                  "forced": false,
+                  "firstFree": false
+                }
+              ],
+              "readyAtMs": 22607,
+              "completeAtMs": 22607,
+              "held": [],
+              "ignored": {
+                "early": 0,
+                "held": 0,
+                "wrongForced": 0,
+                "inactive": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 8,
+          "phase": "test",
+          "condition": "equal:1",
+          "startedAtPerfMs": 22608,
+          "endedAtPerfMs": 24108,
+          "durationMs": 1500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 8,
+              "phase": "test",
+              "round": 0,
+              "blockIndex": 0,
+              "cellId": "0:0:3:0:0",
+              "freeChoices": 1,
+              "totalSteps": 5,
+              "information": "equal",
+              "lessSampledSide": null,
+              "higherMeanSide": "left",
+              "absoluteMeanDifference": 20,
+              "anchorMean": 40,
+              "anchorSide": "right",
+              "means": {
+                "left": 60,
+                "right": 40
+              },
+              "forced": [
+                "left",
+                "left",
+                "right",
+                "right"
+              ],
+              "rewards": {
+                "left": [
+                  59,
+                  55,
+                  64,
+                  49,
+                  68
+                ],
+                "right": [
+                  38,
+                  40,
+                  36,
+                  32,
+                  47
+                ]
+              }
+            },
+            "startedAtPerfMs": 22608,
+            "endedAtPerfMs": 24108,
+            "status": "complete",
+            "stopReason": null,
+            "events": [
+              {
+                "kind": "down",
+                "atMs": 22608,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 22609,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 22908
+              },
+              {
+                "kind": "down",
+                "atMs": 22908,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 22909,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 23208
+              },
+              {
+                "kind": "down",
+                "atMs": 23208,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 23209,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 23508
+              },
+              {
+                "kind": "down",
+                "atMs": 23508,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 23509,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 23808
+              },
+              {
+                "kind": "down",
+                "atMs": 23808,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 23809,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 24108
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "choices": [
+                {
+                  "step": 0,
+                  "side": "left",
+                  "atMs": 22608,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 59,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 1,
+                  "side": "left",
+                  "atMs": 22908,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 55,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 2,
+                  "side": "right",
+                  "atMs": 23208,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 38,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 3,
+                  "side": "right",
+                  "atMs": 23508,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 40,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 4,
+                  "side": "left",
+                  "atMs": 23808,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 64,
+                  "forced": false,
+                  "firstFree": true
+                }
+              ],
+              "readyAtMs": 24108,
+              "completeAtMs": 24108,
+              "held": [],
+              "ignored": {
+                "early": 0,
+                "held": 0,
+                "wrongForced": 0,
+                "inactive": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 9,
+          "phase": "test",
+          "condition": "unequal:6",
+          "startedAtPerfMs": 24109,
+          "endedAtPerfMs": 27109,
+          "durationMs": 3000,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 9,
+              "phase": "test",
+              "round": 0,
+              "blockIndex": 0,
+              "cellId": "1:1:1:0:0",
+              "freeChoices": 6,
+              "totalSteps": 10,
+              "information": "unequal",
+              "lessSampledSide": "left",
+              "higherMeanSide": "left",
+              "absoluteMeanDifference": 8,
+              "anchorMean": 40,
+              "anchorSide": "left",
+              "means": {
+                "left": 40,
+                "right": 32
+              },
+              "forced": [
+                "right",
+                "right",
+                "left",
+                "right"
+              ],
+              "rewards": {
+                "left": [
+                  29,
+                  41,
+                  39,
+                  66,
+                  42,
+                  34,
+                  46,
+                  37,
+                  37,
+                  52
+                ],
+                "right": [
+                  41,
+                  45,
+                  30,
+                  30,
+                  27,
+                  36,
+                  27,
+                  44,
+                  19,
+                  32
+                ]
+              }
+            },
+            "startedAtPerfMs": 24109,
+            "endedAtPerfMs": 27109,
+            "status": "complete",
+            "stopReason": null,
+            "events": [
+              {
+                "kind": "down",
+                "atMs": 24109,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 24110,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 24409
+              },
+              {
+                "kind": "down",
+                "atMs": 24409,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 24410,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 24709
+              },
+              {
+                "kind": "down",
+                "atMs": 24709,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 24710,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 25009
+              },
+              {
+                "kind": "down",
+                "atMs": 25009,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 25010,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 25309
+              },
+              {
+                "kind": "down",
+                "atMs": 25309,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 25310,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 25609
+              },
+              {
+                "kind": "down",
+                "atMs": 25609,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 25610,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 25909
+              },
+              {
+                "kind": "down",
+                "atMs": 25909,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 25910,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 26209
+              },
+              {
+                "kind": "down",
+                "atMs": 26209,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 26210,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 26509
+              },
+              {
+                "kind": "down",
+                "atMs": 26509,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 26510,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 26809
+              },
+              {
+                "kind": "down",
+                "atMs": 26809,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 26810,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 27109
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "choices": [
+                {
+                  "step": 0,
+                  "side": "right",
+                  "atMs": 24109,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 41,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 1,
+                  "side": "right",
+                  "atMs": 24409,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 45,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 2,
+                  "side": "left",
+                  "atMs": 24709,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 29,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 3,
+                  "side": "right",
+                  "atMs": 25009,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 30,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 4,
+                  "side": "right",
+                  "atMs": 25309,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 30,
+                  "forced": false,
+                  "firstFree": true
+                },
+                {
+                  "step": 5,
+                  "side": "right",
+                  "atMs": 25609,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 27,
+                  "forced": false,
+                  "firstFree": false
+                },
+                {
+                  "step": 6,
+                  "side": "right",
+                  "atMs": 25909,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 36,
+                  "forced": false,
+                  "firstFree": false
+                },
+                {
+                  "step": 7,
+                  "side": "right",
+                  "atMs": 26209,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 27,
+                  "forced": false,
+                  "firstFree": false
+                },
+                {
+                  "step": 8,
+                  "side": "right",
+                  "atMs": 26509,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 44,
+                  "forced": false,
+                  "firstFree": false
+                },
+                {
+                  "step": 9,
+                  "side": "right",
+                  "atMs": 26809,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 19,
+                  "forced": false,
+                  "firstFree": false
+                }
+              ],
+              "readyAtMs": 27109,
+              "completeAtMs": 27109,
+              "held": [],
+              "ignored": {
+                "early": 0,
+                "held": 0,
+                "wrongForced": 0,
+                "inactive": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 10,
+          "phase": "test",
+          "condition": "equal:6",
+          "startedAtPerfMs": 27110,
+          "endedAtPerfMs": 30110,
+          "durationMs": 3000,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 10,
+              "phase": "test",
+              "round": 0,
+              "blockIndex": 0,
+              "cellId": "1:0:3:1:0",
+              "freeChoices": 6,
+              "totalSteps": 10,
+              "information": "equal",
+              "lessSampledSide": null,
+              "higherMeanSide": "right",
+              "absoluteMeanDifference": 20,
+              "anchorMean": 40,
+              "anchorSide": "right",
+              "means": {
+                "left": 20,
+                "right": 40
+              },
+              "forced": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ],
+              "rewards": {
+                "left": [
+                  23,
+                  21,
+                  17,
+                  35,
+                  25,
+                  8,
+                  22,
+                  36,
+                  13,
+                  22
+                ],
+                "right": [
+                  57,
+                  46,
+                  39,
+                  49,
+                  27,
+                  50,
+                  44,
+                  42,
+                  47,
+                  37
+                ]
+              }
+            },
+            "startedAtPerfMs": 27110,
+            "endedAtPerfMs": 30110,
+            "status": "complete",
+            "stopReason": null,
+            "events": [
+              {
+                "kind": "down",
+                "atMs": 27110,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 27111,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 27410
+              },
+              {
+                "kind": "down",
+                "atMs": 27410,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 27411,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 27710
+              },
+              {
+                "kind": "down",
+                "atMs": 27710,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 27711,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 28010
+              },
+              {
+                "kind": "down",
+                "atMs": 28010,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 28011,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 28310
+              },
+              {
+                "kind": "down",
+                "atMs": 28310,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 28311,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 28610
+              },
+              {
+                "kind": "down",
+                "atMs": 28610,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 28611,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 28910
+              },
+              {
+                "kind": "down",
+                "atMs": 28910,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 28911,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 29210
+              },
+              {
+                "kind": "down",
+                "atMs": 29210,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 29211,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 29510
+              },
+              {
+                "kind": "down",
+                "atMs": 29510,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 29511,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 29810
+              },
+              {
+                "kind": "down",
+                "atMs": 29810,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 29811,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 30110
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "choices": [
+                {
+                  "step": 0,
+                  "side": "left",
+                  "atMs": 27110,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 23,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 1,
+                  "side": "right",
+                  "atMs": 27410,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 57,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 2,
+                  "side": "right",
+                  "atMs": 27710,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 46,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 3,
+                  "side": "left",
+                  "atMs": 28010,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 21,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 4,
+                  "side": "left",
+                  "atMs": 28310,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 17,
+                  "forced": false,
+                  "firstFree": true
+                },
+                {
+                  "step": 5,
+                  "side": "left",
+                  "atMs": 28610,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 35,
+                  "forced": false,
+                  "firstFree": false
+                },
+                {
+                  "step": 6,
+                  "side": "left",
+                  "atMs": 28910,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 25,
+                  "forced": false,
+                  "firstFree": false
+                },
+                {
+                  "step": 7,
+                  "side": "left",
+                  "atMs": 29210,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 8,
+                  "forced": false,
+                  "firstFree": false
+                },
+                {
+                  "step": 8,
+                  "side": "left",
+                  "atMs": 29510,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 22,
+                  "forced": false,
+                  "firstFree": false
+                },
+                {
+                  "step": 9,
+                  "side": "left",
+                  "atMs": 29810,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 36,
+                  "forced": false,
+                  "firstFree": false
+                }
+              ],
+              "readyAtMs": 30110,
+              "completeAtMs": 30110,
+              "held": [],
+              "ignored": {
+                "early": 0,
+                "held": 0,
+                "wrongForced": 0,
+                "inactive": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 11,
+          "phase": "test",
+          "condition": "unequal:1",
+          "startedAtPerfMs": 30111,
+          "endedAtPerfMs": 31312,
+          "durationMs": 1201,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [
+            "resume"
+          ],
+          "payload": {
+            "plan": {
+              "index": 11,
+              "phase": "test",
+              "round": 0,
+              "blockIndex": 0,
+              "cellId": "0:1:1:1:0",
+              "freeChoices": 1,
+              "totalSteps": 5,
+              "information": "unequal",
+              "lessSampledSide": "left",
+              "higherMeanSide": "right",
+              "absoluteMeanDifference": 8,
+              "anchorMean": 60,
+              "anchorSide": "left",
+              "means": {
+                "left": 60,
+                "right": 68
+              },
+              "forced": [
+                "right",
+                "right",
+                "left",
+                "right"
+              ],
+              "rewards": {
+                "left": [
+                  70,
+                  64,
+                  66,
+                  46,
+                  66
+                ],
+                "right": [
+                  75,
+                  41,
+                  63,
+                  58,
+                  68
+                ]
+              }
+            },
+            "startedAtPerfMs": 30111,
+            "endedAtPerfMs": 31312,
+            "status": "interrupted",
+            "stopReason": "participant-ended",
+            "events": [
+              {
+                "kind": "down",
+                "atMs": 30111,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 30112,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 30411
+              },
+              {
+                "kind": "down",
+                "atMs": 30411,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 30412,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 30711
+              },
+              {
+                "kind": "down",
+                "atMs": 30711,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 30712,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 31011
+              },
+              {
+                "kind": "down",
+                "atMs": 31011,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 31012,
+                "side": "right",
+                "input": "keyboard",
+                "token": "key:ArrowRight",
+                "key": "ArrowRight",
+                "repeat": false
+              },
+              {
+                "kind": "ready",
+                "atMs": 31311
+              },
+              {
+                "kind": "down",
+                "atMs": 31311,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              },
+              {
+                "kind": "up",
+                "atMs": 31312,
+                "side": "left",
+                "input": "keyboard",
+                "token": "key:ArrowLeft",
+                "key": "ArrowLeft",
+                "repeat": false
+              }
+            ],
+            "state": {
+              "stage": "feedback",
+              "choices": [
+                {
+                  "step": 0,
+                  "side": "right",
+                  "atMs": 30111,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 75,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 1,
+                  "side": "right",
+                  "atMs": 30411,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 41,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 2,
+                  "side": "left",
+                  "atMs": 30711,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 70,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 3,
+                  "side": "right",
+                  "atMs": 31011,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 63,
+                  "forced": true,
+                  "firstFree": false
+                },
+                {
+                  "step": 4,
+                  "side": "left",
+                  "atMs": 31311,
+                  "rtMs": 0,
+                  "input": "keyboard",
+                  "reward": 64,
+                  "forced": false,
+                  "firstFree": true
+                }
+              ],
+              "readyAtMs": 31611,
+              "completeAtMs": null,
+              "held": [],
+              "ignored": {
+                "early": 0,
+                "held": 0,
+                "wrongForced": 0,
+                "inactive": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        }
+      ]
+    }
+  }
+}

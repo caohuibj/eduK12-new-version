@@ -1,0 +1,36 @@
+{
+  "sourceReceipt": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/frontend-direct-types.json",
+  "scope": "Read-only TS consumer identity comparison; old screenshots retain component-preview and failed-original invocation identity.",
+  "comparison": [
+    {
+      "path": "server-version/frontend/src/modules/cognitive/CognitiveReportVisual.tsx",
+      "then": "81d90a08a205ef5f963d9a308c830ec99e451df4ffd0ca83780e3a186e6a74a2",
+      "current": "81d90a08a205ef5f963d9a308c830ec99e451df4ffd0ca83780e3a186e6a74a2"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/horizon-exploration/generated/protocol.ts",
+      "then": "5a79a323a57527bab81c8ff2bf97414b2aac006f763c95fec09aedd270d8ae15",
+      "current": "5a79a323a57527bab81c8ff2bf97414b2aac006f763c95fec09aedd270d8ae15"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/horizon-exploration/HorizonInstructions.tsx",
+      "then": "103f374c5f9fd8988fe42e46a95eb3e385937ace72e14ab48e81e322e13bd1ad",
+      "current": "103f374c5f9fd8988fe42e46a95eb3e385937ace72e14ab48e81e322e13bd1ad"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/horizon-exploration/generated/analysis.ts",
+      "then": "9147b0aecd9efac024346f2da040d14bfc5066484c14c30d106e7ed93a8a44c3",
+      "current": "9147b0aecd9efac024346f2da040d14bfc5066484c14c30d106e7ed93a8a44c3"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/horizon-exploration/generated/report.ts",
+      "then": "badf45f31a2c183780d5ab36c8d64fd0371875ca326bdbdc9fd4caae3a32e509",
+      "current": "badf45f31a2c183780d5ab36c8d64fd0371875ca326bdbdc9fd4caae3a32e509"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/horizon-exploration/HorizonReport.tsx",
+      "then": "6ad6147210f6fe571b7bc4a9255d9fa58661dbdbcdbbd15f09842880d2f909de",
+      "current": "6ad6147210f6fe571b7bc4a9255d9fa58661dbdbcdbbd15f09842880d2f909de"
+    }
+  ]
+}
