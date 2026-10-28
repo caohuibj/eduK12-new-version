@@ -1,0 +1,239 @@
+{
+  "identity": "ipip_positive_expressivity9_zh_cn_research:1.0.0",
+  "sourceCommit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "sourceFiles": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ipip_positive_expressivity9_zh_cn_research/1.0.0/source.json",
+      "gitBlob": "7fa66ac8f5c4634d70f466f4f6751c4dd06ec7c2",
+      "sha256": "c9c348aed9a5596aa774d5eae074e63555bd50b379084bcde04f2165c9d2051a"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ipip_positive_expressivity9_zh_cn_research/1.0.0/instrument.ts",
+      "gitBlob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_positive_expressivity9/1.0.0/README.md",
+      "gitBlob": "37fba9b0c9356e8342e02d74077ce6706f9b0018",
+      "sha256": "7c8e075e09a7f0b213dd50d0dfeed0d69cc57f00ab5f0f7f8cfd049ea69143f0"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_positive_expressivity9/1.0.0/bilingual-content.json",
+      "gitBlob": "a072f9cd851f0fa9ce5957b815b72e8f39d60057",
+      "sha256": "4ea8e3ef0698679587ee0ffdf2a4b7817efc38f67af2cd6b162aa00d7bd5a343"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_positive_expressivity9/1.0.0/reviewed-source-pack.json",
+      "gitBlob": "762038edd94384f890921132d919f701a421729c",
+      "sha256": "4d2d8d79a0092c03475908bc519f624fd3b3ed14327b0192f191e83394516891"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_positive_expressivity9/1.0.0/references.md",
+      "gitBlob": "2176600b839da53dd8da415c37bfed6936af4965",
+      "sha256": "1f148e6c6b7674c2a02ea6e440f28447adf9def9d9a36aef2c1a81aff8c33e76"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_positive_expressivity9/1.0.0/report-example.md",
+      "gitBlob": "80e6c132d249e58bbf71bc99574be676cd2b2e8d",
+      "sha256": "6c2d446d26aeab0433f3e7a2032aa850d1b1b0eac3834db990a63fb1629cbfd7"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_positive_expressivity9/1.0.0/report-example.json",
+      "gitBlob": "6258b280032c9c4551cf3d74e7f5dc39bffebeb5",
+      "sha256": "cb049d9c32d80b749dfa6da71c32a3bb32317da1e81c5cf4f51d974568a7b97f"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_positive_expressivity9/1.0.0/external-reference-dossier.json",
+      "gitBlob": "d84c8e1ac101a48028e6daa0d0da1c8afb0a3417",
+      "sha256": "232a5fbebbd7209cb38ea0282cae726f14b79eadf85d86e10df522bb0063ac0c"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_positive_expressivity9/1.0.0/scoring-and-thresholds.md",
+      "gitBlob": "c7067a53aae034e639be3cabcf56c2671365da62",
+      "sha256": "ce7538817932cc4e933bfae94735b3671f80532f98fc24376f8eb1d1d97cafce"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_positive_expressivity9/1.0.0/local-validation.json",
+      "gitBlob": "a03e0f54383f3d54538635fc8bfad0f66ed0ab62",
+      "sha256": "68d5a615e073f2ae8b281be7fa1dc151d0b5504272bd412a95bcf1151a265421"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_positive_expressivity9/1.0.0/runtime-check.json",
+      "gitBlob": "48a0d715096b6df88c21b6f4bd9155db75841036",
+      "sha256": "26286d3c81e6affe2943f4f32dcb73f2a421ad72ee389da37e28564bfcb6a9cc"
+    }
+  ],
+  "threePartConclusions": {
+    "content": "官方 Barchard IPIP Positive Expressivity 当前九题英文及题序逐项一致，1–6 正向，7–9 反向；固定中文题与双语材料一致，表达原意基本对应。第1题 physically 解为身体接触属于具体化译法，第3题 childlike 与第9题补出的不表现出来可由人工译审，不擅改成熟题目。五点锚为符合度，题4本身含有时。",
+    "scoring": "单一总分，六正向 x、三反向 6−x，九题权重均1求和，范围9–45；非均分，无缺失分母。complete_required 缺任一题不计总分、不补零或插补，是项目选择非官方缺失法。阈值及常模均无，referencePolicy none。",
+    "report": "报告1.0.0为成人自我反思，关注表达而非快乐水平，提示双方意愿与边界，提供分享小开心或感谢的温和行动；不生成常模、等级或诊断。student 是技术受众映射而非儿童；instrument/scoring/report/localization 均1.0.0。报告方向的“越常”比符合度锚点多一层频率解释，建议小幅修词。score description 英文可能出现在中文结果，建议本地化（先确认对应呈现与版本策略）。"
+  },
+  "items": [
+    {
+      "position": 1,
+      "runtimeItemCode": "IPIP_POSITIVE_EXPRESSIVITY9_01",
+      "en": "Express my affection physically.",
+      "zh": "我会用身体接触来表达亲近和喜爱。",
+      "key": "positive",
+      "result": "与官方英文/键向及固定运行时一致，中文基本对应；人工译审待完成；身体接触为具体化译法"
+    },
+    {
+      "position": 2,
+      "runtimeItemCode": "IPIP_POSITIVE_EXPRESSIVITY9_02",
+      "en": "Laugh out loud if something is funny.",
+      "zh": "遇到有趣的事，我会放声笑出来。",
+      "key": "positive",
+      "result": "与官方英文/键向及固定运行时一致，中文基本对应；人工译审待完成"
+    },
+    {
+      "position": 3,
+      "runtimeItemCode": "IPIP_POSITIVE_EXPRESSIVITY9_03",
+      "en": "Express my happiness in a childlike manner.",
+      "zh": "我会像孩子一样表达自己的快乐。",
+      "key": "positive",
+      "result": "与官方英文/键向及固定运行时一致，中文基本对应；人工译审待完成；childlike 表达需语境审阅"
+    },
+    {
+      "position": 4,
+      "runtimeItemCode": "IPIP_POSITIVE_EXPRESSIVITY9_04",
+      "en": "Sometimes laugh out loud when reading or watching TV.",
+      "zh": "看书或看电视时，我有时会放声笑出来。",
+      "key": "positive",
+      "result": "与官方英文/键向及固定运行时一致，中文基本对应；人工译审待完成"
+    },
+    {
+      "position": 5,
+      "runtimeItemCode": "IPIP_POSITIVE_EXPRESSIVITY9_05",
+      "en": "Hug my close friends.",
+      "zh": "我会拥抱亲密的朋友。",
+      "key": "positive",
+      "result": "与官方英文/键向及固定运行时一致，中文基本对应；人工译审待完成"
+    },
+    {
+      "position": 6,
+      "runtimeItemCode": "IPIP_POSITIVE_EXPRESSIVITY9_06",
+      "en": "Show my feelings when I'm happy.",
+      "zh": "开心时，我会把自己的感受表现出来。",
+      "key": "positive",
+      "result": "与官方英文/键向及固定运行时一致，中文基本对应；人工译审待完成"
+    },
+    {
+      "position": 7,
+      "runtimeItemCode": "IPIP_POSITIVE_EXPRESSIVITY9_07",
+      "en": "Find it difficult showing people that I care about them.",
+      "zh": "我觉得很难向别人表达我在乎他们。",
+      "key": "negative",
+      "result": "与官方英文/键向及固定运行时一致，中文基本对应；人工译审待完成"
+    },
+    {
+      "position": 8,
+      "runtimeItemCode": "IPIP_POSITIVE_EXPRESSIVITY9_08",
+      "en": "Have difficulty showing affection.",
+      "zh": "我难以表达亲近和喜爱。",
+      "key": "negative",
+      "result": "与官方英文/键向及固定运行时一致，中文基本对应；人工译审待完成"
+    },
+    {
+      "position": 9,
+      "runtimeItemCode": "IPIP_POSITIVE_EXPRESSIVITY9_09",
+      "en": "Keep my happy feelings to myself.",
+      "zh": "我把开心的感受留在心里，不表现出来。",
+      "key": "negative",
+      "result": "与官方英文/键向及固定运行时一致，中文基本对应；人工译审待完成；不表现出来为解释性补充"
+    }
+  ],
+  "anchors": [
+    {
+      "value": 1,
+      "en": "Very Inaccurate",
+      "zh": "非常不符合"
+    },
+    {
+      "value": 2,
+      "en": "Moderately Inaccurate",
+      "zh": "比较不符合"
+    },
+    {
+      "value": 3,
+      "en": "Neither Inaccurate nor Accurate",
+      "zh": "介于不符合与符合之间"
+    },
+    {
+      "value": 4,
+      "en": "Moderately Accurate",
+      "zh": "比较符合"
+    },
+    {
+      "value": 5,
+      "en": "Very Accurate",
+      "zh": "非常符合"
+    }
+  ],
+  "instruction": {
+    "text": "请根据你通常的情况，判断以下说法与你的符合程度。没有标准答案，请按自己的真实感受作答。",
+    "sources": [
+      {
+        "file": {
+          "path": "docs/scale-instruments/research-drafts/ipip_positive_expressivity9/1.0.0/bilingual-content.json",
+          "gitBlob": "a072f9cd851f0fa9ce5957b815b72e8f39d60057",
+          "sha256": "4ea8e3ef0698679587ee0ffdf2a4b7817efc38f67af2cd6b162aa00d7bd5a343"
+        },
+        "field": "instructions"
+      },
+      {
+        "file": {
+          "path": "docs/scale-instruments/research-drafts/ipip_positive_expressivity9/1.0.0/reviewed-source-pack.json",
+          "gitBlob": "762038edd94384f890921132d919f701a421729c",
+          "sha256": "4d2d8d79a0092c03475908bc519f624fd3b3ed14327b0192f191e83394516891"
+        },
+        "field": "administration.instructionZh"
+      }
+    ],
+    "sourceJson": "固定 source 顶层未声明 instruction，既有文档指导语可追溯。",
+    "proposedBinding": {
+      "schemaVersion": 1,
+      "text": "请根据你通常的情况，判断以下说法与你的符合程度。没有标准答案，请按自己的真实感受作答。",
+      "language": "zh-CN",
+      "version": "1.0.0",
+      "source": "docs/scale-instruments/research-drafts/ipip_positive_expressivity9/1.0.0/bilingual-content.json#instructions"
+    },
+    "qualification": "版本为拟议绑定标识，不是人类审核证明。"
+  },
+  "sourceEvidence": [
+    {
+      "url": "https://ipip.ori.org/newEmotionalIntelligenceKey.htm",
+      "finding": "官方 Positive Expressivity 9题，六正三反；标明 Barchard (2001)，独立组分不是完整测验。"
+    },
+    {
+      "url": "https://ipip.ori.org/newScoringInstructions.htm",
+      "finding": "符合度五点、反向及求和。"
+    },
+    {
+      "url": "https://ipip.ori.org/newEmotionalIntelligenceTable.htm",
+      "finding": "现9题、原始10题；历史英文样本系数非中文证据。"
+    }
+  ],
+  "minimalRevisionSuggestions": [
+    {
+      "scope": "报告方向语句",
+      "current": "计分方向越高，表示你越常通过笑声、表情或亲近动作表达积极感受",
+      "proposed": "分数越高，表示你这次更认可通过笑声、表情或亲近动作表达积极感受的描述",
+      "reason": "对齐符合度锚点，不把总分直接表述为行为频率；属于报告措辞，不改变题目或计分。沿用既有报告版本轴及历史快照规则。"
+    },
+    {
+      "scope": "score description",
+      "current": "Self-reported outward expression of positive feelings and affection; not happiness level, emotion-regulation ability, social competence or relationship quality.",
+      "proposed": "自述的积极情绪和亲近感受的外在表达；不代表快乐程度、情绪调节能力、社交能力或关系质量。",
+      "reason": "原字段为英文而受众 zh-CN；若呈现给用户应本地化，先核实消费位置和定义版本影响。"
+    }
+  ],
+  "manualPending": [
+    "中文独立译审与认知访谈/目标人群效度待完成；特别审阅第1、3、9题译法及文化、关系界限。",
+    "实质变更题意、锚点、构念、公式或阈值应记录原依据及版本影响并交 root 协调，不能静默修改。",
+    "保留 DRAFT/CANDIDATE/PILOT 与译审 PENDING；成人研究边界及真实既有权利状态。"
+  ],
+  "notExecuted": [
+    "未运行任何 golden、评分、截图、四入口、DB、CI、安装或系统验证；只读固定 Git 内容。",
+    "历史测试与合成示例均为既存材料，不声称新执行；未开展新科研或版权研究。"
+  ]
+}

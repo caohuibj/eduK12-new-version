@@ -1,0 +1,759 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "ipip_positive_expressivity9_zh_cn_research",
+    "instrumentVersion": "1.0.1"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "IPIP积极情绪表达9题（研究译稿）",
+      "abbreviation": "IPIP_POSITIVE_EXPRESSIVITY9",
+      "instrumentFamily": "International Personality Item Pool"
+    },
+    "construct": {
+      "primaryDomain": "SOCIAL_EMOTIONAL",
+      "secondaryDomains": [
+        "PERSONALITY"
+      ],
+      "constructDefinition": "Self-reported outward expression of positive feelings and affection; not happiness level, emotion-regulation ability, social competence or relationship quality.",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "ipip_positive_expressivity9",
+        "adult_self_report",
+        "non_diagnostic",
+        "public_domain",
+        "working_translation",
+        "research",
+        "descriptive_report",
+        "no_verified_norms",
+        "domain:social_emotional",
+        "construct:positive_expressivity",
+        "population:adult_research",
+        "response:self",
+        "response:digital_self",
+        "response:digital_supervised",
+        "response:paper",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:public_domain",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:translation_review_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    "population": {
+      "populationNotes": "成人本人自陈研究与自我了解；ADULT_SELF / student 中 student 为现有报告技术受众角色，不表示未成年人。中文工作译稿尚无目标人群效度证据，不据此推定青少年适用性。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "minAge": 18
+    },
+    "administration": {
+      "itemCount": 9,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "目前通常状态；无固定回忆时段",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保持当前官方题目顺序及1–5符合度锚点，不混旧题数版本。",
+        "项目采用全9题完整作答才求和，不把缺失当零。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "当前中文译稿的心理测量属性未验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "基于IPIP官方Barchard(2001)构念题库的AI辅助中文工作译稿，不是官方中文版。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "中文专家译审、认知访谈和目标人群心理测量验证待完成。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "ipip_positive_expressivity9-zh-cn-research-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "ipip_positive_expressivity9-zh-cn-research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "ipip_positive_expressivity9-zh-cn-research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "IPIP 官方声明题项公有领域，可复制、改编、翻译及电子施测；权利许可不代表此中文译稿已经验证。",
+      "https://ipip.ori.org/newPermission.htm"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "PUBLISHED",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "IPIP Positive Expressivity",
+        "citation": "Barchard (2001), as attributed by the official IPIP key; do not claim a complete emotional-intelligence battery.",
+        "url": "https://ipip.ori.org/newEmotionalIntelligenceKey.htm"
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "IPIP public domain: https://ipip.ori.org/newPermission.htm ; translation remains unvalidated."
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "ipip_positive_expressivity9_accuracy",
+          "options": [
+            {
+              "value": "1",
+              "label": "非常不符合",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "比较不符合",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "介于不符合与符合之间",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "比较符合",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "非常符合",
+              "score": 5
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_01",
+          "content": "我会用身体接触来表达亲近和喜爱。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "ipip_positive_expressivity9_accuracy",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_02",
+          "content": "遇到有趣的事，我会放声笑出来。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "ipip_positive_expressivity9_accuracy",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_03",
+          "content": "我会像孩子一样表达自己的快乐。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "ipip_positive_expressivity9_accuracy",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_04",
+          "content": "看书或看电视时，我有时会放声笑出来。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "ipip_positive_expressivity9_accuracy",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_05",
+          "content": "我会拥抱亲密的朋友。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "ipip_positive_expressivity9_accuracy",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_06",
+          "content": "开心时，我会把自己的感受表现出来。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "ipip_positive_expressivity9_accuracy",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_07",
+          "content": "我觉得很难向别人表达我在乎他们。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "ipip_positive_expressivity9_accuracy",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_08",
+          "content": "我难以表达亲近和喜爱。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "ipip_positive_expressivity9_accuracy",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_09",
+          "content": "我把开心的感受留在心里，不表现出来。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 8,
+          "responseSetKey": "ipip_positive_expressivity9_accuracy",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_06",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_07",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_08",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_09",
+            "transform": {
+              "type": "reverse"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "ipip_positive_expressivity9",
+            "type": "total",
+            "label": "积极情绪表达",
+            "description": "自述的积极情绪和亲近感受的外在表达；不代表快乐程度、情绪调节能力、社交能力或关系质量。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_09",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.1",
+        "primaryScoreKeys": [
+          "ipip_positive_expressivity9"
+        ],
+        "scoreOrder": [
+          "ipip_positive_expressivity9"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "ipip_positive_expressivity9",
+            "headline": "积极情绪表达：从日常经历看自己的习惯",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这份回答帮助你观察：开心和亲近的感受，通常会怎样被别人看见？它关注表达习惯，而不是你过得有多快乐。分数越高，表示你这次更认可通过笑声、表情或亲近动作表达积极感受的描述；较少外露也不代表冷漠或不在乎。例如，有人习惯笑出声，也有人更愿意说一句感谢；表达是否合适，还要看双方的意愿和关系边界。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回想最近一次开心的事：你是笑出声、说出来，还是安静地享受？身边的人是否知道你的心情？"
+              },
+              {
+                "category": "strategy",
+                "text": "选一个自己舒服、对方也愿意接受的方式，分享一件小开心或说一句感谢；表达亲近不必依赖拥抱或身体接触。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "中文研究译稿尚待人工审校与目标人群验证，目前仅供成人研究与自我了解。",
+          "表达方式受文化、关系边界和情境影响。该中文译稿尚待审核与验证，无可用的项目常模或分界值；不能用于诊断、能力排名或考核。",
+          "目前没有依据划分高低或人群排名；原英文研究的数据不是本中文版本的效度证明。",
+          "9题需完整回答；漏答不当作零分，也不代填。"
+        ],
+        "disclaimer": "仅供成人研究和描述性自我了解，不用于心理诊断、能力鉴定或高风险决策。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted local editorial check (not human expert review)",
+            "reviewedAt": "2026-10-25T16:18:00Z",
+            "basis": "AI editorial check only: descriptive adult reflection, no norms, diagnostic/ability/moral labels or therapy claims; not human expert translation or psychometric review."
+          }
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "ipip_positive_expressivity9",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "midpoint",
+        "answers": [
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_09",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "ipip_positive_expressivity9": 27
+          },
+          "totalScoreKeys": [
+            "ipip_positive_expressivity9"
+          ]
+        }
+      },
+      {
+        "name": "keyed-minimum",
+        "answers": [
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_07",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_08",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_09",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "ipip_positive_expressivity9": 9
+          },
+          "totalScoreKeys": [
+            "ipip_positive_expressivity9"
+          ]
+        }
+      },
+      {
+        "name": "keyed-maximum",
+        "answers": [
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_09",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "ipip_positive_expressivity9": 45
+          },
+          "totalScoreKeys": [
+            "ipip_positive_expressivity9"
+          ]
+        }
+      },
+      {
+        "name": "all-one",
+        "answers": [
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_09",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "ipip_positive_expressivity9": 21
+          },
+          "totalScoreKeys": [
+            "ipip_positive_expressivity9"
+          ]
+        }
+      },
+      {
+        "name": "all-five",
+        "answers": [
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_07",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_08",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_09",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "ipip_positive_expressivity9": 33
+          },
+          "totalScoreKeys": [
+            "ipip_positive_expressivity9"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "请根据你通常的情况，判断以下说法与你的符合程度。没有标准答案，请按自己的真实感受作答。",
+    "language": "zh-CN",
+    "version": "1.0.1",
+    "source": "docs/scale-instruments/research-drafts/ipip_positive_expressivity9/1.0.0/bilingual-content.json#/instructions @ b92c69aefa2472775fa7ee86b9c208366886c908 (项目工作稿；非人工审批声明)"
+  }
+}
