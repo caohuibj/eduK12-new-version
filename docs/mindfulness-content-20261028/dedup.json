@@ -1,0 +1,43 @@
+{
+  "mainSha": "6203a829dc8d7de707e67f413acfa5a354a21e09",
+  "contentSha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "candidateInventorySha": "scale-library-structure-20261027（PR 365 candidates.json，90个候选身份）",
+  "mainExact": [],
+  "contentExact": [],
+  "inventoryExact": [],
+  "exactKeysChecked": [
+    "ffmq39",
+    "maas15",
+    "kims39",
+    "camm10",
+    "fmi14",
+    "cams_r12",
+    "tms13",
+    "mts_teacher14",
+    "mipq28",
+    "meq28"
+  ],
+  "exactCheckNote": "以上10个精确key与 main（57个源）、content/dot-local-scales-20261025（85个版本）、PR 365 候选清单（90个身份）均无重复；候选库中正念/相邻构念仅有 ffmq15_zh_cn_research、chime_s24_zh_cn_research、maia2_37_zh_cn_research（另 mwq5_zh_cn_research 为走神问卷、mpmi_s22_zh_cn_research 为前瞻记忆问卷，均非正念工具，勿混淆）。",
+  "related": [
+    {
+      "newFamily": "ffmq39",
+      "existing": "ffmq15_zh_cn_research",
+      "relation": "FFMQ 原版39题与 FFMQ-15 短版（Bohlmeijer 等公开论文，CC BY）同属一个工具家族的长短版，不计为新的独立构念；题本、计分与证据互不通用，分数不互换比较。ffmq15 为中文工作稿（zh_cn），ffmq39 为英文原版（en）。"
+    },
+    {
+      "newFamily": "maas15",
+      "existing": "mwq5_zh_cn_research",
+      "relation": "名称相近但构念不同：MAAS 测特质正念（不留心体验频次），MWQ 测走神频率（Mind-Wandering Questionnaire，EXECUTIVE_FUNCTION）；非重复、不可互替。"
+    },
+    {
+      "newFamily": "camm10",
+      "existing": "ffmq15_zh_cn_research / ffmq39 / kims39",
+      "relation": "CAMM 为儿童青少年单维工具，与 FFMQ/KIMS 多侧面成人工具测量取向不同；人群与结构均不可互换。"
+    },
+    {
+      "newFamily": "tms13",
+      "existing": "ffmq39 / maas15 / kims39",
+      "relation": "TMS 测一次练习后的即时状态正念，与特质正念量表不同层；导入时不得与特质量表混合计分或比较。"
+    }
+  ]
+}

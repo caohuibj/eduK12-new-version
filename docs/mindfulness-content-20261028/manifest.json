@@ -1,0 +1,204 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-10-28",
+  "actualDatabaseImport": false,
+  "published": false,
+  "ciTriggered": false,
+  "toolFamilies": 10,
+  "exactVersions": 4,
+  "executableDrafts": 4,
+  "catalogOnly": 6,
+  "nativeGoldenCases": 27,
+  "reportSamples": 4,
+  "baseline": {
+    "mainSha": "6203a829dc8d7de707e67f413acfa5a354a21e09",
+    "contentBranchCompared": "content/dot-local-scales-20261025",
+    "contentBranchSha": "b92c69aefa2472775fa7ee86b9c208366886c908"
+  },
+  "tools": [
+    {
+      "family": "ffmq39",
+      "name": "FFMQ-39",
+      "category": "成人正念特质自评（五侧面）",
+      "fullTextSource": "https://www.ruthbaer.com/academics/FFMQ.pdf",
+      "wordingAndScoring": "PASS",
+      "report": "NATIVE_TEMPLATE_AND_STATIC_SAMPLE",
+      "commit": "e3fdd4d17f9f5dced2288d63baa44c95f3a96603",
+      "goldenCases": 5,
+      "versions": [
+        {
+          "key": "ffmq39",
+          "version": "1.0.0",
+          "itemCount": 39,
+          "locale": "en",
+          "executable": true
+        }
+      ]
+    },
+    {
+      "family": "kims39",
+      "name": "KIMS-39",
+      "category": "成人正念技能自评（四技能）",
+      "fullTextSource": "https://www.ruthbaer.com/academics/KIMS.pdf",
+      "wordingAndScoring": "PASS",
+      "report": "NATIVE_TEMPLATE_AND_STATIC_SAMPLE",
+      "commit": "a1591c104a8dcfcd9b8d4a23a6cdecfde36aebe6",
+      "goldenCases": 10,
+      "versions": [
+        {
+          "key": "kims39",
+          "version": "1.0.0",
+          "itemCount": 39,
+          "locale": "en",
+          "executable": true
+        }
+      ]
+    },
+    {
+      "family": "camm10",
+      "name": "CAMM-10",
+      "category": "儿童青少年正念自评（单维）",
+      "fullTextSource": "https://www.ruthbaer.com/academics/CAMM.pdf",
+      "wordingAndScoring": "PASS",
+      "report": "NATIVE_TEMPLATE_AND_STATIC_SAMPLE",
+      "commit": "6c512a198d0bdc7a2ef421e95e2e92e5e235b36d",
+      "goldenCases": 6,
+      "versions": [
+        {
+          "key": "camm10",
+          "version": "1.0.0",
+          "itemCount": 10,
+          "locale": "en",
+          "executable": true
+        }
+      ]
+    },
+    {
+      "family": "maas15",
+      "name": "MAAS-15",
+      "category": "成人正念特质自评（单维频次）",
+      "fullTextSource": "https://ppc.sas.upenn.edu/sites/default/files/mindfulnessscale.pdf",
+      "wordingAndScoring": "PASS",
+      "report": "NATIVE_TEMPLATE_AND_STATIC_SAMPLE",
+      "commit": "aeba46e79f7a6cb8c8f16ce04343564c87e727ce",
+      "goldenCases": 6,
+      "versions": [
+        {
+          "key": "maas15",
+          "version": "1.0.0",
+          "itemCount": 15,
+          "locale": "en",
+          "executable": true
+        }
+      ]
+    },
+    {
+      "family": "fmi",
+      "name": "FMI（Walach 原版14题）",
+      "category": "成人正念特质自评",
+      "fullTextSource": "PENDING",
+      "wordingAndScoring": "PENDING_FULL_CONTENT_IN_SOURCE",
+      "report": "NOT_STARTED",
+      "gap": "已找到的是周仁来、陈思佚编制的中文12题版 FMI-12 题本及使用手册，与 Walach et al. (2006) 原版14题为不同身份；不可直接互替。原版14题题本与许可待核。",
+      "versions": [
+        {
+          "key": "fmi14",
+          "version": "1.0.0",
+          "itemCount": 14,
+          "locale": null,
+          "executable": false
+        }
+      ]
+    },
+    {
+      "family": "cams_r",
+      "name": "CAMS-R",
+      "category": "成人正念特质自评（日常特质）",
+      "fullTextSource": "PENDING_VERIFIED_OPTION_ANCHORS",
+      "wordingAndScoring": "PENDING_RESPONSE_ANCHORS",
+      "report": "NOT_STARTED",
+      "gap": "12题与反向计分说明已核（Berkeley 来源），但各级作答选项的文字锚点未完整印出；补齐锚点前不能施测。",
+      "versions": [
+        {
+          "key": "cams_r12",
+          "version": "1.0.0",
+          "itemCount": 12,
+          "locale": null,
+          "executable": false
+        }
+      ]
+    },
+    {
+      "family": "tms",
+      "name": "TMS",
+      "category": "练习后即时正念状态（状态正念）",
+      "fullTextSource": "PENDING",
+      "wordingAndScoring": "PENDING_FULL_CONTENT_IN_SOURCE",
+      "report": "NOT_STARTED",
+      "gap": "13题（Lau et al., 2006，测量一次冥想/练习后的即时状态）；题文来源待正式核对与许可确认。状态正念与特质正念不混用。",
+      "versions": [
+        {
+          "key": "tms13",
+          "version": "1.0.0",
+          "itemCount": 13,
+          "locale": null,
+          "executable": false
+        }
+      ]
+    },
+    {
+      "family": "mts_teacher",
+      "name": "MTS（教学正念量表）",
+      "category": "教师正念自评（个人9题/师生互动5题）",
+      "fullTextSource": "PENDING",
+      "wordingAndScoring": "PENDING_FULL_CONTENT_IN_SOURCE",
+      "report": "NOT_STARTED",
+      "gap": "Frank et al. (2016) 表1同时给出中英条目、正文交代五级作答；原文可得性与许可待核。",
+      "versions": [
+        {
+          "key": "mts_teacher14",
+          "version": "1.0.0",
+          "itemCount": 14,
+          "locale": null,
+          "executable": false
+        }
+      ]
+    },
+    {
+      "family": "mipq",
+      "name": "MIPQ（正念教养问卷）",
+      "category": "家长正念教养自评",
+      "fullTextSource": "PENDING_VERSION_CONFLICT",
+      "wordingAndScoring": "PENDING_VERSION_CONFLICT",
+      "report": "NOT_STARTED",
+      "gap": "中文版 PDF 附录为28题、四级选项，同一论文方法部分描述为五级量表；版本不一致须在正式入库前解决。",
+      "versions": [
+        {
+          "key": "mipq28",
+          "version": "1.0.0",
+          "itemCount": 28,
+          "locale": null,
+          "executable": false
+        }
+      ]
+    },
+    {
+      "family": "meq",
+      "name": "MEQ（正念饮食问卷）",
+      "category": "成人进食觉察自评",
+      "fullTextSource": "PENDING_PERMISSION",
+      "wordingAndScoring": "PENDING_PERMISSION",
+      "report": "NOT_STARTED",
+      "gap": "官方 PDF（Fred Hutch）明确要求联系 nasr@fredhutch.org 取得使用许可；取得许可前不得复制整套题文。",
+      "versions": [
+        {
+          "key": "meq28",
+          "version": "1.0.0",
+          "itemCount": 28,
+          "locale": null,
+          "executable": false
+        }
+      ]
+    }
+  ]
+}
