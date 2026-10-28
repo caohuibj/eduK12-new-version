@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "base": "8774b1cf158dae1c5eb0f4950044c6ae6d6a18dd",
+  "contentHead": "997615ffdb3d54fb2dc951c68b68849b6f15084c",
+  "node": {
+    "path": "/workspace/eduk12-cloud/tools/node_modules/.bin/node",
+    "version": "v24.21.0",
+    "sha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c"
+  },
+  "environmentLimit": "input manifest conservatively records backend source and lock/config; historical/full node_modules byte inventory not captured; not an attestation of every dependency byte",
+  "checks": [
+    {
+      "id": "selected-content",
+      "cwd": "/workspace/eduK12-new-version",
+      "argv": [
+        "/workspace/eduk12-cloud/tools/node_modules/.bin/node",
+        "/workspace/eduK12-new-version/server-version/backend/node_modules/tsx/dist/cli.mjs",
+        "/workspace/eduK12-new-version/docs/scale-ipip-batch2-20261028/check-selected.ts"
+      ],
+      "startedAt": "2026-10-28T03:10:30.970350+00:00",
+      "endedAt": "2026-10-28T03:10:31.764841+00:00",
+      "processExitCode": 0,
+      "beforeAfterIdentical": true,
+      "inputManifest": "selected-content.inputs.json.gz",
+      "inputManifestUncompressedSHA256": "100f6adcd0186f02e09ebfd7c4c68a878140554f5cd5a06b0326c7c37d31b468",
+      "logs": {
+        "stdout": {
+          "path": "selected-content.stdout.log",
+          "bytes": 1634,
+          "sha256": "5cb7ba11c80a307f15924d5c29283bac437aca701aae22bc5693e4dcfad7130d"
+        },
+        "stderr": {
+          "path": "selected-content.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "id": "generated-index",
+      "cwd": "/workspace/eduK12-new-version/server-version/backend",
+      "argv": [
+        "/workspace/eduk12-cloud/tools/node_modules/.bin/node",
+        "/workspace/eduK12-new-version/server-version/backend/node_modules/tsx/dist/cli.mjs",
+        "scripts/generate-scale-instruments.ts",
+        "--check"
+      ],
+      "startedAt": "2026-10-28T03:10:32.169536+00:00",
+      "endedAt": "2026-10-28T03:10:32.316639+00:00",
+      "processExitCode": 0,
+      "beforeAfterIdentical": true,
+      "inputManifest": "generated-index.inputs.json.gz",
+      "inputManifestUncompressedSHA256": "100f6adcd0186f02e09ebfd7c4c68a878140554f5cd5a06b0326c7c37d31b468",
+      "logs": {
+        "stdout": {
+          "path": "generated-index.stdout.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "path": "generated-index.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    }
+  ],
+  "outerInvocation": {
+    "argv": [
+      "python3",
+      "/tmp/run-scale-batch2-checks.py"
+    ],
+    "cwd": "/workspace/eduK12-new-version",
+    "shellLogin": false,
+    "processExitCode": 0,
+    "executionToolChunk": "3cb04e",
+    "sourceCopy": "../run-checks.py.txt",
+    "note": "Outer process result observed by exec write_stdin; raw inner stdout/stderr retained per check."
+  },
+  "postExecutionObservedTooling": {
+    "observedAt": "2026-10-28T03:12:13.719085+00:00",
+    "files": [
+      {
+        "path": "/workspace/eduK12-new-version/server-version/backend/node_modules/tsx/dist/cli.mjs",
+        "sha256": "fd00586b96028510c228365a4eeb1f163dac5245f1d0e40649969cf9560d376b"
+      },
+      {
+        "path": "/workspace/eduK12-new-version/server-version/backend/node_modules/tsx/package.json",
+        "sha256": "96aee9fd252d0cc31f3c01468250961f5b338c797bc208700d7db926450c7659"
+      }
+    ],
+    "note": "Post-execution observation only, no invented historical full dependency inventory."
+  }
+}

@@ -1,0 +1,62 @@
+import assert from 'node:assert/strict'
+import { readFileSync, writeFileSync } from 'node:fs'
+import { execFileSync } from 'node:child_process'
+import { resolve } from 'node:path'
+import { createHash } from 'node:crypto'
+import { SCALE_INSTRUMENT_REGISTRY } from '../../server-version/backend/src/modules/scale/onboarding/instrument-registry'
+
+const root = process.cwd()
+const fixed = 'b92c69aefa2472775fa7ee86b9c208366886c908'
+const shortNames = ['opt10', 'empathic_concern10', 'attending_emotions10']
+const report: any = { schemaVersion: 1, scope: 'selected content contracts only; no database/browser/system regression', cases: [] }
+const digest = (value: unknown) => createHash('sha256').update(JSON.stringify(value)).digest('hex')
+for (const short of shortNames) {
+  const key = `ipip_${short}_zh_cn_research`
+  const item: any = { fullName: `${key}:1.0.0 traced instruction, unchanged measurement/report and selected registry readiness`, status: 'failed' }
+  try {
+    const path = `server-version/backend/src/modules/scale/instruments/${key}/1.0.0/source.json`
+    const old = JSON.parse(execFileSync('git', ['show', `${fixed}:${path}`], { cwd: root, encoding: 'utf8' }))
+    const actual = JSON.parse(readFileSync(resolve(root, path), 'utf8'))
+    const bilingual = JSON.parse(readFileSync(resolve(root, `docs/scale-instruments/research-drafts/ipip_${short}/1.0.0/bilingual-content.json`), 'utf8'))
+    const source = SCALE_INSTRUMENT_REGISTRY.getSource(key, '1.0.0')!
+    assert.ok(source)
+    assert.deepEqual(source, actual)
+    assert.equal(SCALE_INSTRUMENT_REGISTRY.listSources().filter(x => x.identity.instrumentKey === key && x.identity.instrumentVersion === '1.0.0').length, 1)
+    assert.equal(source.instruction?.text, bilingual.instructions)
+    assert.equal(source.instruction?.language, source.executable?.contentLocale)
+    assert.equal(source.instruction?.version, '1.0.0')
+    assert.ok(source.instruction?.source.includes(fixed))
+    const expected = structuredClone(old)
+    expected.instruction = actual.instruction
+    expected.executable.releaseStatus = 'PUBLISHED'
+    assert.deepEqual(actual, expected, 'only traced instruction and prepared technical release may change')
+    const definition = source.executable!.definition
+    assert.equal(definition.items.length, 10)
+    assert.deepEqual(definition, old.executable.definition)
+    assert.deepEqual(source.executable!.goldenCases, old.executable.goldenCases)
+    assert.equal(source.catalog.catalogStatus, 'CANDIDATE')
+    assert.equal(source.catalog.scientificMaturity, 'PILOT')
+    assert.equal(source.localization?.reviewStatus, 'PENDING')
+    assert.equal(source.scientificReview, undefined)
+    assert.equal(definition.report.audienceContract?.respondent, 'ADULT_SELF')
+    assert.equal(definition.report.audienceContract?.locale, 'zh-CN')
+    // This existing registry call validates and executes the package-declared
+    // golden cases once per selected immutable source. No second scorer loop.
+    const validation = SCALE_INSTRUMENT_REGISTRY.getValidation(key, '1.0.0')!
+    assert.equal(validation.valid, true, JSON.stringify(validation.issues))
+    item.status = 'passed'
+    item.validation = validation
+    item.goldenCasesExecutedByExistingReadiness = source.executable!.goldenCases.map(x => x.name)
+    item.definitionJSONSHA256 = digest(definition)
+    item.originalDefinitionJSONSHA256 = digest(old.executable.definition)
+    item.reportVersion = definition.report.reportVersion
+  } catch (error) {
+    item.error = error instanceof Error ? error.stack : String(error)
+  }
+  report.cases.push(item)
+}
+report.passed = report.cases.filter((x: any) => x.status === 'passed').length
+report.failed = report.cases.length - report.passed
+writeFileSync(resolve(root, 'docs/scale-ipip-batch2-20261028/evidence/selected-content.json'), JSON.stringify(report, null, 2) + '\n')
+console.log(JSON.stringify(report))
+process.exitCode = report.failed ? 1 : 0

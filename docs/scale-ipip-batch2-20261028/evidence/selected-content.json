@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "scope": "selected content contracts only; no database/browser/system regression",
+  "cases": [
+    {
+      "fullName": "ipip_opt10_zh_cn_research:1.0.0 traced instruction, unchanged measurement/report and selected registry readiness",
+      "status": "passed",
+      "validation": {
+        "valid": true,
+        "issues": []
+      },
+      "goldenCasesExecutedByExistingReadiness": [
+        "midpoint",
+        "keyed-maximum",
+        "keyed-minimum"
+      ],
+      "definitionJSONSHA256": "a91f044ce7f5e9f43c9eb38884c6eb67032bba4c1dbb7cfff4c5b8ae919476f9",
+      "originalDefinitionJSONSHA256": "4caaf90441ffdaa004f212ae856126637464c4e05577ac15a503715f3ed6ff16",
+      "reportVersion": "1.0.1"
+    },
+    {
+      "fullName": "ipip_empathic_concern10_zh_cn_research:1.0.0 traced instruction, unchanged measurement/report and selected registry readiness",
+      "status": "passed",
+      "validation": {
+        "valid": true,
+        "issues": []
+      },
+      "goldenCasesExecutedByExistingReadiness": [
+        "midpoint",
+        "keyed-minimum",
+        "keyed-maximum",
+        "all-one",
+        "all-five"
+      ],
+      "definitionJSONSHA256": "4061a27d94899173fac0d827e20b2b6bd6f68f77ecea0d8d64317956315b8cdf",
+      "originalDefinitionJSONSHA256": "419547d283d3215a581dc27b8658b81e2e9258ef2141c66fee017a4816aaa76a",
+      "reportVersion": "1.0.0"
+    },
+    {
+      "fullName": "ipip_attending_emotions10_zh_cn_research:1.0.0 traced instruction, unchanged measurement/report and selected registry readiness",
+      "status": "passed",
+      "validation": {
+        "valid": true,
+        "issues": []
+      },
+      "goldenCasesExecutedByExistingReadiness": [
+        "midpoint",
+        "keyed-maximum",
+        "keyed-minimum"
+      ],
+      "definitionJSONSHA256": "15be0015d27773eabede251583ba877250f5150d72e8040ecbe83de6c6016868",
+      "originalDefinitionJSONSHA256": "5986dfda39bb68beeb6b3a4a151be56a532f0dffd818bedd306ac8ed0c308ec8",
+      "reportVersion": "1.0.1"
+    }
+  ],
+  "passed": 3,
+  "failed": 0
+}
