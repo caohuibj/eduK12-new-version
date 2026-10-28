@@ -743,4 +743,7 @@
   .hui-training[data-training-theme="dark"] .scale-unit-report :is(.report-feedback p,.report-feedback ul,.report-details__body) {
     color: var(--training-ink, #e5e9df);
   }
+  .hui-training[data-training-theme="dark"] .scale-unit-report .text-amber-700 {
+    color: var(--hui-ds-status-warning-text, #e7cc92);
+  }
 }

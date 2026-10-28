@@ -33,5 +33,5 @@ The original reports remain under `evidence/`; failures are not rewritten as pas
 New HTTP test → real login/route serialization and identity failures → isolated local PostgreSQL/Redis (complete).
 Existing role services → observer population and privacy → isolated local PostgreSQL (complete, no repeat).
 Scoped warning color → dark contrast and light/print preservation → sandboxed GitHub Chrome (pending; local Chromium unavailable as documented in PR374).
-Type correctness → new backend test imports/fixtures → local TypeScript (pending at initial documentation).
+Type correctness → new backend test imports/fixtures → local TypeScript (PASS, original shell exit 0; retrospective exact backend tree association).
 CI → exact complete source diff, formally admitted originals and missing UI evidence, changed-source CodeQL and stable merge gate. No unrelated full application replay or production build by default.
