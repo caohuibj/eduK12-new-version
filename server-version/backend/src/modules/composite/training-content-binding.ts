@@ -204,7 +204,7 @@ export async function trainingMeasurementSourceScopeMatchesForConsumer(db:Prisma
  if(context?.educationComposition){
   // The caller verified this immutable attempt's parent header once for the
   // batch. DB containment and immutability bind each unit to that publication.
-  if(source.educationStandard){
+  if(source.educationStandard||source.educationLibrary){
    if(release.layer!=='MEASUREMENT')return false
    await assertCompositionPublicContent(db,{...context,measurementOnly:true,unit:{itemId:context.itemId,family:'SCALE',source,measurement:{releaseId:release.releaseId,contentHash:release.contentHash,measurementHash:release.content.measurementHash}},release})
    return true
@@ -262,7 +262,7 @@ export async function prepareTrainingContentAttemptBinding(db:Prisma.Transaction
       ||canonicalHash(snapshot.educationBinding.origin)!==canonicalHash(anchor.origin))fail('SNAPSHOT_INVALID')
     const measurementItems=input.composite.items.filter(item=>item.type!=='FORM')
     if(measurementItems.length!==snapshot.units.length||snapshot.units.some(unit=>unit.family!=='SCALE'||unit.source.kind!=='SCALE'
-      ||(!unit.source.educationStandard&&(unit.source.ownerId!==anchor.origin.ownerUserId||!unit.source.privateVersionId))
+      ||(!unit.source.educationStandard&&!unit.source.educationLibrary&&(unit.source.ownerId!==anchor.origin.ownerUserId||!unit.source.privateVersionId))
       ||!measurementItems.some(item=>item.id===unit.itemId&&item.type==='SCALE'&&item.scaleId===unit.source.id)))fail('SOURCE_MISMATCH')
     // Admission supplied this anchor from the existing transaction-bound START
     // proof; the loaded source is sealed under its publication SHARE lock.

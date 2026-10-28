@@ -1,5 +1,6 @@
 import {sealPrivateFormRuntimeForPublication} from '../education-tools/private-tool.form-runtime-resources'
 import {publishPrivateCompositionRuntime} from '../education-tools/private-tool.composition-source'
+import {assertLockedLibraryUseTime} from '../education-tools/library-source.use'
 import {privateFormDraftResourcePolicy} from '../education-tools/private-tool.form-draft-policy'
 import {readPrivateScaleRunSourceForPreparation,readPrivateFormRunSourceForPreparation,readPrivateCompositionRunSourcesForPreparation} from './educationPrivateScaleContext'
 import {prelockEducationLibraryAdmissions,assertEducationLibraryAdmissionsUnchanged,assertEducationLibraryPopulationSupport,lockEducationLibraryPopulationFacts} from './educationLibraryPopulation'
@@ -1272,6 +1273,7 @@ export const publishAssessmentRun = async (input: {
     }
     for(const track of preparedTracks.filter(t=>t.resourceKey.startsWith('education-composition:')).sort((a,b)=>a.resourceKey.localeCompare(b.resourceKey)))
       await publishPrivateCompositionRuntime(tx,track.resourcePolicy)
+    await assertLockedLibraryUseTime(tx,education?.libraryUses)
     const version = run.version + 1
     await tx.$executeRaw`
       UPDATE "assessment_runs"

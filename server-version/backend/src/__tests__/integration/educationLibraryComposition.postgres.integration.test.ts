@@ -44,9 +44,9 @@ suite('Original approved library / ordinary composition sealing',()=>{
   expect(snapshot.units[0].source.id).toBe(snapshot.units[1].source.id)
   expect(snapshot.units[0].itemId).not.toBe(snapshot.units[1].itemId)
   expect(await db.scale.count()).toBe(before.scales);expect(await db.compositeAssessment.count()).toBe(before.composites+1)
-  // This checkpoint proves sealing only, never a DRAFT-as-task shortcut.
-  await expect(addPrivateCompositionRunTrack({organizationId:f.organizationId,runId:f.runId,actorUserId:f.managerUserId,parent:{kind:'TEACHER_EVENT',id:f.workflow.id}},
-   {expectedVersion:f.expectedVersion,privateComposition:{versionId:version.id,contentHash:version.contentHash},subjectSelector:{kind:'MEMBERSHIP_IDS',membershipIds:[f.subjectMembershipId]},respondentSelector:{kind:'MEMBERSHIP_IDS',membershipIds:[f.subjectMembershipId]}})).rejects.toMatchObject({code:'PRIVATE_COMPOSITION_LIBRARY_RUNTIME_PENDING'})
+  // A sealed source is attached through the existing real workflow/CAS writer.
+  expect(await addPrivateCompositionRunTrack({organizationId:f.organizationId,runId:f.runId,actorUserId:f.managerUserId,parent:{kind:'TEACHER_EVENT',id:f.workflow.id}},
+   {expectedVersion:f.expectedVersion,privateComposition:{versionId:version.id,contentHash:version.contentHash},subjectSelector:{kind:'MEMBERSHIP_IDS',membershipIds:[f.subjectMembershipId]},respondentSelector:{kind:'MEMBERSHIP_IDS',membershipIds:[f.subjectMembershipId]}})).toMatchObject({resourceKey:version.runtime.resourceKey})
   await revokeUse(f.libraryAdminUserId,f.grantId,{expectedVersion:1,reason:'Synthetic future-use withdrawal'})
   const read=vi.spyOn(librarySources,'readEducationLibrarySources')
   expect(await tools.freezePrivateTool(x.c,x.tool.id,x.command)).toMatchObject({id:version.id,created:false})

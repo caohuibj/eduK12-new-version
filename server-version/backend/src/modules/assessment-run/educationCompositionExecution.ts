@@ -7,6 +7,9 @@ import {privateToolFail} from '../education-tools/private-tool.contracts'
 import {readEducationPublicUse} from '../education-tools/public-source.catalog'
 import {educationPublicSourceKey} from '../education-tools/public-source.identity'
 import {readEducationPublicSourceHeaders} from '../education-tools/public-source.headers'
+import {assertEducationLibraryHeaders} from '../education-tools/library-source.catalog'
+import {assertEducationLibraryUses,lockEducationLibraryUses,type LockedEducationLibraryUses} from '../education-tools/library-source.use'
+import type {PrivateToolContext} from '../education-tools/private-tool.contracts'
 import {educationCompositionKey,educationCompositionPolicyBindingSchema,educationCompositionRuntimeAnchorSchema,
  type EducationCompositionRuntimeAnchor} from '../education-tools/private-tool.composition-contracts'
 import {assertScaleLibraryCollectionAllowed} from '../scale-library-governance/collection-guard'
@@ -15,7 +18,7 @@ import type {RunResourcePolicy} from './resourceAuthority'
 
 type Tx=Prisma.TransactionClient
 const manifestSchema=z.array(z.object({blockId:z.string().guid(),kind:z.enum(['SCALE','FORM']),versionId:z.string().guid(),
- sourceProvider:z.enum(['PRIVATE_VERSION','PUBLIC_FORM','STANDARD_SCALE']),contentHash:z.string(),itemIds:z.array(z.string().guid()),sectionIds:z.array(z.string().guid()),title:z.string()}).strict()).min(1).max(50)
+ sourceProvider:z.enum(['PRIVATE_VERSION','PUBLIC_FORM','STANDARD_SCALE','LIBRARY_SCALE']),contentHash:z.string(),itemIds:z.array(z.string().guid()),sectionIds:z.array(z.string().guid()),title:z.string()}).strict()).min(1).max(50)
 const unitsSchema=z.array(z.object({itemId:z.string(),scaleId:z.string(),versionId:z.string().guid(),contentHash:z.string(),
  releaseId:z.string().guid(),definitionHash:z.string(),measurementHash:z.string()}).strict()).max(50)
 
@@ -34,13 +37,15 @@ export async function readFrozenCompositionIdentity(tx:Tx,input:{policy:RunResou
   privateToolFail('PRIVATE_COMPOSITION_EXECUTION_INVALID')
  const [row]=await tx.$queryRaw<Array<{title:string;manifest:unknown;units:unknown}>>(Prisma.sql`SELECT c.name AS title,
   (SELECT jsonb_agg(jsonb_build_object('blockId',b->>'blockId','kind',b->>'kind','versionId',b->>'versionId','contentHash',b->>'contentHash','sourceProvider',b->>'sourceProvider',
-   'itemIds',b->'itemIds','sectionIds',b->'sectionIds','title',COALESCE(v.title,g.title,std.snapshot->>'title')) ORDER BY ordinal)
+   'itemIds',b->'itemIds','sectionIds',b->'sectionIds','title',COALESCE(v.title,g.title,std.snapshot->>'title',library.snapshot->>'title')) ORDER BY ordinal)
    FROM jsonb_array_elements(c.training_content_snapshot#>'{educationBinding,manifest}') WITH ORDINALITY blocks(b,ordinal)
    LEFT JOIN education_private_tool_versions v ON v.id=b->>'versionId' AND b->>'sourceProvider'='PRIVATE_VERSION'
    LEFT JOIN survey_governed_tools g ON g.id=b->>'versionId' AND g.family='FORM' AND g.snapshot_hash=b->>'contentHash' AND b->>'sourceProvider'='PUBLIC_FORM'
-   LEFT JOIN survey_standard_releases std ON std.id=b->>'versionId' AND std.combination_hash=b->>'contentHash' AND b->>'sourceProvider'='STANDARD_SCALE') AS manifest,
-  (SELECT COALESCE(jsonb_agg(jsonb_build_object('itemId',u->>'itemId','scaleId',s.id,'versionId',COALESCE(u#>>'{source,privateVersionId}',u#>>'{source,educationStandard,releaseId}'),
-   'contentHash',u#>>'{measurement,contentHash}','releaseId',u#>>'{measurement,releaseId}','definitionHash',COALESCE(u#>>'{source,educationStandard,nativeDefinitionHash}',s.definition_hash),
+   LEFT JOIN survey_standard_releases std ON std.id=b->>'versionId' AND std.combination_hash=b->>'contentHash' AND b->>'sourceProvider'='STANDARD_SCALE'
+   LEFT JOIN scale_library_entries library_entry ON library_entry.id=b->>'versionId' AND b->>'sourceProvider'='LIBRARY_SCALE'
+   LEFT JOIN scale_library_submissions library ON library.id=library_entry.submission_id AND library.snapshot_hash=b->>'contentHash') AS manifest,
+  (SELECT COALESCE(jsonb_agg(jsonb_build_object('itemId',u->>'itemId','scaleId',s.id,'versionId',COALESCE(u#>>'{source,privateVersionId}',u#>>'{source,educationStandard,releaseId}',u#>>'{source,libraryEntryId}'),
+   'contentHash',u#>>'{measurement,contentHash}','releaseId',u#>>'{measurement,releaseId}','definitionHash',COALESCE(u#>>'{source,educationStandard,nativeDefinitionHash}',u#>>'{source,educationLibrary,nativeDefinitionHash}',s.definition_hash),
    'measurementHash',u#>>'{measurement,measurementHash}')),'[]'::jsonb)
    FROM jsonb_array_elements(c.training_content_snapshot->'units') u JOIN scales s ON s.id=u#>>'{source,id}') AS units
   FROM composite_assessments c WHERE c.id=${policy.runtimeLaunchTarget.ref} AND c.creation_key=${input.key}
@@ -57,7 +62,7 @@ export type FrozenCompositionIdentity=Awaited<ReturnType<typeof readFrozenCompos
  * a participant never needs that role. Continuation uses its frozen admission,
  * while emergency stops still fence collection. Ordinary role withdrawal does
  * not destroy an entered attempt or historical report. */
-export async function assertCompositionCollection(tx:Tx,identity:FrozenCompositionIdentity,purpose:'NEW_START'|'BOUND_COLLECTION',lock=false){
+export async function assertCompositionCollection(tx:Tx,identity:FrozenCompositionIdentity,purpose:'NEW_START'|'BOUND_COLLECTION',lock=false,libraryUses?:LockedEducationLibraryUses){
  const c={entry:identity.origin.entry,organizationId:identity.origin.organizationId,principal:{userId:identity.origin.ownerUserId,accountDomain:'SCHOOL' as const}}
  if(purpose==='NEW_START')await authorizePrivateTool(tx,c)
  const releases=[...new Set(identity.units.map(unit=>unit.releaseId))],scales=[...new Set(identity.units.map(unit=>unit.scaleId))]
@@ -69,7 +74,10 @@ export async function assertCompositionCollection(tx:Tx,identity:FrozenCompositi
    OR EXISTS(SELECT 1 FROM scales WHERE id=ANY(${scales}::text[]) AND status<>'PUBLISHED')) AS unavailable`)
  if(row.stopped||purpose==='NEW_START'&&row.unavailable)privateToolFail('PRIVATE_COMPOSITION_COLLECTION_UNAVAILABLE',403)
  if(purpose==='NEW_START'){
-  const sources=identity.manifest.filter(block=>block.sourceProvider!=='PRIVATE_VERSION').map(block=>({kind:block.sourceProvider==='PUBLIC_FORM'?'FORM' as const:'STANDARD_SCALE' as const,id:block.versionId,hash:block.contentHash}))
+  const libraries=identity.manifest.filter(block=>block.sourceProvider==='LIBRARY_SCALE')
+  await assertEducationLibraryUses(tx,c,libraries.map(source=>source.versionId),{locked:libraryUses,requireLocked:lock})
+  await assertEducationLibraryHeaders(tx,libraries,lock)
+  const sources=identity.manifest.filter(block=>['PUBLIC_FORM','STANDARD_SCALE'].includes(block.sourceProvider)).map(block=>({kind:block.sourceProvider==='PUBLIC_FORM'?'FORM' as const:'STANDARD_SCALE' as const,id:block.versionId,hash:block.contentHash}))
   const keys=[...new Set(sources.map(educationPublicSourceKey))]
   if(keys.length){
    const headers=await readEducationPublicSourceHeaders(tx,sources,lock),allowed=await readEducationPublicUse(tx,c,keys,lock)
@@ -116,11 +124,33 @@ export async function readCompositionExecutionSource(tx:Tx,input:{executionId?:s
  }
  return {identity,...row}
 }
-export async function admitCompositionStart(tx:Tx,input:{executionId:string;compositeId:string;actorUserId:string}){
+export async function admitCompositionStart(tx:Tx,input:{executionId:string;compositeId:string;actorUserId:string},libraryUses?:LockedEducationLibraryUses){
  const source=await readCompositionExecutionSource(tx,input)
- await assertCompositionCollection(tx,source.identity,'NEW_START',true)
+ await assertCompositionCollection(tx,source.identity,'NEW_START',true,libraryUses)
  return issueVerifiedEducationStart({tx,product:source.product,compositeId:source.identity.compositeId,assignmentRef:source.assignmentRef,
   respondentUserId:source.respondentUserId,composition:source.identity.binding})
+}
+
+/** Before Organization/Run/Execution locks, for this actual frozen respondent
+ * only. An unavailable U is recorded, not thrown here: concurrent reconciliation
+ * may discover an already-entered attempt, which keeps its completion right. */
+export async function lockCompositionStartLibraryUses(tx:Tx,input:{executionId:string;actorUserId:string}){
+ const [row]=await tx.$queryRaw<Array<{entry:'SCHOOL'|'TEACHER';organizationId:string;ownerId:string;entryIds:string[]}>>(Prisma.sql`
+  SELECT v.entry,v.organization_id AS "organizationId",v.owner_user_id AS "ownerId",
+   ARRAY(SELECT DISTINCT b->>'versionId' FROM jsonb_array_elements(c.training_content_snapshot#>'{educationBinding,manifest}') b
+    WHERE b->>'sourceProvider'='LIBRARY_SCALE') AS "entryIds"
+  FROM assessment_run_executions e JOIN assessment_run_tracks t ON t.id=e.track_id AND t.run_id=e.run_id AND t.organization_id=e.organization_id
+  JOIN assessment_run_actor_snapshots respondent ON respondent.id=e.respondent_actor_snapshot_id AND respondent.organization_id=e.organization_id
+   AND respondent.run_id=e.run_id AND respondent.user_id=${input.actorUserId}
+  JOIN composite_assessments c ON c.id=t.frozen_resource_policy#>>'{runtimeLaunchTarget,ref}' AND c.creation_key=t.resource_key
+   AND c.training_content_snapshot_hash=t.frozen_resource_policy#>>'{educationComposition,manifestHash}'
+  JOIN education_private_tool_versions v ON v.id=c.training_content_snapshot#>>'{educationBinding,origin,versionId}'
+   AND v.organization_id=e.organization_id AND c.created_by=v.owner_user_id AND v.kind='COMPOSITION'
+  WHERE e.id=${input.executionId} AND e.runtime_binding_ref IS NULL AND t.resource_family='BUNDLE'
+   AND t.resource_key LIKE 'education-composition:%'`)
+ if(!row?.entryIds.length)return
+ const context:PrivateToolContext={entry:row.entry,organizationId:row.organizationId,principal:{userId:row.ownerId,accountDomain:'SCHOOL'}}
+ return {context,entryIds:row.entryIds,uses:await lockEducationLibraryUses(tx,context,row.entryIds)}
 }
 
 /** FINAL uses a previously DB-bound immutable attempt binding, not a caller

@@ -22,6 +22,42 @@ export function readLockedEducationLibraryUses(tx:Prisma.TransactionClient,c:Pri
  return facts.uses
 }
 
+/** Late wall-clock fence only. Locked account/grant facts stay valid through
+ * commit; never repeat the issuer chain after potentially long row waits. */
+export async function assertLockedLibraryUseTime(tx:Prisma.TransactionClient,proof?:LockedEducationLibraryUses){
+ if(!proof)return
+ const facts=locked.get(proof)
+ if(!facts||facts.tx!==tx)privateToolFail('LIBRARY_SOURCE_LOCK_CONTEXT_REQUIRED')
+ const deadlines=[...facts.uses.values()].flatMap(use=>use.expiresAt?[use.expiresAt]:[])
+ if(!deadlines.length)return
+ const [clock]=await tx.$queryRaw<Array<{now:Date}>>`SELECT clock_timestamp() AS now`
+ if(deadlines.some(date=>date<=clock.now))privateToolFail('LIBRARY_SOURCE_USE_EXPIRED',403)
+}
+
+/** Exact owned immutable questionnaires plus any legacy entry IDs in the same
+ * batch. All issuer/ancestor Users are selected together before the org fence. */
+export async function lockCompositionLibraryUses(tx:Prisma.TransactionClient,c:PrivateToolContext,keys:readonly string[],additionalEntryIds:readonly string[]=[]){
+ const rows=keys.length?await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT DISTINCT b->>'versionId' AS id
+  FROM composite_assessments parent JOIN education_private_tool_versions v ON parent.creation_key=
+   'education-composition:'||v.entry||':'||v.id||':'||CASE v.entry WHEN 'SCHOOL' THEN 'STUDENT' ELSE 'TEACHER' END||':SELF:1.0.0'
+  CROSS JOIN LATERAL jsonb_array_elements(parent.training_content_snapshot#>'{educationBinding,manifest}') b
+  WHERE parent.creation_key IN (${Prisma.join([...new Set(keys)])}) AND v.entry=${c.entry} AND v.organization_id=${c.organizationId}
+   AND v.owner_user_id=${c.principal.userId} AND b->>'sourceProvider'='LIBRARY_SCALE'`):[]
+ const ids=[...new Set([...additionalEntryIds,...rows.map(row=>row.id)])]
+ return ids.length?lockEducationLibraryUses(tx,c,ids):undefined
+}
+
+export async function assertEducationLibraryUses(tx:Prisma.TransactionClient,c:PrivateToolContext,entryIds:readonly string[],options:{locked?:LockedEducationLibraryUses;requireLocked?:boolean}={}){
+ const ids=[...new Set(entryIds)];if(!ids.length)return
+ const uses=options.locked||options.requireLocked?readLockedEducationLibraryUses(tx,c,options.locked):await readEducationLibrarySourceUses(tx,c,ids)
+ if(ids.some(id=>!uses.has(id)))privateToolFail('LIBRARY_SOURCE_USE_REQUIRED',403)
+ const deadlines=ids.flatMap(id=>{const date=uses.get(id)!.expiresAt;return date?[date]:[]})
+ if(deadlines.length){
+  const [clock]=await tx.$queryRaw<Array<{now:Date}>>`SELECT clock_timestamp() AS now`
+  if(deadlines.some(date=>date<=clock.now))privateToolFail('LIBRARY_SOURCE_USE_EXPIRED',403)
+ }
+}
+
 /** Owner-scoped source IDs only. No draft instructions/questions are downloaded
  * and no role decision or mutable draft content is reused as write authority. */
 export async function lockOwnedDraftLibraryUses(tx:Prisma.TransactionClient,c:PrivateToolContext,toolId:string){

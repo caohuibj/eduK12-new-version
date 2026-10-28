@@ -73,6 +73,17 @@ export async function readEducationLibrarySourceUses(tx:Prisma.TransactionClient
  return allowed
 }
 
+/** Current availability only; immutable bodies were verified at sealing. No
+ * grant chain, media download or whole-source hash reconstruction belongs here. */
+export async function assertEducationLibraryHeaders(tx:Prisma.TransactionClient,sources:readonly {versionId:string;contentHash:string}[],lock=false){
+ const ids=[...new Set(sources.map(source=>source.versionId))];if(!ids.length)return
+ const rows=await tx.$queryRaw<Array<{id:string;hash:string}>>(Prisma.sql`SELECT e.id,s.snapshot_hash AS hash
+  FROM scale_library_entries e JOIN scale_library_submissions s ON s.id=e.submission_id AND s.status='APPROVED'
+  JOIN measurement_content_releases m ON m.id=e.release_id AND m.status='PUBLISHED'
+  WHERE e.id IN (${Prisma.join(ids)}) AND e.status='ACTIVE' ORDER BY e.id ${lock?Prisma.sql`FOR SHARE OF e,s,m`:Prisma.empty}`)
+ if(sources.some(source=>!rows.some(row=>row.id===source.versionId&&row.hash===source.contentHash)))throw new ScaleLibraryError(409,'LIBRARY_SOURCE_UNAVAILABLE')
+}
+
 /** Bounded original-library metadata, never the workflow-only registered Scale
  * catalog. Original questions, scoring/P/R bodies, media and source-owner data
  * are absent. Discovery itself does not materialize a Scale or Composite. */

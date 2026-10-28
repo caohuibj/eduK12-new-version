@@ -81,7 +81,8 @@ async function readOrdinaryFeedback(input:ScopedInput){
    const contract:ResultDisclosureContractV1={schemaVersion:1,policyKey:'EDUCATION_PRIVATE_TOOL_V1',minimumRespondents:null,
     audiences:{RESPONDENT:ceiling.respondent,SUBJECT:none,TEACHER:none,PARENT:none,PROFESSIONAL:none,ORGANIZATION:none,RESEARCH:none}}
    sources.push({itemId:unit.itemId,scaleId:unit.scaleId,title:block.title,sourceDefinitionHash:unit.definitionHash,
-    resultDisclosure:contract,privateVersion:{versionId:block.versionId,contentHash:block.contentHash}})
+    resultDisclosure:contract,...(block.sourceProvider==='LIBRARY_SCALE'?{approvedLibrary:{approvedSnapshotHash:block.contentHash}}:
+     {privateVersion:{versionId:block.versionId,contentHash:block.contentHash}})})
   }
   const slots=(sources.length||declaredBlocks.size)&&own.frozenSlots?await loadFrozenActiveSlotSet(own.frozenSlots,tx):undefined
   if((sources.length||declaredBlocks.size)&&(!slots||slots.snapshotHash!==own.frozenSlotsHash||slots.attemptEpoch!==own.attemptEpoch))hidden()
