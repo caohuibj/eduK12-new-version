@@ -1,0 +1,49 @@
+{
+  "recordedAt": "2026-10-28T02:43:23.435Z",
+  "node": "v24.19.0",
+  "vitest": "4.1.11",
+  "tsx": "4.23.12",
+  "dependencyEnvironment": "Existing installed node_modules symlinks supplied by parent; no install or full dependency byte inventory.",
+  "baseline": "fdc72a9739df7cafc2b238ae45f7d976b3c985f2",
+  "commands": [
+    {
+      "cwd": "/workspace/cognitive-review-horizon",
+      "command": "node docs/cognitive-library/onboarding-content-20261028/parallel-review/horizon/audit-records.cjs",
+      "exit": 0
+    },
+    {
+      "cwd": "/workspace/cognitive-review-horizon",
+      "command": "node server-version/scripts/cognitive/horizon-content.cjs --check",
+      "exit": 0,
+      "stdout": "Horizon pure protocol/review/report match backend source\n"
+    },
+    {
+      "cwd": "/workspace/cognitive-review-horizon/server-version/frontend",
+      "command": "node node_modules/vitest/vitest.mjs run src/modules/cognitive/tasks/horizon-exploration/frozen-presentation.test.tsx --maxWorkers=1 --reporter=json --outputFile=/workspace/cognitive-review-horizon/docs/cognitive-library/onboarding-content-20261028/parallel-review/horizon/frozen-presentation-baseline.json",
+      "exit": 1,
+      "passed": 1,
+      "failed": 2,
+      "reason": "Expected baseline red: both unknown native and participant next versions render instead of rejecting."
+    }
+  ],
+  "inputSHA256": {
+    "server-version/frontend/src/modules/cognitive/tasks/horizon-exploration/frozen-presentation.test.tsx": "4b0f304e0b298dbca54068bd344796808a21fcbe2ebe75f9a1ddb9b1351a9cd3",
+    "server-version/frontend/src/modules/cognitive/tasks/horizon-exploration/NativeHorizonRunner.tsx": "f875a773bf01f22f8e578e3ea9f613948e46ecb356d0fc696a57b0ed569faef5",
+    "server-version/frontend/src/modules/cognitive/core/native-public-report.ts": "7b92d7e257f09de07715a1b65bc1214009cc5ea72d5a7d9a75b9e4928883285b",
+    "server-version/frontend/vitest.config.ts": "3d757d2b1cee6c1c09a3ec7016b296aa159c938f83365e2370a1d423f29917db",
+    "server-version/frontend/package-lock.json": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+    "server-version/backend/package-lock.json": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/horizon/audit-records.cjs": "f263765cebd71444e4928e0e29d57efb8ef69a2bc9773e76a470516e1aed6f7f"
+  },
+  "outputSHA256": {
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/horizon/audit-receipt.json": "8e1ea85dc1a080ff2f4e3c99759e247a89abdacb92a652d16766597855238f99",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/horizon/audit-records.log": "932635eb04293da1ff02daaf807e3255124f390e0289bd16836b13b21662d71c",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/horizon/frozen-presentation-baseline.json": "27e0fbf9153c2602049beda6603d7227de4f07fcd1703a39087508975b9377bd",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/horizon/frozen-presentation-baseline.log": "9cd57affb05b8d9f0468d7ba5cc20a2d258d8a097d81e5da55c0c408b3702c62",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/horizon/historical-input-comparison.json": "14f91891ea74ce69b460689457e0b9d5dadd5a3a49c9d6e7344e7216e47f1e32",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/horizon/presentation-reuse.json": "bb5e3cc6a7844e45369fe776022f4ee5d656513d3f0f3fcff5af252587beb5c1",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/horizon/public-reports.json": "7c9460dff67fc08217a98ea105f196384920b7f671f9874c1d68b14da87c3bd7",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/horizon/representative-inputs.json": "7ff4dcfed6c15b8f44fc46681cfda56f8c07480643ea48e98e8f1135c7129c8b"
+  },
+  "remaining": "Parent shared fix and its integrated consumer retest pending here; no denied or uncertain action."
+}

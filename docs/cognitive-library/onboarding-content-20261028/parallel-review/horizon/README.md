@@ -2,7 +2,7 @@
 
 冻结基线 `fdc72a9739df7cafc2b238ae45f7d976b3c985f2`；工作区
 `/workspace/cognitive-review-horizon`；分支 `review/cog-horizon-20261028`。
-此提交只保存独立复核与可重现原件，没有为了产生修改而改变已经正确的测量或文案。
+本分支保存独立复核、可重现原件及专属消费者回归，没有为了产生修改而改变已经正确的测量或文案。
 
 ## 一个明确疏漏，已交统筹修共享层
 
@@ -27,6 +27,21 @@ presentationVersion 数字相等：空间任务的 generic formatter 已合法�
 native task presentation 仍为 `0.1.0`。建议共享修复明确区分、核验这两种身份；
 不得借此重算旧报告或禁止合法的既有空间组合。按分工没有改共享文件，统筹已接手。
 本分支状态为 **pending parent shared fix**，不是被拒绝或结果不确定。
+
+统筹随后确认在主工作区实现共享修复：分别保存 native presentationVersion 和
+participantPresentationVersion，并保留空间及ANT的精确历史兼容。本工作区仍保持
+旧基线，按统筹要求交付专属预期红回归；集成后的定向复验由统筹完成。
+
+`server-version/frontend/src/modules/cognitive/tasks/horizon-exploration/frozen-presentation.test.tsx`
+实际运行结果为 **1通过、2失败、退出1**。已知 `0.1.0`组合正常显示；未知 native
+`next`、未知 participant `next` 均错误显示了报告、没有 alert。两个失败均为实际
+消费者断言，非环境/导入失败。保存 [原始JSON](frozen-presentation-baseline.json)
+及 [原始日志](frozen-presentation-baseline.log)，不改写为修复后通过。
+
+```sh
+# cwd: server-version/frontend
+node node_modules/vitest/vitest.mjs run src/modules/cognitive/tasks/horizon-exploration/frozen-presentation.test.tsx --maxWorkers=1 --reporter=json --outputFile=/workspace/cognitive-review-horizon/docs/cognitive-library/onboarding-content-20261028/parallel-review/horizon/frozen-presentation-baseline.json
+```
 
 复现命令实际退出 `0`，表示复现与核算脚本完成，**不表示这个版本绑定缺陷已修复**：
 
