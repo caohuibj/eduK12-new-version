@@ -11,29 +11,42 @@ import {ContentAuthorityError} from '../measurement-content/content-authority'
 export const educationLibraryCatalogQuery=z.object({cursor:z.string().guid().optional(),q:z.string().trim().max(160).optional()}).strict()
 type Header={entryId:string;releaseId:string;contentHash:string;snapshotHash:string;title:string;sourceProduct:string;version:string;
  language:string|null;dependencies:Array<{releaseId:string;contentHash:string;layer:string;version:string}>}
-type Grant={id:string;entryId:string;releaseId:string;issuerId:string;authorityGrantId:string|null;version:number;scopeKind:'USER'|'ORGANIZATION'}
+export type EducationLibrarySourceUse={id:string;entryId:string;releaseId:string;issuerId:string;authorityGrantId:string|null;version:number;scopeKind:'USER'|'ORGANIZATION';expiresAt?:Date|null}
 
 /** Already-authorized education author only, in this same transaction. Existing
  * USER/ORGANIZATION U stays independent from the issuer's D. This read-only seam
- * does not hold an organization lock, create runtime resources, or grant use. */
-export async function readEducationLibrarySourceUses(tx:Prisma.TransactionClient,c:PrivateToolContext,entryIds:readonly string[]){
- const ids=[...new Set(entryIds)];if(!ids.length)return new Map<string,Grant>()
+ * creates no runtime resources or use grant. The protected-write mode MUST
+ * run before any organization lock; its User/root/U locks last to tx commit. */
+export async function readEducationLibrarySourceUses(tx:Prisma.TransactionClient,c:PrivateToolContext,entryIds:readonly string[],options:{lockForUse?:boolean}={}){
+ const ids=[...new Set(entryIds)];if(!ids.length)return new Map<string,EducationLibrarySourceUse>()
  if(ids.length>128)throw new ScaleLibraryError(400,'共用量表来源范围过大')
- const rows=await tx.$queryRaw<Grant[]>(Prisma.sql`SELECT g.id,g.entry_id AS "entryId",e.release_id AS "releaseId",g.issuer_id AS "issuerId",
+ const candidates=Prisma.sql`SELECT g.id,g.entry_id AS "entryId",e.release_id AS "releaseId",g.issuer_id AS "issuerId",
   g.authority_grant_id AS "authorityGrantId",g.version,g.scope_kind AS "scopeKind"
   FROM scale_library_use_grants g JOIN scale_library_entries e ON e.id=g.entry_id AND e.status='ACTIVE'
   JOIN scale_library_submissions s ON s.id=e.submission_id AND s.status='APPROVED'
   JOIN measurement_content_releases m ON m.id=e.release_id AND m.layer='MEASUREMENT' AND m.family='SCALE' AND m.status='PUBLISHED'
   WHERE g.entry_id IN (${Prisma.join(ids)}) AND g.product=${c.entry} AND g.organization_id=${c.organizationId} AND g.status='ACTIVE'
    AND ((g.scope_kind='USER' AND g.user_id=${c.principal.userId}) OR (g.scope_kind='ORGANIZATION' AND g.user_id IS NULL))
-  ORDER BY g.issuer_id,g.authority_grant_id NULLS FIRST,g.entry_id,g.id`)
- const groups=new Map<string,Grant[]>()
+`
+ const rows=await tx.$queryRaw<EducationLibrarySourceUse[]>(options.lockForUse?Prisma.sql`
+  WITH candidates AS MATERIALIZED (${candidates}),locked_issuers AS MATERIALIZED (
+   SELECT u.id FROM users u WHERE u.id IN (
+    SELECT "issuerId" FROM candidates UNION SELECT ancestor.subject_id FROM candidates candidate
+     JOIN content_capability_grants leaf ON leaf.id=candidate."authorityGrantId"
+     JOIN content_capability_grants ancestor ON ancestor.id=ANY(leaf.ancestry)
+   ) ORDER BY u.id FOR SHARE OF u
+  ) SELECT candidate.* FROM candidates candidate CROSS JOIN (SELECT count(*) FROM locked_issuers) locked
+  ORDER BY "issuerId","authorityGrantId" NULLS FIRST,"entryId",id`:
+  Prisma.sql`${candidates} ORDER BY g.issuer_id,g.authority_grant_id NULLS FIRST,g.entry_id,g.id`)
+
+ const groups=new Map<string,EducationLibrarySourceUse[]>()
  for(const row of rows){const key=JSON.stringify([row.issuerId,row.authorityGrantId]),group=groups.get(key)??[];group.push(row);groups.set(key,group)}
- const allowed=new Map<string,Grant>()
+ const allowed=new Map<string,EducationLibrarySourceUse>(),qualified:EducationLibrarySourceUse[]=[]
  for(const group of groups.values()){
   const first=group[0]
   try{
    await assertLibraryResourcesAuthority(tx,first.issuerId,[...new Set(group.map(row=>row.releaseId))],'material.distribute',c.entry,first.authorityGrantId??undefined)
+   qualified.push(...group)
    for(const row of group)if(!allowed.has(row.entryId))allowed.set(row.entryId,row)
   }catch(error){
    // A second independent U remains eligible. Do not hide infrastructure or
@@ -41,7 +54,34 @@ export async function readEducationLibrarySourceUses(tx:Prisma.TransactionClient
    if(!(error instanceof ContentAuthorityError)&&!((error instanceof ScaleLibraryError||error instanceof AdminPermissionError)&&error.statusCode===403))throw error
   }
  }
+ if(options.lockForUse&&qualified.length){
+  // Every possible issuer/ancestor User is already SHARE-locked before any
+  // organization mutex. Lock only preselected U rows; a new issuer cannot be
+  // substituted during a wait. Current D chains stay held from the batch above.
+  const current=await tx.$queryRaw<EducationLibrarySourceUse[]>(Prisma.sql`SELECT g.id,g.entry_id AS "entryId",e.release_id AS "releaseId",
+   g.issuer_id AS "issuerId",g.authority_grant_id AS "authorityGrantId",g.version,g.scope_kind AS "scopeKind",
+   LEAST(issuer.expires_at,(SELECT min(LEAST(a.expires_at,subject.expires_at)) FROM content_capability_grants leaf
+    JOIN content_capability_grants a ON a.id=ANY(leaf.ancestry) JOIN users subject ON subject.id=a.subject_id
+    WHERE leaf.id=g.authority_grant_id)) AS "expiresAt"
+   FROM scale_library_use_grants g JOIN scale_library_entries e ON e.id=g.entry_id JOIN users issuer ON issuer.id=g.issuer_id
+   WHERE g.id IN (${Prisma.join(qualified.map(row=>row.id))}) AND g.product=${c.entry} AND g.organization_id=${c.organizationId} AND g.status='ACTIVE'
+    AND ((g.scope_kind='USER' AND g.user_id=${c.principal.userId}) OR (g.scope_kind='ORGANIZATION' AND g.user_id IS NULL))
+   ORDER BY g.entry_id,g.id FOR SHARE OF g`)
+  allowed.clear()
+  for(const row of current)if(!allowed.has(row.entryId))allowed.set(row.entryId,row)
+ }
  return allowed
+}
+
+/** Current availability only; immutable bodies were verified at sealing. No
+ * grant chain, media download or whole-source hash reconstruction belongs here. */
+export async function assertEducationLibraryHeaders(tx:Prisma.TransactionClient,sources:readonly {versionId:string;contentHash:string}[],lock=false){
+ const ids=[...new Set(sources.map(source=>source.versionId))];if(!ids.length)return
+ const rows=await tx.$queryRaw<Array<{id:string;hash:string}>>(Prisma.sql`SELECT e.id,s.snapshot_hash AS hash
+  FROM scale_library_entries e JOIN scale_library_submissions s ON s.id=e.submission_id AND s.status='APPROVED'
+  JOIN measurement_content_releases m ON m.id=e.release_id AND m.status='PUBLISHED'
+  WHERE e.id IN (${Prisma.join(ids)}) AND e.status='ACTIVE' ORDER BY e.id ${lock?Prisma.sql`FOR SHARE OF e,s,m`:Prisma.empty}`)
+ if(sources.some(source=>!rows.some(row=>row.id===source.versionId&&row.hash===source.contentHash)))throw new ScaleLibraryError(409,'LIBRARY_SOURCE_UNAVAILABLE')
 }
 
 /** Bounded original-library metadata, never the workflow-only registered Scale

@@ -9,6 +9,8 @@ import {privateToolFail,type PrivateToolContext} from './private-tool.contracts'
 import {readEducationPublicUse} from './public-source.catalog'
 import {parseEducationPublicSourceKey} from './public-source.identity'
 import {readEducationPublicSourceHeaders} from './public-source.headers'
+import {assertEducationLibraryHeaders} from './library-source.catalog'
+import {assertEducationLibraryUses,type LockedEducationLibraryUses} from './library-source.use'
 import {educationCompositionKey,educationCompositionOriginSchema,educationCompositionResourceKeySchema,
  educationCompositionPolicyBindingSchema,type EducationCompositionOrigin} from './private-tool.composition-contracts'
 
@@ -18,7 +20,7 @@ const leafSummarySchema=z.array(z.object({blockId:z.string().guid(),versionId:z.
  kind:z.enum(['SCALE','FORM']),audience:z.string().nullable(),metricKeys:z.array(z.string()).max(100)}).strict()).min(1).max(50)
 type Row={id:string;key:string;creationHash:string;createdBy:string;status:string;publishedAt:Date|null;productKind:string;
  publicEnabled:boolean;copyable:boolean;manifestHash:string;versionId:string;toolId:string;entry:string;organizationId:string;
- ownerUserId:string;contentHash:string;title:string;leaves:unknown;available:boolean;releaseIds:string[];scaleIds:string[];publicKeys:string[]}
+ ownerUserId:string;contentHash:string;title:string;leaves:unknown;available:boolean;releaseIds:string[];scaleIds:string[];publicKeys:string[];librarySources:Array<{versionId:string;contentHash:string}>}
 export type PrivateCompositionRunSource={origin:EducationCompositionOrigin;compositeId:string;manifestHash:string;
  resourceEntry:RelationalProductEntryV1;policy:RunResourcePolicy;identityOnly:true;canPublish:false}
 
@@ -26,7 +28,7 @@ export type PrivateCompositionRunSource={origin:EducationCompositionOrigin;compo
  * Author authority is read once per batch; the DB's immutable seal proves the
  * source/child correspondence. No source definition, stimulus, report body,
  * compilation, materialization or full snapshot hash is read/rebuilt here. */
-export async function readPrivateCompositionRunSources(tx:Tx,c:PrivateToolContext,refs:Ref[],options:{lockForUse?:boolean}={}):Promise<Map<string,PrivateCompositionRunSource>>{
+export async function readPrivateCompositionRunSources(tx:Tx,c:PrivateToolContext,refs:Ref[],options:{lockForUse?:boolean;libraryUses?:LockedEducationLibraryUses}={}):Promise<Map<string,PrivateCompositionRunSource>>{
  if(!refs.length)return new Map()
  for(const ref of refs){
   educationCompositionResourceKeySchema.parse(ref.key)
@@ -41,13 +43,17 @@ export async function readPrivateCompositionRunSources(tx:Tx,c:PrivateToolContex
   c.status,c.published_at AS "publishedAt",c.product_kind AS "productKind",c.public_enabled AS "publicEnabled",c.copyable,
   c.training_content_snapshot_hash AS "manifestHash",v.id AS "versionId",v.tool_id AS "toolId",v.entry,
   v.organization_id AS "organizationId",v.owner_user_id AS "ownerUserId",v.content_hash AS "contentHash",v.title,
+  (SELECT COALESCE(jsonb_agg(jsonb_build_object('versionId',b->>'versionId','contentHash',b->>'contentHash')),'[]'::jsonb)
+   FROM jsonb_array_elements(c.training_content_snapshot#>'{educationBinding,manifest}') b WHERE b->>'sourceProvider'='LIBRARY_SCALE') AS "librarySources",
   (SELECT jsonb_agg(jsonb_build_object('blockId',b->>'blockId','versionId',b->>'versionId','contentHash',b->>'contentHash','kind',b->>'kind',
-    'audience',COALESCE(s.definition#>>'{report,audienceContract,audience}',std.snapshot#>>'{definition,report,audienceContract,audience}'),
-    'metricKeys',CASE WHEN b->>'sourceProvider'='STANDARD_SCALE' THEN (SELECT COALESCE(jsonb_agg(score->>'key'),'[]') FROM jsonb_array_elements(std.snapshot#>'{definition,scoring,scores}') score) WHEN s.kind='SCALE' THEN (SELECT COALESCE(jsonb_agg(score->>'key'),'[]')
+    'audience',COALESCE(s.definition#>>'{report,audienceContract,audience}',std.snapshot#>>'{definition,report,audienceContract,audience}',library.snapshot#>>'{compiledDefinition,report,audienceContract,audience}'),
+    'metricKeys',CASE WHEN b->>'sourceProvider'='LIBRARY_SCALE' THEN (SELECT COALESCE(jsonb_agg(score->>'key'),'[]') FROM jsonb_array_elements(library.snapshot#>'{compiledDefinition,scoring,scores}') score) WHEN b->>'sourceProvider'='STANDARD_SCALE' THEN (SELECT COALESCE(jsonb_agg(score->>'key'),'[]') FROM jsonb_array_elements(std.snapshot#>'{definition,scoring,scores}') score) WHEN s.kind='SCALE' THEN (SELECT COALESCE(jsonb_agg(score->>'key'),'[]')
       FROM jsonb_array_elements(s.definition#>'{scoring,scores}') score) ELSE '[]'::jsonb END) ORDER BY ordinal)
    FROM jsonb_array_elements(c.training_content_snapshot#>'{educationBinding,manifest}') WITH ORDINALITY blocks(b,ordinal)
    LEFT JOIN education_private_tool_versions s ON s.id=b->>'versionId' AND b->>'sourceProvider'='PRIVATE_VERSION'
-   LEFT JOIN survey_standard_releases std ON std.id=b->>'versionId' AND b->>'sourceProvider'='STANDARD_SCALE' AND std.combination_hash=b->>'contentHash') AS leaves,
+   LEFT JOIN survey_standard_releases std ON std.id=b->>'versionId' AND b->>'sourceProvider'='STANDARD_SCALE' AND std.combination_hash=b->>'contentHash'
+   LEFT JOIN scale_library_entries library_entry ON library_entry.id=b->>'versionId' AND b->>'sourceProvider'='LIBRARY_SCALE'
+   LEFT JOIN scale_library_submissions library ON library.id=library_entry.submission_id AND library.snapshot_hash=b->>'contentHash') AS leaves,
   NOT EXISTS(SELECT 1 FROM jsonb_array_elements(c.training_content_snapshot->'units') u
    LEFT JOIN scales s ON s.id=u#>>'{source,id}' LEFT JOIN measurement_content_releases r ON r.id=u#>>'{measurement,releaseId}'
    WHERE s.status IS DISTINCT FROM 'PUBLISHED' OR r.status IS DISTINCT FROM 'PUBLISHED'
@@ -61,6 +67,9 @@ export async function readPrivateCompositionRunSources(tx:Tx,c:PrivateToolContex
    'education-composition:'||v.entry||':'||v.id||':'||CASE v.entry WHEN 'SCHOOL' THEN 'STUDENT' ELSE 'TEACHER' END||':SELF:1.0.0'
   WHERE c.creation_key IN (${Prisma.join(keys)}) AND v.kind='COMPOSITION' AND v.entry=${c.entry}
    AND v.organization_id=${c.organizationId} AND v.owner_user_id=${c.principal.userId}`)
+ const librarySources=rows.flatMap(row=>row.librarySources)
+ await assertEducationLibraryUses(tx,c,librarySources.map(source=>source.versionId),{locked:options.libraryUses,requireLocked:options.lockForUse})
+ await assertEducationLibraryHeaders(tx,librarySources,options.lockForUse)
  if(options.lockForUse){
   const releases=[...new Set(rows.flatMap(row=>row.releaseIds))],scales=[...new Set(rows.flatMap(row=>row.scaleIds))]
   // Reuse the real emergency writer's identity locks, then read mutable status

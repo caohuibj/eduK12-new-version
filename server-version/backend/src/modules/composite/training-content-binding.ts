@@ -1,5 +1,5 @@
 import {assertCompositionPublicContent} from '../education-tools/private-tool.composition-content'
-import {educationStandardSourceSchema} from '../education-tools/private-tool.composition-contracts'
+import {educationStandardSourceSchema,educationLibrarySourceSchema} from '../education-tools/private-tool.composition-contracts'
 import {educationMarkerBindingSchema} from '../education-tools/assessment-resource.marker-contract'
 import {educationCompositionBindingSchema,educationCompositionRuntimeAnchorSchema,type EducationCompositionPolicyBinding,type EducationCompositionRuntimeAnchor} from '../education-tools/private-tool.composition-contracts'
 import {readEducationMarkerSource} from '../education-tools/assessment-resource.marker'
@@ -29,7 +29,8 @@ import { situationalReleaseKey, type ResolvedSituationalRelease } from '../situa
 
 const text=z.string().min(1).max(240),digest=z.string().regex(/^[a-f0-9]{64}$/)
 const sourceSchema=z.object({kind:z.enum(['SCALE','COGNITIVE_CONFIG','SJT_AUTHOR_RELEASE','STATIC_SJT_REGISTRY']),id:text,ownerId:text.optional(),
-  educationBinding:educationMarkerBindingSchema.optional(),educationStandard:educationStandardSourceSchema.optional(),standardCombination:trainingStandardItemSourceSchema.optional(),libraryEntryId:z.string().guid().optional(),privateVersionId:z.string().guid().optional(),assignmentId:text.optional(),instrumentKey:text.optional(),instrumentVersion:text.optional()}).strict().superRefine((source,ctx)=>{
+  educationBinding:educationMarkerBindingSchema.optional(),educationStandard:educationStandardSourceSchema.optional(),educationLibrary:educationLibrarySourceSchema.optional(),standardCombination:trainingStandardItemSourceSchema.optional(),libraryEntryId:z.string().guid().optional(),privateVersionId:z.string().guid().optional(),assignmentId:text.optional(),instrumentKey:text.optional(),instrumentVersion:text.optional()}).strict().superRefine((source,ctx)=>{
+ if(source.educationLibrary&&(source.kind!=='SCALE'||source.libraryEntryId!==source.educationLibrary.entryId||source.privateVersionId||source.standardCombination||source.educationBinding||source.educationStandard))ctx.addIssue({code:'custom',message:'Education library retains its exact approved entry identity'})
  if(source.educationStandard&&(source.kind!=='SCALE'||source.libraryEntryId||source.privateVersionId||source.standardCombination||source.educationBinding))ctx.addIssue({code:'custom',message:'Education Standard retains its independent exact approved source'})
  if(source.standardCombination&&(source.kind!=='SCALE'||source.libraryEntryId||source.privateVersionId||source.id!==source.standardCombination.reference.scaleId))ctx.addIssue({code:'custom',message:'Standard combination must retain its installed Scale identity'})
  if(source.privateVersionId&&(source.kind!=='SCALE'||source.libraryEntryId!==undefined))ctx.addIssue({code:'custom',message:'Private Scale identity cannot alias library or other families'})
@@ -203,7 +204,7 @@ export async function trainingMeasurementSourceScopeMatchesForConsumer(db:Prisma
  if(context?.educationComposition){
   // The caller verified this immutable attempt's parent header once for the
   // batch. DB containment and immutability bind each unit to that publication.
-  if(source.educationStandard){
+  if(source.educationStandard||source.educationLibrary){
    if(release.layer!=='MEASUREMENT')return false
    await assertCompositionPublicContent(db,{...context,measurementOnly:true,unit:{itemId:context.itemId,family:'SCALE',source,measurement:{releaseId:release.releaseId,contentHash:release.contentHash,measurementHash:release.content.measurementHash}},release})
    return true
@@ -261,7 +262,7 @@ export async function prepareTrainingContentAttemptBinding(db:Prisma.Transaction
       ||canonicalHash(snapshot.educationBinding.origin)!==canonicalHash(anchor.origin))fail('SNAPSHOT_INVALID')
     const measurementItems=input.composite.items.filter(item=>item.type!=='FORM')
     if(measurementItems.length!==snapshot.units.length||snapshot.units.some(unit=>unit.family!=='SCALE'||unit.source.kind!=='SCALE'
-      ||(!unit.source.educationStandard&&(unit.source.ownerId!==anchor.origin.ownerUserId||!unit.source.privateVersionId))
+      ||(!unit.source.educationStandard&&!unit.source.educationLibrary&&(unit.source.ownerId!==anchor.origin.ownerUserId||!unit.source.privateVersionId))
       ||!measurementItems.some(item=>item.id===unit.itemId&&item.type==='SCALE'&&item.scaleId===unit.source.id)))fail('SOURCE_MISMATCH')
     // Admission supplied this anchor from the existing transaction-bound START
     // proof; the loaded source is sealed under its publication SHARE lock.

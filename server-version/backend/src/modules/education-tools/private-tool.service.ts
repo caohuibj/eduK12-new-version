@@ -1,3 +1,4 @@
+import {lockOwnedDraftLibraryUses} from './library-source.use'
 import {readEducationPublicSourceHeaders,educationPublicRequiredContextKeys} from './public-source.headers'
 import {compilePrivateFormRuntime} from './private-tool.form-runtime-adapter'
 import {EducationPrivateToolError} from './private-tool.contracts'
@@ -81,7 +82,7 @@ export async function readPrivateTool(c:PrivateToolContext,id:string){
   const ids=[...new Set(definition.blocks.filter(block=>block.source.provider==='PRIVATE_VERSION').map(block=>block.source.versionId))]
   const references=ids.length?await tx.educationPrivateToolVersion.findMany({where:{id:{in:ids},...scope(c),kind:{in:['SCALE','FORM']}},
    select:{id:true,toolId:true,kind:true,title:true,sourceRevision:true,contentHash:true}}):[]
-  const publicSources=definition.blocks.filter(block=>block.source.provider!=='PRIVATE_VERSION').map(block=>block.source)
+  const publicSources=definition.blocks.filter(block=>['PUBLIC_FORM','STANDARD_SCALE'].includes(block.source.provider)).map(block=>block.source)
   const publicKey=(source:typeof publicSources[number])=>educationPublicSourceKey({kind:source.provider==='PUBLIC_FORM'?'FORM':'STANDARD_SCALE',id:source.versionId,hash:source.contentHash})
   // A mutable draft may contain an as-yet unverified reference. It cannot be
   // used as an oracle for another public source's title/version without U.
@@ -155,6 +156,7 @@ export async function previewPrivateTool(c:PrivateToolContext,id:string,raw:unkn
 export async function freezePrivateTool(c:PrivateToolContext,id:string,raw:unknown){
  const input=freezePrivateToolInput.parse(raw)
  return transact(async tx=>{
+  const libraryUses=await lockOwnedDraftLibraryUses(tx,c,id)
   await authorized(tx,c,{toolId:id})
   const row=await readOwned(tx,c,id,true)
   const prior=await tx.educationPrivateToolVersion.findFirst({where:{toolId:id,...scope(c),sourceRevision:input.expectedRevision}})
@@ -166,7 +168,7 @@ export async function freezePrivateTool(c:PrivateToolContext,id:string,raw:unkno
   }
   if(row.revision!==input.expectedRevision||row.contentHash!==input.expectedContentHash)privateToolFail('PRIVATE_TOOL_REVISION_CONFLICT')
   if(row.kind==='COMPOSITION'){
-   const compiled=await compilePrivateComposition(tx,c,row.definition)
+   const compiled=await compilePrivateComposition(tx,c,row.definition,{purpose:'FREEZE',libraryUses})
    const version=await tx.educationPrivateToolVersion.create({data:{id:randomUUID(),toolId:id,...scope(c),kind:row.kind,
     sourceRevision:row.revision,title:row.title,definition:row.definition as Prisma.InputJsonValue,contentHash:row.contentHash}})
    const runtime=await sealPrivateComposition(tx,c,version,compiled)

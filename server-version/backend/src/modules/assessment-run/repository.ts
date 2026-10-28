@@ -1,5 +1,6 @@
 import {privateFormDraftResourcePolicy} from '../education-tools/private-tool.form-draft-policy'
 import {readPrivateCompositionRunSources} from '../education-tools/private-tool.composition-source'
+import {lockCompositionLibraryUses,assertLockedLibraryUseTime,type LockedEducationLibraryUses} from '../education-tools/library-source.use'
 import {privateCompositionRunTrackInput} from '../education-tools/private-tool.run-contract'
 import {assertPrivateScaleRunWorkflow} from './educationPrivateScaleContext'
 import {assertPrivateScaleRunResource,assertPrivateFormRunResource} from './educationPrivateScaleContext'
@@ -113,6 +114,7 @@ export async function addAssessmentRunTrackDraft(input: {
 }): Promise<AssessmentRunTrackRecord> {
   const work=async (tx:Tx) => {
     const composition=input.resource.key.startsWith('education-composition:')
+    let compositionLibraryUses:LockedEducationLibraryUses|undefined
     if(input.resource.key.startsWith('education-assessment:')||composition){
       if(!input.actorUserId||input.expectedVersion===undefined||!Number.isSafeInteger(input.expectedVersion)||input.expectedVersion<1)
         throw new AssessmentRunRepositoryError('EDUCATION_ASSESSMENT_EXPECTED_VERSION_REQUIRED','Current editor and exact draft version required',400)
@@ -122,6 +124,9 @@ export async function addAssessmentRunTrackDraft(input: {
       if(!workflow||workflow.product!==input.educationWorkflow.product
         ||(workflow.product==='TEACHER'?workflow.teacherEventId:workflow.schoolCourseId)!==input.educationWorkflow.id)
         throw new AssessmentRunRepositoryError('EDUCATION_ASSESSMENT_WORKFLOW_REQUIRED','Exact education workflow required',403)
+      const libraryUses=composition?await lockCompositionLibraryUses(tx,{entry:workflow.product,organizationId:input.organizationId,
+        principal:{userId:input.actorUserId,accountDomain:'SCHOOL'}},[input.resource.key]):undefined
+      compositionLibraryUses=libraryUses
       const current=await lockAndAssertEducationRunWorkflow(tx,{...input,actorUserId:input.actorUserId,purpose:'EDIT'},workflow)
       if(!composition&&workflow.product==='TEACHER'&&await tx.huiteacherStudentEvaluationConfig.findUnique({where:{
         organizationId_eventId:{organizationId:input.organizationId,eventId:input.educationWorkflow.id}},select:{id:true}}))
@@ -130,7 +135,7 @@ export async function addAssessmentRunTrackDraft(input: {
         const selected=privateCompositionRunTrackInput.parse({expectedVersion:input.expectedVersion,privateComposition:input.privateComposition,
           subjectSelector:input.subjectSelector,respondentSelector:input.respondentSelector})
         const editor=await assertPrivateScaleRunWorkflow(tx,{...input,actorUserId:input.actorUserId},current)
-        const sources=await readPrivateCompositionRunSources(tx,editor.context,[input.resource],{lockForUse:true}),source=sources.get(input.resource.key)!
+        const sources=await readPrivateCompositionRunSources(tx,editor.context,[input.resource],{lockForUse:true,libraryUses}),source=sources.get(input.resource.key)!
         if(source.origin.versionId!==selected.privateComposition.versionId||source.origin.contentHash!==selected.privateComposition.contentHash)
           throw new AssessmentRunRepositoryError('PRIVATE_COMPOSITION_VERSION_MISMATCH','Exact fixed version required',409)
         assertRunTrackNarrowing(source.policy,input.requestedPolicy)
@@ -168,6 +173,7 @@ export async function addAssessmentRunTrackDraft(input: {
     }
     if(input.expectedVersion!==undefined&&runs[0].version!==input.expectedVersion)
       throw new AssessmentRunRepositoryError('RUN_VERSION_CONFLICT','Draft version changed',409)
+    await assertLockedLibraryUseTime(tx,compositionLibraryUses)
     const id = randomUUID()
     const subjectJson = JSON.stringify(input.subjectSelector ?? {})
     const respondentJson = JSON.stringify(input.respondentSelector ?? {})
