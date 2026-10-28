@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import ScaleUnitReportCard, { type SafeScaleUnitReport } from '../ScaleUnitReportCard'
 import type { ExternalScaleScoreValue } from '../types'
 
@@ -86,6 +86,12 @@ describe('Scale report saved public score metadata', () => {
     const extra = screen.getByTestId('scale-caveats-layer')
     expect(extra).not.toHaveAttribute('open')
     expect(extra.querySelector('summary')).toHaveTextContent('问卷的适用范围与限制')
+    const toggle = extra.querySelector('summary')
+    expect(toggle).not.toBeNull()
+    fireEvent.click(toggle!)
+    expect(extra).toHaveAttribute('open')
+    fireEvent.click(toggle!)
+    expect(extra).not.toHaveAttribute('open')
     expect(screen.getByTestId('scale-caveats')).toHaveTextContent('该语言版本尚无本地人群常模')
     expect(screen.getByTestId('scale-disclaimer')).toHaveTextContent('不是人群排名')
   })
