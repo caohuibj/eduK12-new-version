@@ -27,7 +27,7 @@ const api=async(path,method='GET')=>{window.fixtureCalls.push({path,method});if(
  throw Error('Unexpected fixture read '+path);};
 const child=view==='parent'?<SchoolParentTasks api={api}/>:view==='teacher'?<SchoolTeacherTasks compact api={api} organizationId={id}/>:view==='expert'?<HuiteacherFieldWorkspace api={api}/>:<ScaleUnitReportCard report={f.report}/>;
 const cls=view==='report'?'hui-training hui-app':view==='expert'?'ht-app ht-app-signed-in':view==='parent'?'hs-app hs-workspace hs-parent':'hs-app hs-workspace hs-educator';
-createRoot(document.getElementById('root')).render(<MemoryRouter><main className={cls} data-training-theme={theme} data-theme={theme}><div style={{padding:16,maxWidth:960,margin:'auto'}}>{child}</div></main></MemoryRouter>);
+createRoot(document.getElementById('root')).render(<MemoryRouter><main className={cls} data-training-theme={theme} data-theme={theme} data-shell-mode={view==='report'?'student':undefined}><div style={{padding:16,maxWidth:960,margin:'auto'}}>{child}</div></main></MemoryRouter>);
 `);
 const results={head:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),scope:'Actual UI components/styles. Role display fixtures are synthetic; report fixture is recorded PR374 public output. No API login, registration or FINAL simulated here; real HTTP evidence is separately admitted.',status:'RUNNING',cases:[],sandbox:null};
 const save=()=>writeFileSync(resolve(out,'browser.json'),JSON.stringify(results,null,2)+'\n');save();let vite,browser;
@@ -49,22 +49,19 @@ try{
     await page.screenshot({path:resolve(out,name+'.png'),fullPage:true,animations:'disabled'});row.status='PASS';
    }catch(e){row.status='FAIL';row.error=String(e.stack??e);throw e;}finally{save();await context.close();}
   }
-  for(const view of ['parent','teacher'])await scenario('school-'+view,view,390,'light',async(page,row)=>{
-   const launch=page.getByRole('button',{name:view==='parent'?'查看任务（开始／继续校园正式测评）':'开始／继续教师观察测评',exact:true});await launch.click();
-   await page.getByText('完成作答不会自动开放学生个人心理报告；不同意则不会开始测评。',{exact:true}).waitFor();
-   const start=page.getByRole('button',{name:'开始或继续正式测评'});assert(await start.isDisabled());
-   await page.getByRole('checkbox',{name:'我已阅读本次测评的用途与可见性说明，自愿同意作答。'}).check();assert(await start.isEnabled());
-   await page.getByRole('button',{name:'返回任务',exact:true}).click();await launch.waitFor();
-   row.consentRequired=true;row.returnDidNotStartOrSubmit=true;
-  });
-  await scenario('teacher-expert','expert',390,'light',async(page,row)=>{
-   await page.getByRole('button',{name:'填写实践表单',exact:true}).click();await page.getByRole('region',{name:'活动预制表单'}).waitFor();
-   await page.getByText('课堂讨论证据',{exact:false}).first().waitFor();await page.getByText('按表单逐页填写，最后一页由你确认正式提交。本表单不计分。',{exact:true}).waitFor();
-   await page.getByRole('textbox',{name:'专业意见与补充说明',exact:true}).waitFor();row.frozenFormAndNarrativeDisplayed=true;
-  });
+  // Reuse the three unchanged role UI consumers from the failed overall run.
+  // The failed warning and unexecuted downstream displays are NOT reused.
+  const priorBytes=readFileSync('docs/performance/education-observer-journeys-20261028/evidence/ci-r1-browser.json');
+  const {createHash}=await import('node:crypto');
+  assert.equal(createHash('sha256').update(priorBytes).digest('hex'),'3e247b780804711d8f4ca2d6f1a2712ede7f69da8d2e187e8fe7468229f6974f');
+  const prior=JSON.parse(priorBytes);assert.equal(prior.status,'FAIL');assert.equal(prior.head,'190c3ddbc86723206cc4af30cf8051ca9a00ad06');assert.equal(prior.sandbox.ok,true);
+  const priorSource='6894ba96cddd4881e5d3d2292375d551cf650ddf';
+  const changed=execFileSync('git',['diff','--name-only',priorSource,'HEAD','--','server-version/frontend'],{encoding:'utf8'}).trim().split('\n').filter(Boolean);
+  assert.deepEqual(changed,['server-version/frontend/src/modules/reporting/report-ui.css']);
+  for(const name of ['school-parent','school-teacher','teacher-expert']){const row=prior.cases.find(c=>c.name===name);assert.equal(row?.status,'PASS');assert.equal(row.overflow,false);results.cases.push({...row,reusedFrom:{run:40639538698,artifact:12795300037,source:priorSource},executedThisRun:false});}save();
   async function warningContrast(page,row){
-   const warning=page.locator('.scale-unit-report .text-amber-700').first();await warning.waitFor();
-   row.warning=await warning.evaluate(el=>{const fg=getComputedStyle(el).color;let parent=el,bg='';while(parent){bg=getComputedStyle(parent).backgroundColor;if(bg!=='rgba(0, 0, 0, 0)'&&bg!=='transparent')break;parent=parent.parentElement;}if(!parent)bg='rgb(255, 255, 255)';const lum=c=>{const a=c.match(/[\d.]+/g).slice(0,3).map(Number).map(v=>v/255).map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4);return a[0]*.2126+a[1]*.7152+a[2]*.0722;};const a=lum(fg),b=lum(bg);return {text:el.textContent,color:fg,background:bg,ratio:(Math.max(a,b)+.05)/(Math.min(a,b)+.05)};});assert(row.warning.ratio>=4.5,'Warning text contrast is insufficient');
+   const warning=page.locator('.scale-unit-report .text-amber-700');await warning.first().waitFor();
+   row.warnings=await warning.evaluateAll(elements=>elements.map(el=>{const fg=getComputedStyle(el).color;let parent=el,bg='';while(parent){bg=getComputedStyle(parent).backgroundColor;if(bg!=='rgba(0, 0, 0, 0)'&&bg!=='transparent')break;parent=parent.parentElement;}if(!parent)bg='rgb(255, 255, 255)';const lum=c=>{const a=c.match(/[\d.]+/g).slice(0,3).map(Number).map(v=>v/255).map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4);return a[0]*.2126+a[1]*.7152+a[2]*.0722;};const a=lum(fg),b=lum(bg);return {text:el.textContent,color:fg,background:bg,ratio:(Math.max(a,b)+.05)/(Math.min(a,b)+.05)};}));assert(row.warnings.length>=2);row.warning=row.warnings[0];assert(row.warning.ratio>=4.5,'Warning text contrast is insufficient');for(const value of row.warnings)assert(value.ratio>=4.5,'Auxiliary warning contrast is insufficient');
   }
   await scenario('warning-dark-mobile','report',390,'dark',warningContrast);
   await scenario('warning-dark-tablet','report',820,'dark',warningContrast);

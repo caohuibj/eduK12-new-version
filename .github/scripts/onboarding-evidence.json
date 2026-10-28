@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "product": "bbd83b20ef9a0a98863458147858c3e7254f238d",
+  "product": "301b1d0cc051d06ed571e9db820dd30e9f42362e",
   "reviewer": "root dot",
   "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
   "ciExecuted": false,
@@ -12,7 +12,8 @@
       "Existing observer services mock School HTTP identity only; separate new HTTP test uses actual password login, cookies, CSRF and product routes.",
       "Historical failed reports remain in frozen source and are not admitted as successful.",
       "Only six missing UI display/consent/contrast checks and changed-control SAST run in CI; no repeated database, application or compiler checks.",
-      "Frontend application TypeScript is unchanged; only three scoped CSS lines changed. Role UI uses synthetic GET-only display fixtures, not browser login or FINAL."
+      "Frontend application TypeScript is unchanged; only three scoped CSS lines changed. Role UI uses synthetic GET-only display fixtures, not browser login or FINAL.",
+      "First CI overall failed only at dark warning display; three already-passed role UI cases are retained with original SHA and reused, only warning displays execute again."
     ]
   },
   "reports": [

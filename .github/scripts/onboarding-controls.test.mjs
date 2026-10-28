@@ -115,3 +115,6 @@ test('observer follow-up admits only its HTTP test, scoped CSS and evidence; bro
  const yaml=readFileSync('.github/workflows/ci.yml','utf8');assert(yaml.includes('node .github/scripts/pr376-browser.mjs'));assert(yaml.includes("contains(fromJSON('[374,376]')"));
  const script=readFileSync('.github/scripts/pr376-browser.mjs','utf8');assert(script.includes('chromiumSandbox:true'));assert(script.includes('verifyChromeSandbox'));assert(script.includes('results.cases.length,6'));assert(script.includes('row.warning.ratio>=4.5'));assert(script.includes('Display fixture forbids simulated writes'));
 });
+test('observer display retry keeps failed report and narrows execution without weakening contrast',()=>{
+ const script=readFileSync('.github/scripts/pr376-browser.mjs','utf8');assert(script.includes("assert.equal(prior.status,'FAIL')"));assert(script.includes('executedThisRun:false'));assert(script.includes("assert.deepEqual(changed,['server-version/frontend/src/modules/reporting/report-ui.css'])"));assert(script.includes("data-shell-mode={view==='report'?'student':undefined}"));assert(script.includes('row.warnings.length>=2'));assert(script.includes('value.ratio>=4.5'));
+});
