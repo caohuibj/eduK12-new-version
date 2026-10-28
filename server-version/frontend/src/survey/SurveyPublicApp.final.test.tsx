@@ -719,3 +719,30 @@ it('keeps an unfinished native SJT mounted before a timed scale until its server
   await waitFor(()=>expect(finalCalls).toHaveLength(1))
   expect(finalCalls[0].situationalReferences).toEqual([{protocol:'SITUATIONAL_NATIVE_V1',attemptId:'44444444-4444-4444-8444-444444444444',submissionId:'55555555-5555-4555-8555-555555555555',payloadHash:'c'.repeat(64)}])
 })
+
+describe('first committed descriptive feedback receipt',()=>{
+ const receipt=(pending=false)=>({...firstSuccess().generalReceipt,kind:'DESCRIPTIVE',pending,measurements:pending?[]:[{
+  feedbackKind:'RAW_METRICS',instrumentKey:'scale',title:'量表',measurementReleaseId:'release',quality:'interpretable',
+  metrics:[{key:'total',label:'原始总分',value:7,unit:null,status:'OK'}],
+ }]})
+ it('shows permitted first feedback without GET and reauthorizes after reopening',async()=>{
+  taskOverrides={reportMode:'DESCRIPTIVE'};finalReply=()=>response(firstSuccess({participantFeedbackReceipt:receipt()}))
+  const view=await openTask();fireEvent.click(screen.getByRole('radio',{name:'同意'}));submit()
+  expect(await screen.findByText('原始总分：7（OK）')).toBeInTheDocument();expect(generalCalls()).toHaveLength(0)
+  expect(JSON.stringify(sessionStorage)).not.toContain('原始总分')
+  view.unmount();taskValue={...taskValue,status:'COMPLETED'};generalReply=()=>response(null,403,'研究身份已失效')
+  render(<SurveyPublicApp/>);fireEvent.click(await screen.findByRole('button',{name:'恢复本次作答／查看已完成回执'}))
+  await screen.findByText('研究身份已失效');expect(screen.queryByText('原始总分：7（OK）')).toBeNull();expect(generalCalls()).toHaveLength(1)
+ })
+ it('keeps deferred feedback pending rather than loading hidden metrics',async()=>{
+  taskOverrides={reportMode:'DESCRIPTIVE'};finalReply=()=>response(firstSuccess({participantFeedbackReceipt:receipt(true)}))
+  await openTask();fireEvent.click(screen.getByRole('radio',{name:'同意'}));submit()
+  await screen.findByText(receiptText);expect(generalCalls()).toHaveLength(0);expect(screen.queryByText(/原始总分/)).toBeNull()
+ })
+ it('falls back to the authorized reader for malformed inline metric values',async()=>{
+  taskOverrides={reportMode:'DESCRIPTIVE'};const bad=receipt();(bad.measurements[0].metrics[0] as any).value='not-a-number'
+  finalReply=()=>response(firstSuccess({participantFeedbackReceipt:bad}))
+  await openTask();fireEvent.click(screen.getByRole('radio',{name:'同意'}));submit()
+  await screen.findByText('感谢参与');expect(generalCalls()).toHaveLength(1);expect(screen.queryByText(/not-a-number/)).toBeNull()
+ })
+})

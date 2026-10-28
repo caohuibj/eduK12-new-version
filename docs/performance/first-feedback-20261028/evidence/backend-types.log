@@ -1,0 +1,2 @@
+src/modules/survey/material.authorization.ts(17,21): error TS18048: 'measurements' is possibly 'undefined'.
+src/modules/survey/public.routes.ts(202,21): error TS18048: 'measurements' is possibly 'undefined'.

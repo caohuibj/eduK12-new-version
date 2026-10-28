@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "node",
+    "node_modules/typescript/bin/tsc",
+    "--noEmit"
+  ],
+  "component": "backend",
+  "componentTree": "ca7bcca69ac09b8c396a9eccbad46c1156a19221",
+  "base": "aa774983db8edd85b3c1617aef7218f71664746d",
+  "node": "v24.22.1",
+  "startedAt": "2026-10-28T02:10:20.958577+00:00",
+  "ciExecuted": false,
+  "reason": "Final existing normalization now replaces the original variable rather than retaining two full result objects; final source binding changed, frontend unchanged",
+  "exitCode": 0,
+  "endedAt": "2026-10-28T02:10:53.183564+00:00",
+  "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

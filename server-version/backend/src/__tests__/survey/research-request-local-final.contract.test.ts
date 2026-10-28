@@ -462,3 +462,52 @@ describe('Survey FINAL reused selected variant boundary',()=>{
     expect(mocks.createFinal).not.toHaveBeenCalled()
   })
 })
+
+describe('first committed descriptive feedback',()=>{
+ function descriptive(release:'AFTER_FINAL'|'AFTER_COLLECTION'){
+  // This unit covers FINAL response projection, not the separate governed
+  // interpretation pipeline. Actual frozen content is checked in PG consumers.
+  vi.spyOn(interpretationService,'interpretSurveyFinal').mockResolvedValue(undefined)
+  const source=snapshot()
+  const unit=compileFrozenResearchUnit({id:'scale',instrumentKey:'scale',kind:'SCALE',title:'Synthetic scale',revision:1,
+   definition:{schemaVersion:1,presentationMode:'ALL_AT_ONCE',respondentType:'participant_self_report',aggregation:'mean',
+    dimensions:[{dimensionKey:'dimension',label:'Dimension',direction:'descriptive'}],responseOptions:[{optionKey:'low',label:'Low',score:1},{optionKey:'high',label:'High',score:5}],
+    items:[{itemKey:'one',prompt:'One',required:true,reverse:false,dimensionKeys:['dimension']}]}})
+  unit.measurementRelease={releaseId:'synthetic-release',contentHash:'b'.repeat(64),measurementHash:unit.sourceDigest}
+  unit.participantFeedback={policyVersion:'SURVEY_RAW_METRICS_V1',mode:'DESCRIPTIVE',metricKeys:['dimension'],release}
+  source.units.push(unit)
+  const definitionDigest=canonicalHash(source)
+  Object.assign(known,{status:'STARTED',compiledSnapshot:source,definitionDigest})
+  current.status='STARTED';current.wave.publication={id:'publication',definitionDigest,compiledSnapshot:source};mocks.final.mockResolvedValue(null)
+  return {...input(),answers:{...answers(),scale:{one:'high'}}}
+ }
+ it.each(['AFTER_FINAL','AFTER_COLLECTION'] as const)('projects only the existing %s allowlist without a saved-result reread',async release=>{
+  const result=await submitResearchFinal(descriptive(release))
+  expect(result).toMatchObject({status:'COMPLETED',idempotent:false,participantFeedbackReceipt:{kind:'DESCRIPTIVE',pending:release==='AFTER_COLLECTION'}})
+  const feedback=(result as any).participantFeedbackReceipt
+  if(release==='AFTER_FINAL')expect(feedback.measurements).toMatchObject([{feedbackKind:'RAW_METRICS',instrumentKey:'scale',metrics:[{key:'dimension',value:5,unit:null}]}])
+  else expect(feedback.measurements).toEqual([])
+  expect(mocks.createFinal).toHaveBeenCalledTimes(1);expect(mocks.verified).toHaveBeenCalledTimes(1);expect(mocks.readFinal).not.toHaveBeenCalled()
+  expect(JSON.stringify(result)).not.toMatch(/rawAnswers|privateScoring|resultsCipher|credential/)
+ })
+ it('never returns a prepared feedback receipt when the enclosing commit fails',async()=>{
+  const request=descriptive('AFTER_FINAL'),original=mocks.transaction.getMockImplementation()!
+  mocks.transaction.mockImplementationOnce(async(...args:any[])=>{await original(...args);throw Error('synthetic commit failed')})
+  await expect(submitResearchFinal(request)).rejects.toThrow('synthetic commit failed')
+  expect(mocks.createFinal).toHaveBeenCalledTimes(1)
+ })
+ it('does not return feedback when current consent rejects the first FINAL',async()=>{
+  const request=descriptive('AFTER_FINAL');mocks.consent.mockResolvedValue(null)
+  await expect(submitResearchFinal(request)).rejects.toThrow('知情同意')
+  expect(mocks.createFinal).not.toHaveBeenCalled()
+ })
+ it('keeps accepted answers recoverable when optional first-feedback projection cannot resolve its source',async()=>{
+  const request=descriptive('AFTER_FINAL')
+  delete current.wave.publication.compiledSnapshot.units[1].measurementRelease
+  known.definitionDigest=current.wave.publication.definitionDigest=canonicalHash(current.wave.publication.compiledSnapshot)
+  const result=await submitResearchFinal(request)
+  expect(result).toMatchObject({status:'COMPLETED',idempotent:false})
+  expect(result).not.toHaveProperty('participantFeedbackReceipt')
+  expect(mocks.createFinal).toHaveBeenCalledTimes(1)
+ })
+})

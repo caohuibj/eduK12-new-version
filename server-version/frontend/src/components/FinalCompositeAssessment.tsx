@@ -502,14 +502,16 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
   const units = state.units || state.items
   const currentUnit = units[state.currentIndex]
   const contextText = state.context?.status === 'frozen' ? '已确认的背景信息将沿用于后续部分。' : '未提交的答案保存在当前浏览器，完成本部分后再提交。'
-  const submissionStatus = submitting
-    ? { state: 'submitting' as const, message: '答案已锁定，正在提交当前单元的同一份 FINAL。' }
-    : meta?.status === 'SUBMITTING'
-      ? { state: 'reconciling' as const, message: '当前单元已有封存提交，正在等待服务器终态确认。' }
-      : meta?.status === 'RETRY_PENDING'
-        ? { state: 'pending' as const, message: meta.errorMessage || '提交状态尚未确认；答案保持锁定，后续只重放同一份封存内容。' }
-        : meta?.status === 'COMPLETED'
-          ? { state: 'committed' as const, message: '服务器已确认当前单元的权威结果。' }
+  // The server receipt is already durable while onReload still waits. A later
+  // progress/report request must not hide that accepted state or imply resubmit.
+  const submissionStatus = meta?.status === 'COMPLETED'
+    ? { state: 'committed' as const, message: '服务器已确认当前单元的权威结果。' }
+    : submitting
+      ? { state: 'submitting' as const, message: '答案已锁定，正在提交当前单元的同一份 FINAL。' }
+      : meta?.status === 'SUBMITTING'
+        ? { state: 'reconciling' as const, message: '当前单元已有封存提交，正在等待服务器终态确认。' }
+        : meta?.status === 'RETRY_PENDING'
+          ? { state: 'pending' as const, message: meta.errorMessage || '提交状态尚未确认；答案保持锁定，后续只重放同一份封存内容。' }
           : { state: 'ready' as const }
   const recoveryState = expiredCognitive
     ? { state: 'blocked' as const, message: '当前认知任务的本机试次草稿已过期，不能继续原试次。' }
