@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {BRANCHES,CONTROLS,MARKER,onboardingPlan,onboardingOutputs} from './onboarding-scope.mjs';
-import {verifyOriginalReport,verifyTypeReceipt,verifyReportPlanningObservation,verifyFailureContinuations} from './onboarding-checks.mjs';
+import {verifyOriginalReport,verifyTypeReceipt,verifyReportPlanningObservation,verifyFailureContinuations,verifyRunStartPlanningObservation} from './onboarding-checks.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 const h=c=>c.repeat(40),base=h('a'),head=h('b'),source=h('c'),tree=h('d'),blob=h('e');
 function fixture(){
@@ -117,4 +117,14 @@ test('observer follow-up admits only its HTTP test, scoped CSS and evidence; bro
 });
 test('observer display retry keeps failed report and narrows execution without weakening contrast',()=>{
  const script=readFileSync('.github/scripts/pr376-browser.mjs','utf8');assert(script.includes("assert.equal(prior.status,'FAIL')"));assert(script.includes('executedThisRun:false'));assert(script.includes("assert.deepEqual(changed,['server-version/frontend/src/modules/reporting/report-ui.css'])"));assert(script.includes("data-shell-mode={view==='report'?'student':undefined}"));assert(script.includes('row.warnings.length>=2'));assert(script.includes('value.ratio>=4.5'));
+});
+
+test('START planner scope and original diagnostic reject unrelated runtime or invented outcomes',()=>{
+ const f=fixture(),path='server-version/backend/src/modules/assessment-run/startAuthority.ts',b={...f.b,pr:377,source:{[path]:{before:null,after:blob}}};
+ const entries=f.entries.map(e=>Object.hasOwn(f.b.source,e.file)?{...e,file:path}:e),env={...f.env,CI_PR_NUMBER:'377',CI_HEAD_REF:BRANCHES[377]};assert.equal(onboardingPlan(entries,base,head,f.read,env,b).pr,377);
+ const outside='server-version/backend/src/middleware/auth.ts';assert.throws(()=>onboardingPlan(entries.map(e=>e.file===path?{...e,file:outside}:e),base,head,f.read,env,{...b,source:{[outside]:{before:null,after:blob}}}));
+ const root='docs/performance/storage-ledger-20261028/start-planner/',read=p=>JSON.parse(readFileSync(root+p));
+ const profile=read('authority-profile-summary.json'),validation=read('planner-validation-r1.json'),execution=read('planner-validation-r1-execution.json');assert.equal(verifyRunStartPlanningObservation(profile,validation,execution).ciExecuted,false);
+ assert.throws(()=>verifyRunStartPlanningObservation(profile,{...validation,completed:false},execution));assert.throws(()=>verifyRunStartPlanningObservation(profile,validation,{...execution,exitCode:1}));const bad=structuredClone(validation);bad.cases[0].after.value='1';assert.throws(()=>verifyRunStartPlanningObservation(profile,bad,execution));
+ const yaml=readFileSync('.github/workflows/ci.yml','utf8');assert(yaml.includes(".pr == 377 && 'paths: [server-version/backend/src/modules/assessment-run/startAuthority.ts"));
 });

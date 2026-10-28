@@ -1,97 +1,144 @@
 {
   "schemaVersion": 1,
-  "product": "301b1d0cc051d06ed571e9db820dd30e9f42362e",
+  "product": "086ab229fd35e12b05c83372843aaa3653e23f87",
   "reviewer": "root dot",
   "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
   "ciExecuted": false,
   "originalExecutionSigned": false,
   "environment": {
     "limitations": [
-      "Owned isolated PostgreSQL 17.11/Redis 8.0.2, Node v24.22.1; synthetic source/account/publication setup; migrations fully applied.",
-      "Original execution unsigned; component/input association after execution; no complete contemporaneous installed-dependency manifest.",
-      "Existing observer services mock School HTTP identity only; separate new HTTP test uses actual password login, cookies, CSRF and product routes.",
-      "Historical failed reports remain in frozen source and are not admitted as successful.",
-      "Only six missing UI display/consent/contrast checks and changed-control SAST run in CI; no repeated database, application or compiler checks.",
-      "Frontend application TypeScript is unchanged; only three scoped CSS lines changed. Role UI uses synthetic GET-only display fixtures, not browser login or FINAL.",
-      "First CI overall failed only at dark warning display; three already-passed role UI cases are retained with original SHA and reused, only warning displays execute again."
+      "Original local results unsigned; source associations retrospective; no complete installed-dependency byte manifest.",
+      "Four selected unit cases and two fresh real PG School/Teacher START/FINAL/report cases; filtered rows remain filtered. Original PG HTTP identity and image bytes mocked, not browser/login acceptance.",
+      "Separate existing-record planner validation uses temporary synthetic negative mutations and rolls them back. Not read-only for those negative transactions.",
+      "Storage lifecycle observations are fixed-order single-sequence measurements, not production p95/capacity or full four-entry qualification. No flags enabled in production.",
+      "Frontend/schema/locks unchanged; no browser, build, repeated application/PG/compiler or 60-answer lifecycle replay in CI."
     ]
   },
   "reports": [
     {
-      "id": "observer-services",
-      "path": "docs/performance/education-observer-journeys-20261028/evidence/observer-pg-r1.json",
-      "sha256": "fa3285fc377c20a817312e51ac99f07047eb11cd09bd480b59964e34564bdb20",
-      "originalSourceAssociation": "90c0a9a5c0ba24a5a9d8cb8003279dfb668650ba",
+      "id": "current-authority-unit",
+      "path": "docs/performance/storage-ledger-20261028/start-planner/start-planner-unit-r1.json",
+      "sha256": "d9561e00e72bdcc1067cc75c0242050d5aab0ebed8703ee77d974fd270ce8311",
+      "originalSourceAssociation": "086ab229fd35e12b05c83372843aaa3653e23f87",
       "sourceRoots": [
         "server-version/backend"
       ],
-      "sourceAssociationBasis": "Explicit retrospective source association: original execution head was base, new test was then uncommitted. Root read actual code and raw result; no contemporaneous signed execution claim.",
-      "reviewedUnrelatedSourceDelta": [
-        "server-version/backend/src/__tests__/integration/educationObserverHttp.postgres.integration.test.ts"
-      ],
-      "deltaRationale": "Existing service cases do not import new HTTP test; no runtime source changed. Final HTTP test bytes are exactly the committed product test.",
+      "sourceAssociationBasis": "Root retrospective source association to exact final backend tree; original checks ran while four-line patch and direct test changes were uncommitted. No signed-execution claim.",
+      "reviewedUnrelatedSourceDelta": [],
+      "deltaRationale": "No backend input changes after the recorded checks; documentation only.",
       "cases": [
         {
-          "fullName": "School approved library observer real completion and report privacy completes PARENT_REPORT with real relationship/consent and no individual report disclosure",
+          "fullName": "education execution purpose and account-lock boundary keeps default collection denies and rejects School Training fallback",
+          "status": "skipped"
+        },
+        {
+          "fullName": "education execution purpose and account-lock boundary report history uses current report denies, not collection denies or School legacy collection policy",
+          "status": "skipped"
+        },
+        {
+          "fullName": "education execution purpose and account-lock boundary default caller keeps its existing user SHARE fence",
+          "status": "skipped"
+        },
+        {
+          "fullName": "education execution purpose and account-lock boundary actual library metadata permits query-time accounts without a post-org user lock",
+          "status": "skipped"
+        },
+        {
+          "fullName": "education execution purpose and account-lock boundary requesting detection cannot remove legacy user locks when no actual library track exists",
+          "status": "skipped"
+        },
+        {
+          "fullName": "education execution purpose and account-lock boundary private source qualification joins the immutable version and real workflow before changing account-lock mode",
+          "status": "skipped"
+        },
+        {
+          "fullName": "education execution purpose and account-lock boundary cannot use bound FINAL intake semantics for an unverified legacy/public source",
+          "status": "skipped"
+        },
+        {
+          "fullName": "education execution purpose and account-lock boundary only DB-bound FORM FINAL may finish after the new-intake deadline (final=false)",
           "status": "passed"
         },
         {
-          "fullName": "School approved library observer real completion and report privacy completes TEACHER_REPORT with real relationship/consent and no individual report disclosure",
+          "fullName": "education execution purpose and account-lock boundary only DB-bound FORM FINAL may finish after the new-intake deadline (final=true)",
           "status": "passed"
         },
         {
-          "fullName": "Huiteacher PR4 event-scoped expert access and encrypted field records keeps invited outside expert separate from School membership and private reflection",
+          "fullName": "education execution purpose and account-lock boundary planner bound preserves current accountsCurrent refusal",
+          "status": "passed"
+        },
+        {
+          "fullName": "education execution purpose and account-lock boundary planner bound preserves current populationCurrent refusal",
           "status": "passed"
         }
       ],
       "summary": {
         "success": true,
-        "numPassedTests": 3,
+        "numPassedTests": 4,
         "numFailedTests": 0,
-        "numPendingTests": 0
+        "numPendingTests": 7
       }
     },
     {
-      "id": "observer-http",
-      "path": "docs/performance/education-observer-journeys-20261028/evidence/observer-http-r4.json",
-      "sha256": "a20b46ed70c9745986a285723b206366ea716b0293ad0af4c6b8cc7fbeee5dd2",
-      "originalSourceAssociation": "bbd83b20ef9a0a98863458147858c3e7254f238d",
+      "id": "real-start-final-report",
+      "path": "docs/performance/storage-ledger-20261028/start-planner/planner-pg-r1.json",
+      "sha256": "3fa8e06526289ec9eba43a4ce4912dd371a61a05af48355ce5ccc7abf508bbda",
+      "originalSourceAssociation": "086ab229fd35e12b05c83372843aaa3653e23f87",
       "sourceRoots": [
         "server-version/backend"
       ],
-      "sourceAssociationBasis": "Explicit retrospective source association: original execution head was base, new test was then uncommitted. Root read actual code and raw result; no contemporaneous signed execution claim.",
+      "sourceAssociationBasis": "Root retrospective source association to exact final backend tree; original checks ran while four-line patch and direct test changes were uncommitted. No signed-execution claim.",
       "reviewedUnrelatedSourceDelta": [],
-      "deltaRationale": "Existing service cases do not import new HTTP test; no runtime source changed. Final HTTP test bytes are exactly the committed product test.",
+      "deltaRationale": "No backend input changes after the recorded checks; documentation only.",
       "cases": [
         {
-          "fullName": "School observer real login and HTTP scale journey PARENT_REPORT lists, starts, reads, completes and reopens with independent report privacy",
+          "fullName": "Education library real START→FINAL→personal report and image authorization reads SCHOOL self feedback from real FINAL and enforces identical current image access",
           "status": "passed"
         },
         {
-          "fullName": "School observer real login and HTTP scale journey TEACHER_REPORT lists, starts, reads, completes and reopens with independent report privacy",
+          "fullName": "Education library real START→FINAL→personal report and image authorization reads TEACHER self feedback from real FINAL and enforces identical current image access",
           "status": "passed"
         },
         {
-          "fullName": "School observer real login and HTTP scale journey external expert registers from a scoped invite, logs in and submits the frozen field form",
-          "status": "passed"
+          "fullName": "Education library real START→FINAL→personal report and image authorization does not invent personal text or image rights for a version with no content audience",
+          "status": "skipped"
         }
       ],
       "summary": {
         "success": true,
-        "numPassedTests": 3,
+        "numPassedTests": 2,
         "numFailedTests": 0,
-        "numPendingTests": 0
+        "numPendingTests": 1
       }
     }
   ],
   "types": [
     {
       "component": "backend",
-      "path": "docs/performance/education-observer-journeys-20261028/evidence/backend-types-r1.json",
-      "sha256": "02372e835f0af93a7960ab951168d66f2f3e15094724a4e43474f9fd9849a225",
-      "log": "docs/performance/education-observer-journeys-20261028/evidence/backend-types-r1.log",
+      "path": "docs/performance/storage-ledger-20261028/start-planner/planner-backend-types-r1.json",
+      "sha256": "24bfa88a00e4bb32d43fc9bb9d48da2f3ec9d0995504bc68fe0ce6c215f09b94",
       "exitField": "exitCode",
-      "componentTree": "e2812baf6d8ff641ff40f32443ee318a56e28563"
+      "componentTree": "b7fe981eea351ebb94232571479894e921e53bcd",
+      "log": "docs/performance/storage-ledger-20261028/start-planner/planner-backend-types-r1.log"
     }
-  ]
+  ],
+  "runStartPlanning": {
+    "validation": {
+      "path": "docs/performance/storage-ledger-20261028/start-planner/planner-validation-r1.json",
+      "sha256": "752b3593d4201a758d96b7e9582dd9c6050c6c2b2fb14160b56d6c492558b67e"
+    },
+    "execution": {
+      "path": "docs/performance/storage-ledger-20261028/start-planner/planner-validation-r1-execution.json",
+      "sha256": "8f68c068ff93652c62f6a29c4c48a27529edae3a327eb1206bd6e6059c2050dd"
+    },
+    "profile": {
+      "path": "docs/performance/storage-ledger-20261028/start-planner/authority-profile-summary.json",
+      "sha256": "24d69ca055127a8153771b326eec3fda86ac016a4041eeaeb6662bfdb9ea3265"
+    },
+    "fullProfile": {
+      "path": "docs/performance/storage-ledger-20261028/start-planner/authority-profile-r1.json.gz",
+      "sha256": "2aa0f9e828f52bb5d173797c948a8bf8b3e330291d7e4050a4bf0677248705a3"
+    },
+    "sourceAssociationBasis": "Original planner SELECT statements unchanged by SET LOCAL addition; actual raw diagnostic and same-PID restore/negative rollback verified by root."
+  }
 }
