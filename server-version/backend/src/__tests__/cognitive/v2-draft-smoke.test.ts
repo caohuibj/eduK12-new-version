@@ -51,6 +51,11 @@ const payloadFor = (testType: string): { phase: 'test' | 'learning'; payload: un
     case 'seqlearn': return { phase: 'test', payload: { position: 3, response: 3, rtMs: 300, interrupted: false } }
     case 'timecopy': return { phase: 'test', payload: { targetMs: 1500, responseMs: 1620, interrupted: false } }
     case 'sharegame': return { phase: 'test', payload: { endowment: 20, given: 5, rtMs: 300, interrupted: false } }
+    case 'letternumseries': return { phase: 'test', payload: { sequence: ['D', '6', 'K', '2', 'M', '9'], lettersResponse: ['D', 'K', 'M'], digitsResponse: ['2', '6', '9'], responseDurationMs: 100, interrupted: false } }
+    case 'wordanalogy': return { phase: 'test', payload: { itemId: 'wa-01', responseIndex: 0, rtMs: 300, interrupted: false } }
+    case 'wordmeaning': return { phase: 'test', payload: { itemId: 'wm-01', responseIndex: 0, rtMs: 300, interrupted: false } }
+    case 'semanticfluency': return { phase: 'test', payload: { category: 'animals', responses: ['猫', '狗'], responseDurationMs: 100, interrupted: false } }
+    case 'wordproblem': return { phase: 'test', payload: { itemId: 'wp-01', responseIndex: 0, rtMs: 300, interrupted: false } }
     default: throw new Error(`No cognitive smoke payload for ${testType}`)
   }
 }
