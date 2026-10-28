@@ -1,3 +1,4 @@
+import {listEducationLibrarySources} from './library-source.catalog'
 import {importPrivateForm} from './private-tool.form-import.service'
 import {importPrivateToolCsv} from './private-tool.csv.service'
 import {privateToolSharingRouter} from './private-tool.sharing.routes'
@@ -41,6 +42,7 @@ export function educationPrivateToolRouter(entry:EducationToolEntry){
   return service.listPrivateTools(context(req),query.cursor,query.kind)
  }))
  router.post('/',handle(req=>service.createPrivateTool(context(req),req.body)))
+ router.get('/library-sources',handle(req=>listEducationLibrarySources(context(req),req.query)))
  router.get('/public-sources',handle(req=>listEducationPublicSources(context(req),educationPublicCatalogQuery.parse(req.query))))
  router.get('/public-sources/form/:versionId',handle(req=>{
   const query=z.object({contentHash:z.string().regex(/^[a-f0-9]{64}$/)}).strict().parse(req.query)

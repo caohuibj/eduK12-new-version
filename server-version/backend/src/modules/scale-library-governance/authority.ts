@@ -12,6 +12,13 @@ export async function libraryActor(tx:Prisma.TransactionClient,actorId:string){
   return {...u,systemAdmin:u.platform_role==='SYSTEM_ADMIN'&&['LEGACY','TRAINING'].includes(u.account_domain)}
 }
 export async function assertLibraryAuthority(tx:Prisma.TransactionClient,actorId:string,releaseId:string,capability:'catalog.manage'|'material.distribute',product:LibraryProduct,grantId?:string){
+  return assertLibraryResourcesAuthority(tx,actorId,[releaseId],capability,product,grantId)
+}
+/** The same current issuer/entry/delegation contract for one bounded set.
+ * Consumer directories group by exact issuer + authority basis, not by card. */
+export async function assertLibraryResourcesAuthority(tx:Prisma.TransactionClient,actorId:string,releaseIds:readonly string[],capability:'catalog.manage'|'material.distribute',product:LibraryProduct,grantId?:string){
+  const resourceKeys=[...new Set(releaseIds)]
+  if(!resourceKeys.length||resourceKeys.length>128)fail('精确版本授权范围过大',400)
   const user=await libraryActor(tx,actorId)
   if(!['TRAINING','LEGACY'].includes(user.account_domain))fail('平台内容管理需使用平台账号',403)
   // Formal entry administration and exact delegation are separate issuance bases.
@@ -29,7 +36,7 @@ export async function assertLibraryAuthority(tx:Prisma.TransactionClient,actorId
   }else if(capability==='material.distribute')await assertEntryAdmin(tx,actorId,libraryAdminEntry[product])
   if(!grantId)fail('缺少当前入口管理资格或精确版本委托',403)
   const result=await assertContentAuthority(tx,{actorId,grantId:grantId!,capability,
-    scope:{product,scopeKind:'PLATFORM',scopeId:LIBRARY_SCOPE,resourceKind:capability==='catalog.manage'?'catalog':'material',resourceKeys:[releaseId]}})
+    scope:{product,scopeKind:'PLATFORM',scopeId:LIBRARY_SCOPE,resourceKind:capability==='catalog.manage'?'catalog':'material',resourceKeys}})
   return result
 }
 /** Revalidate a recorded delegated basis. A later entry-admin appointment
