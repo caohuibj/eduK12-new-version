@@ -70,9 +70,9 @@
     "bytes": 479
   },
   {
-    "path": "evidence/common-report-820.png.gz",
-    "sha256": "80a220b597dbd47809c94f97cca7299b84e45eb7e417fd1a1e956981b1d0b9ed",
-    "bytes": 268088
+    "path": "evidence/common-report-820.png",
+    "sha256": "c837f73ca6ee4d510d93d2e5b0a65617310cfe00041a4700d19eade2b4c5f546",
+    "bytes": 278655
   },
   {
     "path": "evidence/database-absence.stderr.log.gz",
@@ -355,9 +355,9 @@
     "bytes": 164
   },
   {
-    "path": "evidence/school-entry.png.gz",
-    "sha256": "6742993da99e0d45a8f26e16962d9cb719d7c3d5183fb7fc78eac6a99c6c6674",
-    "bytes": 196493
+    "path": "evidence/school-entry.png",
+    "sha256": "733a82c5a5b0b43c1826a26a03abe9e7a424e8be93da9951fe30bdd0fdd2f35d",
+    "bytes": 198448
   },
   {
     "path": "evidence/start-scale-system.py.txt",
@@ -365,14 +365,14 @@
     "bytes": 2674
   },
   {
-    "path": "evidence/survey-answering-390.png.gz",
-    "sha256": "ca2ce279c04ff7d683f00aa55ecb6d749e5c41f9c57408ecc566369322be15fa",
-    "bytes": 63139
+    "path": "evidence/survey-answering-390.png",
+    "sha256": "672a73a9a7fbb9cfea95b8c9960dda7ed74a6fb3ab6a82a165c13927f8750cd7",
+    "bytes": 67445
   },
   {
-    "path": "evidence/survey-entry.png.gz",
-    "sha256": "0e289973504f5b7041d99faa55db01ed98d4e44a195d3854928829b3e1ab25ee",
-    "bytes": 90049
+    "path": "evidence/survey-entry.png",
+    "sha256": "7fe78d00ab8bd5efd9f13b458b28b03e4101d5db1488f941640a0af69229fb22",
+    "bytes": 91306
   },
   {
     "path": "evidence/survey-final-feedback-390.png",
@@ -515,9 +515,9 @@
     "bytes": 62734
   },
   {
-    "path": "evidence/training-final-report-390.png.gz",
-    "sha256": "28caa2a5ea90cb2dff9a389e2902f2f2c7f2bd505f332f0e81f3e401bf396c43",
-    "bytes": 267248
+    "path": "evidence/training-final-report-390.png",
+    "sha256": "1bf79a486c0332f406ed5294e8e3cb2fc6f23085123088ce6f7cd4e694d3eb21",
+    "bytes": 274718
   },
   {
     "path": "evidence/training-flow-finish.json",
@@ -550,9 +550,9 @@
     "bytes": 20
   },
   {
-    "path": "evidence/training-report-390.png.gz",
-    "sha256": "771785ed679ccf81a8192c0449d659cd9ac2e7929aa70d9e5e8b847a3c8a0dbf",
-    "bytes": 64637
+    "path": "evidence/training-report-390.png",
+    "sha256": "795a24d7c2a8d70b8d4e47f769ea00deb82e1a3406547476a0622bc08a4edb0f",
+    "bytes": 67753
   },
   {
     "path": "execution-index.json",
@@ -576,7 +576,7 @@
   },
   {
     "path": "transport.json",
-    "sha256": "3fd1cc1dc87b0914a7a69102660300145172a5128738d21a69ad0cff47287193",
-    "bytes": 19525
+    "sha256": "a917705f75f79e2ea1d330d17aaa933e6d4f9d955266f6986417961878d73f3e",
+    "bytes": 17104
   }
 ]

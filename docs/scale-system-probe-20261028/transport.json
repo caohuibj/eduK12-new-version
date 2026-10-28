@@ -16,14 +16,6 @@
     "encoding": "gzip; original bytes unchanged unless explicitly in redactions.json"
   },
   {
-    "originalPath": "evidence/common-report-820.png",
-    "originalSHA256": "c837f73ca6ee4d510d93d2e5b0a65617310cfe00041a4700d19eade2b4c5f546",
-    "bytes": 278655,
-    "storedPath": "evidence/common-report-820.png.gz",
-    "storedSHA256": "80a220b597dbd47809c94f97cca7299b84e45eb7e417fd1a1e956981b1d0b9ed",
-    "encoding": "gzip; original bytes unchanged unless explicitly in redactions.json"
-  },
-  {
     "originalPath": "evidence/prepare-report.json",
     "originalSHA256": "bef06e3ee88da714b53522f1b804f20d8005c304c15d35c6bf6a90a7dc904c5f",
     "bytes": 867443,
@@ -48,51 +40,11 @@
     "encoding": "gzip; original bytes unchanged unless explicitly in redactions.json"
   },
   {
-    "originalPath": "evidence/school-entry.png",
-    "originalSHA256": "733a82c5a5b0b43c1826a26a03abe9e7a424e8be93da9951fe30bdd0fdd2f35d",
-    "bytes": 198448,
-    "storedPath": "evidence/school-entry.png.gz",
-    "storedSHA256": "6742993da99e0d45a8f26e16962d9cb719d7c3d5183fb7fc78eac6a99c6c6674",
-    "encoding": "gzip; original bytes unchanged unless explicitly in redactions.json"
-  },
-  {
-    "originalPath": "evidence/survey-answering-390.png",
-    "originalSHA256": "672a73a9a7fbb9cfea95b8c9960dda7ed74a6fb3ab6a82a165c13927f8750cd7",
-    "bytes": 67445,
-    "storedPath": "evidence/survey-answering-390.png.gz",
-    "storedSHA256": "ca2ce279c04ff7d683f00aa55ecb6d749e5c41f9c57408ecc566369322be15fa",
-    "encoding": "gzip; original bytes unchanged unless explicitly in redactions.json"
-  },
-  {
-    "originalPath": "evidence/survey-entry.png",
-    "originalSHA256": "7fe78d00ab8bd5efd9f13b458b28b03e4101d5db1488f941640a0af69229fb22",
-    "bytes": 91306,
-    "storedPath": "evidence/survey-entry.png.gz",
-    "storedSHA256": "0e289973504f5b7041d99faa55db01ed98d4e44a195d3854928829b3e1ab25ee",
-    "encoding": "gzip; original bytes unchanged unless explicitly in redactions.json"
-  },
-  {
     "originalPath": "evidence/survey-prepare.json",
     "originalSHA256": "63c0515454fc7702fc670c51249414ee0d344a1ddc1034744c20482a0ed5e2f8",
     "bytes": 237121,
     "storedPath": "evidence/survey-prepare.json.gz",
     "storedSHA256": "67599d82ddfce6de686897087eeb820aa6dd0e0696c9d9e78fe17dcffcd270ce",
-    "encoding": "gzip; original bytes unchanged unless explicitly in redactions.json"
-  },
-  {
-    "originalPath": "evidence/training-final-report-390.png",
-    "originalSHA256": "1bf79a486c0332f406ed5294e8e3cb2fc6f23085123088ce6f7cd4e694d3eb21",
-    "bytes": 274718,
-    "storedPath": "evidence/training-final-report-390.png.gz",
-    "storedSHA256": "28caa2a5ea90cb2dff9a389e2902f2f2c7f2bd505f332f0e81f3e401bf396c43",
-    "encoding": "gzip; original bytes unchanged unless explicitly in redactions.json"
-  },
-  {
-    "originalPath": "evidence/training-report-390.png",
-    "originalSHA256": "795a24d7c2a8d70b8d4e47f769ea00deb82e1a3406547476a0622bc08a4edb0f",
-    "bytes": 67753,
-    "storedPath": "evidence/training-report-390.png.gz",
-    "storedSHA256": "771785ed679ccf81a8192c0449d659cd9ac2e7929aa70d9e5e8b847a3c8a0dbf",
     "encoding": "gzip; original bytes unchanged unless explicitly in redactions.json"
   },
   {
