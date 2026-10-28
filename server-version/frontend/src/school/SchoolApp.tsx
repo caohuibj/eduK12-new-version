@@ -124,6 +124,7 @@ const field=(label:string,value:string,onChange:(v:string)=>void,type='text')=>(
 )
 export default function SchoolApp(){
   const [page,setPage]=useState(()=>workspacePage(window.location.pathname))
+  const [activityId,setActivityId]=useState(()=>new URLSearchParams(window.location.search).get('activityId')??undefined)
   const [user,setUser]=useState<CampusUser|null>(null)
   const appearance=useProductTheme('school',user?.id)
   const [loading,setLoading]=useState(true)
@@ -191,21 +192,22 @@ export default function SchoolApp(){
       const organizationId=query.get('organizationId')
       if(organizationId)setSchoolId(organizationId)
       setClassId(query.get('classUnitId')??'');setSummary(null);setIssuedCodes([])
-      setPage(workspacePage(window.location.pathname));setError('');setNotice('');window.scrollTo({top:0,behavior:'instant'})
+      setPage(workspacePage(window.location.pathname));setActivityId(query.get('activityId')??undefined);setError('');setNotice('');window.scrollTo({top:0,behavior:'instant'})
     }
     window.addEventListener('popstate',pop)
     return()=>window.removeEventListener('popstate',pop)
   },[])
   useEffect(()=>{acceptedWorkspaceUrl.current=window.location.href},[page,schoolId,classId])
-  const navigateWorkspace=(id:string,importKind?:'GRADE'|'CLASS')=>{
-    if((id===page&&!importKind)||!canLeavePrivateTools())return
+  const navigateWorkspace=(id:string,importKind?:'GRADE'|'CLASS',nextActivityId?:string)=>{
+    if((id===page&&!importKind&&activityId===nextActivityId)||!canLeavePrivateTools())return
     const query=new URLSearchParams()
     if(schoolId)query.set('organizationId',schoolId)
     if(classId)query.set('classUnitId',classId)
     if(importKind)query.set('importKind',importKind)
+    if(id==='tasks'&&nextActivityId)query.set('activityId',nextActivityId)
     const suffix=query.size?'?'+query.toString():''
     window.history.pushState(null,'',workspacePath(id)+suffix)
-    setPage(id);setError('');setNotice('');window.scrollTo({top:0,behavior:'instant'})
+    setPage(id);setActivityId(id==='tasks'?nextActivityId:undefined);setError('');setNotice('');window.scrollTo({top:0,behavior:'instant'})
   }
 
   useEffect(()=>{const previous=document.title;document.title=screen==='feature'&&activeFeature?`${activeFeature.title} | School`:'School';return()=>{document.title=previous}},[screen,activeFeature])
@@ -523,7 +525,7 @@ export default function SchoolApp(){
         <ProductPasswordChange product="school" forced busy={working} onChangePassword={changeAccountPassword}/>
       </section>}
       {!loading&&user&&screen==='workspace'&&!user.mustChangePassword&&recoveryCodes.length===0&&<SchoolWorkspaceShell contextPlacement={(ordinaryTeacher&&page==='tasks')||(groupedWorkspace&&!['classes','admission','recovery'].includes(page))?'after':'before'} homePage={workspaceHome} compactNavigation={ordinaryTeacher||parentWorkspace||groupedWorkspace} learner={user.role==='STUDENT'} page={page} items={schoolNavigation(user.role,studentStatus,access,campusParentReportEnabled,canAuthorPrivateTools)} onNavigate={navigateWorkspace} context={professionalScopePage?undefined:workspaceContext}>
-        {page==='overview'&&user.role==='STUDENT'&&studentStatus==='APPROVED'&&<SchoolLearnerHome key={user.id} api={api} username={user.username} items={schoolNavigation(user.role,studentStatus,access,campusParentReportEnabled,canAuthorPrivateTools)} onNavigate={navigateWorkspace}/>}
+        {page==='overview'&&user.role==='STUDENT'&&studentStatus==='APPROVED'&&<SchoolLearnerHome key={user.id} api={api} username={user.username} items={schoolNavigation(user.role,studentStatus,access,campusParentReportEnabled,canAuthorPrivateTools)} onNavigate={(id,activity)=>navigateWorkspace(id,undefined,activity)}/>}
         {page==='overview'&&groupedWorkspace&&<SchoolProfessionalHome administrator={administratorWorkspace} items={educatorEntries} username={user.username} schoolName={orgs.find(org=>org.id===schoolId)?.name} onNavigate={navigateWorkspace}/>}
         {page==='overview'&&!groupedWorkspace&&!(user.role==='STUDENT'&&studentStatus==='APPROVED')&&<SchoolWorkspaceOverview compact={ordinaryTeacher||parentWorkspace} parent={parentWorkspace} username={user.username} items={schoolNavigation(user.role,studentStatus,access,campusParentReportEnabled,canAuthorPrivateTools)} onNavigate={navigateWorkspace} pending={user.role==='STUDENT'&&studentStatus!=='APPROVED'?<section className="hs-panel"><h2>我的校园活动</h2><p>{studentStatus==='PENDING_CLASS_APPROVAL'?'账号已注册，正在等待班级整体审批。':'目前暂无可参加的校园活动。请向学校确认注册及审批状态。'}</p><p>尚未审批的账号不能进入历史课程、校园测评或学生报告。</p></section>:undefined}/>}
         {page==='account'&&<section className={'hs-panel hs-account-panel'+(user.role==='STUDENT'?' hs-student-account':'')+(administratorWorkspace?' hs-admin-panel hs-admin-account':'')}><div>{administratorWorkspace?<SchoolReportHeader compact title="校园账号" label="校园账号使用说明"><p>你使用的是独立校园账号。可用功能由学校授权决定。</p></SchoolReportHeader>:<h2>校园账号</h2>}<p>用户名：{user.username}</p>
@@ -545,7 +547,7 @@ export default function SchoolApp(){
         </section>}
         {user.role==='STUDENT'?
           studentStatus==='APPROVED'?<>
-            {page==='tasks'&&<SchoolStudentTasks key={user.id} api={api} activityId={new URLSearchParams(window.location.search).get('activityId')??undefined}/>}
+            {page==='tasks'&&<SchoolStudentTasks key={user.id} api={api} activityId={activityId} onNavigate={(id,activity)=>navigateWorkspace(id,undefined,activity)}/>}
             {page==='feedback'&&<SchoolStudentFeedback api={api}/>}
             {page==='family'&&<SchoolParentLinks api={api} role="STUDENT" organizationId={schoolId}/>}
             {page==='sharing'&&campusParentReportEnabled&&<SchoolStudentReportConsent api={api}/>}

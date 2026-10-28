@@ -4,7 +4,12 @@ import {SchoolCollectionControls,type SchoolCollectionView} from './SchoolCollec
 import {schoolSearchText,schoolDeadline} from './school-collection'
 import {SchoolTaskHelp} from './SchoolTaskHelp'
 import type { SchoolApi } from './SchoolRecovery'
-import { SchoolCompositeRunner,type CampusExecutionRef } from './SchoolCompositeRunner'
+import {deferredPage} from '../components/page-loading/deferredPage'
+import type {CampusExecutionRef} from './SchoolCompositeRunner'
+
+const SchoolCompositeRunner=deferredPage(async()=>({default:(await import('./SchoolCompositeRunner')).SchoolCompositeRunner}),{
+ label:'返回任务列表',run:props=>props.onExit(),
+})
 
 type ParentRunTask={
   executionId:string;runId:string;organizationId:string;activityId:string

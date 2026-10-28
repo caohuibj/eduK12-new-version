@@ -18,7 +18,7 @@ export function SchoolLearnerMenu({items,onNavigate}:{items:SchoolNavigationItem
 }
 
 const labels:Record<SchoolTask['kind'],string>={READING:'阅读',ASSIGNMENT:'练习',CHECKIN:'打卡',MEASUREMENT:'问卷与测评'}
-export function SchoolLearnerHome({api,username,items,onNavigate}:{api:SchoolApi;username:string;items:SchoolNavigationItem[];onNavigate:(id:string)=>void}){
+export function SchoolLearnerHome({api,username,items,onNavigate}:{api:SchoolApi;username:string;items:SchoolNavigationItem[];onNavigate:(id:string,activityId?:string)=>void}){
  const [result,setResult]=useState<TaskPage|null>(null),[loading,setLoading]=useState(true),[error,setError]=useState(''),[retry,setRetry]=useState(0)
  const [query,setQuery]=useState(''),[sort,setSort]=useState('recommended'),[view,setView]=useState<SchoolCollectionView>('list')
  const canReadTasks=items.some(item=>item.id==='tasks')
@@ -33,7 +33,7 @@ export function SchoolLearnerHome({api,username,items,onNavigate}:{api:SchoolApi
  for(const task of result?.list??[]){const group=activities.get(task.activityId)??{id:task.activityId,title:task.activityTitle,tasks:[]};group.tasks.push(task);activities.set(task.activityId,group)}
  const partial=Boolean(result&&(result.hasMore||result.truncated||result.total>result.list.length))
  const shown=[...activities.values()].filter(group=>schoolSearchText(group.title+' '+group.tasks.map(task=>task.title).join(' ')).includes(schoolSearchText(query))).sort((a,b)=>sort==='title'?a.title.localeCompare(b.title,'zh-CN',{numeric:true}):sort==='deadline'?(Math.min(...a.tasks.map(task=>schoolDeadline(task.deadline)))-Math.min(...b.tasks.map(task=>schoolDeadline(task.deadline))))||0:0)
- const navigate=(event:React.MouseEvent<HTMLAnchorElement>,id:string)=>{if(event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;event.preventDefault();onNavigate(id)}
+ const navigate=(event:React.MouseEvent<HTMLAnchorElement>,id:string,activityId?:string)=>{if(event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;event.preventDefault();if(activityId)onNavigate(id,activityId);else onNavigate(id)}
  return <div className="hs-learner-home">
   <header className="hs-learner-home-header"><div><h1>我的校园</h1><p>你好，{username}。选择校园活动，继续今天的参与。</p></div>
    <div className="hs-learner-shortcuts">{items.filter(item=>['tasks','feedback'].includes(item.id)).map(item=><a key={item.id} className={'hs-learner-shortcut hs-learner-shortcut--'+item.id} href={workspaceHref(item.id)} onClick={event=>navigate(event,item.id)}>
@@ -45,7 +45,7 @@ export function SchoolLearnerHome({api,username,items,onNavigate}:{api:SchoolApi
   <section aria-labelledby="hs-learner-activities"><div className="hs-learner-section-heading"><h2 id="hs-learner-activities">校园活动</h2>{result?<SchoolCollectionControls query={query} onQuery={setQuery} sort={sort} onSort={setSort} view={view} onView={setView} searchLabel={partial?'检索已加载的活动':'检索校园活动'} placeholder="搜索活动名称或任务名称" sorts={[{value:'recommended',label:'默认顺序'},{value:'deadline',label:'最早任务截止优先'},{value:'title',label:'活动名称 A–Z'}]} actions={<button type="button" disabled={loading} onClick={()=>setRetry(value=>value+1)} aria-label="刷新校园活动"><RefreshCw size={17} aria-hidden="true"/></button>}/>:<button type="button" disabled={loading} onClick={()=>setRetry(value=>value+1)} aria-label="刷新校园活动"><RefreshCw size={17} aria-hidden="true"/></button>}</div>
    {result&&<><p className="hs-collection-summary" role="status">{query?`检索到 ${shown.length} 组活动 · “${query}”`:`${activities.size} 组活动`}{partial?' · 检索和排序仅作用于已加载的任务所对应的活动':''}</p></>}
    {loading&&canReadTasks?<p className="hs-learner-state" role="status">正在读取校园活动…</p>:error?<div className="hs-learner-state" role="alert"><h3>校园活动暂时无法显示</h3><p>{error}</p><button onClick={()=>setRetry(value=>value+1)}>重新读取</button></div>:activities.size===0?<div className="hs-learner-state"><BookOpen size={26} aria-hidden="true"/><h3>暂时没有开放的活动任务</h3><p>学校安排并开放给你的活动会显示在这里。</p></div>:
-    <div className={"hs-learner-activities"+(view==='cards'?' hs-learner-activities--cards':'')}>{shown.map((group,index)=>{const href=new URL(workspaceHref('tasks'),window.location.origin);href.searchParams.set('activityId',group.id);return <a className="hs-learner-activity" href={href.pathname+href.search} key={group.id}>
+    <div className={"hs-learner-activities"+(view==='cards'?' hs-learner-activities--cards':'')}>{shown.map((group,index)=>{const href=new URL(workspaceHref('tasks'),window.location.origin);href.searchParams.set('activityId',group.id);return <a className="hs-learner-activity" href={href.pathname+href.search} onClick={event=>navigate(event,'tasks',group.id)} key={group.id}>
      <div className={'hs-learner-activity-art hs-learner-activity-art--'+index%3} aria-hidden="true"><span><BookOpen size={16}/>校园活动</span></div>
      <div className="hs-learner-activity-copy"><span className="hs-learner-open">已开放</span><h3>{group.title}</h3><p>{[...new Set(group.tasks.map(task=>labels[task.kind]))].join(' · ')}</p><span className="hs-learner-activity-bottom"><span>查看活动任务</span><ArrowRight size={18} aria-hidden="true"/></span></div>
     </a>})}</div>}

@@ -1,8 +1,11 @@
+import {deferredPage} from '../components/page-loading/deferredPage'
 import {TeacherAssessmentPage} from './TeacherAssessmentPage'
 import { useCallback,useEffect,useMemo,useRef,useState } from 'react'
 import {assessmentStatus,type AssessmentListPresentation} from './assessmentTaskPresentation'
 import {isCapabilitySources} from '../modules/assessment-media/video-capability-client'
-import FinalCompositeAssessment from '../components/FinalCompositeAssessment'
+const FinalCompositeAssessment=deferredPage(()=>import('../components/FinalCompositeAssessment'),{
+ label:'取消打开测评',run:props=>props.onExit(),
+})
 import { type EducationReportApi } from '../components/education-tools/EducationScalePersonalReport'
 import { EducationTaskFeedback, type EducationFeedbackData } from '../components/education-tools/EducationTaskFeedback'
 import type { CompositeAttemptState } from '../modules/composite/types'
@@ -127,24 +130,28 @@ export function HuiteacherMyScaleTasks({api,unified=false,onListStateChange}:{ap
     }
     const value=await load(attemptId)
     if(!valid())return
-    if(value.status==='COMPLETED'){sessionRef.current=null;setSession(null);showReport(item)}
+    if(value.status==='COMPLETED'){sessionRef.current=null;setSession(null);showReport(item);void refresh()}
     else setSession({api,selected:item,attempt:value})
-    void refresh()
     })
   }
   const showReport=(item:Task)=>{if(currentApi.current===api){setFeedback({api,task:item});setMessage('')}}
   const feedbackExecutionId=visibleFeedback?.task.executionId
   const readFeedback=useCallback(()=>api<EducationFeedbackData>(
     '/run-executions/'+feedbackExecutionId+'/personal-summary'),[api,feedbackExecutionId])
-  const leave=()=>{sessionEpoch.current+=1;sessionRef.current=null;setSession(null);setLoading(false)}
+  const leave=()=>{
+    const hadSession=sessionRef.current?.api===api
+    sessionEpoch.current+=1;sessionRef.current=null;setSession(null);setLoading(false)
+    if(hadSession)void refresh()
+  }
   const reload=async()=>{
     const source=visible,token=sessionEpoch.current
     if(!source||source.api!==api||currentApi.current!==api||sessionRef.current!==source)return
     const value=await load(source.attempt.id)
     if(currentApi.current!==api||sessionEpoch.current!==token||sessionRef.current!==source)return
-    if(value.status==='COMPLETED'){sessionRef.current=null;setSession(null);showReport(source.selected)}
+    // Section transitions read only the authoritative current unit. Refresh the
+    // hidden task list after durable completion or an explicit saved exit.
+    if(value.status==='COMPLETED'){sessionRef.current=null;setSession(null);showReport(source.selected);void refresh()}
     else setSession({...source,attempt:value})
-    void refresh()
   }
   const submitScale=async(attemptId:string,itemId:string,payload:unknown)=>{
     const source=visible,token=sessionEpoch.current
@@ -202,7 +209,7 @@ export function HuiteacherMyScaleTasks({api,unified=false,onListStateChange}:{ap
         submitFormSection={async()=>{throw new Error('教师 Scale 任务不存在 Form Section')}}
         onReload={reload}
         onExit={()=>{if(sessionRef.current===visible)leave()}}
-        onCompleted={()=>{if(visible&&visible.attempt.status==='COMPLETED'&&sessionRef.current===visible){const task=visible.selected;leave();showReport(task);void refresh()}}}
+        onCompleted={()=>{if(visible&&visible.attempt.status==='COMPLETED'&&sessionRef.current===visible){const task=visible.selected;leave();showReport(task)}}}
         onEnterCognitive={()=>setMessage('该教师个人测评不允许启动认知任务')}
         onEnterSituational={()=>setMessage('该教师个人测评不允许启动情境任务')}
       />
