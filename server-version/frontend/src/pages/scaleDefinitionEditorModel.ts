@@ -36,6 +36,8 @@ export interface ScaleDefinition {
     }>
   }
   report: {
+    audienceContract?: {schemaVersion:1;respondent:'STUDENT_SELF'|'ADULT_SELF'|'PARENT_REPORT'|'TEACHER_REPORT'|'OBSERVER_REPORT';
+      audience:'student'|'parent'|'teacher';locale:string;qcReview?:{reviewer:string;reviewedAt:string;basis:string}}
     rawScoreFeedback?: RawScoreFeedback
     reportVersion: string
     primaryScoreKeys: string[]

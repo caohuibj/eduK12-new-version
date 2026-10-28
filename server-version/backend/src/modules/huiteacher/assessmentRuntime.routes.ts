@@ -1,5 +1,7 @@
 import {ContentAuthorityError} from '../measurement-content/content-authority'
 import {readTeacherOrdinaryFeedback} from '../reporting/education-ordinary-feedback.service'
+import {serveProjectedReportImage} from '../reporting/report-image-delivery'
+import {assessmentAssetIdSchema} from '../assessment-media/assessment-asset-identity'
 import {Router,type Request,type Response,type NextFunction,type RequestHandler} from 'express'
 import {z,ZodError} from 'zod'
 import {prisma} from '../../config/database'
@@ -106,6 +108,12 @@ export function createTeacherAssessmentRuntimeRouter<Identity extends TeacherSou
  router.get('/run-executions/:executionId/feedback',wrapped(req=>{
   if(Object.keys(req.query).length)throw new TeacherAssessmentRuntimeError()
   return readTeacherOrdinaryFeedback({executionId:uuid.parse(req.params.executionId),actorUserId:req.user!.userId})
+ }))
+ router.get('/run-executions/:executionId/feedback/images/:assetId',handler(async(req,res)=>{
+  if(Object.keys(req.query).length)throw new TeacherAssessmentRuntimeError()
+  const report=await readTeacherOrdinaryFeedback({executionId:uuid.parse(req.params.executionId),actorUserId:req.user!.userId})
+  const assetId=assessmentAssetIdSchema.parse(req.params.assetId)
+  return serveProjectedReportImage({unitReports:report.units.flatMap(unit=>'nativeScaleUnits' in unit?unit.nativeScaleUnits:[])},assetId,res)
  }))
  router.post('/run-executions/:executionId/assessment-consent/accept',wrapped(async req=>{
   const executionId=uuid.parse(req.params.executionId),proof=await access.own(req.user!.userId,{executionId})

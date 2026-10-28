@@ -1,0 +1,8 @@
+.education-private-studio-modes{display:flex;gap:.5rem;margin:1rem 0;flex-wrap:wrap}
+.education-private-studio-modes button[aria-pressed=true]{border-color:var(--ht-copper,#a34f2e);color:var(--ht-copper,#a34f2e)}
+.education-composition-studio{--survey-brand-line:var(--ht-line,#e5dbd0);--survey-brand-ink:var(--ht-ink,#493d34);--survey-brand-muted:var(--ht-quiet,#73675e);--survey-brand-subtle:var(--ht-bg,#fcfaf6);--survey-brand-canvas:var(--ht-paper,#fffefb);--survey-brand-accent:var(--ht-copper,#a34f2e);--survey-brand-accent-strong:var(--ht-copper,#a34f2e);--survey-brand-border:var(--ht-line,#e5dbd0);--survey-brand-soft:#f7eee7}
+.education-composition-studio>label,.education-composition-studio form>label{display:grid;gap:.35rem;margin:.75rem 0;max-width:56rem}
+.education-composition-studio .survey-composition-outline-actions button{display:grid;place-items:center;min-width:32px;min-height:32px;padding:.25rem;color:var(--ht-quiet,#73675e)}
+.education-composition-studio .survey-composition-candidates article{flex-wrap:wrap}
+.education-composition-studio .survey-composition-catalog>label{display:grid;gap:.35rem;margin-bottom:.75rem}
+.education-composition-studio [aria-label="问卷内容预览"]{margin-top:1rem;padding:1rem;border:1px solid var(--ht-line,#e5dbd0);border-radius:.6rem}

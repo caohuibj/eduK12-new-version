@@ -1,6 +1,7 @@
 import {SchoolTaskHelp as ManagementHelp} from '../school/SchoolTaskHelp'
 import {SelectedToolOutline} from '../modules/assessment-core/composition/SelectedToolOutline'
 import {EducationPrivateScalePicker} from '../components/education-tools/EducationPrivateScalePicker'
+import {EducationCompositionRunPicker} from '../components/education-tools/EducationCompositionRunPicker'
 import {EducationAssessmentResourcePicker} from '../components/education-tools/EducationAssessmentResourcePicker'
 import type {EducationAssessmentResourceAdapter} from '../api/educationAssessmentResources'
 import {HuiteacherGrowthManager} from './HuiteacherGrowthManager'
@@ -12,7 +13,7 @@ type Page<T>={list:T[];nextCursor?:string|null}
 const mergeRows=<T extends {id:string}>(old:T[],next:T[])=>Array.from(new Map([...old,...next].map(item=>[item.id,item])).values())
 type Target={id:string;name:string;kind:string;status:string;subjectUserId:string|null}
 type Event={id:string;targetId:string;kind:string;title:string;status:string;version:number}
-type RunTrackSummary={id:string;resourceFamily:string;resourceKey:string;resourceVersion:string}
+type RunTrackSummary={id:string;resourceFamily:string;resourceKey:string;resourceVersion:string;title?:string|null;sourceRevision?:number|null}
 type Run={tracks?:RunTrackSummary[];eventId:string;runId:string;status:string;version:number;name?:string;trackCount?:number}
 type RunPreview={runId:string;version:number;tracks:Array<{trackId:string;executionCount:number;subjectCount:number;respondentCount:number;resourcePolicy:unknown}>}
 type PreviewSnapshot={data:RunPreview;base:string;api:Api;actorKey:string;eventVersion:number;eventStatus:string}
@@ -395,8 +396,11 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
       </div>
       {runMap[event.id]&&<div>
         <p>任务状态：{statusLabel(runMap[event.id].status)} · 已配置工具 {runMap[event.id].trackCount??0} 项</p>
-        <SelectedToolOutline className="ht-selected-tool-outline" items={runMap[event.id].tracks?.map(track=>({
-          id:track.id,title:track.resourceKey,kind:track.resourceFamily,version:track.resourceVersion,
+        <SelectedToolOutline className="ht-selected-tool-outline" items={runMap[event.id].tracks?.map((track,index)=>({
+          id:track.id,title:track.title??((track.resourceKey.startsWith('education-composition:')?'普通问卷':
+            ({SCALE:'量表',FORM:'表单',BUNDLE:'正式整包',COGNITIVE:'认知测验',SITUATIONAL:'情境判断'} as Record<string,string>)[track.resourceFamily]??'测评工具')+' '+(index+1)),
+          kind:track.resourceKey.startsWith('education-composition:')?'普通问卷':({SCALE:'量表',FORM:'表单',BUNDLE:'正式整包',COGNITIVE:'认知测验',SITUATIONAL:'情境判断'} as Record<string,string>)[track.resourceFamily]??'测评工具',
+          version:track.sourceRevision?'修订 '+track.sourceRevision:track.resourceVersion,
         }))}/>
         {(()=>{const snapshot=previews[event.id],run=runMap[event.id]
           if(!snapshot||snapshot.base!==base||snapshot.api!==api||snapshot.actorKey!==actorKey||snapshot.eventVersion!==event.version||snapshot.eventStatus!==event.status||snapshot.data.runId!==run.runId||snapshot.data.version!==run.version||run.status!=='DRAFT')return null
@@ -430,6 +434,10 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
               const run=await api<Run>(base+'/evaluation-events/'+event.id+'/run')
               if(generation===scopeGeneration.current&&scaleScope.current.base===base&&scaleScope.current.api===api)setRunMap(old=>({...old,[event.id]:run}))
             }}/>}
+          {canAuthorPrivateTools&&actorKey&&<EducationCompositionRunPicker
+            key={`composition:${actorKey}:${organizationId}:${event.id}:${runMap[event.id].runId}`} api={api}
+            organizationId={organizationId} actorKey={actorKey} endpoint={base+'/evaluation-events/'+event.id+'/run/tracks'}
+            expectedVersion={runMap[event.id].version} disabled={working} onBusy={privateBusy} onRefresh={async()=>{await fetchRun(event)}}/>}
           <div className="ht-inline"><button disabled={working||scaleLoading[event.id]} onClick={()=>void reloadScales(event)}>
             查询本校授权的教师自评 Scale
           </button></div>

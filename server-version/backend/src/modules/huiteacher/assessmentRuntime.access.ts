@@ -29,8 +29,9 @@ export type TeacherAssessmentTask={
  executionId:string;organizationId:string;runId:string;eventId:string;eventTitle:string;title:string;
  family:'COGNITIVE'|'SITUATIONAL'|'BUNDLE';status:'ASSIGNED'|'STARTED'|'COMPLETED';runStatus:string;
  runtimeBindingRef:string|null;consentRequired:boolean;consentPurpose:string|null;consentVisibility:string|null
+ mode:'COMPOSITION'|'PACKAGE_REFERENCE'|'TOOL'
 }
-type Row=Omit<TeacherAssessmentTask,'title'>&{
+type Row=Omit<TeacherAssessmentTask,'title'|'mode'>&{
  resourceKey:string;resourceVersion:string;policy:RunResourcePolicy;policyHash:string;
  assignmentId:string;episodeId:string;bindingKind:string|null;cursorCreatedAt:string;
  attemptEpoch:number|null;frozenSlotSet:string|null;frozenSlotSetHash:string|null
@@ -103,7 +104,8 @@ export async function queryTeacherAssessmentRows(db:TeacherRuntimeDb,actorUserId
 }
 function taskDto(row:Row,title:string):TeacherAssessmentTask{
  const {executionId,organizationId,runId,eventId,eventTitle,family,status,runStatus,runtimeBindingRef,consentRequired,consentPurpose,consentVisibility}=row
- return {executionId,organizationId,runId,eventId,eventTitle,title,family,status,runStatus,runtimeBindingRef,consentRequired,consentPurpose,consentVisibility}
+ return {executionId,organizationId,runId,eventId,eventTitle,title,family,status,runStatus,runtimeBindingRef,consentRequired,consentPurpose,consentVisibility,
+  mode:row.resourceKey.startsWith('education-composition:')?'COMPOSITION':family==='BUNDLE'?'PACKAGE_REFERENCE':'TOOL'}
 }
 export function createTeacherAssessmentAccess<Identity extends TeacherSourceIdentity>(db:TeacherRuntimeDb,source:TeacherAssessmentSourceAccess<Identity>){
  const authorize=async(row:Row,actorUserId:string)=>{

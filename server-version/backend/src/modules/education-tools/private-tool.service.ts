@@ -16,6 +16,7 @@ import {createPrivateToolInput,updatePrivateToolInput,freezePrivateToolInput,pre
 import {initialPrivateToolDefinition,privateToolDefinition,validatePrivateToolDefinition,privateToolContentHash} from './private-tool.definition'
 import {compilePrivateComposition} from './private-tool.composition-compiler'
 import {sealPrivateComposition,readOwnedCompositionIdentity} from './private-tool.composition-runtime'
+import type {PrivateCompositionDefinition} from './private-tool.composition-contracts'
 
 type Tx=Prisma.TransactionClient
 const boundary={visibility:'AUTHOR_PRIVATE',snapshotOnly:true,canPublish:false,canShare:false,canReadParticipantReports:false} as const
@@ -70,7 +71,15 @@ export async function listPrivateTools(c:PrivateToolContext,cursor?:string,kind?
  })
 }
 export async function readPrivateTool(c:PrivateToolContext,id:string){
- return transact(async tx=>{await authorized(tx,c);return {...await readOwned(tx,c,id),...boundary}})
+ return transact(async tx=>{
+  await authorized(tx,c);const tool=await readOwned(tx,c,id)
+  if(tool.kind!=='COMPOSITION')return {...tool,...boundary}
+  const definition=tool.definition as unknown as PrivateCompositionDefinition
+  const ids=[...new Set(definition.blocks.map(block=>block.source.versionId))]
+  const references=ids.length?await tx.educationPrivateToolVersion.findMany({where:{id:{in:ids},...scope(c),kind:{in:['SCALE','FORM']}},
+   select:{id:true,toolId:true,kind:true,title:true,sourceRevision:true,contentHash:true}}):[]
+  return {...tool,references,...boundary}
+ })
 }
 export async function updatePrivateTool(c:PrivateToolContext,id:string,raw:unknown){
  const input=updatePrivateToolInput.parse(raw)
@@ -160,9 +169,13 @@ export async function freezePrivateTool(c:PrivateToolContext,id:string,raw:unkno
  },true,true)
 }
 export async function listPrivateToolVersions(c:PrivateToolContext,id:string,cursor?:string){
+ privateToolId.parse(id)
  if(cursor)privateToolId.parse(cursor)
  return transact(async tx=>{
-  await authorized(tx,c);await readOwned(tx,c,id)
+  await authorized(tx,c)
+  // Version selection needs ownership and immutable summaries, not the mutable
+  // draft's question body or a full draft hash on every metadata page.
+  if(!await tx.educationPrivateTool.findFirst({where:{id,...scope(c)},select:{id:true}}))privateToolFail('PRIVATE_TOOL_NOT_FOUND',404)
   if(cursor&&!await tx.educationPrivateToolVersion.findFirst({where:{id:cursor,toolId:id,...scope(c)},select:{id:true}}))
    privateToolFail('PRIVATE_TOOL_CURSOR_INVALID',400)
   const rows=await tx.educationPrivateToolVersion.findMany({where:{toolId:id,...scope(c)},
