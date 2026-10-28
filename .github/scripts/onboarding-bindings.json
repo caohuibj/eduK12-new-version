@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "pr": 366,
+  "enabled": false,
+  "base": "6203a829dc8d7de707e67f413acfa5a354a21e09",
+  "product": "750cdb5b40534ed07799dad7d39f0c0e15b0af87",
+  "controlCheckpoint": null,
+  "source": {
+    "docs/cognitive-library/onboarding-structure-20261028/README.md": {
+      "before": null,
+      "after": "fa4c9a149f098e8c4ca657772116b763341a2103"
+    },
+    "docs/cognitive-library/onboarding-structure-20261028/evidence/install-postgres.json": {
+      "before": null,
+      "after": "da3823a75eb7bad77822cbe23230018565ecba7b"
+    },
+    "docs/cognitive-library/onboarding-structure-20261028/evidence/install-postgres.log": {
+      "before": null,
+      "after": "ccc98cc6f16ea77871feb882ec7711e0e7969291"
+    },
+    "docs/cognitive-library/onboarding-structure-20261028/evidence/install-types-before.json": {
+      "before": null,
+      "after": "353c2f8110e06e648d54d593509d02c314e2659f"
+    },
+    "docs/cognitive-library/onboarding-structure-20261028/evidence/install-types-receipt.json": {
+      "before": null,
+      "after": "dbba95f8a3b6821d69a846c10f680162e9a66439"
+    },
+    "docs/cognitive-library/onboarding-structure-20261028/evidence/install-types.log": {
+      "before": null,
+      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    "docs/cognitive-library/onboarding-structure-20261028/evidence/install-unit.json": {
+      "before": null,
+      "after": "a77e6c3bf0c80c78dbd5b4249df8e470ed46f166"
+    },
+    "docs/cognitive-library/onboarding-structure-20261028/evidence/install-unit.log": {
+      "before": null,
+      "after": "0f18d26d46689f70bb417706b5a89d2a37b87cad"
+    },
+    "docs/cognitive-library/onboarding-structure-20261028/evidence/profiles.json": {
+      "before": null,
+      "after": "5c1ef16cfc697253ed270b2b64964b262e3061f9"
+    },
+    "docs/cognitive-library/onboarding-structure-20261028/evidence/profiles.log": {
+      "before": null,
+      "after": "0bedaba9935d1911a5d5453d01aee03b26d6e4bc"
+    },
+    "docs/cognitive-library/onboarding-structure-20261028/evidence/scientific-advisory.json": {
+      "before": null,
+      "after": "920379092d9e9dbf32907f6630e75123597b17fb"
+    },
+    "docs/cognitive-library/onboarding-structure-20261028/evidence/scientific-advisory.log": {
+      "before": null,
+      "after": "6d4e847f68475316576933d413ea97e57f831391"
+    },
+    "server-version/backend/src/__tests__/cognitive/onboarding-decision.test.ts": {
+      "before": "a3659e3a9453c2c6638b8400393a6278084edc1f",
+      "after": "cf71174c87c44e46d8a84332fd760d48e73b4d97"
+    },
+    "server-version/backend/src/__tests__/cognitive/onboarding-install.postgres.integration.test.ts": {
+      "before": null,
+      "after": "fd5a6c22146c1f865b13cab140464dc6c4772f32"
+    },
+    "server-version/backend/src/__tests__/cognitive/onboarding-install.test.ts": {
+      "before": null,
+      "after": "7b09ca92821f598f5b4b603857b2ec937d6723c0"
+    },
+    "server-version/backend/src/__tests__/cognitive/pilot-profiles.test.ts": {
+      "before": "2190e371aa8552208a5324e6c844f6ad993ad236",
+      "after": "e902c4571864aecf52fd8dbe81b579c25985ec4b"
+    },
+    "server-version/backend/src/modules/cognitive/library/product-readiness.ts": {
+      "before": "0377ada25cee265d398ef9fe082006a790c7dfe8",
+      "after": "2673f784ffd03b37923e855a31adf3c6227969d9"
+    },
+    "server-version/backend/src/modules/cognitive/onboarding/decision.ts": {
+      "before": "23b517b38c04597450ba99c7fc4302780bdde3af",
+      "after": "1d2a49354c10fa8bf1b7f2d61b60f85bfc71dfa5"
+    },
+    "server-version/backend/src/modules/cognitive/onboarding/install.ts": {
+      "before": null,
+      "after": "8b38baa99fec5185f7d7f7291b9bb230796500b3"
+    },
+    "server-version/backend/src/modules/cognitive/v2/publication-gate.ts": {
+      "before": "e831b529411f6ffad2df12a38fcdfff4205e358e",
+      "after": "21ba8200acf2c5605a46c4104e4923dbac3942e7"
+    },
+    "server-version/backend/src/scripts/cognitive-onboarding-check.ts": {
+      "before": "2f567d273f67ce5b617401343211d812a337742a",
+      "after": "975168fed2f76fe37d50c6373070b024ab16aa80"
+    },
+    "server-version/backend/src/scripts/install-cognitive-configs.ts": {
+      "before": null,
+      "after": "537a3fe71273b1a19af1e0968159ef79fc3c02de"
+    }
+  },
+  "controlBefore": {
+    ".github/scripts/onboarding-bindings.json": null,
+    ".github/scripts/onboarding-evidence.json": null,
+    ".github/scripts/onboarding-scope.mjs": null,
+    ".github/scripts/onboarding-checks.mjs": null,
+    ".github/scripts/onboarding-controls.test.mjs": null,
+    ".github/scripts/content-scope.mjs": "88a57d9cc8f8dbe18bb9a99a706311ab96519460",
+    ".github/scripts/merge-gate.mjs": "9882a3bbe828f5c0a09e9aedfa1d7d8951a80506",
+    ".github/workflows/ci.yml": "829adba396d2d45ba1bc38440dcf8ec1ae404ea0"
+  },
+  "components": {
+    "backend": "8c73b4d6dda13b7273ed136599a2898cb18cf333",
+    "frontend": "08e007747668fcf67cfd44d323a70daf8dc1ab9e"
+  }
+}

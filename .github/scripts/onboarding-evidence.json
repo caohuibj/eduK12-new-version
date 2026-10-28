@@ -1,0 +1,190 @@
+{
+  "schemaVersion": 1,
+  "product": "750cdb5b40534ed07799dad7d39f0c0e15b0af87",
+  "reviewer": "root dot",
+  "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+  "ciExecuted": false,
+  "originalExecutionSigned": false,
+  "environment": {
+    "node": "24.22.1",
+    "postgres": "17.11",
+    "originalFullDependencyByteManifest": null,
+    "limitations": [
+      "No original signed execution or complete installed dependency-byte inventory for the earlier local cases.",
+      "PG17 is the original actual database; do not claim it ran on Actions PG16.",
+      "Schema and dependency lock are unchanged from the reviewed base; this patch uses existing Prisma operations and ordinary PostgreSQL transactions, not PG17-specific SQL.",
+      "Source association for test reports is retrospective root review. Original filtered rows and setup failure documentation remain; no fresh test run is claimed."
+    ]
+  },
+  "reports": [
+    {
+      "id": "profiles",
+      "path": "docs/cognitive-library/onboarding-structure-20261028/evidence/profiles.json",
+      "sha256": "4938b7a5475bcb5a7ddf93eefe42d685c2701b753212afde82a7a71d24ba64a6",
+      "originalSourceAssociation": "c23cc8a715d542720bb0f6a42da700e6aa875199",
+      "sourceAssociationBasis": "Root inspected exact source after execution; not an original signed commit receipt",
+      "reviewedUnrelatedSourceDelta": [
+        "server-version/backend/src/__tests__/cognitive/onboarding-decision.test.ts",
+        "server-version/backend/src/__tests__/cognitive/onboarding-install.postgres.integration.test.ts",
+        "server-version/backend/src/__tests__/cognitive/onboarding-install.test.ts",
+        "server-version/backend/src/modules/cognitive/onboarding/decision.ts",
+        "server-version/backend/src/modules/cognitive/onboarding/install.ts",
+        "server-version/backend/src/scripts/cognitive-onboarding-check.ts",
+        "server-version/backend/src/scripts/install-cognitive-configs.ts"
+      ],
+      "deltaRationale": "Later additions are the separate onboarding decision/CLI/installer and their tests. The profile-contract import closure was not changed; installer cases bind the final exact product source. No later application edits follow this snapshot.",
+      "cases": [
+        {
+          "fullName": "standard-only Pilot profiles adapts and releases a valid standard-only task without adding missing profiles",
+          "status": "passed"
+        },
+        {
+          "fullName": "standard-only Pilot profiles rejects no declared profiles, broken declared research, and metrics claiming absent profiles",
+          "status": "passed"
+        },
+        {
+          "fullName": "standard-only Pilot profiles accepts explicit research/experience modes without manufacturing a standard mode or publishing the task",
+          "status": "passed"
+        },
+        {
+          "fullName": "standard-only Pilot profiles validates every declared mode even when standard is intentionally absent",
+          "status": "passed"
+        }
+      ],
+      "summary": {
+        "success": true,
+        "numPassedTests": 4,
+        "numFailedTests": 0,
+        "numPendingTests": 0
+      }
+    },
+    {
+      "id": "scientific-advisory",
+      "path": "docs/cognitive-library/onboarding-structure-20261028/evidence/scientific-advisory.json",
+      "sha256": "e185c3acec59ab2911e3b30c017327eb9e7ad0bd41a077061c1ea9145c4dde20",
+      "originalSourceAssociation": "3540ca07fa3d8395013b2f89570c699f27e4edff",
+      "sourceAssociationBasis": "Root inspected exact source after execution; not an original signed commit receipt",
+      "reviewedUnrelatedSourceDelta": [
+        "server-version/backend/src/__tests__/cognitive/onboarding-install.postgres.integration.test.ts",
+        "server-version/backend/src/__tests__/cognitive/onboarding-install.test.ts",
+        "server-version/backend/src/modules/cognitive/onboarding/install.ts",
+        "server-version/backend/src/scripts/install-cognitive-configs.ts"
+      ],
+      "deltaRationale": "Later additions are the separate onboarding decision/CLI/installer and their tests. The profile-contract import closure was not changed; installer cases bind the final exact product source. No later application edits follow this snapshot.",
+      "cases": [
+        {
+          "fullName": "Cognitive onboarding decision v1 contract technical exit preserves unapproved scientific metadata without turning it into an admission gate",
+          "status": "passed"
+        },
+        {
+          "fullName": "Cognitive onboarding decision v1 contract keeps technical, Pilot publication and scientific eligibility independent",
+          "status": "skipped"
+        },
+        {
+          "fullName": "Cognitive onboarding decision v1 contract technical errors prevent Pilot readiness without mislabeling their gate",
+          "status": "skipped"
+        },
+        {
+          "fullName": "Cognitive onboarding decision v1 contract Pilot errors do not become technical errors",
+          "status": "skipped"
+        },
+        {
+          "fullName": "Cognitive onboarding decision v1 contract warnings and informational notes do not block a ready gate",
+          "status": "skipped"
+        },
+        {
+          "fullName": "Cognitive onboarding decision v1 contract reports an excessive declaration separately from readiness and next-tier work",
+          "status": "skipped"
+        },
+        {
+          "fullName": "Cognitive onboarding decision v1 contract produces byte-identical JSON regardless of blocker and object-key insertion order",
+          "status": "skipped"
+        },
+        {
+          "fullName": "Cognitive onboarding decision v1 contract does not collapse different expected/actual diagnoses sharing a code",
+          "status": "skipped"
+        },
+        {
+          "fullName": "Cognitive onboarding decision v1 contract rejects contradictory externally supplied ready flags",
+          "status": "skipped"
+        },
+        {
+          "fullName": "Cognitive onboarding decision v1 contract rejects a blocker put in the wrong gate group",
+          "status": "skipped"
+        },
+        {
+          "fullName": "Cognitive onboarding decision v1 contract rejects unsupported schemas, unknown fields and non-JSON payloads",
+          "status": "skipped"
+        },
+        {
+          "fullName": "Cognitive onboarding decision v1 contract renders codes and locations from the same validated decision as JSON",
+          "status": "skipped"
+        }
+      ],
+      "summary": {
+        "success": true,
+        "numPassedTests": 1,
+        "numFailedTests": 0,
+        "numPendingTests": 11
+      }
+    },
+    {
+      "id": "install-unit",
+      "path": "docs/cognitive-library/onboarding-structure-20261028/evidence/install-unit.json",
+      "sha256": "5775276259273dec8c34eaab98fe36a652ce9fd6de6fbc5ced58489616ff627d",
+      "originalSourceAssociation": "750cdb5b40534ed07799dad7d39f0c0e15b0af87",
+      "sourceAssociationBasis": "Root inspected exact source after execution; not an original signed commit receipt",
+      "reviewedUnrelatedSourceDelta": [],
+      "deltaRationale": "Later additions are the separate onboarding decision/CLI/installer and their tests. The profile-contract import closure was not changed; installer cases bind the final exact product source. No later application edits follow this snapshot.",
+      "cases": [
+        {
+          "fullName": "selected cognitive draft installation previews without writes, creates only restricted drafts and is idempotent without republishing",
+          "status": "passed"
+        },
+        {
+          "fullName": "selected cognitive draft installation preserves published lifecycle and rejects conflicts, duplicate identities and unregistered selections",
+          "status": "passed"
+        },
+        {
+          "fullName": "selected cognitive draft installation requires an active system administrator and an exact declared execution identity",
+          "status": "passed"
+        }
+      ],
+      "summary": {
+        "success": true,
+        "numPassedTests": 3,
+        "numFailedTests": 0,
+        "numPendingTests": 0
+      }
+    },
+    {
+      "id": "install-postgres",
+      "path": "docs/cognitive-library/onboarding-structure-20261028/evidence/install-postgres.json",
+      "sha256": "4893042c5b706327633606c73f97fe8fdf8d7934aa71ecf5d6492396552b6c3a",
+      "originalSourceAssociation": "750cdb5b40534ed07799dad7d39f0c0e15b0af87",
+      "sourceAssociationBasis": "Root inspected exact source after execution; not an original signed commit receipt",
+      "reviewedUnrelatedSourceDelta": [],
+      "deltaRationale": "Later additions are the separate onboarding decision/CLI/installer and their tests. The profile-contract import closure was not changed; installer cases bind the final exact product source. No later application edits follow this snapshot.",
+      "cases": [
+        {
+          "fullName": "selected cognitive installation with isolated PostgreSQL previews and installs a registered draft once without publishing, granting access or overwriting conflicts",
+          "status": "passed"
+        }
+      ],
+      "summary": {
+        "success": true,
+        "numPassedTests": 1,
+        "numFailedTests": 0,
+        "numPendingTests": 0
+      }
+    }
+  ],
+  "types": {
+    "path": "docs/cognitive-library/onboarding-structure-20261028/evidence/install-types-receipt.json",
+    "sha256": "9ccc23deb43dbd4b534dd6a0048491a4bc9dcddbf9b8356da4f163eb90e4db84",
+    "exitField": "exitCode",
+    "log": "docs/cognitive-library/onboarding-structure-20261028/evidence/install-types.log",
+    "backendTree": "8c73b4d6dda13b7273ed136599a2898cb18cf333",
+    "candidateTree": "76f7479eb1963ebeb0ec31afba2d63b7b6073980"
+  }
+}
