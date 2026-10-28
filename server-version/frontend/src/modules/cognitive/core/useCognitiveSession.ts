@@ -641,16 +641,17 @@ export function useCognitiveSession(
     return meta
   }
   const nativeHost: CognitiveNativeHost = {
+    getDraftIdentity:async()=>{const m=await boundMeta();return {draftKey:m.draftKey,instrument:m.instrument,attemptId:m.attemptId,attemptEpoch:m.attemptEpoch,definitionHash:m.definitionHash,submissionId:m.submissionId}},
     appendEnvelope: async (envelope) => {
       assertHost();const session=boundSession!;requireCognitiveDurability()
       const meta=await boundMeta(),index=envelope.trialIndex,key=meta.draftKey
       if (!Number.isSafeInteger(index) || Number(index) < 0 || envelope.schemaVersion !== 1) throw new Error('试次记录格式不正确')
-      const existing=(await checkedHost(finalDraftStore.listTrials(key))).find(t=>t.trialIndex===index)
+      const retained=await checkedHost(finalDraftStore.listTrials(key)),existing=retained.find(t=>t.trialIndex===index)
       if (existing) {
         if (cognitiveRawDigest(existing.payload)!==cognitiveRawDigest(envelope)) throw new Error('原试次记录不允许替换')
         return true
       }
-      if (index!==stateRef.current.trialIndex || !['RUNNING','SUBMITTING_TRIAL'].includes(stateRef.current.status)) throw new Error('试次次序不一致')
+      if (index!==retained.length || retained.some((t,i)=>t.trialIndex!==i) || !['RUNNING','SUBMITTING_TRIAL'].includes(stateRef.current.status)) throw new Error('试次次序不一致')
       dispatch({type:'TRIAL_SUBMIT_START'})
       try {
         await checkedHost(finalDraftStore.putTrial({draftKey:key,trialIndex:Number(index),payload:structuredClone(envelope),createdAt:Date.now()},meta))

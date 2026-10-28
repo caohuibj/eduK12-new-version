@@ -4,3 +4,5 @@ for(const name of ['protocol.ts','report.ts']){const body=fs.readFileSync(path.j
   const text='// Exact pure content projection. Backend SHA256: '+crypto.createHash('sha256').update(body).digest('hex')+'\n'+body,target=path.join(out,name)
   if(process.argv.includes('--check')){if(!fs.existsSync(target)||fs.readFileSync(target,'utf8')!==text)throw Error('Spatial content projection drift: '+name)}else{fs.mkdirSync(out,{recursive:true});fs.writeFileSync(target,text)}}
 process.stdout.write('Spatial pure protocol/report match backend source\n')
+
+require('./native-envelope.cjs')({source,out,check:process.argv.includes('--check')})

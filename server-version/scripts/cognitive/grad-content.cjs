@@ -3,3 +3,5 @@ for(const name of ['source-data.ts','assets.ts','protocol.ts','assignment.ts','a
  const text=name.endsWith('.ts')?'// Exact pure content projection. Backend SHA256: '+crypto.createHash('sha256').update(body).digest('hex')+'\n'+body:body,target=path.join(out,name)
  if(process.argv.includes('--check')){if(!fs.existsSync(target)||fs.readFileSync(target,'utf8')!==text)throw Error('GradCPT projection drift: '+name)}else{fs.mkdirSync(out,{recursive:true});fs.writeFileSync(target,text)}}
 process.stdout.write('GradCPT pure content and LGPL notices match backend source\n')
+
+require('./native-envelope.cjs')({source,out,check:process.argv.includes('--check')})

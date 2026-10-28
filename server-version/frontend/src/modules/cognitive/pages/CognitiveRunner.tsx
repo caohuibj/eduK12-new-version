@@ -312,6 +312,7 @@ const CognitiveRunnerContent: React.FC<CognitiveRunnerProps> = ({ campus: legacy
     const unsafeLocalResume = state.session?.deliveryMode === 'FINAL_ONLY'
       && state.trialIndex > 0
       && readinessProfile.resumeDisposition !== 'trial-boundary-safe'
+      && !readinessProfile.retainedRecordRecovery
     if (unsafeLocalResume) {
       return (
         <AssessmentShell
