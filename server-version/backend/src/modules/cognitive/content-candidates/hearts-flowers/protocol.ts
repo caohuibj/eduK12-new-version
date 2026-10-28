@@ -42,7 +42,7 @@ export function reduceHFEvent(s:HFState,e:HFEvent,p:HFPlan,c:HFConfig,start:numb
  if(e.kind==='onset'){if(s.stage!=='ready'||e.atMs<start)throw Error('Invalid onset');s.stage='stimulus';s.onsetMs=e.atMs;return}
  if(e.kind==='timeout'){if(s.stage!=='stimulus'||e.atMs<s.onsetMs!+p.deadlineMs)throw Error('Early deadline');s.stage='blank';s.closedMs=e.atMs;s.endReason='deadline';return}
  if(e.kind==='finish'){if(s.stage!=='blank'||e.atMs<s.closedMs!+c.blankMs)throw Error('Unexecuted blank');s.stage='complete';s.completeMs=e.atMs;return}
- if(e.input==='keyboard'){if(e.key===null||hfKey(e.key)!==e.side)throw Error('Keyboard mapping mismatch')}else if(e.key!==null)throw Error('Nonkeyboard key mismatch')
+ if(e.input==='keyboard'){if(e.key===null||hfKey(e.key)!==e.side)throw Error('Keyboard mapping mismatch');if(e.token!=='key:'+e.key)throw Error('Keyboard token mismatch')}else if(e.key!==null)throw Error('Nonkeyboard key mismatch')
  if(e.kind==='up'){s.held=s.held.filter(token=>token!==e.token);return}if(e.kind==='activate'&&e.input!=='assistive')throw Error('Atomic activation must identify assistive input')
  if(e.repeat||s.held.includes(e.token)){s.ignored.held++;return}if(e.kind==='down')s.held.push(e.token)
  if(s.stage!=='stimulus'){s.ignored[s.stage==='ready'?'early':'late']++;return}if(e.atMs>=s.onsetMs!+p.deadlineMs){s.ignored.late++;return}

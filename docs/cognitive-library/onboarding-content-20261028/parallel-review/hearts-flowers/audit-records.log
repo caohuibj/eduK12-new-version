@@ -1,0 +1,138 @@
+{
+  "checks": [
+    {
+      "name": "heldWrongFirst",
+      "state": "limited",
+      "received": 1,
+      "valid": 1,
+      "differences": {
+        "keyboard": {
+          "switchMinusRepeatMs": null
+        },
+        "touch": {
+          "switchMinusRepeatMs": null
+        },
+        "mouse": {
+          "switchMinusRepeatMs": null
+        },
+        "pen": {
+          "switchMinusRepeatMs": null
+        },
+        "assistive": {
+          "switchMinusRepeatMs": null
+        }
+      }
+    },
+    {
+      "name": "assistiveZero",
+      "state": "limited",
+      "received": 1,
+      "valid": 1,
+      "differences": {
+        "keyboard": {
+          "switchMinusRepeatMs": null
+        },
+        "touch": {
+          "switchMinusRepeatMs": null
+        },
+        "mouse": {
+          "switchMinusRepeatMs": null
+        },
+        "pen": {
+          "switchMinusRepeatMs": null
+        },
+        "assistive": {
+          "switchMinusRepeatMs": null
+        }
+      }
+    },
+    {
+      "name": "deadlineMissing",
+      "state": "limited",
+      "received": 1,
+      "valid": 1,
+      "differences": {
+        "keyboard": {
+          "switchMinusRepeatMs": null
+        },
+        "touch": {
+          "switchMinusRepeatMs": null
+        },
+        "mouse": {
+          "switchMinusRepeatMs": null
+        },
+        "pen": {
+          "switchMinusRepeatMs": null
+        },
+        "assistive": {
+          "switchMinusRepeatMs": null
+        }
+      }
+    },
+    {
+      "name": "unclosedInterruption",
+      "state": "invalid",
+      "received": 1,
+      "valid": 0,
+      "differences": null
+    },
+    {
+      "name": "closedInterruption",
+      "state": "limited",
+      "received": 1,
+      "valid": 1,
+      "differences": {
+        "keyboard": {
+          "switchMinusRepeatMs": null
+        },
+        "touch": {
+          "switchMinusRepeatMs": null
+        },
+        "mouse": {
+          "switchMinusRepeatMs": null
+        },
+        "pen": {
+          "switchMinusRepeatMs": null
+        },
+        "assistive": {
+          "switchMinusRepeatMs": null
+        }
+      }
+    },
+    {
+      "name": "signedPrefix",
+      "state": "limited",
+      "received": 20,
+      "valid": 20,
+      "differences": {
+        "keyboard": {
+          "switchMinusRepeatMs": null
+        },
+        "touch": {
+          "switchMinusRepeatMs": -200
+        },
+        "mouse": {
+          "switchMinusRepeatMs": null
+        },
+        "pen": {
+          "switchMinusRepeatMs": null
+        },
+        "assistive": {
+          "switchMinusRepeatMs": null
+        }
+      }
+    }
+  ],
+  "terminationFinding": {
+    "status": "shared-gap-pending-parent",
+    "routedState": "interpretable",
+    "explicitAbortedState": "limited",
+    "routedValid": 32,
+    "explicitAbortedValid": 32
+  },
+  "practiceRecordKeys": [
+    "practice:0:0",
+    "practice:1:0",
+    "practice:2:0"
+  ]
+}

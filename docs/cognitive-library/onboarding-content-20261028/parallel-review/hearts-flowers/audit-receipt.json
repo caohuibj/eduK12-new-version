@@ -1,0 +1,1565 @@
+{
+  "node": "v24.21.0",
+  "baseline": "a67f425269283d8281379fdf8234f9fd6b0acebc",
+  "checks": [
+    {
+      "name": "heldWrongFirst",
+      "state": "limited",
+      "received": 1,
+      "valid": 1,
+      "groups": {
+        "heartOnly": {
+          "planned": 8,
+          "valid": 1,
+          "answered": 1,
+          "correct": 0,
+          "missed": 0,
+          "accuracy": 0,
+          "inputs": {
+            "keyboard": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "touch": {
+              "answered": 1,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "mouse": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "pen": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "assistive": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            }
+          }
+        },
+        "flowerOnly": {
+          "planned": 8,
+          "valid": 0,
+          "answered": 0,
+          "correct": 0,
+          "missed": 0,
+          "accuracy": null,
+          "inputs": {
+            "keyboard": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "touch": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "mouse": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "pen": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "assistive": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            }
+          }
+        },
+        "mixed": {
+          "planned": 16,
+          "valid": 0,
+          "answered": 0,
+          "correct": 0,
+          "missed": 0,
+          "accuracy": null,
+          "inputs": {
+            "keyboard": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "touch": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "mouse": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "pen": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "assistive": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            }
+          }
+        },
+        "mixedSwitch": {
+          "planned": 8,
+          "valid": 0,
+          "answered": 0,
+          "correct": 0,
+          "missed": 0,
+          "accuracy": null,
+          "inputs": {
+            "keyboard": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "touch": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "mouse": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "pen": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "assistive": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            }
+          }
+        },
+        "mixedRepeat": {
+          "planned": 7,
+          "valid": 0,
+          "answered": 0,
+          "correct": 0,
+          "missed": 0,
+          "accuracy": null,
+          "inputs": {
+            "keyboard": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "touch": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "mouse": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "pen": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "assistive": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            }
+          }
+        },
+        "mixedFirst": {
+          "planned": 1,
+          "valid": 0,
+          "answered": 0,
+          "correct": 0,
+          "missed": 0,
+          "accuracy": null,
+          "inputs": {
+            "keyboard": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "touch": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "mouse": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "pen": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "assistive": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            }
+          }
+        }
+      },
+      "differences": {
+        "keyboard": {
+          "switchMinusRepeatMs": null
+        },
+        "touch": {
+          "switchMinusRepeatMs": null
+        },
+        "mouse": {
+          "switchMinusRepeatMs": null
+        },
+        "pen": {
+          "switchMinusRepeatMs": null
+        },
+        "assistive": {
+          "switchMinusRepeatMs": null
+        }
+      },
+      "firstIgnored": {
+        "early": 1,
+        "held": 1,
+        "late": 1
+      },
+      "firstIgnoredRepeatCount": 3
+    },
+    {
+      "name": "assistiveZero",
+      "state": "limited",
+      "received": 1,
+      "valid": 1,
+      "groups": {
+        "heartOnly": {
+          "planned": 8,
+          "valid": 1,
+          "answered": 1,
+          "correct": 1,
+          "missed": 0,
+          "accuracy": 1,
+          "inputs": {
+            "keyboard": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "touch": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "mouse": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "pen": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "assistive": {
+              "answered": 1,
+              "correct": 1,
+              "correctRTCount": 1,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": 0
+            }
+          }
+        },
+        "flowerOnly": {
+          "planned": 8,
+          "valid": 0,
+          "answered": 0,
+          "correct": 0,
+          "missed": 0,
+          "accuracy": null,
+          "inputs": {
+            "keyboard": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "touch": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "mouse": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "pen": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "assistive": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            }
+          }
+        },
+        "mixed": {
+          "planned": 16,
+          "valid": 0,
+          "answered": 0,
+          "correct": 0,
+          "missed": 0,
+          "accuracy": null,
+          "inputs": {
+            "keyboard": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "touch": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "mouse": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "pen": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "assistive": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            }
+          }
+        },
+        "mixedSwitch": {
+          "planned": 8,
+          "valid": 0,
+          "answered": 0,
+          "correct": 0,
+          "missed": 0,
+          "accuracy": null,
+          "inputs": {
+            "keyboard": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "touch": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "mouse": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "pen": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "assistive": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            }
+          }
+        },
+        "mixedRepeat": {
+          "planned": 7,
+          "valid": 0,
+          "answered": 0,
+          "correct": 0,
+          "missed": 0,
+          "accuracy": null,
+          "inputs": {
+            "keyboard": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "touch": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "mouse": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "pen": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "assistive": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            }
+          }
+        },
+        "mixedFirst": {
+          "planned": 1,
+          "valid": 0,
+          "answered": 0,
+          "correct": 0,
+          "missed": 0,
+          "accuracy": null,
+          "inputs": {
+            "keyboard": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "touch": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "mouse": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "pen": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "assistive": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            }
+          }
+        }
+      },
+      "differences": {
+        "keyboard": {
+          "switchMinusRepeatMs": null
+        },
+        "touch": {
+          "switchMinusRepeatMs": null
+        },
+        "mouse": {
+          "switchMinusRepeatMs": null
+        },
+        "pen": {
+          "switchMinusRepeatMs": null
+        },
+        "assistive": {
+          "switchMinusRepeatMs": null
+        }
+      },
+      "firstIgnored": {
+        "early": 0,
+        "held": 0,
+        "late": 0
+      },
+      "firstIgnoredRepeatCount": 0
+    },
+    {
+      "name": "deadlineMissing",
+      "state": "limited",
+      "received": 1,
+      "valid": 1,
+      "groups": {
+        "heartOnly": {
+          "planned": 8,
+          "valid": 1,
+          "answered": 0,
+          "correct": 0,
+          "missed": 1,
+          "accuracy": 0,
+          "inputs": {
+            "keyboard": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "touch": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "mouse": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "pen": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "assistive": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            }
+          }
+        },
+        "flowerOnly": {
+          "planned": 8,
+          "valid": 0,
+          "answered": 0,
+          "correct": 0,
+          "missed": 0,
+          "accuracy": null,
+          "inputs": {
+            "keyboard": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "touch": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "mouse": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "pen": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "assistive": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            }
+          }
+        },
+        "mixed": {
+          "planned": 16,
+          "valid": 0,
+          "answered": 0,
+          "correct": 0,
+          "missed": 0,
+          "accuracy": null,
+          "inputs": {
+            "keyboard": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "touch": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "mouse": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "pen": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "assistive": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            }
+          }
+        },
+        "mixedSwitch": {
+          "planned": 8,
+          "valid": 0,
+          "answered": 0,
+          "correct": 0,
+          "missed": 0,
+          "accuracy": null,
+          "inputs": {
+            "keyboard": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "touch": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "mouse": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "pen": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "assistive": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            }
+          }
+        },
+        "mixedRepeat": {
+          "planned": 7,
+          "valid": 0,
+          "answered": 0,
+          "correct": 0,
+          "missed": 0,
+          "accuracy": null,
+          "inputs": {
+            "keyboard": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "touch": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "mouse": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "pen": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "assistive": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            }
+          }
+        },
+        "mixedFirst": {
+          "planned": 1,
+          "valid": 0,
+          "answered": 0,
+          "correct": 0,
+          "missed": 0,
+          "accuracy": null,
+          "inputs": {
+            "keyboard": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "touch": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "mouse": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "pen": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "assistive": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            }
+          }
+        }
+      },
+      "differences": {
+        "keyboard": {
+          "switchMinusRepeatMs": null
+        },
+        "touch": {
+          "switchMinusRepeatMs": null
+        },
+        "mouse": {
+          "switchMinusRepeatMs": null
+        },
+        "pen": {
+          "switchMinusRepeatMs": null
+        },
+        "assistive": {
+          "switchMinusRepeatMs": null
+        }
+      },
+      "firstIgnored": {
+        "early": 0,
+        "held": 0,
+        "late": 1
+      },
+      "firstIgnoredRepeatCount": 0
+    },
+    {
+      "name": "unclosedInterruption",
+      "state": "invalid",
+      "received": 1,
+      "valid": 0,
+      "groups": null,
+      "differences": null,
+      "firstIgnored": {
+        "early": 0,
+        "held": 0,
+        "late": 0
+      },
+      "firstIgnoredRepeatCount": 0
+    },
+    {
+      "name": "closedInterruption",
+      "state": "limited",
+      "received": 1,
+      "valid": 1,
+      "groups": {
+        "heartOnly": {
+          "planned": 8,
+          "valid": 1,
+          "answered": 1,
+          "correct": 1,
+          "missed": 0,
+          "accuracy": 1,
+          "inputs": {
+            "keyboard": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "touch": {
+              "answered": 1,
+              "correct": 1,
+              "correctRTCount": 1,
+              "sumCorrectMs": 100,
+              "meanCorrectMs": 100
+            },
+            "mouse": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "pen": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "assistive": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            }
+          }
+        },
+        "flowerOnly": {
+          "planned": 8,
+          "valid": 0,
+          "answered": 0,
+          "correct": 0,
+          "missed": 0,
+          "accuracy": null,
+          "inputs": {
+            "keyboard": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "touch": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "mouse": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "pen": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "assistive": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            }
+          }
+        },
+        "mixed": {
+          "planned": 16,
+          "valid": 0,
+          "answered": 0,
+          "correct": 0,
+          "missed": 0,
+          "accuracy": null,
+          "inputs": {
+            "keyboard": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "touch": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "mouse": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "pen": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "assistive": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            }
+          }
+        },
+        "mixedSwitch": {
+          "planned": 8,
+          "valid": 0,
+          "answered": 0,
+          "correct": 0,
+          "missed": 0,
+          "accuracy": null,
+          "inputs": {
+            "keyboard": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "touch": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "mouse": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "pen": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "assistive": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            }
+          }
+        },
+        "mixedRepeat": {
+          "planned": 7,
+          "valid": 0,
+          "answered": 0,
+          "correct": 0,
+          "missed": 0,
+          "accuracy": null,
+          "inputs": {
+            "keyboard": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "touch": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "mouse": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "pen": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "assistive": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            }
+          }
+        },
+        "mixedFirst": {
+          "planned": 1,
+          "valid": 0,
+          "answered": 0,
+          "correct": 0,
+          "missed": 0,
+          "accuracy": null,
+          "inputs": {
+            "keyboard": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "touch": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "mouse": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "pen": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "assistive": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            }
+          }
+        }
+      },
+      "differences": {
+        "keyboard": {
+          "switchMinusRepeatMs": null
+        },
+        "touch": {
+          "switchMinusRepeatMs": null
+        },
+        "mouse": {
+          "switchMinusRepeatMs": null
+        },
+        "pen": {
+          "switchMinusRepeatMs": null
+        },
+        "assistive": {
+          "switchMinusRepeatMs": null
+        }
+      },
+      "firstIgnored": {
+        "early": 0,
+        "held": 0,
+        "late": 0
+      },
+      "firstIgnoredRepeatCount": 0
+    },
+    {
+      "name": "signedPrefix",
+      "state": "limited",
+      "received": 20,
+      "valid": 20,
+      "groups": {
+        "heartOnly": {
+          "planned": 8,
+          "valid": 8,
+          "answered": 7,
+          "correct": 6,
+          "missed": 1,
+          "accuracy": 0.75,
+          "inputs": {
+            "keyboard": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "touch": {
+              "answered": 6,
+              "correct": 5,
+              "correctRTCount": 5,
+              "sumCorrectMs": 1000,
+              "meanCorrectMs": 200
+            },
+            "mouse": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "pen": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "assistive": {
+              "answered": 1,
+              "correct": 1,
+              "correctRTCount": 1,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": 0
+            }
+          }
+        },
+        "flowerOnly": {
+          "planned": 8,
+          "valid": 8,
+          "answered": 8,
+          "correct": 8,
+          "missed": 0,
+          "accuracy": 1,
+          "inputs": {
+            "keyboard": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "touch": {
+              "answered": 8,
+              "correct": 8,
+              "correctRTCount": 8,
+              "sumCorrectMs": 1600,
+              "meanCorrectMs": 200
+            },
+            "mouse": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "pen": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "assistive": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            }
+          }
+        },
+        "mixed": {
+          "planned": 16,
+          "valid": 4,
+          "answered": 4,
+          "correct": 4,
+          "missed": 0,
+          "accuracy": 1,
+          "inputs": {
+            "keyboard": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "touch": {
+              "answered": 4,
+              "correct": 4,
+              "correctRTCount": 4,
+              "sumCorrectMs": 1700,
+              "meanCorrectMs": 425
+            },
+            "mouse": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "pen": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "assistive": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            }
+          }
+        },
+        "mixedSwitch": {
+          "planned": 8,
+          "valid": 1,
+          "answered": 1,
+          "correct": 1,
+          "missed": 0,
+          "accuracy": 1,
+          "inputs": {
+            "keyboard": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "touch": {
+              "answered": 1,
+              "correct": 1,
+              "correctRTCount": 1,
+              "sumCorrectMs": 100,
+              "meanCorrectMs": 100
+            },
+            "mouse": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "pen": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "assistive": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            }
+          }
+        },
+        "mixedRepeat": {
+          "planned": 7,
+          "valid": 2,
+          "answered": 2,
+          "correct": 2,
+          "missed": 0,
+          "accuracy": 1,
+          "inputs": {
+            "keyboard": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "touch": {
+              "answered": 2,
+              "correct": 2,
+              "correctRTCount": 2,
+              "sumCorrectMs": 600,
+              "meanCorrectMs": 300
+            },
+            "mouse": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "pen": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "assistive": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            }
+          }
+        },
+        "mixedFirst": {
+          "planned": 1,
+          "valid": 1,
+          "answered": 1,
+          "correct": 1,
+          "missed": 0,
+          "accuracy": 1,
+          "inputs": {
+            "keyboard": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "touch": {
+              "answered": 1,
+              "correct": 1,
+              "correctRTCount": 1,
+              "sumCorrectMs": 1000,
+              "meanCorrectMs": 1000
+            },
+            "mouse": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "pen": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "assistive": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            }
+          }
+        }
+      },
+      "differences": {
+        "keyboard": {
+          "switchMinusRepeatMs": null
+        },
+        "touch": {
+          "switchMinusRepeatMs": -200
+        },
+        "mouse": {
+          "switchMinusRepeatMs": null
+        },
+        "pen": {
+          "switchMinusRepeatMs": null
+        },
+        "assistive": {
+          "switchMinusRepeatMs": null
+        }
+      },
+      "firstIgnored": {
+        "early": 0,
+        "held": 0,
+        "late": 1
+      },
+      "firstIgnoredRepeatCount": 0
+    }
+  ],
+  "terminationFinding": {
+    "status": "shared-gap-pending-parent",
+    "routedState": "interpretable",
+    "explicitAbortedState": "limited",
+    "routedValid": 32,
+    "explicitAbortedValid": 32
+  },
+  "practice": {
+    "rounds": 3,
+    "recordKeys": [
+      "practice:0:0",
+      "practice:1:0",
+      "practice:2:0"
+    ],
+    "finalCalls": 0
+  },
+  "sourceSHA256": {
+    "server-version/backend/src/modules/cognitive/content-candidates/hearts-flowers/analysis.ts": "f5760e2743a992dbe6fd027a6ed7d796f0975bca7a7a157fa73ec661d9053732",
+    "server-version/backend/src/modules/cognitive/content-candidates/hearts-flowers/metadata.ts": "d87fb8216982d9af8c561f35cca1cac7fca8a7b6bbe115d3a626e1cd7d11f00f",
+    "server-version/backend/src/modules/cognitive/content-candidates/hearts-flowers/package.ts": "d0f9ee9f355535549450ec8242191ae2e1e629c8fb2f60da66843605121dd91a",
+    "server-version/backend/src/modules/cognitive/content-candidates/hearts-flowers/participant-presentation.ts": "0f18f697c82f68b04674b109428b19b2d84e085cd17ebd7a9dd1ba54af85c278",
+    "server-version/backend/src/modules/cognitive/content-candidates/hearts-flowers/protocol.ts": "325509091cd92f96e804817ee320f9baa84b3def5170aaec804df4fd5957757e",
+    "server-version/backend/src/modules/cognitive/content-candidates/hearts-flowers/report.ts": "81058a17652c157af55fe5bbcc3ee37295345e89bee1ffefc711b57b99a1e95e",
+    "server-version/backend/src/modules/cognitive/content-candidates/hearts-flowers/schema.ts": "0ea40a91a9037dee197565fa6abc12c652ba2e59345ea78d473b9ff86735b3d8",
+    "server-version/backend/src/modules/cognitive/content-candidates/hearts-flowers/scorer.ts": "0d2bea775f433f8b4d886e3cc0f47b291c1a99de1ee85509ecff70b4b792188f",
+    "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/HFInstructions.tsx": "af14330299c63f3b1e44c2d9ed8cb18c8635297e041ef017738c6b081db19c85",
+    "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/HFReport.test.tsx": "fe99c5205147e3aa61c7140784c9949d6de7171cc797f9bcd7372942b28e869e",
+    "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/HFReport.tsx": "e1cd1ad9ed7a779de78953f1fe40b4c3d0985fde2a31bad07a0dd873b73c9846",
+    "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/HFShape.tsx": "694546f02d874515a4e30bcd44bd429ac14ad51a741f2e14c5bf6c5296c1e9c9",
+    "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/HeartsFlowersTask.tsx": "a3eb89b9554549678ec62ffc894802e41cf3fb18eda2e524f7c4e5971160a6da",
+    "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/NativeHFRunner.tsx": "ffa11be2ede7fde0c29d274ccfb2e586ecc02e67b226d9c6fa908ae6f9babdee",
+    "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/capture.ts": "d4bd137bdcbcc4813f22f4b4a6df31a32ebce27e983636318d5c8944df3a33d6",
+    "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/content.test.tsx": "8f9268230ae25ad0820957325a6e5e78abb5238b73d93125a60c85a7a03a308b",
+    "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/contracts.ts": "732421b614eb698d1bdd20a71fe04db2f744d47223f93a9ba5616d2d0589207b",
+    "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/hearts-flowers.css": "c28af6a9530992a2b119b9f8e888732145ba7d5875f8a7830fb10b9c560d6708",
+    "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/session.ts": "8ef5a61ca22d7c9f74263454a56177658d701d719b08935621b470a65b8dfa08",
+    "server-version/backend/src/modules/cognitive/content-candidates/native-registry/content-contract.ts": "703f0e11221723d6767cd8683900b8ced8122ca3586a7124c859f596f1e81cf3",
+    "server-version/backend/src/modules/cognitive/unified-final-submit.service.ts": "42decdb27516368049e84d3a0036d00dc28191542eaa584011f189596bb752c3",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/hearts-flowers/audit-records.cjs": "6b6377d23847d5dcbac120d76fdacbef8efefd44f41031ad06b966b77140e1f0"
+  }
+}

@@ -1,0 +1,2716 @@
+{
+  "synthetic": true,
+  "scorerOnly": true,
+  "source": {
+    "path": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/report-raw-inputs.json",
+    "sha256": "9f35fc02a34d8def994c453d5f77b394d58d48d4f9e6005a741ab62605054f74"
+  },
+  "normalization": {
+    "changedEventTokens": 32,
+    "description": "Only old synthetic keyboard response:1 placeholders and their response-state token changed to actual UI key:+key. Stimuli, sequence, responses, clocks and score values unchanged; original file untouched."
+  },
+  "input": {
+    "session": {
+      "schemaVersion": 1,
+      "frozenAt": "2026-10-27T00:00:00.000Z",
+      "testType": "hearts-flowers",
+      "configVersion": "0.1.0",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "config": {
+        "profile": "experience",
+        "totalTrials": 32,
+        "heartTrials": 8,
+        "flowerTrials": 8,
+        "mixedTrials": 16,
+        "deadlineMs": 2500,
+        "blankMs": 1000,
+        "practice": {
+          "trials": 8,
+          "deadlineMs": 3500,
+          "minimumCorrect": 7,
+          "maxRounds": 3,
+          "repeatInstructionsBeforeRetry": true
+        },
+        "stimulus": {
+          "background": "#fbfdff",
+          "heart": "#da5c71",
+          "flower": "#7357aa",
+          "fieldMaxWidth": 600,
+          "fieldHeight": 205,
+          "sideFraction": 0.25,
+          "size": 78
+        },
+        "inputPolicy": "fresh-first-down-half-open-v1",
+        "profileDefinitionVersion": "0.1.0",
+        "metricDefinitionVersion": "0.1.0",
+        "qualityDefinitionVersion": "0.1.0",
+        "reportDefinitionVersion": "0.1.0",
+        "presentationVersion": "0.1.0"
+      },
+      "configHash": "092e619eb8c1ce60d0e9ae21f8dae9ed77c9fdd4a1e9073024eb157b09c81839",
+      "protocol": {
+        "schemaVersion": 1,
+        "key": "hearts-flowers/0.1.0/0.1.0",
+        "version": "0.1.0",
+        "clock": "performance",
+        "randomizationAlgorithmVersion": "hf-fnv1a-utf16-xorshift32-euler-balanced-v1",
+        "trialEnvelopeVersion": 1,
+        "phases": [
+          {
+            "key": "test",
+            "persists": true,
+            "required": true
+          }
+        ],
+        "measurementCriticalConfigPaths": [
+          "*"
+        ]
+      },
+      "protocolSignature": "66a6fa4d8e433bcaa599d7ac663137d18b4573a09acf1274e11a1f8c1381186f"
+    },
+    "config": {
+      "profile": "experience",
+      "totalTrials": 32,
+      "heartTrials": 8,
+      "flowerTrials": 8,
+      "mixedTrials": 16,
+      "deadlineMs": 2500,
+      "blankMs": 1000,
+      "practice": {
+        "trials": 8,
+        "deadlineMs": 3500,
+        "minimumCorrect": 7,
+        "maxRounds": 3,
+        "repeatInstructionsBeforeRetry": true
+      },
+      "stimulus": {
+        "background": "#fbfdff",
+        "heart": "#da5c71",
+        "flower": "#7357aa",
+        "fieldMaxWidth": 600,
+        "fieldHeight": 205,
+        "sideFraction": 0.25,
+        "size": 78
+      },
+      "inputPolicy": "fresh-first-down-half-open-v1",
+      "profileDefinitionVersion": "0.1.0",
+      "metricDefinitionVersion": "0.1.0",
+      "qualityDefinitionVersion": "0.1.0",
+      "reportDefinitionVersion": "0.1.0",
+      "presentationVersion": "0.1.0"
+    },
+    "randomSeed": "hf-approved-euler",
+    "trials": [
+      {
+        "schemaVersion": 1,
+        "trialIndex": 0,
+        "phase": "test",
+        "condition": "heartOnly",
+        "startedAtPerfMs": 100,
+        "endedAtPerfMs": 1410,
+        "durationMs": 1310,
+        "flags": {
+          "timeout": false,
+          "premature": false
+        },
+        "qualityEvents": [],
+        "payload": {
+          "plan": {
+            "index": 0,
+            "phase": "test",
+            "round": 0,
+            "mode": "heartOnly",
+            "shape": "heart",
+            "side": "left",
+            "transition": null,
+            "deadlineMs": 2500
+          },
+          "startedAtPerfMs": 100,
+          "endedAtPerfMs": 1410,
+          "status": "complete",
+          "stopReason": null,
+          "initialHeld": [],
+          "events": [
+            {
+              "kind": "onset",
+              "atMs": 110
+            },
+            {
+              "kind": "down",
+              "atMs": 410,
+              "side": "left",
+              "input": "keyboard",
+              "token": "key:ArrowLeft",
+              "key": "ArrowLeft",
+              "repeat": false
+            },
+            {
+              "kind": "up",
+              "atMs": 411,
+              "side": "left",
+              "input": "keyboard",
+              "token": "key:ArrowLeft",
+              "key": "ArrowLeft",
+              "repeat": false
+            },
+            {
+              "kind": "finish",
+              "atMs": 1410
+            }
+          ],
+          "state": {
+            "stage": "complete",
+            "onsetMs": 110,
+            "closedMs": 410,
+            "completeMs": 1410,
+            "endReason": "response",
+            "response": {
+              "side": "left",
+              "atMs": 410,
+              "input": "keyboard",
+              "token": "key:ArrowLeft",
+              "key": "ArrowLeft"
+            },
+            "held": [],
+            "ignored": {
+              "early": 0,
+              "held": 0,
+              "late": 0
+            }
+          },
+          "ignoredRepeatCount": 0,
+          "overflow": false
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "trialIndex": 1,
+        "phase": "test",
+        "condition": "heartOnly",
+        "startedAtPerfMs": 5100,
+        "endedAtPerfMs": 6410,
+        "durationMs": 1310,
+        "flags": {
+          "timeout": false,
+          "premature": false
+        },
+        "qualityEvents": [],
+        "payload": {
+          "plan": {
+            "index": 1,
+            "phase": "test",
+            "round": 0,
+            "mode": "heartOnly",
+            "shape": "heart",
+            "side": "right",
+            "transition": null,
+            "deadlineMs": 2500
+          },
+          "startedAtPerfMs": 5100,
+          "endedAtPerfMs": 6410,
+          "status": "complete",
+          "stopReason": null,
+          "initialHeld": [],
+          "events": [
+            {
+              "kind": "onset",
+              "atMs": 5110
+            },
+            {
+              "kind": "down",
+              "atMs": 5410,
+              "side": "right",
+              "input": "touch",
+              "token": "response:1",
+              "key": null,
+              "repeat": false
+            },
+            {
+              "kind": "up",
+              "atMs": 5411,
+              "side": "right",
+              "input": "touch",
+              "token": "response:1",
+              "key": null,
+              "repeat": false
+            },
+            {
+              "kind": "finish",
+              "atMs": 6410
+            }
+          ],
+          "state": {
+            "stage": "complete",
+            "onsetMs": 5110,
+            "closedMs": 5410,
+            "completeMs": 6410,
+            "endReason": "response",
+            "response": {
+              "side": "right",
+              "atMs": 5410,
+              "input": "touch",
+              "token": "response:1",
+              "key": null
+            },
+            "held": [],
+            "ignored": {
+              "early": 0,
+              "held": 0,
+              "late": 0
+            }
+          },
+          "ignoredRepeatCount": 0,
+          "overflow": false
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "trialIndex": 2,
+        "phase": "test",
+        "condition": "heartOnly",
+        "startedAtPerfMs": 10100,
+        "endedAtPerfMs": 11410,
+        "durationMs": 1310,
+        "flags": {
+          "timeout": false,
+          "premature": false
+        },
+        "qualityEvents": [],
+        "payload": {
+          "plan": {
+            "index": 2,
+            "phase": "test",
+            "round": 0,
+            "mode": "heartOnly",
+            "shape": "heart",
+            "side": "right",
+            "transition": null,
+            "deadlineMs": 2500
+          },
+          "startedAtPerfMs": 10100,
+          "endedAtPerfMs": 11410,
+          "status": "complete",
+          "stopReason": null,
+          "initialHeld": [],
+          "events": [
+            {
+              "kind": "onset",
+              "atMs": 10110
+            },
+            {
+              "kind": "down",
+              "atMs": 10410,
+              "side": "right",
+              "input": "touch",
+              "token": "response:1",
+              "key": null,
+              "repeat": false
+            },
+            {
+              "kind": "up",
+              "atMs": 10411,
+              "side": "right",
+              "input": "touch",
+              "token": "response:1",
+              "key": null,
+              "repeat": false
+            },
+            {
+              "kind": "finish",
+              "atMs": 11410
+            }
+          ],
+          "state": {
+            "stage": "complete",
+            "onsetMs": 10110,
+            "closedMs": 10410,
+            "completeMs": 11410,
+            "endReason": "response",
+            "response": {
+              "side": "right",
+              "atMs": 10410,
+              "input": "touch",
+              "token": "response:1",
+              "key": null
+            },
+            "held": [],
+            "ignored": {
+              "early": 0,
+              "held": 0,
+              "late": 0
+            }
+          },
+          "ignoredRepeatCount": 0,
+          "overflow": false
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "trialIndex": 3,
+        "phase": "test",
+        "condition": "heartOnly",
+        "startedAtPerfMs": 15100,
+        "endedAtPerfMs": 16410,
+        "durationMs": 1310,
+        "flags": {
+          "timeout": false,
+          "premature": false
+        },
+        "qualityEvents": [],
+        "payload": {
+          "plan": {
+            "index": 3,
+            "phase": "test",
+            "round": 0,
+            "mode": "heartOnly",
+            "shape": "heart",
+            "side": "left",
+            "transition": null,
+            "deadlineMs": 2500
+          },
+          "startedAtPerfMs": 15100,
+          "endedAtPerfMs": 16410,
+          "status": "complete",
+          "stopReason": null,
+          "initialHeld": [],
+          "events": [
+            {
+              "kind": "onset",
+              "atMs": 15110
+            },
+            {
+              "kind": "down",
+              "atMs": 15410,
+              "side": "left",
+              "input": "keyboard",
+              "token": "key:ArrowLeft",
+              "key": "ArrowLeft",
+              "repeat": false
+            },
+            {
+              "kind": "up",
+              "atMs": 15411,
+              "side": "left",
+              "input": "keyboard",
+              "token": "key:ArrowLeft",
+              "key": "ArrowLeft",
+              "repeat": false
+            },
+            {
+              "kind": "finish",
+              "atMs": 16410
+            }
+          ],
+          "state": {
+            "stage": "complete",
+            "onsetMs": 15110,
+            "closedMs": 15410,
+            "completeMs": 16410,
+            "endReason": "response",
+            "response": {
+              "side": "left",
+              "atMs": 15410,
+              "input": "keyboard",
+              "token": "key:ArrowLeft",
+              "key": "ArrowLeft"
+            },
+            "held": [],
+            "ignored": {
+              "early": 0,
+              "held": 0,
+              "late": 0
+            }
+          },
+          "ignoredRepeatCount": 0,
+          "overflow": false
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "trialIndex": 4,
+        "phase": "test",
+        "condition": "heartOnly",
+        "startedAtPerfMs": 20100,
+        "endedAtPerfMs": 21410,
+        "durationMs": 1310,
+        "flags": {
+          "timeout": false,
+          "premature": false
+        },
+        "qualityEvents": [],
+        "payload": {
+          "plan": {
+            "index": 4,
+            "phase": "test",
+            "round": 0,
+            "mode": "heartOnly",
+            "shape": "heart",
+            "side": "left",
+            "transition": null,
+            "deadlineMs": 2500
+          },
+          "startedAtPerfMs": 20100,
+          "endedAtPerfMs": 21410,
+          "status": "complete",
+          "stopReason": null,
+          "initialHeld": [],
+          "events": [
+            {
+              "kind": "onset",
+              "atMs": 20110
+            },
+            {
+              "kind": "down",
+              "atMs": 20410,
+              "side": "left",
+              "input": "keyboard",
+              "token": "key:ArrowLeft",
+              "key": "ArrowLeft",
+              "repeat": false
+            },
+            {
+              "kind": "up",
+              "atMs": 20411,
+              "side": "left",
+              "input": "keyboard",
+              "token": "key:ArrowLeft",
+              "key": "ArrowLeft",
+              "repeat": false
+            },
+            {
+              "kind": "finish",
+              "atMs": 21410
+            }
+          ],
+          "state": {
+            "stage": "complete",
+            "onsetMs": 20110,
+            "closedMs": 20410,
+            "completeMs": 21410,
+            "endReason": "response",
+            "response": {
+              "side": "left",
+              "atMs": 20410,
+              "input": "keyboard",
+              "token": "key:ArrowLeft",
+              "key": "ArrowLeft"
+            },
+            "held": [],
+            "ignored": {
+              "early": 0,
+              "held": 0,
+              "late": 0
+            }
+          },
+          "ignoredRepeatCount": 0,
+          "overflow": false
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "trialIndex": 5,
+        "phase": "test",
+        "condition": "heartOnly",
+        "startedAtPerfMs": 25100,
+        "endedAtPerfMs": 26410,
+        "durationMs": 1310,
+        "flags": {
+          "timeout": false,
+          "premature": false
+        },
+        "qualityEvents": [],
+        "payload": {
+          "plan": {
+            "index": 5,
+            "phase": "test",
+            "round": 0,
+            "mode": "heartOnly",
+            "shape": "heart",
+            "side": "right",
+            "transition": null,
+            "deadlineMs": 2500
+          },
+          "startedAtPerfMs": 25100,
+          "endedAtPerfMs": 26410,
+          "status": "complete",
+          "stopReason": null,
+          "initialHeld": [],
+          "events": [
+            {
+              "kind": "onset",
+              "atMs": 25110
+            },
+            {
+              "kind": "down",
+              "atMs": 25410,
+              "side": "right",
+              "input": "touch",
+              "token": "response:1",
+              "key": null,
+              "repeat": false
+            },
+            {
+              "kind": "up",
+              "atMs": 25411,
+              "side": "right",
+              "input": "touch",
+              "token": "response:1",
+              "key": null,
+              "repeat": false
+            },
+            {
+              "kind": "finish",
+              "atMs": 26410
+            }
+          ],
+          "state": {
+            "stage": "complete",
+            "onsetMs": 25110,
+            "closedMs": 25410,
+            "completeMs": 26410,
+            "endReason": "response",
+            "response": {
+              "side": "right",
+              "atMs": 25410,
+              "input": "touch",
+              "token": "response:1",
+              "key": null
+            },
+            "held": [],
+            "ignored": {
+              "early": 0,
+              "held": 0,
+              "late": 0
+            }
+          },
+          "ignoredRepeatCount": 0,
+          "overflow": false
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "trialIndex": 6,
+        "phase": "test",
+        "condition": "heartOnly",
+        "startedAtPerfMs": 30100,
+        "endedAtPerfMs": 31410,
+        "durationMs": 1310,
+        "flags": {
+          "timeout": false,
+          "premature": false
+        },
+        "qualityEvents": [],
+        "payload": {
+          "plan": {
+            "index": 6,
+            "phase": "test",
+            "round": 0,
+            "mode": "heartOnly",
+            "shape": "heart",
+            "side": "right",
+            "transition": null,
+            "deadlineMs": 2500
+          },
+          "startedAtPerfMs": 30100,
+          "endedAtPerfMs": 31410,
+          "status": "complete",
+          "stopReason": null,
+          "initialHeld": [],
+          "events": [
+            {
+              "kind": "onset",
+              "atMs": 30110
+            },
+            {
+              "kind": "down",
+              "atMs": 30410,
+              "side": "right",
+              "input": "touch",
+              "token": "response:1",
+              "key": null,
+              "repeat": false
+            },
+            {
+              "kind": "up",
+              "atMs": 30411,
+              "side": "right",
+              "input": "touch",
+              "token": "response:1",
+              "key": null,
+              "repeat": false
+            },
+            {
+              "kind": "finish",
+              "atMs": 31410
+            }
+          ],
+          "state": {
+            "stage": "complete",
+            "onsetMs": 30110,
+            "closedMs": 30410,
+            "completeMs": 31410,
+            "endReason": "response",
+            "response": {
+              "side": "right",
+              "atMs": 30410,
+              "input": "touch",
+              "token": "response:1",
+              "key": null
+            },
+            "held": [],
+            "ignored": {
+              "early": 0,
+              "held": 0,
+              "late": 0
+            }
+          },
+          "ignoredRepeatCount": 0,
+          "overflow": false
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "trialIndex": 7,
+        "phase": "test",
+        "condition": "heartOnly",
+        "startedAtPerfMs": 35100,
+        "endedAtPerfMs": 36410,
+        "durationMs": 1310,
+        "flags": {
+          "timeout": false,
+          "premature": false
+        },
+        "qualityEvents": [],
+        "payload": {
+          "plan": {
+            "index": 7,
+            "phase": "test",
+            "round": 0,
+            "mode": "heartOnly",
+            "shape": "heart",
+            "side": "left",
+            "transition": null,
+            "deadlineMs": 2500
+          },
+          "startedAtPerfMs": 35100,
+          "endedAtPerfMs": 36410,
+          "status": "complete",
+          "stopReason": null,
+          "initialHeld": [],
+          "events": [
+            {
+              "kind": "onset",
+              "atMs": 35110
+            },
+            {
+              "kind": "down",
+              "atMs": 35410,
+              "side": "left",
+              "input": "keyboard",
+              "token": "key:ArrowLeft",
+              "key": "ArrowLeft",
+              "repeat": false
+            },
+            {
+              "kind": "up",
+              "atMs": 35411,
+              "side": "left",
+              "input": "keyboard",
+              "token": "key:ArrowLeft",
+              "key": "ArrowLeft",
+              "repeat": false
+            },
+            {
+              "kind": "finish",
+              "atMs": 36410
+            }
+          ],
+          "state": {
+            "stage": "complete",
+            "onsetMs": 35110,
+            "closedMs": 35410,
+            "completeMs": 36410,
+            "endReason": "response",
+            "response": {
+              "side": "left",
+              "atMs": 35410,
+              "input": "keyboard",
+              "token": "key:ArrowLeft",
+              "key": "ArrowLeft"
+            },
+            "held": [],
+            "ignored": {
+              "early": 0,
+              "held": 0,
+              "late": 0
+            }
+          },
+          "ignoredRepeatCount": 0,
+          "overflow": false
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "trialIndex": 8,
+        "phase": "test",
+        "condition": "flowerOnly",
+        "startedAtPerfMs": 40100,
+        "endedAtPerfMs": 41410,
+        "durationMs": 1310,
+        "flags": {
+          "timeout": false,
+          "premature": false
+        },
+        "qualityEvents": [],
+        "payload": {
+          "plan": {
+            "index": 8,
+            "phase": "test",
+            "round": 0,
+            "mode": "flowerOnly",
+            "shape": "flower",
+            "side": "right",
+            "transition": null,
+            "deadlineMs": 2500
+          },
+          "startedAtPerfMs": 40100,
+          "endedAtPerfMs": 41410,
+          "status": "complete",
+          "stopReason": null,
+          "initialHeld": [],
+          "events": [
+            {
+              "kind": "onset",
+              "atMs": 40110
+            },
+            {
+              "kind": "down",
+              "atMs": 40410,
+              "side": "left",
+              "input": "touch",
+              "token": "response:1",
+              "key": null,
+              "repeat": false
+            },
+            {
+              "kind": "up",
+              "atMs": 40411,
+              "side": "left",
+              "input": "touch",
+              "token": "response:1",
+              "key": null,
+              "repeat": false
+            },
+            {
+              "kind": "finish",
+              "atMs": 41410
+            }
+          ],
+          "state": {
+            "stage": "complete",
+            "onsetMs": 40110,
+            "closedMs": 40410,
+            "completeMs": 41410,
+            "endReason": "response",
+            "response": {
+              "side": "left",
+              "atMs": 40410,
+              "input": "touch",
+              "token": "response:1",
+              "key": null
+            },
+            "held": [],
+            "ignored": {
+              "early": 0,
+              "held": 0,
+              "late": 0
+            }
+          },
+          "ignoredRepeatCount": 0,
+          "overflow": false
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "trialIndex": 9,
+        "phase": "test",
+        "condition": "flowerOnly",
+        "startedAtPerfMs": 45100,
+        "endedAtPerfMs": 46410,
+        "durationMs": 1310,
+        "flags": {
+          "timeout": false,
+          "premature": false
+        },
+        "qualityEvents": [],
+        "payload": {
+          "plan": {
+            "index": 9,
+            "phase": "test",
+            "round": 0,
+            "mode": "flowerOnly",
+            "shape": "flower",
+            "side": "right",
+            "transition": null,
+            "deadlineMs": 2500
+          },
+          "startedAtPerfMs": 45100,
+          "endedAtPerfMs": 46410,
+          "status": "complete",
+          "stopReason": null,
+          "initialHeld": [],
+          "events": [
+            {
+              "kind": "onset",
+              "atMs": 45110
+            },
+            {
+              "kind": "down",
+              "atMs": 45410,
+              "side": "left",
+              "input": "touch",
+              "token": "response:1",
+              "key": null,
+              "repeat": false
+            },
+            {
+              "kind": "up",
+              "atMs": 45411,
+              "side": "left",
+              "input": "touch",
+              "token": "response:1",
+              "key": null,
+              "repeat": false
+            },
+            {
+              "kind": "finish",
+              "atMs": 46410
+            }
+          ],
+          "state": {
+            "stage": "complete",
+            "onsetMs": 45110,
+            "closedMs": 45410,
+            "completeMs": 46410,
+            "endReason": "response",
+            "response": {
+              "side": "left",
+              "atMs": 45410,
+              "input": "touch",
+              "token": "response:1",
+              "key": null
+            },
+            "held": [],
+            "ignored": {
+              "early": 0,
+              "held": 0,
+              "late": 0
+            }
+          },
+          "ignoredRepeatCount": 0,
+          "overflow": false
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "trialIndex": 10,
+        "phase": "test",
+        "condition": "flowerOnly",
+        "startedAtPerfMs": 50100,
+        "endedAtPerfMs": 51410,
+        "durationMs": 1310,
+        "flags": {
+          "timeout": false,
+          "premature": false
+        },
+        "qualityEvents": [],
+        "payload": {
+          "plan": {
+            "index": 10,
+            "phase": "test",
+            "round": 0,
+            "mode": "flowerOnly",
+            "shape": "flower",
+            "side": "left",
+            "transition": null,
+            "deadlineMs": 2500
+          },
+          "startedAtPerfMs": 50100,
+          "endedAtPerfMs": 51410,
+          "status": "complete",
+          "stopReason": null,
+          "initialHeld": [],
+          "events": [
+            {
+              "kind": "onset",
+              "atMs": 50110
+            },
+            {
+              "kind": "down",
+              "atMs": 50410,
+              "side": "right",
+              "input": "keyboard",
+              "token": "key:ArrowRight",
+              "key": "ArrowRight",
+              "repeat": false
+            },
+            {
+              "kind": "up",
+              "atMs": 50411,
+              "side": "right",
+              "input": "keyboard",
+              "token": "key:ArrowRight",
+              "key": "ArrowRight",
+              "repeat": false
+            },
+            {
+              "kind": "finish",
+              "atMs": 51410
+            }
+          ],
+          "state": {
+            "stage": "complete",
+            "onsetMs": 50110,
+            "closedMs": 50410,
+            "completeMs": 51410,
+            "endReason": "response",
+            "response": {
+              "side": "right",
+              "atMs": 50410,
+              "input": "keyboard",
+              "token": "key:ArrowRight",
+              "key": "ArrowRight"
+            },
+            "held": [],
+            "ignored": {
+              "early": 0,
+              "held": 0,
+              "late": 0
+            }
+          },
+          "ignoredRepeatCount": 0,
+          "overflow": false
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "trialIndex": 11,
+        "phase": "test",
+        "condition": "flowerOnly",
+        "startedAtPerfMs": 55100,
+        "endedAtPerfMs": 56410,
+        "durationMs": 1310,
+        "flags": {
+          "timeout": false,
+          "premature": false
+        },
+        "qualityEvents": [],
+        "payload": {
+          "plan": {
+            "index": 11,
+            "phase": "test",
+            "round": 0,
+            "mode": "flowerOnly",
+            "shape": "flower",
+            "side": "right",
+            "transition": null,
+            "deadlineMs": 2500
+          },
+          "startedAtPerfMs": 55100,
+          "endedAtPerfMs": 56410,
+          "status": "complete",
+          "stopReason": null,
+          "initialHeld": [],
+          "events": [
+            {
+              "kind": "onset",
+              "atMs": 55110
+            },
+            {
+              "kind": "down",
+              "atMs": 55410,
+              "side": "left",
+              "input": "touch",
+              "token": "response:1",
+              "key": null,
+              "repeat": false
+            },
+            {
+              "kind": "up",
+              "atMs": 55411,
+              "side": "left",
+              "input": "touch",
+              "token": "response:1",
+              "key": null,
+              "repeat": false
+            },
+            {
+              "kind": "finish",
+              "atMs": 56410
+            }
+          ],
+          "state": {
+            "stage": "complete",
+            "onsetMs": 55110,
+            "closedMs": 55410,
+            "completeMs": 56410,
+            "endReason": "response",
+            "response": {
+              "side": "left",
+              "atMs": 55410,
+              "input": "touch",
+              "token": "response:1",
+              "key": null
+            },
+            "held": [],
+            "ignored": {
+              "early": 0,
+              "held": 0,
+              "late": 0
+            }
+          },
+          "ignoredRepeatCount": 0,
+          "overflow": false
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "trialIndex": 12,
+        "phase": "test",
+        "condition": "flowerOnly",
+        "startedAtPerfMs": 60100,
+        "endedAtPerfMs": 61410,
+        "durationMs": 1310,
+        "flags": {
+          "timeout": false,
+          "premature": false
+        },
+        "qualityEvents": [],
+        "payload": {
+          "plan": {
+            "index": 12,
+            "phase": "test",
+            "round": 0,
+            "mode": "flowerOnly",
+            "shape": "flower",
+            "side": "right",
+            "transition": null,
+            "deadlineMs": 2500
+          },
+          "startedAtPerfMs": 60100,
+          "endedAtPerfMs": 61410,
+          "status": "complete",
+          "stopReason": null,
+          "initialHeld": [],
+          "events": [
+            {
+              "kind": "onset",
+              "atMs": 60110
+            },
+            {
+              "kind": "down",
+              "atMs": 60410,
+              "side": "left",
+              "input": "touch",
+              "token": "response:1",
+              "key": null,
+              "repeat": false
+            },
+            {
+              "kind": "up",
+              "atMs": 60411,
+              "side": "left",
+              "input": "touch",
+              "token": "response:1",
+              "key": null,
+              "repeat": false
+            },
+            {
+              "kind": "finish",
+              "atMs": 61410
+            }
+          ],
+          "state": {
+            "stage": "complete",
+            "onsetMs": 60110,
+            "closedMs": 60410,
+            "completeMs": 61410,
+            "endReason": "response",
+            "response": {
+              "side": "left",
+              "atMs": 60410,
+              "input": "touch",
+              "token": "response:1",
+              "key": null
+            },
+            "held": [],
+            "ignored": {
+              "early": 0,
+              "held": 0,
+              "late": 0
+            }
+          },
+          "ignoredRepeatCount": 0,
+          "overflow": false
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "trialIndex": 13,
+        "phase": "test",
+        "condition": "flowerOnly",
+        "startedAtPerfMs": 65100,
+        "endedAtPerfMs": 66410,
+        "durationMs": 1310,
+        "flags": {
+          "timeout": false,
+          "premature": false
+        },
+        "qualityEvents": [],
+        "payload": {
+          "plan": {
+            "index": 13,
+            "phase": "test",
+            "round": 0,
+            "mode": "flowerOnly",
+            "shape": "flower",
+            "side": "left",
+            "transition": null,
+            "deadlineMs": 2500
+          },
+          "startedAtPerfMs": 65100,
+          "endedAtPerfMs": 66410,
+          "status": "complete",
+          "stopReason": null,
+          "initialHeld": [],
+          "events": [
+            {
+              "kind": "onset",
+              "atMs": 65110
+            },
+            {
+              "kind": "down",
+              "atMs": 65410,
+              "side": "right",
+              "input": "keyboard",
+              "token": "key:ArrowRight",
+              "key": "ArrowRight",
+              "repeat": false
+            },
+            {
+              "kind": "up",
+              "atMs": 65411,
+              "side": "right",
+              "input": "keyboard",
+              "token": "key:ArrowRight",
+              "key": "ArrowRight",
+              "repeat": false
+            },
+            {
+              "kind": "finish",
+              "atMs": 66410
+            }
+          ],
+          "state": {
+            "stage": "complete",
+            "onsetMs": 65110,
+            "closedMs": 65410,
+            "completeMs": 66410,
+            "endReason": "response",
+            "response": {
+              "side": "right",
+              "atMs": 65410,
+              "input": "keyboard",
+              "token": "key:ArrowRight",
+              "key": "ArrowRight"
+            },
+            "held": [],
+            "ignored": {
+              "early": 0,
+              "held": 0,
+              "late": 0
+            }
+          },
+          "ignoredRepeatCount": 0,
+          "overflow": false
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "trialIndex": 14,
+        "phase": "test",
+        "condition": "flowerOnly",
+        "startedAtPerfMs": 70100,
+        "endedAtPerfMs": 71410,
+        "durationMs": 1310,
+        "flags": {
+          "timeout": false,
+          "premature": false
+        },
+        "qualityEvents": [],
+        "payload": {
+          "plan": {
+            "index": 14,
+            "phase": "test",
+            "round": 0,
+            "mode": "flowerOnly",
+            "shape": "flower",
+            "side": "left",
+            "transition": null,
+            "deadlineMs": 2500
+          },
+          "startedAtPerfMs": 70100,
+          "endedAtPerfMs": 71410,
+          "status": "complete",
+          "stopReason": null,
+          "initialHeld": [],
+          "events": [
+            {
+              "kind": "onset",
+              "atMs": 70110
+            },
+            {
+              "kind": "down",
+              "atMs": 70410,
+              "side": "right",
+              "input": "keyboard",
+              "token": "key:ArrowRight",
+              "key": "ArrowRight",
+              "repeat": false
+            },
+            {
+              "kind": "up",
+              "atMs": 70411,
+              "side": "right",
+              "input": "keyboard",
+              "token": "key:ArrowRight",
+              "key": "ArrowRight",
+              "repeat": false
+            },
+            {
+              "kind": "finish",
+              "atMs": 71410
+            }
+          ],
+          "state": {
+            "stage": "complete",
+            "onsetMs": 70110,
+            "closedMs": 70410,
+            "completeMs": 71410,
+            "endReason": "response",
+            "response": {
+              "side": "right",
+              "atMs": 70410,
+              "input": "keyboard",
+              "token": "key:ArrowRight",
+              "key": "ArrowRight"
+            },
+            "held": [],
+            "ignored": {
+              "early": 0,
+              "held": 0,
+              "late": 0
+            }
+          },
+          "ignoredRepeatCount": 0,
+          "overflow": false
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "trialIndex": 15,
+        "phase": "test",
+        "condition": "flowerOnly",
+        "startedAtPerfMs": 75100,
+        "endedAtPerfMs": 76410,
+        "durationMs": 1310,
+        "flags": {
+          "timeout": false,
+          "premature": false
+        },
+        "qualityEvents": [],
+        "payload": {
+          "plan": {
+            "index": 15,
+            "phase": "test",
+            "round": 0,
+            "mode": "flowerOnly",
+            "shape": "flower",
+            "side": "left",
+            "transition": null,
+            "deadlineMs": 2500
+          },
+          "startedAtPerfMs": 75100,
+          "endedAtPerfMs": 76410,
+          "status": "complete",
+          "stopReason": null,
+          "initialHeld": [],
+          "events": [
+            {
+              "kind": "onset",
+              "atMs": 75110
+            },
+            {
+              "kind": "down",
+              "atMs": 75410,
+              "side": "right",
+              "input": "keyboard",
+              "token": "key:ArrowRight",
+              "key": "ArrowRight",
+              "repeat": false
+            },
+            {
+              "kind": "up",
+              "atMs": 75411,
+              "side": "right",
+              "input": "keyboard",
+              "token": "key:ArrowRight",
+              "key": "ArrowRight",
+              "repeat": false
+            },
+            {
+              "kind": "finish",
+              "atMs": 76410
+            }
+          ],
+          "state": {
+            "stage": "complete",
+            "onsetMs": 75110,
+            "closedMs": 75410,
+            "completeMs": 76410,
+            "endReason": "response",
+            "response": {
+              "side": "right",
+              "atMs": 75410,
+              "input": "keyboard",
+              "token": "key:ArrowRight",
+              "key": "ArrowRight"
+            },
+            "held": [],
+            "ignored": {
+              "early": 0,
+              "held": 0,
+              "late": 0
+            }
+          },
+          "ignoredRepeatCount": 0,
+          "overflow": false
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "trialIndex": 16,
+        "phase": "test",
+        "condition": "mixed",
+        "startedAtPerfMs": 80100,
+        "endedAtPerfMs": 82110,
+        "durationMs": 2010,
+        "flags": {
+          "timeout": false,
+          "premature": false
+        },
+        "qualityEvents": [],
+        "payload": {
+          "plan": {
+            "index": 16,
+            "phase": "test",
+            "round": 0,
+            "mode": "mixed",
+            "shape": "heart",
+            "side": "left",
+            "transition": null,
+            "deadlineMs": 2500
+          },
+          "startedAtPerfMs": 80100,
+          "endedAtPerfMs": 82110,
+          "status": "complete",
+          "stopReason": null,
+          "initialHeld": [],
+          "events": [
+            {
+              "kind": "onset",
+              "atMs": 80110
+            },
+            {
+              "kind": "down",
+              "atMs": 81110,
+              "side": "left",
+              "input": "keyboard",
+              "token": "key:ArrowLeft",
+              "key": "ArrowLeft",
+              "repeat": false
+            },
+            {
+              "kind": "up",
+              "atMs": 81111,
+              "side": "left",
+              "input": "keyboard",
+              "token": "key:ArrowLeft",
+              "key": "ArrowLeft",
+              "repeat": false
+            },
+            {
+              "kind": "finish",
+              "atMs": 82110
+            }
+          ],
+          "state": {
+            "stage": "complete",
+            "onsetMs": 80110,
+            "closedMs": 81110,
+            "completeMs": 82110,
+            "endReason": "response",
+            "response": {
+              "side": "left",
+              "atMs": 81110,
+              "input": "keyboard",
+              "token": "key:ArrowLeft",
+              "key": "ArrowLeft"
+            },
+            "held": [],
+            "ignored": {
+              "early": 0,
+              "held": 0,
+              "late": 0
+            }
+          },
+          "ignoredRepeatCount": 0,
+          "overflow": false
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "trialIndex": 17,
+        "phase": "test",
+        "condition": "mixed",
+        "startedAtPerfMs": 85100,
+        "endedAtPerfMs": 86710,
+        "durationMs": 1610,
+        "flags": {
+          "timeout": false,
+          "premature": false
+        },
+        "qualityEvents": [],
+        "payload": {
+          "plan": {
+            "index": 17,
+            "phase": "test",
+            "round": 0,
+            "mode": "mixed",
+            "shape": "flower",
+            "side": "left",
+            "transition": "switch",
+            "deadlineMs": 2500
+          },
+          "startedAtPerfMs": 85100,
+          "endedAtPerfMs": 86710,
+          "status": "complete",
+          "stopReason": null,
+          "initialHeld": [],
+          "events": [
+            {
+              "kind": "onset",
+              "atMs": 85110
+            },
+            {
+              "kind": "down",
+              "atMs": 85710,
+              "side": "right",
+              "input": "keyboard",
+              "token": "key:ArrowRight",
+              "key": "ArrowRight",
+              "repeat": false
+            },
+            {
+              "kind": "up",
+              "atMs": 85711,
+              "side": "right",
+              "input": "keyboard",
+              "token": "key:ArrowRight",
+              "key": "ArrowRight",
+              "repeat": false
+            },
+            {
+              "kind": "finish",
+              "atMs": 86710
+            }
+          ],
+          "state": {
+            "stage": "complete",
+            "onsetMs": 85110,
+            "closedMs": 85710,
+            "completeMs": 86710,
+            "endReason": "response",
+            "response": {
+              "side": "right",
+              "atMs": 85710,
+              "input": "keyboard",
+              "token": "key:ArrowRight",
+              "key": "ArrowRight"
+            },
+            "held": [],
+            "ignored": {
+              "early": 0,
+              "held": 0,
+              "late": 0
+            }
+          },
+          "ignoredRepeatCount": 0,
+          "overflow": false
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "trialIndex": 18,
+        "phase": "test",
+        "condition": "mixed",
+        "startedAtPerfMs": 90100,
+        "endedAtPerfMs": 91210,
+        "durationMs": 1110,
+        "flags": {
+          "timeout": false,
+          "premature": false
+        },
+        "qualityEvents": [],
+        "payload": {
+          "plan": {
+            "index": 18,
+            "phase": "test",
+            "round": 0,
+            "mode": "mixed",
+            "shape": "heart",
+            "side": "right",
+            "transition": "switch",
+            "deadlineMs": 2500
+          },
+          "startedAtPerfMs": 90100,
+          "endedAtPerfMs": 91210,
+          "status": "complete",
+          "stopReason": null,
+          "initialHeld": [],
+          "events": [
+            {
+              "kind": "onset",
+              "atMs": 90110
+            },
+            {
+              "kind": "down",
+              "atMs": 90210,
+              "side": "right",
+              "input": "touch",
+              "token": "response:1",
+              "key": null,
+              "repeat": false
+            },
+            {
+              "kind": "up",
+              "atMs": 90211,
+              "side": "right",
+              "input": "touch",
+              "token": "response:1",
+              "key": null,
+              "repeat": false
+            },
+            {
+              "kind": "finish",
+              "atMs": 91210
+            }
+          ],
+          "state": {
+            "stage": "complete",
+            "onsetMs": 90110,
+            "closedMs": 90210,
+            "completeMs": 91210,
+            "endReason": "response",
+            "response": {
+              "side": "right",
+              "atMs": 90210,
+              "input": "touch",
+              "token": "response:1",
+              "key": null
+            },
+            "held": [],
+            "ignored": {
+              "early": 0,
+              "held": 0,
+              "late": 0
+            }
+          },
+          "ignoredRepeatCount": 0,
+          "overflow": false
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "trialIndex": 19,
+        "phase": "test",
+        "condition": "mixed",
+        "startedAtPerfMs": 95100,
+        "endedAtPerfMs": 96610,
+        "durationMs": 1510,
+        "flags": {
+          "timeout": false,
+          "premature": false
+        },
+        "qualityEvents": [],
+        "payload": {
+          "plan": {
+            "index": 19,
+            "phase": "test",
+            "round": 0,
+            "mode": "mixed",
+            "shape": "heart",
+            "side": "right",
+            "transition": "repeat",
+            "deadlineMs": 2500
+          },
+          "startedAtPerfMs": 95100,
+          "endedAtPerfMs": 96610,
+          "status": "complete",
+          "stopReason": null,
+          "initialHeld": [],
+          "events": [
+            {
+              "kind": "onset",
+              "atMs": 95110
+            },
+            {
+              "kind": "down",
+              "atMs": 95610,
+              "side": "right",
+              "input": "touch",
+              "token": "response:1",
+              "key": null,
+              "repeat": false
+            },
+            {
+              "kind": "up",
+              "atMs": 95611,
+              "side": "right",
+              "input": "touch",
+              "token": "response:1",
+              "key": null,
+              "repeat": false
+            },
+            {
+              "kind": "finish",
+              "atMs": 96610
+            }
+          ],
+          "state": {
+            "stage": "complete",
+            "onsetMs": 95110,
+            "closedMs": 95610,
+            "completeMs": 96610,
+            "endReason": "response",
+            "response": {
+              "side": "right",
+              "atMs": 95610,
+              "input": "touch",
+              "token": "response:1",
+              "key": null
+            },
+            "held": [],
+            "ignored": {
+              "early": 0,
+              "held": 0,
+              "late": 0
+            }
+          },
+          "ignoredRepeatCount": 0,
+          "overflow": false
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "trialIndex": 20,
+        "phase": "test",
+        "condition": "mixed",
+        "startedAtPerfMs": 100100,
+        "endedAtPerfMs": 101610,
+        "durationMs": 1510,
+        "flags": {
+          "timeout": false,
+          "premature": false
+        },
+        "qualityEvents": [],
+        "payload": {
+          "plan": {
+            "index": 20,
+            "phase": "test",
+            "round": 0,
+            "mode": "mixed",
+            "shape": "heart",
+            "side": "right",
+            "transition": "repeat",
+            "deadlineMs": 2500
+          },
+          "startedAtPerfMs": 100100,
+          "endedAtPerfMs": 101610,
+          "status": "complete",
+          "stopReason": null,
+          "initialHeld": [],
+          "events": [
+            {
+              "kind": "onset",
+              "atMs": 100110
+            },
+            {
+              "kind": "down",
+              "atMs": 100610,
+              "side": "right",
+              "input": "touch",
+              "token": "response:1",
+              "key": null,
+              "repeat": false
+            },
+            {
+              "kind": "up",
+              "atMs": 100611,
+              "side": "right",
+              "input": "touch",
+              "token": "response:1",
+              "key": null,
+              "repeat": false
+            },
+            {
+              "kind": "finish",
+              "atMs": 101610
+            }
+          ],
+          "state": {
+            "stage": "complete",
+            "onsetMs": 100110,
+            "closedMs": 100610,
+            "completeMs": 101610,
+            "endReason": "response",
+            "response": {
+              "side": "right",
+              "atMs": 100610,
+              "input": "touch",
+              "token": "response:1",
+              "key": null
+            },
+            "held": [],
+            "ignored": {
+              "early": 0,
+              "held": 0,
+              "late": 0
+            }
+          },
+          "ignoredRepeatCount": 0,
+          "overflow": false
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "trialIndex": 21,
+        "phase": "test",
+        "condition": "mixed",
+        "startedAtPerfMs": 105100,
+        "endedAtPerfMs": 106710,
+        "durationMs": 1610,
+        "flags": {
+          "timeout": false,
+          "premature": false
+        },
+        "qualityEvents": [],
+        "payload": {
+          "plan": {
+            "index": 21,
+            "phase": "test",
+            "round": 0,
+            "mode": "mixed",
+            "shape": "flower",
+            "side": "left",
+            "transition": "switch",
+            "deadlineMs": 2500
+          },
+          "startedAtPerfMs": 105100,
+          "endedAtPerfMs": 106710,
+          "status": "complete",
+          "stopReason": null,
+          "initialHeld": [],
+          "events": [
+            {
+              "kind": "onset",
+              "atMs": 105110
+            },
+            {
+              "kind": "down",
+              "atMs": 105710,
+              "side": "right",
+              "input": "keyboard",
+              "token": "key:ArrowRight",
+              "key": "ArrowRight",
+              "repeat": false
+            },
+            {
+              "kind": "up",
+              "atMs": 105711,
+              "side": "right",
+              "input": "keyboard",
+              "token": "key:ArrowRight",
+              "key": "ArrowRight",
+              "repeat": false
+            },
+            {
+              "kind": "finish",
+              "atMs": 106710
+            }
+          ],
+          "state": {
+            "stage": "complete",
+            "onsetMs": 105110,
+            "closedMs": 105710,
+            "completeMs": 106710,
+            "endReason": "response",
+            "response": {
+              "side": "right",
+              "atMs": 105710,
+              "input": "keyboard",
+              "token": "key:ArrowRight",
+              "key": "ArrowRight"
+            },
+            "held": [],
+            "ignored": {
+              "early": 0,
+              "held": 0,
+              "late": 0
+            }
+          },
+          "ignoredRepeatCount": 0,
+          "overflow": false
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "trialIndex": 22,
+        "phase": "test",
+        "condition": "mixed",
+        "startedAtPerfMs": 110100,
+        "endedAtPerfMs": 111210,
+        "durationMs": 1110,
+        "flags": {
+          "timeout": false,
+          "premature": false
+        },
+        "qualityEvents": [],
+        "payload": {
+          "plan": {
+            "index": 22,
+            "phase": "test",
+            "round": 0,
+            "mode": "mixed",
+            "shape": "heart",
+            "side": "right",
+            "transition": "switch",
+            "deadlineMs": 2500
+          },
+          "startedAtPerfMs": 110100,
+          "endedAtPerfMs": 111210,
+          "status": "complete",
+          "stopReason": null,
+          "initialHeld": [],
+          "events": [
+            {
+              "kind": "onset",
+              "atMs": 110110
+            },
+            {
+              "kind": "down",
+              "atMs": 110210,
+              "side": "right",
+              "input": "touch",
+              "token": "response:1",
+              "key": null,
+              "repeat": false
+            },
+            {
+              "kind": "up",
+              "atMs": 110211,
+              "side": "right",
+              "input": "touch",
+              "token": "response:1",
+              "key": null,
+              "repeat": false
+            },
+            {
+              "kind": "finish",
+              "atMs": 111210
+            }
+          ],
+          "state": {
+            "stage": "complete",
+            "onsetMs": 110110,
+            "closedMs": 110210,
+            "completeMs": 111210,
+            "endReason": "response",
+            "response": {
+              "side": "right",
+              "atMs": 110210,
+              "input": "touch",
+              "token": "response:1",
+              "key": null
+            },
+            "held": [],
+            "ignored": {
+              "early": 0,
+              "held": 0,
+              "late": 0
+            }
+          },
+          "ignoredRepeatCount": 0,
+          "overflow": false
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "trialIndex": 23,
+        "phase": "test",
+        "condition": "mixed",
+        "startedAtPerfMs": 115100,
+        "endedAtPerfMs": 116210,
+        "durationMs": 1110,
+        "flags": {
+          "timeout": false,
+          "premature": false
+        },
+        "qualityEvents": [],
+        "payload": {
+          "plan": {
+            "index": 23,
+            "phase": "test",
+            "round": 0,
+            "mode": "mixed",
+            "shape": "flower",
+            "side": "right",
+            "transition": "switch",
+            "deadlineMs": 2500
+          },
+          "startedAtPerfMs": 115100,
+          "endedAtPerfMs": 116210,
+          "status": "complete",
+          "stopReason": null,
+          "initialHeld": [],
+          "events": [
+            {
+              "kind": "onset",
+              "atMs": 115110
+            },
+            {
+              "kind": "down",
+              "atMs": 115210,
+              "side": "left",
+              "input": "touch",
+              "token": "response:1",
+              "key": null,
+              "repeat": false
+            },
+            {
+              "kind": "up",
+              "atMs": 115211,
+              "side": "left",
+              "input": "touch",
+              "token": "response:1",
+              "key": null,
+              "repeat": false
+            },
+            {
+              "kind": "finish",
+              "atMs": 116210
+            }
+          ],
+          "state": {
+            "stage": "complete",
+            "onsetMs": 115110,
+            "closedMs": 115210,
+            "completeMs": 116210,
+            "endReason": "response",
+            "response": {
+              "side": "left",
+              "atMs": 115210,
+              "input": "touch",
+              "token": "response:1",
+              "key": null
+            },
+            "held": [],
+            "ignored": {
+              "early": 0,
+              "held": 0,
+              "late": 0
+            }
+          },
+          "ignoredRepeatCount": 0,
+          "overflow": false
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "trialIndex": 24,
+        "phase": "test",
+        "condition": "mixed",
+        "startedAtPerfMs": 120100,
+        "endedAtPerfMs": 121610,
+        "durationMs": 1510,
+        "flags": {
+          "timeout": false,
+          "premature": false
+        },
+        "qualityEvents": [],
+        "payload": {
+          "plan": {
+            "index": 24,
+            "phase": "test",
+            "round": 0,
+            "mode": "mixed",
+            "shape": "flower",
+            "side": "right",
+            "transition": "repeat",
+            "deadlineMs": 2500
+          },
+          "startedAtPerfMs": 120100,
+          "endedAtPerfMs": 121610,
+          "status": "complete",
+          "stopReason": null,
+          "initialHeld": [],
+          "events": [
+            {
+              "kind": "onset",
+              "atMs": 120110
+            },
+            {
+              "kind": "down",
+              "atMs": 120610,
+              "side": "left",
+              "input": "touch",
+              "token": "response:1",
+              "key": null,
+              "repeat": false
+            },
+            {
+              "kind": "up",
+              "atMs": 120611,
+              "side": "left",
+              "input": "touch",
+              "token": "response:1",
+              "key": null,
+              "repeat": false
+            },
+            {
+              "kind": "finish",
+              "atMs": 121610
+            }
+          ],
+          "state": {
+            "stage": "complete",
+            "onsetMs": 120110,
+            "closedMs": 120610,
+            "completeMs": 121610,
+            "endReason": "response",
+            "response": {
+              "side": "left",
+              "atMs": 120610,
+              "input": "touch",
+              "token": "response:1",
+              "key": null
+            },
+            "held": [],
+            "ignored": {
+              "early": 0,
+              "held": 0,
+              "late": 0
+            }
+          },
+          "ignoredRepeatCount": 0,
+          "overflow": false
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "trialIndex": 25,
+        "phase": "test",
+        "condition": "mixed",
+        "startedAtPerfMs": 125100,
+        "endedAtPerfMs": 126310,
+        "durationMs": 1210,
+        "flags": {
+          "timeout": false,
+          "premature": false
+        },
+        "qualityEvents": [],
+        "payload": {
+          "plan": {
+            "index": 25,
+            "phase": "test",
+            "round": 0,
+            "mode": "mixed",
+            "shape": "flower",
+            "side": "left",
+            "transition": "repeat",
+            "deadlineMs": 2500
+          },
+          "startedAtPerfMs": 125100,
+          "endedAtPerfMs": 126310,
+          "status": "complete",
+          "stopReason": null,
+          "initialHeld": [],
+          "events": [
+            {
+              "kind": "onset",
+              "atMs": 125110
+            },
+            {
+              "kind": "down",
+              "atMs": 125310,
+              "side": "right",
+              "input": "keyboard",
+              "token": "key:ArrowRight",
+              "key": "ArrowRight",
+              "repeat": false
+            },
+            {
+              "kind": "up",
+              "atMs": 125311,
+              "side": "right",
+              "input": "keyboard",
+              "token": "key:ArrowRight",
+              "key": "ArrowRight",
+              "repeat": false
+            },
+            {
+              "kind": "finish",
+              "atMs": 126310
+            }
+          ],
+          "state": {
+            "stage": "complete",
+            "onsetMs": 125110,
+            "closedMs": 125310,
+            "completeMs": 126310,
+            "endReason": "response",
+            "response": {
+              "side": "right",
+              "atMs": 125310,
+              "input": "keyboard",
+              "token": "key:ArrowRight",
+              "key": "ArrowRight"
+            },
+            "held": [],
+            "ignored": {
+              "early": 0,
+              "held": 0,
+              "late": 0
+            }
+          },
+          "ignoredRepeatCount": 0,
+          "overflow": false
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "trialIndex": 26,
+        "phase": "test",
+        "condition": "mixed",
+        "startedAtPerfMs": 130100,
+        "endedAtPerfMs": 131310,
+        "durationMs": 1210,
+        "flags": {
+          "timeout": false,
+          "premature": false
+        },
+        "qualityEvents": [],
+        "payload": {
+          "plan": {
+            "index": 26,
+            "phase": "test",
+            "round": 0,
+            "mode": "mixed",
+            "shape": "flower",
+            "side": "left",
+            "transition": "repeat",
+            "deadlineMs": 2500
+          },
+          "startedAtPerfMs": 130100,
+          "endedAtPerfMs": 131310,
+          "status": "complete",
+          "stopReason": null,
+          "initialHeld": [],
+          "events": [
+            {
+              "kind": "onset",
+              "atMs": 130110
+            },
+            {
+              "kind": "down",
+              "atMs": 130310,
+              "side": "right",
+              "input": "keyboard",
+              "token": "key:ArrowRight",
+              "key": "ArrowRight",
+              "repeat": false
+            },
+            {
+              "kind": "up",
+              "atMs": 130311,
+              "side": "right",
+              "input": "keyboard",
+              "token": "key:ArrowRight",
+              "key": "ArrowRight",
+              "repeat": false
+            },
+            {
+              "kind": "finish",
+              "atMs": 131310
+            }
+          ],
+          "state": {
+            "stage": "complete",
+            "onsetMs": 130110,
+            "closedMs": 130310,
+            "completeMs": 131310,
+            "endReason": "response",
+            "response": {
+              "side": "right",
+              "atMs": 130310,
+              "input": "keyboard",
+              "token": "key:ArrowRight",
+              "key": "ArrowRight"
+            },
+            "held": [],
+            "ignored": {
+              "early": 0,
+              "held": 0,
+              "late": 0
+            }
+          },
+          "ignoredRepeatCount": 0,
+          "overflow": false
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "trialIndex": 27,
+        "phase": "test",
+        "condition": "mixed",
+        "startedAtPerfMs": 135100,
+        "endedAtPerfMs": 136710,
+        "durationMs": 1610,
+        "flags": {
+          "timeout": false,
+          "premature": false
+        },
+        "qualityEvents": [],
+        "payload": {
+          "plan": {
+            "index": 27,
+            "phase": "test",
+            "round": 0,
+            "mode": "mixed",
+            "shape": "heart",
+            "side": "left",
+            "transition": "switch",
+            "deadlineMs": 2500
+          },
+          "startedAtPerfMs": 135100,
+          "endedAtPerfMs": 136710,
+          "status": "complete",
+          "stopReason": null,
+          "initialHeld": [],
+          "events": [
+            {
+              "kind": "onset",
+              "atMs": 135110
+            },
+            {
+              "kind": "down",
+              "atMs": 135710,
+              "side": "left",
+              "input": "keyboard",
+              "token": "key:ArrowLeft",
+              "key": "ArrowLeft",
+              "repeat": false
+            },
+            {
+              "kind": "up",
+              "atMs": 135711,
+              "side": "left",
+              "input": "keyboard",
+              "token": "key:ArrowLeft",
+              "key": "ArrowLeft",
+              "repeat": false
+            },
+            {
+              "kind": "finish",
+              "atMs": 136710
+            }
+          ],
+          "state": {
+            "stage": "complete",
+            "onsetMs": 135110,
+            "closedMs": 135710,
+            "completeMs": 136710,
+            "endReason": "response",
+            "response": {
+              "side": "left",
+              "atMs": 135710,
+              "input": "keyboard",
+              "token": "key:ArrowLeft",
+              "key": "ArrowLeft"
+            },
+            "held": [],
+            "ignored": {
+              "early": 0,
+              "held": 0,
+              "late": 0
+            }
+          },
+          "ignoredRepeatCount": 0,
+          "overflow": false
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "trialIndex": 28,
+        "phase": "test",
+        "condition": "mixed",
+        "startedAtPerfMs": 140100,
+        "endedAtPerfMs": 141310,
+        "durationMs": 1210,
+        "flags": {
+          "timeout": false,
+          "premature": false
+        },
+        "qualityEvents": [],
+        "payload": {
+          "plan": {
+            "index": 28,
+            "phase": "test",
+            "round": 0,
+            "mode": "mixed",
+            "shape": "heart",
+            "side": "left",
+            "transition": "repeat",
+            "deadlineMs": 2500
+          },
+          "startedAtPerfMs": 140100,
+          "endedAtPerfMs": 141310,
+          "status": "complete",
+          "stopReason": null,
+          "initialHeld": [],
+          "events": [
+            {
+              "kind": "onset",
+              "atMs": 140110
+            },
+            {
+              "kind": "down",
+              "atMs": 140310,
+              "side": "left",
+              "input": "keyboard",
+              "token": "key:ArrowLeft",
+              "key": "ArrowLeft",
+              "repeat": false
+            },
+            {
+              "kind": "up",
+              "atMs": 140311,
+              "side": "left",
+              "input": "keyboard",
+              "token": "key:ArrowLeft",
+              "key": "ArrowLeft",
+              "repeat": false
+            },
+            {
+              "kind": "finish",
+              "atMs": 141310
+            }
+          ],
+          "state": {
+            "stage": "complete",
+            "onsetMs": 140110,
+            "closedMs": 140310,
+            "completeMs": 141310,
+            "endReason": "response",
+            "response": {
+              "side": "left",
+              "atMs": 140310,
+              "input": "keyboard",
+              "token": "key:ArrowLeft",
+              "key": "ArrowLeft"
+            },
+            "held": [],
+            "ignored": {
+              "early": 0,
+              "held": 0,
+              "late": 0
+            }
+          },
+          "ignoredRepeatCount": 0,
+          "overflow": false
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "trialIndex": 29,
+        "phase": "test",
+        "condition": "mixed",
+        "startedAtPerfMs": 145100,
+        "endedAtPerfMs": 146210,
+        "durationMs": 1110,
+        "flags": {
+          "timeout": false,
+          "premature": false
+        },
+        "qualityEvents": [],
+        "payload": {
+          "plan": {
+            "index": 29,
+            "phase": "test",
+            "round": 0,
+            "mode": "mixed",
+            "shape": "flower",
+            "side": "right",
+            "transition": "switch",
+            "deadlineMs": 2500
+          },
+          "startedAtPerfMs": 145100,
+          "endedAtPerfMs": 146210,
+          "status": "complete",
+          "stopReason": null,
+          "initialHeld": [],
+          "events": [
+            {
+              "kind": "onset",
+              "atMs": 145110
+            },
+            {
+              "kind": "down",
+              "atMs": 145210,
+              "side": "left",
+              "input": "touch",
+              "token": "response:1",
+              "key": null,
+              "repeat": false
+            },
+            {
+              "kind": "up",
+              "atMs": 145211,
+              "side": "left",
+              "input": "touch",
+              "token": "response:1",
+              "key": null,
+              "repeat": false
+            },
+            {
+              "kind": "finish",
+              "atMs": 146210
+            }
+          ],
+          "state": {
+            "stage": "complete",
+            "onsetMs": 145110,
+            "closedMs": 145210,
+            "completeMs": 146210,
+            "endReason": "response",
+            "response": {
+              "side": "left",
+              "atMs": 145210,
+              "input": "touch",
+              "token": "response:1",
+              "key": null
+            },
+            "held": [],
+            "ignored": {
+              "early": 0,
+              "held": 0,
+              "late": 0
+            }
+          },
+          "ignoredRepeatCount": 0,
+          "overflow": false
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "trialIndex": 30,
+        "phase": "test",
+        "condition": "mixed",
+        "startedAtPerfMs": 150100,
+        "endedAtPerfMs": 151610,
+        "durationMs": 1510,
+        "flags": {
+          "timeout": false,
+          "premature": false
+        },
+        "qualityEvents": [],
+        "payload": {
+          "plan": {
+            "index": 30,
+            "phase": "test",
+            "round": 0,
+            "mode": "mixed",
+            "shape": "flower",
+            "side": "right",
+            "transition": "repeat",
+            "deadlineMs": 2500
+          },
+          "startedAtPerfMs": 150100,
+          "endedAtPerfMs": 151610,
+          "status": "complete",
+          "stopReason": null,
+          "initialHeld": [],
+          "events": [
+            {
+              "kind": "onset",
+              "atMs": 150110
+            },
+            {
+              "kind": "down",
+              "atMs": 150610,
+              "side": "left",
+              "input": "touch",
+              "token": "response:1",
+              "key": null,
+              "repeat": false
+            },
+            {
+              "kind": "up",
+              "atMs": 150611,
+              "side": "left",
+              "input": "touch",
+              "token": "response:1",
+              "key": null,
+              "repeat": false
+            },
+            {
+              "kind": "finish",
+              "atMs": 151610
+            }
+          ],
+          "state": {
+            "stage": "complete",
+            "onsetMs": 150110,
+            "closedMs": 150610,
+            "completeMs": 151610,
+            "endReason": "response",
+            "response": {
+              "side": "left",
+              "atMs": 150610,
+              "input": "touch",
+              "token": "response:1",
+              "key": null
+            },
+            "held": [],
+            "ignored": {
+              "early": 0,
+              "held": 0,
+              "late": 0
+            }
+          },
+          "ignoredRepeatCount": 0,
+          "overflow": false
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "trialIndex": 31,
+        "phase": "test",
+        "condition": "mixed",
+        "startedAtPerfMs": 155100,
+        "endedAtPerfMs": 156710,
+        "durationMs": 1610,
+        "flags": {
+          "timeout": false,
+          "premature": false
+        },
+        "qualityEvents": [],
+        "payload": {
+          "plan": {
+            "index": 31,
+            "phase": "test",
+            "round": 0,
+            "mode": "mixed",
+            "shape": "heart",
+            "side": "left",
+            "transition": "switch",
+            "deadlineMs": 2500
+          },
+          "startedAtPerfMs": 155100,
+          "endedAtPerfMs": 156710,
+          "status": "complete",
+          "stopReason": null,
+          "initialHeld": [],
+          "events": [
+            {
+              "kind": "onset",
+              "atMs": 155110
+            },
+            {
+              "kind": "down",
+              "atMs": 155710,
+              "side": "left",
+              "input": "keyboard",
+              "token": "key:ArrowLeft",
+              "key": "ArrowLeft",
+              "repeat": false
+            },
+            {
+              "kind": "up",
+              "atMs": 155711,
+              "side": "left",
+              "input": "keyboard",
+              "token": "key:ArrowLeft",
+              "key": "ArrowLeft",
+              "repeat": false
+            },
+            {
+              "kind": "finish",
+              "atMs": 156710
+            }
+          ],
+          "state": {
+            "stage": "complete",
+            "onsetMs": 155110,
+            "closedMs": 155710,
+            "completeMs": 156710,
+            "endReason": "response",
+            "response": {
+              "side": "left",
+              "atMs": 155710,
+              "input": "keyboard",
+              "token": "key:ArrowLeft",
+              "key": "ArrowLeft"
+            },
+            "held": [],
+            "ignored": {
+              "early": 0,
+              "held": 0,
+              "late": 0
+            }
+          },
+          "ignoredRepeatCount": 0,
+          "overflow": false
+        }
+      }
+    ]
+  },
+  "claimFragment": {
+    "termination": "aborted",
+    "terminationReason": "blur-after-final-raw-before-local-save-ack",
+    "formalCount": 32
+  },
+  "expected": {
+    "state": "limited",
+    "valid": 32,
+    "received": 32
+  },
+  "observed": {
+    "status": "shared-gap-pending-parent",
+    "routedState": "interpretable",
+    "explicitAbortedState": "limited",
+    "routedValid": 32,
+    "explicitAbortedValid": 32
+  }
+}

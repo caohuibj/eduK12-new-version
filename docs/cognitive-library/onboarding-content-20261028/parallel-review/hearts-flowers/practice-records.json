@@ -1,0 +1,154 @@
+{
+  "synthetic": true,
+  "finalCalls": 0,
+  "canRetryPractice": false,
+  "records": [
+    {
+      "contextKey": "independent-hf-practice-review",
+      "phase": "practice",
+      "round": 0,
+      "index": 0,
+      "raw": {
+        "plan": {
+          "index": 0,
+          "phase": "practice",
+          "round": 0,
+          "mode": "heartOnly",
+          "shape": "heart",
+          "side": "left",
+          "transition": null,
+          "deadlineMs": 3500
+        },
+        "startedAtPerfMs": 100,
+        "endedAtPerfMs": 101,
+        "status": "interrupted",
+        "stopReason": "hidden",
+        "initialHeld": [],
+        "events": [],
+        "state": {
+          "stage": "ready",
+          "onsetMs": null,
+          "closedMs": null,
+          "completeMs": null,
+          "endReason": null,
+          "response": null,
+          "held": [],
+          "ignored": {
+            "early": 0,
+            "held": 0,
+            "late": 0
+          }
+        },
+        "ignoredRepeatCount": 0,
+        "overflow": false
+      },
+      "configHash": "092e619eb8c1ce60d0e9ae21f8dae9ed77c9fdd4a1e9073024eb157b09c81839",
+      "protocolSignature": "66a6fa4d8e433bcaa599d7ac663137d18b4573a09acf1274e11a1f8c1381186f",
+      "manifestHash": "978b5b81779e952e705349e6a78a4e3819a159b80b3cec33bdefa760a314f1ea",
+      "realm": {
+        "timeOriginMs": 1793158171816.168,
+        "pageInstanceId": "a1f63f34-295b-4a15-a942-1acdbbb7b31a"
+      },
+      "recordKey": "practice:0:0",
+      "recordDigest": "1f1ca34a43fd760f2344c679beabdd3d98f6585df5e4c53de620fa9d528e7295"
+    },
+    {
+      "contextKey": "independent-hf-practice-review",
+      "phase": "practice",
+      "round": 1,
+      "index": 0,
+      "raw": {
+        "plan": {
+          "index": 0,
+          "phase": "practice",
+          "round": 1,
+          "mode": "heartOnly",
+          "shape": "heart",
+          "side": "left",
+          "transition": null,
+          "deadlineMs": 3500
+        },
+        "startedAtPerfMs": 200,
+        "endedAtPerfMs": 201,
+        "status": "interrupted",
+        "stopReason": "hidden",
+        "initialHeld": [],
+        "events": [],
+        "state": {
+          "stage": "ready",
+          "onsetMs": null,
+          "closedMs": null,
+          "completeMs": null,
+          "endReason": null,
+          "response": null,
+          "held": [],
+          "ignored": {
+            "early": 0,
+            "held": 0,
+            "late": 0
+          }
+        },
+        "ignoredRepeatCount": 0,
+        "overflow": false
+      },
+      "configHash": "092e619eb8c1ce60d0e9ae21f8dae9ed77c9fdd4a1e9073024eb157b09c81839",
+      "protocolSignature": "66a6fa4d8e433bcaa599d7ac663137d18b4573a09acf1274e11a1f8c1381186f",
+      "manifestHash": "978b5b81779e952e705349e6a78a4e3819a159b80b3cec33bdefa760a314f1ea",
+      "realm": {
+        "timeOriginMs": 1793158171816.168,
+        "pageInstanceId": "a1f63f34-295b-4a15-a942-1acdbbb7b31a"
+      },
+      "recordKey": "practice:1:0",
+      "recordDigest": "630db08357a989a94424962628bb91c8a501e7f0c0d551ba1fa808c22ee9947d"
+    },
+    {
+      "contextKey": "independent-hf-practice-review",
+      "phase": "practice",
+      "round": 2,
+      "index": 0,
+      "raw": {
+        "plan": {
+          "index": 0,
+          "phase": "practice",
+          "round": 2,
+          "mode": "heartOnly",
+          "shape": "heart",
+          "side": "left",
+          "transition": null,
+          "deadlineMs": 3500
+        },
+        "startedAtPerfMs": 300,
+        "endedAtPerfMs": 301,
+        "status": "interrupted",
+        "stopReason": "hidden",
+        "initialHeld": [],
+        "events": [],
+        "state": {
+          "stage": "ready",
+          "onsetMs": null,
+          "closedMs": null,
+          "completeMs": null,
+          "endReason": null,
+          "response": null,
+          "held": [],
+          "ignored": {
+            "early": 0,
+            "held": 0,
+            "late": 0
+          }
+        },
+        "ignoredRepeatCount": 0,
+        "overflow": false
+      },
+      "configHash": "092e619eb8c1ce60d0e9ae21f8dae9ed77c9fdd4a1e9073024eb157b09c81839",
+      "protocolSignature": "66a6fa4d8e433bcaa599d7ac663137d18b4573a09acf1274e11a1f8c1381186f",
+      "manifestHash": "978b5b81779e952e705349e6a78a4e3819a159b80b3cec33bdefa760a314f1ea",
+      "realm": {
+        "timeOriginMs": 1793158171816.168,
+        "pageInstanceId": "a1f63f34-295b-4a15-a942-1acdbbb7b31a"
+      },
+      "recordKey": "practice:2:0",
+      "recordDigest": "f1292a454c581ec36f8f0f838a9021073c9bb9664e3e8f947854db01b6f99f27"
+    }
+  ]
+}

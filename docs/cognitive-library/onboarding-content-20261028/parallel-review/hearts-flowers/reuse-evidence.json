@@ -1,0 +1,92 @@
+{
+  "sourceReceipt": "docs/cognitive-library/onboarding-content-20261028/batch-3/evidence/frontend-types.json",
+  "files": [
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/generated/protocol.ts",
+      "oldSHA256": "c08eef7f9fcd1cab02a2b97add5301f3ddf9e6d28e2c985102b250ca94476938",
+      "currentSHA256": "5842d3997c6857191eae5c1cb0d30ccb57be00a7be692fa0ed7fe42c8c1c6bc3",
+      "matches": false
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/capture.ts",
+      "oldSHA256": "d4bd137bdcbcc4813f22f4b4a6df31a32ebce27e983636318d5c8944df3a33d6",
+      "currentSHA256": "d4bd137bdcbcc4813f22f4b4a6df31a32ebce27e983636318d5c8944df3a33d6",
+      "matches": true
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/generated/report.ts",
+      "oldSHA256": "76e3a55d34e0b754f0e3f0252351f79a50bc575dde24734aeb83508e2eb23974",
+      "currentSHA256": "76e3a55d34e0b754f0e3f0252351f79a50bc575dde24734aeb83508e2eb23974",
+      "matches": true
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/contracts.ts",
+      "oldSHA256": "732421b614eb698d1bdd20a71fe04db2f744d47223f93a9ba5616d2d0589207b",
+      "currentSHA256": "732421b614eb698d1bdd20a71fe04db2f744d47223f93a9ba5616d2d0589207b",
+      "matches": true
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/session.ts",
+      "oldSHA256": "8ef5a61ca22d7c9f74263454a56177658d701d719b08935621b470a65b8dfa08",
+      "currentSHA256": "8ef5a61ca22d7c9f74263454a56177658d701d719b08935621b470a65b8dfa08",
+      "matches": true
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/HFShape.tsx",
+      "oldSHA256": "694546f02d874515a4e30bcd44bd429ac14ad51a741f2e14c5bf6c5296c1e9c9",
+      "currentSHA256": "694546f02d874515a4e30bcd44bd429ac14ad51a741f2e14c5bf6c5296c1e9c9",
+      "matches": true
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/HFInstructions.tsx",
+      "oldSHA256": "af14330299c63f3b1e44c2d9ed8cb18c8635297e041ef017738c6b081db19c85",
+      "currentSHA256": "af14330299c63f3b1e44c2d9ed8cb18c8635297e041ef017738c6b081db19c85",
+      "matches": true
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/HFReport.tsx",
+      "oldSHA256": "e1cd1ad9ed7a779de78953f1fe40b4c3d0985fde2a31bad07a0dd873b73c9846",
+      "currentSHA256": "e1cd1ad9ed7a779de78953f1fe40b4c3d0985fde2a31bad07a0dd873b73c9846",
+      "matches": true
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/HeartsFlowersTask.tsx",
+      "oldSHA256": "a3eb89b9554549678ec62ffc894802e41cf3fb18eda2e524f7c4e5971160a6da",
+      "currentSHA256": "a3eb89b9554549678ec62ffc894802e41cf3fb18eda2e524f7c4e5971160a6da",
+      "matches": true
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/generated/envelope.ts",
+      "oldSHA256": "69827824a97258520ffb0da908a280cc3dadd84d7c0b6cb92107b383337963fc",
+      "currentSHA256": "69827824a97258520ffb0da908a280cc3dadd84d7c0b6cb92107b383337963fc",
+      "matches": true
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/NativeHFRunner.tsx",
+      "oldSHA256": "ffa11be2ede7fde0c29d274ccfb2e586ecc02e67b226d9c6fa908ae6f9babdee",
+      "currentSHA256": "ffa11be2ede7fde0c29d274ccfb2e586ecc02e67b226d9c6fa908ae6f9babdee",
+      "matches": true
+    }
+  ],
+  "reportReceipt": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/frontend-direct-types.json",
+  "reportFiles": [
+    {
+      "path": "server-version/frontend/src/modules/cognitive/CognitiveReportVisual.tsx",
+      "oldSHA256": "81d90a08a205ef5f963d9a308c830ec99e451df4ffd0ca83780e3a186e6a74a2",
+      "currentSHA256": "81d90a08a205ef5f963d9a308c830ec99e451df4ffd0ca83780e3a186e6a74a2",
+      "matches": true
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/HFReport.tsx",
+      "oldSHA256": "e1cd1ad9ed7a779de78953f1fe40b4c3d0985fde2a31bad07a0dd873b73c9846",
+      "currentSHA256": "e1cd1ad9ed7a779de78953f1fe40b4c3d0985fde2a31bad07a0dd873b73c9846",
+      "matches": true
+    }
+  ],
+  "browser": {
+    "path": "docs/cognitive-library/onboarding-content-20261028/batch-3/browser/review.json",
+    "sha256": "c73f92ae0929af230f85873ea7878bef5bbe6ad586ee8ba299d4ab8af26238c7",
+    "recordedRawSHA256": "da9460959266595bf45a152ee057cf415adc0187ce1a90d951c899104e620796",
+    "note": "Original browser receipt retains raw digest/counts, API responses and screenshots. Full HF browser raw bytes are not present as a separate JSON fixture in this checkout; no new byte-level readback is claimed. Unchanged UI producers emit canonical key:+key for all global and focused keyboard paths."
+  }
+}

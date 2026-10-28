@@ -1,0 +1,138 @@
+{
+  "baseline": "a67f425269283d8281379fdf8234f9fd6b0acebc",
+  "recordedAt": "2026-10-28T03:37:13.177Z",
+  "node": "v24.21.0",
+  "nodeExecutable": "/tmp/cognitive-node-env/node-v24.21.0-linux-x64/bin/node",
+  "vitest": "4.1.11",
+  "typescript": "5.9.3",
+  "dependencies": "Parent-provided existing links; no dependency install/full byte inventory.",
+  "results": [
+    {
+      "file": "keyboard-original.json",
+      "passed": 1,
+      "failed": 2,
+      "pending": 0
+    },
+    {
+      "file": "keyboard-fixed.json",
+      "passed": 3,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "file": "keyboard-ui.json",
+      "passed": 2,
+      "failed": 0,
+      "pending": 0
+    }
+  ],
+  "commands": [
+    {
+      "cwd": "/workspace/cognitive-review-horizon/server-version/backend",
+      "command": "/tmp/cognitive-node-env/node-v24.21.0-linux-x64/bin/node node_modules/vitest/vitest.mjs run src/__tests__/cognitive/hearts-flowers-keyboard-identity.test.ts --maxWorkers=1 --reporter=json --outputFile=/workspace/cognitive-review-horizon/docs/cognitive-library/onboarding-content-20261028/parallel-review/hearts-flowers/keyboard-original.json",
+      "exit": 1
+    },
+    {
+      "cwd": "/workspace/cognitive-review-horizon/server-version/backend",
+      "command": "/tmp/cognitive-node-env/node-v24.21.0-linux-x64/bin/node node_modules/vitest/vitest.mjs run src/__tests__/cognitive/hearts-flowers-keyboard-identity.test.ts --maxWorkers=1 --reporter=json --outputFile=/workspace/cognitive-review-horizon/docs/cognitive-library/onboarding-content-20261028/parallel-review/hearts-flowers/keyboard-fixed.json",
+      "exit": 0
+    },
+    {
+      "cwd": "/workspace/cognitive-review-horizon/server-version/frontend",
+      "command": "/tmp/cognitive-node-env/node-v24.21.0-linux-x64/bin/node node_modules/vitest/vitest.mjs run src/modules/cognitive/tasks/hearts-flowers/keyboard-identity.test.tsx --maxWorkers=1 --reporter=json --outputFile=/workspace/cognitive-review-horizon/docs/cognitive-library/onboarding-content-20261028/parallel-review/hearts-flowers/keyboard-ui.json",
+      "exit": 0,
+      "sourceAtExecution": "keyboard-ui-before-type-fix.tsx.txt; final type-only fixture/query correction has exact serialized-input proof in ui-type-reuse-proof.json"
+    },
+    {
+      "cwd": "/workspace/cognitive-review-horizon",
+      "command": "/tmp/cognitive-node-env/node-v24.21.0-linux-x64/bin/node docs/cognitive-library/onboarding-content-20261028/parallel-review/hearts-flowers/audit-records.cjs",
+      "exit": 0
+    },
+    {
+      "cwd": "/workspace/cognitive-review-horizon",
+      "command": "/tmp/cognitive-node-env/node-v24.21.0-linux-x64/bin/node docs/cognitive-library/onboarding-content-20261028/parallel-review/hearts-flowers/check-types.cjs backend",
+      "exit": 0,
+      "sources": 50
+    },
+    {
+      "cwd": "/workspace/cognitive-review-horizon",
+      "command": "/tmp/cognitive-node-env/node-v24.21.0-linux-x64/bin/node docs/cognitive-library/onboarding-content-20261028/parallel-review/hearts-flowers/check-types.cjs frontend",
+      "exit": 1,
+      "sources": 71,
+      "diagnostics": 3,
+      "artifact": "frontend-types-original.json"
+    },
+    {
+      "cwd": "/workspace/cognitive-review-horizon",
+      "command": "/tmp/cognitive-node-env/node-v24.21.0-linux-x64/bin/node docs/cognitive-library/onboarding-content-20261028/parallel-review/hearts-flowers/check-types.cjs frontend",
+      "exit": 0,
+      "sources": 71,
+      "diagnostics": 0
+    },
+    {
+      "cwd": "/workspace/cognitive-review-horizon",
+      "command": "/tmp/cognitive-node-env/node-v24.21.0-linux-x64/bin/node server-version/scripts/cognitive/hearts-flowers-content.cjs",
+      "exit": 0,
+      "operation": "Regenerate task protocol projection after source fix."
+    },
+    {
+      "cwd": "/workspace/cognitive-review-horizon",
+      "command": "/tmp/cognitive-node-env/node-v24.21.0-linux-x64/bin/node server-version/scripts/cognitive/hearts-flowers-content.cjs --check",
+      "exit": 0,
+      "stdout": "Hearts-flowers pure protocol/review/report match backend source\n"
+    }
+  ],
+  "baselineProductSHA256": {
+    "server-version/backend/src/modules/cognitive/content-candidates/hearts-flowers/protocol.ts": "872c811cd63d60e932710907ffee777e29e75b2ec35b9aced1d2d31915aa1d4a",
+    "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/generated/protocol.ts": "c08eef7f9fcd1cab02a2b97add5301f3ddf9e6d28e2c985102b250ca94476938",
+    "server-version/backend/src/__tests__/cognitive/hearts-flowers-content.test.ts": "4ae6cf69ef7c47fb716f9f3301cda3d60a04f9a87be3a22ef76a7128b1a61510"
+  },
+  "inputSHA256": {
+    "server-version/backend/src/modules/cognitive/content-candidates/hearts-flowers/protocol.ts": "325509091cd92f96e804817ee320f9baa84b3def5170aaec804df4fd5957757e",
+    "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/generated/protocol.ts": "5842d3997c6857191eae5c1cb0d30ccb57be00a7be692fa0ed7fe42c8c1c6bc3",
+    "server-version/backend/src/__tests__/cognitive/hearts-flowers-content.test.ts": "62ff51f415541633ec0bcd55b1a1b932d7de4968c5f712b5cd1e40f429a5a6d8",
+    "server-version/backend/src/__tests__/cognitive/hearts-flowers-keyboard-identity.test.ts": "ed69a51f04f7c487b53eb3751feb9db3f36b73c129909ebc41f504dfaf56b68a",
+    "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/keyboard-identity.test.tsx": "980973b17bd2f21f5839b6421c9d8804beb3b6003cf86004692aa2bb7acfc663",
+    "server-version/backend/tsconfig.json": "c79ccf595a80514e94936f1ffcd2fa09b57265f0c140d275c81770f494175143",
+    "server-version/frontend/tsconfig.app.json": "97ed0e951ac068a9b2d08635b327932db8e41193f9c82e8291a919b7c68bd62e",
+    "server-version/backend/vitest.config.ts": "26b98b70914617771d41657be8cdf6d7b6d7024c81d1c8a49aeae6a9220cf93b",
+    "server-version/frontend/vitest.config.ts": "3d757d2b1cee6c1c09a3ec7016b296aa159c938f83365e2370a1d423f29917db",
+    "server-version/backend/package-lock.json": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+    "server-version/frontend/package-lock.json": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe"
+  },
+  "artifactSHA256": {
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/hearts-flowers/README.md": "4fb0f1c9619303b6414dbda6259d2206005cfa5a60702c9c26276951c6c62026",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/hearts-flowers/audit-receipt.json": "cacb91b3ac1e4b5008e7058aa5b1f9fdab2ccab0005366fbbcea402de397104a",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/hearts-flowers/audit-records.cjs": "6b6377d23847d5dcbac120d76fdacbef8efefd44f41031ad06b966b77140e1f0",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/hearts-flowers/audit-records.log": "597e26e237845c6b4bb17a5b97707cc3680be3be379c4202e2eed879989a2360",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/hearts-flowers/backend-types.json": "a6eb4345653ac7ff164d359a4495b2ff2489d9857277b7b20b5472f253bfe7f2",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/hearts-flowers/backend-types.log": "a61d2f6c27f19b8ca189378756dc9e04efa09a69056ee8f6c058b870a8cfe333",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/hearts-flowers/check-types.cjs": "4e7e0699fdeb58681922d7ccd5015230ee581e45d7829b4ae49d0850d0844134",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/hearts-flowers/completion-claim-regression.json": "839a2a2aba88ca60e9200ec5338c589f478a4dc5bcb5691b5e67fef91947c0ea",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/hearts-flowers/frontend-types-original.json": "1cf8f131bb9b73bcd164b9caf3374500a649bbf34d6a837e38a7416cbefe12a7",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/hearts-flowers/frontend-types-original.log": "1d2f15a03dce968f9d5c223be26ef0086a1f30e2a2b6e35c6f3a6f6f599cff16",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/hearts-flowers/frontend-types.json": "b2e363762f3cabe1a257a24a26ed6bd4e0c9975fd27fb34f20c65c92a1599317",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/hearts-flowers/frontend-types.log": "1d8d5db659e99c9aff7b8431934979e0b8b76863a70bb4222daf466c25c7472c",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/hearts-flowers/keyboard-fixed.json": "78db64d2e31b8ab6123d728649ff66079815d5a3d3e4605c4868eeb2e89324a3",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/hearts-flowers/keyboard-fixed.log": "51e6e521bf2b47f0442f4f5ba24bb3dacd896805d0f685d721fb12b2c00a67c9",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/hearts-flowers/keyboard-original.json": "5b78984b84d5607636b04462220bcc282b734f2eb6c038df62147b9dfe6b9bbc",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/hearts-flowers/keyboard-original.log": "4fd4515654bc8fc3c99703a487b54d38e8106fb3c5a2030a13162b6a4beeab14",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/hearts-flowers/keyboard-ui-before-type-fix.tsx.txt": "ae39fe0a983e2f829f44e325bb80aeef643dc4a82adb9d40458aebba429d7178",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/hearts-flowers/keyboard-ui.json": "d19789f4d3656ad162dab9851b98211713b6acef41bc01c56228b237d04ac3c2",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/hearts-flowers/keyboard-ui.log": "48b83a998e83d7684b46b79aca1869ca3afe6d5230ac06005efded55f4816ae4",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/hearts-flowers/practice-records.json": "63a18ef7f1e67417ca71d06560af5477a4c24356f9675a5f6bacaec340fd0a40",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/hearts-flowers/public-reports.json": "45eb5056ecfc0be35be053fe98b6f6b88d42bc8a82022b28aa45c440afbf96f6",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/hearts-flowers/representative-inputs.json": "7707dca55f12d61425450d82303085c7bb7c9e107b2fea08fd3bb19cb4de3374",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/hearts-flowers/reuse-evidence.json": "4fcfb8c0fb2bae7e3d3e83e7ab1b0571602e9c2606dd1953ca63de250cb89bb8",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/hearts-flowers/ui-type-reuse-proof.json": "e55090a8bba4779c2dcce29b04435448ae259b386b40281ac1c6d801cfa2b466"
+  },
+  "remaining": {
+    "status": "pending",
+    "action": "Integrate nativeCompletion from sealed claim to authoritative FINAL scorer and freeze into core/hash.",
+    "target": "Parent shared native FINAL pipeline",
+    "reason": "Child is not authorized to edit shared core/archive/registry; parent has accepted ownership.",
+    "alreadyCompleted": "Complete canonical 32-record old fixture with aborted claim fragment and expected limited/32-valid result supplied in completion-claim-regression.json.",
+    "denied": false,
+    "uncertain": false
+  }
+}
