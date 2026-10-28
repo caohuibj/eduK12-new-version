@@ -6,7 +6,7 @@ import {SPATIAL_IDENTITY,SPATIAL_PROTOCOL,spatialPlan,same,signedError,targetAng
 import {spatialConfigSchema,spatialTrialSchema} from './schema'
 const callSchema=z.object({session:z.unknown(),config:z.unknown(),randomSeed:z.string().min(1).max(256),trials:z.array(z.unknown()).max(400)}).strict()
 const near=(a:number,b:number)=>Math.abs(a-b)<1e-6
-const eventsMissing=(events:SpatialRaw['events'])=>events.length<2||events[0].kind==='confirm'
+const eventsMissing=(events:SpatialRaw['events'])=>events.length<2||(events[0].kind!=='select'&&events[0].kind!=='keyboard')
 export function spatialEnvelope(raw:SpatialRaw):TrialEnvelope<SpatialRaw>{return {schemaVersion:1,phase:'test',trialIndex:raw.plan.index,condition:String(raw.plan.setSize),
   startedAtPerfMs:raw.startedAtPerfMs,endedAtPerfMs:raw.endedAtPerfMs,durationMs:raw.endedAtPerfMs-raw.startedAtPerfMs,
   flags:{timeout:false,premature:false},qualityEvents:raw.status==='interrupted'?['resume']:[],payload:raw}}
@@ -30,6 +30,7 @@ export function scoreSpatialMemory(input:AuthoritativeScorerInput<SpatialConfig,
       ||raw.responseOnsetMs!-raw.retentionOnsetMs!<config.retentionMs-1e-6))reasons.push('stage-not-executed')
     const response=raw.response,events=raw.events
     if(eventsMissing(raw.events))reasons.push('selection-not-performed')
+    if(response&&events.length&&!near(response.firstSelectedAtMs,events[0].atMs))reasons.push('first-selection-binding-mismatch')
     if(!response||raw.responseOnsetMs===null||response.firstSelectedAtMs<raw.responseOnsetMs||response.lastAdjustedAtMs<response.firstSelectedAtMs
       ||response.confirmedAtMs<response.lastAdjustedAtMs||!near(response.confirmedAtMs,raw.endedAtPerfMs))reasons.push('no-valid-confirmed-selection')
     if(events.some((v,j)=>v.atMs<raw.responseOnsetMs!||v.atMs>raw.endedAtPerfMs||(j>0&&v.atMs<events[j-1].atMs)))throw Error('Spatial input event clock mismatch')

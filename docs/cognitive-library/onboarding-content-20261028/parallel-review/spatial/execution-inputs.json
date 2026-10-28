@@ -1,0 +1,13 @@
+{
+  "base": "fdc72a9739df7cafc2b238ae45f7d976b3c985f2",
+  "node": "v24.19.0",
+  "recordedAt": "2026-10-28T02:40:51.582Z",
+  "dependencies": "preinstalled source worktree node_modules symlinks; not a full historical node_modules byte manifest",
+  "sha256": {
+    "server-version/backend/src/modules/cognitive/content-candidates/precision-working-memory/scorer.ts": "145ffebd537ef97057166397bd66d5f4526ae83bfc6079ccc637c449b3b580ee",
+    "server-version/backend/src/__tests__/cognitive/spatial-first-selection.test.ts": "71bf9982bdc292a34af2d64b3f5606ae25399f10e44902c77cb6e3c48081eb69",
+    "server-version/frontend/src/modules/cognitive/tasks/precision-working-memory/capture.ts": "0a533a57971120755a55ac54de318c0980404dd218da5378bb64a43a8f2432c2",
+    "server-version/backend/package-lock.json": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+    "server-version/frontend/package-lock.json": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe"
+  }
+}
