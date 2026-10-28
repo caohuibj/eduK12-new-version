@@ -1,0 +1,15 @@
+{
+  "instrument": "Dysfunctional Attitude Scale, Form A (DAS-A), 40-item",
+  "item_count": 40,
+  "options": [1, 2, 3, 4, 5, 6, 7],
+  "dimensions": {},
+  "reverse_items": [2, 6, 12, 17, 24, 29, 30, 35, 37, 40],
+  "reverse_formula": "8-response",
+  "sum_ranges": {
+    "total": [40, 280]
+  },
+  "mean_range": [1, 7],
+  "missing_policy": "complete required per score, otherwise null; product convention (source instructions: omits coded as zero/missing; large omissions invalidate the test; not adopted)",
+  "thresholds": null,
+  "source_note": "Functional (reverse-keyed) items per the official Beck Institute DAS-A scoring table, corroborated by de Graaf et al. (2009) citing Weissman & Beck (1978): items 2/6/12/17/24/29/30/35/37/40 scored in ascending order (totally agree = 1); the remaining 30 dysfunctional items scored descending (totally agree = 7). Total = sum of all 40 (40-280); higher = more dysfunctional attitudes. The 100-item original form and Form B in the same PDF are not implemented."
+}
