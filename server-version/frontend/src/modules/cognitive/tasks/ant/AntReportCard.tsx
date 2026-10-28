@@ -41,5 +41,6 @@ export function AntReportCard({data,contextId,configHash,protocolSignature,langu
     <p>{en?'This describes this session only. Condition differences are not ability levels; the short profile does not establish stable attention networks.':'这里只描述本轮记录，条件差值不是能力等级；体验版不代表稳定的注意网络能力。'}</p>
     <p>{en?'Next time: keep your device still, turn off notifications and look at the central fixation.':'下次可以把设备放稳、关闭通知，让视线留在中央注视点。'}</p>
     <details><summary>{en?'Methods and limits':'方法与限制'}</summary><p>{en?'Wrong responses and timeouts remain in the accuracy denominator. Response times are kept separate for touch, mouse and keyboard. No norms, diagnosis or recruitment predictions are provided.':'错误与超时保留在正确率分母中。触屏、鼠标和键盘的用时分开记录。这里没有常模、诊断或招聘预测结论。'}</p></details>
+    <small className="ant-small">EDUK12.TOP</small>
   </article>
 }

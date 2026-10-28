@@ -2,13 +2,8 @@ import type { AntCaptureTiming,AntPlan,AntTrial,Direction,Input } from './genera
 import type { AntFrozenDisplay } from './display'
 export type AntStage='fixation'|'cue'|'postcue'|'target'|'hold'|'complete'
 export type AntCaptureCore=Omit<AntTrial,'phase'>&{phase:'practice'|'test'}
-export interface AntRawRecord {
-  schemaVersion:1;contextId:string;phase:'practice'|'test';key:string;
-  core:AntCaptureCore;
-  raw:{display:AntFrozenDisplay;frameTimesPerfMs:number[];frameOverflow:boolean;
-    diagnostics:{kind:string;observedAtPerfMs:number;markerAtPerfMs:number}[];fixture:boolean;
-    practice?:{policyVersion:string;round:number;timing:AntCaptureTiming}};
-}
+import type {AntNativeRawRecord as AntRawRecord} from './generated/native-protocol'
+export type {AntNativeRawRecord as AntRawRecord} from './generated/native-protocol'
 /** Paint-owned clock: the host must synchronously draw each tick result in that same rAF callback. */
 export class AntCapture {
   stage:AntStage='fixation'

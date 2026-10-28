@@ -1,13 +1,14 @@
+import './mot.css'
 import React, { useState } from 'react'
 import { motGeometry, type MotCalibration as Calibration } from './generated/protocol'
 import { readMotDisplay } from './display'
 
-export function MotCalibration({language,onConfirm}:{language:'zh'|'en';onConfirm:(value:Calibration)=>void}){
+export function MotCalibration({language,onConfirm,geometryFits}:{language:'zh'|'en';onConfirm:(value:Calibration)=>void;geometryFits?:(value:Calibration)=>boolean}){
   const en=language==='en',[reference,setReference]=useState(190),[distance,setDistance]=useState('350')
   const [confirmed,setConfirmed]=useState(false)
   const calibration=readMotDisplay(language,reference,Number(distance))
   const valid=Number.isFinite(Number(distance))&&Number(distance)>=100&&Number(distance)<=2000
-  const geometry=valid?motGeometry(calibration,window.innerWidth-28,window.innerHeight-242):null
+  const geometry=valid?(geometryFits?{fits:geometryFits(calibration)}:motGeometry(calibration,window.innerWidth-28,window.innerHeight-242)):null
   return <section className="mot-intro">
     <h1>{en?'Set up your viewing distance':'确认屏幕尺寸和观看距离'}</h1>
     <p>{en?'Place the device on a stable surface. Use a physical ruler to adjust the line to exactly 5 cm. Then measure the distance from your eyes to the screen.':'请把设备放稳。用实体尺子测量下方线段，调到正好5厘米，再测量眼睛到屏幕的距离。'}</p>

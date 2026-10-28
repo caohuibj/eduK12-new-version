@@ -1,16 +1,6 @@
 import type { AntConfig,Direction } from './generated/protocol'
-export interface AntViewport { width:number;height:number;devicePixelRatio:number;visualScale:number }
-export interface AntFrozenDisplay {
-  schemaVersion:1;calibrationId:string;geometryVersion:string;geometryHash:string;configHash:string;protocolSignature:string;
-  origin:'host_physical_calibration'|'synthetic_fixture';
-  referenceMm:number;referenceCssPx:number;viewingDistanceMm:number;
-  viewport:AntViewport;
-  /** Host-approved frozen geometry, never resized to fit. Degrees/calibration are not inferred from CSS preview. */
-  geometry:{fieldWidthCssPx:number;fieldHeightCssPx:number;eccentricityCssPx:number;arrowWidthCssPx:number;
-    arrowHeightCssPx:number;arrowSpacingCssPx:number;cueDiameterCssPx:number;strokeCssPx:number;
-    responseWidthCssPx:number;responseHeightCssPx:number;responseGapCssPx:number};
-  inputMap:{leftKey:string;rightKey:string};
-}
+import type {AntViewport,AntFrozenDisplay} from './generated/native-protocol'
+export type {AntViewport,AntFrozenDisplay} from './generated/native-protocol'
 export interface AntDisplayPort { frozen:AntFrozenDisplay;readViewport:()=>AntViewport }
 const hash=(v:string)=>/^[a-f0-9]{64}$/.test(v)
 export function antDisplayProblem(display:AntFrozenDisplay|null,current:AntViewport,config:AntConfig,configHash:string,protocolSignature:string,fixture=false):string|null{

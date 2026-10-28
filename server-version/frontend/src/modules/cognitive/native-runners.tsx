@@ -91,3 +91,12 @@ nativeCognitiveRunnerEntries.push({testType:'visual-search-two-stage',name:'视�
  NativeReportComponent:props=><Suspense fallback={<p role="status">正在读取已保存报告…</p>}><SearchReport {...props}/></Suspense>,
  prepareRunner:async()=>{await loadSearch()},metricDefinitions:[],reportDefinition:{title:'本次记录',headlineMetric:'',summaryMetrics:[],showProductIndex:false},
 })
+
+const loadAnt=()=>import('./tasks/ant/NativeAntRunner')
+const Ant=lazy(()=>loadAnt().then(m=>({default:m.NativeAntRunner})))
+const AntReport=lazy(()=>loadAnt().then(m=>({default:m.NativeContentReport})))
+nativeCognitiveRunnerEntries.push({testType:'ant',name:'线索与箭头',engineVersion:'1.1.0',scoringVersion:'1.1.0',completionMode:'task',
+ RunnerComponent:props=><Suspense fallback={<p role="status">正在准备测验…</p>}><Ant {...props}/></Suspense>,
+ NativeReportComponent:props=><Suspense fallback={<p role="status">正在读取已保存报告…</p>}><AntReport {...props}/></Suspense>,
+ prepareRunner:async()=>{await loadAnt()},metricDefinitions:[],reportDefinition:{title:'这次的线索与箭头记录',headlineMetric:'',summaryMetrics:[],showProductIndex:false},
+})

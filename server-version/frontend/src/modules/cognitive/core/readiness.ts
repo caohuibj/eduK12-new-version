@@ -61,6 +61,7 @@ export const COGNITIVE_READINESS_PROFILES: readonly CognitiveReadinessProfile[] 
   {...profile('horizon-exploration','decision',{globalKeyboardCapture:true,resumeReason:'已开始的任务不重放；仅恢复保存本机已保留的原记录。'}),engineVersion:'0.1.0',retainedRecordRecovery:true},
   {...profile('precision-working-memory','visuospatial',{globalKeyboardCapture:true,resumeReason:'已开始的任务不重放；仅恢复保存本机已保留的原记录。'}),engineVersion:'0.1.0',retainedRecordRecovery:true},
   {...profile('visual-search-two-stage','staged',{globalKeyboardCapture:true,resumeReason:'已开始的任务不重放；仅恢复保存本机已保留的原记录。'}),engineVersion:'0.1.0',retainedRecordRecovery:true},
+  {...profile('ant','staged',{globalKeyboardCapture:true,resumeReason:'ANT 已曝光记录不重放；仅恢复保存原记录与冻结校准。'}),engineVersion:'1.1.0',retainedRecordRecovery:true},
   profile('fake', 'fixed-trial'),
   profile('reaction', 'timed-response', { globalKeyboardCapture: true }),
   profile('memory', 'adaptive', { globalKeyboardCapture: true, resumeReason: '数字广度层级/自适应状态未作为独立安全断点持久化。' }),
