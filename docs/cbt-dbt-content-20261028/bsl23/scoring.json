@@ -1,0 +1,14 @@
+{
+  "instrument": "Borderline Symptom List 23 (BSL-23)",
+  "item_count": 23,
+  "options": [0, 1, 2, 3, 4],
+  "dimensions": {},
+  "reverse_items": [],
+  "sum_ranges": {
+    "total": [0, 92]
+  },
+  "mean_range": [0, 4],
+  "missing_policy": "complete required per score, otherwise null; product convention (official scoring tolerates 2 missing items with SUM.21/MEAN.21; not adopted)",
+  "thresholds": null,
+  "source_note": "Official scoring letter distributed by UW BRTC: total = sum of all 23 items (0-92); mean = average with at least 21 items answered, else treat whole assessment as missing. The BSL Supplement behavior items and the overall 0-100% self-rating on the form are NOT part of BSL-23 scoring and are not implemented."
+}
