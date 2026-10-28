@@ -1,0 +1,49 @@
+{
+  "instrument": "Toronto Mindfulness Scale, 13-item state version",
+  "item_count": 13,
+  "options": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "dimensions": {
+    "curiosity": [
+      3,
+      5,
+      6,
+      10,
+      12,
+      13
+    ],
+    "decentering": [
+      1,
+      2,
+      4,
+      7,
+      8,
+      9,
+      11
+    ]
+  },
+  "reverse_items": [],
+  "reverse_formula": null,
+  "sum_ranges": {
+    "curiosity": [
+      0,
+      24
+    ],
+    "decentering": [
+      0,
+      28
+    ]
+  },
+  "mean_range": [
+    0,
+    4
+  ],
+  "missing_policy": "complete required per score, otherwise null; product convention",
+  "thresholds": null,
+  "source_note": "Official scoring key printed in the paper's Appendix (administered form): 'All items were written in the positively keyed direction, so no reverse scoring of items is required. Curiosity score: the following items are summed: 3, 5, 6, 10, 12, 13. Decentering score: the following items are summed: 1, 2, 4, 7, 8, 9, 11.' Subscale sums 0-24 and 0-28; no total-score composition is given in the paper, so the two subscales are not combined. State measure: items refer to an immediately preceding meditation/practice session ('what you just experienced, just now'); do not mix with trait mindfulness scores. Any missing item yields null for that subscale (complete_required, product-conservative convention, not an author rule); no norms or cutoffs are invented. Form numbering 1-13 is the Appendix administered numbering (Table 1 EFA uses original pool numbers 06-42; mapping recorded in source.md)."
+}
