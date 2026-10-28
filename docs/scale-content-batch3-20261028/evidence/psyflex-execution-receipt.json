@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "base": "8774b1cf158dae1c5eb0f4950044c6ae6d6a18dd",
+  "contentHead": "7152389bf10641e0b403ebdac3491b7fa75e9c42",
+  "node": {
+    "path": "/workspace/eduk12-cloud/tools/node_modules/.bin/node",
+    "version": "v24.21.0",
+    "sha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c"
+  },
+  "environmentLimit": "input manifest conservatively records backend source and lock/config; historical/full node_modules byte inventory not captured; not an attestation of every dependency byte",
+  "checks": [
+    {
+      "id": "psyflex-content",
+      "cwd": "/workspace/eduK12-new-version",
+      "argv": [
+        "/workspace/eduk12-cloud/tools/node_modules/.bin/node",
+        "/workspace/eduK12-new-version/server-version/backend/node_modules/tsx/dist/cli.mjs",
+        "/workspace/eduK12-new-version/docs/scale-content-batch3-20261028/check-psyflex.ts"
+      ],
+      "startedAt": "2026-10-28T04:01:40.208159+00:00",
+      "endedAt": "2026-10-28T04:01:40.778837+00:00",
+      "processExitCode": 0,
+      "beforeAfterIdentical": true,
+      "inputManifest": "psyflex-content.inputs.json.gz",
+      "inputManifestUncompressedSHA256": "88e8a8f09695dcbc661aa10bdc67c57f0f127b24d048ed7833ac43fee2e729b0",
+      "logs": {
+        "stdout": {
+          "path": "psyflex-content.stdout.log",
+          "bytes": 333,
+          "sha256": "b15d448f7491287d7f35c9b4c0972b21de58d896da2fc36f35b07dc8752cb238"
+        },
+        "stderr": {
+          "path": "psyflex-content.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "id": "generated-index-psyflex",
+      "cwd": "/workspace/eduK12-new-version/server-version/backend",
+      "argv": [
+        "/workspace/eduk12-cloud/tools/node_modules/.bin/node",
+        "/workspace/eduK12-new-version/server-version/backend/node_modules/tsx/dist/cli.mjs",
+        "scripts/generate-scale-instruments.ts",
+        "--check"
+      ],
+      "startedAt": "2026-10-28T04:01:41.147864+00:00",
+      "endedAt": "2026-10-28T04:01:41.289691+00:00",
+      "processExitCode": 0,
+      "beforeAfterIdentical": true,
+      "inputManifest": "generated-index-psyflex.inputs.json.gz",
+      "inputManifestUncompressedSHA256": "88e8a8f09695dcbc661aa10bdc67c57f0f127b24d048ed7833ac43fee2e729b0",
+      "logs": {
+        "stdout": {
+          "path": "generated-index-psyflex.stdout.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "path": "generated-index-psyflex.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    }
+  ],
+  "outerInvocation": {
+    "argv": [
+      "python3",
+      "/tmp/run-psyflex-batch3-checks.py"
+    ],
+    "cwd": "/workspace/eduK12-new-version",
+    "shellLogin": false,
+    "processExitCode": 0,
+    "executionToolChunk": "6ed0f0",
+    "sourceCopy": "../commands/run-psyflex-batch3-checks.py.txt"
+  }
+}

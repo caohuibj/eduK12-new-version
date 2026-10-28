@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "applicationHead": "89f62735384019bd7eb38a1ff708a11aaf426a5b",
+  "applicationHead": "7152389bf10641e0b403ebdac3491b7fa75e9c42",
   "acceptedCases": [
     {
       "instrumentKey": "bpses5_zh_cn_research",
@@ -145,9 +145,18 @@
       "sourceBytesUnchangedAtFinal": true,
       "finalSourceSHA256": "13032dbb46a6bf895f4cb962b4cabddf7712e029881f8904e9981ff728c55563",
       "executionContentHead": "89f62735384019bd7eb38a1ff708a11aaf426a5b"
+    },
+    {
+      "instrumentKey": "psyflex6_zh_cn_research",
+      "fullName": "psyflex6_zh_cn_research:1.0.1 approved highest-frequency anchor and preserved numeric scoring",
+      "report": "evidence/psyflex-content.json",
+      "status": "passed",
+      "sourceBytesUnchangedAtFinal": true,
+      "finalSourceSHA256": "778a1d7f4f181e9a25c4041767dfd79f21230620746f694cc75d7e9bf6386210",
+      "executionContentHead": "7152389bf10641e0b403ebdac3491b7fa75e9c42"
     }
   ],
-  "acceptedCaseCount": 16,
+  "acceptedCaseCount": 17,
   "formalCI": "NOT_EXECUTED_NOT_ACTIVATED",
   "production": "DEFERRED_BY_USER",
   "failureHistory": [
@@ -178,5 +187,6 @@
     "database install/publication/idempotence",
     "production deployment"
   ],
-  "dependencies": "Source/lock/config pre/post manifests retained. No claim of complete historical node_modules byte attestation."
+  "dependencies": "Source/lock/config pre/post manifests retained. No claim of complete historical node_modules byte attestation.",
+  "newContentDecision": "User explicitly approved Psy-Flex highest anchor correction in new1.0.1; only that new selected identity and changed generated index checked; previous16 not rerun."
 }

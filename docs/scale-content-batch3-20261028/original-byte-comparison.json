@@ -991,6 +991,36 @@
       "unchanged": true
     },
     {
+      "path": "docs/scale-instruments/research-drafts/psyflex6/1.0.0/README.md",
+      "originalSHA256": "e24e4f45eb56112b2543096e2ac35c64fe38e7ff667247e5673da4099eac27a6",
+      "currentSHA256": "e24e4f45eb56112b2543096e2ac35c64fe38e7ff667247e5673da4099eac27a6",
+      "unchanged": true
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/psyflex6/1.0.0/THIRD_PARTY_LICENSE.md",
+      "originalSHA256": "9f7c5e0c87edfefeb335a8913013146a9ad1af23632f9b77ca83114a362bc0da",
+      "currentSHA256": "9f7c5e0c87edfefeb335a8913013146a9ad1af23632f9b77ca83114a362bc0da",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/psyflex6_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+      "originalSHA256": "9f7c5e0c87edfefeb335a8913013146a9ad1af23632f9b77ca83114a362bc0da",
+      "currentSHA256": "9f7c5e0c87edfefeb335a8913013146a9ad1af23632f9b77ca83114a362bc0da",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/psyflex6_zh_cn_research/1.0.0/instrument.ts",
+      "originalSHA256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+      "currentSHA256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/psyflex6_zh_cn_research/1.0.0/source.json",
+      "originalSHA256": "f0d7e20eab0a65684f24b6cc4bcf859d14299a8ec2e59a1b2897a02ffbcfde5d",
+      "currentSHA256": "f0d7e20eab0a65684f24b6cc4bcf859d14299a8ec2e59a1b2897a02ffbcfde5d",
+      "unchanged": true
+    },
+    {
       "path": "docs/scale-instruments/research-drafts/spane12/1.0.0/README.md",
       "originalSHA256": "888a9a0401eee12e7d8c8cc5199000e7ff1e5809fc90b54bfa47ba99a88d797b",
       "currentSHA256": "888a9a0401eee12e7d8c8cc5199000e7ff1e5809fc90b54bfa47ba99a88d797b",
@@ -1093,6 +1123,6 @@
       "unchanged": true
     }
   ],
-  "count": 182,
+  "count": 187,
   "note": "Only existing uninstalled candidate source bindings/release preparation changed in place; every version that received substantive presentation/definition changes has a new identity and unchanged original bytes."
 }

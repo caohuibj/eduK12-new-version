@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "policy": "For identical content hashes and versions, reuse this content audit; do not re-review all items/scoring/reports at deployment. Changed content invalidates only its affected review. This is not a formal CI/deployment success or a new scientific/rights claim.",
-  "preparedAndPriorContentPackages": 24,
+  "preparedAndPriorContentPackages": 25,
   "productionState": "DEFERRED_BY_USER_NO_WRITES",
   "requiredAtActualDeployment": [
     "approved merged artifact and exact source hashes",
@@ -131,7 +131,7 @@
     {
       "instrumentKey": "apq42_parent_global_zh_cn_research",
       "instrumentVersion": "1.0.1",
-      "sourceCommit": "89f62735384019bd7eb38a1ff708a11aaf426a5b",
+      "sourceCommit": "7152389bf10641e0b403ebdac3491b7fa75e9c42",
       "sourcePath": "server-version/backend/src/modules/scale/instruments/apq42_parent_global_zh_cn_research/1.0.1/source.json",
       "sourceSHA256": "13032dbb46a6bf895f4cb962b4cabddf7712e029881f8904e9981ff728c55563",
       "reportVersion": "1.0.1",
@@ -143,7 +143,7 @@
     {
       "instrumentKey": "bpses5_zh_cn_research",
       "instrumentVersion": "1.0.0",
-      "sourceCommit": "89f62735384019bd7eb38a1ff708a11aaf426a5b",
+      "sourceCommit": "7152389bf10641e0b403ebdac3491b7fa75e9c42",
       "sourcePath": "server-version/backend/src/modules/scale/instruments/bpses5_zh_cn_research/1.0.0/source.json",
       "sourceSHA256": "db2b4fa65e75897ebb6f84e89f276c64bedf545912c2d9770ee5ba2dfa0b6220",
       "reportVersion": "1.0.0",
@@ -155,7 +155,7 @@
     {
       "instrumentKey": "brcs4_zh_cn_research",
       "instrumentVersion": "1.0.0",
-      "sourceCommit": "89f62735384019bd7eb38a1ff708a11aaf426a5b",
+      "sourceCommit": "7152389bf10641e0b403ebdac3491b7fa75e9c42",
       "sourcePath": "server-version/backend/src/modules/scale/instruments/brcs4_zh_cn_research/1.0.0/source.json",
       "sourceSHA256": "2f371fcf26aa89d3bbbdff6fa8ee987cc54715375df27fee89b38a024aab45d9",
       "reportVersion": "1.0.0",
@@ -167,7 +167,7 @@
     {
       "instrumentKey": "cfq7_zh_cn_research",
       "instrumentVersion": "1.0.1",
-      "sourceCommit": "89f62735384019bd7eb38a1ff708a11aaf426a5b",
+      "sourceCommit": "7152389bf10641e0b403ebdac3491b7fa75e9c42",
       "sourcePath": "server-version/backend/src/modules/scale/instruments/cfq7_zh_cn_research/1.0.1/source.json",
       "sourceSHA256": "097a3dbbef82311542607538926310b64985ce17e3a124670bd6c4a4ab4ad052",
       "reportVersion": "1.0.1",
@@ -179,7 +179,7 @@
     {
       "instrumentKey": "dbt_wccl59_zh_tw_official_research",
       "instrumentVersion": "1.0.1",
-      "sourceCommit": "89f62735384019bd7eb38a1ff708a11aaf426a5b",
+      "sourceCommit": "7152389bf10641e0b403ebdac3491b7fa75e9c42",
       "sourcePath": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.1/source.json",
       "sourceSHA256": "cd7d66e49e3d22cb0a23fd947d18c6ea9069b5e6a86f436e11ea92fb660f5546",
       "reportVersion": "1.0.1",
@@ -191,7 +191,7 @@
     {
       "instrumentKey": "djgls6_zh_cn_research",
       "instrumentVersion": "1.0.1",
-      "sourceCommit": "89f62735384019bd7eb38a1ff708a11aaf426a5b",
+      "sourceCommit": "7152389bf10641e0b403ebdac3491b7fa75e9c42",
       "sourcePath": "server-version/backend/src/modules/scale/instruments/djgls6_zh_cn_research/1.0.1/source.json",
       "sourceSHA256": "b6b16ea4c28cccfb795af036ec675ad33143db868fc1f9c4912bc0ba04e337de",
       "reportVersion": "1.0.1",
@@ -203,7 +203,7 @@
     {
       "instrumentKey": "ebq16_zh_cn_research",
       "instrumentVersion": "1.0.2",
-      "sourceCommit": "89f62735384019bd7eb38a1ff708a11aaf426a5b",
+      "sourceCommit": "7152389bf10641e0b403ebdac3491b7fa75e9c42",
       "sourcePath": "server-version/backend/src/modules/scale/instruments/ebq16_zh_cn_research/1.0.2/source.json",
       "sourceSHA256": "fcf25fd4ed02e10d3f284344eb1b577afff45d176168bfd739ee525b395e48ec",
       "reportVersion": "1.0.4",
@@ -215,7 +215,7 @@
     {
       "instrumentKey": "ipip_emotion_based_decision9_zh_cn_research",
       "instrumentVersion": "1.0.1",
-      "sourceCommit": "89f62735384019bd7eb38a1ff708a11aaf426a5b",
+      "sourceCommit": "7152389bf10641e0b403ebdac3491b7fa75e9c42",
       "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_emotion_based_decision9_zh_cn_research/1.0.1/source.json",
       "sourceSHA256": "fc35ef54f3d0ddb142cd63708b872568b42742551770f4f84b56e706a8e95d87",
       "reportVersion": "1.0.0",
@@ -227,7 +227,7 @@
     {
       "instrumentKey": "ipip_negative_expressivity10_zh_cn_research",
       "instrumentVersion": "1.0.1",
-      "sourceCommit": "89f62735384019bd7eb38a1ff708a11aaf426a5b",
+      "sourceCommit": "7152389bf10641e0b403ebdac3491b7fa75e9c42",
       "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_negative_expressivity10_zh_cn_research/1.0.1/source.json",
       "sourceSHA256": "f999fd7b0690224f4abdd441d9560df6441c2bcc84471782b75b1e1a147905a4",
       "reportVersion": "1.0.0",
@@ -239,7 +239,7 @@
     {
       "instrumentKey": "ipip_positive_expressivity9_zh_cn_research",
       "instrumentVersion": "1.0.1",
-      "sourceCommit": "89f62735384019bd7eb38a1ff708a11aaf426a5b",
+      "sourceCommit": "7152389bf10641e0b403ebdac3491b7fa75e9c42",
       "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_positive_expressivity9_zh_cn_research/1.0.1/source.json",
       "sourceSHA256": "95ebdfc943edd53639fa8adbd49718c60d7aee29c7f063085b33619fa57018f2",
       "reportVersion": "1.0.1",
@@ -251,7 +251,7 @@
     {
       "instrumentKey": "ipip_responsive_distress10_zh_cn_research",
       "instrumentVersion": "1.0.1",
-      "sourceCommit": "89f62735384019bd7eb38a1ff708a11aaf426a5b",
+      "sourceCommit": "7152389bf10641e0b403ebdac3491b7fa75e9c42",
       "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_responsive_distress10_zh_cn_research/1.0.1/source.json",
       "sourceSHA256": "e9df843e53ef5761494bf07f4c4d448ae236ab84eb7b43a4105c32f6ec6ac139",
       "reportVersion": "1.0.0",
@@ -263,7 +263,7 @@
     {
       "instrumentKey": "ipip_responsive_joy10_zh_cn_research",
       "instrumentVersion": "1.0.0",
-      "sourceCommit": "89f62735384019bd7eb38a1ff708a11aaf426a5b",
+      "sourceCommit": "7152389bf10641e0b403ebdac3491b7fa75e9c42",
       "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_responsive_joy10_zh_cn_research/1.0.0/source.json",
       "sourceSHA256": "bdc9e05a94bf4b9646cb2e3fab7ee379184da69782bfbcbca3e86f35d9c7c2e6",
       "reportVersion": "1.0.1",
@@ -275,7 +275,7 @@
     {
       "instrumentKey": "kseg6_zh_cn_research",
       "instrumentVersion": "1.0.1",
-      "sourceCommit": "89f62735384019bd7eb38a1ff708a11aaf426a5b",
+      "sourceCommit": "7152389bf10641e0b403ebdac3491b7fa75e9c42",
       "sourcePath": "server-version/backend/src/modules/scale/instruments/kseg6_zh_cn_research/1.0.1/source.json",
       "sourceSHA256": "c411659f3ecf355ee3c11204e9bd4c7ad5c571f44a4e03c24c3a5d32ee332dd8",
       "reportVersion": "1.0.1",
@@ -287,7 +287,7 @@
     {
       "instrumentKey": "maia2_37_zh_cn_research",
       "instrumentVersion": "1.0.1",
-      "sourceCommit": "89f62735384019bd7eb38a1ff708a11aaf426a5b",
+      "sourceCommit": "7152389bf10641e0b403ebdac3491b7fa75e9c42",
       "sourcePath": "server-version/backend/src/modules/scale/instruments/maia2_37_zh_cn_research/1.0.1/source.json",
       "sourceSHA256": "eb69bb29aacf58cc9fdf4fb728de99b4bd7ae34fe7994085ef50f521c9e56ae0",
       "reportVersion": "1.0.0",
@@ -297,9 +297,21 @@
       "state": "PREPARED_SOURCE_ONLY; no DB installation/publication"
     },
     {
+      "instrumentKey": "psyflex6_zh_cn_research",
+      "instrumentVersion": "1.0.1",
+      "sourceCommit": "7152389bf10641e0b403ebdac3491b7fa75e9c42",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/psyflex6_zh_cn_research/1.0.1/source.json",
+      "sourceSHA256": "778a1d7f4f181e9a25c4041767dfd79f21230620746f694cc75d7e9bf6386210",
+      "reportVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "contentReview": "this batch content refinement accepted by bounded direct evidence; not an expert/scientific/license approval",
+      "evidenceDirectory": "docs/scale-content-batch3-20261028",
+      "state": "PREPARED_SOURCE_ONLY; no DB installation/publication"
+    },
+    {
       "instrumentKey": "spane12_zh_cn_research",
       "instrumentVersion": "1.0.1",
-      "sourceCommit": "89f62735384019bd7eb38a1ff708a11aaf426a5b",
+      "sourceCommit": "7152389bf10641e0b403ebdac3491b7fa75e9c42",
       "sourcePath": "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.1/source.json",
       "sourceSHA256": "e250bbf45ccc05980494cfc8dc83f3cd15805a054ff2dbd59cbf094723025705",
       "reportVersion": "1.0.1",
@@ -311,7 +323,7 @@
     {
       "instrumentKey": "sswq16_zh_cn_research",
       "instrumentVersion": "1.0.1",
-      "sourceCommit": "89f62735384019bd7eb38a1ff708a11aaf426a5b",
+      "sourceCommit": "7152389bf10641e0b403ebdac3491b7fa75e9c42",
       "sourcePath": "server-version/backend/src/modules/scale/instruments/sswq16_zh_cn_research/1.0.1/source.json",
       "sourceSHA256": "d4256b5c0c3de791b85cd24c6392d99ce998705c1f4926ca39508d45f905a675",
       "reportVersion": "1.0.1",

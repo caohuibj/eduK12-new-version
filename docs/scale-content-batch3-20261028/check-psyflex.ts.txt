@@ -1,0 +1,27 @@
+import assert from 'node:assert/strict'
+import {readFileSync,writeFileSync} from 'node:fs'
+import {execFileSync} from 'node:child_process'
+import {createHash} from 'node:crypto'
+import {SCALE_INSTRUMENT_REGISTRY as registry} from '../../server-version/backend/src/modules/scale/onboarding/instrument-registry'
+const dir='docs/scale-content-batch3-20261028'
+const record=JSON.parse(readFileSync(`${dir}/packages/psyflex6_zh_cn_research.json`,'utf8'))
+const result:any={cases:[]}
+const item:any={fullName:'psyflex6_zh_cn_research:1.0.1 approved highest-frequency anchor and preserved numeric scoring',status:'failed'}
+try {
+ const oldBytes=execFileSync('git',['show',`${record.sourceSHA}:${record.originalSource}`]);const old=JSON.parse(oldBytes.toString())
+ assert.deepEqual(readFileSync(record.originalSource),oldBytes)
+ const source=registry.getSource(record.sourceKey,'1.0.1')!
+ assert.ok(source)
+ const expected=structuredClone(old.executable.definition.responseSets);assert.equal(expected[0].options[4].label,'总是如此');expected[0].options[4].label='非常经常'
+ assert.deepEqual(source.executable!.definition.responseSets,expected)
+ for(const key of ['items','scoring','report'] as const) assert.deepEqual(source.executable!.definition[key],old.executable.definition[key])
+ assert.deepEqual(source.executable!.goldenCases,old.executable.goldenCases)
+ assert.deepEqual(source.instruction,old.instruction)
+ assert.equal(source.localization!.localizationVersion,'1.0.1');assert.equal(source.executable!.definition.versionAxes!.localizationVersion,'1.0.1')
+ assert.equal(source.localization!.reviewStatus,old.localization.reviewStatus);assert.equal(source.localization!.expertReviewStatus,old.localization.expertReviewStatus)
+ const validation=registry.getValidation(record.sourceKey,'1.0.1')!;assert.equal(validation.valid,true,JSON.stringify(validation.issues))
+ item.status='passed';item.issues=validation.issues;item.goldenCasesConsumedOnce=source.executable!.goldenCases.map(x=>x.name)
+ item.sourceSHA256=createHash('sha256').update(readFileSync(record.preparedSource)).digest('hex')
+}catch(error){item.error=error instanceof Error?error.stack:String(error)}
+result.cases.push(item);result.passed=item.status==='passed'?1:0;result.failed=1-result.passed
+writeFileSync(`${dir}/evidence/psyflex-content.json`,JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify(result));process.exitCode=result.failed?1:0

@@ -3,8 +3,8 @@
   "scope": "78 distinct latest instrumentKeys from the historical fixed candidate source, not 85 versions or current installed count",
   "newAuditFiles": 69,
   "counts": {
-    "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING": 53,
-    "PREPARED_CONTENT_CANDIDATE": 16,
+    "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING": 52,
+    "PREPARED_CONTENT_CANDIDATE": 17,
     "PRIOR_REVIEW_FROZEN_NOT_REAUDITED": 8,
     "EXISTING_PR362_REVIEW_REUSED_NOT_REAUDITED": 1
   },
@@ -1272,11 +1272,13 @@
       ],
       "database": "NOT_EXECUTED_THIS_BATCH",
       "production": "DEFERRED_BY_USER",
-      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "state": "PREPARED_CONTENT_CANDIDATE",
+      "preparedVersion": "1.0.1",
       "audit": {
         "path": "audits/audit-psyflex6-batch3.json",
         "sha256": "fabd6df7b744ec96278037ec6bc58d7b317728379ce28a77bb59efb5fd221714"
-      }
+      },
+      "manifest": "packages/psyflex6_zh_cn_research.json"
     },
     {
       "instrumentKey": "res9_zh_cn",
