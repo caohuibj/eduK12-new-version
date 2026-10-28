@@ -1,0 +1,13 @@
+{
+  "instrument": "Distress Tolerance Scale (DTS), 15-item",
+  "item_count": 15,
+  "options": [1, 2, 3, 4, 5],
+  "dimensions": {},
+  "reverse_items": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+  "reverse_formula": "6-response",
+  "sum_ranges": {},
+  "mean_range": [1, 5],
+  "missing_policy": "complete required per score, otherwise null; product convention",
+  "thresholds": null,
+  "source_note": "All 15 items uniformly reverse-scored (6 - response) and averaged; higher mean indicates greater distress tolerance, per the standard scoring direction for this instrument. The four published subscales (Tolerance / Absorption / Appraisal / Regulation) are NOT implemented in this draft: their item-to-subscale assignment could not be verified against the original 2005 paper, which is not open access. Verify against the original before adding subscale scores."
+}
