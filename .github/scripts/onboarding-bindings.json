@@ -4,7 +4,7 @@
   "enabled": false,
   "base": "c5c28f85085e53de1b7be4ed821489accaae7228",
   "product": "ebf90d6dd7d22cc0a907d8a258f28e95d70f5e64",
-  "controlCheckpoint": "d00cfaaebeb786d6b763fe50f250f0c7748e92eb",
+  "controlCheckpoint": "27145dbd57ee83c493157f024e9ca900dc0c1744",
   "components": {
     "backend": "b7fe981eea351ebb94232571479894e921e53bcd",
     "frontend": "cf228766bf881fd1a4d9e922fc8171488a27756b"
