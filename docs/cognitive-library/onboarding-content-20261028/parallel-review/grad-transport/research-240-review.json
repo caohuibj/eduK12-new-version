@@ -1,0 +1,19 @@
+{
+  "source": "docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/raw/research-240-archive.json.gz",
+  "sourceSHA256": "2c6ff2998506e1bcb10f2315720c84b723728b4405934538295468aceb0a4c7b",
+  "node": "v24.21.0",
+  "reviewComplete": true,
+  "presented": 300,
+  "settled": 300,
+  "assigned": 268,
+  "ignored": {
+    "held": 0,
+    "repeat": 0,
+    "multiple": 0,
+    "debounce": 0,
+    "unassigned": 0,
+    "wrongKey": 0
+  },
+  "scorerInvocations": 0,
+  "practiceNote": "Raw schema checked by size generator; root may use one complete Grad wire/DB/archive test. This check invokes reviewGrad once for research240 only; no scoreGrad/gradStatistics called."
+}

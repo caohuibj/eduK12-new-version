@@ -1,0 +1,32 @@
+{
+  "success": true,
+  "kind": "REAL_BROWSER_COMPRESSIONSTREAM_SAVED_RAW_ONLY",
+  "node": "v24.21.0",
+  "browser": "151.0.7922.173",
+  "browserSandbox": true,
+  "source": "docs/cognitive-library/onboarding-content-20261028/parallel-review/grad-transport/raw/research-240-archive.json.gz",
+  "sourceSHA256": "2c6ff2998506e1bcb10f2315720c84b723728b4405934538295468aceb0a4c7b",
+  "sourceCanonicalRawBytes": 3667150,
+  "sourceCanonicalRawSHA256": "4b785da9e22fafafa9cf8a03dd4caa5736fc526295280b00a7d01a697cec0e3f",
+  "browserEnvelopeBytes": 283812,
+  "browserEnvelopeSHA256": "9efcd6af9efe1900bbf7b2f3debf3a2c419cfae0cf964fb1e145d2c96511d9f2",
+  "artifact": "browser-wire-envelope.json.gz",
+  "artifactSHA256": "26f82fb1f6b7d0c20b00e518cd642de55e6b8d7ad6e1f83564c5b9a86c5f26e7",
+  "wire": {
+    "kind": "GRADCPT_RAW_WIRE",
+    "version": 1,
+    "codec": "gzip-canonical-json-v1",
+    "decodedLength": 3667150,
+    "sha256": "4b785da9e22fafafa9cf8a03dd4caa5736fc526295280b00a7d01a697cec0e3f"
+  },
+  "canonicalFINALBytes": 283825,
+  "backendDecodedEveryCanonicalByteEqual": true,
+  "scorerInvocations": 0,
+  "notExecuted": [
+    "Stimulus rendering",
+    "300/100 product journey",
+    "scoreGrad",
+    "HTTP FINAL/DB/archive"
+  ],
+  "errors": []
+}
