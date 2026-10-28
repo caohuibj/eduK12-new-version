@@ -685,3 +685,26 @@ export type LetternumseriesTrialPayload = {
   responseDurationMs: number
   interrupted: boolean
 }
+
+/** Wordanalogy 冻结 config（与后端 wordanalogy.config schema 一致）。 */
+export interface WordanalogyConfig {
+  totalTrials: number
+  stimulusSetVersion: string
+  fixationMs: number
+  timeoutMs: number
+  validRtFloorMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+/** Wordanalogy 单 trial payload（与后端 wordanalogy.trial schema 一致）。 */
+export type WordanalogyTrialPayload = {
+  itemId: string
+  responseIndex: number | null
+  rtMs: number | null
+  interrupted: boolean
+}
