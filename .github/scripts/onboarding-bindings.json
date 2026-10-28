@@ -2,8 +2,8 @@
   "pr": 376,
   "enabled": true,
   "base": "90c0a9a5c0ba24a5a9d8cb8003279dfb668650ba",
-  "product": "bbd83b20ef9a0a98863458147858c3e7254f238d",
-  "controlCheckpoint": "44e508c2cc8105d9f3c09ed06a0711cb3a9d93f0",
+  "product": "301b1d0cc051d06ed571e9db820dd30e9f42362e",
+  "controlCheckpoint": "b9e8122a040f20b53658afc11f1257000b56bd9f",
   "source": {
     "docs/performance/education-observer-journeys-20261028/CI-PLAN.md": {
       "before": null,
@@ -11,7 +11,7 @@
     },
     "docs/performance/education-observer-journeys-20261028/REVIEW.md": {
       "before": null,
-      "after": "ef8a6ea283bffb4c9009f78b5b2cd267a16b9fe8"
+      "after": "eed1449d01a275337b5a787b145ee08835e9a72e"
     },
     "docs/performance/education-observer-journeys-20261028/evidence/backend-types-r1.json": {
       "before": null,
@@ -20,6 +20,10 @@
     "docs/performance/education-observer-journeys-20261028/evidence/backend-types-r1.log": {
       "before": null,
       "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    "docs/performance/education-observer-journeys-20261028/evidence/ci-r1-browser.json": {
+      "before": null,
+      "after": "0a5dca87c8e0dc87590f22801fc3f6058ac98b68"
     },
     "docs/performance/education-observer-journeys-20261028/evidence/observer-expert-http-r1-execution.json": {
       "before": null,
@@ -79,7 +83,7 @@
     },
     "server-version/frontend/src/modules/reporting/report-ui.css": {
       "before": "a876bba2f434287b0104c903ab871ec95da689c7",
-      "after": "342a17528ce99369bc44ddeca98e65a8f0e34557"
+      "after": "4edbb1550c510e32034d296df62d80fd09420445"
     }
   },
   "controlBefore": {
@@ -97,6 +101,6 @@
   },
   "components": {
     "backend": "e2812baf6d8ff641ff40f32443ee318a56e28563",
-    "frontend": "b2edc1c7d8d2b84866eb7a0096209c78e86bb105"
+    "frontend": "41f956f8c717c1e6829998bfab896bd1a4e50af1"
   }
 }
