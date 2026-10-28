@@ -281,6 +281,12 @@ const SCORING_DECLARATIONS: Record<string, CognitiveScoringContractDeclaration> 
     runtimeReconstructableFacts: ['题目内容与正确项（frozen bank + seed 抽题顺序）'],
     serverDerivedFacts: ['正确性判定', 'metrics（accuracy/medianRtMs）', 'quality flags'],
   },
+  semanticfluency: {
+    testType: 'semanticfluency',
+    clientObservedFacts: ['自由输入的词序列', '输入用时', 'interrupted'],
+    runtimeReconstructableFacts: ['类别轮次（seed/config）', '词库与归一化口径（frozen bank）'],
+    serverDerivedFacts: ['归一化匹配/去重/侵入判定', 'metrics（uniqueValidPerTrial/intrusionRate）', 'quality flags'],
+  },
 }
 
 // 当前通用事实（所有任务一致）：完整加密 trial payload、v2 trial envelope qualityEvents、
@@ -486,6 +492,11 @@ const RESEARCH_CAPTURE_DECLARATIONS: Record<string, CognitiveResearchCaptureDecl
     testType: 'wordmeaning',
     currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次响应与 raw RT'],
     futureCaptureFacts: ['真实 input modality', 'device provenance', 'viewport/dpr'],
+  },
+  semanticfluency: {
+    testType: 'semanticfluency',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐词输入序列与用时'],
+    futureCaptureFacts: ['逐词输入间隔时序', '输入法中间态', 'device/keyboard provenance'],
   },
 }
 

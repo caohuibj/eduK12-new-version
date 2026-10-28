@@ -731,3 +731,24 @@ export type WordmeaningTrialPayload = {
   rtMs: number | null
   interrupted: boolean
 }
+
+/** Semanticfluency 冻结 config（与后端 semanticfluency.config schema 一致）。 */
+export interface SemanticfluencyConfig {
+  totalTrials: number
+  durationMs: number
+  stimulusSetVersion: string
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+/** Semanticfluency 单 trial payload（与后端 semanticfluency.trial schema 一致）。 */
+export type SemanticfluencyTrialPayload = {
+  category: 'animals' | 'fruits'
+  responses: string[]
+  responseDurationMs: number
+  interrupted: boolean
+}
