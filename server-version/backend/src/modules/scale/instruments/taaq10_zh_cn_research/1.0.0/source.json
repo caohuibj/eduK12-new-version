@@ -1,0 +1,165 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "taaq10_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "Teachers' Acceptance and Action Questionnaire (TAAQ)",
+      "abbreviation": "TAAQ",
+      "instrumentFamily": "TAAQ"
+    },
+    "construct": {
+      "primaryDomain": "SELF_REGULATION",
+      "secondaryDomains": [],
+      "constructDefinition": "教师教学情境中的经验性回避/心理不灵活性：由 AAQ 适配到教学情境（如学生拒绝配合、课堂干扰等场景下的接纳与行动）。教师版 ACT 过程指标，不测教学能力或绩效。",
+      "constructLevel": "BROAD_DOMAIN",
+      "constructOverlapTags": [
+        "domain:act",
+        "domain:self_regulation",
+        "population:teacher",
+        "response:teacher_self",
+        "use:reflection",
+        "use:research",
+        "language_validation:chinese_working_translation",
+        "construct:act_teacher_experiential_avoidance",
+        "experiential_avoidance",
+        "self_report"
+      ]
+    },
+    "population": {
+      "populationNotes": "原版为法语教师样本（Grégoire 等）；葡萄牙语 TAAQ-PT 与日语版见二手文献与 ACT Japan 工具页。此记录未取得原始题文。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "PARTIAL"
+    },
+    "administration": {
+      "itemCount": 10,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "PAPER"
+      ],
+      "timeFrame": "教学情境，无指定回忆期",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "作答量尺与题序待取得原始题本后登记。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "SUPPORTED",
+          "notes": "原文研究支持；中文工作译文尚未验证，且题文尚未入库。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "反馈仅作普遍生活化反思。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "gregoire-taaq",
+        "evidenceType": "STRUCTURAL_VALIDITY",
+        "population": "French-speaking teachers (original)",
+        "locale": "fr",
+        "territory": "CA",
+        "studyDesign": "AAQ 适配到教学情境的教师版；题数与结构按 TAAQ-PT（2020）与 ACT Japan TAAQ-J（2024）二手文献转述为 10 题，未从原始出处核实。",
+        "rating": "MIXED",
+        "citation": "Grégoire S, Bouffard T, Vezeau C (约2018). Canadian Journal of Behavioural Science.",
+        "url": "https://www.researchgate.net/publication/341327844",
+        "notes": "以上证据均针对原语言版本，不外推到本中文工作译稿。"
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "本记录未复制题文；样稿仅在报告设计中示意维度名称与模拟分数。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "原始题文（法语）与官方施测包未在公开渠道获得：ACBS 的 TAAQ 日语版页面已失效（410），ResearchGate 的 TAAQ-PT 论文无法程序化获取，原版期刊付费。按 ERQ-CA/CCNES-T 先例登记为 catalog-only，只登记结构概述与升级路径，不登记题目主题索引（题数与措辞未从原始出处核实）。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "taaq10-v1",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "taaq10-v1",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "taaq10-v1",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL"
+    ],
+    "notes": [
+      "原始题文（法语）与官方施测包未在公开渠道获得：ACBS 的 TAAQ 日语版页面已失效（410），ResearchGate 的 TAAQ-PT 论文无法程序化获取，原版期刊付费。按 ERQ-CA/CCNES-T 先例登记为 catalog-only，只登记结构概述与升级路径，不登记题目主题索引（题数与措辞未从原始出处核实）。",
+      "取得原版权利人的明确再分发或施测许可后，才可将完整题文补入可执行源码并升级为 executable。"
+    ]
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "Teachers' Acceptance and Action Questionnaire (TAAQ), original French development",
+      "url": "https://www.researchgate.net/publication/341327844"
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "教学情境中的回避（占位）"
+      ],
+      "limitations": [
+        "原始题文未获得；本记录不能施测。",
+        "题数与结构按二手文献转述，未从原始出处核实。"
+      ],
+      "disclaimer": "结果用于个人反思，不用于诊断或排名。"
+    }
+  }
+}
