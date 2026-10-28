@@ -699,6 +699,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
             </div>
             <span className="text-sm text-slate-500">{allScaleItems ? `整页呈现 · 共 ${scaleItems.length} 题，最后手动提交` : `题目 ${scaleIndex + 1} / ${scaleItems.length}`}</span>
           </div>
+          {item.scale.instruction ? <section aria-label="本量表作答说明" className="mb-5 whitespace-pre-wrap rounded-lg bg-slate-50 p-4 text-sm text-slate-700">{item.scale.instruction}</section> : null}
           {(() => {
             const renderQuestion = (question: typeof scaleItems[number], questionIndex: number) => {
             const imageItems = assessmentImageItems(question.images)
