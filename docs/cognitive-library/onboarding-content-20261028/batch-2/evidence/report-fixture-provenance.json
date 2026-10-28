@@ -1,0 +1,84 @@
+{
+  "synthetic": true,
+  "tasks": [
+    {
+      "key": "blink",
+      "source": "server-version/backend/src/__tests__/cognitive/attentional-blink-content.test.ts",
+      "sourceSHA256": "ae3ac088e69cec4a7b29d6d9ce36e11d7fe85286029826f44ee8d6cf87362099",
+      "extractedHelperSHA256": "2bb7cf51a44d1853b85412265af2e6a23c18cf7dd4f7ec266eb9e614f0952c8d",
+      "args": [
+        "experience",
+        "known"
+      ],
+      "executedAssertions": 0,
+      "note": "Reuses existing exact helper declarations; no original describe/it/assertion executed. New representative inputs feed only changed report consumers."
+    },
+    {
+      "key": "dual",
+      "source": "server-version/backend/src/__tests__/cognitive/dual-arrow-content.test.ts",
+      "sourceSHA256": "137df2ee3ab4836a92b7db9ec7f8094260af02358ce5ed5b59ebb3f38345091c",
+      "extractedHelperSHA256": "f6bcfbf77e9d599d2b564e790b98e43fdce6031b4905282d319709854ee55d69",
+      "args": [
+        "experience"
+      ],
+      "executedAssertions": 0,
+      "note": "Reuses existing exact helper declarations; no original describe/it/assertion executed. New representative inputs feed only changed report consumers."
+    },
+    {
+      "key": "grad",
+      "source": "server-version/backend/src/__tests__/cognitive/gradcpt-content.test.ts",
+      "sourceSHA256": "397aae983fe9c8b006e766befa215b78a86dd3ed816e1ec6281d6faeed57dbf9",
+      "extractedHelperSHA256": "9708b5001966968c69c5edd22dfc6fb4ac003eb8d2c8a045d43623895d04888b",
+      "args": [
+        "experience"
+      ],
+      "executedAssertions": 0,
+      "note": "Reuses existing exact helper declarations; no original describe/it/assertion executed. New representative inputs feed only changed report consumers."
+    },
+    {
+      "key": "hf",
+      "source": "server-version/backend/src/__tests__/cognitive/hearts-flowers-content.test.ts",
+      "sourceSHA256": "4ae6cf69ef7c47fb716f9f3301cda3d60a04f9a87be3a22ef76a7128b1a61510",
+      "extractedHelperSHA256": "e4c16e08e5e592b859c13100f1ae71c1a37e28f0b6ff5c83e0c2272380f856d3",
+      "args": [
+        "experience"
+      ],
+      "executedAssertions": 0,
+      "note": "Reuses existing exact helper declarations; no original describe/it/assertion executed. New representative inputs feed only changed report consumers."
+    },
+    {
+      "key": "horizon",
+      "source": "server-version/backend/src/__tests__/cognitive/horizon-content.test.ts",
+      "sourceSHA256": "f3722748bedd401378ed47e0f9a8fc938a999e92b511ba64dfafc9870d91d806",
+      "extractedHelperSHA256": "0358bcaf19317577374d9dc1213f3ffac1a8130f045c80ce9d858ddfa7e8171d",
+      "args": [
+        "experience"
+      ],
+      "executedAssertions": 0,
+      "note": "Reuses existing exact helper declarations; no original describe/it/assertion executed. New representative inputs feed only changed report consumers."
+    },
+    {
+      "key": "spatial",
+      "source": "server-version/backend/src/__tests__/cognitive/spatial-memory-content.test.ts",
+      "sourceSHA256": "4f789e4d9579d243f4a7f32c59ad33981ecddbc18a7ece3844ba2349b0139492",
+      "extractedHelperSHA256": "b004694c7e692c54e021a273ddb3ba643b58c9d7876db1113c95ee913d84bce3",
+      "args": [
+        "experience"
+      ],
+      "executedAssertions": 0,
+      "note": "Reuses existing exact helper declarations; no original describe/it/assertion executed. New representative inputs feed only changed report consumers."
+    },
+    {
+      "key": "search",
+      "source": "server-version/backend/src/__tests__/cognitive/visual-search-content.test.ts",
+      "sourceSHA256": "62e2e1cf4537a140e9fba625640499dd0c6034ae227f9482c223c6ac583363c1",
+      "extractedHelperSHA256": "bbf979e829b79986c354bfc096b6aca6a66cb40b2fd771d7c59b91ee9b8430a5",
+      "args": [
+        "experience",
+        true
+      ],
+      "executedAssertions": 0,
+      "note": "Reuses existing exact helper declarations; no original describe/it/assertion executed. New representative inputs feed only changed report consumers."
+    }
+  ]
+}

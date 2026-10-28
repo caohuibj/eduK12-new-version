@@ -1,0 +1,3268 @@
+{
+  "blink": {
+    "complete": {
+      "testType": "attentional-blink",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "configVersion": "0.1.0",
+      "reportDefinitionVersion": "0.1.0",
+      "presentationVersion": "0.1.0",
+      "configHash": "a11027931d04226897bc03de9b97702dcebe3dda8b7afb7583cfe5a80afd1c50",
+      "protocolSignature": "0c16c541f1310dbdb5bf9023dc91ede21dea2155f6b7f0b7063a5c691568d3e6",
+      "profile": "experience",
+      "state": "interpretable",
+      "planned": 50,
+      "received": 50,
+      "valid": 50,
+      "t1Correct": 45,
+      "t2Correct": 47,
+      "bothCorrect": 43,
+      "forgotTargets": 0,
+      "byLag": {
+        "1": {
+          "planned": 10,
+          "received": 10,
+          "valid": 10,
+          "t1Correct": 10,
+          "t2Correct": 10,
+          "bothCorrect": 10,
+          "t2GivenT1": 1
+        },
+        "2": {
+          "planned": 10,
+          "received": 10,
+          "valid": 10,
+          "t1Correct": 5,
+          "t2Correct": 7,
+          "bothCorrect": 3,
+          "t2GivenT1": 0.6
+        },
+        "5": {
+          "planned": 10,
+          "received": 10,
+          "valid": 10,
+          "t1Correct": 10,
+          "t2Correct": 10,
+          "bothCorrect": 10,
+          "t2GivenT1": 1
+        },
+        "8": {
+          "planned": 10,
+          "received": 10,
+          "valid": 10,
+          "t1Correct": 10,
+          "t2Correct": 10,
+          "bothCorrect": 10,
+          "t2GivenT1": 1
+        },
+        "10": {
+          "planned": 10,
+          "received": 10,
+          "valid": 10,
+          "t1Correct": 10,
+          "t2Correct": 10,
+          "bothCorrect": 10,
+          "t2GivenT1": 1
+        }
+      }
+    },
+    "limited": {
+      "testType": "attentional-blink",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "configVersion": "0.1.0",
+      "reportDefinitionVersion": "0.1.0",
+      "presentationVersion": "0.1.0",
+      "configHash": "a11027931d04226897bc03de9b97702dcebe3dda8b7afb7583cfe5a80afd1c50",
+      "protocolSignature": "0c16c541f1310dbdb5bf9023dc91ede21dea2155f6b7f0b7063a5c691568d3e6",
+      "profile": "experience",
+      "state": "limited",
+      "planned": 50,
+      "received": 1,
+      "valid": 1,
+      "t1Correct": 1,
+      "t2Correct": 1,
+      "bothCorrect": 1,
+      "forgotTargets": 0,
+      "byLag": {
+        "1": {
+          "planned": 10,
+          "received": 1,
+          "valid": 1,
+          "t1Correct": 1,
+          "t2Correct": 1,
+          "bothCorrect": 1,
+          "t2GivenT1": 1
+        },
+        "2": {
+          "planned": 10,
+          "received": 0,
+          "valid": 0,
+          "t1Correct": 0,
+          "t2Correct": 0,
+          "bothCorrect": 0,
+          "t2GivenT1": null
+        },
+        "5": {
+          "planned": 10,
+          "received": 0,
+          "valid": 0,
+          "t1Correct": 0,
+          "t2Correct": 0,
+          "bothCorrect": 0,
+          "t2GivenT1": null
+        },
+        "8": {
+          "planned": 10,
+          "received": 0,
+          "valid": 0,
+          "t1Correct": 0,
+          "t2Correct": 0,
+          "bothCorrect": 0,
+          "t2GivenT1": null
+        },
+        "10": {
+          "planned": 10,
+          "received": 0,
+          "valid": 0,
+          "t1Correct": 0,
+          "t2Correct": 0,
+          "bothCorrect": 0,
+          "t2GivenT1": null
+        }
+      }
+    },
+    "invalid": {
+      "testType": "attentional-blink",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "configVersion": "0.1.0",
+      "reportDefinitionVersion": "0.1.0",
+      "presentationVersion": "0.1.0",
+      "configHash": "a11027931d04226897bc03de9b97702dcebe3dda8b7afb7583cfe5a80afd1c50",
+      "protocolSignature": "0c16c541f1310dbdb5bf9023dc91ede21dea2155f6b7f0b7063a5c691568d3e6",
+      "profile": "experience",
+      "state": "invalid",
+      "planned": 50,
+      "received": 0,
+      "valid": 0,
+      "t1Correct": 0,
+      "t2Correct": 0,
+      "bothCorrect": 0,
+      "forgotTargets": 0,
+      "byLag": {
+        "1": {
+          "planned": 10,
+          "received": 0,
+          "valid": 0,
+          "t1Correct": 0,
+          "t2Correct": 0,
+          "bothCorrect": 0,
+          "t2GivenT1": null
+        },
+        "2": {
+          "planned": 10,
+          "received": 0,
+          "valid": 0,
+          "t1Correct": 0,
+          "t2Correct": 0,
+          "bothCorrect": 0,
+          "t2GivenT1": null
+        },
+        "5": {
+          "planned": 10,
+          "received": 0,
+          "valid": 0,
+          "t1Correct": 0,
+          "t2Correct": 0,
+          "bothCorrect": 0,
+          "t2GivenT1": null
+        },
+        "8": {
+          "planned": 10,
+          "received": 0,
+          "valid": 0,
+          "t1Correct": 0,
+          "t2Correct": 0,
+          "bothCorrect": 0,
+          "t2GivenT1": null
+        },
+        "10": {
+          "planned": 10,
+          "received": 0,
+          "valid": 0,
+          "t1Correct": 0,
+          "t2Correct": 0,
+          "bothCorrect": 0,
+          "t2GivenT1": null
+        }
+      }
+    }
+  },
+  "dual": {
+    "complete": {
+      "testType": "dual-arrow",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "configVersion": "0.1.0",
+      "reportDefinitionVersion": "0.1.0",
+      "presentationVersion": "0.1.0",
+      "configHash": "501243f598715a0cf1a3120a1ccd220cf13126081f7f36a26624f626b6f31eef",
+      "protocolSignature": "64fc8fae22d489ec151fd3225ec690aa568ea12b11dd60d3890bf11ea8cbed4c",
+      "profile": "experience",
+      "state": "interpretable",
+      "planned": 60,
+      "received": 60,
+      "valid": 60,
+      "dualTrials": 20,
+      "bothCorrectDual": 20,
+      "groups": {
+        "blueSingle": {
+          "plannedRequired": 20,
+          "presentedRequired": 20,
+          "answered": 20,
+          "correct": 20,
+          "missed": 0,
+          "correctRTCount": 20,
+          "medianCorrectMs": 500,
+          "inputs": {
+            "touch": 20
+          }
+        },
+        "redSingle": {
+          "plannedRequired": 20,
+          "presentedRequired": 20,
+          "answered": 20,
+          "correct": 20,
+          "missed": 0,
+          "correctRTCount": 20,
+          "medianCorrectMs": 600,
+          "inputs": {
+            "touch": 20
+          }
+        },
+        "blueDual": {
+          "plannedRequired": 20,
+          "presentedRequired": 20,
+          "answered": 20,
+          "correct": 20,
+          "missed": 0,
+          "correctRTCount": 20,
+          "medianCorrectMs": 400,
+          "inputs": {
+            "touch": 20
+          }
+        },
+        "redDual": {
+          "plannedRequired": 20,
+          "presentedRequired": 20,
+          "answered": 20,
+          "correct": 20,
+          "missed": 0,
+          "correctRTCount": 20,
+          "medianCorrectMs": 900,
+          "inputs": {
+            "touch": 20
+          }
+        }
+      },
+      "differences": {
+        "blueLatencyMs": -100,
+        "redLatencyMs": 300,
+        "blueAccuracy": 0,
+        "redAccuracy": 0
+      }
+    },
+    "limited": {
+      "testType": "dual-arrow",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "configVersion": "0.1.0",
+      "reportDefinitionVersion": "0.1.0",
+      "presentationVersion": "0.1.0",
+      "configHash": "501243f598715a0cf1a3120a1ccd220cf13126081f7f36a26624f626b6f31eef",
+      "protocolSignature": "64fc8fae22d489ec151fd3225ec690aa568ea12b11dd60d3890bf11ea8cbed4c",
+      "profile": "experience",
+      "state": "limited",
+      "planned": 60,
+      "received": 1,
+      "valid": 1,
+      "dualTrials": 0,
+      "bothCorrectDual": 0,
+      "groups": {
+        "blueSingle": {
+          "plannedRequired": 20,
+          "presentedRequired": 1,
+          "answered": 1,
+          "correct": 1,
+          "missed": 0,
+          "correctRTCount": 1,
+          "medianCorrectMs": 500,
+          "inputs": {
+            "touch": 1
+          }
+        },
+        "redSingle": {
+          "plannedRequired": 20,
+          "presentedRequired": 0,
+          "answered": 0,
+          "correct": 0,
+          "missed": 0,
+          "correctRTCount": 0,
+          "medianCorrectMs": null,
+          "inputs": {}
+        },
+        "blueDual": {
+          "plannedRequired": 20,
+          "presentedRequired": 0,
+          "answered": 0,
+          "correct": 0,
+          "missed": 0,
+          "correctRTCount": 0,
+          "medianCorrectMs": null,
+          "inputs": {}
+        },
+        "redDual": {
+          "plannedRequired": 20,
+          "presentedRequired": 0,
+          "answered": 0,
+          "correct": 0,
+          "missed": 0,
+          "correctRTCount": 0,
+          "medianCorrectMs": null,
+          "inputs": {}
+        }
+      },
+      "differences": {
+        "blueLatencyMs": null,
+        "redLatencyMs": null,
+        "blueAccuracy": null,
+        "redAccuracy": null
+      }
+    },
+    "invalid": {
+      "testType": "dual-arrow",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "configVersion": "0.1.0",
+      "reportDefinitionVersion": "0.1.0",
+      "presentationVersion": "0.1.0",
+      "configHash": "501243f598715a0cf1a3120a1ccd220cf13126081f7f36a26624f626b6f31eef",
+      "protocolSignature": "64fc8fae22d489ec151fd3225ec690aa568ea12b11dd60d3890bf11ea8cbed4c",
+      "profile": "experience",
+      "state": "invalid",
+      "planned": 60,
+      "received": 0,
+      "valid": 0,
+      "dualTrials": 0,
+      "bothCorrectDual": 0,
+      "groups": {
+        "blueSingle": {
+          "plannedRequired": 20,
+          "presentedRequired": 0,
+          "answered": 0,
+          "correct": 0,
+          "missed": 0,
+          "correctRTCount": 0,
+          "medianCorrectMs": null,
+          "inputs": {}
+        },
+        "redSingle": {
+          "plannedRequired": 20,
+          "presentedRequired": 0,
+          "answered": 0,
+          "correct": 0,
+          "missed": 0,
+          "correctRTCount": 0,
+          "medianCorrectMs": null,
+          "inputs": {}
+        },
+        "blueDual": {
+          "plannedRequired": 20,
+          "presentedRequired": 0,
+          "answered": 0,
+          "correct": 0,
+          "missed": 0,
+          "correctRTCount": 0,
+          "medianCorrectMs": null,
+          "inputs": {}
+        },
+        "redDual": {
+          "plannedRequired": 20,
+          "presentedRequired": 0,
+          "answered": 0,
+          "correct": 0,
+          "missed": 0,
+          "correctRTCount": 0,
+          "medianCorrectMs": null,
+          "inputs": {}
+        }
+      },
+      "differences": {
+        "blueLatencyMs": null,
+        "redLatencyMs": null,
+        "blueAccuracy": null,
+        "redAccuracy": null
+      }
+    }
+  },
+  "grad": {
+    "complete": {
+      "testType": "gradcpt",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "configVersion": "0.1.0",
+      "reportDefinitionVersion": "0.1.0",
+      "presentationVersion": "0.1.0",
+      "configHash": "809207140532bbb48104c8eda456bdca1b12a632e5a1caf1b6ecc41b70e4538c",
+      "protocolSignature": "1831c3ebf8facc354b33d029674cf30cd47ddf601c60370fd83a3567e683deb6",
+      "profile": "experience",
+      "state": "interpretable",
+      "planned": 100,
+      "presented": 100,
+      "statistics": {
+        "city": 90,
+        "mountain": 10,
+        "hits": 90,
+        "omissions": 0,
+        "falseAlarms": 0,
+        "correctRejections": 10,
+        "rtCount": 90,
+        "meanMs": 721,
+        "medianMs": 721,
+        "sdMs": 0,
+        "cv": 0,
+        "correctedHitRate": 0.9944444444444445,
+        "correctedFalseAlarmRate": 0.05,
+        "dPrime": 4.184038441571728,
+        "criterion": -0.44716559565264746
+      },
+      "inputResponses": {
+        "keyboard": 90
+      }
+    },
+    "limited": {
+      "testType": "gradcpt",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "configVersion": "0.1.0",
+      "reportDefinitionVersion": "0.1.0",
+      "presentationVersion": "0.1.0",
+      "configHash": "809207140532bbb48104c8eda456bdca1b12a632e5a1caf1b6ecc41b70e4538c",
+      "protocolSignature": "1831c3ebf8facc354b33d029674cf30cd47ddf601c60370fd83a3567e683deb6",
+      "profile": "experience",
+      "state": "limited",
+      "planned": 100,
+      "presented": 20,
+      "statistics": {
+        "city": 18,
+        "mountain": 1,
+        "hits": 18,
+        "omissions": 0,
+        "falseAlarms": 0,
+        "correctRejections": 1,
+        "rtCount": 18,
+        "meanMs": 721,
+        "medianMs": 721,
+        "sdMs": 0,
+        "cv": 0,
+        "correctedHitRate": 0.9722222222222222,
+        "correctedFalseAlarmRate": 0.5,
+        "dPrime": 1.9145058243394566,
+        "criterion": -0.9572529121697283
+      },
+      "inputResponses": {
+        "keyboard": 19
+      }
+    },
+    "invalid": {
+      "testType": "gradcpt",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "configVersion": "0.1.0",
+      "reportDefinitionVersion": "0.1.0",
+      "presentationVersion": "0.1.0",
+      "configHash": "809207140532bbb48104c8eda456bdca1b12a632e5a1caf1b6ecc41b70e4538c",
+      "protocolSignature": "1831c3ebf8facc354b33d029674cf30cd47ddf601c60370fd83a3567e683deb6",
+      "profile": "experience",
+      "state": "invalid",
+      "planned": 100,
+      "presented": 0,
+      "statistics": {
+        "city": 0,
+        "mountain": 0,
+        "hits": 0,
+        "omissions": 0,
+        "falseAlarms": 0,
+        "correctRejections": 0,
+        "rtCount": 0,
+        "meanMs": null,
+        "medianMs": null,
+        "sdMs": null,
+        "cv": null,
+        "correctedHitRate": null,
+        "correctedFalseAlarmRate": null,
+        "dPrime": null,
+        "criterion": null
+      },
+      "inputResponses": {}
+    }
+  },
+  "hf": {
+    "complete": {
+      "testType": "hearts-flowers",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "configVersion": "0.1.0",
+      "reportDefinitionVersion": "0.1.0",
+      "presentationVersion": "0.1.0",
+      "configHash": "092e619eb8c1ce60d0e9ae21f8dae9ed77c9fdd4a1e9073024eb157b09c81839",
+      "protocolSignature": "66a6fa4d8e433bcaa599d7ac663137d18b4573a09acf1274e11a1f8c1381186f",
+      "profile": "experience",
+      "state": "interpretable",
+      "planned": 32,
+      "received": 32,
+      "valid": 32,
+      "interrupted": false,
+      "groups": {
+        "heartOnly": {
+          "planned": 8,
+          "valid": 8,
+          "answered": 8,
+          "correct": 8,
+          "missed": 0,
+          "accuracy": 1,
+          "inputs": {
+            "keyboard": {
+              "answered": 4,
+              "correct": 4,
+              "correctRTCount": 4,
+              "sumCorrectMs": 1200,
+              "meanCorrectMs": 300
+            },
+            "touch": {
+              "answered": 4,
+              "correct": 4,
+              "correctRTCount": 4,
+              "sumCorrectMs": 1200,
+              "meanCorrectMs": 300
+            },
+            "mouse": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "pen": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "assistive": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            }
+          }
+        },
+        "flowerOnly": {
+          "planned": 8,
+          "valid": 8,
+          "answered": 8,
+          "correct": 8,
+          "missed": 0,
+          "accuracy": 1,
+          "inputs": {
+            "keyboard": {
+              "answered": 4,
+              "correct": 4,
+              "correctRTCount": 4,
+              "sumCorrectMs": 1200,
+              "meanCorrectMs": 300
+            },
+            "touch": {
+              "answered": 4,
+              "correct": 4,
+              "correctRTCount": 4,
+              "sumCorrectMs": 1200,
+              "meanCorrectMs": 300
+            },
+            "mouse": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "pen": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "assistive": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            }
+          }
+        },
+        "mixed": {
+          "planned": 16,
+          "valid": 16,
+          "answered": 16,
+          "correct": 16,
+          "missed": 0,
+          "accuracy": 1,
+          "inputs": {
+            "keyboard": {
+              "answered": 8,
+              "correct": 8,
+              "correctRTCount": 8,
+              "sumCorrectMs": 4000,
+              "meanCorrectMs": 500
+            },
+            "touch": {
+              "answered": 8,
+              "correct": 8,
+              "correctRTCount": 8,
+              "sumCorrectMs": 2400,
+              "meanCorrectMs": 300
+            },
+            "mouse": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "pen": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "assistive": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            }
+          }
+        },
+        "mixedSwitch": {
+          "planned": 8,
+          "valid": 8,
+          "answered": 8,
+          "correct": 8,
+          "missed": 0,
+          "accuracy": 1,
+          "inputs": {
+            "keyboard": {
+              "answered": 4,
+              "correct": 4,
+              "correctRTCount": 4,
+              "sumCorrectMs": 2400,
+              "meanCorrectMs": 600
+            },
+            "touch": {
+              "answered": 4,
+              "correct": 4,
+              "correctRTCount": 4,
+              "sumCorrectMs": 400,
+              "meanCorrectMs": 100
+            },
+            "mouse": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "pen": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "assistive": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            }
+          }
+        },
+        "mixedRepeat": {
+          "planned": 7,
+          "valid": 7,
+          "answered": 7,
+          "correct": 7,
+          "missed": 0,
+          "accuracy": 1,
+          "inputs": {
+            "keyboard": {
+              "answered": 3,
+              "correct": 3,
+              "correctRTCount": 3,
+              "sumCorrectMs": 600,
+              "meanCorrectMs": 200
+            },
+            "touch": {
+              "answered": 4,
+              "correct": 4,
+              "correctRTCount": 4,
+              "sumCorrectMs": 2000,
+              "meanCorrectMs": 500
+            },
+            "mouse": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "pen": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "assistive": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            }
+          }
+        },
+        "mixedFirst": {
+          "planned": 1,
+          "valid": 1,
+          "answered": 1,
+          "correct": 1,
+          "missed": 0,
+          "accuracy": 1,
+          "inputs": {
+            "keyboard": {
+              "answered": 1,
+              "correct": 1,
+              "correctRTCount": 1,
+              "sumCorrectMs": 1000,
+              "meanCorrectMs": 1000
+            },
+            "touch": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "mouse": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "pen": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "assistive": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            }
+          }
+        }
+      },
+      "differences": {
+        "keyboard": {
+          "switchMinusRepeatMs": 400
+        },
+        "touch": {
+          "switchMinusRepeatMs": -400
+        },
+        "mouse": {
+          "switchMinusRepeatMs": null
+        },
+        "pen": {
+          "switchMinusRepeatMs": null
+        },
+        "assistive": {
+          "switchMinusRepeatMs": null
+        }
+      }
+    },
+    "limited": {
+      "testType": "hearts-flowers",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "configVersion": "0.1.0",
+      "reportDefinitionVersion": "0.1.0",
+      "presentationVersion": "0.1.0",
+      "configHash": "092e619eb8c1ce60d0e9ae21f8dae9ed77c9fdd4a1e9073024eb157b09c81839",
+      "protocolSignature": "66a6fa4d8e433bcaa599d7ac663137d18b4573a09acf1274e11a1f8c1381186f",
+      "profile": "experience",
+      "state": "limited",
+      "planned": 32,
+      "received": 1,
+      "valid": 1,
+      "interrupted": false,
+      "groups": {
+        "heartOnly": {
+          "planned": 8,
+          "valid": 1,
+          "answered": 1,
+          "correct": 1,
+          "missed": 0,
+          "accuracy": 1,
+          "inputs": {
+            "keyboard": {
+              "answered": 1,
+              "correct": 1,
+              "correctRTCount": 1,
+              "sumCorrectMs": 300,
+              "meanCorrectMs": 300
+            },
+            "touch": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "mouse": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "pen": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "assistive": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            }
+          }
+        },
+        "flowerOnly": {
+          "planned": 8,
+          "valid": 0,
+          "answered": 0,
+          "correct": 0,
+          "missed": 0,
+          "accuracy": null,
+          "inputs": {
+            "keyboard": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "touch": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "mouse": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "pen": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "assistive": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            }
+          }
+        },
+        "mixed": {
+          "planned": 16,
+          "valid": 0,
+          "answered": 0,
+          "correct": 0,
+          "missed": 0,
+          "accuracy": null,
+          "inputs": {
+            "keyboard": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "touch": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "mouse": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "pen": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "assistive": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            }
+          }
+        },
+        "mixedSwitch": {
+          "planned": 8,
+          "valid": 0,
+          "answered": 0,
+          "correct": 0,
+          "missed": 0,
+          "accuracy": null,
+          "inputs": {
+            "keyboard": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "touch": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "mouse": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "pen": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "assistive": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            }
+          }
+        },
+        "mixedRepeat": {
+          "planned": 7,
+          "valid": 0,
+          "answered": 0,
+          "correct": 0,
+          "missed": 0,
+          "accuracy": null,
+          "inputs": {
+            "keyboard": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "touch": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "mouse": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "pen": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "assistive": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            }
+          }
+        },
+        "mixedFirst": {
+          "planned": 1,
+          "valid": 0,
+          "answered": 0,
+          "correct": 0,
+          "missed": 0,
+          "accuracy": null,
+          "inputs": {
+            "keyboard": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "touch": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "mouse": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "pen": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            },
+            "assistive": {
+              "answered": 0,
+              "correct": 0,
+              "correctRTCount": 0,
+              "sumCorrectMs": 0,
+              "meanCorrectMs": null
+            }
+          }
+        }
+      },
+      "differences": {
+        "keyboard": {
+          "switchMinusRepeatMs": null
+        },
+        "touch": {
+          "switchMinusRepeatMs": null
+        },
+        "mouse": {
+          "switchMinusRepeatMs": null
+        },
+        "pen": {
+          "switchMinusRepeatMs": null
+        },
+        "assistive": {
+          "switchMinusRepeatMs": null
+        }
+      }
+    },
+    "invalid": {
+      "testType": "hearts-flowers",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "configVersion": "0.1.0",
+      "reportDefinitionVersion": "0.1.0",
+      "presentationVersion": "0.1.0",
+      "configHash": "092e619eb8c1ce60d0e9ae21f8dae9ed77c9fdd4a1e9073024eb157b09c81839",
+      "protocolSignature": "66a6fa4d8e433bcaa599d7ac663137d18b4573a09acf1274e11a1f8c1381186f",
+      "profile": "experience",
+      "state": "invalid",
+      "planned": 32,
+      "received": 0,
+      "valid": 0,
+      "interrupted": false,
+      "groups": null,
+      "differences": null
+    }
+  },
+  "horizon": {
+    "complete": {
+      "testType": "horizon-exploration",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "reportDefinitionVersion": "0.1.0",
+      "presentationVersion": "0.1.0",
+      "configHash": "a0f9a3fbb53776b039230ca18bdc364bb96e36fa652ad9f43f31855866818f57",
+      "protocolSignature": "ad57db3c96d148c831f666a8035b8aec6f8043d577ca4800ada07398e2a43a18",
+      "profile": "experience",
+      "state": "interpretable",
+      "planned": 40,
+      "received": 40,
+      "completed": 40,
+      "validFirstChoices": 40,
+      "totalChoices": 300,
+      "laterFreeChoices": 100,
+      "totalReward": 15541,
+      "groups": {
+        "equalShort": {
+          "planned": 10,
+          "validFirstChoices": 10,
+          "lessSampledChoices": null,
+          "higherObservedChoices": 5,
+          "tiedObservedMeans": 0,
+          "rows": [
+            {
+              "gameIndex": 0,
+              "seenLeft": 2,
+              "seenRight": 2,
+              "observedMeanLeft": 22.5,
+              "observedMeanRight": 45.5,
+              "observedMeanDifference": -23,
+              "choice": "left",
+              "lessSide": null,
+              "chosenLess": null,
+              "observedHigherSide": "right",
+              "chosenHigher": false,
+              "input": "touch"
+            },
+            {
+              "gameIndex": 5,
+              "seenLeft": 2,
+              "seenRight": 2,
+              "observedMeanLeft": 62.5,
+              "observedMeanRight": 54,
+              "observedMeanDifference": 8.5,
+              "choice": "left",
+              "lessSide": null,
+              "chosenLess": null,
+              "observedHigherSide": "left",
+              "chosenHigher": true,
+              "input": "touch"
+            },
+            {
+              "gameIndex": 7,
+              "seenLeft": 2,
+              "seenRight": 2,
+              "observedMeanLeft": 29.5,
+              "observedMeanRight": 41,
+              "observedMeanDifference": -11.5,
+              "choice": "left",
+              "lessSide": null,
+              "chosenLess": null,
+              "observedHigherSide": "right",
+              "chosenHigher": false,
+              "input": "touch"
+            },
+            {
+              "gameIndex": 13,
+              "seenLeft": 2,
+              "seenRight": 2,
+              "observedMeanLeft": 48,
+              "observedMeanRight": 42.5,
+              "observedMeanDifference": 5.5,
+              "choice": "left",
+              "lessSide": null,
+              "chosenLess": null,
+              "observedHigherSide": "left",
+              "chosenHigher": true,
+              "input": "touch"
+            },
+            {
+              "gameIndex": 17,
+              "seenLeft": 2,
+              "seenRight": 2,
+              "observedMeanLeft": 77,
+              "observedMeanRight": 47.5,
+              "observedMeanDifference": 29.5,
+              "choice": "left",
+              "lessSide": null,
+              "chosenLess": null,
+              "observedHigherSide": "left",
+              "chosenHigher": true,
+              "input": "touch"
+            },
+            {
+              "gameIndex": 20,
+              "seenLeft": 2,
+              "seenRight": 2,
+              "observedMeanLeft": 82,
+              "observedMeanRight": 64.5,
+              "observedMeanDifference": 17.5,
+              "choice": "left",
+              "lessSide": null,
+              "chosenLess": null,
+              "observedHigherSide": "left",
+              "chosenHigher": true,
+              "input": "touch"
+            },
+            {
+              "gameIndex": 27,
+              "seenLeft": 2,
+              "seenRight": 2,
+              "observedMeanLeft": 56,
+              "observedMeanRight": 87.5,
+              "observedMeanDifference": -31.5,
+              "choice": "left",
+              "lessSide": null,
+              "chosenLess": null,
+              "observedHigherSide": "right",
+              "chosenHigher": false,
+              "input": "touch"
+            },
+            {
+              "gameIndex": 36,
+              "seenLeft": 2,
+              "seenRight": 2,
+              "observedMeanLeft": 34.5,
+              "observedMeanRight": 25.5,
+              "observedMeanDifference": 9,
+              "choice": "left",
+              "lessSide": null,
+              "chosenLess": null,
+              "observedHigherSide": "left",
+              "chosenHigher": true,
+              "input": "touch"
+            },
+            {
+              "gameIndex": 37,
+              "seenLeft": 2,
+              "seenRight": 2,
+              "observedMeanLeft": 36.5,
+              "observedMeanRight": 50,
+              "observedMeanDifference": -13.5,
+              "choice": "left",
+              "lessSide": null,
+              "chosenLess": null,
+              "observedHigherSide": "right",
+              "chosenHigher": false,
+              "input": "touch"
+            },
+            {
+              "gameIndex": 38,
+              "seenLeft": 2,
+              "seenRight": 2,
+              "observedMeanLeft": 38.5,
+              "observedMeanRight": 47,
+              "observedMeanDifference": -8.5,
+              "choice": "left",
+              "lessSide": null,
+              "chosenLess": null,
+              "observedHigherSide": "right",
+              "chosenHigher": false,
+              "input": "touch"
+            }
+          ]
+        },
+        "equalLong": {
+          "planned": 10,
+          "validFirstChoices": 10,
+          "lessSampledChoices": null,
+          "higherObservedChoices": 6,
+          "tiedObservedMeans": 0,
+          "rows": [
+            {
+              "gameIndex": 2,
+              "seenLeft": 2,
+              "seenRight": 2,
+              "observedMeanLeft": 77.5,
+              "observedMeanRight": 59,
+              "observedMeanDifference": 18.5,
+              "choice": "left",
+              "lessSide": null,
+              "chosenLess": null,
+              "observedHigherSide": "left",
+              "chosenHigher": true,
+              "input": "touch"
+            },
+            {
+              "gameIndex": 4,
+              "seenLeft": 2,
+              "seenRight": 2,
+              "observedMeanLeft": 20.5,
+              "observedMeanRight": 45,
+              "observedMeanDifference": -24.5,
+              "choice": "left",
+              "lessSide": null,
+              "chosenLess": null,
+              "observedHigherSide": "right",
+              "chosenHigher": false,
+              "input": "touch"
+            },
+            {
+              "gameIndex": 6,
+              "seenLeft": 2,
+              "seenRight": 2,
+              "observedMeanLeft": 85.5,
+              "observedMeanRight": 65.5,
+              "observedMeanDifference": 20,
+              "choice": "left",
+              "lessSide": null,
+              "chosenLess": null,
+              "observedHigherSide": "left",
+              "chosenHigher": true,
+              "input": "touch"
+            },
+            {
+              "gameIndex": 9,
+              "seenLeft": 2,
+              "seenRight": 2,
+              "observedMeanLeft": 63,
+              "observedMeanRight": 93,
+              "observedMeanDifference": -30,
+              "choice": "left",
+              "lessSide": null,
+              "chosenLess": null,
+              "observedHigherSide": "right",
+              "chosenHigher": false,
+              "input": "touch"
+            },
+            {
+              "gameIndex": 10,
+              "seenLeft": 2,
+              "seenRight": 2,
+              "observedMeanLeft": 65.5,
+              "observedMeanRight": 67,
+              "observedMeanDifference": -1.5,
+              "choice": "left",
+              "lessSide": null,
+              "chosenLess": null,
+              "observedHigherSide": "right",
+              "chosenHigher": false,
+              "input": "touch"
+            },
+            {
+              "gameIndex": 24,
+              "seenLeft": 2,
+              "seenRight": 2,
+              "observedMeanLeft": 92.5,
+              "observedMeanRight": 61,
+              "observedMeanDifference": 31.5,
+              "choice": "left",
+              "lessSide": null,
+              "chosenLess": null,
+              "observedHigherSide": "left",
+              "chosenHigher": true,
+              "input": "touch"
+            },
+            {
+              "gameIndex": 30,
+              "seenLeft": 2,
+              "seenRight": 2,
+              "observedMeanLeft": 74,
+              "observedMeanRight": 61,
+              "observedMeanDifference": 13,
+              "choice": "left",
+              "lessSide": null,
+              "chosenLess": null,
+              "observedHigherSide": "left",
+              "chosenHigher": true,
+              "input": "touch"
+            },
+            {
+              "gameIndex": 31,
+              "seenLeft": 2,
+              "seenRight": 2,
+              "observedMeanLeft": 53,
+              "observedMeanRight": 63.5,
+              "observedMeanDifference": -10.5,
+              "choice": "left",
+              "lessSide": null,
+              "chosenLess": null,
+              "observedHigherSide": "right",
+              "chosenHigher": false,
+              "input": "touch"
+            },
+            {
+              "gameIndex": 32,
+              "seenLeft": 2,
+              "seenRight": 2,
+              "observedMeanLeft": 67,
+              "observedMeanRight": 66,
+              "observedMeanDifference": 1,
+              "choice": "left",
+              "lessSide": null,
+              "chosenLess": null,
+              "observedHigherSide": "left",
+              "chosenHigher": true,
+              "input": "touch"
+            },
+            {
+              "gameIndex": 35,
+              "seenLeft": 2,
+              "seenRight": 2,
+              "observedMeanLeft": 66,
+              "observedMeanRight": 58,
+              "observedMeanDifference": 8,
+              "choice": "left",
+              "lessSide": null,
+              "chosenLess": null,
+              "observedHigherSide": "left",
+              "chosenHigher": true,
+              "input": "touch"
+            }
+          ]
+        },
+        "unequalShort": {
+          "planned": 10,
+          "validFirstChoices": 10,
+          "lessSampledChoices": 10,
+          "higherObservedChoices": 5,
+          "tiedObservedMeans": 0,
+          "rows": [
+            {
+              "gameIndex": 1,
+              "seenLeft": 3,
+              "seenRight": 1,
+              "observedMeanLeft": 38,
+              "observedMeanRight": 37,
+              "observedMeanDifference": 1,
+              "choice": "right",
+              "lessSide": "right",
+              "chosenLess": true,
+              "observedHigherSide": "left",
+              "chosenHigher": false,
+              "input": "touch"
+            },
+            {
+              "gameIndex": 3,
+              "seenLeft": 3,
+              "seenRight": 1,
+              "observedMeanLeft": 54.333333333333336,
+              "observedMeanRight": 64,
+              "observedMeanDifference": -9.666666666666664,
+              "choice": "right",
+              "lessSide": "right",
+              "chosenLess": true,
+              "observedHigherSide": "right",
+              "chosenHigher": true,
+              "input": "touch"
+            },
+            {
+              "gameIndex": 8,
+              "seenLeft": 1,
+              "seenRight": 3,
+              "observedMeanLeft": 52,
+              "observedMeanRight": 66.33333333333333,
+              "observedMeanDifference": -14.333333333333329,
+              "choice": "left",
+              "lessSide": "left",
+              "chosenLess": true,
+              "observedHigherSide": "right",
+              "chosenHigher": false,
+              "input": "touch"
+            },
+            {
+              "gameIndex": 11,
+              "seenLeft": 3,
+              "seenRight": 1,
+              "observedMeanLeft": 13.333333333333334,
+              "observedMeanRight": 40,
+              "observedMeanDifference": -26.666666666666664,
+              "choice": "right",
+              "lessSide": "right",
+              "chosenLess": true,
+              "observedHigherSide": "right",
+              "chosenHigher": true,
+              "input": "touch"
+            },
+            {
+              "gameIndex": 12,
+              "seenLeft": 1,
+              "seenRight": 3,
+              "observedMeanLeft": 57,
+              "observedMeanRight": 36.666666666666664,
+              "observedMeanDifference": 20.333333333333336,
+              "choice": "left",
+              "lessSide": "left",
+              "chosenLess": true,
+              "observedHigherSide": "left",
+              "chosenHigher": true,
+              "input": "touch"
+            },
+            {
+              "gameIndex": 16,
+              "seenLeft": 1,
+              "seenRight": 3,
+              "observedMeanLeft": 53,
+              "observedMeanRight": 75,
+              "observedMeanDifference": -22,
+              "choice": "left",
+              "lessSide": "left",
+              "chosenLess": true,
+              "observedHigherSide": "right",
+              "chosenHigher": false,
+              "input": "touch"
+            },
+            {
+              "gameIndex": 19,
+              "seenLeft": 3,
+              "seenRight": 1,
+              "observedMeanLeft": 63.666666666666664,
+              "observedMeanRight": 76,
+              "observedMeanDifference": -12.333333333333336,
+              "choice": "right",
+              "lessSide": "right",
+              "chosenLess": true,
+              "observedHigherSide": "right",
+              "chosenHigher": true,
+              "input": "touch"
+            },
+            {
+              "gameIndex": 23,
+              "seenLeft": 1,
+              "seenRight": 3,
+              "observedMeanLeft": 93,
+              "observedMeanRight": 47.666666666666664,
+              "observedMeanDifference": 45.333333333333336,
+              "choice": "left",
+              "lessSide": "left",
+              "chosenLess": true,
+              "observedHigherSide": "left",
+              "chosenHigher": true,
+              "input": "touch"
+            },
+            {
+              "gameIndex": 25,
+              "seenLeft": 3,
+              "seenRight": 1,
+              "observedMeanLeft": 54.666666666666664,
+              "observedMeanRight": 26,
+              "observedMeanDifference": 28.666666666666664,
+              "choice": "right",
+              "lessSide": "right",
+              "chosenLess": true,
+              "observedHigherSide": "left",
+              "chosenHigher": false,
+              "input": "touch"
+            },
+            {
+              "gameIndex": 39,
+              "seenLeft": 1,
+              "seenRight": 3,
+              "observedMeanLeft": 14,
+              "observedMeanRight": 38,
+              "observedMeanDifference": -24,
+              "choice": "left",
+              "lessSide": "left",
+              "chosenLess": true,
+              "observedHigherSide": "right",
+              "chosenHigher": false,
+              "input": "touch"
+            }
+          ]
+        },
+        "unequalLong": {
+          "planned": 10,
+          "validFirstChoices": 10,
+          "lessSampledChoices": 0,
+          "higherObservedChoices": 6,
+          "tiedObservedMeans": 0,
+          "rows": [
+            {
+              "gameIndex": 14,
+              "seenLeft": 3,
+              "seenRight": 1,
+              "observedMeanLeft": 67.33333333333333,
+              "observedMeanRight": 60,
+              "observedMeanDifference": 7.333333333333329,
+              "choice": "left",
+              "lessSide": "right",
+              "chosenLess": false,
+              "observedHigherSide": "left",
+              "chosenHigher": true,
+              "input": "touch"
+            },
+            {
+              "gameIndex": 15,
+              "seenLeft": 1,
+              "seenRight": 3,
+              "observedMeanLeft": 45,
+              "observedMeanRight": 21,
+              "observedMeanDifference": 24,
+              "choice": "right",
+              "lessSide": "left",
+              "chosenLess": false,
+              "observedHigherSide": "left",
+              "chosenHigher": false,
+              "input": "touch"
+            },
+            {
+              "gameIndex": 18,
+              "seenLeft": 3,
+              "seenRight": 1,
+              "observedMeanLeft": 32,
+              "observedMeanRight": 57,
+              "observedMeanDifference": -25,
+              "choice": "left",
+              "lessSide": "right",
+              "chosenLess": false,
+              "observedHigherSide": "right",
+              "chosenHigher": false,
+              "input": "touch"
+            },
+            {
+              "gameIndex": 21,
+              "seenLeft": 1,
+              "seenRight": 3,
+              "observedMeanLeft": 37,
+              "observedMeanRight": 43.666666666666664,
+              "observedMeanDifference": -6.666666666666664,
+              "choice": "right",
+              "lessSide": "left",
+              "chosenLess": false,
+              "observedHigherSide": "right",
+              "chosenHigher": true,
+              "input": "touch"
+            },
+            {
+              "gameIndex": 22,
+              "seenLeft": 3,
+              "seenRight": 1,
+              "observedMeanLeft": 38.666666666666664,
+              "observedMeanRight": 7,
+              "observedMeanDifference": 31.666666666666664,
+              "choice": "left",
+              "lessSide": "right",
+              "chosenLess": false,
+              "observedHigherSide": "left",
+              "chosenHigher": true,
+              "input": "touch"
+            },
+            {
+              "gameIndex": 26,
+              "seenLeft": 3,
+              "seenRight": 1,
+              "observedMeanLeft": 56.333333333333336,
+              "observedMeanRight": 76,
+              "observedMeanDifference": -19.666666666666664,
+              "choice": "left",
+              "lessSide": "right",
+              "chosenLess": false,
+              "observedHigherSide": "right",
+              "chosenHigher": false,
+              "input": "touch"
+            },
+            {
+              "gameIndex": 28,
+              "seenLeft": 1,
+              "seenRight": 3,
+              "observedMeanLeft": 29,
+              "observedMeanRight": 32,
+              "observedMeanDifference": -3,
+              "choice": "right",
+              "lessSide": "left",
+              "chosenLess": false,
+              "observedHigherSide": "right",
+              "chosenHigher": true,
+              "input": "touch"
+            },
+            {
+              "gameIndex": 29,
+              "seenLeft": 3,
+              "seenRight": 1,
+              "observedMeanLeft": 43,
+              "observedMeanRight": 44,
+              "observedMeanDifference": -1,
+              "choice": "left",
+              "lessSide": "right",
+              "chosenLess": false,
+              "observedHigherSide": "right",
+              "chosenHigher": false,
+              "input": "touch"
+            },
+            {
+              "gameIndex": 33,
+              "seenLeft": 1,
+              "seenRight": 3,
+              "observedMeanLeft": 26,
+              "observedMeanRight": 33.333333333333336,
+              "observedMeanDifference": -7.333333333333336,
+              "choice": "right",
+              "lessSide": "left",
+              "chosenLess": false,
+              "observedHigherSide": "right",
+              "chosenHigher": true,
+              "input": "touch"
+            },
+            {
+              "gameIndex": 34,
+              "seenLeft": 1,
+              "seenRight": 3,
+              "observedMeanLeft": 33,
+              "observedMeanRight": 66,
+              "observedMeanDifference": -33,
+              "choice": "right",
+              "lessSide": "left",
+              "chosenLess": false,
+              "observedHigherSide": "right",
+              "chosenHigher": true,
+              "input": "touch"
+            }
+          ]
+        }
+      },
+      "longMinusShortLessSampledRate": -1
+    },
+    "limited": {
+      "testType": "horizon-exploration",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "reportDefinitionVersion": "0.1.0",
+      "presentationVersion": "0.1.0",
+      "configHash": "a0f9a3fbb53776b039230ca18bdc364bb96e36fa652ad9f43f31855866818f57",
+      "protocolSignature": "ad57db3c96d148c831f666a8035b8aec6f8043d577ca4800ada07398e2a43a18",
+      "profile": "experience",
+      "state": "limited",
+      "planned": 40,
+      "received": 1,
+      "completed": 1,
+      "validFirstChoices": 1,
+      "totalChoices": 5,
+      "laterFreeChoices": 0,
+      "totalReward": 154,
+      "groups": {
+        "equalShort": {
+          "planned": 10,
+          "validFirstChoices": 1,
+          "lessSampledChoices": null,
+          "higherObservedChoices": 0,
+          "tiedObservedMeans": 0,
+          "rows": [
+            {
+              "gameIndex": 0,
+              "seenLeft": 2,
+              "seenRight": 2,
+              "observedMeanLeft": 22.5,
+              "observedMeanRight": 45.5,
+              "observedMeanDifference": -23,
+              "choice": "left",
+              "lessSide": null,
+              "chosenLess": null,
+              "observedHigherSide": "right",
+              "chosenHigher": false,
+              "input": "touch"
+            }
+          ]
+        },
+        "equalLong": {
+          "planned": 10,
+          "validFirstChoices": 0,
+          "lessSampledChoices": null,
+          "higherObservedChoices": 0,
+          "tiedObservedMeans": 0,
+          "rows": []
+        },
+        "unequalShort": {
+          "planned": 10,
+          "validFirstChoices": 0,
+          "lessSampledChoices": 0,
+          "higherObservedChoices": 0,
+          "tiedObservedMeans": 0,
+          "rows": []
+        },
+        "unequalLong": {
+          "planned": 10,
+          "validFirstChoices": 0,
+          "lessSampledChoices": 0,
+          "higherObservedChoices": 0,
+          "tiedObservedMeans": 0,
+          "rows": []
+        }
+      },
+      "longMinusShortLessSampledRate": null
+    },
+    "invalid": {
+      "testType": "horizon-exploration",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "reportDefinitionVersion": "0.1.0",
+      "presentationVersion": "0.1.0",
+      "configHash": "a0f9a3fbb53776b039230ca18bdc364bb96e36fa652ad9f43f31855866818f57",
+      "protocolSignature": "ad57db3c96d148c831f666a8035b8aec6f8043d577ca4800ada07398e2a43a18",
+      "profile": "experience",
+      "state": "invalid",
+      "planned": 40,
+      "received": 0,
+      "completed": 0,
+      "validFirstChoices": 0,
+      "totalChoices": 0,
+      "laterFreeChoices": 0,
+      "totalReward": 0,
+      "groups": {
+        "equalShort": {
+          "planned": 10,
+          "validFirstChoices": 0,
+          "lessSampledChoices": null,
+          "higherObservedChoices": 0,
+          "tiedObservedMeans": 0,
+          "rows": []
+        },
+        "equalLong": {
+          "planned": 10,
+          "validFirstChoices": 0,
+          "lessSampledChoices": null,
+          "higherObservedChoices": 0,
+          "tiedObservedMeans": 0,
+          "rows": []
+        },
+        "unequalShort": {
+          "planned": 10,
+          "validFirstChoices": 0,
+          "lessSampledChoices": 0,
+          "higherObservedChoices": 0,
+          "tiedObservedMeans": 0,
+          "rows": []
+        },
+        "unequalLong": {
+          "planned": 10,
+          "validFirstChoices": 0,
+          "lessSampledChoices": 0,
+          "higherObservedChoices": 0,
+          "tiedObservedMeans": 0,
+          "rows": []
+        }
+      },
+      "longMinusShortLessSampledRate": null
+    }
+  },
+  "spatial": {
+    "complete": {
+      "testType": "precision-working-memory",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "configVersion": "0.1.0",
+      "reportDefinitionVersion": "0.1.0",
+      "presentationVersion": "0.1.0",
+      "configHash": "cb0854e4aaecafb2642add136057de71a619abc933255ed7e23afd12f2c7a5ff",
+      "protocolSignature": "8ba6d54df5b93dacbca1eb1f38532c3e192c2b737aea8c080d43ce57e70fd08d",
+      "profile": "experience",
+      "state": "interpretable",
+      "planned": 40,
+      "received": 40,
+      "excluded": 0,
+      "lateResponses": 0,
+      "inputs": [
+        "touch"
+      ],
+      "conditions": [
+        {
+          "setSize": 1,
+          "valid": 20,
+          "planned": 20,
+          "meanAbsoluteErrorDeg": 2,
+          "medianAbsoluteErrorDeg": 2
+        },
+        {
+          "setSize": 5,
+          "valid": 20,
+          "planned": 20,
+          "meanAbsoluteErrorDeg": 2,
+          "medianAbsoluteErrorDeg": 2
+        }
+      ]
+    },
+    "limited": {
+      "testType": "precision-working-memory",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "configVersion": "0.1.0",
+      "reportDefinitionVersion": "0.1.0",
+      "presentationVersion": "0.1.0",
+      "configHash": "cb0854e4aaecafb2642add136057de71a619abc933255ed7e23afd12f2c7a5ff",
+      "protocolSignature": "8ba6d54df5b93dacbca1eb1f38532c3e192c2b737aea8c080d43ce57e70fd08d",
+      "profile": "experience",
+      "state": "limited",
+      "planned": 40,
+      "received": 1,
+      "excluded": 0,
+      "lateResponses": 0,
+      "inputs": [
+        "touch"
+      ],
+      "conditions": [
+        {
+          "setSize": 1,
+          "valid": 0,
+          "planned": 20,
+          "meanAbsoluteErrorDeg": null,
+          "medianAbsoluteErrorDeg": null
+        },
+        {
+          "setSize": 5,
+          "valid": 1,
+          "planned": 20,
+          "meanAbsoluteErrorDeg": 2,
+          "medianAbsoluteErrorDeg": 2
+        }
+      ]
+    },
+    "invalid": {
+      "testType": "precision-working-memory",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "configVersion": "0.1.0",
+      "reportDefinitionVersion": "0.1.0",
+      "presentationVersion": "0.1.0",
+      "configHash": "cb0854e4aaecafb2642add136057de71a619abc933255ed7e23afd12f2c7a5ff",
+      "protocolSignature": "8ba6d54df5b93dacbca1eb1f38532c3e192c2b737aea8c080d43ce57e70fd08d",
+      "profile": "experience",
+      "state": "invalid",
+      "planned": 40,
+      "received": 0,
+      "excluded": 0,
+      "lateResponses": 0,
+      "inputs": [],
+      "conditions": [
+        {
+          "setSize": 1,
+          "valid": 0,
+          "planned": 20,
+          "meanAbsoluteErrorDeg": null,
+          "medianAbsoluteErrorDeg": null
+        },
+        {
+          "setSize": 5,
+          "valid": 0,
+          "planned": 20,
+          "meanAbsoluteErrorDeg": null,
+          "medianAbsoluteErrorDeg": null
+        }
+      ]
+    }
+  },
+  "search": {
+    "complete": {
+      "testType": "visual-search-two-stage",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "configVersion": "0.1.0",
+      "reportDefinitionVersion": "0.1.0",
+      "presentationVersion": "0.1.0",
+      "configHash": "77c9999593188962ebae2524ea8b96df0d60efeadfc5a0b8008251d3359735c4",
+      "protocolSignature": "83fda15215385e3a77b9937472f966693ef6909e8698317ed58b79f67dae90ba",
+      "profile": "experience",
+      "state": "interpretable",
+      "planned": 36,
+      "received": 36,
+      "valid": 36,
+      "correct": 12,
+      "bySetSize": {
+        "10": {
+          "planned": 12,
+          "received": 12,
+          "valid": 12,
+          "correct": 4,
+          "correctRTCount": 4,
+          "medianSearchMs": 1000,
+          "medianLocateMs": 500
+        },
+        "20": {
+          "planned": 12,
+          "received": 12,
+          "valid": 12,
+          "correct": 4,
+          "correctRTCount": 4,
+          "medianSearchMs": 1000,
+          "medianLocateMs": 500
+        },
+        "30": {
+          "planned": 12,
+          "received": 12,
+          "valid": 12,
+          "correct": 4,
+          "correctRTCount": 4,
+          "medianSearchMs": 1000,
+          "medianLocateMs": 500
+        }
+      },
+      "byColour": {
+        "#00FF00": {
+          "planned": 18,
+          "received": 18,
+          "valid": 18,
+          "correct": 6,
+          "correctRTCount": 6,
+          "medianSearchMs": 1000,
+          "medianLocateMs": 500
+        },
+        "#FFFFFF": {
+          "planned": 18,
+          "received": 18,
+          "valid": 18,
+          "correct": 6,
+          "correctRTCount": 6,
+          "medianSearchMs": 1000,
+          "medianLocateMs": 500
+        }
+      },
+      "byTargetCount": {
+        "0": {
+          "planned": 12,
+          "received": 12,
+          "valid": 12,
+          "correct": 12,
+          "correctRTCount": 12,
+          "medianSearchMs": 1000,
+          "medianLocateMs": 500
+        },
+        "1": {
+          "planned": 12,
+          "received": 12,
+          "valid": 12,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "5": {
+          "planned": 12,
+          "received": 12,
+          "valid": 12,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        }
+      },
+      "conditions": {
+        "X/#00FF00/10/5": {
+          "planned": 1,
+          "received": 1,
+          "valid": 1,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#00FF00/30/5": {
+          "planned": 1,
+          "received": 1,
+          "valid": 1,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#FFFFFF/10/1": {
+          "planned": 1,
+          "received": 1,
+          "valid": 1,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#00FF00/10/0": {
+          "planned": 1,
+          "received": 1,
+          "valid": 1,
+          "correct": 1,
+          "correctRTCount": 1,
+          "medianSearchMs": 1000,
+          "medianLocateMs": 500
+        },
+        "X/#FFFFFF/10/5": {
+          "planned": 1,
+          "received": 1,
+          "valid": 1,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#FFFFFF/30/5": {
+          "planned": 1,
+          "received": 1,
+          "valid": 1,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#00FF00/30/5": {
+          "planned": 1,
+          "received": 1,
+          "valid": 1,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#00FF00/20/1": {
+          "planned": 1,
+          "received": 1,
+          "valid": 1,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#00FF00/10/0": {
+          "planned": 1,
+          "received": 1,
+          "valid": 1,
+          "correct": 1,
+          "correctRTCount": 1,
+          "medianSearchMs": 1000,
+          "medianLocateMs": 500
+        },
+        "O/#00FF00/10/5": {
+          "planned": 1,
+          "received": 1,
+          "valid": 1,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#FFFFFF/30/0": {
+          "planned": 1,
+          "received": 1,
+          "valid": 1,
+          "correct": 1,
+          "correctRTCount": 1,
+          "medianSearchMs": 1000,
+          "medianLocateMs": 500
+        },
+        "O/#FFFFFF/30/0": {
+          "planned": 1,
+          "received": 1,
+          "valid": 1,
+          "correct": 1,
+          "correctRTCount": 1,
+          "medianSearchMs": 1000,
+          "medianLocateMs": 500
+        },
+        "X/#FFFFFF/30/5": {
+          "planned": 1,
+          "received": 1,
+          "valid": 1,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#00FF00/20/5": {
+          "planned": 1,
+          "received": 1,
+          "valid": 1,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#00FF00/20/1": {
+          "planned": 1,
+          "received": 1,
+          "valid": 1,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#FFFFFF/20/5": {
+          "planned": 1,
+          "received": 1,
+          "valid": 1,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#FFFFFF/20/0": {
+          "planned": 1,
+          "received": 1,
+          "valid": 1,
+          "correct": 1,
+          "correctRTCount": 1,
+          "medianSearchMs": 1000,
+          "medianLocateMs": 500
+        },
+        "O/#FFFFFF/30/1": {
+          "planned": 1,
+          "received": 1,
+          "valid": 1,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#FFFFFF/20/1": {
+          "planned": 1,
+          "received": 1,
+          "valid": 1,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#FFFFFF/30/1": {
+          "planned": 1,
+          "received": 1,
+          "valid": 1,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#FFFFFF/10/5": {
+          "planned": 1,
+          "received": 1,
+          "valid": 1,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#00FF00/30/0": {
+          "planned": 1,
+          "received": 1,
+          "valid": 1,
+          "correct": 1,
+          "correctRTCount": 1,
+          "medianSearchMs": 1000,
+          "medianLocateMs": 500
+        },
+        "X/#FFFFFF/20/1": {
+          "planned": 1,
+          "received": 1,
+          "valid": 1,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#FFFFFF/10/1": {
+          "planned": 1,
+          "received": 1,
+          "valid": 1,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#00FF00/30/0": {
+          "planned": 1,
+          "received": 1,
+          "valid": 1,
+          "correct": 1,
+          "correctRTCount": 1,
+          "medianSearchMs": 1000,
+          "medianLocateMs": 500
+        },
+        "X/#00FF00/30/1": {
+          "planned": 1,
+          "received": 1,
+          "valid": 1,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#FFFFFF/20/5": {
+          "planned": 1,
+          "received": 1,
+          "valid": 1,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#FFFFFF/10/0": {
+          "planned": 1,
+          "received": 1,
+          "valid": 1,
+          "correct": 1,
+          "correctRTCount": 1,
+          "medianSearchMs": 1000,
+          "medianLocateMs": 500
+        },
+        "X/#FFFFFF/10/0": {
+          "planned": 1,
+          "received": 1,
+          "valid": 1,
+          "correct": 1,
+          "correctRTCount": 1,
+          "medianSearchMs": 1000,
+          "medianLocateMs": 500
+        },
+        "O/#00FF00/20/5": {
+          "planned": 1,
+          "received": 1,
+          "valid": 1,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#FFFFFF/20/0": {
+          "planned": 1,
+          "received": 1,
+          "valid": 1,
+          "correct": 1,
+          "correctRTCount": 1,
+          "medianSearchMs": 1000,
+          "medianLocateMs": 500
+        },
+        "O/#00FF00/20/0": {
+          "planned": 1,
+          "received": 1,
+          "valid": 1,
+          "correct": 1,
+          "correctRTCount": 1,
+          "medianSearchMs": 1000,
+          "medianLocateMs": 500
+        },
+        "O/#00FF00/30/1": {
+          "planned": 1,
+          "received": 1,
+          "valid": 1,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#00FF00/20/0": {
+          "planned": 1,
+          "received": 1,
+          "valid": 1,
+          "correct": 1,
+          "correctRTCount": 1,
+          "medianSearchMs": 1000,
+          "medianLocateMs": 500
+        },
+        "X/#00FF00/10/1": {
+          "planned": 1,
+          "received": 1,
+          "valid": 1,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#00FF00/10/1": {
+          "planned": 1,
+          "received": 1,
+          "valid": 1,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        }
+      },
+      "phaseInputs": {
+        "search": {
+          "touch": 36
+        },
+        "locate": {
+          "touch": 36
+        }
+      }
+    },
+    "limited": {
+      "testType": "visual-search-two-stage",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "configVersion": "0.1.0",
+      "reportDefinitionVersion": "0.1.0",
+      "presentationVersion": "0.1.0",
+      "configHash": "77c9999593188962ebae2524ea8b96df0d60efeadfc5a0b8008251d3359735c4",
+      "protocolSignature": "83fda15215385e3a77b9937472f966693ef6909e8698317ed58b79f67dae90ba",
+      "profile": "experience",
+      "state": "limited",
+      "planned": 36,
+      "received": 1,
+      "valid": 1,
+      "correct": 0,
+      "bySetSize": {
+        "10": {
+          "planned": 12,
+          "received": 1,
+          "valid": 1,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "20": {
+          "planned": 12,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "30": {
+          "planned": 12,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        }
+      },
+      "byColour": {
+        "#00FF00": {
+          "planned": 18,
+          "received": 1,
+          "valid": 1,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "#FFFFFF": {
+          "planned": 18,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        }
+      },
+      "byTargetCount": {
+        "0": {
+          "planned": 12,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "1": {
+          "planned": 12,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "5": {
+          "planned": 12,
+          "received": 1,
+          "valid": 1,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        }
+      },
+      "conditions": {
+        "X/#00FF00/10/5": {
+          "planned": 1,
+          "received": 1,
+          "valid": 1,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#00FF00/30/5": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#FFFFFF/10/1": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#00FF00/10/0": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#FFFFFF/10/5": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#FFFFFF/30/5": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#00FF00/30/5": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#00FF00/20/1": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#00FF00/10/0": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#00FF00/10/5": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#FFFFFF/30/0": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#FFFFFF/30/0": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#FFFFFF/30/5": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#00FF00/20/5": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#00FF00/20/1": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#FFFFFF/20/5": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#FFFFFF/20/0": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#FFFFFF/30/1": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#FFFFFF/20/1": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#FFFFFF/30/1": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#FFFFFF/10/5": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#00FF00/30/0": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#FFFFFF/20/1": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#FFFFFF/10/1": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#00FF00/30/0": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#00FF00/30/1": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#FFFFFF/20/5": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#FFFFFF/10/0": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#FFFFFF/10/0": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#00FF00/20/5": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#FFFFFF/20/0": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#00FF00/20/0": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#00FF00/30/1": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#00FF00/20/0": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#00FF00/10/1": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#00FF00/10/1": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        }
+      },
+      "phaseInputs": {
+        "search": {
+          "touch": 1
+        },
+        "locate": {
+          "touch": 1
+        }
+      }
+    },
+    "invalid": {
+      "testType": "visual-search-two-stage",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "configVersion": "0.1.0",
+      "reportDefinitionVersion": "0.1.0",
+      "presentationVersion": "0.1.0",
+      "configHash": "77c9999593188962ebae2524ea8b96df0d60efeadfc5a0b8008251d3359735c4",
+      "protocolSignature": "83fda15215385e3a77b9937472f966693ef6909e8698317ed58b79f67dae90ba",
+      "profile": "experience",
+      "state": "invalid",
+      "planned": 36,
+      "received": 0,
+      "valid": 0,
+      "correct": 0,
+      "bySetSize": {
+        "10": {
+          "planned": 12,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "20": {
+          "planned": 12,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "30": {
+          "planned": 12,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        }
+      },
+      "byColour": {
+        "#00FF00": {
+          "planned": 18,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "#FFFFFF": {
+          "planned": 18,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        }
+      },
+      "byTargetCount": {
+        "0": {
+          "planned": 12,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "1": {
+          "planned": 12,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "5": {
+          "planned": 12,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        }
+      },
+      "conditions": {
+        "X/#00FF00/10/5": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#00FF00/30/5": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#FFFFFF/10/1": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#00FF00/10/0": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#FFFFFF/10/5": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#FFFFFF/30/5": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#00FF00/30/5": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#00FF00/20/1": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#00FF00/10/0": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#00FF00/10/5": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#FFFFFF/30/0": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#FFFFFF/30/0": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#FFFFFF/30/5": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#00FF00/20/5": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#00FF00/20/1": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#FFFFFF/20/5": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#FFFFFF/20/0": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#FFFFFF/30/1": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#FFFFFF/20/1": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#FFFFFF/30/1": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#FFFFFF/10/5": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#00FF00/30/0": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#FFFFFF/20/1": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#FFFFFF/10/1": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#00FF00/30/0": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#00FF00/30/1": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#FFFFFF/20/5": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#FFFFFF/10/0": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#FFFFFF/10/0": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#00FF00/20/5": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#FFFFFF/20/0": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#00FF00/20/0": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#00FF00/30/1": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#00FF00/20/0": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "X/#00FF00/10/1": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        },
+        "O/#00FF00/10/1": {
+          "planned": 1,
+          "received": 0,
+          "valid": 0,
+          "correct": 0,
+          "correctRTCount": 0,
+          "medianSearchMs": null,
+          "medianLocateMs": null
+        }
+      },
+      "phaseInputs": {
+        "search": {},
+        "locate": {}
+      }
+    }
+  }
+}

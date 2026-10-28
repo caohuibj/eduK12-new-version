@@ -1,4 +1,7 @@
 import React from 'react'
+import CognitiveReportVisual from '../../CognitiveReportVisual'
+import '../../cognitive-report-reading.css'
+import '../../cognitive-native-report.css'
 import {HF_COPY,HF_GROUPS,HF_INPUTS,isHFReport,type HFReport as Report,type GroupKey} from './generated/report'
 const labels:Record<GroupKey,[string,string]>={heartOnly:['心同侧','Hearts, same side'],flowerOnly:['花对侧','Flowers, opposite side'],mixed:['混合规则','Mixed rules'],mixedSwitch:['混合：切换','Mixed: switch'],mixedRepeat:['混合：重复','Mixed: repeat'],mixedFirst:['混合：首题','Mixed: first trial']}
 const mainGroups=['heartOnly','flowerOnly','mixed'] as const
@@ -8,14 +11,14 @@ export function HFReport({report,language='zh'}:{report:Report;language?:'zh'|'e
  const totals=report.groups?mainGroups.reduce((sum,key)=>({correct:sum.correct+report.groups![key].correct,missed:sum.missed+report.groups![key].missed,answered:sum.answered+report.groups![key].answered}),{correct:0,missed:0,answered:0}):null
  const finding=totals?(en?`This attempt recorded results for ${report.valid} trials: ${totals.correct} correct, ${totals.answered-totals.correct} incorrect, and ${totals.missed} without a response.`:`本次记录了${report.valid}题的结果：答对${totals.correct}题，答错${totals.answered-totals.correct}题，${totals.missed}题未回应。`):null
  const conditions=report.groups?mainGroups.map(key=>{const g=report.groups![key],label=labels[key][en?1:0];return g.valid?(en?`${label}: ${g.correct} correct out of ${g.valid} trials`:`${label}共${g.valid}题，答对${g.correct}题`):(en?`${label}: no results available`:`${label}尚无可用记录`)}).join(en?'; ':'；')+(en?'.':'。'):null
- return <article className="hf-task hf-reading" data-hf-report={report.state}>
+ return <article className="cognitive-native-report hf-task hf-reading" data-hf-report={report.state}>
   <h1>{copy.title}</h1>
   <p>{en?`${report.profile==='research'?'Research version':'Practical version'} · ${report.planned} planned trials`:`${report.profile==='research'?'科研版':'实用版'} · 计划${report.planned}题`}</p>
   {report.state==='invalid'?<p>{en?'There are no usable response records to describe, so this attempt cannot support a performance conclusion.':'本次没有可用于描述表现的作答记录，暂时无法形成表现结论。'}</p>:<>
    <p>{finding}</p><p>{conditions}</p>
    {report.state==='limited'&&<p role="status">{en?'This attempt was interrupted or unfinished. Only the results already retained are described; unfinished trials are not counted as incorrect.':'本次有中断或未完成，只描述已经保留的结果；未完成的题目不按答错处理。'}</p>}
    <p>{en?'These counts describe this attempt under each rule. They do not establish a stable strength or difficulty.':'这些数字只描述你这次在不同规则下的作答，不据此判断稳定的长处或困难。'}</p>
-   <table><caption>{en?'Your results under each rule':'你在各条规则下的作答'}</caption><thead><tr><th>{en?'Rule':'规则'}</th><th>{en?'Correct answers':'答对情况'}</th><th>{en?'Accuracy':'正确率'}</th><th>{en?'No response':'未回应'}</th></tr></thead><tbody>{mainGroups.map(key=>{const g=report.groups![key];return <tr key={key}><th>{labels[key][en?1:0]}</th><td>{g.valid?(en?`${g.correct} correct out of ${g.valid} trials`:`${g.valid}题中答对${g.correct}题`):(en?'No results available':'尚无可用记录')}</td><td>{g.accuracy===null?'—':`${(g.accuracy*100).toFixed(1)}%`}</td><td>{g.valid?g.missed:'—'}</td></tr>})}</tbody></table>
+   <CognitiveReportVisual language={language} missingLabel={en?'No records under this rule':'这条规则尚无记录'} visual={{kind:'metrics',unit:'ratio',title:en?'Your record under three rules':'三条规则下的这次记录',points:mainGroups.map(key=>({label:({heartOnly:en?'Hearts':'心同侧',flowerOnly:en?'Flowers':'花对侧',mixed:en?'Mixed':'混合'})[key],value:report.groups![key].accuracy})),caption:mainGroups.map(key=>`${labels[key][en?1:0]}: ${report.groups![key].correct}/${report.groups![key].valid}`).join('；')+(en?'. Correct / closed response windows, including omissions. EDUK12.TOP':'。答对／已闭合回应窗口，含漏答。EDUK12.TOP')}}/><table><caption>{en?'Your results under each rule':'你在各条规则下的作答'}</caption><thead><tr><th>{en?'Rule':'规则'}</th><th>{en?'Correct answers':'答对情况'}</th><th>{en?'Accuracy':'正确率'}</th><th>{en?'No response':'未回应'}</th></tr></thead><tbody>{mainGroups.map(key=>{const g=report.groups![key];return <tr key={key}><th>{labels[key][en?1:0]}</th><td>{g.valid?(en?`${g.correct} correct out of ${g.valid} trials`:`${g.valid}题中答对${g.correct}题`):(en?'No results available':'尚无可用记录')}</td><td>{g.accuracy===null?'—':`${(g.accuracy*100).toFixed(1)}%`}</td><td>{g.valid?g.missed:'—'}</td></tr>})}</tbody></table>
    <p>{en?'When rules change, state the rule clearly and check each step against it.':'需要切换规则时，可以先把规则说清楚，再逐项确认。'}</p>
    <details><summary>{en?'Response times, calculations and research notes':'查看用时、计算方式与研究说明'}</summary>
     <p>{en?`Received ${report.received} records out of ${report.planned} planned trials; ${report.valid} response windows had closed.`:`计划${report.planned}题，收到${report.received}条记录，其中${report.valid}题的回应窗口已闭合。`}</p>

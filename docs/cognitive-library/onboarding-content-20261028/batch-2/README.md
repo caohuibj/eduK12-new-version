@@ -64,3 +64,90 @@ pointer，见 [installation-continued.json](evidence/installation-continued.json
 [说明审阅索引](evidence/instruction-review.json) 包含源码哈希及27张实际预览：
 手机中文、平板英文和 CSS 200% 压力预览。都是组件级预览，不冒充真实四入口或
 原生设备计时验证。完整截图夹具及其首轮标题定位失败会在报告呈现提交保留。
+
+## 七份报告的真实数据图与文字呈现
+
+7份独立报告复用 `CognitiveReportVisual` 和一份仅作用于报告的 CSS，不复制图表引擎：
+
+| 报告 | 图展示什么 | 真实分母与限制 |
+| --- | --- | --- |
+| 注意瞬脱 | 第一个认对后，第二个认对比例 | 两个均正确／第一个正确，按lag分别计算；零分母缺失 |
+| 双箭头 | 各通道单／双任务正确比例 | 正确／要求回应的已闭合窗口；漏答仍在分母；原有符号差值保留 |
+| gradCPT | 城市漏按和山景误按 | 各自有效城市／山景分母，不合成总分，真实零显示0% |
+| 心与花 | 三规则下的正确比例 | 公开投影既有accuracy；实际闭合窗口含漏答，未执行不补造 |
+| Horizon | 信息不等时首选较少采样侧的比例 | 各机会条件真实首自由选择；不把偏好分对错 |
+| 空间精度 | 记1个／5个时的平均角度距离 | 原公开投影自然单位与有效／计划次数，不估容量分 |
+| 视觉搜索 | 不同字母数量下找对的比例 | 正确／实际完整轮次；不推断稳定搜索斜率 |
+
+每图保留可读文字、准确次数、缺失标记、图表数据列表和EDUK12.TOP。invalid 不画
+表现图，limited 继续使用各包既有公开投影，不读内部research maps；原有正文、
+解释、建议和限制继续保留。本轮不新增下载路径或服务器绘图，不改变计分/规范版本。
+
+示例通过[原测试中的精确纯构造函数](evidence/report-fixture-provenance.json)产生，
+未执行原describe/it断言；只为这7个新报告消费者生成对应合成输入，调用真实scorer
+和公开投影。完整可读[原始输入](evidence/report-raw-inputs.json)和
+[公开结果](evidence/report-public-fixtures.json)保留，不是真实参与者数据或常模。
+新7项呈现断言实际全部通过：[report-presentation.json](evidence/report-presentation.json)。
+直接前端类型零诊断：[frontend-direct-types.json](evidence/frontend-direct-types.json)。
+
+图示可直接阅读：[注意瞬脱](evidence/screens/blink-report-phone-zh.png)、
+[双箭头](evidence/screens/dual-report-phone-zh.png)、
+[gradCPT](evidence/screens/grad-report-phone-zh.png)、
+[心与花](evidence/screens/hf-report-phone-zh.png)、
+[Horizon](evidence/screens/horizon-report-phone-zh.png)、
+[空间精度](evidence/screens/spatial-report-phone-zh.png)、
+[视觉搜索](evidence/screens/search-report-phone-zh.png)。
+
+截图原调用成功完成56个场景后，在ANT嵌入说明等待独立H1超时，原调用仍是失败。
+夹具改为等待实际H1/H2层级，只续验尚缺的ANT/再认说明6场景，没有重跑56项。
+[原进度](evidence/browser-reading-original-progress.json)、
+[缺项续验](evidence/browser-reading-continued.json)、
+[实际62场景并集](evidence/browser-reading-union.json)分开保留；不能把并集说成原命令
+整条成功。无页面异常、横向溢出或SVG标签越界。200%是CSS zoom压力预览，不是
+原生手机/平板或计时验证。开发者已逐张查看7张中文手机报告，文字和图例可读。
+
+原构造夹具截断gradCPT时误留下一slot的边界帧，被既有paint证据校验拒绝；只修
+夹具的截断，不修改计分或时序容差。原日志保留。最早前端检查在生成文件未形成时
+启动，因此报fixture文件缺失，零断言执行；生成成功后再验。完整命令/退出与输入
+哈希见[呈现回执](evidence/presentation-receipt.json)。
+
+## 当前真实状态与保留缺口
+
+累计11个现有任务项目的精确配置已分两批在全新隔离库验证安装为DRAFT/GRANT，
+不是在一个正式公共库激活了11项。12项目源码实现去重数不增加；连续图像再认仍
+缺真实图片池。MOT／点数判断有既有native产品运行器；另外9个项目是后端已注册、
+草稿可安装，前端仍只有候选组件及其任务端口，不能声称产品已可作答。
+
+以下按原委托边界交 root 协调，均为 pending／未执行，不是自动审批 denied：
+
+1. **正式运行库安装与发布**：目标库和获授权安装身份尚未提供给本节点。已完成选中
+   selector、隔离安装、幂等和冻结；本节点不接触生产、不投放或授权真实人员。
+2. **连续图像再认配置**：需至少184个真实正式assetId和独立6个练习assetId，才能让
+   同一配置支持research与experience；仅体验需要74个正式ID。必须是真实可加载清单，
+   冻结manifestHash与证据引用；授权状态未核可继续如实pending，不能伪造authorized。
+   已有synthetic-manifests明确仅逻辑ID，不可作为正式池。未尝试用占位素材安装。
+3. **四入口和完整原件**：`raw-archive.service.ts`继续拒绝composite/access-token/无userId；
+   School/Teacher实际认知client没有archiveRaw/getRawArchive；Survey client也没有且有
+   localDraftScope。`useCognitiveSession.ts`在这些条件下明确拒绝native启动。没有移除
+   guard、借用Training cookie或冒称四入口成功。准确源码位置见下方文件清单。
+4. **9个任务产品宿主**：`native-runners.tsx`仍只有MOT和Enumeration；其余任务需要把既有
+   durable prepare/persist/finalize端口接到真实冻结会话与私有原件链路，不能用候选的
+   内存端口、客户端scorer或内部科研字段临时放行。`assertNativeDeliverySupported`
+   保持原拒绝范围，未因源码注册自动开放。这是接入工程缺口，不是科研质量门禁。
+
+最小下一步是由root确定受支持身份/原件入口的工程范围，再复用现有宿主和DB/core＋
+COS链路补端口；不新增平行权限缓存/注册/报告引擎。正式库目标与素材清单未齐前，
+当前可独立完成的注册、草稿安装、说明和7份报告呈现均已有上述实际交付与原始证据。
+
+准确入口文件：
+`backend/src/modules/cognitive/raw-archive.service.ts`、
+`backend/src/modules/cognitive/task-resource.ts`、
+`frontend/src/modules/cognitive/core/useCognitiveSession.ts`、
+`frontend/src/modules/cognitive/native-runners.tsx`、
+`frontend/src/school/SchoolCompositeRunner.tsx`、
+`frontend/src/huiteacher/assessmentRuntime.client.ts`、
+`frontend/src/survey/survey-cognitive-api.ts`（均位于server-version/）。
+
+MOT、Enumeration、ANT及连续再认原有报告已逐源码审阅，保留其已有公开投影/三态和
+已留存报告材料；气球努力沿首批结果。没有为了凑图对这些已合格报告重新画一套或
+重复施测。其余科研、人群、译审与版权状态照原记录保留，不加自动准入门禁。
