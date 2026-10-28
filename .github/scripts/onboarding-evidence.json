@@ -1,123 +1,253 @@
 {
   "schemaVersion": 1,
-  "product": "750cdb5b40534ed07799dad7d39f0c0e15b0af87",
+  "product": "8188745ca7134b38784717af384d72a730e47945",
   "reviewer": "root dot",
   "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
   "ciExecuted": false,
   "originalExecutionSigned": false,
   "environment": {
     "node": "24.22.1",
-    "postgres": "17.11",
     "originalFullDependencyByteManifest": null,
     "limitations": [
-      "No original signed execution or complete installed dependency-byte inventory for the earlier local cases.",
-      "PG17 is the original actual database; do not claim it ran on Actions PG16.",
-      "Schema and dependency lock are unchanged from the reviewed base; this patch uses existing Prisma operations and ordinary PostgreSQL transactions, not PG17-specific SQL.",
-      "Source association for test reports is retrospective root review. Original filtered rows and setup failure documentation remain; no fresh test run is claimed."
+      "Historical child reports are unsigned and source associations are retrospective, not fabricated original source receipts. Original failures and filtered rows remain intact.",
+      "Two historical shell exits were 1; the cache-negative case is admitted only as an actual passed reporter assertion, not a successful command. Its unchanged cache/scorer path was inspected directly.",
+      "The seven affected caller/quarantine/publication assertions and integrated backend typecheck were newly executed once by root locally on 8188745. CI verifies their original evidence without replay.",
+      "Tests use synthetic in-memory persistence; this is not PostgreSQL lifecycle, browser, production activation or content-package admission. No schema, dependencies or database semantics changed."
     ]
   },
   "reports": [
     {
-      "id": "profiles",
-      "path": "docs/cognitive-library/onboarding-structure-20261028/evidence/profiles.json",
-      "sha256": "4938b7a5475bcb5a7ddf93eefe42d685c2701b753212afde82a7a71d24ba64a6",
-      "originalSourceAssociation": "c23cc8a715d542720bb0f6a42da700e6aa875199",
-      "sourceAssociationBasis": "Root inspected exact source after execution; not an original signed commit receipt",
+      "id": "root-affected",
+      "path": "docs/scale-library-structure-20261027/evidence/root-affected.json",
+      "sha256": "9f179c926e349c73ea0c9c071a9429f6473e21b1dd97a9278a4e40427ee3b570",
+      "originalSourceAssociation": "8188745ca7134b38784717af384d72a730e47945",
+      "sourceAssociationBasis": "Retrospective root source/fixture review; original unsigned report retained",
+      "reviewedUnrelatedSourceDelta": [],
+      "deltaRationale": "Root current-input seven-case supplement covers changed install/materialize/publication calls, corrected Prisma select, live actor/deployment/reference states, and candidate quarantine. Backend tree unchanged after this execution.",
+      "cases": [
+        {
+          "fullName": "selected immutable scale admission contract and live row instruction executes each golden once through real install/materialize/publication layers and reuses frozen validation",
+          "status": "passed"
+        },
+        {
+          "fullName": "selected immutable scale admission contract and live row instruction reuses a failed immutable contract without promoting it or replaying golden scorers",
+          "status": "skipped"
+        },
+        {
+          "fullName": "selected immutable scale admission contract and live row instruction rechecks administrator changes inside the transaction despite a cached valid source",
+          "status": "passed"
+        },
+        {
+          "fullName": "selected immutable scale admission contract and live row instruction rechecks deployment identity, installed version and reference data without replaying immutable scoring",
+          "status": "passed"
+        },
+        {
+          "fullName": "selected immutable scale admission contract and live row instruction preserves old-row text and nullable instructions while still binding proof and rejecting wrong-version data",
+          "status": "skipped"
+        },
+        {
+          "fullName": "selected immutable scale admission contract and live row instruction seeds an empty store through the actual scale seed/materializer and admits nullable legacy installation with explicit diagnostics",
+          "status": "skipped"
+        },
+        {
+          "fullName": "three-part structural admission consumes a short report with no editorial review or forced guidance categories",
+          "status": "skipped"
+        },
+        {
+          "fullName": "three-part structural admission retains report language, respondent, metric coverage and duplicate-band structural failures",
+          "status": "skipped"
+        },
+        {
+          "fullName": "three-part structural admission keeps a malformed report candidate discoverable while refusing its selected executable and runtime policy",
+          "status": "passed"
+        },
+        {
+          "fullName": "three-part structural admission quarantines schema-invalid candidates with original diagnostics and still rejects identity collisions",
+          "status": "passed"
+        },
+        {
+          "fullName": "three-part structural admission keeps scientific and translation statuses truthful as manual diagnostics with exact locale/version matching",
+          "status": "skipped"
+        },
+        {
+          "fullName": "explicit STANDARD publication with manual scientific and rights diagnostics retains unqualified research and unknown/restricted rights in the preview proof without granting scientific approval",
+          "status": "passed"
+        },
+        {
+          "fullName": "explicit STANDARD publication with manual scientific and rights diagnostics continues to require real administrator authority and a current publication proof",
+          "status": "passed"
+        }
+      ],
+      "summary": {
+        "success": true,
+        "numPassedTests": 7,
+        "numFailedTests": 0,
+        "numPendingTests": 6
+      }
+    },
+    {
+      "id": "seed-instruction-compatibility",
+      "path": "docs/scale-library-structure-20261027/evidence/seed-instruction-compatibility.json",
+      "sha256": "9d62fa6537c8e284f78d13187786ee0cf62b9fd494bf4fb1eec212f76e98c801",
+      "originalSourceAssociation": "80891374e7b23504b15827484de882e90e7cf5c1",
+      "sourceAssociationBasis": "Retrospective root source/fixture review; original unsigned report retained",
       "reviewedUnrelatedSourceDelta": [
         "server-version/backend/src/__tests__/cognitive/onboarding-decision.test.ts",
         "server-version/backend/src/__tests__/cognitive/onboarding-install.postgres.integration.test.ts",
         "server-version/backend/src/__tests__/cognitive/onboarding-install.test.ts",
+        "server-version/backend/src/__tests__/cognitive/pilot-profiles.test.ts",
+        "server-version/backend/src/modules/cognitive/library/product-readiness.ts",
         "server-version/backend/src/modules/cognitive/onboarding/decision.ts",
         "server-version/backend/src/modules/cognitive/onboarding/install.ts",
+        "server-version/backend/src/modules/cognitive/v2/publication-gate.ts",
         "server-version/backend/src/scripts/cognitive-onboarding-check.ts",
         "server-version/backend/src/scripts/install-cognitive-configs.ts"
       ],
-      "deltaRationale": "Later additions are the separate onboarding decision/CLI/installer and their tests. The profile-contract import closure was not changed; installer cases bind the final exact product source. No later application edits follow this snapshot.",
+      "deltaRationale": "Final nullable-instruction seed/materialize/proof cases. Later backend delta is only the independent cognitive onboarding mechanism and its tests; exact scale code/test bytes unchanged.",
       "cases": [
         {
-          "fullName": "standard-only Pilot profiles adapts and releases a valid standard-only task without adding missing profiles",
+          "fullName": "selected immutable scale admission contract and live row instruction executes each golden once through real install/materialize/publication layers and reuses frozen validation",
+          "status": "skipped"
+        },
+        {
+          "fullName": "selected immutable scale admission contract and live row instruction reuses a failed immutable contract without promoting it or replaying golden scorers",
+          "status": "skipped"
+        },
+        {
+          "fullName": "selected immutable scale admission contract and live row instruction rechecks administrator changes inside the transaction despite a cached valid source",
+          "status": "skipped"
+        },
+        {
+          "fullName": "selected immutable scale admission contract and live row instruction rechecks deployment identity, installed version and reference data without replaying immutable scoring",
+          "status": "skipped"
+        },
+        {
+          "fullName": "selected immutable scale admission contract and live row instruction preserves old-row text and nullable instructions while still binding proof and rejecting wrong-version data",
           "status": "passed"
         },
         {
-          "fullName": "standard-only Pilot profiles rejects no declared profiles, broken declared research, and metrics claiming absent profiles",
-          "status": "passed"
-        },
-        {
-          "fullName": "standard-only Pilot profiles accepts explicit research/experience modes without manufacturing a standard mode or publishing the task",
-          "status": "passed"
-        },
-        {
-          "fullName": "standard-only Pilot profiles validates every declared mode even when standard is intentionally absent",
+          "fullName": "selected immutable scale admission contract and live row instruction seeds an empty store through the actual scale seed/materializer and admits nullable legacy installation with explicit diagnostics",
           "status": "passed"
         }
       ],
       "summary": {
         "success": true,
-        "numPassedTests": 4,
+        "numPassedTests": 2,
         "numFailedTests": 0,
-        "numPendingTests": 0
+        "numPendingTests": 4
       }
     },
     {
-      "id": "scientific-advisory",
-      "path": "docs/cognitive-library/onboarding-structure-20261028/evidence/scientific-advisory.json",
-      "sha256": "e185c3acec59ab2911e3b30c017327eb9e7ad0bd41a077061c1ea9145c4dde20",
-      "originalSourceAssociation": "3540ca07fa3d8395013b2f89570c699f27e4edff",
-      "sourceAssociationBasis": "Root inspected exact source after execution; not an original signed commit receipt",
+      "id": "cache-instruction-tests",
+      "path": "docs/scale-library-structure-20261027/evidence/cache-instruction-tests.json",
+      "sha256": "1e232da8b2bb05b78d5d3992129439e321c2fbf8c69e9d4fd872fee07d0a91e6",
+      "originalSourceAssociation": "94a607663a8b380669c9f14b24112c357a757b47",
+      "sourceAssociationBasis": "Retrospective root source/fixture review; original unsigned report retained",
       "reviewedUnrelatedSourceDelta": [
+        "server-version/backend/prisma/seeds/scales.ts",
+        "server-version/backend/src/__tests__/cognitive/onboarding-decision.test.ts",
         "server-version/backend/src/__tests__/cognitive/onboarding-install.postgres.integration.test.ts",
         "server-version/backend/src/__tests__/cognitive/onboarding-install.test.ts",
+        "server-version/backend/src/__tests__/cognitive/pilot-profiles.test.ts",
+        "server-version/backend/src/__tests__/scale/admission-cache-and-instruction.test.ts",
+        "server-version/backend/src/modules/cognitive/library/product-readiness.ts",
+        "server-version/backend/src/modules/cognitive/onboarding/decision.ts",
         "server-version/backend/src/modules/cognitive/onboarding/install.ts",
+        "server-version/backend/src/modules/cognitive/v2/publication-gate.ts",
+        "server-version/backend/src/modules/scale/onboarding/install.ts",
+        "server-version/backend/src/modules/scale/onboarding/instruction-admission.ts",
+        "server-version/backend/src/modules/scale/onboarding/materialize.ts",
+        "server-version/backend/src/modules/scale/onboarding/preview.ts",
+        "server-version/backend/src/modules/scale/onboarding/publish.ts",
+        "server-version/backend/src/scripts/cognitive-onboarding-check.ts",
         "server-version/backend/src/scripts/install-cognitive-configs.ts"
       ],
-      "deltaRationale": "Later additions are the separate onboarding decision/CLI/installer and their tests. The profile-contract import closure was not changed; installer cases bind the final exact product source. No later application edits follow this snapshot.",
+      "deltaRationale": "Only failed-contract cache assertion selected. Registry, scorer and callback unchanged. Later seed import is not invoked by this case; changed install/instruction callers are excluded and separately qualified.",
       "cases": [
         {
-          "fullName": "Cognitive onboarding decision v1 contract technical exit preserves unapproved scientific metadata without turning it into an admission gate",
+          "fullName": "selected immutable scale admission contract and live row instruction executes each golden once through real install/materialize/publication layers and reuses frozen validation",
           "status": "passed"
         },
         {
-          "fullName": "Cognitive onboarding decision v1 contract keeps technical, Pilot publication and scientific eligibility independent",
+          "fullName": "selected immutable scale admission contract and live row instruction reuses a failed immutable contract without promoting it or replaying golden scorers",
+          "status": "passed"
+        },
+        {
+          "fullName": "selected immutable scale admission contract and live row instruction rechecks administrator changes inside the transaction despite a cached valid source",
+          "status": "passed"
+        },
+        {
+          "fullName": "selected immutable scale admission contract and live row instruction preserves exact legacy text, binds it into proof and rejects stale/empty or mismatched row fallbacks",
+          "status": "passed"
+        },
+        {
+          "fullName": "selected immutable scale admission contract and live row instruction does not treat PUBLISHED package status or unreviewed materials as a formal instruction for a new install",
+          "status": "passed"
+        }
+      ],
+      "summary": {
+        "success": true,
+        "numPassedTests": 5,
+        "numFailedTests": 0,
+        "numPendingTests": 0
+      },
+      "selectedCases": [
+        "selected immutable scale admission contract and live row instruction reuses a failed immutable contract without promoting it or replaying golden scorers"
+      ]
+    },
+    {
+      "id": "executable-bytes-final",
+      "path": "docs/scale-library-structure-20261027/evidence/executable-bytes-final.json",
+      "sha256": "8b0911f60d13a773da9082e0e2583aa9b304f4419d7144233e9f943bc5192e80",
+      "originalSourceAssociation": "ed7315aeafa9f1ab94b7aef1f4daaf0607325713",
+      "sourceAssociationBasis": "Retrospective root source/fixture review; original unsigned report retained",
+      "reviewedUnrelatedSourceDelta": [
+        "server-version/backend/prisma/seeds/scales.ts",
+        "server-version/backend/src/__tests__/cognitive/onboarding-decision.test.ts",
+        "server-version/backend/src/__tests__/cognitive/onboarding-install.postgres.integration.test.ts",
+        "server-version/backend/src/__tests__/cognitive/onboarding-install.test.ts",
+        "server-version/backend/src/__tests__/cognitive/pilot-profiles.test.ts",
+        "server-version/backend/src/__tests__/scale/admission-cache-and-instruction.test.ts",
+        "server-version/backend/src/__tests__/scale/instruction-freeze.test.ts",
+        "server-version/backend/src/modules/cognitive/library/product-readiness.ts",
+        "server-version/backend/src/modules/cognitive/onboarding/decision.ts",
+        "server-version/backend/src/modules/cognitive/onboarding/install.ts",
+        "server-version/backend/src/modules/cognitive/v2/publication-gate.ts",
+        "server-version/backend/src/modules/scale/onboarding/install.ts",
+        "server-version/backend/src/modules/scale/onboarding/instruction-admission.ts",
+        "server-version/backend/src/modules/scale/onboarding/instrument-registry.ts",
+        "server-version/backend/src/modules/scale/onboarding/materialize.ts",
+        "server-version/backend/src/modules/scale/onboarding/preview.ts",
+        "server-version/backend/src/modules/scale/onboarding/publish.ts",
+        "server-version/backend/src/modules/scale/onboarding/status.ts",
+        "server-version/backend/src/modules/scale/onboarding/validate-instrument.ts",
+        "server-version/backend/src/scripts/cognitive-onboarding-check.ts",
+        "server-version/backend/src/scripts/install-cognitive-configs.ts"
+      ],
+      "deltaRationale": "Exact generated source/executable adapter and expected byte hashes unchanged. Later registry freezing/cache does not change executable definitions or ordering; selected callback consumes those bytes.",
+      "cases": [
+        {
+          "fullName": "ScaleInstrumentSourceV1 registry preserves the six-package legacy API order and definition hashes",
+          "status": "passed"
+        },
+        {
+          "fullName": "ScaleInstrumentSourceV1 registry enumerates sources exactly once while allowing new content identities",
           "status": "skipped"
         },
         {
-          "fullName": "Cognitive onboarding decision v1 contract technical errors prevent Pilot readiness without mislabeling their gate",
+          "fullName": "ScaleInstrumentSourceV1 registry allows a catalog-only source but rejects a new executable without explicit policy",
           "status": "skipped"
         },
         {
-          "fullName": "Cognitive onboarding decision v1 contract Pilot errors do not become technical errors",
+          "fullName": "ScaleInstrumentSourceV1 registry rejects unknown source fields and duplicate exact identities",
           "status": "skipped"
         },
         {
-          "fullName": "Cognitive onboarding decision v1 contract warnings and informational notes do not block a ready gate",
+          "fullName": "ScaleInstrumentSourceV1 registry rejects duplicate executable identities before Map overwrite",
           "status": "skipped"
         },
         {
-          "fullName": "Cognitive onboarding decision v1 contract reports an excessive declaration separately from readiness and next-tier work",
-          "status": "skipped"
-        },
-        {
-          "fullName": "Cognitive onboarding decision v1 contract produces byte-identical JSON regardless of blocker and object-key insertion order",
-          "status": "skipped"
-        },
-        {
-          "fullName": "Cognitive onboarding decision v1 contract does not collapse different expected/actual diagnoses sharing a code",
-          "status": "skipped"
-        },
-        {
-          "fullName": "Cognitive onboarding decision v1 contract rejects contradictory externally supplied ready flags",
-          "status": "skipped"
-        },
-        {
-          "fullName": "Cognitive onboarding decision v1 contract rejects a blocker put in the wrong gate group",
-          "status": "skipped"
-        },
-        {
-          "fullName": "Cognitive onboarding decision v1 contract rejects unsupported schemas, unknown fields and non-JSON payloads",
-          "status": "skipped"
-        },
-        {
-          "fullName": "Cognitive onboarding decision v1 contract renders codes and locations from the same validated decision as JSON",
+          "fullName": "ScaleInstrumentSourceV1 registry rejects duplicate scorer descriptors and active-key version collisions",
           "status": "skipped"
         }
       ],
@@ -125,66 +255,212 @@
         "success": true,
         "numPassedTests": 1,
         "numFailedTests": 0,
-        "numPendingTests": 11
+        "numPendingTests": 5
       }
     },
     {
-      "id": "install-unit",
-      "path": "docs/cognitive-library/onboarding-structure-20261028/evidence/install-unit.json",
-      "sha256": "5775276259273dec8c34eaab98fe36a652ce9fd6de6fbc5ced58489616ff627d",
-      "originalSourceAssociation": "750cdb5b40534ed07799dad7d39f0c0e15b0af87",
-      "sourceAssociationBasis": "Root inspected exact source after execution; not an original signed commit receipt",
-      "reviewedUnrelatedSourceDelta": [],
-      "deltaRationale": "Later additions are the separate onboarding decision/CLI/installer and their tests. The profile-contract import closure was not changed; installer cases bind the final exact product source. No later application edits follow this snapshot.",
+      "id": "manual-review-tests",
+      "path": "docs/scale-library-structure-20261027/evidence/manual-review-tests.json",
+      "sha256": "823eefa73ef190048448d6089c8af86f0c19195119cd4c4c4299cc8d256f9158",
+      "originalSourceAssociation": "ed7315aeafa9f1ab94b7aef1f4daaf0607325713",
+      "sourceAssociationBasis": "Retrospective root source/fixture review; original unsigned report retained",
+      "reviewedUnrelatedSourceDelta": [
+        "server-version/backend/prisma/seeds/scales.ts",
+        "server-version/backend/src/__tests__/cognitive/onboarding-decision.test.ts",
+        "server-version/backend/src/__tests__/cognitive/onboarding-install.postgres.integration.test.ts",
+        "server-version/backend/src/__tests__/cognitive/onboarding-install.test.ts",
+        "server-version/backend/src/__tests__/cognitive/pilot-profiles.test.ts",
+        "server-version/backend/src/__tests__/scale/admission-cache-and-instruction.test.ts",
+        "server-version/backend/src/__tests__/scale/instruction-freeze.test.ts",
+        "server-version/backend/src/modules/cognitive/library/product-readiness.ts",
+        "server-version/backend/src/modules/cognitive/onboarding/decision.ts",
+        "server-version/backend/src/modules/cognitive/onboarding/install.ts",
+        "server-version/backend/src/modules/cognitive/v2/publication-gate.ts",
+        "server-version/backend/src/modules/scale/onboarding/install.ts",
+        "server-version/backend/src/modules/scale/onboarding/instruction-admission.ts",
+        "server-version/backend/src/modules/scale/onboarding/instrument-registry.ts",
+        "server-version/backend/src/modules/scale/onboarding/materialize.ts",
+        "server-version/backend/src/modules/scale/onboarding/preview.ts",
+        "server-version/backend/src/modules/scale/onboarding/publish.ts",
+        "server-version/backend/src/modules/scale/onboarding/status.ts",
+        "server-version/backend/src/modules/scale/onboarding/validate-instrument.ts",
+        "server-version/backend/src/scripts/cognitive-onboarding-check.ts",
+        "server-version/backend/src/scripts/install-cognitive-configs.ts"
+      ],
+      "deltaRationale": "Explicit supplied-source preview path remains standalone validation. Later executeGoldenCases option defaults to original true; localization policies/schemas and callback fixtures unchanged. Added optional instruction diagnostic does not change these assertions.",
       "cases": [
         {
-          "fullName": "selected cognitive draft installation previews without writes, creates only restricted drafts and is idempotent without republishing",
+          "fullName": "pending-audit content: review states, evidence records and next actions previews pending manual reviews without manufacturing an approval or blocking technical activation",
           "status": "passed"
         },
         {
-          "fullName": "selected cognitive draft installation preserves published lifecycle and rejects conflicts, duplicate identities and unregistered selections",
+          "fullName": "pending-audit content: review states, evidence records and next actions separates RETURNED from PENDING with revision guidance",
           "status": "passed"
         },
         {
-          "fullName": "selected cognitive draft installation requires an active system administrator and an exact declared execution identity",
+          "fullName": "pending-audit content: review states, evidence records and next actions rejects reusing an old review record after a version change",
+          "status": "passed"
+        },
+        {
+          "fullName": "pending-audit content: review states, evidence records and next actions keeps the three legacy states deployable/regressable: approved formal translation, original source, pending draft",
+          "status": "passed"
+        },
+        {
+          "fullName": "pending-audit content: review states, evidence records and next actions an evidence-carrying approval passes parse when versions match",
+          "status": "passed"
+        },
+        {
+          "fullName": "standard onboarding status view reports distinct lifecycle states with next actions and never merges import with publication",
+          "status": "skipped"
+        }
+      ],
+      "summary": {
+        "success": true,
+        "numPassedTests": 5,
+        "numFailedTests": 0,
+        "numPendingTests": 1
+      }
+    },
+    {
+      "id": "structure-install-final",
+      "path": "docs/scale-library-structure-20261027/evidence/structure-install-final.json",
+      "sha256": "9261123b08b7dd87915f541a6f1ac9b1ced3262aa97a0a5f939c97b0b648c30f",
+      "originalSourceAssociation": "ed7315aeafa9f1ab94b7aef1f4daaf0607325713",
+      "sourceAssociationBasis": "Retrospective root source/fixture review; original unsigned report retained",
+      "reviewedUnrelatedSourceDelta": [
+        "server-version/backend/prisma/seeds/scales.ts",
+        "server-version/backend/src/__tests__/cognitive/onboarding-decision.test.ts",
+        "server-version/backend/src/__tests__/cognitive/onboarding-install.postgres.integration.test.ts",
+        "server-version/backend/src/__tests__/cognitive/onboarding-install.test.ts",
+        "server-version/backend/src/__tests__/cognitive/pilot-profiles.test.ts",
+        "server-version/backend/src/__tests__/scale/admission-cache-and-instruction.test.ts",
+        "server-version/backend/src/__tests__/scale/instruction-freeze.test.ts",
+        "server-version/backend/src/modules/cognitive/library/product-readiness.ts",
+        "server-version/backend/src/modules/cognitive/onboarding/decision.ts",
+        "server-version/backend/src/modules/cognitive/onboarding/install.ts",
+        "server-version/backend/src/modules/cognitive/v2/publication-gate.ts",
+        "server-version/backend/src/modules/scale/onboarding/install.ts",
+        "server-version/backend/src/modules/scale/onboarding/instruction-admission.ts",
+        "server-version/backend/src/modules/scale/onboarding/instrument-registry.ts",
+        "server-version/backend/src/modules/scale/onboarding/materialize.ts",
+        "server-version/backend/src/modules/scale/onboarding/preview.ts",
+        "server-version/backend/src/modules/scale/onboarding/publish.ts",
+        "server-version/backend/src/modules/scale/onboarding/status.ts",
+        "server-version/backend/src/modules/scale/onboarding/validate-instrument.ts",
+        "server-version/backend/src/scripts/cognitive-onboarding-check.ts",
+        "server-version/backend/src/scripts/install-cognitive-configs.ts"
+      ],
+      "deltaRationale": "Select unchanged authority predicates/schema rejection, executable duplicate guards, and report/locale structural rules only. New immutable cache and instruction binding do not alter selected predicates. New install/publication caller journeys and quarantine are separately qualified in root-affected. Historical whole-module success is not substituted for final callers.",
+      "cases": [
+        {
+          "fullName": "applies the audience report gate to direct publication as well as onboarding",
+          "status": "passed"
+        },
+        {
+          "fullName": "ScaleInstrumentSourceV1 registry preserves the six-package legacy API order and definition hashes",
+          "status": "passed"
+        },
+        {
+          "fullName": "ScaleInstrumentSourceV1 registry enumerates sources exactly once while allowing new content identities",
+          "status": "passed"
+        },
+        {
+          "fullName": "ScaleInstrumentSourceV1 registry allows a catalog-only source but rejects a new executable without explicit policy",
+          "status": "passed"
+        },
+        {
+          "fullName": "ScaleInstrumentSourceV1 registry rejects unknown source fields and duplicate exact identities",
+          "status": "passed"
+        },
+        {
+          "fullName": "ScaleInstrumentSourceV1 registry rejects duplicate executable identities before Map overwrite",
+          "status": "passed"
+        },
+        {
+          "fullName": "ScaleInstrumentSourceV1 registry rejects duplicate scorer descriptors and active-key version collisions",
+          "status": "passed"
+        },
+        {
+          "fullName": "V2 install remains an authorized operation without a license ledger plans an exact existing instrument without license storage or reads",
+          "status": "passed"
+        },
+        {
+          "fullName": "V2 install remains an authorized operation without a license ledger retains active system administrator authority: null",
+          "status": "passed"
+        },
+        {
+          "fullName": "V2 install remains an authorized operation without a license ledger retains active system administrator authority: {\"id\":\"admin\",\"platformRole\":\"USER\",\"isActive\":true,\"isFrozen\":false,\"expiresAt\":null}",
+          "status": "passed"
+        },
+        {
+          "fullName": "V2 install remains an authorized operation without a license ledger retains active system administrator authority: {\"id\":\"admin\",\"platformRole\":\"SYSTEM_ADMIN\",\"isActive\":false,\"isFrozen\":false,\"expiresAt\":null}",
+          "status": "passed"
+        },
+        {
+          "fullName": "V2 install remains an authorized operation without a license ledger retains active system administrator authority: {\"id\":\"admin\",\"platformRole\":\"SYSTEM_ADMIN\",\"isActive\":true,\"isFrozen\":true,\"expiresAt\":null}",
+          "status": "passed"
+        },
+        {
+          "fullName": "V2 install remains an authorized operation without a license ledger retains active system administrator authority: {\"id\":\"admin\",\"platformRole\":\"SYSTEM_ADMIN\",\"isActive\":true,\"isFrozen\":false,\"expiresAt\":\"2000-01-01T00:00:00.000Z\"}",
+          "status": "passed"
+        },
+        {
+          "fullName": "V2 install remains an authorized operation without a license ledger records scientific territory for manual review without turning it into installation authority",
+          "status": "passed"
+        },
+        {
+          "fullName": "V2 install remains an authorized operation without a license ledger rejects legacy V1 new writes before touching a database; backfill also requires V2",
+          "status": "passed"
+        },
+        {
+          "fullName": "V2 install remains an authorized operation without a license ledger persists a V2 deployment without writing the old authorization_refs column",
+          "status": "passed"
+        },
+        {
+          "fullName": "three-part structural admission consumes a short report with no editorial review or forced guidance categories",
+          "status": "passed"
+        },
+        {
+          "fullName": "three-part structural admission retains report language, respondent, metric coverage and duplicate-band structural failures",
+          "status": "passed"
+        },
+        {
+          "fullName": "three-part structural admission keeps a malformed report candidate discoverable while refusing its selected executable and runtime policy",
+          "status": "passed"
+        },
+        {
+          "fullName": "three-part structural admission keeps scientific and translation statuses truthful as manual diagnostics with exact locale/version matching",
           "status": "passed"
         }
       ],
       "summary": {
         "success": true,
-        "numPassedTests": 3,
+        "numPassedTests": 20,
         "numFailedTests": 0,
         "numPendingTests": 0
-      }
-    },
-    {
-      "id": "install-postgres",
-      "path": "docs/cognitive-library/onboarding-structure-20261028/evidence/install-postgres.json",
-      "sha256": "4893042c5b706327633606c73f97fe8fdf8d7934aa71ecf5d6492396552b6c3a",
-      "originalSourceAssociation": "750cdb5b40534ed07799dad7d39f0c0e15b0af87",
-      "sourceAssociationBasis": "Root inspected exact source after execution; not an original signed commit receipt",
-      "reviewedUnrelatedSourceDelta": [],
-      "deltaRationale": "Later additions are the separate onboarding decision/CLI/installer and their tests. The profile-contract import closure was not changed; installer cases bind the final exact product source. No later application edits follow this snapshot.",
-      "cases": [
-        {
-          "fullName": "selected cognitive installation with isolated PostgreSQL previews and installs a registered draft once without publishing, granting access or overwriting conflicts",
-          "status": "passed"
-        }
-      ],
-      "summary": {
-        "success": true,
-        "numPassedTests": 1,
-        "numFailedTests": 0,
-        "numPendingTests": 0
-      }
+      },
+      "selectedCases": [
+        "ScaleInstrumentSourceV1 registry rejects duplicate executable identities before Map overwrite",
+        "ScaleInstrumentSourceV1 registry rejects duplicate scorer descriptors and active-key version collisions",
+        "V2 install remains an authorized operation without a license ledger retains active system administrator authority: null",
+        "V2 install remains an authorized operation without a license ledger retains active system administrator authority: {\"id\":\"admin\",\"platformRole\":\"USER\",\"isActive\":true,\"isFrozen\":false,\"expiresAt\":null}",
+        "V2 install remains an authorized operation without a license ledger retains active system administrator authority: {\"id\":\"admin\",\"platformRole\":\"SYSTEM_ADMIN\",\"isActive\":false,\"isFrozen\":false,\"expiresAt\":null}",
+        "V2 install remains an authorized operation without a license ledger retains active system administrator authority: {\"id\":\"admin\",\"platformRole\":\"SYSTEM_ADMIN\",\"isActive\":true,\"isFrozen\":true,\"expiresAt\":null}",
+        "V2 install remains an authorized operation without a license ledger retains active system administrator authority: {\"id\":\"admin\",\"platformRole\":\"SYSTEM_ADMIN\",\"isActive\":true,\"isFrozen\":false,\"expiresAt\":\"2000-01-01T00:00:00.000Z\"}",
+        "V2 install remains an authorized operation without a license ledger rejects legacy V1 new writes before touching a database; backfill also requires V2",
+        "three-part structural admission consumes a short report with no editorial review or forced guidance categories",
+        "three-part structural admission retains report language, respondent, metric coverage and duplicate-band structural failures",
+        "three-part structural admission keeps scientific and translation statuses truthful as manual diagnostics with exact locale/version matching"
+      ]
     }
   ],
-  "types": {
-    "path": "docs/cognitive-library/onboarding-structure-20261028/evidence/install-types-receipt.json",
-    "sha256": "9ccc23deb43dbd4b534dd6a0048491a4bc9dcddbf9b8356da4f163eb90e4db84",
-    "exitField": "exitCode",
-    "log": "docs/cognitive-library/onboarding-structure-20261028/evidence/install-types.log",
-    "backendTree": "8c73b4d6dda13b7273ed136599a2898cb18cf333",
-    "candidateTree": "76f7479eb1963ebeb0ec31afba2d63b7b6073980"
-  }
+  "types": [
+    {
+      "path": "docs/scale-library-structure-20261027/evidence/root-integrated-types-receipt.json",
+      "sha256": "b007b9cdde767c7ce91f4cfb1b2eebb38988e62f7445407bdd18646d0a1516c0",
+      "exitField": "exitCode",
+      "backendTree": "43e1ea8f2cf710ebfbeced06c0e49c2d4052afec",
+      "log": "docs/scale-library-structure-20261027/evidence/root-integrated-types.log"
+    }
+  ]
 }

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "pr": 366,
-  "enabled": true,
+  "enabled": false,
   "base": "6203a829dc8d7de707e67f413acfa5a354a21e09",
   "product": "750cdb5b40534ed07799dad7d39f0c0e15b0af87",
   "controlCheckpoint": "d6e5f4991d92ec41cf2b9123b71a8cee485bb06c",

@@ -1,0 +1,13 @@
+
+ RUN  v4.1.11 /workspace/scratch/5a77e8bdc1ae/scale-365-review/server-version/backend
+
+ ✓ src/__tests__/scale/admission-cache-and-instruction.test.ts (6 tests | 3 skipped) 53ms
+ ✓ src/__tests__/scale/structural-admission.test.ts (5 tests | 3 skipped) 32ms
+ ✓ src/__tests__/scale/structural-publication.test.ts (2 tests) 35ms
+
+ Test Files  3 passed (3)
+      Tests  7 passed | 6 skipped (13)
+   Start at  09:23:56
+   Duration  2.70s (transform 995ms, setup 0ms, import 2.16s, tests 119ms, environment 0ms)
+
+JSON report written to /workspace/scratch/5a77e8bdc1ae/scale-365-review/docs/scale-library-structure-20261027/evidence/root-affected.json

@@ -24,6 +24,8 @@ test('original reports retain filtered rows and cannot substitute empty, failed 
  const report={success:true,numPassedTests:1,numFailedTests:0,numPendingTests:1,testResults:[{assertionResults:[{fullName:'selected',status:'passed'},{fullName:'old filtered',status:'pending'}]}]};
  const review={summary:Object.fromEntries(['success','numPassedTests','numFailedTests','numPendingTests'].map(key=>[key,report[key]])),cases:report.testResults[0].assertionResults};
  assert.deepEqual(verifyOriginalReport(report,review),['selected']);
+ assert.deepEqual(verifyOriginalReport(report,{...review,selectedCases:['selected']}),['selected']);
+ for(const selectedCases of [[],['old filtered'],['unknown'],['selected','selected']])assert.throws(()=>verifyOriginalReport(report,{...review,selectedCases}));
  for(const bad of [{...report,success:false},{...report,testResults:[]},{...report,numPassedTests:2},{...report,testResults:[{assertionResults:[{fullName:'selected',status:'skipped'}]}]}])assert.throws(()=>verifyOriginalReport(bad,review));
  const receipt={argv:['node','node_modules/typescript/bin/tsc','--noEmit'],exitCode:0,backendTree:h('2')},typeReview={exitField:'exitCode',backendTree:h('2')};
  assert.equal(verifyTypeReceipt(receipt,typeReview,()=>Buffer.from(''),h('2')).originalExitCode,0);

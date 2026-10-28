@@ -113,3 +113,47 @@ install、materialize、publish 和按注册身份读取的预览/接入状态�
 - 新代表用例与类型检查采用非 login shell，并直接捕获 subprocess.returncode；本次检查层与外层均为 **0**。修订仅限任务命令包装，没有修改产品断言、CI 或退出检查策略。
 
 以上是针对新增必填回归的有限修复与代表验证，不是 53 包/全库/真实数据库生命周期的通过声明。候选内容、版本、计分、阈值、科研与权利状态未改，仍不触发 CI、Ready、合并、部署或生产数据写入。
+
+## Root qualification on integrated main (2026-10-28)
+
+Mechanism-only candidate `8188745ca7134b38784717af384d72a730e47945`
+includes main `c412baf508a46278c265c20e71952a179813ef31`. No content
+package, frontend, schema, dependency or production database changes were added.
+
+Root directly inspected actual cache/registry, installation, materialization,
+publication, report validators, test fixtures and original reports. Historical
+caller evidence predates the corrected Prisma select and final nullable
+instruction contract; it is not accepted wholesale. Seven affected assertions
+were executed once locally: once-only scoring across install/publication, live
+administrator recheck, deployment/version/reference recheck, two quarantine
+cases and two publication/proof cases. Result: 7 passed, 6 filtered. A single
+integrated backend tsc exited 0. Original reports, argv, real exit and pre-run
+backend tree are under `evidence/root-*`. Persistence in these cases is synthetic
+in-memory, not PostgreSQL. This supplement does not claim public activation.
+
+The CI evidence manifest selects 27 disjoint outcomes: those seven; two final
+seed/nullable-instruction outcomes; one unchanged negative-cache outcome; one
+unchanged executable byte-order outcome; five supplied-source/manual-review
+outcomes; eleven unchanged authority/schema/report/duplicate-identity outcomes.
+Selected-case admission retains the entire original reporter and every filtered
+row. It rejects empty, duplicate, unknown and non-passed selections. Original
+failed runs, missing contemporaneous credentials and the historical outer-shell
+exit 1 are retained. The negative-cache reporter outcome is not a claim that
+its original shell invocation succeeded. Historical source association is an
+explicit retrospective root review, not a signed original execution.
+
+M01/M02 use final seed and row-proof originals; M03/M05/M06/M08/M10 use the new
+seven-case supplement. M04 uses the unchanged negative-cache path. M07/M09/M11/
+M12 use selected unchanged validators, supplied-source policies and predicates,
+with fresh dynamic-caller checks complementing them. Old instruction-required
+assertions are superseded, not silently labelled passed. No rejected candidate
+is made valid by this mapping.
+
+CI uses the existing bounded onboarding route: exact source/control binding,
+original evidence admission, changed-code CodeQL and the required merge gate.
+It does not replay application tests/types or build images. The new selection
+control was checked locally; formal CI verifies its real source rather than
+rerunning the mocked Git fixtures. Admission job budget is 5 minutes and existing
+CodeQL budget remains 30 minutes. Required checks must truly succeed before
+normal merge. Teacher Pilot's distinct disclosure/QC path and backend diagnostic
+UI remain separate; no claim of whole-library/content or browser acceptance.
