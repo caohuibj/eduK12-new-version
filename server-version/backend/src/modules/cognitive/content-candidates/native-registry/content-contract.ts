@@ -7,7 +7,9 @@ export interface NativeContentAdapter {
  manifestHash(config:unknown,seed:string):string
  envelope(raw:unknown):TrialEnvelope<unknown>
  parseRaw(raw:unknown):void
- project(score:CognitiveScoreResult):unknown
+ project(score:CognitiveScoreResult,binding?:Record<string,unknown>):unknown
+ validateArchiveRecord?(raw:unknown,authority:{config:unknown;contextKey:string;recordKey:string;configHash:string;protocolSignature:string;administration:unknown}):void
+ inspectArchiveRecord?(raw:unknown):{phase:string;round:number;index:number;plan:unknown;status:string}
  isReport(value:unknown):boolean
 }
 export interface NativeDefinitionRecord {definition:TaskDefinition<unknown,unknown>;content?:NativeContentAdapter}

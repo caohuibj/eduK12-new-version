@@ -400,7 +400,7 @@ export const submitUnifiedCognitiveSessionFinal = async (
   const nativeReport=projectNativeContentReport({testType:prepared.snapshot.testType,engineVersion:prepared.snapshot.engineVersion,
     scoringVersion:prepared.snapshot.scoringVersion,configVersion:prepared.snapshot.configVersion,configHash:prepared.snapshot.configHash,
     protocolSignature:prepared.snapshot.protocolSignature,reportDefinitionVersion:freeze.frozenReport?.reportDefinitionVersion??prepared.definition.report.version,
-    presentationVersion:freeze.frozenReport?.presentationVersion??'',profile:freeze.profile,score:scored})
+    presentationVersion:freeze.frozenReport?.presentationVersion??'',profile:freeze.profile,contextKey:JSON.stringify([child.id,input.attemptEpoch,prepared.snapshot.configHash]),score:scored})
   if(nativeReport)report.nativeReport=nativeReport
   const resultSnapshot = parseCognitiveResultSnapshot({
     schemaVersion: 1,

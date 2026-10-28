@@ -13,6 +13,7 @@ export const antConfigSchema=z.object({
     if(v[key]!==expected[key])ctx.addIssue({code:'custom',path:[key],message:'ANT profile condition counts disagree'})
 })
 export const antTrialSchema=z.object({
+  presentationBinding:z.object({schemaVersion:z.literal(1),geometryVersion:z.literal('ant-calibrated-geometry-v1'),geometryHash:z.string().regex(/^[a-f0-9]{64}$/),displayHash:z.string().regex(/^[a-f0-9]{64}$/)}).strict().optional(),
   phase:z.literal('test'),trialIndex:z.number().int().min(0).max(287),blockIndex:z.number().int().min(0).max(2),
   cue:z.enum(CUES),location:z.enum(['top','bottom']),direction:z.enum(['left','right']),flanker:z.enum(FLANKERS),
   neutralVariant:z.enum(['absent','dashes']),plannedPreCueMs:z.number().int().min(400).max(1599),

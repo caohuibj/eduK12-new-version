@@ -31,7 +31,9 @@ function scoreAntIdentity(input:AuthoritativeScorerInput<AntConfig,AntTrial>,id:
   const session=parseSessionConfigSnapshot<AntConfig>(input.session)
   if(session.testType!==id.testType||session.engineVersion!==id.engineVersion
     ||session.scoringVersion!==id.scoringVersion||session.configVersion!==id.configVersion
-    ||session.protocolSignature!==computeProtocolSignature(protocol)||session.runtimeGeneration)
+    ||session.protocolSignature!==computeProtocolSignature(protocol)
+    ||(session.runtimeGeneration&&(id.engineVersion!==ANT_GUIDED_IDENTITY.engineVersion||session.runtimeGeneration!=='UNIFIED_V1'))
+    ||(session.referenceBindings?.length??0)>0)
     throw new Error('Unsupported frozen ANT identity/protocol/runtime')
   const config=parseConfig(input.config)
   parseConfig(session.config)

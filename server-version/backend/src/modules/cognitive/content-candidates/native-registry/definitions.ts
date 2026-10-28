@@ -1,3 +1,4 @@
+import {antGuidedNativeRecord} from '../ant/native-adapter'
 import {contentDefinition,type NativeDefinitionRecord} from './content-contract'
 import {BLINK_IDENTITY,blinkPlan} from '../attentional-blink/protocol'
 import {projectBlinkReport,isBlinkReport} from '../attentional-blink/report'
@@ -47,7 +48,8 @@ const nativeDefinitions:readonly NativeDefinitionRecord[]=[
   contentDefinition(horizonDefinition,HORIZON_IDENTITY.configVersion,(c,s)=>({formal:horizonPlan(c,s),practice:[0,1,2].map(round=>horizonPlan(c,s,'practice',round))}),horizonEnvelope,projectHorizonReport,isHorizonReport),
   contentDefinition(spatialMemoryDefinition,SPATIAL_IDENTITY.configVersion,(c,s)=>[...spatialPlan(c,s),...[0,1,2].flatMap(round=>spatialPlan(c,s,'practice',round))],spatialEnvelope,projectSpatialReport,isSpatialReport),
   contentDefinition(searchDefinition,SEARCH_IDENTITY.configVersion,(c,s)=>({formal:searchPlan(c,s),practice:[0,1,2].map(round=>searchPlan(c,s,'practice',round))}),searchEnvelope,projectSearchReport,isSearchReport),
-  ...[motDefinition,enumerationDefinition,enumerationRecipeDefinition,recognitionDefinition,guidedRecognitionDefinition,antDefinition,antGuidedDefinition].map(definition=>({definition} as NativeDefinitionRecord)),
+  antGuidedNativeRecord,
+  ...[motDefinition,enumerationDefinition,enumerationRecipeDefinition,recognitionDefinition,guidedRecognitionDefinition,antDefinition].map(definition=>({definition} as NativeDefinitionRecord)),
 ]
 
 export const listNativeCognitiveTaskDefinitions=():TaskDefinition<unknown,unknown>[]=>nativeDefinitions.map(entry=>entry.definition)

@@ -42,18 +42,19 @@ export function validateNativeContentArchive(value:unknown,authority:ContentArch
    quizzes++;continue
   }
   adapter.parseRaw(row.raw)
-  const raw=row.raw as {plan:{phase?:string;round?:number;index?:number};status:string},phase=Array.isArray(raw.plan)?row.phase:raw.plan.phase,
-   round=row.round??raw.plan.round??0,index=row.index??raw.plan.index??0,m=expectedManifest as {formal:unknown[];practice:unknown[][]}
+  adapter.validateArchiveRecord?.(row.raw,{config:a.config,contextKey:c.contextKey,recordKey:row.recordKey,configHash:s.configHash,protocolSignature:s.protocolSignature,administration:c.administration})
+  const inspected=adapter.inspectArchiveRecord?.(row.raw),raw=row.raw as {plan:{phase?:string;round?:number;index?:number};status:string},phase=inspected?.phase??(Array.isArray(raw.plan)?row.phase:raw.plan.phase),
+   round=row.round??inspected?.round??raw.plan.round??0,index=row.index??inspected?.index??raw.plan.index??0,m=expectedManifest as {formal:unknown[];practice:unknown[][]}
   if(!['test','practice'].includes(String(phase))||row.phase&&row.phase!==phase)throw Error('Native content archive phase mismatch')
   const expected=Array.isArray(expectedManifest)?expectedManifest.find(p=>p.phase===phase&&p.round===round&&p.index===index)
    :phase==='test'?(Array.isArray(raw.plan)?m.formal:m.formal[index]):m.practice[round]?.[index]
-  if(!expected||!same(expected,raw.plan))throw Error('Native content archive record plan mismatch')
+  if(!expected||!same(expected,inspected?.plan??raw.plan))throw Error('Native content archive record plan mismatch')
   if(phase==='test')formal.push(row);else practice.push(row)
  }
- if(formal.length!==a.trials.length||formal.some((r,i)=>{const e=adapter.envelope(r.raw);return e.trialIndex!==i||a.trials[i].trialIndex!==i||!same(r.raw,a.trials[i].payload)}))throw Error('Native content archive core mismatch')
+ if(formal.length!==a.trials.length||formal.some((r,i)=>{const e=adapter.envelope(r.raw);return e.trialIndex!==i||a.trials[i].trialIndex!==i||!same(e.payload,a.trials[i].payload)}))throw Error('Native content archive core mismatch')
  if(practice.length!==f.practiceCount||quizzes!==(f.quizCount??0)||(a.testType==='gradcpt'?(f.formalCaptureCount!==formal.length||f.presented!==a.presentedImageCount):f.formalCount!==formal.length))throw Error('Native content archive record counts mismatch')
  const definition=getNativeCognitiveTaskDefinition(a.testType,a.engineVersion,a.scoringVersion)!
- if(f.termination==='completed'&&(f.terminationReason!==null||formal.length!==resolveCognitiveFinalMaxTrials(definition,a.config)||formal.some(r=>(r.raw as {status:string}).status!=='complete')))
+ if(f.termination==='completed'&&(f.terminationReason!==null||formal.length!==resolveCognitiveFinalMaxTrials(definition,a.config)||formal.some(r=>(adapter.inspectArchiveRecord?.(r.raw)?.status??(r.raw as {status:string}).status)!=='complete')))
   throw Error('Native content archive unexecuted completion claim')
  return detail
 }

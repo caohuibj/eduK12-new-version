@@ -14,7 +14,11 @@ const begin=scorer.indexOf('interface Tally '),end=scorer.indexOf('const tally='
 const projection=scorer.indexOf('/** Sole candidate user/report/export projection.')
 if(begin<0||end<begin||projection<end)throw Error('ANT report projection boundary changed')
 const scoreType=`export type AntScoreResult={metrics:Record<string,unknown>;quality:{state:'interpretable'|'limited'|'invalid';flags:Record<string,boolean>;reasons:string[]};audit:{trialCount:number;scorerVersion:string}}\ntype CognitiveScoreResult=AntScoreResult\n`
+const native=fs.readFileSync(path.join(dir,'native-protocol.ts'),'utf8')
+const nativeReport=fs.readFileSync(path.join(dir,'native-report.ts'),'utf8').replace("import type {CognitiveScoreResult} from '../../v2/types'","import type {AntScoreResult as CognitiveScoreResult} from './report'").replace("from './scorer'","from './report'")
 const outputs={
+ 'native-report.ts':`// Frozen ANT public projection/guard; source SHA256: ${hash(fs.readFileSync(path.join(dir,'native-report.ts'),'utf8'))}\n`+nativeReport,
+ 'native-protocol.ts':`// User-confirmed geometry and native transport; backend SHA256: ${hash(native)}\n`+native,
  'protocol.ts':`// Pure ANT protocol projection. Backend SHA256: ${hash(protocol)}\n`+protocol.replace(importLine,types),
  'report.ts':`// Exact ANT report projection, no scorer/runtime imports. Backend SHA256: ${hash(scorer)}\nimport { CUES,FLANKERS,INPUTS,type Cue,type Flanker,type Input } from './protocol'\n`+scoreType+scorer.slice(begin,end)+scorer.slice(projection),
 }
