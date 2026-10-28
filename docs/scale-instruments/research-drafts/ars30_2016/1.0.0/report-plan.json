@@ -1,0 +1,55 @@
+{
+  "documentStatus": "DRAFT_TEXT_ONLY_NOT_RUNTIME_REPORT_CONFIG",
+  "reportVersion": "1.0.0",
+  "contentVersion": "1.0.0",
+  "parameterPlanVersion": "1.0.0",
+  "audience": "Adult university student, ordinary reader",
+  "locale": "zh-CN",
+  "source": "score_only",
+  "bands": [],
+  "personalization": "Fixed reflection prose at any score; no runtime individualized score-dependent text claimed",
+  "title": "作业受挫之后，我会怎样回应？",
+  "introduction": "这份问卷请你想象一次作业不及格的经历。回答反映的是你设想自己会怎样面对这次挫折，不是对学习能力或未来成绩的判定。",
+  "sections": [
+    {
+      "scoreKey": "total",
+      "headline": "为下一步留一点空间",
+      "summary": "一次作业失利之后，你可能会想再试试、换个办法，也可能先觉得生气、失望或想放弃。这个结果帮助你回看这些可能的反应，不能把你分成“坚强的人”或“脆弱的人”。",
+      "smallAction": "从反馈里选一条最具体的意见，把它改写成一个十分钟内可以开始的小步骤，例如补一个例子或重写一段。",
+      "boundary": "设想中的回答不等于你在真实压力下的表现，也不能预测下一次成绩。"
+    },
+    {
+      "scoreKey": "perseverance",
+      "headline": "继续尝试，也可以换一种走法",
+      "summary": "这一部分围绕受挫后是否还愿意行动，以及怎样看待反馈和目标。继续尝试可以是调整方法后再试一次；重新考虑职业方向，也不等于失败。",
+      "smallAction": "写下一个你仍想保留的目标，再写下一种可以调整的学习方法。把“坚持目标”和“重复旧办法”分开看。",
+      "boundary": "问卷对这个特定情境的计分，不是判断每一次坚持或改变是否正确的通用规则。"
+    },
+    {
+      "scoreKey": "reflection_help_seeking",
+      "headline": "把反馈变成一个能问出口的问题",
+      "summary": "这一部分关注回顾自己的做法、寻找新办法和向别人求助。你不必一次把问题想清楚，也不必一个人解决所有困难。",
+      "smallAction": "给老师或同学准备一个具体问题，例如“这段论证最需要补哪一条依据？”也可以请熟悉你的人听你说说这次经历。",
+      "boundary": "愿意求助不代表能力不足；暂时没有求助机会，也不能据此认定你不会应对。题目提到的自我惩罚不是报告建议。"
+    },
+    {
+      "scoreKey": "adaptive_emotional_response",
+      "headline": "难受的时候，先给自己一点缓冲",
+      "summary": "失望、生气或慌乱，都是这组问题涉及的反应。可以先注意自己最难受的是什么，再决定下一步。分数不能说明你是否患病，也不能要求你马上平静下来。",
+      "smallAction": "先给此刻的感受起一个简单名字，短暂休息后，再找出反馈中一处能够修改的地方；需要时和信任的人聊聊。",
+      "boundary": "这个分数不是情绪是否正常的标准，也不能说明你真实经历过多少难受。"
+    }
+  ],
+  "takeHomeMessage": "先留一点缓冲，再选一个能开始的小步骤。",
+  "image": null,
+  "imageDecision": "Short take-home text is sufficient for this documentation draft; no generated image required.",
+  "limitations": [
+    "独立中文工作译稿，尚未完成专家译审、认知访谈或中国人群验证。",
+    "原研究面向英国大学生；不能自动用于儿童、录取筛选或诊断。",
+    "没有中文常模、等级或百分位；文中的行动建议不是保证有效的干预。",
+    "本报告是文字草稿，尚未由buildScaleResult实际生成，也没有真实被试样例。"
+  ],
+  "implementationNotes": [
+    "Third factor is scored toward more adaptive responses, not more negative emotion; item23 converted6-x. Keep this rule in implementation/reviewer notes, not participant prose."
+  ]
+}

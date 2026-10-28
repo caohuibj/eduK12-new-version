@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "base": "642fda7ab754790686d6626efac62b73a332e663",
+  "node": {
+    "executable": "/workspace/eduk12-cloud/tools/node_modules/.bin/node",
+    "version": "v24.21.0",
+    "sha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c"
+  },
+  "execution": "cloud isolated process; no database or HTTP writes; login:false outer shell",
+  "checks": [
+    {
+      "id": "selected-ars30-retry",
+      "cwd": "/workspace/eduK12-new-version/server-version/backend",
+      "argv": [
+        "/workspace/eduk12-cloud/tools/node_modules/.bin/node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/__tests__/scale/instruments/ars30-registered-content.test.ts",
+        "-t",
+        "resolves the original three-part contract through the generated registry with truthful manual states",
+        "--reporter=json",
+        "--outputFile=/workspace/eduK12-new-version/docs/scale-content-batch1-20261028/evidence/selected-ars30-retry.json"
+      ],
+      "startedAt": "2026-10-28T00:35:29.605585+00:00",
+      "endedAt": "2026-10-28T00:35:31.286188+00:00",
+      "processExitCode": 0,
+      "inputs": {
+        "manifest": "selected-ars30-retry.inputs.json.gz",
+        "compressedSha256": "18782443b3ff82d19b377a73f80295694b48e0de23b5b6796a40a3f9a7578d28",
+        "uncompressedSha256": "d980ae4da9a3b8778aa058b89ea34dd18d986a0900ada26d8eb54199975bedbe",
+        "uncompressedBytes": 892498,
+        "count": 2931,
+        "beforeAfterIdentical": true
+      },
+      "logs": {
+        "stdout": {
+          "path": "selected-ars30-retry.stdout.log",
+          "sha256": "89a96159711a76212a26211a8164aa99542e19b2dab7bf372ce5a66592933784",
+          "bytes": 123
+        },
+        "stderr": {
+          "path": "selected-ars30-retry.stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      },
+      "report": {
+        "path": "docs/scale-content-batch1-20261028/evidence/selected-ars30-retry.json",
+        "sha256": "6adf785fc7c11cde02f3b7aed5c11594d3bd8bf1b23c46bb328a60cd46fe30c4",
+        "passed": 1,
+        "failed": 0,
+        "pendingOrFiltered": 2,
+        "cases": [
+          {
+            "fullName": "ARS-30 fixed-source registration on main admission mechanism resolves the original three-part contract through the generated registry with truthful manual states",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "fullName": "ARS-30 fixed-source registration on main admission mechanism consumes complete and incomplete registered answers through the existing result protocol without inventing thresholds",
+            "status": "skipped",
+            "failureMessages": []
+          },
+          {
+            "fullName": "ARS-30 fixed-source registration on main admission mechanism keeps source registration distinct from installation and rejects DRAFT activation before writes",
+            "status": "skipped",
+            "failureMessages": []
+          }
+        ]
+      }
+    }
+  ],
+  "scope": "One registered ARS30 source; no full catalog, build, types, database or CI execution",
+  "environment": {
+    "COGNITIVE_TEST_FIXTURES_ENABLED": "true (Vitest config)",
+    "credentials": "not retained; env values not printed"
+  },
+  "limits": [
+    "Source/config/tool hashes are contemporaneous; full installed dependency package bytes and process environment are not enumerated.",
+    "Snapshots include other backend source files solely as input evidence, not assertions that they executed."
+  ],
+  "outerToolExitCode": 0,
+  "outerExitEvidence": "Retained exec_command/write_stdin tool result; this field was recorded after completion, not by the subprocess."
+}

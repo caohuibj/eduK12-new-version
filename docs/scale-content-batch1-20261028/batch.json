@@ -1,0 +1,420 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-28T00:36:26.400743+00:00",
+  "base": "642fda7ab754790686d6626efac62b73a332e663",
+  "branch": "content/scale-structural-batch1-20261028",
+  "source": {
+    "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+    "branch": "content/dot-local-scales-20261025",
+    "identity": {
+      "instrumentKey": "ars30_2016_zh_cn_research",
+      "instrumentVersion": "1.0.0"
+    },
+    "versions": {
+      "instruction": "1.0.0",
+      "scoring": "1.0.0",
+      "report": "1.0.0",
+      "localization": "1.0.0",
+      "references": "none"
+    },
+    "files": [
+      {
+        "path": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/README.md",
+        "sourceBlob": "2c077950d06ac2ba30bb2aac23aa0f1c025c0f03",
+        "sha256": "f1f478ed58ae552f054a0df956a95dc3a20851c90b07cddad3bf2d887695cbde",
+        "bytes": 3509,
+        "identical": true
+      },
+      {
+        "path": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/THIRD_PARTY_LICENSE.md",
+        "sourceBlob": "c473e3e99319cdcf748bc915e4f93ca39418787b",
+        "sha256": "0ca5adf6f02f46037bec3c918354bd5f52b65392de514f2de00ecb5412efe8e4",
+        "bytes": 1680,
+        "identical": true
+      },
+      {
+        "path": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/administration.md",
+        "sourceBlob": "52084ee186e194ac1f910c95fd2c875b7ae85bf6",
+        "sha256": "d6e1383eab94b80ca53499dd54ab0a26d2b759c64881970732bea12392eb1dc2",
+        "bytes": 2561,
+        "identical": true
+      },
+      {
+        "path": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/bilingual-content.json",
+        "sourceBlob": "55d4a0321b671246a8eb6b870de865837d5d2170",
+        "sha256": "09500f801faf632ef0b8e73218b8b1df4cc732402e745b790600e6d400a3f436",
+        "bytes": 16606,
+        "identical": true
+      },
+      {
+        "path": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/parameter-plan.json",
+        "sourceBlob": "7bdcf8c2dd9e64592b87bcae677630399b5a2927",
+        "sha256": "e2c01ece08c08b9c31e22f192f5b0a6f713235e86fb09a41a768c6fc4f5d8871",
+        "bytes": 1814,
+        "identical": true
+      },
+      {
+        "path": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/report-draft.md",
+        "sourceBlob": "5677fb71ef7495e8d087f4ec6d7ee65396b0d9a5",
+        "sha256": "dcc143580d444845f6fc9bb6b629d0400506fa5889c378535153abe3ff9fd3db",
+        "bytes": 2813,
+        "identical": true
+      },
+      {
+        "path": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/report-plan.json",
+        "sourceBlob": "af0d5b170bfabaf69576587f1070d939708e6727",
+        "sha256": "ab9e1137ecaa2c0b4b007b23d4a8263a341ab59df0fa0ac59b4fd70f2a208bde",
+        "bytes": 4018,
+        "identical": true
+      },
+      {
+        "path": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/runtime-source-inputs.json",
+        "sourceBlob": "68fa6ab28418b0d2d6f421d48e938e4af7468631",
+        "sha256": "0942dea748acd87d882b9a4b135f962687c2e9f0249c42e938979d0b78247595",
+        "bytes": 2989,
+        "identical": true
+      },
+      {
+        "path": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/runtime-support-review.md",
+        "sourceBlob": "84d15c5a0f3baadae3cf619a27685c908f25c067",
+        "sha256": "4baf2f4afe9a73ea17a76bcc8703d30b4a92e7f429f6b3504e9d56d77cd7d9b6",
+        "bytes": 7795,
+        "identical": true
+      },
+      {
+        "path": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/scoring-and-parameters.md",
+        "sourceBlob": "6e37b57abb410fce67b331db711a3959a0706532",
+        "sha256": "b162574fe7fb3bee4afd6801b40f9e80b1ed44b1bd8011bb14bad7dcf0a28921",
+        "bytes": 5157,
+        "identical": true
+      },
+      {
+        "path": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/source-manifest.json",
+        "sourceBlob": "62202c001bb9b1be435e3330a0e75c9f811d8896",
+        "sha256": "973788739de0e8ddde79244fa9daf916565714f8730a2ca7c0a988bc5aeaaeda",
+        "bytes": 3486,
+        "identical": true
+      },
+      {
+        "path": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/tags.json",
+        "sourceBlob": "88beee63adab40edf931e80a57f480e66033244a",
+        "sha256": "d515744859e0509e9aa854e07b439e2ceb244e29dd104acf8a591a6c13cb6cc3",
+        "bytes": 3253,
+        "identical": true
+      },
+      {
+        "path": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/validation.json",
+        "sourceBlob": "fbe70aebd60cc7bc8b875cfb8449c5ecce6e59f5",
+        "sha256": "70f26b79f58c125f6a59873a268e57c83016fae8250f89aaa3d6cb32c3af7f37",
+        "bytes": 7289,
+        "identical": true
+      },
+      {
+        "path": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/validation.md",
+        "sourceBlob": "c4e2f8d358857319c9153916ffb7e70e5d3e65cd",
+        "sha256": "15f5677c8069dc4581b5bb0011b9b411e4affaee057d6d8dcb6901c50bbeddec",
+        "bytes": 1964,
+        "identical": true
+      },
+      {
+        "path": "server-version/backend/src/modules/scale/instruments/ars30_2016_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+        "sourceBlob": "c473e3e99319cdcf748bc915e4f93ca39418787b",
+        "sha256": "0ca5adf6f02f46037bec3c918354bd5f52b65392de514f2de00ecb5412efe8e4",
+        "bytes": 1680,
+        "identical": true
+      },
+      {
+        "path": "server-version/backend/src/modules/scale/instruments/ars30_2016_zh_cn_research/1.0.0/instrument.ts",
+        "sourceBlob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+        "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+        "bytes": 192,
+        "identical": true
+      },
+      {
+        "path": "server-version/backend/src/modules/scale/instruments/ars30_2016_zh_cn_research/1.0.0/source.json",
+        "sourceBlob": "08a648420b4413282bbd14ef6c23fb2be89b6209",
+        "sha256": "970cd97ea150ae055e6a27096e99cd8e95d74dcf15ad7df3a1147121864f6b45",
+        "bytes": 61629,
+        "identical": true
+      }
+    ],
+    "knownIdentityConflict": false,
+    "absenceChecks": [
+      {
+        "sha": "642fda7ab754790686d6626efac62b73a332e663",
+        "matchingPaths": []
+      },
+      {
+        "sha": "fa355ff2dcd859b57a4bf2e8bddd77f8d428e3cf",
+        "matchingPaths": []
+      },
+      {
+        "sha": "2612a9f5bf22c1370ec786f3d6feb50805003065",
+        "matchingPaths": []
+      }
+    ],
+    "scopeLimit": "The fixed inventory contained one variant for this identity; absence checked on these exact main/PR328/PR362 snapshots. Not a claim about every remote future branch."
+  },
+  "threeParts": {
+    "instrument": "30 items, fixed order/options, declared instruction and tags, zh-CN/ADULT_SELF/student audience: schema/registered contract PASS",
+    "scoringParameters": "Existing generic engine; 1.0.0 item/score references and golden fixtures valid; no references/norms/bands declared (none); no scoring edits",
+    "report": "1.0.0 audience contract, ordered total+3 metrics, score_only/empty bands; complete and incomplete result protocol PASS; no prose or word-count review"
+  },
+  "changes": [
+    "Copy existing 17 package/document files byte-for-byte at their original paths",
+    "Regenerate existing static index with one added identity",
+    "Add 3 selected integration cases; correct one test expectation for existing schema normalization after retaining original failure"
+  ],
+  "manual": {
+    "localization": [
+      "LOCALIZATION_REVIEW_PENDING",
+      "LOCALIZATION_EXPERT_REVIEW_PENDING"
+    ],
+    "scientificMaturityDeclared": "PILOT",
+    "qualification": {
+      "pilot": {
+        "eligible": true,
+        "blockers": []
+      },
+      "researchReady": {
+        "eligible": false,
+        "blockers": [
+          "SCIENTIFIC_REVIEW_MISSING",
+          "LOCALIZATION_REVIEW_PENDING"
+        ]
+      },
+      "researchGrade": {
+        "eligible": false,
+        "blockers": [
+          "SCIENTIFIC_REVIEW_MISSING",
+          "LOCALIZATION_REVIEW_PENDING",
+          "RESEARCH_GRADE_REVIEW_MISSING"
+        ]
+      },
+      "maxEligibleMaturity": "PILOT"
+    },
+    "rights": {
+      "status": "verified",
+      "redistribution": "allowed",
+      "note": "© 2016 Cassidy. 采用 Frontiers 2016 论文正文 CC BY 4.0 载体中的 Methods 本人逆境情境与 Table2 的30题；转载需署名、附许可链接并标明改动。作者2015独立表单／网站版本限定非商业研究且锚点不同（1同意–5不同意），不并入本版本，也不作为本代码的许可依据；不构成作者对任何译文的背书。"
+    },
+    "reportQc": {
+      "reviewer": "AI-assisted fixed-source and plain-language preparation; not human expert review",
+      "reviewedAt": "2026-10-27T00:00:00.000Z",
+      "basis": "Cassidy 2016 CC BY 4.0 article Methods/Table2 carrier; independent working translation; PR356 instruction contract adopted."
+    }
+  },
+  "manualBoundary": "Retain prior source license declaration and CC BY carrier attribution without asserting any new authorization. Translation remains PENDING; no new expert/scientific/editorial approval. Imported historical validation docs are original records, not this execution.",
+  "states": {
+    "sourceRegistration": "REGISTERED_IN_THIS_BRANCH_ONLY",
+    "sourceReleaseStatus": "DRAFT",
+    "catalogStatus": "CANDIDATE",
+    "contentRowMaterialization": "NOT_EXECUTED",
+    "isolationDatabaseInstallation": "NOT_EXECUTED; mock install refusal is not database installation",
+    "deploymentActivation": "NOT_EXECUTED; DRAFT refuses activation",
+    "formalPublicLibraryPublication": "NOT_EXECUTED",
+    "publicLibraryVisible": "NOT_ESTABLISHED; no database queried",
+    "assignable": "NOT_ESTABLISHED; no real capabilities granted",
+    "production": "NOT_QUERIED_NOT_MODIFIED"
+  },
+  "checks": [
+    {
+      "id": "selected-ars30",
+      "cwd": "/workspace/eduK12-new-version/server-version/backend",
+      "argv": [
+        "/workspace/eduk12-cloud/tools/node_modules/.bin/node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/__tests__/scale/instruments/ars30-registered-content.test.ts",
+        "--reporter=json",
+        "--outputFile=/workspace/eduK12-new-version/docs/scale-content-batch1-20261028/evidence/selected-ars30.json"
+      ],
+      "startedAt": "2026-10-28T00:34:58.883967+00:00",
+      "endedAt": "2026-10-28T00:35:00.771447+00:00",
+      "processExitCode": 1,
+      "inputs": {
+        "manifest": "selected-ars30.inputs.json.gz",
+        "compressedSha256": "d0e5df39b58a8085bbaed068edd48d71811a047614f8cf88dab9eaac9db790b3",
+        "uncompressedSha256": "ef0fc857f8cb49aaa2c3cf3b4c72b2374ccdf29a3f579797f5bd984b4cf4e784",
+        "uncompressedBytes": 892498,
+        "count": 2931,
+        "beforeAfterIdentical": true
+      },
+      "logs": {
+        "stdout": {
+          "path": "selected-ars30.stdout.log",
+          "sha256": "e18b38e2a072e9d7e0d785036c3819f315a7957ecb9e20bebc0ab24ce8c060be",
+          "bytes": 117
+        },
+        "stderr": {
+          "path": "selected-ars30.stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      },
+      "report": {
+        "path": "docs/scale-content-batch1-20261028/evidence/selected-ars30.json",
+        "sha256": "026669aa6323f31da7985004401e374fd4979779c6095150bf7e9c6efcffb028",
+        "passed": 2,
+        "failed": 1,
+        "pendingOrFiltered": 0,
+        "cases": [
+          {
+            "fullName": "ARS-30 fixed-source registration on main admission mechanism resolves the original three-part contract through the generated registry with truthful manual states",
+            "status": "failed",
+            "failureMessages": [
+              "AssertionError: expected { schemaVersion: 1, …(8) } to deeply equal { schemaVersion: 1, …(8) }\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/scale/instruments/ars30-registered-content.test.ts:21:20\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+            ]
+          },
+          {
+            "fullName": "ARS-30 fixed-source registration on main admission mechanism consumes complete and incomplete registered answers through the existing result protocol without inventing thresholds",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "fullName": "ARS-30 fixed-source registration on main admission mechanism keeps source registration distinct from installation and rejects DRAFT activation before writes",
+            "status": "passed",
+            "failureMessages": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "generated-index",
+      "cwd": "/workspace/eduK12-new-version/server-version/backend",
+      "argv": [
+        "/workspace/eduk12-cloud/tools/node_modules/.bin/node",
+        "node_modules/tsx/dist/cli.mjs",
+        "scripts/generate-scale-instruments.ts",
+        "--check"
+      ],
+      "startedAt": "2026-10-28T00:35:01.164918+00:00",
+      "endedAt": "2026-10-28T00:35:01.311883+00:00",
+      "processExitCode": 0,
+      "inputs": {
+        "manifest": "generated-index.inputs.json.gz",
+        "compressedSha256": "d0e5df39b58a8085bbaed068edd48d71811a047614f8cf88dab9eaac9db790b3",
+        "uncompressedSha256": "ef0fc857f8cb49aaa2c3cf3b4c72b2374ccdf29a3f579797f5bd984b4cf4e784",
+        "uncompressedBytes": 892498,
+        "count": 2931,
+        "beforeAfterIdentical": true
+      },
+      "logs": {
+        "stdout": {
+          "path": "generated-index.stdout.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "stderr": {
+          "path": "generated-index.stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      }
+    },
+    {
+      "id": "selected-ars30-retry",
+      "cwd": "/workspace/eduK12-new-version/server-version/backend",
+      "argv": [
+        "/workspace/eduk12-cloud/tools/node_modules/.bin/node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/__tests__/scale/instruments/ars30-registered-content.test.ts",
+        "-t",
+        "resolves the original three-part contract through the generated registry with truthful manual states",
+        "--reporter=json",
+        "--outputFile=/workspace/eduK12-new-version/docs/scale-content-batch1-20261028/evidence/selected-ars30-retry.json"
+      ],
+      "startedAt": "2026-10-28T00:35:29.605585+00:00",
+      "endedAt": "2026-10-28T00:35:31.286188+00:00",
+      "processExitCode": 0,
+      "inputs": {
+        "manifest": "selected-ars30-retry.inputs.json.gz",
+        "compressedSha256": "18782443b3ff82d19b377a73f80295694b48e0de23b5b6796a40a3f9a7578d28",
+        "uncompressedSha256": "d980ae4da9a3b8778aa058b89ea34dd18d986a0900ada26d8eb54199975bedbe",
+        "uncompressedBytes": 892498,
+        "count": 2931,
+        "beforeAfterIdentical": true
+      },
+      "logs": {
+        "stdout": {
+          "path": "selected-ars30-retry.stdout.log",
+          "sha256": "89a96159711a76212a26211a8164aa99542e19b2dab7bf372ce5a66592933784",
+          "bytes": 123
+        },
+        "stderr": {
+          "path": "selected-ars30-retry.stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      },
+      "report": {
+        "path": "docs/scale-content-batch1-20261028/evidence/selected-ars30-retry.json",
+        "sha256": "6adf785fc7c11cde02f3b7aed5c11594d3bd8bf1b23c46bb328a60cd46fe30c4",
+        "passed": 1,
+        "failed": 0,
+        "pendingOrFiltered": 2,
+        "cases": [
+          {
+            "fullName": "ARS-30 fixed-source registration on main admission mechanism resolves the original three-part contract through the generated registry with truthful manual states",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "fullName": "ARS-30 fixed-source registration on main admission mechanism consumes complete and incomplete registered answers through the existing result protocol without inventing thresholds",
+            "status": "skipped",
+            "failureMessages": []
+          },
+          {
+            "fullName": "ARS-30 fixed-source registration on main admission mechanism keeps source registration distinct from installation and rejects DRAFT activation before writes",
+            "status": "skipped",
+            "failureMessages": []
+          }
+        ]
+      }
+    }
+  ],
+  "reuse": {
+    "originalTwoPassedCases": "Original reporter selected-ars30.json, original test bytes retained; retry only changes schema import and first-case expectation, other two callback/setup paths unchanged. Not relabelled as executed in retry. Pending independent root review.",
+    "priorCatalogValidation": "Historical candidate inventory is provenance only; not relabelled as fresh verification.",
+    "notRun": [
+      "Full catalog/checker, all historical ARS tests, full typecheck/build, database/seed lifecycle, CI, SAST, browser, production"
+    ],
+    "typesReason": "Existing instrument wrapper and generator pattern copied unchanged; three affected registry/result/installation consumers executed. Main mechanism types already verified by root; no new source API or formula changed. No fresh typecheck success claimed."
+  },
+  "preparationFailures": [
+    {
+      "action": "Initial extraction from backend cwd then generator",
+      "exitCode": 0,
+      "outcome": "No source matched root-relative prefixes; no package files copied; generator unchanged. Corrected cwd before extraction."
+    },
+    {
+      "action": "Correct-cwd extraction expected file count 18",
+      "exitCode": 1,
+      "outcome": "Actual count 17; assertion stopped before writes. Count corrected, 17 files then copied byte-for-byte."
+    },
+    {
+      "action": "du root-relative docs path from backend cwd",
+      "innerDuExitCode": 1,
+      "outerCommandExitCode": 0,
+      "outcome": "Inspection path wrong; later root-relative du confirmed 88K. No file mutations from du."
+    }
+  ],
+  "deferred": [
+    {
+      "identity": "apq42_parent_global_zh_cn_research:1.0.0",
+      "sourceSha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "engineeringGap": "ageMonths.maxInclusive unsupported by current schema; inclusive167 can be expressed as maxExclusive168 only after exact identity/units confirmation",
+      "state": "NOT_COPIED_NOT_REGISTERED",
+      "manualRightsState": "unknown/restricted; public redistribution pending, unchanged",
+      "note": "No APQ schema or item content edit in this batch."
+    },
+    {
+      "identity": "spane12_zh_cn_research:1.0.0",
+      "sourceSha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "engineeringGap": "Versioned custom scorer is present in its wrapper; historical JSON-only audit did not load it. Not a missing-plugin conclusion.",
+      "state": "NOT_COPIED_NOT_REGISTERED",
+      "manualRightsState": "unknown/restricted; public redistribution pending, unchanged"
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "documentVersion": "1.0.0",
+  "selectedContentCarrier": "original2016",
+  "sourceIdentity": "ARS30_2016_PAPER_PERSONAL_VIGNETTE_EN",
+  "targetIdentityProposed": "ars30_2016_zh_cn_research@1.0.0",
+  "status": "DOCUMENTATION_ONLY_NOT_ONBOARDING_SOURCE",
+  "primarySources": [
+    {
+      "id": "original2016",
+      "role": "Actual licensed content and primary scoring source",
+      "doi": "10.3389/fpsyg.2016.01787",
+      "url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2016.01787/full",
+      "exactXmlUrl": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC5114237/fullTextXML",
+      "bytes": 138187,
+      "sha256": "1318b0befedd297bc29e5fb1f537c78c9ad5cb77402b7673012004c1dc34334b",
+      "license": "CC BY4.0; original author copyright; main Methods/Table2/Table3/Table5",
+      "locators": [
+        "Methods > The Academic Resilience Scale-30: original personal vignette, 1 likely to5 unlikely, positive-items reverse6-x, total sum",
+        "Table2: full30 item order",
+        "Factor Structure text/Table3: 14/9/7 facet item membership",
+        "Table5 surrounding text: facet sums toward adaptive responses; table7items range typo5-35"
+      ]
+    },
+    {
+      "id": "author2015",
+      "role": "Read-only scoring corroboration and carrier-rights/anchor distinction; standalone form NOT copied or relicensed",
+      "url": "https://ars-30.com/onewebmedia/ARS-30%20%2B%20Scoring%20Key.pdf",
+      "bytes": 203520,
+      "sha256": "1592efb58c62e721400b15c5468d7bc363a0502de3c99cc39c27f0144ece7e21",
+      "rights": "Copyright author2015; author permissions notice; website download restricted to non-commercial research",
+      "differences": [
+        "1 strongly agree to5 strongly disagree, not paper likelihood anchors",
+        "Independent form-specific instruction and layout not used"
+      ]
+    },
+    {
+      "id": "authorWebsite",
+      "role": "Permission scope for separate download",
+      "url": "https://ars-30.com/",
+      "bytes": 46244,
+      "sha256": "d81973fc48a71d64f75449db9cb0841c64ae3bd7875606c8294d39681dae9067",
+      "scope": "Non-commercial research purposes only; no public adaptation grant inferred for that separate form"
+    },
+    {
+      "id": "ccby40",
+      "role": "License terms",
+      "url": "https://creativecommons.org/licenses/by/4.0/",
+      "scope": "Attribution, license link, identify changes; no author endorsement; limited to actual licensed2016 article carrier"
+    }
+  ],
+  "changes": [
+    "Independent Chinese work translation of main article items and original personal vignette",
+    "Independent Chinese introduction based on Methods; no2015 standalone instruction copied",
+    "Unlabelled middle anchor numbers retained",
+    "Explicit carrier differences/source contradictions recorded",
+    "Plain-reader report independently authored; no clinical bands"
+  ],
+  "independentSourceReview": "Management/root dot directly read primary paper/XML/author site and approved article-derived documentation; not author permission or expert validation",
+  "dedup": {
+    "sourceHead": "ebbf389bb9812189f06987038b6a0859c8cea72b",
+    "sourceJsonCount": 96,
+    "exactMatch": false,
+    "relatedButDifferent": [
+      "RES9",
+      "BRCS4",
+      "SRLO44"
+    ],
+    "notionGlobalDedup": "NOTRUN"
+  },
+  "runtimeSourceHash": null,
+  "hashNote": "Original carrier SHA above identifies retained source bytes. This is not source.json, runtime measurement hash, or activation evidence."
+}

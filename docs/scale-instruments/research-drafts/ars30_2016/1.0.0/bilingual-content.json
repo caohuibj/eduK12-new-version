@@ -1,0 +1,638 @@
+{
+  "documentSchema": "ARS30_2016_RESEARCH_DOCUMENT_V1_NOT_RUNTIME_SOURCE",
+  "status": "DOCUMENTATION_ONLY_NOT_REGISTERED",
+  "proposedInstrumentKey": "ars30_2016_zh_cn_research",
+  "instrumentVersion": "1.0.0",
+  "scoringVersion": "1.0.0",
+  "localizationVersion": "1.0.0",
+  "author": "Simon Cassidy",
+  "sourceDoi": "10.3389/fpsyg.2016.01787",
+  "sourceCarrier": "2016 article main Methods and Table2; original personal-adversity vignette",
+  "translationStatus": "Independent platform Chinese work translation; expert review/cognitive interviews/local validation pending",
+  "instructions": {
+    "platformChinese": "请设想自己就是下面情境中的学生。读完情境后，判断你有多大可能作出每一种反应。请围绕同一个情境回答全部30题，按你认为自己会怎样反应来选，而不是按“应该怎样做”来选。",
+    "isIndependentAdaptationFromMethods": true,
+    "is2015StandaloneInstruction": false
+  },
+  "requiredVignette": {
+    "originalEnglish": "You have received your mark for a recent assignment and it is a ‘fail.’ The marks for two other recent assignments were also poorer than you would want as you are aiming to get as good a degree as you can because you have clear career goals in mind and don’t want to disappoint your family. The feedback from the tutor for the assignment is quite critical, including reference to ‘lack of understanding’ and ‘poor writing and expression,’ but it also includes ways that the work could be improved. Similar comments were made by the tutors who marked your other two assignments.",
+    "platformChinese": "你刚拿到最近一次作业的成绩，结果是“不及格”。另外两次近期作业的成绩，也都比你希望的差。你希望大学毕业时取得尽可能好的成绩，因为你有明确的职业目标，也不想让家人失望。老师给这次作业的反馈相当严厉，提到你“理解不足”“写作和表达欠佳”，但也指出了可以怎样改进。批改另外两次作业的老师也给出了类似的意见。",
+    "placement": "BEFORE_ALL_30_ITEMS",
+    "isScored": false,
+    "mayBeOmitted": false,
+    "runtimeConnected": false
+  },
+  "recallPeriod": null,
+  "responseOptions": [
+    {
+      "value": 1,
+      "originalEnglish": "likely",
+      "platformChinese": "很可能",
+      "rawScore": 1,
+      "anchorSource": "2016 Methods endpoint"
+    },
+    {
+      "value": 2,
+      "originalEnglish": "2",
+      "platformChinese": "2",
+      "rawScore": 2,
+      "anchorSource": "Unlabelled intermediate numeric position; no invented original verbal anchor"
+    },
+    {
+      "value": 3,
+      "originalEnglish": "3",
+      "platformChinese": "3",
+      "rawScore": 3,
+      "anchorSource": "Unlabelled intermediate numeric position; no invented original verbal anchor"
+    },
+    {
+      "value": 4,
+      "originalEnglish": "4",
+      "platformChinese": "4",
+      "rawScore": 4,
+      "anchorSource": "Unlabelled intermediate numeric position; no invented original verbal anchor"
+    },
+    {
+      "value": 5,
+      "originalEnglish": "unlikely",
+      "platformChinese": "不太可能",
+      "rawScore": 5,
+      "anchorSource": "2016 Methods endpoint"
+    }
+  ],
+  "reverseItemNumbers": [
+    2,
+    4,
+    8,
+    9,
+    10,
+    11,
+    13,
+    16,
+    17,
+    18,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    29,
+    30
+  ],
+  "groups": [
+    {
+      "scoreKey": "perseverance",
+      "originalLabel": "Perseverance",
+      "platformLabel": "受挫后继续尝试",
+      "items": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        8,
+        9,
+        10,
+        11,
+        13,
+        15,
+        16,
+        17,
+        30
+      ],
+      "aggregation": "sum",
+      "range": {
+        "min": 14,
+        "max": 70
+      },
+      "higherMeaning": "More adaptive reported response after conversion; not actual ability or diagnosis"
+    },
+    {
+      "scoreKey": "reflection_help_seeking",
+      "originalLabel": "Reflecting and adaptive help-seeking",
+      "platformLabel": "回顾方法与主动求助",
+      "items": [
+        18,
+        20,
+        21,
+        22,
+        24,
+        25,
+        26,
+        27,
+        29
+      ],
+      "aggregation": "sum",
+      "range": {
+        "min": 9,
+        "max": 45
+      },
+      "higherMeaning": "More adaptive reported response after conversion; not actual ability or diagnosis"
+    },
+    {
+      "scoreKey": "adaptive_emotional_response",
+      "originalLabel": "Negative affect and emotional response",
+      "platformLabel": "面对受挫时的难受与慌乱",
+      "items": [
+        6,
+        7,
+        12,
+        14,
+        19,
+        23,
+        28
+      ],
+      "aggregation": "sum",
+      "range": {
+        "min": 7,
+        "max": 35
+      },
+      "higherMeaning": "More adaptive reported response after conversion; not actual ability or diagnosis"
+    }
+  ],
+  "items": [
+    {
+      "number": 1,
+      "itemCode": "ARS30_2016_01",
+      "originalEnglish": "I would not accept the tutors’ feedback",
+      "platformChinese": "我不会接受老师的反馈。",
+      "group": "perseverance",
+      "reverse": false,
+      "formula": "x",
+      "scoreAtRawValues1to5": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "number": 2,
+      "itemCode": "ARS30_2016_02",
+      "originalEnglish": "I would use the feedback to improve my work",
+      "platformChinese": "我会利用这些反馈来改进作业。",
+      "group": "perseverance",
+      "reverse": true,
+      "formula": "6-x",
+      "scoreAtRawValues1to5": [
+        5,
+        4,
+        3,
+        2,
+        1
+      ]
+    },
+    {
+      "number": 3,
+      "itemCode": "ARS30_2016_03",
+      "originalEnglish": "I would just give up",
+      "platformChinese": "我会直接放弃。",
+      "group": "perseverance",
+      "reverse": false,
+      "formula": "x",
+      "scoreAtRawValues1to5": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "number": 4,
+      "itemCode": "ARS30_2016_04",
+      "originalEnglish": "I would use the situation to motivate myself",
+      "platformChinese": "我会用这次经历激励自己。",
+      "group": "perseverance",
+      "reverse": true,
+      "formula": "6-x",
+      "scoreAtRawValues1to5": [
+        5,
+        4,
+        3,
+        2,
+        1
+      ]
+    },
+    {
+      "number": 5,
+      "itemCode": "ARS30_2016_05",
+      "originalEnglish": "I would change my career plans",
+      "platformChinese": "我会改变自己的职业规划。",
+      "group": "perseverance",
+      "reverse": false,
+      "formula": "x",
+      "scoreAtRawValues1to5": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "number": 6,
+      "itemCode": "ARS30_2016_06",
+      "originalEnglish": "I would probably get annoyed",
+      "platformChinese": "我可能会生气。",
+      "group": "adaptive_emotional_response",
+      "reverse": false,
+      "formula": "x",
+      "scoreAtRawValues1to5": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "number": 7,
+      "itemCode": "ARS30_2016_07",
+      "originalEnglish": "I would begin to think my chances of success at university were poor",
+      "platformChinese": "我会开始觉得，自己在大学取得成功的希望很小。",
+      "group": "adaptive_emotional_response",
+      "reverse": false,
+      "formula": "x",
+      "scoreAtRawValues1to5": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "number": 8,
+      "itemCode": "ARS30_2016_08",
+      "originalEnglish": "I would see the situation as a challenge",
+      "platformChinese": "我会把这种情况看作一次挑战。",
+      "group": "perseverance",
+      "reverse": true,
+      "formula": "6-x",
+      "scoreAtRawValues1to5": [
+        5,
+        4,
+        3,
+        2,
+        1
+      ]
+    },
+    {
+      "number": 9,
+      "itemCode": "ARS30_2016_09",
+      "originalEnglish": "I would do my best to stop thinking negative thoughts",
+      "platformChinese": "我会尽力不再想那些消极的念头。",
+      "group": "perseverance",
+      "reverse": true,
+      "formula": "6-x",
+      "scoreAtRawValues1to5": [
+        5,
+        4,
+        3,
+        2,
+        1
+      ]
+    },
+    {
+      "number": 10,
+      "itemCode": "ARS30_2016_10",
+      "originalEnglish": "I would see the situation as temporary",
+      "platformChinese": "我会认为这种情况只是暂时的。",
+      "group": "perseverance",
+      "reverse": true,
+      "formula": "6-x",
+      "scoreAtRawValues1to5": [
+        5,
+        4,
+        3,
+        2,
+        1
+      ]
+    },
+    {
+      "number": 11,
+      "itemCode": "ARS30_2016_11",
+      "originalEnglish": "I would work harder",
+      "platformChinese": "我会更加努力。",
+      "group": "perseverance",
+      "reverse": true,
+      "formula": "6-x",
+      "scoreAtRawValues1to5": [
+        5,
+        4,
+        3,
+        2,
+        1
+      ]
+    },
+    {
+      "number": 12,
+      "itemCode": "ARS30_2016_12",
+      "originalEnglish": "I would probably get depressed",
+      "platformChinese": "我可能会感到情绪低落。",
+      "group": "adaptive_emotional_response",
+      "reverse": false,
+      "formula": "x",
+      "scoreAtRawValues1to5": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "number": 13,
+      "itemCode": "ARS30_2016_13",
+      "originalEnglish": "I would try to think of new solutions",
+      "platformChinese": "我会尝试想出新的解决办法。",
+      "group": "perseverance",
+      "reverse": true,
+      "formula": "6-x",
+      "scoreAtRawValues1to5": [
+        5,
+        4,
+        3,
+        2,
+        1
+      ]
+    },
+    {
+      "number": 14,
+      "itemCode": "ARS30_2016_14",
+      "originalEnglish": "I would be very disappointed",
+      "platformChinese": "我会非常失望。",
+      "group": "adaptive_emotional_response",
+      "reverse": false,
+      "formula": "x",
+      "scoreAtRawValues1to5": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "number": 15,
+      "itemCode": "ARS30_2016_15",
+      "originalEnglish": "I would blame the tutor",
+      "platformChinese": "我会责怪老师。",
+      "group": "perseverance",
+      "reverse": false,
+      "formula": "x",
+      "scoreAtRawValues1to5": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "number": 16,
+      "itemCode": "ARS30_2016_16",
+      "originalEnglish": "I would keep trying",
+      "platformChinese": "我会继续尝试。",
+      "group": "perseverance",
+      "reverse": true,
+      "formula": "6-x",
+      "scoreAtRawValues1to5": [
+        5,
+        4,
+        3,
+        2,
+        1
+      ]
+    },
+    {
+      "number": 17,
+      "itemCode": "ARS30_2016_17",
+      "originalEnglish": "I would not change my long-term goals and ambitions",
+      "platformChinese": "我不会改变自己的长期目标和抱负。",
+      "group": "perseverance",
+      "reverse": true,
+      "formula": "6-x",
+      "scoreAtRawValues1to5": [
+        5,
+        4,
+        3,
+        2,
+        1
+      ]
+    },
+    {
+      "number": 18,
+      "itemCode": "ARS30_2016_18",
+      "originalEnglish": "I would use my past successes to help motivate myself",
+      "platformChinese": "我会用过去的成功经历来激励自己。",
+      "group": "reflection_help_seeking",
+      "reverse": true,
+      "formula": "6-x",
+      "scoreAtRawValues1to5": [
+        5,
+        4,
+        3,
+        2,
+        1
+      ]
+    },
+    {
+      "number": 19,
+      "itemCode": "ARS30_2016_19",
+      "originalEnglish": "I would begin to think my chances of getting the job I want were poor",
+      "platformChinese": "我会开始觉得，自己得到理想工作的希望很小。",
+      "group": "adaptive_emotional_response",
+      "reverse": false,
+      "formula": "x",
+      "scoreAtRawValues1to5": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "number": 20,
+      "itemCode": "ARS30_2016_20",
+      "originalEnglish": "I would start to monitor and evaluate my achievements and effort",
+      "platformChinese": "我会开始检查和评估自己的学习成果及付出的努力。",
+      "group": "reflection_help_seeking",
+      "reverse": true,
+      "formula": "6-x",
+      "scoreAtRawValues1to5": [
+        5,
+        4,
+        3,
+        2,
+        1
+      ]
+    },
+    {
+      "number": 21,
+      "itemCode": "ARS30_2016_21",
+      "originalEnglish": "I would seek help from my tutors",
+      "platformChinese": "我会向老师寻求帮助。",
+      "group": "reflection_help_seeking",
+      "reverse": true,
+      "formula": "6-x",
+      "scoreAtRawValues1to5": [
+        5,
+        4,
+        3,
+        2,
+        1
+      ]
+    },
+    {
+      "number": 22,
+      "itemCode": "ARS30_2016_22",
+      "originalEnglish": "I would give myself encouragement",
+      "platformChinese": "我会鼓励自己。",
+      "group": "reflection_help_seeking",
+      "reverse": true,
+      "formula": "6-x",
+      "scoreAtRawValues1to5": [
+        5,
+        4,
+        3,
+        2,
+        1
+      ]
+    },
+    {
+      "number": 23,
+      "itemCode": "ARS30_2016_23",
+      "originalEnglish": "I would stop myself from panicking",
+      "platformChinese": "我会让自己不慌乱。",
+      "group": "adaptive_emotional_response",
+      "reverse": true,
+      "formula": "6-x",
+      "scoreAtRawValues1to5": [
+        5,
+        4,
+        3,
+        2,
+        1
+      ]
+    },
+    {
+      "number": 24,
+      "itemCode": "ARS30_2016_24",
+      "originalEnglish": "I would try different ways to study",
+      "platformChinese": "我会尝试不同的学习方法。",
+      "group": "reflection_help_seeking",
+      "reverse": true,
+      "formula": "6-x",
+      "scoreAtRawValues1to5": [
+        5,
+        4,
+        3,
+        2,
+        1
+      ]
+    },
+    {
+      "number": 25,
+      "itemCode": "ARS30_2016_25",
+      "originalEnglish": "I would set my own goals for achievement",
+      "platformChinese": "我会为自己设定学习目标。",
+      "group": "reflection_help_seeking",
+      "reverse": true,
+      "formula": "6-x",
+      "scoreAtRawValues1to5": [
+        5,
+        4,
+        3,
+        2,
+        1
+      ]
+    },
+    {
+      "number": 26,
+      "itemCode": "ARS30_2016_26",
+      "originalEnglish": "I would seek encouragement from my family and friends",
+      "platformChinese": "我会向家人和朋友寻求鼓励。",
+      "group": "reflection_help_seeking",
+      "reverse": true,
+      "formula": "6-x",
+      "scoreAtRawValues1to5": [
+        5,
+        4,
+        3,
+        2,
+        1
+      ]
+    },
+    {
+      "number": 27,
+      "itemCode": "ARS30_2016_27",
+      "originalEnglish": "I would try to think more about my strengths and weaknesses to help me work better",
+      "platformChinese": "我会更多地思考自己的长处和不足，帮助自己学得更好。",
+      "group": "reflection_help_seeking",
+      "reverse": true,
+      "formula": "6-x",
+      "scoreAtRawValues1to5": [
+        5,
+        4,
+        3,
+        2,
+        1
+      ]
+    },
+    {
+      "number": 28,
+      "itemCode": "ARS30_2016_28",
+      "originalEnglish": "I would feel like everything was ruined and was going wrong",
+      "platformChinese": "我会觉得，一切都毁了，什么都不对劲。",
+      "group": "adaptive_emotional_response",
+      "reverse": false,
+      "formula": "x",
+      "scoreAtRawValues1to5": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "number": 29,
+      "itemCode": "ARS30_2016_29",
+      "originalEnglish": "I would start to self-impose rewards and punishments depending on my performance",
+      "platformChinese": "我会根据自己的表现，给自己设定奖励和惩罚。",
+      "group": "reflection_help_seeking",
+      "reverse": true,
+      "formula": "6-x",
+      "scoreAtRawValues1to5": [
+        5,
+        4,
+        3,
+        2,
+        1
+      ]
+    },
+    {
+      "number": 30,
+      "itemCode": "ARS30_2016_30",
+      "originalEnglish": "I would look forward to showing that I can improve my grades",
+      "platformChinese": "我会期待证明自己的成绩能够提高。",
+      "group": "perseverance",
+      "reverse": true,
+      "formula": "6-x",
+      "scoreAtRawValues1to5": [
+        5,
+        4,
+        3,
+        2,
+        1
+      ]
+    }
+  ]
+}

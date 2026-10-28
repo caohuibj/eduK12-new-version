@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 1,
+  "base": "642fda7ab754790686d6626efac62b73a332e663",
+  "node": {
+    "executable": "/workspace/eduk12-cloud/tools/node_modules/.bin/node",
+    "version": "v24.21.0",
+    "sha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c"
+  },
+  "execution": "cloud isolated process; no database or HTTP writes; login:false outer shell",
+  "checks": [
+    {
+      "id": "selected-ars30",
+      "cwd": "/workspace/eduK12-new-version/server-version/backend",
+      "argv": [
+        "/workspace/eduk12-cloud/tools/node_modules/.bin/node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/__tests__/scale/instruments/ars30-registered-content.test.ts",
+        "--reporter=json",
+        "--outputFile=/workspace/eduK12-new-version/docs/scale-content-batch1-20261028/evidence/selected-ars30.json"
+      ],
+      "startedAt": "2026-10-28T00:34:58.883967+00:00",
+      "endedAt": "2026-10-28T00:35:00.771447+00:00",
+      "processExitCode": 1,
+      "inputs": {
+        "manifest": "selected-ars30.inputs.json.gz",
+        "compressedSha256": "d0e5df39b58a8085bbaed068edd48d71811a047614f8cf88dab9eaac9db790b3",
+        "uncompressedSha256": "ef0fc857f8cb49aaa2c3cf3b4c72b2374ccdf29a3f579797f5bd984b4cf4e784",
+        "uncompressedBytes": 892498,
+        "count": 2931,
+        "beforeAfterIdentical": true
+      },
+      "logs": {
+        "stdout": {
+          "path": "selected-ars30.stdout.log",
+          "sha256": "e18b38e2a072e9d7e0d785036c3819f315a7957ecb9e20bebc0ab24ce8c060be",
+          "bytes": 117
+        },
+        "stderr": {
+          "path": "selected-ars30.stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      },
+      "report": {
+        "path": "docs/scale-content-batch1-20261028/evidence/selected-ars30.json",
+        "sha256": "026669aa6323f31da7985004401e374fd4979779c6095150bf7e9c6efcffb028",
+        "passed": 2,
+        "failed": 1,
+        "pendingOrFiltered": 0,
+        "cases": [
+          {
+            "fullName": "ARS-30 fixed-source registration on main admission mechanism resolves the original three-part contract through the generated registry with truthful manual states",
+            "status": "failed",
+            "failureMessages": [
+              "AssertionError: expected { schemaVersion: 1, …(8) } to deeply equal { schemaVersion: 1, …(8) }\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/scale/instruments/ars30-registered-content.test.ts:21:20\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+            ]
+          },
+          {
+            "fullName": "ARS-30 fixed-source registration on main admission mechanism consumes complete and incomplete registered answers through the existing result protocol without inventing thresholds",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "fullName": "ARS-30 fixed-source registration on main admission mechanism keeps source registration distinct from installation and rejects DRAFT activation before writes",
+            "status": "passed",
+            "failureMessages": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "generated-index",
+      "cwd": "/workspace/eduK12-new-version/server-version/backend",
+      "argv": [
+        "/workspace/eduk12-cloud/tools/node_modules/.bin/node",
+        "node_modules/tsx/dist/cli.mjs",
+        "scripts/generate-scale-instruments.ts",
+        "--check"
+      ],
+      "startedAt": "2026-10-28T00:35:01.164918+00:00",
+      "endedAt": "2026-10-28T00:35:01.311883+00:00",
+      "processExitCode": 0,
+      "inputs": {
+        "manifest": "generated-index.inputs.json.gz",
+        "compressedSha256": "d0e5df39b58a8085bbaed068edd48d71811a047614f8cf88dab9eaac9db790b3",
+        "uncompressedSha256": "ef0fc857f8cb49aaa2c3cf3b4c72b2374ccdf29a3f579797f5bd984b4cf4e784",
+        "uncompressedBytes": 892498,
+        "count": 2931,
+        "beforeAfterIdentical": true
+      },
+      "logs": {
+        "stdout": {
+          "path": "generated-index.stdout.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "stderr": {
+          "path": "generated-index.stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      }
+    }
+  ],
+  "scope": "One registered ARS30 source; no full catalog, build, types, database or CI execution",
+  "environment": {
+    "COGNITIVE_TEST_FIXTURES_ENABLED": "true (Vitest config)",
+    "credentials": "not retained; env values not printed"
+  },
+  "limits": [
+    "Source/config/tool hashes are contemporaneous; full installed dependency package bytes and process environment are not enumerated.",
+    "Snapshots include other backend source files solely as input evidence, not assertions that they executed."
+  ],
+  "outerToolExitCode": 1,
+  "outerExitEvidence": "Retained exec_command/write_stdin tool result; this field was recorded after completion, not by the subprocess."
+}

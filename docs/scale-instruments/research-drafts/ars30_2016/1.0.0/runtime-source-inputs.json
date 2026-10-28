@@ -1,0 +1,76 @@
+{
+  "reviewKind": "READ_ONLY_STATIC_SUPPORT_REVIEW_NOT_TEST_OR_BROWSER",
+  "sourceHead": "ebbf389bb9812189f06987038b6a0859c8cea72b",
+  "files": [
+    {
+      "path": "server-version/backend/src/modules/scale/onboarding/schema.ts",
+      "bytes": 4798,
+      "sha256": "2f75dad2215f598b329a751f3d91f347caf4b5b39315b783a4a617256056f19a"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/onboarding/materialize.ts",
+      "bytes": 4644,
+      "sha256": "05d433bd13e7433d70afe89a595471d704486047c2854334c952835f8ef47d7b"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/onboarding/axis-snapshots.ts",
+      "bytes": 2980,
+      "sha256": "94d0939c01371be6bde23a2326c65a771019aed6f5076f1e5ce9fd9c354881e0"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/scale-definition.ts",
+      "bytes": 29219,
+      "sha256": "8136925d8a6b99827da7abd68683d2f7de7cd06353105a246216eab920cfdaba"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/scale-start.controller.ts",
+      "bytes": 10791,
+      "sha256": "1a0b00c2f0bd7d8299c70e569231b4d4145047916e41fe3ef10cca19f813b596"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/runtime-snapshot.ts",
+      "bytes": 18887,
+      "sha256": "e463e49590e341f259c1dc523d3beca63b5349a4874030353acc4af9cb3fe8d9"
+    },
+    {
+      "path": "server-version/backend/src/modules/measurement-content/scale.ts",
+      "bytes": 4547,
+      "sha256": "b9cff21374621809e6b04a6a4a65104ec7714549e75a4a3dd14b4b9e5db33afe"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/composite.service.ts",
+      "bytes": 325068,
+      "sha256": "a328d24f9473c5f36810bcadb096ec2141e38b47bb89717d8d0e4439304e0dee"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/whole-questionnaire.service.ts",
+      "bytes": 37548,
+      "sha256": "2f3632dfa86191211662d902bbe2bd7b235cb6b21ac5f3e3e6367e19a4ddeab6"
+    },
+    {
+      "path": "server-version/frontend/src/pages/student/ScaleAssessment.tsx",
+      "bytes": 36535,
+      "sha256": "2177a7442fe9551a60dc594a79c4d5a4aff98ab21d0a9dc9916661da5a3abaca"
+    },
+    {
+      "path": "server-version/frontend/src/components/assessment-shell/AssessmentShell.tsx",
+      "bytes": 9167,
+      "sha256": "9938830b7e841dba2b7e964cce3c27f31d05f525c39899a1582f564471130adb"
+    },
+    {
+      "path": "server-version/frontend/src/components/FinalCompositeAssessment.tsx",
+      "bytes": 47599,
+      "sha256": "0529131add8f49d0bdbd96c9fc360653a15c2a8925687dbf2f7681ea7cdb1824"
+    },
+    {
+      "path": "server-version/frontend/src/components/WholeCompositeQuestionnaire.tsx",
+      "bytes": 26564,
+      "sha256": "e6dee02cf89a920866f050e20d34dab15e1468b4660194c1ccd28c8c6db1d449"
+    },
+    {
+      "path": "server-version/frontend/src/components/questionnaire/ScalePlayer.tsx",
+      "bytes": 4196,
+      "sha256": "b9a483159c588bb2994dc7ffd818b6d02fcb2266e11fe3eb42123e3369fb9c5b"
+    }
+  ]
+}
