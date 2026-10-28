@@ -1,0 +1,21 @@
+{
+  "recordType": "scale-intake-batch",
+  "workflowVersion": "1.0.0",
+  "workflowCommit": null,
+  "batchId": null,
+  "repository": "caohuibj/eduK12-new-version",
+  "sourceBaseSha": null,
+  "inputs": [],
+  "authorization": {
+    "instructionReference": null,
+    "permittedActions": [],
+    "targetEnvironment": null,
+    "visibility": null,
+    "productScope": [],
+    "deploymentAuthorized": false
+  },
+  "notion": { "parentPageId": null, "status": "NOT_RUN", "recordPageIds": [] },
+  "instrumentRecords": [],
+  "sharedEvidence": [],
+  "lastUpdatedAt": null
+}

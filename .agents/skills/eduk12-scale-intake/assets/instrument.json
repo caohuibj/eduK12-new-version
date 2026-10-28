@@ -1,0 +1,86 @@
+{
+  "recordType": "scale-intake-instrument",
+  "key": null,
+  "name": null,
+  "locale": null,
+  "sources": [],
+  "inputHash": null,
+  "deduplication": {
+    "status": "NOT_RUN",
+    "existingIdentity": null,
+    "conflict": null
+  },
+  "versions": {
+    "measurement": {
+      "version": null,
+      "hash": null,
+      "scoringVersion": null
+    },
+    "parameters": {
+      "policy": "UNKNOWN",
+      "version": null,
+      "hash": null,
+      "basis": null,
+      "references": []
+    },
+    "report": {
+      "version": null,
+      "hash": null
+    },
+    "localizationVersion": null,
+    "instructionVersion": null,
+    "catalogVersion": null
+  },
+  "audit": {
+    "measurementAndScoring": "NOT_RUN",
+    "parameters": "NOT_RUN",
+    "report": "NOT_RUN",
+    "issues": [],
+    "changes": [],
+    "evidence": []
+  },
+  "tags": {},
+  "notes": {
+    "commercialUse": "UNKNOWN",
+    "authorizationNeeded": "UNKNOWN",
+    "rightsEvidence": [],
+    "translationRelationship": null,
+    "researchStatus": null,
+    "contactNeeded": null
+  },
+  "delivery": {
+    "git": {
+      "branch": null,
+      "commit": null,
+      "pushReadback": "NOT_RUN",
+      "mergeStatus": "UNKNOWN"
+    },
+    "environment": null,
+    "loadedCodeSha": null,
+    "installStatus": "NOT_RUN",
+    "scaleId": null,
+    "measurementReleaseId": null,
+    "deploymentRevision": null,
+    "runtimePolicyHash": null,
+    "publicationProofHash": null,
+    "publicationStatus": "NOT_RUN",
+    "visibility": "UNKNOWN",
+    "productScope": [],
+    "actualVersionReadback": null,
+    "allocationStatus": "NOT_RUN",
+    "readbackAt": null
+  },
+  "notion": {
+    "pageId": null,
+    "status": "NOT_RUN",
+    "readbackAt": null
+  },
+  "blockedBy": [],
+  "nextAction": null,
+  "artifact": {
+    "instrumentVersion": null,
+    "sourcePath": null,
+    "sourceHash": null
+  },
+  "operationReceipts": []
+}
