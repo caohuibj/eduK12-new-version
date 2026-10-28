@@ -1,3 +1,4 @@
+import './admin/admin-training.css'
 import { Link } from 'react-router-dom'
 import type {TeacherAction} from '../training/TrainingTeacherManagement'
 import {createRetryableLazy} from '../components/shared-ui/RetryableLazy'

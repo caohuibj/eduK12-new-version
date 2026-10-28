@@ -1,13 +1,4 @@
 /* Top navigation is the single Training management navigation surface. */
-.training-management-frame {
-  --tm-page:#f5f3ed;--tm-surface:#fffefa;--tm-soft:#ebeee5;--tm-ink:#263d32;
-  --tm-muted:#627065;--tm-green:#365a48;--tm-line:#dedfd4;--tm-hover:#f1f3eb;
-  display:flex;flex-direction:column;min-height:100dvh;background:var(--tm-page);color:var(--tm-ink);font-family:inherit;
-}
-.training-management-frame[data-training-theme="dark"] {
-  --tm-page:#15231f;--tm-surface:#1d2d26;--tm-soft:#2b3c30;--tm-ink:#e9eee2;
-  --tm-muted:#b9c7b8;--tm-green:#b9d1ae;--tm-line:#3e5043;--tm-hover:#2c3b2e;
-}
 .training-management-frame * { box-sizing:border-box; }
 .training-management-frame a { color:inherit;text-decoration:none; }
 .training-management-frame :is(a,button,summary):focus-visible { outline:3px solid var(--tm-green);outline-offset:4px; }
@@ -32,7 +23,6 @@
 .training-management-account button:hover { background:var(--tm-hover);color:var(--tm-green); }
 .training-management-account button:disabled { opacity:.6;cursor:wait; }
 .training-management-account .training-appearance-trigger { width:44px;height:44px;border-radius:10px;padding:10px; }
-.training-management-main { min-width:0;outline:none;padding:32px 34px; }
 .training-management-home { width:100%;max-width:1200px;margin:auto; }
 .training-management-welcome { position:relative;isolation:isolate;display:flex;align-items:center;justify-content:space-between;gap:28px;overflow:hidden;padding:30px 34px;margin-bottom:28px;border:1px solid var(--tm-line);border-radius:12px;background:var(--tm-surface); }
 .training-management-welcome::before { content:'';position:absolute;inset:0;z-index:-1;opacity:.16;background:url('./training-landscape-v2.webp') 75% 52%/cover; }
@@ -87,7 +77,6 @@
 .training-management-footer a:hover { text-decoration:underline; }
 .training-management-footer { display:flex;justify-content:space-between;gap:16px;padding:18px 34px;border-top:1px solid var(--tm-line);font-size:11px;color:var(--tm-muted); }
 
-.training-management-main { flex:1;width:100%;padding:34px 36px; }
 .training-management-guide { max-width:none; }
 .training-management-guide ol { grid-template-columns:repeat(3,minmax(0,1fr));gap:36px; }
 .training-management-guide-note { display:flex;align-items:center;gap:12px; }
@@ -115,7 +104,6 @@
  .training-management-account .training-management-logout>span { display:none; }
  .training-management-tabs { gap:3px; }
  .training-management-tabs a { padding:8px 4px;min-height:40px;font-size:12px; }
- .training-management-main { padding:24px 18px; }
  .training-management-welcome { display:block;padding:24px;margin-bottom:22px; }
  .training-management-welcome h1 { font-size:27px; }
  .training-management-welcome>div>p:last-child { font-size:12px; }

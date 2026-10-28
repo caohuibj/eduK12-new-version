@@ -5,7 +5,7 @@ import HuiteacherApp from '../../huiteacher/HuiteacherApp'
 vi.mock('../../huiteacher/HuiteacherAssessmentTasks',()=>({HuiteacherAssessmentTasks:()=> <p>当前任务列表</p>}))
 vi.mock('../../huiteacher/HuiteacherPersonalSelf',()=>({HuiteacherPersonalSelf:()=> <input aria-label="个人草稿"/>}))
 vi.mock('../education-roster/EducationRosterManagement',()=>({EducationRosterManagement:()=>null}))
-vi.mock('../../huiteacher/HuiteacherClassRelationships',()=>({HuiteacherClassRelationships:()=> <p>关系页面</p>}))
+vi.mock('../../huiteacher/HuiteacherClassRelationships',()=>({HuiteacherClassRelationships:()=> <input aria-label="关系选择草稿"/>}))
 const reply=(data:unknown)=>({ok:true,json:async()=>({code:0,message:'成功',data})})
 afterEach(()=>{cleanup();vi.restoreAllMocks();vi.unstubAllGlobals();window.history.replaceState(null,'','/')})
 it.each(['School','Teacher'])('%s public home renders before session resolution, but login remains gated',async product=>{
@@ -41,8 +41,11 @@ it('Teacher defers directory and untouched sections, and refresh requests each d
  fireEvent.click(screen.getByRole('button',{name:'学校改进'}));await screen.findByRole('button',{name:'刷新学校信息'})
  await waitFor(()=>{expect(count('/units')).toBe(1);expect(count('/members')).toBe(1)})
  expect(count('/forms')).toBe(0)
+ fireEvent.click(screen.getByRole('link',{name:'班级关系'}));fireEvent.change(await screen.findByLabelText('关系选择草稿'),{target:{value:'保留关系选择'}})
+ fireEvent.click(screen.getByRole('link',{name:'学校设置与成员'}))
  fireEvent.click(screen.getByRole('button',{name:'刷新学校信息'}))
  await waitFor(()=>{expect(count('/units')).toBe(2);expect(count('/members')).toBe(2)})
+ fireEvent.click(screen.getByRole('link',{name:'班级关系'}));expect(await screen.findByLabelText('关系选择草稿')).toHaveValue('保留关系选择')
 })
 it('Teacher discards old-school directory responses and distinguishes failure from an empty list',async()=>{
  let resolveA!:(data:unknown)=>void

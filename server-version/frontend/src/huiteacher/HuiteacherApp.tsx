@@ -289,21 +289,21 @@ export default function HuiteacherApp(){
   }
   const org=me?.organizations.find(o=>o.organizationId===selectedOrg)??null
   const directoryKey=me&&org?`${me.id}:${org.organizationId}:${org.productAdmin}`:''
-  const [directory,setDirectory]=useState({key:'',pending:false,error:''})
+  const [directory,setDirectory]=useState({key:'',pending:false,error:'',loaded:false})
   const units=directory.key===directoryKey?storedUnits:[]
   const members=directory.key===directoryKey?storedMembers:[]
   const directoryPending=directory.key!==directoryKey||directory.pending
   useEffect(()=>{
-    if(!me||!org||me.role==='STUDENT'||me.mustChangePassword||screen!=='workspace'||workspaceTab!=='school'||!org.productAdmin){setUnits([]);setMembers([]);setDirectory({key:'',pending:false,error:''});return}
-    setUnits([]);setMembers([]);setDirectory({key:directoryKey,pending:true,error:''})
+    if(!me||!org||me.role==='STUDENT'||me.mustChangePassword||screen!=='workspace'||workspaceTab!=='school'||!org.productAdmin){setUnits([]);setMembers([]);setDirectory({key:'',pending:false,error:'',loaded:false});return}
+    setDirectory(previous=>({key:directoryKey,pending:true,error:'',loaded:previous.key===directoryKey&&previous.loaded}))
     let active=true
     void Promise.all([
       teacherApi<{list:Unit[]}>(`/organizations/${org.organizationId}/units`),
       teacherApi<{list:typeof storedMembers}>(`/organizations/${org.organizationId}/members`),
     ]).then(([unitData,memberData])=>{
       if(!active)return
-      setUnits(unitData.list);setMembers(memberData.list);setDirectory({key:directoryKey,pending:false,error:''})
-    }).catch(error=>{if(active)setDirectory({key:directoryKey,pending:false,error:error instanceof Error?error.message:'学校名单暂不可读取'})})
+      setUnits(unitData.list);setMembers(memberData.list);setDirectory({key:directoryKey,pending:false,error:'',loaded:true})
+    }).catch(error=>{if(active)setDirectory(previous=>({...previous,key:directoryKey,pending:false,error:error instanceof Error?error.message:'学校名单暂不可读取'}))})
     return ()=>{active=false}
   },[me,selectedOrg,org?.organizationId,org?.productAdmin,screen,workspaceTab,directoryKey])
   const refreshOrg=()=>run(async()=>{
@@ -588,8 +588,8 @@ export default function HuiteacherApp(){
           <button onClick={refreshOrg} disabled={working}>刷新学校信息</button>
         </div>}
       </section>}
-        <section id="ht-school-relationships" hidden={schoolSection!=='ht-school-relationships'} className="ht-workspace-section" tabIndex={-1} aria-label="班级关系"><KeepMountedOnVisit key={me.id+':'+org.organizationId} active={schoolSection==='ht-school-relationships'}>{!directoryPending&&!directory.error?<HuiteacherClassRelationships key={'relations:'+org.organizationId}
-          organizationId={org.organizationId} members={members} units={units} api={teacherApi}/>:<p role={directory.error?'alert':'status'}>{directory.error||'正在读取学校名单…'}</p>}</KeepMountedOnVisit></section>
+        <section id="ht-school-relationships" hidden={schoolSection!=='ht-school-relationships'} className="ht-workspace-section" tabIndex={-1} aria-label="班级关系"><KeepMountedOnVisit key={me.id+':'+org.organizationId} active={schoolSection==='ht-school-relationships'}>{directory.key===directoryKey&&directory.loaded&&<fieldset disabled={directoryPending||!!directory.error} style={{border:0,margin:0,padding:0,minWidth:0}}><HuiteacherClassRelationships key={'relations:'+org.organizationId}
+          organizationId={org.organizationId} members={members} units={units} api={teacherApi}/></fieldset>}{(directoryPending||directory.error)&&<p role={directory.error?'alert':'status'}>{directory.error||'正在读取学校名单…'}</p>}</KeepMountedOnVisit></section>
         <section id="ht-school-evaluations" hidden={schoolSection!=='ht-school-evaluations'} className="ht-workspace-section" tabIndex={-1} aria-label="评价活动"><KeepMountedOnVisit key={me.id+':'+org.organizationId} active={schoolSection==='ht-school-evaluations'}><HuiteacherEvaluationStudio key={'targets:'+me.id+':'+org.organizationId}
           organizationId={org.organizationId} api={teacherApi} assessmentResources={schoolSection==='ht-school-evaluations'?assessmentResources:undefined} canAuthorPrivateTools={canAuthorPrivateTools} actorKey={me.id}/></KeepMountedOnVisit></section>
         <section id="ht-school-forms" hidden={schoolSection!=='ht-school-forms'} className="ht-workspace-section" tabIndex={-1} aria-label="学校表单"><KeepMountedOnVisit key={me.id+':'+org.organizationId} active={schoolSection==='ht-school-forms'}><HuiteacherFormStudio key={'forms:'+org.organizationId}
