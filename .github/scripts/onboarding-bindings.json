@@ -1,6 +1,6 @@
 {
   "pr": 372,
-  "enabled": true,
+  "enabled": false,
   "base": "aa774983db8edd85b3c1617aef7218f71664746d",
   "product": "edb95e462361a8af02d9e6adae9409d6f6c24615",
   "controlCheckpoint": "164b66e148bbd347bf9146cb3cebcbca790b31a6",
