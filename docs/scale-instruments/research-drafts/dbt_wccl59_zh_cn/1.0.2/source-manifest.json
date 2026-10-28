@@ -16,7 +16,7 @@
     "registeredLocale": "zh-CN",
     "englishVersion": "ORIGINAL_59_REVIEWED",
     "traditionalVersion": "UW_HOSTED_59_REVIEWED",
-    "simplifiedChinese": "ENGLISH_DIRECT_INDEPENDENT_DRAFT_PENDING_EXPERT_REVIEW",
+    "simplifiedChinese": "ENGLISH_DIRECT_INDEPENDENT_REVIEWED_EXPERT_USER_ATTESTED",
     "originalTraditionalRegistryPath": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.0/source.json",
     "originalTraditionalBlobSha": "e4ec1b8ae0051a2277e4d277179a39fc6daec43f",
     "adaptationProcedure": "UW英文59题直接翻译；复审只修订12道存在语义补充/减弱或大陆语言习惯问题的中文题文，其他47题保持1.0.1；繁体版及1.0.0均非此次英文直译依据。",
@@ -617,8 +617,9 @@
     "measurement": "1.0.2",
     "scoring": "1.0.0",
     "localization": "1.0.2",
-    "report": "1.0.2",
-    "reference": null
+    "report": "1.0.3",
+    "reference": null,
+    "catalogManifestVersion": 2
   },
   "rights": {
     "allowedNoncommercialUses": [
@@ -658,7 +659,9 @@
     "scoringParityWith101": "STATIC_EQUAL",
     "policyVersions": "dbt_wccl59_zh_cn_research-1.0.2",
     "authorApproval": "NOTRUN",
-    "linguisticExpertReview": "APPROVED_USER_ATTESTED_NO_EXTERNAL_REPORT"
+    "linguisticExpertReview": "APPROVED_USER_ATTESTED_NO_EXTERNAL_REPORT",
+    "reportAudienceContract": "STATIC_SHAPE_PRESENT_ADULT_SELF_STUDENT_ZH_CN",
+    "reportFeedbackVersion": "1.0.3_STATIC_NOT_EXECUTED"
   },
   "translationReview": {
     "status": "USER_CONFIRMED_EXPERT_APPROVED",
