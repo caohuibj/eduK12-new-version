@@ -237,6 +237,9 @@ function MotTaskGeneration(incoming:MotTaskProps){
       <p>{en?'Tap or click each circle once. Selections cannot be undone; the fifth selection ends the trial. Overlapping circles require a clear, unambiguous point.':'点击或轻触圆点，每个只能选一次，不能撤销；选满5个后本轮自动结束。重叠圆点需点到可以明确区分的位置。'}</p>
       <details><summary>{en?'Keyboard controls':'键盘操作'}</summary><p>{en?'In the response phase, Tab into the display. Arrow keys move focus to a circle in that direction; Space or Enter selects it.':'进入作答阶段后，用Tab进入区域，方向键移动到相应方向的圆点，空格或回车选中。'}</p></details>
       <p>{en?'First calibrate the screen and try two practice trials. Formal trials do not tell you which choices were correct.':'先校准屏幕，再练习2次。正式作答不提示选择是否正确。'}</p>
+      <p>{en?(config.profile==='experience'?'Experience version: 9 formal trials, 3 per speed; about 2–5 minutes including setup and practice.':'Literature-aligned version: 45 formal trials, 15 per speed; about 9–15 minutes including setup and practice.'):(config.profile==='experience'?'体验版正式9次，每种速度3次；含校准和练习，预计2–5分钟。':'文献对照版正式45次，每种速度15次；含校准和练习，预计9–15分钟。')}
+        {en?' These are design estimates; reading, calibration or practice retries may take longer.':'以上是设计估计；阅读、校准或重练可能需要更久。'}</p>
+      <p>{en?`To finish, complete all ${config.totalTrials} formal trials and wait for confirmation that the server saved your report. Practice is separate. Full raw archival is confirmed separately; if saving is pending, keep the page open and retry saving the retained record without repeating a formal trial.`:`正常完成需做完${config.totalTrials}次正式任务，并等待服务器确认报告已保存；练习另计。完整原件归档另行确认；若保存尚未确认，请保留页面，重试保存原记录，不重复正式作答。`}</p>
       <button className="mot-button" onClick={()=>setView('calibration')}>{en?'Set up the screen':'校准屏幕'}</button></section>}
     {view==='calibration'&&<MotCalibration language={language} onConfirm={c=>{setCalibration(c);ready()}}/>}
     {(view==='ready'||view==='break')&&<section className="mot-intro"><h1>{view==='break'?(en?'Take a short break':'休息一下'):

@@ -1,0 +1,18 @@
+{
+  "node": "v24.21.0",
+  "kind": "ACTUAL_COMPONENT_STATIC_RENDER_NOT_BROWSER_OR_CALIBRATION_EVIDENCE",
+  "files": [
+    {
+      "file": "intro-experience-en.html",
+      "profile": "experience",
+      "language": "en",
+      "text": "   Follow the five targets  Ten circles appear. Remember the five red circles. When they all turn dark and move, keep track of those five. After they stop, select the five original targets.  Tap or click each circle once. Selections cannot be undone; the fifth selection ends the trial. Overlapping circles require a clear, unambiguous point.   Keyboard controls  In the response phase, Tab into the display. Arrow keys move focus to a circle in that direction; Space or Enter selects it.   First calibrate the screen and try two practice trials. Formal trials do not tell you which choices were correct.  Experience version: 9 formal trials, 3 per speed; about 2–5 minutes including setup and practice. These are design estimates; reading, calibration or practice retries may take longer.  To finish, complete all 9 formal trials and wait for confirmation that the server saved your report. Practice is separate. Full raw archival is confirmed separately; if saving is pending, keep the page open and retry saving the retained record without repeating a formal trial.  Set up the screen   "
+    },
+    {
+      "file": "intro-research-en.html",
+      "profile": "research",
+      "language": "en",
+      "text": "   Follow the five targets  Ten circles appear. Remember the five red circles. When they all turn dark and move, keep track of those five. After they stop, select the five original targets.  Tap or click each circle once. Selections cannot be undone; the fifth selection ends the trial. Overlapping circles require a clear, unambiguous point.   Keyboard controls  In the response phase, Tab into the display. Arrow keys move focus to a circle in that direction; Space or Enter selects it.   First calibrate the screen and try two practice trials. Formal trials do not tell you which choices were correct.  Literature-aligned version: 45 formal trials, 15 per speed; about 9–15 minutes including setup and practice. These are design estimates; reading, calibration or practice retries may take longer.  To finish, complete all 45 formal trials and wait for confirmation that the server saved your report. Practice is separate. Full raw archival is confirmed separately; if saving is pending, keep the page open and retry saving the retained record without repeating a formal trial.  Set up the screen   "
+    }
+  ]
+}
