@@ -2,7 +2,7 @@ import {Prisma} from '@prisma/client'
 import {z} from 'zod'
 import {prisma} from '../../config/database'
 import {authorizePrivateTool} from './private-tool.access'
-import type {PrivateToolContext} from './private-tool.contracts'
+import {privateToolFail,type PrivateToolContext} from './private-tool.contracts'
 import {assertLibraryResourcesAuthority} from '../scale-library-governance/authority'
 import {ScaleLibraryError} from '../scale-library-governance/contracts'
 import {AdminPermissionError} from '../admin-permissions/service'
@@ -81,7 +81,7 @@ export async function assertEducationLibraryHeaders(tx:Prisma.TransactionClient,
   FROM scale_library_entries e JOIN scale_library_submissions s ON s.id=e.submission_id AND s.status='APPROVED'
   JOIN measurement_content_releases m ON m.id=e.release_id AND m.status='PUBLISHED'
   WHERE e.id IN (${Prisma.join(ids)}) AND e.status='ACTIVE' ORDER BY e.id ${lock?Prisma.sql`FOR SHARE OF e,s,m`:Prisma.empty}`)
- if(sources.some(source=>!rows.some(row=>row.id===source.versionId&&row.hash===source.contentHash)))throw new ScaleLibraryError(409,'LIBRARY_SOURCE_UNAVAILABLE')
+ if(sources.some(source=>!rows.some(row=>row.id===source.versionId&&row.hash===source.contentHash)))privateToolFail('LIBRARY_SOURCE_UNAVAILABLE',409)
 }
 
 /** Bounded original-library metadata, never the workflow-only registered Scale

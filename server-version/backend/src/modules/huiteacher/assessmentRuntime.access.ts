@@ -150,6 +150,9 @@ export function createTeacherAssessmentAccess<Identity extends TeacherSourceIden
      if(error instanceof EducationAssessmentSourceError&&['EDUCATION_ASSESSMENT_RESOURCE_NOT_AVAILABLE','EDUCATION_ASSESSMENT_ORIGINAL_ISSUER_REVOKED'].includes(error.code))continue
      if(error instanceof ContentAuthorityError&&error.code==='CONTENT_AUTHORITY_DENIED')continue
      if(error instanceof EducationPrivateToolError&&['PRIVATE_COMPOSITION_COLLECTION_UNAVAILABLE','PRIVATE_TOOL_AUTHOR_REQUIRED'].includes(error.code))continue
+     if(row.status==='ASSIGNED'&&error instanceof EducationPrivateToolError&&[
+      'PUBLIC_SOURCE_USE_REQUIRED','LIBRARY_SOURCE_USE_REQUIRED','LIBRARY_SOURCE_USE_EXPIRED','LIBRARY_SOURCE_UNAVAILABLE',
+     ].includes(error.code))continue
      throw error
     }
    }

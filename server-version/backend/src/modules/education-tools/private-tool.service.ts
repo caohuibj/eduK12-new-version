@@ -1,4 +1,5 @@
 import {lockOwnedDraftLibraryUses} from './library-source.use'
+import {educationPublicScaleDisplay} from './public-source.scale-display'
 import {readEducationPublicSourceHeaders,educationPublicRequiredContextKeys} from './public-source.headers'
 import {compilePrivateFormRuntime} from './private-tool.form-runtime-adapter'
 import {EducationPrivateToolError} from './private-tool.contracts'
@@ -131,7 +132,7 @@ export async function previewPrivateTool(c:PrivateToolContext,id:string,raw:unkn
    return {result:{kind:'COMPOSITION_PREVIEW',instruction:compiled.definition.instruction,blocks:compiled.definition.blocks.map(block=>{
     const leaf=compiled.leaves.get(block.source.provider+':'+block.source.versionId)!
     return {blockId:block.blockId,instruction:block.instruction,kind:leaf.kind,title:leaf.version.title,
-     definition:leaf.kind==='SCALE'?leaf.definition:leaf.form.definition}
+     definition:leaf.kind==='SCALE'?(leaf.provider==='PRIVATE_VERSION'?leaf.definition:educationPublicScaleDisplay(leaf.definition)):leaf.form.definition}
    })},previewOnly:true,persistedAnswers:false,contentHash:row.contentHash,...boundary}
   }
   await assertPrivateToolImages(tx,c,id,row.kind as PrivateToolKind,row.definition)
