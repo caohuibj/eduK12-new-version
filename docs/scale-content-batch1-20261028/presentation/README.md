@@ -1,5 +1,9 @@
 # 量表结果：作答数量与维度说明
 
+后续按用户要求已完成真实 Chromium 手机/平板补验，见
+[supplement/index.json](supplement/index.json) 与 [截图索引](supplement/README.md)。
+下文的浏览器阻碍是原 e4e1e154 执行记录，原退出/日志保持不变，不改写为成功。
+
 Root 明确授权后，在 PR367 中落实质量记录 ARS-Q01/Q02。
 应用改动仅为 `ScaleUnitReportCard.legacy.tsx`、独立的
 `ScaleUnitReportCard.css` 和一个直接测试文件；没有改 ReportPrimitives、

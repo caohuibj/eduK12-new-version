@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 1,
+  "kind": "REAL_CHROMIUM_COMPONENT_PREVIEW_SYNTHETIC_DATA",
+  "scope": "Existing React Scale report components and actual CSS; no API/backend/session/participant workflow; no production build",
+  "screenshots": [
+    {
+      "file": "bps9-390.png",
+      "state": "bps9",
+      "width": 390,
+      "height": 844,
+      "sha256": "d344e39b61a727e96e7922bd37a5f79ee450f4eda01bc5569be36a8e93a5ceda",
+      "observation": {
+        "width": 390,
+        "scrollWidth": 390,
+        "text": "BPS-9 · 合成报告呈现核对\n\n展示状态：BPS-9 完整作答。仅用于组件演示。\n\n上床拖延问卷（BPS成人9题，中文工作稿）\n报告版本 1.0.0\n数据质量：可解释\n\n分数层\n\n实际得分\n查看本次得分及其原始量尺范围。\n\n总体结果\n\n上床前的收尾习惯\n\n原始范围 1–5\n\n2.33\n1\n5\n\n已答\n9\n/ 共\n9\n题\n未答 0 题\n\n分数说明：9题反向后等权均分1–5，更多表示自述更常拖延上床。\n\n核心反馈\n\n上床前的收尾习惯\n\n这份回答关注的是从“还想再做一会儿”到“准备上床”之间的那段时间。有时我们已经想休息，却被一件小事接着另一件小事拖住。它不是在给自律打分，也不能说明睡不着的原因。工作、照护责任和生活安排都可能影响上床时间。可以回想一个常见的晚上，找出最容易让自己停不下来的环节，再选一个负担很小的收尾动作。一次回答不必变成对自己的评价。\n\n自我观察：最近一次比打算更晚上床，拖住你的是必须完成的事，还是可以留到明天的事？\n策略建议：今晚试着设一个收尾信号：把还想做的事记下来，再开始原本打算的睡前准备。\n环境支持：让收尾动作尽量省事，例如提前准备好明早要用的物品；是否有帮助，过后再看。\n\n解释限制：这份结果整理的是你对平时习惯的描述，不能代替对实际生活安排的了解。；不能仅凭回答判断失眠、身体健康、自律程度或一个人的价值。；中文题目为平台工作译稿，目前不适合用来给人与人之间排高低。；没有回答的题目不会算成最低分；题目不完整时，本次结果不作解释。\n\n限制\n\n阅读提示\n这份结果整理的是你对平时习惯的描述，不能代替对实际生活安排的了解。\n不能仅凭回答判断失眠、身体健康、自律程度或一个人的价值。\n中文题目为平台工作译稿，目前不适合用来给人与人之间排高低。\n没有回答的题目不会算成最低分；题目不完整时，本次结果不作解释。\n未提供群体参考。\n\n供成年人回顾上床习惯；不是睡眠疾病检查，也不是自律考试。中文为平台工作译稿。\n\n科学依据与详细参考",
+        "counts": [
+          "已答 9 / 共 9 题未答 0 题"
+        ],
+        "gridColumns": "none",
+        "explanationFonts": [
+          "13px"
+        ],
+        "markerCount": 1
+      }
+    },
+    {
+      "file": "bps9-820.png",
+      "state": "bps9",
+      "width": 820,
+      "height": 1180,
+      "sha256": "b9747d10c06a3eee75db7dcbf3d3e21ea811447b469683d77ade7cc236c7e517",
+      "observation": {
+        "width": 820,
+        "scrollWidth": 820,
+        "text": "BPS-9 · 合成报告呈现核对\n\n展示状态：BPS-9 完整作答。仅用于组件演示。\n\n上床拖延问卷（BPS成人9题，中文工作稿）\n报告版本 1.0.0\n数据质量：可解释\n\n分数层\n\n实际得分\n查看本次得分及其原始量尺范围。\n\n总体结果\n\n上床前的收尾习惯\n\n原始范围 1–5\n\n2.33\n1\n5\n\n已答\n9\n/ 共\n9\n题\n未答 0 题\n\n分数说明：9题反向后等权均分1–5，更多表示自述更常拖延上床。\n\n核心反馈\n\n上床前的收尾习惯\n\n这份回答关注的是从“还想再做一会儿”到“准备上床”之间的那段时间。有时我们已经想休息，却被一件小事接着另一件小事拖住。它不是在给自律打分，也不能说明睡不着的原因。工作、照护责任和生活安排都可能影响上床时间。可以回想一个常见的晚上，找出最容易让自己停不下来的环节，再选一个负担很小的收尾动作。一次回答不必变成对自己的评价。\n\n自我观察：最近一次比打算更晚上床，拖住你的是必须完成的事，还是可以留到明天的事？\n策略建议：今晚试着设一个收尾信号：把还想做的事记下来，再开始原本打算的睡前准备。\n环境支持：让收尾动作尽量省事，例如提前准备好明早要用的物品；是否有帮助，过后再看。\n\n解释限制：这份结果整理的是你对平时习惯的描述，不能代替对实际生活安排的了解。；不能仅凭回答判断失眠、身体健康、自律程度或一个人的价值。；中文题目为平台工作译稿，目前不适合用来给人与人之间排高低。；没有回答的题目不会算成最低分；题目不完整时，本次结果不作解释。\n\n限制\n\n阅读提示\n这份结果整理的是你对平时习惯的描述，不能代替对实际生活安排的了解。\n不能仅凭回答判断失眠、身体健康、自律程度或一个人的价值。\n中文题目为平台工作译稿，目前不适合用来给人与人之间排高低。\n没有回答的题目不会算成最低分；题目不完整时，本次结果不作解释。\n未提供群体参考。\n\n供成年人回顾上床习惯；不是睡眠疾病检查，也不是自律考试。中文为平台工作译稿。\n\n科学依据与详细参考",
+        "counts": [
+          "已答 9 / 共 9 题未答 0 题"
+        ],
+        "gridColumns": "none",
+        "explanationFonts": [
+          "13px"
+        ],
+        "markerCount": 1
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "bps9 390 has no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "bps9 390 does not disclose item identifiers",
+      "passed": true
+    },
+    {
+      "name": "bps9 390 shows the correct fixture title",
+      "passed": true
+    },
+    {
+      "name": "bps9 390 shows9 of9 disclosed items",
+      "passed": true
+    },
+    {
+      "name": "bps9 390 keeps one mean-range marker",
+      "passed": true
+    },
+    {
+      "name": "bps9 820 has no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "bps9 820 does not disclose item identifiers",
+      "passed": true
+    },
+    {
+      "name": "bps9 820 shows the correct fixture title",
+      "passed": true
+    },
+    {
+      "name": "bps9 820 shows9 of9 disclosed items",
+      "passed": true
+    },
+    {
+      "name": "bps9 820 keeps one mean-range marker",
+      "passed": true
+    },
+    {
+      "name": "component preview made no API or external requests",
+      "passed": true
+    },
+    {
+      "name": "component preview has no page errors",
+      "passed": true
+    }
+  ],
+  "browserErrors": [],
+  "unexpectedRequests": [],
+  "completed": true,
+  "origin": "http://127.0.0.1:5173",
+  "launchOptions": {
+    "executablePath": "/usr/bin/chromium",
+    "headless": true,
+    "chromiumSandbox": false,
+    "args": [
+      "--no-sandbox",
+      "--disable-dev-shm-usage"
+    ],
+    "env": {
+      "PATH": "/workspace/eduk12-cloud/tools/node_modules/.bin:/home/agent/.codex/tmp/arg0/codex-arg0oAZyJX:/opt/codex/codex-path:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+      "LANG": "C.UTF-8",
+      "XDG_CONFIG_HOME": "/tmp/scale367-browser-config",
+      "XDG_CACHE_HOME": "/tmp/scale367-browser-cache"
+    }
+  },
+  "browserVersion": "151.0.7922.173"
+}

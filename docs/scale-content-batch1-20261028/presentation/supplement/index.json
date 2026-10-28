@@ -1,0 +1,310 @@
+{
+  "schemaVersion": 1,
+  "recordedAfterExecutionAt": "2026-10-28T01:33:34.623509+00:00",
+  "applicationHead": "e4e1e1548c111db8141ca6724f3c22c813d41e62",
+  "applicationChangedSincePriorUnit12": false,
+  "kind": "REAL_CHROMIUM_SYNTHETIC_COMPONENT_SUPPLEMENT",
+  "resolution": {
+    "priorFailureRetained": "../evidence/browser-report.json, original exit1 and0screens unchanged",
+    "causeCorrection": "Previous worker additionally required Chromium SUID sandbox, which is incompatible with this container installation. Existing cloud install.sh launch configuration uses no-sandbox inside the managed container; no root ownership/system permissions were changed.",
+    "existingEnvironmentLaunchLine": "const browser = await chromium.launch({ executablePath: '/usr/bin/chromium', headless: true, args: ['--no-sandbox', '--disable-dev-shm-usage'], timeout: 15000 });",
+    "environmentScript": "/workspace/eduk12-cloud/install.sh:277",
+    "environmentScriptSHA256": "f9cb420cd00f3d06dcbb2f3d56c84b692ff3f323eca10c6c67d271bbc6816f01",
+    "actualChromeSandbox": false,
+    "outerExecutionRestrictions": "Existing managed execution environment remains in force; observed NoNewPrivs1 and Seccomp2, not modified. This is not a claim Chromium internal SUID sandbox passed.",
+    "profile": "Fresh Playwright temporary profile; pre-existing profile/cookies not used",
+    "browserEnvironment": "Only PATH,LANG,XDG_CONFIG_HOME,XDG_CACHE_HOME passed; no local database/API credentials",
+    "requests": "Local synthetic page requests only; API and external page requests blocked; actual unexpectedRequests0"
+  },
+  "invocations": [
+    {
+      "report": "browser-report.json",
+      "processAndOuterExitCode": 0,
+      "passed": 32,
+      "failed": 0,
+      "screenshots": 8,
+      "note": "Two original BPS screenshots have an ARS fixture header, preserved as superseded originals; six other frames retain their original identities."
+    },
+    {
+      "report": "bps9-header-fix/browser-report.json",
+      "processAndOuterExitCode": 0,
+      "passed": 12,
+      "failed": 0,
+      "screenshots": 2,
+      "note": "Only two affected BPS views regenerated after fixing fixture header; no application or source/scoring changes. Do not add duplicated assertions across invocations as unique tests."
+    }
+  ],
+  "acceptedForVisualReview": [
+    {
+      "file": "complete-390.png",
+      "state": "complete",
+      "width": 390,
+      "height": 844,
+      "sha256": "e4c9d6278233a6d41e7c1b81c92da15d21cce0f78aa679cef61c58c5f358158d",
+      "observation": {
+        "width": 390,
+        "scrollWidth": 390,
+        "text": "ARS-30 · 合成报告呈现核对\n\n展示状态：完整作答。仅用于组件演示。\n\n学业韧性量表（ARS-30，30题）— 中文工作译稿\n报告版本 1.0.0\n数据质量：可解释\n\n分数层\n\n结果概览\n总体结果与各维度分别展示。请结合各自的量尺范围阅读，不同量表的条形长度不能直接比较。\n\n总体结果\n\n学业韧性总分（30题）\n\n原始范围 30–150\n\n90\n30\n150\n\n已答\n30\n/ 共\n30\n题\n未答 0 题\n\n分数说明：30题按正反方向转换后求和，范围30–150。更高表示在这段作业受挫情境中，自述更可能作出作者判定的适应性反应；这是在假设情境中的自评，不是实际行为、学业能力或成绩预测。\n\n维度结果\n\n受挫后继续尝试\n\n原始范围 14–70\n\n42\n14\n70\n\n已答\n14\n/ 共\n14\n题\n未答 0 题\n\n分数说明：14题反向/正向混合后求和，范围14–70。转换后更高表示更多自述的适应性设想反应，例如继续尝试、利用反馈、坚持长期目标；不是实际能力、也不是“必须坚持同一办法”的建议。\n\n回顾方法与主动求助\n\n原始范围 9–45\n\n27\n9\n45\n\n已答\n9\n/ 共\n9\n题\n未答 0 题\n\n分数说明：9题全部按6−x转换后求和，范围9–45。转换后更高表示更多自述的回顾做法与主动求助倾向；不是社交能力或人际关系质量。\n\n面对受挫时的难受与慌乱\n\n原始范围 7–35\n\n21\n7\n35\n\n已答\n7\n/ 共\n7\n题\n未答 0 题\n\n分数说明：7题求和，范围7–35。其中第23题虽属本维度，仍按原作者正向反应题以6−x转换。转换后更高表示自述中更少意料之外的慌乱与失控感，不等同于“负性情绪越多”或临床情绪指标。\n\n核心反馈\n\n为下一步留一点空间\n\n一次作业失利之后，你可能会想要再试一次或者换个办法，也可能先感到生气、失望，甚至想放弃。这个结果是把你对自己各种可能反应的描述汇总起来，帮助你回看自己面对这次挫折时的倾向，而不是把你分成“坚强的人”或“脆弱的人”。同时要知道，你回答的是设想中的情境：它既不等于你在真实压力下的实际表现，也不能预测下一次的成绩。\n\n策略建议：从反馈里选一条最具体的意见，把它改写成一个十分钟内可以开始的小步骤，例如补一个例子或重写一段。\n自我观察：设想中的回答不等于你在真实压力下的表现，也不能预测下一次成绩。\n\n解释限制：这是独立中文工作译稿，尚未完成专家译审、认知访谈或中国人群验证。；原研究面向英国大学生，不能自动用于中小学生、录取筛选或临床诊断。；没有中文常模、等级或百分位；本树仅做 score_only 呈现，不给出切点。；回答反映假设情境中的设想反应，不等于真实压力下的行为或未来成绩。；第三维度描述的是自述的难受与慌乱程度，不是情绪健康诊断。\n\n继续尝试，也可以换一种走法\n\n这一部分围绕受挫之后你还愿不愿意继续行动，以及你怎样看待老师的反馈和自己的目标。继续尝试可以是换个方法之后再试一次，并不一定非要用原来的办法硬撑；重新考虑职业方向，也不意味着你就失败了。问卷只能说明你在这段情境里的设想倾向，不能当作判断每一次坚持或每一次改变是否正确的通用规则。\n\n策略建议：写下一个你仍想保留的目标，再写下一种可以调整的学习方法。把“坚持目标”和“重复旧办法”分开看。\n自我观察：问卷对这个特定情境的计分，不是判断每一次坚持或改变是否正确的通用规则。\n\n解释限制：这是独立中文工作译稿，尚未完成专家译审、认知访谈或中国人群验证。；原研究面向英国大学生，不能自动用于中小学生、录取筛选或临床诊断。；没有中文常模、等级或百分位；本树仅做 score_only 呈现，不给出切点。；回答反映假设情境中的设想反应，不等于真实压力下的行为或未来成绩。；第三维度描述的是自述的难受与慌乱程度，不是情绪健康诊断。\n\n把反馈变成一个能问出口的问题\n\n这一部分关注的是你会不会回头看看自己的做法、寻找新的办法，以及主动向别人求助。你不必一次就把问题全部想清楚，也不必一个人解决所有困难；愿意求助不代表能力不足，暂时没有可以求助的人，也不能据此认定你就不会应对。另外，题目里提到的自我奖惩只是测量情境中的反应，并不是这份报告给你的建议。\n\n策略建议：给老师或同学准备一个具体问题，例如“这段论证最需要补哪一条依据？”也可以请熟悉你的人听你说说这次经历。\n自我观察：愿意求助不代表能力不足；暂时没有求助机会，也不能据此认定你不会应对。题目提到的自我惩罚不是报告建议。\n\n解释限制：这是独立中文工作译稿，尚未完成专家译审、认知访谈或中国人群验证。；原研究面向英国大学生，不能自动用于中小学生、录取筛选或临床诊断。；没有中文常模、等级或百分位；本树仅做 score_only 呈现，不给出切点。；回答反映假设情境中的设想反应，不等于真实压力下的行为或未来成绩。；第三维度描述的是自述的难受与慌乱程度，不是情绪健康诊断。\n\n难受的时候，先给自己一点缓冲\n\n失望、生气或慌乱，都是这一部分涉及的反应。你可以先留意自己最难受的究竟是什么，给自己留出一点缓冲，再决定下一步要做什么。这个分数不能说明你是否患病，也不会要求你马上平静下来；它既不是判断情绪是否正常的标准，也不能说明你真实经历过多少难受，只是这段假设情境里你对自己反应的描述。\n\n策略建议：先给此刻的感受起一个简单名字，短暂休息后，再找出反馈中一处能够修改的地方；需要时和信任的人聊聊。\n自我观察：这个分数不是情绪是否正常的标准，也不能说明你真实经历过多少难受。\n\n解释限制：这是独立中文工作译稿，尚未完成专家译审、认知访谈或中国人群验证。；原研究面向英国大学生，不能自动用于中小学生、录取筛选或临床诊断。；没有中文常模、等级或百分位；本树仅做 score_only 呈现，不给出切点。；回答反映假设情境中的设想反应，不等于真实压力下的行为或未来成绩。；第三维度描述的是自述的难受与慌乱程度，不是情绪健康诊断。\n\n限制\n\n阅读提示\n这是独立中文工作译稿，尚未完成专家译审、认知访谈或中国人群验证。\n原研究面向英国大学生，不能自动用于中小学生、录取筛选或临床诊断。\n没有中文常模、等级或百分位；本树仅做 score_only 呈现，不给出切点。\n回答反映假设情境中的设想反应，不等于真实压力下的行为或未来成绩。\n第三维度描述的是自述的难受与慌乱程度，不是情绪健康诊断。\n\n用于大学生回顾自己在作业受挫情境中的设想反应，不作诊断、能力评价、人格标签或成绩预测。\n\n科学依据与详细参考",
+        "counts": [
+          "已答 30 / 共 30 题未答 0 题",
+          "已答 14 / 共 14 题未答 0 题",
+          "已答 9 / 共 9 题未答 0 题",
+          "已答 7 / 共 7 题未答 0 题"
+        ],
+        "gridColumns": "324px",
+        "explanationFonts": [
+          "13px",
+          "13px",
+          "13px",
+          "13px"
+        ],
+        "markerCount": 4
+      },
+      "path": "complete-390.png",
+      "originalReport": "browser-report.json"
+    },
+    {
+      "file": "complete-820.png",
+      "state": "complete",
+      "width": 820,
+      "height": 1180,
+      "sha256": "3c43fac5b87beff757d106b6f0aee0783d60a78d4f371f64bb561d8eaa3e5868",
+      "observation": {
+        "width": 820,
+        "scrollWidth": 820,
+        "text": "ARS-30 · 合成报告呈现核对\n\n展示状态：完整作答。仅用于组件演示。\n\n学业韧性量表（ARS-30，30题）— 中文工作译稿\n报告版本 1.0.0\n数据质量：可解释\n\n分数层\n\n结果概览\n总体结果与各维度分别展示。请结合各自的量尺范围阅读，不同量表的条形长度不能直接比较。\n\n总体结果\n\n学业韧性总分（30题）\n\n原始范围 30–150\n\n90\n30\n150\n\n已答\n30\n/ 共\n30\n题\n未答 0 题\n\n分数说明：30题按正反方向转换后求和，范围30–150。更高表示在这段作业受挫情境中，自述更可能作出作者判定的适应性反应；这是在假设情境中的自评，不是实际行为、学业能力或成绩预测。\n\n维度结果\n\n受挫后继续尝试\n\n原始范围 14–70\n\n42\n14\n70\n\n已答\n14\n/ 共\n14\n题\n未答 0 题\n\n分数说明：14题反向/正向混合后求和，范围14–70。转换后更高表示更多自述的适应性设想反应，例如继续尝试、利用反馈、坚持长期目标；不是实际能力、也不是“必须坚持同一办法”的建议。\n\n回顾方法与主动求助\n\n原始范围 9–45\n\n27\n9\n45\n\n已答\n9\n/ 共\n9\n题\n未答 0 题\n\n分数说明：9题全部按6−x转换后求和，范围9–45。转换后更高表示更多自述的回顾做法与主动求助倾向；不是社交能力或人际关系质量。\n\n面对受挫时的难受与慌乱\n\n原始范围 7–35\n\n21\n7\n35\n\n已答\n7\n/ 共\n7\n题\n未答 0 题\n\n分数说明：7题求和，范围7–35。其中第23题虽属本维度，仍按原作者正向反应题以6−x转换。转换后更高表示自述中更少意料之外的慌乱与失控感，不等同于“负性情绪越多”或临床情绪指标。\n\n核心反馈\n\n为下一步留一点空间\n\n一次作业失利之后，你可能会想要再试一次或者换个办法，也可能先感到生气、失望，甚至想放弃。这个结果是把你对自己各种可能反应的描述汇总起来，帮助你回看自己面对这次挫折时的倾向，而不是把你分成“坚强的人”或“脆弱的人”。同时要知道，你回答的是设想中的情境：它既不等于你在真实压力下的实际表现，也不能预测下一次的成绩。\n\n策略建议：从反馈里选一条最具体的意见，把它改写成一个十分钟内可以开始的小步骤，例如补一个例子或重写一段。\n自我观察：设想中的回答不等于你在真实压力下的表现，也不能预测下一次成绩。\n\n解释限制：这是独立中文工作译稿，尚未完成专家译审、认知访谈或中国人群验证。；原研究面向英国大学生，不能自动用于中小学生、录取筛选或临床诊断。；没有中文常模、等级或百分位；本树仅做 score_only 呈现，不给出切点。；回答反映假设情境中的设想反应，不等于真实压力下的行为或未来成绩。；第三维度描述的是自述的难受与慌乱程度，不是情绪健康诊断。\n\n继续尝试，也可以换一种走法\n\n这一部分围绕受挫之后你还愿不愿意继续行动，以及你怎样看待老师的反馈和自己的目标。继续尝试可以是换个方法之后再试一次，并不一定非要用原来的办法硬撑；重新考虑职业方向，也不意味着你就失败了。问卷只能说明你在这段情境里的设想倾向，不能当作判断每一次坚持或每一次改变是否正确的通用规则。\n\n策略建议：写下一个你仍想保留的目标，再写下一种可以调整的学习方法。把“坚持目标”和“重复旧办法”分开看。\n自我观察：问卷对这个特定情境的计分，不是判断每一次坚持或改变是否正确的通用规则。\n\n解释限制：这是独立中文工作译稿，尚未完成专家译审、认知访谈或中国人群验证。；原研究面向英国大学生，不能自动用于中小学生、录取筛选或临床诊断。；没有中文常模、等级或百分位；本树仅做 score_only 呈现，不给出切点。；回答反映假设情境中的设想反应，不等于真实压力下的行为或未来成绩。；第三维度描述的是自述的难受与慌乱程度，不是情绪健康诊断。\n\n把反馈变成一个能问出口的问题\n\n这一部分关注的是你会不会回头看看自己的做法、寻找新的办法，以及主动向别人求助。你不必一次就把问题全部想清楚，也不必一个人解决所有困难；愿意求助不代表能力不足，暂时没有可以求助的人，也不能据此认定你就不会应对。另外，题目里提到的自我奖惩只是测量情境中的反应，并不是这份报告给你的建议。\n\n策略建议：给老师或同学准备一个具体问题，例如“这段论证最需要补哪一条依据？”也可以请熟悉你的人听你说说这次经历。\n自我观察：愿意求助不代表能力不足；暂时没有求助机会，也不能据此认定你不会应对。题目提到的自我惩罚不是报告建议。\n\n解释限制：这是独立中文工作译稿，尚未完成专家译审、认知访谈或中国人群验证。；原研究面向英国大学生，不能自动用于中小学生、录取筛选或临床诊断。；没有中文常模、等级或百分位；本树仅做 score_only 呈现，不给出切点。；回答反映假设情境中的设想反应，不等于真实压力下的行为或未来成绩。；第三维度描述的是自述的难受与慌乱程度，不是情绪健康诊断。\n\n难受的时候，先给自己一点缓冲\n\n失望、生气或慌乱，都是这一部分涉及的反应。你可以先留意自己最难受的究竟是什么，给自己留出一点缓冲，再决定下一步要做什么。这个分数不能说明你是否患病，也不会要求你马上平静下来；它既不是判断情绪是否正常的标准，也不能说明你真实经历过多少难受，只是这段假设情境里你对自己反应的描述。\n\n策略建议：先给此刻的感受起一个简单名字，短暂休息后，再找出反馈中一处能够修改的地方；需要时和信任的人聊聊。\n自我观察：这个分数不是情绪是否正常的标准，也不能说明你真实经历过多少难受。\n\n解释限制：这是独立中文工作译稿，尚未完成专家译审、认知访谈或中国人群验证。；原研究面向英国大学生，不能自动用于中小学生、录取筛选或临床诊断。；没有中文常模、等级或百分位；本树仅做 score_only 呈现，不给出切点。；回答反映假设情境中的设想反应，不等于真实压力下的行为或未来成绩。；第三维度描述的是自述的难受与慌乱程度，不是情绪健康诊断。\n\n限制\n\n阅读提示\n这是独立中文工作译稿，尚未完成专家译审、认知访谈或中国人群验证。\n原研究面向英国大学生，不能自动用于中小学生、录取筛选或临床诊断。\n没有中文常模、等级或百分位；本树仅做 score_only 呈现，不给出切点。\n回答反映假设情境中的设想反应，不等于真实压力下的行为或未来成绩。\n第三维度描述的是自述的难受与慌乱程度，不是情绪健康诊断。\n\n用于大学生回顾自己在作业受挫情境中的设想反应，不作诊断、能力评价、人格标签或成绩预测。\n\n科学依据与详细参考",
+        "counts": [
+          "已答 30 / 共 30 题未答 0 题",
+          "已答 14 / 共 14 题未答 0 题",
+          "已答 9 / 共 9 题未答 0 题",
+          "已答 7 / 共 7 题未答 0 题"
+        ],
+        "gridColumns": "366px 366px",
+        "explanationFonts": [
+          "13px",
+          "13px",
+          "13px",
+          "13px"
+        ],
+        "markerCount": 4
+      },
+      "path": "complete-820.png",
+      "originalReport": "browser-report.json"
+    },
+    {
+      "file": "invalid-390.png",
+      "state": "invalid",
+      "width": 390,
+      "height": 844,
+      "sha256": "7ec64e7f23de54881baf07a7046f70fdddc3b2a4af9cdae048b454fa86ac2fc5",
+      "observation": {
+        "width": 390,
+        "scrollWidth": 390,
+        "text": "ARS-30 · 合成报告呈现核对\n\n展示状态：缺答，当前结果不可解释。仅用于组件演示。\n\n学业韧性量表（ARS-30，30题）— 中文工作译稿\n报告版本 1.0.0\n数据质量：当前结果不可解释\n\n分数层\n\n结果概览\n总体结果与各维度分别展示。请结合各自的量尺范围阅读，不同量表的条形长度不能直接比较。\n\n总体结果\n\n学业韧性总分（30题）\n\n原始范围 30–150\n\n—\n30\n无法计算\n150\n\n已答\n29\n/ 共\n30\n题\n未答 1 题\n\n分数说明：30题按正反方向转换后求和，范围30–150。更高表示在这段作业受挫情境中，自述更可能作出作者判定的适应性反应；这是在假设情境中的自评，不是实际行为、学业能力或成绩预测。\n\n维度结果\n\n受挫后继续尝试\n\n原始范围 14–70\n\n—\n14\n无法计算\n70\n\n已答\n13\n/ 共\n14\n题\n未答 1 题\n\n分数说明：14题反向/正向混合后求和，范围14–70。转换后更高表示更多自述的适应性设想反应，例如继续尝试、利用反馈、坚持长期目标；不是实际能力、也不是“必须坚持同一办法”的建议。\n\n回顾方法与主动求助\n\n原始范围 9–45\n\n27\n9\n45\n\n已答\n9\n/ 共\n9\n题\n未答 0 题\n\n分数说明：9题全部按6−x转换后求和，范围9–45。转换后更高表示更多自述的回顾做法与主动求助倾向；不是社交能力或人际关系质量。\n\n面对受挫时的难受与慌乱\n\n原始范围 7–35\n\n21\n7\n35\n\n已答\n7\n/ 共\n7\n题\n未答 0 题\n\n分数说明：7题求和，范围7–35。其中第23题虽属本维度，仍按原作者正向反应题以6−x转换。转换后更高表示自述中更少意料之外的慌乱与失控感，不等同于“负性情绪越多”或临床情绪指标。\n\n数据质量\n\n当前作答不足以稳定计算核心分数，因此不提供解释或群体参考。\n\n限制\n\n阅读提示\n这是独立中文工作译稿，尚未完成专家译审、认知访谈或中国人群验证。\n原研究面向英国大学生，不能自动用于中小学生、录取筛选或临床诊断。\n没有中文常模、等级或百分位；本树仅做 score_only 呈现，不给出切点。\n回答反映假设情境中的设想反应，不等于真实压力下的行为或未来成绩。\n第三维度描述的是自述的难受与慌乱程度，不是情绪健康诊断。\n\n用于大学生回顾自己在作业受挫情境中的设想反应，不作诊断、能力评价、人格标签或成绩预测。",
+        "counts": [
+          "已答 29 / 共 30 题未答 1 题",
+          "已答 13 / 共 14 题未答 1 题",
+          "已答 9 / 共 9 题未答 0 题",
+          "已答 7 / 共 7 题未答 0 题"
+        ],
+        "gridColumns": "324px",
+        "explanationFonts": [
+          "13px",
+          "13px",
+          "13px",
+          "13px"
+        ],
+        "markerCount": 2
+      },
+      "path": "invalid-390.png",
+      "originalReport": "browser-report.json"
+    },
+    {
+      "file": "invalid-820.png",
+      "state": "invalid",
+      "width": 820,
+      "height": 1180,
+      "sha256": "acc1a98667640b7e2fc65916937372e85cc1939aa3793a84badded37a1e50386",
+      "observation": {
+        "width": 820,
+        "scrollWidth": 820,
+        "text": "ARS-30 · 合成报告呈现核对\n\n展示状态：缺答，当前结果不可解释。仅用于组件演示。\n\n学业韧性量表（ARS-30，30题）— 中文工作译稿\n报告版本 1.0.0\n数据质量：当前结果不可解释\n\n分数层\n\n结果概览\n总体结果与各维度分别展示。请结合各自的量尺范围阅读，不同量表的条形长度不能直接比较。\n\n总体结果\n\n学业韧性总分（30题）\n\n原始范围 30–150\n\n—\n30\n无法计算\n150\n\n已答\n29\n/ 共\n30\n题\n未答 1 题\n\n分数说明：30题按正反方向转换后求和，范围30–150。更高表示在这段作业受挫情境中，自述更可能作出作者判定的适应性反应；这是在假设情境中的自评，不是实际行为、学业能力或成绩预测。\n\n维度结果\n\n受挫后继续尝试\n\n原始范围 14–70\n\n—\n14\n无法计算\n70\n\n已答\n13\n/ 共\n14\n题\n未答 1 题\n\n分数说明：14题反向/正向混合后求和，范围14–70。转换后更高表示更多自述的适应性设想反应，例如继续尝试、利用反馈、坚持长期目标；不是实际能力、也不是“必须坚持同一办法”的建议。\n\n回顾方法与主动求助\n\n原始范围 9–45\n\n27\n9\n45\n\n已答\n9\n/ 共\n9\n题\n未答 0 题\n\n分数说明：9题全部按6−x转换后求和，范围9–45。转换后更高表示更多自述的回顾做法与主动求助倾向；不是社交能力或人际关系质量。\n\n面对受挫时的难受与慌乱\n\n原始范围 7–35\n\n21\n7\n35\n\n已答\n7\n/ 共\n7\n题\n未答 0 题\n\n分数说明：7题求和，范围7–35。其中第23题虽属本维度，仍按原作者正向反应题以6−x转换。转换后更高表示自述中更少意料之外的慌乱与失控感，不等同于“负性情绪越多”或临床情绪指标。\n\n数据质量\n\n当前作答不足以稳定计算核心分数，因此不提供解释或群体参考。\n\n限制\n\n阅读提示\n这是独立中文工作译稿，尚未完成专家译审、认知访谈或中国人群验证。\n原研究面向英国大学生，不能自动用于中小学生、录取筛选或临床诊断。\n没有中文常模、等级或百分位；本树仅做 score_only 呈现，不给出切点。\n回答反映假设情境中的设想反应，不等于真实压力下的行为或未来成绩。\n第三维度描述的是自述的难受与慌乱程度，不是情绪健康诊断。\n\n用于大学生回顾自己在作业受挫情境中的设想反应，不作诊断、能力评价、人格标签或成绩预测。",
+        "counts": [
+          "已答 29 / 共 30 题未答 1 题",
+          "已答 13 / 共 14 题未答 1 题",
+          "已答 9 / 共 9 题未答 0 题",
+          "已答 7 / 共 7 题未答 0 题"
+        ],
+        "gridColumns": "366px 366px",
+        "explanationFonts": [
+          "13px",
+          "13px",
+          "13px",
+          "13px"
+        ],
+        "markerCount": 2
+      },
+      "path": "invalid-820.png",
+      "originalReport": "browser-report.json"
+    },
+    {
+      "file": "restricted-390.png",
+      "state": "restricted",
+      "width": 390,
+      "height": 844,
+      "sha256": "c7089c1d3fa0ffd192bd9f7471d9dda04235a84ee4ea16ac3d7b7cb6465282e4",
+      "observation": {
+        "width": 390,
+        "scrollWidth": 390,
+        "text": "ARS-30 · 合成报告呈现核对\n\n展示状态：当前受众不可查看。仅用于组件演示。\n\n当前结果暂不可展示。请稍后重试或联系测评管理员。",
+        "counts": [],
+        "gridColumns": "none",
+        "explanationFonts": [],
+        "markerCount": 0
+      },
+      "path": "restricted-390.png",
+      "originalReport": "browser-report.json"
+    },
+    {
+      "file": "unknown-820.png",
+      "state": "unknown",
+      "width": 820,
+      "height": 1180,
+      "sha256": "7d4750f29bdc14091d6616f6fb056e2d36982cda8c3542e6e9ccd8660e3e0a9c",
+      "observation": {
+        "width": 820,
+        "scrollWidth": 820,
+        "text": "ARS-30 · 合成报告呈现核对\n\n展示状态：数量与方向未提供。仅用于组件演示。\n\n元数据未提供的合成示例\n\n分数层\n\n实际得分\n查看本次得分及其原始量尺范围。\n\n其他得分\n\n这些得分未标注为总分或维度，因此单独列出，不推断其层级。\n\n描述性分数\n12.00\n\n作答数量未提供\n\n分数说明：计分方向未提供，请结合量表说明阅读。\n\n只显示本次已提供的结果。\n\n科学依据与详细参考",
+        "counts": [
+          "作答数量未提供"
+        ],
+        "gridColumns": "366px 366px",
+        "explanationFonts": [
+          "13px"
+        ],
+        "markerCount": 0
+      },
+      "path": "unknown-820.png",
+      "originalReport": "browser-report.json"
+    },
+    {
+      "file": "bps9-390.png",
+      "state": "bps9",
+      "width": 390,
+      "height": 844,
+      "sha256": "d344e39b61a727e96e7922bd37a5f79ee450f4eda01bc5569be36a8e93a5ceda",
+      "observation": {
+        "width": 390,
+        "scrollWidth": 390,
+        "text": "BPS-9 · 合成报告呈现核对\n\n展示状态：BPS-9 完整作答。仅用于组件演示。\n\n上床拖延问卷（BPS成人9题，中文工作稿）\n报告版本 1.0.0\n数据质量：可解释\n\n分数层\n\n实际得分\n查看本次得分及其原始量尺范围。\n\n总体结果\n\n上床前的收尾习惯\n\n原始范围 1–5\n\n2.33\n1\n5\n\n已答\n9\n/ 共\n9\n题\n未答 0 题\n\n分数说明：9题反向后等权均分1–5，更多表示自述更常拖延上床。\n\n核心反馈\n\n上床前的收尾习惯\n\n这份回答关注的是从“还想再做一会儿”到“准备上床”之间的那段时间。有时我们已经想休息，却被一件小事接着另一件小事拖住。它不是在给自律打分，也不能说明睡不着的原因。工作、照护责任和生活安排都可能影响上床时间。可以回想一个常见的晚上，找出最容易让自己停不下来的环节，再选一个负担很小的收尾动作。一次回答不必变成对自己的评价。\n\n自我观察：最近一次比打算更晚上床，拖住你的是必须完成的事，还是可以留到明天的事？\n策略建议：今晚试着设一个收尾信号：把还想做的事记下来，再开始原本打算的睡前准备。\n环境支持：让收尾动作尽量省事，例如提前准备好明早要用的物品；是否有帮助，过后再看。\n\n解释限制：这份结果整理的是你对平时习惯的描述，不能代替对实际生活安排的了解。；不能仅凭回答判断失眠、身体健康、自律程度或一个人的价值。；中文题目为平台工作译稿，目前不适合用来给人与人之间排高低。；没有回答的题目不会算成最低分；题目不完整时，本次结果不作解释。\n\n限制\n\n阅读提示\n这份结果整理的是你对平时习惯的描述，不能代替对实际生活安排的了解。\n不能仅凭回答判断失眠、身体健康、自律程度或一个人的价值。\n中文题目为平台工作译稿，目前不适合用来给人与人之间排高低。\n没有回答的题目不会算成最低分；题目不完整时，本次结果不作解释。\n未提供群体参考。\n\n供成年人回顾上床习惯；不是睡眠疾病检查，也不是自律考试。中文为平台工作译稿。\n\n科学依据与详细参考",
+        "counts": [
+          "已答 9 / 共 9 题未答 0 题"
+        ],
+        "gridColumns": "none",
+        "explanationFonts": [
+          "13px"
+        ],
+        "markerCount": 1
+      },
+      "path": "bps9-header-fix/bps9-390.png",
+      "originalReport": "bps9-header-fix/browser-report.json"
+    },
+    {
+      "file": "bps9-820.png",
+      "state": "bps9",
+      "width": 820,
+      "height": 1180,
+      "sha256": "b9747d10c06a3eee75db7dcbf3d3e21ea811447b469683d77ade7cc236c7e517",
+      "observation": {
+        "width": 820,
+        "scrollWidth": 820,
+        "text": "BPS-9 · 合成报告呈现核对\n\n展示状态：BPS-9 完整作答。仅用于组件演示。\n\n上床拖延问卷（BPS成人9题，中文工作稿）\n报告版本 1.0.0\n数据质量：可解释\n\n分数层\n\n实际得分\n查看本次得分及其原始量尺范围。\n\n总体结果\n\n上床前的收尾习惯\n\n原始范围 1–5\n\n2.33\n1\n5\n\n已答\n9\n/ 共\n9\n题\n未答 0 题\n\n分数说明：9题反向后等权均分1–5，更多表示自述更常拖延上床。\n\n核心反馈\n\n上床前的收尾习惯\n\n这份回答关注的是从“还想再做一会儿”到“准备上床”之间的那段时间。有时我们已经想休息，却被一件小事接着另一件小事拖住。它不是在给自律打分，也不能说明睡不着的原因。工作、照护责任和生活安排都可能影响上床时间。可以回想一个常见的晚上，找出最容易让自己停不下来的环节，再选一个负担很小的收尾动作。一次回答不必变成对自己的评价。\n\n自我观察：最近一次比打算更晚上床，拖住你的是必须完成的事，还是可以留到明天的事？\n策略建议：今晚试着设一个收尾信号：把还想做的事记下来，再开始原本打算的睡前准备。\n环境支持：让收尾动作尽量省事，例如提前准备好明早要用的物品；是否有帮助，过后再看。\n\n解释限制：这份结果整理的是你对平时习惯的描述，不能代替对实际生活安排的了解。；不能仅凭回答判断失眠、身体健康、自律程度或一个人的价值。；中文题目为平台工作译稿，目前不适合用来给人与人之间排高低。；没有回答的题目不会算成最低分；题目不完整时，本次结果不作解释。\n\n限制\n\n阅读提示\n这份结果整理的是你对平时习惯的描述，不能代替对实际生活安排的了解。\n不能仅凭回答判断失眠、身体健康、自律程度或一个人的价值。\n中文题目为平台工作译稿，目前不适合用来给人与人之间排高低。\n没有回答的题目不会算成最低分；题目不完整时，本次结果不作解释。\n未提供群体参考。\n\n供成年人回顾上床习惯；不是睡眠疾病检查，也不是自律考试。中文为平台工作译稿。\n\n科学依据与详细参考",
+        "counts": [
+          "已答 9 / 共 9 题未答 0 题"
+        ],
+        "gridColumns": "none",
+        "explanationFonts": [
+          "13px"
+        ],
+        "markerCount": 1
+      },
+      "path": "bps9-header-fix/bps9-820.png",
+      "originalReport": "bps9-header-fix/browser-report.json"
+    }
+  ],
+  "manualVisualRead": {
+    "reader": "assistant image inspection, not scientific/translation approval",
+    "readImages": [
+      "complete-390.png",
+      "invalid-820.png",
+      "unknown-820.png",
+      "bps9-header-fix/bps9-390.png",
+      "bps9-header-fix/bps9-820.png"
+    ],
+    "conclusion": "Actual values/ranges and counts visible; phone columns wrap and tablet dimensions form two columns; no clipped content identified. Unknown metadata and invalid/restricted states remain distinct.",
+    "automatedFacts": "All viewport scrollWidths equal their390/820 widths; ARS four/invalid two markers, BPS one marker; count/direction text and no item identifiers/page errors/API/external requests asserted."
+  },
+  "reuse": "Prior12 direct component assertions and changed-file lint have unchanged application inputs and are not rerun. Source scoring/golden/DB validations are not repeated for screenshot generation.",
+  "bps9Fixture": {
+    "meaning": "Audience-safe fields extracted from the retained previously computed synthetic report at b92c69; not a new scoring result or real person",
+    "contentBranchCommit": "2c47978c7000f2049cb7ed089e6056a1bb511390",
+    "measurementHash": "ba0b97ac92dc665dcabc3ffc660433bb79a84457d8bfc9e695a316337262dc2c",
+    "file": "preview-data.json"
+  },
+  "inputs": [
+    {
+      "path": "server-version/frontend/src/modules/reporting/ScaleUnitReportCard.legacy.tsx",
+      "blob": "c18672d0df94697b1c1c1c63355afeacbdea3604",
+      "sha256": "aac243e9a07e1c6784c19c9f113dccf63b6fcff86b3a45cb01baea9bbdddefa8",
+      "bindingTiming": "Post-run exact source/config binding; no fabricated at-start manifest"
+    },
+    {
+      "path": "server-version/frontend/src/modules/reporting/ScaleUnitReportCard.css",
+      "blob": "77389e3c382a502a87f6f5631f78bf1435bd2f4f",
+      "sha256": "241e4863e07621dcc30fda7a54225657ed6bb398e597649b00695cfdbea5ed73",
+      "bindingTiming": "Post-run exact source/config binding; no fabricated at-start manifest"
+    },
+    {
+      "path": "server-version/frontend/src/modules/reporting/ReportPrimitives.tsx",
+      "blob": "bed51f8516f9c84465589cffd89a0183edec8751",
+      "sha256": "da85f924d440dee5bcab93b1e053c8bdaeeb1f76aa83708e74db12f90419426b",
+      "bindingTiming": "Post-run exact source/config binding; no fabricated at-start manifest"
+    },
+    {
+      "path": "server-version/frontend/src/modules/reporting/report-ui.css",
+      "blob": "d6b1d286d2a6f36b5cf438a8a61e78f823195290",
+      "sha256": "043340caa080d471d0faf2fc5fd69eec41ad8b87ba2ae71f4a1fa18b9aa42eec",
+      "bindingTiming": "Post-run exact source/config binding; no fabricated at-start manifest"
+    },
+    {
+      "path": "server-version/frontend/src/index.css",
+      "blob": "ace8b1ff469b452916786bf6816b96b7feaa4a4d",
+      "sha256": "0270ed02f5fa33108c04479d30e3ae8c55a506e661ffad01728b042631a5bba6",
+      "bindingTiming": "Post-run exact source/config binding; no fabricated at-start manifest"
+    },
+    {
+      "path": "server-version/frontend/vite.config.ts",
+      "blob": "07ae0e602c0938352829a55397189baa0c0e0f22",
+      "sha256": "8392c66655f644b0a19c6689333117884ceb5b0183116211b24bbb4a8e2be887",
+      "bindingTiming": "Post-run exact source/config binding; no fabricated at-start manifest"
+    },
+    {
+      "path": "server-version/frontend/tailwind.config.js",
+      "blob": "0907b7854ac29537daa75fe5900193ace9f19c6c",
+      "sha256": "09a37975fdea6adec89215827b9cb757f20e520ab8043d1c370a29fd246ad6d0",
+      "bindingTiming": "Post-run exact source/config binding; no fabricated at-start manifest"
+    },
+    {
+      "path": "server-version/frontend/postcss.config.js",
+      "blob": "a7f73a2d1d7c466d1e8037200bca4d1c79b6e609",
+      "sha256": "3fc8d1c13ad963bbf7da04d59024d38cc2ad14563b36afd71bc8b43c7148dd25",
+      "bindingTiming": "Post-run exact source/config binding; no fabricated at-start manifest"
+    }
+  ],
+  "limits": [
+    "Component preview uses actual React components and Vite development CSS; not production-build, authenticated API or full four-entry participant acceptance.",
+    "Browser input bindings are recorded after execution; full at-start browser/dependency/environment manifests and signed execution were not collected.",
+    "All screenshots are synthetic; no author/expert/scientific or new rights approval inferred.",
+    "Root independent exact-candidate review, CI/Ready/merge and production remain separate and not executed."
+  ]
+}
