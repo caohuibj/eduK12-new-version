@@ -1,0 +1,39 @@
+{
+  "base": "90c0a9a5c0ba24a5a9d8cb8003279dfb668650ba",
+  "inputs": {
+    "server-version/backend/src/__tests__/integration/educationObserverHttp.postgres.integration.test.ts": {
+      "sha256": "a9b57527f9cd6b38d19c345b38b2b44f68063ac6fbe8040adb2ffaa351954ee5",
+      "blob": "f9b6dfa2b6fa7a10810de527a172226aae8bd343"
+    },
+    "server-version/backend/src/__tests__/integration/educationLibraryRuntimeFixture.ts": {
+      "sha256": "a5b2464869b6aea25208c740f693dbfa286cd58da1764f851a0c2612c0a5989d",
+      "blob": "c9efb4fa3d5e772880f3094e2cc6a0f340185778"
+    },
+    "server-version/backend/src/__tests__/integration/educationLibraryObserver.postgres.integration.test.ts": {
+      "sha256": "1eb30c62c7555e67423753ff3e06fe46a7478352b7a162655d5f030e7110b4fe",
+      "blob": "5553a7231dd40d184d279381c18a2f98a34dd4f6"
+    },
+    "server-version/backend/src/__tests__/integration/huiteacherFieldObservation.postgres.integration.test.ts": {
+      "sha256": "dce4402062fdef7141d300592e1cf3ef9c68714a47bb455f10b92eb5dc95414a",
+      "blob": "94b748bc57021da543ecbc0c144e85c9ce3e2c60"
+    },
+    "server-version/backend/package-lock.json": {
+      "sha256": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+      "blob": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6"
+    }
+  },
+  "evidence": {
+    "observer-expert-http-r1-execution.json": "0974d1d6a112bed7eb04f33afd98859f19bb92e96d62623364a2cfede2d4c163",
+    "observer-expert-http-r1.json": "f3207272e4232faa0bb9c4911b45542d6bcc677898230e9fd76a7abee674fa61",
+    "observer-http-r1-execution.json": "6f29359d928388dda5bfbf213fa7280783231c8820a6065505cb7ccd48a0bcab",
+    "observer-http-r1.json": "5cb067e35b1cd68ea7d2c76b2d192667daf07f11717f9f08cf2a3f0ef9d617d9",
+    "observer-http-r2-execution.json": "a5a9be55dba76957391e6dc428efcc32a28b422ae616afb4d0ab550ebdf2438c",
+    "observer-http-r2.json": "aa8b18dfd26d08abe4352bdb866ad679deaafa75ddc152b653bbb58e08b48f47",
+    "observer-http-r3-execution.json": "7d74b075d7e0a21d3a657c15701c0d8be29c78a8772f736131cf99059ad2403b",
+    "observer-http-r3.json": "2f772a7e4c3f8d78d13118141f3d27b16d206b0f31eb64661264df93f7ef27cc",
+    "observer-http-r4-execution.json": "1dda4ad4e1707476937f995dea3896962238623cb2b84ef80cc4bbc6643eb139",
+    "observer-http-r4.json": "a20b46ed70c9745986a285723b206366ea716b0293ad0af4c6b8cc7fbeee5dd2",
+    "observer-pg-r1-execution.json": "f49e87d0a2d53bcc7e36509ac20565289137261e4bdded7edffa11bc0822e019",
+    "observer-pg-r1.json": "fa3285fc377c20a817312e51ac99f07047eb11cd09bd480b59964e34564bdb20"
+  }
+}

@@ -105,3 +105,16 @@ test('PR374 binds its own mixed source and keeps browser qualification inside th
 test('PR374 reviewed HTTP source refuses an unreviewed original index',async()=>{
  const {verifyPr374Observations}=await import('./pr374-evidence.mjs');assert.throws(()=>verifyPr374Observations({indexSHA256:'0'.repeat(64)}));
 });
+
+test('observer follow-up admits only its HTTP test, scoped CSS and evidence; browser qualification stays required',()=>{
+ const f=fixture(),path='server-version/frontend/src/modules/reporting/report-ui.css',b={...f.b,pr:376,source:{[path]:{before:null,after:blob}}};
+ const entries=f.entries.map(e=>Object.hasOwn(f.b.source,e.file)?{...e,file:path}:e),env={...f.env,CI_PR_NUMBER:'376',CI_HEAD_REF:BRANCHES[376]};
+ const read=(cmd,a,...r)=>cmd==='rev-parse'&&a===base+':server-version/frontend'?h('9'):f.read(cmd,a,...r);
+ assert.equal(onboardingPlan(entries,base,head,read,env,b).pr,376);
+ for(const outside of ['server-version/backend/src/middleware/auth.ts','server-version/backend/prisma/schema.prisma'])assert.throws(()=>onboardingPlan(entries.map(e=>e.file===path?{...e,file:outside}:e),base,head,read,env,{...b,source:{[outside]:{before:null,after:blob}}}));
+ const yaml=readFileSync('.github/workflows/ci.yml','utf8');assert(yaml.includes('node .github/scripts/pr376-browser.mjs'));assert(yaml.includes("contains(fromJSON('[374,376]')"));
+ const script=readFileSync('.github/scripts/pr376-browser.mjs','utf8');assert(script.includes('chromiumSandbox:true'));assert(script.includes('verifyChromeSandbox'));assert(script.includes('results.cases.length,6'));assert(script.includes('row.warning.ratio>=4.5'));assert(script.includes('Display fixture forbids simulated writes'));
+});
+test('observer display retry keeps failed report and narrows execution without weakening contrast',()=>{
+ const script=readFileSync('.github/scripts/pr376-browser.mjs','utf8');assert(script.includes("assert.equal(prior.status,'FAIL')"));assert(script.includes('executedThisRun:false'));assert(script.includes("assert.deepEqual(changed,['server-version/frontend/src/modules/reporting/report-ui.css'])"));assert(script.includes("data-shell-mode={view==='report'?'student':undefined}"));assert(script.includes('row.warnings.length>=2'));assert(script.includes('value.ratio>=4.5'));
+});
