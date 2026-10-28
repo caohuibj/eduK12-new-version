@@ -36,8 +36,13 @@
     },
     {
       "newFamily": "tms13",
-      "existing": "ffmq39 / maas15 / kims39",
-      "relation": "TMS 测一次练习后的即时状态正念，与特质正念量表不同层；导入时不得与特质量表混合计分或比较。"
+      "existing": "ffmq39 / maas15 / kims39 / cams_r12",
+      "relation": "TMS 为状态正念（测刚结束的一次练习的即时状态，两维不合成总分），与各特质正念量表不同层；不与特质量表混合计分或比较，导出报告须标注状态边界。TMS-T 特质版为另一题本。"
+    },
+    {
+      "newFamily": "cams_r12",
+      "existing": "ffmq15_zh_cn_research / ffmq39 / maas15",
+      "relation": "CAMS-R 为单维总分特质正念工具，与 FFMQ 多侧面结构不同；同为特质层但结构不同，分数不互换比较。选项锚点差异已记录（GGSC 表未印锚点，OA 文献佐证 4 点）。"
     }
   ]
 }

@@ -5,11 +5,11 @@
   "published": false,
   "ciTriggered": false,
   "toolFamilies": 10,
-  "exactVersions": 4,
-  "executableDrafts": 4,
-  "catalogOnly": 6,
-  "nativeGoldenCases": 27,
-  "reportSamples": 4,
+  "exactVersions": 6,
+  "executableDrafts": 6,
+  "catalogOnly": 4,
+  "nativeGoldenCases": 39,
+  "reportSamples": 6,
   "baseline": {
     "mainSha": "6203a829dc8d7de707e67f413acfa5a354a21e09",
     "contentBranchCompared": "content/dot-local-scales-20261025",
@@ -99,7 +99,7 @@
       "fullTextSource": "PENDING",
       "wordingAndScoring": "PENDING_FULL_CONTENT_IN_SOURCE",
       "report": "NOT_STARTED",
-      "gap": "已找到的是周仁来、陈思佚编制的中文12题版 FMI-12 题本及使用手册，与 Walach et al. (2006) 原版14题为不同身份；不可直接互替。原版14题题本与许可待核。",
+      "gap": "原版14题题本仍未取得可验证来源：原始文献 Walach et al. (2006) 为付费墙；2025 BMC Psychology 常模论文（PMC12670850，OA）正文与补充材料只有统计表、无题目文本；已定位一个二级托管副本（blake-group.com 自评页，引用 Walach 2006）待甄别。已找到的中文 FMI-12（周仁来/陈思佚）为不同身份，不可互替。",
       "versions": [
         {
           "key": "fmi14",
@@ -111,40 +111,43 @@
       ]
     },
     {
-      "family": "cams_r",
+      "family": "cams_r12",
       "name": "CAMS-R",
-      "category": "成人正念特质自评（日常特质）",
-      "fullTextSource": "PENDING_VERIFIED_OPTION_ANCHORS",
-      "wordingAndScoring": "PENDING_RESPONSE_ANCHORS",
-      "report": "NOT_STARTED",
-      "gap": "12题与反向计分说明已核（Berkeley 来源），但各级作答选项的文字锚点未完整印出；补齐锚点前不能施测。",
+      "category": "成人正念特质自评（单维总分）",
+      "fullTextSource": "https://ggsc.berkeley.edu/images/uploads/The_Cognitive_and_Affective_Mindfulness_Scale_%E2%80%93_Revised.pdf",
+      "wordingAndScoring": "PASS_WITH_RECORDED_GAP",
+      "report": "NATIVE_TEMPLATE_AND_STATIC_SAMPLE",
+      "gap": "题干、反向键（2/6/7）与求和规则来自 GGSC 官方托管表（逐字）；选项锚点在托管表上缺失，采用同行评审 OA 文献逐字佐证的 4 点锚点（1=rarely/not at all … 4=almost always），已如实记录差异；取得作者原件后复核。",
       "versions": [
         {
           "key": "cams_r12",
           "version": "1.0.0",
           "itemCount": 12,
-          "locale": null,
-          "executable": false
+          "locale": "en",
+          "executable": true
         }
-      ]
+      ],
+      "commit": "c209208860370a237348bfb3750ed7826357471a",
+      "goldenCases": 6
     },
     {
-      "family": "tms",
-      "name": "TMS",
-      "category": "练习后即时正念状态（状态正念）",
-      "fullTextSource": "PENDING",
-      "wordingAndScoring": "PENDING_FULL_CONTENT_IN_SOURCE",
-      "report": "NOT_STARTED",
-      "gap": "13题（Lau et al., 2006，测量一次冥想/练习后的即时状态）；题文来源待正式核对与许可确认。状态正念与特质正念不混用。",
+      "family": "tms13",
+      "name": "TMS-13（状态正念）",
+      "category": "练习后即时状态正念（两维）",
+      "fullTextSource": "https://www.rotman-baycrest.on.ca/files/publicationmodule/@random45f5724eba2f8/pid3280.pdf",
+      "wordingAndScoring": "PASS",
+      "report": "NATIVE_TEMPLATE_AND_STATIC_SAMPLE",
       "versions": [
         {
           "key": "tms13",
           "version": "1.0.0",
           "itemCount": 13,
-          "locale": null,
-          "executable": false
+          "locale": "en",
+          "executable": true
         }
-      ]
+      ],
+      "commit": "42f2e82aef15f5bd6c4841e570d5a19ec1212bec",
+      "goldenCases": 6
     },
     {
       "family": "mts_teacher",
@@ -153,7 +156,7 @@
       "fullTextSource": "PENDING",
       "wordingAndScoring": "PENDING_FULL_CONTENT_IN_SOURCE",
       "report": "NOT_STARTED",
-      "gap": "Frank et al. (2016) 表1同时给出中英条目、正文交代五级作答；原文可得性与许可待核。",
+      "gap": "原文 Frank, Jennings, & Greenberg (2016), Mindfulness 7(1), 155-163 为付费墙；已核实作答方式为五级（1=Never true … 5=Always true，2024 应用论文转述，SHA ed5aee74…）；中文版 MTS-C（Li et al., 2019, PubMed 31284595）存在。缺完整可验证题文，待取得原文或 MTS-C 附录后导入。",
       "versions": [
         {
           "key": "mts_teacher14",
@@ -200,5 +203,6 @@
         }
       ]
     }
-  ]
+  ],
+  "structuralCheck": "scale:instruments:check PASS after regenerating onboarding/instruments.generated.ts (6 new instruments registered at source level; no DB import)"
 }
