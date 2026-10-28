@@ -45,6 +45,7 @@ import { seeds as task42 } from '../tasks/icarmatrix/seeds'
 import { seeds as task43 } from '../tasks/cancellation/seeds'
 import { seeds as task44 } from '../tasks/trustgame/seeds'
 import { seeds as task45 } from '../tasks/embeddedfigures/seeds'
+import { seeds as task46 } from '../tasks/ufov/seeds'
 export const cognitiveSeeds = [
   task0[0],
   task1[0],
@@ -95,5 +96,6 @@ export const cognitiveSeeds = [
   task43[0],
   task44[0],
   task45[0],
+  task46[0],
   task21[1],
 ]

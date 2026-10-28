@@ -317,6 +317,12 @@ const SCORING_DECLARATIONS: Record<string, CognitiveScoringContractDeclaration> 
     runtimeReconstructableFacts: ['几何场与目标 id（冻结题库前 4 题 + seed 生成器重建）'],
     serverDerivedFacts: ['正确性判定', 'metrics（accuracy/medianRtMs）', 'quality flags'],
   },
+  ufov: {
+    testType: 'ufov',
+    clientObservedFacts: ['中心判别选择', '周边位置选择', '串联作答用时', 'interrupted'],
+    runtimeReconstructableFacts: ['中心图形与周边位置（seed+trialIndex 重建）'],
+    serverDerivedFacts: ['中心正确性/周边正确性/双重正确性', 'metrics（dualCorrectRate/centralAccuracy/peripheralAccuracy）', 'quality flags'],
+  },
 }
 
 // 当前通用事实（所有任务一致）：完整加密 trial payload、v2 trial envelope qualityEvents、
@@ -552,6 +558,11 @@ const RESEARCH_CAPTURE_DECLARATIONS: Record<string, CognitiveResearchCaptureDecl
     testType: 'embeddedfigures',
     currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次点击与用时'],
     futureCaptureFacts: ['搜索注视轨迹', '真实 input modality', 'device provenance'],
+  },
+  ufov: {
+    testType: 'ufov',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次两项响应与用时'],
+    futureCaptureFacts: ['自适应偏心率轨迹', '眼动数据', '真实 input modality', 'device provenance'],
   },
 }
 

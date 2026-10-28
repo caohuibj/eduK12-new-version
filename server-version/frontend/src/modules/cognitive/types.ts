@@ -865,3 +865,27 @@ export type EmbeddedfiguresTrialPayload = {
   rtMs: number | null
   interrupted: boolean
 }
+
+/** Ufov 冻结 config（与后端 ufov.config schema 一致）。 */
+export interface UfovConfig {
+  totalTrials: number
+  stimulusMs: number
+  fixationMs: number
+  validRtFloorMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+/** Ufov 单 trial payload（与后端 ufov.trial schema 一致）。 */
+export type UfovTrialPayload = {
+  centralTarget: 'circle' | 'triangle'
+  peripheralPosition: number
+  centralResponse: number | null
+  peripheralResponse: number | null
+  rtMs: number | null
+  interrupted: boolean
+}

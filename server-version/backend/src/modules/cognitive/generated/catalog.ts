@@ -44,6 +44,7 @@ import { catalog as task41 } from '../tasks/icarmatrix/governance'
 import { catalog as task42 } from '../tasks/cancellation/governance'
 import { catalog as task43 } from '../tasks/trustgame/governance'
 import { catalog as task44 } from '../tasks/embeddedfigures/governance'
+import { catalog as task45 } from '../tasks/ufov/governance'
 export const cognitiveCatalog = {
   'reaction': task0,
   'memory': task1,
@@ -90,4 +91,5 @@ export const cognitiveCatalog = {
   'cancellation': task42,
   'trustgame': task43,
   'embeddedfigures': task44,
+  'ufov': task45,
 }
