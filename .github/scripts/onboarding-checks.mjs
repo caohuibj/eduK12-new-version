@@ -10,8 +10,8 @@ const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
 const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
 function safePath(path){assert(typeof path==='string'&&!path.startsWith('/')&&!path.includes('\\')&&path.split('/').every(p=>p&&p!=='.'&&p!=='..'));return path;}
 export function verifyOriginalReport(report,review){
-  assert.equal(report.success,true);assert.equal(report.numFailedTests,0);
   const cases=report.testResults.flatMap(s=>s.assertionResults.map(c=>({fullName:c.fullName,status:c.status})));
+  for(const c of cases)assert(typeof c.fullName==='string'&&c.fullName&&['passed','failed','pending','skipped'].includes(c.status));
   assert.equal(new Set(cases.map(c=>c.fullName)).size,cases.length);
   assert.deepEqual(cases,review.cases,'Original failed/filtered/case rows changed');
   const summary=Object.fromEntries(['success','numPassedTests','numFailedTests','numPendingTests'].map(key=>[key,report[key]]));
@@ -19,7 +19,16 @@ export function verifyOriginalReport(report,review){
   const passed=cases.filter(c=>c.status==='passed');assert(passed.length>0,'Empty selection is not qualification');
   assert.equal(passed.length,report.numPassedTests);
   assert.equal(cases.filter(c=>['pending','skipped'].includes(c.status)).length,report.numPendingTests);
-  assert.equal(cases.length,report.numPassedTests+report.numPendingTests);
+  const failed=cases.filter(c=>c.status==='failed');
+  assert.equal(failed.length,report.numFailedTests);
+  assert.equal(cases.length,report.numPassedTests+report.numPendingTests+report.numFailedTests);
+  if(failed.length){
+    assert.equal(report.success,false);assert.equal(review.allowPartialFailure,true);
+    assert(Array.isArray(review.selectedCases),'Partial failure requires explicit passed-case selection');
+    assert(Array.isArray(review.failureContinuations));
+    assert.deepEqual(review.failureContinuations.map(c=>c.caseName).sort(),failed.map(c=>c.fullName).sort());
+    for(const continuation of review.failureContinuations)assert(typeof continuation.reportId==='string'&&continuation.reportId);
+  }else{assert.equal(report.success,true);assert(!review.failureContinuations?.length);}
   const names=passed.map(c=>c.fullName);
   if(review.selectedCases!==undefined){
     assert(Array.isArray(review.selectedCases)&&review.selectedCases.length,'Explicit selection must not be empty');
@@ -29,16 +38,27 @@ export function verifyOriginalReport(report,review){
   }
   return names;
 }
-export function verifyTypeReceipt(receipt,review,readBytes,currentBackend){
-  assert.equal(receipt[review.exitField],0);assert.deepEqual(receipt.argv??receipt.command,['node','node_modules/typescript/bin/tsc','--noEmit']);
-  if(review.backendTree){assert.equal(receipt.backendTree,review.backendTree);assert.equal(currentBackend,review.backendTree);}
+export function verifyFailureContinuations(reports,admitted){
+  for(const original of reports)for(const continuation of original.failureContinuations??[]){
+    assert.notEqual(continuation.reportId,original.id);
+    const replacement=admitted.find(r=>r.id===continuation.reportId);
+    assert(replacement?.caseNames.includes(continuation.caseName),'Original failed case has no admitted successful continuation');
+  }
+}
+export function verifyTypeReceipt(receipt,review,readBytes,currentTree){
+  const component=review.component??'backend';assert(['backend','frontend'].includes(component));
+  const argv=component==='frontend'?['node','node_modules/typescript/bin/tsc','-p','tsconfig.app.json','--noEmit']:['node','node_modules/typescript/bin/tsc','--noEmit'];
+  assert.equal(receipt[review.exitField],0);assert.deepEqual(receipt.argv??receipt.command,argv);
+  const tree=review.componentTree??review.backendTree;
+  if(tree){assert.equal(receipt.componentTree??receipt.backendTree,tree);assert.equal(currentTree,tree);}
   else {
-    assert(receipt.before&&receipt.after&&Object.keys(receipt.before).length);
+    assert.equal(component,'backend');assert(receipt.before&&receipt.after&&Object.keys(receipt.before).length);
     assert.deepEqual(receipt.before,receipt.after);
     for(const [path,sha]of Object.entries(receipt.after))assert.equal(hash(readBytes(safePath(path))),sha,'Recorded compiler input drift');
   }
   if(receipt.logSHA256)assert.equal(hash(readBytes(safePath(review.log))),receipt.logSHA256);
-  return {originalExitCode:0,originalNode:receipt.node??null,originalSigned:false,currentBackend,coverage:review.backendTree?'exact-backend-tree':'recorded-before-after-source-files'};
+  return {originalExitCode:0,originalNode:receipt.node??null,originalSigned:false,component,currentComponentTree:currentTree,
+    ...(component==='backend'?{currentBackend:currentTree}:{}),coverage:tree?'exact-'+component+'-tree':'recorded-before-after-source-files'};
 }
 export function verifyReportPlanningObservation(observation,execution){
   assert.equal(execution.exitCode,0);assert.match(execution.head,/^[a-f0-9]{40}$/);
@@ -74,17 +94,24 @@ function admit(){
   assert(Array.isArray(review.environment.limitations)&&review.environment.limitations.length,'Disclose original evidence limits');
   const admitted=[];
   for(const original of review.reports){
+    assert(typeof original.id==='string'&&original.id);
     assert.match(original.originalSourceAssociation,/^[a-f0-9]{40}$/);
     try{git('cat-file','-e',original.originalSourceAssociation);}catch{git('fetch','--no-tags','--depth=1','origin',original.originalSourceAssociation);}
-    const delta=git('diff','--name-only',original.originalSourceAssociation,p.product,'--','server-version/backend').split('\n').filter(Boolean);
+    const roots=original.sourceRoots??['server-version/backend'];
+    assert(Array.isArray(roots)&&roots.length&&new Set(roots).size===roots.length);
+    for(const root of roots)assert(['server-version/backend','server-version/frontend'].includes(root));
+    const delta=git('diff','--name-only',original.originalSourceAssociation,p.product,'--',...roots).split('\n').filter(Boolean);
     assert.deepEqual(delta,original.reviewedUnrelatedSourceDelta,'Reviewed test input delta changed');
     assert(original.deltaRationale&&original.sourceAssociationBasis);
     const caseNames=verifyOriginalReport(readOriginal(original),original);
-    admitted.push({id:original.id,caseNames,originalSourceAssociation:original.originalSourceAssociation,sourceAssociationBasis:original.sourceAssociationBasis,originalReportSHA256:original.sha256,ciExecuted:false});
+    admitted.push({id:original.id,caseNames,originalSourceAssociation:original.originalSourceAssociation,sourceAssociationBasis:original.sourceAssociationBasis,originalReportSHA256:original.sha256,originalReportSuccess:original.summary.success,originalFailedCount:original.summary.numFailedTests,ciExecuted:false});
   }
   assert(admitted.length&&new Set(admitted.flatMap(r=>r.caseNames)).size===admitted.flatMap(r=>r.caseNames).length);
-  const types=(Array.isArray(review.types)?review.types:[review.types]).map(record=>verifyTypeReceipt(readOriginal(record),record,path=>readFileSync(path),p.components.backend));
+  assert.equal(new Set(admitted.map(r=>r.id)).size,admitted.length);
+  verifyFailureContinuations(review.reports,admitted);
+  const types=(Array.isArray(review.types)?review.types:[review.types]).map(record=>verifyTypeReceipt(readOriginal(record),record,path=>readFileSync(path),p.components[record.component??'backend']));
   assert(types.length);
+  if(p.pr===372)assert.deepEqual(types.map(t=>t.component).sort(),['backend','frontend']);
   const observations=[];
   if(p.pr===369){
     assert.equal(review.reportPlanningObservations?.length,1);

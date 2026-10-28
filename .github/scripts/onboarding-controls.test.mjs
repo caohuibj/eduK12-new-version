@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {BRANCHES,CONTROLS,MARKER,onboardingPlan,onboardingOutputs} from './onboarding-scope.mjs';
-import {verifyOriginalReport,verifyTypeReceipt,verifyReportPlanningObservation} from './onboarding-checks.mjs';
+import {verifyOriginalReport,verifyTypeReceipt,verifyReportPlanningObservation,verifyFailureContinuations} from './onboarding-checks.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 const h=c=>c.repeat(40),base=h('a'),head=h('b'),source=h('c'),tree=h('d'),blob=h('e');
 function fixture(){
@@ -57,4 +57,34 @@ test('shared planner branch reuses bounded admission with a distinct exact sourc
  assert.throws(()=>onboardingPlan(entries.map(e=>e.file===path?{...e,file:outside}:e),base,head,f.read,env,{...b,source:{[outside]:{before:null,after:blob}}}));
  assert.throws(()=>onboardingPlan(entries,base,head,f.read,{...env,CI_HEAD_REF:BRANCHES[365]},b));
  const yaml=readFileSync('.github/workflows/ci.yml','utf8');assert(yaml.includes(".pr == 369 && 'paths: [server-version/backend/src/modules/reporting,"));
+});
+
+test('partial original failure preserves failed rows and requires a passed continuation',()=>{
+ const cases=[{fullName:'kept',status:'passed'},{fullName:'fixed',status:'failed'},{fullName:'old',status:'skipped'}];
+ const report={success:false,numPassedTests:1,numFailedTests:1,numPendingTests:1,testResults:[{assertionResults:cases}]};
+ const review={id:'original',cases,summary:{success:false,numPassedTests:1,numFailedTests:1,numPendingTests:1},allowPartialFailure:true,selectedCases:['kept'],failureContinuations:[{caseName:'fixed',reportId:'retry'}]};
+ assert.deepEqual(verifyOriginalReport(report,review),['kept']);
+ verifyFailureContinuations([review],[{id:'original',caseNames:['kept']},{id:'retry',caseNames:['fixed']}]);
+ assert.throws(()=>verifyOriginalReport(report,{...review,allowPartialFailure:false}));
+ assert.throws(()=>verifyOriginalReport(report,{...review,selectedCases:['fixed']}));
+ assert.throws(()=>verifyOriginalReport(report,{...review,failureContinuations:[]}));
+ assert.throws(()=>verifyFailureContinuations([review],[{id:'retry',caseNames:[]}]));
+});
+test('component type receipts bind the selected frontend tree and exact compiler command',()=>{
+ const receipt={argv:['node','node_modules/typescript/bin/tsc','-p','tsconfig.app.json','--noEmit'],exitCode:0,componentTree:h('3')};
+ const review={component:'frontend',componentTree:h('3'),exitField:'exitCode'};
+ assert.equal(verifyTypeReceipt(receipt,review,()=>Buffer.from(''),h('3')).component,'frontend');
+ assert.throws(()=>verifyTypeReceipt(receipt,review,()=>Buffer.from(''),h('2')));
+ assert.throws(()=>verifyTypeReceipt(receipt,{...review,component:'backend'},()=>Buffer.from(''),h('3')));
+ assert.throws(()=>verifyTypeReceipt({...receipt,exitCode:2},review,()=>Buffer.from(''),h('3')));
+});
+test('first-feedback scope permits only reviewed mixed components and scans both source families',()=>{
+ const f=fixture(),path='server-version/frontend/src/survey/SurveyPublicApp.tsx',b={...f.b,pr:372,source:{[path]:{before:null,after:blob}}};
+ const entries=f.entries.map(e=>Object.hasOwn(f.b.source,e.file)?{...e,file:path}:e),env={...f.env,CI_PR_NUMBER:'372',CI_HEAD_REF:BRANCHES[372]};
+ const read=(cmd,a,...r)=>cmd==='rev-parse'&&a===base+':server-version/frontend'?h('9'):f.read(cmd,a,...r);
+ assert.equal(onboardingPlan(entries,base,head,read,env,b).pr,372);
+ const outside='server-version/frontend/src/survey/Other.tsx';
+ assert.throws(()=>onboardingPlan(entries.map(e=>e.file===path?{...e,file:outside}:e),base,head,read,env,{...b,source:{[outside]:{before:null,after:blob}}}));
+ assert.throws(()=>onboardingPlan(f.entries,base,head,read,f.env,f.b));
+ const yaml=readFileSync('.github/workflows/ci.yml','utf8');assert(yaml.includes(".pr == 372 && 'paths: [server-version/backend/src/modules/survey, server-version/frontend/src/survey,"));
 });

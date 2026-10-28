@@ -80,3 +80,19 @@ transaction. FINAL reloads/hashes it under current locks, checks exclusions,
 credentials and consent. The public router already sets no-store/no-referrer.
 Fresh projection stays inside that boundary and is returned only after commit;
 no external authority cache or client proof bypass was introduced.
+
+## Bounded formal CI plan
+
+PR #372 reuses the existing immutable source / reviewed-original admission /
+CodeQL / merge-gate route. The source verifier freezes both component trees and
+all changed paths. Admission reads the six original reporters (eleven distinct
+passed cases), retaining the original failed invocation and requiring named
+successful continuations for each failed assertion. It does not execute the
+application scenarios again. Both exact backend and frontend type receipts are
+required for this mixed patch. CodeQL covers the changed Survey and shared FINAL
+consumer code plus the admission controls; the actual SARIF must be reviewed.
+Source/admission budget is five minutes each; prolonged waits are diagnosed,
+not replaced with full-platform CI. No browser, image build, deployment or
+production-capacity qualification is claimed. Static YAML parsing and the
+changed control contracts pass; actionlint still reports the four pre-existing
+artifact-ids metadata warnings outside this patch.
