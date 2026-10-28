@@ -1,0 +1,1100 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-28T01:24:06.592782+00:00",
+  "base": "642fda7ab754790686d6626efac62b73a332e663",
+  "branch": "content/scale-bps9-intake-20261028",
+  "relationshipToPR367": "Independent main-based BPS9 content PR; no ARS or frontend change. PR367 remains separately under root review. No CI/Ready/merge/deploy qualification is implied.",
+  "authorizationMeaning": "Continued user-authorized scale audit/optimization/intake. PUBLISHED is this prepared technical package release candidate, not a claim that root already reviewed BPS9 or that research/translation/rights approval newly occurred.",
+  "source": {
+    "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+    "identity": {
+      "instrumentKey": "bps9_zh_cn_research",
+      "instrumentVersion": "1.0.0"
+    },
+    "files": [
+      {
+        "path": "docs/scale-instruments/research-drafts/bps9/1.0.0/README.md",
+        "originalBlob": "b2b0dff50fc0840f582f80035bb5186d1b0e9f2e",
+        "originalSHA256": "0707db2c6695a5169672ff2a11151697d32d08ccd42d9a59c3194c901b7158a6",
+        "currentBlob": "b2b0dff50fc0840f582f80035bb5186d1b0e9f2e",
+        "currentSHA256": "0707db2c6695a5169672ff2a11151697d32d08ccd42d9a59c3194c901b7158a6",
+        "byteIdentical": true
+      },
+      {
+        "path": "docs/scale-instruments/research-drafts/bps9/1.0.0/administration.md",
+        "originalBlob": "0bc2dec2f3bc5299cc53e5e7b6cb50f6f98b24da",
+        "originalSHA256": "e32045d274b556f8a117e0e17a44d2fb61de5e1181ec4cd66ef2b18332e6a624",
+        "currentBlob": "0bc2dec2f3bc5299cc53e5e7b6cb50f6f98b24da",
+        "currentSHA256": "e32045d274b556f8a117e0e17a44d2fb61de5e1181ec4cd66ef2b18332e6a624",
+        "byteIdentical": true
+      },
+      {
+        "path": "docs/scale-instruments/research-drafts/bps9/1.0.0/bilingual-content.json",
+        "originalBlob": "0239d0c48163f10f598309b23be0d3f0421529bb",
+        "originalSHA256": "d1d96e89da6df51422c0a7d44b7d5a4ec772db272cb8f359f5636c63dd594248",
+        "currentBlob": "0239d0c48163f10f598309b23be0d3f0421529bb",
+        "currentSHA256": "d1d96e89da6df51422c0a7d44b7d5a4ec772db272cb8f359f5636c63dd594248",
+        "byteIdentical": true
+      },
+      {
+        "path": "docs/scale-instruments/research-drafts/bps9/1.0.0/instruction.for-pr356.json",
+        "originalBlob": "c75856d606a0f8a3467cb79548ed4783496da93f",
+        "originalSHA256": "f5497a0050d2ad10dab5ff25536bd7e64aed829c8bda2e40f68053c8483ae01e",
+        "currentBlob": "c75856d606a0f8a3467cb79548ed4783496da93f",
+        "currentSHA256": "f5497a0050d2ad10dab5ff25536bd7e64aed829c8bda2e40f68053c8483ae01e",
+        "byteIdentical": true
+      },
+      {
+        "path": "docs/scale-instruments/research-drafts/bps9/1.0.0/references.md",
+        "originalBlob": "542b28e133a237f6e799ed99a19285afc9ab18df",
+        "originalSHA256": "fb180bad4543c93b0d6b747cfecb0f66e48b33ef2c6a77c4652463700dd3c19a",
+        "currentBlob": "542b28e133a237f6e799ed99a19285afc9ab18df",
+        "currentSHA256": "fb180bad4543c93b0d6b747cfecb0f66e48b33ef2c6a77c4652463700dd3c19a",
+        "byteIdentical": true
+      },
+      {
+        "path": "docs/scale-instruments/research-drafts/bps9/1.0.0/report-example.md",
+        "originalBlob": "5cdde23c0d48a86f35f3e3b0f50e811d81c5fb84",
+        "originalSHA256": "8ed1177875b421c74a9313aeefe1592a40c089b67657120797a12d1d1e3b647e",
+        "currentBlob": "5cdde23c0d48a86f35f3e3b0f50e811d81c5fb84",
+        "currentSHA256": "8ed1177875b421c74a9313aeefe1592a40c089b67657120797a12d1d1e3b647e",
+        "byteIdentical": true
+      },
+      {
+        "path": "docs/scale-instruments/research-drafts/bps9/1.0.0/report-result.synthetic.json",
+        "originalBlob": "87560927f3b4499cb4661fa038b27564b649adc1",
+        "originalSHA256": "71399f013b887ecf72fb0de353a8ef3672a2b4e951cb7ee691380c9d369406e1",
+        "currentBlob": "87560927f3b4499cb4661fa038b27564b649adc1",
+        "currentSHA256": "71399f013b887ecf72fb0de353a8ef3672a2b4e951cb7ee691380c9d369406e1",
+        "byteIdentical": true
+      },
+      {
+        "path": "docs/scale-instruments/research-drafts/bps9/1.0.0/scoring-and-parameters.md",
+        "originalBlob": "a8a37f4a770ec7f31c2706e599493c704448882b",
+        "originalSHA256": "e9e6a3697c11afde905da89842a483f1e1fcf232047d6f2edf95dc9c054a85dd",
+        "currentBlob": "a8a37f4a770ec7f31c2706e599493c704448882b",
+        "currentSHA256": "e9e6a3697c11afde905da89842a483f1e1fcf232047d6f2edf95dc9c054a85dd",
+        "byteIdentical": true
+      },
+      {
+        "path": "docs/scale-instruments/research-drafts/bps9/1.0.0/take-home-message.md",
+        "originalBlob": "1e29e6293cad259819ef00f0116ad1aa4f44a2c1",
+        "originalSHA256": "9939e1d16691c84543cd1b93997216e71080e2d2c73d73778e85f9dcca1a314c",
+        "currentBlob": "1e29e6293cad259819ef00f0116ad1aa4f44a2c1",
+        "currentSHA256": "9939e1d16691c84543cd1b93997216e71080e2d2c73d73778e85f9dcca1a314c",
+        "byteIdentical": true
+      },
+      {
+        "path": "docs/scale-instruments/research-drafts/bps9/1.0.0/validation.md",
+        "originalBlob": "e2ac3d0e200fa237db46a8cfa59cdc598ee9b496",
+        "originalSHA256": "c3801089d8ae07cb69f13f6a4134e12d738fffb6a0e28276744d9813816871ef",
+        "currentBlob": "e2ac3d0e200fa237db46a8cfa59cdc598ee9b496",
+        "currentSHA256": "c3801089d8ae07cb69f13f6a4134e12d738fffb6a0e28276744d9813816871ef",
+        "byteIdentical": true
+      },
+      {
+        "path": "server-version/backend/src/modules/scale/instruments/bps9_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+        "originalBlob": "7e8fc1b728e256ea531815a4b70a2741af83c2ae",
+        "originalSHA256": "53980f36b9db4ba81cb1ffc7e849187152be1a29b559013bf3bdb2d2d893014d",
+        "currentBlob": "7e8fc1b728e256ea531815a4b70a2741af83c2ae",
+        "currentSHA256": "53980f36b9db4ba81cb1ffc7e849187152be1a29b559013bf3bdb2d2d893014d",
+        "byteIdentical": true
+      },
+      {
+        "path": "server-version/backend/src/modules/scale/instruments/bps9_zh_cn_research/1.0.0/instrument.ts",
+        "originalBlob": "0eed070bb879576339c5a71afdf34c0026591fd3",
+        "originalSHA256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+        "currentBlob": "0eed070bb879576339c5a71afdf34c0026591fd3",
+        "currentSHA256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+        "byteIdentical": true
+      },
+      {
+        "path": "server-version/backend/src/modules/scale/instruments/bps9_zh_cn_research/1.0.0/source.json",
+        "originalBlob": "299add75f8a3ea384c9e77ebdbc03fc45491bc8d",
+        "originalSHA256": "4b0af6464233bdcbba61a57b65dfe3e68bac358bcd816d53d9e9e24f434d9510",
+        "currentBlob": "9d76be4b760597a644f5af21f35e836baaa88a40",
+        "currentSHA256": "e6306dd5537786e28cd086aea62462ed7634627bc070f7c08d5c48df27c6dcb4",
+        "byteIdentical": false
+      }
+    ],
+    "changesOnly": [
+      "Top-level instruction bound from exact existing prepared text; instructionVersion→version, locale→language, provenance added",
+      "executable.releaseStatus DRAFT→PUBLISHED technical content candidate"
+    ],
+    "allMeasurementScoringAndReportFieldsUnchanged": true,
+    "allGoldenFixturesUnchanged": true,
+    "instructionTextExactPrepared": true,
+    "newInstructionVersion": "1.0.0",
+    "instructionProvenancePath": "docs/scale-instruments/research-drafts/bps9/1.0.0/instruction.for-pr356.json",
+    "conflicts": "identity-sources.json: one source blob across eight exact scale/main/PR snapshots; not an assertion about every future branch."
+  },
+  "threeParts": {
+    "instrument": "9 fixed required items/options, instruction mapped to existing strict schema, locale/respondent/audience/version parsed and selected contract valid",
+    "scoringParameters": "Original equal-weight mean1–5, reverse2/3/7/9, complete_required, referencePolicy none; no formula/denominator/threshold edits",
+    "report": "Original report1.0.0 score_only with ADULT_SELF/student/zh-CN, one score reference, no bands/norms; retained synthetic report parses and public metadata serializes without rescoring"
+  },
+  "quality": {
+    "primarySource": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2014.00611/full",
+    "primarySectionsRead": [
+      "Measures bedtime procrastination",
+      "Appendix original nine items and frequency endpoints"
+    ],
+    "items": [
+      {
+        "number": 1,
+        "itemCode": "BPS_01",
+        "matchesExistingChineseDraft": true,
+        "declaredReverse": false,
+        "runtimeTransform": "identity",
+        "meaningReview": "Read against fixed bilingual draft and original appendix; no ordinary typo or anchor swap identified; human translation review remains PENDING."
+      },
+      {
+        "number": 2,
+        "itemCode": "BPS_02",
+        "matchesExistingChineseDraft": true,
+        "declaredReverse": true,
+        "runtimeTransform": "reverse",
+        "meaningReview": "Read against fixed bilingual draft and original appendix; no ordinary typo or anchor swap identified; human translation review remains PENDING."
+      },
+      {
+        "number": 3,
+        "itemCode": "BPS_03",
+        "matchesExistingChineseDraft": true,
+        "declaredReverse": true,
+        "runtimeTransform": "reverse",
+        "meaningReview": "Read against fixed bilingual draft and original appendix; no ordinary typo or anchor swap identified; human translation review remains PENDING."
+      },
+      {
+        "number": 4,
+        "itemCode": "BPS_04",
+        "matchesExistingChineseDraft": true,
+        "declaredReverse": false,
+        "runtimeTransform": "identity",
+        "meaningReview": "Read against fixed bilingual draft and original appendix; no ordinary typo or anchor swap identified; human translation review remains PENDING."
+      },
+      {
+        "number": 5,
+        "itemCode": "BPS_05",
+        "matchesExistingChineseDraft": true,
+        "declaredReverse": false,
+        "runtimeTransform": "identity",
+        "meaningReview": "Read against fixed bilingual draft and original appendix; no ordinary typo or anchor swap identified; human translation review remains PENDING."
+      },
+      {
+        "number": 6,
+        "itemCode": "BPS_06",
+        "matchesExistingChineseDraft": true,
+        "declaredReverse": false,
+        "runtimeTransform": "identity",
+        "meaningReview": "Read against fixed bilingual draft and original appendix; no ordinary typo or anchor swap identified; human translation review remains PENDING."
+      },
+      {
+        "number": 7,
+        "itemCode": "BPS_07",
+        "matchesExistingChineseDraft": true,
+        "declaredReverse": true,
+        "runtimeTransform": "reverse",
+        "meaningReview": "Read against fixed bilingual draft and original appendix; no ordinary typo or anchor swap identified; human translation review remains PENDING."
+      },
+      {
+        "number": 8,
+        "itemCode": "BPS_08",
+        "matchesExistingChineseDraft": true,
+        "declaredReverse": false,
+        "runtimeTransform": "identity",
+        "meaningReview": "Read against fixed bilingual draft and original appendix; no ordinary typo or anchor swap identified; human translation review remains PENDING."
+      },
+      {
+        "number": 9,
+        "itemCode": "BPS_09",
+        "matchesExistingChineseDraft": true,
+        "declaredReverse": true,
+        "runtimeTransform": "reverse",
+        "meaningReview": "Read against fixed bilingual draft and original appendix; no ordinary typo or anchor swap identified; human translation review remains PENDING."
+      }
+    ],
+    "design": "Original nine-item adult form preserved, not an eight-item adolescent adaptation. No new time window, intermediate verbal anchors or construct changes.",
+    "scoring": "Review compared declared four reverse keys and existing mean aggregation to appendix and original package; paper is not represented as a full standalone software scoring manual. No new scientific validation claim.",
+    "report": "Existing warm reflection text and small closing routine retained; acknowledges work/care constraints, no self-discipline judgement, diagnosis or norm/rank. No mechanical word/quality admission gate.",
+    "chart": "Single total mean1–5; existing theoretical-range marker and already public counts/description fields are sufficient. PR367 contains generic metadata presentation enhancement; not copied into this independent content PR. BPS9 phone/tablet screenshot NOTRUN.",
+    "wordingNote": "The saved score description wording 9题反向后 can be clarified in a future presentation/versioned wording revision. It was not changed in place because scoring description participates in the existing measurement hash; exact four reverse keys remain explicit and correct.",
+    "manual": {
+      "localization": {
+        "schemaVersion": 1,
+        "sourceLocale": "en",
+        "targetLocale": "zh-CN",
+        "localizationVersion": "1.0.0",
+        "translationSource": "2014作者论文附录（PDF第8页），完整9题；网页实际许可链接为CC BY 3.0",
+        "adaptationMethod": "DIRECT_TRANSLATION",
+        "expertReviewStatus": "PENDING",
+        "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+        "localEvidenceRefs": [],
+        "reviewStatus": "PENDING",
+        "notes": "独立中文工作稿，原版、其他译本、改编版和本平台版本各自管理；未借用青少年8题版或其他译本的验证/阈值。"
+      },
+      "scientificReview": null,
+      "catalogStatus": "CANDIDATE",
+      "scientificMaturity": "PILOT",
+      "rights": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "© 2014 Kroese, De Ridder, Evers and Adriaanse. Kroese, F. M., De Ridder, D. T. D., Evers, C., & Adriaanse, M. A. (2014). Bedtime procrastination: introducing a new area of procrastination. Frontiers in Psychology, 5, 611. https://doi.org/10.3389/fpsyg.2014.00611. 复制源：2014作者论文附录（PDF第8页），完整9题；网页实际许可链接为CC BY 3.0。CC BY 3.0（https://creativecommons.org/licenses/by/3.0/），允许署名再分发与翻译改编，须保留原作者、原始论文、许可链接和修改说明。平台由作者公开英文题文独立译为中文并另写反馈，未获作者中文认可或中国人群验证，不继承其他译本/短版的版本或阈值。作者PDF SHA-256：7b60729ff85028c41dc2cceefb677227c2949cc98b8869c7c4784ab6803da8d0。"
+      },
+      "reportQc": {
+        "reviewer": "AI-assisted primary-source and plain-language editorial check; not human expert approval",
+        "reviewedAt": "2026-10-26T04:56:09.986Z",
+        "basis": "2014作者论文附录（PDF第8页），完整9题；网页实际许可链接为CC BY 3.0；年龄与语言证据独立约束，报告不套用常模或临床阈值。"
+      }
+    }
+  },
+  "checks": {
+    "unitInvocations": [
+      {
+        "report": "evidence/bps9-intake.json",
+        "sha256": "8d1c84dd1c0f1c799d927c5e15facfa7cb5632d3d7cf9a675f2136b13f9d4ccc",
+        "passed": 1,
+        "failed": 1,
+        "pending": 0,
+        "cases": [
+          {
+            "fullName": "BPS9 existing instruction binding and selected intake binds the exact prepared instruction into the current registered contract without approving manual review",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "fullName": "BPS9 existing instruction binding and selected intake consumes the retained synthetic report through the current result and public metadata protocol without rescoring it",
+            "status": "failed",
+            "failureMessages": [
+              "ZodError: [\n  {\n    \"code\": \"invalid_value\",\n    \"values\": [\n      2\n    ],\n    \"path\": [\n      \"schemaVersion\"\n    ],\n    \"message\": \"Invalid input: expected 2\"\n  },\n  {\n    \"expected\": \"object\",\n    \"code\": \"invalid_type\",\n    \"path\": [\n      \"instrument\"\n    ],\n    \"message\": \"Invalid input: expected object, received undefined\"\n  },\n  {\n    \"expected\": \"object\",\n    \"code\": \"invalid_type\",\n    \"path\": [\n      \"method\"\n    ],\n    \"message\": \"Invalid input: expected object, received undefined\"\n  },\n  {\n    \"expected\": \"object\",\n    \"code\": \"invalid_type\",\n    \"path\": [\n      \"quality\"\n    ],\n    \"message\": \"Invalid input: expected object, received undefined\"\n  },\n  {\n    \"expected\": \"array\",\n    \"code\": \"invalid_type\",\n    \"path\": [\n      \"itemScores\"\n    ],\n    \"message\": \"Invalid input: expected array, received undefined\"\n  },\n  {\n    \"expected\": \"array\",\n    \"code\": \"invalid_type\",\n    \"path\": [\n      \"scores\"\n    ],\n    \"message\": \"Invalid input: expected array, received undefined\"\n  },\n  {\n    \"expected\": \"array\",\n    \"code\": \"invalid_type\",\n    \"path\": [\n      \"references\"\n    ],\n    \"message\": \"Invalid input: expected array, received undefined\"\n  },\n  {\n    \"expected\": \"array\",\n    \"code\": \"invalid_type\",\n    \"path\": [\n      \"interpretations\"\n    ],\n    \"message\": \"Invalid input: expected array, received undefined\"\n  },\n  {\n    \"expected\": \"array\",\n    \"code\": \"invalid_type\",\n    \"path\": [\n      \"caveats\"\n    ],\n    \"message\": \"Invalid input: expected array, received undefined\"\n  },\n  {\n    \"expected\": \"string\",\n    \"code\": \"invalid_type\",\n    \"path\": [\n      \"disclaimer\"\n    ],\n    \"message\": \"Invalid input: expected string, received undefined\"\n  }\n]\n    at parseScaleResultV2 (/workspace/eduK12-new-version/server-version/backend/src/modules/scale/scale-result.ts:220:23)\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/scale/instruments/bps9-intake.test.ts:33:19\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)"
+            ]
+          }
+        ]
+      },
+      {
+        "report": "evidence/bps9-report-retry.json",
+        "sha256": "092e2da62d20222ae7b9ac91a574691f8c0cdb423ddbaa09f3c327b4bee9bb9a",
+        "passed": 1,
+        "failed": 0,
+        "pending": 1,
+        "cases": [
+          {
+            "fullName": "BPS9 existing instruction binding and selected intake binds the exact prepared instruction into the current registered contract without approving manual review",
+            "status": "skipped",
+            "failureMessages": []
+          },
+          {
+            "fullName": "BPS9 existing instruction binding and selected intake consumes the retained synthetic report through the current result and public metadata protocol without rescoring it",
+            "status": "passed",
+            "failureMessages": []
+          }
+        ]
+      }
+    ],
+    "firstCommandExit": 1,
+    "retryCommandExit": 0,
+    "failureReason": "New compatibility test initially parsed the historical report envelope instead of its result field; corrected reader only, original failure/test bytes retained. Added actual definitionHash compatibility assertion; first case was not repeated.",
+    "generatedIndexCheck": {
+      "exitCode": 0,
+      "note": "First harness outer exit remains1 because the other selected test failed; no whole-command success relabelling."
+    },
+    "integration": {
+      "report": "evidence/isolation-report.json",
+      "completed": true,
+      "passedAssertions": 27,
+      "failedAssertions": 0,
+      "processExitCode": 0,
+      "outerToolExitCode": 0,
+      "commands": [
+        {
+          "label": "publication-uninstalled-preview",
+          "actualExitCode": 2,
+          "readOnly": true,
+          "beforeAfterIdentical": true
+        },
+        {
+          "label": "install-preview",
+          "actualExitCode": 0,
+          "readOnly": true,
+          "beforeAfterIdentical": true
+        },
+        {
+          "label": "install-first-apply",
+          "actualExitCode": 0,
+          "readOnly": false,
+          "beforeAfterIdentical": false
+        },
+        {
+          "label": "install-repeat-apply",
+          "actualExitCode": 0,
+          "readOnly": false,
+          "beforeAfterIdentical": true
+        },
+        {
+          "label": "publication-preview",
+          "actualExitCode": 0,
+          "readOnly": true,
+          "beforeAfterIdentical": true
+        },
+        {
+          "label": "publication-apply",
+          "actualExitCode": 0,
+          "readOnly": false,
+          "beforeAfterIdentical": false
+        }
+      ]
+    },
+    "notRun": [
+      "Full catalog, standalone scoring/golden/report suite replay, build/types/SAST/CI",
+      "BPS9 browser/phone/tablet/real participant workflow",
+      "School/Teacher BPS9 organization or distribution",
+      "Production"
+    ]
+  },
+  "database": {
+    "name": "eduk12_bps9_518fa660de",
+    "host": "127.0.0.1",
+    "port": 55432,
+    "fresh": true,
+    "setup": "Current Prisma migrations only; no seed; existing local credentials/permissions unchanged",
+    "syntheticAdmin": {
+      "id": "025f2671-1f80-468d-92d2-f9732133e022",
+      "username": "synthetic-bps9-1de02c25-7e34-4c03-8306-f3a0e09cfa80",
+      "accountDomain": "TRAINING",
+      "platformRole": "SYSTEM_ADMIN",
+      "synthetic": true,
+      "password": "random one-use secret discarded; hash not retained in evidence"
+    },
+    "sourceRegistration": "NEW_BRANCH_ONLY",
+    "isolationContentInstalled": true,
+    "firstScaleState": "DRAFT/HIDDEN",
+    "deployment": "ACTIVE_REVISION_1",
+    "repeatInstall": "IDENTICAL_TRACKED_BUSINESS_ROWS_AND_FROZEN_SNAPSHOT",
+    "isolationPublicPublication": "COMPLETED_PUBLIC_SURVEY_ONLY",
+    "currentScale": {
+      "id": "fd3fcc79-786a-4433-b936-38a6ead98fec",
+      "code": "bps9_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "instrumentClass": "STANDARD",
+      "status": "PUBLISHED",
+      "visibility": "PUBLIC",
+      "definitionHash": "ba0b97ac92dc665dcabc3ffc660433bb79a84457d8bfc9e695a316337262dc2c",
+      "instruction": "请根据平时的情况，判断以下说法是否符合自己的做法。选项从1（几乎）从不到5（几乎）总是，2、3、4是两端之间的选项。没有对错，请按实际情况选择。",
+      "measurementReleaseId": "c74998ea-00ec-4b4c-9b14-c412e8e7aae1",
+      "creatorId": "025f2671-1f80-468d-92d2-f9732133e022",
+      "updatedAt": "2026-10-28T01:22:03.999Z",
+      "definitionCanonicalHash": "8df478b14d2cc2686fe3601ef50547b49d16d8e14a8c70169de90633e0b668a1"
+    },
+    "frozenAxis": {
+      "scale_id": "fd3fcc79-786a-4433-b936-38a6ead98fec",
+      "axis_hash": "3b5a8786f60f6e6a54efd0c239be0e2efb9b8a0edfb8afcf68c3e05adfe0b303",
+      "source_hash": "fe15791e29cce219bef00195279ab4eddd1e3194b56866d22b7c86436c50c43e",
+      "axes": {
+        "reportVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "measurementHash": "ba0b97ac92dc665dcabc3ffc660433bb79a84457d8bfc9e695a316337262dc2c",
+        "instrumentVersion": "1.0.0",
+        "referenceVersions": [],
+        "instructionVersion": "1.0.0",
+        "localizationVersion": "1.0.0",
+        "catalogManifestVersion": 1
+      },
+      "created_at": "2026-10-28T01:22:01.502Z",
+      "observedSourceCanonicalHash": "fe15791e29cce219bef00195279ab4eddd1e3194b56866d22b7c86436c50c43e",
+      "frozenIdentity": {
+        "instrumentKey": "bps9_zh_cn_research",
+        "instrumentVersion": "1.0.0"
+      },
+      "frozenReleaseStatus": "PUBLISHED",
+      "frozenInstruction": {
+        "text": "请根据平时的情况，判断以下说法是否符合自己的做法。选项从1（几乎）从不到5（几乎）总是，2、3、4是两端之间的选项。没有对错，请按实际情况选择。",
+        "source": "Fixed existing platform working instruction: b92c69aefa2472775fa7ee86b9c208366886c908, docs/scale-instruments/research-drafts/bps9/1.0.0/instruction.for-pr356.json and administration.md. Structural schema binding; not author endorsement or human translation approval.",
+        "version": "1.0.0",
+        "language": "zh-CN",
+        "schemaVersion": 1
+      },
+      "frozenManual": {
+        "catalogStatus": "CANDIDATE",
+        "maturity": "PILOT",
+        "localization": {
+          "notes": "独立中文工作稿，原版、其他译本、改编版和本平台版本各自管理；未借用青少年8题版或其他译本的验证/阈值。",
+          "reviewStatus": "PENDING",
+          "sourceLocale": "en",
+          "targetLocale": "zh-CN",
+          "schemaVersion": 1,
+          "adaptationMethod": "DIRECT_TRANSLATION",
+          "localEvidenceRefs": [],
+          "translationSource": "2014作者论文附录（PDF第8页），完整9题；网页实际许可链接为CC BY 3.0",
+          "expertReviewStatus": "PENDING",
+          "localizationVersion": "1.0.0",
+          "cognitiveDebriefStatus": "NOT_ESTABLISHED"
+        },
+        "scientificReview": null,
+        "license": {
+          "note": "© 2014 Kroese, De Ridder, Evers and Adriaanse. Kroese, F. M., De Ridder, D. T. D., Evers, C., & Adriaanse, M. A. (2014). Bedtime procrastination: introducing a new area of procrastination. Frontiers in Psychology, 5, 611. https://doi.org/10.3389/fpsyg.2014.00611. 复制源：2014作者论文附录（PDF第8页），完整9题；网页实际许可链接为CC BY 3.0。CC BY 3.0（https://creativecommons.org/licenses/by/3.0/），允许署名再分发与翻译改编，须保留原作者、原始论文、许可链接和修改说明。平台由作者公开英文题文独立译为中文并另写反馈，未获作者中文认可或中国人群验证，不继承其他译本/短版的版本或阈值。作者PDF SHA-256：7b60729ff85028c41dc2cceefb677227c2949cc98b8869c7c4784ab6803da8d0。",
+          "status": "verified",
+          "redistribution": "allowed"
+        }
+      }
+    },
+    "publicationAuditId": "9f6874fb-e8ab-48a5-9f31-703db556f89a",
+    "publicationProofHash": "04258e0b7d1f4338fe0200c63aa4265ba4bae8f403483b0662a136105ddde69e",
+    "surveyCatalog": {
+      "list": [
+        {
+          "ref": {
+            "kind": "SCALE",
+            "sourceId": "fd3fcc79-786a-4433-b936-38a6ead98fec",
+            "sourceVersion": "1.0.0"
+          },
+          "title": "上床拖延问卷（BPS成人9题，中文工作稿）",
+          "classificationTags": [
+            {
+              "id": "bps9_zh_cn_research",
+              "label": "bps9_zh_cn_research",
+              "facet": "other"
+            },
+            {
+              "id": "domain:self_regulation",
+              "label": "行为自我调节",
+              "facet": "domain"
+            },
+            {
+              "id": "domain:sleep_behavior",
+              "label": "domain:sleep_behavior",
+              "facet": "domain"
+            },
+            {
+              "id": "domain:everyday_life",
+              "label": "domain:everyday_life",
+              "facet": "domain"
+            },
+            {
+              "id": "construct:bedtime_procrastination",
+              "label": "construct:bedtime_procrastination",
+              "facet": "construct"
+            },
+            {
+              "id": "construct:intention_action_gap",
+              "label": "construct:intention_action_gap",
+              "facet": "construct"
+            },
+            {
+              "id": "construct:bedtime_transition",
+              "label": "construct:bedtime_transition",
+              "facet": "construct"
+            },
+            {
+              "id": "orientation:self_regulation_perspective",
+              "label": "orientation:self_regulation_perspective",
+              "facet": "orientation"
+            },
+            {
+              "id": "orientation:not_therapy_specific",
+              "label": "orientation:not_therapy_specific",
+              "facet": "orientation"
+            },
+            {
+              "id": "population:adult_18_plus",
+              "label": "population:adult_18_plus",
+              "facet": "population"
+            },
+            {
+              "id": "population:source_mturk_adults",
+              "label": "population:source_mturk_adults",
+              "facet": "population"
+            },
+            {
+              "id": "population:not_k12_validated",
+              "label": "population:not_k12_validated",
+              "facet": "population"
+            },
+            {
+              "id": "response:9_items",
+              "label": "response:9_items",
+              "facet": "response"
+            },
+            {
+              "id": "response:four_reverse_items",
+              "label": "response:four_reverse_items",
+              "facet": "response"
+            },
+            {
+              "id": "response:endpoint_labels_only",
+              "label": "response:endpoint_labels_only",
+              "facet": "response"
+            },
+            {
+              "id": "use:sleep_habit_reflection",
+              "label": "use:sleep_habit_reflection",
+              "facet": "use"
+            },
+            {
+              "id": "language_validation:original_en",
+              "label": "language_validation:original_en",
+              "facet": "language"
+            },
+            {
+              "id": "上床拖延",
+              "label": "上床拖延",
+              "facet": "other"
+            },
+            {
+              "id": "睡前拖延",
+              "label": "睡前拖延",
+              "facet": "other"
+            },
+            {
+              "id": "上床时间",
+              "label": "上床时间",
+              "facet": "other"
+            },
+            {
+              "id": "睡前收尾",
+              "label": "睡前收尾",
+              "facet": "other"
+            },
+            {
+              "id": "作息习惯",
+              "label": "作息习惯",
+              "facet": "other"
+            },
+            {
+              "id": "意图与行动",
+              "label": "意图与行动",
+              "facet": "other"
+            },
+            {
+              "id": "成人自评",
+              "label": "成人自评",
+              "facet": "other"
+            },
+            {
+              "id": "population:self_report",
+              "label": "population:self_report",
+              "facet": "population"
+            },
+            {
+              "id": "response:self",
+              "label": "本人自评",
+              "facet": "response"
+            },
+            {
+              "id": "response:digital_self",
+              "label": "数字自助作答",
+              "facet": "response"
+            },
+            {
+              "id": "response:paper",
+              "label": "纸笔作答",
+              "facet": "response"
+            },
+            {
+              "id": "response:fixed_order",
+              "label": "response:fixed_order",
+              "facet": "response"
+            },
+            {
+              "id": "response:five_point_frequency",
+              "label": "response:five_point_frequency",
+              "facet": "response"
+            },
+            {
+              "id": "use:research",
+              "label": "研究用途",
+              "facet": "use"
+            },
+            {
+              "id": "use:individual_reflection",
+              "label": "use:individual_reflection",
+              "facet": "use"
+            },
+            {
+              "id": "use:not_diagnostic",
+              "label": "非诊断用途",
+              "facet": "use"
+            },
+            {
+              "id": "use:not_high_stakes_selection",
+              "label": "use:not_high_stakes_selection",
+              "facet": "use"
+            },
+            {
+              "id": "use:not_school_ranking",
+              "label": "use:not_school_ranking",
+              "facet": "use"
+            },
+            {
+              "id": "use:no_validated_cutoff",
+              "label": "use:no_validated_cutoff",
+              "facet": "use"
+            },
+            {
+              "id": "license:cc_by_3_0",
+              "label": "CC BY 3.0 署名",
+              "facet": "license"
+            },
+            {
+              "id": "license:attribution_required",
+              "label": "license:attribution_required",
+              "facet": "license"
+            },
+            {
+              "id": "license:changes_indicated",
+              "label": "license:changes_indicated",
+              "facet": "license"
+            },
+            {
+              "id": "license:source_allows_redistribution",
+              "label": "license:source_allows_redistribution",
+              "facet": "license"
+            },
+            {
+              "id": "license:source_allows_adaptation",
+              "label": "license:source_allows_adaptation",
+              "facet": "license"
+            },
+            {
+              "id": "license:source_allows_commercial_use",
+              "label": "license:source_allows_commercial_use",
+              "facet": "license"
+            },
+            {
+              "id": "language_validation:zh_cn_working_translation",
+              "label": "language_validation:zh_cn_working_translation",
+              "facet": "language"
+            },
+            {
+              "id": "language_validation:expert_review_pending",
+              "label": "language_validation:expert_review_pending",
+              "facet": "language"
+            },
+            {
+              "id": "language_validation:china_validation_not_established",
+              "label": "language_validation:china_validation_not_established",
+              "facet": "language"
+            },
+            {
+              "id": "中文工作译稿",
+              "label": "中文工作译稿",
+              "facet": "other"
+            },
+            {
+              "id": "个人反思",
+              "label": "个人反思",
+              "facet": "other"
+            },
+            {
+              "id": "非诊断",
+              "label": "非诊断",
+              "facet": "other"
+            },
+            {
+              "id": "可署名再分发",
+              "label": "可署名再分发",
+              "facet": "other"
+            },
+            {
+              "id": "SELF_REGULATION",
+              "label": "自我调节",
+              "facet": "domain"
+            },
+            {
+              "id": "respondent:SELF",
+              "label": "本人自评",
+              "facet": "population"
+            },
+            {
+              "id": "age:18-",
+              "label": "18岁及以上",
+              "facet": "population"
+            },
+            {
+              "id": "language:zh-CN",
+              "label": "简体中文",
+              "facet": "language"
+            }
+          ],
+          "available": true,
+          "unsupportedReason": null,
+          "definitionDigest": "8df478b14d2cc2686fe3601ef50547b49d16d8e14a8c70169de90633e0b668a1"
+        }
+      ],
+      "page": 1,
+      "hasMore": false,
+      "terminalReason": "END_OF_CATALOG",
+      "tagFacets": {
+        "population": [
+          {
+            "id": "age:13-19",
+            "label": "13–19岁"
+          },
+          {
+            "id": "age:14-100",
+            "label": "14–100岁"
+          },
+          {
+            "id": "age:17-20",
+            "label": "17–20岁"
+          },
+          {
+            "id": "age:18-100",
+            "label": "18–100岁"
+          },
+          {
+            "id": "age:18-",
+            "label": "18岁及以上"
+          },
+          {
+            "id": "grades:3-12",
+            "label": "3–12年级"
+          },
+          {
+            "id": "age:4-10",
+            "label": "4–10岁"
+          },
+          {
+            "id": "age:4-17",
+            "label": "4–17岁"
+          },
+          {
+            "id": "grades:7-12",
+            "label": "7–12年级"
+          },
+          {
+            "id": "age:9-18",
+            "label": "9–18岁"
+          },
+          {
+            "id": "respondent:SELF",
+            "label": "本人自评"
+          },
+          {
+            "id": "respondent:PARENT",
+            "label": "家长评定"
+          },
+          {
+            "id": "respondent:TEACHER",
+            "label": "教师评定"
+          },
+          {
+            "id": "student_self_report",
+            "label": "学生"
+          },
+          {
+            "id": "population:adult_18_plus",
+            "label": "population:adult_18_plus"
+          },
+          {
+            "id": "population:not_k12_validated",
+            "label": "population:not_k12_validated"
+          },
+          {
+            "id": "population:self_report",
+            "label": "population:self_report"
+          },
+          {
+            "id": "population:source_mturk_adults",
+            "label": "population:source_mturk_adults"
+          }
+        ],
+        "construct": [
+          {
+            "id": "tutoring_necessity",
+            "label": "补习必要性信念"
+          },
+          {
+            "id": "domain_fixed_mindset",
+            "label": "学科固定心态"
+          },
+          {
+            "id": "value_cost",
+            "label": "学科价值与时间代价"
+          },
+          {
+            "id": "academic_self_efficacy",
+            "label": "学科学习自我效能"
+          },
+          {
+            "id": "academic_self_concept",
+            "label": "学科自我概念"
+          },
+          {
+            "id": "teacher_subject_liking",
+            "label": "学生感知的教师学科喜爱"
+          },
+          {
+            "id": "construct:bedtime_procrastination",
+            "label": "construct:bedtime_procrastination"
+          },
+          {
+            "id": "construct:bedtime_transition",
+            "label": "construct:bedtime_transition"
+          },
+          {
+            "id": "construct:intention_action_gap",
+            "label": "construct:intention_action_gap"
+          }
+        ],
+        "subject": [
+          {
+            "id": "chemistry",
+            "label": "化学"
+          },
+          {
+            "id": "biology",
+            "label": "生物"
+          },
+          {
+            "id": "mathematics",
+            "label": "数学"
+          },
+          {
+            "id": "physics",
+            "label": "物理"
+          },
+          {
+            "id": "english",
+            "label": "英语"
+          },
+          {
+            "id": "chinese",
+            "label": "语文"
+          }
+        ],
+        "domain": [
+          {
+            "id": "PERSONALITY",
+            "label": "人格"
+          },
+          {
+            "id": "RESILIENCE",
+            "label": "韧性"
+          },
+          {
+            "id": "SOCIAL_EMOTIONAL",
+            "label": "社会情绪"
+          },
+          {
+            "id": "WELL_BEING",
+            "label": "身心健康"
+          },
+          {
+            "id": "ENGAGEMENT",
+            "label": "投入"
+          },
+          {
+            "id": "BEHAVIORAL_DIFFICULTIES",
+            "label": "行为与困难"
+          },
+          {
+            "id": "domain:self_regulation",
+            "label": "行为自我调节"
+          },
+          {
+            "id": "MOTIVATION",
+            "label": "学习动机"
+          },
+          {
+            "id": "EXECUTIVE_FUNCTION",
+            "label": "执行功能"
+          },
+          {
+            "id": "SELF_REGULATION",
+            "label": "自我调节"
+          },
+          {
+            "id": "SELF_EFFICACY",
+            "label": "自我效能"
+          },
+          {
+            "id": "domain:everyday_life",
+            "label": "domain:everyday_life"
+          },
+          {
+            "id": "domain:sleep_behavior",
+            "label": "domain:sleep_behavior"
+          }
+        ],
+        "language": [
+          {
+            "id": "language:zh-CN",
+            "label": "简体中文"
+          },
+          {
+            "id": "language:en",
+            "label": "英语"
+          },
+          {
+            "id": "language:en-GB",
+            "label": "en-GB"
+          },
+          {
+            "id": "language_validation:china_validation_not_established",
+            "label": "language_validation:china_validation_not_established"
+          },
+          {
+            "id": "language_validation:expert_review_pending",
+            "label": "language_validation:expert_review_pending"
+          },
+          {
+            "id": "language_validation:original_en",
+            "label": "language_validation:original_en"
+          },
+          {
+            "id": "language_validation:zh_cn_working_translation",
+            "label": "language_validation:zh_cn_working_translation"
+          }
+        ],
+        "orientation": [
+          {
+            "id": "orientation:not_therapy_specific",
+            "label": "orientation:not_therapy_specific"
+          },
+          {
+            "id": "orientation:self_regulation_perspective",
+            "label": "orientation:self_regulation_perspective"
+          }
+        ],
+        "response": [
+          {
+            "id": "response:self",
+            "label": "本人自评"
+          },
+          {
+            "id": "response:digital_self",
+            "label": "数字自助作答"
+          },
+          {
+            "id": "response:paper",
+            "label": "纸笔作答"
+          },
+          {
+            "id": "response:9_items",
+            "label": "response:9_items"
+          },
+          {
+            "id": "response:endpoint_labels_only",
+            "label": "response:endpoint_labels_only"
+          },
+          {
+            "id": "response:five_point_frequency",
+            "label": "response:five_point_frequency"
+          },
+          {
+            "id": "response:fixed_order",
+            "label": "response:fixed_order"
+          },
+          {
+            "id": "response:four_reverse_items",
+            "label": "response:four_reverse_items"
+          }
+        ],
+        "use": [
+          {
+            "id": "use:not_diagnostic",
+            "label": "非诊断用途"
+          },
+          {
+            "id": "use:research",
+            "label": "研究用途"
+          },
+          {
+            "id": "use:individual_reflection",
+            "label": "use:individual_reflection"
+          },
+          {
+            "id": "use:no_validated_cutoff",
+            "label": "use:no_validated_cutoff"
+          },
+          {
+            "id": "use:not_high_stakes_selection",
+            "label": "use:not_high_stakes_selection"
+          },
+          {
+            "id": "use:not_school_ranking",
+            "label": "use:not_school_ranking"
+          },
+          {
+            "id": "use:sleep_habit_reflection",
+            "label": "use:sleep_habit_reflection"
+          }
+        ],
+        "license": [
+          {
+            "id": "license:cc_by_3_0",
+            "label": "CC BY 3.0 署名"
+          },
+          {
+            "id": "license:attribution_required",
+            "label": "license:attribution_required"
+          },
+          {
+            "id": "license:changes_indicated",
+            "label": "license:changes_indicated"
+          },
+          {
+            "id": "license:source_allows_adaptation",
+            "label": "license:source_allows_adaptation"
+          },
+          {
+            "id": "license:source_allows_commercial_use",
+            "label": "license:source_allows_commercial_use"
+          },
+          {
+            "id": "license:source_allows_redistribution",
+            "label": "license:source_allows_redistribution"
+          }
+        ]
+      }
+    },
+    "entryObservations": [
+      {
+        "product": "SURVEY",
+        "result": "ENTRY_POLICY_ALLOWED",
+        "scope": "actual transaction-scoped policy guard, not end-user grant or participant flow"
+      },
+      {
+        "product": "TRAINING",
+        "result": "REFUSED",
+        "name": "Error",
+        "message": "该精确版本未获本入口准入或已停止新增使用：TRAINING；TRAINING 入口尚未获准",
+        "scope": "actual Training new-entry guard; not chosen in allowedProducts"
+      },
+      {
+        "product": "SCHOOL",
+        "result": "NOT_EXECUTED",
+        "scope": "No organization adapter/distribution/real-user grant created. Existing CLI supports only TRAINING/SURVEY; prior ARS refusal evidence has unchanged shared backend inputs, not relabelled as BPS execution."
+      },
+      {
+        "product": "TEACHER",
+        "result": "NOT_EXECUTED",
+        "scope": "Same boundary; no claim of four-entry availability."
+      }
+    ],
+    "counts": {
+      "assessment_reference_sets": 0,
+      "measurement_content_release_events": 0,
+      "content_capability_grants": 0,
+      "material_grants": 0,
+      "survey_tool_grants": 0,
+      "scale_library_entries": 0,
+      "scale_library_use_grants": 0,
+      "education_assessment_deliveries": 0,
+      "assessments": 0
+    },
+    "production": "NOT_QUERIED_NOT_MODIFIED"
+  },
+  "reuseAndLimits": [
+    "Retained prior synthetic report has its original sourceSHA/measurementHash and original execution identity. It is compatibility input, not fresh scoring evidence.",
+    "Selected registry validation and each cold CLI process use the existing genuine immutable contract/golden validation; no standalone repeated golden loops.",
+    "Original source research-doc statuses and historical validation claims retain original identity; historical relative batch link resolves at fixed b92c69, not newly added current-main evidence.",
+    "Contemporaneous source/config/tool hashes captured before/after each actual unit/integration invocation; full node_modules/environment bytes not recorded; no signatures manufactured.",
+    "PR367 screenshot blocker is unchanged and not retried: helper owner nobody:nogroup, Chromium sandbox configuration failure. No BPS9 visual PASS.",
+    "Root independent review and eventual CI/merge remain separate."
+  ],
+  "preparationFailure": {
+    "action": "Initial concise inventory rights metadata print",
+    "exitCode": 1,
+    "reason": "A legacy manual.rights value was a string, not object; AttributeError after partial diagnostic listing. Not a full inventory or a source-validation failure. No content modified by that scan."
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "instrumentKey": "bps9_zh_cn_research",
+  "instrumentVersion": "1.0.0",
+  "actorUserId": "025f2671-1f80-468d-92d2-f9732133e022",
+  "visibility": "PUBLIC",
+  "allowedProducts": [
+    "SURVEY"
+  ],
+  "expectedProofHash": "04258e0b7d1f4338fe0200c63aa4265ba4bae8f403483b0662a136105ddde69e"
+}

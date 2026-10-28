@@ -1,0 +1,10 @@
+[
+  {
+    "originalPath": "schema-migrate.stdout.log",
+    "transportPath": "schema-migrate.stdout.log.gz",
+    "encoding": "gzip",
+    "originalSHA256": "db9e1d51dcf213e45114c70f01dc49256a1970fe106903e99a634f835c389701",
+    "compressedSHA256": "dfa19187bc67cd3a15a73387bd298e5e286545be9a84b5e4d92d2f91c88905be",
+    "originalBytes": 34101
+  }
+]

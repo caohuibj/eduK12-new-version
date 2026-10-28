@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "base": "642fda7ab754790686d6626efac62b73a332e663",
+  "node": {
+    "executable": "/workspace/eduk12-cloud/tools/node_modules/.bin/node",
+    "version": "v24.21.0",
+    "sha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c"
+  },
+  "execution": "cloud isolated process; no database or HTTP writes; login:false outer shell",
+  "checks": [
+    {
+      "id": "bps9-report-retry",
+      "cwd": "/workspace/eduK12-new-version/server-version/backend",
+      "argv": [
+        "/workspace/eduk12-cloud/tools/node_modules/.bin/node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/__tests__/scale/instruments/bps9-intake.test.ts",
+        "-t",
+        "consumes the retained synthetic report through the current result and public metadata protocol without rescoring it",
+        "--reporter=json",
+        "--outputFile=/workspace/eduK12-new-version/docs/scale-bps9-intake-20261028/evidence/bps9-report-retry.json"
+      ],
+      "startedAt": "2026-10-28T01:21:04.753493+00:00",
+      "endedAt": "2026-10-28T01:21:06.378127+00:00",
+      "processExitCode": 0,
+      "inputs": {
+        "manifest": "bps9-report-retry.inputs.json.gz",
+        "compressedSha256": "5f9223ec98a23037b4945ddbc79c70b921778cd7a1e10a5461a4a700fc0421fb",
+        "uncompressedSha256": "31bce826227b832ced349589fad2e3be0610d18625a6aae004eeff1c15b49d27",
+        "uncompressedBytes": 892436,
+        "count": 2931,
+        "beforeAfterIdentical": true
+      },
+      "logs": {
+        "stdout": {
+          "path": "bps9-report-retry.stdout.log",
+          "sha256": "266adba49cd8702f79fbbda2fabc8020aaed492840820e5bbe36a6d2620d2ac8",
+          "bytes": 117
+        },
+        "stderr": {
+          "path": "bps9-report-retry.stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      }
+    }
+  ],
+  "scope": "One selected BPS9 source and retained report compatibility; no standalone golden replay, full catalog, build, types, database or CI",
+  "environment": {
+    "COGNITIVE_TEST_FIXTURES_ENABLED": "true (Vitest config)",
+    "credentials": "not retained; env values not printed"
+  },
+  "limits": [
+    "Source/config/tool hashes are contemporaneous; full installed dependency package bytes and process environment are not enumerated.",
+    "Snapshots include other backend source files solely as input evidence, not assertions that they executed."
+  ],
+  "outerToolExitCode": 0,
+  "outerExitEvidence": "Actual exec_command/write_stdin completion, login:false shell; recorded after completion"
+}

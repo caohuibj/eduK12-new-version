@@ -1,0 +1,2391 @@
+{
+  "schemaVersion": 1,
+  "database": "eduk12_bps9_518fa660de",
+  "scope": "Actual existing CLI in fresh local database; one synthetic SYSTEM_ADMIN; no production or HTTP service",
+  "selectedEntryProducts": [
+    "SURVEY"
+  ],
+  "commands": [
+    {
+      "label": "publication-uninstalled-preview",
+      "cwd": "/workspace/eduK12-new-version/server-version/backend",
+      "argv": [
+        "/workspace/eduk12-cloud/tools/node_modules/node/bin/node",
+        "node_modules/tsx/dist/cli.mjs",
+        "src/scripts/publish-scale-instrument.ts",
+        "--input",
+        "/workspace/eduK12-new-version/docs/scale-bps9-intake-20261028/evidence/publication-preview-input.json"
+      ],
+      "startedAt": "2026-10-28T01:21:59.316Z",
+      "endedAt": "2026-10-28T01:22:00.082Z",
+      "processExitCode": 2,
+      "signal": null,
+      "error": null,
+      "expectedExitCode": 2,
+      "readOnly": true,
+      "beforeAfterIdentical": true,
+      "logs": {
+        "stdout": {
+          "path": "publication-uninstalled-preview.stdout.log",
+          "bytes": 3475,
+          "sha256": "48ebed0ded6fed70a436458956cea90285796e66ef62e95ccc168ce5c518e4d1"
+        },
+        "stderr": {
+          "path": "publication-uninstalled-preview.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "label": "install-preview",
+      "cwd": "/workspace/eduK12-new-version/server-version/backend",
+      "argv": [
+        "/workspace/eduk12-cloud/tools/node_modules/node/bin/node",
+        "node_modules/tsx/dist/cli.mjs",
+        "src/scripts/install-scale-instrument.ts",
+        "--instrument-key",
+        "bps9_zh_cn_research",
+        "--instrument-version",
+        "1.0.0",
+        "--locale",
+        "zh-CN",
+        "--territory",
+        "CN",
+        "--localization-version",
+        "1.0.0",
+        "--revision",
+        "1",
+        "--modes",
+        "STANDALONE",
+        "--actor-user-id",
+        "025f2671-1f80-468d-92d2-f9732133e022"
+      ],
+      "startedAt": "2026-10-28T01:22:00.097Z",
+      "endedAt": "2026-10-28T01:22:00.756Z",
+      "processExitCode": 0,
+      "signal": null,
+      "error": null,
+      "expectedExitCode": 0,
+      "readOnly": true,
+      "beforeAfterIdentical": true,
+      "logs": {
+        "stdout": {
+          "path": "install-preview.stdout.log",
+          "bytes": 2647,
+          "sha256": "963adbacc8717258d2418e90ab2e4e49f8ebf2d5536737c109977868b4e93f65"
+        },
+        "stderr": {
+          "path": "install-preview.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "label": "install-first-apply",
+      "cwd": "/workspace/eduK12-new-version/server-version/backend",
+      "argv": [
+        "/workspace/eduk12-cloud/tools/node_modules/node/bin/node",
+        "node_modules/tsx/dist/cli.mjs",
+        "src/scripts/install-scale-instrument.ts",
+        "--instrument-key",
+        "bps9_zh_cn_research",
+        "--instrument-version",
+        "1.0.0",
+        "--locale",
+        "zh-CN",
+        "--territory",
+        "CN",
+        "--localization-version",
+        "1.0.0",
+        "--revision",
+        "1",
+        "--modes",
+        "STANDALONE",
+        "--actor-user-id",
+        "025f2671-1f80-468d-92d2-f9732133e022",
+        "--apply"
+      ],
+      "startedAt": "2026-10-28T01:22:00.763Z",
+      "endedAt": "2026-10-28T01:22:01.582Z",
+      "processExitCode": 0,
+      "signal": null,
+      "error": null,
+      "expectedExitCode": 0,
+      "readOnly": false,
+      "beforeAfterIdentical": false,
+      "logs": {
+        "stdout": {
+          "path": "install-first-apply.stdout.log",
+          "bytes": 2679,
+          "sha256": "9560d09fe8a017d322e65c3fc685a89f23f1d5ce4de98877bb1f927678268b8a"
+        },
+        "stderr": {
+          "path": "install-first-apply.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "label": "install-repeat-apply",
+      "cwd": "/workspace/eduK12-new-version/server-version/backend",
+      "argv": [
+        "/workspace/eduk12-cloud/tools/node_modules/node/bin/node",
+        "node_modules/tsx/dist/cli.mjs",
+        "src/scripts/install-scale-instrument.ts",
+        "--instrument-key",
+        "bps9_zh_cn_research",
+        "--instrument-version",
+        "1.0.0",
+        "--locale",
+        "zh-CN",
+        "--territory",
+        "CN",
+        "--localization-version",
+        "1.0.0",
+        "--revision",
+        "1",
+        "--modes",
+        "STANDALONE",
+        "--actor-user-id",
+        "025f2671-1f80-468d-92d2-f9732133e022",
+        "--apply"
+      ],
+      "startedAt": "2026-10-28T01:22:01.621Z",
+      "endedAt": "2026-10-28T01:22:02.331Z",
+      "processExitCode": 0,
+      "signal": null,
+      "error": null,
+      "expectedExitCode": 0,
+      "readOnly": false,
+      "beforeAfterIdentical": true,
+      "logs": {
+        "stdout": {
+          "path": "install-repeat-apply.stdout.log",
+          "bytes": 2679,
+          "sha256": "9560d09fe8a017d322e65c3fc685a89f23f1d5ce4de98877bb1f927678268b8a"
+        },
+        "stderr": {
+          "path": "install-repeat-apply.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "label": "publication-preview",
+      "cwd": "/workspace/eduK12-new-version/server-version/backend",
+      "argv": [
+        "/workspace/eduk12-cloud/tools/node_modules/node/bin/node",
+        "node_modules/tsx/dist/cli.mjs",
+        "src/scripts/publish-scale-instrument.ts",
+        "--input",
+        "/workspace/eduK12-new-version/docs/scale-bps9-intake-20261028/evidence/publication-preview-input.json"
+      ],
+      "startedAt": "2026-10-28T01:22:02.344Z",
+      "endedAt": "2026-10-28T01:22:03.189Z",
+      "processExitCode": 0,
+      "signal": null,
+      "error": null,
+      "expectedExitCode": 0,
+      "readOnly": true,
+      "beforeAfterIdentical": true,
+      "logs": {
+        "stdout": {
+          "path": "publication-preview.stdout.log",
+          "bytes": 3511,
+          "sha256": "d7ba9b6de5fa0c89ee3324ae2b34f57ec0660fc5d25f835fb022fc52e144e93a"
+        },
+        "stderr": {
+          "path": "publication-preview.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "label": "publication-apply",
+      "cwd": "/workspace/eduK12-new-version/server-version/backend",
+      "argv": [
+        "/workspace/eduk12-cloud/tools/node_modules/node/bin/node",
+        "node_modules/tsx/dist/cli.mjs",
+        "src/scripts/publish-scale-instrument.ts",
+        "--input",
+        "/workspace/eduK12-new-version/docs/scale-bps9-intake-20261028/evidence/publication-apply-input.json",
+        "--apply"
+      ],
+      "startedAt": "2026-10-28T01:22:03.206Z",
+      "endedAt": "2026-10-28T01:22:04.065Z",
+      "processExitCode": 0,
+      "signal": null,
+      "error": null,
+      "expectedExitCode": 0,
+      "readOnly": false,
+      "beforeAfterIdentical": false,
+      "logs": {
+        "stdout": {
+          "path": "publication-apply.stdout.log",
+          "bytes": 256,
+          "sha256": "91e42f5ce5a9d17df33258d224d0fd47c0bbb69b8221301c479d3a94868ad03f"
+        },
+        "stderr": {
+          "path": "publication-apply.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "database target exact new loopback isolation",
+      "passed": true
+    },
+    {
+      "name": "connected database exact identity",
+      "passed": true
+    },
+    {
+      "name": "no prior users/scales/deployments/axes/releases",
+      "passed": true
+    },
+    {
+      "name": "publication-uninstalled-preview actual exit",
+      "passed": true,
+      "actual": 2,
+      "expected": 2
+    },
+    {
+      "name": "publication-uninstalled-preview made no tracked business writes",
+      "passed": true
+    },
+    {
+      "name": "publication refuses uninstalled package rather than manual review",
+      "passed": true
+    },
+    {
+      "name": "install-preview actual exit",
+      "passed": true,
+      "actual": 0,
+      "expected": 0
+    },
+    {
+      "name": "install-preview made no tracked business writes",
+      "passed": true
+    },
+    {
+      "name": "preview admits technically released exact source",
+      "passed": true
+    },
+    {
+      "name": "manual unknowns remain truthful at installation",
+      "passed": true
+    },
+    {
+      "name": "install-first-apply actual exit",
+      "passed": true,
+      "actual": 0,
+      "expected": 0
+    },
+    {
+      "name": "first installation creates DRAFT HIDDEN with one active binding",
+      "passed": true
+    },
+    {
+      "name": "first installation freezes actual versions and source",
+      "passed": true
+    },
+    {
+      "name": "installation is not public publication",
+      "passed": true
+    },
+    {
+      "name": "install-repeat-apply actual exit",
+      "passed": true,
+      "actual": 0,
+      "expected": 0
+    },
+    {
+      "name": "repeat installation preserves all tracked rows and frozen source",
+      "passed": true
+    },
+    {
+      "name": "publication-preview actual exit",
+      "passed": true,
+      "actual": 0,
+      "expected": 0
+    },
+    {
+      "name": "publication-preview made no tracked business writes",
+      "passed": true
+    },
+    {
+      "name": "publication plan binds PUBLIC and exact SURVEY selection",
+      "passed": true
+    },
+    {
+      "name": "publication retains pending manual reviews",
+      "passed": true
+    },
+    {
+      "name": "publication-apply actual exit",
+      "passed": true,
+      "actual": 0,
+      "expected": 0
+    },
+    {
+      "name": "PUBLIC publication links release and actor proof audit",
+      "passed": true
+    },
+    {
+      "name": "PUBLIC publication keeps exact frozen source unchanged",
+      "passed": true
+    },
+    {
+      "name": "only SURVEY policy approved; no real user grants",
+      "passed": true
+    },
+    {
+      "name": "actual Survey catalog consumes exact published source",
+      "passed": true
+    },
+    {
+      "name": "unselected Training entry is refused",
+      "passed": true
+    },
+    {
+      "name": "entry reads/refusals add no tracked business rows",
+      "passed": true
+    }
+  ],
+  "snapshots": {
+    "fresh-empty": {
+      "users": [],
+      "scales": [],
+      "deployments": [],
+      "axes": [],
+      "audits": [],
+      "releases": [],
+      "policies": [],
+      "counts": {
+        "assessment_reference_sets": 0,
+        "measurement_content_release_events": 0,
+        "content_capability_grants": 0,
+        "material_grants": 0,
+        "survey_tool_grants": 0,
+        "scale_library_entries": 0,
+        "scale_library_use_grants": 0,
+        "education_assessment_deliveries": 0,
+        "assessments": 0
+      }
+    },
+    "publication-uninstalled-preview-before": {
+      "users": [
+        {
+          "id": "025f2671-1f80-468d-92d2-f9732133e022",
+          "username": "synthetic-bps9-1de02c25-7e34-4c03-8306-f3a0e09cfa80",
+          "role": "ADMIN",
+          "platformRole": "SYSTEM_ADMIN",
+          "accountDomain": "TRAINING",
+          "isActive": true,
+          "isFrozen": false
+        }
+      ],
+      "scales": [],
+      "deployments": [],
+      "axes": [],
+      "audits": [],
+      "releases": [],
+      "policies": [],
+      "counts": {
+        "assessment_reference_sets": 0,
+        "measurement_content_release_events": 0,
+        "content_capability_grants": 0,
+        "material_grants": 0,
+        "survey_tool_grants": 0,
+        "scale_library_entries": 0,
+        "scale_library_use_grants": 0,
+        "education_assessment_deliveries": 0,
+        "assessments": 0
+      }
+    },
+    "publication-uninstalled-preview-after": {
+      "users": [
+        {
+          "id": "025f2671-1f80-468d-92d2-f9732133e022",
+          "username": "synthetic-bps9-1de02c25-7e34-4c03-8306-f3a0e09cfa80",
+          "role": "ADMIN",
+          "platformRole": "SYSTEM_ADMIN",
+          "accountDomain": "TRAINING",
+          "isActive": true,
+          "isFrozen": false
+        }
+      ],
+      "scales": [],
+      "deployments": [],
+      "axes": [],
+      "audits": [],
+      "releases": [],
+      "policies": [],
+      "counts": {
+        "assessment_reference_sets": 0,
+        "measurement_content_release_events": 0,
+        "content_capability_grants": 0,
+        "material_grants": 0,
+        "survey_tool_grants": 0,
+        "scale_library_entries": 0,
+        "scale_library_use_grants": 0,
+        "education_assessment_deliveries": 0,
+        "assessments": 0
+      }
+    },
+    "install-preview-before": {
+      "users": [
+        {
+          "id": "025f2671-1f80-468d-92d2-f9732133e022",
+          "username": "synthetic-bps9-1de02c25-7e34-4c03-8306-f3a0e09cfa80",
+          "role": "ADMIN",
+          "platformRole": "SYSTEM_ADMIN",
+          "accountDomain": "TRAINING",
+          "isActive": true,
+          "isFrozen": false
+        }
+      ],
+      "scales": [],
+      "deployments": [],
+      "axes": [],
+      "audits": [],
+      "releases": [],
+      "policies": [],
+      "counts": {
+        "assessment_reference_sets": 0,
+        "measurement_content_release_events": 0,
+        "content_capability_grants": 0,
+        "material_grants": 0,
+        "survey_tool_grants": 0,
+        "scale_library_entries": 0,
+        "scale_library_use_grants": 0,
+        "education_assessment_deliveries": 0,
+        "assessments": 0
+      }
+    },
+    "install-preview-after": {
+      "users": [
+        {
+          "id": "025f2671-1f80-468d-92d2-f9732133e022",
+          "username": "synthetic-bps9-1de02c25-7e34-4c03-8306-f3a0e09cfa80",
+          "role": "ADMIN",
+          "platformRole": "SYSTEM_ADMIN",
+          "accountDomain": "TRAINING",
+          "isActive": true,
+          "isFrozen": false
+        }
+      ],
+      "scales": [],
+      "deployments": [],
+      "axes": [],
+      "audits": [],
+      "releases": [],
+      "policies": [],
+      "counts": {
+        "assessment_reference_sets": 0,
+        "measurement_content_release_events": 0,
+        "content_capability_grants": 0,
+        "material_grants": 0,
+        "survey_tool_grants": 0,
+        "scale_library_entries": 0,
+        "scale_library_use_grants": 0,
+        "education_assessment_deliveries": 0,
+        "assessments": 0
+      }
+    },
+    "install-first-apply-before": {
+      "users": [
+        {
+          "id": "025f2671-1f80-468d-92d2-f9732133e022",
+          "username": "synthetic-bps9-1de02c25-7e34-4c03-8306-f3a0e09cfa80",
+          "role": "ADMIN",
+          "platformRole": "SYSTEM_ADMIN",
+          "accountDomain": "TRAINING",
+          "isActive": true,
+          "isFrozen": false
+        }
+      ],
+      "scales": [],
+      "deployments": [],
+      "axes": [],
+      "audits": [],
+      "releases": [],
+      "policies": [],
+      "counts": {
+        "assessment_reference_sets": 0,
+        "measurement_content_release_events": 0,
+        "content_capability_grants": 0,
+        "material_grants": 0,
+        "survey_tool_grants": 0,
+        "scale_library_entries": 0,
+        "scale_library_use_grants": 0,
+        "education_assessment_deliveries": 0,
+        "assessments": 0
+      }
+    },
+    "install-first-apply-after": {
+      "users": [
+        {
+          "id": "025f2671-1f80-468d-92d2-f9732133e022",
+          "username": "synthetic-bps9-1de02c25-7e34-4c03-8306-f3a0e09cfa80",
+          "role": "ADMIN",
+          "platformRole": "SYSTEM_ADMIN",
+          "accountDomain": "TRAINING",
+          "isActive": true,
+          "isFrozen": false
+        }
+      ],
+      "scales": [
+        {
+          "id": "fd3fcc79-786a-4433-b936-38a6ead98fec",
+          "code": "bps9_zh_cn_research",
+          "instrumentVersion": "1.0.0",
+          "instrumentClass": "STANDARD",
+          "status": "DRAFT",
+          "visibility": "HIDDEN",
+          "definitionHash": "ba0b97ac92dc665dcabc3ffc660433bb79a84457d8bfc9e695a316337262dc2c",
+          "instruction": "请根据平时的情况，判断以下说法是否符合自己的做法。选项从1（几乎）从不到5（几乎）总是，2、3、4是两端之间的选项。没有对错，请按实际情况选择。",
+          "measurementReleaseId": null,
+          "creatorId": "025f2671-1f80-468d-92d2-f9732133e022",
+          "updatedAt": "2026-10-28T01:22:01.518Z",
+          "definitionCanonicalHash": "8df478b14d2cc2686fe3601ef50547b49d16d8e14a8c70169de90633e0b668a1"
+        }
+      ],
+      "deployments": [
+        {
+          "id": "1b19d679-5dc7-41f2-a5c5-3c88f6bafae2",
+          "scale_id": "fd3fcc79-786a-4433-b936-38a6ead98fec",
+          "revision": 1,
+          "status": "ACTIVE",
+          "policy_json": {
+            "locale": "zh-CN",
+            "revision": 1,
+            "territory": "CN",
+            "schemaVersion": 2,
+            "deploymentModes": [
+              "STANDALONE"
+            ],
+            "runtimePolicyHash": "c1cfb37fef6037048155ee12d52d816010abc43a8a35cab309d3ea16ef4687be",
+            "inFlightCompletion": "FROZEN_DEADLINE",
+            "localizationVersion": "1.0.0"
+          },
+          "policy_hash": "b0696054f5bbfaf3b87b91aa0ac146e451226a6982e4a2c9b6e47fd1f64a9820",
+          "authorization_refs": [],
+          "created_by_user_id": "025f2671-1f80-468d-92d2-f9732133e022",
+          "created_at": "2026-10-28T01:22:01.532Z",
+          "activated_at": "2026-10-28T01:22:01.532Z",
+          "retired_at": null
+        }
+      ],
+      "axes": [
+        {
+          "scale_id": "fd3fcc79-786a-4433-b936-38a6ead98fec",
+          "axis_hash": "3b5a8786f60f6e6a54efd0c239be0e2efb9b8a0edfb8afcf68c3e05adfe0b303",
+          "source_hash": "fe15791e29cce219bef00195279ab4eddd1e3194b56866d22b7c86436c50c43e",
+          "axes": {
+            "reportVersion": "1.0.0",
+            "scoringVersion": "1.0.0",
+            "measurementHash": "ba0b97ac92dc665dcabc3ffc660433bb79a84457d8bfc9e695a316337262dc2c",
+            "instrumentVersion": "1.0.0",
+            "referenceVersions": [],
+            "instructionVersion": "1.0.0",
+            "localizationVersion": "1.0.0",
+            "catalogManifestVersion": 1
+          },
+          "created_at": "2026-10-28T01:22:01.502Z",
+          "observedSourceCanonicalHash": "fe15791e29cce219bef00195279ab4eddd1e3194b56866d22b7c86436c50c43e",
+          "frozenIdentity": {
+            "instrumentKey": "bps9_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "frozenReleaseStatus": "PUBLISHED",
+          "frozenInstruction": {
+            "text": "请根据平时的情况，判断以下说法是否符合自己的做法。选项从1（几乎）从不到5（几乎）总是，2、3、4是两端之间的选项。没有对错，请按实际情况选择。",
+            "source": "Fixed existing platform working instruction: b92c69aefa2472775fa7ee86b9c208366886c908, docs/scale-instruments/research-drafts/bps9/1.0.0/instruction.for-pr356.json and administration.md. Structural schema binding; not author endorsement or human translation approval.",
+            "version": "1.0.0",
+            "language": "zh-CN",
+            "schemaVersion": 1
+          },
+          "frozenManual": {
+            "catalogStatus": "CANDIDATE",
+            "maturity": "PILOT",
+            "localization": {
+              "notes": "独立中文工作稿，原版、其他译本、改编版和本平台版本各自管理；未借用青少年8题版或其他译本的验证/阈值。",
+              "reviewStatus": "PENDING",
+              "sourceLocale": "en",
+              "targetLocale": "zh-CN",
+              "schemaVersion": 1,
+              "adaptationMethod": "DIRECT_TRANSLATION",
+              "localEvidenceRefs": [],
+              "translationSource": "2014作者论文附录（PDF第8页），完整9题；网页实际许可链接为CC BY 3.0",
+              "expertReviewStatus": "PENDING",
+              "localizationVersion": "1.0.0",
+              "cognitiveDebriefStatus": "NOT_ESTABLISHED"
+            },
+            "scientificReview": null,
+            "license": {
+              "note": "© 2014 Kroese, De Ridder, Evers and Adriaanse. Kroese, F. M., De Ridder, D. T. D., Evers, C., & Adriaanse, M. A. (2014). Bedtime procrastination: introducing a new area of procrastination. Frontiers in Psychology, 5, 611. https://doi.org/10.3389/fpsyg.2014.00611. 复制源：2014作者论文附录（PDF第8页），完整9题；网页实际许可链接为CC BY 3.0。CC BY 3.0（https://creativecommons.org/licenses/by/3.0/），允许署名再分发与翻译改编，须保留原作者、原始论文、许可链接和修改说明。平台由作者公开英文题文独立译为中文并另写反馈，未获作者中文认可或中国人群验证，不继承其他译本/短版的版本或阈值。作者PDF SHA-256：7b60729ff85028c41dc2cceefb677227c2949cc98b8869c7c4784ab6803da8d0。",
+              "status": "verified",
+              "redistribution": "allowed"
+            }
+          }
+        }
+      ],
+      "audits": [],
+      "releases": [],
+      "policies": [],
+      "counts": {
+        "assessment_reference_sets": 0,
+        "measurement_content_release_events": 0,
+        "content_capability_grants": 0,
+        "material_grants": 0,
+        "survey_tool_grants": 0,
+        "scale_library_entries": 0,
+        "scale_library_use_grants": 0,
+        "education_assessment_deliveries": 0,
+        "assessments": 0
+      }
+    },
+    "install-repeat-apply-before": {
+      "users": [
+        {
+          "id": "025f2671-1f80-468d-92d2-f9732133e022",
+          "username": "synthetic-bps9-1de02c25-7e34-4c03-8306-f3a0e09cfa80",
+          "role": "ADMIN",
+          "platformRole": "SYSTEM_ADMIN",
+          "accountDomain": "TRAINING",
+          "isActive": true,
+          "isFrozen": false
+        }
+      ],
+      "scales": [
+        {
+          "id": "fd3fcc79-786a-4433-b936-38a6ead98fec",
+          "code": "bps9_zh_cn_research",
+          "instrumentVersion": "1.0.0",
+          "instrumentClass": "STANDARD",
+          "status": "DRAFT",
+          "visibility": "HIDDEN",
+          "definitionHash": "ba0b97ac92dc665dcabc3ffc660433bb79a84457d8bfc9e695a316337262dc2c",
+          "instruction": "请根据平时的情况，判断以下说法是否符合自己的做法。选项从1（几乎）从不到5（几乎）总是，2、3、4是两端之间的选项。没有对错，请按实际情况选择。",
+          "measurementReleaseId": null,
+          "creatorId": "025f2671-1f80-468d-92d2-f9732133e022",
+          "updatedAt": "2026-10-28T01:22:01.518Z",
+          "definitionCanonicalHash": "8df478b14d2cc2686fe3601ef50547b49d16d8e14a8c70169de90633e0b668a1"
+        }
+      ],
+      "deployments": [
+        {
+          "id": "1b19d679-5dc7-41f2-a5c5-3c88f6bafae2",
+          "scale_id": "fd3fcc79-786a-4433-b936-38a6ead98fec",
+          "revision": 1,
+          "status": "ACTIVE",
+          "policy_json": {
+            "locale": "zh-CN",
+            "revision": 1,
+            "territory": "CN",
+            "schemaVersion": 2,
+            "deploymentModes": [
+              "STANDALONE"
+            ],
+            "runtimePolicyHash": "c1cfb37fef6037048155ee12d52d816010abc43a8a35cab309d3ea16ef4687be",
+            "inFlightCompletion": "FROZEN_DEADLINE",
+            "localizationVersion": "1.0.0"
+          },
+          "policy_hash": "b0696054f5bbfaf3b87b91aa0ac146e451226a6982e4a2c9b6e47fd1f64a9820",
+          "authorization_refs": [],
+          "created_by_user_id": "025f2671-1f80-468d-92d2-f9732133e022",
+          "created_at": "2026-10-28T01:22:01.532Z",
+          "activated_at": "2026-10-28T01:22:01.532Z",
+          "retired_at": null
+        }
+      ],
+      "axes": [
+        {
+          "scale_id": "fd3fcc79-786a-4433-b936-38a6ead98fec",
+          "axis_hash": "3b5a8786f60f6e6a54efd0c239be0e2efb9b8a0edfb8afcf68c3e05adfe0b303",
+          "source_hash": "fe15791e29cce219bef00195279ab4eddd1e3194b56866d22b7c86436c50c43e",
+          "axes": {
+            "reportVersion": "1.0.0",
+            "scoringVersion": "1.0.0",
+            "measurementHash": "ba0b97ac92dc665dcabc3ffc660433bb79a84457d8bfc9e695a316337262dc2c",
+            "instrumentVersion": "1.0.0",
+            "referenceVersions": [],
+            "instructionVersion": "1.0.0",
+            "localizationVersion": "1.0.0",
+            "catalogManifestVersion": 1
+          },
+          "created_at": "2026-10-28T01:22:01.502Z",
+          "observedSourceCanonicalHash": "fe15791e29cce219bef00195279ab4eddd1e3194b56866d22b7c86436c50c43e",
+          "frozenIdentity": {
+            "instrumentKey": "bps9_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "frozenReleaseStatus": "PUBLISHED",
+          "frozenInstruction": {
+            "text": "请根据平时的情况，判断以下说法是否符合自己的做法。选项从1（几乎）从不到5（几乎）总是，2、3、4是两端之间的选项。没有对错，请按实际情况选择。",
+            "source": "Fixed existing platform working instruction: b92c69aefa2472775fa7ee86b9c208366886c908, docs/scale-instruments/research-drafts/bps9/1.0.0/instruction.for-pr356.json and administration.md. Structural schema binding; not author endorsement or human translation approval.",
+            "version": "1.0.0",
+            "language": "zh-CN",
+            "schemaVersion": 1
+          },
+          "frozenManual": {
+            "catalogStatus": "CANDIDATE",
+            "maturity": "PILOT",
+            "localization": {
+              "notes": "独立中文工作稿，原版、其他译本、改编版和本平台版本各自管理；未借用青少年8题版或其他译本的验证/阈值。",
+              "reviewStatus": "PENDING",
+              "sourceLocale": "en",
+              "targetLocale": "zh-CN",
+              "schemaVersion": 1,
+              "adaptationMethod": "DIRECT_TRANSLATION",
+              "localEvidenceRefs": [],
+              "translationSource": "2014作者论文附录（PDF第8页），完整9题；网页实际许可链接为CC BY 3.0",
+              "expertReviewStatus": "PENDING",
+              "localizationVersion": "1.0.0",
+              "cognitiveDebriefStatus": "NOT_ESTABLISHED"
+            },
+            "scientificReview": null,
+            "license": {
+              "note": "© 2014 Kroese, De Ridder, Evers and Adriaanse. Kroese, F. M., De Ridder, D. T. D., Evers, C., & Adriaanse, M. A. (2014). Bedtime procrastination: introducing a new area of procrastination. Frontiers in Psychology, 5, 611. https://doi.org/10.3389/fpsyg.2014.00611. 复制源：2014作者论文附录（PDF第8页），完整9题；网页实际许可链接为CC BY 3.0。CC BY 3.0（https://creativecommons.org/licenses/by/3.0/），允许署名再分发与翻译改编，须保留原作者、原始论文、许可链接和修改说明。平台由作者公开英文题文独立译为中文并另写反馈，未获作者中文认可或中国人群验证，不继承其他译本/短版的版本或阈值。作者PDF SHA-256：7b60729ff85028c41dc2cceefb677227c2949cc98b8869c7c4784ab6803da8d0。",
+              "status": "verified",
+              "redistribution": "allowed"
+            }
+          }
+        }
+      ],
+      "audits": [],
+      "releases": [],
+      "policies": [],
+      "counts": {
+        "assessment_reference_sets": 0,
+        "measurement_content_release_events": 0,
+        "content_capability_grants": 0,
+        "material_grants": 0,
+        "survey_tool_grants": 0,
+        "scale_library_entries": 0,
+        "scale_library_use_grants": 0,
+        "education_assessment_deliveries": 0,
+        "assessments": 0
+      }
+    },
+    "install-repeat-apply-after": {
+      "users": [
+        {
+          "id": "025f2671-1f80-468d-92d2-f9732133e022",
+          "username": "synthetic-bps9-1de02c25-7e34-4c03-8306-f3a0e09cfa80",
+          "role": "ADMIN",
+          "platformRole": "SYSTEM_ADMIN",
+          "accountDomain": "TRAINING",
+          "isActive": true,
+          "isFrozen": false
+        }
+      ],
+      "scales": [
+        {
+          "id": "fd3fcc79-786a-4433-b936-38a6ead98fec",
+          "code": "bps9_zh_cn_research",
+          "instrumentVersion": "1.0.0",
+          "instrumentClass": "STANDARD",
+          "status": "DRAFT",
+          "visibility": "HIDDEN",
+          "definitionHash": "ba0b97ac92dc665dcabc3ffc660433bb79a84457d8bfc9e695a316337262dc2c",
+          "instruction": "请根据平时的情况，判断以下说法是否符合自己的做法。选项从1（几乎）从不到5（几乎）总是，2、3、4是两端之间的选项。没有对错，请按实际情况选择。",
+          "measurementReleaseId": null,
+          "creatorId": "025f2671-1f80-468d-92d2-f9732133e022",
+          "updatedAt": "2026-10-28T01:22:01.518Z",
+          "definitionCanonicalHash": "8df478b14d2cc2686fe3601ef50547b49d16d8e14a8c70169de90633e0b668a1"
+        }
+      ],
+      "deployments": [
+        {
+          "id": "1b19d679-5dc7-41f2-a5c5-3c88f6bafae2",
+          "scale_id": "fd3fcc79-786a-4433-b936-38a6ead98fec",
+          "revision": 1,
+          "status": "ACTIVE",
+          "policy_json": {
+            "locale": "zh-CN",
+            "revision": 1,
+            "territory": "CN",
+            "schemaVersion": 2,
+            "deploymentModes": [
+              "STANDALONE"
+            ],
+            "runtimePolicyHash": "c1cfb37fef6037048155ee12d52d816010abc43a8a35cab309d3ea16ef4687be",
+            "inFlightCompletion": "FROZEN_DEADLINE",
+            "localizationVersion": "1.0.0"
+          },
+          "policy_hash": "b0696054f5bbfaf3b87b91aa0ac146e451226a6982e4a2c9b6e47fd1f64a9820",
+          "authorization_refs": [],
+          "created_by_user_id": "025f2671-1f80-468d-92d2-f9732133e022",
+          "created_at": "2026-10-28T01:22:01.532Z",
+          "activated_at": "2026-10-28T01:22:01.532Z",
+          "retired_at": null
+        }
+      ],
+      "axes": [
+        {
+          "scale_id": "fd3fcc79-786a-4433-b936-38a6ead98fec",
+          "axis_hash": "3b5a8786f60f6e6a54efd0c239be0e2efb9b8a0edfb8afcf68c3e05adfe0b303",
+          "source_hash": "fe15791e29cce219bef00195279ab4eddd1e3194b56866d22b7c86436c50c43e",
+          "axes": {
+            "reportVersion": "1.0.0",
+            "scoringVersion": "1.0.0",
+            "measurementHash": "ba0b97ac92dc665dcabc3ffc660433bb79a84457d8bfc9e695a316337262dc2c",
+            "instrumentVersion": "1.0.0",
+            "referenceVersions": [],
+            "instructionVersion": "1.0.0",
+            "localizationVersion": "1.0.0",
+            "catalogManifestVersion": 1
+          },
+          "created_at": "2026-10-28T01:22:01.502Z",
+          "observedSourceCanonicalHash": "fe15791e29cce219bef00195279ab4eddd1e3194b56866d22b7c86436c50c43e",
+          "frozenIdentity": {
+            "instrumentKey": "bps9_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "frozenReleaseStatus": "PUBLISHED",
+          "frozenInstruction": {
+            "text": "请根据平时的情况，判断以下说法是否符合自己的做法。选项从1（几乎）从不到5（几乎）总是，2、3、4是两端之间的选项。没有对错，请按实际情况选择。",
+            "source": "Fixed existing platform working instruction: b92c69aefa2472775fa7ee86b9c208366886c908, docs/scale-instruments/research-drafts/bps9/1.0.0/instruction.for-pr356.json and administration.md. Structural schema binding; not author endorsement or human translation approval.",
+            "version": "1.0.0",
+            "language": "zh-CN",
+            "schemaVersion": 1
+          },
+          "frozenManual": {
+            "catalogStatus": "CANDIDATE",
+            "maturity": "PILOT",
+            "localization": {
+              "notes": "独立中文工作稿，原版、其他译本、改编版和本平台版本各自管理；未借用青少年8题版或其他译本的验证/阈值。",
+              "reviewStatus": "PENDING",
+              "sourceLocale": "en",
+              "targetLocale": "zh-CN",
+              "schemaVersion": 1,
+              "adaptationMethod": "DIRECT_TRANSLATION",
+              "localEvidenceRefs": [],
+              "translationSource": "2014作者论文附录（PDF第8页），完整9题；网页实际许可链接为CC BY 3.0",
+              "expertReviewStatus": "PENDING",
+              "localizationVersion": "1.0.0",
+              "cognitiveDebriefStatus": "NOT_ESTABLISHED"
+            },
+            "scientificReview": null,
+            "license": {
+              "note": "© 2014 Kroese, De Ridder, Evers and Adriaanse. Kroese, F. M., De Ridder, D. T. D., Evers, C., & Adriaanse, M. A. (2014). Bedtime procrastination: introducing a new area of procrastination. Frontiers in Psychology, 5, 611. https://doi.org/10.3389/fpsyg.2014.00611. 复制源：2014作者论文附录（PDF第8页），完整9题；网页实际许可链接为CC BY 3.0。CC BY 3.0（https://creativecommons.org/licenses/by/3.0/），允许署名再分发与翻译改编，须保留原作者、原始论文、许可链接和修改说明。平台由作者公开英文题文独立译为中文并另写反馈，未获作者中文认可或中国人群验证，不继承其他译本/短版的版本或阈值。作者PDF SHA-256：7b60729ff85028c41dc2cceefb677227c2949cc98b8869c7c4784ab6803da8d0。",
+              "status": "verified",
+              "redistribution": "allowed"
+            }
+          }
+        }
+      ],
+      "audits": [],
+      "releases": [],
+      "policies": [],
+      "counts": {
+        "assessment_reference_sets": 0,
+        "measurement_content_release_events": 0,
+        "content_capability_grants": 0,
+        "material_grants": 0,
+        "survey_tool_grants": 0,
+        "scale_library_entries": 0,
+        "scale_library_use_grants": 0,
+        "education_assessment_deliveries": 0,
+        "assessments": 0
+      }
+    },
+    "publication-preview-before": {
+      "users": [
+        {
+          "id": "025f2671-1f80-468d-92d2-f9732133e022",
+          "username": "synthetic-bps9-1de02c25-7e34-4c03-8306-f3a0e09cfa80",
+          "role": "ADMIN",
+          "platformRole": "SYSTEM_ADMIN",
+          "accountDomain": "TRAINING",
+          "isActive": true,
+          "isFrozen": false
+        }
+      ],
+      "scales": [
+        {
+          "id": "fd3fcc79-786a-4433-b936-38a6ead98fec",
+          "code": "bps9_zh_cn_research",
+          "instrumentVersion": "1.0.0",
+          "instrumentClass": "STANDARD",
+          "status": "DRAFT",
+          "visibility": "HIDDEN",
+          "definitionHash": "ba0b97ac92dc665dcabc3ffc660433bb79a84457d8bfc9e695a316337262dc2c",
+          "instruction": "请根据平时的情况，判断以下说法是否符合自己的做法。选项从1（几乎）从不到5（几乎）总是，2、3、4是两端之间的选项。没有对错，请按实际情况选择。",
+          "measurementReleaseId": null,
+          "creatorId": "025f2671-1f80-468d-92d2-f9732133e022",
+          "updatedAt": "2026-10-28T01:22:01.518Z",
+          "definitionCanonicalHash": "8df478b14d2cc2686fe3601ef50547b49d16d8e14a8c70169de90633e0b668a1"
+        }
+      ],
+      "deployments": [
+        {
+          "id": "1b19d679-5dc7-41f2-a5c5-3c88f6bafae2",
+          "scale_id": "fd3fcc79-786a-4433-b936-38a6ead98fec",
+          "revision": 1,
+          "status": "ACTIVE",
+          "policy_json": {
+            "locale": "zh-CN",
+            "revision": 1,
+            "territory": "CN",
+            "schemaVersion": 2,
+            "deploymentModes": [
+              "STANDALONE"
+            ],
+            "runtimePolicyHash": "c1cfb37fef6037048155ee12d52d816010abc43a8a35cab309d3ea16ef4687be",
+            "inFlightCompletion": "FROZEN_DEADLINE",
+            "localizationVersion": "1.0.0"
+          },
+          "policy_hash": "b0696054f5bbfaf3b87b91aa0ac146e451226a6982e4a2c9b6e47fd1f64a9820",
+          "authorization_refs": [],
+          "created_by_user_id": "025f2671-1f80-468d-92d2-f9732133e022",
+          "created_at": "2026-10-28T01:22:01.532Z",
+          "activated_at": "2026-10-28T01:22:01.532Z",
+          "retired_at": null
+        }
+      ],
+      "axes": [
+        {
+          "scale_id": "fd3fcc79-786a-4433-b936-38a6ead98fec",
+          "axis_hash": "3b5a8786f60f6e6a54efd0c239be0e2efb9b8a0edfb8afcf68c3e05adfe0b303",
+          "source_hash": "fe15791e29cce219bef00195279ab4eddd1e3194b56866d22b7c86436c50c43e",
+          "axes": {
+            "reportVersion": "1.0.0",
+            "scoringVersion": "1.0.0",
+            "measurementHash": "ba0b97ac92dc665dcabc3ffc660433bb79a84457d8bfc9e695a316337262dc2c",
+            "instrumentVersion": "1.0.0",
+            "referenceVersions": [],
+            "instructionVersion": "1.0.0",
+            "localizationVersion": "1.0.0",
+            "catalogManifestVersion": 1
+          },
+          "created_at": "2026-10-28T01:22:01.502Z",
+          "observedSourceCanonicalHash": "fe15791e29cce219bef00195279ab4eddd1e3194b56866d22b7c86436c50c43e",
+          "frozenIdentity": {
+            "instrumentKey": "bps9_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "frozenReleaseStatus": "PUBLISHED",
+          "frozenInstruction": {
+            "text": "请根据平时的情况，判断以下说法是否符合自己的做法。选项从1（几乎）从不到5（几乎）总是，2、3、4是两端之间的选项。没有对错，请按实际情况选择。",
+            "source": "Fixed existing platform working instruction: b92c69aefa2472775fa7ee86b9c208366886c908, docs/scale-instruments/research-drafts/bps9/1.0.0/instruction.for-pr356.json and administration.md. Structural schema binding; not author endorsement or human translation approval.",
+            "version": "1.0.0",
+            "language": "zh-CN",
+            "schemaVersion": 1
+          },
+          "frozenManual": {
+            "catalogStatus": "CANDIDATE",
+            "maturity": "PILOT",
+            "localization": {
+              "notes": "独立中文工作稿，原版、其他译本、改编版和本平台版本各自管理；未借用青少年8题版或其他译本的验证/阈值。",
+              "reviewStatus": "PENDING",
+              "sourceLocale": "en",
+              "targetLocale": "zh-CN",
+              "schemaVersion": 1,
+              "adaptationMethod": "DIRECT_TRANSLATION",
+              "localEvidenceRefs": [],
+              "translationSource": "2014作者论文附录（PDF第8页），完整9题；网页实际许可链接为CC BY 3.0",
+              "expertReviewStatus": "PENDING",
+              "localizationVersion": "1.0.0",
+              "cognitiveDebriefStatus": "NOT_ESTABLISHED"
+            },
+            "scientificReview": null,
+            "license": {
+              "note": "© 2014 Kroese, De Ridder, Evers and Adriaanse. Kroese, F. M., De Ridder, D. T. D., Evers, C., & Adriaanse, M. A. (2014). Bedtime procrastination: introducing a new area of procrastination. Frontiers in Psychology, 5, 611. https://doi.org/10.3389/fpsyg.2014.00611. 复制源：2014作者论文附录（PDF第8页），完整9题；网页实际许可链接为CC BY 3.0。CC BY 3.0（https://creativecommons.org/licenses/by/3.0/），允许署名再分发与翻译改编，须保留原作者、原始论文、许可链接和修改说明。平台由作者公开英文题文独立译为中文并另写反馈，未获作者中文认可或中国人群验证，不继承其他译本/短版的版本或阈值。作者PDF SHA-256：7b60729ff85028c41dc2cceefb677227c2949cc98b8869c7c4784ab6803da8d0。",
+              "status": "verified",
+              "redistribution": "allowed"
+            }
+          }
+        }
+      ],
+      "audits": [],
+      "releases": [],
+      "policies": [],
+      "counts": {
+        "assessment_reference_sets": 0,
+        "measurement_content_release_events": 0,
+        "content_capability_grants": 0,
+        "material_grants": 0,
+        "survey_tool_grants": 0,
+        "scale_library_entries": 0,
+        "scale_library_use_grants": 0,
+        "education_assessment_deliveries": 0,
+        "assessments": 0
+      }
+    },
+    "publication-preview-after": {
+      "users": [
+        {
+          "id": "025f2671-1f80-468d-92d2-f9732133e022",
+          "username": "synthetic-bps9-1de02c25-7e34-4c03-8306-f3a0e09cfa80",
+          "role": "ADMIN",
+          "platformRole": "SYSTEM_ADMIN",
+          "accountDomain": "TRAINING",
+          "isActive": true,
+          "isFrozen": false
+        }
+      ],
+      "scales": [
+        {
+          "id": "fd3fcc79-786a-4433-b936-38a6ead98fec",
+          "code": "bps9_zh_cn_research",
+          "instrumentVersion": "1.0.0",
+          "instrumentClass": "STANDARD",
+          "status": "DRAFT",
+          "visibility": "HIDDEN",
+          "definitionHash": "ba0b97ac92dc665dcabc3ffc660433bb79a84457d8bfc9e695a316337262dc2c",
+          "instruction": "请根据平时的情况，判断以下说法是否符合自己的做法。选项从1（几乎）从不到5（几乎）总是，2、3、4是两端之间的选项。没有对错，请按实际情况选择。",
+          "measurementReleaseId": null,
+          "creatorId": "025f2671-1f80-468d-92d2-f9732133e022",
+          "updatedAt": "2026-10-28T01:22:01.518Z",
+          "definitionCanonicalHash": "8df478b14d2cc2686fe3601ef50547b49d16d8e14a8c70169de90633e0b668a1"
+        }
+      ],
+      "deployments": [
+        {
+          "id": "1b19d679-5dc7-41f2-a5c5-3c88f6bafae2",
+          "scale_id": "fd3fcc79-786a-4433-b936-38a6ead98fec",
+          "revision": 1,
+          "status": "ACTIVE",
+          "policy_json": {
+            "locale": "zh-CN",
+            "revision": 1,
+            "territory": "CN",
+            "schemaVersion": 2,
+            "deploymentModes": [
+              "STANDALONE"
+            ],
+            "runtimePolicyHash": "c1cfb37fef6037048155ee12d52d816010abc43a8a35cab309d3ea16ef4687be",
+            "inFlightCompletion": "FROZEN_DEADLINE",
+            "localizationVersion": "1.0.0"
+          },
+          "policy_hash": "b0696054f5bbfaf3b87b91aa0ac146e451226a6982e4a2c9b6e47fd1f64a9820",
+          "authorization_refs": [],
+          "created_by_user_id": "025f2671-1f80-468d-92d2-f9732133e022",
+          "created_at": "2026-10-28T01:22:01.532Z",
+          "activated_at": "2026-10-28T01:22:01.532Z",
+          "retired_at": null
+        }
+      ],
+      "axes": [
+        {
+          "scale_id": "fd3fcc79-786a-4433-b936-38a6ead98fec",
+          "axis_hash": "3b5a8786f60f6e6a54efd0c239be0e2efb9b8a0edfb8afcf68c3e05adfe0b303",
+          "source_hash": "fe15791e29cce219bef00195279ab4eddd1e3194b56866d22b7c86436c50c43e",
+          "axes": {
+            "reportVersion": "1.0.0",
+            "scoringVersion": "1.0.0",
+            "measurementHash": "ba0b97ac92dc665dcabc3ffc660433bb79a84457d8bfc9e695a316337262dc2c",
+            "instrumentVersion": "1.0.0",
+            "referenceVersions": [],
+            "instructionVersion": "1.0.0",
+            "localizationVersion": "1.0.0",
+            "catalogManifestVersion": 1
+          },
+          "created_at": "2026-10-28T01:22:01.502Z",
+          "observedSourceCanonicalHash": "fe15791e29cce219bef00195279ab4eddd1e3194b56866d22b7c86436c50c43e",
+          "frozenIdentity": {
+            "instrumentKey": "bps9_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "frozenReleaseStatus": "PUBLISHED",
+          "frozenInstruction": {
+            "text": "请根据平时的情况，判断以下说法是否符合自己的做法。选项从1（几乎）从不到5（几乎）总是，2、3、4是两端之间的选项。没有对错，请按实际情况选择。",
+            "source": "Fixed existing platform working instruction: b92c69aefa2472775fa7ee86b9c208366886c908, docs/scale-instruments/research-drafts/bps9/1.0.0/instruction.for-pr356.json and administration.md. Structural schema binding; not author endorsement or human translation approval.",
+            "version": "1.0.0",
+            "language": "zh-CN",
+            "schemaVersion": 1
+          },
+          "frozenManual": {
+            "catalogStatus": "CANDIDATE",
+            "maturity": "PILOT",
+            "localization": {
+              "notes": "独立中文工作稿，原版、其他译本、改编版和本平台版本各自管理；未借用青少年8题版或其他译本的验证/阈值。",
+              "reviewStatus": "PENDING",
+              "sourceLocale": "en",
+              "targetLocale": "zh-CN",
+              "schemaVersion": 1,
+              "adaptationMethod": "DIRECT_TRANSLATION",
+              "localEvidenceRefs": [],
+              "translationSource": "2014作者论文附录（PDF第8页），完整9题；网页实际许可链接为CC BY 3.0",
+              "expertReviewStatus": "PENDING",
+              "localizationVersion": "1.0.0",
+              "cognitiveDebriefStatus": "NOT_ESTABLISHED"
+            },
+            "scientificReview": null,
+            "license": {
+              "note": "© 2014 Kroese, De Ridder, Evers and Adriaanse. Kroese, F. M., De Ridder, D. T. D., Evers, C., & Adriaanse, M. A. (2014). Bedtime procrastination: introducing a new area of procrastination. Frontiers in Psychology, 5, 611. https://doi.org/10.3389/fpsyg.2014.00611. 复制源：2014作者论文附录（PDF第8页），完整9题；网页实际许可链接为CC BY 3.0。CC BY 3.0（https://creativecommons.org/licenses/by/3.0/），允许署名再分发与翻译改编，须保留原作者、原始论文、许可链接和修改说明。平台由作者公开英文题文独立译为中文并另写反馈，未获作者中文认可或中国人群验证，不继承其他译本/短版的版本或阈值。作者PDF SHA-256：7b60729ff85028c41dc2cceefb677227c2949cc98b8869c7c4784ab6803da8d0。",
+              "status": "verified",
+              "redistribution": "allowed"
+            }
+          }
+        }
+      ],
+      "audits": [],
+      "releases": [],
+      "policies": [],
+      "counts": {
+        "assessment_reference_sets": 0,
+        "measurement_content_release_events": 0,
+        "content_capability_grants": 0,
+        "material_grants": 0,
+        "survey_tool_grants": 0,
+        "scale_library_entries": 0,
+        "scale_library_use_grants": 0,
+        "education_assessment_deliveries": 0,
+        "assessments": 0
+      }
+    },
+    "publication-apply-before": {
+      "users": [
+        {
+          "id": "025f2671-1f80-468d-92d2-f9732133e022",
+          "username": "synthetic-bps9-1de02c25-7e34-4c03-8306-f3a0e09cfa80",
+          "role": "ADMIN",
+          "platformRole": "SYSTEM_ADMIN",
+          "accountDomain": "TRAINING",
+          "isActive": true,
+          "isFrozen": false
+        }
+      ],
+      "scales": [
+        {
+          "id": "fd3fcc79-786a-4433-b936-38a6ead98fec",
+          "code": "bps9_zh_cn_research",
+          "instrumentVersion": "1.0.0",
+          "instrumentClass": "STANDARD",
+          "status": "DRAFT",
+          "visibility": "HIDDEN",
+          "definitionHash": "ba0b97ac92dc665dcabc3ffc660433bb79a84457d8bfc9e695a316337262dc2c",
+          "instruction": "请根据平时的情况，判断以下说法是否符合自己的做法。选项从1（几乎）从不到5（几乎）总是，2、3、4是两端之间的选项。没有对错，请按实际情况选择。",
+          "measurementReleaseId": null,
+          "creatorId": "025f2671-1f80-468d-92d2-f9732133e022",
+          "updatedAt": "2026-10-28T01:22:01.518Z",
+          "definitionCanonicalHash": "8df478b14d2cc2686fe3601ef50547b49d16d8e14a8c70169de90633e0b668a1"
+        }
+      ],
+      "deployments": [
+        {
+          "id": "1b19d679-5dc7-41f2-a5c5-3c88f6bafae2",
+          "scale_id": "fd3fcc79-786a-4433-b936-38a6ead98fec",
+          "revision": 1,
+          "status": "ACTIVE",
+          "policy_json": {
+            "locale": "zh-CN",
+            "revision": 1,
+            "territory": "CN",
+            "schemaVersion": 2,
+            "deploymentModes": [
+              "STANDALONE"
+            ],
+            "runtimePolicyHash": "c1cfb37fef6037048155ee12d52d816010abc43a8a35cab309d3ea16ef4687be",
+            "inFlightCompletion": "FROZEN_DEADLINE",
+            "localizationVersion": "1.0.0"
+          },
+          "policy_hash": "b0696054f5bbfaf3b87b91aa0ac146e451226a6982e4a2c9b6e47fd1f64a9820",
+          "authorization_refs": [],
+          "created_by_user_id": "025f2671-1f80-468d-92d2-f9732133e022",
+          "created_at": "2026-10-28T01:22:01.532Z",
+          "activated_at": "2026-10-28T01:22:01.532Z",
+          "retired_at": null
+        }
+      ],
+      "axes": [
+        {
+          "scale_id": "fd3fcc79-786a-4433-b936-38a6ead98fec",
+          "axis_hash": "3b5a8786f60f6e6a54efd0c239be0e2efb9b8a0edfb8afcf68c3e05adfe0b303",
+          "source_hash": "fe15791e29cce219bef00195279ab4eddd1e3194b56866d22b7c86436c50c43e",
+          "axes": {
+            "reportVersion": "1.0.0",
+            "scoringVersion": "1.0.0",
+            "measurementHash": "ba0b97ac92dc665dcabc3ffc660433bb79a84457d8bfc9e695a316337262dc2c",
+            "instrumentVersion": "1.0.0",
+            "referenceVersions": [],
+            "instructionVersion": "1.0.0",
+            "localizationVersion": "1.0.0",
+            "catalogManifestVersion": 1
+          },
+          "created_at": "2026-10-28T01:22:01.502Z",
+          "observedSourceCanonicalHash": "fe15791e29cce219bef00195279ab4eddd1e3194b56866d22b7c86436c50c43e",
+          "frozenIdentity": {
+            "instrumentKey": "bps9_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "frozenReleaseStatus": "PUBLISHED",
+          "frozenInstruction": {
+            "text": "请根据平时的情况，判断以下说法是否符合自己的做法。选项从1（几乎）从不到5（几乎）总是，2、3、4是两端之间的选项。没有对错，请按实际情况选择。",
+            "source": "Fixed existing platform working instruction: b92c69aefa2472775fa7ee86b9c208366886c908, docs/scale-instruments/research-drafts/bps9/1.0.0/instruction.for-pr356.json and administration.md. Structural schema binding; not author endorsement or human translation approval.",
+            "version": "1.0.0",
+            "language": "zh-CN",
+            "schemaVersion": 1
+          },
+          "frozenManual": {
+            "catalogStatus": "CANDIDATE",
+            "maturity": "PILOT",
+            "localization": {
+              "notes": "独立中文工作稿，原版、其他译本、改编版和本平台版本各自管理；未借用青少年8题版或其他译本的验证/阈值。",
+              "reviewStatus": "PENDING",
+              "sourceLocale": "en",
+              "targetLocale": "zh-CN",
+              "schemaVersion": 1,
+              "adaptationMethod": "DIRECT_TRANSLATION",
+              "localEvidenceRefs": [],
+              "translationSource": "2014作者论文附录（PDF第8页），完整9题；网页实际许可链接为CC BY 3.0",
+              "expertReviewStatus": "PENDING",
+              "localizationVersion": "1.0.0",
+              "cognitiveDebriefStatus": "NOT_ESTABLISHED"
+            },
+            "scientificReview": null,
+            "license": {
+              "note": "© 2014 Kroese, De Ridder, Evers and Adriaanse. Kroese, F. M., De Ridder, D. T. D., Evers, C., & Adriaanse, M. A. (2014). Bedtime procrastination: introducing a new area of procrastination. Frontiers in Psychology, 5, 611. https://doi.org/10.3389/fpsyg.2014.00611. 复制源：2014作者论文附录（PDF第8页），完整9题；网页实际许可链接为CC BY 3.0。CC BY 3.0（https://creativecommons.org/licenses/by/3.0/），允许署名再分发与翻译改编，须保留原作者、原始论文、许可链接和修改说明。平台由作者公开英文题文独立译为中文并另写反馈，未获作者中文认可或中国人群验证，不继承其他译本/短版的版本或阈值。作者PDF SHA-256：7b60729ff85028c41dc2cceefb677227c2949cc98b8869c7c4784ab6803da8d0。",
+              "status": "verified",
+              "redistribution": "allowed"
+            }
+          }
+        }
+      ],
+      "audits": [],
+      "releases": [],
+      "policies": [],
+      "counts": {
+        "assessment_reference_sets": 0,
+        "measurement_content_release_events": 0,
+        "content_capability_grants": 0,
+        "material_grants": 0,
+        "survey_tool_grants": 0,
+        "scale_library_entries": 0,
+        "scale_library_use_grants": 0,
+        "education_assessment_deliveries": 0,
+        "assessments": 0
+      }
+    },
+    "publication-apply-after": {
+      "users": [
+        {
+          "id": "025f2671-1f80-468d-92d2-f9732133e022",
+          "username": "synthetic-bps9-1de02c25-7e34-4c03-8306-f3a0e09cfa80",
+          "role": "ADMIN",
+          "platformRole": "SYSTEM_ADMIN",
+          "accountDomain": "TRAINING",
+          "isActive": true,
+          "isFrozen": false
+        }
+      ],
+      "scales": [
+        {
+          "id": "fd3fcc79-786a-4433-b936-38a6ead98fec",
+          "code": "bps9_zh_cn_research",
+          "instrumentVersion": "1.0.0",
+          "instrumentClass": "STANDARD",
+          "status": "PUBLISHED",
+          "visibility": "PUBLIC",
+          "definitionHash": "ba0b97ac92dc665dcabc3ffc660433bb79a84457d8bfc9e695a316337262dc2c",
+          "instruction": "请根据平时的情况，判断以下说法是否符合自己的做法。选项从1（几乎）从不到5（几乎）总是，2、3、4是两端之间的选项。没有对错，请按实际情况选择。",
+          "measurementReleaseId": "c74998ea-00ec-4b4c-9b14-c412e8e7aae1",
+          "creatorId": "025f2671-1f80-468d-92d2-f9732133e022",
+          "updatedAt": "2026-10-28T01:22:03.999Z",
+          "definitionCanonicalHash": "8df478b14d2cc2686fe3601ef50547b49d16d8e14a8c70169de90633e0b668a1"
+        }
+      ],
+      "deployments": [
+        {
+          "id": "1b19d679-5dc7-41f2-a5c5-3c88f6bafae2",
+          "scale_id": "fd3fcc79-786a-4433-b936-38a6ead98fec",
+          "revision": 1,
+          "status": "ACTIVE",
+          "policy_json": {
+            "locale": "zh-CN",
+            "revision": 1,
+            "territory": "CN",
+            "schemaVersion": 2,
+            "deploymentModes": [
+              "STANDALONE"
+            ],
+            "runtimePolicyHash": "c1cfb37fef6037048155ee12d52d816010abc43a8a35cab309d3ea16ef4687be",
+            "inFlightCompletion": "FROZEN_DEADLINE",
+            "localizationVersion": "1.0.0"
+          },
+          "policy_hash": "b0696054f5bbfaf3b87b91aa0ac146e451226a6982e4a2c9b6e47fd1f64a9820",
+          "authorization_refs": [],
+          "created_by_user_id": "025f2671-1f80-468d-92d2-f9732133e022",
+          "created_at": "2026-10-28T01:22:01.532Z",
+          "activated_at": "2026-10-28T01:22:01.532Z",
+          "retired_at": null
+        }
+      ],
+      "axes": [
+        {
+          "scale_id": "fd3fcc79-786a-4433-b936-38a6ead98fec",
+          "axis_hash": "3b5a8786f60f6e6a54efd0c239be0e2efb9b8a0edfb8afcf68c3e05adfe0b303",
+          "source_hash": "fe15791e29cce219bef00195279ab4eddd1e3194b56866d22b7c86436c50c43e",
+          "axes": {
+            "reportVersion": "1.0.0",
+            "scoringVersion": "1.0.0",
+            "measurementHash": "ba0b97ac92dc665dcabc3ffc660433bb79a84457d8bfc9e695a316337262dc2c",
+            "instrumentVersion": "1.0.0",
+            "referenceVersions": [],
+            "instructionVersion": "1.0.0",
+            "localizationVersion": "1.0.0",
+            "catalogManifestVersion": 1
+          },
+          "created_at": "2026-10-28T01:22:01.502Z",
+          "observedSourceCanonicalHash": "fe15791e29cce219bef00195279ab4eddd1e3194b56866d22b7c86436c50c43e",
+          "frozenIdentity": {
+            "instrumentKey": "bps9_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "frozenReleaseStatus": "PUBLISHED",
+          "frozenInstruction": {
+            "text": "请根据平时的情况，判断以下说法是否符合自己的做法。选项从1（几乎）从不到5（几乎）总是，2、3、4是两端之间的选项。没有对错，请按实际情况选择。",
+            "source": "Fixed existing platform working instruction: b92c69aefa2472775fa7ee86b9c208366886c908, docs/scale-instruments/research-drafts/bps9/1.0.0/instruction.for-pr356.json and administration.md. Structural schema binding; not author endorsement or human translation approval.",
+            "version": "1.0.0",
+            "language": "zh-CN",
+            "schemaVersion": 1
+          },
+          "frozenManual": {
+            "catalogStatus": "CANDIDATE",
+            "maturity": "PILOT",
+            "localization": {
+              "notes": "独立中文工作稿，原版、其他译本、改编版和本平台版本各自管理；未借用青少年8题版或其他译本的验证/阈值。",
+              "reviewStatus": "PENDING",
+              "sourceLocale": "en",
+              "targetLocale": "zh-CN",
+              "schemaVersion": 1,
+              "adaptationMethod": "DIRECT_TRANSLATION",
+              "localEvidenceRefs": [],
+              "translationSource": "2014作者论文附录（PDF第8页），完整9题；网页实际许可链接为CC BY 3.0",
+              "expertReviewStatus": "PENDING",
+              "localizationVersion": "1.0.0",
+              "cognitiveDebriefStatus": "NOT_ESTABLISHED"
+            },
+            "scientificReview": null,
+            "license": {
+              "note": "© 2014 Kroese, De Ridder, Evers and Adriaanse. Kroese, F. M., De Ridder, D. T. D., Evers, C., & Adriaanse, M. A. (2014). Bedtime procrastination: introducing a new area of procrastination. Frontiers in Psychology, 5, 611. https://doi.org/10.3389/fpsyg.2014.00611. 复制源：2014作者论文附录（PDF第8页），完整9题；网页实际许可链接为CC BY 3.0。CC BY 3.0（https://creativecommons.org/licenses/by/3.0/），允许署名再分发与翻译改编，须保留原作者、原始论文、许可链接和修改说明。平台由作者公开英文题文独立译为中文并另写反馈，未获作者中文认可或中国人群验证，不继承其他译本/短版的版本或阈值。作者PDF SHA-256：7b60729ff85028c41dc2cceefb677227c2949cc98b8869c7c4784ab6803da8d0。",
+              "status": "verified",
+              "redistribution": "allowed"
+            }
+          }
+        }
+      ],
+      "audits": [
+        {
+          "id": "9f6874fb-e8ab-48a5-9f31-703db556f89a",
+          "scaleId": "fd3fcc79-786a-4433-b936-38a6ead98fec",
+          "actorUserId": "025f2671-1f80-468d-92d2-f9732133e022",
+          "proofHash": "04258e0b7d1f4338fe0200c63aa4265ba4bae8f403483b0662a136105ddde69e",
+          "proof": {
+            "scaleId": "fd3fcc79-786a-4433-b936-38a6ead98fec",
+            "identity": {
+              "instrumentKey": "bps9_zh_cn_research",
+              "instrumentVersion": "1.0.0"
+            },
+            "sourceHash": "fe15791e29cce219bef00195279ab4eddd1e3194b56866d22b7c86436c50c43e",
+            "visibility": "PUBLIC",
+            "actorUserId": "025f2671-1f80-468d-92d2-f9732133e022",
+            "instruction": {
+              "text": "请根据平时的情况，判断以下说法是否符合自己的做法。选项从1（几乎）从不到5（几乎）总是，2、3、4是两端之间的选项。没有对错，请按实际情况选择。",
+              "origin": "INSTRUMENT_SOURCE",
+              "source": "Fixed existing platform working instruction: b92c69aefa2472775fa7ee86b9c208366886c908, docs/scale-instruments/research-drafts/bps9/1.0.0/instruction.for-pr356.json and administration.md. Structural schema binding; not author endorsement or human translation approval.",
+              "version": "1.0.0",
+              "language": "zh-CN",
+              "schemaVersion": 1
+            },
+            "manualReview": {
+              "rights": {
+                "note": "© 2014 Kroese, De Ridder, Evers and Adriaanse. Kroese, F. M., De Ridder, D. T. D., Evers, C., & Adriaanse, M. A. (2014). Bedtime procrastination: introducing a new area of procrastination. Frontiers in Psychology, 5, 611. https://doi.org/10.3389/fpsyg.2014.00611. 复制源：2014作者论文附录（PDF第8页），完整9题；网页实际许可链接为CC BY 3.0。CC BY 3.0（https://creativecommons.org/licenses/by/3.0/），允许署名再分发与翻译改编，须保留原作者、原始论文、许可链接和修改说明。平台由作者公开英文题文独立译为中文并另写反馈，未获作者中文认可或中国人群验证，不继承其他译本/短版的版本或阈值。作者PDF SHA-256：7b60729ff85028c41dc2cceefb677227c2949cc98b8869c7c4784ab6803da8d0。",
+                "status": "verified",
+                "redistribution": "allowed"
+              },
+              "reportQc": {
+                "basis": "2014作者论文附录（PDF第8页），完整9题；网页实际许可链接为CC BY 3.0；年龄与语言证据独立约束，报告不套用常模或临床阈值。",
+                "reviewer": "AI-assisted primary-source and plain-language editorial check; not human expert approval",
+                "reviewedAt": "2026-10-26T04:56:09.986Z"
+              },
+              "localization": [
+                "LOCALIZATION_REVIEW_PENDING",
+                "LOCALIZATION_EXPERT_REVIEW_PENDING"
+              ]
+            },
+            "qualification": {
+              "pilot": {
+                "blockers": [],
+                "eligible": true
+              },
+              "researchGrade": {
+                "blockers": [
+                  "SCIENTIFIC_REVIEW_MISSING",
+                  "LOCALIZATION_REVIEW_PENDING",
+                  "RESEARCH_GRADE_REVIEW_MISSING"
+                ],
+                "eligible": false
+              },
+              "researchReady": {
+                "blockers": [
+                  "SCIENTIFIC_REVIEW_MISSING",
+                  "LOCALIZATION_REVIEW_PENDING"
+                ],
+                "eligible": false
+              },
+              "maxEligibleMaturity": "PILOT"
+            },
+            "schemaVersion": 2,
+            "definitionHash": "ba0b97ac92dc665dcabc3ffc660433bb79a84457d8bfc9e695a316337262dc2c",
+            "previousStatus": "DRAFT",
+            "allowedProducts": [
+              "SURVEY"
+            ],
+            "deploymentRevision": 1,
+            "previousVisibility": "HIDDEN",
+            "scientificMaturity": "PILOT",
+            "deploymentPolicyHash": "b0696054f5bbfaf3b87b91aa0ac146e451226a6982e4a2c9b6e47fd1f64a9820",
+            "instructionDiagnostics": []
+          },
+          "createdAt": "2026-10-28T01:22:03.953Z"
+        }
+      ],
+      "releases": [
+        {
+          "id": "c74998ea-00ec-4b4c-9b14-c412e8e7aae1",
+          "layer": "MEASUREMENT",
+          "family": "SCALE",
+          "key": "scale:eed9399a7418c8873ee44b8485611a7eef61437c5b0782ce9957bb66cd31930d:bps9_zh_cn_research",
+          "version": "1.0.0:1.0.0:1.0.0",
+          "contentHash": "d243eaff95cd21d9ff874427a4fc65fc17407e69d0d82a1e9a0a9263c8b10404",
+          "scope": {
+            "kind": "PLATFORM",
+            "ownerId": "025f2671-1f80-468d-92d2-f9732133e022"
+          },
+          "provenance": {
+            "sourceIdentity": {
+              "instrumentKey": "bps9_zh_cn_research",
+              "instrumentVersion": "1.0.0"
+            }
+          }
+        }
+      ],
+      "policies": [
+        {
+          "product": "SURVEY",
+          "resource_key": "standard:bps9_zh_cn_research:1.0.0",
+          "fingerprint": "7b600c8e6ffb58e8c7e6fe3a58d6d873daf222c5d46707d1ffe694f2363476ec",
+          "decision": "APPROVED",
+          "paused": false,
+          "reason": "系统入库批准：PUBLIC",
+          "reviewed_by": "025f2671-1f80-468d-92d2-f9732133e022",
+          "version": 1
+        }
+      ],
+      "counts": {
+        "assessment_reference_sets": 0,
+        "measurement_content_release_events": 0,
+        "content_capability_grants": 0,
+        "material_grants": 0,
+        "survey_tool_grants": 0,
+        "scale_library_entries": 0,
+        "scale_library_use_grants": 0,
+        "education_assessment_deliveries": 0,
+        "assessments": 0
+      }
+    },
+    "final": {
+      "users": [
+        {
+          "id": "025f2671-1f80-468d-92d2-f9732133e022",
+          "username": "synthetic-bps9-1de02c25-7e34-4c03-8306-f3a0e09cfa80",
+          "role": "ADMIN",
+          "platformRole": "SYSTEM_ADMIN",
+          "accountDomain": "TRAINING",
+          "isActive": true,
+          "isFrozen": false
+        }
+      ],
+      "scales": [
+        {
+          "id": "fd3fcc79-786a-4433-b936-38a6ead98fec",
+          "code": "bps9_zh_cn_research",
+          "instrumentVersion": "1.0.0",
+          "instrumentClass": "STANDARD",
+          "status": "PUBLISHED",
+          "visibility": "PUBLIC",
+          "definitionHash": "ba0b97ac92dc665dcabc3ffc660433bb79a84457d8bfc9e695a316337262dc2c",
+          "instruction": "请根据平时的情况，判断以下说法是否符合自己的做法。选项从1（几乎）从不到5（几乎）总是，2、3、4是两端之间的选项。没有对错，请按实际情况选择。",
+          "measurementReleaseId": "c74998ea-00ec-4b4c-9b14-c412e8e7aae1",
+          "creatorId": "025f2671-1f80-468d-92d2-f9732133e022",
+          "updatedAt": "2026-10-28T01:22:03.999Z",
+          "definitionCanonicalHash": "8df478b14d2cc2686fe3601ef50547b49d16d8e14a8c70169de90633e0b668a1"
+        }
+      ],
+      "deployments": [
+        {
+          "id": "1b19d679-5dc7-41f2-a5c5-3c88f6bafae2",
+          "scale_id": "fd3fcc79-786a-4433-b936-38a6ead98fec",
+          "revision": 1,
+          "status": "ACTIVE",
+          "policy_json": {
+            "locale": "zh-CN",
+            "revision": 1,
+            "territory": "CN",
+            "schemaVersion": 2,
+            "deploymentModes": [
+              "STANDALONE"
+            ],
+            "runtimePolicyHash": "c1cfb37fef6037048155ee12d52d816010abc43a8a35cab309d3ea16ef4687be",
+            "inFlightCompletion": "FROZEN_DEADLINE",
+            "localizationVersion": "1.0.0"
+          },
+          "policy_hash": "b0696054f5bbfaf3b87b91aa0ac146e451226a6982e4a2c9b6e47fd1f64a9820",
+          "authorization_refs": [],
+          "created_by_user_id": "025f2671-1f80-468d-92d2-f9732133e022",
+          "created_at": "2026-10-28T01:22:01.532Z",
+          "activated_at": "2026-10-28T01:22:01.532Z",
+          "retired_at": null
+        }
+      ],
+      "axes": [
+        {
+          "scale_id": "fd3fcc79-786a-4433-b936-38a6ead98fec",
+          "axis_hash": "3b5a8786f60f6e6a54efd0c239be0e2efb9b8a0edfb8afcf68c3e05adfe0b303",
+          "source_hash": "fe15791e29cce219bef00195279ab4eddd1e3194b56866d22b7c86436c50c43e",
+          "axes": {
+            "reportVersion": "1.0.0",
+            "scoringVersion": "1.0.0",
+            "measurementHash": "ba0b97ac92dc665dcabc3ffc660433bb79a84457d8bfc9e695a316337262dc2c",
+            "instrumentVersion": "1.0.0",
+            "referenceVersions": [],
+            "instructionVersion": "1.0.0",
+            "localizationVersion": "1.0.0",
+            "catalogManifestVersion": 1
+          },
+          "created_at": "2026-10-28T01:22:01.502Z",
+          "observedSourceCanonicalHash": "fe15791e29cce219bef00195279ab4eddd1e3194b56866d22b7c86436c50c43e",
+          "frozenIdentity": {
+            "instrumentKey": "bps9_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "frozenReleaseStatus": "PUBLISHED",
+          "frozenInstruction": {
+            "text": "请根据平时的情况，判断以下说法是否符合自己的做法。选项从1（几乎）从不到5（几乎）总是，2、3、4是两端之间的选项。没有对错，请按实际情况选择。",
+            "source": "Fixed existing platform working instruction: b92c69aefa2472775fa7ee86b9c208366886c908, docs/scale-instruments/research-drafts/bps9/1.0.0/instruction.for-pr356.json and administration.md. Structural schema binding; not author endorsement or human translation approval.",
+            "version": "1.0.0",
+            "language": "zh-CN",
+            "schemaVersion": 1
+          },
+          "frozenManual": {
+            "catalogStatus": "CANDIDATE",
+            "maturity": "PILOT",
+            "localization": {
+              "notes": "独立中文工作稿，原版、其他译本、改编版和本平台版本各自管理；未借用青少年8题版或其他译本的验证/阈值。",
+              "reviewStatus": "PENDING",
+              "sourceLocale": "en",
+              "targetLocale": "zh-CN",
+              "schemaVersion": 1,
+              "adaptationMethod": "DIRECT_TRANSLATION",
+              "localEvidenceRefs": [],
+              "translationSource": "2014作者论文附录（PDF第8页），完整9题；网页实际许可链接为CC BY 3.0",
+              "expertReviewStatus": "PENDING",
+              "localizationVersion": "1.0.0",
+              "cognitiveDebriefStatus": "NOT_ESTABLISHED"
+            },
+            "scientificReview": null,
+            "license": {
+              "note": "© 2014 Kroese, De Ridder, Evers and Adriaanse. Kroese, F. M., De Ridder, D. T. D., Evers, C., & Adriaanse, M. A. (2014). Bedtime procrastination: introducing a new area of procrastination. Frontiers in Psychology, 5, 611. https://doi.org/10.3389/fpsyg.2014.00611. 复制源：2014作者论文附录（PDF第8页），完整9题；网页实际许可链接为CC BY 3.0。CC BY 3.0（https://creativecommons.org/licenses/by/3.0/），允许署名再分发与翻译改编，须保留原作者、原始论文、许可链接和修改说明。平台由作者公开英文题文独立译为中文并另写反馈，未获作者中文认可或中国人群验证，不继承其他译本/短版的版本或阈值。作者PDF SHA-256：7b60729ff85028c41dc2cceefb677227c2949cc98b8869c7c4784ab6803da8d0。",
+              "status": "verified",
+              "redistribution": "allowed"
+            }
+          }
+        }
+      ],
+      "audits": [
+        {
+          "id": "9f6874fb-e8ab-48a5-9f31-703db556f89a",
+          "scaleId": "fd3fcc79-786a-4433-b936-38a6ead98fec",
+          "actorUserId": "025f2671-1f80-468d-92d2-f9732133e022",
+          "proofHash": "04258e0b7d1f4338fe0200c63aa4265ba4bae8f403483b0662a136105ddde69e",
+          "proof": {
+            "scaleId": "fd3fcc79-786a-4433-b936-38a6ead98fec",
+            "identity": {
+              "instrumentKey": "bps9_zh_cn_research",
+              "instrumentVersion": "1.0.0"
+            },
+            "sourceHash": "fe15791e29cce219bef00195279ab4eddd1e3194b56866d22b7c86436c50c43e",
+            "visibility": "PUBLIC",
+            "actorUserId": "025f2671-1f80-468d-92d2-f9732133e022",
+            "instruction": {
+              "text": "请根据平时的情况，判断以下说法是否符合自己的做法。选项从1（几乎）从不到5（几乎）总是，2、3、4是两端之间的选项。没有对错，请按实际情况选择。",
+              "origin": "INSTRUMENT_SOURCE",
+              "source": "Fixed existing platform working instruction: b92c69aefa2472775fa7ee86b9c208366886c908, docs/scale-instruments/research-drafts/bps9/1.0.0/instruction.for-pr356.json and administration.md. Structural schema binding; not author endorsement or human translation approval.",
+              "version": "1.0.0",
+              "language": "zh-CN",
+              "schemaVersion": 1
+            },
+            "manualReview": {
+              "rights": {
+                "note": "© 2014 Kroese, De Ridder, Evers and Adriaanse. Kroese, F. M., De Ridder, D. T. D., Evers, C., & Adriaanse, M. A. (2014). Bedtime procrastination: introducing a new area of procrastination. Frontiers in Psychology, 5, 611. https://doi.org/10.3389/fpsyg.2014.00611. 复制源：2014作者论文附录（PDF第8页），完整9题；网页实际许可链接为CC BY 3.0。CC BY 3.0（https://creativecommons.org/licenses/by/3.0/），允许署名再分发与翻译改编，须保留原作者、原始论文、许可链接和修改说明。平台由作者公开英文题文独立译为中文并另写反馈，未获作者中文认可或中国人群验证，不继承其他译本/短版的版本或阈值。作者PDF SHA-256：7b60729ff85028c41dc2cceefb677227c2949cc98b8869c7c4784ab6803da8d0。",
+                "status": "verified",
+                "redistribution": "allowed"
+              },
+              "reportQc": {
+                "basis": "2014作者论文附录（PDF第8页），完整9题；网页实际许可链接为CC BY 3.0；年龄与语言证据独立约束，报告不套用常模或临床阈值。",
+                "reviewer": "AI-assisted primary-source and plain-language editorial check; not human expert approval",
+                "reviewedAt": "2026-10-26T04:56:09.986Z"
+              },
+              "localization": [
+                "LOCALIZATION_REVIEW_PENDING",
+                "LOCALIZATION_EXPERT_REVIEW_PENDING"
+              ]
+            },
+            "qualification": {
+              "pilot": {
+                "blockers": [],
+                "eligible": true
+              },
+              "researchGrade": {
+                "blockers": [
+                  "SCIENTIFIC_REVIEW_MISSING",
+                  "LOCALIZATION_REVIEW_PENDING",
+                  "RESEARCH_GRADE_REVIEW_MISSING"
+                ],
+                "eligible": false
+              },
+              "researchReady": {
+                "blockers": [
+                  "SCIENTIFIC_REVIEW_MISSING",
+                  "LOCALIZATION_REVIEW_PENDING"
+                ],
+                "eligible": false
+              },
+              "maxEligibleMaturity": "PILOT"
+            },
+            "schemaVersion": 2,
+            "definitionHash": "ba0b97ac92dc665dcabc3ffc660433bb79a84457d8bfc9e695a316337262dc2c",
+            "previousStatus": "DRAFT",
+            "allowedProducts": [
+              "SURVEY"
+            ],
+            "deploymentRevision": 1,
+            "previousVisibility": "HIDDEN",
+            "scientificMaturity": "PILOT",
+            "deploymentPolicyHash": "b0696054f5bbfaf3b87b91aa0ac146e451226a6982e4a2c9b6e47fd1f64a9820",
+            "instructionDiagnostics": []
+          },
+          "createdAt": "2026-10-28T01:22:03.953Z"
+        }
+      ],
+      "releases": [
+        {
+          "id": "c74998ea-00ec-4b4c-9b14-c412e8e7aae1",
+          "layer": "MEASUREMENT",
+          "family": "SCALE",
+          "key": "scale:eed9399a7418c8873ee44b8485611a7eef61437c5b0782ce9957bb66cd31930d:bps9_zh_cn_research",
+          "version": "1.0.0:1.0.0:1.0.0",
+          "contentHash": "d243eaff95cd21d9ff874427a4fc65fc17407e69d0d82a1e9a0a9263c8b10404",
+          "scope": {
+            "kind": "PLATFORM",
+            "ownerId": "025f2671-1f80-468d-92d2-f9732133e022"
+          },
+          "provenance": {
+            "sourceIdentity": {
+              "instrumentKey": "bps9_zh_cn_research",
+              "instrumentVersion": "1.0.0"
+            }
+          }
+        }
+      ],
+      "policies": [
+        {
+          "product": "SURVEY",
+          "resource_key": "standard:bps9_zh_cn_research:1.0.0",
+          "fingerprint": "7b600c8e6ffb58e8c7e6fe3a58d6d873daf222c5d46707d1ffe694f2363476ec",
+          "decision": "APPROVED",
+          "paused": false,
+          "reason": "系统入库批准：PUBLIC",
+          "reviewed_by": "025f2671-1f80-468d-92d2-f9732133e022",
+          "version": 1
+        }
+      ],
+      "counts": {
+        "assessment_reference_sets": 0,
+        "measurement_content_release_events": 0,
+        "content_capability_grants": 0,
+        "material_grants": 0,
+        "survey_tool_grants": 0,
+        "scale_library_entries": 0,
+        "scale_library_use_grants": 0,
+        "education_assessment_deliveries": 0,
+        "assessments": 0
+      }
+    }
+  },
+  "failures": [],
+  "entryObservations": [
+    {
+      "product": "SURVEY",
+      "result": "ENTRY_POLICY_ALLOWED",
+      "scope": "actual transaction-scoped policy guard, not end-user grant or participant flow"
+    },
+    {
+      "product": "TRAINING",
+      "result": "REFUSED",
+      "name": "Error",
+      "message": "该精确版本未获本入口准入或已停止新增使用：TRAINING；TRAINING 入口尚未获准",
+      "scope": "actual Training new-entry guard; not chosen in allowedProducts"
+    },
+    {
+      "product": "SCHOOL",
+      "result": "NOT_EXECUTED",
+      "scope": "No organization adapter/distribution/real-user grant created. Existing CLI supports only TRAINING/SURVEY; prior ARS refusal evidence has unchanged shared backend inputs, not relabelled as BPS execution."
+    },
+    {
+      "product": "TEACHER",
+      "result": "NOT_EXECUTED",
+      "scope": "Same boundary; no claim of four-entry availability."
+    }
+  ],
+  "notRun": [
+    "Full scoring/report/golden suites",
+    "HTTP/browser participant flow",
+    "Real School/Teacher organizations, distribution or capabilities",
+    "Production"
+  ],
+  "limits": [
+    "Each new CLI process performs its existing selected immutable contract validation on cold start; no separate golden replay suite is invoked.",
+    "PUBLIC database status/catalog discovery is not participant assignment or four-entry launch."
+  ],
+  "server": {
+    "database": "eduk12_bps9_518fa660de",
+    "role": "clouddev",
+    "version": "PostgreSQL 16.15 (Debian 16.15-1.pgdg12+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit"
+  },
+  "actor": {
+    "id": "025f2671-1f80-468d-92d2-f9732133e022",
+    "username": "synthetic-bps9-1de02c25-7e34-4c03-8306-f3a0e09cfa80",
+    "accountDomain": "TRAINING",
+    "platformRole": "SYSTEM_ADMIN",
+    "synthetic": true,
+    "password": "random one-use secret discarded; hash not retained in evidence"
+  },
+  "sourcePolicyIdentity": {
+    "resourceKey": "standard:bps9_zh_cn_research:1.0.0",
+    "fingerprint": "7b600c8e6ffb58e8c7e6fe3a58d6d873daf222c5d46707d1ffe694f2363476ec"
+  },
+  "surveyCatalog": {
+    "list": [
+      {
+        "ref": {
+          "kind": "SCALE",
+          "sourceId": "fd3fcc79-786a-4433-b936-38a6ead98fec",
+          "sourceVersion": "1.0.0"
+        },
+        "title": "上床拖延问卷（BPS成人9题，中文工作稿）",
+        "classificationTags": [
+          {
+            "id": "bps9_zh_cn_research",
+            "label": "bps9_zh_cn_research",
+            "facet": "other"
+          },
+          {
+            "id": "domain:self_regulation",
+            "label": "行为自我调节",
+            "facet": "domain"
+          },
+          {
+            "id": "domain:sleep_behavior",
+            "label": "domain:sleep_behavior",
+            "facet": "domain"
+          },
+          {
+            "id": "domain:everyday_life",
+            "label": "domain:everyday_life",
+            "facet": "domain"
+          },
+          {
+            "id": "construct:bedtime_procrastination",
+            "label": "construct:bedtime_procrastination",
+            "facet": "construct"
+          },
+          {
+            "id": "construct:intention_action_gap",
+            "label": "construct:intention_action_gap",
+            "facet": "construct"
+          },
+          {
+            "id": "construct:bedtime_transition",
+            "label": "construct:bedtime_transition",
+            "facet": "construct"
+          },
+          {
+            "id": "orientation:self_regulation_perspective",
+            "label": "orientation:self_regulation_perspective",
+            "facet": "orientation"
+          },
+          {
+            "id": "orientation:not_therapy_specific",
+            "label": "orientation:not_therapy_specific",
+            "facet": "orientation"
+          },
+          {
+            "id": "population:adult_18_plus",
+            "label": "population:adult_18_plus",
+            "facet": "population"
+          },
+          {
+            "id": "population:source_mturk_adults",
+            "label": "population:source_mturk_adults",
+            "facet": "population"
+          },
+          {
+            "id": "population:not_k12_validated",
+            "label": "population:not_k12_validated",
+            "facet": "population"
+          },
+          {
+            "id": "response:9_items",
+            "label": "response:9_items",
+            "facet": "response"
+          },
+          {
+            "id": "response:four_reverse_items",
+            "label": "response:four_reverse_items",
+            "facet": "response"
+          },
+          {
+            "id": "response:endpoint_labels_only",
+            "label": "response:endpoint_labels_only",
+            "facet": "response"
+          },
+          {
+            "id": "use:sleep_habit_reflection",
+            "label": "use:sleep_habit_reflection",
+            "facet": "use"
+          },
+          {
+            "id": "language_validation:original_en",
+            "label": "language_validation:original_en",
+            "facet": "language"
+          },
+          {
+            "id": "上床拖延",
+            "label": "上床拖延",
+            "facet": "other"
+          },
+          {
+            "id": "睡前拖延",
+            "label": "睡前拖延",
+            "facet": "other"
+          },
+          {
+            "id": "上床时间",
+            "label": "上床时间",
+            "facet": "other"
+          },
+          {
+            "id": "睡前收尾",
+            "label": "睡前收尾",
+            "facet": "other"
+          },
+          {
+            "id": "作息习惯",
+            "label": "作息习惯",
+            "facet": "other"
+          },
+          {
+            "id": "意图与行动",
+            "label": "意图与行动",
+            "facet": "other"
+          },
+          {
+            "id": "成人自评",
+            "label": "成人自评",
+            "facet": "other"
+          },
+          {
+            "id": "population:self_report",
+            "label": "population:self_report",
+            "facet": "population"
+          },
+          {
+            "id": "response:self",
+            "label": "本人自评",
+            "facet": "response"
+          },
+          {
+            "id": "response:digital_self",
+            "label": "数字自助作答",
+            "facet": "response"
+          },
+          {
+            "id": "response:paper",
+            "label": "纸笔作答",
+            "facet": "response"
+          },
+          {
+            "id": "response:fixed_order",
+            "label": "response:fixed_order",
+            "facet": "response"
+          },
+          {
+            "id": "response:five_point_frequency",
+            "label": "response:five_point_frequency",
+            "facet": "response"
+          },
+          {
+            "id": "use:research",
+            "label": "研究用途",
+            "facet": "use"
+          },
+          {
+            "id": "use:individual_reflection",
+            "label": "use:individual_reflection",
+            "facet": "use"
+          },
+          {
+            "id": "use:not_diagnostic",
+            "label": "非诊断用途",
+            "facet": "use"
+          },
+          {
+            "id": "use:not_high_stakes_selection",
+            "label": "use:not_high_stakes_selection",
+            "facet": "use"
+          },
+          {
+            "id": "use:not_school_ranking",
+            "label": "use:not_school_ranking",
+            "facet": "use"
+          },
+          {
+            "id": "use:no_validated_cutoff",
+            "label": "use:no_validated_cutoff",
+            "facet": "use"
+          },
+          {
+            "id": "license:cc_by_3_0",
+            "label": "CC BY 3.0 署名",
+            "facet": "license"
+          },
+          {
+            "id": "license:attribution_required",
+            "label": "license:attribution_required",
+            "facet": "license"
+          },
+          {
+            "id": "license:changes_indicated",
+            "label": "license:changes_indicated",
+            "facet": "license"
+          },
+          {
+            "id": "license:source_allows_redistribution",
+            "label": "license:source_allows_redistribution",
+            "facet": "license"
+          },
+          {
+            "id": "license:source_allows_adaptation",
+            "label": "license:source_allows_adaptation",
+            "facet": "license"
+          },
+          {
+            "id": "license:source_allows_commercial_use",
+            "label": "license:source_allows_commercial_use",
+            "facet": "license"
+          },
+          {
+            "id": "language_validation:zh_cn_working_translation",
+            "label": "language_validation:zh_cn_working_translation",
+            "facet": "language"
+          },
+          {
+            "id": "language_validation:expert_review_pending",
+            "label": "language_validation:expert_review_pending",
+            "facet": "language"
+          },
+          {
+            "id": "language_validation:china_validation_not_established",
+            "label": "language_validation:china_validation_not_established",
+            "facet": "language"
+          },
+          {
+            "id": "中文工作译稿",
+            "label": "中文工作译稿",
+            "facet": "other"
+          },
+          {
+            "id": "个人反思",
+            "label": "个人反思",
+            "facet": "other"
+          },
+          {
+            "id": "非诊断",
+            "label": "非诊断",
+            "facet": "other"
+          },
+          {
+            "id": "可署名再分发",
+            "label": "可署名再分发",
+            "facet": "other"
+          },
+          {
+            "id": "SELF_REGULATION",
+            "label": "自我调节",
+            "facet": "domain"
+          },
+          {
+            "id": "respondent:SELF",
+            "label": "本人自评",
+            "facet": "population"
+          },
+          {
+            "id": "age:18-",
+            "label": "18岁及以上",
+            "facet": "population"
+          },
+          {
+            "id": "language:zh-CN",
+            "label": "简体中文",
+            "facet": "language"
+          }
+        ],
+        "available": true,
+        "unsupportedReason": null,
+        "definitionDigest": "8df478b14d2cc2686fe3601ef50547b49d16d8e14a8c70169de90633e0b668a1"
+      }
+    ],
+    "page": 1,
+    "hasMore": false,
+    "terminalReason": "END_OF_CATALOG",
+    "tagFacets": {
+      "population": [
+        {
+          "id": "age:13-19",
+          "label": "13–19岁"
+        },
+        {
+          "id": "age:14-100",
+          "label": "14–100岁"
+        },
+        {
+          "id": "age:17-20",
+          "label": "17–20岁"
+        },
+        {
+          "id": "age:18-100",
+          "label": "18–100岁"
+        },
+        {
+          "id": "age:18-",
+          "label": "18岁及以上"
+        },
+        {
+          "id": "grades:3-12",
+          "label": "3–12年级"
+        },
+        {
+          "id": "age:4-10",
+          "label": "4–10岁"
+        },
+        {
+          "id": "age:4-17",
+          "label": "4–17岁"
+        },
+        {
+          "id": "grades:7-12",
+          "label": "7–12年级"
+        },
+        {
+          "id": "age:9-18",
+          "label": "9–18岁"
+        },
+        {
+          "id": "respondent:SELF",
+          "label": "本人自评"
+        },
+        {
+          "id": "respondent:PARENT",
+          "label": "家长评定"
+        },
+        {
+          "id": "respondent:TEACHER",
+          "label": "教师评定"
+        },
+        {
+          "id": "student_self_report",
+          "label": "学生"
+        },
+        {
+          "id": "population:adult_18_plus",
+          "label": "population:adult_18_plus"
+        },
+        {
+          "id": "population:not_k12_validated",
+          "label": "population:not_k12_validated"
+        },
+        {
+          "id": "population:self_report",
+          "label": "population:self_report"
+        },
+        {
+          "id": "population:source_mturk_adults",
+          "label": "population:source_mturk_adults"
+        }
+      ],
+      "construct": [
+        {
+          "id": "tutoring_necessity",
+          "label": "补习必要性信念"
+        },
+        {
+          "id": "domain_fixed_mindset",
+          "label": "学科固定心态"
+        },
+        {
+          "id": "value_cost",
+          "label": "学科价值与时间代价"
+        },
+        {
+          "id": "academic_self_efficacy",
+          "label": "学科学习自我效能"
+        },
+        {
+          "id": "academic_self_concept",
+          "label": "学科自我概念"
+        },
+        {
+          "id": "teacher_subject_liking",
+          "label": "学生感知的教师学科喜爱"
+        },
+        {
+          "id": "construct:bedtime_procrastination",
+          "label": "construct:bedtime_procrastination"
+        },
+        {
+          "id": "construct:bedtime_transition",
+          "label": "construct:bedtime_transition"
+        },
+        {
+          "id": "construct:intention_action_gap",
+          "label": "construct:intention_action_gap"
+        }
+      ],
+      "subject": [
+        {
+          "id": "chemistry",
+          "label": "化学"
+        },
+        {
+          "id": "biology",
+          "label": "生物"
+        },
+        {
+          "id": "mathematics",
+          "label": "数学"
+        },
+        {
+          "id": "physics",
+          "label": "物理"
+        },
+        {
+          "id": "english",
+          "label": "英语"
+        },
+        {
+          "id": "chinese",
+          "label": "语文"
+        }
+      ],
+      "domain": [
+        {
+          "id": "PERSONALITY",
+          "label": "人格"
+        },
+        {
+          "id": "RESILIENCE",
+          "label": "韧性"
+        },
+        {
+          "id": "SOCIAL_EMOTIONAL",
+          "label": "社会情绪"
+        },
+        {
+          "id": "WELL_BEING",
+          "label": "身心健康"
+        },
+        {
+          "id": "ENGAGEMENT",
+          "label": "投入"
+        },
+        {
+          "id": "BEHAVIORAL_DIFFICULTIES",
+          "label": "行为与困难"
+        },
+        {
+          "id": "domain:self_regulation",
+          "label": "行为自我调节"
+        },
+        {
+          "id": "MOTIVATION",
+          "label": "学习动机"
+        },
+        {
+          "id": "EXECUTIVE_FUNCTION",
+          "label": "执行功能"
+        },
+        {
+          "id": "SELF_REGULATION",
+          "label": "自我调节"
+        },
+        {
+          "id": "SELF_EFFICACY",
+          "label": "自我效能"
+        },
+        {
+          "id": "domain:everyday_life",
+          "label": "domain:everyday_life"
+        },
+        {
+          "id": "domain:sleep_behavior",
+          "label": "domain:sleep_behavior"
+        }
+      ],
+      "language": [
+        {
+          "id": "language:zh-CN",
+          "label": "简体中文"
+        },
+        {
+          "id": "language:en",
+          "label": "英语"
+        },
+        {
+          "id": "language:en-GB",
+          "label": "en-GB"
+        },
+        {
+          "id": "language_validation:china_validation_not_established",
+          "label": "language_validation:china_validation_not_established"
+        },
+        {
+          "id": "language_validation:expert_review_pending",
+          "label": "language_validation:expert_review_pending"
+        },
+        {
+          "id": "language_validation:original_en",
+          "label": "language_validation:original_en"
+        },
+        {
+          "id": "language_validation:zh_cn_working_translation",
+          "label": "language_validation:zh_cn_working_translation"
+        }
+      ],
+      "orientation": [
+        {
+          "id": "orientation:not_therapy_specific",
+          "label": "orientation:not_therapy_specific"
+        },
+        {
+          "id": "orientation:self_regulation_perspective",
+          "label": "orientation:self_regulation_perspective"
+        }
+      ],
+      "response": [
+        {
+          "id": "response:self",
+          "label": "本人自评"
+        },
+        {
+          "id": "response:digital_self",
+          "label": "数字自助作答"
+        },
+        {
+          "id": "response:paper",
+          "label": "纸笔作答"
+        },
+        {
+          "id": "response:9_items",
+          "label": "response:9_items"
+        },
+        {
+          "id": "response:endpoint_labels_only",
+          "label": "response:endpoint_labels_only"
+        },
+        {
+          "id": "response:five_point_frequency",
+          "label": "response:five_point_frequency"
+        },
+        {
+          "id": "response:fixed_order",
+          "label": "response:fixed_order"
+        },
+        {
+          "id": "response:four_reverse_items",
+          "label": "response:four_reverse_items"
+        }
+      ],
+      "use": [
+        {
+          "id": "use:not_diagnostic",
+          "label": "非诊断用途"
+        },
+        {
+          "id": "use:research",
+          "label": "研究用途"
+        },
+        {
+          "id": "use:individual_reflection",
+          "label": "use:individual_reflection"
+        },
+        {
+          "id": "use:no_validated_cutoff",
+          "label": "use:no_validated_cutoff"
+        },
+        {
+          "id": "use:not_high_stakes_selection",
+          "label": "use:not_high_stakes_selection"
+        },
+        {
+          "id": "use:not_school_ranking",
+          "label": "use:not_school_ranking"
+        },
+        {
+          "id": "use:sleep_habit_reflection",
+          "label": "use:sleep_habit_reflection"
+        }
+      ],
+      "license": [
+        {
+          "id": "license:cc_by_3_0",
+          "label": "CC BY 3.0 署名"
+        },
+        {
+          "id": "license:attribution_required",
+          "label": "license:attribution_required"
+        },
+        {
+          "id": "license:changes_indicated",
+          "label": "license:changes_indicated"
+        },
+        {
+          "id": "license:source_allows_adaptation",
+          "label": "license:source_allows_adaptation"
+        },
+        {
+          "id": "license:source_allows_commercial_use",
+          "label": "license:source_allows_commercial_use"
+        },
+        {
+          "id": "license:source_allows_redistribution",
+          "label": "license:source_allows_redistribution"
+        }
+      ]
+    }
+  },
+  "completed": true
+}

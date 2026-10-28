@@ -1,0 +1,44 @@
+{
+  "mode": "apply",
+  "instrumentKey": "bps9_zh_cn_research",
+  "instrumentVersion": "1.0.0",
+  "scaleId": "fd3fcc79-786a-4433-b936-38a6ead98fec",
+  "createScale": false,
+  "packageReleaseStatus": "PUBLISHED",
+  "runtimePolicyHash": "c1cfb37fef6037048155ee12d52d816010abc43a8a35cab309d3ea16ef4687be",
+  "deploymentPolicyHash": "b0696054f5bbfaf3b87b91aa0ac146e451226a6982e4a2c9b6e47fd1f64a9820",
+  "deploymentRevision": 1,
+  "deploymentAlreadyActive": true,
+  "referenceCreates": [],
+  "referenceUnchanged": [],
+  "allowActivation": true,
+  "blockers": [],
+  "instruction": {
+    "diagnostics": [],
+    "binding": {
+      "origin": "INSTRUMENT_SOURCE",
+      "schemaVersion": 1,
+      "text": "请根据平时的情况，判断以下说法是否符合自己的做法。选项从1（几乎）从不到5（几乎）总是，2、3、4是两端之间的选项。没有对错，请按实际情况选择。",
+      "language": "zh-CN",
+      "version": "1.0.0",
+      "source": "Fixed existing platform working instruction: b92c69aefa2472775fa7ee86b9c208366886c908, docs/scale-instruments/research-drafts/bps9/1.0.0/instruction.for-pr356.json and administration.md. Structural schema binding; not author endorsement or human translation approval."
+    }
+  },
+  "manualReview": {
+    "localization": [
+      "LOCALIZATION_REVIEW_PENDING",
+      "LOCALIZATION_EXPERT_REVIEW_PENDING"
+    ],
+    "scientificReview": null,
+    "rights": {
+      "status": "verified",
+      "redistribution": "allowed",
+      "note": "© 2014 Kroese, De Ridder, Evers and Adriaanse. Kroese, F. M., De Ridder, D. T. D., Evers, C., & Adriaanse, M. A. (2014). Bedtime procrastination: introducing a new area of procrastination. Frontiers in Psychology, 5, 611. https://doi.org/10.3389/fpsyg.2014.00611. 复制源：2014作者论文附录（PDF第8页），完整9题；网页实际许可链接为CC BY 3.0。CC BY 3.0（https://creativecommons.org/licenses/by/3.0/），允许署名再分发与翻译改编，须保留原作者、原始论文、许可链接和修改说明。平台由作者公开英文题文独立译为中文并另写反馈，未获作者中文认可或中国人群验证，不继承其他译本/短版的版本或阈值。作者PDF SHA-256：7b60729ff85028c41dc2cceefb677227c2949cc98b8869c7c4784ab6803da8d0。"
+    },
+    "reportQc": {
+      "reviewer": "AI-assisted primary-source and plain-language editorial check; not human expert approval",
+      "reviewedAt": "2026-10-26T04:56:09.986Z",
+      "basis": "2014作者论文附录（PDF第8页），完整9题；网页实际许可链接为CC BY 3.0；年龄与语言证据独立约束，报告不套用常模或临床阈值。"
+    }
+  }
+}

@@ -1,0 +1,89 @@
+import { createRequire } from 'node:module'
+import { readFileSync, writeFileSync } from 'node:fs'
+import { spawnSync } from 'node:child_process'
+import { randomBytes, randomUUID, createHash } from 'node:crypto'
+import assert from 'node:assert/strict'
+const backend='/workspace/eduK12-new-version/server-version/backend'
+const root='/workspace/eduK12-new-version'
+const out=root+'/docs/scale-bps9-intake-20261028/evidence'
+const req=createRequire(backend+'/package.json')
+const {prisma:db}=req(backend+'/src/config/database.ts')
+const {canonicalHash}=req(backend+'/src/modules/assessment-runtime/canonical.ts')
+const {getScaleInstrumentSource}=req(backend+'/src/modules/scale/onboarding/instrument-registry.ts')
+const {scaleSourcePolicyIdentity}=req(backend+'/src/modules/scale/onboarding/source-snapshot.ts')
+const identity={instrumentKey:'bps9_zh_cn_research',instrumentVersion:'1.0.0'}
+const report:any={schemaVersion:1,database:JSON.parse(readFileSync(out+'/database-setup.json','utf8')).database,
+ scope:'Actual existing CLI in fresh local database; one synthetic SYSTEM_ADMIN; no production or HTTP service',
+ selectedEntryProducts:['SURVEY'],commands:[],assertions:[],snapshots:{},failures:[],entryObservations:[],notRun:['Full scoring/report/golden suites','HTTP/browser participant flow','Real School/Teacher organizations, distribution or capabilities','Production'],
+ limits:['Each new CLI process performs its existing selected immutable contract validation on cold start; no separate golden replay suite is invoked.','PUBLIC database status/catalog discovery is not participant assignment or four-entry launch.']}
+const sha=(s:Buffer|string)=>createHash('sha256').update(s).digest('hex')
+const save=()=>writeFileSync(out+'/isolation-report.json',JSON.stringify(report,null,2)+'\n')
+const check=(name:string,condition:any,detail:any={})=>{report.assertions.push({name,passed:Boolean(condition),...detail});save();assert.ok(condition,name)}
+async function snapshot(name:string){
+ const users=await db.user.findMany({select:{id:true,username:true,role:true,platformRole:true,accountDomain:true,isActive:true,isFrozen:true},orderBy:{id:'asc'}})
+ const scales=await db.scale.findMany({select:{id:true,code:true,instrumentVersion:true,instrumentClass:true,status:true,visibility:true,definitionHash:true,definition:true,instruction:true,measurementReleaseId:true,creatorId:true,updatedAt:true},orderBy:{id:'asc'}})
+ for(const s of scales){s.definitionCanonicalHash=canonicalHash(s.definition);delete s.definition}
+ const deployments=await db.$queryRawUnsafe('SELECT * FROM scale_deployment_policies ORDER BY id')
+ const axes=await db.$queryRawUnsafe('SELECT * FROM scale_axis_snapshots ORDER BY scale_id,axis_hash')
+ for(const a of axes){const s=a.source_snapshot;a.observedSourceCanonicalHash=canonicalHash(s);a.frozenIdentity=s.identity;a.frozenReleaseStatus=s.executable.releaseStatus;a.frozenInstruction=s.instruction;a.frozenManual={catalogStatus:s.catalog.catalogStatus,maturity:s.catalog.scientificMaturity,localization:s.localization,scientificReview:s.scientificReview??null,license:s.executable.definition.license};delete a.source_snapshot}
+ const audits=await db.scalePublicationAudit.findMany({orderBy:{id:'asc'}})
+ const releases=await db.measurementContentRelease.findMany({select:{id:true,layer:true,family:true,key:true,version:true,contentHash:true,scope:true,provenance:true},orderBy:{id:'asc'}})
+ const policies=await db.$queryRawUnsafe('SELECT product,resource_key,fingerprint,decision,paused,reason,reviewed_by,version FROM survey_tool_policies ORDER BY product,resource_key,fingerprint')
+ const counts:any={}
+ for(const table of ['assessment_reference_sets','measurement_content_release_events','content_capability_grants','material_grants','survey_tool_grants','scale_library_entries','scale_library_use_grants','education_assessment_deliveries','assessments']){const rows=await db.$queryRawUnsafe('SELECT count(*)::int AS count FROM '+table);counts[table]=rows[0].count}
+ const value=JSON.parse(JSON.stringify({users,scales,deployments,axes,audits,releases,policies,counts},(_k,v)=>typeof v==='bigint'?v.toString():v))
+ report.snapshots[name]=value;save();return value
+}
+async function cli(label:string,script:string,args:string[],expected:number,readonly=false){
+ const before=await snapshot(label+'-before'),start=new Date().toISOString()
+ const argv=['node_modules/tsx/dist/cli.mjs','src/scripts/'+script,...args]
+ const result=spawnSync(process.execPath,argv,{cwd:backend,env:{...process.env,NODE_ENV:'test'},encoding:'utf8',timeout:60000,maxBuffer:8*1024*1024})
+ const logs:any={}
+ for(const [kind,text] of [['stdout',result.stdout??''],['stderr',result.stderr??'']]){writeFileSync(out+'/'+label+'.'+kind+'.log',text);logs[kind]={path:label+'.'+kind+'.log',bytes:Buffer.byteLength(text),sha256:sha(text)}}
+ const after=await snapshot(label+'-after')
+ const row={label,cwd:backend,argv:[process.execPath,...argv],startedAt:start,endedAt:new Date().toISOString(),processExitCode:result.status,signal:result.signal,error:result.error?.message??null,expectedExitCode:expected,readOnly:readonly,beforeAfterIdentical:canonicalHash(before)===canonicalHash(after),logs}
+ report.commands.push(row);save();check(label+' actual exit',result.status===expected,{actual:result.status,expected})
+ if(readonly)check(label+' made no tracked business writes',row.beforeAfterIdentical)
+ return {data:result.status===0?JSON.parse(result.stdout):null,before,after,row}
+}
+async function main(){
+ const u=new URL(process.env.DATABASE_URL!);check('database target exact new loopback isolation',u.hostname==='127.0.0.1'&&u.port==='55432'&&u.pathname==='/'+report.database)
+ const [meta]=await db.$queryRawUnsafe('SELECT current_database() AS database,current_user AS role,version() AS version');report.server=meta;save();check('connected database exact identity',meta.database===report.database)
+ const blank=await snapshot('fresh-empty');check('no prior users/scales/deployments/axes/releases',!blank.users.length&&!blank.scales.length&&!blank.deployments.length&&!blank.axes.length&&!blank.releases.length)
+ const actor=await db.user.create({data:{id:randomUUID(),username:'synthetic-bps9-'+randomUUID(),passwordHash:await req('bcryptjs').hash(randomBytes(32).toString('hex'),4),role:'ADMIN',platformRole:'SYSTEM_ADMIN',accountDomain:'TRAINING',isActive:true,isFrozen:false,mustChangePassword:false}})
+ report.actor={id:actor.id,username:actor.username,accountDomain:actor.accountDomain,platformRole:actor.platformRole,synthetic:true,password:'random one-use secret discarded; hash not retained in evidence'};save()
+ const source=getScaleInstrumentSource(identity.instrumentKey,identity.instrumentVersion);report.sourcePolicyIdentity=scaleSourcePolicyIdentity(source);save()
+ const base=['--instrument-key',identity.instrumentKey,'--instrument-version',identity.instrumentVersion,'--locale','zh-CN','--territory','CN','--localization-version','1.0.0','--revision','1','--modes','STANDALONE','--actor-user-id',actor.id]
+ const pub:any={...identity,actorUserId:actor.id,visibility:'PUBLIC',allowedProducts:['SURVEY']}
+ const pubpath=out+'/publication-preview-input.json';writeFileSync(pubpath,JSON.stringify(pub,null,2)+'\n')
+ const missing=await cli('publication-uninstalled-preview','publish-scale-instrument.ts',['--input',pubpath],2,true)
+ const miss=JSON.parse(readFileSync(out+'/publication-uninstalled-preview.stdout.log','utf8'));check('publication refuses uninstalled package rather than manual review',miss.blockers.includes('SCALE_NOT_INSTALLED')&&miss.blockers.includes('DEPLOYMENT_BINDING_MISSING')&&!miss.blockers.includes('EXECUTABLE_NOT_PUBLISHED'))
+ const preview=await cli('install-preview','install-scale-instrument.ts',base,0,true)
+ check('preview admits technically released exact source',preview.data.allowActivation&&preview.data.createScale&&preview.data.packageReleaseStatus==='PUBLISHED'&&!preview.data.blockers.length)
+ check('manual unknowns remain truthful at installation',preview.data.manualReview.localization.includes('LOCALIZATION_REVIEW_PENDING')&&preview.data.manualReview.scientificReview===null)
+ const installed=await cli('install-first-apply','install-scale-instrument.ts',[...base,'--apply'],0)
+ check('first installation creates DRAFT HIDDEN with one active binding',installed.after.scales.length===1&&installed.after.scales[0].status==='DRAFT'&&installed.after.scales[0].visibility==='HIDDEN'&&installed.after.deployments.length===1&&installed.after.deployments[0].status==='ACTIVE')
+ check('first installation freezes actual versions and source',installed.after.axes.length===1&&installed.after.axes[0].frozenReleaseStatus==='PUBLISHED'&&installed.after.axes[0].frozenInstruction.version==='1.0.0'&&installed.after.axes[0].source_hash===installed.after.axes[0].observedSourceCanonicalHash)
+ check('installation is not public publication',!installed.after.audits.length&&!installed.after.releases.length&&!installed.after.policies.length)
+ const repeated=await cli('install-repeat-apply','install-scale-instrument.ts',[...base,'--apply'],0)
+ check('repeat installation preserves all tracked rows and frozen source',canonicalHash(repeated.before)===canonicalHash(repeated.after))
+ const plan=await cli('publication-preview','publish-scale-instrument.ts',['--input',pubpath],0,true)
+ check('publication plan binds PUBLIC and exact SURVEY selection',plan.data.allowPublish&&plan.data.proof.visibility==='PUBLIC'&&JSON.stringify(plan.data.proof.allowedProducts)==='["SURVEY"]'&&plan.data.proof.previousStatus==='DRAFT'&&plan.data.proof.previousVisibility==='HIDDEN')
+ check('publication retains pending manual reviews',plan.data.proof.manualReview.localization.includes('LOCALIZATION_REVIEW_PENDING')&&source.catalog.catalogStatus==='CANDIDATE'&&source.catalog.scientificMaturity==='PILOT'&&source.scientificReview===undefined)
+ const applypath=out+'/publication-apply-input.json';writeFileSync(applypath,JSON.stringify({...pub,expectedProofHash:plan.data.proofHash},null,2)+'\n')
+ const published=await cli('publication-apply','publish-scale-instrument.ts',['--input',applypath,'--apply'],0)
+ check('PUBLIC publication links release and actor proof audit',published.after.scales[0].status==='PUBLISHED'&&published.after.scales[0].visibility==='PUBLIC'&&Boolean(published.after.scales[0].measurementReleaseId)&&published.after.releases.length===1&&published.after.audits.length===1&&published.after.audits[0].actorUserId===actor.id&&published.after.audits[0].proofHash===plan.data.proofHash)
+ check('PUBLIC publication keeps exact frozen source unchanged',canonicalHash(published.before.axes)===canonicalHash(published.after.axes))
+ check('only SURVEY policy approved; no real user grants',published.after.policies.length===1&&published.after.policies[0].product==='SURVEY'&&published.after.policies[0].decision==='APPROVED'&&published.after.counts.content_capability_grants===0&&published.after.counts.material_grants===0&&published.after.counts.survey_tool_grants===0)
+ const {assertSurveyToolPolicy}=req(backend+'/src/modules/survey/tool-policy.ts')
+ await db.$transaction((tx:any)=>assertSurveyToolPolicy(tx,report.sourcePolicyIdentity,true));report.entryObservations.push({product:'SURVEY',result:'ENTRY_POLICY_ALLOWED',scope:'actual transaction-scoped policy guard, not end-user grant or participant flow'});save()
+ const {listCatalogSources}=req(backend+'/src/modules/survey/catalog.sources.ts')
+ const catalog=await listCatalogSources({actorUserId:actor.id,kind:'SCALE',query:identity.instrumentKey,limit:1,includeGoverned:false},db);report.surveyCatalog=catalog;save();check('actual Survey catalog consumes exact published source',catalog.list.length===1&&catalog.list[0].ref.sourceVersion==='1.0.0'&&catalog.list[0].available===true)
+ const {assertTrainingScaleCollectionAllowed}=req(backend+'/src/modules/scale/scale-collection-guard.ts')
+ let refused=false
+ try{await db.$transaction((tx:any)=>assertTrainingScaleCollectionAllowed(tx,[published.after.scales[0].id]))}catch(e:any){refused=true;report.entryObservations.push({product:'TRAINING',result:'REFUSED',name:e.name,message:e.message,scope:'actual Training new-entry guard; not chosen in allowedProducts'})}save();check('unselected Training entry is refused',refused)
+ report.entryObservations.push({product:'SCHOOL',result:'NOT_EXECUTED',scope:'No organization adapter/distribution/real-user grant created. Existing CLI supports only TRAINING/SURVEY; prior ARS refusal evidence has unchanged shared backend inputs, not relabelled as BPS execution.'},{product:'TEACHER',result:'NOT_EXECUTED',scope:'Same boundary; no claim of four-entry availability.'});save()
+ const final=await snapshot('final');check('entry reads/refusals add no tracked business rows',canonicalHash(final)===canonicalHash(published.after))
+ report.completed=true;save();console.log(JSON.stringify({completed:true,database:report.database,commands:report.commands.length,assertions:report.assertions.length,states:{scale:final.scales[0].status,visibility:final.scales[0].visibility,deployment:final.deployments[0].status,audits:final.audits.length,entries:report.entryObservations}},null,2))
+}
+main().catch((e:any)=>{report.failures.push({name:e.name,message:e.message,stack:e.stack});report.completed=false;save();console.error(e.message);process.exitCode=1}).finally(()=>db.$disconnect())
