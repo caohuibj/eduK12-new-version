@@ -1,3 +1,5 @@
+import {readEducationStandardSources} from '../education-tools/public-source.standard'
+import {freezeExactStandardScaleRuntime} from './training-standard-combination'
 import {readVerifiedEducationStart,readVerifiedCompositionStart,bindVerifiedEducationAttempt,type VerifiedEducationStart,type VerifiedEducationAttempt} from '../assessment-run/education-start-context'
 import {resolveEducationAssessmentSituationalItems} from '../education-tools/assessment-resource.source'
 import { emptyOptionalReportRelations, OPTIONAL_REPORT_RELATION_COUNTS } from './composite-report-read-plan'
@@ -2844,7 +2846,9 @@ const createAttempt = async (
   }
   const variantEnabled = composite.trainingVariantFrozen != null || composite.trainingVariantDraft != null || composite.trainingVariantDigest != null
   const hasStandardCombinations=composite.items.some((item:any)=>item.standardCombinationSource!=null)
-  const prepared: PreparedVariantRuntimes | undefined = (variantEnabled||flowEnabled||hasStandardCombinations) ? { scales:new Map(), cognitive:new Map(), assignments:new Map() } : undefined
+  const educationStandardUnits=educationComposition?(composite.trainingContentSnapshot as import('./training-content-binding').TrainingContentSnapshot).units.filter(unit=>unit.source.educationStandard):[]
+  const educationStandards=await readEducationStandardSources(db as Prisma.TransactionClient,educationStandardUnits.map(unit=>({versionId:unit.source.educationStandard!.releaseId,contentHash:unit.source.educationStandard!.combinationHash})),'SEALED_START')
+  const prepared: PreparedVariantRuntimes | undefined = (variantEnabled||flowEnabled||hasStandardCombinations||educationStandardUnits.length>0) ? { scales:new Map(), cognitive:new Map(), assignments:new Map() } : undefined
   if (variantEnabled && relationalIdentity) throw compositeBadRequest('概率分卷不支持关系测评投放')
   if (variantEnabled || flowEnabled) {
     if(variantEnabled)await assertTrainingVariantAuthoringScope(db as any, composite)
@@ -2871,7 +2875,13 @@ const createAttempt = async (
   if (prepared) {
     try {
     for (const item of composite.items) {
-      if (item.type === 'SCALE'&&item.standardCombinationSource!=null)prepared.scales.set(item.id,await freezeTrainingStandardScaleRuntime(db as Prisma.TransactionClient,
+      const educationUnit=educationStandardUnits.find(unit=>unit.itemId===item.id)
+      if(educationUnit){
+        const source=educationStandards.get(educationUnit.source.educationStandard!.releaseId)
+        if(!source||source.scale.id!==item.scaleId||canonicalHash(source.descriptor)!==canonicalHash(educationUnit.source.educationStandard))throw compositeForbidden('教育标准量表固定版本不一致')
+        prepared.scales.set(item.id,await freezeExactStandardScaleRuntime(db as Prisma.TransactionClient,source.row.snapshot))
+      }
+      else if (item.type === 'SCALE'&&item.standardCombinationSource!=null)prepared.scales.set(item.id,await freezeTrainingStandardScaleRuntime(db as Prisma.TransactionClient,
         await verifyStoredTrainingStandardItem(db as Prisma.TransactionClient,composite,item,'COLLECTION')))
       else if (item.type === 'SCALE') prepared.scales.set(item.id, await freezeScaleRuntimeAtAttemptStart(db, {
         instrumentKey:item.scale.code,instrumentVersion:item.scale.instrumentVersion,

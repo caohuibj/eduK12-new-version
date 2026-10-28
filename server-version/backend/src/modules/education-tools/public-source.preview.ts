@@ -45,3 +45,42 @@ export async function readEducationPublicFormPreviewAsset(c:PrivateToolContext,v
   return materialSchema.shape.asset.parse(row.reference)
  },{isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted})
 }
+
+/** Fixed Standard display projection: items/options/instruction only. P/R and
+ * scorer inputs remain internal; preview is never a freeze or use receipt. */
+export async function readEducationPublicStandardPreview(c:PrivateToolContext,versionId:string,contentHash:string){
+ return prisma.$transaction(async tx=>{
+  await authorizePrivateTool(tx,c)
+  const key=educationPublicSourceKey({kind:'STANDARD_SCALE',id:versionId,hash:contentHash})
+  if(!(await readEducationPublicUse(tx,c,[key])).has(key))privateToolFail('PUBLIC_SOURCE_USE_REQUIRED',403)
+  const [row]=await tx.$queryRaw<Array<{title:string;instruction:string|null;definition:unknown}>>(Prisma.sql`
+   SELECT s.snapshot->>'title' AS title,s.snapshot#>>'{parts,CONTENT,reference,metadata,instruction,text}' AS instruction,
+    jsonb_build_object('items',(SELECT jsonb_agg(jsonb_strip_nulls(jsonb_build_object('itemCode',q->>'itemCode','content',q->>'content',
+      'type',q->>'type','required',q->'required','sortOrder',q->'sortOrder','responseSetKey',q->>'responseSetKey',
+      'images',q->'images','materials',q->'materials','video',q->'video')) ORDER BY ordinal)
+     FROM jsonb_array_elements(s.snapshot#>'{definition,items}') WITH ORDINALITY questions(q,ordinal)),
+     'responseSets',(SELECT jsonb_agg(jsonb_build_object('key',rs->>'key','options',(SELECT jsonb_agg(jsonb_build_object('value',opt->'value','label',opt->>'label') ORDER BY ordinal)
+       FROM jsonb_array_elements(rs->'options') WITH ORDINALITY options(opt,ordinal)))) FROM jsonb_array_elements(s.snapshot#>'{definition,responseSets}') rs)) AS definition
+   FROM survey_standard_releases s JOIN measurement_content_releases m ON m.id=s.measurement_release->>'releaseId'
+   WHERE s.id=${versionId} AND s.combination_hash=${contentHash} AND s.state='ONLINE' AND m.status='PUBLISHED'
+    AND m.content_hash=s.measurement_release->>'contentHash' AND s.snapshot#>'{parts,CONTENT,reference,metadata,applicability,respondentTypes}' ? 'SELF'`)
+  if(!row)privateToolFail('PUBLIC_STANDARD_SOURCE_UNAVAILABLE',404)
+  return {id:versionId,kind:'SCALE' as const,title:row.title,contentHash,definition:row.definition,
+   ...(row.instruction?{instruction:row.instruction}:{}),previewOnly:true,canEditOriginal:false}
+ },{isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted})
+}
+
+export async function readEducationPublicStandardPreviewAsset(c:PrivateToolContext,versionId:string,contentHash:string,assetId:string){
+ return prisma.$transaction(async tx=>{
+  await authorizePrivateTool(tx,c)
+  const key=educationPublicSourceKey({kind:'STANDARD_SCALE',id:versionId,hash:contentHash})
+  if(!(await readEducationPublicUse(tx,c,[key])).has(key))privateToolFail('PUBLIC_SOURCE_USE_REQUIRED',403)
+  const [row]=await tx.$queryRaw<Array<{reference:unknown}>>(Prisma.sql`SELECT ref AS reference FROM survey_standard_releases s
+   JOIN measurement_content_releases m ON m.id=s.measurement_release->>'releaseId'
+   CROSS JOIN LATERAL jsonb_array_elements(m.asset_refs) ref
+   WHERE s.id=${versionId} AND s.combination_hash=${contentHash} AND s.state='ONLINE' AND m.status='PUBLISHED'
+    AND m.content_hash=s.measurement_release->>'contentHash' AND ref->>'assetId'=${assetId} LIMIT 1`)
+  if(!row)privateToolFail('PUBLIC_STANDARD_ASSET_NOT_FOUND',404)
+  return materialSchema.shape.asset.parse(row.reference)
+ },{isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted})
+}

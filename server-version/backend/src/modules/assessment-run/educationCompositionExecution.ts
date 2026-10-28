@@ -1,3 +1,4 @@
+import {readSealedCompositionContent} from '../education-tools/private-tool.composition-content'
 import {Prisma} from '@prisma/client'
 import {z} from 'zod'
 import {canonicalHash} from '../assessment-runtime/canonical'
@@ -14,7 +15,7 @@ import type {RunResourcePolicy} from './resourceAuthority'
 
 type Tx=Prisma.TransactionClient
 const manifestSchema=z.array(z.object({blockId:z.string().guid(),kind:z.enum(['SCALE','FORM']),versionId:z.string().guid(),
- sourceProvider:z.enum(['PRIVATE_VERSION','PUBLIC_FORM']),contentHash:z.string(),itemIds:z.array(z.string().guid()),sectionIds:z.array(z.string().guid()),title:z.string()}).strict()).min(1).max(50)
+ sourceProvider:z.enum(['PRIVATE_VERSION','PUBLIC_FORM','STANDARD_SCALE']),contentHash:z.string(),itemIds:z.array(z.string().guid()),sectionIds:z.array(z.string().guid()),title:z.string()}).strict()).min(1).max(50)
 const unitsSchema=z.array(z.object({itemId:z.string(),scaleId:z.string(),versionId:z.string().guid(),contentHash:z.string(),
  releaseId:z.string().guid(),definitionHash:z.string(),measurementHash:z.string()}).strict()).max(50)
 
@@ -33,12 +34,13 @@ export async function readFrozenCompositionIdentity(tx:Tx,input:{policy:RunResou
   privateToolFail('PRIVATE_COMPOSITION_EXECUTION_INVALID')
  const [row]=await tx.$queryRaw<Array<{title:string;manifest:unknown;units:unknown}>>(Prisma.sql`SELECT c.name AS title,
   (SELECT jsonb_agg(jsonb_build_object('blockId',b->>'blockId','kind',b->>'kind','versionId',b->>'versionId','contentHash',b->>'contentHash','sourceProvider',b->>'sourceProvider',
-   'itemIds',b->'itemIds','sectionIds',b->'sectionIds','title',COALESCE(v.title,g.title)) ORDER BY ordinal)
+   'itemIds',b->'itemIds','sectionIds',b->'sectionIds','title',COALESCE(v.title,g.title,std.snapshot->>'title')) ORDER BY ordinal)
    FROM jsonb_array_elements(c.training_content_snapshot#>'{educationBinding,manifest}') WITH ORDINALITY blocks(b,ordinal)
    LEFT JOIN education_private_tool_versions v ON v.id=b->>'versionId' AND b->>'sourceProvider'='PRIVATE_VERSION'
-   LEFT JOIN survey_governed_tools g ON g.id=b->>'versionId' AND g.family='FORM' AND g.snapshot_hash=b->>'contentHash' AND b->>'sourceProvider'='PUBLIC_FORM') AS manifest,
-  (SELECT COALESCE(jsonb_agg(jsonb_build_object('itemId',u->>'itemId','scaleId',s.id,'versionId',u#>>'{source,privateVersionId}',
-   'contentHash',u#>>'{measurement,contentHash}','releaseId',u#>>'{measurement,releaseId}','definitionHash',s.definition_hash,
+   LEFT JOIN survey_governed_tools g ON g.id=b->>'versionId' AND g.family='FORM' AND g.snapshot_hash=b->>'contentHash' AND b->>'sourceProvider'='PUBLIC_FORM'
+   LEFT JOIN survey_standard_releases std ON std.id=b->>'versionId' AND std.combination_hash=b->>'contentHash' AND b->>'sourceProvider'='STANDARD_SCALE') AS manifest,
+  (SELECT COALESCE(jsonb_agg(jsonb_build_object('itemId',u->>'itemId','scaleId',s.id,'versionId',COALESCE(u#>>'{source,privateVersionId}',u#>>'{source,educationStandard,releaseId}'),
+   'contentHash',u#>>'{measurement,contentHash}','releaseId',u#>>'{measurement,releaseId}','definitionHash',COALESCE(u#>>'{source,educationStandard,nativeDefinitionHash}',s.definition_hash),
    'measurementHash',u#>>'{measurement,measurementHash}')),'[]'::jsonb)
    FROM jsonb_array_elements(c.training_content_snapshot->'units') u JOIN scales s ON s.id=u#>>'{source,id}') AS units
   FROM composite_assessments c WHERE c.id=${policy.runtimeLaunchTarget.ref} AND c.creation_key=${input.key}
@@ -67,7 +69,7 @@ export async function assertCompositionCollection(tx:Tx,identity:FrozenCompositi
    OR EXISTS(SELECT 1 FROM scales WHERE id=ANY(${scales}::text[]) AND status<>'PUBLISHED')) AS unavailable`)
  if(row.stopped||purpose==='NEW_START'&&row.unavailable)privateToolFail('PRIVATE_COMPOSITION_COLLECTION_UNAVAILABLE',403)
  if(purpose==='NEW_START'){
-  const sources=identity.manifest.filter(block=>block.sourceProvider==='PUBLIC_FORM').map(block=>({kind:'FORM' as const,id:block.versionId,hash:block.contentHash}))
+  const sources=identity.manifest.filter(block=>block.sourceProvider!=='PRIVATE_VERSION').map(block=>({kind:block.sourceProvider==='PUBLIC_FORM'?'FORM' as const:'STANDARD_SCALE' as const,id:block.versionId,hash:block.contentHash}))
   const keys=[...new Set(sources.map(educationPublicSourceKey))]
   if(keys.length){
    const headers=await readEducationPublicSourceHeaders(tx,sources,lock),allowed=await readEducationPublicUse(tx,c,keys,lock)
@@ -124,12 +126,5 @@ export async function admitCompositionStart(tx:Tx,input:{executionId:string;comp
 /** FINAL uses a previously DB-bound immutable attempt binding, not a caller
  * receipt. One header assertion can be reused for all its measurement units. */
 export async function assertSealedCompositionAnchor(tx:Tx,raw:EducationCompositionRuntimeAnchor,compositeId:string,ownerId:string){
- const anchor=educationCompositionRuntimeAnchorSchema.parse(raw),origin=anchor.origin
- if(origin.ownerUserId!==ownerId)privateToolFail('PRIVATE_COMPOSITION_IDENTITY_INVALID')
- const [row]=await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT id FROM composite_assessments
-  WHERE id=${compositeId} AND created_by=${ownerId} AND creation_key=${educationCompositionKey(origin)}
-   AND creation_hash=${canonicalHash(origin)} AND training_content_snapshot_hash=${anchor.manifestHash}
-   AND status='PUBLISHED' AND product_kind='ORGANIZATION_RESOURCE' AND NOT public_enabled AND NOT copyable`)
- if(!row)privateToolFail('PRIVATE_COMPOSITION_IDENTITY_INVALID')
- return anchor
+ return (await readSealedCompositionContent(tx,{compositeId,ownerId,anchor:educationCompositionRuntimeAnchorSchema.parse(raw)})).anchor
 }

@@ -10,7 +10,7 @@ import type {ExactStandardCombination} from './standard-combination-source'
 
 type Measurement=Extract<StoredRelease,{layer:'MEASUREMENT'}>
 type Pointer={releaseId:string;contentHash:string}
-export function standardCombinationContentInputs(row:ExactStandardCombination,measurement:Measurement){
+export function standardCombinationContentInputs(row:ExactStandardCombination,measurement:Measurement,audience:'teacher'|'student'|'parent'='teacher'){
  const t=row.snapshot,pointer={releaseId:measurement.releaseId,contentHash:measurement.contentHash}
  const base={family:'SCALE' as const,scope:measurement.scope,sourceReleaseId:null,assetRefs:[]}
  const provenance={standardCombinationId:row.id,combinationHash:row.combination_hash,parametersAxisHash:t.parts.PARAMETERS.hash,reportAxisHash:t.parts.REPORT.hash}
@@ -22,17 +22,17 @@ export function standardCombinationContentInputs(row:ExactStandardCombination,me
     evidence:{sourceVersion:set.referenceVersion,parameterVersion:t.parts.PARAMETERS.version}}}
   return {input,entries,sourceVersion:set.referenceVersion}
  })
- const report:ReleaseInput|null=t.template===null?null:{...base,layer:'REPORT',key:'standard-combination-report:'+row.id,
+ const report:ReleaseInput|null=t.template===null?null:{...base,layer:'REPORT',key:'standard-combination-report:'+row.id+(audience==='teacher'?'':':'+audience),
   version:canonicalHash({parameters:t.parts.PARAMETERS.hash,report:t.parts.REPORT.hash}),provenance,
-  content:{projectionVersion:1,measurements:[pointer],metricKeys:t.definition.scoring.scores.map(s=>s.key),audience:'teacher',
+  content:{projectionVersion:1,measurements:[pointer],metricKeys:t.definition.scoring.scores.map(s=>s.key),audience,
    language:t.definition.versionAxes?.locale??'und',generatorVersion:DECLARATIVE_REPORT_GENERATOR,template:t.template}}
  return {references,report}
 }
 
 /** Mechanical derivation from the locked approved source, once in the shared
  * immutable release store. No new approval, new authorship or private copy. */
-export async function materializeStandardCombinationContent(tx:Prisma.TransactionClient,row:ExactStandardCombination,measurement:Measurement,actorId:string){
- const inputs=standardCombinationContentInputs(row,measurement),releases=new Map<string,StoredRelease>()
+export async function materializeStandardCombinationContent(tx:Prisma.TransactionClient,row:ExactStandardCombination,measurement:Measurement,actorId:string,audience:'teacher'|'student'|'parent'='teacher'){
+ const inputs=standardCombinationContentInputs(row,measurement,audience),releases=new Map<string,StoredRelease>()
  const referencePolicy:FrozenReferencePolicy={policyVersion:'EXACT_POPULATION_PRIORITY_V1',measurementReleaseId:measurement.releaseId,choices:[]}
  for(const source of inputs.references){
   const release=await publishContentRelease(tx,source.input,actorId)

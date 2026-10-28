@@ -1,3 +1,5 @@
+import {readOrdinaryDeclaredFeedback,type OrdinaryStoredContent} from './education-ordinary-declared-feedback'
+import {loadFrozenActiveSlotSet} from '../assessment-runtime/slot-set'
 import {Prisma} from '@prisma/client'
 import {prisma} from '../../config/database'
 import {canonicalHash} from '../assessment-runtime/canonical'
@@ -11,13 +13,17 @@ import {reportingFail} from './types'
 function hidden():never{return reportingFail('REPORT_NOT_FOUND','reporting resource not found',404)}
 type Input={executionId:string;actorUserId:string}
 type ScopedInput=Input&{entry:'SCHOOL'|'TEACHER'}
-async function readOwn(tx:Prisma.TransactionClient,input:ScopedInput){
+async function readOwn(tx:Prisma.TransactionClient,input:ScopedInput,loadContent=false){
  const population=input.entry==='SCHOOL'?'STUDENT':'TEACHER'
  const [row]=await tx.$queryRaw<Array<{organizationId:string;key:string;version:string;policy:RunResourcePolicy;policyHash:string;status:string;
-  parentId:string|null;parentStatus:string|null;attemptEpoch:number|null;contextSnapshotHash:string|null;frozenSlots:string|null;frozenSlotsHash:string|null}>>(Prisma.sql`
+  contentState:OrdinaryStoredContent|null;parentId:string|null;parentStatus:string|null;attemptEpoch:number|null;contextSnapshotHash:string|null;frozenSlots:string|null;frozenSlotsHash:string|null}>>(Prisma.sql`
   SELECT e.organization_id AS "organizationId",t.resource_key AS key,t.resource_version AS version,t.frozen_resource_policy AS policy,
    t.resource_policy_hash AS "policyHash",e.status,p.id AS "parentId",p.status AS "parentStatus",p.attempt_epoch AS "attemptEpoch",
-   p.context_snapshot_hash AS "contextSnapshotHash",p.frozen_active_slot_set_encrypted AS "frozenSlots",p.frozen_active_slot_set_hash AS "frozenSlotsHash"
+   p.context_snapshot_hash AS "contextSnapshotHash",p.frozen_active_slot_set_encrypted AS "frozenSlots",p.frozen_active_slot_set_hash AS "frozenSlotsHash",
+   ${loadContent?Prisma.sql`jsonb_build_object('trainingContentBinding',p.training_content_binding,'trainingContentBindingHash',p.training_content_binding_hash,
+    'trainingReferenceBinding',p.training_reference_binding,'trainingReferenceBindingHash',p.training_reference_binding_hash,
+    'trainingContentInterpretationEncrypted',p.training_content_interpretation_encrypted,'trainingContentInterpretationHash',p.training_content_interpretation_hash,
+    'aggregateInputHash',p.aggregate_input_hash)`:Prisma.sql`NULL::jsonb`} AS "contentState"
   FROM assessment_run_executions e JOIN assessment_runs r ON r.id=e.run_id AND r.organization_id=e.organization_id AND r.status IN ('PUBLISHED','CLOSED')
   JOIN assessment_run_tracks t ON t.id=e.track_id AND t.run_id=e.run_id AND t.organization_id=e.organization_id
    AND t.resource_family='BUNDLE' AND t.resource_key LIKE ${'education-composition:'+input.entry+':%'}
@@ -57,17 +63,18 @@ export const readSchoolOrdinaryFeedback=(input:Input)=>readOrdinaryFeedback({...
 async function readOrdinaryFeedback(input:ScopedInput){
  return prisma.$transaction(async tx=>{
   await tx.$executeRaw`SET LOCAL join_collapse_limit = 1`
-  const own=await readOwn(tx,input)
+  const own=await readOwn(tx,input,true)
   if(!own)hidden()
   const identity=await readFrozenCompositionIdentity(tx,own)
   if(identity.origin.entry!==input.entry)hidden()
   if(own.status!=='COMPLETED')return {schemaVersion:1 as const,kind:'EDUCATION_FEEDBACK' as const,mode:'COMPOSITION' as const,state:'IN_PROGRESS' as const,title:identity.title,units:[]}
   if(!own.parentId||own.parentStatus!=='COMPLETED'||!own.attemptEpoch)hidden()
-  const sources:NativeEducationFeedbackSource[]=[]
+  const sources:NativeEducationFeedbackSource[]=[],declaredBlocks=new Set<string>()
   for(const block of identity.manifest.filter(block=>block.kind==='SCALE')){
    const ceiling=identity.binding.unitReports.find(unit=>unit.blockId===block.blockId)
    if(!ceiling||ceiling.versionId!==block.versionId||ceiling.contentHash!==block.contentHash||block.itemIds.length!==1)hidden()
    if(ceiling.respondent.mode!=='INDIVIDUAL_SUMMARY')continue
+   if(block.sourceProvider==='STANDARD_SCALE'){declaredBlocks.add(block.blockId);continue}
    const unit=identity.units.find(unit=>unit.itemId===block.itemIds[0]&&unit.versionId===block.versionId)
    if(!unit)hidden()
    const none={mode:'NONE' as const,metricKeys:[],longitudinalMetricKeys:[]}
@@ -76,12 +83,19 @@ async function readOrdinaryFeedback(input:ScopedInput){
    sources.push({itemId:unit.itemId,scaleId:unit.scaleId,title:block.title,sourceDefinitionHash:unit.definitionHash,
     resultDisclosure:contract,privateVersion:{versionId:block.versionId,contentHash:block.contentHash}})
   }
+  const slots=(sources.length||declaredBlocks.size)&&own.frozenSlots?await loadFrozenActiveSlotSet(own.frozenSlots,tx):undefined
+  if((sources.length||declaredBlocks.size)&&(!slots||slots.snapshotHash!==own.frozenSlotsHash||slots.attemptEpoch!==own.attemptEpoch))hidden()
+  const declared=declaredBlocks.size?await readOrdinaryDeclaredFeedback(tx,{identity,parent:{...own.contentState!,id:own.parentId!,attemptEpoch:own.attemptEpoch!,contextSnapshotHash:own.contextSnapshotHash},slots:slots!,blockIds:declaredBlocks}):new Map()
   const reports=await readNativeEducationScaleFeedback(tx,{actorUserId:input.actorUserId,parent:{id:own.parentId!,status:own.parentStatus!,
    userId:input.actorUserId,subjectUserId:input.actorUserId,respondentUserId:input.actorUserId,attemptEpoch:own.attemptEpoch!,
-   contextSnapshotHash:own.contextSnapshotHash,frozenActiveSlotSetEncrypted:own.frozenSlots,frozenActiveSlotSetHash:own.frozenSlotsHash},sources})
+   contextSnapshotHash:own.contextSnapshotHash,frozenActiveSlotSetEncrypted:own.frozenSlots,frozenActiveSlotSetHash:own.frozenSlotsHash},sources,slotSet:slots})
   const units=identity.manifest.map(block=>{
    const base={blockId:block.blockId,kind:block.kind,title:block.title}
    if(block.kind==='FORM')return {...base,state:'COMPLETION_ONLY' as const}
+   if(block.sourceProvider==='STANDARD_SCALE'){
+    const report=declared.get(block.itemIds[0])
+    return report?.status==='READY'&&report.rendered?{...base,state:'READY' as const,declaredReport:report.rendered,...(report.message?{message:report.message}:{})}:{...base,state:'WITHHELD' as const}
+   }
    const report=reports.get(block.itemIds[0])
    return report?.state==='PROJECTED'?{...base,state:'READY' as const,nativeScaleUnits:report.unitReports}:{...base,state:'WITHHELD' as const}
   })

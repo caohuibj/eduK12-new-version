@@ -56,18 +56,8 @@ export async function readCurrentStandardCombination(tx:Prisma.TransactionClient
   if(!row)fail('NOT_CURRENT')
   current(row,input,purpose);hold(row.snapshot,purpose)
   const measurement=await getContentRelease(tx,row.measurement_release!.releaseId,true)
-  const mapping=describeStandardCombination(row,measurement)
-  if(mapping.axisIdentity.status!=='VALID'||!readable(mapping.measurement.status,purpose))fail('IDENTITY_MISMATCH')
+  const mapping=assertExactStandardCombinationFacts(row,measurement,purpose)
   if(!measurement||measurement.layer!=='MEASUREMENT')return fail('MEASUREMENT_REQUIRED')
-  const {report,referencePolicy,source:_,license:__,...content}=row.snapshot.definition
-  if(canonicalHash(content)!==row.snapshot.parts.CONTENT.hash)fail('CONTENT_SNAPSHOT_MISMATCH')
-  const p=row.snapshot.parts.PARAMETERS.payload as {referencePolicy:unknown;references:unknown[]}|null
-  if(canonicalHash(referencePolicy)!==canonicalHash(p?.referencePolicy??{type:'none'})
-    ||canonicalHash(row.snapshot.references)!==canonicalHash(p?.references??[]))fail('PARAMETERS_SNAPSHOT_MISMATCH')
-  if(row.snapshot.parts.REPORT.payload===null){if(row.snapshot.template!==null)fail('REPORT_SNAPSHOT_MISMATCH')}
-  else if(canonicalHash(report)!==row.snapshot.parts.REPORT.hash)fail('REPORT_SNAPSHOT_MISMATCH')
-  const compiled=compileStandardCombinationReport(row.snapshot.title,row.snapshot.definition,row.snapshot.parts.REPORT.payload!==null)
-  if(compiled.blockers.length||canonicalHash(compiled.template)!==canonicalHash(row.snapshot.template))fail('REPORT_TEMPLATE_MISMATCH')
   if(eligible){
     let cache=transactionFacts.get(tx);if(!cache){cache=new Map();transactionFacts.set(tx,cache)}
     if(cache.size<128){
@@ -79,4 +69,22 @@ export async function readCurrentStandardCombination(tx:Prisma.TransactionClient
     }
   }
   return {row,measurement,mapping}
+}
+
+/** Pure exact-source validation shared by bounded family loaders. Authorization,
+ * current source state and emergency admission remain at their consuming layer. */
+export function assertExactStandardCombinationFacts(row:ExactStandardCombination,measurement:StoredRelease|null|undefined,purpose:Purpose='NEW_REFERENCE'){
+  const mapping=describeStandardCombination(row,measurement??null)
+  if(mapping.axisIdentity.status!=='VALID'||!readable(mapping.measurement.status,purpose))fail('IDENTITY_MISMATCH')
+  if(!measurement||measurement.layer!=='MEASUREMENT')return fail('MEASUREMENT_REQUIRED')
+  const {report,referencePolicy,source:_,license:__,...content}=row.snapshot.definition
+  if(canonicalHash(content)!==row.snapshot.parts.CONTENT.hash)fail('CONTENT_SNAPSHOT_MISMATCH')
+  const p=row.snapshot.parts.PARAMETERS.payload as {referencePolicy:unknown;references:unknown[]}|null
+  if(canonicalHash(referencePolicy)!==canonicalHash(p?.referencePolicy??{type:'none'})
+    ||canonicalHash(row.snapshot.references)!==canonicalHash(p?.references??[]))fail('PARAMETERS_SNAPSHOT_MISMATCH')
+  if(row.snapshot.parts.REPORT.payload===null){if(row.snapshot.template!==null)fail('REPORT_SNAPSHOT_MISMATCH')}
+  else if(canonicalHash(report)!==row.snapshot.parts.REPORT.hash)fail('REPORT_SNAPSHOT_MISMATCH')
+  const compiled=compileStandardCombinationReport(row.snapshot.title,row.snapshot.definition,row.snapshot.parts.REPORT.payload!==null)
+  if(compiled.blockers.length||canonicalHash(compiled.template)!==canonicalHash(row.snapshot.template))fail('REPORT_TEMPLATE_MISMATCH')
+  return mapping
 }

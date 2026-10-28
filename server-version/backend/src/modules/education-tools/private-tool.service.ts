@@ -1,3 +1,4 @@
+import {readEducationPublicSourceHeaders,educationPublicRequiredContextKeys} from './public-source.headers'
 import {compilePrivateFormRuntime} from './private-tool.form-runtime-adapter'
 import {EducationPrivateToolError} from './private-tool.contracts'
 import {randomUUID} from 'node:crypto'
@@ -80,18 +81,17 @@ export async function readPrivateTool(c:PrivateToolContext,id:string){
   const ids=[...new Set(definition.blocks.filter(block=>block.source.provider==='PRIVATE_VERSION').map(block=>block.source.versionId))]
   const references=ids.length?await tx.educationPrivateToolVersion.findMany({where:{id:{in:ids},...scope(c),kind:{in:['SCALE','FORM']}},
    select:{id:true,toolId:true,kind:true,title:true,sourceRevision:true,contentHash:true}}):[]
-  const publicSources=definition.blocks.filter(block=>block.source.provider==='PUBLIC_FORM').map(block=>block.source)
-  const publicKey=(source:typeof publicSources[number])=>educationPublicSourceKey({kind:'FORM',id:source.versionId,hash:source.contentHash})
+  const publicSources=definition.blocks.filter(block=>block.source.provider!=='PRIVATE_VERSION').map(block=>block.source)
+  const publicKey=(source:typeof publicSources[number])=>educationPublicSourceKey({kind:source.provider==='PUBLIC_FORM'?'FORM':'STANDARD_SCALE',id:source.versionId,hash:source.contentHash})
   // A mutable draft may contain an as-yet unverified reference. It cannot be
   // used as an oracle for another public source's title/version without U.
   // Keep the owner's draft intact; resolve only currently authorized summaries.
   const allowed=await readEducationPublicUse(tx,c,publicSources.map(publicKey))
   const visibleSources=publicSources.filter(source=>allowed.has(publicKey(source)))
-  const publicReferences=visibleSources.length?await tx.$queryRaw<Array<{id:string;kind:'FORM';title:string;contentHash:string;version:string}>>(Prisma.sql`
-   SELECT id,'FORM' AS kind,title,snapshot_hash AS "contentHash",snapshot#>>'{unit,ref,sourceVersion}' AS version
-   FROM survey_governed_tools WHERE family='FORM' AND (id,snapshot_hash) IN (${Prisma.join(visibleSources.map(source=>Prisma.sql`(${source.versionId},${source.contentHash})`))}) ORDER BY id`):[]
+  const publicHeaders=await readEducationPublicSourceHeaders(tx,visibleSources.map(source=>({kind:source.provider==='PUBLIC_FORM'?'FORM':'STANDARD_SCALE',id:source.versionId,hash:source.contentHash})))
   return {...tool,references:[...references.map(ref=>({...ref,sourceProvider:'PRIVATE_VERSION' as const})),
-   ...publicReferences.map(ref=>({...ref,sourceProvider:'PUBLIC_FORM' as const}))],...boundary}
+   ...[...publicHeaders.values()].map(header=>({id:header.id,kind:header.kind==='FORM'?'FORM' as const:'SCALE' as const,title:header.title,contentHash:header.hash,version:header.versions.content,versions:header.versions,requiredContextKeys:educationPublicRequiredContextKeys(header),referenceContextKeys:header.referenceContextKeys,
+    sourceProvider:header.kind==='FORM'?'PUBLIC_FORM' as const:'STANDARD_SCALE' as const}))],...boundary}
  })
 }
 export async function updatePrivateTool(c:PrivateToolContext,id:string,raw:unknown){

@@ -20,7 +20,7 @@ function hidden():never{return reportingFail('REPORT_NOT_FOUND','reporting resou
  * facts once and share the reader across native projections. NONE units never
  * load/decrypt child results. This helper does no scoring or source rebuilding. */
 export async function readNativeEducationScaleFeedback(tx:Prisma.TransactionClient,input:{actorUserId:string;parent:Parent;
- sources:NativeEducationFeedbackSource[]}){
+ sources:NativeEducationFeedbackSource[];slotSet?:Awaited<ReturnType<typeof loadFrozenActiveSlotSet>>}){
  const {parent}=input,allowed=input.sources.filter(source=>source.resultDisclosure.audiences.RESPONDENT.mode==='INDIVIDUAL_SUMMARY')
  const output=new Map<string,ReturnType<typeof projectEducationScaleIndividualReport>>()
  if(!allowed.length)return output
@@ -30,7 +30,7 @@ export async function readNativeEducationScaleFeedback(tx:Prisma.TransactionClie
  const finals=await tx.assessmentUnitSnapshot.findMany({where:{compositeAttemptId:parent.id,attemptEpoch:parent.attemptEpoch,
   slotKey:{in:allowed.map(source=>compositeItemSlotKey(source.itemId,'SCALE'))},unitType:'SCALE',terminalState:'COMPLETED',payloadKind:'UNIT_RESULT'}})
  if(children.length!==allowed.length||finals.length!==allowed.length||finals.some(row=>!row.canonicalResultEncrypted))hidden()
- const slotSet=await loadFrozenActiveSlotSet(parent.frozenActiveSlotSetEncrypted!,tx)
+ const slotSet=input.slotSet??await loadFrozenActiveSlotSet(parent.frozenActiveSlotSetEncrypted!,tx)
  const reader=await createStoredScaleFactsReader(children,tx)
  const envelopes=await loadStoredCanonicalUnitResults(finals.map(row=>row.canonicalResultEncrypted!),tx,[],reader)
  for(const source of allowed){

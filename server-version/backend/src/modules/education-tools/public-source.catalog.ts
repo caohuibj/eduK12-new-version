@@ -4,7 +4,7 @@ import {prisma} from '../../config/database'
 import {authorizePrivateTool} from './private-tool.access'
 import {privateToolFail,type PrivateToolContext} from './private-tool.contracts'
 import {parseEducationPublicSourceKey} from './public-source.identity'
-import {educationStandardHeaderColumns,educationFormHeaderColumns,type EducationPublicSourceHeader} from './public-source.headers'
+import {educationStandardHeaderColumns,educationFormHeaderColumns,educationPublicRequiredContextKeys,type EducationPublicSourceHeader} from './public-source.headers'
 import {assertContentGrantChain,type ContentGrant} from '../measurement-content/content-authority'
 import {educationApplicabilitySchema} from '../scale-library-governance/education-applicability'
 
@@ -65,6 +65,7 @@ export async function listEducationPublicSources(c:PrivateToolContext,raw:unknow
    SELECT ${educationStandardHeaderColumns} FROM authorized_keys k
     JOIN survey_standard_releases s ON s.id=split_part(k.key,':',3) AND k.key='education-source:STANDARD_SCALE:'||s.id||':'||s.combination_hash
     JOIN measurement_content_releases m ON m.id=s.measurement_release->>'releaseId'
+    LEFT JOIN scales native ON native.code=s.snapshot->>'toolKey' AND native.instrument_version=s.snapshot->>'instrumentVersion' AND native.status='PUBLISHED' AND native.instrument_class='STANDARD' AND native.library_entry_id IS NULL
     WHERE s.state='ONLINE' AND m.layer='MEASUREMENT' AND m.family='SCALE' AND m.status='PUBLISHED' AND m.content_hash=s.measurement_release->>'contentHash'
    UNION ALL
    SELECT ${educationFormHeaderColumns} FROM authorized_keys k
@@ -78,11 +79,12 @@ export async function listEducationPublicSources(c:PrivateToolContext,raw:unknow
   const selected=candidates.slice(0,40)
   return {list:selected.map(header=>{
    const declaration=header.kind==='FORM'?educationApplicabilitySchema.safeParse(header.applicability):null
-   const applicable=declaration?.success&&declaration.data.administrations.some(a=>a.population===(c.entry==='SCHOOL'?'STUDENT':'TEACHER')&&a.responseMode==='SELF')
+   const applicable=header.kind==='STANDARD_SCALE'?header.nativeAvailable&&(header.applicability as {respondentTypes?:string[]}|null)?.respondentTypes?.includes('SELF'):declaration?.success&&declaration.data.administrations.some(a=>a.population===(c.entry==='SCHOOL'?'STUDENT':'TEACHER')&&a.responseMode==='SELF')
    return {
    catalogKey:header.key,kind:header.kind==='STANDARD_SCALE'?'SCALE':'FORM',sourceProvider:header.kind,sourceId:header.id,contentHash:header.hash,
-   title:header.title,language:header.language,versions:header.versions,sourceLabel:'获授权公共固定版本',
-   allowedActions:applicable?['REFERENCE_FIXED_VERSION']:[],runtimeStatus:header.kind==='FORM'?'CHECK_EXACT_FORM_AT_FREEZE':'ADAPTER_PENDING',canEditOriginal:false,canDistribute:false,
+   title:header.title,language:header.language,versions:header.versions,requiredContextKeys:educationPublicRequiredContextKeys(header),referenceContextKeys:header.referenceContextKeys,sourceLabel:'获授权公共固定版本',
+   allowedActions:applicable?['REFERENCE_FIXED_VERSION']:[],runtimeStatus:header.kind==='FORM'?'CHECK_EXACT_FORM_AT_FREEZE':header.nativeAvailable?'CHECK_EXACT_STANDARD_AT_FREEZE':'NATIVE_UNAVAILABLE',canEditOriginal:false,canDistribute:false,
+   ...(header.kind==='STANDARD_SCALE'&&!applicable?{unavailableReason:header.nativeAvailable?'该版本未声明支持自评。':'原生量表尚未安装或已停止使用；授权不会创建执行程序。'}:{}),
    ...(header.kind==='FORM'&&!applicable?{unavailableReason:'该固定版本未声明适用于当前问卷的施测方式。'}:{}),
   }}),nextCursor:candidates.length>40?selected.at(-1)!.key:null}
  },{isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted})

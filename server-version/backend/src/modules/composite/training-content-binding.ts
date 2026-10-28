@@ -1,3 +1,5 @@
+import {assertCompositionPublicContent} from '../education-tools/private-tool.composition-content'
+import {educationStandardSourceSchema} from '../education-tools/private-tool.composition-contracts'
 import {educationMarkerBindingSchema} from '../education-tools/assessment-resource.marker-contract'
 import {educationCompositionBindingSchema,educationCompositionRuntimeAnchorSchema,type EducationCompositionPolicyBinding,type EducationCompositionRuntimeAnchor} from '../education-tools/private-tool.composition-contracts'
 import {readEducationMarkerSource} from '../education-tools/assessment-resource.marker'
@@ -27,7 +29,8 @@ import { situationalReleaseKey, type ResolvedSituationalRelease } from '../situa
 
 const text=z.string().min(1).max(240),digest=z.string().regex(/^[a-f0-9]{64}$/)
 const sourceSchema=z.object({kind:z.enum(['SCALE','COGNITIVE_CONFIG','SJT_AUTHOR_RELEASE','STATIC_SJT_REGISTRY']),id:text,ownerId:text.optional(),
-  educationBinding:educationMarkerBindingSchema.optional(),standardCombination:trainingStandardItemSourceSchema.optional(),libraryEntryId:z.string().guid().optional(),privateVersionId:z.string().guid().optional(),assignmentId:text.optional(),instrumentKey:text.optional(),instrumentVersion:text.optional()}).strict().superRefine((source,ctx)=>{
+  educationBinding:educationMarkerBindingSchema.optional(),educationStandard:educationStandardSourceSchema.optional(),standardCombination:trainingStandardItemSourceSchema.optional(),libraryEntryId:z.string().guid().optional(),privateVersionId:z.string().guid().optional(),assignmentId:text.optional(),instrumentKey:text.optional(),instrumentVersion:text.optional()}).strict().superRefine((source,ctx)=>{
+ if(source.educationStandard&&(source.kind!=='SCALE'||source.libraryEntryId||source.privateVersionId||source.standardCombination||source.educationBinding))ctx.addIssue({code:'custom',message:'Education Standard retains its independent exact approved source'})
  if(source.standardCombination&&(source.kind!=='SCALE'||source.libraryEntryId||source.privateVersionId||source.id!==source.standardCombination.reference.scaleId))ctx.addIssue({code:'custom',message:'Standard combination must retain its installed Scale identity'})
  if(source.privateVersionId&&(source.kind!=='SCALE'||source.libraryEntryId!==undefined))ctx.addIssue({code:'custom',message:'Private Scale identity cannot alias library or other families'})
  if(source.libraryEntryId&&source.kind!=='SCALE')ctx.addIssue({code:'custom',message:'Library identity is only valid for Scale'})
@@ -167,7 +170,7 @@ function projectActualMeasurement(item:any,release:Stored,resolvedSituational:Ma
   return expected
 }
 export function trainingMeasurementSourceScopeMatches(release:Stored,source:Unit['source']){
- if(source.libraryEntryId||source.standardCombination)return false // Requires the database-backed exact adapter below.
+ if(source.libraryEntryId||source.standardCombination||source.educationStandard)return false // Requires the database-backed exact adapter below.
  const scope=release.scope
  if(release.provenance?.sourceKind==='STATIC_SJT_REGISTRY'&&source.kind!=='STATIC_SJT_REGISTRY')return false
  if(source.kind==='STATIC_SJT_REGISTRY')return release.layer==='MEASUREMENT'&&release.family==='SJT'&&scope.kind==='PLATFORM'&&scope.ownerId===undefined&&source.ownerId===undefined
@@ -200,6 +203,11 @@ export async function trainingMeasurementSourceScopeMatchesForConsumer(db:Prisma
  if(context?.educationComposition){
   // The caller verified this immutable attempt's parent header once for the
   // batch. DB containment and immutability bind each unit to that publication.
+  if(source.educationStandard){
+   if(release.layer!=='MEASUREMENT')return false
+   await assertCompositionPublicContent(db,{...context,measurementOnly:true,unit:{itemId:context.itemId,family:'SCALE',source,measurement:{releaseId:release.releaseId,contentHash:release.contentHash,measurementHash:release.content.measurementHash}},release})
+   return true
+  }
   const origin=context.educationComposition.origin,scope=release.scope
   return source.kind==='SCALE'&&Boolean(source.privateVersionId)&&!source.libraryEntryId&&!source.educationBinding&&!source.standardCombination
    &&source.ownerId===origin.ownerUserId&&context.ownerId===origin.ownerUserId
@@ -253,7 +261,7 @@ export async function prepareTrainingContentAttemptBinding(db:Prisma.Transaction
       ||canonicalHash(snapshot.educationBinding.origin)!==canonicalHash(anchor.origin))fail('SNAPSHOT_INVALID')
     const measurementItems=input.composite.items.filter(item=>item.type!=='FORM')
     if(measurementItems.length!==snapshot.units.length||snapshot.units.some(unit=>unit.family!=='SCALE'||unit.source.kind!=='SCALE'
-      ||unit.source.ownerId!==anchor.origin.ownerUserId||!unit.source.privateVersionId
+      ||(!unit.source.educationStandard&&(unit.source.ownerId!==anchor.origin.ownerUserId||!unit.source.privateVersionId))
       ||!measurementItems.some(item=>item.id===unit.itemId&&item.type==='SCALE'&&item.scaleId===unit.source.id)))fail('SOURCE_MISMATCH')
     // Admission supplied this anchor from the existing transaction-bound START
     // proof; the loaded source is sealed under its publication SHARE lock.
@@ -261,7 +269,11 @@ export async function prepareTrainingContentAttemptBinding(db:Prisma.Transaction
     // registry wrapper. Native runtime freezing still occurs once per child.
     const binding=trainingContentAttemptBindingSchema.parse({schemaVersion:1,compositeId:input.compositeId,attemptId:input.attemptId,
       epoch:input.epoch,publicationHash:input.snapshotHash,units:snapshot.units,educationComposition:anchor})
-    const presentation=new Map<string,EducationSlotPresentation>(),orderedSlots:string[]=[]
+    const presentation=new Map<string,EducationSlotPresentation>(),orderedSlots:string[]=snapshot.educationBinding.context?['form-section:'+snapshot.educationBinding.context.sectionId]:[]
+    if(snapshot.educationBinding.context){
+      const id=snapshot.educationBinding.context.sectionId
+      presentation.set('form-section:'+id,{blockId:id})
+    }
     for(const block of snapshot.educationBinding.manifest){
       const keys=block.kind==='SCALE'?block.itemIds.map(id=>'scale:'+id):block.sectionIds.map(id=>'form-section:'+id)
       const instruction=[block.instruction,block.sourceInstruction].filter(Boolean).join('\n\n')

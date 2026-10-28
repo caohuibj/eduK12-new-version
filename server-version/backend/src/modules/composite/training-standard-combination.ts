@@ -135,7 +135,11 @@ export async function freezeTrainingStandardReference(tx:Prisma.TransactionClien
 /** The approved P/R definition reaches the native runtime. Existing exact native
  * P records must match the immutable approved P, never a latest/default set. */
 export async function freezeTrainingStandardScaleRuntime(tx:Prisma.TransactionClient,source:Awaited<ReturnType<typeof verifyStoredTrainingStandardItem>>){
- const t=source.resolved.row.snapshot
+ return freezeExactStandardScaleRuntime(tx,source.resolved.row.snapshot)
+}
+
+/** Native freezing only. Each product must supply its own source/use proof. */
+export async function freezeExactStandardScaleRuntime(tx:Prisma.TransactionClient,t:import('../survey/standard-triplet.model').Triplet){
  // Standard combinations freeze the versioned source instruction with the
  // exact approved tool version (presentation content, outside the P/R hash).
  const frozen=await freezeScaleRuntimeAtAttemptStart(tx,{instrumentKey:t.toolKey,instrumentVersion:t.instrumentVersion,definition:t.definition,requestedMode:'COMPOSITE',

@@ -1,10 +1,11 @@
+import {contextOptionsForKey,assessmentContextLabels,type AssessmentContextKey} from '../../modules/assessment-context/options'
 import {useCallback,useEffect,useMemo,useRef,useState} from 'react'
 import {EducationPrivateVersionChooser} from './EducationPrivateVersionChooser'
 import {CompositionOutline} from '../../modules/assessment-core/composition/CompositionOutline'
 import {SchoolPrivateToolCollection,type SchoolPrivateToolControls} from '../../school/SchoolPrivateToolCollection'
 import {PrivateToolPreview,type PrivateToolPreviewValue} from './PrivateToolPreview'
 import {EducationPublicFormChooser} from './EducationPublicFormChooser'
-import {educationPublicFormPreviewMedia,publicFormPreviewPath} from './educationPublicFormClient'
+import {educationPublicFormPreviewMedia,publicFormPreviewPath,publicStandardPreviewPath} from './educationPublicFormClient'
 import {createEducationPrivateImageAdapter} from './educationPrivateImageAdapter'
 import {EducationMaterialPreview} from './EducationMaterialPicker'
 import {privateToolBase,privateToolError,type PrivateToolApi,type PrivateToolVersion,type PrivateTool,type PrivateDraftState} from './privateToolClient'
@@ -36,7 +37,7 @@ function CompositionSession({api,organizationId,actorId,entry,onDraftStateChange
  const [versionsCursor,setVersionsCursor]=useState<string|null>(null),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('')
  const [uncertain,setUncertain]=useState(false),[preview,setPreview]=useState(false),[previewIndex,setPreviewIndex]=useState(0)
  const [previewTool,setPreviewTool]=useState<PrivateToolPreviewValue|null>(null),[previewError,setPreviewError]=useState(''),[previewInstruction,setPreviewInstruction]=useState('')
- const [sourceView,setSourceView]=useState<'PRIVATE'|'PUBLIC_FORM'>('PRIVATE')
+ const [sourceView,setSourceView]=useState<'PRIVATE'|'PUBLIC_FORM'|'STANDARD_SCALE'>('PRIVATE')
  const [answers,setAnswers]=useState<Record<string,ProfessionalAnswer>>({})
  const mounted=useRef(true),epoch=useRef(0),locked=useRef(false)
  const dirty=tool?fingerprint(tool)!==saved:Boolean(title.trim()),dirtyRef=useRef(dirty);dirtyRef.current=dirty
@@ -97,7 +98,7 @@ function CompositionSession({api,organizationId,actorId,entry,onDraftStateChange
  useEffect(()=>{
   let current=true;setPreviewTool(null);setPreviewError('');setPreviewInstruction('');setAnswers({})
   if(block&&reference)void api<{id:string;kind:'SCALE'|'FORM';title:string;contentHash:string;definition:PrivateTool['definition'];instruction?:string}>(
-   reference.sourceProvider==='PUBLIC_FORM'?publicFormPreviewPath(organizationId,reference.id,reference.contentHash):`${base}/${reference.toolId}/versions/${block.source.versionId}`)
+   reference.sourceProvider==='PRIVATE_VERSION'?`${base}/${reference.toolId}/versions/${block.source.versionId}`:reference.sourceProvider==='PUBLIC_FORM'?publicFormPreviewPath(organizationId,reference.id,reference.contentHash):publicStandardPreviewPath(organizationId,reference.id,reference.contentHash))
    .then(value=>{if(current){
     if(value.id!==block.source.versionId||value.contentHash!==block.source.contentHash||value.kind!==block.source.kind)throw new Error('固定工具身份已不匹配。')
     setPreviewTool({id:reference.sourceProvider==='PRIVATE_VERSION'?reference.toolId:reference.id,title:value.title,kind:value.kind,definition:value.definition});setPreviewInstruction(value.instruction??'')
@@ -105,7 +106,7 @@ function CompositionSession({api,organizationId,actorId,entry,onDraftStateChange
   return()=>{current=false}
  },[api,base,organizationId,block,reference])
  const previewToolId=previewTool?.id
- const publicMedia=useMemo(()=>block?.source.provider==='PUBLIC_FORM'?educationPublicFormPreviewMedia({api,entry,organizationId,actorId,versionId:block.source.versionId,contentHash:block.source.contentHash}):undefined,
+ const publicMedia=useMemo(()=>block&&block.source.provider!=='PRIVATE_VERSION'?educationPublicFormPreviewMedia({api,entry,organizationId,actorId,versionId:block.source.versionId,contentHash:block.source.contentHash,provider:block.source.provider}):undefined,
   [api,entry,organizationId,actorId,block?.source.provider,block?.source.versionId,block?.source.contentHash])
  const imageAdapter=useMemo(()=>publicMedia?.imageAdapter??(previewToolId?createEducationPrivateImageAdapter({api,entry,organizationId,toolId:previewToolId,actorId}):undefined),
   [publicMedia,api,entry,organizationId,previewToolId,actorId])
@@ -114,7 +115,7 @@ function CompositionSession({api,organizationId,actorId,entry,onDraftStateChange
   if(current()){setVersions(old=>merge(old,page.list));setVersionsCursor(page.nextCursor)}
  })}
  return <section className={'education-private-tools education-private-tools--'+entry.toLowerCase()+' '+(entry==='SCHOOL'?'hs-panel':'ht-panel')+' education-composition-studio education-composition-studio--'+entry.toLowerCase()} aria-label="普通问卷编制">
-  <header className="education-private-heading"><div><h2>{tool?'普通问卷编制':'我的普通问卷'}</h2><p>将本人固定量表和表单、获授权公共表单编成一份{entry==='SCHOOL'?'学生':'教师'}自评问卷，各项保留独立计分与反馈。</p></div></header>
+  <header className="education-private-heading"><div><h2>{tool?'普通问卷编制':'我的普通问卷'}</h2><p>将本人固定量表和表单、获授权公共量表与表单编成一份{entry==='SCHOOL'?'学生':'教师'}自评问卷，各项保留独立计分与反馈。</p></div></header>
   {error&&<p role="alert">{error}</p>}{notice&&<p role="status">{notice}</p>}
   {!tool?<>
    <form onSubmit={event=>{event.preventDefault();create()}}><label>问卷名称<input value={title} maxLength={200} onChange={event=>setTitle(event.target.value)} disabled={busy}/></label><button type="submit" disabled={busy||uncertain||!title.trim()}>新建普通问卷</button></form>
@@ -129,23 +130,34 @@ function CompositionSession({api,organizationId,actorId,entry,onDraftStateChange
    {dirty&&<p role="status">当前有未保存修改，请先保存后再预览或固定版本。</p>}
    <label>问卷名称<input value={tool.title} maxLength={200} disabled={busy} onChange={event=>change({title:event.target.value})}/></label>
    <label>问卷说明<textarea value={tool.definition.instruction} maxLength={16000} disabled={busy} onChange={event=>change({definition:{...tool.definition,instruction:event.target.value}})}/></label>
-   <div className="survey-composition-studio"><div><nav aria-label="问卷工具来源"><button type="button" aria-pressed={sourceView==='PRIVATE'} onClick={()=>setSourceView('PRIVATE')}>本人固定工具</button><button type="button" aria-pressed={sourceView==='PUBLIC_FORM'} onClick={()=>setSourceView('PUBLIC_FORM')}>获授权公共表单</button></nav>
+   <fieldset disabled={busy}><legend>背景信息区段</legend><p>按所选工具的原版适用范围配置；勾选后会作为问卷第一屏展示并固定。未勾选时不会增加背景页。</p>
+    {(['gradeLevel','birthYearMonth','sexAtBirth','primaryLanguage','countryOrRegion'] as AssessmentContextKey[]).map(key=>{
+     const labels=assessmentContextLabels
+     return <label key={key}><input type="checkbox" checked={tool.definition.contextFields?.some(field=>field.contextKey===key)??false} onChange={event=>{
+      const fields=(tool.definition.contextFields??[]).filter(field=>field.contextKey!==key)
+      if(event.target.checked)fields.push({contextKey:key,formType:key==='birthYearMonth'?'year_month':'single_choice',formLabel:labels[key],formOptions:contextOptionsForKey(key)})
+      const {contextFields:_,...definition}=tool.definition;change({definition:{...definition,...(fields.length?{contextFields:fields}:{})}})
+     }}/>{labels[key]}</label>
+    })}
+   </fieldset>
+   <div className="survey-composition-studio"><div><nav aria-label="问卷工具来源"><button type="button" aria-pressed={sourceView==='PRIVATE'} onClick={()=>setSourceView('PRIVATE')}>本人固定工具</button><button type="button" aria-pressed={sourceView==='PUBLIC_FORM'} onClick={()=>setSourceView('PUBLIC_FORM')}>获授权公共表单</button><button type="button" aria-pressed={sourceView==='STANDARD_SCALE'} onClick={()=>setSourceView('STANDARD_SCALE')}>获授权公共量表</button></nav>
     {sourceView==='PRIVATE'?<EducationPrivateVersionChooser key={tool.id} api={api} organizationId={organizationId} disabled={busy||tool.definition.blocks.length>=50}
      onSelect={value=>{if(value.kind==='COMPOSITION')return;const leaf={...value,kind:value.kind,sourceProvider:'PRIVATE_VERSION' as const};setReferences(old=>mergeReferences(old,[leaf]));change({definition:{...tool.definition,blocks:[...tool.definition.blocks,
       {blockId:crypto.randomUUID(),instruction:'',source:{provider:'PRIVATE_VERSION',kind:value.kind,versionId:value.id,contentHash:value.contentHash}}]}})}}/>:
-     <EducationPublicFormChooser api={api} entry={entry} organizationId={organizationId} actorId={actorId} disabled={busy||tool.definition.blocks.length>=50} onChoose={value=>{
-      setReferences(old=>mergeReferences(old,[{id:value.sourceId,sourceProvider:'PUBLIC_FORM',kind:'FORM',title:value.title,contentHash:value.contentHash,version:value.versions.content}]))
-      change({definition:{...tool.definition,blocks:[...tool.definition.blocks,{blockId:crypto.randomUUID(),instruction:'',source:{provider:'PUBLIC_FORM',kind:'FORM',versionId:value.sourceId,contentHash:value.contentHash}}]}})
+     <EducationPublicFormChooser key={sourceView} kind={sourceView==='STANDARD_SCALE'?'SCALE':'FORM'} api={api} entry={entry} organizationId={organizationId} actorId={actorId} disabled={busy||tool.definition.blocks.length>=50} onChoose={value=>{
+      const provider=value.kind==='SCALE'?'STANDARD_SCALE' as const:'PUBLIC_FORM' as const
+      setReferences(old=>mergeReferences(old,[{id:value.sourceId,sourceProvider:provider,kind:value.kind,title:value.title,contentHash:value.contentHash,version:value.versions.content,versions:value.versions,requiredContextKeys:value.requiredContextKeys}]))
+      change({definition:{...tool.definition,blocks:[...tool.definition.blocks,{blockId:crypto.randomUUID(),instruction:'',source:value.kind==='SCALE'?{provider:'STANDARD_SCALE',kind:'SCALE',versionId:value.sourceId,contentHash:value.contentHash}:{provider:'PUBLIC_FORM',kind:'FORM',versionId:value.sourceId,contentHash:value.contentHash}}]}})
      }}/>}</div>
     <CompositionOutline items={tool.definition.blocks.map(row=>({id:row.blockId,title:compositionTitle(row,references),
-     detail:(row.source.provider==='PUBLIC_FORM'?'公共表单':row.source.kind==='SCALE'?'量表':'表单')+' · 固定版本 '+referenceVersion(references.find(ref=>ref.sourceProvider===row.source.provider&&ref.id===row.source.versionId&&ref.contentHash===row.source.contentHash))}))} max={50} disabled={busy}
+     detail:(row.source.provider==='STANDARD_SCALE'?'公共量表':row.source.provider==='PUBLIC_FORM'?'公共表单':row.source.kind==='SCALE'?'量表':'表单')+' · 固定版本 '+referenceVersion(references.find(ref=>ref.sourceProvider===row.source.provider&&ref.id===row.source.versionId&&ref.contentHash===row.source.contentHash))}))} max={50} disabled={busy}
      onMove={(index,offset)=>{const blocks=[...tool.definition.blocks];[blocks[index],blocks[index+offset]]=[blocks[index+offset],blocks[index]];change({definition:{...tool.definition,blocks}})}}
      onRemove={index=>change({definition:{...tool.definition,blocks:tool.definition.blocks.filter((_,i)=>i!==index)}})}
      renderItemEditor={(_,index)=><label className="education-composition-block-instruction">工具衔接说明 {index+1}<textarea value={tool.definition.blocks[index].instruction} maxLength={16000} disabled={busy}
       onChange={event=>change({definition:{...tool.definition,blocks:tool.definition.blocks.map((block,i)=>i===index?{...block,instruction:event.target.value}:block)}})}/></label>}
      footer="量表的本人反馈范围由所选固定版本决定，表单仅采集信息。正式整包不能拆分或加入这里。"/>
    </div>
-   {preview&&<section aria-label="问卷内容预览"><h3>问卷内容预览</h3><p>试填仅保留在本页，不计分或保存为正式作答。</p><p>{tool.definition.instruction}</p>
+   {preview&&<section aria-label="问卷内容预览"><h3>问卷内容预览</h3><p>试填仅保留在本页，不计分或保存为正式作答。</p><p>{tool.definition.instruction}</p>{!!tool.definition.contextFields?.length&&<aside aria-label="背景信息预览"><h4>背景信息（问卷第一屏）</h4>{tool.definition.contextFields.map(field=><p key={field.contextKey}>{field.formLabel}（必答）{field.formOptions.length?'：'+field.formOptions.map(option=>option.label).join('、'):'：YYYY-MM'}</p>)}</aside>}
     <div><button disabled={previewIndex===0} onClick={()=>setPreviewIndex(index=>index-1)}>上一工具</button><span>{previewIndex+1} / {tool.definition.blocks.length}</span>
      <button disabled={previewIndex===tool.definition.blocks.length-1} onClick={()=>setPreviewIndex(index=>index+1)}>下一工具</button></div>
     <h4>{block?compositionTitle(block,references):''}</h4>{block?.instruction&&<p className="whitespace-pre-wrap">{block.instruction}</p>}{previewInstruction&&<p className="whitespace-pre-wrap">{previewInstruction}</p>}{previewError?<p role="alert">{previewError}</p>:!reference?<p>当前固定工具不可读取，请重新核对来源。</p>:!previewTool?<p role="status">正在读取当前固定工具…</p>:

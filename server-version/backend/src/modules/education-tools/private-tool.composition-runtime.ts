@@ -1,3 +1,4 @@
+import {materializeStandardCombinationContent} from '../measurement-content/standard-combination-content'
 import {randomUUID} from 'node:crypto'
 import {Prisma,type EducationPrivateToolVersion} from '@prisma/client'
 import {canonicalHash} from '../assessment-runtime/canonical'
@@ -52,7 +53,7 @@ export async function readOwnedCompositionIdentity(tx:Tx,c:PrivateToolContext,ve
   manifestHash:row.trainingContentSnapshotHash,origin,status:row.status as 'DRAFT'|'PUBLISHED',identityOnly:true as const,canPublish:false as const}
 }
 
-async function materializeScale(tx:Tx,leaf:Extract<CompositionLeaf,{kind:'SCALE'}>){
+async function materializeScale(tx:Tx,leaf:Extract<CompositionLeaf,{provider:'PRIVATE_VERSION';kind:'SCALE'}>){
  const {version,definition}=leaf,code=privateScaleCode(version.id)
  const release=await publishContentRelease(tx,privateScaleMeasurementInput(version,definition),version.ownerUserId)
  if(release.layer!=='MEASUREMENT'||release.family!=='SCALE'||release.status!=='PUBLISHED')privateToolFail('PRIVATE_TOOL_RUNTIME_RELEASE_NOT_SELECTABLE')
@@ -79,22 +80,40 @@ export async function sealPrivateComposition(tx:Tx,c:PrivateToolContext,version:
  const prior=await tx.compositeAssessment.findUnique({where:{creationKey:key},select:{id:true}})
  if(prior)return readOwnedCompositionIdentity(tx,c,version)
  const scaleLeaves=new Map<string,Awaited<ReturnType<typeof materializeScale>>>()
+ const standardContent=new Map<string,Awaited<ReturnType<typeof materializeStandardCombinationContent>>>()
+ for(const leaf of [...compiled.leaves.values()].filter(leaf=>leaf.provider==='STANDARD_SCALE').sort((a,b)=>a.version.id.localeCompare(b.version.id))){
+  const {row,measurement,descriptor}=leaf.standard
+  standardContent.set(leaf.version.id,await materializeStandardCombinationContent(tx,row,measurement,c.principal.userId,descriptor.reportAudience))
+ }
  // Stable source locks serialize reuse across different questionnaire versions.
- for(const leaf of [...compiled.leaves.values()].filter((leaf):leaf is Extract<CompositionLeaf,{kind:'SCALE'}>=>leaf.kind==='SCALE').sort((a,b)=>a.version.id.localeCompare(b.version.id))){
+ for(const leaf of [...compiled.leaves.values()].filter((leaf):leaf is Extract<CompositionLeaf,{provider:'PRIVATE_VERSION';kind:'SCALE'}>=>leaf.provider==='PRIVATE_VERSION'&&leaf.kind==='SCALE').sort((a,b)=>a.version.id.localeCompare(b.version.id))){
   await tx.$executeRaw(Prisma.sql`SELECT pg_advisory_xact_lock(hashtext(${'private-scale:'+leaf.version.id}))`)
   scaleLeaves.set(leaf.version.id,await materializeScale(tx,leaf))
  }
  const parent=await tx.compositeAssessment.create({data:{id:randomUUID(),code:'internal-education-composition-'+randomUUID(),
   name:version.title,instruction:compiled.definition.instruction,createdBy:c.principal.userId,productKind:'ORGANIZATION_RESOURCE',status:'DRAFT',publicEnabled:false,copyable:false}})
  const sections:Prisma.CompositeFormSectionCreateManyInput[]=[],items:Prisma.CompositeAssessmentItemCreateManyInput[]=[]
- const units:Array<Prisma.JsonObject>=[],manifest:EducationCompositionBinding['manifest']=[]
+ const units:unknown[]=[],manifest:EducationCompositionBinding['manifest']=[]
+ let context:EducationCompositionBinding['context']
+ if(compiled.definition.contextFields?.length){
+  const sectionId=randomUUID(),itemIds:string[]=[]
+  sections.push({id:sectionId,compositeAssessmentId:parent.id,title:'背景信息',position:0,contextSection:true})
+  for(const field of compiled.definition.contextFields){
+   const id=randomUUID();itemIds.push(id);items.push({id,compositeAssessmentId:parent.id,type:'FORM',position:items.length,required:true,
+    contextKey:field.contextKey,formType:field.formType,formLabel:field.formLabel,formOptions:field.formOptions as Prisma.InputJsonValue,formSectionId:sectionId,formSectionPosition:itemIds.length-1})
+  }
+  context={sectionId,itemIds}
+ }
  for(const block of compiled.definition.blocks){
   const leaf=compiled.leaves.get(compositionLeafKey(block.source))!,itemIds:string[]=[],sectionIds:string[]=[]
   if(leaf.kind==='SCALE'){
-   const {scale,release}=scaleLeaves.get(leaf.version.id)!,itemId=randomUUID()
+   const {scale,release}=leaf.provider==='STANDARD_SCALE'?{scale:leaf.standard.scale,release:leaf.standard.measurement}:scaleLeaves.get(leaf.version.id)!,itemId=randomUUID()
    itemIds.push(itemId);items.push({id:itemId,compositeAssessmentId:parent.id,type:'SCALE',position:items.length,required:true,scaleId:scale.id})
-   units.push({itemId,family:'SCALE',source:{kind:'SCALE',id:scale.id,ownerId:leaf.version.ownerUserId,privateVersionId:leaf.version.id},
-    measurement:{releaseId:release.releaseId,contentHash:release.contentHash,measurementHash:release.content.measurementHash}})
+   const derived=leaf.provider==='STANDARD_SCALE'?standardContent.get(leaf.version.id)!:null
+   units.push({itemId,family:'SCALE',source:leaf.provider==='STANDARD_SCALE'?{kind:'SCALE',id:scale.id,ownerId:scale.creatorId,educationStandard:leaf.standard.descriptor}:
+    {kind:'SCALE',id:scale.id,ownerId:leaf.version.ownerUserId,privateVersionId:leaf.version.id},
+    measurement:{releaseId:release.releaseId,contentHash:release.contentHash,measurementHash:release.content.measurementHash},
+    ...(derived?{referencePolicy:derived.referencePolicy,...(derived.report?{report:derived.report}:{})}:{})})
   }else for(const page of leaf.form.sections){
    const sectionId=randomUUID();sectionIds.push(sectionId)
    sections.push({id:sectionId,compositeAssessmentId:parent.id,title:page.title,description:page.description,position:sections.length,contextSection:false})
@@ -112,7 +131,7 @@ export async function sealPrivateComposition(tx:Tx,c:PrivateToolContext,version:
  if(sections.length)await tx.compositeFormSection.createMany({data:sections})
  await tx.compositeAssessmentItem.createMany({data:items})
  const snapshot=trainingContentSnapshotSchema.parse({schemaVersion:1,compositeId:parent.id,units,
-  educationBinding:educationCompositionBindingSchema.parse({schemaVersion:1,origin,sealed:true,manifest})})
+  educationBinding:educationCompositionBindingSchema.parse({schemaVersion:1,origin,sealed:true,manifest,...(context?{context}:{})})})
  const manifestHash=canonicalHash(snapshot)
  if(compiled.publicUseExpiresAt){
   // Only time can change after the grant SHARE locks. Scale materialization or

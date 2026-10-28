@@ -1,3 +1,4 @@
+import {assertCompositionPublicContent} from '../education-tools/private-tool.composition-content'
 import {assertEducationRuntimeContentScope} from './education-content-scope'
 import {validateTrainingReportPointer} from './training-report-selection'
 import {assertTrainingPrivateReferenceCourseUse} from './training-private-reference-use'
@@ -40,6 +41,10 @@ export async function validateTrainingReferenceRelease(tx:Prisma.TransactionClie
   if(entry.metricKey!==definition.scoreKey||entry.referenceKind!==definition.referenceKind)trainingReferenceFail('ENTRY_INVALID');return definition})
  if(new Set(entries.map(referenceEntryKey)).size!==entries.length)trainingReferenceFail('ENTRY_INVALID')
  const scope=release.scope
+ if(input.unit.source.educationStandard){
+  await assertCompositionPublicContent(tx,{compositeId:input.compositeId,ownerId:input.ownerId,unit:input.unit,release})
+  return {releaseId:release.releaseId,contentHash:release.contentHash,status:release.status,measurementReleaseId:input.unit.measurement.releaseId,entries}
+ }
  if(input.unit.source.standardCombination){
   await validateTrainingStandardDerivedContent(tx,input.unit,release,{compositeId:input.compositeId,ownerId:input.ownerId})
   return {releaseId:release.releaseId,contentHash:release.contentHash,status:release.status,measurementReleaseId:input.unit.measurement.releaseId,entries}

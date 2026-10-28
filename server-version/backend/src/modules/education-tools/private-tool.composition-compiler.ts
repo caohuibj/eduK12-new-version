@@ -1,3 +1,6 @@
+import {validateContextFormItems} from '../assessment-context/context'
+import {requiredScaleContextKeys} from '../scale/policy/context-preflight'
+import {readEducationStandardSources,type EducationStandardLeaf} from './public-source.standard'
 import {Prisma,type EducationPrivateToolVersion} from '@prisma/client'
 import {privateCompositionDefinitionSchema,type PrivateCompositionDefinition} from './private-tool.composition-contracts'
 import {privateToolFail,type PrivateToolContext} from './private-tool.contracts'
@@ -15,7 +18,7 @@ import {educationPublicSourceKey} from './public-source.identity'
 import {readEducationPublicUse} from './public-source.catalog'
 import {assertAssessmentAssetReferencesReady} from '../assessment-media/assessment-asset'
 
-export type CompositionLeaf=({provider:'PRIVATE_VERSION';version:EducationPrivateToolVersion}&(
+export type CompositionLeaf={provider:'STANDARD_SCALE';kind:'SCALE';version:Pick<EducationPrivateToolVersion,'id'|'toolId'|'title'|'contentHash'>;definition:ScaleDefinitionV2;standard:EducationStandardLeaf}|({provider:'PRIVATE_VERSION';version:EducationPrivateToolVersion}&(
  {kind:'SCALE';definition:ScaleDefinitionV2}|{kind:'FORM';form:ReturnType<typeof compilePrivateFormRuntime>}))|
  {provider:'PUBLIC_FORM';kind:'FORM';version:Pick<EducationPrivateToolVersion,'id'|'toolId'|'title'|'contentHash'>;
   sourceInstruction?:string;form:ReturnType<typeof compilePrivateFormRuntime>}
@@ -29,8 +32,8 @@ export async function compilePrivateComposition(tx:Prisma.TransactionClient,c:Pr
  if(!definition.blocks.length)privateToolFail('PRIVATE_TOOL_DEFINITION_INCOMPLETE',400,[{path:'blocks',severity:'error',message:'请加入至少一个固定版本工具'}])
  if(definition.administration.population!==(c.entry==='SCHOOL'?'STUDENT':'TEACHER'))
   privateToolFail('PRIVATE_COMPOSITION_VARIANT_UNSUPPORTED',400)
- const publicSources=definition.blocks.filter(block=>block.source.provider==='PUBLIC_FORM').map(block=>block.source)
- const publicKeys=publicSources.map(source=>educationPublicSourceKey({kind:'FORM',id:source.versionId,hash:source.contentHash}))
+ const publicSources=definition.blocks.filter(block=>block.source.provider!=='PRIVATE_VERSION').map(block=>block.source)
+ const publicKeys=publicSources.map(source=>educationPublicSourceKey({kind:source.provider==='PUBLIC_FORM'?'FORM':'STANDARD_SCALE',id:source.versionId,hash:source.contentHash}))
  const publicUse=await readEducationPublicUse(tx,c,publicKeys,true)
  if(publicUse.size!==new Set(publicKeys).size)privateToolFail('PUBLIC_SOURCE_USE_REQUIRED',403)
  const ids=[...new Set(definition.blocks.filter(block=>block.source.provider==='PRIVATE_VERSION').map(block=>block.source.versionId))]
@@ -51,11 +54,15 @@ export async function compilePrivateComposition(tx:Prisma.TransactionClient,c:Pr
    leaves.set(key,{provider:'PRIVATE_VERSION',version:row,kind:'SCALE',definition:scale})
   }else leaves.set(key,{provider:'PRIVATE_VERSION',version:row,kind:'FORM',form:compilePrivateFormRuntime(row.definition)})
  }
- const publicIds=[...new Set(publicSources.map(source=>source.versionId))]
+ const standards=await readEducationStandardSources(tx,publicSources.filter(source=>source.provider==='STANDARD_SCALE'))
+ for(const standard of standards.values())leaves.set('STANDARD_SCALE:'+standard.row.id,{provider:'STANDARD_SCALE',kind:'SCALE',standard,definition:standard.row.snapshot.definition,
+  version:{id:standard.row.id,toolId:standard.row.id,title:standard.row.snapshot.title,contentHash:standard.row.combination_hash}})
+ const formSources=publicSources.filter(source=>source.provider==='PUBLIC_FORM')
+ const publicIds=[...new Set(formSources.map(source=>source.versionId))]
  const publicRows=publicIds.length?await tx.$queryRaw<Array<{id:string;title:string;snapshot_hash:string;snapshot:GovernedArtifact}>>(Prisma.sql`
   SELECT id,title,snapshot_hash,snapshot FROM survey_governed_tools WHERE id IN (${Prisma.join(publicIds)}) AND family='FORM' AND state='ONLINE' ORDER BY id FOR SHARE`):[]
  const publicMedia:Array<{id:string;refs:ReturnType<typeof governedMediaRefs>}>=[]
- for(const source of publicSources){
+ for(const source of formSources){
   const key=compositionLeafKey(source)
   const row=publicRows.find(row=>row.id===source.versionId)
   if(!row||row.snapshot_hash!==source.contentHash||canonicalHash(row.snapshot)!==source.contentHash||row.snapshot.family!=='FORM'
@@ -79,6 +86,13 @@ export async function compilePrivateComposition(tx:Prisma.TransactionClient,c:Pr
   const pins=await tx.assetReference.findMany({where:{entityType:'SurveyGovernedTool',entityId:{in:publicMedia.map(row=>row.id)},field:'media',assetId:{in:refs.map(ref=>ref.assetId)}},select:{entityId:true,assetId:true}})
   if(publicMedia.some(row=>row.refs.some(ref=>!pins.some(pin=>pin.entityId===row.id&&pin.assetId===ref.assetId))))privateToolFail('PUBLIC_FORM_MEDIA_NOT_SHARED',403)
   await assertAssessmentAssetReferencesReady(refs,tx)
+ }
+ const fields=definition.contextFields??[]
+ const contextIssues=validateContextFormItems(fields.map((field,index)=>({id:String(index),type:field.formType,label:field.formLabel,required:true,position:0,contextKey:field.contextKey,options:field.formOptions})),[1])
+ if(contextIssues.length)privateToolFail('PRIVATE_COMPOSITION_CONTEXT_INVALID',400,contextIssues.map(issue=>({...issue,severity:'error' as const})))
+ for(const leaf of leaves.values())if(leaf.provider==='STANDARD_SCALE'){
+  const policy=leaf.standard.row.snapshot.parts.CONTENT.reference.metadata.applicability as Parameters<typeof requiredScaleContextKeys>[0]
+  if(requiredScaleContextKeys(policy).some(key=>!fields.some(field=>field.contextKey===key)))privateToolFail('PRIVATE_COMPOSITION_CONTEXT_REQUIRED',400)
  }
  // U was checked before loading public bodies; its SHARE locks remain through
  // freeze. Only interval expiry needs a final post-materialization clock check.
