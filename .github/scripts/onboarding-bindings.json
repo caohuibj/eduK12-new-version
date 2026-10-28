@@ -1,123 +1,155 @@
 {
-  "pr": 369,
-  "enabled": false,
-  "base": "642fda7ab754790686d6626efac62b73a332e663",
-  "product": "dca8865ce2f71797ca41264789d9098fbf54e68a",
-  "controlCheckpoint": "2f5bc2081aee41116ed3bacbdfca0dbd004f8cd9",
+  "pr": 372,
+  "enabled": true,
+  "base": "aa774983db8edd85b3c1617aef7218f71664746d",
+  "product": "edb95e462361a8af02d9e6adae9409d6f6c24615",
+  "controlCheckpoint": "164b66e148bbd347bf9146cb3cebcbca790b31a6",
   "source": {
-    "docs/performance/shared-report-planning-20261028/README.md": {
+    "docs/performance/first-feedback-20261028/PLAN.md": {
       "before": null,
-      "after": "6038726fc07b53a97738bd17b1b60c2f529242fa"
+      "after": "8d33a0c8b0614d2d2892c4caf4fb3ec7d74489d0"
     },
-    "docs/performance/shared-report-planning-20261028/evidence/education-assessment-candidate-execution.json": {
+    "docs/performance/first-feedback-20261028/evidence-index.json": {
       "before": null,
-      "after": "446152e290fd447ddf198cdd248b07c466c48e25"
+      "after": "d765c441bd8caa576c85c54fd5e1cd48aeaa2d0f"
     },
-    "docs/performance/shared-report-planning-20261028/evidence/education-assessment-candidate.json": {
+    "docs/performance/first-feedback-20261028/evidence/ack-after.json": {
       "before": null,
-      "after": "35141c6b38306cd68ace89f0639c4e53d2efd89a"
+      "after": "6c7d58c0613209fdb0e9bdea49b290dbbbe2f662"
     },
-    "docs/performance/shared-report-planning-20261028/evidence/education-assessment-candidate.ts.txt": {
+    "docs/performance/first-feedback-20261028/evidence/ack-after.log": {
       "before": null,
-      "after": "574c65fa6530098994ff04a0fc26a2dfb3699926"
+      "after": "6c95f66f36feff4ecfad416792a81bd2725fb618"
     },
-    "docs/performance/shared-report-planning-20261028/evidence/education-assessment-current-execution.json": {
+    "docs/performance/first-feedback-20261028/evidence/ack-before-red.json": {
       "before": null,
-      "after": "446152e290fd447ddf198cdd248b07c466c48e25"
+      "after": "52f8eb66b3f487b3ace82f326a5c4b5c670122f0"
     },
-    "docs/performance/shared-report-planning-20261028/evidence/education-assessment-current.json": {
+    "docs/performance/first-feedback-20261028/evidence/ack-before-red.log": {
       "before": null,
-      "after": "7ac8b3dbf79a7b5a3ef2727dc3b33a6616e7a168"
+      "after": "a067d4398a4edd486f62979cfdb6fafe42708e83"
     },
-    "docs/performance/shared-report-planning-20261028/evidence/education-assessment-current.ts.txt": {
+    "docs/performance/first-feedback-20261028/evidence/backend-types-r2-receipt.json": {
       "before": null,
-      "after": "0096139f0aa0a380e6a5804a1c49c6569b83bf28"
+      "after": "ac5892dc505b84d85ddbc883af8d51f33c3bf946"
     },
-    "docs/performance/shared-report-planning-20261028/evidence/education-assessment-plans-execution.json": {
-      "before": null,
-      "after": "446152e290fd447ddf198cdd248b07c466c48e25"
-    },
-    "docs/performance/shared-report-planning-20261028/evidence/education-assessment-plans.json": {
-      "before": null,
-      "after": "6ac587e0b94912f33f205301f2feca068cd77b51"
-    },
-    "docs/performance/shared-report-planning-20261028/evidence/education-assessment-plans.ts.txt": {
-      "before": null,
-      "after": "f214488482e75d07554e0a9e1067e16b37bc9cec"
-    },
-    "docs/performance/shared-report-planning-20261028/evidence/education-current-execution.json": {
-      "before": null,
-      "after": "446152e290fd447ddf198cdd248b07c466c48e25"
-    },
-    "docs/performance/shared-report-planning-20261028/evidence/education-report-current.json": {
-      "before": null,
-      "after": "9c30ae6d032808f93a90aea379e8f7ad93335bcd"
-    },
-    "docs/performance/shared-report-planning-20261028/evidence/execution-02.json": {
-      "before": null,
-      "after": "00a76e8098a03769113bd36220a96175cdcbf32f"
-    },
-    "docs/performance/shared-report-planning-20261028/evidence/prisma-source-check.json": {
-      "before": null,
-      "after": "200cab0a5af51cbe9514c14044d70020e283c430"
-    },
-    "docs/performance/shared-report-planning-20261028/evidence/report-planning-types-receipt.json": {
-      "before": null,
-      "after": "4899b44859da230bcecaf56a497190386864f975"
-    },
-    "docs/performance/shared-report-planning-20261028/evidence/report-planning-types.log": {
+    "docs/performance/first-feedback-20261028/evidence/backend-types-r2.log": {
       "before": null,
       "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
     },
-    "docs/performance/shared-report-planning-20261028/evidence/shared-planning-contract.json": {
+    "docs/performance/first-feedback-20261028/evidence/backend-types-r3-receipt.json": {
       "before": null,
-      "after": "45ddfcb4bd1f5e6802b1fcdf0ab15cbc02377ef0"
+      "after": "9c1678586b92c332f4a788679602056c5e776074"
     },
-    "docs/performance/shared-report-planning-20261028/evidence/shared-planning-contract.log": {
+    "docs/performance/first-feedback-20261028/evidence/backend-types-r3.log": {
       "before": null,
-      "after": "e9df4e0b68444bcce31d3817c26803bfcb443cd1"
+      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
     },
-    "docs/performance/shared-report-planning-20261028/evidence/survey-first-warm-02-results.json": {
+    "docs/performance/first-feedback-20261028/evidence/backend-types-receipt.json": {
       "before": null,
-      "after": "c84d423d8b80efb888333b605bd7e67f02e93b19"
+      "after": "564ef6dfc963bd317bb33e4003a3da22b83a15b8"
     },
-    "docs/performance/shared-report-planning-20261028/evidence/survey-first-warm-02-source.json": {
+    "docs/performance/first-feedback-20261028/evidence/backend-types.log": {
       "before": null,
-      "after": "6ece944a29ee4c2ee4eb11cff0e52505ca922b04"
+      "after": "e11b1bcc54eadbb6877ee5971e5a9e32e29a3e6e"
     },
-    "docs/performance/shared-report-planning-20261028/evidence/training-execution.json": {
+    "docs/performance/first-feedback-20261028/evidence/frontend-types-r1-receipt.json": {
       "before": null,
-      "after": "28deb47f6c75dbb653b990f4d933431926b983d6"
+      "after": "bd1f14b488cc4c6f3c59279a512e699108f062bb"
     },
-    "docs/performance/shared-report-planning-20261028/evidence/training-whole-probe.json": {
+    "docs/performance/first-feedback-20261028/evidence/frontend-types-r1.log": {
       "before": null,
-      "after": "a7803de18e629b8cdb9852958dce1ff070c6d6ed"
+      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
     },
-    "docs/performance/shared-report-planning-20261028/manifest.json": {
+    "docs/performance/first-feedback-20261028/evidence/inline-pg-r1-execution.json": {
       "before": null,
-      "after": "465c67895ec554ad56273bf116849559ea549077"
+      "after": "7f0fda9137370c13f617f2ec3714c094cb6019fc"
     },
-    "server-version/backend/src/__tests__/reporting/education-assessment-personal-report.service.test.ts": {
-      "before": "fd5496f3c39ea3e1254b35e1ff1d30f63605d0be",
-      "after": "d35c6a4ec22b5231905fc282e4d9588ee3349b05"
+    "docs/performance/first-feedback-20261028/evidence/inline-pg-r1.json": {
+      "before": null,
+      "after": "7bf47dc475fa0147275fccc63b6c340976f4afd8"
     },
-    "server-version/backend/src/modules/reporting/education-assessment-personal-report.service.ts": {
-      "before": "368a93a592944897a21f5936073395069473519c",
-      "after": "48d968e8e0442c88de15cbd324a133cbcc0ee180"
+    "docs/performance/first-feedback-20261028/evidence/inline-pg-r1.log": {
+      "before": null,
+      "after": "eca4c15ba316021de173c983ea48e8439c69cb31"
+    },
+    "docs/performance/first-feedback-20261028/evidence/survey-commit-failure.json": {
+      "before": null,
+      "after": "0f6f3d62eaa5b4a6068d20399529ccc9c5d62944"
+    },
+    "docs/performance/first-feedback-20261028/evidence/survey-commit-failure.log": {
+      "before": null,
+      "after": "c150ef64fa4f1d71f96d915c0d31cee024750ef3"
+    },
+    "docs/performance/first-feedback-20261028/evidence/survey-inline-backend-r1.json": {
+      "before": null,
+      "after": "c64e1ffc2b8d37bc5d25c1e37aca14db190f067b"
+    },
+    "docs/performance/first-feedback-20261028/evidence/survey-inline-backend-r1.log": {
+      "before": null,
+      "after": "300eaf3835920d4d770bb280d5fa28638b7eab5f"
+    },
+    "docs/performance/first-feedback-20261028/evidence/survey-inline-backend-r2.json": {
+      "before": null,
+      "after": "545a0d0906201d9faff15e4f2eecbb6a120ec361"
+    },
+    "docs/performance/first-feedback-20261028/evidence/survey-inline-backend-r2.log": {
+      "before": null,
+      "after": "e0a09e1c4a132770f01943a4679172cdb48a3b2a"
+    },
+    "docs/performance/first-feedback-20261028/evidence/survey-inline-frontend-r1.json": {
+      "before": null,
+      "after": "bf23cc7568f33b92ff98d502bc0d2564f2b00847"
+    },
+    "docs/performance/first-feedback-20261028/evidence/survey-inline-frontend-r1.log": {
+      "before": null,
+      "after": "9de9e4921e687cfdef4e890864a4bd6730845432"
+    },
+    "server-version/backend/src/__tests__/survey/research-request-local-final.contract.test.ts": {
+      "before": "c281284117a80d1c5ce6b3dd6b48cc674a919ea0",
+      "after": "980793cf90cfb3cf2f4b4b0f971b01274533ecdd"
+    },
+    "server-version/backend/src/__tests__/survey/situational-native-staged.postgres.integration.test.ts": {
+      "before": "12c16ee79531e850d0f3f8bb62b23e1d177148f5",
+      "after": "c06702c7b3ae57f6fc923daff6ee365b868c9002"
+    },
+    "server-version/backend/src/modules/survey/final.service.ts": {
+      "before": "d7c83a0306b6b7c2a36cb1704ea3c41ee8958b45",
+      "after": "58ef4183ebe04ab47485a4cc22ee3bcaee99d854"
+    },
+    "server-version/backend/src/modules/survey/participant-feedback-response.ts": {
+      "before": null,
+      "after": "7d842c50089c48ede356e33c9b94b1f98b67fff8"
+    },
+    "server-version/frontend/src/components/FinalCompositeAssessment.tsx": {
+      "before": "6e5176e59df515962291f15a25a0b9a8270dc7b5",
+      "after": "23c1cd4834a2bcde961d44cbffe6790c5955a3e3"
+    },
+    "server-version/frontend/src/components/__tests__/FinalCompositeAssessment.test.tsx": {
+      "before": "d26248139817107f425e89c4288f5f24166f70e5",
+      "after": "156f5b079c663bdb2df89f707ae1a09d5a674526"
+    },
+    "server-version/frontend/src/survey/SurveyPublicApp.final.test.tsx": {
+      "before": "f536e86ad257cd81a13f83e6485dc7753590cb02",
+      "after": "a3fbe163cdacc08a440e1d0f05e8b5f0ab15c893"
+    },
+    "server-version/frontend/src/survey/SurveyPublicApp.tsx": {
+      "before": "2265c87e0034b03a16ccc0139dd1a8e282ef39b3",
+      "after": "af6ac0694afe40fa866753099577d67d2f1f5e71"
     }
   },
   "controlBefore": {
     ".github/scripts/content-scope.mjs": "31a340af23927250b9a40f6097b3815d617c70ec",
     ".github/scripts/merge-gate.mjs": "985c744ac800aa425323db1c57010e64d0d69a8e",
-    ".github/scripts/onboarding-bindings.json": "6bb7349e659ae0d6e0f7f9fc170f79794da7818f",
-    ".github/scripts/onboarding-checks.mjs": "28d36aeab7961578a9d642dab4b38491b1c77ce2",
-    ".github/scripts/onboarding-controls.test.mjs": "4696fb42b34d7cc9ffba0c44aad7ae3cd267dab4",
-    ".github/scripts/onboarding-evidence.json": "5cf67575b5b47dd1aee900ddeaa6f2c068974aa9",
-    ".github/scripts/onboarding-scope.mjs": "2e16cbb12ff48f7b23976b39477168d590c95acf",
-    ".github/workflows/ci.yml": "ded3ee19c9659b0f161c610a59c1e45d5020561e"
+    ".github/scripts/onboarding-bindings.json": "a7406399c0ee400f43cda88057e8e552e29500db",
+    ".github/scripts/onboarding-checks.mjs": "2d1b6eaa7aeb38d3206e509756d417c4a758391d",
+    ".github/scripts/onboarding-controls.test.mjs": "a62649e9be58d6a9efc6cbb6330cbe66f6946bad",
+    ".github/scripts/onboarding-evidence.json": "1f25b54d453399f7023704f05dcf3e04358f3508",
+    ".github/scripts/onboarding-scope.mjs": "48f3f4baf52d647cdd77cb933fe8c723d695058d",
+    ".github/workflows/ci.yml": "680daeadcecc4da3bf7631cf0a9adc235e81c7d9"
   },
   "components": {
-    "backend": "c1af3b336b5c1d90f2ff0334bdc7af9c6c9cb570",
-    "frontend": "08e007747668fcf67cfd44d323a70daf8dc1ab9e"
+    "backend": "ca7bcca69ac09b8c396a9eccbad46c1156a19221",
+    "frontend": "1293d7b8d02f0c020e3a1076f08c7921b4a0f872"
   }
 }
