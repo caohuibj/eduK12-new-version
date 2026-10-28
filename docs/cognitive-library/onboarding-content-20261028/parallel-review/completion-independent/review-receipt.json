@@ -1,0 +1,221 @@
+{
+  "kind": "INDEPENDENT_READ_ONLY_SOURCE_AND_PRIOR_EVIDENCE_REVIEW_NO_TEST_REPLAY",
+  "node": "v24.21.0",
+  "reviewedCommit": "307d94ae5e15ca134a694c1dad8158eb29b58b49",
+  "reviewedRepo": "/workspace/eduK12-new-version",
+  "sources": [
+    {
+      "file": "server-version/backend/src/modules/cognitive/native-completion.ts",
+      "sha256": "98edac477c7bea769bd8fee295c4c1b70e4eeabb85fe9cde225f7ea18688198f"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/core/native-completion.ts",
+      "sha256": "08ef41ba2cbf790b7c8db31bce5c80c8a94fae22005993b13774ddf878c66479"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/cognitive.schema.ts",
+      "sha256": "c4a2fe80c0a1970ef6495c7b64028f62425f220f6727fa9c65d9ba848a99c344"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/final-submit.service.ts",
+      "sha256": "efe2b712bbde8670edcf72e4619dd7ac7c6a54541f666c6d51189ca9d5de2e1b"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/unified-final-submit.service.ts",
+      "sha256": "60a98541663dd11f42a187920037aac91e4781c725065b09ed1abb3a364c0f7a"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/unified-raw-submission.ts",
+      "sha256": "ede594c9bb418df14b7b6899825e211b607bdb2cdbd76468b637a94d0b4a29dd"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/raw-archive.service.ts",
+      "sha256": "3a484de8fe42b3e7d63340ff386d7005e5356cc9083a1bdaf62a4a741d84f8ff"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/v2/authoritative-scorer.ts",
+      "sha256": "4958beadfb8f02872c0ad458fb5ae4885744213557c7e9517620c78cb6eec3c7"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/v2/types.ts",
+      "sha256": "5700965181a1efdd9a1552c3969c28b2283e7ee418f16c0a3cf92a496f517941"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/core/useCognitiveSession.ts",
+      "sha256": "9c7a1d54197085aae91de04b6a024ec62cbbd50e686ef2334a1f73980bf6ddf5"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/api.ts",
+      "sha256": "943f7ea2ebf74327023c01f8d20deea78efb9ece5f895deb08c5868ffd3fff30"
+    },
+    {
+      "file": "server-version/frontend/src/services/persistence/finalDraftStore.ts",
+      "sha256": "007bfcbe75134e424b306940d60001698595ef8499598f956cf509f7af6787ca"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/hearts-flowers/scorer.ts",
+      "sha256": "0d2bea775f433f8b4d886e3cc0f47b291c1a99de1ee85509ecff70b4b792188f"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/native-registry/archive-detail.ts",
+      "sha256": "1d2eae63885c4821bb065d88283d3d8967a17849fe9686588ae7b2b81d166005"
+    }
+  ],
+  "reports": [
+    {
+      "file": "docs/cognitive-library/onboarding-content-20261028/parallel-review/integration/backend-completion-original.json",
+      "sha256": "f60de49f18431cf3575248cf766a31421ced7244be083ba2b298652e6d5de7a2",
+      "success": false,
+      "passed": 0,
+      "failed": 1,
+      "pending": 0,
+      "cases": [
+        {
+          "name": "native completion frozen in the committed FINAL keeps all 32 closed HF windows, lowers the aborted report and binds the identical archived claim",
+          "status": "failed",
+          "firstFailure": "InstrumentFinalSubmitError: child is not defined"
+        }
+      ]
+    },
+    {
+      "file": "docs/cognitive-library/onboarding-content-20261028/parallel-review/integration/backend-completion-corrected.json",
+      "sha256": "22c208e72f92b04271ceab5bd167c76bb08a0a96e63fdd3be31d68c3cca5174c",
+      "success": false,
+      "passed": 0,
+      "failed": 1,
+      "pending": 0,
+      "cases": [
+        {
+          "name": "native completion frozen in the committed FINAL keeps all 32 closed HF windows, lowers the aborted report and binds the identical archived claim",
+          "status": "failed",
+          "firstFailure": "PrismaClientKnownRequestError: "
+        }
+      ]
+    },
+    {
+      "file": "docs/cognitive-library/onboarding-content-20261028/parallel-review/integration/backend-completion-fixture-corrected.json",
+      "sha256": "8209a92db428550485c76367c8d9dd5c51c3529f8f3dda911600e06f633c01e3",
+      "success": false,
+      "passed": 0,
+      "failed": 1,
+      "pending": 0,
+      "cases": [
+        {
+          "name": "native completion frozen in the committed FINAL keeps all 32 closed HF windows, lowers the aborted report and binds the identical archived claim",
+          "status": "failed",
+          "firstFailure": "CognitiveServiceError: PUBLISHED -> PUBLISHED is not a transition"
+        }
+      ]
+    },
+    {
+      "file": "docs/cognitive-library/onboarding-content-20261028/parallel-review/integration/backend-completion-final.json",
+      "sha256": "77e705eae64676b13ebca511f3cfebf8a6786b7dfc923626b3abab6c804f8581",
+      "success": true,
+      "passed": 1,
+      "failed": 0,
+      "pending": 0,
+      "cases": [
+        {
+          "name": "native completion frozen in the committed FINAL keeps all 32 closed HF windows, lowers the aborted report and binds the identical archived claim",
+          "status": "passed",
+          "firstFailure": null
+        }
+      ]
+    },
+    {
+      "file": "docs/cognitive-library/onboarding-content-20261028/parallel-review/integration/backend-compatibility.json",
+      "sha256": "d9f6b9e69a1729eeaedeff2af18a49723242b0bc920932055e3bc9a9e7cf2a6b",
+      "success": true,
+      "passed": 2,
+      "failed": 0,
+      "pending": 0,
+      "cases": [
+        {
+          "name": "native completion backward compatibility leaves an old encrypted-payload shape and canonical identity unchanged",
+          "status": "passed",
+          "firstFailure": null
+        },
+        {
+          "name": "native completion backward compatibility accepts the authenticated optional claim while preserving the public schema boundary",
+          "status": "passed",
+          "firstFailure": null
+        }
+      ]
+    },
+    {
+      "file": "docs/cognitive-library/onboarding-content-20261028/parallel-review/integration/frontend-completion-original.json",
+      "sha256": "4e9a8db4232e94ad42fe0d95c54a4302321d286cf29ecd9dda6af6dbd4f9790f",
+      "success": true,
+      "passed": 2,
+      "failed": 0,
+      "pending": 0,
+      "cases": [
+        {
+          "name": "locally sealed native completion in FINAL submits the original aborted claim and keeps the exact sealed payload on retry",
+          "status": "passed",
+          "firstFailure": null
+        },
+        {
+          "name": "locally sealed native completion in FINAL preserves old task formats and refuses a changed locally sealed claim",
+          "status": "passed",
+          "firstFailure": null
+        }
+      ]
+    }
+  ],
+  "frozen": {
+    "file": "docs/cognitive-library/onboarding-content-20261028/parallel-review/integration/frozen-completion-result.json",
+    "sha256": "b9b59e22c5923ab0a6c9cdf64b5563e4ff027a6d003fc423346dc7b2239d9c5b",
+    "source": "read-only existing disposable DB; no scoring or report regeneration",
+    "inputFile": "docs/cognitive-library/onboarding-content-20261028/parallel-review/hearts-flowers/completion-claim-regression.json",
+    "inputSHA256": "839a2a2aba88ca60e9200ec5338c589f478a4dc5bcb5691b5e67fef91947c0ea",
+    "inputTrialCount": 32,
+    "allInputRawStatusesComplete": true,
+    "storedTrialCount": 32,
+    "formalCount": 32,
+    "termination": "aborted",
+    "reason": "window-blur-after-final-record",
+    "valid": 32,
+    "received": 32,
+    "quality": {
+      "state": "limited",
+      "flags": {
+        "noValidTrials": false,
+        "incompleteRecords": false,
+        "technicalInterruption": true
+      },
+      "reasons": [
+        "technicalInterruption"
+      ]
+    },
+    "publicOuterState": "limited",
+    "publicInnerState": "limited",
+    "coreHash": "b65b3551304cff4e25138fdaa9411ef810ba1305c70142ebe8dc3dff7b8eb649",
+    "trialsHash": "601d9030312f5cd4dd8e9fd829e06e515f6e60983018c4b1dc3d31806b50974a",
+    "signedDifferences": {
+      "keyboard": {
+        "switchMinusRepeatMs": 400
+      },
+      "touch": {
+        "switchMinusRepeatMs": -400
+      },
+      "mouse": {
+        "switchMinusRepeatMs": null
+      },
+      "pen": {
+        "switchMinusRepeatMs": null
+      },
+      "assistive": {
+        "switchMinusRepeatMs": null
+      }
+    }
+  },
+  "preparationHistory": [
+    {
+      "exit": 1,
+      "action": "Initial inline receipt assembler read frozen.input as an embedded scorer input",
+      "reason": "TypeError: Cannot read properties of undefined (reading length); input is a source path. No receipt was written. Corrected assembler reads the referenced committed fixture."
+    }
+  ],
+  "newExecution": "Read Git blobs and existing JSON only; no tests, database requests, browser, scorer, archive upload or CI."
+}

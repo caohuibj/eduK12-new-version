@@ -1,0 +1,28 @@
+{
+  "reviewedCommit": "307d94ae5e15ca134a694c1dad8158eb29b58b49",
+  "sourceCount": 14,
+  "inputTrialCount": 32,
+  "allInputRawStatusesComplete": true,
+  "storedTrialCount": 32,
+  "formalCount": 32,
+  "termination": "aborted",
+  "state": "limited",
+  "valid": 32,
+  "signedDifferences": {
+    "keyboard": {
+      "switchMinusRepeatMs": 400
+    },
+    "touch": {
+      "switchMinusRepeatMs": -400
+    },
+    "mouse": {
+      "switchMinusRepeatMs": null
+    },
+    "pen": {
+      "switchMinusRepeatMs": null
+    },
+    "assistive": {
+      "switchMinusRepeatMs": null
+    }
+  }
+}
