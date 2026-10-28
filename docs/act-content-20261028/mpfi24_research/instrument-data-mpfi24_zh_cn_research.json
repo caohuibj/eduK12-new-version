@@ -1,0 +1,359 @@
+{
+  "instrumentKey": "mpfi24_zh_cn_research",
+  "options": [
+    {
+      "value": "1",
+      "label_en_note": "官方锚点为 Never TRUE / Rarely TRUE / Occasionally TRUE / Often TRUE / Very Often TRUE / Always TRUE，作答参照系为过去两周。",
+      "score": 1
+    },
+    {
+      "value": "2",
+      "label_en_note": "官方锚点为 Never TRUE / Rarely TRUE / Occasionally TRUE / Often TRUE / Very Often TRUE / Always TRUE，作答参照系为过去两周。",
+      "score": 2
+    },
+    {
+      "value": "3",
+      "label_en_note": "官方锚点为 Never TRUE / Rarely TRUE / Occasionally TRUE / Often TRUE / Very Often TRUE / Always TRUE，作答参照系为过去两周。",
+      "score": 3
+    },
+    {
+      "value": "4",
+      "label_en_note": "官方锚点为 Never TRUE / Rarely TRUE / Occasionally TRUE / Often TRUE / Very Often TRUE / Always TRUE，作答参照系为过去两周。",
+      "score": 4
+    },
+    {
+      "value": "5",
+      "label_en_note": "官方锚点为 Never TRUE / Rarely TRUE / Occasionally TRUE / Often TRUE / Very Often TRUE / Always TRUE，作答参照系为过去两周。",
+      "score": 5
+    },
+    {
+      "value": "6",
+      "label_en_note": "官方锚点为 Never TRUE / Rarely TRUE / Occasionally TRUE / Often TRUE / Very Often TRUE / Always TRUE，作答参照系为过去两周。",
+      "score": 6
+    }
+  ],
+  "items": [
+    {
+      "itemCode": "MPFI24_01",
+      "en": "I was receptive to observing unpleasant thoughts and feelings without interfering with them.",
+      "zh_working": "我对观察不愉快的想法和感受保持开放，不去干扰它们。",
+      "assignedScore": "flexibility_composite"
+    },
+    {
+      "itemCode": "MPFI24_02",
+      "en": "I tried to make peace with my negative thoughts and feelings rather than resisting them",
+      "zh_working": "我试着与自己的消极想法和感受和解，而不是抗拒它们。",
+      "assignedScore": "flexibility_composite"
+    },
+    {
+      "itemCode": "MPFI24_03",
+      "en": "I was attentive and aware of my emotions",
+      "zh_working": "我留意并觉察自己的情绪。",
+      "assignedScore": "flexibility_composite"
+    },
+    {
+      "itemCode": "MPFI24_04",
+      "en": "I was in tune with my thoughts and feelings from moment to moment",
+      "zh_working": "我时时刻刻与自己的想法和感受保持联结。",
+      "assignedScore": "flexibility_composite"
+    },
+    {
+      "itemCode": "MPFI24_05",
+      "en": "Even when I felt hurt or upset, I tried to maintain a broader perspective",
+      "zh_working": "即使感到受伤或心烦，我也试着保持更开阔的视角。",
+      "assignedScore": "flexibility_composite"
+    },
+    {
+      "itemCode": "MPFI24_06",
+      "en": "I carried myself through tough moments by seeing my life from a larger viewpoint",
+      "zh_working": "我试着从更大的视角看待自己的生活，帮自己度过艰难时刻。",
+      "assignedScore": "flexibility_composite"
+    },
+    {
+      "itemCode": "MPFI24_07",
+      "en": "I was able to let negative feelings come and go without getting caught up in them",
+      "zh_working": "我能让消极的感受来了又走，而不被它们缠住。",
+      "assignedScore": "flexibility_composite"
+    },
+    {
+      "itemCode": "MPFI24_08",
+      "en": "When I was upset, I was able to let those negative feelings pass through me without clinging to them",
+      "zh_working": "当我心烦时，我能让那些消极的感受从我身上流过，不抓住不放。",
+      "assignedScore": "flexibility_composite"
+    },
+    {
+      "itemCode": "MPFI24_09",
+      "en": "I was very in-touch with what is important to me and my life",
+      "zh_working": "我很清楚对自己和自己的生活来说什么是重要的。",
+      "assignedScore": "flexibility_composite"
+    },
+    {
+      "itemCode": "MPFI24_10",
+      "en": "I stuck to my deeper priorities in life",
+      "zh_working": "我坚持生活中更深层的优先事项。",
+      "assignedScore": "flexibility_composite"
+    },
+    {
+      "itemCode": "MPFI24_11",
+      "en": "Even when I stumbled in my efforts, I didn't quit working toward what is important",
+      "zh_working": "即使受挫，我也没有停止为重要的事努力。",
+      "assignedScore": "flexibility_composite"
+    },
+    {
+      "itemCode": "MPFI24_12",
+      "en": "Even when times got tough, I was still able to take steps toward what I value in life",
+      "zh_working": "即使日子变得艰难，我仍能朝自己看重的方向迈出步伐。",
+      "assignedScore": "flexibility_composite"
+    },
+    {
+      "itemCode": "MPFI24_13",
+      "en": "When I had a bad memory, I tried to distract myself to make it go away",
+      "zh_working": "当想起不愉快的记忆时，我设法让自己分心，好让它消失。",
+      "assignedScore": "inflexibility_composite"
+    },
+    {
+      "itemCode": "MPFI24_14",
+      "en": "I tried to distract myself when I felt unpleasant emotions",
+      "zh_working": "当我有不愉快的情绪时，我试着让自己分心。",
+      "assignedScore": "inflexibility_composite"
+    },
+    {
+      "itemCode": "MPFI24_15",
+      "en": "I did most things on \"automatic\" with little awareness of what I was doing.",
+      "zh_working": "我做大部分事情都像“自动运行”，不太留意自己在做什么。",
+      "assignedScore": "inflexibility_composite"
+    },
+    {
+      "itemCode": "MPFI24_16",
+      "en": "I did most things mindlessly without paying much attention.",
+      "zh_working": "我心不在焉地做大部分事情，没有太多注意。",
+      "assignedScore": "inflexibility_composite"
+    },
+    {
+      "itemCode": "MPFI24_17",
+      "en": "I thought some of my emotions were bad or inappropriate and I shouldn't feel them",
+      "zh_working": "我觉得有些情绪是不好的或不恰当的，我不应该有它们。",
+      "assignedScore": "inflexibility_composite"
+    },
+    {
+      "itemCode": "MPFI24_18",
+      "en": "I criticized myself for having irrational or inappropriate emotions",
+      "zh_working": "我会因为自己有不合理或不恰当的情绪而责备自己。",
+      "assignedScore": "inflexibility_composite"
+    },
+    {
+      "itemCode": "MPFI24_19",
+      "en": "Negative thoughts and feelings tended to stick with me for a long time.",
+      "zh_working": "消极的想法和感受往往在我心里停留很久。",
+      "assignedScore": "inflexibility_composite"
+    },
+    {
+      "itemCode": "MPFI24_20",
+      "en": "Distressing thoughts tended to spin around in my mind like a broken record.",
+      "zh_working": "令人苦恼的想法常像坏掉的唱片一样在我脑子里转个不停。",
+      "assignedScore": "inflexibility_composite"
+    },
+    {
+      "itemCode": "MPFI24_21",
+      "en": "My priorities and values often fell by the wayside in my day to day life",
+      "zh_working": "我的优先事项和价值观常常在日常生活的忙碌中被丢在一边。",
+      "assignedScore": "inflexibility_composite"
+    },
+    {
+      "itemCode": "MPFI24_22",
+      "en": "When life got hectic, I often lost touch with the things I value",
+      "zh_working": "当生活变得忙乱时，我常常与自己在乎的东西失去联结。",
+      "assignedScore": "inflexibility_composite"
+    },
+    {
+      "itemCode": "MPFI24_23",
+      "en": "Negative feelings often trapped me in inaction",
+      "zh_working": "消极的感受常把我困在无所作为里。",
+      "assignedScore": "inflexibility_composite"
+    },
+    {
+      "itemCode": "MPFI24_24",
+      "en": "Negative feelings easily stalled out my plans",
+      "zh_working": "消极的感受很容易让我的计划停摆。",
+      "assignedScore": "inflexibility_composite"
+    }
+  ],
+  "reverseScored": [],
+  "scores": [
+    {
+      "key": "acceptance",
+      "label": "接纳",
+      "items": [
+        "MPFI24_01",
+        "MPFI24_02"
+      ],
+      "aggregation": "mean",
+      "reverse": [],
+      "description": "两题均值，范围 1–6；越高表示越多报告接纳。"
+    },
+    {
+      "key": "present_moment",
+      "label": "接触当下",
+      "items": [
+        "MPFI24_03",
+        "MPFI24_04"
+      ],
+      "aggregation": "mean",
+      "reverse": [],
+      "description": "两题均值，范围 1–6；越高表示越多报告对当下想法和情绪的觉察。"
+    },
+    {
+      "key": "self_as_context",
+      "label": "以己为景",
+      "items": [
+        "MPFI24_05",
+        "MPFI24_06"
+      ],
+      "aggregation": "mean",
+      "reverse": [],
+      "description": "两题均值，范围 1–6；越高表示越多报告从更大视角看待自己的经历。"
+    },
+    {
+      "key": "defusion",
+      "label": "认知解离",
+      "items": [
+        "MPFI24_07",
+        "MPFI24_08"
+      ],
+      "aggregation": "mean",
+      "reverse": [],
+      "description": "两题均值，范围 1–6；越高表示越多报告与消极感受保持距离。"
+    },
+    {
+      "key": "values",
+      "label": "价值",
+      "items": [
+        "MPFI24_09",
+        "MPFI24_10"
+      ],
+      "aggregation": "mean",
+      "reverse": [],
+      "description": "两题均值，范围 1–6；越高表示越多报告清楚并坚持自己的价值方向。"
+    },
+    {
+      "key": "committed_action",
+      "label": "承诺行动",
+      "items": [
+        "MPFI24_11",
+        "MPFI24_12"
+      ],
+      "aggregation": "mean",
+      "reverse": [],
+      "description": "两题均值，范围 1–6；越高表示越多报告在困难中仍朝价值方向行动。"
+    },
+    {
+      "key": "experiential_avoidance",
+      "label": "经验性回避",
+      "items": [
+        "MPFI24_13",
+        "MPFI24_14"
+      ],
+      "aggregation": "mean",
+      "reverse": [],
+      "description": "两题均值，范围 1–6；越高表示越多报告用分心等方式回避内心体验。"
+    },
+    {
+      "key": "lack_of_contact_present_moment",
+      "label": "缺乏当下接触",
+      "items": [
+        "MPFI24_15",
+        "MPFI24_16"
+      ],
+      "aggregation": "mean",
+      "reverse": [],
+      "description": "两题均值，范围 1–6；越高表示越多报告“自动运行”式的不觉察状态。"
+    },
+    {
+      "key": "self_as_content",
+      "label": "以己为内容",
+      "items": [
+        "MPFI24_17",
+        "MPFI24_18"
+      ],
+      "aggregation": "mean",
+      "reverse": [],
+      "description": "两题均值，范围 1–6；越高表示越多报告评判和不接纳自己的情绪。"
+    },
+    {
+      "key": "fusion",
+      "label": "认知融合",
+      "items": [
+        "MPFI24_19",
+        "MPFI24_20"
+      ],
+      "aggregation": "mean",
+      "reverse": [],
+      "description": "两题均值，范围 1–6；越高表示越多报告被消极想法缠住。"
+    },
+    {
+      "key": "lack_of_contact_values",
+      "label": "缺乏价值联结",
+      "items": [
+        "MPFI24_21",
+        "MPFI24_22"
+      ],
+      "aggregation": "mean",
+      "reverse": [],
+      "description": "两题均值，范围 1–6；越高表示越多报告在忙碌中与价值失去联结。"
+    },
+    {
+      "key": "inaction",
+      "label": "无所作为",
+      "items": [
+        "MPFI24_23",
+        "MPFI24_24"
+      ],
+      "aggregation": "mean",
+      "reverse": [],
+      "description": "两题均值，范围 1–6；越高表示越多报告被消极感受困住而停摆。"
+    },
+    {
+      "key": "flexibility_composite",
+      "label": "全局灵活性合成分（12题均值）",
+      "items": [
+        "MPFI24_01",
+        "MPFI24_02",
+        "MPFI24_03",
+        "MPFI24_04",
+        "MPFI24_05",
+        "MPFI24_06",
+        "MPFI24_07",
+        "MPFI24_08",
+        "MPFI24_09",
+        "MPFI24_10",
+        "MPFI24_11",
+        "MPFI24_12"
+      ],
+      "aggregation": "mean",
+      "reverse": [],
+      "description": "官方短版全局合成分：六个灵活性子量表前两题共 12 题的均值，范围 1–6；越高表示越多报告整体心理灵活性。"
+    },
+    {
+      "key": "inflexibility_composite",
+      "label": "全局不灵活性合成分（12题均值）",
+      "items": [
+        "MPFI24_13",
+        "MPFI24_14",
+        "MPFI24_15",
+        "MPFI24_16",
+        "MPFI24_17",
+        "MPFI24_18",
+        "MPFI24_19",
+        "MPFI24_20",
+        "MPFI24_21",
+        "MPFI24_22",
+        "MPFI24_23",
+        "MPFI24_24"
+      ],
+      "aggregation": "mean",
+      "reverse": [],
+      "description": "官方短版全局合成分：六个不灵活性子量表前两题共 12 题的均值，范围 1–6；越高表示越多报告整体心理僵化。与灵活性合成分分开解读，不合成为总分。"
+    }
+  ],
+  "missingPolicy": "complete_required；任一题缺失则该分数不计算，不插补、不补0。"
+}

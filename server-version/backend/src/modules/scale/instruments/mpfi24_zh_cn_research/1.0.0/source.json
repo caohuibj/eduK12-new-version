@@ -1,0 +1,2065 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "mpfi24_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "Multidimensional Psychological Flexibility Inventory, official 24-item short form",
+      "abbreviation": "MPFI-24",
+      "instrumentFamily": "MPFI"
+    },
+    "construct": {
+      "primaryDomain": "SELF_REGULATION",
+      "secondaryDomains": [],
+      "constructDefinition": "基于 ACT 六过程框架的六个灵活性子量表（接纳、接触当下、以己为景、认知解离、价值、承诺行动）与六个不灵活性子量表（经验性回避、缺乏当下接触、以己为内容、认知融合、缺乏价值联结、无所作为），每子量表两题取均值，另有官方 12 题全局灵活性/不灵活性两个合成分。灵活性与不灵活性分开计分，不合成为总分。",
+      "constructLevel": "BROAD_DOMAIN",
+      "constructOverlapTags": [
+        "domain:act",
+        "domain:self_regulation",
+        "population:adolescent_adult",
+        "response:student_self",
+        "use:reflection",
+        "use:research",
+        "language_validation:chinese_working_translation",
+        "construct:act_acceptance",
+        "construct:act_present_moment",
+        "construct:act_self_as_context",
+        "construct:act_defusion",
+        "construct:act_values",
+        "construct:act_committed_action",
+        "psychological_flexibility",
+        "psychological_inflexibility",
+        "self_report"
+      ]
+    },
+    "population": {
+      "populationNotes": "原开发样本为成人社区样本；中国 MPFI-24 验证（Fang 2024，N=3568，含中学生）见 main 的 mpfi24_zh_cn catalog 条目。此中文工作译稿未经独立回译或本地验证。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "PARTIAL"
+    },
+    "administration": {
+      "itemCount": 24,
+      "estimatedMinutes": 6,
+      "administrationModes": [
+        "PAPER"
+      ],
+      "timeFrame": "过去两周",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保持官方作答量尺与题序；官方锚点为 Never TRUE / Rarely TRUE / Occasionally TRUE / Often TRUE / Very Often TRUE / Always TRUE，作答参照系为过去两周。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "SUPPORTED",
+          "notes": "原文研究支持；中文工作译文尚未验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "反馈仅作普遍生活化反思，不推断个体能力或状态。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "rolffs-2018-mpfi",
+        "evidenceType": "STRUCTURAL_VALIDITY",
+        "population": "Adult community samples (original); Chinese MPFI-24 validation N=3,568 incl. secondary students (Fang 2024)",
+        "locale": "en",
+        "territory": "US/CN",
+        "studyDesign": "原论文开发 60 题版并给出 24 题短版（每子量表前两题）与 12 题全局合成分算法；中国 MPFI-24 验证见 Fang et al. 2024（JCBS 33, 100805）。本记录为官方短版的中文工作译稿。",
+        "rating": "MIXED",
+        "citation": "Rolffs JL, Rogge RD, Wilson KG (2018). Psychological Assessment; Fang S et al. (2024). Journal of Contextual Behavioral Science, 33, 100805.",
+        "doi": "10.1016/j.jcbs.2024.100805",
+        "url": "https://doi.org/10.1016/j.jcbs.2024.100805",
+        "notes": "以上证据均针对原语言版本，不外推到本中文工作译稿。"
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "Multidimensional Psychological Flexibility Inventory (MPFI) official scale handout; official 24-item short form = first two items of each subscale",
+        "citation": "Rolffs, J. L., Rogge, R. D., & Wilson, K. G. (2016/2018). Disentangling components of flexibility via the Hexaflex model: Development and validation of the Multidimensional Psychological Flexibility Inventory (MPFI). 官方题本与计分说明见 Rogge 研究团队网站。",
+        "url": "https://couples-research.com/wp-content/uploads/2017/06/MPFI.docx",
+        "publicationYear": 2018
+      },
+      "license": {
+        "status": "unknown",
+        "redistribution": "unknown",
+        "note": "官方题本由原作者 Rogge 研究团队网站公开提供下载，题本内附明确许可声明：We developed the MPFI scales to be freely available for research and clinical use（免费用于科研与临床，无需另行申请）。短版构成与合成分算法同样出自官方计分说明。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "mpfi_truth_1_6",
+          "options": [
+            {
+              "value": "1",
+              "label": "从不如此",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "很少如此",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "偶尔如此",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "经常如此",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "非常频繁如此",
+              "score": 5
+            },
+            {
+              "value": "6",
+              "label": "总是如此",
+              "score": 6
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "MPFI24_01",
+          "content": "我对观察不愉快的想法和感受保持开放，不去干扰它们。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "mpfi_truth_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MPFI24_02",
+          "content": "我试着与自己的消极想法和感受和解，而不是抗拒它们。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "mpfi_truth_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MPFI24_03",
+          "content": "我留意并觉察自己的情绪。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "mpfi_truth_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MPFI24_04",
+          "content": "我时时刻刻与自己的想法和感受保持联结。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "mpfi_truth_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MPFI24_05",
+          "content": "即使感到受伤或心烦，我也试着保持更开阔的视角。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "mpfi_truth_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MPFI24_06",
+          "content": "我试着从更大的视角看待自己的生活，帮自己度过艰难时刻。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "mpfi_truth_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MPFI24_07",
+          "content": "我能让消极的感受来了又走，而不被它们缠住。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "mpfi_truth_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MPFI24_08",
+          "content": "当我心烦时，我能让那些消极的感受从我身上流过，不抓住不放。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "mpfi_truth_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MPFI24_09",
+          "content": "我很清楚对自己和自己的生活来说什么是重要的。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 8,
+          "responseSetKey": "mpfi_truth_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MPFI24_10",
+          "content": "我坚持生活中更深层的优先事项。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 9,
+          "responseSetKey": "mpfi_truth_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MPFI24_11",
+          "content": "即使受挫，我也没有停止为重要的事努力。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 10,
+          "responseSetKey": "mpfi_truth_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MPFI24_12",
+          "content": "即使日子变得艰难，我仍能朝自己看重的方向迈出步伐。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 11,
+          "responseSetKey": "mpfi_truth_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MPFI24_13",
+          "content": "当想起不愉快的记忆时，我设法让自己分心，好让它消失。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 12,
+          "responseSetKey": "mpfi_truth_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MPFI24_14",
+          "content": "当我有不愉快的情绪时，我试着让自己分心。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 13,
+          "responseSetKey": "mpfi_truth_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MPFI24_15",
+          "content": "我做大部分事情都像“自动运行”，不太留意自己在做什么。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 14,
+          "responseSetKey": "mpfi_truth_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MPFI24_16",
+          "content": "我心不在焉地做大部分事情，没有太多注意。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 15,
+          "responseSetKey": "mpfi_truth_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MPFI24_17",
+          "content": "我觉得有些情绪是不好的或不恰当的，我不应该有它们。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 16,
+          "responseSetKey": "mpfi_truth_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MPFI24_18",
+          "content": "我会因为自己有不合理或不恰当的情绪而责备自己。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 17,
+          "responseSetKey": "mpfi_truth_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MPFI24_19",
+          "content": "消极的想法和感受往往在我心里停留很久。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 18,
+          "responseSetKey": "mpfi_truth_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MPFI24_20",
+          "content": "令人苦恼的想法常像坏掉的唱片一样在我脑子里转个不停。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 19,
+          "responseSetKey": "mpfi_truth_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MPFI24_21",
+          "content": "我的优先事项和价值观常常在日常生活的忙碌中被丢在一边。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 20,
+          "responseSetKey": "mpfi_truth_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MPFI24_22",
+          "content": "当生活变得忙乱时，我常常与自己在乎的东西失去联结。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 21,
+          "responseSetKey": "mpfi_truth_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MPFI24_23",
+          "content": "消极的感受常把我困在无所作为里。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 22,
+          "responseSetKey": "mpfi_truth_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MPFI24_24",
+          "content": "消极的感受很容易让我的计划停摆。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 23,
+          "responseSetKey": "mpfi_truth_1_6",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "MPFI24_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MPFI24_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MPFI24_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MPFI24_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MPFI24_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MPFI24_06",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MPFI24_07",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MPFI24_08",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MPFI24_09",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MPFI24_10",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MPFI24_11",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MPFI24_12",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MPFI24_13",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MPFI24_14",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MPFI24_15",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MPFI24_16",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MPFI24_17",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MPFI24_18",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MPFI24_19",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MPFI24_20",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MPFI24_21",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MPFI24_22",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MPFI24_23",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MPFI24_24",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "acceptance",
+            "type": "dimension",
+            "label": "接纳",
+            "description": "两题均值，范围 1–6；越高表示越多报告接纳。",
+            "direction": "higher_is_more",
+            "canonical": false,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "MPFI24_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPFI24_02",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "present_moment",
+            "type": "dimension",
+            "label": "接触当下",
+            "description": "两题均值，范围 1–6；越高表示越多报告对当下想法和情绪的觉察。",
+            "direction": "higher_is_more",
+            "canonical": false,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "MPFI24_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPFI24_04",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "self_as_context",
+            "type": "dimension",
+            "label": "以己为景",
+            "description": "两题均值，范围 1–6；越高表示越多报告从更大视角看待自己的经历。",
+            "direction": "higher_is_more",
+            "canonical": false,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "MPFI24_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPFI24_06",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "defusion",
+            "type": "dimension",
+            "label": "认知解离",
+            "description": "两题均值，范围 1–6；越高表示越多报告与消极感受保持距离。",
+            "direction": "higher_is_more",
+            "canonical": false,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "MPFI24_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPFI24_08",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "values",
+            "type": "dimension",
+            "label": "价值",
+            "description": "两题均值，范围 1–6；越高表示越多报告清楚并坚持自己的价值方向。",
+            "direction": "higher_is_more",
+            "canonical": false,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "MPFI24_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPFI24_10",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "committed_action",
+            "type": "dimension",
+            "label": "承诺行动",
+            "description": "两题均值，范围 1–6；越高表示越多报告在困难中仍朝价值方向行动。",
+            "direction": "higher_is_more",
+            "canonical": false,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "MPFI24_11",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPFI24_12",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "experiential_avoidance",
+            "type": "dimension",
+            "label": "经验性回避",
+            "description": "两题均值，范围 1–6；越高表示越多报告用分心等方式回避内心体验。",
+            "direction": "higher_is_more",
+            "canonical": false,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "MPFI24_13",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPFI24_14",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "lack_of_contact_present_moment",
+            "type": "dimension",
+            "label": "缺乏当下接触",
+            "description": "两题均值，范围 1–6；越高表示越多报告“自动运行”式的不觉察状态。",
+            "direction": "higher_is_more",
+            "canonical": false,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "MPFI24_15",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPFI24_16",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "self_as_content",
+            "type": "dimension",
+            "label": "以己为内容",
+            "description": "两题均值，范围 1–6；越高表示越多报告评判和不接纳自己的情绪。",
+            "direction": "higher_is_more",
+            "canonical": false,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "MPFI24_17",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPFI24_18",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "fusion",
+            "type": "dimension",
+            "label": "认知融合",
+            "description": "两题均值，范围 1–6；越高表示越多报告被消极想法缠住。",
+            "direction": "higher_is_more",
+            "canonical": false,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "MPFI24_19",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPFI24_20",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "lack_of_contact_values",
+            "type": "dimension",
+            "label": "缺乏价值联结",
+            "description": "两题均值，范围 1–6；越高表示越多报告在忙碌中与价值失去联结。",
+            "direction": "higher_is_more",
+            "canonical": false,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "MPFI24_21",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPFI24_22",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "inaction",
+            "type": "dimension",
+            "label": "无所作为",
+            "description": "两题均值，范围 1–6；越高表示越多报告被消极感受困住而停摆。",
+            "direction": "higher_is_more",
+            "canonical": false,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "MPFI24_23",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPFI24_24",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "flexibility_composite",
+            "type": "dimension",
+            "label": "全局灵活性合成分（12题均值）",
+            "description": "官方短版全局合成分：六个灵活性子量表前两题共 12 题的均值，范围 1–6；越高表示越多报告整体心理灵活性。",
+            "direction": "higher_is_more",
+            "canonical": false,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "MPFI24_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPFI24_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPFI24_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPFI24_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPFI24_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPFI24_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPFI24_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPFI24_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPFI24_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPFI24_10",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPFI24_11",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPFI24_12",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "inflexibility_composite",
+            "type": "dimension",
+            "label": "全局不灵活性合成分（12题均值）",
+            "description": "官方短版全局合成分：六个不灵活性子量表前两题共 12 题的均值，范围 1–6；越高表示越多报告整体心理僵化。与灵活性合成分分开解读，不合成为总分。",
+            "direction": "higher_is_more",
+            "canonical": false,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "MPFI24_13",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPFI24_14",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPFI24_15",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPFI24_16",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPFI24_17",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPFI24_18",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPFI24_19",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPFI24_20",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPFI24_21",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPFI24_22",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPFI24_23",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPFI24_24",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "acceptance",
+          "present_moment",
+          "self_as_context",
+          "defusion",
+          "values",
+          "committed_action",
+          "experiential_avoidance",
+          "lack_of_contact_present_moment",
+          "self_as_content",
+          "fusion",
+          "lack_of_contact_values",
+          "inaction",
+          "flexibility_composite",
+          "inflexibility_composite"
+        ],
+        "scoreOrder": [
+          "acceptance",
+          "present_moment",
+          "self_as_context",
+          "defusion",
+          "values",
+          "committed_action",
+          "experiential_avoidance",
+          "lack_of_contact_present_moment",
+          "self_as_content",
+          "fusion",
+          "lack_of_contact_values",
+          "inaction",
+          "flexibility_composite",
+          "inflexibility_composite"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "flexibility_composite",
+            "headline": "整体灵活性",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "六个灵活性侧面的总体均值：越高表示越多报告接纳、觉察当下、与想法保持距离、看清价值并采取行动。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近两周，哪个侧面最像你？哪个最不像？"
+              },
+              {
+                "category": "strategy",
+                "text": "挑一个最弱的侧面，本周做一次与之相关的小练习（如解离：给念头加一句“我注意到我在想……”）。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "inflexibility_composite",
+            "headline": "整体僵化",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "六个不灵活性侧面的总体均值：越高表示越多报告回避、不觉察、评判自己、被想法缠住或停摆。数字不是病情或缺陷标签。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "什么时候僵化的反应最容易出现——累的时候？压力大的事上？"
+              },
+              {
+                "category": "strategy",
+                "text": "选一个最容易出现的僵化反应，提前想好一句自我提醒的话。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "acceptance",
+            "headline": "接纳",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "对不愉快想法和感受保持开放、不干扰它们的程度。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近哪种感受你最想赶走？"
+              },
+              {
+                "category": "strategy",
+                "text": "试着给那种感受让出一点空间，观察 10 秒。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "present_moment",
+            "headline": "接触当下",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "对当下情绪和想法的觉察程度。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "今天哪些时刻你真正“在场”？"
+              },
+              {
+                "category": "strategy",
+                "text": "挑一个日常活动，练习只留意此刻的感官信息。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "self_as_context",
+            "headline": "以己为景",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "从更大视角看待自己经历的程度。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回想一件难事——十年后的你会怎么看它？"
+              },
+              {
+                "category": "strategy",
+                "text": "试着用“我注意到我在经历……”开头描述一件难事。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "defusion",
+            "headline": "认知解离",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "让消极感受来了又走、不被缠住的程度。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "哪个念头最容易缠住你？"
+              },
+              {
+                "category": "strategy",
+                "text": "把那个念头写下来，加一句“这是一个想法，不是命令”。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "values",
+            "headline": "价值",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "清楚并坚持自己价值方向的程度。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "用一句话说，你在乎什么？"
+              },
+              {
+                "category": "strategy",
+                "text": "把这句话写下来，放在每天能看见的地方。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "committed_action",
+            "headline": "承诺行动",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "在困难中仍朝价值方向行动的程度。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近一次受挫后你做了什么？"
+              },
+              {
+                "category": "strategy",
+                "text": "为在乎的事设定一个“最小行动”，受挫日也完成它。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "experiential_avoidance",
+            "headline": "经验性回避",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "越高表示越多报告用分心等方式推开内心体验；这是常见反应，不是缺点。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "你通常用什么方式让自己分心？"
+              },
+              {
+                "category": "strategy",
+                "text": "下次分心时，先停 10 秒留意一下自己在躲什么。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "lack_of_contact_present_moment",
+            "headline": "缺乏当下接触",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "越高表示越多报告“自动运行”、心不在焉。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "一天里哪段路你是“自动走完”的？"
+              },
+              {
+                "category": "strategy",
+                "text": "在那段路上练习留意三个细节。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "self_as_content",
+            "headline": "以己为内容",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "越高表示越多报告评判和不接纳自己的情绪。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "你常批评自己哪些“不该有”的感受？"
+              },
+              {
+                "category": "strategy",
+                "text": "把批评改成描述：“我现在感到……，这可以理解。”"
+              }
+            ]
+          },
+          {
+            "scoreKey": "fusion",
+            "headline": "认知融合",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "越高表示越多报告被消极想法缠住、反复盘旋。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "那个反复出现的念头在说什么？"
+              },
+              {
+                "category": "strategy",
+                "text": "把它写在纸上，然后写一句“这是一个想法，不是事实”。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "lack_of_contact_values",
+            "headline": "缺乏价值联结",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "越高表示越多报告在忙碌中丢下自己在乎的事。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近一周，什么占据了你在乎之事的时间？"
+              },
+              {
+                "category": "strategy",
+                "text": "在日程里为在乎的事找回一个固定小格。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "inaction",
+            "headline": "无所作为",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "越高表示越多报告被消极感受困住而停摆。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "情绪来时，什么最容易停摆？"
+              },
+              {
+                "category": "strategy",
+                "text": "约定一个“最小动作”：哪怕只做 5 分钟也算数。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这是未经回译及本地验证的中文工作译稿，结果不可视作已验证中文测量结果。",
+          "灵活性与不灵活性分开计分，不合成为总分；两合成分方向相反，需分别解读。",
+          "24 题短版题序按官方题本“每子量表前两题”的说明组织；与官方 24 题独立施测版如有差异，以官方版本核对后更新。",
+          "该报告是单次自述；缺答不计分，不插补。"
+        ],
+        "disclaimer": "这些内容仅供一般自我反思，不用于诊断、筛查、选拔或排名。"
+      },
+      "referencePolicy": {
+        "type": "none"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "all_minimum",
+        "answers": [
+          {
+            "itemCode": "MPFI24_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPFI24_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPFI24_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPFI24_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPFI24_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPFI24_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPFI24_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPFI24_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPFI24_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPFI24_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPFI24_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPFI24_12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPFI24_13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPFI24_14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPFI24_15",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPFI24_16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPFI24_17",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPFI24_18",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPFI24_19",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPFI24_20",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPFI24_21",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPFI24_22",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPFI24_23",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPFI24_24",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "acceptance": 1.0,
+            "present_moment": 1.0,
+            "self_as_context": 1.0,
+            "defusion": 1.0,
+            "values": 1.0,
+            "committed_action": 1.0,
+            "experiential_avoidance": 1.0,
+            "lack_of_contact_present_moment": 1.0,
+            "self_as_content": 1.0,
+            "fusion": 1.0,
+            "lack_of_contact_values": 1.0,
+            "inaction": 1.0,
+            "flexibility_composite": 1.0,
+            "inflexibility_composite": 1.0
+          },
+          "totalScoreKeys": [
+            "acceptance",
+            "present_moment",
+            "self_as_context",
+            "defusion",
+            "values",
+            "committed_action",
+            "experiential_avoidance",
+            "lack_of_contact_present_moment",
+            "self_as_content",
+            "fusion",
+            "lack_of_contact_values",
+            "inaction",
+            "flexibility_composite",
+            "inflexibility_composite"
+          ]
+        }
+      },
+      {
+        "name": "all_maximum",
+        "answers": [
+          {
+            "itemCode": "MPFI24_01",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "MPFI24_02",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "MPFI24_03",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "MPFI24_04",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "MPFI24_05",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "MPFI24_06",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "MPFI24_07",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "MPFI24_08",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "MPFI24_09",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "MPFI24_10",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "MPFI24_11",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "MPFI24_12",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "MPFI24_13",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "MPFI24_14",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "MPFI24_15",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "MPFI24_16",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "MPFI24_17",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "MPFI24_18",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "MPFI24_19",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "MPFI24_20",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "MPFI24_21",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "MPFI24_22",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "MPFI24_23",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "MPFI24_24",
+            "responseValue": "6"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "acceptance": 6.0,
+            "present_moment": 6.0,
+            "self_as_context": 6.0,
+            "defusion": 6.0,
+            "values": 6.0,
+            "committed_action": 6.0,
+            "experiential_avoidance": 6.0,
+            "lack_of_contact_present_moment": 6.0,
+            "self_as_content": 6.0,
+            "fusion": 6.0,
+            "lack_of_contact_values": 6.0,
+            "inaction": 6.0,
+            "flexibility_composite": 6.0,
+            "inflexibility_composite": 6.0
+          },
+          "totalScoreKeys": [
+            "acceptance",
+            "present_moment",
+            "self_as_context",
+            "defusion",
+            "values",
+            "committed_action",
+            "experiential_avoidance",
+            "lack_of_contact_present_moment",
+            "self_as_content",
+            "fusion",
+            "lack_of_contact_values",
+            "inaction",
+            "flexibility_composite",
+            "inflexibility_composite"
+          ]
+        }
+      },
+      {
+        "name": "all_midpoint",
+        "answers": [
+          {
+            "itemCode": "MPFI24_01",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_03",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_06",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_07",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_08",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_09",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_10",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_11",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_12",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_13",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_14",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_15",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_16",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_17",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_18",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_19",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_20",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_21",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_22",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_23",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_24",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "acceptance": 4.0,
+            "present_moment": 4.0,
+            "self_as_context": 4.0,
+            "defusion": 4.0,
+            "values": 4.0,
+            "committed_action": 4.0,
+            "experiential_avoidance": 4.0,
+            "lack_of_contact_present_moment": 4.0,
+            "self_as_content": 4.0,
+            "fusion": 4.0,
+            "lack_of_contact_values": 4.0,
+            "inaction": 4.0,
+            "flexibility_composite": 4.0,
+            "inflexibility_composite": 4.0
+          },
+          "totalScoreKeys": [
+            "acceptance",
+            "present_moment",
+            "self_as_context",
+            "defusion",
+            "values",
+            "committed_action",
+            "experiential_avoidance",
+            "lack_of_contact_present_moment",
+            "self_as_content",
+            "fusion",
+            "lack_of_contact_values",
+            "inaction",
+            "flexibility_composite",
+            "inflexibility_composite"
+          ]
+        }
+      },
+      {
+        "name": "mixed_pattern",
+        "answers": [
+          {
+            "itemCode": "MPFI24_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPFI24_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_03",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "MPFI24_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPFI24_05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_06",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "MPFI24_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPFI24_08",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_09",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "MPFI24_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPFI24_11",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_12",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "MPFI24_13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPFI24_14",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_15",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "MPFI24_16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPFI24_17",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_18",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "MPFI24_19",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPFI24_20",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_21",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "MPFI24_22",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPFI24_23",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_24",
+            "responseValue": "6"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "acceptance": 2.5,
+            "present_moment": 3.5,
+            "self_as_context": 5.0,
+            "defusion": 2.5,
+            "values": 3.5,
+            "committed_action": 5.0,
+            "experiential_avoidance": 2.5,
+            "lack_of_contact_present_moment": 3.5,
+            "self_as_content": 5.0,
+            "fusion": 2.5,
+            "lack_of_contact_values": 3.5,
+            "inaction": 5.0,
+            "flexibility_composite": 3.6666666666666665,
+            "inflexibility_composite": 3.6666666666666665
+          },
+          "totalScoreKeys": [
+            "acceptance",
+            "present_moment",
+            "self_as_context",
+            "defusion",
+            "values",
+            "committed_action",
+            "experiential_avoidance",
+            "lack_of_contact_present_moment",
+            "self_as_content",
+            "fusion",
+            "lack_of_contact_values",
+            "inaction",
+            "flexibility_composite",
+            "inflexibility_composite"
+          ]
+        }
+      },
+      {
+        "name": "missing_first_item",
+        "answers": [
+          {
+            "itemCode": "MPFI24_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_03",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_06",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_07",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_08",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_09",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_10",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_11",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_12",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_13",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_14",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_15",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_16",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_17",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_18",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_19",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_20",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_21",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_22",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_23",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPFI24_24",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "acceptance": null,
+            "present_moment": 4.0,
+            "self_as_context": 4.0,
+            "defusion": 4.0,
+            "values": 4.0,
+            "committed_action": 4.0,
+            "experiential_avoidance": 4.0,
+            "lack_of_contact_present_moment": 4.0,
+            "self_as_content": 4.0,
+            "fusion": 4.0,
+            "lack_of_contact_values": 4.0,
+            "inaction": 4.0,
+            "flexibility_composite": null,
+            "inflexibility_composite": 4.0
+          },
+          "totalScoreKeys": [
+            "acceptance",
+            "present_moment",
+            "self_as_context",
+            "defusion",
+            "values",
+            "committed_action",
+            "experiential_avoidance",
+            "lack_of_contact_present_moment",
+            "self_as_content",
+            "fusion",
+            "lack_of_contact_values",
+            "inaction",
+            "flexibility_composite",
+            "inflexibility_composite"
+          ]
+        }
+      },
+      {
+        "name": "all_missing",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "acceptance": null,
+            "present_moment": null,
+            "self_as_context": null,
+            "defusion": null,
+            "values": null,
+            "committed_action": null,
+            "experiential_avoidance": null,
+            "lack_of_contact_present_moment": null,
+            "self_as_content": null,
+            "fusion": null,
+            "lack_of_contact_values": null,
+            "inaction": null,
+            "flexibility_composite": null,
+            "inflexibility_composite": null
+          },
+          "totalScoreKeys": [
+            "acceptance",
+            "present_moment",
+            "self_as_context",
+            "defusion",
+            "values",
+            "committed_action",
+            "experiential_avoidance",
+            "lack_of_contact_present_moment",
+            "self_as_content",
+            "fusion",
+            "lack_of_contact_values",
+            "inaction",
+            "flexibility_composite",
+            "inflexibility_composite"
+          ]
+        }
+      }
+    ]
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "mpfi24-v1",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "mpfi24-v1",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
