@@ -1,0 +1,81 @@
+{
+  "workerCommit": "d5d4594bb26ec4ac220d43aecabd3366fb768b4a",
+  "rootState": "shared WIP; no claim of committed final candidate",
+  "files": [
+    {
+      "worktree": "/workspace/cognitive-review-horizon",
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/gradcpt/wire.ts",
+      "sha256": "d3a108e880b6f3f57c189b024bc1112b255aa02533c60aeae6d0cd6d06df7261"
+    },
+    {
+      "worktree": "/workspace/cognitive-review-horizon",
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/gradcpt/wire-format.ts",
+      "sha256": "fdd9c630199f7377e1268e55c0ce0de81d4b4abc255f0f436f8df7147c6e6125"
+    },
+    {
+      "worktree": "/workspace/cognitive-review-horizon",
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/gradcpt/package.ts",
+      "sha256": "f59ae12f0cd119e93557e0fba6a10738039ddfbc0705c673f99cb9baced003bc"
+    },
+    {
+      "worktree": "/workspace/cognitive-review-horizon",
+      "path": "server-version/frontend/src/modules/cognitive/tasks/gradcpt/wire.ts",
+      "sha256": "3d637b9395d6f2e1ef1307235be53cea50eb6a9241ce098e2ee12cbf65d3ec32"
+    },
+    {
+      "worktree": "/workspace/cognitive-review-horizon",
+      "path": "server-version/frontend/src/modules/cognitive/tasks/gradcpt/NativeGradRunner.tsx",
+      "sha256": "d5af344d76878859d76b7e31840595a6370a50c5ede719d089707b8de40631ac"
+    },
+    {
+      "worktree": "/workspace/cognitive-review-horizon",
+      "path": "server-version/backend/src/__tests__/cognitive/grad-wire.test.ts",
+      "sha256": "e306fda7c7c60d4aa5d41c09c0726ac3356cc499b5c3343c9e6642ebaa8512ce"
+    },
+    {
+      "worktree": "/workspace/cognitive-review-horizon",
+      "path": "server-version/frontend/src/modules/cognitive/tasks/gradcpt/wire.test.ts",
+      "sha256": "8d9faf6d4d1df6519b981c5514bc513ce7cd6556097f6b593142b92d9f7350ae"
+    },
+    {
+      "worktree": "/workspace/eduK12-new-version",
+      "path": "server-version/frontend/src/modules/cognitive/core/native-content-port.ts",
+      "sha256": "6d9a2451cd427529829bfbc7cbb9b899f58ebf13a373bd9079d9c9c4e057d4ed"
+    },
+    {
+      "worktree": "/workspace/eduK12-new-version",
+      "path": "server-version/frontend/src/modules/cognitive/core/useCognitiveSession.ts",
+      "sha256": "9c7a1d54197085aae91de04b6a024ec62cbbd50e686ef2334a1f73980bf6ddf5"
+    },
+    {
+      "worktree": "/workspace/eduK12-new-version",
+      "path": "server-version/frontend/src/services/persistence/finalDraftStore.ts",
+      "sha256": "007bfcbe75134e424b306940d60001698595ef8499598f956cf509f7af6787ca"
+    },
+    {
+      "worktree": "/workspace/eduK12-new-version",
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/native-registry/archive-detail.ts",
+      "sha256": "8a4d5883f85b0f3b4fa486b9b108a91838dd13209e09f5ad7eb429af52fc86c6"
+    },
+    {
+      "worktree": "/workspace/eduK12-new-version",
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/native-registry/content-contract.ts",
+      "sha256": "f11e30ac88067b9c3fb8a9ab6308828d566bb88e84346956f330ed5ae61d9bb9"
+    },
+    {
+      "worktree": "/workspace/eduK12-new-version",
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/native-registry/definitions.ts",
+      "sha256": "48a81226014480f9c39f7238ac80d1f79727553042a67cbc6dd0f1f258430d1c"
+    },
+    {
+      "worktree": "/workspace/eduK12-new-version",
+      "path": "server-version/backend/src/modules/cognitive/export.service.ts",
+      "sha256": "c7e43617f4b76fb8781e82f16389e85f1aa08f72ecdd98018be1ce351625700e"
+    },
+    {
+      "worktree": "/workspace/eduK12-new-version",
+      "path": "server-version/backend/src/modules/cognitive/session.service.ts",
+      "sha256": "2e491483e05bf9d1e6b7526b120e44fe8ecb37bca708a7f01a83d0346f3040eb"
+    }
+  ]
+}
