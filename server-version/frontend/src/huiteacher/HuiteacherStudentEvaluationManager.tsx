@@ -1,4 +1,4 @@
-import {useCallback,useEffect,useState} from 'react'
+import {useCallback,useEffect,useRef,useState} from 'react'
 import {HuiteacherStudentFeedbackView,type StudentFeedbackReport} from './HuiteacherStudentFeedbackView'
 type Api=<T>(path:string,method?:string,data?:unknown)=>Promise<T>
 type Form={id:string;title:string;definitionDigest:string;status:'PUBLISHED'|'DRAFT'}
@@ -16,11 +16,20 @@ type Preview={
 }
 type Run={runId:string;status:string;version:number;trackCount?:number}
 type Progress={runId:string;total:number;counts:Record<string,number>}
-export function HuiteacherStudentEvaluationManager({organizationId,eventId,eventStatus,
-  eventVersion,teacherName,forms,api,onChanged}:{
+type Props={
   organizationId:string;eventId:string;eventStatus:string;eventVersion:number;
   teacherName:string;forms:Form[];api:Api;onChanged?:()=>void
-}){
+}
+// Match teacherApi's Error.status, rather than its application-level code.
+const notFound=(error:unknown)=>error instanceof Error&&'status' in error&&error.status===404
+export function HuiteacherStudentEvaluationManager(props:Props){
+  const scope=useRef({api:props.api,organizationId:props.organizationId,eventId:props.eventId,epoch:0})
+  if(scope.current.api!==props.api||scope.current.organizationId!==props.organizationId||scope.current.eventId!==props.eventId)
+    scope.current={api:props.api,organizationId:props.organizationId,eventId:props.eventId,epoch:scope.current.epoch+1}
+  return <StudentEvaluationSession key={scope.current.epoch} {...props}/>
+}
+function StudentEvaluationSession({organizationId,eventId,eventStatus,
+  eventVersion,teacherName,forms,api:hostApi,onChanged}:Props){
   const base='/organizations/'+organizationId+'/evaluation-events/'+eventId+'/student-evaluation'
   const eventBase='/organizations/'+organizationId+'/evaluation-events/'+eventId
   const [appointments,setAppointments]=useState<Appointment[]>([])
@@ -34,32 +43,69 @@ export function HuiteacherStudentEvaluationManager({organizationId,eventId,event
   const [deadline,setDeadline]=useState('')
   const [busy,setBusy]=useState(false)
   const [notice,setNotice]=useState('')
+  const [readState,setReadState]=useState<'LOADING'|'READY'|'ERROR'>('LOADING')
+  const [readError,setReadError]=useState('')
+  const alive=useRef(true),pending=useRef(false)
+  useEffect(()=>{alive.current=true;return()=>{alive.current=false}},[])
+  // A response from an abandoned event/account must not continue a multi-step
+  // action, including a later POST after its first request has returned.
+  const api:Api=useCallback(async <T,>(path:string,method='GET',data?:unknown):Promise<T>=>{
+    if(!alive.current)throw new Error('评价页面已切换')
+    try{
+      const result=await hostApi<T>(path,method,data)
+      if(!alive.current)throw new Error('评价页面已切换')
+      return result
+    }catch(error){
+      if(alive.current&&method!=='GET'){
+        setReadState('ERROR');setReadError('操作结果需要重新核对，请重新读取评价配置与任务。')
+      }
+      throw error
+    }
+  },[hostApi])
   const available=forms.filter(f=>f.status==='PUBLISHED')
   const loadRun=useCallback(async()=>{
     try{
       const current=await api<Run>(eventBase+'/run')
       setAssignedRun(current)
       return current
-    }catch{setAssignedRun(null);return null}
+    }catch(error){
+      if(!alive.current)throw error
+      if(notFound(error)){setAssignedRun(null);return null}
+      setReadState('ERROR')
+      setReadError(error instanceof Error?error.message:'评价任务读取失败')
+      throw error
+    }
   },[api,eventBase])
-  useEffect(()=>{
-    let current=true
-    void api<Config>(base).then(value=>{if(current){setConfigured(value);void loadRun()}})
-      .catch(()=>{if(current)setConfigured(null)})
-    return ()=>{current=false}
+  const readCurrent=useCallback(async()=>{
+    setReadState('LOADING');setReadError('')
+    try{
+      let config:Config|null
+      try{config=await api<Config>(base)}
+      catch(error){if(!notFound(error))throw error;config=null}
+      if(!alive.current)return
+      setConfigured(config)
+      if(config)await loadRun()
+      else{setAssignedRun(null);setPreview(null);setProgress(null);setReport(null)}
+      if(alive.current)setReadState('READY')
+    }catch(error){
+      if(alive.current){setReadState('ERROR');setReadError(error instanceof Error?error.message:'评价配置读取失败')}
+    }
   },[api,base,loadRun])
-  const run=(job:()=>Promise<void>)=>{
+  useEffect(()=>{void readCurrent()},[readCurrent])
+  const run=(job:()=>Promise<void>,retry=false)=>{
+    if(pending.current||!alive.current||!retry&&readState!=='READY')return
+    pending.current=true
     setBusy(true);setNotice('')
-    void job().catch(e=>setNotice(e instanceof Error?e.message:'评教操作未获授权或状态已更新'))
-      .finally(()=>setBusy(false))
+    void job().catch(e=>{if(alive.current)setNotice(e instanceof Error?e.message:'评教操作未获授权或状态已更新')})
+      .finally(()=>{pending.current=false;if(alive.current)setBusy(false)})
   }
+  const blocked=busy||readState!=='READY'
   const load=()=>run(async()=>{
     if(eventStatus!=='DRAFT')throw new Error('只有草稿可以选择任教关系')
     const result=await api<{list:Appointment[];truncated:boolean}>(base+'/candidates')
     setAppointments(result.list)
     if(result.truncated)setNotice('候选任教记录超过显示上限，请先核实学校资料')
-    try{setConfigured(await api<Config>(base));await loadRun()}
-    catch{setConfigured(null)}
+    await readCurrent()
   })
   const configure=()=>run(async()=>{
     const appointment=appointments.find(c=>c.staffAssignmentId===staffId)
@@ -137,9 +183,12 @@ export function HuiteacherStudentEvaluationManager({organizationId,eventId,event
     <p>被评价教师：{teacherName}。学生使用原有教育账号分别登录 Teacher，
       本功能不读取 School 心理资料或导出学生个人答案。</p>
     {notice&&<p role="status" className="ht-notice">{notice}</p>}
-    {eventStatus==='DRAFT'&&!configured&&<button disabled={busy} onClick={load}>
+    {readState==='LOADING'&&<p role="status">正在核对评价配置与任务…</p>}
+    {readState==='ERROR'&&<div><p role="alert">{readError}</p>
+      <button disabled={busy} onClick={()=>run(readCurrent,true)}>重试读取评价配置与任务</button></div>}
+    {readState==='READY'&&eventStatus==='DRAFT'&&!configured&&<button disabled={blocked} onClick={load}>
       选择学校核验的任教关系</button>}
-    {!configured&&<p className="ht-muted">须先冻结本次评价的教师、任教班级和正式发布 Form。</p>}
+    {readState==='READY'&&!configured&&<p className="ht-muted">须先冻结本次评价的教师、任教班级和正式发布 Form。</p>}
     {!configured&&appointments.length>0&&<div className="ht-inline">
       <label className="ht-field"><span>本教师合法任教的班级</span>
         <select value={staffId} onChange={e=>setStaffId(e.target.value)}>
@@ -156,41 +205,41 @@ export function HuiteacherStudentEvaluationManager({organizationId,eventId,event
       <label className="ht-field"><span>截止时间（选填，本地时间）</span>
         <input type="datetime-local" value={deadline}
           onChange={e=>setDeadline(e.target.value)}/></label>
-      <button disabled={busy||!staffId||!formId} onClick={configure}>准备评价草稿</button>
+      <button disabled={blocked||!staffId||!formId} onClick={configure}>准备评价草稿</button>
     </div>}
     {configured&&<div className="ht-field-evidence">
       <p>冻结班级：<code>{configured.classUnitId}</code>
         {' · '}发布 Form：<code>{configured.formId}</code></p>
       <p>问卷内容摘要：<code>{configured.definitionDigest.slice(0,16)}…</code></p>
-      {eventStatus==='DRAFT'&&<button disabled={busy} onClick={count}>
+      {eventStatus==='DRAFT'&&<button disabled={blocked} onClick={count}>
         核验当前参与资格与隐私人数下限</button>}
       {preview&&<p>当前符合资格学生：{preview.eligibleStudentCount} 人，
         披露最低 {preview.privacyFloor} 份 FINAL。
         {preview.readyForPrivacyProtectedFeedback
           ?' 仅满足基本人数门槛，其他披露条件在关闭后核查。'
           :' 当前样本不足，不得向教师披露统计结果。'}</p>}
-      {!assignedRun&&eventStatus==='DRAFT'&&<div className="ht-inline">
+      {readState==='READY'&&!assignedRun&&eventStatus==='DRAFT'&&<div className="ht-inline">
         <label className="ht-field"><span>截止时间（选填，本地时间）</span>
           <input type="datetime-local" value={deadline}
             onChange={e=>setDeadline(e.target.value)}/></label>
-        <button disabled={busy} onClick={create}>继续准备已保存的评价</button>
+        <button disabled={blocked} onClick={create}>继续准备已保存的评价</button>
       </div>}
       {assignedRun&&<div className="ht-event">
         <p>标准 Run · {assignedRun.status} · {assignedRun.runId}</p>
         <div className="ht-inline">
           {['DRAFT','OPEN'].includes(eventStatus)&&assignedRun.status==='DRAFT'&&
-            <button disabled={busy} onClick={publish}>发布评价</button>}
+            <button disabled={blocked} onClick={publish}>发布评价</button>}
           {assignedRun.status==='PUBLISHED'&&<>
-            <button disabled={busy} onClick={loadProgress}>查看参与进度</button>
-            {eventStatus==='OPEN'&&<button disabled={busy} onClick={close}>
+            <button disabled={blocked} onClick={loadProgress}>查看参与进度</button>
+            {eventStatus==='OPEN'&&<button disabled={blocked} onClick={close}>
               结束评价并准备群体反馈</button>}
           </>}
           {eventStatus==='OPEN'&&assignedRun.status==='CLOSED'&&
-            <button disabled={busy} onClick={close}>完成活动关闭</button>}
+            <button disabled={blocked} onClick={close}>完成活动关闭</button>}
           {eventStatus==='CLOSED'&&assignedRun.status==='CLOSED'&&<>
             {import.meta.env.VITE_REPORT_PRIVACY_TEACHER_V2_ENABLED==='true'
-              &&<button disabled={busy} onClick={releaseReport}>正式发布新版群体报告</button>}
-            <button disabled={busy} onClick={readReport}>查看群体反馈</button>
+              &&<button disabled={blocked} onClick={releaseReport}>正式发布新版群体报告</button>}
+            <button disabled={blocked} onClick={readReport}>查看群体反馈</button>
           </>}
         </div>
         {progress&&<p>已完成 {progress.counts.COMPLETED??0} / {progress.total}
