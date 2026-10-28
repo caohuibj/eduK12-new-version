@@ -1,0 +1,46 @@
+{
+  "instrument": "Mindful Attention Awareness Scale, 15-item version (Day-to-Day Experiences)",
+  "item_count": 15,
+  "options": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "dimensions": {
+    "dispositional_mindfulness": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ]
+  },
+  "reverse_items": [],
+  "reverse_formula": null,
+  "sum_ranges": {
+    "dispositional_mindfulness": [
+      15,
+      90
+    ]
+  },
+  "mean_range": [
+    1,
+    6
+  ],
+  "missing_policy": "complete required per score, otherwise null; product convention",
+  "thresholds": null,
+  "source_note": "Official UPenn PPC PDF scoring page: 'To score the scale, simply compute a mean of the 15 items. Higher scores reflect higher levels of dispositional mindfulness.' The page lists no reverse key and no per-item R marks (unlike the same author's KIMS PDF). All 15 items are worded as lapses in mindfulness (verified item-by-item), and the anchors run 1=Almost Always to 6=Almost Never, so the plain mean of raw responses is already direction-correct: raw 6 (lapses almost never) means fewer lapses and thus higher mindfulness. No reverse scoring is applied. Corroboration: GGSC Berkeley trait-MAAS PDF ('simply compute a mean (average) of the 15 items') and selfdeterminationtheory.org ('Based on a mean of all items, MAAS scores can range from 1 to 6'). Brown & Ryan (2003) 'reverse scored' statements concern the alternate direct-worded form (13 items rephrased; items 2/12 retained and reversed) and the State MAAS - different forms, not this trait form; derivative versions are not mixed into this record. Score = mean of the 15 raw items (1-6); the 15-90 sum is reported alongside but is not the primary reading. Any missing item yields null (complete_required, product-conservative convention, not an author rule); no norms or cutoffs are invented."
+}
