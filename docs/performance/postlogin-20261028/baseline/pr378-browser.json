@@ -1,0 +1,2730 @@
+{
+  "head": "b9644606385627445c8311306adea2d5e8c1bcc3",
+  "status": "PASS",
+  "scope": "One production build. Built static JS/CSS gzip1 estimates and sandboxed compiled-page consumers with synthetic read-only API replies. No production transfer, RTT, login, START or FINAL qualification.",
+  "cases": [
+    {
+      "name": "school-public-pending",
+      "host": "school.eduk12.top",
+      "path": "/",
+      "width": 390,
+      "status": "PASS",
+      "requests": [
+        "/",
+        "/entry-brand.css",
+        "/entry-brand.js",
+        "/assets/index-BYrOY8Xa.js",
+        "/assets/index-RCBHkAFU.css",
+        "/assets/SchoolApp-BVhmqSpH.js",
+        "/assets/deferredPage-CopuSF3X.js",
+        "/assets/RetryableLazy-BPpeFHpN.js",
+        "/assets/education-entry-layout-w6n9bUS1.js",
+        "/assets/createLucideIcon-Bc77O2Ki.js",
+        "/assets/info-B3BgItkY.js",
+        "/assets/education-entry-layout-CpJy3zDV.css",
+        "/assets/ProductThemeControl-BW-KiUtg.js",
+        "/assets/sun-deCwFiy7.js",
+        "/assets/ProductThemeControl-lELuWh9q.css",
+        "/assets/SchoolMark-2_knsI4Q.js",
+        "/assets/SchoolMark-CcA7i-Iq.css",
+        "/assets/calendar-days-Cku-0JUJ.js",
+        "/assets/book-open-Cp704KnQ.js",
+        "/assets/heart-handshake-UXHw5QWL.js",
+        "/assets/users-DZ39kNLb.js",
+        "/assets/shield-check-CblOR6NH.js",
+        "/assets/clipboard-list-DllXQlk5.js",
+        "/assets/chart-no-axes-combined-CUGW388O.js",
+        "/assets/x-D97MjwYD.js",
+        "/assets/arrow-right-COartPe5.js",
+        "/assets/refresh-cw-Q6dBFrYY.js",
+        "/assets/users-round-BPQxynoL.js",
+        "/assets/school-collection-BlpFJJAA.js",
+        "/assets/list-BAyLCUVS.js",
+        "/assets/search-D3s-VGP6.js",
+        "/assets/message-square-text-FXbbf8lB.js",
+        "/assets/SchoolApp-CxHg8BQI.css",
+        "/school/favicon.svg",
+        "/assets/school-home-wordmark-BO8jmBb-.svg",
+        "/api/campus/auth/me",
+        "/assets/huischool-a1-emblem-BNEzhrHA.svg",
+        "/assets/huischool-a1-emblem-dark-ClWHGvL8.svg",
+        "/assets/huischool-campus-sunlight-D3Yo_Q2B.webp"
+      ],
+      "api": [
+        {
+          "path": "/api/campus/auth/me",
+          "method": "GET"
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "name": "teacher-public-pending",
+      "host": "teacher.eduk12.top",
+      "path": "/",
+      "width": 768,
+      "status": "PASS",
+      "requests": [
+        "/",
+        "/entry-brand.css",
+        "/entry-brand.js",
+        "/assets/index-BYrOY8Xa.js",
+        "/assets/index-RCBHkAFU.css",
+        "/assets/HuiteacherApp-DZ1tz1B0.js",
+        "/assets/deferredPage-CopuSF3X.js",
+        "/assets/RetryableLazy-BPpeFHpN.js",
+        "/assets/education-entry-layout-w6n9bUS1.js",
+        "/assets/createLucideIcon-Bc77O2Ki.js",
+        "/assets/info-B3BgItkY.js",
+        "/assets/education-entry-layout-CpJy3zDV.css",
+        "/assets/index-CjVJlT6C.js",
+        "/assets/sun-deCwFiy7.js",
+        "/assets/educationAssessmentFeedbackAdapter-DVmGUCUS.js",
+        "/assets/ScaleUnitReportCard-Cah-WOtG.js",
+        "/assets/TrainingMaterials-Dz5dLTRF.js",
+        "/assets/AssessmentMaterialDisplay-D8V6m1Mq.js",
+        "/assets/AssessmentMaterialDisplay-B3_-Rx-i.css",
+        "/assets/client-DLEYkVg8.js",
+        "/assets/useAssessmentImageAssets-CvNk8yr3.js",
+        "/assets/ReportPrimitives-DCXp0ZbU.js",
+        "/assets/ReportPrimitives-BJQ-FC7T.css",
+        "/assets/TrainingContentReports-ci4FDGaF.js",
+        "/assets/educationAssessmentFeedbackAdapter-DqsvUUdR.css",
+        "/assets/index-BPUuZ9i6.js",
+        "/assets/TeacherBrand-CE4eTdkF.js",
+        "/assets/ProductThemeControl-BW-KiUtg.js",
+        "/assets/ProductThemeControl-lELuWh9q.css",
+        "/assets/book-open-Cp704KnQ.js",
+        "/assets/file-text-DLQMs23J.js",
+        "/assets/users-round-BPQxynoL.js",
+        "/assets/user-round-DygDGooC.js",
+        "/assets/clipboard-list-DllXQlk5.js",
+        "/assets/x-D97MjwYD.js",
+        "/assets/HuiteacherApp-ClGL_1jI.css",
+        "/vite.svg",
+        "/assets/teacher-home-wordmark-CaR56Unw.svg",
+        "/huiteacher/huiteacher-b3-emblem.svg",
+        "/huiteacher/educator-journal-small.webp",
+        "/api/huiteacher/auth/me",
+        "/huiteacher/huiteacher-b3-emblem.svg"
+      ],
+      "api": [
+        {
+          "path": "/api/huiteacher/auth/me",
+          "method": "GET"
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "name": "school-protected-pending",
+      "host": "school.eduk12.top",
+      "path": "/workspace/tasks",
+      "width": 390,
+      "status": "PASS",
+      "requests": [
+        "/workspace/tasks",
+        "/entry-brand.css",
+        "/entry-brand.js",
+        "/assets/index-BYrOY8Xa.js",
+        "/assets/index-RCBHkAFU.css",
+        "/assets/SchoolApp-BVhmqSpH.js",
+        "/assets/deferredPage-CopuSF3X.js",
+        "/assets/RetryableLazy-BPpeFHpN.js",
+        "/assets/education-entry-layout-w6n9bUS1.js",
+        "/assets/createLucideIcon-Bc77O2Ki.js",
+        "/assets/info-B3BgItkY.js",
+        "/assets/education-entry-layout-CpJy3zDV.css",
+        "/assets/ProductThemeControl-BW-KiUtg.js",
+        "/assets/sun-deCwFiy7.js",
+        "/assets/ProductThemeControl-lELuWh9q.css",
+        "/assets/SchoolMark-2_knsI4Q.js",
+        "/assets/SchoolMark-CcA7i-Iq.css",
+        "/assets/calendar-days-Cku-0JUJ.js",
+        "/assets/book-open-Cp704KnQ.js",
+        "/assets/heart-handshake-UXHw5QWL.js",
+        "/assets/users-DZ39kNLb.js",
+        "/assets/shield-check-CblOR6NH.js",
+        "/assets/clipboard-list-DllXQlk5.js",
+        "/assets/chart-no-axes-combined-CUGW388O.js",
+        "/assets/x-D97MjwYD.js",
+        "/assets/arrow-right-COartPe5.js",
+        "/assets/refresh-cw-Q6dBFrYY.js",
+        "/assets/users-round-BPQxynoL.js",
+        "/assets/school-collection-BlpFJJAA.js",
+        "/assets/list-BAyLCUVS.js",
+        "/assets/search-D3s-VGP6.js",
+        "/assets/message-square-text-FXbbf8lB.js",
+        "/assets/SchoolApp-CxHg8BQI.css",
+        "/school/favicon.svg",
+        "/assets/school-home-wordmark-BO8jmBb-.svg",
+        "/assets/huischool-a1-emblem-BNEzhrHA.svg",
+        "/assets/huischool-a1-emblem-dark-ClWHGvL8.svg",
+        "/api/campus/auth/me"
+      ],
+      "api": [
+        {
+          "path": "/api/campus/auth/me",
+          "method": "GET"
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "name": "teacher-workspace-lazy",
+      "host": "teacher.eduk12.top",
+      "path": "/",
+      "width": 1280,
+      "status": "PASS",
+      "requests": [
+        "/",
+        "/entry-brand.css",
+        "/entry-brand.js",
+        "/assets/index-BYrOY8Xa.js",
+        "/assets/index-RCBHkAFU.css",
+        "/assets/HuiteacherApp-DZ1tz1B0.js",
+        "/assets/deferredPage-CopuSF3X.js",
+        "/assets/RetryableLazy-BPpeFHpN.js",
+        "/assets/education-entry-layout-w6n9bUS1.js",
+        "/assets/createLucideIcon-Bc77O2Ki.js",
+        "/assets/info-B3BgItkY.js",
+        "/assets/education-entry-layout-CpJy3zDV.css",
+        "/assets/index-CjVJlT6C.js",
+        "/assets/sun-deCwFiy7.js",
+        "/assets/educationAssessmentFeedbackAdapter-DVmGUCUS.js",
+        "/assets/ScaleUnitReportCard-Cah-WOtG.js",
+        "/assets/TrainingMaterials-Dz5dLTRF.js",
+        "/assets/AssessmentMaterialDisplay-D8V6m1Mq.js",
+        "/assets/AssessmentMaterialDisplay-B3_-Rx-i.css",
+        "/assets/client-DLEYkVg8.js",
+        "/assets/useAssessmentImageAssets-CvNk8yr3.js",
+        "/assets/ReportPrimitives-DCXp0ZbU.js",
+        "/assets/ReportPrimitives-BJQ-FC7T.css",
+        "/assets/TrainingContentReports-ci4FDGaF.js",
+        "/assets/educationAssessmentFeedbackAdapter-DqsvUUdR.css",
+        "/assets/index-BPUuZ9i6.js",
+        "/assets/TeacherBrand-CE4eTdkF.js",
+        "/assets/ProductThemeControl-BW-KiUtg.js",
+        "/assets/ProductThemeControl-lELuWh9q.css",
+        "/assets/book-open-Cp704KnQ.js",
+        "/assets/file-text-DLQMs23J.js",
+        "/assets/users-round-BPQxynoL.js",
+        "/assets/user-round-DygDGooC.js",
+        "/assets/clipboard-list-DllXQlk5.js",
+        "/assets/x-D97MjwYD.js",
+        "/assets/HuiteacherApp-ClGL_1jI.css",
+        "/vite.svg",
+        "/assets/teacher-home-wordmark-CaR56Unw.svg",
+        "/huiteacher/huiteacher-b3-emblem.svg",
+        "/huiteacher/educator-journal.webp",
+        "/api/huiteacher/auth/me",
+        "/huiteacher/huiteacher-b3-emblem.svg",
+        "/api/huiteacher/organizations/fixture-school/tool-authoring-capabilities",
+        "/assets/HuiteacherAssessmentTasks-0QYGFzk_.js",
+        "/assets/HuiteacherMyFormTasks-DnLg_LLG.js",
+        "/assets/assessmentTaskPresentation-CgUhURVl.js",
+        "/assets/SurveyPublicApp-DJxzKQ85.js",
+        "/assets/ParticipationCode-K6IYWUc1.js",
+        "/assets/SurveyMaterialDisplay-4XJtZYU6.js",
+        "/assets/deferred-media-CKPgQOkN.js",
+        "/assets/FormChoiceExtras-kwcjx2Hj.js",
+        "/assets/form-visibility-DWnADqY8.js",
+        "/assets/item-timing-BbFhZhS2.js",
+        "/assets/response-timing-NEHx8NlB.js",
+        "/assets/flow.client-CD4zNBOs.js",
+        "/assets/participation-link-CnLAbyD5.js",
+        "/assets/SurveyPublicApp-BUaAwE3x.css",
+        "/assets/survey-participant-Be5qZXqZ.css",
+        "/assets/FinalCompositeAssessment-CcOBFTTx.js",
+        "/assets/TrainingCheckpointPanel-DL30xglV.js",
+        "/assets/context-DH9TJPZn.js",
+        "/assets/AssessmentImageGate-BUwdnXw4.js",
+        "/assets/finalSubmissionFailure-DgG0CFLr.js",
+        "/assets/device-input-provenance-D0sktvKS.js",
+        "/assets/useScaleAutoAdvance-Bg1T8YzE.js",
+        "/assets/checkpointTypes-CE0Ib90y.js",
+        "/assets/finalDraftStore-Dm59dNEG.js",
+        "/assets/readiness-CA7SeYHK.js",
+        "/assets/finalDraftCapacityRetry-CW5GRnx7.js",
+        "/assets/ProductButton-BI88xbAY.js",
+        "/assets/ProductButton-CSdvJMrA.css",
+        "/assets/ProductStatus-Db9Td03n.js",
+        "/assets/ScalePlayer-w-XlBFmb.js",
+        "/assets/chevron-left-BPqDKqYU.js",
+        "/assets/chevron-right-DJ9nc8nf.js",
+        "/assets/circle-check-big-ozk2RDEV.js",
+        "/assets/layers-DOgSx72G.js",
+        "/assets/save-BjlGbUim.js",
+        "/assets/training-form-surface-BhEY1h6v.css",
+        "/assets/ProductPasswordChange-B6EOb6e-.js",
+        "/assets/HuiteacherMyAssessmentTasks-BGl7faz3.js",
+        "/assets/chunk-BV7QT456-wzp59Q_j.js",
+        "/api/huiteacher/my-form-tasks",
+        "/api/huiteacher/my-private-form-tasks",
+        "/api/huiteacher/my-scale-tasks",
+        "/api/huiteacher/my-assessment-tasks",
+        "/api/huiteacher/organizations/fixture-school/units",
+        "/api/huiteacher/organizations/fixture-school/members",
+        "/assets/EducationRosterManagement-BszlASIl.js",
+        "/assets/SchoolPersonnelDirectory-CyzagF5U.js",
+        "/assets/SchoolPersonnelImport-BsWF56xt.js",
+        "/assets/search-D3s-VGP6.js",
+        "/assets/refresh-cw-Q6dBFrYY.js",
+        "/assets/circle-alert-E3S4ejXs.js",
+        "/assets/circle-check-BD79vQWj.js",
+        "/assets/shield-check-CblOR6NH.js",
+        "/assets/copy-BmbclgkI.js",
+        "/assets/SchoolPersonnelImport-SE1YIb47.css",
+        "/assets/pause-Acvt2Pd7.js",
+        "/assets/history-BPHVUyNP.js",
+        "/assets/SchoolPersonnelDirectory-B5poee7-.css",
+        "/api/huiteacher/organizations/fixture-school/roster-files/capabilities"
+      ],
+      "api": [
+        {
+          "path": "/api/huiteacher/auth/me",
+          "method": "GET"
+        },
+        {
+          "path": "/api/huiteacher/organizations/fixture-school/tool-authoring-capabilities",
+          "method": "GET"
+        },
+        {
+          "path": "/api/huiteacher/my-form-tasks",
+          "method": "GET"
+        },
+        {
+          "path": "/api/huiteacher/my-private-form-tasks",
+          "method": "GET"
+        },
+        {
+          "path": "/api/huiteacher/my-scale-tasks",
+          "method": "GET"
+        },
+        {
+          "path": "/api/huiteacher/my-assessment-tasks",
+          "method": "GET"
+        },
+        {
+          "path": "/api/huiteacher/organizations/fixture-school/units",
+          "method": "GET"
+        },
+        {
+          "path": "/api/huiteacher/organizations/fixture-school/members",
+          "method": "GET"
+        },
+        {
+          "path": "/api/huiteacher/organizations/fixture-school/roster-files/capabilities",
+          "method": "GET"
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "name": "training-public",
+      "host": "training.eduk12.top",
+      "path": "/",
+      "width": 390,
+      "status": "PASS",
+      "requests": [
+        "/",
+        "/entry-brand.css",
+        "/entry-brand.js",
+        "/assets/index-BYrOY8Xa.js",
+        "/assets/index-RCBHkAFU.css",
+        "/assets/App-BnjGXfNE.js",
+        "/assets/chunk-BV7QT456-wzp59Q_j.js",
+        "/assets/index-CjVJlT6C.js",
+        "/assets/client-DLEYkVg8.js",
+        "/assets/context-DH9TJPZn.js",
+        "/assets/learnerNavigation-CL4ZtASK.js",
+        "/assets/shield-check-CblOR6NH.js",
+        "/assets/createLucideIcon-Bc77O2Ki.js",
+        "/assets/clipboard-check-Dnp3zpYu.js",
+        "/assets/SurveyBrand-BQSPV-TO.js",
+        "/assets/SurveyBrand-CzGZEkwd.css",
+        "/assets/sun-deCwFiy7.js",
+        "/assets/user-round-DygDGooC.js",
+        "/assets/heart-handshake-UXHw5QWL.js",
+        "/assets/ProductButton-BI88xbAY.js",
+        "/assets/ProductButton-CSdvJMrA.css",
+        "/assets/ProductStatus-Db9Td03n.js",
+        "/assets/search-D3s-VGP6.js",
+        "/assets/folder-open-WDld8yQr.js",
+        "/assets/layers-DOgSx72G.js",
+        "/assets/book-open-Cp704KnQ.js",
+        "/assets/chevron-right-DJ9nc8nf.js",
+        "/assets/App-BJUYgD4R.css",
+        "/training/favicon.svg",
+        "/api/auth/me",
+        "/api/capabilities",
+        "/assets/TrainingPortal-Bpw2CIZh.js",
+        "/assets/training-portal-refresh-Bf3zJHme.js",
+        "/assets/training-portal-refresh-DbTaAAZU.css",
+        "/assets/featureContent-BrYBPIov.js",
+        "/assets/list-checks-DVKBaifB.js",
+        "/assets/images-dpMmDVZ1.js",
+        "/assets/chart-no-axes-combined-CUGW388O.js",
+        "/assets/arrow-right-COartPe5.js",
+        "/assets/arrow-down-Cwik-fsU.js",
+        "/assets/training-logo-nWDnbkt0.svg",
+        "/assets/training-landscape-v2-Cse4yhq7.webp"
+      ],
+      "api": [
+        {
+          "path": "/api/auth/me",
+          "method": "GET"
+        },
+        {
+          "path": "/api/capabilities",
+          "method": "GET"
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "name": "survey-public",
+      "host": "survey.eduk12.top",
+      "path": "/",
+      "width": 1280,
+      "status": "PASS",
+      "requests": [
+        "/",
+        "/entry-brand.css",
+        "/entry-brand.js",
+        "/assets/index-BYrOY8Xa.js",
+        "/assets/index-RCBHkAFU.css",
+        "/assets/SurveyApp-BNPFHk7t.js",
+        "/assets/ParticipationSettings-hU42_Iz3.js",
+        "/assets/createLucideIcon-Bc77O2Ki.js",
+        "/assets/survey-participant-Be5qZXqZ.css",
+        "/assets/SurveyAppearance-CW0ATSmv.js",
+        "/assets/SurveyBrand-BQSPV-TO.js",
+        "/assets/context-DH9TJPZn.js",
+        "/assets/SurveyBrand-CzGZEkwd.css",
+        "/assets/sun-deCwFiy7.js",
+        "/assets/SurveyAppearance-C7j5YiIH.css",
+        "/assets/survey-workspace-polish-BrHjM6dA.js",
+        "/assets/file-text-DLQMs23J.js",
+        "/assets/clipboard-list-DllXQlk5.js",
+        "/assets/survey-workspace-polish-D6RH9D6F.css",
+        "/assets/ProductPasswordChange-B6EOb6e-.js",
+        "/assets/SurveyEntryPanel-DYFjpZXH.js",
+        "/assets/folder-open-WDld8yQr.js",
+        "/assets/chart-no-axes-combined-CUGW388O.js",
+        "/assets/arrow-right-COartPe5.js",
+        "/assets/check-d6z1kuEb.js",
+        "/assets/arrow-up-right-CYBiLBUG.js",
+        "/assets/ModalSurface-Cdq3-Pbo.js",
+        "/assets/x-D97MjwYD.js",
+        "/assets/SurveyEntryPanel-DT7vVWQ-.css",
+        "/assets/lock-keyhole-Bn-DjpQv.js",
+        "/assets/layers-DOgSx72G.js",
+        "/assets/search-D3s-VGP6.js",
+        "/assets/plus-BpvXbo-2.js",
+        "/assets/calendar-days-Cku-0JUJ.js",
+        "/assets/chevron-up-BE2XVFL2.js",
+        "/assets/user-round-DygDGooC.js",
+        "/assets/shield-check-CblOR6NH.js",
+        "/assets/images-dpMmDVZ1.js",
+        "/assets/SurveyApp-klBqdmlV.css",
+        "/survey/huisurvey-w2-emblem.svg",
+        "/survey/huisurvey-w2-emblem.svg",
+        "/survey/research-wordmark.svg",
+        "/survey/research-wordmark-dark.svg",
+        "/survey/research-wind-light.webp",
+        "/api/survey/auth/me",
+        "/survey/research-wind-light-small.webp"
+      ],
+      "api": [
+        {
+          "path": "/api/survey/auth/me",
+          "method": "GET"
+        }
+      ],
+      "overflow": false
+    }
+  ],
+  "sandbox": {
+    "ok": true,
+    "code": "CHROME_SANDBOX_VERIFIED",
+    "seccompBpf": true,
+    "suidSandbox": false,
+    "pidNamespaces": true
+  },
+  "build": {
+    "exitCode": 0,
+    "elapsedMs": 22083,
+    "command": "npm run build -- --manifest"
+  },
+  "closures": [
+    {
+      "name": "Training app shell",
+      "count": 25,
+      "rawBytes": 873579,
+      "gzip1Bytes": 255185,
+      "baselineGzip1Bytes": 278174,
+      "files": [
+        {
+          "file": "assets/App-BJUYgD4R.css",
+          "bytes": 339284,
+          "gzip1Bytes": 67309,
+          "sha256": "15502fca2446f1d3a564527dbceebd7ef404229e255e09fc0dae0c4c25b289d3"
+        },
+        {
+          "file": "assets/App-BnjGXfNE.js",
+          "bytes": 132323,
+          "gzip1Bytes": 43937,
+          "sha256": "637107f0b606e6af8f201e50a5cc9b8998cc876ababde2cd53d31c442dfeeedb"
+        },
+        {
+          "file": "assets/ProductButton-BI88xbAY.js",
+          "bytes": 275,
+          "gzip1Bytes": 218,
+          "sha256": "4a37bb90e01fbe369dddddc49997ce85e3f54fd32858741249ba80a50a0f5b67"
+        },
+        {
+          "file": "assets/ProductButton-CSdvJMrA.css",
+          "bytes": 7883,
+          "gzip1Bytes": 2141,
+          "sha256": "10a80513e2752d0ebca6da1b01e3513075a3cac2387aba9fc1abdb198f5a239b"
+        },
+        {
+          "file": "assets/ProductStatus-Db9Td03n.js",
+          "bytes": 850,
+          "gzip1Bytes": 459,
+          "sha256": "d7938727c7b6d5acfbd39c1158194fa9c254a3cef185ad3dcfae7372637103db"
+        },
+        {
+          "file": "assets/SurveyBrand-BQSPV-TO.js",
+          "bytes": 3194,
+          "gzip1Bytes": 1437,
+          "sha256": "010bb7ce2b0cd37f4537106143e61f94b406e52a2c34ad8d1942b0f8ec75cef1"
+        },
+        {
+          "file": "assets/SurveyBrand-CzGZEkwd.css",
+          "bytes": 12889,
+          "gzip1Bytes": 3651,
+          "sha256": "5fed2e933a410643d3f407149817c5e0750a4724a412f710084526fdd7843480"
+        },
+        {
+          "file": "assets/book-open-Cp704KnQ.js",
+          "bytes": 463,
+          "gzip1Bytes": 319,
+          "sha256": "cd6e6010ce58f7416418907d6f49787065264df53dc5ab7f24b65ccb6535d4c2"
+        },
+        {
+          "file": "assets/chevron-right-DJ9nc8nf.js",
+          "bytes": 314,
+          "gzip1Bytes": 254,
+          "sha256": "6ad00c70e6d843205df9569c1b4917637f549e8ebe29be9aceeee026c7ab4eb5"
+        },
+        {
+          "file": "assets/chunk-BV7QT456-wzp59Q_j.js",
+          "bytes": 97350,
+          "gzip1Bytes": 36535,
+          "sha256": "f58f8364fae84a31c491907992c3df426c99ab1e16868f22f8309f740a1ae47b"
+        },
+        {
+          "file": "assets/client-DLEYkVg8.js",
+          "bytes": 56979,
+          "gzip1Bytes": 23624,
+          "sha256": "824841cd8e60d23aa8adfcd46c5fa154a4c32c967c991eda6fa4ae582ad80f77"
+        },
+        {
+          "file": "assets/clipboard-check-Dnp3zpYu.js",
+          "bytes": 483,
+          "gzip1Bytes": 342,
+          "sha256": "1f09be1bf484cd01df9ff84ae037951a473e6e7a21df23a317ce7eaa290a7e39"
+        },
+        {
+          "file": "assets/context-DH9TJPZn.js",
+          "bytes": 747,
+          "gzip1Bytes": 448,
+          "sha256": "66736b9f539dda7f46c18c2d1f5f5b3b605624fba0d4f6247ddd53675c137035"
+        },
+        {
+          "file": "assets/createLucideIcon-Bc77O2Ki.js",
+          "bytes": 2578,
+          "gzip1Bytes": 823,
+          "sha256": "acd88ee9060c5a6402b9319a2ab4e010c990ad612cb01e0ea09b8c7cf9f70dc0"
+        },
+        {
+          "file": "assets/folder-open-WDld8yQr.js",
+          "bytes": 476,
+          "gzip1Bytes": 330,
+          "sha256": "c361a731f2285fc04c2679f2392e3180f4c4d874bae51d752aab0fa3f8b05b24"
+        },
+        {
+          "file": "assets/heart-handshake-UXHw5QWL.js",
+          "bytes": 642,
+          "gzip1Bytes": 412,
+          "sha256": "235a6d6acf13e4849d6fab83a8e42d0eee0c188f098187b58cfb095d04ada967"
+        },
+        {
+          "file": "assets/index-BYrOY8Xa.js",
+          "bytes": 150768,
+          "gzip1Bytes": 55855,
+          "sha256": "6f2cbe18b8a386c1eb47d69c3116ba7b140f7f408a6095ebe74433c2364888fb"
+        },
+        {
+          "file": "assets/index-CjVJlT6C.js",
+          "bytes": 66,
+          "gzip1Bytes": 79,
+          "sha256": "2164b616b5eb3bc3de789a57a96553ad6e597083af79849364f532ea78bea2c6"
+        },
+        {
+          "file": "assets/index-RCBHkAFU.css",
+          "bytes": 56620,
+          "gzip1Bytes": 12667,
+          "sha256": "245951723c3ee46dee385e238c29586d9b4a17f7f2d951e607ab772ba14db870"
+        },
+        {
+          "file": "assets/layers-DOgSx72G.js",
+          "bytes": 605,
+          "gzip1Bytes": 350,
+          "sha256": "af0287bf6d11b81ca5c32f68211ed9b32043692552dbaa552419a0e6266b487d"
+        },
+        {
+          "file": "assets/learnerNavigation-CL4ZtASK.js",
+          "bytes": 6003,
+          "gzip1Bytes": 2493,
+          "sha256": "3a03e7db1a655cc1d66113cdd928ec91490d8e25bb1a986e7c488a9ddacbf6ee"
+        },
+        {
+          "file": "assets/search-D3s-VGP6.js",
+          "bytes": 353,
+          "gzip1Bytes": 278,
+          "sha256": "5b4b7967717448284b1052d87e5bb7211cf66793dcbeef1f479b815f78874233"
+        },
+        {
+          "file": "assets/shield-check-CblOR6NH.js",
+          "bytes": 499,
+          "gzip1Bytes": 361,
+          "sha256": "7c55371d1e99c39237e2f057940d5c4c2d94d0e86cf9fc7c933a7decef190f13"
+        },
+        {
+          "file": "assets/sun-deCwFiy7.js",
+          "bytes": 1574,
+          "gzip1Bytes": 576,
+          "sha256": "5c53f0d4747ec6eec811af1dc810d2d26cfa9e5b38aa471bc5f1aa2966121609"
+        },
+        {
+          "file": "assets/user-round-DygDGooC.js",
+          "bytes": 361,
+          "gzip1Bytes": 287,
+          "sha256": "3a15884aa28f41738126ce095c15dd444a38e1b4387b58380dc3d3b29be1241e"
+        }
+      ]
+    },
+    {
+      "name": "Training homepage",
+      "count": 34,
+      "rawBytes": 910025,
+      "gzip1Bytes": 267168,
+      "baselineGzip1Bytes": 290122,
+      "files": [
+        {
+          "file": "assets/App-BJUYgD4R.css",
+          "bytes": 339284,
+          "gzip1Bytes": 67309,
+          "sha256": "15502fca2446f1d3a564527dbceebd7ef404229e255e09fc0dae0c4c25b289d3"
+        },
+        {
+          "file": "assets/App-BnjGXfNE.js",
+          "bytes": 132323,
+          "gzip1Bytes": 43937,
+          "sha256": "637107f0b606e6af8f201e50a5cc9b8998cc876ababde2cd53d31c442dfeeedb"
+        },
+        {
+          "file": "assets/ProductButton-BI88xbAY.js",
+          "bytes": 275,
+          "gzip1Bytes": 218,
+          "sha256": "4a37bb90e01fbe369dddddc49997ce85e3f54fd32858741249ba80a50a0f5b67"
+        },
+        {
+          "file": "assets/ProductButton-CSdvJMrA.css",
+          "bytes": 7883,
+          "gzip1Bytes": 2141,
+          "sha256": "10a80513e2752d0ebca6da1b01e3513075a3cac2387aba9fc1abdb198f5a239b"
+        },
+        {
+          "file": "assets/ProductStatus-Db9Td03n.js",
+          "bytes": 850,
+          "gzip1Bytes": 459,
+          "sha256": "d7938727c7b6d5acfbd39c1158194fa9c254a3cef185ad3dcfae7372637103db"
+        },
+        {
+          "file": "assets/SurveyBrand-BQSPV-TO.js",
+          "bytes": 3194,
+          "gzip1Bytes": 1437,
+          "sha256": "010bb7ce2b0cd37f4537106143e61f94b406e52a2c34ad8d1942b0f8ec75cef1"
+        },
+        {
+          "file": "assets/SurveyBrand-CzGZEkwd.css",
+          "bytes": 12889,
+          "gzip1Bytes": 3651,
+          "sha256": "5fed2e933a410643d3f407149817c5e0750a4724a412f710084526fdd7843480"
+        },
+        {
+          "file": "assets/TrainingPortal-Bpw2CIZh.js",
+          "bytes": 5738,
+          "gzip1Bytes": 2299,
+          "sha256": "fc1f53bdf8daec4fe02574e8ea1e5aae262c29151dca9de60da1a9a7784de0da"
+        },
+        {
+          "file": "assets/arrow-down-Cwik-fsU.js",
+          "bytes": 349,
+          "gzip1Bytes": 270,
+          "sha256": "45354f3071de64c3c6f4e6b46ed9adf8486aac9fb02b5c684fd7f45a4b3d5d51"
+        },
+        {
+          "file": "assets/arrow-right-COartPe5.js",
+          "bytes": 349,
+          "gzip1Bytes": 270,
+          "sha256": "f72100212badbfd9993ce4c6e2b52241db2f8b5b9df0f9ad31e97228735360c0"
+        },
+        {
+          "file": "assets/book-open-Cp704KnQ.js",
+          "bytes": 463,
+          "gzip1Bytes": 319,
+          "sha256": "cd6e6010ce58f7416418907d6f49787065264df53dc5ab7f24b65ccb6535d4c2"
+        },
+        {
+          "file": "assets/chart-no-axes-combined-CUGW388O.js",
+          "bytes": 564,
+          "gzip1Bytes": 366,
+          "sha256": "9c6ebfbe45418fc7c5707c5d57cf5d9e24df65d2ef83e047552fed59c1588793"
+        },
+        {
+          "file": "assets/chevron-right-DJ9nc8nf.js",
+          "bytes": 314,
+          "gzip1Bytes": 254,
+          "sha256": "6ad00c70e6d843205df9569c1b4917637f549e8ebe29be9aceeee026c7ab4eb5"
+        },
+        {
+          "file": "assets/chunk-BV7QT456-wzp59Q_j.js",
+          "bytes": 97350,
+          "gzip1Bytes": 36535,
+          "sha256": "f58f8364fae84a31c491907992c3df426c99ab1e16868f22f8309f740a1ae47b"
+        },
+        {
+          "file": "assets/client-DLEYkVg8.js",
+          "bytes": 56979,
+          "gzip1Bytes": 23624,
+          "sha256": "824841cd8e60d23aa8adfcd46c5fa154a4c32c967c991eda6fa4ae582ad80f77"
+        },
+        {
+          "file": "assets/clipboard-check-Dnp3zpYu.js",
+          "bytes": 483,
+          "gzip1Bytes": 342,
+          "sha256": "1f09be1bf484cd01df9ff84ae037951a473e6e7a21df23a317ce7eaa290a7e39"
+        },
+        {
+          "file": "assets/context-DH9TJPZn.js",
+          "bytes": 747,
+          "gzip1Bytes": 448,
+          "sha256": "66736b9f539dda7f46c18c2d1f5f5b3b605624fba0d4f6247ddd53675c137035"
+        },
+        {
+          "file": "assets/createLucideIcon-Bc77O2Ki.js",
+          "bytes": 2578,
+          "gzip1Bytes": 823,
+          "sha256": "acd88ee9060c5a6402b9319a2ab4e010c990ad612cb01e0ea09b8c7cf9f70dc0"
+        },
+        {
+          "file": "assets/featureContent-BrYBPIov.js",
+          "bytes": 6926,
+          "gzip1Bytes": 3109,
+          "sha256": "83f0d22fbac98d4afe8b802b104a09b04371fc153d81ceeeb0256a13b61531e0"
+        },
+        {
+          "file": "assets/folder-open-WDld8yQr.js",
+          "bytes": 476,
+          "gzip1Bytes": 330,
+          "sha256": "c361a731f2285fc04c2679f2392e3180f4c4d874bae51d752aab0fa3f8b05b24"
+        },
+        {
+          "file": "assets/heart-handshake-UXHw5QWL.js",
+          "bytes": 642,
+          "gzip1Bytes": 412,
+          "sha256": "235a6d6acf13e4849d6fab83a8e42d0eee0c188f098187b58cfb095d04ada967"
+        },
+        {
+          "file": "assets/images-dpMmDVZ1.js",
+          "bytes": 554,
+          "gzip1Bytes": 388,
+          "sha256": "63575b5658f8e9bf528a4351a7638ae8b2fbbaf14e6895fa76405efe0b134f91"
+        },
+        {
+          "file": "assets/index-BYrOY8Xa.js",
+          "bytes": 150768,
+          "gzip1Bytes": 55855,
+          "sha256": "6f2cbe18b8a386c1eb47d69c3116ba7b140f7f408a6095ebe74433c2364888fb"
+        },
+        {
+          "file": "assets/index-CjVJlT6C.js",
+          "bytes": 66,
+          "gzip1Bytes": 79,
+          "sha256": "2164b616b5eb3bc3de789a57a96553ad6e597083af79849364f532ea78bea2c6"
+        },
+        {
+          "file": "assets/index-RCBHkAFU.css",
+          "bytes": 56620,
+          "gzip1Bytes": 12667,
+          "sha256": "245951723c3ee46dee385e238c29586d9b4a17f7f2d951e607ab772ba14db870"
+        },
+        {
+          "file": "assets/layers-DOgSx72G.js",
+          "bytes": 605,
+          "gzip1Bytes": 350,
+          "sha256": "af0287bf6d11b81ca5c32f68211ed9b32043692552dbaa552419a0e6266b487d"
+        },
+        {
+          "file": "assets/learnerNavigation-CL4ZtASK.js",
+          "bytes": 6003,
+          "gzip1Bytes": 2493,
+          "sha256": "3a03e7db1a655cc1d66113cdd928ec91490d8e25bb1a986e7c488a9ddacbf6ee"
+        },
+        {
+          "file": "assets/list-checks-DVKBaifB.js",
+          "bytes": 458,
+          "gzip1Bytes": 299,
+          "sha256": "7147d79b24a3b32abe4d8f5a743d63c4da76c0a588101761675a1beee5e5185f"
+        },
+        {
+          "file": "assets/search-D3s-VGP6.js",
+          "bytes": 353,
+          "gzip1Bytes": 278,
+          "sha256": "5b4b7967717448284b1052d87e5bb7211cf66793dcbeef1f479b815f78874233"
+        },
+        {
+          "file": "assets/shield-check-CblOR6NH.js",
+          "bytes": 499,
+          "gzip1Bytes": 361,
+          "sha256": "7c55371d1e99c39237e2f057940d5c4c2d94d0e86cf9fc7c933a7decef190f13"
+        },
+        {
+          "file": "assets/sun-deCwFiy7.js",
+          "bytes": 1574,
+          "gzip1Bytes": 576,
+          "sha256": "5c53f0d4747ec6eec811af1dc810d2d26cfa9e5b38aa471bc5f1aa2966121609"
+        },
+        {
+          "file": "assets/training-portal-refresh-Bf3zJHme.js",
+          "bytes": 871,
+          "gzip1Bytes": 498,
+          "sha256": "8feb593b07c614df64846cc058fb2bbb48ca529d9e8c69eacb6a37a74350a144"
+        },
+        {
+          "file": "assets/training-portal-refresh-DbTaAAZU.css",
+          "bytes": 20637,
+          "gzip1Bytes": 4484,
+          "sha256": "1e17706447820a35d5f5080f84da415914def3bce830d7ce1569bc691b0a06ca"
+        },
+        {
+          "file": "assets/user-round-DygDGooC.js",
+          "bytes": 361,
+          "gzip1Bytes": 287,
+          "sha256": "3a15884aa28f41738126ce095c15dd444a38e1b4387b58380dc3d3b29be1241e"
+        }
+      ]
+    },
+    {
+      "name": "Training learner home",
+      "count": 39,
+      "rawBytes": 931597,
+      "gzip1Bytes": 271342,
+      "baselineGzip1Bytes": 294356,
+      "files": [
+        {
+          "file": "assets/App-BJUYgD4R.css",
+          "bytes": 339284,
+          "gzip1Bytes": 67309,
+          "sha256": "15502fca2446f1d3a564527dbceebd7ef404229e255e09fc0dae0c4c25b289d3"
+        },
+        {
+          "file": "assets/App-BnjGXfNE.js",
+          "bytes": 132323,
+          "gzip1Bytes": 43937,
+          "sha256": "637107f0b606e6af8f201e50a5cc9b8998cc876ababde2cd53d31c442dfeeedb"
+        },
+        {
+          "file": "assets/ModalSurface-Cdq3-Pbo.js",
+          "bytes": 2541,
+          "gzip1Bytes": 1239,
+          "sha256": "5352a6d906898bc53dfee9dd8aee34fbf981f3fd2a2a483168b187a25b1747b5"
+        },
+        {
+          "file": "assets/ProductButton-BI88xbAY.js",
+          "bytes": 275,
+          "gzip1Bytes": 218,
+          "sha256": "4a37bb90e01fbe369dddddc49997ce85e3f54fd32858741249ba80a50a0f5b67"
+        },
+        {
+          "file": "assets/ProductButton-CSdvJMrA.css",
+          "bytes": 7883,
+          "gzip1Bytes": 2141,
+          "sha256": "10a80513e2752d0ebca6da1b01e3513075a3cac2387aba9fc1abdb198f5a239b"
+        },
+        {
+          "file": "assets/ProductStatus-Db9Td03n.js",
+          "bytes": 850,
+          "gzip1Bytes": 459,
+          "sha256": "d7938727c7b6d5acfbd39c1158194fa9c254a3cef185ad3dcfae7372637103db"
+        },
+        {
+          "file": "assets/SurveyBrand-BQSPV-TO.js",
+          "bytes": 3194,
+          "gzip1Bytes": 1437,
+          "sha256": "010bb7ce2b0cd37f4537106143e61f94b406e52a2c34ad8d1942b0f8ec75cef1"
+        },
+        {
+          "file": "assets/SurveyBrand-CzGZEkwd.css",
+          "bytes": 12889,
+          "gzip1Bytes": 3651,
+          "sha256": "5fed2e933a410643d3f407149817c5e0750a4724a412f710084526fdd7843480"
+        },
+        {
+          "file": "assets/TrainingLearnerHome-DTq0mELR.css",
+          "bytes": 34370,
+          "gzip1Bytes": 5389,
+          "sha256": "268d600c5017a8c05c78550a93b0c58e6a155127a0df1c18c6826d87ffa031d3"
+        },
+        {
+          "file": "assets/TrainingLearnerHome-Dg5J4LOD.js",
+          "bytes": 15892,
+          "gzip1Bytes": 5912,
+          "sha256": "f1467002b213cec66e777693082193215c41ee199bfa2e093ae34fa322aeafa1"
+        },
+        {
+          "file": "assets/arrow-right-COartPe5.js",
+          "bytes": 349,
+          "gzip1Bytes": 270,
+          "sha256": "f72100212badbfd9993ce4c6e2b52241db2f8b5b9df0f9ad31e97228735360c0"
+        },
+        {
+          "file": "assets/book-open-Cp704KnQ.js",
+          "bytes": 463,
+          "gzip1Bytes": 319,
+          "sha256": "cd6e6010ce58f7416418907d6f49787065264df53dc5ab7f24b65ccb6535d4c2"
+        },
+        {
+          "file": "assets/check-check-lBKKeFxw.js",
+          "bytes": 358,
+          "gzip1Bytes": 279,
+          "sha256": "bfb0ecc593572fedfecb23acb579a4cabf1ee3fee2d458d0e60f95844a82c843"
+        },
+        {
+          "file": "assets/check-d6z1kuEb.js",
+          "bytes": 303,
+          "gzip1Bytes": 249,
+          "sha256": "753b1f29f949775fa6f2ed99eef8b221d25b9e86aad59f45d80dd8631f18929e"
+        },
+        {
+          "file": "assets/chevron-right-DJ9nc8nf.js",
+          "bytes": 314,
+          "gzip1Bytes": 254,
+          "sha256": "6ad00c70e6d843205df9569c1b4917637f549e8ebe29be9aceeee026c7ab4eb5"
+        },
+        {
+          "file": "assets/chunk-BV7QT456-wzp59Q_j.js",
+          "bytes": 97350,
+          "gzip1Bytes": 36535,
+          "sha256": "f58f8364fae84a31c491907992c3df426c99ab1e16868f22f8309f740a1ae47b"
+        },
+        {
+          "file": "assets/client-DLEYkVg8.js",
+          "bytes": 56979,
+          "gzip1Bytes": 23624,
+          "sha256": "824841cd8e60d23aa8adfcd46c5fa154a4c32c967c991eda6fa4ae582ad80f77"
+        },
+        {
+          "file": "assets/clipboard-check-Dnp3zpYu.js",
+          "bytes": 483,
+          "gzip1Bytes": 342,
+          "sha256": "1f09be1bf484cd01df9ff84ae037951a473e6e7a21df23a317ce7eaa290a7e39"
+        },
+        {
+          "file": "assets/clipboard-list-DllXQlk5.js",
+          "bytes": 595,
+          "gzip1Bytes": 373,
+          "sha256": "16083cdb9915127f5b593a7fc8bca39a670483491e7ad0dfa56d18b295e36fc9"
+        },
+        {
+          "file": "assets/context-DH9TJPZn.js",
+          "bytes": 747,
+          "gzip1Bytes": 448,
+          "sha256": "66736b9f539dda7f46c18c2d1f5f5b3b605624fba0d4f6247ddd53675c137035"
+        },
+        {
+          "file": "assets/createLucideIcon-Bc77O2Ki.js",
+          "bytes": 2578,
+          "gzip1Bytes": 823,
+          "sha256": "acd88ee9060c5a6402b9319a2ab4e010c990ad612cb01e0ea09b8c7cf9f70dc0"
+        },
+        {
+          "file": "assets/folder-open-WDld8yQr.js",
+          "bytes": 476,
+          "gzip1Bytes": 330,
+          "sha256": "c361a731f2285fc04c2679f2392e3180f4c4d874bae51d752aab0fa3f8b05b24"
+        },
+        {
+          "file": "assets/heart-handshake-UXHw5QWL.js",
+          "bytes": 642,
+          "gzip1Bytes": 412,
+          "sha256": "235a6d6acf13e4849d6fab83a8e42d0eee0c188f098187b58cfb095d04ada967"
+        },
+        {
+          "file": "assets/index-BYrOY8Xa.js",
+          "bytes": 150768,
+          "gzip1Bytes": 55855,
+          "sha256": "6f2cbe18b8a386c1eb47d69c3116ba7b140f7f408a6095ebe74433c2364888fb"
+        },
+        {
+          "file": "assets/index-CjVJlT6C.js",
+          "bytes": 66,
+          "gzip1Bytes": 79,
+          "sha256": "2164b616b5eb3bc3de789a57a96553ad6e597083af79849364f532ea78bea2c6"
+        },
+        {
+          "file": "assets/index-RCBHkAFU.css",
+          "bytes": 56620,
+          "gzip1Bytes": 12667,
+          "sha256": "245951723c3ee46dee385e238c29586d9b4a17f7f2d951e607ab772ba14db870"
+        },
+        {
+          "file": "assets/layers-DOgSx72G.js",
+          "bytes": 605,
+          "gzip1Bytes": 350,
+          "sha256": "af0287bf6d11b81ca5c32f68211ed9b32043692552dbaa552419a0e6266b487d"
+        },
+        {
+          "file": "assets/learnerNavigation-CL4ZtASK.js",
+          "bytes": 6003,
+          "gzip1Bytes": 2493,
+          "sha256": "3a03e7db1a655cc1d66113cdd928ec91490d8e25bb1a986e7c488a9ddacbf6ee"
+        },
+        {
+          "file": "assets/list-checks-DVKBaifB.js",
+          "bytes": 458,
+          "gzip1Bytes": 299,
+          "sha256": "7147d79b24a3b32abe4d8f5a743d63c4da76c0a588101761675a1beee5e5185f"
+        },
+        {
+          "file": "assets/loader-circle-C9646s5r.js",
+          "bytes": 323,
+          "gzip1Bytes": 263,
+          "sha256": "f5aab2fcaeb871af10b69cefc606c0feae1f461224f94847fcaed6b942bd9e28"
+        },
+        {
+          "file": "assets/message-square-text-FXbbf8lB.js",
+          "bytes": 530,
+          "gzip1Bytes": 360,
+          "sha256": "d8cd6dfc645e34aace05588d0c8710f0520702049a46db3735e27c00f3b549e2"
+        },
+        {
+          "file": "assets/plus-BpvXbo-2.js",
+          "bytes": 337,
+          "gzip1Bytes": 259,
+          "sha256": "529d370ad16317a6bd5f8b1c2f3572e14a3e79342127886bea0346692c7f9c3b"
+        },
+        {
+          "file": "assets/refresh-cw-Q6dBFrYY.js",
+          "bytes": 505,
+          "gzip1Bytes": 334,
+          "sha256": "787711e58cf89e00cbb674aa1a8403b4f6fc98b38340475821ac4806c00c3840"
+        },
+        {
+          "file": "assets/search-D3s-VGP6.js",
+          "bytes": 353,
+          "gzip1Bytes": 278,
+          "sha256": "5b4b7967717448284b1052d87e5bb7211cf66793dcbeef1f479b815f78874233"
+        },
+        {
+          "file": "assets/shield-check-CblOR6NH.js",
+          "bytes": 499,
+          "gzip1Bytes": 361,
+          "sha256": "7c55371d1e99c39237e2f057940d5c4c2d94d0e86cf9fc7c933a7decef190f13"
+        },
+        {
+          "file": "assets/sun-deCwFiy7.js",
+          "bytes": 1574,
+          "gzip1Bytes": 576,
+          "sha256": "5c53f0d4747ec6eec811af1dc810d2d26cfa9e5b38aa471bc5f1aa2966121609"
+        },
+        {
+          "file": "assets/useCursorList-CadlQAEY.js",
+          "bytes": 1119,
+          "gzip1Bytes": 667,
+          "sha256": "f7bc4db1f78f22986fb42b757969b2a212b577ed6db1e4dd19aa37abcf9e4a61"
+        },
+        {
+          "file": "assets/user-round-DygDGooC.js",
+          "bytes": 361,
+          "gzip1Bytes": 287,
+          "sha256": "3a15884aa28f41738126ce095c15dd444a38e1b4387b58380dc3d3b29be1241e"
+        },
+        {
+          "file": "assets/x-D97MjwYD.js",
+          "bytes": 338,
+          "gzip1Bytes": 264,
+          "sha256": "07aa71f02a1c691aee8977e2330a42ca0a0786478515a467154ceb8c9e6ea6e3"
+        }
+      ]
+    },
+    {
+      "name": "Training composite answer",
+      "count": 62,
+      "rawBytes": 1056189,
+      "gzip1Bytes": 327841,
+      "baselineGzip1Bytes": 350982,
+      "files": [
+        {
+          "file": "assets/App-BJUYgD4R.css",
+          "bytes": 339284,
+          "gzip1Bytes": 67309,
+          "sha256": "15502fca2446f1d3a564527dbceebd7ef404229e255e09fc0dae0c4c25b289d3"
+        },
+        {
+          "file": "assets/App-BnjGXfNE.js",
+          "bytes": 132323,
+          "gzip1Bytes": 43937,
+          "sha256": "637107f0b606e6af8f201e50a5cc9b8998cc876ababde2cd53d31c442dfeeedb"
+        },
+        {
+          "file": "assets/AssessmentImageGate-BUwdnXw4.js",
+          "bytes": 682,
+          "gzip1Bytes": 414,
+          "sha256": "2c711d34d69af55f493e5c21ce060ed4a7187024d8affd21f3d13b3eecf6498c"
+        },
+        {
+          "file": "assets/AssessmentMaterialDisplay-B3_-Rx-i.css",
+          "bytes": 3886,
+          "gzip1Bytes": 1036,
+          "sha256": "4cb6e25fa06c7c1bd206436e76a4c526188f66ad0e2adc982a938b717b0e8f92"
+        },
+        {
+          "file": "assets/AssessmentMaterialDisplay-D8V6m1Mq.js",
+          "bytes": 1927,
+          "gzip1Bytes": 1095,
+          "sha256": "2ccd1a64a0ae3ad49b443ebb2867767bc3706d72d12d7dfbb318e5d1c863c819"
+        },
+        {
+          "file": "assets/CompositeAssessmentPage-DFGykCqX.js",
+          "bytes": 36043,
+          "gzip1Bytes": 14247,
+          "sha256": "19b3566317a381260b98b68822094405328b11892d171479a0c5ae8654575fc3"
+        },
+        {
+          "file": "assets/FinalCompositeAssessment-CcOBFTTx.js",
+          "bytes": 33220,
+          "gzip1Bytes": 12475,
+          "sha256": "f1407c7b6b58518eb92d7c0fec967940282a5e67a2d034979b07fecd8d0e3ad3"
+        },
+        {
+          "file": "assets/FormChoiceExtras-kwcjx2Hj.js",
+          "bytes": 7309,
+          "gzip1Bytes": 2806,
+          "sha256": "0a62ac6cef871fd2bba8f3aae0bf9adbe2346c84414bf8324d772aca026beda3"
+        },
+        {
+          "file": "assets/ProductButton-BI88xbAY.js",
+          "bytes": 275,
+          "gzip1Bytes": 218,
+          "sha256": "4a37bb90e01fbe369dddddc49997ce85e3f54fd32858741249ba80a50a0f5b67"
+        },
+        {
+          "file": "assets/ProductButton-CSdvJMrA.css",
+          "bytes": 7883,
+          "gzip1Bytes": 2141,
+          "sha256": "10a80513e2752d0ebca6da1b01e3513075a3cac2387aba9fc1abdb198f5a239b"
+        },
+        {
+          "file": "assets/ProductStatus-Db9Td03n.js",
+          "bytes": 850,
+          "gzip1Bytes": 459,
+          "sha256": "d7938727c7b6d5acfbd39c1158194fa9c254a3cef185ad3dcfae7372637103db"
+        },
+        {
+          "file": "assets/ScalePlayer-w-XlBFmb.js",
+          "bytes": 2482,
+          "gzip1Bytes": 1277,
+          "sha256": "46abb4d3ff481f116b6a9b1681ddcfe971f16638ad94c2691c5e82ab1763190c"
+        },
+        {
+          "file": "assets/SurveyBrand-BQSPV-TO.js",
+          "bytes": 3194,
+          "gzip1Bytes": 1437,
+          "sha256": "010bb7ce2b0cd37f4537106143e61f94b406e52a2c34ad8d1942b0f8ec75cef1"
+        },
+        {
+          "file": "assets/SurveyBrand-CzGZEkwd.css",
+          "bytes": 12889,
+          "gzip1Bytes": 3651,
+          "sha256": "5fed2e933a410643d3f407149817c5e0750a4724a412f710084526fdd7843480"
+        },
+        {
+          "file": "assets/SurveyPersonalLink--xeI1HYg.js",
+          "bytes": 3722,
+          "gzip1Bytes": 1708,
+          "sha256": "2ea1eaa73c93673cf0ce87ead7ffa827c46b070da51d303ff64e03e8393194d4"
+        },
+        {
+          "file": "assets/TrainingCheckpointPanel-DL30xglV.js",
+          "bytes": 5294,
+          "gzip1Bytes": 2496,
+          "sha256": "9021c0531fe86bd590d5bf3f7dd28e273fb2a3e127471dcbc62e66e11c56a379"
+        },
+        {
+          "file": "assets/TrainingMaterials-Dz5dLTRF.js",
+          "bytes": 350,
+          "gzip1Bytes": 276,
+          "sha256": "527e1728830f7bcc08178e12a5e1bb841d587f1db11c8ca86ba6f84dda250709"
+        },
+        {
+          "file": "assets/api-BwzgHkMa.js",
+          "bytes": 7804,
+          "gzip1Bytes": 2071,
+          "sha256": "092e04268706d2ae1ec38a804e08a80e175ee95d16e959aa3f51655c65bd39eb"
+        },
+        {
+          "file": "assets/book-open-Cp704KnQ.js",
+          "bytes": 463,
+          "gzip1Bytes": 319,
+          "sha256": "cd6e6010ce58f7416418907d6f49787065264df53dc5ab7f24b65ccb6535d4c2"
+        },
+        {
+          "file": "assets/checkpointTypes-CE0Ib90y.js",
+          "bytes": 193,
+          "gzip1Bytes": 171,
+          "sha256": "be69094ba668feed9d8680389067e06cb07387ebcc066fe58e525719d415c4d4"
+        },
+        {
+          "file": "assets/chevron-left-BPqDKqYU.js",
+          "bytes": 314,
+          "gzip1Bytes": 257,
+          "sha256": "fe0324e68b9853562214636fed7bc8a8fe1caa59ab5c24f1e7089d02924706fa"
+        },
+        {
+          "file": "assets/chevron-right-DJ9nc8nf.js",
+          "bytes": 314,
+          "gzip1Bytes": 254,
+          "sha256": "6ad00c70e6d843205df9569c1b4917637f549e8ebe29be9aceeee026c7ab4eb5"
+        },
+        {
+          "file": "assets/child-route-context-CQZoqJHU.js",
+          "bytes": 1417,
+          "gzip1Bytes": 705,
+          "sha256": "47ae80381fe762cb2f3ed081707b5c28796c8a6567f9b31e877e70fb403fac57"
+        },
+        {
+          "file": "assets/chunk-BV7QT456-wzp59Q_j.js",
+          "bytes": 97350,
+          "gzip1Bytes": 36535,
+          "sha256": "f58f8364fae84a31c491907992c3df426c99ab1e16868f22f8309f740a1ae47b"
+        },
+        {
+          "file": "assets/circle-check-big-ozk2RDEV.js",
+          "bytes": 373,
+          "gzip1Bytes": 289,
+          "sha256": "5172b7e26b0ad458e69e8f92751fd843864a11339fc7ae9d63c6d9b2829088d5"
+        },
+        {
+          "file": "assets/client-DLEYkVg8.js",
+          "bytes": 56979,
+          "gzip1Bytes": 23624,
+          "sha256": "824841cd8e60d23aa8adfcd46c5fa154a4c32c967c991eda6fa4ae582ad80f77"
+        },
+        {
+          "file": "assets/clipboard-check-Dnp3zpYu.js",
+          "bytes": 483,
+          "gzip1Bytes": 342,
+          "sha256": "1f09be1bf484cd01df9ff84ae037951a473e6e7a21df23a317ce7eaa290a7e39"
+        },
+        {
+          "file": "assets/completionRetry-z9jthbVU.js",
+          "bytes": 642,
+          "gzip1Bytes": 438,
+          "sha256": "48aeb1331e58f7bea8a0ece5f5c74356c290fff27dbabe50862fb3bc2b7b99a4"
+        },
+        {
+          "file": "assets/context-DH9TJPZn.js",
+          "bytes": 747,
+          "gzip1Bytes": 448,
+          "sha256": "66736b9f539dda7f46c18c2d1f5f5b3b605624fba0d4f6247ddd53675c137035"
+        },
+        {
+          "file": "assets/createLucideIcon-Bc77O2Ki.js",
+          "bytes": 2578,
+          "gzip1Bytes": 823,
+          "sha256": "acd88ee9060c5a6402b9319a2ab4e010c990ad612cb01e0ea09b8c7cf9f70dc0"
+        },
+        {
+          "file": "assets/deferred-media-CKPgQOkN.js",
+          "bytes": 685,
+          "gzip1Bytes": 498,
+          "sha256": "b5e6f3521130f3106cd9d17e6d30f5a8fc742c929524ff8400bbb2c368e85e56"
+        },
+        {
+          "file": "assets/device-input-provenance-D0sktvKS.js",
+          "bytes": 7282,
+          "gzip1Bytes": 2843,
+          "sha256": "5db18445ed26cd6a1f29faeee4c6c239bf7f9d6992b598188f7331f3d1f0b3f3"
+        },
+        {
+          "file": "assets/file-text-DLQMs23J.js",
+          "bytes": 569,
+          "gzip1Bytes": 364,
+          "sha256": "3e76b22eaab917b190cdb703da759f735789366fb48cb5392cdd74493924d8b0"
+        },
+        {
+          "file": "assets/finalDraftCapacityRetry-CW5GRnx7.js",
+          "bytes": 6311,
+          "gzip1Bytes": 2488,
+          "sha256": "078ddeb0d2f3ca54a73a743a4136d1f61dfad08d710101bc54e9f3202e2dff50"
+        },
+        {
+          "file": "assets/finalDraftStore-Dm59dNEG.js",
+          "bytes": 20314,
+          "gzip1Bytes": 6530,
+          "sha256": "ce55bcd1f018aa34e8810faaa8e144208f731427b0716a30de30f1a20d584539"
+        },
+        {
+          "file": "assets/finalSubmissionFailure-DgG0CFLr.js",
+          "bytes": 11100,
+          "gzip1Bytes": 4556,
+          "sha256": "222b23b7ed046e5d6ac427b2729777c3f4e50403b0603dec928476ea1335e576"
+        },
+        {
+          "file": "assets/folder-open-WDld8yQr.js",
+          "bytes": 476,
+          "gzip1Bytes": 330,
+          "sha256": "c361a731f2285fc04c2679f2392e3180f4c4d874bae51d752aab0fa3f8b05b24"
+        },
+        {
+          "file": "assets/form-visibility-DWnADqY8.js",
+          "bytes": 632,
+          "gzip1Bytes": 333,
+          "sha256": "7c275eea7e6bfdcc5853be84a14158dab89af34d43630eaec917519a1577a00c"
+        },
+        {
+          "file": "assets/heart-handshake-UXHw5QWL.js",
+          "bytes": 642,
+          "gzip1Bytes": 412,
+          "sha256": "235a6d6acf13e4849d6fab83a8e42d0eee0c188f098187b58cfb095d04ada967"
+        },
+        {
+          "file": "assets/index-BPUuZ9i6.js",
+          "bytes": 16705,
+          "gzip1Bytes": 6702,
+          "sha256": "4057248dfa76ad825873813126d5aeb6fd6c5baac1b83404028f4cc2dcfc5168"
+        },
+        {
+          "file": "assets/index-BYrOY8Xa.js",
+          "bytes": 150768,
+          "gzip1Bytes": 55855,
+          "sha256": "6f2cbe18b8a386c1eb47d69c3116ba7b140f7f408a6095ebe74433c2364888fb"
+        },
+        {
+          "file": "assets/index-CjVJlT6C.js",
+          "bytes": 66,
+          "gzip1Bytes": 79,
+          "sha256": "2164b616b5eb3bc3de789a57a96553ad6e597083af79849364f532ea78bea2c6"
+        },
+        {
+          "file": "assets/index-RCBHkAFU.css",
+          "bytes": 56620,
+          "gzip1Bytes": 12667,
+          "sha256": "245951723c3ee46dee385e238c29586d9b4a17f7f2d951e607ab772ba14db870"
+        },
+        {
+          "file": "assets/item-timing-BbFhZhS2.js",
+          "bytes": 3345,
+          "gzip1Bytes": 1266,
+          "sha256": "886e0bf1bf01c831af3d0b77e0a39fe6230ad8bcc986ae02c3b7d92383bc07c7"
+        },
+        {
+          "file": "assets/layers-DOgSx72G.js",
+          "bytes": 605,
+          "gzip1Bytes": 350,
+          "sha256": "af0287bf6d11b81ca5c32f68211ed9b32043692552dbaa552419a0e6266b487d"
+        },
+        {
+          "file": "assets/learnerNavigation-CL4ZtASK.js",
+          "bytes": 6003,
+          "gzip1Bytes": 2493,
+          "sha256": "3a03e7db1a655cc1d66113cdd928ec91490d8e25bb1a986e7c488a9ddacbf6ee"
+        },
+        {
+          "file": "assets/lock-keyhole-Bn-DjpQv.js",
+          "bytes": 439,
+          "gzip1Bytes": 330,
+          "sha256": "b3a8228408b6c02a52d8ae2cc7f9080cf40c353969038fe04a85e5fdd0d39750"
+        },
+        {
+          "file": "assets/participation-link-CnLAbyD5.js",
+          "bytes": 691,
+          "gzip1Bytes": 429,
+          "sha256": "92ece1c22bf601a554f8ff5ba2056b2682cc25e5361aed71096f46503458c536"
+        },
+        {
+          "file": "assets/play-BejOvm8V.js",
+          "bytes": 374,
+          "gzip1Bytes": 290,
+          "sha256": "8f6d6214c019a3897935b3bfc3598be7ec89b5ceda95c2fe56a56fc469736c55"
+        },
+        {
+          "file": "assets/readiness-CA7SeYHK.js",
+          "bytes": 2797,
+          "gzip1Bytes": 1265,
+          "sha256": "002a9f33185ae4f6ee4169725d78b49549f01b5962394538ffd8e000520725a8"
+        },
+        {
+          "file": "assets/receipt-recovery-Ci-Eu2lI.js",
+          "bytes": 1294,
+          "gzip1Bytes": 812,
+          "sha256": "891193472b6a3b56611dea95ce1773988bf0212bbf4478a55578d3bbdd47a804"
+        },
+        {
+          "file": "assets/recovery-credential-DTG-RQ8c.js",
+          "bytes": 194,
+          "gzip1Bytes": 156,
+          "sha256": "8e4033478611cd80765f4a4c3072c7bfe7b666f3a311df2de982b93c5295048f"
+        },
+        {
+          "file": "assets/response-timing-NEHx8NlB.js",
+          "bytes": 198,
+          "gzip1Bytes": 157,
+          "sha256": "1567cc9efcd1aca39dc500d65df939fe34aa7a5def12a2443310f9950d76a433"
+        },
+        {
+          "file": "assets/save-BjlGbUim.js",
+          "bytes": 511,
+          "gzip1Bytes": 336,
+          "sha256": "01d8329d707d7cab1533aeda06064e6c600d0ce73d92bda2707ab907d1612cfe"
+        },
+        {
+          "file": "assets/search-D3s-VGP6.js",
+          "bytes": 353,
+          "gzip1Bytes": 278,
+          "sha256": "5b4b7967717448284b1052d87e5bb7211cf66793dcbeef1f479b815f78874233"
+        },
+        {
+          "file": "assets/shield-check-CblOR6NH.js",
+          "bytes": 499,
+          "gzip1Bytes": 361,
+          "sha256": "7c55371d1e99c39237e2f057940d5c4c2d94d0e86cf9fc7c933a7decef190f13"
+        },
+        {
+          "file": "assets/sun-deCwFiy7.js",
+          "bytes": 1574,
+          "gzip1Bytes": 576,
+          "sha256": "5c53f0d4747ec6eec811af1dc810d2d26cfa9e5b38aa471bc5f1aa2966121609"
+        },
+        {
+          "file": "assets/training-form-surface-BhEY1h6v.css",
+          "bytes": 1734,
+          "gzip1Bytes": 563,
+          "sha256": "6dfa74e40d2882d2bb8606a9a4f535cf2a834027f18b5b846d61b2a34cddd4d2"
+        },
+        {
+          "file": "assets/training-participation-link-D9SaThRF.js",
+          "bytes": 417,
+          "gzip1Bytes": 232,
+          "sha256": "c5b0e8ca665e1cf16d636c0256d0c57791ad1a37283872018eff8007c2ace208"
+        },
+        {
+          "file": "assets/usePageSignal-Vzpvg1WZ.js",
+          "bytes": 231,
+          "gzip1Bytes": 182,
+          "sha256": "ec6ba91f72ad2a3ecb9d3cd1a130605d5518243db6194341af271534e208caa2"
+        },
+        {
+          "file": "assets/useScaleAutoAdvance-Bg1T8YzE.js",
+          "bytes": 1129,
+          "gzip1Bytes": 563,
+          "sha256": "62349109c816708fad963e02c424cd631a3da533c3066b68e8d3920135d34298"
+        },
+        {
+          "file": "assets/user-round-DygDGooC.js",
+          "bytes": 361,
+          "gzip1Bytes": 287,
+          "sha256": "3a15884aa28f41738126ce095c15dd444a38e1b4387b58380dc3d3b29be1241e"
+        }
+      ]
+    },
+    {
+      "name": "Training standalone scale answer",
+      "count": 43,
+      "rawBytes": 948148,
+      "gzip1Bytes": 284780,
+      "baselineGzip1Bytes": 308119,
+      "files": [
+        {
+          "file": "assets/ActionBar-CNmI3pI1.js",
+          "bytes": 211,
+          "gzip1Bytes": 179,
+          "sha256": "127b2e16f0bce2a76ddd7359c582fc45b5618cc5108a6525ee888353f9a28ccf"
+        },
+        {
+          "file": "assets/App-BJUYgD4R.css",
+          "bytes": 339284,
+          "gzip1Bytes": 67309,
+          "sha256": "15502fca2446f1d3a564527dbceebd7ef404229e255e09fc0dae0c4c25b289d3"
+        },
+        {
+          "file": "assets/App-BnjGXfNE.js",
+          "bytes": 132323,
+          "gzip1Bytes": 43937,
+          "sha256": "637107f0b606e6af8f201e50a5cc9b8998cc876ababde2cd53d31c442dfeeedb"
+        },
+        {
+          "file": "assets/AssessmentImageGate-BUwdnXw4.js",
+          "bytes": 682,
+          "gzip1Bytes": 414,
+          "sha256": "2c711d34d69af55f493e5c21ce060ed4a7187024d8affd21f3d13b3eecf6498c"
+        },
+        {
+          "file": "assets/AssessmentMaterialDisplay-B3_-Rx-i.css",
+          "bytes": 3886,
+          "gzip1Bytes": 1036,
+          "sha256": "4cb6e25fa06c7c1bd206436e76a4c526188f66ad0e2adc982a938b717b0e8f92"
+        },
+        {
+          "file": "assets/AssessmentMaterialDisplay-D8V6m1Mq.js",
+          "bytes": 1927,
+          "gzip1Bytes": 1095,
+          "sha256": "2ccd1a64a0ae3ad49b443ebb2867767bc3706d72d12d7dfbb318e5d1c863c819"
+        },
+        {
+          "file": "assets/ProductButton-BI88xbAY.js",
+          "bytes": 275,
+          "gzip1Bytes": 218,
+          "sha256": "4a37bb90e01fbe369dddddc49997ce85e3f54fd32858741249ba80a50a0f5b67"
+        },
+        {
+          "file": "assets/ProductButton-CSdvJMrA.css",
+          "bytes": 7883,
+          "gzip1Bytes": 2141,
+          "sha256": "10a80513e2752d0ebca6da1b01e3513075a3cac2387aba9fc1abdb198f5a239b"
+        },
+        {
+          "file": "assets/ProductStatus-Db9Td03n.js",
+          "bytes": 850,
+          "gzip1Bytes": 459,
+          "sha256": "d7938727c7b6d5acfbd39c1158194fa9c254a3cef185ad3dcfae7372637103db"
+        },
+        {
+          "file": "assets/ScaleAssessment-B5PUYnEx.js",
+          "bytes": 19506,
+          "gzip1Bytes": 8455,
+          "sha256": "f5a04763d99cb77e1412007848e60b30fb384ddc1c2bf34a8dfd677c83367273"
+        },
+        {
+          "file": "assets/SurveyBrand-BQSPV-TO.js",
+          "bytes": 3194,
+          "gzip1Bytes": 1437,
+          "sha256": "010bb7ce2b0cd37f4537106143e61f94b406e52a2c34ad8d1942b0f8ec75cef1"
+        },
+        {
+          "file": "assets/SurveyBrand-CzGZEkwd.css",
+          "bytes": 12889,
+          "gzip1Bytes": 3651,
+          "sha256": "5fed2e933a410643d3f407149817c5e0750a4724a412f710084526fdd7843480"
+        },
+        {
+          "file": "assets/TrainingMaterials-Dz5dLTRF.js",
+          "bytes": 350,
+          "gzip1Bytes": 276,
+          "sha256": "527e1728830f7bcc08178e12a5e1bb841d587f1db11c8ca86ba6f84dda250709"
+        },
+        {
+          "file": "assets/book-open-Cp704KnQ.js",
+          "bytes": 463,
+          "gzip1Bytes": 319,
+          "sha256": "cd6e6010ce58f7416418907d6f49787065264df53dc5ab7f24b65ccb6535d4c2"
+        },
+        {
+          "file": "assets/checkpointTypes-CE0Ib90y.js",
+          "bytes": 193,
+          "gzip1Bytes": 171,
+          "sha256": "be69094ba668feed9d8680389067e06cb07387ebcc066fe58e525719d415c4d4"
+        },
+        {
+          "file": "assets/chevron-left-BPqDKqYU.js",
+          "bytes": 314,
+          "gzip1Bytes": 257,
+          "sha256": "fe0324e68b9853562214636fed7bc8a8fe1caa59ab5c24f1e7089d02924706fa"
+        },
+        {
+          "file": "assets/chevron-right-DJ9nc8nf.js",
+          "bytes": 314,
+          "gzip1Bytes": 254,
+          "sha256": "6ad00c70e6d843205df9569c1b4917637f549e8ebe29be9aceeee026c7ab4eb5"
+        },
+        {
+          "file": "assets/chunk-BV7QT456-wzp59Q_j.js",
+          "bytes": 97350,
+          "gzip1Bytes": 36535,
+          "sha256": "f58f8364fae84a31c491907992c3df426c99ab1e16868f22f8309f740a1ae47b"
+        },
+        {
+          "file": "assets/circle-check-big-ozk2RDEV.js",
+          "bytes": 373,
+          "gzip1Bytes": 289,
+          "sha256": "5172b7e26b0ad458e69e8f92751fd843864a11339fc7ae9d63c6d9b2829088d5"
+        },
+        {
+          "file": "assets/client-DLEYkVg8.js",
+          "bytes": 56979,
+          "gzip1Bytes": 23624,
+          "sha256": "824841cd8e60d23aa8adfcd46c5fa154a4c32c967c991eda6fa4ae582ad80f77"
+        },
+        {
+          "file": "assets/clipboard-check-Dnp3zpYu.js",
+          "bytes": 483,
+          "gzip1Bytes": 342,
+          "sha256": "1f09be1bf484cd01df9ff84ae037951a473e6e7a21df23a317ce7eaa290a7e39"
+        },
+        {
+          "file": "assets/context-DH9TJPZn.js",
+          "bytes": 747,
+          "gzip1Bytes": 448,
+          "sha256": "66736b9f539dda7f46c18c2d1f5f5b3b605624fba0d4f6247ddd53675c137035"
+        },
+        {
+          "file": "assets/createLucideIcon-Bc77O2Ki.js",
+          "bytes": 2578,
+          "gzip1Bytes": 823,
+          "sha256": "acd88ee9060c5a6402b9319a2ab4e010c990ad612cb01e0ea09b8c7cf9f70dc0"
+        },
+        {
+          "file": "assets/deferred-media-CKPgQOkN.js",
+          "bytes": 685,
+          "gzip1Bytes": 498,
+          "sha256": "b5e6f3521130f3106cd9d17e6d30f5a8fc742c929524ff8400bbb2c368e85e56"
+        },
+        {
+          "file": "assets/device-input-provenance-D0sktvKS.js",
+          "bytes": 7282,
+          "gzip1Bytes": 2843,
+          "sha256": "5db18445ed26cd6a1f29faeee4c6c239bf7f9d6992b598188f7331f3d1f0b3f3"
+        },
+        {
+          "file": "assets/finalDraftCapacityRetry-CW5GRnx7.js",
+          "bytes": 6311,
+          "gzip1Bytes": 2488,
+          "sha256": "078ddeb0d2f3ca54a73a743a4136d1f61dfad08d710101bc54e9f3202e2dff50"
+        },
+        {
+          "file": "assets/finalDraftStore-Dm59dNEG.js",
+          "bytes": 20314,
+          "gzip1Bytes": 6530,
+          "sha256": "ce55bcd1f018aa34e8810faaa8e144208f731427b0716a30de30f1a20d584539"
+        },
+        {
+          "file": "assets/flushLifecycle-WKV-tPeo.js",
+          "bytes": 10023,
+          "gzip1Bytes": 3553,
+          "sha256": "f936c40fae699db4f3eefad0db6d1dc15bafd3fd1d2aca33a5c9a6bbbc848b5d"
+        },
+        {
+          "file": "assets/folder-open-WDld8yQr.js",
+          "bytes": 476,
+          "gzip1Bytes": 330,
+          "sha256": "c361a731f2285fc04c2679f2392e3180f4c4d874bae51d752aab0fa3f8b05b24"
+        },
+        {
+          "file": "assets/heart-handshake-UXHw5QWL.js",
+          "bytes": 642,
+          "gzip1Bytes": 412,
+          "sha256": "235a6d6acf13e4849d6fab83a8e42d0eee0c188f098187b58cfb095d04ada967"
+        },
+        {
+          "file": "assets/index-BYrOY8Xa.js",
+          "bytes": 150768,
+          "gzip1Bytes": 55855,
+          "sha256": "6f2cbe18b8a386c1eb47d69c3116ba7b140f7f408a6095ebe74433c2364888fb"
+        },
+        {
+          "file": "assets/index-CjVJlT6C.js",
+          "bytes": 66,
+          "gzip1Bytes": 79,
+          "sha256": "2164b616b5eb3bc3de789a57a96553ad6e597083af79849364f532ea78bea2c6"
+        },
+        {
+          "file": "assets/index-RCBHkAFU.css",
+          "bytes": 56620,
+          "gzip1Bytes": 12667,
+          "sha256": "245951723c3ee46dee385e238c29586d9b4a17f7f2d951e607ab772ba14db870"
+        },
+        {
+          "file": "assets/layers-DOgSx72G.js",
+          "bytes": 605,
+          "gzip1Bytes": 350,
+          "sha256": "af0287bf6d11b81ca5c32f68211ed9b32043692552dbaa552419a0e6266b487d"
+        },
+        {
+          "file": "assets/learnerNavigation-CL4ZtASK.js",
+          "bytes": 6003,
+          "gzip1Bytes": 2493,
+          "sha256": "3a03e7db1a655cc1d66113cdd928ec91490d8e25bb1a986e7c488a9ddacbf6ee"
+        },
+        {
+          "file": "assets/required-video-completion-zGCnAAFE.js",
+          "bytes": 926,
+          "gzip1Bytes": 576,
+          "sha256": "8c394c5b0d5ad6eb205ed2a18f14d3d21e68b3fb82911d6548c3f989329bfd94"
+        },
+        {
+          "file": "assets/response-timing-NEHx8NlB.js",
+          "bytes": 198,
+          "gzip1Bytes": 157,
+          "sha256": "1567cc9efcd1aca39dc500d65df939fe34aa7a5def12a2443310f9950d76a433"
+        },
+        {
+          "file": "assets/search-D3s-VGP6.js",
+          "bytes": 353,
+          "gzip1Bytes": 278,
+          "sha256": "5b4b7967717448284b1052d87e5bb7211cf66793dcbeef1f479b815f78874233"
+        },
+        {
+          "file": "assets/shield-check-CblOR6NH.js",
+          "bytes": 499,
+          "gzip1Bytes": 361,
+          "sha256": "7c55371d1e99c39237e2f057940d5c4c2d94d0e86cf9fc7c933a7decef190f13"
+        },
+        {
+          "file": "assets/sun-deCwFiy7.js",
+          "bytes": 1574,
+          "gzip1Bytes": 576,
+          "sha256": "5c53f0d4747ec6eec811af1dc810d2d26cfa9e5b38aa471bc5f1aa2966121609"
+        },
+        {
+          "file": "assets/useRunnerSaveState-DecgSYhg.js",
+          "bytes": 259,
+          "gzip1Bytes": 215,
+          "sha256": "d191cd13cbedc3a97f6673e0a66d6fe635ca4ebd56fe1295ee1116bf8fe0969c"
+        },
+        {
+          "file": "assets/useScaleAutoAdvance-Bg1T8YzE.js",
+          "bytes": 1129,
+          "gzip1Bytes": 563,
+          "sha256": "62349109c816708fad963e02c424cd631a3da533c3066b68e8d3920135d34298"
+        },
+        {
+          "file": "assets/user-round-DygDGooC.js",
+          "bytes": 361,
+          "gzip1Bytes": 287,
+          "sha256": "3a15884aa28f41738126ce095c15dd444a38e1b4387b58380dc3d3b29be1241e"
+        }
+      ]
+    },
+    {
+      "name": "Training composite report",
+      "count": 43,
+      "rawBytes": 989485,
+      "gzip1Bytes": 298897,
+      "baselineGzip1Bytes": 322034,
+      "files": [
+        {
+          "file": "assets/ActionBar-CNmI3pI1.js",
+          "bytes": 211,
+          "gzip1Bytes": 179,
+          "sha256": "127b2e16f0bce2a76ddd7359c582fc45b5618cc5108a6525ee888353f9a28ccf"
+        },
+        {
+          "file": "assets/App-BJUYgD4R.css",
+          "bytes": 339284,
+          "gzip1Bytes": 67309,
+          "sha256": "15502fca2446f1d3a564527dbceebd7ef404229e255e09fc0dae0c4c25b289d3"
+        },
+        {
+          "file": "assets/App-BnjGXfNE.js",
+          "bytes": 132323,
+          "gzip1Bytes": 43937,
+          "sha256": "637107f0b606e6af8f201e50a5cc9b8998cc876ababde2cd53d31c442dfeeedb"
+        },
+        {
+          "file": "assets/AssessmentMaterialDisplay-B3_-Rx-i.css",
+          "bytes": 3886,
+          "gzip1Bytes": 1036,
+          "sha256": "4cb6e25fa06c7c1bd206436e76a4c526188f66ad0e2adc982a938b717b0e8f92"
+        },
+        {
+          "file": "assets/AssessmentMaterialDisplay-D8V6m1Mq.js",
+          "bytes": 1927,
+          "gzip1Bytes": 1095,
+          "sha256": "2ccd1a64a0ae3ad49b443ebb2867767bc3706d72d12d7dfbb318e5d1c863c819"
+        },
+        {
+          "file": "assets/CognitiveSingleTaskReportCard-CssbEuoM.js",
+          "bytes": 7671,
+          "gzip1Bytes": 3482,
+          "sha256": "c132255fa0c0c9ae87331e9294879eab3cc41cf112893e08be00f59bc0dd50d6"
+        },
+        {
+          "file": "assets/CompositeReportPage-1T1c_xtO.js",
+          "bytes": 46534,
+          "gzip1Bytes": 17270,
+          "sha256": "b7add8e1577160949e94953f3fc988684c4e4e1893cc3f55927f17bf36afe3d9"
+        },
+        {
+          "file": "assets/PageHeader-BdxbiLXK.js",
+          "bytes": 477,
+          "gzip1Bytes": 260,
+          "sha256": "e167e75ba39645bcc406dd2209a5048017b4eabc2c8a00073caf30972933fc6a"
+        },
+        {
+          "file": "assets/ProductButton-BI88xbAY.js",
+          "bytes": 275,
+          "gzip1Bytes": 218,
+          "sha256": "4a37bb90e01fbe369dddddc49997ce85e3f54fd32858741249ba80a50a0f5b67"
+        },
+        {
+          "file": "assets/ProductButton-CSdvJMrA.css",
+          "bytes": 7883,
+          "gzip1Bytes": 2141,
+          "sha256": "10a80513e2752d0ebca6da1b01e3513075a3cac2387aba9fc1abdb198f5a239b"
+        },
+        {
+          "file": "assets/ProductStatus-Db9Td03n.js",
+          "bytes": 850,
+          "gzip1Bytes": 459,
+          "sha256": "d7938727c7b6d5acfbd39c1158194fa9c254a3cef185ad3dcfae7372637103db"
+        },
+        {
+          "file": "assets/ReportPrimitives-BJQ-FC7T.css",
+          "bytes": 13331,
+          "gzip1Bytes": 3550,
+          "sha256": "3b681a6c4ed245e66a8a889f44060d4691b2143e8d47521cd99ea6e31f92ecdd"
+        },
+        {
+          "file": "assets/ReportPrimitives-DCXp0ZbU.js",
+          "bytes": 3434,
+          "gzip1Bytes": 1263,
+          "sha256": "43f5b6fa0493b76a66887fd0d703c9260303c1ae90fb0a9705cdcaf6ece81303"
+        },
+        {
+          "file": "assets/ReportShell-C3G8_MEp.js",
+          "bytes": 1734,
+          "gzip1Bytes": 801,
+          "sha256": "a14a311e1d2bd94c739ef3b200dadb7a293731c82f2522cebb43848ddeee99b9"
+        },
+        {
+          "file": "assets/ScaleUnitReportCard-Cah-WOtG.js",
+          "bytes": 12055,
+          "gzip1Bytes": 4740,
+          "sha256": "175ad5ecdc483ae0acb2e7f1d0e03a62a3ea274551f7642501ad5c47c77dd3d7"
+        },
+        {
+          "file": "assets/SituationalReportCard-Cfi6hga8.js",
+          "bytes": 6984,
+          "gzip1Bytes": 3022,
+          "sha256": "6efbb24c95b963ae09a40cc10ab4f475b6f7a42fcfd6393f3939505a2c7300c7"
+        },
+        {
+          "file": "assets/SurveyBrand-BQSPV-TO.js",
+          "bytes": 3194,
+          "gzip1Bytes": 1437,
+          "sha256": "010bb7ce2b0cd37f4537106143e61f94b406e52a2c34ad8d1942b0f8ec75cef1"
+        },
+        {
+          "file": "assets/SurveyBrand-CzGZEkwd.css",
+          "bytes": 12889,
+          "gzip1Bytes": 3651,
+          "sha256": "5fed2e933a410643d3f407149817c5e0750a4724a412f710084526fdd7843480"
+        },
+        {
+          "file": "assets/TrainingContentReports-ci4FDGaF.js",
+          "bytes": 4112,
+          "gzip1Bytes": 1989,
+          "sha256": "6ddc99575d91667ea29891933e902a1cc43316d2214d06a486934ccfd03bfebd"
+        },
+        {
+          "file": "assets/TrainingMaterials-Dz5dLTRF.js",
+          "bytes": 350,
+          "gzip1Bytes": 276,
+          "sha256": "527e1728830f7bcc08178e12a5e1bb841d587f1db11c8ca86ba6f84dda250709"
+        },
+        {
+          "file": "assets/api-BwzgHkMa.js",
+          "bytes": 7804,
+          "gzip1Bytes": 2071,
+          "sha256": "092e04268706d2ae1ec38a804e08a80e175ee95d16e959aa3f51655c65bd39eb"
+        },
+        {
+          "file": "assets/book-open-Cp704KnQ.js",
+          "bytes": 463,
+          "gzip1Bytes": 319,
+          "sha256": "cd6e6010ce58f7416418907d6f49787065264df53dc5ab7f24b65ccb6535d4c2"
+        },
+        {
+          "file": "assets/chevron-right-DJ9nc8nf.js",
+          "bytes": 314,
+          "gzip1Bytes": 254,
+          "sha256": "6ad00c70e6d843205df9569c1b4917637f549e8ebe29be9aceeee026c7ab4eb5"
+        },
+        {
+          "file": "assets/chunk-BV7QT456-wzp59Q_j.js",
+          "bytes": 97350,
+          "gzip1Bytes": 36535,
+          "sha256": "f58f8364fae84a31c491907992c3df426c99ab1e16868f22f8309f740a1ae47b"
+        },
+        {
+          "file": "assets/client-DLEYkVg8.js",
+          "bytes": 56979,
+          "gzip1Bytes": 23624,
+          "sha256": "824841cd8e60d23aa8adfcd46c5fa154a4c32c967c991eda6fa4ae582ad80f77"
+        },
+        {
+          "file": "assets/clipboard-check-Dnp3zpYu.js",
+          "bytes": 483,
+          "gzip1Bytes": 342,
+          "sha256": "1f09be1bf484cd01df9ff84ae037951a473e6e7a21df23a317ce7eaa290a7e39"
+        },
+        {
+          "file": "assets/completionRetry-z9jthbVU.js",
+          "bytes": 642,
+          "gzip1Bytes": 438,
+          "sha256": "48aeb1331e58f7bea8a0ece5f5c74356c290fff27dbabe50862fb3bc2b7b99a4"
+        },
+        {
+          "file": "assets/context-DH9TJPZn.js",
+          "bytes": 747,
+          "gzip1Bytes": 448,
+          "sha256": "66736b9f539dda7f46c18c2d1f5f5b3b605624fba0d4f6247ddd53675c137035"
+        },
+        {
+          "file": "assets/createLucideIcon-Bc77O2Ki.js",
+          "bytes": 2578,
+          "gzip1Bytes": 823,
+          "sha256": "acd88ee9060c5a6402b9319a2ab4e010c990ad612cb01e0ea09b8c7cf9f70dc0"
+        },
+        {
+          "file": "assets/folder-open-WDld8yQr.js",
+          "bytes": 476,
+          "gzip1Bytes": 330,
+          "sha256": "c361a731f2285fc04c2679f2392e3180f4c4d874bae51d752aab0fa3f8b05b24"
+        },
+        {
+          "file": "assets/heart-handshake-UXHw5QWL.js",
+          "bytes": 642,
+          "gzip1Bytes": 412,
+          "sha256": "235a6d6acf13e4849d6fab83a8e42d0eee0c188f098187b58cfb095d04ada967"
+        },
+        {
+          "file": "assets/index-BYrOY8Xa.js",
+          "bytes": 150768,
+          "gzip1Bytes": 55855,
+          "sha256": "6f2cbe18b8a386c1eb47d69c3116ba7b140f7f408a6095ebe74433c2364888fb"
+        },
+        {
+          "file": "assets/index-CjVJlT6C.js",
+          "bytes": 66,
+          "gzip1Bytes": 79,
+          "sha256": "2164b616b5eb3bc3de789a57a96553ad6e597083af79849364f532ea78bea2c6"
+        },
+        {
+          "file": "assets/index-RCBHkAFU.css",
+          "bytes": 56620,
+          "gzip1Bytes": 12667,
+          "sha256": "245951723c3ee46dee385e238c29586d9b4a17f7f2d951e607ab772ba14db870"
+        },
+        {
+          "file": "assets/layers-DOgSx72G.js",
+          "bytes": 605,
+          "gzip1Bytes": 350,
+          "sha256": "af0287bf6d11b81ca5c32f68211ed9b32043692552dbaa552419a0e6266b487d"
+        },
+        {
+          "file": "assets/learnerNavigation-CL4ZtASK.js",
+          "bytes": 6003,
+          "gzip1Bytes": 2493,
+          "sha256": "3a03e7db1a655cc1d66113cdd928ec91490d8e25bb1a986e7c488a9ddacbf6ee"
+        },
+        {
+          "file": "assets/receipt-recovery-Ci-Eu2lI.js",
+          "bytes": 1294,
+          "gzip1Bytes": 812,
+          "sha256": "891193472b6a3b56611dea95ce1773988bf0212bbf4478a55578d3bbdd47a804"
+        },
+        {
+          "file": "assets/search-D3s-VGP6.js",
+          "bytes": 353,
+          "gzip1Bytes": 278,
+          "sha256": "5b4b7967717448284b1052d87e5bb7211cf66793dcbeef1f479b815f78874233"
+        },
+        {
+          "file": "assets/shield-check-CblOR6NH.js",
+          "bytes": 499,
+          "gzip1Bytes": 361,
+          "sha256": "7c55371d1e99c39237e2f057940d5c4c2d94d0e86cf9fc7c933a7decef190f13"
+        },
+        {
+          "file": "assets/sun-deCwFiy7.js",
+          "bytes": 1574,
+          "gzip1Bytes": 576,
+          "sha256": "5c53f0d4747ec6eec811af1dc810d2d26cfa9e5b38aa471bc5f1aa2966121609"
+        },
+        {
+          "file": "assets/training-form-surface-BhEY1h6v.css",
+          "bytes": 1734,
+          "gzip1Bytes": 563,
+          "sha256": "6dfa74e40d2882d2bb8606a9a4f535cf2a834027f18b5b846d61b2a34cddd4d2"
+        },
+        {
+          "file": "assets/useAssessmentImageAssets-CvNk8yr3.js",
+          "bytes": 1726,
+          "gzip1Bytes": 865,
+          "sha256": "f84e196c8cb2e5fdb17d98bf78b66ca92262fbba3e9bac02d51fad1ff1db4784"
+        },
+        {
+          "file": "assets/user-round-DygDGooC.js",
+          "bytes": 361,
+          "gzip1Bytes": 287,
+          "sha256": "3a15884aa28f41738126ce095c15dd444a38e1b4387b58380dc3d3b29be1241e"
+        }
+      ]
+    },
+    {
+      "name": "School app homepage and shell",
+      "count": 30,
+      "rawBytes": 559001,
+      "gzip1Bytes": 157641,
+      "baselineGzip1Bytes": 533610,
+      "files": [
+        {
+          "file": "assets/ProductThemeControl-BW-KiUtg.js",
+          "bytes": 2675,
+          "gzip1Bytes": 1383,
+          "sha256": "6984383ff3d12867e9d843c026f9854954a879d8b96c22d655221dc9f96abf4d"
+        },
+        {
+          "file": "assets/ProductThemeControl-lELuWh9q.css",
+          "bytes": 1021,
+          "gzip1Bytes": 461,
+          "sha256": "e97c1ab064bef369f6548ccc8e8da5283c1ca39296d110e1b5cf9991c071f203"
+        },
+        {
+          "file": "assets/RetryableLazy-BPpeFHpN.js",
+          "bytes": 852,
+          "gzip1Bytes": 547,
+          "sha256": "2e21bf1b52584fcf3505c691406e5a1ede5480a8623ffa9c80c05fd98c86ebfa"
+        },
+        {
+          "file": "assets/SchoolApp-BVhmqSpH.js",
+          "bytes": 80291,
+          "gzip1Bytes": 27603,
+          "sha256": "def1394ae984c03e56c1e440e993818ca214ca46534460f2e1dc17557f1fe8b3"
+        },
+        {
+          "file": "assets/SchoolApp-CxHg8BQI.css",
+          "bytes": 236922,
+          "gzip1Bytes": 44839,
+          "sha256": "2d65127ff42fd9c4d27f4a37f77b813b4a047df0d8e9986955df4076a146d729"
+        },
+        {
+          "file": "assets/SchoolMark-2_knsI4Q.js",
+          "bytes": 858,
+          "gzip1Bytes": 461,
+          "sha256": "261456222538dd52c027c46e2a117fa992dfe3be538c9c3b7cdeb0496387c5f3"
+        },
+        {
+          "file": "assets/SchoolMark-CcA7i-Iq.css",
+          "bytes": 1120,
+          "gzip1Bytes": 281,
+          "sha256": "53f1b3e19045174122c460f63208d3f32d8cea040af4e2b177e62662afaf5a01"
+        },
+        {
+          "file": "assets/arrow-right-COartPe5.js",
+          "bytes": 349,
+          "gzip1Bytes": 270,
+          "sha256": "f72100212badbfd9993ce4c6e2b52241db2f8b5b9df0f9ad31e97228735360c0"
+        },
+        {
+          "file": "assets/book-open-Cp704KnQ.js",
+          "bytes": 463,
+          "gzip1Bytes": 319,
+          "sha256": "cd6e6010ce58f7416418907d6f49787065264df53dc5ab7f24b65ccb6535d4c2"
+        },
+        {
+          "file": "assets/calendar-days-Cku-0JUJ.js",
+          "bytes": 678,
+          "gzip1Bytes": 383,
+          "sha256": "bd56fc20a54fd58162363bc88e6d20f251b06824c71ef93a72f60af89593278a"
+        },
+        {
+          "file": "assets/chart-no-axes-combined-CUGW388O.js",
+          "bytes": 564,
+          "gzip1Bytes": 366,
+          "sha256": "9c6ebfbe45418fc7c5707c5d57cf5d9e24df65d2ef83e047552fed59c1588793"
+        },
+        {
+          "file": "assets/clipboard-list-DllXQlk5.js",
+          "bytes": 595,
+          "gzip1Bytes": 373,
+          "sha256": "16083cdb9915127f5b593a7fc8bca39a670483491e7ad0dfa56d18b295e36fc9"
+        },
+        {
+          "file": "assets/createLucideIcon-Bc77O2Ki.js",
+          "bytes": 2578,
+          "gzip1Bytes": 823,
+          "sha256": "acd88ee9060c5a6402b9319a2ab4e010c990ad612cb01e0ea09b8c7cf9f70dc0"
+        },
+        {
+          "file": "assets/deferredPage-CopuSF3X.js",
+          "bytes": 298,
+          "gzip1Bytes": 262,
+          "sha256": "c73cd274eadebfd6cc06c8c6f342a3686f9b4cb39b7856add2e9601701ac51a4"
+        },
+        {
+          "file": "assets/education-entry-layout-CpJy3zDV.css",
+          "bytes": 2367,
+          "gzip1Bytes": 642,
+          "sha256": "e3933351e3eb28cd3474395440df10b03782afa537882adb6978778df3261271"
+        },
+        {
+          "file": "assets/education-entry-layout-w6n9bUS1.js",
+          "bytes": 10968,
+          "gzip1Bytes": 4984,
+          "sha256": "269abc1f72dad20fd44212ac4ec067a0fdb2454edf6aa678c7b9c13c69b94875"
+        },
+        {
+          "file": "assets/heart-handshake-UXHw5QWL.js",
+          "bytes": 642,
+          "gzip1Bytes": 412,
+          "sha256": "235a6d6acf13e4849d6fab83a8e42d0eee0c188f098187b58cfb095d04ada967"
+        },
+        {
+          "file": "assets/index-BYrOY8Xa.js",
+          "bytes": 150768,
+          "gzip1Bytes": 55855,
+          "sha256": "6f2cbe18b8a386c1eb47d69c3116ba7b140f7f408a6095ebe74433c2364888fb"
+        },
+        {
+          "file": "assets/index-RCBHkAFU.css",
+          "bytes": 56620,
+          "gzip1Bytes": 12667,
+          "sha256": "245951723c3ee46dee385e238c29586d9b4a17f7f2d951e607ab772ba14db870"
+        },
+        {
+          "file": "assets/info-B3BgItkY.js",
+          "bytes": 383,
+          "gzip1Bytes": 287,
+          "sha256": "d23ae3676ba66ce75502cc9f29c009da560d037838f62681888c23139839f964"
+        },
+        {
+          "file": "assets/list-BAyLCUVS.js",
+          "bytes": 486,
+          "gzip1Bytes": 303,
+          "sha256": "bf677b6ae260a099d71cc88400f9261afadf6a2471b5343657cf68de8644c50d"
+        },
+        {
+          "file": "assets/message-square-text-FXbbf8lB.js",
+          "bytes": 530,
+          "gzip1Bytes": 360,
+          "sha256": "d8cd6dfc645e34aace05588d0c8710f0520702049a46db3735e27c00f3b549e2"
+        },
+        {
+          "file": "assets/refresh-cw-Q6dBFrYY.js",
+          "bytes": 505,
+          "gzip1Bytes": 334,
+          "sha256": "787711e58cf89e00cbb674aa1a8403b4f6fc98b38340475821ac4806c00c3840"
+        },
+        {
+          "file": "assets/school-collection-BlpFJJAA.js",
+          "bytes": 2782,
+          "gzip1Bytes": 1289,
+          "sha256": "6ba95f35dbef9ae40322bf847d0c434af313b570c6a6006fc5133f07edd0ffc3"
+        },
+        {
+          "file": "assets/search-D3s-VGP6.js",
+          "bytes": 353,
+          "gzip1Bytes": 278,
+          "sha256": "5b4b7967717448284b1052d87e5bb7211cf66793dcbeef1f479b815f78874233"
+        },
+        {
+          "file": "assets/shield-check-CblOR6NH.js",
+          "bytes": 499,
+          "gzip1Bytes": 361,
+          "sha256": "7c55371d1e99c39237e2f057940d5c4c2d94d0e86cf9fc7c933a7decef190f13"
+        },
+        {
+          "file": "assets/sun-deCwFiy7.js",
+          "bytes": 1574,
+          "gzip1Bytes": 576,
+          "sha256": "5c53f0d4747ec6eec811af1dc810d2d26cfa9e5b38aa471bc5f1aa2966121609"
+        },
+        {
+          "file": "assets/users-DZ39kNLb.js",
+          "bytes": 490,
+          "gzip1Bytes": 333,
+          "sha256": "71cdab1ef7c2a7437758a66ef0126a155dcdc5a75a78e7c09ac21d6727e2aa4b"
+        },
+        {
+          "file": "assets/users-round-BPQxynoL.js",
+          "bytes": 432,
+          "gzip1Bytes": 325,
+          "sha256": "365cc8105cb58bf083ec8729c290c5db6a0158a2de7272314d360b7995fdd031"
+        },
+        {
+          "file": "assets/x-D97MjwYD.js",
+          "bytes": 338,
+          "gzip1Bytes": 264,
+          "sha256": "07aa71f02a1c691aee8977e2330a42ca0a0786478515a467154ceb8c9e6ea6e3"
+        }
+      ]
+    },
+    {
+      "name": "Teacher app homepage and shell",
+      "count": 33,
+      "rawBytes": 468765,
+      "gzip1Bytes": 161594,
+      "baselineGzip1Bytes": 458974,
+      "files": [
+        {
+          "file": "assets/AssessmentMaterialDisplay-B3_-Rx-i.css",
+          "bytes": 3886,
+          "gzip1Bytes": 1036,
+          "sha256": "4cb6e25fa06c7c1bd206436e76a4c526188f66ad0e2adc982a938b717b0e8f92"
+        },
+        {
+          "file": "assets/AssessmentMaterialDisplay-D8V6m1Mq.js",
+          "bytes": 1927,
+          "gzip1Bytes": 1095,
+          "sha256": "2ccd1a64a0ae3ad49b443ebb2867767bc3706d72d12d7dfbb318e5d1c863c819"
+        },
+        {
+          "file": "assets/HuiteacherApp-ClGL_1jI.css",
+          "bytes": 66088,
+          "gzip1Bytes": 15329,
+          "sha256": "d5b77a2e973e3ba120f9a5ad78d01ac73d41d073b2ab2efdf25823901a3aa6e2"
+        },
+        {
+          "file": "assets/HuiteacherApp-DZ1tz1B0.js",
+          "bytes": 47635,
+          "gzip1Bytes": 16995,
+          "sha256": "3b8f418dbe046161c2ddc4eea686c3161c4136804b16ba9120e0ed9620af220d"
+        },
+        {
+          "file": "assets/ProductThemeControl-BW-KiUtg.js",
+          "bytes": 2675,
+          "gzip1Bytes": 1383,
+          "sha256": "6984383ff3d12867e9d843c026f9854954a879d8b96c22d655221dc9f96abf4d"
+        },
+        {
+          "file": "assets/ProductThemeControl-lELuWh9q.css",
+          "bytes": 1021,
+          "gzip1Bytes": 461,
+          "sha256": "e97c1ab064bef369f6548ccc8e8da5283c1ca39296d110e1b5cf9991c071f203"
+        },
+        {
+          "file": "assets/ReportPrimitives-BJQ-FC7T.css",
+          "bytes": 13331,
+          "gzip1Bytes": 3550,
+          "sha256": "3b681a6c4ed245e66a8a889f44060d4691b2143e8d47521cd99ea6e31f92ecdd"
+        },
+        {
+          "file": "assets/ReportPrimitives-DCXp0ZbU.js",
+          "bytes": 3434,
+          "gzip1Bytes": 1263,
+          "sha256": "43f5b6fa0493b76a66887fd0d703c9260303c1ae90fb0a9705cdcaf6ece81303"
+        },
+        {
+          "file": "assets/RetryableLazy-BPpeFHpN.js",
+          "bytes": 852,
+          "gzip1Bytes": 547,
+          "sha256": "2e21bf1b52584fcf3505c691406e5a1ede5480a8623ffa9c80c05fd98c86ebfa"
+        },
+        {
+          "file": "assets/ScaleUnitReportCard-Cah-WOtG.js",
+          "bytes": 12055,
+          "gzip1Bytes": 4740,
+          "sha256": "175ad5ecdc483ae0acb2e7f1d0e03a62a3ea274551f7642501ad5c47c77dd3d7"
+        },
+        {
+          "file": "assets/TeacherBrand-CE4eTdkF.js",
+          "bytes": 678,
+          "gzip1Bytes": 425,
+          "sha256": "2b4136c744f21769ada8cc0f7262452ed27b9be09d328130b52e253d40eaa25b"
+        },
+        {
+          "file": "assets/TrainingContentReports-ci4FDGaF.js",
+          "bytes": 4112,
+          "gzip1Bytes": 1989,
+          "sha256": "6ddc99575d91667ea29891933e902a1cc43316d2214d06a486934ccfd03bfebd"
+        },
+        {
+          "file": "assets/TrainingMaterials-Dz5dLTRF.js",
+          "bytes": 350,
+          "gzip1Bytes": 276,
+          "sha256": "527e1728830f7bcc08178e12a5e1bb841d587f1db11c8ca86ba6f84dda250709"
+        },
+        {
+          "file": "assets/book-open-Cp704KnQ.js",
+          "bytes": 463,
+          "gzip1Bytes": 319,
+          "sha256": "cd6e6010ce58f7416418907d6f49787065264df53dc5ab7f24b65ccb6535d4c2"
+        },
+        {
+          "file": "assets/client-DLEYkVg8.js",
+          "bytes": 56979,
+          "gzip1Bytes": 23624,
+          "sha256": "824841cd8e60d23aa8adfcd46c5fa154a4c32c967c991eda6fa4ae582ad80f77"
+        },
+        {
+          "file": "assets/clipboard-list-DllXQlk5.js",
+          "bytes": 595,
+          "gzip1Bytes": 373,
+          "sha256": "16083cdb9915127f5b593a7fc8bca39a670483491e7ad0dfa56d18b295e36fc9"
+        },
+        {
+          "file": "assets/createLucideIcon-Bc77O2Ki.js",
+          "bytes": 2578,
+          "gzip1Bytes": 823,
+          "sha256": "acd88ee9060c5a6402b9319a2ab4e010c990ad612cb01e0ea09b8c7cf9f70dc0"
+        },
+        {
+          "file": "assets/deferredPage-CopuSF3X.js",
+          "bytes": 298,
+          "gzip1Bytes": 262,
+          "sha256": "c73cd274eadebfd6cc06c8c6f342a3686f9b4cb39b7856add2e9601701ac51a4"
+        },
+        {
+          "file": "assets/education-entry-layout-CpJy3zDV.css",
+          "bytes": 2367,
+          "gzip1Bytes": 642,
+          "sha256": "e3933351e3eb28cd3474395440df10b03782afa537882adb6978778df3261271"
+        },
+        {
+          "file": "assets/education-entry-layout-w6n9bUS1.js",
+          "bytes": 10968,
+          "gzip1Bytes": 4984,
+          "sha256": "269abc1f72dad20fd44212ac4ec067a0fdb2454edf6aa678c7b9c13c69b94875"
+        },
+        {
+          "file": "assets/educationAssessmentFeedbackAdapter-DVmGUCUS.js",
+          "bytes": 5786,
+          "gzip1Bytes": 2746,
+          "sha256": "bab4879e236b0ecae89204ed959d6f36004e9a25c685951c75f8510889515177"
+        },
+        {
+          "file": "assets/educationAssessmentFeedbackAdapter-DqsvUUdR.css",
+          "bytes": 1145,
+          "gzip1Bytes": 461,
+          "sha256": "2ed3c4014610517558ea4edef33d8623eb407df93003d80b244cb18ccaf6c924"
+        },
+        {
+          "file": "assets/file-text-DLQMs23J.js",
+          "bytes": 569,
+          "gzip1Bytes": 364,
+          "sha256": "3e76b22eaab917b190cdb703da759f735789366fb48cb5392cdd74493924d8b0"
+        },
+        {
+          "file": "assets/index-BPUuZ9i6.js",
+          "bytes": 16705,
+          "gzip1Bytes": 6702,
+          "sha256": "4057248dfa76ad825873813126d5aeb6fd6c5baac1b83404028f4cc2dcfc5168"
+        },
+        {
+          "file": "assets/index-BYrOY8Xa.js",
+          "bytes": 150768,
+          "gzip1Bytes": 55855,
+          "sha256": "6f2cbe18b8a386c1eb47d69c3116ba7b140f7f408a6095ebe74433c2364888fb"
+        },
+        {
+          "file": "assets/index-CjVJlT6C.js",
+          "bytes": 66,
+          "gzip1Bytes": 79,
+          "sha256": "2164b616b5eb3bc3de789a57a96553ad6e597083af79849364f532ea78bea2c6"
+        },
+        {
+          "file": "assets/index-RCBHkAFU.css",
+          "bytes": 56620,
+          "gzip1Bytes": 12667,
+          "sha256": "245951723c3ee46dee385e238c29586d9b4a17f7f2d951e607ab772ba14db870"
+        },
+        {
+          "file": "assets/info-B3BgItkY.js",
+          "bytes": 383,
+          "gzip1Bytes": 287,
+          "sha256": "d23ae3676ba66ce75502cc9f29c009da560d037838f62681888c23139839f964"
+        },
+        {
+          "file": "assets/sun-deCwFiy7.js",
+          "bytes": 1574,
+          "gzip1Bytes": 576,
+          "sha256": "5c53f0d4747ec6eec811af1dc810d2d26cfa9e5b38aa471bc5f1aa2966121609"
+        },
+        {
+          "file": "assets/useAssessmentImageAssets-CvNk8yr3.js",
+          "bytes": 1726,
+          "gzip1Bytes": 865,
+          "sha256": "f84e196c8cb2e5fdb17d98bf78b66ca92262fbba3e9bac02d51fad1ff1db4784"
+        },
+        {
+          "file": "assets/user-round-DygDGooC.js",
+          "bytes": 361,
+          "gzip1Bytes": 287,
+          "sha256": "3a15884aa28f41738126ce095c15dd444a38e1b4387b58380dc3d3b29be1241e"
+        },
+        {
+          "file": "assets/users-round-BPQxynoL.js",
+          "bytes": 432,
+          "gzip1Bytes": 325,
+          "sha256": "365cc8105cb58bf083ec8729c290c5db6a0158a2de7272314d360b7995fdd031"
+        },
+        {
+          "file": "assets/x-D97MjwYD.js",
+          "bytes": 338,
+          "gzip1Bytes": 264,
+          "sha256": "07aa71f02a1c691aee8977e2330a42ca0a0786478515a467154ceb8c9e6ea6e3"
+        }
+      ]
+    },
+    {
+      "name": "Survey researcher entry",
+      "count": 36,
+      "rawBytes": 467151,
+      "gzip1Bytes": 148263,
+      "baselineGzip1Bytes": 150917,
+      "files": [
+        {
+          "file": "assets/ModalSurface-Cdq3-Pbo.js",
+          "bytes": 2541,
+          "gzip1Bytes": 1239,
+          "sha256": "5352a6d906898bc53dfee9dd8aee34fbf981f3fd2a2a483168b187a25b1747b5"
+        },
+        {
+          "file": "assets/ParticipationSettings-hU42_Iz3.js",
+          "bytes": 7642,
+          "gzip1Bytes": 3494,
+          "sha256": "1fe05be94b04731cdacbef1551f7ee51051b81346995c4cfcb658727990c6be9"
+        },
+        {
+          "file": "assets/ProductPasswordChange-B6EOb6e-.js",
+          "bytes": 1805,
+          "gzip1Bytes": 982,
+          "sha256": "370ae9f128310c1cb576dbafe96625b2d260d58f7903b4cbd703005e0d570955"
+        },
+        {
+          "file": "assets/SurveyApp-BNPFHk7t.js",
+          "bytes": 54768,
+          "gzip1Bytes": 19468,
+          "sha256": "6d31a1222cc1cea4c5770ebf37c23d3212663cba56c387a86e60aab8344562e3"
+        },
+        {
+          "file": "assets/SurveyApp-klBqdmlV.css",
+          "bytes": 39331,
+          "gzip1Bytes": 8499,
+          "sha256": "d153d28285d4878e39c8b9d243ddc596eff6bd69e034acd2a65d5ed6df61fedf"
+        },
+        {
+          "file": "assets/SurveyAppearance-C7j5YiIH.css",
+          "bytes": 6925,
+          "gzip1Bytes": 1972,
+          "sha256": "c2deb038b7b1f940f39a30df80f65e5c247f40f74f400279d95931aa404df584"
+        },
+        {
+          "file": "assets/SurveyAppearance-CW0ATSmv.js",
+          "bytes": 2569,
+          "gzip1Bytes": 1302,
+          "sha256": "fd213d3fe2abb43e80752f5f42ff2d42536b1dd66515ba380a946b485bcd5c38"
+        },
+        {
+          "file": "assets/SurveyBrand-BQSPV-TO.js",
+          "bytes": 3194,
+          "gzip1Bytes": 1437,
+          "sha256": "010bb7ce2b0cd37f4537106143e61f94b406e52a2c34ad8d1942b0f8ec75cef1"
+        },
+        {
+          "file": "assets/SurveyBrand-CzGZEkwd.css",
+          "bytes": 12889,
+          "gzip1Bytes": 3651,
+          "sha256": "5fed2e933a410643d3f407149817c5e0750a4724a412f710084526fdd7843480"
+        },
+        {
+          "file": "assets/SurveyEntryPanel-DT7vVWQ-.css",
+          "bytes": 28667,
+          "gzip1Bytes": 6744,
+          "sha256": "168d6bf069b0ceb6583f0a241c14a3bc750dcb20fdfa7cac80020ffb27c203e4"
+        },
+        {
+          "file": "assets/SurveyEntryPanel-DYFjpZXH.js",
+          "bytes": 22004,
+          "gzip1Bytes": 8839,
+          "sha256": "452b5ec087a2464464e7e7f467d22786bc82c0a1a1213a260c81ead4c1ff98d9"
+        },
+        {
+          "file": "assets/arrow-right-COartPe5.js",
+          "bytes": 349,
+          "gzip1Bytes": 270,
+          "sha256": "f72100212badbfd9993ce4c6e2b52241db2f8b5b9df0f9ad31e97228735360c0"
+        },
+        {
+          "file": "assets/arrow-up-right-CYBiLBUG.js",
+          "bytes": 351,
+          "gzip1Bytes": 271,
+          "sha256": "5d6b046157c2edd6d8586e1dc1887bbd8eccf23d3e889ebf05e8328e2d71a67e"
+        },
+        {
+          "file": "assets/calendar-days-Cku-0JUJ.js",
+          "bytes": 678,
+          "gzip1Bytes": 383,
+          "sha256": "bd56fc20a54fd58162363bc88e6d20f251b06824c71ef93a72f60af89593278a"
+        },
+        {
+          "file": "assets/chart-no-axes-combined-CUGW388O.js",
+          "bytes": 564,
+          "gzip1Bytes": 366,
+          "sha256": "9c6ebfbe45418fc7c5707c5d57cf5d9e24df65d2ef83e047552fed59c1588793"
+        },
+        {
+          "file": "assets/check-d6z1kuEb.js",
+          "bytes": 303,
+          "gzip1Bytes": 249,
+          "sha256": "753b1f29f949775fa6f2ed99eef8b221d25b9e86aad59f45d80dd8631f18929e"
+        },
+        {
+          "file": "assets/chevron-up-BE2XVFL2.js",
+          "bytes": 312,
+          "gzip1Bytes": 254,
+          "sha256": "736b2af26e315414b14f9b4d3d5c7badbdc9d935d8203cee2328ee2934d005e1"
+        },
+        {
+          "file": "assets/clipboard-list-DllXQlk5.js",
+          "bytes": 595,
+          "gzip1Bytes": 373,
+          "sha256": "16083cdb9915127f5b593a7fc8bca39a670483491e7ad0dfa56d18b295e36fc9"
+        },
+        {
+          "file": "assets/context-DH9TJPZn.js",
+          "bytes": 747,
+          "gzip1Bytes": 448,
+          "sha256": "66736b9f539dda7f46c18c2d1f5f5b3b605624fba0d4f6247ddd53675c137035"
+        },
+        {
+          "file": "assets/createLucideIcon-Bc77O2Ki.js",
+          "bytes": 2578,
+          "gzip1Bytes": 823,
+          "sha256": "acd88ee9060c5a6402b9319a2ab4e010c990ad612cb01e0ea09b8c7cf9f70dc0"
+        },
+        {
+          "file": "assets/file-text-DLQMs23J.js",
+          "bytes": 569,
+          "gzip1Bytes": 364,
+          "sha256": "3e76b22eaab917b190cdb703da759f735789366fb48cb5392cdd74493924d8b0"
+        },
+        {
+          "file": "assets/folder-open-WDld8yQr.js",
+          "bytes": 476,
+          "gzip1Bytes": 330,
+          "sha256": "c361a731f2285fc04c2679f2392e3180f4c4d874bae51d752aab0fa3f8b05b24"
+        },
+        {
+          "file": "assets/images-dpMmDVZ1.js",
+          "bytes": 554,
+          "gzip1Bytes": 388,
+          "sha256": "63575b5658f8e9bf528a4351a7638ae8b2fbbaf14e6895fa76405efe0b134f91"
+        },
+        {
+          "file": "assets/index-BYrOY8Xa.js",
+          "bytes": 150768,
+          "gzip1Bytes": 55855,
+          "sha256": "6f2cbe18b8a386c1eb47d69c3116ba7b140f7f408a6095ebe74433c2364888fb"
+        },
+        {
+          "file": "assets/index-RCBHkAFU.css",
+          "bytes": 56620,
+          "gzip1Bytes": 12667,
+          "sha256": "245951723c3ee46dee385e238c29586d9b4a17f7f2d951e607ab772ba14db870"
+        },
+        {
+          "file": "assets/layers-DOgSx72G.js",
+          "bytes": 605,
+          "gzip1Bytes": 350,
+          "sha256": "af0287bf6d11b81ca5c32f68211ed9b32043692552dbaa552419a0e6266b487d"
+        },
+        {
+          "file": "assets/lock-keyhole-Bn-DjpQv.js",
+          "bytes": 439,
+          "gzip1Bytes": 330,
+          "sha256": "b3a8228408b6c02a52d8ae2cc7f9080cf40c353969038fe04a85e5fdd0d39750"
+        },
+        {
+          "file": "assets/plus-BpvXbo-2.js",
+          "bytes": 337,
+          "gzip1Bytes": 259,
+          "sha256": "529d370ad16317a6bd5f8b1c2f3572e14a3e79342127886bea0346692c7f9c3b"
+        },
+        {
+          "file": "assets/search-D3s-VGP6.js",
+          "bytes": 353,
+          "gzip1Bytes": 278,
+          "sha256": "5b4b7967717448284b1052d87e5bb7211cf66793dcbeef1f479b815f78874233"
+        },
+        {
+          "file": "assets/shield-check-CblOR6NH.js",
+          "bytes": 499,
+          "gzip1Bytes": 361,
+          "sha256": "7c55371d1e99c39237e2f057940d5c4c2d94d0e86cf9fc7c933a7decef190f13"
+        },
+        {
+          "file": "assets/sun-deCwFiy7.js",
+          "bytes": 1574,
+          "gzip1Bytes": 576,
+          "sha256": "5c53f0d4747ec6eec811af1dc810d2d26cfa9e5b38aa471bc5f1aa2966121609"
+        },
+        {
+          "file": "assets/survey-participant-Be5qZXqZ.css",
+          "bytes": 22839,
+          "gzip1Bytes": 6009,
+          "sha256": "b036593c4c36fa6f7669c753260ab07ae481c44ecd9628928358cc74cf4d2b0f"
+        },
+        {
+          "file": "assets/survey-workspace-polish-BrHjM6dA.js",
+          "bytes": 2605,
+          "gzip1Bytes": 1298,
+          "sha256": "deebfb490df8189521da9be18255e4115bb53037e823b47e4e3703123a9d6d87"
+        },
+        {
+          "file": "assets/survey-workspace-polish-D6RH9D6F.css",
+          "bytes": 39402,
+          "gzip1Bytes": 7583,
+          "sha256": "3d7364a41a5baf85130ca9d0e2c3d63f102429411dfbfbba206aad80b57caf09"
+        },
+        {
+          "file": "assets/user-round-DygDGooC.js",
+          "bytes": 361,
+          "gzip1Bytes": 287,
+          "sha256": "3a15884aa28f41738126ce095c15dd444a38e1b4387b58380dc3d3b29be1241e"
+        },
+        {
+          "file": "assets/x-D97MjwYD.js",
+          "bytes": 338,
+          "gzip1Bytes": 264,
+          "sha256": "07aa71f02a1c691aee8977e2330a42ca0a0786478515a467154ceb8c9e6ea6e3"
+        }
+      ]
+    },
+    {
+      "name": "Survey participant entry",
+      "count": 18,
+      "rawBytes": 378995,
+      "gzip1Bytes": 125239,
+      "baselineGzip1Bytes": 167603,
+      "files": [
+        {
+          "file": "assets/AssessmentMaterialDisplay-B3_-Rx-i.css",
+          "bytes": 3886,
+          "gzip1Bytes": 1036,
+          "sha256": "4cb6e25fa06c7c1bd206436e76a4c526188f66ad0e2adc982a938b717b0e8f92"
+        },
+        {
+          "file": "assets/AssessmentMaterialDisplay-D8V6m1Mq.js",
+          "bytes": 1927,
+          "gzip1Bytes": 1095,
+          "sha256": "2ccd1a64a0ae3ad49b443ebb2867767bc3706d72d12d7dfbb318e5d1c863c819"
+        },
+        {
+          "file": "assets/FormChoiceExtras-kwcjx2Hj.js",
+          "bytes": 7309,
+          "gzip1Bytes": 2806,
+          "sha256": "0a62ac6cef871fd2bba8f3aae0bf9adbe2346c84414bf8324d772aca026beda3"
+        },
+        {
+          "file": "assets/ParticipationCode-K6IYWUc1.js",
+          "bytes": 5586,
+          "gzip1Bytes": 2248,
+          "sha256": "0884194de20de4c7113d46e5527f58877c4eff6a27ab1d7cb9ef18b3d5c85c8f"
+        },
+        {
+          "file": "assets/RetryableLazy-BPpeFHpN.js",
+          "bytes": 852,
+          "gzip1Bytes": 547,
+          "sha256": "2e21bf1b52584fcf3505c691406e5a1ede5480a8623ffa9c80c05fd98c86ebfa"
+        },
+        {
+          "file": "assets/SurveyMaterialDisplay-4XJtZYU6.js",
+          "bytes": 803,
+          "gzip1Bytes": 506,
+          "sha256": "1f5f767413434e8f79d758ed501ef66b66915a6d553f89de556a330c732efe75"
+        },
+        {
+          "file": "assets/SurveyPublicApp-BUaAwE3x.css",
+          "bytes": 31231,
+          "gzip1Bytes": 6527,
+          "sha256": "15aef12a23f09cb7e60a51b8d0c8933e767877ce577f2df6e2e89e6dd9a70d3e"
+        },
+        {
+          "file": "assets/SurveyPublicApp-DJxzKQ85.js",
+          "bytes": 89331,
+          "gzip1Bytes": 31983,
+          "sha256": "722210be68451998a0045bbfc9b89926ba83e288d4480da90a62aef5b8be27f6"
+        },
+        {
+          "file": "assets/deferred-media-CKPgQOkN.js",
+          "bytes": 685,
+          "gzip1Bytes": 498,
+          "sha256": "b5e6f3521130f3106cd9d17e6d30f5a8fc742c929524ff8400bbb2c368e85e56"
+        },
+        {
+          "file": "assets/deferredPage-CopuSF3X.js",
+          "bytes": 298,
+          "gzip1Bytes": 262,
+          "sha256": "c73cd274eadebfd6cc06c8c6f342a3686f9b4cb39b7856add2e9601701ac51a4"
+        },
+        {
+          "file": "assets/flow.client-CD4zNBOs.js",
+          "bytes": 1994,
+          "gzip1Bytes": 1015,
+          "sha256": "af3d3dcbd1845ba439b428443d0dfaeee31c8aef591cd22313e1cc81bb8d97b4"
+        },
+        {
+          "file": "assets/form-visibility-DWnADqY8.js",
+          "bytes": 632,
+          "gzip1Bytes": 333,
+          "sha256": "7c275eea7e6bfdcc5853be84a14158dab89af34d43630eaec917519a1577a00c"
+        },
+        {
+          "file": "assets/index-BYrOY8Xa.js",
+          "bytes": 150768,
+          "gzip1Bytes": 55855,
+          "sha256": "6f2cbe18b8a386c1eb47d69c3116ba7b140f7f408a6095ebe74433c2364888fb"
+        },
+        {
+          "file": "assets/index-RCBHkAFU.css",
+          "bytes": 56620,
+          "gzip1Bytes": 12667,
+          "sha256": "245951723c3ee46dee385e238c29586d9b4a17f7f2d951e607ab772ba14db870"
+        },
+        {
+          "file": "assets/item-timing-BbFhZhS2.js",
+          "bytes": 3345,
+          "gzip1Bytes": 1266,
+          "sha256": "886e0bf1bf01c831af3d0b77e0a39fe6230ad8bcc986ae02c3b7d92383bc07c7"
+        },
+        {
+          "file": "assets/participation-link-CnLAbyD5.js",
+          "bytes": 691,
+          "gzip1Bytes": 429,
+          "sha256": "92ece1c22bf601a554f8ff5ba2056b2682cc25e5361aed71096f46503458c536"
+        },
+        {
+          "file": "assets/response-timing-NEHx8NlB.js",
+          "bytes": 198,
+          "gzip1Bytes": 157,
+          "sha256": "1567cc9efcd1aca39dc500d65df939fe34aa7a5def12a2443310f9950d76a433"
+        },
+        {
+          "file": "assets/survey-participant-Be5qZXqZ.css",
+          "bytes": 22839,
+          "gzip1Bytes": 6009,
+          "sha256": "b036593c4c36fa6f7669c753260ab07ae481c44ecd9628928358cc74cf4d2b0f"
+        }
+      ]
+    }
+  ]
+}
