@@ -1,0 +1,58 @@
+{
+  "head": "190c3ddbc86723206cc4af30cf8051ca9a00ad06",
+  "scope": "Actual UI components/styles. Role display fixtures are synthetic; report fixture is recorded PR374 public output. No API login, registration or FINAL simulated here; real HTTP evidence is separately admitted.",
+  "status": "FAIL",
+  "cases": [
+    {
+      "name": "school-parent",
+      "view": "parent",
+      "width": 390,
+      "theme": "light",
+      "status": "PASS",
+      "consentRequired": true,
+      "returnDidNotStartOrSubmit": true,
+      "overflow": false
+    },
+    {
+      "name": "school-teacher",
+      "view": "teacher",
+      "width": 390,
+      "theme": "light",
+      "status": "PASS",
+      "consentRequired": true,
+      "returnDidNotStartOrSubmit": true,
+      "overflow": false
+    },
+    {
+      "name": "teacher-expert",
+      "view": "expert",
+      "width": 390,
+      "theme": "light",
+      "status": "PASS",
+      "frozenFormAndNarrativeDisplayed": true,
+      "overflow": false
+    },
+    {
+      "name": "warning-dark-mobile",
+      "view": "report",
+      "width": 390,
+      "theme": "dark",
+      "status": "FAIL",
+      "warning": {
+        "text": "解释限制：这份中文研究译稿仍待专家审校和适用人群验证，目前只供成人研究和自我了解。；目前没有可靠依据划分高低或排名；信心不等于实际能力，也不代表个人价值。；这是IPIP的一项独立工具，并非完整人格评估；不能借用其他自我效能量表的分界。原英文研究的数据不能证明本中文版本已经验证。；10题都需完整回答；漏答不当作零分，也不代填。不用于诊断、学生筛选或教师考核。",
+        "color": "rgb(41, 45, 43)",
+        "background": "rgb(37, 48, 41)",
+        "ratio": 1.019236394849906
+      },
+      "error": "AssertionError [ERR_ASSERTION]: Warning text contrast is insufficient\n    at warningContrast (file:///home/runner/work/eduK12-new-version/eduK12-new-version/.github/scripts/pr376-browser.mjs:67:570)\n    at runNextTicks (node:internal/process/task_queues:65:5)\n    at process.processImmediate (node:internal/timers:541:9)\n    at async scenario (file:///home/runner/work/eduK12-new-version/eduK12-new-version/.github/scripts/pr376-browser.mjs:46:121)\n    at async file:///home/runner/work/eduK12-new-version/eduK12-new-version/.github/scripts/pr376-browser.mjs:69:3"
+    }
+  ],
+  "sandbox": {
+    "ok": true,
+    "code": "CHROME_SANDBOX_VERIFIED",
+    "seccompBpf": true,
+    "suidSandbox": false,
+    "pidNamespaces": true
+  },
+  "error": "AssertionError [ERR_ASSERTION]: Warning text contrast is insufficient\n    at warningContrast (file:///home/runner/work/eduK12-new-version/eduK12-new-version/.github/scripts/pr376-browser.mjs:67:570)\n    at runNextTicks (node:internal/process/task_queues:65:5)\n    at process.processImmediate (node:internal/timers:541:9)\n    at async scenario (file:///home/runner/work/eduK12-new-version/eduK12-new-version/.github/scripts/pr376-browser.mjs:46:121)\n    at async file:///home/runner/work/eduK12-new-version/eduK12-new-version/.github/scripts/pr376-browser.mjs:69:3"
+}

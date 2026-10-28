@@ -35,3 +35,11 @@ Existing role services → observer population and privacy → isolated local Po
 Scoped warning color → dark contrast and light/print preservation → sandboxed GitHub Chrome (pending; local Chromium unavailable as documented in PR374).
 Type correctness → new backend test imports/fixtures → local TypeScript (PASS, original shell exit 0; retrospective exact backend tree association).
 CI → exact complete source diff, formally admitted originals and missing UI evidence, changed-source CodeQL and stable merge gate. No unrelated full application replay or production build by default.
+
+## First formal CI (40639538698)
+
+Source6894ba96cddd4881e5d3d2292375d551cf650ddf, merge checkout190c3ddbc86723206cc4af30cf8051ca9a00ad06. Source and original admission PASS; CodeQL job PASS. Three role browser consumers PASS and root read all screenshots. Dark warning first case FAIL, later tablet/light-print NOTRUN; overall qualification failed. Original browser JSON preserved, artifact12795300037 ZIP SHA256 f9d333139d0afafca6e1ca510ed4651a4d7f02e9cce6599ae3a7096b16910b37.
+
+The new display harness omitted actual Training shell data-shell-mode, required by the dark-token selector. Computed warning foreground was light-theme ink rgb(41,45,43), background rgb(37,48,41), ratio1.019. Restore the real shell attribute; do not bypass theme setup or relax 4.5. Separately make the warning p/ul selector equal in specificity to existing report-feedback p so later warning color wins intentionally. No importance override or runtime changes.
+
+Retry only failed/unexecuted warning displays. Preserve and admit exactly the previous three PASS role UI rows from the immutable overall FAIL report; current frontend differs only in report-ui.css, whose Training-scoped change does not touch School/Teacher hosts. Role fixture/consumer behavior unchanged; data-shell-mode is added for report view only. Original role screenshots remain in the first artifact, not regenerated. New control script gets current SAST. No application/PG/type replay.
