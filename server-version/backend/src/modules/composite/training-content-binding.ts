@@ -12,6 +12,7 @@ import { validateTrainingReportPointer } from './training-report-selection'
 import { Prisma } from '@prisma/client'
 import { z } from 'zod'
 import { canonicalHash } from '../assessment-runtime/canonical'
+import type {EducationSlotPresentation} from '../assessment-runtime/attempt-runtime'
 import { getContentRelease } from '../measurement-content/repository'
 import { ContentReleaseError, prepareRelease, type ReleaseInput } from '../measurement-content/release'
 import { scaleMeasurementRelease } from '../measurement-content/scale'
@@ -260,9 +261,15 @@ export async function prepareTrainingContentAttemptBinding(db:Prisma.Transaction
     // registry wrapper. Native runtime freezing still occurs once per child.
     const binding=trainingContentAttemptBindingSchema.parse({schemaVersion:1,compositeId:input.compositeId,attemptId:input.attemptId,
       epoch:input.epoch,publicationHash:input.snapshotHash,units:snapshot.units,educationComposition:anchor})
-    const orderedSlots=snapshot.educationBinding.manifest.flatMap(block=>block.kind==='SCALE'
-      ?block.itemIds.map(id=>'scale:'+id):block.sectionIds.map(id=>'form-section:'+id))
-    return {binding,bindingHash:canonicalHash(binding),educationUnitOrder:new Map(orderedSlots.map((key,index)=>[key,index])),recheckSourceLicenses:async()=>{}}
+    const presentation=new Map<string,EducationSlotPresentation>(),orderedSlots:string[]=[]
+    for(const block of snapshot.educationBinding.manifest){
+      const keys=block.kind==='SCALE'?block.itemIds.map(id=>'scale:'+id):block.sectionIds.map(id=>'form-section:'+id)
+      for(const [index,key] of keys.entries()){
+        orderedSlots.push(key);presentation.set(key,{blockId:block.blockId,...(index===0&&block.instruction?{instruction:block.instruction}:{})})
+      }
+    }
+    return {binding,bindingHash:canonicalHash(binding),educationUnitOrder:new Map(orderedSlots.map((key,index)=>[key,index])),
+      educationUnitPresentation:presentation,recheckSourceLicenses:async()=>{}}
   }
   const actualItems=input.composite.items.filter(item=>item.type!=='FORM')
   const itemsById=new Map<string,any>(actualItems.map(item=>[item.id,item]))

@@ -596,6 +596,9 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
           if (sectionId) { formValuesRef.current = nextForm; setFormValues(nextForm); setSectionIndex(0) }
           else { timingRef.current = nextTiming; setScaleValues(nextScale); setScaleIndex(0); setActiveWholePageItem('') }
         }}/>:null}
+      {item?.questionnaireInstruction&&<section aria-label="本段作答说明" className="mb-4 whitespace-pre-wrap rounded-lg border border-slate-200 p-4 text-sm">
+        <p>{item.questionnaireInstruction}</p>
+      </section>}
       {error ? <p role="alert" className="mb-4 text-sm text-red-600">{error}</p> : null}
       {requiresRestart && onRestart ? (
         <div className="mb-4 flex items-center justify-between gap-3 rounded border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">

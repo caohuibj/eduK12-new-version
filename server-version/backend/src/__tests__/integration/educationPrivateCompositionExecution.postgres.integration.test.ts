@@ -14,6 +14,8 @@ import {getAttemptState,startUserAttempt} from '../../modules/composite/composit
 import {readTeacherOrdinaryFeedback} from '../../modules/reporting/education-ordinary-feedback.service'
 import {submitCompositeScaleFinal} from '../../modules/scale/scale-final-submit.service'
 import {canonicalHash} from '../../modules/assessment-runtime/canonical'
+import {loadFrozenActiveSlotSet} from '../../modules/assessment-runtime/slot-set'
+import {updatePrivateTool} from '../../modules/education-tools/private-tool.service'
 
 const url=integrationDatabaseUrl('RELEASE_INTEGRATION_DATABASE_URL'),suite=url?describe:describe.skip
 let db:PrismaClient,server:Server,base:string
@@ -41,6 +43,30 @@ suite('Teacher ordinary questionnaire / actual SELF participation and block feed
   base='http://127.0.0.1:'+(server.address() as {port:number}).port+'/api/huiteacher'
  })
  afterAll(async()=>{if(server)await new Promise<void>(resolve=>server.close(()=>resolve()));await db?.$disconnect()})
+ it('delivers frozen block instructions through the real Scale/Form execution after a draft edit, without extra pages',async()=>{
+  const instructions=['冻结的量表衔接说明','冻结的表单衔接说明','']
+  const f=await setupTeacherCompositionExecution(db,{instructions}),auth=await headers(f.participantUserId)
+  const tasks=await request('/my-assessment-tasks',auth),task=tasks.data.list.find((row:any)=>row.executionId===f.executionId)
+  if(task.consentRequired)expect((await request(`/run-executions/${f.executionId}/assessment-consent/accept`,auth,{})).status).toBe(200)
+  const start=await request(`/run-executions/${f.executionId}/start-assessment`,auth,{})
+  expect(start.status,JSON.stringify(start.value)).toBe(200)
+  const id=start.data.runtimeBindingRef,path=`/assessment-composite-attempts/${id}`
+  const state=await request(path,auth),current=state.data.currentItem
+  expect(state.data.totalItems).toBe(3);expect(current).toMatchObject({type:'SCALE',questionnaireInstruction:instructions[0]})
+  const parent=await db.compositeAssessmentAttempt.findUniqueOrThrow({where:{id}})
+  const slots=await loadFrozenActiveSlotSet(parent.frozenActiveSlotSetEncrypted!)
+  expect(slots.slots.filter(slot=>slot.sourceBinding.educationInstruction===instructions[1])).toHaveLength(1)
+  await updatePrivateTool(f.context,f.fixed.toolId,{expectedRevision:f.fixed.sourceRevision,title:f.fixed.title,
+   definition:{...f.definition,blocks:f.definition.blocks.map(block=>({...block,instruction:'尚未固定的新草稿说明'}))}})
+  expect((await request(path,auth)).data.currentItem.questionnaireInstruction).toBe(instructions[0])
+  const final=await request(path+`/items/${current.id}/scale/submit`,auth,{submissionId:randomUUID(),attemptEpoch:state.data.attemptEpoch,
+   definitionHash:current.definitionHash,contextSnapshotHash:state.data.contextSnapshotHash,
+   answers:current.scale.definition.items.map((item:any)=>({itemCode:item.itemCode,responseValue:'a'}))})
+  expect(final.status,JSON.stringify(final.value)).toBe(200)
+  const next=await request(path,auth)
+  expect(next.data.totalItems).toBe(3);expect(next.data.currentItem).toMatchObject({type:'FORM_SECTION',questionnaireInstruction:instructions[1]})
+  expect(JSON.stringify(next.value)).not.toContain('尚未固定的新草稿说明')
+ })
  it('starts one frozen parent, resumes after author withdrawal, finalizes Scale/Form once, and discloses only the permitted same-key block',async()=>{
   const f=await setupTeacherCompositionExecution(db),auth=await headers(f.participantUserId)
   const tasks=await request('/my-assessment-tasks',auth)

@@ -5,4 +5,6 @@
 .education-composition-studio .survey-composition-outline-actions button{display:grid;place-items:center;min-width:32px;min-height:32px;padding:.25rem;color:var(--ht-quiet,#73675e)}
 .education-composition-studio .survey-composition-candidates article{flex-wrap:wrap}
 .education-composition-studio .survey-composition-catalog>label{display:grid;gap:.35rem;margin-bottom:.75rem}
+.education-composition-block-instruction{display:grid;gap:.3rem;margin-top:.65rem;font-size:.75rem;color:var(--ht-quiet,#73675e)}
+.education-composition-block-instruction textarea{width:100%;min-height:4rem;resize:vertical}
 .education-composition-studio [aria-label="问卷内容预览"]{margin-top:1rem;padding:1rem;border:1px solid var(--ht-line,#e5dbd0);border-radius:.6rem}

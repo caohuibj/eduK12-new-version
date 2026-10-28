@@ -189,6 +189,7 @@ import {
 import {
   formSectionIdentityHash,
   freezeCompositeActiveSlotSet,
+  frozenEducationBlockInstruction,
 } from '../assessment-runtime/attempt-runtime'
 import {
   loadFrozenScaleRuntimeSnapshot,
@@ -3041,6 +3042,7 @@ const createAttempt = async (
     const frozenActiveSlotSet = freezeCompositeActiveSlotSet({
       attemptEpoch,
       unitOrder:contentCandidate&&'educationUnitOrder' in contentCandidate?contentCandidate.educationUnitOrder:undefined,
+      unitPresentation:contentCandidate&&'educationUnitPresentation' in contentCandidate?contentCandidate.educationUnitPresentation:undefined,
       scales: runtime.scales,
       cognitive: runtime.cognitive,
       situational: runtime.situational,
@@ -4107,6 +4109,11 @@ const getUnifiedCompositeAttemptState = async (
     }
   }
 
+  if(currentItem&&currentUnit){
+    const key=currentUnit.type==='FORM_SECTION'?formSectionSlotKey(currentUnit.id):compositeItemSlotKey(currentUnit.id,currentUnit.type)
+    const instruction=frozenEducationBlockInstruction(frozenSlotSet.slots,key)
+    if(instruction)currentItem.questionnaireInstruction=instruction
+  }
   const definitionHash = computeSubmissionPayloadHash({
     assessmentId: attempt.compositeAssessment.id,
     items: attempt.compositeAssessment.items.map((item: any) => ({ id: item.id, type: item.type, position: item.position, formSectionId: item.formSectionId ?? null })),

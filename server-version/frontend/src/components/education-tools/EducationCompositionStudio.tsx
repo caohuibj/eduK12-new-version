@@ -127,12 +127,14 @@ function CompositionSession({api,organizationId,actorId,onDraftStateChange}:Prop
      detail:(row.source.kind==='SCALE'?'量表':'表单')+' · 固定版本 '+(references.find(ref=>ref.id===row.source.versionId)?.sourceRevision??'已选')}))} max={50} disabled={busy}
      onMove={(index,offset)=>{const blocks=[...tool.definition.blocks];[blocks[index],blocks[index+offset]]=[blocks[index+offset],blocks[index]];change({definition:{...tool.definition,blocks}})}}
      onRemove={index=>change({definition:{...tool.definition,blocks:tool.definition.blocks.filter((_,i)=>i!==index)}})}
+     renderItemEditor={(_,index)=><label className="education-composition-block-instruction">工具衔接说明 {index+1}<textarea value={tool.definition.blocks[index].instruction} maxLength={16000} disabled={busy}
+      onChange={event=>change({definition:{...tool.definition,blocks:tool.definition.blocks.map((block,i)=>i===index?{...block,instruction:event.target.value}:block)}})}/></label>}
      footer="量表的本人反馈范围由所选固定版本决定，表单仅采集信息。正式整包不能拆分或加入这里。"/>
    </div>
    {preview&&<section aria-label="问卷内容预览"><h3>问卷内容预览</h3><p>试填仅保留在本页，不计分或保存为正式作答。</p><p>{tool.definition.instruction}</p>
     <div><button disabled={previewIndex===0} onClick={()=>setPreviewIndex(index=>index-1)}>上一工具</button><span>{previewIndex+1} / {tool.definition.blocks.length}</span>
      <button disabled={previewIndex===tool.definition.blocks.length-1} onClick={()=>setPreviewIndex(index=>index+1)}>下一工具</button></div>
-    <h4>{block?compositionTitle(block,references):''}</h4>{previewError?<p role="alert">{previewError}</p>:!reference?<p>当前固定工具不可读取，请重新核对来源。</p>:!previewTool?<p role="status">正在读取当前固定工具…</p>:
+    <h4>{block?compositionTitle(block,references):''}</h4>{block?.instruction&&<p className="whitespace-pre-wrap">{block.instruction}</p>}{previewError?<p role="alert">{previewError}</p>:!reference?<p>当前固定工具不可读取，请重新核对来源。</p>:!previewTool?<p role="status">正在读取当前固定工具…</p>:
      <PrivateToolPreview tool={previewTool} answers={answers} onAnswer={(key,value)=>setAnswers(old=>({...old,[key]:value}))} imageAdapter={imageAdapter}
       renderMaterials={items=>items?.map(item=><EducationMaterialPreview key={item.asset.assetId} api={api} organizationId={organizationId} toolId={previewTool.id} item={item}/>)}/>}
    </section>}

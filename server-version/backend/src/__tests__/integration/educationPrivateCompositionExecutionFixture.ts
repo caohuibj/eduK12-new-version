@@ -8,7 +8,7 @@ import {addTeacherPrivateCompositionRunTrack,publishTeacherRun} from '../../modu
 
 /** Real author/freeze/attach/publish services only. Runtime, admission, answers,
  * canonical FINAL and feedback are never inserted or repaired by the fixture. */
-export async function setupTeacherCompositionExecution(db:PrismaClient){
+export async function setupTeacherCompositionExecution(db:PrismaClient,options:{instructions?:readonly string[]}={}){
  const f=await setupEducationLibraryRuntimeFixture({db,product:'TEACHER',trackCount:0,publish:false})
  const context:PrivateToolContext={entry:'TEACHER',organizationId:f.organizationId,principal:{userId:f.managerUserId,accountDomain:'SCHOOL'}}
  const freeze=async(kind:'SCALE'|'FORM'|'COMPOSITION',title:string,definition:unknown)=>{
@@ -29,7 +29,7 @@ export async function setupTeacherCompositionExecution(db:PrismaClient){
   schemaVersion:2,pages:[{pageKey:'p',title:'Fixed Form page',questions:[{itemKey:'comment',type:'SHORT_TEXT',prompt:'Fixed comment',required:true,options:[],rows:[]}]}]}),
   hidden=await freeze('SCALE','Hidden fixed Scale',scale(false))
  const definition={schemaVersion:1,adapterVersion:'1.0.0',administration:{population:'TEACHER',responseMode:'SELF'},instruction:'Frozen ordinary questionnaire',
-  blocks:[visible,form,hidden].map(source=>({blockId:randomUUID(),instruction:'',source:{provider:'PRIVATE_VERSION',kind:source.kind,versionId:source.id,contentHash:source.contentHash}}))}
+  blocks:[visible,form,hidden].map((source,index)=>({blockId:randomUUID(),instruction:options.instructions?.[index]??'',source:{provider:'PRIVATE_VERSION',kind:source.kind,versionId:source.id,contentHash:source.contentHash}}))}
  const fixed=await freeze('COMPOSITION','One ordinary SELF questionnaire',definition)
  if(!('runtime' in fixed)||!fixed.runtime)throw new Error('Missing sealed ordinary questionnaire')
  const teacher={organizationId:f.organizationId,eventId:f.workflow.id,actorUserId:f.managerUserId}
