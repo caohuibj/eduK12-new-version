@@ -1,0 +1,306 @@
+{
+  "instrumentKey": "compact23_zh_cn_research",
+  "options": [
+    {
+      "value": "0",
+      "label_en_note": "两端锚点 0 = strongly disagree、6 = strongly agree；中间选项按仓库先例（SECQ-25）以数字标注，不猜测文字。",
+      "score": 0
+    },
+    {
+      "value": "1",
+      "label_en_note": "两端锚点 0 = strongly disagree、6 = strongly agree；中间选项按仓库先例（SECQ-25）以数字标注，不猜测文字。",
+      "score": 1
+    },
+    {
+      "value": "2",
+      "label_en_note": "两端锚点 0 = strongly disagree、6 = strongly agree；中间选项按仓库先例（SECQ-25）以数字标注，不猜测文字。",
+      "score": 2
+    },
+    {
+      "value": "3",
+      "label_en_note": "两端锚点 0 = strongly disagree、6 = strongly agree；中间选项按仓库先例（SECQ-25）以数字标注，不猜测文字。",
+      "score": 3
+    },
+    {
+      "value": "4",
+      "label_en_note": "两端锚点 0 = strongly disagree、6 = strongly agree；中间选项按仓库先例（SECQ-25）以数字标注，不猜测文字。",
+      "score": 4
+    },
+    {
+      "value": "5",
+      "label_en_note": "两端锚点 0 = strongly disagree、6 = strongly agree；中间选项按仓库先例（SECQ-25）以数字标注，不猜测文字。",
+      "score": 5
+    },
+    {
+      "value": "6",
+      "label_en_note": "两端锚点 0 = strongly disagree、6 = strongly agree；中间选项按仓库先例（SECQ-25）以数字标注，不猜测文字。",
+      "score": 6
+    }
+  ],
+  "items": [
+    {
+      "itemCode": "COMPACT_01",
+      "en": "I can identify the things that really matter to me in life and pursue them.",
+      "zh_working": "我能找出生活中真正重要的事，并去追求它们。",
+      "assignedScore": "valued_action"
+    },
+    {
+      "itemCode": "COMPACT_02",
+      "en": "One of my big goals is to be free from painful emotions.",
+      "zh_working": "我的一大目标就是摆脱痛苦的情绪。",
+      "assignedScore": "openness_to_experience"
+    },
+    {
+      "itemCode": "COMPACT_03",
+      "en": "I rush through meaningful activities without being really attentive to them.",
+      "zh_working": "我匆匆做完有意义的活动，却没有真正留心。",
+      "assignedScore": "behavioural_awareness"
+    },
+    {
+      "itemCode": "COMPACT_04",
+      "en": "I try to stay busy to keep thoughts or feelings from coming.",
+      "zh_working": "我尽量让自己忙起来，好让那些想法或感受不要冒出来。",
+      "assignedScore": "openness_to_experience"
+    },
+    {
+      "itemCode": "COMPACT_05",
+      "en": "I act in ways that are consistent with how I wish to live my life.",
+      "zh_working": "我的行为方式与我想要的生活一致。",
+      "assignedScore": "valued_action"
+    },
+    {
+      "itemCode": "COMPACT_06",
+      "en": "I get so caught up in my thoughts that I am unable to do the things that I most want to do.",
+      "zh_working": "我陷在自己的想法里，以至于做不成自己最想做的事。",
+      "assignedScore": "openness_to_experience"
+    },
+    {
+      "itemCode": "COMPACT_07",
+      "en": "I make choices based on what is important to me, even if it is stressful.",
+      "zh_working": "即使有压力，我也基于对自己重要的东西来做选择。",
+      "assignedScore": "valued_action"
+    },
+    {
+      "itemCode": "COMPACT_08",
+      "en": "I tell myself that I shouldn't have certain thoughts.",
+      "zh_working": "我告诉自己，我不应该有某些念头。",
+      "assignedScore": "openness_to_experience"
+    },
+    {
+      "itemCode": "COMPACT_09",
+      "en": "I find it difficult to stay focused on what's happening in the present.",
+      "zh_working": "我很难把注意力放在当下正在发生的事上。",
+      "assignedScore": "behavioural_awareness"
+    },
+    {
+      "itemCode": "COMPACT_10",
+      "en": "I behave in line with my personal values.",
+      "zh_working": "我的行为与自己的个人价值观一致。",
+      "assignedScore": "valued_action"
+    },
+    {
+      "itemCode": "COMPACT_11",
+      "en": "I go out of my way to avoid situations that might bring difficult thoughts, feelings, or sensations.",
+      "zh_working": "我刻意回避那些可能带来困难想法、感受或身体感觉的情境。",
+      "assignedScore": "openness_to_experience"
+    },
+    {
+      "itemCode": "COMPACT_12",
+      "en": "Even when doing the things that matter to me, I find myself doing them without paying attention.",
+      "zh_working": "即使在做对自己重要的事，我也会发现自己心不在焉。",
+      "assignedScore": "behavioural_awareness"
+    },
+    {
+      "itemCode": "COMPACT_13",
+      "en": "I am willing to fully experience whatever thoughts, feelings and sensations come up for me, without trying to change or defend against them.",
+      "zh_working": "我愿意完整地体验出现的一切想法、感受和身体感觉，不去改变或防御它们。",
+      "assignedScore": "openness_to_experience"
+    },
+    {
+      "itemCode": "COMPACT_14",
+      "en": "I undertake things that are meaningful to me, even when I find it hard to do so.",
+      "zh_working": "即使困难，我也会去做对自己有意义的事。",
+      "assignedScore": "valued_action"
+    },
+    {
+      "itemCode": "COMPACT_15",
+      "en": "I work hard to keep out upsetting feelings.",
+      "zh_working": "我很努力地把难受的感受挡在外面。",
+      "assignedScore": "openness_to_experience"
+    },
+    {
+      "itemCode": "COMPACT_16",
+      "en": "I do jobs or tasks automatically, without being aware of what I'm doing.",
+      "zh_working": "我自动化地完成任务，意识不到自己在做什么。",
+      "assignedScore": "behavioural_awareness"
+    },
+    {
+      "itemCode": "COMPACT_17",
+      "en": "I am able to follow my long terms plans including times when progress is slow.",
+      "zh_working": "即使进展缓慢，我也能坚持执行自己的长期计划。",
+      "assignedScore": "valued_action"
+    },
+    {
+      "itemCode": "COMPACT_18",
+      "en": "Even when something is important to me, I'll rarely do it if there is a chance it will upset me.",
+      "zh_working": "即使一件事对我重要，只要它可能让我难受，我就很少去做。",
+      "assignedScore": "openness_to_experience"
+    },
+    {
+      "itemCode": "COMPACT_19",
+      "en": "It seems I am 'running on automatic' without much awareness of what I'm doing.",
+      "zh_working": "我好像在“自动运行”，不太觉察自己在做什么。",
+      "assignedScore": "behavioural_awareness"
+    },
+    {
+      "itemCode": "COMPACT_20",
+      "en": "Thoughts are just thoughts - they don't control what I do.",
+      "zh_working": "想法只是想法——它们控制不了我的行动。",
+      "assignedScore": "openness_to_experience"
+    },
+    {
+      "itemCode": "COMPACT_21",
+      "en": "My values are really reflected in my behavior.",
+      "zh_working": "我的价值观确实体现在我的行为里。",
+      "assignedScore": "valued_action"
+    },
+    {
+      "itemCode": "COMPACT_22",
+      "en": "I can take thoughts and feelings as they come, without attempting to control or avoid them.",
+      "zh_working": "我能让想法和感受自然来去，不试图控制或回避它们。",
+      "assignedScore": "openness_to_experience"
+    },
+    {
+      "itemCode": "COMPACT_23",
+      "en": "I can keep going with something when it's important to me.",
+      "zh_working": "只要事情对我重要，我就能坚持做下去。",
+      "assignedScore": "valued_action"
+    }
+  ],
+  "reverseScored": [
+    "COMPACT_02",
+    "COMPACT_03",
+    "COMPACT_04",
+    "COMPACT_06",
+    "COMPACT_08",
+    "COMPACT_09",
+    "COMPACT_11",
+    "COMPACT_12",
+    "COMPACT_15",
+    "COMPACT_16",
+    "COMPACT_18",
+    "COMPACT_19"
+  ],
+  "scores": [
+    {
+      "key": "total",
+      "label": "心理灵活性总分（23题）",
+      "items": [
+        "COMPACT_01",
+        "COMPACT_02",
+        "COMPACT_03",
+        "COMPACT_04",
+        "COMPACT_05",
+        "COMPACT_06",
+        "COMPACT_07",
+        "COMPACT_08",
+        "COMPACT_09",
+        "COMPACT_10",
+        "COMPACT_11",
+        "COMPACT_12",
+        "COMPACT_13",
+        "COMPACT_14",
+        "COMPACT_15",
+        "COMPACT_16",
+        "COMPACT_17",
+        "COMPACT_18",
+        "COMPACT_19",
+        "COMPACT_20",
+        "COMPACT_21",
+        "COMPACT_22",
+        "COMPACT_23"
+      ],
+      "aggregation": "sum",
+      "reverse": [
+        "COMPACT_02",
+        "COMPACT_03",
+        "COMPACT_04",
+        "COMPACT_06",
+        "COMPACT_08",
+        "COMPACT_09",
+        "COMPACT_11",
+        "COMPACT_12",
+        "COMPACT_15",
+        "COMPACT_16",
+        "COMPACT_18",
+        "COMPACT_19"
+      ],
+      "description": "12 个负向键题按 6−原始分反向后与全部题目相加，范围 0–138。分数越高表示越多报告心理灵活性。"
+    },
+    {
+      "key": "openness_to_experience",
+      "label": "对体验的开放（OE，10题反向后）",
+      "items": [
+        "COMPACT_02",
+        "COMPACT_04",
+        "COMPACT_06",
+        "COMPACT_08",
+        "COMPACT_11",
+        "COMPACT_13",
+        "COMPACT_15",
+        "COMPACT_18",
+        "COMPACT_20",
+        "COMPACT_22"
+      ],
+      "aggregation": "sum",
+      "reverse": [
+        "COMPACT_02",
+        "COMPACT_04",
+        "COMPACT_06",
+        "COMPACT_08",
+        "COMPACT_11",
+        "COMPACT_15",
+        "COMPACT_18"
+      ],
+      "description": "OE 十题（其中九题负向键反向）求和，范围 0–60；越高表示越多报告允许想法和感受存在。"
+    },
+    {
+      "key": "behavioural_awareness",
+      "label": "对行为的觉察（BA，5题反向后）",
+      "items": [
+        "COMPACT_03",
+        "COMPACT_09",
+        "COMPACT_12",
+        "COMPACT_16",
+        "COMPACT_19"
+      ],
+      "aggregation": "sum",
+      "reverse": [
+        "COMPACT_03",
+        "COMPACT_09",
+        "COMPACT_12",
+        "COMPACT_16",
+        "COMPACT_19"
+      ],
+      "description": "BA 五题（全部负向键反向）求和，范围 0–30；越高表示越多报告做事时留意当下。"
+    },
+    {
+      "key": "valued_action",
+      "label": "价值行动（VA，8题）",
+      "items": [
+        "COMPACT_01",
+        "COMPACT_05",
+        "COMPACT_07",
+        "COMPACT_10",
+        "COMPACT_14",
+        "COMPACT_17",
+        "COMPACT_21",
+        "COMPACT_23"
+      ],
+      "aggregation": "sum",
+      "reverse": [],
+      "description": "VA 八题（全部正向键）求和，范围 0–48；越高表示越多报告按价值行动。"
+    }
+  ],
+  "missingPolicy": "complete_required；任一题缺失则该分数不计算，不插补、不补0。"
+}

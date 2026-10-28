@@ -1,0 +1,35 @@
+{
+  "note": "模拟数据，仅用于核对计分与报告样稿",
+  "answers": {
+    "COMPACT_01": 3,
+    "COMPACT_02": 0,
+    "COMPACT_03": 6,
+    "COMPACT_04": 3,
+    "COMPACT_05": 0,
+    "COMPACT_06": 6,
+    "COMPACT_07": 3,
+    "COMPACT_08": 0,
+    "COMPACT_09": 6,
+    "COMPACT_10": 3,
+    "COMPACT_11": 0,
+    "COMPACT_12": 6,
+    "COMPACT_13": 3,
+    "COMPACT_14": 0,
+    "COMPACT_15": 6,
+    "COMPACT_16": 3,
+    "COMPACT_17": 0,
+    "COMPACT_18": 6,
+    "COMPACT_19": 3,
+    "COMPACT_20": 0,
+    "COMPACT_21": 6,
+    "COMPACT_22": 3,
+    "COMPACT_23": 0
+  },
+  "expectedScores": {
+    "total": 48,
+    "openness_to_experience": 27,
+    "behavioural_awareness": 6,
+    "valued_action": 15
+  },
+  "quality": "interpretable"
+}

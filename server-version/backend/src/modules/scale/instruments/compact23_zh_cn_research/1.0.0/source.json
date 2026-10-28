@@ -1,0 +1,1513 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "compact23_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "Comprehensive assessment of Acceptance and Commitment Therapy processes, 23-item (CompACT)",
+      "abbreviation": "CompACT",
+      "instrumentFamily": "CompACT"
+    },
+    "construct": {
+      "primaryDomain": "SELF_REGULATION",
+      "secondaryDomains": [],
+      "constructDefinition": "成人心理灵活性三维度自评：对体验的开放（OE，10题）、对行为的觉察（BA，5题）、价值行动（VA，8题）。12 个负向键题反向后计分，总分越高表示越多报告心理灵活性。与青少年版 CompACT-Y 是不同工具，不混合计分。",
+      "constructLevel": "BROAD_DOMAIN",
+      "constructOverlapTags": [
+        "domain:act",
+        "domain:self_regulation",
+        "population:adolescent_adult",
+        "response:student_self",
+        "use:reflection",
+        "use:research",
+        "language_validation:chinese_working_translation",
+        "construct:act_openness",
+        "construct:act_behavioural_awareness",
+        "construct:act_valued_action",
+        "psychological_flexibility",
+        "self_report"
+      ]
+    },
+    "population": {
+      "populationNotes": "原开发样本为英国成人；题文逐题来源为 CC BY 4.0 开放验证论文（Christopher et al. 2025, JBCT），子量表归属另经 Hsu et al. 2023（Psychological Assessment）Table 1 交叉核实。此中文工作译稿未经独立回译或本地验证。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "PARTIAL"
+    },
+    "administration": {
+      "itemCount": 23,
+      "estimatedMinutes": 6,
+      "administrationModes": [
+        "PAPER"
+      ],
+      "timeFrame": "一般情形，无指定回忆期",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保持官方作答量尺与题序；两端锚点 0 = strongly disagree、6 = strongly agree；中间选项按仓库先例（SECQ-25）以数字标注，不猜测文字。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "SUPPORTED",
+          "notes": "原文研究支持；中文工作译文尚未验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "反馈仅作普遍生活化反思，不推断个体能力或状态。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "francis-2016-compact",
+        "evidenceType": "STRUCTURAL_VALIDITY",
+        "population": "UK adults (original); US community adults N=601 (open validation)",
+        "locale": "en",
+        "territory": "UK/US",
+        "studyDesign": "原论文开发 23 题三因子；开放验证论文给出 0–6 量尺、12 个反向题与逐题原文；Hsu 2023 Table 1 确认三因子题号（OE=10/BA=5/VA=8）。",
+        "rating": "MIXED",
+        "citation": "Francis AW, Dawson DL, Golijani-Moghaddam N (2016). J Contextual Behav Sci, 5, 134-145; Christopher M et al. (2025). J Behav Cogn Ther, 36(2), 100569.",
+        "doi": "10.1016/j.jbct.2025.100569",
+        "url": "https://doi.org/10.1016/j.jbct.2025.100569",
+        "notes": "以上证据均针对原语言版本，不外推到本中文工作译稿。"
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "CompACT 23 items verified in open-access validation (CC BY 4.0); original development by Francis, Dawson & Golijani-Moghaddam (2016)",
+        "citation": "题本来源: Christopher, M., et al. (2025). Assessing the psychometric properties of the 10-item version of the CompACT in a community-based adult sample. Journal of Behavioral and Cognitive Therapy, 36(2), 100569 (CC BY 4.0). 原版: Francis, A. W., Dawson, D. L., & Golijani-Moghaddam, N. (2016). Journal of Contextual Behavioral Science, 5, 134-145. 子量表归属交叉核实: Hsu et al. (2023). Psychological Assessment.",
+        "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13344365/",
+        "publicationYear": 2016
+      },
+      "license": {
+        "status": "unknown",
+        "redistribution": "unknown",
+        "note": "逐题原文取自 CC BY 4.0 开放获取论文并署名转载；原始题文的潜在第三方权利边界随原版论文保留。开放论文 Table 2 将第 17、21 题误标入 BA（其正文自述 BA=5、VA=8）；子量表归属以 Hsu et al. 2023 Table 1（OE=10/BA=5/VA=8）为准，冲突已在记录中说明。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "compact_agree_0_6",
+          "options": [
+            {
+              "value": "0",
+              "label": "非常不同意",
+              "score": 0
+            },
+            {
+              "value": "1",
+              "label": "1",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "2",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "3",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "4",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "5",
+              "score": 5
+            },
+            {
+              "value": "6",
+              "label": "非常同意",
+              "score": 6
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "COMPACT_01",
+          "content": "我能找出生活中真正重要的事，并去追求它们。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "compact_agree_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "COMPACT_02",
+          "content": "我的一大目标就是摆脱痛苦的情绪。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "compact_agree_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "COMPACT_03",
+          "content": "我匆匆做完有意义的活动，却没有真正留心。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "compact_agree_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "COMPACT_04",
+          "content": "我尽量让自己忙起来，好让那些想法或感受不要冒出来。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "compact_agree_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "COMPACT_05",
+          "content": "我的行为方式与我想要的生活一致。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "compact_agree_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "COMPACT_06",
+          "content": "我陷在自己的想法里，以至于做不成自己最想做的事。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "compact_agree_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "COMPACT_07",
+          "content": "即使有压力，我也基于对自己重要的东西来做选择。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "compact_agree_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "COMPACT_08",
+          "content": "我告诉自己，我不应该有某些念头。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "compact_agree_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "COMPACT_09",
+          "content": "我很难把注意力放在当下正在发生的事上。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 8,
+          "responseSetKey": "compact_agree_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "COMPACT_10",
+          "content": "我的行为与自己的个人价值观一致。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 9,
+          "responseSetKey": "compact_agree_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "COMPACT_11",
+          "content": "我刻意回避那些可能带来困难想法、感受或身体感觉的情境。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 10,
+          "responseSetKey": "compact_agree_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "COMPACT_12",
+          "content": "即使在做对自己重要的事，我也会发现自己心不在焉。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 11,
+          "responseSetKey": "compact_agree_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "COMPACT_13",
+          "content": "我愿意完整地体验出现的一切想法、感受和身体感觉，不去改变或防御它们。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 12,
+          "responseSetKey": "compact_agree_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "COMPACT_14",
+          "content": "即使困难，我也会去做对自己有意义的事。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 13,
+          "responseSetKey": "compact_agree_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "COMPACT_15",
+          "content": "我很努力地把难受的感受挡在外面。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 14,
+          "responseSetKey": "compact_agree_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "COMPACT_16",
+          "content": "我自动化地完成任务，意识不到自己在做什么。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 15,
+          "responseSetKey": "compact_agree_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "COMPACT_17",
+          "content": "即使进展缓慢，我也能坚持执行自己的长期计划。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 16,
+          "responseSetKey": "compact_agree_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "COMPACT_18",
+          "content": "即使一件事对我重要，只要它可能让我难受，我就很少去做。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 17,
+          "responseSetKey": "compact_agree_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "COMPACT_19",
+          "content": "我好像在“自动运行”，不太觉察自己在做什么。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 18,
+          "responseSetKey": "compact_agree_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "COMPACT_20",
+          "content": "想法只是想法——它们控制不了我的行动。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 19,
+          "responseSetKey": "compact_agree_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "COMPACT_21",
+          "content": "我的价值观确实体现在我的行为里。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 20,
+          "responseSetKey": "compact_agree_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "COMPACT_22",
+          "content": "我能让想法和感受自然来去，不试图控制或回避它们。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 21,
+          "responseSetKey": "compact_agree_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "COMPACT_23",
+          "content": "只要事情对我重要，我就能坚持做下去。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 22,
+          "responseSetKey": "compact_agree_0_6",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "COMPACT_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "COMPACT_02",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "COMPACT_03",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "COMPACT_04",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "COMPACT_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "COMPACT_06",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "COMPACT_07",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "COMPACT_08",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "COMPACT_09",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "COMPACT_10",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "COMPACT_11",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "COMPACT_12",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "COMPACT_13",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "COMPACT_14",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "COMPACT_15",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "COMPACT_16",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "COMPACT_17",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "COMPACT_18",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "COMPACT_19",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "COMPACT_20",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "COMPACT_21",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "COMPACT_22",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "COMPACT_23",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "total",
+            "type": "total",
+            "label": "心理灵活性总分（23题）",
+            "description": "12 个负向键题按 6−原始分反向后与全部题目相加，范围 0–138。分数越高表示越多报告心理灵活性。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "COMPACT_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "COMPACT_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "COMPACT_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "COMPACT_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "COMPACT_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "COMPACT_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "COMPACT_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "COMPACT_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "COMPACT_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "COMPACT_10",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "COMPACT_11",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "COMPACT_12",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "COMPACT_13",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "COMPACT_14",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "COMPACT_15",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "COMPACT_16",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "COMPACT_17",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "COMPACT_18",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "COMPACT_19",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "COMPACT_20",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "COMPACT_21",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "COMPACT_22",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "COMPACT_23",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "openness_to_experience",
+            "type": "dimension",
+            "label": "对体验的开放（OE，10题反向后）",
+            "description": "OE 十题（其中九题负向键反向）求和，范围 0–60；越高表示越多报告允许想法和感受存在。",
+            "direction": "higher_is_more",
+            "canonical": false,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "COMPACT_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "COMPACT_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "COMPACT_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "COMPACT_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "COMPACT_11",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "COMPACT_13",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "COMPACT_15",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "COMPACT_18",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "COMPACT_20",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "COMPACT_22",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "behavioural_awareness",
+            "type": "dimension",
+            "label": "对行为的觉察（BA，5题反向后）",
+            "description": "BA 五题（全部负向键反向）求和，范围 0–30；越高表示越多报告做事时留意当下。",
+            "direction": "higher_is_more",
+            "canonical": false,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "COMPACT_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "COMPACT_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "COMPACT_12",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "COMPACT_16",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "COMPACT_19",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "valued_action",
+            "type": "dimension",
+            "label": "价值行动（VA，8题）",
+            "description": "VA 八题（全部正向键）求和，范围 0–48；越高表示越多报告按价值行动。",
+            "direction": "higher_is_more",
+            "canonical": false,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "COMPACT_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "COMPACT_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "COMPACT_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "COMPACT_10",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "COMPACT_14",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "COMPACT_17",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "COMPACT_21",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "COMPACT_23",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "total",
+          "openness_to_experience",
+          "behavioural_awareness",
+          "valued_action"
+        ],
+        "scoreOrder": [
+          "total",
+          "openness_to_experience",
+          "behavioural_awareness",
+          "valued_action"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "total",
+            "headline": "心理灵活性总分",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "负向题反向后求和，分数越高表示越多报告三个支点的整体灵活。数字不是等级，也不定义你。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近一次“感觉不好但还是做了重要的事”是什么时候？"
+              },
+              {
+                "category": "strategy",
+                "text": "下次感觉不好时，先给感受命名，再做一小步重要的事。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "openness_to_experience",
+            "headline": "对体验的开放（反向后）",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "由十个题（多数为负向措辞）反向计分：分数越高，越少报告压制、回避和被想法缠住。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "你通常怎样对待不请自来的情绪？"
+              },
+              {
+                "category": "strategy",
+                "text": "让一种感受“在场”10 秒，不赶它也不跟随它。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "behavioural_awareness",
+            "headline": "对行为的觉察（反向后）",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "由五个负向题反向计分：分数越高，越多报告做事时留意当下。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "哪个时刻你最容易“自动导航”？"
+              },
+              {
+                "category": "strategy",
+                "text": "给常走神的活动设一个“开始留意”的提醒动作。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "valued_action",
+            "headline": "价值行动",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "分数越高，越多报告清楚什么重要并按它行动。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "这周你为在乎的事做了什么？"
+              },
+              {
+                "category": "strategy",
+                "text": "给在乎的事留一个固定的 10 分钟。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这是未经回译及本地验证的中文工作译稿，结果不可视作已验证中文测量结果。",
+          "OE、BA 各题多为负向措辞，已反向计分；不将未反向分呈现给被试。",
+          "子量表归属在开放文献间存在 Table 排印冲突（第17、21题），本记录以 Hsu et al. 2023 Table 1 为准并保留说明。",
+          "该报告是单次自述；缺答不计分，不插补。"
+        ],
+        "disclaimer": "这些内容仅供一般自我反思，不用于诊断、筛查、选拔或排名。"
+      },
+      "referencePolicy": {
+        "type": "none"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "all_minimum",
+        "answers": [
+          {
+            "itemCode": "COMPACT_01",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "COMPACT_02",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "COMPACT_03",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "COMPACT_04",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "COMPACT_05",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "COMPACT_06",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "COMPACT_07",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "COMPACT_08",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "COMPACT_09",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "COMPACT_10",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "COMPACT_11",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "COMPACT_12",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "COMPACT_13",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "COMPACT_14",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "COMPACT_15",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "COMPACT_16",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "COMPACT_17",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "COMPACT_18",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "COMPACT_19",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "COMPACT_20",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "COMPACT_21",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "COMPACT_22",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "COMPACT_23",
+            "responseValue": "0"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 72,
+            "openness_to_experience": 42,
+            "behavioural_awareness": 30,
+            "valued_action": 0
+          },
+          "totalScoreKeys": [
+            "total",
+            "openness_to_experience",
+            "behavioural_awareness",
+            "valued_action"
+          ]
+        }
+      },
+      {
+        "name": "all_maximum",
+        "answers": [
+          {
+            "itemCode": "COMPACT_01",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "COMPACT_02",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "COMPACT_03",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "COMPACT_04",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "COMPACT_05",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "COMPACT_06",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "COMPACT_07",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "COMPACT_08",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "COMPACT_09",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "COMPACT_10",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "COMPACT_11",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "COMPACT_12",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "COMPACT_13",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "COMPACT_14",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "COMPACT_15",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "COMPACT_16",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "COMPACT_17",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "COMPACT_18",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "COMPACT_19",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "COMPACT_20",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "COMPACT_21",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "COMPACT_22",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "COMPACT_23",
+            "responseValue": "6"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 66,
+            "openness_to_experience": 18,
+            "behavioural_awareness": 0,
+            "valued_action": 48
+          },
+          "totalScoreKeys": [
+            "total",
+            "openness_to_experience",
+            "behavioural_awareness",
+            "valued_action"
+          ]
+        }
+      },
+      {
+        "name": "all_midpoint",
+        "answers": [
+          {
+            "itemCode": "COMPACT_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_12",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_14",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_15",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_16",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_17",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_18",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_19",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_20",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_21",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_22",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_23",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 69,
+            "openness_to_experience": 30,
+            "behavioural_awareness": 15,
+            "valued_action": 24
+          },
+          "totalScoreKeys": [
+            "total",
+            "openness_to_experience",
+            "behavioural_awareness",
+            "valued_action"
+          ]
+        }
+      },
+      {
+        "name": "mixed_pattern",
+        "answers": [
+          {
+            "itemCode": "COMPACT_01",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "COMPACT_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_03",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "COMPACT_04",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "COMPACT_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_06",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "COMPACT_07",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "COMPACT_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_09",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "COMPACT_10",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "COMPACT_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_12",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "COMPACT_13",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "COMPACT_14",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_15",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "COMPACT_16",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "COMPACT_17",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_18",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "COMPACT_19",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "COMPACT_20",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_21",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "COMPACT_22",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "COMPACT_23",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 48,
+            "openness_to_experience": 18,
+            "behavioural_awareness": 12,
+            "valued_action": 18
+          },
+          "totalScoreKeys": [
+            "total",
+            "openness_to_experience",
+            "behavioural_awareness",
+            "valued_action"
+          ]
+        }
+      },
+      {
+        "name": "missing_first_item",
+        "answers": [
+          {
+            "itemCode": "COMPACT_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_12",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_14",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_15",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_16",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_17",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_18",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_19",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_20",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_21",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_22",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "COMPACT_23",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "total": null,
+            "openness_to_experience": 30,
+            "behavioural_awareness": 15,
+            "valued_action": null
+          },
+          "totalScoreKeys": [
+            "total",
+            "openness_to_experience",
+            "behavioural_awareness",
+            "valued_action"
+          ]
+        }
+      },
+      {
+        "name": "all_missing",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "total": null,
+            "openness_to_experience": null,
+            "behavioural_awareness": null,
+            "valued_action": null
+          },
+          "totalScoreKeys": [
+            "total",
+            "openness_to_experience",
+            "behavioural_awareness",
+            "valued_action"
+          ]
+        }
+      }
+    ]
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "compact23-v1",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "compact23-v1",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
