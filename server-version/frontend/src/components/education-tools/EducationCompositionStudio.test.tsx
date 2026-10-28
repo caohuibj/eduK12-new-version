@@ -29,7 +29,6 @@ describe('Teacher ordinary questionnaire authoring and fixed task attachment',()
    if(path===base+'/'+rootId&&method==='PUT'){expect(data.expectedRevision).toBe(1);root={...root,title:data.title,definition:data.definition,revision:2,contentHash:hash('f')};return structuredClone(root)}
    if(path===base+'/'+rootId&&method==='GET')return {...structuredClone(root),references:[scaleRef,formRef]}
    if(path===base+'/'+rootId+'/versions')return {list:fixed?[{id:rootVersion,title:root.title,sourceRevision:2,contentHash:root.contentHash}]:[],nextCursor:null}
-   if(path===base+'/'+rootId+'/preview'){expect(data).toEqual({});return {contentHash:root.contentHash,result:{kind:'COMPOSITION_PREVIEW'}}}
    if(path===base+'/'+rootId+'/freeze'){expect(data).toEqual({expectedRevision:2,expectedContentHash:hash('f')});fixed=true;return {id:rootVersion,title:root.title,sourceRevision:2,contentHash:root.contentHash}}
    throw new Error('Unexpected API '+method+' '+path)
   })
@@ -63,6 +62,7 @@ describe('Teacher ordinary questionnaire authoring and fixed task attachment',()
   fireEvent.change(within(preview).getByRole('textbox'),{target:{value:'仅在本页试填'}})
   expect(api.mock.calls.filter(([path])=>/\/versions\/[0-9a-f-]+$/.test(path)).map(([path])=>path)).toEqual([base+'/'+formId+'/versions/'+formVersion])
   fireEvent.click(within(preview).getByRole('button',{name:'下一工具'}));await within(preview).findByText('1. 固定量表题目')
+  expect(api.mock.calls.some(([path])=>path.endsWith('/preview')||path.endsWith('/validate'))).toBe(false)
   expect(api.mock.calls.some(([path,,body])=>path.includes('/tracks')||(JSON.stringify(body)??'').includes('仅在本页试填'))).toBe(false)
  })
  it('attaches one fixed ordinary version with draft CAS and SELF selectors, blocking duplicate writes',async()=>{

@@ -79,13 +79,13 @@ function CompositionSession({api,organizationId,actorId,onDraftStateChange}:Prop
   const value=await api<PrivateToolVersion>(`${base}/${tool.id}/freeze`,'POST',{expectedRevision:tool.revision,expectedContentHash:tool.contentHash})
   if(current()){setVersions(old=>merge([value],old));setNotice('问卷版本已固定。请在学校改进的评价活动中选用本版本，再预览并发布任务。')}
  })}
- const showPreview=()=>{if(!tool||dirty||!tool.definition.blocks.length)return;void operate(async current=>{
-  const result=await api<{contentHash:string}>(`${base}/${tool.id}/preview`,'POST',{})
-  if(current()){
-   if(result.contentHash!==tool.contentHash)throw new Error('草稿已变化，请重新读取并核对。')
-   setPreview(true);setPreviewIndex(0);setAnswers({});setPreviewTool(null)
-  }
- })}
+ // A preview renders the saved local revision's exact immutable leaves. Do not
+ // first call the legacy whole-composition preview (all bodies + compilation)
+ // and then fetch those bodies again. Freeze alone owns full runtime validation
+ // and rechecks the actual draft revision/hash; preview is never its receipt.
+ const showPreview=()=>{if(!tool||dirty||locked.current||!tool.definition.blocks.length)return
+  setPreview(true);setPreviewIndex(0);setAnswers({});setPreviewTool(null);setPreviewError('')
+ }
  const block=preview?tool?.definition.blocks[previewIndex]:undefined
  const reference=block?references.find(row=>row.id===block.source.versionId&&row.contentHash===block.source.contentHash):undefined
  useEffect(()=>{
