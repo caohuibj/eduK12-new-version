@@ -1,0 +1,12 @@
+{
+  "argv": [
+    "npm",
+    "run",
+    "typecheck"
+  ],
+  "exitCode": 0,
+  "componentTree": "77babf45b8eba4b14e0f22be9a6c3ffd523b6e00",
+  "node": "v24.22.1",
+  "logSHA256": "6b1d030647f61e7307e64570ee39a2e7bd65c52c9a89a10c12e140f55438fcda",
+  "sourceAssociationBasis": "Root-run npm command completed on the final unchanged frontend tree; Git commit association is retrospective and unsigned. Backend dependency symlink provides existing imported shared types only."
+}

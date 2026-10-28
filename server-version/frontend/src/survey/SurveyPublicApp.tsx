@@ -1,5 +1,6 @@
 import {clearSurveySituationalSessions,rememberSurveySituationalSession} from './survey-situational-local'
-import { SurveySituationalUnit } from './SurveySituationalUnit'
+import {deferredPage} from '../components/page-loading/deferredPage'
+const SurveySituationalUnit=deferredPage(async()=>({default:(await import('./SurveySituationalUnit')).SurveySituationalUnit}))
 import type { SurveySituationalReference } from './survey-situational-api'
 import {SurveyRandomCodeEntry} from './SurveyRandomCodeEntry'
 import {SurveyMemorableCodeSetup,SurveyMemorableCodeSaved,SurveyMemorableCodeRecovery,type MemorableEnrollment} from './SurveyMemorableCode'

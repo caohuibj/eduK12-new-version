@@ -112,7 +112,7 @@ test('observer follow-up admits only its HTTP test, scoped CSS and evidence; bro
  const read=(cmd,a,...r)=>cmd==='rev-parse'&&a===base+':server-version/frontend'?h('9'):f.read(cmd,a,...r);
  assert.equal(onboardingPlan(entries,base,head,read,env,b).pr,376);
  for(const outside of ['server-version/backend/src/middleware/auth.ts','server-version/backend/prisma/schema.prisma'])assert.throws(()=>onboardingPlan(entries.map(e=>e.file===path?{...e,file:outside}:e),base,head,read,env,{...b,source:{[outside]:{before:null,after:blob}}}));
- const yaml=readFileSync('.github/workflows/ci.yml','utf8');assert(yaml.includes('node .github/scripts/pr376-browser.mjs'));assert(yaml.includes("contains(fromJSON('[374,376]')"));
+ const yaml=readFileSync('.github/workflows/ci.yml','utf8');assert(yaml.includes('node .github/scripts/pr376-browser.mjs'));assert(yaml.includes("contains(fromJSON('[374,376,378]')"));
  const script=readFileSync('.github/scripts/pr376-browser.mjs','utf8');assert(script.includes('chromiumSandbox:true'));assert(script.includes('verifyChromeSandbox'));assert(script.includes('results.cases.length,6'));assert(script.includes('row.warning.ratio>=4.5'));assert(script.includes('Display fixture forbids simulated writes'));
 });
 test('observer display retry keeps failed report and narrows execution without weakening contrast',()=>{
@@ -127,4 +127,16 @@ test('START planner scope and original diagnostic reject unrelated runtime or in
  const profile=read('authority-profile-summary.json'),validation=read('planner-validation-r1.json'),execution=read('planner-validation-r1-execution.json');assert.equal(verifyRunStartPlanningObservation(profile,validation,execution).ciExecuted,false);
  assert.throws(()=>verifyRunStartPlanningObservation(profile,{...validation,completed:false},execution));assert.throws(()=>verifyRunStartPlanningObservation(profile,validation,{...execution,exitCode:1}));const bad=structuredClone(validation);bad.cases[0].after.value='1';assert.throws(()=>verifyRunStartPlanningObservation(profile,bad,execution));
  const yaml=readFileSync('.github/workflows/ci.yml','utf8');assert(yaml.includes(".pr == 377 && 'paths: [server-version/backend/src/modules/assessment-run/startAuthority.ts"));
+});
+
+test('PR378 keeps frontend-only scope, exact npm type receipt and compiled loading consumers mandatory',()=>{
+ const f=fixture(),path='server-version/frontend/src/huiteacher/HuiteacherApp.tsx',b={...f.b,pr:378,source:{[path]:{before:null,after:blob}}};
+ const entries=f.entries.map(e=>Object.hasOwn(f.b.source,e.file)?{...e,file:path}:e),env={...f.env,CI_PR_NUMBER:'378',CI_HEAD_REF:BRANCHES[378]};
+ assert.equal(onboardingPlan(entries,base,head,f.read,env,b).pr,378);
+ const outside='server-version/backend/src/modules/assessment-run/startAuthority.ts';assert.throws(()=>onboardingPlan(entries.map(e=>e.file===path?{...e,file:outside}:e),base,head,f.read,env,{...b,source:{[outside]:{before:null,after:blob}}}));
+ assert.throws(()=>onboardingPlan(entries,base,head,(cmd,a,...rest)=>a===base+':server-version/backend'?h('9'):f.read(cmd,a,...rest),env,b));
+ const receipt={argv:['npm','run','typecheck'],exitCode:0,componentTree:h('3')},review={component:'frontend',componentTree:h('3'),exitField:'exitCode'};
+ assert.equal(verifyTypeReceipt(receipt,review,()=>Buffer.from(''),h('3')).originalExitCode,0);assert.throws(()=>verifyTypeReceipt({...receipt,argv:['npm','run','build']},review,()=>Buffer.from(''),h('3')));
+ const yaml=readFileSync('.github/workflows/ci.yml','utf8'),script=readFileSync('.github/scripts/pr378-browser.mjs','utf8');assert(yaml.includes('node .github/scripts/pr378-browser.mjs'));assert(yaml.includes(".pr == 378 && 'paths: [server-version/frontend/src"));assert(script.includes("['run','build','--','--manifest']"));assert(script.includes('chromiumSandbox:true'));assert(script.includes('verifyChromeSandbox'));assert(!script.includes('--no-sandbox'));assert(script.includes("request.method()!=='GET'"));
+ assert.deepEqual(requiredChecks({scope:{outputs:{application_route:'onboarding-structure'}}},false),['scope','onboarding-structure','codeql']);
 });

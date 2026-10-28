@@ -1,0 +1,20 @@
+{
+  "source": "b7909cbf05d5ba0092c59853f20c86491ab38137",
+  "command": [
+    "npm",
+    "run",
+    "build",
+    "--",
+    "--manifest"
+  ],
+  "exitCode": 0,
+  "node": "v24.22.1",
+  "lockSHA256": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+  "manifestDecodedSHA256": "fb144ee1dbe4b4f722a3ccc24fb3772db3a31608cd116a6ab5006268c807e9f0",
+  "limitations": [
+    "Cached frontend dependencies reused via local symlink; no fresh registry-install claim.",
+    "Static import/CSS dependency closure, not actual browser network trace, route TTI or production CDN state.",
+    "gzip1 estimate excludes HTTP headers, public media, runtime APIs and cache reuse; route increments explicitly separated.",
+    "No application source, nginx, deployment or security setting changed."
+  ]
+}

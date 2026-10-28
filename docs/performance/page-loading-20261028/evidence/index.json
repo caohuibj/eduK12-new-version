@@ -1,0 +1,22 @@
+{
+  "analyze-manifest.py": {
+    "bytes": 2265,
+    "sha256": "1b5558a5de93ba1392f6f129a996ab09753d984239707ac803fea9d6c73dcbf3"
+  },
+  "build-main.log": {
+    "bytes": 46636,
+    "sha256": "745fe04eab1f3c4b23718c3b81455998fb7651a6585d209eba8da67982d14ff9"
+  },
+  "build-receipt.json": {
+    "bytes": 796,
+    "sha256": "d6effab8a086a3a27ad7dbd37a81d0ce438f4c6c33b1a3fd1b6158dfd1bf8090"
+  },
+  "main-entry-closures.json": {
+    "bytes": 108915,
+    "sha256": "28786e20a742d5602758c75a78a695dc1d8fcdf7e74f297ec9bedf20b5da4e7a"
+  },
+  "vite-manifest.json.gz": {
+    "bytes": 28926,
+    "sha256": "887d67d4f8a685c48b3ca5f571a970ef315fc88d850bdbf7aceb8a773343bdf3"
+  }
+}

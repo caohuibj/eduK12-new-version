@@ -1,41 +1,42 @@
-import {EducationAssessmentRegistrationPanel} from '../components/education-tools/EducationAssessmentRegistrationPanel'
-import {EducationPrivateToolStudio} from '../components/education-tools/EducationPrivateToolStudio'
+import {deferredPage} from '../components/page-loading/deferredPage'
+
+
 import {usePrivateToolCapability,type PrivateDraftState} from '../components/education-tools/privateToolClient'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { UserRoundPen } from 'lucide-react'
+import {UserRoundPen} from 'lucide-react'
 import './school.css'
 import './school-workspace.css'
-import { useProductTheme } from '../components/product-theme/useProductTheme'
-import { ProductThemeControl } from '../components/product-theme/ProductThemeControl'
-import { SchoolMark } from './SchoolMark'
-import { SchoolWorkspaceShell, SchoolWorkspaceOverview } from './SchoolWorkspaceShell'
+import {useProductTheme} from '../components/product-theme/useProductTheme'
+import {ProductThemeControl} from '../components/product-theme/ProductThemeControl'
+import {SchoolMark} from './SchoolMark'
+import {SchoolWorkspaceShell,SchoolWorkspaceOverview} from './SchoolWorkspaceShell'
 import {SchoolProfessionalHome,SchoolProfessionalNavigation,SchoolProfessionalClassScope} from './SchoolProfessionalWorkspace'
 import {SchoolProfessionalAdmission,SchoolAdmissionProgress} from './SchoolProfessionalAdmission'
-import {SchoolPersonnelDirectory} from './SchoolPersonnelDirectory'
-import {SchoolPersonnelClaim} from './SchoolPersonnelImport'
+
+
 import {SchoolAdminPanel,SchoolAdminSections} from './SchoolAdministratorWorkspace'
 import {SchoolReportHeader} from './SchoolReportPresentation'
-import { canManageSchoolActivities, canReadSchoolClasses, schoolNavigation, workspaceHref, workspacePage, workspacePath } from './school-navigation'
-import { schoolFeatures } from './school-features'
-import { SchoolLanding, SchoolPublicHeader, SchoolCodeRegistration, type SchoolRegistrationEntry } from './SchoolLanding'
-import { SchoolStudentRecovery, SchoolRecoveryOfficer } from './SchoolRecovery'
-import { SchoolActivityManager } from './SchoolActivityManager'
+import {canManageSchoolActivities,canReadSchoolClasses,schoolNavigation,workspaceHref,workspacePage,workspacePath} from './school-navigation'
+import {schoolFeatures} from './school-features'
+import {SchoolLanding,SchoolPublicHeader,SchoolCodeRegistration,type SchoolRegistrationEntry} from './SchoolLanding'
+
+
 import {createEducationAssessmentResourceAdapter} from '../api/educationAssessmentResourceClient'
-import { schoolClassApprovalReasons } from './school-activity-workflow'
-import { ReportPrivacyPreferences } from '../components/report-privacy/ReportPrivacyPreferences'
-import { ProductPasswordChange } from '../components/account/ProductPasswordChange'
+import {schoolClassApprovalReasons} from './school-activity-workflow'
+
+
 import {SchoolLearnerHome,SchoolLearnerMenu} from './SchoolLearnerHome'
-import { SchoolStudentTasks } from './SchoolStudentTasks'
-import { SchoolTeacherTasks } from './SchoolTeacherTasks'
-import { SchoolRelationships } from './SchoolRelationships'
-import { SchoolGroupReports } from './SchoolGroupReports'
-import { SchoolProtectedReportStudio } from './SchoolProtectedReportStudio'
-import { SchoolIndividualLongitudinalStudio } from './SchoolIndividualLongitudinalStudio'
-import { SchoolGroupLongitudinal } from './SchoolGroupLongitudinal'
-import { SchoolParentRegistration, SchoolParentLinks } from './SchoolParentPortal'
-import { SchoolParentTasks } from './SchoolParentTasks'
-import { SchoolPeerConsent } from './SchoolPeerConsent'
-import { SchoolStudentFeedback, SchoolStudentReportConsent, SchoolParentReports, SchoolReportOfficer, SchoolDisclosureOfficers, SchoolProfessionalReports } from './SchoolReports'
+
+
+
+
+
+
+
+
+
+
+
 
 import './school-theme.css'
 import './school-home-refresh.css'
@@ -51,6 +52,33 @@ import './school-private-tools.css'
 import './school-compact-navigation.css'
 import './school-administrator-polish.css'
 import './school-secondary-pages.css'
+
+const EducationAssessmentRegistrationPanel=deferredPage(async()=>({default:(await import('../components/education-tools/EducationAssessmentRegistrationPanel')).EducationAssessmentRegistrationPanel}))
+const EducationPrivateToolStudio=deferredPage(async()=>({default:(await import('../components/education-tools/EducationPrivateToolStudio')).EducationPrivateToolStudio}))
+const SchoolPersonnelDirectory=deferredPage(async()=>({default:(await import('./SchoolPersonnelDirectory')).SchoolPersonnelDirectory}))
+const SchoolPersonnelClaim=deferredPage(async()=>({default:(await import('./SchoolPersonnelImport')).SchoolPersonnelClaim}))
+const SchoolStudentRecovery=deferredPage(async()=>({default:(await import('./SchoolRecovery')).SchoolStudentRecovery}))
+const SchoolRecoveryOfficer=deferredPage(async()=>({default:(await import('./SchoolRecovery')).SchoolRecoveryOfficer}))
+const SchoolActivityManager=deferredPage(async()=>({default:(await import('./SchoolActivityManager')).SchoolActivityManager}))
+const ReportPrivacyPreferences=deferredPage(async()=>({default:(await import('../components/report-privacy/ReportPrivacyPreferences')).ReportPrivacyPreferences}))
+const ProductPasswordChange=deferredPage(async()=>({default:(await import('../components/account/ProductPasswordChange')).ProductPasswordChange}))
+const SchoolStudentTasks=deferredPage(async()=>({default:(await import('./SchoolStudentTasks')).SchoolStudentTasks}))
+const SchoolTeacherTasks=deferredPage(async()=>({default:(await import('./SchoolTeacherTasks')).SchoolTeacherTasks}))
+const SchoolRelationships=deferredPage(async()=>({default:(await import('./SchoolRelationships')).SchoolRelationships}))
+const SchoolGroupReports=deferredPage(async()=>({default:(await import('./SchoolGroupReports')).SchoolGroupReports}))
+const SchoolProtectedReportStudio=deferredPage(async()=>({default:(await import('./SchoolProtectedReportStudio')).SchoolProtectedReportStudio}))
+const SchoolIndividualLongitudinalStudio=deferredPage(async()=>({default:(await import('./SchoolIndividualLongitudinalStudio')).SchoolIndividualLongitudinalStudio}))
+const SchoolGroupLongitudinal=deferredPage(async()=>({default:(await import('./SchoolGroupLongitudinal')).SchoolGroupLongitudinal}))
+const SchoolParentRegistration=deferredPage(async()=>({default:(await import('./SchoolParentPortal')).SchoolParentRegistration}))
+const SchoolParentLinks=deferredPage(async()=>({default:(await import('./SchoolParentPortal')).SchoolParentLinks}))
+const SchoolParentTasks=deferredPage(async()=>({default:(await import('./SchoolParentTasks')).SchoolParentTasks}))
+const SchoolPeerConsent=deferredPage(async()=>({default:(await import('./SchoolPeerConsent')).SchoolPeerConsent}))
+const SchoolStudentFeedback=deferredPage(async()=>({default:(await import('./SchoolReports')).SchoolStudentFeedback}))
+const SchoolStudentReportConsent=deferredPage(async()=>({default:(await import('./SchoolReports')).SchoolStudentReportConsent}))
+const SchoolParentReports=deferredPage(async()=>({default:(await import('./SchoolReports')).SchoolParentReports}))
+const SchoolReportOfficer=deferredPage(async()=>({default:(await import('./SchoolReports')).SchoolReportOfficer}))
+const SchoolDisclosureOfficers=deferredPage(async()=>({default:(await import('./SchoolReports')).SchoolDisclosureOfficers}))
+const SchoolProfessionalReports=deferredPage(async()=>({default:(await import('./SchoolReports')).SchoolProfessionalReports}))
 
 type CampusUser={id:string;username:string;role:string;accountDomain:'SCHOOL';mustChangePassword:boolean}
 type CampusOrg={id:string;name:string;orgRole:string}
@@ -382,7 +410,7 @@ export default function SchoolApp(){
     heading?.setAttribute('tabindex','-1');heading?.focus({preventScroll:true})
     setFocusPublic(false)
   },[focusPublic,screen,loading])
-  const publicHome=!user&&screen==='home'
+  const publicHome=!user&&screen==='home'&&(!loading||window.location.pathname==='/')
   const publicAuth=!user&&['login','code','register','staff','parent','recover','mfa'].includes(screen)
 
   const professionalClassPage=professionalWorkspace&&!schoolAdmin&&page==='classes'
@@ -430,8 +458,8 @@ export default function SchoolApp(){
     <main id="hs-main" tabIndex={-1} className={`hs-main${publicHome?' hs-main-landing':publicAuth?' hs-main-auth':user?' hs-main-workspace':''}`}>
       {error&&<p className="hs-alert" role="alert">{error}</p>}
       {notice&&<p className="hs-message" role="status">{notice}</p>}
-      {loading?<p>正在核对校园会话…</p>:null}
-      {!loading&&publicHome&&<SchoolLanding theme={appearance.theme} onJoin={()=>goPublic('recruit')}/>}
+      {loading&&!publicHome?<p>正在核对校园会话…</p>:null}
+      {publicHome&&<SchoolLanding theme={appearance.theme} onJoin={()=>goPublic('recruit')}/>}
       {!loading&&!user&&screen==='code'&&<SchoolCodeRegistration api={api} onResolved={codeResolved} onLogin={()=>goPublic('login')}/>}
       {!loading&&!user&&screen==='feature'&&activeFeature&&<section className="hs-feature-blank" aria-label={`${activeFeature.title}介绍页面`}>
         <h1 className="hs-visually-hidden">{activeFeature.title}</h1>

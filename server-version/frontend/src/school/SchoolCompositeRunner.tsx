@@ -1,12 +1,13 @@
+import {deferredPage} from '../components/page-loading/deferredPage'
 import { useCallback,useEffect,useMemo,useRef,useState } from 'react'
 import {ArrowLeft,CircleCheck} from 'lucide-react'
 import {SchoolTaskHelp} from './SchoolTaskHelp'
 import { MemoryRouter } from 'react-router-dom'
 import FinalCompositeAssessment from '../components/FinalCompositeAssessment'
-import { CognitiveRunner } from '../modules/cognitive/pages/CognitiveRunner'
+const CognitiveRunner=deferredPage(async()=>({default:(await import('../modules/cognitive/pages/CognitiveRunner')).CognitiveRunner}))
 import type { CognitiveSessionApi } from '../modules/cognitive/api'
 import type { CognitiveSession } from '../modules/cognitive/types'
-import SituationalRunner from '../modules/situational/pages/SituationalRunner'
+const SituationalRunner=deferredPage(()=>import('../modules/situational/pages/SituationalRunner'))
 import type { SituationalRunnerClient, SituationalFinalSubmitPayload } from '../modules/situational/api'
 import type { SituationalAttemptResponse } from '../modules/situational/types'
 import type { AssessmentVideoCapabilitySources } from '../modules/assessment-media/types'
