@@ -1,0 +1,10 @@
+src/__tests__/cognitive/enumeration-recipe-config.test.ts(130,85): error TS2322: Type 'SessionConfigSnapshot<EnumerationConfig>' is not assignable to type 'SessionConfigSnapshot<EnumerationRecipeConfig>'.
+  Type 'EnumerationConfig' is not assignable to type 'EnumerationRecipeConfig'.
+    Type 'EnumerationConfig' is not assignable to type '{ stimulusRecipe: EnumerationStimulusRecipe; }'.
+      Types of property 'stimulusRecipe' are incompatible.
+        Type 'EnumerationStimulusRecipe | null' is not assignable to type 'EnumerationStimulusRecipe'.
+          Type 'null' is not assignable to type 'EnumerationStimulusRecipe'.
+src/modules/cognitive/content-candidates/enumeration/package.ts(69,62): error TS2322: Type 'EnumerationRecipeConfig' is not assignable to type 'Record<string, unknown>'.
+  Index signature for type 'string' is missing in type 'EnumerationRecipeConfig'.
+src/modules/cognitive/content-candidates/enumeration/package.ts(70,66): error TS2322: Type 'EnumerationRecipeConfig' is not assignable to type 'Record<string, unknown>'.
+  Index signature for type 'string' is missing in type 'EnumerationRecipeConfig'.

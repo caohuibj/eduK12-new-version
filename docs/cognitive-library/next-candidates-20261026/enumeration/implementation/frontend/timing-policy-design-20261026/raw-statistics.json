@@ -1,0 +1,960 @@
+{
+  "kind": "READ_ONLY_DESCRIPTIVE_STATISTICS_NOT_POLICY_EXECUTION",
+  "base": "97883153077a9527b6b5442feec7055f72933ab4",
+  "input": "docs/cognitive-library/next-candidates-20261026/enumeration/implementation/frontend/browser-captured-raw.json",
+  "inputSha256": "92ce9ca47badb38c0af37e28c4ee497ecf3c5863c4c752a4c7f26290ccace132",
+  "formula": {
+    "P": "(r_last-r_first)/interval_count; descriptive per recorded segment, not the uncollected240-interval preflight",
+    "median": "ordinary ordered median",
+    "p95": "nearest-rank sorted absolute deviations, rank=ceil(.95*n), 1-based; no interpolation",
+    "segments": "do not join across response/idle/page/attempt"
+  },
+  "sample": {
+    "records": 28,
+    "formalRecords": 25,
+    "source": "one cloud headless Chromium run with synthetic host/calibration; not physical-device samples",
+    "full270IntervalSegments": 0,
+    "formalIntervalCounts": {
+      "min": 123,
+      "max": 126
+    },
+    "formalSpanMeanMs": {
+      "min": 16.66479999999999,
+      "max": 16.666666666666668
+    },
+    "formalP95AbsDeviationMs": {
+      "min": 0.06480000000144415,
+      "max": 0.13467741935047428
+    },
+    "formalMaxAbsDeviationMs": 0.1664032258064374,
+    "formalWindowPSpanMsMax": 0.0033333333334049087,
+    "fourStimulusDrawIndices": [
+      1,
+      2,
+      11,
+      12,
+      14,
+      16,
+      22
+    ]
+  },
+  "records": [
+    {
+      "phase": "practice",
+      "trialIndex": 0,
+      "recordedTimestampCount": 183,
+      "continuousIntervalCount": 182,
+      "spanMs": 3033.2340000000004,
+      "spanMeanIntervalMs": 16.666120879120882,
+      "medianIntervalMs": 16.699999999999818,
+      "intervalMinMs": 16.5,
+      "intervalMaxMs": 16.800000000000182,
+      "nearestRankP95AbsDeviationFromSpanMeanMs": 0.06787912087912673,
+      "maxAbsDeviationFromSpanMeanMs": 0.16612087912088214,
+      "completeNonoverlapping60IntervalWindows": [
+        {
+          "firstInterval": 0,
+          "count": 60,
+          "P": 16.665566666666667
+        },
+        {
+          "firstInterval": 60,
+          "count": 60,
+          "P": 16.666666666666668
+        },
+        {
+          "firstInterval": 120,
+          "count": 60,
+          "P": 16.665000000000003
+        }
+      ],
+      "windowPSpanMs": 0.0016666666666651508,
+      "enoughFor30WarmupPlus240Measurement": false,
+      "stimulusFrameCount": 61,
+      "stimulusRafSpanMs": 1016.6000000000001,
+      "hasCallbackEnteredPerfMs": false,
+      "hasDrawCommandStartPerfMs": false,
+      "hasDrawCommandReturnPerfMs": false
+    },
+    {
+      "phase": "practice",
+      "trialIndex": 1,
+      "recordedTimestampCount": 183,
+      "continuousIntervalCount": 182,
+      "spanMs": 3033.2340000000004,
+      "spanMeanIntervalMs": 16.666120879120882,
+      "medianIntervalMs": 16.699999999999818,
+      "intervalMinMs": 16.5,
+      "intervalMaxMs": 16.800000000000182,
+      "nearestRankP95AbsDeviationFromSpanMeanMs": 0.06612087912142783,
+      "maxAbsDeviationFromSpanMeanMs": 0.16612087912088214,
+      "completeNonoverlapping60IntervalWindows": [
+        {
+          "firstInterval": 0,
+          "count": 60,
+          "P": 16.66556666666667
+        },
+        {
+          "firstInterval": 60,
+          "count": 60,
+          "P": 16.666666666666668
+        },
+        {
+          "firstInterval": 120,
+          "count": 60,
+          "P": 16.664999999999996
+        }
+      ],
+      "windowPSpanMs": 0.0016666666666722563,
+      "enoughFor30WarmupPlus240Measurement": false,
+      "stimulusFrameCount": 60,
+      "stimulusRafSpanMs": 1000,
+      "hasCallbackEnteredPerfMs": false,
+      "hasDrawCommandStartPerfMs": false,
+      "hasDrawCommandReturnPerfMs": false
+    },
+    {
+      "phase": "practice",
+      "trialIndex": 2,
+      "recordedTimestampCount": 183,
+      "continuousIntervalCount": 182,
+      "spanMs": 3033.133999999999,
+      "spanMeanIntervalMs": 16.665571428571425,
+      "medianIntervalMs": 16.699999999999818,
+      "intervalMinMs": 16.5,
+      "intervalMaxMs": 16.800000000000182,
+      "nearestRankP95AbsDeviationFromSpanMeanMs": 0.06557142857288056,
+      "maxAbsDeviationFromSpanMeanMs": 0.16557142857142537,
+      "completeNonoverlapping60IntervalWindows": [
+        {
+          "firstInterval": 0,
+          "count": 60,
+          "P": 16.66556666666667
+        },
+        {
+          "firstInterval": 60,
+          "count": 60,
+          "P": 16.664999999999996
+        },
+        {
+          "firstInterval": 120,
+          "count": 60,
+          "P": 16.666666666666668
+        }
+      ],
+      "windowPSpanMs": 0.0016666666666722563,
+      "enoughFor30WarmupPlus240Measurement": false,
+      "stimulusFrameCount": 60,
+      "stimulusRafSpanMs": 1000.0000000000009,
+      "hasCallbackEnteredPerfMs": false,
+      "hasDrawCommandStartPerfMs": false,
+      "hasDrawCommandReturnPerfMs": false
+    },
+    {
+      "phase": "test",
+      "trialIndex": 0,
+      "recordedTimestampCount": 126,
+      "continuousIntervalCount": 125,
+      "spanMs": 2083.199999999999,
+      "spanMeanIntervalMs": 16.66559999999999,
+      "medianIntervalMs": 16.69999999999891,
+      "intervalMinMs": 16.5,
+      "intervalMaxMs": 16.80000000000109,
+      "nearestRankP95AbsDeviationFromSpanMeanMs": 0.06560000000144584,
+      "maxAbsDeviationFromSpanMeanMs": 0.16559999999999064,
+      "completeNonoverlapping60IntervalWindows": [
+        {
+          "firstInterval": 0,
+          "count": 60,
+          "P": 16.664999999999996
+        },
+        {
+          "firstInterval": 60,
+          "count": 60,
+          "P": 16.666666666666668
+        }
+      ],
+      "windowPSpanMs": 0.0016666666666722563,
+      "enoughFor30WarmupPlus240Measurement": false,
+      "stimulusFrameCount": 3,
+      "stimulusRafSpanMs": 50,
+      "hasCallbackEnteredPerfMs": false,
+      "hasDrawCommandStartPerfMs": false,
+      "hasDrawCommandReturnPerfMs": false
+    },
+    {
+      "phase": "test",
+      "trialIndex": 1,
+      "recordedTimestampCount": 127,
+      "continuousIntervalCount": 126,
+      "spanMs": 2099.9339999999993,
+      "spanMeanIntervalMs": 16.66614285714285,
+      "medianIntervalMs": 16.69999999999891,
+      "intervalMinMs": 16.53399999999965,
+      "intervalMaxMs": 16.80000000000109,
+      "nearestRankP95AbsDeviationFromSpanMeanMs": 0.06614285714430679,
+      "maxAbsDeviationFromSpanMeanMs": 0.1338571428582398,
+      "completeNonoverlapping60IntervalWindows": [
+        {
+          "firstInterval": 0,
+          "count": 60,
+          "P": 16.66389999999998
+        },
+        {
+          "firstInterval": 60,
+          "count": 60,
+          "P": 16.666666666666668
+        }
+      ],
+      "windowPSpanMs": 0.002766666666687456,
+      "enoughFor30WarmupPlus240Measurement": false,
+      "stimulusFrameCount": 4,
+      "stimulusRafSpanMs": 66.60000000000036,
+      "hasCallbackEnteredPerfMs": false,
+      "hasDrawCommandStartPerfMs": false,
+      "hasDrawCommandReturnPerfMs": false
+    },
+    {
+      "phase": "test",
+      "trialIndex": 2,
+      "recordedTimestampCount": 125,
+      "continuousIntervalCount": 124,
+      "spanMs": 2066.6000000000004,
+      "spanMeanIntervalMs": 16.666129032258066,
+      "medianIntervalMs": 16.69999999999891,
+      "intervalMinMs": 16.5,
+      "intervalMaxMs": 16.80000000000109,
+      "nearestRankP95AbsDeviationFromSpanMeanMs": 0.13387096774120621,
+      "maxAbsDeviationFromSpanMeanMs": 0.1661290322580662,
+      "completeNonoverlapping60IntervalWindows": [
+        {
+          "firstInterval": 0,
+          "count": 60,
+          "P": 16.666666666666668
+        },
+        {
+          "firstInterval": 60,
+          "count": 60,
+          "P": 16.664999999999996
+        }
+      ],
+      "windowPSpanMs": 0.0016666666666722563,
+      "enoughFor30WarmupPlus240Measurement": false,
+      "stimulusFrameCount": 4,
+      "stimulusRafSpanMs": 66.60000000000036,
+      "hasCallbackEnteredPerfMs": false,
+      "hasDrawCommandStartPerfMs": false,
+      "hasDrawCommandReturnPerfMs": false
+    },
+    {
+      "phase": "test",
+      "trialIndex": 3,
+      "recordedTimestampCount": 126,
+      "continuousIntervalCount": 125,
+      "spanMs": 2083.199999999999,
+      "spanMeanIntervalMs": 16.66559999999999,
+      "medianIntervalMs": 16.700000000000728,
+      "intervalMinMs": 16.5,
+      "intervalMaxMs": 16.80000000000291,
+      "nearestRankP95AbsDeviationFromSpanMeanMs": 0.13439999999928176,
+      "maxAbsDeviationFromSpanMeanMs": 0.16559999999999064,
+      "completeNonoverlapping60IntervalWindows": [
+        {
+          "firstInterval": 0,
+          "count": 60,
+          "P": 16.666666666666636
+        },
+        {
+          "firstInterval": 60,
+          "count": 60,
+          "P": 16.665000000000024
+        }
+      ],
+      "windowPSpanMs": 0.0016666666666118601,
+      "enoughFor30WarmupPlus240Measurement": false,
+      "stimulusFrameCount": 3,
+      "stimulusRafSpanMs": 50.10000000000218,
+      "hasCallbackEnteredPerfMs": false,
+      "hasDrawCommandStartPerfMs": false,
+      "hasDrawCommandReturnPerfMs": false
+    },
+    {
+      "phase": "test",
+      "trialIndex": 4,
+      "recordedTimestampCount": 124,
+      "continuousIntervalCount": 123,
+      "spanMs": 2050,
+      "spanMeanIntervalMs": 16.666666666666668,
+      "medianIntervalMs": 16.69999999999709,
+      "intervalMinMs": 16.599999999998545,
+      "intervalMaxMs": 16.799999999999272,
+      "nearestRankP95AbsDeviationFromSpanMeanMs": 0.13333333333260455,
+      "maxAbsDeviationFromSpanMeanMs": 0.13333333333260455,
+      "completeNonoverlapping60IntervalWindows": [
+        {
+          "firstInterval": 0,
+          "count": 60,
+          "P": 16.666666666666668
+        },
+        {
+          "firstInterval": 60,
+          "count": 60,
+          "P": 16.665000000000024
+        }
+      ],
+      "windowPSpanMs": 0.0016666666666438346,
+      "enoughFor30WarmupPlus240Measurement": false,
+      "stimulusFrameCount": 3,
+      "stimulusRafSpanMs": 50,
+      "hasCallbackEnteredPerfMs": false,
+      "hasDrawCommandStartPerfMs": false,
+      "hasDrawCommandReturnPerfMs": false
+    },
+    {
+      "phase": "test",
+      "trialIndex": 5,
+      "recordedTimestampCount": 125,
+      "continuousIntervalCount": 124,
+      "spanMs": 2066.5339999999997,
+      "spanMeanIntervalMs": 16.665596774193546,
+      "medianIntervalMs": 16.700000000000728,
+      "intervalMinMs": 16.599999999998545,
+      "intervalMaxMs": 16.80000000000291,
+      "nearestRankP95AbsDeviationFromSpanMeanMs": 0.06559677419500076,
+      "maxAbsDeviationFromSpanMeanMs": 0.1344032258093648,
+      "completeNonoverlapping60IntervalWindows": [
+        {
+          "firstInterval": 0,
+          "count": 60,
+          "P": 16.66389999999998
+        },
+        {
+          "firstInterval": 60,
+          "count": 60,
+          "P": 16.666666666666668
+        }
+      ],
+      "windowPSpanMs": 0.002766666666687456,
+      "enoughFor30WarmupPlus240Measurement": false,
+      "stimulusFrameCount": 3,
+      "stimulusRafSpanMs": 50,
+      "hasCallbackEnteredPerfMs": false,
+      "hasDrawCommandStartPerfMs": false,
+      "hasDrawCommandReturnPerfMs": false
+    },
+    {
+      "phase": "test",
+      "trialIndex": 6,
+      "recordedTimestampCount": 125,
+      "continuousIntervalCount": 124,
+      "spanMs": 2066.5339999999997,
+      "spanMeanIntervalMs": 16.665596774193546,
+      "medianIntervalMs": 16.69999999999709,
+      "intervalMinMs": 16.599999999998545,
+      "intervalMaxMs": 16.799999999999272,
+      "nearestRankP95AbsDeviationFromSpanMeanMs": 0.06559677419500076,
+      "maxAbsDeviationFromSpanMeanMs": 0.13440322580572683,
+      "completeNonoverlapping60IntervalWindows": [
+        {
+          "firstInterval": 0,
+          "count": 60,
+          "P": 16.665566666666624
+        },
+        {
+          "firstInterval": 60,
+          "count": 60,
+          "P": 16.666666666666668
+        }
+      ],
+      "windowPSpanMs": 0.0011000000000436216,
+      "enoughFor30WarmupPlus240Measurement": false,
+      "stimulusFrameCount": 3,
+      "stimulusRafSpanMs": 50,
+      "hasCallbackEnteredPerfMs": false,
+      "hasDrawCommandStartPerfMs": false,
+      "hasDrawCommandReturnPerfMs": false
+    },
+    {
+      "phase": "test",
+      "trialIndex": 7,
+      "recordedTimestampCount": 126,
+      "continuousIntervalCount": 125,
+      "spanMs": 2083.2999999999993,
+      "spanMeanIntervalMs": 16.666399999999996,
+      "medianIntervalMs": 16.700000000000728,
+      "intervalMinMs": 16.599999999998545,
+      "intervalMaxMs": 16.80000000000291,
+      "nearestRankP95AbsDeviationFromSpanMeanMs": 0.06640000000145108,
+      "maxAbsDeviationFromSpanMeanMs": 0.1336000000029145,
+      "completeNonoverlapping60IntervalWindows": [
+        {
+          "firstInterval": 0,
+          "count": 60,
+          "P": 16.664999999999964
+        },
+        {
+          "firstInterval": 60,
+          "count": 60,
+          "P": 16.66833333333337
+        }
+      ],
+      "windowPSpanMs": 0.0033333333334049087,
+      "enoughFor30WarmupPlus240Measurement": false,
+      "stimulusFrameCount": 3,
+      "stimulusRafSpanMs": 50,
+      "hasCallbackEnteredPerfMs": false,
+      "hasDrawCommandStartPerfMs": false,
+      "hasDrawCommandReturnPerfMs": false
+    },
+    {
+      "phase": "test",
+      "trialIndex": 8,
+      "recordedTimestampCount": 124,
+      "continuousIntervalCount": 123,
+      "spanMs": 2050,
+      "spanMeanIntervalMs": 16.666666666666668,
+      "medianIntervalMs": 16.69999999999709,
+      "intervalMinMs": 16.599999999998545,
+      "intervalMaxMs": 16.799999999999272,
+      "nearestRankP95AbsDeviationFromSpanMeanMs": 0.06666666666812304,
+      "maxAbsDeviationFromSpanMeanMs": 0.13333333333260455,
+      "completeNonoverlapping60IntervalWindows": [
+        {
+          "firstInterval": 0,
+          "count": 60,
+          "P": 16.666666666666668
+        },
+        {
+          "firstInterval": 60,
+          "count": 60,
+          "P": 16.666666666666668
+        }
+      ],
+      "windowPSpanMs": 0,
+      "enoughFor30WarmupPlus240Measurement": false,
+      "stimulusFrameCount": 3,
+      "stimulusRafSpanMs": 50,
+      "hasCallbackEnteredPerfMs": false,
+      "hasDrawCommandStartPerfMs": false,
+      "hasDrawCommandReturnPerfMs": false
+    },
+    {
+      "phase": "test",
+      "trialIndex": 9,
+      "recordedTimestampCount": 126,
+      "continuousIntervalCount": 125,
+      "spanMs": 2083.2000000000007,
+      "spanMeanIntervalMs": 16.665600000000005,
+      "medianIntervalMs": 16.700000000000728,
+      "intervalMinMs": 16.599999999998545,
+      "intervalMaxMs": 16.80000000000291,
+      "nearestRankP95AbsDeviationFromSpanMeanMs": 0.06560000000146005,
+      "maxAbsDeviationFromSpanMeanMs": 0.13440000000290553,
+      "completeNonoverlapping60IntervalWindows": [
+        {
+          "firstInterval": 0,
+          "count": 60,
+          "P": 16.665000000000024
+        },
+        {
+          "firstInterval": 60,
+          "count": 60,
+          "P": 16.666666666666668
+        }
+      ],
+      "windowPSpanMs": 0.0016666666666438346,
+      "enoughFor30WarmupPlus240Measurement": false,
+      "stimulusFrameCount": 3,
+      "stimulusRafSpanMs": 50,
+      "hasCallbackEnteredPerfMs": false,
+      "hasDrawCommandStartPerfMs": false,
+      "hasDrawCommandReturnPerfMs": false
+    },
+    {
+      "phase": "test",
+      "trialIndex": 10,
+      "recordedTimestampCount": 126,
+      "continuousIntervalCount": 125,
+      "spanMs": 2083.300000000003,
+      "spanMeanIntervalMs": 16.666400000000024,
+      "medianIntervalMs": 16.69999999999709,
+      "intervalMinMs": 16.599999999998545,
+      "intervalMaxMs": 16.80000000000291,
+      "nearestRankP95AbsDeviationFromSpanMeanMs": 0.1335999999992481,
+      "maxAbsDeviationFromSpanMeanMs": 0.13360000000288608,
+      "completeNonoverlapping60IntervalWindows": [
+        {
+          "firstInterval": 0,
+          "count": 60,
+          "P": 16.665000000000024
+        },
+        {
+          "firstInterval": 60,
+          "count": 60,
+          "P": 16.666666666666668
+        }
+      ],
+      "windowPSpanMs": 0.0016666666666438346,
+      "enoughFor30WarmupPlus240Measurement": false,
+      "stimulusFrameCount": 3,
+      "stimulusRafSpanMs": 50,
+      "hasCallbackEnteredPerfMs": false,
+      "hasDrawCommandStartPerfMs": false,
+      "hasDrawCommandReturnPerfMs": false
+    },
+    {
+      "phase": "test",
+      "trialIndex": 11,
+      "recordedTimestampCount": 125,
+      "continuousIntervalCount": 124,
+      "spanMs": 2066.600000000006,
+      "spanMeanIntervalMs": 16.666129032258112,
+      "medianIntervalMs": 16.69999999999709,
+      "intervalMinMs": 16.5,
+      "intervalMaxMs": 16.80000000000291,
+      "nearestRankP95AbsDeviationFromSpanMeanMs": 0.06612903225956757,
+      "maxAbsDeviationFromSpanMeanMs": 0.16612903225811237,
+      "completeNonoverlapping60IntervalWindows": [
+        {
+          "firstInterval": 0,
+          "count": 60,
+          "P": 16.666666666666668
+        },
+        {
+          "firstInterval": 60,
+          "count": 60,
+          "P": 16.665000000000024
+        }
+      ],
+      "windowPSpanMs": 0.0016666666666438346,
+      "enoughFor30WarmupPlus240Measurement": false,
+      "stimulusFrameCount": 4,
+      "stimulusRafSpanMs": 66.60000000000582,
+      "hasCallbackEnteredPerfMs": false,
+      "hasDrawCommandStartPerfMs": false,
+      "hasDrawCommandReturnPerfMs": false
+    },
+    {
+      "phase": "test",
+      "trialIndex": 12,
+      "recordedTimestampCount": 125,
+      "continuousIntervalCount": 124,
+      "spanMs": 2066.5999999999985,
+      "spanMeanIntervalMs": 16.666129032258052,
+      "medianIntervalMs": 16.69999999999709,
+      "intervalMinMs": 16.5,
+      "intervalMaxMs": 16.80000000000291,
+      "nearestRankP95AbsDeviationFromSpanMeanMs": 0.06612903225950717,
+      "maxAbsDeviationFromSpanMeanMs": 0.16612903225805198,
+      "completeNonoverlapping60IntervalWindows": [
+        {
+          "firstInterval": 0,
+          "count": 60,
+          "P": 16.666666666666668
+        },
+        {
+          "firstInterval": 60,
+          "count": 60,
+          "P": 16.664999999999903
+        }
+      ],
+      "windowPSpanMs": 0.0016666666667646268,
+      "enoughFor30WarmupPlus240Measurement": false,
+      "stimulusFrameCount": 4,
+      "stimulusRafSpanMs": 66.59999999999854,
+      "hasCallbackEnteredPerfMs": false,
+      "hasDrawCommandStartPerfMs": false,
+      "hasDrawCommandReturnPerfMs": false
+    },
+    {
+      "phase": "test",
+      "trialIndex": 13,
+      "recordedTimestampCount": 126,
+      "continuousIntervalCount": 125,
+      "spanMs": 2083.199999999997,
+      "spanMeanIntervalMs": 16.665599999999976,
+      "medianIntervalMs": 16.69999999999709,
+      "intervalMinMs": 16.599999999998545,
+      "intervalMaxMs": 16.80000000000291,
+      "nearestRankP95AbsDeviationFromSpanMeanMs": 0.06560000000143162,
+      "maxAbsDeviationFromSpanMeanMs": 0.13440000000293395,
+      "completeNonoverlapping60IntervalWindows": [
+        {
+          "firstInterval": 0,
+          "count": 60,
+          "P": 16.665000000000024
+        },
+        {
+          "firstInterval": 60,
+          "count": 60,
+          "P": 16.666666666666668
+        }
+      ],
+      "windowPSpanMs": 0.0016666666666438346,
+      "enoughFor30WarmupPlus240Measurement": false,
+      "stimulusFrameCount": 3,
+      "stimulusRafSpanMs": 50,
+      "hasCallbackEnteredPerfMs": false,
+      "hasDrawCommandStartPerfMs": false,
+      "hasDrawCommandReturnPerfMs": false
+    },
+    {
+      "phase": "test",
+      "trialIndex": 14,
+      "recordedTimestampCount": 127,
+      "continuousIntervalCount": 126,
+      "spanMs": 2099.9000000000015,
+      "spanMeanIntervalMs": 16.66587301587303,
+      "medianIntervalMs": 16.69999999999709,
+      "intervalMinMs": 16.5,
+      "intervalMaxMs": 16.80000000000291,
+      "nearestRankP95AbsDeviationFromSpanMeanMs": 0.13412698412988178,
+      "maxAbsDeviationFromSpanMeanMs": 0.1658730158730286,
+      "completeNonoverlapping60IntervalWindows": [
+        {
+          "firstInterval": 0,
+          "count": 60,
+          "P": 16.665000000000024
+        },
+        {
+          "firstInterval": 60,
+          "count": 60,
+          "P": 16.666666666666668
+        }
+      ],
+      "windowPSpanMs": 0.0016666666666438346,
+      "enoughFor30WarmupPlus240Measurement": false,
+      "stimulusFrameCount": 4,
+      "stimulusRafSpanMs": 66.59999999999854,
+      "hasCallbackEnteredPerfMs": false,
+      "hasDrawCommandStartPerfMs": false,
+      "hasDrawCommandReturnPerfMs": false
+    },
+    {
+      "phase": "test",
+      "trialIndex": 15,
+      "recordedTimestampCount": 125,
+      "continuousIntervalCount": 124,
+      "spanMs": 2066.5,
+      "spanMeanIntervalMs": 16.66532258064516,
+      "medianIntervalMs": 16.69999999999709,
+      "intervalMinMs": 16.5,
+      "intervalMaxMs": 16.80000000000291,
+      "nearestRankP95AbsDeviationFromSpanMeanMs": 0.13467741935047428,
+      "maxAbsDeviationFromSpanMeanMs": 0.16532258064516014,
+      "completeNonoverlapping60IntervalWindows": [
+        {
+          "firstInterval": 0,
+          "count": 60,
+          "P": 16.665000000000024
+        },
+        {
+          "firstInterval": 60,
+          "count": 60,
+          "P": 16.665000000000024
+        }
+      ],
+      "windowPSpanMs": 0,
+      "enoughFor30WarmupPlus240Measurement": false,
+      "stimulusFrameCount": 3,
+      "stimulusRafSpanMs": 50,
+      "hasCallbackEnteredPerfMs": false,
+      "hasDrawCommandStartPerfMs": false,
+      "hasDrawCommandReturnPerfMs": false
+    },
+    {
+      "phase": "test",
+      "trialIndex": 16,
+      "recordedTimestampCount": 126,
+      "continuousIntervalCount": 125,
+      "spanMs": 2083.199999999997,
+      "spanMeanIntervalMs": 16.665599999999976,
+      "medianIntervalMs": 16.69999999999709,
+      "intervalMinMs": 16.5,
+      "intervalMaxMs": 16.80000000000291,
+      "nearestRankP95AbsDeviationFromSpanMeanMs": 0.06560000000143162,
+      "maxAbsDeviationFromSpanMeanMs": 0.16559999999997643,
+      "completeNonoverlapping60IntervalWindows": [
+        {
+          "firstInterval": 0,
+          "count": 60,
+          "P": 16.666666666666668
+        },
+        {
+          "firstInterval": 60,
+          "count": 60,
+          "P": 16.664999999999903
+        }
+      ],
+      "windowPSpanMs": 0.0016666666667646268,
+      "enoughFor30WarmupPlus240Measurement": false,
+      "stimulusFrameCount": 4,
+      "stimulusRafSpanMs": 66.59999999999854,
+      "hasCallbackEnteredPerfMs": false,
+      "hasDrawCommandStartPerfMs": false,
+      "hasDrawCommandReturnPerfMs": false
+    },
+    {
+      "phase": "test",
+      "trialIndex": 17,
+      "recordedTimestampCount": 126,
+      "continuousIntervalCount": 125,
+      "spanMs": 2083.0999999999985,
+      "spanMeanIntervalMs": 16.66479999999999,
+      "medianIntervalMs": 16.69999999999709,
+      "intervalMinMs": 16.599999999998545,
+      "intervalMaxMs": 16.80000000000291,
+      "nearestRankP95AbsDeviationFromSpanMeanMs": 0.06480000000144415,
+      "maxAbsDeviationFromSpanMeanMs": 0.13520000000292143,
+      "completeNonoverlapping60IntervalWindows": [
+        {
+          "firstInterval": 0,
+          "count": 60,
+          "P": 16.665000000000024
+        },
+        {
+          "firstInterval": 60,
+          "count": 60,
+          "P": 16.665000000000024
+        }
+      ],
+      "windowPSpanMs": 0,
+      "enoughFor30WarmupPlus240Measurement": false,
+      "stimulusFrameCount": 3,
+      "stimulusRafSpanMs": 50.099999999998545,
+      "hasCallbackEnteredPerfMs": false,
+      "hasDrawCommandStartPerfMs": false,
+      "hasDrawCommandReturnPerfMs": false
+    },
+    {
+      "phase": "test",
+      "trialIndex": 18,
+      "recordedTimestampCount": 126,
+      "continuousIntervalCount": 125,
+      "spanMs": 2083.2339999999967,
+      "spanMeanIntervalMs": 16.665871999999975,
+      "medianIntervalMs": 16.69999999999709,
+      "intervalMinMs": 16.599999999998545,
+      "intervalMaxMs": 16.80000000000291,
+      "nearestRankP95AbsDeviationFromSpanMeanMs": 0.068127999996765,
+      "maxAbsDeviationFromSpanMeanMs": 0.134128000002935,
+      "completeNonoverlapping60IntervalWindows": [
+        {
+          "firstInterval": 0,
+          "count": 60,
+          "P": 16.665566666666564
+        },
+        {
+          "firstInterval": 60,
+          "count": 60,
+          "P": 16.666666666666668
+        }
+      ],
+      "windowPSpanMs": 0.0011000000001040178,
+      "enoughFor30WarmupPlus240Measurement": false,
+      "stimulusFrameCount": 3,
+      "stimulusRafSpanMs": 50.099999999998545,
+      "hasCallbackEnteredPerfMs": false,
+      "hasDrawCommandStartPerfMs": false,
+      "hasDrawCommandReturnPerfMs": false
+    },
+    {
+      "phase": "test",
+      "trialIndex": 19,
+      "recordedTimestampCount": 126,
+      "continuousIntervalCount": 125,
+      "spanMs": 2083.234000000004,
+      "spanMeanIntervalMs": 16.665872000000032,
+      "medianIntervalMs": 16.69999999999709,
+      "intervalMinMs": 16.599999999998545,
+      "intervalMaxMs": 16.80000000000291,
+      "nearestRankP95AbsDeviationFromSpanMeanMs": 0.1341279999956022,
+      "maxAbsDeviationFromSpanMeanMs": 0.13412800000287817,
+      "completeNonoverlapping60IntervalWindows": [
+        {
+          "firstInterval": 0,
+          "count": 60,
+          "P": 16.665566666666685
+        },
+        {
+          "firstInterval": 60,
+          "count": 60,
+          "P": 16.665000000000024
+        }
+      ],
+      "windowPSpanMs": 0.000566666666660609,
+      "enoughFor30WarmupPlus240Measurement": false,
+      "stimulusFrameCount": 3,
+      "stimulusRafSpanMs": 50.099999999998545,
+      "hasCallbackEnteredPerfMs": false,
+      "hasDrawCommandStartPerfMs": false,
+      "hasDrawCommandReturnPerfMs": false
+    },
+    {
+      "phase": "test",
+      "trialIndex": 20,
+      "recordedTimestampCount": 125,
+      "continuousIntervalCount": 124,
+      "spanMs": 2066.5999999999985,
+      "spanMeanIntervalMs": 16.666129032258052,
+      "medianIntervalMs": 16.69999999999709,
+      "intervalMinMs": 16.5,
+      "intervalMaxMs": 16.80000000000291,
+      "nearestRankP95AbsDeviationFromSpanMeanMs": 0.13387096773758245,
+      "maxAbsDeviationFromSpanMeanMs": 0.16612903225805198,
+      "completeNonoverlapping60IntervalWindows": [
+        {
+          "firstInterval": 0,
+          "count": 60,
+          "P": 16.666666666666668
+        },
+        {
+          "firstInterval": 60,
+          "count": 60,
+          "P": 16.665000000000024
+        }
+      ],
+      "windowPSpanMs": 0.0016666666666438346,
+      "enoughFor30WarmupPlus240Measurement": false,
+      "stimulusFrameCount": 3,
+      "stimulusRafSpanMs": 50,
+      "hasCallbackEnteredPerfMs": false,
+      "hasDrawCommandStartPerfMs": false,
+      "hasDrawCommandReturnPerfMs": false
+    },
+    {
+      "phase": "test",
+      "trialIndex": 21,
+      "recordedTimestampCount": 126,
+      "continuousIntervalCount": 125,
+      "spanMs": 2083.199999999997,
+      "spanMeanIntervalMs": 16.665599999999976,
+      "medianIntervalMs": 16.69999999999709,
+      "intervalMinMs": 16.5,
+      "intervalMaxMs": 16.80000000000291,
+      "nearestRankP95AbsDeviationFromSpanMeanMs": 0.06560000000143162,
+      "maxAbsDeviationFromSpanMeanMs": 0.16559999999997643,
+      "completeNonoverlapping60IntervalWindows": [
+        {
+          "firstInterval": 0,
+          "count": 60,
+          "P": 16.665000000000024
+        },
+        {
+          "firstInterval": 60,
+          "count": 60,
+          "P": 16.666666666666668
+        }
+      ],
+      "windowPSpanMs": 0.0016666666666438346,
+      "enoughFor30WarmupPlus240Measurement": false,
+      "stimulusFrameCount": 3,
+      "stimulusRafSpanMs": 50.099999999998545,
+      "hasCallbackEnteredPerfMs": false,
+      "hasDrawCommandStartPerfMs": false,
+      "hasDrawCommandReturnPerfMs": false
+    },
+    {
+      "phase": "test",
+      "trialIndex": 22,
+      "recordedTimestampCount": 126,
+      "continuousIntervalCount": 125,
+      "spanMs": 2083.199999999997,
+      "spanMeanIntervalMs": 16.665599999999976,
+      "medianIntervalMs": 16.69999999999709,
+      "intervalMinMs": 16.5,
+      "intervalMaxMs": 16.80000000000291,
+      "nearestRankP95AbsDeviationFromSpanMeanMs": 0.13440000000293395,
+      "maxAbsDeviationFromSpanMeanMs": 0.16559999999997643,
+      "completeNonoverlapping60IntervalWindows": [
+        {
+          "firstInterval": 0,
+          "count": 60,
+          "P": 16.664999999999903
+        },
+        {
+          "firstInterval": 60,
+          "count": 60,
+          "P": 16.665000000000024
+        }
+      ],
+      "windowPSpanMs": 1.2079226507921703e-13,
+      "enoughFor30WarmupPlus240Measurement": false,
+      "stimulusFrameCount": 4,
+      "stimulusRafSpanMs": 66.59999999999854,
+      "hasCallbackEnteredPerfMs": false,
+      "hasDrawCommandStartPerfMs": false,
+      "hasDrawCommandReturnPerfMs": false
+    },
+    {
+      "phase": "test",
+      "trialIndex": 23,
+      "recordedTimestampCount": 125,
+      "continuousIntervalCount": 124,
+      "spanMs": 2066.5999999999985,
+      "spanMeanIntervalMs": 16.666129032258052,
+      "medianIntervalMs": 16.69999999999709,
+      "intervalMinMs": 16.599999999998545,
+      "intervalMaxMs": 16.80000000000291,
+      "nearestRankP95AbsDeviationFromSpanMeanMs": 0.06612903225950717,
+      "maxAbsDeviationFromSpanMeanMs": 0.1338709677448584,
+      "completeNonoverlapping60IntervalWindows": [
+        {
+          "firstInterval": 0,
+          "count": 60,
+          "P": 16.665000000000024
+        },
+        {
+          "firstInterval": 60,
+          "count": 60,
+          "P": 16.666666666666668
+        }
+      ],
+      "windowPSpanMs": 0.0016666666666438346,
+      "enoughFor30WarmupPlus240Measurement": false,
+      "stimulusFrameCount": 3,
+      "stimulusRafSpanMs": 50,
+      "hasCallbackEnteredPerfMs": false,
+      "hasDrawCommandStartPerfMs": false,
+      "hasDrawCommandReturnPerfMs": false
+    },
+    {
+      "phase": "test",
+      "trialIndex": 24,
+      "recordedTimestampCount": 125,
+      "continuousIntervalCount": 124,
+      "spanMs": 2066.633999999998,
+      "spanMeanIntervalMs": 16.666403225806437,
+      "medianIntervalMs": 16.69999999999709,
+      "intervalMinMs": 16.5,
+      "intervalMaxMs": 16.80000000000291,
+      "nearestRankP95AbsDeviationFromSpanMeanMs": 0.13359677418919702,
+      "maxAbsDeviationFromSpanMeanMs": 0.1664032258064374,
+      "completeNonoverlapping60IntervalWindows": [
+        {
+          "firstInterval": 0,
+          "count": 60,
+          "P": 16.665566666666685
+        },
+        {
+          "firstInterval": 60,
+          "count": 60,
+          "P": 16.666666666666668
+        }
+      ],
+      "windowPSpanMs": 0.0010999999999832255,
+      "enoughFor30WarmupPlus240Measurement": false,
+      "stimulusFrameCount": 3,
+      "stimulusRafSpanMs": 50,
+      "hasCallbackEnteredPerfMs": false,
+      "hasDrawCommandStartPerfMs": false,
+      "hasDrawCommandReturnPerfMs": false
+    }
+  ],
+  "unsupportedInferences": [
+    "No complete30+240 preflight segment exists; cannot award a preflight pass.",
+    "No performance.now probe/callback-entry/draw-command readings exist; cannot infer zero cost or precision.",
+    "No120/VRR/device evidence, no physical scanout/exposure proof.",
+    "No admission result, new renderer execution, epsilon or tolerance modification."
+  ]
+}

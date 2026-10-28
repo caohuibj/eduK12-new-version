@@ -1,0 +1,9 @@
+{
+  "kind": "NATIVE_ADMISSION_DEFINITION_CORRECTION_WITHIN_UNRELEASED_0_2_0",
+  "finding": "hitRate declared user visibility while listed as headline; native contract gate correctly rejected it",
+  "fix": "Set hitRate visibility=headline, remove duplicate from userMetrics; FAR/CRR retain user visibility; no metric arithmetic/quality/stimulus change",
+  "source": "server-version/backend/src/modules/cognitive/content-candidates/continuous-recognition/package.ts",
+  "sourceSha256": "eaf7c9e3b2d41d95c77546deebb3ce80c0ee9bd12b5b1c235849024fecf7dfc3",
+  "validation": "Native registry integration agent checks actual production definition via unchanged visibility assertions; no weakened shared gate. Final results under native-registry evidence.",
+  "historicalEvidence": "Original recognition evidence is preserved; final package source binding supplied here and in final coordination manifest."
+}

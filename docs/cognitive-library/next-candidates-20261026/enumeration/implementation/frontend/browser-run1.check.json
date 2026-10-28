@@ -1,0 +1,11 @@
+{
+  "command": [
+    "/workspace/eduk12-cloud/tools/node_modules/node/bin/node",
+    "/workspace/eduK12-new-version/docs/cognitive-library/next-candidates-20261026/enumeration/implementation/frontend/browser-check.cjs"
+  ],
+  "cwd": "/workspace/eduK12-new-version",
+  "exitCode": 0,
+  "elapsedSeconds": 69.46515989303589,
+  "scriptSha256": "7d91d202aaba390a0e6c565463c97acaa8a47b6e9292b4501e7c7d8930799cd4",
+  "scope": "scoped esbuild candidate harness; sandboxed cloud Chromium actual rAF, synthetic explicit durable host; no full product build/CI/physical timing"
+}

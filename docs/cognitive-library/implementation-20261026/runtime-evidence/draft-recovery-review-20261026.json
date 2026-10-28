@@ -1,0 +1,40 @@
+{
+  "kind": "REAL_CLOUD_CHROMIUM_INDEXEDDB_AND_COMPONENT_RECOVERY_NOT_PRODUCT_API_DB_COS",
+  "browser": "151.0.7922.173",
+  "chromiumSandbox": true,
+  "sourceFixtureSha256": "8dc0beab21c56d6c6b373b7a4ad5c58d80b77952591e3d6190682bcc3052fe4d",
+  "cases": [
+    {
+      "name": "legacy-order-and-identity",
+      "status": "passed",
+      "legacyPendingPreserved": true,
+      "canonicalIdentity": true,
+      "idempotentAppend": true,
+      "conflictPreserved": true,
+      "attemptIsolated": true,
+      "mutableCallerIsolated": true,
+      "unrelatedKeyPreserved": true
+    },
+    {
+      "name": "conflicting-legacy-aliases",
+      "status": "passed",
+      "rejected": true,
+      "originalDrafts": 2
+    },
+    {
+      "name": "blocked-open-retry",
+      "status": "passed",
+      "blockedReported": true,
+      "retrySucceeded": true
+    },
+    {
+      "name": "pending-exposure-recovery-ui",
+      "status": "passed",
+      "refreshPreservedPending": true,
+      "interruptedRecordSaved": true,
+      "exposureRepeated": false,
+      "timingInvented": false
+    }
+  ],
+  "productionMutations": false
+}

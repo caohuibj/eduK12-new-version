@@ -1,0 +1,18 @@
+{
+  "kind": "REAL_CLOUD_CHROMIUM_INDEXEDDB_AND_COMPONENT_RECOVERY_NOT_PRODUCT_API_DB_COS",
+  "browser": "151.0.7922.173",
+  "chromiumSandbox": true,
+  "sourceFixtureSha256": "8dc0beab21c56d6c6b373b7a4ad5c58d80b77952591e3d6190682bcc3052fe4d",
+  "cases": [
+    {
+      "name": "practice-original-save-retry",
+      "status": "passed",
+      "fault": "injected precommit port failure",
+      "practiceSaveCalls": 2,
+      "savedPracticeCount": 1,
+      "exposureRepeated": false,
+      "completeRawRetained": true
+    }
+  ],
+  "productionMutations": false
+}

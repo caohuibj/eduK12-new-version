@@ -1,0 +1,245 @@
+{
+  "artifactKind": "TIMING_DESIGN_PROPOSAL_AND_DESCRIPTIVE_BOUNDARY_CONTRACT_NOT_RUNTIME_CONFIG",
+  "candidateId": "attention-enumeration-flower",
+  "status": "PENDING_INDEPENDENT_REVIEW_AND_EXPLICIT_USER_APPROVAL",
+  "developerAnalysisOnly": true,
+  "implemented": false,
+  "formalAdministrationAllowed": false,
+  "basis": {
+    "frozenRawSha256": "92ce9ca47badb38c0af37e28c4ee497ecf3c5863c4c752a4c7f26290ccace132",
+    "diagnosis": "timing-diagnosis.json",
+    "paper": "Adolphe2022 DOI10.3389/fpsyg.2022.880375 §2.4.2; nominal50ms, not a published project tolerance",
+    "currentSourceUnchanged": true
+  },
+  "proposedRoute": {
+    "cadenceSource": "observed requestAnimationFrame callback cadence during explicit preflight; not inferred native panel refresh rate",
+    "allowedNominalCadenceFamiliesProposalHz": [
+      60,
+      120
+    ],
+    "targetNominalMs": 50,
+    "frameSlotCountAtIdealCadence": {
+      "60": 3,
+      "120": 6
+    },
+    "unsupportedFamiliesProposal": "Block before stimulus. No silent floor/ceil, alternating counts, automatic slower protocol or per-device duration correction.",
+    "physicalDisplayGuarantee": false,
+    "preflight": {
+      "samplingDurationMs": null,
+      "minimumSampleCount": null,
+      "cadenceFamilyBandHz": null,
+      "stabilityCriterion": null,
+      "maximumGapRule": null,
+      "status": "numeric acceptance and review owner/evidence pending; null never means pass"
+    },
+    "admissionConsequenceWhileUnset": "NO_FORMAL_START",
+    "measuredCadenceChangeDuringAttempt": "Proposal: end attempt, retain raw for read-only/original save retry; do not switch frame count or restart exposure. Exact numerical detection rule pending."
+  },
+  "proposedClockContract": {
+    "origin": "Keep one actual performance.timeOrigin/pageInstance artifact; new realm ends the attempt. No cross-refresh performance concatenation.",
+    "rafCallbackTimestampMs": "Record exact argument supplied to the callback. It is not a physical pixel timestamp.",
+    "callbackEnteredPerfMs": "Record performance.now at callback entry separately.",
+    "drawCommandStartedPerfMs": "Record performance.now just before actual canvas commands.",
+    "drawCommandReturnedPerfMs": "Record performance.now just after canvas commands return, with exception/context availability facts.",
+    "firstStimulusDrawMeaning": "First stimulus draw-command group actually issued and returned without exception; commit its draw counter only after that result. This does not prove display scanout.",
+    "firstMaskDrawMeaning": "First mask draw-command group issued/returned; record both callback and command on/off identities separately.",
+    "physicalPixelOnsetPerfMs": null,
+    "physicalPixelOffsetPerfMs": null,
+    "countMeaning": "N stimulus draw groups at distinct increasing rAF callbacks; mask group on following selected callback. No claim that each group was physically displayed.",
+    "notAllowed": [
+      "backdating onset to nominal deadline",
+      "counting an intended but failed draw as a completed stimulus draw",
+      "reusing response/timeout clock as stimulus onset",
+      "changing old core onset semantics under same frozen version"
+    ]
+  },
+  "futureSidecarShapeProposal": {
+    "schemaVersion": "TBD after platform/content review; no invented production field is being registered",
+    "cadenceMeasurement": {
+      "source": "raf_preflight_observed",
+      "measuredIntervalsMs": [],
+      "selectedFamilyHz": null,
+      "measurementWindow": null,
+      "ruleIdentity": null
+    },
+    "phaseDrawEvent": {
+      "phase": "fixation|stimulus|mask|response",
+      "rendererCallbackIndex": null,
+      "rafTimestampMs": null,
+      "callbackEnteredPerfMs": null,
+      "drawCommandStartedPerfMs": null,
+      "drawCommandReturnedPerfMs": null,
+      "returnedWithoutException": null
+    },
+    "stimulusOn": {
+      "firstStimulusCallbackIndex": null,
+      "rafTimestampMs": null,
+      "drawCommandStartedPerfMs": null,
+      "drawCommandReturnedPerfMs": null
+    },
+    "stimulusOff": {
+      "firstMaskCallbackIndex": null,
+      "rafTimestampMs": null,
+      "drawCommandStartedPerfMs": null,
+      "drawCommandReturnedPerfMs": null
+    },
+    "physicalPixelOn": null,
+    "physicalPixelOff": null,
+    "storage": "Trial memory bounded, one boundary write. Full draw events in research archive; core only frozen summaries/references after real schema review."
+  },
+  "boundaryExamples": [
+    {
+      "id": "ideal60_three_slots",
+      "kind": "DESCRIPTIVE_NOT_AN_ACCEPTANCE_TEST",
+      "observedFamilyHz": 60,
+      "rafRelativeMs": [
+        0,
+        16.6666666667,
+        33.3333333333,
+        50
+      ],
+      "stimulusCallbackIndices": [
+        0,
+        1,
+        2
+      ],
+      "firstMaskCallbackIndex": 3,
+      "nominalSlotMath": "3/60*1000 = 50ms",
+      "quality": "Not granted by this example; real preflight/timing/device rules missing"
+    },
+    {
+      "id": "recorded60_like_49_9_boundary",
+      "kind": "DESCRIPTIVE_POLICY_DIFFERENCE_REQUIRES_APPROVAL",
+      "rafRelativeMs": [
+        0,
+        16.6,
+        33.3,
+        49.9,
+        66.6
+      ],
+      "legacyElapsedPolicy": {
+        "stimulusCallbackIndices": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "firstMaskCallbackIndex": 4,
+        "drawCommandIntervalMs": 66.6
+      },
+      "proposedThreeSlotPolicy": {
+        "stimulusCallbackIndices": [
+          0,
+          1,
+          2
+        ],
+        "firstMaskCallbackIndex": 3,
+        "drawCommandIntervalMs": 49.9
+      },
+      "quality": "49.9 is not literal50.0; no epsilon/tolerance is approved. This is a substantive presentation-policy change, not a bug-fix permission."
+    },
+    {
+      "id": "ideal120_six_slots",
+      "kind": "DESCRIPTIVE_NOT_AN_ACCEPTANCE_TEST",
+      "observedFamilyHz": 120,
+      "rafRelativeMs": [
+        0,
+        8.3333333333,
+        16.6666666667,
+        25,
+        33.3333333333,
+        41.6666666667,
+        50
+      ],
+      "stimulusCallbackIndices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "firstMaskCallbackIndex": 6,
+      "nominalSlotMath": "6/120*1000 = 50ms",
+      "quality": "Pending real numerical acceptance"
+    },
+    {
+      "id": "ideal90_no_integer_slots",
+      "observedFamilyHz": 90,
+      "targetSlots": 4.5,
+      "floorExposureMs": 44.44444444444444,
+      "ceilExposureMs": 55.55555555555555,
+      "proposedConsequence": "BLOCK_BEFORE_FIRST_STIMULUS",
+      "draws": []
+    },
+    {
+      "id": "ideal144_no_integer_slots",
+      "observedFamilyHz": 144,
+      "targetSlots": 7.2,
+      "floorExposureMs": 48.611111111111114,
+      "ceilExposureMs": 55.55555555555555,
+      "proposedConsequence": "BLOCK_BEFORE_FIRST_STIMULUS",
+      "draws": []
+    },
+    {
+      "id": "ideal100_integer_but_unreviewed",
+      "observedFamilyHz": 100,
+      "targetSlots": 5,
+      "proposedConsequence": "BLOCK_INITIAL_ALLOWLIST; mathematical integer alone is not platform approval"
+    },
+    {
+      "id": "cadence_or_gap_outside_frozen_contract",
+      "rafRelativeMs": [
+        0,
+        16.6,
+        50.0
+      ],
+      "risk": "Blindly counting three callbacks could extend exposure despite a missing/delayed opportunity. Slot count alone is insufficient.",
+      "proposedConsequence": "Before issuing another stimulus group, follow approved interruption/neutralization contract and end attempt; record raw, no individual interpretation. Detection numbers and exact visual neutralization require review/approval."
+    },
+    {
+      "id": "first_stimulus_draw_throws",
+      "attemptedRafTimestampMs": 1000,
+      "drawCommandException": true,
+      "firstSuccessfulStimulusDraw": null,
+      "proposedConsequence": "No fabricated successful onset/counter; retain attempted event/error, end attempt"
+    },
+    {
+      "id": "duplicate_or_nonmonotonic_raf",
+      "rafTimestampMs": [
+        1000,
+        1000,
+        999
+      ],
+      "proposedConsequence": "Do not advance slot counter from invalid callback identity; end attempt under approved technical rule"
+    },
+    {
+      "id": "new_page_origin",
+      "originalOrigin": "artifactA",
+      "newOrigin": "artifactB",
+      "proposedConsequence": "END_SAME_ATTEMPT; no new exposure, original records remain read-only/retryable"
+    }
+  ],
+  "versionImpact": {
+    "measurementLayer": "Frame policy and onset/draw semantics change measurement meaning. Review engine/protocol/stimulus recipe/raw contract identities before implementation; exact next versions follow repository rules, not assigned here.",
+    "configAndReferenceLayer": "Freeze cadence selection and approved numerical rules with actual config/hash and applicability. Do not pool profiles/devices or reuse norms by default.",
+    "reportLayer": "Maintain invalid gate until approved evidence; no new interpretability from slot math."
+  },
+  "pendingDecisions": [
+    "Independent source/protocol review of rAF slot route and actual draw semantics",
+    "Explicit user approval of substantive presentation-policy change",
+    "Numerical cadence-family/stability/gap criteria with evidence tier and consequences",
+    "Whether 60/120 observed-rAF route is acceptable and all other rates block initially",
+    "Exact neutralization display after a detected gap; no silent new stimulus",
+    "Content/platform schema, storage, replay and release compatibility binding",
+    "Real target browser/device validation scope after review"
+  ],
+  "prohibitedNow": [
+    "editing runtime renderer/capture",
+    "adding0.2ms or any epsilon",
+    "expanding timing tolerance to accept66.6",
+    "altering original25 observations",
+    "rerunning unchanged3+25/backend checks",
+    "claiming this proposal is independently validated"
+  ]
+}

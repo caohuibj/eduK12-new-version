@@ -1,9 +1,12 @@
 import apiClient, { sessionFetch } from '../../api/client'
 import type { AssessmentVideoCapabilitySources } from '../assessment-media/types'
 import type { CognitiveAssignmentSummary, CognitiveHistoryPage, CognitiveSession, CognitiveV2Report } from './types'
+import type { CognitiveArchiveIdentity, CognitiveArchiveReceipt } from './core/raw-archive'
 import type { AdministrationProvenanceV1 } from './core/administration-provenance'
 
 export interface CognitiveSessionApi {
+  archiveRaw?: (identity: CognitiveArchiveIdentity, raw: {rawPayload: unknown; rawSha256: string; expectedCoreHash?: string}) => ReturnType<typeof apiClient.post<CognitiveArchiveReceipt>>
+  getRawArchive?: (identity: CognitiveArchiveIdentity) => ReturnType<typeof apiClient.get<CognitiveArchiveReceipt>>
   /** Explicit local-only retention ownership; absent for every other product. */
   localDraftScope?: 'survey-cognitive'
   getSession: (sessionId: string) => ReturnType<typeof apiClient.get<CognitiveSession>>
@@ -43,6 +46,16 @@ const loadSessionAsset = async (
  * 禁止为了 Fake UI 新增 backend endpoint（v1.1 §15）。
  */
 export const cognitiveApi = {
+  archiveRaw: (identity: CognitiveArchiveIdentity, raw: {rawPayload: unknown; rawSha256: string; expectedCoreHash?: string}) => {
+    const {sessionId, ...binding} = identity
+    const body = new Blob([JSON.stringify({...binding, ...raw})], {type: 'application/octet-stream'})
+    return apiClient.post<CognitiveArchiveReceipt>(`/cognitive/sessions/${encodeURIComponent(sessionId)}/raw-archive`, body,
+      {headers: {'Content-Type': 'application/octet-stream'}})
+  },
+  getRawArchive: (identity: CognitiveArchiveIdentity) => {
+    const {sessionId, ...binding} = identity
+    return apiClient.get<CognitiveArchiveReceipt>(`/cognitive/sessions/${encodeURIComponent(sessionId)}/raw-archive?${new URLSearchParams(Object.entries(binding).map(([k,v])=>[k,String(v)]))}`)
+  },
   collections: (id: string) => apiClient.get<Array<{ id: string; name: string; completedCount: number }>>(`/cognitive/assignments/${encodeURIComponent(id)}/collections`),
   professionalReports: (id: string, offset = 0, collectionId?: string) => apiClient.get<{
     assignmentId: string; assignmentTitle: string; total: number; offset: number; nextOffset: number | null

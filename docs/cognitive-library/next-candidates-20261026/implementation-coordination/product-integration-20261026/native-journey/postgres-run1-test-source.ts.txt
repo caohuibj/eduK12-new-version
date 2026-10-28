@@ -1,0 +1,148 @@
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
+import { randomUUID } from 'node:crypto'
+import { integrationDatabaseUrl, requireIsolatedReleaseDatabase } from '../integration/integration-env'
+// This fixture reads only explicit process variables, never a local .env file or production credentials.
+vi.mock('dotenv', () => ({ default: { config: () => ({ parsed: {} }) } }))
+const url = integrationDatabaseUrl('COGNITIVE_INTEGRATION_DB_URL')
+const suite = url ? describe : describe.skip
+suite('native MOT real PostgreSQL authoring, owner START and authoritative FINAL journey', () => {
+  let db: (typeof import('../../config/database'))['prisma']
+  let teacher: string, student: string, outsider: string, publisher: string, configId: string, courseId: string
+  const assignmentIds: string[] = [], releaseIds: string[] = []
+  const prefix = 'native-mot-journey-' + randomUUID()
+  let assignment: typeof import('../../modules/cognitive/assignment.service')
+  let sessions: typeof import('../../modules/cognitive/session.service')
+  let release: typeof import('../../modules/cognitive/release.service')
+  let final: typeof import('../../modules/cognitive/final-submit.service')
+  let proto: typeof import('../../modules/cognitive/content-candidates/mot/protocol')
+  let freeze: typeof import('../../modules/cognitive/profile-freeze')
+  beforeAll(async () => {
+    requireIsolatedReleaseDatabase(url!)
+    process.env.COGNITIVE_MODULE_ENABLED = 'true'
+    process.env.DATA_ENCRYPTION_KEY = 'a'.repeat(64)
+    process.env.DATA_PSEUDONYM_KEY = 'b'.repeat(64)
+    db = (await import('../../config/database')).prisma
+    assignment = await import('../../modules/cognitive/assignment.service')
+    sessions = await import('../../modules/cognitive/session.service')
+    release = await import('../../modules/cognitive/release.service')
+    final = await import('../../modules/cognitive/final-submit.service')
+    proto = await import('../../modules/cognitive/content-candidates/mot/protocol')
+    freeze = await import('../../modules/cognitive/profile-freeze')
+    for (const role of ['TEACHER', 'STUDENT', 'STUDENT', 'ADMIN'] as const) {
+      const user = await db.user.create({ data: { username: prefix + '-' + randomUUID(), passwordHash: 'synthetic-not-a-login-password',
+        role, platformRole: role === 'ADMIN' ? 'SYSTEM_ADMIN' : 'STANDARD', isActive: true } })
+      if (role === 'TEACHER') teacher = user.id
+      else if (role === 'ADMIN') publisher = user.id
+      else if (!student) student = user.id
+      else outsider = user.id
+    }
+    courseId = (await db.course.create({ data: { title: prefix, courseCode: randomUUID(), creatorId: teacher } })).id
+    await db.courseStudent.create({ data: { courseId, studentId: student, status: 'ACTIVE' } })
+    configId = (await db.cognitiveTestConfig.create({ data: { testType: 'mot', configVersion: proto.MOT_IDENTITY.configVersion,
+      engineVersion: proto.MOT_IDENTITY.engineVersion, scoringVersion: proto.MOT_IDENTITY.scoringVersion,
+      name: prefix, status: 'DRAFT', config: proto.motConfig('experience') } })).id
+  })
+  afterAll(async () => {
+    if (!db) return
+    if (assignmentIds.length) {
+      await db.cognitiveSession.deleteMany({ where: { assignmentId: { in: assignmentIds } } })
+      const rows = await db.cognitiveAssignment.findMany({ where: { id: { in: assignmentIds } }, select: { measurementReleaseId: true } })
+      releaseIds.push(...rows.flatMap(row => row.measurementReleaseId ? [row.measurementReleaseId] : []))
+      await db.cognitiveAssignment.deleteMany({ where: { id: { in: assignmentIds } } })
+    }
+    if (configId) {
+      const config = await db.cognitiveTestConfig.findUnique({ where: { id: configId }, select: { measurementReleaseId: true } })
+      if (config?.measurementReleaseId) releaseIds.push(config.measurementReleaseId)
+      await db.cognitiveTestConfig.deleteMany({ where: { id: configId } })
+    }
+    if (releaseIds.length) await db.$executeRawUnsafe('DELETE FROM measurement_content_releases WHERE id = ANY($1::text[])', releaseIds)
+    if (courseId) { await db.courseStudent.deleteMany({ where: { courseId } }); await db.course.deleteMany({ where: { id: courseId } }) }
+    await db.user.deleteMany({ where: { id: { in: [teacher, student, outsider, publisher].filter(Boolean) } } })
+    await db.$disconnect()
+  })
+  async function create(profile: 'research' | 'experience' = 'experience') {
+    const row = await assignment.createAssignment(teacher, 'TEACHER', { courseId, configId, title: prefix + '-' + profile,
+      profile, required: true, maxAttempts: 1 })
+    assignmentIds.push(row.id)
+    await assignment.publishAssignment(teacher, 'TEACHER', row.id)
+    return row.id
+  }
+  /** Synthetic core fixture only. Existing native generation/scorer is used as part of the new real business consumer, not a timing experiment. */
+  function trials(session: Awaited<ReturnType<typeof sessions.createSession>>, invalid = false) {
+    const config = proto.motConfig('experience')
+    return Array.from({ length: 9 }, (_, index) => {
+      const plan = proto.motTrialPlan(config, session.randomSeed, index), start = index * 12000
+      const payload = { recordOrigin: 'live' as const, phase: 'test' as const, trialIndex: index, blockIndex: plan.blockIndex,
+        speed: plan.speed, targetIds: plan.targetIds, initialObjects: plan.objects,
+        startedAtPerfMs: start, cueStartedAtPerfMs: start + 500, motionStartedAtPerfMs: start + 1500,
+        motionEndedAtPerfMs: start + 9500, responseStartedAtPerfMs: start + 10000,
+        endedAtPerfMs: start + 10500, completionTimeMs: 10500,
+        frameTiming: proto.summarizeMotFrames(Array.from({ length: 481 }, (_, f) => f * 8000 / 480)),
+        calibration: { version: 1 as const, method: 'ruler_and_distance_self_reported' as const, referenceMm: 50 as const,
+          referenceCssPx: 200, viewingDistanceMm: 350, viewportWidthCssPx: 800, viewportHeightCssPx: 900,
+          devicePixelRatio: 2, visualViewportScale: 1, language: 'zh' as const },
+        responses: plan.targetIds.map((id, i) => ({ objectId: id, ...proto.motPosition(plan.objects[id], 8000, config), atPerfMs: start + 10100 + i * 100, input: 'touch' as const })),
+        prematureInputs: 0, missedInputs: 0, ambiguousInputs: 0, interactionEvents: [], interactionOverflow: false,
+        interruptions: invalid ? ['window_blur' as const] : [], timedOut: false }
+      return { schemaVersion: 1 as const, trialIndex: index, phase: 'test' as const, startedAtPerfMs: start,
+        endedAtPerfMs: start + 10500, durationMs: 10500, flags: { timeout: false, premature: false }, qualityEvents: [], payload }
+    })
+  }
+  it('explicitly publishes the real native config, freezes both real profiles and starts only an authorized member', async () => {
+    await expect(assignment.createAssignment(teacher, 'TEACHER', { courseId, configId, title: prefix, profile: 'experience', required: true, maxAttempts: 1 })).rejects.toThrow('PUBLISHED')
+    await expect(release.publishCognitiveConfig(configId, teacher)).rejects.toThrow('administrator')
+    const published = await release.publishCognitiveConfig(configId, publisher)
+    expect(published.status).toBe('PUBLISHED'); expect(published.measurementReleaseId).toBeTruthy()
+    const catalog = await import('../../modules/cognitive/catalog.service')
+    const row = catalog.listCognitiveTestsCatalog('mot').list.find(row => row.engineVersion === proto.MOT_IDENTITY.engineVersion)!
+    expect(row.profiles.map(p => p.profile).sort()).toEqual(['experience', 'research'])
+    await expect(assignment.createAssignment(teacher, 'TEACHER', { courseId, configId, title: prefix, profile: 'standard', required: true, maxAttempts: 1 })).rejects.toThrow('Profile')
+    const id = await create()
+    const stored = await db.cognitiveAssignment.findUniqueOrThrow({ where: { id } })
+    expect(stored.measurementReleaseId).toBeTruthy()
+    expect(freeze.readFrozenReport(stored.resolvedReportSnapshotEncrypted)).toMatchObject({ profile: 'experience',
+      nativeIdentity: { testType: 'mot', engineVersion: '1.1.1', scoringVersion: '1.1.0', configVersion: '1.0.0' },
+      reportDefinition: { showProductIndex: false } })
+    await expect(sessions.createSession(outsider, id)).rejects.toThrow('member')
+    const started = await sessions.createSession(student, id)
+    expect(started.config).toMatchObject({ profile: 'experience', totalTrials: 9 })
+    expect(started).toMatchObject({ nativeTask: true, attemptEpoch: 1, sessionEpoch: 1, deliveryMode: 'FINAL_ONLY' })
+    expect(started.sessionSnapshot?.configHash).toBe(started.definitionHash)
+    await expect(sessions.getSession(outsider, started.sessionId)).rejects.toThrow('owner')
+    const researchId = await create('research'), research = await sessions.createSession(student, researchId)
+    expect(research.config).toMatchObject({ profile: 'research', totalTrials: 45 })
+    expect(research.definitionHash).not.toBe(started.definitionHash)
+    expect(research.protocolSignature).toBe(started.protocolSignature)
+    const publicService = await import('../../modules/cognitive/public.service')
+    await expect(publicService.createAccessTokenForAssignment(teacher, 'TEACHER', id, new Date(Date.now() + 3600000).toISOString(), 1)).rejects.toThrow('delivery path')
+  })
+  it('persists normal and all-invalid native FINAL results without numeric score, with ownership, epoch and exact replay', async () => {
+    for (const invalid of [false, true]) {
+      const id = await create(), session = await sessions.createSession(student, id)
+      const input = { sessionId: session.sessionId, submissionId: prefix + '-' + randomUUID(), attemptEpoch: session.attemptEpoch,
+        definitionHash: session.definitionHash!, contextSnapshotHash: session.contextSnapshotHash, trials: trials(session, invalid) }
+      await expect(final.submitCognitiveSessionFinal(outsider, input)).rejects.toThrow('权限')
+      await expect(final.submitCognitiveSessionFinal(student, { ...input, attemptEpoch: input.attemptEpoch + 1 })).rejects.toThrow()
+      await expect(final.submitCognitiveSessionFinal(student, { ...input, definitionHash: '0'.repeat(64) })).rejects.toThrow()
+      const done = await final.submitCognitiveSessionFinal(student, input)
+      expect(done.replayed).toBe(false)
+      const stored = await db.cognitiveSession.findUniqueOrThrow({ where: { id: session.sessionId } })
+      expect(stored.status).toBe('COMPLETED'); expect(stored.scoreEncrypted).toBeNull()
+      expect(stored.submissionId).toBe(input.submissionId)
+      expect(await db.cognitiveRawSubmission.count({ where: { sessionId: session.sessionId, attemptEpoch: session.attemptEpoch } })).toBe(1)
+      const read = await sessions.getSession(student, session.sessionId)
+      expect(read.result).not.toHaveProperty('score')
+      expect(read.result?.quality?.state).toBe(invalid ? 'invalid' : 'interpretable')
+      const report = read.result?.report as { qualityState: string; headline: unknown[] }
+      expect(report.qualityState).toBe(invalid ? 'invalid' : 'interpretable')
+      if (invalid) expect(report.headline).toEqual([])
+      expect(read).toMatchObject({ submissionId: input.submissionId, submissionPayloadHash: stored.submissionPayloadHash })
+      const replay = await final.submitCognitiveSessionFinal(student, input)
+      expect(replay.replayed).toBe(true)
+      const changed = structuredClone(input); changed.trials[0].payload.prematureInputs = 1
+      await expect(final.submitCognitiveSessionFinal(student, changed)).rejects.toThrow()
+      expect(await db.cognitiveRawSubmission.count({ where: { sessionId: session.sessionId } })).toBe(1)
+      expect((await sessions.getSession(student, session.sessionId)).result).toEqual(read.result)
+    }
+  })
+})

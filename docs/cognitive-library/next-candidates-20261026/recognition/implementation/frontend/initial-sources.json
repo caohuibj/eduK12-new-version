@@ -1,0 +1,42 @@
+[
+  {
+    "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/initial-sources/assets.ts.txt",
+    "sha256": "0f4c3ea5c5eaded945ba5e6498704a430c7b81eb25d040ecc96e992bb43594e9"
+  },
+  {
+    "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/initial-sources/RecognitionReport.tsx.txt",
+    "sha256": "b5fcf337cd149127b4d1c0ca27eb63f0dd64e36731a1b3497e4f80792a65d322"
+  },
+  {
+    "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/initial-sources/recognition.test.ts.txt",
+    "sha256": "65dbff9c7c83b8386f83210b945441717c94d4c051bdb8a3e2b57764ed684904"
+  },
+  {
+    "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/initial-sources/digest.ts.txt",
+    "sha256": "0c5c254b9777ab57ddc29cc12b52beced70457b944ba47aa97a96d23984079eb"
+  },
+  {
+    "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/initial-sources/contracts.ts.txt",
+    "sha256": "1767b61bbf6f317415a3525908c616cc56deb532ee4317380626acef875547de"
+  },
+  {
+    "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/initial-sources/RecognitionTask.tsx.txt",
+    "sha256": "b31161383daa597cfed3ab38ab593ccd54da382a321e88a9699582b3c6f7d79b"
+  },
+  {
+    "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/initial-sources/recognition.css.txt",
+    "sha256": "3f5ba7495fe4048f73b398a966a10155c9462110c4d2f747242d20af3cea2891"
+  },
+  {
+    "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/initial-sources/capture.ts.txt",
+    "sha256": "5a15054ae89d8766462e13f3f0efb8d010ee8a20609ca9cf7deac27c9567f1c5"
+  },
+  {
+    "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/initial-sources/save-queue.ts.txt",
+    "sha256": "633026e45619a8ec5a59d7be78de669be8b8da1671044517e7bcc25580bb573f"
+  },
+  {
+    "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/initial-sources/session.ts.txt",
+    "sha256": "5fcbee5659a0f5443d496881853fbfdf3e6a5e681a78e237ceb57beaa152b4a5"
+  }
+]

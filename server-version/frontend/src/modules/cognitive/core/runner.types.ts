@@ -1,5 +1,5 @@
 import type { AssessmentVideoCapabilitySources } from '../../assessment-media/types'
-import type { CognitivePresentationDefinitionV1, CognitiveResult, CognitiveSession } from '../types'
+import type { CognitivePresentationDefinitionV1, CognitiveResult, CognitiveSession, CognitiveNativeSnapshot } from '../types'
 
 /**
  * Runner 核心类型（Stage B v1.1 §16/§20/§22）。
@@ -9,6 +9,11 @@ import type { CognitivePresentationDefinitionV1, CognitiveResult, CognitiveSessi
 export interface CognitiveTaskContext {
   /** An embedded, frozen device policy may restrict input without changing timing. */
   requiredInput?: 'KEYBOARD'
+  nativeTask?: boolean
+  sessionSnapshot?: CognitiveNativeSnapshot
+  attemptEpoch?: number
+  sessionEpoch?: number
+  definitionHash?: string | null
   sessionId: string
   testType: string
   engineVersion: string
@@ -23,8 +28,23 @@ export interface CognitiveTaskContext {
   randomSeed: string
 }
 
+export interface CognitiveCoreSavedReceipt {
+  coreSaved: true
+  sessionId: string
+  attemptEpoch: number
+  submissionId: string
+  definitionHash: string
+  payloadHash: string
+}
+export interface CognitiveNativeHost {
+  appendEnvelope: (envelope: Record<string, unknown>) => Promise<boolean>
+  sealRaw: (rawPayload: unknown) => Promise<void>
+  complete: (provenance?: import('./administration-provenance').AdministrationProvenanceV1) => Promise<CognitiveCoreSavedReceipt>
+}
+
 /** Task Runner 组件契约：渲染当前 trial，提交 raw trial payload。 */
 export interface CognitiveTaskProps {
+  nativeHost?: CognitiveNativeHost
   taskContext: CognitiveTaskContext
   /** Preloaded immutable image ObjectURLs keyed by frozen assetId. */
   imageAssetUrls?: Readonly<Record<string, string>>

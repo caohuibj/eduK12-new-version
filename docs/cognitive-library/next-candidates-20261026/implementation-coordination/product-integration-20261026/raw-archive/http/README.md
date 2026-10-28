@@ -1,0 +1,13 @@
+# Real MOT authenticated HTTP slice
+
+The cloud-only `native-mot-http-review.cjs` creates synthetic approved teacher/student/course and an exact validated MOT config seed, publishes the configuration and assignment through the real services, then listens only on 127.0.0.1. Schema: cognitive_http_20261026; Redis: the separate temporary loopback 16380 instance. It disables dotenv file loading before importing app configuration and uses public synthetic fixture encryption/JWT keys. JWTs are delivered only as HttpOnly cookies by a loopback review endpoint; no token is recorded in evidence.
+
+The actual authenticate/current-principal chain, authController.me, cognitiveRouter START/FINAL, archive router, archive service and PostgreSQL locks/references run unchanged. Only external COS upload/deletion are synthetic; fake upload atomically creates a real PRIVATE cos asset/reference and keeps encrypted bytes. No production index, worker, full app CSRF middleware or real COS was exercised. This proves the router slice, not full deployment or physical timing.
+
+Three HTTP contracts passed in actual-http-contracts.json: owner/role/cookie auth plus START→FINAL native receipt; pending/error→same sealed retry/GET confirmation with unchanged stored report; global2MiB JSON parser remains in force while the authenticated binary archive route uses its own bounded parser.
+
+Failures remain available. The initial CLI had an unsupported Vitest option and ran no cases. The first HTTP START500 was traced to registering only tsx/cjs: native dynamic extensionless TS import needed the original tsx ESM loader too. A temporary diagnostic assignment to a read-only module export caused a separate setup failure and was removed. The harness now registers both loaders and uses a separate diagnostic call only after unexpected START500. Some failed setup diagnostics had no test execution and left only synthetic fixture rows; they are distinct from product failures. No production-source fix was made to obtain the PASS.
+
+Browser consumer uses /__review/context, GET /__review/login?actor=student, POST /__review/archive-mode {failUploads:1} and GET /__review/archive-state. These controls exist only in the loopback synthetic harness. Runtime cookies and storage keys must never be committed or printed.
+
+The cloud browser consumer completed its real frontend journey separately (../client/browser/review.json). The 18855 process was then stopped with exit0. cleanup.json reads back zero own users/courses/assignments/MOT seed/archival assets in the exclusive HTTP schema; failed setup remnants were removed by their synthetic prefix/known seed IDs.

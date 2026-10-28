@@ -1,0 +1,13 @@
+import type {TaskDefinition,MetricDefinition,QualityDefinition,SessionConfigSnapshot} from '../../v2/types'
+import {createSessionConfigSnapshot} from '../../v2/session-snapshot'
+import {HF_IDENTITY,HF_PROTOCOL,hfConfig,type Profile,type HFConfig,type HFRaw} from './protocol'
+import {hfConfigSchema,hfRawSchema} from './schema'
+import {scoreHF} from './scorer'
+import {HF_COPY} from './report'
+const metrics:Record<string,MetricDefinition>={}
+for(const [key,label] of Object.entries({validTrialCount:'完整回应窗口数',receivedTrialCount:'收到原始试次数',expectedTrialCount:'计划正式试次数',technicalInterruptionCount:'实际技术中断标记（0或1）',groups:'各规则与切换条件的真实正确率及按输入分层的正确用时',differences:'各输入切换减重复的有符号正确用时差',reportBinding:'冻结报告身份'})){const count=key.endsWith('Count');metrics[key]={key,label,description:label,category:'executive_function',construct:'rule_selection_same_opposite',unit:count?'count':'map',valueType:count?'integer':'object',direction:'descriptive',visibility:'research_only',role:'research_only',availableProfiles:['research','experience'],referenceEligible:false,export:{summary:count,label}}}
+const quality:Record<string,QualityDefinition>={noValidTrials:{key:'noValidTrials',label:'无完整回应窗口',description:'不形成表现结论。',effect:'invalid'},incompleteRecords:{key:'incompleteRecords',label:'仅完成部分窗口',description:'仅报告实际有效分母。',effect:'limited'},technicalInterruption:{key:'technicalInterruption',label:'本次有技术中断',description:'已闭合窗口保留，未闭合窗口不当作漏答。',effect:'limited'}}
+export const hfDefinition:TaskDefinition<HFConfig,HFRaw>={schemaVersion:1,...HF_IDENTITY,name:'心与花',category:'executive_function',protocol:HF_PROTOCOL,configSchema:hfConfigSchema,trialSchema:hfRawSchema,scorer:scoreHF,finalSubmission:{maxTrials:c=>c.totalTrials},metrics,quality,references:[],profiles:{research:{estimatedMinutes:[6,9],configPatch:hfConfig('research'),reportCaveats:['57次（12心/12花/33混合）参考所读论文Methods。触屏、几何、教学与混合条件平衡为项目变式，非原版复刻或效度证明。','时间为设计估计，尚非实测。']},experience:{estimatedMinutes:[4,6],configPatch:hfConfig('experience'),reportCaveats:['32次（8/8/16），重复较少；不得合并科研版常模或声称稳定个体能力。','时间为设计估计，尚非实测。']}},report:{schemaVersion:1,version:'0.1.0',title:HF_COPY.zh.title,headlineMetrics:[],userMetrics:[],detailMetrics:[],disclaimer:HF_COPY.zh.limit,practicalTips:[HF_COPY.zh.tip]},publication:{status:'DRAFT',referenceRequired:false,evidenceNote:'已获图形/布局、57/32、8练习及3组上限批准。仅内容候选，未接入入口、持久化产品或集中验收。'}}
+export const createHFSnapshot=(profile:Profile,frozenAt='2026-10-27T00:00:00.000Z'):SessionConfigSnapshot<HFConfig>=>createSessionConfigSnapshot({definition:hfDefinition,configVersion:HF_IDENTITY.configVersion,config:hfConfig(profile),frozenAt:new Date(frozenAt)})
+export {projectHFReport} from './report'
+export {hfContent} from './metadata'

@@ -1,0 +1,56 @@
+{
+  "kind": "AUTHENTICATED_NATIVE_MOT_HTTP_ROUTER_SLICE",
+  "checks": [
+    {
+      "path": "attempt0-cli.json",
+      "exitCode": 1,
+      "cases": 0
+    },
+    {
+      "path": "attempt1-failed.json",
+      "exitCode": 1,
+      "passed": 0,
+      "failed": 3,
+      "cause": "tsx CJS-only hook left native dynamic TS import unresolved; two dependent assertions lacked session"
+    },
+    {
+      "path": "diagnostic3-readonly-export.stdout.txt",
+      "exitCode": 1,
+      "cases": 0,
+      "cause": "test diagnostic attempted read-only CJS export assignment; removed"
+    },
+    {
+      "path": "diagnostic4-dynamic-import.stdout.txt",
+      "exitCode": 1,
+      "failed": 1,
+      "skipped": 2,
+      "cause": "original START500 isolated to harness dynamic TS loader"
+    },
+    {
+      "path": "actual-http-contracts.json",
+      "exitCode": 0,
+      "passed": 3
+    }
+  ],
+  "sourceHashes": {
+    "server-version/scripts/cognitive/native-mot-http-review.cjs": "5b15ce932dcae47168b7a8987f9b50443f16b94c98ae09121653148d11ed1a36",
+    "server-version/backend/src/__tests__/cognitive/native-mot-http-archive.integration.test.ts": "7949890e0a1727184ff16677265c013c92b6f5033e0a7270b72ce80432759562"
+  },
+  "realAuth": true,
+  "realCurrentPrincipal": true,
+  "realCognitiveRouter": true,
+  "realFINAL": true,
+  "realPostgres": true,
+  "realRedis": true,
+  "externalCOS": false,
+  "csrfMiddlewareMounted": false,
+  "fullApplicationStartup": false,
+  "production": false,
+  "cloudLoopbackServer": 18855,
+  "status": "STOPPED_READY_FOR_REVIEW",
+  "serverStopped": true,
+  "serverExitCode": 0,
+  "cleanup": "cleanup.json",
+  "browserEvidenceByOtherAgent": "../client/browser/review.json",
+  "sourceStoppedAfterQualifiedChecks": true
+}

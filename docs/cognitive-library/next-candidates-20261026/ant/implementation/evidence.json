@@ -1,0 +1,226 @@
+{
+  "artifactKind": "ANT_PURE_LOGIC_CANDIDATE_EVIDENCE",
+  "candidateId": "attention-ant-pebl",
+  "status": "LOCAL_CLOUD_TARGETED_LOGIC_PASS_NOT_REGISTERED",
+  "recordedAt": "2026-10-26T06:38:23.458268+00:00",
+  "branch": "cognitive-next-three-core-20261026",
+  "baselineHead": "9969583b2c95fa87ff44a4f2b3aa68cbd7471390",
+  "environment": {
+    "os": "Linux 6.18.55 x86_64",
+    "cwd": "/workspace/eduK12-new-version/server-version/backend",
+    "cpuQuota": "400000/100000 = 4 CPU",
+    "memoryLimitBytes": 17179869184,
+    "node": "24.21.0",
+    "nodeExecutable": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node",
+    "runner": "existing locked backend Vitest, maxWorkers=1",
+    "cloudOnly": true,
+    "macFilesTerminalBrowserUsed": false,
+    "dependenciesInstalled": false,
+    "browserRunInThisStage": false
+  },
+  "runs": [
+    {
+      "file": "vitest-attempt1.json",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/vitest/vitest.mjs run src/__tests__/cognitive/ant-candidate.test.ts --maxWorkers=1 --reporter=json --outputFile=/workspace/eduK12-new-version/docs/cognitive-library/next-candidates-20261026/ant/implementation/vitest-attempt1.json",
+      "cwd": "/workspace/eduK12-new-version/server-version/backend",
+      "exitCode": 1,
+      "success": false,
+      "passed": 37,
+      "failed": 1,
+      "skipped": 0,
+      "totalInFile": 38,
+      "startTimeUnixMs": 1792996286599,
+      "reason": "First run failed 1/38: setup patch used repository-root relative paths from backend cwd and did not apply; golden placeholders remained. Raw result preserved. No product bug inferred from this failure."
+    },
+    {
+      "file": "vitest-attempt2.json",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/vitest/vitest.mjs run src/__tests__/cognitive/ant-candidate.test.ts --maxWorkers=1 --reporter=json --outputFile=/workspace/eduK12-new-version/docs/cognitive-library/next-candidates-20261026/ant/implementation/vitest-attempt2.json",
+      "cwd": "/workspace/eduK12-new-version/server-version/backend",
+      "exitCode": 0,
+      "success": true,
+      "passed": 40,
+      "failed": 0,
+      "skipped": 0,
+      "totalInFile": 40,
+      "startTimeUnixMs": 1792996355955,
+      "reason": "Golden values applied; scorer/projection and two reviewed boundary tests changed. Revalidated affected scorer/projection/seed/golden paths; this run also repeated a few unchanged independent condition/schema checks unnecessarily. No further repeat planned."
+    },
+    {
+      "file": "vitest-interruption-bound.json",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/vitest/vitest.mjs run src/__tests__/cognitive/ant-candidate.test.ts --maxWorkers=1 -t 'keeps all 32 raw interruptions' --reporter=json --outputFile=/workspace/eduK12-new-version/docs/cognitive-library/next-candidates-20261026/ant/implementation/vitest-interruption-bound.json",
+      "cwd": "/workspace/eduK12-new-version/server-version/backend",
+      "exitCode": 0,
+      "success": true,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 40,
+      "totalInFile": 41,
+      "startTimeUnixMs": 1792996494848,
+      "reason": "Only new raw32/native20 event-bound adapter branch changed. Earlier helper branch for <=20 events is identical; previous40 tests reused, not rerun."
+    }
+  ],
+  "finalAcceptedEvidence": {
+    "totalDistinctTests": 41,
+    "reusedPassingTests": 40,
+    "newBoundaryPassingTests": 1,
+    "singleFinalFullRerunClaimed": false,
+    "typeSemanticClosure": "pending main-agent shared scoped check; no whole-project tsc claim",
+    "formalCI": false
+  },
+  "sourceHashes": [
+    {
+      "file": "server-version/backend/src/__tests__/cognitive/ant-candidate.test.ts",
+      "sha256": "fe2fed1bf3bbd5096d2f40ce859e942c57a50fee7f1b65209791f58f101db2c0"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/ant/metadata.ts",
+      "sha256": "c7663e62c297d566482bef46af6dadc6758ad801d67bcd4ecdf6d7f7c06bef76"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/ant/package.ts",
+      "sha256": "c21ebc58f28857c9963456f6955b89997596f16ce34694b48772cf2fd3f55d21"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/ant/protocol.ts",
+      "sha256": "eec480585323197971d147a29826e197aeda9c6a42dd8b82d9a6d084412a905b"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/ant/schema.ts",
+      "sha256": "8f9a947b91700be855a1c126f82d8dd0c6e49c6ef0b598f5ee6ca349666c1712"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/ant/scorer.ts",
+      "sha256": "193c468841a6e71cc52470f0d327290830a9be377307d1841454e017be7dd856"
+    }
+  ],
+  "implementationDocumentHashes": [
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/ant/implementation/README.md",
+      "sha256": "3c3c9e5d23f124794fd9588d0704c3b32434a3e380b1b6fe18ce0ac5f1a63187"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/ant/implementation/rule-register.json",
+      "sha256": "c0321a1754fd7f52dd403bc0749bac1f5df65a77614b87fe6e4d86d6fdee69ba"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/ant/implementation/frozen-examples.json",
+      "sha256": "361b5839816c238e64fd11a8439da75108d26c1e246b9d8815096e2d74fb5672"
+    }
+  ],
+  "rawResultHashes": [
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/ant/implementation/vitest-attempt1.json",
+      "sha256": "eca648f2caad5e29180531000832d0ebab2246c60bd35e669226050b07b6e377"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/ant/implementation/vitest-attempt2.json",
+      "sha256": "b3be6c20991dd1564858105cd4abab019a9005da0a3215f936e949feb7efb6ed"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/ant/implementation/vitest-interruption-bound.json",
+      "sha256": "629473ac3f558f6ed8c85ebe4bb3e6771f1ced180df154780d6f9fd1c560ab79"
+    }
+  ],
+  "sharedInputHashes": [
+    {
+      "file": "server-version/backend/package.json",
+      "sha256": "d629185584fcd679ca367c2d536c6c7783f7a9fe23363a8cd870964a47b2990a"
+    },
+    {
+      "file": "server-version/backend/package-lock.json",
+      "sha256": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450"
+    },
+    {
+      "file": "server-version/backend/vitest.config.ts",
+      "sha256": "26b98b70914617771d41657be8cdf6d7b6d7024c81d1c8a49aeae6a9220cf93b"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/v2/session-snapshot.ts",
+      "sha256": "ef885828b8f0dc097ac38e17701f789e82e12036eb71bacdc8a859c43209ecb3"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/v2/canonical.ts",
+      "sha256": "6688d12144fcd63f143429390cedb90332721cde57dbb0e9c14aab9b1e5caaaa"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/v2/trial-envelope.ts",
+      "sha256": "9a6cd24c06876b82557ec6159c713519c13bb401693ae75ddb53218c24f3ba78"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/v2/authoritative-scorer.ts",
+      "sha256": "5ba5d4d668d7a4616fce6bc73fa54d32808a482a659792ece3c16ce9ba517c66"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/v2/types.ts",
+      "sha256": "ca6740c52cf7aafa8e09640abe608708af043c228ea82f9a290358bd0c8ba656"
+    },
+    {
+      "file": "AGENTS.md",
+      "sha256": "aa8005b01c6acaf6985ba1dfb111338d7a06c57170f348c4f1d31db4b2aa02cd"
+    },
+    {
+      "file": "docs/release/README.md",
+      "sha256": "94d5a47cfa431f84b0eac3307fe9e27856724098bbc47c06e804aa05bb418533"
+    }
+  ],
+  "archivedDesignSourceChecks": [
+    {
+      "file": "README.md",
+      "unchanged": true
+    },
+    {
+      "file": "design.json",
+      "unchanged": true
+    },
+    {
+      "file": "preview.html",
+      "unchanged": true
+    }
+  ],
+  "compatibility": {
+    "engine": "1.0.0",
+    "scorer": "1.0.0",
+    "config": "1.0.0",
+    "profiles": [
+      "research",
+      "experience"
+    ],
+    "neutralVariants": [
+      "absent",
+      "dashes"
+    ],
+    "frozenExamples": "frozen-examples.json",
+    "metricQualityReportDefinitionIdentity": "1.0.0 candidate metadata; not independently persisted by SessionConfigSnapshot",
+    "registered": false,
+    "standardProfileInvented": false,
+    "legacyScoreInvented": false
+  },
+  "nonTestToolErrors": [
+    {
+      "action": "Root-relative Python patch from backend cwd",
+      "result": "FileNotFoundError; patch not applied; subsequent test attempt1 ran with old inputs",
+      "resolution": "Applied patch from repository root before attempt2"
+    },
+    {
+      "action": "Frozen example generation require tsx/cjs from repository root",
+      "result": "MODULE_NOT_FOUND because tsx resides in backend node_modules; no output written",
+      "resolution": "Ran same generation from backend dependency directory; exit0"
+    }
+  ],
+  "unverified": [
+    "Product runner/UI and four-entry consistency",
+    "Real phone/tablet/desktop physical timing, input latency, geometry/calibration and 20ms applicability",
+    "Device/session persistence, database/COS/full export consumers",
+    "Catalog tag persistence/filter/search",
+    "English report projection integration, Chinese/English comprehension and translation validation",
+    "Age/population validity/reliability, short-form equivalence and norms",
+    "Native registry/publication/standard/legacy consumer adaptation",
+    "Shared-platform type semantic check and required formal release gates"
+  ],
+  "scope": [
+    "Only assigned ANT candidate code/test/implementation documents changed",
+    "No archived design changes",
+    "No registry/core/schema/lockfile/DB/COS/production changes",
+    "No commit/push/CI/deploy/Notion writes by this agent"
+  ]
+}

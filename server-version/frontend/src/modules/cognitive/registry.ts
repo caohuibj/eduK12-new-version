@@ -1,3 +1,4 @@
+import { nativeCognitiveRunnerEntries } from './native-runners'
 import { cognitiveRunnerEntries } from './generated/runners'
 import type { CognitiveTaskProps } from './core/runner.types'
 
@@ -72,4 +73,4 @@ export const resolveRunner = (
   engineVersion: string
 ): CognitiveFrontendRegistryEntry | undefined => REGISTRY.get(keyOf(testType, engineVersion))
 
-for (const entry of cognitiveRunnerEntries) registerCognitiveRunner(entry)
+for (const entry of [...cognitiveRunnerEntries, ...nativeCognitiveRunnerEntries]) registerCognitiveRunner(entry)

@@ -1,0 +1,24 @@
+{
+  "typescriptVersion": "5.9.3",
+  "scope": "Only the two type-annotation corrections after four passing behavioral checks; no behavioral re-execution.",
+  "results": [
+    {
+      "historicalSource": "tests-run1-source.ts.txt",
+      "currentSource": "src/__tests__/cognitive/mot-report-format.test.ts",
+      "historicalSha256": "06c91843d07055f6c9194498925209422ada758608f62e06e65ea002d7b0c308",
+      "currentSha256": "0923182063e0281b291a3ae92d42cfa3ab3bf5a5f010f501f8f92124cc881361",
+      "historicalRuntimeSha256": "591a841febe67bafa0df33e9d9017b1c3e597c6ff6d8772be1a4a51ed385ed3c",
+      "currentRuntimeSha256": "591a841febe67bafa0df33e9d9017b1c3e597c6ff6d8772be1a4a51ed385ed3c",
+      "emittedRuntimeEqual": true
+    },
+    {
+      "historicalSource": "types-run2-profile-freeze.ts.txt",
+      "currentSource": "src/modules/cognitive/profile-freeze.ts",
+      "historicalSha256": "46346c6abb9b1d07000a91ff539831109290d37b5c353be8e38a898ecd2423e5",
+      "currentSha256": "e20b7bc761e82bf9bde419a62da34129ad527b81ce3291b1e97377101b782d2a",
+      "historicalRuntimeSha256": "7b580d26f5620207ad5bc23133730605aea75a3434c237f764358d54ccf576f9",
+      "currentRuntimeSha256": "7b580d26f5620207ad5bc23133730605aea75a3434c237f764358d54ccf576f9",
+      "emittedRuntimeEqual": true
+    }
+  ]
+}

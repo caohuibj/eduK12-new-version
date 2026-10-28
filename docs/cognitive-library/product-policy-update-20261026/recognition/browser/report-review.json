@@ -1,0 +1,178 @@
+{
+  "syntheticReportsOnly": true,
+  "formalAssetsLicensed": false,
+  "authorityBindingIsLogicFixtureOnly": true,
+  "noCaptureOrTimingStudy": true,
+  "chromiumSandbox": true,
+  "reports": {
+    "normal": {
+      "state": "interpretable",
+      "profile": "experience",
+      "reportVersion": "0.2.0",
+      "scoringVersion": "0.2.0",
+      "qualityRule": "product-session-descriptive-0.2.0",
+      "configHash": "27fda126a7d900aaac53c1da597ad8d98cfbe0c2e4b34fe96463c62d94518732",
+      "protocolSignature": "d20cde838bdcaef2e69a1ea04e402a834c0756e8a85b2e7cd54badedc7c43e73",
+      "assetManifestHash": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "hitRate": 0.8,
+      "falseAlarmRate": 0.25,
+      "correctedRecognitionRate": 0.55,
+      "targetHits": 16,
+      "targetFalseAlarms": 5,
+      "denominator": 20,
+      "completeTargetPairs": 20,
+      "plannedTargetPairs": 20,
+      "receivedTrialCount": 100,
+      "expectedTrialCount": 100,
+      "reasons": [],
+      "canGenerateTakeHomeImage": false,
+      "logo": "EDUK12.TOP",
+      "interpretationScope": "this-session-descriptive-only"
+    },
+    "negative": {
+      "state": "interpretable",
+      "profile": "experience",
+      "reportVersion": "0.2.0",
+      "scoringVersion": "0.2.0",
+      "qualityRule": "product-session-descriptive-0.2.0",
+      "configHash": "27fda126a7d900aaac53c1da597ad8d98cfbe0c2e4b34fe96463c62d94518732",
+      "protocolSignature": "d20cde838bdcaef2e69a1ea04e402a834c0756e8a85b2e7cd54badedc7c43e73",
+      "assetManifestHash": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "hitRate": 0.3,
+      "falseAlarmRate": 0.5,
+      "correctedRecognitionRate": -0.2,
+      "targetHits": 6,
+      "targetFalseAlarms": 10,
+      "denominator": 20,
+      "completeTargetPairs": 20,
+      "plannedTargetPairs": 20,
+      "receivedTrialCount": 100,
+      "expectedTrialCount": 100,
+      "reasons": [],
+      "canGenerateTakeHomeImage": false,
+      "logo": "EDUK12.TOP",
+      "interpretationScope": "this-session-descriptive-only"
+    },
+    "limited": {
+      "state": "limited",
+      "profile": "experience",
+      "reportVersion": "0.2.0",
+      "scoringVersion": "0.2.0",
+      "qualityRule": "product-session-descriptive-0.2.0",
+      "configHash": "14d21697165a6e9a7f147f2f2169acbaa1c0c3e9e2a6101f2479e94b2d19b2ba",
+      "protocolSignature": "d20cde838bdcaef2e69a1ea04e402a834c0756e8a85b2e7cd54badedc7c43e73",
+      "assetManifestHash": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "hitRate": null,
+      "falseAlarmRate": null,
+      "correctedRecognitionRate": null,
+      "targetHits": null,
+      "targetFalseAlarms": null,
+      "denominator": null,
+      "completeTargetPairs": 20,
+      "plannedTargetPairs": 20,
+      "receivedTrialCount": 100,
+      "expectedTrialCount": 100,
+      "reasons": [
+        "asset-authorization-not-confirmed"
+      ],
+      "canGenerateTakeHomeImage": false,
+      "logo": "EDUK12.TOP",
+      "interpretationScope": "this-session-descriptive-only"
+    },
+    "invalid": {
+      "state": "invalid",
+      "profile": "experience",
+      "reportVersion": "0.2.0",
+      "scoringVersion": "0.2.0",
+      "qualityRule": "product-session-descriptive-0.2.0",
+      "configHash": "14d21697165a6e9a7f147f2f2169acbaa1c0c3e9e2a6101f2479e94b2d19b2ba",
+      "protocolSignature": "d20cde838bdcaef2e69a1ea04e402a834c0756e8a85b2e7cd54badedc7c43e73",
+      "assetManifestHash": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "hitRate": null,
+      "falseAlarmRate": null,
+      "correctedRecognitionRate": null,
+      "targetHits": null,
+      "targetFalseAlarms": null,
+      "denominator": null,
+      "completeTargetPairs": 0,
+      "plannedTargetPairs": 20,
+      "receivedTrialCount": 0,
+      "expectedTrialCount": 100,
+      "reasons": [
+        "aborted",
+        "incomplete-presentation-sequence",
+        "incomplete-target-pairs",
+        "asset-authorization-not-confirmed"
+      ],
+      "canGenerateTakeHomeImage": false,
+      "logo": "EDUK12.TOP",
+      "interpretationScope": "this-session-descriptive-only"
+    }
+  },
+  "screenshots": [
+    {
+      "state": "normal",
+      "lang": "zh",
+      "width": 390,
+      "file": "normal-zh-390.png",
+      "sha256": "997799652694204a57883de69de8a1b33700fa96e8f26d4a76ca406ccdab7d64"
+    },
+    {
+      "state": "normal",
+      "lang": "en",
+      "width": 390,
+      "file": "normal-en-390.png",
+      "sha256": "05ad2ac5826c03da5ab63132e0f514e3f7ed3f2c31a8f8903acb26d8bc23a9ad"
+    },
+    {
+      "state": "negative",
+      "lang": "zh",
+      "width": 390,
+      "file": "negative-zh-390.png",
+      "sha256": "d544ba3f3c70bd208e43d5a5e4ddd12df8fa10b9b41e3a6678f17b2345a19ac1"
+    },
+    {
+      "state": "limited",
+      "lang": "zh",
+      "width": 390,
+      "file": "limited-zh-390.png",
+      "sha256": "ed61c5c4bcbfa4b8de92fdbd51ac84494ee01761032cd61f8387c2589339ff83"
+    },
+    {
+      "state": "invalid",
+      "lang": "zh",
+      "width": 390,
+      "file": "invalid-zh-390.png",
+      "sha256": "2a99b27e9757b99db3078d0a2864a666fc735a348c836dc5d0e7bb454b129f07"
+    },
+    {
+      "state": "normal",
+      "lang": "en",
+      "width": 820,
+      "zoom": 2,
+      "file": "normal-en-820-200.png",
+      "sha256": "3de61adcc0eedebb3fd30c0965de59b8826de92b2593c95329bd00a6af42d6df"
+    }
+  ],
+  "errors": [],
+  "generatedBundle": [
+    {
+      "file": "review.js",
+      "bytes": 151089,
+      "sha256": "e5d50f043169fb0c86de35d9dcd14f623da2c023ab33cb2a34577063aeff3dc1",
+      "workspaceTemporaryPath": "/tmp/recognition-product-policy-evidence-9vgkki89/review.js"
+    },
+    {
+      "file": "review.css",
+      "bytes": 1624,
+      "sha256": "4f7fa630857182433c94a3ee67792de6105126a18177c302fbf77a47bf3a75ab",
+      "workspaceTemporaryPath": "/tmp/recognition-product-policy-evidence-9vgkki89/review.css"
+    },
+    {
+      "file": "index.html",
+      "bytes": 257,
+      "sha256": "8c3cafe319a877b1c378c4cc444edb1e4b361b9ba7713da3a4ff5847ed6cdfe2",
+      "workspaceTemporaryPath": "/tmp/recognition-product-policy-evidence-9vgkki89/index.html"
+    }
+  ]
+}

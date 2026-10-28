@@ -1,0 +1,174 @@
+[
+  {
+    "schemaVersion": 1,
+    "frozenAt": "2026-10-26T00:00:00.000Z",
+    "testType": "ant",
+    "configVersion": "1.0.0",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.1.0",
+    "config": {
+      "profile": "research",
+      "totalTrials": 288,
+      "blocks": 3,
+      "repetitionsPerCellPerBlock": 2,
+      "practiceTrials": 24,
+      "cueMs": 100,
+      "postCueMs": 400,
+      "responseWindowMs": 1700,
+      "trialIntervalMs": 4000,
+      "preCueMinMs": 400,
+      "preCueMaxExclusiveMs": 1600,
+      "neutralVariant": "absent",
+      "phaseToleranceMs": 20
+    },
+    "configHash": "bf9064014b6fb5f2192dfc771a1963519614daf12f4d88af497a2041041b519b",
+    "protocol": {
+      "schemaVersion": 1,
+      "key": "ant/1.0.0/1.1.0",
+      "version": "1.0.0",
+      "clock": "performance",
+      "randomizationAlgorithmVersion": "ant-fnv1a-mulberry32-v1",
+      "trialEnvelopeVersion": 1,
+      "phases": [
+        {
+          "key": "test",
+          "persists": true,
+          "required": true
+        }
+      ],
+      "measurementCriticalConfigPaths": [
+        "*"
+      ]
+    },
+    "protocolSignature": "87cb928b877f7d4c107b0c495ddc263e94a6cfd8d93ff65ab2293ab57d20a32d"
+  },
+  {
+    "schemaVersion": 1,
+    "frozenAt": "2026-10-26T00:00:00.000Z",
+    "testType": "ant",
+    "configVersion": "1.0.0",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.1.0",
+    "config": {
+      "profile": "research",
+      "totalTrials": 288,
+      "blocks": 3,
+      "repetitionsPerCellPerBlock": 2,
+      "practiceTrials": 24,
+      "cueMs": 100,
+      "postCueMs": 400,
+      "responseWindowMs": 1700,
+      "trialIntervalMs": 4000,
+      "preCueMinMs": 400,
+      "preCueMaxExclusiveMs": 1600,
+      "neutralVariant": "dashes",
+      "phaseToleranceMs": 20
+    },
+    "configHash": "056ec8c474cfe128e2122cf806eff4727f9186b66a5e98eac7bec0a40be78129",
+    "protocol": {
+      "schemaVersion": 1,
+      "key": "ant/1.0.0/1.1.0",
+      "version": "1.0.0",
+      "clock": "performance",
+      "randomizationAlgorithmVersion": "ant-fnv1a-mulberry32-v1",
+      "trialEnvelopeVersion": 1,
+      "phases": [
+        {
+          "key": "test",
+          "persists": true,
+          "required": true
+        }
+      ],
+      "measurementCriticalConfigPaths": [
+        "*"
+      ]
+    },
+    "protocolSignature": "87cb928b877f7d4c107b0c495ddc263e94a6cfd8d93ff65ab2293ab57d20a32d"
+  },
+  {
+    "schemaVersion": 1,
+    "frozenAt": "2026-10-26T00:00:00.000Z",
+    "testType": "ant",
+    "configVersion": "1.0.0",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.1.0",
+    "config": {
+      "profile": "experience",
+      "totalTrials": 48,
+      "blocks": 1,
+      "repetitionsPerCellPerBlock": 1,
+      "practiceTrials": 24,
+      "cueMs": 100,
+      "postCueMs": 400,
+      "responseWindowMs": 1700,
+      "trialIntervalMs": 4000,
+      "preCueMinMs": 400,
+      "preCueMaxExclusiveMs": 1600,
+      "neutralVariant": "absent",
+      "phaseToleranceMs": 20
+    },
+    "configHash": "6b623c236c31134cc5b59cff505b0d77d4b8cfa25868d832290c787140683a02",
+    "protocol": {
+      "schemaVersion": 1,
+      "key": "ant/1.0.0/1.1.0",
+      "version": "1.0.0",
+      "clock": "performance",
+      "randomizationAlgorithmVersion": "ant-fnv1a-mulberry32-v1",
+      "trialEnvelopeVersion": 1,
+      "phases": [
+        {
+          "key": "test",
+          "persists": true,
+          "required": true
+        }
+      ],
+      "measurementCriticalConfigPaths": [
+        "*"
+      ]
+    },
+    "protocolSignature": "87cb928b877f7d4c107b0c495ddc263e94a6cfd8d93ff65ab2293ab57d20a32d"
+  },
+  {
+    "schemaVersion": 1,
+    "frozenAt": "2026-10-26T00:00:00.000Z",
+    "testType": "ant",
+    "configVersion": "1.0.0",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.1.0",
+    "config": {
+      "profile": "experience",
+      "totalTrials": 48,
+      "blocks": 1,
+      "repetitionsPerCellPerBlock": 1,
+      "practiceTrials": 24,
+      "cueMs": 100,
+      "postCueMs": 400,
+      "responseWindowMs": 1700,
+      "trialIntervalMs": 4000,
+      "preCueMinMs": 400,
+      "preCueMaxExclusiveMs": 1600,
+      "neutralVariant": "dashes",
+      "phaseToleranceMs": 20
+    },
+    "configHash": "cdd346790638bf96d2c538b38764f60842309e5093d4c194d1ae0cfd18b3febe",
+    "protocol": {
+      "schemaVersion": 1,
+      "key": "ant/1.0.0/1.1.0",
+      "version": "1.0.0",
+      "clock": "performance",
+      "randomizationAlgorithmVersion": "ant-fnv1a-mulberry32-v1",
+      "trialEnvelopeVersion": 1,
+      "phases": [
+        {
+          "key": "test",
+          "persists": true,
+          "required": true
+        }
+      ],
+      "measurementCriticalConfigPaths": [
+        "*"
+      ]
+    },
+    "protocolSignature": "87cb928b877f7d4c107b0c495ddc263e94a6cfd8d93ff65ab2293ab57d20a32d"
+  }
+]

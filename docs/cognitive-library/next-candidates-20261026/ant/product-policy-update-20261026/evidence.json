@@ -1,0 +1,217 @@
+{
+  "artifactKind": "ANT_PRODUCT_REPORT_NATIVE_ADMISSION_PREPARATION",
+  "candidateId": "attention-ant-pebl",
+  "status": "TARGETED_REPORT_CONTRACT_PASS_NOT_REGISTERED",
+  "baseline": "86adea091270134b5197fb81b76649007596b8f3",
+  "recordedAt": "2026-10-26T09:39:59.535556+00:00",
+  "sourceAuthorization": "authorization-source.json",
+  "scope": "ANT-only additive native descriptive metrics/denominators and report side-arrow section; original measurement rules unchanged",
+  "versions": {
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.1.0",
+    "configVersion": "1.0.0",
+    "metricDefinitionVersion": "1.1.0",
+    "qualityDefinitionVersion": "1.0.0",
+    "reportDefinitionVersion": "1.1.0",
+    "protocolVersion": "1.0.0",
+    "protocolKey": "ant/1.0.0/1.1.0",
+    "phaseToleranceMs": 20,
+    "rng": "ant-fnv1a-mulberry32-v1"
+  },
+  "sourceHashes": [
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/ant/protocol.ts",
+      "sha256": "3c7d56f2bc6bf4ef92d7251e90bedbc94baaa98ad507fca5e255b13be846d974"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/ant/scorer.ts",
+      "sha256": "e86d4004d7aac162a75ce25ca849a041efc624616b063382fdaaa090fb63a60d"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/ant/package.ts",
+      "sha256": "dccf4723f4ea9b66d317b532310fc30768406c74614e7d645aa990939266f56f"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/cognitive/ant-product-policy.test.ts",
+      "sha256": "7268963ad867289b6fd34cbe1376ce593ad06f25b259ca2934e9ce648e19a449"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/ant/AntReportCard.tsx",
+      "sha256": "a1621625f4f92ff4e25445aef1e43ffc935cefd9d04d086be040ff97a05daddf"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/ant/AntReport.product-policy.test.tsx",
+      "sha256": "5f512bc11087115e729c3c4c0a5840e1a7735edb2d4d5144433a16299f16db32"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/ant/AntTask.test.tsx",
+      "sha256": "995dc488f2b075c83b05a8b56cf11354f8e54fb134f6888d61dfa70d8dc1aa50"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/ant/generated/protocol.ts",
+      "sha256": "686dd198f5537272d5993547905b5c2d522d21001267717f0c5f9ed9861417fc"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/ant/generated/report.ts",
+      "sha256": "8364a0abaff2826fddde21345ca08c719b8d571cf7a76234b752c0f14af6df32"
+    },
+    {
+      "file": "server-version/scripts/cognitive/ant-content.cjs",
+      "sha256": "0cc449ba248cc9a241d3a4cfe2bf2e29b7cad012979782582a6366f04b92b2fe"
+    }
+  ],
+  "unchangedInputs": [
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/ant/schema.ts",
+      "sha256": "8f9a947b91700be855a1c126f82d8dd0c6e49c6ef0b598f5ee6ca349666c1712",
+      "sameAsBase": true
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/ant/capture.ts",
+      "sha256": "3ea2e3dcd4bdc7010b209b4edf980b67d2572bf4560487e0c4d3994faefe5f90",
+      "sameAsBase": true
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/ant/paint.ts",
+      "sha256": "d4a43342fa73c7e591901a7411d04304d7d5b70e63e85514035589ea86438ef3",
+      "sameAsBase": true
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/ant/session.ts",
+      "sha256": "6bb06eb510d0e2948d88b07c8922edf37675414ffd8000b2b651e22b89d2d3d1",
+      "sameAsBase": true
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/ant/AntTask.tsx",
+      "sha256": "ef5e970714895db6a37a9b9d9b76a5e98e3d542f06ee37c263f961edc435e712",
+      "sameAsBase": true
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/ant/display.ts",
+      "sha256": "6046840499f49662756f48c56a435deec06db6f892c4c9908e5a41c75498cd5a",
+      "sameAsBase": true
+    }
+  ],
+  "unchangedProtocolBody": {
+    "from": "export const CUES to EOF",
+    "sha256": "68f2af729557e1f85fe8049cf73e062fedeca62fa8aa739df17980f6cb73a1a2",
+    "sameAsBase": true,
+    "meaning": "Config values, condition/RNG generation, response/trial data and envelope helper untouched; only definition identity header changed"
+  },
+  "unchangedScoringAndQualityBody": {
+    "from": "parseAntConfig through original metrics construction",
+    "sha256": "828669bed91d6390e71c89b72dfa64df58b4cad1569226a883ce933cb3060b83",
+    "sameAsBase": true,
+    "meaning": "Original validation, timing gate, denominators, RT arithmetic, signed differences and quality-state computation unchanged"
+  },
+  "runs": [
+    {
+      "file": "backend-report.json",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/vitest/vitest.mjs run src/__tests__/cognitive/ant-product-policy.test.ts --maxWorkers=1 --reporter=json --outputFile=/workspace/eduK12-new-version/docs/cognitive-library/next-candidates-20261026/ant/product-policy-update-20261026/backend-report.json",
+      "cwd": "/workspace/eduK12-new-version/server-version/backend",
+      "exitCode": 0,
+      "passed": 7,
+      "failed": 0,
+      "sha256": "ca670703a8ee2711580f741a1b820127569e620d965e8e346a48f36e049184a8"
+    },
+    {
+      "file": "frontend-report.json",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/vitest/vitest.mjs run src/modules/cognitive/tasks/ant/AntReport.product-policy.test.tsx --maxWorkers=1 --reporter=json --outputFile=/workspace/eduK12-new-version/docs/cognitive-library/next-candidates-20261026/ant/product-policy-update-20261026/frontend-report.json",
+      "cwd": "/workspace/eduK12-new-version/server-version/frontend",
+      "exitCode": 0,
+      "passed": 4,
+      "failed": 0,
+      "sha256": "d25ccfb4edca10e44c7157e28197aeef692d03ddeaec48763b5883c3c86c7b75"
+    }
+  ],
+  "backendChangedRootTypes": {
+    "kind": "ANT_CHANGED_BACKEND_ROOTS_ACTUAL_TSCONFIG",
+    "exitCode": 0,
+    "durationSeconds": 3.011399745941162,
+    "cwd": "/workspace/eduK12-new-version/server-version/backend",
+    "node": "24.21.0",
+    "script": "const ts=require('typescript'),path=require('node:path');const c=ts.readConfigFile('tsconfig.json',ts.sys.readFile);if(c.error)throw Error('tsconfig unreadable');const p=ts.parseJsonConfigFileContent(c.config,ts.sys,process.cwd());const roots=['protocol.ts','scorer.ts','package.ts'].map(f=>path.join(process.cwd(),'src/modules/cognitive/content-candidates/ant',f));const program=ts.createProgram(roots,p.options);const ds=ts.getPreEmitDiagnostics(program);if(ds.length){process.stdout.write(ts.formatDiagnosticsWithColorAndContext(ds,{getCanonicalFileName:f=>f,getCurrentDirectory:()=>process.cwd(),getNewLine:()=>String.fromCharCode(10)}));process.exitCode=1;}",
+    "roots": [
+      "protocol.ts",
+      "scorer.ts",
+      "package.ts"
+    ],
+    "wholeApplication": false
+  },
+  "frontendTypes": "Delegated to main agent joint actual frontend entry closure after owners stop writing; not run again here",
+  "projectionCheck": {
+    "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node server-version/scripts/cognitive/ant-content.cjs --check",
+    "exitCode": 0
+  },
+  "rawArtifactHashes": [
+    {
+      "file": "README.md",
+      "sha256": "bef9c6ed80bb3ea2894a2001253e60b91ae97b8e1d32a3361c970f5a527cec74"
+    },
+    {
+      "file": "admission-dependencies.json",
+      "sha256": "aae8620308af87a6d84b3397de2855a9a5caec27d72972ab28b0819ef6dcf63b"
+    },
+    {
+      "file": "authorization-source.json",
+      "sha256": "bf5f8c0e95fc8e02b826e4ab488014b3fde13a73e954095d8682fcac7b6d7f4d"
+    },
+    {
+      "file": "backend-report.json",
+      "sha256": "ca670703a8ee2711580f741a1b820127569e620d965e8e346a48f36e049184a8"
+    },
+    {
+      "file": "backend-types.json",
+      "sha256": "9d4c78383a605319ed072978bddd9ac920b0323b349c2f81e7dc2f0caac1347f"
+    },
+    {
+      "file": "backend-types.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "backend-types.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "frontend-report.json",
+      "sha256": "d25ccfb4edca10e44c7157e28197aeef692d03ddeaec48763b5883c3c86c7b75"
+    },
+    {
+      "file": "frozen-tuples.json",
+      "sha256": "6709f73689d1cfb01b6565eb66c77a9059dbfee532a3872c90d107939ee31cea"
+    }
+  ],
+  "trackedChangeDiff": {
+    "file": "change.diff",
+    "sha256": "1c1406c41df1b7d33e93875d35900e06d1bea16170f663074bc859581615fec7",
+    "newTestOriginals": "Both new test files are complete workspace source originals, individually SHA-bound in sourceHashes; untracked new files are not claimed present in git diff."
+  },
+  "reuse": [
+    "Prior backend full41 not rerun",
+    "Prior frontend capture/session suites not rerun",
+    "Prior browser/timing/screenshots not rerun or modified",
+    "No new physical timing measurement, precheck, extra event capture, COS download/reanalysis or adjustment",
+    "Original schema/capture/paint/session/Task code hashes exactly match baseline"
+  ],
+  "admissionDependencies": "admission-dependencies.json",
+  "environment": {
+    "cloudOnly": true,
+    "node": "24.21.0",
+    "workers": 1,
+    "dependencyInstall": false,
+    "macFilesTerminalBrowserUsed": false,
+    "CI": false
+  },
+  "notCompleted": [
+    "Global native registration / standard admission policy",
+    "Product API/DB/COS and server receipt consumers",
+    "Frozen report/ref/geometry persistence/export and four product entries",
+    "Tag persistence/search and device-derived norms",
+    "Real hardware/population/language validity"
+  ],
+  "gitActionsByThisAgent": {
+    "commit": false,
+    "push": false
+  },
+  "notionWrittenByThisAgent": false
+}

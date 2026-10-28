@@ -1,0 +1,22 @@
+{
+  "kind": "PARTICIPANT_COPY_BROWSER_INPUT_BINDING",
+  "scope": "11 copy/status/reading checks completed before later queue-after-termination fix; unchanged normal failure branch; later branch separately checked",
+  "sessionSourceSnapshot": "94152032885d5cbaf149a15ec03d5a0c72ea2c67",
+  "sourceSha256": {
+    "server-version/frontend/src/modules/cognitive/tasks/ant/capture.ts": "3ea2e3dcd4bdc7010b209b4edf980b67d2572bf4560487e0c4d3994faefe5f90",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/seal.ts": "5c0e39ea3cf60286ba37db5a89fcc21319f46ba980dd9f08b589ad595692b029",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/AntTask.tsx": "ef5e970714895db6a37a9b9d9b76a5e98e3d542f06ee37c263f961edc435e712",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/display.ts": "6046840499f49662756f48c56a435deec06db6f892c4c9908e5a41c75498cd5a",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/local-save.ts": "ce23b298a385435a122bdc1992c21401490f4637ce7946fd9ba6ab9e3cba8219",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/test-fixtures.ts": "5f727f76b8249281d282354d6a913faab33ee173b01b9f54b01b077c9897acb4",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/paint.ts": "d4a43342fa73c7e591901a7411d04304d7d5b70e63e85514035589ea86438ef3",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/session.ts": "1b30fb429d31f118b6e29559afe999fa3dec5a7befe9d822a12b4cae60d69fed",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/AntReportCard.tsx": "1e3747000eb1025dd81e5789559dbc0c52e6b5140e9bbfe15edc19df4f89a162",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/ant.css": "c9f5df2248708e9444629d384a972837f279e780d9f8bb67961e8b0f6458ffc4",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/generated/report.ts": "371c1834ad1a63ba8962b21173c6a399c398f5d40b5d254077b5da0502814326",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/generated/protocol.ts": "3792e7a94f6be7e19c9d496cafa380412c1760242e8a76c5cd9d064153c78cc9"
+  },
+  "bundleSha256": "fff2bc2f35166dd367aa7d8193d98882db67aee72691472c8d203a1e1c163ed3",
+  "previewEntrySha256": "da2c2e1abac5fff163762bdfee35218346848ccf5a450145cc22421844844df9",
+  "result": "browser-participant-copy-result.json"
+}

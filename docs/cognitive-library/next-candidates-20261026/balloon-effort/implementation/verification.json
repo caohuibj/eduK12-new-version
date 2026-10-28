@@ -1,0 +1,80 @@
+{
+  "date": "2026-10-27",
+  "execution": "cloud; Node24.21.0; existing dependencies",
+  "scope": "Content-only balloon effort research72/experience18; integration and final tests deferred by user.",
+  "tests": {
+    "backend": {
+      "success": true,
+      "numPassedTests": 3,
+      "numFailedTests": 0,
+      "numPendingTests": 0
+    },
+    "frontend": {
+      "success": true,
+      "numPassedTests": 3,
+      "numFailedTests": 0,
+      "numPendingTests": 0
+    }
+  },
+  "types": {
+    "backend": {
+      "config": "tsconfig.json",
+      "roots": [
+        "src/modules/cognitive/content-candidates/balloon-effort/package.ts",
+        "src/modules/cognitive/content-candidates/balloon-effort/participant-presentation.ts",
+        "src/__tests__/cognitive/balloon-effort-content.test.ts"
+      ],
+      "sourceCount": 48,
+      "diagnostics": []
+    },
+    "frontend": {
+      "config": "tsconfig.app.json",
+      "roots": [
+        "src/modules/cognitive/tasks/balloon-effort/BalloonEffortTask.tsx",
+        "src/modules/cognitive/tasks/balloon-effort/content.test.tsx",
+        "src/test/setup.ts",
+        "src/vite-env.d.ts"
+      ],
+      "sourceCount": 55,
+      "diagnostics": []
+    }
+  },
+  "sourceSha256": {
+    "server-version/backend/src/__tests__/cognitive/balloon-effort-content.test.ts": "6daf9c12467142e407b59b4dc4307233ff6f81f23c84bbfaaea4542ead7edf7f",
+    "server-version/backend/src/modules/cognitive/content-candidates/balloon-effort/metadata.ts": "a40eefb52da3a3d67ee1cfbcf5a16da56c92065c57f0482c7b7494e357883dc4",
+    "server-version/backend/src/modules/cognitive/content-candidates/balloon-effort/package.ts": "9683205c4d74142ed54ffae8cbdd9ee80fe265dcaa183342a7f4250561da6302",
+    "server-version/backend/src/modules/cognitive/content-candidates/balloon-effort/participant-presentation.ts": "4c12f81c1312ab87e78147fd7cff1559fd5f65937abf0a017388a8858a54ed92",
+    "server-version/backend/src/modules/cognitive/content-candidates/balloon-effort/protocol.ts": "346318b6f4bf234cb6308428b40c147634fecb8df15c21aaf34d8bf68bc85c9c",
+    "server-version/backend/src/modules/cognitive/content-candidates/balloon-effort/report.ts": "c649dff623d791d09571393e35611297d89dea7b268eb761f43166daab142aff",
+    "server-version/backend/src/modules/cognitive/content-candidates/balloon-effort/schema.ts": "62d2e31ebaadd310a45e01d2e8690c147ccb3b543d1fadd394e58e8f34a317eb",
+    "server-version/backend/src/modules/cognitive/content-candidates/balloon-effort/scorer.ts": "c639a878eba7f457734a80ab54fe9f479d6c1e058a1204b1e276ed8fcb0bdf3a",
+    "server-version/frontend/src/modules/cognitive/tasks/balloon-effort/BalloonEffortTask.tsx": "150152cdbe817b9bc30152d06cdd48d31b228520100f6f5ad6135829a921309a",
+    "server-version/frontend/src/modules/cognitive/tasks/balloon-effort/EffortInstructions.tsx": "d0d204f35117d740eb3ad880529cea71bcfc60c8e634c864d1062608ae0e4182",
+    "server-version/frontend/src/modules/cognitive/tasks/balloon-effort/EffortReport.tsx": "2b4089d6ffd440f5f0ef7f3898131e5248cb46294dba45f2cfc2f95ba8395b5d",
+    "server-version/frontend/src/modules/cognitive/tasks/balloon-effort/capture.ts": "228c62b062e86df06d287ab3ca2862de7b7fab21cb9ee97d50a5ae4e5c85d689",
+    "server-version/frontend/src/modules/cognitive/tasks/balloon-effort/content.test.tsx": "3d543617175dba66f31b8a39a2fd0b5b4e2bc5ba05bf0c084ca974f639f30097",
+    "server-version/frontend/src/modules/cognitive/tasks/balloon-effort/contracts.ts": "c397e6bcf022cdf065f3a0e12734a24f083f170fb13a8a83a03483c3029b802c",
+    "server-version/frontend/src/modules/cognitive/tasks/balloon-effort/effort.css": "263531e40ccba66c21cb5d61c25b9565ee95956667ccab4b049c292e4af8e9f5",
+    "server-version/frontend/src/modules/cognitive/tasks/balloon-effort/generated/protocol.ts": "1760cb0f6b2b5a130aed5a3199b45ab0592f6094700d290c4a8de4f7f4b64fb8",
+    "server-version/frontend/src/modules/cognitive/tasks/balloon-effort/generated/report.ts": "c13992f24acf3e1a1856c80ca75c8aeac6d0ee4b7ceb5d65f6a52e5068c1ba7d",
+    "server-version/frontend/src/modules/cognitive/tasks/balloon-effort/session.ts": "4b8dd708c9edb8725973cd3c3e5110016b3fea8ab3f75f3983961b694ac0987b",
+    "server-version/scripts/cognitive/effort-content.cjs": "f9a664905658f14a05369aee2a149ac3f6261b5788e4181b37b48165365d0b2f"
+  },
+  "distinctRuntimeTargets": 6,
+  "notRun": [
+    "product registry/admission/seed",
+    "real IndexedDB",
+    "HTTP/session/core/report readback",
+    "COS",
+    "full App/browser/physical devices",
+    "research72 browser journey",
+    "CI",
+    "deployment"
+  ],
+  "approvedDesignPngSha256": "06f2afe046911de836455047b342e1aa9acb3aff403f6cb587cc47171c559497",
+  "verificationNotes": [
+    "First six runtime targets passed; first backend/frontend type closures had zero diagnostics. No repeat runs.",
+    "Synthetic full18 controller used actual backend scorer behind a synthetic final port. React/jsdom input is not a physical-device or product-integration journey.",
+    "No registry/seed/host/storage/archive implementation was added."
+  ]
+}

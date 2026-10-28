@@ -1,0 +1,543 @@
+{
+  "scope": "Targeted participant-copy/state rendering; saving/report use synthetic initial-view injection in cloud-only bundle. No full3+25 or backend replay. Two single synthetic practices only exercise changed save/interruption wording.",
+  "sourceBase": "94152032885d5cbaf149a15ec03d5a0c72ea2c67",
+  "taskSourceSha256": "a2cacadbed917ae742a285a8818e060ee07be284b42938a88ee061d9eaacf463",
+  "instrumentedBundleSourceSha256": "0383c0ff973f6ddd48c310a6666bfafda6f23fc6503a0bd31ea7956be8b2848a",
+  "checks": [
+    {
+      "name": "zh intro has no implementation terms",
+      "pass": true,
+      "detail": "实际界面 · 合成设置演示 · 仅供内部审阅\n刚才有几个点？\n\n请注视画面中央。白色圆点会在中灰背景上短暂出现，随后画面变成黑白纹理。请报告刚才看到的点数。\n\n拖动1–15整数滑杆，再点击确认。每轮初值随机变化，它不是答案提示。\n\n先完成3次练习。本次体验版共25轮作答，作答阶段不提示对错。\n\n键盘操作与屏幕设置\n\n仅供内部审阅，暂不用于正式施测；呈现效果与结果解释仍待验证。\n\n查看准备状态"
+    },
+    {
+      "name": "zh intro retains internal/synthetic marker",
+      "pass": true
+    },
+    {
+      "name": "zh intro no horizontal overflow",
+      "pass": true,
+      "detail": {
+        "width": 390,
+        "scroll": 390
+      }
+    },
+    {
+      "name": "zh intro 200% has no implementation terms",
+      "pass": true,
+      "detail": "实际界面 · 合成设置演示 · 仅供内部审阅\n刚才有几个点？\n\n请注视画面中央。白色圆点会在中灰背景上短暂出现，随后画面变成黑白纹理。请报告刚才看到的点数。\n\n拖动1–15整数滑杆，再点击确认。每轮初值随机变化，它不是答案提示。\n\n先完成3次练习。本次体验版共25轮作答，作答阶段不提示对错。\n\n键盘操作与屏幕设置\n\n仅供内部审阅，暂不用于正式施测；呈现效果与结果解释仍待验证。\n\n查看准备状态"
+    },
+    {
+      "name": "zh intro 200% retains internal/synthetic marker",
+      "pass": true
+    },
+    {
+      "name": "zh intro 200% no horizontal overflow",
+      "pass": true,
+      "detail": {
+        "width": 390,
+        "scroll": 390
+      }
+    },
+    {
+      "name": "zh missingCalibration start remains disabled",
+      "pass": true
+    },
+    {
+      "name": "zh missingCalibration has no implementation terms",
+      "pass": true,
+      "detail": "实际界面 · 合成设置演示 · 仅供内部审阅\n先来练习\n\n1 / 3\n\n请放稳设备，保持屏幕设置时的观看距离，准备好后再开始。\n\n请先完成屏幕与观看距离设置。\n\n开始练习"
+    },
+    {
+      "name": "zh missingCalibration retains internal/synthetic marker",
+      "pass": true
+    },
+    {
+      "name": "zh missingCalibration no horizontal overflow",
+      "pass": true,
+      "detail": {
+        "width": 390,
+        "scroll": 390
+      }
+    },
+    {
+      "name": "zh missingRecipe start remains disabled",
+      "pass": true
+    },
+    {
+      "name": "zh missingRecipe has no implementation terms",
+      "pass": true,
+      "detail": "实际界面 · 合成设置演示 · 仅供内部审阅\n先来练习\n\n1 / 3\n\n请放稳设备，保持屏幕设置时的观看距离，准备好后再开始。\n\n当前测验尚未完成施测设置，请联系发布者。\n\n开始练习"
+    },
+    {
+      "name": "zh missingRecipe retains internal/synthetic marker",
+      "pass": true
+    },
+    {
+      "name": "zh missingRecipe no horizontal overflow",
+      "pass": true,
+      "detail": {
+        "width": 390,
+        "scroll": 390
+      }
+    },
+    {
+      "name": "zh displayChanged start remains disabled",
+      "pass": true
+    },
+    {
+      "name": "zh displayChanged has no implementation terms",
+      "pass": true,
+      "detail": "实际界面 · 合成设置演示 · 仅供内部审阅\n先来练习\n\n1 / 3\n\n请放稳设备，保持屏幕设置时的观看距离，准备好后再开始。\n\n屏幕、缩放或方向变了，请重新完成屏幕与观看距离设置。\n\n开始练习"
+    },
+    {
+      "name": "zh displayChanged retains internal/synthetic marker",
+      "pass": true
+    },
+    {
+      "name": "zh displayChanged no horizontal overflow",
+      "pass": true,
+      "detail": {
+        "width": 390,
+        "scroll": 390
+      }
+    },
+    {
+      "name": "zh doesNotFit start remains disabled",
+      "pass": true
+    },
+    {
+      "name": "zh doesNotFit has no implementation terms",
+      "pass": true,
+      "detail": "实际界面 · 合成设置演示 · 仅供内部审阅\n先来练习\n\n1 / 3\n\n请放稳设备，保持屏幕设置时的观看距离，准备好后再开始。\n\n当前屏幕放不下测验画面。请调整观看设置或更换设备后重试。\n\n开始练习"
+    },
+    {
+      "name": "zh doesNotFit retains internal/synthetic marker",
+      "pass": true
+    },
+    {
+      "name": "zh doesNotFit no horizontal overflow",
+      "pass": true,
+      "detail": {
+        "width": 390,
+        "scroll": 390
+      }
+    },
+    {
+      "name": "zh prepareError has no implementation terms",
+      "pass": true,
+      "detail": "实际界面 · 合成设置演示 · 仅供内部审阅\n\n这次作答暂时无法开始。请保持页面打开并联系发布者，避免重复作答。"
+    },
+    {
+      "name": "zh prepareError retains internal/synthetic marker",
+      "pass": true
+    },
+    {
+      "name": "zh prepareError no horizontal overflow",
+      "pass": true,
+      "detail": {
+        "width": 390,
+        "scroll": 390
+      }
+    },
+    {
+      "name": "zh saving has no implementation terms",
+      "pass": true,
+      "detail": "实际界面 · 合成设置演示 · 仅供内部审阅\n\n正在提交，请保持页面打开…"
+    },
+    {
+      "name": "zh saving retains internal/synthetic marker",
+      "pass": true
+    },
+    {
+      "name": "zh saving no horizontal overflow",
+      "pass": true,
+      "detail": {
+        "width": 390,
+        "scroll": 390
+      }
+    },
+    {
+      "name": "zh saveError has no implementation terms",
+      "pass": true,
+      "detail": "实际界面 · 合成设置演示 · 仅供内部审阅\n\n提交尚未确认，请保持页面打开并重试。已作答内容仍在此页面等待提交，无需重复作答。\n\n重试提交"
+    },
+    {
+      "name": "zh saveError retains internal/synthetic marker",
+      "pass": true
+    },
+    {
+      "name": "zh saveError no horizontal overflow",
+      "pass": true,
+      "detail": {
+        "width": 390,
+        "scroll": 390
+      }
+    },
+    {
+      "name": "zh interrupted has no implementation terms",
+      "pass": true,
+      "detail": "实际界面 · 合成设置演示 · 仅供内部审阅\n练习记录\n\n这轮练习中断了，不判断对错，也不算作已完成练习。\n\n重新做这轮练习\n\n这次作答已因中断结束。请保持页面打开以便完成提交；如需重新作答，请联系发布者。"
+    },
+    {
+      "name": "zh interrupted retains internal/synthetic marker",
+      "pass": true
+    },
+    {
+      "name": "zh interrupted no horizontal overflow",
+      "pass": true,
+      "detail": {
+        "width": 390,
+        "scroll": 390
+      }
+    },
+    {
+      "name": "zh report has no implementation terms",
+      "pass": true,
+      "detail": "实际界面 · 合成设置演示 · 仅供内部审阅\n这次的记录\n\n当前为合成演示，不代表真实作答已提交。\n\n本次不提供表现结论\n\n这次暂不解释作答表现。测验的呈现方式和结果解释还需要进一步验证。\n\n下次可把设备放稳，减少通知干扰，并保持观看位置。\n\n目前没有适用常模，不提供排名、能力等级或诊断结论。"
+    },
+    {
+      "name": "zh report retains internal/synthetic marker",
+      "pass": true
+    },
+    {
+      "name": "zh report no horizontal overflow",
+      "pass": true,
+      "detail": {
+        "width": 390,
+        "scroll": 390
+      }
+    },
+    {
+      "name": "zh report remains invalid",
+      "pass": true
+    },
+    {
+      "name": "zh report hides forged metrics",
+      "pass": true
+    },
+    {
+      "name": "zh report 200% has no implementation terms",
+      "pass": true,
+      "detail": "实际界面 · 合成设置演示 · 仅供内部审阅\n这次的记录\n\n当前为合成演示，不代表真实作答已提交。\n\n本次不提供表现结论\n\n这次暂不解释作答表现。测验的呈现方式和结果解释还需要进一步验证。\n\n下次可把设备放稳，减少通知干扰，并保持观看位置。\n\n目前没有适用常模，不提供排名、能力等级或诊断结论。"
+    },
+    {
+      "name": "zh report 200% retains internal/synthetic marker",
+      "pass": true
+    },
+    {
+      "name": "zh report 200% no horizontal overflow",
+      "pass": true,
+      "detail": {
+        "width": 390,
+        "scroll": 390
+      }
+    },
+    {
+      "name": "en intro has no implementation terms",
+      "pass": true,
+      "detail": "Actual interface · Synthetic setup · Internal review only\nHow many dots did you see?\n\nKeep looking at the centre. White dots briefly appear on a mid-grey background, followed by a black-and-white pattern. Report how many dots you saw.\n\nUse the integer slider from 1 to 15, then confirm. Its initial value changes each trial; it is not a hint.\n\nFirst complete 3 practice trials. This experience version has 25 assessment trials. You will not receive correctness feedback during the assessment.\n\nKeyboard and screen setup\n\nThis version is for internal review only, not formal assessment. Its screen presentation and result interpretation still need validation.\n\nReview readiness"
+    },
+    {
+      "name": "en intro retains internal/synthetic marker",
+      "pass": true
+    },
+    {
+      "name": "en intro no horizontal overflow",
+      "pass": true,
+      "detail": {
+        "width": 820,
+        "scroll": 820
+      }
+    },
+    {
+      "name": "en intro 200% has no implementation terms",
+      "pass": true,
+      "detail": "Actual interface · Synthetic setup · Internal review only\nHow many dots did you see?\n\nKeep looking at the centre. White dots briefly appear on a mid-grey background, followed by a black-and-white pattern. Report how many dots you saw.\n\nUse the integer slider from 1 to 15, then confirm. Its initial value changes each trial; it is not a hint.\n\nFirst complete 3 practice trials. This experience version has 25 assessment trials. You will not receive correctness feedback during the assessment.\n\nKeyboard and screen setup\n\nThis version is for internal review only, not formal assessment. Its screen presentation and result interpretation still need validation.\n\nReview readiness"
+    },
+    {
+      "name": "en intro 200% retains internal/synthetic marker",
+      "pass": true
+    },
+    {
+      "name": "en intro 200% no horizontal overflow",
+      "pass": true,
+      "detail": {
+        "width": 820,
+        "scroll": 820
+      }
+    },
+    {
+      "name": "en missingCalibration start remains disabled",
+      "pass": true
+    },
+    {
+      "name": "en missingCalibration has no implementation terms",
+      "pass": true,
+      "detail": "Actual interface · Synthetic setup · Internal review only\nTry the practice\n\n1 / 3\n\nKeep the device still and maintain the viewing distance used during setup. Start when ready.\n\nPlease complete the screen and viewing-distance setup first.\n\nStart practice"
+    },
+    {
+      "name": "en missingCalibration retains internal/synthetic marker",
+      "pass": true
+    },
+    {
+      "name": "en missingCalibration no horizontal overflow",
+      "pass": true,
+      "detail": {
+        "width": 820,
+        "scroll": 820
+      }
+    },
+    {
+      "name": "en missingRecipe start remains disabled",
+      "pass": true
+    },
+    {
+      "name": "en missingRecipe has no implementation terms",
+      "pass": true,
+      "detail": "Actual interface · Synthetic setup · Internal review only\nTry the practice\n\n1 / 3\n\nKeep the device still and maintain the viewing distance used during setup. Start when ready.\n\nThis assessment is not ready yet. Please contact its publisher.\n\nStart practice"
+    },
+    {
+      "name": "en missingRecipe retains internal/synthetic marker",
+      "pass": true
+    },
+    {
+      "name": "en missingRecipe no horizontal overflow",
+      "pass": true,
+      "detail": {
+        "width": 820,
+        "scroll": 820
+      }
+    },
+    {
+      "name": "en displayChanged start remains disabled",
+      "pass": true
+    },
+    {
+      "name": "en displayChanged has no implementation terms",
+      "pass": true,
+      "detail": "Actual interface · Synthetic setup · Internal review only\nTry the practice\n\n1 / 3\n\nKeep the device still and maintain the viewing distance used during setup. Start when ready.\n\nThe screen, zoom or orientation changed. Please repeat the screen and viewing-distance setup.\n\nStart practice"
+    },
+    {
+      "name": "en displayChanged retains internal/synthetic marker",
+      "pass": true
+    },
+    {
+      "name": "en displayChanged no horizontal overflow",
+      "pass": true,
+      "detail": {
+        "width": 820,
+        "scroll": 820
+      }
+    },
+    {
+      "name": "en doesNotFit start remains disabled",
+      "pass": true
+    },
+    {
+      "name": "en doesNotFit has no implementation terms",
+      "pass": true,
+      "detail": "Actual interface · Synthetic setup · Internal review only\nTry the practice\n\n1 / 3\n\nKeep the device still and maintain the viewing distance used during setup. Start when ready.\n\nThe assessment display does not fit this screen. Adjust the viewing setup or use another device.\n\nStart practice"
+    },
+    {
+      "name": "en doesNotFit retains internal/synthetic marker",
+      "pass": true
+    },
+    {
+      "name": "en doesNotFit no horizontal overflow",
+      "pass": true,
+      "detail": {
+        "width": 820,
+        "scroll": 820
+      }
+    },
+    {
+      "name": "en prepareError has no implementation terms",
+      "pass": true,
+      "detail": "Actual interface · Synthetic setup · Internal review only\n\nThis attempt cannot start right now. Keep the page open and contact the publisher before trying again."
+    },
+    {
+      "name": "en prepareError retains internal/synthetic marker",
+      "pass": true
+    },
+    {
+      "name": "en prepareError no horizontal overflow",
+      "pass": true,
+      "detail": {
+        "width": 820,
+        "scroll": 820
+      }
+    },
+    {
+      "name": "en saving has no implementation terms",
+      "pass": true,
+      "detail": "Actual interface · Synthetic setup · Internal review only\n\nSubmitting… Please keep this page open."
+    },
+    {
+      "name": "en saving retains internal/synthetic marker",
+      "pass": true
+    },
+    {
+      "name": "en saving no horizontal overflow",
+      "pass": true,
+      "detail": {
+        "width": 820,
+        "scroll": 820
+      }
+    },
+    {
+      "name": "en saveError has no implementation terms",
+      "pass": true,
+      "detail": "Actual interface · Synthetic setup · Internal review only\n\nSubmission is not confirmed. Keep this page open and retry. Your answers remain here, so you do not need to answer again.\n\nRetry submission"
+    },
+    {
+      "name": "en saveError retains internal/synthetic marker",
+      "pass": true
+    },
+    {
+      "name": "en saveError no horizontal overflow",
+      "pass": true,
+      "detail": {
+        "width": 820,
+        "scroll": 820
+      }
+    },
+    {
+      "name": "en interrupted has no implementation terms",
+      "pass": true,
+      "detail": "Actual interface · Synthetic setup · Internal review only\nPractice record\n\nThis practice was interrupted. No correctness judgment is given.\n\nRetry this practice explicitly\n\nThis attempt ended after an interruption. Keep the page open to finish submitting. Contact the publisher if you need to try again."
+    },
+    {
+      "name": "en interrupted retains internal/synthetic marker",
+      "pass": true
+    },
+    {
+      "name": "en interrupted no horizontal overflow",
+      "pass": true,
+      "detail": {
+        "width": 820,
+        "scroll": 820
+      }
+    },
+    {
+      "name": "en report has no implementation terms",
+      "pass": true,
+      "detail": "Actual interface · Synthetic setup · Internal review only\nYour record\n\nThis is a synthetic demonstration. It does not confirm submission of a real assessment.\n\nNo performance conclusion yet\n\nThis attempt has no performance interpretation yet. Screen presentation and result interpretation still need validation.\n\nFor next time: keep the device still, reduce interruptions and maintain your viewing position.\n\nNo applicable norms, rankings, ability grades or diagnostic conclusions are available."
+    },
+    {
+      "name": "en report retains internal/synthetic marker",
+      "pass": true
+    },
+    {
+      "name": "en report no horizontal overflow",
+      "pass": true,
+      "detail": {
+        "width": 820,
+        "scroll": 820
+      }
+    },
+    {
+      "name": "en report remains invalid",
+      "pass": true
+    },
+    {
+      "name": "en report hides forged metrics",
+      "pass": true
+    },
+    {
+      "name": "en report 200% has no implementation terms",
+      "pass": true,
+      "detail": "Actual interface · Synthetic setup · Internal review only\nYour record\n\nThis is a synthetic demonstration. It does not confirm submission of a real assessment.\n\nNo performance conclusion yet\n\nThis attempt has no performance interpretation yet. Screen presentation and result interpretation still need validation.\n\nFor next time: keep the device still, reduce interruptions and maintain your viewing position.\n\nNo applicable norms, rankings, ability grades or diagnostic conclusions are available."
+    },
+    {
+      "name": "en report 200% retains internal/synthetic marker",
+      "pass": true
+    },
+    {
+      "name": "en report 200% no horizontal overflow",
+      "pass": true,
+      "detail": {
+        "width": 820,
+        "scroll": 820
+      }
+    },
+    {
+      "name": "no browser page errors",
+      "pass": true,
+      "detail": []
+    }
+  ],
+  "screenshots": [
+    {
+      "file": "zh-intro.png",
+      "sha256": "798794193cdf0d8691a5f593e9e8e94d5b7537e3e7f9ce57145e0a2cb34df091"
+    },
+    {
+      "file": "zh-intro-200pct.png",
+      "sha256": "3ebc53c964f84171f0d7f0b2458bf38dc19d8a86cb345fb2cfe41b4d7ffdac13"
+    },
+    {
+      "file": "zh-missingCalibration.png",
+      "sha256": "38699c3f42297db44f95b8a15035703f4443d7b13bb6fa54cc3b5c660dffcb51"
+    },
+    {
+      "file": "zh-missingRecipe.png",
+      "sha256": "e532f7faf332f2794df5e3e5310ef6a33728ec7d7c04e1b00e2302462d47d274"
+    },
+    {
+      "file": "zh-displayChanged.png",
+      "sha256": "357c97f20e123bd753e5d7073a33055f917e66c911f510962c89eb1a4ebfefd6"
+    },
+    {
+      "file": "zh-doesNotFit.png",
+      "sha256": "cfdf2a4083fd765f2069a67c758e51e5507480a5535576b4c98d2968553e9d90"
+    },
+    {
+      "file": "zh-prepareError.png",
+      "sha256": "1638386bca4a908602ec072a1bb0e259486af902c742e66384532ca19515885b"
+    },
+    {
+      "file": "zh-saving.png",
+      "sha256": "cc6c4b8cf64451e99c6ac653fe3addd0a0ca7ec78c9aad4e20f6b7166d59a06b"
+    },
+    {
+      "file": "zh-saveError.png",
+      "sha256": "dbc5ae07eeb1c51d7047044742b6c73b11b48e800181400e76c0ef1c733f9fda"
+    },
+    {
+      "file": "zh-interrupted.png",
+      "sha256": "a24d0c0c43f8b0c3c73141247d26427492f1df7d9b927761548ec8d8d82f3c9e"
+    },
+    {
+      "file": "zh-report.png",
+      "sha256": "d5e06263d38b1ec265b44b4736df193fcf2f5ac89c9444db25d030ac5b90161e"
+    },
+    {
+      "file": "zh-report-200pct.png",
+      "sha256": "4ca5f025900c87100037f5684b78db59d027bbb972c6c70fd6ff17b76da3b592"
+    },
+    {
+      "file": "en-intro-200pct.png",
+      "sha256": "d9b5da6b8f4b274989ef8b7b11b083e5a777523ef730a292391f5aad07df5d13"
+    },
+    {
+      "file": "en-missingRecipe.png",
+      "sha256": "76712cd9ad740a128bb29c87469523ce6212ecb4370721a7c972b35c61e5abe3"
+    },
+    {
+      "file": "en-saveError.png",
+      "sha256": "f24a6384e1e5db83cad5c8d7b2463dcd5e6edfd244beaef620b8ba350deef309"
+    },
+    {
+      "file": "en-report.png",
+      "sha256": "e7f1a71f71b73fe377f48c2406d8027f8b4c5c57a5a4f91c33eaef62315fbfbe"
+    },
+    {
+      "file": "en-report-200pct.png",
+      "sha256": "f967b22d5e05fc1473826f0253f6754c4ab3480d141315ef13a5847dd6ec5c62"
+    }
+  ],
+  "errors": [],
+  "browser": "151.0.7922.173",
+  "chromiumSandbox": true,
+  "success": true
+}

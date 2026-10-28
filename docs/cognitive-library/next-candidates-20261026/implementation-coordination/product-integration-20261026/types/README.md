@@ -1,0 +1,9 @@
+# 本轮受影响类型证据及原失败
+
+读取前后端真实tsconfig选项，以变动入口及实际导入闭包检查，非全项目types、CI或正式发布门禁。
+
+首次frontend统一入口检查exit1：ANT生成器漏FLANKERS导入及再认fixture字面量推宽，原失败保留。MOT和点数相关源没有diagnostic且输入未变，不重跑。ANT修生成器并新增真实执行生成投影的1项runtime回归通过；再认只修测试类型。第二次只检查受影响6个根，exit1仅剩recognition.test.ts被as const误伤类型注解的语法错误；已保留。定点修复后仅该测试及环境声明2根再查，exit0。
+
+三份报告保留各自source闭包、hash、diagnostics和退出码；evidence-union.json说明最终输入覆盖。不是把任一旧失败改成成功，也不声称有一轮完整frontend检查退出0。MOT/点数backend12根实际tsconfig闭包exit0；ANT和再认backend证据按原执行身份在各自目录复用。
+
+未重复无关capture、seed、完整施测、截图、backend或全量测试。未激活CI。新增native注册若改变相关源由该步另核影响，不复用不匹配输入。

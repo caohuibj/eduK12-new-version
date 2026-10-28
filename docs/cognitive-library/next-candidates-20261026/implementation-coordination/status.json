@@ -1,0 +1,145 @@
+{
+  "artifactKind": "PARALLEL_CANDIDATE_IMPLEMENTATION_COORDINATION",
+  "dateUtc": "2026-10-26T06:44:19.521126+00:00",
+  "baseCommit": "9969583b2c95fa87ff44a4f2b3aa68cbd7471390",
+  "branch": "cognitive-next-three-core-20261026",
+  "approval": {
+    "userText": "三个都通过，图片保存notion",
+    "previewsApproved": true,
+    "profileCountsApproved": {
+      "enumeration": [
+        100,
+        25
+      ],
+      "continuous-recognition": [
+        260,
+        100
+      ],
+      "ant": [
+        288,
+        48
+      ]
+    },
+    "doesNotValidate": [
+      "hardware timing",
+      "physical geometry",
+      "stimulus asset rights",
+      "population validity",
+      "normative interpretation"
+    ]
+  },
+  "cloudOnly": true,
+  "notion": {
+    "pageId": "405d27635a3881b2a2d3fecce26d7cb3",
+    "nativeImagesAttachedAndReadBack": true,
+    "images": [
+      {
+        "candidateDirectory": "enumeration",
+        "uploadId": "405d2763-5a38-8165-af40-00b29d31d553",
+        "sha256": "65b63eeaa6045ce0554a5e6c197e6752480aba7bd36b7db3f83bc6f4624fe538"
+      },
+      {
+        "candidateDirectory": "recognition",
+        "uploadId": "405d2763-5a38-81b8-99a3-00b2921f9bcb",
+        "sha256": "4daf10ce00a91735a46e3ca732ebb1d212760179cde84274b0617995627876d9"
+      },
+      {
+        "candidateDirectory": "ant",
+        "uploadId": "405d2763-5a38-81e6-a39d-00b24fa2d211",
+        "sha256": "bf20483844cbd45f2bbe5f87298bbfb3486ba722efadbeca1d0655700c6ede73"
+      }
+    ]
+  },
+  "platformReadBack": {
+    "main": "ff8471e529e7b3c56e1e20f17d1e2581040fc896",
+    "pr356Head": "5c05355daf8a0b17087dc7139c9b410e43e870a4",
+    "pr356State": "OPEN_DRAFT_UNMERGED",
+    "currentIntegrationPlatformBase": "48516ef5900cf9f711ea3cc852ac148cd221d7f8",
+    "aheadCommits": 5,
+    "latestDeltaAddsNativeCognitiveRegistrationOrCos": false
+  },
+  "scope": {
+    "implementation": "independent task-owned protocol, schemas, seeded sequence, pure scorer, projection and directed tests; recognition adds v2 adapter",
+    "excluded": [
+      "shared core",
+      "runtime registration",
+      "DB migration",
+      "dependencies or lockfiles",
+      "CI activation",
+      "merge",
+      "deployment"
+    ],
+    "tests": "each agent owns one test file; maxWorkers1; changed/missing cases only; passed unchanged checks retain original evidence",
+    "budget": "about20 minutes per independent pure-logic implementation; report progress while main reviews"
+  },
+  "agents": [
+    {
+      "name": "enumeration_plan",
+      "candidate": "attention-enumeration-flower",
+      "status": "CORE_REVIEWED_UNREGISTERED",
+      "uniquePassingCases": 22
+    },
+    {
+      "name": "recognition_plan",
+      "candidate": "continuous-recognition",
+      "status": "CORE_REVIEWED_UNREGISTERED",
+      "uniquePassingCases": 84
+    },
+    {
+      "name": "ant_plan",
+      "candidate": "attention-ant-pebl",
+      "status": "CORE_REVIEWED_UNREGISTERED",
+      "uniquePassingCases": 41
+    }
+  ],
+  "verification": {
+    "taskContractDistinctPassingCases": 147,
+    "platformAdmissionAuditPassingCases": 6,
+    "formalCI": false,
+    "realDeviceTiming": false,
+    "types": {
+      "enumerationAndAntMissingClosures": {
+        "exitCode": 0,
+        "rootFiles": 11,
+        "report": "types.json"
+      },
+      "recognition": "owner original and native entry type checks passed; not repeated"
+    },
+    "admission": "real definition validator rejects only absent standard profile; exact production resolver returns undefined for all three"
+  },
+  "frozenSourceSha256": {
+    "server-version/backend/src/modules/cognitive/content-candidates/enumeration/metadata.ts": "56dcd201fa290eda8aa48a3a0b23afe668f21e6de6cfff45e40f5d1b26e0f0a8",
+    "server-version/backend/src/modules/cognitive/content-candidates/enumeration/package.ts": "679dbd85bfbbac12b89549dc03bded87d0a57b6d522f85332d50c17ad00f1ffa",
+    "server-version/backend/src/modules/cognitive/content-candidates/enumeration/protocol.ts": "ff2215ae31ae280dbec19d582ab0aead2608445706bf5c4f403a4887472faed4",
+    "server-version/backend/src/modules/cognitive/content-candidates/enumeration/schema.ts": "228c23516e78fea3030ac21b3e7ef8d5f3078e4a363201c82c440c1baea4ca36",
+    "server-version/backend/src/modules/cognitive/content-candidates/enumeration/scorer.ts": "f89b3ccc3b3f33afd72bd8c1948a4a220d4ffab30ad039a491b5aa762a0bbd72",
+    "server-version/backend/src/modules/cognitive/content-candidates/enumeration/trial-envelope.ts": "87bb3ec491005ebbfb6419a778f598ffafa29e503e49414c29398d4e2c12afbd",
+    "server-version/backend/src/modules/cognitive/content-candidates/continuous-recognition/metadata.ts": "a272a4761cfbf77743dc131309dbcd0c0fe3a01f8a0c229729666afb4d5a6e90",
+    "server-version/backend/src/modules/cognitive/content-candidates/continuous-recognition/native.ts": "a032299978cb2aeabf5f6c28b591994fb858159e6310f742c06aa667adc83f80",
+    "server-version/backend/src/modules/cognitive/content-candidates/continuous-recognition/package.ts": "755904d328f9141384d5203fd1a40c76866c13042a7fdd4e6dd17accaba07826",
+    "server-version/backend/src/modules/cognitive/content-candidates/continuous-recognition/protocol.ts": "f9b724b0bbca7c172089ae1699b311605e1681845a331f192f9afc4de454804b",
+    "server-version/backend/src/modules/cognitive/content-candidates/continuous-recognition/scorer.ts": "cd3f53ad81d127da6342fe62f91ed7aa52b6c9a665c1484d0895ed7bbb7272ff",
+    "server-version/backend/src/modules/cognitive/content-candidates/ant/metadata.ts": "c7663e62c297d566482bef46af6dadc6758ad801d67bcd4ecdf6d7f7c06bef76",
+    "server-version/backend/src/modules/cognitive/content-candidates/ant/package.ts": "c21ebc58f28857c9963456f6955b89997596f16ce34694b48772cf2fd3f55d21",
+    "server-version/backend/src/modules/cognitive/content-candidates/ant/protocol.ts": "eec480585323197971d147a29826e197aeda9c6a42dd8b82d9a6d084412a905b",
+    "server-version/backend/src/modules/cognitive/content-candidates/ant/schema.ts": "8f9a947b91700be855a1c126f82d8dd0c6e49c6ef0b598f5ee6ca349666c1712",
+    "server-version/backend/src/modules/cognitive/content-candidates/ant/scorer.ts": "193c468841a6e71cc52470f0d327290830a9be377307d1841454e017be7dd856"
+  },
+  "coreSourceScope": {
+    "newRuntimeReachability": "none; no product registry imports changed",
+    "nativeDefinitions": [
+      "enumeration/0.1.0/0.1.0",
+      "continuous-recognition/0.1.0/0.1.0",
+      "ant/1.0.0/1.0.0"
+    ],
+    "actualScorerProductScoreAdded": false,
+    "legacyAdapterAdded": false,
+    "standardAliasAdded": false
+  },
+  "evidenceReuseNotes": [
+    "Enumeration retained first20 pass assertions; corrected failed budget fixture plus added independent PRNG vector2 passed; owner reconstructed original test hash.",
+    "Recognition original43 retained verbatim prefix; new native41 selected, originals43 skipped; original test snapshot hash verified.",
+    "ANT second scoped run40 contains some unnecessary repeats of unchanged protocol/schema cases; explicitly retained as deviation in owner evidence. New interruption-cap boundary1 ran alone.",
+    "Original failures, tool preparation mistakes and empty selection were preserved, never counted as passing cases."
+  ]
+}

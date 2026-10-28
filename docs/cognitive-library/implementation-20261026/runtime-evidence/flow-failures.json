@@ -1,0 +1,27 @@
+{
+  "attempt1": {
+    "status": "failed",
+    "lastAssertion": "expected interpretable heading timed out after 30000ms",
+    "rootCauseAtThatPoint": "not yet determined; fixture route placement was suspected"
+  },
+  "attempt2": {
+    "status": "terminated",
+    "reason": "driver rewrite failed; an old driver was started and stopped; no success claimed"
+  },
+  "attempt3": {
+    "status": "failed",
+    "evidence": "browser-flow-debug.json retains 9 complete core/raw records",
+    "diagnosis": "native scorer rejected browser-generated trigonometric values differing from Node by at most 8.881784197001252e-16",
+    "productFix": "1e-12 absolute tolerance on x/y/vx/vy only; exact ID/condition/target-order and strict hit tests remain",
+    "backendReplay": "browser-authoritative-result.json: interpretable, 9 valid, mean 5"
+  },
+  "continuation": {
+    "status": "passed",
+    "evidence": "browser-flow.json",
+    "reusedFormalRecords": true,
+    "formalTrialsRecaptured": false,
+    "practiceTrials": 2,
+    "description": "restored captured records into synthetic IndexedDB fixture; verified final upload-failure retry, real native scorer and report binding"
+  },
+  "realProductApiDbCosVerified": false
+}

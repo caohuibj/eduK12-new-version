@@ -49,6 +49,8 @@ const profile = (
 })
 
 export const COGNITIVE_READINESS_PROFILES: readonly CognitiveReadinessProfile[] = [
+  {...profile('mot', 'visuospatial', {globalKeyboardCapture:true, resumeReason:'沿用MOT耐久试次边界恢复；已曝光未完整记录的试次不得重放。'}), engineVersion:'1.1.1'},
+  {...profile('enumeration','staged',{resumeReason:'持久化曝光预约后仅恢复保存原记录，不重复呈现；换realm结束原序列。'}),engineVersion:'0.2.0'},
   profile('fake', 'fixed-trial'),
   profile('reaction', 'timed-response', { globalKeyboardCapture: true }),
   profile('memory', 'adaptive', { globalKeyboardCapture: true, resumeReason: '数字广度层级/自适应状态未作为独立安全断点持久化。' }),

@@ -1,0 +1,42 @@
+{
+  "artifactKind": "POST_SNAPSHOT_COPY_AND_STOPPED_SAVE_FIX_HANDOFF",
+  "createdUtc": "2026-10-26T07:53:41.221073+00:00",
+  "parentAuditSnapshot": "94152032885d5cbaf149a15ec03d5a0c72ea2c67",
+  "branch": "cognitive-next-three-core-20261026",
+  "allAgentsStoppedWriting": true,
+  "changeClassification": {
+    "participantCopy": "presentation text/diagnostic disclosure only; no metric,unit,denominator,aggregation,stimulus or timing change",
+    "antSaveFix": "compatible recovery behavior after an already terminated attempt; same interruption reason/raw/digest, retry becomes reachable; no exposure restarts",
+    "timingProposal": "documentation and descriptive boundary contract only; not implemented; substantive policy still requires review and explicit user approval",
+    "versions": "No new production normVersion/overall tuple or published package created. Candidate source commits remain exact evidence; actual native release and report/presentation freeze consumer compatibility remains pending."
+  },
+  "typesEvidence": "frontend-copy-types.json",
+  "typesExitCode": 0,
+  "typeRootHashesStillMatch": true,
+  "backend16FilesUnchanged": true,
+  "enumerationRuntimeTimingUnchangedSince9415203": true,
+  "original25RawSha256": "92ce9ca47badb38c0af37e28c4ee497ecf3c5863c4c752a4c7f26290ccace132",
+  "independentCoordinatorDirectFinding": {
+    "status": "direct software threshold path independently reviewed, not full candidate qualification",
+    "observation": "Seven cases have third-interval elapsed49.9<50, hence a fourth stimulus draw, followed by mask at66.6. Existing16.6–16.7 intervals do not support main-thread stall attribution. No physical pixel duration measured."
+  },
+  "newEvidence": {
+    "enumeration": "copy-and-timing-20261026:85 state assertions/17 screenshots; only existing raw read for diagnosis;10 descriptive proposal examples, not executable test passes",
+    "recognition": "participant-copy:14 state/reading browser checks; Task/Report changed; nonrender logic unchanged",
+    "ant": "32 distinct frontend test cases; new late-save failure reproduced once then3 affected cases passed;11 copy browser checks and2 late-save states; final frontend evidence written"
+  },
+  "proposal": "docs/cognitive-library/next-candidates-20261026/enumeration/implementation/frontend/copy-and-timing-20261026/timing-proposal.json",
+  "futureFrameRuntimeChanged": false,
+  "newFormalProfilesOrDurationsAdded": false,
+  "independentAuditApprovedAllCandidates": false,
+  "formalAdministrationOrImportComplete": false,
+  "ciActivated": false,
+  "merged": false,
+  "deployed": false,
+  "reviewFollowups": [
+    "Independent review and explicit approval of new frame-quantization/actual-draw/gap/unsupported-cadence policy before implementation",
+    "Enumeration formal running progress counter should be reconciled with the approved minimal stimulus UI/no dynamic progress rule; not changed during copy-only step",
+    "Real hardware/browsers/Chinese-English comprehension/population validity remain unverified",
+    "Native registration/profiles/host durability/FINAL/API/DB/COS/4entrance/export/tag persistence remain unresolved"
+  ]
+}

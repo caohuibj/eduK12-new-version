@@ -1,0 +1,55 @@
+{
+  "command": [
+    "/workspace/eduk12-cloud/tools/node_modules/node/bin/node",
+    "/workspace/eduK12-new-version/server-version/backend/node_modules/typescript/bin/tsc",
+    "--project",
+    "/workspace/eduK12-new-version/docs/cognitive-library/next-candidates-20261026/enumeration/implementation/recipe-config-20261026/types-tsconfig.json",
+    "--pretty",
+    "false"
+  ],
+  "cwd": "/workspace/eduK12-new-version/server-version/backend",
+  "exitCode": 2,
+  "durationSeconds": 16.67375485600496,
+  "executedAt": "2026-10-26T13:22:42.095265+00:00",
+  "roots": [
+    "src/modules/cognitive/content-candidates/enumeration/scorer.ts",
+    "src/modules/cognitive/content-candidates/enumeration/report.ts",
+    "src/modules/cognitive/content-candidates/enumeration/protocol.ts",
+    "src/modules/cognitive/content-candidates/enumeration/metadata.ts",
+    "src/modules/cognitive/content-candidates/enumeration/trial-envelope.ts",
+    "src/modules/cognitive/content-candidates/enumeration/package.ts",
+    "src/modules/cognitive/content-candidates/enumeration/schema.ts",
+    "src/modules/cognitive/content-candidates/native-registry/definitions.ts",
+    "src/modules/cognitive/task-resource.ts",
+    "src/__tests__/cognitive/enumeration-recipe-config.test.ts",
+    "src/middleware/auth.ts"
+  ],
+  "rootSha256Before": {
+    "src/modules/cognitive/content-candidates/enumeration/scorer.ts": "2eec4bce079bd62b02c7d28216e0ba037cf609ffc36044af7bd29c445a732380",
+    "src/modules/cognitive/content-candidates/enumeration/report.ts": "229c2516025b597a9b55176d8167624c0c5d66d5c8d333348e1f3a1d6b824a1f",
+    "src/modules/cognitive/content-candidates/enumeration/protocol.ts": "3c947be5c15444357fb01f556cd9cafa70bc976dd87ab39de6672cf7eb629a31",
+    "src/modules/cognitive/content-candidates/enumeration/metadata.ts": "ab0d18d6921cb5563ab6b7a24f9ee10b76dbb1769c79c533526a08067e420797",
+    "src/modules/cognitive/content-candidates/enumeration/trial-envelope.ts": "87bb3ec491005ebbfb6419a778f598ffafa29e503e49414c29398d4e2c12afbd",
+    "src/modules/cognitive/content-candidates/enumeration/package.ts": "f64af471b077debd4d09a1d767c93b81caf1efa32fe7c3cf4b42a10a58488bd1",
+    "src/modules/cognitive/content-candidates/enumeration/schema.ts": "32fc4b1e9341dda311b5a673a1ed9bfab90b0ec6a94e4ff32cbcd3c4debc0de1",
+    "src/modules/cognitive/content-candidates/native-registry/definitions.ts": "34eb50e30dbb64b1bd1bd6b4173d07c6c0c86c09bf6785e86f8f26b9d8823f92",
+    "src/modules/cognitive/task-resource.ts": "38ad1b05aad305d7bc0c66ce7d9b480b56f5503de0150915d42254911b4e0dff",
+    "src/__tests__/cognitive/enumeration-recipe-config.test.ts": "cbb03507c3ec2547a07e8de5520ec6f1143e16aa743a2fe1b0cc30301ee6181e",
+    "src/middleware/auth.ts": "63a53c9e448f7b171a0139d9ae9491694bbf3b94cfe07bfc586c37242901b214"
+  },
+  "rootSha256After": {
+    "src/modules/cognitive/content-candidates/enumeration/scorer.ts": "2eec4bce079bd62b02c7d28216e0ba037cf609ffc36044af7bd29c445a732380",
+    "src/modules/cognitive/content-candidates/enumeration/report.ts": "229c2516025b597a9b55176d8167624c0c5d66d5c8d333348e1f3a1d6b824a1f",
+    "src/modules/cognitive/content-candidates/enumeration/protocol.ts": "3c947be5c15444357fb01f556cd9cafa70bc976dd87ab39de6672cf7eb629a31",
+    "src/modules/cognitive/content-candidates/enumeration/metadata.ts": "ab0d18d6921cb5563ab6b7a24f9ee10b76dbb1769c79c533526a08067e420797",
+    "src/modules/cognitive/content-candidates/enumeration/trial-envelope.ts": "87bb3ec491005ebbfb6419a778f598ffafa29e503e49414c29398d4e2c12afbd",
+    "src/modules/cognitive/content-candidates/enumeration/package.ts": "f64af471b077debd4d09a1d767c93b81caf1efa32fe7c3cf4b42a10a58488bd1",
+    "src/modules/cognitive/content-candidates/enumeration/schema.ts": "32fc4b1e9341dda311b5a673a1ed9bfab90b0ec6a94e4ff32cbcd3c4debc0de1",
+    "src/modules/cognitive/content-candidates/native-registry/definitions.ts": "34eb50e30dbb64b1bd1bd6b4173d07c6c0c86c09bf6785e86f8f26b9d8823f92",
+    "src/modules/cognitive/task-resource.ts": "38ad1b05aad305d7bc0c66ce7d9b480b56f5503de0150915d42254911b4e0dff",
+    "src/__tests__/cognitive/enumeration-recipe-config.test.ts": "cbb03507c3ec2547a07e8de5520ec6f1143e16aa743a2fe1b0cc30301ee6181e",
+    "src/middleware/auth.ts": "63a53c9e448f7b171a0139d9ae9491694bbf3b94cfe07bfc586c37242901b214"
+  },
+  "rootsStable": true,
+  "ciExecuted": false
+}

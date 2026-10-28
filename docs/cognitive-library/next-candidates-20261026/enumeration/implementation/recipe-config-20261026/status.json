@@ -1,0 +1,54 @@
+{
+  "status": "RECIPE_AND_EXACT_TUPLE_CANDIDATE_NOT_DELIVERY",
+  "baseHead": "efe32ed793976bb9364d6694e8fd90ed15379007",
+  "sourceSha256": {
+    "server-version/backend/src/modules/cognitive/content-candidates/enumeration/metadata.ts": "ab0d18d6921cb5563ab6b7a24f9ee10b76dbb1769c79c533526a08067e420797",
+    "server-version/backend/src/modules/cognitive/content-candidates/enumeration/package.ts": "6a6f02c6090c60b0e483c34744a0da552904623e370ef45e3d8b5da35535dac0",
+    "server-version/backend/src/modules/cognitive/content-candidates/enumeration/protocol.ts": "3c947be5c15444357fb01f556cd9cafa70bc976dd87ab39de6672cf7eb629a31",
+    "server-version/backend/src/modules/cognitive/content-candidates/enumeration/report.ts": "229c2516025b597a9b55176d8167624c0c5d66d5c8d333348e1f3a1d6b824a1f",
+    "server-version/backend/src/modules/cognitive/content-candidates/enumeration/schema.ts": "32fc4b1e9341dda311b5a673a1ed9bfab90b0ec6a94e4ff32cbcd3c4debc0de1",
+    "server-version/backend/src/modules/cognitive/content-candidates/enumeration/scorer.ts": "2eec4bce079bd62b02c7d28216e0ba037cf609ffc36044af7bd29c445a732380",
+    "server-version/backend/src/modules/cognitive/content-candidates/native-registry/definitions.ts": "34eb50e30dbb64b1bd1bd6b4173d07c6c0c86c09bf6785e86f8f26b9d8823f92",
+    "server-version/backend/src/modules/cognitive/task-resource.ts": "38ad1b05aad305d7bc0c66ce7d9b480b56f5503de0150915d42254911b4e0dff",
+    "server-version/backend/src/__tests__/cognitive/enumeration-recipe-config.test.ts": "053d72bd46ee26236148ffaee5a03860093e8db8ef607dbb51faf64acff1d594",
+    "server-version/backend/src/__tests__/cognitive/v2-native-registry.test.ts": "01c6847425d975abebda50b9126879840ea58539f9f05cd94b4cc72af371dda0",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/generated/protocol.ts": "4b7ff685b4b899435c2028ff2e9a90f85af569f302ffee53d265c297403502fe",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/generated/report.ts": "b74995c7a872811c2bd7fa08f4e7f7bc8a4b09b5def64c03f0df2f6c0bacc373"
+  },
+  "checks": {
+    "newCases": 7,
+    "oldInventoryConsumer": 1,
+    "newInitialReport": "tests-run1.json",
+    "changedFreezeContinuation": "freeze-and-inventory-followup.json (only passed freeze case; other suite setup failed)",
+    "inventoryContinuation": "inventory-continued.json",
+    "backendTypes": "types-parent-run3-receipt.json exit0",
+    "generatedCheck": "enumeration-content.cjs --check exit0"
+  },
+  "versions": {
+    "old": [
+      "0.1.0",
+      "0.2.0",
+      "0.2.0"
+    ],
+    "new": [
+      "0.2.0",
+      "0.2.0",
+      "0.3.0"
+    ],
+    "order": "engine/scorer/config"
+  },
+  "notRun": [
+    "old scorer full suite",
+    "database",
+    "browser/timing",
+    "COS",
+    "CI"
+  ],
+  "notImplemented": [
+    "seed",
+    "delivery admission",
+    "native frontend host",
+    "enum COS archive"
+  ],
+  "failurePreservation": "Initial types and parent type/fixture environment/import failures remain separate; no failed job relabelled."
+}

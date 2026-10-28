@@ -1,0 +1,95 @@
+{
+  "kind": "CONTENT_DEVELOPMENT_STEP_NOT_RUNTIME_ACTIVATION",
+  "capturedAt": "2026-10-27T01:07:02.480590+00:00",
+  "parentHead": "131d0132ca83266b2584a842fe0c3dc2fbeca629",
+  "sourceSnapshot": "after targeted execution; no source edits between execution and capture; not signed execution provenance",
+  "classification": {
+    "recognitionBinding": "backward-compatible content bug fix; no schema/scorer/protocol change; old frozen snapshots untouched; future authorized base binding survives profile merge",
+    "metadataAndTags": "content extension and status wording; no runtime or discovery authorization"
+  },
+  "sources": [
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/continuous-recognition/package.ts",
+      "sha256": "808c7fcba1bc42f5f923606d49cf7095a0494244e7bc338421915d03c4f19026"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/enumeration/metadata.ts",
+      "sha256": "78bf7953ffc09280186b76dacfc2e3f1cad46e40bb6be59fbe8c995c091beb04"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/enumeration/package.ts",
+      "sha256": "36ff4d1e06ce0cee687ccd4440015fba5e2b9dc53062a09888a44f0b0da451a7"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/mot/metadata.ts",
+      "sha256": "e6e7d7f740d1cb510e454f9fd54dd6d332c7e100a4b466b212dede31135e29ba"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/mot/package.ts",
+      "sha256": "6888cda02a024c3c7046188768cf831508dfeff70929618d256473c4cf96936b"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/enumeration/catalog.ts",
+      "sha256": "3b8beea1fb1a80d900c6252b1d5e4a7221070bddb32c2140ddbc5c1ee4ef29d8"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/cognitive/enumeration-catalog-projection.test.ts",
+      "sha256": "0d5c7eceaaa9965cfcd72deb753d3ecffd454401328469e92057c2d48bebd14e"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/cognitive/recognition-profile-binding.test.ts",
+      "sha256": "4eabbbe77da6938655ebc80e8af2a2427548d995618645c0b7276ac9896d48ff"
+    },
+    {
+      "path": "server-version/backend/tsconfig.json",
+      "sha256": "c79ccf595a80514e94936f1ffcd2fa09b57265f0c140d275c81770f494175143"
+    },
+    {
+      "path": "server-version/backend/package-lock.json",
+      "sha256": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450"
+    },
+    {
+      "path": "server-version/backend/vitest.config.ts",
+      "sha256": "26b98b70914617771d41657be8cdf6d7b6d7024c81d1c8a49aeae6a9220cf93b"
+    }
+  ],
+  "execution": {
+    "location": "cloud /workspace/eduK12-new-version/server-version/backend",
+    "node": "24.21.0",
+    "dependencies": "reused existing cloud installation; no reinstall or full byte-level provenance claimed",
+    "unit": {
+      "files": [
+        "src/__tests__/cognitive/recognition-profile-binding.test.ts",
+        "src/__tests__/cognitive/enumeration-catalog-projection.test.ts"
+      ],
+      "maxWorkers": 1,
+      "passed": 6,
+      "failed": 0,
+      "pending": 0,
+      "raw": "unit-original.json"
+    },
+    "types": {
+      "config": "tsconfig.json",
+      "roots": 6,
+      "sources": 1002,
+      "diagnostics": 0,
+      "raw": "types-original.json"
+    }
+  },
+  "notRun": [
+    "Existing unrelated MOT/enumeration/recognition scorer or browser checks",
+    "Frontend checks (frontend unchanged)",
+    "Database/server startup",
+    "External COS",
+    "Full App/CSRF",
+    "Physical devices",
+    "research100 browser journey",
+    "CI",
+    "Merge/deploy/activate"
+  ],
+  "tagState": {
+    "persisted": false,
+    "globalSearchConnected": false,
+    "meaning": "Content projection only; no API/schema/database changes"
+  }
+}

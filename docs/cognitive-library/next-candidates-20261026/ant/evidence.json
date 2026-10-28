@@ -1,0 +1,249 @@
+{
+  "artifactKind": "STATIC_DESIGN_BROWSER_REVIEW_NOT_RUNTIME_OR_SCIENTIFIC_VALIDATION",
+  "candidateId": "attention-ant-pebl",
+  "status": "DESIGN_PROPOSAL",
+  "sourceSnapshot": "22721e5c63dd78819e8c58921adf20157cdaa08c",
+  "upstream": "eb22a0725d765a0597a4905920ad3c603b1c9ae8",
+  "environment": {
+    "location": "cloud Linux workspace",
+    "browser": "151.0.7922.173",
+    "chromiumSandbox": true,
+    "node": "v24.21.0",
+    "realUserMacUsed": false
+  },
+  "checks": {
+    "phone390x844": true,
+    "tablet820x1180": true,
+    "horizontalOverflow": false,
+    "englishReadingAt200Percent": true,
+    "keyboardArrowDemonstration": true,
+    "limitedHidesAffectedMetrics": true,
+    "invalidNoPerformanceConclusion": true,
+    "externalRequestsBlocked": true,
+    "staticPrototypeOnly": true
+  },
+  "measurements": [
+    {
+      "name": "intro-390",
+      "width": 390,
+      "scrollWidth": 390,
+      "field": null
+    },
+    {
+      "name": "cue-390",
+      "width": 390,
+      "scrollWidth": 390,
+      "field": {
+        "x": 20,
+        "y": 238,
+        "width": 350,
+        "height": 280,
+        "top": 238,
+        "right": 370,
+        "bottom": 518,
+        "left": 20
+      }
+    },
+    {
+      "name": "target-390",
+      "width": 390,
+      "scrollWidth": 390,
+      "field": {
+        "x": 20,
+        "y": 238,
+        "width": 350,
+        "height": 280,
+        "top": 238,
+        "right": 370,
+        "bottom": 518,
+        "left": 20
+      }
+    },
+    {
+      "name": "report-390",
+      "width": 390,
+      "scrollWidth": 390,
+      "field": null
+    },
+    {
+      "name": "neutral-none-390",
+      "width": 390,
+      "scrollWidth": 390,
+      "field": {
+        "x": 20,
+        "y": 238,
+        "width": 350,
+        "height": 280,
+        "top": 238,
+        "right": 370,
+        "bottom": 518,
+        "left": 20
+      }
+    },
+    {
+      "name": "neutral-dash-390",
+      "width": 390,
+      "scrollWidth": 390,
+      "field": {
+        "x": 20,
+        "y": 238,
+        "width": 350,
+        "height": 280,
+        "top": 238,
+        "right": 370,
+        "bottom": 518,
+        "left": 20
+      }
+    },
+    {
+      "name": "limited-390",
+      "width": 390,
+      "scrollWidth": 390,
+      "field": null
+    },
+    {
+      "name": "invalid-390",
+      "width": 390,
+      "scrollWidth": 390,
+      "field": null
+    },
+    {
+      "name": "intro-en-390",
+      "width": 390,
+      "scrollWidth": 390,
+      "field": null
+    },
+    {
+      "name": "intro-en-200percent",
+      "width": 390,
+      "scrollWidth": 390,
+      "field": null
+    },
+    {
+      "name": "report-en-200percent",
+      "width": 390,
+      "scrollWidth": 390,
+      "field": null
+    },
+    {
+      "name": "intro-820",
+      "width": 820,
+      "scrollWidth": 820,
+      "field": null
+    },
+    {
+      "name": "target-820",
+      "width": 820,
+      "scrollWidth": 820,
+      "field": {
+        "x": 60,
+        "y": 174,
+        "width": 700,
+        "height": 340,
+        "top": 174,
+        "right": 760,
+        "bottom": 514,
+        "left": 60
+      }
+    },
+    {
+      "name": "report-820",
+      "width": 820,
+      "scrollWidth": 820,
+      "field": null
+    }
+  ],
+  "shots": [
+    {
+      "file": "intro-390.png",
+      "sha256": "c6e9f6bd5047e1cf0f3feacbc721c66e332078768b45eef2a07d948b47e6dbb8"
+    },
+    {
+      "file": "cue-390.png",
+      "sha256": "ccf9614a5c95fa950dd0a85a87ad678e9e12a2ac27490a3c6be20fe8c963e1ba"
+    },
+    {
+      "file": "target-390.png",
+      "sha256": "624e48ed56c392de5755c75876997bbeed653e397bf017aa954da6174c1a52cb"
+    },
+    {
+      "file": "report-390.png",
+      "sha256": "a9160e10ee87cd74b57ce3621efd147edaffdd93e2fa30c9077a899748be8ef7"
+    },
+    {
+      "file": "neutral-none-390.png",
+      "sha256": "3e13e32e8f635a9406ac6eee680352834f265f84da1289f6e9a2d7d7ce4f76c4"
+    },
+    {
+      "file": "neutral-dash-390.png",
+      "sha256": "49a531d6344b695032b3d6fb0547783844ae6e17e887233c9147c8e8fe1501ee"
+    },
+    {
+      "file": "limited-390.png",
+      "sha256": "9f9af66c0f06912c836b74f693d16adb9c92bf58c368ee51350836239b89ea28"
+    },
+    {
+      "file": "invalid-390.png",
+      "sha256": "49bb00924bb9638cbce416b3024d50e7e561b2119d820380c103214fdaedf353"
+    },
+    {
+      "file": "intro-en-390.png",
+      "sha256": "b1aa0d89609b77c9ac869d237e0f5f1513ccab0705d3469cbe87c037b25efbbb"
+    },
+    {
+      "file": "intro-en-200percent.png",
+      "sha256": "0c838ba50a18b1e06218ff0e84315d290cfd01a5b60a8b49fc9200a5d47161ba"
+    },
+    {
+      "file": "report-en-200percent.png",
+      "sha256": "470938cdc3ac36a3aff596d9e8e351bc7eff22a803f7eba3f229f7ab95c47067"
+    },
+    {
+      "file": "intro-820.png",
+      "sha256": "24484a80fba9c8717e1d33e7af54d958a31ed001c9124620523cb1a11681c932"
+    },
+    {
+      "file": "target-820.png",
+      "sha256": "968ec07e34c8b72b11995af5e667cab9b9592bfcdc1e88fe6df15fe68a04c04f"
+    },
+    {
+      "file": "report-820.png",
+      "sha256": "cf834102a29947316c2f2aa1adf2ee892f53af5834596ac27ef63fd6cee443bd"
+    },
+    {
+      "file": "review.png",
+      "sha256": "bf20483844cbd45f2bbe5f87298bbfb3486ba722efadbeca1d0655700c6ede73"
+    }
+  ],
+  "sourceHashes": [
+    {
+      "file": "README.md",
+      "sha256": "a56f7b8e22650ce61422ad73a1178faf4bc6e002bf9f6608a00c0be9d78e8963"
+    },
+    {
+      "file": "design.json",
+      "sha256": "6452c905ca5f915b8d200f1674d54367e1c0d4ea5fac4f97df397f5b6557081f"
+    },
+    {
+      "file": "preview.html",
+      "sha256": "9fd745f37c81eed3c0ab070db084e38415f3eb58d4a8f410b6e560c0667e4f5f"
+    }
+  ],
+  "captureScriptSha256": "2794490984308bbbc251676e81fbdc0829b2477002b8b4ffa887b9bc87ef5337",
+  "unverified": [
+    "Actual 100ms/1700ms and physical display timing",
+    "Actual calibrated visual angles and target device motor equivalence",
+    "Real product four-entrance theme isolation and consumers",
+    "Seeded sequence/runtime/scorer/data persistence",
+    "Chinese/English comprehension and age/population validity",
+    "48-trial experience reliability, sufficiency gates, norms",
+    "Licensing of any future reused external component"
+  ],
+  "documentationFollowup": {
+    "description": "After rendering, clarified orienting/conflict denominators and practice sampling provenance in design.json only; preview.html, images and rendered checks were unchanged. No rerender needed for documentation-only change.",
+    "currentDesignSha256": "6452c905ca5f915b8d200f1674d54367e1c0d4ea5fac4f97df397f5b6557081f"
+  },
+  "manualVisualReview": [
+    "review.png inspected for guidance, target/response layout and single optional report graphic"
+  ]
+}

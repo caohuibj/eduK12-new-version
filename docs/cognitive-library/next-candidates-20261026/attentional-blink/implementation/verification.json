@@ -1,0 +1,95 @@
+{
+  "date": "2026-10-27",
+  "execution": "cloud; Node24.21.0; existing dependencies",
+  "scope": "Content-only blink research200 / experience50, practice6 pass5. Integration and final tests deferred by user.",
+  "distinctRuntimeTargets": 6,
+  "tests": {
+    "backend-original": {
+      "success": true,
+      "numPassedTests": 3,
+      "numFailedTests": 0,
+      "numPendingTests": 0
+    },
+    "frontend-original": {
+      "success": true,
+      "numPassedTests": 3,
+      "numFailedTests": 0,
+      "numPendingTests": 0
+    },
+    "frontend-affected": {
+      "success": true,
+      "numPassedTests": 1,
+      "numFailedTests": 0,
+      "numPendingTests": 2
+    }
+  },
+  "types": {
+    "backend": {
+      "config": "tsconfig.json",
+      "roots": [
+        "src/modules/cognitive/content-candidates/attentional-blink/package.ts",
+        "src/modules/cognitive/content-candidates/attentional-blink/participant-presentation.ts",
+        "src/__tests__/cognitive/attentional-blink-content.test.ts"
+      ],
+      "sourceCount": 50,
+      "diagnostics": []
+    },
+    "frontend": {
+      "config": "tsconfig.app.json",
+      "roots": [
+        "src/modules/cognitive/tasks/attentional-blink/AttentionalBlinkTask.tsx",
+        "src/modules/cognitive/tasks/attentional-blink/content.test.tsx",
+        "src/test/setup.ts",
+        "src/vite-env.d.ts"
+      ],
+      "sourceCount": 60,
+      "diagnostics": []
+    }
+  },
+  "sourceSha256": {
+    "server-version/backend/src/__tests__/cognitive/attentional-blink-content.test.ts": "ae3ac088e69cec4a7b29d6d9ce36e11d7fe85286029826f44ee8d6cf87362099",
+    "server-version/backend/src/modules/cognitive/content-candidates/attentional-blink/analysis.ts": "163e40ed2e6c363c6554bfe0cf894285ce9cfffb1c739851ec452c0a6db3e3d9",
+    "server-version/backend/src/modules/cognitive/content-candidates/attentional-blink/font.ts": "5bc8f11e0035f13698278bcb838ad49094f7e3cde89529920412c8a6ddc81970",
+    "server-version/backend/src/modules/cognitive/content-candidates/attentional-blink/metadata.ts": "ba8fed24b896aef968df3c687590301d3fa7f9085bb8d0696f9ef941522c6231",
+    "server-version/backend/src/modules/cognitive/content-candidates/attentional-blink/package.ts": "a471cd45cddf4983b413fd59ee2a4be81ad703bd147503d92f80fb08ac65bde2",
+    "server-version/backend/src/modules/cognitive/content-candidates/attentional-blink/participant-presentation.ts": "c9eae354e7352d3e30ec9f7b48a0512cf086e894692721f3e23fc5e4900f7016",
+    "server-version/backend/src/modules/cognitive/content-candidates/attentional-blink/protocol.ts": "138e5083cad7d220a5afb95f9890836f25733c9081531e2c4dbf9a91a3660073",
+    "server-version/backend/src/modules/cognitive/content-candidates/attentional-blink/report.ts": "2f7c38450c995af8e548211d8f846df8d6a5fbaf8bcb7aad7ffd4a4b1d6dcaac",
+    "server-version/backend/src/modules/cognitive/content-candidates/attentional-blink/schema.ts": "98852ba94b2e6d7a3b90dd772b00c90475fd45e8b7359c59c88814e4431adcd4",
+    "server-version/backend/src/modules/cognitive/content-candidates/attentional-blink/scorer.ts": "294fe4ec916563bf7101c96947a5f1e1b5a6b7e37047ad22197ac3b0758728c2",
+    "server-version/frontend/src/modules/cognitive/tasks/attentional-blink/AttentionalBlinkTask.tsx": "2170f34605f0eed95274f07512505d86a3392a0445e6dee9a7e2adc0ab68f396",
+    "server-version/frontend/src/modules/cognitive/tasks/attentional-blink/BlinkInstructions.tsx": "b8c71af164c657ec60ea2d6cacf90de88d8a7427a3ec9c8c7e9ae85b6e74f8df",
+    "server-version/frontend/src/modules/cognitive/tasks/attentional-blink/BlinkReport.tsx": "1df6dd94223c2b6b556a12569c48e7e42076feefac4c7e4381fd90c85df120bc",
+    "server-version/frontend/src/modules/cognitive/tasks/attentional-blink/assets/FONT-LICENSE.txt": "f32df582a2aab128c07b2f7e36e7b928dc5f6bd82657b905c04f91459f9e5cf9",
+    "server-version/frontend/src/modules/cognitive/tasks/attentional-blink/assets/LiberationSans-Regular.ttf": "bade59d822652f76e6941aa87b40a87c13d1cc70db98ededb5011127efafd1d3",
+    "server-version/frontend/src/modules/cognitive/tasks/attentional-blink/blink.css": "393f46bd176b6b456a99cd8113ff63f99abcc48f507b8935f13616ff0cc47552",
+    "server-version/frontend/src/modules/cognitive/tasks/attentional-blink/capture.ts": "2789d07d46be161b0cfff1dc72a8fbce3ab98136c78284c7759e216576de8a76",
+    "server-version/frontend/src/modules/cognitive/tasks/attentional-blink/content.test.tsx": "0963b91b1fef0669a2d252e7ba945b1ec600d1e988084e92a4e730d884bc7b70",
+    "server-version/frontend/src/modules/cognitive/tasks/attentional-blink/contracts.ts": "e7a96687d8bdfd6a02ac937264212cc7cb56a8d3d410203688591e774c852bd5",
+    "server-version/frontend/src/modules/cognitive/tasks/attentional-blink/font-loader.ts": "aabd5db782bb0e03b04ef9dd2337cbdd17e3b1bccf9918c75517d089f2bcc755",
+    "server-version/frontend/src/modules/cognitive/tasks/attentional-blink/generated/analysis.ts": "3d57a4af7c29e4606c2fc21ea64b7e86d559fd58c51b50ee1f7df736744613c7",
+    "server-version/frontend/src/modules/cognitive/tasks/attentional-blink/generated/font.ts": "bad8df4050fb17a254237432bf1bee46657ff7d1c54b5618a6f608879d865ba7",
+    "server-version/frontend/src/modules/cognitive/tasks/attentional-blink/generated/protocol.ts": "6b5e90dc15d570a6743035122cabf13826c75b30ae98b339c981c591d4a069b0",
+    "server-version/frontend/src/modules/cognitive/tasks/attentional-blink/generated/report.ts": "cb144b8fb62ec66ba174b5b6265f732e7c2a39c87bbd4049ffd18d315ec6bc3c",
+    "server-version/frontend/src/modules/cognitive/tasks/attentional-blink/session.ts": "d0c70acefd37f049a07e60ea80547f551537bb3fb8d47107cccdce46166b5692",
+    "server-version/scripts/cognitive/blink-content.cjs": "21363e53828e4c748ce3dbecdf940d9461f59ab82c74406a678863f62685c4db"
+  },
+  "notRun": [
+    "product registry/admission/seed",
+    "actual browser FontFace and physical timing",
+    "real IndexedDB durability",
+    "real HTTP/core/report readback",
+    "COS",
+    "full App/physical devices",
+    "research200 browser journey",
+    "CI",
+    "deployment"
+  ],
+  "approvedDesignPngSha256": "3f65e2bdbd56748d18f711f1990399c44980f9aaa6f2cf6298aad857d30af80d",
+  "verificationNotes": [
+    "First six runtime targets passed; initial actual-config backend/frontend type closures had zero diagnostics.",
+    "Independent review found the formal draft round could inherit practice retry round. Replaced draft metadata/key round with the frozen plan.round; rechecked only the one frontend full50 target with two six-item practice rounds, then final frontend type closure. Same six distinct targets, not seven.",
+    "The capture-only target never executes session draft construction; the React failure/retry target executes only practice where session.round equals plan.round. Their first-run passing results remain applicable. Backend source/type inputs were unchanged.",
+    "Final type source SHA256 values verified. Synthetic software clocks, mock font loader and in-memory ports are not browser FontFace, physical exposure or durable product-integration evidence."
+  ]
+}

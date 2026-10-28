@@ -1,0 +1,109 @@
+{
+  "status": "READY_FOR_PARENT_INDEPENDENT_REVIEW",
+  "base": "d00fa0965245f456ff565a51d9e39f4569c13f90",
+  "scope": "MOT C-02 async host ownership and unmount retention only",
+  "sourceSha256": {
+    "server-version/frontend/src/modules/cognitive/tasks/mot/MotTask.tsx": "0b97f2b08a1e68c80a7504f701699f25beac88ed73e27adb3873a58636fa4325",
+    "server-version/frontend/src/modules/cognitive/tasks/mot/context-retention.ts": "6cd4d85f791059f0472a53dd57f5da7597c5e46901697cd799057b4eb1e89ca2",
+    "server-version/frontend/src/modules/cognitive/tasks/mot/MotTask.context.test.tsx": "6c1b71547ed92195acd3da28604f0a98205e996855132c93e9acaa96007cda94"
+  },
+  "types": {
+    "exitCode": 0,
+    "elapsedSeconds": 1.6972133769995708,
+    "sourceHashesMatchFinal": true,
+    "actualConfig": "server-version/frontend/tsconfig.app.json",
+    "roots": 3
+  },
+  "checks": {
+    "context-run1": {
+      "exitCode": 1,
+      "durationSeconds": 1.3301047870008915,
+      "passed": 0,
+      "failed": 0,
+      "pending": 0,
+      "success": false
+    },
+    "context-run2": {
+      "exitCode": 0,
+      "durationSeconds": 1.3806355980013905,
+      "passed": 10,
+      "failed": 0,
+      "pending": 0,
+      "success": true
+    },
+    "context-run3-new-windows": {
+      "exitCode": 0,
+      "durationSeconds": 1.2813336250001157,
+      "passed": 2,
+      "failed": 0,
+      "pending": 10,
+      "success": true
+    }
+  },
+  "distinctSuccessfulNewCases": 12,
+  "firstFailure": "test-fixture transform ASI error, zero cases executed; preserved",
+  "versionsChanged": false,
+  "measurementOrScorerOrFrozenDataContractChanged": false,
+  "retainedContextBudget": 8,
+  "evictsUnsavedRaw": false,
+  "captureFramesBudgetUnchanged": 3000,
+  "memoryIsDurableAcrossRefresh": false,
+  "actualConsumerRead": "server-version/scripts/cognitive/mot-browser-review.cjs; stable draft, core.trialIndex-based progress; synthetic host only, not rerun",
+  "unchangedSha256": {
+    "server-version/frontend/src/modules/cognitive/tasks/mot/generated/protocol.ts": "7a8fa5c93d3032c86a9156cdc24bde0c019cc4eb4b990f56aaaa9be553c485fb",
+    "server-version/frontend/src/modules/cognitive/tasks/mot/capture.ts": "7a7deeb1e657250f59f54916d5a99d7b768eb7c17d805194a8b897cae03034ea",
+    "server-version/frontend/src/modules/cognitive/tasks/mot/draft.ts": "c1f48de1bcf08b37d04648e949a71ac1f682178a39fdcedf0b625eba16bff77c",
+    "server-version/frontend/src/modules/cognitive/tasks/mot/mot.css": "3c71d70fa7eba2f62d81f05859424075ae3b8f10bcd4b73e19edca2ef324ba90",
+    "server-version/frontend/src/modules/cognitive/tasks/mot/MotCalibration.tsx": "b50b10b92a75ac23d24b4af39c6973eedb8efae5580588ff745669aec218be20",
+    "server-version/frontend/src/modules/cognitive/tasks/mot/save-gate.ts": "40264a4d74d1df47f9587f94ec748106f2611342b6df4f290026c1332b3e35c1"
+  },
+  "unchangedVsBase": {
+    "server-version/frontend/src/modules/cognitive/tasks/mot/generated/protocol.ts": true,
+    "server-version/frontend/src/modules/cognitive/tasks/mot/capture.ts": true,
+    "server-version/frontend/src/modules/cognitive/tasks/mot/draft.ts": true,
+    "server-version/frontend/src/modules/cognitive/tasks/mot/mot.css": true,
+    "server-version/frontend/src/modules/cognitive/tasks/mot/MotCalibration.tsx": true,
+    "server-version/frontend/src/modules/cognitive/tasks/mot/save-gate.ts": true
+  },
+  "notExecuted": [
+    "C-01 tests",
+    "old persistence suite",
+    "full motion/seed/scorer or timing checks",
+    "other candidate types",
+    "browser/device",
+    "CI",
+    "install/build",
+    "API/DB/COS validation"
+  ],
+  "notImplemented": [
+    "production host adapters",
+    "server epoch/exposure/idempotency authority",
+    "cross-tab ownership",
+    "COS uploads",
+    "new scientific or timing gate"
+  ],
+  "committedByThisAgent": false,
+  "pushedByThisAgent": false,
+  "developerSelfCheckNotIndependentAudit": true,
+  "evidenceSha256": {
+    "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/mot-context-repair/README.md": "44d2861f0603b880ae325f64fda1d5b95f397c7617ec72f22809dc53a2b3c7df",
+    "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/mot-context-repair/context-run1.check.json": "f6fa704946b2f9e45c3cb0be835b4d5c599dcc71d336aaf18e70d3354c1bbf32",
+    "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/mot-context-repair/context-run1.json": "0d1de0cca14f02ed03b2c8eec20729d8bc97b5db587ab291804f6f6123303906",
+    "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/mot-context-repair/context-run1.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/mot-context-repair/context-run1.stdout.txt": "6ed3063728c39a0a6ba2184458fbefb5c8bb2da7ad0290760910868b786e473d",
+    "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/mot-context-repair/context-run2.check.json": "9632f304f24bf8934706c7d84b0e54a3d3b56dcec83a2f294f54878200df9094",
+    "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/mot-context-repair/context-run2.json": "5687655fc4d3df3697a6941045ef48e0a84b0bf148c3e9d003c1f492e24cfe87",
+    "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/mot-context-repair/context-run2.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/mot-context-repair/context-run2.stdout.txt": "b08b567010a033d6036725ac8ecd4ad72626a3567d8c9736d4266881eaa82aab",
+    "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/mot-context-repair/context-run3-new-windows.check.json": "3fd09740a4cda0d8821aaff1e76096b205d27bfd4ed04589c6d9c4a5b226cac1",
+    "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/mot-context-repair/context-run3-new-windows.json": "e1edb87a1cdff11a05cef6bf8ac82c15a9fb74ca4b9be418279cbe1ead24d749",
+    "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/mot-context-repair/context-run3-new-windows.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/mot-context-repair/context-run3-new-windows.stdout.txt": "e6af2e3268ceeacc2d5d59a39a33fe744410bd3faa7bda21cdd683109b4ea5e0",
+    "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/mot-context-repair/context-types.check.json": "6dad70d341dac704563108f3fea51ef7d73807636236c208a08160b97c2060c8",
+    "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/mot-context-repair/context-types.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/mot-context-repair/context-types.stdout.txt": "afe77dff678707fa9d1c7bc0bb994d5b27e54adcf338ce92ae201a733be71057",
+    "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/mot-context-repair/finalize-evidence.py": "96bc9c6f6765fd236fc39484e27ebbd354673843d8a86a32621902a11ae31398",
+    "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/mot-context-repair/run-check.py": "29ebbb748881a54ba20aabde727ffbbff9278b10153707930701ddd146047e58",
+    "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/mot-context-repair/typecheck.cjs": "067f5e84b18507e4e3f9534168f2d95973da45df827f76148401e8f47fc847f5"
+  }
+}

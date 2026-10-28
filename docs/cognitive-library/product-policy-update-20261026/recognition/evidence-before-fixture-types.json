@@ -1,0 +1,260 @@
+{
+  "candidateId": "continuous-recognition",
+  "kind": "PRODUCT_DESCRIPTIVE_POLICY_UPDATE",
+  "baseCommit": "86adea091270134b5197fb81b76649007596b8f3",
+  "createdUtc": "2026-10-26T09:45:13.251182+00:00",
+  "policySource": {
+    "url": "https://app.notion.com/p/405d27635a3881b2a2d3fecce26d7cb3",
+    "fetchedUtc": "2026-10-26T09:22:25.456Z",
+    "effectiveUtc": "2026-10-26T09:20:00Z",
+    "principle": "Occasional one-frame/ten-ms-scale deviations do not block normal reports or trigger research recalculation."
+  },
+  "checks": [
+    {
+      "kind": "new-backend-policy",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node server-version/backend/node_modules/vitest/vitest.mjs run src/__tests__/cognitive/continuous-recognition-product-policy.test.ts --root server-version/backend --maxWorkers=1 --reporter=json --outputFile=../../docs/cognitive-library/product-policy-update-20261026/recognition/backend-vitest.json",
+      "cwd": "/workspace/eduK12-new-version",
+      "exitCode": 0,
+      "passed": 19,
+      "report": "backend-vitest.json"
+    },
+    {
+      "kind": "new-frontend-report",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node server-version/frontend/node_modules/vitest/vitest.mjs run src/modules/cognitive/tasks/continuous-recognition/product-policy.test.tsx --root server-version/frontend --maxWorkers=1 --reporter=json --outputFile=../../docs/cognitive-library/product-policy-update-20261026/recognition/frontend-vitest.json",
+      "cwd": "/workspace/eduK12-new-version",
+      "exitCode": 0,
+      "passed": 7,
+      "report": "frontend-vitest.json"
+    },
+    {
+      "kind": "initial-backend-types",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/typescript/bin/tsc --noEmit --strict --target ES2020 --module commonjs --moduleResolution node --esModuleInterop --skipLibCheck src/modules/cognitive/content-candidates/continuous-recognition/native.ts src/modules/cognitive/content-candidates/continuous-recognition/package.ts",
+      "cwd": "/workspace/eduK12-new-version/server-version/backend",
+      "exitCode": 0,
+      "qualification": "Package subsequently gained reportPolicy MetricDefinition; final package closure below supersedes it."
+    },
+    {
+      "kind": "changed-metric-declaration-only",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node server-version/backend/node_modules/vitest/vitest.mjs run src/__tests__/cognitive/continuous-recognition-product-policy.test.ts --root server-version/backend --maxWorkers=1 -t 'declares descriptive' --reporter=json --outputFile=../../docs/cognitive-library/product-policy-update-20261026/recognition/metric-definition-vitest.json",
+      "cwd": "/workspace/eduK12-new-version",
+      "exitCode": 0,
+      "passed": 1,
+      "skipped": 18,
+      "report": "metric-definition-vitest.json"
+    },
+    {
+      "kind": "final-backend-package-types",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/typescript/bin/tsc --noEmit --strict --target ES2020 --module commonjs --moduleResolution node --esModuleInterop --skipLibCheck src/modules/cognitive/content-candidates/continuous-recognition/package.ts",
+      "cwd": "/workspace/eduK12-new-version/server-version/backend",
+      "exitCode": 0,
+      "rootFiles": [
+        {
+          "file": "server-version/backend/src/modules/cognitive/content-candidates/continuous-recognition/package.ts",
+          "sha256": "5a614387a4e5d944a8b5bd5cbd15bcee1ad371898296297ec566e492769fc4c2"
+        }
+      ],
+      "typeClosureKeyFiles": [
+        {
+          "file": "server-version/backend/src/modules/cognitive/content-candidates/continuous-recognition/package.ts",
+          "sha256": "5a614387a4e5d944a8b5bd5cbd15bcee1ad371898296297ec566e492769fc4c2"
+        },
+        {
+          "file": "server-version/backend/src/modules/cognitive/content-candidates/continuous-recognition/native.ts",
+          "sha256": "8780ed5a2d7ec90f14a4f5129c97f1a84fd271197c40c32a39148a4b256d0016"
+        },
+        {
+          "file": "server-version/backend/src/modules/cognitive/content-candidates/continuous-recognition/protocol.ts",
+          "sha256": "f9b724b0bbca7c172089ae1699b311605e1681845a331f192f9afc4de454804b"
+        },
+        {
+          "file": "server-version/backend/src/modules/cognitive/content-candidates/continuous-recognition/scorer.ts",
+          "sha256": "cd3f53ad81d127da6342fe62f91ed7aa52b6c9a665c1484d0895ed7bbb7272ff"
+        }
+      ],
+      "compilerSha256": "2cffde0b8c6760dfb0b5b0382bbb7e00ba6a8b2d981b9205b256a700a481d983",
+      "nodeSha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c",
+      "metadataTextOnlyChangedAfterCheck": true
+    },
+    {
+      "kind": "new-report-browser-only",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node server-version/scripts/cognitive/recognition-product-policy-review.cjs",
+      "cwd": "/workspace/eduK12-new-version",
+      "exitCode": 0,
+      "cases": 6,
+      "report": "browser/report-review.json",
+      "executedHarnessSnapshot": "executed-browser-harness.cjs.txt",
+      "currentHarnessChangeAfterExecution": "Only output directory moved to tmp and bundle SHA metadata; no report/fixture changes."
+    }
+  ],
+  "files": [
+    {
+      "file": "docs/cognitive-library/product-policy-update-20261026/recognition/README.md",
+      "sha256": "58e028cd16a274b2e90d9ad980e40512db896bd21d050fd281ad5cf9f4175384"
+    },
+    {
+      "file": "docs/cognitive-library/product-policy-update-20261026/recognition/backend-vitest.json",
+      "sha256": "dc3163251a5a4f67d8bbfed7a5ab892f2e2c63eb12a5e808c5a0c576258fa59e"
+    },
+    {
+      "file": "docs/cognitive-library/product-policy-update-20261026/recognition/browser/invalid-zh-390.png",
+      "sha256": "2a99b27e9757b99db3078d0a2864a666fc735a348c836dc5d0e7bb454b129f07"
+    },
+    {
+      "file": "docs/cognitive-library/product-policy-update-20261026/recognition/browser/limited-zh-390.png",
+      "sha256": "ed61c5c4bcbfa4b8de92fdbd51ac84494ee01761032cd61f8387c2589339ff83"
+    },
+    {
+      "file": "docs/cognitive-library/product-policy-update-20261026/recognition/browser/negative-zh-390.png",
+      "sha256": "d544ba3f3c70bd208e43d5a5e4ddd12df8fa10b9b41e3a6678f17b2345a19ac1"
+    },
+    {
+      "file": "docs/cognitive-library/product-policy-update-20261026/recognition/browser/normal-en-390.png",
+      "sha256": "05ad2ac5826c03da5ab63132e0f514e3f7ed3f2c31a8f8903acb26d8bc23a9ad"
+    },
+    {
+      "file": "docs/cognitive-library/product-policy-update-20261026/recognition/browser/normal-en-820-200.png",
+      "sha256": "3de61adcc0eedebb3fd30c0965de59b8826de92b2593c95329bd00a6af42d6df"
+    },
+    {
+      "file": "docs/cognitive-library/product-policy-update-20261026/recognition/browser/normal-zh-390.png",
+      "sha256": "997799652694204a57883de69de8a1b33700fa96e8f26d4a76ca406ccdab7d64"
+    },
+    {
+      "file": "docs/cognitive-library/product-policy-update-20261026/recognition/browser/report-review.json",
+      "sha256": "e49cdbe955388e04f1d154effe392b0c9c4fe19dd2385900059776d3f6d03879"
+    },
+    {
+      "file": "docs/cognitive-library/product-policy-update-20261026/recognition/compatibility.json",
+      "sha256": "8008a5c66655e7677dba9d8a9ff4d577110ec7f39de9d644ff23e2da3833c5b6"
+    },
+    {
+      "file": "docs/cognitive-library/product-policy-update-20261026/recognition/executed-browser-harness.cjs.txt",
+      "sha256": "37de7e7913dfe1909658c75f98502ab1f1efd3b0dd12fa484b73a03222f8aeb6"
+    },
+    {
+      "file": "docs/cognitive-library/product-policy-update-20261026/recognition/frontend-vitest.json",
+      "sha256": "245a4c66da785f551201fdbbc2c16f3bfb3d6a7c77725b8ccd8e44efe2516346"
+    },
+    {
+      "file": "docs/cognitive-library/product-policy-update-20261026/recognition/metric-definition-vitest.json",
+      "sha256": "38e68126e5563ae6153b399da7d8c0fc910a0d43fcb94ba02567293b710f18ff"
+    },
+    {
+      "file": "server-version/backend/package-lock.json",
+      "sha256": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450"
+    },
+    {
+      "file": "server-version/backend/package.json",
+      "sha256": "d629185584fcd679ca367c2d536c6c7783f7a9fe23363a8cd870964a47b2990a"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/cognitive/continuous-recognition-candidate.test.ts",
+      "sha256": "03f36f89f84c17deb68060824c612fa8d2585d4507f65e20162ac5e0cc63e554"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/cognitive/continuous-recognition-product-policy.test.ts",
+      "sha256": "e2110d4903f3eadd9d6cb40501c91aca6da81f27b20af37d42ee38dc78a9aa3b"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/continuous-recognition/metadata.ts",
+      "sha256": "17bd8861353a0c93f04b708ae260c1bd8524e5fe16408f78a38cfe5a53d6c706"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/continuous-recognition/native.ts",
+      "sha256": "8780ed5a2d7ec90f14a4f5129c97f1a84fd271197c40c32a39148a4b256d0016"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/continuous-recognition/package.ts",
+      "sha256": "5a614387a4e5d944a8b5bd5cbd15bcee1ad371898296297ec566e492769fc4c2"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/continuous-recognition/protocol.ts",
+      "sha256": "f9b724b0bbca7c172089ae1699b311605e1681845a331f192f9afc4de454804b"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/continuous-recognition/scorer.ts",
+      "sha256": "cd3f53ad81d127da6342fe62f91ed7aa52b6c9a665c1484d0895ed7bbb7272ff"
+    },
+    {
+      "file": "server-version/backend/vitest.config.ts",
+      "sha256": "26b98b70914617771d41657be8cdf6d7b6d7024c81d1c8a49aeae6a9220cf93b"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/RecognitionReport.tsx",
+      "sha256": "66e7bc9613999a019e56e353cabd0cdcc7b91d0e64b5e96cb737025292ed888f"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/RecognitionTask.tsx",
+      "sha256": "465a1981f21f179b06db541ee1dbb7a4dd5cde727df7bbf8597b6893b55d0e44"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/assets.ts",
+      "sha256": "e3da605e2ef92567554e8d79e0ac20fb36e25f7e6a1107e4c8adb0de0349e3c2"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/capture.ts",
+      "sha256": "5a15054ae89d8766462e13f3f0efb8d010ee8a20609ca9cf7deac27c9567f1c5"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/contracts.ts",
+      "sha256": "1767b61bbf6f317415a3525908c616cc56deb532ee4317380626acef875547de"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/digest.ts",
+      "sha256": "0c5c254b9777ab57ddc29cc12b52beced70457b944ba47aa97a96d23984079eb"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/lifecycle.test.tsx",
+      "sha256": "2c0fddaa9343c736bcee35b064d86711b51c6dff7fc3d5957ac851ef22cad7c2"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/product-policy.test.tsx",
+      "sha256": "95145b7dcbc360e66897049419c2d7aa297aa02fddf9aa764805c2c5edd3a251"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/recognition.css",
+      "sha256": "3f5ba7495fe4048f73b398a966a10155c9462110c4d2f747242d20af3cea2891"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/recognition.test.ts",
+      "sha256": "5e9656b8da71e3144f35d3c796b739c698c2b95bd1837e5e031fa20a4cd5b296"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/report-projection.ts",
+      "sha256": "c535cf868a4082e31eb6fd44a3eddf9a9f757b40fc326a3c34e8e5720af6b4d2"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/save-queue.ts",
+      "sha256": "633026e45619a8ec5a59d7be78de669be8b8da1671044517e7bcc25580bb573f"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/session.ts",
+      "sha256": "7a2bd7ab6cc3df2a29e0bb935845eeb971d7b265d0b3424855c8f052614ac9a5"
+    },
+    {
+      "file": "server-version/scripts/cognitive/recognition-browser-review.cjs",
+      "sha256": "5333cbc92ff145f420df31ef840b09a054696c44074ec80a9b45e7ce4318e094"
+    },
+    {
+      "file": "server-version/scripts/cognitive/recognition-product-policy-review.cjs",
+      "sha256": "dface9e1178c077920763b38e19403271cf0fea38a47d7ad5bef97bc4478faff"
+    }
+  ],
+  "frontendTypes": "Delegated to main agent actual frontend configuration, not run here",
+  "old84OrFullBrowserFlowRepeated": false,
+  "formalAssetsCleared": false,
+  "trustedHostMapperImplemented": false,
+  "registrationApiDbCosChanged": false,
+  "dependencyOrCiChanges": false,
+  "commitPushNotionDeployPerformed": false,
+  "completeTransitiveDependencyByteInventoryRecorded": false,
+  "selfCheckOnly": true,
+  "notes": [
+    "No new timing threshold/preflight/white-list/analysis/recalculation",
+    "Asset binding defaults pending; authorized status only from trusted server evidence, never client self-approval",
+    "Synthetic/NC-SA examples not made formal assets",
+    "Existing source/evidence kept; explicit new version tuple required",
+    "Metadata-only status/policy wording changed after backend type check; inherited 18 tags retained",
+    "Generated bundle bytes live under tmp; hash/size recorded, not committed"
+  ]
+}

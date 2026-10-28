@@ -1,0 +1,93 @@
+{
+  "sourceCommit": "22721e5c63dd78819e8c58921adf20157cdaa08c",
+  "historicalResearchTags": {
+    "cognitive_domain": [
+      "decision_learning"
+    ],
+    "target_process": [
+      "information_seeking"
+    ],
+    "paradigm": [
+      "horizon_forced_free"
+    ],
+    "stimulus_form": [
+      "reward_machines_history"
+    ],
+    "input_upstream": [
+      "left_right_keys"
+    ],
+    "input_proposed": [
+      "not_frozen"
+    ],
+    "key_metric": [
+      "less_sampled_choice",
+      "task_reward"
+    ],
+    "intended_use": [
+      "research_protocol_selection"
+    ],
+    "code_license": [
+      "cc_by_nc_sa_4_0_root"
+    ],
+    "code_rights_disposition": [
+      "authorization_pending"
+    ],
+    "asset_rights_disposition": [
+      "authorization_pending"
+    ],
+    "asset_license_review": [
+      "external_assets_unverified"
+    ],
+    "implementation_strategy": [
+      "literature_reimplementation"
+    ],
+    "maturity": [
+      "source_research_only"
+    ],
+    "evidence_limitations": [
+      "timing_device_unverified",
+      "short_demo_only",
+      "static_runtime_risk",
+      "model_validation_pending"
+    ],
+    "baseline_relation": [
+      "new_family_candidate"
+    ],
+    "research_priority": [
+      "reserve"
+    ],
+    "rule_type": [
+      "technical_quality",
+      "theoretical_reference",
+      "literature_experience",
+      "project_provisional"
+    ]
+  },
+  "currentStatus": "CONTENT_CANDIDATE_NOT_INTEGRATED",
+  "ageRange": null,
+  "difficulty": null,
+  "chineseValidation": null,
+  "deviceEquivalence": null,
+  "backendTagSearchConnected": false,
+  "currentRoute": {
+    "implementation": "independent literature implementation; no upstream code or assets",
+    "upstreamCodeLicense": "CC-BY-NC-SA-4.0; no product-use clearance inferred"
+  },
+  "currentSearchDescriptions": [
+    "探索与利用决策",
+    "信息寻求",
+    "行为决策研究",
+    "学习与策略教学演示",
+    "人机交互研究"
+  ],
+  "applicabilityClaim": "research/use descriptions only; no diagnosis, selection or individual prediction validity",
+  "currentProfiles": {
+    "research": 320,
+    "experience": 40
+  },
+  "currentPractice": {
+    "games": 3,
+    "maximumGroups": 3,
+    "criterion": "complete-guided-games-not-choice-correctness"
+  }
+}

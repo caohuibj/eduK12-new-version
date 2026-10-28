@@ -1,0 +1,91 @@
+{
+  "candidateId": "attention-enumeration-flower",
+  "status": "COPY_AND_TIMING_PROPOSAL_READY_FOR_PARENT_REVIEW",
+  "sourceBase": "94152032885d5cbaf149a15ec03d5a0c72ea2c67",
+  "formalAdministrationAllowed": false,
+  "newSourceSha256": {
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/EnumerationTask.tsx": "a2cacadbed917ae742a285a8818e060ee07be284b42938a88ee061d9eaacf463",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/enumeration-candidate.test.tsx": "181a24bc21c3275a98a166ff90dc084f180601e94fef1b0eee9b31c042c118aa"
+  },
+  "unchangedRuntimeSha256": {
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/capture.ts": "05e0dc40d8be27cc0d7efa7bfab48594d23d4e0ebffa35e818aaa23a337cb8ce",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/display.ts": "27b4f2fd796a7be570d6b313dc2254cc4da31ffd83ad7ada9d73953951cf4990",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/persistence.ts": "57954df32232655d91521a464d0bc0e21a0ce5de443eb6683380fedb9c9e01a4",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/enumeration.css": "08587111a926937b2f63bf6c5c7ecb346002adb31401a28e890211efe10a1999",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/generated/protocol.ts": "9b0257c9e96e01c6ac5c70b7fd61c5deafe6df3cf57a562e623d06ed5aa70abb",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/generated/report.ts": "0f05977a63f4197fa503c7bdd48ac2e2159b2350e680efdd2f77654d54a7c245"
+  },
+  "frozenRawSha256": "92ce9ca47badb38c0af37e28c4ee497ecf3c5863c4c752a4c7f26290ccace132",
+  "participantCopyOnly": true,
+  "mainTypesEvidence": {
+    "file": "docs/cognitive-library/next-candidates-20261026/implementation-coordination/frontend-copy-types.json",
+    "sha256": "56f1db5cb447fc8f9849593e2f6ea79c65b8f41f7e308736d2dfcf08915f9481",
+    "exitCode": 0,
+    "entryHashMatches": true
+  },
+  "copyChecks": {
+    "exitCode": 0,
+    "browser": "151.0.7922.173",
+    "assertions": 85,
+    "screenshots": 17,
+    "syntheticInitialViews": [
+      "saving",
+      "report"
+    ],
+    "syntheticPracticeExposuresTotal": 4,
+    "formalExposures": 0,
+    "scopeClarification": "Two state kinds each exercised in zh/en, total4 practice exposures; 3+25 not rerun."
+  },
+  "timingDiagnosis": "read-only developer reproduction, not independent scientific conclusion",
+  "proposalStatus": "PENDING_INDEPENDENT_REVIEW_AND_EXPLICIT_USER_APPROVAL",
+  "runtimeTimingPolicyChanged": false,
+  "epsilonOrToleranceAdded": false,
+  "oldChecksNotRepeated": [
+    "backend arithmetic",
+    "frontend17",
+    "full3+25",
+    "original browser run",
+    "types rerun by this child"
+  ],
+  "evidenceSha256": {
+    "EnumerationTask.after-copy.tsx.txt": "a2cacadbed917ae742a285a8818e060ee07be284b42938a88ee061d9eaacf463",
+    "EnumerationTask.before-copy.tsx.txt": "45257667e9cbb2b00ceae6dd3823eb1580084ea297956661c4dcf53483c90421",
+    "README.md": "8bb8d247b94c2feff3f554f20057551db443198ea95cdfc57fd423c67720a75e",
+    "copy-state-check.cjs": "1c50a2ec356918a74448a2d97b5db00f0e737cfbec21b825e4ebe85c83c30e40",
+    "copy-state-evidence.json": "0820fbe6e96f14fa6f48e651e623b438eebc478662310d4e7f64cdbba1a88a1e",
+    "copy-state.check.json": "5e06d202176a410aec9c7f9bda2deed24d13a8805fd5779cfe4b12d9b5e3885b",
+    "copy-state.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "copy-state.stdout.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "en-intro-200pct.png": "d9b5da6b8f4b274989ef8b7b11b083e5a777523ef730a292391f5aad07df5d13",
+    "en-missingRecipe.png": "76712cd9ad740a128bb29c87469523ce6212ecb4370721a7c972b35c61e5abe3",
+    "en-report-200pct.png": "f967b22d5e05fc1473826f0253f6754c4ab3480d141315ef13a5847dd6ec5c62",
+    "en-report.png": "e7f1a71f71b73fe377f48c2406d8027f8b4c5c57a5a4f91c33eaef62315fbfbe",
+    "en-saveError.png": "f24a6384e1e5db83cad5c8d7b2463dcd5e6edfd244beaef620b8ba350deef309",
+    "test.after-copy.tsx.txt": "181a24bc21c3275a98a166ff90dc084f180601e94fef1b0eee9b31c042c118aa",
+    "test.before-copy.tsx.txt": "270b09bab20a0fa4261b4505b8f6535c2a8c4d7ad3f1f9e987a69099d1bf9e02",
+    "timing-diagnosis.cjs": "b5e694a5d539e46eccc19a4994ce65467a35f87ff337b59239bb4458cbbf9b43",
+    "timing-diagnosis.json": "de2c0f360a7a2c92213780a82a221cabbba0a0dad595c28ab388c02cb99fea96",
+    "timing-diagnosis.md": "46da4f0fe61bb29f2619c5ca5f3e6f64c60e838769997c4d4648742de9dd5c54",
+    "timing-proposal.json": "f33847bbcc68a6bf33ff067b4ed2faeb2dd6aca7d93927f746665f02848d820b",
+    "timing-proposal.md": "ed6701c16b7a8afb15fff319aeee70406febf84af07f62019abc3ef99a4eec06",
+    "zh-displayChanged.png": "357c97f20e123bd753e5d7073a33055f917e66c911f510962c89eb1a4ebfefd6",
+    "zh-doesNotFit.png": "cfdf2a4083fd765f2069a67c758e51e5507480a5535576b4c98d2968553e9d90",
+    "zh-interrupted.png": "a24d0c0c43f8b0c3c73141247d26427492f1df7d9b927761548ec8d8d82f3c9e",
+    "zh-intro-200pct.png": "3ebc53c964f84171f0d7f0b2458bf38dc19d8a86cb345fb2cfe41b4d7ffdac13",
+    "zh-intro.png": "798794193cdf0d8691a5f593e9e8e94d5b7537e3e7f9ce57145e0a2cb34df091",
+    "zh-missingCalibration.png": "38699c3f42297db44f95b8a15035703f4443d7b13bb6fa54cc3b5c660dffcb51",
+    "zh-missingRecipe.png": "e532f7faf332f2794df5e3e5310ef6a33728ec7d7c04e1b00e2302462d47d274",
+    "zh-prepareError.png": "1638386bca4a908602ec072a1bb0e259486af902c742e66384532ca19515885b",
+    "zh-report-200pct.png": "4ca5f025900c87100037f5684b78db59d027bbb972c6c70fd6ff17b76da3b592",
+    "zh-report.png": "d5e06263d38b1ec265b44b4736df193fcf2f5ac89c9444db25d030ac5b90161e",
+    "zh-saveError.png": "dbc5ae07eeb1c51d7047044742b6c73b11b48e800181400e76c0ef1c733f9fda",
+    "zh-saving.png": "cc6c4b8cf64451e99c6ac653fe3addd0a0ca7ec78c9aad4e20f6b7166d59a06b"
+  },
+  "remaining": [
+    "independent source/protocol and proposal review",
+    "explicit user approval for substantive presentation-policy changes",
+    "numerical cadence/gap/stability acceptance rules",
+    "real-device browser/physical timing validation",
+    "production platform/durable host/registration/storage/export"
+  ]
+}

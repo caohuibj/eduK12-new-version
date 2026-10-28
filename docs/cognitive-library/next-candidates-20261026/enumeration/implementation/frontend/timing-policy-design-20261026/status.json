@@ -1,0 +1,71 @@
+{
+  "candidateId": "attention-enumeration-flower",
+  "status": "READY_FOR_PARENT_AND_EXTERNAL_REVIEW_DESIGN_ONLY",
+  "baseline": "97883153077a9527b6b5442feec7055f72933ab4",
+  "formalAdministrationAllowed": false,
+  "policyImplemented": false,
+  "policyExecutedAsAdmission": false,
+  "independentApprovalClaimed": false,
+  "userApprovalForPolicyChange": false,
+  "ruleCards": 21,
+  "descriptiveBoundaryCases": 22,
+  "newPhysicalDeviceEvidence": false,
+  "readOnlyRawStatistics": {
+    "inputSha256": "92ce9ca47badb38c0af37e28c4ee497ecf3c5863c4c752a4c7f26290ccace132",
+    "formalSegments": 25,
+    "full270IntervalSegments": 0,
+    "notRetrospectivelyQualified": true
+  },
+  "frozenTrackedCodeTestsAndOldEvidenceUnchangedFromBaseline": true,
+  "runtimeSha256": {
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/EnumerationTask.tsx": "a2cacadbed917ae742a285a8818e060ee07be284b42938a88ee061d9eaacf463",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/capture.ts": "05e0dc40d8be27cc0d7efa7bfab48594d23d4e0ebffa35e818aaa23a337cb8ce",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/display.ts": "27b4f2fd796a7be570d6b313dc2254cc4da31ffd83ad7ada9d73953951cf4990",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/enumeration-candidate.test.tsx": "181a24bc21c3275a98a166ff90dc084f180601e94fef1b0eee9b31c042c118aa",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/enumeration.css": "08587111a926937b2f63bf6c5c7ecb346002adb31401a28e890211efe10a1999",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/fixtures.test-support.ts": "335418859e893eaaf5bf01e1dee02d187d5a123ce2e01bbb1427b18f8a70f8d4",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/generated/protocol.ts": "9b0257c9e96e01c6ac5c70b7fd61c5deafe6df3cf57a562e623d06ed5aa70abb",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/generated/report.ts": "0f05977a63f4197fa503c7bdd48ac2e2159b2350e680efdd2f77654d54a7c245",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/persistence.ts": "57954df32232655d91521a464d0bc0e21a0ce5de443eb6683380fedb9c9e01a4",
+    "server-version/backend/src/modules/cognitive/content-candidates/enumeration/metadata.ts": "56dcd201fa290eda8aa48a3a0b23afe668f21e6de6cfff45e40f5d1b26e0f0a8",
+    "server-version/backend/src/modules/cognitive/content-candidates/enumeration/package.ts": "679dbd85bfbbac12b89549dc03bded87d0a57b6d522f85332d50c17ad00f1ffa",
+    "server-version/backend/src/modules/cognitive/content-candidates/enumeration/protocol.ts": "ff2215ae31ae280dbec19d582ab0aead2608445706bf5c4f403a4887472faed4",
+    "server-version/backend/src/modules/cognitive/content-candidates/enumeration/schema.ts": "228c23516e78fea3030ac21b3e7ef8d5f3078e4a363201c82c440c1baea4ca36",
+    "server-version/backend/src/modules/cognitive/content-candidates/enumeration/scorer.ts": "f89b3ccc3b3f33afd72bd8c1948a4a220d4ffab30ad039a491b5aa762a0bbd72",
+    "server-version/backend/src/modules/cognitive/content-candidates/enumeration/trial-envelope.ts": "87bb3ec491005ebbfb6419a778f598ffafa29e503e49414c29398d4e2c12afbd",
+    "server-version/scripts/cognitive/enumeration-content.cjs": "0c8c09206999dbdbdea66ba6430fc438fbe30648ca1e4b323ee3525e475cead2"
+  },
+  "mainSupportSha256": {
+    "existing-raw-statistics.json": "d8921d49c7e12bf9f0a6ac68f7c3a1293a71858582f7b483168009ea2d578b3b",
+    "primary-source-notes.json": "e5ea08622e5f40af9c2ca2427ff69fb1a5963a70b8bc9cc97b4bf0a8cfe7bf7b"
+  },
+  "newDesignFileSha256": {
+    "README.md": "cc5138e91f158c6d43a44d8be569cd4078f97f32aaecf84d455068e174ce02c3",
+    "boundary-cases.json": "3d7516ea31d81e9b0cea344c68d08e0fb87433f4fd44d7e31614b3f0a26902d9",
+    "consumer-map.json": "ef70d2aff144fe830375be0fcac02ac025e4fbcf64750a936b07db9811a46371",
+    "policy-design-builder.py": "66c605af63f22823d6eb7f964332a8dbe37f672c0f08fd63c95c0de3083c62af",
+    "policy-design.json": "c72fbb7f85f5bc6f043635274e73a0b40e5c5946a2ce10fc6ca1588b3c48c85d",
+    "raw-statistics.cjs": "b60d1c874f9dd27cf0f6ccb938c5f2b961a52f6be7a0bc0072dca1236c49a3db",
+    "raw-statistics.json": "26d2302efccbc234f66d5d3ea05792f382bc63da8a9ea7ff3b73d61a3cb97a7a",
+    "sources.json": "bad813adde044f74aa2a24b069046dfa5d9457c1dfaf07889be98c1914267e96",
+    "statistics-execution.json": "48f2646bbc126d8be599375fabb447274aec1c08829e81d7f4ebb7cea130b9e3",
+    "validation-plan.md": "b27a76e0e4ad75efd1ee12d0fdfa34c622eb983d9f29c476ce8a61485efe2b36"
+  },
+  "notExecuted": [
+    "new preflight/clock probe",
+    "new counter/neutralization",
+    "new policy evaluation",
+    "new unit/old backend or frontend tests",
+    "browser rerun",
+    "real device/optical study",
+    "CI/build/install",
+    "commit/push/Notion/deployment"
+  ],
+  "dependencies": [
+    "authoritative host admitted-attempt mapper not implemented",
+    "new raw/schema/actor contracts only listed, not patched",
+    "independent review and user approval",
+    "new affected validation after approval"
+  ],
+  "clarification": "L02 full fixation/latest60 each own span mean/P95/max/frozen-family drift; four60 windows initial preflight only. Probe completes at <=caps with16 positives/all other rules pass; at-cap insufficient fails, exceeded cap fails."
+}

@@ -1,0 +1,451 @@
+{
+  "kind": "AFFECTED_ACTUAL_TSCONFIG_ENTRY_CLOSURE_NOT_FULL_PROJECT_TYPECHECK",
+  "side": "frontend",
+  "configPath": "server-version/frontend/tsconfig.app.json",
+  "roots": [
+    "server-version/frontend/src/modules/cognitive/tasks/ant/AntReportCard.tsx",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/AntTask.test.tsx",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/generated/protocol.ts",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/generated/report.ts",
+    "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/RecognitionReport.tsx",
+    "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/assets.ts",
+    "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/lifecycle.test.tsx",
+    "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/recognition.test.ts",
+    "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/session.ts",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/EnumerationTask.tsx",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/enumeration-candidate.test.tsx",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/generated/protocol.ts",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/generated/report.ts",
+    "server-version/frontend/src/modules/cognitive/tasks/mot/MotTask.persistence.test.tsx",
+    "server-version/frontend/src/modules/cognitive/tasks/mot/MotTask.tsx",
+    "server-version/frontend/src/modules/cognitive/tasks/mot/draft.ts",
+    "server-version/frontend/src/modules/cognitive/tasks/mot/generated/protocol.ts",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/AntReport.product-policy.test.tsx",
+    "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/product-policy.test.tsx",
+    "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/report-projection.ts",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/EnumerationReport.tsx",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/enumeration-report.test.tsx",
+    "server-version/frontend/src/modules/cognitive/tasks/mot/MotTask.practice-policy.test.tsx",
+    "server-version/frontend/src/vite-env.d.ts"
+  ],
+  "configSha256": "97ed0e951ac068a9b2d08635b327932db8e41193f9c82e8291a919b7c68bd62e",
+  "sourceClosure": [
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/ant/generated/protocol.ts",
+      "sha256": "686dd198f5537272d5993547905b5c2d522d21001267717f0c5f9ed9861417fc"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/ant/generated/report.ts",
+      "sha256": "8364a0abaff2826fddde21345ca08c719b8d571cf7a76234b752c0f14af6df32"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/ant/AntReportCard.tsx",
+      "sha256": "a1621625f4f92ff4e25445aef1e43ffc935cefd9d04d086be040ff97a05daddf"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/ant/display.ts",
+      "sha256": "6046840499f49662756f48c56a435deec06db6f892c4c9908e5a41c75498cd5a"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/ant/capture.ts",
+      "sha256": "3ea2e3dcd4bdc7010b209b4edf980b67d2572bf4560487e0c4d3994faefe5f90"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/ant/seal.ts",
+      "sha256": "5c0e39ea3cf60286ba37db5a89fcc21319f46ba980dd9f08b589ad595692b029"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/ant/local-save.ts",
+      "sha256": "ce23b298a385435a122bdc1992c21401490f4637ce7946fd9ba6ab9e3cba8219"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/ant/session.ts",
+      "sha256": "6bb06eb510d0e2948d88b07c8922edf37675414ffd8000b2b651e22b89d2d3d1"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/ant/paint.ts",
+      "sha256": "d4a43342fa73c7e591901a7411d04304d7d5b70e63e85514035589ea86438ef3"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/ant/AntTask.tsx",
+      "sha256": "ef5e970714895db6a37a9b9d9b76a5e98e3d542f06ee37c263f961edc435e712"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/ant/test-fixtures.ts",
+      "sha256": "5f727f76b8249281d282354d6a913faab33ee173b01b9f54b01b077c9897acb4"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/ant/AntTask.test.tsx",
+      "sha256": "995dc488f2b075c83b05a8b56cf11354f8e54fb134f6888d61dfa70d8dc1aa50"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-reference/governance.ts",
+      "sha256": "6487175a5e4f4905264938e4e6ebe99db645e3c40e72a92d9796090fe9fa0930"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-media/material.ts",
+      "sha256": "2d12c58d222991ab4136a682c1281e6ac11e3e87911ca7e23d57aa9de0488a92"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-media/assessment-asset-identity.ts",
+      "sha256": "1fc3935d4b329989280dcb8e8464e8791e1134fcbb98951662d18378b5dd44c1"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-media/assessment-image.ts",
+      "sha256": "00acb1f2aaaffb4dbfbf990f82042834a63830418aa68a026ae0aba3dbf74fe1"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-media/assessment-image-presentation.ts",
+      "sha256": "69e686e9fb501950d928f4b074acdd07f28a603ef817921b95e02f8671829a38"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/raw-score-feedback.ts",
+      "sha256": "3a9d99d7086c1659ea6d212c3a6277d08c64d28f5873138b62521b3d5234fbe4"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/library/audience-report-gate.ts",
+      "sha256": "eae74de499e5710826bf9d65b203cbae6e3d9795652148a8a87136a371813ed6"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-media/assessment-video.ts",
+      "sha256": "46aab4aa9395d27a4f5cf14e01c175323422712ebbf656d30f50c198ab71edd5"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/scale-definition.ts",
+      "sha256": "35d9e51e53dc9fa5d1e2ff5539a82ec803a31b042a23e7cee952f8d24d3e0642"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/scale-scoring.ts",
+      "sha256": "74e3526c81b86a15e84d35b7dbbb0a112562a6e78254928640762615aecef2ba"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-context/context.ts",
+      "sha256": "2e2785f7e38edc4a3ffcf867f171243a9e36151a1cd8668da6604662cb349b6d"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/control-reference-codec.ts",
+      "sha256": "e57e4e7366e800947bd06cc81851ef5d45b32abc7b50cf6abf450900ef7f7e38"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/compact-field-codec.ts",
+      "sha256": "61fede51c449e1f2a84a2bcc5485ec5fdd149cc72e70f5ecd0d0c2c24bfb24c7"
+    },
+    {
+      "path": "server-version/backend/src/utils/logger.ts",
+      "sha256": "a133aa7b8be98cb6a567bc8af648f7267817c92ff72cab821a582743db013e15"
+    },
+    {
+      "path": "server-version/backend/src/utils/encryption.ts",
+      "sha256": "2c1a615c82088fc48a3082c188dd58e7b9cdfa7935bc5e56d541e6a1fbc7470e"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-context/form-answer.ts",
+      "sha256": "ef06de2e9d183aacb1ef61ebbb0ad60df4cc57e716db9883e54c93d4388f032a"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-context/security.ts",
+      "sha256": "56524add610fe2f1d00b1e48e7205ec23b25cb945e6e8cd17b141dafefb7824d"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-context/index.ts",
+      "sha256": "47da8cffe79e8dd9b1e64b722d62c8361472c56afdb8cd49abec5dede4ecf44d"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-reference/reference.ts",
+      "sha256": "179da23a71ca2f972a69b49f9c2a775d0fdd5aa6c93c65f520e82be01b4f2e02"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/canonical.ts",
+      "sha256": "e469eb794eadd6596cb0c4531dd6b6b256c8c176eac657ee20d5982f8e217066"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/types.ts",
+      "sha256": "d5e2393f0317013edf3cf6b349c2b3b625af393ea55045740f10718327423d55"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/task-package.types.ts",
+      "sha256": "ab1e4e3d040190162b46008a1f6d3e4d72a92d19034232a462d22631e41db25a"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/v2/presentation.ts",
+      "sha256": "95841697a6ce8afdc241c567d63602b8a9c2043f1b7bb02d151b550ba77e1b7d"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/cognitive.types.ts",
+      "sha256": "c1983d53cb88a1ed220fc8a3349b536cfd713a7187e292cc30c861bc14a71e46"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/v2/types.ts",
+      "sha256": "ca6740c52cf7aafa8e09640abe608708af043c228ea82f9a290358bd0c8ba656"
+    },
+    {
+      "path": "server-version/backend/src/services/runtimeObservability.ts",
+      "sha256": "fad3be33a8f6851565143fb1b91081e237f7cc760ac5e7165d8459ee40392f5d"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/v2/canonical.ts",
+      "sha256": "6688d12144fcd63f143429390cedb90332721cde57dbb0e9c14aab9b1e5caaaa"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/situation-scientific-contract.ts",
+      "sha256": "c2010f48c3ba35c3c4c3adf6976598f6e7d83cb3051afb556562892a030149e2"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/situation-definition.ts",
+      "sha256": "7b6a0d7667ac7850d5b8a1b4c2dad7d6ad3f58e54398b3c2250c2856e44c0ba9"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/situation-scientific-validation.ts",
+      "sha256": "29716bdd0a5eb380e84370edb7b8ddec3dd7485b7d2047ad97e2c669790de09f"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/situation-branching.ts",
+      "sha256": "3ee11726c8d26e2290c43a0317531d7a17803e02707eb1320cf7cb7139253cd2"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/situation-runtime-definition.ts",
+      "sha256": "4d852a9fbf1b77c7c21e1e38d22a451911461f3e53c115f381c2a825be1dd99a"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/compiler.ts",
+      "sha256": "37f7cc4cf3fa68dafcddab2a889a4b3dddf5b6c5c43f97915d89412d8fbf2877"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-governance/operational-hold.ts",
+      "sha256": "425f53d9b1b5e2dc68446580e85106a89ea39c8adb2c0106ebb1d2112e7dd7d6"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/v2/final-submission-budget.ts",
+      "sha256": "9bf9ba2bb7e4bafdc4c437c881bb979b3790c9775ee24eeda4ab27fe98e3e774"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/cognitive.errors.ts",
+      "sha256": "ad18c4c83881e2c39c6e3cc176be6454626d093ddfb15ef47873dd77aa657a8a"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/v2/session-snapshot.ts",
+      "sha256": "ef885828b8f0dc097ac38e17701f789e82e12036eb71bacdc8a859c43209ecb3"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/v2/trial-envelope.ts",
+      "sha256": "9a6cd24c06876b82557ec6159c713519c13bb401693ae75ddb53218c24f3ba78"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/continuous-recognition/protocol.ts",
+      "sha256": "f9b724b0bbca7c172089ae1699b311605e1681845a331f192f9afc4de454804b"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/continuous-recognition/scorer.ts",
+      "sha256": "cd3f53ad81d127da6342fe62f91ed7aa52b6c9a665c1484d0895ed7bbb7272ff"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/continuous-recognition/native.ts",
+      "sha256": "8780ed5a2d7ec90f14a4f5129c97f1a84fd271197c40c32a39148a4b256d0016"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/contracts.ts",
+      "sha256": "1767b61bbf6f317415a3525908c616cc56deb532ee4317380626acef875547de"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/report-projection.ts",
+      "sha256": "c535cf868a4082e31eb6fd44a3eddf9a9f757b40fc326a3c34e8e5720af6b4d2"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/RecognitionReport.tsx",
+      "sha256": "66e7bc9613999a019e56e353cabd0cdcc7b91d0e64b5e96cb737025292ed888f"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/assets.ts",
+      "sha256": "e3da605e2ef92567554e8d79e0ac20fb36e25f7e6a1107e4c8adb0de0349e3c2"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/digest.ts",
+      "sha256": "0c5c254b9777ab57ddc29cc12b52beced70457b944ba47aa97a96d23984079eb"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/capture.ts",
+      "sha256": "5a15054ae89d8766462e13f3f0efb8d010ee8a20609ca9cf7deac27c9567f1c5"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/save-queue.ts",
+      "sha256": "633026e45619a8ec5a59d7be78de669be8b8da1671044517e7bcc25580bb573f"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/session.ts",
+      "sha256": "7a2bd7ab6cc3df2a29e0bb935845eeb971d7b265d0b3424855c8f052614ac9a5"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/RecognitionTask.tsx",
+      "sha256": "465a1981f21f179b06db541ee1dbb7a4dd5cde727df7bbf8597b6893b55d0e44"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/lifecycle.test.tsx",
+      "sha256": "2c0fddaa9343c736bcee35b064d86711b51c6dff7fc3d5957ac851ef22cad7c2"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/recognition.test.ts",
+      "sha256": "5e9656b8da71e3144f35d3c796b739c698c2b95bd1837e5e031fa20a4cd5b296"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/enumeration/generated/protocol.ts",
+      "sha256": "38590b65aad9674efbfe495c99295a132f8d4c48493848c17a491000d23b5bc0"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/enumeration/generated/report.ts",
+      "sha256": "2900b82c1c1056cb39cf113a5d669780130d5d57d6af18662b28404f812012d4"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/enumeration/EnumerationReport.tsx",
+      "sha256": "1c531e18e522ba918a9665430c6537b6c83abf49c0846d1b2c2cf409c40d0628"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/enumeration/display.ts",
+      "sha256": "27b4f2fd796a7be570d6b313dc2254cc4da31ffd83ad7ada9d73953951cf4990"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/enumeration/capture.ts",
+      "sha256": "05e0dc40d8be27cc0d7efa7bfab48594d23d4e0ebffa35e818aaa23a337cb8ce"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/enumeration/persistence.ts",
+      "sha256": "57954df32232655d91521a464d0bc0e21a0ce5de443eb6683380fedb9c9e01a4"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/enumeration/EnumerationTask.tsx",
+      "sha256": "5cabfd159dd4c344ae724d206643b2b5735b4435bf5db8c97a28bb3150a87c6e"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/enumeration/fixtures.test-support.ts",
+      "sha256": "335418859e893eaaf5bf01e1dee02d187d5a123ce2e01bbb1427b18f8a70f8d4"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/enumeration/enumeration-candidate.test.tsx",
+      "sha256": "c03947f1d3de46e5ec92baf152acbec704942fc5542276600d5ed3bb6c2c9320"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/mot/generated/protocol.ts",
+      "sha256": "7a8fa5c93d3032c86a9156cdc24bde0c019cc4eb4b990f56aaaa9be553c485fb"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/mot/display.ts",
+      "sha256": "47942092c64eaa1c0527c5dce66cd6202cc39e2164bf58728f36b16a3811444c"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/mot/MotCalibration.tsx",
+      "sha256": "b50b10b92a75ac23d24b4af39c6973eedb8efae5580588ff745669aec218be20"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/mot/capture.ts",
+      "sha256": "7a7deeb1e657250f59f54916d5a99d7b768eb7c17d805194a8b897cae03034ea"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/mot/draft.ts",
+      "sha256": "c1f48de1bcf08b37d04648e949a71ac1f682178a39fdcedf0b625eba16bff77c"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/mot/save-gate.ts",
+      "sha256": "40264a4d74d1df47f9587f94ec748106f2611342b6df4f290026c1332b3e35c1"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/mot/MotTask.tsx",
+      "sha256": "ce8221cb5c59bd72989d0ef9f651b4ee81b1dec6d695c3e83cacb463c6d52a1e"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/mot/MotTask.persistence.test.tsx",
+      "sha256": "fcee5effb2f8f6a5e644623e03af3cad344307f785f7a993bc97709e058430a2"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/ant/AntReport.product-policy.test.tsx",
+      "sha256": "5f512bc11087115e729c3c4c0a5840e1a7735edb2d4d5144433a16299f16db32"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/product-policy.test.tsx",
+      "sha256": "95145b7dcbc360e66897049419c2d7aa297aa02fddf9aa764805c2c5edd3a251"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/enumeration/enumeration-report.test.tsx",
+      "sha256": "f18124fb9705d843cc3a38f1ce0a44f82f15c570c09c942b0d8eb6b40206663b"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/mot/MotTask.practice-policy.test.tsx",
+      "sha256": "d437104aa32588c0b19f6bdc74bf217936a43832f6946344afbc275c2a6127fe"
+    },
+    {
+      "path": "server-version/frontend/src/vite-env.d.ts",
+      "sha256": "65996936fbb042915f7b74a200fcdde7e410f32a669b1ab9597cfaa4b0faddb5"
+    }
+  ],
+  "diagnostics": [
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/ant/AntReportCard.tsx",
+      "line": 22,
+      "message": "Parameter 'r' implicitly has an 'any' type."
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/ant/AntReportCard.tsx",
+      "line": 22,
+      "message": "Parameter 'r' implicitly has an 'any' type."
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/ant/AntReportCard.tsx",
+      "line": 35,
+      "message": "Parameter 'r' implicitly has an 'any' type."
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/ant/AntReportCard.tsx",
+      "line": 35,
+      "message": "Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ congruent: string[]; incongruent: string[]; neutral: string[]; }'."
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/ant/AntReportCard.tsx",
+      "line": 38,
+      "message": "Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ touch: string[]; pointer: string[]; keyboard: string[]; }'."
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/ant/generated/report.ts",
+      "line": 39,
+      "message": "Cannot find name 'FLANKERS'."
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/ant/generated/report.ts",
+      "line": 39,
+      "message": "Parameter 'flanker' implicitly has an 'any' type."
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/ant/generated/report.ts",
+      "line": 40,
+      "message": "Element implicitly has an 'any' type because expression of type 'any' can't be used to index type 'Record<\"congruent\" | \"incongruent\" | \"neutral\", ConditionRecord>'."
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/ant/generated/report.ts",
+      "line": 42,
+      "message": "Element implicitly has an 'any' type because expression of type 'any' can't be used to index type 'Record<\"congruent\" | \"incongruent\" | \"neutral\", RtTally>'."
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/lifecycle.test.tsx",
+      "line": 13,
+      "message": "Type 'Mock<(c: any) => Promise<{ contextKey: any; bindingDigest: string; fresh: boolean; }>>' is not assignable to type '(context: RecognitionContext) => Promise<{ contextKey: string; bindingDigest: string; fresh: true; }>'.   Type 'Promise<{ contextKey: any; bindingDigest: string; fresh: boolean; }>' is not assignable to type 'Promise<{ contextKey: string; bindingDigest: string; fresh: true; }>'.     Type '{ contextKey: any; bindingDigest: string; fresh: boolean; }' is not assignable to type '{ contextKey: string; bindingDigest: string; fresh: true; }'.       Types of property 'fresh' are incompatible.         Type 'boolean' is not assignable to type 'true'."
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/lifecycle.test.tsx",
+      "line": 13,
+      "message": "Type 'Mock<(r: any) => Promise<{ contextKey: any; recordKey: any; recordDigest: any; retained: boolean; }>>' is not assignable to type '(record: SealedRecord) => Promise<LocalReceipt>'.   Type 'Promise<{ contextKey: any; recordKey: any; recordDigest: any; retained: boolean; }>' is not assignable to type 'Promise<LocalReceipt>'.     Type '{ contextKey: any; recordKey: any; recordDigest: any; retained: boolean; }' is not assignable to type 'LocalReceipt'.       Types of property 'retained' are incompatible.         Type 'boolean' is not assignable to type 'true'."
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/recognition.test.ts",
+      "line": 20,
+      "message": "Type 'Mock<(i: any) => Promise<{ contextKey: any; manifestHash: any; finalPayloadDigest: any; formalCount: any; practiceCount: any; finalSaved: true; receiptId: string; report: { state: \"limited\"; profile: \"experience\"; ... 19 more ...; logo: string; }; }>>' is not assignable to type '(input: FinalClaim) => Promise<FinalReceipt>'.   Type 'Promise<{ contextKey: any; manifestHash: any; finalPayloadDigest: any; formalCount: any; practiceCount: any; finalSaved: true; receiptId: string; report: { state: \"limited\"; profile: \"experience\"; reportVersion: \"0.2.0\"; ... 18 more ...; logo: string; }; }>' is not assignable to type 'Promise<FinalReceipt>'.     Type '{ contextKey: any; manifestHash: any; finalPayloadDigest: any; formalCount: any; practiceCount: any; finalSaved: true; receiptId: string; report: { state: \"limited\"; profile: \"experience\"; reportVersion: \"0.2.0\"; ... 18 more ...; logo: string; }; }' is not assignable to type 'FinalReceipt'.       The types of 'report.canGenerateTakeHomeImage' are incompatible between these types.         Type 'boolean' is not assignable to type 'false'."
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/recognition.test.ts",
+      "line": 102,
+      "message": "Type 'Mock<(r: any) => Promise<{ contextKey: any; recordKey: any; recordDigest: string; retained: boolean; }>>' is not assignable to type '(record: SealedRecord) => Promise<LocalReceipt>'.   Type 'Promise<{ contextKey: any; recordKey: any; recordDigest: string; retained: boolean; }>' is not assignable to type 'Promise<LocalReceipt>'.     Type '{ contextKey: any; recordKey: any; recordDigest: string; retained: boolean; }' is not assignable to type 'LocalReceipt'.       Types of property 'retained' are incompatible.         Type 'boolean' is not assignable to type 'true'."
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/recognition.test.ts",
+      "line": 108,
+      "message": "Type 'Mock<(r: any) => Promise<unknown>>' is not assignable to type '(record: SealedRecord) => Promise<LocalReceipt>'.   Type 'Promise<unknown>' is not assignable to type 'Promise<LocalReceipt>'.     Type 'unknown' is not assignable to type 'LocalReceipt'."
+    }
+  ],
+  "exitCode": 1
+}

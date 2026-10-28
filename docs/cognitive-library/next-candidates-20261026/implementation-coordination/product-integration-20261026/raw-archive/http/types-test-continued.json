@@ -1,0 +1,14 @@
+{
+  "kind": "ACTUAL_ARCHIVE_HTTP_ROUTER_BACKEND_TSCONFIG_ENTRY_CLOSURE",
+  "roots": [
+    "server-version/backend/src/__tests__/cognitive/native-mot-http-archive.integration.test.ts"
+  ],
+  "source": [
+    {
+      "path": "server-version/backend/src/__tests__/cognitive/native-mot-http-archive.integration.test.ts",
+      "sha256": "b5c01dac4620b7ee548e9b1c40f64902ffde3d5d7e531171b0de5554d6eaf3c8"
+    }
+  ],
+  "diagnostics": [],
+  "exitCode": 0
+}

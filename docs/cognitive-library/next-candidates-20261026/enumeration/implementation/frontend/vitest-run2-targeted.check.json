@@ -1,0 +1,28 @@
+{
+  "command": [
+    "/workspace/eduk12-cloud/tools/node_modules/node/bin/node",
+    "/workspace/eduK12-new-version/server-version/frontend/node_modules/vitest/vitest.mjs",
+    "run",
+    "src/modules/cognitive/tasks/enumeration/enumeration-candidate.test.tsx",
+    "--maxWorkers=1",
+    "-t",
+    "retries failed practice retention with identical raw and no new rAF/exposure",
+    "--reporter=json",
+    "--outputFile=/workspace/eduK12-new-version/docs/cognitive-library/next-candidates-20261026/enumeration/implementation/frontend/vitest-run2-targeted.json"
+  ],
+  "cwd": "/workspace/eduK12-new-version/server-version/frontend",
+  "exitCode": 0,
+  "elapsedSeconds": 1.150813102722168,
+  "inputSha256": {
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/EnumerationTask.tsx": "45257667e9cbb2b00ceae6dd3823eb1580084ea297956661c4dcf53483c90421",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/capture.ts": "05e0dc40d8be27cc0d7efa7bfab48594d23d4e0ebffa35e818aaa23a337cb8ce",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/display.ts": "27b4f2fd796a7be570d6b313dc2254cc4da31ffd83ad7ada9d73953951cf4990",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/enumeration-candidate.test.tsx": "270b09bab20a0fa4261b4505b8f6535c2a8c4d7ad3f1f9e987a69099d1bf9e02",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/enumeration.css": "08587111a926937b2f63bf6c5c7ecb346002adb31401a28e890211efe10a1999",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/fixtures.test-support.ts": "335418859e893eaaf5bf01e1dee02d187d5a123ce2e01bbb1427b18f8a70f8d4",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/generated/protocol.ts": "9b0257c9e96e01c6ac5c70b7fd61c5deafe6df3cf57a562e623d06ed5aa70abb",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/generated/report.ts": "0f05977a63f4197fa503c7bdd48ac2e2159b2350e680efdd2f77654d54a7c245",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/persistence.ts": "57954df32232655d91521a464d0bc0e21a0ce5de443eb6683380fedb9c9e01a4"
+  },
+  "scope": "only original failed case; 16 passed cases not repeated; production sources unchanged"
+}

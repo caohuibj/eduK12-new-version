@@ -1,0 +1,13 @@
+{
+  "status": "PASS",
+  "scope": "Only new terminated-then-local-write-fault state and participant copy",
+  "reason": "window_blur",
+  "firstDigest": "7e033df4b04d1c91445a0ab1cdf740d928686750cc45f943345db5fbcc9cc541",
+  "retryDigest": "7e033df4b04d1c91445a0ab1cdf740d928686750cc45f943345db5fbcc9cc541",
+  "screenshots": [
+    "phone-late-local-failure-copy.png",
+    "phone-late-local-retry-copy.png"
+  ],
+  "pageErrors": [],
+  "restarted": false
+}

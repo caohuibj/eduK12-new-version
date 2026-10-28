@@ -1,0 +1,26 @@
+{
+  "command": [
+    "/workspace/eduk12-cloud/tools/node_modules/node/bin/node",
+    "/workspace/eduK12-new-version/server-version/backend/node_modules/vitest/vitest.mjs",
+    "run",
+    "src/__tests__/cognitive/enumeration-candidate.test.ts",
+    "--maxWorkers=1",
+    "-t",
+    "pins the versioned first formal block|rejects reordered, duplicate, skipped",
+    "--reporter=json",
+    "--outputFile=/workspace/eduK12-new-version/docs/cognitive-library/next-candidates-20261026/enumeration/implementation/vitest-run2-targeted.json"
+  ],
+  "cwd": "/workspace/eduK12-new-version/server-version/backend",
+  "exitCode": 0,
+  "elapsedSeconds": 0.9632549285888672,
+  "scope": "only prior failed test and newly added immutable PRNG golden vector; 20 prior passing cases not rerun",
+  "inputSha256": {
+    "server-version/backend/src/modules/cognitive/content-candidates/enumeration/metadata.ts": "56dcd201fa290eda8aa48a3a0b23afe668f21e6de6cfff45e40f5d1b26e0f0a8",
+    "server-version/backend/src/modules/cognitive/content-candidates/enumeration/package.ts": "679dbd85bfbbac12b89549dc03bded87d0a57b6d522f85332d50c17ad00f1ffa",
+    "server-version/backend/src/modules/cognitive/content-candidates/enumeration/protocol.ts": "ff2215ae31ae280dbec19d582ab0aead2608445706bf5c4f403a4887472faed4",
+    "server-version/backend/src/modules/cognitive/content-candidates/enumeration/schema.ts": "228c23516e78fea3030ac21b3e7ef8d5f3078e4a363201c82c440c1baea4ca36",
+    "server-version/backend/src/modules/cognitive/content-candidates/enumeration/scorer.ts": "f89b3ccc3b3f33afd72bd8c1948a4a220d4ffab30ad039a491b5aa762a0bbd72",
+    "server-version/backend/src/modules/cognitive/content-candidates/enumeration/trial-envelope.ts": "87bb3ec491005ebbfb6419a778f598ffafa29e503e49414c29398d4e2c12afbd",
+    "server-version/backend/src/__tests__/cognitive/enumeration-candidate.test.ts": "ccc137e555faa25ff99f16533522899e14c67ea7efa1de26fdc8937c398a2f8e"
+  }
+}

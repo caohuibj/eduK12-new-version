@@ -1,0 +1,12 @@
+{
+  "kind": "PARENT_HTTP_TEST_TYPE_FOLLOWUP",
+  "initialReport": "types-initial-failed.json",
+  "initialExitCode": 1,
+  "initialDiagnosticBoundary": "Only the new HTTP test: import.meta under actual backend CommonJS and unknown fetch JSON. No product route diagnostics.",
+  "fix": "Use createRequire(absolute backend package.json); required harness target was already absolute and is unchanged. Add response-envelope type annotation (erased in JS). Runtime assertions/HTTP service data unchanged.",
+  "continuedReport": "types-test-continued.json",
+  "continuedExitCode": 0,
+  "reranHTTP": false,
+  "productionSourcesChanged": false,
+  "finalTestSha256": "b5c01dac4620b7ee548e9b1c40f64902ffde3d5d7e531171b0de5554d6eaf3c8"
+}

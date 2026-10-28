@@ -1,0 +1,310 @@
+{
+  "scope": "actual React candidate, synthetic explicit localStorage host and calibration/recipe; real headless rAF APIs, no physical display timing proof",
+  "startedAt": "2026-10-26T07:15:33.295Z",
+  "checks": [
+    {
+      "name": "phone guide no horizontal overflow",
+      "pass": true,
+      "detail": {
+        "width": 390,
+        "scroll": 390
+      }
+    },
+    {
+      "name": "phone guide 200% no horizontal overflow",
+      "pass": true,
+      "detail": {
+        "width": 390,
+        "scroll": 390
+      }
+    },
+    {
+      "name": "tablet guide no horizontal overflow",
+      "pass": true,
+      "detail": {
+        "width": 820,
+        "scroll": 820
+      }
+    },
+    {
+      "name": "slider Home=1",
+      "pass": true
+    },
+    {
+      "name": "slider End=15",
+      "pass": true
+    },
+    {
+      "name": "slider ArrowLeft=14",
+      "pass": true
+    },
+    {
+      "name": "phone answer no horizontal overflow",
+      "pass": true,
+      "detail": {
+        "width": 390,
+        "scroll": 390
+      }
+    },
+    {
+      "name": "retry did not reserve/expose again",
+      "pass": true
+    },
+    {
+      "name": "report absent before final host ACK",
+      "pass": true
+    },
+    {
+      "name": "phone report no horizontal overflow",
+      "pass": true,
+      "detail": {
+        "width": 390,
+        "scroll": 390
+      }
+    },
+    {
+      "name": "actual three practice and 25 formal ACK records",
+      "pass": true
+    },
+    {
+      "name": "single fixed artifact",
+      "pass": true
+    },
+    {
+      "name": "phone actual fixation/stimulus/mask/answer field rect equal",
+      "pass": true,
+      "detail": [
+        {
+          "stage": "fixation",
+          "rect": {
+            "x": 43.0625,
+            "y": 104,
+            "width": 303.875,
+            "height": 303.875
+          }
+        },
+        {
+          "stage": "stimulus",
+          "rect": {
+            "x": 43.0625,
+            "y": 104,
+            "width": 303.875,
+            "height": 303.875
+          }
+        },
+        {
+          "stage": "mask",
+          "rect": {
+            "x": 43.0625,
+            "y": 104,
+            "width": 303.875,
+            "height": 303.875
+          }
+        },
+        {
+          "stage": "response",
+          "rect": {
+            "x": 43.0625,
+            "y": 104,
+            "width": 303.875,
+            "height": 303.875
+          }
+        }
+      ]
+    },
+    {
+      "name": "input actual touch confirmation retained",
+      "pass": true
+    },
+    {
+      "name": "report remains invalid",
+      "pass": true
+    },
+    {
+      "name": "phone report 200% no horizontal overflow",
+      "pass": true,
+      "detail": {
+        "width": 390,
+        "scroll": 390
+      }
+    },
+    {
+      "name": "tablet report read-only no horizontal overflow",
+      "pass": true,
+      "detail": {
+        "width": 820,
+        "scroll": 820
+      }
+    },
+    {
+      "name": "new page realm refuses the same stable attempt",
+      "pass": true
+    },
+    {
+      "name": "tablet actual answer no horizontal overflow",
+      "pass": true,
+      "detail": {
+        "width": 820,
+        "scroll": 820
+      }
+    },
+    {
+      "name": "tablet actual stage rectangles equal",
+      "pass": true,
+      "detail": [
+        {
+          "stage": "fixation",
+          "rect": {
+            "x": 258.0625,
+            "y": 104,
+            "width": 303.875,
+            "height": 303.875
+          }
+        },
+        {
+          "stage": "stimulus",
+          "rect": {
+            "x": 258.0625,
+            "y": 104,
+            "width": 303.875,
+            "height": 303.875
+          }
+        },
+        {
+          "stage": "mask",
+          "rect": {
+            "x": 258.0625,
+            "y": 104,
+            "width": 303.875,
+            "height": 303.875
+          }
+        },
+        {
+          "stage": "response",
+          "rect": {
+            "x": 258.0625,
+            "y": 104,
+            "width": 303.875,
+            "height": 303.875
+          }
+        }
+      ]
+    },
+    {
+      "name": "pagehide interruption gives no pass and prohibits more exposures",
+      "pass": true
+    },
+    {
+      "name": "English guide 200% no horizontal overflow",
+      "pass": true,
+      "detail": {
+        "width": 820,
+        "scroll": 820
+      }
+    },
+    {
+      "name": "no page errors",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "no external requests",
+      "pass": true,
+      "detail": []
+    }
+  ],
+  "screenshots": [
+    {
+      "file": "phone-intro.png",
+      "sha256": "31bb9820fd651f421a46ab7100855702b9c1a630658c25cb7d51f3ebfc1769de"
+    },
+    {
+      "file": "phone-intro-200pct.png",
+      "sha256": "3afc9e7af3c5bc4e28e572ab16718e6fe5cbab65956030bfd49fc056f17f93cc"
+    },
+    {
+      "file": "tablet-intro.png",
+      "sha256": "3d0a2dd91d535d5b04002d773d475fe6997317bfe892ab1d1f457a44b6ac2861"
+    },
+    {
+      "file": "phone-ready.png",
+      "sha256": "ada621c6a1c389f2eace58e655a9dadeb268053ec8e720c2a7c8131a5d53d8a6"
+    },
+    {
+      "file": "phone-fixation.png",
+      "sha256": "1280781ce02e03c7b821402f308d9a94cea3928c058514579f7fb2245d39fcca"
+    },
+    {
+      "file": "phone-practice-stimulus.png",
+      "sha256": "d101e845e70d6bc503c41737e64bd9a2043f4351cf1335d35d316a6bc893cb93"
+    },
+    {
+      "file": "phone-mask.png",
+      "sha256": "598c7112fb2094fca72d252eb7cb3df5a16384b990ae96d565f5e350eed4125e"
+    },
+    {
+      "file": "phone-response.png",
+      "sha256": "1690e40f961f006dca09d02869a2dce2b36f90d4c703d07fb50ce0ef07aba54d"
+    },
+    {
+      "file": "phone-save-unconfirmed.png",
+      "sha256": "e43e052457aa2a6924a68bd991180c35d58cfd5b5c5dfd816fc814f43dacf671"
+    },
+    {
+      "file": "phone-final-awaiting-ack.png",
+      "sha256": "88b72c92c55b3a291a60446d7edca07a7972675bb50a2d799572ea74e4fa593a"
+    },
+    {
+      "file": "phone-report-invalid.png",
+      "sha256": "2b3fb231e7126cee6121f689759f9b67fff1f51b57f19491762077a19b42c876"
+    },
+    {
+      "file": "phone-formal-stimulus-canvas.png",
+      "sha256": "3eff25efee5f5ba84e34bc21727258ac8413bbd2ca69d3e6c48c5c8a8790642b",
+      "scope": "actual canvas snapshot taken by stage MutationObserver; no full-page timing claim"
+    },
+    {
+      "file": "phone-report-200pct.png",
+      "sha256": "c63f6289eeca27f89802af6b9e0928fe6d2e768e27814841bffcf60ea7d06113"
+    },
+    {
+      "file": "tablet-report-invalid.png",
+      "sha256": "4b13f7aa0dd8d3984c8bc7daaae79c88d1d2aa474bd99b33da2dc8b0473c0e8e"
+    },
+    {
+      "file": "tablet-response.png",
+      "sha256": "9a61dc75b7119794c8d3e4614bd02c5da83fd1d0c93061956f753a9b1e5b2be6"
+    },
+    {
+      "file": "tablet-interrupted-practice.png",
+      "sha256": "1a7781cd786dda72cdc1b80d8f6cc3e2b3676a5bbf452bf11b7afa837a484d50"
+    },
+    {
+      "file": "tablet-en-intro-200pct.png",
+      "sha256": "b393c27b8a53c8157d9fad75c2be4b3b658d700beceaf5f64ca181ffd7a334b3"
+    }
+  ],
+  "sources": {
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/EnumerationTask.tsx": "45257667e9cbb2b00ceae6dd3823eb1580084ea297956661c4dcf53483c90421",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/capture.ts": "05e0dc40d8be27cc0d7efa7bfab48594d23d4e0ebffa35e818aaa23a337cb8ce",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/display.ts": "27b4f2fd796a7be570d6b313dc2254cc4da31ffd83ad7ada9d73953951cf4990",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/enumeration-candidate.test.tsx": "270b09bab20a0fa4261b4505b8f6535c2a8c4d7ad3f1f9e987a69099d1bf9e02",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/enumeration.css": "08587111a926937b2f63bf6c5c7ecb346002adb31401a28e890211efe10a1999",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/fixtures.test-support.ts": "335418859e893eaaf5bf01e1dee02d187d5a123ce2e01bbb1427b18f8a70f8d4",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/generated/protocol.ts": "9b0257c9e96e01c6ac5c70b7fd61c5deafe6df3cf57a562e623d06ed5aa70abb",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/generated/report.ts": "0f05977a63f4197fa503c7bdd48ac2e2159b2350e680efdd2f77654d54a7c245",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/persistence.ts": "57954df32232655d91521a464d0bc0e21a0ce5de443eb6683380fedb9c9e01a4",
+    "docs/cognitive-library/next-candidates-20261026/enumeration/implementation/frontend/browser-check.cjs": "7d91d202aaba390a0e6c565463c97acaa8a47b6e9292b4501e7c7d8930799cd4"
+  },
+  "errors": [],
+  "networkBlocked": [],
+  "browser": "151.0.7922.173",
+  "chromiumSandbox": true,
+  "buildArtifacts": {
+    "js": "6f3b7ff84f6ae32a9e3365356fc38e5617f88c004d2ad40902c651da93c89495",
+    "css": "f7ba78c3c66d8f109b374406781a9456dbbc39b2a116ee25de1cbc8b67e1410c",
+    "harness": "91d3c9b497b33ea245e6aa1d41cb8c500021f2e5542f5aa670942c163e668521"
+  },
+  "success": true,
+  "finishedAt": "2026-10-26T07:16:42.466Z"
+}

@@ -1,0 +1,25 @@
+{
+  "id": "enumeration-square5deg-circle-white-grey-mask48-r1",
+  "source": "host_reviewed_candidate",
+  "status": "CANDIDATE_RECIPE_NOT_VALIDATED",
+  "fieldShape": "square_background_circular_sampling_proposal",
+  "fieldDiameterDeg": 5,
+  "dotDiameterDeg": 0.5,
+  "fieldColor": "#808080",
+  "dotColor": "#FFFFFF",
+  "mask": {
+    "rows": 48,
+    "columns": 48,
+    "values": [
+      "#141414",
+      "#EBEBEB"
+    ],
+    "seed": 20261026,
+    "algorithm": "lcg1664525-1013904223-u32-topbit",
+    "scope": "session_fixed"
+  },
+  "fixationMs": 1000,
+  "formalExposureMs": 50,
+  "practiceExposureMs": 1000,
+  "maskMs": 1000
+}

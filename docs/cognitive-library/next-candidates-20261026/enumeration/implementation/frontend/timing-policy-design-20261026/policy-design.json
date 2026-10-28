@@ -1,0 +1,525 @@
+{
+  "artifactKind": "SINGLE_NUMERICAL_TIMING_POLICY_DESIGN_NOT_RUNTIME_CONFIG",
+  "candidateId": "attention-enumeration-flower",
+  "baseline": "97883153077a9527b6b5442feec7055f72933ab4",
+  "status": "PROJECT_PROVISIONAL_PENDING_EXTERNAL_REVIEW_AND_EXPLICIT_USER_APPROVAL",
+  "implemented": false,
+  "executedAsAdmission": false,
+  "formalAdministrationAllowed": false,
+  "independentAuditClaimed": false,
+  "changeScope": {
+    "prospectiveCounterOnly": "formal nominal50ms stimulus only",
+    "unchanged": [
+      "practice1000ms exposure scheduling",
+      "existing1000ms fixation/mask elapsed scheduling",
+      "100/25 counts",
+      "3 practice targets",
+      "1–15 integer slider+confirm",
+      "current running50ms strategy",
+      "original25 raw"
+    ],
+    "otherPhases": "Record actual durations without claiming precise1000ms; new monitoring/entry gates do not add or lengthen phases."
+  },
+  "normativeVersusProject": "All new numbers are project provisional technical budgets/parameters, not norms, published psychometric cutoffs, normative browser guarantees or approved product policy.",
+  "definitions": {
+    "P": "(r270-r30)/240, equivalently measurement-local(q240-q0)/240; raw full precision; median descriptive only",
+    "windowP": "(r_end-r_start)/60; no idle joins",
+    "p95": "nearest rank ceil(.95*n),1-based, abs deviations from span/window mean; no interpolation",
+    "comparison": "Stated literal inequalities on finite raw values, no epsilon or display-rounded admission",
+    "cadence": "Observed client callbacks, not panelHz/VRR-off certificate",
+    "futureQualification": "Client callback/draw technical fit only, not physical50ms or validity; external optical/device status stays separate",
+    "unknown": "Unknown/missing/simulation-only blocks; never fallback60"
+  },
+  "periodFamilies": [
+    {
+      "H": 60,
+      "nominalPeriodMs": 16.666666666666668,
+      "acceptedPMinMs": 16.583333333333336,
+      "acceptedPMaxMs": 16.75,
+      "N": 3
+    },
+    {
+      "H": 120,
+      "nominalPeriodMs": 8.333333333333334,
+      "acceptedPMinMs": 8.291666666666668,
+      "acceptedPMaxMs": 8.375,
+      "N": 6
+    }
+  ],
+  "derivedSoftwareEnvelope": {
+    "predictedNPMs": [
+      49.75,
+      50.25
+    ],
+    "markerSpanWithF02Ms": [
+      49.25,
+      50.75
+    ],
+    "commandStartSpanWithD04Ms": [
+      48.75,
+      51.25
+    ],
+    "meaning": "Widest arithmetic bounds of draft budgets, not50.000ms, physical range, or scientific equivalence. Original66.6 is not accepted."
+  },
+  "rules": [
+    {
+      "id": "P01",
+      "ruleClass": "project_provisional_researcher_rule",
+      "purpose": "technical_quality_or_preparation_protocol",
+      "object": "preparation count per truly host-admitted frozen attempt identity, across client context/port aliases",
+      "expression": "attempts_used <2 AND ever_trial_exposure_reserved_or_task_drawn ==false",
+      "value": 2,
+      "unit": "preparations/frozen host attempt",
+      "consequence": "At most2 explicit preparations in this host-admitted frozen attempt before any reservation/draw; no auto retry. A genuinely new host-admitted attempt may prepare anew; changing a client string is not new admission.",
+      "prevents": "Unbounded setup loops, client strings resetting budget, or incorrectly locking every future legitimate attempt on this page.",
+      "evidenceBasis": "Project workload/UX choice, not literature count.",
+      "owner": "认知内容线计时负责人（由统筹指定姓名）",
+      "reviewer": "外部统筹独立审查；平台runner负责人复核可实现性",
+      "reviewCondition": "Pilot burden, false rejection, lifecycle changes.",
+      "status": "PROPOSED_NOT_APPROVED_NOT_IMPLEMENTED"
+    },
+    {
+      "id": "P02",
+      "ruleClass": "project_provisional_researcher_rule",
+      "purpose": "technical_quality_or_preparation_protocol",
+      "object": "clock probe progress",
+      "expression": "positive_advance_count ==16 AND perf_elapsed<=20 AND resource_wall_elapsed<=20 AND reads<=262144",
+      "value": 16,
+      "unit": "positive advances",
+      "consequence": "Completion at elapsed==20 and/or reads==262144 is allowed if16 positives and all other probe rules pass. Reaching a cap with fewer than16 fails; unknown blocks, never fallback60.",
+      "prevents": "Nonadvancing/coarse clock interpreted as precise or free work.",
+      "evidenceBasis": "Project preliminary observation length; HRT only supports possible coarsening.",
+      "owner": "认知内容线计时负责人（由统筹指定姓名）",
+      "reviewer": "外部统筹独立审查；平台runner负责人复核可实现性",
+      "reviewCondition": "Target privacy/browser/timer observations.",
+      "status": "PROPOSED_NOT_APPROVED_NOT_IMPLEMENTED"
+    },
+    {
+      "id": "P03",
+      "ruleClass": "project_provisional_researcher_rule",
+      "purpose": "technical_quality_or_preparation_protocol",
+      "object": "one clock probe resource budget",
+      "expression": "observed perf elapsed<=20 AND resource-wall elapsed<=20 AND performance.now reads<=262144",
+      "value": {
+        "elapsedMs": 20,
+        "maxReads": 262144,
+        "resourceWallCheckEveryReads": 256
+      },
+      "unit": "ms / calls",
+      "consequence": "Exceeding any cap fails even if16 positives were read. At a cap,16 positives may complete if all other rules pass; fewer than16 fails without an extra read. Negative/nonfinite measurement clock or backward resource wall clock also blocks.",
+      "prevents": "Unbounded busy polling.",
+      "evidenceBasis": "Project bounded-work proposal; observed deadlines are not a hard physical CPU limit because one API call cannot be preempted.",
+      "owner": "认知内容线计时负责人（由统筹指定姓名）",
+      "reviewer": "外部统筹独立审查；平台runner负责人复核可实现性",
+      "reviewCondition": "Probe cost on target devices; coarse/unknown wall guard.",
+      "status": "PROPOSED_NOT_APPROVED_NOT_IMPLEMENTED"
+    },
+    {
+      "id": "P04",
+      "ruleClass": "project_provisional_researcher_rule",
+      "purpose": "technical_quality_or_preparation_protocol",
+      "object": "16 observed positive performance.now steps",
+      "expression": "max(positive_step_ms)<=0.25",
+      "value": 0.25,
+      "unit": "ms",
+      "consequence": "Coarser/slower or missing observation blocks. Positive step is not certified timer precision.",
+      "prevents": "Claiming sub-ms evidence from millisecond/coarser readings.",
+      "evidenceBasis": "Project sensitivity criterion; MDN/HRT do not prescribe0.25.",
+      "owner": "认知内容线计时负责人（由统筹指定姓名）",
+      "reviewer": "外部统筹独立审查；平台runner负责人复核可实现性",
+      "reviewCondition": "Clock quantization/scheduling and false exclusion.",
+      "status": "PROPOSED_NOT_APPROVED_NOT_IMPLEMENTED"
+    },
+    {
+      "id": "P05",
+      "ruleClass": "project_provisional_researcher_rule",
+      "purpose": "technical_quality_or_preparation_protocol",
+      "object": "rAF preflight coverage",
+      "expression": "r0..r270 yields D1..D270; first30 consecutive interval records are warmup; D31..D270 are exactly240 measured intervals",
+      "value": {
+        "warmupIntervals": 30,
+        "measuredIntervals": 240,
+        "totalRafMarkers": 271
+      },
+      "unit": "intervals / markers",
+      "consequence": "No trimming/replacing bad intervals. Warmup also must be finite/strictly increasing/same realm; any bad value aborts, never skip to find30 good intervals. Interruption blocks.",
+      "prevents": "Cold-start bias, short or cherry-picked samples.",
+      "evidenceBasis": "Project sample/burden choice; jsPsych default60 is reference only.",
+      "owner": "认知内容线计时负责人（由统筹指定姓名）",
+      "reviewer": "外部统筹独立审查；平台runner负责人复核可实现性",
+      "reviewCondition": "Warmup/power transitions, repeatability and setup cost.",
+      "status": "PROPOSED_NOT_APPROVED_NOT_IMPLEMENTED"
+    },
+    {
+      "id": "P06",
+      "ruleClass": "project_provisional_researcher_rule",
+      "purpose": "technical_quality_or_preparation_protocol",
+      "object": "entire preparation starting before the clock probe",
+      "expression": "probe+warmup+240 measurement intervals completed within observed elapsed<=6000",
+      "value": 6000,
+      "unit": "ms",
+      "consequence": "First callback delay counts; timeout/incomplete coverage blocks. Never concatenate response/ready/other-trial gaps.",
+      "prevents": "Paused/throttled RAF represented as complete measurement.",
+      "evidenceBasis": "Project deadline; ideal60/120 rates suggest4500/2250ms, not actual-device guarantees.",
+      "owner": "认知内容线计时负责人（由统筹指定姓名）",
+      "reviewer": "外部统筹独立审查；平台runner负责人复核可实现性",
+      "reviewCondition": "Sampling count or setup latency changes.",
+      "status": "PROPOSED_NOT_APPROVED_NOT_IMPLEMENTED"
+    },
+    {
+      "id": "C01",
+      "ruleClass": "project_provisional_researcher_rule",
+      "purpose": "technical_quality_or_preparation_protocol",
+      "object": "P=(r270-r30)/240",
+      "expression": "exactly one H in{60,120}: abs(P-1000/H)/(1000/H)<=0.005",
+      "value": {
+        "familiesHz": [
+          60,
+          120
+        ],
+        "relativePeriodBand": 0.005
+      },
+      "unit": "Hz / ratio",
+      "consequence": "Freeze H,N=3/6,P; unknown/other/ambiguous family blocks; no display rounding before comparison. Median is descriptive only.",
+      "prevents": "90/144/100 silently mapped to convenient counts; quantized median bias.",
+      "evidenceBasis": "Project family band plus nominal50ms arithmetic; mean-span only reduces endpoint leverage, no device guarantee.",
+      "owner": "认知内容线计时负责人（由统筹指定姓名）",
+      "reviewer": "外部统筹独立审查；平台runner负责人复核可实现性",
+      "reviewCondition": "Near-family/privacy/power data and source protocol review.",
+      "status": "PROPOSED_NOT_APPROVED_NOT_IMPLEMENTED"
+    },
+    {
+      "id": "S01",
+      "ruleClass": "project_provisional_researcher_rule",
+      "purpose": "technical_quality_or_preparation_protocol",
+      "object": "240 measured absolute deviations from P",
+      "expression": "nearest_rank_P95(abs(delta-P))<=0.25",
+      "value": 0.25,
+      "unit": "ms",
+      "consequence": "Otherwise block unstable observed cadence; rank=ceil(.95*n), no interpolation.",
+      "prevents": "Sustained jitter hidden by mean.",
+      "evidenceBasis": "Project provisional jitter budget; short one-cloud data do not validate it.",
+      "owner": "认知内容线计时负责人（由统筹指定姓名）",
+      "reviewer": "外部统筹独立审查；平台runner负责人复核可实现性",
+      "reviewCondition": "Target-device false acceptance/rejection.",
+      "status": "PROPOSED_NOT_APPROVED_NOT_IMPLEMENTED"
+    },
+    {
+      "id": "S02",
+      "ruleClass": "project_provisional_researcher_rule",
+      "purpose": "technical_quality_or_preparation_protocol",
+      "object": "same absolute deviations",
+      "expression": "max(abs(delta-P))<=0.75",
+      "value": 0.75,
+      "unit": "ms",
+      "consequence": "Any violation blocks; keep all intervals.",
+      "prevents": "A single large anomaly hidden by P95.",
+      "evidenceBasis": "Project maximum budget, well below one ideal missing opportunity; not a published cutoff.",
+      "owner": "认知内容线计时负责人（由统筹指定姓名）",
+      "reviewer": "外部统筹独立审查；平台runner负责人复核可实现性",
+      "reviewCondition": "Gap/delay corpus and draw workload changes.",
+      "status": "PROPOSED_NOT_APPROVED_NOT_IMPLEMENTED"
+    },
+    {
+      "id": "S03",
+      "ruleClass": "project_provisional_researcher_rule",
+      "purpose": "technical_quality_or_preparation_protocol",
+      "object": "four consecutive nonoverlapping60-interval preflight windows",
+      "expression": "each Pj in frozen H band; abs(Pj-P)<=0.20; max(Pj)-min(Pj)<=0.20; each window repeats S01/S02 around Pj",
+      "value": {
+        "windowIntervals": 60,
+        "windowCount": 4,
+        "meanDriftMs": 0.2,
+        "windowRangeMs": 0.2
+      },
+      "unit": "intervals / ms",
+      "consequence": "Any failure blocks mixed/drifting observed cadence; passing never proves hardware VRR off.",
+      "prevents": "Whole-sample mean hiding block shifts.",
+      "evidenceBasis": "Project window/drift budget, not hardware VRR detection.",
+      "owner": "认知内容线计时负责人（由统筹指定姓名）",
+      "reviewer": "外部统筹独立审查；平台runner负责人复核可实现性",
+      "reviewCondition": "VRR/power/mixed cadence samples and monitoring cost.",
+      "status": "PROPOSED_NOT_APPROVED_NOT_IMPLEMENTED"
+    },
+    {
+      "id": "S04",
+      "ruleClass": "project_provisional_researcher_rule",
+      "purpose": "technical_quality_or_preparation_protocol",
+      "object": "suspected missing or short opportunities",
+      "expression": "delta/P>=1.5 OR delta/P<=0.75",
+      "value": {
+        "missingRatio": 1.5,
+        "shortRatio": 0.75
+      },
+      "unit": "ratio",
+      "consequence": "Reject; diagnostic labels only suspected_missing_opportunity / short_or_mixed_interval. S02 may reject earlier.",
+      "prevents": "A long/short opportunity normalized into a mean.",
+      "evidenceBasis": "Project labels/rejection, not physical dropped-frame diagnosis.",
+      "owner": "认知内容线计时负责人（由统筹指定姓名）",
+      "reviewer": "外部统筹独立审查；平台runner负责人复核可实现性",
+      "reviewCondition": "Synthetic/real gap patterns and callback semantics.",
+      "status": "PROPOSED_NOT_APPROVED_NOT_IMPLEMENTED"
+    },
+    {
+      "id": "L01",
+      "ruleClass": "project_provisional_researcher_rule",
+      "purpose": "technical_quality_or_preparation_protocol",
+      "object": "continuous monitor scope",
+      "expression": "cross-response/ready/break stopped-RAF joins ==0",
+      "value": 0,
+      "unit": "joins permitted",
+      "consequence": "Each existing fixation starts a fresh segment; keep frozen H,N,P and origin. Do not reclassify.",
+      "prevents": "Human answer pause mistaken for missed frame; manufactured preflight coverage.",
+      "evidenceBasis": "Same-realm contract and existing untimed response/ready behavior.",
+      "owner": "认知内容线计时负责人（由统筹指定姓名）",
+      "reviewer": "外部统筹独立审查；平台runner负责人复核可实现性",
+      "reviewCondition": "Actor pause/restart changes.",
+      "status": "PROPOSED_NOT_APPROVED_NOT_IMPLEMENTED"
+    },
+    {
+      "id": "L02",
+      "ruleClass": "project_provisional_researcher_rule",
+      "purpose": "technical_quality_or_preparation_protocol",
+      "object": "each formal first-draw gate in existing fixation",
+      "expression": "at existing elapsed>=1000 boundary: >=60 consecutive intervals; full fixation and latest60 each use their own span mean, P95/max around that mean, frozen H band and abs(own_mean-frozen_P)<=0.20; no240/four-window requirement (S03 four windows are initial preflight only)",
+      "value": {
+        "existingFixationMs": 1000,
+        "minimumIntervals": 60,
+        "meanDriftMs": 0.2
+      },
+      "unit": "ms / intervals",
+      "consequence": "Failure ends reserved attempt before formal dots. Do not extend1000ms, add fixation/trial, replace samples or switch N.",
+      "prevents": "Startup estimate stale after idle/power/VRR change.",
+      "evidenceBasis": "Project coverage gate within existing fixation, not proof of exact1000ms.",
+      "owner": "认知内容线计时负责人（由统筹指定姓名）",
+      "reviewer": "外部统筹独立审查；平台runner负责人复核可实现性",
+      "reviewCondition": "Target fixation coverage and entry timing.",
+      "status": "PROPOSED_NOT_APPROVED_NOT_IMPLEMENTED"
+    },
+    {
+      "id": "L04",
+      "ruleClass": "project_provisional_researcher_rule",
+      "purpose": "technical_quality_or_preparation_protocol",
+      "object": "online intervals and every available rolling60 window",
+      "expression": "each abs(delta-P)<=0.75; each P60 same frozen H band, abs(P60-P)<=0.20; repeat S01/S02 around P60",
+      "value": {
+        "intervalDeviationMs": 0.75,
+        "rollingIntervals": 60,
+        "meanDriftMs": 0.2
+      },
+      "unit": "ms / intervals",
+      "consequence": "Any failure after reservation/draw ends same attempt. Never switch N or join across L01 idle.",
+      "prevents": "Mid-task cadence switch hidden by initial classification.",
+      "evidenceBasis": "Project online guard; no physical scanout guarantee.",
+      "owner": "认知内容线计时负责人（由统筹指定姓名）",
+      "reviewer": "外部统筹独立审查；平台runner负责人复核可实现性",
+      "reviewCondition": "Runtime overhead and real device changes.",
+      "status": "PROPOSED_NOT_APPROVED_NOT_IMPLEMENTED"
+    },
+    {
+      "id": "F01",
+      "ruleClass": "project_provisional_researcher_rule",
+      "purpose": "technical_quality_or_preparation_protocol",
+      "object": "prospective formal nominal50ms only",
+      "expression": "H60->N3; H120->N6; stimulus groups0..N-1, first intended mask group N",
+      "value": {
+        "60": 3,
+        "120": 6,
+        "currentNominalMs": 50
+      },
+      "unit": "draw opportunities / ms",
+      "consequence": "No elapsed-flip epsilon, alternating count or adaptive count. First issued/returned group anchors0, not reservation/deadline.",
+      "prevents": "Off-by-one onset/count; assuming integer math is physical50ms.",
+      "evidenceBasis": "Nominal source50ms plus arithmetic; substantive new presentation policy needs approval.",
+      "owner": "认知内容线计时负责人（由统筹指定姓名）",
+      "reviewer": "外部统筹独立审查；平台runner负责人复核可实现性",
+      "reviewCondition": "Independent protocol review, user confirmation and schema/version freeze.",
+      "status": "PROPOSED_NOT_APPROVED_NOT_IMPLEMENTED"
+    },
+    {
+      "id": "F02",
+      "ruleClass": "project_provisional_researcher_rule",
+      "purpose": "technical_quality_or_preparation_protocol",
+      "object": "each future k=1..N callback marker",
+      "expression": "abs((rk-r_on)-k*P)<=0.5",
+      "value": 0.5,
+      "unit": "ms",
+      "consequence": "Violation triggers pending gray-clear/end strategy before another stimulus group; no catch-up. Old66.6 is not accepted.",
+      "prevents": "Six individually small delays accumulating.",
+      "evidenceBasis": "Project0.5ms=1% of nominal50ms technical marker budget, not scientific tolerance.",
+      "owner": "认知内容线计时负责人（由统筹指定姓名）",
+      "reviewer": "外部统筹独立审查；平台runner负责人复核可实现性",
+      "reviewCondition": "New callback traces and sensitivity to derived envelope.",
+      "status": "PROPOSED_NOT_APPROVED_NOT_IMPLEMENTED"
+    },
+    {
+      "id": "D01",
+      "ruleClass": "project_provisional_researcher_rule",
+      "purpose": "technical_quality_or_preparation_protocol",
+      "object": "on/slot/off marker and command clock integrity",
+      "expression": "finite same-origin rAF<=entry<=commandStart<=commandReturn; missing/exception events==0",
+      "value": 0,
+      "unit": "missing/invalid events permitted",
+      "consequence": "Intended/failed groups not counted as returned draws; retain attempted vs actual facts, no mask/off backfill.",
+      "prevents": "Failed/unmeasured draw recorded as success.",
+      "evidenceBasis": "Technical integrity; return without exception still does not prove GPU/pixels.",
+      "owner": "认知内容线计时负责人（由统筹指定姓名）",
+      "reviewer": "外部统筹独立审查；平台runner负责人复核可实现性",
+      "reviewCondition": "Canvas/context loss and clock-alignment review.",
+      "status": "PROPOSED_NOT_APPROVED_NOT_IMPLEMENTED"
+    },
+    {
+      "id": "D02",
+      "ruleClass": "project_provisional_researcher_rule",
+      "purpose": "technical_quality_or_preparation_protocol",
+      "object": "entry lag from shared RAF marker",
+      "expression": "0<=entry-rAF<=0.25*P",
+      "value": 0.25,
+      "unit": "fraction of frozen P",
+      "consequence": "Reject outside budget; retain signed raw, do not clamp negative values.",
+      "prevents": "Late callback hidden behind on-time marker.",
+      "evidenceBasis": "Project25% of period, roughly4.17/2.08ms at ideal60/120.",
+      "owner": "认知内容线计时负责人（由统筹指定姓名）",
+      "reviewer": "外部统筹独立审查；平台runner负责人复核可实现性",
+      "reviewCondition": "Real entry lag/coarsening; unknown alignment blocks.",
+      "status": "PROPOSED_NOT_APPROVED_NOT_IMPLEMENTED"
+    },
+    {
+      "id": "D03",
+      "ruleClass": "project_provisional_researcher_rule",
+      "purpose": "technical_quality_or_preparation_protocol",
+      "object": "work from callback entry to draw-command return",
+      "expression": "rawWork=return-entry>=0; chargedWork=rawWork+0.25; chargedWork<=0.20*P",
+      "value": {
+        "workPeriodFraction": 0.2,
+        "measurementReserveMs": 0.25
+      },
+      "unit": "fraction / ms",
+      "consequence": "Keep raw0 and censored flag; charge0.25 rather than zero cost. Reserve is engineering accounting, not measured upper bound. Failed/unknown probe blocks.",
+      "prevents": "Coarse-clock0 treated as zero CPU work; ignoring monitoring/pre-draw work.",
+      "evidenceBasis": "Project20% work budget plus0.25ms reserve, not GPU guarantee; entire entry-to-return work included.",
+      "owner": "认知内容线计时负责人（由统筹指定姓名）",
+      "reviewer": "外部统筹独立审查；平台runner负责人复核可实现性",
+      "reviewCondition": "Probe and actual mask/dot workload feasibility/false rejection.",
+      "status": "PROPOSED_NOT_APPROVED_NOT_IMPLEMENTED"
+    },
+    {
+      "id": "D04",
+      "ruleClass": "project_provisional_researcher_rule",
+      "purpose": "technical_quality_or_preparation_protocol",
+      "object": "commandStart span against marker span for every k including off",
+      "expression": "abs((startk-start_on)-(rk-r_on))<=0.5",
+      "value": 0.5,
+      "unit": "ms",
+      "consequence": "Reject beyond budget; actual signed clocks retained. With F02, command span residual to kP can be as large as1ms.",
+      "prevents": "Command latency drift despite regular markers.",
+      "evidenceBasis": "Project extra0.5ms alignment budget; not physical exposure tolerance.",
+      "owner": "认知内容线计时负责人（由统筹指定姓名）",
+      "reviewer": "外部统筹独立审查；平台runner负责人复核可实现性",
+      "reviewCondition": "Measured draw clocks and wider derived software envelope.",
+      "status": "PROPOSED_NOT_APPROVED_NOT_IMPLEMENTED"
+    },
+    {
+      "id": "E01",
+      "ruleClass": "project_provisional_researcher_rule",
+      "purpose": "technical_quality_or_preparation_protocol",
+      "object": "failure after reservation/task draw",
+      "expression": "further stimulus groups==0; attempt clear to original #808080, then end same attempt",
+      "value": {
+        "clearColor": "#808080",
+        "newMaskOnFailure": false,
+        "reExposureRetries": 0
+      },
+      "unit": "display action / attempts",
+      "consequence": "Gray-clear behavior is explicitly pending approval. Clear success is neutral_background command offset, not mask; failed clear leaves offset unknown.",
+      "prevents": "Improvised mask/new stimulus, fake mask/off, silent re-exposure.",
+      "evidenceBasis": "Project conservative interruption display strategy.",
+      "owner": "认知内容线计时负责人（由统筹指定姓名）",
+      "reviewer": "外部统筹独立审查；平台runner负责人复核可实现性",
+      "reviewCondition": "User approval; Canvas/context loss and actor recovery validation.",
+      "status": "PROPOSED_NOT_APPROVED_NOT_IMPLEMENTED"
+    }
+  ],
+  "clockProbeSemantics": {
+    "notExecuted": true,
+    "compactRaw": "Initial reading, at most16 positive advances with readOrdinal/value, totalReads/equal-run counts, any abort reading/ordinal and resource flags; equal readings losslessly reconstructible without262144 duplicate JSON values.",
+    "readsIncludeInitial": true,
+    "positiveAdvances": "Consecutive performance.now values increasing; equal reads do not count, negative/nonfinite abort. After a read,16 positives may complete when elapsed<=20 and reads<=262144 and every other probe rule passes, including equality at caps. Any exceeded cap fails; at a cap with fewer than16 positives fail without another read.",
+    "observedStepNotPrecision": "Polling/scheduling/coarsening all affect steps. <=0.25ms cannot certify timer accuracy.",
+    "deadline": "performance.now elapsed checked every read; Date.now resource guard each256 reads and on completion, backward wall jump aborts. Wall epoch not exported. One API call cannot be preempted:20ms is not hard realtime CPU guarantee.",
+    "zeroWork": "Raw0 kept/censored, reserve0.25ms against work budget. Do not call actual cost0 or upper bound0.25. Unknown probe blocks.",
+    "maxPerFrozenHostAttemptDraftBudget": {
+      "preparationAttempts": 2,
+      "performanceNowReads": 524288,
+      "observedProbeBudgetMs": 40,
+      "observedEntirePreparationBudgetMs": 12000,
+      "retainedPreflightMarkers": 542
+    }
+  },
+  "retryIdle": {
+    "preExposure": "At most2 explicit preparations for one host-admitted frozen attempt across client aliases; no reservation/draw before ready. New host-admitted attempt may start anew; a client-renamed string cannot.",
+    "postExposure": "Any failure after reservation/draw ends same attempt, including practice. Only read-only/original save retries; no switch/replacement exposure.",
+    "idle": "Every existing1000ms fixation starts new segment; Any idle duration gets the same revalidation; no stale-time threshold exists. Need>=60 intervals at first-formal-draw gate, no extension/new fixation or extra preflight after exposure."
+  },
+  "rawClockContract": {
+    "oncePerPrep": [
+      "preparationStartPerfMs before probe; initial resource wall guard (epoch not exported)",
+      "actual origin/pageInstance/source",
+      "warmup/measurement markers",
+      "clock positive steps/read counts/resource flags",
+      "policy/H/N/P/window/quantile identities"
+    ],
+    "preflightIndexing": {
+      "markers": "r0..r270",
+      "warmupIntervals": "D1..D30",
+      "measurementIntervals": "D31..D270",
+      "P": "(r270-r30)/240",
+      "windows": [
+        "D31..D90: (r90-r30)/60",
+        "D91..D150: (r150-r90)/60",
+        "D151..D210: (r210-r150)/60",
+        "D211..D270: (r270-r210)/60"
+      ]
+    },
+    "perDraw": [
+      "rAF marker",
+      "callback entry",
+      "candidate/actual command start/return",
+      "draw kind and issued/returned/exception facts",
+      "slot index",
+      "failure/neutralization facts without fake mask"
+    ],
+    "physicalPixelOnset": null,
+    "physicalPixelOffset": null,
+    "absence": "unknown; do not fill from planned deadline or neutral clear",
+    "storage": "Bounded client memory, preparation/trial boundary write; full archive with core references, no per-frame server calls."
+  },
+  "exposureDefinition": {
+    "trialExposureReserved": "A task-trial exposure reservation, including practice; counts even if first draw has not yet happened.",
+    "notExposureReservation": [
+      "host admission/openAttempt",
+      "verified same-attempt claim",
+      "preflight-only observation"
+    ],
+    "retryWithinClaim": "If only preflight failed and no task trial was reserved/drawn, one explicit retry within the same legitimate claim is allowed, up to2 total; no new fresh claim fabricated."
+  },
+  "hostAdmissionIdentity": {
+    "required": "Platform-authorized and frozen administration identity, potentially verified sessionId+attemptNo ->candidate attemptId mapping",
+    "mapperImplemented": false,
+    "clientAliasCannotCreateAdmission": true,
+    "newLegitimateHostAttempt": "May reset its own two-preparation budget; not poisoned by an older completed attempt on the same page",
+    "sameAttempt": "Context/port/client-string rename does not reset budget or ended/exposed marker; new realm ends it"
+  },
+  "activation": [
+    "External independent numeric/protocol review",
+    "Explicit user approval of counter/preparation/gray-clear policy changes",
+    "Actual schema/version/frozen tuple/archive consumers reviewed",
+    "Only new affected deterministic/browser checks after approval",
+    "Real-device/optical evidence; never reclassify old data"
+  ],
+  "sourcesFile": "sources.json",
+  "statisticsFile": "raw-statistics.json",
+  "boundariesFile": "boundary-cases.json",
+  "consumerMapFile": "consumer-map.json",
+  "validationPlanFile": "validation-plan.md"
+}

@@ -1,3 +1,4 @@
+import { getNativeCognitiveTaskDefinition,listNativeCognitiveTaskDefinitions } from '../content-candidates/native-registry/definitions'
 import {
   getCognitiveRegistryEntry,
   listCognitiveRegistryEntries,
@@ -183,14 +184,21 @@ export const buildCognitiveV2TaskDefinition = (
   }
 }
 
-export const listCognitiveV2TaskDefinitions = (): TaskDefinition<unknown, unknown>[] =>
-  listCognitiveRegistryEntries().map((entry) => buildCognitiveV2TaskDefinition(entry))
+export const listCognitiveV2TaskDefinitions = (): TaskDefinition<unknown, unknown>[] => {
+  const native = listNativeCognitiveTaskDefinitions()
+  const legacy = listCognitiveRegistryEntries().filter(entry => !getNativeCognitiveTaskDefinition(
+    entry.testType, entry.engineVersion, entry.scoringVersion,
+  )).map(entry => buildCognitiveV2TaskDefinition(entry))
+  return [...legacy, ...native]
+}
 
 export const getCognitiveV2TaskDefinition = (
   testType: string,
   engineVersion: string,
   scoringVersion: string,
 ): TaskDefinition<unknown, unknown> | undefined => {
+  const native = getNativeCognitiveTaskDefinition(testType, engineVersion, scoringVersion)
+  if (native) return native
   const entry = getCognitiveRegistryEntry(testType, engineVersion, scoringVersion)
   return entry ? buildCognitiveV2TaskDefinition(entry) : undefined
 }

@@ -1,0 +1,7 @@
+# 原生宿主一代归属修复
+
+旧MOT callback冻结session/epoch/definition/protocol/版本/seed及hook代数；load/restart开始、卸载立即失效旧代。每个关键await后才允许继续动作或推进UI，StrictMode正常effect重建可继续。
+
+既有draftKey不变。putTrial / sealForSubmission / setStatus / delete新增可选expectedIdentity，在写入同事务比较draftKey/instrument/session/epoch/definition/submission。legacy不传保持既有语义。raw seal与finish逐步透传原身份，避免旧回包清新meta；封存重放的onRetry和catch也受currentLoad及原meta约束。MOT已绑定的独立raw port继续保留原记录，不因回调过期取消或丢弃原件。已发出的服务器FINAL允许按原身份落账，不宣称被客户端取消。
+
+新增8个独立病例通过：首轮7＋增量2（active重复一次，因为fixture从非法MOBILE更正为真实PHONE），0断言失败。真实tsconfig四受影响入口闭包0诊断。active病例核一次FINAL与PHONE/TOUCH来源保留。原25/18、single-flight及2+9浏览器不复跑、不覆盖。真实IndexedDB新增事务小合同由主线独立执行，未冒充本文件Memory hook病例。原件与当前4源码hash见evidence.json。

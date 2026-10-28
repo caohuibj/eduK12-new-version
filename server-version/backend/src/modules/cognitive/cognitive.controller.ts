@@ -1,3 +1,4 @@
+import { withNativeCoreReceipt } from './native-final-receipt'
 import { enqueueExportJob } from '../../services/exportJobService'
 import { registerAssessmentExport, resolveAssessmentExport } from '../../services/assessmentExportArtifact'
 import { Request, Response } from 'express'
@@ -467,7 +468,8 @@ export const cognitiveController = {
         ...input,
       })
       const responseData = await projectRelationalUnitFinalResponse(internalContext.compositeAttemptId, data)
-      return success(res, responseData, data.replayed ? '认知测评提交已确认' : '认知测评已完成')
+      const receipt=withNativeCoreReceipt(responseData,internalContext,{sessionId:req.params.id,submissionId:input.submissionId,definitionHash:input.definitionHash})
+      return success(res, receipt, data.replayed ? '认知测评提交已确认' : '认知测评已完成')
     } catch (err) {
       if (isUnitSubmitAdmissionBusyError(err)) return assessmentSubmitBusy(res, err.retryAfterSeconds)
       if (isQuestionnaireCompletionAdmissionBusyError(err)) return completionBusy(res, err.retryAfterSeconds)

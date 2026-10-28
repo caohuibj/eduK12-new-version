@@ -1,0 +1,38 @@
+{
+  "artifactKind": "PARALLEL_DESIGN_COORDINATION_NOT_RUNTIME_REGISTRY",
+  "dateUtc": "2026-10-26",
+  "baselineCommit": "e393f730a7b0832534a181df1f3fbbc6b9575f8c",
+  "authorization": "User explicitly requested parallel subagents, one assessment each.",
+  "scope": "Protocol and static UI proposals only; participant-facing measurement design requires review before implementation.",
+  "agents": [
+    {
+      "agent": "enumeration_plan",
+      "candidateId": "attention-enumeration-flower",
+      "directory": "enumeration",
+      "status": "REVIEW_DRAFT_READY",
+      "designStatus": "DESIGN_PROPOSAL",
+      "pendingDecisionCount": 6
+    },
+    {
+      "agent": "recognition_plan",
+      "candidateId": "continuous-recognition",
+      "directory": "recognition",
+      "status": "REVIEW_DRAFT_READY",
+      "designStatus": "DESIGN_PROPOSAL",
+      "pendingDecisionCount": 8
+    },
+    {
+      "agent": "ant_plan",
+      "candidateId": "attention-ant-pebl",
+      "directory": "ant",
+      "status": "REVIEW_DRAFT_READY",
+      "designStatus": "DESIGN_PROPOSAL",
+      "pendingDecisionCount": 7
+    }
+  ],
+  "productCodeChanged": false,
+  "runtimeRegistered": false,
+  "realFourEntrancesVerified": false,
+  "physicalTimingValidated": false,
+  "normsAvailable": false
+}

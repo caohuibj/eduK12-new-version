@@ -18,6 +18,7 @@ import { cognitiveApi, publicCognitiveApi } from '../api'
 import { readCognitiveRecoveryCredential } from '../core/recovery-credential'
 import { resolveRunner, type MetricDefinition } from '../registry'
 import type { CognitiveSession, CognitiveV2Report } from '../types'
+import {CognitiveRawArchiveNotice} from '../CognitiveRawArchiveNotice'
 import CognitiveSingleTaskReportCard from '../CognitiveSingleTaskReportCard'
 import CognitiveV2ReportCard from '../CognitiveV2ReportCard'
 
@@ -119,6 +120,7 @@ const CognitiveResult: React.FC = () => {
         <button onClick={back} className="mb-4 inline-flex min-h-11 items-center gap-2 text-gray-500 hover:text-gray-700" data-report-screen-only>
           <ArrowLeft className="h-4 w-4" aria-hidden="true" />{learner.enabled ? learner.backLabel : '返回列表'}
         </button>
+        <CognitiveRawArchiveNotice session={session} api={sessionApi}/>
         <CognitiveV2ReportCard
           report={v2Report}
           references={referenceRows}
@@ -185,6 +187,7 @@ const CognitiveResult: React.FC = () => {
         <ArrowLeft className="h-4 w-4" aria-hidden="true" />{learner.enabled ? learner.backLabel : '返回列表'}
       </button>
 
+      <CognitiveRawArchiveNotice session={session} api={sessionApi}/>
       {result.singleTaskReport ? (
         <CognitiveSingleTaskReportCard
           report={result.singleTaskReport}

@@ -1,0 +1,332 @@
+{
+  "candidateId": "continuous-recognition",
+  "status": "UNREGISTERED_FRONTEND_CANDIDATE",
+  "baselineCommit": "d78332d54488cc677dff3dcb2b64761dc3fca207",
+  "branch": "cognitive-next-three-core-20261026",
+  "createdUtc": "2026-10-26T07:24:12.597463+00:00",
+  "environment": {
+    "cloudOnly": true,
+    "os": "Linux-6.18.55-x86_64-with-glibc2.41",
+    "node": "v24.21.0",
+    "browser": "/usr/bin/chromium",
+    "chromiumSandbox": true,
+    "macResourcesUsed": false,
+    "newDependenciesInstalled": false
+  },
+  "checks": [
+    {
+      "kind": "initial-frontend-tests",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/vitest/vitest.mjs run src/modules/cognitive/tasks/continuous-recognition/recognition.test.ts --maxWorkers=1 --reporter=json --outputFile=../../docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/vitest.json",
+      "cwd": "/workspace/eduK12-new-version/server-version/frontend",
+      "exitCode": 0,
+      "passed": 27,
+      "report": "vitest.json"
+    },
+    {
+      "kind": "new-receipt-boundaries-only",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node server-version/frontend/node_modules/vitest/vitest.mjs run src/modules/cognitive/tasks/continuous-recognition/recognition.test.ts --root server-version/frontend --maxWorkers=1 -t 'recognition sealed receipt boundaries' --reporter=json --outputFile=../../docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/receipt-vitest.json",
+      "cwd": "/workspace/eduK12-new-version",
+      "exitCode": 0,
+      "passed": 10,
+      "skipped": 27,
+      "report": "receipt-vitest.json"
+    },
+    {
+      "kind": "affected-assets-and-new-lifecycle",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node server-version/frontend/node_modules/vitest/vitest.mjs run src/modules/cognitive/tasks/continuous-recognition/recognition.test.ts src/modules/cognitive/tasks/continuous-recognition/lifecycle.test.tsx --root server-version/frontend --maxWorkers=1 -t 'recognition component frozen lifecycle|recognition verified image bytes|recognition bound assets' --reporter=json --outputFile=../../docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/lifecycle-vitest.json",
+      "cwd": "/workspace/eduK12-new-version",
+      "exitCode": 0,
+      "passed": 18,
+      "skipped": 28,
+      "repeatedBecauseInputsChanged": 9,
+      "report": "lifecycle-vitest.json"
+    },
+    {
+      "kind": "initial-owned-types-only",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/typescript/bin/tsc --noEmit --strict --target ES2020 --lib ES2020,DOM,DOM.Iterable --module ESNext --moduleResolution bundler --esModuleInterop --skipLibCheck --jsx react-jsx --types vite/client,node src/modules/cognitive/tasks/continuous-recognition/contracts.ts src/modules/cognitive/tasks/continuous-recognition/assets.ts src/modules/cognitive/tasks/continuous-recognition/capture.ts src/modules/cognitive/tasks/continuous-recognition/save-queue.ts src/modules/cognitive/tasks/continuous-recognition/digest.ts src/modules/cognitive/tasks/continuous-recognition/session.ts src/modules/cognitive/tasks/continuous-recognition/RecognitionTask.tsx src/modules/cognitive/tasks/continuous-recognition/RecognitionReport.tsx",
+      "cwd": "/workspace/eduK12-new-version/server-version/frontend",
+      "exitCode": 0
+    },
+    {
+      "kind": "changed-entry-types-only",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/typescript/bin/tsc --noEmit --strict --target ES2020 --lib ES2020,DOM,DOM.Iterable --module ESNext --moduleResolution bundler --esModuleInterop --skipLibCheck --jsx react-jsx --types vite/client,node src/modules/cognitive/tasks/continuous-recognition/assets.ts src/modules/cognitive/tasks/continuous-recognition/RecognitionTask.tsx",
+      "cwd": "/workspace/eduK12-new-version/server-version/frontend",
+      "exitCode": 0
+    },
+    {
+      "kind": "initial-cloud-browser",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node server-version/scripts/cognitive/recognition-browser-review.cjs",
+      "cwd": "/workspace/eduK12-new-version",
+      "exitCode": 0,
+      "screenshots": 13,
+      "report": "browser/browser-initial.json",
+      "initialCompleteBundlePreserved": false
+    },
+    {
+      "kind": "affected-cloud-browser-followup",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node server-version/scripts/cognitive/recognition-browser-review.cjs --followup",
+      "cwd": "/workspace/eduK12-new-version",
+      "exitCode": 0,
+      "screenshots": 7,
+      "report": "browser/browser.json",
+      "commandSourceSnapshot": "browser-followup-command-source.cjs.txt",
+      "unchangedReadingChecksReused": 6
+    },
+    {
+      "kind": "new-browser-input-only",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node server-version/scripts/cognitive/recognition-browser-review.cjs --input-only",
+      "cwd": "/workspace/eduK12-new-version",
+      "exitCode": 0,
+      "report": "browser/browser-input.json",
+      "actualRawInputEvents": 4
+    }
+  ],
+  "uniqueFrontendTests": 46,
+  "backendOriginal84Repeated": false,
+  "failureHistory": [
+    {
+      "exitCode": 1,
+      "kind": "test-setup-wrong-cwd",
+      "testsExecuted": 0,
+      "record": "preparation-failure.txt"
+    }
+  ],
+  "screenshotReuse": {
+    "unchangedReportAndCssBytesVerified": true,
+    "readingScenarios": 6,
+    "from": "browser/browser-initial.json",
+    "originalCompleteBundleRetained": false
+  },
+  "files": [
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/README.md",
+      "sha256": "fad7f846f7adf831dfc38f8e9d09ef60624975e5330a1ce455e54a61447c75e5"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/browser/browser-initial.json",
+      "sha256": "a6c1272961b3e589da5159e36bd01256dd811c455af2a20d171a59e18cc9c0c9"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/browser/browser-input.json",
+      "sha256": "b3e8318f753ff43699e5e014f363d53d29193bf4e0bec9557bc8fddf6561dfa8"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/browser/browser.json",
+      "sha256": "e6574dbfc10fd0159b751dcd29162f9bbfb1d2095d67d1be5361b1c4e428fdbd"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/browser/index.html",
+      "sha256": "2ce7e2aa94a5f375b9850a872be49f4447da2a8593c5d5635771bde8a4f9579e"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/browser/phone-final-limited.png",
+      "sha256": "0b69a9126c976b4bea1f6e2e3262847082f479f7a9daaad5953b316fe2496af0"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/browser/phone-image.png",
+      "sha256": "4184b2b3f8fd0d95fe2bcb102b5528bbdf89157bb671f341bf38c3ed7e725b79"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/browser/phone-intro.png",
+      "sha256": "d3274ca1f80fb981a503b658ac8baed5df76de6bd8eea458cc4e389d150d444c"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/browser/phone-isi.png",
+      "sha256": "17b0d2da8dfacd5122dc2a92a25b5bfd2282cfd8677d8beb7c0f35b6e24901c9"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/browser/review.css",
+      "sha256": "4f7fa630857182433c94a3ee67792de6105126a18177c302fbf77a47bf3a75ab"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/browser/review.js",
+      "sha256": "0e5ddea42113f854052dfeb207991906fe4ce27535d65f44441783394f74771f"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/browser/synthetic-flow-records.json",
+      "sha256": "9a39ae59447317f4367840445f9d849e8950067b1fb574532cdf42631e120289"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/browser/tablet-image.png",
+      "sha256": "9726c89416cd1244a10ac39c6c2aec1867831bfe3bfb8aa71bfeddc490a59513"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/browser/tablet-intro.png",
+      "sha256": "27d05a70bf84176afad151a6d34dd28186414ea0c2a6a850547f469e041f4f8e"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/browser/tablet-isi.png",
+      "sha256": "21877c38d90900e09b50fb014a2572bbb8b03c12b5adf867202a769ac3cf2402"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/browser/zoom-en-intro.png",
+      "sha256": "98dbffb5a9eeafbf051676126bd223ea59118b0b091d417f98dd4556ce134979"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/browser/zoom-en-invalid.png",
+      "sha256": "f5e0cca8b659c2c1036a8dec37ff370a4cd75b9505b2a00a451a54312f0e5703"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/browser/zoom-en-limited.png",
+      "sha256": "030f68a017cbf878b8e6275dac0e4ebd83972e0e0941e0f7cbe451f311968489"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/browser/zoom-zh-intro.png",
+      "sha256": "07466cb49954f80159a697bb1931ab87b9edaa1255d7b585a91f85fb37ee0a1e"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/browser/zoom-zh-invalid.png",
+      "sha256": "7eae16e2d4a4058e870ea699deee92eaf34c3bb16be775819aaaca3f81fe1554"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/browser/zoom-zh-limited.png",
+      "sha256": "603e85edf133b457fa7bb74a4bd76c1f2203d81de3401878d142bf65376532de"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/browser-followup-command-source.cjs.txt",
+      "sha256": "c93f622652e4e1fdcb41c4727f463db850e0f483596c3aa4e0dcd8f6b5f3ae22"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/initial-sources/RecognitionReport.tsx.txt",
+      "sha256": "b5fcf337cd149127b4d1c0ca27eb63f0dd64e36731a1b3497e4f80792a65d322"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/initial-sources/RecognitionTask.tsx.txt",
+      "sha256": "b31161383daa597cfed3ab38ab593ccd54da382a321e88a9699582b3c6f7d79b"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/initial-sources/assets.ts.txt",
+      "sha256": "0f4c3ea5c5eaded945ba5e6498704a430c7b81eb25d040ecc96e992bb43594e9"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/initial-sources/capture.ts.txt",
+      "sha256": "5a15054ae89d8766462e13f3f0efb8d010ee8a20609ca9cf7deac27c9567f1c5"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/initial-sources/contracts.ts.txt",
+      "sha256": "1767b61bbf6f317415a3525908c616cc56deb532ee4317380626acef875547de"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/initial-sources/digest.ts.txt",
+      "sha256": "0c5c254b9777ab57ddc29cc12b52beced70457b944ba47aa97a96d23984079eb"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/initial-sources/recognition.css.txt",
+      "sha256": "3f5ba7495fe4048f73b398a966a10155c9462110c4d2f747242d20af3cea2891"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/initial-sources/recognition.test.ts.txt",
+      "sha256": "65dbff9c7c83b8386f83210b945441717c94d4c051bdb8a3e2b57764ed684904"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/initial-sources/save-queue.ts.txt",
+      "sha256": "633026e45619a8ec5a59d7be78de669be8b8da1671044517e7bcc25580bb573f"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/initial-sources/session.ts.txt",
+      "sha256": "5fcbee5659a0f5443d496881853fbfdf3e6a5e681a78e237ceb57beaa152b4a5"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/initial-sources.json",
+      "sha256": "40f0cab0848249348d6f0f87106be14db15e082b0fbebecfe7e035909dbfe665"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/lifecycle-vitest.json",
+      "sha256": "51d5aa3aa7d87b489cf25d5905973ca50783153a3694eb3ec6c868b8d4348db3"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/preparation-failure.txt",
+      "sha256": "3328093f5880d8e5e336bb9ef1162a955f220b7058faec8583768ff0dcf6e7c9"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/receipt-vitest.json",
+      "sha256": "2a47aff4be7643d13c76bff2164459459148a17d735d59e1615f98010bf5679a"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/vitest.json",
+      "sha256": "0bcac8822cd2f9e20aeabb44b025686c98c9ccc24eb4e68b957ab6757a89ab6e"
+    },
+    {
+      "file": "server-version/frontend/package-lock.json",
+      "sha256": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe"
+    },
+    {
+      "file": "server-version/frontend/package.json",
+      "sha256": "ba3959e4e7935cb3b60b8391f590a2622990397b1b33b99a545c45867d51e49f"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/RecognitionReport.tsx",
+      "sha256": "b5fcf337cd149127b4d1c0ca27eb63f0dd64e36731a1b3497e4f80792a65d322"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/RecognitionTask.tsx",
+      "sha256": "0268b96e3e7efffa844e9311f526d26f87e64d87fab966eb8b6bfad9749db61d"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/assets.ts",
+      "sha256": "2f8a79262e49859ad5ff5a4758e8dd7004d231f33fda85a74a6ca68500534dc3"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/capture.ts",
+      "sha256": "5a15054ae89d8766462e13f3f0efb8d010ee8a20609ca9cf7deac27c9567f1c5"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/contracts.ts",
+      "sha256": "1767b61bbf6f317415a3525908c616cc56deb532ee4317380626acef875547de"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/digest.ts",
+      "sha256": "0c5c254b9777ab57ddc29cc12b52beced70457b944ba47aa97a96d23984079eb"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/lifecycle.test.tsx",
+      "sha256": "c7de6c3994d86cc848e4c11b616d606d4b387dee496dc1a9f148fcceb4f9c042"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/recognition.css",
+      "sha256": "3f5ba7495fe4048f73b398a966a10155c9462110c4d2f747242d20af3cea2891"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/recognition.test.ts",
+      "sha256": "940ff9351e7165f4798ec363ecefc14b948aefcd95e15200e91b0cf54fd0db56"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/save-queue.ts",
+      "sha256": "633026e45619a8ec5a59d7be78de669be8b8da1671044517e7bcc25580bb573f"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/session.ts",
+      "sha256": "5fcbee5659a0f5443d496881853fbfdf3e6a5e681a78e237ceb57beaa152b4a5"
+    },
+    {
+      "file": "server-version/frontend/vitest.config.ts",
+      "sha256": "3d757d2b1cee6c1c09a3ec7016b296aa159c938f83365e2370a1d423f29917db"
+    },
+    {
+      "file": "server-version/scripts/cognitive/recognition-browser-review.cjs",
+      "sha256": "621356dcc16400a94dbac01b5fc08f23c771e3eb0e8178540e05bcc3acf039ff"
+    }
+  ],
+  "selfCheckOnly": true,
+  "independentAuditClaimed": false,
+  "completeDependencyByteInventoryRecorded": false,
+  "formalAssetsAuthorized": false,
+  "realPlatformPortsImplemented": false,
+  "unverified": [
+    "research260 frontend full flow",
+    "real stimulus library rights and cognitive equivalence",
+    "physical phone/tablet timing or Safari/Firefox",
+    "Chinese/English comprehension or population validity",
+    "backend catalog/tag persistence and search",
+    "four-entry consumers",
+    "real local durable recovery and API/DB/COS/FINAL/export/device readback",
+    "load capacity and worst payload budget",
+    "registration/publication/deploy"
+  ],
+  "notes": [
+    "Synthetic SVG fixture only; actual bytes SHA256 verified in prepare",
+    "Host native scorer executed in synthetic localhost final flow; fixture finalSaved is not real COS evidence",
+    "Report limited/invalid only; no internal HR/FAR/CRR shown",
+    "No backend/shared-core/registry/schema/lock/CI changes; no commit/push/Notion"
+  ]
+}

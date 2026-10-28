@@ -1,0 +1,102 @@
+{
+  "candidateId": "continuous-recognition",
+  "status": "DESIGN_PROPOSAL",
+  "baseline": "9969583b2c95fa87ff44a4f2b3aa68cbd7471390",
+  "branch": "cognitive-next-three-core-20261026",
+  "createdUtc": "2026-10-26T06:26:21.120758+00:00",
+  "environment": {
+    "cloudOnly": true,
+    "node": "v24.21.0",
+    "os": "Linux-6.18.55-x86_64-with-glibc2.41",
+    "cwd": "/workspace/eduK12-new-version/server-version/backend",
+    "noMacResourcesUsed": true
+  },
+  "authorization": {
+    "threePreviewsApproved": true,
+    "profileCounts260And100Approved": true,
+    "formalAssetRightsApproved": false,
+    "hardwareTimingOrValidityApproved": false
+  },
+  "checks": [
+    {
+      "kind": "single-file-vitest",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/vitest/vitest.mjs run src/__tests__/cognitive/continuous-recognition-candidate.test.ts --maxWorkers=1 --reporter=json --outputFile=../../docs/cognitive-library/next-candidates-20261026/recognition/implementation/vitest.json",
+      "cwd": "/workspace/eduK12-new-version/server-version/backend",
+      "exitCode": 0,
+      "passedTests": 43,
+      "failedTests": 0,
+      "report": "vitest.json"
+    },
+    {
+      "kind": "isolated-source-types",
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/typescript/bin/tsc --noEmit --strict --target ES2020 --module commonjs --moduleResolution node --esModuleInterop --skipLibCheck src/modules/cognitive/content-candidates/continuous-recognition/protocol.ts src/modules/cognitive/content-candidates/continuous-recognition/scorer.ts src/modules/cognitive/content-candidates/continuous-recognition/metadata.ts",
+      "cwd": "/workspace/eduK12-new-version/server-version/backend",
+      "exitCode": 0,
+      "sourceFiles": 3
+    }
+  ],
+  "sourceAndEvidenceFiles": [
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/continuous-recognition/metadata.ts",
+      "sha256": "a272a4761cfbf77743dc131309dbcd0c0fe3a01f8a0c229729666afb4d5a6e90"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/continuous-recognition/protocol.ts",
+      "sha256": "f9b724b0bbca7c172089ae1699b311605e1681845a331f192f9afc4de454804b"
+    },
+    {
+      "file": "server-version/backend/src/modules/cognitive/content-candidates/continuous-recognition/scorer.ts",
+      "sha256": "cd3f53ad81d127da6342fe62f91ed7aa52b6c9a665c1484d0895ed7bbb7272ff"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/cognitive/continuous-recognition-candidate.test.ts",
+      "sha256": "5a718f6af774b0177ee91b371a50b97aadced1b3d808cd968e68ae51997f72a6"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/README.md",
+      "sha256": "6a42ebbd864d285db43e68eb0bae9d43f1e92b0020d4ec8932f02a84ba60fb7d"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/synthetic-manifests.json",
+      "sha256": "be2ac8cd17d562f94b584e259b5fe8cbc5966cd096b7d9791cb14b186a803810"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/vitest.json",
+      "sha256": "f0ef2eb019b73cd2c734a8adf17d8d7138bc83dd7cb3ffe493edf6040b7de959"
+    },
+    {
+      "file": "server-version/backend/vitest.config.ts",
+      "sha256": "26b98b70914617771d41657be8cdf6d7b6d7024c81d1c8a49aeae6a9220cf93b"
+    },
+    {
+      "file": "server-version/backend/package.json",
+      "sha256": "d629185584fcd679ca367c2d536c6c7783f7a9fe23363a8cd870964a47b2990a"
+    },
+    {
+      "file": "server-version/backend/package-lock.json",
+      "sha256": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450"
+    },
+    {
+      "file": "server-version/backend/tsconfig.json",
+      "sha256": "c79ccf595a80514e94936f1ffcd2fa09b57265f0c140d275c81770f494175143"
+    }
+  ],
+  "notRun": [
+    "CI",
+    "application-wide types or build",
+    "product runner/browser",
+    "platform frozen session adaptation",
+    "real device timing",
+    "formal asset clearance",
+    "scientific population validation",
+    "four entrances",
+    "API/DB/COS/export"
+  ],
+  "limitations": [
+    "Only logical asset identifiers, no formal stimulus bank",
+    "External research-review gate is isolated candidate trusted-caller contract, not production authorization",
+    "Historical archived design and screenshots unchanged",
+    "No registration, persisted tags, database, commit, push, Notion or deployment"
+  ],
+  "originalDependencyBytesCompleteInventoryRecorded": false
+}

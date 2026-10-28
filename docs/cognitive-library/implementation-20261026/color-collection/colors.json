@@ -1,0 +1,407 @@
+{
+  "artifactKind": "COGNITIVE_COLOR_COLLECTION_DESIGN_NOT_RUNTIME_SCHEMA",
+  "status": "DRAFT_FOR_REVIEW",
+  "revision": "2026-10-26-color-correction",
+  "purpose": "项目统一认知配色合集；不是国际统一测验色标或效度证书",
+  "colorEncoding": "sRGB hex and rgb255",
+  "physicalLuminanceCalibrated": false,
+  "groups": {
+    "interface": [
+      {
+        "key": "page",
+        "hex": "#F8FAFC",
+        "rgb255": [
+          248,
+          250,
+          252
+        ],
+        "relativeLuminanceSRGB": 0.9535594780808018,
+        "labelZh": "页面底色",
+        "usageZh": "固定浅色，不继承入口昼夜主题"
+      },
+      {
+        "key": "surface",
+        "hex": "#FFFFFF",
+        "rgb255": [
+          255,
+          255,
+          255
+        ],
+        "relativeLuminanceSRGB": 1.0,
+        "labelZh": "内容表面",
+        "usageZh": "引导、报告、说明面板"
+      },
+      {
+        "key": "text",
+        "hex": "#1F2937",
+        "rgb255": [
+          31,
+          41,
+          55
+        ],
+        "relativeLuminanceSRGB": 0.02153018088926846,
+        "labelZh": "主要文字",
+        "usageZh": "标题和正文"
+      },
+      {
+        "key": "secondary_text",
+        "hex": "#4B5563",
+        "rgb255": [
+          75,
+          85,
+          99
+        ],
+        "relativeLuminanceSRGB": 0.08893707341137008,
+        "labelZh": "次要文字",
+        "usageZh": "说明、分母、辅助内容"
+      },
+      {
+        "key": "subtle_line",
+        "hex": "#CBD5E1",
+        "rgb255": [
+          203,
+          213,
+          225
+        ],
+        "relativeLuminanceSRGB": 0.6572125239888499,
+        "labelZh": "辅助分隔",
+        "usageZh": "仅非必要装饰分隔，不能单独作为控件/焦点边界"
+      },
+      {
+        "key": "control_boundary",
+        "hex": "#64748B",
+        "rgb255": [
+          100,
+          116,
+          139
+        ],
+        "relativeLuminanceSRGB": 0.17064187593603228,
+        "labelZh": "控件与焦点边界",
+        "usageZh": "必要边界与键盘焦点"
+      },
+      {
+        "key": "action",
+        "hex": "#1D4ED8",
+        "rgb255": [
+          29,
+          78,
+          216
+        ],
+        "relativeLuminanceSRGB": 0.10667857181794133,
+        "labelZh": "统一操作蓝",
+        "usageZh": "开始、继续、链接；正式追踪画面不出现操作按钮"
+      },
+      {
+        "key": "action_hover",
+        "hex": "#1E40AF",
+        "rgb255": [
+          30,
+          64,
+          175
+        ],
+        "relativeLuminanceSRGB": 0.07037956316058576,
+        "labelZh": "操作悬停",
+        "usageZh": "只用于非计时交互"
+      },
+      {
+        "key": "on_action",
+        "hex": "#FFFFFF",
+        "rgb255": [
+          255,
+          255,
+          255
+        ],
+        "relativeLuminanceSRGB": 1.0,
+        "labelZh": "操作文字",
+        "usageZh": "蓝底按钮的文字和图标"
+      }
+    ],
+    "mot_stimulus": [
+      {
+        "key": "field",
+        "hex": "#F2F2F2",
+        "rgb255": [
+          242,
+          242,
+          242
+        ],
+        "relativeLuminanceSRGB": 0.8879231178819663,
+        "labelZh": "刺激区域底色",
+        "usageZh": "仅本MOT提案；不是所有任务的强制背景"
+      },
+      {
+        "key": "field_boundary",
+        "hex": "#64748B",
+        "rgb255": [
+          100,
+          116,
+          139
+        ],
+        "relativeLuminanceSRGB": 0.17064187593603228,
+        "labelZh": "区域边界",
+        "usageZh": "静态细线；边界及反射规则一同冻结"
+      },
+      {
+        "key": "object",
+        "hex": "#222222",
+        "rgb255": [
+          34,
+          34,
+          34
+        ],
+        "relativeLuminanceSRGB": 0.01599629336550963,
+        "labelZh": "普通与运动对象",
+        "usageZh": "提示结束后10个对象均为此色"
+      },
+      {
+        "key": "cue_target",
+        "hex": "#E53935",
+        "rgb255": [
+          229,
+          57,
+          53
+        ],
+        "relativeLuminanceSRGB": 0.19841309824022663,
+        "labelZh": "目标提示红",
+        "usageZh": "仅1000ms目标提示阶段，表示目标而非答错"
+      },
+      {
+        "key": "selected",
+        "hex": "#1D4ED8",
+        "rgb255": [
+          29,
+          78,
+          216
+        ],
+        "relativeLuminanceSRGB": 0.10667857181794133,
+        "labelZh": "已选择",
+        "usageZh": "只在停止后的选择阶段，与勾号/描边共同表示已选"
+      },
+      {
+        "key": "selected_mark",
+        "hex": "#FFFFFF",
+        "rgb255": [
+          255,
+          255,
+          255
+        ],
+        "relativeLuminanceSRGB": 1.0,
+        "labelZh": "已选勾号",
+        "usageZh": "只表示选中，不表示正确"
+      }
+    ],
+    "report_categories": [
+      {
+        "key": "black",
+        "hex": "#000000",
+        "rgb255": [
+          0,
+          0,
+          0
+        ],
+        "relativeLuminanceSRGB": 0.0,
+        "labelZh": "黑",
+        "usageZh": "类别色；配合标签/标记"
+      },
+      {
+        "key": "orange",
+        "hex": "#E69F00",
+        "rgb255": [
+          230,
+          159,
+          0
+        ],
+        "relativeLuminanceSRGB": 0.4161926832198344,
+        "labelZh": "橙",
+        "usageZh": "类别色；浅色底上不作小字号文字"
+      },
+      {
+        "key": "sky_blue",
+        "hex": "#56B4E9",
+        "rgb255": [
+          86,
+          180,
+          233
+        ],
+        "relativeLuminanceSRGB": 0.4050414217938337,
+        "labelZh": "天蓝",
+        "usageZh": "类别色；浅色底小图形需进一步审查"
+      },
+      {
+        "key": "bluish_green",
+        "hex": "#009E73",
+        "rgb255": [
+          0,
+          158,
+          115
+        ],
+        "relativeLuminanceSRGB": 0.25691524416758404,
+        "labelZh": "蓝绿",
+        "usageZh": "类别色，不表示更好"
+      },
+      {
+        "key": "yellow",
+        "hex": "#F0E442",
+        "rgb255": [
+          240,
+          228,
+          66
+        ],
+        "relativeLuminanceSRGB": 0.7440541760414299,
+        "labelZh": "黄",
+        "usageZh": "白底对比不足，不单独用作可点击目标或小字号文字"
+      },
+      {
+        "key": "blue",
+        "hex": "#0072B2",
+        "rgb255": [
+          0,
+          114,
+          178
+        ],
+        "relativeLuminanceSRGB": 0.15248980125973846,
+        "labelZh": "蓝",
+        "usageZh": "类别色，不表示能力高低"
+      },
+      {
+        "key": "vermillion",
+        "hex": "#D55E00",
+        "rgb255": [
+          213,
+          94,
+          0
+        ],
+        "relativeLuminanceSRGB": 0.22151541200376595,
+        "labelZh": "朱红",
+        "usageZh": "类别色，不表示答错"
+      },
+      {
+        "key": "reddish_purple",
+        "hex": "#CC79A7",
+        "rgb255": [
+          204,
+          121,
+          167
+        ],
+        "relativeLuminanceSRGB": 0.29302134085628373,
+        "labelZh": "红紫",
+        "usageZh": "类别色；与其他色的区分须按任务核验"
+      }
+    ]
+  },
+  "sources": [
+    {
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html",
+      "use": "普通文字可读性目标，不作为刺激效度证明"
+    },
+    {
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html",
+      "use": "普通控件/有意义图形的可见性；实验必要外观另按协议审查"
+    },
+    {
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/use-of-color.html",
+      "use": "普通界面/报告避免仅靠色相传递状态"
+    },
+    {
+      "url": "https://jfly.uni-koeln.de/color/",
+      "use": "Okabe–Ito/CUD报告类别色参考；不表示任意背景、尺寸和人群均可辨识"
+    },
+    {
+      "url": "https://psychopy.org/general/colours.html",
+      "use": "颜色空间与显示器校准边界；同一RGB不能证明设备物理等效"
+    }
+  ],
+  "policies": {
+    "brandInheritance": false,
+    "automaticDarkMode": false,
+    "automaticPaletteForAllTasks": false,
+    "researchAndExperienceShareStimulusColors": true,
+    "colorVisionUniversalGuarantee": false,
+    "silentAccessibilityStimulusChanges": false,
+    "reportStateRequiresTextOrIcon": true,
+    "taskSpecificColorDefinitionsOverrideCollection": true
+  },
+  "nominalContrastChecks": [
+    {
+      "key": "primary_text_on_white",
+      "foreground": "#1F2937",
+      "background": "#FFFFFF",
+      "ratio": 14.67911847763172,
+      "threshold": 4.5,
+      "pass": true,
+      "scope": "普通文字"
+    },
+    {
+      "key": "secondary_text_on_white",
+      "foreground": "#4B5563",
+      "background": "#FFFFFF",
+      "ratio": 7.557378129674007,
+      "threshold": 4.5,
+      "pass": true,
+      "scope": "普通文字"
+    },
+    {
+      "key": "white_text_on_action",
+      "foreground": "#FFFFFF",
+      "background": "#1D4ED8",
+      "ratio": 6.701618401398807,
+      "threshold": 4.5,
+      "pass": true,
+      "scope": "按钮文字"
+    },
+    {
+      "key": "control_boundary_on_white",
+      "foreground": "#64748B",
+      "background": "#FFFFFF",
+      "ratio": 4.758842787868665,
+      "threshold": 3,
+      "pass": true,
+      "scope": "普通控件边界"
+    },
+    {
+      "key": "target_on_field",
+      "foreground": "#E53935",
+      "background": "#F2F2F2",
+      "ratio": 3.7756588703505183,
+      "threshold": 3,
+      "pass": true,
+      "scope": "本项目候选可见性检查，不证明测量效度"
+    },
+    {
+      "key": "object_on_field",
+      "foreground": "#222222",
+      "background": "#F2F2F2",
+      "ratio": 14.211754479716507,
+      "threshold": 3,
+      "pass": true,
+      "scope": "本项目候选可见性检查，不证明测量效度"
+    },
+    {
+      "key": "target_vs_object",
+      "foreground": "#E53935",
+      "background": "#222222",
+      "ratio": 3.7640462149053047,
+      "threshold": 3,
+      "pass": true,
+      "scope": "名义亮度差，仅项目设计检查，不是色觉人群通过"
+    },
+    {
+      "key": "selected_on_field",
+      "foreground": "#1D4ED8",
+      "background": "#F2F2F2",
+      "ratio": 5.986288405614408,
+      "threshold": 3,
+      "pass": true,
+      "scope": "选择状态图形"
+    },
+    {
+      "key": "selected_mark_on_blue",
+      "foreground": "#FFFFFF",
+      "background": "#1D4ED8",
+      "ratio": 6.701618401398807,
+      "threshold": 3,
+      "pass": true,
+      "scope": "勾号"
+    }
+  ]
+}

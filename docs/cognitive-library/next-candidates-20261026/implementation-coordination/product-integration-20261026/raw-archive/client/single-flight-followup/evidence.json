@@ -1,0 +1,43 @@
+{
+  "status": "SCOPED_FOLLOWUP_PASS",
+  "recordedAt": "2026-10-26T11:31:36.099139+00:00",
+  "change": "Per-FinalDraftStore/per-draftKey in-page in-flight Promise reuse, covering upload, validated receipt persistence and cleanup. Entries are removed after either success or failure; no durable queue or new endpoint.",
+  "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node node_modules/vitest/vitest.mjs run src/modules/cognitive/core/__tests__/native-mot-archive.test.ts -t single-flight --maxWorkers=1 --reporter=json --outputFile=/tmp/mot-archive-single-flight-tests.json",
+  "workingDirectory": "server-version/frontend",
+  "exitCode": 0,
+  "passed": 2,
+  "skipped": 18,
+  "newTotalAcrossStages": 27,
+  "checks": [
+    "Overlapping consumers receive the same Promise, invoke send once, both receive the same validated confirmed state, cleanup occurs once.",
+    "After delayed failure, both consumers reject, the sealed identity/raw package remain, and a fresh explicit retry sends the same package and can confirm.",
+    "A missing draft after settled confirmation still rejects; missing storage is never treated as confirmed."
+  ],
+  "failedPreparationAttempt": {
+    "exitCode": 1,
+    "reason": "Initial command used repo-relative paths while cwd was frontend. File open failed before edits; Vitest path failed before any test ran. Corrected paths; no test assertion failed."
+  },
+  "sourceFiles": [
+    {
+      "path": "server-version/frontend/src/modules/cognitive/core/raw-archive.ts",
+      "sha256": "594b73d9470c23507ba71ccf829aab4d02e74220ade8233b8c3ede1bc89dc5d7"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/core/__tests__/native-mot-archive.test.ts",
+      "sha256": "6ad12f9d94c3cd7c57da6d6c1810690b08ac4d41b48db52c9caba94c63aa99cd"
+    }
+  ],
+  "rawResult": {
+    "path": "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/raw-archive/client/single-flight-followup/vitest.json",
+    "sha256": "35187d343778e10a9feca4c388119b38789e56b1b1d0dc7436bf5a72a52366d1"
+  },
+  "reuse": [
+    "Original 25 new tests and 18 direct consumer cases not repeated",
+    "Successful 2+9 actual browser/HTTP originals preserved unchanged; this patch is not retrospectively included in those source hashes"
+  ],
+  "notVerified": [
+    "Parent will typecheck only affected helper/test roots",
+    "Cross-tab/cross-realm single-flight (not claimed)",
+    "External COS/physical timing/full App CSRF (unchanged scope)"
+  ]
+}
