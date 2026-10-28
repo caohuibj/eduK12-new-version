@@ -1,0 +1,3518 @@
+{
+  "schemaVersion": 1,
+  "database": "eduk12_scale367_9cd3f7ef4f",
+  "scope": "Actual existing CLI in fresh local database; one synthetic SYSTEM_ADMIN; no production or HTTP service",
+  "selectedEntryProducts": [
+    "SURVEY"
+  ],
+  "commands": [
+    {
+      "label": "publication-uninstalled-preview",
+      "cwd": "/workspace/eduK12-new-version/server-version/backend",
+      "argv": [
+        "/workspace/eduk12-cloud/tools/node_modules/node/bin/node",
+        "node_modules/tsx/dist/cli.mjs",
+        "src/scripts/publish-scale-instrument.ts",
+        "--input",
+        "/workspace/eduK12-new-version/docs/scale-content-batch1-20261028/technical-release/evidence/publication-preview-input.json"
+      ],
+      "startedAt": "2026-10-28T00:48:57.956Z",
+      "endedAt": "2026-10-28T00:48:59.001Z",
+      "processExitCode": 2,
+      "signal": null,
+      "error": null,
+      "expectedExitCode": 2,
+      "readOnly": true,
+      "beforeAfterIdentical": true,
+      "logs": {
+        "stdout": {
+          "path": "publication-uninstalled-preview.stdout.log",
+          "bytes": 3662,
+          "sha256": "e99f7a1d55ef3926a638fdc013bcc687dc1f0b4de50fa000e9e1b14e7b2e7932"
+        },
+        "stderr": {
+          "path": "publication-uninstalled-preview.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "label": "install-preview",
+      "cwd": "/workspace/eduK12-new-version/server-version/backend",
+      "argv": [
+        "/workspace/eduk12-cloud/tools/node_modules/node/bin/node",
+        "node_modules/tsx/dist/cli.mjs",
+        "src/scripts/install-scale-instrument.ts",
+        "--instrument-key",
+        "ars30_2016_zh_cn_research",
+        "--instrument-version",
+        "1.0.0",
+        "--locale",
+        "zh-CN",
+        "--territory",
+        "CN",
+        "--localization-version",
+        "1.0.0",
+        "--revision",
+        "1",
+        "--modes",
+        "STANDALONE",
+        "--actor-user-id",
+        "242b3f0d-f2ac-49ec-bba7-2d650ec73c24"
+      ],
+      "startedAt": "2026-10-28T00:48:59.008Z",
+      "endedAt": "2026-10-28T00:48:59.709Z",
+      "processExitCode": 0,
+      "signal": null,
+      "error": null,
+      "expectedExitCode": 0,
+      "readOnly": true,
+      "beforeAfterIdentical": true,
+      "logs": {
+        "stdout": {
+          "path": "install-preview.stdout.log",
+          "bytes": 2834,
+          "sha256": "318a45dd1fc6454ad28afa6984a0fe5117815a5518f392d6f85157487973b4fd"
+        },
+        "stderr": {
+          "path": "install-preview.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "label": "install-first-apply",
+      "cwd": "/workspace/eduK12-new-version/server-version/backend",
+      "argv": [
+        "/workspace/eduk12-cloud/tools/node_modules/node/bin/node",
+        "node_modules/tsx/dist/cli.mjs",
+        "src/scripts/install-scale-instrument.ts",
+        "--instrument-key",
+        "ars30_2016_zh_cn_research",
+        "--instrument-version",
+        "1.0.0",
+        "--locale",
+        "zh-CN",
+        "--territory",
+        "CN",
+        "--localization-version",
+        "1.0.0",
+        "--revision",
+        "1",
+        "--modes",
+        "STANDALONE",
+        "--actor-user-id",
+        "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+        "--apply"
+      ],
+      "startedAt": "2026-10-28T00:48:59.718Z",
+      "endedAt": "2026-10-28T00:49:00.347Z",
+      "processExitCode": 0,
+      "signal": null,
+      "error": null,
+      "expectedExitCode": 0,
+      "readOnly": false,
+      "beforeAfterIdentical": false,
+      "logs": {
+        "stdout": {
+          "path": "install-first-apply.stdout.log",
+          "bytes": 2866,
+          "sha256": "5fee82299e597c1fca514040a1a540b84197c8431e649968a8dd86eeb6fef3a3"
+        },
+        "stderr": {
+          "path": "install-first-apply.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "label": "install-repeat-apply",
+      "cwd": "/workspace/eduK12-new-version/server-version/backend",
+      "argv": [
+        "/workspace/eduk12-cloud/tools/node_modules/node/bin/node",
+        "node_modules/tsx/dist/cli.mjs",
+        "src/scripts/install-scale-instrument.ts",
+        "--instrument-key",
+        "ars30_2016_zh_cn_research",
+        "--instrument-version",
+        "1.0.0",
+        "--locale",
+        "zh-CN",
+        "--territory",
+        "CN",
+        "--localization-version",
+        "1.0.0",
+        "--revision",
+        "1",
+        "--modes",
+        "STANDALONE",
+        "--actor-user-id",
+        "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+        "--apply"
+      ],
+      "startedAt": "2026-10-28T00:49:00.357Z",
+      "endedAt": "2026-10-28T00:49:01.018Z",
+      "processExitCode": 0,
+      "signal": null,
+      "error": null,
+      "expectedExitCode": 0,
+      "readOnly": false,
+      "beforeAfterIdentical": true,
+      "logs": {
+        "stdout": {
+          "path": "install-repeat-apply.stdout.log",
+          "bytes": 2866,
+          "sha256": "5fee82299e597c1fca514040a1a540b84197c8431e649968a8dd86eeb6fef3a3"
+        },
+        "stderr": {
+          "path": "install-repeat-apply.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "label": "publication-preview",
+      "cwd": "/workspace/eduK12-new-version/server-version/backend",
+      "argv": [
+        "/workspace/eduk12-cloud/tools/node_modules/node/bin/node",
+        "node_modules/tsx/dist/cli.mjs",
+        "src/scripts/publish-scale-instrument.ts",
+        "--input",
+        "/workspace/eduK12-new-version/docs/scale-content-batch1-20261028/technical-release/evidence/publication-preview-input.json"
+      ],
+      "startedAt": "2026-10-28T00:49:01.047Z",
+      "endedAt": "2026-10-28T00:49:01.778Z",
+      "processExitCode": 0,
+      "signal": null,
+      "error": null,
+      "expectedExitCode": 0,
+      "readOnly": true,
+      "beforeAfterIdentical": true,
+      "logs": {
+        "stdout": {
+          "path": "publication-preview.stdout.log",
+          "bytes": 3698,
+          "sha256": "4560a4e3ff3c2aeda8de091bfa353e43d56394edc285cd42d9a6a0e4a0ca04b5"
+        },
+        "stderr": {
+          "path": "publication-preview.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "label": "publication-apply",
+      "cwd": "/workspace/eduK12-new-version/server-version/backend",
+      "argv": [
+        "/workspace/eduk12-cloud/tools/node_modules/node/bin/node",
+        "node_modules/tsx/dist/cli.mjs",
+        "src/scripts/publish-scale-instrument.ts",
+        "--input",
+        "/workspace/eduK12-new-version/docs/scale-content-batch1-20261028/technical-release/evidence/publication-apply-input.json",
+        "--apply"
+      ],
+      "startedAt": "2026-10-28T00:49:01.790Z",
+      "endedAt": "2026-10-28T00:49:02.538Z",
+      "processExitCode": 0,
+      "signal": null,
+      "error": null,
+      "expectedExitCode": 0,
+      "readOnly": false,
+      "beforeAfterIdentical": false,
+      "logs": {
+        "stdout": {
+          "path": "publication-apply.stdout.log",
+          "bytes": 256,
+          "sha256": "85aec770e278fd502faece1440ef4f3e5abc2ca631414dc6387926b0c994bec8"
+        },
+        "stderr": {
+          "path": "publication-apply.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "label": "publication-school-scope-refusal",
+      "cwd": "/workspace/eduK12-new-version/server-version/backend",
+      "argv": [
+        "/workspace/eduk12-cloud/tools/node_modules/node/bin/node",
+        "node_modules/tsx/dist/cli.mjs",
+        "src/scripts/publish-scale-instrument.ts",
+        "--input",
+        "/workspace/eduK12-new-version/docs/scale-content-batch1-20261028/technical-release/evidence/publication-invalid-school.json"
+      ],
+      "startedAt": "2026-10-28T00:49:04.770Z",
+      "endedAt": "2026-10-28T00:49:05.421Z",
+      "processExitCode": 1,
+      "signal": null,
+      "error": null,
+      "expectedExitCode": 1,
+      "readOnly": true,
+      "beforeAfterIdentical": true,
+      "logs": {
+        "stdout": {
+          "path": "publication-school-scope-refusal.stdout.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "path": "publication-school-scope-refusal.stderr.log",
+          "bytes": 224,
+          "sha256": "9bc466eb07ee830a0131a7ac4a48e2945dfe8310eaa4f829a180263a1a73d0cf"
+        }
+      }
+    },
+    {
+      "label": "publication-teacher-scope-refusal",
+      "cwd": "/workspace/eduK12-new-version/server-version/backend",
+      "argv": [
+        "/workspace/eduk12-cloud/tools/node_modules/node/bin/node",
+        "node_modules/tsx/dist/cli.mjs",
+        "src/scripts/publish-scale-instrument.ts",
+        "--input",
+        "/workspace/eduK12-new-version/docs/scale-content-batch1-20261028/technical-release/evidence/publication-invalid-teacher.json"
+      ],
+      "startedAt": "2026-10-28T00:49:05.439Z",
+      "endedAt": "2026-10-28T00:49:06.067Z",
+      "processExitCode": 1,
+      "signal": null,
+      "error": null,
+      "expectedExitCode": 1,
+      "readOnly": true,
+      "beforeAfterIdentical": true,
+      "logs": {
+        "stdout": {
+          "path": "publication-teacher-scope-refusal.stdout.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "path": "publication-teacher-scope-refusal.stderr.log",
+          "bytes": 224,
+          "sha256": "9bc466eb07ee830a0131a7ac4a48e2945dfe8310eaa4f829a180263a1a73d0cf"
+        }
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "database target exact new loopback isolation",
+      "passed": true
+    },
+    {
+      "name": "connected database exact identity",
+      "passed": true
+    },
+    {
+      "name": "no prior users/scales/deployments/axes/releases",
+      "passed": true
+    },
+    {
+      "name": "publication-uninstalled-preview actual exit",
+      "passed": true,
+      "actual": 2,
+      "expected": 2
+    },
+    {
+      "name": "publication-uninstalled-preview made no tracked business writes",
+      "passed": true
+    },
+    {
+      "name": "publication refuses uninstalled package rather than manual review",
+      "passed": true
+    },
+    {
+      "name": "install-preview actual exit",
+      "passed": true,
+      "actual": 0,
+      "expected": 0
+    },
+    {
+      "name": "install-preview made no tracked business writes",
+      "passed": true
+    },
+    {
+      "name": "preview admits technically released exact source",
+      "passed": true
+    },
+    {
+      "name": "manual unknowns remain truthful at installation",
+      "passed": true
+    },
+    {
+      "name": "install-first-apply actual exit",
+      "passed": true,
+      "actual": 0,
+      "expected": 0
+    },
+    {
+      "name": "first installation creates DRAFT HIDDEN with one active binding",
+      "passed": true
+    },
+    {
+      "name": "first installation freezes actual versions and source",
+      "passed": true
+    },
+    {
+      "name": "installation is not public publication",
+      "passed": true
+    },
+    {
+      "name": "install-repeat-apply actual exit",
+      "passed": true,
+      "actual": 0,
+      "expected": 0
+    },
+    {
+      "name": "repeat installation preserves all tracked rows and frozen source",
+      "passed": true
+    },
+    {
+      "name": "publication-preview actual exit",
+      "passed": true,
+      "actual": 0,
+      "expected": 0
+    },
+    {
+      "name": "publication-preview made no tracked business writes",
+      "passed": true
+    },
+    {
+      "name": "publication plan binds PUBLIC and exact SURVEY selection",
+      "passed": true
+    },
+    {
+      "name": "publication retains pending manual reviews",
+      "passed": true
+    },
+    {
+      "name": "publication-apply actual exit",
+      "passed": true,
+      "actual": 0,
+      "expected": 0
+    },
+    {
+      "name": "PUBLIC publication links release and actor proof audit",
+      "passed": true
+    },
+    {
+      "name": "PUBLIC publication keeps exact frozen source unchanged",
+      "passed": true
+    },
+    {
+      "name": "only SURVEY policy approved; no real user grants",
+      "passed": true
+    },
+    {
+      "name": "actual Survey catalog consumes exact published source",
+      "passed": true
+    },
+    {
+      "name": "unselected Training entry is refused",
+      "passed": true
+    },
+    {
+      "name": "publication-school-scope-refusal actual exit",
+      "passed": true,
+      "actual": 1,
+      "expected": 1
+    },
+    {
+      "name": "publication-school-scope-refusal made no tracked business writes",
+      "passed": true
+    },
+    {
+      "name": "SCHOOL account boundary remains enforced",
+      "passed": true
+    },
+    {
+      "name": "publication-teacher-scope-refusal actual exit",
+      "passed": true,
+      "actual": 1,
+      "expected": 1
+    },
+    {
+      "name": "publication-teacher-scope-refusal made no tracked business writes",
+      "passed": true
+    },
+    {
+      "name": "TEACHER account boundary remains enforced",
+      "passed": true
+    },
+    {
+      "name": "entry reads/refusals add no tracked business rows",
+      "passed": true
+    }
+  ],
+  "snapshots": {
+    "fresh-empty": {
+      "users": [],
+      "scales": [],
+      "deployments": [],
+      "axes": [],
+      "audits": [],
+      "releases": [],
+      "policies": [],
+      "counts": {
+        "assessment_reference_sets": 0,
+        "measurement_content_release_events": 0,
+        "content_capability_grants": 0,
+        "material_grants": 0,
+        "survey_tool_grants": 0,
+        "scale_library_entries": 0,
+        "scale_library_use_grants": 0,
+        "education_assessment_deliveries": 0,
+        "assessments": 0
+      }
+    },
+    "publication-uninstalled-preview-before": {
+      "users": [
+        {
+          "id": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "username": "synthetic-ars30-00ea8574-2db9-423b-a3de-3546fbddeb1a",
+          "role": "ADMIN",
+          "platformRole": "SYSTEM_ADMIN",
+          "accountDomain": "TRAINING",
+          "isActive": true,
+          "isFrozen": false
+        }
+      ],
+      "scales": [],
+      "deployments": [],
+      "axes": [],
+      "audits": [],
+      "releases": [],
+      "policies": [],
+      "counts": {
+        "assessment_reference_sets": 0,
+        "measurement_content_release_events": 0,
+        "content_capability_grants": 0,
+        "material_grants": 0,
+        "survey_tool_grants": 0,
+        "scale_library_entries": 0,
+        "scale_library_use_grants": 0,
+        "education_assessment_deliveries": 0,
+        "assessments": 0
+      }
+    },
+    "publication-uninstalled-preview-after": {
+      "users": [
+        {
+          "id": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "username": "synthetic-ars30-00ea8574-2db9-423b-a3de-3546fbddeb1a",
+          "role": "ADMIN",
+          "platformRole": "SYSTEM_ADMIN",
+          "accountDomain": "TRAINING",
+          "isActive": true,
+          "isFrozen": false
+        }
+      ],
+      "scales": [],
+      "deployments": [],
+      "axes": [],
+      "audits": [],
+      "releases": [],
+      "policies": [],
+      "counts": {
+        "assessment_reference_sets": 0,
+        "measurement_content_release_events": 0,
+        "content_capability_grants": 0,
+        "material_grants": 0,
+        "survey_tool_grants": 0,
+        "scale_library_entries": 0,
+        "scale_library_use_grants": 0,
+        "education_assessment_deliveries": 0,
+        "assessments": 0
+      }
+    },
+    "install-preview-before": {
+      "users": [
+        {
+          "id": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "username": "synthetic-ars30-00ea8574-2db9-423b-a3de-3546fbddeb1a",
+          "role": "ADMIN",
+          "platformRole": "SYSTEM_ADMIN",
+          "accountDomain": "TRAINING",
+          "isActive": true,
+          "isFrozen": false
+        }
+      ],
+      "scales": [],
+      "deployments": [],
+      "axes": [],
+      "audits": [],
+      "releases": [],
+      "policies": [],
+      "counts": {
+        "assessment_reference_sets": 0,
+        "measurement_content_release_events": 0,
+        "content_capability_grants": 0,
+        "material_grants": 0,
+        "survey_tool_grants": 0,
+        "scale_library_entries": 0,
+        "scale_library_use_grants": 0,
+        "education_assessment_deliveries": 0,
+        "assessments": 0
+      }
+    },
+    "install-preview-after": {
+      "users": [
+        {
+          "id": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "username": "synthetic-ars30-00ea8574-2db9-423b-a3de-3546fbddeb1a",
+          "role": "ADMIN",
+          "platformRole": "SYSTEM_ADMIN",
+          "accountDomain": "TRAINING",
+          "isActive": true,
+          "isFrozen": false
+        }
+      ],
+      "scales": [],
+      "deployments": [],
+      "axes": [],
+      "audits": [],
+      "releases": [],
+      "policies": [],
+      "counts": {
+        "assessment_reference_sets": 0,
+        "measurement_content_release_events": 0,
+        "content_capability_grants": 0,
+        "material_grants": 0,
+        "survey_tool_grants": 0,
+        "scale_library_entries": 0,
+        "scale_library_use_grants": 0,
+        "education_assessment_deliveries": 0,
+        "assessments": 0
+      }
+    },
+    "install-first-apply-before": {
+      "users": [
+        {
+          "id": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "username": "synthetic-ars30-00ea8574-2db9-423b-a3de-3546fbddeb1a",
+          "role": "ADMIN",
+          "platformRole": "SYSTEM_ADMIN",
+          "accountDomain": "TRAINING",
+          "isActive": true,
+          "isFrozen": false
+        }
+      ],
+      "scales": [],
+      "deployments": [],
+      "axes": [],
+      "audits": [],
+      "releases": [],
+      "policies": [],
+      "counts": {
+        "assessment_reference_sets": 0,
+        "measurement_content_release_events": 0,
+        "content_capability_grants": 0,
+        "material_grants": 0,
+        "survey_tool_grants": 0,
+        "scale_library_entries": 0,
+        "scale_library_use_grants": 0,
+        "education_assessment_deliveries": 0,
+        "assessments": 0
+      }
+    },
+    "install-first-apply-after": {
+      "users": [
+        {
+          "id": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "username": "synthetic-ars30-00ea8574-2db9-423b-a3de-3546fbddeb1a",
+          "role": "ADMIN",
+          "platformRole": "SYSTEM_ADMIN",
+          "accountDomain": "TRAINING",
+          "isActive": true,
+          "isFrozen": false
+        }
+      ],
+      "scales": [
+        {
+          "id": "34a32540-5a64-40c8-80db-e994c7f87e36",
+          "code": "ars30_2016_zh_cn_research",
+          "instrumentVersion": "1.0.0",
+          "instrumentClass": "STANDARD",
+          "status": "DRAFT",
+          "visibility": "HIDDEN",
+          "definitionHash": "f2bc8219660b295793179828d0830c8dbcbf27e107228d9a66c546ee6f5cd3e3",
+          "instruction": "请设想你自己就是下面情境中的这位学生。\n\n【情境】\n你刚拿到最近一次作业的成绩，结果是“不及格”。另外两次近期作业的成绩，也都比你希望的差。你希望大学毕业时取得尽可能好的成绩，因为你有明确的职业目标，也不想让家人失望。老师给这次作业的反馈相当严厉，提到你“理解不足”“写作和表达欠佳”，但也指出了可以怎样改进。批改另外两次作业的老师也给出了类似的意见。\n\n【作答说明】\n读完上面这段情境后，请围绕同一个情境，判断你有多大可能作出下面每一种反应。全部30题都请围绕这一情境作答。按你认为自己真正会怎样反应来选，而不是按“应该怎样做”或别人期待你怎样做来选。中间的数字表示介于两端之间的程度。",
+          "measurementReleaseId": null,
+          "creatorId": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "updatedAt": "2026-10-28T00:49:00.286Z",
+          "definitionCanonicalHash": "5b776e7a1b23d57c4585f152b30a69e5fd169f3c25d03b38646729f15fd748bf"
+        }
+      ],
+      "deployments": [
+        {
+          "id": "27c899a1-1607-4ff7-8352-f008e68540b5",
+          "scale_id": "34a32540-5a64-40c8-80db-e994c7f87e36",
+          "revision": 1,
+          "status": "ACTIVE",
+          "policy_json": {
+            "locale": "zh-CN",
+            "revision": 1,
+            "territory": "CN",
+            "schemaVersion": 2,
+            "deploymentModes": [
+              "STANDALONE"
+            ],
+            "runtimePolicyHash": "a2b2e60a2ba338530bb80a2f647d6916a960e206d669d88bdba52751f6658390",
+            "inFlightCompletion": "FROZEN_DEADLINE",
+            "localizationVersion": "1.0.0"
+          },
+          "policy_hash": "9a1f9d1235e431d810757f015925610a69c155266e56e2aac2a9c863ebe5ed3c",
+          "authorization_refs": [],
+          "created_by_user_id": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "created_at": "2026-10-28T00:49:00.302Z",
+          "activated_at": "2026-10-28T00:49:00.302Z",
+          "retired_at": null
+        }
+      ],
+      "axes": [
+        {
+          "scale_id": "34a32540-5a64-40c8-80db-e994c7f87e36",
+          "axis_hash": "58cd9efa1f3e153a66acd9d2714510323ccc97d54655191a73060afa5f383be2",
+          "source_hash": "9a96fdda238eda75684e42df2cad5929781c974c455019579e94756a0fa6ebb8",
+          "axes": {
+            "reportVersion": "1.0.0",
+            "scoringVersion": "1.0.0",
+            "measurementHash": "f2bc8219660b295793179828d0830c8dbcbf27e107228d9a66c546ee6f5cd3e3",
+            "instrumentVersion": "1.0.0",
+            "referenceVersions": [],
+            "instructionVersion": "1.0.0",
+            "localizationVersion": "1.0.0",
+            "catalogManifestVersion": 1
+          },
+          "created_at": "2026-10-28T00:49:00.275Z",
+          "observedSourceCanonicalHash": "9a96fdda238eda75684e42df2cad5929781c974c455019579e94756a0fa6ebb8",
+          "frozenIdentity": {
+            "instrumentKey": "ars30_2016_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "frozenReleaseStatus": "PUBLISHED",
+          "frozenInstruction": {
+            "text": "请设想你自己就是下面情境中的这位学生。\n\n【情境】\n你刚拿到最近一次作业的成绩，结果是“不及格”。另外两次近期作业的成绩，也都比你希望的差。你希望大学毕业时取得尽可能好的成绩，因为你有明确的职业目标，也不想让家人失望。老师给这次作业的反馈相当严厉，提到你“理解不足”“写作和表达欠佳”，但也指出了可以怎样改进。批改另外两次作业的老师也给出了类似的意见。\n\n【作答说明】\n读完上面这段情境后，请围绕同一个情境，判断你有多大可能作出下面每一种反应。全部30题都请围绕这一情境作答。按你认为自己真正会怎样反应来选，而不是按“应该怎样做”或别人期待你怎样做来选。中间的数字表示介于两端之间的程度。",
+            "source": "必需本人受挫情境取自 Cassidy 2016 论文 Methods 原文（CC BY 4.0 载体），作答说明为平台依据 Methods 撰写的独立中文工作稿；未复制或未重新许可作者 2015 独立表单/网站版本的指导语与版式。",
+            "version": "1.0.0",
+            "language": "zh-CN",
+            "schemaVersion": 1
+          },
+          "frozenManual": {
+            "catalogStatus": "CANDIDATE",
+            "maturity": "PILOT",
+            "localization": {
+              "notes": "平台独立中文工作译稿；不继承任何已出版中文ARS译本的文字或验证。专家审校 PENDING、认知访谈与中国人群验证 NOT_ESTABLISHED。必需情境通过版本化 instruction 冻结呈现，作答说明依据 Methods 独立撰写，不复制作者 2015 独立表单/网站版本的指导语与版式。",
+              "reviewStatus": "PENDING",
+              "sourceLocale": "en",
+              "targetLocale": "zh-CN",
+              "schemaVersion": 1,
+              "adaptationMethod": "DIRECT_TRANSLATION",
+              "localEvidenceRefs": [],
+              "translationSource": "Cassidy 2016 论文 Methods 的本人受挫情境原英文与 Table2 完整30题、1 likely 至 5 unlikely 端点及正向反应题 6−x 转换说明（CC BY 4.0 论文正文载体）。",
+              "expertReviewStatus": "PENDING",
+              "localizationVersion": "1.0.0",
+              "cognitiveDebriefStatus": "NOT_ESTABLISHED"
+            },
+            "scientificReview": null,
+            "license": {
+              "note": "© 2016 Cassidy. 采用 Frontiers 2016 论文正文 CC BY 4.0 载体中的 Methods 本人逆境情境与 Table2 的30题；转载需署名、附许可链接并标明改动。作者2015独立表单／网站版本限定非商业研究且锚点不同（1同意–5不同意），不并入本版本，也不作为本代码的许可依据；不构成作者对任何译文的背书。",
+              "status": "verified",
+              "redistribution": "allowed"
+            }
+          }
+        }
+      ],
+      "audits": [],
+      "releases": [],
+      "policies": [],
+      "counts": {
+        "assessment_reference_sets": 0,
+        "measurement_content_release_events": 0,
+        "content_capability_grants": 0,
+        "material_grants": 0,
+        "survey_tool_grants": 0,
+        "scale_library_entries": 0,
+        "scale_library_use_grants": 0,
+        "education_assessment_deliveries": 0,
+        "assessments": 0
+      }
+    },
+    "install-repeat-apply-before": {
+      "users": [
+        {
+          "id": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "username": "synthetic-ars30-00ea8574-2db9-423b-a3de-3546fbddeb1a",
+          "role": "ADMIN",
+          "platformRole": "SYSTEM_ADMIN",
+          "accountDomain": "TRAINING",
+          "isActive": true,
+          "isFrozen": false
+        }
+      ],
+      "scales": [
+        {
+          "id": "34a32540-5a64-40c8-80db-e994c7f87e36",
+          "code": "ars30_2016_zh_cn_research",
+          "instrumentVersion": "1.0.0",
+          "instrumentClass": "STANDARD",
+          "status": "DRAFT",
+          "visibility": "HIDDEN",
+          "definitionHash": "f2bc8219660b295793179828d0830c8dbcbf27e107228d9a66c546ee6f5cd3e3",
+          "instruction": "请设想你自己就是下面情境中的这位学生。\n\n【情境】\n你刚拿到最近一次作业的成绩，结果是“不及格”。另外两次近期作业的成绩，也都比你希望的差。你希望大学毕业时取得尽可能好的成绩，因为你有明确的职业目标，也不想让家人失望。老师给这次作业的反馈相当严厉，提到你“理解不足”“写作和表达欠佳”，但也指出了可以怎样改进。批改另外两次作业的老师也给出了类似的意见。\n\n【作答说明】\n读完上面这段情境后，请围绕同一个情境，判断你有多大可能作出下面每一种反应。全部30题都请围绕这一情境作答。按你认为自己真正会怎样反应来选，而不是按“应该怎样做”或别人期待你怎样做来选。中间的数字表示介于两端之间的程度。",
+          "measurementReleaseId": null,
+          "creatorId": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "updatedAt": "2026-10-28T00:49:00.286Z",
+          "definitionCanonicalHash": "5b776e7a1b23d57c4585f152b30a69e5fd169f3c25d03b38646729f15fd748bf"
+        }
+      ],
+      "deployments": [
+        {
+          "id": "27c899a1-1607-4ff7-8352-f008e68540b5",
+          "scale_id": "34a32540-5a64-40c8-80db-e994c7f87e36",
+          "revision": 1,
+          "status": "ACTIVE",
+          "policy_json": {
+            "locale": "zh-CN",
+            "revision": 1,
+            "territory": "CN",
+            "schemaVersion": 2,
+            "deploymentModes": [
+              "STANDALONE"
+            ],
+            "runtimePolicyHash": "a2b2e60a2ba338530bb80a2f647d6916a960e206d669d88bdba52751f6658390",
+            "inFlightCompletion": "FROZEN_DEADLINE",
+            "localizationVersion": "1.0.0"
+          },
+          "policy_hash": "9a1f9d1235e431d810757f015925610a69c155266e56e2aac2a9c863ebe5ed3c",
+          "authorization_refs": [],
+          "created_by_user_id": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "created_at": "2026-10-28T00:49:00.302Z",
+          "activated_at": "2026-10-28T00:49:00.302Z",
+          "retired_at": null
+        }
+      ],
+      "axes": [
+        {
+          "scale_id": "34a32540-5a64-40c8-80db-e994c7f87e36",
+          "axis_hash": "58cd9efa1f3e153a66acd9d2714510323ccc97d54655191a73060afa5f383be2",
+          "source_hash": "9a96fdda238eda75684e42df2cad5929781c974c455019579e94756a0fa6ebb8",
+          "axes": {
+            "reportVersion": "1.0.0",
+            "scoringVersion": "1.0.0",
+            "measurementHash": "f2bc8219660b295793179828d0830c8dbcbf27e107228d9a66c546ee6f5cd3e3",
+            "instrumentVersion": "1.0.0",
+            "referenceVersions": [],
+            "instructionVersion": "1.0.0",
+            "localizationVersion": "1.0.0",
+            "catalogManifestVersion": 1
+          },
+          "created_at": "2026-10-28T00:49:00.275Z",
+          "observedSourceCanonicalHash": "9a96fdda238eda75684e42df2cad5929781c974c455019579e94756a0fa6ebb8",
+          "frozenIdentity": {
+            "instrumentKey": "ars30_2016_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "frozenReleaseStatus": "PUBLISHED",
+          "frozenInstruction": {
+            "text": "请设想你自己就是下面情境中的这位学生。\n\n【情境】\n你刚拿到最近一次作业的成绩，结果是“不及格”。另外两次近期作业的成绩，也都比你希望的差。你希望大学毕业时取得尽可能好的成绩，因为你有明确的职业目标，也不想让家人失望。老师给这次作业的反馈相当严厉，提到你“理解不足”“写作和表达欠佳”，但也指出了可以怎样改进。批改另外两次作业的老师也给出了类似的意见。\n\n【作答说明】\n读完上面这段情境后，请围绕同一个情境，判断你有多大可能作出下面每一种反应。全部30题都请围绕这一情境作答。按你认为自己真正会怎样反应来选，而不是按“应该怎样做”或别人期待你怎样做来选。中间的数字表示介于两端之间的程度。",
+            "source": "必需本人受挫情境取自 Cassidy 2016 论文 Methods 原文（CC BY 4.0 载体），作答说明为平台依据 Methods 撰写的独立中文工作稿；未复制或未重新许可作者 2015 独立表单/网站版本的指导语与版式。",
+            "version": "1.0.0",
+            "language": "zh-CN",
+            "schemaVersion": 1
+          },
+          "frozenManual": {
+            "catalogStatus": "CANDIDATE",
+            "maturity": "PILOT",
+            "localization": {
+              "notes": "平台独立中文工作译稿；不继承任何已出版中文ARS译本的文字或验证。专家审校 PENDING、认知访谈与中国人群验证 NOT_ESTABLISHED。必需情境通过版本化 instruction 冻结呈现，作答说明依据 Methods 独立撰写，不复制作者 2015 独立表单/网站版本的指导语与版式。",
+              "reviewStatus": "PENDING",
+              "sourceLocale": "en",
+              "targetLocale": "zh-CN",
+              "schemaVersion": 1,
+              "adaptationMethod": "DIRECT_TRANSLATION",
+              "localEvidenceRefs": [],
+              "translationSource": "Cassidy 2016 论文 Methods 的本人受挫情境原英文与 Table2 完整30题、1 likely 至 5 unlikely 端点及正向反应题 6−x 转换说明（CC BY 4.0 论文正文载体）。",
+              "expertReviewStatus": "PENDING",
+              "localizationVersion": "1.0.0",
+              "cognitiveDebriefStatus": "NOT_ESTABLISHED"
+            },
+            "scientificReview": null,
+            "license": {
+              "note": "© 2016 Cassidy. 采用 Frontiers 2016 论文正文 CC BY 4.0 载体中的 Methods 本人逆境情境与 Table2 的30题；转载需署名、附许可链接并标明改动。作者2015独立表单／网站版本限定非商业研究且锚点不同（1同意–5不同意），不并入本版本，也不作为本代码的许可依据；不构成作者对任何译文的背书。",
+              "status": "verified",
+              "redistribution": "allowed"
+            }
+          }
+        }
+      ],
+      "audits": [],
+      "releases": [],
+      "policies": [],
+      "counts": {
+        "assessment_reference_sets": 0,
+        "measurement_content_release_events": 0,
+        "content_capability_grants": 0,
+        "material_grants": 0,
+        "survey_tool_grants": 0,
+        "scale_library_entries": 0,
+        "scale_library_use_grants": 0,
+        "education_assessment_deliveries": 0,
+        "assessments": 0
+      }
+    },
+    "install-repeat-apply-after": {
+      "users": [
+        {
+          "id": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "username": "synthetic-ars30-00ea8574-2db9-423b-a3de-3546fbddeb1a",
+          "role": "ADMIN",
+          "platformRole": "SYSTEM_ADMIN",
+          "accountDomain": "TRAINING",
+          "isActive": true,
+          "isFrozen": false
+        }
+      ],
+      "scales": [
+        {
+          "id": "34a32540-5a64-40c8-80db-e994c7f87e36",
+          "code": "ars30_2016_zh_cn_research",
+          "instrumentVersion": "1.0.0",
+          "instrumentClass": "STANDARD",
+          "status": "DRAFT",
+          "visibility": "HIDDEN",
+          "definitionHash": "f2bc8219660b295793179828d0830c8dbcbf27e107228d9a66c546ee6f5cd3e3",
+          "instruction": "请设想你自己就是下面情境中的这位学生。\n\n【情境】\n你刚拿到最近一次作业的成绩，结果是“不及格”。另外两次近期作业的成绩，也都比你希望的差。你希望大学毕业时取得尽可能好的成绩，因为你有明确的职业目标，也不想让家人失望。老师给这次作业的反馈相当严厉，提到你“理解不足”“写作和表达欠佳”，但也指出了可以怎样改进。批改另外两次作业的老师也给出了类似的意见。\n\n【作答说明】\n读完上面这段情境后，请围绕同一个情境，判断你有多大可能作出下面每一种反应。全部30题都请围绕这一情境作答。按你认为自己真正会怎样反应来选，而不是按“应该怎样做”或别人期待你怎样做来选。中间的数字表示介于两端之间的程度。",
+          "measurementReleaseId": null,
+          "creatorId": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "updatedAt": "2026-10-28T00:49:00.286Z",
+          "definitionCanonicalHash": "5b776e7a1b23d57c4585f152b30a69e5fd169f3c25d03b38646729f15fd748bf"
+        }
+      ],
+      "deployments": [
+        {
+          "id": "27c899a1-1607-4ff7-8352-f008e68540b5",
+          "scale_id": "34a32540-5a64-40c8-80db-e994c7f87e36",
+          "revision": 1,
+          "status": "ACTIVE",
+          "policy_json": {
+            "locale": "zh-CN",
+            "revision": 1,
+            "territory": "CN",
+            "schemaVersion": 2,
+            "deploymentModes": [
+              "STANDALONE"
+            ],
+            "runtimePolicyHash": "a2b2e60a2ba338530bb80a2f647d6916a960e206d669d88bdba52751f6658390",
+            "inFlightCompletion": "FROZEN_DEADLINE",
+            "localizationVersion": "1.0.0"
+          },
+          "policy_hash": "9a1f9d1235e431d810757f015925610a69c155266e56e2aac2a9c863ebe5ed3c",
+          "authorization_refs": [],
+          "created_by_user_id": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "created_at": "2026-10-28T00:49:00.302Z",
+          "activated_at": "2026-10-28T00:49:00.302Z",
+          "retired_at": null
+        }
+      ],
+      "axes": [
+        {
+          "scale_id": "34a32540-5a64-40c8-80db-e994c7f87e36",
+          "axis_hash": "58cd9efa1f3e153a66acd9d2714510323ccc97d54655191a73060afa5f383be2",
+          "source_hash": "9a96fdda238eda75684e42df2cad5929781c974c455019579e94756a0fa6ebb8",
+          "axes": {
+            "reportVersion": "1.0.0",
+            "scoringVersion": "1.0.0",
+            "measurementHash": "f2bc8219660b295793179828d0830c8dbcbf27e107228d9a66c546ee6f5cd3e3",
+            "instrumentVersion": "1.0.0",
+            "referenceVersions": [],
+            "instructionVersion": "1.0.0",
+            "localizationVersion": "1.0.0",
+            "catalogManifestVersion": 1
+          },
+          "created_at": "2026-10-28T00:49:00.275Z",
+          "observedSourceCanonicalHash": "9a96fdda238eda75684e42df2cad5929781c974c455019579e94756a0fa6ebb8",
+          "frozenIdentity": {
+            "instrumentKey": "ars30_2016_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "frozenReleaseStatus": "PUBLISHED",
+          "frozenInstruction": {
+            "text": "请设想你自己就是下面情境中的这位学生。\n\n【情境】\n你刚拿到最近一次作业的成绩，结果是“不及格”。另外两次近期作业的成绩，也都比你希望的差。你希望大学毕业时取得尽可能好的成绩，因为你有明确的职业目标，也不想让家人失望。老师给这次作业的反馈相当严厉，提到你“理解不足”“写作和表达欠佳”，但也指出了可以怎样改进。批改另外两次作业的老师也给出了类似的意见。\n\n【作答说明】\n读完上面这段情境后，请围绕同一个情境，判断你有多大可能作出下面每一种反应。全部30题都请围绕这一情境作答。按你认为自己真正会怎样反应来选，而不是按“应该怎样做”或别人期待你怎样做来选。中间的数字表示介于两端之间的程度。",
+            "source": "必需本人受挫情境取自 Cassidy 2016 论文 Methods 原文（CC BY 4.0 载体），作答说明为平台依据 Methods 撰写的独立中文工作稿；未复制或未重新许可作者 2015 独立表单/网站版本的指导语与版式。",
+            "version": "1.0.0",
+            "language": "zh-CN",
+            "schemaVersion": 1
+          },
+          "frozenManual": {
+            "catalogStatus": "CANDIDATE",
+            "maturity": "PILOT",
+            "localization": {
+              "notes": "平台独立中文工作译稿；不继承任何已出版中文ARS译本的文字或验证。专家审校 PENDING、认知访谈与中国人群验证 NOT_ESTABLISHED。必需情境通过版本化 instruction 冻结呈现，作答说明依据 Methods 独立撰写，不复制作者 2015 独立表单/网站版本的指导语与版式。",
+              "reviewStatus": "PENDING",
+              "sourceLocale": "en",
+              "targetLocale": "zh-CN",
+              "schemaVersion": 1,
+              "adaptationMethod": "DIRECT_TRANSLATION",
+              "localEvidenceRefs": [],
+              "translationSource": "Cassidy 2016 论文 Methods 的本人受挫情境原英文与 Table2 完整30题、1 likely 至 5 unlikely 端点及正向反应题 6−x 转换说明（CC BY 4.0 论文正文载体）。",
+              "expertReviewStatus": "PENDING",
+              "localizationVersion": "1.0.0",
+              "cognitiveDebriefStatus": "NOT_ESTABLISHED"
+            },
+            "scientificReview": null,
+            "license": {
+              "note": "© 2016 Cassidy. 采用 Frontiers 2016 论文正文 CC BY 4.0 载体中的 Methods 本人逆境情境与 Table2 的30题；转载需署名、附许可链接并标明改动。作者2015独立表单／网站版本限定非商业研究且锚点不同（1同意–5不同意），不并入本版本，也不作为本代码的许可依据；不构成作者对任何译文的背书。",
+              "status": "verified",
+              "redistribution": "allowed"
+            }
+          }
+        }
+      ],
+      "audits": [],
+      "releases": [],
+      "policies": [],
+      "counts": {
+        "assessment_reference_sets": 0,
+        "measurement_content_release_events": 0,
+        "content_capability_grants": 0,
+        "material_grants": 0,
+        "survey_tool_grants": 0,
+        "scale_library_entries": 0,
+        "scale_library_use_grants": 0,
+        "education_assessment_deliveries": 0,
+        "assessments": 0
+      }
+    },
+    "publication-preview-before": {
+      "users": [
+        {
+          "id": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "username": "synthetic-ars30-00ea8574-2db9-423b-a3de-3546fbddeb1a",
+          "role": "ADMIN",
+          "platformRole": "SYSTEM_ADMIN",
+          "accountDomain": "TRAINING",
+          "isActive": true,
+          "isFrozen": false
+        }
+      ],
+      "scales": [
+        {
+          "id": "34a32540-5a64-40c8-80db-e994c7f87e36",
+          "code": "ars30_2016_zh_cn_research",
+          "instrumentVersion": "1.0.0",
+          "instrumentClass": "STANDARD",
+          "status": "DRAFT",
+          "visibility": "HIDDEN",
+          "definitionHash": "f2bc8219660b295793179828d0830c8dbcbf27e107228d9a66c546ee6f5cd3e3",
+          "instruction": "请设想你自己就是下面情境中的这位学生。\n\n【情境】\n你刚拿到最近一次作业的成绩，结果是“不及格”。另外两次近期作业的成绩，也都比你希望的差。你希望大学毕业时取得尽可能好的成绩，因为你有明确的职业目标，也不想让家人失望。老师给这次作业的反馈相当严厉，提到你“理解不足”“写作和表达欠佳”，但也指出了可以怎样改进。批改另外两次作业的老师也给出了类似的意见。\n\n【作答说明】\n读完上面这段情境后，请围绕同一个情境，判断你有多大可能作出下面每一种反应。全部30题都请围绕这一情境作答。按你认为自己真正会怎样反应来选，而不是按“应该怎样做”或别人期待你怎样做来选。中间的数字表示介于两端之间的程度。",
+          "measurementReleaseId": null,
+          "creatorId": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "updatedAt": "2026-10-28T00:49:00.286Z",
+          "definitionCanonicalHash": "5b776e7a1b23d57c4585f152b30a69e5fd169f3c25d03b38646729f15fd748bf"
+        }
+      ],
+      "deployments": [
+        {
+          "id": "27c899a1-1607-4ff7-8352-f008e68540b5",
+          "scale_id": "34a32540-5a64-40c8-80db-e994c7f87e36",
+          "revision": 1,
+          "status": "ACTIVE",
+          "policy_json": {
+            "locale": "zh-CN",
+            "revision": 1,
+            "territory": "CN",
+            "schemaVersion": 2,
+            "deploymentModes": [
+              "STANDALONE"
+            ],
+            "runtimePolicyHash": "a2b2e60a2ba338530bb80a2f647d6916a960e206d669d88bdba52751f6658390",
+            "inFlightCompletion": "FROZEN_DEADLINE",
+            "localizationVersion": "1.0.0"
+          },
+          "policy_hash": "9a1f9d1235e431d810757f015925610a69c155266e56e2aac2a9c863ebe5ed3c",
+          "authorization_refs": [],
+          "created_by_user_id": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "created_at": "2026-10-28T00:49:00.302Z",
+          "activated_at": "2026-10-28T00:49:00.302Z",
+          "retired_at": null
+        }
+      ],
+      "axes": [
+        {
+          "scale_id": "34a32540-5a64-40c8-80db-e994c7f87e36",
+          "axis_hash": "58cd9efa1f3e153a66acd9d2714510323ccc97d54655191a73060afa5f383be2",
+          "source_hash": "9a96fdda238eda75684e42df2cad5929781c974c455019579e94756a0fa6ebb8",
+          "axes": {
+            "reportVersion": "1.0.0",
+            "scoringVersion": "1.0.0",
+            "measurementHash": "f2bc8219660b295793179828d0830c8dbcbf27e107228d9a66c546ee6f5cd3e3",
+            "instrumentVersion": "1.0.0",
+            "referenceVersions": [],
+            "instructionVersion": "1.0.0",
+            "localizationVersion": "1.0.0",
+            "catalogManifestVersion": 1
+          },
+          "created_at": "2026-10-28T00:49:00.275Z",
+          "observedSourceCanonicalHash": "9a96fdda238eda75684e42df2cad5929781c974c455019579e94756a0fa6ebb8",
+          "frozenIdentity": {
+            "instrumentKey": "ars30_2016_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "frozenReleaseStatus": "PUBLISHED",
+          "frozenInstruction": {
+            "text": "请设想你自己就是下面情境中的这位学生。\n\n【情境】\n你刚拿到最近一次作业的成绩，结果是“不及格”。另外两次近期作业的成绩，也都比你希望的差。你希望大学毕业时取得尽可能好的成绩，因为你有明确的职业目标，也不想让家人失望。老师给这次作业的反馈相当严厉，提到你“理解不足”“写作和表达欠佳”，但也指出了可以怎样改进。批改另外两次作业的老师也给出了类似的意见。\n\n【作答说明】\n读完上面这段情境后，请围绕同一个情境，判断你有多大可能作出下面每一种反应。全部30题都请围绕这一情境作答。按你认为自己真正会怎样反应来选，而不是按“应该怎样做”或别人期待你怎样做来选。中间的数字表示介于两端之间的程度。",
+            "source": "必需本人受挫情境取自 Cassidy 2016 论文 Methods 原文（CC BY 4.0 载体），作答说明为平台依据 Methods 撰写的独立中文工作稿；未复制或未重新许可作者 2015 独立表单/网站版本的指导语与版式。",
+            "version": "1.0.0",
+            "language": "zh-CN",
+            "schemaVersion": 1
+          },
+          "frozenManual": {
+            "catalogStatus": "CANDIDATE",
+            "maturity": "PILOT",
+            "localization": {
+              "notes": "平台独立中文工作译稿；不继承任何已出版中文ARS译本的文字或验证。专家审校 PENDING、认知访谈与中国人群验证 NOT_ESTABLISHED。必需情境通过版本化 instruction 冻结呈现，作答说明依据 Methods 独立撰写，不复制作者 2015 独立表单/网站版本的指导语与版式。",
+              "reviewStatus": "PENDING",
+              "sourceLocale": "en",
+              "targetLocale": "zh-CN",
+              "schemaVersion": 1,
+              "adaptationMethod": "DIRECT_TRANSLATION",
+              "localEvidenceRefs": [],
+              "translationSource": "Cassidy 2016 论文 Methods 的本人受挫情境原英文与 Table2 完整30题、1 likely 至 5 unlikely 端点及正向反应题 6−x 转换说明（CC BY 4.0 论文正文载体）。",
+              "expertReviewStatus": "PENDING",
+              "localizationVersion": "1.0.0",
+              "cognitiveDebriefStatus": "NOT_ESTABLISHED"
+            },
+            "scientificReview": null,
+            "license": {
+              "note": "© 2016 Cassidy. 采用 Frontiers 2016 论文正文 CC BY 4.0 载体中的 Methods 本人逆境情境与 Table2 的30题；转载需署名、附许可链接并标明改动。作者2015独立表单／网站版本限定非商业研究且锚点不同（1同意–5不同意），不并入本版本，也不作为本代码的许可依据；不构成作者对任何译文的背书。",
+              "status": "verified",
+              "redistribution": "allowed"
+            }
+          }
+        }
+      ],
+      "audits": [],
+      "releases": [],
+      "policies": [],
+      "counts": {
+        "assessment_reference_sets": 0,
+        "measurement_content_release_events": 0,
+        "content_capability_grants": 0,
+        "material_grants": 0,
+        "survey_tool_grants": 0,
+        "scale_library_entries": 0,
+        "scale_library_use_grants": 0,
+        "education_assessment_deliveries": 0,
+        "assessments": 0
+      }
+    },
+    "publication-preview-after": {
+      "users": [
+        {
+          "id": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "username": "synthetic-ars30-00ea8574-2db9-423b-a3de-3546fbddeb1a",
+          "role": "ADMIN",
+          "platformRole": "SYSTEM_ADMIN",
+          "accountDomain": "TRAINING",
+          "isActive": true,
+          "isFrozen": false
+        }
+      ],
+      "scales": [
+        {
+          "id": "34a32540-5a64-40c8-80db-e994c7f87e36",
+          "code": "ars30_2016_zh_cn_research",
+          "instrumentVersion": "1.0.0",
+          "instrumentClass": "STANDARD",
+          "status": "DRAFT",
+          "visibility": "HIDDEN",
+          "definitionHash": "f2bc8219660b295793179828d0830c8dbcbf27e107228d9a66c546ee6f5cd3e3",
+          "instruction": "请设想你自己就是下面情境中的这位学生。\n\n【情境】\n你刚拿到最近一次作业的成绩，结果是“不及格”。另外两次近期作业的成绩，也都比你希望的差。你希望大学毕业时取得尽可能好的成绩，因为你有明确的职业目标，也不想让家人失望。老师给这次作业的反馈相当严厉，提到你“理解不足”“写作和表达欠佳”，但也指出了可以怎样改进。批改另外两次作业的老师也给出了类似的意见。\n\n【作答说明】\n读完上面这段情境后，请围绕同一个情境，判断你有多大可能作出下面每一种反应。全部30题都请围绕这一情境作答。按你认为自己真正会怎样反应来选，而不是按“应该怎样做”或别人期待你怎样做来选。中间的数字表示介于两端之间的程度。",
+          "measurementReleaseId": null,
+          "creatorId": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "updatedAt": "2026-10-28T00:49:00.286Z",
+          "definitionCanonicalHash": "5b776e7a1b23d57c4585f152b30a69e5fd169f3c25d03b38646729f15fd748bf"
+        }
+      ],
+      "deployments": [
+        {
+          "id": "27c899a1-1607-4ff7-8352-f008e68540b5",
+          "scale_id": "34a32540-5a64-40c8-80db-e994c7f87e36",
+          "revision": 1,
+          "status": "ACTIVE",
+          "policy_json": {
+            "locale": "zh-CN",
+            "revision": 1,
+            "territory": "CN",
+            "schemaVersion": 2,
+            "deploymentModes": [
+              "STANDALONE"
+            ],
+            "runtimePolicyHash": "a2b2e60a2ba338530bb80a2f647d6916a960e206d669d88bdba52751f6658390",
+            "inFlightCompletion": "FROZEN_DEADLINE",
+            "localizationVersion": "1.0.0"
+          },
+          "policy_hash": "9a1f9d1235e431d810757f015925610a69c155266e56e2aac2a9c863ebe5ed3c",
+          "authorization_refs": [],
+          "created_by_user_id": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "created_at": "2026-10-28T00:49:00.302Z",
+          "activated_at": "2026-10-28T00:49:00.302Z",
+          "retired_at": null
+        }
+      ],
+      "axes": [
+        {
+          "scale_id": "34a32540-5a64-40c8-80db-e994c7f87e36",
+          "axis_hash": "58cd9efa1f3e153a66acd9d2714510323ccc97d54655191a73060afa5f383be2",
+          "source_hash": "9a96fdda238eda75684e42df2cad5929781c974c455019579e94756a0fa6ebb8",
+          "axes": {
+            "reportVersion": "1.0.0",
+            "scoringVersion": "1.0.0",
+            "measurementHash": "f2bc8219660b295793179828d0830c8dbcbf27e107228d9a66c546ee6f5cd3e3",
+            "instrumentVersion": "1.0.0",
+            "referenceVersions": [],
+            "instructionVersion": "1.0.0",
+            "localizationVersion": "1.0.0",
+            "catalogManifestVersion": 1
+          },
+          "created_at": "2026-10-28T00:49:00.275Z",
+          "observedSourceCanonicalHash": "9a96fdda238eda75684e42df2cad5929781c974c455019579e94756a0fa6ebb8",
+          "frozenIdentity": {
+            "instrumentKey": "ars30_2016_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "frozenReleaseStatus": "PUBLISHED",
+          "frozenInstruction": {
+            "text": "请设想你自己就是下面情境中的这位学生。\n\n【情境】\n你刚拿到最近一次作业的成绩，结果是“不及格”。另外两次近期作业的成绩，也都比你希望的差。你希望大学毕业时取得尽可能好的成绩，因为你有明确的职业目标，也不想让家人失望。老师给这次作业的反馈相当严厉，提到你“理解不足”“写作和表达欠佳”，但也指出了可以怎样改进。批改另外两次作业的老师也给出了类似的意见。\n\n【作答说明】\n读完上面这段情境后，请围绕同一个情境，判断你有多大可能作出下面每一种反应。全部30题都请围绕这一情境作答。按你认为自己真正会怎样反应来选，而不是按“应该怎样做”或别人期待你怎样做来选。中间的数字表示介于两端之间的程度。",
+            "source": "必需本人受挫情境取自 Cassidy 2016 论文 Methods 原文（CC BY 4.0 载体），作答说明为平台依据 Methods 撰写的独立中文工作稿；未复制或未重新许可作者 2015 独立表单/网站版本的指导语与版式。",
+            "version": "1.0.0",
+            "language": "zh-CN",
+            "schemaVersion": 1
+          },
+          "frozenManual": {
+            "catalogStatus": "CANDIDATE",
+            "maturity": "PILOT",
+            "localization": {
+              "notes": "平台独立中文工作译稿；不继承任何已出版中文ARS译本的文字或验证。专家审校 PENDING、认知访谈与中国人群验证 NOT_ESTABLISHED。必需情境通过版本化 instruction 冻结呈现，作答说明依据 Methods 独立撰写，不复制作者 2015 独立表单/网站版本的指导语与版式。",
+              "reviewStatus": "PENDING",
+              "sourceLocale": "en",
+              "targetLocale": "zh-CN",
+              "schemaVersion": 1,
+              "adaptationMethod": "DIRECT_TRANSLATION",
+              "localEvidenceRefs": [],
+              "translationSource": "Cassidy 2016 论文 Methods 的本人受挫情境原英文与 Table2 完整30题、1 likely 至 5 unlikely 端点及正向反应题 6−x 转换说明（CC BY 4.0 论文正文载体）。",
+              "expertReviewStatus": "PENDING",
+              "localizationVersion": "1.0.0",
+              "cognitiveDebriefStatus": "NOT_ESTABLISHED"
+            },
+            "scientificReview": null,
+            "license": {
+              "note": "© 2016 Cassidy. 采用 Frontiers 2016 论文正文 CC BY 4.0 载体中的 Methods 本人逆境情境与 Table2 的30题；转载需署名、附许可链接并标明改动。作者2015独立表单／网站版本限定非商业研究且锚点不同（1同意–5不同意），不并入本版本，也不作为本代码的许可依据；不构成作者对任何译文的背书。",
+              "status": "verified",
+              "redistribution": "allowed"
+            }
+          }
+        }
+      ],
+      "audits": [],
+      "releases": [],
+      "policies": [],
+      "counts": {
+        "assessment_reference_sets": 0,
+        "measurement_content_release_events": 0,
+        "content_capability_grants": 0,
+        "material_grants": 0,
+        "survey_tool_grants": 0,
+        "scale_library_entries": 0,
+        "scale_library_use_grants": 0,
+        "education_assessment_deliveries": 0,
+        "assessments": 0
+      }
+    },
+    "publication-apply-before": {
+      "users": [
+        {
+          "id": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "username": "synthetic-ars30-00ea8574-2db9-423b-a3de-3546fbddeb1a",
+          "role": "ADMIN",
+          "platformRole": "SYSTEM_ADMIN",
+          "accountDomain": "TRAINING",
+          "isActive": true,
+          "isFrozen": false
+        }
+      ],
+      "scales": [
+        {
+          "id": "34a32540-5a64-40c8-80db-e994c7f87e36",
+          "code": "ars30_2016_zh_cn_research",
+          "instrumentVersion": "1.0.0",
+          "instrumentClass": "STANDARD",
+          "status": "DRAFT",
+          "visibility": "HIDDEN",
+          "definitionHash": "f2bc8219660b295793179828d0830c8dbcbf27e107228d9a66c546ee6f5cd3e3",
+          "instruction": "请设想你自己就是下面情境中的这位学生。\n\n【情境】\n你刚拿到最近一次作业的成绩，结果是“不及格”。另外两次近期作业的成绩，也都比你希望的差。你希望大学毕业时取得尽可能好的成绩，因为你有明确的职业目标，也不想让家人失望。老师给这次作业的反馈相当严厉，提到你“理解不足”“写作和表达欠佳”，但也指出了可以怎样改进。批改另外两次作业的老师也给出了类似的意见。\n\n【作答说明】\n读完上面这段情境后，请围绕同一个情境，判断你有多大可能作出下面每一种反应。全部30题都请围绕这一情境作答。按你认为自己真正会怎样反应来选，而不是按“应该怎样做”或别人期待你怎样做来选。中间的数字表示介于两端之间的程度。",
+          "measurementReleaseId": null,
+          "creatorId": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "updatedAt": "2026-10-28T00:49:00.286Z",
+          "definitionCanonicalHash": "5b776e7a1b23d57c4585f152b30a69e5fd169f3c25d03b38646729f15fd748bf"
+        }
+      ],
+      "deployments": [
+        {
+          "id": "27c899a1-1607-4ff7-8352-f008e68540b5",
+          "scale_id": "34a32540-5a64-40c8-80db-e994c7f87e36",
+          "revision": 1,
+          "status": "ACTIVE",
+          "policy_json": {
+            "locale": "zh-CN",
+            "revision": 1,
+            "territory": "CN",
+            "schemaVersion": 2,
+            "deploymentModes": [
+              "STANDALONE"
+            ],
+            "runtimePolicyHash": "a2b2e60a2ba338530bb80a2f647d6916a960e206d669d88bdba52751f6658390",
+            "inFlightCompletion": "FROZEN_DEADLINE",
+            "localizationVersion": "1.0.0"
+          },
+          "policy_hash": "9a1f9d1235e431d810757f015925610a69c155266e56e2aac2a9c863ebe5ed3c",
+          "authorization_refs": [],
+          "created_by_user_id": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "created_at": "2026-10-28T00:49:00.302Z",
+          "activated_at": "2026-10-28T00:49:00.302Z",
+          "retired_at": null
+        }
+      ],
+      "axes": [
+        {
+          "scale_id": "34a32540-5a64-40c8-80db-e994c7f87e36",
+          "axis_hash": "58cd9efa1f3e153a66acd9d2714510323ccc97d54655191a73060afa5f383be2",
+          "source_hash": "9a96fdda238eda75684e42df2cad5929781c974c455019579e94756a0fa6ebb8",
+          "axes": {
+            "reportVersion": "1.0.0",
+            "scoringVersion": "1.0.0",
+            "measurementHash": "f2bc8219660b295793179828d0830c8dbcbf27e107228d9a66c546ee6f5cd3e3",
+            "instrumentVersion": "1.0.0",
+            "referenceVersions": [],
+            "instructionVersion": "1.0.0",
+            "localizationVersion": "1.0.0",
+            "catalogManifestVersion": 1
+          },
+          "created_at": "2026-10-28T00:49:00.275Z",
+          "observedSourceCanonicalHash": "9a96fdda238eda75684e42df2cad5929781c974c455019579e94756a0fa6ebb8",
+          "frozenIdentity": {
+            "instrumentKey": "ars30_2016_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "frozenReleaseStatus": "PUBLISHED",
+          "frozenInstruction": {
+            "text": "请设想你自己就是下面情境中的这位学生。\n\n【情境】\n你刚拿到最近一次作业的成绩，结果是“不及格”。另外两次近期作业的成绩，也都比你希望的差。你希望大学毕业时取得尽可能好的成绩，因为你有明确的职业目标，也不想让家人失望。老师给这次作业的反馈相当严厉，提到你“理解不足”“写作和表达欠佳”，但也指出了可以怎样改进。批改另外两次作业的老师也给出了类似的意见。\n\n【作答说明】\n读完上面这段情境后，请围绕同一个情境，判断你有多大可能作出下面每一种反应。全部30题都请围绕这一情境作答。按你认为自己真正会怎样反应来选，而不是按“应该怎样做”或别人期待你怎样做来选。中间的数字表示介于两端之间的程度。",
+            "source": "必需本人受挫情境取自 Cassidy 2016 论文 Methods 原文（CC BY 4.0 载体），作答说明为平台依据 Methods 撰写的独立中文工作稿；未复制或未重新许可作者 2015 独立表单/网站版本的指导语与版式。",
+            "version": "1.0.0",
+            "language": "zh-CN",
+            "schemaVersion": 1
+          },
+          "frozenManual": {
+            "catalogStatus": "CANDIDATE",
+            "maturity": "PILOT",
+            "localization": {
+              "notes": "平台独立中文工作译稿；不继承任何已出版中文ARS译本的文字或验证。专家审校 PENDING、认知访谈与中国人群验证 NOT_ESTABLISHED。必需情境通过版本化 instruction 冻结呈现，作答说明依据 Methods 独立撰写，不复制作者 2015 独立表单/网站版本的指导语与版式。",
+              "reviewStatus": "PENDING",
+              "sourceLocale": "en",
+              "targetLocale": "zh-CN",
+              "schemaVersion": 1,
+              "adaptationMethod": "DIRECT_TRANSLATION",
+              "localEvidenceRefs": [],
+              "translationSource": "Cassidy 2016 论文 Methods 的本人受挫情境原英文与 Table2 完整30题、1 likely 至 5 unlikely 端点及正向反应题 6−x 转换说明（CC BY 4.0 论文正文载体）。",
+              "expertReviewStatus": "PENDING",
+              "localizationVersion": "1.0.0",
+              "cognitiveDebriefStatus": "NOT_ESTABLISHED"
+            },
+            "scientificReview": null,
+            "license": {
+              "note": "© 2016 Cassidy. 采用 Frontiers 2016 论文正文 CC BY 4.0 载体中的 Methods 本人逆境情境与 Table2 的30题；转载需署名、附许可链接并标明改动。作者2015独立表单／网站版本限定非商业研究且锚点不同（1同意–5不同意），不并入本版本，也不作为本代码的许可依据；不构成作者对任何译文的背书。",
+              "status": "verified",
+              "redistribution": "allowed"
+            }
+          }
+        }
+      ],
+      "audits": [],
+      "releases": [],
+      "policies": [],
+      "counts": {
+        "assessment_reference_sets": 0,
+        "measurement_content_release_events": 0,
+        "content_capability_grants": 0,
+        "material_grants": 0,
+        "survey_tool_grants": 0,
+        "scale_library_entries": 0,
+        "scale_library_use_grants": 0,
+        "education_assessment_deliveries": 0,
+        "assessments": 0
+      }
+    },
+    "publication-apply-after": {
+      "users": [
+        {
+          "id": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "username": "synthetic-ars30-00ea8574-2db9-423b-a3de-3546fbddeb1a",
+          "role": "ADMIN",
+          "platformRole": "SYSTEM_ADMIN",
+          "accountDomain": "TRAINING",
+          "isActive": true,
+          "isFrozen": false
+        }
+      ],
+      "scales": [
+        {
+          "id": "34a32540-5a64-40c8-80db-e994c7f87e36",
+          "code": "ars30_2016_zh_cn_research",
+          "instrumentVersion": "1.0.0",
+          "instrumentClass": "STANDARD",
+          "status": "PUBLISHED",
+          "visibility": "PUBLIC",
+          "definitionHash": "f2bc8219660b295793179828d0830c8dbcbf27e107228d9a66c546ee6f5cd3e3",
+          "instruction": "请设想你自己就是下面情境中的这位学生。\n\n【情境】\n你刚拿到最近一次作业的成绩，结果是“不及格”。另外两次近期作业的成绩，也都比你希望的差。你希望大学毕业时取得尽可能好的成绩，因为你有明确的职业目标，也不想让家人失望。老师给这次作业的反馈相当严厉，提到你“理解不足”“写作和表达欠佳”，但也指出了可以怎样改进。批改另外两次作业的老师也给出了类似的意见。\n\n【作答说明】\n读完上面这段情境后，请围绕同一个情境，判断你有多大可能作出下面每一种反应。全部30题都请围绕这一情境作答。按你认为自己真正会怎样反应来选，而不是按“应该怎样做”或别人期待你怎样做来选。中间的数字表示介于两端之间的程度。",
+          "measurementReleaseId": "f059c18d-a991-4ad7-b06f-0e4e303c8a04",
+          "creatorId": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "updatedAt": "2026-10-28T00:49:02.482Z",
+          "definitionCanonicalHash": "5b776e7a1b23d57c4585f152b30a69e5fd169f3c25d03b38646729f15fd748bf"
+        }
+      ],
+      "deployments": [
+        {
+          "id": "27c899a1-1607-4ff7-8352-f008e68540b5",
+          "scale_id": "34a32540-5a64-40c8-80db-e994c7f87e36",
+          "revision": 1,
+          "status": "ACTIVE",
+          "policy_json": {
+            "locale": "zh-CN",
+            "revision": 1,
+            "territory": "CN",
+            "schemaVersion": 2,
+            "deploymentModes": [
+              "STANDALONE"
+            ],
+            "runtimePolicyHash": "a2b2e60a2ba338530bb80a2f647d6916a960e206d669d88bdba52751f6658390",
+            "inFlightCompletion": "FROZEN_DEADLINE",
+            "localizationVersion": "1.0.0"
+          },
+          "policy_hash": "9a1f9d1235e431d810757f015925610a69c155266e56e2aac2a9c863ebe5ed3c",
+          "authorization_refs": [],
+          "created_by_user_id": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "created_at": "2026-10-28T00:49:00.302Z",
+          "activated_at": "2026-10-28T00:49:00.302Z",
+          "retired_at": null
+        }
+      ],
+      "axes": [
+        {
+          "scale_id": "34a32540-5a64-40c8-80db-e994c7f87e36",
+          "axis_hash": "58cd9efa1f3e153a66acd9d2714510323ccc97d54655191a73060afa5f383be2",
+          "source_hash": "9a96fdda238eda75684e42df2cad5929781c974c455019579e94756a0fa6ebb8",
+          "axes": {
+            "reportVersion": "1.0.0",
+            "scoringVersion": "1.0.0",
+            "measurementHash": "f2bc8219660b295793179828d0830c8dbcbf27e107228d9a66c546ee6f5cd3e3",
+            "instrumentVersion": "1.0.0",
+            "referenceVersions": [],
+            "instructionVersion": "1.0.0",
+            "localizationVersion": "1.0.0",
+            "catalogManifestVersion": 1
+          },
+          "created_at": "2026-10-28T00:49:00.275Z",
+          "observedSourceCanonicalHash": "9a96fdda238eda75684e42df2cad5929781c974c455019579e94756a0fa6ebb8",
+          "frozenIdentity": {
+            "instrumentKey": "ars30_2016_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "frozenReleaseStatus": "PUBLISHED",
+          "frozenInstruction": {
+            "text": "请设想你自己就是下面情境中的这位学生。\n\n【情境】\n你刚拿到最近一次作业的成绩，结果是“不及格”。另外两次近期作业的成绩，也都比你希望的差。你希望大学毕业时取得尽可能好的成绩，因为你有明确的职业目标，也不想让家人失望。老师给这次作业的反馈相当严厉，提到你“理解不足”“写作和表达欠佳”，但也指出了可以怎样改进。批改另外两次作业的老师也给出了类似的意见。\n\n【作答说明】\n读完上面这段情境后，请围绕同一个情境，判断你有多大可能作出下面每一种反应。全部30题都请围绕这一情境作答。按你认为自己真正会怎样反应来选，而不是按“应该怎样做”或别人期待你怎样做来选。中间的数字表示介于两端之间的程度。",
+            "source": "必需本人受挫情境取自 Cassidy 2016 论文 Methods 原文（CC BY 4.0 载体），作答说明为平台依据 Methods 撰写的独立中文工作稿；未复制或未重新许可作者 2015 独立表单/网站版本的指导语与版式。",
+            "version": "1.0.0",
+            "language": "zh-CN",
+            "schemaVersion": 1
+          },
+          "frozenManual": {
+            "catalogStatus": "CANDIDATE",
+            "maturity": "PILOT",
+            "localization": {
+              "notes": "平台独立中文工作译稿；不继承任何已出版中文ARS译本的文字或验证。专家审校 PENDING、认知访谈与中国人群验证 NOT_ESTABLISHED。必需情境通过版本化 instruction 冻结呈现，作答说明依据 Methods 独立撰写，不复制作者 2015 独立表单/网站版本的指导语与版式。",
+              "reviewStatus": "PENDING",
+              "sourceLocale": "en",
+              "targetLocale": "zh-CN",
+              "schemaVersion": 1,
+              "adaptationMethod": "DIRECT_TRANSLATION",
+              "localEvidenceRefs": [],
+              "translationSource": "Cassidy 2016 论文 Methods 的本人受挫情境原英文与 Table2 完整30题、1 likely 至 5 unlikely 端点及正向反应题 6−x 转换说明（CC BY 4.0 论文正文载体）。",
+              "expertReviewStatus": "PENDING",
+              "localizationVersion": "1.0.0",
+              "cognitiveDebriefStatus": "NOT_ESTABLISHED"
+            },
+            "scientificReview": null,
+            "license": {
+              "note": "© 2016 Cassidy. 采用 Frontiers 2016 论文正文 CC BY 4.0 载体中的 Methods 本人逆境情境与 Table2 的30题；转载需署名、附许可链接并标明改动。作者2015独立表单／网站版本限定非商业研究且锚点不同（1同意–5不同意），不并入本版本，也不作为本代码的许可依据；不构成作者对任何译文的背书。",
+              "status": "verified",
+              "redistribution": "allowed"
+            }
+          }
+        }
+      ],
+      "audits": [
+        {
+          "id": "b1435c8d-1edb-4773-80e7-a13461bec324",
+          "scaleId": "34a32540-5a64-40c8-80db-e994c7f87e36",
+          "actorUserId": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "proofHash": "15bc0be9ddb2961306540a7defa7a1c681c1255f2f69876dfe324643322d69c2",
+          "proof": {
+            "scaleId": "34a32540-5a64-40c8-80db-e994c7f87e36",
+            "identity": {
+              "instrumentKey": "ars30_2016_zh_cn_research",
+              "instrumentVersion": "1.0.0"
+            },
+            "sourceHash": "9a96fdda238eda75684e42df2cad5929781c974c455019579e94756a0fa6ebb8",
+            "visibility": "PUBLIC",
+            "actorUserId": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+            "instruction": {
+              "text": "请设想你自己就是下面情境中的这位学生。\n\n【情境】\n你刚拿到最近一次作业的成绩，结果是“不及格”。另外两次近期作业的成绩，也都比你希望的差。你希望大学毕业时取得尽可能好的成绩，因为你有明确的职业目标，也不想让家人失望。老师给这次作业的反馈相当严厉，提到你“理解不足”“写作和表达欠佳”，但也指出了可以怎样改进。批改另外两次作业的老师也给出了类似的意见。\n\n【作答说明】\n读完上面这段情境后，请围绕同一个情境，判断你有多大可能作出下面每一种反应。全部30题都请围绕这一情境作答。按你认为自己真正会怎样反应来选，而不是按“应该怎样做”或别人期待你怎样做来选。中间的数字表示介于两端之间的程度。",
+              "origin": "INSTRUMENT_SOURCE",
+              "source": "必需本人受挫情境取自 Cassidy 2016 论文 Methods 原文（CC BY 4.0 载体），作答说明为平台依据 Methods 撰写的独立中文工作稿；未复制或未重新许可作者 2015 独立表单/网站版本的指导语与版式。",
+              "version": "1.0.0",
+              "language": "zh-CN",
+              "schemaVersion": 1
+            },
+            "manualReview": {
+              "rights": {
+                "note": "© 2016 Cassidy. 采用 Frontiers 2016 论文正文 CC BY 4.0 载体中的 Methods 本人逆境情境与 Table2 的30题；转载需署名、附许可链接并标明改动。作者2015独立表单／网站版本限定非商业研究且锚点不同（1同意–5不同意），不并入本版本，也不作为本代码的许可依据；不构成作者对任何译文的背书。",
+                "status": "verified",
+                "redistribution": "allowed"
+              },
+              "reportQc": {
+                "basis": "Cassidy 2016 CC BY 4.0 article Methods/Table2 carrier; independent working translation; PR356 instruction contract adopted.",
+                "reviewer": "AI-assisted fixed-source and plain-language preparation; not human expert review",
+                "reviewedAt": "2026-10-27T00:00:00.000Z"
+              },
+              "localization": [
+                "LOCALIZATION_REVIEW_PENDING",
+                "LOCALIZATION_EXPERT_REVIEW_PENDING"
+              ]
+            },
+            "qualification": {
+              "pilot": {
+                "blockers": [],
+                "eligible": true
+              },
+              "researchGrade": {
+                "blockers": [
+                  "SCIENTIFIC_REVIEW_MISSING",
+                  "LOCALIZATION_REVIEW_PENDING",
+                  "RESEARCH_GRADE_REVIEW_MISSING"
+                ],
+                "eligible": false
+              },
+              "researchReady": {
+                "blockers": [
+                  "SCIENTIFIC_REVIEW_MISSING",
+                  "LOCALIZATION_REVIEW_PENDING"
+                ],
+                "eligible": false
+              },
+              "maxEligibleMaturity": "PILOT"
+            },
+            "schemaVersion": 2,
+            "definitionHash": "f2bc8219660b295793179828d0830c8dbcbf27e107228d9a66c546ee6f5cd3e3",
+            "previousStatus": "DRAFT",
+            "allowedProducts": [
+              "SURVEY"
+            ],
+            "deploymentRevision": 1,
+            "previousVisibility": "HIDDEN",
+            "scientificMaturity": "PILOT",
+            "deploymentPolicyHash": "9a1f9d1235e431d810757f015925610a69c155266e56e2aac2a9c863ebe5ed3c",
+            "instructionDiagnostics": []
+          },
+          "createdAt": "2026-10-28T00:49:02.441Z"
+        }
+      ],
+      "releases": [
+        {
+          "id": "f059c18d-a991-4ad7-b06f-0e4e303c8a04",
+          "layer": "MEASUREMENT",
+          "family": "SCALE",
+          "key": "scale:d55f8214d02d21f8bfc346282b1ae62e2017be0950962a3b604bb6295f6d2d09:ars30_2016_zh_cn_research",
+          "version": "1.0.0:1.0.0:1.0.0",
+          "contentHash": "486c5b4e9a0856f5a04f478d45db9ae872a29b3775da25058f2bcb8f093bc3b0",
+          "scope": {
+            "kind": "PLATFORM",
+            "ownerId": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24"
+          },
+          "provenance": {
+            "sourceIdentity": {
+              "instrumentKey": "ars30_2016_zh_cn_research",
+              "instrumentVersion": "1.0.0"
+            }
+          }
+        }
+      ],
+      "policies": [
+        {
+          "product": "SURVEY",
+          "resource_key": "standard:ars30_2016_zh_cn_research:1.0.0",
+          "fingerprint": "a3cd518cacb8bcdd91657edefde2d4db8fd45308520cb41a428ac18b61be93b6",
+          "decision": "APPROVED",
+          "paused": false,
+          "reason": "系统入库批准：PUBLIC",
+          "reviewed_by": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "version": 1
+        }
+      ],
+      "counts": {
+        "assessment_reference_sets": 0,
+        "measurement_content_release_events": 0,
+        "content_capability_grants": 0,
+        "material_grants": 0,
+        "survey_tool_grants": 0,
+        "scale_library_entries": 0,
+        "scale_library_use_grants": 0,
+        "education_assessment_deliveries": 0,
+        "assessments": 0
+      }
+    },
+    "publication-school-scope-refusal-before": {
+      "users": [
+        {
+          "id": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "username": "synthetic-ars30-00ea8574-2db9-423b-a3de-3546fbddeb1a",
+          "role": "ADMIN",
+          "platformRole": "SYSTEM_ADMIN",
+          "accountDomain": "TRAINING",
+          "isActive": true,
+          "isFrozen": false
+        }
+      ],
+      "scales": [
+        {
+          "id": "34a32540-5a64-40c8-80db-e994c7f87e36",
+          "code": "ars30_2016_zh_cn_research",
+          "instrumentVersion": "1.0.0",
+          "instrumentClass": "STANDARD",
+          "status": "PUBLISHED",
+          "visibility": "PUBLIC",
+          "definitionHash": "f2bc8219660b295793179828d0830c8dbcbf27e107228d9a66c546ee6f5cd3e3",
+          "instruction": "请设想你自己就是下面情境中的这位学生。\n\n【情境】\n你刚拿到最近一次作业的成绩，结果是“不及格”。另外两次近期作业的成绩，也都比你希望的差。你希望大学毕业时取得尽可能好的成绩，因为你有明确的职业目标，也不想让家人失望。老师给这次作业的反馈相当严厉，提到你“理解不足”“写作和表达欠佳”，但也指出了可以怎样改进。批改另外两次作业的老师也给出了类似的意见。\n\n【作答说明】\n读完上面这段情境后，请围绕同一个情境，判断你有多大可能作出下面每一种反应。全部30题都请围绕这一情境作答。按你认为自己真正会怎样反应来选，而不是按“应该怎样做”或别人期待你怎样做来选。中间的数字表示介于两端之间的程度。",
+          "measurementReleaseId": "f059c18d-a991-4ad7-b06f-0e4e303c8a04",
+          "creatorId": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "updatedAt": "2026-10-28T00:49:02.482Z",
+          "definitionCanonicalHash": "5b776e7a1b23d57c4585f152b30a69e5fd169f3c25d03b38646729f15fd748bf"
+        }
+      ],
+      "deployments": [
+        {
+          "id": "27c899a1-1607-4ff7-8352-f008e68540b5",
+          "scale_id": "34a32540-5a64-40c8-80db-e994c7f87e36",
+          "revision": 1,
+          "status": "ACTIVE",
+          "policy_json": {
+            "locale": "zh-CN",
+            "revision": 1,
+            "territory": "CN",
+            "schemaVersion": 2,
+            "deploymentModes": [
+              "STANDALONE"
+            ],
+            "runtimePolicyHash": "a2b2e60a2ba338530bb80a2f647d6916a960e206d669d88bdba52751f6658390",
+            "inFlightCompletion": "FROZEN_DEADLINE",
+            "localizationVersion": "1.0.0"
+          },
+          "policy_hash": "9a1f9d1235e431d810757f015925610a69c155266e56e2aac2a9c863ebe5ed3c",
+          "authorization_refs": [],
+          "created_by_user_id": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "created_at": "2026-10-28T00:49:00.302Z",
+          "activated_at": "2026-10-28T00:49:00.302Z",
+          "retired_at": null
+        }
+      ],
+      "axes": [
+        {
+          "scale_id": "34a32540-5a64-40c8-80db-e994c7f87e36",
+          "axis_hash": "58cd9efa1f3e153a66acd9d2714510323ccc97d54655191a73060afa5f383be2",
+          "source_hash": "9a96fdda238eda75684e42df2cad5929781c974c455019579e94756a0fa6ebb8",
+          "axes": {
+            "reportVersion": "1.0.0",
+            "scoringVersion": "1.0.0",
+            "measurementHash": "f2bc8219660b295793179828d0830c8dbcbf27e107228d9a66c546ee6f5cd3e3",
+            "instrumentVersion": "1.0.0",
+            "referenceVersions": [],
+            "instructionVersion": "1.0.0",
+            "localizationVersion": "1.0.0",
+            "catalogManifestVersion": 1
+          },
+          "created_at": "2026-10-28T00:49:00.275Z",
+          "observedSourceCanonicalHash": "9a96fdda238eda75684e42df2cad5929781c974c455019579e94756a0fa6ebb8",
+          "frozenIdentity": {
+            "instrumentKey": "ars30_2016_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "frozenReleaseStatus": "PUBLISHED",
+          "frozenInstruction": {
+            "text": "请设想你自己就是下面情境中的这位学生。\n\n【情境】\n你刚拿到最近一次作业的成绩，结果是“不及格”。另外两次近期作业的成绩，也都比你希望的差。你希望大学毕业时取得尽可能好的成绩，因为你有明确的职业目标，也不想让家人失望。老师给这次作业的反馈相当严厉，提到你“理解不足”“写作和表达欠佳”，但也指出了可以怎样改进。批改另外两次作业的老师也给出了类似的意见。\n\n【作答说明】\n读完上面这段情境后，请围绕同一个情境，判断你有多大可能作出下面每一种反应。全部30题都请围绕这一情境作答。按你认为自己真正会怎样反应来选，而不是按“应该怎样做”或别人期待你怎样做来选。中间的数字表示介于两端之间的程度。",
+            "source": "必需本人受挫情境取自 Cassidy 2016 论文 Methods 原文（CC BY 4.0 载体），作答说明为平台依据 Methods 撰写的独立中文工作稿；未复制或未重新许可作者 2015 独立表单/网站版本的指导语与版式。",
+            "version": "1.0.0",
+            "language": "zh-CN",
+            "schemaVersion": 1
+          },
+          "frozenManual": {
+            "catalogStatus": "CANDIDATE",
+            "maturity": "PILOT",
+            "localization": {
+              "notes": "平台独立中文工作译稿；不继承任何已出版中文ARS译本的文字或验证。专家审校 PENDING、认知访谈与中国人群验证 NOT_ESTABLISHED。必需情境通过版本化 instruction 冻结呈现，作答说明依据 Methods 独立撰写，不复制作者 2015 独立表单/网站版本的指导语与版式。",
+              "reviewStatus": "PENDING",
+              "sourceLocale": "en",
+              "targetLocale": "zh-CN",
+              "schemaVersion": 1,
+              "adaptationMethod": "DIRECT_TRANSLATION",
+              "localEvidenceRefs": [],
+              "translationSource": "Cassidy 2016 论文 Methods 的本人受挫情境原英文与 Table2 完整30题、1 likely 至 5 unlikely 端点及正向反应题 6−x 转换说明（CC BY 4.0 论文正文载体）。",
+              "expertReviewStatus": "PENDING",
+              "localizationVersion": "1.0.0",
+              "cognitiveDebriefStatus": "NOT_ESTABLISHED"
+            },
+            "scientificReview": null,
+            "license": {
+              "note": "© 2016 Cassidy. 采用 Frontiers 2016 论文正文 CC BY 4.0 载体中的 Methods 本人逆境情境与 Table2 的30题；转载需署名、附许可链接并标明改动。作者2015独立表单／网站版本限定非商业研究且锚点不同（1同意–5不同意），不并入本版本，也不作为本代码的许可依据；不构成作者对任何译文的背书。",
+              "status": "verified",
+              "redistribution": "allowed"
+            }
+          }
+        }
+      ],
+      "audits": [
+        {
+          "id": "b1435c8d-1edb-4773-80e7-a13461bec324",
+          "scaleId": "34a32540-5a64-40c8-80db-e994c7f87e36",
+          "actorUserId": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "proofHash": "15bc0be9ddb2961306540a7defa7a1c681c1255f2f69876dfe324643322d69c2",
+          "proof": {
+            "scaleId": "34a32540-5a64-40c8-80db-e994c7f87e36",
+            "identity": {
+              "instrumentKey": "ars30_2016_zh_cn_research",
+              "instrumentVersion": "1.0.0"
+            },
+            "sourceHash": "9a96fdda238eda75684e42df2cad5929781c974c455019579e94756a0fa6ebb8",
+            "visibility": "PUBLIC",
+            "actorUserId": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+            "instruction": {
+              "text": "请设想你自己就是下面情境中的这位学生。\n\n【情境】\n你刚拿到最近一次作业的成绩，结果是“不及格”。另外两次近期作业的成绩，也都比你希望的差。你希望大学毕业时取得尽可能好的成绩，因为你有明确的职业目标，也不想让家人失望。老师给这次作业的反馈相当严厉，提到你“理解不足”“写作和表达欠佳”，但也指出了可以怎样改进。批改另外两次作业的老师也给出了类似的意见。\n\n【作答说明】\n读完上面这段情境后，请围绕同一个情境，判断你有多大可能作出下面每一种反应。全部30题都请围绕这一情境作答。按你认为自己真正会怎样反应来选，而不是按“应该怎样做”或别人期待你怎样做来选。中间的数字表示介于两端之间的程度。",
+              "origin": "INSTRUMENT_SOURCE",
+              "source": "必需本人受挫情境取自 Cassidy 2016 论文 Methods 原文（CC BY 4.0 载体），作答说明为平台依据 Methods 撰写的独立中文工作稿；未复制或未重新许可作者 2015 独立表单/网站版本的指导语与版式。",
+              "version": "1.0.0",
+              "language": "zh-CN",
+              "schemaVersion": 1
+            },
+            "manualReview": {
+              "rights": {
+                "note": "© 2016 Cassidy. 采用 Frontiers 2016 论文正文 CC BY 4.0 载体中的 Methods 本人逆境情境与 Table2 的30题；转载需署名、附许可链接并标明改动。作者2015独立表单／网站版本限定非商业研究且锚点不同（1同意–5不同意），不并入本版本，也不作为本代码的许可依据；不构成作者对任何译文的背书。",
+                "status": "verified",
+                "redistribution": "allowed"
+              },
+              "reportQc": {
+                "basis": "Cassidy 2016 CC BY 4.0 article Methods/Table2 carrier; independent working translation; PR356 instruction contract adopted.",
+                "reviewer": "AI-assisted fixed-source and plain-language preparation; not human expert review",
+                "reviewedAt": "2026-10-27T00:00:00.000Z"
+              },
+              "localization": [
+                "LOCALIZATION_REVIEW_PENDING",
+                "LOCALIZATION_EXPERT_REVIEW_PENDING"
+              ]
+            },
+            "qualification": {
+              "pilot": {
+                "blockers": [],
+                "eligible": true
+              },
+              "researchGrade": {
+                "blockers": [
+                  "SCIENTIFIC_REVIEW_MISSING",
+                  "LOCALIZATION_REVIEW_PENDING",
+                  "RESEARCH_GRADE_REVIEW_MISSING"
+                ],
+                "eligible": false
+              },
+              "researchReady": {
+                "blockers": [
+                  "SCIENTIFIC_REVIEW_MISSING",
+                  "LOCALIZATION_REVIEW_PENDING"
+                ],
+                "eligible": false
+              },
+              "maxEligibleMaturity": "PILOT"
+            },
+            "schemaVersion": 2,
+            "definitionHash": "f2bc8219660b295793179828d0830c8dbcbf27e107228d9a66c546ee6f5cd3e3",
+            "previousStatus": "DRAFT",
+            "allowedProducts": [
+              "SURVEY"
+            ],
+            "deploymentRevision": 1,
+            "previousVisibility": "HIDDEN",
+            "scientificMaturity": "PILOT",
+            "deploymentPolicyHash": "9a1f9d1235e431d810757f015925610a69c155266e56e2aac2a9c863ebe5ed3c",
+            "instructionDiagnostics": []
+          },
+          "createdAt": "2026-10-28T00:49:02.441Z"
+        }
+      ],
+      "releases": [
+        {
+          "id": "f059c18d-a991-4ad7-b06f-0e4e303c8a04",
+          "layer": "MEASUREMENT",
+          "family": "SCALE",
+          "key": "scale:d55f8214d02d21f8bfc346282b1ae62e2017be0950962a3b604bb6295f6d2d09:ars30_2016_zh_cn_research",
+          "version": "1.0.0:1.0.0:1.0.0",
+          "contentHash": "486c5b4e9a0856f5a04f478d45db9ae872a29b3775da25058f2bcb8f093bc3b0",
+          "scope": {
+            "kind": "PLATFORM",
+            "ownerId": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24"
+          },
+          "provenance": {
+            "sourceIdentity": {
+              "instrumentKey": "ars30_2016_zh_cn_research",
+              "instrumentVersion": "1.0.0"
+            }
+          }
+        }
+      ],
+      "policies": [
+        {
+          "product": "SURVEY",
+          "resource_key": "standard:ars30_2016_zh_cn_research:1.0.0",
+          "fingerprint": "a3cd518cacb8bcdd91657edefde2d4db8fd45308520cb41a428ac18b61be93b6",
+          "decision": "APPROVED",
+          "paused": false,
+          "reason": "系统入库批准：PUBLIC",
+          "reviewed_by": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "version": 1
+        }
+      ],
+      "counts": {
+        "assessment_reference_sets": 0,
+        "measurement_content_release_events": 0,
+        "content_capability_grants": 0,
+        "material_grants": 0,
+        "survey_tool_grants": 0,
+        "scale_library_entries": 0,
+        "scale_library_use_grants": 0,
+        "education_assessment_deliveries": 0,
+        "assessments": 0
+      }
+    },
+    "publication-school-scope-refusal-after": {
+      "users": [
+        {
+          "id": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "username": "synthetic-ars30-00ea8574-2db9-423b-a3de-3546fbddeb1a",
+          "role": "ADMIN",
+          "platformRole": "SYSTEM_ADMIN",
+          "accountDomain": "TRAINING",
+          "isActive": true,
+          "isFrozen": false
+        }
+      ],
+      "scales": [
+        {
+          "id": "34a32540-5a64-40c8-80db-e994c7f87e36",
+          "code": "ars30_2016_zh_cn_research",
+          "instrumentVersion": "1.0.0",
+          "instrumentClass": "STANDARD",
+          "status": "PUBLISHED",
+          "visibility": "PUBLIC",
+          "definitionHash": "f2bc8219660b295793179828d0830c8dbcbf27e107228d9a66c546ee6f5cd3e3",
+          "instruction": "请设想你自己就是下面情境中的这位学生。\n\n【情境】\n你刚拿到最近一次作业的成绩，结果是“不及格”。另外两次近期作业的成绩，也都比你希望的差。你希望大学毕业时取得尽可能好的成绩，因为你有明确的职业目标，也不想让家人失望。老师给这次作业的反馈相当严厉，提到你“理解不足”“写作和表达欠佳”，但也指出了可以怎样改进。批改另外两次作业的老师也给出了类似的意见。\n\n【作答说明】\n读完上面这段情境后，请围绕同一个情境，判断你有多大可能作出下面每一种反应。全部30题都请围绕这一情境作答。按你认为自己真正会怎样反应来选，而不是按“应该怎样做”或别人期待你怎样做来选。中间的数字表示介于两端之间的程度。",
+          "measurementReleaseId": "f059c18d-a991-4ad7-b06f-0e4e303c8a04",
+          "creatorId": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "updatedAt": "2026-10-28T00:49:02.482Z",
+          "definitionCanonicalHash": "5b776e7a1b23d57c4585f152b30a69e5fd169f3c25d03b38646729f15fd748bf"
+        }
+      ],
+      "deployments": [
+        {
+          "id": "27c899a1-1607-4ff7-8352-f008e68540b5",
+          "scale_id": "34a32540-5a64-40c8-80db-e994c7f87e36",
+          "revision": 1,
+          "status": "ACTIVE",
+          "policy_json": {
+            "locale": "zh-CN",
+            "revision": 1,
+            "territory": "CN",
+            "schemaVersion": 2,
+            "deploymentModes": [
+              "STANDALONE"
+            ],
+            "runtimePolicyHash": "a2b2e60a2ba338530bb80a2f647d6916a960e206d669d88bdba52751f6658390",
+            "inFlightCompletion": "FROZEN_DEADLINE",
+            "localizationVersion": "1.0.0"
+          },
+          "policy_hash": "9a1f9d1235e431d810757f015925610a69c155266e56e2aac2a9c863ebe5ed3c",
+          "authorization_refs": [],
+          "created_by_user_id": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "created_at": "2026-10-28T00:49:00.302Z",
+          "activated_at": "2026-10-28T00:49:00.302Z",
+          "retired_at": null
+        }
+      ],
+      "axes": [
+        {
+          "scale_id": "34a32540-5a64-40c8-80db-e994c7f87e36",
+          "axis_hash": "58cd9efa1f3e153a66acd9d2714510323ccc97d54655191a73060afa5f383be2",
+          "source_hash": "9a96fdda238eda75684e42df2cad5929781c974c455019579e94756a0fa6ebb8",
+          "axes": {
+            "reportVersion": "1.0.0",
+            "scoringVersion": "1.0.0",
+            "measurementHash": "f2bc8219660b295793179828d0830c8dbcbf27e107228d9a66c546ee6f5cd3e3",
+            "instrumentVersion": "1.0.0",
+            "referenceVersions": [],
+            "instructionVersion": "1.0.0",
+            "localizationVersion": "1.0.0",
+            "catalogManifestVersion": 1
+          },
+          "created_at": "2026-10-28T00:49:00.275Z",
+          "observedSourceCanonicalHash": "9a96fdda238eda75684e42df2cad5929781c974c455019579e94756a0fa6ebb8",
+          "frozenIdentity": {
+            "instrumentKey": "ars30_2016_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "frozenReleaseStatus": "PUBLISHED",
+          "frozenInstruction": {
+            "text": "请设想你自己就是下面情境中的这位学生。\n\n【情境】\n你刚拿到最近一次作业的成绩，结果是“不及格”。另外两次近期作业的成绩，也都比你希望的差。你希望大学毕业时取得尽可能好的成绩，因为你有明确的职业目标，也不想让家人失望。老师给这次作业的反馈相当严厉，提到你“理解不足”“写作和表达欠佳”，但也指出了可以怎样改进。批改另外两次作业的老师也给出了类似的意见。\n\n【作答说明】\n读完上面这段情境后，请围绕同一个情境，判断你有多大可能作出下面每一种反应。全部30题都请围绕这一情境作答。按你认为自己真正会怎样反应来选，而不是按“应该怎样做”或别人期待你怎样做来选。中间的数字表示介于两端之间的程度。",
+            "source": "必需本人受挫情境取自 Cassidy 2016 论文 Methods 原文（CC BY 4.0 载体），作答说明为平台依据 Methods 撰写的独立中文工作稿；未复制或未重新许可作者 2015 独立表单/网站版本的指导语与版式。",
+            "version": "1.0.0",
+            "language": "zh-CN",
+            "schemaVersion": 1
+          },
+          "frozenManual": {
+            "catalogStatus": "CANDIDATE",
+            "maturity": "PILOT",
+            "localization": {
+              "notes": "平台独立中文工作译稿；不继承任何已出版中文ARS译本的文字或验证。专家审校 PENDING、认知访谈与中国人群验证 NOT_ESTABLISHED。必需情境通过版本化 instruction 冻结呈现，作答说明依据 Methods 独立撰写，不复制作者 2015 独立表单/网站版本的指导语与版式。",
+              "reviewStatus": "PENDING",
+              "sourceLocale": "en",
+              "targetLocale": "zh-CN",
+              "schemaVersion": 1,
+              "adaptationMethod": "DIRECT_TRANSLATION",
+              "localEvidenceRefs": [],
+              "translationSource": "Cassidy 2016 论文 Methods 的本人受挫情境原英文与 Table2 完整30题、1 likely 至 5 unlikely 端点及正向反应题 6−x 转换说明（CC BY 4.0 论文正文载体）。",
+              "expertReviewStatus": "PENDING",
+              "localizationVersion": "1.0.0",
+              "cognitiveDebriefStatus": "NOT_ESTABLISHED"
+            },
+            "scientificReview": null,
+            "license": {
+              "note": "© 2016 Cassidy. 采用 Frontiers 2016 论文正文 CC BY 4.0 载体中的 Methods 本人逆境情境与 Table2 的30题；转载需署名、附许可链接并标明改动。作者2015独立表单／网站版本限定非商业研究且锚点不同（1同意–5不同意），不并入本版本，也不作为本代码的许可依据；不构成作者对任何译文的背书。",
+              "status": "verified",
+              "redistribution": "allowed"
+            }
+          }
+        }
+      ],
+      "audits": [
+        {
+          "id": "b1435c8d-1edb-4773-80e7-a13461bec324",
+          "scaleId": "34a32540-5a64-40c8-80db-e994c7f87e36",
+          "actorUserId": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "proofHash": "15bc0be9ddb2961306540a7defa7a1c681c1255f2f69876dfe324643322d69c2",
+          "proof": {
+            "scaleId": "34a32540-5a64-40c8-80db-e994c7f87e36",
+            "identity": {
+              "instrumentKey": "ars30_2016_zh_cn_research",
+              "instrumentVersion": "1.0.0"
+            },
+            "sourceHash": "9a96fdda238eda75684e42df2cad5929781c974c455019579e94756a0fa6ebb8",
+            "visibility": "PUBLIC",
+            "actorUserId": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+            "instruction": {
+              "text": "请设想你自己就是下面情境中的这位学生。\n\n【情境】\n你刚拿到最近一次作业的成绩，结果是“不及格”。另外两次近期作业的成绩，也都比你希望的差。你希望大学毕业时取得尽可能好的成绩，因为你有明确的职业目标，也不想让家人失望。老师给这次作业的反馈相当严厉，提到你“理解不足”“写作和表达欠佳”，但也指出了可以怎样改进。批改另外两次作业的老师也给出了类似的意见。\n\n【作答说明】\n读完上面这段情境后，请围绕同一个情境，判断你有多大可能作出下面每一种反应。全部30题都请围绕这一情境作答。按你认为自己真正会怎样反应来选，而不是按“应该怎样做”或别人期待你怎样做来选。中间的数字表示介于两端之间的程度。",
+              "origin": "INSTRUMENT_SOURCE",
+              "source": "必需本人受挫情境取自 Cassidy 2016 论文 Methods 原文（CC BY 4.0 载体），作答说明为平台依据 Methods 撰写的独立中文工作稿；未复制或未重新许可作者 2015 独立表单/网站版本的指导语与版式。",
+              "version": "1.0.0",
+              "language": "zh-CN",
+              "schemaVersion": 1
+            },
+            "manualReview": {
+              "rights": {
+                "note": "© 2016 Cassidy. 采用 Frontiers 2016 论文正文 CC BY 4.0 载体中的 Methods 本人逆境情境与 Table2 的30题；转载需署名、附许可链接并标明改动。作者2015独立表单／网站版本限定非商业研究且锚点不同（1同意–5不同意），不并入本版本，也不作为本代码的许可依据；不构成作者对任何译文的背书。",
+                "status": "verified",
+                "redistribution": "allowed"
+              },
+              "reportQc": {
+                "basis": "Cassidy 2016 CC BY 4.0 article Methods/Table2 carrier; independent working translation; PR356 instruction contract adopted.",
+                "reviewer": "AI-assisted fixed-source and plain-language preparation; not human expert review",
+                "reviewedAt": "2026-10-27T00:00:00.000Z"
+              },
+              "localization": [
+                "LOCALIZATION_REVIEW_PENDING",
+                "LOCALIZATION_EXPERT_REVIEW_PENDING"
+              ]
+            },
+            "qualification": {
+              "pilot": {
+                "blockers": [],
+                "eligible": true
+              },
+              "researchGrade": {
+                "blockers": [
+                  "SCIENTIFIC_REVIEW_MISSING",
+                  "LOCALIZATION_REVIEW_PENDING",
+                  "RESEARCH_GRADE_REVIEW_MISSING"
+                ],
+                "eligible": false
+              },
+              "researchReady": {
+                "blockers": [
+                  "SCIENTIFIC_REVIEW_MISSING",
+                  "LOCALIZATION_REVIEW_PENDING"
+                ],
+                "eligible": false
+              },
+              "maxEligibleMaturity": "PILOT"
+            },
+            "schemaVersion": 2,
+            "definitionHash": "f2bc8219660b295793179828d0830c8dbcbf27e107228d9a66c546ee6f5cd3e3",
+            "previousStatus": "DRAFT",
+            "allowedProducts": [
+              "SURVEY"
+            ],
+            "deploymentRevision": 1,
+            "previousVisibility": "HIDDEN",
+            "scientificMaturity": "PILOT",
+            "deploymentPolicyHash": "9a1f9d1235e431d810757f015925610a69c155266e56e2aac2a9c863ebe5ed3c",
+            "instructionDiagnostics": []
+          },
+          "createdAt": "2026-10-28T00:49:02.441Z"
+        }
+      ],
+      "releases": [
+        {
+          "id": "f059c18d-a991-4ad7-b06f-0e4e303c8a04",
+          "layer": "MEASUREMENT",
+          "family": "SCALE",
+          "key": "scale:d55f8214d02d21f8bfc346282b1ae62e2017be0950962a3b604bb6295f6d2d09:ars30_2016_zh_cn_research",
+          "version": "1.0.0:1.0.0:1.0.0",
+          "contentHash": "486c5b4e9a0856f5a04f478d45db9ae872a29b3775da25058f2bcb8f093bc3b0",
+          "scope": {
+            "kind": "PLATFORM",
+            "ownerId": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24"
+          },
+          "provenance": {
+            "sourceIdentity": {
+              "instrumentKey": "ars30_2016_zh_cn_research",
+              "instrumentVersion": "1.0.0"
+            }
+          }
+        }
+      ],
+      "policies": [
+        {
+          "product": "SURVEY",
+          "resource_key": "standard:ars30_2016_zh_cn_research:1.0.0",
+          "fingerprint": "a3cd518cacb8bcdd91657edefde2d4db8fd45308520cb41a428ac18b61be93b6",
+          "decision": "APPROVED",
+          "paused": false,
+          "reason": "系统入库批准：PUBLIC",
+          "reviewed_by": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "version": 1
+        }
+      ],
+      "counts": {
+        "assessment_reference_sets": 0,
+        "measurement_content_release_events": 0,
+        "content_capability_grants": 0,
+        "material_grants": 0,
+        "survey_tool_grants": 0,
+        "scale_library_entries": 0,
+        "scale_library_use_grants": 0,
+        "education_assessment_deliveries": 0,
+        "assessments": 0
+      }
+    },
+    "publication-teacher-scope-refusal-before": {
+      "users": [
+        {
+          "id": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "username": "synthetic-ars30-00ea8574-2db9-423b-a3de-3546fbddeb1a",
+          "role": "ADMIN",
+          "platformRole": "SYSTEM_ADMIN",
+          "accountDomain": "TRAINING",
+          "isActive": true,
+          "isFrozen": false
+        }
+      ],
+      "scales": [
+        {
+          "id": "34a32540-5a64-40c8-80db-e994c7f87e36",
+          "code": "ars30_2016_zh_cn_research",
+          "instrumentVersion": "1.0.0",
+          "instrumentClass": "STANDARD",
+          "status": "PUBLISHED",
+          "visibility": "PUBLIC",
+          "definitionHash": "f2bc8219660b295793179828d0830c8dbcbf27e107228d9a66c546ee6f5cd3e3",
+          "instruction": "请设想你自己就是下面情境中的这位学生。\n\n【情境】\n你刚拿到最近一次作业的成绩，结果是“不及格”。另外两次近期作业的成绩，也都比你希望的差。你希望大学毕业时取得尽可能好的成绩，因为你有明确的职业目标，也不想让家人失望。老师给这次作业的反馈相当严厉，提到你“理解不足”“写作和表达欠佳”，但也指出了可以怎样改进。批改另外两次作业的老师也给出了类似的意见。\n\n【作答说明】\n读完上面这段情境后，请围绕同一个情境，判断你有多大可能作出下面每一种反应。全部30题都请围绕这一情境作答。按你认为自己真正会怎样反应来选，而不是按“应该怎样做”或别人期待你怎样做来选。中间的数字表示介于两端之间的程度。",
+          "measurementReleaseId": "f059c18d-a991-4ad7-b06f-0e4e303c8a04",
+          "creatorId": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "updatedAt": "2026-10-28T00:49:02.482Z",
+          "definitionCanonicalHash": "5b776e7a1b23d57c4585f152b30a69e5fd169f3c25d03b38646729f15fd748bf"
+        }
+      ],
+      "deployments": [
+        {
+          "id": "27c899a1-1607-4ff7-8352-f008e68540b5",
+          "scale_id": "34a32540-5a64-40c8-80db-e994c7f87e36",
+          "revision": 1,
+          "status": "ACTIVE",
+          "policy_json": {
+            "locale": "zh-CN",
+            "revision": 1,
+            "territory": "CN",
+            "schemaVersion": 2,
+            "deploymentModes": [
+              "STANDALONE"
+            ],
+            "runtimePolicyHash": "a2b2e60a2ba338530bb80a2f647d6916a960e206d669d88bdba52751f6658390",
+            "inFlightCompletion": "FROZEN_DEADLINE",
+            "localizationVersion": "1.0.0"
+          },
+          "policy_hash": "9a1f9d1235e431d810757f015925610a69c155266e56e2aac2a9c863ebe5ed3c",
+          "authorization_refs": [],
+          "created_by_user_id": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "created_at": "2026-10-28T00:49:00.302Z",
+          "activated_at": "2026-10-28T00:49:00.302Z",
+          "retired_at": null
+        }
+      ],
+      "axes": [
+        {
+          "scale_id": "34a32540-5a64-40c8-80db-e994c7f87e36",
+          "axis_hash": "58cd9efa1f3e153a66acd9d2714510323ccc97d54655191a73060afa5f383be2",
+          "source_hash": "9a96fdda238eda75684e42df2cad5929781c974c455019579e94756a0fa6ebb8",
+          "axes": {
+            "reportVersion": "1.0.0",
+            "scoringVersion": "1.0.0",
+            "measurementHash": "f2bc8219660b295793179828d0830c8dbcbf27e107228d9a66c546ee6f5cd3e3",
+            "instrumentVersion": "1.0.0",
+            "referenceVersions": [],
+            "instructionVersion": "1.0.0",
+            "localizationVersion": "1.0.0",
+            "catalogManifestVersion": 1
+          },
+          "created_at": "2026-10-28T00:49:00.275Z",
+          "observedSourceCanonicalHash": "9a96fdda238eda75684e42df2cad5929781c974c455019579e94756a0fa6ebb8",
+          "frozenIdentity": {
+            "instrumentKey": "ars30_2016_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "frozenReleaseStatus": "PUBLISHED",
+          "frozenInstruction": {
+            "text": "请设想你自己就是下面情境中的这位学生。\n\n【情境】\n你刚拿到最近一次作业的成绩，结果是“不及格”。另外两次近期作业的成绩，也都比你希望的差。你希望大学毕业时取得尽可能好的成绩，因为你有明确的职业目标，也不想让家人失望。老师给这次作业的反馈相当严厉，提到你“理解不足”“写作和表达欠佳”，但也指出了可以怎样改进。批改另外两次作业的老师也给出了类似的意见。\n\n【作答说明】\n读完上面这段情境后，请围绕同一个情境，判断你有多大可能作出下面每一种反应。全部30题都请围绕这一情境作答。按你认为自己真正会怎样反应来选，而不是按“应该怎样做”或别人期待你怎样做来选。中间的数字表示介于两端之间的程度。",
+            "source": "必需本人受挫情境取自 Cassidy 2016 论文 Methods 原文（CC BY 4.0 载体），作答说明为平台依据 Methods 撰写的独立中文工作稿；未复制或未重新许可作者 2015 独立表单/网站版本的指导语与版式。",
+            "version": "1.0.0",
+            "language": "zh-CN",
+            "schemaVersion": 1
+          },
+          "frozenManual": {
+            "catalogStatus": "CANDIDATE",
+            "maturity": "PILOT",
+            "localization": {
+              "notes": "平台独立中文工作译稿；不继承任何已出版中文ARS译本的文字或验证。专家审校 PENDING、认知访谈与中国人群验证 NOT_ESTABLISHED。必需情境通过版本化 instruction 冻结呈现，作答说明依据 Methods 独立撰写，不复制作者 2015 独立表单/网站版本的指导语与版式。",
+              "reviewStatus": "PENDING",
+              "sourceLocale": "en",
+              "targetLocale": "zh-CN",
+              "schemaVersion": 1,
+              "adaptationMethod": "DIRECT_TRANSLATION",
+              "localEvidenceRefs": [],
+              "translationSource": "Cassidy 2016 论文 Methods 的本人受挫情境原英文与 Table2 完整30题、1 likely 至 5 unlikely 端点及正向反应题 6−x 转换说明（CC BY 4.0 论文正文载体）。",
+              "expertReviewStatus": "PENDING",
+              "localizationVersion": "1.0.0",
+              "cognitiveDebriefStatus": "NOT_ESTABLISHED"
+            },
+            "scientificReview": null,
+            "license": {
+              "note": "© 2016 Cassidy. 采用 Frontiers 2016 论文正文 CC BY 4.0 载体中的 Methods 本人逆境情境与 Table2 的30题；转载需署名、附许可链接并标明改动。作者2015独立表单／网站版本限定非商业研究且锚点不同（1同意–5不同意），不并入本版本，也不作为本代码的许可依据；不构成作者对任何译文的背书。",
+              "status": "verified",
+              "redistribution": "allowed"
+            }
+          }
+        }
+      ],
+      "audits": [
+        {
+          "id": "b1435c8d-1edb-4773-80e7-a13461bec324",
+          "scaleId": "34a32540-5a64-40c8-80db-e994c7f87e36",
+          "actorUserId": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "proofHash": "15bc0be9ddb2961306540a7defa7a1c681c1255f2f69876dfe324643322d69c2",
+          "proof": {
+            "scaleId": "34a32540-5a64-40c8-80db-e994c7f87e36",
+            "identity": {
+              "instrumentKey": "ars30_2016_zh_cn_research",
+              "instrumentVersion": "1.0.0"
+            },
+            "sourceHash": "9a96fdda238eda75684e42df2cad5929781c974c455019579e94756a0fa6ebb8",
+            "visibility": "PUBLIC",
+            "actorUserId": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+            "instruction": {
+              "text": "请设想你自己就是下面情境中的这位学生。\n\n【情境】\n你刚拿到最近一次作业的成绩，结果是“不及格”。另外两次近期作业的成绩，也都比你希望的差。你希望大学毕业时取得尽可能好的成绩，因为你有明确的职业目标，也不想让家人失望。老师给这次作业的反馈相当严厉，提到你“理解不足”“写作和表达欠佳”，但也指出了可以怎样改进。批改另外两次作业的老师也给出了类似的意见。\n\n【作答说明】\n读完上面这段情境后，请围绕同一个情境，判断你有多大可能作出下面每一种反应。全部30题都请围绕这一情境作答。按你认为自己真正会怎样反应来选，而不是按“应该怎样做”或别人期待你怎样做来选。中间的数字表示介于两端之间的程度。",
+              "origin": "INSTRUMENT_SOURCE",
+              "source": "必需本人受挫情境取自 Cassidy 2016 论文 Methods 原文（CC BY 4.0 载体），作答说明为平台依据 Methods 撰写的独立中文工作稿；未复制或未重新许可作者 2015 独立表单/网站版本的指导语与版式。",
+              "version": "1.0.0",
+              "language": "zh-CN",
+              "schemaVersion": 1
+            },
+            "manualReview": {
+              "rights": {
+                "note": "© 2016 Cassidy. 采用 Frontiers 2016 论文正文 CC BY 4.0 载体中的 Methods 本人逆境情境与 Table2 的30题；转载需署名、附许可链接并标明改动。作者2015独立表单／网站版本限定非商业研究且锚点不同（1同意–5不同意），不并入本版本，也不作为本代码的许可依据；不构成作者对任何译文的背书。",
+                "status": "verified",
+                "redistribution": "allowed"
+              },
+              "reportQc": {
+                "basis": "Cassidy 2016 CC BY 4.0 article Methods/Table2 carrier; independent working translation; PR356 instruction contract adopted.",
+                "reviewer": "AI-assisted fixed-source and plain-language preparation; not human expert review",
+                "reviewedAt": "2026-10-27T00:00:00.000Z"
+              },
+              "localization": [
+                "LOCALIZATION_REVIEW_PENDING",
+                "LOCALIZATION_EXPERT_REVIEW_PENDING"
+              ]
+            },
+            "qualification": {
+              "pilot": {
+                "blockers": [],
+                "eligible": true
+              },
+              "researchGrade": {
+                "blockers": [
+                  "SCIENTIFIC_REVIEW_MISSING",
+                  "LOCALIZATION_REVIEW_PENDING",
+                  "RESEARCH_GRADE_REVIEW_MISSING"
+                ],
+                "eligible": false
+              },
+              "researchReady": {
+                "blockers": [
+                  "SCIENTIFIC_REVIEW_MISSING",
+                  "LOCALIZATION_REVIEW_PENDING"
+                ],
+                "eligible": false
+              },
+              "maxEligibleMaturity": "PILOT"
+            },
+            "schemaVersion": 2,
+            "definitionHash": "f2bc8219660b295793179828d0830c8dbcbf27e107228d9a66c546ee6f5cd3e3",
+            "previousStatus": "DRAFT",
+            "allowedProducts": [
+              "SURVEY"
+            ],
+            "deploymentRevision": 1,
+            "previousVisibility": "HIDDEN",
+            "scientificMaturity": "PILOT",
+            "deploymentPolicyHash": "9a1f9d1235e431d810757f015925610a69c155266e56e2aac2a9c863ebe5ed3c",
+            "instructionDiagnostics": []
+          },
+          "createdAt": "2026-10-28T00:49:02.441Z"
+        }
+      ],
+      "releases": [
+        {
+          "id": "f059c18d-a991-4ad7-b06f-0e4e303c8a04",
+          "layer": "MEASUREMENT",
+          "family": "SCALE",
+          "key": "scale:d55f8214d02d21f8bfc346282b1ae62e2017be0950962a3b604bb6295f6d2d09:ars30_2016_zh_cn_research",
+          "version": "1.0.0:1.0.0:1.0.0",
+          "contentHash": "486c5b4e9a0856f5a04f478d45db9ae872a29b3775da25058f2bcb8f093bc3b0",
+          "scope": {
+            "kind": "PLATFORM",
+            "ownerId": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24"
+          },
+          "provenance": {
+            "sourceIdentity": {
+              "instrumentKey": "ars30_2016_zh_cn_research",
+              "instrumentVersion": "1.0.0"
+            }
+          }
+        }
+      ],
+      "policies": [
+        {
+          "product": "SURVEY",
+          "resource_key": "standard:ars30_2016_zh_cn_research:1.0.0",
+          "fingerprint": "a3cd518cacb8bcdd91657edefde2d4db8fd45308520cb41a428ac18b61be93b6",
+          "decision": "APPROVED",
+          "paused": false,
+          "reason": "系统入库批准：PUBLIC",
+          "reviewed_by": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "version": 1
+        }
+      ],
+      "counts": {
+        "assessment_reference_sets": 0,
+        "measurement_content_release_events": 0,
+        "content_capability_grants": 0,
+        "material_grants": 0,
+        "survey_tool_grants": 0,
+        "scale_library_entries": 0,
+        "scale_library_use_grants": 0,
+        "education_assessment_deliveries": 0,
+        "assessments": 0
+      }
+    },
+    "publication-teacher-scope-refusal-after": {
+      "users": [
+        {
+          "id": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "username": "synthetic-ars30-00ea8574-2db9-423b-a3de-3546fbddeb1a",
+          "role": "ADMIN",
+          "platformRole": "SYSTEM_ADMIN",
+          "accountDomain": "TRAINING",
+          "isActive": true,
+          "isFrozen": false
+        }
+      ],
+      "scales": [
+        {
+          "id": "34a32540-5a64-40c8-80db-e994c7f87e36",
+          "code": "ars30_2016_zh_cn_research",
+          "instrumentVersion": "1.0.0",
+          "instrumentClass": "STANDARD",
+          "status": "PUBLISHED",
+          "visibility": "PUBLIC",
+          "definitionHash": "f2bc8219660b295793179828d0830c8dbcbf27e107228d9a66c546ee6f5cd3e3",
+          "instruction": "请设想你自己就是下面情境中的这位学生。\n\n【情境】\n你刚拿到最近一次作业的成绩，结果是“不及格”。另外两次近期作业的成绩，也都比你希望的差。你希望大学毕业时取得尽可能好的成绩，因为你有明确的职业目标，也不想让家人失望。老师给这次作业的反馈相当严厉，提到你“理解不足”“写作和表达欠佳”，但也指出了可以怎样改进。批改另外两次作业的老师也给出了类似的意见。\n\n【作答说明】\n读完上面这段情境后，请围绕同一个情境，判断你有多大可能作出下面每一种反应。全部30题都请围绕这一情境作答。按你认为自己真正会怎样反应来选，而不是按“应该怎样做”或别人期待你怎样做来选。中间的数字表示介于两端之间的程度。",
+          "measurementReleaseId": "f059c18d-a991-4ad7-b06f-0e4e303c8a04",
+          "creatorId": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "updatedAt": "2026-10-28T00:49:02.482Z",
+          "definitionCanonicalHash": "5b776e7a1b23d57c4585f152b30a69e5fd169f3c25d03b38646729f15fd748bf"
+        }
+      ],
+      "deployments": [
+        {
+          "id": "27c899a1-1607-4ff7-8352-f008e68540b5",
+          "scale_id": "34a32540-5a64-40c8-80db-e994c7f87e36",
+          "revision": 1,
+          "status": "ACTIVE",
+          "policy_json": {
+            "locale": "zh-CN",
+            "revision": 1,
+            "territory": "CN",
+            "schemaVersion": 2,
+            "deploymentModes": [
+              "STANDALONE"
+            ],
+            "runtimePolicyHash": "a2b2e60a2ba338530bb80a2f647d6916a960e206d669d88bdba52751f6658390",
+            "inFlightCompletion": "FROZEN_DEADLINE",
+            "localizationVersion": "1.0.0"
+          },
+          "policy_hash": "9a1f9d1235e431d810757f015925610a69c155266e56e2aac2a9c863ebe5ed3c",
+          "authorization_refs": [],
+          "created_by_user_id": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "created_at": "2026-10-28T00:49:00.302Z",
+          "activated_at": "2026-10-28T00:49:00.302Z",
+          "retired_at": null
+        }
+      ],
+      "axes": [
+        {
+          "scale_id": "34a32540-5a64-40c8-80db-e994c7f87e36",
+          "axis_hash": "58cd9efa1f3e153a66acd9d2714510323ccc97d54655191a73060afa5f383be2",
+          "source_hash": "9a96fdda238eda75684e42df2cad5929781c974c455019579e94756a0fa6ebb8",
+          "axes": {
+            "reportVersion": "1.0.0",
+            "scoringVersion": "1.0.0",
+            "measurementHash": "f2bc8219660b295793179828d0830c8dbcbf27e107228d9a66c546ee6f5cd3e3",
+            "instrumentVersion": "1.0.0",
+            "referenceVersions": [],
+            "instructionVersion": "1.0.0",
+            "localizationVersion": "1.0.0",
+            "catalogManifestVersion": 1
+          },
+          "created_at": "2026-10-28T00:49:00.275Z",
+          "observedSourceCanonicalHash": "9a96fdda238eda75684e42df2cad5929781c974c455019579e94756a0fa6ebb8",
+          "frozenIdentity": {
+            "instrumentKey": "ars30_2016_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "frozenReleaseStatus": "PUBLISHED",
+          "frozenInstruction": {
+            "text": "请设想你自己就是下面情境中的这位学生。\n\n【情境】\n你刚拿到最近一次作业的成绩，结果是“不及格”。另外两次近期作业的成绩，也都比你希望的差。你希望大学毕业时取得尽可能好的成绩，因为你有明确的职业目标，也不想让家人失望。老师给这次作业的反馈相当严厉，提到你“理解不足”“写作和表达欠佳”，但也指出了可以怎样改进。批改另外两次作业的老师也给出了类似的意见。\n\n【作答说明】\n读完上面这段情境后，请围绕同一个情境，判断你有多大可能作出下面每一种反应。全部30题都请围绕这一情境作答。按你认为自己真正会怎样反应来选，而不是按“应该怎样做”或别人期待你怎样做来选。中间的数字表示介于两端之间的程度。",
+            "source": "必需本人受挫情境取自 Cassidy 2016 论文 Methods 原文（CC BY 4.0 载体），作答说明为平台依据 Methods 撰写的独立中文工作稿；未复制或未重新许可作者 2015 独立表单/网站版本的指导语与版式。",
+            "version": "1.0.0",
+            "language": "zh-CN",
+            "schemaVersion": 1
+          },
+          "frozenManual": {
+            "catalogStatus": "CANDIDATE",
+            "maturity": "PILOT",
+            "localization": {
+              "notes": "平台独立中文工作译稿；不继承任何已出版中文ARS译本的文字或验证。专家审校 PENDING、认知访谈与中国人群验证 NOT_ESTABLISHED。必需情境通过版本化 instruction 冻结呈现，作答说明依据 Methods 独立撰写，不复制作者 2015 独立表单/网站版本的指导语与版式。",
+              "reviewStatus": "PENDING",
+              "sourceLocale": "en",
+              "targetLocale": "zh-CN",
+              "schemaVersion": 1,
+              "adaptationMethod": "DIRECT_TRANSLATION",
+              "localEvidenceRefs": [],
+              "translationSource": "Cassidy 2016 论文 Methods 的本人受挫情境原英文与 Table2 完整30题、1 likely 至 5 unlikely 端点及正向反应题 6−x 转换说明（CC BY 4.0 论文正文载体）。",
+              "expertReviewStatus": "PENDING",
+              "localizationVersion": "1.0.0",
+              "cognitiveDebriefStatus": "NOT_ESTABLISHED"
+            },
+            "scientificReview": null,
+            "license": {
+              "note": "© 2016 Cassidy. 采用 Frontiers 2016 论文正文 CC BY 4.0 载体中的 Methods 本人逆境情境与 Table2 的30题；转载需署名、附许可链接并标明改动。作者2015独立表单／网站版本限定非商业研究且锚点不同（1同意–5不同意），不并入本版本，也不作为本代码的许可依据；不构成作者对任何译文的背书。",
+              "status": "verified",
+              "redistribution": "allowed"
+            }
+          }
+        }
+      ],
+      "audits": [
+        {
+          "id": "b1435c8d-1edb-4773-80e7-a13461bec324",
+          "scaleId": "34a32540-5a64-40c8-80db-e994c7f87e36",
+          "actorUserId": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "proofHash": "15bc0be9ddb2961306540a7defa7a1c681c1255f2f69876dfe324643322d69c2",
+          "proof": {
+            "scaleId": "34a32540-5a64-40c8-80db-e994c7f87e36",
+            "identity": {
+              "instrumentKey": "ars30_2016_zh_cn_research",
+              "instrumentVersion": "1.0.0"
+            },
+            "sourceHash": "9a96fdda238eda75684e42df2cad5929781c974c455019579e94756a0fa6ebb8",
+            "visibility": "PUBLIC",
+            "actorUserId": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+            "instruction": {
+              "text": "请设想你自己就是下面情境中的这位学生。\n\n【情境】\n你刚拿到最近一次作业的成绩，结果是“不及格”。另外两次近期作业的成绩，也都比你希望的差。你希望大学毕业时取得尽可能好的成绩，因为你有明确的职业目标，也不想让家人失望。老师给这次作业的反馈相当严厉，提到你“理解不足”“写作和表达欠佳”，但也指出了可以怎样改进。批改另外两次作业的老师也给出了类似的意见。\n\n【作答说明】\n读完上面这段情境后，请围绕同一个情境，判断你有多大可能作出下面每一种反应。全部30题都请围绕这一情境作答。按你认为自己真正会怎样反应来选，而不是按“应该怎样做”或别人期待你怎样做来选。中间的数字表示介于两端之间的程度。",
+              "origin": "INSTRUMENT_SOURCE",
+              "source": "必需本人受挫情境取自 Cassidy 2016 论文 Methods 原文（CC BY 4.0 载体），作答说明为平台依据 Methods 撰写的独立中文工作稿；未复制或未重新许可作者 2015 独立表单/网站版本的指导语与版式。",
+              "version": "1.0.0",
+              "language": "zh-CN",
+              "schemaVersion": 1
+            },
+            "manualReview": {
+              "rights": {
+                "note": "© 2016 Cassidy. 采用 Frontiers 2016 论文正文 CC BY 4.0 载体中的 Methods 本人逆境情境与 Table2 的30题；转载需署名、附许可链接并标明改动。作者2015独立表单／网站版本限定非商业研究且锚点不同（1同意–5不同意），不并入本版本，也不作为本代码的许可依据；不构成作者对任何译文的背书。",
+                "status": "verified",
+                "redistribution": "allowed"
+              },
+              "reportQc": {
+                "basis": "Cassidy 2016 CC BY 4.0 article Methods/Table2 carrier; independent working translation; PR356 instruction contract adopted.",
+                "reviewer": "AI-assisted fixed-source and plain-language preparation; not human expert review",
+                "reviewedAt": "2026-10-27T00:00:00.000Z"
+              },
+              "localization": [
+                "LOCALIZATION_REVIEW_PENDING",
+                "LOCALIZATION_EXPERT_REVIEW_PENDING"
+              ]
+            },
+            "qualification": {
+              "pilot": {
+                "blockers": [],
+                "eligible": true
+              },
+              "researchGrade": {
+                "blockers": [
+                  "SCIENTIFIC_REVIEW_MISSING",
+                  "LOCALIZATION_REVIEW_PENDING",
+                  "RESEARCH_GRADE_REVIEW_MISSING"
+                ],
+                "eligible": false
+              },
+              "researchReady": {
+                "blockers": [
+                  "SCIENTIFIC_REVIEW_MISSING",
+                  "LOCALIZATION_REVIEW_PENDING"
+                ],
+                "eligible": false
+              },
+              "maxEligibleMaturity": "PILOT"
+            },
+            "schemaVersion": 2,
+            "definitionHash": "f2bc8219660b295793179828d0830c8dbcbf27e107228d9a66c546ee6f5cd3e3",
+            "previousStatus": "DRAFT",
+            "allowedProducts": [
+              "SURVEY"
+            ],
+            "deploymentRevision": 1,
+            "previousVisibility": "HIDDEN",
+            "scientificMaturity": "PILOT",
+            "deploymentPolicyHash": "9a1f9d1235e431d810757f015925610a69c155266e56e2aac2a9c863ebe5ed3c",
+            "instructionDiagnostics": []
+          },
+          "createdAt": "2026-10-28T00:49:02.441Z"
+        }
+      ],
+      "releases": [
+        {
+          "id": "f059c18d-a991-4ad7-b06f-0e4e303c8a04",
+          "layer": "MEASUREMENT",
+          "family": "SCALE",
+          "key": "scale:d55f8214d02d21f8bfc346282b1ae62e2017be0950962a3b604bb6295f6d2d09:ars30_2016_zh_cn_research",
+          "version": "1.0.0:1.0.0:1.0.0",
+          "contentHash": "486c5b4e9a0856f5a04f478d45db9ae872a29b3775da25058f2bcb8f093bc3b0",
+          "scope": {
+            "kind": "PLATFORM",
+            "ownerId": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24"
+          },
+          "provenance": {
+            "sourceIdentity": {
+              "instrumentKey": "ars30_2016_zh_cn_research",
+              "instrumentVersion": "1.0.0"
+            }
+          }
+        }
+      ],
+      "policies": [
+        {
+          "product": "SURVEY",
+          "resource_key": "standard:ars30_2016_zh_cn_research:1.0.0",
+          "fingerprint": "a3cd518cacb8bcdd91657edefde2d4db8fd45308520cb41a428ac18b61be93b6",
+          "decision": "APPROVED",
+          "paused": false,
+          "reason": "系统入库批准：PUBLIC",
+          "reviewed_by": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "version": 1
+        }
+      ],
+      "counts": {
+        "assessment_reference_sets": 0,
+        "measurement_content_release_events": 0,
+        "content_capability_grants": 0,
+        "material_grants": 0,
+        "survey_tool_grants": 0,
+        "scale_library_entries": 0,
+        "scale_library_use_grants": 0,
+        "education_assessment_deliveries": 0,
+        "assessments": 0
+      }
+    },
+    "final": {
+      "users": [
+        {
+          "id": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "username": "synthetic-ars30-00ea8574-2db9-423b-a3de-3546fbddeb1a",
+          "role": "ADMIN",
+          "platformRole": "SYSTEM_ADMIN",
+          "accountDomain": "TRAINING",
+          "isActive": true,
+          "isFrozen": false
+        }
+      ],
+      "scales": [
+        {
+          "id": "34a32540-5a64-40c8-80db-e994c7f87e36",
+          "code": "ars30_2016_zh_cn_research",
+          "instrumentVersion": "1.0.0",
+          "instrumentClass": "STANDARD",
+          "status": "PUBLISHED",
+          "visibility": "PUBLIC",
+          "definitionHash": "f2bc8219660b295793179828d0830c8dbcbf27e107228d9a66c546ee6f5cd3e3",
+          "instruction": "请设想你自己就是下面情境中的这位学生。\n\n【情境】\n你刚拿到最近一次作业的成绩，结果是“不及格”。另外两次近期作业的成绩，也都比你希望的差。你希望大学毕业时取得尽可能好的成绩，因为你有明确的职业目标，也不想让家人失望。老师给这次作业的反馈相当严厉，提到你“理解不足”“写作和表达欠佳”，但也指出了可以怎样改进。批改另外两次作业的老师也给出了类似的意见。\n\n【作答说明】\n读完上面这段情境后，请围绕同一个情境，判断你有多大可能作出下面每一种反应。全部30题都请围绕这一情境作答。按你认为自己真正会怎样反应来选，而不是按“应该怎样做”或别人期待你怎样做来选。中间的数字表示介于两端之间的程度。",
+          "measurementReleaseId": "f059c18d-a991-4ad7-b06f-0e4e303c8a04",
+          "creatorId": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "updatedAt": "2026-10-28T00:49:02.482Z",
+          "definitionCanonicalHash": "5b776e7a1b23d57c4585f152b30a69e5fd169f3c25d03b38646729f15fd748bf"
+        }
+      ],
+      "deployments": [
+        {
+          "id": "27c899a1-1607-4ff7-8352-f008e68540b5",
+          "scale_id": "34a32540-5a64-40c8-80db-e994c7f87e36",
+          "revision": 1,
+          "status": "ACTIVE",
+          "policy_json": {
+            "locale": "zh-CN",
+            "revision": 1,
+            "territory": "CN",
+            "schemaVersion": 2,
+            "deploymentModes": [
+              "STANDALONE"
+            ],
+            "runtimePolicyHash": "a2b2e60a2ba338530bb80a2f647d6916a960e206d669d88bdba52751f6658390",
+            "inFlightCompletion": "FROZEN_DEADLINE",
+            "localizationVersion": "1.0.0"
+          },
+          "policy_hash": "9a1f9d1235e431d810757f015925610a69c155266e56e2aac2a9c863ebe5ed3c",
+          "authorization_refs": [],
+          "created_by_user_id": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "created_at": "2026-10-28T00:49:00.302Z",
+          "activated_at": "2026-10-28T00:49:00.302Z",
+          "retired_at": null
+        }
+      ],
+      "axes": [
+        {
+          "scale_id": "34a32540-5a64-40c8-80db-e994c7f87e36",
+          "axis_hash": "58cd9efa1f3e153a66acd9d2714510323ccc97d54655191a73060afa5f383be2",
+          "source_hash": "9a96fdda238eda75684e42df2cad5929781c974c455019579e94756a0fa6ebb8",
+          "axes": {
+            "reportVersion": "1.0.0",
+            "scoringVersion": "1.0.0",
+            "measurementHash": "f2bc8219660b295793179828d0830c8dbcbf27e107228d9a66c546ee6f5cd3e3",
+            "instrumentVersion": "1.0.0",
+            "referenceVersions": [],
+            "instructionVersion": "1.0.0",
+            "localizationVersion": "1.0.0",
+            "catalogManifestVersion": 1
+          },
+          "created_at": "2026-10-28T00:49:00.275Z",
+          "observedSourceCanonicalHash": "9a96fdda238eda75684e42df2cad5929781c974c455019579e94756a0fa6ebb8",
+          "frozenIdentity": {
+            "instrumentKey": "ars30_2016_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "frozenReleaseStatus": "PUBLISHED",
+          "frozenInstruction": {
+            "text": "请设想你自己就是下面情境中的这位学生。\n\n【情境】\n你刚拿到最近一次作业的成绩，结果是“不及格”。另外两次近期作业的成绩，也都比你希望的差。你希望大学毕业时取得尽可能好的成绩，因为你有明确的职业目标，也不想让家人失望。老师给这次作业的反馈相当严厉，提到你“理解不足”“写作和表达欠佳”，但也指出了可以怎样改进。批改另外两次作业的老师也给出了类似的意见。\n\n【作答说明】\n读完上面这段情境后，请围绕同一个情境，判断你有多大可能作出下面每一种反应。全部30题都请围绕这一情境作答。按你认为自己真正会怎样反应来选，而不是按“应该怎样做”或别人期待你怎样做来选。中间的数字表示介于两端之间的程度。",
+            "source": "必需本人受挫情境取自 Cassidy 2016 论文 Methods 原文（CC BY 4.0 载体），作答说明为平台依据 Methods 撰写的独立中文工作稿；未复制或未重新许可作者 2015 独立表单/网站版本的指导语与版式。",
+            "version": "1.0.0",
+            "language": "zh-CN",
+            "schemaVersion": 1
+          },
+          "frozenManual": {
+            "catalogStatus": "CANDIDATE",
+            "maturity": "PILOT",
+            "localization": {
+              "notes": "平台独立中文工作译稿；不继承任何已出版中文ARS译本的文字或验证。专家审校 PENDING、认知访谈与中国人群验证 NOT_ESTABLISHED。必需情境通过版本化 instruction 冻结呈现，作答说明依据 Methods 独立撰写，不复制作者 2015 独立表单/网站版本的指导语与版式。",
+              "reviewStatus": "PENDING",
+              "sourceLocale": "en",
+              "targetLocale": "zh-CN",
+              "schemaVersion": 1,
+              "adaptationMethod": "DIRECT_TRANSLATION",
+              "localEvidenceRefs": [],
+              "translationSource": "Cassidy 2016 论文 Methods 的本人受挫情境原英文与 Table2 完整30题、1 likely 至 5 unlikely 端点及正向反应题 6−x 转换说明（CC BY 4.0 论文正文载体）。",
+              "expertReviewStatus": "PENDING",
+              "localizationVersion": "1.0.0",
+              "cognitiveDebriefStatus": "NOT_ESTABLISHED"
+            },
+            "scientificReview": null,
+            "license": {
+              "note": "© 2016 Cassidy. 采用 Frontiers 2016 论文正文 CC BY 4.0 载体中的 Methods 本人逆境情境与 Table2 的30题；转载需署名、附许可链接并标明改动。作者2015独立表单／网站版本限定非商业研究且锚点不同（1同意–5不同意），不并入本版本，也不作为本代码的许可依据；不构成作者对任何译文的背书。",
+              "status": "verified",
+              "redistribution": "allowed"
+            }
+          }
+        }
+      ],
+      "audits": [
+        {
+          "id": "b1435c8d-1edb-4773-80e7-a13461bec324",
+          "scaleId": "34a32540-5a64-40c8-80db-e994c7f87e36",
+          "actorUserId": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "proofHash": "15bc0be9ddb2961306540a7defa7a1c681c1255f2f69876dfe324643322d69c2",
+          "proof": {
+            "scaleId": "34a32540-5a64-40c8-80db-e994c7f87e36",
+            "identity": {
+              "instrumentKey": "ars30_2016_zh_cn_research",
+              "instrumentVersion": "1.0.0"
+            },
+            "sourceHash": "9a96fdda238eda75684e42df2cad5929781c974c455019579e94756a0fa6ebb8",
+            "visibility": "PUBLIC",
+            "actorUserId": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+            "instruction": {
+              "text": "请设想你自己就是下面情境中的这位学生。\n\n【情境】\n你刚拿到最近一次作业的成绩，结果是“不及格”。另外两次近期作业的成绩，也都比你希望的差。你希望大学毕业时取得尽可能好的成绩，因为你有明确的职业目标，也不想让家人失望。老师给这次作业的反馈相当严厉，提到你“理解不足”“写作和表达欠佳”，但也指出了可以怎样改进。批改另外两次作业的老师也给出了类似的意见。\n\n【作答说明】\n读完上面这段情境后，请围绕同一个情境，判断你有多大可能作出下面每一种反应。全部30题都请围绕这一情境作答。按你认为自己真正会怎样反应来选，而不是按“应该怎样做”或别人期待你怎样做来选。中间的数字表示介于两端之间的程度。",
+              "origin": "INSTRUMENT_SOURCE",
+              "source": "必需本人受挫情境取自 Cassidy 2016 论文 Methods 原文（CC BY 4.0 载体），作答说明为平台依据 Methods 撰写的独立中文工作稿；未复制或未重新许可作者 2015 独立表单/网站版本的指导语与版式。",
+              "version": "1.0.0",
+              "language": "zh-CN",
+              "schemaVersion": 1
+            },
+            "manualReview": {
+              "rights": {
+                "note": "© 2016 Cassidy. 采用 Frontiers 2016 论文正文 CC BY 4.0 载体中的 Methods 本人逆境情境与 Table2 的30题；转载需署名、附许可链接并标明改动。作者2015独立表单／网站版本限定非商业研究且锚点不同（1同意–5不同意），不并入本版本，也不作为本代码的许可依据；不构成作者对任何译文的背书。",
+                "status": "verified",
+                "redistribution": "allowed"
+              },
+              "reportQc": {
+                "basis": "Cassidy 2016 CC BY 4.0 article Methods/Table2 carrier; independent working translation; PR356 instruction contract adopted.",
+                "reviewer": "AI-assisted fixed-source and plain-language preparation; not human expert review",
+                "reviewedAt": "2026-10-27T00:00:00.000Z"
+              },
+              "localization": [
+                "LOCALIZATION_REVIEW_PENDING",
+                "LOCALIZATION_EXPERT_REVIEW_PENDING"
+              ]
+            },
+            "qualification": {
+              "pilot": {
+                "blockers": [],
+                "eligible": true
+              },
+              "researchGrade": {
+                "blockers": [
+                  "SCIENTIFIC_REVIEW_MISSING",
+                  "LOCALIZATION_REVIEW_PENDING",
+                  "RESEARCH_GRADE_REVIEW_MISSING"
+                ],
+                "eligible": false
+              },
+              "researchReady": {
+                "blockers": [
+                  "SCIENTIFIC_REVIEW_MISSING",
+                  "LOCALIZATION_REVIEW_PENDING"
+                ],
+                "eligible": false
+              },
+              "maxEligibleMaturity": "PILOT"
+            },
+            "schemaVersion": 2,
+            "definitionHash": "f2bc8219660b295793179828d0830c8dbcbf27e107228d9a66c546ee6f5cd3e3",
+            "previousStatus": "DRAFT",
+            "allowedProducts": [
+              "SURVEY"
+            ],
+            "deploymentRevision": 1,
+            "previousVisibility": "HIDDEN",
+            "scientificMaturity": "PILOT",
+            "deploymentPolicyHash": "9a1f9d1235e431d810757f015925610a69c155266e56e2aac2a9c863ebe5ed3c",
+            "instructionDiagnostics": []
+          },
+          "createdAt": "2026-10-28T00:49:02.441Z"
+        }
+      ],
+      "releases": [
+        {
+          "id": "f059c18d-a991-4ad7-b06f-0e4e303c8a04",
+          "layer": "MEASUREMENT",
+          "family": "SCALE",
+          "key": "scale:d55f8214d02d21f8bfc346282b1ae62e2017be0950962a3b604bb6295f6d2d09:ars30_2016_zh_cn_research",
+          "version": "1.0.0:1.0.0:1.0.0",
+          "contentHash": "486c5b4e9a0856f5a04f478d45db9ae872a29b3775da25058f2bcb8f093bc3b0",
+          "scope": {
+            "kind": "PLATFORM",
+            "ownerId": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24"
+          },
+          "provenance": {
+            "sourceIdentity": {
+              "instrumentKey": "ars30_2016_zh_cn_research",
+              "instrumentVersion": "1.0.0"
+            }
+          }
+        }
+      ],
+      "policies": [
+        {
+          "product": "SURVEY",
+          "resource_key": "standard:ars30_2016_zh_cn_research:1.0.0",
+          "fingerprint": "a3cd518cacb8bcdd91657edefde2d4db8fd45308520cb41a428ac18b61be93b6",
+          "decision": "APPROVED",
+          "paused": false,
+          "reason": "系统入库批准：PUBLIC",
+          "reviewed_by": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+          "version": 1
+        }
+      ],
+      "counts": {
+        "assessment_reference_sets": 0,
+        "measurement_content_release_events": 0,
+        "content_capability_grants": 0,
+        "material_grants": 0,
+        "survey_tool_grants": 0,
+        "scale_library_entries": 0,
+        "scale_library_use_grants": 0,
+        "education_assessment_deliveries": 0,
+        "assessments": 0
+      }
+    }
+  },
+  "failures": [],
+  "entryObservations": [
+    {
+      "product": "SURVEY",
+      "result": "ENTRY_POLICY_ALLOWED",
+      "scope": "actual transaction-scoped policy guard, not end-user grant or participant flow"
+    },
+    {
+      "product": "TRAINING",
+      "result": "REFUSED",
+      "name": "Error",
+      "message": "该精确版本未获本入口准入或已停止新增使用：TRAINING；TRAINING 入口尚未获准",
+      "scope": "actual Training new-entry guard; not chosen in allowedProducts"
+    },
+    {
+      "product": "SCHOOL",
+      "result": "REFUSED",
+      "code": "EDUCATION_ASSESSMENT_CATALOG_ACCOUNT_REQUIRED",
+      "message": "EDUCATION_ASSESSMENT_CATALOG_ACCOUNT_REQUIRED",
+      "scope": "actual education catalog account-domain guard; this CLI also rejects product enum. No organization adapter/distribution tested."
+    },
+    {
+      "product": "TEACHER",
+      "result": "REFUSED",
+      "code": "EDUCATION_ASSESSMENT_CATALOG_ACCOUNT_REQUIRED",
+      "message": "EDUCATION_ASSESSMENT_CATALOG_ACCOUNT_REQUIRED",
+      "scope": "actual education catalog account-domain guard; this CLI also rejects product enum. No organization adapter/distribution tested."
+    }
+  ],
+  "notRun": [
+    "Full scoring/report/golden suites",
+    "HTTP/browser participant flow",
+    "Real School/Teacher organizations, distribution or capabilities",
+    "Production"
+  ],
+  "limits": [
+    "Each new CLI process performs its existing selected immutable contract validation on cold start; no separate golden replay suite is invoked.",
+    "PUBLIC database status/catalog discovery is not participant assignment or four-entry launch."
+  ],
+  "server": {
+    "database": "eduk12_scale367_9cd3f7ef4f",
+    "role": "clouddev",
+    "version": "PostgreSQL 16.15 (Debian 16.15-1.pgdg12+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit"
+  },
+  "actor": {
+    "id": "242b3f0d-f2ac-49ec-bba7-2d650ec73c24",
+    "username": "synthetic-ars30-00ea8574-2db9-423b-a3de-3546fbddeb1a",
+    "accountDomain": "TRAINING",
+    "platformRole": "SYSTEM_ADMIN",
+    "synthetic": true,
+    "password": "random one-use secret discarded; hash not retained in evidence"
+  },
+  "sourcePolicyIdentity": {
+    "resourceKey": "standard:ars30_2016_zh_cn_research:1.0.0",
+    "fingerprint": "a3cd518cacb8bcdd91657edefde2d4db8fd45308520cb41a428ac18b61be93b6"
+  },
+  "surveyCatalog": {
+    "list": [
+      {
+        "ref": {
+          "kind": "SCALE",
+          "sourceId": "34a32540-5a64-40c8-80db-e994c7f87e36",
+          "sourceVersion": "1.0.0"
+        },
+        "title": "学业韧性量表（ARS-30，30题）— 中文工作译稿",
+        "classificationTags": [
+          {
+            "id": "domain:academic_resilience",
+            "label": "domain:academic_resilience",
+            "facet": "domain"
+          },
+          {
+            "id": "domain:motivation_learning",
+            "label": "学习动机、信念与学业体验",
+            "facet": "domain"
+          },
+          {
+            "id": "domain:wellbeing_strength",
+            "label": "幸福感、韧性与积极心理",
+            "facet": "domain"
+          },
+          {
+            "id": "domain:selfreg_executive",
+            "label": "自我调节与执行功能",
+            "facet": "domain"
+          },
+          {
+            "id": "construct:academic_resilience",
+            "label": "construct:academic_resilience",
+            "facet": "construct"
+          },
+          {
+            "id": "construct:perseverance",
+            "label": "construct:perseverance",
+            "facet": "construct"
+          },
+          {
+            "id": "construct:adaptive_help_seeking",
+            "label": "construct:adaptive_help_seeking",
+            "facet": "construct"
+          },
+          {
+            "id": "construct:learning_self_reflection",
+            "label": "construct:learning_self_reflection",
+            "facet": "construct"
+          },
+          {
+            "id": "construct:emotional_response_to_setback",
+            "label": "construct:emotional_response_to_setback",
+            "facet": "construct"
+          },
+          {
+            "id": "construct:hypothetical_adversity_response",
+            "label": "construct:hypothetical_adversity_response",
+            "facet": "construct"
+          },
+          {
+            "id": "construct:not_objective_ability",
+            "label": "construct:not_objective_ability",
+            "facet": "construct"
+          },
+          {
+            "id": "construct:not_diagnostic_emotion_index",
+            "label": "construct:not_diagnostic_emotion_index",
+            "facet": "construct"
+          },
+          {
+            "id": "orientation:educational_psychology",
+            "label": "orientation:educational_psychology",
+            "facet": "orientation"
+          },
+          {
+            "id": "orientation:self_regulated_learning",
+            "label": "orientation:self_regulated_learning",
+            "facet": "orientation"
+          },
+          {
+            "id": "orientation:self_efficacy_theory",
+            "label": "orientation:self_efficacy_theory",
+            "facet": "orientation"
+          },
+          {
+            "id": "orientation:not_therapy_specific",
+            "label": "orientation:not_therapy_specific",
+            "facet": "orientation"
+          },
+          {
+            "id": "population:adult_university_students",
+            "label": "population:adult_university_students",
+            "facet": "population"
+          },
+          {
+            "id": "population:project_18_plus",
+            "label": "population:project_18_plus",
+            "facet": "population"
+          },
+          {
+            "id": "population:original_british_undergraduates",
+            "label": "population:original_british_undergraduates",
+            "facet": "population"
+          },
+          {
+            "id": "population:original_personal_vignette_n321",
+            "label": "population:original_personal_vignette_n321",
+            "facet": "population"
+          },
+          {
+            "id": "population:comparison_other_vignette_n211",
+            "label": "population:comparison_other_vignette_n211",
+            "facet": "population"
+          },
+          {
+            "id": "population:not_k12_validated",
+            "label": "population:not_k12_validated",
+            "facet": "population"
+          },
+          {
+            "id": "population:not_chinese_validated",
+            "label": "population:not_chinese_validated",
+            "facet": "population"
+          },
+          {
+            "id": "response:self",
+            "label": "本人自评",
+            "facet": "response"
+          },
+          {
+            "id": "response:30_items",
+            "label": "response:30_items",
+            "facet": "response"
+          },
+          {
+            "id": "response:required_personal_adversity_vignette",
+            "label": "response:required_personal_adversity_vignette",
+            "facet": "response"
+          },
+          {
+            "id": "response:vignette_frozen_via_instruction",
+            "label": "response:vignette_frozen_via_instruction",
+            "facet": "response"
+          },
+          {
+            "id": "response:fixed_table2_order",
+            "label": "response:fixed_table2_order",
+            "facet": "response"
+          },
+          {
+            "id": "response:five_point_1_to_5",
+            "label": "response:five_point_1_to_5",
+            "facet": "response"
+          },
+          {
+            "id": "response:likely_to_unlikely",
+            "label": "response:likely_to_unlikely",
+            "facet": "response"
+          },
+          {
+            "id": "response:20_positive_items_reversed",
+            "label": "response:20_positive_items_reversed",
+            "facet": "response"
+          },
+          {
+            "id": "response:one_total_three_facets",
+            "label": "response:one_total_three_facets",
+            "facet": "response"
+          },
+          {
+            "id": "response:no_recall_window",
+            "label": "response:no_recall_window",
+            "facet": "response"
+          },
+          {
+            "id": "response:complete_required_project_proposal",
+            "label": "response:complete_required_project_proposal",
+            "facet": "response"
+          },
+          {
+            "id": "use:research",
+            "label": "研究用途",
+            "facet": "use"
+          },
+          {
+            "id": "use:individual_reflection",
+            "label": "use:individual_reflection",
+            "facet": "use"
+          },
+          {
+            "id": "use:not_diagnostic",
+            "label": "非诊断用途",
+            "facet": "use"
+          },
+          {
+            "id": "use:not_selection",
+            "label": "不用于甄选或录取决策",
+            "facet": "use"
+          },
+          {
+            "id": "use:no_chinese_norms",
+            "label": "use:no_chinese_norms",
+            "facet": "use"
+          },
+          {
+            "id": "use:no_empirical_cutoffs",
+            "label": "use:no_empirical_cutoffs",
+            "facet": "use"
+          },
+          {
+            "id": "license:cc_by_4_0_article_carrier_only",
+            "label": "license:cc_by_4_0_article_carrier_only",
+            "facet": "license"
+          },
+          {
+            "id": "license:attribution_required",
+            "label": "license:attribution_required",
+            "facet": "license"
+          },
+          {
+            "id": "license:changes_indicated",
+            "label": "license:changes_indicated",
+            "facet": "license"
+          },
+          {
+            "id": "license:2015_standalone_form_separate_terms",
+            "label": "license:2015_standalone_form_separate_terms",
+            "facet": "license"
+          },
+          {
+            "id": "license:no_author_endorsement",
+            "label": "license:no_author_endorsement",
+            "facet": "license"
+          },
+          {
+            "id": "language_validation:source_en",
+            "label": "language_validation:source_en",
+            "facet": "language"
+          },
+          {
+            "id": "language_validation:content_zh-CN",
+            "label": "实际题本：zh-CN",
+            "facet": "language"
+          },
+          {
+            "id": "language_validation:independent_work_translation",
+            "label": "language_validation:independent_work_translation",
+            "facet": "language"
+          },
+          {
+            "id": "language_validation:expert_translation_review_pending",
+            "label": "language_validation:expert_translation_review_pending",
+            "facet": "language"
+          },
+          {
+            "id": "language_validation:cognitive_interviews_pending",
+            "label": "language_validation:cognitive_interviews_pending",
+            "facet": "language"
+          },
+          {
+            "id": "language_validation:local_validation_pending",
+            "label": "本地适用性验证待完成",
+            "facet": "language"
+          },
+          {
+            "id": "ARS-30",
+            "label": "ARS-30",
+            "facet": "other"
+          },
+          {
+            "id": "Academic Resilience Scale",
+            "label": "Academic Resilience Scale",
+            "facet": "other"
+          },
+          {
+            "id": "学业韧性",
+            "label": "学业韧性",
+            "facet": "other"
+          },
+          {
+            "id": "学业受挫",
+            "label": "学业受挫",
+            "facet": "other"
+          },
+          {
+            "id": "作业反馈",
+            "label": "作业反馈",
+            "facet": "other"
+          },
+          {
+            "id": "坚持尝试",
+            "label": "坚持尝试",
+            "facet": "other"
+          },
+          {
+            "id": "反思方法",
+            "label": "反思方法",
+            "facet": "other"
+          },
+          {
+            "id": "主动求助",
+            "label": "主动求助",
+            "facet": "other"
+          },
+          {
+            "id": "大学生自评",
+            "label": "大学生自评",
+            "facet": "other"
+          },
+          {
+            "id": "中文工作译稿",
+            "label": "中文工作译稿",
+            "facet": "other"
+          },
+          {
+            "id": "非诊断",
+            "label": "非诊断",
+            "facet": "other"
+          },
+          {
+            "id": "RESILIENCE",
+            "label": "韧性",
+            "facet": "domain"
+          },
+          {
+            "id": "respondent:SELF",
+            "label": "本人自评",
+            "facet": "population"
+          },
+          {
+            "id": "age:18-",
+            "label": "18岁及以上",
+            "facet": "population"
+          },
+          {
+            "id": "language:zh-CN",
+            "label": "简体中文",
+            "facet": "language"
+          }
+        ],
+        "available": true,
+        "unsupportedReason": null,
+        "definitionDigest": "5b776e7a1b23d57c4585f152b30a69e5fd169f3c25d03b38646729f15fd748bf"
+      }
+    ],
+    "page": 1,
+    "hasMore": false,
+    "terminalReason": "END_OF_CATALOG",
+    "tagFacets": {
+      "population": [
+        {
+          "id": "age:13-19",
+          "label": "13–19岁"
+        },
+        {
+          "id": "age:14-100",
+          "label": "14–100岁"
+        },
+        {
+          "id": "age:17-20",
+          "label": "17–20岁"
+        },
+        {
+          "id": "age:18-100",
+          "label": "18–100岁"
+        },
+        {
+          "id": "age:18-",
+          "label": "18岁及以上"
+        },
+        {
+          "id": "grades:3-12",
+          "label": "3–12年级"
+        },
+        {
+          "id": "age:4-10",
+          "label": "4–10岁"
+        },
+        {
+          "id": "age:4-17",
+          "label": "4–17岁"
+        },
+        {
+          "id": "grades:7-12",
+          "label": "7–12年级"
+        },
+        {
+          "id": "age:9-18",
+          "label": "9–18岁"
+        },
+        {
+          "id": "respondent:SELF",
+          "label": "本人自评"
+        },
+        {
+          "id": "respondent:PARENT",
+          "label": "家长评定"
+        },
+        {
+          "id": "respondent:TEACHER",
+          "label": "教师评定"
+        },
+        {
+          "id": "student_self_report",
+          "label": "学生"
+        },
+        {
+          "id": "population:adult_university_students",
+          "label": "population:adult_university_students"
+        },
+        {
+          "id": "population:comparison_other_vignette_n211",
+          "label": "population:comparison_other_vignette_n211"
+        },
+        {
+          "id": "population:not_chinese_validated",
+          "label": "population:not_chinese_validated"
+        },
+        {
+          "id": "population:not_k12_validated",
+          "label": "population:not_k12_validated"
+        },
+        {
+          "id": "population:original_british_undergraduates",
+          "label": "population:original_british_undergraduates"
+        },
+        {
+          "id": "population:original_personal_vignette_n321",
+          "label": "population:original_personal_vignette_n321"
+        },
+        {
+          "id": "population:project_18_plus",
+          "label": "population:project_18_plus"
+        }
+      ],
+      "construct": [
+        {
+          "id": "tutoring_necessity",
+          "label": "补习必要性信念"
+        },
+        {
+          "id": "domain_fixed_mindset",
+          "label": "学科固定心态"
+        },
+        {
+          "id": "value_cost",
+          "label": "学科价值与时间代价"
+        },
+        {
+          "id": "academic_self_efficacy",
+          "label": "学科学习自我效能"
+        },
+        {
+          "id": "academic_self_concept",
+          "label": "学科自我概念"
+        },
+        {
+          "id": "teacher_subject_liking",
+          "label": "学生感知的教师学科喜爱"
+        },
+        {
+          "id": "construct:academic_resilience",
+          "label": "construct:academic_resilience"
+        },
+        {
+          "id": "construct:adaptive_help_seeking",
+          "label": "construct:adaptive_help_seeking"
+        },
+        {
+          "id": "construct:emotional_response_to_setback",
+          "label": "construct:emotional_response_to_setback"
+        },
+        {
+          "id": "construct:hypothetical_adversity_response",
+          "label": "construct:hypothetical_adversity_response"
+        },
+        {
+          "id": "construct:learning_self_reflection",
+          "label": "construct:learning_self_reflection"
+        },
+        {
+          "id": "construct:not_diagnostic_emotion_index",
+          "label": "construct:not_diagnostic_emotion_index"
+        },
+        {
+          "id": "construct:not_objective_ability",
+          "label": "construct:not_objective_ability"
+        },
+        {
+          "id": "construct:perseverance",
+          "label": "construct:perseverance"
+        }
+      ],
+      "subject": [
+        {
+          "id": "chemistry",
+          "label": "化学"
+        },
+        {
+          "id": "biology",
+          "label": "生物"
+        },
+        {
+          "id": "mathematics",
+          "label": "数学"
+        },
+        {
+          "id": "physics",
+          "label": "物理"
+        },
+        {
+          "id": "english",
+          "label": "英语"
+        },
+        {
+          "id": "chinese",
+          "label": "语文"
+        }
+      ],
+      "domain": [
+        {
+          "id": "PERSONALITY",
+          "label": "人格"
+        },
+        {
+          "id": "RESILIENCE",
+          "label": "韧性"
+        },
+        {
+          "id": "SOCIAL_EMOTIONAL",
+          "label": "社会情绪"
+        },
+        {
+          "id": "WELL_BEING",
+          "label": "身心健康"
+        },
+        {
+          "id": "ENGAGEMENT",
+          "label": "投入"
+        },
+        {
+          "id": "BEHAVIORAL_DIFFICULTIES",
+          "label": "行为与困难"
+        },
+        {
+          "id": "domain:wellbeing_strength",
+          "label": "幸福感、韧性与积极心理"
+        },
+        {
+          "id": "MOTIVATION",
+          "label": "学习动机"
+        },
+        {
+          "id": "domain:motivation_learning",
+          "label": "学习动机、信念与学业体验"
+        },
+        {
+          "id": "EXECUTIVE_FUNCTION",
+          "label": "执行功能"
+        },
+        {
+          "id": "SELF_REGULATION",
+          "label": "自我调节"
+        },
+        {
+          "id": "domain:selfreg_executive",
+          "label": "自我调节与执行功能"
+        },
+        {
+          "id": "SELF_EFFICACY",
+          "label": "自我效能"
+        },
+        {
+          "id": "domain:academic_resilience",
+          "label": "domain:academic_resilience"
+        }
+      ],
+      "language": [
+        {
+          "id": "language_validation:local_validation_pending",
+          "label": "本地适用性验证待完成"
+        },
+        {
+          "id": "language:zh-CN",
+          "label": "简体中文"
+        },
+        {
+          "id": "language_validation:content_zh-CN",
+          "label": "实际题本：zh-CN"
+        },
+        {
+          "id": "language:en",
+          "label": "英语"
+        },
+        {
+          "id": "language:en-GB",
+          "label": "en-GB"
+        },
+        {
+          "id": "language_validation:cognitive_interviews_pending",
+          "label": "language_validation:cognitive_interviews_pending"
+        },
+        {
+          "id": "language_validation:expert_translation_review_pending",
+          "label": "language_validation:expert_translation_review_pending"
+        },
+        {
+          "id": "language_validation:independent_work_translation",
+          "label": "language_validation:independent_work_translation"
+        },
+        {
+          "id": "language_validation:source_en",
+          "label": "language_validation:source_en"
+        }
+      ],
+      "orientation": [
+        {
+          "id": "orientation:educational_psychology",
+          "label": "orientation:educational_psychology"
+        },
+        {
+          "id": "orientation:not_therapy_specific",
+          "label": "orientation:not_therapy_specific"
+        },
+        {
+          "id": "orientation:self_efficacy_theory",
+          "label": "orientation:self_efficacy_theory"
+        },
+        {
+          "id": "orientation:self_regulated_learning",
+          "label": "orientation:self_regulated_learning"
+        }
+      ],
+      "response": [
+        {
+          "id": "response:self",
+          "label": "本人自评"
+        },
+        {
+          "id": "response:20_positive_items_reversed",
+          "label": "response:20_positive_items_reversed"
+        },
+        {
+          "id": "response:30_items",
+          "label": "response:30_items"
+        },
+        {
+          "id": "response:complete_required_project_proposal",
+          "label": "response:complete_required_project_proposal"
+        },
+        {
+          "id": "response:five_point_1_to_5",
+          "label": "response:five_point_1_to_5"
+        },
+        {
+          "id": "response:fixed_table2_order",
+          "label": "response:fixed_table2_order"
+        },
+        {
+          "id": "response:likely_to_unlikely",
+          "label": "response:likely_to_unlikely"
+        },
+        {
+          "id": "response:no_recall_window",
+          "label": "response:no_recall_window"
+        },
+        {
+          "id": "response:one_total_three_facets",
+          "label": "response:one_total_three_facets"
+        },
+        {
+          "id": "response:required_personal_adversity_vignette",
+          "label": "response:required_personal_adversity_vignette"
+        },
+        {
+          "id": "response:vignette_frozen_via_instruction",
+          "label": "response:vignette_frozen_via_instruction"
+        }
+      ],
+      "use": [
+        {
+          "id": "use:not_selection",
+          "label": "不用于甄选或录取决策"
+        },
+        {
+          "id": "use:not_diagnostic",
+          "label": "非诊断用途"
+        },
+        {
+          "id": "use:research",
+          "label": "研究用途"
+        },
+        {
+          "id": "use:individual_reflection",
+          "label": "use:individual_reflection"
+        },
+        {
+          "id": "use:no_chinese_norms",
+          "label": "use:no_chinese_norms"
+        },
+        {
+          "id": "use:no_empirical_cutoffs",
+          "label": "use:no_empirical_cutoffs"
+        }
+      ],
+      "license": [
+        {
+          "id": "license:2015_standalone_form_separate_terms",
+          "label": "license:2015_standalone_form_separate_terms"
+        },
+        {
+          "id": "license:attribution_required",
+          "label": "license:attribution_required"
+        },
+        {
+          "id": "license:cc_by_4_0_article_carrier_only",
+          "label": "license:cc_by_4_0_article_carrier_only"
+        },
+        {
+          "id": "license:changes_indicated",
+          "label": "license:changes_indicated"
+        },
+        {
+          "id": "license:no_author_endorsement",
+          "label": "license:no_author_endorsement"
+        }
+      ]
+    }
+  },
+  "completed": true
+}

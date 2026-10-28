@@ -1,5 +1,10 @@
 # 量表内容首批：ARS-30 静态注册
 
+本文件及 batch.json 保留 `5e64d33` 首批注册时的历史状态。Root 后续独立复核并明确
+批准本包技术内容发布；当前单字段修改与全新隔离库安装/发布结果见
+[technical-release/README.md](technical-release/README.md) 和其 index.json。
+不得把下面的原 DRAFT 状态或“17 文件一致”改写成后续源文件的状态。
+
 基线 main `642fda7ab754790686d6626efac62b73a332e663`，独立分支
 `content/scale-structural-batch1-20261028`。本批只有一个工具、一个版本：
 `ars30_2016_zh_cn_research:1.0.0`。不修改认知、共享治理、安装/发布引擎或工作流。

@@ -34,12 +34,13 @@ describe('ARS-30 fixed-source registration on main admission mechanism', () => {
     expect(frozen).toEqual({ text: source.instruction!.text, language: 'zh-CN', version: '1.0.0', origin: 'INSTRUMENT_SOURCE' })
     const preview = previewScaleInstrument({ ...identity, locale: 'zh-CN', territory: 'CN', deploymentModes: ['STANDALONE'] })
     expect(preview.sourceValidation.ok).toBe(true)
-    expect(preview.blockers).toEqual(['EXECUTABLE_NOT_PUBLISHED'])
+    expect(preview.blockers).toEqual([])
+    expect(preview.allowActivation).toBe(true)
     expect(preview.manualReview.localization).toEqual(['LOCALIZATION_REVIEW_PENDING', 'LOCALIZATION_EXPERT_REVIEW_PENDING'])
     expect(preview.manualReview.scientific.researchReady.eligible).toBe(false)
     expect(source.scientificReview).toBeUndefined()
     expect(source.catalog.catalogStatus).toBe('CANDIDATE')
-    expect(source.executable!.releaseStatus).toBe('DRAFT')
+    expect(source.executable!.releaseStatus).toBe('PUBLISHED')
   })
 
   it('consumes complete and incomplete registered answers through the existing result protocol without inventing thresholds', () => {
@@ -67,11 +68,12 @@ describe('ARS-30 fixed-source registration on main admission mechanism', () => {
     expect(incomplete.interpretations).toEqual([])
   })
 
-  it('keeps source registration distinct from installation and rejects DRAFT activation before writes', async () => {
+  it('plans the technically released package but rejects an inactive actor before installation writes', async () => {
     const create = vi.fn(), transaction = vi.fn()
+    const actor = { id: 'synthetic-admin', platformRole: 'SYSTEM_ADMIN', isActive: true, isFrozen: false, expiresAt: null }
     // Deliberately in-memory read doubles: this is not PostgreSQL installation.
     const db = {
-      user: { findUnique: async () => ({ id: 'synthetic-admin', platformRole: 'SYSTEM_ADMIN', isActive: true, isFrozen: false, expiresAt: null }) },
+      user: { findUnique: async () => actor },
       scale: { findUnique: async () => null, create },
       $transaction: transaction,
     } as unknown as PrismaClient
@@ -85,10 +87,11 @@ describe('ARS-30 fixed-source registration on main admission mechanism', () => {
     }
     const plan = await planScaleInstrumentInstall(db, input)
     expect(plan.createScale).toBe(true)
-    expect(plan.allowActivation).toBe(false)
-    expect(plan.blockers).toEqual(['EXECUTABLE_NOT_PUBLISHED'])
+    expect(plan.allowActivation).toBe(true)
+    expect(plan.blockers).toEqual([])
     expect(plan.instruction.binding).toMatchObject({ origin: 'INSTRUMENT_SOURCE', text: selected().instruction!.text, version: '1.0.0' })
-    await expect(installScaleInstrument(db, input)).rejects.toThrow('Scale install blocked: EXECUTABLE_NOT_PUBLISHED')
+    actor.isActive = false
+    await expect(installScaleInstrument(db, input)).rejects.toThrow('Scale install blocked: SYSTEM_ADMIN_REQUIRED')
     expect(create).not.toHaveBeenCalled()
     expect(transaction).not.toHaveBeenCalled()
   })

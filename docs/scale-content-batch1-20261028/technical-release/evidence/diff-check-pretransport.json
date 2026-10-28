@@ -1,0 +1,8 @@
+{
+  "command": "git diff --cached --check",
+  "diagnostic": "docs/scale-content-batch1-20261028/technical-release/evidence/schema-migrate.stdout.log:730: trailing whitespace.",
+  "checkExitCode": "NOT_SEPARATELY_CAPTURED",
+  "enclosingShellExitCode": 0,
+  "enclosingShellExplanation": "A later git diff --cached --stat determined the shell status. The diff-check diagnostic was a failure; shell zero is not its successful result.",
+  "resolution": "Exact original stdout compressed losslessly; SHA in log-transports.json. No application or test change, no rerun of application checks."
+}

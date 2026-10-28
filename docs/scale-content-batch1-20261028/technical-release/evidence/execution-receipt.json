@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "base": "5e64d33b557fb4a498d03954f4e25b7c7ef05e68",
+  "node": {
+    "executable": "/workspace/eduk12-cloud/tools/node_modules/.bin/node",
+    "version": "v24.21.0",
+    "sha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c"
+  },
+  "execution": "Unit process uses read doubles only; no database/HTTP writes; login:false shell",
+  "checks": [
+    {
+      "id": "released-source-install-actor",
+      "cwd": "/workspace/eduK12-new-version/server-version/backend",
+      "argv": [
+        "/workspace/eduk12-cloud/tools/node_modules/.bin/node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/__tests__/scale/instruments/ars30-registered-content.test.ts",
+        "-t",
+        "plans the technically released package but rejects an inactive actor before installation writes",
+        "--reporter=json",
+        "--outputFile=/workspace/eduK12-new-version/docs/scale-content-batch1-20261028/technical-release/evidence/released-source-install-actor.json"
+      ],
+      "startedAt": "2026-10-28T00:49:34.935308+00:00",
+      "endedAt": "2026-10-28T00:49:36.445519+00:00",
+      "processExitCode": 0,
+      "inputs": {
+        "manifest": "released-source-install-actor.inputs.json.gz",
+        "compressedSha256": "15da0ca6173e09dfd1f83467c2b6eb9548d8841a90ed74926d3be277c7019583",
+        "uncompressedSha256": "2071c65cbd5f9bfd3918342f74c7683b98a0d3f0a150fbf2ef0e78145d7a8d28",
+        "uncompressedBytes": 892498,
+        "count": 2931,
+        "beforeAfterIdentical": true
+      },
+      "logs": {
+        "stdout": {
+          "path": "released-source-install-actor.stdout.log",
+          "sha256": "ff298c2b718e2afcb1f16f971dfacdbf0844588734e3df52a2faf1c35317fdb7",
+          "bytes": 150
+        },
+        "stderr": {
+          "path": "released-source-install-actor.stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      }
+    }
+  ],
+  "scope": "One changed installation unit case; database integration has a separate receipt; no full catalog, build, types or CI",
+  "environment": {
+    "COGNITIVE_TEST_FIXTURES_ENABLED": "true (Vitest config)",
+    "credentials": "not retained; env values not printed"
+  },
+  "limits": [
+    "Source/config/tool hashes are contemporaneous; full installed dependency package bytes and process environment are not enumerated.",
+    "Snapshots include other backend source files solely as input evidence, not assertions that they executed."
+  ],
+  "outerToolExitCode": 0,
+  "outerExitEvidence": "exec_command/write_stdin tool completion, recorded after completion; login:false shell"
+}
