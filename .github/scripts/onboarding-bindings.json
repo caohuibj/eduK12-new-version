@@ -1,230 +1,196 @@
 {
-  "pr": 380,
-  "enabled": true,
-  "base": "ec19f532b7a962ff9027ba5558d1412bf886a3c4",
-  "product": "2b417daa8a02d1103948e0918af10238aa7685b8",
-  "controlCheckpoint": "914c88518b1a56540abee353a559d5429b062482",
-  "source": {
-    "docs/performance/postlogin-20261028/README.md": {
-      "before": null,
-      "after": "1b60c4bf8e9cb35f9a3a62f6bbe0155ac388817f"
-    },
-    "docs/performance/postlogin-20261028/baseline/authenticated-closures.json": {
-      "before": null,
-      "after": "ffcb3f114943afdfab906e18f678341d135b0bae"
-    },
-    "docs/performance/postlogin-20261028/baseline/pr378-browser.json": {
-      "before": null,
-      "after": "c0da1005da41fc70fac52fe98d2b00dbace4cf79"
-    },
-    "docs/performance/postlogin-20261028/evidence/editor-03.report.json": {
-      "before": null,
-      "after": "ee7315ab1a7d432c1b07d6b4b05845ddb276fd25"
-    },
-    "docs/performance/postlogin-20261028/evidence/education-cancel-01.json": {
-      "before": null,
-      "after": "2f27c1c7f9057bff92162b4581e413ce257463e1"
-    },
-    "docs/performance/postlogin-20261028/evidence/education-school-cancel-01.json": {
-      "before": null,
-      "after": "605a6c02f93157f8081847d217fd1bc3d3bd3afd"
-    },
-    "docs/performance/postlogin-20261028/evidence/education-targeted-01.json": {
-      "before": null,
-      "after": "4d3c5151b6972c18f275b8911694857c4bd246e3"
-    },
-    "docs/performance/postlogin-20261028/evidence/education-targeted-02.json": {
-      "before": null,
-      "after": "d60fdc449938642b88fd187abfcd80344101f3c3"
-    },
-    "docs/performance/postlogin-20261028/evidence/form-direct-consumers.json": {
-      "before": null,
-      "after": "779bd8d8fefb33575821f82c3d2d6804f88d1292"
-    },
-    "docs/performance/postlogin-20261028/evidence/form-practice-pagination.json": {
-      "before": null,
-      "after": "a4c9d5f546f3527ed3a590dcce9dcb42577ee539"
-    },
-    "docs/performance/postlogin-20261028/evidence/frontend-typecheck-02.log": {
-      "before": null,
-      "after": "c1159c59a15f916d3674258293c6a7c8ad9e5691"
-    },
-    "docs/performance/postlogin-20261028/evidence/original-history.json.gz": {
-      "before": null,
-      "after": "e907e30851395e4cb80b53759fef669a08193969"
-    },
-    "docs/performance/postlogin-20261028/evidence/root-navigation-01.json": {
-      "before": null,
-      "after": "5a6420612ef7043c2eedaac74330b71438c88a12"
-    },
-    "docs/performance/postlogin-20261028/evidence/root-navigation-02.json": {
-      "before": null,
-      "after": "4ef816dbca1dea9ec6081f9eb4360153eb7f451d"
-    },
-    "docs/performance/postlogin-20261028/evidence/type-receipt.json": {
-      "before": null,
-      "after": "efbb04ba53cd0e130d6bc206dcc6ca2ec5396ffb"
-    },
-    "server-version/frontend/src/components/page-loading/deferredPage.test.tsx": {
-      "before": "c5cdbc7a6531ddc8b7de163690b58325169afaa1",
-      "after": "765093761618d9dae0836d9fed1b8d1e83730b12"
-    },
-    "server-version/frontend/src/components/page-loading/deferredPage.tsx": {
-      "before": "b0c1a3e5293a915d0425d33d2095c05af667f0a7",
-      "after": "d6d8753769eeb29062e770750c521cab88b1b53e"
-    },
-    "server-version/frontend/src/components/page-loading/taskRunnerLoading.test.tsx": {
-      "before": null,
-      "after": "3a6e752ff00b80361023edcdb6ab29c18fb8358d"
-    },
-    "server-version/frontend/src/contexts/AuthContext.tsx": {
-      "before": "0668d733b7eeb2f4b864033677677b0937e80d9c",
-      "after": "de8ca03ef3f652b6fb56719aeba799cfa2c994ab"
-    },
-    "server-version/frontend/src/contexts/__tests__/AuthContext.test.tsx": {
-      "before": "2f8c7fa80a4426f16ca162c816e329d2e463443c",
-      "after": "cdd1b491f57b002e5ecaf3a0864233c800b9b7a4"
-    },
-    "server-version/frontend/src/huiteacher/HuiteacherAssessmentTasks.test.tsx": {
-      "before": "1928e89bbab253f794f021909a03004704468dfa",
-      "after": "ffce8ac1cc58985daa210d9156bb7986103846ba"
-    },
-    "server-version/frontend/src/huiteacher/HuiteacherFieldWorkspace.tsx": {
-      "before": "e40ea048fe206c3750fb32d8c582d494e56c289e",
-      "after": "9889a53ddbcfd49ae64a4fee61959e8b8caffbbb"
-    },
-    "server-version/frontend/src/huiteacher/HuiteacherMyAssessmentTasks.tsx": {
-      "before": "e27ece7645c1816e840410e77d2ebb3696faa08e",
-      "after": "341862329d725e273088dd0573d5bb464e48011e"
-    },
-    "server-version/frontend/src/huiteacher/HuiteacherMyFormTasks.tsx": {
-      "before": "975f08ad9d84f97de72232c42d60a734e498258d",
-      "after": "7e5cd6a1c774fb8197ddd1083322f4a8e674f5cd"
-    },
-    "server-version/frontend/src/huiteacher/HuiteacherMyPrivateFormTasks.tsx": {
-      "before": "02aea9b8c6c5887884a3e0c2250364e227c6dfc0",
-      "after": "557940f604c9cf2ac3761d4b079cc3d66b78eb6d"
-    },
-    "server-version/frontend/src/huiteacher/HuiteacherMyScaleTasks.test.tsx": {
-      "before": "a75794aaa1b2e6fc20ceaa1b0abadb7dfaeb1ab2",
-      "after": "5393fc697b78f6d9cd68cbc31760b0106daad83e"
-    },
-    "server-version/frontend/src/huiteacher/HuiteacherMyScaleTasks.tsx": {
-      "before": "fdf470f2ffbc9fb063f1634160f25b609f61ddcb",
-      "after": "67e996f49ce24a43bd32afa0464900454bff8599"
-    },
-    "server-version/frontend/src/huiteacher/HuiteacherPracticePages.test.tsx": {
-      "before": "4ff786df0033e179721d06a00db50036941bb0e1",
-      "after": "bc4b2434b14fcbcb7c83e95ba765b64a8adc0a4a"
-    },
-    "server-version/frontend/src/huiteacher/HuiteacherTaskListStates.test.tsx": {
-      "before": "d17cb9df4b786893bc07a39505934a60d434aafc",
-      "after": "3d6e113cbec03e0cadcfce13567578ac8632875d"
-    },
-    "server-version/frontend/src/huiteacher/HuiteacherTaskLoadingCancel.test.tsx": {
-      "before": null,
-      "after": "53d918e3a73fad11b1e62061c7f6feb30a2da9cf"
-    },
-    "server-version/frontend/src/huiteacher/HuiteacherTaskSectionReads.test.tsx": {
-      "before": null,
-      "after": "e5b9675ee5e9606328795f4f98fbf10af5db7db2"
-    },
-    "server-version/frontend/src/huiteacher/TeacherAssessmentPages.test.tsx": {
-      "before": "f3c8922ffb694966a0048e41d734bf67cb1f1709",
-      "after": "ce1275baf97b2a6063162ab882694771b298079c"
-    },
-    "server-version/frontend/src/pages/__tests__/QuestionnaireEditors.guard.test.tsx": {
-      "before": "a5cfdb3b2adc3332969eb7c89eda73d596ae3368",
-      "after": "a3090ee94c4cfb1317b97448a3727ffad1c66ba5"
-    },
-    "server-version/frontend/src/pages/teacher/GeneralQuestionnaireEdit.deferred.test.tsx": {
-      "before": null,
-      "after": "4823102350bf3d2230bed21a903eed4a333484b9"
-    },
-    "server-version/frontend/src/pages/teacher/GeneralQuestionnaireEdit.tsx": {
-      "before": "93cf604681b8f4740341e17854d2a5f63b10de53",
-      "after": "e1abaded9a19c57bd4c01799e8e771fc49b2b118"
-    },
-    "server-version/frontend/src/school/SchoolApp.tsx": {
-      "before": "c980a1a28ab94398985bead8d444dc162d68b6cf",
-      "after": "2ddaf6b1420606d2484049b908eb1a1fbff8f5af"
-    },
-    "server-version/frontend/src/school/SchoolLearnerHome.tsx": {
-      "before": "80f09cc1ef9006d8296dba4abb1d7f93477cc767",
-      "after": "34e21b5024563546597efaf376121b0144549d4f"
-    },
-    "server-version/frontend/src/school/SchoolLearnerNavigation.test.tsx": {
-      "before": null,
-      "after": "18ec969d018d4fb0eb3286c0863c37a0cfa8046f"
-    },
-    "server-version/frontend/src/school/SchoolParentTasks.test.tsx": {
-      "before": "83dc8eb77ff15b538cfef2ac32135d4ff12e91ab",
-      "after": "1724e0870d48f42e1301617fba26936384dd5987"
-    },
-    "server-version/frontend/src/school/SchoolParentTasks.tsx": {
-      "before": "bce3b5c9519cd4c03f2283e5524dfa72feb5ca8d",
-      "after": "569ae7819227de50a38753c5ebafcb0ea4daadcb"
-    },
-    "server-version/frontend/src/school/SchoolStudentTasks.test.tsx": {
-      "before": "5c5c2188406e28042a6fa8655775120adf032947",
-      "after": "23a62c8d76c5c295589fa2c51669e17051d8d8df"
-    },
-    "server-version/frontend/src/school/SchoolStudentTasks.tsx": {
-      "before": "9ada2ffce9f6c50fe8eb64b157d0b908329930f8",
-      "after": "9b9e0c953214bdeee7d9d8810c24d70adf2f197e"
-    },
-    "server-version/frontend/src/school/SchoolTaskLoadingCancel.test.tsx": {
-      "before": null,
-      "after": "425eb721d3912b99297d230c95de6c1bfca17a82"
-    },
-    "server-version/frontend/src/school/SchoolTeacherTasks.test.tsx": {
-      "before": "9b2c2a361a4ee9efa88def3135349fef5a609e9b",
-      "after": "5924fe63cc981541a69fea59775e481eb3c544b6"
-    },
-    "server-version/frontend/src/school/SchoolTeacherTasks.tsx": {
-      "before": "e2895d629645b93a5ce2363152cd058d76c89b7b",
-      "after": "42a0cb18fa2f782ec6057356fc2314b459a4ed49"
-    },
-    "server-version/frontend/src/survey/SurveyApp.leave-risk.test.tsx": {
-      "before": "592b0584e28586c532906d3fb6e99a3b7c38e3fd",
-      "after": "dd8d461e359dfb26e6e8a503bece5e306a26a4f8"
-    },
-    "server-version/frontend/src/survey/SurveyApp.tsx": {
-      "before": "7e309807aabf3d72b6c6fc2eef90c92744cd62a1",
-      "after": "a0c9b50e663afb37c3e1befda33a5d8e9fb2cc86"
-    },
-    "server-version/frontend/src/survey/SurveyPublicApp.tsx": {
-      "before": "44eca309a26626cf1b48da1075c1e03eba184060",
-      "after": "624c9659c0cc31f33b72afafae68916029cb0c11"
-    },
-    "server-version/frontend/src/survey/SurveyWorkspaceLoading.test.tsx": {
-      "before": null,
-      "after": "82d23c3421b4a4d31bda1444092b68c2028b9f00"
-    },
-    "server-version/frontend/src/survey/TaskForm.tsx": {
-      "before": null,
-      "after": "f467a2e67b9ba1d88f2791f1e63e5d76a115d7ba"
-    }
+  "schemaVersion": 1,
+  "pr": 381,
+  "enabled": false,
+  "base": "c5c28f85085e53de1b7be4ed821489accaae7228",
+  "product": "ebf90d6dd7d22cc0a907d8a258f28e95d70f5e64",
+  "controlCheckpoint": "d00cfaaebeb786d6b763fe50f250f0c7748e92eb",
+  "components": {
+    "backend": "b7fe981eea351ebb94232571479894e921e53bcd",
+    "frontend": "cf228766bf881fd1a4d9e922fc8171488a27756b"
   },
   "controlBefore": {
     ".github/scripts/content-scope.mjs": "31a340af23927250b9a40f6097b3815d617c70ec",
     ".github/scripts/merge-gate.mjs": "985c744ac800aa425323db1c57010e64d0d69a8e",
-    ".github/scripts/onboarding-bindings.json": "ae16ea3bef7ad8462b94ec18ca767fbe5ea779a9",
+    ".github/scripts/onboarding-bindings.json": "2f23321c29e931316c2a80ba8d35d05f74d4af1a",
     ".github/scripts/onboarding-checks.mjs": "9e87c249dde03a009b8286c31141ede3df1ee66e",
-    ".github/scripts/onboarding-controls.test.mjs": "cdfd882585b402cc094f8bde58d84c99b3569eb9",
-    ".github/scripts/onboarding-evidence.json": "1629ba9bdfb800fddb6a0fd742ad20ce4e96cd75",
-    ".github/scripts/onboarding-scope.mjs": "ac35d2fd42d4a9675d427085d0435a044bb7ff79",
+    ".github/scripts/onboarding-controls.test.mjs": "bb960b061cdd3c13fb25e13b3442c9d04eecd755",
+    ".github/scripts/onboarding-evidence.json": "ddf30836b393812366c0cd0adae48622a6508381",
+    ".github/scripts/onboarding-scope.mjs": "215b68222d52645b214567f19ab95a48eec1a9cf",
     ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
     ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
     ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
     ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
-    ".github/scripts/pr380-browser.mjs": null,
-    ".github/workflows/ci.yml": "e1e110efc0559c229fec876e432cd0187318d7d4",
-    ".github/scripts/pr380-browser-reuse.mjs": null,
-    ".github/scripts/pr380-browser-reuse.test.mjs": null
+    ".github/scripts/pr380-browser-reuse.mjs": "35fde26a8103c0c32c28f0cc458278c47ccb7067",
+    ".github/scripts/pr380-browser-reuse.test.mjs": "6da41c90df0b9d4aae0106a45eede5e0afae89c3",
+    ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
+    ".github/scripts/pr381-browser.mjs": null,
+    ".github/workflows/ci.yml": "f644951edb4f109f7d6e33d9561407673bfd739c"
   },
-  "components": {
-    "backend": "b7fe981eea351ebb94232571479894e921e53bcd",
-    "frontend": "2c12784be9807b9d653dcee5bc781be279aaac9c"
+  "source": {
+    "docs/performance/form-section-reads-20261028/README.md": {
+      "before": null,
+      "after": "70effbed38eca4265d58de3e75ab76242d1a8cc0"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/baseline/browser-preflight.log": {
+      "before": null,
+      "after": "7dbd402e6e289f944611dab9739a34b97aeac106"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/baseline/component-http.log": {
+      "before": null,
+      "after": "79fe01ec6ba19c89557b6e4d5ef6d4eeedfd1af3"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/baseline/harness-r1.tsx": {
+      "before": null,
+      "after": "4a84bdd892aec749d9d81f273904a644c8bf3976"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/baseline/inputs.json": {
+      "before": null,
+      "after": "988cd7c4894d85c46744be6cc81d70591aca4fd6"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/baseline/measurements.jsonl": {
+      "before": null,
+      "after": "02b04d4950bff493fb3ea27d14cd55e20542e8c5"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/baseline/reporter.json": {
+      "before": null,
+      "after": "9e33c377121e892e04ac42cd4599d3523bd38864"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/candidate/component-http.log": {
+      "before": null,
+      "after": "5b2836eee2b575c9bbb7b45b3b1e9f335e9e7e9f"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/candidate/errors-r2.log": {
+      "before": null,
+      "after": "6b1e2f8f340b188da3cda2511b70dcab791643d1"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/candidate/harness-r1.tsx": {
+      "before": null,
+      "after": "4a84bdd892aec749d9d81f273904a644c8bf3976"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/candidate/inputs-final.json": {
+      "before": null,
+      "after": "c1597a34cd8e308c45402503c5b21339ece9a6a2"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/candidate/inputs-r1.json": {
+      "before": null,
+      "after": "6dba2a565398ea871e1e89ddd92602d85b3fb9ed"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/candidate/lint-final-test.log": {
+      "before": null,
+      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/candidate/lint.log": {
+      "before": null,
+      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/candidate/measurements.jsonl": {
+      "before": null,
+      "after": "9edee5056877ab91611046e41be51b17c90daad8"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/candidate/nested-r3.log": {
+      "before": null,
+      "after": "1537183ec11f43cf433751d5b2be394113176a1f"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/candidate/reporter-r2-errors.json": {
+      "before": null,
+      "after": "b5a985caabc00177dccd94ca387cc6b0189357f4"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/candidate/reporter-r3-nested.json": {
+      "before": null,
+      "after": "6d38288389d29aa04b09ced11b944f956183c976"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/candidate/reporter.json": {
+      "before": null,
+      "after": "b4fa0bc7cc53cd6d423b3507fde487d8c377be84"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/candidate/types-app-final.log": {
+      "before": null,
+      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/candidate/types-app.log": {
+      "before": null,
+      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/case-evidence.json": {
+      "before": null,
+      "after": "86c60efe18b136406a6ac2fe925b64b384b767dd"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/ci-controls/actionlint-base.log": {
+      "before": null,
+      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/ci-controls/actionlint-candidate.log": {
+      "before": null,
+      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/ci-controls/actionlint-comparison.json": {
+      "before": null,
+      "after": "aa8de48993a92ba6e83964efd15440f95366e46e"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/ci-controls/actionlint-tool.json": {
+      "before": null,
+      "after": "ab77605f347d5a914a0c3bd0a10acae7f279702d"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/ci-controls/evidence-metadata-check.json": {
+      "before": null,
+      "after": "a03c41856b968ba4b950c77d3a0a94fec3ade584"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/ci-controls/onboarding-controls-round1.test.mjs": {
+      "before": null,
+      "after": "783a1e69765ab610b756a72a3fb8b872d06372b6"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/ci-controls/pr381-browser-round1.mjs": {
+      "before": null,
+      "after": "10ac0dfd8bce13b7b0bdc5afbe4a06d5466c32ed"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/ci-controls/round1-execution.json": {
+      "before": null,
+      "after": "c930e7e8544ca45ca76d2d9137aa31957a979729"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/ci-controls/round1.tap": {
+      "before": null,
+      "after": "97d4aebd2ec8787089a2bfdba1f77278bfd84c7a"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/ci-controls/round2-build-log-contract.tap": {
+      "before": null,
+      "after": "d859755f0e0b6464a80858a26ad66ee990fa14dd"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/ci-controls/round2-execution.json": {
+      "before": null,
+      "after": "b69bb226432a523d87e3700d27918916661c5e2e"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/ci-controls/sha256sums.json": {
+      "before": null,
+      "after": "2b6f4aeca4ecb6e0bf8ec287ee094c55349a995b"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/ci-controls/syntax-tool-result.json": {
+      "before": null,
+      "after": "ab131656884ad150851bf741ea05b3dea958c8c3"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/commands.json": {
+      "before": null,
+      "after": "e5fd41355b3b30834e41675a9f9fad512af8e98d"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/comparison.json": {
+      "before": null,
+      "after": "553ed499a37e2bc8b1937d333adfd7d1ef7725ec"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/module-before.tsx": {
+      "before": null,
+      "after": "599cc279bc75be989455e3144b5100703e4d2bd2"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/sha256sums.json": {
+      "before": null,
+      "after": "3f8e450beda11bb5fce38f1f3632eb9639f2a42b"
+    },
+    "server-version/frontend/src/components/FormSectionManager.tsx": {
+      "before": "599cc279bc75be989455e3144b5100703e4d2bd2",
+      "after": "74f332fad7d94b9e7c0d1d0c49e16e150f66041e"
+    },
+    "server-version/frontend/src/components/__tests__/FormSectionManager.http.test.tsx": {
+      "before": null,
+      "after": "a40a38fe914f7d251b7e47c9802914cafa99ab5b"
+    }
   }
 }
