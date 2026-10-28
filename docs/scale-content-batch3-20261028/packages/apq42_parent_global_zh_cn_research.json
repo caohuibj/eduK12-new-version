@@ -7,7 +7,7 @@
   "originalSource": "server-version/backend/src/modules/scale/instruments/apq42_parent_global_zh_cn_research/1.0.0/source.json",
   "preparedSource": "server-version/backend/src/modules/scale/instruments/apq42_parent_global_zh_cn_research/1.0.1/source.json",
   "originalSourceSHA256": "6ee31b0d77723f252dbbdab3c92465dfd817606d3f1756745a326103c2bce842",
-  "preparedSourceSHA256": "09aeb534515274bc23c08d059069c3c195458c9d650432795d0c691cd514b998",
+  "preparedSourceSHA256": "13032dbb46a6bf895f4cb962b4cabddf7712e029881f8904e9981ff728c55563",
   "originalFiles": [
     {
       "path": "docs/scale-instruments/research-drafts/apq42_parent_global/1.0.0/README.md",
@@ -75,6 +75,22 @@
       "path": "/identity/instrumentVersion",
       "from": "1.0.0",
       "value": "1.0.1"
+    },
+    {
+      "op": "remove",
+      "path": "/applicability/subject/ageMonths/maxInclusive",
+      "from": 167
+    },
+    {
+      "op": "add",
+      "path": "/applicability/subject/ageMonths/maxExclusive",
+      "value": 168
+    },
+    {
+      "op": "replace",
+      "path": "/applicability/policyVersion",
+      "from": "apq42_parent_global_zh_cn_research-1.0.0",
+      "value": "apq42_parent_global_zh_cn_research-1.0.1"
     }
   ],
   "audit": "audits/audit-apq42-batch3.json",
@@ -96,5 +112,6 @@
     "databasePublish": "NOT_EXECUTED",
     "production": "NOT_TOUCHED"
   },
-  "versionReason": "Original source identities are retained byte-for-byte. New item clarification/metadata/report/administration wording is explicit; formulas, anchors, directions, parameter data and scoringVersion are unchanged. Old report editorial timestamp is not reused as approval of revised wording."
+  "versionReason": "Original source identities are retained byte-for-byte. New item clarification/metadata/report/administration wording is explicit; formulas, anchors, directions, parameter data and scoringVersion are unchanged. Old report editorial timestamp is not reused as approval of revised wording.",
+  "ageContractAdaptation": "Current schema supports exclusive upper bound. Declared child age 6–13 years / completed months 72..167 becomes [72,168), with policy revision; no age-14 inclusion or actor/grant change. Original DRAFT 1.0.0 remains schema-quarantined, not overwritten."
 }

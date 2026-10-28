@@ -683,7 +683,13 @@
           "每个6题维度要求完整作答，平衡分需两者都完整；缺答不插补，是本平台保守项目规则而非作者已规定的个人缺答算法。",
           "作者网站明确仅免费非商业研究使用并要求署名，独立翻译、公开GitHub再分发或商用范围需要管理员单独确认。"
         ],
-        "disclaimer": "SPANE © Ed Diener、Robert Biswas-Diener（2009），原始研究2010。该中文文本和报告是EDUK12.TOP独立未验证研究工作稿，使用范围与作者联系交由管理员确认。结果不用于诊断、筛查、排名或高风险决策。"
+        "disclaimer": "SPANE © Ed Diener、Robert Biswas-Diener（2009），原始研究2010。该中文文本和报告是EDUK12.TOP独立未验证研究工作稿，使用范围与作者联系交由管理员确认。结果不用于诊断、筛查、排名或高风险决策。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN"
+        }
       },
       "referencePolicy": {
         "type": "none"

@@ -7,7 +7,7 @@
   "originalSource": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.0/source.json",
   "preparedSource": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.1/source.json",
   "originalSourceSHA256": "c9ca1c13f8a397b1c302d3c3bbb1fa8856e27767c204cbe77a50038f1ae8b2ea",
-  "preparedSourceSHA256": "0096799925876f0094d30edbc1637e0cb45f724f2bc6212c0a194531ca6e8b60",
+  "preparedSourceSHA256": "cd7d66e49e3d22cb0a23fd947d18c6ea9069b5e6a86f436e11ea92fb660f5546",
   "originalFiles": [
     {
       "path": "docs/scale-instruments/research-drafts/dbt_wccl59/1.0.0/README.md",
@@ -197,6 +197,16 @@
       "path": "/identity/instrumentVersion",
       "from": "1.0.0",
       "value": "1.0.1"
+    },
+    {
+      "op": "add",
+      "path": "/executable/definition/report/audienceContract",
+      "value": {
+        "schemaVersion": 1,
+        "respondent": "ADULT_SELF",
+        "audience": "student",
+        "locale": "zh-TW"
+      }
     }
   ],
   "audit": "audits/audit-dbt-wccl59-zh-tw-batch3.json",
@@ -218,5 +228,6 @@
     "databasePublish": "NOT_EXECUTED",
     "production": "NOT_TOUCHED"
   },
-  "versionReason": "Original source identities are retained byte-for-byte. New item clarification/metadata/report/administration wording is explicit; formulas, anchors, directions, parameter data and scoringVersion are unchanged. Old report editorial timestamp is not reused as approval of revised wording."
+  "versionReason": "Original source identities are retained byte-for-byte. New item clarification/metadata/report/administration wording is explicit; formulas, anchors, directions, parameter data and scoringVersion are unchanged. Old report editorial timestamp is not reused as approval of revised wording.",
+  "audienceBinding": "Existing SELF and subject minAgeMonths=216 / catalog minAge=18, contentLocale define adult self-report in existing subject technical role student; no reviewer/qcReview fabricated."
 }

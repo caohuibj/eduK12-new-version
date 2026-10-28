@@ -160,14 +160,14 @@
   },
   "applicability": {
     "schemaVersion": 1,
-    "policyVersion": "apq42_parent_global_zh_cn_research-1.0.0",
+    "policyVersion": "apq42_parent_global_zh_cn_research-1.0.1",
     "respondentTypes": [
       "PARENT"
     ],
     "subject": {
       "ageMonths": {
         "minInclusive": 72,
-        "maxInclusive": 167
+        "maxExclusive": 168
       }
     },
     "requiredContextKeys": []

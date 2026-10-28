@@ -7,7 +7,7 @@
   "originalSource": "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.0/source.json",
   "preparedSource": "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.1/source.json",
   "originalSourceSHA256": "a1a6428c9b50d08361d69639138579de8ced8d917d4edfc3dca5fa1ca4dd41a6",
-  "preparedSourceSHA256": "05fece56cd3d148d60a64e2e68a8459d21c30efe0007c54018ac135fd7864a5f",
+  "preparedSourceSHA256": "e250bbf45ccc05980494cfc8dc83f3cd15805a054ff2dbd59cbf094723025705",
   "originalFiles": [
     {
       "path": "docs/scale-instruments/research-drafts/spane12/1.0.0/README.md",
@@ -70,6 +70,16 @@
       "path": "/identity/instrumentVersion",
       "from": "1.0.0",
       "value": "1.0.1"
+    },
+    {
+      "op": "add",
+      "path": "/executable/definition/report/audienceContract",
+      "value": {
+        "schemaVersion": 1,
+        "respondent": "ADULT_SELF",
+        "audience": "student",
+        "locale": "zh-CN"
+      }
     }
   ],
   "audit": "audits/audit-spane12-batch3.json",
@@ -98,5 +108,6 @@
     "afterSHA256": "bce2e798d8157071dacc1f82da9454338cf845744c12c93ef6557d4e84b49b46",
     "registration": "Only the original retained 1.0.0 source registers spane12.balance.v1:1.0.0; new report identity reuses that registration. Original scorer.ts and original wrapper are unchanged.",
     "reason": "Original second-group invocation failed during module import on duplicate descriptor before any case. No registry/system change."
-  }
+  },
+  "audienceBinding": "Existing SELF and subject minAgeMonths=216 / catalog minAge=18, contentLocale define adult self-report in existing subject technical role student; no reviewer/qcReview fabricated."
 }

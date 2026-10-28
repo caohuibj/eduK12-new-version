@@ -1535,7 +1535,13 @@
           "UW允許非商業研究/臨床/教育用途，禁止商業；公開GitHub再分發及新譯版不等於已獲得授權。",
           "華盛頓大學 Behavioral Research & Therapy Clinics 作者資源頁明確免費允許非商業研究、臨床及教育用途，並禁止商業使用；使用時必須註明原論文。原站提供英文及「Chinese」繁體譯本，但這並不明確授予完整題文在公開 GitHub 儲存庫二次再分發或隨商業平台軟體發行的權利。本 DRAFT 保存官方繁體題文與獨立報告說明；是否允許公開複製、下載或匯出、公開託管、中文版譯者署名及日後轉為獨立簡體中文版，均由管理員複核或聯絡作者；不聲稱另已獲電子施測、翻譯、商業使用或 GitHub 再分發授權。"
         ],
-        "disclaimer": "僅非商業研究準備的官方繁體題本DRAFT版本。不得將任何應對均值解釋為疾病診斷、治療成功或個人能力等級。"
+        "disclaimer": "僅非商業研究準備的官方繁體題本DRAFT版本。不得將任何應對均值解釋為疾病診斷、治療成功或個人能力等級。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-TW"
+        }
       },
       "referencePolicy": {
         "type": "none"
