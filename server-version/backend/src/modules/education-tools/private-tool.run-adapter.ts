@@ -8,13 +8,25 @@ import {preparePrivateFormRuntimeResource} from './private-tool.form-runtime-res
 import {preparePrivateScaleRuntimeResource} from './private-tool.runtime-resources'
 import {privateScaleVariant} from './private-tool.runtime-origin'
 import {privateToolFail} from './private-tool.contracts'
-import {privateRunTrackInput,privateFormRunTrackInput,assertPrivateRunSelection} from './private-tool.run-contract'
+import {privateRunTrackInput,privateFormRunTrackInput,privateCompositionRunTrackInput,assertPrivateRunSelection} from './private-tool.run-contract'
 
 /** Fixed-version attachment to an EXISTING draft only. No activity/event,
  * approval, publication, participant or report entitlement is created. */
 type PrivateRunAttachmentContext={organizationId:string;runId:string;actorUserId:string;parent:{kind:'SCHOOL_ACTIVITY'|'TEACHER_EVENT';id:string}}
 export const addPrivateScaleRunTrack=(input:PrivateRunAttachmentContext,raw:unknown)=>addPrivateToolRunTrack(input,raw,'SCALE')
 export const addPrivateFormRunTrack=(input:PrivateRunAttachmentContext,raw:unknown)=>addPrivateToolRunTrack(input,raw,'FORM')
+/** No preparation/materialization here. The repository resolves the exact
+ * sealed source under the actual Teacher workflow/editor and draft CAS. */
+export async function addPrivateCompositionRunTrack(input:PrivateRunAttachmentContext,raw:unknown){
+ const selected=privateCompositionRunTrackInput.parse(raw)
+ if(input.parent.kind!=='TEACHER_EVENT')privateToolFail('PRIVATE_COMPOSITION_TEACHER_SELF_REQUIRED',403)
+ return addAssessmentRunTrackDraft({...input,expectedVersion:selected.expectedVersion,expectedRunId:input.runId,
+  educationWorkflow:{product:'TEACHER',id:input.parent.id},privateComposition:selected.privateComposition,
+  resource:{family:'BUNDLE',key:`education-composition:TEACHER:${selected.privateComposition.versionId}:TEACHER:SELF:1.0.0`,version:'1.0.0'},
+  subjectSelector:selected.subjectSelector,respondentSelector:selected.respondentSelector,
+  requestedPolicy:{subjectRoles:['TEACHER'],respondentRoles:['TEACHER'],relationshipKinds:['SELF'],perspectives:['SELF_REPORT'],
+   analysisMode:'INDIVIDUAL_ONLY',visibilityPolicyKey:'EDUCATION_PRIVATE_COMPOSITION_V1',minimumRespondents:null}})
+}
 async function addPrivateToolRunTrack(input:PrivateRunAttachmentContext,raw:unknown,kind:'SCALE'|'FORM'){
  const selected=kind==='FORM'?privateFormRunTrackInput.parse(raw):privateRunTrackInput.parse(raw)
  const fixed='privateScale' in selected?selected.privateScale:selected.privateForm

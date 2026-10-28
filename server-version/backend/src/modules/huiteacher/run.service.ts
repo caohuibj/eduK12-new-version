@@ -1,5 +1,5 @@
 import {assertTeacherPersonalAssessmentPolicy} from './assessmentRunPolicy'
-import {addPrivateScaleRunTrack,addPrivateFormRunTrack} from '../education-tools/private-tool.run-adapter'
+import {addPrivateScaleRunTrack,addPrivateFormRunTrack,addPrivateCompositionRunTrack} from '../education-tools/private-tool.run-adapter'
 import {listEducationLibraryResourcePage} from '../scale-library-governance/education-catalog'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import { prisma } from '../../config/database'
@@ -126,6 +126,14 @@ export async function addTeacherPrivateFormRunTrack(input:Key,raw:unknown){
   if(link.eventStatus!=='DRAFT'||link.runStatus!=='DRAFT')fail('HUITEACHER_RUN_NOT_DRAFT')
   return addPrivateFormRunTrack({organizationId:input.organizationId,runId:link.runId,actorUserId:input.actorUserId,
     parent:{kind:'TEACHER_EVENT',id:input.eventId}},raw)
+}
+export async function addTeacherPrivateCompositionRunTrack(input:Key,raw:unknown){
+  // Resolve the server-owned event link here; all current author/workflow/CAS
+  // checks run once in the repository transaction, not via advisory activeLink.
+  const [link]=await prisma.$queryRaw<Array<{runId:string}>>`SELECT run_id AS "runId" FROM huiteacher_evaluation_run_links
+    WHERE organization_id=${input.organizationId} AND event_id=${input.eventId}`
+  if(!link)fail('HUITEACHER_RUN_NOT_FOUND',404)
+  return addPrivateCompositionRunTrack({...input,runId:link.runId,parent:{kind:'TEACHER_EVENT',id:input.eventId}},raw)
 }
 export async function previewTeacherRun(input:Key&{expectedVersion:number}){
   const link=await activeLink(input)

@@ -1,4 +1,5 @@
 import type { ResultDisclosureContractV1 } from '../assessment-policy/result-disclosure'
+import type {EducationCompositionPolicyBinding} from '../education-tools/private-tool.composition-contracts'
 import { teacherFormResourceId,resolveTeacherFormResourcePolicy } from '../huiteacher/formRunResource'
 import {studentFormResourceId,resolveStudentFormResourcePolicy} from '../huiteacher/studentFormResource'
 import type { AssessmentInitiationModeV1 } from '../assessment-policy/journey'
@@ -23,6 +24,8 @@ export interface RunResourceRef {
 }
 
 export interface RunResourcePolicy {
+  /** Server-frozen ordinary questionnaire identity and per-unit report ceilings. */
+  educationComposition?: EducationCompositionPolicyBinding
   resultDisclosure?: ResultDisclosureContractV1
   initiationModes?: readonly AssessmentInitiationModeV1[]
   allowedTargetModes?: readonly EvaluationTargetMode[]

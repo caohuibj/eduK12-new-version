@@ -1,4 +1,5 @@
 import {z} from 'zod'
+import {resultAudiencePolicySchema} from '../assessment-policy/result-disclosure'
 
 const id=z.string().guid(),hash=z.string().regex(/^[a-f0-9]{64}$/)
 // P1 consumes immutable author-private leaves. Public/native providers are added
@@ -38,3 +39,12 @@ export type EducationCompositionBinding=z.infer<typeof educationCompositionBindi
 export type EducationCompositionOrigin=z.infer<typeof educationCompositionOriginSchema>
 export const educationCompositionKey=(origin:EducationCompositionOrigin)=>
  `education-composition:${origin.entry}:${origin.versionId}:${origin.variantKey}:${origin.adapterVersion}`
+
+export const educationCompositionResourceKeySchema=z.string().regex(/^education-composition:(SCHOOL|TEACHER):[0-9a-f-]{36}:(STUDENT|TEACHER):SELF:1\.0\.0$/)
+export const privateCompositionSelectionSchema=z.object({versionId:id,contentHash:hash}).strict()
+/** Frozen task anchor. Native scores are scoped to a block, never pooled into
+ * an invented cross-tool score or widened by a same-named score in another unit. */
+export const educationCompositionPolicyBindingSchema=z.object({origin:educationCompositionOriginSchema,manifestHash:hash,
+ unitReports:z.array(z.object({blockId:id,versionId:id,contentHash:hash,respondent:resultAudiencePolicySchema}).strict()).max(50),
+}).strict()
+export type EducationCompositionPolicyBinding=z.infer<typeof educationCompositionPolicyBindingSchema>

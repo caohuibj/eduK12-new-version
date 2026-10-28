@@ -1,8 +1,17 @@
 import {describe,it,expect} from 'vitest'
-import {privateRunTrackInput,assertPrivateRunSelection} from '../../modules/education-tools/private-tool.run-contract'
+import {privateRunTrackInput,privateCompositionRunTrackInput,assertPrivateRunSelection} from '../../modules/education-tools/private-tool.run-contract'
 const base={expectedVersion:1,privateScale:{versionId:'00000000-0000-4000-8000-000000000001',contentHash:'a'.repeat(64),administration:{population:'STUDENT',responseMode:'SELF'}},subjectSelector:{kind:'ALL_CURRENT'},respondentSelector:{kind:'ALL_CURRENT'}}
 const valid=(v:unknown)=>assertPrivateRunSelection(privateRunTrackInput.parse(v))
 describe('Private fixed-version draft request',()=>{
+ it('accepts only an exact ordinary composition version and SELF selectors, without client-supplied authority or package edits',()=>{
+  const input={expectedVersion:1,privateComposition:{versionId:base.privateScale.versionId,contentHash:'a'.repeat(64)},
+   subjectSelector:{kind:'ALL_CURRENT'},respondentSelector:{kind:'ALL_CURRENT'}}
+  expect(privateCompositionRunTrackInput.safeParse(input).success).toBe(true)
+  for(const value of [{...input,expectedVersion:undefined},{...input,privateComposition:{...input.privateComposition,contentHash:'bad'}},
+   {...input,educationComposition:{}},{...input,requestedPolicy:{}},{...input,blocks:[]},{...input,report:{}},
+   {...input,privateComposition:{...input.privateComposition,administration:{responseMode:'TEACHER_REPORT'}}},
+   {...input,respondentSelector:{kind:'RELATED_PARENT'}}])expect(privateCompositionRunTrackInput.safeParse(value).success).toBe(false)
+ })
  it('requires CAS and exact version hash without accepting a resource or authority body',()=>{
   expect(()=>valid(base)).not.toThrow()
   for(const v of [{...base,expectedVersion:undefined},{...base,resource:{family:'SCALE',key:'other',version:'1'}},{...base,requestedPolicy:{}},{...base,privateOrigin:{}},{...base,report:{audience:'teacher'}},{...base,privateScale:{...base.privateScale,ownerUserId:'other'}}])
