@@ -1,0 +1,31 @@
+{
+  "sourceFix": "cad66cb18e5378a08c8501be4266dac2b55a6bb9",
+  "integrated": "bb0ab6e78",
+  "checks": {
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/GradCptTask.tsx": {
+      "sha256": "2fb64e869866ea00524e0ed83ed028e0d48531325e441e9ed7f2c841554b99f5",
+      "identicalWorkerCommit": true
+    },
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/session.ts": {
+      "sha256": "5f27d489665e31940504549e0b991c0d5d0bfa8adda1a92fda4ecfabc4b77123",
+      "identicalWorkerCommit": true
+    },
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/wire.ts": {
+      "sha256": "38960391284ef3937ae3507ae1185d458b89850c6d768ca3bb10d9e08dbd7a09",
+      "identicalWorkerCommit": true
+    },
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/transport-error.ts": {
+      "sha256": "3a8942b9cd021288ef557c69b3b32605ec6b18a2181ec046c546c5696797f563",
+      "identicalWorkerCommit": true
+    },
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/transport-error.test.tsx": {
+      "sha256": "f85bfae7ff4ff9f824b9094af00ed1383a2aa72e4217c62202a7b7c654422ca9",
+      "identicalWorkerCommit": true
+    },
+    "server-version/frontend/src/modules/cognitive/tasks/gradcpt/wire.test.ts": {
+      "sha256": "ff31314b6fea0fb1e00b2966817fdfd587ee6b1a367a166d52a5d298461ec885",
+      "identicalWorkerCommit": true
+    }
+  },
+  "reuse": "Only fixed task-owned error class/copy/retry presentation changed. Successful wire generation, canonical bytes, decoder, scoring, large DB/export/archive inputs and semantics unchanged. New error-case and changed limit expectation have targeted receipts; no duplicate full task checks. README append conflict retained both sections."
+}

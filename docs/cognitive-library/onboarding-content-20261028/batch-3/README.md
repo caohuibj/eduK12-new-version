@@ -1,6 +1,6 @@
 # 第3批：补齐真实运行、报告与原件链路
 
-> 当前继续进展见 [滚动补全队列](../parallel-review/README.md)。下文c0efd源码冻结是该批历史快照，后续修复独立列证据；GradCPT高刷新记录存在实际传输超限，正在修复，不能当作科研版全链路已完成。
+> 当前继续进展见 [滚动补全队列](../parallel-review/README.md)。下文c0efd源码冻结是该批历史快照，后续修复独立列证据；GradCPT高刷新记录的提交超限已用专属无损wire修复；保存的research240实例已通过新受影响浏览器生产字节→隔离FINAL/DB/原件消费者，容量/浏览器边界仍保留，详见滚动队列。
 
 已完成9个既有候选的产品接线：8个同类任务＋用户确认几何后的 ANT。
 沿用原任务、scorer、public projector、FinalDraftStore、FINAL、DB及私有资产归档；
@@ -68,7 +68,7 @@
 - 正式运行库目标、发布权限、真实业务激活仍为pending，由root协调；本节点没有请求生产操作，没有部署或给真实人员授权。
 - authenticated standalone/course native已接；public/access-token/composite仍拒绝，`survey/survey-cognitive-api.ts`只有survey scope的read/final，未提供archiveRaw；
   `modules/cognitive/core/useCognitiveSession.ts:215`拒绝native在aggregateOnly/localDraftScope/无archiveRaw路径运行。
-  School/Teacher嵌入的特定客户端还需root沿其实际身份端点定向补archiveRaw；这不是内容配置缺失。没有移除guard、扩大身份范围或借Training cookie冒充四入口。此处允许一个受支持入口独立入库，不以其他入口缺口伪造全可用或新增科研门禁。
+  School/Teacher实际采用Composite，尚缺native精确准入、冻结运行事实、完成回执和本域原件端点合同；Survey也使用专属固定Go/No-Go模型，不能仅补一个archiveRaw方法。见[实际入口与最小建议](../../../parallel-review/entry-adapters/README.md)。这不是内容配置缺失。没有移除guard、扩大身份范围或借Training cookie冒充四入口。此处允许一个受支持入口独立入库，不以其他入口缺口伪造全可用或新增科研门禁。
 - root独立审计、精确候选CI路线、Ready与合并。PR365/PR372历史CI绑定均不替代PR368；本节点没有触发CI、Ready、merge或部署。
 
 本节点专用PostgreSQL/Redis已停止并自动移除；清理保留不可变发布历史到容器销毁，

@@ -52,10 +52,10 @@
 [三个中断练习原件](practice-records.json)：`practice:0:0`、`practice:1:0`、
 `practice:2:0`，0次FINAL、上限后不能再练。原session/Task/教学四例一字未改。
 
-## 已交统筹的共享接线疏漏，pending
+## 所发现共享接线疏漏与后续修复
 
 原`IMPLEMENTATION.md`规定FINAL适配器将claim.termination传给scoreHF第二参数。
-当前基线的native port只把claim封存到原件，通用appendEnvelope/complete及
+本工具独审基线的native port只把claim封存到原件，通用appendEnvelope/complete及
 `unified-final-submit.service.ts`的scorer调用不携带此声明。最后一题raw完整、但本机
 保存回执前失焦时，HFSession可以封存`aborted`，完整32个窗口仍应保留且报告limited。
 
@@ -67,7 +67,7 @@
 
 统筹已接手通过既有sealed raw.claim向FINAL传可选nativeCompletion并冻结入core/hash；
 旧无字段保持原身份，不读COS回算。此分支**没有修改共享core/archive/registry**；
-该共享集成及对应回归仍由统筹处理，状态pending，不是denied或uncertain。
+后续统筹已在 `307d94ae5` 完成共享集成，实际隔离FINAL/DB/归档原件为[32有效仍limited](../integration/README.md)，并有[独立复核](../completion-independent/README.md)。此项已完成，不再pending；旧无声明结果不重算。
 
 ## 证据复用及边界
 
