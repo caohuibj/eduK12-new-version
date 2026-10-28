@@ -1,0 +1,162 @@
+{
+  "schemaVersion": 2,
+  "instrument": {
+    "scaleId": "synthetic-local-only",
+    "code": "ipip_attending_emotions10_zh_cn_research",
+    "name": "IPIP情绪关注10题（研究译稿）",
+    "instrumentVersion": "1.0.0"
+  },
+  "method": {
+    "scaleId": "synthetic-local-only",
+    "instrumentVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "reportVersion": "1.0.1",
+    "reportAudience": "student",
+    "localizationVersion": "1.0.0",
+    "definitionHash": "f2b3e97bdf000ef0665edc0b2e8cc4f814b218dc3a2b83afc0e79e029199e5c4",
+    "referenceVersions": [],
+    "assessmentContext": null
+  },
+  "quality": {
+    "status": "interpretable",
+    "flags": []
+  },
+  "itemScores": [
+    {
+      "itemCode": "IPIP_ATTENDING_EMOTIONS10_01",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_ATTENDING_EMOTIONS10_02",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_ATTENDING_EMOTIONS10_03",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_ATTENDING_EMOTIONS10_04",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_ATTENDING_EMOTIONS10_05",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_ATTENDING_EMOTIONS10_06",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_ATTENDING_EMOTIONS10_07",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_ATTENDING_EMOTIONS10_08",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_ATTENDING_EMOTIONS10_09",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_ATTENDING_EMOTIONS10_10",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    }
+  ],
+  "scores": [
+    {
+      "key": "ipip_attending_emotions10",
+      "type": "total",
+      "label": "情绪关注",
+      "description": "分数概括你对自己情绪进行留意和思考的自述倾向。较高分数不等于情绪调节更好，较低分数也不意味着能力不足。",
+      "direction": "higher_is_more",
+      "canonical": true,
+      "displayPrecision": 0,
+      "value": 30,
+      "range": {
+        "min": 10,
+        "max": 50
+      },
+      "expectedItems": [
+        "IPIP_ATTENDING_EMOTIONS10_01",
+        "IPIP_ATTENDING_EMOTIONS10_02",
+        "IPIP_ATTENDING_EMOTIONS10_03",
+        "IPIP_ATTENDING_EMOTIONS10_04",
+        "IPIP_ATTENDING_EMOTIONS10_05",
+        "IPIP_ATTENDING_EMOTIONS10_06",
+        "IPIP_ATTENDING_EMOTIONS10_07",
+        "IPIP_ATTENDING_EMOTIONS10_08",
+        "IPIP_ATTENDING_EMOTIONS10_09",
+        "IPIP_ATTENDING_EMOTIONS10_10"
+      ],
+      "answeredItems": [
+        "IPIP_ATTENDING_EMOTIONS10_01",
+        "IPIP_ATTENDING_EMOTIONS10_02",
+        "IPIP_ATTENDING_EMOTIONS10_03",
+        "IPIP_ATTENDING_EMOTIONS10_04",
+        "IPIP_ATTENDING_EMOTIONS10_05",
+        "IPIP_ATTENDING_EMOTIONS10_06",
+        "IPIP_ATTENDING_EMOTIONS10_07",
+        "IPIP_ATTENDING_EMOTIONS10_08",
+        "IPIP_ATTENDING_EMOTIONS10_09",
+        "IPIP_ATTENDING_EMOTIONS10_10"
+      ],
+      "status": "calculated",
+      "prorated": false
+    }
+  ],
+  "references": [],
+  "interpretations": [
+    {
+      "scoreKey": "ipip_attending_emotions10",
+      "headline": "情绪关注：你会不会留意心里的变化",
+      "label": null,
+      "interpretation": "这一项关注你是否留意、思考自己的情绪。分数越高，表示这次更认可关注情绪的描述。它有点像注意到心里的“天气”正在变化，但不测你能否把天气变晴。关注得多，不一定调节得更好；关注得少，也不能直接说能力不足。",
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "回想最近一次情绪变化：你先注意到身体的感觉、脑中的想法，还是想做某件事的冲动？"
+        },
+        {
+          "category": "strategy",
+          "text": "用一个词给当下感受命名，如“有些紧张”或“有点期待”，再把注意力带回眼前的一件小事。不必追着每种情绪反复分析。"
+        }
+      ],
+      "limitations": [
+        "这份中文研究译稿仍待专家审校和适用人群验证，目前只供成人研究和自我了解。",
+        "目前没有可靠依据划分高低或排名；这项结果也不代表整体情绪能力或调节能力。",
+        "原英文研究的数据不能当作本中文版本已经验证的证明。",
+        "10题都需完整回答；漏答不当作零分，也不代填。不用于诊断、学生筛选或教师考核。"
+      ],
+      "referenceVersion": null
+    }
+  ],
+  "caveats": [
+    "这份中文研究译稿仍待专家审校和适用人群验证，目前只供成人研究和自我了解。",
+    "目前没有可靠依据划分高低或排名；这项结果也不代表整体情绪能力或调节能力。",
+    "原英文研究的数据不能当作本中文版本已经验证的证明。",
+    "10题都需完整回答；漏答不当作零分，也不代填。不用于诊断、学生筛选或教师考核。",
+    "未提供群体参考。"
+  ],
+  "disclaimer": "仅供成人研究和描述性自我了解，不用于心理诊断、能力鉴定或高风险决策。情绪关注不是整体情绪智力或调节能力。"
+}
