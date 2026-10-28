@@ -91,5 +91,12 @@
     "databasePublish": "NOT_EXECUTED",
     "production": "NOT_TOUCHED"
   },
-  "versionReason": "Original source identities are retained byte-for-byte. New item clarification/metadata/report/administration wording is explicit; formulas, anchors, directions, parameter data and scoringVersion are unchanged. Old report editorial timestamp is not reused as approval of revised wording."
+  "versionReason": "Original source identities are retained byte-for-byte. New item clarification/metadata/report/administration wording is explicit; formulas, anchors, directions, parameter data and scoringVersion are unchanged. Old report editorial timestamp is not reused as approval of revised wording.",
+  "wrapperAdaptation": {
+    "path": "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.1/instrument.ts",
+    "beforeSHA256": "76ba48a81bc638a8c3dd30fadccafefc174a51256070668f212b246581406204",
+    "afterSHA256": "bce2e798d8157071dacc1f82da9454338cf845744c12c93ef6557d4e84b49b46",
+    "registration": "Only the original retained 1.0.0 source registers spane12.balance.v1:1.0.0; new report identity reuses that registration. Original scorer.ts and original wrapper are unchanged.",
+    "reason": "Original second-group invocation failed during module import on duplicate descriptor before any case. No registry/system change."
+  }
 }

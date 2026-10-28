@@ -1,13 +1,6 @@
 import type { ScaleInstrumentSourceV1 } from '../../../onboarding/types'
-import sourceJson from './source.json'
-import { SPANE_SCORER_KEY, spane12BalanceScorer } from '../1.0.0/scorer'
+import source from './source.json'
 
-const base = sourceJson as unknown as ScaleInstrumentSourceV1
-/** The executable registry registers this versioned scorer before validating golden vectors. */
-export const SCALE_INSTRUMENT_SOURCE: ScaleInstrumentSourceV1 = {
-  ...base,
-  executable: base.executable ? {
-    ...base.executable,
-    scorerPlugins: [{ key: SPANE_SCORER_KEY, version: '1.0.0', scorer: spane12BalanceScorer }],
-  } : undefined,
-}
+// The retained 1.0.0 source owns the unchanged spane12.balance.v1:1.0.0
+// descriptor in the existing generated registry. Reuse it; do not register twice.
+export const SCALE_INSTRUMENT_SOURCE = source as unknown as ScaleInstrumentSourceV1
