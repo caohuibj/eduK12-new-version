@@ -1,0 +1,45 @@
+{
+  "instrument": "Cognitive and Affective Mindfulness Scale-Revised, 12-item",
+  "item_count": 12,
+  "options": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "dimensions": {
+    "mindful_qualities": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ]
+  },
+  "reverse_items": [
+    2,
+    6,
+    7
+  ],
+  "reverse_formula": "5-response",
+  "sum_ranges": {
+    "mindful_qualities": [
+      12,
+      48
+    ]
+  },
+  "mean_range": [
+    1,
+    4
+  ],
+  "missing_policy": "complete required per score, otherwise null; product convention",
+  "thresholds": null,
+  "source_note": "GGSC Berkeley-hosted official form prints 12 items, reverse key (items 2, 6, 7) and 'sum values for items 1-12; higher values reflect greater mindful qualities' but no option anchor text. Anchors (1=rarely/not at all, 2=sometimes, 3=often, 4=almost always) corroborated verbatim from peer-reviewed open-access descriptions of the CAMS-R (Europe PMC PMC13059079; consistent with PMC13370295, PMC10779681); author's original form not consulted. Reverse formula for a 1-4 scale is min+max-response = 5-response. Score = sum of the 12 items after reversal (12-48); mean reported alongside. Any missing item yields null (complete_required, product-conservative convention, not an author rule); no norms or cutoffs are invented."
+}
