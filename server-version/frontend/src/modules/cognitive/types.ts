@@ -752,3 +752,26 @@ export type SemanticfluencyTrialPayload = {
   responseDurationMs: number
   interrupted: boolean
 }
+
+/** Wordproblem 冻结 config（与后端 wordproblem.config schema 一致）。 */
+export interface WordproblemConfig {
+  totalTrials: number
+  stimulusSetVersion: string
+  fixationMs: number
+  timeoutMs: number
+  validRtFloorMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+/** Wordproblem 单 trial payload（与后端 wordproblem.trial schema 一致）。 */
+export type WordproblemTrialPayload = {
+  itemId: string
+  responseIndex: number | null
+  rtMs: number | null
+  interrupted: boolean
+}

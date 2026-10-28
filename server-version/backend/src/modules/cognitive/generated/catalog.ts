@@ -39,6 +39,7 @@ import { catalog as task36 } from '../tasks/letternumseries/governance'
 import { catalog as task37 } from '../tasks/wordanalogy/governance'
 import { catalog as task38 } from '../tasks/wordmeaning/governance'
 import { catalog as task39 } from '../tasks/semanticfluency/governance'
+import { catalog as task40 } from '../tasks/wordproblem/governance'
 export const cognitiveCatalog = {
   'reaction': task0,
   'memory': task1,
@@ -80,4 +81,5 @@ export const cognitiveCatalog = {
   'wordanalogy': task37,
   'wordmeaning': task38,
   'semanticfluency': task39,
+  'wordproblem': task40,
 }

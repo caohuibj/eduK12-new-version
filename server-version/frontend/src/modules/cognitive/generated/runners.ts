@@ -40,4 +40,5 @@ import { letternumseriesRegistryEntry as task37 } from '../tasks/letternumseries
 import { wordanalogyRegistryEntry as task38 } from '../tasks/wordanalogy/wordanalogy.registry'
 import { wordmeaningRegistryEntry as task39 } from '../tasks/wordmeaning/wordmeaning.registry'
 import { semanticfluencyRegistryEntry as task40 } from '../tasks/semanticfluency/semanticfluency.registry'
-export const cognitiveRunnerEntries = [task0, task1, task2, task3, task4, task5, task6, task7, task8, task9, task10, task11, task12, task13, task14, task15, task16, task17, task18, task19, task20, task21, task22, task23, task24, task25, task26, task27, task28, task29, task30, task31, task32, task33, task34, task35, task36, task37, task38, task39, task40]
+import { wordproblemRegistryEntry as task41 } from '../tasks/wordproblem/wordproblem.registry'
+export const cognitiveRunnerEntries = [task0, task1, task2, task3, task4, task5, task6, task7, task8, task9, task10, task11, task12, task13, task14, task15, task16, task17, task18, task19, task20, task21, task22, task23, task24, task25, task26, task27, task28, task29, task30, task31, task32, task33, task34, task35, task36, task37, task38, task39, task40, task41]
