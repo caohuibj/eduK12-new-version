@@ -1,0 +1,1045 @@
+{
+  "generatedBy": "actual buildScaleResult + parseScaleResultV2, synthetic answers only",
+  "reports": [
+    {
+      "fixture": "midpoint",
+      "synthetic": true,
+      "answers": [
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_01",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_02",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_03",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_04",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_05",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_06",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_07",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_08",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_09",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_10",
+          "responseValue": "3"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-local-only",
+          "code": "ipip_negative_expressivity10_zh_cn_research",
+          "name": "IPIP消极情绪表达10题（研究译稿）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "synthetic-local-only",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "f1ee55470d9ca96cbf8f20d3240494a24a7118b79ba7bbafd1172cf85d1d37ba",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_01",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_02",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_03",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_04",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_05",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_06",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_07",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_08",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_09",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_10",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          }
+        ],
+        "scores": [
+          {
+            "key": "ipip_negative_expressivity10",
+            "type": "total",
+            "label": "消极情绪的外在表达",
+            "description": "消极情绪更容易外露的自述倾向，不等于症状更严重，也没有统一的优劣方向。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "value": 30,
+            "range": {
+              "min": 10,
+              "max": 50
+            },
+            "expectedItems": [
+              "IPIP_NEGATIVE_EXPRESSIVITY10_01",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_02",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_03",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_04",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_05",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_06",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_07",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_08",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_09",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_10"
+            ],
+            "answeredItems": [
+              "IPIP_NEGATIVE_EXPRESSIVITY10_01",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_02",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_03",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_04",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_05",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_06",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_07",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_08",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_09",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_10"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "ipip_negative_expressivity10",
+            "headline": "消极情绪的外在表达：从日常经历看自己的习惯",
+            "label": null,
+            "interpretation": "这份回答关注的是：难过、害怕或生气时，别人有多容易看见你的感受。它不是在判断你是不是“情绪不好的人”。计分方向越高，表示这些感受越容易通过表情或行动流露；越少外露，也不等于更平静或更会调节。表达得多或少都没有统一的好坏答案。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "想想最近一次不开心：你想让别人理解什么？你实际表达出来的内容，和心里想说的一样吗？"
+              },
+              {
+                "category": "strategy",
+                "text": "可以试着把“你怎么总这样”换成“刚才发生这件事时，我有些生气，我希望……”。表达感受不等于吼叫、威胁或伤害别人；情绪很强时，先暂停一下也可以。"
+              }
+            ],
+            "limitations": [
+              "中文研究译稿尚待人工审校与目标人群验证，目前仅供成人研究与自我了解。",
+              "习惯、文化、关系安全感和具体场合都会影响表达。这个中文工作译稿尚待审核与验证，没有诊断分界值，也不能据此判断情绪控制能力。",
+              "目前没有依据划分高低或人群排名；原英文研究的数据不是本中文版本的效度证明。",
+              "10题需完整回答；漏答不当作零分，也不代填。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "中文研究译稿尚待人工审校与目标人群验证，目前仅供成人研究与自我了解。",
+          "习惯、文化、关系安全感和具体场合都会影响表达。这个中文工作译稿尚待审核与验证，没有诊断分界值，也不能据此判断情绪控制能力。",
+          "目前没有依据划分高低或人群排名；原英文研究的数据不是本中文版本的效度证明。",
+          "10题需完整回答；漏答不当作零分，也不代填。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "仅供成人研究和描述性自我了解，不用于心理诊断、能力鉴定或高风险决策。"
+      }
+    },
+    {
+      "fixture": "keyed-minimum",
+      "synthetic": true,
+      "answers": [
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_01",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_02",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_03",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_04",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_05",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_06",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_07",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_08",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_09",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_10",
+          "responseValue": "5"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-local-only",
+          "code": "ipip_negative_expressivity10_zh_cn_research",
+          "name": "IPIP消极情绪表达10题（研究译稿）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "synthetic-local-only",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "f1ee55470d9ca96cbf8f20d3240494a24a7118b79ba7bbafd1172cf85d1d37ba",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_01",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_02",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_03",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_04",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_05",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_06",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_07",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_08",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_09",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_10",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 1
+          }
+        ],
+        "scores": [
+          {
+            "key": "ipip_negative_expressivity10",
+            "type": "total",
+            "label": "消极情绪的外在表达",
+            "description": "消极情绪更容易外露的自述倾向，不等于症状更严重，也没有统一的优劣方向。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "value": 10,
+            "range": {
+              "min": 10,
+              "max": 50
+            },
+            "expectedItems": [
+              "IPIP_NEGATIVE_EXPRESSIVITY10_01",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_02",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_03",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_04",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_05",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_06",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_07",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_08",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_09",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_10"
+            ],
+            "answeredItems": [
+              "IPIP_NEGATIVE_EXPRESSIVITY10_01",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_02",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_03",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_04",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_05",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_06",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_07",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_08",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_09",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_10"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "ipip_negative_expressivity10",
+            "headline": "消极情绪的外在表达：从日常经历看自己的习惯",
+            "label": null,
+            "interpretation": "这份回答关注的是：难过、害怕或生气时，别人有多容易看见你的感受。它不是在判断你是不是“情绪不好的人”。计分方向越高，表示这些感受越容易通过表情或行动流露；越少外露，也不等于更平静或更会调节。表达得多或少都没有统一的好坏答案。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "想想最近一次不开心：你想让别人理解什么？你实际表达出来的内容，和心里想说的一样吗？"
+              },
+              {
+                "category": "strategy",
+                "text": "可以试着把“你怎么总这样”换成“刚才发生这件事时，我有些生气，我希望……”。表达感受不等于吼叫、威胁或伤害别人；情绪很强时，先暂停一下也可以。"
+              }
+            ],
+            "limitations": [
+              "中文研究译稿尚待人工审校与目标人群验证，目前仅供成人研究与自我了解。",
+              "习惯、文化、关系安全感和具体场合都会影响表达。这个中文工作译稿尚待审核与验证，没有诊断分界值，也不能据此判断情绪控制能力。",
+              "目前没有依据划分高低或人群排名；原英文研究的数据不是本中文版本的效度证明。",
+              "10题需完整回答；漏答不当作零分，也不代填。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "中文研究译稿尚待人工审校与目标人群验证，目前仅供成人研究与自我了解。",
+          "习惯、文化、关系安全感和具体场合都会影响表达。这个中文工作译稿尚待审核与验证，没有诊断分界值，也不能据此判断情绪控制能力。",
+          "目前没有依据划分高低或人群排名；原英文研究的数据不是本中文版本的效度证明。",
+          "10题需完整回答；漏答不当作零分，也不代填。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "仅供成人研究和描述性自我了解，不用于心理诊断、能力鉴定或高风险决策。"
+      }
+    },
+    {
+      "fixture": "keyed-maximum",
+      "synthetic": true,
+      "answers": [
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_01",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_02",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_03",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_04",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_05",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_06",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_07",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_08",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_09",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_10",
+          "responseValue": "1"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-local-only",
+          "code": "ipip_negative_expressivity10_zh_cn_research",
+          "name": "IPIP消极情绪表达10题（研究译稿）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "synthetic-local-only",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "f1ee55470d9ca96cbf8f20d3240494a24a7118b79ba7bbafd1172cf85d1d37ba",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_01",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_02",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_03",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_04",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_05",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_06",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_07",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_08",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_09",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_10",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 5
+          }
+        ],
+        "scores": [
+          {
+            "key": "ipip_negative_expressivity10",
+            "type": "total",
+            "label": "消极情绪的外在表达",
+            "description": "消极情绪更容易外露的自述倾向，不等于症状更严重，也没有统一的优劣方向。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "value": 50,
+            "range": {
+              "min": 10,
+              "max": 50
+            },
+            "expectedItems": [
+              "IPIP_NEGATIVE_EXPRESSIVITY10_01",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_02",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_03",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_04",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_05",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_06",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_07",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_08",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_09",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_10"
+            ],
+            "answeredItems": [
+              "IPIP_NEGATIVE_EXPRESSIVITY10_01",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_02",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_03",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_04",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_05",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_06",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_07",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_08",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_09",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_10"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "ipip_negative_expressivity10",
+            "headline": "消极情绪的外在表达：从日常经历看自己的习惯",
+            "label": null,
+            "interpretation": "这份回答关注的是：难过、害怕或生气时，别人有多容易看见你的感受。它不是在判断你是不是“情绪不好的人”。计分方向越高，表示这些感受越容易通过表情或行动流露；越少外露，也不等于更平静或更会调节。表达得多或少都没有统一的好坏答案。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "想想最近一次不开心：你想让别人理解什么？你实际表达出来的内容，和心里想说的一样吗？"
+              },
+              {
+                "category": "strategy",
+                "text": "可以试着把“你怎么总这样”换成“刚才发生这件事时，我有些生气，我希望……”。表达感受不等于吼叫、威胁或伤害别人；情绪很强时，先暂停一下也可以。"
+              }
+            ],
+            "limitations": [
+              "中文研究译稿尚待人工审校与目标人群验证，目前仅供成人研究与自我了解。",
+              "习惯、文化、关系安全感和具体场合都会影响表达。这个中文工作译稿尚待审核与验证，没有诊断分界值，也不能据此判断情绪控制能力。",
+              "目前没有依据划分高低或人群排名；原英文研究的数据不是本中文版本的效度证明。",
+              "10题需完整回答；漏答不当作零分，也不代填。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "中文研究译稿尚待人工审校与目标人群验证，目前仅供成人研究与自我了解。",
+          "习惯、文化、关系安全感和具体场合都会影响表达。这个中文工作译稿尚待审核与验证，没有诊断分界值，也不能据此判断情绪控制能力。",
+          "目前没有依据划分高低或人群排名；原英文研究的数据不是本中文版本的效度证明。",
+          "10题需完整回答；漏答不当作零分，也不代填。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "仅供成人研究和描述性自我了解，不用于心理诊断、能力鉴定或高风险决策。"
+      }
+    },
+    {
+      "fixture": "all-one",
+      "synthetic": true,
+      "answers": [
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_01",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_02",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_03",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_04",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_05",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_06",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_07",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_08",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_09",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_10",
+          "responseValue": "1"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-local-only",
+          "code": "ipip_negative_expressivity10_zh_cn_research",
+          "name": "IPIP消极情绪表达10题（研究译稿）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "synthetic-local-only",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "f1ee55470d9ca96cbf8f20d3240494a24a7118b79ba7bbafd1172cf85d1d37ba",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_01",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_02",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_03",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_04",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_05",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_06",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_07",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_08",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_09",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_10",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 5
+          }
+        ],
+        "scores": [
+          {
+            "key": "ipip_negative_expressivity10",
+            "type": "total",
+            "label": "消极情绪的外在表达",
+            "description": "消极情绪更容易外露的自述倾向，不等于症状更严重，也没有统一的优劣方向。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "value": 30,
+            "range": {
+              "min": 10,
+              "max": 50
+            },
+            "expectedItems": [
+              "IPIP_NEGATIVE_EXPRESSIVITY10_01",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_02",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_03",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_04",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_05",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_06",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_07",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_08",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_09",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_10"
+            ],
+            "answeredItems": [
+              "IPIP_NEGATIVE_EXPRESSIVITY10_01",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_02",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_03",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_04",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_05",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_06",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_07",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_08",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_09",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_10"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "ipip_negative_expressivity10",
+            "headline": "消极情绪的外在表达：从日常经历看自己的习惯",
+            "label": null,
+            "interpretation": "这份回答关注的是：难过、害怕或生气时，别人有多容易看见你的感受。它不是在判断你是不是“情绪不好的人”。计分方向越高，表示这些感受越容易通过表情或行动流露；越少外露，也不等于更平静或更会调节。表达得多或少都没有统一的好坏答案。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "想想最近一次不开心：你想让别人理解什么？你实际表达出来的内容，和心里想说的一样吗？"
+              },
+              {
+                "category": "strategy",
+                "text": "可以试着把“你怎么总这样”换成“刚才发生这件事时，我有些生气，我希望……”。表达感受不等于吼叫、威胁或伤害别人；情绪很强时，先暂停一下也可以。"
+              }
+            ],
+            "limitations": [
+              "中文研究译稿尚待人工审校与目标人群验证，目前仅供成人研究与自我了解。",
+              "习惯、文化、关系安全感和具体场合都会影响表达。这个中文工作译稿尚待审核与验证，没有诊断分界值，也不能据此判断情绪控制能力。",
+              "目前没有依据划分高低或人群排名；原英文研究的数据不是本中文版本的效度证明。",
+              "10题需完整回答；漏答不当作零分，也不代填。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "中文研究译稿尚待人工审校与目标人群验证，目前仅供成人研究与自我了解。",
+          "习惯、文化、关系安全感和具体场合都会影响表达。这个中文工作译稿尚待审核与验证，没有诊断分界值，也不能据此判断情绪控制能力。",
+          "目前没有依据划分高低或人群排名；原英文研究的数据不是本中文版本的效度证明。",
+          "10题需完整回答；漏答不当作零分，也不代填。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "仅供成人研究和描述性自我了解，不用于心理诊断、能力鉴定或高风险决策。"
+      }
+    },
+    {
+      "fixture": "all-five",
+      "synthetic": true,
+      "answers": [
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_01",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_02",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_03",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_04",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_05",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_06",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_07",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_08",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_09",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_10",
+          "responseValue": "5"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-local-only",
+          "code": "ipip_negative_expressivity10_zh_cn_research",
+          "name": "IPIP消极情绪表达10题（研究译稿）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "synthetic-local-only",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "f1ee55470d9ca96cbf8f20d3240494a24a7118b79ba7bbafd1172cf85d1d37ba",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_01",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_02",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_03",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_04",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_05",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_06",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_07",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_08",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_09",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_NEGATIVE_EXPRESSIVITY10_10",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 1
+          }
+        ],
+        "scores": [
+          {
+            "key": "ipip_negative_expressivity10",
+            "type": "total",
+            "label": "消极情绪的外在表达",
+            "description": "消极情绪更容易外露的自述倾向，不等于症状更严重，也没有统一的优劣方向。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "value": 30,
+            "range": {
+              "min": 10,
+              "max": 50
+            },
+            "expectedItems": [
+              "IPIP_NEGATIVE_EXPRESSIVITY10_01",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_02",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_03",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_04",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_05",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_06",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_07",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_08",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_09",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_10"
+            ],
+            "answeredItems": [
+              "IPIP_NEGATIVE_EXPRESSIVITY10_01",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_02",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_03",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_04",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_05",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_06",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_07",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_08",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_09",
+              "IPIP_NEGATIVE_EXPRESSIVITY10_10"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "ipip_negative_expressivity10",
+            "headline": "消极情绪的外在表达：从日常经历看自己的习惯",
+            "label": null,
+            "interpretation": "这份回答关注的是：难过、害怕或生气时，别人有多容易看见你的感受。它不是在判断你是不是“情绪不好的人”。计分方向越高，表示这些感受越容易通过表情或行动流露；越少外露，也不等于更平静或更会调节。表达得多或少都没有统一的好坏答案。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "想想最近一次不开心：你想让别人理解什么？你实际表达出来的内容，和心里想说的一样吗？"
+              },
+              {
+                "category": "strategy",
+                "text": "可以试着把“你怎么总这样”换成“刚才发生这件事时，我有些生气，我希望……”。表达感受不等于吼叫、威胁或伤害别人；情绪很强时，先暂停一下也可以。"
+              }
+            ],
+            "limitations": [
+              "中文研究译稿尚待人工审校与目标人群验证，目前仅供成人研究与自我了解。",
+              "习惯、文化、关系安全感和具体场合都会影响表达。这个中文工作译稿尚待审核与验证，没有诊断分界值，也不能据此判断情绪控制能力。",
+              "目前没有依据划分高低或人群排名；原英文研究的数据不是本中文版本的效度证明。",
+              "10题需完整回答；漏答不当作零分，也不代填。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "中文研究译稿尚待人工审校与目标人群验证，目前仅供成人研究与自我了解。",
+          "习惯、文化、关系安全感和具体场合都会影响表达。这个中文工作译稿尚待审核与验证，没有诊断分界值，也不能据此判断情绪控制能力。",
+          "目前没有依据划分高低或人群排名；原英文研究的数据不是本中文版本的效度证明。",
+          "10题需完整回答；漏答不当作零分，也不代填。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "仅供成人研究和描述性自我了解，不用于心理诊断、能力鉴定或高风险决策。"
+      }
+    }
+  ]
+}
