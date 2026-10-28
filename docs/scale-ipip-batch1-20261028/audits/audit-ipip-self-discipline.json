@@ -1,0 +1,243 @@
+{
+  "instrument": "ipip_neo_c5_self_discipline10_zh_cn_research:1.0.0",
+  "source_commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "source_branch": "content/dot-local-scales-20261025",
+  "main_baseline": "aa774983db8edd85b3c1617aef7218f71664746d",
+  "main_source_exists": false,
+  "files": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ipip_neo_c5_self_discipline10_zh_cn_research/1.0.0/source.json",
+      "git_blob": "916ca9491b04d6d8001d44ac1e9b9e09c6e87270",
+      "sha256": "7f3a2d36a86d3f2a8cd6a35991e35d1ac1bebbc9f9ebfbc87d54ea07a95c6bfa"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ipip_neo_c5_self_discipline10_zh_cn_research/1.0.0/instrument.ts",
+      "git_blob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_neo_c5_self_discipline10/1.0.0/README.md",
+      "git_blob": "7a92f6c6c3be562a26685743466db6ee102501b8",
+      "sha256": "3855e4e8892c0e647127247155b870a1bfd79613547ae50bd6841396d891ea75"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_neo_c5_self_discipline10/1.0.0/bilingual-content.json",
+      "git_blob": "9061addb883c5768d116b08a4241ea878293f4dd",
+      "sha256": "0d1111e344c8665641a5f99a4dda0c3c5531e05a337de7cd24c10aac09349bbc"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_neo_c5_self_discipline10/1.0.0/original-research-pack.json",
+      "git_blob": "0a882e67107a00c8315911bc34cfbefd810de30b",
+      "sha256": "bd1cb8e64933451fa4d696daadc0e735e747f32f9b3abfd015979ecc92796567"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_neo_c5_self_discipline10/1.0.0/local-validation.json",
+      "git_blob": "902390a8a739b9fa9104632c5863acc2f6a1a85c",
+      "sha256": "ab50774d841bdc190b56d6b57f7fe2f79a8b61aba9e5b1be0470a61b8eb1c18c"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_neo_c5_self_discipline10/1.0.0/references.md",
+      "git_blob": "0731013b86801684b70aea0bd470f77f8f5049c7",
+      "sha256": "2772d7660ccc16da4e39c32442e9ea7a1dc580b16dc0593cbc2c29db32d99b79"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_neo_c5_self_discipline10/1.0.0/scoring-and-thresholds.md",
+      "git_blob": "4296f08a0fe04107553a33a55929f08849387fb0",
+      "sha256": "7f5929615ab0aaae6bf84b80673d56ed75337385e5f176f35c1008acc22f17b1"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_neo_c5_self_discipline10/1.0.0/report-example.md",
+      "git_blob": "8ddf0c556c6c58e267dc5a86d6c4a8c14665ecb9",
+      "sha256": "4aa83e5f60ace069cc3a78006d5d4eca1b224800e5a79470796865aea4a6ce00"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_neo_c5_self_discipline10/1.0.0/synthetic-report-example.json",
+      "git_blob": "32596a1c884d5a356fbaabf11f84b6be7537c701",
+      "sha256": "6e6ff030943ee6b38019a39a5cd859073ec52c1353a606bc789623e2a5f028f3"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/onboarding/schema.ts",
+      "git_blob": "a4a2e493e5fa246a213583bf5a641ed64b7f427e",
+      "sha256": "8667396de1184dd9ee137d432fd95aded6437593f7a3e22f83cb47077d15bfdf"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/onboarding/materialize.ts",
+      "git_blob": "1fa9e896065d97e317dc987fd3091fcc00805fed",
+      "sha256": "64ef5926d9c63b9c9895af9cd5466d17bf199ef4a48410d8e64dd6073cf25201"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/onboarding/instruments.generated.ts",
+      "git_blob": "35a1d8e979827140a01fe386da2a1494fd289363",
+      "sha256": "b7296bf05ec8ee2d2fcafa961407c9fc85275a74c8866fc3fe5ad4e34b0d4b72"
+    }
+  ],
+  "third_party_license": {
+    "exists_for_this_package": false,
+    "basis": "git tree 该包无 THIRD_PARTY_LICENSE.md；权利说明在 source.json 和研究包 references.md/original-research-pack.json。"
+  },
+  "three_parts": {
+    "items_administration": {
+      "individual_items": [
+        {
+          "number": 1,
+          "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_01",
+          "english": "Get chores done right away.",
+          "chinese": "我会马上把日常杂事做完。",
+          "reverse": false,
+          "review": "忠实表达立即完成日常杂事；“杂事”与 chores 合理。",
+          "matches_runtime": true
+        },
+        {
+          "number": 2,
+          "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_02",
+          "english": "Am always prepared.",
+          "chinese": "我总是做好准备。",
+          "reverse": false,
+          "review": "保留 always 的绝对程度及准备。",
+          "matches_runtime": true
+        },
+        {
+          "number": 3,
+          "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_03",
+          "english": "Start tasks right away.",
+          "chinese": "我会马上开始任务。",
+          "reverse": false,
+          "review": "立即开始任务，清楚。",
+          "matches_runtime": true
+        },
+        {
+          "number": 4,
+          "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_04",
+          "english": "Get to work at once.",
+          "chinese": "我会立刻着手做事。",
+          "reverse": false,
+          "review": "立即着手工作/做事，接近第3题但原文即相近。",
+          "matches_runtime": true
+        },
+        {
+          "number": 5,
+          "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_05",
+          "english": "Carry out my plans.",
+          "chinese": "我会执行自己的计划。",
+          "reverse": false,
+          "review": "执行自己计划，清楚。",
+          "matches_runtime": true
+        },
+        {
+          "number": 6,
+          "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_06",
+          "english": "Find it difficult to get down to work.",
+          "chinese": "我觉得很难着手做事。",
+          "reverse": true,
+          "review": "着手做事困难；修订去除原文未必含有的静下心，保留困难。",
+          "matches_runtime": true
+        },
+        {
+          "number": 7,
+          "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_07",
+          "english": "Waste my time.",
+          "chinese": "我会浪费时间。",
+          "reverse": true,
+          "review": "浪费时间，保留自我表述；带价值色彩源于原题，报告不作道德判断。",
+          "matches_runtime": true
+        },
+        {
+          "number": 8,
+          "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_08",
+          "english": "Need a push to get started.",
+          "chinese": "我需要一些推动才会开始。",
+          "reverse": true,
+          "review": "需要推动开始；“一些推动”略不自然且来源含糊，避免推断仅来自他人，供人工译审，勿擅自改变题意。",
+          "matches_runtime": true
+        },
+        {
+          "number": 9,
+          "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_09",
+          "english": "Have difficulty starting tasks.",
+          "chinese": "我很难开始一项任务。",
+          "reverse": true,
+          "review": "开始任务困难，接近第6题但源文如此。",
+          "matches_runtime": true
+        },
+        {
+          "number": 10,
+          "itemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_10",
+          "english": "Postpone decisions.",
+          "chinese": "我会推迟作决定。",
+          "reverse": true,
+          "review": "推迟作决定，符合原意。",
+          "matches_runtime": true
+        }
+      ],
+      "anchors": "1 很不符合、2 比较不符合、3 介于不符合与符合之间、4 比较符合、5 很符合；与官方 1–5 准确度锚点方向对应。",
+      "population": "成人自陈；AI辅助工作译稿，翻译审校 PENDING、认知访谈 NOT_ESTABLISHED、目标人群效度待建立。",
+      "instruction": {
+        "text": "请根据你目前通常的情况，而不是希望将来成为的样子，判断下面各句话与你的实际情况有多符合。",
+        "sources": [
+          {
+            "path": "docs/scale-instruments/research-drafts/ipip_neo_c5_self_discipline10/1.0.0/bilingual-content.json",
+            "git_blob": "9061addb883c5768d116b08a4241ea878293f4dd",
+            "sha256": "0d1111e344c8665641a5f99a4dda0c3c5531e05a337de7cd24c10aac09349bbc",
+            "json_pointer": "/instructions"
+          },
+          {
+            "path": "docs/scale-instruments/research-drafts/ipip_neo_c5_self_discipline10/1.0.0/original-research-pack.json",
+            "git_blob": "0a882e67107a00c8315911bc34cfbefd810de30b",
+            "sha256": "bd1cb8e64933451fa4d696daadc0e735e747f32f9b3abfd015979ecc92796567",
+            "json_pointer": "/instructionZh"
+          }
+        ],
+        "status": "两份同文项目研究工作指导语，非正式或人工审批声明；目标包无 administration.md 或 prepared sidecar。",
+        "runtime": "source 顶层 instruction 缺失；materialize 将 source.instruction?.text ?? null 写入 Scale.instruction。无法仅据静态证据断言实际页面或数据库内容。",
+        "mapping": {
+          "instruction.schemaVersion": 1,
+          "instruction.text": "上述逐字工作指导语",
+          "instruction.language": "zh-CN",
+          "instruction.version": "1.0.0",
+          "instruction.source": "引用上述两个固定文件及字段，标明项目研究工作稿；不声称官方指导语或人工审批"
+        },
+        "minimal_adaptation": "采用现有 source 顶层 instruction 合同进行绑定，由 root 在集成时评估；不拼进题1、不变更评分定义。"
+      }
+    },
+    "scoring": {
+      "score": "task_self_discipline，一个 total，10项各权重1求和；1–5 identity，6–10 reverse，即6−原分。",
+      "range": "10–50；30为理论中点而非常模或阈值。",
+      "missing": "每项required，complete_required；缺一不计算，无补零、插补或按已答题分母折算；完整规则为项目保守政策，非原版心理测量规则。",
+      "dimension_metadata": "0 dimension、1 total、10 items；materialize 仅计 type=dimension，不应把 total 误计维度。",
+      "evidence": "官方C5题序与键、5锚点和求和均核对；本次未运行计分。"
+    },
+    "report": {
+      "direction": "higher_is_more 表示本次自报启动和执行倾向更强，不等于客观能力或道德价值。",
+      "content": "描述性、具体情境与小步行动；无分档、常模、排名或诊断。",
+      "reference": "referencePolicy none、references空；source引用英文IPIP C5及许可；报告参考不启用。",
+      "range": "合成样例30，范围10–50；图表消费者是否实际展示该范围未运行核验，不将截图/显示视为已验证。",
+      "audience": "ADULT_SELF，student为现有技术受众角色；不能推断未成年人适用，teacher披露策略本身不代表授权。",
+      "version": "instrument/scoring/report/localization均1.0.0；独立IPIP表征，不是专有NEO-PI-R或完整人格画像。"
+    }
+  },
+  "rights": {
+    "source_claim": "PUBLIC_DOMAIN / verified / redistribution allowed",
+    "official": "https://ipip.ori.org/newPermission.htm 声明 IPIP 题项、量表及题本商用和非商用；仅据此不扩张到专有NEO-PI-R、其他中文译本或第三方论文。",
+    "translation": "项目独立AI辅助工作译稿，未验证；权限不代表有效性。"
+  },
+  "official_sources": [
+    "https://ipip.ori.org/newNEOKey.htm",
+    "https://ipip.ori.org/newScoringInstructions.htm",
+    "https://ipip.ori.org/newPermission.htm"
+  ],
+  "minimal_adaptations": [
+    "绑定固定指导语至现有顶层 instruction，附明确来源和工作稿状态；无新引擎或CSV覆盖STANDARD。",
+    "公开元数据按实际10题、0 dimension、1 total和10–50呈现；核查展示路径与受众授权，勿虚构数量。"
+  ],
+  "human_followups": [
+    "独立人工译审，尤其第6及第8题及锚点；认知访谈和目标成人群体适用性研究尚未建立。",
+    "若拟改变题意、锚点、算法、构念或增加阈值，交root协调版本及科学决策，不直接修改成熟版本。",
+    "版权状态保留既有声明及来源，人工追踪其他独立材料的实际权利边界，不虚构审批。"
+  ],
+  "batch_assessment": "可作为成人研究候选进入本批静态集成审查，建议先绑定已有指导语并核对公开数量与真实范围；并非科研、译审、安装、发布或运行验收通过。最终是否入批由root统筹。",
+  "not_performed": [
+    "未改共享仓库、切分支、commit、push、数据库、CI或生产。",
+    "未执行现有计分/golden/全库/浏览器测试；未做新效度研究；未验证实际页面与数据库。",
+    "无新增自动门禁；未宣称既往记录在本次运行通过。"
+  ]
+}

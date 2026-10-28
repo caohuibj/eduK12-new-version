@@ -1,0 +1,11 @@
+{
+  "sourceSha256": "bae9d0896677a0f133e6d6fec77aac603da2f19ae37e0b19d77d7e18fc288254",
+  "validatedAt": "2026-10-25T15:07:50Z",
+  "node": "v24.22.1",
+  "toolTests": 12,
+  "combinedTests": 18,
+  "testExitCode": 0,
+  "typecheckExitCode": 0,
+  "generatorExitCode": 0,
+  "scope": "Local source and synthetic scorer/report only; no database or production writes."
+}

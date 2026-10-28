@@ -1,0 +1,214 @@
+{
+  "checkedAt": "2026-10-25",
+  "contentStatus": "RESEARCH_CANDIDATE",
+  "translationStatus": "PROJECT_WORKING_TRANSLATION_NOT_VALIDATED",
+  "expertReview": "PENDING",
+  "thresholds": [],
+  "missingPolicy": {
+    "rule": "all items required; no imputation",
+    "status": "PROJECT_POLICY_NOT_ORIGINAL_PSYCHOMETRIC_RULE"
+  },
+  "defaultAudience": "ADULT_SELF; school/minor use requires population-specific review",
+  "reportPolicy": "Descriptive feedback only. No diagnosis, percentile, low/medium/high bands, selection or ranking.",
+  "id": "IPIP_NEO_C5_SELF_DISCIPLINE10",
+  "title": "任务启动与自律",
+  "family": "IPIP-NEO facet representation",
+  "facet": "C5",
+  "identityWarning": "Public-domain IPIP representation, not proprietary NEO-PI-R items; standalone facet, not full NEO profile. Not equivalent to GSE or domain-specific academic self-efficacy.",
+  "rights": {
+    "status": "PUBLIC_DOMAIN",
+    "scope": [
+      "full-item-reproduction",
+      "translation",
+      "online-administration",
+      "commercial-and-noncommercial",
+      "project-authored-feedback"
+    ],
+    "sources": [
+      "https://ipip.ori.org/newPermission.htm",
+      "https://www.ipip.ori.org/"
+    ]
+  },
+  "instructionZh": "请根据你目前通常的情况，而不是希望将来成为的样子，判断下面各句话与你的实际情况有多符合。",
+  "timeframe": "general current self-description; no fixed retrospective window",
+  "responseOptions": [
+    {
+      "value": 1,
+      "en": "Very Inaccurate",
+      "zh": "很不符合"
+    },
+    {
+      "value": 2,
+      "en": "Moderately Inaccurate",
+      "zh": "比较不符合"
+    },
+    {
+      "value": 3,
+      "en": "Neither Inaccurate nor Accurate",
+      "zh": "介于不符合与符合之间"
+    },
+    {
+      "value": 4,
+      "en": "Moderately Accurate",
+      "zh": "比较符合"
+    },
+    {
+      "value": 5,
+      "en": "Very Accurate",
+      "zh": "很符合"
+    }
+  ],
+  "items": [
+    {
+      "number": 1,
+      "en": "Get chores done right away.",
+      "zh": "我会马上把日常杂事做完。",
+      "reverse": false
+    },
+    {
+      "number": 2,
+      "en": "Am always prepared.",
+      "zh": "我总是做好准备。",
+      "reverse": false
+    },
+    {
+      "number": 3,
+      "en": "Start tasks right away.",
+      "zh": "我会马上开始任务。",
+      "reverse": false
+    },
+    {
+      "number": 4,
+      "en": "Get to work at once.",
+      "zh": "我会立刻着手做事。",
+      "reverse": false
+    },
+    {
+      "number": 5,
+      "en": "Carry out my plans.",
+      "zh": "我会执行自己的计划。",
+      "reverse": false
+    },
+    {
+      "number": 6,
+      "en": "Find it difficult to get down to work.",
+      "zh": "我觉得很难静下心来开始做事。",
+      "reverse": true
+    },
+    {
+      "number": 7,
+      "en": "Waste my time.",
+      "zh": "我会浪费时间。",
+      "reverse": true
+    },
+    {
+      "number": 8,
+      "en": "Need a push to get started.",
+      "zh": "我需要有人推动才会开始。",
+      "reverse": true
+    },
+    {
+      "number": 9,
+      "en": "Have difficulty starting tasks.",
+      "zh": "我很难开始一项任务。",
+      "reverse": true
+    },
+    {
+      "number": 10,
+      "en": "Postpone decisions.",
+      "zh": "我会推迟作决定。",
+      "reverse": true
+    }
+  ],
+  "scoring": {
+    "type": "sum",
+    "positiveItems": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "reverseItems": [
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "reverseFormula": "6 - response",
+    "range": [
+      10,
+      50
+    ],
+    "higherMeans": "任务启动与自律自报倾向更强；不代表客观能力更高或更有道德价值"
+  },
+  "evidence": [
+    {
+      "kind": "internal-consistency-alpha",
+      "value": 0.85,
+      "source": "IPIP_NEO_KEYS",
+      "limitation": "Official key page reports English source alpha; sample details not re-established here. Not a Chinese coefficient, norm or cutoff."
+    }
+  ],
+  "references": [
+    {
+      "id": "IPIP_PERMISSION",
+      "title": "Obtaining Permission",
+      "url": "https://ipip.ori.org/newPermission.htm",
+      "role": "Public-domain commercial/non-commercial use"
+    },
+    {
+      "id": "IPIP_HOME",
+      "title": "International Personality Item Pool",
+      "url": "https://www.ipip.ori.org/",
+      "role": "Explicit copy/edit/translate/use-any-purpose statement"
+    },
+    {
+      "id": "IPIP_NEO_KEYS",
+      "title": "Items in the Preliminary IPIP Scales Measuring Constructs Similar to Those in the NEO-PI-R",
+      "url": "https://ipip.ori.org/newNEOKey.htm",
+      "role": "Exact English items and positive/negative keys"
+    },
+    {
+      "id": "IPIP_SCORING",
+      "title": "Converting IPIP Item Responses to Scale Scores",
+      "url": "https://ipip.ori.org/newScoringInstructions.htm",
+      "role": "1–5 anchors; reverse keys; sum"
+    },
+    {
+      "id": "GOLDBERG_1999",
+      "citation": "Goldberg, L. R. (1999). A broad-bandwidth, public domain, personality inventory measuring the lower-level facets of several five-factor models. In I. Mervielde, I. Deary, F. De Fruyt, & F. Ostendorf (Eds.), Personality Psychology in Europe, Vol. 7 (pp. 7–28). Tilburg University Press.",
+      "url": "https://www.ipip.ori.org/A%20broad-bandwidth%20inventory.pdf",
+      "role": "IPIP project/facet construction background; not Chinese validation"
+    },
+    {
+      "id": "GOLDBERG_2006",
+      "citation": "Goldberg, L. R., Johnson, J. A., Eber, H. W., Hogan, R., Ashton, M. C., Cloninger, C. R., & Gough, H. C. (2006). The International Personality Item Pool and the future of public-domain personality measures. Journal of Research in Personality, 40, 84–96.",
+      "doi": "10.1016/j.jrp.2005.08.007",
+      "url": "https://projects.ori.org/lrg/PDFs_papers/Goldberg_etal_2006_IPIP_JRP.pdf",
+      "role": "Project background, not standalone C1/C5 Chinese validation"
+    }
+  ],
+  "tags": [
+    "人格倾向",
+    "自我报告",
+    "成人",
+    "研究译稿",
+    "任务启动与自律"
+  ],
+  "reportDraft": {
+    "heading": "你的任务启动与执行习惯",
+    "summary": "本次结果反映你对启动任务和执行计划习惯的自我描述，不是道德评价，也不能据此诊断注意力或执行功能障碍。",
+    "scoreExplanation": "反向计分后总分10–50，得分越高表示本次自报的任务启动与自律倾向越强。本中文研究译稿不提供常模比较或高低分类。",
+    "reflection": [
+      "哪些情境让你容易开始，哪些情境容易拖延？",
+      "任务不清楚、疲劳、资源不足和情绪负担分别会带来什么影响？"
+    ],
+    "actions": [
+      "把任务的第一步写成一个具体、短小的动作，并准备好所需材料。",
+      "为任务设置合适的时间和环境支持，观察哪种安排更容易开始。"
+    ],
+    "limits": "本量表不等同于Grit或BSCS；不可从分数推定人品、努力程度或临床诊断。"
+  }
+}
