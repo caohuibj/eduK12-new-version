@@ -1,0 +1,109 @@
+{
+  "success": true,
+  "componentPreviewOnly": true,
+  "synthetic": true,
+  "node": "v24.21.0",
+  "results": [
+    {
+      "name": "interrupted-zh-phone",
+      "language": "zh",
+      "layout": {
+        "viewport": 390,
+        "scroll": 390,
+        "headings": [
+          "这轮练习尚未完成"
+        ],
+        "saved": [
+          {
+            "key": "practice:0:0",
+            "status": "interrupted",
+            "reason": "blur"
+          }
+        ]
+      },
+      "file": "docs/cognitive-library/onboarding-content-20261028/parallel-review/dual-arrow/screens/interrupted-zh-phone.png",
+      "sha256": "3115542df895af032fc10267e1a8804e1824c89829f5ad33f0b2babbddf9e3c0"
+    },
+    {
+      "name": "reread-zh-phone",
+      "language": "zh",
+      "layout": {
+        "viewport": 390,
+        "scroll": 390,
+        "headings": [
+          "先看本块要求，再回答箭头朝左还是朝右",
+          "同一幅图，三种规则",
+          "只做3轮较易练习",
+          "怎样算完成"
+        ],
+        "saved": [
+          {
+            "key": "practice:0:0",
+            "status": "interrupted",
+            "reason": "blur"
+          }
+        ]
+      },
+      "file": "docs/cognitive-library/onboarding-content-20261028/parallel-review/dual-arrow/screens/reread-zh-phone.png",
+      "sha256": "dc65368bce3e2890a9e36cd1e3c8a39bf77ea3ab6999e2581c0dde441f707a73"
+    },
+    {
+      "language": "zh",
+      "newGroupRecordKeys": [
+        "practice:0:0",
+        "practice:1:0"
+      ]
+    },
+    {
+      "name": "interrupted-en-phone",
+      "language": "en",
+      "layout": {
+        "viewport": 390,
+        "scroll": 390,
+        "headings": [
+          "This practice trial was not completed"
+        ],
+        "saved": [
+          {
+            "key": "practice:0:0",
+            "status": "interrupted",
+            "reason": "blur"
+          }
+        ]
+      },
+      "file": "docs/cognitive-library/onboarding-content-20261028/parallel-review/dual-arrow/screens/interrupted-en-phone.png",
+      "sha256": "b23de2d9711e12495a82cd5888de67355c770c42167ca5a985ba7415fd2bc3db"
+    },
+    {
+      "name": "reread-en-phone",
+      "language": "en",
+      "layout": {
+        "viewport": 390,
+        "scroll": 390,
+        "headings": [
+          "Read the block rule, then report left or right",
+          "One picture, three rules",
+          "Only three easier practice trials",
+          "When you are finished"
+        ],
+        "saved": [
+          {
+            "key": "practice:0:0",
+            "status": "interrupted",
+            "reason": "blur"
+          }
+        ]
+      },
+      "file": "docs/cognitive-library/onboarding-content-20261028/parallel-review/dual-arrow/screens/reread-en-phone.png",
+      "sha256": "7960c5024eb51711dd838d234e35f48cd074413e5091b3eda59c45ec82074e21"
+    },
+    {
+      "language": "en",
+      "newGroupRecordKeys": [
+        "practice:0:0",
+        "practice:1:0"
+      ]
+    }
+  ],
+  "errors": []
+}

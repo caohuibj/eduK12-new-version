@@ -10,6 +10,7 @@ export class DualSession {
  constructor(context:DualContext,ports:DualPorts,private changed:()=>void,private now=()=>performance.now()){this.context=validateDualContext(context);this.manifest=dualManifest(this.context);this.ports={prepareLocalAttempt:ports.prepareLocalAttempt.bind(ports),persistLocalDraft:ports.persistLocalDraft.bind(ports),finalize:ports.finalize.bind(ports)}}
  get retained(){return structuredClone([...this.records,...this.pending?[this.pending]:[]])}
  get practicePassed(){return this.practiceIndex===3&&this.correct>=3}
+ get practiceIncomplete(){return this.lastFeedback?.raw.status==='interrupted'}
  get canRetryPractice(){return this.round+1<3}
  async prepare(){if(this.view!=='intro'||this.opened||this.disposed)return;this.view='preparing';this.changed();try{const receipt=await this.ports.prepareLocalAttempt(structuredClone(this.context),structuredClone(this.manifest),{...this.realm});if(this.disposed)return
   if(receipt.fresh!==true||receipt.contextKey!==this.context.contextKey||receipt.bindingDigest!==digest({context:this.context,manifest:this.manifest,realm:this.realm}))throw Error('Fresh durable dual identity required');this.opened=true;this.view='practice-ready';this.changed()
@@ -20,7 +21,7 @@ export class DualSession {
  private start(now:number){const plan=this.phase==='test'?this.manifest.formal[this.formalIndex]:this.manifest.practice[this.round][this.practiceIndex];if(!plan)throw Error('Dual budget exhausted');this.capture=new DualCapture(this.context.snapshot.config,plan,now);this.view='running';this.changed()}
  tick(now:number){if(this.disposed||this.view!=='running'||!this.capture)return;this.capture.tick(now);if(this.capture.done)this.captureDone()}
  input(event:DualInputEvent){if(this.disposed||this.view!=='running'||!this.capture)return;this.capture.input(event);if(this.capture.done)this.captureDone();else this.changed()}
- private captureDone(){const raw=structuredClone(this.capture!.raw);this.capture=null;if(raw.status!=='complete'){this.aborted=true;if(!this.reason)this.reason=raw.stopReason??'capture-stopped'}
+ private captureDone(){const raw=structuredClone(this.capture!.raw);this.capture=null;if(raw.status!=='complete'&&this.phase==='test'){this.aborted=true;if(!this.reason)this.reason=raw.stopReason??'capture-stopped'}
   if(this.phase==='practice'){const correct=raw.status==='complete'&&allDualCorrect(raw.state,raw.plan);if(correct)this.correct++;this.lastFeedback={correct,raw}}
   const base={contextKey:this.context.contextKey,phase:this.phase,round:raw.plan.round,index:raw.plan.index,raw,configHash:this.context.snapshot.configHash,protocolSignature:this.context.snapshot.protocolSignature,manifestHash:this.context.manifestHash,realm:{...this.realm},recordKey:`${this.phase}:${raw.plan.round}:${raw.plan.index}`}
   this.pending={...base,recordDigest:digest(base)};this.view='saving-item';this.changed();void this.persist()}
@@ -29,11 +30,13 @@ export class DualSession {
   this.records.push(record);this.pending=null;if(this.disposed)return
   if(this.phase==='practice'){this.practiceIndex++;this.view=this.aborted?'stopped':'feedback';this.changed()}else{this.formalIndex++;if(this.aborted||this.formalIndex===this.context.snapshot.config.totalTrials){this.view='saving-final';this.changed()}else if(this.manifest.formal[this.formalIndex].blockIndex!==record.raw.plan.blockIndex){this.view=this.context.snapshot.config.profile==='research'&&this.formalIndex%75===0?'break':'block-ready';this.changed()}else this.start(this.now())}
  }catch{if(!this.disposed){this.aborted=true;if(!this.reason)this.reason='local-save-failure';this.view='retry';this.changed()}}finally{this.busy=false;if(!this.disposed&&this.view==='saving-final')void this.finish()}}
- nextPractice(now:number){if(this.disposed||this.view!=='feedback'||this.practiceIndex>=3)return;this.start(now)}
+ nextPractice(now:number){if(this.disposed||this.view!=='feedback'||this.practiceIndex>=3||this.practiceIncomplete)return;this.start(now)}
  acceptPractice(){if(this.disposed||this.view!=='feedback'||!this.practicePassed)return;this.view='formal-ready';this.changed()}
- reviewInstructions(){if(this.disposed||this.view!=='feedback'||this.practiceIndex!==3||this.practicePassed||!this.canRetryPractice)return;this.view='practice-instructions';this.changed()}
+ reviewInstructions(){if(this.disposed||this.view!=='feedback'||(!this.practiceIncomplete&&this.practiceIndex!==3)||this.practicePassed||!this.canRetryPractice)return;this.view='practice-instructions';this.changed()}
  endPractice(){if(this.disposed||this.phase!=='practice'||!['intro','practice-ready','feedback','practice-instructions','formal-ready'].includes(this.view))return;this.reason='practice-ended';this.view='stopped';this.changed()}
- stop(reason:string,now:number){if(this.disposed||!['running','saving-item','formal-ready','block-ready','break'].includes(this.view))return;this.aborted=true;if(!this.reason)this.reason=reason
+ stop(reason:string,now:number){if(this.disposed||!['running','saving-item','formal-ready','block-ready','break'].includes(this.view))return
+  const retryablePractice=this.phase==='practice'&&this.view==='running'&&!['participant-ended','context-disposed','page-hidden'].includes(reason)
+  if(!retryablePractice){this.aborted=true;if(!this.reason)this.reason=reason}
   if(this.capture){this.capture.interrupt(reason,now);this.captureDone()}else if(this.view==='saving-item')return;else if(this.phase==='test'){this.view='saving-final';this.changed();void this.finish()}else{this.view='stopped';this.changed()}}
  async retry(){if(this.disposed||this.busy||this.view!=='retry')return;if(this.pending)await this.persist();else await this.finish()}
  private async finish(){if(this.disposed||this.busy||this.pending||this.phase!=='test')return;this.busy=true;this.view='saving-final';this.changed()

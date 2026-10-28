@@ -1,0 +1,120 @@
+{
+  "baseline": "a67f425269283d8281379fdf8234f9fd6b0acebc",
+  "recordedAt": "2026-10-28T03:18:45.048Z",
+  "node": "v24.21.0",
+  "nodeExecutable": "/tmp/cognitive-node-env/node-v24.21.0-linux-x64/bin/node",
+  "vitest": "4.1.11",
+  "typescript": "5.6.3",
+  "dependencies": "Existing parent-supplied links; no install/full node_modules byte inventory.",
+  "results": [
+    {
+      "artifact": "practice-original.json",
+      "passed": 1,
+      "failed": 1,
+      "filtered": 0
+    },
+    {
+      "artifact": "practice-fixed.json",
+      "passed": 2,
+      "failed": 0,
+      "filtered": 0
+    },
+    {
+      "artifact": "practice-boundaries.json",
+      "passed": 2,
+      "failed": 0,
+      "filtered": 1
+    }
+  ],
+  "commands": [
+    {
+      "cwd": "/workspace/cognitive-review-horizon/server-version/frontend",
+      "command": "/tmp/cognitive-node-env/node-v24.21.0-linux-x64/bin/node node_modules/vitest/vitest.mjs run src/modules/cognitive/tasks/dual-arrow/practice-interruption.test.tsx --maxWorkers=1 --reporter=json --outputFile=/workspace/cognitive-review-horizon/docs/cognitive-library/onboarding-content-20261028/parallel-review/dual-arrow/practice-original.json",
+      "exit": 1
+    },
+    {
+      "cwd": "/workspace/cognitive-review-horizon/server-version/frontend",
+      "command": "/tmp/cognitive-node-env/node-v24.21.0-linux-x64/bin/node node_modules/vitest/vitest.mjs run src/modules/cognitive/tasks/dual-arrow/practice-interruption.test.tsx --maxWorkers=1 --reporter=json --outputFile=/workspace/cognitive-review-horizon/docs/cognitive-library/onboarding-content-20261028/parallel-review/dual-arrow/practice-fixed.json",
+      "exit": 0
+    },
+    {
+      "cwd": "/workspace/cognitive-review-horizon/server-version/frontend",
+      "command": "/tmp/cognitive-node-env/node-v24.21.0-linux-x64/bin/node node_modules/vitest/vitest.mjs run src/modules/cognitive/tasks/dual-arrow/practice-interruption.test.tsx --maxWorkers=1 -t 'waits for|explicit ending' --reporter=json --outputFile=/workspace/cognitive-review-horizon/docs/cognitive-library/onboarding-content-20261028/parallel-review/dual-arrow/practice-boundaries.json",
+      "exit": 0
+    },
+    {
+      "cwd": "/workspace/cognitive-review-horizon",
+      "command": "/tmp/cognitive-node-env/node-v24.21.0-linux-x64/bin/node docs/cognitive-library/onboarding-content-20261028/parallel-review/dual-arrow/audit-records.cjs",
+      "exit": 0
+    },
+    {
+      "cwd": "/workspace/cognitive-review-horizon",
+      "command": "/tmp/cognitive-node-env/node-v24.21.0-linux-x64/bin/node server-version/scripts/cognitive/dual-content.cjs --check",
+      "exit": 0,
+      "stdout": "Dual pure protocol/review/report match backend source\n"
+    },
+    {
+      "cwd": "/workspace/cognitive-review-horizon",
+      "command": "/tmp/cognitive-node-env/node-v24.21.0-linux-x64/bin/node docs/cognitive-library/onboarding-content-20261028/parallel-review/dual-arrow/check-types.cjs",
+      "exit": 0,
+      "diagnostics": 0,
+      "sources": 63
+    },
+    {
+      "cwd": "/workspace/cognitive-review-horizon",
+      "command": "/tmp/cognitive-node-env/node-v24.21.0-linux-x64/bin/node docs/cognitive-library/onboarding-content-20261028/parallel-review/dual-arrow/preview-practice.cjs",
+      "exit": 1,
+      "reason": "Browser launch failed before pages due to outer sandbox mapping Chromium helper owner; source/settings unchanged."
+    },
+    {
+      "cwd": "/workspace/cognitive-review-horizon",
+      "command": "/tmp/cognitive-node-env/node-v24.21.0-linux-x64/bin/node docs/cognitive-library/onboarding-content-20261028/parallel-review/dual-arrow/preview-practice.cjs",
+      "sandboxPermissions": "require_escalated",
+      "exit": 0,
+      "browserSandbox": true,
+      "loopbackOnly": true
+    }
+  ],
+  "originalSourceNote": "practice-original.test-source.tsx.txt is reconstructed after execution by removing the exact two subsequently-added boundary blocks; not a contemporaneously recorded original source digest. Baseline product sources remain exact Git base; raw failure JSON/log retain original identity.",
+  "inputSHA256": {
+    "server-version/frontend/src/modules/cognitive/tasks/dual-arrow/practice-interruption.test.tsx": "c7bb285e6297e2e0a74628f83f2781ce36fb7a4eb8829a3f8cf11b8e6de2d687",
+    "server-version/frontend/src/modules/cognitive/tasks/dual-arrow/session.ts": "99c2c0fbed89ff736551a6e641902fcae899d962f9a09e4bf96e3e051fdb86de",
+    "server-version/frontend/src/modules/cognitive/tasks/dual-arrow/DualArrowTask.tsx": "5f21604f920cc2cdb715ff6490c4d9c183b82956c2c3cc42a9d4ce5e0e883d07",
+    "server-version/frontend/src/modules/cognitive/tasks/dual-arrow/DualInstructions.tsx": "8c614f744245b60d08ca6d7ccefc33df95bea0aba497c4c35b840db167c9ac0e",
+    "server-version/frontend/vitest.config.ts": "3d757d2b1cee6c1c09a3ec7016b296aa159c938f83365e2370a1d423f29917db",
+    "server-version/frontend/tsconfig.app.json": "97ed0e951ac068a9b2d08635b327932db8e41193f9c82e8291a919b7c68bd62e",
+    "server-version/frontend/package-lock.json": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+    "server-version/backend/package-lock.json": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450"
+  },
+  "artifactSHA256": {
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/dual-arrow/README.md": "45ab50f65d286a106e710da07fefad96d18521ae333ec3dba2f29ce6100575b1",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/dual-arrow/audit-receipt.json": "9a0e39234acc9f80d8abe0ca25a13ba38425e00fa27eeb513dd38e2edb3beb41",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/dual-arrow/audit-records.cjs": "944f4bb860a8ee8afec8f5c5443c4d8fe38759cf0794fdd3acc63d5ec358838d",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/dual-arrow/audit-records.log": "0d2e3f0613ec3f1220c1938fc25baf8342a54e25f5c2caf4f0504adfdab75fa8",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/dual-arrow/browser-practice-failure.json": "b1c097f76427efc7ff41370d0a4e7fe6c3b2dd267af21b60edbba3ce39d6d86d",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/dual-arrow/browser-practice-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/dual-arrow/browser-practice.json": "45c801290a8cfcd91e27ee766818a3d0a95d2b85ae19ed74a2ed9b0a42a81726",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/dual-arrow/browser-practice.log": "1b65a51048996d06b2e820e85bad8ddc8cbc5d9e258a293242bc7e9a69f02216",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/dual-arrow/check-types.cjs": "c9412af3e7dbff07b0b6e6166a8069bc8bb27162c19ee27173a53cbfa7cedab7",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/dual-arrow/direct-types-initial.json": "4d56c2e90481edb0ba5838eaf8067c623446b785f1016f6912184fef013e4005",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/dual-arrow/direct-types.json": "4d56c2e90481edb0ba5838eaf8067c623446b785f1016f6912184fef013e4005",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/dual-arrow/direct-types.log": "c9db930c4ed03238086df1f56bf5cc14b7f29115b47d62db33eb25771265435a",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/dual-arrow/historical-input-comparison.json": "194fb680d085735ab6e41635cea4a93e965e415b5d3da30315996ea37189db33",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/dual-arrow/practice-boundaries.json": "cd2d3f23f09d04983e138d418039cbdee4f70f90cca73672a829449ba4b93671",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/dual-arrow/practice-boundaries.log": "65f52f1e9361768fa58b7cfb217e790dfb074676dfeed8fd4e2bd822dedb085b",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/dual-arrow/practice-fixed.json": "401441470fac31696ed9922864a7034c1971b93b851705026b489e3d5d36201d",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/dual-arrow/practice-fixed.log": "8095061646ca79b107e889d70df12ef7538d937e2ab3b85e72d685fa2cb4812f",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/dual-arrow/practice-original.json": "4a45b03af6457a1a6a9fa177329013d964dea84dda51b4307188a16cdfb8819e",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/dual-arrow/practice-original.log": "3040f751041703bd6235784a287f85e20107c38bc68b676f8d5309f774b8c3dc",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/dual-arrow/practice-original.test-source.tsx.txt": "93786b925c611b8131c5d03c29803d77f7d9dfc240912ab98c7ae1d5d26f5bb2",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/dual-arrow/presentation-reuse.json": "5e8f14b880f9b9d5769f10921121ddd308aa1ad78e198ab420f3a2378a2a0e1a",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/dual-arrow/preview-practice.cjs": "e61d14b62d7d0d1b3115bcb1437262acae725860883f1e69fa2abe6e9f840b1a",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/dual-arrow/public-reports.json": "e28a6b44387963bbe1473fdf529654d99d3e5dcfe5ef11c8b60555322441741c",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/dual-arrow/representative-inputs.json": "4593dc0fe34b6b6dc38db34fecb31456e3c0bf730b94c84110e65b8f8e5f270e",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/dual-arrow/screens/interrupted-en-phone.png": "b23de2d9711e12495a82cd5888de67355c770c42167ca5a985ba7415fd2bc3db",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/dual-arrow/screens/interrupted-zh-phone.png": "3115542df895af032fc10267e1a8804e1824c89829f5ad33f0b2babbddf9e3c0",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/dual-arrow/screens/reread-en-phone.png": "7960c5024eb51711dd838d234e35f48cd074413e5091b3eda59c45ec82074e21",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/dual-arrow/screens/reread-zh-phone.png": "dc65368bce3e2890a9e36cd1e3c8a39bf77ea3ab6999e2581c0dde441f707a73"
+  },
+  "remaining": "Parent independent review/integration only; no denied or uncertain actions."
+}

@@ -1,0 +1,3562 @@
+{
+  "synthetic": true,
+  "sessionJourney": false,
+  "note": "Independent scorer fixtures using actual frozen plans/capture/envelopes; not permission to resume an interrupted formal session.",
+  "inputs": {
+    "firstResponseNoise": {
+      "session": {
+        "schemaVersion": 1,
+        "frozenAt": "2026-10-27T00:00:00.000Z",
+        "testType": "dual-arrow",
+        "configVersion": "0.1.0",
+        "engineVersion": "0.1.0",
+        "scoringVersion": "0.1.0",
+        "config": {
+          "profile": "experience",
+          "totalTrials": 60,
+          "trialsPerBlock": 10,
+          "cycles": 2,
+          "modes": [
+            "blue",
+            "red",
+            "dual"
+          ],
+          "deadlineMs": 5000,
+          "fixationMinMs": 300,
+          "fixationMaxMs": 799,
+          "correctFeedbackMs": 500,
+          "errorFeedbackMs": 1000,
+          "stimulus": {
+            "width": 300,
+            "height": 260,
+            "background": "#000000",
+            "blue": "#00AAFF",
+            "red": "#E53935",
+            "blueX": 110,
+            "blueY": 113.75,
+            "redX": 190,
+            "redY": 146.25,
+            "size": 65,
+            "shaftWidth": 8,
+            "shaftLength": 45,
+            "headLength": 32.5,
+            "headHalfHeight": 16.25,
+            "fixationLength": 12,
+            "fixationStroke": 2
+          },
+          "inputPolicy": "fresh-first-down-per-required-channel-v1",
+          "practice": {
+            "version": "dual-easier-three-v1",
+            "trials": 3,
+            "deadlineMs": 8000,
+            "minimumCorrect": 3,
+            "maxRounds": 3,
+            "repeatInstructionsBeforeRetry": true
+          },
+          "profileDefinitionVersion": "0.1.0",
+          "metricDefinitionVersion": "0.1.0",
+          "qualityDefinitionVersion": "0.1.0",
+          "reportDefinitionVersion": "0.1.0",
+          "presentationVersion": "0.1.0"
+        },
+        "configHash": "501243f598715a0cf1a3120a1ccd220cf13126081f7f36a26624f626b6f31eef",
+        "protocol": {
+          "schemaVersion": 1,
+          "key": "dual-arrow/0.1.0/0.1.0",
+          "version": "0.1.0",
+          "clock": "performance",
+          "randomizationAlgorithmVersion": "dual-fnv1a-utf16-xorshift32-latin-balanced-v1",
+          "trialEnvelopeVersion": 1,
+          "phases": [
+            {
+              "key": "test",
+              "persists": true,
+              "required": true
+            }
+          ],
+          "measurementCriticalConfigPaths": [
+            "*"
+          ]
+        },
+        "protocolSignature": "64fc8fae22d489ec151fd3225ec690aa568ea12b11dd60d3890bf11ea8cbed4c"
+      },
+      "config": {
+        "profile": "experience",
+        "totalTrials": 60,
+        "trialsPerBlock": 10,
+        "cycles": 2,
+        "modes": [
+          "blue",
+          "red",
+          "dual"
+        ],
+        "deadlineMs": 5000,
+        "fixationMinMs": 300,
+        "fixationMaxMs": 799,
+        "correctFeedbackMs": 500,
+        "errorFeedbackMs": 1000,
+        "stimulus": {
+          "width": 300,
+          "height": 260,
+          "background": "#000000",
+          "blue": "#00AAFF",
+          "red": "#E53935",
+          "blueX": 110,
+          "blueY": 113.75,
+          "redX": 190,
+          "redY": 146.25,
+          "size": 65,
+          "shaftWidth": 8,
+          "shaftLength": 45,
+          "headLength": 32.5,
+          "headHalfHeight": 16.25,
+          "fixationLength": 12,
+          "fixationStroke": 2
+        },
+        "inputPolicy": "fresh-first-down-per-required-channel-v1",
+        "practice": {
+          "version": "dual-easier-three-v1",
+          "trials": 3,
+          "deadlineMs": 8000,
+          "minimumCorrect": 3,
+          "maxRounds": 3,
+          "repeatInstructionsBeforeRetry": true
+        },
+        "profileDefinitionVersion": "0.1.0",
+        "metricDefinitionVersion": "0.1.0",
+        "qualityDefinitionVersion": "0.1.0",
+        "reportDefinitionVersion": "0.1.0",
+        "presentationVersion": "0.1.0"
+      },
+      "randomSeed": "independent-dual-review-0",
+      "trials": [
+        {
+          "schemaVersion": 1,
+          "trialIndex": 0,
+          "phase": "test",
+          "condition": "dual",
+          "startedAtPerfMs": 100,
+          "endedAtPerfMs": 1605,
+          "durationMs": 1505,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 0,
+              "phase": "test",
+              "round": 0,
+              "blockIndex": 0,
+              "cycle": 0,
+              "withinBlock": 0,
+              "mode": "dual",
+              "blue": "left",
+              "red": "right",
+              "fixationMs": 405,
+              "deadlineMs": 5000
+            },
+            "startedAtPerfMs": 100,
+            "endedAtPerfMs": 1605,
+            "status": "complete",
+            "stopReason": null,
+            "events": [
+              {
+                "kind": "down",
+                "atMs": 101,
+                "channel": "blue",
+                "direction": "left",
+                "token": "pointer:early",
+                "input": "touch",
+                "key": null,
+                "repeat": false,
+                "primary": true
+              },
+              {
+                "kind": "stimulus",
+                "atMs": 505
+              },
+              {
+                "kind": "down",
+                "atMs": 505,
+                "channel": "red",
+                "direction": "right",
+                "token": "pointer:early",
+                "input": "touch",
+                "key": null,
+                "repeat": false,
+                "primary": false
+              },
+              {
+                "kind": "up",
+                "atMs": 506,
+                "channel": "blue",
+                "direction": "left",
+                "token": "pointer:early",
+                "input": "touch",
+                "key": null,
+                "repeat": false,
+                "primary": true
+              },
+              {
+                "kind": "down",
+                "atMs": 515,
+                "channel": "blue",
+                "direction": "right",
+                "token": "pointer:blue",
+                "input": "touch",
+                "key": null,
+                "repeat": false,
+                "primary": true
+              },
+              {
+                "kind": "up",
+                "atMs": 516,
+                "channel": "blue",
+                "direction": "right",
+                "token": "pointer:blue",
+                "input": "touch",
+                "key": null,
+                "repeat": false,
+                "primary": true
+              },
+              {
+                "kind": "down",
+                "atMs": 525,
+                "channel": "blue",
+                "direction": "left",
+                "token": "pointer:correction",
+                "input": "touch",
+                "key": null,
+                "repeat": false,
+                "primary": true
+              },
+              {
+                "kind": "up",
+                "atMs": 526,
+                "channel": "blue",
+                "direction": "left",
+                "token": "pointer:correction",
+                "input": "touch",
+                "key": null,
+                "repeat": false,
+                "primary": true
+              },
+              {
+                "kind": "down",
+                "atMs": 605,
+                "channel": "red",
+                "direction": "right",
+                "token": "pointer:red",
+                "input": "touch",
+                "key": null,
+                "repeat": false,
+                "primary": false
+              },
+              {
+                "kind": "finish",
+                "atMs": 1605
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "stimulusAtMs": 505,
+              "feedbackAtMs": 605,
+              "completeAtMs": 1605,
+              "endReason": "responses",
+              "responses": {
+                "blue": {
+                  "required": true,
+                  "choice": "right",
+                  "atMs": 515,
+                  "input": "touch",
+                  "token": "pointer:blue",
+                  "key": null
+                },
+                "red": {
+                  "required": true,
+                  "choice": "right",
+                  "atMs": 605,
+                  "input": "touch",
+                  "token": "pointer:red",
+                  "key": null
+                }
+              },
+              "held": [
+                {
+                  "token": "pointer:red",
+                  "channel": "red",
+                  "direction": "right",
+                  "stage": "stimulus"
+                }
+              ],
+              "ignored": {
+                "early": 1,
+                "inactive": 0,
+                "held": 1,
+                "answered": 1,
+                "late": 0
+              }
+            },
+            "ignoredRepeatCount": 3,
+            "overflow": false
+          }
+        }
+      ]
+    },
+    "atDeadlineMissing": {
+      "session": {
+        "schemaVersion": 1,
+        "frozenAt": "2026-10-27T00:00:00.000Z",
+        "testType": "dual-arrow",
+        "configVersion": "0.1.0",
+        "engineVersion": "0.1.0",
+        "scoringVersion": "0.1.0",
+        "config": {
+          "profile": "experience",
+          "totalTrials": 60,
+          "trialsPerBlock": 10,
+          "cycles": 2,
+          "modes": [
+            "blue",
+            "red",
+            "dual"
+          ],
+          "deadlineMs": 5000,
+          "fixationMinMs": 300,
+          "fixationMaxMs": 799,
+          "correctFeedbackMs": 500,
+          "errorFeedbackMs": 1000,
+          "stimulus": {
+            "width": 300,
+            "height": 260,
+            "background": "#000000",
+            "blue": "#00AAFF",
+            "red": "#E53935",
+            "blueX": 110,
+            "blueY": 113.75,
+            "redX": 190,
+            "redY": 146.25,
+            "size": 65,
+            "shaftWidth": 8,
+            "shaftLength": 45,
+            "headLength": 32.5,
+            "headHalfHeight": 16.25,
+            "fixationLength": 12,
+            "fixationStroke": 2
+          },
+          "inputPolicy": "fresh-first-down-per-required-channel-v1",
+          "practice": {
+            "version": "dual-easier-three-v1",
+            "trials": 3,
+            "deadlineMs": 8000,
+            "minimumCorrect": 3,
+            "maxRounds": 3,
+            "repeatInstructionsBeforeRetry": true
+          },
+          "profileDefinitionVersion": "0.1.0",
+          "metricDefinitionVersion": "0.1.0",
+          "qualityDefinitionVersion": "0.1.0",
+          "reportDefinitionVersion": "0.1.0",
+          "presentationVersion": "0.1.0"
+        },
+        "configHash": "501243f598715a0cf1a3120a1ccd220cf13126081f7f36a26624f626b6f31eef",
+        "protocol": {
+          "schemaVersion": 1,
+          "key": "dual-arrow/0.1.0/0.1.0",
+          "version": "0.1.0",
+          "clock": "performance",
+          "randomizationAlgorithmVersion": "dual-fnv1a-utf16-xorshift32-latin-balanced-v1",
+          "trialEnvelopeVersion": 1,
+          "phases": [
+            {
+              "key": "test",
+              "persists": true,
+              "required": true
+            }
+          ],
+          "measurementCriticalConfigPaths": [
+            "*"
+          ]
+        },
+        "protocolSignature": "64fc8fae22d489ec151fd3225ec690aa568ea12b11dd60d3890bf11ea8cbed4c"
+      },
+      "config": {
+        "profile": "experience",
+        "totalTrials": 60,
+        "trialsPerBlock": 10,
+        "cycles": 2,
+        "modes": [
+          "blue",
+          "red",
+          "dual"
+        ],
+        "deadlineMs": 5000,
+        "fixationMinMs": 300,
+        "fixationMaxMs": 799,
+        "correctFeedbackMs": 500,
+        "errorFeedbackMs": 1000,
+        "stimulus": {
+          "width": 300,
+          "height": 260,
+          "background": "#000000",
+          "blue": "#00AAFF",
+          "red": "#E53935",
+          "blueX": 110,
+          "blueY": 113.75,
+          "redX": 190,
+          "redY": 146.25,
+          "size": 65,
+          "shaftWidth": 8,
+          "shaftLength": 45,
+          "headLength": 32.5,
+          "headHalfHeight": 16.25,
+          "fixationLength": 12,
+          "fixationStroke": 2
+        },
+        "inputPolicy": "fresh-first-down-per-required-channel-v1",
+        "practice": {
+          "version": "dual-easier-three-v1",
+          "trials": 3,
+          "deadlineMs": 8000,
+          "minimumCorrect": 3,
+          "maxRounds": 3,
+          "repeatInstructionsBeforeRetry": true
+        },
+        "profileDefinitionVersion": "0.1.0",
+        "metricDefinitionVersion": "0.1.0",
+        "qualityDefinitionVersion": "0.1.0",
+        "reportDefinitionVersion": "0.1.0",
+        "presentationVersion": "0.1.0"
+      },
+      "randomSeed": "independent-dual-review-0",
+      "trials": [
+        {
+          "schemaVersion": 1,
+          "trialIndex": 0,
+          "phase": "test",
+          "condition": "dual",
+          "startedAtPerfMs": 100,
+          "endedAtPerfMs": 6505,
+          "durationMs": 6405,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 0,
+              "phase": "test",
+              "round": 0,
+              "blockIndex": 0,
+              "cycle": 0,
+              "withinBlock": 0,
+              "mode": "dual",
+              "blue": "left",
+              "red": "right",
+              "fixationMs": 405,
+              "deadlineMs": 5000
+            },
+            "startedAtPerfMs": 100,
+            "endedAtPerfMs": 6505,
+            "status": "complete",
+            "stopReason": null,
+            "events": [
+              {
+                "kind": "stimulus",
+                "atMs": 505
+              },
+              {
+                "kind": "timeout",
+                "atMs": 5505
+              },
+              {
+                "kind": "down",
+                "atMs": 5505,
+                "channel": "blue",
+                "direction": "left",
+                "token": "pointer:blue",
+                "input": "touch",
+                "key": null,
+                "repeat": false,
+                "primary": true
+              },
+              {
+                "kind": "finish",
+                "atMs": 6505
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "stimulusAtMs": 505,
+              "feedbackAtMs": 5505,
+              "completeAtMs": 6505,
+              "endReason": "deadline",
+              "responses": {
+                "blue": {
+                  "required": true,
+                  "choice": null,
+                  "atMs": null,
+                  "input": null,
+                  "token": null,
+                  "key": null
+                },
+                "red": {
+                  "required": true,
+                  "choice": null,
+                  "atMs": null,
+                  "input": null,
+                  "token": null,
+                  "key": null
+                }
+              },
+              "held": [
+                {
+                  "token": "pointer:blue",
+                  "channel": "blue",
+                  "direction": "left",
+                  "stage": "feedback"
+                }
+              ],
+              "ignored": {
+                "early": 0,
+                "inactive": 0,
+                "held": 0,
+                "answered": 0,
+                "late": 1
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        }
+      ]
+    },
+    "inactiveSingle": {
+      "session": {
+        "schemaVersion": 1,
+        "frozenAt": "2026-10-27T00:00:00.000Z",
+        "testType": "dual-arrow",
+        "configVersion": "0.1.0",
+        "engineVersion": "0.1.0",
+        "scoringVersion": "0.1.0",
+        "config": {
+          "profile": "experience",
+          "totalTrials": 60,
+          "trialsPerBlock": 10,
+          "cycles": 2,
+          "modes": [
+            "blue",
+            "red",
+            "dual"
+          ],
+          "deadlineMs": 5000,
+          "fixationMinMs": 300,
+          "fixationMaxMs": 799,
+          "correctFeedbackMs": 500,
+          "errorFeedbackMs": 1000,
+          "stimulus": {
+            "width": 300,
+            "height": 260,
+            "background": "#000000",
+            "blue": "#00AAFF",
+            "red": "#E53935",
+            "blueX": 110,
+            "blueY": 113.75,
+            "redX": 190,
+            "redY": 146.25,
+            "size": 65,
+            "shaftWidth": 8,
+            "shaftLength": 45,
+            "headLength": 32.5,
+            "headHalfHeight": 16.25,
+            "fixationLength": 12,
+            "fixationStroke": 2
+          },
+          "inputPolicy": "fresh-first-down-per-required-channel-v1",
+          "practice": {
+            "version": "dual-easier-three-v1",
+            "trials": 3,
+            "deadlineMs": 8000,
+            "minimumCorrect": 3,
+            "maxRounds": 3,
+            "repeatInstructionsBeforeRetry": true
+          },
+          "profileDefinitionVersion": "0.1.0",
+          "metricDefinitionVersion": "0.1.0",
+          "qualityDefinitionVersion": "0.1.0",
+          "reportDefinitionVersion": "0.1.0",
+          "presentationVersion": "0.1.0"
+        },
+        "configHash": "501243f598715a0cf1a3120a1ccd220cf13126081f7f36a26624f626b6f31eef",
+        "protocol": {
+          "schemaVersion": 1,
+          "key": "dual-arrow/0.1.0/0.1.0",
+          "version": "0.1.0",
+          "clock": "performance",
+          "randomizationAlgorithmVersion": "dual-fnv1a-utf16-xorshift32-latin-balanced-v1",
+          "trialEnvelopeVersion": 1,
+          "phases": [
+            {
+              "key": "test",
+              "persists": true,
+              "required": true
+            }
+          ],
+          "measurementCriticalConfigPaths": [
+            "*"
+          ]
+        },
+        "protocolSignature": "64fc8fae22d489ec151fd3225ec690aa568ea12b11dd60d3890bf11ea8cbed4c"
+      },
+      "config": {
+        "profile": "experience",
+        "totalTrials": 60,
+        "trialsPerBlock": 10,
+        "cycles": 2,
+        "modes": [
+          "blue",
+          "red",
+          "dual"
+        ],
+        "deadlineMs": 5000,
+        "fixationMinMs": 300,
+        "fixationMaxMs": 799,
+        "correctFeedbackMs": 500,
+        "errorFeedbackMs": 1000,
+        "stimulus": {
+          "width": 300,
+          "height": 260,
+          "background": "#000000",
+          "blue": "#00AAFF",
+          "red": "#E53935",
+          "blueX": 110,
+          "blueY": 113.75,
+          "redX": 190,
+          "redY": 146.25,
+          "size": 65,
+          "shaftWidth": 8,
+          "shaftLength": 45,
+          "headLength": 32.5,
+          "headHalfHeight": 16.25,
+          "fixationLength": 12,
+          "fixationStroke": 2
+        },
+        "inputPolicy": "fresh-first-down-per-required-channel-v1",
+        "practice": {
+          "version": "dual-easier-three-v1",
+          "trials": 3,
+          "deadlineMs": 8000,
+          "minimumCorrect": 3,
+          "maxRounds": 3,
+          "repeatInstructionsBeforeRetry": true
+        },
+        "profileDefinitionVersion": "0.1.0",
+        "metricDefinitionVersion": "0.1.0",
+        "qualityDefinitionVersion": "0.1.0",
+        "reportDefinitionVersion": "0.1.0",
+        "presentationVersion": "0.1.0"
+      },
+      "randomSeed": "independent-dual-review-2",
+      "trials": [
+        {
+          "schemaVersion": 1,
+          "trialIndex": 0,
+          "phase": "test",
+          "condition": "blue",
+          "startedAtPerfMs": 100,
+          "endedAtPerfMs": 1067,
+          "durationMs": 967,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 0,
+              "phase": "test",
+              "round": 0,
+              "blockIndex": 0,
+              "cycle": 0,
+              "withinBlock": 0,
+              "mode": "blue",
+              "blue": "right",
+              "red": "right",
+              "fixationMs": 467,
+              "deadlineMs": 5000
+            },
+            "startedAtPerfMs": 100,
+            "endedAtPerfMs": 1067,
+            "status": "complete",
+            "stopReason": null,
+            "events": [
+              {
+                "kind": "stimulus",
+                "atMs": 567
+              },
+              {
+                "kind": "down",
+                "atMs": 567,
+                "channel": "red",
+                "direction": "left",
+                "token": "pointer:red",
+                "input": "touch",
+                "key": null,
+                "repeat": false,
+                "primary": false
+              },
+              {
+                "kind": "down",
+                "atMs": 567,
+                "channel": "blue",
+                "direction": "right",
+                "token": "pointer:blue",
+                "input": "touch",
+                "key": null,
+                "repeat": false,
+                "primary": true
+              },
+              {
+                "kind": "finish",
+                "atMs": 1067
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "stimulusAtMs": 567,
+              "feedbackAtMs": 567,
+              "completeAtMs": 1067,
+              "endReason": "responses",
+              "responses": {
+                "blue": {
+                  "required": true,
+                  "choice": "right",
+                  "atMs": 567,
+                  "input": "touch",
+                  "token": "pointer:blue",
+                  "key": null
+                },
+                "red": {
+                  "required": false,
+                  "choice": null,
+                  "atMs": null,
+                  "input": null,
+                  "token": null,
+                  "key": null
+                }
+              },
+              "held": [
+                {
+                  "token": "pointer:red",
+                  "channel": "red",
+                  "direction": "left",
+                  "stage": "stimulus"
+                },
+                {
+                  "token": "pointer:blue",
+                  "channel": "blue",
+                  "direction": "right",
+                  "stage": "stimulus"
+                }
+              ],
+              "ignored": {
+                "early": 0,
+                "inactive": 1,
+                "held": 0,
+                "answered": 0,
+                "late": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        }
+      ]
+    },
+    "unclosedInterruption": {
+      "session": {
+        "schemaVersion": 1,
+        "frozenAt": "2026-10-27T00:00:00.000Z",
+        "testType": "dual-arrow",
+        "configVersion": "0.1.0",
+        "engineVersion": "0.1.0",
+        "scoringVersion": "0.1.0",
+        "config": {
+          "profile": "experience",
+          "totalTrials": 60,
+          "trialsPerBlock": 10,
+          "cycles": 2,
+          "modes": [
+            "blue",
+            "red",
+            "dual"
+          ],
+          "deadlineMs": 5000,
+          "fixationMinMs": 300,
+          "fixationMaxMs": 799,
+          "correctFeedbackMs": 500,
+          "errorFeedbackMs": 1000,
+          "stimulus": {
+            "width": 300,
+            "height": 260,
+            "background": "#000000",
+            "blue": "#00AAFF",
+            "red": "#E53935",
+            "blueX": 110,
+            "blueY": 113.75,
+            "redX": 190,
+            "redY": 146.25,
+            "size": 65,
+            "shaftWidth": 8,
+            "shaftLength": 45,
+            "headLength": 32.5,
+            "headHalfHeight": 16.25,
+            "fixationLength": 12,
+            "fixationStroke": 2
+          },
+          "inputPolicy": "fresh-first-down-per-required-channel-v1",
+          "practice": {
+            "version": "dual-easier-three-v1",
+            "trials": 3,
+            "deadlineMs": 8000,
+            "minimumCorrect": 3,
+            "maxRounds": 3,
+            "repeatInstructionsBeforeRetry": true
+          },
+          "profileDefinitionVersion": "0.1.0",
+          "metricDefinitionVersion": "0.1.0",
+          "qualityDefinitionVersion": "0.1.0",
+          "reportDefinitionVersion": "0.1.0",
+          "presentationVersion": "0.1.0"
+        },
+        "configHash": "501243f598715a0cf1a3120a1ccd220cf13126081f7f36a26624f626b6f31eef",
+        "protocol": {
+          "schemaVersion": 1,
+          "key": "dual-arrow/0.1.0/0.1.0",
+          "version": "0.1.0",
+          "clock": "performance",
+          "randomizationAlgorithmVersion": "dual-fnv1a-utf16-xorshift32-latin-balanced-v1",
+          "trialEnvelopeVersion": 1,
+          "phases": [
+            {
+              "key": "test",
+              "persists": true,
+              "required": true
+            }
+          ],
+          "measurementCriticalConfigPaths": [
+            "*"
+          ]
+        },
+        "protocolSignature": "64fc8fae22d489ec151fd3225ec690aa568ea12b11dd60d3890bf11ea8cbed4c"
+      },
+      "config": {
+        "profile": "experience",
+        "totalTrials": 60,
+        "trialsPerBlock": 10,
+        "cycles": 2,
+        "modes": [
+          "blue",
+          "red",
+          "dual"
+        ],
+        "deadlineMs": 5000,
+        "fixationMinMs": 300,
+        "fixationMaxMs": 799,
+        "correctFeedbackMs": 500,
+        "errorFeedbackMs": 1000,
+        "stimulus": {
+          "width": 300,
+          "height": 260,
+          "background": "#000000",
+          "blue": "#00AAFF",
+          "red": "#E53935",
+          "blueX": 110,
+          "blueY": 113.75,
+          "redX": 190,
+          "redY": 146.25,
+          "size": 65,
+          "shaftWidth": 8,
+          "shaftLength": 45,
+          "headLength": 32.5,
+          "headHalfHeight": 16.25,
+          "fixationLength": 12,
+          "fixationStroke": 2
+        },
+        "inputPolicy": "fresh-first-down-per-required-channel-v1",
+        "practice": {
+          "version": "dual-easier-three-v1",
+          "trials": 3,
+          "deadlineMs": 8000,
+          "minimumCorrect": 3,
+          "maxRounds": 3,
+          "repeatInstructionsBeforeRetry": true
+        },
+        "profileDefinitionVersion": "0.1.0",
+        "metricDefinitionVersion": "0.1.0",
+        "qualityDefinitionVersion": "0.1.0",
+        "reportDefinitionVersion": "0.1.0",
+        "presentationVersion": "0.1.0"
+      },
+      "randomSeed": "independent-dual-review-0",
+      "trials": [
+        {
+          "schemaVersion": 1,
+          "trialIndex": 0,
+          "phase": "test",
+          "condition": "dual",
+          "startedAtPerfMs": 100,
+          "endedAtPerfMs": 506,
+          "durationMs": 406,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [
+            "resume"
+          ],
+          "payload": {
+            "plan": {
+              "index": 0,
+              "phase": "test",
+              "round": 0,
+              "blockIndex": 0,
+              "cycle": 0,
+              "withinBlock": 0,
+              "mode": "dual",
+              "blue": "left",
+              "red": "right",
+              "fixationMs": 405,
+              "deadlineMs": 5000
+            },
+            "startedAtPerfMs": 100,
+            "endedAtPerfMs": 506,
+            "status": "interrupted",
+            "stopReason": "blur",
+            "events": [
+              {
+                "kind": "stimulus",
+                "atMs": 505
+              },
+              {
+                "kind": "down",
+                "atMs": 505,
+                "channel": "blue",
+                "direction": "left",
+                "token": "pointer:blue",
+                "input": "touch",
+                "key": null,
+                "repeat": false,
+                "primary": true
+              }
+            ],
+            "state": {
+              "stage": "stimulus",
+              "stimulusAtMs": 505,
+              "feedbackAtMs": null,
+              "completeAtMs": null,
+              "endReason": null,
+              "responses": {
+                "blue": {
+                  "required": true,
+                  "choice": "left",
+                  "atMs": 505,
+                  "input": "touch",
+                  "token": "pointer:blue",
+                  "key": null
+                },
+                "red": {
+                  "required": true,
+                  "choice": null,
+                  "atMs": null,
+                  "input": null,
+                  "token": null,
+                  "key": null
+                }
+              },
+              "held": [
+                {
+                  "token": "pointer:blue",
+                  "channel": "blue",
+                  "direction": "left",
+                  "stage": "stimulus"
+                }
+              ],
+              "ignored": {
+                "early": 0,
+                "inactive": 0,
+                "held": 0,
+                "answered": 0,
+                "late": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        }
+      ]
+    },
+    "closedInterruption": {
+      "session": {
+        "schemaVersion": 1,
+        "frozenAt": "2026-10-27T00:00:00.000Z",
+        "testType": "dual-arrow",
+        "configVersion": "0.1.0",
+        "engineVersion": "0.1.0",
+        "scoringVersion": "0.1.0",
+        "config": {
+          "profile": "experience",
+          "totalTrials": 60,
+          "trialsPerBlock": 10,
+          "cycles": 2,
+          "modes": [
+            "blue",
+            "red",
+            "dual"
+          ],
+          "deadlineMs": 5000,
+          "fixationMinMs": 300,
+          "fixationMaxMs": 799,
+          "correctFeedbackMs": 500,
+          "errorFeedbackMs": 1000,
+          "stimulus": {
+            "width": 300,
+            "height": 260,
+            "background": "#000000",
+            "blue": "#00AAFF",
+            "red": "#E53935",
+            "blueX": 110,
+            "blueY": 113.75,
+            "redX": 190,
+            "redY": 146.25,
+            "size": 65,
+            "shaftWidth": 8,
+            "shaftLength": 45,
+            "headLength": 32.5,
+            "headHalfHeight": 16.25,
+            "fixationLength": 12,
+            "fixationStroke": 2
+          },
+          "inputPolicy": "fresh-first-down-per-required-channel-v1",
+          "practice": {
+            "version": "dual-easier-three-v1",
+            "trials": 3,
+            "deadlineMs": 8000,
+            "minimumCorrect": 3,
+            "maxRounds": 3,
+            "repeatInstructionsBeforeRetry": true
+          },
+          "profileDefinitionVersion": "0.1.0",
+          "metricDefinitionVersion": "0.1.0",
+          "qualityDefinitionVersion": "0.1.0",
+          "reportDefinitionVersion": "0.1.0",
+          "presentationVersion": "0.1.0"
+        },
+        "configHash": "501243f598715a0cf1a3120a1ccd220cf13126081f7f36a26624f626b6f31eef",
+        "protocol": {
+          "schemaVersion": 1,
+          "key": "dual-arrow/0.1.0/0.1.0",
+          "version": "0.1.0",
+          "clock": "performance",
+          "randomizationAlgorithmVersion": "dual-fnv1a-utf16-xorshift32-latin-balanced-v1",
+          "trialEnvelopeVersion": 1,
+          "phases": [
+            {
+              "key": "test",
+              "persists": true,
+              "required": true
+            }
+          ],
+          "measurementCriticalConfigPaths": [
+            "*"
+          ]
+        },
+        "protocolSignature": "64fc8fae22d489ec151fd3225ec690aa568ea12b11dd60d3890bf11ea8cbed4c"
+      },
+      "config": {
+        "profile": "experience",
+        "totalTrials": 60,
+        "trialsPerBlock": 10,
+        "cycles": 2,
+        "modes": [
+          "blue",
+          "red",
+          "dual"
+        ],
+        "deadlineMs": 5000,
+        "fixationMinMs": 300,
+        "fixationMaxMs": 799,
+        "correctFeedbackMs": 500,
+        "errorFeedbackMs": 1000,
+        "stimulus": {
+          "width": 300,
+          "height": 260,
+          "background": "#000000",
+          "blue": "#00AAFF",
+          "red": "#E53935",
+          "blueX": 110,
+          "blueY": 113.75,
+          "redX": 190,
+          "redY": 146.25,
+          "size": 65,
+          "shaftWidth": 8,
+          "shaftLength": 45,
+          "headLength": 32.5,
+          "headHalfHeight": 16.25,
+          "fixationLength": 12,
+          "fixationStroke": 2
+        },
+        "inputPolicy": "fresh-first-down-per-required-channel-v1",
+        "practice": {
+          "version": "dual-easier-three-v1",
+          "trials": 3,
+          "deadlineMs": 8000,
+          "minimumCorrect": 3,
+          "maxRounds": 3,
+          "repeatInstructionsBeforeRetry": true
+        },
+        "profileDefinitionVersion": "0.1.0",
+        "metricDefinitionVersion": "0.1.0",
+        "qualityDefinitionVersion": "0.1.0",
+        "reportDefinitionVersion": "0.1.0",
+        "presentationVersion": "0.1.0"
+      },
+      "randomSeed": "independent-dual-review-0",
+      "trials": [
+        {
+          "schemaVersion": 1,
+          "trialIndex": 0,
+          "phase": "test",
+          "condition": "dual",
+          "startedAtPerfMs": 100,
+          "endedAtPerfMs": 516,
+          "durationMs": 416,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [
+            "resume"
+          ],
+          "payload": {
+            "plan": {
+              "index": 0,
+              "phase": "test",
+              "round": 0,
+              "blockIndex": 0,
+              "cycle": 0,
+              "withinBlock": 0,
+              "mode": "dual",
+              "blue": "left",
+              "red": "right",
+              "fixationMs": 405,
+              "deadlineMs": 5000
+            },
+            "startedAtPerfMs": 100,
+            "endedAtPerfMs": 516,
+            "status": "interrupted",
+            "stopReason": "blur",
+            "events": [
+              {
+                "kind": "stimulus",
+                "atMs": 505
+              },
+              {
+                "kind": "down",
+                "atMs": 505,
+                "channel": "blue",
+                "direction": "left",
+                "token": "pointer:blue",
+                "input": "touch",
+                "key": null,
+                "repeat": false,
+                "primary": true
+              },
+              {
+                "kind": "down",
+                "atMs": 515,
+                "channel": "red",
+                "direction": "right",
+                "token": "pointer:red",
+                "input": "touch",
+                "key": null,
+                "repeat": false,
+                "primary": false
+              }
+            ],
+            "state": {
+              "stage": "feedback",
+              "stimulusAtMs": 505,
+              "feedbackAtMs": 515,
+              "completeAtMs": null,
+              "endReason": "responses",
+              "responses": {
+                "blue": {
+                  "required": true,
+                  "choice": "left",
+                  "atMs": 505,
+                  "input": "touch",
+                  "token": "pointer:blue",
+                  "key": null
+                },
+                "red": {
+                  "required": true,
+                  "choice": "right",
+                  "atMs": 515,
+                  "input": "touch",
+                  "token": "pointer:red",
+                  "key": null
+                }
+              },
+              "held": [
+                {
+                  "token": "pointer:blue",
+                  "channel": "blue",
+                  "direction": "left",
+                  "stage": "stimulus"
+                },
+                {
+                  "token": "pointer:red",
+                  "channel": "red",
+                  "direction": "right",
+                  "stage": "stimulus"
+                }
+              ],
+              "ignored": {
+                "early": 0,
+                "inactive": 0,
+                "held": 0,
+                "answered": 0,
+                "late": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        }
+      ]
+    },
+    "signedPrefix": {
+      "session": {
+        "schemaVersion": 1,
+        "frozenAt": "2026-10-27T00:00:00.000Z",
+        "testType": "dual-arrow",
+        "configVersion": "0.1.0",
+        "engineVersion": "0.1.0",
+        "scoringVersion": "0.1.0",
+        "config": {
+          "profile": "experience",
+          "totalTrials": 60,
+          "trialsPerBlock": 10,
+          "cycles": 2,
+          "modes": [
+            "blue",
+            "red",
+            "dual"
+          ],
+          "deadlineMs": 5000,
+          "fixationMinMs": 300,
+          "fixationMaxMs": 799,
+          "correctFeedbackMs": 500,
+          "errorFeedbackMs": 1000,
+          "stimulus": {
+            "width": 300,
+            "height": 260,
+            "background": "#000000",
+            "blue": "#00AAFF",
+            "red": "#E53935",
+            "blueX": 110,
+            "blueY": 113.75,
+            "redX": 190,
+            "redY": 146.25,
+            "size": 65,
+            "shaftWidth": 8,
+            "shaftLength": 45,
+            "headLength": 32.5,
+            "headHalfHeight": 16.25,
+            "fixationLength": 12,
+            "fixationStroke": 2
+          },
+          "inputPolicy": "fresh-first-down-per-required-channel-v1",
+          "practice": {
+            "version": "dual-easier-three-v1",
+            "trials": 3,
+            "deadlineMs": 8000,
+            "minimumCorrect": 3,
+            "maxRounds": 3,
+            "repeatInstructionsBeforeRetry": true
+          },
+          "profileDefinitionVersion": "0.1.0",
+          "metricDefinitionVersion": "0.1.0",
+          "qualityDefinitionVersion": "0.1.0",
+          "reportDefinitionVersion": "0.1.0",
+          "presentationVersion": "0.1.0"
+        },
+        "configHash": "501243f598715a0cf1a3120a1ccd220cf13126081f7f36a26624f626b6f31eef",
+        "protocol": {
+          "schemaVersion": 1,
+          "key": "dual-arrow/0.1.0/0.1.0",
+          "version": "0.1.0",
+          "clock": "performance",
+          "randomizationAlgorithmVersion": "dual-fnv1a-utf16-xorshift32-latin-balanced-v1",
+          "trialEnvelopeVersion": 1,
+          "phases": [
+            {
+              "key": "test",
+              "persists": true,
+              "required": true
+            }
+          ],
+          "measurementCriticalConfigPaths": [
+            "*"
+          ]
+        },
+        "protocolSignature": "64fc8fae22d489ec151fd3225ec690aa568ea12b11dd60d3890bf11ea8cbed4c"
+      },
+      "config": {
+        "profile": "experience",
+        "totalTrials": 60,
+        "trialsPerBlock": 10,
+        "cycles": 2,
+        "modes": [
+          "blue",
+          "red",
+          "dual"
+        ],
+        "deadlineMs": 5000,
+        "fixationMinMs": 300,
+        "fixationMaxMs": 799,
+        "correctFeedbackMs": 500,
+        "errorFeedbackMs": 1000,
+        "stimulus": {
+          "width": 300,
+          "height": 260,
+          "background": "#000000",
+          "blue": "#00AAFF",
+          "red": "#E53935",
+          "blueX": 110,
+          "blueY": 113.75,
+          "redX": 190,
+          "redY": 146.25,
+          "size": 65,
+          "shaftWidth": 8,
+          "shaftLength": 45,
+          "headLength": 32.5,
+          "headHalfHeight": 16.25,
+          "fixationLength": 12,
+          "fixationStroke": 2
+        },
+        "inputPolicy": "fresh-first-down-per-required-channel-v1",
+        "practice": {
+          "version": "dual-easier-three-v1",
+          "trials": 3,
+          "deadlineMs": 8000,
+          "minimumCorrect": 3,
+          "maxRounds": 3,
+          "repeatInstructionsBeforeRetry": true
+        },
+        "profileDefinitionVersion": "0.1.0",
+        "metricDefinitionVersion": "0.1.0",
+        "qualityDefinitionVersion": "0.1.0",
+        "reportDefinitionVersion": "0.1.0",
+        "presentationVersion": "0.1.0"
+      },
+      "randomSeed": "independent-dual-review-0",
+      "trials": [
+        {
+          "schemaVersion": 1,
+          "trialIndex": 0,
+          "phase": "test",
+          "condition": "dual",
+          "startedAtPerfMs": 100,
+          "endedAtPerfMs": 6505,
+          "durationMs": 6405,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 0,
+              "phase": "test",
+              "round": 0,
+              "blockIndex": 0,
+              "cycle": 0,
+              "withinBlock": 0,
+              "mode": "dual",
+              "blue": "left",
+              "red": "right",
+              "fixationMs": 405,
+              "deadlineMs": 5000
+            },
+            "startedAtPerfMs": 100,
+            "endedAtPerfMs": 6505,
+            "status": "complete",
+            "stopReason": null,
+            "events": [
+              {
+                "kind": "stimulus",
+                "atMs": 505
+              },
+              {
+                "kind": "down",
+                "atMs": 505,
+                "channel": "blue",
+                "direction": "right",
+                "token": "pointer:blue",
+                "input": "touch",
+                "key": null,
+                "repeat": false,
+                "primary": true
+              },
+              {
+                "kind": "down",
+                "atMs": 506,
+                "channel": "blue",
+                "direction": "left",
+                "token": "pointer:blue-correction",
+                "input": "touch",
+                "key": null,
+                "repeat": false,
+                "primary": true
+              },
+              {
+                "kind": "timeout",
+                "atMs": 5505
+              },
+              {
+                "kind": "finish",
+                "atMs": 6505
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "stimulusAtMs": 505,
+              "feedbackAtMs": 5505,
+              "completeAtMs": 6505,
+              "endReason": "deadline",
+              "responses": {
+                "blue": {
+                  "required": true,
+                  "choice": "right",
+                  "atMs": 505,
+                  "input": "touch",
+                  "token": "pointer:blue",
+                  "key": null
+                },
+                "red": {
+                  "required": true,
+                  "choice": null,
+                  "atMs": null,
+                  "input": null,
+                  "token": null,
+                  "key": null
+                }
+              },
+              "held": [
+                {
+                  "token": "pointer:blue",
+                  "channel": "blue",
+                  "direction": "right",
+                  "stage": "stimulus"
+                },
+                {
+                  "token": "pointer:blue-correction",
+                  "channel": "blue",
+                  "direction": "left",
+                  "stage": "stimulus"
+                }
+              ],
+              "ignored": {
+                "early": 0,
+                "inactive": 0,
+                "held": 0,
+                "answered": 1,
+                "late": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 1,
+          "phase": "test",
+          "condition": "dual",
+          "startedAtPerfMs": 6506,
+          "endedAtPerfMs": 8399,
+          "durationMs": 1893,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 1,
+              "phase": "test",
+              "round": 0,
+              "blockIndex": 0,
+              "cycle": 0,
+              "withinBlock": 1,
+              "mode": "dual",
+              "blue": "right",
+              "red": "right",
+              "fixationMs": 693,
+              "deadlineMs": 5000
+            },
+            "startedAtPerfMs": 6506,
+            "endedAtPerfMs": 8399,
+            "status": "complete",
+            "stopReason": null,
+            "events": [
+              {
+                "kind": "stimulus",
+                "atMs": 7199
+              },
+              {
+                "kind": "down",
+                "atMs": 7199,
+                "channel": "blue",
+                "direction": "right",
+                "token": "pointer:blue",
+                "input": "touch",
+                "key": null,
+                "repeat": false,
+                "primary": true
+              },
+              {
+                "kind": "down",
+                "atMs": 7899,
+                "channel": "red",
+                "direction": "right",
+                "token": "pointer:red",
+                "input": "touch",
+                "key": null,
+                "repeat": false,
+                "primary": false
+              },
+              {
+                "kind": "finish",
+                "atMs": 8399
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "stimulusAtMs": 7199,
+              "feedbackAtMs": 7899,
+              "completeAtMs": 8399,
+              "endReason": "responses",
+              "responses": {
+                "blue": {
+                  "required": true,
+                  "choice": "right",
+                  "atMs": 7199,
+                  "input": "touch",
+                  "token": "pointer:blue",
+                  "key": null
+                },
+                "red": {
+                  "required": true,
+                  "choice": "right",
+                  "atMs": 7899,
+                  "input": "touch",
+                  "token": "pointer:red",
+                  "key": null
+                }
+              },
+              "held": [
+                {
+                  "token": "pointer:blue",
+                  "channel": "blue",
+                  "direction": "right",
+                  "stage": "stimulus"
+                },
+                {
+                  "token": "pointer:red",
+                  "channel": "red",
+                  "direction": "right",
+                  "stage": "stimulus"
+                }
+              ],
+              "ignored": {
+                "early": 0,
+                "inactive": 0,
+                "held": 0,
+                "answered": 0,
+                "late": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 2,
+          "phase": "test",
+          "condition": "dual",
+          "startedAtPerfMs": 8400,
+          "endedAtPerfMs": 10327,
+          "durationMs": 1927,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 2,
+              "phase": "test",
+              "round": 0,
+              "blockIndex": 0,
+              "cycle": 0,
+              "withinBlock": 2,
+              "mode": "dual",
+              "blue": "left",
+              "red": "left",
+              "fixationMs": 727,
+              "deadlineMs": 5000
+            },
+            "startedAtPerfMs": 8400,
+            "endedAtPerfMs": 10327,
+            "status": "complete",
+            "stopReason": null,
+            "events": [
+              {
+                "kind": "stimulus",
+                "atMs": 9127
+              },
+              {
+                "kind": "down",
+                "atMs": 9127,
+                "channel": "blue",
+                "direction": "left",
+                "token": "pointer:blue",
+                "input": "touch",
+                "key": null,
+                "repeat": false,
+                "primary": true
+              },
+              {
+                "kind": "down",
+                "atMs": 9827,
+                "channel": "red",
+                "direction": "left",
+                "token": "pointer:red",
+                "input": "touch",
+                "key": null,
+                "repeat": false,
+                "primary": false
+              },
+              {
+                "kind": "finish",
+                "atMs": 10327
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "stimulusAtMs": 9127,
+              "feedbackAtMs": 9827,
+              "completeAtMs": 10327,
+              "endReason": "responses",
+              "responses": {
+                "blue": {
+                  "required": true,
+                  "choice": "left",
+                  "atMs": 9127,
+                  "input": "touch",
+                  "token": "pointer:blue",
+                  "key": null
+                },
+                "red": {
+                  "required": true,
+                  "choice": "left",
+                  "atMs": 9827,
+                  "input": "touch",
+                  "token": "pointer:red",
+                  "key": null
+                }
+              },
+              "held": [
+                {
+                  "token": "pointer:blue",
+                  "channel": "blue",
+                  "direction": "left",
+                  "stage": "stimulus"
+                },
+                {
+                  "token": "pointer:red",
+                  "channel": "red",
+                  "direction": "left",
+                  "stage": "stimulus"
+                }
+              ],
+              "ignored": {
+                "early": 0,
+                "inactive": 0,
+                "held": 0,
+                "answered": 0,
+                "late": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 3,
+          "phase": "test",
+          "condition": "dual",
+          "startedAtPerfMs": 10328,
+          "endedAtPerfMs": 12181,
+          "durationMs": 1853,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 3,
+              "phase": "test",
+              "round": 0,
+              "blockIndex": 0,
+              "cycle": 0,
+              "withinBlock": 3,
+              "mode": "dual",
+              "blue": "left",
+              "red": "left",
+              "fixationMs": 653,
+              "deadlineMs": 5000
+            },
+            "startedAtPerfMs": 10328,
+            "endedAtPerfMs": 12181,
+            "status": "complete",
+            "stopReason": null,
+            "events": [
+              {
+                "kind": "stimulus",
+                "atMs": 10981
+              },
+              {
+                "kind": "down",
+                "atMs": 10981,
+                "channel": "blue",
+                "direction": "left",
+                "token": "pointer:blue",
+                "input": "touch",
+                "key": null,
+                "repeat": false,
+                "primary": true
+              },
+              {
+                "kind": "down",
+                "atMs": 11681,
+                "channel": "red",
+                "direction": "left",
+                "token": "pointer:red",
+                "input": "touch",
+                "key": null,
+                "repeat": false,
+                "primary": false
+              },
+              {
+                "kind": "finish",
+                "atMs": 12181
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "stimulusAtMs": 10981,
+              "feedbackAtMs": 11681,
+              "completeAtMs": 12181,
+              "endReason": "responses",
+              "responses": {
+                "blue": {
+                  "required": true,
+                  "choice": "left",
+                  "atMs": 10981,
+                  "input": "touch",
+                  "token": "pointer:blue",
+                  "key": null
+                },
+                "red": {
+                  "required": true,
+                  "choice": "left",
+                  "atMs": 11681,
+                  "input": "touch",
+                  "token": "pointer:red",
+                  "key": null
+                }
+              },
+              "held": [
+                {
+                  "token": "pointer:blue",
+                  "channel": "blue",
+                  "direction": "left",
+                  "stage": "stimulus"
+                },
+                {
+                  "token": "pointer:red",
+                  "channel": "red",
+                  "direction": "left",
+                  "stage": "stimulus"
+                }
+              ],
+              "ignored": {
+                "early": 0,
+                "inactive": 0,
+                "held": 0,
+                "answered": 0,
+                "late": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 4,
+          "phase": "test",
+          "condition": "dual",
+          "startedAtPerfMs": 12182,
+          "endedAtPerfMs": 13844,
+          "durationMs": 1662,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 4,
+              "phase": "test",
+              "round": 0,
+              "blockIndex": 0,
+              "cycle": 0,
+              "withinBlock": 4,
+              "mode": "dual",
+              "blue": "right",
+              "red": "right",
+              "fixationMs": 462,
+              "deadlineMs": 5000
+            },
+            "startedAtPerfMs": 12182,
+            "endedAtPerfMs": 13844,
+            "status": "complete",
+            "stopReason": null,
+            "events": [
+              {
+                "kind": "stimulus",
+                "atMs": 12644
+              },
+              {
+                "kind": "down",
+                "atMs": 12644,
+                "channel": "blue",
+                "direction": "right",
+                "token": "pointer:blue",
+                "input": "touch",
+                "key": null,
+                "repeat": false,
+                "primary": true
+              },
+              {
+                "kind": "down",
+                "atMs": 13344,
+                "channel": "red",
+                "direction": "right",
+                "token": "pointer:red",
+                "input": "touch",
+                "key": null,
+                "repeat": false,
+                "primary": false
+              },
+              {
+                "kind": "finish",
+                "atMs": 13844
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "stimulusAtMs": 12644,
+              "feedbackAtMs": 13344,
+              "completeAtMs": 13844,
+              "endReason": "responses",
+              "responses": {
+                "blue": {
+                  "required": true,
+                  "choice": "right",
+                  "atMs": 12644,
+                  "input": "touch",
+                  "token": "pointer:blue",
+                  "key": null
+                },
+                "red": {
+                  "required": true,
+                  "choice": "right",
+                  "atMs": 13344,
+                  "input": "touch",
+                  "token": "pointer:red",
+                  "key": null
+                }
+              },
+              "held": [
+                {
+                  "token": "pointer:blue",
+                  "channel": "blue",
+                  "direction": "right",
+                  "stage": "stimulus"
+                },
+                {
+                  "token": "pointer:red",
+                  "channel": "red",
+                  "direction": "right",
+                  "stage": "stimulus"
+                }
+              ],
+              "ignored": {
+                "early": 0,
+                "inactive": 0,
+                "held": 0,
+                "answered": 0,
+                "late": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 5,
+          "phase": "test",
+          "condition": "dual",
+          "startedAtPerfMs": 13845,
+          "endedAtPerfMs": 15612,
+          "durationMs": 1767,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 5,
+              "phase": "test",
+              "round": 0,
+              "blockIndex": 0,
+              "cycle": 0,
+              "withinBlock": 5,
+              "mode": "dual",
+              "blue": "right",
+              "red": "right",
+              "fixationMs": 567,
+              "deadlineMs": 5000
+            },
+            "startedAtPerfMs": 13845,
+            "endedAtPerfMs": 15612,
+            "status": "complete",
+            "stopReason": null,
+            "events": [
+              {
+                "kind": "stimulus",
+                "atMs": 14412
+              },
+              {
+                "kind": "down",
+                "atMs": 14412,
+                "channel": "blue",
+                "direction": "right",
+                "token": "pointer:blue",
+                "input": "touch",
+                "key": null,
+                "repeat": false,
+                "primary": true
+              },
+              {
+                "kind": "down",
+                "atMs": 15112,
+                "channel": "red",
+                "direction": "right",
+                "token": "pointer:red",
+                "input": "touch",
+                "key": null,
+                "repeat": false,
+                "primary": false
+              },
+              {
+                "kind": "finish",
+                "atMs": 15612
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "stimulusAtMs": 14412,
+              "feedbackAtMs": 15112,
+              "completeAtMs": 15612,
+              "endReason": "responses",
+              "responses": {
+                "blue": {
+                  "required": true,
+                  "choice": "right",
+                  "atMs": 14412,
+                  "input": "touch",
+                  "token": "pointer:blue",
+                  "key": null
+                },
+                "red": {
+                  "required": true,
+                  "choice": "right",
+                  "atMs": 15112,
+                  "input": "touch",
+                  "token": "pointer:red",
+                  "key": null
+                }
+              },
+              "held": [
+                {
+                  "token": "pointer:blue",
+                  "channel": "blue",
+                  "direction": "right",
+                  "stage": "stimulus"
+                },
+                {
+                  "token": "pointer:red",
+                  "channel": "red",
+                  "direction": "right",
+                  "stage": "stimulus"
+                }
+              ],
+              "ignored": {
+                "early": 0,
+                "inactive": 0,
+                "held": 0,
+                "answered": 0,
+                "late": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 6,
+          "phase": "test",
+          "condition": "dual",
+          "startedAtPerfMs": 15613,
+          "endedAtPerfMs": 17567,
+          "durationMs": 1954,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 6,
+              "phase": "test",
+              "round": 0,
+              "blockIndex": 0,
+              "cycle": 0,
+              "withinBlock": 6,
+              "mode": "dual",
+              "blue": "right",
+              "red": "left",
+              "fixationMs": 754,
+              "deadlineMs": 5000
+            },
+            "startedAtPerfMs": 15613,
+            "endedAtPerfMs": 17567,
+            "status": "complete",
+            "stopReason": null,
+            "events": [
+              {
+                "kind": "stimulus",
+                "atMs": 16367
+              },
+              {
+                "kind": "down",
+                "atMs": 16367,
+                "channel": "blue",
+                "direction": "right",
+                "token": "pointer:blue",
+                "input": "touch",
+                "key": null,
+                "repeat": false,
+                "primary": true
+              },
+              {
+                "kind": "down",
+                "atMs": 17067,
+                "channel": "red",
+                "direction": "left",
+                "token": "pointer:red",
+                "input": "touch",
+                "key": null,
+                "repeat": false,
+                "primary": false
+              },
+              {
+                "kind": "finish",
+                "atMs": 17567
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "stimulusAtMs": 16367,
+              "feedbackAtMs": 17067,
+              "completeAtMs": 17567,
+              "endReason": "responses",
+              "responses": {
+                "blue": {
+                  "required": true,
+                  "choice": "right",
+                  "atMs": 16367,
+                  "input": "touch",
+                  "token": "pointer:blue",
+                  "key": null
+                },
+                "red": {
+                  "required": true,
+                  "choice": "left",
+                  "atMs": 17067,
+                  "input": "touch",
+                  "token": "pointer:red",
+                  "key": null
+                }
+              },
+              "held": [
+                {
+                  "token": "pointer:blue",
+                  "channel": "blue",
+                  "direction": "right",
+                  "stage": "stimulus"
+                },
+                {
+                  "token": "pointer:red",
+                  "channel": "red",
+                  "direction": "left",
+                  "stage": "stimulus"
+                }
+              ],
+              "ignored": {
+                "early": 0,
+                "inactive": 0,
+                "held": 0,
+                "answered": 0,
+                "late": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 7,
+          "phase": "test",
+          "condition": "dual",
+          "startedAtPerfMs": 17568,
+          "endedAtPerfMs": 19483,
+          "durationMs": 1915,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 7,
+              "phase": "test",
+              "round": 0,
+              "blockIndex": 0,
+              "cycle": 0,
+              "withinBlock": 7,
+              "mode": "dual",
+              "blue": "left",
+              "red": "right",
+              "fixationMs": 715,
+              "deadlineMs": 5000
+            },
+            "startedAtPerfMs": 17568,
+            "endedAtPerfMs": 19483,
+            "status": "complete",
+            "stopReason": null,
+            "events": [
+              {
+                "kind": "stimulus",
+                "atMs": 18283
+              },
+              {
+                "kind": "down",
+                "atMs": 18283,
+                "channel": "blue",
+                "direction": "left",
+                "token": "pointer:blue",
+                "input": "touch",
+                "key": null,
+                "repeat": false,
+                "primary": true
+              },
+              {
+                "kind": "down",
+                "atMs": 18983,
+                "channel": "red",
+                "direction": "right",
+                "token": "pointer:red",
+                "input": "touch",
+                "key": null,
+                "repeat": false,
+                "primary": false
+              },
+              {
+                "kind": "finish",
+                "atMs": 19483
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "stimulusAtMs": 18283,
+              "feedbackAtMs": 18983,
+              "completeAtMs": 19483,
+              "endReason": "responses",
+              "responses": {
+                "blue": {
+                  "required": true,
+                  "choice": "left",
+                  "atMs": 18283,
+                  "input": "touch",
+                  "token": "pointer:blue",
+                  "key": null
+                },
+                "red": {
+                  "required": true,
+                  "choice": "right",
+                  "atMs": 18983,
+                  "input": "touch",
+                  "token": "pointer:red",
+                  "key": null
+                }
+              },
+              "held": [
+                {
+                  "token": "pointer:blue",
+                  "channel": "blue",
+                  "direction": "left",
+                  "stage": "stimulus"
+                },
+                {
+                  "token": "pointer:red",
+                  "channel": "red",
+                  "direction": "right",
+                  "stage": "stimulus"
+                }
+              ],
+              "ignored": {
+                "early": 0,
+                "inactive": 0,
+                "held": 0,
+                "answered": 0,
+                "late": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 8,
+          "phase": "test",
+          "condition": "dual",
+          "startedAtPerfMs": 19484,
+          "endedAtPerfMs": 20991,
+          "durationMs": 1507,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 8,
+              "phase": "test",
+              "round": 0,
+              "blockIndex": 0,
+              "cycle": 0,
+              "withinBlock": 8,
+              "mode": "dual",
+              "blue": "right",
+              "red": "left",
+              "fixationMs": 307,
+              "deadlineMs": 5000
+            },
+            "startedAtPerfMs": 19484,
+            "endedAtPerfMs": 20991,
+            "status": "complete",
+            "stopReason": null,
+            "events": [
+              {
+                "kind": "stimulus",
+                "atMs": 19791
+              },
+              {
+                "kind": "down",
+                "atMs": 19791,
+                "channel": "blue",
+                "direction": "right",
+                "token": "pointer:blue",
+                "input": "touch",
+                "key": null,
+                "repeat": false,
+                "primary": true
+              },
+              {
+                "kind": "down",
+                "atMs": 20491,
+                "channel": "red",
+                "direction": "left",
+                "token": "pointer:red",
+                "input": "touch",
+                "key": null,
+                "repeat": false,
+                "primary": false
+              },
+              {
+                "kind": "finish",
+                "atMs": 20991
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "stimulusAtMs": 19791,
+              "feedbackAtMs": 20491,
+              "completeAtMs": 20991,
+              "endReason": "responses",
+              "responses": {
+                "blue": {
+                  "required": true,
+                  "choice": "right",
+                  "atMs": 19791,
+                  "input": "touch",
+                  "token": "pointer:blue",
+                  "key": null
+                },
+                "red": {
+                  "required": true,
+                  "choice": "left",
+                  "atMs": 20491,
+                  "input": "touch",
+                  "token": "pointer:red",
+                  "key": null
+                }
+              },
+              "held": [
+                {
+                  "token": "pointer:blue",
+                  "channel": "blue",
+                  "direction": "right",
+                  "stage": "stimulus"
+                },
+                {
+                  "token": "pointer:red",
+                  "channel": "red",
+                  "direction": "left",
+                  "stage": "stimulus"
+                }
+              ],
+              "ignored": {
+                "early": 0,
+                "inactive": 0,
+                "held": 0,
+                "answered": 0,
+                "late": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 9,
+          "phase": "test",
+          "condition": "dual",
+          "startedAtPerfMs": 20992,
+          "endedAtPerfMs": 22528,
+          "durationMs": 1536,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 9,
+              "phase": "test",
+              "round": 0,
+              "blockIndex": 0,
+              "cycle": 0,
+              "withinBlock": 9,
+              "mode": "dual",
+              "blue": "left",
+              "red": "right",
+              "fixationMs": 336,
+              "deadlineMs": 5000
+            },
+            "startedAtPerfMs": 20992,
+            "endedAtPerfMs": 22528,
+            "status": "complete",
+            "stopReason": null,
+            "events": [
+              {
+                "kind": "stimulus",
+                "atMs": 21328
+              },
+              {
+                "kind": "down",
+                "atMs": 21328,
+                "channel": "blue",
+                "direction": "left",
+                "token": "pointer:blue",
+                "input": "touch",
+                "key": null,
+                "repeat": false,
+                "primary": true
+              },
+              {
+                "kind": "down",
+                "atMs": 22028,
+                "channel": "red",
+                "direction": "right",
+                "token": "pointer:red",
+                "input": "touch",
+                "key": null,
+                "repeat": false,
+                "primary": false
+              },
+              {
+                "kind": "finish",
+                "atMs": 22528
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "stimulusAtMs": 21328,
+              "feedbackAtMs": 22028,
+              "completeAtMs": 22528,
+              "endReason": "responses",
+              "responses": {
+                "blue": {
+                  "required": true,
+                  "choice": "left",
+                  "atMs": 21328,
+                  "input": "touch",
+                  "token": "pointer:blue",
+                  "key": null
+                },
+                "red": {
+                  "required": true,
+                  "choice": "right",
+                  "atMs": 22028,
+                  "input": "touch",
+                  "token": "pointer:red",
+                  "key": null
+                }
+              },
+              "held": [
+                {
+                  "token": "pointer:blue",
+                  "channel": "blue",
+                  "direction": "left",
+                  "stage": "stimulus"
+                },
+                {
+                  "token": "pointer:red",
+                  "channel": "red",
+                  "direction": "right",
+                  "stage": "stimulus"
+                }
+              ],
+              "ignored": {
+                "early": 0,
+                "inactive": 0,
+                "held": 0,
+                "answered": 0,
+                "late": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 10,
+          "phase": "test",
+          "condition": "red",
+          "startedAtPerfMs": 22529,
+          "endedAtPerfMs": 23843,
+          "durationMs": 1314,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 10,
+              "phase": "test",
+              "round": 0,
+              "blockIndex": 1,
+              "cycle": 0,
+              "withinBlock": 0,
+              "mode": "red",
+              "blue": "right",
+              "red": "left",
+              "fixationMs": 614,
+              "deadlineMs": 5000
+            },
+            "startedAtPerfMs": 22529,
+            "endedAtPerfMs": 23843,
+            "status": "complete",
+            "stopReason": null,
+            "events": [
+              {
+                "kind": "stimulus",
+                "atMs": 23143
+              },
+              {
+                "kind": "down",
+                "atMs": 23343,
+                "channel": "red",
+                "direction": "left",
+                "token": "pointer:red",
+                "input": "touch",
+                "key": null,
+                "repeat": false,
+                "primary": false
+              },
+              {
+                "kind": "finish",
+                "atMs": 23843
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "stimulusAtMs": 23143,
+              "feedbackAtMs": 23343,
+              "completeAtMs": 23843,
+              "endReason": "responses",
+              "responses": {
+                "blue": {
+                  "required": false,
+                  "choice": null,
+                  "atMs": null,
+                  "input": null,
+                  "token": null,
+                  "key": null
+                },
+                "red": {
+                  "required": true,
+                  "choice": "left",
+                  "atMs": 23343,
+                  "input": "touch",
+                  "token": "pointer:red",
+                  "key": null
+                }
+              },
+              "held": [
+                {
+                  "token": "pointer:red",
+                  "channel": "red",
+                  "direction": "left",
+                  "stage": "stimulus"
+                }
+              ],
+              "ignored": {
+                "early": 0,
+                "inactive": 0,
+                "held": 0,
+                "answered": 0,
+                "late": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 11,
+          "phase": "test",
+          "condition": "red",
+          "startedAtPerfMs": 23844,
+          "endedAtPerfMs": 24995,
+          "durationMs": 1151,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 11,
+              "phase": "test",
+              "round": 0,
+              "blockIndex": 1,
+              "cycle": 0,
+              "withinBlock": 1,
+              "mode": "red",
+              "blue": "left",
+              "red": "left",
+              "fixationMs": 451,
+              "deadlineMs": 5000
+            },
+            "startedAtPerfMs": 23844,
+            "endedAtPerfMs": 24995,
+            "status": "complete",
+            "stopReason": null,
+            "events": [
+              {
+                "kind": "stimulus",
+                "atMs": 24295
+              },
+              {
+                "kind": "down",
+                "atMs": 24495,
+                "channel": "red",
+                "direction": "left",
+                "token": "pointer:red",
+                "input": "touch",
+                "key": null,
+                "repeat": false,
+                "primary": false
+              },
+              {
+                "kind": "finish",
+                "atMs": 24995
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "stimulusAtMs": 24295,
+              "feedbackAtMs": 24495,
+              "completeAtMs": 24995,
+              "endReason": "responses",
+              "responses": {
+                "blue": {
+                  "required": false,
+                  "choice": null,
+                  "atMs": null,
+                  "input": null,
+                  "token": null,
+                  "key": null
+                },
+                "red": {
+                  "required": true,
+                  "choice": "left",
+                  "atMs": 24495,
+                  "input": "touch",
+                  "token": "pointer:red",
+                  "key": null
+                }
+              },
+              "held": [
+                {
+                  "token": "pointer:red",
+                  "channel": "red",
+                  "direction": "left",
+                  "stage": "stimulus"
+                }
+              ],
+              "ignored": {
+                "early": 0,
+                "inactive": 0,
+                "held": 0,
+                "answered": 0,
+                "late": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 12,
+          "phase": "test",
+          "condition": "red",
+          "startedAtPerfMs": 24996,
+          "endedAtPerfMs": 26266,
+          "durationMs": 1270,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 12,
+              "phase": "test",
+              "round": 0,
+              "blockIndex": 1,
+              "cycle": 0,
+              "withinBlock": 2,
+              "mode": "red",
+              "blue": "left",
+              "red": "left",
+              "fixationMs": 570,
+              "deadlineMs": 5000
+            },
+            "startedAtPerfMs": 24996,
+            "endedAtPerfMs": 26266,
+            "status": "complete",
+            "stopReason": null,
+            "events": [
+              {
+                "kind": "stimulus",
+                "atMs": 25566
+              },
+              {
+                "kind": "down",
+                "atMs": 25766,
+                "channel": "red",
+                "direction": "left",
+                "token": "pointer:red",
+                "input": "touch",
+                "key": null,
+                "repeat": false,
+                "primary": false
+              },
+              {
+                "kind": "finish",
+                "atMs": 26266
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "stimulusAtMs": 25566,
+              "feedbackAtMs": 25766,
+              "completeAtMs": 26266,
+              "endReason": "responses",
+              "responses": {
+                "blue": {
+                  "required": false,
+                  "choice": null,
+                  "atMs": null,
+                  "input": null,
+                  "token": null,
+                  "key": null
+                },
+                "red": {
+                  "required": true,
+                  "choice": "left",
+                  "atMs": 25766,
+                  "input": "touch",
+                  "token": "pointer:red",
+                  "key": null
+                }
+              },
+              "held": [
+                {
+                  "token": "pointer:red",
+                  "channel": "red",
+                  "direction": "left",
+                  "stage": "stimulus"
+                }
+              ],
+              "ignored": {
+                "early": 0,
+                "inactive": 0,
+                "held": 0,
+                "answered": 0,
+                "late": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 13,
+          "phase": "test",
+          "condition": "red",
+          "startedAtPerfMs": 26267,
+          "endedAtPerfMs": 27299,
+          "durationMs": 1032,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 13,
+              "phase": "test",
+              "round": 0,
+              "blockIndex": 1,
+              "cycle": 0,
+              "withinBlock": 3,
+              "mode": "red",
+              "blue": "left",
+              "red": "right",
+              "fixationMs": 332,
+              "deadlineMs": 5000
+            },
+            "startedAtPerfMs": 26267,
+            "endedAtPerfMs": 27299,
+            "status": "complete",
+            "stopReason": null,
+            "events": [
+              {
+                "kind": "stimulus",
+                "atMs": 26599
+              },
+              {
+                "kind": "down",
+                "atMs": 26799,
+                "channel": "red",
+                "direction": "right",
+                "token": "pointer:red",
+                "input": "touch",
+                "key": null,
+                "repeat": false,
+                "primary": false
+              },
+              {
+                "kind": "finish",
+                "atMs": 27299
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "stimulusAtMs": 26599,
+              "feedbackAtMs": 26799,
+              "completeAtMs": 27299,
+              "endReason": "responses",
+              "responses": {
+                "blue": {
+                  "required": false,
+                  "choice": null,
+                  "atMs": null,
+                  "input": null,
+                  "token": null,
+                  "key": null
+                },
+                "red": {
+                  "required": true,
+                  "choice": "right",
+                  "atMs": 26799,
+                  "input": "touch",
+                  "token": "pointer:red",
+                  "key": null
+                }
+              },
+              "held": [
+                {
+                  "token": "pointer:red",
+                  "channel": "red",
+                  "direction": "right",
+                  "stage": "stimulus"
+                }
+              ],
+              "ignored": {
+                "early": 0,
+                "inactive": 0,
+                "held": 0,
+                "answered": 0,
+                "late": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 14,
+          "phase": "test",
+          "condition": "red",
+          "startedAtPerfMs": 27300,
+          "endedAtPerfMs": 28635,
+          "durationMs": 1335,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 14,
+              "phase": "test",
+              "round": 0,
+              "blockIndex": 1,
+              "cycle": 0,
+              "withinBlock": 4,
+              "mode": "red",
+              "blue": "right",
+              "red": "right",
+              "fixationMs": 635,
+              "deadlineMs": 5000
+            },
+            "startedAtPerfMs": 27300,
+            "endedAtPerfMs": 28635,
+            "status": "complete",
+            "stopReason": null,
+            "events": [
+              {
+                "kind": "stimulus",
+                "atMs": 27935
+              },
+              {
+                "kind": "down",
+                "atMs": 28135,
+                "channel": "red",
+                "direction": "right",
+                "token": "pointer:red",
+                "input": "touch",
+                "key": null,
+                "repeat": false,
+                "primary": false
+              },
+              {
+                "kind": "finish",
+                "atMs": 28635
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "stimulusAtMs": 27935,
+              "feedbackAtMs": 28135,
+              "completeAtMs": 28635,
+              "endReason": "responses",
+              "responses": {
+                "blue": {
+                  "required": false,
+                  "choice": null,
+                  "atMs": null,
+                  "input": null,
+                  "token": null,
+                  "key": null
+                },
+                "red": {
+                  "required": true,
+                  "choice": "right",
+                  "atMs": 28135,
+                  "input": "touch",
+                  "token": "pointer:red",
+                  "key": null
+                }
+              },
+              "held": [
+                {
+                  "token": "pointer:red",
+                  "channel": "red",
+                  "direction": "right",
+                  "stage": "stimulus"
+                }
+              ],
+              "ignored": {
+                "early": 0,
+                "inactive": 0,
+                "held": 0,
+                "answered": 0,
+                "late": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 15,
+          "phase": "test",
+          "condition": "red",
+          "startedAtPerfMs": 28636,
+          "endedAtPerfMs": 29649,
+          "durationMs": 1013,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 15,
+              "phase": "test",
+              "round": 0,
+              "blockIndex": 1,
+              "cycle": 0,
+              "withinBlock": 5,
+              "mode": "red",
+              "blue": "right",
+              "red": "left",
+              "fixationMs": 313,
+              "deadlineMs": 5000
+            },
+            "startedAtPerfMs": 28636,
+            "endedAtPerfMs": 29649,
+            "status": "complete",
+            "stopReason": null,
+            "events": [
+              {
+                "kind": "stimulus",
+                "atMs": 28949
+              },
+              {
+                "kind": "down",
+                "atMs": 29149,
+                "channel": "red",
+                "direction": "left",
+                "token": "pointer:red",
+                "input": "touch",
+                "key": null,
+                "repeat": false,
+                "primary": false
+              },
+              {
+                "kind": "finish",
+                "atMs": 29649
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "stimulusAtMs": 28949,
+              "feedbackAtMs": 29149,
+              "completeAtMs": 29649,
+              "endReason": "responses",
+              "responses": {
+                "blue": {
+                  "required": false,
+                  "choice": null,
+                  "atMs": null,
+                  "input": null,
+                  "token": null,
+                  "key": null
+                },
+                "red": {
+                  "required": true,
+                  "choice": "left",
+                  "atMs": 29149,
+                  "input": "touch",
+                  "token": "pointer:red",
+                  "key": null
+                }
+              },
+              "held": [
+                {
+                  "token": "pointer:red",
+                  "channel": "red",
+                  "direction": "left",
+                  "stage": "stimulus"
+                }
+              ],
+              "ignored": {
+                "early": 0,
+                "inactive": 0,
+                "held": 0,
+                "answered": 0,
+                "late": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 16,
+          "phase": "test",
+          "condition": "red",
+          "startedAtPerfMs": 29650,
+          "endedAtPerfMs": 30989,
+          "durationMs": 1339,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 16,
+              "phase": "test",
+              "round": 0,
+              "blockIndex": 1,
+              "cycle": 0,
+              "withinBlock": 6,
+              "mode": "red",
+              "blue": "right",
+              "red": "right",
+              "fixationMs": 639,
+              "deadlineMs": 5000
+            },
+            "startedAtPerfMs": 29650,
+            "endedAtPerfMs": 30989,
+            "status": "complete",
+            "stopReason": null,
+            "events": [
+              {
+                "kind": "stimulus",
+                "atMs": 30289
+              },
+              {
+                "kind": "down",
+                "atMs": 30489,
+                "channel": "red",
+                "direction": "right",
+                "token": "pointer:red",
+                "input": "touch",
+                "key": null,
+                "repeat": false,
+                "primary": false
+              },
+              {
+                "kind": "finish",
+                "atMs": 30989
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "stimulusAtMs": 30289,
+              "feedbackAtMs": 30489,
+              "completeAtMs": 30989,
+              "endReason": "responses",
+              "responses": {
+                "blue": {
+                  "required": false,
+                  "choice": null,
+                  "atMs": null,
+                  "input": null,
+                  "token": null,
+                  "key": null
+                },
+                "red": {
+                  "required": true,
+                  "choice": "right",
+                  "atMs": 30489,
+                  "input": "touch",
+                  "token": "pointer:red",
+                  "key": null
+                }
+              },
+              "held": [
+                {
+                  "token": "pointer:red",
+                  "channel": "red",
+                  "direction": "right",
+                  "stage": "stimulus"
+                }
+              ],
+              "ignored": {
+                "early": 0,
+                "inactive": 0,
+                "held": 0,
+                "answered": 0,
+                "late": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 17,
+          "phase": "test",
+          "condition": "red",
+          "startedAtPerfMs": 30990,
+          "endedAtPerfMs": 32114,
+          "durationMs": 1124,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 17,
+              "phase": "test",
+              "round": 0,
+              "blockIndex": 1,
+              "cycle": 0,
+              "withinBlock": 7,
+              "mode": "red",
+              "blue": "right",
+              "red": "right",
+              "fixationMs": 424,
+              "deadlineMs": 5000
+            },
+            "startedAtPerfMs": 30990,
+            "endedAtPerfMs": 32114,
+            "status": "complete",
+            "stopReason": null,
+            "events": [
+              {
+                "kind": "stimulus",
+                "atMs": 31414
+              },
+              {
+                "kind": "down",
+                "atMs": 31614,
+                "channel": "red",
+                "direction": "right",
+                "token": "pointer:red",
+                "input": "touch",
+                "key": null,
+                "repeat": false,
+                "primary": false
+              },
+              {
+                "kind": "finish",
+                "atMs": 32114
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "stimulusAtMs": 31414,
+              "feedbackAtMs": 31614,
+              "completeAtMs": 32114,
+              "endReason": "responses",
+              "responses": {
+                "blue": {
+                  "required": false,
+                  "choice": null,
+                  "atMs": null,
+                  "input": null,
+                  "token": null,
+                  "key": null
+                },
+                "red": {
+                  "required": true,
+                  "choice": "right",
+                  "atMs": 31614,
+                  "input": "touch",
+                  "token": "pointer:red",
+                  "key": null
+                }
+              },
+              "held": [
+                {
+                  "token": "pointer:red",
+                  "channel": "red",
+                  "direction": "right",
+                  "stage": "stimulus"
+                }
+              ],
+              "ignored": {
+                "early": 0,
+                "inactive": 0,
+                "held": 0,
+                "answered": 0,
+                "late": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 18,
+          "phase": "test",
+          "condition": "red",
+          "startedAtPerfMs": 32115,
+          "endedAtPerfMs": 33520,
+          "durationMs": 1405,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 18,
+              "phase": "test",
+              "round": 0,
+              "blockIndex": 1,
+              "cycle": 0,
+              "withinBlock": 8,
+              "mode": "red",
+              "blue": "left",
+              "red": "right",
+              "fixationMs": 705,
+              "deadlineMs": 5000
+            },
+            "startedAtPerfMs": 32115,
+            "endedAtPerfMs": 33520,
+            "status": "complete",
+            "stopReason": null,
+            "events": [
+              {
+                "kind": "stimulus",
+                "atMs": 32820
+              },
+              {
+                "kind": "down",
+                "atMs": 33020,
+                "channel": "red",
+                "direction": "right",
+                "token": "pointer:red",
+                "input": "touch",
+                "key": null,
+                "repeat": false,
+                "primary": false
+              },
+              {
+                "kind": "finish",
+                "atMs": 33520
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "stimulusAtMs": 32820,
+              "feedbackAtMs": 33020,
+              "completeAtMs": 33520,
+              "endReason": "responses",
+              "responses": {
+                "blue": {
+                  "required": false,
+                  "choice": null,
+                  "atMs": null,
+                  "input": null,
+                  "token": null,
+                  "key": null
+                },
+                "red": {
+                  "required": true,
+                  "choice": "right",
+                  "atMs": 33020,
+                  "input": "touch",
+                  "token": "pointer:red",
+                  "key": null
+                }
+              },
+              "held": [
+                {
+                  "token": "pointer:red",
+                  "channel": "red",
+                  "direction": "right",
+                  "stage": "stimulus"
+                }
+              ],
+              "ignored": {
+                "early": 0,
+                "inactive": 0,
+                "held": 0,
+                "answered": 0,
+                "late": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 19,
+          "phase": "test",
+          "condition": "red",
+          "startedAtPerfMs": 33521,
+          "endedAtPerfMs": 34697,
+          "durationMs": 1176,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 19,
+              "phase": "test",
+              "round": 0,
+              "blockIndex": 1,
+              "cycle": 0,
+              "withinBlock": 9,
+              "mode": "red",
+              "blue": "left",
+              "red": "right",
+              "fixationMs": 476,
+              "deadlineMs": 5000
+            },
+            "startedAtPerfMs": 33521,
+            "endedAtPerfMs": 34697,
+            "status": "complete",
+            "stopReason": null,
+            "events": [
+              {
+                "kind": "stimulus",
+                "atMs": 33997
+              },
+              {
+                "kind": "down",
+                "atMs": 34197,
+                "channel": "red",
+                "direction": "right",
+                "token": "pointer:red",
+                "input": "touch",
+                "key": null,
+                "repeat": false,
+                "primary": false
+              },
+              {
+                "kind": "finish",
+                "atMs": 34697
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "stimulusAtMs": 33997,
+              "feedbackAtMs": 34197,
+              "completeAtMs": 34697,
+              "endReason": "responses",
+              "responses": {
+                "blue": {
+                  "required": false,
+                  "choice": null,
+                  "atMs": null,
+                  "input": null,
+                  "token": null,
+                  "key": null
+                },
+                "red": {
+                  "required": true,
+                  "choice": "right",
+                  "atMs": 34197,
+                  "input": "touch",
+                  "token": "pointer:red",
+                  "key": null
+                }
+              },
+              "held": [
+                {
+                  "token": "pointer:red",
+                  "channel": "red",
+                  "direction": "right",
+                  "stage": "stimulus"
+                }
+              ],
+              "ignored": {
+                "early": 0,
+                "inactive": 0,
+                "held": 0,
+                "answered": 0,
+                "late": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 20,
+          "phase": "test",
+          "condition": "blue",
+          "startedAtPerfMs": 34698,
+          "endedAtPerfMs": 36164,
+          "durationMs": 1466,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "plan": {
+              "index": 20,
+              "phase": "test",
+              "round": 0,
+              "blockIndex": 2,
+              "cycle": 0,
+              "withinBlock": 0,
+              "mode": "blue",
+              "blue": "left",
+              "red": "right",
+              "fixationMs": 666,
+              "deadlineMs": 5000
+            },
+            "startedAtPerfMs": 34698,
+            "endedAtPerfMs": 36164,
+            "status": "complete",
+            "stopReason": null,
+            "events": [
+              {
+                "kind": "stimulus",
+                "atMs": 35364
+              },
+              {
+                "kind": "down",
+                "atMs": 35664,
+                "channel": "blue",
+                "direction": "left",
+                "token": "pointer:blue",
+                "input": "touch",
+                "key": null,
+                "repeat": false,
+                "primary": true
+              },
+              {
+                "kind": "finish",
+                "atMs": 36164
+              }
+            ],
+            "state": {
+              "stage": "complete",
+              "stimulusAtMs": 35364,
+              "feedbackAtMs": 35664,
+              "completeAtMs": 36164,
+              "endReason": "responses",
+              "responses": {
+                "blue": {
+                  "required": true,
+                  "choice": "left",
+                  "atMs": 35664,
+                  "input": "touch",
+                  "token": "pointer:blue",
+                  "key": null
+                },
+                "red": {
+                  "required": false,
+                  "choice": null,
+                  "atMs": null,
+                  "input": null,
+                  "token": null,
+                  "key": null
+                }
+              },
+              "held": [
+                {
+                  "token": "pointer:blue",
+                  "channel": "blue",
+                  "direction": "left",
+                  "stage": "stimulus"
+                }
+              ],
+              "ignored": {
+                "early": 0,
+                "inactive": 0,
+                "held": 0,
+                "answered": 0,
+                "late": 0
+              }
+            },
+            "ignoredRepeatCount": 0,
+            "overflow": false
+          }
+        }
+      ]
+    }
+  }
+}

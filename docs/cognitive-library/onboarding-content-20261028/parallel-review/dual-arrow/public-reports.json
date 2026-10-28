@@ -1,0 +1,410 @@
+{
+  "firstResponseNoise": {
+    "testType": "dual-arrow",
+    "engineVersion": "0.1.0",
+    "scoringVersion": "0.1.0",
+    "configVersion": "0.1.0",
+    "reportDefinitionVersion": "0.1.0",
+    "presentationVersion": "0.1.0",
+    "configHash": "501243f598715a0cf1a3120a1ccd220cf13126081f7f36a26624f626b6f31eef",
+    "protocolSignature": "64fc8fae22d489ec151fd3225ec690aa568ea12b11dd60d3890bf11ea8cbed4c",
+    "profile": "experience",
+    "state": "limited",
+    "planned": 60,
+    "received": 1,
+    "valid": 1,
+    "dualTrials": 1,
+    "bothCorrectDual": 0,
+    "groups": {
+      "blueSingle": {
+        "plannedRequired": 20,
+        "presentedRequired": 0,
+        "answered": 0,
+        "correct": 0,
+        "missed": 0,
+        "correctRTCount": 0,
+        "medianCorrectMs": null,
+        "inputs": {}
+      },
+      "redSingle": {
+        "plannedRequired": 20,
+        "presentedRequired": 0,
+        "answered": 0,
+        "correct": 0,
+        "missed": 0,
+        "correctRTCount": 0,
+        "medianCorrectMs": null,
+        "inputs": {}
+      },
+      "blueDual": {
+        "plannedRequired": 20,
+        "presentedRequired": 1,
+        "answered": 1,
+        "correct": 0,
+        "missed": 0,
+        "correctRTCount": 0,
+        "medianCorrectMs": null,
+        "inputs": {
+          "touch": 1
+        }
+      },
+      "redDual": {
+        "plannedRequired": 20,
+        "presentedRequired": 1,
+        "answered": 1,
+        "correct": 1,
+        "missed": 0,
+        "correctRTCount": 1,
+        "medianCorrectMs": 100,
+        "inputs": {
+          "touch": 1
+        }
+      }
+    },
+    "differences": {
+      "blueLatencyMs": null,
+      "redLatencyMs": null,
+      "blueAccuracy": null,
+      "redAccuracy": null
+    }
+  },
+  "atDeadlineMissing": {
+    "testType": "dual-arrow",
+    "engineVersion": "0.1.0",
+    "scoringVersion": "0.1.0",
+    "configVersion": "0.1.0",
+    "reportDefinitionVersion": "0.1.0",
+    "presentationVersion": "0.1.0",
+    "configHash": "501243f598715a0cf1a3120a1ccd220cf13126081f7f36a26624f626b6f31eef",
+    "protocolSignature": "64fc8fae22d489ec151fd3225ec690aa568ea12b11dd60d3890bf11ea8cbed4c",
+    "profile": "experience",
+    "state": "limited",
+    "planned": 60,
+    "received": 1,
+    "valid": 1,
+    "dualTrials": 1,
+    "bothCorrectDual": 0,
+    "groups": {
+      "blueSingle": {
+        "plannedRequired": 20,
+        "presentedRequired": 0,
+        "answered": 0,
+        "correct": 0,
+        "missed": 0,
+        "correctRTCount": 0,
+        "medianCorrectMs": null,
+        "inputs": {}
+      },
+      "redSingle": {
+        "plannedRequired": 20,
+        "presentedRequired": 0,
+        "answered": 0,
+        "correct": 0,
+        "missed": 0,
+        "correctRTCount": 0,
+        "medianCorrectMs": null,
+        "inputs": {}
+      },
+      "blueDual": {
+        "plannedRequired": 20,
+        "presentedRequired": 1,
+        "answered": 0,
+        "correct": 0,
+        "missed": 1,
+        "correctRTCount": 0,
+        "medianCorrectMs": null,
+        "inputs": {}
+      },
+      "redDual": {
+        "plannedRequired": 20,
+        "presentedRequired": 1,
+        "answered": 0,
+        "correct": 0,
+        "missed": 1,
+        "correctRTCount": 0,
+        "medianCorrectMs": null,
+        "inputs": {}
+      }
+    },
+    "differences": {
+      "blueLatencyMs": null,
+      "redLatencyMs": null,
+      "blueAccuracy": null,
+      "redAccuracy": null
+    }
+  },
+  "inactiveSingle": {
+    "testType": "dual-arrow",
+    "engineVersion": "0.1.0",
+    "scoringVersion": "0.1.0",
+    "configVersion": "0.1.0",
+    "reportDefinitionVersion": "0.1.0",
+    "presentationVersion": "0.1.0",
+    "configHash": "501243f598715a0cf1a3120a1ccd220cf13126081f7f36a26624f626b6f31eef",
+    "protocolSignature": "64fc8fae22d489ec151fd3225ec690aa568ea12b11dd60d3890bf11ea8cbed4c",
+    "profile": "experience",
+    "state": "limited",
+    "planned": 60,
+    "received": 1,
+    "valid": 1,
+    "dualTrials": 0,
+    "bothCorrectDual": 0,
+    "groups": {
+      "blueSingle": {
+        "plannedRequired": 20,
+        "presentedRequired": 1,
+        "answered": 1,
+        "correct": 1,
+        "missed": 0,
+        "correctRTCount": 1,
+        "medianCorrectMs": 0,
+        "inputs": {
+          "touch": 1
+        }
+      },
+      "redSingle": {
+        "plannedRequired": 20,
+        "presentedRequired": 0,
+        "answered": 0,
+        "correct": 0,
+        "missed": 0,
+        "correctRTCount": 0,
+        "medianCorrectMs": null,
+        "inputs": {}
+      },
+      "blueDual": {
+        "plannedRequired": 20,
+        "presentedRequired": 0,
+        "answered": 0,
+        "correct": 0,
+        "missed": 0,
+        "correctRTCount": 0,
+        "medianCorrectMs": null,
+        "inputs": {}
+      },
+      "redDual": {
+        "plannedRequired": 20,
+        "presentedRequired": 0,
+        "answered": 0,
+        "correct": 0,
+        "missed": 0,
+        "correctRTCount": 0,
+        "medianCorrectMs": null,
+        "inputs": {}
+      }
+    },
+    "differences": {
+      "blueLatencyMs": null,
+      "redLatencyMs": null,
+      "blueAccuracy": null,
+      "redAccuracy": null
+    }
+  },
+  "unclosedInterruption": {
+    "testType": "dual-arrow",
+    "engineVersion": "0.1.0",
+    "scoringVersion": "0.1.0",
+    "configVersion": "0.1.0",
+    "reportDefinitionVersion": "0.1.0",
+    "presentationVersion": "0.1.0",
+    "configHash": "501243f598715a0cf1a3120a1ccd220cf13126081f7f36a26624f626b6f31eef",
+    "protocolSignature": "64fc8fae22d489ec151fd3225ec690aa568ea12b11dd60d3890bf11ea8cbed4c",
+    "profile": "experience",
+    "state": "invalid",
+    "planned": 60,
+    "received": 1,
+    "valid": 0,
+    "dualTrials": 0,
+    "bothCorrectDual": 0,
+    "groups": {
+      "blueSingle": {
+        "plannedRequired": 20,
+        "presentedRequired": 0,
+        "answered": 0,
+        "correct": 0,
+        "missed": 0,
+        "correctRTCount": 0,
+        "medianCorrectMs": null,
+        "inputs": {}
+      },
+      "redSingle": {
+        "plannedRequired": 20,
+        "presentedRequired": 0,
+        "answered": 0,
+        "correct": 0,
+        "missed": 0,
+        "correctRTCount": 0,
+        "medianCorrectMs": null,
+        "inputs": {}
+      },
+      "blueDual": {
+        "plannedRequired": 20,
+        "presentedRequired": 0,
+        "answered": 0,
+        "correct": 0,
+        "missed": 0,
+        "correctRTCount": 0,
+        "medianCorrectMs": null,
+        "inputs": {}
+      },
+      "redDual": {
+        "plannedRequired": 20,
+        "presentedRequired": 0,
+        "answered": 0,
+        "correct": 0,
+        "missed": 0,
+        "correctRTCount": 0,
+        "medianCorrectMs": null,
+        "inputs": {}
+      }
+    },
+    "differences": {
+      "blueLatencyMs": null,
+      "redLatencyMs": null,
+      "blueAccuracy": null,
+      "redAccuracy": null
+    }
+  },
+  "closedInterruption": {
+    "testType": "dual-arrow",
+    "engineVersion": "0.1.0",
+    "scoringVersion": "0.1.0",
+    "configVersion": "0.1.0",
+    "reportDefinitionVersion": "0.1.0",
+    "presentationVersion": "0.1.0",
+    "configHash": "501243f598715a0cf1a3120a1ccd220cf13126081f7f36a26624f626b6f31eef",
+    "protocolSignature": "64fc8fae22d489ec151fd3225ec690aa568ea12b11dd60d3890bf11ea8cbed4c",
+    "profile": "experience",
+    "state": "limited",
+    "planned": 60,
+    "received": 1,
+    "valid": 1,
+    "dualTrials": 1,
+    "bothCorrectDual": 1,
+    "groups": {
+      "blueSingle": {
+        "plannedRequired": 20,
+        "presentedRequired": 0,
+        "answered": 0,
+        "correct": 0,
+        "missed": 0,
+        "correctRTCount": 0,
+        "medianCorrectMs": null,
+        "inputs": {}
+      },
+      "redSingle": {
+        "plannedRequired": 20,
+        "presentedRequired": 0,
+        "answered": 0,
+        "correct": 0,
+        "missed": 0,
+        "correctRTCount": 0,
+        "medianCorrectMs": null,
+        "inputs": {}
+      },
+      "blueDual": {
+        "plannedRequired": 20,
+        "presentedRequired": 1,
+        "answered": 1,
+        "correct": 1,
+        "missed": 0,
+        "correctRTCount": 1,
+        "medianCorrectMs": 0,
+        "inputs": {
+          "touch": 1
+        }
+      },
+      "redDual": {
+        "plannedRequired": 20,
+        "presentedRequired": 1,
+        "answered": 1,
+        "correct": 1,
+        "missed": 0,
+        "correctRTCount": 1,
+        "medianCorrectMs": 10,
+        "inputs": {
+          "touch": 1
+        }
+      }
+    },
+    "differences": {
+      "blueLatencyMs": null,
+      "redLatencyMs": null,
+      "blueAccuracy": null,
+      "redAccuracy": null
+    }
+  },
+  "signedPrefix": {
+    "testType": "dual-arrow",
+    "engineVersion": "0.1.0",
+    "scoringVersion": "0.1.0",
+    "configVersion": "0.1.0",
+    "reportDefinitionVersion": "0.1.0",
+    "presentationVersion": "0.1.0",
+    "configHash": "501243f598715a0cf1a3120a1ccd220cf13126081f7f36a26624f626b6f31eef",
+    "protocolSignature": "64fc8fae22d489ec151fd3225ec690aa568ea12b11dd60d3890bf11ea8cbed4c",
+    "profile": "experience",
+    "state": "limited",
+    "planned": 60,
+    "received": 21,
+    "valid": 21,
+    "dualTrials": 10,
+    "bothCorrectDual": 9,
+    "groups": {
+      "blueSingle": {
+        "plannedRequired": 20,
+        "presentedRequired": 1,
+        "answered": 1,
+        "correct": 1,
+        "missed": 0,
+        "correctRTCount": 1,
+        "medianCorrectMs": 300,
+        "inputs": {
+          "touch": 1
+        }
+      },
+      "redSingle": {
+        "plannedRequired": 20,
+        "presentedRequired": 10,
+        "answered": 10,
+        "correct": 10,
+        "missed": 0,
+        "correctRTCount": 10,
+        "medianCorrectMs": 200,
+        "inputs": {
+          "touch": 10
+        }
+      },
+      "blueDual": {
+        "plannedRequired": 20,
+        "presentedRequired": 10,
+        "answered": 10,
+        "correct": 9,
+        "missed": 0,
+        "correctRTCount": 9,
+        "medianCorrectMs": 0,
+        "inputs": {
+          "touch": 10
+        }
+      },
+      "redDual": {
+        "plannedRequired": 20,
+        "presentedRequired": 10,
+        "answered": 9,
+        "correct": 9,
+        "missed": 1,
+        "correctRTCount": 9,
+        "medianCorrectMs": 700,
+        "inputs": {
+          "touch": 9
+        }
+      }
+    },
+    "differences": {
+      "blueLatencyMs": -300,
+      "redLatencyMs": 500,
+      "blueAccuracy": -0.09999999999999998,
+      "redAccuracy": -0.09999999999999998
+    }
+  }
+}

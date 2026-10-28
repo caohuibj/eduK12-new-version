@@ -1,0 +1,137 @@
+{
+  "receipt": "docs/cognitive-library/next-candidates-20261026/dual-arrow/implementation/verification.json",
+  "items": [
+    {
+      "path": "server-version/backend/src/__tests__/cognitive/dual-arrow-content.test.ts",
+      "oldSHA256": "137df2ee3ab4836a92b7db9ec7f8094260af02358ce5ed5b59ebb3f38345091c",
+      "currentSHA256": "137df2ee3ab4836a92b7db9ec7f8094260af02358ce5ed5b59ebb3f38345091c",
+      "matches": true
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/dual-arrow/analysis.ts",
+      "oldSHA256": "ac0284e5be786c84ab509f1d3a0513397d5cfa88f26e7a790f70da45db73aeaa",
+      "currentSHA256": "ac0284e5be786c84ab509f1d3a0513397d5cfa88f26e7a790f70da45db73aeaa",
+      "matches": true
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/dual-arrow/metadata.ts",
+      "oldSHA256": "4f6e1ed745252587614a1df9dd2c9593317ec1b2310556904a8b13f73a34b1fa",
+      "currentSHA256": "4f6e1ed745252587614a1df9dd2c9593317ec1b2310556904a8b13f73a34b1fa",
+      "matches": true
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/dual-arrow/package.ts",
+      "oldSHA256": "01c29deceec43d7c631734cbba2b2849e7de4a093f385d4a45e834ff37ca6cc3",
+      "currentSHA256": "62b05496aaa4c7bc152359e7fe8174eebd60ff233ce742e0b0a7fff609755628",
+      "matches": false
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/dual-arrow/participant-presentation.ts",
+      "oldSHA256": "4bedbe559b0a7d9eb2cbe5cb67962e2620a65bf9ef851ca473eba80a7a18ec99",
+      "currentSHA256": "4bedbe559b0a7d9eb2cbe5cb67962e2620a65bf9ef851ca473eba80a7a18ec99",
+      "matches": true
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/dual-arrow/protocol.ts",
+      "oldSHA256": "0147eff1d935434710f847ff741f52437f2afcb5c6d8e109bccfcaabd96f7467",
+      "currentSHA256": "0147eff1d935434710f847ff741f52437f2afcb5c6d8e109bccfcaabd96f7467",
+      "matches": true
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/dual-arrow/report.ts",
+      "oldSHA256": "7d6d61722a2ac32155df18f7c7bf0ce68b86772fc8c9e44eabafebd61ee7c96d",
+      "currentSHA256": "7d6d61722a2ac32155df18f7c7bf0ce68b86772fc8c9e44eabafebd61ee7c96d",
+      "matches": true
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/dual-arrow/schema.ts",
+      "oldSHA256": "3e551d39c1295448b10bd466b000d4d26b48e23537708551d0018086b3be3981",
+      "currentSHA256": "3e551d39c1295448b10bd466b000d4d26b48e23537708551d0018086b3be3981",
+      "matches": true
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/dual-arrow/scorer.ts",
+      "oldSHA256": "0410a08b2c155b6d78e2804400f656c47b7c5c4c9d8e74c042e9ca1e7fa5be2b",
+      "currentSHA256": "0410a08b2c155b6d78e2804400f656c47b7c5c4c9d8e74c042e9ca1e7fa5be2b",
+      "matches": true
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/dual-arrow/DualArrowTask.tsx",
+      "oldSHA256": "cf5fb09acc407c464993f346f2ffa3be60234458580b727226e4f470e56a9124",
+      "currentSHA256": "5f21604f920cc2cdb715ff6490c4d9c183b82956c2c3cc42a9d4ce5e0e883d07",
+      "matches": false
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/dual-arrow/DualArrows.tsx",
+      "oldSHA256": "85cc4893dd430c37025080351c74ac941d878914f6674a6d132b42e90a474ede",
+      "currentSHA256": "85cc4893dd430c37025080351c74ac941d878914f6674a6d132b42e90a474ede",
+      "matches": true
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/dual-arrow/DualInstructions.tsx",
+      "oldSHA256": "a482a471589fe9beaa8e14596c36544121a09ead831dac3baa13722cd6366883",
+      "currentSHA256": "8c614f744245b60d08ca6d7ccefc33df95bea0aba497c4c35b840db167c9ac0e",
+      "matches": false
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/dual-arrow/DualReport.tsx",
+      "oldSHA256": "18793f5181ca7679f49320dedf0575eb2e48494dfba531b31918c6f56dec4298",
+      "currentSHA256": "ccfcc1e43218ff87ee58dbb2233106d9a8adce53ab1a9b491e6f0df5acb0f6a3",
+      "matches": false
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/dual-arrow/capture.ts",
+      "oldSHA256": "71a33d69af4e18ae58dcca84decaf869ead1f6819559e5d51e215d1b6c9a7c16",
+      "currentSHA256": "71a33d69af4e18ae58dcca84decaf869ead1f6819559e5d51e215d1b6c9a7c16",
+      "matches": true
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/dual-arrow/content.test.tsx",
+      "oldSHA256": "464602a2e96bca032c64ec70e7235c5d734cde3d06f800d8321fb8040d2130fd",
+      "currentSHA256": "464602a2e96bca032c64ec70e7235c5d734cde3d06f800d8321fb8040d2130fd",
+      "matches": true
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/dual-arrow/contracts.ts",
+      "oldSHA256": "8dc624debf95119a05092e0be4a3e5274a28d8a9d66c01ccc1ebf9b85e2fa285",
+      "currentSHA256": "8dc624debf95119a05092e0be4a3e5274a28d8a9d66c01ccc1ebf9b85e2fa285",
+      "matches": true
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/dual-arrow/dual.css",
+      "oldSHA256": "aa3082c3bccc0ff978336a6fc2ac59262c0991359d503701de929afe9a2f4f41",
+      "currentSHA256": "aa3082c3bccc0ff978336a6fc2ac59262c0991359d503701de929afe9a2f4f41",
+      "matches": true
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/dual-arrow/generated/analysis.ts",
+      "oldSHA256": "822f8d792e0383ded927da285fdeffa30df2e5c8ea63ed004615c4cd40b7634a",
+      "currentSHA256": "822f8d792e0383ded927da285fdeffa30df2e5c8ea63ed004615c4cd40b7634a",
+      "matches": true
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/dual-arrow/generated/protocol.ts",
+      "oldSHA256": "921fb934d684a9a52685a00e81f2b05b1be13b8b6c22c2b7ced77f70b274865e",
+      "currentSHA256": "921fb934d684a9a52685a00e81f2b05b1be13b8b6c22c2b7ced77f70b274865e",
+      "matches": true
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/dual-arrow/generated/report.ts",
+      "oldSHA256": "6b7b8afbed98ade26dab0533a801dc28bfb06cd6f54d9cf5990d74101752b18a",
+      "currentSHA256": "6b7b8afbed98ade26dab0533a801dc28bfb06cd6f54d9cf5990d74101752b18a",
+      "matches": true
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/dual-arrow/session.ts",
+      "oldSHA256": "f6cea53286f7cf358c0472674657729cf73492f66c3d430cabd18e4aa4f548f6",
+      "currentSHA256": "99c2c0fbed89ff736551a6e641902fcae899d962f9a09e4bf96e3e051fdb86de",
+      "matches": false
+    },
+    {
+      "path": "server-version/scripts/cognitive/dual-content.cjs",
+      "oldSHA256": "d9e487ee39be67edb280204c1ffeac97c6ee56f4fc39e0878785b69c69fa14fa",
+      "currentSHA256": "322cd25604f9ef6789c02ad59ad5f7ac24fdc2974cd65de132a4545868068540",
+      "matches": false
+    }
+  ]
+}

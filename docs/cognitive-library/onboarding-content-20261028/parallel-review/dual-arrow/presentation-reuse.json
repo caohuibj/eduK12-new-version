@@ -1,0 +1,42 @@
+{
+  "receipt": "docs/cognitive-library/onboarding-content-20261028/batch-2/evidence/frontend-direct-types.json",
+  "items": [
+    {
+      "path": "server-version/frontend/src/modules/cognitive/CognitiveReportVisual.tsx",
+      "oldSHA256": "81d90a08a205ef5f963d9a308c830ec99e451df4ffd0ca83780e3a186e6a74a2",
+      "currentSHA256": "81d90a08a205ef5f963d9a308c830ec99e451df4ffd0ca83780e3a186e6a74a2",
+      "matches": true
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/dual-arrow/generated/protocol.ts",
+      "oldSHA256": "921fb934d684a9a52685a00e81f2b05b1be13b8b6c22c2b7ced77f70b274865e",
+      "currentSHA256": "921fb934d684a9a52685a00e81f2b05b1be13b8b6c22c2b7ced77f70b274865e",
+      "matches": true
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/dual-arrow/DualArrows.tsx",
+      "oldSHA256": "85cc4893dd430c37025080351c74ac941d878914f6674a6d132b42e90a474ede",
+      "currentSHA256": "85cc4893dd430c37025080351c74ac941d878914f6674a6d132b42e90a474ede",
+      "matches": true
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/dual-arrow/DualInstructions.tsx",
+      "oldSHA256": "66a65012ba070ab348b2851daea9983d50f6224a0495a47802070194c3bb8acc",
+      "currentSHA256": "8c614f744245b60d08ca6d7ccefc33df95bea0aba497c4c35b840db167c9ac0e",
+      "matches": false
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/dual-arrow/generated/report.ts",
+      "oldSHA256": "6b7b8afbed98ade26dab0533a801dc28bfb06cd6f54d9cf5990d74101752b18a",
+      "currentSHA256": "6b7b8afbed98ade26dab0533a801dc28bfb06cd6f54d9cf5990d74101752b18a",
+      "matches": true
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/dual-arrow/DualReport.tsx",
+      "oldSHA256": "ccfcc1e43218ff87ee58dbb2233106d9a8adce53ab1a9b491e6f0df5acb0f6a3",
+      "currentSHA256": "ccfcc1e43218ff87ee58dbb2233106d9a8adce53ab1a9b491e6f0df5acb0f6a3",
+      "matches": true
+    }
+  ],
+  "note": "Unchanged report/chart consumers can retain prior three-state screenshot/assertion evidence; changed instructions/task/session use current targeted tests and screenshots."
+}

@@ -1,0 +1,420 @@
+{
+  "node": "v24.21.0",
+  "baseline": "a67f425269283d8281379fdf8234f9fd6b0acebc",
+  "configHash": "501243f598715a0cf1a3120a1ccd220cf13126081f7f36a26624f626b6f31eef",
+  "protocolSignature": "64fc8fae22d489ec151fd3225ec690aa568ea12b11dd60d3890bf11ea8cbed4c",
+  "checks": [
+    {
+      "name": "firstResponseNoise",
+      "state": "limited",
+      "received": 1,
+      "valid": 1,
+      "groups": {
+        "blueSingle": {
+          "plannedRequired": 20,
+          "presentedRequired": 0,
+          "answered": 0,
+          "correct": 0,
+          "missed": 0,
+          "correctRTCount": 0,
+          "medianCorrectMs": null,
+          "inputs": {}
+        },
+        "redSingle": {
+          "plannedRequired": 20,
+          "presentedRequired": 0,
+          "answered": 0,
+          "correct": 0,
+          "missed": 0,
+          "correctRTCount": 0,
+          "medianCorrectMs": null,
+          "inputs": {}
+        },
+        "blueDual": {
+          "plannedRequired": 20,
+          "presentedRequired": 1,
+          "answered": 1,
+          "correct": 0,
+          "missed": 0,
+          "correctRTCount": 0,
+          "medianCorrectMs": null,
+          "inputs": {
+            "touch": 1
+          }
+        },
+        "redDual": {
+          "plannedRequired": 20,
+          "presentedRequired": 1,
+          "answered": 1,
+          "correct": 1,
+          "missed": 0,
+          "correctRTCount": 1,
+          "medianCorrectMs": 100,
+          "inputs": {
+            "touch": 1
+          }
+        }
+      },
+      "differences": {
+        "blueLatencyMs": null,
+        "redLatencyMs": null,
+        "blueAccuracy": null,
+        "redAccuracy": null
+      },
+      "firstIgnored": {
+        "early": 1,
+        "inactive": 0,
+        "held": 1,
+        "answered": 1,
+        "late": 0
+      },
+      "firstIgnoredRepeatCount": 3
+    },
+    {
+      "name": "atDeadlineMissing",
+      "state": "limited",
+      "received": 1,
+      "valid": 1,
+      "groups": {
+        "blueSingle": {
+          "plannedRequired": 20,
+          "presentedRequired": 0,
+          "answered": 0,
+          "correct": 0,
+          "missed": 0,
+          "correctRTCount": 0,
+          "medianCorrectMs": null,
+          "inputs": {}
+        },
+        "redSingle": {
+          "plannedRequired": 20,
+          "presentedRequired": 0,
+          "answered": 0,
+          "correct": 0,
+          "missed": 0,
+          "correctRTCount": 0,
+          "medianCorrectMs": null,
+          "inputs": {}
+        },
+        "blueDual": {
+          "plannedRequired": 20,
+          "presentedRequired": 1,
+          "answered": 0,
+          "correct": 0,
+          "missed": 1,
+          "correctRTCount": 0,
+          "medianCorrectMs": null,
+          "inputs": {}
+        },
+        "redDual": {
+          "plannedRequired": 20,
+          "presentedRequired": 1,
+          "answered": 0,
+          "correct": 0,
+          "missed": 1,
+          "correctRTCount": 0,
+          "medianCorrectMs": null,
+          "inputs": {}
+        }
+      },
+      "differences": {
+        "blueLatencyMs": null,
+        "redLatencyMs": null,
+        "blueAccuracy": null,
+        "redAccuracy": null
+      },
+      "firstIgnored": {
+        "early": 0,
+        "inactive": 0,
+        "held": 0,
+        "answered": 0,
+        "late": 1
+      },
+      "firstIgnoredRepeatCount": 0
+    },
+    {
+      "name": "inactiveSingle",
+      "state": "limited",
+      "received": 1,
+      "valid": 1,
+      "groups": {
+        "blueSingle": {
+          "plannedRequired": 20,
+          "presentedRequired": 1,
+          "answered": 1,
+          "correct": 1,
+          "missed": 0,
+          "correctRTCount": 1,
+          "medianCorrectMs": 0,
+          "inputs": {
+            "touch": 1
+          }
+        },
+        "redSingle": {
+          "plannedRequired": 20,
+          "presentedRequired": 0,
+          "answered": 0,
+          "correct": 0,
+          "missed": 0,
+          "correctRTCount": 0,
+          "medianCorrectMs": null,
+          "inputs": {}
+        },
+        "blueDual": {
+          "plannedRequired": 20,
+          "presentedRequired": 0,
+          "answered": 0,
+          "correct": 0,
+          "missed": 0,
+          "correctRTCount": 0,
+          "medianCorrectMs": null,
+          "inputs": {}
+        },
+        "redDual": {
+          "plannedRequired": 20,
+          "presentedRequired": 0,
+          "answered": 0,
+          "correct": 0,
+          "missed": 0,
+          "correctRTCount": 0,
+          "medianCorrectMs": null,
+          "inputs": {}
+        }
+      },
+      "differences": {
+        "blueLatencyMs": null,
+        "redLatencyMs": null,
+        "blueAccuracy": null,
+        "redAccuracy": null
+      },
+      "firstIgnored": {
+        "early": 0,
+        "inactive": 1,
+        "held": 0,
+        "answered": 0,
+        "late": 0
+      },
+      "firstIgnoredRepeatCount": 0
+    },
+    {
+      "name": "unclosedInterruption",
+      "state": "invalid",
+      "received": 1,
+      "valid": 0,
+      "groups": {
+        "blueSingle": {
+          "plannedRequired": 20,
+          "presentedRequired": 0,
+          "answered": 0,
+          "correct": 0,
+          "missed": 0,
+          "correctRTCount": 0,
+          "medianCorrectMs": null,
+          "inputs": {}
+        },
+        "redSingle": {
+          "plannedRequired": 20,
+          "presentedRequired": 0,
+          "answered": 0,
+          "correct": 0,
+          "missed": 0,
+          "correctRTCount": 0,
+          "medianCorrectMs": null,
+          "inputs": {}
+        },
+        "blueDual": {
+          "plannedRequired": 20,
+          "presentedRequired": 0,
+          "answered": 0,
+          "correct": 0,
+          "missed": 0,
+          "correctRTCount": 0,
+          "medianCorrectMs": null,
+          "inputs": {}
+        },
+        "redDual": {
+          "plannedRequired": 20,
+          "presentedRequired": 0,
+          "answered": 0,
+          "correct": 0,
+          "missed": 0,
+          "correctRTCount": 0,
+          "medianCorrectMs": null,
+          "inputs": {}
+        }
+      },
+      "differences": {
+        "blueLatencyMs": null,
+        "redLatencyMs": null,
+        "blueAccuracy": null,
+        "redAccuracy": null
+      },
+      "firstIgnored": {
+        "early": 0,
+        "inactive": 0,
+        "held": 0,
+        "answered": 0,
+        "late": 0
+      },
+      "firstIgnoredRepeatCount": 0
+    },
+    {
+      "name": "closedInterruption",
+      "state": "limited",
+      "received": 1,
+      "valid": 1,
+      "groups": {
+        "blueSingle": {
+          "plannedRequired": 20,
+          "presentedRequired": 0,
+          "answered": 0,
+          "correct": 0,
+          "missed": 0,
+          "correctRTCount": 0,
+          "medianCorrectMs": null,
+          "inputs": {}
+        },
+        "redSingle": {
+          "plannedRequired": 20,
+          "presentedRequired": 0,
+          "answered": 0,
+          "correct": 0,
+          "missed": 0,
+          "correctRTCount": 0,
+          "medianCorrectMs": null,
+          "inputs": {}
+        },
+        "blueDual": {
+          "plannedRequired": 20,
+          "presentedRequired": 1,
+          "answered": 1,
+          "correct": 1,
+          "missed": 0,
+          "correctRTCount": 1,
+          "medianCorrectMs": 0,
+          "inputs": {
+            "touch": 1
+          }
+        },
+        "redDual": {
+          "plannedRequired": 20,
+          "presentedRequired": 1,
+          "answered": 1,
+          "correct": 1,
+          "missed": 0,
+          "correctRTCount": 1,
+          "medianCorrectMs": 10,
+          "inputs": {
+            "touch": 1
+          }
+        }
+      },
+      "differences": {
+        "blueLatencyMs": null,
+        "redLatencyMs": null,
+        "blueAccuracy": null,
+        "redAccuracy": null
+      },
+      "firstIgnored": {
+        "early": 0,
+        "inactive": 0,
+        "held": 0,
+        "answered": 0,
+        "late": 0
+      },
+      "firstIgnoredRepeatCount": 0
+    },
+    {
+      "name": "signedPrefix",
+      "state": "limited",
+      "received": 21,
+      "valid": 21,
+      "groups": {
+        "blueSingle": {
+          "plannedRequired": 20,
+          "presentedRequired": 1,
+          "answered": 1,
+          "correct": 1,
+          "missed": 0,
+          "correctRTCount": 1,
+          "medianCorrectMs": 300,
+          "inputs": {
+            "touch": 1
+          }
+        },
+        "redSingle": {
+          "plannedRequired": 20,
+          "presentedRequired": 10,
+          "answered": 10,
+          "correct": 10,
+          "missed": 0,
+          "correctRTCount": 10,
+          "medianCorrectMs": 200,
+          "inputs": {
+            "touch": 10
+          }
+        },
+        "blueDual": {
+          "plannedRequired": 20,
+          "presentedRequired": 10,
+          "answered": 10,
+          "correct": 9,
+          "missed": 0,
+          "correctRTCount": 9,
+          "medianCorrectMs": 0,
+          "inputs": {
+            "touch": 10
+          }
+        },
+        "redDual": {
+          "plannedRequired": 20,
+          "presentedRequired": 10,
+          "answered": 9,
+          "correct": 9,
+          "missed": 1,
+          "correctRTCount": 9,
+          "medianCorrectMs": 700,
+          "inputs": {
+            "touch": 9
+          }
+        }
+      },
+      "differences": {
+        "blueLatencyMs": -300,
+        "redLatencyMs": 500,
+        "blueAccuracy": -0.09999999999999998,
+        "redAccuracy": -0.09999999999999998
+      },
+      "firstIgnored": {
+        "early": 0,
+        "inactive": 0,
+        "held": 0,
+        "answered": 1,
+        "late": 0
+      },
+      "firstIgnoredRepeatCount": 0
+    }
+  ],
+  "sourceSHA256": {
+    "server-version/backend/src/modules/cognitive/content-candidates/dual-arrow/analysis.ts": "ac0284e5be786c84ab509f1d3a0513397d5cfa88f26e7a790f70da45db73aeaa",
+    "server-version/backend/src/modules/cognitive/content-candidates/dual-arrow/metadata.ts": "4f6e1ed745252587614a1df9dd2c9593317ec1b2310556904a8b13f73a34b1fa",
+    "server-version/backend/src/modules/cognitive/content-candidates/dual-arrow/package.ts": "62b05496aaa4c7bc152359e7fe8174eebd60ff233ce742e0b0a7fff609755628",
+    "server-version/backend/src/modules/cognitive/content-candidates/dual-arrow/participant-presentation.ts": "4bedbe559b0a7d9eb2cbe5cb67962e2620a65bf9ef851ca473eba80a7a18ec99",
+    "server-version/backend/src/modules/cognitive/content-candidates/dual-arrow/protocol.ts": "0147eff1d935434710f847ff741f52437f2afcb5c6d8e109bccfcaabd96f7467",
+    "server-version/backend/src/modules/cognitive/content-candidates/dual-arrow/report.ts": "7d6d61722a2ac32155df18f7c7bf0ce68b86772fc8c9e44eabafebd61ee7c96d",
+    "server-version/backend/src/modules/cognitive/content-candidates/dual-arrow/schema.ts": "3e551d39c1295448b10bd466b000d4d26b48e23537708551d0018086b3be3981",
+    "server-version/backend/src/modules/cognitive/content-candidates/dual-arrow/scorer.ts": "0410a08b2c155b6d78e2804400f656c47b7c5c4c9d8e74c042e9ca1e7fa5be2b",
+    "server-version/frontend/src/modules/cognitive/tasks/dual-arrow/DualArrowTask.tsx": "5f21604f920cc2cdb715ff6490c4d9c183b82956c2c3cc42a9d4ce5e0e883d07",
+    "server-version/frontend/src/modules/cognitive/tasks/dual-arrow/DualArrows.tsx": "85cc4893dd430c37025080351c74ac941d878914f6674a6d132b42e90a474ede",
+    "server-version/frontend/src/modules/cognitive/tasks/dual-arrow/DualInstructions.tsx": "8c614f744245b60d08ca6d7ccefc33df95bea0aba497c4c35b840db167c9ac0e",
+    "server-version/frontend/src/modules/cognitive/tasks/dual-arrow/DualReport.tsx": "ccfcc1e43218ff87ee58dbb2233106d9a8adce53ab1a9b491e6f0df5acb0f6a3",
+    "server-version/frontend/src/modules/cognitive/tasks/dual-arrow/NativeDualRunner.tsx": "9d2a8d0bcd1cf77d1d7bc226ec76758f4efbe3bc37f41bc4b0df4bda3a2678fd",
+    "server-version/frontend/src/modules/cognitive/tasks/dual-arrow/capture.ts": "71a33d69af4e18ae58dcca84decaf869ead1f6819559e5d51e215d1b6c9a7c16",
+    "server-version/frontend/src/modules/cognitive/tasks/dual-arrow/content.test.tsx": "464602a2e96bca032c64ec70e7235c5d734cde3d06f800d8321fb8040d2130fd",
+    "server-version/frontend/src/modules/cognitive/tasks/dual-arrow/contracts.ts": "8dc624debf95119a05092e0be4a3e5274a28d8a9d66c01ccc1ebf9b85e2fa285",
+    "server-version/frontend/src/modules/cognitive/tasks/dual-arrow/dual.css": "aa3082c3bccc0ff978336a6fc2ac59262c0991359d503701de929afe9a2f4f41",
+    "server-version/frontend/src/modules/cognitive/tasks/dual-arrow/practice-interruption.test.tsx": "c7bb285e6297e2e0a74628f83f2781ce36fb7a4eb8829a3f8cf11b8e6de2d687",
+    "server-version/frontend/src/modules/cognitive/tasks/dual-arrow/session.ts": "99c2c0fbed89ff736551a6e641902fcae899d962f9a09e4bf96e3e051fdb86de",
+    "docs/cognitive-library/onboarding-content-20261028/parallel-review/dual-arrow/audit-records.cjs": "944f4bb860a8ee8afec8f5c5443c4d8fe38759cf0794fdd3acc63d5ec358838d"
+  }
+}
