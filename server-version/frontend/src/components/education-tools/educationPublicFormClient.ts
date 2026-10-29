@@ -4,7 +4,7 @@ import {privateToolBase,type PrivateToolApi} from './privateToolClient'
 import type {CompositionResponseMode,ExpertTargetKind} from './educationCompositionAdministration'
 
 export type EducationPublicSourceSummary={catalogKey:string;kind:'FORM'|'SCALE'|'COGNITIVE'|'SJT';sourceProvider:'FORM'|'STANDARD_SCALE'|'LIBRARY_SCALE'|'COGNITIVE_CONFIG'|'SJT_RELEASE';sourceId:string;contentHash:string;title:string;language:string|null;
- versions:{content:string;parameters:string|null;report:string|null;profiles?:Array<'experience'|'standard'|'research'>};profile?:'experience'|'standard'|'research';requiredContextKeys?:string[];referenceContextKeys?:string[];allowedActions:string[];canEditOriginal:false;canDistribute:false;unavailableReason?:string}
+ versions:{content:string;parameters:string|null;report:string|null;profiles?:Array<'experience'|'standard'|'research'>};profile?:'experience'|'standard'|'research';configurationName?:string;selectedBinding?:import('./educationCompositionClient').SelectedConfigurationPointer;requiredContextKeys?:string[];referenceContextKeys?:string[];allowedActions:string[];canEditOriginal:false;canDistribute:false;unavailableReason?:string}
 export const publicNativePreviewPath=(organizationId:string,source:Extract<import('./educationCompositionClient').CompositionSource,{provider:'COGNITIVE_CONFIG'|'SJT_RELEASE'}>)=>
  `${privateToolBase(organizationId)}/public-sources/native/${source.provider}/${encodeURIComponent(source.versionId)}?contentHash=${encodeURIComponent(source.contentHash)}${source.provider==='COGNITIVE_CONFIG'?'&profile='+source.profile:''}`
 export type EducationPublicFormSummary=EducationPublicSourceSummary

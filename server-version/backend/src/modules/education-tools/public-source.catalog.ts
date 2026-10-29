@@ -16,9 +16,14 @@ import {EDUCATION_STANDARD_USE_ACTION} from '../assessment-authorization/educati
 import {selectedConfigurationPointer} from '../assessment-authorization/standard-configuration-binding'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import type {SelectedSourceBindings} from './selected-source-binding'
+import {selectedEducationCatalogChoices,type SelectedCatalogFacts} from './selected-source-catalog'
 
 const key=z.string().max(240).refine(value=>parseEducationPublicSourceKey(value)!==null)
 export const educationPublicCatalogQuery=z.object({cursor:key.optional(),kind:z.enum(['SCALE','FORM','COGNITIVE','SJT']).optional(),q:z.string().trim().max(160).optional(),responseMode:educationCompositionResponseModeSchema.optional(),targetKind:expertTargetKindSchema.optional()}).strict()
+type EducationPublicCatalogCard={catalogKey:string;kind:'SCALE'|'FORM'|'COGNITIVE'|'SJT';sourceProvider:EducationPublicSourceHeader['kind'];sourceId:string;
+ contentHash:string;title:string;language:string|null;versions:EducationPublicSourceHeader['versions'];requiredContextKeys:string[];referenceContextKeys:string[];
+ sourceLabel:string;allowedActions:string[];runtimeStatus:string;canEditOriginal:false;canDistribute:false;unavailableReason?:string;
+ authorizationMode?:'LEGACY';configurationName?:string;selectedBinding?:ReturnType<typeof selectedConfigurationPointer>}
 type GrantRow={id:string;subject_id:string;issuer_id:string;product:'SCHOOL'|'TEACHER';scope_id:string;resource_keys:string[];
  valid_from:Date;expires_at:Date;read_at:Date;version:number;revoked_at:Date|null;parent_grant_id:string|null;ancestry:string[];
  capabilities:ContentGrant['capabilities'];delegable_capabilities:ContentGrant['capabilities'];remaining_delegation_depth:number;
@@ -88,13 +93,15 @@ export async function listEducationPublicSources(c:PrivateToolContext,raw:unknow
   // Deduplicate grant keys before the PK joins and paginate/search real source
   // headers in this single statement. No page-size sparse post-filter, no full
   // bodies, deep ancestry reads or per-card runtime materialization.
-  const candidates=await tx.$queryRaw<EducationPublicSourceHeader[]>(Prisma.sql`WITH authorized_keys AS (
-   SELECT DISTINCT k.key
-   FROM content_capability_grants g CROSS JOIN LATERAL unnest(g.resource_keys) k(key)
+  const candidates=await tx.$queryRaw<Array<EducationPublicSourceHeader&SelectedCatalogFacts>>(Prisma.sql`WITH authorized_grants AS (
+   SELECT g.id,g.subject_id,g.issuer_id,g.resource_keys,g.version,g.valid_from,g.expires_at,typed.actor_id,typed.metadata
+   FROM content_capability_grants g LEFT JOIN assessment_management_events typed ON typed.id=g.id AND typed.action=${EDUCATION_STANDARD_USE_ACTION}
    WHERE g.subject_id=${c.principal.userId} AND g.product=${c.entry} AND g.scope_kind='ORGANIZATION' AND g.scope_id=${c.organizationId}
     AND g.resource_kind='material' AND g.capabilities=ARRAY['material.use']::text[] AND g.parent_grant_id IS NULL
     AND g.ancestry=ARRAY[g.id]::text[] AND g.remaining_delegation_depth=0 AND g.delegable_capabilities=ARRAY[]::text[]
     AND g.revoked_at IS NULL AND g.valid_from<=clock_timestamp() AT TIME ZONE 'UTC' AND g.expires_at>clock_timestamp() AT TIME ZONE 'UTC'
+  ), authorized_keys AS (
+   SELECT DISTINCT k.key FROM authorized_grants g CROSS JOIN LATERAL unnest(g.resource_keys) k(key)
   ), sources AS (
    SELECT ${educationStandardHeaderColumns} FROM authorized_keys k
     JOIN survey_standard_releases s ON s.id=split_part(k.key,':',3) AND k.key='education-source:STANDARD_SCALE:'||s.id||':'||s.combination_hash
@@ -116,13 +123,23 @@ export async function listEducationPublicSources(c:PrivateToolContext,raw:unknow
     JOIN LATERAL ${educationSjtHeaderSources(Prisma.sql`ARRAY[split_part(k.key,':',3)]`)} ON sjt_source.id=split_part(k.key,':',3)
     JOIN measurement_content_releases m ON m.id=sjt_source.measurement_release_id AND k.key='education-source:SJT_RELEASE:'||sjt_source.id||':'||m.content_hash
     WHERE m.layer='MEASUREMENT' AND m.family='SJT' AND m.status='PUBLISHED' AND m.scope->>'kind'='PLATFORM'
-  ) SELECT * FROM sources
+  ), page AS (SELECT * FROM sources
    WHERE (${input.cursor??null}::text IS NULL OR key COLLATE "C">${input.cursor??null} COLLATE "C")
     AND (${input.kind??null}::text IS NULL OR kind=${input.kind==='SCALE'?'STANDARD_SCALE':input.kind==='COGNITIVE'?'COGNITIVE_CONFIG':input.kind==='SJT'?'SJT_RELEASE':'FORM'})
-    AND (${input.q??''}='' OR strpos(lower(title),lower(${input.q??''}))>0)
-   ORDER BY key COLLATE "C" LIMIT 41`)
+    AND (${input.q??''}='' OR strpos(lower(title),lower(${input.q??''}))>0 OR EXISTS(SELECT 1 FROM authorized_grants named WHERE key=ANY(named.resource_keys) AND strpos(lower(named.metadata->>'configurationName'),lower(${input.q??''}))>0))
+   ORDER BY key COLLATE "C" LIMIT 41), shown_page AS (SELECT * FROM page ORDER BY key COLLATE "C" LIMIT 40), typed_page_grants AS (
+    SELECT g.* FROM authorized_grants g WHERE g.actor_id IS NOT NULL AND EXISTS(SELECT 1 FROM shown_page p WHERE p.key=ANY(g.resource_keys))
+    ORDER BY g.id LIMIT 129
+   ) SELECT page.*,clock_timestamp() AS "catalogReadAt",
+    EXISTS(SELECT 1 FROM authorized_grants g WHERE g.actor_id IS NULL AND page.key=ANY(g.resource_keys)) AS "legacyUseAvailable",
+    (SELECT count(*)>128 FROM typed_page_grants) AS "typedOverflow",
+    COALESCE((SELECT jsonb_agg(jsonb_build_object('id',g.id,'subject_id',g.subject_id,'issuer_id',g.issuer_id,'resource_keys',g.resource_keys,
+     'version',g.version,'valid_from',g.valid_from AT TIME ZONE 'UTC','expires_at',g.expires_at AT TIME ZONE 'UTC','actor_id',g.actor_id,'metadata',g.metadata))
+     FROM typed_page_grants g WHERE page.key=ANY(g.resource_keys)),'[]'::jsonb) AS "typedUses"
+    FROM page ORDER BY key COLLATE "C"`)
   const selected=candidates.slice(0,40)
-  return {list:selected.map(header=>{
+  const configured=await selectedEducationCatalogChoices(tx,c,selected)
+  return {list:selected.flatMap<EducationPublicCatalogCard>(header=>{
    const declaration=header.kind==='FORM'?educationApplicabilitySchema.safeParse(header.applicability):null
    const native=['COGNITIVE_CONFIG','SJT_RELEASE'].includes(header.kind)
    const applicable=native?administration.responseMode==='SELF'&&['participant_self_report',c.entry==='SCHOOL'?'student_self_report':'teacher_self_report'].includes(header.nativeRespondentType??''):administration.responseMode==='EXPERT_REPORT'?supportsExpertSource(header.expertApplicability,administration)
@@ -132,7 +149,7 @@ export async function listEducationPublicSources(c:PrivateToolContext,raw:unknow
      :(header.applicability as {respondentTypes?:string[]}|null)?.respondentTypes?.includes(respondent)):declaration?.success&&declaration.data.administrations.some(a=>a.population===administration.population&&a.responseMode===administration.responseMode)
    const requiredContextKeys=educationPublicRequiredContextKeys(header)
    const contextUnavailable=['STUDENT_REPORT','EXPERT_REPORT'].includes(administration.responseMode)&&requiredContextKeys.length>0
-   return {
+   const summary:EducationPublicCatalogCard={
    catalogKey:header.key,kind:header.kind==='STANDARD_SCALE'?'SCALE':header.kind==='COGNITIVE_CONFIG'?'COGNITIVE':header.kind==='SJT_RELEASE'?'SJT':'FORM',sourceProvider:header.kind,sourceId:header.id,contentHash:header.hash,
    title:header.title,language:header.language,versions:header.versions,requiredContextKeys,referenceContextKeys:header.referenceContextKeys,sourceLabel:'获授权公共固定版本',
    allowedActions:applicable&&!contextUnavailable?['REFERENCE_FIXED_VERSION']:[],runtimeStatus:native?'CHECK_EXACT_NATIVE_AT_FREEZE':header.kind==='FORM'?'CHECK_EXACT_FORM_AT_FREEZE':header.nativeAvailable?'CHECK_EXACT_STANDARD_AT_FREEZE':'NATIVE_UNAVAILABLE',canEditOriginal:false,canDistribute:false,
@@ -140,6 +157,15 @@ export async function listEducationPublicSources(c:PrivateToolContext,raw:unknow
    ...(header.kind==='STANDARD_SCALE'&&!applicable?{unavailableReason:header.nativeAvailable?'该版本未声明支持当前作答方式。':'原生量表尚未安装或已停止使用；授权不会创建执行程序。'}:{}),
    ...(header.kind==='FORM'&&!applicable?{unavailableReason:'该固定版本未声明适用于当前问卷的施测方式。'}:{}),
    ...(contextUnavailable?{unavailableReason:administration.responseMode==='EXPERT_REPORT'?'该版本需要受评教师的个人背景；当前专家观察不能用专家背景代替，原版内容与参数保持不变。':'该版本需要受评教师的个人背景才能计分，当前学生评教暂不支持。原版内容与参数保持不变。'}:{}),
-  }}),nextCursor:candidates.length>40?selected.at(-1)!.key:null}
+   }
+   const choices=configured.choices.get(header.key)??[]
+   const titleMatches=!input.q||header.title.toLowerCase().includes(input.q.toLowerCase())
+   const exact=choices.filter(choice=>titleMatches||choice.configurationName?.toLowerCase().includes(input.q!.toLowerCase())).map(choice=>({...summary,catalogKey:header.key+':use:'+choice.selectedBinding.authorizationId,
+    configurationName:choice.configurationName??header.title,selectedBinding:choice.selectedBinding,
+    ...(choice.ambiguous?{allowedActions:[],unavailableReason:'存在多条同名或未命名配置，请管理员明确使用配置名称。'}:{})}))
+   if(header.legacyUseAvailable&&titleMatches)return [{...summary,authorizationMode:'LEGACY' as const},...exact]
+   if(exact.length)return exact
+   return [{...summary,allowedActions:[],unavailableReason:configured.overflow?'当前精确授权较多，请缩小搜索范围或请管理员整理配置。':'原授权的管理资格、分发依据或入口批准已变化，请管理员重新配置。'}]
+  }),nextCursor:candidates.length>40?selected.at(-1)!.key:null}
  },{isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted})
 }

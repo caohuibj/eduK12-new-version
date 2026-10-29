@@ -1,8 +1,9 @@
 import type {PrivateToolSummary,PrivateToolVersion} from './privateToolClient'
 import type {CompositionAdministration} from './educationCompositionAdministration'
+export type SelectedConfigurationPointer={bindingHash:string;configurationHash:string;authorizationId:string;authorizationRevision:number}
 export type CompositionSource={provider:'PRIVATE_VERSION';kind:'SCALE'|'FORM';versionId:string;contentHash:string}|
  {provider:'LIBRARY_SCALE';kind:'SCALE';versionId:string;contentHash:string}|
- {provider:'STANDARD_SCALE';kind:'SCALE';versionId:string;contentHash:string}|
+ {provider:'STANDARD_SCALE';kind:'SCALE';versionId:string;contentHash:string;selectedBinding?:SelectedConfigurationPointer}|
  {provider:'PUBLIC_FORM';kind:'FORM';versionId:string;contentHash:string}|
  {provider:'COGNITIVE_CONFIG';kind:'COGNITIVE';versionId:string;contentHash:string;profile:'experience'|'standard'|'research'}|
  {provider:'SJT_RELEASE';kind:'SJT';versionId:string;contentHash:string}

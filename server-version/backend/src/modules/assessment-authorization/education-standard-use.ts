@@ -21,7 +21,9 @@ import {sealSelectedConfigurationBinding,readSelectedConfigurationBinding} from 
 const id=z.string().guid(),hash=z.string().regex(/^[a-f0-9]{64}$/)
 export type EducationConfigurationScope={product:'SCHOOL'|'TEACHER';organizationId:string}
 export const educationStandardUseInput=z.object({requestId:id,userId:id,combinationHash:hash,authorityGrantId:id,
- expectedAuthorityVersion:z.number().int().positive(),validFrom:z.string().datetime(),expiresAt:z.string().datetime()}).strict()
+ expectedAuthorityVersion:z.number().int().positive(),validFrom:z.string().datetime(),expiresAt:z.string().datetime(),configurationName:z.string().trim().min(1).max(120).optional()}).strict()
+export const educationStandardUseMetadata=z.object({schemaVersion:z.literal(1),selectedBinding:z.unknown(),requestIntentHash:hash,selfGrant:z.boolean(),
+ configurationName:z.string().trim().min(1).max(120).optional()}).strict()
 const options={isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted,maxWait:5000,timeout:15000}
 const deny:(message:string)=>never=(message)=>{throw new AdminPermissionError(403,message)}
 const conflict:(message:string)=>never=(message)=>{throw new AdminPermissionError(409,message)}
@@ -96,7 +98,8 @@ export async function grantEducationStandardConfigurationUse(actorId:string,scop
    VALUES(${input.requestId},${input.userId},${actorId},${scope.product},'ORGANIZATION',${scope.organizationId},'material',${[resourceKey]}::text[],
     ARRAY['material.use']::text[],ARRAY[]::text[],0,(${validFrom}::timestamptz AT TIME ZONE 'UTC'),(${expiresAt}::timestamptz AT TIME ZONE 'UTC'),${[input.requestId]}::text[])`)
   await tx.assessmentManagementEvent.create({data:{id:input.requestId,actorId,resourceId:combinationId,action:EDUCATION_STANDARD_USE_ACTION,
-   metadata:{schemaVersion:1,selectedBinding:sealed,requestIntentHash:intentHash,selfGrant:actorId===input.userId}}})
+   metadata:{schemaVersion:1,selectedBinding:sealed,requestIntentHash:intentHash,selfGrant:actorId===input.userId,
+    ...(input.configurationName?{configurationName:input.configurationName}:{})}}})
   // Final current checks after all waits. Recipient membership is protected by
   // Organization; manager/account/source/delegation locks remain held to commit.
   await assertEntryAdmin(tx,actorId,entry(scope.product))
@@ -108,7 +111,7 @@ export async function grantEducationStandardConfigurationUse(actorId:string,scop
 /** Historical identity read only; callers still need their existing data ACL.
  * Current use and original manager/delegation validation are separate. */
 export function readEducationStandardUseBinding(metadata:unknown,expected:{id:string;issuerId:string;recipientId:string;scope:EducationConfigurationScope;resourceKey:string}){
- const value=z.object({schemaVersion:z.literal(1),selectedBinding:z.unknown(),requestIntentHash:hash,selfGrant:z.boolean()}).strict().parse(metadata)
+ const value=educationStandardUseMetadata.parse(metadata)
  const sealed=readSelectedConfigurationBinding(value.selectedBinding,{product:expected.scope.product,recipientId:expected.recipientId,organizationId:expected.scope.organizationId,
   authorizationId:expected.id,authorizationRevision:1})
  if(!sealed||sealed.binding.authorization.kind!=='EDUCATION_SOURCE_USE'||sealed.binding.authorization.issuerId!==expected.issuerId
