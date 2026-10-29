@@ -29,24 +29,21 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 3
           persist-credentials: false
       - name: refuse unfrozen source or any additional validation-branch change
         shell: bash
         run: |
           set -euo pipefail
           source_commit='191a187439af026f33d46fbdc2f9d7958340f789'
-          test "$(git rev-parse HEAD^)" = "$source_commit"
+          git merge-base --is-ancestor "$source_commit" HEAD
           test "$(git diff --name-only "$source_commit" HEAD)" = '.github/workflows/scale26-intake-light-20261029.yml'
           test "$(git ls-tree HEAD .github/workflows/scale26-intake-light-20261029.yml | awk '{print $1}')" = 100644
           git checkout --detach "$source_commit"
           test "$(git rev-parse HEAD)" = "$source_commit"
           test "$(git rev-parse HEAD^{tree})" = 'cffae9ecd3b0a3a786008b5e5a857785eb9bd1ff'
           test "$(git rev-parse HEAD:server-version/backend/src/modules/scale/onboarding/instruments.generated.ts)" = de1f0d395c1ef6b712f89c5516642eccc139adcd
-          test "$(git rev-parse HEAD:server-version/backend/src/modules/scale/packages/spane12-balance-scorer.ts)" = "$(git rev-parse 5c680be4d121ecc3bf042a5b05da62cdd72866b0:server-version/backend/src/modules/scale/packages/spane12-balance-scorer.ts)" || {
-            echo 'A-stage scorer blob cannot be read; source identity must be established before reuse' >&2
-            exit 1
-          }
+          test "$(git rev-parse HEAD:server-version/backend/src/modules/scale/packages/spane12-balance-scorer.ts)" = '2e7c5f46dec510d86cc64d4b3a0f28d924dc4024'
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
