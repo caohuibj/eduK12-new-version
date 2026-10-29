@@ -18,7 +18,7 @@ export function verifyPackageFixtures(raw:unknown){
     const scaleSources=p.schemaVersion===2?p.manifest.definition.slots.filter(s=>s.unitType==='SCALE').map(slot=>{
       const b=p.profile.bindings.find(b=>p.evidence.find(e=>e.evidenceKey===b.evidenceKey)?.slotKey===slot.slotKey)!
       return {slotKey:slot.slotKey,instrumentKey:slot.instrumentKey,instrumentVersion:slot.instrumentVersion,sourceResultHash:canonicalHash({fixture:name,slot:slot.slotKey,values:fixture.values}),envelopeResultHash:null,
-        qualityState:'interpretable' as const,profileIdentity:{measurementHash:b.source.measurementHash,scoringVersion:b.source.scoringVersion,sourceResultId:'synthetic-fixture',qualityFlags:[]},
+        qualityState:'interpretable' as const,profileIdentity:{runtimeDefinitionHash:b.source.runtimeDefinitionHash,scoringVersion:b.source.scoringVersion,sourceResultId:'synthetic-fixture',qualityFlags:[]},
         scores:p.evidence.filter(e=>e.slotKey===slot.slotKey).map(e=>({scoreKey:e.selector,value:fixture.values[e.evidenceKey]?.state==='present'?(fixture.values[e.evidenceKey] as {value:number}).value:null,status:'calculated' as const,criterionBandKey:null}))}
     }):undefined
     const result=(p.schemaVersion===2?runProfileEvidence:runDeclarativeEvidence)({snapshot:{bundleKey:p.manifest.definition.bundleKey,bundleVersion:p.manifest.definition.bundleVersion} as any,compiledRuntime:{} as any,contextFacts:null,aggregateInputHash:null,evidence,declarativePackage:p,scaleSources})

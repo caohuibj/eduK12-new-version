@@ -18,7 +18,7 @@ import { scaffoldPackage } from '../../modules/assessment-bundle/onboarding/temp
 import type { BundleEngineInputV1 } from '../../modules/assessment-bundle/registry'
 import type { ProfileResult } from '../../modules/assessment-bundle/profile/match'
 
-const pack=loadPackage(path.resolve(__dirname,'../../modules/assessment-bundle/packages/learning_motivation_math_support/0.1.0'))
+const pack=loadPackage(path.resolve(__dirname,'../../modules/assessment-bundle/packages/learning_motivation_math_support/0.1.1'))
 if(pack.schemaVersion!==2)throw new Error('PROFILE_FIXTURE_REQUIRED')
 const model=pack.profile
 function input(e:number|null=2.2,v=5,c=5,grade=9):BundleEngineInputV1{
@@ -27,7 +27,7 @@ function input(e:number|null=2.2,v=5,c=5,grade=9):BundleEngineInputV1{
     const binding=model.bindings.find(b=>b.source.instrumentKey===slot.instrumentKey)!
     const rows=pack.evidence.filter(m=>m.slotKey===slot.slotKey).map(m=>({scoreKey:m.selector,value:m.evidenceKey==='e'?e:m.evidenceKey==='v'?v:c,status:(m.evidenceKey==='e' && e===null?'not_calculable':'calculated') as 'calculated'|'not_calculable',criterionBandKey:null}))
     const envelope=createCanonicalUnitResultEnvelope({
-      core:{schemaVersion:1,unitType:'SCALE',instrumentKey:slot.instrumentKey,instrumentVersion:slot.instrumentVersion,sourceDefinitionHash:binding.source.measurementHash,
+      core:{schemaVersion:1,unitType:'SCALE',instrumentKey:slot.instrumentKey,instrumentVersion:slot.instrumentVersion,sourceDefinitionHash:binding.source.runtimeDefinitionHash!,
         compilerVersion:'1.0.0',compiledRuntimeHash:'a'.repeat(64),scorerKey:'synthetic-unit-scorer',scorerVersion:'1.0.0',quality:{status:'interpretable',flags:[]},
         metrics:[],facts:[],references:[],contextHash:null,scientificProvenance:{instrumentKey:slot.instrumentKey,instrumentVersion:slot.instrumentVersion}},
       completedAt:'2026-10-29T12:00:00.000Z',persistenceProvenance:{sourceType:'ASSESSMENT',sourceAttemptId:'synthetic-'+slot.slotKey},
@@ -134,3 +134,16 @@ describe('native profile package compatibility',()=>{
   })
 })
 
+
+it('keeps a complete selected core independent of unselected score quality',()=>{
+  const i=input(),vc=i.scaleSources!.find(s=>s.slotKey==='vc')!
+  vc.qualityState='invalid'
+  vc.scores.push({scoreKey:'synthetic_unselected_aux',value:null,status:'not_calculable',criterionBandKey:null})
+  ;(vc as any).profileIdentity.qualityFlags=['missing_items','score_not_calculable']
+  i.evidence=mapDeclarativeEvidence(i)
+  expect(run(i)).toMatchObject({state:'MATCHED',profileId:'P4'})
+  vc.scores.find(s=>s.scoreKey==='cost')!.status='not_calculable'
+  vc.scores.find(s=>s.scoreKey==='cost')!.value=null
+  i.evidence=mapDeclarativeEvidence(i)
+  expect(run(i)).toMatchObject({state:'INSUFFICIENT',profileId:null})
+})

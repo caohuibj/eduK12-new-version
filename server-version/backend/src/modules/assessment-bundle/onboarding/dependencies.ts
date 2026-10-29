@@ -1,3 +1,5 @@
+import { canonicalHash } from '../../assessment-runtime/canonical'
+import { calculateScoreRanges } from '../../scale/scale-scoring'
 import { hashScaleDefinition } from '../../scale/scale-definition'
 import { cognitiveSeeds } from '../../cognitive/generated/seeds'
 import { getExecutableScalePackage } from '../../scale/onboarding/executable-registry'
@@ -32,7 +34,8 @@ export function dependencyBlockers(raw: unknown): string[] {
   if(p.schemaVersion===2)for(const b of p.profile.bindings){
     const e=p.evidence.find(e=>e.evidenceKey===b.evidenceKey)!,pkg=getExecutableScalePackage(b.source.instrumentKey,b.source.instrumentVersion)
     const d=pkg?.definition,score=d?.scoring.scores.find(s=>s.key===e.selector)
-    if(!d || hashScaleDefinition(d)!==b.source.measurementHash || d.scoring.scoringVersion!==b.source.scoringVersion ||
+    const range=d?calculateScoreRanges(d).get(e.selector):undefined
+    if(!d || canonicalHash(d)!==b.source.runtimeDefinitionHash || range?.min!==b.transformation.min || range?.max!==b.transformation.max || hashScaleDefinition(d)!==b.source.measurementHash || d.scoring.scoringVersion!==b.source.scoringVersion ||
       d.versionAxes?.localizationVersion!==b.source.localizationVersion || d.versionAxes?.subjectKey!==p.profile.applicability.domain ||
       d.scoring.scorerKey || score?.source.type!=='items' || score.source.items.length!==b.source.expectedItems || score.source.aggregation!=='mean')
       errors.push(b.evidenceKey+': PROFILE frozen measurement/scoring/locale/item identity mismatch')

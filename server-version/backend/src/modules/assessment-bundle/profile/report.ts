@@ -8,6 +8,7 @@ export interface ProfileView {
   title:string; explanation:string|null; profileId:string|null
   constructs:Array<{key:string;label:string;raw:number;min:number;max:number;referenceCenter:number|null}>
   candidates:Array<{profileId:string;name:string;matchingScore:number}>
+  alternatives:string[]
   actions:string[]
   methods:ProfileResult['model']|null
   limitation:string
@@ -31,6 +32,7 @@ export function projectProfileView(result:ProfileResult,pack:DeclarativePackage,
       referenceCenter:profile && numeric?c.min+(c.max-c.min)*(c.orientation==='DIRECT'?profile.centers[c.key]:1-profile.centers[c.key]):null,
     })),
     candidates:technical && interpret && numeric && every('methods')?result.candidates.map(c=>({profileId:c.profileId,name:model.profiles.find(p=>p.id===c.profileId)!.name,matchingScore:c.matchingScore})):[],
+    alternatives:interpret && result.state==='MIXED'?result.candidates.slice(0,2).map(c=>model.profiles.find(p=>p.id===c.profileId)!.name):[],
     actions:profile && every('educationalContent')?profile.actions.map(a=>a.text):[],
     methods:every('methods')?{...result.model}:null,
     limitation:'理论试验画像；预设中心与分界尚未经真实人群验证。匹配分不是概率或常模，不用于诊断、排名或能力判断。',

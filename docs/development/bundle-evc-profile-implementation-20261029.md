@@ -1,6 +1,6 @@
 # EVC 理论 Bundle：实施与验收设计（2026-10-29）
 
-状态：设计，自审完成；尚未实现、安装、正式 CI、合并或部署。执行仅在独立云端，禁止访问生产数据库。分支 `feat/bundle-evc-profile-20261029`。
+状态：首个切片已实现，隔离 PostgreSQL/真实会话 HTTP/恢复读取通过；正式 CI、浏览器页面、合并和生产部署尚未完成。第11—12节保留早期检查点，最新结果以第13节为准。执行仅在独立云端，禁止访问生产数据库。分支 `feat/bundle-evc-profile-20261029`。
 
 ## 1. 精确来源与当前事实
 
@@ -23,7 +23,7 @@
 | 编号 | 低E高V高C编号不同 | P4=低E、高V、高C |
 | 成熟度 | 理论候选 | EXPERIMENTAL；无真实类别验证 |
 
-采用依据：委托要求优先复用B参考实现；有精确可校验源码、六型、拒判规则、固定中文文案及12例。作为独立研究候选集成，不替代A、不平均阈值、不改年龄或科学身份。已提出唯一专家决策：是否冻结B为首个可安装试验示范；未答前通用集成继续，正式示范身份保持待决。代码合入不等于科学批准、DB发布或生产上线。
+采用依据：委托要求优先复用B参考实现；有精确可校验源码、六型、拒判规则、固定中文文案及12例。作为独立研究候选集成，不替代A、不平均阈值、不改年龄或科学身份。DOT后续明确选择B为首个研究试验示范，继续工程验证；无需修改B的理论、阈值或年龄。代码合入不等于科学批准、DB发布或生产上线。
 
 B参数保持原值：三轴等权；低<=.35，高>=.65；低/高中心.2/.8；模糊节点.25/.5/.75；加权平均绝对距离 d，匹配=100*(1-d)，绝对拒判优先于分差；全精度计算，显示才舍入。六型为 HHL、HHH、LHL、LHH、HLL、LLH；LLL/HLH明确未覆盖。
 
@@ -37,7 +37,7 @@ B参数保持原值：三轴等权；低<=.35，高>=.65；低/高中心.2/.8；
 
 源blob须与实际文件核验；Git blob只作来源，不作运行 measurementHash。生产映射固定实际 measurement 内容hash、scoringVersion、语言版本及来源版本。E/VC原 scorer 的 calculated 语义要求该分量表完整，缺答为limited/not_calculable；优先复用这一契约，避免为本功能改变共享单项计分/CanonicalUnitResult schema。若核心完整性不能由现有协议证明，输出INSUFFICIENT，不伪造expected/answered。
 
-版本分别固定：Bundle定义C=0.1.0；模型/映射/参数P=0.1.0（算法 weighted-l1-guarded-v1）；中文模板R=0.1.0；引擎 declarative-evidence-v1@1.1.0；onboarding package schema=2；外层 FrozenBundleProductionDefinition schema2、Bundle Snapshot V3均保留。单项 C/P/R 不变（instrument/scoring/localization1.0.0，既有report1.1.0）。
+版本分别固定：Bundle定义C=0.1.1、映射=0.1.1（原生完整定义hash修复，见第13节）；模型/参数P=0.1.0（算法 weighted-l1-guarded-v1）；中文模板R=0.1.0；引擎 declarative-evidence-v1@1.1.0；onboarding package schema=2；外层 FrozenBundleProductionDefinition schema2、Bundle Snapshot V3均保留。单项 C/P/R 不变（instrument/scoring/localization1.0.0，既有report1.1.0）。
 
 坐标只为理论范围位置，不是百分位、常模分、能力、心理等距或等值转换。参考版本无统计后验概率。现有原始反向题由单项计分一次；Bundle只对已冻结维度做显式方向转换。本例两工具无反向项。
 
@@ -170,3 +170,79 @@ DOT已确认：B原参考是首个研究试验示范，保持原L1参数和7—1
 已实际推送设计35c31f552及候选e860cfc4202d049e4b16a19ddca03eaffa1234b0，远端分支回读吻合；main回读仍2de32609。Draft前静态核到新包缺少既有content-check要求的ci-fixture，补齐同一12题S04合成输入，不改量表评分或既有断言。
 
 Draft激活范围：base2de32609、scope实际分类platform/legacy；Draft只运行既有light compile/type及独立publication观察，不授予Ready/合并资格。适用CI-003（真实类型闭包）、CI-006（正常安装/部署前置）、CI-007（新增包/ci-fixture清单）、CI-019/020（范围、原始结果和未执行状态）；真实PG/browser尚未通过，不启动Ready全平台作为排错。已有45个纯算法/合同本地结果不重复运行，未将其冒称正式CI。后续Ready资格需冻结实际完整功能切片及适用范围。
+
+
+## 13. 原生闭环与第二自然提交（2026-10-29）
+
+### 结果与版本边界
+
+已推送的历史检查点为 `35c31f5522277d5d7d09c6be1764208029c58a6d`、`e860cfc4202d049e4b16a19ddca03eaffa1234b0`、`4f329cdb57b19201ad930559acefedc71c47d2fb`。本节对应后续原生闭环提交；提交SHA以Git为准，不在同一提交内制造自引用。
+
+B仍是独立研究试验候选 `learning_motivation_math_support@0.1.0`，7—12年级、三轴等权、六型与全部L1参数不变。真实PG揭示 `canonical.core.sourceDefinitionHash` 是包含报告设计的**完整运行时定义**hash，原参考记录的measurement C hash只覆盖科学测量定义，两者不可互换。因此Bundle/映射升为0.1.1，模型/中文模板仍0.1.0，引擎1.1.0；未声称B科学定版。
+
+- 原生包contentHash：`34625844b7014e409a423e99ee2f31fdf28f3d41f629d6432a928e9a2214a941`。
+- 完整ASE runtime hash：`8b4eb7b667ede55476fdb5f1c8be3d42627b9677f6a9dcd5379f23f7cfe83a73`。
+- 完整VC runtime hash：`53e935260ed7c4e54e7dbfdc67a8b1f68c4fcc64ec4aa4ebacc6371e90c1c89d`。
+- 第11节两项C hash继续独立验证；同时验证精确计分版本、语言、均分来源题数和实际原量尺。
+- 分支早期0.1.0仅存在本云端合成DB与尚未合main的候选历史；目录移为0.1.1，原UNAVAILABLE分析未覆盖。schema2读取允许缺runtime hash以保持旧冻结artifact原hash；新发布必须有且匹配实际runtime hash。package1解析/hash未改变。
+
+### 实际改动及共享文件清单
+
+新增 `profile/admission.ts` 只为声明的Bundle年级字段生成canonical `gradeLevel`选项；年级不产生个人数据权限。`profile/sources.ts` 是局部交叉类型，只读取已经解析验证的canonical envelope。完整性按选中的generic item-mean分量表calculated状态判断，其他辅助分数的缺失不会冒充核心无效，核心自身缺失仍拒判。
+
+共享消费者的精确改动为：
+
+| 文件（相对server-version） | 最小输入/输出 |
+|---|---|
+| `backend/src/modules/bundle-product/service.ts` | package2年级声明→既有Context formItem；其余包不变 |
+| `backend/src/modules/bundle-product/analysis.ts` | package2 canonical source→原持久化facts的Profile payload；原鉴权/冻结admission policy交集→可选ProfileView |
+| `backend/src/modules/assessment-bundle/report-facts.ts` | 仅新增兼容可选 `profileView?: ProfileView`；旧字段保留 |
+| `backend/src/modules/bundle-product/admin-authoring.ts` | 原preview附加可选模型及合成状态；profile包独立review明确要求既有cross_source_condition claim |
+| `frontend/src/pages/bundle/BundleReport.tsx` | 消费服务端白名单，可选ProfileView走新增局部组件；既有报告路径保留 |
+| `frontend/src/pages/bundle/BundleAuthoring.tsx` | Bundle专用内容预览展示冻结参数与研究试验状态，不涉及管理员精确授权分配UI |
+
+未修改CanonicalUnitResult、ScaleResult、共享授权/grant核心或任务1分支。`analysis.ts`还沿用单项冻结report audience约束，防止仅有numeric权限的其他受众取得画像解释。WITHHELD不返回型名、候选、排名、原型中心或行动。实际source策略下教师被抑制，学生可解释；所有来源educationalContent=false，所以真实示范的actions为空，模板中的建议没有越权显示。
+
+前端新增中文画像摘要、三个各自原量尺的SVG与等价文字表、拒判/混合状态和方法版本；无雷达面积、综合动机分或概率。报告重开从已有BundleAnalysis读取，不重新运行单项计分、画像或查最新模板。静态包缓存上限16，不缓存用户/权限。
+
+### 验证、首错与未执行项
+
+只使用本云端隔离 `eduk12_test` 及独立恢复库，无生产DB。原有main迁移已按正规流程部署到test库，没有新增schema迁移。两项量表均通过正常installScaleInstrument→plan/publishStandardScale补齐reference、deployment与入口policy；Bundle通过正常安装和独立签名合成review发布，未直接写审批状态或取消断言。合成review不是生产科学审核，也不是GitHub APPROVE。
+
+| 证据 | 实际结果/边界 |
+|---|---|
+| 原45个算法/合同/loader/cache检查 | 原43+2 PASS保留，不重复运行；不冒称参考包旧42项 |
+| 新选中核心质量案例 | Vitest JSON及stdout为1 PASS/23 filtered；原组合工具调用exit存在不一致，未把整次调用提升为合格exit0证据 |
+| 新setup预览 | 1 PASS，exit0；原签名review claim、B模型/映射身份、四fixture状态、canonical grade选项 |
+| 前端 | 新ProfileSummary 1+原BundleReport 2 PASS；集成frontend types exit0；后续BundleAuthoring闭包232源文件/0诊断、exit0 |
+| 后端类型 | 集成检查0诊断；最终实际消费者闭包再次0诊断/exit0；未过滤诊断、未修改tsconfig放宽规则 |
+| 首次PG lifecycle失败1 | STALE_ATTEMPT：fixture错用child context hash；改读parent canonical context。保留原日志 |
+| 首次PG lifecycle失败2 | durable FINAL/replay成功，期望READY实际UNAVAILABLE；静态解密确认三项IDENTITY_MISMATCH，定位C/runtime hash区别后停止重复旅程 |
+| 显式修复读取 | 新0.1.1正规安装/发布后，仅重分析已存FINAL，READY P4、匹配96.666667；原UNAVAILABLE及factsHash保留；不重跑单项计分 |
+| 真实会话HTTP新首次FINAL | 登录→启动→canonical年级FINAL→5+7题FINAL→COMPLETED→INITIAL READY P4；两项单项报告/三项原分2.2、5、5及个体解释保留；重复FINAL replayed=true；再次GET factsHash一致 |
+| 首次结果DB核对 | attempt `bfacf613-754a-47a0-90c4-6b2b267757f8`，一条INITIAL READY、三个单元snapshot；没有第二次综合分析。factsHash `6c01a7af4bf4f0f84369ae0b5d8fa9a935330a90225133465bfddef6ed3ead53` |
+| 备份恢复 | pg_dump -Fc 1863944字节，SHA256 `addc0b7c66aefbc0c73135907b431228c5a03b15ceb2dfc652d9f5355ef984c8`；独立新库pg_restore exit0；恢复读取1 PASS/exit0，校验factsHash且spy禁止画像重算、历史两条分析和三单元保持 |
+| 浏览器 | Chromium sandbox=true启动前失败，helper实际owner不合要求；未使用--no-sandbox、TLS忽略或修改helper权限。尚无真实DOM、截图或键盘/布局成功证据 |
+| 正式CI/合并/生产 | 均未执行；正式CI失败累计0。Draft PR创建审批服务故障且已知未执行（下文），未绕过或换工具重试 |
+
+新原生HTTP和恢复是补缺失消费者，并非重跑此前45个纯算法检查。完整新lifecycle测试文件保留可重现入口，本轮不把其两次失败改写成整套PASS；成功的全新0.1.1首次FINAL由上表真实HTTP证明。原日志/JSON及私有合成fixture均保留在本云端 `/workspace/bundle-inputs/`，包含密码/signingKey的fixture为0600且不入Git。后续正式CI须按实际支持能力判断本地未签名证据的接纳，不能冒称已经通过官方门禁。
+
+性能记录是单样本、无负载：修复后的保存报告服务读取20.91ms、SQL5、CPU user22.417/system4.383ms、响应4095B、facts密文12198B/定义密文39980B；新真实HTTP两项FINAL总446.27ms、整体报告GET98.94ms/18278B。两组计时范围不同；早期baseline前置失败，因此没有有效修改前同环境baseline，也不主张性能提升/p95/生产容量。恢复原件无新增每题计算或PDF/图片双归档。
+
+### 正常安装与后续入口
+
+从backend工作目录使用现有 `npm run bundle:package:preview -- src/modules/assessment-bundle/packages/learning_motivation_math_support/0.1.1`，然后 `bundle:package:install -- <目录> <管理员ID>`。两项精确工具须先按原normal install/publication正常可用；在既有Bundle内容管理页由不同审核者检查scientific/rights/language/report及cross_source_condition，再发布完整包。创建Bundle实例绑定ASE和VC精确版本及同一课程，发布后受试者填写年级并完成两项；不把内容文件requestedStatus:DRAFT误当DB已发布。配置签名密钥走现有环境配置，不入内容文件。
+
+第7节矩阵仍有效：本次闭环是Training/通用Bundle。Survey现有 `FrozenGovernedPackage`/`governed-package.reports.ts` 是单独的已冻结TEXT/METRIC/FORM_FIELD拼装契约，不能直接把B型算法伪装为普通BUNDLE枚举；School/Teacher的P6候选仍只有wholepackage preview/read。后续最薄桥接需要接收**完整原生包hash＋精确slot canonical结果＋现有release/admission身份**，输出可选持久化Profile payload/白名单，原GRANT和单项权限继续由任务1所有。没有合入P6 WIP、拆分完整包或声称三入口已接通。
+
+### 外部阻塞（已知未执行，不绕过）
+
+创建 `caohuibj/eduK12-new-version` 的Draft PR（head本分支、base main、draft=true）返回原文：
+
+> Automatic approval review failed: Selected model is at capacity. Please try a different model.
+
+工具明确说明：action was not executed；这是审批服务未完成，不是安全判定。按平台要求停止该操作，未改用gh/其他工具绕过审批，未执行GitHub APPROVE。需要DOT/平台恢复审批服务后提供与该故障有关的新证据，才可重试。分支提交/正常push继续，不受此创建PR动作故障影响。
+
+Ready前仍须独立审阅精确base/head及适用CI：当前实际scope是platform/legacy，Draft选light，Ready默认会选全平台；不能通过skip/伪造成功规避。新功能正式缺失项为受影响build/正式CI与真实浏览器，后续四入口为独立功能切片。用户要求最少重复，故不把全平台Ready作为首轮排错，也不将未经正式接纳的本地结果冒称必需门禁成功。
+
+本自然提交前再次回读main，发现已推进到 `6142ddc74db9787f6606746610df58c73de256f5`（PR387三项独立量表材料，11路径；不含EVC两源、Bundle、授权或本消费者）。将按正常merge对齐，避免强推和改写已推送历史；上述旧base结果仅对未变化的对应输入有效。

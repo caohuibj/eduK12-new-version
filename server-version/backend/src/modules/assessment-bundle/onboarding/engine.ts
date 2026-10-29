@@ -47,7 +47,10 @@ export function mapDeclarativeEvidence(input: BundleEngineInputV1): EvidenceItem
     const raw = 'metrics' in source ? source.metrics[mapping.selector] : score?.value
     const missing = raw === undefined || raw === null
     const invalid = !missing && (typeof raw !== mapping.valueType || (typeof raw==='number' && !Number.isFinite(raw)))
-    const quality = invalid || source.qualityState==='invalid' ? 'invalid' as const : missing || score?.status==='not_calculable' ? 'unavailable' as const : source.qualityState==='limited' || score?.status==='limited' ? 'limited' as const : 'interpretable' as const
+    // Package2 binds a strict generic item-mean scorer and classifies the
+    // selected core scores. Another score's missingness cannot invalidate it.
+    const perScore=pack.schemaVersion===2 && slot.unitType==='SCALE'
+    const quality = invalid || !perScore && source.qualityState==='invalid' ? 'invalid' as const : missing || score?.status==='not_calculable' ? 'unavailable' as const : !perScore && source.qualityState==='limited' || score?.status==='limited' ? 'limited' as const : 'interpretable' as const
     const kind = slot.unitType==='SCALE' ? 'SCALE_SCORE' as const : slot.unitType==='COGNITIVE' ? 'COGNITIVE_METRIC' as const : 'SITUATIONAL_METRIC' as const
     return { evidenceKey:mapping.evidenceKey, constructKey:mapping.construct, role:mapping.role,
       source:kind==='SCALE_SCORE'?{kind,slotKey:slot.slotKey,scoreKey:mapping.selector,sourceResultHash:source.sourceResultHash}:{kind,slotKey:slot.slotKey,metricKey:mapping.selector,sourceResultHash:source.sourceResultHash},

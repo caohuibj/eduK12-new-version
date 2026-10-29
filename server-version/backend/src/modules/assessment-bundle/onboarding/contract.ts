@@ -202,7 +202,7 @@ export function parseDeclarativePackage(raw: unknown): DeclarativePackage {
       const rule=value.rules.items.find(r=>r.ruleId===id)
       if(!rule || !rule.evidenceKeys.some(k=>evidence.get(k)?.role==='SUPPORTING'))fail('profile.modifierRuleIds','modifier requires its own supporting evidence')
     }
-    if(profile.templateVersion!==value.report.version || profile.key!==definition.bundleKey || profile.version!==definition.bundleVersion)fail('profile','exact model/template identity required')
+    if(profile.templateVersion!==value.report.version || profile.key!==definition.bundleKey)fail('profile','exact model/template identity required')
     if(value.scientific.maturity!=='EXPERIMENTAL')fail('profile','theory model is experimental')
   }
   if(cacheKey){

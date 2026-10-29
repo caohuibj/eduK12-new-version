@@ -3,7 +3,7 @@ import path from 'node:path'
 import {loadPackage} from '../../modules/assessment-bundle/onboarding/loader'
 import {parseDeclarativePackage,hashDeclarativePackage} from '../../modules/assessment-bundle/onboarding/contract'
 import {verifyPackageFixtures} from '../../modules/assessment-bundle/onboarding/fixtures'
-const pack=loadPackage(path.resolve(__dirname,'../../modules/assessment-bundle/packages/learning_motivation_math_support/0.1.0'))
+const pack=loadPackage(path.resolve(__dirname,'../../modules/assessment-bundle/packages/learning_motivation_math_support/0.1.1'))
 it('bounds static model reuse through immutable content and rejects incomplete fixture sets',()=>{
   expect(pack.schemaVersion).toBe(2)
   const before=hashDeclarativePackage(pack)

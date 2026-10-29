@@ -2,7 +2,7 @@
   "definition": {
     "schemaVersion": 1,
     "bundleKey": "learning_motivation_math_support",
-    "bundleVersion": "0.1.0",
+    "bundleVersion": "0.1.1",
     "status": "DRAFT",
     "category": "scale_self",
     "name": "数学学习动机支持画像｜理论试验版",

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "key": "learning_motivation_math_support",
   "version": "0.1.0",
-  "mappingVersion": "0.1.0",
+  "mappingVersion": "0.1.1",
   "templateVersion": "0.1.0",
   "algorithm": "weighted-l1-guarded-v1",
   "maturity": "EXPERIMENTAL",
@@ -36,7 +36,8 @@
         "definitionSourceHash": "a5f02168ad4135d3c13a2740d391d2043770cb8b",
         "timeframeKey": "current_beliefs_with_next_semester_item_v1",
         "expectedItems": 5,
-        "measurementHash": "ea8cd4535b0c80c64bf6c93e538f2d33b282860136bcb153ac053b06d9f9da2d"
+        "measurementHash": "ea8cd4535b0c80c64bf6c93e538f2d33b282860136bcb153ac053b06d9f9da2d",
+        "runtimeDefinitionHash": "8b4eb7b667ede55476fdb5f1c8be3d42627b9677f6a9dcd5379f23f7cfe83a73"
       }
     },
     {
@@ -61,7 +62,8 @@
         "definitionSourceHash": "8db7d7822006b919e03b33d0543e37f81b79f426",
         "timeframeKey": "current_subject_beliefs_no_fixed_recall_v1",
         "expectedItems": 3,
-        "measurementHash": "931040631cfcb3c02b7d7116374537b1a2aff5805cbf0e22258e18b43d158ff3"
+        "measurementHash": "931040631cfcb3c02b7d7116374537b1a2aff5805cbf0e22258e18b43d158ff3",
+        "runtimeDefinitionHash": "53e935260ed7c4e54e7dbfdc67a8b1f68c4fcc64ec4aa4ebacc6371e90c1c89d"
       }
     },
     {
@@ -86,7 +88,8 @@
         "definitionSourceHash": "8db7d7822006b919e03b33d0543e37f81b79f426",
         "timeframeKey": "current_subject_beliefs_no_fixed_recall_v1",
         "expectedItems": 4,
-        "measurementHash": "931040631cfcb3c02b7d7116374537b1a2aff5805cbf0e22258e18b43d158ff3"
+        "measurementHash": "931040631cfcb3c02b7d7116374537b1a2aff5805cbf0e22258e18b43d158ff3",
+        "runtimeDefinitionHash": "53e935260ed7c4e54e7dbfdc67a8b1f68c4fcc64ec4aa4ebacc6371e90c1c89d"
       }
     }
   ],

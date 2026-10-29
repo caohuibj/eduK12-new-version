@@ -16,7 +16,7 @@ export const profileSchema = z.object({
     constructKey: key, evidenceKey: key, label: text, contributionGroup: key, weight: z.number().finite().positive().max(1000),
     source: z.object({
       instrumentKey: key, instrumentVersion: version, scoringVersion: version, localizationVersion: version,
-      measurementHash: hash, definitionSourceHash: z.string().regex(/^[a-f0-9]{40}$/),
+      measurementHash: hash, runtimeDefinitionHash: hash.optional(), definitionSourceHash: z.string().regex(/^[a-f0-9]{40}$/),
       expectedItems: z.number().int().positive().max(1000), timeframeKey: key,
     }).strict(),
     transformation: z.object({

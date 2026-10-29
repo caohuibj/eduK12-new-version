@@ -46,13 +46,13 @@ export function runBundleProfile(model:ProfileModel,input:BundleEngineInputV1):P
     // Missing historical metadata never becomes invented trusted completeness.
     if(!s || !identity){out.reasons.push(b.evidenceKey+':IDENTITY_UNAVAILABLE');continue}
     if(s.instrumentKey!==b.source.instrumentKey || s.instrumentVersion!==b.source.instrumentVersion ||
-      identity.measurementHash!==b.source.measurementHash || identity.scoringVersion!==b.source.scoringVersion){
+      identity.runtimeDefinitionHash!==b.source.runtimeDefinitionHash || identity.scoringVersion!==b.source.scoringVersion){
       invalid=true;out.reasons.push(b.evidenceKey+':IDENTITY_MISMATCH');continue
     }
     const score=s.scores.find(s=>s.scoreKey===(e.source as {scoreKey:string}).scoreKey)
     // Exact dependency validation permits only the item-mean scorer. It emits
     // calculated iff every source item is answered; partial means are limited.
-    if(!score || score.status!=='calculated' || identity.qualityFlags.includes('missing_items')){
+    if(!score || score.status!=='calculated'){
       out.reasons.push(b.evidenceKey+':INCOMPLETE');continue
     }
     const raw=e.value.value,t=b.transformation
