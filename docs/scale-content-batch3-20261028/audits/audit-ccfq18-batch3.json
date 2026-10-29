@@ -1,0 +1,487 @@
+{
+  "instrument": "ccfq18_zh_cn:1.0.0",
+  "source_commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "source_files": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ccfq18_zh_cn/1.0.0/source.json",
+      "blob": "458edc3d14c6f6b37ed55ab0d4d8a8e53435ac3f",
+      "sha256": "4ca5939a4601d3b0e1a845e354fb4b192add1736682e48f9dbffa2a80937c103"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ccfq18_zh_cn/1.0.0/instrument.ts",
+      "blob": "5417115074965b06a10f1bb4724b8d718574b343",
+      "sha256": "3377f617ada9915282a8e8c781809461030d3302be33c45564d3577e4a533085"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ccfq18_zh_cn/README.md",
+      "blob": "835c91d14f7839235eaab9a976bc4d2a59a9edcc",
+      "sha256": "b0753a8a6c388f6c867e7387cef56a9ffcbbebe24ec7b62be1bc501956e8d685"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ccfq18_zh_cn/administration-and-translation.json",
+      "blob": "e626f388c92eac870e28915f9152b982f2012ba4",
+      "sha256": "15e1188705bdd540ed9116cbcfa2d1ef4c492dec70cf8a78cc038d417acc44be"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ccfq18_zh_cn/source-en.handoff.json",
+      "blob": "0630d424c7f3091788815ea442ae4a3949fa108d",
+      "sha256": "8c649536e6f61534778fe72919edeb5250f8e855e28546f97e4e2296b10c03b5"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ccfq18_zh_cn/references.md",
+      "blob": "dc6c478c019327e04c7d366655d5736c3c41f38b",
+      "sha256": "f544ac8e3f54e98b5faf8c39576b8e9b7021d175a4bb5fe4bf2452dbc1829666"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ccfq18_zh_cn/scoring-and-thresholds.md",
+      "blob": "3929197d0ffb5d483b387ec6f468c67f0c49c3f8",
+      "sha256": "bae6deafdf3706751099e5280ffb812a91a9d6562a0d2700ae889fe34d792c46"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ccfq18_zh_cn/report-example.md",
+      "blob": "5425a524819611cf2388363f0b50ec18ad5010c9",
+      "sha256": "7955e38840e888801d889457078d49cf3652ad582ab60c48a1fa0a250468a06d"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ccfq18_zh_cn/validation.json",
+      "blob": "ed71795a1a3b77cb56ba15a8141113e7d99b0a24",
+      "sha256": "c6780d84c0801dedd2cd7a870c689d4286dccd57f013a2b9fd48e5e4070aa103"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ccfq18_zh_cn/verification-20261026.md",
+      "blob": "ca7bb8b3c7cc9ef66a36b02953f5f584aac4133f",
+      "sha256": "8afb43b065ab7e542ef2fc01c354d68f1898f089f76ebebc0826a00bfe559dac"
+    }
+  ],
+  "three_parts": {
+    "items_administration": {
+      "items": [
+        {
+          "number": 1,
+          "code": "CCFQ1",
+          "english": "I weigh out my options before choosing how to take action.",
+          "chinese": "我会先权衡可选的办法，再决定如何行动。",
+          "source_table_row": 15,
+          "dimension": "appraisal_and_coping_flexibility",
+          "reverse": false,
+          "runtime_transform": "identity",
+          "runtime_matches": true,
+          "review": "保留英语核心含义；中文工作译稿尚待人工译审。"
+        },
+        {
+          "number": 2,
+          "code": "CCFQ2",
+          "english": "I feel like I lose control over my thoughts and emotions.",
+          "chinese": "我觉得自己失去了对想法和情绪的控制。",
+          "source_table_row": 5,
+          "dimension": "cognitive_control_over_emotion",
+          "reverse": true,
+          "runtime_transform": "reverse",
+          "runtime_matches": true,
+          "review": "保留英语核心含义；中文工作译稿尚待人工译审。"
+        },
+        {
+          "number": 3,
+          "code": "CCFQ3",
+          "english": "I approach the situation from multiple angles.",
+          "chinese": "我会从多个角度看待这件事。",
+          "source_table_row": 11,
+          "dimension": "appraisal_and_coping_flexibility",
+          "reverse": false,
+          "runtime_transform": "identity",
+          "runtime_matches": true,
+          "review": "保留英语核心含义；中文工作译稿尚待人工译审。"
+        },
+        {
+          "number": 4,
+          "code": "CCFQ4",
+          "english": "It’s difficult to let go of intrusive thoughts or emotions.",
+          "chinese": "我很难放下那些不由自主冒出来的想法或情绪。",
+          "source_table_row": 7,
+          "dimension": "cognitive_control_over_emotion",
+          "reverse": true,
+          "runtime_transform": "reverse",
+          "runtime_matches": true,
+          "review": "保留英语核心含义；中文工作译稿尚待人工译审。"
+        },
+        {
+          "number": 5,
+          "code": "CCFQ5",
+          "english": "I consider the situation for multiple viewpoints before responding.",
+          "chinese": "在作出回应之前，我会从多个视角考虑这件事。",
+          "source_table_row": 12,
+          "dimension": "appraisal_and_coping_flexibility",
+          "reverse": false,
+          "runtime_transform": "identity",
+          "runtime_matches": true,
+          "review": "保留英语核心含义；中文工作译稿尚待人工译审。"
+        },
+        {
+          "number": 6,
+          "code": "CCFQ6",
+          "english": "I take the time to think of several ways to best cope with the situation before acting.",
+          "chinese": "在行动之前，我会花时间想出几种尽可能妥善应对这件事的办法。",
+          "source_table_row": 14,
+          "dimension": "appraisal_and_coping_flexibility",
+          "reverse": false,
+          "runtime_transform": "identity",
+          "runtime_matches": true,
+          "review": "保留英语核心含义；中文工作译稿尚待人工译审。"
+        },
+        {
+          "number": 7,
+          "code": "CCFQ7",
+          "english": "I find it easy to set-aside unpleasant thoughts or emotions.",
+          "chinese": "我发现自己很容易暂且把令人不快的想法或情绪放到一边。",
+          "source_table_row": 8,
+          "dimension": "cognitive_control_over_emotion",
+          "reverse": false,
+          "runtime_transform": "identity",
+          "runtime_matches": true,
+          "review": "保留英语核心含义；中文工作译稿尚待人工译审。"
+        },
+        {
+          "number": 8,
+          "code": "CCFQ8",
+          "english": "It is easy for me to ignore distracting thoughts.",
+          "chinese": "对我来说，不去理会那些分散注意力的想法很容易。",
+          "source_table_row": 6,
+          "dimension": "cognitive_control_over_emotion",
+          "reverse": false,
+          "runtime_transform": "identity",
+          "runtime_matches": true,
+          "review": "保留英语核心含义；中文工作译稿尚待人工译审。"
+        },
+        {
+          "number": 9,
+          "code": "CCFQ9",
+          "english": "I can easily think of multiple coping options before deciding how to respond.",
+          "chinese": "在决定如何回应之前，我能很容易地想到多种应对办法。",
+          "source_table_row": 18,
+          "dimension": "appraisal_and_coping_flexibility",
+          "reverse": false,
+          "runtime_transform": "identity",
+          "runtime_matches": true,
+          "review": "保留英语核心含义；中文工作译稿尚待人工译审。"
+        },
+        {
+          "number": 10,
+          "code": "CCFQ10",
+          "english": "I take the time to see things from different perspectives before reacting.",
+          "chinese": "在作出反应之前，我会花时间从不同角度看待事情。",
+          "source_table_row": 13,
+          "dimension": "appraisal_and_coping_flexibility",
+          "reverse": false,
+          "runtime_transform": "identity",
+          "runtime_matches": true,
+          "review": "保留英语核心含义；中文工作译稿尚待人工译审。"
+        },
+        {
+          "number": 11,
+          "code": "CCFQ11",
+          "english": "I get easily distracted by upsetting thoughts or feelings.",
+          "chinese": "令人心烦的想法或感受很容易分散我的注意力。",
+          "source_table_row": 1,
+          "dimension": "cognitive_control_over_emotion",
+          "reverse": true,
+          "runtime_transform": "reverse",
+          "runtime_matches": true,
+          "review": "保留英语核心含义；中文工作译稿尚待人工译审。"
+        },
+        {
+          "number": 12,
+          "code": "CCFQ12",
+          "english": "I take the time to think of more than one way to resolve the problem.",
+          "chinese": "我会花时间想出不止一种解决问题的办法。",
+          "source_table_row": 10,
+          "dimension": "appraisal_and_coping_flexibility",
+          "reverse": false,
+          "runtime_transform": "identity",
+          "runtime_matches": true,
+          "review": "保留英语核心含义；中文工作译稿尚待人工译审。"
+        },
+        {
+          "number": 13,
+          "code": "CCFQ13",
+          "english": "I control my thoughts and feelings by putting the situation into context.",
+          "chinese": "我会通过把事情放在具体背景中理解，来控制自己的想法和感受。",
+          "source_table_row": 17,
+          "dimension": "appraisal_and_coping_flexibility",
+          "reverse": false,
+          "runtime_transform": "identity",
+          "runtime_matches": true,
+          "review": "保留英语核心含义；中文工作译稿尚待人工译审。"
+        },
+        {
+          "number": 14,
+          "code": "CCFQ14",
+          "english": "I can remain in control of my thoughts and emotions.",
+          "chinese": "我能够保持对自己想法和情绪的控制。",
+          "source_table_row": 9,
+          "dimension": "cognitive_control_over_emotion",
+          "reverse": false,
+          "runtime_transform": "identity",
+          "runtime_matches": true,
+          "review": "保留英语核心含义；中文工作译稿尚待人工译审。"
+        },
+        {
+          "number": 15,
+          "code": "CCFQ15",
+          "english": "I have a hard time managing my emotions.",
+          "chinese": "我很难管理自己的情绪。",
+          "source_table_row": 3,
+          "dimension": "cognitive_control_over_emotion",
+          "reverse": true,
+          "runtime_transform": "reverse",
+          "runtime_matches": true,
+          "review": "保留英语核心含义；中文工作译稿尚待人工译审。"
+        },
+        {
+          "number": 16,
+          "code": "CCFQ16",
+          "english": "My thoughts and emotions interfere with my ability to concentrate.",
+          "chinese": "我的想法和情绪会妨碍我集中注意力。",
+          "source_table_row": 2,
+          "dimension": "cognitive_control_over_emotion",
+          "reverse": true,
+          "runtime_transform": "reverse",
+          "runtime_matches": true,
+          "review": "保留英语核心含义；中文工作译稿尚待人工译审。"
+        },
+        {
+          "number": 17,
+          "code": "CCFQ17",
+          "english": "I manage my thoughts or feelings by reframing the situation.",
+          "chinese": "我会通过换一种方式理解这件事，来调节自己的想法或感受。",
+          "source_table_row": 16,
+          "dimension": "appraisal_and_coping_flexibility",
+          "reverse": false,
+          "runtime_transform": "identity",
+          "runtime_matches": true,
+          "review": "保留英语核心含义；中文工作译稿尚待人工译审。"
+        },
+        {
+          "number": 18,
+          "code": "CCFQ18",
+          "english": "It’s hard for me to shift my attention away from negative thoughts or feelings.",
+          "chinese": "我很难把注意力从消极的想法或感受上移开。",
+          "source_table_row": 4,
+          "dimension": "cognitive_control_over_emotion",
+          "reverse": true,
+          "runtime_transform": "reverse",
+          "runtime_matches": true,
+          "review": "保留英语核心含义；中文工作译稿尚待人工译审。"
+        }
+      ],
+      "basis": "现有administration-and-translation.json与source-en.handoff.json逐题对照，18项顺序及中译一致；原文 https://doi.org/10.3389/fpsyg.2018.02219。",
+      "anchors": "1非常不同意、7非常同意；2–6只数字，未自拟原版标签。",
+      "instruction": {
+        "doc": {
+          "path": "docs/scale-instruments/research-drafts/ccfq18_zh_cn/administration-and-translation.json",
+          "blob": "e626f388c92eac870e28915f9152b982f2012ba4",
+          "sha256": "15e1188705bdd540ed9116cbcfa2d1ef4c492dec70cf8a78cc038d417acc44be"
+        },
+        "fields": [
+          "/administration/instructions_zh_working",
+          "/administration/stem_zh_working"
+        ],
+        "text": "这份问卷希望了解：当有压力的情境引起消极的想法和情绪时，你通常会怎么想、怎么感受或怎么做。不同情境下你的反应当然可能不同，但请尽量想一想，当你感到有压力或心烦时，你通常的想法、感受或做法。请使用下面的选项，表示你对以下每句话的同意或不同意程度。",
+        "stem": "通常，在有压力的情境中……",
+        "runtime": "固定source无顶层instruction；题干不含共有压力情境。既有文档所称旧schema缺字段需按现有顶层instruction合同协调；不称已运行展示。",
+        "minimal_binding": {
+          "path": "server-version/backend/src/modules/scale/instruments/ccfq18_zh_cn/1.0.0/source.json#/instruction",
+          "old": null,
+          "new": {
+            "schemaVersion": 1,
+            "text": "这份问卷希望了解：当有压力的情境引起消极的想法和情绪时，你通常会怎么想、怎么感受或怎么做。不同情境下你的反应当然可能不同，但请尽量想一想，当你感到有压力或心烦时，你通常的想法、感受或做法。请使用下面的选项，表示你对以下每句话的同意或不同意程度。\n\n通常，在有压力的情境中……",
+            "language": "zh-CN",
+            "version": "1.0.0",
+            "source": "项目独立中文工作译稿，见固定administration-and-translation.json之说明与共有引导句；Gabrys等2018"
+          }
+        },
+        "note": "压力情境引导句是每题共同语境，放于完整说明末尾，不改题文；呈现语义和版本由root确认。"
+      }
+    },
+    "scoring": {
+      "reverse": [
+        2,
+        4,
+        11,
+        15,
+        16,
+        18
+      ],
+      "formula": "反向8−x；两个九题等权均分1–7，无总分。",
+      "scores": [
+        {
+          "key": "cognitive_control_over_emotion",
+          "type": "dimension",
+          "label": "压力情境中注意力与情绪的调节感",
+          "description": "对应九题调整方向后的平均分1–7；分数越高表示越认同自己通常有这种调节或应对空间，不是客观能力、诊断或等级。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "CCFQ2",
+                "weight": 1
+              },
+              {
+                "itemCode": "CCFQ4",
+                "weight": 1
+              },
+              {
+                "itemCode": "CCFQ7",
+                "weight": 1
+              },
+              {
+                "itemCode": "CCFQ8",
+                "weight": 1
+              },
+              {
+                "itemCode": "CCFQ11",
+                "weight": 1
+              },
+              {
+                "itemCode": "CCFQ14",
+                "weight": 1
+              },
+              {
+                "itemCode": "CCFQ15",
+                "weight": 1
+              },
+              {
+                "itemCode": "CCFQ16",
+                "weight": 1
+              },
+              {
+                "itemCode": "CCFQ18",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        },
+        {
+          "key": "appraisal_and_coping_flexibility",
+          "type": "dimension",
+          "label": "考虑不同解释与应对办法的灵活感",
+          "description": "对应九题调整方向后的平均分1–7；分数越高表示越认同自己通常有这种调节或应对空间，不是客观能力、诊断或等级。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "CCFQ1",
+                "weight": 1
+              },
+              {
+                "itemCode": "CCFQ3",
+                "weight": 1
+              },
+              {
+                "itemCode": "CCFQ5",
+                "weight": 1
+              },
+              {
+                "itemCode": "CCFQ6",
+                "weight": 1
+              },
+              {
+                "itemCode": "CCFQ9",
+                "weight": 1
+              },
+              {
+                "itemCode": "CCFQ10",
+                "weight": 1
+              },
+              {
+                "itemCode": "CCFQ12",
+                "weight": 1
+              },
+              {
+                "itemCode": "CCFQ13",
+                "weight": 1
+              },
+              {
+                "itemCode": "CCFQ17",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        }
+      ],
+      "missing": "各维9题完整才均分，不插补；固定文档称任一题缺失整体invalid不输出解释，另一完整维数值可能保留；项目政策，未验证运行。",
+      "thresholds": "无常模、分档或切点；1–7理论范围不是等级。"
+    },
+    "report": {
+      "interpretations": [
+        {
+          "scoreKey": "cognitive_control_over_emotion",
+          "headline": "压力来了，能否把注意力带回来",
+          "source": {
+            "type": "score_only"
+          },
+          "summary": "这组题关注的是：遇到压力时，你通常觉得自己能否把注意力从困扰的想法和感受中带回来，并稳住接下来要做的事。九题按原计分方向调整后的平均分在1到7之间；分数越高，只表示你更认同自己有这样的调节空间，不是客观能力或心理健康等级。比如，事情出了差错后，有时我们还能听清别人说什么，有时却会一直被刚才的画面拉走。这些体验也会随疲劳、事情的难度和身边的支持而变化。中文工作译稿尚未验证，没有高、中、低分界，也不与别人排名。这里不是要求你消除、压住或否定正常情绪。",
+          "bands": [],
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "回想一件最近让你分心的小事：当时最牵动你的是什么？什么环境、休息或支持让你更容易回到手头的事情？不必为了问卷分数评价自己。"
+            },
+            {
+              "category": "strategy",
+              "text": "下次被担心的念头拉走时，可以先停一停，承认“我现在有些难受”，再选一件眼前能做的小事。让情绪存在，和继续行动可以同时发生；不需要强迫自己把情绪赶走。"
+            }
+          ]
+        },
+        {
+          "scoreKey": "appraisal_and_coping_flexibility",
+          "headline": "遇到难题，给自己多留一种办法",
+          "source": {
+            "type": "score_only"
+          },
+          "summary": "这组题关注的是：面对有压力的事情时，你通常会不会换几个角度理解，并考虑不止一种应对办法。九题的平均分在1到7之间；分数越高，表示你更认同自己会这样思考，而不是证明你总能作出正确决定。比如，收到一条简短回复时，除了“对方不愿理我”，也可以想到“对方正在忙”；接下来既可以等一等，也可以找合适的时间问清楚。情境紧急时先行动同样可能合适，并不是考虑得越多越好。这份中文工作译稿尚未验证，结果用于自我观察，没有临床分界或人群排名，也不是ACT心理灵活性总分。",
+          "bands": [],
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "选一个不太棘手的日常难题，问问自己：“除了最先想到的解释，还可能是什么？”留意哪些事实已经知道，哪些只是猜测。"
+            },
+            {
+              "category": "strategy",
+              "text": "试着写下两种可能的解释和两种可做的行动，再结合时间、资源和安全条件选一小步。如果一时想不到其他办法，可以找信任的人一起梳理；不需要逼自己给所有困难找积极解释。"
+            }
+          ]
+        }
+      ],
+      "review": "两个scoreKey与维度匹配，高分是对应自报更认同；报告温暖具体，强调情绪可存在、不是客观能力、诊断或ACT总分；可保留。",
+      "stale_text": {
+        "path": "server-version/backend/src/modules/scale/instruments/ccfq18_zh_cn/1.0.0/source.json#/executable/definition/report/limitations/5",
+        "old": "原文仅核实1 strongly disagree与7 strongly agree；两端中文为工作翻译，中间2–6仅显示数字，不冒充原版完整文字锚点。",
+        "new_if_instruction_bound": "指导语和共有压力情境引导句依据项目中文工作译稿提供；该译稿仍待人工审校和验证。",
+        "condition": "仅当root完成并确认独立指导语及引导句绑定后同步更新，勿预称已呈现。"
+      },
+      "versions": "内容、计分、报告、本地化均1.0.0，references空和referencePolicy none。"
+    }
+  },
+  "substantive_coordination": [
+    "保留18题、反向键和两维均分；题文/锚点/算法/构念变化须人工译审及版本协调。"
+  ],
+  "human_status": "专家译审PENDING、认知访谈及中文验证NOT_ESTABLISHED。",
+  "not_executed": [
+    "无仓库改动、数据库、CI、测试、浏览器或系统核验；既有历史验证并非本次执行。"
+  ],
+  "conclusion": "建议root接入已有指导语与共有引导句；其余题项、计分和报告可沿用，人工验证待完成。"
+}

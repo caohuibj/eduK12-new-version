@@ -1,0 +1,636 @@
+{
+  "instrument": "socs_s20_2023_zh_cn:1.0.0",
+  "source_commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "source_files": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/socs_s20_2023_zh_cn/1.0.0/source.json",
+      "blob": "acc6cde659c1f35872283d0fb45ee06afb43fcc9",
+      "sha256": "b45dbbc08b95535517cb0c724a802c8a48e7af04f6c96aaab9847538cddbdebe"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/socs_s20_2023_zh_cn/1.0.0/instrument.ts",
+      "blob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/socs_s20_2023_zh_cn/1.0.0/THIRD_PARTY_LICENSE.md",
+      "blob": "eaa1574ac111c05daad5088737477de7645d080c",
+      "sha256": "9862318f008ec6cb55777679d43cfec8d3418e57a569bbac084a58d31656ebf8"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/socs_s20_2023/1.0.0/README.md",
+      "blob": "0e081f99d7017d64fef8dd20269dc51d2965f1e0",
+      "sha256": "4f68954ceeea80d34f51c2767d3895acb140480c7da6de043e0f1798abc5b26d"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/socs_s20_2023/1.0.0/fixed-content.json",
+      "blob": "f21fd1f9e9f399e2cabde7792c56922f61456f64",
+      "sha256": "cc605a914aec8a316ee7fc60af61fd2e157fc46c5eb918a1a63595cfd4da16f7"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/socs_s20_2023/1.0.0/administration-sidecar.prepared.json",
+      "blob": "f254a0c02ad89d8b4d0b5c268e7def0d39a63e22",
+      "sha256": "d0898963b0f698f7ee83765d734dc5e3bd78eea92c09de1275250905868338e3"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/socs_s20_2023/1.0.0/administration.md",
+      "blob": "ba072aced94ca0e08c24c224b4c7c00415c4da6a",
+      "sha256": "213e5509f8ceadef8f3c1406c68c95675ebec5cbc19dc92ce7004b049d5b662e"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/socs_s20_2023/1.0.0/scoring-and-parameters.md",
+      "blob": "16acf24a33906727395c60303c1661587f8f8acd",
+      "sha256": "af504ec3d081f1eb715dc60e02dac76b6154a754bdda48d37f55ad810ed7f893"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/socs_s20_2023/1.0.0/source-audit.json",
+      "blob": "05b5eb37bcff2b9a73d2c5b8ca1450c3bd92545e",
+      "sha256": "d215afd3dd5a0e35bf95816bf8caefee22af3b87fbe34e28ee74c68ba636dec9"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/socs_s20_2023/1.0.0/references.md",
+      "blob": "da251e6f8b213493b28046aad8b59992ffba6171",
+      "sha256": "0e10b6677952c61b5b50bebc0868f4c1ecfe6c87cb0aea9db35d73d30260a700"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/socs_s20_2023/1.0.0/report-example.md",
+      "blob": "fce6c6316a9a93a814bbcefdf26e8be9d6eb5764",
+      "sha256": "1cd99280241a76ad06f63dc6e873844556f1c7c533e855b1472be9e6579d029d"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/socs_s20_2023/1.0.0/validation.json",
+      "blob": "3855c1a7a38538595b7c0ee42c6b951b2c57a157",
+      "sha256": "5926eeca9ea618593c27522456918497ed368d945a90c627b2266c82f227c4ef"
+    }
+  ],
+  "three_parts": {
+    "items_instruction": {
+      "items": [
+        {
+          "number": 1,
+          "code": "SOCSS_01",
+          "published_text": "我很善于识别我痛苦时的感受",
+          "runtime": "我很善于识别我痛苦时的感受",
+          "exact": true,
+          "facet": "recognizing_suffering",
+          "transform": "identity",
+          "review": "与固定2023中文材料逐题对应；未冒称平台新译。"
+        },
+        {
+          "number": 2,
+          "code": "SOCSS_02",
+          "published_text": "我知道每个人都会在生命中的某些阶段经历痛苦",
+          "runtime": "我知道每个人都会在生命中的某些阶段经历痛苦",
+          "exact": true,
+          "facet": "understanding_universality",
+          "transform": "identity",
+          "review": "与固定2023中文材料逐题对应；未冒称平台新译。"
+        },
+        {
+          "number": 3,
+          "code": "SOCSS_03",
+          "published_text": "当我经历困难时，我会善待自己",
+          "runtime": "当我经历困难时，我会善待自己",
+          "exact": true,
+          "facet": "feeling_for_self",
+          "transform": "identity",
+          "review": "与固定2023中文材料逐题对应；未冒称平台新译。"
+        },
+        {
+          "number": 4,
+          "code": "SOCSS_04",
+          "published_text": "当我情绪低落时，我试着敞开心扉接受自己的感受，而不是回避它们",
+          "runtime": "当我情绪低落时，我试着敞开心扉接受自己的感受，而不是回避它们",
+          "exact": true,
+          "facet": "tolerating_feelings",
+          "transform": "identity",
+          "review": "与固定2023中文材料逐题对应；未冒称平台新译。"
+        },
+        {
+          "number": 5,
+          "code": "SOCSS_05",
+          "published_text": "当我苦恼时，我尽量让自己感觉好一点，即使我对此无能为力",
+          "runtime": "当我苦恼时，我尽量让自己感觉好一点，即使我对此无能为力",
+          "exact": true,
+          "facet": "acting_to_alleviate",
+          "transform": "identity",
+          "review": "与固定2023中文材料逐题对应；未冒称平台新译。"
+        },
+        {
+          "number": 6,
+          "code": "SOCSS_06",
+          "published_text": "我会注意到我正在经历的痛苦",
+          "runtime": "我会注意到我正在经历的痛苦",
+          "exact": true,
+          "facet": "recognizing_suffering",
+          "transform": "identity",
+          "review": "与固定2023中文材料逐题对应；未冒称平台新译。"
+        },
+        {
+          "number": 7,
+          "code": "SOCSS_07",
+          "published_text": "我明白偶尔感到不安是人生常态",
+          "runtime": "我明白偶尔感到不安是人生常态",
+          "exact": true,
+          "facet": "understanding_universality",
+          "transform": "identity",
+          "review": "与固定2023中文材料逐题对应；未冒称平台新译。"
+        },
+        {
+          "number": 8,
+          "code": "SOCSS_08",
+          "published_text": "当我遭遇不幸时，我会关心自己",
+          "runtime": "当我遭遇不幸时，我会关心自己",
+          "exact": true,
+          "facet": "feeling_for_self",
+          "transform": "identity",
+          "review": "与固定2023中文材料逐题对应；未冒称平台新译。"
+        },
+        {
+          "number": 9,
+          "code": "SOCSS_09",
+          "published_text": "我与自己的痛苦持联结，而不是让它压倒我。",
+          "runtime": "我与自己的痛苦持联结，而不是让它压倒我。",
+          "exact": true,
+          "facet": "tolerating_feelings",
+          "transform": "identity",
+          "review": "固定已发表题文“持联结”疑似缺字；保留来源证据，若修为“保持联结”须协调版本。"
+        },
+        {
+          "number": 10,
+          "code": "SOCSS_10",
+          "published_text": "遇到困难时，我会尽量照顾好自己",
+          "runtime": "遇到困难时，我会尽量照顾好自己",
+          "exact": true,
+          "facet": "acting_to_alleviate",
+          "transform": "identity",
+          "review": "与固定2023中文材料逐题对应；未冒称平台新译。"
+        },
+        {
+          "number": 11,
+          "code": "SOCSS_11",
+          "published_text": "我很快就注意到自己痛苦的早期迹象",
+          "runtime": "我很快就注意到自己痛苦的早期迹象",
+          "exact": true,
+          "facet": "recognizing_suffering",
+          "transform": "identity",
+          "review": "与固定2023中文材料逐题对应；未冒称平台新译。"
+        },
+        {
+          "number": 12,
+          "code": "SOCSS_12",
+          "published_text": "我知道其他人也像我一样在生活中会经历挣扎",
+          "runtime": "我知道其他人也像我一样在生活中会经历挣扎",
+          "exact": true,
+          "facet": "understanding_universality",
+          "transform": "identity",
+          "review": "与固定2023中文材料逐题对应；未冒称平台新译。"
+        },
+        {
+          "number": 13,
+          "code": "SOCSS_13",
+          "published_text": "当我心烦意乱时，我试着调整我的感受",
+          "runtime": "当我心烦意乱时，我试着调整我的感受",
+          "exact": true,
+          "facet": "feeling_for_self",
+          "transform": "identity",
+          "review": "与固定2023中文材料逐题对应；未冒称平台新译。"
+        },
+        {
+          "number": 14,
+          "code": "SOCSS_14",
+          "published_text": "我与自己的痛苦保持联结，而不是批判自己",
+          "runtime": "我与自己的痛苦保持联结，而不是批判自己",
+          "exact": true,
+          "facet": "tolerating_feelings",
+          "transform": "identity",
+          "review": "与固定2023中文材料逐题对应；未冒称平台新译。"
+        },
+        {
+          "number": 15,
+          "code": "SOCSS_15",
+          "published_text": "当我感到不安时，我尽量做对自己最有利的事",
+          "runtime": "当我感到不安时，我尽量做对自己最有利的事",
+          "exact": true,
+          "facet": "acting_to_alleviate",
+          "transform": "identity",
+          "review": "与固定2023中文材料逐题对应；未冒称平台新译。"
+        },
+        {
+          "number": 16,
+          "code": "SOCSS_16",
+          "published_text": "我能识别自己的痛苦迹象",
+          "runtime": "我能识别自己的痛苦迹象",
+          "exact": true,
+          "facet": "recognizing_suffering",
+          "transform": "identity",
+          "review": "与固定2023中文材料逐题对应；未冒称平台新译。"
+        },
+        {
+          "number": 17,
+          "code": "SOCSS_17",
+          "published_text": "我知道当生活中的事情进展不顺利时，我们都会感到痛苦",
+          "runtime": "我知道当生活中的事情进展不顺利时，我们都会感到痛苦",
+          "exact": true,
+          "facet": "understanding_universality",
+          "transform": "identity",
+          "review": "与固定2023中文材料逐题对应；未冒称平台新译。"
+        },
+        {
+          "number": 18,
+          "code": "SOCSS_18",
+          "published_text": "即使我对自己很失望，我也能在困境中善待自己",
+          "runtime": "即使我对自己很失望，我也能在困境中善待自己",
+          "exact": true,
+          "facet": "feeling_for_self",
+          "transform": "identity",
+          "review": "与固定2023中文材料逐题对应；未冒称平台新译。"
+        },
+        {
+          "number": 19,
+          "code": "SOCSS_19",
+          "published_text": "当我心烦意乱时，我会让情绪顺其自然而不受它控制",
+          "runtime": "当我心烦意乱时，我会让情绪顺其自然而不受它控制",
+          "exact": true,
+          "facet": "tolerating_feelings",
+          "transform": "identity",
+          "review": "与固定2023中文材料逐题对应；未冒称平台新译。"
+        },
+        {
+          "number": 20,
+          "code": "SOCSS_20",
+          "published_text": "当情绪低落时，我尽力照顾好自己",
+          "runtime": "当情绪低落时，我尽力照顾好自己",
+          "exact": true,
+          "facet": "acting_to_alleviate",
+          "transform": "identity",
+          "review": "与固定2023中文材料逐题对应；未冒称平台新译。"
+        }
+      ],
+      "options": [
+        {
+          "value": "1",
+          "score": 1,
+          "label": "完全不符合"
+        },
+        {
+          "value": "2",
+          "score": 2,
+          "label": "基本不符合"
+        },
+        {
+          "value": "3",
+          "score": 3,
+          "label": "不确定"
+        },
+        {
+          "value": "4",
+          "score": 4,
+          "label": "基本符合"
+        },
+        {
+          "value": "5",
+          "score": 5,
+          "label": "完全符合"
+        }
+      ],
+      "instruction": {
+        "sources": [
+          {
+            "path": "docs/scale-instruments/research-drafts/socs_s20_2023/1.0.0/fixed-content.json",
+            "blob": "f21fd1f9e9f399e2cabde7792c56922f61456f64",
+            "sha256": "cc605a914aec8a316ee7fc60af61fd2e157fc46c5eb918a1a63595cfd4da16f7",
+            "field": "/instruction"
+          },
+          {
+            "path": "docs/scale-instruments/research-drafts/socs_s20_2023/1.0.0/administration-sidecar.prepared.json",
+            "blob": "f254a0c02ad89d8b4d0b5c268e7def0d39a63e22",
+            "sha256": "d0898963b0f698f7ee83765d734dc5e3bd78eea92c09de1275250905868338e3",
+            "field": "/instructions/0"
+          }
+        ],
+        "text": "*请为每个条目选择合适的一项。",
+        "status": "已有原中文说明，PREPARED，source顶层无instruction。",
+        "binding": {
+          "path": "server-version/backend/src/modules/scale/instruments/socs_s20_2023_zh_cn/1.0.0/source.json#/instruction",
+          "old": null,
+          "new": {
+            "schemaVersion": 1,
+            "text": "*请为每个条目选择合适的一项。",
+            "language": "zh-CN",
+            "version": "1.0.0",
+            "source": "2023中文附录固定说明，见fixed-content.json"
+          }
+        }
+      },
+      "audience": "成人自陈；原中文证据为职场便利样本，不泛化全部人群。"
+    },
+    "scoring": {
+      "scores": [
+        {
+          "key": "recognizing_suffering",
+          "type": "dimension",
+          "label": "识别自己的痛苦",
+          "description": "平台按完整作答等权均分1–5整理；较大表示本次自述更符合相关关怀方式，不对应等级、诊断或人群排名。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "SOCSS_01",
+                "weight": 1
+              },
+              {
+                "itemCode": "SOCSS_06",
+                "weight": 1
+              },
+              {
+                "itemCode": "SOCSS_11",
+                "weight": 1
+              },
+              {
+                "itemCode": "SOCSS_16",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        },
+        {
+          "key": "understanding_universality",
+          "type": "dimension",
+          "label": "理解痛苦是共同经历",
+          "description": "平台按完整作答等权均分1–5整理；较大表示本次自述更符合相关关怀方式，不对应等级、诊断或人群排名。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "SOCSS_02",
+                "weight": 1
+              },
+              {
+                "itemCode": "SOCSS_07",
+                "weight": 1
+              },
+              {
+                "itemCode": "SOCSS_12",
+                "weight": 1
+              },
+              {
+                "itemCode": "SOCSS_17",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        },
+        {
+          "key": "feeling_for_self",
+          "type": "dimension",
+          "label": "关怀受苦的自己",
+          "description": "平台按完整作答等权均分1–5整理；较大表示本次自述更符合相关关怀方式，不对应等级、诊断或人群排名。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "SOCSS_03",
+                "weight": 1
+              },
+              {
+                "itemCode": "SOCSS_08",
+                "weight": 1
+              },
+              {
+                "itemCode": "SOCSS_13",
+                "weight": 1
+              },
+              {
+                "itemCode": "SOCSS_18",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        },
+        {
+          "key": "tolerating_feelings",
+          "type": "dimension",
+          "label": "容纳不舒服的感受",
+          "description": "平台按完整作答等权均分1–5整理；较大表示本次自述更符合相关关怀方式，不对应等级、诊断或人群排名。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "SOCSS_04",
+                "weight": 1
+              },
+              {
+                "itemCode": "SOCSS_09",
+                "weight": 1
+              },
+              {
+                "itemCode": "SOCSS_14",
+                "weight": 1
+              },
+              {
+                "itemCode": "SOCSS_19",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        },
+        {
+          "key": "acting_to_alleviate",
+          "type": "dimension",
+          "label": "采取行动照顾自己",
+          "description": "平台按完整作答等权均分1–5整理；较大表示本次自述更符合相关关怀方式，不对应等级、诊断或人群排名。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "SOCSS_05",
+                "weight": 1
+              },
+              {
+                "itemCode": "SOCSS_10",
+                "weight": 1
+              },
+              {
+                "itemCode": "SOCSS_15",
+                "weight": 1
+              },
+              {
+                "itemCode": "SOCSS_20",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        },
+        {
+          "key": "total",
+          "type": "total",
+          "label": "自我关怀整体描述",
+          "description": "平台按完整作答等权均分1–5整理；较大表示本次自述更符合相关关怀方式，不对应等级、诊断或人群排名。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "SOCSS_01",
+                "weight": 1
+              },
+              {
+                "itemCode": "SOCSS_02",
+                "weight": 1
+              },
+              {
+                "itemCode": "SOCSS_03",
+                "weight": 1
+              },
+              {
+                "itemCode": "SOCSS_04",
+                "weight": 1
+              },
+              {
+                "itemCode": "SOCSS_05",
+                "weight": 1
+              },
+              {
+                "itemCode": "SOCSS_06",
+                "weight": 1
+              },
+              {
+                "itemCode": "SOCSS_07",
+                "weight": 1
+              },
+              {
+                "itemCode": "SOCSS_08",
+                "weight": 1
+              },
+              {
+                "itemCode": "SOCSS_09",
+                "weight": 1
+              },
+              {
+                "itemCode": "SOCSS_10",
+                "weight": 1
+              },
+              {
+                "itemCode": "SOCSS_11",
+                "weight": 1
+              },
+              {
+                "itemCode": "SOCSS_12",
+                "weight": 1
+              },
+              {
+                "itemCode": "SOCSS_13",
+                "weight": 1
+              },
+              {
+                "itemCode": "SOCSS_14",
+                "weight": 1
+              },
+              {
+                "itemCode": "SOCSS_15",
+                "weight": 1
+              },
+              {
+                "itemCode": "SOCSS_16",
+                "weight": 1
+              },
+              {
+                "itemCode": "SOCSS_17",
+                "weight": 1
+              },
+              {
+                "itemCode": "SOCSS_18",
+                "weight": 1
+              },
+              {
+                "itemCode": "SOCSS_19",
+                "weight": 1
+              },
+              {
+                "itemCode": "SOCSS_20",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        }
+      ],
+      "method": "20题无反向，5维每4题均分及20题总均分1–5；均分为平台明确决定，不冒称2023原手册直接指定。",
+      "missing": "每个输出完整才均分，不补零或改变分母；整体缺题invalid及其他维数值为材料既有表述，未运行。",
+      "parameters": "无中国个体常模/阈值；referencePolicy none。"
+    },
+    "report": {
+      "review": "五维及总分引用准确，具体、尊重处境，不使用样本均值作常模，不按分数断言个体人格；可保留。",
+      "version": "内容/计分/本地化/报告1.0.0。"
+    }
+  },
+  "ordinary_suggestions": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/socs_s20_2023_zh_cn/1.0.0/source.json#/executable/definition/items/8/content",
+      "old": "我与自己的痛苦持联结，而不是让它压倒我。",
+      "new": "我与自己的痛苦保持联结，而不是让它压倒我。",
+      "note": "疑似明显漏字；题文来自已发表固定中文材料，任何改动须明确记录为平台修订并协调版本，不能声称逐字原文。"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/socs_s20_2023_zh_cn/1.0.0/source.json#/instruction",
+      "old": null,
+      "new": {
+        "schemaVersion": 1,
+        "text": "*请为每个条目选择合适的一项。",
+        "language": "zh-CN",
+        "version": "1.0.0",
+        "source": "固定2023中文附录说明"
+      }
+    }
+  ],
+  "substantive_coordination": [
+    "原文题9疑似错字先核其准确来源和版本影响；不得静默改写2023发表文本。",
+    "均分与来源求和可线性换算，但不因此改变既定算法或添加阈值。"
+  ],
+  "human_status": "已有原中文样本研究；平台专家和治理审核待完成，不能改称未经研究或已审批。",
+  "not_executed": [
+    "未改仓库、DB、CI或分支，未运行测试/系统；历史材料不是本次结果。"
+  ],
+  "conclusion": "维度映射及平台均分与固定材料一致；指导语可绑定，题9疑似漏字应保留溯源与版本决策。"
+}

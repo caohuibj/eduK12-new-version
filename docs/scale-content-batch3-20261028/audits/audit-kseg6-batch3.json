@@ -1,0 +1,193 @@
+{
+  "identity": "kseg6_zh_cn_research:1.0.0",
+  "sourceCommit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "sourceFiles": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/kseg6_zh_cn_research/1.0.0/source.json",
+      "gitBlob": "7f524cab304fab8f565189e2ce83c1d17d762533",
+      "sha256": "e7bb632b8da7b942e46777d4d3f55b9c3212b63e8fc6b52a42d9b4772f304dfc"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/kseg6_zh_cn_research/1.0.0/instrument.ts",
+      "gitBlob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/kseg6/1.0.0/README.md",
+      "gitBlob": "910035febedc40e2a07bab27c72465a57f229765",
+      "sha256": "ede351047a0af13eaf5342637f9004b1f6535967bdf9b151aa116e62eb3ec922"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/kseg6/1.0.0/bilingual-content.json",
+      "gitBlob": "e6ac6a7a789b0e170f0fdfae33dd74b186d8dd46",
+      "sha256": "25a61ff3cf0349956a020f6a83a6129bc2a0c47e5ab22cb4f42bac5698ca9a21"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/kseg6/1.0.0/reviewed-source-pack.json",
+      "gitBlob": "7ba00fa81f43a0fc93f684844a2df7d250f115a8",
+      "sha256": "43aa3d86ef42abd08dfe73802b6641cdbfa0a4feb19101d1d3fc2cc0095a13cb"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/kseg6/1.0.0/external-reference-dossier.json",
+      "gitBlob": "d2419b3cdf2f4752f76882fc8369603d1e62dad8",
+      "sha256": "4b0637f27f10977a7975a47f8476f21b46a5ac182e23f98c0d10f4a056c7e270"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/kseg6/1.0.0/references.md",
+      "gitBlob": "f55beebca7962b314501ea44210b4053462898cf",
+      "sha256": "fa33f989103ca4e608469e69a2cf7d56c71383615be332389777a77f6762e8e8"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/kseg6/1.0.0/report-example.md",
+      "gitBlob": "3f8d65a99ba494a7e988a7e58467da9cb917fe63",
+      "sha256": "92df00b83fc1392688d158a62af961655ba8adf23a504e5d507a4fdeb43c8fb2"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/kseg6/1.0.0/scoring-and-thresholds.md",
+      "gitBlob": "1f30d4c1571185252f7cfb4f5911ba3cbf6a5ceb",
+      "sha256": "2c17a9703f284bb9e4df1b2faead3b4ad0bff20e5c3316fe60c1545c29d0e1b7"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/kseg6/1.0.0/synthetic-report-example.json",
+      "gitBlob": "ff1a60a9e34339b40e9937f82c94f6a13a072fd1",
+      "sha256": "1a8223cc22f87b5bf666b2124dca3867c9e1c7c19e484447b24f735bb52c03e1"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/kseg6/1.0.0/local-validation.json",
+      "gitBlob": "af60576c7124e1c5efaca707d71e7cf678221230",
+      "sha256": "40a6b517187c18e2124be0451e7b47a76bd943f7f9034e176152442ece0031a4"
+    }
+  ],
+  "threePartConclusions": {
+    "content": "六题英文/项目中文与运行时对应，1–3是正面表现描述，4–6是不理想行为的raw承认；无反向。五点符合度；第1题“总能”可能多一层能力色彩、第4题“占便宜”可能弱化take advantage，留人工译审。",
+    "scoring": "两组三题分别原值等权均分1–5，无总分、无反向；每组三题complete_required，分母3，缺失不插补；六题完整才提供完整报告。后组分数高为较认同所述行为，不能倒写为更隐瞒。无中国常模、临床分档、诚信判定或自动剔除。",
+    "report": "1.0.0两个方向及非测谎限制清楚，建议基于具体经历而不强迫承认未发生之事。成人工作译稿待审；student为技术映射。正向摘要用“越常把自己描述”稍偏频率，可更贴近符合度。"
+  },
+  "items": [
+    {
+      "number": 1,
+      "itemCode": "KSEG6_01",
+      "en": "In an argument, I always remain objective and stick to the facts.",
+      "zh": "争论时，我总能保持客观、就事论事。",
+      "dimension": "PQ_POSITIVE_ENDORSEMENT",
+      "key": "identity",
+      "assessment": "固定译文与运行时一致；原意基本对应，待译审。"
+    },
+    {
+      "number": 2,
+      "itemCode": "KSEG6_02",
+      "en": "Even if I am feeling stressed, I am always friendly and polite to others.",
+      "zh": "即使感到压力，我也总是友好、有礼貌地对待别人。",
+      "dimension": "PQ_POSITIVE_ENDORSEMENT",
+      "key": "identity",
+      "assessment": "固定译文与运行时一致；原意基本对应，待译审。"
+    },
+    {
+      "number": 3,
+      "itemCode": "KSEG6_03",
+      "en": "When talking to someone, I always listen carefully to what the other person says.",
+      "zh": "与人交谈时，我总是认真听对方说话。",
+      "dimension": "PQ_POSITIVE_ENDORSEMENT",
+      "key": "identity",
+      "assessment": "固定译文与运行时一致；原意基本对应，待译审。"
+    },
+    {
+      "number": 4,
+      "itemCode": "KSEG6_04",
+      "en": "It has happened that I have taken advantage of someone in the past.",
+      "zh": "过去我曾占过别人的便宜。",
+      "dimension": "NQ_NEGATIVE_ADMISSION_RAW",
+      "key": "identity",
+      "assessment": "固定译文与运行时一致；原意基本对应，待译审。"
+    },
+    {
+      "number": 5,
+      "itemCode": "KSEG6_05",
+      "en": "I have occasionally thrown litter away in the countryside or on to the road.",
+      "zh": "我偶尔曾在郊外或路上乱扔垃圾。",
+      "dimension": "NQ_NEGATIVE_ADMISSION_RAW",
+      "key": "identity",
+      "assessment": "固定译文与运行时一致；原意基本对应，待译审。"
+    },
+    {
+      "number": 6,
+      "itemCode": "KSEG6_06",
+      "en": "Sometimes I only help people if I expect to get something in return.",
+      "zh": "有时，只有觉得会得到回报，我才帮助别人。",
+      "dimension": "NQ_NEGATIVE_ADMISSION_RAW",
+      "key": "identity",
+      "assessment": "固定译文与运行时一致；原意基本对应，待译审。"
+    }
+  ],
+  "anchors": [
+    {
+      "value": 1,
+      "en": "doesn’t apply at all",
+      "zh": "完全不符合"
+    },
+    {
+      "value": 2,
+      "en": "applies a bit",
+      "zh": "有一点符合"
+    },
+    {
+      "value": 3,
+      "en": "applies somewhat",
+      "zh": "有些符合"
+    },
+    {
+      "value": 4,
+      "en": "applies mostly",
+      "zh": "大体符合"
+    },
+    {
+      "value": 5,
+      "en": "applies completely",
+      "zh": "完全符合"
+    }
+  ],
+  "instruction": {
+    "text": "下面这些说法与你的实际情况可能有不同程度的符合。请指出每句话与你有多符合。",
+    "sources": [
+      {
+        "file": {
+          "path": "docs/scale-instruments/research-drafts/kseg6/1.0.0/bilingual-content.json",
+          "gitBlob": "e6ac6a7a789b0e170f0fdfae33dd74b186d8dd46",
+          "sha256": "25a61ff3cf0349956a020f6a83a6129bc2a0c47e5ab22cb4f42bac5698ca9a21"
+        },
+        "field": "instructions.zh"
+      },
+      {
+        "file": {
+          "path": "docs/scale-instruments/research-drafts/kseg6/1.0.0/reviewed-source-pack.json",
+          "gitBlob": "7ba00fa81f43a0fc93f684844a2df7d250f115a8",
+          "sha256": "43aa3d86ef42abd08dfe73802b6641cdbfa0a4feb19101d1d3fc2cc0095a13cb"
+        },
+        "field": "instructions.zh"
+      }
+    ],
+    "proposedBinding": {
+      "schemaVersion": 1,
+      "text": "下面这些说法与你的实际情况可能有不同程度的符合。请指出每句话与你有多符合。",
+      "language": "zh-CN",
+      "version": "1.0.0",
+      "source": "docs/scale-instruments/research-drafts/kseg6/1.0.0/bilingual-content.json#instructions.zh"
+    },
+    "qualification": "现有中文工作指导语，版本为拟议标识。"
+  },
+  "ordinaryRevisions": [
+    {
+      "jsonPath": "executable.definition.report.interpretations[0].summary",
+      "old": "你越同意这些说法，表示越常把自己描述为始终有这些正面表现",
+      "new": "你越同意这些说法，表示你越认同自己始终有这些正面表现的描述",
+      "reason": "符合度不直接推断描述频率；沿报告版本轴处理。"
+    }
+  ],
+  "manualPending": [
+    "中文专家译审及目标样本验证待完成；题1、4译法待人工审阅。",
+    "改题、两维方向、缺失或分数阈值需原据及版本影响协调。"
+  ],
+  "notExecuted": [
+    "未运行golden、评分、系统、DB、CI；未写仓库或新开展科研/版权调查。"
+  ]
+}

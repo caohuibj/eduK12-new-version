@@ -1,0 +1,4358 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "dbt_wccl59_zh_tw_official_research",
+    "instrumentVersion": "1.0.1"
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "以下的句子代表您應對生活中壓力事件的可能方法。我們希望能夠了解，您有多經常運用以下的想法或行為去應對問題和壓力。請試回想你過往一個月的情況，然後根據你有多經常運用該想法或行為去圈出合適的數字：(0)從不運用、(1)很少運用、(2)有時運用、(3)經常運用（即每星期至少 4 至 5 次）。請不要以該方法看似是否有效減少壓力或解決問題為回答基準 -- 純粹以您有沒有運用該方法為回答基準。請您使用以下提供的選項，嘗試逐一回答每條題目。您的答案應盡量反映著你真實的情況。",
+    "language": "zh-TW",
+    "version": "1.0.0",
+    "source": "作者UW实验室官方Chinese繁体PDF：https://depts.washington.edu/uwbrtc/wp-content/uploads/DBT-WCCL-Chinese.pdf。仅合并PDF排版分行；内容未重新译为简体。"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "辯證行為治療之應對技巧問卷DBT-WCCL 59（UW繁體中文原稿）",
+      "abbreviation": "DBT-WCCL59-ZH-TW-UW-DRAFT",
+      "instrumentFamily": "DBT Ways of Coping Checklist 59; Neacsiu et al. 2010; official UW-hosted Traditional Chinese"
+    },
+    "construct": {
+      "primaryDomain": "SOCIAL_EMOTIONAL",
+      "secondaryDomains": [
+        "SELF_REGULATION"
+      ],
+      "constructDefinition": "应对方式过程测量：DBT技能使用DSS38题、一般非建设性应对DCS1 15题、责怪他人DCS2 6题，各维原题均值0–3；不能将59题合成单一健康分数。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "domain:emotion_regulation",
+        "domain:coping",
+        "domain:social_emotional",
+        "construct:dbt_wccl_59",
+        "construct:dialectical_behavior_therapy_coping",
+        "construct:dbt_skills_use",
+        "construct:general_dysfunctional_coping",
+        "construct:blaming_others",
+        "construct:three_subscale_means",
+        "construct:no_global_59_total",
+        "orientation:dbt_process",
+        "orientation:non_diagnostic",
+        "orientation:not_treatment_effectiveness",
+        "population:adult_clinical_research",
+        "population:self_report",
+        "population:zh_tw_validation_not_established",
+        "population:not_k12_validated",
+        "response:59_items",
+        "response:self_0_to_3",
+        "response:past_month",
+        "response:all_original_order",
+        "response:no_reverse",
+        "response:three_means",
+        "response:platform_complete_required",
+        "use:research_noncommercial",
+        "use:clinical_noncommercial",
+        "use:education_noncommercial",
+        "use:process_monitoring",
+        "use:not_selection",
+        "use:no_norm_bands",
+        "license:uw_noncommercial_research_clinical_education",
+        "license:commercial_forbidden",
+        "license:author_citation_required",
+        "license:github_redistribution_review_pending",
+        "license:author_contact_required",
+        "license:derivative_translation_review_pending",
+        "language_validation:original_en",
+        "language_validation:uw_hosted_zh-TW",
+        "language_validation:no_zh-CN_registered",
+        "language_validation:simplified_draft_pending",
+        "language_validation:target_validation_pending",
+        "DBT",
+        "应对方式",
+        "应对技能",
+        "非建设性应对",
+        "责怪他人",
+        "技能使用",
+        "繁体中文版",
+        "简体工作稿待审",
+        "非商业",
+        "过程测量",
+        "无临床阈值"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "原成人临床与相关研究来源，与国内未成年学生、教师或当前繁体中文人群的通用常模和信效度不等同；平台保守18岁以上成年人自评。"
+    },
+    "administration": {
+      "itemCount": 59,
+      "estimatedMinutes": 12,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED"
+      ],
+      "timeFrame": "过去一个月；评价有无使用而不是是否有效，0–3频率。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "维持UW官方Chinese（繁体）题本59题原序、指导语和0从不/1很少/2有时/3经常（至少每周4–5次）的原响应锚点。",
+        "所有59题均identity（无反向）；DSS38项、DCS115项、DCS26项分别做算术均值0–3，不给59题总分。",
+        "原官方SPSS中DSS MEAN.30/DCS1 MEAN.10/DCS2 MEAN.4，最少有效题数分别30/38、10/15、4/6；这不是本平台所实现的缺答策略。",
+        "本平台首版严格每个维度全部作答才形成其均值，是更保守的complete_required平台规则，不能谎称原作者阈值。",
+        "原作者SPSS还提供可选合并DCS MEAN.4语法，但当前正式三维包不生成第4个合并DCS或59题综合健康分。",
+        "不将繁体原版擅自声明已是简体标准译本；简体研究工作译稿另行译审登记。",
+        "非商业科研、临床与教学用途许可不自动等于公开GitHub全题文再分发许可。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "原作者英文研究有心理测量证据，但本站在线繁体题文没有独立本地人群验证证明；且仅非商业。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "非商业反思，非DBT疗效认证或诊断。"
+        },
+        {
+          "use": "PROGRESS_MONITORING",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "仅非商业且在有专业支持时谨慎使用，不能自动借此作治疗效果的结论。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "dbt-wccl-neacsiu-2010-uw",
+        "evidenceType": "CONTENT_VALIDITY",
+        "population": "2010英文原量表心理测量开发样本；不等于当前中文平台效度",
+        "locale": "en",
+        "territory": "ZZ",
+        "studyDesign": "官方UW英语和Chinese繁体59题与SPSS计分语法，DSS38/DCS115/DCS26。",
+        "rating": "UNKNOWN",
+        "citation": "Neacsiu, A. D., Rizvi, S. L., Vitaliano, P. P., Lynch, T. R., & Linehan, M. M. (2010). The Dialectical Behavior Therapy Ways of Coping Checklist (DBT-WCCL): Development and Psychometric Properties. Journal of Clinical Psychology, 66(6), 563–582. https://doi.org/10.1002/jclp.20685",
+        "doi": "10.1002/jclp.20685",
+        "url": "https://depts.washington.edu/uwbrtc/wp-content/uploads/Scoring-description-for-the-DBT-WCCL.pdf"
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-TW",
+    "localizationVersion": "1.0.0",
+    "translationSource": "UW作者实验室公开提供的正式Chinese繁体题本：https://depts.washington.edu/uwbrtc/wp-content/uploads/DBT-WCCL-Chinese.pdf。译者身份及繁简许可需原作者核查，不冒称由本站新译。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "已获取UW官方繁体中文题本；无法据此声称繁体译本在当前中国内地成人样本具有信效度、临床切点或作者对网上重发的许可。独立简体中文工作译稿本包未生成，另待专家译审，不能隐式zh-TW→zh-CN。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "dbt_wccl59_zh_tw_official_research-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    },
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "dbt_wccl59_zh_tw_official_research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "dbt_wccl59_zh_tw_official_research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "translation",
+      "display"
+    ],
+    "notes": [
+      "华盛顿大学Behavioral Research & Therapy Clinics作者资源页明确免费允许research、clinical、educational非商业用途，并禁止commercial use，使用时必须注明原论文。原站提供英文及“Chinese”繁体译本，并未据此明确授予完整题文在公开GitHub仓库二次再分发或商用平台软件随包发行的权利。本DRAFT先保存官方繁体题文与独立报告说明，是否容许公开复制、下载/导出、公开托管、中文版译者署名以及以后独立简体中文转换均由管理员复核或联系作者；不伪称另外获得了电子施测、翻译、商用或Github再分发授权。",
+      "商业用途禁止（UW官方声明）；管理员须确认数字复制、平台和公开GitHub再分发的独立权利，不把DRAFT作为正式产品发布。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "PUBLISHED",
+    "contentLocale": "zh-TW",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "DBT-WCCL 59 official UW Traditional Chinese; original English, Neacsiu et al. (2010)",
+        "citation": "Neacsiu, A. D., Rizvi, S. L., Vitaliano, P. P., Lynch, T. R., & Linehan, M. M. (2010). The Dialectical Behavior Therapy Ways of Coping Checklist (DBT-WCCL): Development and Psychometric Properties. Journal of Clinical Psychology, 66(6), 563–582. https://doi.org/10.1002/jclp.20685",
+        "url": "https://depts.washington.edu/uwbrtc/wp-content/uploads/DBT-WCCL-Chinese.pdf",
+        "publicationYear": 2010
+      },
+      "license": {
+        "status": "unknown",
+        "redistribution": "restricted",
+        "note": "华盛顿大学Behavioral Research & Therapy Clinics作者资源页明确免费允许research、clinical、educational非商业用途，并禁止commercial use，使用时必须注明原论文。原站提供英文及“Chinese”繁体译本，并未据此明确授予完整题文在公开GitHub仓库二次再分发或商用平台软件随包发行的权利。本DRAFT先保存官方繁体题文与独立报告说明，是否容许公开复制、下载/导出、公开托管、中文版译者署名以及以后独立简体中文转换均由管理员复核或联系作者；不伪称另外获得了电子施测、翻译、商用或Github再分发授权。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "dbt_wccl_frequency_0_3",
+          "options": [
+            {
+              "value": "0",
+              "label": "從不運用",
+              "score": 0
+            },
+            {
+              "value": "1",
+              "label": "很少運用",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "有時運用",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "經常運用（每星期至少4至5次）",
+              "score": 3
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "DBTWC01",
+          "content": "討價還價或作出讓步，以在該處境中獲益。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 0,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC02",
+          "content": "懂得感恩。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 1,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC03",
+          "content": "怪責自己。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 2,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC04",
+          "content": "專注於整件事情中可能發生的美好事情。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 3,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC05",
+          "content": "隱藏自己的感受。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 4,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC06",
+          "content": "確保我的回應不會讓別人感到被排擠。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 5,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC07",
+          "content": "找出應該歸咎誰。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 6,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC08",
+          "content": "希望奇蹟會發生。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 7,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC09",
+          "content": "採取任何行動之前先嘗試安定自己。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 8,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC10",
+          "content": "跟別人談論我的感受。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 9,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC11",
+          "content": "堅守自己的立場，爭取自己想要的。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 10,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC12",
+          "content": "拒絕相信事情已經發生。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 11,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC13",
+          "content": "用美食來獎勵自己。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 12,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC14",
+          "content": "批評自己或對自己訓話。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 13,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC15",
+          "content": "拿別人來發泄情緒。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 14,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC16",
+          "content": "為我的問題想出幾種不同的解決方案。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 15,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC17",
+          "content": "但願我是一個更堅強、更樂觀和有力量的人。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 16,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC18",
+          "content": "接受我的強烈感受，但不讓它們過於影響其他事情。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 17,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC19",
+          "content": "專注於我生命中美好的事物。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 18,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC20",
+          "content": "但願我可以改變自己的感受。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 19,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC21",
+          "content": "找出及觀看美麗的事物，讓自己感覺好一些。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 20,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC22",
+          "content": "改變某部分的自己，令我可以更好地應對這情況。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 21,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC23",
+          "content": "專注於我生活中美好的方面，並減少注意負面的想法或感受。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 22,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC24",
+          "content": "為引起問題的人或事而氣瘋了。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 23,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC25",
+          "content": "因為我不能避免問題而感到難受。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 24,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC26",
+          "content": "嘗試活躍起來以分散自己的注意力。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 25,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC27",
+          "content": "一直都清楚需要做到些什麼，所以已經加倍用功及更努力去辦妥事情。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 26,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC28",
+          "content": "覺得別人對我不公平。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 27,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC29",
+          "content": "以某種芳香包圍自己，來安撫自己。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 28,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC30",
+          "content": "怪罪別人。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 29,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC31",
+          "content": "聆聽或播放讓我感到放鬆的音樂。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 30,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC32",
+          "content": "假裝什麼也沒有發生般，繼續下去。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 31,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC33",
+          "content": "接受「退而求其次」。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 32,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC34",
+          "content": "告訴自己事情本可以更差 。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 33,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC35",
+          "content": "用其他東西填滿自己的思緒。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 34,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC36",
+          "content": "跟能夠就該問題做些具體事情的人傾談。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 35,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC37",
+          "content": "嘗試透過進食、飲酒、吸煙、服用藥物等讓自己好過些。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 36,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC38",
+          "content": "嘗試不太輕率或依賴自己的直覺行事。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 37,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC39",
+          "content": "改變一些東西令事情變得順利。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 38,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC40",
+          "content": "用一些在觸感上令自己舒服的東西來愛錫自己 (例如浸泡泡浴或擁抱)。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 39,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC41",
+          "content": "迴避別人。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 40,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC42",
+          "content": "想到我的處境已經比別人好多了。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 41,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC43",
+          "content": "做事時，一步一步來。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 42,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC44",
+          "content": "做一些事去經歷完全不同的情緒 (例如去看一部滑稽的電影)。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 43,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC45",
+          "content": "希望情況會過去或以某種方式結束。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 44,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC46",
+          "content": "不讓別人知道事情有多差勁。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 45,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC47",
+          "content": "將精力集中在幫助他人之上。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 46,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC48",
+          "content": "找出他人要負的責任。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 47,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC49",
+          "content": "確保照顧好自己的身體並保持健康，以減低情緒上的敏感度。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 48,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC50",
+          "content": "告訴自己，我已經做到了多少事。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 49,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC51",
+          "content": "確保我回應的方式讓我往後仍能尊重自己。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 50,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC52",
+          "content": "但願我可以改變已發生的事情。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 51,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC53",
+          "content": "制定行動計劃並遵循它。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 52,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC54",
+          "content": "與他人傾談以了解情況。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 53,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC55",
+          "content": "逃避我的問題。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 54,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC56",
+          "content": "退後一步，嘗試如實地看待事物。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 55,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC57",
+          "content": "將自己與其他更不幸的人相比。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 56,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC58",
+          "content": "增加我生活中愉悅的事物，讓我有更正面的看法。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 57,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DBTWC59",
+          "content": "嘗試不自斷後路，而讓事情留有餘地。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 58,
+          "responseSetKey": "dbt_wccl_frequency_0_3",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "itemRules": [
+          {
+            "itemCode": "DBTWC01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC06",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC07",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC08",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC09",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC10",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC11",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC12",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC13",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC14",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC15",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC16",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC17",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC18",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC19",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC20",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC21",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC22",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC23",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC24",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC25",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC26",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC27",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC28",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC29",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC30",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC31",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC32",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC33",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC34",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC35",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC36",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC37",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC38",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC39",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC40",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC41",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC42",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC43",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC44",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC45",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC46",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC47",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC48",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC49",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC50",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC51",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC52",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC53",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC54",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC55",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC56",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC57",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC58",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DBTWC59",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "scores": [
+          {
+            "key": "dss",
+            "type": "dimension",
+            "label": "DBT技能使用（DSS）",
+            "description": "過去一個月使用與 DBT 技能相關的應對方法的自述頻率，不等於方法是否有效、技能水平或治療認證。原題均分為 0–3；官方最少有效題數僅作來源說明，平台首版要求該維度完整作答。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "DBTWC01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC10",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC11",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC13",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC16",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC18",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC19",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC21",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC22",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC23",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC26",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC27",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC29",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC31",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC33",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC34",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC35",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC36",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC38",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC39",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC40",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC42",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC43",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC44",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC47",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC49",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC50",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC51",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC53",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC54",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC56",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC57",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC58",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC59",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "dcs1",
+            "type": "dimension",
+            "label": "一般非建設性應對（DCS1）",
+            "description": "面對壓力時出現迴避、自責及類似應對方式的頻率，並非人格缺點或疾病診斷。原題均分為 0–3；官方最少有效題數僅作來源說明，平台首版要求該維度完整作答。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "DBTWC03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC12",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC14",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC17",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC20",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC25",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC32",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC37",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC41",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC45",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC46",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC52",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC55",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "dcs2",
+            "type": "dimension",
+            "label": "責怪他人相關應對（DCS2）",
+            "description": "面對壓力時責怪他人或把責任歸於外界的頻率，不宜用於道德判斷。原題均分為 0–3；官方最少有效題數僅作來源說明，平台首版要求該維度完整作答。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "DBTWC07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC15",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC24",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC28",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC30",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DBTWC48",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.1",
+        "primaryScoreKeys": [
+          "dss",
+          "dcs1",
+          "dcs2"
+        ],
+        "scoreOrder": [
+          "dss",
+          "dcs1",
+          "dcs2"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "dss",
+            "headline": "壓力來時，你曾用過哪些應對工具",
+            "summary": "當壓力出現時，有時我們會嘗試讓自己平靜、調整行動、尋求支持或照顧身體。這組回答只描述這些方法在過去一個月使用的頻率，不能證明當時一定有效，也不代表你已經完成 DBT 治療或具備某項認證。你可以回想最近一次有壓力的情境：哪種安全、實際的做法容易開始？哪種支持還不夠？",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近一次感到壓力時，你做的哪一件小事曾幫助你撐過當下？"
+              },
+              {
+                "category": "strategy",
+                "text": "選一種安全、可以重複的小行動，在真正需要時試用。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "dcs1",
+            "headline": "哪些應對可能讓問題暫時被擱置",
+            "summary": "壓力特別大時，人可能會隱藏感受、責怪自己、盼望事情自動消失或迴避眼前困難。這裡記錄這些方法出現的頻率，並不是說你做錯了什麼。某種做法也可能只是當時資源有限的反應。可以想想：哪些現實條件讓你很難面對那件事？有沒有一個足夠小、而且安全的下一步？",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近一次想躲開某件事時，真正讓你困難的是什麼？"
+              },
+              {
+                "category": "strategy",
+                "text": "允許自己求助或休息，同時找一小步可改變的現實安排。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "dcs2",
+            "headline": "和他人的責任與衝突",
+            "summary": "遇到壓力時，我們有時會想知道誰應承擔責任，或覺得被他人不公平對待。這些題目反映這類應對方式的出現頻率，不是對你的品格、關係品質或實際責任的判決。試著把發生了什麼、自己的感受，以及哪些部分可以協商分開來看；必要時也可以請可信賴的人幫忙釐清。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "衝突裡有哪些已經確定的事實，哪些只是暫時的推測？"
+              },
+              {
+                "category": "support",
+                "text": "在安全的情況下，找可靠的人商量邊界、需求和可行行動。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "量表是UW作者實驗室提供的官方繁體中文59題，不是未驗證的簡體中文版；不聲稱譯者身份已確定。",
+          "過去一個月自述使用頻率，三個獨立維度的均分各為 0–3：DSS 38 題、DCS1 15 題、DCS2 6 題；無反向題，也沒有 59 題健康總分。",
+          "原作者 SPSS 計分所需的最低有效題數為 DSS 30 題、DCS1 10 題、DCS2 4 題；本站要求該維度全部作答才計算，是較嚴格的技術選擇，不是原作者的缺答策略。",
+          "沒有中文常模、臨床標準分、百分位、療效認證或高低切點，也不應用於診斷、選拔或學校排名。",
+          "UW允許非商業研究/臨床/教育用途，禁止商業；公開GitHub再分發及新譯版不等於已獲得授權。",
+          "華盛頓大學 Behavioral Research & Therapy Clinics 作者資源頁明確免費允許非商業研究、臨床及教育用途，並禁止商業使用；使用時必須註明原論文。原站提供英文及「Chinese」繁體譯本，但這並不明確授予完整題文在公開 GitHub 儲存庫二次再分發或隨商業平台軟體發行的權利。本 DRAFT 保存官方繁體題文與獨立報告說明；是否允許公開複製、下載或匯出、公開託管、中文版譯者署名及日後轉為獨立簡體中文版，均由管理員複核或聯絡作者；不聲稱另已獲電子施測、翻譯、商業使用或 GitHub 再分發授權。"
+        ],
+        "disclaimer": "僅非商業研究準備的官方繁體題本DRAFT版本。不得將任何應對均值解釋為疾病診斷、治療成功或個人能力等級。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-TW"
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "dbt_wccl59",
+        "locale": "zh-TW",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "all0",
+        "answers": [
+          {
+            "itemCode": "DBTWC01",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC02",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC03",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC04",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC05",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC06",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC07",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC08",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC09",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC10",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC11",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC12",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC13",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC14",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC15",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC16",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC17",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC18",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC19",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC20",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC21",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC22",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC23",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC24",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC25",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC26",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC27",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC28",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC29",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC30",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC31",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC32",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC33",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC34",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC35",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC36",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC37",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC38",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC39",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC40",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC41",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC42",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC43",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC44",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC45",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC46",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC47",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC48",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC49",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC50",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC51",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC52",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC53",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC54",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC55",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC56",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC57",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC58",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC59",
+            "responseValue": "0"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "dss": 0,
+            "dcs1": 0,
+            "dcs2": 0
+          },
+          "totalScoreKeys": [
+            "dss",
+            "dcs1",
+            "dcs2"
+          ]
+        }
+      },
+      {
+        "name": "all1",
+        "answers": [
+          {
+            "itemCode": "DBTWC01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC15",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC17",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC18",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC19",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC20",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC21",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC22",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC23",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC24",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC25",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC26",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC27",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC28",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC29",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC30",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC31",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC32",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC33",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC34",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC35",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC36",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC37",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC38",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC39",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC40",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC41",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC42",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC43",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC44",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC45",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC46",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC47",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC48",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC49",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC50",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC51",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC52",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC53",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC54",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC55",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC56",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC57",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC58",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC59",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "dss": 1,
+            "dcs1": 1,
+            "dcs2": 1
+          },
+          "totalScoreKeys": [
+            "dss",
+            "dcs1",
+            "dcs2"
+          ]
+        }
+      },
+      {
+        "name": "all2",
+        "answers": [
+          {
+            "itemCode": "DBTWC01",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC03",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC04",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC05",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC06",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC07",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC08",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC09",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC10",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC11",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC12",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC13",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC14",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC15",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC16",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC17",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC18",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC19",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC20",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC21",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC22",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC23",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC24",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC25",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC26",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC27",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC28",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC29",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC30",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC31",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC32",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC33",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC34",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC35",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC36",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC37",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC38",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC39",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC40",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC41",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC42",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC43",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC44",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC45",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC46",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC47",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC48",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC49",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC50",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC51",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC52",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC53",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC54",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC55",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC56",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC57",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC58",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC59",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "dss": 2,
+            "dcs1": 2,
+            "dcs2": 2
+          },
+          "totalScoreKeys": [
+            "dss",
+            "dcs1",
+            "dcs2"
+          ]
+        }
+      },
+      {
+        "name": "all3",
+        "answers": [
+          {
+            "itemCode": "DBTWC01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC12",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC14",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC15",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC16",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC17",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC18",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC19",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC20",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC21",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC22",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC23",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC24",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC25",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC26",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC27",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC28",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC29",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC30",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC31",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC32",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC33",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC34",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC35",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC36",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC37",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC38",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC39",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC40",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC41",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC42",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC43",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC44",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC45",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC46",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC47",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC48",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC49",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC50",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC51",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC52",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC53",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC54",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC55",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC56",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC57",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC58",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC59",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "dss": 3,
+            "dcs1": 3,
+            "dcs2": 3
+          },
+          "totalScoreKeys": [
+            "dss",
+            "dcs1",
+            "dcs2"
+          ]
+        }
+      },
+      {
+        "name": "only_dss_3",
+        "answers": [
+          {
+            "itemCode": "DBTWC01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC03",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC05",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC07",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC08",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC12",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC14",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC15",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC16",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC17",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC18",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC19",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC20",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC21",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC22",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC23",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC24",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC25",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC26",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC27",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC28",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC29",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC30",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC31",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC32",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC33",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC34",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC35",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC36",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC37",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC38",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC39",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC40",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC41",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC42",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC43",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC44",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC45",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC46",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC47",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC48",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC49",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC50",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC51",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC52",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC53",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC54",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC55",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC56",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC57",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC58",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC59",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "dss": 3,
+            "dcs1": 0,
+            "dcs2": 0
+          },
+          "totalScoreKeys": [
+            "dss",
+            "dcs1",
+            "dcs2"
+          ]
+        }
+      },
+      {
+        "name": "only_dcs1_3",
+        "answers": [
+          {
+            "itemCode": "DBTWC01",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC02",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC04",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC06",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC07",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC09",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC10",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC11",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC12",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC13",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC14",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC15",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC16",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC17",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC18",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC19",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC20",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC21",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC22",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC23",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC24",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC25",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC26",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC27",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC28",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC29",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC30",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC31",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC32",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC33",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC34",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC35",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC36",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC37",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC38",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC39",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC40",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC41",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC42",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC43",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC44",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC45",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC46",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC47",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC48",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC49",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC50",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC51",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC52",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC53",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC54",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC55",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC56",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC57",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC58",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC59",
+            "responseValue": "0"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "dss": 0,
+            "dcs1": 3,
+            "dcs2": 0
+          },
+          "totalScoreKeys": [
+            "dss",
+            "dcs1",
+            "dcs2"
+          ]
+        }
+      },
+      {
+        "name": "only_dcs2_3",
+        "answers": [
+          {
+            "itemCode": "DBTWC01",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC02",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC03",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC04",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC05",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC06",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC08",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC09",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC10",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC11",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC12",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC13",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC14",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC15",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC16",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC17",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC18",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC19",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC20",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC21",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC22",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC23",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC24",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC25",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC26",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC27",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC28",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC29",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC30",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC31",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC32",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC33",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC34",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC35",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC36",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC37",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC38",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC39",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC40",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC41",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC42",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC43",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC44",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC45",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC46",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC47",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC48",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC49",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC50",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC51",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC52",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC53",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC54",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC55",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC56",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC57",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC58",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC59",
+            "responseValue": "0"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "dss": 0,
+            "dcs1": 0,
+            "dcs2": 3
+          },
+          "totalScoreKeys": [
+            "dss",
+            "dcs1",
+            "dcs2"
+          ]
+        }
+      },
+      {
+        "name": "cycling",
+        "answers": [
+          {
+            "itemCode": "DBTWC01",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC03",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC05",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC07",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC09",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC11",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC12",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC13",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC15",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC16",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC17",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC18",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC19",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC20",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC21",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC22",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC23",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC24",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC25",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC26",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC27",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC28",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC29",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC30",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC31",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC32",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC33",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC34",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC35",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC36",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC37",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC38",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC39",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC40",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC41",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC42",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC43",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC44",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC45",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC46",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC47",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC48",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC49",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC50",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC51",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC52",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC53",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC54",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC55",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC56",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DBTWC57",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DBTWC58",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DBTWC59",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "dss": 1.368421052631579,
+            "dcs1": 1.4,
+            "dcs2": 2.3333333333333335
+          },
+          "totalScoreKeys": [
+            "dss",
+            "dcs1",
+            "dcs2"
+          ]
+        }
+      },
+      {
+        "name": "missing_dss",
+        "answers": [
+          {
+            "itemCode": "DBTWC02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC03",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC04",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC05",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC06",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC07",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC08",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC09",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC10",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC11",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC12",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC13",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC14",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC15",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC16",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC17",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC18",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC19",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC20",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC21",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC22",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC23",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC24",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC25",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC26",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC27",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC28",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC29",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC30",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC31",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC32",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC33",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC34",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC35",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC36",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC37",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC38",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC39",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC40",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC41",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC42",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC43",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC44",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC45",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC46",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC47",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC48",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC49",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC50",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC51",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC52",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC53",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC54",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC55",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC56",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC57",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC58",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC59",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "dss": null,
+            "dcs1": 2,
+            "dcs2": 2
+          },
+          "totalScoreKeys": [
+            "dss",
+            "dcs1",
+            "dcs2"
+          ]
+        }
+      },
+      {
+        "name": "missing_dcs1",
+        "answers": [
+          {
+            "itemCode": "DBTWC01",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC04",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC05",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC06",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC07",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC08",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC09",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC10",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC11",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC12",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC13",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC14",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC15",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC16",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC17",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC18",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC19",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC20",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC21",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC22",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC23",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC24",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC25",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC26",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC27",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC28",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC29",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC30",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC31",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC32",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC33",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC34",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC35",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC36",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC37",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC38",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC39",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC40",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC41",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC42",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC43",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC44",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC45",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC46",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC47",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC48",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC49",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC50",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC51",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC52",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC53",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC54",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC55",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC56",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC57",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC58",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC59",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "dss": 2,
+            "dcs1": null,
+            "dcs2": 2
+          },
+          "totalScoreKeys": [
+            "dss",
+            "dcs1",
+            "dcs2"
+          ]
+        }
+      },
+      {
+        "name": "missing_dcs2",
+        "answers": [
+          {
+            "itemCode": "DBTWC01",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC03",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC04",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC05",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC06",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC08",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC09",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC10",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC11",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC12",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC13",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC14",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC15",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC16",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC17",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC18",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC19",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC20",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC21",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC22",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC23",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC24",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC25",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC26",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC27",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC28",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC29",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC30",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC31",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC32",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC33",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC34",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC35",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC36",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC37",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC38",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC39",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC40",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC41",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC42",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC43",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC44",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC45",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC46",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC47",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC48",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC49",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC50",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC51",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC52",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC53",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC54",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC55",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC56",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC57",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC58",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DBTWC59",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "dss": 2,
+            "dcs1": 2,
+            "dcs2": null
+          },
+          "totalScoreKeys": [
+            "dss",
+            "dcs1",
+            "dcs2"
+          ]
+        }
+      },
+      {
+        "name": "none",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "dss": null,
+            "dcs1": null,
+            "dcs2": null
+          },
+          "totalScoreKeys": [
+            "dss",
+            "dcs1",
+            "dcs2"
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "status": "PREPARED_NOT_RUNTIME_CONNECTED",
+  "instrumentKey": "maia2_37_zh_cn_research",
+  "instrumentVersion": "1.0.0",
+  "locale": "zh-CN",
+  "instructions": [
+    "下面列出一些陈述。请根据一般日常生活中的情况，指出每项陈述符合你的频率，每行选择一个数字：0表示“从不”，5表示“总是”；中间选项保留数字1、2、3、4。"
+  ],
+  "recallPeriod": null,
+  "recallContext": "generally in daily life",
+  "itemOrderLocked": true,
+  "consumerStatus": "旧schema无独立instruction字段，待后续消费者接入"
+}

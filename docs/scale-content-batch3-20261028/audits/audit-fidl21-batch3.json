@@ -1,0 +1,310 @@
+{
+  "instrument": "fidl21_horne_zh_cn_research:1.0.1",
+  "sourceSHA": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "files": [
+    {
+      "path": "docs/scale-instruments/research-drafts/fidl21_horne/1.0.0/README.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "gitBlob": "fe0d7157ca2e1124235740b82d32377e3d313d11",
+      "sha256": "6ae4cf82e2c3b2d7afff59dc472803499a8fdf000eeaaa6110ac34c461a87d6a"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/fidl21_horne/1.0.0/source-manifest.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "gitBlob": "144e95f1610fd4484a7022ae62322c91eb9f5840",
+      "sha256": "9ff7f4c072533023a0ab19b59f0c82ad3b272daa36d4a93c9470634ebbf20d81"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/fidl21_horne/1.0.1/README.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "gitBlob": "4c650a8dae5792cf72f1afddba4084e3ab3b699d",
+      "sha256": "d3e49ee1e4e2a7f3f54ccb686eb3d30076d48dbe2abe3f24b298d9ba88c961c9"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/fidl21_horne/1.0.1/source-manifest.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "gitBlob": "22e23459aae6bf01485b1b92a4527231483505f0",
+      "sha256": "d2ccdc83fbca9bed58d8c1a3d322356a3998798bf5961e931d248bf68cc75691"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/fidl21_horne_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "gitBlob": "1cdd13b3af1d4a80926dc942185fd4b58f3e491a",
+      "sha256": "99d73dde660d772b766a17283b68c2bbea2860988d558ee8f66ba29997d2dc15"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/fidl21_horne_zh_cn_research/1.0.0/instrument.ts",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "gitBlob": "0eed070bb879576339c5a71afdf34c0026591fd3",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/fidl21_horne_zh_cn_research/1.0.0/source.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "gitBlob": "753698d0ec917af1fa8e650c5390f3613fd407e6",
+      "sha256": "839f32945cee98572884d7a25b01f18b5f4a546b22c0a9949da7c70c508742a6"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/fidl21_horne_zh_cn_research/1.0.1/THIRD_PARTY_LICENSE.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "gitBlob": "b836ebc6afdc593f376971f16a43d7be478b1972",
+      "sha256": "00b2a8fd114984872ae9ba1170805a3e9f304893240aa1818ffd4079ab0fe142"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/fidl21_horne_zh_cn_research/1.0.1/instrument.ts",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "gitBlob": "0eed070bb879576339c5a71afdf34c0026591fd3",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/fidl21_horne_zh_cn_research/1.0.1/source.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "gitBlob": "5b5cbad73ed02a6a67979c14dbeb48af873bd630",
+      "sha256": "b6616f74faa2337e75fae8e775a36dfacfce9b0785754f57cea4919ca9db62b8"
+    }
+  ],
+  "historicVersion": "1.0.0 catalog-only 历史保留；不以旧目录替代1.0.1。",
+  "sourceEvidence": {
+    "manifest": {
+      "path": "docs/scale-instruments/research-drafts/fidl21_horne/1.0.1/source-manifest.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "gitBlob": "22e23459aae6bf01485b1b92a4527231483505f0",
+      "sha256": "d2ccdc83fbca9bed58d8c1a3d322356a3998798bf5961e931d248bf68cc75691"
+    },
+    "officialSupplementName": "BJC-64-315-s001.docx",
+    "officialSupplementSHA256": "da3393c6b1d362e6d7fcbdba78b9210b6ec7cb923eeff2bdd442825102eada8e",
+    "scope": "固定研究清单记录用户提供的原作者附件第8–11页正式21题和第12页五因素、反向；附件字节不在固定git树，本次未重新独立回读原件。",
+    "article": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12057328/",
+    "articleAccess": "本次网页返回reCAPTCHA，不能作为新原文核验；结论依据固定清单的既有附件摘录记录。"
+  },
+  "items": [
+    {
+      "number": 1,
+      "code": "FIDL21_01",
+      "english": "I insist on eating the same foods or at the same time every day.",
+      "chinese": "我坚持每天吃相同的食物，或者每天在相同的时间吃饭。",
+      "facet": "routine",
+      "reverse": false,
+      "conclusion": "与固定source-manifest记录的正式英文题及中文一致；项目用户已确认中文题文，独立专家译审待完成。"
+    },
+    {
+      "number": 2,
+      "code": "FIDL21_02",
+      "english": "I become frustrated or upset if things don't go to plan.",
+      "chinese": "如果事情没有按计划进行，我会感到沮丧或烦躁。",
+      "facet": "predictability_control",
+      "reverse": false,
+      "conclusion": "与固定source-manifest记录的正式英文题及中文一致；项目用户已确认中文题文，独立专家译审待完成。"
+    },
+    {
+      "number": 3,
+      "code": "FIDL21_03",
+      "english": "I can modify my plans when there is a change in circumstances (e.g., change of time or venue, unexpected weather, something is unavailable).",
+      "chinese": "情况发生变化时，我能够调整自己的计划（例如时间或地点改变、天气突变，或者原定需要的东西无法使用）。",
+      "facet": "switching",
+      "reverse": true,
+      "conclusion": "与固定source-manifest记录的正式英文题及中文一致；项目用户已确认中文题文，独立专家译审待完成。"
+    },
+    {
+      "number": 4,
+      "code": "FIDL21_04",
+      "english": "I feel anxious or stressed when faced with unfamiliar situations or people.",
+      "chinese": "面对不熟悉的情况或人时，我会感到焦虑或压力。",
+      "facet": "predictability_control",
+      "reverse": false,
+      "conclusion": "与固定source-manifest记录的正式英文题及中文一致；项目用户已确认中文题文，独立专家译审待完成。"
+    },
+    {
+      "number": 5,
+      "code": "FIDL21_05",
+      "english": "I have specific routines related to my meals/food (e.g. needing to sit in the same spot, use the same cutlery).",
+      "chinese": "我在吃饭方面有固定的习惯（例如必须坐在同一个位置、使用同一套餐具）。",
+      "facet": "routine",
+      "reverse": false,
+      "conclusion": "与固定source-manifest记录的正式英文题及中文一致；项目用户已确认中文题文，独立专家译审待完成。"
+    },
+    {
+      "number": 6,
+      "code": "FIDL21_06",
+      "english": "I can easily change my approach to a task if shown a better way.",
+      "chinese": "如果有人告诉我做某项任务有更好的方法，我能轻松改变自己的做法。",
+      "facet": "switching",
+      "reverse": true,
+      "conclusion": "与固定source-manifest记录的正式英文题及中文一致；项目用户已确认中文题文，独立专家译审待完成。"
+    },
+    {
+      "number": 7,
+      "code": "FIDL21_07",
+      "english": "I often repeat particular words or phrases in exactly the same way (e.g., catchphrases).",
+      "chinese": "我经常以完全相同的方式重复某些词语或短句（例如口头禅）。",
+      "facet": "repetition",
+      "reverse": false,
+      "conclusion": "与固定source-manifest记录的正式英文题及中文一致；项目用户已确认中文题文，独立专家译审待完成。"
+    },
+    {
+      "number": 8,
+      "code": "FIDL21_08",
+      "english": "I like to follow specific routines when I leave the house (e.g., always taking the same route, always being dropped off at the same spot).",
+      "chinese": "离家外出时，我喜欢遵循固定的习惯（例如总走同一条路，或总在同一个地点下车）。",
+      "facet": "routine",
+      "reverse": false,
+      "conclusion": "与固定source-manifest记录的正式英文题及中文一致；项目用户已确认中文题文，独立专家译审待完成。"
+    },
+    {
+      "number": 9,
+      "code": "FIDL21_09",
+      "english": "I have to be right, even if it means not listening to others’ opinions.",
+      "chinese": "我认为自己必须是对的，即使这意味着不听别人的意见。",
+      "facet": "thoughts_beliefs",
+      "reverse": false,
+      "conclusion": "与固定source-manifest记录的正式英文题及中文一致；项目用户已确认中文题文，独立专家译审待完成。"
+    },
+    {
+      "number": 10,
+      "code": "FIDL21_10",
+      "english": "I expect others to uphold the same ideas, values, and beliefs as mine.",
+      "chinese": "我希望别人也坚持与我相同的观点、价值观和信念。",
+      "facet": "thoughts_beliefs",
+      "reverse": false,
+      "conclusion": "与固定source-manifest记录的正式英文题及中文一致；项目用户已确认中文题文，独立专家译审待完成。"
+    },
+    {
+      "number": 11,
+      "code": "FIDL21_11",
+      "english": "I need to repeat some actions/tasks until they feel “just right”.",
+      "chinese": "我需要反复做某些动作或任务，直到觉得“恰到好处”为止。",
+      "facet": "repetition",
+      "reverse": false,
+      "conclusion": "与固定source-manifest记录的正式英文题及中文一致；项目用户已确认中文题文，独立专家译审待完成。"
+    },
+    {
+      "number": 12,
+      "code": "FIDL21_12",
+      "english": "I find it hard to let go of my ideas or beliefs, even when presented with new information.",
+      "chinese": "即使得到了新的信息，我也很难放下原有的想法或信念。",
+      "facet": "thoughts_beliefs",
+      "reverse": false,
+      "conclusion": "与固定source-manifest记录的正式英文题及中文一致；项目用户已确认中文题文，独立专家译审待完成。"
+    },
+    {
+      "number": 13,
+      "code": "FIDL21_13",
+      "english": "I feel like I need to repeat certain actions (e.g., pacing, tapping, checking).",
+      "chinese": "我觉得自己必须重复某些动作（例如来回踱步、敲击或反复检查）。",
+      "facet": "repetition",
+      "reverse": false,
+      "conclusion": "与固定source-manifest记录的正式英文题及中文一致；项目用户已确认中文题文，独立专家译审待完成。 原文“feel like I need”译为“觉得自己必须”，语气强度供独立译审，不静默改题。"
+    },
+    {
+      "number": 14,
+      "code": "FIDL21_14",
+      "english": "I get overly focused on small details even when it’s not helpful to do so.",
+      "chinese": "即使关注细节没有帮助，我也会过度关注一些小细节。",
+      "facet": "repetition",
+      "reverse": false,
+      "conclusion": "与固定source-manifest记录的正式英文题及中文一致；项目用户已确认中文题文，独立专家译审待完成。"
+    },
+    {
+      "number": 15,
+      "code": "FIDL21_15",
+      "english": "I repetitively count and/or order objects in my environment.",
+      "chinese": "我会反复清点或排列周围的物品。",
+      "facet": "repetition",
+      "reverse": false,
+      "conclusion": "与固定source-manifest记录的正式英文题及中文一致；项目用户已确认中文题文，独立专家译审待完成。"
+    },
+    {
+      "number": 16,
+      "code": "FIDL21_16",
+      "english": "When interrupted, I can easily switch back to what I was previously doing.",
+      "chinese": "被打断后，我能够轻松回到之前正在做的事情上。",
+      "facet": "switching",
+      "reverse": true,
+      "conclusion": "与固定source-manifest记录的正式英文题及中文一致；项目用户已确认中文题文，独立专家译审待完成。"
+    },
+    {
+      "number": 17,
+      "code": "FIDL21_17",
+      "english": "I prefer it when people behave in a specific way or according to a set of rules during activities.",
+      "chinese": "在活动中，我更希望别人以特定方式行事，或者按照一套规则行动。",
+      "facet": "predictability_control",
+      "reverse": false,
+      "conclusion": "与固定source-manifest记录的正式英文题及中文一致；项目用户已确认中文题文，独立专家译审待完成。"
+    },
+    {
+      "number": 18,
+      "code": "FIDL21_18",
+      "english": "I can easily adapt to changes in the topic of conversation.",
+      "chinese": "谈话话题发生变化时，我能够轻松适应。",
+      "facet": "switching",
+      "reverse": true,
+      "conclusion": "与固定source-manifest记录的正式英文题及中文一致；项目用户已确认中文题文，独立专家译审待完成。"
+    },
+    {
+      "number": 19,
+      "code": "FIDL21_19",
+      "english": "I have specific interests in items or objects that others find unusual.",
+      "chinese": "我对某些物品有特别的兴趣，而别人觉得这些物品很不寻常。",
+      "facet": "repetition",
+      "reverse": false,
+      "conclusion": "与固定source-manifest记录的正式英文题及中文一致；项目用户已确认中文题文，独立专家译审待完成。 英文others find unusual的指向可供独立译审，维持既有用户审核题文。"
+    },
+    {
+      "number": 20,
+      "code": "FIDL21_20",
+      "english": "I can adapt my behaviour according to the social situation (e.g., casual versus formal settings)",
+      "chinese": "我能够根据不同的社交场合调整自己的行为（例如非正式场合与正式场合）。",
+      "facet": "switching",
+      "reverse": true,
+      "conclusion": "与固定source-manifest记录的正式英文题及中文一致；项目用户已确认中文题文，独立专家译审待完成。"
+    },
+    {
+      "number": 21,
+      "code": "FIDL21_21",
+      "english": "I am very unsettled by last-minute changes to my plans.",
+      "chinese": "如果我的计划在最后一刻发生变化，我会感到很不安。",
+      "facet": "predictability_control",
+      "reverse": false,
+      "conclusion": "与固定source-manifest记录的正式英文题及中文一致；项目用户已确认中文题文，独立专家译审待完成。"
+    }
+  ],
+  "threePartConclusions": {
+    "content": "21题与固定研究清单原文、已确认的中文、顺序及维度映射逐项匹配，03/06/16/18/20反向；过去两周 Never/Rarely/Sometimes/Often/All the time 与从不/很少/有时/经常/总是对应。题13强度及19含义指向可留独立专家复核；不改动已由项目用户确认的题文。",
+    "scoring": "五维等权求和 Repetition 7/11/13/14/15/19（6–30），Switching 3/6/16/18/20（5–25，均反向6−x），Predictability/Control 2/4/17/21（4–20），Routine 1/5/8（3–15），Thoughts/Beliefs 9/10/12（3–15）；总分21–105，21题加和等价五维总和；没有均分分母。每维完整才计该维、21题完整才计总分是平台规则，原作者缺失规则未标明；总结果无效时不能把其余可算分数理解为有效报告。references空，referencePolicy none，无中文常模、临床阈值或分档。",
+    "report": "报告1.0.0，测量1.0.1、计分1.0.0、localization1.0.0；总分与各维higher_is_more，切换维明确高分代表自报灵活行为较少，不是能力缺失。各维题量不同，不直接比较原始分。文本非诊断、语气中性，有反思及小建议，无阈值；沿用合格正文，不按旧最小字数强改。未声明report.audienceContract，适用范围依据source的成人年龄/SELF及研究限定，不能补称技术受众审阅批准。"
+  },
+  "instruction": {
+    "source": {
+      "path": "server-version/backend/src/modules/scale/instruments/fidl21_horne_zh_cn_research/1.0.1/source.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "gitBlob": "5b5cbad73ed02a6a67979c14dbeb48af873bd630",
+      "sha256": "b6616f74faa2337e75fae8e775a36dfacfce9b0785754f57cea4919ca9db62b8"
+    },
+    "jsonPointer": "/instruction",
+    "value": {
+      "schemaVersion": 1,
+      "text": "我们想了解，在日常生活中，你有多经常出现以下想法或行为。请回想过去两周的实际经历，按每种情况出现的频率选择答案。没有正确或错误的答案。",
+      "language": "zh-CN",
+      "version": "1.0.1",
+      "source": "原作者官方补充材料BJC-64-315-s001.docx，第8页修订21题指导语；本站独立简体中文工作译稿。"
+    },
+    "note": "固定1.0.1已有独立中文指导语，标明作者附录第8页及本站译稿，无需再添加；21题用户审核不含指导语。"
+  },
+  "minimalOrdinaryEdits": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/fidl21_horne_zh_cn_research/1.0.1/source.json",
+      "jsonPointer": "/catalog/administration/layoutConstraints/5",
+      "issue": "“当前中文独立翻译待审”与项目用户已确认21项题文的reviewStatus APPROVED容易混淆。",
+      "suggestion": "改为“中文题文已获项目用户审校确认；独立专家译审、认知访谈和目标人群验证仍待完成；8分钟为平台目录技术估计，而非作者精确施测时长。无作者/中国常模、分位数、轻中重诊断阈值或干预建议分界。” 不扩大用户审校范围。"
+    }
+  ],
+  "humanItems": [
+    "用户题文审核APPROVED照实保留；expertReviewStatus PENDING、认知访谈和中国人群验证仍待完成。",
+    "按已有license记录：作者联系、附件/译文/电子施测及公开再分发权利待管理员核查；不开展新版权研究或称已获许可。",
+    "确需改题义、锚点、维度、缺失政策或阈值应先协调并评估测量版本，保持历史1.0.0。"
+  ],
+  "notExecuted": [
+    "未改仓库/分支/DB/CI，未执行golden、截图、四入口或系统测试。",
+    "未把既有历史检查标为新执行，未做新的科研或版权研究；本文逐题以固定manifest既存原文记录核对，未重读附件原件。"
+  ]
+}

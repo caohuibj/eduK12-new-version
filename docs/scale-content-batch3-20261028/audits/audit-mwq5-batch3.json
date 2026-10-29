@@ -1,0 +1,181 @@
+{
+  "instrument": "mwq5_zh_cn_research:1.0.0",
+  "sourceSHA": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "files": [
+    {
+      "path": "docs/scale-instruments/research-drafts/mwq5/1.0.0/README.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "gitBlob": "ab55f94a2254a06915f255b9a99e197c8962e776",
+      "sha256": "53c6c7f4a97f03c468483fccfddbeeceda801b5267eb01591d3e9a34f2ba31c6"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/mwq5/1.0.0/bilingual-content.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "gitBlob": "c468f7502751caa64dbf269fec48064649ac63c2",
+      "sha256": "e4c268da8a45bac31af995c6d2c31bb354a84a1ab307d5b350525b8ce0a8f9fd"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/mwq5/1.0.0/external-reference-dossier.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "gitBlob": "60e014361f3b23586cfaefbff163778270c6b63d",
+      "sha256": "cf33cb49efd6c381c6d40504bec12b6882eb3dfbe729535cd355c5549a1075b0"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/mwq5/1.0.0/local-test-output.txt",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "gitBlob": "23073de9b1e2ae5c4d9f1c3aee1fad145b162883",
+      "sha256": "5a035142d2b3a4d4cbdc37cdad917f5680e7a9e5b9e8971503e8cefb322cf95d"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/mwq5/1.0.0/local-validation.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "gitBlob": "193a204c0463246871c8a22188008fbf8f03ab08",
+      "sha256": "304e5a760258bc03179f3a59ccbb6b9445300494efb28cc5dd736ff77928e0e8"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/mwq5/1.0.0/references.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "gitBlob": "f759064c44025132e81b5efae953c62aa27775d0",
+      "sha256": "dd579ffae50476dd82b5303d737c5da0c841d7db32b7172c3460bfe5f886d53a"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/mwq5/1.0.0/report-example.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "gitBlob": "082fbc8a9df7a23b3933cc56d7fc651008d825c2",
+      "sha256": "ad5a38e4f21c41cce85ace57c60192b4750938b7b4ee7edd76131adacacb6134"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/mwq5/1.0.0/report-example.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "gitBlob": "121b51b5f450f39e4395c362e9eb0871cf7ea779",
+      "sha256": "312c392392ba61ef62b1563be0a96b50e175a364b3bd8e7b4a5d52e6dae0ce3e"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/mwq5/1.0.0/reviewed-source-pack.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "gitBlob": "4c313b3f6389746dfca77a4ad83d095f5c0aeddb",
+      "sha256": "170787ea31d7fb5e46a55f5266ce288dc1dcacdd214ec5c2be20db88466aaba7"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/mwq5/1.0.0/runtime-check.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "gitBlob": "961b47321785e7bcd8aa22bf68f61a2a71181bb9",
+      "sha256": "5c64e4db25d455800e5e029677b0eb86726e31f275a7d8e7d3679b92a44dec56"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/mwq5/1.0.0/scoring-and-thresholds.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "gitBlob": "c0e3be94dfa06a51ed6667c4f1fd951172074759",
+      "sha256": "a11478a1f0fa8841b2bc962824475a35f9f844ca2cd3d4b7edcc2b38ec296827"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/scale/instruments/mwq5_zh_cn_research.test.ts",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "gitBlob": "466e3388e070f0591e313752facb1a3d6d87130b",
+      "sha256": "c0fa275682acd7cca21db008a78a445f2411c24c1150a3997fc703e6bd4a3fcf"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/mwq5_zh_cn_research/1.0.0/instrument.ts",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "gitBlob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/mwq5_zh_cn_research/1.0.0/source.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "gitBlob": "d39e21e008352c79bd20ea85c0d12056443c030c",
+      "sha256": "7e179c1051023b5d7d8b7831ff73a36cb4a117d74038bed8fe0b7940e408f749"
+    }
+  ],
+  "originalEvidence": {
+    "url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2013.00560/full",
+    "access": "本次直接读取原作者2013年论文Study 1正文五题与锚点、表1；题5正文or与表1 of不同，研究包保留差异。",
+    "storedSource": "研究包记录mwq-original.html SHA-256 df659d41d0b357e81544afcde0f320cfdc759558058f6f237dc7a5cfdfb7760e；该来源文件不在本次固定git树路径清单，本次不声称重新核验该文件字节。"
+  },
+  "items": [
+    {
+      "number": 1,
+      "code": "MWQ5_01",
+      "english": "I have difficulty maintaining focus on simple or repetitive work",
+      "chinese": "做简单或重复的工作时，我很难保持专注。",
+      "key": "identity",
+      "conclusion": "原论文Study 1正文与双语材料一致；中文保持原意，独立译审待完成。"
+    },
+    {
+      "number": 2,
+      "code": "MWQ5_02",
+      "english": "While reading, I find I haven't been thinking about the text and must therefore read it again",
+      "chinese": "阅读时，我发现自己并没有在想文字的内容，因此不得不重新读一遍。",
+      "key": "identity",
+      "conclusion": "原论文Study 1正文与双语材料一致；中文保持原意，独立译审待完成。"
+    },
+    {
+      "number": 3,
+      "code": "MWQ5_03",
+      "english": "I do things without paying full attention",
+      "chinese": "我做事时没有把注意力完全放在上面。",
+      "key": "identity",
+      "conclusion": "原论文Study 1正文与双语材料一致；中文保持原意，独立译审待完成。"
+    },
+    {
+      "number": 4,
+      "code": "MWQ5_04",
+      "english": "I find myself listening with one ear, thinking about something else at the same time",
+      "chinese": "我发现自己一边听着，一边在想别的事情。",
+      "key": "identity",
+      "conclusion": "原论文Study 1正文与双语材料一致；中文保持原意，独立译审待完成。"
+    },
+    {
+      "number": 5,
+      "code": "MWQ5_05",
+      "english": "I mind-wander during lectures or presentations",
+      "chinese": "听课或听报告时，我会走神。",
+      "key": "identity",
+      "conclusion": "原论文Study 1正文与双语材料一致；中文保持原意，独立译审待完成。 表1作lectures of presentations；正文为or，现译按正文，差异已记录。"
+    }
+  ],
+  "threePartConclusions": {
+    "content": "五题顺序与原论文Study1正文一致，全正向；6个锚点按从几乎从不到几乎总是单调递增。中文是未经验证的项目工作译稿，原英文学生证据不证明中文版K12适用。",
+    "scoring": "5题等权均分=(5项得分之和)/5，范围1–6，均为identity，高分代表自报情形更频繁；缺一题complete_required不补分、不出分，是项目规则；论文报告MWQ均值支持在该尺度上表述，但未见论文正文单列MWQ聚合公式，不应冒称公式是作者明确规定。无经验阈值、references空及referencePolicy none；样本均值不是个体分级。",
+    "report": "报告1.0.0，zh-CN、ADULT_SELF/student技术角色，非未成年人适用；高分方向正确，score_only无分档，说明走神不等于懒惰、ADHD诊断或学习能力，给予具体反思与小行动，保留现有文本。"
+  },
+  "instruction": {
+    "text": "请根据平时的情况，选择以下每句话发生的频繁程度。",
+    "provenance": "项目编写，非原作者已验证指导语",
+    "source": {
+      "path": "docs/scale-instruments/research-drafts/mwq5/1.0.0/bilingual-content.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "gitBlob": "c468f7502751caa64dbf269fec48064649ac63c2",
+      "sha256": "e4c268da8a45bac31af995c6d2c31bb354a84a1ab307d5b350525b8ce0a8f9fd"
+    },
+    "jsonPointer": "/instructions/zh",
+    "corroboratingSource": {
+      "path": "docs/scale-instruments/research-drafts/mwq5/1.0.0/reviewed-source-pack.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "gitBlob": "4c313b3f6389746dfca77a4ad83d095f5c0aeddb",
+      "sha256": "170787ea31d7fb5e46a55f5266ce288dc1dcacdd214ec5c2be20db88466aaba7"
+    },
+    "corroboratingPointer": "/instructions/zh",
+    "existingRuntimeSource": {
+      "path": "server-version/backend/src/modules/scale/instruments/mwq5_zh_cn_research/1.0.0/source.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "gitBlob": "d39e21e008352c79bd20ea85c0d12056443c030c",
+      "sha256": "7e179c1051023b5d7d8b7831ff73a36cb4a117d74038bed8fe0b7940e408f749"
+    },
+    "existingRuntimePointer": "/executable/definition/items/0/content",
+    "existingState": "原文已嵌首题前，source.instruction缺失。",
+    "recommendation": "不直接再添加独立instruction，否则指导语可能重复；如要迁移，应由root协调删除嵌入、增加独立字段及评估definition hash/版本、已存答案和报告影响，不静默改变题本。"
+  },
+  "minimalOrdinaryEdits": [],
+  "humanItems": [
+    "翻译专家审核、认知访谈与本地效度仍PENDING；不得将AI编辑检查称为专家审批。",
+    "移动题首指导语涉及测量definition/版本影响，协调后处理；不重复文本或伪称原版指导语。",
+    "若变更题义、锚点、计分、缺失或经验阈值须依据原文与目标人群证据协调版本；无擅改。",
+    "保留Mrazek等署名、CC BY3.0链接和项目改编声明，版权范围按既有记录，不扩展到其他材料。"
+  ],
+  "eligibility": "可作为现有DRAFT/CANDIDATE/PILOT研究候选，不代表中文验证或K12授权；首题嵌入指导语的呈现方式在任何迁移前保持。",
+  "notExecuted": [
+    "未改仓库/分支/DB/CI；未执行golden、系统、截图、四入口或新增科学验证。",
+    "历史本地结果不作为本次新执行结果。"
+  ]
+}

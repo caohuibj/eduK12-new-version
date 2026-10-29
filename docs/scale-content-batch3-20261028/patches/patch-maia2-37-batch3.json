@@ -1,0 +1,44 @@
+{
+  "source": {
+    "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+    "path": "server-version/backend/src/modules/scale/instruments/maia2_37_zh_cn_research/1.0.0/source.json",
+    "gitBlob": "1a90a50926821211bf865acf419b15bf9c7a0f15",
+    "sha256": "3d1fc6192db0261518b8d85c6bea2eed7219d7f3e7ca73a5e0010d7a3292c3cb"
+  },
+  "format": "operations 为针对上述 source.json 的 RFC 6902 JSON Patch；test 必须成功后再 replace。",
+  "operations": [
+    {
+      "op": "test",
+      "path": "/executable/definition/scoring/scores/1/key",
+      "value": "not_distracting"
+    },
+    {
+      "op": "test",
+      "path": "/executable/definition/scoring/scores/1/description",
+      "value": "更多表示本次自述在这一方面的体验或回应较常发生；不等同于身体健康、客观能力或人群高低。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/scoring/scores/1/description",
+      "value": "反向计分后，分数越高表示自述较少忽略、硬撑或转移对身体不适的注意；不等同于身体健康，也不意味着应忍受伤害。"
+    },
+    {
+      "op": "test",
+      "path": "/executable/definition/scoring/scores/2/key",
+      "value": "not_worrying"
+    },
+    {
+      "op": "test",
+      "path": "/executable/definition/scoring/scores/2/description",
+      "value": "更多表示本次自述在这一方面的体验或回应较常发生；不等同于身体健康、客观能力或人群高低。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/scoring/scores/2/description",
+      "value": "计分后，分数越高表示自述面对身体不适或疼痛时较少担忧、较能保持平静；不等同于身体健康，也不意味着应忽视症状。"
+    }
+  ],
+  "versionImpact": "公开 score.description 属于 measurement 内容；变更 measurement hash，需要新 instrument identity / instrumentVersion，保留 1.0.0 原样。两项均为方向解释文字，未改变引擎公式、键向或计分结果。版本号由主代理统一协调。",
+  "scope": "仅两项 description；不变更题文、选项、反向、公式、分母、阈值及报告正文。",
+  "execution": "只生成建议，未修改仓库，未执行系统、DB、CI 或测试。"
+}

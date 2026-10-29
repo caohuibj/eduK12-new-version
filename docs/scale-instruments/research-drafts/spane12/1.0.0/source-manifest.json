@@ -1,0 +1,182 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "spane12_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "source": {
+    "pdf": "https://eddiener.com/wp-content/uploads/2024/10/SPANE-Scale.pdf",
+    "permission": "https://eddiener.com/scale-of-positive-and-negative-experience-spane/",
+    "authors": [
+      "Ed Diener",
+      "Robert Biswas-Diener"
+    ],
+    "originalCopyrightYear": 2009,
+    "originalCitation": "Diener, E., Wirtz, D., Tov, W., Kim-Prieto, C., Choi, D. W., Oishi, S., & Biswas-Diener, R. (2010). New Well-being Measures: Short Scales to Assess Flourishing and Positive and Negative Feelings. Social Indicators Research, 97, 143–156. https://doi.org/10.1007/s11205-009-9493-y."
+  },
+  "contentMap": [
+    {
+      "itemCode": "SPANE12_01",
+      "sourceOrder": 1,
+      "originalEnglishWord": "Positive",
+      "platformChineseWord": "积极的",
+      "side": "P"
+    },
+    {
+      "itemCode": "SPANE12_02",
+      "sourceOrder": 2,
+      "originalEnglishWord": "Negative",
+      "platformChineseWord": "消极的",
+      "side": "N"
+    },
+    {
+      "itemCode": "SPANE12_03",
+      "sourceOrder": 3,
+      "originalEnglishWord": "Good",
+      "platformChineseWord": "感觉良好的",
+      "side": "P"
+    },
+    {
+      "itemCode": "SPANE12_04",
+      "sourceOrder": 4,
+      "originalEnglishWord": "Bad",
+      "platformChineseWord": "感觉不好的",
+      "side": "N"
+    },
+    {
+      "itemCode": "SPANE12_05",
+      "sourceOrder": 5,
+      "originalEnglishWord": "Pleasant",
+      "platformChineseWord": "愉快的",
+      "side": "P"
+    },
+    {
+      "itemCode": "SPANE12_06",
+      "sourceOrder": 6,
+      "originalEnglishWord": "Unpleasant",
+      "platformChineseWord": "不愉快的",
+      "side": "N"
+    },
+    {
+      "itemCode": "SPANE12_07",
+      "sourceOrder": 7,
+      "originalEnglishWord": "Happy",
+      "platformChineseWord": "开心的",
+      "side": "P"
+    },
+    {
+      "itemCode": "SPANE12_08",
+      "sourceOrder": 8,
+      "originalEnglishWord": "Sad",
+      "platformChineseWord": "悲伤的",
+      "side": "N"
+    },
+    {
+      "itemCode": "SPANE12_09",
+      "sourceOrder": 9,
+      "originalEnglishWord": "Afraid",
+      "platformChineseWord": "害怕的",
+      "side": "N"
+    },
+    {
+      "itemCode": "SPANE12_10",
+      "sourceOrder": 10,
+      "originalEnglishWord": "Joyful",
+      "platformChineseWord": "欣喜的",
+      "side": "P"
+    },
+    {
+      "itemCode": "SPANE12_11",
+      "sourceOrder": 11,
+      "originalEnglishWord": "Angry",
+      "platformChineseWord": "生气的",
+      "side": "N"
+    },
+    {
+      "itemCode": "SPANE12_12",
+      "sourceOrder": 12,
+      "originalEnglishWord": "Contented",
+      "platformChineseWord": "满足的",
+      "side": "P"
+    }
+  ],
+  "recall": "past_4_weeks",
+  "responseOptions": [
+    {
+      "value": "1",
+      "label": "极少或从未出现",
+      "score": 1
+    },
+    {
+      "value": "2",
+      "label": "很少出现",
+      "score": 2
+    },
+    {
+      "value": "3",
+      "label": "有时出现",
+      "score": 3
+    },
+    {
+      "value": "4",
+      "label": "经常出现",
+      "score": 4
+    },
+    {
+      "value": "5",
+      "label": "非常经常或一直出现",
+      "score": 5
+    }
+  ],
+  "scoring": {
+    "scoringVersion": "1.0.0",
+    "positive": [
+      1,
+      3,
+      5,
+      7,
+      10,
+      12
+    ],
+    "negative": [
+      2,
+      4,
+      6,
+      8,
+      9,
+      11
+    ],
+    "positiveRange": [
+      6,
+      30
+    ],
+    "negativeRange": [
+      6,
+      30
+    ],
+    "balance": "P-N",
+    "balanceRange": [
+      -24,
+      24
+    ],
+    "noReverse": true,
+    "customPluginKey": "spane12.balance.v1",
+    "customPluginVersion": "1.0.0",
+    "missing": "complete_facet_required_platform_policy",
+    "thresholdVersion": "NO_REFERENCE_SET"
+  },
+  "reportVersion": "1.0.0",
+  "rights": {
+    "noncommercialResearch": true,
+    "authorContactRequired": true,
+    "publicGitTranslationRedist": "UNKNOWN",
+    "commercialPermission": "UNVERIFIED"
+  },
+  "verification": {
+    "staticArithmetic": "checked_in_generation",
+    "codeExecution": "NOTRUN",
+    "CI": "NOTRUN",
+    "database": "NOTRUN",
+    "activation": "DRAFT_HIDDEN"
+  }
+}

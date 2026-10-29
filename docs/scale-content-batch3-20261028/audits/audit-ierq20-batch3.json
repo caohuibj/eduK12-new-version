@@ -1,0 +1,249 @@
+{
+  "instrument": "ierq20_zh_cn_research:1.0.0",
+  "sourceSHA": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "files": [
+    {
+      "path": "docs/scale-instruments/research-drafts/ierq20/1.0.0/README.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "dc6504a665f7cf2822df6c8c2e551d373b41cf10",
+      "sha256": "2e4541a72ab46e9f1f2fbf3d668d71456854a8782cb460ba13deb95502bf924b"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ierq20/1.0.0/source-manifest.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "119a8ecc2403cc9d946a224c846be46dcd5d8b56",
+      "sha256": "869a7b6160c3eae57a1c138c7211e5cfe68da5233cabb10c5a48e77e131da926"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ierq20_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "3a8ba2b5fa4463634fc20759ad023823a1e44f65",
+      "sha256": "70f717dd38c8e6a57d1344f7faf985782a9a06b82ef8fc0a533e007e307b5704"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ierq20_zh_cn_research/1.0.0/instrument.ts",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "0eed070bb879576339c5a71afdf34c0026591fd3",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ierq20_zh_cn_research/1.0.0/source.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "8a13ba963e39ef23dd45b1492ad48075b1878694",
+      "sha256": "dfad3705516d279c524a38a50f5f63d35c6e706489b05764580913245ad43d47"
+    }
+  ],
+  "originalEvidence": {
+    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4864994/",
+    "access": "本次访问返回reCAPTCHA，无法读取Appendix I原英文题目及原锚点；Europe PMC访问亦不可用。固定源manifest不存英文逐题，仅记20题/维度/键向。原文题义和五点中文锚点未独立复核，不能宣称通过。"
+  },
+  "items": [
+    {
+      "number": 1,
+      "code": "IERQ20_01",
+      "chinese": "了解别人以前是怎样面对情绪的，会让我感觉好一些。",
+      "facet": "social_modeling",
+      "key": "identity",
+      "conclusion": "固定source与manifest题序、归属和键向一致；本次未能逐题独立读取英文附录，中文题义留待原文/专家复核。"
+    },
+    {
+      "number": 2,
+      "code": "IERQ20_02",
+      "chinese": "心情低落时，别人提醒我事情或许没有看起来那么糟，会帮助我缓过来。",
+      "facet": "perspective_taking",
+      "key": "identity",
+      "conclusion": "固定source与manifest题序、归属和键向一致；本次未能逐题独立读取英文附录，中文题义留待原文/专家复核。"
+    },
+    {
+      "number": 3,
+      "code": "IERQ20_03",
+      "chinese": "非常高兴、想分享快乐的时候，我喜欢和其他人待在一起。",
+      "facet": "enhancing_positive_affect",
+      "key": "identity",
+      "conclusion": "固定source与manifest题序、归属和键向一致；本次未能逐题独立读取英文附录，中文题义留待原文/专家复核。"
+    },
+    {
+      "number": 4,
+      "code": "IERQ20_04",
+      "chinese": "情绪不好的时候，我会寻找愿意理解和关怀我的人。",
+      "facet": "soothing",
+      "key": "identity",
+      "conclusion": "固定source与manifest题序、归属和键向一致；本次未能逐题独立读取英文附录，中文题义留待原文/专家复核。"
+    },
+    {
+      "number": 5,
+      "code": "IERQ20_05",
+      "chinese": "感到担忧时，听一听别人对如何处理事情的看法会帮助我。",
+      "facet": "social_modeling",
+      "key": "identity",
+      "conclusion": "固定source与manifest题序、归属和键向一致；本次未能逐题独立读取英文附录，中文题义留待原文/专家复核。"
+    },
+    {
+      "number": 6,
+      "code": "IERQ20_06",
+      "chinese": "特别开心的时候，和某些人在一起会让我感觉更愉快。",
+      "facet": "enhancing_positive_affect",
+      "key": "identity",
+      "conclusion": "固定source与manifest题序、归属和键向一致；本次未能逐题独立读取英文附录，中文题义留待原文/专家复核。"
+    },
+    {
+      "number": 7,
+      "code": "IERQ20_07",
+      "chinese": "难受时，如果有人提醒我还有人处境更艰难，我会得到一些宽慰。",
+      "facet": "perspective_taking",
+      "key": "identity",
+      "conclusion": "固定source与manifest题序、归属和键向一致；本次未能逐题独立读取英文附录，中文题义留待原文/专家复核。"
+    },
+    {
+      "number": 8,
+      "code": "IERQ20_08",
+      "chinese": "心情不错时，我喜欢和其他人待在一起，因为那会让我感觉更开心。",
+      "facet": "enhancing_positive_affect",
+      "key": "identity",
+      "conclusion": "固定source与manifest题序、归属和键向一致；本次未能逐题独立读取英文附录，中文题义留待原文/专家复核。"
+    },
+    {
+      "number": 9,
+      "code": "IERQ20_09",
+      "chinese": "情绪低落时，我常常会去找愿意表达同情和理解的人。",
+      "facet": "soothing",
+      "key": "identity",
+      "conclusion": "固定source与manifest题序、归属和键向一致；本次未能逐题独立读取英文附录，中文题义留待原文/专家复核。"
+    },
+    {
+      "number": 10,
+      "code": "IERQ20_10",
+      "chinese": "不开心时，别人提醒我情况原本可能更糟，会让我感觉好些。",
+      "facet": "perspective_taking",
+      "key": "identity",
+      "conclusion": "固定source与manifest题序、归属和键向一致；本次未能逐题独立读取英文附录，中文题义留待原文/专家复核。"
+    },
+    {
+      "number": 11,
+      "code": "IERQ20_11",
+      "chinese": "感到挫折时，了解别人会怎样处理相同处境，对我有帮助。",
+      "facet": "social_modeling",
+      "key": "identity",
+      "conclusion": "固定source与manifest题序、归属和键向一致；本次未能逐题独立读取英文附录，中文题义留待原文/专家复核。"
+    },
+    {
+      "number": 12,
+      "code": "IERQ20_12",
+      "chinese": "心里难受时，我会向其他人寻求安慰。",
+      "facet": "soothing",
+      "key": "identity",
+      "conclusion": "固定source与manifest题序、归属和键向一致；本次未能逐题独立读取英文附录，中文题义留待原文/专家复核。"
+    },
+    {
+      "number": 13,
+      "code": "IERQ20_13",
+      "chinese": "因为快乐可以相互感染，所以我开心时会主动去找别人。",
+      "facet": "enhancing_positive_affect",
+      "key": "identity",
+      "conclusion": "固定source与manifest题序、归属和键向一致；本次未能逐题独立读取英文附录，中文题义留待原文/专家复核。"
+    },
+    {
+      "number": 14,
+      "code": "IERQ20_14",
+      "chinese": "感到烦躁时，别人劝我别太担心，能够帮助我平静下来。",
+      "facet": "perspective_taking",
+      "key": "identity",
+      "conclusion": "固定source与manifest题序、归属和键向一致；本次未能逐题独立读取英文附录，中文题义留待原文/专家复核。"
+    },
+    {
+      "number": 15,
+      "code": "IERQ20_15",
+      "chinese": "难过时，听别人讲述他们怎样面对类似感受，对我有帮助。",
+      "facet": "social_modeling",
+      "key": "identity",
+      "conclusion": "固定source与manifest题序、归属和键向一致；本次未能逐题独立读取英文附录，中文题义留待原文/专家复核。"
+    },
+    {
+      "number": 16,
+      "code": "IERQ20_16",
+      "chinese": "心情非常低落时，我会去找人，希望确认自己是被爱着的。",
+      "facet": "soothing",
+      "key": "identity",
+      "conclusion": "固定source与manifest题序、归属和键向一致；本次未能逐题独立读取英文附录，中文题义留待原文/专家复核。"
+    },
+    {
+      "number": 17,
+      "code": "IERQ20_17",
+      "chinese": "焦虑时，别人告诉我不必过于担心，会让我慢慢平静下来。",
+      "facet": "perspective_taking",
+      "key": "identity",
+      "conclusion": "固定source与manifest题序、归属和键向一致；本次未能逐题独立读取英文附录，中文题义留待原文/专家复核。"
+    },
+    {
+      "number": 18,
+      "code": "IERQ20_18",
+      "chinese": "特别兴奋和高兴时，我会去找其他人，也希望把快乐带给他们。",
+      "facet": "enhancing_positive_affect",
+      "key": "identity",
+      "conclusion": "固定source与manifest题序、归属和键向一致；本次未能逐题独立读取英文附录，中文题义留待原文/专家复核。"
+    },
+    {
+      "number": 19,
+      "code": "IERQ20_19",
+      "chinese": "悲伤时，我会找人寻求宽慰。",
+      "facet": "soothing",
+      "key": "identity",
+      "conclusion": "固定source与manifest题序、归属和键向一致；本次未能逐题独立读取英文附录，中文题义留待原文/专家复核。"
+    },
+    {
+      "number": 20,
+      "code": "IERQ20_20",
+      "chinese": "心情不好时，我想知道别人处在我的情境里会怎么做。",
+      "facet": "social_modeling",
+      "key": "identity",
+      "conclusion": "固定source与manifest题序、归属和键向一致；本次未能逐题独立读取英文附录，中文题义留待原文/专家复核。"
+    }
+  ],
+  "threePartConclusions": {
+    "content": "20条中文题、固定顺序、全正向及维度与固定manifest一致；原附录不可读，具体题义与1–5锚点是否逐条忠实原文未能独立确认，等待可读原始附件。",
+    "scoring": "四维各5题等权求和5–25：积极03/06/08/13/18、视角02/07/10/14/17、安慰04/09/12/16/19、示范01/05/11/15/20；无反向与总分，每维完整才能算是项目保守规则。manifest记载作者映射，但本次原附录未能重读；无参考集或阈值。",
+    "report": "report1.0.0，四维score_only、higher_is_more、不推断能力或病症；针对视角转换的界限及具体建议合理。安慰和示范两段可补充直接高分方向；涉及其他完整维可显示的陈述为内容表述，本次未检系统行为。"
+  },
+  "instruction": {
+    "source": {
+      "path": "server-version/backend/src/modules/scale/instruments/ierq20_zh_cn_research/1.0.0/source.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "8a13ba963e39ef23dd45b1492ad48075b1878694",
+      "sha256": "dfad3705516d279c524a38a50f5f63d35c6e706489b05764580913245ad43d47"
+    },
+    "jsonPointer": "/instruction",
+    "value": {
+      "schemaVersion": 1,
+      "text": "下面是一些描述人们如何借助他人来调整自己情绪的陈述。请逐句判断这种描述在多大程度上符合你平时的实际情况。1表示完全不符合，5表示非常符合。没有标准答案，请按自己真实的习惯作答。",
+      "language": "zh-CN",
+      "version": "1.0.0",
+      "source": "独立中文研究工作译稿；依据Hofmann等2016原论文Appendix I的施测说明，不复制任何现有正式中文版。"
+    },
+    "note": "已独立绑定项目中文工作指导语，来源标注Appendix I；因原附录本次不可读，真实性与完整性仍待核。"
+  },
+  "ordinaryEdits": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ierq20_zh_cn_research/1.0.0/source.json",
+      "jsonPointer": "/executable/definition/report/interpretations/2/summary",
+      "old": "人在低落、烦躁或受挫时，有时最需要的不是立即解决问题，而是有人愿意关心和陪伴。这一部分关注你是否倾向于向他人寻求同情、安慰与关怀。分数较高不表示你更软弱、更加依赖别人，也不等同于实际得到的支持一定更好；分数较低也不能说明你不需要关心。可以思考哪些人、哪些回应让自己感到安全，以及在暂时找不到人时，是否还有其他照顾自己的办法。",
+      "new": "人在低落、烦躁或受挫时，有时最需要的不是立即解决问题，而是有人愿意关心和陪伴。这一部分关注你是否倾向于向他人寻求同情、安慰与关怀。分数较高不表示你更软弱、更加依赖别人，也不等同于实际得到的支持一定更好；分数较低也不能说明你不需要关心。可以思考哪些人、哪些回应让自己感到安全，以及在暂时找不到人时，是否还有其他照顾自己的办法。 分数越高，表示你越认同向他人寻求安慰和关怀的描述。",
+      "reason": "清楚说明这两个维度的分数方向，不引入等级。"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ierq20_zh_cn_research/1.0.0/source.json",
+      "jsonPointer": "/executable/definition/report/interpretations/3/summary",
+      "old": "遇到难题或困扰时，听听别人如何面对类似经历，可能为自己打开另一种思路。这部分关注你是否习惯借助他人的经验、想法和示范来调整情绪与处理处境。分数较高不代表每次都能找到更好的解决方案，也不说明你缺乏独立性；相似的事情在不同人身上可能需要不同做法。可以从他人的经历中选择适合自己的部分，而不必照搬别人的生活或应对方式。",
+      "new": "遇到难题或困扰时，听听别人如何面对类似经历，可能为自己打开另一种思路。这部分关注你是否习惯借助他人的经验、想法和示范来调整情绪与处理处境。分数较高不代表每次都能找到更好的解决方案，也不说明你缺乏独立性；相似的事情在不同人身上可能需要不同做法。可以从他人的经历中选择适合自己的部分，而不必照搬别人的生活或应对方式。 分数越高，表示你越认同参考他人应对经验的描述。",
+      "reason": "清楚说明这两个维度的分数方向，不引入等级。"
+    }
+  ],
+  "humanItems": [
+    "取得可读2016论文Appendix I后逐题核英文、选项及指导语；此为证据缺口，不自行编造核验或状态。",
+    "独立译审、认知访谈及目标人群验证、管理员作者联系与再分发范围待完成，保持现有人工作业不设新自动门禁。",
+    "题目、锚点、计分实质修改应协调版本。"
+  ],
+  "notExecuted": [
+    "未修改仓库/分支、DB/CI或系统，未运行测试。",
+    "未以其他中文版本替代独立译本原文核验，未开展新科研版权调查。"
+  ]
+}

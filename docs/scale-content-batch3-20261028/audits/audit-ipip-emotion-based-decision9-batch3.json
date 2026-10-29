@@ -1,0 +1,234 @@
+{
+  "instrument": "ipip_emotion_based_decision9_zh_cn_research:1.0.0",
+  "sourceSHA": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "files": [
+    {
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "path": "docs/scale-instruments/research-drafts/ipip_emotion_based_decision9/1.0.0/README.md",
+      "gitBlob": "2b7b0961b2cf6a7b0b75532076c87cebe836d950",
+      "sha256": "2200f4b1b515404237c124b06f10994ba8b0c93d944fc0c6b04b810346cb0b22"
+    },
+    {
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "path": "docs/scale-instruments/research-drafts/ipip_emotion_based_decision9/1.0.0/bilingual-content.json",
+      "gitBlob": "eab7716241d34fb14f06c56126a93c807199ea1b",
+      "sha256": "553fa576e9496ac6766e6f89aa4b5b3ebc007ac7c57e003cc4c6b02639cdd5f3"
+    },
+    {
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "path": "docs/scale-instruments/research-drafts/ipip_emotion_based_decision9/1.0.0/external-reference-dossier.json",
+      "gitBlob": "9500f8b7ad9625c195696ad8c9c7c16009234f7c",
+      "sha256": "a506e2dd2b4e1d099850af415dbc6091ae4bdfb7271cf699be650aad05297cb5"
+    },
+    {
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "path": "docs/scale-instruments/research-drafts/ipip_emotion_based_decision9/1.0.0/local-test-output.txt",
+      "gitBlob": "c8b37f605ddf82c3bd4b64885eb032088af98b26",
+      "sha256": "dbae946d34f2fd03e6e5363c4caf4bda49dd140a224f9b9030f8c1f870505289"
+    },
+    {
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "path": "docs/scale-instruments/research-drafts/ipip_emotion_based_decision9/1.0.0/local-validation.json",
+      "gitBlob": "5e5e9c22545ecf91efe777201cc5f51abab6771c",
+      "sha256": "b81365982f5ea2ba1de594869a297d02506413e57ee10a77742c41da5aa1fb30"
+    },
+    {
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "path": "docs/scale-instruments/research-drafts/ipip_emotion_based_decision9/1.0.0/references.md",
+      "gitBlob": "2176600b839da53dd8da415c37bfed6936af4965",
+      "sha256": "1f148e6c6b7674c2a02ea6e440f28447adf9def9d9a36aef2c1a81aff8c33e76"
+    },
+    {
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "path": "docs/scale-instruments/research-drafts/ipip_emotion_based_decision9/1.0.0/report-example.json",
+      "gitBlob": "cd5a10b0f811a913445e16e80c9ff9c93a12f8d8",
+      "sha256": "88edd8ef11bf7174022a4ea5b5f6fd8e3b8e78894fcedcbf442cc56094290cd7"
+    },
+    {
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "path": "docs/scale-instruments/research-drafts/ipip_emotion_based_decision9/1.0.0/report-example.md",
+      "gitBlob": "f4b66998c010dff874478992fa8b0e6d7b164349",
+      "sha256": "69babf296da7e5cf8173cb66132fdeb2b1ca6da2d4dd36f3ff39ca639d796758"
+    },
+    {
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "path": "docs/scale-instruments/research-drafts/ipip_emotion_based_decision9/1.0.0/reviewed-source-pack.json",
+      "gitBlob": "f2defa40b8cb9ff0f9a95d23af38afe7b233b011",
+      "sha256": "1c28dd19900fdd4129b721d8dbf8716700566538ba68d8f57462de5db94a39fa"
+    },
+    {
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "path": "docs/scale-instruments/research-drafts/ipip_emotion_based_decision9/1.0.0/runtime-check.json",
+      "gitBlob": "46a1e0537041bdd3d695a23026df4855a83461a2",
+      "sha256": "24bc975aab11abec3537006ef371ac82df547a53ef5f54e330393f50ca1d53a5"
+    },
+    {
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "path": "docs/scale-instruments/research-drafts/ipip_emotion_based_decision9/1.0.0/scoring-and-thresholds.md",
+      "gitBlob": "19ade596d9b044f45a1f9055f0ad27b93aa7454b",
+      "sha256": "7d6671763e95d27fcf776f3461681ea2115d3a1ce35f82d2eb357d44e461df38"
+    },
+    {
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "path": "server-version/backend/src/__tests__/scale/instruments/ipip_emotion_based_decision9_zh_cn_research.test.ts",
+      "gitBlob": "94357a8360aafe62843471e4027ce3264ef1e599",
+      "sha256": "a82ac3034020de0cc85c81c04904a50333a2d8934b1401cf5fa0e9f6c210b58d"
+    },
+    {
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "path": "server-version/backend/src/modules/scale/instruments/ipip_emotion_based_decision9_zh_cn_research/1.0.0/instrument.ts",
+      "gitBlob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "path": "server-version/backend/src/modules/scale/instruments/ipip_emotion_based_decision9_zh_cn_research/1.0.0/source.json",
+      "gitBlob": "e07e872eaf084f099cb49eed57c0a9893f9f67ef",
+      "sha256": "7c18445fa8a24e64f5acc46ba2c42036a85c8bf733ce91fe91920a694d232aa2"
+    }
+  ],
+  "items": [
+    {
+      "code": "IPIP_EMOTION_BASED_DECISION9_01",
+      "english": "Listen to my feelings when making important decisions.",
+      "chinese": "做重要决定时，我会听从自己的感受。",
+      "key": "positive",
+      "conclusion": "官方原文、顺序、归属与键向匹配；中文工作译稿基本保留意思，待独立译审。 “听从”相较 listen to 有较强服从意味，提交独立译审，不静默改题。"
+    },
+    {
+      "code": "IPIP_EMOTION_BASED_DECISION9_02",
+      "english": "Base my goals in life on inspiration, rather than logic.",
+      "chinese": "我设定人生目标时，依据的是灵感，而不是逻辑。",
+      "key": "positive",
+      "conclusion": "官方原文、顺序、归属与键向匹配；中文工作译稿基本保留意思，待独立译审。"
+    },
+    {
+      "code": "IPIP_EMOTION_BASED_DECISION9_03",
+      "english": "Plan my life based on how I feel.",
+      "chinese": "我会根据自己的感受规划生活。",
+      "key": "positive",
+      "conclusion": "官方原文、顺序、归属与键向匹配；中文工作译稿基本保留意思，待独立译审。"
+    },
+    {
+      "code": "IPIP_EMOTION_BASED_DECISION9_04",
+      "english": "Believe emotions give direction to life.",
+      "chinese": "我相信情绪能为生活指引方向。",
+      "key": "positive",
+      "conclusion": "官方原文、顺序、归属与键向匹配；中文工作译稿基本保留意思，待独立译审。"
+    },
+    {
+      "code": "IPIP_EMOTION_BASED_DECISION9_05",
+      "english": "Listen to my heart rather than my brain.",
+      "chinese": "相比理性思考，我更听从内心的感受。",
+      "key": "positive",
+      "conclusion": "官方原文、顺序、归属与键向匹配；中文工作译稿基本保留意思，待独立译审。 heart/brain 译为内心感受/理性思考是对比性意译，供独立译审。"
+    },
+    {
+      "code": "IPIP_EMOTION_BASED_DECISION9_06",
+      "english": "Plan my life logically.",
+      "chinese": "我会按照逻辑规划自己的生活。",
+      "key": "negative",
+      "conclusion": "官方原文、顺序、归属与键向匹配；中文工作译稿基本保留意思，待独立译审。"
+    },
+    {
+      "code": "IPIP_EMOTION_BASED_DECISION9_07",
+      "english": "Believe important decisions should be based on logical reasoning.",
+      "chinese": "我认为重要决定应当以逻辑推理为依据。",
+      "key": "negative",
+      "conclusion": "官方原文、顺序、归属与键向匹配；中文工作译稿基本保留意思，待独立译审。"
+    },
+    {
+      "code": "IPIP_EMOTION_BASED_DECISION9_08",
+      "english": "Listen to my brain rather than my heart.",
+      "chinese": "相比内心感受，我更听从理性思考。",
+      "key": "negative",
+      "conclusion": "官方原文、顺序、归属与键向匹配；中文工作译稿基本保留意思，待独立译审。 heart/brain 译为内心感受/理性思考是对比性意译，供独立译审。"
+    },
+    {
+      "code": "IPIP_EMOTION_BASED_DECISION9_09",
+      "english": "Make decisions based on facts, not feelings.",
+      "chinese": "我依据事实而不是感受做决定。",
+      "key": "negative",
+      "conclusion": "官方原文、顺序、归属与键向匹配；中文工作译稿基本保留意思，待独立译审。"
+    }
+  ],
+  "threePartConclusions": {
+    "content": "九题按官方当前情绪导向决策分量表顺序，01–05正向、06–09反向一致；五点符合度对应官方五锚点，中点不等于不知道。官方表当前9题，括号10为优化前题数，不混淆。题01听从和05/08心脑意译供独立译审，不擅改。",
+    "scoring": "每题1–5，正向x、反向6−x，9题权重均为1，求和9–45；无均分或分母。所有9题必答、不插补是项目选择，非官方缺失规则。无经验分档和运行参考：references=[]，referencePolicy none；英文女性N432 alpha .73、男性N317 alpha .67仅原英文统计，不外推本中文版或个体精确度。",
+    "report": "version 1.0.0、zh-CN、ADULT_SELF/student技术角色，非儿童适用；score_only、higher_is_more、无bands和常模阈值。方向清楚，反思并列事实及感受、行动具体，明确不是决策能力判断，无须强改报告正文。score.description目前英文，公开结果可透传；catalog.construct.constructDefinition也为英文且可作量表描述，影响中文受众，可做等义本地化。"
+  },
+  "instruction": {
+    "existingText": "请根据你通常的情况，判断以下说法与你的符合程度。没有标准答案，请按自己的真实感受作答。",
+    "source": {
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "path": "docs/scale-instruments/research-drafts/ipip_emotion_based_decision9/1.0.0/bilingual-content.json",
+      "gitBlob": "eab7716241d34fb14f06c56126a93c807199ea1b",
+      "sha256": "553fa576e9496ac6766e6f89aa4b5b3ebc007ac7c57e003cc4c6b02639cdd5f3"
+    },
+    "jsonPointer": "/instructions",
+    "corroboratingSource": {
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "path": "docs/scale-instruments/research-drafts/ipip_emotion_based_decision9/1.0.0/reviewed-source-pack.json",
+      "gitBlob": "f2defa40b8cb9ff0f9a95d23af38afe7b233b011",
+      "sha256": "1c28dd19900fdd4129b721d8dbf8716700566538ba68d8f57462de5db94a39fa"
+    },
+    "corroboratingPointer": "/administration/instructionZh",
+    "sourceStatus": "项目中文工作指导语，非官方中文或人工审批",
+    "mapping": {
+      "field": "source.instruction",
+      "value": {
+        "schemaVersion": 1,
+        "text": "请根据你通常的情况，判断以下说法与你的符合程度。没有标准答案，请按自己的真实感受作答。",
+        "language": "zh-CN",
+        "version": "1.0.0",
+        "source": "docs/scale-instruments/research-drafts/ipip_emotion_based_decision9/1.0.0/bilingual-content.json#/instructions @ b92c69aefa2472775fa7ee86b9c208366886c908"
+      }
+    },
+    "note": "固定源无独立instruction字段；此为既有材料绑定建议，不新增自动内容门禁。"
+  },
+  "minimalOrdinaryEdits": [
+    {
+      "field": "instruction",
+      "value": {
+        "schemaVersion": 1,
+        "text": "请根据你通常的情况，判断以下说法与你的符合程度。没有标准答案，请按自己的真实感受作答。",
+        "language": "zh-CN",
+        "version": "1.0.0",
+        "source": "docs/scale-instruments/research-drafts/ipip_emotion_based_decision9/1.0.0/bilingual-content.json#/instructions @ b92c69aefa2472775fa7ee86b9c208366886c908"
+      },
+      "reason": "绑定已有指导语与来源。"
+    },
+    {
+      "field": "executable.definition.scoring.scores[0].description",
+      "value": "对做决定时相较于逻辑推理更依赖感受的自我描述；不衡量决策质量、冲动性、心理灵活性、情绪调节或情绪智力能力。",
+      "reason": "原字段为英文、对外分数说明可透传；仅等义中文呈现，不改变测量方向、题目或算法。root依实际版本轴处理。"
+    },
+    {
+      "field": "catalog.construct.constructDefinition",
+      "value": "对做决定时相较于逻辑推理更依赖感受的自我描述；不衡量决策质量、冲动性、心理灵活性、情绪调节或情绪智力能力。",
+      "reason": "同一英文构念描述可投影到量表说明；中文等义翻译，不变构念。"
+    }
+  ],
+  "rights": {
+    "sourceDefinition": "server-version/backend/src/modules/scale/instruments/ipip_emotion_based_decision9_zh_cn_research/1.0.0/source.json#/executable/definition/license",
+    "officialPermission": "https://ipip.ori.org/newPermission.htm",
+    "officialHome": "https://ipip.ori.org/",
+    "scope": "IPIP对其自身题项、量表及清单声明公共领域，可复制、编辑、翻译和商用；不扩展到名称相似的专有量表或其他材料；不代表中文验证或原作者批准。"
+  },
+  "humanItems": [
+    "中文独立译审、认知访谈及本地目标人群证据待完成；人工审核状态PENDING，不伪造专家确认。",
+    "题01“听从”及05/08对心脑比喻的解释性翻译，留待人工译审；若拟更改题义、锚点、算法、构念或阈值，需root协调用户并评估版本影响。",
+    "仅成人研究与自我了解，未建立青少年效度。"
+  ],
+  "eligibility": "可作DRAFT/CANDIDATE/PILOT批次候选；不能将候选当作正式科学批准或现有中文效度证明。用户授权普通绑定和等义中文说明；root决定版本轴与集成。",
+  "notExecuted": [
+    "未修改仓库、切分支、提交、操作数据库、CI或系统检查；未派子代理。",
+    "未运行golden、截图、四入口、安装幂等、全库检查或新效度研究；历史报告和测试仅留作来源记录。"
+  ],
+  "officialSources": [
+    "https://ipip.ori.org/newEmotionalIntelligenceKey.htm",
+    "https://ipip.ori.org/newEmotionalIntelligenceTable.htm",
+    "https://ipip.ori.org/newScoringInstructions.htm",
+    "https://ipip.ori.org/newPermission.htm"
+  ]
+}

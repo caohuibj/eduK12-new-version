@@ -1,0 +1,1589 @@
+{
+  "sourceSHA": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "scope": "78 distinct latest instrumentKeys from the historical fixed candidate source, not 85 versions or current installed count",
+  "newAuditFiles": 69,
+  "counts": {
+    "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING": 52,
+    "PREPARED_CONTENT_CANDIDATE": 17,
+    "PRIOR_REVIEW_FROZEN_NOT_REAUDITED": 8,
+    "EXISTING_PR362_REVIEW_REUSED_NOT_REAUDITED": 1
+  },
+  "rows": [
+    {
+      "instrumentKey": "aaq_us12_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/aaq_us12_zh_cn_research/1.0.0/source.json",
+          "blob": "168326942b967053b89cffd79c14f3f370f05f6c",
+          "sha256": "da609de37bda75759af3f130a71b9f1f44c87629535c011f8e7179217eebad39"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-aaq-us12-batch3.json",
+        "sha256": "37eb09f0716b32ce78f76e4154530addb36c6612103c74358dc3a21b63be8f47"
+      }
+    },
+    {
+      "instrumentKey": "act_sq6_zh_cn",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/act_sq6_zh_cn/1.0.0/source.json",
+          "blob": "0f2ce8e3da0203e02c522ad68ae5b90946da91b0",
+          "sha256": "8fb4a923d155da3c6209f9898b3f35e91c49030098d8730ab11d0c0f22ad49d0"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-act-sq6-batch3.json",
+        "sha256": "3d5c03a8a35dd09940f8bed70baf9bc8434ed071f3bc09ce9b5ee8f680a131e8"
+      }
+    },
+    {
+      "instrumentKey": "apq42_parent_global_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/apq42_parent_global_zh_cn_research/1.0.0/source.json",
+          "blob": "14ad739f89a99c41baddc8b31441704b18c3f850",
+          "sha256": "6ee31b0d77723f252dbbdab3c92465dfd817606d3f1756745a326103c2bce842"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "PREPARED_CONTENT_CANDIDATE",
+      "preparedVersion": "1.0.1",
+      "audit": {
+        "path": "audits/audit-apq42-batch3.json",
+        "sha256": "1d2257df88e02cecbb8dc76c748a51539ff906a6e2fdf4dedb4c69b3c9bbc8a6"
+      },
+      "manifest": "packages/apq42_parent_global_zh_cn_research.json"
+    },
+    {
+      "instrumentKey": "ars30_2016_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/ars30_2016_zh_cn_research/1.0.0/source.json",
+          "blob": "08a648420b4413282bbd14ef6c23fb2be89b6209",
+          "sha256": "970cd97ea150ae055e6a27096e99cd8e95d74dcf15ad7df3a1147121864f6b45"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "PRIOR_REVIEW_FROZEN_NOT_REAUDITED",
+      "priorPR": 367
+    },
+    {
+      "instrumentKey": "bads_sf9_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/bads_sf9_zh_cn_research/1.0.0/source.json",
+          "blob": "f3296423940bb5561cc34812c288545042e564e1",
+          "sha256": "cb59a05c12f38eaf97aaa299905f7d66e9300d61d39ed8dfe720cbc3063072e2"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-bads-sf9-batch3.json",
+        "sha256": "a1a9dedac3039b3471d0f4bd48417051316bf154e42422fb7aeee6a2f4de82f6"
+      }
+    },
+    {
+      "instrumentKey": "bat23_2020_en",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/bat23_2020_en/1.0.0/source.json",
+          "blob": "abe02fe4d7876c0cf00fb400160305389b911bea",
+          "sha256": "de5a26557659539d3f94caa049efeb7a467d42e83c7357f833c5b89f6a55e89f"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-bat23-batch3.json",
+        "sha256": "e17acd525cd887a2a66ca8e77cbf34ee6e637db97f58029f2d94762cbe2b9d97"
+      }
+    },
+    {
+      "instrumentKey": "bps9_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/bps9_zh_cn_research/1.0.0/source.json",
+          "blob": "299add75f8a3ea384c9e77ebdbc03fc45491bc8d",
+          "sha256": "4b0af6464233bdcbba61a57b65dfe3e68bac358bcd816d53d9e9e24f434d9510"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "PRIOR_REVIEW_FROZEN_NOT_REAUDITED",
+      "priorPR": 370
+    },
+    {
+      "instrumentKey": "bpses5_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/bpses5_zh_cn_research/1.0.0/source.json",
+          "blob": "6f6f52ddb27e23dde3d5b02f731842ed2fcfabb6",
+          "sha256": "8fa89e6acfcd1041940f5b502fce0f0b19436eab7fb39bb1ac9df751f06e7755"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "PREPARED_CONTENT_CANDIDATE",
+      "preparedVersion": "1.0.0",
+      "audit": {
+        "path": "audits/audit-bpses5-batch3.json",
+        "sha256": "0cd269ef195948560be3872d96e360a16f4a9866a01cacf6c88af4773fecc054"
+      },
+      "manifest": "packages/bpses5_zh_cn_research.json"
+    },
+    {
+      "instrumentKey": "brcs4_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/brcs4_zh_cn_research/1.0.0/source.json",
+          "blob": "2875ba303bc65abe15a6ef4a239d37502bab5f8b",
+          "sha256": "68ae0f92da27333ee9b6b9f62bab7e4a98b6e2853910f8ad9fb9fafe2c972a66"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "PREPARED_CONTENT_CANDIDATE",
+      "preparedVersion": "1.0.0",
+      "audit": {
+        "path": "audits/audit-brcs4-batch3.json",
+        "sha256": "d6a748c6c3d733dadf1ade70c5dbfa0dfa7eb01f83dc9dff55ecab99b2c6d508"
+      },
+      "manifest": "packages/brcs4_zh_cn_research.json"
+    },
+    {
+      "instrumentKey": "cbi_zh_cn",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/cbi_zh_cn/1.0.0/source.json",
+          "blob": "f95611fd69f92276f0e2aae39edcd09a582af0ee",
+          "sha256": "0980f8e86e840623e151cde0af06365ddd30f7b765854285100093d106ca9902"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-cbi-batch3.json",
+        "sha256": "b360f8bada8d659bdd2b06b48dc293066a61a08f66a471ad3cabc0bbea91bd83"
+      }
+    },
+    {
+      "instrumentKey": "ccfq18_zh_cn",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/ccfq18_zh_cn/1.0.0/source.json",
+          "blob": "458edc3d14c6f6b37ed55ab0d4d8a8e53435ac3f",
+          "sha256": "4ca5939a4601d3b0e1a845e354fb4b192add1736682e48f9dbffa2a80937c103"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-ccfq18-batch3.json",
+        "sha256": "8e0b9c0d6cfe532fb95325c36a271cd00c5ff53aec07d4f1b088057c49f15562"
+      }
+    },
+    {
+      "instrumentKey": "cesd10_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/cesd10_zh_cn_research/1.0.0/source.json",
+          "blob": "d50d0a0698fbc8ebaf9c502a9fa54a7e881af703",
+          "sha256": "5c2cd9214a45ed735d058f9617418ef4dc1ccc6e27f999d38d2512c3d26ff476"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-cesd10-batch3.json",
+        "sha256": "f6a333a56aca7e2896e7bff7736fa8781e226484a32c1cc624e8ed38c0d4ccab"
+      }
+    },
+    {
+      "instrumentKey": "cfq7_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/cfq7_zh_cn_research/1.0.0/source.json",
+          "blob": "239584a258419880e4a99b078d430ab403f8f7e9",
+          "sha256": "c820e9d08b01114985e420c240c9a873e742c95f0c99058b058736ada6966fab"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "PREPARED_CONTENT_CANDIDATE",
+      "preparedVersion": "1.0.1",
+      "audit": {
+        "path": "audits/audit-cfq7-batch3.json",
+        "sha256": "516f75111fdf861b2cc957929e28c3415254e79af252cb5e3263b2cbe59bc6ba"
+      },
+      "manifest": "packages/cfq7_zh_cn_research.json"
+    },
+    {
+      "instrumentKey": "cfsr12_zh_cn_research",
+      "sourceVersion": "1.0.1",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/cfsr12_zh_cn_research/1.0.1/source.json",
+          "blob": "8d03c05142d780574ac015eb04ded81404da4c43",
+          "sha256": "7953e7125b692d33721a2dc1ad54ef07c95df781c08ec63e7f1813d9c8b9a796"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-cfsr12-batch3.json",
+        "sha256": "0433fc08bbbcbefc001983fddc28636a3ca7a0978ffdeaf60108207203ccad8f"
+      }
+    },
+    {
+      "instrumentKey": "chime_s24_zh_cn_research",
+      "sourceVersion": "1.0.1",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/chime_s24_zh_cn_research/1.0.1/source.json",
+          "blob": "530fbc0b622b42e4da3ca702180c4922d57cf4c6",
+          "sha256": "1c5de416222b8ae41574e28239959220affaabb51ddfbec939aaac9ba33e2bfe"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-chime-s24-batch3.json",
+        "sha256": "19129091657e03b884da0b65f6affb209350266ceb7cbc959a29e235a89fae2f"
+      }
+    },
+    {
+      "instrumentKey": "csacs9_zh_cn",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/csacs9_zh_cn/1.0.0/source.json",
+          "blob": "e798d38e39dc05313bce00995ba0e0d2d839a766",
+          "sha256": "c2ff0097228444602d11e092c2bc86640e4b72713601076fa7af844c6fc9b0cf"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-csacs9-batch3.json",
+        "sha256": "92813a13e2599745f12c60e528750c9aedf7a0b8fc3758977dcd58354968511a"
+      }
+    },
+    {
+      "instrumentKey": "curiosity_5dcr24_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/curiosity_5dcr24_zh_cn_research/1.0.0/source.json",
+          "blob": "143ad706d355718b34e8c20bfeba402bb96c6719",
+          "sha256": "fa3ec5f120acf82649c291949129205362cad9a28e2f9de736a2912bd34fdc95"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-curiosity-5dcr24-batch3.json",
+        "sha256": "8037a6f06ec2169d46aecb5cd16c9e58ce1bae98866bb7914090fe90f09db3a9"
+      }
+    },
+    {
+      "instrumentKey": "dbt_wccl59_zh_cn_research",
+      "sourceVersion": "1.0.2",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_cn_research/1.0.2/source.json",
+          "blob": "f3f14b4d0bb73d722ac457acd3d6ae887fe0f1f1",
+          "sha256": "c494dac541c9be067070b069b45d1d8b4cbd8fcbf875d8b05d00bb7382220357"
+        },
+        {
+          "ref": "origin/pr362",
+          "sha": "2612a9f5bf22c1370ec786f3d6feb50805003065",
+          "path": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_cn_research/1.0.2/source.json",
+          "blob": "c776043d94820063948cb5e101187d165ca157f0",
+          "sha256": "7bc99549956347ac874bbe8d72c5e07f3a251dc85b8a7a1b618ec7c8349a5f26"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "EXISTING_PR362_REVIEW_REUSED_NOT_REAUDITED",
+      "selectedSource": "PR362@2612a9f5bf22c1370ec786f3d6feb50805003065",
+      "selectionReason": "Preserve the existing approved-content PR as the integration source rather than overwrite it with the b92 same-identity candidate. Both variants and exact content differences are recorded separately; independent integration remains with dot."
+    },
+    {
+      "instrumentKey": "dbt_wccl59_zh_tw_official_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.0/source.json",
+          "blob": "e4ec1b8ae0051a2277e4d277179a39fc6daec43f",
+          "sha256": "c9ca1c13f8a397b1c302d3c3bbb1fa8856e27767c204cbe77a50038f1ae8b2ea"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "PREPARED_CONTENT_CANDIDATE",
+      "preparedVersion": "1.0.1",
+      "audit": {
+        "path": "audits/audit-dbt-wccl59-zh-tw-batch3.json",
+        "sha256": "7dfc6015b4e561da7df1a94f035b7c73338e14904c63d6f51d9e70f980f5c1fb"
+      },
+      "manifest": "packages/dbt_wccl59_zh_tw_official_research.json"
+    },
+    {
+      "instrumentKey": "ders_sf18_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/ders_sf18_zh_cn_research/1.0.0/source.json",
+          "blob": "68998db7a6da417139d9e92ee6eb08264666f2e5",
+          "sha256": "189457a3b31103deb770b911c5e46777422146615abd477575f7e531f9cf5335"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-ders-sf18-batch3.json",
+        "sha256": "23f4296504a14acac3aebf004b8cf9cf4c26226065776d0afc2f266ce2ca88b4"
+      }
+    },
+    {
+      "instrumentKey": "ders16_bjureberg_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/ders16_bjureberg_zh_cn_research/1.0.0/source.json",
+          "blob": "2067376e417237cfe39f9fa68bd598ccdd33321e",
+          "sha256": "d770ab7bebd83095391960f723f2d23ce414523822f3147aaf8245b88d0e36e3"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-ders16-batch3.json",
+        "sha256": "aef74a087d0987237015b073dddee0abbbe2a6150027cc0335674b5026638162"
+      }
+    },
+    {
+      "instrumentKey": "djgls6_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/djgls6_zh_cn_research/1.0.0/source.json",
+          "blob": "38be96db91f579d42e57debe6b5814bd80e584be",
+          "sha256": "c07038b029b02c520ff0344434499358242145ee8122c7dd9ce1984f12c48a46"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "PREPARED_CONTENT_CANDIDATE",
+      "preparedVersion": "1.0.1",
+      "audit": {
+        "path": "audits/audit-djgls6-batch3.json",
+        "sha256": "f81bbe7d1b253967662cde8b25314c8bc458eec0d2cd808808fa14b40fb5cd4d"
+      },
+      "manifest": "packages/djgls6_zh_cn_research.json"
+    },
+    {
+      "instrumentKey": "ebq16_zh_cn_research",
+      "sourceVersion": "1.0.1",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/ebq16_zh_cn_research/1.0.1/source.json",
+          "blob": "7ad049de7927582b3e036d833cb0e2e7258b70f6",
+          "sha256": "b2b7bb41355511aaf2e5599155dd60d113177da5136649c28fd20f041a733834"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "PREPARED_CONTENT_CANDIDATE",
+      "preparedVersion": "1.0.2",
+      "audit": {
+        "path": "audits/audit-ebq16-batch3.json",
+        "sha256": "60031f8fe267c3ad477a47c19465c6cb9568959f2ca5d589242a22466bd59f79"
+      },
+      "manifest": "packages/ebq16_zh_cn_research.json"
+    },
+    {
+      "instrumentKey": "erq10_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/erq10_zh_cn_research/1.0.0/source.json",
+          "blob": "b74965aa5cce0696100371cdc61a5627b7d95efe",
+          "sha256": "703e7d1cb1f12050bbc48dc473f052700eca3d43e1c92f6ff19e7cb17b35c432"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-erq10-batch3.json",
+        "sha256": "fed7d2fb8edf90ca3a79025f82f4f52c3a89d3f9d0fb75736d26c5f3b0337600"
+      }
+    },
+    {
+      "instrumentKey": "erss19_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/erss19_zh_cn_research/1.0.0/source.json",
+          "blob": "5cb98137887b3f1579d87dd55926ad2e28680a8a",
+          "sha256": "13ada797d32319eb4a39892ed85ebbb83d78501d1fbffdbeb15f75848e2d2e3e"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-erss19-batch3.json",
+        "sha256": "89c72b346ed2270e16a370c15a0899f047226b02e3c3f3351ca243003e948c7b"
+      }
+    },
+    {
+      "instrumentKey": "ffmq15_zh_cn_research",
+      "sourceVersion": "1.0.1",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/ffmq15_zh_cn_research/1.0.1/source.json",
+          "blob": "9123ff639c961a4d128016c89825142714215fd3",
+          "sha256": "3faa7bab6250e6aaf1e6ab109416a8f6f2a10f4016e7e3141a65904787267962"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-ffmq15-batch3.json",
+        "sha256": "00b5a11272726d90be071d70104cd5592a003ab6ae7e90623d617dc95d3a8b18"
+      }
+    },
+    {
+      "instrumentKey": "fidl21_horne_zh_cn_research",
+      "sourceVersion": "1.0.1",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/fidl21_horne_zh_cn_research/1.0.1/source.json",
+          "blob": "5b5cbad73ed02a6a67979c14dbeb48af873bd630",
+          "sha256": "b6616f74faa2337e75fae8e775a36dfacfce9b0785754f57cea4919ca9db62b8"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-fidl21-batch3.json",
+        "sha256": "1d134e969796ba5ebd630ea8780bc1b88c5622de10780f9f27b4718618bfbccc"
+      }
+    },
+    {
+      "instrumentKey": "flourishing_fs8_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/flourishing_fs8_zh_cn_research/1.0.0/source.json",
+          "blob": "7d4788cf20174462d9e3fb32f3a92cb9fc29e7e9",
+          "sha256": "b91f042a3d83df53bc0cb7aa65d0f54582a93fb69c304d14a66db89ed425e8de"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-flourishing-fs8-batch3.json",
+        "sha256": "70c164be4703f977db9659f67359f79437a129bbb38cb21a86ee06249f0523f2"
+      }
+    },
+    {
+      "instrumentKey": "gad7_zh_cn_research",
+      "sourceVersion": "1.1.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/gad7_zh_cn_research/1.1.0/source.json",
+          "blob": "8cef5680c1d576fb5f463a0f8990e86cad4788f9",
+          "sha256": "93019ebbe52aecbf3d3acff87c346fdb8bd20daf81f0d60ace594681ee5b161e"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-gad7-batch3.json",
+        "sha256": "a5347a6ca4bd4b43d9a15b068e4264c9a5029275943b73a6d43bb878d886915a"
+      }
+    },
+    {
+      "instrumentKey": "gse3_asku_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/gse3_asku_zh_cn_research/1.0.0/source.json",
+          "blob": "0e80009eaccc53594590277438278a71e669ab08",
+          "sha256": "bb5214bb0b123cd2ee4ed4187af226e17ec4e3169b98a9771052adc3b9bf9451"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-gse3-asku-batch3.json",
+        "sha256": "5ecb84f09432a8aa6e863681dc529217505ce402305f4306e6a4429bdc55bacf"
+      }
+    },
+    {
+      "instrumentKey": "hse_msit_zh_cn",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/hse_msit_zh_cn/1.0.0/source.json",
+          "blob": "b644be50127582c88890e0d03955e076b9cc6f92",
+          "sha256": "7e5021f4c8031f2d20650b04342e0025e785ac08f912a4520972f564f6122ef9"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-hse-msit-batch3.json",
+        "sha256": "9539874cc34acb168299d6ba3cc77467fb590f9badd7f23304fb511ed1702f8f"
+      }
+    },
+    {
+      "instrumentKey": "ie4_zh_cn_research",
+      "sourceVersion": "1.1.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/ie4_zh_cn_research/1.1.0/source.json",
+          "blob": "31d1850fc1f53b09702ecdf4d007a3b781b0a038",
+          "sha256": "b3ec87226d5030dccb59e1f362b8da4372fb3dda43ea0559d7998ce45539bca3"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-ie4-batch3.json",
+        "sha256": "2936b27420991f0954888abb9fc6d86545244ab193f7dba1f6b2b173638f7172"
+      }
+    },
+    {
+      "instrumentKey": "ierq20_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/ierq20_zh_cn_research/1.0.0/source.json",
+          "blob": "8a13ba963e39ef23dd45b1492ad48075b1878694",
+          "sha256": "dfad3705516d279c524a38a50f5f63d35c6e706489b05764580913245ad43d47"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-ierq20-batch3.json",
+        "sha256": "9ce2fbd180b97821b707e52dbac9020275c314ae4fc8605c565d518d3a6dd8fc"
+      }
+    },
+    {
+      "instrumentKey": "ipip_attending_emotions10_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/ipip_attending_emotions10_zh_cn_research/1.0.0/source.json",
+          "blob": "079effd9c0b6457af13556e9d471fcee118060ce",
+          "sha256": "79c1977eec784fed5fd974a7c55a2a4fe5f5b9ceee99b7fa4f0ca58aec41a555"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "PRIOR_REVIEW_FROZEN_NOT_REAUDITED",
+      "priorPR": 373
+    },
+    {
+      "instrumentKey": "ipip_emotion_based_decision9_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/ipip_emotion_based_decision9_zh_cn_research/1.0.0/source.json",
+          "blob": "e07e872eaf084f099cb49eed57c0a9893f9f67ef",
+          "sha256": "7c18445fa8a24e64f5acc46ba2c42036a85c8bf733ce91fe91920a694d232aa2"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "PREPARED_CONTENT_CANDIDATE",
+      "preparedVersion": "1.0.1",
+      "audit": {
+        "path": "audits/audit-ipip-emotion-based-decision9-batch3.json",
+        "sha256": "14dfa475889417ee0d04eb409d878ae5229471d3a6fae73a89727d24038c1ac6"
+      },
+      "manifest": "packages/ipip_emotion_based_decision9_zh_cn_research.json"
+    },
+    {
+      "instrumentKey": "ipip_empathic_concern10_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/ipip_empathic_concern10_zh_cn_research/1.0.0/source.json",
+          "blob": "5f47c77530afb7874b3f9414ff9cf294f0aa71e8",
+          "sha256": "c2e2c8c60c091ba6c3e85c2c25721c44d9915365afd4a3067f4798b18d92e4ef"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "PRIOR_REVIEW_FROZEN_NOT_REAUDITED",
+      "priorPR": 373
+    },
+    {
+      "instrumentKey": "ipip_negative_expressivity10_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/ipip_negative_expressivity10_zh_cn_research/1.0.0/source.json",
+          "blob": "9122549aa443a63cfdd346a20e91f1a28c4724c3",
+          "sha256": "c8f4646ebba0e7dc345c010f0cbf36d0852e59b3fc677ccb88fb81231931ee5e"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "PREPARED_CONTENT_CANDIDATE",
+      "preparedVersion": "1.0.1",
+      "audit": {
+        "path": "audits/audit-ipip-negative-expressivity10-batch3.json",
+        "sha256": "6e1600bd401187e0cd8d2ba13d2f4b86f09ab7314ad2ddb80c45058d54de1756"
+      },
+      "manifest": "packages/ipip_negative_expressivity10_zh_cn_research.json"
+    },
+    {
+      "instrumentKey": "ipip_neo_c1_self_efficacy10_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/ipip_neo_c1_self_efficacy10_zh_cn_research/1.0.0/source.json",
+          "blob": "9c74ef87a6f1833264f553c0f08aa778ee4146a5",
+          "sha256": "22ddbb0f7d0a94240c21d56eb5a807306688158bb70a83a228a3857d565acac9"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "PRIOR_REVIEW_FROZEN_NOT_REAUDITED",
+      "priorPR": 371
+    },
+    {
+      "instrumentKey": "ipip_neo_c5_self_discipline10_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/ipip_neo_c5_self_discipline10_zh_cn_research/1.0.0/source.json",
+          "blob": "916ca9491b04d6d8001d44ac1e9b9e09c6e87270",
+          "sha256": "7f3a2d36a86d3f2a8cd6a35991e35d1ac1bebbc9f9ebfbc87d54ea07a95c6bfa"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "PRIOR_REVIEW_FROZEN_NOT_REAUDITED",
+      "priorPR": 371
+    },
+    {
+      "instrumentKey": "ipip_nfc10_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/ipip_nfc10_zh_cn_research/1.0.0/source.json",
+          "blob": "bcfb7c053f7b7b565da35bde11e530174ef99d67",
+          "sha256": "fd6b9f4a40cd10729e339d01eacaa0c9b2a64ff13b9413856a888eeb7f59fb5f"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "PRIOR_REVIEW_FROZEN_NOT_REAUDITED",
+      "priorPR": 371
+    },
+    {
+      "instrumentKey": "ipip_opt10_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/ipip_opt10_zh_cn_research/1.0.0/source.json",
+          "blob": "666bb410051d1caa22a042abb5f43af4a7b0d2a8",
+          "sha256": "1327accb2a02d8909fbac4512e7cc8323f4388073256f7e9e9a23d6f77f97cf0"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "PRIOR_REVIEW_FROZEN_NOT_REAUDITED",
+      "priorPR": 373
+    },
+    {
+      "instrumentKey": "ipip_positive_expressivity9_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/ipip_positive_expressivity9_zh_cn_research/1.0.0/source.json",
+          "blob": "7fa66ac8f5c4634d70f466f4f6751c4dd06ec7c2",
+          "sha256": "c9c348aed9a5596aa774d5eae074e63555bd50b379084bcde04f2165c9d2051a"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "PREPARED_CONTENT_CANDIDATE",
+      "preparedVersion": "1.0.1",
+      "audit": {
+        "path": "audits/audit-ipip-positive-expressivity9-batch3.json",
+        "sha256": "20423fd8bc88e96dd30d60d189ebee6fc4b805097548dcd7361623a7ad994ba0"
+      },
+      "manifest": "packages/ipip_positive_expressivity9_zh_cn_research.json"
+    },
+    {
+      "instrumentKey": "ipip_responsive_distress10_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/ipip_responsive_distress10_zh_cn_research/1.0.0/source.json",
+          "blob": "649accbe3c5325d0f6c5bbe6be634445ce19f7b8",
+          "sha256": "4d0a1c876f786abd7f7572fa4c9a956e0734744fe3fee428cdc1aefe0b5e8fd0"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "PREPARED_CONTENT_CANDIDATE",
+      "preparedVersion": "1.0.1",
+      "audit": {
+        "path": "audits/audit-ipip-responsive-distress10-batch3.json",
+        "sha256": "a4c0e7d6810819a9b5352e4221baa16500e1a14e968b630575b203edea00b1bd"
+      },
+      "manifest": "packages/ipip_responsive_distress10_zh_cn_research.json"
+    },
+    {
+      "instrumentKey": "ipip_responsive_joy10_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/ipip_responsive_joy10_zh_cn_research/1.0.0/source.json",
+          "blob": "f145abdef6b23011a67273c12f03f51fe6c28e2f",
+          "sha256": "a7a3dcdea8fec952e5beb39c760542c34ad3b55e996fbc9d66d273067239c15c"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "PREPARED_CONTENT_CANDIDATE",
+      "preparedVersion": "1.0.0",
+      "audit": {
+        "path": "audits/audit-ipip-responsive-joy10-batch3.json",
+        "sha256": "3c061f5f5d880019847e648656e797a711f04669c961bfcb837c430e55b83822"
+      },
+      "manifest": "packages/ipip_responsive_joy10_zh_cn_research.json"
+    },
+    {
+      "instrumentKey": "ipip50_zh_cn_research",
+      "sourceVersion": "1.1.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/ipip50_zh_cn_research/1.1.0/source.json",
+          "blob": "26de489548e4caa55839ae460db4318089dad1d1",
+          "sha256": "6cc56383060babff5d7774c313063e71769fd62c46fdf3709cf80c7f65e6dc45"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-ipip50-batch3.json",
+        "sha256": "4b1e4f26da3af363a297046ef64494734d02907667c459ac212c73bf8e4710d4"
+      }
+    },
+    {
+      "instrumentKey": "ips9_2021_zh_cn",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/ips9_2021_zh_cn/1.0.0/source.json",
+          "blob": "064471f0cc5d7c62d5b07a12385b2034bc29f945",
+          "sha256": "f1f15cd10886356261fab9fb64b715a8ff7e6c34879bd82d60368a702941227c"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-ips9-batch3.json",
+        "sha256": "cb9682a587d9bf34e0e94143b242782680c28b815320c18e7f6d89e81125166f"
+      }
+    },
+    {
+      "instrumentKey": "jss8_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/jss8_zh_cn_research/1.0.0/source.json",
+          "blob": "c2839fec588419175c1198820604cd0ea2d42226",
+          "sha256": "aa46e5e52852230d83410c04315cf8a9173a4795388ffce2f2f6ce8d22eab3db"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-jss8-batch3.json",
+        "sha256": "b70b8be8fbad2a5685922a7d7c09582b3c89234d8efa22a11fc715e62a9263ca"
+      }
+    },
+    {
+      "instrumentKey": "k6_zh_cn_research",
+      "sourceVersion": "1.1.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/k6_zh_cn_research/1.1.0/source.json",
+          "blob": "9234f3a924032a88537c0f0e9ab39091c07b42f4",
+          "sha256": "60f80c0a3c0755f8277dbb60d8cc7d47a550249a096abcaae47890629f682640"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-k6-batch3.json",
+        "sha256": "06e5eb7fd012158611c6ffecff694355aca27f4becc0345749fc8e268080ce6e"
+      }
+    },
+    {
+      "instrumentKey": "kseg6_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/kseg6_zh_cn_research/1.0.0/source.json",
+          "blob": "7f524cab304fab8f565189e2ce83c1d17d762533",
+          "sha256": "e7bb632b8da7b942e46777d4d3f55b9c3212b63e8fc6b52a42d9b4772f304dfc"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "PREPARED_CONTENT_CANDIDATE",
+      "preparedVersion": "1.0.1",
+      "audit": {
+        "path": "audits/audit-kseg6-batch3.json",
+        "sha256": "f80cdd0a45b9fbd4ea2d66c5a2278fd689d9112f434bdbda3560c81fd6fd1567"
+      },
+      "manifest": "packages/kseg6_zh_cn_research.json"
+    },
+    {
+      "instrumentKey": "kusiv3_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/kusiv3_zh_cn_research/1.0.0/source.json",
+          "blob": "17a180cb1afd8b84b9ea3cb778ff39449be43978",
+          "sha256": "fb8189a4d0c422f6f4c231cef0a1a5c6e8edf664eff4cb921dba3f3bb0f708f2"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-kusiv3-batch3.json",
+        "sha256": "81852e7762cde09ecab3040fd008a6f466556fa07cbc6729f952c9dc7784177a"
+      }
+    },
+    {
+      "instrumentKey": "l1_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/l1_zh_cn_research/1.0.0/source.json",
+          "blob": "7728b7c0cb8b05aadf941bafb105498b8439adab",
+          "sha256": "c50ada90db0da250d253f7a9fb16da65b2c01cd7758e603b3c79bfd72a667833"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-l1-batch3.json",
+        "sha256": "07741a8ca4272ee2c7a9297831eae8cf2b8174d9d54cb32b42a558c2552efb03"
+      }
+    },
+    {
+      "instrumentKey": "maia2_37_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/maia2_37_zh_cn_research/1.0.0/source.json",
+          "blob": "1a90a50926821211bf865acf419b15bf9c7a0f15",
+          "sha256": "3d1fc6192db0261518b8d85c6bea2eed7219d7f3e7ca73a5e0010d7a3292c3cb"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "PREPARED_CONTENT_CANDIDATE",
+      "preparedVersion": "1.0.1",
+      "audit": {
+        "path": "audits/audit-maia2-37-batch3.json",
+        "sha256": "618ac90efa01fb544e65a414f7848a9f8d0dab32bd6eeebd14f15f6d1ba40030"
+      },
+      "manifest": "packages/maia2_37_zh_cn_research.json"
+    },
+    {
+      "instrumentKey": "mpmi_s22_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/mpmi_s22_zh_cn_research/1.0.0/source.json",
+          "blob": "573a618b8a609632391df4f1e60663d71cd2adb9",
+          "sha256": "edb6d9f9a8da1995a92674a4520d6cafd45896f31312b878d9435df88d1e2879"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-mpmi-s22-batch3.json",
+        "sha256": "3975fc156d2b82a0673244033c9927b1c8b61514979c32785c58f8458ba3bd24"
+      }
+    },
+    {
+      "instrumentKey": "mslq_critical_thinking5_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/mslq_critical_thinking5_zh_cn_research/1.0.0/source.json",
+          "blob": "c2fefe260276288b87ca7f29ff567aab751521fa",
+          "sha256": "549556bd24ee7aefb28130abe0e5b6b08cba242c536965c17825d89eab02cc3c"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-mslq-critical-thinking5-batch3.json",
+        "sha256": "b7c0a53fb86744e3b1ca29b9ca86ca603bb88433e419ce10157d62deda1ccc73"
+      }
+    },
+    {
+      "instrumentKey": "mspss12_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/mspss12_zh_cn_research/1.0.0/source.json",
+          "blob": "950346d27b105a295184e9e7f34f8eb1fa09b9dc",
+          "sha256": "016e6a0f24d900d8dff12e75062ab6681714a9adcc77950933d9543441e1a90d"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-mspss12-batch3.json",
+        "sha256": "bf362b6f067f52e11f6f43f93591dc9b815f48b1de4e2aba5b978c46aa7d0c8b"
+      }
+    },
+    {
+      "instrumentKey": "mwq5_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/mwq5_zh_cn_research/1.0.0/source.json",
+          "blob": "d39e21e008352c79bd20ea85c0d12056443c030c",
+          "sha256": "7e179c1051023b5d7d8b7831ff73a36cb4a117d74038bed8fe0b7940e408f749"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-mwq5-batch3.json",
+        "sha256": "2cf870ec79ecd7ea42aad9e9652aa1ff2e8eacff1965932afd6fea73866309ca"
+      }
+    },
+    {
+      "instrumentKey": "ofs10_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/ofs10_zh_cn_research/1.0.0/source.json",
+          "blob": "1879b6e7b7e413cc2b03f41ebf2c1c3a3ce83691",
+          "sha256": "18e787244051ad737921fe3b9aba6df3bdd251d7cd3b8e8e88cd1e1f5bd97a4f"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-ofs10-batch3.json",
+        "sha256": "d9940d35ab8d18c5f519a809eb6f03d6b8e2fa8c8e6f467fb73455f8b7aa5bb4"
+      }
+    },
+    {
+      "instrumentKey": "orvis92_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/orvis92_zh_cn_research/1.0.0/source.json",
+          "blob": "d3e82942718cfe1c08dd8115151a07fa3e1e51e9",
+          "sha256": "ca75edacb9eed515ea7fe6cc273df26c9b311f9f495c8eadfec71ef86f86dcf5"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-orvis92-batch3.json",
+        "sha256": "ccf00a39e0729431df6119eed234917fb59d0b93ae36f326e43f3e4299c37045"
+      }
+    },
+    {
+      "instrumentKey": "parental_stress_pss18_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/parental_stress_pss18_zh_cn_research/1.0.0/source.json",
+          "blob": "f2fbaa377cd3e6b242c266fe0f1eec6f09a67793",
+          "sha256": "3d4ebb6c72f2cfbe4d81905b947b32bda8f71d81b55e603e87fd132f1165d492"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-parental-stress-pss18-batch3.json",
+        "sha256": "aa14c69ae95199ad6575d7ba714166db722130e345af25255a2695e19077f384"
+      }
+    },
+    {
+      "instrumentKey": "pba23_2018_zh_cn",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/pba23_2018_zh_cn/1.0.0/source.json",
+          "blob": "400da4d295dbb2d2c400f7f097da2b2f63ff423e",
+          "sha256": "e0ccedb0e8f368362cac1d0901fd21f16fd295a449d0ebdf1c316e53026353a4"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-pba23-batch3.json",
+        "sha256": "f669840f98a884ac6d035328e163a74d32320796f332d3427968ffcc4578fe64"
+      }
+    },
+    {
+      "instrumentKey": "phq4_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/phq4_zh_cn_research/1.0.0/source.json",
+          "blob": "10fe9a5c868f9c21d1e2159aa11f7382a758a7e3",
+          "sha256": "3ec151119973c2349d90f001d265f6d868b959517bef5fa8f0103f9bb870d531"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-phq4-batch3.json",
+        "sha256": "72e417f43ed6335fcbe0af540d7f60f0f1c39435f6836b27fc4970c682b62e7a"
+      }
+    },
+    {
+      "instrumentKey": "prfq18_parent_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/prfq18_parent_zh_cn_research/1.0.0/source.json",
+          "blob": "3b53177b4c5e31b6709c653ca5f61dfb3a14a10a",
+          "sha256": "2d5169999c7b4e181a04ec85e6a5913f18321d8712906ecd23fc37b01d39665d"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-prfq18-parent-batch3.json",
+        "sha256": "37a845369121724f6700ca2e696924e941075fc99b394a11ff3d6a93cea21ba4"
+      }
+    },
+    {
+      "instrumentKey": "psyflex6_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/psyflex6_zh_cn_research/1.0.0/source.json",
+          "blob": "c887b6529869f2c7467a61e02c460abe3436d10d",
+          "sha256": "f0d7e20eab0a65684f24b6cc4bcf859d14299a8ec2e59a1b2897a02ffbcfde5d"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "PREPARED_CONTENT_CANDIDATE",
+      "preparedVersion": "1.0.1",
+      "audit": {
+        "path": "audits/audit-psyflex6-batch3.json",
+        "sha256": "fabd6df7b744ec96278037ec6bc58d7b317728379ce28a77bb59efb5fd221714"
+      },
+      "manifest": "packages/psyflex6_zh_cn_research.json"
+    },
+    {
+      "instrumentKey": "res9_zh_cn",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/res9_zh_cn/1.0.0/source.json",
+          "blob": "b05afbf46fb9484cc7fac550b4517c6c2bcf744a",
+          "sha256": "97e209e223ddae28fd81ce0b9727b3ab0c85c972d7db7b0b7cc288f3a9e0221b"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-res9-batch3.json",
+        "sha256": "bf39ae70c8516b549ad331d2cf40c1f430026b41d61e8fae0726b716fb443232"
+      }
+    },
+    {
+      "instrumentKey": "rses10_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/rses10_zh_cn_research/1.0.0/source.json",
+          "blob": "1a6e1eb66b6e6494154b23e99ca8e12fc67b18d3",
+          "sha256": "82e4e486da2ead626d28e3bc34a74616618c82b2a5bd4e024dc16195faf9cc45"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-rses10-batch3.json",
+        "sha256": "4717d3dbec1a40cc474419e7ca0d6c6a3542519c6a8d47879700927b7e6307db"
+      }
+    },
+    {
+      "instrumentKey": "sas_sv10_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/sas_sv10_zh_cn_research/1.0.0/source.json",
+          "blob": "141d9107370508cd2ff46ca59d5409dc70b97438",
+          "sha256": "db270c80d2a1086f0adce5ef0005c6acad294aeb396ad05f9d70987e251fe0a1"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-sas-sv10-batch3.json",
+        "sha256": "0379eb53a4424e4abd8bcf5ea4ffcca7af999169d17f00b8568c7053727b7fec"
+      }
+    },
+    {
+      "instrumentKey": "sci8_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/sci8_zh_cn_research/1.0.0/source.json",
+          "blob": "d60c559d8e3752e120e8fd392cea6f8c6352d19e",
+          "sha256": "9a8e7c669cd1df9b9a6279de208029555bafa8a1c5e939187e0a64780cb7a540"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-sci8-batch3.json",
+        "sha256": "d08c06b67add4be2ff4dea82a3e3e907c1e19b70eee18d051ab0059a835afd63"
+      }
+    },
+    {
+      "instrumentKey": "scs_sf12_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/scs_sf12_zh_cn_research/1.0.0/source.json",
+          "blob": "f0afe5d3c40549502b75fa00769f0f07500b2724",
+          "sha256": "fa8c8d5340efcb9a7485a0c0f4c1cc0d2782741b75027bbf27e7f0ad2a7c4995"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-scs-sf12-batch3.json",
+        "sha256": "b7147b39750862e466a43ed3688708bb2cc9d184aa1cd5789693e6af6feb7d24"
+      }
+    },
+    {
+      "instrumentKey": "socs_s20_2023_zh_cn",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/socs_s20_2023_zh_cn/1.0.0/source.json",
+          "blob": "acc6cde659c1f35872283d0fb45ee06afb43fcc9",
+          "sha256": "b45dbbc08b95535517cb0c724a802c8a48e7af04f6c96aaab9847538cddbdebe"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-socs-s20-batch3.json",
+        "sha256": "9a7274038d609eb3557720734eab290eb48575d033155667fc5ba4cedc7fa1ee"
+      }
+    },
+    {
+      "instrumentKey": "sop2_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/sop2_zh_cn_research/1.0.0/source.json",
+          "blob": "54838ac53b67bdf2251ef1253d49b197b9f31891",
+          "sha256": "944906cd932b4b60c43508bb106c8c539b4c86e69da543cb614428c9616ff41a"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-sop2-batch3.json",
+        "sha256": "4b7ee106615990121e328203fe7ea3f3d3f29abd49796d1aeeaa661e5de44c46"
+      }
+    },
+    {
+      "instrumentKey": "spane12_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.0/source.json",
+          "blob": "410e10f564ec0020204d40956c320776253fd086",
+          "sha256": "a1a6428c9b50d08361d69639138579de8ced8d917d4edfc3dca5fa1ca4dd41a6"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "PREPARED_CONTENT_CANDIDATE",
+      "preparedVersion": "1.0.1",
+      "audit": {
+        "path": "audits/audit-spane12-batch3.json",
+        "sha256": "054f7991dec212ebe1534ac6fda36cf1caf5e875150d5d9f33065d7ced90f17a"
+      },
+      "manifest": "packages/spane12_zh_cn_research.json"
+    },
+    {
+      "instrumentKey": "srlo44_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/srlo44_zh_cn_research/1.0.0/source.json",
+          "blob": "8fb7447881cb69842837a7d6572666b6fb0a778b",
+          "sha256": "1ed7b85f6bb2478bf7b63046440abdec823989364d77d73678c8f6847f79b59c"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-srlo44-batch3.json",
+        "sha256": "8b547c93c69e116b297a66a46041cce4142ae868b6f66bea7ae0342296c9d26c"
+      }
+    },
+    {
+      "instrumentKey": "srq63_brown_miller_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/srq63_brown_miller_zh_cn_research/1.0.0/source.json",
+          "blob": "7aeab9ed63dc84c7ad674798db0e32533ca04aa9",
+          "sha256": "31ea003d17f0cdd08b9a76f657805c09c48f7d93b4486778a07738ea675b729d"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-srq63-batch3.json",
+        "sha256": "d6c7a1bbfb0b627da1e39a2c68b6c1720de5e9c474d5fa34cd5265dd007f6984"
+      }
+    },
+    {
+      "instrumentKey": "sswq16_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/sswq16_zh_cn_research/1.0.0/source.json",
+          "blob": "b015e1ded86691216ad5d9e4825967fce3c5eff0",
+          "sha256": "cf23dcb15ece5b40af0d58e48d9c43edac0d9eea8058dcd35b343636820b66b7"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "PREPARED_CONTENT_CANDIDATE",
+      "preparedVersion": "1.0.1",
+      "audit": {
+        "path": "audits/audit-sswq16-batch3.json",
+        "sha256": "a3bf8283d9647e884a65e32fb9c92d12b4539c5014510097ea8afc7f2e24f815"
+      },
+      "manifest": "packages/sswq16_zh_cn_research.json"
+    },
+    {
+      "instrumentKey": "swls5_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/swls5_zh_cn_research/1.0.0/source.json",
+          "blob": "d2a9e3a22cf4642f20c656d97955777d3f1efc6c",
+          "sha256": "218ca1496c5e9e54246270cb118a78e0c62e2ad5ec8036403f1c7aa81ea25621"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-swls5-batch3.json",
+        "sha256": "5347fb70dac5b7a112bf86785896aaf335c895b5258c815a69a43c2506391a9e"
+      }
+    },
+    {
+      "instrumentKey": "tes12_general_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/tes12_general_zh_cn_research/1.0.0/source.json",
+          "blob": "1af6821c8cbff5f2eabf5e5c6e0406574503777d",
+          "sha256": "050b5f164686cacd60de06e3f738ae5469855835f062f43cbf6b459975988e81"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-tes12-general-batch3.json",
+        "sha256": "d924ccfc53031dce591e6e5c470daa3d9595a8a6bc31d6ef0c463ed5efd5ddaa"
+      }
+    },
+    {
+      "instrumentKey": "tswq_zh_cn",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/tswq_zh_cn/1.0.0/source.json",
+          "blob": "ea475d0afb70b90c2f39b3607b5899e356ceb5ec",
+          "sha256": "9d27fabf9181caf45c4f6cdb705d88759bbd79899bed0052311cde087a9bed62"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-tswq-batch3.json",
+        "sha256": "39b1d77e160ad8f91d7b58d8c2d2837dc08f6b26bb18df9aae4cba3d621cec8d"
+      }
+    },
+    {
+      "instrumentKey": "wibps7_adolescent_zh_cn_research",
+      "sourceVersion": "1.0.0",
+      "originalVariants": [
+        {
+          "ref": "origin/content/dot-local-scales-20261025",
+          "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+          "path": "server-version/backend/src/modules/scale/instruments/wibps7_adolescent_zh_cn_research/1.0.0/source.json",
+          "blob": "03193be89dc9e25fbfd033ef7ee921bb8f246b59",
+          "sha256": "304eac4add31b811b799a3b39c6bdd5cf88bf6e63dd1b4b5616529f6dc8f8c98"
+        }
+      ],
+      "database": "NOT_EXECUTED_THIS_BATCH",
+      "production": "DEFERRED_BY_USER",
+      "state": "AUDIT_RECORDED_REFINEMENT_OR_INTEGRATION_PENDING",
+      "audit": {
+        "path": "audits/audit-wibps7-batch3.json",
+        "sha256": "a3a0f0d1ee90d8b0eebe91b71a67aebd76869f6fb2cea789e6c6391269cafd4d"
+      }
+    }
+  ],
+  "supplements": "5DCR and IERQ original-content gaps resolved by supplementary documents; original gaps remain in their historical reports. APQ old gate report is corrected by the current-main supplement."
+}

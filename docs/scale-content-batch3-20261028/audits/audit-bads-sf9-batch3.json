@@ -1,0 +1,173 @@
+{
+  "instrument": "bads_sf9_zh_cn_research:1.0.0",
+  "source_commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "source_files": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/bads_sf9_zh_cn_research/1.0.0/source.json",
+      "blob": "f3296423940bb5561cc34812c288545042e564e1",
+      "sha256": "cb59a05c12f38eaf97aaa299905f7d66e9300d61d39ed8dfe720cbc3063072e2"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/bads_sf9_zh_cn_research/1.0.0/instrument.ts",
+      "blob": "0eed070bb879576339c5a71afdf34c0026591fd3",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/bads_sf9_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+      "blob": "83f8b74777baf18725c13608baebf31a608cc9ea",
+      "sha256": "dd446e4414e2ea7ba5b869c811e06c6c5376f7a77a0cb555664d6d2080f3d6b7"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bads_sf9/1.0.0/README.md",
+      "blob": "752fb82f7708d6356921fe5569f8995ec2bc55d8",
+      "sha256": "8a2f02b05c7bb820c272b12f4d8def24e29818deecf5d844e71f7666ddb3d3c0"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bads_sf9/1.0.0/source-manifest.json",
+      "blob": "49db8ea9009ef6387a2a67e8b2ec9b6a84774ae4",
+      "sha256": "1d7e8a02d4d18493a22036e8f23e8d5c333b4d72f096413780c23b4e28e23db1"
+    }
+  ],
+  "original_sources": [
+    {
+      "url": "https://societyofclinicalpsychology.org/wp-content/uploads/2025/09/BADS-SF.pdf",
+      "sha256": "35337d956a09f7df990c166c2a27c8800ef2721124a3db843ffbdc6b3fc35a27",
+      "assessment": "本次读取作者九题原表核对题意、时间窗、锚点、键。"
+    },
+    {
+      "url": "https://societyofclinicalpsychology.org/wp-content/uploads/2025/09/BADS-SF-instructions.pdf",
+      "sha256": "ed64de2727e562a431a20535ca9a28cf8b31220b7a71d53e80f9e8cbf6af7ddb",
+      "assessment": "本次读取2012作者评分说明；短式分量表不推荐单独使用。"
+    }
+  ],
+  "three_parts": {
+    "items_administration": {
+      "items": [
+        {
+          "number": 1,
+          "code": "BADS_SF9_01",
+          "original_meaning_summary": "有需要做却没有做的事",
+          "chinese": "过去一周，有一些我本来需要做的事情，我却没有去做。",
+          "transform": "reverse",
+          "review": "核心一致；每题重复过去一周是项目改写。"
+        },
+        {
+          "number": 2,
+          "code": "BADS_SF9_02",
+          "original_meaning_summary": "满意所做事情的数量和类型",
+          "chinese": "过去一周，我对自己做过的事情的数量和类型感到满意。",
+          "transform": "identity",
+          "review": "满意数量和类型，一致。"
+        },
+        {
+          "number": 3,
+          "code": "BADS_SF9_03",
+          "original_meaning_summary": "参加多种活动",
+          "chinese": "过去一周，我参加了许多不同的活动。",
+          "transform": "identity",
+          "review": "参与许多不同活动，一致。"
+        },
+        {
+          "number": 4,
+          "code": "BADS_SF9_04",
+          "original_meaning_summary": "对参与活动或置身情境的类型作出好的决定",
+          "chinese": "过去一周，我能较好地决定参与哪些活动、置身于哪些情境。",
+          "transform": "identity",
+          "review": "原文作出好的决定，中文“能较好地决定”可能偏向能力而非决定质量；人工译审。"
+        },
+        {
+          "number": 5,
+          "code": "BADS_SF9_05",
+          "original_meaning_summary": "是积极行动的人并完成所设目标",
+          "chinese": "过去一周，我积极参与活动，也完成了为自己设定的目标。",
+          "transform": "identity",
+          "review": "原文描述积极行动的人，中文说积极参与活动可能收窄；人工译审。"
+        },
+        {
+          "number": 6,
+          "code": "BADS_SF9_06",
+          "original_meaning_summary": "大部分行为用于逃避不愉快",
+          "chinese": "过去一周，我做的大部分事情都是为了逃离或回避某些不愉快的事情。",
+          "transform": "reverse",
+          "review": "多数行为逃避不愉快，一致。"
+        },
+        {
+          "number": 7,
+          "code": "BADS_SF9_07",
+          "original_meaning_summary": "长时间反复思考问题",
+          "chinese": "过去一周，我花了很长时间反复想着自己的问题。",
+          "transform": "reverse",
+          "review": "长时间反复想问题，一致。"
+        },
+        {
+          "number": 8,
+          "code": "BADS_SF9_08",
+          "original_meaning_summary": "做让自己分心以不感到难受的活动",
+          "chinese": "过去一周，我做了一些活动，目的是让自己不去感受难受的情绪。",
+          "transform": "reverse",
+          "review": "英文活动能转移难受感，中文“目的是”加入意图，潜在改义；人工译审与版本协调。"
+        },
+        {
+          "number": 9,
+          "code": "BADS_SF9_09",
+          "original_meaning_summary": "做令人愉快的事",
+          "chinese": "过去一周，我做了一些令自己感到愉快的事情。",
+          "transform": "identity",
+          "review": "做愉快的事情，一致。"
+        }
+      ],
+      "anchors": "0完全不符合、2稍微符合、4相当符合、6完全符合；1、3、5数字；对应作者原版0 Not at all、2 A little、4 A lot、6 Completely。",
+      "instruction": {
+        "path": "server-version/backend/src/modules/scale/instruments/bads_sf9_zh_cn_research/1.0.0/source.json",
+        "field": "/instruction",
+        "blob": "f3296423940bb5561cc34812c288545042e564e1",
+        "sha256": "cb59a05c12f38eaf97aaa299905f7d66e9300d61d39ed8dfe720cbc3063072e2",
+        "value": {
+          "schemaVersion": 1,
+          "language": "zh-CN",
+          "version": "1.0.0",
+          "source": "依据专业心理学会SCP提供的BADS-SF9原版英文指导语单独起草中文研究工作译文",
+          "text": "请回想**过去一周，包括今天**的实际生活。请逐句判断下面的描述在这段时间里有多符合自己：0表示完全不符合，6表示完全符合，中间数字表示介于两者之间的程度。没有标准答案；请按这段时间真正发生的事情作答。"
+        },
+        "review": "顶层已绑定；过去一周包括今天与原版一致。中间数值解释未明示2和4已标文字，但题目选项实际含中文标签；无需强改。"
+      },
+      "audience": "成人18+自评；独立中文工作译稿，尚未验证。"
+    },
+    "scoring": {
+      "reverse": [
+        1,
+        6,
+        7,
+        8
+      ],
+      "formula": "反向6−x，全部九项等权相加，总分0–54。",
+      "missing": "所有题required=false，总分complete_required；缺任一项不补零不插补，系项目政策；未运行评分。",
+      "subscales": "原作者说明不推荐单独使用短式分量表；本版仅total，不混BADS25。",
+      "parameters": "无常模、百分位和临床切点，referencePolicy none。"
+    },
+    "report": {
+      "direction": "高分代表题组中更多自报激活、较少回避；非抑郁程度或治疗效果。当前summary未直接说明总分方向，limitations仅说高分代表“模式”，可增加简洁方向。",
+      "optional_edit": {
+        "path": "server-version/backend/src/modules/scale/instruments/bads_sf9_zh_cn_research/1.0.0/source.json#/executable/definition/report/interpretations/0/summary",
+        "old": "这九道题回顾的是最近一周你做过的活动、为自己作过的选择，以及有没有因为困难的情绪而回避某些事情。这里的分数不是“你有多勤奋”，也不要求你总要把时间排得很满。一次看似很小的行动，可能已经需要许多力气；生活环境、健康状况和可获得的支持也会影响你能做什么。可以想想过去一周哪件事情让你感到一点意义或者满足，哪些事因为困难而难以开始。如果愿意，不妨把下一步安排得足够小、足够可行，给自己留出休息和调整的余地。",
+        "new": "这九道题回顾的是最近一周你做过的活动、为自己作过的选择，以及有没有因为困难的情绪而回避某些事情。这里的分数不是“你有多勤奋”，也不要求你总要把时间排得很满。一次看似很小的行动，可能已经需要许多力气；生活环境、健康状况和可获得的支持也会影响你能做什么。可以想想过去一周哪件事情让你感到一点意义或者满足，哪些事因为困难而难以开始。如果愿意，不妨把下一步安排得足够小、足够可行，给自己留出休息和调整的余地。 总分越高，表示这组回答总体上反映更多活动参与和较少回避；它不能判断抑郁程度或治疗效果。",
+        "note": "保持现有非评判性建议；报告版本按现有治理。"
+      },
+      "guidance": "已有回忆有价值的小事、设定可负担活动和开始时间，尊重休息，合适可保留。",
+      "versions": "instrument、scoring、localization、report及instruction均1.0.0；references空。"
+    }
+  },
+  "ordinary_suggestions": [
+    "可在报告summary补充明确分数方向；现有报告具体、温暖不必按字数强改。"
+  ],
+  "substantive_coordination": [
+    "第4题“好决定”与“能够决定”、第5题积极行动的人与参与活动、第8题分心结果与加入目的均可能存在译义变化；请人工译审，变更题意需版本协调，不静默修订。",
+    "题序、反向键、总分和回忆期保持；不引入阈值或独立分量表。"
+  ],
+  "human_status": "专家译审PENDING、认知访谈NOT_ESTABLISHED、本地中文验证待完成；保留已有权限状态，未进行新版权调查。",
+  "not_executed": [
+    "未修改仓库或操作DB、CI、分支；未执行评分/golden、系统或浏览器测试。",
+    "原有10组golden为期望定义，不声称执行通过。"
+  ],
+  "conclusion": "题目和总分结构按原始载体核对；第4、5、8题需人工译审协调，报告可按上述方向作轻量修订。"
+}

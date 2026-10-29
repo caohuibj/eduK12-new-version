@@ -1,0 +1,17 @@
+/workspace/eduK12-new-version/server-version/backend/src/modules/scale/onboarding/executable-registry.ts:25
+    if (descriptors.has(descriptor)) throw new Error(`Duplicate scale scorer plugin descriptor: ${descriptor}`)
+                                           ^
+
+Error: Duplicate scale scorer plugin descriptor: spane12.balance.v1:1.0.0
+    at <anonymous> (/workspace/eduK12-new-version/server-version/backend/src/modules/scale/onboarding/executable-registry.ts:25:44)
+    at Array.forEach (<anonymous>)
+    at bootstrapScorerPlugins (/workspace/eduK12-new-version/server-version/backend/src/modules/scale/onboarding/executable-registry.ts:23:11)
+    at <anonymous> (/workspace/eduK12-new-version/server-version/backend/src/modules/scale/onboarding/executable-registry.ts:40:1)
+    at Object.<anonymous> (/workspace/eduK12-new-version/server-version/backend/src/modules/scale/onboarding/executable-registry.ts:82:49)
+    at Module._compile (node:internal/modules/cjs/loader:1929:14)
+    at Object.transformer (/workspace/eduK12-new-version/server-version/backend/node_modules/tsx/dist/register-C557imBs.cjs:9:3619)
+    at Module.load (node:internal/modules/cjs/loader:1651:32)
+    at Module._load (node:internal/modules/cjs/loader:1443:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+
+Node.js v24.21.0

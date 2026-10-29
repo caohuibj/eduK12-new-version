@@ -1,0 +1,209 @@
+{
+  "identity": "aaq_us12_zh_cn_research:1.0.0",
+  "sourceCommit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "sourceFiles": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/aaq_us12_zh_cn_research/1.0.0/source.json",
+      "gitBlob": "168326942b967053b89cffd79c14f3f370f05f6c",
+      "sha256": "da609de37bda75759af3f130a71b9f1f44c87629535c011f8e7179217eebad39"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/aaq_us12_zh_cn_research/1.0.0/instrument.ts",
+      "gitBlob": "0eed070bb879576339c5a71afdf34c0026591fd3",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/aaq_us12_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+      "gitBlob": "60197b5d6f142936b234ce9fdff8bbd5bdfe27c6",
+      "sha256": "1c001ea32a5964b24ab76edc23bd32b95c1dbcf7efed8bac8facb9f0046ac763"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/aaq_us12/1.0.0/README.md",
+      "gitBlob": "c4282c6bae9efcaf0bc23b7068a5b04bf06aa4aa",
+      "sha256": "a4ff43802e6cbace7ed28769f91a77a40bc4777121db9eb4213ee37b1c9ccaf1"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/aaq_us12/1.0.0/source-manifest.json",
+      "gitBlob": "f7bb6c1256bcd69cfb769fe5a0c9a07f0368f46c",
+      "sha256": "7ca5555e683738fecfa4226e8cdc4d257877958415352b44042def301794afee"
+    }
+  ],
+  "threePartConclusions": {
+    "content": "作者DOC原题及源记录次序映射保留；12题与项目中文大意对应，中文为独立工作译稿。作者DOC原字节SHA与manifest一致，提取文本不重建DOC视觉顺序，按固定manifest记录映射。第10题原“没有收获”译为“很难获得收获”、第12题原“瘫住不能学习”译为“难以开始复习”，程度被缓和；实质语义留协调。七点从never true到always true，不是普通同意度。",
+    "scoring": "12题均正向原值等权求和12–84，无反向及子量表；complete_required为项目规则，不把研究listwise deletion当个人缺失算法。无中文常模、临床阈值或分档；较高表示更符合学习中被想法/情绪牵制的自述，不表示更灵活。",
+    "report": "1.0.0面向大学情境的具体反思、小步行动及寻求支持，非智力或诊断；18+不能自动证明大学生身份。原DOC题序与论文表序必须区分；所有版本1.0.0，中文未验证。"
+  },
+  "items": [
+    {
+      "authorDocNumber": 1,
+      "paperRow": 12,
+      "itemCode": "AAQ_US12_01",
+      "englishConcept": "caught up in worries during tests, trouble focusing",
+      "zh": "参加考试时，我会陷入担忧，以至于很难专注在试题本身。",
+      "key": "identity",
+      "assessment": "原题大意对应；译审待完成"
+    },
+    {
+      "authorDocNumber": 2,
+      "paperRow": 5,
+      "itemCode": "AAQ_US12_02",
+      "englishConcept": "assignment too hard/confusing, give up",
+      "zh": "觉得某项课程作业太困难或难以理解时，我会选择放弃。",
+      "key": "identity",
+      "assessment": "原题大意对应；译审待完成"
+    },
+    {
+      "authorDocNumber": 3,
+      "paperRow": 4,
+      "itemCode": "AAQ_US12_03",
+      "englishConcept": "avoid classes when anxious/depressed",
+      "zh": "当我感到焦虑或低落时，会发现自己在回避去上课。",
+      "key": "identity",
+      "assessment": "原题大意对应；译审待完成"
+    },
+    {
+      "authorDocNumber": 4,
+      "paperRow": 6,
+      "itemCode": "AAQ_US12_04",
+      "englishConcept": "hard to focus on professors",
+      "zh": "在课堂上，我很难集中注意力听老师讲课。",
+      "key": "identity",
+      "assessment": "原题大意对应；译审待完成"
+    },
+    {
+      "authorDocNumber": 5,
+      "paperRow": 11,
+      "itemCode": "AAQ_US12_05",
+      "englishConcept": "often believe not smart enough for college/major",
+      "zh": "我经常觉得自己不够聪明，不应该在大学或现在的专业学习。",
+      "key": "identity",
+      "assessment": "原题大意对应；译审待完成"
+    },
+    {
+      "authorDocNumber": 6,
+      "paperRow": 8,
+      "itemCode": "AAQ_US12_06",
+      "englishConcept": "worries get in way of success at school",
+      "zh": "担忧会妨碍我在大学里的学习表现。",
+      "key": "identity",
+      "assessment": "原题大意对应；译审待完成"
+    },
+    {
+      "authorDocNumber": 7,
+      "paperRow": 3,
+      "itemCode": "AAQ_US12_07",
+      "englishConcept": "struggle with thoughts about school",
+      "zh": "与学业有关的各种想法常常让我感到纠结。",
+      "key": "identity",
+      "assessment": "原题大意对应；译审待完成"
+    },
+    {
+      "authorDocNumber": 8,
+      "paperRow": 1,
+      "itemCode": "AAQ_US12_08",
+      "englishConcept": "put off schoolwork when feeling bad",
+      "zh": "我心情不好的时候，会拖延需要完成的大学课程作业。",
+      "key": "identity",
+      "assessment": "原题大意对应；译审待完成"
+    },
+    {
+      "authorDocNumber": 9,
+      "paperRow": 2,
+      "itemCode": "AAQ_US12_09",
+      "englishConcept": "going through motions at school",
+      "zh": "在学校时，我有时只是机械地走完程序，并没有真正投入。",
+      "key": "identity",
+      "assessment": "原题大意对应；译审待完成"
+    },
+    {
+      "authorDocNumber": 10,
+      "paperRow": 10,
+      "itemCode": "AAQ_US12_10",
+      "englishConcept": "get nothing out of class with negative thoughts",
+      "zh": "当脑中有消极想法时，我很难从课堂上获得收获。",
+      "key": "identity",
+      "assessment": "原题大意对应；译审待完成；原文 get nothing 译为很难有收获，程度差异"
+    },
+    {
+      "authorDocNumber": 11,
+      "paperRow": 9,
+      "itemCode": "AAQ_US12_11",
+      "englishConcept": "thoughts and feelings get in way of studying",
+      "zh": "我的想法和感受会干扰学习。",
+      "key": "identity",
+      "assessment": "原题大意对应；译审待完成"
+    },
+    {
+      "authorDocNumber": 12,
+      "paperRow": 7,
+      "itemCode": "AAQ_US12_12",
+      "englishConcept": "worry about exams, feel paralyzed and cannot study",
+      "zh": "想到即将到来的考试，我会担心得难以开始复习。",
+      "key": "identity",
+      "assessment": "原题大意对应；译审待完成；原文 paralyzed and cannot study 译难以开始复习，程度差异"
+    }
+  ],
+  "anchors": [
+    {
+      "value": "1",
+      "label": "从不符合",
+      "score": 1
+    },
+    {
+      "value": "2",
+      "label": "极少符合",
+      "score": 2
+    },
+    {
+      "value": "3",
+      "label": "很少符合",
+      "score": 3
+    },
+    {
+      "value": "4",
+      "label": "有时符合",
+      "score": 4
+    },
+    {
+      "value": "5",
+      "label": "经常符合",
+      "score": 5
+    },
+    {
+      "value": "6",
+      "label": "几乎总是符合",
+      "score": 6
+    },
+    {
+      "value": "7",
+      "label": "总是符合",
+      "score": 7
+    }
+  ],
+  "instruction": {
+    "file": {
+      "path": "server-version/backend/src/modules/scale/instruments/aaq_us12_zh_cn_research/1.0.0/source.json",
+      "gitBlob": "168326942b967053b89cffd79c14f3f370f05f6c",
+      "sha256": "da609de37bda75759af3f130a71b9f1f44c87629535c011f8e7179217eebad39"
+    },
+    "field": "instruction",
+    "value": {
+      "schemaVersion": 1,
+      "text": "请根据自己在大学学习过程中实际经历过的事情，判断下面每一句描述有多符合你。1表示从来不符合，7表示总是符合；其他数字表示中间程度。这里所说的学习包括大学课程、作业、课堂活动和考试。没有标准答案，请按真实经历作答，而不是按你希望自己做到的样子。",
+      "language": "zh-CN",
+      "version": "1.0.0",
+      "source": "依据Levin等作者官网AAQ-US12英文DOC原指导语制作的独立中文工作稿；1..7为Never true..Always true。"
+    },
+    "status": "顶层已存在原指导语的独立中文工作稿。"
+  },
+  "substantivePending": [
+    "第10/12题强度变化应交人工译审，任何改题须评估工具/本地化版本及既有作答影响；不得静默修订。"
+  ],
+  "ordinaryRevisions": [],
+  "manualPending": [
+    "译审、认知访谈、目标人群验证及原许可状态保留；大学生身份需研究组织者确认。"
+  ],
+  "notExecuted": [
+    "未运行golden、评分、系统、DB或CI；DOC仅下载并核对哈希、提取字符串，未执行测试或渲染。"
+  ]
+}

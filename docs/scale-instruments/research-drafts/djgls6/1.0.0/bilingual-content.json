@@ -1,0 +1,179 @@
+{
+  "status": "UNVALIDATED_WORKING_TRANSLATION",
+  "sourceEdition": "English items as published by original authors in 2010 article, grouped emotional then social",
+  "items": [
+    {
+      "id": 1,
+      "en": "I experience a general sense of emptiness",
+      "zh": "我感到一种空虚感。",
+      "dimension": "emotional",
+      "options": [
+        {
+          "key": "no",
+          "en": "no",
+          "zh": "不是这样",
+          "score": 0
+        },
+        {
+          "key": "middle",
+          "en": "more or less",
+          "zh": "或多或少是这样",
+          "score": 1
+        },
+        {
+          "key": "yes",
+          "en": "yes",
+          "zh": "是这样",
+          "score": 1
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "en": "I miss having people around",
+      "zh": "我想念有人在身边的感觉。",
+      "dimension": "emotional",
+      "options": [
+        {
+          "key": "no",
+          "en": "no",
+          "zh": "不是这样",
+          "score": 0
+        },
+        {
+          "key": "middle",
+          "en": "more or less",
+          "zh": "或多或少是这样",
+          "score": 1
+        },
+        {
+          "key": "yes",
+          "en": "yes",
+          "zh": "是这样",
+          "score": 1
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "en": "Often, I feel rejected",
+      "zh": "我常常感到被拒绝。",
+      "dimension": "emotional",
+      "options": [
+        {
+          "key": "no",
+          "en": "no",
+          "zh": "不是这样",
+          "score": 0
+        },
+        {
+          "key": "middle",
+          "en": "more or less",
+          "zh": "或多或少是这样",
+          "score": 1
+        },
+        {
+          "key": "yes",
+          "en": "yes",
+          "zh": "是这样",
+          "score": 1
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "en": "There are plenty of people that I can lean on in case of trouble",
+      "zh": "遇到困难时，我有很多可以依靠的人。",
+      "dimension": "social",
+      "options": [
+        {
+          "key": "no",
+          "en": "no",
+          "zh": "不是这样",
+          "score": 1
+        },
+        {
+          "key": "middle",
+          "en": "more or less",
+          "zh": "或多或少是这样",
+          "score": 1
+        },
+        {
+          "key": "yes",
+          "en": "yes",
+          "zh": "是这样",
+          "score": 0
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "en": "There are many people that I can count on completely",
+      "zh": "有很多人是我可以完全信赖的。",
+      "dimension": "social",
+      "options": [
+        {
+          "key": "no",
+          "en": "no",
+          "zh": "不是这样",
+          "score": 1
+        },
+        {
+          "key": "middle",
+          "en": "more or less",
+          "zh": "或多或少是这样",
+          "score": 1
+        },
+        {
+          "key": "yes",
+          "en": "yes",
+          "zh": "是这样",
+          "score": 0
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "en": "There are enough people that I feel close to",
+      "zh": "有足够多的人让我感到亲近。",
+      "dimension": "social",
+      "options": [
+        {
+          "key": "no",
+          "en": "no",
+          "zh": "不是这样",
+          "score": 1
+        },
+        {
+          "key": "middle",
+          "en": "more or less",
+          "zh": "或多或少是这样",
+          "score": 1
+        },
+        {
+          "key": "yes",
+          "en": "yes",
+          "zh": "是这样",
+          "score": 0
+        }
+      ]
+    }
+  ],
+  "instructions": "请根据你目前的情况，判断下面每句话与你的感受是否相符。没有标准答案。",
+  "license": {
+    "id": "CC-BY-NC-2.0",
+    "url": "https://creativecommons.org/licenses/by-nc/2.0/",
+    "authority_url": "https://link.springer.com/article/10.1007/s10433-010-0144-6",
+    "evidence_location": "Open Access / Rights and permissions explicitly CC Attribution Noncommercial; original developers publish all six English items in Measurements; no separate English-item credit exclusion identified",
+    "scope_note": "Use English items appearing in this original-author licensed paper, not third-party Chinese/Japanese translations. Article thanks Japanese GGP for Japanese items, so those are not included. This is narrower than claiming every edition/form of the instrument universally open.",
+    "noncommercial_only": true,
+    "conditions": [
+      "credit Jenny De Jong Gierveld and Theo Van Tilburg",
+      "link source and license",
+      "state independent Chinese translation and formatting modifications",
+      "no commercial reuse without further permission"
+    ]
+  },
+  "runtimeStemAdaptation": "Project explanatory wording; source2010 does not specify a fixed past-week/month recall window, so none added.",
+  "attribution": "De Jong Gierveld J, Van Tilburg T. The De Jong Gierveld short scales for emotional and social loneliness: tested on data from 7 countries in the UN generations and gender surveys. Eur J Ageing. 2010;7:121–130. https://link.springer.com/article/10.1007/s10433-010-0144-6 https://creativecommons.org/licenses/by-nc/2.0/；本项目独立中文翻译/数字排版与反馈为改编，非作者认可。"
+}

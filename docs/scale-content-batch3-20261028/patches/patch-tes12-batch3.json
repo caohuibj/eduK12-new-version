@@ -1,0 +1,87 @@
+{
+  "format": "reviewable-json-patch-proposal",
+  "source_commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "source": {
+    "path": "server-version/backend/src/modules/scale/instruments/tes12_general_zh_cn_research/1.0.0/source.json",
+    "blob": "1af6821c8cbff5f2eabf5e5c6e0406574503777d",
+    "sha256": "050b5f164686cacd60de06e3f738ae5469855835f062f43cbf6b459975988e81"
+  },
+  "audit": "/tmp/audit-tes12-general-batch3.json",
+  "preconditions": "三条key及原description匹配固定源；不得直接覆盖已有1.0.0，root决定新instrument身份及可共存方式。",
+  "operations": [
+    {
+      "op": "test",
+      "path": "/executable/definition/scoring/scores/0/key",
+      "value": "enjoyment"
+    },
+    {
+      "op": "test",
+      "path": "/executable/definition/scoring/scores/0/description",
+      "value": "教师通常是否乐于授课、备课并感受到教学的愉快与热情。 更多分表示较常认同相关体验，而不是能力或临床状况。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/scoring/scores/0/description",
+      "value": "教师通常是否乐于授课、备课并感受到教学的愉快与热情。 分数越高表示越认同相关体验，而不是能力或临床状况。"
+    },
+    {
+      "op": "test",
+      "path": "/executable/definition/scoring/scores/1/key",
+      "value": "anger"
+    },
+    {
+      "op": "test",
+      "path": "/executable/definition/scoring/scores/1/description",
+      "value": "教师通常在授课过程中感到恼火、生气、烦躁或受挫的倾向。 更多分表示较常认同相关体验，而不是能力或临床状况。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/scoring/scores/1/description",
+      "value": "教师通常在授课过程中感到恼火、生气、烦躁或受挫的倾向。 分数越高表示越认同相关体验，而不是能力或临床状况。"
+    },
+    {
+      "op": "test",
+      "path": "/executable/definition/scoring/scores/2/key",
+      "value": "anxiety"
+    },
+    {
+      "op": "test",
+      "path": "/executable/definition/scoring/scores/2/description",
+      "value": "教师通常在备课、授课或想到教学时感到紧张、不安和担心的倾向。 更多分表示较常认同相关体验，而不是能力或临床状况。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/scoring/scores/2/description",
+      "value": "教师通常在备课、授课或想到教学时感到紧张、不安和担心的倾向。 分数越高表示越认同相关体验，而不是能力或临床状况。"
+    }
+  ],
+  "changes": [
+    {
+      "scoreKey": "enjoyment",
+      "path": "/executable/definition/scoring/scores/0/description",
+      "old": "教师通常是否乐于授课、备课并感受到教学的愉快与热情。 更多分表示较常认同相关体验，而不是能力或临床状况。",
+      "new": "教师通常是否乐于授课、备课并感受到教学的愉快与热情。 分数越高表示越认同相关体验，而不是能力或临床状况。"
+    },
+    {
+      "scoreKey": "anger",
+      "path": "/executable/definition/scoring/scores/1/description",
+      "old": "教师通常在授课过程中感到恼火、生气、烦躁或受挫的倾向。 更多分表示较常认同相关体验，而不是能力或临床状况。",
+      "new": "教师通常在授课过程中感到恼火、生气、烦躁或受挫的倾向。 分数越高表示越认同相关体验，而不是能力或临床状况。"
+    },
+    {
+      "scoreKey": "anxiety",
+      "path": "/executable/definition/scoring/scores/2/description",
+      "old": "教师通常在备课、授课或想到教学时感到紧张、不安和担心的倾向。 更多分表示较常认同相关体验，而不是能力或临床状况。",
+      "new": "教师通常在备课、授课或想到教学时感到紧张、不安和担心的倾向。 分数越高表示越认同相关体验，而不是能力或临床状况。"
+    }
+  ],
+  "version_and_hash_impact": {
+    "instrument": "描述属于scoring.scores，hashScaleDefinition包含scoring，三个描述变化使measurement hash改变；需要新instrument identity/版本，保留原1.0.0，不在本补丁猜新版本号。",
+    "scoring": "题目、响应、维度映射、均分公式、键向及缺失政策不变；score description虽在scoring对象，是否变更scoringVersion按既有版本治理由root核定，不冒称无需审查。",
+    "report": "interpretations文字不变；是否须对应版本快照按现有治理由root核定。"
+  },
+  "existing_runtime_limitation": "原作者建议随机题序，原definition display.randomizeItems=true；既有正式发布校验不支持该配置（固定源README所述）。该补丁保留原随机规则，不改系统或声称已解决。",
+  "not_executed": [
+    "未写仓库、修改分支、执行测试、系统、DB或CI。"
+  ]
+}

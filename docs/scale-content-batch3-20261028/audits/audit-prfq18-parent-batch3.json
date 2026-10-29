@@ -1,0 +1,372 @@
+{
+  "instrument": "prfq18_parent_zh_cn_research:1.0.0",
+  "source_commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "source_files": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/prfq18_parent_zh_cn_research/1.0.0/source.json",
+      "blob": "3b53177b4c5e31b6709c653ca5f61dfb3a14a10a",
+      "sha256": "2d5169999c7b4e181a04ec85e6a5913f18321d8712906ecd23fc37b01d39665d"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/prfq18_parent_zh_cn_research/1.0.0/instrument.ts",
+      "blob": "0eed070bb879576339c5a71afdf34c0026591fd3",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/prfq18_parent_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+      "blob": "a97081b574fa0c81ed2312e698e8dc48c041531f",
+      "sha256": "59f594c6746e6a00043d763de673bed1794ef451c373cccd4573ea217242ce01"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/prfq18/1.0.0/README.md",
+      "blob": "5b616aef76e60846fe561e9eb0d709bf31c1aa2a",
+      "sha256": "da38a4ce62e67a35f8a5bdc47e1370f08577ece655bbf4c02cb746453827ad7b"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/prfq18/1.0.0/source-manifest.json",
+      "blob": "76a2f5eb3f361c1083550dafb5a387c0609ef071",
+      "sha256": "5702cf47ff4de25cd72beb670050559127fabadedbaba94a8a73a57a5c359c59"
+    }
+  ],
+  "original_form": {
+    "url": "https://haruv-usa.org/wp-content/uploads/2022/09/The-Parental-Reflective-Functioning-Questionnaire.pdf",
+    "sha256": "e436ffd69f867e3106c16d1d1606a224e97939d1893fd8edd7ac874fafa4ad11",
+    "scope": "本次逐题对照作者署名18题题本；未重做评分文献研究。"
+  },
+  "three_parts": {
+    "items_instruction": {
+      "items": [
+        {
+          "number": 1,
+          "code": "PRFQ18_01",
+          "original_meaning": "只有微笑时确信孩子爱我",
+          "chinese": "只有孩子对我笑的时候，我才敢肯定他或她爱我。",
+          "dimension": "prementalizing",
+          "transform": "identity",
+          "review": "核心意思与英文题本相符。"
+        },
+        {
+          "number": 2,
+          "code": "PRFQ18_02",
+          "original_meaning": "总知道孩子想要什么",
+          "chinese": "我总是知道孩子想要什么。",
+          "dimension": "certainty",
+          "transform": "identity",
+          "review": "核心意思与英文题本相符。"
+        },
+        {
+          "number": 3,
+          "code": "PRFQ18_03",
+          "original_meaning": "思考孩子行为及感受的原因",
+          "chinese": "我喜欢思考孩子为什么会有那些行为和感受。",
+          "dimension": "curiosity",
+          "transform": "identity",
+          "review": "核心意思与英文题本相符。"
+        },
+        {
+          "number": 4,
+          "code": "PRFQ18_04",
+          "original_meaning": "孩子在陌生人面前哭是让我难堪",
+          "chinese": "孩子会在陌生人面前哭，是为了让我难堪。",
+          "dimension": "prementalizing",
+          "transform": "identity",
+          "review": "核心意思与英文题本相符。"
+        },
+        {
+          "number": 5,
+          "code": "PRFQ18_05",
+          "original_meaning": "完全看透孩子心思",
+          "chinese": "我能够完全看透孩子在想什么。",
+          "dimension": "certainty",
+          "transform": "identity",
+          "review": "核心意思与英文题本相符。"
+        },
+        {
+          "number": 6,
+          "code": "PRFQ18_06",
+          "original_meaning": "常思考孩子想法与感受",
+          "chinese": "我经常琢磨孩子心里正在想什么、感受如何。",
+          "dimension": "curiosity",
+          "transform": "identity",
+          "review": "核心意思与英文题本相符。"
+        },
+        {
+          "number": 7,
+          "code": "PRFQ18_07",
+          "original_meaning": "难以参与假装游戏",
+          "chinese": "我觉得自己很难真正参与孩子的假扮游戏。",
+          "dimension": "prementalizing",
+          "transform": "identity",
+          "review": "核心意思与英文题本相符。"
+        },
+        {
+          "number": 8,
+          "code": "PRFQ18_08",
+          "original_meaning": "总能预测孩子行为",
+          "chinese": "我总能预料孩子接下来会做什么。",
+          "dimension": "certainty",
+          "transform": "identity",
+          "review": "核心意思与英文题本相符。"
+        },
+        {
+          "number": 9,
+          "code": "PRFQ18_09",
+          "original_meaning": "常好奇孩子感受",
+          "chinese": "我常常好奇孩子正在经历怎样的感受。",
+          "dimension": "curiosity",
+          "transform": "identity",
+          "review": "核心意思与英文题本相符。"
+        },
+        {
+          "number": 10,
+          "code": "PRFQ18_10",
+          "original_meaning": "孩子生病阻止我做想做的事",
+          "chinese": "孩子有时生病，是为了让我没办法做自己想做的事。",
+          "dimension": "prementalizing",
+          "transform": "identity",
+          "review": "核心意思与英文题本相符。"
+        },
+        {
+          "number": 11,
+          "code": "PRFQ18_11",
+          "original_meaning": "有时误解孩子反应",
+          "chinese": "我有时也会误解孩子的反应。",
+          "dimension": "certainty",
+          "transform": "reverse",
+          "review": "核心意思与英文题本相符。"
+        },
+        {
+          "number": 12,
+          "code": "PRFQ18_12",
+          "original_meaning": "从孩子眼光看情境",
+          "chinese": "我会尝试从孩子的角度来看待事情。",
+          "dimension": "curiosity",
+          "transform": "identity",
+          "review": "核心意思与英文题本相符。"
+        },
+        {
+          "number": 13,
+          "code": "PRFQ18_13",
+          "original_meaning": "孩子烦躁只为惹恼我",
+          "chinese": "孩子闹脾气时，只是为了故意惹我生气。",
+          "dimension": "prementalizing",
+          "transform": "identity",
+          "review": "核心意思与英文题本相符。"
+        },
+        {
+          "number": 14,
+          "code": "PRFQ18_14",
+          "original_meaning": "总知道自己对孩子行为的原因",
+          "chinese": "我总是知道自己为什么要以某种方式对待孩子。",
+          "dimension": "certainty",
+          "transform": "identity",
+          "review": "核心意思与英文题本相符。"
+        },
+        {
+          "number": 15,
+          "code": "PRFQ18_15",
+          "original_meaning": "理解孩子不当行为的原因",
+          "chinese": "当孩子表现得不合适时，我会试着理解背后的原因。",
+          "dimension": "curiosity",
+          "transform": "identity",
+          "review": "核心意思与英文题本相符。"
+        },
+        {
+          "number": 16,
+          "code": "PRFQ18_16",
+          "original_meaning": "孩子行为太令人困惑而不值得费心弄清",
+          "chinese": "孩子的行为常常让人难以理解，以至于我懒得再去弄清原因。",
+          "dimension": "prementalizing",
+          "transform": "identity",
+          "review": "英文too confusing to bother figuring out，中文“懒得”可能增加懒惰道德意味，需人工译审、版本协调。"
+        },
+        {
+          "number": 17,
+          "code": "PRFQ18_17",
+          "original_meaning": "总知道孩子行为的原因",
+          "chinese": "我总是知道孩子为什么会有那样的行为。",
+          "dimension": "certainty",
+          "transform": "identity",
+          "review": "核心意思与英文题本相符。"
+        },
+        {
+          "number": 18,
+          "code": "PRFQ18_18",
+          "original_meaning": "认为猜孩子感受无意义",
+          "chinese": "我认为费力猜测孩子的感受并没有什么意义。",
+          "dimension": "curiosity",
+          "transform": "reverse",
+          "review": "核心意思与英文题本相符。"
+        }
+      ],
+      "anchors": "1非常不同意、4中立、7非常同意；2/3/5/6数字，与原版对应。",
+      "instruction": {
+        "path": "server-version/backend/src/modules/scale/instruments/prfq18_parent_zh_cn_research/1.0.0/source.json",
+        "blob": "3b53177b4c5e31b6709c653ca5f61dfb3a14a10a",
+        "sha256": "2d5169999c7b4e181a04ec85e6a5913f18321d8712906ecd23fc37b01d39665d",
+        "field": "/instruction",
+        "value": {
+          "schemaVersion": 1,
+          "language": "zh-CN",
+          "version": "1.0.0",
+          "text": "下面这些句子涉及你和孩子的日常相处，以及你通常怎样理解孩子的感受与行为。请根据你的实际看法判断每句话与你有多一致。1表示非常不同意，4表示中立，7表示非常同意；其余数字表示不同程度。没有正确或错误答案。请以家中一名0–5岁的孩子为对象回答，不要在不同题目中随意切换所指的孩子。",
+          "source": "Luyten等2017作者英文18题说明独立中文研究工作译稿；题号顺序和0–5岁适用边界均按UCL作者网页固定，不复制UCL已有中文版本。"
+        }
+      },
+      "population": "成人家长对单一0–5岁儿童报告；儿童年龄不代替家长年龄。"
+    },
+    "scoring": {
+      "dimensions": [
+        {
+          "key": "prementalizing",
+          "type": "dimension",
+          "label": "前心理化倾向",
+          "description": "六题均分1–7。描述对孩子行为作单一或敌意归因、难以考虑其内在体验的倾向；不是一项整体反思能力的结论。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "PRFQ18_01",
+                "weight": 1
+              },
+              {
+                "itemCode": "PRFQ18_04",
+                "weight": 1
+              },
+              {
+                "itemCode": "PRFQ18_07",
+                "weight": 1
+              },
+              {
+                "itemCode": "PRFQ18_10",
+                "weight": 1
+              },
+              {
+                "itemCode": "PRFQ18_13",
+                "weight": 1
+              },
+              {
+                "itemCode": "PRFQ18_16",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        },
+        {
+          "key": "certainty",
+          "type": "dimension",
+          "label": "对孩子内心状态的确定感",
+          "description": "六题均分1–7，第11题反向。描述自己多大程度上确信能了解孩子及其行为动机；不能简单解释成越高越好。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "PRFQ18_02",
+                "weight": 1
+              },
+              {
+                "itemCode": "PRFQ18_05",
+                "weight": 1
+              },
+              {
+                "itemCode": "PRFQ18_08",
+                "weight": 1
+              },
+              {
+                "itemCode": "PRFQ18_11",
+                "weight": 1
+              },
+              {
+                "itemCode": "PRFQ18_14",
+                "weight": 1
+              },
+              {
+                "itemCode": "PRFQ18_17",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        },
+        {
+          "key": "curiosity",
+          "type": "dimension",
+          "label": "对孩子内心世界的兴趣与好奇",
+          "description": "六题均分1–7，第18题反向。描述愿意了解孩子情绪、想法和行为原因的倾向；高分不能自动诊断良好亲职能力。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "PRFQ18_03",
+                "weight": 1
+              },
+              {
+                "itemCode": "PRFQ18_06",
+                "weight": 1
+              },
+              {
+                "itemCode": "PRFQ18_09",
+                "weight": 1
+              },
+              {
+                "itemCode": "PRFQ18_12",
+                "weight": 1
+              },
+              {
+                "itemCode": "PRFQ18_15",
+                "weight": 1
+              },
+              {
+                "itemCode": "PRFQ18_18",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        }
+      ],
+      "reverse": "11、18按8−x，其余identity；三维各六题均分1–7，无总分。",
+      "missing": "各维完整才均分、不插补是项目选择；缺失时整体quality是否输出解释未实际运行。",
+      "caveat": "固定研究资料记录PM文字方向冲突与11/16和11/18反向争议；现冻结11/18不是已完成权威最终确认，须按材料独立核对UCL评分syntax；任何改键需版本协调。",
+      "parameters": "referencePolicy none，无中文常模或临床切点。"
+    },
+    "report": {
+      "review": "三维scoreKey与源匹配，无父母等级、CMS/IC不简单越高越好，具体、支持性。对0–5岁尤其尚不会说话的儿童，开放问题仅适合具备相应语言能力者。",
+      "optional_revision": {
+        "path": "server-version/backend/src/modules/scale/instruments/prfq18_parent_zh_cn_research/1.0.0/source.json#/executable/definition/report/interpretations/1/guidance/1/text",
+        "old": "与其直接说“我知道你在想什么”，可以试着问一句开放的问题，并认真听听孩子的回应。",
+        "new": "可以根据孩子的年龄和表达方式，观察表情、动作和反应；孩子能表达时，试着问一个开放的问题并认真听。",
+        "note": "仅细化家庭建议、不改变测量，按报告版本规则协调。"
+      },
+      "versions": "instrument/scoring/localization/instruction/report均1.0.0。"
+    }
+  },
+  "substantive_coordination": [
+    "第16题“懒得”可能引入道德评断，请人工译审；不得静默更改成熟题目。",
+    "PM方向与反向键争议依原资料待权威syntax核查，不自行修改计分或伪称通过。"
+  ],
+  "human_status": "人工译审、认知访谈、中文效度及源内许可事项保持既有待完成状态，不新加自动门禁。",
+  "not_executed": [
+    "未写仓库、分支、DB、CI；未运行测试或系统检查。既有验证为历史记录。"
+  ],
+  "conclusion": "可供root整合内容审议；评分依据冲突及人工译审须保留，不能声称科学复核完成。"
+}

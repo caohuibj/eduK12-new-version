@@ -1,0 +1,15 @@
+{
+  "parameterVersion": "1.0.0",
+  "status": "NONE_NO_NORMS",
+  "runtimeReferencePolicy": {
+    "type": "none"
+  },
+  "runtimeIndependentVersionField": "NOT_SUPPORTED_FOR_NONE",
+  "referenceBindings": [],
+  "thresholds": [],
+  "contentVersion": "1.0.0",
+  "localizationVersion": "1.0.0",
+  "scoringVersion": "1.0.0",
+  "reportVersion": "1.0.0",
+  "notes": "参数version仅独立档案计划，运行none不具独立参数版本字段。内容（含计分/本地化）、参数和报告版本分别维护；不继承2026中文阈值或人群证据。"
+}

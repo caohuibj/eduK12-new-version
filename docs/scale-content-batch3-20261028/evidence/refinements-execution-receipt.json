@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "base": "8774b1cf158dae1c5eb0f4950044c6ae6d6a18dd",
+  "contentHead": "b7ea10d858f601b7d68dacef3a35f4dc93ddcd7c",
+  "node": {
+    "path": "/workspace/eduk12-cloud/tools/node_modules/.bin/node",
+    "version": "v24.21.0",
+    "sha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c"
+  },
+  "environmentLimit": "input manifest conservatively records backend source and lock/config; historical/full node_modules byte inventory not captured; not an attestation of every dependency byte",
+  "checks": [
+    {
+      "id": "refinements-content",
+      "cwd": "/workspace/eduK12-new-version",
+      "argv": [
+        "/workspace/eduk12-cloud/tools/node_modules/.bin/node",
+        "/workspace/eduK12-new-version/server-version/backend/node_modules/tsx/dist/cli.mjs",
+        "/workspace/eduK12-new-version/docs/scale-content-batch3-20261028/check-refinements.ts"
+      ],
+      "startedAt": "2026-10-28T03:45:48.195952+00:00",
+      "endedAt": "2026-10-28T03:45:48.807507+00:00",
+      "processExitCode": 1,
+      "beforeAfterIdentical": true,
+      "inputManifest": "refinements-content.inputs.json.gz",
+      "inputManifestUncompressedSHA256": "2315a7ecb5925bf13f1b66747a6e6d2c01e0c84f3c41cfbc4771006bb528e4e0",
+      "logs": {
+        "stdout": {
+          "path": "refinements-content.stdout.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "path": "refinements-content.stderr.log",
+          "bytes": 1325,
+          "sha256": "d05c6a171ebbd7f5c418e556746f3180d3018695c84be81e1984dbde19d9f1d1"
+        }
+      }
+    }
+  ],
+  "outerInvocation": {
+    "argv": [
+      "python3",
+      "/tmp/run-refinements-batch3-checks.py"
+    ],
+    "cwd": "/workspace/eduK12-new-version",
+    "shellLogin": false,
+    "processExitCode": 1,
+    "executionToolChunk": "e1278f",
+    "sourceCopy": "../commands/run-refinements-batch3-checks.py.txt",
+    "note": "Observed outer unified-exec exit, independent of individual cases; failed invocation is not relabelled success."
+  },
+  "plannedButNotExecuted": [
+    "generated-index check skipped after preceding command failed"
+  ]
+}

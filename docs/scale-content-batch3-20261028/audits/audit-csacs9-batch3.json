@@ -1,0 +1,199 @@
+{
+  "identity": "csacs9_zh_cn:1.0.0",
+  "sourceCommit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "sourceFiles": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/csacs9_zh_cn/1.0.0/source.json",
+      "gitBlob": "e798d38e39dc05313bce00995ba0e0d2d839a766",
+      "sha256": "c2ff0097228444602d11e092c2bc86640e4b72713601076fa7af844c6fc9b0cf"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/csacs9_zh_cn/1.0.0/instrument.ts",
+      "gitBlob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/csacs9_zh_cn/1.0.0/README.md",
+      "gitBlob": "d5b2c3eb5bc41e0d8e9ca0e1ac01d8dfb514570f",
+      "sha256": "a0d8ad260ab495df81e2f1a99db2e9a993e442fb3eaadb423782e833f385c26f"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/csacs9_zh_cn/1.0.0/bilingual-content.json",
+      "gitBlob": "4f3865b8365d49f18640ac713886223d29e3845f",
+      "sha256": "38325afb6372aa6601edcd5d1f341ae330e8d66b26440e8438ab28f0058a67a2"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/csacs9_zh_cn/1.0.0/reviewed-source-pack.md",
+      "gitBlob": "fc37b95563c4182a79466d490c585bf7f4c85103",
+      "sha256": "fba1d125c355276f5fe122dfd1c78f134890ed90dfe3a92752b628e174ad3692"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/csacs9_zh_cn/1.0.0/external-reference-dossier.json",
+      "gitBlob": "5fdc282400400a7fa71f32c3ff3259d3b986268f",
+      "sha256": "cbcc9872b9a24e539709190825a832b81aacf24a07b3ebdf38d96bcbe2102bc9"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/csacs9_zh_cn/1.0.0/references.md",
+      "gitBlob": "bca337b2fa8d3edf4860e5d127ba7a2529410e06",
+      "sha256": "0ef2961b337b63322183f830cad803b415b0621aa236f2d14c5e48143139cd7f"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/csacs9_zh_cn/1.0.0/report-example.md",
+      "gitBlob": "ea07877b0464bd219f11cc4622b5df110148b7c1",
+      "sha256": "9a0dace1538f6c32687a981e541444e9316a06497a0ef7a1179017b6a250282d"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/csacs9_zh_cn/1.0.0/report-example.json",
+      "gitBlob": "70b9a9c5959a8b8aa05211f8c217e204ba14973f",
+      "sha256": "0404c8d05e898b3c80400a6466ed6e51f01a89d5e72e94ef5ceff665f33bdfb8"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/csacs9_zh_cn/1.0.0/scoring-and-thresholds.md",
+      "gitBlob": "4342a09c31708c1411bc93e71f88ffabf38bdc45",
+      "sha256": "8d8a8648ce7667e7e072827e9096aa9adb3454f13448ec3a4fc8fa0911ec4f7f"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/csacs9_zh_cn/1.0.0/local-validation.json",
+      "gitBlob": "f5c60c7b1f97fa3b66b0367210bdd249625b4f2c",
+      "sha256": "b157c45a9e6f9c78700b724390e038415bfcf52257062a90692f2286f962e972"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/csacs9_zh_cn/1.0.0/runtime-check.json",
+      "gitBlob": "1b5643eb2d064b95468078d4bd22a89c48418989",
+      "sha256": "7b67367f50472005ceaa69f1288efe9ca14f5ac4bdd12b8f0663a924f90d0fbf"
+    }
+  ],
+  "threePartConclusions": {
+    "content": "源发表中文保留原题1–6、8–10，删除7是论文最终模型。中文题目与固定源一致；原4/9/10的发表中文较英文多观察视角等解释，保留现有已发表载体，不静默回译。1–7同意度只标端点，中间数值；平台说明嵌于题1，不冒称源中文指导语。",
+    "scoring": "全正向等权，centering原1/2/5/6总4–28，transcending原3/4/8/9/10总5–35，总分9–63；题数不同不直接比较维度总和。缺各维一题维度不可算，缺任一总分不可算，项目complete_required，无插补。等权sum依据原作者计分及中文研究沿用原规则证据链，不伪称2022正文单独列明公式。无阈值、常模或诊断。",
+    "report": "1.0.0双维及总分的描述具体、温和，指出题数不同不可比较，建议停顿及不适时停止、必要时求助；未作诊断或排名。源中国大学生研究不等于平台数字呈现已审，报告适用18–25成人大学生；student技术映射。"
+  },
+  "items": [
+    {
+      "originalNumber": 1,
+      "itemCode": "CSACS_ORIG_01",
+      "english": "When I am upset, I am able to find a place of calm within myself.",
+      "zh": "当我心烦意乱时，我能在自己的心中找到一个平静的地方。",
+      "key": "positive",
+      "assessment": "固定发表中文与运行时一致，首题前有独立平台说明；保留现有发表译文。"
+    },
+    {
+      "originalNumber": 2,
+      "itemCode": "CSACS_ORIG_02",
+      "english": "I have a perspective on life that allows me to deal with life’s disappointments without getting overwhelmed with them.",
+      "zh": "我对生活有一种领悟，可以让我应对生活中的不如意，而不会被它们压倒。",
+      "key": "positive",
+      "assessment": "固定发表中文与运行时一致；保留现有发表译文。"
+    },
+    {
+      "originalNumber": 3,
+      "itemCode": "CSACS_ORIG_03",
+      "english": "Despite the many changes in my life, there is a basic part of who I am that remains unchanged.",
+      "zh": "尽管我的人生发生了许多变化，但有一个最基本的“我”保持不变。",
+      "key": "positive",
+      "assessment": "固定发表中文与运行时一致；保留现有发表译文。"
+    },
+    {
+      "originalNumber": 4,
+      "itemCode": "CSACS_ORIG_04",
+      "english": "As I look back upon my life so far, I have a sense that part of me has been there for all of it.",
+      "zh": "回顾迄今为止的生活，我意识到那个能觉察情绪或想法的“我”一直在那里，陪伴着我。",
+      "key": "positive",
+      "assessment": "固定发表中文与运行时一致；保留现有发表译文。"
+    },
+    {
+      "originalNumber": 5,
+      "itemCode": "CSACS_ORIG_05",
+      "english": "I allow my emotions to come and go without struggling with them.",
+      "zh": "我允许我的情绪起伏变化而不挣扎其中。",
+      "key": "positive",
+      "assessment": "固定发表中文与运行时一致；保留现有发表译文。"
+    },
+    {
+      "originalNumber": 6,
+      "itemCode": "CSACS_ORIG_06",
+      "english": "I am able to notice my changing thoughts without getting caught up in them.",
+      "zh": "我能够注意到自己不断变化的想法而不会陷入其中。",
+      "key": "positive",
+      "assessment": "固定发表中文与运行时一致；保留现有发表译文。"
+    },
+    {
+      "originalNumber": 8,
+      "itemCode": "CSACS_ORIG_08",
+      "english": "Even though there have been many changes in my life, I’m aware of a part of me that has witnessed it all.",
+      "zh": "尽管我的人生发生了很多变化，但我意识到心中有个“观察者”见证了这一切。",
+      "key": "positive",
+      "assessment": "固定发表中文与运行时一致；保留现有发表译文。"
+    },
+    {
+      "originalNumber": 9,
+      "itemCode": "CSACS_ORIG_09",
+      "english": "I am able to access a perspective from which I can notice my thoughts, feelings, and emotions.",
+      "zh": "我能够站在一个更高的视角去觉察我的想法、感受和情绪。",
+      "key": "positive",
+      "assessment": "固定发表中文与运行时一致；保留现有发表译文。"
+    },
+    {
+      "originalNumber": 10,
+      "itemCode": "CSACS_ORIG_10",
+      "english": "When I think back to when I was younger, I recognize that a part of me that was there then is still here now.",
+      "zh": "当我回想曾经的生活，我意识到那个能够观察情绪和感觉的“我”依然存在。",
+      "key": "positive",
+      "assessment": "固定发表中文与运行时一致；保留现有发表译文。"
+    }
+  ],
+  "anchors": {
+    "sourceEnglishEndpoints": [
+      "strongly disagree",
+      "strongly agree"
+    ],
+    "platformChineseEndpoints": [
+      "非常不同意",
+      "非常同意"
+    ],
+    "intermediateNumbersOnly": [
+      2,
+      3,
+      4,
+      5,
+      6
+    ]
+  },
+  "instruction": {
+    "text": "请选择你对每句话的同意程度：1为非常不同意，7为非常同意，2–6表示其间的程度。此说明与两端中文选项为平台界面译注。",
+    "sources": [
+      {
+        "file": {
+          "path": "docs/scale-instruments/research-drafts/csacs9_zh_cn/1.0.0/bilingual-content.json",
+          "gitBlob": "4f3865b8365d49f18640ac713886223d29e3845f",
+          "sha256": "38325afb6372aa6601edcd5d1f341ae330e8d66b26440e8438ab28f0058a67a2"
+        },
+        "field": "platformInstructions"
+      },
+      {
+        "file": {
+          "path": "server-version/backend/src/modules/scale/instruments/csacs9_zh_cn/1.0.0/source.json",
+          "gitBlob": "e798d38e39dc05313bce00995ba0e0d2d839a766",
+          "sha256": "c2ff0097228444602d11e092c2bc86640e4b72713601076fa7af844c6fc9b0cf"
+        },
+        "field": "executable.definition.items[0].content首段"
+      }
+    ],
+    "qualification": "平台译注已嵌首题，非发表中文指导语；如接入独立字段应避免重复，删除原首段改变定义需版本协调。"
+  },
+  "ordinaryRevisions": [
+    {
+      "jsonPath": "executable.definition.items[0].content 首段",
+      "old": "请选择你对每句话的同意程度：1为非常不同意，7为非常同意，2–6表示其间的程度。此说明与两端中文选项为平台界面译注。",
+      "new": "请选择你对每句话的同意程度：1为非常不同意，7为非常同意，2–6表示其间的程度。",
+      "reason": "末句是实现来源元信息，建议留在来源记录而非答题者指引；现已嵌入题干，执行须评估冻结定义及版本，不可在1.0.0静默覆盖。"
+    }
+  ],
+  "manualPending": [
+    "保留发表中文原4/9/10的表达，即便与英文题意存在差异；实质改题需版本、证据及用户协调。",
+    "数字呈现和平台新增反馈待审；人群边界不可外推。"
+  ],
+  "notExecuted": [
+    "未运行评分、golden、系统、DB、CI或部署；历史合成材料不视为本次执行。"
+  ]
+}

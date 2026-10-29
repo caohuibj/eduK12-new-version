@@ -1,0 +1,304 @@
+{
+  "instrument": "tes12_general_zh_cn_research:1.0.0",
+  "source_commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "source_files": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/tes12_general_zh_cn_research/1.0.0/source.json",
+      "blob": "1af6821c8cbff5f2eabf5e5c6e0406574503777d",
+      "sha256": "050b5f164686cacd60de06e3f738ae5469855835f062f43cbf6b459975988e81"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/tes12_general_zh_cn_research/1.0.0/instrument.ts",
+      "blob": "0eed070bb879576339c5a71afdf34c0026591fd3",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/tes12_general_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+      "blob": "0120eec927464ed8026615fa885d68bc7e423fe3",
+      "sha256": "389a62517c6e1d5fbca317f3b5744d494b7c93a43dcb8ca455d5bf1ca10d6433"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/tes12_general/1.0.0/README.md",
+      "blob": "e1afb421fd2ea9a8348c52372dad17525a00cdfc",
+      "sha256": "aed3cf0fe7c3630edcbd133a5cd39bee450858c25b643c1793bd3aa538b6c1e1"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/tes12_general/1.0.0/source-manifest.json",
+      "blob": "cbe8545bdc52df8823951b26ef954f8b97be8908",
+      "sha256": "b1186572f1d5632ca0f2280464bc2f02135e2440333f6011c44bfc52ccd09aac"
+    }
+  ],
+  "three_parts": {
+    "items_instruction": {
+      "items": [
+        {
+          "number": 1,
+          "code": "TESG_01",
+          "english": "I generally enjoy teaching.",
+          "chinese": "一般而言，我喜欢教学。",
+          "dimension": "enjoyment",
+          "transform": "identity",
+          "review": "中文核心意思与固定英文材料对应，待人工译审。"
+        },
+        {
+          "number": 2,
+          "code": "TESG_02",
+          "english": "I generally have so much fun teaching that I gladly prepare and teach my lessons.",
+          "chinese": "通常，教学让我感到非常愉快，因此我也乐于备课和上课。",
+          "dimension": "enjoyment",
+          "transform": "identity",
+          "review": "中文核心意思与固定英文材料对应，待人工译审。"
+        },
+        {
+          "number": 3,
+          "code": "TESG_03",
+          "english": "I often have reasons to be happy while I teach.",
+          "chinese": "在授课过程中，我常有值得高兴的事情。",
+          "dimension": "enjoyment",
+          "transform": "identity",
+          "review": "中文核心意思与固定英文材料对应，待人工译审。"
+        },
+        {
+          "number": 4,
+          "code": "TESG_04",
+          "english": "I generally teach with enthusiasm.",
+          "chinese": "一般来说，我带着热情进行教学。",
+          "dimension": "enjoyment",
+          "transform": "identity",
+          "review": "中文核心意思与固定英文材料对应，待人工译审。"
+        },
+        {
+          "number": 5,
+          "code": "TESG_05",
+          "english": "I often have reasons to be angry while I teach.",
+          "chinese": "授课时，我常常有生气的理由。",
+          "dimension": "anger",
+          "transform": "identity",
+          "review": "中文核心意思与固定英文材料对应，待人工译审。"
+        },
+        {
+          "number": 6,
+          "code": "TESG_06",
+          "english": "I often feel annoyed while teaching.",
+          "chinese": "我在授课过程中经常感到烦躁。",
+          "dimension": "anger",
+          "transform": "identity",
+          "review": "中文核心意思与固定英文材料对应，待人工译审。"
+        },
+        {
+          "number": 7,
+          "code": "TESG_07",
+          "english": "Sometimes I get really mad while I teach.",
+          "chinese": "有时我在授课时真的会非常生气。",
+          "dimension": "anger",
+          "transform": "identity",
+          "review": "中文核心意思与固定英文材料对应，待人工译审。"
+        },
+        {
+          "number": 8,
+          "code": "TESG_08",
+          "english": "Teaching generally frustrates me.",
+          "chinese": "一般来说，教学会让我感到受挫。",
+          "dimension": "anger",
+          "transform": "identity",
+          "review": "中文核心意思与固定英文材料对应，待人工译审。"
+        },
+        {
+          "number": 9,
+          "code": "TESG_09",
+          "english": "I generally feel tense and nervous while teaching.",
+          "chinese": "一般情况下，我在授课时会感到紧张和不安。",
+          "dimension": "anxiety",
+          "transform": "identity",
+          "review": "中文核心意思与固定英文材料对应，待人工译审。"
+        },
+        {
+          "number": 10,
+          "code": "TESG_10",
+          "english": "I am often worried that my teaching isn't going so well.",
+          "chinese": "我常常担心自己的教学进行得不够顺利。",
+          "dimension": "anxiety",
+          "transform": "identity",
+          "review": "中文核心意思与固定英文材料对应，待人工译审。"
+        },
+        {
+          "number": 11,
+          "code": "TESG_11",
+          "english": "Preparing to teach often causes me to worry.",
+          "chinese": "准备授课的过程经常让我担心。",
+          "dimension": "anxiety",
+          "transform": "identity",
+          "review": "中文核心意思与固定英文材料对应，待人工译审。"
+        },
+        {
+          "number": 12,
+          "code": "TESG_12",
+          "english": "I feel uneasy when I think about teaching.",
+          "chinese": "想到要教学时，我会感到心神不安。",
+          "dimension": "anxiety",
+          "transform": "identity",
+          "review": "中文核心意思与固定英文材料对应，待人工译审。"
+        }
+      ],
+      "basis": "本次逐题对照固定source-manifest英文和中文，未重新验证原论文。",
+      "anchors": "四点：非常不同意、不同意、同意、非常同意，不混其他研究的5或6点。",
+      "instruction": {
+        "path": "server-version/backend/src/modules/scale/instruments/tes12_general_zh_cn_research/1.0.0/source.json",
+        "blob": "1af6821c8cbff5f2eabf5e5c6e0406574503777d",
+        "sha256": "050b5f164686cacd60de06e3f738ae5469855835f062f43cbf6b459975988e81",
+        "field": "/instruction",
+        "value": {
+          "schemaVersion": 1,
+          "text": "下面的陈述描述你作为教师时通常体验到的感受。请根据平时的教学经历，逐句判断自己有多赞同。1=非常不同意，2=不同意，3=同意，4=非常同意。答案没有对错，不要求教师必须只有一种情绪。题目涉及日常教学的一般体验，不是对某个特定班级的评价。",
+          "language": "zh-CN",
+          "version": "1.0.0",
+          "source": "Frenzel等2016原论文Appendix A General Scales英文指导语的独立中文研究工作稿。原作者研究采用四级同意度，不是后续研究中出现的五级或六级。"
+        }
+      },
+      "scope": "一般教师授课体验，不是指定班级；无固定时间窗；受众教师自报。"
+    },
+    "scoring": {
+      "dimensions": [
+        {
+          "key": "enjoyment",
+          "type": "dimension",
+          "label": "教学愉悦",
+          "description": "教师通常是否乐于授课、备课并感受到教学的愉快与热情。 更多分表示较常认同相关体验，而不是能力或临床状况。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "TESG_01",
+                "weight": 1
+              },
+              {
+                "itemCode": "TESG_02",
+                "weight": 1
+              },
+              {
+                "itemCode": "TESG_03",
+                "weight": 1
+              },
+              {
+                "itemCode": "TESG_04",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        },
+        {
+          "key": "anger",
+          "type": "dimension",
+          "label": "教学愤怒",
+          "description": "教师通常在授课过程中感到恼火、生气、烦躁或受挫的倾向。 更多分表示较常认同相关体验，而不是能力或临床状况。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "TESG_05",
+                "weight": 1
+              },
+              {
+                "itemCode": "TESG_06",
+                "weight": 1
+              },
+              {
+                "itemCode": "TESG_07",
+                "weight": 1
+              },
+              {
+                "itemCode": "TESG_08",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        },
+        {
+          "key": "anxiety",
+          "type": "dimension",
+          "label": "教学焦虑",
+          "description": "教师通常在备课、授课或想到教学时感到紧张、不安和担心的倾向。 更多分表示较常认同相关体验，而不是能力或临床状况。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "TESG_09",
+                "weight": 1
+              },
+              {
+                "itemCode": "TESG_10",
+                "weight": 1
+              },
+              {
+                "itemCode": "TESG_11",
+                "weight": 1
+              },
+              {
+                "itemCode": "TESG_12",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        }
+      ],
+      "formula": "愉悦1–4、愤怒5–8、焦虑9–12分别四题均分1–4，全部identity，不造总分；高分更认同对应情绪。",
+      "missing": "每维四题完整才均分，项目策略不插补；其他完整维可计算，整体质量不从静态数据推断。",
+      "parameters": "referencePolicy none、无临床常模、阈值或排名。",
+      "display": "固定source randomizeItems=true，作者推荐随机化；source README记载当前forPublish不接受，内容审计不修改引擎或强行改题序；root协调。"
+    },
+    "report": {
+      "review": "三维引用一致，区分积极和负向情绪，具体教学情境、非道德或能力评价，包含支持；报告可保留。",
+      "version": "instrument/scoring/localization/instruction/report均1.0.0；教师技术SELF并非实际教师身份认证。"
+    }
+  },
+  "ordinary_suggestions": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/tes12_general_zh_cn_research/1.0.0/source.json#/executable/definition/scoring/scores/0/description",
+      "old": "教师通常是否乐于授课、备课并感受到教学的愉快与热情。 更多分表示较常认同相关体验，而不是能力或临床状况。",
+      "new": "教师通常是否乐于授课、备课并感受到教学的愉快与热情。 分数越高表示越认同相关体验，而不是能力或临床状况。",
+      "reason": "选项为同意程度，“较常认同”易误作频率；只澄清措辞。"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/tes12_general_zh_cn_research/1.0.0/source.json#/executable/definition/scoring/scores/1/description",
+      "old": "教师通常在授课过程中感到恼火、生气、烦躁或受挫的倾向。 更多分表示较常认同相关体验，而不是能力或临床状况。",
+      "new": "教师通常在授课过程中感到恼火、生气、烦躁或受挫的倾向。 分数越高表示越认同相关体验，而不是能力或临床状况。",
+      "reason": "选项为同意程度，“较常认同”易误作频率；只澄清措辞。"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/tes12_general_zh_cn_research/1.0.0/source.json#/executable/definition/scoring/scores/2/description",
+      "old": "教师通常在备课、授课或想到教学时感到紧张、不安和担心的倾向。 更多分表示较常认同相关体验，而不是能力或临床状况。",
+      "new": "教师通常在备课、授课或想到教学时感到紧张、不安和担心的倾向。 分数越高表示越认同相关体验，而不是能力或临床状况。",
+      "reason": "选项为同意程度，“较常认同”易误作频率；只澄清措辞。"
+    }
+  ],
+  "substantive_coordination": [
+    "保留作者推荐随机呈现；既有发布不兼容按root协调，不能静默关闭或修改引擎。",
+    "题文、四档锚点、维度及计分变化需要人工译审和版本治理。"
+  ],
+  "human_status": "中文译审、认知访谈、目标教师效度及现有权限审查待完成，不新造自动门禁。",
+  "not_executed": [
+    "未修改仓库、分支、DB、CI或生产；未运行测试或系统检查。历史合成向量不是本次执行。"
+  ],
+  "conclusion": "原文与现有中译静态对应；三维描述“较常认同”可作最小措辞修订，报告和计分可保留，随机展示兼容由root协调。"
+}

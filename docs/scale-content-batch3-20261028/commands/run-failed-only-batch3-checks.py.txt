@@ -1,0 +1,30 @@
+import datetime, gzip, hashlib, json, os, pathlib, subprocess
+root=pathlib.Path('/workspace/eduK12-new-version')
+out=root/'docs/scale-content-batch3-20261028/evidence';out.mkdir(exist_ok=True)
+node='/workspace/eduk12-cloud/tools/node_modules/.bin/node'
+backend=root/'server-version/backend'
+harness=root/'docs/scale-content-batch3-20261028/check-failed-only.ts'
+harness.write_bytes(harness.with_suffix('.ts.txt').read_bytes())
+digest=lambda b:hashlib.sha256(b).hexdigest()
+def manifest():
+ paths=list((backend/'src').rglob('*.ts'))+list((backend/'src').rglob('*.json'))
+ paths += [backend/'package.json',backend/'package-lock.json',backend/'tsconfig.json',backend/'scripts/generate-scale-instruments.ts',harness]
+ paths += list((root/'docs/scale-instruments/research-drafts').glob('ipip_*/1.0.0/bilingual-content.json'))
+ return [{'path':str(p.relative_to(root)),'sha256':digest(p.read_bytes())} for p in sorted(set(paths)) if p.is_file()]
+receipt={'schemaVersion':1,'base':subprocess.check_output(['git','merge-base','HEAD','origin/main'],cwd=root,text=True).strip(),'contentHead':subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip(),'node':{'path':node,'version':subprocess.check_output([node,'--version'],text=True).strip(),'sha256':digest(pathlib.Path(node).read_bytes())},'environmentLimit':'input manifest conservatively records backend source and lock/config; historical/full node_modules byte inventory not captured; not an attestation of every dependency byte','checks':[]}
+commands=[('refinements-failed-only',root,[node,str(backend/'node_modules/tsx/dist/cli.mjs'),str(harness)]),('generated-index-final-success',backend,[node,str(backend/'node_modules/tsx/dist/cli.mjs'),'scripts/generate-scale-instruments.ts','--check'])]
+for name,cwd,argv in commands:
+ before=manifest();start=datetime.datetime.now(datetime.timezone.utc).isoformat()
+ run=subprocess.run(argv,cwd=cwd,capture_output=True)
+ end=datetime.datetime.now(datetime.timezone.utc).isoformat();after=manifest()
+ raw=(json.dumps({'scope':'conservative source superset, not a claim of executed tests or exact import closure','before':before,'after':after},ensure_ascii=False,separators=(',',':'))+'\n').encode()
+ (out/(name+'.inputs.json.gz')).write_bytes(gzip.compress(raw,mtime=0))
+ entry={'id':name,'cwd':str(cwd),'argv':argv,'startedAt':start,'endedAt':end,'processExitCode':run.returncode,'beforeAfterIdentical':before==after,'inputManifest':name+'.inputs.json.gz','inputManifestUncompressedSHA256':digest(raw),'logs':{}}
+ for label,data in [('stdout',run.stdout),('stderr',run.stderr)]:
+  p=out/(name+'.'+label+'.log');p.write_bytes(data);entry['logs'][label]={'path':p.name,'bytes':len(data),'sha256':digest(data)}
+ receipt['checks'].append(entry)
+ (out/'failed-only-execution-receipt.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2)+'\n')
+ print(json.dumps({'check':name,'exit':run.returncode,'inputsStable':before==after,'stdout':run.stdout.decode()[:500],'stderr':run.stderr.decode()[:1000]}))
+ if run.returncode: break
+harness.unlink()
+raise SystemExit(0 if len(receipt['checks'])==2 and all(x['processExitCode']==0 and x['beforeAfterIdentical'] for x in receipt['checks']) else 1)

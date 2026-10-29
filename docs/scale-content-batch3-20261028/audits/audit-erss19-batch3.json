@@ -1,0 +1,280 @@
+{
+  "instrument": "erss19_zh_cn_research:1.0.0",
+  "sourceSHA": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "files": [
+    {
+      "path": "docs/scale-instruments/research-drafts/erss19/1.0.0/README.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "d3604d5136cf5c3488d8a006333f709bebacdaa9",
+      "sha256": "68c8249cf8ea45f15bdd6f5f8eb27539acce95bd0fc23c79e24aee6306ad26ca"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/erss19/1.0.0/administration.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "0aab760fcf78adf0a42a9da285c21877264c8a46",
+      "sha256": "42daba9ab3c1b8b6e2bdb60ab79239cbee803e731daa64eec37520bd970957dc"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/erss19/1.0.0/bilingual-content.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "c8944d802285d6a993afa8428520b34890741630",
+      "sha256": "d7e9abaff86571265838008949400807fd01b83d4ed300673b2a7581aba3ec24"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/erss19/1.0.0/instruction.for-pr356.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "d1ddb9568a26e1a1bc3e2b9525d9083beedac8be",
+      "sha256": "ae2980b68e78331e746c48e3b5decc2eed3ece9bc37f37e0e42ae5b9c5c86876"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/erss19/1.0.0/references.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "881d9480d4bc2e3b554266f7a02fccea45c75862",
+      "sha256": "4785befaf077294d9f4e11f75dd7317891180f63d02fa124e2b11b1668e00ae8"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/erss19/1.0.0/report-example.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "ccbd0fa9b34a9cdf3eb8ebf4f35670ff82f2f091",
+      "sha256": "1139dfcbcf0c77a55502f6a70061f23b6f56bb5e75386a2c6e5fd45dadd82225"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/erss19/1.0.0/report-result.synthetic.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "9fc3d4479896e0aea022a79073fdced175c44b9e",
+      "sha256": "535b5c329322c40674bb593c9b593b7107da166356e8fcb22592d1535bf44823"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/erss19/1.0.0/scoring-and-parameters.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "e07a93f08ae54568990f59fe759e67a76bc573af",
+      "sha256": "775709acbd98d8738526b341020041d50a35ebe096ee6160ea7544bee072a625"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/erss19/1.0.0/take-home-message.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "64f40e2d3908066eae27648391d8665d08b410d5",
+      "sha256": "07393ef07ea29fa7009475b2e84121e3ea0335d484b76d7aad989f4d941441db"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/erss19/1.0.0/validation.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "be2d2ba4e38022499b8efc9d5e025e101df49ddb",
+      "sha256": "4ac3788d53feac46bb192396f34f919b16ea385108e0da14271fd1c629265018"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/erss19_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "0b7181aafdb8475aeff2444069a67d2d0a6a735c",
+      "sha256": "39034943658672b9c377afb75cdd1435b6ac78a64e71deb9530b9b52d2603bd8"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/erss19_zh_cn_research/1.0.0/instrument.ts",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "0eed070bb879576339c5a71afdf34c0026591fd3",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/erss19_zh_cn_research/1.0.0/source.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "5cb98137887b3f1579d87dd55926ad2e28680a8a",
+      "sha256": "13ada797d32319eb4a39892ed85ebbb83d78501d1fbffdbeb15f75848e2d2e3e"
+    }
+  ],
+  "originalEvidence": {
+    "url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2019.01486/full",
+    "access": "本次直接读取论文方法部分19条及两道反向。24题删4与实际19条有来源算术矛盾，完整施测题序未公开；不补造题。"
+  },
+  "items": [
+    {
+      "code": "ERSS_01",
+      "english": "When I want to feel more positive emotion, I can change aspects of the situation in order to do that,",
+      "chinese": "当我想体验更多积极情绪时，我能改变情境中的某些方面来做到这一点。",
+      "dimension": "situation_modification",
+      "reverse": false,
+      "conclusion": "论文逐维列项和固定双语记录一致；整表施测顺序原文未明确，中文待译审。"
+    },
+    {
+      "code": "ERSS_02",
+      "english": "I can change the emotional nature of a situation by injecting humor into the situation,",
+      "chinese": "我能通过在情境中加入幽默，改变它带来的情绪。",
+      "dimension": "situation_modification",
+      "reverse": false,
+      "conclusion": "论文逐维列项和固定双语记录一致；整表施测顺序原文未明确，中文待译审。"
+    },
+    {
+      "code": "ERSS_03",
+      "english": "I manage my emotions by changing aspects of the situation",
+      "chinese": "我会通过改变情境中的某些方面来调节自己的情绪。",
+      "dimension": "situation_modification",
+      "reverse": false,
+      "conclusion": "论文逐维列项和固定双语记录一致；整表施测顺序原文未明确，中文待译审。"
+    },
+    {
+      "code": "ERSS_04",
+      "english": "I am able to distract myself from strong emotions,",
+      "chinese": "我能够把注意力从强烈的情绪上转移开。",
+      "dimension": "attentional_deployment",
+      "reverse": false,
+      "conclusion": "论文逐维列项和固定双语记录一致；整表施测顺序原文未明确，中文待译审。"
+    },
+    {
+      "code": "ERSS_05",
+      "english": "When I am in an emotional situation, I manage my emotions by focusing on non-emotional aspects of the situation,",
+      "chinese": "处在带有情绪的情境中时，我会把注意力放在其中不涉及情绪的方面，来调节自己的情绪。",
+      "dimension": "attentional_deployment",
+      "reverse": false,
+      "conclusion": "论文逐维列项和固定双语记录一致；整表施测顺序原文未明确，中文待译审。"
+    },
+    {
+      "code": "ERSS_06",
+      "english": "It is hard for me to stop thinking about the emotions I am feelings",
+      "chinese": "我很难停止想着自己正在感受到的情绪。",
+      "dimension": "attentional_deployment",
+      "reverse": true,
+      "conclusion": "论文逐维列项和固定双语记录一致；整表施测顺序原文未明确，中文待译审。"
+    },
+    {
+      "code": "ERSS_07",
+      "english": "When experiencing negative emotions, I am unable to think about anything but that emotion",
+      "chinese": "体验消极情绪时，除了那种情绪，我无法想到别的事情。",
+      "dimension": "attentional_deployment",
+      "reverse": true,
+      "conclusion": "论文逐维列项和固定双语记录一致；整表施测顺序原文未明确，中文待译审。"
+    },
+    {
+      "code": "ERSS_08",
+      "english": "When I want to feel more positive emotions, I can change my perspective on the situation,",
+      "chinese": "当我想体验更多积极情绪时，我能换个角度看待情境。",
+      "dimension": "cognitive_reappraisal",
+      "reverse": false,
+      "conclusion": "论文逐维列项和固定双语记录一致；整表施测顺序原文未明确，中文待译审。"
+    },
+    {
+      "code": "ERSS_09",
+      "english": "When I want to feel less negative emotions, I can change my perspective on the situation,",
+      "chinese": "当我想少体验一些消极情绪时，我能换个角度看待情境。",
+      "dimension": "cognitive_reappraisal",
+      "reverse": false,
+      "conclusion": "论文逐维列项和固定双语记录一致；整表施测顺序原文未明确，中文待译审。"
+    },
+    {
+      "code": "ERSS_10",
+      "english": "I can control my negative emotions by changing the way I think about the situation,",
+      "chinese": "我能通过改变对情境的看法来控制自己的消极情绪。",
+      "dimension": "cognitive_reappraisal",
+      "reverse": false,
+      "conclusion": "论文逐维列项和固定双语记录一致；整表施测顺序原文未明确，中文待译审。"
+    },
+    {
+      "code": "ERSS_11",
+      "english": "I can control my positive emotions by changing the way I think about the situation,",
+      "chinese": "我能通过改变对情境的看法来控制自己的积极情绪。",
+      "dimension": "cognitive_reappraisal",
+      "reverse": false,
+      "conclusion": "论文逐维列项和固定双语记录一致；整表施测顺序原文未明确，中文待译审。"
+    },
+    {
+      "code": "ERSS_12",
+      "english": "I manage my emotions by changing my perspective on the situation I am in,",
+      "chinese": "我会通过改变看待所处情境的角度来调节自己的情绪。",
+      "dimension": "cognitive_reappraisal",
+      "reverse": false,
+      "conclusion": "论文逐维列项和固定双语记录一致；整表施测顺序原文未明确，中文待译审。"
+    },
+    {
+      "code": "ERSS_13",
+      "english": "I can increase my feelings of positive emotions by thinking about different aspects of the situation,",
+      "chinese": "我能通过思考情境中的不同方面，增加自己的积极情绪。",
+      "dimension": "cognitive_reappraisal",
+      "reverse": false,
+      "conclusion": "论文逐维列项和固定双语记录一致；整表施测顺序原文未明确，中文待译审。"
+    },
+    {
+      "code": "ERSS_14",
+      "english": "I can decrease my feelings of negative emotions by thinking about different aspects of the situation",
+      "chinese": "我能通过思考情境中的不同方面，减少自己的消极情绪。",
+      "dimension": "cognitive_reappraisal",
+      "reverse": false,
+      "conclusion": "论文逐维列项和固定双语记录一致；整表施测顺序原文未明确，中文待译审。"
+    },
+    {
+      "code": "ERSS_15",
+      "english": "I generally try not to show my negative emotions,",
+      "chinese": "我通常会尽量不表现出自己的消极情绪。",
+      "dimension": "suppression",
+      "reverse": false,
+      "conclusion": "论文逐维列项和固定双语记录一致；整表施测顺序原文未明确，中文待译审。"
+    },
+    {
+      "code": "ERSS_16",
+      "english": "I keep my emotions to myself,",
+      "chinese": "我把自己的情绪留在心里。",
+      "dimension": "suppression",
+      "reverse": false,
+      "conclusion": "论文逐维列项和固定双语记录一致；整表施测顺序原文未明确，中文待译审。"
+    },
+    {
+      "code": "ERSS_17",
+      "english": "I manage my emotions by not expressing them,",
+      "chinese": "我会通过不表达情绪来调节自己的情绪。",
+      "dimension": "suppression",
+      "reverse": false,
+      "conclusion": "论文逐维列项和固定双语记录一致；整表施测顺序原文未明确，中文待译审。"
+    },
+    {
+      "code": "ERSS_18",
+      "english": "I do not express my negative emotions,",
+      "chinese": "我不表达自己的消极情绪。",
+      "dimension": "suppression",
+      "reverse": false,
+      "conclusion": "论文逐维列项和固定双语记录一致；整表施测顺序原文未明确，中文待译审。"
+    },
+    {
+      "code": "ERSS_19",
+      "english": "I generally try not to show my positive emotions",
+      "chinese": "我通常会尽量不表现出自己的积极情绪。",
+      "dimension": "suppression",
+      "reverse": false,
+      "conclusion": "论文逐维列项和固定双语记录一致；整表施测顺序原文未明确，中文待译审。"
+    }
+  ],
+  "threePartConclusions": {
+    "content": "19题按论文四类列出顺序与双语记录一致，06/07反向，1/7文字端点中间数字。论文未提供整体施测题序和原中文；中文待译审。",
+    "scoring": "四维分别3/4/7/5题等权均分1–7，06/07 8−x；作者描述统计支持均分量级但未单列公式，均分为项目实现，分维全答是项目规则。无总分/阈值。",
+    "report": "report1.0.0中文成人本人，四维score_only解释温和、按情境提供可行动提示，不做能力或疗效判断；沿用。"
+  },
+  "instruction": {
+    "source": {
+      "path": "docs/scale-instruments/research-drafts/erss19/1.0.0/administration.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "0aab760fcf78adf0a42a9da285c21877264c8a46",
+      "sha256": "42daba9ab3c1b8b6e2bdb60ab79239cbee803e731daa64eec37520bd970957dc"
+    },
+    "pointer": "首段",
+    "text": "请根据平时的情况，选择你对下面每句话的同意程度。1表示非常不同意，7表示非常同意，2至6是两端之间的选项。没有对错，请按自己的实际情况选择。",
+    "note": "论文未给完整统一指导语，此为项目原创；source未绑定。"
+  },
+  "ordinaryEdits": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/erss19_zh_cn_research/1.0.0/source.json",
+      "jsonPointer": "/instruction",
+      "old": "不存在",
+      "new": {
+        "schemaVersion": 1,
+        "text": "请根据平时的情况，选择你对下面每句话的同意程度。1表示非常不同意，7表示非常同意，2至6是两端之间的选项。没有对错，请按自己的实际情况选择。",
+        "language": "zh-CN",
+        "version": "1.0.0",
+        "source": "docs/scale-instruments/research-drafts/erss19/1.0.0/administration.md @ b92c69aefa2472775fa7ee86b9c208366886c908；项目独立编写"
+      },
+      "reason": "绑定既有项目指导语并标明出处。"
+    }
+  ],
+  "humanItems": [
+    "作者24删4与所列19条不一致，维持记录、不得添题；原始施测顺序未证实。",
+    "中文独立专家译审及本地验证待完成；题义/锚点/算法实质改变需协调版本。"
+  ],
+  "notExecuted": [
+    "未改仓库或测试系统、DB、CI；未做新科研版权研究。"
+  ]
+}

@@ -1,0 +1,192 @@
+{
+  "identity": "djgls6_zh_cn_research:1.0.0",
+  "sourceCommit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "sourceFiles": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/djgls6_zh_cn_research/1.0.0/source.json",
+      "gitBlob": "38be96db91f579d42e57debe6b5814bd80e584be",
+      "sha256": "c07038b029b02c520ff0344434499358242145ee8122c7dd9ce1984f12c48a46"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/djgls6_zh_cn_research/1.0.0/instrument.ts",
+      "gitBlob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/djgls6/1.0.0/README.md",
+      "gitBlob": "db71460c3dafe634d03f217ceec48ea2602778b0",
+      "sha256": "7b666f87b3ef505a9693f8d0377b23a74d1aca270c42f709f43186cf6ca3a470"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/djgls6/1.0.0/bilingual-content.json",
+      "gitBlob": "c3338dca7882bd7ad596c83e3a013f31ba711735",
+      "sha256": "e95070a5a38b07cfa9ac4800ae87e00cbc4005476735adba7892166e7a330257"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/djgls6/1.0.0/reviewed-source-pack.json",
+      "gitBlob": "80547ed22fdeca4ebe7e8627dca009b13b073e57",
+      "sha256": "f5ba39b28a8a0dd753d4980491633cfce958805dafdea2767990fdf04d629a0a"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/djgls6/1.0.0/external-reference-dossier.json",
+      "gitBlob": "83b518b12c1de3665c63a4ba91c3444ff09bca92",
+      "sha256": "a2609812405f27ccc514ae940e179d695c6ef14d14859f90f2ed1a17a2455dfb"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/djgls6/1.0.0/references.md",
+      "gitBlob": "0d3ce58ef3e23157cec00abff3fa658579f2e5ab",
+      "sha256": "62ee7838edff47f378d433eb77534d5f127f3df07ff46a03eba09d098bc7ed51"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/djgls6/1.0.0/report-example.md",
+      "gitBlob": "4ebb7b86c240b3f450214c8bb7eda702c69e9a78",
+      "sha256": "bc2f3e662bdc5c9b07d79e6036e5b8d928c98dd7940951b3d220aba86a869385"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/djgls6/1.0.0/scoring-and-thresholds.md",
+      "gitBlob": "8e2bd1389d7007862523193b160b1ae414a4ecfe",
+      "sha256": "5434a913bcbf44e38954cce5ef8c137d761fa7836d0b905618343b0efbdc6fb4"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/djgls6/1.0.0/synthetic-report-example.json",
+      "gitBlob": "9857de6efd8240ae90fbf11be8d84a3c84c4ae18",
+      "sha256": "bb0509c83f3898f2a683bed75b42ff12e0f81fdc1b598e0dac56899f6956ffaf"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/djgls6/1.0.0/local-validation.json",
+      "gitBlob": "a103c006c7a6282abe1c3a290119b869cfe06c74",
+      "sha256": "3edd912650c29ec3f133af4e658001f0957012d7113516928a701e4bbe7a4129"
+    }
+  ],
+  "threePartConclusions": {
+    "content": "2010原作者所列六题按情感后三社会顺序，中文工作译稿与原意及运行时一致；题3有 often，答题选项不是频率量表。第2题 miss having people around 译“想念有人在身边的感觉”是解释性译法，待译审。",
+    "scoring": "1–3 no/middle/yes=0/1/1，4–6=1/1/0；middle两向均1，二元重编码后各题等权identity求和，不能按常规反向2−x。情感1–3及社会4–6各0–3，总分0–6，越高信号越多；无均分分母。各维度需各自3题完整、总分需6题完整，不插补；整体报告不承诺部分反馈。",
+    "report": "总分、两维方向清楚，温和支持与具体联系建议合适；无诊断、常模、排名或风险分档。参考档案有荷兰CBS统计分组但不绑定，不当中国临床阈值。中文未验证，成人非商业；版本分别1.0.0，student是技术角色。情感维度“出现得更多”可能被读作频率，应小幅澄清为被肯定的题项线索数。"
+  },
+  "items": [
+    {
+      "number": 1,
+      "runtimeItemCode": "DJGLS6_01",
+      "en": "I experience a general sense of emptiness",
+      "zh": "我感到一种空虚感。",
+      "dimension": "emotional",
+      "mapping": {
+        "no": 0,
+        "middle": 1,
+        "yes": 1
+      },
+      "result": "固定双语与运行时一致，语义基本对应，待人工译审。"
+    },
+    {
+      "number": 2,
+      "runtimeItemCode": "DJGLS6_02",
+      "en": "I miss having people around",
+      "zh": "我想念有人在身边的感觉。",
+      "dimension": "emotional",
+      "mapping": {
+        "no": 0,
+        "middle": 1,
+        "yes": 1
+      },
+      "result": "固定双语与运行时一致，语义基本对应，待人工译审。"
+    },
+    {
+      "number": 3,
+      "runtimeItemCode": "DJGLS6_03",
+      "en": "Often, I feel rejected",
+      "zh": "我常常感到被拒绝。",
+      "dimension": "emotional",
+      "mapping": {
+        "no": 0,
+        "middle": 1,
+        "yes": 1
+      },
+      "result": "固定双语与运行时一致，语义基本对应，待人工译审。"
+    },
+    {
+      "number": 4,
+      "runtimeItemCode": "DJGLS6_04",
+      "en": "There are plenty of people that I can lean on in case of trouble",
+      "zh": "遇到困难时，我有很多可以依靠的人。",
+      "dimension": "social",
+      "mapping": {
+        "no": 1,
+        "middle": 1,
+        "yes": 0
+      },
+      "result": "固定双语与运行时一致，语义基本对应，待人工译审。"
+    },
+    {
+      "number": 5,
+      "runtimeItemCode": "DJGLS6_05",
+      "en": "There are many people that I can count on completely",
+      "zh": "有很多人是我可以完全信赖的。",
+      "dimension": "social",
+      "mapping": {
+        "no": 1,
+        "middle": 1,
+        "yes": 0
+      },
+      "result": "固定双语与运行时一致，语义基本对应，待人工译审。"
+    },
+    {
+      "number": 6,
+      "runtimeItemCode": "DJGLS6_06",
+      "en": "There are enough people that I feel close to",
+      "zh": "有足够多的人让我感到亲近。",
+      "dimension": "social",
+      "mapping": {
+        "no": 1,
+        "middle": 1,
+        "yes": 0
+      },
+      "result": "固定双语与运行时一致，语义基本对应，待人工译审。"
+    }
+  ],
+  "instruction": {
+    "text": "请根据你目前的情况，判断下面每句话与你的感受是否相符。没有标准答案。",
+    "sources": [
+      {
+        "file": {
+          "path": "docs/scale-instruments/research-drafts/djgls6/1.0.0/bilingual-content.json",
+          "gitBlob": "c3338dca7882bd7ad596c83e3a013f31ba711735",
+          "sha256": "e95070a5a38b07cfa9ac4800ae87e00cbc4005476735adba7892166e7a330257"
+        },
+        "field": "instructions"
+      },
+      {
+        "file": {
+          "path": "docs/scale-instruments/research-drafts/djgls6/1.0.0/reviewed-source-pack.json",
+          "gitBlob": "80547ed22fdeca4ebe7e8627dca009b13b073e57",
+          "sha256": "f5ba39b28a8a0dd753d4980491633cfce958805dafdea2767990fdf04d629a0a"
+        },
+        "field": "instructions_zh"
+      }
+    ],
+    "proposedBinding": {
+      "schemaVersion": 1,
+      "text": "请根据你目前的情况，判断下面每句话与你的感受是否相符。没有标准答案。",
+      "language": "zh-CN",
+      "version": "1.0.0",
+      "source": "docs/scale-instruments/research-drafts/djgls6/1.0.0/bilingual-content.json#instructions"
+    },
+    "qualification": "项目解释性指导语，无固定回忆期；绑定版本为拟议标识，非审校。"
+  },
+  "ordinaryRevisions": [
+    {
+      "jsonPath": "executable.definition.report.interpretations[1].summary",
+      "old": "回答汇总越高，表示这些体验在本次回答中出现得更多",
+      "new": "回答汇总越高，表示本次回答中有关这些体验的线索更多",
+      "reason": "二元题项数量而非可推断体验频率；其余报告无需重写，按既有报告版本轴处理。"
+    }
+  ],
+  "manualPending": [
+    "第2题译法及全部中文工作稿待独立译审、认知访谈和目标人群验证。",
+    "实质变更题意、二元键向、缺失规则或阈值需原据和版本影响交root协调。",
+    "保留固定来源非商业及工作译稿限制，未开展新权利研究。"
+  ],
+  "notExecuted": [
+    "未运行golden、评分、截图、四入口、系统、DB、CI，未写仓库。",
+    "历史验证和合成报告仅作为固定来源既有记录，不声称本次执行。"
+  ]
+}

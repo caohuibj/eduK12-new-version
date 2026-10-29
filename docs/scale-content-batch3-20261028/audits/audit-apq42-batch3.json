@@ -1,0 +1,653 @@
+{
+  "instrument": "apq42_parent_global_zh_cn_research:1.0.0",
+  "source_commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "source_files": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/apq42_parent_global_zh_cn_research/1.0.0/source.json",
+      "blob": "14ad739f89a99c41baddc8b31441704b18c3f850",
+      "sha256": "6ee31b0d77723f252dbbdab3c92465dfd817606d3f1756745a326103c2bce842"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/apq42_parent_global_zh_cn_research/1.0.0/instrument.ts",
+      "blob": "0eed070bb879576339c5a71afdf34c0026591fd3",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/apq42_parent_global_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+      "blob": "56e3117d4eedeb7c550efae8354aa6830fd3906d",
+      "sha256": "9a16158327a9ffca53f239e7fddc95e920b43a3e2676eb6d480fa4bfd516f9f7"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/apq42_parent_global/1.0.0/README.md",
+      "blob": "4a17d341e56d806c51bd8bc7ef220a62395310c4",
+      "sha256": "ffdaf15875544e368016dadee14aae33b4d3fca4db9c2e5e5f774844ab7462fb"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/apq42_parent_global/1.0.0/source-manifest.json",
+      "blob": "6f99297e1864eeb2f0eaaffc100d06957cdb2021",
+      "sha256": "dc180996bc81a41daee7b2f3eda84e8cee21e7d1d42ceb545593daa64a9c0bc0"
+    }
+  ],
+  "source_form": "https://faculty.lsu.edu/pfricklab/pdfs/alabamaparenting-pdfs/apg-parent-form.pdf；本次以官方扫描/OCR核对42题行为及顺序，归属依据固定研究manifest，不声称本次另核作者计分手册。",
+  "three_parts": {
+    "items_and_instruction": {
+      "items": [
+        {
+          "number": 1,
+          "code": "APQ42_01",
+          "original_meaning_summary": "友好交谈",
+          "chinese": "你会和孩子友好地交谈。",
+          "manifest_dimension": "involvement",
+          "reverse": false,
+          "transform": "identity",
+          "review": "中文与官方扫描该题核心行为一致；保留工作译稿状态。"
+        },
+        {
+          "number": 2,
+          "code": "APQ42_02",
+          "original_meaning_summary": "孩子做得好时告知",
+          "chinese": "当孩子把某件事做得不错时，你会让孩子知道这一点。",
+          "manifest_dimension": "positive_parenting",
+          "reverse": false,
+          "transform": "identity",
+          "review": "中文与官方扫描该题核心行为一致；保留工作译稿状态。"
+        },
+        {
+          "number": 3,
+          "code": "APQ42_03",
+          "original_meaning_summary": "威胁惩罚但未实际惩罚",
+          "chinese": "你威胁要惩罚孩子，但后来没有真的惩罚。",
+          "manifest_dimension": "inconsistent_discipline",
+          "reverse": false,
+          "transform": "identity",
+          "review": "中文与官方扫描该题核心行为一致；保留工作译稿状态。"
+        },
+        {
+          "number": 4,
+          "code": "APQ42_04",
+          "original_meaning_summary": "主动协助特殊活动",
+          "chinese": "你会主动协助孩子参加的特别活动（例如体育、童子军或青少年团体活动）。",
+          "manifest_dimension": "involvement",
+          "reverse": false,
+          "transform": "identity",
+          "review": "原版例子含教会青年团体，译文为青少年团体，已扩大示例；记录文化适配并待人工译审。"
+        },
+        {
+          "number": 5,
+          "code": "APQ42_05",
+          "original_meaning_summary": "好行为额外奖励",
+          "chinese": "孩子听话或表现良好时，你会给予额外奖励或东西。",
+          "manifest_dimension": "positive_parenting",
+          "reverse": false,
+          "transform": "identity",
+          "review": "中文与官方扫描该题核心行为一致；保留工作译稿状态。"
+        },
+        {
+          "number": 6,
+          "code": "APQ42_06",
+          "original_meaning_summary": "未留言或告知去向",
+          "chinese": "孩子外出时没有留下字条或告诉你要去哪里。",
+          "manifest_dimension": "poor_monitoring",
+          "reverse": false,
+          "transform": "identity",
+          "review": "中文与官方扫描该题核心行为一致；保留工作译稿状态。"
+        },
+        {
+          "number": 7,
+          "code": "APQ42_07",
+          "original_meaning_summary": "共同游戏",
+          "chinese": "你会和孩子玩游戏，或一起做其他有趣的事情。",
+          "manifest_dimension": "involvement",
+          "reverse": false,
+          "transform": "identity",
+          "review": "中文与官方扫描该题核心行为一致；保留工作译稿状态。"
+        },
+        {
+          "number": 8,
+          "code": "APQ42_08",
+          "original_meaning_summary": "孩子说服家长免于惩罚",
+          "chinese": "孩子做错事后会说服你不要惩罚自己。",
+          "manifest_dimension": "inconsistent_discipline",
+          "reverse": false,
+          "transform": "identity",
+          "review": "“不要惩罚自己”代词可能误解为家长；可建议“不要惩罚孩子”，明确孩子免受惩罚并保留原意，纳入版本治理。"
+        },
+        {
+          "number": 9,
+          "code": "APQ42_09",
+          "original_meaning_summary": "问学校一天",
+          "chinese": "你会问孩子当天在学校过得怎样。",
+          "manifest_dimension": "involvement",
+          "reverse": false,
+          "transform": "identity",
+          "review": "中文与官方扫描该题核心行为一致；保留工作译稿状态。"
+        },
+        {
+          "number": 10,
+          "code": "APQ42_10",
+          "original_meaning_summary": "超过宵禁回家",
+          "chinese": "孩子晚上超过规定的时间才回家。",
+          "manifest_dimension": "poor_monitoring",
+          "reverse": false,
+          "transform": "identity",
+          "review": "中文与官方扫描该题核心行为一致；保留工作译稿状态。"
+        },
+        {
+          "number": 11,
+          "code": "APQ42_11",
+          "original_meaning_summary": "帮家庭作业",
+          "chinese": "你会帮助孩子做家庭作业。",
+          "manifest_dimension": "involvement",
+          "reverse": false,
+          "transform": "identity",
+          "review": "中文与官方扫描该题核心行为一致；保留工作译稿状态。"
+        },
+        {
+          "number": 12,
+          "code": "APQ42_12",
+          "original_meaning_summary": "觉得要求服从不值得",
+          "chinese": "你认为让孩子服从你的要求太费劲，不值得这样做。",
+          "manifest_dimension": "inconsistent_discipline",
+          "reverse": false,
+          "transform": "identity",
+          "review": "中文与官方扫描该题核心行为一致；保留工作译稿状态。"
+        },
+        {
+          "number": 13,
+          "code": "APQ42_13",
+          "original_meaning_summary": "称赞做得好",
+          "chinese": "孩子做得好时，你会称赞孩子。",
+          "manifest_dimension": "positive_parenting",
+          "reverse": false,
+          "transform": "identity",
+          "review": "中文与官方扫描该题核心行为一致；保留工作译稿状态。"
+        },
+        {
+          "number": 14,
+          "code": "APQ42_14",
+          "original_meaning_summary": "问即将到来的一天计划",
+          "chinese": "你会问孩子明天有什么计划。",
+          "manifest_dimension": "involvement",
+          "reverse": false,
+          "transform": "identity",
+          "review": "原文coming day，译为明天基本相符；人工译审可确认语境。"
+        },
+        {
+          "number": 15,
+          "code": "APQ42_15",
+          "original_meaning_summary": "开车送活动",
+          "chinese": "你会开车送孩子去参加某项特别活动。",
+          "manifest_dimension": "involvement",
+          "reverse": false,
+          "transform": "identity",
+          "review": "中文与官方扫描该题核心行为一致；保留工作译稿状态。"
+        },
+        {
+          "number": 16,
+          "code": "APQ42_16",
+          "original_meaning_summary": "表扬好行为",
+          "chinese": "孩子表现好时，你会表扬孩子。",
+          "manifest_dimension": "positive_parenting",
+          "reverse": false,
+          "transform": "identity",
+          "review": "中文与官方扫描该题核心行为一致；保留工作译稿状态。"
+        },
+        {
+          "number": 17,
+          "code": "APQ42_17",
+          "original_meaning_summary": "与不认识的朋友外出",
+          "chinese": "孩子会和你不认识的朋友外出。",
+          "manifest_dimension": "poor_monitoring",
+          "reverse": false,
+          "transform": "identity",
+          "review": "中文与官方扫描该题核心行为一致；保留工作译稿状态。"
+        },
+        {
+          "number": 18,
+          "code": "APQ42_18",
+          "original_meaning_summary": "做得好时拥抱或亲吻",
+          "chinese": "孩子做得好时，你会拥抱或亲吻孩子。",
+          "manifest_dimension": "positive_parenting",
+          "reverse": false,
+          "transform": "identity",
+          "review": "中文与官方扫描该题核心行为一致；保留工作译稿状态。"
+        },
+        {
+          "number": 19,
+          "code": "APQ42_19",
+          "original_meaning_summary": "外出无规定回家时间",
+          "chinese": "孩子外出时没有设定回家的时间。",
+          "manifest_dimension": "poor_monitoring",
+          "reverse": false,
+          "transform": "identity",
+          "review": "中文与官方扫描该题核心行为一致；保留工作译稿状态。"
+        },
+        {
+          "number": 20,
+          "code": "APQ42_20",
+          "original_meaning_summary": "谈孩子朋友",
+          "chinese": "你会和孩子谈论孩子的朋友。",
+          "manifest_dimension": "involvement",
+          "reverse": false,
+          "transform": "identity",
+          "review": "中文与官方扫描该题核心行为一致；保留工作译稿状态。"
+        },
+        {
+          "number": 21,
+          "code": "APQ42_21",
+          "original_meaning_summary": "天黑后无成人外出",
+          "chinese": "天黑以后，孩子会在没有成年人陪同的情况下外出。",
+          "manifest_dimension": "poor_monitoring",
+          "reverse": false,
+          "transform": "identity",
+          "review": "中文与官方扫描该题核心行为一致；保留工作译稿状态。"
+        },
+        {
+          "number": 22,
+          "code": "APQ42_22",
+          "original_meaning_summary": "提前结束惩罚",
+          "chinese": "你会提前结束对孩子的惩罚（例如提前解除原先规定的限制）。",
+          "manifest_dimension": "inconsistent_discipline",
+          "reverse": false,
+          "transform": "identity",
+          "review": "中文与官方扫描该题核心行为一致；保留工作译稿状态。"
+        },
+        {
+          "number": 23,
+          "code": "APQ42_23",
+          "original_meaning_summary": "孩子参与计划家庭活动",
+          "chinese": "孩子会帮忙筹划家庭活动。",
+          "manifest_dimension": "involvement",
+          "reverse": false,
+          "transform": "identity",
+          "review": "中文与官方扫描该题核心行为一致；保留工作译稿状态。"
+        },
+        {
+          "number": 24,
+          "code": "APQ42_24",
+          "original_meaning_summary": "忙得忘记孩子去向",
+          "chinese": "你会忙到忘记孩子在哪里、正在做什么。",
+          "manifest_dimension": "poor_monitoring",
+          "reverse": false,
+          "transform": "identity",
+          "review": "中文与官方扫描该题核心行为一致；保留工作译稿状态。"
+        },
+        {
+          "number": 25,
+          "code": "APQ42_25",
+          "original_meaning_summary": "做错未受罚",
+          "chinese": "孩子做错事后，没有受到惩罚。",
+          "manifest_dimension": "inconsistent_discipline",
+          "reverse": false,
+          "transform": "identity",
+          "review": "中文与官方扫描该题核心行为一致；保留工作译稿状态。"
+        },
+        {
+          "number": 26,
+          "code": "APQ42_26",
+          "original_meaning_summary": "参加学校会议",
+          "chinese": "你会参加家长教师协会会议、家长会或孩子学校举办的其他会议。",
+          "manifest_dimension": "involvement",
+          "reverse": false,
+          "transform": "identity",
+          "review": "中文与官方扫描该题核心行为一致；保留工作译稿状态。"
+        },
+        {
+          "number": 27,
+          "code": "APQ42_27",
+          "original_meaning_summary": "肯定帮助做家务",
+          "chinese": "孩子帮忙做家务时，你会告诉孩子你喜欢这样的举动。",
+          "manifest_dimension": "positive_parenting",
+          "reverse": false,
+          "transform": "identity",
+          "review": "中文与官方扫描该题核心行为一致；保留工作译稿状态。"
+        },
+        {
+          "number": 28,
+          "code": "APQ42_28",
+          "original_meaning_summary": "不检查是否按时回家",
+          "chinese": "你没有检查孩子是否按规定时间回家。",
+          "manifest_dimension": "poor_monitoring",
+          "reverse": false,
+          "transform": "identity",
+          "review": "中文与官方扫描该题核心行为一致；保留工作译稿状态。"
+        },
+        {
+          "number": 29,
+          "code": "APQ42_29",
+          "original_meaning_summary": "家长出门不告知孩子去向",
+          "chinese": "你出门时不告诉孩子要去哪里。",
+          "manifest_dimension": "poor_monitoring",
+          "reverse": false,
+          "transform": "identity",
+          "review": "中文与官方扫描该题核心行为一致；保留工作译稿状态。"
+        },
+        {
+          "number": 30,
+          "code": "APQ42_30",
+          "original_meaning_summary": "放学比预期晚一小时以上",
+          "chinese": "孩子放学回家，会比你预计的时间晚一个多小时。",
+          "manifest_dimension": "poor_monitoring",
+          "reverse": false,
+          "transform": "identity",
+          "review": "中文与官方扫描该题核心行为一致；保留工作译稿状态。"
+        },
+        {
+          "number": 31,
+          "code": "APQ42_31",
+          "original_meaning_summary": "惩罚随心情变化",
+          "chinese": "你给孩子的惩罚取决于你当时的心情。",
+          "manifest_dimension": "inconsistent_discipline",
+          "reverse": false,
+          "transform": "identity",
+          "review": "中文与官方扫描该题核心行为一致；保留工作译稿状态。"
+        },
+        {
+          "number": 32,
+          "code": "APQ42_32",
+          "original_meaning_summary": "在家无成人监督",
+          "chinese": "孩子在家时没有成年人监督。",
+          "manifest_dimension": "poor_monitoring",
+          "reverse": false,
+          "transform": "identity",
+          "review": "中文与官方扫描该题核心行为一致；保留工作译稿状态。"
+        },
+        {
+          "number": 33,
+          "code": "APQ42_33",
+          "original_meaning_summary": "用手打屁股",
+          "chinese": "孩子做错事时，你会用手打孩子的屁股。",
+          "manifest_dimension": "corporal_punishment",
+          "reverse": false,
+          "transform": "identity",
+          "review": "中文与官方扫描该题核心行为一致；保留工作译稿状态。"
+        },
+        {
+          "number": 34,
+          "code": "APQ42_34",
+          "original_meaning_summary": "行为不当时忽视",
+          "chinese": "孩子行为不当时，你会不理睬孩子。",
+          "manifest_dimension": "other_discipline_unscored",
+          "reverse": false,
+          "transform": "identity",
+          "review": "中文与官方扫描该题核心行为一致；保留工作译稿状态。"
+        },
+        {
+          "number": 35,
+          "code": "APQ42_35",
+          "original_meaning_summary": "做错时掌掴",
+          "chinese": "孩子做错事时，你会扇孩子耳光。",
+          "manifest_dimension": "corporal_punishment",
+          "reverse": false,
+          "transform": "identity",
+          "review": "原文slap并未指定面部，“扇耳光”增加部位，属潜在实质译义偏移；人工译审及版本协调，不静默更改。"
+        },
+        {
+          "number": 36,
+          "code": "APQ42_36",
+          "original_meaning_summary": "剥夺特权或钱财",
+          "chinese": "你会通过取消孩子的某些权利或收走钱来惩罚孩子。",
+          "manifest_dimension": "other_discipline_unscored",
+          "reverse": false,
+          "transform": "identity",
+          "review": "中文与官方扫描该题核心行为一致；保留工作译稿状态。"
+        },
+        {
+          "number": 37,
+          "code": "APQ42_37",
+          "original_meaning_summary": "送回房间惩罚",
+          "chinese": "你会让孩子回自己的房间，作为惩罚。",
+          "manifest_dimension": "other_discipline_unscored",
+          "reverse": false,
+          "transform": "identity",
+          "review": "中文与官方扫描该题核心行为一致；保留工作译稿状态。"
+        },
+        {
+          "number": 38,
+          "code": "APQ42_38",
+          "original_meaning_summary": "皮带树枝或其他物品打",
+          "chinese": "孩子做错事时，你会用皮带、树枝或其他物品打孩子。",
+          "manifest_dimension": "corporal_punishment",
+          "reverse": false,
+          "transform": "identity",
+          "review": "器物击打，为体罚维；非第39题。"
+        },
+        {
+          "number": 39,
+          "code": "APQ42_39",
+          "original_meaning_summary": "大喊尖叫",
+          "chinese": "孩子做错事时，你会对孩子大喊或尖叫。",
+          "manifest_dimension": "other_discipline_unscored",
+          "reverse": false,
+          "transform": "identity",
+          "review": "对孩子大喊，Other Discipline，非体罚维。"
+        },
+        {
+          "number": 40,
+          "code": "APQ42_40",
+          "original_meaning_summary": "平静解释不对原因",
+          "chinese": "孩子行为不当时，你会平静地解释为什么那样做不对。",
+          "manifest_dimension": "other_discipline_unscored",
+          "reverse": false,
+          "transform": "identity",
+          "review": "中文与官方扫描该题核心行为一致；保留工作译稿状态。"
+        },
+        {
+          "number": 41,
+          "code": "APQ42_41",
+          "original_meaning_summary": "角落暂停惩罚",
+          "chinese": "你会用“暂停”（让孩子坐在或站在角落）作为惩罚。",
+          "manifest_dimension": "other_discipline_unscored",
+          "reverse": false,
+          "transform": "identity",
+          "review": "time out译为暂停，角落示例保留；成人读者对术语理解待人工译审。"
+        },
+        {
+          "number": 42,
+          "code": "APQ42_42",
+          "original_meaning_summary": "额外家务惩罚",
+          "chinese": "你会让孩子额外做家务，作为惩罚。",
+          "manifest_dimension": "other_discipline_unscored",
+          "reverse": false,
+          "transform": "identity",
+          "review": "中文与官方扫描该题核心行为一致；保留工作译稿状态。"
+        }
+      ],
+      "anchors": "1从不、2几乎从不、3有时、4经常、5总是；对应原版Never/Almost Never/Sometimes/Often/Always。",
+      "instruction": {
+        "path": "server-version/backend/src/modules/scale/instruments/apq42_parent_global_zh_cn_research/1.0.0/source.json",
+        "field": "/instruction",
+        "blob": "14ad739f89a99c41baddc8b31441704b18c3f850",
+        "sha256": "6ee31b0d77723f252dbbdab3c92465dfd817606d3f1756745a326103c2bce842",
+        "value": {
+          "schemaVersion": 1,
+          "text": "请根据你家中通常出现的情形回答以下关于亲子相处的说法。1表示从不，2几乎从不，3有时，4经常，5总是。尽量回答全部问题；不存在正确或错误的答案。",
+          "language": "zh-CN",
+          "version": "1.0.0",
+          "source": "LSU APQ Parent Global原文指导语的独立简体中文工作译稿，非作者核准中文版。"
+        },
+        "assessment": "已在顶层独立绑定；项目独立中文工作稿，非作者核准译文。指导语原文要求按家庭通常出现频率作答并全部回答，未规定固定回忆期。"
+      },
+      "scope": "家长报告、被评价儿童6–13岁（72–167月为保守项目范围）；非儿童自答或完整家庭评估。"
+    },
+    "scoring": {
+      "dimensions": [
+        {
+          "key": "involvement",
+          "type": "dimension",
+          "items": [
+            1,
+            4,
+            7,
+            9,
+            11,
+            14,
+            15,
+            20,
+            23,
+            26
+          ],
+          "weights": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "aggregation": "sum",
+          "direction": "higher_is_more",
+          "missing": {
+            "type": "complete_required"
+          }
+        },
+        {
+          "key": "positive_parenting",
+          "type": "dimension",
+          "items": [
+            2,
+            5,
+            13,
+            16,
+            18,
+            27
+          ],
+          "weights": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "aggregation": "sum",
+          "direction": "higher_is_more",
+          "missing": {
+            "type": "complete_required"
+          }
+        },
+        {
+          "key": "poor_monitoring",
+          "type": "dimension",
+          "items": [
+            6,
+            10,
+            17,
+            19,
+            21,
+            24,
+            28,
+            29,
+            30,
+            32
+          ],
+          "weights": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "aggregation": "sum",
+          "direction": "higher_is_more",
+          "missing": {
+            "type": "complete_required"
+          }
+        },
+        {
+          "key": "inconsistent_discipline",
+          "type": "dimension",
+          "items": [
+            3,
+            8,
+            12,
+            22,
+            25,
+            31
+          ],
+          "weights": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "aggregation": "sum",
+          "direction": "higher_is_more",
+          "missing": {
+            "type": "complete_required"
+          }
+        },
+        {
+          "key": "corporal_punishment",
+          "type": "dimension",
+          "items": [
+            33,
+            35,
+            38
+          ],
+          "weights": [
+            1,
+            1,
+            1
+          ],
+          "aggregation": "sum",
+          "direction": "higher_is_more",
+          "missing": {
+            "type": "complete_required"
+          }
+        }
+      ],
+      "other_unscored": [
+        34,
+        36,
+        37,
+        39,
+        40,
+        41,
+        42
+      ],
+      "no_total": "42题没有总分，其他管教7题没有第六维；42个itemRules均identity。",
+      "missing": "每题required=false，score默认及各维complete_required；静态定义每个维度在其各项完整时才可计算，不补零/分母折算；项目选择，非作者缺失规范。历史golden期望的overall quality=invalid不可断言运行时表现，本次未执行。",
+      "schema_boundary": "五个评分type=dimension且report.primaryScoreKeys与scoreOrder引用这些维度；无虚构total。既知schema兼容缺口不通过改构念、改total或新建系统解决，交root处理。",
+      "thresholds": "referencePolicy none；没有中文常模、百分位、诊断分界或高低标签。"
+    },
+    "report": {
+      "references": "五个interpretation的scoreKey各自对应五维，primaryScoreKeys和scoreOrder相同；higher_is_more表明该题组所述行为更多，不是所有维度同向代表较好。",
+      "direction_risk": "poor_monitoring摘要说通常知道多少去向，未明确分数越高是监督不足场景更多，可能被误读为监督更多；建议补充明确的一句方向说明。",
+      "minimal_report_edit": {
+        "path": "server-version/backend/src/modules/scale/instruments/apq42_parent_global_zh_cn_research/1.0.0/source.json",
+        "field": "/executable/definition/report/interpretations/2/summary",
+        "suggestion": "保留原文并补充：该维度分数越高，表示你报告这些监督不足相关情形出现得越频繁。",
+        "version_impact": "仅报告措辞；遵循既有报告版本管理。"
+      },
+      "other": "参与、积极教养、管教不一致与体罚报告有家庭情景、具体反思和儿童安全建议；不评分家长品格，不必因长度强改。体罚得分不能单独判定风险。",
+      "audience": "报告为家长亲子语境；source缺report.audienceContract，不能无凭据虚构成人专家审核。",
+      "versions": "measurement/scoring/localization/report均1.0.0；无参考集。"
+    }
+  },
+  "ordinary_suggestions": [
+    "第8题代词明确为孩子，保持原意；遵守冻结版本治理。",
+    "监督不足报告明确高分方向，保留其余合格报告。"
+  ],
+  "substantive_coordination": [
+    "第35题英文掌掴未指定脸部，中文扇耳光更具体；第4题例子适配需人工翻译审校。实质题意调整须先协调版本，不静默改动。",
+    "无依据变更五维归属、增加总分、反向键或阈值。"
+  ],
+  "human_status": "expertReviewStatus PENDING，cognitiveDebrief NOT_ESTABLISHED，目标人群效度与译文等值待完成；作者许可事项维持原始待核状态，不做新授权判断。",
+  "not_executed": [
+    "未修改repo、分支、DB、CI或生产；未运行golden、系统、浏览器、截图或四入口。",
+    "既有15组期望是源内定义，非本次运行通过。"
+  ],
+  "conclusion": "可交root做受限研究候选内容审议；题35译义及既知schema缺口需协调，人工译审/权限状态未完成，不声称正式发布就绪。"
+}

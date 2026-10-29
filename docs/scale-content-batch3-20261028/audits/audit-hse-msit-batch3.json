@@ -1,0 +1,804 @@
+{
+  "instrument": "hse_msit_zh_cn:1.0.0",
+  "source_commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "source_files": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/hse_msit_zh_cn/1.0.0/source.json",
+      "blob": "b644be50127582c88890e0d03955e076b9cc6f92",
+      "sha256": "7e5021f4c8031f2d20650b04342e0025e785ac08f912a4520972f564f6122ef9"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/hse_msit_zh_cn/1.0.0/instrument.ts",
+      "blob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/hse_msit_zh_cn/1.0.0/README.md",
+      "blob": "c82da36a3c609258f6098abf41570ed78b5e0b55",
+      "sha256": "834af9475b83b02730552171167f705d066a4d13624a4a8c7e9f27d1d54c6abd"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/hse_msit_zh_cn/1.0.0/bilingual-content.json",
+      "blob": "40a1b5d92377e41391d7e6cc2806789f26dd62d3",
+      "sha256": "f38be23bf5a614fa99b25fe43984b460d98cec9702e9ab7650b79affb8ae4df5"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/hse_msit_zh_cn/1.0.0/reviewed-source-pack.json",
+      "blob": "b5428d7fb1ae8538867b8537e285d71aa00c71fa",
+      "sha256": "da5635336f7fa46a9bff5ac8917c4acb3a5411e307ec831e8c83bd303f2ed347"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/hse_msit_zh_cn/1.0.0/scoring-and-thresholds.md",
+      "blob": "1743c80faf89b619e6ead0cbc8b8532b0f52cc24",
+      "sha256": "e5c58b1eab228c71c8c3d0a72491eebc36d101a94cfc2d9850c0d1f15f0f425c"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/hse_msit_zh_cn/1.0.0/references.md",
+      "blob": "fdf6ce16b2a86369f649f96dc717c80b277e018a",
+      "sha256": "c1490011e805fa8fb08a7521b82077b2f95fb112ef9a370b6e935f0542d2e06b"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/hse_msit_zh_cn/1.0.0/report-example.md",
+      "blob": "1905666ff5b089965323b3bd6b7b6df5a35227f7",
+      "sha256": "9f5bbf3a5bd8a383f97aec37ce9883f61089047334ce689ce2fb9c3f95f5f49e"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/hse_msit_zh_cn/1.0.0/local-validation.json",
+      "blob": "2743183dc58b461191be49ce69f388af5407ec50",
+      "sha256": "69703d4a99fd61278a29ef1f9bd6e7c19bf9533d55f702cb7274ec2c085722f4"
+    }
+  ],
+  "three_parts": {
+    "items_instruction": {
+      "items": [
+        {
+          "number": 1,
+          "code": "HSE-01",
+          "english": "I am clear what is expected of me at work",
+          "chinese": "我清楚工作中对我的要求。",
+          "runtime": "工作条件会影响身心状态。以下问题帮助了解当前工作环境，并为后续改善提供线索。为便于比较，请根据过去六个月的工作经历作答。\n\n我清楚工作中对我的要求。",
+          "responseSetKey": "hse_frequency_1_5",
+          "transform": "identity",
+          "review": "与固定英文双语材料核心意思对应，独立中文待人工译审。"
+        },
+        {
+          "number": 2,
+          "code": "HSE-02",
+          "english": "I can decide when to take a break",
+          "chinese": "我可以决定什么时候休息一下。",
+          "runtime": "我可以决定什么时候休息一下。",
+          "responseSetKey": "hse_frequency_1_5",
+          "transform": "identity",
+          "review": "与固定英文双语材料核心意思对应，独立中文待人工译审。"
+        },
+        {
+          "number": 3,
+          "code": "HSE-03",
+          "english": "Different groups at work demand things from me that are hard to combine",
+          "chinese": "工作中不同群体对我的要求很难兼顾。",
+          "runtime": "工作中不同群体对我的要求很难兼顾。",
+          "responseSetKey": "hse_frequency_1_5",
+          "transform": "reverse",
+          "review": "与固定英文双语材料核心意思对应，独立中文待人工译审。"
+        },
+        {
+          "number": 4,
+          "code": "HSE-04",
+          "english": "I know how to go about getting my job done",
+          "chinese": "我知道该怎样完成自己的工作。",
+          "runtime": "我知道该怎样完成自己的工作。",
+          "responseSetKey": "hse_frequency_1_5",
+          "transform": "identity",
+          "review": "与固定英文双语材料核心意思对应，独立中文待人工译审。"
+        },
+        {
+          "number": 5,
+          "code": "HSE-05",
+          "english": "I am subject to personal harassment in the form of unkind words or behaviour",
+          "chinese": "我遭受到针对个人的骚扰，例如不友善的言语或行为。",
+          "runtime": "我遭受到针对个人的骚扰，例如不友善的言语或行为。",
+          "responseSetKey": "hse_frequency_1_5",
+          "transform": "reverse",
+          "review": "与固定英文双语材料核心意思对应，独立中文待人工译审。"
+        },
+        {
+          "number": 6,
+          "code": "HSE-06",
+          "english": "I have unachievable deadlines",
+          "chinese": "我被要求在无法做到的期限内完成工作。",
+          "runtime": "我被要求在无法做到的期限内完成工作。",
+          "responseSetKey": "hse_frequency_1_5",
+          "transform": "reverse",
+          "review": "与固定英文双语材料核心意思对应，独立中文待人工译审。"
+        },
+        {
+          "number": 7,
+          "code": "HSE-07",
+          "english": "If work gets difficult, my colleagues will help me",
+          "chinese": "如果工作遇到困难，同事会帮助我。",
+          "runtime": "如果工作遇到困难，同事会帮助我。",
+          "responseSetKey": "hse_frequency_1_5",
+          "transform": "identity",
+          "review": "与固定英文双语材料核心意思对应，独立中文待人工译审。"
+        },
+        {
+          "number": 8,
+          "code": "HSE-08",
+          "english": "I am given supportive feedback on the work I do",
+          "chinese": "我所做的工作能得到支持性的反馈。",
+          "runtime": "我所做的工作能得到支持性的反馈。",
+          "responseSetKey": "hse_frequency_1_5",
+          "transform": "identity",
+          "review": "与固定英文双语材料核心意思对应，独立中文待人工译审。"
+        },
+        {
+          "number": 9,
+          "code": "HSE-09",
+          "english": "I have to work very intensively",
+          "chinese": "我不得不以很高的强度工作。",
+          "runtime": "我不得不以很高的强度工作。",
+          "responseSetKey": "hse_frequency_1_5",
+          "transform": "reverse",
+          "review": "与固定英文双语材料核心意思对应，独立中文待人工译审。"
+        },
+        {
+          "number": 10,
+          "code": "HSE-10",
+          "english": "I have a say in my own work speed",
+          "chinese": "对于自己的工作速度，我有发言权。",
+          "runtime": "对于自己的工作速度，我有发言权。",
+          "responseSetKey": "hse_frequency_1_5",
+          "transform": "identity",
+          "review": "与固定英文双语材料核心意思对应，独立中文待人工译审。"
+        },
+        {
+          "number": 11,
+          "code": "HSE-11",
+          "english": "I am clear what my duties and responsibilities are",
+          "chinese": "我清楚自己的工作职责。",
+          "runtime": "我清楚自己的工作职责。",
+          "responseSetKey": "hse_frequency_1_5",
+          "transform": "identity",
+          "review": "与固定英文双语材料核心意思对应，独立中文待人工译审。"
+        },
+        {
+          "number": 12,
+          "code": "HSE-12",
+          "english": "I have to neglect some tasks because I have too much to do",
+          "chinese": "因为要做的事情太多，我不得不忽略某些任务。",
+          "runtime": "因为要做的事情太多，我不得不忽略某些任务。",
+          "responseSetKey": "hse_frequency_1_5",
+          "transform": "reverse",
+          "review": "与固定英文双语材料核心意思对应，独立中文待人工译审。"
+        },
+        {
+          "number": 13,
+          "code": "HSE-13",
+          "english": "I am clear about the goals and objectives for my department",
+          "chinese": "我清楚所在部门的目标。",
+          "runtime": "我清楚所在部门的目标。",
+          "responseSetKey": "hse_frequency_1_5",
+          "transform": "identity",
+          "review": "与固定英文双语材料核心意思对应，独立中文待人工译审。"
+        },
+        {
+          "number": 14,
+          "code": "HSE-14",
+          "english": "There is friction or anger between colleagues",
+          "chinese": "同事之间存在摩擦或愤怒情绪。",
+          "runtime": "同事之间存在摩擦或愤怒情绪。",
+          "responseSetKey": "hse_frequency_1_5",
+          "transform": "reverse",
+          "review": "与固定英文双语材料核心意思对应，独立中文待人工译审。"
+        },
+        {
+          "number": 15,
+          "code": "HSE-15",
+          "english": "I have a choice in deciding how I do my work",
+          "chinese": "我可以选择怎样开展自己的工作。",
+          "runtime": "我可以选择怎样开展自己的工作。",
+          "responseSetKey": "hse_frequency_1_5",
+          "transform": "identity",
+          "review": "与固定英文双语材料核心意思对应，独立中文待人工译审。"
+        },
+        {
+          "number": 16,
+          "code": "HSE-16",
+          "english": "I am unable to take sufficient breaks",
+          "chinese": "我无法获得充分的休息。",
+          "runtime": "我无法获得充分的休息。",
+          "responseSetKey": "hse_frequency_1_5",
+          "transform": "reverse",
+          "review": "与固定英文双语材料核心意思对应，独立中文待人工译审。"
+        },
+        {
+          "number": 17,
+          "code": "HSE-17",
+          "english": "I understand how my work fits into the overall aim of the organisation",
+          "chinese": "我理解自己的工作如何配合组织的总体目标。",
+          "runtime": "我理解自己的工作如何配合组织的总体目标。",
+          "responseSetKey": "hse_frequency_1_5",
+          "transform": "identity",
+          "review": "与固定英文双语材料核心意思对应，独立中文待人工译审。"
+        },
+        {
+          "number": 18,
+          "code": "HSE-18",
+          "english": "I am pressured to work long hours",
+          "chinese": "我受到压力，需要长时间工作。",
+          "runtime": "我受到压力，需要长时间工作。",
+          "responseSetKey": "hse_frequency_1_5",
+          "transform": "reverse",
+          "review": "与固定英文双语材料核心意思对应，独立中文待人工译审。"
+        },
+        {
+          "number": 19,
+          "code": "HSE-19",
+          "english": "I have a choice in deciding what I do at work",
+          "chinese": "我可以选择自己在工作中做什么。",
+          "runtime": "我可以选择自己在工作中做什么。",
+          "responseSetKey": "hse_frequency_1_5",
+          "transform": "identity",
+          "review": "与固定英文双语材料核心意思对应，独立中文待人工译审。"
+        },
+        {
+          "number": 20,
+          "code": "HSE-20",
+          "english": "I have to work very fast",
+          "chinese": "我不得不非常快速地工作。",
+          "runtime": "我不得不非常快速地工作。",
+          "responseSetKey": "hse_frequency_1_5",
+          "transform": "reverse",
+          "review": "与固定英文双语材料核心意思对应，独立中文待人工译审。"
+        },
+        {
+          "number": 21,
+          "code": "HSE-21",
+          "english": "I am subject to bullying at work",
+          "chinese": "我在工作中受到欺凌。",
+          "runtime": "我在工作中受到欺凌。",
+          "responseSetKey": "hse_frequency_1_5",
+          "transform": "reverse",
+          "review": "与固定英文双语材料核心意思对应，独立中文待人工译审。"
+        },
+        {
+          "number": 22,
+          "code": "HSE-22",
+          "english": "I have unrealistic time pressures",
+          "chinese": "我承受着不切实际的时间压力。",
+          "runtime": "我承受着不切实际的时间压力。",
+          "responseSetKey": "hse_frequency_1_5",
+          "transform": "reverse",
+          "review": "与固定英文双语材料核心意思对应，独立中文待人工译审。"
+        },
+        {
+          "number": 23,
+          "code": "HSE-23",
+          "english": "I can rely on my line manager to help me out with a work problem",
+          "chinese": "遇到工作问题时，我可以依靠直属主管提供帮助。",
+          "runtime": "遇到工作问题时，我可以依靠直属主管提供帮助。",
+          "responseSetKey": "hse_frequency_1_5",
+          "transform": "identity",
+          "review": "与固定英文双语材料核心意思对应，独立中文待人工译审。"
+        },
+        {
+          "number": 24,
+          "code": "HSE-24",
+          "english": "I get help and support I need from colleagues",
+          "chinese": "我能从同事那里得到所需要的帮助和支持。",
+          "runtime": "我能从同事那里得到所需要的帮助和支持。",
+          "responseSetKey": "hse_agreement_1_5",
+          "transform": "identity",
+          "review": "与固定英文双语材料核心意思对应，独立中文待人工译审。"
+        },
+        {
+          "number": 25,
+          "code": "HSE-25",
+          "english": "I have some say over the way I work",
+          "chinese": "对于自己的工作方式，我有一定发言权。",
+          "runtime": "对于自己的工作方式，我有一定发言权。",
+          "responseSetKey": "hse_agreement_1_5",
+          "transform": "identity",
+          "review": "与固定英文双语材料核心意思对应，独立中文待人工译审。"
+        },
+        {
+          "number": 26,
+          "code": "HSE-26",
+          "english": "I have sufficient opportunities to question managers about change at work",
+          "chinese": "关于工作中的变动，我有充分机会向管理者提问。",
+          "runtime": "关于工作中的变动，我有充分机会向管理者提问。",
+          "responseSetKey": "hse_agreement_1_5",
+          "transform": "identity",
+          "review": "与固定英文双语材料核心意思对应，独立中文待人工译审。"
+        },
+        {
+          "number": 27,
+          "code": "HSE-27",
+          "english": "I receive the respect at work I deserve from my colleagues",
+          "chinese": "我在工作中受到同事应有的尊重。",
+          "runtime": "我在工作中受到同事应有的尊重。",
+          "responseSetKey": "hse_agreement_1_5",
+          "transform": "identity",
+          "review": "与固定英文双语材料核心意思对应，独立中文待人工译审。"
+        },
+        {
+          "number": 28,
+          "code": "HSE-28",
+          "english": "Staff are always consulted about change at work",
+          "chinese": "工作发生变动时，总会征求员工的意见。",
+          "runtime": "工作发生变动时，总会征求员工的意见。",
+          "responseSetKey": "hse_agreement_1_5",
+          "transform": "identity",
+          "review": "与固定英文双语材料核心意思对应，独立中文待人工译审。"
+        },
+        {
+          "number": 29,
+          "code": "HSE-29",
+          "english": "I can talk to my line manager about something that has upset or annoyed me about work",
+          "chinese": "对于工作中让我难过或烦恼的事情，我可以与直属主管交谈。",
+          "runtime": "对于工作中让我难过或烦恼的事情，我可以与直属主管交谈。",
+          "responseSetKey": "hse_agreement_1_5",
+          "transform": "identity",
+          "review": "与固定英文双语材料核心意思对应，独立中文待人工译审。"
+        },
+        {
+          "number": 30,
+          "code": "HSE-30",
+          "english": "My working time can be flexible",
+          "chinese": "我的工作时间可以灵活安排。",
+          "runtime": "我的工作时间可以灵活安排。",
+          "responseSetKey": "hse_agreement_1_5",
+          "transform": "identity",
+          "review": "与固定英文双语材料核心意思对应，独立中文待人工译审。"
+        },
+        {
+          "number": 31,
+          "code": "HSE-31",
+          "english": "My colleagues are willing to listen to my work-related problems",
+          "chinese": "同事愿意倾听我与工作有关的问题。",
+          "runtime": "同事愿意倾听我与工作有关的问题。",
+          "responseSetKey": "hse_agreement_1_5",
+          "transform": "identity",
+          "review": "与固定英文双语材料核心意思对应，独立中文待人工译审。"
+        },
+        {
+          "number": 32,
+          "code": "HSE-32",
+          "english": "When changes are made at work, I am clear how they will work out in practice",
+          "chinese": "工作发生变动时，我清楚这些变动将如何实际开展。",
+          "runtime": "工作发生变动时，我清楚这些变动将如何实际开展。",
+          "responseSetKey": "hse_agreement_1_5",
+          "transform": "identity",
+          "review": "与固定英文双语材料核心意思对应，独立中文待人工译审。"
+        },
+        {
+          "number": 33,
+          "code": "HSE-33",
+          "english": "I am supported through emotionally demanding work",
+          "chinese": "面对情绪负荷较高的工作时，我能得到支持。",
+          "runtime": "面对情绪负荷较高的工作时，我能得到支持。",
+          "responseSetKey": "hse_agreement_1_5",
+          "transform": "identity",
+          "review": "与固定英文双语材料核心意思对应，独立中文待人工译审。"
+        },
+        {
+          "number": 34,
+          "code": "HSE-34",
+          "english": "Relationships at work are strained",
+          "chinese": "工作中的人际关系紧张。",
+          "runtime": "工作中的人际关系紧张。",
+          "responseSetKey": "hse_agreement_1_5",
+          "transform": "reverse",
+          "review": "与固定英文双语材料核心意思对应，独立中文待人工译审。"
+        },
+        {
+          "number": 35,
+          "code": "HSE-35",
+          "english": "My line manager encourages me at work",
+          "chinese": "直属主管在工作中鼓励我。",
+          "runtime": "直属主管在工作中鼓励我。",
+          "responseSetKey": "hse_agreement_1_5",
+          "transform": "identity",
+          "review": "与固定英文双语材料核心意思对应，独立中文待人工译审。"
+        }
+      ],
+      "options": [
+        {
+          "key": "hse_frequency_1_5",
+          "options": [
+            {
+              "value": "never",
+              "label": "从不",
+              "score": 1
+            },
+            {
+              "value": "seldom",
+              "label": "很少",
+              "score": 2
+            },
+            {
+              "value": "sometimes",
+              "label": "有时",
+              "score": 3
+            },
+            {
+              "value": "often",
+              "label": "经常",
+              "score": 4
+            },
+            {
+              "value": "always",
+              "label": "总是",
+              "score": 5
+            }
+          ]
+        },
+        {
+          "key": "hse_agreement_1_5",
+          "options": [
+            {
+              "value": "strongly_disagree",
+              "label": "非常不同意",
+              "score": 1
+            },
+            {
+              "value": "disagree",
+              "label": "不同意",
+              "score": 2
+            },
+            {
+              "value": "neutral",
+              "label": "中立",
+              "score": 3
+            },
+            {
+              "value": "agree",
+              "label": "同意",
+              "score": 4
+            },
+            {
+              "value": "strongly_agree",
+              "label": "非常同意",
+              "score": 5
+            }
+          ]
+        }
+      ],
+      "response": "1–23频率，24–35同意；不可共用单套锚点。",
+      "instruction": {
+        "sources": [
+          {
+            "path": "docs/scale-instruments/research-drafts/hse_msit_zh_cn/1.0.0/bilingual-content.json",
+            "blob": "40a1b5d92377e41391d7e6cc2806789f26dd62d3",
+            "sha256": "f38be23bf5a614fa99b25fe43984b460d98cec9702e9ab7650b79affb8ae4df5",
+            "field": "/administration/instructionsZh"
+          },
+          {
+            "path": "server-version/backend/src/modules/scale/instruments/hse_msit_zh_cn/1.0.0/source.json",
+            "blob": "b644be50127582c88890e0d03955e076b9cc6f92",
+            "sha256": "7e5021f4c8031f2d20650b04342e0025e785ac08f912a4520972f564f6122ef9",
+            "field": "/executable/definition/items/0/content",
+            "note": "首题前缀"
+          }
+        ],
+        "text": "工作条件会影响身心状态。以下问题帮助了解当前工作环境，并为后续改善提供线索。为便于比较，请根据过去六个月的工作经历作答。",
+        "status": "中文工作说明含过去六个月，嵌首题前缀，顶层instruction缺失。",
+        "minimal_binding": {
+          "path": "server-version/backend/src/modules/scale/instruments/hse_msit_zh_cn/1.0.0/source.json#/instruction",
+          "old": null,
+          "new": {
+            "schemaVersion": 1,
+            "text": "工作条件会影响身心状态。以下问题帮助了解当前工作环境，并为后续改善提供线索。为便于比较，请根据过去六个月的工作经历作答。",
+            "language": "zh-CN",
+            "version": "1.0.0",
+            "source": "固定双语材料项目中文工作稿"
+          }
+        },
+        "version_impact": "从题1拆出同文说明改变definition/hash，须root按版本和安装冲突规则处理。"
+      },
+      "audience": "成人工作者自述，教师是报告技术角色；组织结论和匿名保护不凭单人得分推断。"
+    },
+    "scoring": {
+      "scores": [
+        {
+          "key": "demands",
+          "type": "dimension",
+          "label": "工作量与节奏",
+          "description": "这部分关注任务是否过多、期限是否现实、有没有足够休息，不是看你够不够能扛。",
+          "direction": "higher_is_better",
+          "canonical": true,
+          "displayPrecision": 2,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "HSE-03",
+                "weight": 1
+              },
+              {
+                "itemCode": "HSE-06",
+                "weight": 1
+              },
+              {
+                "itemCode": "HSE-09",
+                "weight": 1
+              },
+              {
+                "itemCode": "HSE-12",
+                "weight": 1
+              },
+              {
+                "itemCode": "HSE-16",
+                "weight": 1
+              },
+              {
+                "itemCode": "HSE-18",
+                "weight": 1
+              },
+              {
+                "itemCode": "HSE-20",
+                "weight": 1
+              },
+              {
+                "itemCode": "HSE-22",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        },
+        {
+          "key": "control",
+          "type": "dimension",
+          "label": "对工作安排的自主空间",
+          "description": "看看你能否对工作方式、速度和休息安排有一些选择。",
+          "direction": "higher_is_better",
+          "canonical": true,
+          "displayPrecision": 2,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "HSE-02",
+                "weight": 1
+              },
+              {
+                "itemCode": "HSE-10",
+                "weight": 1
+              },
+              {
+                "itemCode": "HSE-15",
+                "weight": 1
+              },
+              {
+                "itemCode": "HSE-19",
+                "weight": 1
+              },
+              {
+                "itemCode": "HSE-25",
+                "weight": 1
+              },
+              {
+                "itemCode": "HSE-30",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        },
+        {
+          "key": "managerial_support",
+          "type": "dimension",
+          "label": "来自管理者的支持",
+          "description": "关注遇到难题或情绪负荷时，能否得到回应、反馈与帮助。",
+          "direction": "higher_is_better",
+          "canonical": true,
+          "displayPrecision": 2,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "HSE-08",
+                "weight": 1
+              },
+              {
+                "itemCode": "HSE-23",
+                "weight": 1
+              },
+              {
+                "itemCode": "HSE-29",
+                "weight": 1
+              },
+              {
+                "itemCode": "HSE-33",
+                "weight": 1
+              },
+              {
+                "itemCode": "HSE-35",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        },
+        {
+          "key": "peer_support",
+          "type": "dimension",
+          "label": "同事之间的支持",
+          "description": "关注日常合作中能否获得帮助、倾听和尊重。",
+          "direction": "higher_is_better",
+          "canonical": true,
+          "displayPrecision": 2,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "HSE-07",
+                "weight": 1
+              },
+              {
+                "itemCode": "HSE-24",
+                "weight": 1
+              },
+              {
+                "itemCode": "HSE-27",
+                "weight": 1
+              },
+              {
+                "itemCode": "HSE-31",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        },
+        {
+          "key": "relationships",
+          "type": "dimension",
+          "label": "人际相处是否安全、尊重",
+          "description": "关注冲突、紧张、骚扰或欺凌，不把问题归咎于个人性格。",
+          "direction": "higher_is_better",
+          "canonical": true,
+          "displayPrecision": 2,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "HSE-05",
+                "weight": 1
+              },
+              {
+                "itemCode": "HSE-14",
+                "weight": 1
+              },
+              {
+                "itemCode": "HSE-21",
+                "weight": 1
+              },
+              {
+                "itemCode": "HSE-34",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        },
+        {
+          "key": "role",
+          "type": "dimension",
+          "label": "工作期待是否清楚",
+          "description": "看看职责、目标和分工是不是足够清晰。",
+          "direction": "higher_is_better",
+          "canonical": true,
+          "displayPrecision": 2,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "HSE-01",
+                "weight": 1
+              },
+              {
+                "itemCode": "HSE-04",
+                "weight": 1
+              },
+              {
+                "itemCode": "HSE-11",
+                "weight": 1
+              },
+              {
+                "itemCode": "HSE-13",
+                "weight": 1
+              },
+              {
+                "itemCode": "HSE-17",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        },
+        {
+          "key": "change",
+          "type": "dimension",
+          "label": "变化是否解释清楚",
+          "description": "关注工作变动前后有没有咨询、说明和可提问的机会。",
+          "direction": "higher_is_better",
+          "canonical": true,
+          "displayPrecision": 2,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "HSE-26",
+                "weight": 1
+              },
+              {
+                "itemCode": "HSE-28",
+                "weight": 1
+              },
+              {
+                "itemCode": "HSE-32",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        }
+      ],
+      "reverse": [
+        3,
+        5,
+        6,
+        9,
+        12,
+        14,
+        16,
+        18,
+        20,
+        21,
+        22,
+        34
+      ],
+      "method": "按升序1–5原答，反向6−x仅一次；七个维度分别均分1–5，越高为更有利自述工作条件，无总分。",
+      "missing": "各维complete_required，缺项不插补，是项目保守策略；未声称等同官方分析表。",
+      "parameters": "无本地常模或个体分级，外部参数未绑定。"
+    },
+    "report": {
+      "review": "七维scoreKey匹配，解释工作条件而非抗压能力；关系项提示欺凌支持、安全渠道，单人不能代表组织。现有报告可保留。",
+      "version": "内容/计分/报告/本地化1.0.0。"
+    }
+  },
+  "ordinary_suggestions": [
+    "将已有工作说明原文单独绑定instruction，并依版本治理处理首题前缀。"
+  ],
+  "substantive_coordination": [
+    "反向键、两个反应集、维度和完整缺失政策不得静默更改；题意及参数变更须人工与版本协调。"
+  ],
+  "human_status": "中文工作稿译审及目标人群验证待完成，保留既有声明。",
+  "not_executed": [
+    "未写仓库、DB、CI或分支，未运行测试或系统核验；匿名或小样本保护不声明已实现。"
+  ],
+  "conclusion": "35题及计分与固定双语/研究材料对应；指导语拆分须版本协调，报告可保留。"
+}

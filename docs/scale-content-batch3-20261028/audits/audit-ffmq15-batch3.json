@@ -1,0 +1,295 @@
+{
+  "instrument": "ffmq15_zh_cn_research:1.0.1",
+  "sourceSHA": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "files": [
+    {
+      "path": "docs/scale-instruments/research-drafts/ffmq15/1.0.0/README.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "aaddb67e5daa8f241fae18ca7e40a91ac54e0104",
+      "sha256": "ca16c833c77ebe0b7e035010d5a933dd274e44f2b96abaeb444f9bbe9b975cdc"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ffmq15/1.0.0/administration.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "da6da93cbce0b6d8111a32b530131e5e25954222",
+      "sha256": "36ef45ca5e43b9a7e14b025558f4729b4e2d571940f58f45bf34a8156ad7ecfa"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ffmq15/1.0.0/bilingual-content.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "1a3c3725dc01d5b89260b5488bf3b24ba5f4bca3",
+      "sha256": "8fdcd7b30b62143495f165c049bda8c2fef44c4978c83d486b081a57ef6a111a"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ffmq15/1.0.0/instruction.for-pr356.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "07e3ea8a8cf24128e6f2005adc85529e3d9e6531",
+      "sha256": "52b2ebc57765d94173931fbb2f425f8fb9e9dd69b142f709e06378704b46cb25"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ffmq15/1.0.0/references.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "202f516964ca61fa85b5880cb5959ec30b08cc34",
+      "sha256": "9985e8cc66312c4d8626a9e1c14f049634df748bf37d2c7585fb002076b905d1"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ffmq15/1.0.0/report-example.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "657d45cd2cec0e8a29b322ef5c75e688456f7165",
+      "sha256": "c7338e8fa01eb9533c347ec45e2df1d578eb2ddabccc7bc8d23afbf881233e55"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ffmq15/1.0.0/report-result.synthetic.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "dca0bc181952536cda94d6ea271d14158e3e977a",
+      "sha256": "1bd27f1b1d1b3959c603881f81e79595b09b9019ccd100ae07326ca2ca1acd97"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ffmq15/1.0.0/scoring-and-parameters.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "76f8f1bbc8a3daf1e3f28a31777459afb38adfce",
+      "sha256": "0adb806d73ee78547c3d3f7db12ee9ded01dcdddc5f98cb1148cb67f720b9747"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ffmq15/1.0.0/take-home-message.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "d654aad0a30e16f0b76f43fccea742f40c0cea33",
+      "sha256": "64c30f7ef2c11f1f9262b7d16d917324932af34c64f2b33b84b7525979340222"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ffmq15/1.0.0/validation.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "be2d2ba4e38022499b8efc9d5e025e101df49ddb",
+      "sha256": "4ac3788d53feac46bb192396f34f919b16ea385108e0da14271fd1c629265018"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ffmq15/1.0.1/CHANGES.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "a2833ce743d6a07706c5860de07e2920fdf65a74",
+      "sha256": "2994dc421cd544e59150251eade01d7130be4e196fea7214a2c3b5e3cd9fa100"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ffmq15/1.0.1/report-result.synthetic.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "e2e74e08f3627a67213889bffb737f7876e5e369",
+      "sha256": "6029f412f8106187393d156ce7f4e2004255f73d355edff588f3783df954b0a2"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ffmq15/1.0.1/validation.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "cbb775d4e0e150d34c1b28757ef61a6cec1ebc62",
+      "sha256": "6b2fb6b285200ceb34f3781f2a49f6fc0c0f51cb3ed3288e559a397b61abf6f4"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ffmq15/1.0.1/validation.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "35a989b827a18731d82446e177c01bcace795817",
+      "sha256": "1591e8cb410f29604aeb5c524f853585be8dc697e67e716c124c7067386d37fe"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ffmq15_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "84769ec99d83e9174a3b4dec4d1d3ea2639d9fec",
+      "sha256": "56df40b1f2f12630a11ed6169c1731d97dfa82a09d31d30dc0bf380ef3b805b5"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ffmq15_zh_cn_research/1.0.0/instrument.ts",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "0eed070bb879576339c5a71afdf34c0026591fd3",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ffmq15_zh_cn_research/1.0.0/source.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "a63fc22ba48b5c6046f768716eabf7d0b9b806b1",
+      "sha256": "14cb5952f23bfce7fa4a56595444fe892908164b3c19af13ea24da9225d7c7ff"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ffmq15_zh_cn_research/1.0.1/THIRD_PARTY_LICENSE.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "84769ec99d83e9174a3b4dec4d1d3ea2639d9fec",
+      "sha256": "56df40b1f2f12630a11ed6169c1731d97dfa82a09d31d30dc0bf380ef3b805b5"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ffmq15_zh_cn_research/1.0.1/instrument.ts",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "0eed070bb879576339c5a71afdf34c0026591fd3",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ffmq15_zh_cn_research/1.0.1/source.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "9123ff639c961a4d128016c89825142714215fd3",
+      "sha256": "3faa7bab6250e6aaf1e6ab109416a8f6f2a10f4016e7e3141a65904787267962"
+    }
+  ],
+  "originalEvidence": {
+    "url": "https://www.researchgate.net/profile/Jenny-Gu-10/publication/303709635_FFMQ-15_items_and_scoring_information/data/5a9701470f7e9ba42974c147/FFMQ-15.pdf",
+    "access": "直接读取作者2018 PDF两页，15题和反向维度映射；PDF文件字节本次未重新计算，固定文档记录SHA256 f0c7d7875ed6eac280d166b0329ec06d1b788ee00dbaf108b33ece4f1f3d4a2c。"
+  },
+  "items": [
+    {
+      "code": "FFMQ15_01",
+      "english": "When I take a shower or a bath, I stay alert to the sensations of water on my body.",
+      "chinese": "洗澡或泡澡时，我会留意水接触身体的感觉。",
+      "facet": "observe",
+      "reverse": false,
+      "conclusion": "与作者2018题本及固定双语映射一致，中文待专家译审。"
+    },
+    {
+      "code": "FFMQ15_02",
+      "english": "I’m good at finding words to describe my feelings.",
+      "chinese": "我很会找到词语来描述自己的感受。",
+      "facet": "describe",
+      "reverse": false,
+      "conclusion": "与作者2018题本及固定双语映射一致，中文待专家译审。"
+    },
+    {
+      "code": "FFMQ15_03",
+      "english": "I don’t pay attention to what I’m doing because I’m daydreaming, worrying, or otherwise distracted.",
+      "chinese": "因为在做白日梦、担心事情或被其他事分心，我没有注意自己正在做什么。",
+      "facet": "act_aware",
+      "reverse": true,
+      "conclusion": "与作者2018题本及固定双语映射一致，中文待专家译审。"
+    },
+    {
+      "code": "FFMQ15_04",
+      "english": "I believe some of my thoughts are abnormal or bad and I shouldn’t think that way.",
+      "chinese": "我认为自己的一些想法不正常或不好，觉得不该那样想。",
+      "facet": "nonjudge",
+      "reverse": true,
+      "conclusion": "与作者2018题本及固定双语映射一致，中文待专家译审。"
+    },
+    {
+      "code": "FFMQ15_05",
+      "english": "When I have distressing thoughts or images, I “step back” and am aware of the thought or image without getting taken over by it.",
+      "chinese": "当出现令人苦恼的想法或画面时，我会“退后一步”，觉察它们，而不被它们带着走。",
+      "facet": "nonreact",
+      "reverse": false,
+      "conclusion": "与作者2018题本及固定双语映射一致，中文待专家译审。"
+    },
+    {
+      "code": "FFMQ15_06",
+      "english": "I notice how foods and drinks affect my thoughts, bodily sensations, and emotions.",
+      "chinese": "我会注意食物和饮料怎样影响自己的想法、身体感觉和情绪。",
+      "facet": "observe",
+      "reverse": false,
+      "conclusion": "与作者2018题本及固定双语映射一致，中文待专家译审。"
+    },
+    {
+      "code": "FFMQ15_07",
+      "english": "I have trouble thinking of the right words to express how I feel about things.",
+      "chinese": "我很难想到合适的词语，来表达自己对事情的感受。",
+      "facet": "describe",
+      "reverse": true,
+      "conclusion": "与作者2018题本及固定双语映射一致，中文待专家译审。"
+    },
+    {
+      "code": "FFMQ15_08",
+      "english": "I do jobs or tasks automatically without being aware of what I’m doing.",
+      "chinese": "我会自动地做事或完成任务，却没有意识到自己正在做什么。",
+      "facet": "act_aware",
+      "reverse": true,
+      "conclusion": "与作者2018题本及固定双语映射一致，中文待专家译审。"
+    },
+    {
+      "code": "FFMQ15_09",
+      "english": "I think some of my emotions are bad or inappropriate and I shouldn’t feel them.",
+      "chinese": "我认为自己的某些情绪不好或不合适，觉得不该有这些感受。",
+      "facet": "nonjudge",
+      "reverse": true,
+      "conclusion": "与作者2018题本及固定双语映射一致，中文待专家译审。"
+    },
+    {
+      "code": "FFMQ15_10",
+      "english": "When I have distressing thoughts or images I am able just to notice them without reacting.",
+      "chinese": "当出现令人苦恼的想法或画面时，我能够只是注意到它们，而不作出反应。",
+      "facet": "nonreact",
+      "reverse": false,
+      "conclusion": "与作者2018题本及固定双语映射一致，中文待专家译审。"
+    },
+    {
+      "code": "FFMQ15_11",
+      "english": "I pay attention to sensations, such as the wind in my hair or sun on my face.",
+      "chinese": "我会留意一些感觉，比如风吹动头发，或阳光照在脸上的感觉。",
+      "facet": "observe",
+      "reverse": false,
+      "conclusion": "与作者2018题本及固定双语映射一致，中文待专家译审。"
+    },
+    {
+      "code": "FFMQ15_12",
+      "english": "Even when I’m feeling terribly upset I can find a way to put it into words.",
+      "chinese": "即使心烦意乱，我也能找到用语言表达感受的方式。",
+      "facet": "describe",
+      "reverse": false,
+      "conclusion": "与作者2018题本及固定双语映射一致，中文待专家译审。 原文terribly程度在中文不明显，留待译审，不静默改题。"
+    },
+    {
+      "code": "FFMQ15_13",
+      "english": "I find myself doing things without paying attention.",
+      "chinese": "我发现自己做事时没有留意。",
+      "facet": "act_aware",
+      "reverse": true,
+      "conclusion": "与作者2018题本及固定双语映射一致，中文待专家译审。"
+    },
+    {
+      "code": "FFMQ15_14",
+      "english": "I tell myself I shouldn’t be feeling the way I’m feeling.",
+      "chinese": "我会告诉自己，不该有现在这样的感受。",
+      "facet": "nonjudge",
+      "reverse": true,
+      "conclusion": "与作者2018题本及固定双语映射一致，中文待专家译审。"
+    },
+    {
+      "code": "FFMQ15_15",
+      "english": "When I have distressing thoughts or images I just notice them and let them go.",
+      "chinese": "当出现令人苦恼的想法或画面时，我只是注意到它们，然后让它们过去。",
+      "facet": "nonreact",
+      "reverse": false,
+      "conclusion": "与作者2018题本及固定双语映射一致，中文待专家译审。"
+    }
+  ],
+  "threePartConclusions": {
+    "content": "15题顺序、5级频率与作者题本相符，反向03/04/07/08/09/13/14；12题terribly强度在中文不明显，需独立译审。",
+    "scoring": "五维各3题求和3–15；observe 01/06/11、describe 02/07/12、act_aware 03/08/13、nonjudge 04/09/14、nonreact 05/10/15，反向6−x，无总分；每维完整与不完整总体不解释是项目政策，无阈值。1.0.1修正旧版统一称三题反向的说明，计分1.0.1，保留1.0.0历史。",
+    "report": "report1.0.0、成人SELF/student技术角色，五维自然反思和可选行动，不能判断疗效或能力，没有经验分档，沿用。"
+  },
+  "instruction": {
+    "text": "请根据平时的情况，选择下面每句话有多符合你。选项从“从不或极少符合”到“非常经常或总是符合”。例如，经常符合可选4，有时符合可选3。没有对错，请按自己的实际情况作答。",
+    "source": {
+      "path": "docs/scale-instruments/research-drafts/ffmq15/1.0.0/administration.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "da6da93cbce0b6d8111a32b530131e5e25954222",
+      "sha256": "36ef45ca5e43b9a7e14b025558f4729b4e2d571940f58f45bf34a8156ad7ecfa"
+    },
+    "preparedSource": {
+      "path": "docs/scale-instruments/research-drafts/ffmq15/1.0.0/instruction.for-pr356.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "07e3ea8a8cf24128e6f2005adc85529e3d9e6531",
+      "sha256": "52b2ebc57765d94173931fbb2f425f8fb9e9dd69b142f709e06378704b46cb25"
+    },
+    "note": "固定1.0.1 source未绑定，研究档案有PREPARED指导语，适配现行instruction schema，不改变题目。"
+  },
+  "ordinaryEdits": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ffmq15_zh_cn_research/1.0.1/source.json",
+      "jsonPointer": "/instruction",
+      "old": "不存在",
+      "new": {
+        "schemaVersion": 1,
+        "text": "请根据平时的情况，选择下面每句话有多符合你。选项从“从不或极少符合”到“非常经常或总是符合”。例如，经常符合可选4，有时符合可选3。没有对错，请按自己的实际情况作答。",
+        "language": "zh-CN",
+        "version": "1.0.0",
+        "source": "docs/scale-instruments/research-drafts/ffmq15/1.0.0/administration.md @ b92c69aefa2472775fa7ee86b9c208366886c908；项目改编自作者指导语"
+      },
+      "reason": "绑定已有项目中文指导语，注明改编出处。"
+    }
+  ],
+  "humanItems": [
+    "独立专家译审及目标人群验证待完成；12题程度译法如变更需协调版本。",
+    "保持既有版权与署名状态，不发明审批。"
+  ],
+  "notExecuted": [
+    "未修改仓库、分支、系统、DB或CI；未执行测试或新增科研版权调查。"
+  ]
+}

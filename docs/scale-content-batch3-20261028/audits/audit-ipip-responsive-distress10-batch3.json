@@ -1,0 +1,247 @@
+{
+  "instrument": "ipip_responsive_distress10_zh_cn_research:1.0.0",
+  "source_commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "files": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ipip_responsive_distress10_zh_cn_research/1.0.0/source.json",
+      "blob": "649accbe3c5325d0f6c5bbe6be634445ce19f7b8",
+      "sha256": "4d0a1c876f786abd7f7572fa4c9a956e0734744fe3fee428cdc1aefe0b5e8fd0"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ipip_responsive_distress10_zh_cn_research/1.0.0/instrument.ts",
+      "blob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_distress10/1.0.0/README.md",
+      "blob": "d93cd9c46fcc35045d5b3c3e3061c0a88348cb10",
+      "sha256": "9e85cf9b81406b0cabbfb20af1af756a7ca3cbdf7e73c6dbd983f7786874c517"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_distress10/1.0.0/bilingual-content.json",
+      "blob": "746a9555de83b5fa1dbc4328792cb44e722f179a",
+      "sha256": "d796b46d0a3cf82bca3ba989b63ed9861bad8fd83720ae18285169051e78857b"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_distress10/1.0.0/reviewed-source-pack.json",
+      "blob": "45df4d83e3eedda1ab9c7323b8dbbacfd60e882c",
+      "sha256": "f2e03734e8130390a7d49677499efe674e576193074f9fe3a6ced1513bbfa6bb"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_distress10/1.0.0/external-reference-dossier.json",
+      "blob": "d8f0155cff5794148e6c2877a41f1636b5d2798a",
+      "sha256": "e23468e315f6e6b2c55866a013781fe71ff416f6c7d4f07b1f8fd8ba2b657c37"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_distress10/1.0.0/scoring-and-thresholds.md",
+      "blob": "b9a1d049eda38b870bbfbfd6cdc27c2d0fa08315",
+      "sha256": "d316030cce6275dab27bc1e14d1780eb6b7d61401f44a7336cf55b49ff86bfcf"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_distress10/1.0.0/references.md",
+      "blob": "8eb0e65b2e1893151a4109539e0bcbc5105f4327",
+      "sha256": "42eb4683461faea9d8d1cc2dae4da0a96aa0fc0e4a5f7166a48654332925b105"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_distress10/1.0.0/report-example.md",
+      "blob": "8ac7c9f9c155c44e753ee36e9d4a4be60bea2ba4",
+      "sha256": "7114a0f0c0181b0fe4aab0631243bdfc159a09c52d47c9aa0fb7a8f98cefd07c"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_distress10/1.0.0/report-example.json",
+      "blob": "60dac25c2196415d69febf3e859b813b0e051002",
+      "sha256": "7aaa4fc74fa954f16be250d675248f4b1b545335520ddfb41dc731bbd06d9146"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_distress10/1.0.0/local-validation.json",
+      "blob": "96f5bbea82f1ddf12dbb2e6fcd386f06a6b73d66",
+      "sha256": "bc970916ba5cdfdfed947ab6522900cb729a335fd9c4d98c37b4b8d8b25360bd"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_distress10/1.0.0/local-test-output.txt",
+      "blob": "1319aee8c4163f01ee5eed5b5a57b95c9975d4ad",
+      "sha256": "eb425e5abde4f76ba69dfb2c41d7e96c5fc7f74b89f9d5a87a0f321abb475d68"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_responsive_distress10/1.0.0/runtime-check.json",
+      "blob": "34be99ba1dfbcfddc574de8dd8351f285c532fd5",
+      "sha256": "f5739a294814ff1d7fbe5568f6e0d300a8ee04edd0ebae69cc9bc92551880d7d"
+    }
+  ],
+  "third_party_license": "固定源目标包无 THIRD_PARTY_LICENSE.md；权利记录见source及研究材料。",
+  "three_parts": {
+    "items_and_administration": {
+      "items": [
+        {
+          "position": 1,
+          "code": "IPIP_RESPONSIVE_DISTRESS10_01",
+          "english": "Am deeply moved by others' misfortunes.",
+          "chinese_research": "别人的不幸会深深触动我。",
+          "runtime_content": "请描述你现在通常的真实情况，而不是你希望将来成为的样子。判断下面每句话与你的符合程度。没有标准答案。\n\n别人的不幸会深深触动我。",
+          "key": "positive",
+          "transform": "identity",
+          "review": "别人不幸深深触动，含义一致；runtime首题前拼有全局指导语。"
+        },
+        {
+          "position": 2,
+          "code": "IPIP_RESPONSIVE_DISTRESS10_02",
+          "english": "Am easily moved to tears.",
+          "chinese_research": "我很容易被触动而流泪。",
+          "runtime_content": "我很容易被触动而流泪。",
+          "key": "positive",
+          "transform": "identity",
+          "review": "容易被触动流泪，符合。"
+        },
+        {
+          "position": 3,
+          "code": "IPIP_RESPONSIVE_DISTRESS10_03",
+          "english": "Suffer from others' sorrows.",
+          "chinese_research": "别人的悲伤也会让我感到痛苦。",
+          "runtime_content": "别人的悲伤也会让我感到痛苦。",
+          "key": "positive",
+          "transform": "identity",
+          "review": "别人悲伤令我痛苦，符合。"
+        },
+        {
+          "position": 4,
+          "code": "IPIP_RESPONSIVE_DISTRESS10_04",
+          "english": "Am upset by the misfortunes of strangers.",
+          "chinese_research": "陌生人的不幸也会让我难过。",
+          "runtime_content": "陌生人的不幸也会让我难过。",
+          "key": "positive",
+          "transform": "identity",
+          "review": "陌生人的不幸令我难过，符合。"
+        },
+        {
+          "position": 5,
+          "code": "IPIP_RESPONSIVE_DISTRESS10_05",
+          "english": "Would be upset if I saw an injured animal.",
+          "chinese_research": "如果看到受伤的动物，我会难过。",
+          "runtime_content": "如果看到受伤的动物，我会难过。",
+          "key": "positive",
+          "transform": "identity",
+          "review": "受伤动物会令我难过，符合。"
+        },
+        {
+          "position": 6,
+          "code": "IPIP_RESPONSIVE_DISTRESS10_06",
+          "english": "Am calm even in tense situations.",
+          "chinese_research": "即使在紧张的情境中，我也很平静。",
+          "runtime_content": "即使在紧张的情境中，我也很平静。",
+          "key": "negative",
+          "transform": "reverse",
+          "review": "紧张情境仍平静，符合。"
+        },
+        {
+          "position": 7,
+          "code": "IPIP_RESPONSIVE_DISTRESS10_07",
+          "english": "Am not easily disturbed by events.",
+          "chinese_research": "发生的事情不容易使我心烦意乱。",
+          "runtime_content": "发生的事情不容易使我心烦意乱。",
+          "key": "negative",
+          "transform": "reverse",
+          "review": "事件不易使我心烦意乱，意思接近；disturbed 范围可能更广，留译审。"
+        },
+        {
+          "position": 8,
+          "code": "IPIP_RESPONSIVE_DISTRESS10_08",
+          "english": "Am unaffected by the suffering of others.",
+          "chinese_research": "别人的痛苦不会影响我的情绪。",
+          "runtime_content": "别人的痛苦不会影响我的情绪。",
+          "key": "negative",
+          "transform": "reverse",
+          "review": "英文 unaffected 未限影响方式，中文增加“情绪”可能收窄含义；须人工译审和版本协调。"
+        },
+        {
+          "position": 9,
+          "code": "IPIP_RESPONSIVE_DISTRESS10_09",
+          "english": "Rarely cry during sad movies.",
+          "chinese_research": "看悲伤的电影时，我很少哭。",
+          "runtime_content": "看悲伤的电影时，我很少哭。",
+          "key": "negative",
+          "transform": "reverse",
+          "review": "悲伤电影时很少哭，对应rarely。"
+        },
+        {
+          "position": 10,
+          "code": "IPIP_RESPONSIVE_DISTRESS10_10",
+          "english": "Remain calm during emergencies.",
+          "chinese_research": "遇到紧急情况时，我保持平静。",
+          "runtime_content": "遇到紧急情况时，我保持平静。",
+          "key": "negative",
+          "transform": "reverse",
+          "review": "紧急情况保持平静，符合。"
+        }
+      ],
+      "official": "https://ipip.ori.org/newEmotionalIntelligenceKey.htm 响应性痛苦10项正负键及题序逐项对应，Barchard (2001)归属为IPIP来源，不是完整情绪智力电池。",
+      "anchors": "1非常不符合、2比较不符合、3介于不符合与符合之间、4比较符合、5非常符合；对应IPIP五点准确度 https://ipip.ori.org/newScoringInstructions.htm。",
+      "instruction": {
+        "text": "请描述你现在通常的真实情况，而不是你希望将来成为的样子。判断下面每句话与你的符合程度。没有标准答案。",
+        "sources": [
+          {
+            "path": "docs/scale-instruments/research-drafts/ipip_responsive_distress10/1.0.0/bilingual-content.json",
+            "blob": "746a9555de83b5fa1dbc4328792cb44e722f179a",
+            "sha256": "d796b46d0a3cf82bca3ba989b63ed9861bad8fd83720ae18285169051e78857b",
+            "field": "/instructions"
+          },
+          {
+            "path": "docs/scale-instruments/research-drafts/ipip_responsive_distress10/1.0.0/reviewed-source-pack.json",
+            "blob": "45df4d83e3eedda1ab9c7323b8dbbacfd60e882c",
+            "sha256": "f2e03734e8130390a7d49677499efe674e576193074f9fe3a6ced1513bbfa6bb",
+            "field": "/administration/instructionZh"
+          },
+          {
+            "path": "server-version/backend/src/modules/scale/instruments/ipip_responsive_distress10_zh_cn_research/1.0.0/source.json",
+            "blob": "649accbe3c5325d0f6c5bbe6be634445ce19f7b8",
+            "sha256": "4d0a1c876f786abd7f7572fa4c9a956e0734744fe3fee428cdc1aefe0b5e8fd0",
+            "field": "/executable/definition/items/0/content",
+            "note": "前缀，后接两个换行和第1题"
+          }
+        ],
+        "status": "项目工作指导语，源于IPIP施测示例的一般自我描述改编，不是正式审核或强制标准指导语；source顶层 instruction 不存在。",
+        "official_context": "https://ipip.ori.org/New_IPIP-50-item-scale.htm 明确建议而非要求；现有项目措辞不承诺绝对保密或同性同龄比较。",
+        "suggested_mapping": {
+          "schemaVersion": 1,
+          "text": "请描述你现在通常的真实情况，而不是你希望将来成为的样子。判断下面每句话与你的符合程度。没有标准答案。",
+          "language": "zh-CN",
+          "version": "1.0.0",
+          "source": "项目中文工作指导语；见固定研究材料两字段及IPIP施测示例"
+        },
+        "integration_note": "建议在既有顶层instruction字段绑定并从首题content仅移除相同前缀与换行，保留首题纯题文；该操作改变definition/hash，必须由root按版本及既有安装冲突机制协调，不声明已有展示或可原位覆盖。"
+      },
+      "language_audience": "zh-CN AI辅助工作译稿，仅成人自陈（minAge 18）；student为技术受众，不代表未成年人适用。"
+    },
+    "scoring_parameters": {
+      "method": "一个total，全部10题等权求和；1–5正向，6–10反向6−x；理论范围10–50。",
+      "missing": "全部必答 complete_required；漏项不计算、不补零、不插补或缩放分母。完整作答为项目选择，不是声称官方缺失规则。",
+      "thresholds": "无项目常模、经验分界或分档，30为理论中点。",
+      "english_reliability": "官方英文女性N=432 alpha .59、男性N=317 alpha .63，说明英文来源一致性有限，不证明中文信度、个体准确性或规范阈值；https://ipip.ori.org/newEmotionalIntelligenceTable.htm。",
+      "metadata": "10个题项、1个total；定义无dimension类型。研究包dimensionCount=1表达单一构念，公开运行维度数量须区分。"
+    },
+    "report": {
+      "direction": "higher_is_more描述自报在他人苦难、受伤动物和紧张场景的情绪反应倾向；平静不等于冷漠，易难过不说明更善良或更会帮助。",
+      "guidance": "有温和具体的倾听或共同想办法询问及短暂休息建议，无需强行修改。",
+      "limitations": "说明英文来源内部一致性有限、中文待验证、非诊断和非排名；无分档或常模。",
+      "versions": "instrument、scoring、report、localization均1.0.0；references空、referencePolicy none；报告角色student是技术合同而非未成年人适用。"
+    }
+  },
+  "rights": {
+    "source": "PUBLIC_DOMAIN、verified、允许再分发及商业与非商业",
+    "official": "https://ipip.ori.org/newPermission.htm 及 https://ipip.ori.org/ 表明IPIP材料自由使用、复制、修改及翻译；不扩张至同名专有工具、第三方材料或其他译本。",
+    "translation": "项目独立AI辅助工作译稿，不是官方审定中文版；权利声明不证明效度。"
+  },
+  "ordinary_suggestions": [
+    "指导语按上述字段独立绑定并移出第一题前缀，需统筹定义hash/版本影响；不更改指导语与纯题干。",
+    "元数据准确区分一个构念总分与零个运行dimension。"
+  ],
+  "substantive_coordination": [
+    "第8题 unaffected被限定为情绪，可能窄于原文；第7题 disturbed译为心烦意乱也需审查。由人工译审判断，若修改题文需协调版本与科研影响，不静默修订。",
+    "不得自行更改题项、锚点、构念、计分、缺失政策或引入阈值。"
+  ],
+  "human_review_status": "expertReviewStatus PENDING，cognitiveDebriefStatus NOT_ESTABLISHED；适用人群心理测量验证待完成；AI编辑检查非人工专家审校。",
+  "not_executed": [
+    "仅静态阅读固定Git对象与官方原始资料；未修改仓库、切分支、提交、push、DB或CI。",
+    "未运行golden、截图、四入口、安装幂等、全库或系统检查。历史验证文件作为原件记录，不称为本次执行。"
+  ],
+  "batch_conclusion": "成人研究候选可提交root审议；先处理首题嵌入指导语的版本绑定问题，保留译审和科学验证状态，不声称已安装、发布或完成运行验证。"
+}

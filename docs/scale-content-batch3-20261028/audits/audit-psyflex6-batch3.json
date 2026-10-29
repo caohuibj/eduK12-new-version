@@ -1,0 +1,140 @@
+{
+  "identity": "psyflex6_zh_cn_research:1.0.0",
+  "sourceCommit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "sourceFiles": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/psyflex6_zh_cn_research/1.0.0/source.json",
+      "gitBlob": "c887b6529869f2c7467a61e02c460abe3436d10d",
+      "sha256": "f0d7e20eab0a65684f24b6cc4bcf859d14299a8ec2e59a1b2897a02ffbcfde5d"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/psyflex6_zh_cn_research/1.0.0/instrument.ts",
+      "gitBlob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/psyflex6_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+      "gitBlob": "8901cc70b49f34bce955541a93bab8a0a03c81e0",
+      "sha256": "9f7c5e0c87edfefeb335a8913013146a9ad1af23632f9b77ca83114a362bc0da"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/psyflex6/1.0.0/README.md",
+      "gitBlob": "6f1deba98ca58044c381850f1fb0c560b0acdbcb",
+      "sha256": "e24e4f45eb56112b2543096e2ac35c64fe38e7ff667247e5673da4099eac27a6"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/psyflex6/1.0.0/THIRD_PARTY_LICENSE.md",
+      "gitBlob": "8901cc70b49f34bce955541a93bab8a0a03c81e0",
+      "sha256": "9f7c5e0c87edfefeb335a8913013146a9ad1af23632f9b77ca83114a362bc0da"
+    }
+  ],
+  "threePartConclusions": {
+    "content": "官方英文6题及7天时间窗与中文工作稿大意相符，均正向；第4题steady core译安稳部分、第5题“I determine”译“我能决定”须人工译审。关键差异：官方1 very seldom、2 seldom、3 from time to time、4 often、5 very often；固定中文5=总是如此，把非常经常扩展为绝对始终，影响作答。不得静默改成熟版。",
+    "scoring": "六题原值等权求和6–30、无反向、一个总分；complete_required为项目规则，题可跳过但缺一不计总分，无插补或平均分母。不激活常模、临床阈值或分档。",
+    "report": "1.0.0方向为过去七天自述灵活性，说明非人格、能力、诊断，提供不适时小步行动；与六项相符，保持具体和不强迫。成人工作稿待译审，student技术映射。原源unknown与HOLD/authorization_pending如实保留，不扩大权限。"
+  },
+  "items": [
+    {
+      "itemCode": "PSYFLEX6_1",
+      "englishConcept": "focus on what is happening in important moments despite thoughts elsewhere",
+      "zh": "即使我的心思飘到了别处，在重要的时刻，我仍然能把注意力放回到当下正在发生的事情上。",
+      "key": "positive",
+      "assessment": "官方大意与固定题序基本对应；译审待完成。"
+    },
+    {
+      "itemCode": "PSYFLEX6_2",
+      "englishConcept": "allow unpleasant thoughts and experiences without immediate removal if needed",
+      "zh": "如果有需要，我可以让不愉快的想法和经历就那样存在着，而不必马上去摆脱它们。",
+      "key": "positive",
+      "assessment": "官方大意与固定题序基本对应；译审待完成。"
+    },
+    {
+      "itemCode": "PSYFLEX6_3",
+      "englishConcept": "view hindering thoughts from distance without control",
+      "zh": "我可以退一步看待那些妨碍我的想法，而不被它们牵着走。",
+      "key": "positive",
+      "assessment": "官方大意与固定题序基本对应；译审待完成。"
+    },
+    {
+      "itemCode": "PSYFLEX6_4",
+      "englishConcept": "notice steady core even if experiences confuse",
+      "zh": "即使想法和经历让我感到混乱，我依然能感觉到自己内心有一个安稳的部分。",
+      "key": "positive",
+      "assessment": "官方大意与固定题序基本对应；译审待完成。"
+    },
+    {
+      "itemCode": "PSYFLEX6_5",
+      "englishConcept": "determine what matters and where to use energy",
+      "zh": "我能自己决定什么对我重要，并决定要把精力用在哪些地方。",
+      "key": "positive",
+      "assessment": "官方大意与固定题序基本对应；译审待完成。"
+    },
+    {
+      "itemCode": "PSYFLEX6_6",
+      "englishConcept": "engage thoroughly in important useful or meaningful things",
+      "zh": "我会全身心地投入到那些对我重要、有用或有意义的事情中。",
+      "key": "positive",
+      "assessment": "官方大意与固定题序基本对应；译审待完成。"
+    }
+  ],
+  "anchors": [
+    {
+      "value": "1",
+      "score": 1,
+      "label": "极少如此"
+    },
+    {
+      "value": "2",
+      "score": 2,
+      "label": "很少如此"
+    },
+    {
+      "value": "3",
+      "score": 3,
+      "label": "有时如此"
+    },
+    {
+      "value": "4",
+      "score": 4,
+      "label": "经常如此"
+    },
+    {
+      "value": "5",
+      "score": 5,
+      "label": "总是如此"
+    }
+  ],
+  "instruction": {
+    "file": {
+      "path": "server-version/backend/src/modules/scale/instruments/psyflex6_zh_cn_research/1.0.0/source.json",
+      "gitBlob": "c887b6529869f2c7467a61e02c460abe3436d10d",
+      "sha256": "f0d7e20eab0a65684f24b6cc4bcf859d14299a8ec2e59a1b2897a02ffbcfde5d"
+    },
+    "field": "instruction",
+    "value": {
+      "schemaVersion": 1,
+      "text": "下面是一些描述你近期状态的句子。\n\n请只根据你**过去七天**的真实经历来回答每一句，选择最符合你实际情况的程度。没有对错之分，不必反复斟酌，按你真实的感受和做法来选就好。",
+      "language": "zh-CN",
+      "version": "1.0.0",
+      "source": "「过去七天」回顾期取自作者官方 Psy-Flex 英文问卷说明；作答引导语为平台独立撰写的中文工作稿。作者另发布官方中文版问卷，本译稿不复制其措辞。"
+    },
+    "status": "固定源已有顶层指导语，包含过去七天。"
+  },
+  "substantivePending": [
+    {
+      "jsonPath": "executable.definition.responseSets[0].options[4].label",
+      "current": "总是如此",
+      "original": "very often（非常经常）",
+      "issue": "把频率最高档写为总是会改变测量锚点；应由root协调是否新版本修订为“非常经常如此”，评估既有作答、定义/本地化版本及验证影响，不静默修改。",
+      "source": "https://psychologie.unibas.ch/fileadmin/user_upload/psychologie/Abteilungen/Clinical_Psychology_and_Intervention_Science/docs/psy-flex/psy-flex-eng.pdf"
+    }
+  ],
+  "ordinaryRevisions": [],
+  "manualPending": [
+    "中文译审、认知访谈及目标人群验证未完成；保留原HOLD及授权状态。",
+    "锚点实质问题及任何其他改题/计分/阈值需root与用户协调并保留固定版本。"
+  ],
+  "notExecuted": [
+    "未运行golden、评分、系统、DB、CI或部署；未更改仓库或重新开展版权调查。"
+  ]
+}

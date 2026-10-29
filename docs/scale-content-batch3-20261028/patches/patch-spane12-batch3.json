@@ -1,0 +1,48 @@
+{
+  "identity": "spane12_zh_cn_research:1.0.0",
+  "sourceCommit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "source": {
+    "path": "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.0/source.json",
+    "gitBlob": "410e10f564ec0020204d40956c320776253fd086",
+    "sha256": "a1a6428c9b50d08361d69639138579de8ced8d917d4edfc3dca5fa1ca4dd41a6"
+  },
+  "format": "RFC6902",
+  "patch": [
+    {
+      "op": "test",
+      "path": "/executable/definition/report/interpretations/0/summary",
+      "value": "这组问题回顾过去四周那些让你感觉不错、开心、轻松或满足的时刻。每个人的生活节奏和环境不同，所以这些感受出现的频率也会不同。较高的分数表示你更常记得自己有过这类体验，并不意味着困难已经消失，也不是对乐观性格的评价。回想一下最近一个让你心情稍微亮起来的片段，它与谁、什么活动或者什么环境有关？如果愿意，可以为这种对你有帮助的小事继续留一点空间，同时允许自己有不那么开心的日子。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/interpretations/0/summary",
+      "value": "这组问题回顾过去四周那些让你感觉不错、开心、欣喜或满足的时刻。每个人的生活节奏和环境不同，所以这些感受出现的频率也会不同。较高的分数表示你更常记得自己有过这类体验，并不意味着困难已经消失，也不是对乐观性格的评价。回想一下最近一个让你心情稍微亮起来的片段，它与谁、什么活动或者什么环境有关？如果愿意，可以为这种对你有帮助的小事继续留一点空间，同时允许自己有不那么开心的日子。"
+    },
+    {
+      "op": "test",
+      "path": "/executable/definition/report/interpretations/1/summary",
+      "value": "过去四周如果出现悲伤、生气、担心或不愉快，这些感受也值得被认真对待。分数较高只表示你较常报告这类感受，并不能据此判断你是否患有心理疾病，更不是你应该独自承担所有问题的证据。有些困难来自压力、关系或生活条件，并非只靠调整心情就能解决。可以想想，哪种情况最容易让你感到难受？当时有什么人或资源能给你一点帮助？如果持续受到困扰，寻求可信任的人或专业支持也是合理的选择。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/interpretations/1/summary",
+      "value": "过去四周如果出现悲伤、生气、害怕或不愉快，这些感受也值得被认真对待。分数较高只表示你较常报告这类感受，并不能据此判断你是否患有心理疾病，更不是你应该独自承担所有问题的证据。有些困难来自压力、关系或生活条件，并非只靠调整心情就能解决。可以想想，哪种情况最容易让你感到难受？当时有什么人或资源能给你一点帮助？如果持续受到困扰，寻求可信任的人或专业支持也是合理的选择。"
+    },
+    {
+      "op": "test",
+      "path": "/executable/definition/report/reportVersion",
+      "value": "1.0.0"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/reportVersion",
+      "value": "1.0.1"
+    }
+  ],
+  "rationale": "报告例词欣喜对应第10题joyful，害怕对应第9题afraid；没有改变答题内容或分数解释。",
+  "versionImpact": "reportVersion 1.0.0→1.0.1 为拟议新报告轴，沿既有版本机制保留1.0.0旧快照；最终版本与定义哈希由集成流程核定，不能覆写历史。",
+  "unchanged": "题文、P/N/B公式、缺失规则、阈值及指导语保持固定源；不造人审或测试结果。",
+  "notExecuted": [
+    "未修改仓库，未执行测试、系统、DB或CI。"
+  ]
+}

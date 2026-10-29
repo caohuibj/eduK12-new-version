@@ -1,0 +1,140 @@
+{
+  "identity": "swls5_zh_cn_research:1.0.0",
+  "sourceCommit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "sourceFiles": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/swls5_zh_cn_research/1.0.0/source.json",
+      "gitBlob": "d2a9e3a22cf4642f20c656d97955777d3f1efc6c",
+      "sha256": "218ca1496c5e9e54246270cb118a78e0c62e2ad5ec8036403f1c7aa81ea25621"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/swls5_zh_cn_research/1.0.0/instrument.ts",
+      "gitBlob": "0eed070bb879576339c5a71afdf34c0026591fd3",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/swls5_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+      "gitBlob": "8c7f8c335076b5f596b4efd9d259f79b26b31d9a",
+      "sha256": "f4c62a2668100bbac5ded58c1d1e4ddd74bb2b6f57669b8f1a2931f66b620f5b"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/swls5/1.0.0/README.md",
+      "gitBlob": "dd0ce9e239a0922c7eb8f87ae3fa16cc9eeb1396",
+      "sha256": "4b74d6c004c8bf23946d0cc53ec166ee7a0c2593ce47af4a24cedc83c0c86651"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/swls5/1.0.0/source-manifest.json",
+      "gitBlob": "c6a858d0151d1b9c7e98f7e85fd5e26c879689dd",
+      "sha256": "a21017c92457f33494967a5e99dc292d4e8d6b6b10ce6adfffd323727be5a563"
+    }
+  ],
+  "threePartConclusions": {
+    "content": "五题顺序与作者英文7点PDF一致；全正向。中文工作稿基本对应，题4“也一直希望”增加持续性，题5“非常少”对almost nothing为近义译法，均交译审，任何修改影响内容/本地化版本。7级同意度与源序一致，中间4中立，不把3–5当频率。",
+    "scoring": "五题等权原值求和5–35，无反向或均分分母；complete_required为平台保守缺失政策，非作者确认个人缺失规则。理论中点和原作者经验解释不是中国常模或诊断阈值，referencePolicy none。",
+    "report": "1.0.0聚焦整体生活认知评价、温和反思和可选行动，指出环境与支持，不用于诊断排名；方向较高=本次更满意。中文独立工作译稿未获验证，成人研究边界，版本各1.0.0；源许可unknown/restricted及管理员待办按原样保留。"
+  },
+  "items": [
+    {
+      "itemCode": "SWLS5_01",
+      "zh": "从生活的多数方面来看，我现在的生活和自己理想中的状态比较接近。",
+      "englishConcept": "overall life near one's ideal",
+      "key": "positive",
+      "assessment": "整体生活接近理想，与英文大意相符"
+    },
+    {
+      "itemCode": "SWLS5_02",
+      "zh": "我觉得自己目前的生活条件非常好。",
+      "englishConcept": "excellent conditions of life",
+      "key": "positive",
+      "assessment": "生活条件非常好，对应 excellent"
+    },
+    {
+      "itemCode": "SWLS5_03",
+      "zh": "整体而言，我对自己的生活感到满意。",
+      "englishConcept": "general satisfaction with life",
+      "key": "positive",
+      "assessment": "整体生活满意，对应满意判断"
+    },
+    {
+      "itemCode": "SWLS5_04",
+      "zh": "到目前为止，我已经在生活中获得了那些自己很看重、也一直希望得到的东西。",
+      "englishConcept": "important desired things obtained so far",
+      "key": "positive",
+      "assessment": "“也一直希望”加了持续性，源仅重要想要的事；留译审"
+    },
+    {
+      "itemCode": "SWLS5_05",
+      "zh": "假如能重新经历一次人生，我想改变的事情会非常少。",
+      "englishConcept": "few changes if life were lived again",
+      "key": "positive",
+      "assessment": "“非常少”对应几乎不改变，语气与表达待译审"
+    }
+  ],
+  "anchors": [
+    {
+      "value": "1",
+      "label": "完全不同意",
+      "score": 1
+    },
+    {
+      "value": "2",
+      "label": "不同意",
+      "score": 2
+    },
+    {
+      "value": "3",
+      "label": "有点不同意",
+      "score": 3
+    },
+    {
+      "value": "4",
+      "label": "既不赞同也不反对",
+      "score": 4
+    },
+    {
+      "value": "5",
+      "label": "有点赞同",
+      "score": 5
+    },
+    {
+      "value": "6",
+      "label": "同意",
+      "score": 6
+    },
+    {
+      "value": "7",
+      "label": "非常同意",
+      "score": 7
+    }
+  ],
+  "instruction": {
+    "file": {
+      "path": "server-version/backend/src/modules/scale/instruments/swls5_zh_cn_research/1.0.0/source.json",
+      "gitBlob": "d2a9e3a22cf4642f20c656d97955777d3f1efc6c",
+      "sha256": "218ca1496c5e9e54246270cb118a78e0c62e2ad5ec8036403f1c7aa81ea25621"
+    },
+    "field": "instruction",
+    "value": {
+      "schemaVersion": 1,
+      "language": "zh-CN",
+      "version": "1.0.0",
+      "text": "下面有五句话，表达一个人对自己整体生活的看法。请根据你现在的真实感受，选择每句话与你的想法有多一致。1表示完全不同意，7表示非常同意；答案没有对错，也不必考虑别人会怎样评价。",
+      "source": "依照Diener等1985英文原版说明独立编写的中文工作引导语；未复制官网2002年Mantak Yuen特别授权研究译文。"
+    },
+    "status": "已在固定源顶层声明，不需另造或重复绑定。"
+  },
+  "sourceEvidence": [
+    {
+      "url": "https://eddiener.com/wp-content/uploads/2024/09/SWLS-Scale.pdf",
+      "finding": "官方英文五题及1–7同意锚点；原PDF含解释档，未对本独立中文稿自动适用。"
+    }
+  ],
+  "ordinaryRevisions": [],
+  "manualPending": [
+    "题4持续性与题5程度交译审；实质改题/锚点/计分须记录原据和版本影响交root协调。",
+    "独立中文专家译审、认知访谈、本地验证及源中既有授权范围事项保留；不将未完成事项伪造完成，也不新设自动内容门禁。"
+  ],
+  "notExecuted": [
+    "未运行计分、golden、系统、DB、CI或生产部署；历史静态材料不称为本次运行。"
+  ]
+}

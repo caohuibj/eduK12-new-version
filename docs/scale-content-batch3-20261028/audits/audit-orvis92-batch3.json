@@ -1,0 +1,2120 @@
+{
+  "instrument": "orvis92_zh_cn_research:1.0.0",
+  "source_commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "source_files": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/orvis92_zh_cn_research/1.0.0/source.json",
+      "blob": "d3e82942718cfe1c08dd8115151a07fa3e1e51e9",
+      "sha256": "ca75edacb9eed515ea7fe6cc273df26c9b311f9f495c8eadfec71ef86f86dcf5"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/orvis92_zh_cn_research/1.0.0/instrument.ts",
+      "blob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/orvis92/1.0.0/README.md",
+      "blob": "b10013f85421c90f8b5c51ec7174599db4aa72d7",
+      "sha256": "0fe2b529d8f987b492c41b0b0d6f2eaf8e93f7b769eabf9ce5d18e6a22d5b250"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/orvis92/1.0.0/bilingual-content.json",
+      "blob": "4acadece0094d1bd1e9ef0a234bf5308b86b8388",
+      "sha256": "ff8209b96cb6962306508cd65020fab8cc7f309ead66e3746cc5a473b1fd0c65"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/orvis92/1.0.0/source-manifest.json",
+      "blob": "fffb3866c57ce1b2059395958c35eee2029bee2f",
+      "sha256": "ebb2e306155dfed7a1a60c3d7fbf480c8abe46922788a4050bbbfbca3c5502d2"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/orvis92/1.0.0/reviewed-source-pack.json",
+      "blob": "2f929e0705407ce986776e1e94bc97ac3fb84e58",
+      "sha256": "632838ec325ec8eeb6b8013633a43844c5399f7193e9d10c08f0502d573fa1d6"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/orvis92/1.0.0/scoring-and-thresholds.md",
+      "blob": "49b8be8e176248d4cc4c943447fecd6611322e25",
+      "sha256": "a2190dd7452956ea6e1b745add6fc707e6afe890b6138cf1059635a2085a5bed"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/orvis92/1.0.0/references.md",
+      "blob": "0b7463cf8ab23db300dd81c327c0bc6256d1004b",
+      "sha256": "79b6fff4ff2e86ae37c933a70a9d8f5eaeeb7a55ba52cd3905b412d40d9f5d96"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/orvis92/1.0.0/report-example.md",
+      "blob": "51ef4fd1823a08f3d6fcf819da28706db6aab90a",
+      "sha256": "5f6ad207efe1a793cddf2a648b1c95fc03d60710af257048a8a9a8b862cf5151"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/orvis92/1.0.0/local-validation.json",
+      "blob": "79f343bae5deb4a816334bedad0432ba0e341a6a",
+      "sha256": "2a255be2c5ac8341a17afb205ad93dcea0889cc1724dd5d9d02260d8de27e53a"
+    }
+  ],
+  "three_parts": {
+    "items_instruction": {
+      "items": [
+        {
+          "number": 1,
+          "originalItemNumber": 1,
+          "code": "ORVIS_01",
+          "english": "Make important things happen",
+          "chinese": "推动重要的事情实现",
+          "runtime": "请使用以下选项，评价你对从事下列活动的喜欢程度。我想要……\n本问卷问的是喜欢程度，不是你现在会不会做、能不能被录用或应不应该选择某个职业。没有尝试过的活动可能较难想象；你可以不完成问卷，不必为了得到结果而猜答。\n\n我想要……推动重要的事情实现",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Leadership",
+          "runtime_dimension": [
+            "leadership"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 2,
+          "originalItemNumber": 2,
+          "code": "ORVIS_02",
+          "english": "Be the financial officer for a company",
+          "chinese": "担任一家公司的财务主管",
+          "runtime": "我想要……担任一家公司的财务主管",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Organization",
+          "runtime_dimension": [
+            "organization"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 3,
+          "originalItemNumber": 3,
+          "code": "ORVIS_03",
+          "english": "Help others learn new ideas",
+          "chinese": "帮助他人学习新观念",
+          "runtime": "我想要……帮助他人学习新观念",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Altruism",
+          "runtime_dimension": [
+            "altruism"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 4,
+          "originalItemNumber": 4,
+          "code": "ORVIS_04",
+          "english": "Create works of art",
+          "chinese": "创作艺术作品",
+          "runtime": "我想要……创作艺术作品",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Creativity",
+          "runtime_dimension": [
+            "creativity"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 5,
+          "originalItemNumber": 5,
+          "code": "ORVIS_05",
+          "english": "Be a chemist",
+          "chinese": "成为化学家",
+          "runtime": "我想要……成为化学家",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Analysis",
+          "runtime_dimension": [
+            "analysis"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 6,
+          "originalItemNumber": 6,
+          "code": "ORVIS_06",
+          "english": "Care for cattle or horses",
+          "chinese": "照料牛或马",
+          "runtime": "我想要……照料牛或马",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Production",
+          "runtime_dimension": [
+            "production"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 7,
+          "originalItemNumber": 7,
+          "code": "ORVIS_07",
+          "english": "Be a professional athlete",
+          "chinese": "成为职业运动员",
+          "runtime": "我想要……成为职业运动员",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Adventure",
+          "runtime_dimension": [
+            "adventure"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 8,
+          "originalItemNumber": 8,
+          "code": "ORVIS_08",
+          "english": "Be a translator or interpreter",
+          "chinese": "从事笔译或口译工作",
+          "runtime": "我想要……从事笔译或口译工作",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Erudition",
+          "runtime_dimension": [
+            "erudition"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 9,
+          "originalItemNumber": 9,
+          "code": "ORVIS_09",
+          "english": "Lead other people",
+          "chinese": "带领其他人",
+          "runtime": "我想要……带领其他人",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Leadership",
+          "runtime_dimension": [
+            "leadership"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 10,
+          "originalItemNumber": 10,
+          "code": "ORVIS_10",
+          "english": "Be an office manager",
+          "chinese": "担任办公室经理",
+          "runtime": "我想要……担任办公室经理",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Organization",
+          "runtime_dimension": [
+            "organization"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 11,
+          "originalItemNumber": 11,
+          "code": "ORVIS_11",
+          "english": "Care for sick people",
+          "chinese": "照顾病人",
+          "runtime": "我想要……照顾病人",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Altruism",
+          "runtime_dimension": [
+            "altruism"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 12,
+          "originalItemNumber": 12,
+          "code": "ORVIS_12",
+          "english": "Create new fashion designs",
+          "chinese": "设计新的时装款式",
+          "runtime": "我想要……设计新的时装款式",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Creativity",
+          "runtime_dimension": [
+            "creativity"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 13,
+          "originalItemNumber": 13,
+          "code": "ORVIS_13",
+          "english": "Design a laboratory experiment",
+          "chinese": "设计实验室实验",
+          "runtime": "我想要……设计实验室实验",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Analysis",
+          "runtime_dimension": [
+            "analysis"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 14,
+          "originalItemNumber": 14,
+          "code": "ORVIS_14",
+          "english": "Be a farmer",
+          "chinese": "从事农业生产",
+          "runtime": "我想要……从事农业生产",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Production",
+          "runtime_dimension": [
+            "production"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 15,
+          "originalItemNumber": 15,
+          "code": "ORVIS_15",
+          "english": "Engage in exciting adventure",
+          "chinese": "参与令人兴奋的探险",
+          "runtime": "我想要……参与令人兴奋的探险",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Adventure",
+          "runtime_dimension": [
+            "adventure"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 16,
+          "originalItemNumber": 16,
+          "code": "ORVIS_16",
+          "english": "Be a librarian",
+          "chinese": "担任图书馆员",
+          "runtime": "我想要……担任图书馆员",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Erudition",
+          "runtime_dimension": [
+            "erudition"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 17,
+          "originalItemNumber": 17,
+          "code": "ORVIS_17",
+          "english": "Be a sales or marketing director",
+          "chinese": "担任销售或市场营销总监",
+          "runtime": "我想要……担任销售或市场营销总监",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Leadership",
+          "runtime_dimension": [
+            "leadership"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 18,
+          "originalItemNumber": 18,
+          "code": "ORVIS_18",
+          "english": "Plan budgets",
+          "chinese": "编制预算",
+          "runtime": "我想要……编制预算",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Organization",
+          "runtime_dimension": [
+            "organization"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 19,
+          "originalItemNumber": 19,
+          "code": "ORVIS_19",
+          "english": "Be an elementary-school teacher",
+          "chinese": "成为小学教师",
+          "runtime": "我想要……成为小学教师",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Altruism",
+          "runtime_dimension": [
+            "altruism"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 20,
+          "originalItemNumber": 20,
+          "code": "ORVIS_20",
+          "english": "Be a professional dancer",
+          "chinese": "成为职业舞蹈演员",
+          "runtime": "我想要……成为职业舞蹈演员",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Creativity",
+          "runtime_dimension": [
+            "creativity"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 21,
+          "originalItemNumber": 21,
+          "code": "ORVIS_21",
+          "english": "Be a mathematician",
+          "chinese": "成为数学家",
+          "runtime": "我想要……成为数学家",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Analysis",
+          "runtime_dimension": [
+            "analysis"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 22,
+          "originalItemNumber": 22,
+          "code": "ORVIS_22",
+          "english": "Construct new buildings",
+          "chinese": "建造新的建筑物",
+          "runtime": "我想要……建造新的建筑物",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Production",
+          "runtime_dimension": [
+            "production"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 23,
+          "originalItemNumber": 23,
+          "code": "ORVIS_23",
+          "english": "Survive in the wilderness",
+          "chinese": "在荒野中求生",
+          "runtime": "我想要……在荒野中求生",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Adventure",
+          "runtime_dimension": [
+            "adventure"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 24,
+          "originalItemNumber": 24,
+          "code": "ORVIS_24",
+          "english": "Be a professor of English",
+          "chinese": "成为英语教授",
+          "runtime": "我想要……成为英语教授",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Erudition",
+          "runtime_dimension": [
+            "erudition"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 25,
+          "originalItemNumber": 25,
+          "code": "ORVIS_25",
+          "english": "Be the chief executive of a large company",
+          "chinese": "担任一家大型公司的首席执行官",
+          "runtime": "我想要……担任一家大型公司的首席执行官",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Leadership",
+          "runtime_dimension": [
+            "leadership"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 26,
+          "originalItemNumber": 26,
+          "code": "ORVIS_26",
+          "english": "Prepare financial contracts",
+          "chinese": "拟订财务合同",
+          "runtime": "我想要……拟订财务合同",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Organization",
+          "runtime_dimension": [
+            "organization"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 27,
+          "originalItemNumber": 27,
+          "code": "ORVIS_27",
+          "english": "Be a social worker",
+          "chinese": "成为社会工作者",
+          "runtime": "我想要……成为社会工作者",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Altruism",
+          "runtime_dimension": [
+            "altruism"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 28,
+          "originalItemNumber": 28,
+          "code": "ORVIS_28",
+          "english": "Write short stories or novels",
+          "chinese": "创作短篇故事或长篇小说",
+          "runtime": "我想要……创作短篇故事或长篇小说",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Creativity",
+          "runtime_dimension": [
+            "creativity"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 29,
+          "originalItemNumber": 29,
+          "code": "ORVIS_29",
+          "english": "Explain scientific concepts to others",
+          "chinese": "向他人解释科学概念",
+          "runtime": "我想要……向他人解释科学概念",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Analysis",
+          "runtime_dimension": [
+            "analysis"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 30,
+          "originalItemNumber": 30,
+          "code": "ORVIS_30",
+          "english": "Be a forest ranger",
+          "chinese": "成为护林员",
+          "runtime": "我想要……成为护林员",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Production",
+          "runtime_dimension": [
+            "production"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 31,
+          "originalItemNumber": 31,
+          "code": "ORVIS_31",
+          "english": "Be a racing car driver",
+          "chinese": "成为赛车手",
+          "runtime": "我想要……成为赛车手",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Adventure",
+          "runtime_dimension": [
+            "adventure"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 32,
+          "originalItemNumber": 32,
+          "code": "ORVIS_32",
+          "english": "Make up word puzzles",
+          "chinese": "编制文字谜题",
+          "runtime": "我想要……编制文字谜题",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Erudition",
+          "runtime_dimension": [
+            "erudition"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 33,
+          "originalItemNumber": 33,
+          "code": "ORVIS_33",
+          "english": "Organize a political campaign",
+          "chinese": "组织政治竞选活动",
+          "runtime": "我想要……组织政治竞选活动",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Leadership",
+          "runtime_dimension": [
+            "leadership"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 34,
+          "originalItemNumber": 34,
+          "code": "ORVIS_34",
+          "english": "Develop an office filing system",
+          "chinese": "建立办公室档案管理系统",
+          "runtime": "我想要……建立办公室档案管理系统",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Organization",
+          "runtime_dimension": [
+            "organization"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 35,
+          "originalItemNumber": 35,
+          "code": "ORVIS_35",
+          "english": "Be a minister, priest, rabbi, or other religious teacher",
+          "chinese": "成为牧师、神父、拉比或其他宗教教师",
+          "runtime": "我想要……成为牧师、神父、拉比或其他宗教教师",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Altruism",
+          "runtime_dimension": [
+            "altruism"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 36,
+          "originalItemNumber": 36,
+          "code": "ORVIS_36",
+          "english": "Play an instrument in a symphony",
+          "chinese": "在交响乐团中演奏乐器",
+          "runtime": "我想要……在交响乐团中演奏乐器",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Creativity",
+          "runtime_dimension": [
+            "creativity"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 37,
+          "originalItemNumber": 37,
+          "code": "ORVIS_37",
+          "english": "Be a physicist",
+          "chinese": "成为物理学家",
+          "runtime": "我想要……成为物理学家",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Analysis",
+          "runtime_dimension": [
+            "analysis"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 38,
+          "originalItemNumber": 38,
+          "code": "ORVIS_38",
+          "english": "Cultivate plants",
+          "chinese": "栽培植物",
+          "runtime": "我想要……栽培植物",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Production",
+          "runtime_dimension": [
+            "production"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 39,
+          "originalItemNumber": 39,
+          "code": "ORVIS_39",
+          "english": "Face physical danger",
+          "chinese": "面对人身危险",
+          "runtime": "我想要……面对人身危险",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Adventure",
+          "runtime_dimension": [
+            "adventure"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 40,
+          "originalItemNumber": 40,
+          "code": "ORVIS_40",
+          "english": "Edit a newspaper",
+          "chinese": "编辑报纸",
+          "runtime": "我想要……编辑报纸",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Erudition",
+          "runtime_dimension": [
+            "erudition"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 41,
+          "originalItemNumber": 41,
+          "code": "ORVIS_41",
+          "english": "Be the master of ceremonies at a meeting",
+          "chinese": "担任会议主持人",
+          "runtime": "我想要……担任会议主持人",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Leadership",
+          "runtime_dimension": [
+            "leadership"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 42,
+          "originalItemNumber": 42,
+          "code": "ORVIS_42",
+          "english": "Supervise the work of others",
+          "chinese": "监督他人的工作",
+          "runtime": "我想要……监督他人的工作",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Organization",
+          "runtime_dimension": [
+            "organization"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 43,
+          "originalItemNumber": 43,
+          "code": "ORVIS_43",
+          "english": "Counsel persons who need help",
+          "chinese": "为需要帮助的人提供咨询",
+          "runtime": "我想要……为需要帮助的人提供咨询",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Altruism",
+          "runtime_dimension": [
+            "altruism"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 44,
+          "originalItemNumber": 44,
+          "code": "ORVIS_44",
+          "english": "Redecorate one’s house",
+          "chinese": "重新装饰自己的房子",
+          "runtime": "我想要……重新装饰自己的房子",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Creativity",
+          "runtime_dimension": [
+            "creativity"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 45,
+          "originalItemNumber": 45,
+          "code": "ORVIS_45",
+          "english": "Carry out medical research",
+          "chinese": "开展医学研究",
+          "runtime": "我想要……开展医学研究",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Analysis",
+          "runtime_dimension": [
+            "analysis"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 46,
+          "originalItemNumber": 46,
+          "code": "ORVIS_46",
+          "english": "Go on nature walks",
+          "chinese": "在大自然中散步",
+          "runtime": "我想要……在大自然中散步",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Production",
+          "runtime_dimension": [
+            "production"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 47,
+          "originalItemNumber": 47,
+          "code": "ORVIS_47",
+          "english": "Be a military officer",
+          "chinese": "成为军官",
+          "runtime": "我想要……成为军官",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Adventure",
+          "runtime_dimension": [
+            "adventure"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 48,
+          "originalItemNumber": 48,
+          "code": "ORVIS_48",
+          "english": "Know many languages",
+          "chinese": "掌握多种语言",
+          "runtime": "我想要……掌握多种语言",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Erudition",
+          "runtime_dimension": [
+            "erudition"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 49,
+          "originalItemNumber": 49,
+          "code": "ORVIS_49",
+          "english": "Plan an advertising campaign",
+          "chinese": "策划广告宣传活动",
+          "runtime": "我想要……策划广告宣传活动",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Leadership",
+          "runtime_dimension": [
+            "leadership"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 50,
+          "originalItemNumber": 50,
+          "code": "ORVIS_50",
+          "english": "Plan investment strategies",
+          "chinese": "规划投资策略",
+          "runtime": "我想要……规划投资策略",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Organization",
+          "runtime_dimension": [
+            "organization"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 51,
+          "originalItemNumber": 51,
+          "code": "ORVIS_51",
+          "english": "Instruct parents on child care",
+          "chinese": "指导父母照顾孩子",
+          "runtime": "我想要……指导父母照顾孩子",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Altruism",
+          "runtime_dimension": [
+            "altruism"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 52,
+          "originalItemNumber": 52,
+          "code": "ORVIS_52",
+          "english": "Select art works for a museum",
+          "chinese": "为博物馆挑选艺术作品",
+          "runtime": "我想要……为博物馆挑选艺术作品",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Creativity",
+          "runtime_dimension": [
+            "creativity"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 53,
+          "originalItemNumber": 53,
+          "code": "ORVIS_53",
+          "english": "Be a scientific reporter",
+          "chinese": "成为科学记者",
+          "runtime": "我想要……成为科学记者",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Analysis",
+          "runtime_dimension": [
+            "analysis"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 54,
+          "originalItemNumber": 54,
+          "code": "ORVIS_54",
+          "english": "Do woodworking",
+          "chinese": "做木工",
+          "runtime": "我想要……做木工",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Production",
+          "runtime_dimension": [
+            "production"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 55,
+          "originalItemNumber": 55,
+          "code": "ORVIS_55",
+          "english": "Compete in athletic events",
+          "chinese": "参加体育竞赛",
+          "runtime": "我想要……参加体育竞赛",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Adventure",
+          "runtime_dimension": [
+            "adventure"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 56,
+          "originalItemNumber": 56,
+          "code": "ORVIS_56",
+          "english": "Be a foreign correspondent",
+          "chinese": "成为驻外记者",
+          "runtime": "我想要……成为驻外记者",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Erudition",
+          "runtime_dimension": [
+            "erudition"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 57,
+          "originalItemNumber": 57,
+          "code": "ORVIS_57",
+          "english": "Debate topics in a public meeting",
+          "chinese": "在公开会议上就议题进行辩论",
+          "runtime": "我想要……在公开会议上就议题进行辩论",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Leadership",
+          "runtime_dimension": [
+            "leadership"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 58,
+          "originalItemNumber": 58,
+          "code": "ORVIS_58",
+          "english": "Establish time schedules",
+          "chinese": "制订时间安排",
+          "runtime": "我想要……制订时间安排",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Organization",
+          "runtime_dimension": [
+            "organization"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 59,
+          "originalItemNumber": 59,
+          "code": "ORVIS_59",
+          "english": "Be a doctor or nurse",
+          "chinese": "成为医生或护士",
+          "runtime": "我想要……成为医生或护士",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Altruism",
+          "runtime_dimension": [
+            "altruism"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 60,
+          "originalItemNumber": 60,
+          "code": "ORVIS_60",
+          "english": "Sing professionally",
+          "chinese": "以歌唱为职业",
+          "runtime": "我想要……以歌唱为职业",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Creativity",
+          "runtime_dimension": [
+            "creativity"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 61,
+          "originalItemNumber": 61,
+          "code": "ORVIS_61",
+          "english": "Solve complex puzzles",
+          "chinese": "解答复杂的谜题",
+          "runtime": "我想要……解答复杂的谜题",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Analysis",
+          "runtime_dimension": [
+            "analysis"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 62,
+          "originalItemNumber": 62,
+          "code": "ORVIS_62",
+          "english": "Raise flowers",
+          "chinese": "种花",
+          "runtime": "我想要……种花",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Production",
+          "runtime_dimension": [
+            "production"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 63,
+          "originalItemNumber": 63,
+          "code": "ORVIS_63",
+          "english": "Be a bounty hunter",
+          "chinese": "成为赏金猎人",
+          "runtime": "我想要……成为赏金猎人",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Adventure",
+          "runtime_dimension": [
+            "adventure"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 64,
+          "originalItemNumber": 64,
+          "code": "ORVIS_64",
+          "english": "Speak fluently on any subject",
+          "chinese": "就任何话题流畅地表达",
+          "runtime": "我想要……就任何话题流畅地表达",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Erudition",
+          "runtime_dimension": [
+            "erudition"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 65,
+          "originalItemNumber": 65,
+          "code": "ORVIS_65",
+          "english": "Persuade others to change their views",
+          "chinese": "说服他人改变观点",
+          "runtime": "我想要……说服他人改变观点",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Leadership",
+          "runtime_dimension": [
+            "leadership"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 66,
+          "originalItemNumber": 66,
+          "code": "ORVIS_66",
+          "english": "Monitor business expenses",
+          "chinese": "监控企业开支",
+          "runtime": "我想要……监控企业开支",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Organization",
+          "runtime_dimension": [
+            "organization"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 67,
+          "originalItemNumber": 67,
+          "code": "ORVIS_67",
+          "english": "Be a physical therapist",
+          "chinese": "成为物理治疗师",
+          "runtime": "我想要……成为物理治疗师",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Altruism",
+          "runtime_dimension": [
+            "altruism"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 68,
+          "originalItemNumber": 68,
+          "code": "ORVIS_68",
+          "english": "Be an actor or actress",
+          "chinese": "成为演员",
+          "runtime": "我想要……成为演员",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Creativity",
+          "runtime_dimension": [
+            "creativity"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 69,
+          "originalItemNumber": 69,
+          "code": "ORVIS_69",
+          "english": "Develop a computer program",
+          "chinese": "开发计算机程序",
+          "runtime": "我想要……开发计算机程序",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Analysis",
+          "runtime_dimension": [
+            "analysis"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 70,
+          "originalItemNumber": 70,
+          "code": "ORVIS_70",
+          "english": "Repair cars or trucks",
+          "chinese": "修理汽车或卡车",
+          "runtime": "我想要……修理汽车或卡车",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Production",
+          "runtime_dimension": [
+            "production"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 71,
+          "originalItemNumber": 71,
+          "code": "ORVIS_71",
+          "english": "Be a long-distance bicycle rider",
+          "chinese": "进行长途骑行",
+          "runtime": "我想要……进行长途骑行",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Adventure",
+          "runtime_dimension": [
+            "adventure"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 72,
+          "originalItemNumber": 72,
+          "code": "ORVIS_72",
+          "english": "Read many books",
+          "chinese": "阅读许多书籍",
+          "runtime": "我想要……阅读许多书籍",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Erudition",
+          "runtime_dimension": [
+            "erudition"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 73,
+          "originalItemNumber": 73,
+          "code": "ORVIS_73",
+          "english": "Be a state governor or senator",
+          "chinese": "成为州长或参议员",
+          "runtime": "我想要……成为州长或参议员",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Leadership",
+          "runtime_dimension": [
+            "leadership"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 74,
+          "originalItemNumber": 74,
+          "code": "ORVIS_74",
+          "english": "Be a purchasing agent",
+          "chinese": "担任采购员",
+          "runtime": "我想要……担任采购员",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Organization",
+          "runtime_dimension": [
+            "organization"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 75,
+          "originalItemNumber": 75,
+          "code": "ORVIS_75",
+          "english": "Provide comfort and support to others",
+          "chinese": "给他人安慰和支持",
+          "runtime": "我想要……给他人安慰和支持",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Altruism",
+          "runtime_dimension": [
+            "altruism"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 76,
+          "originalItemNumber": 76,
+          "code": "ORVIS_76",
+          "english": "Be an artist or architect",
+          "chinese": "成为艺术家或建筑师",
+          "runtime": "我想要……成为艺术家或建筑师",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Creativity",
+          "runtime_dimension": [
+            "creativity"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 77,
+          "originalItemNumber": 77,
+          "code": "ORVIS_77",
+          "english": "Be a statistician",
+          "chinese": "成为统计学家",
+          "runtime": "我想要……成为统计学家",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Analysis",
+          "runtime_dimension": [
+            "analysis"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 78,
+          "originalItemNumber": 78,
+          "code": "ORVIS_78",
+          "english": "Work with tools and machinery",
+          "chinese": "使用工具和机器工作",
+          "runtime": "我想要……使用工具和机器工作",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Production",
+          "runtime_dimension": [
+            "production"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 79,
+          "originalItemNumber": 79,
+          "code": "ORVIS_79",
+          "english": "Be a police officer",
+          "chinese": "成为警察",
+          "runtime": "我想要……成为警察",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Adventure",
+          "runtime_dimension": [
+            "adventure"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 80,
+          "originalItemNumber": 80,
+          "code": "ORVIS_80",
+          "english": "Keep a diary or journal",
+          "chinese": "写日记或日志",
+          "runtime": "我想要……写日记或日志",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Erudition",
+          "runtime_dimension": [
+            "erudition"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 81,
+          "originalItemNumber": 81,
+          "code": "ORVIS_81",
+          "english": "Run for political office",
+          "chinese": "竞选公职",
+          "runtime": "我想要……竞选公职",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Leadership",
+          "runtime_dimension": [
+            "leadership"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 82,
+          "originalItemNumber": 82,
+          "code": "ORVIS_82",
+          "english": "Keep track of a company's inventory",
+          "chinese": "跟踪一家公司的库存情况",
+          "runtime": "我想要……跟踪一家公司的库存情况",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Organization",
+          "runtime_dimension": [
+            "organization"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 83,
+          "originalItemNumber": 83,
+          "code": "ORVIS_83",
+          "english": "Participate in charity events",
+          "chinese": "参加慈善活动",
+          "runtime": "我想要……参加慈善活动",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Altruism",
+          "runtime_dimension": [
+            "altruism"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 84,
+          "originalItemNumber": 84,
+          "code": "ORVIS_84",
+          "english": "Act in a play",
+          "chinese": "出演戏剧",
+          "runtime": "我想要……出演戏剧",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Creativity",
+          "runtime_dimension": [
+            "creativity"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 85,
+          "originalItemNumber": 85,
+          "code": "ORVIS_85",
+          "english": "Design Internet web pages",
+          "chinese": "设计互联网网页",
+          "runtime": "我想要……设计互联网网页",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Creativity",
+          "runtime_dimension": [
+            "creativity"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 86,
+          "originalItemNumber": 86,
+          "code": "ORVIS_86",
+          "english": "Make decisions that affect a lot of people",
+          "chinese": "作出影响许多人的决定",
+          "runtime": "我想要……作出影响许多人的决定",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Leadership",
+          "runtime_dimension": [
+            "leadership"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 87,
+          "originalItemNumber": 87,
+          "code": "ORVIS_87",
+          "english": "Manage a computer data base",
+          "chinese": "管理计算机数据库",
+          "runtime": "我想要……管理计算机数据库",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Organization",
+          "runtime_dimension": [
+            "organization"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 88,
+          "originalItemNumber": 88,
+          "code": "ORVIS_88",
+          "english": "Help people make career decisions",
+          "chinese": "帮助他人作出职业决定",
+          "runtime": "我想要……帮助他人作出职业决定",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Altruism",
+          "runtime_dimension": [
+            "altruism"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 89,
+          "originalItemNumber": 89,
+          "code": "ORVIS_89",
+          "english": "Write songs",
+          "chinese": "创作歌曲",
+          "runtime": "我想要……创作歌曲",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Creativity",
+          "runtime_dimension": [
+            "creativity"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 90,
+          "originalItemNumber": 90,
+          "code": "ORVIS_90",
+          "english": "Keep detailed records",
+          "chinese": "保存详细记录",
+          "runtime": "我想要……保存详细记录",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Organization",
+          "runtime_dimension": [
+            "organization"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 91,
+          "originalItemNumber": 91,
+          "code": "ORVIS_91",
+          "english": "Be a counselor or therapist",
+          "chinese": "成为咨询师或治疗师",
+          "runtime": "我想要……成为咨询师或治疗师",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Altruism",
+          "runtime_dimension": [
+            "altruism"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        },
+        {
+          "number": 92,
+          "originalItemNumber": 92,
+          "code": "ORVIS_92",
+          "english": "Paint or draw",
+          "chinese": "绘画或素描",
+          "runtime": "我想要……绘画或素描",
+          "runtime_contains_chinese": true,
+          "reference_dimension": "Creativity",
+          "runtime_dimension": [
+            "creativity"
+          ],
+          "dimension_matches": true,
+          "transform": "identity",
+          "review": "对照固定英中题项；题意和北美职业语境仍需人工译审与文化访谈。"
+        }
+      ],
+      "basis": "固定bilingual-content包含92条英文和中文及维度，均逐项对照运行定义；原始IPIP网页本次未再读取，来源manifest所列原始hash为历史记录，非本次复核。",
+      "options": [
+        {
+          "value": 1,
+          "en": "Strongly dislike",
+          "zh": "非常不喜欢"
+        },
+        {
+          "value": 2,
+          "en": "Dislike",
+          "zh": "不喜欢"
+        },
+        {
+          "value": 3,
+          "en": "Neutral",
+          "zh": "中立"
+        },
+        {
+          "value": 4,
+          "en": "Like",
+          "zh": "喜欢"
+        },
+        {
+          "value": 5,
+          "en": "Strongly like",
+          "zh": "非常喜欢"
+        }
+      ],
+      "instruction": {
+        "source": {
+          "path": "docs/scale-instruments/research-drafts/orvis92/1.0.0/bilingual-content.json",
+          "blob": "4acadece0094d1bd1e9ef0a234bf5308b86b8388",
+          "sha256": "ff8209b96cb6962306508cd65020fab8cc7f309ead66e3746cc5a473b1fd0c65",
+          "field": "/administration/instructionZh 与 /administration/contextNoteZh"
+        },
+        "text": "请使用以下选项，评价你对从事下列活动的喜欢程度。我想要……\n本问卷问的是喜欢程度，不是你现在会不会做、能不能被录用或应不应该选择某个职业。没有尝试过的活动可能较难想象；你可以不完成问卷，不必为了得到结果而猜答。",
+        "status": "说明嵌ORVIS_01前缀，所有题含“我想要……”共享句首；source顶层instruction缺失。",
+        "binding": {
+          "path": "server-version/backend/src/modules/scale/instruments/orvis92_zh_cn_research/1.0.0/source.json#/instruction",
+          "old": null,
+          "new": {
+            "schemaVersion": 1,
+            "text": "请使用以下选项，评价你对从事下列活动的喜欢程度。我想要……\n本问卷问的是喜欢程度，不是你现在会不会做、能不能被录用或应不应该选择某个职业。没有尝试过的活动可能较难想象；你可以不完成问卷，不必为了得到结果而猜答。",
+            "language": "zh-CN",
+            "version": "1.0.0",
+            "source": "固定双语材料原说明及项目语境说明的中文工作稿"
+          }
+        },
+        "impact": "仅拆第1题全局说明并保留其共享句首会改变definition/hash，按既有版本协调；不得删除其他题句首。"
+      },
+      "audience": "成人活动喜欢程度自述；北美职业情境未经中国文化适配，不以陌生代填中立。"
+    },
+    "scoring": {
+      "scores": [
+        {
+          "key": "leadership",
+          "type": "dimension",
+          "label": "带领与影响",
+          "description": "对带领与影响相关活动的平均喜欢程度，不是能力、品格或职业适配。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "ORVIS_01",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_09",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_17",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_25",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_33",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_41",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_49",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_57",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_65",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_73",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_81",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_86",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        },
+        {
+          "key": "organization",
+          "type": "dimension",
+          "label": "组织与安排",
+          "description": "对组织与安排相关活动的平均喜欢程度，不是能力、品格或职业适配。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "ORVIS_02",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_10",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_18",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_26",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_34",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_42",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_50",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_58",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_66",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_74",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_82",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_87",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_90",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        },
+        {
+          "key": "altruism",
+          "type": "dimension",
+          "label": "助人与照顾",
+          "description": "对助人与照顾相关活动的平均喜欢程度，不是能力、品格或职业适配。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "ORVIS_03",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_11",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_19",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_27",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_35",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_43",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_51",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_59",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_67",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_75",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_83",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_88",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_91",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        },
+        {
+          "key": "creativity",
+          "type": "dimension",
+          "label": "艺术与创作",
+          "description": "对艺术与创作相关活动的平均喜欢程度，不是能力、品格或职业适配。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "ORVIS_04",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_12",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_20",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_28",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_36",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_44",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_52",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_60",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_68",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_76",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_84",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_85",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_89",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_92",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        },
+        {
+          "key": "analysis",
+          "type": "dimension",
+          "label": "分析与探究",
+          "description": "对分析与探究相关活动的平均喜欢程度，不是能力、品格或职业适配。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "ORVIS_05",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_13",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_21",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_29",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_37",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_45",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_53",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_61",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_69",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_77",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        },
+        {
+          "key": "production",
+          "type": "dimension",
+          "label": "动手与自然",
+          "description": "对动手与自然相关活动的平均喜欢程度，不是能力、品格或职业适配。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "ORVIS_06",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_14",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_22",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_30",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_38",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_46",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_54",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_62",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_70",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_78",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        },
+        {
+          "key": "adventure",
+          "type": "dimension",
+          "label": "运动与冒险",
+          "description": "对运动与冒险相关活动的平均喜欢程度，不是能力、品格或职业适配。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "ORVIS_07",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_15",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_23",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_31",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_39",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_47",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_55",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_63",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_71",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_79",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        },
+        {
+          "key": "erudition",
+          "type": "dimension",
+          "label": "语言与阅读",
+          "description": "对语言与阅读相关活动的平均喜欢程度，不是能力、品格或职业适配。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "ORVIS_08",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_16",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_24",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_32",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_40",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_48",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_56",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_64",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_72",
+                "weight": 1
+              },
+              {
+                "itemCode": "ORVIS_80",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        }
+      ],
+      "method": "8独立维题数12/13/13/14/10/10/10/10，1–5喜欢度全identity，各维等权均分；无总分、职业匹配率或反向。",
+      "missing": "每维complete_required，漏题不插补；材料称整体无效时不出解释，未做运行验证。",
+      "parameters": "无中国常模/阈值；原样本均值冲突保留档案、不自动采用，referencePolicy none。"
+    },
+    "report": {
+      "review": "八项报告与scoreKey对应，明确兴趣非能力、人格或职业适配，不提供职业决定；低成本安全活动建议可保留。",
+      "version": "内容/计分/本地化/报告1.0.0。"
+    }
+  },
+  "ordinary_suggestions": [
+    "将已有全局说明独立绑定，保留每题“我想要……”；移首题前缀须协调定义hash及版本。"
+  ],
+  "substantive_coordination": [
+    "美国职业语境和译文须人工文化审校，不能静默替换原题。",
+    "均分是项目透明实现，任何参数、分母或职业决策阈值需另行协调；不能把理论中点当常模。"
+  ],
+  "human_status": "独立中文工作译稿，人工译审、认知访谈/回译和本地验证待完成。",
+  "not_executed": [
+    "未改仓库、DB、CI、分支，未运行测试或系统；未重取原始IPIP页面。"
+  ],
+  "conclusion": "92项固定英文/中文及内部维度映射逐项已对照；未独立复核外部原文，工作指导语与文化审校仍需后续协调。"
+}

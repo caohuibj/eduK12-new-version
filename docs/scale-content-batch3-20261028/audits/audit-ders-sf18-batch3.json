@@ -1,0 +1,198 @@
+{
+  "instrument": "ders_sf18_zh_cn_research:1.0.0",
+  "sourceSHA": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "files": [
+    {
+      "path": "docs/scale-instruments/research-drafts/ders_sf18/1.0.0/README.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "bf8003534437493dae13c04857a9d900fdbad900",
+      "sha256": "da87b1ddce9ef0820dbe2226ef3f3df1dfc641d66b9ac15461890c73c4f03557"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ders_sf18/1.0.0/source-manifest.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "2d583d167be6f0c207e75eaab5b0c92b533a36c6",
+      "sha256": "96dd5ae8dd2b3bc24da019312d9e01d825c0fc33140fe548ea0f5670580bc569"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ders_sf18_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "cad5cfa15c263401f32e06303f8341acd30e7926",
+      "sha256": "33979bb1242639fb4a78c8651835b07f26e1dfb796127e5f02cab8aa6150c496"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ders_sf18_zh_cn_research/1.0.0/instrument.ts",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "0eed070bb879576339c5a71afdf34c0026591fd3",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ders_sf18_zh_cn_research/1.0.0/source.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "68998db7a6da417139d9e92ee6eb08264666f2e5",
+      "sha256": "189457a3b31103deb770b911c5e46777422146615abd477575f7e531f9cf5335"
+    }
+  ],
+  "originalEvidence": {
+    "url": "https://www.researchgate.net/publication/286383944_DERS-SF_scoring_and_measure",
+    "access": "本次可读作者上传18题、锚点及六维计分说明。"
+  },
+  "items": [
+    {
+      "code": "DERS_SF18_01",
+      "chinese": "我会留意自己当下有什么感受。",
+      "facet": "awareness",
+      "reverse": true,
+      "conclusion": "与作者上传题本顺序及键向对应；中文独立译审待完成。 原文未明示当下，中文补入时点，留译审。"
+    },
+    {
+      "code": "DERS_SF18_02",
+      "chinese": "我经常不知道自己究竟是什么感受。",
+      "facet": "clarity",
+      "reverse": false,
+      "conclusion": "与作者上传题本顺序及键向对应；中文独立译审待完成。 原题无“经常”或“常常”，中文额外频率词叠加频率选项，留译审及版本协调。"
+    },
+    {
+      "code": "DERS_SF18_03",
+      "chinese": "我很难弄明白自己的感受是什么意思。",
+      "facet": "clarity",
+      "reverse": false,
+      "conclusion": "与作者上传题本顺序及键向对应；中文独立译审待完成。"
+    },
+    {
+      "code": "DERS_SF18_04",
+      "chinese": "我会关心自己正在经历什么感受。",
+      "facet": "awareness",
+      "reverse": true,
+      "conclusion": "与作者上传题本顺序及键向对应；中文独立译审待完成。"
+    },
+    {
+      "code": "DERS_SF18_05",
+      "chinese": "我对自己的感受常常感到困惑。",
+      "facet": "clarity",
+      "reverse": false,
+      "conclusion": "与作者上传题本顺序及键向对应；中文独立译审待完成。 原题无“经常”或“常常”，中文额外频率词叠加频率选项，留译审及版本协调。"
+    },
+    {
+      "code": "DERS_SF18_06",
+      "chinese": "情绪难受的时候，我能够承认自己正在有这些感受。",
+      "facet": "awareness",
+      "reverse": true,
+      "conclusion": "与作者上传题本顺序及键向对应；中文独立译审待完成。"
+    },
+    {
+      "code": "DERS_SF18_07",
+      "chinese": "情绪难受的时候，我会因为自己有这样的感受而觉得难为情。",
+      "facet": "nonacceptance",
+      "reverse": false,
+      "conclusion": "与作者上传题本顺序及键向对应；中文独立译审待完成。"
+    },
+    {
+      "code": "DERS_SF18_08",
+      "chinese": "情绪难受的时候，我很难完成手头需要做的事。",
+      "facet": "goals",
+      "reverse": false,
+      "conclusion": "与作者上传题本顺序及键向对应；中文独立译审待完成。"
+    },
+    {
+      "code": "DERS_SF18_09",
+      "chinese": "情绪难受的时候，我会觉得自己失去了控制。",
+      "facet": "impulse",
+      "reverse": false,
+      "conclusion": "与作者上传题本顺序及键向对应；中文独立译审待完成。"
+    },
+    {
+      "code": "DERS_SF18_10",
+      "chinese": "情绪难受的时候，我认为自己最终会陷入非常低落的心情。",
+      "facet": "strategies",
+      "reverse": false,
+      "conclusion": "与作者上传题本顺序及键向对应；中文独立译审待完成。"
+    },
+    {
+      "code": "DERS_SF18_11",
+      "chinese": "情绪难受的时候，我很难把注意力转到其他事情上。",
+      "facet": "goals",
+      "reverse": false,
+      "conclusion": "与作者上传题本顺序及键向对应；中文独立译审待完成。"
+    },
+    {
+      "code": "DERS_SF18_12",
+      "chinese": "情绪难受的时候，我会因为自己有这种感受而感到内疚。",
+      "facet": "nonacceptance",
+      "reverse": false,
+      "conclusion": "与作者上传题本顺序及键向对应；中文独立译审待完成。"
+    },
+    {
+      "code": "DERS_SF18_13",
+      "chinese": "情绪难受的时候，我难以集中注意力。",
+      "facet": "goals",
+      "reverse": false,
+      "conclusion": "与作者上传题本顺序及键向对应；中文独立译审待完成。"
+    },
+    {
+      "code": "DERS_SF18_14",
+      "chinese": "情绪难受的时候，我很难控制自己的行为。",
+      "facet": "impulse",
+      "reverse": false,
+      "conclusion": "与作者上传题本顺序及键向对应；中文独立译审待完成。"
+    },
+    {
+      "code": "DERS_SF18_15",
+      "chinese": "情绪难受的时候，我觉得自己没有办法让自己好受一点。",
+      "facet": "strategies",
+      "reverse": false,
+      "conclusion": "与作者上传题本顺序及键向对应；中文独立译审待完成。"
+    },
+    {
+      "code": "DERS_SF18_16",
+      "chinese": "情绪难受的时候，我会因为自己有这种感受而对自己生气。",
+      "facet": "nonacceptance",
+      "reverse": false,
+      "conclusion": "与作者上传题本顺序及键向对应；中文独立译审待完成。"
+    },
+    {
+      "code": "DERS_SF18_17",
+      "chinese": "情绪难受的时候，我会失去对自己行为的控制。",
+      "facet": "impulse",
+      "reverse": false,
+      "conclusion": "与作者上传题本顺序及键向对应；中文独立译审待完成。"
+    },
+    {
+      "code": "DERS_SF18_18",
+      "chinese": "情绪难受的时候，我要经过很长时间才能感觉好些。",
+      "facet": "strategies",
+      "reverse": false,
+      "conclusion": "与作者上传题本顺序及键向对应；中文独立译审待完成。"
+    }
+  ],
+  "threePartConclusions": {
+    "content": "18题序、六维映射及1/4/6反向和原题本匹配；频率锚点含百分比。01增加当下、02/05增加频率词，留译审不静默改。",
+    "scoring": "总分18题反向后SUM 18–90；六维各3题mean 1–5（分母3），作者允许sum或均值；觉察题6−x、高分困难更多。完整每维或总分是项目缺失规则；无常模阈值。",
+    "report": "report1.0.0成人自述，觉察维明确反向方向，非诊断及温和支持建议可沿用；原英文青少年验证不代表此中文或K12验证。"
+  },
+  "instruction": {
+    "source": {
+      "path": "server-version/backend/src/modules/scale/instruments/ders_sf18_zh_cn_research/1.0.0/source.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "68998db7a6da417139d9e92ee6eb08264666f2e5",
+      "sha256": "189457a3b31103deb770b911c5e46777422146615abd477575f7e531f9cf5335"
+    },
+    "pointer": "/instruction",
+    "value": {
+      "schemaVersion": 1,
+      "text": "请想一想以下描述在你平时生活中出现的频率。有些句子涉及心情不好的时候，也有些涉及平常是否留意自己的情绪。1表示几乎从不，5表示几乎总是；请选择最符合自己的数字。题目没有标准答案，也不需要给自己贴上好坏标签。",
+      "language": "zh-CN",
+      "version": "1.0.0",
+      "source": "依据Kaufman等作者2015年公布的DERS-SF 18题英文施测说明独立写作的中文工作稿；不设原文未声明的最近一周回顾时限。"
+    },
+    "note": "已独立绑定项目工作指导语。"
+  },
+  "ordinaryEdits": [],
+  "humanItems": [
+    "01/02/05措辞细节及中文专家译审、认知访谈、目标人群验证待完成，若改题须协调版本。",
+    "既有版权与使用范围人工事项保持。"
+  ],
+  "notExecuted": [
+    "未改仓库、系统、DB/CI或运行测试。"
+  ]
+}

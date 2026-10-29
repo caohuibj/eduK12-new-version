@@ -1,0 +1,208 @@
+{
+  "instrument": "tswq_zh_cn:1.0.0",
+  "source_commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "source_files": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/tswq_zh_cn/1.0.0/source.json",
+      "blob": "ea475d0afb70b90c2f39b3607b5899e356ceb5ec",
+      "sha256": "9d27fabf9181caf45c4f6cdb705d88759bbd79899bed0052311cde087a9bed62"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/tswq_zh_cn/1.0.0/instrument.ts",
+      "blob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/tswq_zh_cn/1.0.0/README.md",
+      "blob": "6c00e3389b3b915a5ea862f714d53d4f69ec47da",
+      "sha256": "b3751406f17cd68ab2898b79cd0c2e18c0bcdf271851a03dce3e7edcec353328"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/tswq_zh_cn/1.0.0/bilingual-content.json",
+      "blob": "826c00f7d419549c281eba751b69f28ca07fbe43",
+      "sha256": "a60c70b2e81b398208855b4c8e87a4fab8013758336f5f1cd13671ae1fbca3a4"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/tswq_zh_cn/1.0.0/reviewed-source-pack.json",
+      "blob": "026f8050cc6e5af1196cab75b365cf47cbaddc40",
+      "sha256": "83c24f3c15f7ff068adaf3898318cd689792e7a7e68c4886b6008a3dbb6eac01"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/tswq_zh_cn/1.0.0/scoring-and-thresholds.md",
+      "blob": "f43751aae2bf2020cf1f9866fd6700fc80bd06ff",
+      "sha256": "6315035022a7d82c9945f14e28e3b81af02701b008e45b20218b32420d46490a"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/tswq_zh_cn/1.0.0/references.md",
+      "blob": "adf6c07e5f8516e2e6b93cde1514566c91a6a6e2",
+      "sha256": "e102a2111887ce326fc5c47f04d0f8b5606eff2fbc213a4d0d4c667b2911d848"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/tswq_zh_cn/1.0.0/report-example.md",
+      "blob": "548ccff75907426087eed8ab00bf9545826ada01",
+      "sha256": "6b9d86e3794c4474fce9f0fc8e2b001da2fbda0ec9d89e05fcc877e6d29bd566"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/tswq_zh_cn/1.0.0/local-validation.json",
+      "blob": "2e87c24c1f2818053e5ddef28312185a87388101",
+      "sha256": "1249c45a00adbba62795155524a6663d97912a431fe123df803b020f882bd600"
+    }
+  ],
+  "three_parts": {
+    "items_instruction": {
+      "items": [
+        {
+          "number": 1,
+          "code": "TSWQ-01",
+          "english": "I feel like I belong at this school.",
+          "chinese": "我觉得自己属于这所学校。",
+          "runtime": "下面是一些关于你作为教师的经历的问题。请阅读每句话，选择最能描述你在过去一个月中感受的选项。\n\n我觉得自己属于这所学校。",
+          "transform": "identity",
+          "review": "中文与固定英文材料核心意思对应，独立译稿需人工审校。"
+        },
+        {
+          "number": 2,
+          "code": "TSWQ-02",
+          "english": "I am a successful teacher.",
+          "chinese": "我是一名成功的教师。",
+          "runtime": "我是一名成功的教师。",
+          "transform": "identity",
+          "review": "中文与固定英文材料核心意思对应，独立译稿需人工审校。"
+        },
+        {
+          "number": 3,
+          "code": "TSWQ-03",
+          "english": "I can really be myself at this school.",
+          "chinese": "在这所学校，我能够真正做自己。",
+          "runtime": "在这所学校，我能够真正做自己。",
+          "transform": "identity",
+          "review": "中文与固定英文材料核心意思对应，独立译稿需人工审校。"
+        },
+        {
+          "number": 4,
+          "code": "TSWQ-04",
+          "english": "I am good at helping students learn new things.",
+          "chinese": "我善于帮助学生学习新的东西。",
+          "runtime": "我善于帮助学生学习新的东西。",
+          "transform": "identity",
+          "review": "中文与固定英文材料核心意思对应，独立译稿需人工审校。"
+        },
+        {
+          "number": 5,
+          "code": "TSWQ-05",
+          "english": "I feel like people at this school care about me.",
+          "chinese": "我觉得这所学校的人关心我。",
+          "runtime": "我觉得这所学校的人关心我。",
+          "transform": "identity",
+          "review": "中文与固定英文材料核心意思对应，独立译稿需人工审校。"
+        },
+        {
+          "number": 6,
+          "code": "TSWQ-06",
+          "english": "I have accomplished a lot as a teacher.",
+          "chinese": "作为教师，我已经取得了不少成就。",
+          "runtime": "作为教师，我已经取得了不少成就。",
+          "transform": "identity",
+          "review": "中文与固定英文材料核心意思对应，独立译稿需人工审校。"
+        },
+        {
+          "number": 7,
+          "code": "TSWQ-07",
+          "english": "I am treated with respect at this school.",
+          "chinese": "在这所学校，我受到尊重。",
+          "runtime": "在这所学校，我受到尊重。",
+          "transform": "identity",
+          "review": "中文与固定英文材料核心意思对应，独立译稿需人工审校。"
+        },
+        {
+          "number": 8,
+          "code": "TSWQ-08",
+          "english": "I feel like my teaching is effective and helpful.",
+          "chinese": "我觉得自己的教学是有效而且有帮助的。",
+          "runtime": "我觉得自己的教学是有效而且有帮助的。",
+          "transform": "identity",
+          "review": "中文与固定英文材料核心意思对应，独立译稿需人工审校。"
+        }
+      ],
+      "options": [
+        {
+          "key": "tswq_1_4",
+          "options": [
+            {
+              "value": "1",
+              "label": "几乎从不",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "有时",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "经常",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "几乎总是",
+              "score": 4
+            }
+          ]
+        }
+      ],
+      "instruction": {
+        "sources": [
+          {
+            "path": "docs/scale-instruments/research-drafts/tswq_zh_cn/1.0.0/bilingual-content.json",
+            "blob": "826c00f7d419549c281eba751b69f28ca07fbe43",
+            "sha256": "a60c70b2e81b398208855b4c8e87a4fab8013758336f5f1cd13671ae1fbca3a4",
+            "field": "/administration/instructionsZh"
+          },
+          {
+            "path": "server-version/backend/src/modules/scale/instruments/tswq_zh_cn/1.0.0/source.json",
+            "blob": "ea475d0afb70b90c2f39b3607b5899e356ceb5ec",
+            "sha256": "9d27fabf9181caf45c4f6cdb705d88759bbd79899bed0052311cde087a9bed62",
+            "field": "/executable/definition/items/0/content",
+            "note": "首题前缀"
+          }
+        ],
+        "text": "下面是一些关于你作为教师的经历的问题。请阅读每句话，选择最能描述你在过去一个月中感受的选项。",
+        "status": "过去一个月工作指导语已嵌入首题，source顶层缺instruction。",
+        "binding": {
+          "path": "server-version/backend/src/modules/scale/instruments/tswq_zh_cn/1.0.0/source.json#/instruction",
+          "old": null,
+          "new": {
+            "schemaVersion": 1,
+            "text": "下面是一些关于你作为教师的经历的问题。请阅读每句话，选择最能描述你在过去一个月中感受的选项。",
+            "language": "zh-CN",
+            "version": "1.0.0",
+            "source": "固定双语材料独立中文工作指导语"
+          }
+        },
+        "version_impact": "移除首题前缀将改变definition/hash，须root按版本规则协调。"
+      },
+      "audience": "教师自评过去一个月，非对客观教学能力或岗位考核。"
+    },
+    "scoring": {
+      "method": "8题identity，学校归属1/3/5/7与教学效能2/4/6/8各求和4–16；总和8–32。高分表示更常自报相关感受。",
+      "missing": "每个维度及总分complete_required，缺答不补零；项目政策。",
+      "parameters": "referencePolicy none，作者允许均值作频率锚点辅助解释，但当前canonical均为求和，不虚构新均值或等级。"
+    },
+    "report": {
+      "review": "三分数引用对应；具体小行动、非诊断/排名/能力判断，关注同伴支持与情境，保留。",
+      "version": "内容/计分/本地化/报告1.0.0。"
+    }
+  },
+  "ordinary_suggestions": [
+    "原文绑定顶层instruction；首题前缀拆分需要定义hash/版本协调。"
+  ],
+  "substantive_coordination": [
+    "不能把均分替代canonical总和、增加阈值或擅改题目；相关变化按版本治理。"
+  ],
+  "human_status": "中文工作稿人工译审与本地验证待完成，保留原有状态。",
+  "not_executed": [
+    "未改仓库/分支/DB/CI，未运行测试或系统。"
+  ],
+  "conclusion": "题项与固定双语材料、三项和分一致；指导语需独立绑定，报告可保留。"
+}

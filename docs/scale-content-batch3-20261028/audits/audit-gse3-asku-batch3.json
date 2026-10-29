@@ -1,0 +1,160 @@
+{
+  "instrument": "gse3_asku_zh_cn_research:1.0.0",
+  "sourceSHA": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "files": [
+    {
+      "path": "docs/scale-instruments/research-drafts/gse3_asku/1.0.0/LICENSE.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "cc50f692e1923fb84a26209b107caeff423e5f35",
+      "sha256": "5fc8d481946549968afd8344d8363d25943a60e32b80ec07bb7d91995c2c58ac"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/gse3_asku/1.0.0/README.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "bf91da4fa219bb27290b7912855deb8f876b004c",
+      "sha256": "2d4e200466e5b2a4d33f23be57e0f3c8938cdffff008cd8e7d11226f1ffb0c23"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/gse3_asku/1.0.0/bilingual-content.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "3ba9bcab9824b18bd48c557a0c80b77b969233d9",
+      "sha256": "a45cef7bc400832a77aa830c568b1f1f97be5f984b60ea69546d9bc7fd5789f4"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/gse3_asku/1.0.0/historical-hold-source-pack.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "57c4159f13bcf1c29fceacedb297d2f58d996c49",
+      "sha256": "5d4e384a52ea86df0976f516952e04f21897c9c529f3fe87300054034833ef70"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/gse3_asku/1.0.0/local-validation.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "34407c31f56f98f71ed9ff7b0ffc200cef9c3546",
+      "sha256": "b56266a474d593b8147373bb8ed989b091d0e49a0c990836f8bb44dca9279767"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/gse3_asku/1.0.0/references.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "071b8387fe92c0527a8748cccdc409e4e24bcb80",
+      "sha256": "a90627e424aa778bf822367d7368de9d93bb37b0cb3765f66c1c23ebfcc67000"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/gse3_asku/1.0.0/report-example.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "9fb1c20a0c51edaf78557f5c11bdb02bc3f39b8f",
+      "sha256": "c9775b0e239e92a991d09a495ace4269ce6c81e8fb9a5d06bbf8e446fe494023"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/gse3_asku/1.0.0/scoring-and-thresholds.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "61b9fc52cabbe540fb0981287150403bb4383372",
+      "sha256": "df461b03abcf57ae60b8a77efadd4b663c544267fa4feaebf14ea7036240b2fa"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/gse3_asku/1.0.0/synthetic-report-example.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "f91425b089465f5c1861dc16d722df961bcd10a7",
+      "sha256": "77a74f1a39ad7999f44411bb802255ddd028ed72c6586520761c6dd23d5e636e"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/gse3_asku_zh_cn_research/1.0.0/instrument.ts",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/gse3_asku_zh_cn_research/1.0.0/source.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "0e80009eaccc53594590277438278a71e669ab08",
+      "sha256": "bb5214bb0b123cd2ee4ed4187af226e17ec4e3169b98a9771052adc3b9bf9451"
+    }
+  ],
+  "originalEvidence": {
+    "questionnaire": "https://access.gesis.org/zis/1436",
+    "questionnaireAccess": "本次直接读取作者2021英文题本，3题和5级锚点及指导语匹配。",
+    "documentation": "https://access.gesis.org/zis/1435",
+    "documentationAccess": "本次访问超时；三题均分及完整规则基于固定scoring-and-thresholds.md及研究包的既有作者文档记录，不称本次重新核实。"
+  },
+  "items": [
+    {
+      "code": "gse3_1",
+      "english": "I can rely on my own abilities in difficult situations.",
+      "chinese": "在困难的情况下，我可以依靠自己的能力。",
+      "key": "identity",
+      "conclusion": "匹配作者2021英文题本及项目双语材料；中文为待专家审校工作译稿。"
+    },
+    {
+      "code": "gse3_2",
+      "english": "I am able to solve most problems on my own.",
+      "chinese": "我能够独立解决大多数问题。",
+      "key": "identity",
+      "conclusion": "匹配作者2021英文题本及项目双语材料；中文为待专家审校工作译稿。"
+    },
+    {
+      "code": "gse3_3",
+      "english": "I can usually solve even challenging and complex tasks well.",
+      "chinese": "即使是具有挑战性且复杂的任务，我通常也能很好地完成。",
+      "key": "identity",
+      "conclusion": "匹配作者2021英文题本及项目双语材料；中文为待专家审校工作译稿。"
+    }
+  ],
+  "threePartConclusions": {
+    "content": "三题原序、中文与官方英文题本基本一致，全部正向，五级符合度文字锚点匹配。中文工作译稿及成人范围未被英文数据验证。",
+    "scoring": "三题等权均分=(q1+q2+q3)/3，范围1–5、全部完整才算、不插补，显示精度2位，按固定研究记录作者建议完整3题；不混GSE10或IPIP C1。无运行参考集、经验分档、中文阈值；3为理论中点不作常模。",
+    "report": "报告1.0.0、zh-CN、ADULT_SELF/student技术角色，score_only、higher_is_more；较高指自述信心，不等于实际能力，反思和小步行动具体，不声称中国验证或国外样本排名，文本沿用。"
+  },
+  "instruction": {
+    "text": "以下陈述与你的实际情况可能有不同程度的符合。你认为每项陈述在多大程度上符合你个人的情况？",
+    "source": {
+      "path": "docs/scale-instruments/research-drafts/gse3_asku/1.0.0/bilingual-content.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "3ba9bcab9824b18bd48c557a0c80b77b969233d9",
+      "sha256": "a45cef7bc400832a77aa830c568b1f1f97be5f984b60ea69546d9bc7fd5789f4"
+    },
+    "jsonPointer": "/instructions/zh",
+    "corroboratingSource": {
+      "path": "docs/scale-instruments/research-drafts/gse3_asku/1.0.0/historical-hold-source-pack.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "57c4159f13bcf1c29fceacedb297d2f58d996c49",
+      "sha256": "5d4e384a52ea86df0976f516952e04f21897c9c529f3fe87300054034833ef70"
+    },
+    "corroboratingPointer": "/instructions/zh",
+    "existingState": "固定source无独立instruction，题目中也无指导语。",
+    "proposed": {
+      "field": "/instruction",
+      "old": "不存在",
+      "new": {
+        "schemaVersion": 1,
+        "text": "以下陈述与你的实际情况可能有不同程度的符合。你认为每项陈述在多大程度上符合你个人的情况？",
+        "language": "zh-CN",
+        "version": "1.0.0",
+        "source": "docs/scale-instruments/research-drafts/gse3_asku/1.0.0/bilingual-content.json#/instructions/zh @ b92c69aefa2472775fa7ee86b9c208366886c908"
+      }
+    },
+    "provenance": "作者英文题本指导语的项目中文工作译稿，非专家批准。"
+  },
+  "ordinaryEdits": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/gse3_asku_zh_cn_research/1.0.0/source.json",
+      "jsonPointer": "/instruction",
+      "old": "不存在",
+      "new": {
+        "schemaVersion": 1,
+        "text": "以下陈述与你的实际情况可能有不同程度的符合。你认为每项陈述在多大程度上符合你个人的情况？",
+        "language": "zh-CN",
+        "version": "1.0.0",
+        "source": "docs/scale-instruments/research-drafts/gse3_asku/1.0.0/bilingual-content.json#/instructions/zh @ b92c69aefa2472775fa7ee86b9c208366886c908"
+      },
+      "reason": "绑定已存在的作者指导语中文工作译稿，不修改题目评分或人工状态。"
+    }
+  ],
+  "humanItems": [
+    "独立中文专家译审、认知访谈和本地效度仍待完成，不冒称原作者批准。",
+    "沿用固定研究资料与原题本非商业CC BY-NC-SA 4.0限制及署名、同许可；不把旧HOLD包当当前新状态，也不声称商业许可。",
+    "题义、锚点、均分/缺失或阈值变更需协调及版本审查。"
+  ],
+  "notExecuted": [
+    "未写仓库、切分支、DB/CI，未运行测试或系统检查；未新增版权科研调查。",
+    "历史测试不当作本次执行。"
+  ]
+}

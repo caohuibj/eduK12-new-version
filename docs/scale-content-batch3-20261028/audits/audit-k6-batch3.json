@@ -1,0 +1,195 @@
+{
+  "identity": "k6_zh_cn_research:1.1.0",
+  "sourceCommit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "sourceFiles": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/k6_zh_cn_research/1.1.0/source.json",
+      "gitBlob": "9234f3a924032a88537c0f0e9ab39091c07b42f4",
+      "sha256": "60f80c0a3c0755f8277dbb60d8cc7d47a550249a096abcaae47890629f682640"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/k6_zh_cn_research/1.1.0/instrument.ts",
+      "gitBlob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/k6/1.1.0/README.md",
+      "gitBlob": "50e230bc0af57fe7e448306393d7567020206e0a",
+      "sha256": "4b42ee3fe0e90a4eb4b92c307da523de87ede5263d589c2cf80b4d2a4c3ec902"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/k6/1.1.0/bilingual-content.json",
+      "gitBlob": "97dacc94dadca3838dbe616fb6735a054f2dfee2",
+      "sha256": "fa2f54adc5f3c653a8d29b88fbb3c31d3d7592a2d9ec0ecd9f859ff935a3c7e1"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/k6/1.1.0/reviewed-source-pack.json",
+      "gitBlob": "a41b8223ec65b5c52e5eeb348998f6b3d8a6f7a0",
+      "sha256": "071e7c662cf285f9e61ea26d91a41de3c00ec7101b0d276b876172e63e1ef55d"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/k6/1.1.0/external-reference-dossier.json",
+      "gitBlob": "2eab39ae641c2263812a47f65e06566d5df5b374",
+      "sha256": "5122e255ce3cda20fdbc3c2557ce7985c993cc95a62a75ec3ed7bccdb2e0fd20"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/k6/1.1.0/references.md",
+      "gitBlob": "af01ec939431873d555cd2670294279feda606cc",
+      "sha256": "23ee392a974bb6093178c49f8631ab5ea191402b29aa89d427cc315171cddb2f"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/k6/1.1.0/report-example.md",
+      "gitBlob": "b0079ae7fc4510da767a499d05d7bd58c862f91c",
+      "sha256": "3d3f56dfb94abde532749490c1456dab3db5efd830d3b09e2b951b0493424207"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/k6/1.1.0/report-example.json",
+      "gitBlob": "f9a08773e0908d318a3fc57ef803e668564e4387",
+      "sha256": "29694ea447da13e4b698eaac929553065f252de273af426c009320558dc6298e"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/k6/1.1.0/scoring-and-thresholds.md",
+      "gitBlob": "b25fc9c2e907e616f82a5cb2cc457f80eff3d71f",
+      "sha256": "f80c2eac8fdb546ff8dd16f0e73d63a59b3e69b47a1ebb685289e48665b95faf"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/k6/1.1.0/local-validation.json",
+      "gitBlob": "0222720095e4caebc1e6d314a304aaa2120a9a3c",
+      "sha256": "19da35c5ac51478e4ffc6eb8b94904526d87d860a2306d7d7b44a7e5281bf2a4"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/k6/1.1.0/runtime-check.json",
+      "gitBlob": "4c78b086276de739c7cf54097e39dbeacabb67b4",
+      "sha256": "99e853c5d85e1051b7b73a9e72b9253f1c75f7b456fab80fbb5f33e298340ef0"
+    }
+  ],
+  "threePartConclusions": {
+    "content": "六核心症状为作者官网普通话原题，题序及运行时与固定记录一致；保留30天时窗，非K6+全部功能题。打印代码1–5按全部时间到无递减，分值4–0，不对其二次反向；不能当代码就是分数。",
+    "scoring": "六题同向分值等权求和0–24；项目complete_required缺一不计分、不插补，作者FAQ不强制唯一缺失规则。原2003≥13为美国校准且回顾过去12个月情绪最差月份，与当前30天普通话不同，未绑定、不作诊断。",
+    "report": "1.0.0为困扰频率描述，低分不证明安全，明确不能评估自杀风险及无实时救援。报告开头用过去一个月可与精确30天不同，建议措辞明确30天。instrument1.1.0、scoring/report1.0.0，成人研究，目标人群与官方普通话精确适用待核。"
+  },
+  "items": [
+    {
+      "id": "K6_1",
+      "sourceId": "Q1a",
+      "en": "…nervous?",
+      "zh": "…紧张?",
+      "key": "identity after option remap",
+      "assessment": "固定作者普通话题文及运行时一致，不自行重译。"
+    },
+    {
+      "id": "K6_2",
+      "sourceId": "Q1b",
+      "en": "…hopeless?",
+      "zh": "…绝望?",
+      "key": "identity after option remap",
+      "assessment": "固定作者普通话题文及运行时一致，不自行重译。"
+    },
+    {
+      "id": "K6_3",
+      "sourceId": "Q1c",
+      "en": "…restless or fidgety?",
+      "zh": "…不安或烦躁?",
+      "key": "identity after option remap",
+      "assessment": "固定作者普通话题文及运行时一致，不自行重译。"
+    },
+    {
+      "id": "K6_4",
+      "sourceId": "Q1d",
+      "en": "…so depressed that nothing could cheer you up?",
+      "zh": "…太沮丧以至于什么都不能让您愉快起来?",
+      "key": "identity after option remap",
+      "assessment": "固定作者普通话题文及运行时一致，不自行重译。"
+    },
+    {
+      "id": "K6_5",
+      "sourceId": "Q1e",
+      "en": "…that everything was an effort?",
+      "zh": "…做每一件事情都很费劲?",
+      "key": "identity after option remap",
+      "assessment": "固定作者普通话题文及运行时一致，不自行重译。"
+    },
+    {
+      "id": "K6_6",
+      "sourceId": "Q1f",
+      "en": "…worthless?",
+      "zh": "…无价值?",
+      "key": "identity after option remap",
+      "assessment": "固定作者普通话题文及运行时一致，不自行重译。"
+    }
+  ],
+  "anchors": [
+    {
+      "value": 4,
+      "printed_code": 1,
+      "en": "All of the time",
+      "zh": "全部时间",
+      "zh_draft": "全部时间"
+    },
+    {
+      "value": 3,
+      "printed_code": 2,
+      "en": "Most of the time",
+      "zh": "大部分时间",
+      "zh_draft": "大部分时间"
+    },
+    {
+      "value": 2,
+      "printed_code": 3,
+      "en": "Some of the time",
+      "zh": "一部分时间",
+      "zh_draft": "一部分时间"
+    },
+    {
+      "value": 1,
+      "printed_code": 4,
+      "en": "A little of the time",
+      "zh": "偶尔",
+      "zh_draft": "偶尔"
+    },
+    {
+      "value": 0,
+      "printed_code": 5,
+      "en": "None of the time",
+      "zh": "无",
+      "zh_draft": "无"
+    }
+  ],
+  "instruction": {
+    "text": "下面的问题是询问您过去 30 天中的情绪。回答每一个问题时，请圈出最能描述这种情绪的出现频率的号码。",
+    "sources": [
+      {
+        "file": {
+          "path": "docs/scale-instruments/research-drafts/k6/1.1.0/bilingual-content.json",
+          "gitBlob": "97dacc94dadca3838dbe616fb6735a054f2dfee2",
+          "sha256": "fa2f54adc5f3c653a8d29b88fbb3c31d3d7592a2d9ec0ecd9f859ff935a3c7e1"
+        },
+        "field": "instructions"
+      },
+      {
+        "file": {
+          "path": "server-version/backend/src/modules/scale/instruments/k6_zh_cn_research/1.1.0/source.json",
+          "gitBlob": "9234f3a924032a88537c0f0e9ab39091c07b42f4",
+          "sha256": "60f80c0a3c0755f8277dbb60d8cc7d47a550249a096abcaae47890629f682640"
+        },
+        "field": "executable.definition.items[*].content 中共同30天题干"
+      }
+    ],
+    "qualification": "完整总指导语和题干不同；按原语义独立绑定时避免重复，既有题文改动需版本协调。"
+  },
+  "ordinaryRevisions": [
+    {
+      "jsonPath": "executable.definition.report.interpretations[0].summary",
+      "old": "这份小记录关注过去一个月里，紧张、沮丧和做事费劲等感受出现得有多频繁。",
+      "new": "这份小记录关注过去30天里，紧张、沮丧和做事费劲等感受出现得有多频繁。",
+      "reason": "与题本精确30天回忆期一致，避免自然月歧义；报告版本轴处理。"
+    }
+  ],
+  "manualPending": [
+    "保留原作者普通话/权利和目标人群匹配状态；切点及回忆时段不可跨版本迁移。",
+    "题意、选项映射、公式或阈值改变需原据及版本协调。"
+  ],
+  "notExecuted": [
+    "未运行golden、评分、系统、DB、CI；未进行新研究或版权审核。"
+  ]
+}

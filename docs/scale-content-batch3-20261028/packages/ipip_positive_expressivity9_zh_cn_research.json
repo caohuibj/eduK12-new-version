@@ -1,0 +1,145 @@
+{
+  "schemaVersion": 1,
+  "sourceSHA": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "sourceKey": "ipip_positive_expressivity9_zh_cn_research",
+  "originalVersion": "1.0.0",
+  "preparedVersion": "1.0.1",
+  "originalSource": "server-version/backend/src/modules/scale/instruments/ipip_positive_expressivity9_zh_cn_research/1.0.0/source.json",
+  "preparedSource": "server-version/backend/src/modules/scale/instruments/ipip_positive_expressivity9_zh_cn_research/1.0.1/source.json",
+  "originalSourceSHA256": "c9c348aed9a5596aa774d5eae074e63555bd50b379084bcde04f2165c9d2051a",
+  "preparedSourceSHA256": "95ebdfc943edd53639fa8adbd49718c60d7aee29c7f063085b33619fa57018f2",
+  "originalFiles": [
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_positive_expressivity9/1.0.0/README.md",
+      "blob": "37fba9b0c9356e8342e02d74077ce6706f9b0018",
+      "sha256": "7c8e075e09a7f0b213dd50d0dfeed0d69cc57f00ab5f0f7f8cfd049ea69143f0"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_positive_expressivity9/1.0.0/bilingual-content.json",
+      "blob": "a072f9cd851f0fa9ce5957b815b72e8f39d60057",
+      "sha256": "4ea8e3ef0698679587ee0ffdf2a4b7817efc38f67af2cd6b162aa00d7bd5a343"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_positive_expressivity9/1.0.0/external-reference-dossier.json",
+      "blob": "d84c8e1ac101a48028e6daa0d0da1c8afb0a3417",
+      "sha256": "232a5fbebbd7209cb38ea0282cae726f14b79eadf85d86e10df522bb0063ac0c"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_positive_expressivity9/1.0.0/local-validation.json",
+      "blob": "a03e0f54383f3d54538635fc8bfad0f66ed0ab62",
+      "sha256": "68d5a615e073f2ae8b281be7fa1dc151d0b5504272bd412a95bcf1151a265421"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_positive_expressivity9/1.0.0/references.md",
+      "blob": "2176600b839da53dd8da415c37bfed6936af4965",
+      "sha256": "1f148e6c6b7674c2a02ea6e440f28447adf9def9d9a36aef2c1a81aff8c33e76"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_positive_expressivity9/1.0.0/report-example.json",
+      "blob": "6258b280032c9c4551cf3d74e7f5dc39bffebeb5",
+      "sha256": "cb049d9c32d80b749dfa6da71c32a3bb32317da1e81c5cf4f51d974568a7b97f"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_positive_expressivity9/1.0.0/report-example.md",
+      "blob": "80e6c132d249e58bbf71bc99574be676cd2b2e8d",
+      "sha256": "6c2d446d26aeab0433f3e7a2032aa850d1b1b0eac3834db990a63fb1629cbfd7"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_positive_expressivity9/1.0.0/reviewed-source-pack.json",
+      "blob": "762038edd94384f890921132d919f701a421729c",
+      "sha256": "4d2d8d79a0092c03475908bc519f624fd3b3ed14327b0192f191e83394516891"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_positive_expressivity9/1.0.0/runtime-check.json",
+      "blob": "48a0d715096b6df88c21b6f4bd9155db75841036",
+      "sha256": "26286d3c81e6affe2943f4f32dcb73f2a421ad72ee389da37e28564bfcb6a9cc"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_positive_expressivity9/1.0.0/scoring-and-thresholds.md",
+      "blob": "c7067a53aae034e639be3cabcf56c2671365da62",
+      "sha256": "ce7538817932cc4e933bfae94735b3671f80532f98fc24376f8eb1d1d97cafce"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ipip_positive_expressivity9_zh_cn_research/1.0.0/instrument.ts",
+      "blob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ipip_positive_expressivity9_zh_cn_research/1.0.0/source.json",
+      "blob": "7fa66ac8f5c4634d70f466f4f6751c4dd06ec7c2",
+      "sha256": "c9c348aed9a5596aa774d5eae074e63555bd50b379084bcde04f2165c9d2051a"
+    }
+  ],
+  "jsonChanges": [
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/interpretations/0/summary",
+      "from": "这份回答帮助你观察：开心和亲近的感受，通常会怎样被别人看见？它关注表达习惯，而不是你过得有多快乐。计分方向越高，表示你越常通过笑声、表情或亲近动作表达积极感受；较少外露也不代表冷漠或不在乎。例如，有人习惯笑出声，也有人更愿意说一句感谢；表达是否合适，还要看双方的意愿和关系边界。",
+      "value": "这份回答帮助你观察：开心和亲近的感受，通常会怎样被别人看见？它关注表达习惯，而不是你过得有多快乐。分数越高，表示你这次更认可通过笑声、表情或亲近动作表达积极感受的描述；较少外露也不代表冷漠或不在乎。例如，有人习惯笑出声，也有人更愿意说一句感谢；表达是否合适，还要看双方的意愿和关系边界。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/reportVersion",
+      "from": "1.0.0",
+      "value": "1.0.1"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/scoring/scores/0/description",
+      "from": "Self-reported outward expression of positive feelings and affection; not happiness level, emotion-regulation ability, social competence or relationship quality.",
+      "value": "自述的积极情绪和亲近感受的外在表达；不代表快乐程度、情绪调节能力、社交能力或关系质量。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/releaseStatus",
+      "from": "DRAFT",
+      "value": "PUBLISHED"
+    },
+    {
+      "op": "replace",
+      "path": "/identity/instrumentVersion",
+      "from": "1.0.0",
+      "value": "1.0.1"
+    },
+    {
+      "op": "add",
+      "path": "/instruction",
+      "value": {
+        "schemaVersion": 1,
+        "text": "请根据你通常的情况，判断以下说法与你的符合程度。没有标准答案，请按自己的真实感受作答。",
+        "language": "zh-CN",
+        "version": "1.0.1",
+        "source": "docs/scale-instruments/research-drafts/ipip_positive_expressivity9/1.0.0/bilingual-content.json#/instructions @ b92c69aefa2472775fa7ee86b9c208366886c908 (项目工作稿；非人工审批声明)"
+      }
+    },
+    {
+      "op": "remove",
+      "path": "/executable/definition/report/audienceContract/qcReview",
+      "from": {
+        "reviewer": "AI-assisted local editorial check (not human expert review)",
+        "reviewedAt": "2026-10-25T16:18:00Z",
+        "basis": "AI editorial check only: descriptive adult reflection, no norms, diagnostic/ability/moral labels or therapy claims; not human expert translation or psychometric review."
+      }
+    }
+  ],
+  "audit": "audits/audit-ipip-positive-expressivity9-batch3.json",
+  "versions": {
+    "instrument": "1.0.1",
+    "scoring": "1.0.0",
+    "report": "1.0.1",
+    "localization": "1.0.0",
+    "instruction": "1.0.1"
+  },
+  "states": {
+    "sourceRelease": "PUBLISHED candidate, independent integration pending",
+    "catalog": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "translation": "PENDING",
+    "scientificReview": null,
+    "databaseInstall": "NOT_EXECUTED",
+    "databasePublish": "NOT_EXECUTED",
+    "production": "NOT_TOUCHED"
+  },
+  "versionReason": "Original 1.0.0 source is retained byte-for-byte as DRAFT where a new 1.0.1 definition identity is introduced; same-identity existing rows must conflict, never overwrite. Description translation and instruction extraction do not change formulas, item meaning or options. Report-only wording has an explicit report revision.",
+  "reviewProvenance": "Original 1.0.0 retains its historical AI editorial qcReview. Revised report 1.0.1 does not reuse that prior timestamp/reviewer as approval of new wording; current content audit is separately preserved."
+}

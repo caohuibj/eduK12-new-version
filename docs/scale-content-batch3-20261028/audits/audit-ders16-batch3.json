@@ -1,0 +1,189 @@
+{
+  "instrument": "ders16_bjureberg_zh_cn_research:1.0.0",
+  "sourceSHA": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "files": [
+    {
+      "path": "docs/scale-instruments/research-drafts/ders16_bjureberg/1.0.0/README.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "320c4d471e4002230467009cdf358fe404983df3",
+      "sha256": "05d07ab0968f3a224929a1824a2310bf7f36774cae5bddcbd20da7f552c5b5d8"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ders16_bjureberg/1.0.0/source-manifest.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "dce145de8a28da08eb6f63d90f67768caef4266f",
+      "sha256": "898562fe4fb25690931238aa3a6add4e81228086cfb824864a1ae44a2987194b"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ders16_bjureberg_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "66d61eaf69242db5de2473a49756922d8390e242",
+      "sha256": "6300d50344dacb81ac43292fcaab64f485158d377310452de273c60e8c402513"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ders16_bjureberg_zh_cn_research/1.0.0/instrument.ts",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "0eed070bb879576339c5a71afdf34c0026591fd3",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ders16_bjureberg_zh_cn_research/1.0.0/source.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "2067376e417237cfe39f9fa68bd598ccdd33321e",
+      "sha256": "d770ab7bebd83095391960f723f2d23ce414523822f3147aaf8245b88d0e36e3"
+    }
+  ],
+  "originalEvidence": {
+    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4882111/",
+    "access": "本次直接读取2016作者论文Appendix和Discussion。"
+  },
+  "items": [
+    {
+      "code": "DERS16_01",
+      "chinese": "我很难弄明白自己的感受究竟意味着什么。",
+      "originalFacet": "clarity",
+      "key": "identity",
+      "conclusion": "作者Appendix题序及原36题归属吻合；中文待专家译审。"
+    },
+    {
+      "code": "DERS16_02",
+      "chinese": "我常常对自己是什么感受感到困惑。",
+      "originalFacet": "clarity",
+      "key": "identity",
+      "conclusion": "作者Appendix题序及原36题归属吻合；中文待专家译审。"
+    },
+    {
+      "code": "DERS16_03",
+      "chinese": "情绪难受的时候，我很难完成手头需要做的事情。",
+      "originalFacet": "goals",
+      "key": "identity",
+      "conclusion": "作者Appendix题序及原36题归属吻合；中文待专家译审。"
+    },
+    {
+      "code": "DERS16_04",
+      "chinese": "情绪难受的时候，我会变得难以控制自己。",
+      "originalFacet": "impulse",
+      "key": "identity",
+      "conclusion": "作者Appendix题序及原36题归属吻合；中文待专家译审。"
+    },
+    {
+      "code": "DERS16_05",
+      "chinese": "情绪难受的时候，我认为自己会这样难受很长时间。",
+      "originalFacet": "strategies",
+      "key": "identity",
+      "conclusion": "作者Appendix题序及原36题归属吻合；中文待专家译审。"
+    },
+    {
+      "code": "DERS16_06",
+      "chinese": "情绪难受的时候，我担心自己最后会陷入非常低落的状态。",
+      "originalFacet": "strategies",
+      "key": "identity",
+      "conclusion": "作者Appendix题序及原36题归属吻合；中文待专家译审。"
+    },
+    {
+      "code": "DERS16_07",
+      "chinese": "情绪难受的时候，我很难把注意力放到其他事情上。",
+      "originalFacet": "goals",
+      "key": "identity",
+      "conclusion": "作者Appendix题序及原36题归属吻合；中文待专家译审。"
+    },
+    {
+      "code": "DERS16_08",
+      "chinese": "情绪难受的时候，我感觉自己失去了控制。",
+      "originalFacet": "impulse",
+      "key": "identity",
+      "conclusion": "作者Appendix题序及原36题归属吻合；中文待专家译审。"
+    },
+    {
+      "code": "DERS16_09",
+      "chinese": "情绪难受的时候，我会因为自己有这种感受而感到羞耻。",
+      "originalFacet": "nonacceptance",
+      "key": "identity",
+      "conclusion": "作者Appendix题序及原36题归属吻合；中文待专家译审。"
+    },
+    {
+      "code": "DERS16_10",
+      "chinese": "情绪难受的时候，我会觉得自己很软弱。",
+      "originalFacet": "nonacceptance",
+      "key": "identity",
+      "conclusion": "作者Appendix题序及原36题归属吻合；中文待专家译审。"
+    },
+    {
+      "code": "DERS16_11",
+      "chinese": "情绪难受的时候，我很难控制自己的行为。",
+      "originalFacet": "impulse",
+      "key": "identity",
+      "conclusion": "作者Appendix题序及原36题归属吻合；中文待专家译审。"
+    },
+    {
+      "code": "DERS16_12",
+      "chinese": "情绪难受的时候，我觉得自己没办法让自己好受一点。",
+      "originalFacet": "strategies",
+      "key": "identity",
+      "conclusion": "作者Appendix题序及原36题归属吻合；中文待专家译审。"
+    },
+    {
+      "code": "DERS16_13",
+      "chinese": "情绪难受的时候，我会因为自己产生这种感受而对自己生气。",
+      "originalFacet": "nonacceptance",
+      "key": "identity",
+      "conclusion": "作者Appendix题序及原36题归属吻合；中文待专家译审。"
+    },
+    {
+      "code": "DERS16_14",
+      "chinese": "情绪难受的时候，我开始对自己感到非常失望和难过。",
+      "originalFacet": "strategies",
+      "key": "identity",
+      "conclusion": "作者Appendix题序及原36题归属吻合；中文待专家译审。 原文very bad about myself译为失望和难过属解释性细节，待人工审阅。"
+    },
+    {
+      "code": "DERS16_15",
+      "chinese": "情绪难受的时候，我很难去想其他事情。",
+      "originalFacet": "goals",
+      "key": "identity",
+      "conclusion": "作者Appendix题序及原36题归属吻合；中文待专家译审。"
+    },
+    {
+      "code": "DERS16_16",
+      "chinese": "情绪难受的时候，我会觉得这些感受强烈得难以承受。",
+      "originalFacet": "strategies",
+      "key": "identity",
+      "conclusion": "作者Appendix题序及原36题归属吻合；中文待专家译审。"
+    }
+  ],
+  "threePartConclusions": {
+    "content": "16题与原附录次序、五类原DERS36归属及全正向一致；五级频率百分比锚点按现有来源记录，需见原附录图核。第14题解释性译文留审。",
+    "scoring": "总分16–80、无反向；五组按原36题归属的2/3/3/5/3题求和，项目每组完整缺答规则。关键：论文Appendix说明五类别源自DERS36，Discussion明确未检验DERS16低阶因素，需未来研究；不能称作者已验证五个DERS16分量表。其展示/用途有科学依据范围问题，需root协调，不擅改算法。无常模阈值。",
+    "report": "report1.0.0中文成人SELF，尊重、无诊断分档、包含求助小建议；目前五组报告似稳定分量表，需准确标注原36题归属及DERS16低阶结构未验证。"
+  },
+  "instruction": {
+    "source": {
+      "path": "server-version/backend/src/modules/scale/instruments/ders16_bjureberg_zh_cn_research/1.0.0/source.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "2067376e417237cfe39f9fa68bd598ccdd33321e",
+      "sha256": "d770ab7bebd83095391960f723f2d23ce414523822f3147aaf8245b88d0e36e3"
+    },
+    "pointer": "/instruction",
+    "value": {
+      "schemaVersion": 1,
+      "text": "请根据你平时的真实经历，判断下面每句话在自己身上出现的频率。1表示几乎从不，5表示几乎总是；每一级具体含义见选项。部分题目特别询问你情绪难受时会怎样，请按照通常的情况作答，而不是只回忆一个特别严重的日子。没有正确或错误答案。",
+      "language": "zh-CN",
+      "version": "1.0.0",
+      "source": "根据Bjureberg等2016 DERS-16作者论文Appendix 16题与频率锚点，独立起草简体中文研究指导语。"
+    },
+    "note": "独立项目中文指导语已绑定。"
+  },
+  "materialIssue": {
+    "evidence": "论文Discussion指出DERS-16是否有有意义低阶因素须后续研究；Appendix星注归属依据DERS36。",
+    "impact": "现README“官方总分与五个分量表”及报告五维易过度声称；不应将来源题目分类描述成已验证DERS16五因子。",
+    "coordination": "先和root协调用户明确展示与版本；不得静默删维、改算法或伪称新验证。"
+  },
+  "ordinaryEdits": [],
+  "humanItems": [
+    "五维归属/展示证据范围需人工协调；中文独立译审及目标人群验证待完成。",
+    "原响应百分比图片及第14题翻译须人工核对；既有权利待办不变。"
+  ],
+  "notExecuted": [
+    "未修改仓库、系统、DB/CI，不执行测试、新科研版权调查。"
+  ]
+}

@@ -1,0 +1,224 @@
+{
+  "instrument": "ierq20_zh_cn_research:1.0.0",
+  "scope": "仅补此前不可读的英文附录、题序、选项锚点与原文所载计分证据，不重做此前报告审核。",
+  "sourceSHA": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "sourceFile": {
+    "path": "server-version/backend/src/modules/scale/instruments/ierq20_zh_cn_research/1.0.0/source.json",
+    "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+    "blob": "8a13ba963e39ef23dd45b1492ad48075b1878694",
+    "sha256": "dfad3705516d279c524a38a50f5f63d35c6e706489b05764580913245ad43d47"
+  },
+  "original": {
+    "title": "Interpersonal Emotion Regulation Questionnaire (IERQ): Scale Development and Psychometric Characteristics",
+    "authors": "Hofmann, Carpenter, Curtiss",
+    "doi": "10.1007/s10608-016-9756-2",
+    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4864994/#APP1",
+    "location": "Appendix I, table T5, items 1–20; scoring P61",
+    "retrieval": "本次通过公开 PMC 正常访问获得作者稿全文 HTML；之前访问 reCAPTCHA 的记录如实保留，原文不可读缺口已补。",
+    "localFile": "/tmp/ierq-pmc-20261028.html",
+    "bytes": 262240,
+    "sha256": "f622e44b09dd5f77d9c4bbcc2efd54ae856a071244d7b749d322e4e98f7e7d55",
+    "qualification": "此哈希只对应本次取得的 HTML 字节，不代表出版物文件的永久规范哈希。"
+  },
+  "items": [
+    {
+      "original_item": 1,
+      "source_code": "IERQ20_01",
+      "original_meaning_zh": "了解别人如何处理情绪后感觉更好",
+      "source_chinese": "了解别人以前是怎样面对情绪的，会让我感觉好一些。",
+      "finding": "核心题意对应；工作译文仍须按原有人工作业审阅。"
+    },
+    {
+      "original_item": 2,
+      "source_code": "IERQ20_02",
+      "original_meaning_zh": "低落时别人提醒事情没有表面糟糕",
+      "source_chinese": "心情低落时，别人提醒我事情或许没有看起来那么糟，会帮助我缓过来。",
+      "finding": "核心题意对应；工作译文仍须按原有人工作业审阅。"
+    },
+    {
+      "original_item": 3,
+      "source_code": "IERQ20_03",
+      "original_meaning_zh": "兴奋并分享喜悦时喜欢和别人一起",
+      "source_chinese": "非常高兴、想分享快乐的时候，我喜欢和其他人待在一起。",
+      "finding": "核心题意对应；工作译文仍须按原有人工作业审阅。"
+    },
+    {
+      "original_item": 4,
+      "source_code": "IERQ20_04",
+      "original_meaning_zh": "难受时寻找他人给予同情",
+      "source_chinese": "情绪不好的时候，我会寻找愿意理解和关怀我的人。",
+      "finding": "compassion 译为理解和关怀，表达略有扩展，供人工译审。"
+    },
+    {
+      "original_item": 5,
+      "source_code": "IERQ20_05",
+      "original_meaning_zh": "担忧时听他人如何处理事情的想法",
+      "source_chinese": "感到担忧时，听一听别人对如何处理事情的看法会帮助我。",
+      "finding": "核心题意对应；工作译文仍须按原有人工作业审阅。"
+    },
+    {
+      "original_item": 6,
+      "source_code": "IERQ20_06",
+      "original_meaning_zh": "欣喜时和某些人在一起感觉很好",
+      "source_chinese": "特别开心的时候，和某些人在一起会让我感觉更愉快。",
+      "finding": "原文是感觉良好，中文“更愉快”加入比较，供人工译审。"
+    },
+    {
+      "original_item": 7,
+      "source_code": "IERQ20_07",
+      "original_meaning_zh": "难受时有人提醒还有人更糟有帮助",
+      "source_chinese": "难受时，如果有人提醒我还有人处境更艰难，我会得到一些宽慰。",
+      "finding": "核心题意对应；工作译文仍须按原有人工作业审阅。"
+    },
+    {
+      "original_item": 8,
+      "source_code": "IERQ20_08",
+      "original_meaning_zh": "积极心情时和他人在一起扩大好感受",
+      "source_chinese": "心情不错时，我喜欢和其他人待在一起，因为那会让我感觉更开心。",
+      "finding": "核心题意对应；工作译文仍须按原有人工作业审阅。"
+    },
+    {
+      "original_item": 9,
+      "source_code": "IERQ20_09",
+      "original_meaning_zh": "难受常促使寻找会表达同情的人",
+      "source_chinese": "情绪低落时，我常常会去找愿意表达同情和理解的人。",
+      "finding": "核心题意对应；工作译文仍须按原有人工作业审阅。"
+    },
+    {
+      "original_item": 10,
+      "source_code": "IERQ20_10",
+      "original_meaning_zh": "难受时别人提醒情况可能糟糕得多",
+      "source_chinese": "不开心时，别人提醒我情况原本可能更糟，会让我感觉好些。",
+      "finding": "原文表示可能糟糕得多，中文“更糟”未显明程度，供人工译审。"
+    },
+    {
+      "original_item": 11,
+      "source_code": "IERQ20_11",
+      "original_meaning_zh": "受挫时看别人如何处理同样情境",
+      "source_chinese": "感到挫折时，了解别人会怎样处理相同处境，对我有帮助。",
+      "finding": "核心题意对应；工作译文仍须按原有人工作业审阅。"
+    },
+    {
+      "original_item": 12,
+      "source_code": "IERQ20_12",
+      "original_meaning_zh": "难受时向他人寻求安慰",
+      "source_chinese": "心里难受时，我会向其他人寻求安慰。",
+      "finding": "核心题意对应；工作译文仍须按原有人工作业审阅。"
+    },
+    {
+      "original_item": 13,
+      "source_code": "IERQ20_13",
+      "original_meaning_zh": "快乐有感染性所以开心时找别人",
+      "source_chinese": "因为快乐可以相互感染，所以我开心时会主动去找别人。",
+      "finding": "核心题意对应；工作译文仍须按原有人工作业审阅。"
+    },
+    {
+      "original_item": 14,
+      "source_code": "IERQ20_14",
+      "original_meaning_zh": "烦躁时别人说不必担心能够安抚",
+      "source_chinese": "感到烦躁时，别人劝我别太担心，能够帮助我平静下来。",
+      "finding": "核心题意对应；工作译文仍须按原有人工作业审阅。"
+    },
+    {
+      "original_item": 15,
+      "source_code": "IERQ20_15",
+      "original_meaning_zh": "悲伤时听别人处理类似感受的经历",
+      "source_chinese": "难过时，听别人讲述他们怎样面对类似感受，对我有帮助。",
+      "finding": "核心题意对应；工作译文仍须按原有人工作业审阅。"
+    },
+    {
+      "original_item": 16,
+      "source_code": "IERQ20_16",
+      "original_meaning_zh": "低落时找别人以知道自己被爱",
+      "source_chinese": "心情非常低落时，我会去找人，希望确认自己是被爱着的。",
+      "finding": "核心题意对应；工作译文仍须按原有人工作业审阅。"
+    },
+    {
+      "original_item": 17,
+      "source_code": "IERQ20_17",
+      "original_meaning_zh": "焦虑时别人告诉不要担心可以平静",
+      "source_chinese": "焦虑时，别人告诉我不必过于担心，会让我慢慢平静下来。",
+      "finding": "核心题意对应；工作译文仍须按原有人工作业审阅。"
+    },
+    {
+      "original_item": 18,
+      "source_code": "IERQ20_18",
+      "original_meaning_zh": "欣喜时找别人让他们开心",
+      "source_chinese": "特别兴奋和高兴时，我会去找其他人，也希望把快乐带给他们。",
+      "finding": "核心题意对应；工作译文仍须按原有人工作业审阅。"
+    },
+    {
+      "original_item": 19,
+      "source_code": "IERQ20_19",
+      "original_meaning_zh": "悲伤时找别人寻求慰藉",
+      "source_chinese": "悲伤时，我会找人寻求宽慰。",
+      "finding": "核心题意对应；工作译文仍须按原有人工作业审阅。"
+    },
+    {
+      "original_item": 20,
+      "source_code": "IERQ20_20",
+      "original_meaning_zh": "难受时想知道别人处于同样情境会怎么做",
+      "source_chinese": "心情不好时，我想知道别人处在我的情境里会怎么做。",
+      "finding": "核心题意对应；工作译文仍须按原有人工作业审阅。"
+    }
+  ],
+  "anchors": {
+    "original": [
+      "not true for me at all",
+      "a little bit",
+      "moderately",
+      "quite a bit",
+      "extremely true for me"
+    ],
+    "source_zh": [
+      "完全不符合",
+      "稍微符合",
+      "中等程度符合",
+      "比较符合",
+      "非常符合"
+    ],
+    "finding": "序位与符合程度总体对应；最高项 extremely 与“非常”强度差异是否需精细调整留待译审，任何选项变更按版本协调，不自行变更。"
+  },
+  "instruction": "原文要求逐题评估陈述符合自己的程度，并说明无对错；源中文“平时的实际情况”“真实的习惯”是工作译稿的表述，不是原文逐字直译。",
+  "scoring_evidence": {
+    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4864994/#P61",
+    "forward": "全部正向",
+    "subscales": {
+      "enhancing_positive_affect": [
+        3,
+        6,
+        8,
+        13,
+        18
+      ],
+      "perspective_taking": [
+        2,
+        7,
+        10,
+        14,
+        17
+      ],
+      "soothing": [
+        4,
+        9,
+        12,
+        16,
+        19
+      ],
+      "social_modeling": [
+        1,
+        5,
+        11,
+        15,
+        20
+      ]
+    },
+    "method": "作者附录列各维求和，与此前固定源归属一致；附录此处未给缺失处理，先前项目规则不应归因于原作者。"
+  },
+  "remaining": "独立译审及项目原有人工作业状态不因读到原文而自动完成。题6、10及最高锚点的可能语义强度差异交人工协调；未修改题目、选项或版本。",
+  "notExecuted": [
+    "未重审此前报告或运行测试",
+    "未修改仓库、数据库或 CI",
+    "未开展新的科研或版权审核"
+  ]
+}

@@ -1,0 +1,192 @@
+{
+  "schemaVersion": 1,
+  "applicationHead": "7152389bf10641e0b403ebdac3491b7fa75e9c42",
+  "acceptedCases": [
+    {
+      "instrumentKey": "bpses5_zh_cn_research",
+      "fullName": "bpses5_zh_cn_research:1.0.0 source content contract",
+      "report": "evidence/selected-content.json",
+      "status": "passed",
+      "sourceBytesUnchangedAtFinal": true,
+      "finalSourceSHA256": "db2b4fa65e75897ebb6f84e89f276c64bedf545912c2d9770ee5ba2dfa0b6220",
+      "executionContentHead": "4d64682ef120f30f5c90d02e9671a853f737546a"
+    },
+    {
+      "instrumentKey": "brcs4_zh_cn_research",
+      "fullName": "brcs4_zh_cn_research:1.0.0 source content contract",
+      "report": "evidence/selected-content.json",
+      "status": "passed",
+      "sourceBytesUnchangedAtFinal": true,
+      "finalSourceSHA256": "2f371fcf26aa89d3bbbdff6fa8ee987cc54715375df27fee89b38a024aab45d9",
+      "executionContentHead": "4d64682ef120f30f5c90d02e9671a853f737546a"
+    },
+    {
+      "instrumentKey": "ipip_emotion_based_decision9_zh_cn_research",
+      "fullName": "ipip_emotion_based_decision9_zh_cn_research:1.0.1 source content contract",
+      "report": "evidence/selected-content.json",
+      "status": "passed",
+      "sourceBytesUnchangedAtFinal": true,
+      "finalSourceSHA256": "fc35ef54f3d0ddb142cd63708b872568b42742551770f4f84b56e706a8e95d87",
+      "executionContentHead": "4d64682ef120f30f5c90d02e9671a853f737546a"
+    },
+    {
+      "instrumentKey": "ipip_negative_expressivity10_zh_cn_research",
+      "fullName": "ipip_negative_expressivity10_zh_cn_research:1.0.1 source content contract",
+      "report": "evidence/selected-content.json",
+      "status": "passed",
+      "sourceBytesUnchangedAtFinal": true,
+      "finalSourceSHA256": "f999fd7b0690224f4abdd441d9560df6441c2bcc84471782b75b1e1a147905a4",
+      "executionContentHead": "4d64682ef120f30f5c90d02e9671a853f737546a"
+    },
+    {
+      "instrumentKey": "ipip_positive_expressivity9_zh_cn_research",
+      "fullName": "ipip_positive_expressivity9_zh_cn_research:1.0.1 source content contract",
+      "report": "evidence/selected-content.json",
+      "status": "passed",
+      "sourceBytesUnchangedAtFinal": true,
+      "finalSourceSHA256": "95ebdfc943edd53639fa8adbd49718c60d7aee29c7f063085b33619fa57018f2",
+      "executionContentHead": "4d64682ef120f30f5c90d02e9671a853f737546a"
+    },
+    {
+      "instrumentKey": "ipip_responsive_distress10_zh_cn_research",
+      "fullName": "ipip_responsive_distress10_zh_cn_research:1.0.1 source content contract",
+      "report": "evidence/selected-content.json",
+      "status": "passed",
+      "sourceBytesUnchangedAtFinal": true,
+      "finalSourceSHA256": "e9df843e53ef5761494bf07f4c4d448ae236ab84eb7b43a4105c32f6ec6ac139",
+      "executionContentHead": "4d64682ef120f30f5c90d02e9671a853f737546a"
+    },
+    {
+      "instrumentKey": "ipip_responsive_joy10_zh_cn_research",
+      "fullName": "ipip_responsive_joy10_zh_cn_research:1.0.0 source content contract",
+      "report": "evidence/selected-content.json",
+      "status": "passed",
+      "sourceBytesUnchangedAtFinal": true,
+      "finalSourceSHA256": "bdc9e05a94bf4b9646cb2e3fab7ee379184da69782bfbcbca3e86f35d9c7c2e6",
+      "executionContentHead": "4d64682ef120f30f5c90d02e9671a853f737546a"
+    },
+    {
+      "instrumentKey": "cfq7_zh_cn_research",
+      "fullName": "cfq7_zh_cn_research:1.0.1 source content contract",
+      "report": "evidence/refinements-content.json",
+      "status": "passed",
+      "sourceBytesUnchangedAtFinal": true,
+      "finalSourceSHA256": "097a3dbbef82311542607538926310b64985ce17e3a124670bd6c4a4ab4ad052",
+      "executionContentHead": "609f012b1c6ec095a0a551d9fc96d8616801cd36"
+    },
+    {
+      "instrumentKey": "djgls6_zh_cn_research",
+      "fullName": "djgls6_zh_cn_research:1.0.1 source content contract",
+      "report": "evidence/refinements-content.json",
+      "status": "passed",
+      "sourceBytesUnchangedAtFinal": true,
+      "finalSourceSHA256": "b6b16ea4c28cccfb795af036ec675ad33143db868fc1f9c4912bc0ba04e337de",
+      "executionContentHead": "609f012b1c6ec095a0a551d9fc96d8616801cd36"
+    },
+    {
+      "instrumentKey": "ebq16_zh_cn_research",
+      "fullName": "ebq16_zh_cn_research:1.0.2 source content contract",
+      "report": "evidence/refinements-content.json",
+      "status": "passed",
+      "sourceBytesUnchangedAtFinal": true,
+      "finalSourceSHA256": "fcf25fd4ed02e10d3f284344eb1b577afff45d176168bfd739ee525b395e48ec",
+      "executionContentHead": "609f012b1c6ec095a0a551d9fc96d8616801cd36"
+    },
+    {
+      "instrumentKey": "kseg6_zh_cn_research",
+      "fullName": "kseg6_zh_cn_research:1.0.1 source content contract",
+      "report": "evidence/refinements-content.json",
+      "status": "passed",
+      "sourceBytesUnchangedAtFinal": true,
+      "finalSourceSHA256": "c411659f3ecf355ee3c11204e9bd4c7ad5c571f44a4e03c24c3a5d32ee332dd8",
+      "executionContentHead": "609f012b1c6ec095a0a551d9fc96d8616801cd36"
+    },
+    {
+      "instrumentKey": "maia2_37_zh_cn_research",
+      "fullName": "maia2_37_zh_cn_research:1.0.1 source content contract",
+      "report": "evidence/refinements-content.json",
+      "status": "passed",
+      "sourceBytesUnchangedAtFinal": true,
+      "finalSourceSHA256": "eb69bb29aacf58cc9fdf4fb728de99b4bd7ae34fe7994085ef50f521c9e56ae0",
+      "executionContentHead": "609f012b1c6ec095a0a551d9fc96d8616801cd36"
+    },
+    {
+      "instrumentKey": "sswq16_zh_cn_research",
+      "fullName": "sswq16_zh_cn_research:1.0.1 source content contract",
+      "report": "evidence/refinements-content.json",
+      "status": "passed",
+      "sourceBytesUnchangedAtFinal": true,
+      "finalSourceSHA256": "d4256b5c0c3de791b85cd24c6392d99ce998705c1f4926ca39508d45f905a675",
+      "executionContentHead": "609f012b1c6ec095a0a551d9fc96d8616801cd36"
+    },
+    {
+      "instrumentKey": "dbt_wccl59_zh_tw_official_research",
+      "fullName": "dbt_wccl59_zh_tw_official_research:1.0.1 source content contract",
+      "report": "evidence/refinements-failed-only.json",
+      "status": "passed",
+      "sourceBytesUnchangedAtFinal": true,
+      "finalSourceSHA256": "cd7d66e49e3d22cb0a23fd947d18c6ea9069b5e6a86f436e11ea92fb660f5546",
+      "executionContentHead": "89f62735384019bd7eb38a1ff708a11aaf426a5b"
+    },
+    {
+      "instrumentKey": "spane12_zh_cn_research",
+      "fullName": "spane12_zh_cn_research:1.0.1 source content contract",
+      "report": "evidence/refinements-failed-only.json",
+      "status": "passed",
+      "sourceBytesUnchangedAtFinal": true,
+      "finalSourceSHA256": "e250bbf45ccc05980494cfc8dc83f3cd15805a054ff2dbd59cbf094723025705",
+      "executionContentHead": "89f62735384019bd7eb38a1ff708a11aaf426a5b"
+    },
+    {
+      "instrumentKey": "apq42_parent_global_zh_cn_research",
+      "fullName": "apq42_parent_global_zh_cn_research:1.0.1 source content contract",
+      "report": "evidence/apq-final.json",
+      "status": "passed",
+      "sourceBytesUnchangedAtFinal": true,
+      "finalSourceSHA256": "13032dbb46a6bf895f4cb962b4cabddf7712e029881f8904e9981ff728c55563",
+      "executionContentHead": "89f62735384019bd7eb38a1ff708a11aaf426a5b"
+    },
+    {
+      "instrumentKey": "psyflex6_zh_cn_research",
+      "fullName": "psyflex6_zh_cn_research:1.0.1 approved highest-frequency anchor and preserved numeric scoring",
+      "report": "evidence/psyflex-content.json",
+      "status": "passed",
+      "sourceBytesUnchangedAtFinal": true,
+      "finalSourceSHA256": "778a1d7f4f181e9a25c4041767dfd79f21230620746f694cc75d7e9bf6386210",
+      "executionContentHead": "7152389bf10641e0b403ebdac3491b7fa75e9c42"
+    }
+  ],
+  "acceptedCaseCount": 17,
+  "formalCI": "NOT_EXECUTED_NOT_ACTIVATED",
+  "production": "DEFERRED_BY_USER",
+  "failureHistory": [
+    {
+      "receipt": "refinements-execution-receipt.json",
+      "processExit": 1,
+      "caseResult": "NOT_EXECUTED; module import duplicate SPANE descriptor",
+      "fix": "new source wrapper reuses original plugin registration, no registry edit"
+    },
+    {
+      "receipt": "refinements-retry-execution-receipt.json",
+      "processExit": 1,
+      "caseResult": "6 passed, 3 failed",
+      "fix": "APQ maxInclusive unsupported schema; two missing report audience contracts"
+    },
+    {
+      "receipt": "failed-only-execution-receipt.json",
+      "processExit": 1,
+      "caseResult": "2 passed, 1 failed",
+      "fix": "APQ check harness assumed retained old schema-invalid DRAFT appeared in registry; corrected harness to assert honest quarantine and original bytes, no product change"
+    }
+  ],
+  "reuse": "Original failed commands remain failed. Passed cases are disjoint and source hashes checked against their actual execution heads. SPANE/TW unchanged scoring fixtures from the failed readiness result are reused only with exact scoring/items/fixture/measurement equality and current structural/runtime compile success. No whole-catalog or system retest.",
+  "notExecuted": [
+    "full tsc/build/CI",
+    "browser/phone/tablet/screenshots",
+    "four-entry checks",
+    "database install/publication/idempotence",
+    "production deployment"
+  ],
+  "dependencies": "Source/lock/config pre/post manifests retained. No claim of complete historical node_modules byte attestation.",
+  "newContentDecision": "User explicitly approved Psy-Flex highest anchor correction in new1.0.1; only that new selected identity and changed generated index checked; previous16 not rerun."
+}

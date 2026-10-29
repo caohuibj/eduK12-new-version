@@ -1,0 +1,10 @@
+{
+  "status": "PREPARATION_PROBE_FAILED_NOT_AN_APPLICATION_TEST",
+  "executionToolChunk": "c80cca",
+  "outerExitCode": 1,
+  "action": "An unnecessary tsx --version probe was invoked from repository root after content preparation; module path was backend-relative.",
+  "error": "MODULE_NOT_FOUND /workspace/eduK12-new-version/node_modules/tsx/dist/cli.mjs",
+  "completedBeforeFailure": "Psy-Flex source preparation completed and read back; mutation was not repeated.",
+  "notExecuted": "No content test or production action in this failed probe. Actual backend generation and single Psy-Flex content check are separate receipts.",
+  "originalRawLogFile": "NOT_CAPTURED_SEPARATELY; tool output exists, no invented raw log hash"
+}

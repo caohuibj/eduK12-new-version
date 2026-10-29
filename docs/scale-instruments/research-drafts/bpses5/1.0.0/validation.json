@@ -1,0 +1,83 @@
+{
+  "instrumentKey": "bpses5_zh_cn_research",
+  "version": "1.0.0",
+  "status": "LOCAL_RESEARCH_DRAFT_CHECKS_PASSED_NOT_ACTIVATED",
+  "source": {
+    "bytes": 27689,
+    "sha256": "8fa89e6acfcd1041940f5b502fce0f0b19436eab7fb39bb1ac9df751f06e7755"
+  },
+  "test": {
+    "bytes": 12158,
+    "sha256": "0e30656184d18f52e478e23e8feac90cb4e94bba41fa92957bcc02850d097f55"
+  },
+  "unit": {
+    "total": 18,
+    "passed": 18,
+    "failed": 0,
+    "firstRun": true,
+    "exitCode": 0,
+    "reporter": "/workspace/eduk12-scale-evidence/20261026-wave9/bpses5/20261026T101112Z.vitest.json"
+  },
+  "types": {
+    "exitCode": 0,
+    "strict": true,
+    "scope": "Dedicated test static transitive closure only, not all-backend test traversal",
+    "listing": "/workspace/eduk12-scale-evidence/20261026-wave9/bpses5/20261026T101112Z.types-inputs.txt"
+  },
+  "reports": {
+    "exitCode": 0,
+    "firstRun": true,
+    "cases": [
+      "minimum",
+      "maximum",
+      "mixed",
+      "missing_first"
+    ],
+    "reports": 4,
+    "completeReports": 3,
+    "interpretations": 3,
+    "minimumTotal": 5,
+    "maximumTotal": 25,
+    "mixedTotal": 15,
+    "missingTotal": null,
+    "missingInterpretations": 0
+  },
+  "binding": {
+    "manifest": "/workspace/eduk12-scale-evidence/20261026-wave9/bpses5/20261026T101112Z.inputs-before.json",
+    "manifestSha256": "6ab96947293c0bbab348dd6854471cad04ffe92766f2f087174436905d76cdcd",
+    "capturedAt": "2026-10-26T10:11:13.255181+00:00",
+    "phase": "BEFORE_REPORT_UNIT_AND_TYPE_EXECUTION",
+    "inputCount": 573,
+    "inputChangedDuringExecution": [],
+    "originalBytes": "PRIVATE .input-bytes directory; no post-hoc signature",
+    "coverage": "Static transitive closure, two explicitly runtime-read doc files, config/lock/scripts and named tool entrypoints; not full installed package byte attestation",
+    "captureFailFast": "Capture persisted/read back before selected commands; any capture failure stops with NOTRUN, no check ran before capture completion"
+  },
+  "commandReceipt": "/workspace/eduk12-scale-evidence/20261026-wave9/bpses5/20261026T101112Z.invocation.json",
+  "checkReceipts": [
+    "/workspace/eduk12-scale-evidence/20261026-wave9/bpses5/20261026T101112Z.reports.result.json",
+    "/workspace/eduk12-scale-evidence/20261026-wave9/bpses5/20261026T101112Z.unit.result.json",
+    "/workspace/eduk12-scale-evidence/20261026-wave9/bpses5/20261026T101112Z.types.result.json"
+  ],
+  "stdoutStderr": "Each check retains separate original .stdout and .stderr files, even if empty",
+  "expertReview": "PENDING",
+  "cognitiveDebrief": "NOT_ESTABLISHED",
+  "ChineseValidation": "NOT_ESTABLISHED_INDEPENDENT_DERIVATIVE",
+  "database": "NOTRUN_BY_THIS_AGENT_ROOT_INTEGRATION",
+  "browser": "NOTRUN",
+  "ci": "NOTRUN",
+  "deployment": "NOTRUN",
+  "activation": "DRAFT_REFUSED_BY_ACTUAL_UNIT",
+  "instructionConsumer": "PREPARED_NOT_RUNTIME_CONNECTED",
+  "coordinatorIntegration": {
+    "status": "PASS_NON_OWNER_SYNTHETIC_POSTGRES",
+    "cases": 7,
+    "newRows": 1,
+    "finalRows": 15,
+    "finalSnapshots": 17,
+    "references": 0,
+    "deployments": 0,
+    "evidence": "../../../batches/20261026-wave9/validation.json",
+    "ciExecuted": false
+  }
+}

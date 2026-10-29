@@ -1,0 +1,137 @@
+{
+  "instrument": "l1_zh_cn_research:1.0.0",
+  "sourceSHA": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "files": [
+    {
+      "path": "docs/scale-instruments/research-drafts/l1/1.0.0/README.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "f143bda2ff022afa5d7b54f0feb8273c0c8a8553",
+      "sha256": "c51ed20d6120e6fd6ff733e89fb01c51de4aa077d587478c1a1dbbe8baf5e130"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/l1/1.0.0/bilingual-content.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "fd6944b00b1f0187faa53afb035fdb0fe7c8fa0d",
+      "sha256": "53b26c0640dd656390bfe41fdab88e97ced407181fc1cb64b18986ead5ad73c2"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/l1/1.0.0/external-reference-dossier.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "d5eeb9fe440a05f45e28447359c20026c7597aea",
+      "sha256": "c60a1980981e2f15394c7b7023774f9279f6a93f19e577467bc9a0c73a9ff1a8"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/l1/1.0.0/local-test-output.txt",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "492017743df12908a97a4f51c29bc1863e567e82",
+      "sha256": "a65cd0ba8cfc473e213e2b27bdab04f4ff2b51ba561bd964c29b956495970609"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/l1/1.0.0/local-validation.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "252851d11ad562e6fea27e6b09661f7b6206417b",
+      "sha256": "6aa6ce8b2fbb791fb40caef6ce4b9b5c1938c8a766ac44131acf55843b01d41c"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/l1/1.0.0/references.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "e319e267a260df2c43dbb7f2b980e2b4232d7e69",
+      "sha256": "3fd723371c78bec21466f6c17ff079a02714e80a05496ef93b16edd6b1590010"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/l1/1.0.0/report-example.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "a079f5aefa3d767f5774f9af301223217f6d5bbc",
+      "sha256": "860ce178f692e5f6f3c8aa36f3d5b175ed677f4a07b90e5abca2869640efe376"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/l1/1.0.0/report-example.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "0c40f35ca00fd5c1475925333acfccda7f36304c",
+      "sha256": "e15d17d1437874c9fdc4a763059af8ba5513a1e5a1033001af7877b666abcebb"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/l1/1.0.0/reviewed-source-pack.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "1c07bcc0021174358b92d0e88c00782e74db49ff",
+      "sha256": "90afbf68afb43ca711e14bfa33f0d5a376e7fe8509fed9f6d7e0dee078c40271"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/l1/1.0.0/runtime-check.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "2d01be6d64a7811d3677f72a0302cebdb1d7cf35",
+      "sha256": "c165669f16b91f19c48e7824592f0af9ca148655d9343f94d6485646c1b77585"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/l1/1.0.0/scoring-and-thresholds.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "398a8ec8cd47c7aa34d9c5d3e90135cd73bd63f2",
+      "sha256": "a5d4ecec62be9c11f9b4dc5119df199670d3ff4939a66bbfb204ce6ac6748f04"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/l1_zh_cn_research/1.0.0/instrument.ts",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/l1_zh_cn_research/1.0.0/source.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "7728b7c0cb8b05aadf941bafb105498b8439adab",
+      "sha256": "c50ada90db0da250d253f7a9fb16da65b2c01cd7758e603b3c79bfd72a667833"
+    }
+  ],
+  "originalEvidence": {
+    "url": "https://access.gesis.org/zis/624",
+    "access": "本次直接读取作者英文题本PDF第3页题目和两端、11格；研究包记录英文版1–11编码及德文版0–10差异。PDF封面与现行目录DOI差异保留，不静默更改。"
+  },
+  "items": [
+    {
+      "code": "L1_01",
+      "english": "The next question is about your general satisfaction with life. All things considered, how satisfied are you with your life these days?",
+      "chinese": "下面的问题关于您对生活的总体满意程度。综合各方面来看，您对近来的生活有多满意？",
+      "key": "identity",
+      "conclusion": "题文与可读作者英文题本一致，中文保留近来、综合各方面含义；独立译审待完成。"
+    }
+  ],
+  "threePartConclusions": {
+    "content": "唯一题包含原题首句说明及近来总体满意度问题；英文本11格，1完全不满意到11完全满意，中间数字为项目标记；不能混用德语0–10记分。",
+    "scoring": "单题identity；实现mean但只有一个权重1题，分母1即答案1–11，无反向；缺答不计分、不插补为项目规则。没有参考集或经验分档；外国样本数值不是中文常模。",
+    "report": "报告1.0.0、zh-CN和成人本人；student为技术受众。higher_is_more方向正确，生活满意度快照非心理诊断，不提供常模排名，有可操作小建议。正文可保留。"
+  },
+  "instruction": {
+    "existingText": "下面的问题关于您对生活的总体满意程度。",
+    "source": {
+      "path": "server-version/backend/src/modules/scale/instruments/l1_zh_cn_research/1.0.0/source.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "7728b7c0cb8b05aadf941bafb105498b8439adab",
+      "sha256": "c50ada90db0da250d253f7a9fb16da65b2c01cd7758e603b3c79bfd72a667833"
+    },
+    "jsonPointer": "/executable/definition/items/0/content",
+    "corroboratingSource": {
+      "path": "docs/scale-instruments/research-drafts/l1/1.0.0/bilingual-content.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "fd6944b00b1f0187faa53afb035fdb0fe7c8fa0d",
+      "sha256": "53b26c0640dd656390bfe41fdab88e97ced407181fc1cb64b18986ead5ad73c2"
+    },
+    "corroboratingPointer": "/items/0/zh",
+    "note": "这是唯一原题的一部分，研究材料instructions=null，不重复另加指导语或拆改题本。"
+  },
+  "ordinaryEdits": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/l1_zh_cn_research/1.0.0/source.json",
+      "jsonPointer": "/executable/definition/scoring/scores/0/description",
+      "old": "对近来生活的总体满意程度的自述程度，不是诊断、排名或道德评价。",
+      "new": "对近来生活总体满意程度的自述，不是诊断、排名或道德评价。",
+      "reason": "消除“程度”的重复，维持原意；依现行版本轴处理。"
+    }
+  ],
+  "humanItems": [
+    "中文独立专家译审、认知访谈和目标人群效度待完成；原作者未背书。",
+    "保留既有CC BY-NC-SA 4.0署名、非商业和相同方式共享限制，不能将代码许可替代材料许可。",
+    "任何题义、量尺编码或阈值变动应协调版本。"
+  ],
+  "notExecuted": [
+    "未改仓库、分支、DB/CI，未运行测试或系统检查；未开展新版权科研调查。"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "sourceSHA": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "sourcePath": "server-version/backend/src/modules/scale/instruments/psyflex6_zh_cn_research/1.0.0/source.json",
+  "sourceSHA256": "f0d7e20eab0a65684f24b6cc4bcf859d14299a8ec2e59a1b2897a02ffbcfde5d",
+  "status": "APPROVED_BY_USER_APPLIED_TO_NEW_VERSION",
+  "proposedNewInstrumentVersion": "1.0.1",
+  "operations": [
+    {
+      "op": "test",
+      "path": "/executable/definition/responseSets/0/options/4/label",
+      "value": "总是如此"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/responseSets/0/options/4/label",
+      "value": "非常经常"
+    }
+  ],
+  "reason": "Official highest anchor very often differs from current 总是如此; changing an answer anchor requires explicit version/impact coordination under the user’s prior content rule. Preserve 1.0.0 and all actual scoring formulas/thresholds.",
+  "officialSource": "https://psychologie.unibas.ch/fileadmin/user_upload/psychologie/Abteilungen/Clinical_Psychology_and_Intervention_Science/docs/psy-flex/psy-flex-eng.pdf",
+  "preparedVersion": "1.0.1"
+}

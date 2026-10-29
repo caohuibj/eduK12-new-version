@@ -1,0 +1,176 @@
+{
+  "instrument": "sop2_zh_cn_research:1.0.0",
+  "sourceSHA": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "files": [
+    {
+      "path": "docs/scale-instruments/research-drafts/sop2/1.0.0/README.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "145bb8d828f89e4d0d8610fda4cc8dc1b4cea60f",
+      "sha256": "092da91c3e0629107cfce59770105e2bc8d27f2afd89ede7aad9a5cd76439575"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/sop2/1.0.0/bilingual-content.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "ba6341d08cee2cdce054f557fd4b1cc19adfbce7",
+      "sha256": "8ae25023192a7f2f9a2e1eb49aeba3d39fd32f64f8458986ad94db43dbcfd0ff"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/sop2/1.0.0/local-validation.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "7ea514354a8d9c05b81ec955094d0a89e679c67b",
+      "sha256": "df236a55f6c83785ddce96d6ece087bb96ba76be4605576ac4a00e5d0daad06e"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/sop2/1.0.0/references.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "9da899f01371cda752e7681a6df50f30c12036ed",
+      "sha256": "6ce8d0523b50d626fd55cdca53295384f8257b828419e0df1eb49e0774cc9f38"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/sop2/1.0.0/report-example.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "937a6da00b96ec64ce7b30c8fc3b95045c7895f5",
+      "sha256": "e17d25fe2ad41c922fbcc1f88d8d101d97c1843d44090f48940b5e862f7e42b0"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/sop2/1.0.0/report-revisions/1.0.1/change-record.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "3eaa13e405122a43c5f5b1651349f694323bb1aa",
+      "sha256": "40c899b159e1bbb22385a67b30719ad07a5f2f839dc1486fde3c158d6e435ba5"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/sop2/1.0.0/report-revisions/1.0.1/previous-report-1.0.0.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "d6de0995673453a709eb265fcf17a3d9b3c61998",
+      "sha256": "5e5a0e67ebddb35ace1eda38182a9a39cb484f66fc641bb020f3facbaf237e6d"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/sop2/1.0.0/report-revisions/1.0.1/previous-report-example.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "ca1a110d28cc3060f25e9c06da17e908e9d02f1f",
+      "sha256": "eae093828f0c65ad658295fd8d6157f4f9748c0045f9bf695fa5cd55bad20221"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/sop2/1.0.0/report-revisions/1.0.1/previous-synthetic-report-example.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "aa3004c82046c10abb1fe645a780f6d9f30a91a5",
+      "sha256": "14a6bc519e36718008de3cc030da9ecc8298ab656a778d9f8c50ee0b397b4724"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/sop2/1.0.0/report-revisions/1.0.1/validation.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "88fad41c6648115799d48acef7205da04743c66f",
+      "sha256": "da2baa07b3b426276fdb5cb43e602007f5d308a2ec11f6c1bbca2b98f116bc6e"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/sop2/1.0.0/reviewed-source-pack.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "8c9830eb709be231334c25bd25a92b4af1a8092b",
+      "sha256": "fdff2b9321ef3f2ea17cfd59ecd4a346a048d7ae3eaa00eb86973c15fdefc456"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/sop2/1.0.0/scoring-direction.svg",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "1dbb31cfbfbe88f210a7252316bf71234aeec82a",
+      "sha256": "fa7df1b7f75adf51da2147376f3c1ac78e8aceeecc07240b4a60500c1b7e86fb"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/sop2/1.0.0/synthetic-report-example.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "fd5fec3d9856f33efd5a87f31a7c1c4054d80b14",
+      "sha256": "94496cdc15ff3b4c94b22c885420697a8a3f870fc199b8a80caa44c4da01d662"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/sop2_zh_cn_research/1.0.0/instrument.ts",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/sop2_zh_cn_research/1.0.0/source.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "54838ac53b67bdf2251ef1253d49b197b9f31891",
+      "sha256": "944906cd932b4b60c43508bb106c8c539b4c86e69da543cb614428c9616ff41a"
+    }
+  ],
+  "originalEvidence": {
+    "url": "https://link.springer.com/article/10.1186/s42409-021-00027-6",
+    "access": "本次直接读取论文作者说明两题不同端点、第二题8−x和无权均分；论文表格题文以固定双语研究包原文记录核对，未声称本次读取表格内容。"
+  },
+  "items": [
+    {
+      "code": "sop2_1",
+      "english": "The next question deals with optimism. Optimists are people who look to the future with confidence and who mostly expect good things to happen. How would you describe yourself? How optimistic are you in general?",
+      "chinese": "接下来的问题涉及乐观。乐观的人对未来抱有信心，并且通常期待好事发生。你会如何描述自己？总的来说，你有多乐观？",
+      "key": "identity",
+      "endpoints": {
+        "1": {
+          "en": "not at all optimistic",
+          "zh": "一点也不乐观"
+        },
+        "7": {
+          "en": "very optimistic",
+          "zh": "非常乐观"
+        }
+      },
+      "conclusion": "固定双语研究材料与运行源一致，题意及定义完整保留，独立中文译审待完成。"
+    },
+    {
+      "code": "sop2_2",
+      "english": "The next question is about pessimism. Pessimists are people who are full of doubt when they look to the future and who mostly expect bad things to happen. How would you describe yourself? How pessimistic are you in general?",
+      "chinese": "接下来的问题涉及悲观。悲观的人想到未来时充满疑虑，并且通常预期坏事发生。你会如何描述自己？总的来说，你有多悲观？",
+      "key": "reverse",
+      "endpoints": {
+        "1": {
+          "en": "not at all pessimistic",
+          "zh": "一点也不悲观"
+        },
+        "7": {
+          "en": "very pessimistic",
+          "zh": "非常悲观"
+        }
+      },
+      "conclusion": "固定双语研究材料与运行源一致，题意及定义完整保留，独立中文译审待完成。"
+    }
+  ],
+  "threePartConclusions": {
+    "content": "两题分别包含乐观/悲观定义及问题，1–7各自专属端点，中间2–6只数字；两个工作译题与固定双语材料一致，维持完整题文，不造总指导语。",
+    "scoring": "乐观原值和悲观反向8−x等权均分，分母2，范围1–7、步长0.5；complete_required、两题缺一不给分不补填；不生成单独悲观分。原论文确认反向与均值，既有来源记录两题完整要求。references空、referencePolicy none，无经验等级。",
+    "report": "报告1.0.1、zh-CN、ADULT_SELF/student技术角色；高分代表本次整体较积极期待，并明示悲观原答方向与反向分不同。反思和小行动合适、无诊断或人群比较；沿用。"
+  },
+  "instruction": {
+    "source": {
+      "path": "docs/scale-instruments/research-drafts/sop2/1.0.0/bilingual-content.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "ba6341d08cee2cdce054f557fd4b1cc19adfbce7",
+      "sha256": "8ae25023192a7f2f9a2e1eb49aeba3d39fd32f64f8458986ad94db43dbcfd0ff"
+    },
+    "jsonPointer": "/instructions",
+    "value": {
+      "en": null,
+      "zh": null,
+      "note": "No general instruction in source. Retain the construct definition and question as one complete item."
+    },
+    "runtimeSource": {
+      "path": "server-version/backend/src/modules/scale/instruments/sop2_zh_cn_research/1.0.0/source.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "54838ac53b67bdf2251ef1253d49b197b9f31891",
+      "sha256": "944906cd932b4b60c43508bb106c8c539b4c86e69da543cb614428c9616ff41a"
+    },
+    "runtimePointers": [
+      "/executable/definition/items/0/content",
+      "/executable/definition/items/1/content"
+    ],
+    "note": "无一般指导语；定义及问题分别是原题组成部分，不能自行新建或拆除。"
+  },
+  "ordinaryEdits": [],
+  "humanItems": [
+    "中文专家译审、认知访谈和目标人群验证仍待完成；不得把原英文效度移植到中文或青少年。",
+    "保持既有CC BY4出处署名与改动说明，不暗示作者背书。",
+    "实质题义、反向、锚点或缺失变更需协调版本，不静默调整。"
+  ],
+  "notExecuted": [
+    "未写仓库/分支、DB/CI，不执行测试或系统检查；无新增版权科研调查。",
+    "既有历史验证不视作本次执行。"
+  ]
+}

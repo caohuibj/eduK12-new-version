@@ -1,0 +1,859 @@
+{
+  "instrument": "srq63_brown_miller_zh_cn_research:1.0.0",
+  "source_commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "source_files": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/srq63_brown_miller_zh_cn_research/1.0.0/source.json",
+      "blob": "7aeab9ed63dc84c7ad674798db0e32533ca04aa9",
+      "sha256": "31ea003d17f0cdd08b9a76f657805c09c48f7d93b4486778a07738ea675b729d"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/srq63_brown_miller_zh_cn_research/1.0.0/instrument.ts",
+      "blob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/srq63_brown_miller/1.0.0/README.md",
+      "blob": "028ab2a50afbe7eef31ed37384aac82208acc9a8",
+      "sha256": "e4318fe7448321c61fa9b8a4f3950ee4d907b039c6bee95bb6ec1d0c4cf691a4"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/srq63_brown_miller/1.0.0/bilingual-content.json",
+      "blob": "05241971974e917a86bd293a911e3ee2c6de73fa",
+      "sha256": "ba296a52c605329c6eb686530d727b927479d10816ba3697f9df6223bad025cb"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/srq63_brown_miller/1.0.0/reviewed-source-pack.json",
+      "blob": "a38008aa09d6c2abd104040e6bae6595c64617f4",
+      "sha256": "3644a966ed0dc27dbf3a0d78f08d0ec8961ea3a652c123f7f22ca2127650d92f"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/srq63_brown_miller/1.0.0/scoring-and-thresholds.md",
+      "blob": "0ed4618ea4105cbfa0c9798fd43c8b4954446a2f",
+      "sha256": "d5d9d1ee8cbfa58d667dc16c0d4d9bcc094ac0af1dd7aeb44cd340cfc0cd518c"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/srq63_brown_miller/1.0.0/references.md",
+      "blob": "bc177b9d14d68aef4ab01b0e00b6b9992bb50d2b",
+      "sha256": "1d47ee33226f3d7cb3769781a69a769a73e4282dfbe417fe11c7e18ae38d578b"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/srq63_brown_miller/1.0.0/report-example.md",
+      "blob": "d45d40b048e743fa58f5034c12b864703798bd4d",
+      "sha256": "c51c4b8d7e5b1e6009f12400e7a32ba5fb48b7896100f5bfc77436b99f24c1ef"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/srq63_brown_miller/1.0.0/local-validation.json",
+      "blob": "bdb26e251572e8c215cde01d5fbe48369bd03557",
+      "sha256": "45af9493813b6f6c3038b55c1ad76d58204c9c50c26b59e0f5fe758c4aa16f25"
+    }
+  ],
+  "three_parts": {
+    "items_instruction": {
+      "items": [
+        {
+          "number": 1,
+          "code": "SRQ63_BROWN_MILLER_01",
+          "english": "I usually keep track of my progress toward my goals.",
+          "chinese": "我通常会留意自己朝目标前进的进展。",
+          "runtime": "请选择最符合您情况的回答。答案没有对错，请按第一反应作答，不必思考太久。\n\n我通常会留意自己朝目标前进的进展。",
+          "matches": true,
+          "reverse_reference": false,
+          "transform": "identity",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 2,
+          "code": "SRQ63_BROWN_MILLER_02",
+          "english": "My behavior is not that different from other people's.",
+          "chinese": "我的行为和别人并没有那么不同。",
+          "runtime": "我的行为和别人并没有那么不同。",
+          "matches": true,
+          "reverse_reference": true,
+          "transform": "reverse",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 3,
+          "code": "SRQ63_BROWN_MILLER_03",
+          "english": "Others tell me that I keep on with things too long.",
+          "chinese": "别人说我做某些事坚持得太久。",
+          "runtime": "别人说我做某些事坚持得太久。",
+          "matches": true,
+          "reverse_reference": true,
+          "transform": "reverse",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 4,
+          "code": "SRQ63_BROWN_MILLER_04",
+          "english": "I doubt I could change even if I wanted to.",
+          "chinese": "即使我想改变，我也怀疑自己能否做到。",
+          "runtime": "即使我想改变，我也怀疑自己能否做到。",
+          "matches": true,
+          "reverse_reference": true,
+          "transform": "reverse",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 5,
+          "code": "SRQ63_BROWN_MILLER_05",
+          "english": "I have trouble making up my mind about things.",
+          "chinese": "我很难对事情拿定主意。",
+          "runtime": "我很难对事情拿定主意。",
+          "matches": true,
+          "reverse_reference": true,
+          "transform": "reverse",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 6,
+          "code": "SRQ63_BROWN_MILLER_06",
+          "english": "I get easily distracted from my plans.",
+          "chinese": "我很容易分心，偏离自己的计划。",
+          "runtime": "我很容易分心，偏离自己的计划。",
+          "matches": true,
+          "reverse_reference": true,
+          "transform": "reverse",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 7,
+          "code": "SRQ63_BROWN_MILLER_07",
+          "english": "I reward myself for progress toward my goals.",
+          "chinese": "当我朝目标取得进展时，我会奖励自己。",
+          "runtime": "当我朝目标取得进展时，我会奖励自己。",
+          "matches": true,
+          "reverse_reference": false,
+          "transform": "identity",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 8,
+          "code": "SRQ63_BROWN_MILLER_08",
+          "english": "I don't notice the effects of my actions until it's too late.",
+          "chinese": "我往往等到为时已晚，才察觉自己行为的影响。",
+          "runtime": "我往往等到为时已晚，才察觉自己行为的影响。",
+          "matches": true,
+          "reverse_reference": true,
+          "transform": "reverse",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 9,
+          "code": "SRQ63_BROWN_MILLER_09",
+          "english": "My behavior is similar to that of my friends.",
+          "chinese": "我的行为和朋友们相似。",
+          "runtime": "我的行为和朋友们相似。",
+          "matches": true,
+          "reverse_reference": false,
+          "transform": "identity",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 10,
+          "code": "SRQ63_BROWN_MILLER_10",
+          "english": "It's hard for me to see anything helpful about changing my ways.",
+          "chinese": "我很难看出改变自己的做法有什么帮助。",
+          "runtime": "我很难看出改变自己的做法有什么帮助。",
+          "matches": true,
+          "reverse_reference": true,
+          "transform": "reverse",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 11,
+          "code": "SRQ63_BROWN_MILLER_11",
+          "english": "I am able to accomplish goals I set for myself.",
+          "chinese": "我能够实现自己设定的目标。",
+          "runtime": "我能够实现自己设定的目标。",
+          "matches": true,
+          "reverse_reference": false,
+          "transform": "identity",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 12,
+          "code": "SRQ63_BROWN_MILLER_12",
+          "english": "I put off making decisions.",
+          "chinese": "我会拖延做决定。",
+          "runtime": "我会拖延做决定。",
+          "matches": true,
+          "reverse_reference": true,
+          "transform": "reverse",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 13,
+          "code": "SRQ63_BROWN_MILLER_13",
+          "english": "I have so many plans that it's hard for me to focus on any one of them.",
+          "chinese": "我的计划太多，很难专注于其中任何一个。",
+          "runtime": "我的计划太多，很难专注于其中任何一个。",
+          "matches": true,
+          "reverse_reference": true,
+          "transform": "reverse",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 14,
+          "code": "SRQ63_BROWN_MILLER_14",
+          "english": "I change the way I do things when I see a problem with how things are going.",
+          "chinese": "当我发现事情的进展有问题时，我会改变自己的做法。",
+          "runtime": "当我发现事情的进展有问题时，我会改变自己的做法。",
+          "matches": true,
+          "reverse_reference": false,
+          "transform": "identity",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 15,
+          "code": "SRQ63_BROWN_MILLER_15",
+          "english": "It's hard for me to notice when I've “had enough” (alcohol, food, sweets).",
+          "chinese": "我很难察觉自己什么时候已经“够了”（比如饮酒、吃东西、吃甜食）。",
+          "runtime": "我很难察觉自己什么时候已经“够了”（比如饮酒、吃东西、吃甜食）。",
+          "matches": true,
+          "reverse_reference": true,
+          "transform": "reverse",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 16,
+          "code": "SRQ63_BROWN_MILLER_16",
+          "english": "I think a lot about what other people think of me.",
+          "chinese": "我常常想别人怎么看我。",
+          "runtime": "我常常想别人怎么看我。",
+          "matches": true,
+          "reverse_reference": false,
+          "transform": "identity",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 17,
+          "code": "SRQ63_BROWN_MILLER_17",
+          "english": "I am willing to consider other ways of doing things.",
+          "chinese": "我愿意考虑用其他方式做事。",
+          "runtime": "我愿意考虑用其他方式做事。",
+          "matches": true,
+          "reverse_reference": false,
+          "transform": "identity",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 18,
+          "code": "SRQ63_BROWN_MILLER_18",
+          "english": "If I wanted to change, I am confident that I could do it.",
+          "chinese": "如果我想改变，我有信心自己做得到。",
+          "runtime": "如果我想改变，我有信心自己做得到。",
+          "matches": true,
+          "reverse_reference": false,
+          "transform": "identity",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 19,
+          "code": "SRQ63_BROWN_MILLER_19",
+          "english": "When it comes to deciding about a change, I feel overwhelmed by the choices.",
+          "chinese": "要决定作出改变时，众多选择让我感到不知所措。",
+          "runtime": "要决定作出改变时，众多选择让我感到不知所措。",
+          "matches": true,
+          "reverse_reference": true,
+          "transform": "reverse",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 20,
+          "code": "SRQ63_BROWN_MILLER_20",
+          "english": "I have trouble following through with things once I've made up my mind to do something.",
+          "chinese": "一旦下定决心做一件事，我仍很难坚持做下去。",
+          "runtime": "一旦下定决心做一件事，我仍很难坚持做下去。",
+          "matches": true,
+          "reverse_reference": true,
+          "transform": "reverse",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 21,
+          "code": "SRQ63_BROWN_MILLER_21",
+          "english": "I don't seem to learn from my mistakes.",
+          "chinese": "我似乎无法从自己的错误中吸取教训。",
+          "runtime": "我似乎无法从自己的错误中吸取教训。",
+          "matches": true,
+          "reverse_reference": true,
+          "transform": "reverse",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 22,
+          "code": "SRQ63_BROWN_MILLER_22",
+          "english": "I'm usually careful not to overdo it when working, eating, drinking.",
+          "chinese": "在工作、吃东西或饮酒时，我通常会注意不过量。",
+          "runtime": "在工作、吃东西或饮酒时，我通常会注意不过量。",
+          "matches": true,
+          "reverse_reference": false,
+          "transform": "identity",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 23,
+          "code": "SRQ63_BROWN_MILLER_23",
+          "english": "I tend to compare myself with other people.",
+          "chinese": "我倾向于拿自己和别人比较。",
+          "runtime": "我倾向于拿自己和别人比较。",
+          "matches": true,
+          "reverse_reference": false,
+          "transform": "identity",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 24,
+          "code": "SRQ63_BROWN_MILLER_24",
+          "english": "I enjoy a routine, and like things to stay the same.",
+          "chinese": "我喜欢按惯例行事，也喜欢事情保持原样。",
+          "runtime": "我喜欢按惯例行事，也喜欢事情保持原样。",
+          "matches": true,
+          "reverse_reference": true,
+          "transform": "reverse",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 25,
+          "code": "SRQ63_BROWN_MILLER_25",
+          "english": "I have sought out advice or information about changing.",
+          "chinese": "我曾主动寻求有关改变的建议或信息。",
+          "runtime": "我曾主动寻求有关改变的建议或信息。",
+          "matches": true,
+          "reverse_reference": false,
+          "transform": "identity",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 26,
+          "code": "SRQ63_BROWN_MILLER_26",
+          "english": "I can come up with lots of ways to change, but it's hard for me to decide which one to use.",
+          "chinese": "我能想出很多改变的方法，但很难决定采用哪一种。",
+          "runtime": "我能想出很多改变的方法，但很难决定采用哪一种。",
+          "matches": true,
+          "reverse_reference": true,
+          "transform": "reverse",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 27,
+          "code": "SRQ63_BROWN_MILLER_27",
+          "english": "I can stick to a plan that's working well.",
+          "chinese": "如果一个计划效果不错，我能坚持执行。",
+          "runtime": "如果一个计划效果不错，我能坚持执行。",
+          "matches": true,
+          "reverse_reference": false,
+          "transform": "identity",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 28,
+          "code": "SRQ63_BROWN_MILLER_28",
+          "english": "I usually only have to make a mistake one time in order to learn from it.",
+          "chinese": "通常犯过一次错，我就能吸取教训。",
+          "runtime": "通常犯过一次错，我就能吸取教训。",
+          "matches": true,
+          "reverse_reference": false,
+          "transform": "identity",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 29,
+          "code": "SRQ63_BROWN_MILLER_29",
+          "english": "I don't learn well from punishment.",
+          "chinese": "我不太能从惩罚中吸取教训。",
+          "runtime": "我不太能从惩罚中吸取教训。",
+          "matches": true,
+          "reverse_reference": true,
+          "transform": "reverse",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 30,
+          "code": "SRQ63_BROWN_MILLER_30",
+          "english": "I have personal standards, and try to live up to them.",
+          "chinese": "我有自己的标准，并努力做到。",
+          "runtime": "我有自己的标准，并努力做到。",
+          "matches": true,
+          "reverse_reference": false,
+          "transform": "identity",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 31,
+          "code": "SRQ63_BROWN_MILLER_31",
+          "english": "I am set in my ways.",
+          "chinese": "我的做事方式已经固定下来。",
+          "runtime": "我的做事方式已经固定下来。",
+          "matches": true,
+          "reverse_reference": true,
+          "transform": "reverse",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 32,
+          "code": "SRQ63_BROWN_MILLER_32",
+          "english": "As soon as I see a problem or challenge, I start looking for possible solutions.",
+          "chinese": "一发现问题或挑战，我就开始寻找可能的解决办法。",
+          "runtime": "一发现问题或挑战，我就开始寻找可能的解决办法。",
+          "matches": true,
+          "reverse_reference": false,
+          "transform": "identity",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 33,
+          "code": "SRQ63_BROWN_MILLER_33",
+          "english": "I have a hard time setting goals for myself.",
+          "chinese": "我很难为自己设定目标。",
+          "runtime": "我很难为自己设定目标。",
+          "matches": true,
+          "reverse_reference": true,
+          "transform": "reverse",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 34,
+          "code": "SRQ63_BROWN_MILLER_34",
+          "english": "I have a lot of willpower.",
+          "chinese": "我有很强的意志力。",
+          "runtime": "我有很强的意志力。",
+          "matches": true,
+          "reverse_reference": false,
+          "transform": "identity",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 35,
+          "code": "SRQ63_BROWN_MILLER_35",
+          "english": "When I'm trying to change something, I pay a lot of attention to how I'm doing.",
+          "chinese": "当我尝试改变某件事时，我会密切留意自己的进展。",
+          "runtime": "当我尝试改变某件事时，我会密切留意自己的进展。",
+          "matches": true,
+          "reverse_reference": false,
+          "transform": "identity",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 36,
+          "code": "SRQ63_BROWN_MILLER_36",
+          "english": "I usually judge what I'm doing by the consequences of my actions.",
+          "chinese": "我通常会根据行为带来的后果，判断自己正在做的事。",
+          "runtime": "我通常会根据行为带来的后果，判断自己正在做的事。",
+          "matches": true,
+          "reverse_reference": false,
+          "transform": "identity",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 37,
+          "code": "SRQ63_BROWN_MILLER_37",
+          "english": "I don't care if I'm different from most people.",
+          "chinese": "我不在意自己是否与大多数人不同。",
+          "runtime": "我不在意自己是否与大多数人不同。",
+          "matches": true,
+          "reverse_reference": true,
+          "transform": "reverse",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 38,
+          "code": "SRQ63_BROWN_MILLER_38",
+          "english": "As soon as I see things aren't going right I want to do something about it.",
+          "chinese": "一发现事情进展不顺，我就想采取行动。",
+          "runtime": "一发现事情进展不顺，我就想采取行动。",
+          "matches": true,
+          "reverse_reference": false,
+          "transform": "identity",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 39,
+          "code": "SRQ63_BROWN_MILLER_39",
+          "english": "There is usually more than one way to accomplish something.",
+          "chinese": "完成一件事通常不止一种办法。",
+          "runtime": "完成一件事通常不止一种办法。",
+          "matches": true,
+          "reverse_reference": false,
+          "transform": "identity",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 40,
+          "code": "SRQ63_BROWN_MILLER_40",
+          "english": "I have trouble making plans to help me reach my goals.",
+          "chinese": "我很难制定帮助自己达成目标的计划。",
+          "runtime": "我很难制定帮助自己达成目标的计划。",
+          "matches": true,
+          "reverse_reference": true,
+          "transform": "reverse",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 41,
+          "code": "SRQ63_BROWN_MILLER_41",
+          "english": "I am able to resist temptation.",
+          "chinese": "我能够抵挡诱惑。",
+          "runtime": "我能够抵挡诱惑。",
+          "matches": true,
+          "reverse_reference": false,
+          "transform": "identity",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 42,
+          "code": "SRQ63_BROWN_MILLER_42",
+          "english": "I set goals for myself and keep track of my progress.",
+          "chinese": "我会为自己设定目标，并持续关注进展。",
+          "runtime": "我会为自己设定目标，并持续关注进展。",
+          "matches": true,
+          "reverse_reference": false,
+          "transform": "identity",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 43,
+          "code": "SRQ63_BROWN_MILLER_43",
+          "english": "Most of the time I don't pay attention to what I'm doing.",
+          "chinese": "大多数时候，我不太留意自己正在做什么。",
+          "runtime": "大多数时候，我不太留意自己正在做什么。",
+          "matches": true,
+          "reverse_reference": true,
+          "transform": "reverse",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 44,
+          "code": "SRQ63_BROWN_MILLER_44",
+          "english": "I try to be like people around me.",
+          "chinese": "我努力让自己像身边的人一样。",
+          "runtime": "我努力让自己像身边的人一样。",
+          "matches": true,
+          "reverse_reference": false,
+          "transform": "identity",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 45,
+          "code": "SRQ63_BROWN_MILLER_45",
+          "english": "I tend to keep doing the same thing, even when it doesn't work.",
+          "chinese": "即使某种做法没有效果，我也倾向于继续照做。",
+          "runtime": "即使某种做法没有效果，我也倾向于继续照做。",
+          "matches": true,
+          "reverse_reference": true,
+          "transform": "reverse",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 46,
+          "code": "SRQ63_BROWN_MILLER_46",
+          "english": "I can usually find several different possibilities when I want to change something.",
+          "chinese": "当我想改变某件事时，通常能找到几种不同的办法。",
+          "runtime": "当我想改变某件事时，通常能找到几种不同的办法。",
+          "matches": true,
+          "reverse_reference": false,
+          "transform": "identity",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 47,
+          "code": "SRQ63_BROWN_MILLER_47",
+          "english": "Once I have a goal, I can usually plan how to reach it.",
+          "chinese": "一旦有了目标，我通常能够规划如何实现它。",
+          "runtime": "一旦有了目标，我通常能够规划如何实现它。",
+          "matches": true,
+          "reverse_reference": false,
+          "transform": "identity",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 48,
+          "code": "SRQ63_BROWN_MILLER_48",
+          "english": "I have rules that I stick by no matter what.",
+          "chinese": "我有无论如何都会坚持的规则。",
+          "runtime": "我有无论如何都会坚持的规则。",
+          "matches": true,
+          "reverse_reference": false,
+          "transform": "identity",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 49,
+          "code": "SRQ63_BROWN_MILLER_49",
+          "english": "If I make a resolution to change something, I pay a lot of attention to how I'm doing.",
+          "chinese": "如果我下决心改变某件事，我会密切留意自己的进展。",
+          "runtime": "如果我下决心改变某件事，我会密切留意自己的进展。",
+          "matches": true,
+          "reverse_reference": false,
+          "transform": "identity",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 50,
+          "code": "SRQ63_BROWN_MILLER_50",
+          "english": "Often I don't notice what I'm doing until someone calls it to my attention.",
+          "chinese": "常常要等别人提醒，我才注意到自己正在做什么。",
+          "runtime": "常常要等别人提醒，我才注意到自己正在做什么。",
+          "matches": true,
+          "reverse_reference": true,
+          "transform": "reverse",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 51,
+          "code": "SRQ63_BROWN_MILLER_51",
+          "english": "I think a lot about how I'm doing.",
+          "chinese": "我常常思考自己做得怎么样。",
+          "runtime": "我常常思考自己做得怎么样。",
+          "matches": true,
+          "reverse_reference": false,
+          "transform": "identity",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 52,
+          "code": "SRQ63_BROWN_MILLER_52",
+          "english": "Usually I see the need to change before others do.",
+          "chinese": "通常我比别人更早意识到需要改变。",
+          "runtime": "通常我比别人更早意识到需要改变。",
+          "matches": true,
+          "reverse_reference": false,
+          "transform": "identity",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 53,
+          "code": "SRQ63_BROWN_MILLER_53",
+          "english": "I'm good at finding different ways to get what I want.",
+          "chinese": "我善于寻找不同的方法来得到自己想要的东西。",
+          "runtime": "我善于寻找不同的方法来得到自己想要的东西。",
+          "matches": true,
+          "reverse_reference": false,
+          "transform": "identity",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 54,
+          "code": "SRQ63_BROWN_MILLER_54",
+          "english": "I usually think before I act.",
+          "chinese": "我通常会先思考再行动。",
+          "runtime": "我通常会先思考再行动。",
+          "matches": true,
+          "reverse_reference": false,
+          "transform": "identity",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 55,
+          "code": "SRQ63_BROWN_MILLER_55",
+          "english": "Little problems or distractions throw me off course.",
+          "chinese": "小问题或分心的事就会让我偏离原来的方向。",
+          "runtime": "小问题或分心的事就会让我偏离原来的方向。",
+          "matches": true,
+          "reverse_reference": true,
+          "transform": "reverse",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 56,
+          "code": "SRQ63_BROWN_MILLER_56",
+          "english": "I feel bad when I don't meet my goals.",
+          "chinese": "没有达成目标时，我会感到难受。",
+          "runtime": "没有达成目标时，我会感到难受。",
+          "matches": true,
+          "reverse_reference": false,
+          "transform": "identity",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 57,
+          "code": "SRQ63_BROWN_MILLER_57",
+          "english": "I learn from my mistakes.",
+          "chinese": "我会从自己的错误中吸取教训。",
+          "runtime": "我会从自己的错误中吸取教训。",
+          "matches": true,
+          "reverse_reference": false,
+          "transform": "identity",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 58,
+          "code": "SRQ63_BROWN_MILLER_58",
+          "english": "I know how I want to be.",
+          "chinese": "我知道自己想成为什么样的人。",
+          "runtime": "我知道自己想成为什么样的人。",
+          "matches": true,
+          "reverse_reference": false,
+          "transform": "identity",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 59,
+          "code": "SRQ63_BROWN_MILLER_59",
+          "english": "It bothers me when things aren't the way I want them.",
+          "chinese": "事情不如我所愿时，我会感到烦恼。",
+          "runtime": "事情不如我所愿时，我会感到烦恼。",
+          "matches": true,
+          "reverse_reference": false,
+          "transform": "identity",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 60,
+          "code": "SRQ63_BROWN_MILLER_60",
+          "english": "I call in others for help when I need it.",
+          "chinese": "需要时，我会请别人帮忙。",
+          "runtime": "需要时，我会请别人帮忙。",
+          "matches": true,
+          "reverse_reference": false,
+          "transform": "identity",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 61,
+          "code": "SRQ63_BROWN_MILLER_61",
+          "english": "Before making a decision, I consider what is likely to happen if I do one thing or another.",
+          "chinese": "做决定前，我会考虑选择不同做法可能带来的结果。",
+          "runtime": "做决定前，我会考虑选择不同做法可能带来的结果。",
+          "matches": true,
+          "reverse_reference": false,
+          "transform": "identity",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 62,
+          "code": "SRQ63_BROWN_MILLER_62",
+          "english": "I give up quickly.",
+          "chinese": "我很快就会放弃。",
+          "runtime": "我很快就会放弃。",
+          "matches": true,
+          "reverse_reference": true,
+          "transform": "reverse",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        },
+        {
+          "number": 63,
+          "code": "SRQ63_BROWN_MILLER_63",
+          "english": "I usually decide to change and hope for the best.",
+          "chinese": "我通常会决定作出改变，然后期待出现好结果。",
+          "runtime": "我通常会决定作出改变，然后期待出现好结果。",
+          "matches": true,
+          "reverse_reference": true,
+          "transform": "reverse",
+          "review": "逐项与固定双语原文及中文工作稿对应，需人工译审。"
+        }
+      ],
+      "basis": "固定双语材料63题英文与中文工作稿逐项对照source；未再读取原始题本，不能宣称独立原文复核。",
+      "anchors": [
+        {
+          "value": 1,
+          "en": "Strongly disagree",
+          "zh": "非常不同意"
+        },
+        {
+          "value": 2,
+          "en": "Disagree",
+          "zh": "不同意"
+        },
+        {
+          "value": 3,
+          "en": "Uncertain or Unsure",
+          "zh": "不确定或拿不准"
+        },
+        {
+          "value": 4,
+          "en": "Agree",
+          "zh": "同意"
+        },
+        {
+          "value": 5,
+          "en": "Strongly Agree",
+          "zh": "非常同意"
+        }
+      ],
+      "instruction": {
+        "sources": [
+          {
+            "path": "docs/scale-instruments/research-drafts/srq63_brown_miller/1.0.0/bilingual-content.json",
+            "blob": "05241971974e917a86bd293a911e3ee2c6de73fa",
+            "sha256": "ba296a52c605329c6eb686530d727b927479d10816ba3697f9df6223bad025cb",
+            "field": "/instructions/zh"
+          },
+          {
+            "path": "server-version/backend/src/modules/scale/instruments/srq63_brown_miller_zh_cn_research/1.0.0/source.json",
+            "blob": "7aeab9ed63dc84c7ad674798db0e32533ca04aa9",
+            "sha256": "31ea003d17f0cdd08b9a76f657805c09c48f7d93b4486778a07738ea675b729d",
+            "field": "/executable/definition/items/0/content",
+            "note": "首题说明前缀"
+          }
+        ],
+        "english": "Please answer the following questions by circling the response that best describes how you are. There are no right or wrong answers. Work quickly and don’t think too long about your answers.",
+        "text": "请选择最符合您情况的回答。答案没有对错，请按第一反应作答，不必思考太久。",
+        "status": "说明已嵌题1前缀，source顶层缺instruction。",
+        "binding": {
+          "path": "server-version/backend/src/modules/scale/instruments/srq63_brown_miller_zh_cn_research/1.0.0/source.json#/instruction",
+          "old": null,
+          "new": {
+            "schemaVersion": 1,
+            "text": "请选择最符合您情况的回答。答案没有对错，请按第一反应作答，不必思考太久。",
+            "language": "zh-CN",
+            "version": "1.0.0",
+            "source": "固定双语材料原英文指导语独立中文工作译稿"
+          }
+        },
+        "impact": "从首题删同文前缀改变definition/hash，需按版本协调。"
+      },
+      "audience": "成人专业研究自述，非一般K12开放或临床决策。"
+    },
+    "scoring": {
+      "reverse": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        8,
+        10,
+        12,
+        13,
+        15,
+        19,
+        20,
+        21,
+        24,
+        26,
+        29,
+        31,
+        33,
+        37,
+        40,
+        43,
+        45,
+        50,
+        55,
+        62,
+        63
+      ],
+      "method": "63题1–5，26项按6−x反向，等权和63–315，无七阶段分量表。",
+      "missing": "complete_required，缺题不插补或补零，是项目政策。",
+      "parameters": "原作者试探区间遗漏213、239，研究档案保留但未启用，不擅自补齐，referencePolicy none。"
+    },
+    "report": {
+      "review": "总分方向及研究用途恰当，具体小行动非道德评价，不用原试探阈值；可保留。",
+      "version": "内容/计分/本地化/报告1.0.0。"
+    }
+  },
+  "ordinary_suggestions": [
+    "已有工作指导语原文可独立绑定；首题前缀拆分按定义版本治理。"
+  ],
+  "substantive_coordination": [
+    "未补原分界缺口或启用阈值；题意、反向或算法变化交人工和版本协调。"
+  ],
+  "human_status": "中文AI辅助工作译稿，人工译审与本地验证待完成。",
+  "not_executed": [
+    "未写仓库/DB/CI/分支，未运行测试/系统；未独立读取原始题本。"
+  ],
+  "conclusion": "固定英中材料与63题键向一致；指导语拆分需版本协调，原始材料尚未独立复核。"
+}

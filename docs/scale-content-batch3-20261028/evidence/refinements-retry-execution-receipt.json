@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "base": "8774b1cf158dae1c5eb0f4950044c6ae6d6a18dd",
+  "contentHead": "609f012b1c6ec095a0a551d9fc96d8616801cd36",
+  "node": {
+    "path": "/workspace/eduk12-cloud/tools/node_modules/.bin/node",
+    "version": "v24.21.0",
+    "sha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c"
+  },
+  "environmentLimit": "input manifest conservatively records backend source and lock/config; historical/full node_modules byte inventory not captured; not an attestation of every dependency byte",
+  "checks": [
+    {
+      "id": "refinements-content-retry",
+      "cwd": "/workspace/eduK12-new-version",
+      "argv": [
+        "/workspace/eduk12-cloud/tools/node_modules/.bin/node",
+        "/workspace/eduK12-new-version/server-version/backend/node_modules/tsx/dist/cli.mjs",
+        "/workspace/eduK12-new-version/docs/scale-content-batch3-20261028/check-refinements.ts"
+      ],
+      "startedAt": "2026-10-28T03:46:37.562964+00:00",
+      "endedAt": "2026-10-28T03:46:38.235319+00:00",
+      "processExitCode": 1,
+      "beforeAfterIdentical": true,
+      "inputManifest": "refinements-content-retry.inputs.json.gz",
+      "inputManifestUncompressedSHA256": "c96d6297beae19f3a866b66cc1aeddbfdc628fae3addcb8f3986f89541001ad7",
+      "logs": {
+        "stdout": {
+          "path": "refinements-content-retry.stdout.log",
+          "bytes": 6096,
+          "sha256": "9a813d69d5b42656b8306972b7827fc51ada560eeec3f0b4d3efd5b0148eb91d"
+        },
+        "stderr": {
+          "path": "refinements-content-retry.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    }
+  ],
+  "outerInvocation": {
+    "argv": [
+      "python3",
+      "/tmp/run-refinements-retry-batch3-checks.py"
+    ],
+    "cwd": "/workspace/eduK12-new-version",
+    "shellLogin": false,
+    "processExitCode": 1,
+    "executionToolChunk": "684ce1",
+    "sourceCopy": "../commands/run-refinements-retry-batch3-checks.py.txt",
+    "note": "Observed outer unified-exec exit, independent of individual cases; failed invocation is not relabelled success."
+  },
+  "plannedButNotExecuted": [
+    "generated-index check skipped after preceding command failed"
+  ]
+}

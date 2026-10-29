@@ -1,0 +1,171 @@
+{
+  "instrument": "act_sq6_zh_cn:1.0.0",
+  "source_commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "source_files": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/act_sq6_zh_cn/1.0.0/source.json",
+      "blob": "0f2ce8e3da0203e02c522ad68ae5b90946da91b0",
+      "sha256": "8fb4a923d155da3c6209f9898b3f35e91c49030098d8730ab11d0c0f22ad49d0"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/act_sq6_zh_cn/1.0.0/instrument.ts",
+      "blob": "0eed070bb879576339c5a71afdf34c0026591fd3",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/act_sq6_zh_cn/1.0.0/THIRD_PARTY_LICENSE.md",
+      "blob": "8b4f8283a296cfac7b01f3cfcef65c9fdd10decb",
+      "sha256": "ddc7832ecbe8d11e1a98a54a0b7f99a78784ad8a6d274245108f9ef6fb778c52"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/act_sq6_zh_cn/1.0.0/README.md",
+      "blob": "1f229a34e260ec5cadfd82bf973d081f6d83dc5c",
+      "sha256": "f3f0bb5e2fbd0390c74e01c19848bbaada4cdc799e6e5a98864cb9c1dc72f275"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/act_sq6_zh_cn/1.0.0/administration.md",
+      "blob": "c194e23b3b045160859d5d8f0602c2703f4d506b",
+      "sha256": "aa6b407d38af0c012f80744ffb6ed05db2540263c8194ec5e5490667e02b21b5"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/act_sq6_zh_cn/1.0.0/bilingual-content.json",
+      "blob": "c026dd0ed608fba50855ce59b9a8d7c3dd45649f",
+      "sha256": "d8f6a1b4efb55ca701677a87beeafb0d36308f82c752cce2a64171325b90a8af"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/act_sq6_zh_cn/1.0.0/source-evidence.json",
+      "blob": "1be1403091ac1fbbea956ce22e90c1c4b62f6fe3",
+      "sha256": "a97b139f72de5ac62e9db62c4f335b01c4cc67f966bbe459dbce415f4bb2135f"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/act_sq6_zh_cn/1.0.0/report-example.json",
+      "blob": "a65b0b27a4d6442560232eb7307197bc0da0e8e2",
+      "sha256": "caad70c06024821cf987cb8ceea366812fe16b9e5090e7fd268157a51fe7479d"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/act_sq6_zh_cn/1.0.0/validation.json",
+      "blob": "cac2e06f3ea84436878a4e5c63b1a94c1bfe841d",
+      "sha256": "09926b8d500693e528c675334bdc3896f4a7fd3f7ea5e3145032200efe45704f"
+    }
+  ],
+  "three_parts": {
+    "items_instruction": {
+      "items": [
+        {
+          "number": 1,
+          "code": "ACTSQ_01",
+          "english": "… to accept unpleasant feelings, thoughts or body sensations rather than fight them.",
+          "chinese": "…接纳令人不愉快的感受、想法或身体感觉，而不是与它们对抗。",
+          "runtime": "…接纳令人不愉快的感受、想法或身体感觉，而不是与它们对抗。",
+          "transform": "identity",
+          "review": "续接片段核心意义对应；需与已指定的会谈指导语同时呈现，不是一般心理特质。"
+        },
+        {
+          "number": 2,
+          "code": "ACTSQ_02",
+          "english": "… to gain more inner distance from unpleasant feelings, thoughts or body sensations and to observe them rather than getting caught up in them.",
+          "chinese": "…在心里与令人不愉快的感受、想法或身体感觉拉开更多距离，观察它们，而不是陷入其中。",
+          "runtime": "…在心里与令人不愉快的感受、想法或身体感觉拉开更多距离，观察它们，而不是陷入其中。",
+          "transform": "identity",
+          "review": "续接片段核心意义对应；需与已指定的会谈指导语同时呈现，不是一般心理特质。"
+        },
+        {
+          "number": 3,
+          "code": "ACTSQ_03",
+          "english": "… to stay in the here and now (in the present moment) rather than concerning myself with my future and my past.",
+          "chinese": "…把注意力放在此时此地（当下），而不是放在自己的未来和过去。",
+          "runtime": "…把注意力放在此时此地（当下），而不是放在自己的未来和过去。",
+          "transform": "identity",
+          "review": "续接片段核心意义对应；需与已指定的会谈指导语同时呈现，不是一般心理特质。"
+        },
+        {
+          "number": 4,
+          "code": "ACTSQ_04",
+          "english": "… to realize that my feelings, thoughts and body sensations are part of me, but that I am more than my feelings, thoughts and body sensations.",
+          "chinese": "…认识到我的感受、想法和身体感觉是我的一部分，但我不仅仅是这些感受、想法和身体感觉。",
+          "runtime": "…认识到我的感受、想法和身体感觉是我的一部分，但我不仅仅是这些感受、想法和身体感觉。",
+          "transform": "identity",
+          "review": "续接片段核心意义对应；需与已指定的会谈指导语同时呈现，不是一般心理特质。"
+        },
+        {
+          "number": 5,
+          "code": "ACTSQ_05",
+          "english": "… to recognize what is important to me in my life and what gives orientation to my life.",
+          "chinese": "…看清生活中什么对我重要，以及什么为我的生活指明方向。",
+          "runtime": "…看清生活中什么对我重要，以及什么为我的生活指明方向。",
+          "transform": "identity",
+          "review": "续接片段核心意义对应；需与已指定的会谈指导语同时呈现，不是一般心理特质。"
+        },
+        {
+          "number": 6,
+          "code": "ACTSQ_06",
+          "english": "… to act in daily life according to what is important to me in my life and what gives orientation to my life.",
+          "chinese": "…在日常生活中，按照那些对我重要、并为我的生活指明方向的事来行动。",
+          "runtime": "…在日常生活中，按照那些对我重要、并为我的生活指明方向的事来行动。",
+          "transform": "identity",
+          "review": "续接片段核心意义对应；需与已指定的会谈指导语同时呈现，不是一般心理特质。"
+        }
+      ],
+      "options": [
+        {
+          "value": 0,
+          "en": "does not apply",
+          "zhWorking": "不符合"
+        },
+        {
+          "value": 1,
+          "en": "applies slightly",
+          "zhWorking": "略微符合"
+        },
+        {
+          "value": 2,
+          "en": "applies fairly well",
+          "zhWorking": "较为符合"
+        },
+        {
+          "value": 3,
+          "en": "applies to a great extent",
+          "zhWorking": "很大程度上符合"
+        },
+        {
+          "value": 4,
+          "en": "applies extremely",
+          "zhWorking": "极其符合"
+        }
+      ],
+      "instruction": {
+        "source": {
+          "path": "docs/scale-instruments/research-drafts/act_sq6_zh_cn/1.0.0/bilingual-content.json",
+          "blob": "c026dd0ed608fba50855ce59b9a8d7c3dd45649f",
+          "sha256": "d8f6a1b4efb55ca701677a87beeafb0d36308f82c752cce2a64171325b90a8af",
+          "field": "/instructions/zhWorking"
+        },
+        "text": "最近的（XY）次心理治疗会谈帮助我……",
+        "english": "The last (XY) psychotherapy session(s) helped me…",
+        "status": "source顶层instruction缺失；XY必须明确最近1次或具体多次会谈范围，不能把未替换XY当完整施测。",
+        "note": "现有研究说明独立列示指导语与XY范围；可准备准确绑定，但单独静态文字绑定不证明会谈范围已采集。"
+      },
+      "scope": "成人明确指定ACT心理治疗会谈后的自述，非普遍筛查。"
+    },
+    "scoring": {
+      "method": "6题identity，等权均分0–4；type total为唯一汇总类型而非0–24和；不输出六个单题维度。",
+      "missing": "complete_required，完整全0有效，缺任一题不算均分；项目政策。",
+      "parameters": "无常模、分档、可靠变化或疗效阈值；referencePolicy none。"
+    },
+    "report": {
+      "review": "六题均分方向与指定会谈一致，尊重自主、不给疗效或治疗师绩效结论，具体反思可保留。",
+      "version": "内容/计分/报告/本地化1.0.0。"
+    }
+  },
+  "ordinary_suggestions": [
+    "保留原工作指导语“最近的（XY）次心理治疗会谈帮助我……”并明确记录实际会谈范围；在未具备指定范围前不声称完整施测。"
+  ],
+  "substantive_coordination": [
+    "会谈范围不能以一般性时间窗口替代；题项/选项/计分变化需协调版本和人工译审。"
+  ],
+  "human_status": "专家译审、认知访谈、目标人群验证待完成，现有状态如实保留。",
+  "not_executed": [
+    "未修改仓库、DB、CI或系统，未运行测试；不声称会谈范围采集或展示已验收。"
+  ],
+  "conclusion": "题文、锚点与六题均分可保留；需要具体XY范围与指导语共同呈现，不应仅凭当前片段施测。"
+}

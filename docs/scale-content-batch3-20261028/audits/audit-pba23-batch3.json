@@ -1,0 +1,624 @@
+{
+  "instrument": "pba23_2018_zh_cn:1.0.0",
+  "source_commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "source_files": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/pba23_2018_zh_cn/1.0.0/source.json",
+      "blob": "400da4d295dbb2d2c400f7f097da2b2f63ff423e",
+      "sha256": "e0ccedb0e8f368362cac1d0901fd21f16fd295a449d0ebdf1c316e53026353a4"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/pba23_2018_zh_cn/1.0.0/instrument.ts",
+      "blob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/pba23_2018_zh_cn/1.0.0/README.md",
+      "blob": "acddead442b31dedab4d5c4aacbafb0a6f9923b4",
+      "sha256": "6effd04bb96be5db638fa7f3c4f33845b8815933a552c132196824c0f90e9cc4"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/pba23_2018_zh_cn/1.0.0/bilingual-content.json",
+      "blob": "55aeb0933b1e29915e0898bbbdb573ce6c600b60",
+      "sha256": "7a09b1cb8278cb9f78af6ec20ed32f3e62dd8805d9e556cf2229db0269f7e2c7"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/pba23_2018_zh_cn/1.0.0/reviewed-source-pack.json",
+      "blob": "8236da4ed9e4aba1055ae65655135d3d4d8a5040",
+      "sha256": "7ae846b412b84591985fcf92c7b6fffa203928719cef192987d2320962a4a7d8"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/pba23_2018_zh_cn/1.0.0/scoring-and-thresholds.md",
+      "blob": "220075d3ffceea3b940699e0582d93f84c21f1e4",
+      "sha256": "fe8cd66a6a6d0aa960a63358d84dc4133ec86b7562ef9a31dfce6635684fec4f"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/pba23_2018_zh_cn/1.0.0/references.md",
+      "blob": "7a3fee6d0117cd6c5da5ca809c5165fa2149c970",
+      "sha256": "128fcee52a60f47cf986abdfb86b170fe2967cec4cf1fc5079fc7e686305e19e"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/pba23_2018_zh_cn/1.0.0/report-example.md",
+      "blob": "10ad7c5e992253fd35c7821e3049f41993919a90",
+      "sha256": "6acced81fb806ed1bd14fe07b1f01543a22cc4fe336a9de06eb3e4d19364c17d"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/pba23_2018_zh_cn/1.0.0/local-validation.json",
+      "blob": "c9952b5cfbbc79f76b81b9abcb68998b0200ca6b",
+      "sha256": "7d6062cc3cf2a18ae0c8c23b155a0049aabc75c5833e6debfd2ea986a427da32"
+    }
+  ],
+  "three_parts": {
+    "items_instruction": {
+      "items": [
+        {
+          "number": 1,
+          "code": "EX1",
+          "english": "I feel completely run down by my role as a parent",
+          "chinese": "作为父母，我感到自己已经完全筋疲力尽。",
+          "runtime": "下面的问题关注你作为父母的感受，而不是评价孩子。请根据自己的实际体验，选择每种感受出现的频率。没有对错答案，不愿作答时可以暂停或退出。爱孩子和感到疲惫可以同时存在。\n\n作为父母，我感到自己已经完全筋疲力尽。",
+          "transform": "identity",
+          "review": "与固定英中材料相符；独立中文工作译稿待人工译审。"
+        },
+        {
+          "number": 2,
+          "code": "EX2",
+          "english": "I have the sense that I'm really worn out as a parent",
+          "chinese": "我感觉自己作为父母真的已经累垮了。",
+          "runtime": "我感觉自己作为父母真的已经累垮了。",
+          "transform": "identity",
+          "review": "与固定英中材料相符；独立中文工作译稿待人工译审。"
+        },
+        {
+          "number": 3,
+          "code": "EX3",
+          "english": "I'm so tired out by my role as a parent that sleeping doesn't seem like enough",
+          "chinese": "做父母让我累得似乎连睡觉都不足以恢复过来。",
+          "runtime": "做父母让我累得似乎连睡觉都不足以恢复过来。",
+          "transform": "identity",
+          "review": "与固定英中材料相符；独立中文工作译稿待人工译审。"
+        },
+        {
+          "number": 4,
+          "code": "EX4",
+          "english": "When I get up in the morning and have to face another day with my child(ren), I feel exhausted before I've even started",
+          "chinese": "早上起床，想到又要和孩子度过一天，我还没开始就已经觉得精疲力尽了。",
+          "runtime": "早上起床，想到又要和孩子度过一天，我还没开始就已经觉得精疲力尽了。",
+          "transform": "identity",
+          "review": "与固定英中材料相符；独立中文工作译稿待人工译审。"
+        },
+        {
+          "number": 5,
+          "code": "EX5",
+          "english": "I find it exhausting just thinking of everything I have to do for my child(ren)",
+          "chinese": "只要想到要为孩子做的所有事情，我就觉得疲惫不堪。",
+          "runtime": "只要想到要为孩子做的所有事情，我就觉得疲惫不堪。",
+          "transform": "identity",
+          "review": "与固定英中材料相符；独立中文工作译稿待人工译审。"
+        },
+        {
+          "number": 6,
+          "code": "EX6",
+          "english": "I have zero energy for looking after my child(ren)",
+          "chinese": "我一点照顾孩子的精力都没有了。",
+          "runtime": "我一点照顾孩子的精力都没有了。",
+          "transform": "identity",
+          "review": "与固定英中材料相符；独立中文工作译稿待人工译审。"
+        },
+        {
+          "number": 7,
+          "code": "EX7",
+          "english": "My role as a parent uses up all my resources",
+          "chinese": "做父母这件事耗尽了我所有可以调动的资源。",
+          "runtime": "做父母这件事耗尽了我所有可以调动的资源。",
+          "transform": "identity",
+          "review": "与固定英中材料相符；独立中文工作译稿待人工译审。"
+        },
+        {
+          "number": 8,
+          "code": "EX8",
+          "english": "I sometimes have the impression that I'm looking after my child(ren) on autopilot",
+          "chinese": "有时我觉得自己像开着自动驾驶一样照顾孩子。",
+          "runtime": "有时我觉得自己像开着自动驾驶一样照顾孩子。",
+          "transform": "identity",
+          "review": "与固定英中材料相符；独立中文工作译稿待人工译审。"
+        },
+        {
+          "number": 9,
+          "code": "EX9",
+          "english": "I'm in survival mode in my role as a parent",
+          "chinese": "在做父母这件事上，我正处在勉强撑下去的“生存模式”。",
+          "runtime": "在做父母这件事上，我正处在勉强撑下去的“生存模式”。",
+          "transform": "identity",
+          "review": "与固定英中材料相符；独立中文工作译稿待人工译审。"
+        },
+        {
+          "number": 10,
+          "code": "CO1",
+          "english": "I don't think I'm the good father/mother that I used to be to my child(ren)",
+          "chinese": "我觉得对孩子来说，我已经不再是以前那个好爸爸／好妈妈了。",
+          "runtime": "我觉得对孩子来说，我已经不再是以前那个好爸爸／好妈妈了。",
+          "transform": "identity",
+          "review": "与固定英中材料相符；独立中文工作译稿待人工译审。"
+        },
+        {
+          "number": 11,
+          "code": "CO2",
+          "english": "I tell myself that I'm no longer the parent I used to be",
+          "chinese": "我告诉自己，我已经不再是以前那个做父母的自己了。",
+          "runtime": "我告诉自己，我已经不再是以前那个做父母的自己了。",
+          "transform": "identity",
+          "review": "与固定英中材料相符；独立中文工作译稿待人工译审。"
+        },
+        {
+          "number": 12,
+          "code": "CO3",
+          "english": "I'm ashamed of the parent that I've become",
+          "chinese": "对于自己变成了现在这样的父母，我感到羞愧。",
+          "runtime": "对于自己变成了现在这样的父母，我感到羞愧。",
+          "transform": "identity",
+          "review": "与固定英中材料相符；独立中文工作译稿待人工译审。"
+        },
+        {
+          "number": 13,
+          "code": "CO4",
+          "english": "I'm no longer proud of myself as a parent",
+          "chinese": "作为父母，我不再为自己感到自豪。",
+          "runtime": "作为父母，我不再为自己感到自豪。",
+          "transform": "identity",
+          "review": "与固定英中材料相符；独立中文工作译稿待人工译审。"
+        },
+        {
+          "number": 14,
+          "code": "CO5",
+          "english": "I have the impression that I'm not myself any more when I'm interacting with my child(ren)",
+          "chinese": "和孩子相处时，我觉得自己已经不像自己了。",
+          "runtime": "和孩子相处时，我觉得自己已经不像自己了。",
+          "transform": "identity",
+          "review": "与固定英中材料相符；独立中文工作译稿待人工译审。"
+        },
+        {
+          "number": 15,
+          "code": "CO6",
+          "english": "I feel as though I've lost my direction as a dad/mum",
+          "chinese": "我觉得自己已经失去了做爸爸／妈妈的方向。",
+          "runtime": "我觉得自己已经失去了做爸爸／妈妈的方向。",
+          "transform": "identity",
+          "review": "与固定英中材料相符；独立中文工作译稿待人工译审。"
+        },
+        {
+          "number": 16,
+          "code": "FU1",
+          "english": "I can't stand my role as father/mother any more",
+          "chinese": "我再也忍受不了自己作为爸爸／妈妈的角色了。",
+          "runtime": "我再也忍受不了自己作为爸爸／妈妈的角色了。",
+          "transform": "identity",
+          "review": "与固定英中材料相符；独立中文工作译稿待人工译审。"
+        },
+        {
+          "number": 17,
+          "code": "FU2",
+          "english": "I can't take being a parent any more",
+          "chinese": "做父母这件事，我再也承受不了了。",
+          "runtime": "做父母这件事，我再也承受不了了。",
+          "transform": "identity",
+          "review": "与固定英中材料相符；独立中文工作译稿待人工译审。"
+        },
+        {
+          "number": 18,
+          "code": "FU3",
+          "english": "I feel like I can't take any more as a parent",
+          "chinese": "作为父母，我觉得自己再也撑不下去了。",
+          "runtime": "作为父母，我觉得自己再也撑不下去了。",
+          "transform": "identity",
+          "review": "与固定英中材料相符；独立中文工作译稿待人工译审。"
+        },
+        {
+          "number": 19,
+          "code": "FU4",
+          "english": "I feel like I can't cope as a parent",
+          "chinese": "作为父母，我觉得自己已经应付不过来了。",
+          "runtime": "作为父母，我觉得自己已经应付不过来了。",
+          "transform": "identity",
+          "review": "与固定英中材料相符；独立中文工作译稿待人工译审。"
+        },
+        {
+          "number": 20,
+          "code": "FU5",
+          "english": "I don't enjoy being with my child(ren)",
+          "chinese": "和孩子在一起时，我感受不到乐趣。",
+          "runtime": "和孩子在一起时，我感受不到乐趣。",
+          "transform": "identity",
+          "review": "与固定英中材料相符；独立中文工作译稿待人工译审。"
+        },
+        {
+          "number": 21,
+          "code": "ED1",
+          "english": "I do what I'm supposed to do for my child(ren), but nothing more",
+          "chinese": "我只做那些应该为孩子做的事，不会再做更多。",
+          "runtime": "我只做那些应该为孩子做的事，不会再做更多。",
+          "transform": "identity",
+          "review": "与固定英中材料相符；独立中文工作译稿待人工译审。"
+        },
+        {
+          "number": 22,
+          "code": "ED2",
+          "english": "Outside the usual routines (lifts in the car, bedtime, meals), I'm no longer able to make an effort for my child(ren)",
+          "chinese": "除了日常的例行事务（开车接送、就寝、吃饭），我已经没有能力再为孩子付出更多努力。",
+          "runtime": "除了日常的例行事务（开车接送、就寝、吃饭），我已经没有能力再为孩子付出更多努力。",
+          "transform": "identity",
+          "review": "与固定英中材料相符；独立中文工作译稿待人工译审。"
+        },
+        {
+          "number": 23,
+          "code": "ED3",
+          "english": "I'm no longer able to show my child(ren) how much I love them",
+          "chinese": "我已经没有能力向孩子表达我有多么爱他们。",
+          "runtime": "我已经没有能力向孩子表达我有多么爱他们。",
+          "transform": "identity",
+          "review": "与固定英中材料相符；独立中文工作译稿待人工译审。"
+        }
+      ],
+      "options": [
+        {
+          "key": "pba_frequency_0_6",
+          "options": [
+            {
+              "value": "0",
+              "label": "从不",
+              "score": 0
+            },
+            {
+              "value": "1",
+              "label": "一年几次或更少",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "一个月一次或更少",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "一个月几次",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "一周一次",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "一周几次",
+              "score": 5
+            },
+            {
+              "value": "6",
+              "label": "每天",
+              "score": 6
+            }
+          ]
+        }
+      ],
+      "instruction": {
+        "source": {
+          "path": "docs/scale-instruments/research-drafts/pba23_2018_zh_cn/1.0.0/bilingual-content.json",
+          "blob": "55aeb0933b1e29915e0898bbbdb573ce6c600b60",
+          "sha256": "7a09b1cb8278cb9f78af6ec20ed32f3e62dd8805d9e556cf2229db0269f7e2c7",
+          "field": "/administration/instructionsZh"
+        },
+        "text": "下面的问题关注你作为父母的感受，而不是评价孩子。请根据自己的实际体验，选择每种感受出现的频率。没有对错答案，不愿作答时可以暂停或退出。爱孩子和感到疲惫可以同时存在。",
+        "status": "项目新增指导语，非作者原句；source顶层缺失。",
+        "binding": {
+          "path": "server-version/backend/src/modules/scale/instruments/pba23_2018_zh_cn/1.0.0/source.json#/instruction",
+          "old": null,
+          "new": {
+            "schemaVersion": 1,
+            "text": "下面的问题关注你作为父母的感受，而不是评价孩子。请根据自己的实际体验，选择每种感受出现的频率。没有对错答案，不愿作答时可以暂停或退出。爱孩子和感到疲惫可以同时存在。",
+            "language": "zh-CN",
+            "version": "1.0.0",
+            "source": "固定双语材料平台新增说明"
+          }
+        }
+      },
+      "audience": "成人父母自评至少一名孩子同住，非儿童自评或家长代评儿童，不用作资格判断。"
+    },
+    "scoring": {
+      "scores": [
+        {
+          "key": "exhaustion",
+          "type": "dimension",
+          "label": "养育中的疲惫与消耗",
+          "direction": "higher_is_worse",
+          "canonical": true,
+          "displayPrecision": 0,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "EX1",
+                "weight": 1
+              },
+              {
+                "itemCode": "EX2",
+                "weight": 1
+              },
+              {
+                "itemCode": "EX3",
+                "weight": 1
+              },
+              {
+                "itemCode": "EX4",
+                "weight": 1
+              },
+              {
+                "itemCode": "EX5",
+                "weight": 1
+              },
+              {
+                "itemCode": "EX6",
+                "weight": 1
+              },
+              {
+                "itemCode": "EX7",
+                "weight": 1
+              },
+              {
+                "itemCode": "EX8",
+                "weight": 1
+              },
+              {
+                "itemCode": "EX9",
+                "weight": 1
+              }
+            ],
+            "aggregation": "sum"
+          },
+          "description": "关注照顾孩子时的疲惫、难恢复，以及只能靠惯性撑着的感受。它不是勤奋或责任心的证明。"
+        },
+        {
+          "key": "contrast_previous_self",
+          "type": "dimension",
+          "label": "你是否觉得，自己不像从前那个父母了？",
+          "direction": "higher_is_worse",
+          "canonical": true,
+          "displayPrecision": 0,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "CO1",
+                "weight": 1
+              },
+              {
+                "itemCode": "CO2",
+                "weight": 1
+              },
+              {
+                "itemCode": "CO3",
+                "weight": 1
+              },
+              {
+                "itemCode": "CO4",
+                "weight": 1
+              },
+              {
+                "itemCode": "CO5",
+                "weight": 1
+              },
+              {
+                "itemCode": "CO6",
+                "weight": 1
+              }
+            ],
+            "aggregation": "sum"
+          },
+          "description": "关注你对过去和现在的自己的感受差异。这些自我评价可能很严厉，但不是对你真实价值的裁决。"
+        },
+        {
+          "key": "fed_up",
+          "type": "dimension",
+          "label": "养育中难以承受的感受",
+          "direction": "higher_is_worse",
+          "canonical": true,
+          "displayPrecision": 0,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "FU1",
+                "weight": 1
+              },
+              {
+                "itemCode": "FU2",
+                "weight": 1
+              },
+              {
+                "itemCode": "FU3",
+                "weight": 1
+              },
+              {
+                "itemCode": "FU4",
+                "weight": 1
+              },
+              {
+                "itemCode": "FU5",
+                "weight": 1
+              }
+            ],
+            "aggregation": "sum"
+          },
+          "description": "关注难以承受、难以应付，以及和孩子相处时快乐变少的体验。承认这种感受，不等于不爱孩子。"
+        },
+        {
+          "key": "emotional_distancing",
+          "type": "dimension",
+          "label": "日常照顾之外，亲近变难了吗？",
+          "direction": "higher_is_worse",
+          "canonical": true,
+          "displayPrecision": 0,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "ED1",
+                "weight": 1
+              },
+              {
+                "itemCode": "ED2",
+                "weight": 1
+              },
+              {
+                "itemCode": "ED3",
+                "weight": 1
+              }
+            ],
+            "aggregation": "sum"
+          },
+          "description": "关注是否只够完成必要事务、很难再表达爱意。这记录的是当下可用的情感精力，不是亲子关系的最终结论。"
+        },
+        {
+          "key": "parental_burnout",
+          "type": "total",
+          "label": "整体看看养育中的消耗",
+          "direction": "higher_is_worse",
+          "canonical": true,
+          "displayPrecision": 0,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "EX1",
+                "weight": 1
+              },
+              {
+                "itemCode": "EX2",
+                "weight": 1
+              },
+              {
+                "itemCode": "EX3",
+                "weight": 1
+              },
+              {
+                "itemCode": "EX4",
+                "weight": 1
+              },
+              {
+                "itemCode": "EX5",
+                "weight": 1
+              },
+              {
+                "itemCode": "EX6",
+                "weight": 1
+              },
+              {
+                "itemCode": "EX7",
+                "weight": 1
+              },
+              {
+                "itemCode": "EX8",
+                "weight": 1
+              },
+              {
+                "itemCode": "EX9",
+                "weight": 1
+              },
+              {
+                "itemCode": "CO1",
+                "weight": 1
+              },
+              {
+                "itemCode": "CO2",
+                "weight": 1
+              },
+              {
+                "itemCode": "CO3",
+                "weight": 1
+              },
+              {
+                "itemCode": "CO4",
+                "weight": 1
+              },
+              {
+                "itemCode": "CO5",
+                "weight": 1
+              },
+              {
+                "itemCode": "CO6",
+                "weight": 1
+              },
+              {
+                "itemCode": "FU1",
+                "weight": 1
+              },
+              {
+                "itemCode": "FU2",
+                "weight": 1
+              },
+              {
+                "itemCode": "FU3",
+                "weight": 1
+              },
+              {
+                "itemCode": "FU4",
+                "weight": 1
+              },
+              {
+                "itemCode": "FU5",
+                "weight": 1
+              },
+              {
+                "itemCode": "ED1",
+                "weight": 1
+              },
+              {
+                "itemCode": "ED2",
+                "weight": 1
+              },
+              {
+                "itemCode": "ED3",
+                "weight": 1
+              }
+            ],
+            "aggregation": "sum"
+          },
+          "description": "这四个角度合起来描述你的养育体验，不是诊断，也不是养育能力总分。不同维度题数不同，不直接比较原始分数大小。"
+        }
+      ],
+      "method": "0–6全正向，EX9和0–54、CO6和0–36、FU5和0–30、ED3和0–18；23题总和0–138，高分自报较多耗竭；不同维题数不能直接比原始和。",
+      "missing": "complete_required，缺答非从不、无插补；项目保守规则。",
+      "parameters": "原外部ROC信息未绑定，不做中文诊断/风险分档。"
+    },
+    "report": {
+      "review": "五分数对应，注明示例不必符合本人、可跳过建议，具体分担与安全支持且不评价父母价值；无需强改。",
+      "version": "内容/计分/报告/本地化1.0.0。"
+    }
+  },
+  "ordinary_suggestions": [
+    "绑定固定双语项目说明原文至顶层instruction，不放入题干。"
+  ],
+  "substantive_coordination": [
+    "题目、锚点、计分及外部阈值如需变化须人工及版本协调。"
+  ],
+  "human_status": "中文译审及本地验证待完成；保留源资料状态。",
+  "not_executed": [
+    "未改仓库、DB、CI或分支，未运行测试/系统。"
+  ],
+  "conclusion": "固定双语题项与评分一致，指导语可按原文绑定，现有报告可保留。"
+}

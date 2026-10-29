@@ -1,0 +1,160 @@
+{
+  "instrument": "erq10_zh_cn_research:1.0.0",
+  "sourceSHA": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "files": [
+    {
+      "path": "docs/scale-instruments/research-drafts/erq10/1.0.0/README.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "d14414eeb0fe57d080b7c4062da57f08e0f2cde2",
+      "sha256": "6f7b62698338982f739cd29312665514ad87e82864e82ef312344bf96a92cd17"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/erq10/1.0.0/source-manifest.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "c9509709bd4bf2523ae654f431dc3c3cf3c22794",
+      "sha256": "eaf65b49552d39600fac7ee64fb30f0c9009b9fc5817e67d2e3a012c18a4e98a"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/erq10_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "969236dd32c44337ad21a81789909ead024ce768",
+      "sha256": "1a4769b36fcd9ac2d2bb824ee74e780d9536eb12aea88066f17047b17745214c"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/erq10_zh_cn_research/1.0.0/instrument.ts",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "0eed070bb879576339c5a71afdf34c0026591fd3",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/erq10_zh_cn_research/1.0.0/source.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "b74965aa5cce0696100371cdc61a5627b7d95efe",
+      "sha256": "703e7d1cb1f12050bbc48dc473f052700eca3d43e1c92f6ff19e7cb17b35c432"
+    }
+  ],
+  "originalEvidence": {
+    "url": "https://spl.stanford.edu/sites/g/files/sbiybj19321/files/media/file/english_0.pdf",
+    "access": "本次直接读取官方题本及维度键；原版不改变题序、无反向。"
+  },
+  "items": [
+    {
+      "code": "ERQ10_01",
+      "english": "When I want to feel more positive emotion (such as joy or amusement), I change what I’m thinking about.",
+      "chinese": "想让自己体验更多积极情绪（例如喜悦或觉得有趣）时，我会调整当下正在想的事情。",
+      "facet": "reappraisal",
+      "key": "identity",
+      "conclusion": "与官方原题及源映射对应，中文工作译稿待专家审校。"
+    },
+    {
+      "code": "ERQ10_02",
+      "english": "I keep my emotions to myself.",
+      "chinese": "我习惯把自己的情绪留在心里，不告诉别人。",
+      "facet": "suppression",
+      "key": "identity",
+      "conclusion": "与官方原题及源映射对应，中文工作译稿待专家审校。 中文添加“不告诉别人”，可能收窄keep to myself，提请译审，不静默改题。"
+    },
+    {
+      "code": "ERQ10_03",
+      "english": "When I want to feel less negative emotion (such as sadness or anger), I change what I’m thinking about.",
+      "chinese": "希望悲伤或愤怒等消极情绪少一些时，我会改变自己正在思考的内容。",
+      "facet": "reappraisal",
+      "key": "identity",
+      "conclusion": "与官方原题及源映射对应，中文工作译稿待专家审校。"
+    },
+    {
+      "code": "ERQ10_04",
+      "english": "When I am feeling positive emotions, I am careful not to express them.",
+      "chinese": "感到高兴等积极情绪时，我会有意识地不把这些感受表露出来。",
+      "facet": "suppression",
+      "key": "identity",
+      "conclusion": "与官方原题及源映射对应，中文工作译稿待专家审校。"
+    },
+    {
+      "code": "ERQ10_05",
+      "english": "When I’m faced with a stressful situation, I make myself think about it in a way that helps me stay calm.",
+      "chinese": "身处压力较大的情境时，我会试着用有助于自己平静下来的方式去看待这件事。",
+      "facet": "reappraisal",
+      "key": "identity",
+      "conclusion": "与官方原题及源映射对应，中文工作译稿待专家审校。 中文“试着/尝试”相对原文动作表述可能弱化，提请译审。"
+    },
+    {
+      "code": "ERQ10_06",
+      "english": "I control my emotions by not expressing them.",
+      "chinese": "我会通过不表达情绪来调节自己的感受。",
+      "facet": "suppression",
+      "key": "identity",
+      "conclusion": "与官方原题及源映射对应，中文工作译稿待专家审校。"
+    },
+    {
+      "code": "ERQ10_07",
+      "english": "When I want to feel more positive emotion, I change the way I’m thinking about the situation.",
+      "chinese": "当我想体验更多积极情绪时，我会改变对眼前处境的看法。",
+      "facet": "reappraisal",
+      "key": "identity",
+      "conclusion": "与官方原题及源映射对应，中文工作译稿待专家审校。"
+    },
+    {
+      "code": "ERQ10_08",
+      "english": "I control my emotions by changing the way I think about the situation I’m in.",
+      "chinese": "我会通过调整对所处情境的理解来调节情绪。",
+      "facet": "reappraisal",
+      "key": "identity",
+      "conclusion": "与官方原题及源映射对应，中文工作译稿待专家审校。"
+    },
+    {
+      "code": "ERQ10_09",
+      "english": "When I am feeling negative emotions, I make sure not to express them.",
+      "chinese": "当我有悲伤或愤怒等消极情绪时，我会确保不把这些情绪表现出来。",
+      "facet": "suppression",
+      "key": "identity",
+      "conclusion": "与官方原题及源映射对应，中文工作译稿待专家审校。"
+    },
+    {
+      "code": "ERQ10_10",
+      "english": "When I want to feel less negative emotion, I change the way I’m thinking about the situation.",
+      "chinese": "想减少消极情绪时，我会尝试用另一种角度理解当下的处境。",
+      "facet": "reappraisal",
+      "key": "identity",
+      "conclusion": "与官方原题及源映射对应，中文工作译稿待专家审校。 中文“试着/尝试”相对原文动作表述可能弱化，提请译审。"
+    }
+  ],
+  "threePartConclusions": {
+    "content": "十题顺序、三端点1非常不同意/4中立/7非常同意与官方匹配，中间数字不加标签。02、05、10译文有可能收窄或弱化含义，保留已记待译审，不静默变更；01/03解释正负情绪，题序应锁定。",
+    "scoring": "认知重评01/03/05/07/08/10等权均分分母6，表达抑制02/04/06/09等权均分分母4，各1–7，无反向、无总分；每维完整才计算为项目缺失选择，缺失不插补。不可将完整他维可算误作完整解释报告。无中文常模或阈值。",
+    "report": "报告1.0.0两个维度score_only、higher_is_more，描述习惯而非情绪能力；没有评判某策略必然好坏，提供具体行动与支持建议，不虚构等级，可沿用。成人本人，未配置report.audienceContract，不补称人工审批。"
+  },
+  "instruction": {
+    "source": {
+      "path": "server-version/backend/src/modules/scale/instruments/erq10_zh_cn_research/1.0.0/source.json",
+      "commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "blob": "b74965aa5cce0696100371cdc61a5627b7d95efe",
+      "sha256": "703e7d1cb1f12050bbc48dc473f052700eca3d43e1c92f6ff19e7cb17b35c432"
+    },
+    "jsonPointer": "/instruction",
+    "value": {
+      "schemaVersion": 1,
+      "language": "zh-CN",
+      "version": "1.0.0",
+      "text": "请根据平时调节情绪的习惯回答。情绪体验是内心的感受，情绪表达是通过言语、动作、表情等让人知道感受。下面句子涉及不同的习惯，即使看起来相似，也请逐句判断自己有多赞同。1表示非常不同意、4表示中立、7表示非常同意；其他档用数字表示程度。请保持原题序作答。",
+      "source": "Gross & John 2003 Stanford官方英文指导语的独立中文工作译稿。"
+    },
+    "note": "指导语已独立绑定；包含“平时”“题序”等项目补充，来源应准确称基于而非逐字官方译本。"
+  },
+  "ordinaryEdits": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/erq10_zh_cn_research/1.0.0/source.json",
+      "jsonPointer": "/instruction/source",
+      "old": "Gross & John 2003 Stanford官方英文指导语的独立中文工作译稿。",
+      "new": "基于Gross & John 2003 Stanford官方英文指导语及题序说明编写的独立中文工作指导语，包含项目对一般习惯、数字锚点和保留题序的说明。",
+      "reason": "来源描述消歧，保留指导语正文与测量内容。"
+    }
+  ],
+  "humanItems": [
+    "中文专家译审、认知访谈及人群验证待完成；02/05/10语义细节须独立判断，题意变更须协调版本。",
+    "保留既有作者许可与独立译文、公开再分发待管理员协调状态。"
+  ],
+  "notExecuted": [
+    "未改仓库/分支、系统、DB/CI，未执行测试或新科研版权调查。"
+  ]
+}

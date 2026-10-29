@@ -1,0 +1,56 @@
+{
+  "documentSchema": "CFQ7_RESEARCH_DOCUMENT_V1",
+  "status": "REGISTERED_AS_SOURCE_ars30_STYLE_WORKFLOW",
+  "instrumentKey": "cfq7_zh_cn_research",
+  "instrumentVersion": "1.0.0",
+  "scoringVersion": "1.0.0",
+  "localizationVersion": "1.0.0",
+  "author": "Gillanders, D. T., Bolderston, H., Bond, F. W., Dempster, M., Flaxman, P. E., Campbell, L., Kerr, S., Tansey, L., Noel, P., Ferenbach, C., Masley, S., Roach, L., Lloyd, J., May, L., Clarke, S., & Remington, B.",
+  "sourceDoi": "10.1016/j.beth.2013.09.001",
+  "sourceCarrier": "CFQ-7 seven-item version; items cross-verified across four independent carriers",
+  "translationStatus": "Independent platform Chinese work translation; expert review and local validation pending",
+  "crossVerification": [
+    "APPI (American Psychiatric Publishing) official CFQ PDF",
+    "MDPI Life 13:803 (Italian university sample study)",
+    "Open Psychology Journal CFQ-7-M Malay validation appendix",
+    "psytests.org.ru public item listing"
+  ],
+  "licenseStatus": "authorization_pending",
+  "licenseNote": "ACBS: \"The CFQ is free to use for non-commercial educational, clinical and research purposes, permission is not needed.\" Non-commercial only; commercial use not granted. ACBS lists an existing Chinese version and asks prospective translators to contact David Gillanders first, which this project does not do.",
+  "instructions": {
+    "originalEnglish": "Below are a number of statements. Please rate how often each statement is true for you.",
+    "platformChinese": "下面是一些描述你与自己想法之间关系的句子。请仔细阅读每一句，并根据你自己的真实经验，判断它在多大程度上符合你。没有对错之分，也不必反复斟酌——你的第一反应通常最准确。",
+    "isIndependentAdaptation": true
+  },
+  "recallPeriod": null,
+  "responseOptions": [
+    { "value": 1, "originalEnglish": "Never true", "platformChinese": "从不如此" },
+    { "value": 2, "originalEnglish": "Very seldom true", "platformChinese": "极少如此" },
+    { "value": 3, "originalEnglish": "Seldom true", "platformChinese": "很少如此" },
+    { "value": 4, "originalEnglish": "Sometimes true", "platformChinese": "有时如此" },
+    { "value": 5, "originalEnglish": "Frequently true", "platformChinese": "经常如此" },
+    { "value": 6, "originalEnglish": "Almost always true", "platformChinese": "几乎总是如此" },
+    { "value": 7, "originalEnglish": "Always true", "platformChinese": "总是如此" }
+  ],
+  "reverseItemNumbers": [],
+  "groups": [
+    {
+      "scoreKey": "total",
+      "originalLabel": "Cognitive Fusion",
+      "platformLabel": "认知融合",
+      "items": [1, 2, 3, 4, 5, 6, 7],
+      "aggregation": "sum",
+      "range": { "min": 7, "max": 49 },
+      "higherMeaning": "更高的分数表示认知融合更多，即更容易被自己的想法钩住；不是能力好坏，也不是临床诊断"
+    }
+  ],
+  "items": [
+    { "number": 1, "itemCode": "CFQ7_01", "originalEnglish": "My thoughts cause me distress or emotional pain.", "platformChinese": "我的想法让我感到痛苦或情绪上的难受。", "reverse": false },
+    { "number": 2, "itemCode": "CFQ7_02", "originalEnglish": "I get so caught up in my thoughts that I am unable to do the things that I most want to do.", "platformChinese": "我太陷入自己的想法，以至于无法去做自己最想做的事。", "reverse": false },
+    { "number": 3, "itemCode": "CFQ7_03", "originalEnglish": "I overanalyze situations to the point where it's unhelpful to me.", "platformChinese": "我会过度分析某些情况，到了对自己反而没有帮助的地步。", "reverse": false },
+    { "number": 4, "itemCode": "CFQ7_04", "originalEnglish": "I struggle with my thoughts.", "platformChinese": "我和自己的想法较劲。", "reverse": false },
+    { "number": 5, "itemCode": "CFQ7_05", "originalEnglish": "I get upset with myself for having certain thoughts.", "platformChinese": "我会因为自己有某些想法而生自己的气。", "reverse": false },
+    { "number": 6, "itemCode": "CFQ7_06", "originalEnglish": "I tend to get very entangled in my thoughts.", "platformChinese": "我很容易深陷在自己的想法里。", "reverse": false },
+    { "number": 7, "itemCode": "CFQ7_07", "originalEnglish": "It's such a struggle to let go of upsetting thoughts even when I know that letting go would be helpful.", "platformChinese": "即使我知道放下会有帮助，要放下那些令人难受的想法仍然非常困难。", "reverse": false }
+  ]
+}

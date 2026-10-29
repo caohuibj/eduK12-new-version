@@ -1,0 +1,38 @@
+{
+  "identity": "kseg6_zh_cn_research:1.0.0",
+  "sourceCommit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "source": {
+    "path": "server-version/backend/src/modules/scale/instruments/kseg6_zh_cn_research/1.0.0/source.json",
+    "gitBlob": "7f524cab304fab8f565189e2ce83c1d17d762533",
+    "sha256": "e7bb632b8da7b942e46777d4d3f55b9c3212b63e8fc6b52a42d9b4772f304dfc"
+  },
+  "format": "RFC6902",
+  "patch": [
+    {
+      "op": "test",
+      "path": "/executable/definition/report/interpretations/0/summary",
+      "value": "这几道题问到争论时保持客观、压力下友好待人，以及认真听别人说话。你越同意这些说法，表示越常把自己描述为始终有这些正面表现，并不能据此断定你在夸大或说谎。比如，工作汇报时我们可能先想到顺利完成的部分，而和熟悉的人复盘时更容易讲到困难。描述自己会受到场合、心情和题目理解的影响；试着回到具体经历，比给自己一个笼统评价更有帮助。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/interpretations/0/summary",
+      "value": "这几道题问到争论时保持客观、压力下友好待人，以及认真听别人说话。你越同意这些说法，表示这次越认同自己始终有这些正面表现的描述，并不能据此断定你在夸大或说谎。比如，工作汇报时我们可能先想到顺利完成的部分，而和熟悉的人复盘时更容易讲到困难。描述自己会受到场合、心情和题目理解的影响；试着回到具体经历，比给自己一个笼统评价更有帮助。"
+    },
+    {
+      "op": "test",
+      "path": "/executable/definition/report/reportVersion",
+      "value": "1.0.0"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/reportVersion",
+      "value": "1.0.1"
+    }
+  ],
+  "rationale": "符合度回答表示本次认同题项描述的程度，不推断作答者描述自身的频率。",
+  "versionImpact": "报告1.0.0→拟议1.0.1；使用现有报告版本轴新增快照，保留旧版，最终版本与定义哈希由集成流程核定。",
+  "unchanged": "两个三题均分保持原值方向；后组高分表示更认同所述不理想行为，并非更多隐瞒。题目、锚点、缺失、阈值和指导语不变。",
+  "notExecuted": [
+    "未修改仓库，未运行测试、系统、DB或CI。"
+  ]
+}

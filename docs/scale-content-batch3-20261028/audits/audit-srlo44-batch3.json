@@ -1,0 +1,1008 @@
+{
+  "instrument": "srlo44_zh_cn_research:1.0.0",
+  "source_commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "source_files": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/srlo44_zh_cn_research/1.0.0/source.json",
+      "blob": "8fb7447881cb69842837a7d6572666b6fb0a778b",
+      "sha256": "1ed7b85f6bb2478bf7b63046440abdec823989364d77d73678c8f6847f79b59c"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/srlo44_zh_cn_research/1.0.0/instrument.ts",
+      "blob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/srlo44_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+      "blob": "60a863885f956147d3b94d8cd92e18516c137452",
+      "sha256": "1e26124302d025e26aa3c39ae5c4a79747a668544c48c2b246cb93cabcc5d1ce"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/srlo44/1.0.0/README.md",
+      "blob": "cd2d47b172bcd5da7167817614bd4e4338354372",
+      "sha256": "6e1219809721dcf76f726d1e0e16fd56f5076de06bc4322f972953b1ca6372dc"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/srlo44/1.0.0/bilingual-content.json",
+      "blob": "ff2c7b20805172da8f577712f63b95168afca1a2",
+      "sha256": "2805f5941787482e914ec4eb132756d860bab068d32ff6ffbaa83cfe515185b6"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/srlo44/1.0.0/administration-sidecar.prepared.json",
+      "blob": "59b8d4745a0649e6eaf082d6daecfc49d4b2463b",
+      "sha256": "153ff9ee4c0eeb0550e87ac1cd051306d0d18a06ef2a9ebb1acbfea9a993e2aa"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/srlo44/1.0.0/administration.md",
+      "blob": "240d867cfae171ed3d7ee16dae497b96fd25a8b0",
+      "sha256": "f8043767d19391859b950aaee9d0e7b23d47cbfc4efcefcb2bfed5fe662992e5"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/srlo44/1.0.0/scoring-and-parameters.md",
+      "blob": "a927854cbf27c7e377e23642c511d9d96c9a0a40",
+      "sha256": "f8859866e8f7485d289683c4ccb608cef2022594219a4b29f7c840bb5cee7694"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/srlo44/1.0.0/source-manifest.json",
+      "blob": "449db75172dba9c1ec4d284334ddda3c2c0fc578",
+      "sha256": "2a7e3af08c1d609b51c039691a9ecebd84e496510b17313906483f4c916eb109"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/srlo44/1.0.0/cross-carrier-differences.json",
+      "blob": "12810fb53babdf1c777fbabe7c9e0ab3ff129a18",
+      "sha256": "45a26acd25ee4ae1f5c2f17faff7e1e86232dda3cf77cb6a70332b79620607c2"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/srlo44/1.0.0/report-draft.md",
+      "blob": "4191472b47d7cb9249ca32133623c29d786028a8",
+      "sha256": "f60049c7833fb48247a1965f60482cbcecb5cab12ce57f53c77bc446974d576d"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/srlo44/1.0.0/validation.json",
+      "blob": "86954dbac3713c075a5ad411c9c36629ee98f390",
+      "sha256": "5fae411e8f8c935eaaa266a8fcd2cba06e8ca7fa7072561d4f554ce5905d703c"
+    }
+  ],
+  "three_parts": {
+    "items_instruction": {
+      "items": [
+        {
+          "number": 1,
+          "code": "SRLO_01",
+          "english": "I am confident that I will be able to master the content and assignments in this online class",
+          "chinese": "我有信心掌握这门在线课程的内容并完成作业。",
+          "runtime": "我有信心掌握这门在线课程的内容并完成作业。",
+          "exact": true,
+          "scoreKey": "online_academic_self_efficacy",
+          "transform": "identity",
+          "review": "固定英中材料与source逐项对照；中文工作稿待人工译审。"
+        },
+        {
+          "number": 2,
+          "code": "SRLO_02",
+          "english": "I am confident in my ability to successfully persist in this online class, even if I find the content difficult",
+          "chinese": "即使觉得内容困难，我也有信心顺利坚持学完这门在线课程。",
+          "runtime": "即使觉得内容困难，我也有信心顺利坚持学完这门在线课程。",
+          "exact": true,
+          "scoreKey": "online_academic_self_efficacy",
+          "transform": "identity",
+          "review": "固定英中材料与source逐项对照；中文工作稿待人工译审。"
+        },
+        {
+          "number": 3,
+          "code": "SRLO_03",
+          "english": "I am confident I can put in the effort required to get a high grade in this online class",
+          "chinese": "我有信心付出这门在线课程取得高分所需的努力。",
+          "runtime": "我有信心付出这门在线课程取得高分所需的努力。",
+          "exact": true,
+          "scoreKey": "online_academic_self_efficacy",
+          "transform": "identity",
+          "review": "固定英中材料与source逐项对照；中文工作稿待人工译审。"
+        },
+        {
+          "number": 4,
+          "code": "SRLO_04",
+          "english": "I am confident that I can accurately work out what the task is requiring me to do",
+          "chinese": "我有信心准确弄清任务要求我做什么。",
+          "runtime": "我有信心准确弄清任务要求我做什么。",
+          "exact": true,
+          "scoreKey": "online_academic_self_efficacy",
+          "transform": "identity",
+          "review": "固定英中材料与source逐项对照；中文工作稿待人工译审。"
+        },
+        {
+          "number": 5,
+          "code": "SRLO_05",
+          "english": "I always find aspects of the content that arouse my curiosity",
+          "chinese": "我总能在课程内容中找到引起自己好奇的部分。",
+          "runtime": "我总能在课程内容中找到引起自己好奇的部分。",
+          "exact": true,
+          "scoreKey": "online_intrinsic_motivation",
+          "transform": "identity",
+          "review": "固定英中材料与source逐项对照；中文工作稿待人工译审。"
+        },
+        {
+          "number": 6,
+          "code": "SRLO_06",
+          "english": "I love learning new things in this online class",
+          "chinese": "我喜欢在这门在线课程中学习新东西。",
+          "runtime": "我喜欢在这门在线课程中学习新东西。",
+          "exact": true,
+          "scoreKey": "online_intrinsic_motivation",
+          "transform": "identity",
+          "review": "固定英中材料与source逐项对照；中文工作稿待人工译审。"
+        },
+        {
+          "number": 7,
+          "code": "SRLO_07",
+          "english": "I find studying for this online class enjoyable",
+          "chinese": "我觉得学习这门在线课程很愉快。",
+          "runtime": "我觉得学习这门在线课程很愉快。",
+          "exact": true,
+          "scoreKey": "online_intrinsic_motivation",
+          "transform": "identity",
+          "review": "固定英中材料与source逐项对照；中文工作稿待人工译审。"
+        },
+        {
+          "number": 8,
+          "code": "SRLO_08",
+          "english": "I find it very satisfying when I learn new material in this online course",
+          "chinese": "在这门在线课程中学到新内容时，我会感到很满足。",
+          "runtime": "在这门在线课程中学到新内容时，我会感到很满足。",
+          "exact": true,
+          "scoreKey": "online_intrinsic_motivation",
+          "transform": "identity",
+          "review": "固定英中材料与source逐项对照；中文工作稿待人工译审。"
+        },
+        {
+          "number": 9,
+          "code": "SRLO_09",
+          "english": "I get a sense of achievement when I learn new skills or information",
+          "chinese": "学到新的技能或知识时，我会有成就感。",
+          "runtime": "学到新的技能或知识时，我会有成就感。",
+          "exact": true,
+          "scoreKey": "online_intrinsic_motivation",
+          "transform": "identity",
+          "review": "固定英中材料与source逐项对照；中文工作稿待人工译审。"
+        },
+        {
+          "number": 10,
+          "code": "SRLO_10",
+          "english": "I want to do well in this online course so I can show off to my friends and family",
+          "chinese": "我想在这门在线课程中表现出色，好向朋友和家人展示一番。",
+          "runtime": "我想在这门在线课程中表现出色，好向朋友和家人展示一番。",
+          "exact": true,
+          "scoreKey": "online_extrinsic_motivation",
+          "transform": "identity",
+          "review": "固定英中材料与source逐项对照；中文工作稿待人工译审。"
+        },
+        {
+          "number": 11,
+          "code": "SRLO_11",
+          "english": "I want to do well because of others real or perceived expectations of me",
+          "chinese": "我想表现出色，是因为别人确实对我有期待，或我认为他们对我有期待。",
+          "runtime": "我想表现出色，是因为别人确实对我有期待，或我认为他们对我有期待。",
+          "exact": true,
+          "scoreKey": "online_extrinsic_motivation",
+          "transform": "identity",
+          "review": "固定英中材料与source逐项对照；中文工作稿待人工译审。"
+        },
+        {
+          "number": 12,
+          "code": "SRLO_12",
+          "english": "I want to get a better grade than others in my online class",
+          "chinese": "我想在这门在线课程中取得比其他同学更好的成绩。",
+          "runtime": "我想在这门在线课程中取得比其他同学更好的成绩。",
+          "exact": true,
+          "scoreKey": "online_extrinsic_motivation",
+          "transform": "identity",
+          "review": "固定英中材料与source逐项对照；中文工作稿待人工译审。"
+        },
+        {
+          "number": 13,
+          "code": "SRLO_13",
+          "english": "I feel so helpless that I cannot dedicate all my effort to my online studies",
+          "chinese": "我感到很无助，以至于无法全力投入在线学习。",
+          "runtime": "我感到很无助，以至于无法全力投入在线学习。",
+          "exact": true,
+          "scoreKey": "online_negative_achievement_emotion",
+          "transform": "identity",
+          "review": "固定英中材料与source逐项对照；中文工作稿待人工译审。"
+        },
+        {
+          "number": 14,
+          "code": "SRLO_14",
+          "english": "I consider dropping out because I feel overwhelmed by my online studies",
+          "chinese": "在线学习让我觉得难以承受，因此我考虑退学。",
+          "runtime": "在线学习让我觉得难以承受，因此我考虑退学。",
+          "exact": true,
+          "scoreKey": "online_negative_achievement_emotion",
+          "transform": "identity",
+          "review": "固定英中材料与source逐项对照；中文工作稿待人工译审。"
+        },
+        {
+          "number": 15,
+          "code": "SRLO_15",
+          "english": "While studying, I want to distract myself to lower my anxiety level",
+          "chinese": "学习时，我想分散自己的注意力来减轻焦虑。",
+          "runtime": "学习时，我想分散自己的注意力来减轻焦虑。",
+          "exact": true,
+          "scoreKey": "online_negative_achievement_emotion",
+          "transform": "identity",
+          "review": "固定英中材料与source逐项对照；中文工作稿待人工译审。"
+        },
+        {
+          "number": 16,
+          "code": "SRLO_16",
+          "english": "I get so anxious that I don't even want to start studying online",
+          "chinese": "我焦虑得甚至不想开始在线学习。",
+          "runtime": "我焦虑得甚至不想开始在线学习。",
+          "exact": true,
+          "scoreKey": "online_negative_achievement_emotion",
+          "transform": "identity",
+          "review": "固定英中材料与source逐项对照；中文工作稿待人工译审。"
+        },
+        {
+          "number": 17,
+          "code": "SRLO_17",
+          "english": "When I have to study online, I start to feel bad",
+          "chinese": "一想到必须在线学习，我就开始感到难受。",
+          "runtime": "一想到必须在线学习，我就开始感到难受。",
+          "exact": true,
+          "scoreKey": "online_negative_achievement_emotion",
+          "transform": "identity",
+          "review": "固定英中材料与source逐项对照；中文工作稿待人工译审。"
+        },
+        {
+          "number": 18,
+          "code": "SRLO_18",
+          "english": "I set short-term (daily or weekly) goals",
+          "chinese": "我会设定短期目标，例如每天或每周的目标。",
+          "runtime": "我会设定短期目标，例如每天或每周的目标。",
+          "exact": true,
+          "scoreKey": "planning_time_management",
+          "transform": "identity",
+          "review": "固定英中材料与source逐项对照；中文工作稿待人工译审。"
+        },
+        {
+          "number": 19,
+          "code": "SRLO_19",
+          "english": "I set realistic deadlines for learning",
+          "chinese": "我会为学习设定切实可行的截止时间。",
+          "runtime": "我会为学习设定切实可行的截止时间。",
+          "exact": true,
+          "scoreKey": "planning_time_management",
+          "transform": "identity",
+          "review": "固定英中材料与source逐项对照；中文工作稿待人工译审。"
+        },
+        {
+          "number": 20,
+          "code": "SRLO_20",
+          "english": "I break larger goals into smaller actionable goals",
+          "chinese": "我会把大目标拆成可以付诸行动的小目标。",
+          "runtime": "我会把大目标拆成可以付诸行动的小目标。",
+          "exact": true,
+          "scoreKey": "planning_time_management",
+          "transform": "identity",
+          "review": "固定英中材料与source逐项对照；中文工作稿待人工译审。"
+        },
+        {
+          "number": 21,
+          "code": "SRLO_21",
+          "english": "I make a list of detailed actions that I need to complete",
+          "chinese": "我会列出需要完成的具体行动。",
+          "runtime": "我会列出需要完成的具体行动。",
+          "exact": true,
+          "scoreKey": "planning_time_management",
+          "transform": "identity",
+          "review": "固定英中材料与source逐项对照；中文工作稿待人工译审。"
+        },
+        {
+          "number": 22,
+          "code": "SRLO_22",
+          "english": "I plan out my schedule each week so I have the appropriate amount of time available for online study",
+          "chinese": "我每周都会安排日程，确保有适当的时间用于在线学习。",
+          "runtime": "我每周都会安排日程，确保有适当的时间用于在线学习。",
+          "exact": true,
+          "scoreKey": "planning_time_management",
+          "transform": "identity",
+          "review": "固定英中材料与source逐项对照；中文工作稿待人工译审。"
+        },
+        {
+          "number": 23,
+          "code": "SRLO_23",
+          "english": "I think about what learning strategies have worked for me in the past when doing similar assignments/types of study",
+          "chinese": "做类似的作业或学习任务时，我会想一想过去哪些学习方法对自己有用。",
+          "runtime": "做类似的作业或学习任务时，我会想一想过去哪些学习方法对自己有用。",
+          "exact": true,
+          "scoreKey": "metacognition",
+          "transform": "identity",
+          "review": "固定英中材料与source逐项对照；中文工作稿待人工译审。"
+        },
+        {
+          "number": 24,
+          "code": "SRLO_24",
+          "english": "I spend time trying to interpret the task to ensure I understand accurately what I need to do",
+          "chinese": "我会花时间理解任务，确保准确明白自己需要做什么。",
+          "runtime": "我会花时间理解任务，确保准确明白自己需要做什么。",
+          "exact": true,
+          "scoreKey": "metacognition",
+          "transform": "identity",
+          "review": "固定英中材料与source逐项对照；中文工作稿待人工译审。"
+        },
+        {
+          "number": 25,
+          "code": "SRLO_25",
+          "english": "I usually self-assess my performance once I finish",
+          "chinese": "完成任务后，我通常会评价自己的表现。",
+          "runtime": "完成任务后，我通常会评价自己的表现。",
+          "exact": true,
+          "scoreKey": "metacognition",
+          "transform": "identity",
+          "review": "固定英中材料与source逐项对照；中文工作稿待人工译审。"
+        },
+        {
+          "number": 26,
+          "code": "SRLO_26",
+          "english": "I look over past feedback I have received and check that I have made improvements in my current learning",
+          "chinese": "我会回顾过去收到的反馈，检查当前的学习是否已有改进。",
+          "runtime": "我会回顾过去收到的反馈，检查当前的学习是否已有改进。",
+          "exact": true,
+          "scoreKey": "metacognition",
+          "transform": "identity",
+          "review": "固定英中材料与source逐项对照；中文工作稿待人工译审。"
+        },
+        {
+          "number": 27,
+          "code": "SRLO_27",
+          "english": "I think about how I might improve my work by evaluating it against the marking criteria provided by the teacher",
+          "chinese": "我会对照老师提供的评分标准评价自己的作业，想一想怎样改进。",
+          "runtime": "我会对照老师提供的评分标准评价自己的作业，想一想怎样改进。",
+          "exact": true,
+          "scoreKey": "metacognition",
+          "transform": "identity",
+          "review": "固定英中材料与source逐项对照；中文工作稿待人工译审。"
+        },
+        {
+          "number": 28,
+          "code": "SRLO_28",
+          "english": "I am able to study for my online course without distraction",
+          "chinese": "我能够不受干扰地学习这门在线课程。",
+          "runtime": "我能够不受干扰地学习这门在线课程。",
+          "exact": true,
+          "scoreKey": "study_environment",
+          "transform": "identity",
+          "review": "固定英中材料与source逐项对照；中文工作稿待人工译审。"
+        },
+        {
+          "number": 29,
+          "code": "SRLO_29",
+          "english": "I have access to a quiet and distraction-free place to study",
+          "chinese": "我能找到安静、不受干扰的地方学习。",
+          "runtime": "我能找到安静、不受干扰的地方学习。",
+          "exact": true,
+          "scoreKey": "study_environment",
+          "transform": "identity",
+          "review": "固定英中材料与source逐项对照；中文工作稿待人工译审。"
+        },
+        {
+          "number": 30,
+          "code": "SRLO_30",
+          "english": "I know where I can study most efficiently for this online course",
+          "chinese": "我知道在哪里学习这门在线课程最有效率。",
+          "runtime": "我知道在哪里学习这门在线课程最有效率。",
+          "exact": true,
+          "scoreKey": "study_environment",
+          "transform": "identity",
+          "review": "固定英中材料与source逐项对照；中文工作稿待人工译审。"
+        },
+        {
+          "number": 31,
+          "code": "SRLO_31",
+          "english": "I work hard in my online study, even when there are more interesting things to do",
+          "chinese": "即使有更有趣的事情可做，我也会努力进行在线学习。",
+          "runtime": "即使有更有趣的事情可做，我也会努力进行在线学习。",
+          "exact": true,
+          "scoreKey": "online_effort_regulation",
+          "transform": "identity",
+          "review": "固定英中材料与source逐项对照；中文工作稿待人工译审。"
+        },
+        {
+          "number": 32,
+          "code": "SRLO_32",
+          "english": "When my online study gets difficult, I remain committed to reaching my study goals",
+          "chinese": "在线学习遇到困难时，我仍会坚持实现自己的学习目标。",
+          "runtime": "在线学习遇到困难时，我仍会坚持实现自己的学习目标。",
+          "exact": true,
+          "scoreKey": "online_effort_regulation",
+          "transform": "identity",
+          "review": "固定英中材料与source逐项对照；中文工作稿待人工译审。"
+        },
+        {
+          "number": 33,
+          "code": "SRLO_33",
+          "english": "When my mind begins to wander during a learning session for this online course, I make a special effort to keep concentrating",
+          "chinese": "学习这门在线课程时，如果开始走神，我会特意努力重新集中注意力。",
+          "runtime": "学习这门在线课程时，如果开始走神，我会特意努力重新集中注意力。",
+          "exact": true,
+          "scoreKey": "online_effort_regulation",
+          "transform": "identity",
+          "review": "固定英中材料与source逐项对照；中文工作稿待人工译审。"
+        },
+        {
+          "number": 34,
+          "code": "SRLO_34",
+          "english": "No matter how I am feeling, I persevere with my online study",
+          "chinese": "无论心情如何，我都会坚持在线学习。",
+          "runtime": "无论心情如何，我都会坚持在线学习。",
+          "exact": true,
+          "scoreKey": "online_effort_regulation",
+          "transform": "identity",
+          "review": "固定英中材料与source逐项对照；中文工作稿待人工译审。"
+        },
+        {
+          "number": 35,
+          "code": "SRLO_35",
+          "english": "I try to help other students when they ask a question online, I can answer",
+          "chinese": "其他同学在网上提出我能回答的问题时，我会尽量帮助他们。",
+          "runtime": "其他同学在网上提出我能回答的问题时，我会尽量帮助他们。",
+          "exact": true,
+          "scoreKey": "online_social_support",
+          "transform": "identity",
+          "review": "固定英中材料与source逐项对照；中文工作稿待人工译审。"
+        },
+        {
+          "number": 36,
+          "code": "SRLO_36",
+          "english": "I ask for help from knowledgeable others through online channels when I am not sure what to do in my online class",
+          "chinese": "不确定这门在线课程该怎么学时，我会通过网络向了解相关知识的人求助。",
+          "runtime": "不确定这门在线课程该怎么学时，我会通过网络向了解相关知识的人求助。",
+          "exact": true,
+          "scoreKey": "online_social_support",
+          "transform": "identity",
+          "review": "固定英中材料与source逐项对照；中文工作稿待人工译审。"
+        },
+        {
+          "number": 37,
+          "code": "SRLO_37",
+          "english": "I ask the teacher and/or my peers to clarify information in my online course",
+          "chinese": "我会请老师或同学澄清这门在线课程中的信息。",
+          "runtime": "我会请老师或同学澄清这门在线课程中的信息。",
+          "exact": true,
+          "scoreKey": "online_social_support",
+          "transform": "identity",
+          "review": "固定英中材料与source逐项对照；中文工作稿待人工译审。"
+        },
+        {
+          "number": 38,
+          "code": "SRLO_38",
+          "english": "When I have difficulties with my online class, I seek assistance from others through online means (discussion boards, social media, email, instant messaging etc.)",
+          "chinese": "这门在线课程遇到困难时，我会通过网络向他人求助，例如讨论区、社交媒体、电子邮件或即时消息。",
+          "runtime": "这门在线课程遇到困难时，我会通过网络向他人求助，例如讨论区、社交媒体、电子邮件或即时消息。",
+          "exact": true,
+          "scoreKey": "online_social_support",
+          "transform": "identity",
+          "review": "固定英中材料与source逐项对照；中文工作稿待人工译审。"
+        },
+        {
+          "number": 39,
+          "code": "SRLO_39",
+          "english": "I use email, discussion boards, social media, etc., to connect with the teacher and other students when I need help",
+          "chinese": "需要帮助时，我会使用电子邮件、讨论区、社交媒体等联系老师和其他同学。",
+          "runtime": "需要帮助时，我会使用电子邮件、讨论区、社交媒体等联系老师和其他同学。",
+          "exact": true,
+          "scoreKey": "online_social_support",
+          "transform": "identity",
+          "review": "固定英中材料与source逐项对照；中文工作稿待人工译审。"
+        },
+        {
+          "number": 40,
+          "code": "SRLO_40",
+          "english": "When studying online, I create my own examples of the content to make it more meaningful",
+          "chinese": "在线学习时，我会为课程内容想出自己的例子，让内容对自己更有意义。",
+          "runtime": "在线学习时，我会为课程内容想出自己的例子，让内容对自己更有意义。",
+          "exact": true,
+          "scoreKey": "online_task_strategies",
+          "transform": "identity",
+          "review": "固定英中材料与source逐项对照；中文工作稿待人工译审。"
+        },
+        {
+          "number": 41,
+          "code": "SRLO_41",
+          "english": "When studying online, I organise my thoughts by making summaries of what I am learning",
+          "chinese": "在线学习时，我会总结所学内容，整理自己的思路。",
+          "runtime": "在线学习时，我会总结所学内容，整理自己的思路。",
+          "exact": true,
+          "scoreKey": "online_task_strategies",
+          "transform": "identity",
+          "review": "固定英中材料与source逐项对照；中文工作稿待人工译审。"
+        },
+        {
+          "number": 42,
+          "code": "SRLO_42",
+          "english": "When studying online, I try and relate the content to what I already know",
+          "chinese": "在线学习时，我会尝试把课程内容与已有知识联系起来。",
+          "runtime": "在线学习时，我会尝试把课程内容与已有知识联系起来。",
+          "exact": true,
+          "scoreKey": "online_task_strategies",
+          "transform": "identity",
+          "review": "固定英中材料与source逐项对照；中文工作稿待人工译审。"
+        },
+        {
+          "number": 43,
+          "code": "SRLO_43",
+          "english": "When learning the online content, I try and develop my own ideas about it",
+          "chinese": "学习在线课程内容时，我会尝试形成自己的想法。",
+          "runtime": "学习在线课程内容时，我会尝试形成自己的想法。",
+          "exact": true,
+          "scoreKey": "online_task_strategies",
+          "transform": "identity",
+          "review": "固定英中材料与source逐项对照；中文工作稿待人工译审。"
+        },
+        {
+          "number": 44,
+          "code": "SRLO_44",
+          "english": "I try and improve my understanding by doing additional work beyond the core content (e.g., doing extra problem-solving activities or extra readings)",
+          "chinese": "我会尝试做核心课程内容以外的额外学习来加深理解，例如多做解题练习或额外阅读。",
+          "runtime": "我会尝试做核心课程内容以外的额外学习来加深理解，例如多做解题练习或额外阅读。",
+          "exact": true,
+          "scoreKey": "online_task_strategies",
+          "transform": "identity",
+          "review": "固定英中材料与source逐项对照；中文工作稿待人工译审。"
+        }
+      ],
+      "basis": "固定英文材料为勘误后Table8；本次对照固定双语/manifest，不重复研究载体比对。",
+      "anchors": [
+        {
+          "value": "1",
+          "originalEnglish": "Not at all true of me",
+          "platformChinese": "完全不符合我",
+          "score": 1
+        },
+        {
+          "value": "2",
+          "originalEnglish": "2",
+          "platformChinese": "2",
+          "score": 2
+        },
+        {
+          "value": "3",
+          "originalEnglish": "3",
+          "platformChinese": "3",
+          "score": 3
+        },
+        {
+          "value": "4",
+          "originalEnglish": "4",
+          "platformChinese": "4",
+          "score": 4
+        },
+        {
+          "value": "5",
+          "originalEnglish": "5",
+          "platformChinese": "5",
+          "score": 5
+        },
+        {
+          "value": "6",
+          "originalEnglish": "6",
+          "platformChinese": "6",
+          "score": 6
+        },
+        {
+          "value": "7",
+          "originalEnglish": "Very true of me",
+          "platformChinese": "非常符合我",
+          "score": 7
+        }
+      ],
+      "instruction": {
+        "source": {
+          "path": "docs/scale-instruments/research-drafts/srlo44/1.0.0/administration-sidecar.prepared.json",
+          "blob": "59b8d4745a0649e6eaf082d6daecfc49d4b2463b",
+          "sha256": "153ff9ee4c0eeb0550e87ac1cd051306d0d18a06ef2a9ebb1acbfea9a993e2aa",
+          "field": "/courseSelectionChinese 与 /instructions/0/platformChinese、/instructions/1/platformChinese"
+        },
+        "course": "请以你当前正在修读的一门大学在线或混合课程为参照，整份问卷都围绕同一门课程作答。",
+        "sections": [
+          {
+            "id": "motivation",
+            "beforeItemCode": "SRLO_01",
+            "throughItemCode": "SRLO_17",
+            "originalEnglish": "The following questions ask about your motivation for and attitudes about this course. Remember there are no right or wrong answers, just answer as accurately as possible. Use the scale below to answer the questions. If you think the statement is very true of you, select 7; if a statement is not at all true of you, select 1. If the statement is more or less true of you, find the number between 1 and 7 that best describes you.",
+            "platformChinese": "以下问题询问你对这门课程的学习动机和态度。没有对错之分，请尽可能准确地作答。若某句话非常符合你的情况，选7；若完全不符合，选1；若介于两者之间，请从1到7中选择最能描述你的数字。"
+          },
+          {
+            "id": "learning_strategies",
+            "beforeItemCode": "SRLO_18",
+            "throughItemCode": "SRLO_44",
+            "originalEnglish": "The following questions ask about your learning strategies used in this course. Remember there are no right or wrong answers, just answer as accurately as possible. Use the scale below to answer the questions. If you think the statement is very true of you, select 7; if a statement is not at all true of you, select 1. If the statement is more or less true of you, find the number between 1 and 7 that best describes you.",
+            "platformChinese": "以下问题询问你在这门课程中使用的学习策略。没有对错之分，请尽可能准确地作答。若某句话非常符合你的情况，选7；若完全不符合，选1；若介于两者之间，请从1到7中选择最能描述你的数字。"
+          }
+        ],
+        "status": "PREPARED_NOT_RUNTIME_CONNECTED；第一段置01前，第二段置18前，不宜合并在题1前冒称按段展示。",
+        "note": "统一课程选择为项目适配，真实课程选择及分段呈现未核验；需root统筹既有字段/能力而非伪造。"
+      },
+      "audience": "18+目前修读一门大学在线或混合课程的本人；全程同一课程。"
+    },
+    "scoring": {
+      "scores": [
+        {
+          "key": "online_academic_self_efficacy",
+          "type": "dimension",
+          "label": "面对这门课程的信心",
+          "description": "4题原分均分1–7，无反向；更多表示对这门课程学习与完成任务的信心，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "SRLO_01",
+                "weight": 1
+              },
+              {
+                "itemCode": "SRLO_02",
+                "weight": 1
+              },
+              {
+                "itemCode": "SRLO_03",
+                "weight": 1
+              },
+              {
+                "itemCode": "SRLO_04",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        },
+        {
+          "key": "online_intrinsic_motivation",
+          "type": "dimension",
+          "label": "学习本身带来的兴趣",
+          "description": "5题原分均分1–7，无反向；更多表示对学习本身的兴趣、愉快与成就体验，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "SRLO_05",
+                "weight": 1
+              },
+              {
+                "itemCode": "SRLO_06",
+                "weight": 1
+              },
+              {
+                "itemCode": "SRLO_07",
+                "weight": 1
+              },
+              {
+                "itemCode": "SRLO_08",
+                "weight": 1
+              },
+              {
+                "itemCode": "SRLO_09",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        },
+        {
+          "key": "online_extrinsic_motivation",
+          "type": "dimension",
+          "label": "成绩与他人期待的推动",
+          "description": "3题原分均分1–7，无反向；更多表示由成绩、比较与他人期待推动学习的自述，不统一表示好坏，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "SRLO_10",
+                "weight": 1
+              },
+              {
+                "itemCode": "SRLO_11",
+                "weight": 1
+              },
+              {
+                "itemCode": "SRLO_12",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        },
+        {
+          "key": "online_negative_achievement_emotion",
+          "type": "dimension",
+          "label": "学习时的难受与压力",
+          "description": "5题原分均分1–7，无反向；更多表示学习时的无助、焦虑与难受等负性体验；不反向，不表示更好，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "SRLO_13",
+                "weight": 1
+              },
+              {
+                "itemCode": "SRLO_14",
+                "weight": 1
+              },
+              {
+                "itemCode": "SRLO_15",
+                "weight": 1
+              },
+              {
+                "itemCode": "SRLO_16",
+                "weight": 1
+              },
+              {
+                "itemCode": "SRLO_17",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        },
+        {
+          "key": "planning_time_management",
+          "type": "dimension",
+          "label": "安排目标和时间",
+          "description": "5题原分均分1–7，无反向；更多表示安排目标、行动和学习时间的自述，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "SRLO_18",
+                "weight": 1
+              },
+              {
+                "itemCode": "SRLO_19",
+                "weight": 1
+              },
+              {
+                "itemCode": "SRLO_20",
+                "weight": 1
+              },
+              {
+                "itemCode": "SRLO_21",
+                "weight": 1
+              },
+              {
+                "itemCode": "SRLO_22",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        },
+        {
+          "key": "metacognition",
+          "type": "dimension",
+          "label": "检查与调整学习方法",
+          "description": "5题原分均分1–7，无反向；更多表示检查任务理解、学习方法与反馈并作调整的自述，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "SRLO_23",
+                "weight": 1
+              },
+              {
+                "itemCode": "SRLO_24",
+                "weight": 1
+              },
+              {
+                "itemCode": "SRLO_25",
+                "weight": 1
+              },
+              {
+                "itemCode": "SRLO_26",
+                "weight": 1
+              },
+              {
+                "itemCode": "SRLO_27",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        },
+        {
+          "key": "study_environment",
+          "type": "dimension",
+          "label": "可用的学习环境",
+          "description": "3题原分均分1–7，无反向；更多表示可获得安静少干扰学习条件的自述，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "SRLO_28",
+                "weight": 1
+              },
+              {
+                "itemCode": "SRLO_29",
+                "weight": 1
+              },
+              {
+                "itemCode": "SRLO_30",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        },
+        {
+          "key": "online_effort_regulation",
+          "type": "dimension",
+          "label": "遇到干扰时继续投入",
+          "description": "4题原分均分1–7，无反向；更多表示在困难或分心时继续投入的自述，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "SRLO_31",
+                "weight": 1
+              },
+              {
+                "itemCode": "SRLO_32",
+                "weight": 1
+              },
+              {
+                "itemCode": "SRLO_33",
+                "weight": 1
+              },
+              {
+                "itemCode": "SRLO_34",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        },
+        {
+          "key": "online_social_support",
+          "type": "dimension",
+          "label": "通过网络互相支持",
+          "description": "5题原分均分1–7，无反向；更多表示通过网络求助、澄清与帮助同学的自述，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "SRLO_35",
+                "weight": 1
+              },
+              {
+                "itemCode": "SRLO_36",
+                "weight": 1
+              },
+              {
+                "itemCode": "SRLO_37",
+                "weight": 1
+              },
+              {
+                "itemCode": "SRLO_38",
+                "weight": 1
+              },
+              {
+                "itemCode": "SRLO_39",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        },
+        {
+          "key": "online_task_strategies",
+          "type": "dimension",
+          "label": "理解和联系课程内容",
+          "description": "5题原分均分1–7，无反向；更多表示用例子、总结、知识联系和额外练习理解内容的自述，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "missingPolicy": {
+            "type": "complete_required"
+          },
+          "source": {
+            "type": "items",
+            "items": [
+              {
+                "itemCode": "SRLO_40",
+                "weight": 1
+              },
+              {
+                "itemCode": "SRLO_41",
+                "weight": 1
+              },
+              {
+                "itemCode": "SRLO_42",
+                "weight": 1
+              },
+              {
+                "itemCode": "SRLO_43",
+                "weight": 1
+              },
+              {
+                "itemCode": "SRLO_44",
+                "weight": 1
+              }
+            ],
+            "aggregation": "mean"
+          }
+        }
+      ],
+      "method": "44题全identity，十维各题数4/5/3/5/5/5/3/4/5/5分别均分1–7，无总分；负性情绪高表示更多难受，不反向，不等于好。",
+      "missing": "每维complete_required，缺失不插补；原QSF固定分母不等于允许缺题。",
+      "parameters": "作者4分经验参考未绑定中文分档；referencePolicy none。"
+    },
+    "report": {
+      "review": "十维scoreKey对应，负性情绪方向明示，外在动机不作好坏，给具体可行建议；保留。",
+      "version": "instrument/scoring/localization/report1.0.0。"
+    }
+  },
+  "ordinary_suggestions": [
+    "保留单课程说明及第1/18题前各自准确分段指导语；不把两段简单拼入首题，具体接入方式由root处理。"
+  ],
+  "substantive_coordination": [
+    "课程情境与分段指导语呈现的缺口未闭环，不能声称题本完整可施测。",
+    "不更改10维、负性情绪方向或用4作中文阈值。"
+  ],
+  "human_status": "独立中文译审及本地验证待完成；保留来源原状态。",
+  "not_executed": [
+    "未写仓库、DB、CI或分支，未运行测试或系统。"
+  ],
+  "conclusion": "44题和内部十维与固定材料对应；课程选择及两段定位指导语需协调，报告可保留。"
+}

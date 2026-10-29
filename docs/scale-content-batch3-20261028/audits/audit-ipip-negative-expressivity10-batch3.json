@@ -1,0 +1,239 @@
+{
+  "instrument": "ipip_negative_expressivity10_zh_cn_research:1.0.0",
+  "source_commit": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "source_files": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ipip_negative_expressivity10_zh_cn_research/1.0.0/source.json",
+      "blob": "9122549aa443a63cfdd346a20e91f1a28c4724c3",
+      "sha256": "c8f4646ebba0e7dc345c010f0cbf36d0852e59b3fc677ccb88fb81231931ee5e"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ipip_negative_expressivity10_zh_cn_research/1.0.0/instrument.ts",
+      "blob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_negative_expressivity10/1.0.0/README.md",
+      "blob": "32c67c349083c8ef33d6ce51a67cae7bb2c77fcd",
+      "sha256": "6d09bdc6db4ab78f5b80199d9eb14c7ae0b865978cda616ae5f5c32be5b7af5b"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_negative_expressivity10/1.0.0/bilingual-content.json",
+      "blob": "f6a90e9c108082bd6c0d50b0fc8cbc663e3da30e",
+      "sha256": "7306c5f5874ee46255f55bfa048e31c830e94d57e11e2c0890f6200c03c08627"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_negative_expressivity10/1.0.0/reviewed-source-pack.json",
+      "blob": "1722c4e7829b984ca8ecc506e251b8a25718af90",
+      "sha256": "4e9ddaa296679710dd193156cc2654e963c564e2fb090ea0f7157bf5130f2c8e"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_negative_expressivity10/1.0.0/external-reference-dossier.json",
+      "blob": "206b4386f24d6ca626f85e7ce6694b5544ff2b98",
+      "sha256": "b06cb26b9354c49e0df4ecc9e649759295743d44eaa72253a61e1d7d92fd23e8"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_negative_expressivity10/1.0.0/scoring-and-thresholds.md",
+      "blob": "b9a1d049eda38b870bbfbfd6cdc27c2d0fa08315",
+      "sha256": "d316030cce6275dab27bc1e14d1780eb6b7d61401f44a7336cf55b49ff86bfcf"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_negative_expressivity10/1.0.0/references.md",
+      "blob": "8eb0e65b2e1893151a4109539e0bcbc5105f4327",
+      "sha256": "42eb4683461faea9d8d1cc2dae4da0a96aa0fc0e4a5f7166a48654332925b105"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_negative_expressivity10/1.0.0/report-example.md",
+      "blob": "ac2e0ae60678bc10c75b7d8df8ea301ea1601007",
+      "sha256": "a6da072a06bf9094ebf21163a3bedcd87fcc19627424dd1d6db0653587ee01c6"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_negative_expressivity10/1.0.0/report-example.json",
+      "blob": "e1f1027adc78a9882a30f4bb7bccfd4c44e5ff9e",
+      "sha256": "e7ae98b6ff8df33db5959dfabfcb68622eb1957f763a5e13be0424639879bb88"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_negative_expressivity10/1.0.0/local-validation.json",
+      "blob": "9afc493ed9afd59ead371aabe69ebc9da623d859",
+      "sha256": "7dabb845cf522ef6d4127f9ee9e9adccb8fa850045bb5b3168969346891c72de"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_negative_expressivity10/1.0.0/local-test-output.txt",
+      "blob": "1319aee8c4163f01ee5eed5b5a57b95c9975d4ad",
+      "sha256": "eb425e5abde4f76ba69dfb2c41d7e96c5fc7f74b89f9d5a87a0f321abb475d68"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_negative_expressivity10/1.0.0/runtime-check.json",
+      "blob": "59f836074382e6dc167b2aa2b1590ae06a418866",
+      "sha256": "19caeb1b74f4129d0994cf4008c5225de3378b0a4611006f8987b8b19f79cbd3"
+    }
+  ],
+  "three_parts": {
+    "items_and_instruction": {
+      "items": [
+        {
+          "position": 1,
+          "code": "IPIP_NEGATIVE_EXPRESSIVITY10_01",
+          "english": "Shout or scream when I'm angry.",
+          "chinese": "生气时，我会大喊大叫。",
+          "runtime_content": "请描述你现在通常的真实情况，而不是你希望将来成为的样子。判断下面每句话与你的符合程度。没有标准答案。\n\n生气时，我会大喊大叫。",
+          "official_key": "positive",
+          "runtime_transform": "identity",
+          "review": "生气时大喊大叫，对应shout or scream；首题被附加说明。"
+        },
+        {
+          "position": 2,
+          "code": "IPIP_NEGATIVE_EXPRESSIVITY10_02",
+          "english": "Can't help but look upset when something bad happens.",
+          "chinese": "发生不好的事情时，我会不由自主地显露出难受的样子。",
+          "runtime_content": "发生不好的事情时，我会不由自主地显露出难受的样子。",
+          "official_key": "positive",
+          "runtime_transform": "identity",
+          "review": "不由自主显露难受，保留原意。"
+        },
+        {
+          "position": 3,
+          "code": "IPIP_NEGATIVE_EXPRESSIVITY10_03",
+          "english": "Show my fear.",
+          "chinese": "我会把害怕的感受表现出来。",
+          "runtime_content": "我会把害怕的感受表现出来。",
+          "official_key": "positive",
+          "runtime_transform": "identity",
+          "review": "表现害怕，保留原意。"
+        },
+        {
+          "position": 4,
+          "code": "IPIP_NEGATIVE_EXPRESSIVITY10_04",
+          "english": "Suspect that my facial expressions give me away when I feel sad.",
+          "chinese": "难过时，我觉得自己的表情会流露出这种感受。",
+          "runtime_content": "难过时，我觉得自己的表情会流露出这种感受。",
+          "official_key": "positive",
+          "runtime_transform": "identity",
+          "review": "表情流露悲伤并有“觉得”，与suspect相近。"
+        },
+        {
+          "position": 5,
+          "code": "IPIP_NEGATIVE_EXPRESSIVITY10_05",
+          "english": "Show my sadness.",
+          "chinese": "我会把悲伤的感受表现出来。",
+          "runtime_content": "我会把悲伤的感受表现出来。",
+          "official_key": "positive",
+          "runtime_transform": "identity",
+          "review": "表现悲伤，保留原意。"
+        },
+        {
+          "position": 6,
+          "code": "IPIP_NEGATIVE_EXPRESSIVITY10_06",
+          "english": "Keep my feelings to myself, regardless of how unhappy I am.",
+          "chinese": "不管有多不开心，我都把感受藏在心里。",
+          "runtime_content": "不管有多不开心，我都把感受藏在心里。",
+          "official_key": "negative",
+          "runtime_transform": "reverse",
+          "review": "不论多不开心仍藏感受，保留原意。"
+        },
+        {
+          "position": 7,
+          "code": "IPIP_NEGATIVE_EXPRESSIVITY10_07",
+          "english": "Find it difficult showing people that I'm angry with them.",
+          "chinese": "我很难向别人表现出我在生他们的气。",
+          "runtime_content": "我很难向别人表现出我在生他们的气。",
+          "official_key": "negative",
+          "runtime_transform": "reverse",
+          "review": "难以让生气对象知道自己生他们的气，保留对象关系。"
+        },
+        {
+          "position": 8,
+          "code": "IPIP_NEGATIVE_EXPRESSIVITY10_08",
+          "english": "Keep my feelings to myself, regardless of how scared I am.",
+          "chinese": "不管有多害怕，我都把感受藏在心里。",
+          "runtime_content": "不管有多害怕，我都把感受藏在心里。",
+          "official_key": "negative",
+          "runtime_transform": "reverse",
+          "review": "不论多害怕仍藏感受，保留原意。"
+        },
+        {
+          "position": 9,
+          "code": "IPIP_NEGATIVE_EXPRESSIVITY10_09",
+          "english": "Rarely show my anger.",
+          "chinese": "我很少表现出愤怒。",
+          "runtime_content": "我很少表现出愤怒。",
+          "official_key": "negative",
+          "runtime_transform": "reverse",
+          "review": "很少表现愤怒，对应rarely。"
+        },
+        {
+          "position": 10,
+          "code": "IPIP_NEGATIVE_EXPRESSIVITY10_10",
+          "english": "Wish I could more easily show my negative feelings.",
+          "chinese": "我希望自己能更容易地表达消极情绪。",
+          "runtime_content": "我希望自己能更容易地表达消极情绪。",
+          "official_key": "negative",
+          "runtime_transform": "reverse",
+          "review": "希望更容易表达消极情绪，保留愿望；官方反向，不能改成现实表达能力。"
+        }
+      ],
+      "official": "https://ipip.ori.org/newEmotionalIntelligenceKey.htm Negative Expressivity原文顺序与1–5正、6–10反对应，Barchard (2001) 为官方归属。",
+      "anchors": "非常不符合、比较不符合、介于不符合与符合之间、比较符合、非常符合，对应1–5，符合 https://ipip.ori.org/newScoringInstructions.htm。",
+      "instruction": {
+        "text": "请描述你现在通常的真实情况，而不是你希望将来成为的样子。判断下面每句话与你的符合程度。没有标准答案。",
+        "sources": [
+          {
+            "path": "docs/scale-instruments/research-drafts/ipip_negative_expressivity10/1.0.0/bilingual-content.json",
+            "blob": "f6a90e9c108082bd6c0d50b0fc8cbc663e3da30e",
+            "sha256": "7306c5f5874ee46255f55bfa048e31c830e94d57e11e2c0890f6200c03c08627",
+            "field": "/instructions"
+          },
+          {
+            "path": "docs/scale-instruments/research-drafts/ipip_negative_expressivity10/1.0.0/reviewed-source-pack.json",
+            "blob": "1722c4e7829b984ca8ecc506e251b8a25718af90",
+            "sha256": "4e9ddaa296679710dd193156cc2654e963c564e2fb090ea0f7157bf5130f2c8e",
+            "field": "/administration/instructionZh"
+          },
+          {
+            "path": "server-version/backend/src/modules/scale/instruments/ipip_negative_expressivity10_zh_cn_research/1.0.0/source.json",
+            "blob": "9122549aa443a63cfdd346a20e91f1a28c4724c3",
+            "sha256": "c8f4646ebba0e7dc345c010f0cbf36d0852e59b3fc677ccb88fb81231931ee5e",
+            "field": "/executable/definition/items/0/content",
+            "note": "与纯第1题之间两个换行"
+          }
+        ],
+        "status": "项目工作指导语，取IPIP施测示例的一般自述原则；非原版标准指导语或已人工审批。source顶层instruction缺失。",
+        "recommended_binding": {
+          "schemaVersion": 1,
+          "text": "请描述你现在通常的真实情况，而不是你希望将来成为的样子。判断下面每句话与你的符合程度。没有标准答案。",
+          "language": "zh-CN",
+          "version": "1.0.0",
+          "source": "固定双语和研究包指导语字段；项目中文工作稿"
+        },
+        "impact": "独立绑定并从第1题仅移除说明前缀可避免混入题干；定义内容及hash改变，应由root评估版本和已有安装冲突，不直接覆盖成熟版本。"
+      },
+      "audience": "zh-CN 成人本人自陈工作译稿，student为技术角色而非未成年人适用。"
+    },
+    "scoring": {
+      "method": "总分一个total，10项权重1；1–5正向x、6–10反向6−x；理论范围10–50。",
+      "missing": "complete_required，10题全部作答；缺失不补零、不插补或以已答数折算，系项目规则。",
+      "thresholds": "无项目常模、阈值和高低分档；30是理论中点而不是人群均值。",
+      "source_alpha": "研究材料记录英文来源女性.75、男性.74，不能当中文信度或常模。",
+      "item10": "愿望项仍按官方反向；不得因表述与其他题不同而重写或改键。"
+    },
+    "report": {
+      "direction": "更高是本组题自报外露倾向，非真实客观行为测量、诊断、好坏或调节能力；第10题为表达愿望，结果不能断言任何个人必然更容易流露。",
+      "guidance": "保留现有不指责的具体表达示例、暂停建议及文化/安全感影响。",
+      "optional_wording": "如进行轻量报告文字优化，可将“表示这些感受越容易通过表情或行动流露”措辞改为“在这些题目中的回答总体更倾向于消极情绪的外在表达”，以减少个人确定性；保持方向、无分档、报告版本治理，已有报告合格不强制修改。",
+      "references_versions": "definition来源为官方Barchard归属；referencePolicy none及references空。instrument/scoring/report/localization均1.0.0，英文资料不作为中文效度。"
+    }
+  },
+  "ordinary_suggestions": [
+    "指导语按既有instruction字段独立绑定，与第1题拆分时保留原文；按definition hash和版本规则协调。",
+    "无必须修正的明显错字；报告可保留，或采纳上述措辞降低确定性。"
+  ],
+  "substantive_coordination": [
+    "第10题愿望表达及官方反向需保留；任何题意、锚点、构念、规则或阈值更改涉及版本/科研影响，交root协调。"
+  ],
+  "human_status": "专家译审 PENDING，认知访谈 NOT_ESTABLISHED，目标人群效度未建立；本次未进行新科研或版权研究。",
+  "not_executed": [
+    "未修改仓库、分支、DB、CI或生产；未运行golden、截图、四入口和系统检查。",
+    "历史测试材料只列为源文件，不称本次执行。"
+  ],
+  "conclusion": "题项与官方键一致，成人研究候选可交root集成；指导语拆分须考虑定义版本，人工译审和中文效度仍待完成。"
+}
