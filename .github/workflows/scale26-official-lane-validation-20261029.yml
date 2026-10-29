@@ -1,0 +1,82 @@
+name: Scale26 exact-lane control validation
+on:
+  push:
+    branches: [validation/scale26-official-lane-20261029]
+    paths: [.github/workflows/scale26-official-lane-validation-20261029.yml]
+permissions:
+  contents: read
+concurrency:
+  group: scale26-official-lane-controls
+  cancel-in-progress: false
+jobs:
+  controls:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: source and control files only; never validate altered product data
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD^)" = 'b19d90c1bab1dc701f97686e1c9aa8d53f562615'
+          test "$(git diff --name-only HEAD^ HEAD)" = '.github/workflows/scale26-official-lane-validation-20261029.yml'
+          git checkout --detach 'b19d90c1bab1dc701f97686e1c9aa8d53f562615'
+          git fetch --no-tags --depth=1 origin '9801107019d51a4af7ddb651789b674867539d24'
+          git fetch --no-tags --depth=1 origin '191a187439af026f33d46fbdc2f9d7958340f789'
+          node --check .github/scripts/scale26-intake-scope.mjs
+          node --check .github/scripts/content-scope.mjs
+          node --check .github/scripts/merge-gate.mjs
+      - name: exact admission classifier, required needs, and legacy controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --test .github/scripts/scale26-intake-scope.test.mjs \
+            .github/scripts/content-scope.test.mjs \
+            .github/scripts/content-workflows.test.mjs \
+            .github/scripts/ci-topology.test.mjs \
+            .github/scripts/maintenance-routing.test.mjs
+      - name: read true diff under the strict PR379 event and test required job success/failure
+        shell: bash
+        env:
+          GITHUB_REPOSITORY: caohuibj/eduK12-new-version
+          CI_EVENT: pull_request
+          CI_PR_NUMBER: '379'
+          CI_HEAD_REF: integration/scale-26-b0-main-20261028
+          CI_PR_REPOSITORY: caohuibj/eduK12-new-version
+          CI_BASE_SHA: 9801107019d51a4af7ddb651789b674867539d24
+          CI_IS_DRAFT: 'true'
+        run: |
+          set -euo pipefail
+          export CI_SOURCE_HEAD="$(git rev-parse HEAD)"
+          export GITHUB_SHA="$CI_SOURCE_HEAD"
+          node .github/scripts/content-scope.mjs > /tmp/scale26-scope.json
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          import {readFileSync} from 'node:fs';
+          import {requiredChecks,failedChecks} from './.github/scripts/merge-gate.mjs';
+          import {scale26IntakeOutputs} from './.github/scripts/scale26-intake-scope.mjs';
+          const output=JSON.parse(readFileSync('/tmp/scale26-scope.json','utf8'));
+          const plan=JSON.parse(output.scale26_intake_plan);
+          assert.equal(plan.originalPaths,266);
+          assert.equal(plan.ciControlPaths,6);
+          assert.equal(plan.route,'scale26-intake');
+          const draftNeeds={scope:{result:'success',outputs:scale26IntakeOutputs(plan)},'scale26-intake':{result:'success'},codeql:{result:'skipped'}};
+          assert.deepEqual(requiredChecks(draftNeeds,true),['scope','scale26-intake']);
+          assert.deepEqual(failedChecks(draftNeeds,true),[]);
+          const ready={...plan,draft:false};
+          const readyNeeds={scope:{result:'success',outputs:scale26IntakeOutputs(ready)},'scale26-intake':{result:'success'},codeql:{result:'success'}};
+          assert.deepEqual(requiredChecks(readyNeeds,false),['scope','scale26-intake','codeql']);
+          assert.deepEqual(failedChecks(readyNeeds,false),[]);
+          assert.deepEqual(failedChecks({...readyNeeds,codeql:{result:'skipped'}},false),['codeql']);
+          assert.deepEqual(failedChecks({...readyNeeds,'scale26-intake':{result:'failure'}},false),['scale26-intake']);
+          const forged={...readyNeeds,scope:{result:'success',outputs:{...readyNeeds.scope.outputs,scale26_intake_plan:'{}'}}};
+          assert.deepEqual(failedChecks(forged,false),['scope']);
+          console.log(JSON.stringify({status:'PASS',scenario:output.scenario,originalPaths:plan.originalPaths,controls:plan.ciControlPaths}));
+          JS
+          JS
