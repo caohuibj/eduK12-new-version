@@ -7,7 +7,7 @@
 ## 当前证据
 
 - R1/R2 修复及增强回归已在 ff528cafa；9fa 又扩展了展示白名单的 SQL 投影。需核对最终原件及消费输入，再决定哪些证据仍有效。本线未重复诊断或重跑它们。
-- B 两项修复及 privacy fixture 已在固定父链；8756addf5 与 c55d6d721 的八控制 patch-id 完全相同。本轮无 CI 控制输入变化，八项控制及已有 UI 本地结果不重跑。
+- B 两项修复及 privacy fixture 已在固定父链；8756addf5 与 c55d6d721 的八控制 patch-id 完全相同。前轮八项控制与已有 UI 的本地结果保留；本轮 CI 控制输入已变化，仅续验受影响的控制合同，本地不重跑业务/UI。
 - R3：原 53193a894 的真实 FAIL 保留；799066638 只转入其独立测试。新 forward migration 保留原结构整数编码，只有两个完整科学定义摘要调用改用专用编码；没有修改既有迁移或科学分值。
 - 本线定向结果：原批准小数来源冻结、JS/PG 编码边界、结构整数约束共 3 PASS；既有库伪造描述符案例 1 PASS（其余 2 个未选中）；受同一新摘要调用点影响的 Standard School 案例 1 PASS。两份新测试的消费类型 PASS。独立 review 的跨预览叶迟到响应、跨入口/账号迟到预览两例未在固定候选中集成；本线只补入这两例，当前消费者下 2 PASS，新增文件消费类型 PASS。未进行前后端构建、浏览器或正式 CI。
 - 新迁移最初使用保留字 leading 的本地语法失败已保留，改为 leading_count 后只续应用该未提交迁移。Standard 首次因缺合成校园 HMAC key 在夹具阶段失败；补明确隔离测试环境后才通过，保留首错。
@@ -24,14 +24,25 @@
 
 6. 直接改变的共用合同消费者：`education-tools/access.test.ts`、`education-tools/capabilities.routes.test.ts`、`education-tools/private-tool.run-contract.test.ts`、`assessment-runtime/education-block-presentation.test.ts`、`measurement-content/admin-authority-route.test.ts`、`measurement-content/training-standard-combination-boundary.test.ts`、`reporting/education-assessment-report.projector.test.ts`、`scale/scale-presentation.test.ts`；真实边界补入 `integration/educationToolAuthoringAccess.postgres.integration.test.ts` 和 `integration/educationPublicSourceUse.postgres.integration.test.ts`。它们分别约束入口作者、显式授权、共享 runner/报告与原 Training 分支，不能仅用本批成功自评流程推断这些合同通过。
 
-## 执行接线与预算
+## 精确执行接线（等待 DOT 复核后激活）
 
-| 层 | 现有入口及前置 | 本批待完成的接线 |
-| --- | --- | --- |
-| 接纳/分类/报告 | `fetch-ci-base.mjs` → `content-scope.mjs`；既有 `school-teacher-scope.mjs` / `school-teacher-checks.mjs admission` 负责完整 raw diff、原始来源和精确输入。 | 旧 School/Teacher 入口固定旧分支及旧 base。本批需独立候选配置并复用既有执行器，保留旧记录；绑定本批完整差异、最终传递闭包、确切 passed/filtered 集合和实际 jobs/needs。现阶段尚未接线，不能激活。控制预检预算约 5 分钟，失败先定向排错。 |
-| 类型与行为 | 前端锁定依赖及 backend Prisma 生成类型；既有 `frontend` / `postgres` 阶段执行类型、lint 和所选 Vitest 批次。Vitest exit 0、零失败、必需断言完整且过滤吻合共同成立；单独 anti-skip reporter 不足。 | 使用上列行为集合及核对后的 UI 精确集合。PG 只用当前 run 的新合成服务；School 夹具显式提供合成 `CAMPUS_ELIGIBILITY_HMAC_KEY`，同时具备实际测试加密/签名设置及一致的三个隔离数据库 URL。真实容量、身份与紧急停用保留。预算前端约 8 分钟、PG 约 12 分钟。 |
-| 迁移/恢复 | `npm run db:migrate:guarded`；既有 `migrate` / `restore` 的非空基线、运行时角色和真实 dump/restore。 | 更新本批非空普通问卷/授权/冻结事实的保留集合。当前新库 deploy 不能替代这项资格。与 PG 共用本批服务，不再另建整个平台旅程。 |
-| 单次构建与浏览器 | 既有 `frontend` / `backend` producer 及 `ci-artifact.mjs write/verify`；浏览器消费同 SHA/run 的真实 dist，沿用受限合成身份、正式 Chrome sandbox 和真实断言报告。 | 原旧浏览器矩阵不覆盖新增普通问卷。补 School/Teacher 选择来源→编制冻结→分配→作答保存→仅获准反馈的受影响短流程；选定 UI/浏览器配置后才冻结矩阵。构建各一次；浏览器约 8 分钟，失败保留产物后定向续接。 |
-| 安全与合并 | 所选既有路线的 HIGH/CRITICAL 审计、真实 CodeQL/security-extended，以及完整 needs 驱动的 `merge-gate.mjs`。 | 保留既有门禁含义及 required checks/保护。最终 scope 选择出的其他必需项须真实成功；本计划不自动裁掉它们。审计/SAST 可与行为验证并行，按既有超时约束。 |
+候选配置为 `.github/scripts/school-teacher-self-bindings.json`，单独绑定本分支、main 基线、完整 raw diff 的 blob/mode、共用组件 tree、控制文件 after blob 及确切 passed/filtered 集合。配置初始 `enabled=false`、`review.completed=false`；不能凭本线自行勾选独立复核。完整组件 tree 包含传递源码、测试夹具、schema、迁移、包依赖和配置；Node/PG/存储环境同时由现有执行入口核对。该闭包是保守的组件范围，不声称支持未来任意模块的细粒度跨提交接纳。
 
-当前正式 CI 为 NOTRUN。先由 DOT 读取修复差异和上述所选集合，确认本批接纳/浏览器矩阵及接线方案；完成精确控制接线和独立复核后再启动一次适用正式 CI。Draft PR 保持 [skip ci] 提交。实际合并须由 DOT 核对该 PR 的最终候选及全部适用门禁后控制；本线不调用 APPROVE、不改保护、不 force、不部署。
+A 最终原件 82 个目录项已逐 SHA 核对，CP14 声明的 23 项输入与本线一致；更早 CP12/13 的部分消费输入已变化，原件声明也不等于完整传递闭包。既有 fresh 路线明确拒绝私有历史接纳，本轮不新增接纳系统、不把 A/B 本地通过改称 CI PASS；按最终选择交给唯一正式作业执行，本地不再复测相同业务输入。`vitest list --json` 只用于收集真实名称，未执行断言，不能计 PASS。保留所有旧 FAIL 与过滤记录。
+
+| 实际作业 | 实际入口 / 前置 | 证据和范围 | 预算 |
+| --- | --- | --- | --- |
+| scope | `fetch-ci-base.mjs` → `content-scope.mjs` → `school-teacher-scope.mjs` | 固定 branch/base、source/checkout tree 相等、完整差异、控制 after blob；已存在的 merge-gate 重算同一计划。 | 5 分钟 |
+| admission | `school-teacher-checks.mjs admission`；`node --test .github/scripts/school-teacher-self.test.mjs` | 拒绝未独立冻结、丢 marker、手动/全量降级、旧证据、缺源；仅本轮新控制合同。 | 5 分钟 |
+| frontend | `school-teacher-checks.mjs frontend`；锁定依赖、仅 Prisma 类型生成 | 现有 `npm run typecheck`、受影响文件 lint、所选组件 Vitest、一次 `vite build`；输出当前 SHA/run 的不可变 dist 和规范报告。FinalComposite 与私有单工具编辑器只选实际交界消费者，其余用例明确过滤。 | 12 分钟 |
+| backend-self | `school-teacher-checks.mjs backend`；锁定依赖、Prisma validate/generate | 一次实际 `tsc -p tsconfig.json` 产生后端 dist；不在 PG/浏览器重复编译。 | 12 分钟 |
+| postgres-self | `verify-backend-artifact` → `migrate` → `postgres` → `postgres-restore` | 新合成 PG16.15/Redis；非空精确 main 升级；上列 25 个文件合为 5 个受影响批次；当前真实 native/declared 结果、冻结来源和科学 DDL 一次 dump/restore；完整行/列/hash、受限运行时角色及 release schema。显式合成加密/校园 key，不替代真实容量或权限校验。 | 25 分钟 |
+| browser-self | `verify-backend-artifact` / `verify-frontend-artifact` → 当前 schema deploy（仅新服务初始化）→ `seed` → `school-teacher-browser.cjs` → `browser-report` | 同 SHA/run 的两个 dist，原正式 Chrome sandbox、真实登录/同意/HTTP/生产入口。School/Teacher 各一条：原批准共用量表来源 + 自编 Scale/Form → 普通问卷编制/预览/冻结/重开 → 分配 → 单 parent 作答/保存恢复/FINAL → 获准与 withheld 反馈、作者拒读。新来源只通过正常 Survey 发布、库审核和原 U 授权产生；不 seed 问卷、分配、答案或 FINAL。四张脱敏截图。复用现有浏览器执行器，标 `SELF_COMPOSITION`，不声称通过旧主题/全部题型视觉矩阵。 | 25 分钟 |
+| security / codeql | `school-teacher-checks.mjs audit`；既有 CodeQL `security-extended` 实际应用路径 | 前后端 HIGH/CRITICAL 审计；真实 SAST。与行为并行，保留原阈值/门禁含义。 | 8 分钟 / 既有上限 |
+| qualified / merge-gate | `school-teacher-checks.mjs aggregate`；既有 `merge-gate.mjs` | 所选六作业必须 success；旧 connected 仅本批显式 skipped；未知、缺失、失败、取消不接纳。根 gate 仍要求 scope + school-teacher + codeql。不改 required checks 或保护。 | 5 分钟 |
+
+`migrate` 的新非空夹具仅为技术保留证明，没有伪造 ONLINE 或科学发布事实；正式 `postgres-restore` 必须先有当前真实 PG 批次合格报告，并恢复其实际 source/result 表。浏览器复用同 run 产物、单独空服务初始化，不再重复非空升级资格或 dump/restore。新增控制用本地隔离 PG 预检时明确标 `LOCAL_PRECHECK`，不冒充 Actions 或完整作答恢复资格。
+
+本线科学迁移为 `20261028223000_education_scientific_freeze_hash`。A 在交接时另有已运行实现 `bd251371fa7dea7726a365550329de4ee42fbd32` / `20261028230000_education_scientific_definition_hash`；未混入本线，也不借其结果证明本线迁移。实际 merge 后由 DOT 协调 A 一次 main 对齐、去重两套迁移/函数/测试。
+
+当前正式 CI、真实浏览器、构建均 NOTRUN。接线本地控制及非空存储预检另留原件。非空迁移/真实 dump-restore 与受限角色本地预检已 PASS（8 表、9 行、科学函数定义逐项一致），临时容器及匿名卷已移除；这是 LOCAL_PRECHECK，不是当前真实结果的正式恢复资格。受影响旧控制测试暴露了两处 YAML 文本格式假设（if 前缀/折行），原失败保留，改为核对实际条件与规范化空白后，仅该用例续验 PASS；业务断言未放松；不会把收集、语法或静态审查计作业务 PASS。DOT 读实际 YAML/选择器/报告/needs/候选后才准备激活一次；draft 和 [skip ci] 保留。实际合并由 DOT 核对最终 PR 全部门禁后控制；本线不 APPROVE、不改保护、不 force、不部署。
