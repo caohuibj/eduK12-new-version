@@ -48,7 +48,7 @@ function verifyInputs(b, git) {
     assert.deepEqual(b.execution[component], old.execution[component], component + ' invocation or dependency closure drift')
   }
   for (const p of ['server-version/shared', 'server-version/scripts/ci-install-canvas-deps.sh', '.github/release-tools'])
-    assert.equal(git('rev-parse', 'HEAD:' + p), git('rev-parse', fixed.checkout + ':' + p))
+    assert.equal(git('ls-tree', '-r', 'HEAD', '--', p), git('ls-tree', '-r', fixed.checkout, '--', p))
   assert.deepEqual(b.execution.auditComponents, old.execution.auditComponents)
   const migration = structuredClone(old.execution.migration)
   migration.restoreTables = migration.restoreTables.filter(t => t !== 'cognitive_trials')

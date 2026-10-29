@@ -691,7 +691,7 @@
   "controlAfter": {
     ".github/scripts/school-teacher-checks.mjs": "524878a3c417f193e2aeb81f2674e2c694d6c57e",
     ".github/scripts/school-teacher-observer-restore-input.sql.gz": "eb694d821fec247da9050c4511409673e6ee2f3c",
-    ".github/scripts/school-teacher-observer-reuse.cjs": "d321100bc268da6631acbed7653b12b4eda0b961",
+    ".github/scripts/school-teacher-observer-reuse.cjs": "5ae6b712c1e42afefa7908ed18b15a38e83e7947",
     ".github/scripts/school-teacher-observer-reuse.test.cjs": "2773f5a3895617e21b37427e00a98980726ddbdc",
     ".github/scripts/school-teacher-scope.mjs": "b98c4accf5c08ee4aeb905fb88da741290822a8f",
     ".github/scripts/school-teacher-self-baseline.sql": "41aa7034b492471e930d4fa1b52f156c1184ddf3",
