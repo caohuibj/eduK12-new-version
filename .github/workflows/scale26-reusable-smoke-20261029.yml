@@ -1,0 +1,12 @@
+name: Scale26 reusable syntax smoke
+on:
+  push:
+    branches: [validation/scale26-reusable-smoke-20261029]
+    paths: [.github/workflows/scale26-reusable-smoke-20261029.yml]
+permissions:
+  contents: read
+jobs:
+  call:
+    uses: ./.github/workflows/ci-scale26-intake.yml
+    with:
+      plan: '{"route":"intentional-short-circuit-smoke"}'
