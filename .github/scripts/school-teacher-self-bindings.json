@@ -3,7 +3,7 @@
   "candidate": "education-self-scale-form-20261028",
   "repository": "caohuibj/eduK12-new-version",
   "branch": "release/education-self-scale-form-20261028",
-  "enabled": false,
+  "enabled": true,
   "base": "9801107019d51a4af7ddb651789b674867539d24",
   "frozenDevelopmentHead": "9fa3c51e5deb882beb4a0d56f1ebe44dae8f76f5",
   "productHead": "7561f5bbe77ded60ae180c3b299a2f0b1dc54f3e",
@@ -676,9 +676,11 @@
   },
   "evidenceSha256": "db20d58fbafe0178969fa8ab3d13cde454131630bfe772beada344f6b4df37db",
   "review": {
-    "completed": false,
+    "completed": true,
     "originalExecutionSigned": false,
-    "note": "DOT final control review pending; local private evidence is historical only. Real selected checks must qualify the exact current source and same-run immutable builds."
+    "note": "DOT independently read the scope/binding selector, exact control-after blobs, selected six jobs and root gates, unique producers/artifact consumers, nonempty PG upgrade/restore, real SELF browser consumers, selected case sets and raw local control/precheck evidence at fb8489caf. Authorized one actual PR-event CI qualification; not PR approval or merge authorization. Historical local results remain unadmitted.",
+    "basisCommit": "fb8489caf91e09fb9ca7183bef5d0c7a49e0ad7e",
+    "reviewer": "DOT independent parent review"
   },
   "requiredJobs": [
     "admission",
@@ -1644,7 +1646,5 @@
     ],
     "browserHelper": "server-version/e2e/education-self-questionnaire.cjs"
   },
-  "blockers": [
-    "DOT_FINAL_CONTROL_REVIEW_PENDING"
-  ]
+  "blockers": []
 }
