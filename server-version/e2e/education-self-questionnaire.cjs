@@ -72,7 +72,7 @@ async function authorQuestionnaire(s,f,{suffix,toolsPage,report,out}) {
  }
  await studio.getByRole('navigation',{name:'问卷工具来源',exact:true}).getByRole('button',{name:'获授权共用量表',exact:true}).click()
  const catalog=studio.getByRole('region',{name:'获授权共用量表',exact:true})
- await catalog.locator('article').filter({has:catalog.locator('strong').filter({hasText:f.library.title})}).getByRole('button',{name:'加入共用量表',exact:true}).click()
+ await catalog.locator('article').filter({has:p.getByText(f.library.title,{exact:true})}).getByRole('button',{name:'加入共用量表',exact:true}).click()
  const instruction='合成固定问卷说明 '+suffix
  await studio.getByLabel('问卷说明',{exact:true}).fill(instruction)
  for(let n=1;n<=3;n++)await studio.getByLabel('工具衔接说明 '+n,{exact:true}).fill('合成固定工具说明 '+n)
