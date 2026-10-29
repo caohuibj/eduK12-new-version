@@ -85,8 +85,8 @@ export const SCALE_INSTRUMENT_SOURCE = {
         "population": "原作者英文研究工具；已公开面向研究人员与专业使用",
         "locale": "en",
         "territory": "US",
-        "studyDesign": "作者提供CTAS-2 24题题本、统一响应选项与总分求和说明",
-        "rating": "SUFFICIENT",
+        "studyDesign": "作者提供CTAS-2 24题题本、统一响应选项与总分求和说明；本条是原文来源证据，不构成独立内容效度研究",
+        "rating": "UNKNOWN",
         "citation": "Cassady, J. C. Cognitive Test Anxiety Scale – 2nd Edition. Academic Anxiety Resource Center, Ball State University.",
         "url": "https://sites.bsu.edu/aarc/research/cognitive-test-anxiety-scale-2nd-edition/",
         "notes": "作者明确许可科研及专业在线复制分享，须恰当引用；本记录不替代部署场景的InstrumentAuthorization。"
