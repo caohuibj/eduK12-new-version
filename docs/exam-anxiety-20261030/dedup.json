@@ -1,0 +1,57 @@
+{
+  "mainSha": "9801107019d51a4af7ddb651789b674867539d24",
+  "selBranchRef": "SELcontents",
+  "exact": [],
+  "related": [
+    {
+      "newFamily": "westside_10_driscoll_en",
+      "existing": "dass21_zh_cn",
+      "relation": "Westside 测考试情境特异的担忧与损害；DASS-21 焦虑维测泛化焦虑。情境特异 vs 泛化，不合并计分、不互相替代。"
+    },
+    {
+      "newFamily": "aeq_test_anxiety_en",
+      "existing": "dass21_zh_cn",
+      "relation": "AEQ 考试焦虑为学业情境情绪（控制-价值理论）；DASS-21 为跨情境症状自评。相邻不合并。"
+    },
+    {
+      "newFamily": "aeq_test_anxiety_en",
+      "existing": "value_cost_mathematics_zh_cn 等六科学科版",
+      "relation": "同一控制-价值理论框架：value_cost 测任务主观价值与代价（前因信念），AEQ 测情境情绪（结果/伴生）。建参照关系，不作同一构念。"
+    },
+    {
+      "newFamily": "aeq_test_anxiety_en",
+      "existing": "academic_self_efficacy_mathematics_zh_cn 等六科学科版",
+      "relation": "控制-价值理论中控制感（自我效能）为学业情绪前因；效能信念与焦虑情绪为不同构念，不合并。"
+    },
+    {
+      "newFamily": "westside_10_driscoll_en",
+      "existing": "erq_ca_5point",
+      "relation": "ERQ-CA 测情绪调节策略（认知重评/表达抑制），是考试焦虑的邻近调节变量而非同一构念。"
+    },
+    {
+      "newFamily": "ctas_27_cassady_en",
+      "existing": "westside_10_driscoll_en",
+      "relation": "Westside 验证报告自述其认知担忧题与 CTAS 同类：CTAS 为认知干扰专维 27 题连续计分，Westside 为担忧+损害 10 题筛查均分。相邻家族，不合并题库或计分。"
+    },
+    {
+      "newFamily": "tai_20_spielberger_en",
+      "existing": "westside_10_driscoll_en",
+      "relation": "TAI 忧虑/情绪性两维特质取向；Westside 损害筛查取向（自述不含生理唤醒题）。相邻不合并。"
+    },
+    {
+      "newFamily": "tai_20_spielberger_en",
+      "existing": "texi_parent_zh_cn / texi_teacher_zh_cn",
+      "relation": "名称防混淆：TEXI 为 Teenage Executive Functioning Inventory（执行功能家长/教师观察），与 TAI（Test Anxiety Inventory）无关。"
+    },
+    {
+      "newFamily": "exam_anxiety_batch1",
+      "existing": "gad7 / k6 / phq9（PR 328 research-drafts）",
+      "relation": "广泛性焦虑/心理困扰/抑郁为泛化构念；本批全部为考试情境特异工具。不重复登记、不互相换算。"
+    },
+    {
+      "newFamily": "exam_anxiety_batch1",
+      "existing": "pss10_zh_cn / sswq16 / spane12",
+      "relation": "一般压力、学生幸福感与正负性情绪体验为跨情境构念，与考试情境特异焦虑相邻不合并。"
+    }
+  ]
+}
