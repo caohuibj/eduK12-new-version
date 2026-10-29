@@ -4,9 +4,12 @@ export interface VerifiedEducationStart { readonly kind: 'VERIFIED_EDUCATION_STA
 type Facts={tx:object;product:'SCHOOL'|'TEACHER';compositeId:string;assignmentRef:string;subjectUserId?:string;respondentUserId:string;composition?:EducationCompositionPolicyBinding}
 const proofs=new WeakMap<object,Facts>()
 export function issueVerifiedEducationStart(facts:Facts):VerifiedEducationStart {
+ const origin=facts.composition?.origin
+ const observer=origin&&(facts.product==='SCHOOL'&&origin.entry==='SCHOOL'
+  &&['STUDENT:PARENT_REPORT','STUDENT:TEACHER_REPORT'].includes(origin.variantKey)
+  ||facts.product==='TEACHER'&&origin.entry==='TEACHER'&&origin.variantKey==='TEACHER:STUDENT_REPORT')
  if(facts.subjectUserId!==undefined&&facts.subjectUserId!==facts.respondentUserId
-  &&(facts.product!=='SCHOOL'||facts.composition?.origin.entry!=='SCHOOL'
-   ||!['STUDENT:PARENT_REPORT','STUDENT:TEACHER_REPORT'].includes(facts.composition.origin.variantKey)))
+  &&!observer)
   throw new Error('EDUCATION_START_CONTEXT_MISMATCH')
  const proof=Object.freeze({kind:'VERIFIED_EDUCATION_START' as const});proofs.set(proof,{...facts});return proof
 }

@@ -51,4 +51,18 @@ describe('School ordinary questionnaires preserve exact observer identity',()=>{
   expect(()=>issueVerifiedEducationStart({...facts,composition:undefined})).toThrow('EDUCATION_START_CONTEXT_MISMATCH')
   expect(()=>issueVerifiedEducationStart({...facts,product:'TEACHER'})).toThrow('EDUCATION_START_CONTEXT_MISMATCH')
  })
+ it('admits the exact Teacher student observer proof, binds both people and rejects SELF or a cross-entry hint',()=>{
+  const tx={},composition={origin:educationCompositionOriginSchema.parse(origin('TEACHER:STUDENT_REPORT','TEACHER')),manifestHash:'b'.repeat(64),unitReports:[]}
+  const facts={tx,product:'TEACHER' as const,compositeId:'runtime',assignmentRef:'assignment',subjectUserId:'rated-teacher',respondentUserId:'actual-student',composition}
+  const proof=issueVerifiedEducationStart(facts),parent={id:'attempt',compositeAssessmentId:'runtime',assignmentRef:'assignment',userId:'actual-student',subjectUserId:'rated-teacher',respondentUserId:'actual-student'}
+  expect(readVerifiedEducationStart(proof,facts)).toBe('TEACHER')
+  expect(()=>bindVerifiedEducationAttempt(proof,tx,parent)).not.toThrow()
+  for(const change of [{subjectUserId:'other-teacher'},{respondentUserId:'rated-teacher'},{userId:'other-student'}])
+   expect(()=>bindVerifiedEducationAttempt(proof,tx,{...parent,...change})).toThrow('EDUCATION_START_CONTEXT_MISMATCH')
+  for(const change of [{product:'SCHOOL' as const},{composition:undefined},
+   {composition:{...composition,origin:educationCompositionOriginSchema.parse(origin('TEACHER:SELF','TEACHER'))}}])
+   expect(()=>issueVerifiedEducationStart({...facts,...change})).toThrow('EDUCATION_START_CONTEXT_MISMATCH')
+  expect(()=>readVerifiedEducationStart({...proof},facts)).toThrow('EDUCATION_START_CONTEXT_MISMATCH')
+  expect(()=>readVerifiedEducationStart(proof,{...facts,tx:{}})).toThrow('EDUCATION_START_CONTEXT_MISMATCH')
+ })
 })
