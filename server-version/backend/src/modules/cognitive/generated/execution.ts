@@ -49,6 +49,7 @@ import { executionEntries as task46 } from '../tasks/ufov/package'
 import { executionEntries as task47 } from '../tasks/logicdeduce/package'
 import { executionEntries as task48 } from '../tasks/seriescomplete/package'
 import { executionEntries as task49 } from '../tasks/pursuitrotor/package'
+import { executionEntries as task50 } from '../tasks/readingcomp/package'
 export const cognitiveExecutionEntries = [
   task0[0],
   task1[0],
@@ -103,5 +104,6 @@ export const cognitiveExecutionEntries = [
   task47[0],
   task48[0],
   task49[0],
+  task50[0],
   task21[1],
 ]

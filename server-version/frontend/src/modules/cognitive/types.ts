@@ -956,3 +956,26 @@ export type PursuitrotorTrialPayload = {
   totalTrackMs: number
   interrupted: boolean
 }
+
+/** Readingcomp 冻结 config（与后端 readingcomp.config schema 一致）。 */
+export interface ReadingcompConfig {
+  totalTrials: number
+  stimulusSetVersion: string
+  fixationMs: number
+  timeoutMs: number
+  validRtFloorMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+/** Readingcomp 单 trial payload（与后端 readingcomp.trial schema 一致）。 */
+export type ReadingcompTrialPayload = {
+  itemId: string
+  responseIndex: number | null
+  rtMs: number | null
+  interrupted: boolean
+}
