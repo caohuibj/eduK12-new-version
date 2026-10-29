@@ -164,10 +164,9 @@ async function participant(s,f,w,version,{author,report,out}) {
    if(index===0) {
     await p.getByRole('button',{name:'保存并退出',exact:true}).click()
     if(s.product==='TEACHER') {
-     // START leaves the mounted list row unchanged. Reload only after durable
-     // exit closes the answer page, then resume from the persisted parent/draft.
+     // The product preserves its durable START binding on the mounted card.
+     // Resume on the same page so a reload cannot hide stale participant state.
      await p.getByRole('region',{name:'测评独立作答页',exact:true}).waitFor({state:'hidden'})
-     await p.reload()
     }
     state=await open();assert.equal(state.id,attemptId);assert.equal(state.currentItem.id,item.id)
     assert.equal(await p.getByRole('button',{name:'合成量表选项乙',exact:true}).getAttribute('aria-pressed'),'true')

@@ -125,7 +125,11 @@ suite('School ordinary observer questionnaire: exact subject, relationship and c
    const endpoint=attemptPath+(index===0?`/items/${item.id}/scale/submit`:`/form-sections/${item.formSectionId}/submit`)
    expect((await request(f.subjectUserId,endpoint,input)).status).toBe(404)
    const final=await request(actor,endpoint,input);expect(final.status,JSON.stringify(final.value)).toBe(200)
-   expect((await request(actor,endpoint,input)).status).toBe(200)
+   const replay=await request(actor,endpoint+(index===0?'?response=full':''),input);expect(replay.status,JSON.stringify(replay.value)).toBe(200)
+   if(index===0)for(const result of [final,replay]){
+    expect(result.data).not.toHaveProperty('assessment')
+    expect(JSON.stringify(result.data)).not.toMatch(/"scores"|"itemScores"|"interpretations"/)
+   }
   }
   expect((await request(actor,attemptPath)).data.status).toBe('COMPLETED')
   expect(await db.assessment.findMany({where:{compositeAttemptId:attempt},select:{userId:true,subjectUserId:true,respondentUserId:true,status:true}}))
@@ -169,6 +173,13 @@ suite('School ordinary observer questionnaire: exact subject, relationship and c
    const endpoint=attemptPath+(index===0?`/items/${item.id}/scale/submit`:`/form-sections/${item.formSectionId}/submit`)
    expect((await request(f.subjectUserId,endpoint,input)).status).toBe(404)
    const final=await request(f.participantUserId,endpoint,input);expect(final.status,JSON.stringify(final.value)).toBe(200)
+   if(index===0){
+    const replay=await request(f.participantUserId,endpoint+'?response=full',input);expect(replay.status,JSON.stringify(replay.value)).toBe(200)
+    for(const result of [final,replay]){
+     expect(result.data).not.toHaveProperty('assessment')
+     expect(JSON.stringify(result.data)).not.toMatch(/"scores"|"itemScores"|"interpretations"/)
+    }
+   }
   }
   const feedbackPath='/run-executions/'+execution.id+'/feedback',feedback=await request(f.participantUserId,feedbackPath)
   expect(feedback.status,JSON.stringify(feedback.value)).toBe(200)

@@ -23,7 +23,7 @@ import {canonicalHash} from '../../modules/assessment-runtime/canonical'
 import {createFrozenActiveSlotSet,encryptFrozenActiveSlotSet} from '../../modules/assessment-runtime/slot-set'
 
 // Actual HTTP authentication/current principal and SQL builder; persisted source,
-// query rows and FINAL controllers are synthetic. PostgreSQL is owned by R.
+// query rows and FINAL controllers are synthetic; the separate PG journey uses real services.
 const id=(n:number)=>`00000000-0000-4000-8000-${String(n).padStart(12,'0')}`
 const student=id(1),teacher=id(2),attempt=id(3),item=id(4)
 const origin={schemaVersion:1 as const,adapterVersion:'1.0.0' as const,mode:'COMPOSITION' as const,entry:'TEACHER' as const,
@@ -42,7 +42,7 @@ beforeEach(async()=>{
  vi.clearAllMocks();vi.stubEnv('HUITEACHER_STUDENT_FEEDBACK_ENABLED','true')
  principal={userId:student,username:'synthetic-student',accountDomain:'SCHOOL',role:'STUDENT',platformRole:'STANDARD',tokenVersion:1,isActive:true,isFrozen:false,mustChangePassword:false,expiresAt:null,teacherApproved:true}
  m.principal.mockImplementation(async()=>principal)
- m.identity.mockResolvedValue({origin,binding,compositeId:id(9),title:'Fixed classroom questionnaire',units:[{itemId:item,scaleId:id(15)}]})
+ m.identity.mockResolvedValue({origin,binding,compositeId:id(9),title:'Fixed classroom questionnaire',units:[{itemId:item,family:'SCALE',scaleId:id(15)}]})
  m.collection.mockResolvedValue(undefined);m.consent.mockResolvedValue(undefined)
  m.query.mockImplementation(async(query:{sql:string})=>query.sql.includes('SELECT slot.id')?[{id:item}]:[row])
  m.parent.mockResolvedValue({id:attempt,status:'IN_PROGRESS',deliveryMode:'FINAL_ONLY',currentItem:null})
