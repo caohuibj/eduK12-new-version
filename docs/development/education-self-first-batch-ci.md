@@ -22,6 +22,8 @@
 4. 已知边界：`integration/educationCompositionPreviewBoundary.review.postgres.integration.test.ts`、`huiteacher/assessment-runtime-composition-page.review.test.ts`、`integration/educationLibraryNumericFreeze.review.postgres.integration.test.ts`、`integration/educationScientificHash.postgres.integration.test.ts`。上述路径均相对 backend `src/__tests__/`。
 5. UI：新增 `components/education-tools/EducationCompositionPreviewBoundary.review.test.tsx` 的两条不同预览边界；按原 A/B 已交付的精确用例/输入接纳；当前差异中的共享 Studio、公共来源/库选择、School/Teacher 消费和反馈，以及 B 两管理页的原有定向测试。原件未到本节点的状态为 UNKNOWN，不把父线口头通过当成正式接纳。只补真实缺失或输入变化失效的断言。
 
+6. 直接改变的共用合同消费者：`education-tools/access.test.ts`、`education-tools/capabilities.routes.test.ts`、`education-tools/private-tool.run-contract.test.ts`、`assessment-runtime/education-block-presentation.test.ts`、`measurement-content/admin-authority-route.test.ts`、`measurement-content/training-standard-combination-boundary.test.ts`、`reporting/education-assessment-report.projector.test.ts`、`scale/scale-presentation.test.ts`；真实边界补入 `integration/educationToolAuthoringAccess.postgres.integration.test.ts` 和 `integration/educationPublicSourceUse.postgres.integration.test.ts`。它们分别约束入口作者、显式授权、共享 runner/报告与原 Training 分支，不能仅用本批成功自评流程推断这些合同通过。
+
 ## 执行接线与预算
 
 | 层 | 现有入口及前置 | 本批待完成的接线 |
