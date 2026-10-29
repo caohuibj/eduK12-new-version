@@ -1346,5 +1346,16 @@
         "sha256": "53024ccd41e547bc97821a23a2322726a23d977847e50f03fb532a74cc7178ce"
       }
     ]
+  },
+  "currentCodeMain": {
+    "commit": "e65d87222d351e5dfde52e389f3aa403380443eb",
+    "tree": "04cb6aa255e6d6d1e205077ede59311bfd253361",
+    "integratedBy": "69ba08ac461476885422f2c86e3bc007eff66dde",
+    "previousMain": "c52e1675fe7990ce49b42589d993fb12e8541ae1",
+    "diffPaths": 72,
+    "scope": "72 pure materials/declarative instrument/generated index/doc paths; no dependency, schema, seed implementation, authorization, engine or CI changes",
+    "setupExecutedAtThisMain": false,
+    "lastQualifiedSetup": "currentMainSetup retains exact c52 evidence; 88 rows is not asserted as latest main count",
+    "contentEvidence": "Reuse DOT original content qualification, not replayed here; newly documented fun R still not registered"
   }
 }

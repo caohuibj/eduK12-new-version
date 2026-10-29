@@ -8,6 +8,7 @@
 [Training T1→T2/T3 接线](training-binding-progress.md)给出共同契约的轻量指针及 legacy 兼容。
 [教育 T1 与原委托校验](education-use-progress.md)和[教育原授权指针](education-selected-source-progress.md)及[教育固定配置目录](education-selected-catalog-progress.md)记录后续实现。
 [教育管理员内部服务](education-manager-services-progress.md)与[管理员 HTTP/页面](education-manager-ui-progress.md)记录管理读取、接收者、自身 use 撤销和跨报告目录歧义修正。
+[Survey 原入口修订绑定](survey-standard-use-progress.md)记录可选精确 grant、草稿/波次冻结与新 START 原授权校验；其管理员 UI/HTTP 与被试全链路仍待执行。
 以下共同契约和撤权矩阵是初始基线记录；当前新增源码仍在独立开发分支，未合入 main。
 
 ## 当前共同契约

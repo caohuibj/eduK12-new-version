@@ -9,6 +9,7 @@ import { success, error } from '../../utils/response'
 import * as governance from './governance.service'
 
 import {requireSurveyManager} from './admin-role'
+import {surveyStandardUseInput} from '../assessment-authorization/survey-standard-use'
 export const surveyPlatformRouter=Router()
 const password=z.object({currentPassword:z.string().min(1).max(128)}).strict()
 const inviteId=z.string().guid()
@@ -64,10 +65,14 @@ surveyPlatformRouter.get('/source-catalog',handler(req=>catalog.sourceCatalog(re
   discovery:z.object(catalogDiscoveryQueryFields).parse(req.query),page:page(req.query.page),kind:sourceRef.shape.kind.optional().parse(req.query.kind),
   organizationId:sourceRef.shape.organizationId.parse(req.query.organizationId)})))
 surveyPlatformRouter.get('/researchers/:id/tool-grants',handler(req=>catalog.listToolGrants(req.user!.userId,inviteId.parse(req.params.id),page(req.query.page))))
+surveyPlatformRouter.use('/researchers/:id/tool-grant-requests',(_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
+surveyPlatformRouter.get('/researchers/:id/tool-grant-requests/:requestId',handler(async req=>{
+ return {operation:await catalog.readExactToolGrantRequest(req.user!.userId,inviteId.parse(req.params.id),inviteId.parse(req.params.requestId))}
+}))
 surveyPlatformRouter.post('/researchers/:id/tool-grants',handler(async req=>{
-  const body=z.object({currentPassword:z.string().min(1).max(128),source:sourceRef}).strict().parse(req.body)
+  const body=z.object({currentPassword:z.string().min(1).max(128),source:sourceRef,exact:surveyStandardUseInput.optional()}).strict().parse(req.body)
   await governance.authorizeAdmin(req.user!.userId,body.currentPassword)
-  return catalog.grantCatalogSource(req.user!.userId,inviteId.parse(req.params.id),body.source)
+  return catalog.grantCatalogSource(req.user!.userId,inviteId.parse(req.params.id),body.source,body.exact)
 }))
 surveyPlatformRouter.post('/tool-grants/:id/revoke',handler(async req=>{
   await administrator(req);return catalog.revokeToolGrant(req.user!.userId,inviteId.parse(req.params.id))

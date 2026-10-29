@@ -12,6 +12,7 @@ import type {ResearchFrozenPublication} from './publication.service'
 export type {ToolEntryProduct,PolicyIdentity,ToolPolicy} from '../assessment-governance/tool-entry-policy'
 export {readToolPolicy,readToolPolicies,exactToolEntryProducts,approveToolEntryPolicies,assertToolEntryPolicy} from '../assessment-governance/tool-entry-policy'
 import {readToolPolicy,type PolicyIdentity} from '../assessment-governance/tool-entry-policy'
+import {readFrozenSurveyStandardUses,assertSurveyStandardUseAuthority} from '../assessment-authorization/survey-standard-use'
 export const standardPolicyIdentity=(key:string,version:string):PolicyIdentity=>{
  const source=getScaleInstrumentSource(key,version)
  return source?scaleSourcePolicyIdentity(source):{resourceKey:`standard:${key}:${version}`,fingerprint:canonicalHash({key,version,missing:true})}
@@ -42,6 +43,7 @@ export async function assertSurveyToolPolicy(tx:Prisma.TransactionClient,identit
  * have separate boundaries; never call this on an existing Attempt's writes. */
 export async function assertSurveyPublicationNotPaused(tx:Prisma.TransactionClient,snapshot:ResearchFrozenPublication){
  await assertFrozenPackageAdmissions(tx,snapshot)
+ const typedUses=await readFrozenSurveyStandardUses(tx,snapshot.projectId,snapshot.units)
  const checkedSjtAuthorities=new Set<string>()
  for(const unit of snapshot.units){
   const p=unit.sourceProvenance,ref=p?.source as CatalogSourceSnapshot['ref']|undefined
@@ -66,8 +68,10 @@ export async function assertSurveyPublicationNotPaused(tx:Prisma.TransactionClie
    }
   }
   if(typeof p.sourceGrantId==='string'){
-   const rows=await tx.$queryRaw<Array<{id:string}>>`SELECT id FROM survey_tool_grants WHERE id=${p.sourceGrantId} AND status='ACTIVE' FOR SHARE`
-   if(!rows.length)throw new AdminPermissionError(403,'研究者此精确版本授权已撤销，停止新入场；已入场作答按原冻结规则完成')
+   if(!typedUses.ids.has(p.sourceGrantId)){
+    const rows=await tx.$queryRaw<Array<{id:string}>>`SELECT id FROM survey_tool_grants WHERE id=${p.sourceGrantId} AND status='ACTIVE' FOR SHARE`
+    if(!rows.length)throw new AdminPermissionError(403,'研究者此精确版本授权已撤销，停止新入场；已入场作答按原冻结规则完成')
+   }
   }else if(!p.surveyPackage){
    // Pre-ref publications can use their original immutable sourced-draft FK.
    // Never search for a newer grant or silently substitute an exact version.
@@ -89,4 +93,6 @@ export async function assertSurveyPublicationNotPaused(tx:Prisma.TransactionClie
   const identity=await snapshotPolicyIdentity(tx,{ref,provenance:p,definitionDigest:unit.sourceDigest} as CatalogSourceSnapshot)
   await assertSurveyToolPolicy(tx,identity,false)
  }
+ // Check the original issuer's current expiry AFTER later source/policy waits.
+ await assertSurveyStandardUseAuthority(tx,typedUses.rows)
 }
