@@ -134,11 +134,14 @@ function tightenChromePermissions({ repo = path.resolve(__dirname, '../..'), env
     return r.stdout
   }
   try {
+    const legacy = env.GITHUB_REF === 'refs/pull/338/merge' && env.GITHUB_HEAD_REF === 'work/school-teacher-review-20261022' &&
+      env.SCHOOL_TEACHER_CHROME_TIGHTEN === 'confirmed-temporary-runner'
+    const selfOptOnly = env.GITHUB_REF === 'refs/pull/382/merge' && env.GITHUB_HEAD_REF === 'release/education-self-scale-form-20261028' &&
+      env.SCHOOL_TEACHER_CHROME_TIGHTEN === 'confirmed-self-opt-only'
     check(env.CI === 'true' && env.GITHUB_ACTIONS === 'true' && env.RUNNER_ENVIRONMENT === 'github-hosted' &&
       env.RUNNER_OS === 'Linux' && env.RUNNER_ARCH === 'X64' && env.ImageOS === 'ubuntu24' &&
       env.GITHUB_REPOSITORY === 'caohuibj/eduK12-new-version' && env.GITHUB_EVENT_NAME === 'pull_request' &&
-      env.GITHUB_REF === 'refs/pull/338/merge' && env.GITHUB_HEAD_REF === 'work/school-teacher-review-20261022' &&
-      env.SCHOOL_TEACHER_CHROME_TIGHTEN === 'confirmed-temporary-runner', 'UNAPPROVED_CI_CONTEXT')
+      (legacy || selfOptOnly), 'UNAPPROVED_CI_CONTEXT')
     check(facts.platform === 'linux' && facts.arch === 'x64' && Number.isSafeInteger(facts.getuid?.()) &&
       facts.getuid() > 0 && facts.geteuid?.() === facts.getuid(), 'NONROOT_RUNNER_REQUIRED')
     check(!['CHROME_DEVEL_SANDBOX', 'LD_PRELOAD', 'LD_LIBRARY_PATH', 'NODE_OPTIONS', 'NODE_PATH'].some(k => env[k]), 'EXECUTION_OVERRIDE_PRESENT')
@@ -151,6 +154,12 @@ function tightenChromePermissions({ repo = path.resolve(__dirname, '../..'), env
     report.source = { head: env.GITHUB_SHA, runId: env.GITHUB_RUN_ID }
     stage = 'PACKAGE_CONSISTENCY'
     const before = inspectInstallation(io, query)
+    if (selfOptOnly) {
+      const opt = before.entries.find(entry => entry.path === '/opt')
+      check(opt && opt.kind === 'directory' && opt.stat.gid === 0 && [0o755, 0o777].includes(opt.stat.mode & 0o7777) &&
+        before.entries.filter(entry => (entry.stat.mode & 0o022) !== 0).every(entry => entry.path === '/opt'),
+      'SELF_UNOBSERVED_WRITABLE_RUNTIME_PATH')
+    }
     report.package = before.package; report.packageConsistency = 'LOCAL_DPKG_MD5_BYTES_MATCH'
     report.consistencyScope = 'Installed package records, not cryptographic publisher authentication'
     report.recordsDigest = before.recordsDigest; report.checkedEntries = before.entries.length

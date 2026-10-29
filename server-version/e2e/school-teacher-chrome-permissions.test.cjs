@@ -56,6 +56,38 @@ function fixture() {
   return { items, env, calls, state, process, add, run: () => tightenChromePermissions({ repo: REPO, env, deps: { fs, spawnSync, process } }) }
 }
 const mutations = f => f.calls.filter(c => c.command === '/usr/bin/sudo')
+test('PR382 explicit confirmation tightens only observed root opt and rejects every wider or mixed approval', () => {
+  const setup = () => {
+    const f = fixture(); f.env.GITHUB_REF = 'refs/pull/382/merge'; f.env.GITHUB_HEAD_REF = 'release/education-self-scale-form-20261028'
+    f.env.SCHOOL_TEACHER_CHROME_TIGHTEN = 'confirmed-self-opt-only'
+    for (const [p, row] of f.items) if (p === '/opt/google' || p === ROOT || p.startsWith(ROOT + '/')) row.mode &= ~0o022
+    return f
+  }
+  const good = setup(), result = good.run(); assert.equal(result.status, 'PERMISSIONS_TIGHTENED')
+  assert.deepEqual(mutations(good).map(c => c.args), [['-n', '/usr/bin/chmod', 'go-w', '--', '/opt']])
+  assert.equal(good.items.get('/opt').mode & 0o7777, 0o755)
+  const already = setup(); already.items.get('/opt').mode &= ~0o022
+  assert.equal(already.run().status, 'PERMISSIONS_TIGHTENED'); assert.equal(mutations(already).length, 0)
+  for (const alter of [f => { f.env.SCHOOL_TEACHER_CHROME_TIGHTEN = 'confirmed-temporary-runner' },
+    f => { f.env.GITHUB_REF = 'refs/pull/338/merge' }, f => { f.env.GITHUB_HEAD_REF = 'work/school-teacher-review-20261022' },
+    f => { f.items.get(ROOT + '/chrome').mode |= 0o022 }, f => { f.items.get('/opt/google').mode |= 0o022 },
+    f => { f.items.get('/opt').gid = 1001 }, f => { f.items.get('/opt').mode = 0o40775 }]) {
+    const f = setup(); alter(f); assert.equal(f.run().status, 'FAILED'); assert.equal(mutations(f).length, 0)
+  }
+})
+test('PR382 workflow calls only the guarded existing helper immediately before unchanged strict Chrome preflight', () => {
+  const workflow = require('node:fs').readFileSync(require('node:path').resolve(__dirname, '../../.github/workflows/ci-school-teacher.yml'), 'utf8')
+  const job = workflow.split('  browser-self:\n')[1].split('\n  security:')[0]
+  const start = job.indexOf('    - name: tighten only the confirmed PR382 temporary /opt write bits'), end = job.indexOf('    - name: inspect this runner Chrome, no automatic install or fallback')
+  assert(start > job.indexOf('school-teacher-checks.mjs fonts') && end > start)
+  const step = job.slice(start, end)
+  for (const text of ["github.repository == 'caohuibj/eduK12-new-version'", "github.event_name == 'pull_request'", 'github.event.pull_request.number == 382',
+    "github.event.pull_request.head.ref == 'release/education-self-scale-form-20261028'", 'github.event.pull_request.head.repo.full_name == github.repository',
+    "fromJSON(inputs.plan).candidate == 'education-self'", 'SCHOOL_TEACHER_CHROME_TIGHTEN: confirmed-self-opt-only', 'school-teacher-chrome-permissions.cjs tighten']) assert(step.includes(text))
+  assert(!/sudo|chmod|chown|sysctl|no-sandbox|continue-on-error/.test(step)); assert.equal(job.split('SCHOOL_TEACHER_CHROME_TIGHTEN').length - 1, 1)
+  assert.equal(workflow.split('SCHOOL_TEACHER_CHROME_TIGHTEN: confirmed-self-opt-only').length - 1, 1)
+  assert.equal(workflow.split('SCHOOL_TEACHER_CHROME_TIGHTEN: confirmed-temporary-runner').length - 1, 1)
+})
 test('only approved parents and verified Chrome package entries lose go write with all other bits preserved', () => {
   const f = fixture(), before = new Map([...f.items].map(([p, r]) => [p, { ...r }]))
   const r = f.run(); assert.equal(r.status, 'PERMISSIONS_TIGHTENED'); assert.equal(r.acceptance, false); assert.equal(r.browserLaunched, false)
