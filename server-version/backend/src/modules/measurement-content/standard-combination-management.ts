@@ -2,7 +2,10 @@ import {Prisma} from '@prisma/client'
 import {z} from 'zod'
 import {prisma} from '../../config/database'
 import {assertEntryAdmin,AdminPermissionError} from '../admin-permissions/service'
-import {libraryActor} from '../scale-library-governance/authority'
+import {libraryActor,assertExactTrainingDistributionDelegation} from '../scale-library-governance/authority'
+import {trainingStandardIssueReceiptSchema} from './standard-combination-use'
+import {canonicalHash} from '../assessment-runtime/canonical'
+import {readSelectedConfigurationBinding} from '../assessment-authorization/selected-configuration'
 
 const page=z.coerce.number().int().min(1).max(10000).default(1)
 const options={isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted,maxWait:5000,timeout:10000}
@@ -56,9 +59,12 @@ export async function trainingStandardManagementGrants(actorId:string,combinatio
   return prisma.$transaction(async tx=>{
     await manager(tx,actorId)
     const rows=await tx.$queryRaw<Array<{id:string;userId:string;username:string;nickname:string|null;
-      issuerId:string;version:number;revokedAt:Date|null;combinationHash:string}>>(Prisma.sql`
+      issuerId:string;version:number;revokedAt:Date|null;combinationHash:string;configurationName:string|null}>>(Prisma.sql`
       SELECT g.id,g.teacher_id AS "userId",u.username,u.nickname,g.granted_by AS "issuerId",
-        g.version,g.revoked_at AS "revokedAt",g.standard_combination_hash AS "combinationHash"
+        g.version,g.revoked_at AS "revokedAt",g.standard_combination_hash AS "combinationHash",
+        (SELECT CASE WHEN count(DISTINCT e.metadata->>'configurationName')=1 THEN min(e.metadata->>'configurationName') ELSE NULL END
+         FROM assessment_management_events e WHERE e.action='STANDARD_COMBINATION_USE_GRANTED' AND e.resource_id=g.resource_id
+          AND e.metadata->>'grantId'=g.id AND e.metadata->>'useVersion'=(g.version-CASE WHEN g.revoked_at IS NULL THEN 0 ELSE 1 END)::text) AS "configurationName"
       FROM material_grants g JOIN users u ON u.id=g.teacher_id
       WHERE g.resource_type='STANDARD_COMBINATION' AND g.resource_id=${id}
         AND u.account_domain IN ('TRAINING','LEGACY')
@@ -66,4 +72,50 @@ export async function trainingStandardManagementGrants(actorId:string,combinatio
       ORDER BY u.username,g.id LIMIT ${size+1} OFFSET ${(currentPage-1)*size}`)
     return {page:currentPage,hasMore:rows.length>size,list:rows.slice(0,size).map(row=>({...row,canManage:row.issuerId===actorId}))}
   },options)
+}
+
+/** Own immutable request, not current/latest grant state guessed as the old
+ * operation's result. Current issuer management qualification is independent
+ * from whether this historical revision is still usable. */
+export async function trainingStandardManagementRequest(actorId:string,combinationId:string,requestId:string,raw:unknown={}){
+ z.string().guid().parse(combinationId);z.string().guid().parse(requestId)
+ const input=z.object({grantId:z.string().guid().optional()}).strict().parse(raw)
+ return prisma.$transaction(async tx=>{
+  const actor=await libraryActor(tx,actorId)
+  if(actor.systemAdmin||!['TRAINING','LEGACY'].includes(actor.account_domain))throw new AdminPermissionError(403,'需要当前 Training 管理身份')
+  const [row]=await tx.$queryRaw<Array<{metadata:unknown;grantId:string|null;userId:string|null;version:number|null;revokedAt:Date|null;combinationHash:string|null}>>(Prisma.sql`
+   SELECT e.metadata,g.id AS "grantId",g.teacher_id AS "userId",g.version,g.revoked_at AS "revokedAt",g.standard_combination_hash AS "combinationHash"
+   FROM assessment_management_events e LEFT JOIN material_grants g ON g.id=e.metadata->>'grantId' AND g.resource_type='STANDARD_COMBINATION' AND g.resource_id=${combinationId}
+   WHERE e.id=${requestId} AND e.actor_id=${actorId} AND e.resource_id=${combinationId} AND e.action='STANDARD_COMBINATION_USE_GRANTED'`)
+  if(!row){
+   try{await manager(tx,actorId)}catch(error){
+    if(!(error instanceof AdminPermissionError)||error.statusCode!==403||!input.grantId)throw error
+    const [source]=await tx.$queryRaw<Array<{measurement_release:{releaseId:string}|null}>>(Prisma.sql`SELECT measurement_release FROM survey_standard_releases WHERE id=${combinationId}`)
+    if(!source?.measurement_release)throw error
+    await assertExactTrainingDistributionDelegation(tx,actorId,source.measurement_release.releaseId,input.grantId)
+   }
+   return {operation:null}
+  }
+  const parsed=trainingStandardIssueReceiptSchema.safeParse(row.metadata)
+  if(!parsed.success)throw new AdminPermissionError(409,'原请求缺少完整可信回执')
+  const receipt=parsed.data,selected=readSelectedConfigurationBinding(receipt.selectedBinding,{product:'TRAINING',recipientId:receipt.userId,organizationId:null,
+   authorizationId:receipt.grantId,authorizationRevision:receipt.useVersion})
+  if(row.grantId&&(receipt.grantId!==row.grantId||receipt.userId!==row.userId||receipt.combinationHash!==row.combinationHash)
+   ||selected&&(selected.binding.authorization.issuerId!==actorId||selected.binding.authorization.kind!=='TRAINING_STANDARD_USE'
+    ||selected.binding.configuration.kind!=='STANDARD_COMBINATION'||selected.binding.configuration.combinationId!==combinationId
+    ||selected.binding.configuration.combinationHash!==receipt.combinationHash))throw new AdminPermissionError(409,'原请求与来源或接收者身份不一致')
+  try{await manager(tx,actorId)}catch(error){
+   if(!(error instanceof AdminPermissionError)||error.statusCode!==403)throw error
+   if(!('authorityGrantId'in receipt)||!selected||selected.binding.configuration.kind!=='STANDARD_COMBINATION')throw error
+   await assertExactTrainingDistributionDelegation(tx,actorId,selected.binding.configuration.measurement.releaseId,receipt.authorityGrantId)
+  }
+  const grant={id:receipt.grantId,version:receipt.useVersion,currentVersion:row.version,revoked:row.version===null||row.revokedAt!==null||row.version!==receipt.useVersion}
+  if(!receipt.requestIntent||!receipt.requestIntentHash||!selected)return {operation:{legacy:true,grant,request:null}}
+  const intent=receipt.requestIntent
+  if(canonicalHash(intent)!==receipt.requestIntentHash||intent.actorId!==actorId||intent.combinationId!==combinationId||intent.userId!==receipt.userId
+   ||intent.combinationHash!==receipt.combinationHash||intent.configurationName!==undefined&&intent.configurationName!==receipt.configurationName
+   ||intent.expectedUseId!==undefined&&intent.expectedUseId!==receipt.grantId
+   ||receipt.selfGrant!==undefined&&receipt.selfGrant!==(actorId===receipt.userId))throw new AdminPermissionError(409,'原完整授权意图与回执不一致')
+  return {operation:{legacy:false,grant,request:{requestId,...intent}}}
+ },options)
 }

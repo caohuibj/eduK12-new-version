@@ -10,12 +10,12 @@ import {standardCombinationPointerSchema} from './standard-combination'
 import {assertScaleLibraryCollectionAllowed} from '../scale-library-governance/collection-guard'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {selectedConfigurationBindingSchema} from '../assessment-authorization/selected-configuration'
-import {sealTrainingStandardUseConfiguration,readTrainingStandardUseConfiguration} from '../assessment-authorization/standard-configuration-binding'
+import {sealTrainingStandardUseConfiguration,readTrainingStandardUseConfigurationReceipt,trainingStandardUseFromEvidence,selectedConfigurationPointer,type TrainingStandardUseEvidence} from '../assessment-authorization/standard-configuration-binding'
 export {standardCombinationPointerSchema} from './standard-combination'
 
 const uuid=z.string().guid(),hash=z.string().regex(/^[a-f0-9]{64}$/)
 const issueSchema=z.object({requestId:uuid,userId:uuid,combinationHash:hash,grantId:uuid.optional(),
- expectedGrantVersion:z.number().int().positive().optional(),expectedUseVersion:z.number().int().positive().optional()}).strict()
+ expectedGrantVersion:z.number().int().positive().optional(),expectedUseVersion:z.number().int().positive().optional(),expectedUseId:uuid.optional(),configurationName:z.string().trim().min(1).max(120).optional()}).strict()
 const revokeSchema=z.object({expectedVersion:z.number().int().positive(),reason:z.string().trim().min(1).max(1000)}).strict()
 const positive=z.number().int().positive()
 const useAuthority={useGrantId:uuid,useGrantVersion:positive,issuerId:z.string().min(1).max(240)}
@@ -24,8 +24,10 @@ export const trainingStandardUseAuthoritySchema=z.union([
  z.object({...useAuthority,authorityGrantId:uuid}).strict(),
  z.object({...useAuthority,authorityEntryGrantId:uuid,authorityEntryGrantVersion:positive}).strict(),
 ])
-const receipt={grantId:uuid,userId:uuid,combinationHash:hash,useVersion:positive,product:z.literal('TRAINING'),selectedBinding:selectedConfigurationBindingSchema.optional(),requestIntentHash:hash.optional()}
-const receiptSchema=z.union([
+const requestIntentSchema=issueSchema.omit({requestId:true}).extend({actorId:uuid,combinationId:uuid,grantId:uuid.nullable(),expectedGrantVersion:positive.nullable(),expectedUseVersion:positive.nullable()}).strict()
+const receipt={grantId:uuid,userId:uuid,combinationHash:hash,useVersion:positive,product:z.literal('TRAINING'),selectedBinding:selectedConfigurationBindingSchema.optional(),requestIntentHash:hash.optional(),
+ configurationName:issueSchema.shape.configurationName,requestIntent:requestIntentSchema.optional(),selfGrant:z.boolean().optional()}
+export const trainingStandardIssueReceiptSchema=z.union([
  z.object({...receipt,authorityGrantId:uuid}).strict(),
  z.object({...receipt,authorityEntryGrantId:uuid,authorityEntryGrantVersion:positive}).strict(),
 ])
@@ -79,8 +81,10 @@ export async function assertTrainingStandardUse(tx:Prisma.TransactionClient,inpu
 
 export async function grantTrainingStandardCombinationUse(actorId:string,combinationId:string,raw:unknown){
  const id=uuid.parse(combinationId),input=issueSchema.parse(raw)
- const requestIntentHash=canonicalHash({actorId,combinationId:id,userId:input.userId,combinationHash:input.combinationHash,
-  grantId:input.grantId??null,expectedGrantVersion:input.expectedGrantVersion??null,expectedUseVersion:input.expectedUseVersion??null})
+ const requestIntent={actorId,combinationId:id,userId:input.userId,combinationHash:input.combinationHash,
+  grantId:input.grantId??null,expectedGrantVersion:input.expectedGrantVersion??null,expectedUseVersion:input.expectedUseVersion??null,
+  ...(input.configurationName!==undefined?{configurationName:input.configurationName}:{}),...(input.expectedUseId!==undefined?{expectedUseId:input.expectedUseId}:{})}
+ const requestIntentHash=canonicalHash(requestIntent)
  return prisma.$transaction(async tx=>{
   const [header]=await tx.$queryRaw<Array<{tool_key:string;instrument_version:string;measurement_release:{releaseId:string}|null}>>(Prisma.sql`
    SELECT tool_key,snapshot->>'instrumentVersion' AS instrument_version,measurement_release FROM survey_standard_releases WHERE id=${id}`)
@@ -101,12 +105,15 @@ export async function grantTrainingStandardCombinationUse(actorId:string,combina
   await tx.$executeRaw(Prisma.sql`SELECT pg_advisory_xact_lock(hashtext(${'standard-use-request:'+input.requestId}))`)
   await tx.$executeRaw(Prisma.sql`SELECT pg_advisory_xact_lock(hashtext(${'standard-use:'+id+':'+input.userId}))`)
   const prior=await tx.materialGrant.findUnique({where:{teacherId_resourceType_resourceId:{teacherId:input.userId,resourceType:MaterialResourceType.STANDARD_COMBINATION,resourceId:id}}})
+  if(input.expectedUseId!==undefined&&prior?.id!==input.expectedUseId)throw new AdminPermissionError(409,'原使用权身份已变化，请回读原授权后再操作')
   const recorded=await tx.assessmentManagementEvent.findUnique({where:{id:input.requestId}})
   if(recorded){
-   const receipt=receiptSchema.safeParse(recorded.metadata)
+   const receipt=trainingStandardIssueReceiptSchema.safeParse(recorded.metadata)
    if(recorded.actorId!==actorId||recorded.resourceId!==id||recorded.action!=='STANDARD_COMBINATION_USE_GRANTED'||!receipt.success
     ||receipt.data.userId!==input.userId||receipt.data.combinationHash!==input.combinationHash||canonicalHash(binding(receipt.data))!==canonicalHash(selected)
-    ||prior?.id!==receipt.data.grantId||receipt.data.requestIntentHash!==undefined&&receipt.data.requestIntentHash!==requestIntentHash)deny('请求编号已用于其他授权')
+    ||prior?.id!==receipt.data.grantId||receipt.data.requestIntentHash!==undefined&&receipt.data.requestIntentHash!==requestIntentHash
+    ||input.configurationName!==undefined&&receipt.data.configurationName!==input.configurationName
+    ||receipt.data.requestIntent!==undefined&&canonicalHash(receipt.data.requestIntent)!==requestIntentHash)deny('请求编号已用于其他授权')
    return {id:prior.id,userId:input.userId,combination:{releaseId:id,combinationHash:input.combinationHash},
     version:receipt.data.useVersion,currentVersion:prior.version,revoked:prior.revokedAt!==null,changed:false,replayed:true}
   }
@@ -125,10 +132,14 @@ export async function grantTrainingStandardCombinationUse(actorId:string,combina
   const exactUse={useGrantId:use.id,useGrantVersion:use.version,issuerId:actorId,...selected}
   // An active legacy revision must not acquire new fields under an old draft.
   // Its explicit revoke/reissue creates a new revision eligible for T1 sealing.
-  const selectedBinding=!prior||prior.revokedAt?sealTrainingStandardUseConfiguration(source,input.userId,exactUse,authority.version):
-   await readTrainingStandardUseConfiguration(tx,source,input.userId,exactUse)
+  const existing=prior&&!prior.revokedAt?await readTrainingStandardUseConfigurationReceipt(tx,source,input.userId,exactUse):null
+  if(prior&&!prior.revokedAt&&input.configurationName!==undefined&&(!existing||existing.configurationName!==input.configurationName))
+   throw new AdminPermissionError(409,'当前授权修订不能改名或升级；请先明确撤销，再按新修订分配')
+  const selectedBinding=!prior||prior.revokedAt?sealTrainingStandardUseConfiguration(source,input.userId,exactUse,authority.version):existing?.selectedBinding??null
+  const configurationName=!prior||prior.revokedAt?input.configurationName:existing?.configurationName??undefined
   await tx.assessmentManagementEvent.create({data:{id:input.requestId,actorId,resourceId:id,action:'STANDARD_COMBINATION_USE_GRANTED',
-   metadata:{grantId:use.id,userId:input.userId,combinationHash:input.combinationHash,...selected,useVersion:use.version,product:'TRAINING',requestIntentHash,...(selectedBinding?{selectedBinding}:{})}}})
+   metadata:{grantId:use.id,userId:input.userId,combinationHash:input.combinationHash,...selected,useVersion:use.version,product:'TRAINING',requestIntentHash,requestIntent,selfGrant:actorId===input.userId,
+    ...(configurationName?{configurationName}:{}),...(selectedBinding?{selectedBinding}:{})}}})
   await assertTrainingStandardUse(tx,{userId:input.userId,combination:{releaseId:id,combinationHash:input.combinationHash},
    measurementReleaseId:source.measurement.releaseId,useGrantId:use.id,useGrantVersion:use.version})
   return {id:use.id,userId:input.userId,combination:{releaseId:id,combinationHash:input.combinationHash},version:use.version,
@@ -182,26 +193,56 @@ export async function listTrainingStandardCombinationChoices(userId:string){
   let cursor:{toolKey:string;releaseId:string;useId:string}|undefined
   const pageSize=100
   while(choices.length<pageSize){
-  const rows=await tx.$queryRaw<Array<{id:string;combination_hash:string;title:string;tool_key:string;instrument_version:string;content_version:string;parameters_version:string;report_version:string;scale_id:string;measurement_release:{releaseId:string};use_id:string;use_version:number}>>(Prisma.sql`
+  const rows=await tx.$queryRaw<Array<{id:string;combination_hash:string;title:string;tool_key:string;instrument_version:string;content_version:string;parameters_version:string;report_version:string;
+   content_hash:string;parameters_hash:string;report_hash:string;scale_id:string;measurement_release:{releaseId:string;contentHash:string};use_id:string;use_version:number;evidence:TrainingStandardUseEvidence[]}>>(Prisma.sql`
    SELECT r.id,r.combination_hash,r.snapshot->>'title' AS title,r.tool_key,r.snapshot->>'instrumentVersion' AS instrument_version,
     r.snapshot#>>'{parts,CONTENT,version}' AS content_version,r.snapshot#>>'{parts,PARAMETERS,version}' AS parameters_version,r.snapshot#>>'{parts,REPORT,version}' AS report_version,
-    s.id AS scale_id,r.measurement_release,g.id AS use_id,g.version AS use_version
+    r.snapshot#>>'{parts,CONTENT,hash}' AS content_hash,r.snapshot#>>'{parts,PARAMETERS,hash}' AS parameters_hash,r.snapshot#>>'{parts,REPORT,hash}' AS report_hash,
+    s.id AS scale_id,r.measurement_release,g.id AS use_id,g.version AS use_version,
+    COALESCE((SELECT jsonb_agg(a) FROM (SELECT DISTINCT e.actor_id,e.metadata->'selectedBinding' AS selected,e.metadata->>'configurationName' AS "configurationName"
+     FROM assessment_management_events e WHERE e.action='STANDARD_COMBINATION_USE_GRANTED' AND e.resource_id=r.id
+      AND e.metadata->>'grantId'=g.id AND e.metadata->>'useVersion'=g.version::text AND e.metadata?'selectedBinding' ORDER BY e.actor_id LIMIT 2) a),'[]'::jsonb) AS evidence
    FROM material_grants g JOIN survey_standard_releases r ON r.id=g.resource_id AND r.combination_hash=g.standard_combination_hash
+   JOIN measurement_content_releases m ON m.id=r.measurement_release->>'releaseId' AND m.content_hash=r.measurement_release->>'contentHash'
+    AND m.layer='MEASUREMENT' AND m.family='SCALE' AND m.status='PUBLISHED'
    JOIN scales s ON s.code=r.tool_key AND s.instrument_version=r.snapshot->>'instrumentVersion'
    WHERE g.teacher_id=${userId} AND g.resource_type='STANDARD_COMBINATION' AND g.revoked_at IS NULL AND r.state='ONLINE'
     AND s.status='PUBLISHED' AND s.instrument_class='STANDARD' AND s.library_entry_id IS NULL
     ${cursor?Prisma.sql`AND (r.tool_key,r.id,g.id)>(${cursor.toolKey},${cursor.releaseId},${cursor.useId})`:Prisma.empty}
    ORDER BY r.tool_key,r.id,g.id LIMIT 100`)
   for(const row of rows){
-   try{await assertToolEntryPolicy(tx,{resourceKey:'standard-release:'+row.id,fingerprint:row.combination_hash},'TRAINING');await assertTrainingStandardUse(tx,{userId,combination:{releaseId:row.id,combinationHash:row.combination_hash},measurementReleaseId:row.measurement_release.releaseId,useGrantId:row.use_id,useGrantVersion:row.use_version})}
+   cursor={toolKey:row.tool_key,releaseId:row.id,useId:row.use_id}
+   let authority:Awaited<ReturnType<typeof assertTrainingStandardUse>>
+   try{await assertToolEntryPolicy(tx,{resourceKey:'standard-release:'+row.id,fingerprint:row.combination_hash},'TRAINING');authority=await assertTrainingStandardUse(tx,{userId,combination:{releaseId:row.id,combinationHash:row.combination_hash},measurementReleaseId:row.measurement_release.releaseId,useGrantId:row.use_id,useGrantVersion:row.use_version})}
    catch(e){if(e instanceof AdminPermissionError||(e instanceof Error&&'statusCode'in e&&e.statusCode===403))continue;throw e}
+   let selected:ReturnType<typeof trainingStandardUseFromEvidence>=null,unavailableReason:string|null=null
+   if(row.evidence.length)try{
+    selected=trainingStandardUseFromEvidence({row:{id:row.id,combination_hash:row.combination_hash,snapshot:{toolKey:row.tool_key,instrumentVersion:row.instrument_version,
+     parts:{CONTENT:{version:row.content_version,hash:row.content_hash},PARAMETERS:{version:row.parameters_version,hash:row.parameters_hash},REPORT:{version:row.report_version,hash:row.report_hash}}}},measurement:row.measurement_release},userId,authority,row.evidence)
+   }catch{unavailableReason='原固定配置证据不完整，请管理员核对原授权修订。'}
    choices.push({combination:{releaseId:row.id,combinationHash:row.combination_hash},scaleId:row.scale_id,title:row.title,
-    toolKey:row.tool_key,instrumentVersion:row.instrument_version,axisVersions:{CONTENT:row.content_version,PARAMETERS:row.parameters_version,REPORT:row.report_version},useGrantId:row.use_id,useGrantVersion:row.use_version})
+    toolKey:row.tool_key,instrumentVersion:row.instrument_version,axisVersions:{CONTENT:row.content_version,PARAMETERS:row.parameters_version,REPORT:row.report_version},useGrantId:row.use_id,useGrantVersion:row.use_version,
+    authorizationMode:row.evidence.length?'PRECISE':'LEGACY',configurationName:selected?.configurationName??null,
+    ...(selected?{selectedBinding:selectedConfigurationPointer(selected.selectedBinding)}:{}),available:!unavailableReason,unavailableReason})
    if(choices.length===pageSize)break
   }
   if(rows.length<pageSize)break
-  const last=rows[rows.length-1]
-  cursor={toolKey:last.tool_key,releaseId:last.id,useId:last.use_id}
+  }
+  let overflow=false
+  if(choices.length===pageSize&&cursor){
+   const next=await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT g.id FROM material_grants g JOIN survey_standard_releases r ON r.id=g.resource_id AND r.combination_hash=g.standard_combination_hash
+    JOIN scales s ON s.code=r.tool_key AND s.instrument_version=r.snapshot->>'instrumentVersion'
+    JOIN measurement_content_releases m ON m.id=r.measurement_release->>'releaseId' AND m.content_hash=r.measurement_release->>'contentHash' AND m.layer='MEASUREMENT' AND m.family='SCALE' AND m.status='PUBLISHED'
+    WHERE g.teacher_id=${userId} AND g.resource_type='STANDARD_COMBINATION' AND g.revoked_at IS NULL AND r.state='ONLINE'
+     AND s.status='PUBLISHED' AND s.instrument_class='STANDARD' AND s.library_entry_id IS NULL AND (r.tool_key,r.id,g.id)>(${cursor.toolKey},${cursor.releaseId},${cursor.useId}) LIMIT 1`)
+   overflow=next.length>0
+  }
+  const eligible=choices.filter(choice=>choice.available)
+  for(const choice of choices){
+   if(choice.authorizationMode!=='PRECISE'||!choice.available)continue
+   const peers=eligible.filter(other=>other.toolKey===choice.toolKey)
+   const ambiguous=peers.length>1&&(!choice.configurationName||peers.filter(other=>other.configurationName===choice.configurationName).length>1)
+   if(overflow||ambiguous){choice.available=false;choice.unavailableReason=overflow?'精确配置超出当前目录读取范围，请管理员整理后重试；未选择任何默认版本。':'同一工具存在同名或未命名配置，请管理员明确业务配置名称。'}
   }
   return choices
  },options)

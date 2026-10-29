@@ -11,6 +11,7 @@
 [教育显式授权替换](education-replacement-progress.md)给出同一工具的新授权 lineage、普通撤销旧 use 和完整请求恢复；旧草稿不自动换 binding。
 [教育 T2 草稿变化审计](education-draft-change-progress.md)保留明确新增/移除 slot 的原授权身份、修订和内容 hash，不制造 legacy 的历史绑定。
 [Survey 原入口修订绑定](survey-standard-use-progress.md)与[Survey 页面/HTTP](survey-standard-ui-progress.md)记录精确 grant、草稿/波次冻结、新 START 原授权校验及账号/请求恢复；被试全链路仍待执行。
+[Training 具名配置与原请求恢复](training-named-configuration-progress.md)记录管理员业务命名、完整原意图回读、使用者精确选择身份及固定 P/R 展示。
 以下共同契约和撤权矩阵是初始基线记录；当前新增源码仍在独立开发分支，未合入 main。
 
 ## 当前共同契约

@@ -17,15 +17,15 @@ import {resolveScaleStartDeployment} from '../scale/deployment/service'
 import {lockInstrumentSourceIdentity} from '../assessment-authorization/source-identity-lock'
 import {freezeScaleRuntimeAtAttemptStart} from '../assessment-runtime/runtime-snapshot'
 import {referenceSetHash,freezeExactReferenceBindings} from '../assessment-runtime/reference-binding'
-import {readTrainingStandardUseConfiguration,sealTrainingStandardUseConfiguration,selectedConfigurationPointer,selectedConfigurationPointerSchema} from '../assessment-authorization/standard-configuration-binding'
+import {readTrainingStandardUseConfigurationReceipt,sealTrainingStandardUseConfiguration,selectedConfigurationPointer,selectedConfigurationPointerSchema,trainingStandardSelectionSchema} from '../assessment-authorization/standard-configuration-binding'
 
 const uuid=z.string().guid(),hash=z.string().regex(/^[a-f0-9]{64}$/),text=z.string().min(1).max(240)
-export const trainingStandardSourceInput=z.object({itemId:uuid,combination:standardCombinationPointerSchema,useGrantId:uuid.optional()}).strict()
+export const trainingStandardSourceInput=z.object({itemId:uuid,combination:trainingStandardSelectionSchema,useGrantId:uuid.optional()}).strict()
 const axis=z.object({version:text,axisHash:hash,sourceVersion:text}).strict()
 export const trainingStandardReferenceSchema=z.object({schemaVersion:z.literal(1),compositeId:uuid,itemId:uuid,ownerId:text,scaleId:uuid,
  combination:standardCombinationPointerSchema.extend({toolKey:text,instrumentVersion:text,axes:z.object({CONTENT:axis,PARAMETERS:axis,REPORT:axis}).strict()}).strict(),
  measurement:z.object({releaseId:uuid,contentHash:hash,measurementHash:hash}).strict(),
- authority:trainingStandardUseAuthoritySchema,selectedBinding:selectedConfigurationPointerSchema.optional(),reportDisclosure:z.literal('EXISTING_TRAINING_POLICY'),
+ authority:trainingStandardUseAuthoritySchema,selectedBinding:selectedConfigurationPointerSchema.optional(),configurationName:z.string().trim().min(1).max(120).optional(),reportDisclosure:z.literal('EXISTING_TRAINING_POLICY'),
 }).strict()
 export const trainingStandardItemSourceSchema=z.object({reference:trainingStandardReferenceSchema,referenceHash:hash}).strict()
 export type TrainingStandardReference=z.infer<typeof trainingStandardReferenceSchema>
@@ -38,8 +38,9 @@ type Purpose='NEW_REFERENCE'|'COLLECTION'
  * server-loaded composites/items may reach this helper. New and frozen use both
  * resolve the user's one exact MaterialGrant, never legacy canUseScale as well. */
 export async function prepareTrainingStandardItemSource(tx:Prisma.TransactionClient,actorId:string,composite:any,
- item:{id:string;scaleId:string},selection:{releaseId:string;combinationHash:string},purpose:Purpose='NEW_REFERENCE',useGrantId?:string,useGrantVersion?:number){
+ item:{id:string;scaleId:string},selection:z.infer<typeof trainingStandardSelectionSchema>,purpose:Purpose='NEW_REFERENCE',useGrantId?:string,useGrantVersion?:number){
  const pointer=standardCombinationPointerSchema.parse({releaseId:selection.releaseId,combinationHash:selection.combinationHash})
+ const expected=selection.selectedBinding===undefined?null:selectedConfigurationPointerSchema.parse(selection.selectedBinding)
  if(composite.productKind!=='QUESTIONNAIRE'||!['COURSE','GENERAL'].includes(composite.questionnaireType)
   ||composite.questionnaireType==='GENERAL'&&(composite.courseId!=null||(composite.questionnaireCourses??[]).length>0)
   ||purpose==='NEW_REFERENCE'&&!['DRAFT','PUBLISHED'].includes(composite.status))fail('COMPOSITE_UNAVAILABLE')
@@ -52,10 +53,12 @@ export async function prepareTrainingStandardItemSource(tx:Prisma.TransactionCli
  const scale=await tx.scale.findUnique({where:{id:item.scaleId}})
  if(!scale||purpose==='NEW_REFERENCE'&&(scale.instrumentClass!=='STANDARD'||scale.libraryEntryId||scale.status!=='PUBLISHED'))fail('SCALE_SOURCE_REQUIRED')
  if(purpose==='NEW_REFERENCE'&&(scale.code!==header.tool_key||scale.instrumentVersion!==header.instrument_version))fail('SCALE_SOURCE_CHANGED')
- const authority=await assertTrainingStandardUse(tx,{userId:actorId,combination:pointer,measurementReleaseId:header.measurement_release.releaseId,useGrantId,useGrantVersion})
+ const authority=await assertTrainingStandardUse(tx,{userId:actorId,combination:pointer,measurementReleaseId:header.measurement_release.releaseId,
+  useGrantId:useGrantId??expected?.authorizationId,useGrantVersion:useGrantVersion??expected?.authorizationRevision})
  if(purpose==='NEW_REFERENCE')await tx.$queryRaw(Prisma.sql`SELECT id FROM scale_deployment_policies WHERE scale_id=${scale.id} AND status='ACTIVE' FOR SHARE`)
  const resolved=await readCurrentStandardCombination(tx,pointer,purpose),t=resolved.row.snapshot
- const selectedBinding=await readTrainingStandardUseConfiguration(tx,resolved,actorId,authority)
+ const selected=await readTrainingStandardUseConfigurationReceipt(tx,resolved,actorId,authority),selectedBinding=selected?.selectedBinding
+ if(expected&&(!selectedBinding||canonicalHash(selectedConfigurationPointer(selectedBinding))!==canonicalHash(expected)))fail('SELECTED_BINDING_MISMATCH')
  await assertToolEntryPolicy(tx,{resourceKey:'standard-release:'+pointer.releaseId,fingerprint:pointer.combinationHash},'TRAINING')
  if(resolved.measurement.releaseId!==header.measurement_release.releaseId||header.tool_key!==t.toolKey||header.instrument_version!==t.instrumentVersion)fail('TOOL_VERSION_MISMATCH')
  if(purpose==='NEW_REFERENCE'){
@@ -73,7 +76,7 @@ export async function prepareTrainingStandardItemSource(tx:Prisma.TransactionCli
   combination:{...pointer,toolKey:t.toolKey,instrumentVersion:t.instrumentVersion,
    axes:Object.fromEntries(Object.entries(t.parts).map(([a,p])=>[a,{version:p.version,axisHash:p.hash,sourceVersion:p.sourceVersion}]))},
   measurement:{releaseId:resolved.measurement.releaseId,contentHash:resolved.measurement.contentHash,measurementHash:resolved.measurement.content.measurementHash},
-  authority,...(selectedBinding?{selectedBinding:selectedConfigurationPointer(selectedBinding)}:{}),reportDisclosure:'EXISTING_TRAINING_POLICY'})
+  authority,...(selectedBinding?{selectedBinding:selectedConfigurationPointer(selectedBinding)}:{}),...(selected?.configurationName?{configurationName:selected.configurationName}:{}),reportDisclosure:'EXISTING_TRAINING_POLICY'})
  const current=await assertTrainingStandardUse(tx,{userId:actorId,combination:pointer,measurementReleaseId:resolved.measurement.releaseId,
   useGrantId:authority.useGrantId,useGrantVersion:authority.useGrantVersion})
  if(canonicalHash(current)!==canonicalHash(authority))fail('USE_AUTHORITY_CHANGED')
@@ -105,8 +108,8 @@ export function decodeTrainingStandardItemSource(raw:unknown,context?:{composite
 /** Teacher display after the caller's container/data ACL. This is a frozen
  * identity summary, never current authority or a source body. */
 export function trainingStandardCombinationSummary(raw:unknown){
- const {combination}=decodeTrainingStandardItemSource(raw).reference
- return {instrumentVersion:combination.instrumentVersion,axisVersions:{
+ const {combination,configurationName,selectedBinding}=decodeTrainingStandardItemSource(raw).reference
+ return {instrumentVersion:combination.instrumentVersion,configurationName:configurationName??null,authorizationMode:selectedBinding?'PRECISE':'LEGACY',axisVersions:{
   CONTENT:combination.axes.CONTENT.version,PARAMETERS:combination.axes.PARAMETERS.version,REPORT:combination.axes.REPORT.version}}
 }
 

@@ -8,6 +8,7 @@ import {sealSelectedConfigurationBinding,readSelectedConfigurationBinding,select
 
 const hash=z.string().regex(/^[a-f0-9]{64}$/),id=z.string().guid(),revision=z.number().int().positive()
 export const selectedConfigurationPointerSchema=z.object({bindingHash:hash,configurationHash:hash,authorizationId:id,authorizationRevision:revision}).strict()
+export const trainingStandardSelectionSchema=z.object({releaseId:id,combinationHash:hash,selectedBinding:selectedConfigurationPointerSchema.optional()}).strict()
 type Source=Awaited<ReturnType<typeof readCurrentStandardCombination>>
 type SourceIdentity={row:{id:string;combination_hash:string;snapshot:{toolKey:string;instrumentVersion:string;
  parts:Record<'CONTENT'|'PARAMETERS'|'REPORT',{version:string;hash:string}>}};measurement:{releaseId:string;contentHash:string}}
@@ -38,12 +39,8 @@ export function selectedConfigurationPointer(value:SelectedConfigurationBinding)
 /** An exact revision lookup, never latest. Old grants with no typed T1 evidence
  * remain explicitly legacy; malformed or conflicting evidence cannot fall back.
  * Current authority was checked by the caller, separately from this identity. */
-export async function readTrainingStandardUseConfiguration(tx:Prisma.TransactionClient,source:Source,userId:string,use:Authority){
- const rows=await tx.$queryRaw<Array<{selected:unknown;actor_id:string}>>(Prisma.sql`
-  SELECT DISTINCT metadata->'selectedBinding' AS selected,actor_id FROM assessment_management_events
-  WHERE action='STANDARD_COMBINATION_USE_GRANTED' AND resource_id=${source.row.id}
-   AND metadata->>'grantId'=${use.useGrantId} AND metadata->>'useVersion'=${String(use.useGrantVersion)}
-   AND metadata?'selectedBinding' ORDER BY actor_id LIMIT 2`)
+export type TrainingStandardUseEvidence={selected:unknown;actor_id:string;configurationName?:string|null}
+export function trainingStandardUseFromEvidence(source:SourceIdentity,userId:string,use:Authority,rows:readonly TrainingStandardUseEvidence[]){
  if(!rows.length)return null
  if(rows.length!==1||rows[0].actor_id!==use.issuerId)fail('REVISION_CONFLICT')
  let sealed:ReturnType<typeof readSelectedConfigurationBinding>
@@ -53,8 +50,18 @@ export async function readTrainingStandardUseConfiguration(tx:Prisma.Transaction
   ||canonicalHash(sealed.binding.configuration)!==canonicalHash(standardConfigurationIdentity(source)))return fail('SOURCE_MISMATCH')
  const expected='authorityEntryGrantId'in use?{kind:'ENTRY_ADMIN',id:use.authorityEntryGrantId,revision:use.authorityEntryGrantVersion}:
   {kind:'CONTENT_DELEGATION',id:use.authorityGrantId,revision:1}
- // Capability roots are immutable except a versioned revocation; an available
- // original root is still revision 1. No replacement root can repair a binding.
  if(canonicalHash(sealed.binding.authorization.authority)!==canonicalHash([expected]))fail('AUTHORITY_MISMATCH')
- return sealed
+ const configurationName=rows[0].configurationName==null?null:z.string().trim().min(1).max(120).parse(rows[0].configurationName)
+ return {selectedBinding:sealed,configurationName}
+}
+export async function readTrainingStandardUseConfigurationReceipt(tx:Prisma.TransactionClient,source:SourceIdentity,userId:string,use:Authority){
+ const rows=await tx.$queryRaw<TrainingStandardUseEvidence[]>(Prisma.sql`
+  SELECT DISTINCT metadata->'selectedBinding' AS selected,actor_id,metadata->>'configurationName' AS "configurationName" FROM assessment_management_events
+  WHERE action='STANDARD_COMBINATION_USE_GRANTED' AND resource_id=${source.row.id}
+   AND metadata->>'grantId'=${use.useGrantId} AND metadata->>'useVersion'=${String(use.useGrantVersion)}
+   AND metadata?'selectedBinding' ORDER BY actor_id LIMIT 2`)
+ return trainingStandardUseFromEvidence(source,userId,use,rows)
+}
+export async function readTrainingStandardUseConfiguration(tx:Prisma.TransactionClient,source:Source,userId:string,use:Authority){
+ return (await readTrainingStandardUseConfigurationReceipt(tx,source,userId,use))?.selectedBinding??null
 }

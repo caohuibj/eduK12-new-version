@@ -1140,3 +1140,16 @@ it('offers granted exact configurations in GENERAL while retaining authorized na
  fireEvent.click(screen.getByRole('button',{name:'添加到测评'}))
  await waitFor(()=>expect(api.post).toHaveBeenCalledExactlyOnceWith('/questionnaire-products/general-exact/items',{revision:4,item:{type:'SCALE',required:true,scaleId:combo.scaleId,standardCombination:combo.combination}}))
 })
+
+it('uses named precise Training choices and sends the original selected binding while disabling ambiguous choices',async()=>{
+ vi.resetAllMocks();sessionStorage.clear();capabilities.enabled=true;trainingPresentation.enabled=true
+ const row={id:'named',name:'具名配置草稿',status:'DRAFT',revision:4,questionnaireType:'GENERAL',questionnaireCourses:[],items:[],formSections:[],publicEnabled:false}
+ const pointer={schemaVersion:1,artifactHash:'d'.repeat(64),bindingHash:'e'.repeat(64),authorizationId:'original-use',authorizationRevision:3}
+ const good={combination:{releaseId:'reviewed',combinationHash:'c'.repeat(64)},scaleId:'physical-scale',title:'注意力',toolKey:'hidden-code',instrumentVersion:'technical-version',axisVersions:{CONTENT:'c-secret',PARAMETERS:'p-secret',REPORT:'r-secret'},authorizationMode:'PRECISE',configurationName:'教学简报',selectedBinding:pointer,available:true,unavailableReason:null}
+ const ambiguous={...good,combination:{releaseId:'unavailable',combinationHash:'b'.repeat(64)},configurationName:'待管理员配置',available:false,unavailableReason:'同名配置，请管理员明确用途'}
+ api.get.mockImplementation(async(path:string)=>({code:0,data:path.endsWith('/resources')?{scales:[],cognitive:[],situational:[],courses:[],standardCombinations:[good,ambiguous]}:row}));api.post.mockResolvedValue({code:0,data:{...row,revision:5}})
+ mount('named','#questionnaire-content');fireEvent.click(await screen.findByRole('button',{name:'量表'}));fireEvent.click(await screen.findByRole('button',{name:/^选择量表/}))
+ const dialog=await screen.findByRole('dialog',{name:'选择量表'});expect(within(dialog).getByRole('button',{name:/待管理员配置.*暂不可用/})).toBeDisabled();expect(within(dialog).getByText('同名配置，请管理员明确用途')).toBeVisible();expect(dialog).not.toHaveTextContent(/technical-version|c-secret|p-secret|r-secret|hidden-code/)
+ fireEvent.click(within(dialog).getByRole('button',{name:'选择 注意力 · 教学简报'}));fireEvent.click(screen.getByRole('button',{name:'添加到测评'}))
+ await waitFor(()=>expect(api.post).toHaveBeenCalledExactlyOnceWith('/questionnaire-products/named/items',{revision:4,item:{type:'SCALE',required:true,scaleId:good.scaleId,standardCombination:{...good.combination,selectedBinding:pointer}}}))
+})

@@ -3,7 +3,7 @@ import {trainingReinterpretationsRouter} from './reinterpretation.routes'
 import {trainingReferencesRouter} from '../training-analysis/reference.routes'
 import {trainingContentReportsRouter} from './content-report.routes'
 import {grantTrainingStandardCombinationUse,revokeTrainingStandardCombinationUse} from '../measurement-content/standard-combination-use'
-import {trainingStandardManagementCatalog,trainingStandardManagementGrants} from '../measurement-content/standard-combination-management'
+import {trainingStandardManagementCatalog,trainingStandardManagementGrants,trainingStandardManagementRequest} from '../measurement-content/standard-combination-management'
 import {platformSurveyOriginGuard} from '../survey/originGuard'
 import {ContentAuthorityError} from '../measurement-content/content-authority'
 import {ContentReleaseError} from '../measurement-content/release'
@@ -31,6 +31,8 @@ router.get('/standard-combinations/catalog',authenticate,platformSurveyOriginGua
   handle(req=>trainingStandardManagementCatalog(req.user!.userId,req.query.page)))
 router.get('/standard-combinations/:combinationId/use-grants',authenticate,platformSurveyOriginGuard,
   handle(req=>trainingStandardManagementGrants(req.user!.userId,req.params.combinationId,req.query)))
+router.get('/standard-combinations/:combinationId/use-requests/:requestId',authenticate,platformSurveyOriginGuard,(req,res,next)=>{res.setHeader('Cache-Control','no-store');next()},
+  handle(req=>trainingStandardManagementRequest(req.user!.userId,req.params.combinationId,req.params.requestId,req.query)))
 router.post('/standard-combinations/:combinationId/use-grants',authenticate,platformSurveyOriginGuard,
   handle(req=>grantTrainingStandardCombinationUse(req.user!.userId,req.params.combinationId,req.body)))
 router.post('/standard-combination-use-grants/:grantId/revoke',authenticate,platformSurveyOriginGuard,
