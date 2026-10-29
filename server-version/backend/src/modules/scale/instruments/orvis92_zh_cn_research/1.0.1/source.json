@@ -1,0 +1,3914 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "orvis92_zh_cn_research",
+    "instrumentVersion": "1.0.1"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 2,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "俄勒冈职业兴趣量表（ORVIS，92题中文工作译稿）",
+      "abbreviation": "ORVIS92",
+      "instrumentFamily": "Oregon Vocational Interest Scales"
+    },
+    "construct": {
+      "primaryDomain": "MOTIVATION",
+      "secondaryDomains": [],
+      "constructDefinition": "八类职业相关活动的自述喜欢程度；不是能力、职业适配、录用资格、人格优劣或诊断。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "orvis92_zh_cn_research",
+        "domain:interests_career_exploration",
+        "construct:activity_preferences",
+        "construct:orvis_leadership",
+        "construct:orvis_organization",
+        "construct:orvis_altruism",
+        "construct:orvis_creativity",
+        "construct:orvis_analysis",
+        "construct:orvis_production",
+        "construct:orvis_adventure",
+        "construct:orvis_erudition",
+        "population:adult_research",
+        "response:self",
+        "response:digital_self",
+        "response:paper",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "use:not_selection",
+        "license:public_domain",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:translation_review_pending",
+        "language_validation:local_validation_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    "population": {
+      "populationNotes": "研究样本为美国社区成人及加拿大大学新生；不外推为中国常模或中小学生适用性证据。 当前仅成人自主研究与探索，18岁是项目保守范围，不是原作者适用年龄阈值。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "minAge": 18
+    },
+    "administration": {
+      "itemCount": 92,
+      "estimatedMinutes": 20,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "原版未规定回顾时段；活动喜欢程度",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保留官方92题顺序、5档喜欢程度和8个不同题数维度，不误用人格符合度锚点。",
+        "既有全局指导语及项目情境说明已从首题前缀独立绑定到instruction，92道活动题各自的“我想要……”保留；明确数字呈现变化，不宣称平台版式已验证。",
+        "20分钟为项目阅读负担估计，不是原文标准时长。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "当前中文译稿的心理测量属性未验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "IPIP官方ORVIS92英文题本的独立简体中文工作译稿，非官方中文版。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "独立工作译稿，尚未回译、专家审校或开展中文版效度研究。保留原题美国语境（州长、参议员、赏金猎人等），未用本地职业替换；文化适配未完成。 原指导语及项目情境说明已独立绑定到instruction，各题“我想要……”保留，保留北美职业语境，不宣称文化适配或本地验证完成。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "orvis92_zh_cn_research-1.0.1",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": [],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    }
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "orvis92_zh_cn_research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "orvis92_zh_cn_research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "官方IPIP公共领域ORVIS题项可复制、翻译及商用/非商用：https://ipip.ori.org/newPermission.htm ，https://ipip.ori.org/ 。不是CISS许可，不复制受限论文排版。",
+      "当前中文只作成人探索与研究，不用于招聘、教育选拔、职业推荐裁决或能力评分。",
+      "八维独立均分，若宿主选择单一mainScore，只能表示其实际带领与影响维度，不能称整体职业兴趣分；本包不新增总分。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "PUBLISHED",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "Oregon Vocational Interest Scales",
+        "citation": "Pozzebon, J. A., Visser, B. A., Ashton, M. C., Lee, K., & Goldberg, L. R. (2010). Psychometric characteristics of a public-domain self-report measure of vocational interests: The Oregon Vocational Interest Scales. Journal of Personality Assessment, 92(2), 168–174.",
+        "url": "https://ipip.ori.org/newORVISSurvey.htm"
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "Exact IPIP ORVIS items are public domain; https://ipip.ori.org/newPermission.htm permits any commercial or noncommercial purpose; https://ipip.ori.org/ permits translation. Independent Chinese working translation, no author endorsement."
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "orvis_liking",
+          "options": [
+            {
+              "value": "1",
+              "label": "非常不喜欢",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "不喜欢",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "中立",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "喜欢",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "非常喜欢",
+              "score": 5
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "ORVIS_01",
+          "content": "我想要……推动重要的事情实现",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_02",
+          "content": "我想要……担任一家公司的财务主管",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_03",
+          "content": "我想要……帮助他人学习新观念",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_04",
+          "content": "我想要……创作艺术作品",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_05",
+          "content": "我想要……成为化学家",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_06",
+          "content": "我想要……照料牛或马",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_07",
+          "content": "我想要……成为职业运动员",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_08",
+          "content": "我想要……从事笔译或口译工作",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_09",
+          "content": "我想要……带领其他人",
+          "type": "single",
+          "required": true,
+          "sortOrder": 8,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_10",
+          "content": "我想要……担任办公室经理",
+          "type": "single",
+          "required": true,
+          "sortOrder": 9,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_11",
+          "content": "我想要……照顾病人",
+          "type": "single",
+          "required": true,
+          "sortOrder": 10,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_12",
+          "content": "我想要……设计新的时装款式",
+          "type": "single",
+          "required": true,
+          "sortOrder": 11,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_13",
+          "content": "我想要……设计实验室实验",
+          "type": "single",
+          "required": true,
+          "sortOrder": 12,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_14",
+          "content": "我想要……从事农业生产",
+          "type": "single",
+          "required": true,
+          "sortOrder": 13,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_15",
+          "content": "我想要……参与令人兴奋的探险",
+          "type": "single",
+          "required": true,
+          "sortOrder": 14,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_16",
+          "content": "我想要……担任图书馆员",
+          "type": "single",
+          "required": true,
+          "sortOrder": 15,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_17",
+          "content": "我想要……担任销售或市场营销总监",
+          "type": "single",
+          "required": true,
+          "sortOrder": 16,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_18",
+          "content": "我想要……编制预算",
+          "type": "single",
+          "required": true,
+          "sortOrder": 17,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_19",
+          "content": "我想要……成为小学教师",
+          "type": "single",
+          "required": true,
+          "sortOrder": 18,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_20",
+          "content": "我想要……成为职业舞蹈演员",
+          "type": "single",
+          "required": true,
+          "sortOrder": 19,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_21",
+          "content": "我想要……成为数学家",
+          "type": "single",
+          "required": true,
+          "sortOrder": 20,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_22",
+          "content": "我想要……建造新的建筑物",
+          "type": "single",
+          "required": true,
+          "sortOrder": 21,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_23",
+          "content": "我想要……在荒野中求生",
+          "type": "single",
+          "required": true,
+          "sortOrder": 22,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_24",
+          "content": "我想要……成为英语教授",
+          "type": "single",
+          "required": true,
+          "sortOrder": 23,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_25",
+          "content": "我想要……担任一家大型公司的首席执行官",
+          "type": "single",
+          "required": true,
+          "sortOrder": 24,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_26",
+          "content": "我想要……拟订财务合同",
+          "type": "single",
+          "required": true,
+          "sortOrder": 25,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_27",
+          "content": "我想要……成为社会工作者",
+          "type": "single",
+          "required": true,
+          "sortOrder": 26,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_28",
+          "content": "我想要……创作短篇故事或长篇小说",
+          "type": "single",
+          "required": true,
+          "sortOrder": 27,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_29",
+          "content": "我想要……向他人解释科学概念",
+          "type": "single",
+          "required": true,
+          "sortOrder": 28,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_30",
+          "content": "我想要……成为护林员",
+          "type": "single",
+          "required": true,
+          "sortOrder": 29,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_31",
+          "content": "我想要……成为赛车手",
+          "type": "single",
+          "required": true,
+          "sortOrder": 30,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_32",
+          "content": "我想要……编制文字谜题",
+          "type": "single",
+          "required": true,
+          "sortOrder": 31,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_33",
+          "content": "我想要……组织政治竞选活动",
+          "type": "single",
+          "required": true,
+          "sortOrder": 32,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_34",
+          "content": "我想要……建立办公室档案管理系统",
+          "type": "single",
+          "required": true,
+          "sortOrder": 33,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_35",
+          "content": "我想要……成为牧师、神父、拉比或其他宗教教师",
+          "type": "single",
+          "required": true,
+          "sortOrder": 34,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_36",
+          "content": "我想要……在交响乐团中演奏乐器",
+          "type": "single",
+          "required": true,
+          "sortOrder": 35,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_37",
+          "content": "我想要……成为物理学家",
+          "type": "single",
+          "required": true,
+          "sortOrder": 36,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_38",
+          "content": "我想要……栽培植物",
+          "type": "single",
+          "required": true,
+          "sortOrder": 37,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_39",
+          "content": "我想要……面对人身危险",
+          "type": "single",
+          "required": true,
+          "sortOrder": 38,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_40",
+          "content": "我想要……编辑报纸",
+          "type": "single",
+          "required": true,
+          "sortOrder": 39,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_41",
+          "content": "我想要……担任会议主持人",
+          "type": "single",
+          "required": true,
+          "sortOrder": 40,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_42",
+          "content": "我想要……监督他人的工作",
+          "type": "single",
+          "required": true,
+          "sortOrder": 41,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_43",
+          "content": "我想要……为需要帮助的人提供咨询",
+          "type": "single",
+          "required": true,
+          "sortOrder": 42,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_44",
+          "content": "我想要……重新装饰自己的房子",
+          "type": "single",
+          "required": true,
+          "sortOrder": 43,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_45",
+          "content": "我想要……开展医学研究",
+          "type": "single",
+          "required": true,
+          "sortOrder": 44,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_46",
+          "content": "我想要……在大自然中散步",
+          "type": "single",
+          "required": true,
+          "sortOrder": 45,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_47",
+          "content": "我想要……成为军官",
+          "type": "single",
+          "required": true,
+          "sortOrder": 46,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_48",
+          "content": "我想要……掌握多种语言",
+          "type": "single",
+          "required": true,
+          "sortOrder": 47,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_49",
+          "content": "我想要……策划广告宣传活动",
+          "type": "single",
+          "required": true,
+          "sortOrder": 48,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_50",
+          "content": "我想要……规划投资策略",
+          "type": "single",
+          "required": true,
+          "sortOrder": 49,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_51",
+          "content": "我想要……指导父母照顾孩子",
+          "type": "single",
+          "required": true,
+          "sortOrder": 50,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_52",
+          "content": "我想要……为博物馆挑选艺术作品",
+          "type": "single",
+          "required": true,
+          "sortOrder": 51,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_53",
+          "content": "我想要……成为科学记者",
+          "type": "single",
+          "required": true,
+          "sortOrder": 52,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_54",
+          "content": "我想要……做木工",
+          "type": "single",
+          "required": true,
+          "sortOrder": 53,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_55",
+          "content": "我想要……参加体育竞赛",
+          "type": "single",
+          "required": true,
+          "sortOrder": 54,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_56",
+          "content": "我想要……成为驻外记者",
+          "type": "single",
+          "required": true,
+          "sortOrder": 55,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_57",
+          "content": "我想要……在公开会议上就议题进行辩论",
+          "type": "single",
+          "required": true,
+          "sortOrder": 56,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_58",
+          "content": "我想要……制订时间安排",
+          "type": "single",
+          "required": true,
+          "sortOrder": 57,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_59",
+          "content": "我想要……成为医生或护士",
+          "type": "single",
+          "required": true,
+          "sortOrder": 58,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_60",
+          "content": "我想要……以歌唱为职业",
+          "type": "single",
+          "required": true,
+          "sortOrder": 59,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_61",
+          "content": "我想要……解答复杂的谜题",
+          "type": "single",
+          "required": true,
+          "sortOrder": 60,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_62",
+          "content": "我想要……种花",
+          "type": "single",
+          "required": true,
+          "sortOrder": 61,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_63",
+          "content": "我想要……成为赏金猎人",
+          "type": "single",
+          "required": true,
+          "sortOrder": 62,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_64",
+          "content": "我想要……就任何话题流畅地表达",
+          "type": "single",
+          "required": true,
+          "sortOrder": 63,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_65",
+          "content": "我想要……说服他人改变观点",
+          "type": "single",
+          "required": true,
+          "sortOrder": 64,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_66",
+          "content": "我想要……监控企业开支",
+          "type": "single",
+          "required": true,
+          "sortOrder": 65,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_67",
+          "content": "我想要……成为物理治疗师",
+          "type": "single",
+          "required": true,
+          "sortOrder": 66,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_68",
+          "content": "我想要……成为演员",
+          "type": "single",
+          "required": true,
+          "sortOrder": 67,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_69",
+          "content": "我想要……开发计算机程序",
+          "type": "single",
+          "required": true,
+          "sortOrder": 68,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_70",
+          "content": "我想要……修理汽车或卡车",
+          "type": "single",
+          "required": true,
+          "sortOrder": 69,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_71",
+          "content": "我想要……进行长途骑行",
+          "type": "single",
+          "required": true,
+          "sortOrder": 70,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_72",
+          "content": "我想要……阅读许多书籍",
+          "type": "single",
+          "required": true,
+          "sortOrder": 71,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_73",
+          "content": "我想要……成为州长或参议员",
+          "type": "single",
+          "required": true,
+          "sortOrder": 72,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_74",
+          "content": "我想要……担任采购员",
+          "type": "single",
+          "required": true,
+          "sortOrder": 73,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_75",
+          "content": "我想要……给他人安慰和支持",
+          "type": "single",
+          "required": true,
+          "sortOrder": 74,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_76",
+          "content": "我想要……成为艺术家或建筑师",
+          "type": "single",
+          "required": true,
+          "sortOrder": 75,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_77",
+          "content": "我想要……成为统计学家",
+          "type": "single",
+          "required": true,
+          "sortOrder": 76,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_78",
+          "content": "我想要……使用工具和机器工作",
+          "type": "single",
+          "required": true,
+          "sortOrder": 77,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_79",
+          "content": "我想要……成为警察",
+          "type": "single",
+          "required": true,
+          "sortOrder": 78,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_80",
+          "content": "我想要……写日记或日志",
+          "type": "single",
+          "required": true,
+          "sortOrder": 79,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_81",
+          "content": "我想要……竞选公职",
+          "type": "single",
+          "required": true,
+          "sortOrder": 80,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_82",
+          "content": "我想要……跟踪一家公司的库存情况",
+          "type": "single",
+          "required": true,
+          "sortOrder": 81,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_83",
+          "content": "我想要……参加慈善活动",
+          "type": "single",
+          "required": true,
+          "sortOrder": 82,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_84",
+          "content": "我想要……出演戏剧",
+          "type": "single",
+          "required": true,
+          "sortOrder": 83,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_85",
+          "content": "我想要……设计互联网网页",
+          "type": "single",
+          "required": true,
+          "sortOrder": 84,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_86",
+          "content": "我想要……作出影响许多人的决定",
+          "type": "single",
+          "required": true,
+          "sortOrder": 85,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_87",
+          "content": "我想要……管理计算机数据库",
+          "type": "single",
+          "required": true,
+          "sortOrder": 86,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_88",
+          "content": "我想要……帮助他人作出职业决定",
+          "type": "single",
+          "required": true,
+          "sortOrder": 87,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_89",
+          "content": "我想要……创作歌曲",
+          "type": "single",
+          "required": true,
+          "sortOrder": 88,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_90",
+          "content": "我想要……保存详细记录",
+          "type": "single",
+          "required": true,
+          "sortOrder": 89,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_91",
+          "content": "我想要……成为咨询师或治疗师",
+          "type": "single",
+          "required": true,
+          "sortOrder": 90,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ORVIS_92",
+          "content": "我想要……绘画或素描",
+          "type": "single",
+          "required": true,
+          "sortOrder": 91,
+          "responseSetKey": "orvis_liking",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "ORVIS_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_06",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_07",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_08",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_09",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_10",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_11",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_12",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_13",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_14",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_15",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_16",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_17",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_18",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_19",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_20",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_21",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_22",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_23",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_24",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_25",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_26",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_27",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_28",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_29",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_30",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_31",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_32",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_33",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_34",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_35",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_36",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_37",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_38",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_39",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_40",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_41",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_42",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_43",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_44",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_45",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_46",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_47",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_48",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_49",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_50",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_51",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_52",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_53",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_54",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_55",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_56",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_57",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_58",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_59",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_60",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_61",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_62",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_63",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_64",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_65",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_66",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_67",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_68",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_69",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_70",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_71",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_72",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_73",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_74",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_75",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_76",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_77",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_78",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_79",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_80",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_81",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_82",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_83",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_84",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_85",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_86",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_87",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_88",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_89",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_90",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_91",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ORVIS_92",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "leadership",
+            "type": "dimension",
+            "label": "带领与影响",
+            "description": "对带领与影响相关活动的平均喜欢程度，不是能力、品格或职业适配。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "ORVIS_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_17",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_25",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_33",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_41",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_49",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_57",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_65",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_73",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_81",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_86",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "organization",
+            "type": "dimension",
+            "label": "组织与安排",
+            "description": "对组织与安排相关活动的平均喜欢程度，不是能力、品格或职业适配。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "ORVIS_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_10",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_18",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_26",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_34",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_42",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_50",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_58",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_66",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_74",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_82",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_87",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_90",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "altruism",
+            "type": "dimension",
+            "label": "助人与照顾",
+            "description": "对助人与照顾相关活动的平均喜欢程度，不是能力、品格或职业适配。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "ORVIS_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_11",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_19",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_27",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_35",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_43",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_51",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_59",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_67",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_75",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_83",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_88",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_91",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "creativity",
+            "type": "dimension",
+            "label": "艺术与创作",
+            "description": "对艺术与创作相关活动的平均喜欢程度，不是能力、品格或职业适配。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "ORVIS_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_12",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_20",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_28",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_36",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_44",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_52",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_60",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_68",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_76",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_84",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_85",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_89",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_92",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "analysis",
+            "type": "dimension",
+            "label": "分析与探究",
+            "description": "对分析与探究相关活动的平均喜欢程度，不是能力、品格或职业适配。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "ORVIS_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_13",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_21",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_29",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_37",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_45",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_53",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_61",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_69",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_77",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "production",
+            "type": "dimension",
+            "label": "动手与自然",
+            "description": "对动手与自然相关活动的平均喜欢程度，不是能力、品格或职业适配。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "ORVIS_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_14",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_22",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_30",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_38",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_46",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_54",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_62",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_70",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_78",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "adventure",
+            "type": "dimension",
+            "label": "运动与冒险",
+            "description": "对运动与冒险相关活动的平均喜欢程度，不是能力、品格或职业适配。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "ORVIS_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_15",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_23",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_31",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_39",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_47",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_55",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_63",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_71",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_79",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "erudition",
+            "type": "dimension",
+            "label": "语言与阅读",
+            "description": "对语言与阅读相关活动的平均喜欢程度，不是能力、品格或职业适配。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "ORVIS_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_16",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_24",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_32",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_40",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_48",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_56",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_64",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_72",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ORVIS_80",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.1.0",
+        "primaryScoreKeys": [
+          "leadership",
+          "organization",
+          "altruism",
+          "creativity",
+          "analysis",
+          "production",
+          "adventure",
+          "erudition"
+        ],
+        "scoreOrder": [
+          "leadership",
+          "organization",
+          "altruism",
+          "creativity",
+          "analysis",
+          "production",
+          "adventure",
+          "erudition"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "leadership",
+            "headline": "带领与影响：喜欢推动，不等于擅长管理",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这份报告带走一句话：用兴趣提出探索问题，不用它替自己选定职业。\n\n八类活动各取1–5喜欢程度均分，没有总分、职业适配率或固定回顾期；越大表示对相应一组活动平均更喜欢，不是能力更强。以下只是自愿探索的场景，不是个人结论。\n\n带领与影响包括提出方向、主持、说服和推动事情。例如，筹备活动时享受提出方案，可以回顾是否喜欢这个过程；它不证明管理能力、社会地位或一定适合某职位。已有喜欢的角色可保留，不需要因此承担领导责任。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回想一次自愿参与的小事，分开自己喜欢的环节与“听起来有地位”的角色。若愿意，可试提一个方案，再看实际体验，不承担超出权限或经验的责任。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "organization",
+            "headline": "组织与安排：喜欢有序过程，不是细心考试",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这一项越大，表示平均更喜欢预算、记录、流程、数据与时间安排类活动，不是更自律、细心或适合财务岗位。\n\n例如，为一次出行排日程和预算，可能有趣，也可能只是不得不做；场景并不代表你的偏好。兴趣与熟练、责任和资源条件要分开。\n\n已有顺手方式可保留；不喜欢安排也不等于做不好，不必把生活管理得更复杂来证明分数。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "strategy",
+                "text": "在愿意且低负担时，为一件普通小事做个简单安排，留意喜欢的是整理、核对还是完成后的方便。只了解过程，不用真实投资、公司数据或重大责任试兴趣。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "altruism",
+            "headline": "助人与照顾：偏好不决定善意",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这一项越大，表示更喜欢教学、照顾、咨询与支持等活动，不是更善良或已经具备专业照护能力。\n\n例如，享受把一个熟悉概念讲清楚，是可能的入口，不是系统认定你适合教学或医疗职业。喜欢与现实培训、资质、劳动条件不同。\n\n已有有边界的帮助可保留；不喜欢某类助人活动也不代表冷漠，更不要求牺牲自己来证实关心。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "strategy",
+                "text": "对方愿意时，可分享一个熟悉的小技能或提供一项力所能及的帮助，然后留意过程是否合适。保留双方边界，不承担医疗、心理或其他专业职责来试兴趣。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "creativity",
+            "headline": "艺术与创作：看过程吸引力，不评作品高下",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这一项越大，表示对写作、设计、表演、绘画等一组创作活动平均更喜欢，不是天赋、作品质量或创造力考试。\n\n例如，画一张小图和登台表演可能吸引力不同，一个均分装不下所有偏好；这也不是问卷已查到你的具体组合。\n\n喜欢的创作可以继续，不需要先有拿得出手的成品；暂时没兴趣也不用硬培养成职业方向。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "strategy",
+                "text": "若愿意，选一种低成本材料写几句或做个小作品，不公开也可以。只留意过程哪一段想继续，不比较成品，不用购买昂贵设备来验证兴趣。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "analysis",
+            "headline": "分析与探究：想研究，不是智力分数",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这一项越大，表示平均更喜欢科学问题、实验设计、数学、程序或复杂谜题，不等于客观分析能力、学业成绩或科研潜力更高。\n\n例如，想找证据解释一个生活现象，是可能的兴趣入口；问卷没有证明你会怎样研究。熟悉程度与学习机会也会影响想象。\n\n已有想了解的问题可保留，不喜欢某些科学职业名称，也不能推出不能学会相关技能。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "strategy",
+                "text": "选一个安全的小问题，读一份可靠介绍并写一个仍想核实的问题即可。不做危险实验，不用考试难度、付费课程或职业决定来检验兴趣。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "production",
+            "headline": "动手与自然：不同具体活动可以不同",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这一项越大，表示对植物、自然、制作、机械与工具等活动平均更喜欢，不是动手能力、体力或某类劳动身份评价。\n\n例如，喜欢照料植物却不想修车，都可能出现在同一组；一个均分不能替这些活动各作结论。这只是说明组合的例子。\n\n已有合适活动可保留，也不需要按性别或职业刻板印象挑选。陌生可能只是缺少体验，不能被叫作不适合。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "strategy",
+                "text": "想了解时先从安全、低成本且愿意的一种体验入手，如观察植物或简单拼装。工具与机器需相应安全条件，不因兴趣分尝试没有准备的操作。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "adventure",
+            "headline": "运动与冒险：偏好不能换成危险任务",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这一项越大，表示对运动、挑战及部分有风险的职业想象平均更喜欢，不是更勇敢、身体更强或能安全处理危险。\n\n例如，喜欢体育竞赛与想从事危险职业并不一样，均分不能给每个活动作资格判断。题中保留北美职业语境，陌生不等于缺点。\n\n现有安全偏好可以保留。不想冒险也不必补齐胆量，更不能用危险行为证明问卷结果。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "strategy",
+                "text": "若愿意探索挑战感，只选规则清楚、量力而行、风险低且可退出的活动，并遵守安全要求。不要尝试危险职业情境或极限行为来验证偏好。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "erudition",
+            "headline": "语言与阅读：喜欢交流，不是文化水平排名",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这一项越大，表示对语言、阅读、写作、编辑和知识交流类活动平均更喜欢，不是掌握语言多少或文化水平更高。\n\n例如，喜欢读短文却不喜欢公开表达，可能同时存在，均分不能把它们都说成擅长；这只是解释兴趣多样的场景。\n\n已有喜欢的阅读或表达方式可保留。兴趣可变化，不需要为了量表名称变成博学的人，或据此决定专业。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "strategy",
+                "text": "从愿意的主题读一小段、写几句观察或了解一个外语表达，留意哪种过程吸引自己。无须一次尝试全部，不以阅读量或语言考试成绩证明偏好。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "本独立中文稿未验证，北美情境尚未文化适配；八项仅为兴趣，不用于能力排名、职业推荐裁决或录用。"
+        ],
+        "disclaimer": "这份中文题本是尚未验证的工作译稿。结果只整理这一次的兴趣自述，不测能力、人格好坏或职业适配，也不能决定选科、升学、录用、晋升或职业资格。兴趣会随体验与环境改变。 八维独立，不提供职业推荐裁决。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted editorial self-review for standard R1.1.0; not human expert approval",
+            "reviewedAt": "2026-10-29T16:52:24Z",
+            "basis": "本次AI文字自审对应orvis92_zh_cn_research的标准增强版R1.1.0：独立读取当前source题本、指导语、计分、参数、报告、受众与既有本地审计；核对真实分数范围/方向、固定解释与假设例子、可选行动、简短边界及未改动scoreKey/source/bands。仅作报告文字自审，不是人工专家、作者、译审或本地效度批准；未运行schema validator、计分器、golden、PG、报告渲染、CI或DB。"
+          }
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "orvis92",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "ORVIS_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_15",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_17",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_18",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_19",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_20",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_21",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_22",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_23",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_24",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_25",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_26",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_27",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_28",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_29",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_30",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_31",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_32",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_33",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_34",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_35",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_36",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_37",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_38",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_39",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_40",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_41",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_42",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_43",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_44",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_45",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_46",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_47",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_48",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_49",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_50",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_51",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_52",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_53",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_54",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_55",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_56",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_57",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_58",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_59",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_60",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_61",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_62",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_63",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_64",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_65",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_66",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_67",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_68",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_69",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_70",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_71",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_72",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_73",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_74",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_75",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_76",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_77",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_78",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_79",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_80",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_81",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_82",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_83",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_84",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_85",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_86",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_87",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_88",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_89",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_90",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_91",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_92",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "leadership": 1.0,
+            "organization": 1.0,
+            "altruism": 1.0,
+            "creativity": 1.0,
+            "analysis": 1.0,
+            "production": 1.0,
+            "adventure": 1.0,
+            "erudition": 1.0
+          },
+          "totalScoreKeys": [
+            "leadership",
+            "organization",
+            "altruism",
+            "creativity",
+            "analysis",
+            "production",
+            "adventure",
+            "erudition"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "ORVIS_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_07",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_08",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_09",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_10",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_11",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_12",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_13",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_14",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_15",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_16",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_17",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_18",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_19",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_20",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_21",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_22",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_23",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_24",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_25",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_26",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_27",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_28",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_29",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_30",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_31",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_32",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_33",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_34",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_35",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_36",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_37",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_38",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_39",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_40",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_41",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_42",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_43",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_44",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_45",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_46",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_47",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_48",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_49",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_50",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_51",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_52",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_53",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_54",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_55",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_56",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_57",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_58",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_59",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_60",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_61",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_62",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_63",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_64",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_65",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_66",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_67",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_68",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_69",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_70",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_71",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_72",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_73",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_74",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_75",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_76",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_77",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_78",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_79",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_80",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_81",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_82",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_83",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_84",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_85",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_86",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_87",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_88",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_89",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_90",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_91",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_92",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "leadership": 5.0,
+            "organization": 5.0,
+            "altruism": 5.0,
+            "creativity": 5.0,
+            "analysis": 5.0,
+            "production": 5.0,
+            "adventure": 5.0,
+            "erudition": 5.0
+          },
+          "totalScoreKeys": [
+            "leadership",
+            "organization",
+            "altruism",
+            "creativity",
+            "analysis",
+            "production",
+            "adventure",
+            "erudition"
+          ]
+        }
+      },
+      {
+        "name": "neutral",
+        "answers": [
+          {
+            "itemCode": "ORVIS_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_12",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_14",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_15",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_16",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_17",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_18",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_19",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_20",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_21",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_22",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_23",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_24",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_25",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_26",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_27",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_28",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_29",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_30",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_31",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_32",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_33",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_34",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_35",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_36",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_37",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_38",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_39",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_40",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_41",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_42",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_43",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_44",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_45",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_46",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_47",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_48",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_49",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_50",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_51",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_52",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_53",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_54",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_55",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_56",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_57",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_58",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_59",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_60",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_61",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_62",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_63",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_64",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_65",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_66",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_67",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_68",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_69",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_70",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_71",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_72",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_73",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_74",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_75",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_76",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_77",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_78",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_79",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_80",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_81",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_82",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_83",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_84",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_85",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_86",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_87",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_88",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_89",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_90",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_91",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_92",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "leadership": 3.0,
+            "organization": 3.0,
+            "altruism": 3.0,
+            "creativity": 3.0,
+            "analysis": 3.0,
+            "production": 3.0,
+            "adventure": 3.0,
+            "erudition": 3.0
+          },
+          "totalScoreKeys": [
+            "leadership",
+            "organization",
+            "altruism",
+            "creativity",
+            "analysis",
+            "production",
+            "adventure",
+            "erudition"
+          ]
+        }
+      },
+      {
+        "name": "mixed",
+        "answers": [
+          {
+            "itemCode": "ORVIS_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "ORVIS_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ORVIS_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_07",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "ORVIS_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_09",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ORVIS_10",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_12",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "ORVIS_13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_14",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ORVIS_15",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_17",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "ORVIS_18",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_19",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ORVIS_20",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_21",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_22",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "ORVIS_23",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_24",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ORVIS_25",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_26",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_27",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "ORVIS_28",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_29",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ORVIS_30",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_31",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_32",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "ORVIS_33",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_34",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ORVIS_35",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_36",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_37",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "ORVIS_38",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_39",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ORVIS_40",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_41",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_42",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "ORVIS_43",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_44",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ORVIS_45",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_46",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_47",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "ORVIS_48",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_49",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ORVIS_50",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_51",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_52",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "ORVIS_53",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_54",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ORVIS_55",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_56",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_57",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "ORVIS_58",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_59",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ORVIS_60",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_61",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_62",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "ORVIS_63",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_64",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ORVIS_65",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_66",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_67",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "ORVIS_68",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_69",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ORVIS_70",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_71",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_72",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "ORVIS_73",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_74",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ORVIS_75",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_76",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_77",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "ORVIS_78",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_79",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ORVIS_80",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_81",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_82",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "ORVIS_83",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_84",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ORVIS_85",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_86",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_87",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "ORVIS_88",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ORVIS_89",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ORVIS_90",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "ORVIS_91",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ORVIS_92",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "leadership": 2.6666666666666665,
+            "organization": 3.0,
+            "altruism": 2.8461538461538463,
+            "creativity": 3.2142857142857144,
+            "analysis": 3.0,
+            "production": 3.0,
+            "adventure": 3.0,
+            "erudition": 3.0
+          },
+          "totalScoreKeys": [
+            "leadership",
+            "organization",
+            "altruism",
+            "creativity",
+            "analysis",
+            "production",
+            "adventure",
+            "erudition"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "请使用以下选项，评价你对从事下列活动的喜欢程度。我想要……\n本问卷问的是喜欢程度，不是你现在会不会做、能不能被录用或应不应该选择某个职业。没有尝试过的活动可能较难想象；你可以不完成问卷，不必为了得到结果而猜答。",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "docs/scale-instruments/research-drafts/orvis92/1.0.0/bilingual-content.json#/administration @ b92c69aefa2472775fa7ee86b9c208366886c908；既有全局指导语及项目情境说明从首题前缀独立绑定，各题“我想要……”仍逐字保留。"
+  }
+}

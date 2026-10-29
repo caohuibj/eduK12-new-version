@@ -1,0 +1,2646 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "maia2_37_zh_cn_research",
+    "instrumentVersion": "1.0.1"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "内感受觉察多维评估第2版（MAIA-2，37题独立中文工作稿）",
+      "abbreviation": "MAIA-2-37-ZH-WORKING",
+      "instrumentFamily": "Multidimensional Assessment of Interoceptive Awareness (MAIA)"
+    },
+    "construct": {
+      "primaryDomain": "SELF_REGULATION",
+      "secondaryDomains": [
+        "WELL_BEING",
+        "SOCIAL_EMOTIONAL"
+      ],
+      "constructDefinition": "通过自我报告描述觉察身体感觉、回应不适、调节注意、了解身体与情绪联系、借助身体安顿自己、倾听与信任身体等八方面；不等同于客观内感受准确性、身体疾病判断、练习疗效或总体能力。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "maia2_37_zh_cn_research",
+        "domain:interoception",
+        "domain:body_awareness",
+        "domain:self_regulation",
+        "domain:well_being",
+        "construct:interoceptive_awareness",
+        "construct:interoceptive_sensibility",
+        "construct:noticing",
+        "construct:not_distracting",
+        "construct:not_worrying",
+        "construct:attention_regulation",
+        "construct:emotional_awareness",
+        "construct:self_regulation",
+        "construct:body_listening",
+        "construct:trusting",
+        "orientation:multidimensional_interoception",
+        "orientation:mind_body_research",
+        "orientation:not_therapy_specific",
+        "population:adult_18_plus",
+        "population:source_uk_adults_18_to_69",
+        "population:self_report",
+        "population:not_k12_validated",
+        "response:self",
+        "response:digital_self",
+        "response:paper",
+        "response:37_items",
+        "response:six_point_0_to_5",
+        "response:intermediate_anchors_unlabeled",
+        "response:nine_reverse_items",
+        "response:fixed_order",
+        "response:eight_facet_means",
+        "response:no_total_score",
+        "response:complete_facet_project_missing_policy",
+        "use:research",
+        "use:individual_reflection",
+        "use:not_diagnostic",
+        "use:not_objective_interoceptive_accuracy_test",
+        "use:not_high_stakes_selection",
+        "license:cc_by_4_0",
+        "license:attribution_required",
+        "license:changes_indicated",
+        "license:redistribution_allowed",
+        "license:adaptation_allowed",
+        "license:commercial_reuse_allowed",
+        "license:record_copy_request_not_prior_approval",
+        "language_validation:source_english",
+        "language_validation:independent_zh_cn_working_translation",
+        "language_validation:distinct_from_pang_li2020",
+        "language_validation:distinct_from_teng2022_31_item",
+        "language_validation:expert_review_pending",
+        "language_validation:china_validation_not_established",
+        "内感受",
+        "身体觉察",
+        "身体感觉",
+        "呼吸觉察",
+        "不分心",
+        "不担忧",
+        "注意调节",
+        "情绪觉察",
+        "自我调节",
+        "身体倾听",
+        "身体信任",
+        "成人自评",
+        "独立中文工作译稿",
+        "无总分",
+        "非诊断"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "原英语开发研究为英国伦敦科学博物馆便利样本N=1090，18–69岁；只纳入成人分析。项目保守限定18岁及以上成人自评，18岁是使用政策下限，不证明所有中国成人适用，也不将MAIA-Y年龄或中文31题验证人群并入。"
+    },
+    "administration": {
+      "itemCount": 37,
+      "estimatedMinutes": 8,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "一般日常生活中的频率（generally in daily life）；无固定回顾天数，不增设最近一周等时间窗。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "固定2018原论文Table 2的完整37题顺序，八维4/6/5/7/5/4/3/3；不混原32题、青年版或中文31题。",
+        "六点原值0/1/2/3/4/5，仅两端标0 Never、5 Always；中间选项保留数字，不发明频率文字。",
+        "反向题5、6、7、8、9、10、11、12、15换算5减原值；每个分量表等权均分，无整体总分。",
+        "第9题严格采用Table2原文末尾something，不无声补else；论文正文另有else，UCSF PDF与S1题本无else。",
+        "Table2部分标点与PDF/S1不同，全部题文固定同一Table2载体；不逐题拼接来源。",
+        "作者未规定个人分数缺失阈值，本项目保守要求每个分量表完整作答，不插补；原论文统计处理不是个人施测缺失规则。",
+        "独立指导语见administration.md与PREPARED sidecar；旧schema无instruction字段，不拼入第1题，不声称浏览器已经展示。",
+        "8分钟是平台估计，并非原作者实测。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "源英语37题有成人结构与内部一致性证据，独立中文工作稿不继承现成中文版本验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "帮助回顾日常身体觉察方式，不作疾病判断、客观内感受能力检验或练习效果结论。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "maia2-mehling2018-en-structure",
+        "evidenceType": "STRUCTURAL_VALIDITY",
+        "population": "英国伦敦科学博物馆成年便利样本，能理解英语；60%英语母语",
+        "ageRange": "18–69岁",
+        "locale": "en",
+        "territory": "GB",
+        "sampleSize": 1090,
+        "studyDesign": "从32+6项中保留37题；随机分半样本做探索聚类和CFA，每半545人；八因子模型，未建立本中文稿证据。",
+        "rating": "MIXED",
+        "citation": "Mehling, W. E., Acree, M., Stewart, A., Silas, J., & Jones, A. (2018). The Multidimensional Assessment of Interoceptive Awareness, Version 2 (MAIA-2). PLoS ONE, 13(12), e0208034. https://doi.org/10.1371/journal.pone.0208034.",
+        "doi": "10.1371/journal.pone.0208034",
+        "url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0208034",
+        "notes": "八维结构的CFI=.860/TLI=.845，RMSEA=.055/SRMR=.064；作者按预设至少两项达标接受，不夸大所有指标良好。"
+      },
+      {
+        "evidenceId": "maia2-mehling2018-en-reliability",
+        "evidenceType": "INTERNAL_CONSISTENCY",
+        "population": "同一英国成人样本，非中国人群",
+        "locale": "en",
+        "territory": "GB",
+        "sampleSize": 1090,
+        "studyDesign": "八维α=.64–.83；Noticing与Not-Worrying低于.70，不冒称所有分量表内部一致性充分。",
+        "rating": "MIXED",
+        "citation": "Mehling, W. E., Acree, M., Stewart, A., Silas, J., & Jones, A. (2018). The Multidimensional Assessment of Interoceptive Awareness, Version 2 (MAIA-2). PLoS ONE, 13(12), e0208034. https://doi.org/10.1371/journal.pone.0208034.",
+        "doi": "10.1371/journal.pone.0208034",
+        "url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0208034",
+        "notes": "自我报告不等于客观内感受准确性；无中国常模/临床界值可绑定。Teng2022的31题七因子证据不用于本37题独立译稿。"
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Mehling等2018 PLOS ONE原版Table 2完整37题，原出版商JATS XML固定载体；指导语与评分另由同论文S1/UCSF英文题本核对事实。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "平台独立中文工作译稿；不是庞娇艳/李惠2020现成中文译本，不共享该序列，也不继承Teng等2022删为31题七因子的验证。专家审校PENDING、认知访谈NOT_ESTABLISHED、中国验证NOT_ESTABLISHED。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "maia2_37_zh_cn_research-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": [],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    }
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "maia2_37_zh_cn_research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "maia2_37_zh_cn_research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "translation",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "© 2018 Mehling et al. (Wolf E. Mehling, Michael Acree, Anita Stewart, Jonathan Silas, Alexander Jones). Mehling, W. E., Acree, M., Stewart, A., Silas, J., & Jones, A. (2018). The Multidimensional Assessment of Interoceptive Awareness, Version 2 (MAIA-2). PLoS ONE, 13(12), e0208034. https://doi.org/10.1371/journal.pone.0208034. 固定题文取自原出版商Table 2完整37项，CC BY 4.0（https://creativecommons.org/licenses/by/4.0/），表内未发现单独排除声明。中文题文、选项与指导语为EDUK12.TOP独立工作翻译，报告为平台原创；改动为语言转换与保守成人/缺失使用约定，未经作者认可。与庞娇艳/李惠2020官方既有37题译文、Teng等2022删为31题的验证版本均独立，不复制其题文或继承其验证。原论文称MAIA-2 public domain；UCSF题本仍署版权，并请求修改/新译后向作者提供记录副本。本稿基于Table2的CC授权，不将该记录请求改写为预先批准条件；本轮未联系作者或提交译本。署名、来源、许可链接及改动说明须随再分发保留。",
+      "版权标签只作检索分类；系统实际授权沿用既有事实源。DRAFT/CANDIDATE不能据文件存在激活发放。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "PUBLISHED",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "MAIA-2 adult English 37-item Table 2 (Mehling et al., 2018); independent Chinese working translation",
+        "citation": "Mehling, W. E., Acree, M., Stewart, A., Silas, J., & Jones, A. (2018). The Multidimensional Assessment of Interoceptive Awareness, Version 2 (MAIA-2). PLoS ONE, 13(12), e0208034. https://doi.org/10.1371/journal.pone.0208034.",
+        "url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0208034",
+        "publicationYear": 2018
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "© 2018 Mehling et al. (Wolf E. Mehling, Michael Acree, Anita Stewart, Jonathan Silas, Alexander Jones). Mehling, W. E., Acree, M., Stewart, A., Silas, J., & Jones, A. (2018). The Multidimensional Assessment of Interoceptive Awareness, Version 2 (MAIA-2). PLoS ONE, 13(12), e0208034. https://doi.org/10.1371/journal.pone.0208034. 固定题文取自原出版商Table 2完整37项，CC BY 4.0（https://creativecommons.org/licenses/by/4.0/），表内未发现单独排除声明。中文题文、选项与指导语为EDUK12.TOP独立工作翻译，报告为平台原创；改动为语言转换与保守成人/缺失使用约定，未经作者认可。与庞娇艳/李惠2020官方既有37题译文、Teng等2022删为31题的验证版本均独立，不复制其题文或继承其验证。原论文称MAIA-2 public domain；UCSF题本仍署版权，并请求修改/新译后向作者提供记录副本。本稿基于Table2的CC授权，不将该记录请求改写为预先批准条件；本轮未联系作者或提交译本。署名、来源、许可链接及改动说明须随再分发保留。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "maia2_frequency_0_5",
+          "options": [
+            {
+              "value": "0",
+              "label": "从不",
+              "score": 0
+            },
+            {
+              "value": "1",
+              "label": "1",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "2",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "3",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "4",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "总是",
+              "score": 5
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "MAIA2_01",
+          "content": "紧张时，我会注意到身体哪个部位紧绷。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 0,
+          "responseSetKey": "maia2_frequency_0_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MAIA2_02",
+          "content": "身体不舒服时，我会注意到。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 1,
+          "responseSetKey": "maia2_frequency_0_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MAIA2_03",
+          "content": "我会注意到身体哪些部位感觉舒服。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 2,
+          "responseSetKey": "maia2_frequency_0_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MAIA2_04",
+          "content": "我会注意到呼吸的变化，例如变慢或变快。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 3,
+          "responseSetKey": "maia2_frequency_0_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MAIA2_05",
+          "content": "我会忽略身体的紧绷或不适，直到它们变得更严重。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 4,
+          "responseSetKey": "maia2_frequency_0_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MAIA2_06",
+          "content": "我会转移注意力，不去感觉身体的不适。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 5,
+          "responseSetKey": "maia2_frequency_0_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MAIA2_07",
+          "content": "感到疼痛或不适时，我会试着硬撑过去。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 6,
+          "responseSetKey": "maia2_frequency_0_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MAIA2_08",
+          "content": "我会试着忽略疼痛",
+          "type": "single",
+          "required": false,
+          "sortOrder": 7,
+          "responseSetKey": "maia2_frequency_0_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MAIA2_09",
+          "content": "我会把注意力集中到某件事情上，来推开不舒服的感觉",
+          "type": "single",
+          "required": false,
+          "sortOrder": 8,
+          "responseSetKey": "maia2_frequency_0_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MAIA2_10",
+          "content": "感到身体不舒服时，我会让自己忙于别的事情，这样就不用感觉到它们。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 9,
+          "responseSetKey": "maia2_frequency_0_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MAIA2_11",
+          "content": "感到身体疼痛时，我会心烦意乱。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 10,
+          "responseSetKey": "maia2_frequency_0_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MAIA2_12",
+          "content": "只要感觉有任何不适，我就开始担心是不是出了什么问题。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 11,
+          "responseSetKey": "maia2_frequency_0_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MAIA2_13",
+          "content": "我能注意到身体不舒服的感觉，而不为此担忧。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 12,
+          "responseSetKey": "maia2_frequency_0_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MAIA2_14",
+          "content": "感到不适或疼痛时，我能保持平静而不担忧。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 13,
+          "responseSetKey": "maia2_frequency_0_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MAIA2_15",
+          "content": "感到不适或疼痛时，我无法把它从脑海中放下",
+          "type": "single",
+          "required": false,
+          "sortOrder": 14,
+          "responseSetKey": "maia2_frequency_0_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MAIA2_16",
+          "content": "我能把注意力放在呼吸上，而不被周围发生的事情分心。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 15,
+          "responseSetKey": "maia2_frequency_0_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MAIA2_17",
+          "content": "即使周围有很多事情发生，我仍能觉察到身体内部的感觉。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 16,
+          "responseSetKey": "maia2_frequency_0_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MAIA2_18",
+          "content": "与人交谈时，我能留意自己的姿势。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 17,
+          "responseSetKey": "maia2_frequency_0_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MAIA2_19",
+          "content": "分心后，我能重新把觉察带回身体。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 18,
+          "responseSetKey": "maia2_frequency_0_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MAIA2_20",
+          "content": "我能把注意力从思考重新转向感受身体。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 19,
+          "responseSetKey": "maia2_frequency_0_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MAIA2_21",
+          "content": "即使身体某个部位疼痛或不适，我仍能觉察整个身体。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 20,
+          "responseSetKey": "maia2_frequency_0_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MAIA2_22",
+          "content": "我能有意识地把身体作为一个整体来关注。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 21,
+          "responseSetKey": "maia2_frequency_0_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MAIA2_23",
+          "content": "生气时，我会注意到身体怎样变化。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 22,
+          "responseSetKey": "maia2_frequency_0_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MAIA2_24",
+          "content": "生活中出了问题时，我能在身体里感觉到。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 23,
+          "responseSetKey": "maia2_frequency_0_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MAIA2_25",
+          "content": "经历平静之后，我会注意到身体的感觉有所不同。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 24,
+          "responseSetKey": "maia2_frequency_0_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MAIA2_26",
+          "content": "感觉舒服时，我会注意到呼吸变得轻松自在。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 25,
+          "responseSetKey": "maia2_frequency_0_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MAIA2_27",
+          "content": "感到高兴或喜悦时，我会注意到身体怎样变化。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 26,
+          "responseSetKey": "maia2_frequency_0_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MAIA2_28",
+          "content": "感到难以应付时，我能在内心找到一处平静。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 27,
+          "responseSetKey": "maia2_frequency_0_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MAIA2_29",
+          "content": "把觉察带到身体上时，我会感到平静。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 28,
+          "responseSetKey": "maia2_frequency_0_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MAIA2_30",
+          "content": "我能通过呼吸减轻紧张。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 29,
+          "responseSetKey": "maia2_frequency_0_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MAIA2_31",
+          "content": "陷入思绪时，我能通过关注身体或呼吸让心静下来。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 30,
+          "responseSetKey": "maia2_frequency_0_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MAIA2_32",
+          "content": "我会倾听身体提供的信息，了解自己的情绪状态。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 31,
+          "responseSetKey": "maia2_frequency_0_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MAIA2_33",
+          "content": "心烦时，我会花时间探索身体的感觉。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 32,
+          "responseSetKey": "maia2_frequency_0_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MAIA2_34",
+          "content": "我会倾听身体，以了解自己该怎样做。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 33,
+          "responseSetKey": "maia2_frequency_0_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MAIA2_35",
+          "content": "待在自己的身体里，我感到自在。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 34,
+          "responseSetKey": "maia2_frequency_0_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MAIA2_36",
+          "content": "我感觉身体是一个安全的地方。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 35,
+          "responseSetKey": "maia2_frequency_0_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MAIA2_37",
+          "content": "我信任身体的感觉。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 36,
+          "responseSetKey": "maia2_frequency_0_5",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "MAIA2_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MAIA2_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MAIA2_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MAIA2_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MAIA2_05",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "MAIA2_06",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "MAIA2_07",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "MAIA2_08",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "MAIA2_09",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "MAIA2_10",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "MAIA2_11",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "MAIA2_12",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "MAIA2_13",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MAIA2_14",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MAIA2_15",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "MAIA2_16",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MAIA2_17",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MAIA2_18",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MAIA2_19",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MAIA2_20",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MAIA2_21",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MAIA2_22",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MAIA2_23",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MAIA2_24",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MAIA2_25",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MAIA2_26",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MAIA2_27",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MAIA2_28",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MAIA2_29",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MAIA2_30",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MAIA2_31",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MAIA2_32",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MAIA2_33",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MAIA2_34",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MAIA2_35",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MAIA2_36",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MAIA2_37",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "noticing",
+            "type": "dimension",
+            "label": "觉察身体的感觉",
+            "description": "更多表示本次自述在这一方面的体验或回应较常发生；不等同于身体健康、客观能力或人群高低。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "MAIA2_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MAIA2_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MAIA2_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MAIA2_04",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "not_distracting",
+            "type": "dimension",
+            "label": "不急于转移身体感受",
+            "description": "反向计分后，分数越高表示自述较少忽略、硬撑或转移对身体不适的注意；不等同于身体健康，也不意味着应忍受伤害。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "MAIA2_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MAIA2_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MAIA2_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MAIA2_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MAIA2_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MAIA2_10",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "not_worrying",
+            "type": "dimension",
+            "label": "面对不适时少些担忧",
+            "description": "计分后，分数越高表示自述面对身体不适或疼痛时较少担忧、较能保持平静；不等同于身体健康，也不意味着应忽视症状。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "MAIA2_11",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MAIA2_12",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MAIA2_13",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MAIA2_14",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MAIA2_15",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "attention_regulation",
+            "type": "dimension",
+            "label": "调节对身体的注意",
+            "description": "更多表示本次自述在这一方面的体验或回应较常发生；不等同于身体健康、客观能力或人群高低。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "MAIA2_16",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MAIA2_17",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MAIA2_18",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MAIA2_19",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MAIA2_20",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MAIA2_21",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MAIA2_22",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "emotional_awareness",
+            "type": "dimension",
+            "label": "觉察身体与情绪的联系",
+            "description": "更多表示本次自述在这一方面的体验或回应较常发生；不等同于身体健康、客观能力或人群高低。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "MAIA2_23",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MAIA2_24",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MAIA2_25",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MAIA2_26",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MAIA2_27",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "self_regulation",
+            "type": "dimension",
+            "label": "借助身体安顿自己",
+            "description": "更多表示本次自述在这一方面的体验或回应较常发生；不等同于身体健康、客观能力或人群高低。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "MAIA2_28",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MAIA2_29",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MAIA2_30",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MAIA2_31",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "body_listening",
+            "type": "dimension",
+            "label": "倾听身体的提示",
+            "description": "更多表示本次自述在这一方面的体验或回应较常发生；不等同于身体健康、客观能力或人群高低。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "MAIA2_32",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MAIA2_33",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MAIA2_34",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "trusting",
+            "type": "dimension",
+            "label": "在身体里感到安心",
+            "description": "更多表示本次自述在这一方面的体验或回应较常发生；不等同于身体健康、客观能力或人群高低。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "MAIA2_35",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MAIA2_36",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MAIA2_37",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.1.0",
+        "primaryScoreKeys": [
+          "noticing",
+          "not_distracting",
+          "not_worrying",
+          "attention_regulation",
+          "emotional_awareness",
+          "self_regulation",
+          "body_listening",
+          "trusting"
+        ],
+        "scoreOrder": [
+          "noticing",
+          "not_distracting",
+          "not_worrying",
+          "attention_regulation",
+          "emotional_awareness",
+          "self_regulation",
+          "body_listening",
+          "trusting"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "noticing",
+            "headline": "先知道自己注意到了什么，不要求整天扫描身体",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "本报告分别呈现八个方面的0–5均分，没有整体总分。这一组四题关注是否注意到紧绷、舒适、身体不适和呼吸变化；数字越大，表示你报告这些觉察更常发生，不是身体更健康或判断得更准确。\n\n例如，忙完一段工作后才发现肩膀紧，或坐下来时注意到某处很舒服。如果这类观察对你有帮助，可以保留；如果一时没有明显感觉，也不用努力找出一个答案。注意到身体可以是一条生活信息，不必变成全天监测自己的任务。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "strategy",
+                "text": "在坐下、起身等自然停顿里，选择一个愿意注意的身体细节，大致描述即可，不刻意寻找异常。"
+              },
+              {
+                "category": "reflection",
+                "text": "留意什么环境让你容易觉察、什么环境让你忙不过来；选择一个已有帮助的条件保留，而不是增加整天打卡。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "not_distracting",
+            "headline": "不适出现时，给回应留一点选择",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这六题已按原规则反向整理，均分0–5。数字越大，表示你报告较少忽略、硬撑或通过忙别的事来避开身体不适，不是更应该忍住疼痛。\n\n例如，久坐后不舒服，可能继续埋头做事，也可能先调整安排。如果这与你的经历有关，可以先看当时实际需要什么，再决定休息、改变姿势、适当分散注意或求助。分散注意有时也合适；重点不是守着感觉不放，而是不让“只能硬撑”成为唯一选项。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回想一次轻微不适，记下最初怎样回应，以及当时是否有休息或照护的条件；不把选择简单判成对错。"
+              },
+              {
+                "category": "environment",
+                "text": "下次愿意停顿时，先安排一项现实照顾，例如暂停某个负担或请求协助，再决定注意力放在哪里，不要求持续盯着不适。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "not_worrying",
+            "headline": "分开身体感觉与随后出现的猜测",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这五题经过原计分方向处理，均分0–5。数字越大，表示你报告面对不适或疼痛时较少担忧、较能保持平静，不是症状一定无须处理。\n\n例如，感觉到一次不舒服，心里随即跳出“是不是很严重”的猜测。如果这种经历熟悉，可以先分开已经知道的感觉与尚未确定的解释。能够担心少一点时，可以保留有帮助的支持；担心难以放下时，也不需要靠责备自己解决。平静与按实际情况寻求照护可以同时存在。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "strategy",
+                "text": "把“我注意到的感觉”和“我担心它意味着什么”各说一句，先不把猜测当作已确定的事实。"
+              },
+              {
+                "category": "support",
+                "text": "若不适或担忧需要帮助，可以把具体感受、变化和疑问清楚说明给合适的照护或支持人员，而不是让问卷替你判断。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "attention_regulation",
+            "headline": "能把注意带向身体，也能回到眼前的事",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这七题均分0–5，数字越大，表示你更常报告自己能有意关注身体、在分心后返回，或兼顾整体身体感觉。它不是持续专注时间或客观注意力测试。\n\n例如，交谈中注意到自己的姿势，随后仍能听对方说话。若身体注意对你有帮助，可以在自然停顿里使用；若当下任务需要看外界，也可以把注意转出去。走神不是失败，不需要为了分数把注意一直留在身体里。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "strategy",
+                "text": "在自己愿意时，短暂留意一种自然感觉，再有意回到周围或手头的事，体验注意可以来回选择。"
+              },
+              {
+                "category": "environment",
+                "text": "选一个不需要兼顾安全操作或复杂任务的停顿；如果向内注意让你更不舒服，可以停止，转向外界或寻求支持。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "emotional_awareness",
+            "headline": "留意身体与情绪的联系，但不急着判定原因",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这五题均分0–5，数字越大，表示你报告更常注意到生气、平静、高兴等状态伴随的身体变化，不代表已经准确识别变化的原因。\n\n例如，谈完一件在意的事后，肩膀松了一点，或高兴时注意到呼吸更轻松。如果这样的联系对你有帮助，可以把它记作线索；同一种感觉也可能有不同来源，不必套固定的“身体部位对应情绪表”，更不能把所有身体不适都解释成心情造成。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "选一个感受较清楚的日常片段，分别用普通词描述情绪与身体感觉，允许它们没有明显联系。"
+              },
+              {
+                "category": "strategy",
+                "text": "在需要判断下一步时，同时看看情境、身体状态和已知事实；把身心联系当作一种可能信息，不当成唯一原因。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "self_regulation",
+            "headline": "身体觉察可以是一种安顿方式，不是必须有效的办法",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这四题均分0–5，数字越大，表示你更常报告能借助身体或呼吸的觉察获得平静。分数不是某种练习已经有效的证明，也不表示所有困难都应靠自己调节。\n\n例如，思绪很乱时，有人觉得注意自然呼吸或身体接触椅子的感觉有帮助，也有人更需要和人说话、换个环境。若已有合适的方法，可以保留；若向内注意不舒服，可以不用它。适合自己的支持不必只有一条路。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "strategy",
+                "text": "在愿意且相对舒适的时刻，试着短暂留意自然感觉，看看是否适合自己；不强行改变呼吸，也不追求立刻平静。"
+              },
+              {
+                "category": "support",
+                "text": "给自己留一个不依赖身体关注的替代选项，例如与人交流、调整环境或寻求实际协助；无效时可以换方法，不归咎自己。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "body_listening",
+            "headline": "听见身体的提示，再结合处境作决定",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这三题均分0–5，数字越大，表示你报告更常通过身体感觉了解情绪、思考自己需要怎样做，不是身体提示一定准确。\n\n例如，约定一件事情时发现自己一直紧绷，可以提醒你再看看负担、意愿或环境；它本身却不能证明这件事一定危险或一定不该做。如果你愿意，可以先听见感觉，再核对事实和其他需要，给判断多一条信息，而不是把决定完全交给感觉。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "遇到一个身体提示，先写“我注意到什么”，再列出两种可能的背景解释，暂时不把其中一种定为答案。"
+              },
+              {
+                "category": "strategy",
+                "text": "结合事实、资源和自己的意愿，选择一个可核实的回应，例如问清安排或调整负担；需要时请合适的人一起判断。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "trusting",
+            "headline": "自在和安心可以被照顾，不需要被强迫",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这三题均分0–5，数字越大，表示你报告更常在身体里感到自在、安全，并愿意信任身体感觉。这是主观体验，不是实际身体状况或环境安全的证明。\n\n例如，有人会在熟悉的地方或得到支持时更容易放松。如果这种经验属于你，可以留意哪些条件在帮忙；如果安心不容易出现，也不说明你做错了什么。生活经历、身体状态和环境都可能参与其中，可以先寻找一点相对舒适，而不要求自己立刻喜欢所有身体感觉。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "environment",
+                "text": "从外部条件选一处自己愿意的调整，例如座位、光线、衣物舒适度或隐私空间，看看是否更自在。"
+              },
+              {
+                "category": "support",
+                "text": "若向内关注让你更不安，可以先停下，选择外界活动或可信任的陪伴；不必为了“学会信任身体”勉强自己。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这是尚未验证的中文工作稿，只作成人自我了解，无总分或个人分级，不判断疾病或客观能力。漏答不是0分；留意身体不能替代必要照护，也不必勉强忍受不适。"
+        ],
+        "disclaimer": "用于成人回顾日常身体觉察体验，不是考试、健康诊断或疗效判断。中文为平台独立工作译稿。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI editorial self-review; not human or author approval",
+            "reviewedAt": "2026-10-29T16:33:46Z",
+            "basis": "本次仅审读新R文字、分数方向与当前源合同一致性；无计分／报告运行测试，不代表专家译审、人工批准或心理测量验证。保留原成人自答受众，student技术槽位不扩大为K12适用。"
+          }
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "maia2_37",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "MAIA2_01",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_02",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_03",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_04",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_07",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_08",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_09",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_10",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_11",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_12",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_13",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_14",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_15",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_16",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_17",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_18",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_19",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_20",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_21",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_22",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_23",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_24",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_25",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_26",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_27",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_28",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_29",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_30",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_31",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_32",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_33",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_34",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_35",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_36",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_37",
+            "responseValue": "0"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "noticing": 0.0,
+            "not_distracting": 0.0,
+            "not_worrying": 0.0,
+            "attention_regulation": 0.0,
+            "emotional_awareness": 0.0,
+            "self_regulation": 0.0,
+            "body_listening": 0.0,
+            "trusting": 0.0
+          },
+          "totalScoreKeys": [
+            "noticing",
+            "not_distracting",
+            "not_worrying",
+            "attention_regulation",
+            "emotional_awareness",
+            "self_regulation",
+            "body_listening",
+            "trusting"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "MAIA2_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_05",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_06",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_07",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_08",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_09",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_10",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_11",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_12",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_13",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_14",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_15",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_16",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_17",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_18",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_19",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_20",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_21",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_22",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_23",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_24",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_25",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_26",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_27",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_28",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_29",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_30",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_31",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_32",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_33",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_34",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_35",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_36",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_37",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "noticing": 5.0,
+            "not_distracting": 5.0,
+            "not_worrying": 5.0,
+            "attention_regulation": 5.0,
+            "emotional_awareness": 5.0,
+            "self_regulation": 5.0,
+            "body_listening": 5.0,
+            "trusting": 5.0
+          },
+          "totalScoreKeys": [
+            "noticing",
+            "not_distracting",
+            "not_worrying",
+            "attention_regulation",
+            "emotional_awareness",
+            "self_regulation",
+            "body_listening",
+            "trusting"
+          ]
+        }
+      },
+      {
+        "name": "raw_zero",
+        "answers": [
+          {
+            "itemCode": "MAIA2_01",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_02",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_03",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_04",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_05",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_06",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_07",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_08",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_09",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_10",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_11",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_12",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_13",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_14",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_15",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_16",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_17",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_18",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_19",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_20",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_21",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_22",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_23",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_24",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_25",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_26",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_27",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_28",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_29",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_30",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_31",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_32",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_33",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_34",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_35",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_36",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_37",
+            "responseValue": "0"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "noticing": 0.0,
+            "not_distracting": 5.0,
+            "not_worrying": 3.0,
+            "attention_regulation": 0.0,
+            "emotional_awareness": 0.0,
+            "self_regulation": 0.0,
+            "body_listening": 0.0,
+            "trusting": 0.0
+          },
+          "totalScoreKeys": [
+            "noticing",
+            "not_distracting",
+            "not_worrying",
+            "attention_regulation",
+            "emotional_awareness",
+            "self_regulation",
+            "body_listening",
+            "trusting"
+          ]
+        }
+      },
+      {
+        "name": "raw_five",
+        "answers": [
+          {
+            "itemCode": "MAIA2_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_07",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_08",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_09",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_10",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_11",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_12",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_13",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_14",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_15",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_16",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_17",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_18",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_19",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_20",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_21",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_22",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_23",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_24",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_25",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_26",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_27",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_28",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_29",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_30",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_31",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_32",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_33",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_34",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_35",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_36",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_37",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "noticing": 5.0,
+            "not_distracting": 0.0,
+            "not_worrying": 2.0,
+            "attention_regulation": 5.0,
+            "emotional_awareness": 5.0,
+            "self_regulation": 5.0,
+            "body_listening": 5.0,
+            "trusting": 5.0
+          },
+          "totalScoreKeys": [
+            "noticing",
+            "not_distracting",
+            "not_worrying",
+            "attention_regulation",
+            "emotional_awareness",
+            "self_regulation",
+            "body_listening",
+            "trusting"
+          ]
+        }
+      },
+      {
+        "name": "midpoint",
+        "answers": [
+          {
+            "itemCode": "MAIA2_01",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MAIA2_03",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MAIA2_05",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MAIA2_07",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MAIA2_09",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MAIA2_11",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_12",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MAIA2_13",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_14",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MAIA2_15",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_16",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MAIA2_17",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_18",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MAIA2_19",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_20",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MAIA2_21",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_22",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MAIA2_23",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_24",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MAIA2_25",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_26",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MAIA2_27",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_28",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MAIA2_29",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_30",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MAIA2_31",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_32",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MAIA2_33",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_34",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MAIA2_35",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_36",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MAIA2_37",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "noticing": 2.5,
+            "not_distracting": 2.5,
+            "not_worrying": 2.6,
+            "attention_regulation": 2.5714285714285716,
+            "emotional_awareness": 2.4,
+            "self_regulation": 2.5,
+            "body_listening": 2.6666666666666665,
+            "trusting": 2.3333333333333335
+          },
+          "totalScoreKeys": [
+            "noticing",
+            "not_distracting",
+            "not_worrying",
+            "attention_regulation",
+            "emotional_awareness",
+            "self_regulation",
+            "body_listening",
+            "trusting"
+          ]
+        }
+      },
+      {
+        "name": "mixed",
+        "answers": [
+          {
+            "itemCode": "MAIA2_01",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MAIA2_03",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MAIA2_05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MAIA2_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_07",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MAIA2_09",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MAIA2_11",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MAIA2_12",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_13",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MAIA2_15",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_16",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MAIA2_17",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MAIA2_18",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_19",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_20",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MAIA2_21",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_22",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MAIA2_23",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MAIA2_24",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_25",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_26",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MAIA2_27",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_28",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MAIA2_29",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MAIA2_30",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_31",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "MAIA2_32",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MAIA2_33",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_34",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MAIA2_35",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MAIA2_36",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MAIA2_37",
+            "responseValue": "0"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "noticing": 1.5,
+            "not_distracting": 2.5,
+            "not_worrying": 1.0,
+            "attention_regulation": 2.5714285714285716,
+            "emotional_awareness": 2.4,
+            "self_regulation": 3.0,
+            "body_listening": 2.0,
+            "trusting": 3.0
+          },
+          "totalScoreKeys": [
+            "noticing",
+            "not_distracting",
+            "not_worrying",
+            "attention_regulation",
+            "emotional_awareness",
+            "self_regulation",
+            "body_listening",
+            "trusting"
+          ]
+        }
+      },
+      {
+        "name": "missing_not_distracting",
+        "answers": [
+          {
+            "itemCode": "MAIA2_01",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_03",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_04",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_05",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_06",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_07",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_08",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_10",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_11",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_12",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_13",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_14",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_15",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_16",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_17",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_18",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_19",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_20",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_21",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_22",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_23",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_24",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_25",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_26",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_27",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_28",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_29",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_30",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_31",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_32",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_33",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_34",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_35",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_36",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MAIA2_37",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "noticing": 2.0,
+            "not_distracting": null,
+            "not_worrying": 2.6,
+            "attention_regulation": 2.0,
+            "emotional_awareness": 2.0,
+            "self_regulation": 2.0,
+            "body_listening": 2.0,
+            "trusting": 2.0
+          },
+          "totalScoreKeys": [
+            "noticing",
+            "not_distracting",
+            "not_worrying",
+            "attention_regulation",
+            "emotional_awareness",
+            "self_regulation",
+            "body_listening",
+            "trusting"
+          ]
+        }
+      },
+      {
+        "name": "empty",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "noticing": null,
+            "not_distracting": null,
+            "not_worrying": null,
+            "attention_regulation": null,
+            "emotional_awareness": null,
+            "self_regulation": null,
+            "body_listening": null,
+            "trusting": null
+          },
+          "totalScoreKeys": [
+            "noticing",
+            "not_distracting",
+            "not_worrying",
+            "attention_regulation",
+            "emotional_awareness",
+            "self_regulation",
+            "body_listening",
+            "trusting"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "下面列出一些陈述。请根据一般日常生活中的情况，指出每项陈述符合你的频率，每行选择一个数字：0表示“从不”，5表示“总是”；中间选项保留数字1、2、3、4。",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "docs/scale-instruments/research-drafts/maia2_37/1.0.0/bilingual-content.json#/administrationZh @ b92c69aefa2472775fa7ee86b9c208366886c908 (项目工作稿；非人工审批声明)"
+  }
+}
