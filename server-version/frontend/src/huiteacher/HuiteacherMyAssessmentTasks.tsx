@@ -102,7 +102,15 @@ function TeacherAssessmentTasksSession({api,actorKey,unified=false,onListStateCh
    if(!valid())return
    if(result.state==='IN_PROGRESS')throw new Error('测评正在建立，请稍后重新核对同一任务')
    if(result.state!=='STARTED'||result.runtimeBindingKind!=='COMPOSITE'||!result.runtimeBindingRef)throw new Error('当前任务尚无获授权的正式运行记录')
-   await load(task,result.runtimeBindingRef,valid)
+   // START is already durable. Preserve its binding even if the first read fails
+   // or the participant leaves, so resume never repeats consent or START.
+   const startedTask:TeacherAssessmentTask={...task,status:'STARTED',runtimeBindingRef:result.runtimeBindingRef}
+   listGeneration.current++
+   setList(old=>({...old,pending:false}))
+   setRows(old=>old.map(row=>row.executionId===task.executionId?{...row,status:'STARTED',runtimeBindingRef:result.runtimeBindingRef!}:row))
+   const startedSession={...source,task:startedTask}
+   active.current=startedSession;setSession(startedSession)
+   await load(startedTask,result.runtimeBindingRef,valid)
   })
  }
  const reload=async()=>{
