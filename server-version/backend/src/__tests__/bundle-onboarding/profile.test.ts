@@ -147,3 +147,15 @@ it('keeps a complete selected core independent of unselected score quality',()=>
   i.evidence=mapDeclarativeEvidence(i)
   expect(run(i)).toMatchObject({state:'INSUFFICIENT',profileId:null})
 })
+
+
+it.each(['false','unknown'] as const)('withholds profile and modifiers when package applicability is %s',state=>{
+  const p=structuredClone(pack),i=input()
+  p.rules.applicability={op:'gt',evidenceKey:'e',value:5}
+  if(state==='unknown'){
+    const e=i.evidence.find(row=>row.evidenceKey==='e')!
+    e.value={state:'missing'};e.quality='unavailable'
+  }
+  // Strict equality also forbids profile, modifier and explanation payloads.
+  expect(runProfileEvidence({...i,declarativePackage:p})).toEqual({kind:'UNAVAILABLE',reason:'DECLARATIVE_NOT_APPLICABLE_OR_UNKNOWN'})
+})

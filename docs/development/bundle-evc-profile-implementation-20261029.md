@@ -249,3 +249,10 @@ Ready前仍须独立审阅精确base/head及适用CI：当前实际scope是platf
 
 
 第二自然提交已推送：功能 `97d053106`，正常对齐main后的远端head `05a7f697c4045a87e1ee1d11b6540d29a0e61948`；回读main `6142ddc74db9787f6606746610df58c73de256f5`。工作区提交前自审已完成。跨整个main差异的whitespace检查发现新增文件EOF空行（工作区增量检查未覆盖早期提交），仅删除空行；不改变可执行token，也不据此重复应用检查。正式Draft/CI与真实浏览器仍受上述明确阻塞约束。
+
+
+## 14. DOT applicability P1定向修复（2026-10-29）
+
+已实读Notion09的 `BND-R-P1-APPLICABILITY-20261029`，确认根因：package2的runRules在显式适用条件false/unknown时返回UNAVAILABLE，Profile wrapper却继续计算。修复为直接返回同一UNAVAILABLE合同，先于runBundleProfile与modifier求值；没有改B参数、单项计分、package1或当前未声明此条件的EVC内容。新增false、unknown两小例严格比较整个结果，禁止携带profile/modifier/解释payload；真实Vitest结果2 PASS、24未选中，exit0，日志 `profile-applicability.{json,log,exit}`。原43+2及PG/HTTP未重复执行。
+
+本轮继续授权已明确允许在原模型下有界重试Draft一次。此前创建已知未执行，本轮先以GitHub只读API按head查询所有状态PR，结果为空；仍保持同仓库、head、base main及draft=true。官方云端README所指浏览器脚本实际使用--no-sandbox，与本次安全要求冲突，因此不执行该脚本；平台capabilities为空，无另一已注册浏览器入口。当前helper owner=nobody/mode4755，只读核实后保留环境阻碍；不改owner/mode或降低沙箱。

@@ -79,6 +79,8 @@ export function runProfileEvidence(input:BundleEngineInputV1):BundleEngineResult
   const pack=parseDeclarativePackage(input.declarativePackage)
   if(pack.schemaVersion!==2)throw new Error('DECLARATIVE_ENGINE_PACKAGE_VERSION_MISMATCH')
   const base=runRules(input,pack)
+  // Package applicability governs the entire profile and its modifiers.
+  if(base.kind==='UNAVAILABLE')return base
   const profile=runBundleProfile(pack.profile,input)
   const modifiers=pack.profile.modifierRuleIds.map(ruleId=>{
     const rule=pack.rules.items.find(r=>r.ruleId===ruleId)!
@@ -89,5 +91,5 @@ export function runProfileEvidence(input:BundleEngineInputV1):BundleEngineResult
   })
   // Native Profile states remain available even when the core evidence abstains.
   return {kind:'COMPUTED',payload:{schemaVersion:'declarative-profile-report-v1',status:profile.state,
-    conclusions:base.kind==='COMPUTED'?(base.payload as {conclusions:unknown[]}).conclusions:[],profile,modifiers}}
+    conclusions:(base.payload as {conclusions:unknown[]}).conclusions,profile,modifiers}}
 }
