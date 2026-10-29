@@ -659,5 +659,115 @@
     ],
     "harnessSHA256": "5adaeb93dd2486efc74509fa3039c009d2fd10b33ea42b041ae757256181ca3b",
     "reusedEvidence": "DOT reports twenty scoring/report comparisons; not rerun here, not claimed as cloud permission/UI qualification"
+  },
+  "currentMainSetup": {
+    "sourceCommit": "6142ddc74db9787f6606746610df58c73de256f5",
+    "sourceTree": "bf8fc715333ab3d96e0faa73249bb385a52e4248",
+    "node": "v24.21.0",
+    "backendLockBlob": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6",
+    "expectedExecutableScales": 56,
+    "expectedSeedConfigs": 32,
+    "seedFileHashes": {
+      "prisma/seed.ts": "06b400c876bac0576b9c8c5283514ade59344527cce87119b7fcb047bcde26e8",
+      "prisma/seeds/scales.ts": "f6e7714173469a71d9eaee52c809a0e9416b27937654cf0b9fcb19b4b64f2570",
+      "prisma/seeds/cognitive.ts": "e39cbf8727fc4ee78157bf07f8c96d1502f2714f135ba57e2ed88be0f0eca3fd",
+      "prisma/seeds/cognitive-timing-pilot.ts": "e180f69dc2620c0c18800700e21705ea882d0f3c65300bf6293f4f0a107b965e"
+    },
+    "canonicalStateHash": "2175cdd75219bcfab7ac2a7f7a022d58b0bb88cf54f3b11c0719daa0043d1e4c",
+    "scope": "Official guarded migrate + full db:seed at exact main with matched installed dependencies; not fresh dependency installation, frontend build, production or runtime-role qualification",
+    "database": "main_setup_test_20261029",
+    "sameTreeAsPureContentCommit": "6fa885ec74ca01350db25c44bd61c700648b05d1",
+    "counts": {
+      "users": 1,
+      "scales": 56,
+      "configs": 32,
+      "materialGrants": 0,
+      "contentGrants": 0,
+      "assignments": 0,
+      "assessments": 0,
+      "composites": 0,
+      "entryGrants": 0,
+      "systemAdmins": 0,
+      "publishedScales": 0,
+      "deployments": 0,
+      "standardCombinations": 0,
+      "standardVersions": 0
+    },
+    "targetBasics": [
+      {
+        "id": "ffec0dbf-fb14-4d50-b4d5-d00f225c34da",
+        "code": "bps9_zh_cn_research",
+        "instrumentVersion": "1.0.0",
+        "status": "DRAFT",
+        "visibility": "HIDDEN",
+        "creatorId": "78f791dc-9d34-4f31-8c6a-f91216bac751",
+        "definitionHash": "ba0b97ac92dc665dcabc3ffc660433bb79a84457d8bfc9e695a316337262dc2c",
+        "instruction": "请根据平时的情况，判断以下说法是否符合自己的做法。选项从1（几乎）从不到5（几乎）总是，2、3、4是两端之间的选项。没有对错，请按实际情况选择。",
+        "createdAt": "2026-10-29T16:35:07.428Z",
+        "updatedAt": "2026-10-29T16:35:07.428Z",
+        "definitionCanonicalHash": "8df478b14d2cc2686fe3601ef50547b49d16d8e14a8c70169de90633e0b668a1",
+        "basicReportVersion": "1.0.0",
+        "funReport": "MATERIAL_ONLY_NOT_REGISTERED"
+      },
+      {
+        "id": "734d27b1-e36e-4ca5-881e-00a83c8d3e13",
+        "code": "cfq7_zh_cn_research",
+        "instrumentVersion": "1.0.1",
+        "status": "DRAFT",
+        "visibility": "HIDDEN",
+        "creatorId": "78f791dc-9d34-4f31-8c6a-f91216bac751",
+        "definitionHash": "7882f8b3cb47f768e66dc346e017870ec689e30f1a833c50a014113ffde7807c",
+        "instruction": "下面是一些描述你与自己想法之间关系的句子。\n\n请仔细阅读每一句，根据自己的真实经验，选择这种情况出现的频率。没有对错之分。",
+        "createdAt": "2026-10-29T16:35:07.476Z",
+        "updatedAt": "2026-10-29T16:35:07.476Z",
+        "definitionCanonicalHash": "f9d553563819ecb20619582c3b449c864971cdf231688ff956a0cb53ed7c7b95",
+        "basicReportVersion": "1.0.2",
+        "funReport": "MATERIAL_ONLY_NOT_REGISTERED"
+      },
+      {
+        "id": "021c36fe-6c62-49cc-bf66-4220d1008915",
+        "code": "ipip_neo_c1_self_efficacy10_zh_cn_research",
+        "instrumentVersion": "1.0.0",
+        "status": "DRAFT",
+        "visibility": "HIDDEN",
+        "creatorId": "78f791dc-9d34-4f31-8c6a-f91216bac751",
+        "definitionHash": "99c88b01aa596875b10b95a65aa43dc10c4c3ad73bdffdf0546e21d327b7ff2c",
+        "instruction": "请根据你目前通常的情况，而不是希望将来成为的样子，判断下面各句话与你的实际情况有多符合。",
+        "createdAt": "2026-10-29T16:35:07.670Z",
+        "updatedAt": "2026-10-29T16:35:07.670Z",
+        "definitionCanonicalHash": "af9ca60acb2e393c673f2f683e29581d26a5568d86ec2974033856f40c5142fb",
+        "basicReportVersion": "1.0.1",
+        "funReport": "MATERIAL_ONLY_NOT_REGISTERED"
+      }
+    ],
+    "repeatStateIdentical": true,
+    "funReportsRegistered": 0,
+    "cognitiveCandidateImport": false,
+    "evidence": [
+      {
+        "file": "main-6142-setup-before.json",
+        "sha256": "404d711e184d614701c25d68e6afad21fdb789dca28effe11bea2c0ad0d6bfaf"
+      },
+      {
+        "file": "main-6142-seed-first-status.json",
+        "sha256": "82b6f7476a62521084f1c561c5aff8670ceb2aeee61b688469a3c018d677a6db"
+      },
+      {
+        "file": "main-6142-setup-first-readback.json",
+        "sha256": "d22a84ac8c210f40a361ed21b14737ea6270830efb5b22c686f8cb6c7c777826"
+      },
+      {
+        "file": "main-6142-migrate-repeat-status.json",
+        "sha256": "fab8284885d4dc272d67f4c27a83e3d17058e90e942b944e3f93efb832343fb3"
+      },
+      {
+        "file": "main-6142-seed-repeat-status.json",
+        "sha256": "bfdf7065cf862ab63f22aa0ec147f1a25754b26dcf4cbfbb7a7185f5aa228cda"
+      },
+      {
+        "file": "main-6142-setup-repeat-readback.json",
+        "sha256": "f04514b5b338778b01e63fc0d9aebf41fb572381cdac2d5f735b7b434c4fca36"
+      }
+    ]
   }
 }
