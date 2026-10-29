@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "task": "proofread",
+  "order": 126,
+  "identities": [
+    {
+      "testType": "proofread",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "order": 126
+    }
+  ],
+  "backend": {
+    "file": "package.ts",
+    "export": "executionEntries"
+  },
+  "frontend": [
+    {
+      "testType": "proofread",
+      "engineVersion": "1.0.0",
+      "file": "server-version/frontend/src/modules/cognitive/tasks/proofread/proofread.registry.ts",
+      "export": "proofreadRegistryEntry"
+    }
+  ],
+  "catalog": {
+    "file": "governance.ts",
+    "export": "catalog"
+  },
+  "seeds": {
+    "file": "seeds.ts",
+    "export": "seeds",
+    "orders": [
+      113
+    ]
+  },
+  "presentation": {
+    "file": "participant-presentation.ts",
+    "export": "participantPresentations"
+  },
+  "scientific": {
+    "file": "scientific.ts",
+    "export": "scientificGovernance"
+  },
+  "acceptance": {
+    "frontendSuites": [
+      "src/modules/cognitive/tasks/proofread/__tests__/ProofreadTask.test.tsx",
+      "src/modules/cognitive/tasks/proofread/__tests__/prng.test.ts"
+    ]
+  }
+}

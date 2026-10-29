@@ -49,6 +49,7 @@ import { catalog as task46 } from '../tasks/logicdeduce/governance'
 import { catalog as task47 } from '../tasks/seriescomplete/governance'
 import { catalog as task48 } from '../tasks/pursuitrotor/governance'
 import { catalog as task49 } from '../tasks/readingcomp/governance'
+import { catalog as task50 } from '../tasks/proofread/governance'
 export const cognitiveCatalog = {
   'reaction': task0,
   'memory': task1,
@@ -100,4 +101,5 @@ export const cognitiveCatalog = {
   'seriescomplete': task47,
   'pursuitrotor': task48,
   'readingcomp': task49,
+  'proofread': task50,
 }

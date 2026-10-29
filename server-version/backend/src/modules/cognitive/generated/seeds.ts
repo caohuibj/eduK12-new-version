@@ -50,6 +50,7 @@ import { seeds as task47 } from '../tasks/logicdeduce/seeds'
 import { seeds as task48 } from '../tasks/seriescomplete/seeds'
 import { seeds as task49 } from '../tasks/pursuitrotor/seeds'
 import { seeds as task50 } from '../tasks/readingcomp/seeds'
+import { seeds as task51 } from '../tasks/proofread/seeds'
 export const cognitiveSeeds = [
   task0[0],
   task1[0],
@@ -93,6 +94,7 @@ export const cognitiveSeeds = [
   task36[0],
   task37[0],
   task47[0],
+  task51[0],
   task50[0],
   task48[0],
   task38[0],
