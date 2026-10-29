@@ -1,3 +1,4 @@
+import {computeSurveyNativeReports} from '../bundle-product/survey-native'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {gonogoSequence} from '../cognitive/randomization'
 import {createTrialEnvelope} from '../cognitive/v2/trial-envelope'
@@ -65,8 +66,10 @@ export function computeGovernedTrial(a:GovernedArtifact,toolId:string,index:numb
   }
  }
  const publication:ResearchFrozenPublication={schemaVersion:1,purpose:'RESEARCH_ONLY',projectId:'isolated-trial',waveId:'isolated-trial',collectionMode:'SINGLE_UNLINKED',consentVersion:1,linkageNoticeConfirmed:false,consentDigest:canonicalHash('synthetic'),units,runtimeStatus:'SURVEY_FINAL_V1'}
+ if(a.nativeBundle)publication.governedPackages=[{schemaVersion:1,importId:toolId,toolId,hash:canonicalHash(a),title:a.title,family:'BUNDLE',parentGrantId:'trial-only',report:null,nativeBundle:a.nativeBundle,slots:entries.map(c=>({slotKey:c.slotKey,draftId:units.find(u=>u.instrumentKey===c.slotKey)!.draftId,instrumentKey:c.slotKey,kind:c.unit.ref.kind}))}]
  // The same controlled child scorer and parent FINAL closure, without creating a human Attempt.
  const calculated=verifySurveyFinalPublication(publication,canonicalHash(publication))!.compute(answers,null,undefined,'FINAL',Object.keys(timings).length?timings:undefined,cognitive,native)
+ if(a.nativeBundle){calculated.nativeBundleReports=computeSurveyNativeReports(publication,calculated);if(calculated.nativeBundleReports.some(r=>r.status==='FAILED'))throw new Error('原生整包综合报告试运行失败')}
  for(const unit of calculated.units)if(unit.kind!=='FORM'&&!resultMetrics(unit).some(m=>m.value!==null))throw new Error('试运行没有生成有效评分指标：'+unit.instrumentKey)
  const report=a.unit?renderGovernedUnitReport(a,calculated.units[0]):a.packageReport?renderPackageReport(a.packageReport,a.components,calculated,Object.fromEntries(entries.map(c=>[c.slotKey,c.slotKey]))):null
  if((a.report||a.packageReport)&&!report)throw new Error('已配置报告但试运行没有生成报告')

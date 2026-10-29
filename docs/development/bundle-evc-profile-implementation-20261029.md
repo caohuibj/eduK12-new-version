@@ -363,3 +363,61 @@ School新状态原生pg_dump2230414字节，SHA256 `461fb131e7a95eab20308170ff9c
 PR388正文先前两次容量故障均已知未执行；此切片提交后按DOT最新授权先读回再仅有界重试一次。当前Ready路由仍是platform/legacy，真实required将涉及广泛默认套件；没有现成给本分支接纳这些本地应用证据的通用途径。不能通过skip、伪造gate或抢跑merge解决，不能把Draft green冒称Ready green。需在自然节点集中协调适用正式qualification范围，不为此创建新CI平台。
 
 最新已读main c52e1675fe7990ce49b42589d993fb12e8541ae1（PR389独立32份材料），没有改EVC两源或本切片消费者。提交后按正常merge对齐并回读，不改写已推历史。新输入将再执行实际受影响Draft正式检查；适用CI-001/003/006/019/020，原第一轮失败保留。未执行生产部署、GitHub APPROVE、保护修改或生产数据访问。
+
+
+## 18. Survey native整包完整切片
+
+按DOT继续授权，本次没有等待缺失接口，而在现有Survey治理生命周期内增加可选native引用：系统内容作者用本人已发布原生Bundle的compositeId/definitionHash/bindingsHash和明确Context映射提交；只接受原包全部且同序的SCALE/FORM组件，原始完整计分定义必须一致。原包定义/模型/报告文字不从客户端接收，不允许替换跨工具报告，也不允许嵌套或把叶许可当整包U。支持范围明确是schema2 Profile的SCALE＋声明的数字Context；其他原生族拒绝，不冒称适配完成。
+
+新增 `bundle-product/survey-source.ts` 只处理内容来源/冻结与当前新增准入，`survey-native.ts` 只包装已有单项计分事实、复用既有Bundle projector和Profile受众交集。没有新增授权表、队列、版本生命周期、SnapshotV4或新报表系统。现有governed artifact独立review/三案例试运行/Survey整包grant/import/不可拆用/连续投放校验均保留。批准不自动授予研究者U；technical child grants仍不能发现、复制或单独使用。完整模型仅共享保存在governed artifact与publication，个人FINAL只增加小型已存受众投影和factsHash，不复制大题本。
+
+### 共享接口与正常安装路径
+
+| 文件 | 增量合同 |
+|---|---|
+| `survey/governed-tool.{model,service,routes,summary}.ts` | package提交可选nativeBundle来源；本人原包精确header只读预览；单工具R可选audience（省略仍researcher）；原模型/映射/模板版本在完整原包冻结；列表报告轴识别native R |
+| `survey/governed-tool.content.ts` | R发布保持显式student/researcher受众，旧缺省仍researcher |
+| `survey/governed-tool.trial.ts` | 新native内容在原有三条合成试运行里消费已经算出的单项，验证综合投影，没有再运行单项scorer |
+| `survey/governed-package.service.ts`、`publication.service.ts` | FrozenGovernedPackage可选完整native定义与每槽R受众/原policy，保留原parentGrant；新增准入查原精确source和签名package；历史读不查新来源；静态最坏报告预算继续沿原4MB合计上限 |
+| `survey/final.compute.ts`、`final.service.ts` | 原一次单项计分之后、FINAL hash/加密之前增加nativeBundleReports（状态/hash/两种受众已投影结果）；轻量计算失败保存FAILED，不使已验证作答因可选画像错误丢失；无在线自动重算/新增retry生命周期 |
+| `survey/participant-feedback{,-response}.ts` | 原个人凭据/同意/撤回/开放时间边界后，核心单项R与全部选定metric均实际开放才附加综合反馈；未知source policy或不同R受众不公开单项/画像 |
+| `survey/governed-package.reports.ts` | 原append-only报告表保存researcher投影；不把student view放入研究者artifact，保留旧schema/budget/读取授权 |
+| `frontend/.../GovernedToolsWorkspace.tsx` | 原来源编制选择R受众；组合包可读取本人已发布原包身份、完整组件对齐、绑定必填数字Context；不提供模型参数改写 |
+| `frontend/.../SurveyPublicApp.tsx`、`StoredPackageReports.tsx` | 原单项反馈保留，附加中文只读Profile；first FINAL可读新receipt，恢复仍独立鉴权；研究者显示实际WITHHELD，不在前端重建学生解释 |
+
+实际安装顺序：已有原生Bundle正规安装/科学签名发布→两项原精确工具经Survey系统内容作者提交C及student R、独立批准与试运行→研究者编制必填数字年级FORM并正常共享批准→组合包选择这三个精确已批准组件，读取本人原包版本并明确grade_level→grade映射（报告不能另写）→独立批准并试运行→Survey入口管理者显式授予研究者该精确整包U→研究者整包导入、原工具选择器完整选中、波次显式开放两单项所需metric反馈并发布→匿名SELF有同意及本次私密凭据→正常FINAL→两单项与综合反馈→独立凭据重开。界面与POST /api/platform/survey-tools/submissions/package使用同一合同，没有管理者身份自动读取个体结果。
+
+B模型仍0.1.0、映射/包0.1.1、模板0.1.0、model hash87f889c9…40a3f。不是成人Teacher EVC；没有重生量表材料、改变阈值、增加常模或在线拟合。Survey样本Context只作为适用性输入，不能授予个人数据权限。研究者与学生的R受众均冻结，原source政策与R受众求交；本B研究者不得得到Profile，只显示WITHHELD。R受众不匹配时连numeric/method字段也不借综合包开放。
+
+### 实际验证与首错
+
+新增纯适配3例（手记S04冻结分数，不调用scorer）最终PASS：P4/确定性与受众交集；缺Context为UNAVAILABLE、坏分数为FAILED而非硬分型；单项R/metric未公开则综合弃权。后续只给新增UNKNOWN策略边界补同一受限用例，未重跑原43+2。首轮误用measurement-only hash作为完整runtimeDefinitionHash，被新适配用例拒绝；修为原完整canonicalHash，与冻结模型8b4eb7…/53e935…一致，不改模型参数。缺失必填Context不能送进要求完整Context hash的facts builder，改为先保存UNAVAILABLE/CONTEXT_MISSING。R不同受众原先仅清解释、未清数字投影，测试实际指出后改为交集全拒绝；首错保留，未减弱断言。一次仓库根Vitest命令未选中测试，另一次根目录node无法解析tsx，均不算测试PASS。
+
+真实隔离PG按正常入口完成：系统管理者changeEntryGrant→研究者invite/redeem/MFA真实TOTP enrollment→已有原EVC签名review正常续期→两原单项C/student R独立review和试运行→数字Context FORM共享review→完整native整包review/试运行→manager whole grant→import→prepare/open→匿名有同意START→FINAL。首错分别是FORM纯数字optionKey不符合合同、NUMBER答案误用字符串、原逐题施测缺itemTimings。均保留；前三次未产生FINAL。随后先对全部FORM与逐题metadata用现有无计分validator预检，再从checkpoint续验，已成功的C/R/整包批准与试运行不重复。没有直填approved/ONLINE/ACTIVE审批状态，研究者ACTIVE来自正常MFA服务；组织管理入口grant来自原正式命令。DRAFT项目/用户作为隔离基础fixture创建，不宣称完整管理端浏览器注册验收。
+
+最终真实PG调用exit0：project fe9bd9e5-c79d-4bee-844f-b8a85e9190cf，attempt613f7fb2-2e7a-43c7-a8b7-252c403f737b，FINAL91fdbb12-d492-4151-9e0d-f096f3f65c3a；学生P4 READY＋2单项，researcher Profile WITHHELD（无构念数字/候选），manager读取私有报告拒绝，FINAL重放idempotent=true、仅1行FINAL，scorer/profile spy均未调用。factsHash `5987659111ad2207f543f254b7dee191dc4e9246f97e79f733396489f742aae9`。另一个只读/来源边界case实际验证拆包、重排、来源hash变化拒绝，无计分。独立保存读取测试初次缺Survey显式opt-in，被正常拒绝；只补两个环境标志后定向读取PASS，未重跑已过来源边界。
+
+保存读取另有错误私密凭据拒绝，spy确认没有scorer、Profile projector或current native admission/source查询。源库单样本104.55ms、2290字节；原生dump2304229字节，SHA256 `1726278269044511aae269a06e39572c2970f2d05b0aabb05d7d007344c06eef`，恢复新库eduk12_evc_survey_restore_20261029_test。恢复库connection_limit=1同样保存读取PASS：96.63ms、CPU user74031/system16154μs、2290字节、同factsHash。不同执行环境不能当性能改善或p95；没有改前可运行的native Survey baseline。没有生产数据或生产部署。
+
+新增前端消费者2例PASS/60未选中：学生first FINAL综合＋原单项并存、重开重新鉴权；研究者只渲染服务器WITHHELD且无导出。作者UI另1例实际PASS：读取本人原包、必需Context未绑定时禁止提交、精确全部slot＋原包引用提交，report=null。对应frontend types exit0，backend含生产/新fixture2421源闭包0诊断。完整研究者管理浏览器NOTRUN；不以transport mock当浏览器通过。Survey代表恢复页面将仅补缺失的实际浏览器，不重新作答计分。
+
+轻量native计算属于现有Survey FINAL的确定性工作；失败状态保存在同一不可变结果，GET不会重试。尚未增加旧FINAL的显式新版本画像重分析UI/任务；不得把FAILED说成READY或读时重算。现有单项C/P/R解释与研究数据权限保持独立。
+
+## 19. 最小正式qualification计划（待集中review，未改路由）
+
+本PR完整差异含Bundle engine/schema2、聚合FINAL、Survey冻结/报告及前端消费者，不能伪装成纯量表内容、普通组合、文档或A/B外观变更。无DDL、依赖/锁文件/生产配置变化，但结果合同与持久化消费者改变；保守按运行时C范围审核。最新已对齐main e65d87222；最终head/tree及完整raw diff在此功能提交后回读，不能借用d58的正式成功。
+
+当前可执行的既有Draft legacy route会真跑backend compile、frontend lint/types（包括锁定backend依赖/Prisma前置）、maintenance、mini-program、stable gate与独立publication，适合普通预检，不能替代Ready资格。d58的run40926329352全绿保留原身份；Survey新提交尚未跑正式检查。现有onboarding-structure只有固定历史PR及local admission；survey-assessment、shared-authoring、school-teacher均有精确历史base/product/branch绑定，不能直接改branch参数声称可用。本次不markReady，不运行平台全工具、无关浏览器、媒体或性能套件。
+
+建议扩展**既有school-teacher qualification family**的一个有界native-bundle场景，不创建每PR一套workflow或通用证据/签名平台。具体拟改文件与最小职责：
+
+1. `.github/scripts/school-teacher-scope.mjs` 与现有bindings数据：新增本候选native-bundle场景，绑定完整base/head/source/merge tree、每个raw路径/模式/blob及backend/frontend/config/locks/schema；保留历史observer/SELF分支判定。未知路径、外部PR、强制full/manual、不匹配产物拒绝，不回退全平台。
+2. `.github/scripts/school-teacher-checks.mjs`：沿原命令/原件验证器增加本场景recipe。可以复用现有onboarding-checks的原report逐case/失败续验验证函数，但本地结果只有DOT独立审阅并明确接纳后才消费，不冒充Actions原执行。按实际共享调用闭包判断旧43+2、P1两例、School/Training PG/浏览器及Survey3＋新增权限/来源/前端case；原失败/filtered/未知退出都保留。不得仅按函数未变认定可复用。
+3. `.github/workflows/ci-school-teacher.yml`：复用现有frontend/backend producer、postgres/restore、browser与runtime security/qualified消费者，以场景精确选择缺失输入。当前轻量编译没有可验证的正式可发布dist artifact，故需两组件各正式构建一次并保留manifest/hash，后续原生装配/浏览器/扫描消费同一产物；保留锁定依赖审计、运行时HIGH/CRITICAL及受影响SAST。已接纳的本地同输入PG/恢复/真实浏览器不重做；未接纳的项明确为缺口，不能静默标绿或用HTTP替代。是否可接纳由DOT独立review决定，不由本实现自行签发。
+4. `.github/workflows/ci.yml` 如原workflow输入/runner预算需要兼容字段，仅透传可选场景；`.github/scripts/merge-gate.mjs` 只在所选新qualified字段确有需要时增加严格校验，仍要求scope、school-teacher、codeql真实success，不减少原必需项。对应既有scope/gate/checker控制测试补外部PR/未知path/错tree/缺result拒绝，不新建独立门禁。
+
+最小必需证据清单：精确边界与实际来源；已验证模型边界＋新适配/受众合同；真实FINAL/幂等、错误actor/凭据拒绝、恢复后不重算；中文跨入口报告；当前两组件正式构建/锁定审计与runtime scan；变化生产及控制代码CodeQL；stable selected gate。无schema变化，不以此新增迁移矩阵；本轮已有真实当前schema dump/restore证据，若被接纳不重复。单项计分公式未变，不重跑全量工具或四套同公式。
+
+预算：原始证据/边界接纳1—2分钟；两组件构建并行各2—4分钟；安全扫描/审计依赖官方下载，通常各2—4分钟；CodeQL一次3—6分钟。缺失且获准的精确浏览器另2—5分钟。5分钟作为具体等待项通报阈值，不能因下载超时弱化TLS、扩大等待或换SHA清零。正式失败目标累计一次后收敛；本次无新正式失败，不抹掉首次CI-003。
+
+此节为明确可审计划，不是已实现route或已获正式资格；需要DOT在自然节点就这组有限文件/接纳边界集中判断后实施。新生产/测试源码可先正常提交推送Draft；禁止跳过CodeQL、伪造gate、抢跑merge或更换保护。生产部署仍未授权。
