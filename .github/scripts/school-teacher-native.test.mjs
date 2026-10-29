@@ -5,6 +5,8 @@ import {execFileSync} from 'node:child_process';
 import {nativeBinding,nativeSastConfig,validateNativeBoundary,requireNativeQualification,requireNativeEvidence,observeNativeMain,requireNativeProducerAttempt,NATIVE_BRANCH,NATIVE_MARKER,NATIVE_JOBS} from './school-teacher-native.mjs';
 import {binding,schoolTeacherPlan,schoolTeacherOutputs,requireSuccess,BRANCH,SELF_BRANCH,JOBS,SELF_JOBS} from './school-teacher-scope.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
+import {inspectHistoricalCase,requireReviewedCase} from './school-teacher-checks.mjs';
+import {verifyNativeEvidence,readNativeEvidenceBytes,selection,canonical,hash} from './school-teacher-native-evidence.mjs';
 const workflow=readFileSync(new URL('../workflows/ci-school-teacher.yml',import.meta.url),'utf8');
 const ci=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
 const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
@@ -128,4 +130,29 @@ test('main observes only the exact merged PR and newest successful official full
 test('a failed runtime consumer cannot silently cause producers to build again under a later attempt',()=>{
  requireNativeProducerAttempt('1');for(const attempt of ['2','0','',undefined])assert.throws(()=>requireNativeProducerAttempt(attempt));
  const checks=readFileSync(new URL('./school-teacher-checks.mjs',import.meta.url),'utf8');assert(checks.indexOf('requireNativeProducerAttempt(process.env.GITHUB_RUN_ATTEMPT)')<checks.indexOf("freshBuild(kind);nativeContext(kind)"));
+});
+test('reviewed local byte reader selects only exact passed rows, preserves duplicate names and missing exits, and leaves new supplement pending',()=>{
+ const b=nativeBinding(),helpers={inspectHistoricalCase,requireReviewedCase};
+ const out=verifyNativeEvidence(readNativeEvidenceBytes(),b,helpers);
+ assert.equal(out.applicationTestsExecutedInCI,false);assert.equal(out.originalEnvironmentFullyBound,false);assert.equal(out.admittedCases.length,50);assert.equal(out.recordedSupplements.length,1);
+ const model=out.admittedCases.filter(c=>c.group==='M01');assert.equal(model.length,23);assert(model.every(c=>c.index>=20));assert.equal(model[0].originalShellExit,null);
+ const duplicates=model.filter(c=>c.caseName.endsWith('rejects ambiguous or unsupported model configuration'));assert.deepEqual(duplicates.map(c=>c.index),[35,36,37,38,39,40,41,42]);
+ assert.equal(out.observations.find(o=>o.id==='PUB-SCHOOL').wholeInvocationSuccess,false);assert.equal(out.pendingFinalReview,true);assert.throws(()=>requireNativeEvidence(b,helpers),/not admitted until final candidate review/);
+ const reviewed={...b,enabled:true,review:{status:'INDEPENDENTLY_REVIEWED',recordSha256:'f'.repeat(64)}};
+ assert.equal(requireNativeEvidence(reviewed,helpers).recordedSupplements.length,0);
+});
+test('original byte reader refuses byte drift, filtered selection, invented exits and unknown observation even if a synthetic manifest hash is changed',()=>{
+ const bytes=readNativeEvidenceBytes(),base=nativeBinding(),helpers={inspectHistoricalCase,requireReviewedCase};
+ const changed=Buffer.from(bytes);changed[10]^=1;assert.throws(()=>verifyNativeEvidence(changed,base,helpers));
+ for(const mutate of [
+  d=>d.reports[0].originalShellExit=0,
+  d=>{const r=d.reports.find(r=>r.file==='survey-native-unknown-policy-corrected.json');r.selected=[0];r.caseBranches={'0':r.branchReview}},
+  d=>d.observations.find(o=>o.id==='T-BROWSER').expected.sourceCommit='a'.repeat(40),
+  d=>d.observations.find(o=>o.id==='T-HTTP').originalShellExit=0,
+  d=>d.observations.find(o=>o.id==='LINKS').expected.readOnly='off',
+  d=>d.coverage[Object.keys(d.coverage)[0]].push('unrecorded-behavior'),
+  d=>d.observations.find(o=>o.id==='T-HTTP').kind='unknown'
+ ]){
+  const d=JSON.parse(bytes),b=structuredClone(base);mutate(d);const raw=Buffer.from(JSON.stringify(d));b.evidence.manifestSha256=hash(raw);b.evidence.selectionSha256=hash(canonical(selection(d)));assert.throws(()=>verifyNativeEvidence(raw,b,helpers));
+ }
 });

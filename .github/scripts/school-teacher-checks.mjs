@@ -512,7 +512,7 @@ async function nativePhase(phase,b,plan){
  }
  else if(phase==='verify-frontend-artifact')freshArtifact('frontend');
  else if(phase==='verify-backend-artifact')freshArtifact('backend');
- else if(phase==='native-evidence')requireNativeEvidence(b);
+ else if(phase==='native-evidence')receipt('native-reviewed-local-evidence',requireNativeEvidence(b,{inspectHistoricalCase,requireReviewedCase}));
  else if(phase==='native-runtime')command('native-runtime','python3',['.github/scripts/school-teacher-native-runtime.py']);
  else if(phase==='audit')auditComponents(b.execution.auditComponents,auditComponent,value=>receipt('audit',value));
  else if(phase==='aggregate')requireSuccess(plan,JSON.parse(process.env.NEEDS_JSON));

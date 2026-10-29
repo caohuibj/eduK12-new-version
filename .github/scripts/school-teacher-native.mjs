@@ -3,6 +3,7 @@
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {readFileSync} from 'node:fs';
+import {readNativeEvidenceBytes,verifyNativeEvidence} from './school-teacher-native-evidence.mjs';
 export const NATIVE_BRANCH='feat/bundle-evc-profile-20261029';
 export const NATIVE_MARKER='.github/scripts/school-teacher-native-bindings.json';
 export const NATIVE_JOBS=['admission','frontend','backend-self','native-evidence','native-runtime','security'];
@@ -78,14 +79,7 @@ export function nativePlan(entries,base,head,read,env,b=nativeBinding()){
   entries:entries.map(e=>({...e,oldBlob:e.oldMode==='000000'?'0'.repeat(40):read('rev-parse',base+':'+e.file),newBlob:read('rev-parse',head+':'+e.file)}))};
  return validateNativeBoundary(b,observed,{draftPreflight});
 }
-export function requireNativeEvidence(b){
- // Deliberately no generic attestation/admission engine. DOT must inspect the
- // retained raw cases/closures before selecting the small exact reader patch
- // or the specific missing assertions. A status string cannot grant success.
- assert.equal(b.evidence.status,'PENDING_INDEPENDENT_REVIEW');
- assert(Array.isArray(b.evidence.obligations)&&b.evidence.obligations.length>0);
- throw Error('Native application assertions not admitted: '+b.evidence.obligations.join(', '));
-}
+export function requireNativeEvidence(b,helpers){const result=verifyNativeEvidence(readNativeEvidenceBytes(),b,helpers);assert.equal(result.pendingFinalReview,false,'Native supplement not admitted until final candidate review');return result}
 export function requireNativeProducerAttempt(attempt){
  assert.equal(attempt,'1','Native producer retry requires diagnosis and an exact continuation; never rebuild an existing successful artifact by default');
 }

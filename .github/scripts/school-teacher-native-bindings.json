@@ -374,11 +374,19 @@
     },
     ".github/scripts/school-teacher-checks.mjs": {
       "before": "3ab008be96c779e282d101f8d9c8277ad4659b71",
-      "after": "c65d528e70250048f7867bdede9e597dc6d90c3c"
+      "after": "6826eeb0b7ee49bac050b5f02f8a327111eff088"
     },
     ".github/scripts/school-teacher-native-bindings.json": {
       "before": null,
       "after": null
+    },
+    ".github/scripts/school-teacher-native-evidence.json": {
+      "before": null,
+      "after": "8e58bb6c69b3d675d44fd72049a17992e189baf6"
+    },
+    ".github/scripts/school-teacher-native-evidence.mjs": {
+      "before": null,
+      "after": "f47d74ca2bffa17bd6c8e06a8d19055f2a3a90bf"
     },
     ".github/scripts/school-teacher-native-runtime.py": {
       "before": null,
@@ -390,11 +398,11 @@
     },
     ".github/scripts/school-teacher-native.mjs": {
       "before": null,
-      "after": "994f2721c8e03b5181793cd9726c98a7741d1efb"
+      "after": "dbc90deb25a9b787d27ef7c5608a2c59eb0b03df"
     },
     ".github/scripts/school-teacher-native.test.mjs": {
       "before": null,
-      "after": "7dc0a6f1e2b3bbc809986bfe44ecbe17af02684c"
+      "after": "02b0f0cded583a6722421656e0d373944bf34ee9"
     },
     ".github/scripts/school-teacher-scope.mjs": {
       "before": "41e85a871dcc046937cbaf21547415132b5d6343",
@@ -414,7 +422,7 @@
     },
     "docs/development/bundle-evc-profile-implementation-20261029.md": {
       "before": null,
-      "after": "2f78b188f56497e18abebfb8f1c7fca43ac15322"
+      "after": "095b77dabc16a624d1d2a4a09922b50b7bc4ebe7"
     }
   },
   "protectedInputs": {
@@ -467,7 +475,7 @@
     }
   },
   "evidence": {
-    "status": "PENDING_INDEPENDENT_REVIEW",
+    "status": "REVIEWED_LOCAL_EVIDENCE_PENDING_ACTIVATION",
     "obligations": [
       "EVC-B-model-boundaries-and-applicability",
       "deterministic-source-permissions-and-cache",
@@ -475,6 +483,9 @@
       "School-native-source-FINAL-replay-saved-restore-browser",
       "Survey-whole-U-frozen-R-FINAL-replay-saved-restore-browser",
       "Survey-native-authoring-and-legacy-projections"
-    ]
+    ],
+    "manifestSha256": "92bc77290a45263d572db475dd868222fa7758f38881c84caabee75440c9ffb2",
+    "reviewSha256": "7aa937f418091080e689fc3305f2504a488f501f95d3e060b1efc5d9da41c2cf",
+    "selectionSha256": "a0965162e076140cf850df18040c4c453e925022c699d387ba1616cc1c7d2edd"
   }
 }

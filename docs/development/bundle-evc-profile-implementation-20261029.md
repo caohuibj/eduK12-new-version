@@ -525,3 +525,17 @@ frontend/backend-self各自独立producer完成后，原dist manifest与runtime 
 ### node_modules链接与解包兼容
 
 只读检查本环境的实际node_modules和同样GNU tar头：14,119个member、展开356,842,863字节；28个内部相对symlink、1个hardlink，其target是已出现的同node_modules根regular文件（esbuild两个入口）。没有设备/越界/特权mode/重复路径/在链接下写入；低于safe_extract既有150,000 member/4GiB上限。逐规则与现有safe_extract的prior-regular、内部相对symlink、无link-parent写入及Python data filter合同对应，没有放松解包校验，没有为此完整解包368MB、构建或扫描。该记录是本地锁定依赖安装的兼容性观察，不是未来CI原件，正式producer仍须绑定实际原件及完整hash。
+
+## 22. 两项材料缺口收口及既有historical reader接入
+
+DOT已逐项读取77份原件并决定：接纳School原失败调用中实际到达的发布UPDATE/后续读取/COMMIT阶段，不称整条命令成功；明确passed行按原report hash＋suite/行/fullName选择，失败/filtered不计；三个浏览器只证明原开发环境报告重开/刷新/手机宽度，不替代正式构建或镜像扫描。本轮只补以下两点，没有重跑发布、作答、FINAL、计分、恢复或浏览器。
+
+真正写Training HTTP核心结果的是原`evc-http-scales.cjs`，并非只交Context的`evc-http-final.cjs`。已找到原`evc-http-scales.log`，其全部字段与现有result JSON相同，脚本明确断言两份SCALE提交、COMPLETED、幂等重放、P4及报告重开同hash。原shell exit仍未留存；后来JSON增加的7个DB计数/分数字段不在该原输出，不补写其历史来源。恢复的原runner/log实际字节已固定在本切片数据文件中，供最终核对。
+
+另在同一个明确隔离的eduk12_test完成一个只读关联case：事务实际transaction_read_only=on，精确读取两个已有已完成任务；Training/School各唯一INITIAL、3快照、2份已存单项、P4及原factsHash一致。School原resource/source/runtime/track/execution/task及三份native identity hash关联一致，发布/独立review字段存在。计分、matcher、Profile engine均spy为禁止调用且实际0次；没有发布/FINAL/恢复写入。只读结果不伪装成重新执行原HTTP。第一次审计误对canonical unit用cognitive解密器，在READ ONLY事务中失败回滚；改用既有decryptUnifiedRuntimePayload后1 PASS/exit0，原失败report/exit/script保留，不改业务数据。静态另核原发布packageHash与该只读审计的releaseContentHash一致。
+
+接纳代码仅新增一个约百行的有界reader和一个约165KB的数据文件，复用原inspectHistoricalCase/requireReviewedCase。52份必要原始字节以无损gzip保留，每份核长度/SHA；22份report按确切索引选51行，其中50行是已审范围的原passed行，1行为本次新只读补充。原43例只选相关23行，共用20行不因数量好看而计入；8个重名配置行保持35—42身份。每个选中行都有实际分支解释：新来源hash/quality、适用条件、默认db参数、School ORG入口、Survey完整Context/显式student R/新researcher403分别界定；110个其他量表材料不参与这些源分数，不新增测验。当前应用tree/锁/schema绑定与历史环境限制分开，绝不以当前清单倒填历史环境。
+
+恢复的Training HTTP原件、本次新审计及其关联观察仍待DOT最终候选核对：reader能验证原件，但requireNativeEvidence保持拒绝这部分pending；既有enabled=false、control review PENDING未变。后续只在已有最终候选review/激活流程中收口，不另造签名、证据提供者或审批层。只改状态而没有原字节、选择摘要、分支映射和输入一致性，无法通过reader。缺失退出仍null；旧School失败整次仍false；浏览器始终声明开发环境范围。
+
+新增reader控制两例覆盖原件漂移、filtered行、伪造exit、篡改声明source/只读状态、漏行为及未知观察拒绝。逐行分支元数据加入后，负例夹具在构造非法选择时先遇undefined的自校验错误；只修夹具的非法行分支说明，失败原件保留，仅重验该负例PASS。未重复旧模型/三入口用例。本切片不Ready、不运行正式build/audit/runtime/CodeQL、不合main或部署，PR正文拒绝动作未重试。
