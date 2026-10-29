@@ -9,6 +9,8 @@ import {readCurrentStandardCombination} from './standard-combination-source'
 import {standardCombinationPointerSchema} from './standard-combination'
 import {assertScaleLibraryCollectionAllowed} from '../scale-library-governance/collection-guard'
 import {canonicalHash} from '../assessment-runtime/canonical'
+import {selectedConfigurationBindingSchema} from '../assessment-authorization/selected-configuration'
+import {sealTrainingStandardUseConfiguration,readTrainingStandardUseConfiguration} from '../assessment-authorization/standard-configuration-binding'
 export {standardCombinationPointerSchema} from './standard-combination'
 
 const uuid=z.string().guid(),hash=z.string().regex(/^[a-f0-9]{64}$/)
@@ -22,7 +24,7 @@ export const trainingStandardUseAuthoritySchema=z.union([
  z.object({...useAuthority,authorityGrantId:uuid}).strict(),
  z.object({...useAuthority,authorityEntryGrantId:uuid,authorityEntryGrantVersion:positive}).strict(),
 ])
-const receipt={grantId:uuid,userId:uuid,combinationHash:hash,useVersion:positive,product:z.literal('TRAINING')}
+const receipt={grantId:uuid,userId:uuid,combinationHash:hash,useVersion:positive,product:z.literal('TRAINING'),selectedBinding:selectedConfigurationBindingSchema.optional(),requestIntentHash:hash.optional()}
 const receiptSchema=z.union([
  z.object({...receipt,authorityGrantId:uuid}).strict(),
  z.object({...receipt,authorityEntryGrantId:uuid,authorityEntryGrantVersion:positive}).strict(),
@@ -77,6 +79,8 @@ export async function assertTrainingStandardUse(tx:Prisma.TransactionClient,inpu
 
 export async function grantTrainingStandardCombinationUse(actorId:string,combinationId:string,raw:unknown){
  const id=uuid.parse(combinationId),input=issueSchema.parse(raw)
+ const requestIntentHash=canonicalHash({actorId,combinationId:id,userId:input.userId,combinationHash:input.combinationHash,
+  grantId:input.grantId??null,expectedGrantVersion:input.expectedGrantVersion??null,expectedUseVersion:input.expectedUseVersion??null})
  return prisma.$transaction(async tx=>{
   const [header]=await tx.$queryRaw<Array<{tool_key:string;instrument_version:string;measurement_release:{releaseId:string}|null}>>(Prisma.sql`
    SELECT tool_key,snapshot->>'instrumentVersion' AS instrument_version,measurement_release FROM survey_standard_releases WHERE id=${id}`)
@@ -102,7 +106,7 @@ export async function grantTrainingStandardCombinationUse(actorId:string,combina
    const receipt=receiptSchema.safeParse(recorded.metadata)
    if(recorded.actorId!==actorId||recorded.resourceId!==id||recorded.action!=='STANDARD_COMBINATION_USE_GRANTED'||!receipt.success
     ||receipt.data.userId!==input.userId||receipt.data.combinationHash!==input.combinationHash||canonicalHash(binding(receipt.data))!==canonicalHash(selected)
-    ||prior?.id!==receipt.data.grantId)deny('请求编号已用于其他授权')
+    ||prior?.id!==receipt.data.grantId||receipt.data.requestIntentHash!==undefined&&receipt.data.requestIntentHash!==requestIntentHash)deny('请求编号已用于其他授权')
    return {id:prior.id,userId:input.userId,combination:{releaseId:id,combinationHash:input.combinationHash},
     version:receipt.data.useVersion,currentVersion:prior.version,revoked:prior.revokedAt!==null,changed:false,replayed:true}
   }
@@ -118,8 +122,13 @@ export async function grantTrainingStandardCombinationUse(actorId:string,combina
    data:{revokedAt:null,version:{increment:1},grantedBy:actorId,...columns(selected)}}):prior
    :await tx.materialGrant.create({data:{id:input.requestId,teacherId:input.userId,resourceType:MaterialResourceType.STANDARD_COMBINATION,
     resourceId:id,grantedBy:actorId,...columns(selected),standardCombinationHash:input.combinationHash}})
+  const exactUse={useGrantId:use.id,useGrantVersion:use.version,issuerId:actorId,...selected}
+  // An active legacy revision must not acquire new fields under an old draft.
+  // Its explicit revoke/reissue creates a new revision eligible for T1 sealing.
+  const selectedBinding=!prior||prior.revokedAt?sealTrainingStandardUseConfiguration(source,input.userId,exactUse,authority.version):
+   await readTrainingStandardUseConfiguration(tx,source,input.userId,exactUse)
   await tx.assessmentManagementEvent.create({data:{id:input.requestId,actorId,resourceId:id,action:'STANDARD_COMBINATION_USE_GRANTED',
-   metadata:{grantId:use.id,userId:input.userId,combinationHash:input.combinationHash,...selected,useVersion:use.version,product:'TRAINING'}}})
+   metadata:{grantId:use.id,userId:input.userId,combinationHash:input.combinationHash,...selected,useVersion:use.version,product:'TRAINING',requestIntentHash,...(selectedBinding?{selectedBinding}:{})}}})
   await assertTrainingStandardUse(tx,{userId:input.userId,combination:{releaseId:id,combinationHash:input.combinationHash},
    measurementReleaseId:source.measurement.releaseId,useGrantId:use.id,useGrantVersion:use.version})
   return {id:use.id,userId:input.userId,combination:{releaseId:id,combinationHash:input.combinationHash},version:use.version,
