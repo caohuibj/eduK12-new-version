@@ -74,6 +74,7 @@ suite('Education public fixed-source use on isolated PostgreSQL',()=>{
  afterAll(async()=>{if(server){server.closeAllConnections();await new Promise<void>(resolve=>server.close(()=>resolve()))}vi.unstubAllEnvs();await db.$disconnect()})
 
  it('issues exact non-delegable U and exposes bounded source summaries without wrappers, content copies or source rights',async()=>{
+  const beforeComposites=await db.compositeAssessment.count(),beforeVersions=await db.educationPrivateToolVersion.count()
   const empty=await get('TEACHER');expect(empty.status,JSON.stringify(empty.value)).toBe(200);expect(empty.value.data.list).toEqual([])
   const body=request(),issued=await issueAdminContentRoot(system,proof(),body)
   expect(issued).toMatchObject({changed:true,version:1});expect(await issueAdminContentRoot(system,proof(),body)).toMatchObject({changed:false})
@@ -97,7 +98,7 @@ suite('Education public fixed-source use on isolated PostgreSQL',()=>{
    const allowed=await readEducationPublicUse(tracked,context(),[standardKey,formKey,formKey],true);return {allowed,queries}
   })
   expect(batch.allowed.size).toBe(2);expect(batch.queries).toHaveLength(2);expect(batch.queries[0]).toContain('FOR SHARE OF g')
-  expect(await db.compositeAssessment.count()).toBe(0);expect(await db.educationPrivateToolVersion.count()).toBe(0)
+  expect(await db.compositeAssessment.count()).toBe(beforeComposites);expect(await db.educationPrivateToolVersion.count()).toBe(beforeVersions)
   await revokeAdminContentGrant(system,proof(),issued.grantId,{expectedVersion:1,reason:'Synthetic U withdrawal'})
   expect((await get('TEACHER')).value.data.list).toEqual([])
   expect((await db.$transaction(tx=>readEducationPublicUse(tx,context(),[standardKey,formKey],true))).size).toBe(0)

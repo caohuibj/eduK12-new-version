@@ -12,7 +12,7 @@ describe('School composition product consumers / synthetic HTTP contracts',()=>{
   render(<EducationPrivateToolStudio api={api as PrivateToolApi} organizationId="org" actorId="author" entry="SCHOOL"/>)
   await waitFor(()=>expect(screen.getByRole('button',{name:'普通问卷'})).toBeEnabled())
   fireEvent.click(screen.getByRole('button',{name:'普通问卷'}))
-  expect(await screen.findByText(/将本人固定量表和表单编成一份学生自评问卷/)).toBeInTheDocument()
+  expect(await screen.findByText(/将本人固定量表和表单、获授权公共量表与表单编成一份学生自评问卷/)).toBeInTheDocument()
   expect(api).toHaveBeenCalledWith('/organizations/org/private-tools?kind=COMPOSITION')
  })
  it('attaches one fixed questionnaire from the actual activity consumer and displays the source revision',async()=>{
