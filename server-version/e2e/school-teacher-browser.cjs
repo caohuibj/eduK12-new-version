@@ -634,7 +634,8 @@ async function run() {
       }
       await s.page.reload()
       await s.page.getByRole('navigation', { name: 'Teacher 工作台' }).getByRole('button', { name: '学校改进', exact: true }).click()
-      if(!selfMode)await ui.schoolManagementAnchor(s)
+      if(selfMode)await s.page.getByRole('navigation',{name:'学校管理分区',exact:true}).getByRole('link',{name:'评价活动',exact:true}).click()
+      else await ui.schoolManagementAnchor(s)
       const event = s.page.getByRole('region', { name: '评价活动', exact: true }).locator('article.ht-event').filter({ has: s.page.locator('strong').filter({ hasText: w.title }) })
       await event.getByRole('button', { name: '查看任务配置', exact: true }).click()
       return event
