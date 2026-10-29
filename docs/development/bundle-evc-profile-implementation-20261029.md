@@ -161,3 +161,12 @@ B参数保持原值：三轴等权；低<=.35，高>=.65；低/高中心.2/.8；
 - baseline使用的临时fixture与所有失败日志已保留在仓库外 `/workspace/bundle-inputs/`；未将临时诊断fixture加入正式suite或当作平台PASS。
 
 后续只补实际缺失旅程；已通过纯算法输入未变时不重复全套。类型补验与正式CI复用能力须由真实route决定，不能把本地未签名结果冒称官方CI。当前没有启动正式CI或PR，连续正式CI失败次数为0。
+
+
+## 12. DOT协调回执与Draft推进
+
+DOT已确认：B原参考是首个研究试验示范，保持原L1参数和7—12年级范围，不宣称最终科学定版。允许Bundle限定gradeLevel采集、analysis受众投影和报告UI；不同独立分支可分别推送，不修改任务1授权核心、管理员UI或其分支。
+
+已实际推送设计35c31f552及候选e860cfc4202d049e4b16a19ddca03eaffa1234b0，远端分支回读吻合；main回读仍2de32609。Draft前静态核到新包缺少既有content-check要求的ci-fixture，补齐同一12题S04合成输入，不改量表评分或既有断言。
+
+Draft激活范围：base2de32609、scope实际分类platform/legacy；Draft只运行既有light compile/type及独立publication观察，不授予Ready/合并资格。适用CI-003（真实类型闭包）、CI-006（正常安装/部署前置）、CI-007（新增包/ci-fixture清单）、CI-019/020（范围、原始结果和未执行状态）；真实PG/browser尚未通过，不启动Ready全平台作为排错。已有45个纯算法/合同本地结果不重复运行，未将其冒称正式CI。后续Ready资格需冻结实际完整功能切片及适用范围。
