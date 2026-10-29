@@ -1,3 +1,4 @@
+import {scale26IntakePlan,scale26IntakeOutputs} from './scale26-intake-scope.mjs';
 import {onboardingPlan,onboardingOutputs} from './onboarding-scope.mjs';
 import {pr364Plan,pr364Outputs} from './pr364-scope.mjs';
 import {pr363Plan,pr363Outputs} from './pr363-scope.mjs';
@@ -320,6 +321,13 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const event = process.env.CI_EVENT;
   refuseUnplannedPR356();
   const base = process.env.CI_BASE_SHA;
+  // Exact Scale26 source and control closure, before generic platform routing.
+  const scale26=scale26IntakePlan(event==='workflow_dispatch'?[]:changedEntries(base),base,
+    execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
+  if(scale26){const output=scale26IntakeOutputs(scale26);console.log(JSON.stringify(output));
+    if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,
+      Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));
+    process.exit(0);}
   const onboarding=onboardingPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
   if(onboarding){const output=onboardingOutputs(onboarding);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
   const pr364=pr364Plan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());

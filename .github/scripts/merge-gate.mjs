@@ -1,3 +1,4 @@
+import {SCALE26_BASE,SCALE26_SOURCE,SCALE26_TREE,SCALE26_BRANCH,scale26IntakeOutputs} from './scale26-intake-scope.mjs';
 import {onboardingPlan,onboardingOutputs} from './onboarding-scope.mjs';
 import {pr364Plan,pr364Outputs} from './pr364-scope.mjs';
 import {pr363Plan,pr363Outputs} from './pr363-scope.mjs';
@@ -68,6 +69,7 @@ const acceptanceJobs = {
 
 export function requiredChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
+  if(scope.application_route==='scale26-intake')return ['scope','scale26-intake',...(!draft?['codeql']:[])];
   if(scope.application_route==='onboarding-structure')return ['scope','onboarding-structure','codeql'];
   if(scope.application_route==='pr364')return ['scope','pr364','codeql'];
   if(scope.application_route==='pr363')return ['scope','pr363','codeql'];
@@ -155,6 +157,19 @@ export function failedChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
   if(scope.application_route==='pr356')return failedPr356Checks(needs,draft);
   const failed = requiredChecks(needs, draft).filter(name => needs[name]?.result !== 'success');
+  if(scope.application_route==='scale26-intake'){
+    try {
+      const p=JSON.parse(scope.scale26_intake_plan);
+      if (!p || p.route!=='scale26-intake' || p.base!==SCALE26_BASE ||
+          p.source!==SCALE26_SOURCE || p.sourceTree!==SCALE26_TREE ||
+          p.branch!==SCALE26_BRANCH || p.pr!==379 ||
+          p.postMerge!==false || p.draft!==draft ||
+          p.originalPaths!==266 || p.ciControlPaths!==6 ||
+          p.head!==process.env.GITHUB_SHA || p.prSource!==process.env.CI_SOURCE_HEAD ||
+          Object.entries(scale26IntakeOutputs(p)).some(([k,v])=>String(scope[k])!==String(v))) failed.push('scope');
+    }catch {failed.push('scope');}
+    return [...new Set(failed)];
+  }
   if(scope.application_route==='onboarding-structure'){
     try{const p=JSON.parse(scope.onboarding_plan);if(draft||p.draft||p.postMerge!==false||p.route!=='onboarding-structure'||Object.entries(onboardingOutputs(p)).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');}catch{failed.push('scope');}
     return [...new Set(failed)];
