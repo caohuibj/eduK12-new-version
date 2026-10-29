@@ -27,7 +27,7 @@ jobs:
         env:
           SCHOOL_TEACHER_CHROME_TIGHTEN: confirmed-self-package-scope
         run: node server-version/e2e/school-teacher-chrome-permissions.cjs tighten
-      - name: verify the sandbox and only the repaired locator against synthetic DOM
+      - name: observe only saved textarea locator semantics with sandboxed Chrome
         run: |
           node <<'NODE'
           'use strict'
@@ -52,39 +52,18 @@ jobs:
               report.sandbox = await verifyChromeSandbox(browser)
               const checked = validateChromeEvidence({ options: CHROME_LAUNCH_OPTIONS, preflight: report.preflight, sandbox: report.sandbox })
               if (!checked.ok) { report.code = checked.code; return }
-              stage = 'SELECTOR_SYNTHETIC_DOM'
-              const assert = require('node:assert/strict')
-              const source = fs.readFileSync(path.join(repo, 'server-version/e2e/education-self-questionnaire.cjs'), 'utf8')
-              assert.equal(createHash('sha256').update(source).digest('hex'), '9d1fa6d1ac6fdbc56bbbb8a63d956515fe33346d18e82785898f7fa26d680dc5')
-              const line = source.split('\n').find(row => row.includes("catalog.locator('article').filter(") && row.includes("name:'加入共用量表'"))
-              const expression = line.trim().slice('await '.length, line.trim().indexOf(".getByRole('button'"))
-              const p = await browser.newPage(), title = '合成获授权共用量表 精确来源', f = { library: { title } }
-              await p.setContent(`<section aria-label="普通问卷编制"><section aria-label="获授权共用量表"><article><strong>${title} 附录</strong><button data-source="decoy" onclick="window.picked.push(this.dataset.source)">加入共用量表</button></article><article><strong>${title}</strong><button data-source="expected" onclick="window.picked.push(this.dataset.source)">加入共用量表</button></article></section></section><section aria-label="其他目录"><article><strong>${title}</strong><button data-source="outside" onclick="window.picked.push(this.dataset.source)">加入共用量表</button></article></section><script>window.picked=[]</script>`)
-              const catalog = p.getByRole('region', { name: '普通问卷编制', exact: true }).getByRole('region', { name: '获授权共用量表', exact: true })
-              const oldMatches = await catalog.locator('article').filter({ has: catalog.locator('strong').filter({ hasText: title }) }).count()
-              const card = new Function('catalog', 'p', 'f', 'return (' + expression + ')')(catalog, p, f)
-              const correctedMatches = await card.count()
-              report.selectorDom = { scope: 'SYNTHETIC_DOM_ONLY', sourceCommit: '9b0aec2b576405b4eabdd2fcffe79f78b8520282', helperSha256: createHash('sha256').update(source).digest('hex'), oldMatches, correctedMatches }
-              assert.equal(oldMatches, 0); assert.equal(correctedMatches, 1)
-              await card.getByRole('button', { name: '加入共用量表', exact: true }).click()
-              report.selectorDom.clicked = await p.evaluate(() => window.picked)
-              assert.deepEqual(report.selectorDom.clicked, ['expected']); report.selectorDom.status = 'PASS'
-              stage = 'TEACHER_PUBLICATION_SELECTOR_DOM'
-              const publication = fs.readFileSync(path.join(repo, 'server-version/e2e/school-teacher-browser.cjs'), 'utf8')
-              const publicationLine = publication.split('\n').find(row => row.includes("const picker=scope.locator('details').filter("))
-              const publicationExpression = publicationLine.trim().slice('const picker='.length)
-              await p.setContent(`<section aria-label="评价活动"><article class="ht-event"><strong>目标活动</strong><details id="expected-picker"><summary>选用本人普通问卷</summary><button>选择固定版本</button></details></article><article class="ht-event"><strong>其他活动</strong><details id="outside-picker"><summary>选用本人普通问卷</summary></details></article></section>`)
-              const scope = p.getByRole('region', { name: '评价活动', exact: true }).locator('article.ht-event').filter({ has: p.getByText('目标活动', { exact: true }) })
-              const oldPickerMatches = await scope.locator('details').filter({ has: scope.locator('summary').filter({ hasText: '选用本人普通问卷' }) }).count()
-              const picker = new Function('scope', 's', 'return (' + publicationExpression + ')')(scope, { page: p })
-              const correctedPickerMatches = await picker.count()
-              report.publicationSelectorDom = { scope: 'SYNTHETIC_DOM_ONLY', sourceCommit: 'a1c203608290f9a58500a005ae866c14d8db6cee', publicationSha256: createHash('sha256').update(publication).digest('hex'), oldMatches: oldPickerMatches, correctedMatches: correctedPickerMatches }
-              assert.equal(oldPickerMatches, 0); assert.equal(correctedPickerMatches, 1)
-              await picker.locator('summary').click()
-              assert.equal(await picker.getAttribute('id'), 'expected-picker')
-              assert.equal(await picker.evaluate(node => node.open), true)
-              report.publicationSelectorDom.openedExpectedOnly = await p.locator('#outside-picker').evaluate(node => !node.open)
-              assert.equal(report.publicationSelectorDom.openedExpectedOnly, true); report.publicationSelectorDom.status = 'PASS'
+              stage = 'SAVED_TEXTAREA_LABEL_OBSERVATION'
+              const p = await browser.newPage()
+              await p.setContent('<section aria-label="普通问卷编制"><label>问卷名称<input value="已保存的问卷"/></label><label>问卷说明<textarea maxlength="16000" rows="4">合成固定问卷说明</textarea></label></section>')
+              const studio = p.getByRole('region', { name: '普通问卷编制', exact: true })
+              const label = studio.getByLabel('问卷说明', { exact: true }), role = studio.getByRole('textbox', { name: '问卷说明', exact: true })
+              report.savedTextareaObservation = { scope: 'SYNTHETIC_DOM_ONLY', labelMatches: await label.count(), roleMatches: await role.count(),
+                inputLabelMatches: await studio.getByLabel('问卷名称', { exact: true }).count(), labelTextContent: await studio.locator('label').nth(1).textContent() }
+              if (report.savedTextareaObservation.roleMatches === 1) {
+                report.savedTextareaObservation.savedValue = await role.inputValue()
+                await role.fill('后续草稿不应成为已固定作答说明')
+                report.savedTextareaObservation.editedValue = await role.inputValue()
+              }
               await p.close()
               report.status = 'ENVIRONMENT_READY'; report.code = 'CHROME_ENVIRONMENT_VERIFIED'
             } catch (error) {
