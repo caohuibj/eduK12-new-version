@@ -6,6 +6,7 @@ import {pathToFileURL} from 'node:url';
 import {spawnSync} from 'node:child_process';
 import {createRequire} from 'node:module';
 import {binding,actualPlan,requireSuccess,sha256,git} from './school-teacher-scope.mjs';
+import observerReuse from './school-teacher-observer-reuse.cjs';
 const out=resolve('school-teacher-evidence');
 function receipt(name,value){mkdirSync(out,{recursive:true});writeFileSync(join(out,name+'.json'),JSON.stringify(value,null,2)+'\n')}
 const RESUME={run:39867718449,head:'dcbc58483c6b6ce8a81526ddbc124a8b1c1c993c',checkout:'81ee1f6d6a097e0c9e0aca3da05582f614325878',frontendJob:120134202466,auditJob:120134202442,sastJob:120134095190,frontendArtifact:12465090917,frontendDigest:'7663300255799eff7bd3e8f4ac7f79fef42e3ad62af40da66d5f947876241451',auditArtifact:12464502959,auditDigest:'dac8363a31ff8e8a05809ec80d9b31929624e0be9a9f06bc549d2fb0e66fda1b',workflowSha256:'3711b141411280f2775ba9475d72b4011ecbfd664789b5228114eefee58331d7'};
@@ -347,7 +348,7 @@ export function verifyExecutionInputs(b,read=path=>readFileSync(resolve(path),'u
   'server-version/e2e/school-teacher-fixture.cjs','server-version/e2e/school-teacher-browser.cjs','server-version/e2e/school-teacher-chrome.cjs','server-version/e2e/school-teacher-chrome-permissions.cjs','server-version/e2e/school-teacher-ui.cjs',b.execution.browserHelper]);
  for(const component of ['frontend','backend']){
   const prefix='server-version/'+component+'/';paths.add(prefix+'package.json');paths.add(prefix+'package-lock.json');
-  if(b.branch==='release/education-self-scale-form-20261028')for(const f of b.execution[component].inputClosure.files)paths.add(f.path);
+  if(b.branch==='release/education-observer-native-20261029')for(const f of b.execution[component].inputClosure.files)paths.add(f.path);
   for(const batch of b.execution[component].batches){for(const f of batch.files)paths.add(prefix+f);for(const f of batch.inputClosure.files)paths.add(f.path)}
  }
  for(const f of b.execution.frontend.lintFiles)paths.add('server-version/frontend/'+f);
@@ -355,7 +356,7 @@ export function verifyExecutionInputs(b,read=path=>readFileSync(resolve(path),'u
  const frontend=JSON.parse(read('server-version/frontend/package.json')),backend=JSON.parse(read('server-version/backend/package.json'));
  assert.equal(frontend.scripts?.build,'vite build','Frontend build script changed');assert.equal(backend.scripts?.['db:generate'],'prisma generate','Backend client generation script changed');
  assert.equal(sha256(b.execution.migration.baselineFixtureSql),b.execution.migration.baselineFixtureSha256);
- if(b.branch==='release/education-self-scale-form-20261028'){
+ if(b.branch==='release/education-observer-native-20261029'){
   assert.equal(b.execution.migration.baselineFixturePath,'.github/scripts/school-teacher-self-baseline.sql');
   assert.equal(read(b.execution.migration.baselineFixturePath),b.execution.migration.baselineFixtureSql,'Reviewed nonempty baseline fixture changed');
  }
@@ -363,7 +364,8 @@ export function verifyExecutionInputs(b,read=path=>readFileSync(resolve(path),'u
 }
 function admission(b,plan){
  const evidence=JSON.parse(readFileSync('.github/scripts/school-teacher-evidence.json','utf8'));requireNoHistoricalAcceptance(evidence);
- if(b.branch==='release/education-self-scale-form-20261028')for(const component of ['frontend','backend'])verifyClosure(b.execution[component].inputClosure);
+ if(b.branch==='release/education-observer-native-20261029')for(const component of ['frontend','backend'])verifyClosure(b.execution[component].inputClosure);
+ if(b.qualification===observerReuse.mode)observerReuse.verifyInputs(b,git);
  const inputs=verifyExecutionInputs(b);receipt('admission',{status:'PASSED',plan,inputs,historicalAcceptedCases:0,acceptedCases:[]});
 }
 function batches(component,selected,offset=0){const cwd=resolve('server-version',component),allowedSourcePaths=new Set(git('ls-files','server-version/'+component+'/src').split('\n').map(p=>p.slice(('server-version/'+component+'/').length)));assert(Array.isArray(selected));for(const [index,b] of selected.entries()){const i=index+offset;
@@ -384,6 +386,11 @@ function freshArtifact(kind){
  const dir=resolve('server-version',kind,'dist'),manifest=JSON.parse(readFileSync(join(dir,'ci-build-manifest.json')));
  return verifyFreshManifest(manifest,{kind,head:git('rev-parse','HEAD'),runId:process.env.GITHUB_RUN_ID,lockDigest:sha256(readFileSync(resolve('server-version',kind,'package-lock.json'))),contentDigest:treeDigest(dir)});
 }
+function currentBackendArtifact(){
+ const dir=resolve('server-version/backend/dist');assert.equal(existsSync(join(out,'official-backend-build-reuse.json')),false);
+ const manifest=JSON.parse(readFileSync(join(dir,'ci-build-manifest.json')));
+ return verifyFreshManifest(manifest,{kind:'backend',head:git('rev-parse','HEAD'),runId:process.env.GITHUB_RUN_ID,lockDigest:sha256(readFileSync('server-version/backend/package-lock.json')),contentDigest:treeDigest(dir)});
+}
 function freshBuild(kind){
  const cwd=resolve('server-version',kind);rmSync(join(cwd,'dist'),{recursive:true,force:true});
  if(kind==='frontend')command('frontend-build','npm',['run','build'],cwd);
@@ -391,12 +398,12 @@ function freshBuild(kind){
  command(kind+'-manifest',process.execPath,['.github/scripts/ci-artifact.mjs','write',kind]);
  receipt(kind+'-fresh-build',{status:'PASSED',qualification:'fresh-current-source',manifest:freshArtifact(kind)});
 }
-export const frontendTypeCommand=b=>b.branch==='release/education-self-scale-form-20261028'
+export const frontendTypeCommand=b=>b.branch==='release/education-observer-native-20261029'
  ?{exe:'npm',args:['run','typecheck']}:{exe:process.execPath,args:['node_modules/typescript/bin/tsc','-b']};
 async function frontend(b){
  if(b.qualification!=='fresh-integrated-authoring'){await reuseCompletedFrontend(b);return}
  const cwd=resolve('server-version/frontend');
- if(b.branch==='release/education-self-scale-form-20261028')verifyClosure(b.execution.frontend.inputClosure);
+ if(b.branch==='release/education-observer-native-20261029')verifyClosure(b.execution.frontend.inputClosure);
  const types=frontendTypeCommand(b);command('frontend-types',types.exe,types.args,cwd);
  if(b.execution.frontend.lintFiles.length)command('frontend-lint',process.execPath,['node_modules/eslint/bin/eslint.js',...b.execution.frontend.lintFiles],cwd);
  batches('frontend',b.execution.frontend.batches);freshBuild('frontend');
@@ -468,7 +475,7 @@ async function restore(b){
  receipt('restore',{status:'PASSED',preserved,restrictedRuntimeRole:true,releaseSchemaVerified:true});
 }
 async function restoreQualifiedPostgres(b){
- databaseGuard();assert.equal(b.branch,'release/education-self-scale-form-20261028');assert.equal(process.env.ASSESSMENT_COMPACT_FACTS_ENABLED,'false');
+ databaseGuard();assert.equal(b.branch,'release/education-observer-native-20261029');assert.equal(process.env.ASSESSMENT_COMPACT_FACTS_ENABLED,'false');
  for(const [index,batch]of b.execution.backend.batches.entries()){
   const result=JSON.parse(readFileSync(join(out,'backend-tests-'+index+'.json')));
   assert.equal(result.sourceHead,git('rev-parse','HEAD'));assert.equal(result.wholeInvocationSucceeded,true);
@@ -487,20 +494,22 @@ async function restoreQualifiedPostgres(b){
 }
 function cleanup(){const root=realpathSync(process.env.RUNNER_TEMP);for(const name of ['school-teacher-private','school-teacher-checks-private','school-teacher-seed.log']){const p=join(root,name);if(existsSync(p)){assert.equal(realpathSync(p),p);rmSync(p,{recursive:true})}}receipt('cleanup',{privateMaterialRemoved:true})}
 async function main(){const phase=process.argv[2];if(phase==='cleanup'){cleanup();return}assert.equal(process.version,'v24.21.0');const b=binding(),plan=actualPlan();assert.deepEqual(plan,JSON.parse(process.env.PLAN));const fresh=b.qualification==='fresh-integrated-authoring';
+ const continuation=b.qualification===observerReuse.mode;
+ const reuseDeps={git,officialApi,officialZip,jsonZip,verifyTestReport,receipt,treeDigest,command,databaseGuard,restoreRows,checkRestoredRuntime};
  if(phase==='admission')admission(b,plan);
- else if(phase==='frontend')await frontend(b);
- else if(phase==='verify-frontend-artifact')fresh?freshArtifact('frontend'):verifyConnectedFrontend();
- else if(phase==='backend'){if(fresh)freshBuild('backend');else await reuseCompletedBackend(b);}
- else if(phase==='verify-backend-artifact')fresh?freshArtifact('backend'):verifyConnectedBackend();
+ else if(phase==='frontend'){if(continuation)await observerReuse.reuse('frontend',b,reuseDeps);else await frontend(b);}
+ else if(phase==='verify-frontend-artifact')continuation?observerReuse.verifyArtifact('frontend',reuseDeps):fresh?freshArtifact('frontend'):verifyConnectedFrontend();
+ else if(phase==='backend'){if(continuation||fresh)freshBuild('backend');else await reuseCompletedBackend(b);}
+ else if(phase==='verify-backend-artifact')continuation?currentBackendArtifact():fresh?freshArtifact('backend'):verifyConnectedBackend();
  else if(phase==='migrate'){if(fresh){freshArtifact('backend');await migrate(b)}else await prepareCurrentDatabase(b);}
- else if(phase==='postgres'){if(fresh){freshArtifact('backend');databaseGuard();assert.notEqual(process.env.EDUCATION_MATERIAL_CAPACITY_PROBE_STUB,'true','Real upload admission capacity required');if(b.branch==='release/education-self-scale-form-20261028')verifyClosure(b.execution.backend.inputClosure);batches('backend',b.execution.backend.batches)}else{verifyConnectedBackend();await reuseCompletedRemainder(b)}}
+ else if(phase==='postgres'){if(continuation)await observerReuse.reuse('postgres',b,reuseDeps);else if(fresh){freshArtifact('backend');databaseGuard();assert.notEqual(process.env.EDUCATION_MATERIAL_CAPACITY_PROBE_STUB,'true','Real upload admission capacity required');if(b.branch==='release/education-observer-native-20261029')verifyClosure(b.execution.backend.inputClosure);batches('backend',b.execution.backend.batches)}else{verifyConnectedBackend();await reuseCompletedRemainder(b)}}
  else if(phase==='fonts')prepareFonts();
  else if(phase==='seed'){databaseGuard();command('browser-fixture',process.execPath,['server-version/e2e/school-teacher-fixture.cjs','seed']);}
  else if(phase==='restore')await restore(b);
- else if(phase==='postgres-restore')await restoreQualifiedPostgres(b);
- else if(phase==='browser-report'){const module=await import(pathToFileURL(resolve(b.execution.browserHelper))),helper=module.default||module;assert.equal(typeof helper.verifyReport,'function');const report=JSON.parse(readFileSync(join(out,'browser.json'))),frontend=JSON.parse(readFileSync('server-version/frontend/dist/ci-build-manifest.json')),backend=JSON.parse(readFileSync('server-version/backend/dist/ci-build-manifest.json'));const result=helper.verifyReport(report,{head:plan.head,tree:plan.sourceTree,runId:process.env.GITHUB_RUN_ID,frontend,backend,...(fresh?{frontend:freshArtifact('frontend'),backend:freshArtifact('backend')}:{officialFrontendReuse:verifyConnectedFrontend(),officialBackendReuse:verifyConnectedBackend(),backendCompileDigest:verifyBackendCompileInputs()}),backendLockDigest:sha256(readFileSync('server-version/backend/package-lock.json')),backendContentDigest:treeDigest(resolve('server-version/backend/dist')),frontendTree:git('rev-parse','HEAD:server-version/frontend'),frontendLockDigest:sha256(readFileSync('server-version/frontend/package-lock.json')),frontendContentDigest:treeDigest(resolve('server-version/frontend/dist'))},file=>{assert(/^screenshots\/[a-z0-9-]+\.png$/.test(file));return readFileSync(join(out,file))});receipt('browser-acceptance',result);}
- else if(phase==='audit'){if(fresh)auditComponents(b.execution.auditComponents,auditComponent,value=>receipt('audit',value));else await reuseOfficial('audit',b);}
- else if(phase==='sast-reuse'){assert.equal(fresh,false,'Fresh qualification requires actual SAST, never historical reuse');await reuseOfficial('sast',b);}
+ else if(phase==='postgres-restore'){if(continuation)await observerReuse.restore(b,reuseDeps);else await restoreQualifiedPostgres(b);}
+ else if(phase==='browser-report'){const module=await import(pathToFileURL(resolve(b.execution.browserHelper))),helper=module.default||module;assert.equal(typeof helper.verifyReport,'function');const report=JSON.parse(readFileSync(join(out,'browser.json'))),frontend=JSON.parse(readFileSync('server-version/frontend/dist/ci-build-manifest.json')),backend=JSON.parse(readFileSync('server-version/backend/dist/ci-build-manifest.json'));const result=helper.verifyReport(report,{head:plan.head,tree:plan.sourceTree,runId:process.env.GITHUB_RUN_ID,frontend,backend,...(continuation?{officialFrontendReuse:observerReuse.verifyArtifact('frontend',reuseDeps),backend:currentBackendArtifact()}:fresh?{frontend:freshArtifact('frontend'),backend:freshArtifact('backend')}:{officialFrontendReuse:verifyConnectedFrontend(),officialBackendReuse:verifyConnectedBackend(),backendCompileDigest:verifyBackendCompileInputs()}),backendLockDigest:sha256(readFileSync('server-version/backend/package-lock.json')),backendContentDigest:treeDigest(resolve('server-version/backend/dist')),frontendTree:git('rev-parse','HEAD:server-version/frontend'),frontendLockDigest:sha256(readFileSync('server-version/frontend/package-lock.json')),frontendContentDigest:treeDigest(resolve('server-version/frontend/dist'))},file=>{assert(/^screenshots\/[a-z0-9-]+\.png$/.test(file));return readFileSync(join(out,file))});receipt('browser-acceptance',result);}
+ else if(phase==='audit'){if(continuation)await observerReuse.reuse('audit',b,reuseDeps);else if(fresh)auditComponents(b.execution.auditComponents,auditComponent,value=>receipt('audit',value));else await reuseOfficial('audit',b);}
+ else if(phase==='sast-reuse'){if(continuation)await observerReuse.reuse('sast',b,reuseDeps);else{assert.equal(fresh,false,'Fresh qualification requires actual SAST, never historical reuse');await reuseOfficial('sast',b);}}
  else if(phase==='aggregate')requireSuccess(plan,JSON.parse(process.env.NEEDS_JSON));
  else throw Error('Unknown phase');
 }

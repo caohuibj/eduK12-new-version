@@ -15,6 +15,12 @@ import {EducationPrivateToolError,privateToolId,privateToolKind,type PrivateTool
 import * as service from './private-tool.service'
 import {listEducationPublicSources,educationPublicCatalogQuery} from './public-source.catalog'
 import {readEducationPublicFormPreview,readEducationPublicStandardPreview} from './public-source.preview'
+import {educationCompositionResponseModeSchema} from './private-tool.composition-contracts'
+import {expertTargetKindSchema} from './expert-observation.contract'
+import {readEducationNativePreview} from './native-source.preview'
+import {educationCognitiveProfileSchema} from './native-source.contracts'
+
+const sourcePreviewQuery=z.object({contentHash:z.string().regex(/^[a-f0-9]{64}$/),responseMode:educationCompositionResponseModeSchema.optional(),targetKind:expertTargetKindSchema.optional()}).strict()
 
 /** Mounted under the matching product authentication middleware only. */
 export function educationPrivateToolRouter(entry:EducationToolEntry){
@@ -45,17 +51,21 @@ export function educationPrivateToolRouter(entry:EducationToolEntry){
  router.post('/',handle(req=>service.createPrivateTool(context(req),req.body)))
  router.get('/library-sources',handle(req=>listEducationLibrarySources(context(req),req.query)))
  router.get('/library-sources/:versionId',handle(req=>{
-  const query=z.object({contentHash:z.string().regex(/^[a-f0-9]{64}$/)}).strict().parse(req.query)
-  return readEducationLibraryScalePreview(context(req),privateToolId.parse(req.params.versionId),query.contentHash)
+  const query=sourcePreviewQuery.parse(req.query)
+  return readEducationLibraryScalePreview(context(req),privateToolId.parse(req.params.versionId),query.contentHash,query.responseMode,query.targetKind)
  }))
  router.get('/public-sources',handle(req=>listEducationPublicSources(context(req),educationPublicCatalogQuery.parse(req.query))))
+ router.get('/public-sources/native/:provider/:versionId',handle(req=>{
+  const input=z.object({contentHash:z.string().regex(/^[a-f0-9]{64}$/),profile:educationCognitiveProfileSchema.optional(),responseMode:educationCompositionResponseModeSchema.optional()}).strict().parse(req.query)
+  return readEducationNativePreview(context(req),{...input,provider:z.enum(['COGNITIVE_CONFIG','SJT_RELEASE']).parse(req.params.provider),versionId:privateToolId.parse(req.params.versionId)})
+ }))
  router.get('/public-sources/form/:versionId',handle(req=>{
-  const query=z.object({contentHash:z.string().regex(/^[a-f0-9]{64}$/)}).strict().parse(req.query)
-  return readEducationPublicFormPreview(context(req),privateToolId.parse(req.params.versionId),query.contentHash)
+  const query=sourcePreviewQuery.parse(req.query)
+  return readEducationPublicFormPreview(context(req),privateToolId.parse(req.params.versionId),query.contentHash,query.responseMode,query.targetKind)
  }))
  router.get('/public-sources/standard/:versionId',handle(req=>{
-  const query=z.object({contentHash:z.string().regex(/^[a-f0-9]{64}$/)}).strict().parse(req.query)
-  return readEducationPublicStandardPreview(context(req),privateToolId.parse(req.params.versionId),query.contentHash)
+  const query=sourcePreviewQuery.parse(req.query)
+  return readEducationPublicStandardPreview(context(req),privateToolId.parse(req.params.versionId),query.contentHash,query.responseMode,query.targetKind)
  }))
  router.get('/runtime-candidates',handle(req=>{
   const query=z.object({cursor:privateToolId.optional(),kind:z.enum(['SCALE','FORM']).default('SCALE')}).strict().parse(req.query)

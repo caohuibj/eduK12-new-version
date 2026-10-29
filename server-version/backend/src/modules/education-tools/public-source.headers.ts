@@ -5,10 +5,13 @@ import {educationPublicSourceKey} from './public-source.identity'
 
 export type EducationPublicSourceHeader={
  key:string;kind:EducationPublicSource['kind'];id:string;hash:string;title:string;language:string|null
- versions:{content:string;parameters:string|null;report:string|null};applicability:unknown;referenceContextKeys:string[];nativeAvailable:boolean
+ versions:{content:string;parameters:string|null;report:string|null;profiles?:Array<'experience'|'standard'|'research'>};applicability:unknown;educationApplicability?:unknown;expertApplicability?:unknown;nativeRespondentType?:string|null;referenceContextKeys:string[];nativeAvailable:boolean
 }
 export const educationStandardHeaderColumns=Prisma.sql`'education-source:STANDARD_SCALE:'||s.id||':'||s.combination_hash AS key,'STANDARD_SCALE' AS kind,s.id,s.combination_hash AS hash,s.snapshot->>'title' AS title,
  s.snapshot#>>'{parts,CONTENT,reference,metadata,executable,contentLocale}' AS language,s.snapshot#>'{parts,CONTENT,reference,metadata,applicability}' AS applicability,
+ s.snapshot#>'{parts,CONTENT,reference,metadata,educationExpertApplicability}' AS "expertApplicability",
+ s.snapshot#>'{parts,CONTENT,reference,metadata,educationApplicability}' AS "educationApplicability",
+ s.snapshot#>>'{definition,respondentType}' AS "nativeRespondentType",
  ARRAY_REMOVE(ARRAY[
   CASE WHEN jsonb_path_exists(s.snapshot,'$.references[*].entries[*].population.ageBand') OR jsonb_path_exists(s.snapshot,'$.references[*].entries[*].population.match.minAgeMonthsInclusive') OR jsonb_path_exists(s.snapshot,'$.references[*].entries[*].population.match.maxAgeMonthsExclusive') THEN 'birthYearMonth' END,
   CASE WHEN jsonb_path_exists(s.snapshot,'$.references[*].entries[*].population.sexScope') OR jsonb_path_exists(s.snapshot,'$.references[*].entries[*].population.match.sexAtBirth') THEN 'sexAtBirth' END,
@@ -21,8 +24,23 @@ export const educationStandardHeaderColumns=Prisma.sql`'education-source:STANDAR
   'parameters',CASE WHEN s.snapshot#>'{parts,PARAMETERS,payload}'='null'::jsonb THEN NULL ELSE s.snapshot#>>'{parts,PARAMETERS,version}' END,
   'report',CASE WHEN s.snapshot#>'{parts,REPORT,payload}'='null'::jsonb THEN NULL ELSE s.snapshot#>>'{parts,REPORT,version}' END) AS versions`
 export const educationFormHeaderColumns=Prisma.sql`'education-source:FORM:'||t.id||':'||t.snapshot_hash AS key,'FORM' AS kind,t.id,t.snapshot_hash AS hash,t.title,
- t.reference#>>'{metadata,annotations,language}' AS language,t.snapshot#>'{reference,metadata,annotations,educationApplicability}' AS applicability,ARRAY[]::text[] AS "referenceContextKeys",true AS "nativeAvailable",
+ t.reference#>>'{metadata,annotations,language}' AS language,t.snapshot#>'{reference,metadata,annotations,educationApplicability}' AS applicability,
+ t.snapshot#>'{reference,metadata,annotations,educationExpertApplicability}' AS "expertApplicability",NULL::jsonb AS "educationApplicability",NULL::text AS "nativeRespondentType",ARRAY[]::text[] AS "referenceContextKeys",true AS "nativeAvailable",
  jsonb_build_object('content',t.snapshot#>>'{unit,ref,sourceVersion}','parameters',NULL,'report',NULL) AS versions`
+export const educationCognitiveHeaderColumns=Prisma.sql`'education-source:COGNITIVE_CONFIG:'||c.id||':'||m.content_hash AS key,'COGNITIVE_CONFIG' AS kind,c.id,m.content_hash AS hash,c.name AS title,
+ 'und'::text AS language,NULL::jsonb AS applicability,NULL::jsonb AS "expertApplicability",NULL::jsonb AS "educationApplicability",'participant_self_report'::text AS "nativeRespondentType",
+ ARRAY[]::text[] AS "referenceContextKeys",true AS "nativeAvailable",jsonb_build_object('content',c.config_version,'parameters',NULL,'report',NULL,
+  'profiles',ARRAY(SELECT jsonb_object_keys(m.content#>'{executable,profiles}'))) AS versions`
+// sjt_source is a bounded metadata UNION over the two native source tables;
+// neither a Survey delivery nor an existing Training assignment is required.
+export const educationSjtHeaderSources=(ids:Prisma.Sql|readonly string[])=>Prisma.sql`(
+ SELECT id,instrument_key,instrument_version,measurement_release_id,COALESCE(package#>>'{definition,source,title}',instrument_key) AS title,package#>>'{definition,respondentType}' AS respondent
+ FROM sjt_author_releases WHERE id=ANY(${ids}::text[]) AND status='PUBLISHED' AND (authorization_policy IS NULL OR authorization_policy='COURSE_GRANT_V1')
+ UNION ALL SELECT id,instrument_key,instrument_version,measurement_release_id,instrument_key AS title,NULL::text AS respondent
+ FROM static_sjt_measurement_mappings WHERE id=ANY(${ids}::text[]) AND measurement_release_id IS NOT NULL AND deployment_hash IS NOT NULL) sjt_source`
+export const educationSjtHeaderColumns=Prisma.sql`'education-source:SJT_RELEASE:'||sjt_source.id||':'||m.content_hash AS key,'SJT_RELEASE' AS kind,sjt_source.id,m.content_hash AS hash,sjt_source.title,
+ 'und'::text AS language,NULL::jsonb AS applicability,NULL::jsonb AS "expertApplicability",NULL::jsonb AS "educationApplicability",COALESCE(sjt_source.respondent,m.content#>>'{executable,respondentType}') AS "nativeRespondentType",
+ ARRAY[]::text[] AS "referenceContextKeys",true AS "nativeAvailable",jsonb_build_object('content',sjt_source.instrument_version,'parameters',NULL,'report',NULL) AS versions`
 /** Bounded discovery/action metadata. The source guards make approved contents
  * immutable; no source body/hash/compiler or runtime object is needed here.
  * Use SHARE for a new-use write so withdrawal serializes through its real row. */
@@ -41,6 +59,24 @@ export async function readEducationPublicSourceHeaders(tx:Prisma.TransactionClie
   SELECT ${educationFormHeaderColumns}
   FROM survey_governed_tools t WHERE (t.id,t.snapshot_hash) IN (${Prisma.join(forms.map(s=>Prisma.sql`(${s.id},${s.hash})`))})
    AND t.family='FORM' AND t.state='ONLINE' ORDER BY t.id ${lock?Prisma.sql`FOR SHARE OF t`:Prisma.empty}`))
+ const cognitive=[...byKey.values()].filter(source=>source.kind==='COGNITIVE_CONFIG'),sjt=[...byKey.values()].filter(source=>source.kind==='SJT_RELEASE')
+ if(cognitive.length)rows.push(...await tx.$queryRaw<EducationPublicSourceHeader[]>(Prisma.sql`SELECT ${educationCognitiveHeaderColumns}
+  FROM cognitive_test_configs c JOIN measurement_content_releases m ON m.id=c.measurement_release_id
+  WHERE (c.id,m.content_hash) IN (${Prisma.join(cognitive.map(source=>Prisma.sql`(${source.id},${source.hash})`))})
+   AND c.status='PUBLISHED' AND m.layer='MEASUREMENT' AND m.family='COGNITIVE' AND m.status='PUBLISHED' AND m.scope->>'kind'='PLATFORM'
+  ORDER BY c.id ${lock?Prisma.sql`FOR SHARE OF c,m`:Prisma.empty}`))
+ if(sjt.length&&lock){
+  const ids=sjt.map(source=>source.id)
+  await tx.$queryRaw(Prisma.sql`SELECT draft.id FROM sjt_author_drafts draft JOIN sjt_author_releases author ON author.source_draft_id=draft.id WHERE author.id=ANY(${ids}::text[]) ORDER BY draft.id FOR SHARE OF draft`)
+  await tx.$queryRaw(Prisma.sql`SELECT id FROM sjt_author_releases WHERE id=ANY(${ids}::text[]) ORDER BY id FOR SHARE`)
+  // Writers that require source advisory locks prelock mappings before Users.
+  await tx.$queryRaw(Prisma.sql`SELECT id FROM static_sjt_measurement_mappings WHERE id=ANY(${ids}::text[]) ORDER BY id FOR SHARE`)
+ }
+ if(sjt.length)rows.push(...await tx.$queryRaw<EducationPublicSourceHeader[]>(Prisma.sql`SELECT ${educationSjtHeaderColumns}
+  FROM ${educationSjtHeaderSources(sjt.map(source=>source.id))} JOIN measurement_content_releases m ON m.id=sjt_source.measurement_release_id
+  WHERE (sjt_source.id,m.content_hash) IN (${Prisma.join(sjt.map(source=>Prisma.sql`(${source.id},${source.hash})`))})
+   AND m.layer='MEASUREMENT' AND m.family='SJT' AND m.status='PUBLISHED' AND m.scope->>'kind'='PLATFORM'
+  ORDER BY sjt_source.id ${lock?Prisma.sql`FOR SHARE OF m`:Prisma.empty}`))
  return new Map(rows.map(row=>[row.key,row]))
 }
 

@@ -7,6 +7,8 @@ import {resolveEducationProductMemberScope} from '../organization/educationProdu
 import {assertTeacherComparableDisclosure} from './disclosureOverlap.service'
 import {resolvePublishedTeacherForm,teacherFormResourceRef} from './formRunResource'
 import {STUDENT_FORM_PRIVACY_FLOOR} from './studentFormResource'
+import {studentCompositionRef} from './studentCompositionResource'
+import {collectStudentCompositionFinals} from './studentComposition.report'
 import {createProtectedFormItems,recordProtectedFormAnswers,
   discloseProtectedFormItems} from './groupReport.service'
 import type {FormDraft} from '../survey/builder.definition'
@@ -32,6 +34,7 @@ type Source={
   runId:string;eventStatus:string;runStatus:string;
   targetUserId:string;targetName:string;eventTitle:string;
   formId:string;formTitle:string;definitionDigest:string;
+  compositionVersionId:string|null;compositionContentHash:string|null;
   classUnitId:string;deadline:Date|null;
   eventClosedAt:Date|null;runClosedAt:Date|null
 }
@@ -61,8 +64,9 @@ export async function readHuiteacherStudentFeedbackReport(input:{
       SELECT link."run_id" AS "runId",event."status" AS "eventStatus",
         run."status" AS "runStatus",target."subject_user_id" AS "targetUserId",
         target."name" AS "targetName",event."title" AS "eventTitle",
-        form."id" AS "formId",form."title" AS "formTitle",
-        form."definition_digest" AS "definitionDigest",
+        COALESCE(form."id",version.id) AS "formId",COALESCE(form."title",version.title) AS "formTitle",
+        COALESCE(form."definition_digest",cfg.composition_content_hash) AS "definitionDigest",
+        cfg.composition_version_id AS "compositionVersionId",cfg.composition_content_hash AS "compositionContentHash",
         cfg."class_unit_id" AS "classUnitId",run."intake_deadline" AS "deadline",
         event."closed_at" AS "eventClosedAt",run."closed_at" AS "runClosedAt"
       FROM "huiteacher_evaluation_run_links" link
@@ -80,18 +84,23 @@ export async function readHuiteacherStudentFeedbackReport(input:{
         ON target."organization_id"=link."organization_id"
         AND target."id"=event."target_id"
         AND target."kind"='PERSON'
-      JOIN "huiteacher_form_instruments" form
+      LEFT JOIN "huiteacher_form_instruments" form
         ON form."organization_id"=cfg."organization_id"
         AND form."id"=cfg."form_id"
         AND form."definition_digest"=cfg."definition_digest"
         AND form."status"='PUBLISHED'
+      LEFT JOIN education_private_tool_versions version ON version.id=cfg.composition_version_id
+        AND version.content_hash=cfg.composition_content_hash AND version.kind='COMPOSITION' AND version.entry='TEACHER'
+        AND version.organization_id=cfg.organization_id AND version.owner_user_id=cfg.configured_by_user_id
+        AND version.definition#>>'{administration,population}'='TEACHER' AND version.definition#>>'{administration,responseMode}'='STUDENT_REPORT'
       JOIN "education_product_entitlements" entitlement
         ON entitlement."organization_id"=link."organization_id"
         AND entitlement."product"='HUITEACHER'
         AND entitlement."status"='ACTIVE'
       WHERE link."organization_id"=${input.organizationId}
         AND link."event_id"=${input.eventId}
-      FOR SHARE OF event,run,form,entitlement
+        AND ((cfg.composition_version_id IS NULL AND form.id IS NOT NULL) OR (cfg.composition_version_id IS NOT NULL AND version.id IS NOT NULL))
+      FOR SHARE OF event,run,entitlement
     `
     const source=sources[0]
     if(sources.length!==1||!source)deny('STUDENT_REPORT_SOURCE_UNAVAILABLE',404)
@@ -113,10 +122,13 @@ export async function readHuiteacherStudentFeedbackReport(input:{
     if(!member.productAdmin&&!entitledTeacher)deny('STUDENT_REPORT_AUDIENCE_FORBIDDEN')
     if(source.eventStatus!=='CLOSED'||source.runStatus!=='CLOSED')
       deny('STUDENT_REPORT_NOT_CLOSED',409)
-    const form=await resolvePublishedTeacherForm(
+    const form=source.compositionVersionId?null:await resolvePublishedTeacherForm(
       teacherFormResourceRef(source.formId,source.definitionDigest),tx)
-    if(form.organizationId!==input.organizationId)
+    if(form&&form.organizationId!==input.organizationId)
       deny('STUDENT_REPORT_FORM_MISMATCH')
+    if(form&&!(await tx.$queryRaw<Array<{id:string}>>`SELECT id FROM huiteacher_form_instruments WHERE id=${form.id} AND status='PUBLISHED' FOR SHARE`).length)
+      deny('STUDENT_REPORT_FORM_MISMATCH')
+    const resource=source.compositionVersionId?studentCompositionRef(source.compositionVersionId):{family:'FORM',key:'huiteacher-student-form:'+source.formId,version:source.definitionDigest}
     const frozen=await teacherFrozenPolicy(tx,{
       organizationId:input.organizationId,runId:source.runId,
       scenario:'TEACHER_STUDENT_EVALUATION'})
@@ -139,8 +151,8 @@ export async function readHuiteacherStudentFeedbackReport(input:{
     const minimumN=frozen
       ?await teacherReportFloor(tx,{
         organizationId:input.organizationId,runId:source.runId,
-        resourceKey:'huiteacher-student-form:'+source.formId,
-        resourceVersion:source.definitionDigest,options:frozen.options})
+        resourceKey:resource.key,
+        resourceVersion:resource.version,options:frozen.options})
       :STUDENT_FORM_PRIVACY_FLOOR
     const totals=await tx.$queryRaw<Array<{
       assigned:number;students:number;completed:number
@@ -164,8 +176,8 @@ export async function readHuiteacherStudentFeedbackReport(input:{
         ON track."organization_id"=execution."organization_id"
         AND track."run_id"=execution."run_id"
         AND track."id"=execution."track_id"
-        AND track."resource_key"='huiteacher-student-form:'||${source.formId}
-        AND track."resource_version"=${source.definitionDigest}
+        AND track."resource_family"=${resource.family} AND track."resource_key"=${resource.key}
+        AND track."resource_version"=${resource.version}
       WHERE execution."organization_id"=${input.organizationId}
         AND execution."run_id"=${source.runId}
     `
@@ -181,10 +193,11 @@ export async function readHuiteacherStudentFeedbackReport(input:{
     if(assigned!==n&&assigned-n<COMPLEMENT_FLOOR
       &&(!frozen||frozen.options.protectSmallNonrespondentComplement))
       deny('STUDENT_REPORT_ATTRITION_COMPLEMENT_SMALL')
-    const items=createProtectedFormItems(form.definition as FormDraft)
+    const items=form?createProtectedFormItems(form.definition as FormDraft):[]
+    let unitReports:Awaited<ReturnType<typeof collectStudentCompositionFinals>>['units']|undefined,comparableKeys:string[]|undefined
     let cursor='',seen=0
     const distinct=new Set<string>()
-    for(;;){
+    for(;form;){
       const rows=await tx.$queryRaw<Array<{
         id:string;respondentId:string;attemptId:string;
         resultsCipher:string;resultsHash:string;definitionDigest:string
@@ -240,6 +253,12 @@ export async function readHuiteacherStudentFeedbackReport(input:{
       cursor=rows[rows.length-1].id
       if(rows.length<PAGE_SIZE)break
     }
+    if(source.compositionVersionId){
+      const result=await collectStudentCompositionFinals(tx,{organizationId:input.organizationId,runId:source.runId,teacherUserId:source.targetUserId,
+        versionId:source.compositionVersionId,contentHash:source.compositionContentHash!,count:n,minimum:minimumN,options:frozen?.options})
+      unitReports=result.units;comparableKeys=result.comparableKeys;seen=result.respondents.size
+      for(const id of result.respondents)distinct.add(id)
+    }
     if(seen!==n||distinct.size!==n)deny('STUDENT_REPORT_FINAL_INCOMPLETE',409)
     // A report reader may not select time slices, contributors or predicates.
     // The digest is retained only server-side as release evidence.
@@ -281,15 +300,15 @@ export async function readHuiteacherStudentFeedbackReport(input:{
         await assertTeacherComparableDisclosure(tx,{
           organizationId:input.organizationId,runId:source.runId,
           definitionDigest:source.definitionDigest,scenario:'TEACHER_STUDENT_EVALUATION',
-          respondents:[...distinct],teacherUserId:source.targetUserId,enhanced:false,
+          respondents:[...distinct],teacherUserId:source.targetUserId,enhanced:false,comparableKeys,
         })
     const rows=await tx.$queryRaw<Array<{firstRunId:string;releasedAt:Date}>>`
       INSERT INTO "huiteacher_student_disclosure_ledgers"
         ("organization_id","teacher_user_id","class_unit_id","first_run_id",
-         "form_digest","population_digest")
+         "form_digest","population_digest","comparable_keys")
       VALUES (${input.organizationId},${source.targetUserId},
         ${source.classUnitId},${source.runId},
-        ${source.definitionDigest},${populationDigest})
+        ${source.definitionDigest},${populationDigest},${comparableKeys??['FORM:'+source.definitionDigest]}::text[])
       ON CONFLICT ("organization_id","teacher_user_id")
       DO UPDATE SET "first_run_id"=
         "huiteacher_student_disclosure_ledgers"."first_run_id"
@@ -317,26 +336,27 @@ export async function readHuiteacherStudentFeedbackReport(input:{
     `
 
       return {
-        source:'VERIFIED_HUITEACHER_STUDENT_FORM_FINAL' as const,
+        source:unitReports?'VERIFIED_HUITEACHER_STUDENT_COMPOSITION_FINAL' as const:'VERIFIED_HUITEACHER_STUDENT_FORM_FINAL' as const,
         eventId:input.eventId,teacherName:source.targetName,
         formTitle:source.formTitle,definitionDigest:source.definitionDigest,
         frozenPopulation:assigned,independentRespondents:n,
         participationRate:Number((n/assigned).toFixed(3)),
         minimumRespondents:STUDENT_FORM_PRIVACY_FLOOR,
         releasedAt:rows[0].releasedAt,
-        distributions:discloseProtectedFormItems(items,n),
-        withheldFreeText:true,reportMode:'FORM_DESCRIPTIVE_AGGREGATE' as const,
-        note:'身份受保护的学生评教。每题按符合披露规则的选项频数汇总；不足最低样本数、小单元、拒答及开放意见受到抑制。不构成经科学验证的教学能力分数。',
+        distributions:unitReports?[]:discloseProtectedFormItems(items,n),...(unitReports?{units:unitReports,comparableKeys}:{}),
+        withheldFreeText:true,reportMode:unitReports?'COMPOSITION_DESCRIPTIVE_AGGREGATE' as const:'FORM_DESCRIPTIVE_AGGREGATE' as const,
+        note:unitReports?'按固定工具分别展示描述性群体统计；量表沿用原有计分，表单不计分，个人答案与开放意见受到保护。':
+         '身份受保护的学生评教。每题按符合披露规则的选项频数汇总；不足最低样本数、小单元、拒答及开放意见受到抑制。不构成经科学验证的教学能力分数。',
       }
     }
     await assertTeacherComparableDisclosure(tx,{
       organizationId:input.organizationId,runId:source.runId,
       definitionDigest:source.definitionDigest,scenario:'TEACHER_STUDENT_EVALUATION',
       respondents:[...distinct],teacherUserId:source.targetUserId,
-      enhanced:frozen.options.crossReleaseOverlapGuard,
+      enhanced:frozen.options.crossReleaseOverlapGuard,comparableKeys,
     })
     const projection={
-      source:'VERIFIED_HUITEACHER_STUDENT_FORM_FINAL' as const,
+      source:unitReports?'VERIFIED_HUITEACHER_STUDENT_COMPOSITION_FINAL' as const:'VERIFIED_HUITEACHER_STUDENT_FORM_FINAL' as const,
       eventId:input.eventId,teacherName:source.targetName,
       formTitle:source.formTitle,definitionDigest:source.definitionDigest,
       frozenPopulation:frozen.options.restrictedStatisticsProjection?null:assigned,
@@ -345,10 +365,11 @@ export async function readHuiteacherStudentFeedbackReport(input:{
         ?null:Number((n/assigned).toFixed(3)),
       minimumRespondents:minimumN,
       releasedAt:new Date().toISOString(),
-      distributions:discloseProtectedFormItems(items,n,frozen.options),
-      withheldFreeText:true,reportMode:'FORM_DESCRIPTIVE_AGGREGATE' as const,
+      distributions:unitReports?[]:discloseProtectedFormItems(items,n,frozen.options),...(unitReports?{units:unitReports,comparableKeys}:{}),
+      withheldFreeText:true,reportMode:unitReports?'COMPOSITION_DESCRIPTIVE_AGGREGATE' as const:'FORM_DESCRIPTIVE_AGGREGATE' as const,
       privacyPolicy:'FROZEN_TEACHER_V2' as const,
-      note:'授权的教学反馈群体统计快照；不包含学生姓名、个人原始作答、响应时间或开放意见。此结果不构成个人绩效或因果判断。',
+      note:unitReports?'按固定工具分别展示描述性群体统计；量表复用原有计分，表单不计分。个人答案、开放意见和个人报告解释不向教师开放，不生成跨工具总分。':
+       '授权的教学反馈群体统计快照；不包含学生姓名、个人原始作答、响应时间或开放意见。此结果不构成个人绩效或因果判断。',
     }
     return recordTeacherReportRelease(tx,{
       organizationId:input.organizationId,runId:source.runId,scopeKey:scopeKey!,
@@ -383,7 +404,7 @@ export async function listMyHuiteacherStudentFeedback(actorUserId:string){
   }>>`
     SELECT org."id" AS "organizationId",org."name" AS "organizationName",
       event."id" AS "eventId",event."title" AS "eventTitle",
-      target."name" AS "teacherName",form."title" AS "formTitle"
+      target."name" AS "teacherName",COALESCE(form."title",version.title) AS "formTitle"
     FROM "huiteacher_student_eval_configs" cfg
     JOIN "huiteacher_evaluation_events" event
       ON event."id"=cfg."event_id" AND event."organization_id"=cfg."organization_id"
@@ -397,10 +418,12 @@ export async function listMyHuiteacherStudentFeedback(actorUserId:string){
     JOIN "assessment_runs" run
       ON run."id"=link."run_id" AND run."organization_id"=link."organization_id"
       AND run."status"='CLOSED'
-    JOIN "huiteacher_form_instruments" form
+    LEFT JOIN "huiteacher_form_instruments" form
       ON form."organization_id"=cfg."organization_id"
       AND form."id"=cfg."form_id"
       AND form."definition_digest"=cfg."definition_digest"
+    LEFT JOIN education_private_tool_versions version ON version.id=cfg.composition_version_id AND version.content_hash=cfg.composition_content_hash
+      AND version.entry='TEACHER' AND version.kind='COMPOSITION' AND version.organization_id=cfg.organization_id
     JOIN "organizations" org
       ON org."id"=event."organization_id"
       AND org."product_domain"='SCHOOL' AND org."status"='ACTIVE'
@@ -416,7 +439,7 @@ export async function listMyHuiteacherStudentFeedback(actorUserId:string){
       ON persona."organization_id"=member."organization_id"
       AND persona."membership_id"=member."id"
       AND persona."persona"='TEACHER' AND persona."revoked_at" IS NULL
-    WHERE NOT EXISTS(SELECT 1 FROM "organization_access_denies" deny
+    WHERE (form.id IS NOT NULL OR version.id IS NOT NULL) AND NOT EXISTS(SELECT 1 FROM "organization_access_denies" deny
       WHERE deny."organization_id"=org."id"
         AND deny."user_id"=${actorUserId}
         AND deny."lifted_at" IS NULL

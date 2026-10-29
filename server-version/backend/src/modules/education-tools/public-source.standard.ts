@@ -10,11 +10,13 @@ import {prepareRelease} from '../measurement-content/release'
 import {scaleMeasurementRelease} from '../measurement-content/scale'
 import {frozenDatabaseScaleDefinition} from '../scale/scale-workflow.service'
 import {privateToolFail} from './private-tool.contracts'
-import {educationStandardSourceSchema} from './private-tool.composition-contracts'
+import {educationStandardSourceSchema,type PrivateCompositionDefinition} from './private-tool.composition-contracts'
+import {supportsExpertSource,isNativeExpertObserver} from './expert-observation.contract'
+import {supportsStudentStandardSource} from './student-observation.contract'
 
 /** Content adapter only. The caller checks current author/U before this bounded
  * body read. No Training grant, single-tool Composite or approval is created. */
-export async function readEducationStandardSources(tx:Prisma.TransactionClient,sources:readonly {versionId:string;contentHash:string}[]){
+export async function readEducationStandardSources(tx:Prisma.TransactionClient,sources:readonly {versionId:string;contentHash:string}[],administration:PrivateCompositionDefinition['administration']){
  const ids=[...new Set(sources.map(source=>source.versionId))]
  if(!ids.length)return new Map<string,EducationStandardLeaf>()
  const rows=await tx.$queryRaw<ExactStandardCombination[]>(Prisma.sql`SELECT * FROM survey_standard_releases
@@ -38,7 +40,12 @@ export async function readEducationStandardSources(tx:Prisma.TransactionClient,s
    instrumentVersion:scale.instrumentVersion,definition:frozenDatabaseScaleDefinition(scale),instrumentClass:'STANDARD',scope:measurement.scope}))
   if(installed.contentHash!==measurement.contentHash)privateToolFail('PUBLIC_STANDARD_NATIVE_CONTENT_MISMATCH')
   const applicability=row.snapshot.parts.CONTENT.reference.metadata.applicability as {respondentTypes?:string[]}|undefined
-  if(!applicability?.respondentTypes?.includes('SELF'))privateToolFail('PUBLIC_STANDARD_VARIANT_UNSUPPORTED',400)
+  const respondent=administration.responseMode==='SELF'?'SELF':administration.responseMode==='PARENT_REPORT'?'PARENT':administration.responseMode==='TEACHER_REPORT'?'TEACHER':'OBSERVER'
+  if(administration.responseMode==='STUDENT_REPORT'&&!supportsStudentStandardSource({nativeRespondentType:row.snapshot.definition.respondentType,
+   educationApplicability:row.snapshot.parts.CONTENT.reference.metadata.educationApplicability,applicability}))privateToolFail('PUBLIC_STANDARD_STUDENT_DECLARATION_REQUIRED',400)
+  if(administration.responseMode==='EXPERT_REPORT'&&(administration.targetKind!=='PERSON'||!isNativeExpertObserver(row.snapshot.definition.respondentType)
+   ||!supportsExpertSource(row.snapshot.parts.CONTENT.reference.metadata.educationExpertApplicability,administration)))privateToolFail('PUBLIC_STANDARD_EXPERT_DECLARATION_REQUIRED',400)
+  if(!applicability?.respondentTypes?.includes(respondent))privateToolFail('PUBLIC_STANDARD_VARIANT_UNSUPPORTED',400)
   const descriptor=educationStandardSourceSchema.parse({releaseId:row.id,combinationHash:row.combination_hash,toolKey:row.snapshot.toolKey,
    instrumentVersion:row.snapshot.instrumentVersion,nativeDefinitionHash:canonicalHash(row.snapshot.definition),
    parametersAxisHash:row.snapshot.parts.PARAMETERS.hash,reportAxisHash:row.snapshot.parts.REPORT.hash,

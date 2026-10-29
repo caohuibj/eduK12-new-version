@@ -39,12 +39,12 @@ import '../components/education-tools/education-entry-layout.css'
 const EducationAssessmentRegistrationPanel=deferredPage(async()=>({default:(await import('../components/education-tools/EducationAssessmentRegistrationPanel')).EducationAssessmentRegistrationPanel}))
 const EducationRosterManagement=deferredPage(async()=>({default:(await import('../components/education-roster/EducationRosterManagement')).EducationRosterManagement}))
 const HuiteacherAssessmentTasks=deferredPage(async()=>({default:(await import('./HuiteacherAssessmentTasks')).HuiteacherAssessmentTasks}))
+const HuiteacherStudentTasks=deferredPage(async()=>({default:(await import('./HuiteacherStudentTasks')).HuiteacherStudentTasks}))
 const EducationPrivateToolStudio=deferredPage(async()=>({default:(await import('../components/education-tools/EducationPrivateToolStudio')).EducationPrivateToolStudio}))
 const HuiteacherMyGrowth=deferredPage(async()=>({default:(await import('./HuiteacherMyGrowth')).HuiteacherMyGrowth}))
 const HuiteacherFormStudio=deferredPage(async()=>({default:(await import('./HuiteacherFormStudio')).HuiteacherFormStudio}))
 const HuiteacherClassRelationships=deferredPage(async()=>({default:(await import('./HuiteacherClassRelationships')).HuiteacherClassRelationships}))
 const HuiteacherEvaluationStudio=deferredPage(async()=>({default:(await import('./HuiteacherEvaluationStudio')).HuiteacherEvaluationStudio}))
-const HuiteacherMyFormTasks=deferredPage(async()=>({default:(await import('./HuiteacherMyFormTasks')).HuiteacherMyFormTasks}))
 const HuiteacherMyStudentFeedback=deferredPage(async()=>({default:(await import('./HuiteacherMyStudentFeedback')).HuiteacherMyStudentFeedback}))
 const HuiteacherPersonalSelf=deferredPage(async()=>({default:(await import('./HuiteacherPersonalSelf')).HuiteacherPersonalSelf}))
 const HuiteacherFieldWorkspace=deferredPage(async()=>({default:(await import('./HuiteacherFieldWorkspace')).HuiteacherFieldWorkspace}))
@@ -513,7 +513,7 @@ export default function HuiteacherApp(){
           <p className="ht-workspace-welcome">欢迎，{me.username}</p>
         </div>
       </section>
-      {me.role==='STUDENT'?<HuiteacherMyFormTasks student api={teacherApi}/>:
+      {me.role==='STUDENT'?<HuiteacherStudentTasks key={me.id} actorKey={me.id} api={teacherApi}/>:
       <>
 
       {workspaceTab==='private-tools'&&selectedOrg&&canAuthorPrivateTools&&<EducationAssessmentRegistrationPanel key={'registration:'+me.id+':'+selectedOrg} api={teacherApi} organizationId={selectedOrg} actorId={me.id} product="TEACHER"/>}
@@ -599,7 +599,7 @@ export default function HuiteacherApp(){
       {workspaceTab==='expert'&&<>
         <p className="ht-workspace-context"><Compass size={16} aria-hidden="true"/><span>专业实践 · 现场观察、专业反馈与同行协作</span></p>
         <div className="ht-practice-layout">
-          <HuiteacherFieldWorkspace api={teacherApi} onDraftStateChange={setPracticeDraftState}/>
+          <HuiteacherFieldWorkspace api={teacherApi} actorKey={me.id} onDraftStateChange={setPracticeDraftState}/>
           <HuiteacherConsensusReviews api={teacherApi}/>
         </div>
       </>}

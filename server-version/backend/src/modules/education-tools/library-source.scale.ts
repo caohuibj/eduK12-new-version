@@ -7,8 +7,9 @@ import {validateScaleProductDefinition} from '../scale/product-definition-readin
 import {assertLibraryMediaReady} from '../scale-library-governance/media'
 import {readFrozenEducationApplicability} from '../scale-library-governance/education-applicability'
 import type {LibrarySnapshot} from '../scale-library-governance/source'
-import {educationLibrarySourceSchema,type EducationLibrarySource} from './private-tool.composition-contracts'
-import {privateToolFail,type PrivateToolContext} from './private-tool.contracts'
+import {educationLibrarySourceSchema,type EducationLibrarySource,type PrivateCompositionDefinition} from './private-tool.composition-contracts'
+import {privateToolFail} from './private-tool.contracts'
+import {readFrozenExpertApplicability,supportsExpertSource,isNativeExpertObserver} from './expert-observation.contract'
 
 type Measurement=Extract<StoredRelease,{layer:'MEASUREMENT'}>
 type Source={entryId:string;releaseId:string;authorId:string;snapshotHash:string;snapshot:LibrarySnapshot;dependencyIds:string[]}
@@ -18,7 +19,7 @@ export type EducationLibraryLeaf={row:Source;measurement:Measurement;definition:
  * Current receiver U/issuer locks precede this content-only bounded read. Full
  * C/presentation/native report/media correspondence is established once here;
  * the immutable seal, not a receipt supplied by a client, carries it forward. */
-export async function readEducationLibrarySources(tx:Prisma.TransactionClient,c:PrivateToolContext,sources:readonly {versionId:string;contentHash:string}[]){
+export async function readEducationLibrarySources(tx:Prisma.TransactionClient,sources:readonly {versionId:string;contentHash:string}[],administration:PrivateCompositionDefinition['administration']){
  const ids=[...new Set(sources.map(source=>source.versionId))],result=new Map<string,EducationLibraryLeaf>()
  if(!ids.length)return result
  const rows=await tx.$queryRaw<Source[]>(Prisma.sql`SELECT e.id AS "entryId",e.release_id AS "releaseId",s.author_id AS "authorId",
@@ -34,9 +35,13 @@ export async function readEducationLibrarySources(tx:Prisma.TransactionClient,c:
   if(!measurement||measurement.layer!=='MEASUREMENT'||measurement.family!=='SCALE'||measurement.status!=='PUBLISHED'
    ||measurement.scope.kind!=='PRIVATE'||measurement.scope.ownerId!==row.authorId||measurement.scope.product!==row.snapshot.product)
    privateToolFail('LIBRARY_SOURCE_MEASUREMENT_INVALID')
-  const applicability=readFrozenEducationApplicability(row.snapshot)
-  if(!applicability?.variants.some(variant=>variant.population===(c.entry==='SCHOOL'?'STUDENT':'TEACHER')&&variant.responseMode==='SELF'))
-   privateToolFail('LIBRARY_SOURCE_VARIANT_UNSUPPORTED',400)
+  if(administration.responseMode==='EXPERT_REPORT'){
+   const declared=readFrozenExpertApplicability(row.snapshot)
+   if(administration.targetKind!=='PERSON'||!supportsExpertSource(declared?.declaration,administration)||!isNativeExpertObserver(row.snapshot.compiledDefinition.respondentType))privateToolFail('LIBRARY_SOURCE_EXPERT_DECLARATION_REQUIRED',400)
+  }else{
+   const applicability=readFrozenEducationApplicability(row.snapshot)
+   if(!applicability?.variants.some(variant=>variant.population===administration.population&&variant.responseMode===administration.responseMode))privateToolFail('LIBRARY_SOURCE_VARIANT_UNSUPPORTED',400)
+  }
   const checked=validateScaleProductDefinition(row.snapshot.compiledDefinition,'CUSTOM_DESCRIPTIVE')
   if(!checked.valid||!checked.definition)privateToolFail('LIBRARY_SOURCE_DEFINITION_INVALID')
   const definition=checked.definition

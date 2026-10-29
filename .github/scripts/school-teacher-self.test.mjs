@@ -56,20 +56,19 @@ test('SELF exact needs accepts only selected successes and deliberately skipped 
  assert.throws(()=>requireSuccess({requiredJobs:SELF_JOBS},{...n,connected:{result:'success'}}));assert.throws(()=>requireSuccess({requiredJobs:SELF_JOBS},{...n,unexpected:{result:'success'}}));
  const legacy=Object.fromEntries(JOBS.map(id=>[id,{result:'success'}]));for(const id of SELF_JOBS.filter(id=>!JOBS.includes(id)))legacy[id]={result:'skipped'};assert.equal(requireSuccess({requiredJobs:JOBS},legacy),true);
 });
-test('separate producers build once while PG and browser verify same-run artifacts and restore only qualified PG facts once',()=>{
+test('separate producers reuse unchanged results while the missing browser alone consumes both builds',()=>{
  assert.deepEqual(needs('backend-self'),['admission']);assert.deepEqual(needs('postgres-self'),['admission','backend-self']);assert.deepEqual(needs('browser-self'),['admission','frontend','backend-self','postgres-self']);
  assert(job('backend-self').includes('school-teacher-checks.mjs backend'));assert(job('backend-self').includes('school-teacher-backend-${{ github.sha }}'));
- for(const id of ['postgres-self','browser-self']){const text=job(id);assert(text.includes('school-teacher-backend-${{ github.sha }}'));assert(text.includes('school-teacher-checks.mjs verify-backend-artifact'));assert(!text.includes('school-teacher-checks.mjs backend\n'));assert(text.includes('CAMPUS_ELIGIBILITY_HMAC_KEY CAMPUS_MFA_ENCRYPTION_KEY'));assert(text.includes("ASSESSMENT_COMPACT_FACTS_ENABLED: 'false'"));assert(!text.includes('EDUCATION_MATERIAL_CAPACITY_PROBE_STUB'));}
- assert(job('postgres-self').includes('school-teacher-checks.mjs migrate'));assert(job('postgres-self').includes('school-teacher-checks.mjs postgres-restore'));
- assert(job('browser-self').includes('school-teacher-checks.mjs browser-report'));assert(job('browser-self').includes('school-teacher-checks.mjs verify-frontend-artifact'));
- assert(!job('browser-self').includes('school-teacher-checks.mjs restore'));assert(!job('browser-self').includes('school-teacher-checks.mjs migrate'));assert(job('browser-self').includes('migrate deploy'));
+ const pg=job('postgres-self');assert(pg.includes('school-teacher-checks.mjs postgres'));assert(!pg.includes('services:'));assert(!pg.includes('npm ci'));assert(!pg.includes('school-teacher-checks.mjs migrate'));assert(!pg.includes('school-teacher-checks.mjs postgres-restore'));
+ const text=job('browser-self');assert(text.includes('school-teacher-backend-${{ github.sha }}'));assert(text.includes('school-teacher-checks.mjs verify-backend-artifact'));assert(text.includes('CAMPUS_ELIGIBILITY_HMAC_KEY CAMPUS_MFA_ENCRYPTION_KEY'));assert(text.includes("ASSESSMENT_COMPACT_FACTS_ENABLED: 'false'"));assert(!text.includes('EDUCATION_MATERIAL_CAPACITY_PROBE_STUB'));
+ assert(text.includes('school-teacher-checks.mjs browser-report'));assert(text.includes('school-teacher-checks.mjs verify-frontend-artifact'));assert(!text.includes('school-teacher-checks.mjs restore'));assert(text.includes('migrate deploy'));
  assert(!/continue-on-error|no-sandbox|ignoreHTTPSErrors|sysctl|workflow_dispatch/.test(workflow));assert.equal(frontendTypeCommand({branch:SELF_BRANCH}).exe,'npm');assert.deepEqual(frontendTypeCommand({branch:SELF_BRANCH}).args,['run','typecheck']);
 });
 test('collected selections require nonzero exact passes, exact filtering and successful teardown; private results remain unadmitted',()=>{
  const batch={expectedPassed:['actual'],expectedFiltered:['not selected']},report={success:true,numFailedTests:0,testResults:[{assertionResults:[{fullName:'actual',status:'passed'},{fullName:'not selected',status:'pending'}]}]};assert.equal(verifyTestReport(report,batch).passed,1);
  for(const mutate of [r=>r.success=false,r=>r.numFailedTests=1,r=>r.testResults[0].assertionResults[0].status='skipped',r=>r.testResults[0].assertionResults.push({fullName:'unknown',status:'pending'}),r=>r.testResults=[]]){const r=structuredClone(report);mutate(r);assert.throws(()=>verifyTestReport(r,batch));}
  assert.throws(()=>requireNoHistoricalAcceptance({schemaVersion:1,acceptedGroups:[{originalExecutionSigned:false}]}));
- const b=binding({CI_HEAD_REF:SELF_BRANCH});for(const c of ['frontend','backend']){const closure=b.execution[c].inputClosure;assert(closure.trees.some(t=>t.path==='server-version/'+c));assert.equal(sha256(JSON.stringify({files:closure.files,trees:closure.trees})),closure.sha256);for(const selected of b.execution[c].batches){assert(selected.expectedPassed.length);assert(Array.isArray(selected.expectedFiltered));}}
+ const b=binding({CI_HEAD_REF:SELF_BRANCH});for(const c of ['frontend','backend']){const closure=b.execution[c].inputClosure;assert(closure.trees.some(t=>t.path==='server-version/'+c));assert.equal(sha256(JSON.stringify({files:closure.files,trees:closure.trees})),closure.sha256);for(const selected of b.execution[c].batches){assert(selected.expectedPassed.length);assert(Array.isArray(selected.expectedFiltered));const names=[...selected.expectedPassed,...selected.expectedFiltered];assert.equal(new Set(names).size,names.length,'Frozen assertion names must be unique before CI activation');}}
 });
 function reportFixture(){
  const head='a'.repeat(40),tree='b'.repeat(40),runId='123',hex='c'.repeat(64),binary='/opt/google/chrome/chrome';
@@ -93,8 +92,7 @@ test('browser report consumer accepts complete exact-source SELF matrix and reje
  for(const mutate of [r=>r.source.head='d'.repeat(40),r=>r.runId='old',r=>r.inputs.frontend.sha='d'.repeat(40),r=>r.coverage.pop(),r=>r.coverage[0].displayOnly=false,r=>r.coverage[2].authorDenied=false,r=>r.sessions[0].authenticated=false,r=>r.sessions[1].pageErrors=['synthetic error'],r=>r.sessions[2].failedResponses=[{path:'/unexpected',status:500}],r=>r.chrome.options.chromiumSandbox=false,r=>r.chrome.launchedVersion='old',r=>r.startups[1].ready=false,r=>r.storageModes[0].compactFactsEnabled=true,r=>r.screenshots.pop(),r=>r.errors=['synthetic teardown failure']]){const r=structuredClone(f.report);mutate(r);assert.throws(()=>browser.verifyReport(r,f.identity,f.read));}
 });
 
-// Model the existing Teacher task controller: START does not replace its list
-// rows, leaving the mounted card ASSIGNED until a reload. No DOM, account, API
+// Model the repaired Teacher task controller's durable START binding. No DOM, account, API
 // server or application qualification is implied by these executor contracts.
 function teacherResumeFixture({failOpen=false}={}){
  const events=[],stop=new Error('synthetic stop before FINAL'),openError=new Error('synthetic task click failed');
@@ -106,7 +104,7 @@ function teacherResumeFixture({failOpen=false}={}){
  };
  const card={filter:()=>card,getByRole:(role,{name})=>({click:async()=>{
   if(failOpen)throw openError;
-  assert.equal(role,'button');assert.equal(name,rowRef?'继续测评':'开始测评','The mounted list keeps its pre-START label until reload');
+  assert.equal(role,'button');assert.equal(name,rowRef?'继续测评':'开始测评','The mounted card must retain its durable START binding');
   events.push('card:'+name);panelOpen=true;if(rowRef)parentResponse();
  }})};
  const page={
@@ -114,13 +112,13 @@ function teacherResumeFixture({failOpen=false}={}){
   waitForResponse:match=>new Promise((resolve,reject)=>{
    const waiter={match,resolve,timer:null};waiter.timer=setTimeout(()=>{waiters.delete(waiter);reject(new Error('synthetic missing response'))},15);waiters.add(waiter);
   }),
-  reload:async()=>{assert.equal(panelOpen,false,'Durable exit must finish before the page reload');events.push('reload');rowRef=parentRef},
+  reload:async()=>assert.fail('Same-page resume must not reload the product'),
   getByRole:(role,{name})=>{
    if(role==='region'&&name==='本段作答说明')return {getByText:()=>({waitFor:async()=>{}})};
    if(role==='region'&&name==='测评独立作答页')return {waitFor:async options=>{assert.deepEqual(options,{state:'hidden'});assert.equal(panelOpen,false);events.push('exit-confirmed')}};
    if(role==='checkbox')return {count:async()=>1,check:async()=>events.push('consent')};
    assert.equal(role,'button');
-   if(name==='开始或继续测评')return {click:async()=>{parentRef='parent';events.push('START');parentResponse()}};
+   if(name==='开始或继续测评')return {click:async()=>{parentRef='parent';rowRef=parentRef;events.push('START');parentResponse()}};
    if(name==='合成量表选项乙')return {click:async()=>{selected=true;events.push('answer')},getAttribute:async attribute=>{assert.equal(attribute,'aria-pressed');events.push('restored');return String(selected)}};
    if(name==='保存并退出')return {click:async()=>{events.push('save-exit');panelOpen=false}};
    if(name==='提交整份量表')return {click:async()=>{events.push('before-FINAL');throw stop}};
@@ -132,9 +130,9 @@ function teacherResumeFixture({failOpen=false}={}){
  }};
  return {events,stop,openError,run:()=>browser.participant(session,{}, {id:'event'},{title:'fixed ordinary questionnaire'},{author:{},report:{coverage:[]},out:'/unused'})};
 }
-test('SELF browser resumes the same durable Teacher parent after refreshing the mounted pre-START task row',async()=>{
+test('SELF browser resumes the same durable Teacher parent from its mounted card without reloading',async()=>{
  const f=teacherResumeFixture();await assert.rejects(f.run(),error=>error===f.stop);
- assert.deepEqual(f.events,['card:开始测评','consent','START','answer','save-exit','exit-confirmed','reload','card:继续测评','restored','before-FINAL']);
+ assert.deepEqual(f.events,['card:开始测评','consent','START','answer','save-exit','exit-confirmed','card:继续测评','restored','before-FINAL']);
  await new Promise(resolve=>setTimeout(resolve,25)); // The intentionally stopped POST waiter must remain handled.
 });
 test('SELF browser catches a failed UI action while its response waiter later rejects',async()=>{

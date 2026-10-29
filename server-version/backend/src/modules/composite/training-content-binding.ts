@@ -1,4 +1,5 @@
 import {assertCompositionPublicContent} from '../education-tools/private-tool.composition-content'
+import {educationNativeDescriptorSchema} from '../education-tools/native-source.contracts'
 import {educationStandardSourceSchema,educationLibrarySourceSchema} from '../education-tools/private-tool.composition-contracts'
 import {educationMarkerBindingSchema} from '../education-tools/assessment-resource.marker-contract'
 import {educationCompositionBindingSchema,educationCompositionRuntimeAnchorSchema,type EducationCompositionPolicyBinding,type EducationCompositionRuntimeAnchor} from '../education-tools/private-tool.composition-contracts'
@@ -29,7 +30,9 @@ import { situationalReleaseKey, type ResolvedSituationalRelease } from '../situa
 
 const text=z.string().min(1).max(240),digest=z.string().regex(/^[a-f0-9]{64}$/)
 const sourceSchema=z.object({kind:z.enum(['SCALE','COGNITIVE_CONFIG','SJT_AUTHOR_RELEASE','STATIC_SJT_REGISTRY']),id:text,ownerId:text.optional(),
-  educationBinding:educationMarkerBindingSchema.optional(),educationStandard:educationStandardSourceSchema.optional(),educationLibrary:educationLibrarySourceSchema.optional(),standardCombination:trainingStandardItemSourceSchema.optional(),libraryEntryId:z.string().guid().optional(),privateVersionId:z.string().guid().optional(),assignmentId:text.optional(),instrumentKey:text.optional(),instrumentVersion:text.optional()}).strict().superRefine((source,ctx)=>{
+  educationBinding:educationMarkerBindingSchema.optional(),educationStandard:educationStandardSourceSchema.optional(),educationLibrary:educationLibrarySourceSchema.optional(),educationNative:educationNativeDescriptorSchema.optional(),standardCombination:trainingStandardItemSourceSchema.optional(),libraryEntryId:z.string().guid().optional(),privateVersionId:z.string().guid().optional(),assignmentId:text.optional(),instrumentKey:text.optional(),instrumentVersion:text.optional()}).strict().superRefine((source,ctx)=>{
+ if(source.educationNative&&(source.privateVersionId||source.libraryEntryId||source.educationStandard||source.educationLibrary||source.standardCombination||source.educationBinding
+  ||(source.educationNative.provider==='COGNITIVE_CONFIG'?(source.kind!=='COGNITIVE_CONFIG'||source.id!==source.educationNative.sourceId||!source.assignmentId):!['SJT_AUTHOR_RELEASE','STATIC_SJT_REGISTRY'].includes(source.kind)||source.id!==source.educationNative.sourceId)))ctx.addIssue({code:'custom',message:'教育原生单元必须保留独立原源身份'})
  if(source.educationLibrary&&(source.kind!=='SCALE'||source.libraryEntryId!==source.educationLibrary.entryId||source.privateVersionId||source.standardCombination||source.educationBinding||source.educationStandard))ctx.addIssue({code:'custom',message:'Education library retains its exact approved entry identity'})
  if(source.educationStandard&&(source.kind!=='SCALE'||source.libraryEntryId||source.privateVersionId||source.standardCombination||source.educationBinding))ctx.addIssue({code:'custom',message:'Education Standard retains its independent exact approved source'})
  if(source.standardCombination&&(source.kind!=='SCALE'||source.libraryEntryId||source.privateVersionId||source.id!==source.standardCombination.reference.scaleId))ctx.addIssue({code:'custom',message:'Standard combination must retain its installed Scale identity'})
@@ -201,12 +204,13 @@ async function readExactLibrarySource(db:Prisma.TransactionClient,release:Stored
  * entry marker or a widened PRIVATE scope. Their existing lifecycle/stop policy
  * remains at each collection or historical-report boundary. */
 export async function trainingMeasurementSourceScopeMatchesForConsumer(db:Prisma.TransactionClient,release:Stored,source:Unit['source'],context?:{compositeId:string;ownerId:string;itemId:string;educationComposition?:EducationCompositionRuntimeAnchor}){
+ if(source.educationNative&&!context?.educationComposition)return false
  if(context?.educationComposition){
   // The caller verified this immutable attempt's parent header once for the
   // batch. DB containment and immutability bind each unit to that publication.
-  if(source.educationStandard||source.educationLibrary){
+  if(source.educationStandard||source.educationLibrary||source.educationNative){
    if(release.layer!=='MEASUREMENT')return false
-   await assertCompositionPublicContent(db,{...context,measurementOnly:true,unit:{itemId:context.itemId,family:'SCALE',source,measurement:{releaseId:release.releaseId,contentHash:release.contentHash,measurementHash:release.content.measurementHash}},release})
+   await assertCompositionPublicContent(db,{...context,measurementOnly:true,unit:{itemId:context.itemId,family:release.family,source,measurement:{releaseId:release.releaseId,contentHash:release.contentHash,measurementHash:release.content.measurementHash}},release})
    return true
   }
   const origin=context.educationComposition.origin,scope=release.scope
@@ -261,9 +265,16 @@ export async function prepareTrainingContentAttemptBinding(db:Prisma.Transaction
     if(!snapshot.educationBinding||anchor.manifestHash!==input.snapshotHash||input.composite.createdBy!==anchor.origin.ownerUserId
       ||canonicalHash(snapshot.educationBinding.origin)!==canonicalHash(anchor.origin))fail('SNAPSHOT_INVALID')
     const measurementItems=input.composite.items.filter(item=>item.type!=='FORM')
-    if(measurementItems.length!==snapshot.units.length||snapshot.units.some(unit=>unit.family!=='SCALE'||unit.source.kind!=='SCALE'
-      ||(!unit.source.educationStandard&&!unit.source.educationLibrary&&(unit.source.ownerId!==anchor.origin.ownerUserId||!unit.source.privateVersionId))
-      ||!measurementItems.some(item=>item.id===unit.itemId&&item.type==='SCALE'&&item.scaleId===unit.source.id)))fail('SOURCE_MISMATCH')
+    if(measurementItems.length!==snapshot.units.length||snapshot.units.some(unit=>{
+      const native=unit.source.educationNative
+      if(native)return !anchor.origin.variantKey.endsWith(':SELF')||!measurementItems.some(item=>item.id===unit.itemId&&(
+       native.provider==='COGNITIVE_CONFIG'?unit.family==='COGNITIVE'&&item.type==='COGNITIVE'&&item.cognitiveAssignmentId===unit.source.assignmentId&&item.cognitiveAssignment?.configId===native.sourceId
+        &&item.cognitiveAssignment.profile===native.profile&&item.cognitiveAssignment.profileDefinitionVersion===native.profileDefinitionVersion&&item.cognitiveAssignment.resolvedConfigHash===native.resolvedConfigHash&&item.cognitiveAssignment.resolvedReportSnapshotEncrypted:
+        unit.family==='SJT'&&item.type==='SITUATIONAL'&&item.situationalInstrumentKey===unit.source.instrumentKey&&item.situationalInstrumentVersion===unit.source.instrumentVersion))
+      return unit.family!=='SCALE'||unit.source.kind!=='SCALE'
+       ||(!unit.source.educationStandard&&!unit.source.educationLibrary&&(unit.source.ownerId!==anchor.origin.ownerUserId||!unit.source.privateVersionId))
+       ||!measurementItems.some(item=>item.id===unit.itemId&&item.type==='SCALE'&&item.scaleId===unit.source.id)
+    }))fail('SOURCE_MISMATCH')
     // Admission supplied this anchor from the existing transaction-bound START
     // proof; the loaded source is sealed under its publication SHARE lock.
     // Do not recompile/rehash definitions or pretend a leaf has a single-Scale
@@ -276,7 +287,8 @@ export async function prepareTrainingContentAttemptBinding(db:Prisma.Transaction
       presentation.set('form-section:'+id,{blockId:id})
     }
     for(const block of snapshot.educationBinding.manifest){
-      const keys=block.kind==='SCALE'?block.itemIds.map(id=>'scale:'+id):block.sectionIds.map(id=>'form-section:'+id)
+      const prefix=block.kind==='SCALE'?'scale:':block.kind==='COGNITIVE'?'cognitive:':'situational:'
+      const keys=block.kind!=='FORM'?block.itemIds.map(id=>prefix+id):block.sectionIds.map(id=>'form-section:'+id)
       const instruction=[block.instruction,block.sourceInstruction].filter(Boolean).join('\n\n')
       for(const [index,key] of keys.entries()){
         orderedSlots.push(key);presentation.set(key,{blockId:block.blockId,...(index===0&&instruction?{instruction}:{})})

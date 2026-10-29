@@ -7,6 +7,7 @@ import {isSupportedEducationLibraryVariant} from '../../modules/scale-library-go
 import {compileEducationApplicability} from '../../modules/scale-library-governance/education-applicability'
 import {compileResearchScale} from '../../modules/survey/builder.compiler'
 import type {LibrarySnapshot} from '../../modules/scale-library-governance/source'
+import {compileExpertSourceApplicability} from '../../modules/education-tools/expert-observation.contract'
 const exact={releaseId:randomUUID(),contentHash:'a'.repeat(64),product:'SCHOOL' as const}
 const definition={schemaVersion:1,presentationMode:'ALL_AT_ONCE',respondentType:'participant_self_report',aggregation:'mean',responseOptions:[{optionKey:'one',label:'1',score:1},{optionKey:'two',label:'2',score:2}],dimensions:[{dimensionKey:'total',label:'总分',direction:'descriptive'}],items:[{itemKey:'item',prompt:'问题',required:true,reverse:false,dimensionKeys:['total']}]}
 const declaration={schemaVersion:1 as const,administrations:[{population:'STUDENT' as const,responseMode:'SELF' as const}]}
@@ -15,6 +16,18 @@ const snapshot:LibrarySnapshot={title:'Synthetic',product:'SURVEY',instrumentCla
  compiledDefinition:compileResearchScale('Synthetic',definition),educationApplicability:declaration,
  educationApplicabilityHash:compiled.contractHash,educationApplicabilityCompilerVersion:compiled.compilerVersion}
 describe('Education public distribution exact-product contract',()=>{
+ it('makes an explicitly frozen expert original distributable to Teacher without inferring a School or global relational expert role',()=>{
+  const {educationApplicability:_a,educationApplicabilityHash:_h,educationApplicabilityCompilerVersion:_v,...base}=snapshot
+  const frozen=compileExpertSourceApplicability({schemaVersion:2,administrations:[{population:'TEACHER',responseMode:'EXPERT_REPORT',targetKind:'PERSON'}]})
+  const expert:LibrarySnapshot={...base,compiledDefinition:{...snapshot.compiledDefinition,respondentType:'observer_report'},educationExpertApplicability:frozen.declaration,educationExpertApplicabilityHash:frozen.contractHash,educationExpertApplicabilityCompilerVersion:frozen.compilerVersion}
+  const readiness=educationDistributionReadiness(expert,{approved:true,dependencyReleaseIds:[]})
+  expect(readiness.products.TEACHER).toMatchObject({contentCompatible:true,canDistribute:true,status:'READY'})
+  expect(readiness.products.SCHOOL.canDistribute).toBe(false)
+  expect(isSupportedEducationLibraryVariant('TEACHER','TEACHER:EXPERT_REPORT')).toBe(false)
+  expect(educationDistributionReadiness({...expert,compiledDefinition:snapshot.compiledDefinition},{approved:true,dependencyReleaseIds:[]}).products.TEACHER.canDistribute).toBe(false)
+  expect(educationDistributionReadiness({...expert,educationExpertApplicabilityHash:'forged'},{approved:true,dependencyReleaseIds:[]}).products.TEACHER.canDistribute).toBe(false)
+  expect(educationDistributionReadiness(expert,{approved:false,dependencyReleaseIds:[]}).products.TEACHER.canDistribute).toBe(false)
+ })
  it('requires exact release/hash and explicit org vs user scope without legacy field smuggling',()=>{
   const org={...exact,scopeKind:'ORGANIZATION' as const}
   expect(educationRecipientInput.parse(org).keyword).toBe('')

@@ -1,4 +1,4 @@
--- Isolated synthetic row-preservation fixture, exact base 9801107019d51a4af7ddb651789b674867539d24; not login or business-authorization evidence.
+-- Isolated synthetic row-preservation fixture, exact base 908af20ecfbd3ede55685d2052bf01b52266661c; not login or business-authorization evidence.
 BEGIN;
 INSERT INTO users (id,username,password_hash,role,account_domain,updated_at) VALUES
 ('8f761e22-0000-4000-8000-000000000001','hs_migration_fixture','synthetic-not-a-login-hash','ADMIN','SCHOOL','2026-10-22T00:00:00Z');

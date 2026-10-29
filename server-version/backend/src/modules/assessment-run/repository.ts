@@ -3,8 +3,10 @@ import {readPrivateCompositionRunSources} from '../education-tools/private-tool.
 import {lockCompositionLibraryUses,assertLockedLibraryUseTime,type LockedEducationLibraryUses} from '../education-tools/library-source.use'
 import {privateCompositionRunTrackInput} from '../education-tools/private-tool.run-contract'
 import {assertPrivateScaleRunWorkflow} from './educationPrivateScaleContext'
+import {isStudentCompositionKey} from '../huiteacher/studentComposition.policy'
+import {assertStudentCompositionRunUse,assertStudentCompositionSelection} from '../huiteacher/studentCompositionResource'
 import {assertPrivateScaleRunResource,assertPrivateFormRunResource} from './educationPrivateScaleContext'
-import {privateRunTrackInput,privateFormRunTrackInput,assertPrivateRunSelection} from '../education-tools/private-tool.run-contract'
+import {privateRunTrackInput,privateFormRunTrackInput,assertPrivateRunSelection,assertPrivateAdministrationSelection} from '../education-tools/private-tool.run-contract'
 import {assertRunTrackNarrowing,relationalEntryToRunPolicy} from './resourceAuthority'
 import {assertEducationLibraryPopulationSupport} from './educationLibraryPopulation'
 import {assertEducationRunLibraryResources,readEducationRunLibraryContext,lockAndAssertEducationRunWorkflow} from './educationLibraryContext'
@@ -109,6 +111,7 @@ export async function addAssessmentRunTrackDraft(input: {
   expectedRunId?:string
   educationWorkflow?:{product:'SCHOOL'|'TEACHER';id:string}
   privateComposition?:{versionId:string;contentHash:string}
+  privateCompositionLibraryLocks?:{proof:LockedEducationLibraryUses|undefined}
   // Trusted product adapter can bind draft + track in the same transaction.
   tx?: Tx
 }): Promise<AssessmentRunTrackRecord> {
@@ -124,8 +127,8 @@ export async function addAssessmentRunTrackDraft(input: {
       if(!workflow||workflow.product!==input.educationWorkflow.product
         ||(workflow.product==='TEACHER'?workflow.teacherEventId:workflow.schoolCourseId)!==input.educationWorkflow.id)
         throw new AssessmentRunRepositoryError('EDUCATION_ASSESSMENT_WORKFLOW_REQUIRED','Exact education workflow required',403)
-      const libraryUses=composition?await lockCompositionLibraryUses(tx,{entry:workflow.product,organizationId:input.organizationId,
-        principal:{userId:input.actorUserId,accountDomain:'SCHOOL'}},[input.resource.key]):undefined
+      const libraryUses=composition?(input.privateCompositionLibraryLocks?input.privateCompositionLibraryLocks.proof:await lockCompositionLibraryUses(tx,{entry:workflow.product,organizationId:input.organizationId,
+        principal:{userId:input.actorUserId,accountDomain:'SCHOOL'}},[input.resource.key])):undefined
       compositionLibraryUses=libraryUses
       const current=await lockAndAssertEducationRunWorkflow(tx,{...input,actorUserId:input.actorUserId,purpose:'EDIT'},workflow)
       if(!composition&&workflow.product==='TEACHER'&&await tx.huiteacherStudentEvaluationConfig.findUnique({where:{
@@ -133,11 +136,21 @@ export async function addAssessmentRunTrackDraft(input: {
         throw new AssessmentRunRepositoryError('HUITEACHER_STUDENT_EVAL_TRACK_READONLY','Student evaluation tracks require their protected workflow',403)
       if(composition){
         const selected=privateCompositionRunTrackInput.parse({expectedVersion:input.expectedVersion,privateComposition:input.privateComposition,
-          subjectSelector:input.subjectSelector,respondentSelector:input.respondentSelector})
-        const editor=await assertPrivateScaleRunWorkflow(tx,{...input,actorUserId:input.actorUserId},current)
+          subjectSelector:input.subjectSelector,respondentSelector:input.respondentSelector,targetPolicy:input.requestedPolicy.targetPolicy})
+        let editor:{context:import('../education-tools/private-tool.contracts').PrivateToolContext;schoolAdmin:boolean}
+        if(isStudentCompositionKey(input.resource.key)){
+          const protectedScope=await assertStudentCompositionRunUse(tx,{...input,actorUserId:input.actorUserId,ref:input.resource})
+          assertStudentCompositionSelection({...selected,requestedPolicy:input.requestedPolicy},protectedScope)
+          editor={context:{entry:'TEACHER',organizationId:input.organizationId,principal:{userId:input.actorUserId,accountDomain:'SCHOOL'}},schoolAdmin:false}
+        }else editor=await assertPrivateScaleRunWorkflow(tx,{...input,actorUserId:input.actorUserId},current)
         const sources=await readPrivateCompositionRunSources(tx,editor.context,[input.resource],{lockForUse:true,libraryUses}),source=sources.get(input.resource.key)!
         if(source.origin.versionId!==selected.privateComposition.versionId||source.origin.contentHash!==selected.privateComposition.contentHash)
           throw new AssessmentRunRepositoryError('PRIVATE_COMPOSITION_VERSION_MISMATCH','Exact fixed version required',409)
+        const mode=source.origin.variantKey.split(':')[1]
+        assertPrivateAdministrationSelection(mode,selected)
+        if(editor.context.entry==='SCHOOL'&&!editor.schoolAdmin&&mode==='TEACHER_REPORT'&&selected.targetPolicy?.mode!=='HOMEROOM_TEACHER')
+          throw new AssessmentRunRepositoryError('PRIVATE_TOOL_HOMEROOM_TARGET_REQUIRED','Psychology drafts require explicit homeroom target',403)
+        assertEducationLibraryPopulationSupport([input])
         assertRunTrackNarrowing(source.policy,input.requestedPolicy)
       }else{
         const {assertEducationAssessmentRunUse}=await import('../education-tools/assessment-resource.authority')

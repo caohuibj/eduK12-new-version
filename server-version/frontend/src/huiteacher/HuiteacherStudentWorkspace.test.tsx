@@ -28,7 +28,7 @@ describe('Teacher student task presentation',()=>{
   fireEvent.submit(screen.getByLabelText('教育账号').closest('form')!)
   fireEvent.click(await screen.findByRole('button',{name:'继续评价'}))
   const page=await screen.findByRole('region',{name:'测评独立作答页'})
-  expect(within(page).getByRole('radio',{name:'课堂目标清晰'})).toBeVisible()
+  expect(await within(page).findByRole('radio',{name:'课堂目标清晰'})).toBeVisible()
   expect(screen.queryByRole('heading',{name:'我的教育发展空间'})).not.toBeInTheDocument()
   expect(screen.queryByRole('navigation',{name:'Teacher 工作台'})).not.toBeInTheDocument()
   expect(fetch.mock.calls.every(([url,options])=>!options?.method||options.method==='GET'||/auth\/(login|logout)$/.test(url))).toBe(true)

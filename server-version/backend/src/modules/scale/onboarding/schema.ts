@@ -1,3 +1,5 @@
+import {expertSourceApplicabilitySchema} from '../../education-tools/expert-observation.contract'
+import {educationApplicabilitySchema} from '../../scale-library-governance/education-applicability'
 import { z } from 'zod'
 import { validateReferenceSetDefinition } from '../../assessment-reference/reference'
 import { scaleCatalogIdentitySchema, scaleCatalogManifestV1Schema } from '../library/catalog-manifest'
@@ -60,6 +62,8 @@ export const scaleInstrumentSourceV1Schema = z.object({
   catalog: catalogBodySchema,
   localization: z.record(z.string(), z.unknown()).optional(),
   applicability: instrumentApplicabilityV1Schema.optional(),
+  educationApplicability: educationApplicabilitySchema.optional(),
+  educationExpertApplicability: expertSourceApplicabilitySchema.optional(),
   disclosure: audienceDisclosurePolicyV1Schema.optional(),
   usageRequirements: instrumentUsageRequirementsV1Schema.optional(),
   educationalFeedback: educationalFeedbackDefinitionV1Schema.optional(),

@@ -22,6 +22,7 @@ import {
   validateSubmissionId,
 } from '../../services/instrumentFinalSubmit'
 import { withFinalOnlyCompletionTransaction } from '../../services/questionnaireProgressService'
+import {assertPrivateFormFinalCurrent} from '../assessment-run/educationPrivateFormExecution'
 import { measureRequestPhase, measureRequestPhaseSync } from '../../services/runtimeObservability'
 import { withUnitSubmitAdmission } from '../../services/unitSubmitAdmission'
 import {
@@ -428,13 +429,15 @@ const persistSituationalAttemptFinal = async (
     ? await loadEmbeddedSituationalAttemptRuntime(input.attemptId, embedded)
     : await loadSituationalAttemptRuntime(input.attemptId, input.userId as string)
   const { row, snapshot } = runtime
+  const educationComposition=row.compositeAttempt?.compositeAssessment?.creationKey?.startsWith('education-composition:')===true
   const prepared = prepareSituationalFinalSubmission(input, runtime)
   const { payloadHash } = prepared
 
   if (row.status === 'COMPLETED') {
     if (assertSubmissionReplay(row, submissionId, payloadHash) === 'replay') {
-      if (requiresTrainingFlowFinalLock(row.compositeAttemptId, row.compositeAttempt) || await assertCurrentStudyPrincipal(prisma,{attemptId:row.compositeAttemptId,userId:embedded?.userId,recoveryTokenHash:embedded?.recoveryTokenHash,attemptEpoch:input.attemptEpoch})) {
+      if (educationComposition||requiresTrainingFlowFinalLock(row.compositeAttemptId, row.compositeAttempt) || await assertCurrentStudyPrincipal(prisma,{attemptId:row.compositeAttemptId,userId:embedded?.userId,recoveryTokenHash:embedded?.recoveryTokenHash,attemptEpoch:input.attemptEpoch})) {
         await withFinalOnlyCompletionTransaction(async tx => {
+          if(educationComposition)await assertPrivateFormFinalCurrent(tx,{attemptId:row.compositeAttemptId!,actorUserId:embedded?.userId??input.userId})
           await assertCurrentStudyPrincipal(tx,{attemptId:row.compositeAttemptId,userId:embedded?.userId,recoveryTokenHash:embedded?.recoveryTokenHash,attemptEpoch:input.attemptEpoch},true)
           const assertFlowFinal = await lockTrainingFlowFinalAdmission(tx, { attemptId: row.compositeAttemptId, parent: row.compositeAttempt, attemptEpoch: input.attemptEpoch, itemId: row.compositeItemId, sourceAttemptId: row.id, submissionId })
           assertFlowFinal(true)
@@ -452,6 +455,7 @@ const persistSituationalAttemptFinal = async (
   const { result, canonicalResult } = derived
 
   const committed = await withFinalOnlyCompletionTransaction(async (tx) => {
+    if(educationComposition)await assertPrivateFormFinalCurrent(tx,{attemptId:row.compositeAttemptId!,actorUserId:embedded?.userId??input.userId})
     await assertCurrentStudyPrincipal(tx,{attemptId:row.compositeAttemptId,userId:embedded?.userId,recoveryTokenHash:embedded?.recoveryTokenHash,attemptEpoch:input.attemptEpoch},true)
     if (embedded) await lockEmbeddedCompositeAttempt(tx, embedded.compositeAttemptId)
     const assertFlowFinal = await lockTrainingFlowFinalAdmission(tx, { attemptId: row.compositeAttemptId, parent: row.compositeAttempt, attemptEpoch: input.attemptEpoch, itemId: row.compositeItemId, sourceAttemptId: row.id, submissionId, parentLocked: Boolean(embedded) })

@@ -74,14 +74,16 @@ const embedded=(req:Request)=>({userId:req.user!.userId,compositeAttemptId:req.p
 
 /** Deliberately requires both the root identity reader and current-use checker.
  * Never mount with an identity-only checker or a fabricated grant. */
-export function createTeacherAssessmentRuntimeRouter<Identity extends TeacherSourceIdentity>(source:TeacherAssessmentSourceAccess<Identity>,db:TeacherRuntimeDb=prisma){
- const router=Router(),access=createTeacherAssessmentAccess(db,source)
+export function createTeacherAssessmentRuntimeRouter<Identity extends TeacherSourceIdentity>(source:TeacherAssessmentSourceAccess<Identity>,db:TeacherRuntimeDb=prisma,audience:import('./assessmentRuntime.access').TeacherAssessmentAudience='TEACHER_SELF'){
+ const router=Router(),access=createTeacherAssessmentAccess(db,source,audience)
  router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
  // Authentication itself validates the HUITEACHER credential audience; this
  // separate current-account check prevents an accidental non-Teacher mount.
  router.use(['/my-assessment-tasks','/run-executions/:executionId/assessment-consent/accept',
   '/run-executions/:executionId/start-assessment','/run-executions/:executionId/feedback','/assessment-composite-attempts/:attemptId'],authenticateHuiteacher,(req,res,next)=>{
-  if(req.user?.accountDomain!=='SCHOOL'||!['TEACHER','ADMIN'].includes(req.user.role))
+  if(audience==='STUDENT_EVALUATION'&&process.env.HUITEACHER_STUDENT_FEEDBACK_ENABLED!=='true')
+   return runtimeError(new TeacherAssessmentRuntimeError(),res,next)
+  if(req.user?.accountDomain!=='SCHOOL'||(audience==='STUDENT_EVALUATION'?req.user.role!=='STUDENT':!['TEACHER','ADMIN'].includes(req.user.role)))
    return runtimeError(new TeacherAssessmentRuntimeError(),res,next)
   next()
  })

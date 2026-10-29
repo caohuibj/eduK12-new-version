@@ -10,6 +10,7 @@ import {canonicalHash} from '../assessment-runtime/canonical'
 import {contentGrantInputSchema,type ContentGrantInput} from './content-authority'
 import {educationMaterialUse,parseEducationPublicSourceKey} from '../education-tools/public-source.identity'
 import {readEducationPublicSourceHeaders} from '../education-tools/public-source.headers'
+import {lockEducationNativeSourceIds} from '../education-tools/native-source.locks'
 const uuid=z.string().guid(),reason=z.string().trim().min(1).max(500)
 const wireGrant=z.object({ ...contentGrantInputSchema.shape,
   validFrom:z.string().datetime().transform(value=>new Date(value)),
@@ -109,6 +110,7 @@ export async function issueAdminContentRoot(actorId:string,proof:AdminSessionPro
       if(mappings.length!==scope.resourceKeys.length||mappings.some(row=>!scope.resourceKeys.includes(row.id)))deny()
       registryResources=mappings
     }
+    if(isEducationUse)await lockEducationNativeSourceIds(tx,scope.resourceKeys.map(key=>parseEducationPublicSourceKey(key)!).filter(source=>source.kind==='SJT_RELEASE').map(source=>source.id))
     const projects=isEducationDistribution||isEducationUse?await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT id FROM organizations
       WHERE id=${scope.scopeId} AND product_domain='SCHOOL' AND status='ACTIVE' FOR UPDATE`)
       :isPlatformSjt||isPlatformReference||isLibrary||isScalePublic||isSjtDistribution?[{id:scope.scopeId}]:scope.product==='TRAINING'

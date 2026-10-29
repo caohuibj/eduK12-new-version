@@ -12,7 +12,7 @@ import {createTeacherCognitiveClient,createTeacherSituationalClient,createTeache
  teacherAssessmentParentPath,type TeacherAssessmentTask,type TeacherAssessmentCompletion} from './assessmentRuntime.client'
 
 export type TeacherAssessmentRuntimeProps={
- api:EducationReportApi;actorKey:string;
+ api:EducationReportApi;actorKey:string;student?:boolean;
  onCompleted?:(completion:TeacherAssessmentCompletion)=>void;
  renderFeedback?:(completion:TeacherAssessmentCompletion)=>ReactNode
 }&AssessmentListPresentation
@@ -25,7 +25,7 @@ export function HuiteacherMyAssessmentTasks(props:TeacherAssessmentRuntimeProps)
   context.current={api:props.api,actorKey:props.actorKey,version:context.current.version+1}
  return <TeacherAssessmentTasksSession key={context.current.version} {...props}/>
 }
-function TeacherAssessmentTasksSession({api,actorKey,unified=false,onListStateChange,onCompleted,renderFeedback}:TeacherAssessmentRuntimeProps){
+function TeacherAssessmentTasksSession({api,actorKey,unified=false,student=false,onListStateChange,onCompleted,renderFeedback}:TeacherAssessmentRuntimeProps){
  const [rows,setRows]=useState<TeacherAssessmentTask[]>([]),[cursor,setCursor]=useState<string|null>(null)
  const [list,setList]=useState({pending:true,error:'',loaded:false})
  const [session,setSession]=useState<Session|null>(null),[busy,setBusy]=useState(false),[error,setError]=useState('')
@@ -102,7 +102,15 @@ function TeacherAssessmentTasksSession({api,actorKey,unified=false,onListStateCh
    if(!valid())return
    if(result.state==='IN_PROGRESS')throw new Error('测评正在建立，请稍后重新核对同一任务')
    if(result.state!=='STARTED'||result.runtimeBindingKind!=='COMPOSITE'||!result.runtimeBindingRef)throw new Error('当前任务尚无获授权的正式运行记录')
-   await load(task,result.runtimeBindingRef,valid)
+   // START is already durable. Preserve its binding even if the first read fails
+   // or the participant leaves, so resume never repeats consent or START.
+   const startedTask:TeacherAssessmentTask={...task,status:'STARTED',runtimeBindingRef:result.runtimeBindingRef}
+   listGeneration.current++
+   setList(old=>({...old,pending:false}))
+   setRows(old=>old.map(row=>row.executionId===task.executionId?{...row,status:'STARTED',runtimeBindingRef:result.runtimeBindingRef!}:row))
+   const startedSession={...source,task:startedTask}
+   active.current=startedSession;setSession(startedSession)
+   await load(startedTask,result.runtimeBindingRef,valid)
   })
  }
  const reload=async()=>{
@@ -133,27 +141,30 @@ function TeacherAssessmentTasksSession({api,actorKey,unified=false,onListStateCh
   return {code:0,message:'本次提交已确认',data}
  }
  const enterChild=(item:CompositeCurrentItem)=>{
+  if(student){setError('学生评教仅支持量表与表单。');return}
   const source=active.current
   if(!source?.attempt||source.attempt.currentItem?.id!==item.id)return
   if(item.type==='COGNITIVE'&&!item.cognitiveSession?.sessionId||item.type==='SITUATIONAL'&&!item.situationalAttemptId){setError('当前子测评缺少冻结运行记录');return}
   setSession({...source,child:item})
  }
- return <section className={unified?'ht-assessment-source':'ht-panel'} aria-label={unified?undefined:'教师认知情境与组合测评'}>
+ return <section className={unified?'ht-assessment-source':'ht-panel'} aria-label={unified?undefined:student?'学生评教普通问卷':'教师认知情境与组合测评'}>
   {!unified&&<h2>我的测评任务</h2>}
   {!unified&&list.pending&&<p role="status">正在读取任务…</p>}
   {list.error&&<div role="alert"><p>{list.error}</p><button disabled={list.pending} onClick={()=>void refresh()}>重试读取任务</button></div>}
   {list.loaded&&!rows.length&&!unified&&!list.pending&&!list.error&&<p>暂无分配给你的测评任务。</p>}
   <div className="ht-event-list">{rows.map(task=><article className="ht-event" key={task.executionId}>
    <strong>{task.title}</strong> <span className="ht-tag">{assessmentStatus(task.status)}</span>{task.mode==='COMPOSITION'&&<span className="ht-tag">普通问卷</span>}{task.mode==='PACKAGE_REFERENCE'&&<span className="ht-tag">正式整包</span>}<p>{task.eventTitle}</p>
-   <button disabled={!!session||busy} onClick={()=>open(task)}>{task.status==='COMPLETED'?'查看完成状态':task.runtimeBindingRef?'继续测评':'开始测评'}</button>
+   {student&&task.teacherName&&<p>被评价教师：{task.teacherName}</p>}
+   <button disabled={!!session||busy} onClick={()=>open(task)}>{task.status==='COMPLETED'?'查看完成状态':task.runtimeBindingRef?(student?'继续评价':'继续测评'):(student?'开始评价':'开始测评')}</button>
   </article>)}</div>
   {cursor&&<button disabled={list.pending} onClick={()=>void refresh(cursor)}>加载更多测评任务</button>}
   {session&&<TeacherAssessmentPage kind="answer" title={session.task.title} showTitle={false}>
-   <div ref={panel} tabIndex={-1} role="region" aria-label="当前教师测评作答">
+   <div ref={panel} tabIndex={-1} role="region" aria-label={student?'当前学生评教作答':'当前教师测评作答'}>
     <button onClick={leave}>返回任务列表</button>
+    {student&&session.task.teacherName&&<p>被评价教师：{session.task.teacherName}</p>}
     {error&&<p role="alert">{error}</p>}
     {busy&&<p role="status">正在核对测评状态…</p>}
-    {session.completion?<div role="status"><h3>本次测评已完成</h3><p>正式作答已提交并确认，反馈按独立授权规则开放。</p>
+    {session.completion?<div role="status"><h3>{student?'本次评价已完成':'本次测评已完成'}</h3><p>正式作答已提交并确认，反馈按独立授权规则开放。</p>
       {renderFeedback?.(session.completion)}
      </div>:
      child?.type==='COGNITIVE'&&child.cognitiveSession?.sessionId&&cognitive?
@@ -173,7 +184,7 @@ function TeacherAssessmentTasksSession({api,actorKey,unified=false,onListStateCh
        <p>用途：{session.task.consentPurpose??'本次正式测评'}</p><p>可见性：{session.task.consentVisibility??'按任务授权范围'}</p>
        <label><input type="checkbox" checked={accepted} onChange={event=>setAccepted(event.target.checked)}/>我已阅读用途与可见性说明，自愿同意作答。</label>
       </div>}
-      <button disabled={busy||session.task.consentRequired&&!session.task.runtimeBindingRef&&!accepted} onClick={launch}>开始或继续测评</button>
+      <button disabled={busy||session.task.consentRequired&&!session.task.runtimeBindingRef&&!accepted} onClick={launch}>{student?'开始或继续评价':'开始或继续测评'}</button>
      </div>}
     {attempt&&!session.completion&&error&&<button disabled={busy} onClick={childFinished}>重新核对任务进度</button>}
    </div>

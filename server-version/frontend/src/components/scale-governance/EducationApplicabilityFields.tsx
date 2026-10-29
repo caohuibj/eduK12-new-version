@@ -1,5 +1,5 @@
 import {useEffect,useState} from 'react'
-import type {EducationApplicability} from '../../api/scaleLibraryGovernance'
+import type {EducationApplicability,EducationExpertApplicability} from '../../api/scaleLibraryGovernance'
 type Administration=EducationApplicability['administrations'][number]
 type Row={population:Administration['population']|'';responseMode:Administration['responseMode']|''}
 const modes={STUDENT:[['SELF','学生自评'],['PARENT_REPORT','家长评学生'],['TEACHER_REPORT','教师评学生']],TEACHER:[['SELF','教师自评'],['STUDENT_REPORT','学生评教师']]} as const
@@ -23,6 +23,8 @@ export function EducationApplicabilityFields({rows,onChange,disabled=false,valid
   {!valid&&<p role="alert">请补齐每行的适用人群与作答方式，移除不需要或重复的组合后再提交。</p>}
  </fieldset>
 }
-export function EducationApplicabilitySummary({value,hash}:{value?:EducationApplicability|null;hash?:string|null}){
- return <section aria-label="本次版本适用方式"><h4>本次版本适用方式</h4>{value?.administrations.length?<ul>{value.administrations.map(row=><li key={`${row.population}:${row.responseMode}`}>{row.population==='STUDENT'?'学生':'教师'} · {modes[row.population].find(([mode])=>mode===row.responseMode)?.[1]??row.responseMode}</li>)}</ul>:<p>未声明学校/教师适用方式。原 Training / Survey 使用规则不变。</p>}{hash&&<p className="break-all text-xs">适用方式快照摘要：{hash}</p>}</section>
+export function EducationApplicabilitySummary({value,hash,expert,expertHash}:{value?:EducationApplicability|null;hash?:string|null;expert?:EducationExpertApplicability|null;expertHash?:string|null}){
+ return <section aria-label="本次版本适用方式"><h4>本次版本适用方式</h4>{value?.administrations.length?<ul>{value.administrations.map(row=><li key={`${row.population}:${row.responseMode}`}>{row.population==='STUDENT'?'学生':'教师'} · {modes[row.population].find(([mode])=>mode===row.responseMode)?.[1]??row.responseMode}</li>)}</ul>:!expert?.administrations.length?<p>未声明学校/教师适用方式。原 Training / Survey 使用规则不变。</p>:null}
+  {!!expert?.administrations.length&&<p>独立 V2 声明：受邀专家观察教师个人；仍须另行获得工具授权与活动邀请。</p>}
+  {hash&&<p className="break-all text-xs">适用方式快照摘要：{hash}</p>}{expertHash&&<p className="break-all text-xs">专家适用方式快照摘要：{expertHash}</p>}</section>
 }

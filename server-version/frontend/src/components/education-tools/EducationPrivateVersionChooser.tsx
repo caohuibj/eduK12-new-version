@@ -1,6 +1,7 @@
 import {useCallback,useEffect,useRef,useState} from 'react'
 import {privateToolBase,privateToolError,type PrivateToolApi,type PrivateToolSummary,type PrivateToolVersion} from './privateToolClient'
 import type {CompositionSummary} from './educationCompositionClient'
+import {compositionAdministrationLabel} from './educationCompositionAdministration'
 import '../../survey/survey-composition-studio.css'
 import './education-composition.css'
 const merge=<T extends {id:string}>(old:T[],rows:T[])=>Array.from(new Map([...old,...rows].map(row=>[row.id,row])).values())
@@ -37,7 +38,7 @@ export function EducationPrivateVersionChooser({api,organizationId,disabled,onSe
   </article>)}</div>
   <div><button type="button" disabled={loading||disabled} onClick={()=>void load()}>刷新工具</button>{cursor&&<button type="button" disabled={loading||disabled} onClick={()=>void load(cursor)}>加载更多工具</button>}</div>
   {selected&&<section aria-label="选择工具版本"><h3>{selected.title} · 固定版本</h3>{!loading&&!versions.length&&<p>{kind?'尚无固定版本，请先在普通问卷编制页固定内容。':'尚无固定版本，请先返回量表或表单编制页固定内容。'}</p>}
-   {versions.map(version=><p key={version.id}>{version.title} · 修订 {version.sourceRevision} <button type="button" disabled={disabled||loading}
+   {versions.map(version=><p key={version.id}>{version.title} · 修订 {version.sourceRevision}{selected.kind==='COMPOSITION'?' · '+compositionAdministrationLabel(version.administration):''} <button type="button" disabled={disabled||loading}
     onClick={()=>onSelect({...version,toolId:selected.id,kind:selected.kind})}>{selectLabel} · 修订 {version.sourceRevision}</button></p>)}
    {versionCursor&&<button type="button" disabled={loading||disabled} onClick={()=>void choose(selected,versionCursor)}>加载更多工具版本</button>}
   </section>}

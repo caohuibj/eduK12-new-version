@@ -1,5 +1,7 @@
 import {sealPrivateFormRuntimeForPublication} from '../education-tools/private-tool.form-runtime-resources'
 import {publishPrivateCompositionRuntime} from '../education-tools/private-tool.composition-source'
+import {isStudentCompositionKey} from '../huiteacher/studentComposition.policy'
+import {studentEvaluationConfigMatches} from '../huiteacher/studentCompositionResource'
 import {assertLockedLibraryUseTime} from '../education-tools/library-source.use'
 import {privateFormDraftResourcePolicy} from '../education-tools/private-tool.form-draft-policy'
 import {readPrivateScaleRunSourceForPreparation,readPrivateFormRunSourceForPreparation,readPrivateCompositionRunSourcesForPreparation} from './educationPrivateScaleContext'
@@ -599,13 +601,13 @@ const resolvePairs = async (tx: Tx, organizationId: string, track: PreparedTrack
     // Student feedback has a uniquely school-verified teaching appointment.
     // A class's other teachers MUST NOT leak into this Run's frozen cohort.
     if(studentFormResourceId({family:track.resourceFamily,
-      key:track.resourceKey,version:track.resourceVersion})){
+      key:track.resourceKey,version:track.resourceVersion})||isStudentCompositionKey(track.resourceKey)){
       if(relationshipKind!=='CLASS_TEACHER_STUDENT'
         ||subjectRole!=='TEACHER'||respondentRole!=='STUDENT')
         throw new RunPublishError('STUDENT_EVAL_ROLE_MISMATCH','student evaluation requires student->teacher relationship',403)
       const cfg=await tx.$queryRaw<Array<{
         teacherUserId:string;classUnitId:string;staffAssignmentId:string
-      }>>`
+      }>>(Prisma.sql`
         SELECT target."subject_user_id" AS "teacherUserId",
           config."class_unit_id" AS "classUnitId",
           config."staff_assignment_id" AS "staffAssignmentId"
@@ -621,9 +623,10 @@ const resolvePairs = async (tx: Tx, organizationId: string, track: PreparedTrack
           AND target."kind"='PERSON' AND target."status"='ACTIVE'
         WHERE config."organization_id"=${organizationId}
           AND link."run_id"=${track.runId}
-          AND config."form_id"=${track.resourceKey.slice('huiteacher-student-form:'.length)}
-          AND config."definition_digest"=${track.resourceVersion}
-      `
+          AND ${isStudentCompositionKey(track.resourceKey)?Prisma.sql`config.composition_version_id=split_part(${track.resourceKey},':',3)
+            AND ${track.resourceKey}='education-composition:TEACHER:'||config.composition_version_id||':TEACHER:STUDENT_REPORT:1.0.0'`:
+            Prisma.sql`config.form_id=${track.resourceKey.slice('huiteacher-student-form:'.length)} AND config.definition_digest=${track.resourceVersion}`}
+      `)
       if(cfg.length!==1)throw new RunPublishError('STUDENT_EVAL_SCOPE_INVALID','evaluation configuration is missing',403)
       pairs=pairs.filter(pair=>pair.subject.userId===cfg[0].teacherUserId
         &&pair.respondent.actorRole==='STUDENT'
@@ -1058,12 +1061,12 @@ export const publishAssessmentRun = async (input: {
           where:{organizationId:input.organizationId,runId:input.runId},
           select:{eventId:true},
         })).map(link=>link.eventId)}},
-      select:{formId:true,definitionDigest:true},
+      select:{formId:true,definitionDigest:true,compositionVersionId:true,compositionContentHash:true},
     })
-    if(configured&&(preparedTracks.length!==1
-      ||preparedTracks[0].resourceKey!=='huiteacher-student-form:'+configured.formId
-      ||preparedTracks[0].resourceVersion!==configured.definitionDigest))
-      throw new RunPublishError('STUDENT_EVAL_TRACK_SCOPE','student feedback requires one exact frozen Form track',403)
+    if(configured&&(preparedTracks.length!==1||!studentEvaluationConfigMatches(configured,{
+      family:preparedTracks[0].resourceFamily,key:preparedTracks[0].resourceKey,version:preparedTracks[0].resourceVersion,
+      contentHash:preparedTracks[0].resourcePolicy.educationComposition?.origin.contentHash})))
+      throw new RunPublishError('STUDENT_EVAL_TRACK_SCOPE','student feedback requires one exact configured track',403)
     const timeRows = await tx.$queryRaw<Array<{ now: Date }>>`SELECT transaction_timestamp() AS "now"`
     const verifiedAt = timeRows[0].now.toISOString()
     const campusSelected=await campusRunParticipantScope(tx,{
@@ -1108,12 +1111,12 @@ export const publishAssessmentRun = async (input: {
       `
       const pairs = libraryPairs?.get(track.id)??await resolvePairs(tx, input.organizationId, track, campusSelected)
       if (pairs.length === 0) throw new RunPublishError('RUN_EMPTY_POPULATION', `Track ${track.id} resolved no eligible actor pairs`, 409)
-      if(studentFormResourceId({family:track.resourceFamily,
-        key:track.resourceKey,version:track.resourceVersion})&&pairs.length<teacherResourceMinimum())
+      if((studentFormResourceId({family:track.resourceFamily,
+        key:track.resourceKey,version:track.resourceVersion})||isStudentCompositionKey(track.resourceKey))&&pairs.length<Math.max(teacherResourceMinimum(),track.requestedPolicy.minimumRespondents??0))
         throw new RunPublishError('STUDENT_FEEDBACK_MINIMUM_POPULATION',
           'Student feedback does not meet the protected publication floor',409)
-      if(studentFormResourceId({family:track.resourceFamily,
-        key:track.resourceKey,version:track.resourceVersion})
+      if((studentFormResourceId({family:track.resourceFamily,
+        key:track.resourceKey,version:track.resourceVersion})||isStudentCompositionKey(track.resourceKey))
         &&pairs.length!==new Set(pairs.map(pair=>pair.respondent.userId)).size)
         throw new RunPublishError('STUDENT_EVAL_DUPLICATE_RESPONDENT','each eligible student must have exactly one execution',409)
       const perspective = requireSingle(track.requestedPolicy.perspectives, 'perspectives')
@@ -1191,7 +1194,7 @@ export const publishAssessmentRun = async (input: {
     // freeze precisely that decision. Generic publisher entrypoints cannot
     // bypass a Teacher-bound Form by skipping the Teacher UI.
     const hasStudentForm=preparedTracks.some(track=>!!studentFormResourceId({
-      family:track.resourceFamily,key:track.resourceKey,version:track.resourceVersion}))
+      family:track.resourceFamily,key:track.resourceKey,version:track.resourceVersion})||isStudentCompositionKey(track.resourceKey))
     const hasAdultForm=preparedTracks.some(track=>!!teacherFormResourceId({
       family:track.resourceFamily,key:track.resourceKey,version:track.resourceVersion}))
     if(hasStudentForm&&hasAdultForm)

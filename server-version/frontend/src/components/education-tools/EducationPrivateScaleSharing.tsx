@@ -20,7 +20,8 @@ function SharingSession({api,entry,organizationId,actorId,toolId,version,disable
  const [acknowledged,setAcknowledged]=useState<PrivateSharingRow|null>(null)
  const generation=useRef(0),listEpoch=useRef(0),locked=useRef(false),alive=useRef(true)
  const applicability=useEducationApplicabilityDraft(scope)
- const dirty=JSON.stringify(metadata)!==baseline||Boolean(consent||applicability.rows.length||reason.trim()||pending)
+ const [expert,setExpert]=useState(false)
+ const dirty=JSON.stringify(metadata)!==baseline||Boolean(consent||applicability.rows.length||expert||reason.trim()||pending)
  useEffect(()=>{onDraftStateChange?.({dirty,writing:busy||Boolean(pending)})},[dirty,busy,pending,onDraftStateChange])
  useEffect(()=>()=>{onDraftStateChange?.({dirty:false,writing:false})},[onDraftStateChange])
  useEffect(()=>{alive.current=true;return()=>{alive.current=false;generation.current++;locked.current=false}},[client])
@@ -56,13 +57,13 @@ function SharingSession({api,entry,organizationId,actorId,toolId,version,disable
  const submit=(retry=false)=>void work(async current=>{
   if(!retry&&!canSubmit)return
   const body=retry?pending:prepared?{contentHash:version.contentHash,releaseId:prepared.releaseId,requestId:crypto.randomUUID(),metadata:{...metadata},dependencyReleaseIds:[] as [],
-   ...(manifest?.items.length?{mediaConsent:{manifestHash:manifest.manifestHash,shareWithAuthorizedUsers:true as const}}:{}),...(applicability.value?{educationApplicability:applicability.value}:{})}:null
+   ...(manifest?.items.length?{mediaConsent:{manifestHash:manifest.manifestHash,shareWithAuthorizedUsers:true as const}}:{}),...(applicability.value?{educationApplicability:applicability.value}:{}),...(expert?{educationExpertApplicability:{schemaVersion:2 as const,administrations:[{population:'TEACHER' as const,responseMode:'EXPERT_REPORT' as const,targetKind:'PERSON' as const}]}}:{})}:null
   if(!body)return
   setPending(body)
   try{
    const row=await client.submit(version.id,body)
    if(!current())return
-   setAcknowledged(row);setRows(old=>[row,...old.filter(item=>item.id!==row.id)]);setPending(null);setConsent('');applicability.clear();setBaseline(JSON.stringify(metadata));setNotice('入库申请已提交，等待管理员审核。批准后仍须另行授权，不会自动发布活动或开放报告。')
+   setAcknowledged(row);setRows(old=>[row,...old.filter(item=>item.id!==row.id)]);setPending(null);setConsent('');setExpert(false);applicability.clear();setBaseline(JSON.stringify(metadata));setNotice('入库申请已提交，等待管理员审核。批准后仍须另行授权，不会自动发布活动或开放报告。')
    try{await refresh()}catch{if(current())setError('申请已提交，但列表刷新失败。请重新读取申请记录，不要重复提交。')}
   }catch(cause){
    if(!current())return
@@ -94,6 +95,8 @@ function SharingSession({api,entry,organizationId,actorId,toolId,version,disable
    <p>私有版本摘要：{prepared.privateContentHash} · 入库内容版本：{prepared.releaseId} · 内容摘要：{prepared.contentHash}</p>
    <SubmissionMetadataFields value={metadata} onChange={setMetadata} disabled={busy||disabled||Boolean(pending)} entry={entry}/>
    <EducationApplicabilityFields product={entry} rows={applicability.rows} onChange={applicability.setRows} valid={applicability.valid} disabled={busy||disabled||Boolean(pending)}/>
+   {entry==='TEACHER'&&<><label><input type="checkbox" checked={expert} disabled={busy||disabled||Boolean(pending)} onChange={event=>setExpert(event.target.checked)}/>本次新固定版本另行声明适用于受邀专家观察教师个人</label>
+   <p>专家声明独立于上述 V1 关系适用方式；原量表须明确为观察者／专家作答。声明随本次申请固定并审核，不自动授权，也不修改已有入库版本。</p></>}
    {images(prepared.mediaManifest,{versionId:version.id,releaseId:prepared.releaseId})}
    {manifest&&manifest.items.length>0&&<label className={`${prefix}-field`}><input type="checkbox" disabled={busy||disabled||Boolean(pending)} checked={consent===consentIdentity} onChange={event=>setConsent(event.target.checked?consentIdentity:'')}/>我同意上述附件随此精确量表版本申请进入受控共用媒体库，仅随获批量表供获授权任务使用，不单独公开复用。</label>}
    {duplicate&&<p>此版本已有待审或获批申请，请查看现有记录。</p>}
@@ -103,7 +106,7 @@ function SharingSession({api,entry,organizationId,actorId,toolId,version,disable
   {loaded&&!rows.length&&<p>{acknowledged?'本次列表未返回申请记录，请稍后刷新。':'当前量表没有申请记录。'}</p>}
   {rows.map(row=><article key={row.id}><p>{row.metadata.title} · {submissionStatusLabel[row.status]} · 固定版本 {row.versionId}</p><button type="button" disabled={busy||disabled} onClick={()=>readDetail(row)}>查看申请 {row.id}</button></article>)}
   {detail&&<section aria-label="申请冻结详情"><h5>{detail.metadata.title} · {submissionStatusLabel[detail.status]}</h5><SubmissionMetadataFields value={detail.metadata} onChange={()=>undefined} disabled entry={entry}/>
-   <EducationApplicabilitySummary value={detail.educationApplicability} hash={detail.educationApplicabilityHash}/>{images(detail.mediaManifest,{submissionId:detail.id})}
+   <EducationApplicabilitySummary value={detail.educationApplicability} hash={detail.educationApplicabilityHash} expert={detail.educationExpertApplicability} expertHash={detail.educationExpertApplicabilityHash}/>{images(detail.mediaManifest,{submissionId:detail.id})}
    <details><summary>精确版本冻结记录</summary><pre>{JSON.stringify(detail.snapshot,null,2)}</pre></details>{detail.reason&&<p>{detail.reason}</p>}
    {detail.status==='SUBMITTED'&&<><label className={`${prefix}-field`}><span>撤回说明</span><input disabled={busy||Boolean(pending)} maxLength={1000} value={reason} onChange={event=>setReason(event.target.value)}/></label><button type="button" disabled={busy||disabled||Boolean(pending)||!reason.trim()} onClick={withdraw}>撤回此申请</button></>}
   </section>}

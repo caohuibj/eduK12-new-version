@@ -7,6 +7,8 @@ import {hashScaleDefinition} from '../scale/scale-definition'
 import {prepareTrainingContentSnapshot,trainingContentSnapshotSchema} from '../composite/training-content-binding'
 import {readLibraryScaleMeasurementSource} from './training-source'
 import {readFrozenEducationApplicability,type EducationApplicabilityVariant} from './education-applicability'
+import {readFrozenExpertApplicability,isNativeExpertObserver} from '../education-tools/expert-observation.contract'
+import {assertLibraryMediaReady} from './media'
 import {isSupportedEducationLibraryVariant} from './education-supported-variants'
 import {educationLibraryOriginSchema,educationLibraryResourceEntry,educationLibraryResourceKey,
   type EducationLibraryOrigin,type EducationLibraryResourceEntry} from './education-runtime-entry'
@@ -134,9 +136,12 @@ export async function prepareEducationLibraryResources(tx:Prisma.TransactionClie
   await lockEducationLibraryOrganization(tx,input.organizationId,input.product)
   const {entry,submission}=await loadEntry(tx,input.entryId)
   const applicability=readFrozenEducationApplicability(submission.snapshot)
-  if(!applicability)fail('EDUCATION_LIBRARY_APPLICABILITY_REQUIRED')
+  const expert=readFrozenExpertApplicability(submission.snapshot)
+  const expertOnly=input.product==='TEACHER'&&expert&&isNativeExpertObserver(submission.snapshot.compiledDefinition.respondentType)
+    &&expert.declaration.administrations.every(a=>a.targetKind==='PERSON')
+    &&!applicability?.variants.some(v=>isSupportedEducationLibraryVariant(input.product,v.variantKey))
+  if(!applicability&&!expertOnly)fail('EDUCATION_LIBRARY_APPLICABILITY_REQUIRED')
   if(submission.status!=='APPROVED'||entry.status!=='ACTIVE')fail('EDUCATION_LIBRARY_ENTRY_UNAVAILABLE')
-  const runnableVariants=runnableEducationLibraryVariants(input.product,applicability.variants)
   const release=await getContentRelease(tx,entry.release_id,true)
   if(!release||release.layer!=='MEASUREMENT'||release.family!=='SCALE'||release.status!=='PUBLISHED')fail('EDUCATION_LIBRARY_RELEASE_UNAVAILABLE')
   const dependencies:EducationLibraryOrigin['dependencies']=[]
@@ -147,6 +152,16 @@ export async function prepareEducationLibraryResources(tx:Prisma.TransactionClie
   }
   if(dependencies.length)fail('EDUCATION_LIBRARY_DEPENDENCY_ADAPTER_NOT_READY')
   await assertScaleLibraryCollectionAllowed(tx,[release.releaseId])
+  // Expert U authorizes the original approved source. The ordinary compiler
+  // prepares its shared native Scale on actual reference; no V1 relational
+  // role, fake single-tool Composite or registered expert resource is made.
+  if(expertOnly){
+    if(submission.snapshot.compiledDefinition.referencePolicy.type!=='none'||!submission.snapshot.mediaManifest)fail('EDUCATION_LIBRARY_SOURCE_NOT_READY')
+    await assertLibraryMediaReady(tx,entry.id,submission.snapshot.mediaManifest)
+    return {resources:[],authority,submissionId:submission.id}
+  }
+  if(!applicability)fail('EDUCATION_LIBRARY_APPLICABILITY_REQUIRED')
+  const runnableVariants=runnableEducationLibraryVariants(input.product,applicability.variants)
   // Same global per-entry lock as Training; prevents cross-org duplicate wrappers.
   await tx.$executeRaw(Prisma.sql`SELECT pg_advisory_xact_lock(hashtext(${'library-wrapper:'+entry.id}))`)
   let scale=await tx.scale.findUnique({where:{libraryEntryId:entry.id}})

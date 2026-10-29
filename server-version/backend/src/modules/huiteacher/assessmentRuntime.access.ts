@@ -11,10 +11,12 @@ import type {RelationalProductEntryV1} from '../assessment-relational/product-re
 import {educationAssessmentOriginSchema,educationAssessmentResourceKey,type EducationAssessmentOrigin} from '../education-tools/assessment-resource.contract'
 import {readFrozenCompositionIdentity,assertCompositionCollection} from '../assessment-run/educationCompositionExecution'
 import {EducationPrivateToolError} from '../education-tools/private-tool.contracts'
+import {studentEvaluationTrackConfigSql} from './studentCompositionResource'
 
 export type TeacherRuntimeDb=Prisma.TransactionClient
 export type TeacherSourceIdentity={origin:EducationAssessmentOrigin;entry:RelationalProductEntryV1;identityOnly:true}
 export type TeacherRuntimePurpose='START'|'BOUND_COLLECTION'|'HISTORY_READ'
+export type TeacherAssessmentAudience='TEACHER_SELF'|'STUDENT_EVALUATION'
 /** Required integration port. Reading a registered identity does not grant use.
  * Root must also enforce this contract within shared START/FINAL transactions. */
 export type TeacherAssessmentSourceAccess<Identity extends TeacherSourceIdentity=TeacherSourceIdentity>={
@@ -30,6 +32,7 @@ export type TeacherAssessmentTask={
  family:'COGNITIVE'|'SITUATIONAL'|'BUNDLE';status:'ASSIGNED'|'STARTED'|'COMPLETED';runStatus:string;
  runtimeBindingRef:string|null;consentRequired:boolean;consentPurpose:string|null;consentVisibility:string|null
  mode:'COMPOSITION'|'PACKAGE_REFERENCE'|'TOOL'
+ teacherName?:string
 }
 type Row=Omit<TeacherAssessmentTask,'title'|'mode'>&{
  resourceKey:string;resourceVersion:string;policy:RunResourcePolicy;policyHash:string;
@@ -51,10 +54,11 @@ function decodeCursor(value:string,actorUserId:string):Cursor{
 }
 /** Product identity, current account/persona/entitlement, exact SELF assignment,
  * event, Run and durable parent binding are predicates on actual database rows. */
-export async function queryTeacherAssessmentRows(db:TeacherRuntimeDb,actorUserId:string,input:{executionId?:string;attemptId?:string;cursor?:Cursor;limit:number}){
+export async function queryTeacherAssessmentRows(db:TeacherRuntimeDb,actorUserId:string,input:{executionId?:string;attemptId?:string;cursor?:Cursor;limit:number},audience:TeacherAssessmentAudience='TEACHER_SELF'){
+ const student=audience==='STUDENT_EVALUATION'
  return db.$queryRaw<Row[]>(Prisma.sql`
  SELECT e.id AS "executionId",e.organization_id AS "organizationId",e.run_id AS "runId",event.id AS "eventId",
-  event.title AS "eventTitle",t.resource_family AS family,e.status,r.status AS "runStatus",e.runtime_binding_ref AS "runtimeBindingRef",
+  event.title AS "eventTitle",${student?Prisma.sql`student_target.name`:Prisma.sql`NULL::text`} AS "teacherName",t.resource_family AS family,e.status,r.status AS "runStatus",e.runtime_binding_ref AS "runtimeBindingRef",
   t.resource_key AS "resourceKey",t.resource_version AS "resourceVersion",t.frozen_resource_policy AS policy,t.resource_policy_hash AS "policyHash",
   a.id AS "assignmentId",a.episode_id AS "episodeId",e.runtime_binding_kind AS "bindingKind",
   parent.attempt_epoch AS "attemptEpoch",parent.frozen_active_slot_set_encrypted AS "frozenSlotSet",parent.frozen_active_slot_set_hash AS "frozenSlotSetHash",
@@ -68,23 +72,30 @@ export async function queryTeacherAssessmentRows(db:TeacherRuntimeDb,actorUserId
  JOIN assessment_run_tracks t ON t.id=e.track_id AND t.organization_id=e.organization_id AND t.run_id=e.run_id
  JOIN huiteacher_evaluation_run_links link ON link.organization_id=e.organization_id AND link.run_id=e.run_id
  JOIN huiteacher_evaluation_events event ON event.id=link.event_id AND event.organization_id=link.organization_id
+ ${student?Prisma.sql`JOIN huiteacher_student_eval_configs cfg ON cfg.organization_id=link.organization_id AND cfg.event_id=link.event_id
+  AND event.kind='ASSESSMENT' AND cfg.composition_version_id IS NOT NULL AND ${studentEvaluationTrackConfigSql(Prisma.sql`t`,Prisma.sql`cfg`)}
+  JOIN huiteacher_evaluation_targets student_target ON student_target.id=event.target_id AND student_target.organization_id=event.organization_id
+   AND student_target.kind='PERSON' AND student_target.status='ACTIVE'`:Prisma.empty}
  JOIN users actual_teacher ON actual_teacher.id=${actorUserId} AND actual_teacher.account_domain='SCHOOL'
-  AND actual_teacher.role IN ('TEACHER','ADMIN') AND actual_teacher.teacher_approved=TRUE
+  AND ${student?Prisma.sql`actual_teacher.role='STUDENT'`:Prisma.sql`actual_teacher.role IN ('TEACHER','ADMIN') AND actual_teacher.teacher_approved=TRUE`}
   AND actual_teacher.is_active=TRUE AND actual_teacher.is_frozen=FALSE AND actual_teacher.must_change_password=FALSE
   AND (actual_teacher.expires_at IS NULL OR actual_teacher.expires_at>statement_timestamp())
  JOIN assessment_run_actor_snapshots subject ON subject.id=e.subject_actor_snapshot_id
-  AND subject.organization_id=e.organization_id AND subject.run_id=e.run_id AND subject.user_id=${actorUserId} AND subject.actor_role='TEACHER'
+  AND subject.organization_id=e.organization_id AND subject.run_id=e.run_id AND subject.actor_role='TEACHER'
+  AND ${student?Prisma.sql`subject.user_id<>${actorUserId} AND subject.user_id=student_target.subject_user_id`:Prisma.sql`subject.user_id=${actorUserId}`}
  JOIN assessment_run_actor_snapshots respondent ON respondent.id=e.respondent_actor_snapshot_id
-  AND respondent.organization_id=e.organization_id AND respondent.run_id=e.run_id AND respondent.user_id=${actorUserId} AND respondent.actor_role='TEACHER'
+  AND respondent.organization_id=e.organization_id AND respondent.run_id=e.run_id AND respondent.user_id=${actorUserId} AND respondent.actor_role=${student?'STUDENT':'TEACHER'}
  JOIN relational_assessment_assignments a ON a.id=e.relational_assignment_id AND a.policy_domain='ORGANIZATION_RUN'
   AND a.resource_kind=t.resource_family AND a.resource_key=t.resource_key AND a.resource_version=t.resource_version
-  AND a.respondent_user_id=${actorUserId} AND a.subject_user_id=${actorUserId}
-  AND a.respondent_role='TEACHER' AND a.subject_role='TEACHER' AND a.relationship_kind='SELF' AND a.perspective='SELF_REPORT'
-  AND a.analysis_mode='INDIVIDUAL_ONLY' AND a.minimum_respondents IS NULL
+  AND a.respondent_user_id=${actorUserId} AND a.subject_user_id=subject.user_id
+  AND ${student?Prisma.sql`a.respondent_role='STUDENT' AND a.subject_role='TEACHER' AND a.relationship_kind='CLASS_TEACHER_STUDENT'
+   AND a.perspective='OBSERVER_REPORT' AND a.analysis_mode='COHORT_AGGREGATE' AND a.minimum_respondents>=5`:
+   Prisma.sql`a.respondent_role='TEACHER' AND a.subject_role='TEACHER' AND a.relationship_kind='SELF' AND a.perspective='SELF_REPORT'
+    AND a.analysis_mode='INDIVIDUAL_ONLY' AND a.minimum_respondents IS NULL`}
  LEFT JOIN assessment_attempt_consents consent ON consent.id=a.consent_id
  LEFT JOIN composite_assessment_attempts parent ON parent.id=e.runtime_binding_ref AND e.runtime_binding_kind='COMPOSITE'
   AND parent.assignment_ref=a.id AND parent.episode_id=a.episode_id
-  AND parent.user_id=${actorUserId} AND parent.subject_user_id=${actorUserId} AND parent.respondent_user_id=${actorUserId}
+  AND parent.user_id=${actorUserId} AND parent.subject_user_id=subject.user_id AND parent.respondent_user_id=${actorUserId}
   AND parent.composite_assessment_id=t.frozen_resource_policy->'runtimeLaunchTarget'->>'ref'
   AND parent.delivery_mode='FINAL_ONLY' AND parent.runtime_generation='UNIFIED_V1'
  WHERE t.resource_family IN ('COGNITIVE','SITUATIONAL','BUNDLE') AND t.resource_version='1.0.0'
@@ -105,19 +116,20 @@ export async function queryTeacherAssessmentRows(db:TeacherRuntimeDb,actorUserId
 function taskDto(row:Row,title:string):TeacherAssessmentTask{
  const {executionId,organizationId,runId,eventId,eventTitle,family,status,runStatus,runtimeBindingRef,consentRequired,consentPurpose,consentVisibility}=row
  return {executionId,organizationId,runId,eventId,eventTitle,title,family,status,runStatus,runtimeBindingRef,consentRequired,consentPurpose,consentVisibility,
-  mode:row.resourceKey.startsWith('education-composition:')?'COMPOSITION':family==='BUNDLE'?'PACKAGE_REFERENCE':'TOOL'}
+  ...(row.teacherName?{teacherName:row.teacherName}:{}),mode:row.resourceKey.startsWith('education-composition:')?'COMPOSITION':family==='BUNDLE'?'PACKAGE_REFERENCE':'TOOL'}
 }
-export function createTeacherAssessmentAccess<Identity extends TeacherSourceIdentity>(db:TeacherRuntimeDb,source:TeacherAssessmentSourceAccess<Identity>){
+export function createTeacherAssessmentAccess<Identity extends TeacherSourceIdentity>(db:TeacherRuntimeDb,source:TeacherAssessmentSourceAccess<Identity>,audience:TeacherAssessmentAudience='TEACHER_SELF'){
  const authorize=async(row:Row,actorUserId:string)=>{
   if(row.resourceKey.startsWith('education-composition:')){
    if(row.family!=='BUNDLE')fail()
    const identity=await readFrozenCompositionIdentity(db,{policy:row.policy,policyHash:row.policyHash,organizationId:row.organizationId,
     key:row.resourceKey,version:row.resourceVersion})
-   if(identity.origin.entry!=='TEACHER')fail()
+   if(identity.origin.entry!=='TEACHER'||identity.origin.variantKey!==(audience==='STUDENT_EVALUATION'?'TEACHER:STUDENT_REPORT':'TEACHER:SELF'))fail()
    if(row.status!=='COMPLETED')await assertCompositionCollection(db,identity,row.status==='ASSIGNED'?'NEW_START':'BOUND_COLLECTION')
    return {task:taskDto(row,identity.title),identity,row,runtimeCompositeId:identity.compositeId,
-    units:identity.units.map(unit=>({itemId:unit.itemId,family:'SCALE' as const}))}
+    units:identity.units.map(unit=>({itemId:unit.itemId,family:unit.family}))}
   }
+  if(audience==='STUDENT_EVALUATION')fail()
   const identity=await source.readIdentity(db,{resourceKey:row.resourceKey,version:row.resourceVersion,purpose:row.status==='ASSIGNED'?'NEW_USE':'HISTORY'})
   const origin=educationAssessmentOriginSchema.parse(identity.origin),entry=identity.entry
   if(identity.identityOnly!==true||origin.product!=='TEACHER'||origin.organizationId!==row.organizationId
@@ -135,7 +147,7 @@ export function createTeacherAssessmentAccess<Identity extends TeacherSourceIden
  }
  const own=async(actorUserId:string,input:{executionId?:string;attemptId?:string})=>{
   if(!input.executionId&&!input.attemptId)fail()
-  const rows=await queryTeacherAssessmentRows(db,actorUserId,{...input,limit:2})
+  const rows=await queryTeacherAssessmentRows(db,actorUserId,{...input,limit:2},audience)
   if(rows.length!==1)fail()
   return authorize(rows[0],actorUserId)
  }
@@ -143,7 +155,7 @@ export function createTeacherAssessmentAccess<Identity extends TeacherSourceIden
   own,
   async page(actorUserId:string,raw:unknown={}){
    const input=pageSchema.parse(raw),cursor=input.cursor?decodeCursor(input.cursor,actorUserId):undefined
-   const rows=await queryTeacherAssessmentRows(db,actorUserId,{cursor,limit:input.pageSize+1})
+   const rows=await queryTeacherAssessmentRows(db,actorUserId,{cursor,limit:input.pageSize+1},audience)
    const page=rows.slice(0,input.pageSize),list:TeacherAssessmentTask[]=[]
    for(const row of page){
     try{list.push((await authorize(row,actorUserId)).task)}catch(error){

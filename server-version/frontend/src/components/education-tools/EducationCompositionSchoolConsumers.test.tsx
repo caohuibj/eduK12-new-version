@@ -12,10 +12,10 @@ describe('School composition product consumers / synthetic HTTP contracts',()=>{
   render(<EducationPrivateToolStudio api={api as PrivateToolApi} organizationId="org" actorId="author" entry="SCHOOL"/>)
   await waitFor(()=>expect(screen.getByRole('button',{name:'普通问卷'})).toBeEnabled())
   fireEvent.click(screen.getByRole('button',{name:'普通问卷'}))
-  expect(await screen.findByText(/将本人固定量表和表单、获授权公共量表与表单编成一份学生自评问卷/)).toBeInTheDocument()
+  expect(await screen.findByText(/将本人固定量表和表单、获授权公共量表与表单编成一份学生自评或家长、教师观察问卷/)).toBeInTheDocument()
   expect(api).toHaveBeenCalledWith('/organizations/org/private-tools?kind=COMPOSITION')
  })
- it('attaches one fixed questionnaire from the actual activity consumer and displays the source revision',async()=>{
+ it.each(['SELF','PARENT_REPORT','TEACHER_REPORT'] as const)('attaches a fixed %s questionnaire from the actual activity consumer and displays the source revision',async responseMode=>{
   const base='/organizations/org/activities/activity',root='00000000-0000-4000-8000-000000000001',fixed='00000000-0000-4000-8000-000000000002',hash='a'.repeat(64)
   let added=false
   const api=vi.fn(async(path:string,method='GET',body?:unknown)=>{
@@ -24,7 +24,7 @@ describe('School composition product consumers / synthetic HTTP contracts',()=>{
    if(path.endsWith('/eligible-classes'))return {list:[]}
    if(path===base+'/runs/run')return {run:{id:'run',name:'本人批次',status:'DRAFT',version:added?10:9},tracks:added?[{id:'track',resourceFamily:'BUNDLE',resourceKey:`education-composition:SCHOOL:${fixed}:STUDENT:SELF:1.0.0`,resourceVersion:'1.0.0',title:'固定学生问卷',sourceRevision:4}]:[]}
    if(path==='/organizations/org/private-tools?kind=COMPOSITION')return {list:[{id:root,kind:'COMPOSITION',title:'草稿学生问卷',revision:12}],nextCursor:null}
-   if(path===`/organizations/org/private-tools/${root}/versions`)return {list:[{id:fixed,title:'固定学生问卷',sourceRevision:4,contentHash:hash}],nextCursor:null}
+   if(path===`/organizations/org/private-tools/${root}/versions`)return {list:[{id:fixed,title:'固定学生问卷',sourceRevision:4,contentHash:hash,administration:{population:'STUDENT',responseMode}}],nextCursor:null}
    if(path===base+'/runs/run/tracks'&&method==='POST'){added=true;return {id:'track'}}
    throw Error('Unexpected '+method+' '+path+' '+JSON.stringify(body))
   })
@@ -37,8 +37,13 @@ describe('School composition product consumers / synthetic HTTP contracts',()=>{
   view.rerender(<SchoolActivityManager api={api as PrivateToolApi} organizationId="org" isAdmin={false} classes={[]} actorKey="author" canAuthorPrivateTools/>)
   const details=(await screen.findByText('选用本人普通问卷')).closest('details')!;details.open=true;fireEvent(details,new Event('toggle'))
   fireEvent.click(await screen.findByRole('button',{name:'选择固定版本 · 草稿学生问卷'}))
-  fireEvent.click(await screen.findByRole('button',{name:'选择本版本 · 修订 4'}));fireEvent.click(screen.getByRole('button',{name:'加入测评批次'}))
-  await waitFor(()=>expect(api).toHaveBeenCalledWith(base+'/runs/run/tracks','POST',{expectedVersion:9,privateComposition:{versionId:fixed,contentHash:hash},subjectSelector:{kind:'ALL_CURRENT'},respondentSelector:{kind:'ALL_CURRENT'}}))
+  fireEvent.click(await screen.findByRole('button',{name:'选择本版本 · 修订 4'}))
+  if(responseMode==='TEACHER_REPORT'){
+   expect(screen.getByRole('button',{name:'加入测评批次'})).toBeDisabled()
+   fireEvent.click(screen.getByLabelText('仅分配给受评学生的当前班主任'))
+  }
+  fireEvent.click(screen.getByRole('button',{name:'加入测评批次'}))
+  await waitFor(()=>expect(api).toHaveBeenCalledWith(base+'/runs/run/tracks','POST',{expectedVersion:9,privateComposition:{versionId:fixed,contentHash:hash},subjectSelector:{kind:'ALL_CURRENT'},respondentSelector:{kind:responseMode==='PARENT_REPORT'?'RELATED_PARENT':'ALL_CURRENT'},...(responseMode==='TEACHER_REPORT'?{targetPolicy:{mode:'HOMEROOM_TEACHER'}}:{})}))
   await screen.findByText('固定学生问卷')
   expect(screen.getByText(/固定版本：修订 4/)).toBeInTheDocument()
  })

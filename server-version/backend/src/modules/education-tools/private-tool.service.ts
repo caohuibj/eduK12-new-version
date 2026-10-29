@@ -20,9 +20,12 @@ import {createPrivateToolInput,updatePrivateToolInput,freezePrivateToolInput,pre
 import {initialPrivateToolDefinition,privateToolDefinition,validatePrivateToolDefinition,privateToolContentHash} from './private-tool.definition'
 import {compilePrivateComposition} from './private-tool.composition-compiler'
 import {sealPrivateComposition,readOwnedCompositionIdentity} from './private-tool.composition-runtime'
-import type {PrivateCompositionDefinition} from './private-tool.composition-contracts'
+import {privateCompositionAdministrationSchema,type PrivateCompositionDefinition} from './private-tool.composition-contracts'
 import {readEducationPublicUse} from './public-source.catalog'
 import {educationPublicSourceKey} from './public-source.identity'
+import {educationBlockPublicSource} from './public-source.identity'
+import {compositionLeafKey} from './private-tool.composition-compiler'
+import {lockOwnedDraftNativeSources} from './native-source.locks'
 
 type Tx=Prisma.TransactionClient
 const boundary={visibility:'AUTHOR_PRIVATE',snapshotOnly:true,canPublish:false,canShare:false,canReadParticipantReports:false} as const
@@ -84,18 +87,18 @@ export async function readPrivateTool(c:PrivateToolContext,id:string){
   const ids=[...new Set(definition.blocks.filter(block=>block.source.provider==='PRIVATE_VERSION').map(block=>block.source.versionId))]
   const references=ids.length?await tx.educationPrivateToolVersion.findMany({where:{id:{in:ids},...scope(c),kind:{in:['SCALE','FORM']}},
    select:{id:true,toolId:true,kind:true,title:true,sourceRevision:true,contentHash:true}}):[]
-  const publicSources=definition.blocks.filter(block=>['PUBLIC_FORM','STANDARD_SCALE'].includes(block.source.provider)).map(block=>block.source)
-  const publicKey=(source:typeof publicSources[number])=>educationPublicSourceKey({kind:source.provider==='PUBLIC_FORM'?'FORM':'STANDARD_SCALE',id:source.versionId,hash:source.contentHash})
+  const publicSources=definition.blocks.map(block=>educationBlockPublicSource(block.source)).filter((source):source is NonNullable<typeof source>=>source!==null)
+  const publicKey=educationPublicSourceKey
   // A mutable draft may contain an as-yet unverified reference. It cannot be
   // used as an oracle for another public source's title/version without U.
   // Keep the owner's draft intact; resolve only currently authorized summaries.
   const allowed=await readEducationPublicUse(tx,c,publicSources.map(publicKey))
   const visibleSources=publicSources.filter(source=>allowed.has(publicKey(source)))
-  const publicHeaders=await readEducationPublicSourceHeaders(tx,visibleSources.map(source=>({kind:source.provider==='PUBLIC_FORM'?'FORM':'STANDARD_SCALE',id:source.versionId,hash:source.contentHash})))
-  const libraryHeaders=await readEducationLibrarySourceSummaries(tx,c,definition.blocks.filter(block=>block.source.provider==='LIBRARY_SCALE').map(block=>block.source))
+  const publicHeaders=await readEducationPublicSourceHeaders(tx,visibleSources)
+  const libraryHeaders=await readEducationLibrarySourceSummaries(tx,c,definition.blocks.filter(block=>block.source.provider==='LIBRARY_SCALE').map(block=>block.source),definition.administration.responseMode,definition.administration.responseMode==='EXPERT_REPORT'?definition.administration.targetKind:undefined)
   return {...tool,references:[...references.map(ref=>({...ref,sourceProvider:'PRIVATE_VERSION' as const})),
-   ...[...publicHeaders.values()].map(header=>({id:header.id,kind:header.kind==='FORM'?'FORM' as const:'SCALE' as const,title:header.title,contentHash:header.hash,version:header.versions.content,versions:header.versions,requiredContextKeys:educationPublicRequiredContextKeys(header),referenceContextKeys:header.referenceContextKeys,
-    sourceProvider:header.kind==='FORM'?'PUBLIC_FORM' as const:'STANDARD_SCALE' as const})),
+   ...[...publicHeaders.values()].map(header=>({id:header.id,kind:header.kind==='FORM'?'FORM' as const:header.kind==='STANDARD_SCALE'?'SCALE' as const:header.kind==='COGNITIVE_CONFIG'?'COGNITIVE' as const:'SJT' as const,title:header.title,contentHash:header.hash,version:header.versions.content,versions:header.versions,requiredContextKeys:educationPublicRequiredContextKeys(header),referenceContextKeys:header.referenceContextKeys,
+    sourceProvider:header.kind==='FORM'?'PUBLIC_FORM' as const:header.kind})),
    ...libraryHeaders.map(header=>({id:header.sourceId,kind:header.kind,title:header.title,contentHash:header.contentHash,version:header.versions.content,versions:header.versions,sourceProvider:'LIBRARY_SCALE' as const}))],...boundary}
  })
 }
@@ -117,6 +120,7 @@ export async function updatePrivateTool(c:PrivateToolContext,id:string,raw:unkno
 }
 export async function validatePrivateTool(c:PrivateToolContext,id:string){
  return transact(async tx=>{
+  await lockOwnedDraftNativeSources(tx,c,id)
   await authorized(tx,c);const row=await readOwned(tx,c,id)
   await assertPrivateToolImages(tx,c,id,row.kind as PrivateToolKind,row.definition)
   const {valid,issues}=validatePrivateToolDefinition(row.kind as PrivateToolKind,row.definition)
@@ -128,14 +132,16 @@ const scaleAnswers=z.array(z.object({itemCode:z.string().min(1),responseValue:z.
 export async function previewPrivateTool(c:PrivateToolContext,id:string,raw:unknown){
  const input=previewPrivateToolInput.parse(raw)
  return transact(async tx=>{
+  await lockOwnedDraftNativeSources(tx,c,id)
   await authorized(tx,c);const row=await readOwned(tx,c,id)
   if(row.kind==='COMPOSITION'){
    if(input.answers!==undefined||input.rawScores!==undefined)privateToolFail('PRIVATE_TOOL_PREVIEW_INPUT_INVALID',400)
    const compiled=await compilePrivateComposition(tx,c,row.definition)
    return {result:{kind:'COMPOSITION_PREVIEW',instruction:compiled.definition.instruction,blocks:compiled.definition.blocks.map(block=>{
-    const leaf=compiled.leaves.get(block.source.provider+':'+block.source.versionId)!
+    const leaf=compiled.leaves.get(compositionLeafKey(block.source))!
     return {blockId:block.blockId,instruction:block.instruction,kind:leaf.kind,title:leaf.version.title,
-     definition:leaf.kind==='SCALE'?(leaf.provider==='PRIVATE_VERSION'?leaf.definition:educationPublicScaleDisplay(leaf.definition)):leaf.form.definition}
+     definition:leaf.kind==='SCALE'?(leaf.provider==='PRIVATE_VERSION'?leaf.definition:educationPublicScaleDisplay(leaf.definition)):leaf.kind==='FORM'?leaf.form.definition:
+      leaf.kind==='COGNITIVE'?{instruction:leaf.native.config.instruction,profile:leaf.native.descriptor.profile,profileDefinitionVersion:leaf.native.descriptor.profileDefinitionVersion,resolvedConfigHash:leaf.native.descriptor.resolvedConfigHash}:{instrumentVersion:leaf.native.instrumentVersion}}
    })},previewOnly:true,persistedAnswers:false,contentHash:row.contentHash,...boundary}
   }
   await assertPrivateToolImages(tx,c,id,row.kind as PrivateToolKind,row.definition)
@@ -160,6 +166,7 @@ export async function previewPrivateTool(c:PrivateToolContext,id:string,raw:unkn
 export async function freezePrivateTool(c:PrivateToolContext,id:string,raw:unknown){
  const input=freezePrivateToolInput.parse(raw)
  return transact(async tx=>{
+  await lockOwnedDraftNativeSources(tx,c,id)
   const libraryUses=await lockOwnedDraftLibraryUses(tx,c,id)
   await authorized(tx,c,{toolId:id})
   const row=await readOwned(tx,c,id,true)
@@ -194,10 +201,19 @@ export async function listPrivateToolVersions(c:PrivateToolContext,id:string,cur
   await authorized(tx,c)
   // Version selection needs ownership and immutable summaries, not the mutable
   // draft's question body or a full draft hash on every metadata page.
-  if(!await tx.educationPrivateTool.findFirst({where:{id,...scope(c)},select:{id:true}}))privateToolFail('PRIVATE_TOOL_NOT_FOUND',404)
+  const tool=await tx.educationPrivateTool.findFirst({where:{id,...scope(c)},select:{id:true,kind:true}})
+  if(!tool)privateToolFail('PRIVATE_TOOL_NOT_FOUND',404)
   if(cursor&&!await tx.educationPrivateToolVersion.findFirst({where:{id:cursor,toolId:id,...scope(c)},select:{id:true}}))
    privateToolFail('PRIVATE_TOOL_CURSOR_INVALID',400)
-  const rows=await tx.educationPrivateToolVersion.findMany({where:{toolId:id,...scope(c)},
+  // Project only the fixed administration header, never the question body.
+  // The database tuple preserves microsecond cursor order without JS Date.
+  const rows=tool.kind==='COMPOSITION'?(await tx.$queryRaw<Array<{id:string;sourceRevision:number;title:string;contentHash:string;createdAt:Date;administration:unknown}>>(Prisma.sql`
+   SELECT v.id,v.source_revision AS "sourceRevision",v.title,v.content_hash AS "contentHash",v.created_at AS "createdAt",
+    v.definition->'administration' AS administration FROM education_private_tool_versions v
+   WHERE v.tool_id=${id} AND v.entry=${c.entry} AND v.organization_id=${c.organizationId} AND v.owner_user_id=${c.principal.userId}
+    AND (${cursor??null}::text IS NULL OR (v.created_at,v.id)<(SELECT created_at,id FROM education_private_tool_versions WHERE id=${cursor??null}))
+   ORDER BY v.created_at DESC,v.id DESC LIMIT 51`)).map(row=>({...row,administration:privateCompositionAdministrationSchema.parse(row.administration)})):
+   await tx.educationPrivateToolVersion.findMany({where:{toolId:id,...scope(c)},
    orderBy:[{createdAt:'desc'},{id:'desc'}],...(cursor?{cursor:{id:cursor},skip:1}:{}),take:51,
    select:{id:true,sourceRevision:true,title:true,contentHash:true,createdAt:true}})
   return {list:rows.slice(0,50),nextCursor:rows.length>50?rows[49].id:null,...boundary}
