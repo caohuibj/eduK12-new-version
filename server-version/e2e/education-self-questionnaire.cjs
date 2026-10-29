@@ -10,6 +10,24 @@ const feedback = '合成固定版本反馈：本次体验只用于自我反思�
 const withheld = '共用原版反馈不应向当前参与者开放。'
 const checks = ['authorized-source-compose-freeze-reopen','one-parent-start-resume-final','per-block-permitted-feedback']
 
+async function isSafeScreenshot(page,product) {
+ return page.evaluate(product=>{
+  if(!['SCHOOL','TEACHER'].includes(product))return false
+  if(document.querySelector('.ht-secret,.hs-secret,.ht-mfa-setup'))return false
+  const passwords=[...document.querySelectorAll('input[type=password]')]
+  if(!passwords.length)return true
+  // Teacher intentionally keeps its password form mounted in the closed native
+  // account dialog. Only those two empty, unrendered controls are harmless;
+  // open dialogs, retained values and every other password control still fail.
+  if(product!=='TEACHER'||passwords.length!==2)return false
+  const dialog=document.querySelector('dialog#ht-account-settings.ht-account-dialog')
+  if(!(dialog instanceof HTMLDialogElement)||dialog.open||dialog.getClientRects().length)return false
+  return passwords.every(input=>input.closest('dialog')===dialog&&input.value===''&&!input.getClientRects().length
+   &&input.closest('form[aria-label="修改账号密码"]'))
+   &&passwords.map(input=>input.autocomplete).sort().join(',')==='current-password,new-password'
+ },product)
+}
+
 async function prepareApprovedSource({db,passwordHash,suffix,products}) {
  const admin=await db.user.create({data:{username:'self_library_admin_'+suffix,passwordHash,role:'ADMIN',platformRole:'SYSTEM_ADMIN',accountDomain:'LEGACY'}})
  const author=await db.user.create({data:{username:'self_library_author_'+suffix,passwordHash,accountDomain:'SURVEY'}})
@@ -103,7 +121,7 @@ async function authorQuestionnaire(s,f,{suffix,toolsPage,report,out}) {
  await studio.getByRole('textbox',{name:'问卷说明',exact:true}).fill('后续草稿不应成为已固定作答说明')
  await s.click(studio.getByRole('button',{name:'保存问卷草稿',exact:true}),uri,'PUT')
  const file='screenshots/'+s.product.toLowerCase()+'-ordinary-author.png'
- assert.equal(await p.locator('input[type=password],.ht-secret,.hs-secret,.ht-mfa-setup').count(),0)
+ assert.equal(await isSafeScreenshot(p,s.product),true,'Screenshot must not expose authentication controls or secrets')
  await p.screenshot({path:path.join(out,file),fullPage:true});report.screenshots.push({product:s.product,file})
  report.coverage.push({product:s.product,check:checks[0],sourceProviders:['PRIVATE_VERSION','PRIVATE_VERSION','LIBRARY_SCALE'],fixedVersion:true,reopened:true,displayOnly:true})
  return {...version,title,instruction}
@@ -170,7 +188,7 @@ async function participant(s,f,w,version,{author,report,out}) {
  assert.ok(!JSON.stringify(data).includes(withheld))
  await author.api('/run-executions/'+executionId+'/feedback','GET',undefined,[404])
  const file='screenshots/'+s.product.toLowerCase()+'-ordinary-feedback.png'
- assert.equal(await p.locator('input[type=password],.ht-secret,.hs-secret,.ht-mfa-setup').count(),0)
+ assert.equal(await isSafeScreenshot(p,s.product),true,'Screenshot must not expose authentication controls or secrets')
  await p.screenshot({path:path.join(out,file),fullPage:true});report.screenshots.push({product:s.product,file})
  report.coverage.push({product:s.product,check:checks[2],states:['READY','COMPLETION_ONLY','WITHHELD'],authorDenied:true})
 }
@@ -205,4 +223,4 @@ function verifyReport(report,identity,read) {
   const png=read(s.file);assert(png.length>100);assert(png.subarray(0,8).equals(Buffer.from('89504e470d0a1a0a','hex')));assert.equal(png.readUInt32BE(16),1440);assert(png.readUInt32BE(20)>=400)}
  return {status:'PASSED',browserMode:'SELF_COMPOSITION',source:report.source,runId:report.runId,assertions:expected,screenshots:report.screenshots}
 }
-module.exports={prepareApprovedSource,authorQuestionnaire,participant,verifyReport,checks}
+module.exports={prepareApprovedSource,authorQuestionnaire,participant,verifyReport,isSafeScreenshot,checks}

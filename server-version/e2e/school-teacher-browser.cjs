@@ -893,8 +893,9 @@ async function run() {
           note: 'Realm journey failed; dependent steps stopped. No raw exception is published.' })
         if (lastSafeSession?.authenticated && !lastSafeSession.page.isClosed()) {
           try {
-            const unsafe = await lastSafeSession.page.locator('input[type=password],.ht-secret,.hs-secret,.ht-mfa-setup').count()
-            if (!unsafe) await lastSafeSession.page.screenshot({ path: path.join(out, 'screenshots', product.toLowerCase() + '-failure.png'), fullPage: true })
+            const safe = selfConsumer ? await selfConsumer.isSafeScreenshot(lastSafeSession.page, lastSafeSession.product)
+              : await lastSafeSession.page.locator('input[type=password],.ht-secret,.hs-secret,.ht-mfa-setup').count() === 0
+            if (safe) await lastSafeSession.page.screenshot({ path: path.join(out, 'screenshots', product.toLowerCase() + '-failure.png'), fullPage: true })
           } catch { /* Preserve the original sanitized failure. */ }
         }
       },
@@ -926,8 +927,9 @@ async function run() {
       note: 'No raw auth-bearing exception/body/trace is published. Inspect the failing stage and status records.' })
     if (lastSafeSession?.authenticated && !lastSafeSession.page.isClosed()) {
       try {
-        const unsafe = await lastSafeSession.page.locator('input[type=password],.ht-secret,.hs-secret,.ht-mfa-setup').count()
-        if (!unsafe) await lastSafeSession.page.screenshot({ path: path.join(out, 'screenshots', 'failure.png'), fullPage: true })
+        const safe = selfConsumer ? await selfConsumer.isSafeScreenshot(lastSafeSession.page, lastSafeSession.product)
+          : await lastSafeSession.page.locator('input[type=password],.ht-secret,.hs-secret,.ht-mfa-setup').count() === 0
+        if (safe) await lastSafeSession.page.screenshot({ path: path.join(out, 'screenshots', 'failure.png'), fullPage: true })
       } catch { /* A broken renderer must not hide the original sanitized failure. */ }
     }
     throw new Error('School/Teacher browser acceptance failed at ' + stage + '; see sanitized evidence, not fixture secrets')
