@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 3
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
@@ -24,8 +24,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD^)" = 'b19d90c1bab1dc701f97686e1c9aa8d53f562615'
-          test "$(git diff --name-only HEAD^ HEAD)" = '.github/workflows/scale26-official-lane-validation-20261029.yml'
+          git merge-base --is-ancestor 'b19d90c1bab1dc701f97686e1c9aa8d53f562615' HEAD
+          test "$(git diff --name-only b19d90c1bab1dc701f97686e1c9aa8d53f562615 HEAD)" = '.github/workflows/scale26-official-lane-validation-20261029.yml'
           git checkout --detach 'b19d90c1bab1dc701f97686e1c9aa8d53f562615'
           git fetch --no-tags --depth=1 origin '9801107019d51a4af7ddb651789b674867539d24'
           git fetch --no-tags --depth=1 origin '191a187439af026f33d46fbdc2f9d7958340f789'
@@ -78,5 +78,4 @@ jobs:
           const forged={...readyNeeds,scope:{result:'success',outputs:{...readyNeeds.scope.outputs,scale26_intake_plan:'{}'}}};
           assert.deepEqual(failedChecks(forged,false),['scope']);
           console.log(JSON.stringify({status:'PASS',scenario:output.scenario,originalPaths:plan.originalPaths,controls:plan.ciControlPaths}));
-          JS
           JS
