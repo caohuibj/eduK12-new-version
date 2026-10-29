@@ -3,15 +3,15 @@
   "candidate": "native-bundle",
   "repository": "caohuibj/eduK12-new-version",
   "branch": "feat/bundle-evc-profile-20261029",
-  "enabled": false,
+  "enabled": true,
   "base": "e65d87222d351e5dfde52e389f3aa403380443eb",
   "productHead": "72078d2ccd1546abe4ca915366b694a18433c44a",
   "productTree": "d285d33c5c8e1ad0a4ffc1c7fe3c22a0625e9c4d",
   "frontendTree": "5a2676e3fea15901e55cd320c4b015678a49528a",
   "backendTree": "0e2ef32d7467de7b7da6f1700918c510a7ca7554",
   "review": {
-    "status": "PENDING",
-    "recordSha256": null
+    "status": "INDEPENDENTLY_REVIEWED",
+    "recordSha256": "ed596ac04a661234ae8c4ccc58c4eacb69f200db0971948ea9582cf077473ca2"
   },
   "requiredJobs": [
     "admission",
@@ -475,7 +475,7 @@
     }
   },
   "evidence": {
-    "status": "REVIEWED_LOCAL_EVIDENCE_PENDING_ACTIVATION",
+    "status": "REVIEWED_LOCAL_EVIDENCE",
     "obligations": [
       "EVC-B-model-boundaries-and-applicability",
       "deterministic-source-permissions-and-cache",
