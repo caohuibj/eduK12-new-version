@@ -4,6 +4,20 @@ import { verifyToken } from '../../utils/jwt'
 import { forbidden } from '../../utils/response'
 import { resolveEducationProductMemberScope } from '../organization/educationProductAccess'
 
+/** Session proof only: callers resolve current product authority in their own
+ * transaction. Do not add a second membership query or a five-minute step-up
+ * to routine private-tool reads/writes. */
+export function requireTeacherAdminSession(req:Request,res:Response,next:NextFunction){
+  const token=getHuiteacherSessionToken(req)
+  const claims=token?verifyToken(token):null
+  if(!req.user||req.user.accountDomain!=='SCHOOL'
+    ||claims?.sessionProduct!=='HUITEACHER'||claims.accountDomain!=='SCHOOL'
+    ||claims.userId!==req.user.userId||!claims.mfaVerifiedAt
+    ||claims.mfaVerifiedAt>Date.now()/1000)
+    return forbidden(res,'管理权限需要先完成双因素登录，请重新登录')
+  next()
+}
+
 /** Read-only Teacher pages still require active enrollment in this product. */
 export async function requireTeacherProductMember(req:Request,res:Response,next:NextFunction){
   if(!req.user||req.user.accountDomain!=='SCHOOL')return forbidden(res,'教育账号不可用')
@@ -31,12 +45,7 @@ export async function requireTeacherProductAdmin(req:Request,res:Response,next:N
     // A product-admin grant may be added after an ordinary session was issued.
     // Routine writes no longer require a fresh 5-minute TOTP, but they must
     // never turn a password-only session into an administrative session.
-    const token=getHuiteacherSessionToken(req)
-    const claims=token?verifyToken(token):null
-    if(claims?.sessionProduct!=='HUITEACHER'||claims.accountDomain!=='SCHOOL'
-      ||claims.userId!==req.user.userId||!claims.mfaVerifiedAt)
-      return forbidden(res,'管理权限需要先完成双因素登录，请重新登录')
-    next()
+    return requireTeacherAdminSession(req,res,next)
   }catch(e){next(e)}
 }
 

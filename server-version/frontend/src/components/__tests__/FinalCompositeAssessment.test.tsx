@@ -155,6 +155,17 @@ const sharedProps = {
   onEnterSituational: vi.fn(),
 }
 
+describe('ordinary questionnaire block instructions',()=>{
+ it('shows the current frozen transition alongside native tool text without inserting a unit',async()=>{
+  const state=makeState({...scaleItem,questionnaireInstruction:'本段固定衔接说明',scale:{...scaleItem.scale!,instruction:'原量表作答说明'}})
+  const view=render(<FinalCompositeAssessment state={state} campusMode submitFormSection={vi.fn()} submitScale={vi.fn()} {...sharedProps}/>)
+  expect(await screen.findByRole('region',{name:'本段作答说明'})).toHaveTextContent('本段固定衔接说明')
+  expect(screen.getByRole('region',{name:'本量表作答说明'})).toHaveTextContent('原量表作答说明')
+  view.rerender(<FinalCompositeAssessment state={makeState({...formItem,questionnaireInstruction:'表单的衔接说明'})} campusMode submitFormSection={vi.fn()} submitScale={vi.fn()} {...sharedProps}/>)
+  expect(await screen.findByRole('region',{name:'本段作答说明'})).toHaveTextContent('表单的衔接说明')
+  expect(screen.queryByText('本段固定衔接说明')).not.toBeInTheDocument()
+ })
+})
 describe('historical empty sections', () => {
   it('submits an explicit empty FINAL for an ordinary frozen section', async () => {
     const submitFormSection = vi.fn().mockResolvedValue({ code: 0 })

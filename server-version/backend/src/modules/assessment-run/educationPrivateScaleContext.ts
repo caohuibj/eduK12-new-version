@@ -4,6 +4,7 @@ import {assertEducationLibraryReadCommitted} from '../scale-library-governance/e
 import {readPrivateFormRuntimeResource} from '../education-tools/private-tool.form-runtime-resources'
 import {readPrivateScaleRuntimeResource} from '../education-tools/private-tool.runtime-resources'
 import {privateToolFail,type PrivateToolContext} from '../education-tools/private-tool.contracts'
+import {readPrivateCompositionRunSources} from '../education-tools/private-tool.composition-source'
 
 /** Current draft editor facts only; neither private ownership nor this check
  * confers event publication authority or participant/report access. */
@@ -61,4 +62,15 @@ export async function readPrivateFormRunSourceForPreparation(tx:Prisma.Transacti
  if(!workflow)privateToolFail('PRIVATE_TOOL_WORKFLOW_REQUIRED',403)
  return readPrivateFormRuntimeResource(tx,{key:input.resource.key,version:'1.0.0',purpose:'NEW_USE',context:{
   entry:workflow.product,organizationId:input.organizationId,principal:{userId:input.actorUserId,accountDomain:'SCHOOL'}}})
+}
+
+/** One advisory workflow/author/metadata batch, regardless of selected track
+ * count. The locked consumer rechecks current rights and mutable source state. */
+export async function readPrivateCompositionRunSourcesForPreparation(tx:Prisma.TransactionClient,input:{organizationId:string;runId:string;actorUserId:string;
+ resources:Array<{family:string;key:string;version:string}>}){
+ if(!input.resources.length)return new Map()
+ const workflow=await readEducationRunLibraryContext(tx,input)
+ if(!workflow)privateToolFail('PRIVATE_TOOL_WORKFLOW_REQUIRED',403)
+ return readPrivateCompositionRunSources(tx,{entry:workflow.product,organizationId:input.organizationId,
+  principal:{userId:input.actorUserId,accountDomain:'SCHOOL'}},input.resources)
 }

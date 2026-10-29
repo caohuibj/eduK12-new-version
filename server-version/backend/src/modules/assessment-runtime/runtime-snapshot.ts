@@ -220,6 +220,9 @@ export const freezeScaleRuntimeAtAttemptStart = async (
     frozenAt?: Date
     requestedMode?: import('../scale/policy/deployment').ScaleDeploymentModeV1
     instruction?: FrozenScaleInstruction | null
+    /** Content facts from an actual immutable education unit, never authority.
+     * The owning START layer verifies current U and DB seal containment. */
+    sealedLibraryPresentation?: {entryId:string;sourceDefinitionHash:string;presentation:FrozenScalePresentation}
   },
 ): Promise<VersionedFrozenScaleRuntimeSnapshot> => {
   assertAssessmentStartResources()
@@ -261,9 +264,14 @@ export const freezeScaleRuntimeAtAttemptStart = async (
   if (scale.instrumentVersion !== input.instrumentVersion) throw new Error('Scale new start denied: DEPLOYMENT_VERSION_CONFLICT')
 
   if (scale.libraryEntryId) {
-    v1.measurementPresentation = await freezeLibraryScalePresentation(db as any, scale, input.definition)
+    if(input.sealedLibraryPresentation){
+      const source=input.sealedLibraryPresentation,presentation=frozenScalePresentationSchema.parse(source.presentation)
+      if(scale.libraryEntryId!==source.entryId||scale.measurementReleaseId!==presentation.releaseId||v1.sourceDefinitionHash!==source.sourceDefinitionHash)
+        throw new Error('Frozen education library presentation identity mismatch')
+      v1.measurementPresentation=presentation
+    }else v1.measurementPresentation = await freezeLibraryScalePresentation(db as any, scale, input.definition)
     v1.snapshotHash = hashFrozenScaleRuntimeSnapshot(v1)
-  }
+  }else if(input.sealedLibraryPresentation)throw new Error('Frozen education library source required')
 
   const { resolveScaleStartDeployment } = await import('../scale/deployment/service')
   const resolution = await resolveScaleStartDeployment({ db: db as any, scale, requestedMode: input.requestedMode })

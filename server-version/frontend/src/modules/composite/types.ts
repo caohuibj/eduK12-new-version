@@ -63,6 +63,8 @@ export interface CompositeScale {
 }
 
 export interface CompositeCurrentItem {
+  /** Author's frozen ordinary-questionnaire transition; native tool text stays separate. */
+  questionnaireInstruction?: string
   presentationMode?: 'ONE_BY_ONE' | 'ALL_AT_ONCE'
   trainingTiming?:TrainingTimingBinding
   id: string

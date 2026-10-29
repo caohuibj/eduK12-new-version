@@ -311,14 +311,15 @@ export async function readHuiteacherEventRun(input:{
     // check above remains mandatory; never return selectors, definitions,
     // respondent identities, frozen policies or execution details here.
     const tracks=await tx.$queryRaw<Array<{
-      id:string;resourceFamily:string;resourceKey:string;resourceVersion:string
+      id:string;resourceFamily:string;resourceKey:string;resourceVersion:string;title:string|null;sourceRevision:number|null
     }>>`
-      SELECT "id", "resource_family" AS "resourceFamily",
-        "resource_key" AS "resourceKey", "resource_version" AS "resourceVersion"
-      FROM "assessment_run_tracks"
-      WHERE "organization_id"=${input.organizationId}
-        AND "run_id"=${link.runId}
-      ORDER BY "created_at", "id"
+      SELECT t.id,t.resource_family AS "resourceFamily",t.resource_key AS "resourceKey",t.resource_version AS "resourceVersion",
+        v.title,v.source_revision AS "sourceRevision"
+      FROM assessment_run_tracks t LEFT JOIN education_private_tool_versions v ON v.kind='COMPOSITION'
+        AND v.entry='TEACHER' AND v.organization_id=t.organization_id AND t.resource_family='BUNDLE'
+        AND t.resource_key='education-composition:TEACHER:'||v.id||':TEACHER:SELF:1.0.0'
+      WHERE t.organization_id=${input.organizationId} AND t.run_id=${link.runId}
+      ORDER BY t.created_at,t.id
     `
     return {...link,...run[0],trackCount:tracks.length,tracks}
   })

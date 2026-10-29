@@ -1,5 +1,6 @@
 import {useEffect,useState} from 'react'
-import {ArrowDown,ArrowUp,Brain,Check,FileText,Layers,Plus,Route,Search,SlidersHorizontal,Trash2} from 'lucide-react'
+import {Brain,Check,FileText,Layers,Plus,Route,Search,SlidersHorizontal} from 'lucide-react'
+import {CompositionOutline} from '../modules/assessment-core/composition/CompositionOutline'
 import {toolLibraryApi as api,libraryKindLabel,type ToolRef} from './tool-library-api'
 import type {CatalogGrant} from './ResearchCatalog'
 import './survey-composition-studio.css'
@@ -53,11 +54,8 @@ export function SurveyCompositionEditor({items,onChange}:{items:ToolRef[];onChan
       </>}
       <footer className="survey-composition-pagination"><button type="button" className="btn-secondary" disabled={!ready||page<=1} onClick={()=>setPage(value=>value-1)}>上一页</button><span>第 {page} 页{ready&&source==='owned'?' · 共 '+result.total+' 项':''}</span><button type="button" className="btn-secondary" disabled={!ready||!result.hasMore} onClick={()=>setPage(value=>value+1)}>下一页</button><button type="button" className="survey-composition-refresh" disabled={!ready} onClick={()=>setGeneration(value=>value+1)}>重新读取</button></footer>
     </section>
-    <aside className="survey-composition-outline" aria-label="作答顺序">
-      <header className="survey-composition-step"><span>03</span><div><h2>作答顺序</h2><p>从上到下依次呈现，使用箭头调整。</p></div><small aria-live="polite" aria-atomic="true">{items.length} / 20 项</small></header>
-      {!items.length?<div className="survey-composition-empty"><Layers size={28}/><h3>从第一个工具开始</h3><p>添加后的工具会出现在这里，再按被试作答顺序排列。</p></div>:<ol>{items.map((item,index)=><li key={item.source+':'+item.id}><span className="survey-composition-position">{String(index+1).padStart(2,'0')}</span><div><strong>{item.title||'已选工具'}</strong><small>{item.source==='owned'?'我编制的 · 修订 '+item.revision:'已获授权 · 固定版本'}</small></div><div className="survey-composition-outline-actions"><button type="button" aria-label={'上移工具 '+(index+1)} disabled={index===0} onClick={()=>move(index,-1)}><ArrowUp size={16}/></button><button type="button" aria-label={'下移工具 '+(index+1)} disabled={index===items.length-1} onClick={()=>move(index,1)}><ArrowDown size={16}/></button><button type="button" aria-label={'移除工具 '+(index+1)} onClick={()=>onChange(items.filter((_,i)=>i!==index))}><Trash2 size={16}/></button></div></li>)}</ol>}
-      {items.length>=20&&<p role="status" className="survey-composition-limit">已达到 20 项上限，移除一项后可继续添加。</p>}
-      <div className="survey-composition-outline-note"><strong>各项分别计分与反馈</strong><p>保存后在研究的“发布与采集”中选用，再配置波次与反馈策略。</p></div>
-    </aside>
+    <CompositionOutline items={items.map(item=>({id:item.source+':'+item.id,title:item.title||'已选工具',
+      detail:item.source==='owned'?'我编制的 · 修订 '+item.revision:'已获授权 · 固定版本'}))} max={20} onMove={move}
+      onRemove={index=>onChange(items.filter((_,i)=>i!==index))} footer="保存后在研究的“发布与采集”中选用，再配置波次与反馈策略。"/>
   </div>
 }

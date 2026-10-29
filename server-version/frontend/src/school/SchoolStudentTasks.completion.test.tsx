@@ -11,6 +11,22 @@ const id='00000000-0000-4000-8000-000000000042'
 const page=(family='SCALE')=>({list:[{id,activityId:'activity',activityTitle:'校园活动',kind:'MEASUREMENT',resourceFamily:family,title:'正式本人测评',status:'PENDING',deadline:null,
   href:`/organizations/org/activities/activity/runs/run/executions/${id}`}],total:1,page:1,hasMore:false,truncated:false})
 describe('School authoritative completion feedback consumer (synthetic transport)',()=>{
+  it('routes an assigned ordinary questionnaire completion to its scoped feedback without relying on a refreshed list',async()=>{
+    const first=page('BUNDLE');const ordinary={...first,list:[{...first.list[0],feedbackNamespace:'EDUCATION_ASSESSMENT',feedbackMode:'COMPOSITION'}]}
+    let reads=0
+    const api=vi.fn(async(path:string)=>{
+      if(path==='/my/student-reference')return {reference:'SYNTHETIC'}
+      if(path.startsWith('/my/activity-tasks'))return ++reads===1?ordinary:{list:[],total:0,page:1,hasMore:false,truncated:false}
+      if(path==='/run-executions/'+id+'/feedback')return {schemaVersion:1,kind:'EDUCATION_FEEDBACK',mode:'COMPOSITION',state:'COMPLETION_ONLY',units:[{blockId:'f',kind:'FORM',title:'本次表单',state:'COMPLETION_ONLY'}]}
+      throw Error('Unexpected request '+path)
+    })
+    render(<SchoolStudentTasks api={api as unknown as SchoolApi}/>)
+    fireEvent.click(await screen.findByRole('button',{name:'开始／继续官方测评'}));await screen.findByRole('button',{name:'退出合成测评宿主'})
+    act(()=>capture.finished!())
+    expect(await screen.findByText('表单已完成，不计算量表分数。')).toBeInTheDocument()
+    expect(api).toHaveBeenCalledWith('/run-executions/'+id+'/feedback')
+    expect(api.mock.calls.some(([path])=>path.startsWith('/reports/')||path.startsWith('/assessment-reports/'))).toBe(false)
+  })
   it('opens feedback once independently of a slow or failed list refresh',async()=>{
     let lists=0,rejectList!:(error:Error)=>void
     const refresh=new Promise((_,reject)=>{rejectList=reject})

@@ -1,0 +1,1675 @@
+{
+  "schemaVersion": 1,
+  "candidate": "education-self-scale-form-20261028",
+  "repository": "caohuibj/eduK12-new-version",
+  "branch": "release/education-self-scale-form-20261028",
+  "enabled": true,
+  "base": "9801107019d51a4af7ddb651789b674867539d24",
+  "frozenDevelopmentHead": "9fa3c51e5deb882beb4a0d56f1ebe44dae8f76f5",
+  "productHead": "43c2ba35b8bbd85c5d906bb7ba529149e6ed4111",
+  "frontendTree": "2907eedb6ad9d1bdc5559f3e61b1f6145ac8b39b",
+  "backendTree": "8a5df3518f9cadd5b56a397a71de7019e9fb5b95",
+  "source": {
+    "docs/development/education-self-first-batch-ci.md": {
+      "before": "",
+      "after": "e9d7292e6fd93d4ac251709d0da081f34d160311"
+    },
+    "server-version/backend/prisma/migrations/20261028160000_education_private_composition/migration.sql": {
+      "before": "",
+      "after": "52240ee40c9750ed1304f2254f2d43c6dec263b8"
+    },
+    "server-version/backend/prisma/migrations/20261028200000_education_public_form_composition/migration.sql": {
+      "before": "",
+      "after": "6d673827c1b17d3c273400904befa7dd9696afd8"
+    },
+    "server-version/backend/prisma/migrations/20261028210000_education_standard_composition/migration.sql": {
+      "before": "",
+      "after": "8632bcb7d71214b3f3596bca8b9130af47238277"
+    },
+    "server-version/backend/prisma/migrations/20261028220000_education_library_composition/migration.sql": {
+      "before": "",
+      "after": "39495b909e33b058abea9f7d0995cfeb9528d9b1"
+    },
+    "server-version/backend/prisma/migrations/20261028223000_education_scientific_freeze_hash/migration.sql": {
+      "before": "",
+      "after": "5bfe93e3f2ccdf8b1164272cfc2fd712a9d63f61"
+    },
+    "server-version/backend/src/__tests__/assessment-runtime/education-block-presentation.test.ts": {
+      "before": "",
+      "after": "95ae53a017615268706df8263eba462798dd28cc"
+    },
+    "server-version/backend/src/__tests__/education-tools/access.test.ts": {
+      "before": "d77ec6018f99bad342af692d61fc314c1894379e",
+      "after": "9f7642a5f2ae480b014cb7da8266b351f0fc03c9"
+    },
+    "server-version/backend/src/__tests__/education-tools/capabilities.routes.test.ts": {
+      "before": "224756bc396dc9162fc73471c5fe4533664060c4",
+      "after": "3934e15861d86d8e800af75f00ecce5bd7f1fc73"
+    },
+    "server-version/backend/src/__tests__/education-tools/private-tool.composition.test.ts": {
+      "before": "",
+      "after": "fc34c2cce1211228d31d8324265c420fc3a0b555"
+    },
+    "server-version/backend/src/__tests__/education-tools/private-tool.csv.service.test.ts": {
+      "before": "0234dd9240809ac3811f82b4f7aa2b031a997209",
+      "after": "999c4cdea812ec4f3dc4b006b72fccbcc1aeea3d"
+    },
+    "server-version/backend/src/__tests__/education-tools/private-tool.preview.routes.test.ts": {
+      "before": "edc168ee3c6dda6adfcbb52dff39300843f262cd",
+      "after": "f860df90750b2c95a221bab73e5de0bba5f97ff4"
+    },
+    "server-version/backend/src/__tests__/education-tools/private-tool.run-contract.test.ts": {
+      "before": "0848775bce9daf77175c776b8f089d3f4026897a",
+      "after": "e49ed240f7c7b05d81692d6291c374baa615ef0a"
+    },
+    "server-version/backend/src/__tests__/huiteacher/assessment-runtime-composition-page.review.test.ts": {
+      "before": "",
+      "after": "7df44c634668ddcdcf35f7fb1f32aa05cf9d9da5"
+    },
+    "server-version/backend/src/__tests__/huiteacher/ordinary-feedback-image.routes.test.ts": {
+      "before": "",
+      "after": "cf0631312b57a7a75a274e4a184585ad09ee9785"
+    },
+    "server-version/backend/src/__tests__/integration/educationCompositionPreviewBoundary.review.postgres.integration.test.ts": {
+      "before": "",
+      "after": "bd0e04f04ee98f26384567699f04e37b3bdd0fb2"
+    },
+    "server-version/backend/src/__tests__/integration/educationLibraryComposition.postgres.integration.test.ts": {
+      "before": "",
+      "after": "810445f31058d99c7c1dbcc40aa3d782d18cdcf8"
+    },
+    "server-version/backend/src/__tests__/integration/educationLibraryCompositionExecution.postgres.integration.test.ts": {
+      "before": "",
+      "after": "c05563c9abb6bc3921b56a22d89092a5c3191fc8"
+    },
+    "server-version/backend/src/__tests__/integration/educationLibraryCompositionPreview.postgres.integration.test.ts": {
+      "before": "",
+      "after": "adc00e184eae97d9993efd84fac0f37a239bda7b"
+    },
+    "server-version/backend/src/__tests__/integration/educationLibraryConcurrentDelivery.review.postgres.integration.test.ts": {
+      "before": "",
+      "after": "17bf549d2ad339063cf01b70ede39e00091c1efd"
+    },
+    "server-version/backend/src/__tests__/integration/educationLibraryNumericFreeze.review.postgres.integration.test.ts": {
+      "before": "",
+      "after": "b6e4bbbd23a6b84fa669d94cd53f9c658ee49d75"
+    },
+    "server-version/backend/src/__tests__/integration/educationLibrarySourceCatalog.postgres.integration.test.ts": {
+      "before": "",
+      "after": "247abef2e3813b9b15e60b3a323b8b87decaf1c5"
+    },
+    "server-version/backend/src/__tests__/integration/educationPrivateComposition.postgres.integration.test.ts": {
+      "before": "",
+      "after": "40efde3ba0ef7722a23da2b392ee2748a0df28b9"
+    },
+    "server-version/backend/src/__tests__/integration/educationPrivateCompositionExecution.postgres.integration.test.ts": {
+      "before": "",
+      "after": "6d97debd0ee3758a1e74af88fd61eab5ac3c9288"
+    },
+    "server-version/backend/src/__tests__/integration/educationPrivateCompositionExecutionFixture.ts": {
+      "before": "",
+      "after": "8377f992e62cd3eaedfc5dad1e538516cb8af566"
+    },
+    "server-version/backend/src/__tests__/integration/educationPrivateCompositionLocks.postgres.integration.test.ts": {
+      "before": "",
+      "after": "863d9999a6f98a049977f0d45ca2afec8bb72718"
+    },
+    "server-version/backend/src/__tests__/integration/educationPrivateCompositionMetadata.postgres.integration.test.ts": {
+      "before": "",
+      "after": "10413e8f13cb110cb7db7dcc44e1003aa6d76014"
+    },
+    "server-version/backend/src/__tests__/integration/educationPrivateCompositionPublication.postgres.integration.test.ts": {
+      "before": "",
+      "after": "11ad0c7b1657aa6e6342f461408087fbf22b9257"
+    },
+    "server-version/backend/src/__tests__/integration/educationPrivateFormDraft.postgres.integration.test.ts": {
+      "before": "4796d9db6f83d58c5766af7f1d5bcb2eb9a68826",
+      "after": "7e175e025ce34a9bbb9c08ff3d62fa2369c85157"
+    },
+    "server-version/backend/src/__tests__/integration/educationPrivateFormPublication.postgres.integration.test.ts": {
+      "before": "aec87fe25a619d2f495ae10f55463f04114c82ec",
+      "after": "7fd7f92154df2b321ba81a304e1e3ad4f43d97e6"
+    },
+    "server-version/backend/src/__tests__/integration/educationPrivateScaleDraft.postgres.integration.test.ts": {
+      "before": "faf0cd2e973bf7492c022bcdbab47586386aec2e",
+      "after": "2b00d21da8ae3b8362a951991cffc72bc8f9da50"
+    },
+    "server-version/backend/src/__tests__/integration/educationPrivateToolPagination.postgres.integration.test.ts": {
+      "before": "08b19b626d4130805f30549b2fd66d590102bd6a",
+      "after": "acb74206fe999a30111c6707ad73dbcb69a2a8b2"
+    },
+    "server-version/backend/src/__tests__/integration/educationPrivateTools.postgres.integration.test.ts": {
+      "before": "b6fc2cc1c510352164130e5024b9db33507e61c7",
+      "after": "71b8ce44fd3a6ab84a95bfa44dd14195aacc0884"
+    },
+    "server-version/backend/src/__tests__/integration/educationPublicFormComposition.postgres.integration.test.ts": {
+      "before": "",
+      "after": "96a006af12fea9c0dcdde9dee9c959b771fe44a5"
+    },
+    "server-version/backend/src/__tests__/integration/educationPublicFormPreview.postgres.integration.test.ts": {
+      "before": "",
+      "after": "e45a96701f6c70fc22136714b2e18d052932fc76"
+    },
+    "server-version/backend/src/__tests__/integration/educationPublicSourceUse.postgres.integration.test.ts": {
+      "before": "",
+      "after": "5ff372869443f38cece3bf9d24b47f9ca4631567"
+    },
+    "server-version/backend/src/__tests__/integration/educationPublicStandardComposition.postgres.integration.test.ts": {
+      "before": "",
+      "after": "acbf2a856928575f0f78e0f2eccbe6720a644b5e"
+    },
+    "server-version/backend/src/__tests__/integration/educationSchoolCompositionExecution.postgres.integration.test.ts": {
+      "before": "",
+      "after": "9431441891abcdc06157f2148df905dca60c95f9"
+    },
+    "server-version/backend/src/__tests__/integration/educationScientificHash.postgres.integration.test.ts": {
+      "before": "",
+      "after": "f25a5a257fb218ff270f5adf62682c096d84093a"
+    },
+    "server-version/backend/src/__tests__/integration/educationToolAuthoringAccess.postgres.integration.test.ts": {
+      "before": "1c3834b8faab1b0da02c9b13dd6b6dd24066566a",
+      "after": "d3ff6d03c3a2e23c05d8733c929df90746d45dcf"
+    },
+    "server-version/backend/src/__tests__/measurement-content/admin-authority-route.test.ts": {
+      "before": "71cc3be60933a38ed1f1331fb8c1839f8ae86220",
+      "after": "719cb74c7a47898242da1b8ba27ecce3eda93728"
+    },
+    "server-version/backend/src/__tests__/measurement-content/training-standard-combination-boundary.test.ts": {
+      "before": "1137d1872e379d0499b28cbcd393159467c5be3c",
+      "after": "d66d4ca06df3fe269e3d1883d1e5e28c1971ed90"
+    },
+    "server-version/backend/src/__tests__/reporting/education-assessment-report.projector.test.ts": {
+      "before": "24d968b0d767c0df4c47c4df0ff2d4917f2b57fb",
+      "after": "8a4fbc68091539d5d26dde51915ce10598d86b5c"
+    },
+    "server-version/backend/src/__tests__/scale/scale-presentation.test.ts": {
+      "before": "0ed58ace64737ab200a19644fc515fa1d4ab94fa",
+      "after": "8b82ab6697fe327061f8f6e2631c88b58acddc8e"
+    },
+    "server-version/backend/src/modules/assessment-media/assessment-asset.ts": {
+      "before": "72485a3f1713a70f7445f5c00c6ee9cd26638341",
+      "after": "ef7575222e6ee9769fffc03422e125a7d07b0835"
+    },
+    "server-version/backend/src/modules/assessment-run/currentPopulationAuthority.ts": {
+      "before": "d88d16de4f535da5af270b82f3b459e384956bd7",
+      "after": "b2967d0684c8ddc48ab5d5c3bf161f23aa6e43c3"
+    },
+    "server-version/backend/src/modules/assessment-run/education-start-context.ts": {
+      "before": "eaaf9def6fba07c36979908548737b27116da99c",
+      "after": "961c6b0e7503438c6fdd7825a71a3de83204ee90"
+    },
+    "server-version/backend/src/modules/assessment-run/educationCompositionExecution.ts": {
+      "before": "",
+      "after": "feea72d55ab002dacb5ff7566adf78807658e920"
+    },
+    "server-version/backend/src/modules/assessment-run/educationCompositionIdentitySql.ts": {
+      "before": "",
+      "after": "15e63e71dbf8ce658ef1580cdad381e41bc77c0a"
+    },
+    "server-version/backend/src/modules/assessment-run/educationLibraryContext.ts": {
+      "before": "c29fdcd474a7289c39714bb0d362a59d6c627482",
+      "after": "478b0a69e7f6ca66d1f0b74102b6f6a2de3cc41d"
+    },
+    "server-version/backend/src/modules/assessment-run/educationPrivateFormExecution.ts": {
+      "before": "675620e8aa1ee06ae3a082b3f90352df55c40414",
+      "after": "b59e11d7ed986f22667fca5dafc673ae5f5acfc4"
+    },
+    "server-version/backend/src/modules/assessment-run/educationPrivateScaleContext.ts": {
+      "before": "f865ee90a09b45c75e37c7e438f28bbb89e07141",
+      "after": "c067b5d1ab49cfc010d8ddcc98a7ccef46079739"
+    },
+    "server-version/backend/src/modules/assessment-run/productRead.ts": {
+      "before": "81a4dd1af58d1cd71f5da2d810dc9babac2eab03",
+      "after": "3738345e965e5f5379cc85a6429d93b612f25cf4"
+    },
+    "server-version/backend/src/modules/assessment-run/publish.ts": {
+      "before": "30323cce714cd062d25cbc71b6bf6b2fed030356",
+      "after": "015fdf333629c154e7421ae00fe7eb6f37002c5a"
+    },
+    "server-version/backend/src/modules/assessment-run/repository.ts": {
+      "before": "b2fd07dd9a3f7c5c50d14840e3eb72d263bd85b3",
+      "after": "795b9a9d36364a623cdef2f850a7c7a7df3b5cc6"
+    },
+    "server-version/backend/src/modules/assessment-run/resourceAuthority.ts": {
+      "before": "beda30e15a0d86ba6f8ef0f21b69d8a393209054",
+      "after": "2c9e161688e1c2ce10d890704a440d5473ecfd6f"
+    },
+    "server-version/backend/src/modules/assessment-run/run.controller.ts": {
+      "before": "0ddff827ee6a3c8d7d382b203868b1d8aeb35915",
+      "after": "e65641b19c944eee873dcaabe6a7a7fc74b2130f"
+    },
+    "server-version/backend/src/modules/assessment-run/scientificProvenance.ts": {
+      "before": "c9ec00a8e1bbcb2d713d87be8dc0fc44c0173913",
+      "after": "74482e8523dd97a5eb7b2396a7fb7c77b9f79d41"
+    },
+    "server-version/backend/src/modules/assessment-run/startAuthority.ts": {
+      "before": "dada40dbf8a0a305aea3067f61d2361a4723668e",
+      "after": "adc1cb8d443a9c22cf05ea055cc47fa6837dd69d"
+    },
+    "server-version/backend/src/modules/assessment-run/startExecution.ts": {
+      "before": "371f82dbc0380692d2512a05a09768a1bcc689ca",
+      "after": "94d687dad6826b33bddfed3fd9e933b239eeb103"
+    },
+    "server-version/backend/src/modules/assessment-runtime/attempt-runtime.ts": {
+      "before": "cf04e6ed937f1e7d48cc480a11b370baca9d7777",
+      "after": "31d9775d0779a412dca4bf0a1a55f8f84b23a706"
+    },
+    "server-version/backend/src/modules/assessment-runtime/runtime-snapshot.ts": {
+      "before": "86df862ef5db6bd02ed150763dd13e22bdda7abb",
+      "after": "8402b019cfc82b68d565651c18c72f7dea741082"
+    },
+    "server-version/backend/src/modules/campus/activity.run.routes.ts": {
+      "before": "5323b8d18fcca85534b6a779101ed748eb56f8ac",
+      "after": "0731e2258a84269ae5f7e3858980994f368c652e"
+    },
+    "server-version/backend/src/modules/campus/activity.tasks.ts": {
+      "before": "b51df17ba67bf6f907e5cb39acc3d6f901da0cbb",
+      "after": "da9f9c472cdb26662567e3a9d57c46484656cd43"
+    },
+    "server-version/backend/src/modules/campus/composite.routes.ts": {
+      "before": "3b54fd20e9b016b3c96646a9e0e005a069bd3ac2",
+      "after": "5f666cea70ef0177b6f521b0bdc214effe6a97f9"
+    },
+    "server-version/backend/src/modules/composite/composite.service.ts": {
+      "before": "457d5a794df63a85e4b212f2f33b0ca0d97aa242",
+      "after": "c78446153f743f9558c2e3bc741d55794d4038f5"
+    },
+    "server-version/backend/src/modules/composite/training-content-binding.ts": {
+      "before": "446c722d59f2f442aff9af7446065f8b20fb72b4",
+      "after": "3d105708e762c7e1bef3300f0e06dee4459824c1"
+    },
+    "server-version/backend/src/modules/composite/training-content-final.ts": {
+      "before": "5e444e43640c85c3765dd47ea79fec69bd099ba1",
+      "after": "30a6542281a4faa25271b5b2404551a6f705bb30"
+    },
+    "server-version/backend/src/modules/composite/training-reference-binding.ts": {
+      "before": "a4fd9833df9268f826d11588f7df4dab780a5111",
+      "after": "7331b0225ce3fd6fb3b6ae668ce362cdc270da59"
+    },
+    "server-version/backend/src/modules/composite/training-reference-selection.ts": {
+      "before": "82718211089580774240d8214a371ca41103b4f8",
+      "after": "99e2c80a147dea2e4f017beec2f5a12d81d38d81"
+    },
+    "server-version/backend/src/modules/composite/training-report-selection.ts": {
+      "before": "ffaf688552c8ef49f68595593e3862a02576e55f",
+      "after": "8aa39725ef3d2d3c3a407c650806e4ed6a330b11"
+    },
+    "server-version/backend/src/modules/composite/training-standard-combination.ts": {
+      "before": "89ac7a1ff288d3c89bf25d616a4d246b72afede7",
+      "after": "cc9115f70de8881dea49af40e84a3a2e152d1c59"
+    },
+    "server-version/backend/src/modules/education-tools/access.ts": {
+      "before": "e24f78cbbc65c89e9584acfaa9a1903ebd9fce55",
+      "after": "a92cda8d4eea01ced569ad665a8afbd86661dcde"
+    },
+    "server-version/backend/src/modules/education-tools/library-source.catalog.ts": {
+      "before": "",
+      "after": "737042ddf0008b5322c7523684399cd96b4dede5"
+    },
+    "server-version/backend/src/modules/education-tools/library-source.preview.ts": {
+      "before": "",
+      "after": "8d2ccc52f47b3a3149d2eb07bc165c185fe5b47c"
+    },
+    "server-version/backend/src/modules/education-tools/library-source.scale.ts": {
+      "before": "",
+      "after": "5214fd2ffaf699b2976d53c2bc87729dc9c74214"
+    },
+    "server-version/backend/src/modules/education-tools/library-source.use.ts": {
+      "before": "",
+      "after": "b8fc349daca9c7c3b0520954788fee838f0411bb"
+    },
+    "server-version/backend/src/modules/education-tools/private-tool.access.ts": {
+      "before": "4a9b0022b951792906fad4122e31012f46f3db0c",
+      "after": "e2b78b45d11b8c368a243f34804157bdcf7bc92a"
+    },
+    "server-version/backend/src/modules/education-tools/private-tool.composition-compiler.ts": {
+      "before": "",
+      "after": "beaa628a7d8da3454d88645dba03064ce1fc69bd"
+    },
+    "server-version/backend/src/modules/education-tools/private-tool.composition-content.ts": {
+      "before": "",
+      "after": "9ee799e95572fb37345296b41dd022374c60c95a"
+    },
+    "server-version/backend/src/modules/education-tools/private-tool.composition-contracts.ts": {
+      "before": "",
+      "after": "fcb7ef679d8f26d2be8b56e24860620d86048c75"
+    },
+    "server-version/backend/src/modules/education-tools/private-tool.composition-runtime.ts": {
+      "before": "",
+      "after": "67542a110f8829696ba93a9f78fb3ed22e617927"
+    },
+    "server-version/backend/src/modules/education-tools/private-tool.composition-source.ts": {
+      "before": "",
+      "after": "d4aac0876f00cd9d123c9c46edf51042a0cea3df"
+    },
+    "server-version/backend/src/modules/education-tools/private-tool.contracts.ts": {
+      "before": "aa47bc4e3620f699fbaa71ab104897e45a53ba60",
+      "after": "ef8a6528494ab1d947b9c75eae868d3ecbde9e49"
+    },
+    "server-version/backend/src/modules/education-tools/private-tool.definition.ts": {
+      "before": "f60be0f88c6bfddd9f41fff8f5f7c26a7cc00265",
+      "after": "efb501b0efb045bee261743d5eeaf28a0f6fc58c"
+    },
+    "server-version/backend/src/modules/education-tools/private-tool.media-definition.ts": {
+      "before": "de30c94ad7542546d6fe2ec3598f5c4330494bc2",
+      "after": "2492973c8f6b267cf538f730ec9841588bfcb6e3"
+    },
+    "server-version/backend/src/modules/education-tools/private-tool.media.routes.ts": {
+      "before": "6cc2b58e6a6f87015eb320bd3b88fb899e629fb3",
+      "after": "f2152d81229fab47d9e728fbabebb32d18385e02"
+    },
+    "server-version/backend/src/modules/education-tools/private-tool.routes.ts": {
+      "before": "fe63eac9c41ac91136379f947962a1cfc1ec22b9",
+      "after": "1f82898121aee7d71dad19be99331f6398d985d3"
+    },
+    "server-version/backend/src/modules/education-tools/private-tool.run-adapter.ts": {
+      "before": "7bc7261c1c01b594132485718618f4d166cf9606",
+      "after": "afd11fd53a58a7999fb6590852db65733ca3082c"
+    },
+    "server-version/backend/src/modules/education-tools/private-tool.run-contract.ts": {
+      "before": "0204031a90b93e424b270689ee334e6e5cb79c58",
+      "after": "ad57ce068558874418ec69bfc83efb0efce963ba"
+    },
+    "server-version/backend/src/modules/education-tools/private-tool.service.ts": {
+      "before": "e4ed71b9ae965b140087d896117d200cfb7fc791",
+      "after": "439b67f633c74e49bad36dc34ada20b03ca8086c"
+    },
+    "server-version/backend/src/modules/education-tools/public-source.catalog.ts": {
+      "before": "",
+      "after": "285a54b15d80d7af16a8620878b7bd6f2ab3eae3"
+    },
+    "server-version/backend/src/modules/education-tools/public-source.headers.ts": {
+      "before": "",
+      "after": "07dce78d7ef2012e1fcca1f6cf767e64efeeec87"
+    },
+    "server-version/backend/src/modules/education-tools/public-source.identity.ts": {
+      "before": "",
+      "after": "92d25f11884d992c3543793bb8686935823df633"
+    },
+    "server-version/backend/src/modules/education-tools/public-source.preview.ts": {
+      "before": "",
+      "after": "3163aab02599fe295d84e3c9069709dafe176cf8"
+    },
+    "server-version/backend/src/modules/education-tools/public-source.scale-display.ts": {
+      "before": "",
+      "after": "7d4dbb70ec9bfdc6b0f2d91519afcaf4a22664ad"
+    },
+    "server-version/backend/src/modules/education-tools/public-source.standard.ts": {
+      "before": "",
+      "after": "7616b484b2c55c89674f0c985166eb35075673a5"
+    },
+    "server-version/backend/src/modules/huiteacher/assessmentRuntime.access.ts": {
+      "before": "d47f201ae8efe60302ee7c5cefcc7d76c6dd5d1c",
+      "after": "8eb8fd2b92e587b83d6b393b9009cd536af2c55a"
+    },
+    "server-version/backend/src/modules/huiteacher/assessmentRuntime.routes.ts": {
+      "before": "1d398d24c0d509fca6256d82d27fd0f2e7556554",
+      "after": "c986dc86b0727a4295c8a1d3d3f7e6e77f815ca6"
+    },
+    "server-version/backend/src/modules/huiteacher/authority.ts": {
+      "before": "55138a22c0d8ddebf50835991589a7d6e13b5b0a",
+      "after": "74d8b8ab7811dc9b81656c04cd0881d62b4ed2e6"
+    },
+    "server-version/backend/src/modules/huiteacher/evaluation.service.ts": {
+      "before": "114a5390a2edb0ffaa720da1c6ebaf16b6533229",
+      "after": "5de03db1d97e18647246e98d4cc8706f497cc97b"
+    },
+    "server-version/backend/src/modules/huiteacher/organization.routes.ts": {
+      "before": "7039701ffc53497bdeca09a261dec44cdd02a817",
+      "after": "9f7e06fc20bf59a43130e768c424ac69c9b84aa2"
+    },
+    "server-version/backend/src/modules/huiteacher/run.routes.ts": {
+      "before": "308afd19d501083b8cfe195e50dceb0728368eca",
+      "after": "367d1ced654b44762fd003a3ba1f6c075e2c81b0"
+    },
+    "server-version/backend/src/modules/huiteacher/run.service.ts": {
+      "before": "1a3d9c4d277e40105b7cc98456bec4a185667a06",
+      "after": "98468e55eae9c201a32fe5cc46a703b013cee2fc"
+    },
+    "server-version/backend/src/modules/measurement-content/admin-authority.service.ts": {
+      "before": "2b59d4a09f4fa27d77efff356fd50c3643a18534",
+      "after": "74d7e7ce49c2fd88309904d686b6b0f330c61315"
+    },
+    "server-version/backend/src/modules/measurement-content/standard-combination-content.ts": {
+      "before": "dea5209fd8640becbba506d06c989dad425e4970",
+      "after": "69a1cdd4178d2c80e8dfd1ed001f5e6340fa5ca4"
+    },
+    "server-version/backend/src/modules/measurement-content/standard-combination-source.ts": {
+      "before": "557852077fdc66b467c3c051757555395af2bc0a",
+      "after": "40ba8d95ce8526aca1435d02c0da2e2224adb3cf"
+    },
+    "server-version/backend/src/modules/reporting/education-assessment-report.projector.ts": {
+      "before": "623e471ac6420dec4ab5b42943eefb1a344445e1",
+      "after": "e42b6ac3720a53041c832ea0e2346da21e8ab99c"
+    },
+    "server-version/backend/src/modules/reporting/education-native-scale-feedback.ts": {
+      "before": "",
+      "after": "46594e3c23422183bf8c284bf0d5379bc896c91b"
+    },
+    "server-version/backend/src/modules/reporting/education-ordinary-declared-feedback.ts": {
+      "before": "",
+      "after": "f3b4079c12527d17f0381123faf7566f6e4acde7"
+    },
+    "server-version/backend/src/modules/reporting/education-ordinary-feedback.service.ts": {
+      "before": "",
+      "after": "b3ac405aa8a0c244b8d6bd40e078126495ecba5d"
+    },
+    "server-version/backend/src/modules/reporting/education-scale-personal-report.service.ts": {
+      "before": "0147e53823af93d88d703a9d7857854770a2e524",
+      "after": "5a52debb678293ddc7fe5c2a1c2a34275771f2a9"
+    },
+    "server-version/backend/src/modules/scale-library-governance/authority.ts": {
+      "before": "283bee076da8a0ec3a0ada197085be8fb8a9932e",
+      "after": "4e6d31b53bbfe05b0a9ed466dc27439e83f7f70c"
+    },
+    "server-version/backend/src/modules/scale/scale-admission.service.ts": {
+      "before": "cb927b0ec31851dc307a0ba1075e4cb1f8e4854c",
+      "after": "273e7b369144c262edca45e6a0b880b75b19897c"
+    },
+    "server-version/backend/src/modules/scale/unified-final-submit.service.ts": {
+      "before": "d853dcaeee37f392aff2d88616ff951453b85f67",
+      "after": "e4886afa9d8c7836a43d8f847bc87d10e33243b0"
+    },
+    "server-version/frontend/src/components/FinalCompositeAssessment.tsx": {
+      "before": "399137382d9e454f0ee452838fa664d993ffc562",
+      "after": "2b403b0ef69b75416d251e78f67eb07c3cccb962"
+    },
+    "server-version/frontend/src/components/__tests__/FinalCompositeAssessment.test.tsx": {
+      "before": "f12d02acc20f457a4b5cd22e298afb3934e0512a",
+      "after": "a93b4a7d97782c8c21e8e97604bc8f75a1115ee8"
+    },
+    "server-version/frontend/src/components/education-tools/EducationAssessmentFeedback.test.tsx": {
+      "before": "92596e6afe0bcdd3eacce97a3d23499d5617467d",
+      "after": "3b961feb44ccdb4cb0a9d72737646701d5c3016a"
+    },
+    "server-version/frontend/src/components/education-tools/EducationAssessmentFeedback.tsx": {
+      "before": "c21801e62d47f63ec7c6fa19e31691591fd07f1e",
+      "after": "5e09ad7218a6ab65346215b5ef20d85c35c191d1"
+    },
+    "server-version/frontend/src/components/education-tools/EducationCompositionLibraryScale.test.tsx": {
+      "before": "",
+      "after": "07609b592c458f310ea1d351214950f8468d4922"
+    },
+    "server-version/frontend/src/components/education-tools/EducationCompositionPreviewBoundary.review.test.tsx": {
+      "before": "",
+      "after": "b6b6a592efa756a8f04bce68736f7f9c3e1cc051"
+    },
+    "server-version/frontend/src/components/education-tools/EducationCompositionPublicForms.test.tsx": {
+      "before": "",
+      "after": "e43df1c78f4ac37dc66aebf230a1343e92974ce4"
+    },
+    "server-version/frontend/src/components/education-tools/EducationCompositionPublicStandard.test.tsx": {
+      "before": "",
+      "after": "29c6b55fb2f164201fe3c4f7b016b27c3d8457c7"
+    },
+    "server-version/frontend/src/components/education-tools/EducationCompositionRunPicker.tsx": {
+      "before": "",
+      "after": "f492657307ddd4fd2fcfdc5669f3d834cf087774"
+    },
+    "server-version/frontend/src/components/education-tools/EducationCompositionSchoolConsumers.test.tsx": {
+      "before": "",
+      "after": "91aee3f61d8ec16a61c993ef3cffe332e4a95844"
+    },
+    "server-version/frontend/src/components/education-tools/EducationCompositionStudio.test.tsx": {
+      "before": "",
+      "after": "66ae34350c3eca9721005874e68621b2101d4f31"
+    },
+    "server-version/frontend/src/components/education-tools/EducationCompositionStudio.tsx": {
+      "before": "",
+      "after": "2e5947695581ca537a95741984693a943434f06d"
+    },
+    "server-version/frontend/src/components/education-tools/EducationMaterialPicker.tsx": {
+      "before": "70c65987b8577e97b470e357aa5b180f120c3543",
+      "after": "6d398861e64cdcca6483fd23156f79328c5a4979"
+    },
+    "server-version/frontend/src/components/education-tools/EducationOrdinaryFeedback.tsx": {
+      "before": "",
+      "after": "9b7e42ff84177eb062031a30c830f2e226aca68f"
+    },
+    "server-version/frontend/src/components/education-tools/EducationPrivateFeedbackAuthoring.test.tsx": {
+      "before": "",
+      "after": "656b6c421d1213b79b23e8a34365bbc75b673c9c"
+    },
+    "server-version/frontend/src/components/education-tools/EducationPrivateToolStudio.test.tsx": {
+      "before": "72c83e4d84b3bc831329d78d316df055c074c10b",
+      "after": "c55d90a51072338a5273fe92a78f932999b1e728"
+    },
+    "server-version/frontend/src/components/education-tools/EducationPrivateToolStudio.tsx": {
+      "before": "b6db980baa29bd6ba5e36d34a9e63bb55f0e070e",
+      "after": "93b1f85087320e0d86dbe2ec3bc8204e987b67f5"
+    },
+    "server-version/frontend/src/components/education-tools/EducationPrivateVersionChooser.tsx": {
+      "before": "",
+      "after": "2261fc574ed2c3656af7e4a46eeee07f4bf1110a"
+    },
+    "server-version/frontend/src/components/education-tools/EducationPublicFormChooser.tsx": {
+      "before": "",
+      "after": "52dae8b596ad0b4fdcab9c77a9ecefc28150a500"
+    },
+    "server-version/frontend/src/components/education-tools/EducationTaskFeedback.tsx": {
+      "before": "b84ecfeb59eec2bfc3d1478b0a5e360c0d4464d8",
+      "after": "a0dfafc838ed623c0f38160b99acfded9e26b4dd"
+    },
+    "server-version/frontend/src/components/education-tools/PrivateToolPreview.tsx": {
+      "before": "9b33f684fc80117ed3dd6129bdb52bcf9ceca9bb",
+      "after": "4ba88f856261e3936a5fbcd823baf97203e04fa9"
+    },
+    "server-version/frontend/src/components/education-tools/education-composition.css": {
+      "before": "",
+      "after": "c09b98c26b772a86d68b0077fe6fc3f187e58b59"
+    },
+    "server-version/frontend/src/components/education-tools/educationCompositionClient.ts": {
+      "before": "",
+      "after": "4c2aa1b3afd30acbbef86366680858ff08b98bbb"
+    },
+    "server-version/frontend/src/components/education-tools/educationPublicFormClient.ts": {
+      "before": "",
+      "after": "020a53f28935a00dcd50c3da00c99df861594352"
+    },
+    "server-version/frontend/src/components/education-tools/privateToolClient.ts": {
+      "before": "4427ccce59a3ac10f5c674db1b2eb93216dca85e",
+      "after": "4a32eadc8afa22d66e1f32237d44256a4ce9daf1"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherApp.tsx": {
+      "before": "6033eb6def65c3a9d4d8591d4dd85c12829be404",
+      "after": "07c6fd394a07ead96e057eb9b7c804fe5f048e0d"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx": {
+      "before": "a42315fa331b237287a84ee8cfd10904f7163283",
+      "after": "72708bedf1c0ce6308d3c6fcf4f0267655229c73"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherMyAssessmentTasks.tsx": {
+      "before": "341862329d725e273088dd0573d5bb464e48011e",
+      "after": "51242c7f66fbcd5f52581f8d7869ad291086a2fd"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherPrivacyV2.test.tsx": {
+      "before": "c0b2f9a782e7fdcada6a35bac532fc790c5acb15",
+      "after": "82217d76606eacca862f82795082bbbe1e6f4c0f"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherPrivateToolNavigation.test.tsx": {
+      "before": "6a87368db2af4f77ad24f6ace077e3035c63956e",
+      "after": "4b396e5d06261c19c7b734e6a36c48f324d1a3f7"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherStudentEvaluationManager.tsx": {
+      "before": "cca7bb42b75e58eccaab73ad0587ca5d32734f13",
+      "after": "feba211651b1d1197b70fa81c7b6442f812b3af9"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherStudentEvaluationReadRecovery.test.tsx": {
+      "before": "",
+      "after": "1caed2a419b17c828ad52bf6001be86d6c73d8bd"
+    },
+    "server-version/frontend/src/huiteacher/assessmentRuntime.client.ts": {
+      "before": "93107cd133e1e321d83a874b371a2df226bceb74",
+      "after": "d3b6039a77c00f885060f5082a0070db7dfb4215"
+    },
+    "server-version/frontend/src/modules/assessment-context/options.ts": {
+      "before": "42a66a7ebc116fcc860349aa9236118b1b3729a2",
+      "after": "5c7a19705c99f72523c64c0fb6907e5f8cb183ca"
+    },
+    "server-version/frontend/src/modules/assessment-core/composition/CompositionOutline.tsx": {
+      "before": "",
+      "after": "636067f9359e04bbe61b5fc12382a2f5f1de0195"
+    },
+    "server-version/frontend/src/modules/composite/types.ts": {
+      "before": "2fcd4390374a76b98a453824536d5f74001fd5a8",
+      "after": "db126a5ad47805cb31b34239164ccbf4f7c1cf36"
+    },
+    "server-version/frontend/src/pages/scaleDefinitionEditorModel.ts": {
+      "before": "b236cbc0c7f510fea4ecc25fd5ff551ed9e384bd",
+      "after": "54a502f284aae434819be5c730faadcf38b5583c"
+    },
+    "server-version/frontend/src/school/SchoolActivityManager.tsx": {
+      "before": "40ee0241ae980fafb125732822dd7c25b5c5c4e6",
+      "after": "1963db2da9c513ceed2e1fd28f9f8bdf217cdbe6"
+    },
+    "server-version/frontend/src/school/SchoolActivityTeacherObserverTargets.test.tsx": {
+      "before": "",
+      "after": "8d4ca8e7238dd86b82539e26eda2fe329ff1b4ac"
+    },
+    "server-version/frontend/src/school/SchoolPrivateToolCollection.tsx": {
+      "before": "d1c742f67b75bd4ffab0f71d31dd185187557eda",
+      "after": "ee1f21a1c7932dc2fb3269c3fda3071bfd5a5bae"
+    },
+    "server-version/frontend/src/school/SchoolStudentTasks.completion.test.tsx": {
+      "before": "e74848149c33dafacbd04adb7d6b7a656c1e8d37",
+      "after": "6efd554c5461fcfb9a2f1a53ad78ddc3621e4640"
+    },
+    "server-version/frontend/src/school/SchoolStudentTasks.tsx": {
+      "before": "9b9e0c953214bdeee7d9d8810c24d70adf2f197e",
+      "after": "1dbf0802689bcee03d25cc5e6d4b410475dc5cac"
+    },
+    "server-version/frontend/src/survey/SurveyCompositionEditor.tsx": {
+      "before": "38410cbf67b477fe9da8e3ca1922cced809aa9a8",
+      "after": "6366cf458a08c467c41facf690cb65a803f8409a"
+    }
+  },
+  "controlBefore": {
+    ".github/scripts/admin-permissions-functional.test.mjs": "1169ee24bd84112c9219fd3bb68dcf1a0923e513",
+    ".github/scripts/ci-topology.test.mjs": "a553379f26232ed8cec9f124bc248d3c8d6eef14",
+    ".github/scripts/content-workflows.test.mjs": "004287384024ed8b6fed4b1283ff64a5c5693368",
+    ".github/scripts/maintenance-routing.test.mjs": "8c5e48f84cba06c011f090ca126eb677d79e69f8",
+    ".github/scripts/school-teacher-checks.mjs": "b9fd6a6b09cdd8f02a87d4120b4d467c313b4a3d",
+    ".github/scripts/school-teacher-fresh.test.mjs": "56609e6934c1e4e12bf28370faf0ecb0060d365a",
+    ".github/scripts/school-teacher-scope.mjs": "06580d14de1d7135e80f945e62aeccfde43264ad",
+    ".github/scripts/school-teacher-self-baseline.sql": "",
+    ".github/scripts/school-teacher-self-bindings.json": "",
+    ".github/scripts/school-teacher-self.test.mjs": "",
+    ".github/scripts/school-teacher-storage.postgres.test.mjs": "",
+    ".github/workflows/ci-school-teacher.yml": "6b7a50b397c207c25c3762e49cf658ccc19e57d3",
+    ".github/workflows/ci.yml": "78f8d7fe2f3ad38e9388d38f58085b84d3087f56",
+    "server-version/e2e/education-self-questionnaire.cjs": "",
+    "server-version/e2e/school-teacher-browser.cjs": "530a56f8e456a47718b2a4c00e2b2643b80cf50b",
+    "server-version/e2e/school-teacher-fixture.cjs": "e143fd988330b1c62578b3e43ab85382725a8c3f",
+    "server-version/e2e/school-teacher-chrome-permissions.cjs": "4a0b22f2eb8fb778549a1a83495460d0a203bf64",
+    "server-version/e2e/school-teacher-chrome-permissions.test.cjs": "e8ae485de219a08589419d377293b9f005e54d7c"
+  },
+  "controlAfter": {
+    ".github/scripts/admin-permissions-functional.test.mjs": "6c1d1e05c8ab463bc99780a8a042b94d2c729dee",
+    ".github/scripts/ci-topology.test.mjs": "24d1c826f7a54adb2f3170bd5dcd1ea5d99ffb92",
+    ".github/scripts/content-workflows.test.mjs": "41cfcb9bf88af33e88b2fa091a4692a0916db69d",
+    ".github/scripts/maintenance-routing.test.mjs": "351b25e070141fe03996e0b56fb37e0672225dd0",
+    ".github/scripts/school-teacher-checks.mjs": "eccd8affa6a34637fe377fdddf00f77f1e02167f",
+    ".github/scripts/school-teacher-fresh.test.mjs": "f27123818e33b980f47f0fdece834679bca504e4",
+    ".github/scripts/school-teacher-scope.mjs": "0b8d47820a1745142d4317f48bc3d62cf01c2136",
+    ".github/scripts/school-teacher-self-baseline.sql": "4052c21cfb980282bf72f581a6cd26494021d153",
+    ".github/scripts/school-teacher-self.test.mjs": "c4fd118ac85d7b77d66b6878f6b469422d9ecea6",
+    ".github/scripts/school-teacher-storage.postgres.test.mjs": "727cc24474da221fcebb49905c58605f6a166f97",
+    ".github/workflows/ci-school-teacher.yml": "45a4db88aa1b30e9d8c26dc17191100e37763f88",
+    ".github/workflows/ci.yml": "797cc8c87ad01a055663e90ad5e6c8b44b4ed7e0",
+    "server-version/e2e/education-self-questionnaire.cjs": "af54e6357a1610d8cfd96e9853b173eb966c9dc3",
+    "server-version/e2e/school-teacher-browser.cjs": "265542e0e58f38fccaa8a4f9c13a9e9292e1b1b1",
+    "server-version/e2e/school-teacher-fixture.cjs": "cc42e320cbf8a5ec49fbf28c0adf690bd15d223c",
+    "server-version/e2e/school-teacher-chrome-permissions.cjs": "c2653f2aa38f48aaee1ab17291ed27cb8ea21df5",
+    "server-version/e2e/school-teacher-chrome-permissions.test.cjs": "a21ad90aab90e3e12e795301dc09af3505e05976"
+  },
+  "evidenceSha256": "db20d58fbafe0178969fa8ab3d13cde454131630bfe772beada344f6b4df37db",
+  "review": {
+    "completed": true,
+    "originalExecutionSigned": false,
+    "note": "DOT independently reviewed the existing six-job wiring, V1 row-lock repair, screenshot guard, Teacher publication navigation and precise ordinary-participant management denial (basis025ba7253). Current user subsequently instructed direct repair and CI reactivation, then careful repair after repeated CI failures. R traced the ninth-run official stack to participant162: save-and-exit resume, not the first START. Commit43c2ba35b reloads the Teacher task page only after the durable exit closes, then retains the exact parent, item and restored-answer assertions. Promise.all attaches response and action failures immediately throughout the SELF helper and the existing session click primitive, preserving catch/finally report handling without changing accepted statuses, methods, paths or timeouts. Two new targeted Node executor contracts fail on the original and pass on the repair; no new DOM, PG or broad local suite was run. New code has not been represented as a fresh DOT independent review. Prior authorization and runtime guards, current formal qualification/SAST and final DOT exact-head merge review remain required. This is not GitHub APPROVE or current application qualification.",
+    "basisCommit": "025ba7253c4d24ef245a047c4651bfe88d401145",
+    "reviewer": "DOT independent parent and supplemental Teacher boundary review",
+    "wiringBasisCommit": "fb8489caf91e09fb9ca7183bef5d0c7a49e0ad7e",
+    "testRepairBasisCommit": "9f65b298ffe17700638f1a55bca6a91973c17189",
+    "permissionAuthorization": "Current user explicitly authorized PR382 temporary GitHub runner /opt, /opt/google, /opt/google/chrome and the installed Chrome package paths confirmed by the existing checker to remove go-w only. Preserve bytes, ownership, all other permission bits and sandbox; no unbounded recursive chmod, added setuid, production or system-policy changes. Revalidate current package records/bytes/owner/inode/path scope before each mutation. DOT independently reviewed commit0b6b3a31c."
+  },
+  "requiredJobs": [
+    "admission",
+    "frontend",
+    "backend-self",
+    "postgres-self",
+    "browser-self",
+    "security"
+  ],
+  "qualification": "fresh-integrated-authoring",
+  "frontendBuildDecision": "fresh-current-source",
+  "backendBuildDecision": "fresh-current-source",
+  "execution": {
+    "frontend": {
+      "batches": [
+        {
+          "files": [
+            "src/components/__tests__/FinalCompositeAssessment.test.tsx"
+          ],
+          "expectedPassed": [
+            "ordinary questionnaire block instructions shows the current frozen transition alongside native tool text without inserting a unit",
+            "advances a campus form only after durable save and never submits the page automatically",
+            "enables campus single-question scale advance while keeping its FINAL manual",
+            "frozen scale instruction in the shared unit player shows the frozen scale instruction before questions for training without inventing text",
+            "frozen scale instruction in the shared unit player shows the frozen scale instruction before questions for education without inventing text",
+            "frozen scale instruction in the shared unit player shows the frozen scale instruction before questions for public without inventing text"
+          ],
+          "expectedFiltered": [
+            "historical empty sections submits an explicit empty FINAL for an ordinary frozen section",
+            "historical empty sections explains recovery for an invalid frozen context instead of silently skipping it",
+            "FinalCompositeAssessment durable selection and exit waits for the current item write before exiting and preserves both item answers",
+            "FinalCompositeAssessment durable selection and exit restores saved item selections without advancing or bleeding into the next item",
+            "FinalCompositeAssessment durable selection and exit keeps the page and current selection when durable storage fails",
+            "FinalCompositeAssessment provenance sibling placement sends one top-level provenance object for a Scale child",
+            "FinalCompositeAssessment provenance sibling placement keeps Scale provenance out of a Form child submit",
+            "durable submission confirmation does not relabel an accepted submission as failed when loading the next screen fails",
+            "C04 typed FINAL persistence restores numeric zero and retries the identical sealed typed payload (public=false)",
+            "C04 typed FINAL persistence restores numeric zero and retries the identical sealed typed payload (public=true)",
+            "C04 negative and large text draft restoration preserves 'NUMBER' across local save, unmount and FINAL",
+            "C04 negative and large text draft restoration preserves 'LONG_TEXT' across local save, unmount and FINAL",
+            "C05 structured FINAL persistence restores 'LIKERT' and replays identical sealed typed payload across reload",
+            "C05 structured FINAL persistence restores 'MATRIX' and replays identical sealed typed payload across reload",
+            "C05 structured FINAL persistence restores 'MATRIX_MULTIPLE' and replays identical sealed typed payload across reload",
+            "C05 structured FINAL persistence restores 'RANK_ORDER' and replays identical sealed typed payload across reload",
+            "C05 structured FINAL persistence restores 'SLIDER' and replays identical sealed typed payload across reload",
+            "C05 structured FINAL persistence restores 'CONSTANT_SUM' and replays identical sealed typed payload across reload",
+            "C06 visibility and durable answer cleanup saves each ordinary form edit without an empty cleanup transaction",
+            "C06 visibility and durable answer cleanup clears a previously saved hidden answer and seals only visible fields",
+            "C06 versioned sealed recovery preserves refusal through offline sealed replay (public=false)",
+            "C06 versioned sealed recovery preserves refusal through offline sealed replay (public=true)",
+            "C06 versioned sealed recovery keeps same-frame selection and Other text through offline sealed replay",
+            "clears hidden selected Other and late same-frame text when a source changes",
+            "focuses the first missing anonymous whole-page scale answer without sending a FINAL",
+            "focuses the missing anonymous form field without changing required validation or submitting",
+            "uses a compact Training header and Chinese SJT labels without changing the child action",
+            "keeps the campus privacy appendix in one folded instruction entry without submitting",
+            "advances to a newly revealed campus form question after the source choice is saved",
+            "uses plain School page wording for submission, progress and required answers",
+            "durable acknowledgement before slow progress or feedback reload shows accepted FORM_SECTION immediately without submitting again while reload waits",
+            "durable acknowledgement before slow progress or feedback reload shows accepted SCALE immediately without submitting again while reload waits"
+          ],
+          "inputClosure": {
+            "files": [
+              {
+                "path": "server-version/frontend/package-lock.json",
+                "blob": "38d624d2dd610673f9392a89af7290682862e2b0"
+              },
+              {
+                "path": "server-version/frontend/src/components/__tests__/FinalCompositeAssessment.test.tsx",
+                "blob": "a93b4a7d97782c8c21e8e97604bc8f75a1115ee8"
+              },
+              {
+                "path": "server-version/frontend/vitest.config.ts",
+                "blob": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7"
+              }
+            ],
+            "sha256": "8f4c5663caa0b92f806e46fc0115ea8c19d6edd12fdb4bfed4db1fa14077a4bc"
+          },
+          "namePattern": "^(?:ordinary\\ questionnaire\\ block\\ instructions\\ shows\\ the\\ current\\ frozen\\ transition\\ alongside\\ native\\ tool\\ text\\ without\\ inserting\\ a\\ unit|advances\\ a\\ campus\\ form\\ only\\ after\\ durable\\ save\\ and\\ never\\ submits\\ the\\ page\\ automatically|enables\\ campus\\ single\\-question\\ scale\\ advance\\ while\\ keeping\\ its\\ FINAL\\ manual|frozen\\ scale\\ instruction\\ in\\ the\\ shared\\ unit\\ player\\ shows\\ the\\ frozen\\ scale\\ instruction\\ before\\ questions\\ for\\ training\\ without\\ inventing\\ text|frozen\\ scale\\ instruction\\ in\\ the\\ shared\\ unit\\ player\\ shows\\ the\\ frozen\\ scale\\ instruction\\ before\\ questions\\ for\\ education\\ without\\ inventing\\ text|frozen\\ scale\\ instruction\\ in\\ the\\ shared\\ unit\\ player\\ shows\\ the\\ frozen\\ scale\\ instruction\\ before\\ questions\\ for\\ public\\ without\\ inventing\\ text)$"
+        },
+        {
+          "files": [
+            "src/components/education-tools/EducationAssessmentFeedback.test.tsx"
+          ],
+          "expectedPassed": [
+            "shared education application feedback adapter SCHOOL uses ordinary execution feedback and renders each block without exposing an injected NONE same-key result",
+            "shared education application feedback adapter TEACHER uses ordinary execution feedback and renders each block without exposing an injected NONE same-key result",
+            "shared education application feedback adapter renders a declared block next to a native block without showing injected withheld declared content",
+            "shared education application feedback adapter uses the existing SCHOOL transport and only an execution-scoped report path",
+            "shared education application feedback adapter uses the existing TEACHER transport and only an execution-scoped report path",
+            "shared education application feedback adapter closes a late pending response and can explicitly reopen through fresh authorization"
+          ],
+          "expectedFiltered": [],
+          "inputClosure": {
+            "files": [
+              {
+                "path": "server-version/frontend/package-lock.json",
+                "blob": "38d624d2dd610673f9392a89af7290682862e2b0"
+              },
+              {
+                "path": "server-version/frontend/src/components/education-tools/EducationAssessmentFeedback.test.tsx",
+                "blob": "3b961feb44ccdb4cb0a9d72737646701d5c3016a"
+              },
+              {
+                "path": "server-version/frontend/vitest.config.ts",
+                "blob": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7"
+              }
+            ],
+            "sha256": "383c239062739b0f078365dc294c2afbc774086e7dffffaeecc63accec63513b"
+          }
+        },
+        {
+          "files": [
+            "src/components/education-tools/EducationCompositionLibraryScale.test.tsx"
+          ],
+          "expectedPassed": [
+            "ordinary questionnaire original-library UI adapter selects the exact library identity, reopens only authorized headers, previews one display leaf and fixes the questionnaire",
+            "ordinary questionnaire original-library UI adapter discards a late library directory when the same actor switches to the public Standard directory"
+          ],
+          "expectedFiltered": [],
+          "inputClosure": {
+            "files": [
+              {
+                "path": "server-version/frontend/package-lock.json",
+                "blob": "38d624d2dd610673f9392a89af7290682862e2b0"
+              },
+              {
+                "path": "server-version/frontend/src/components/education-tools/EducationCompositionLibraryScale.test.tsx",
+                "blob": "07609b592c458f310ea1d351214950f8468d4922"
+              },
+              {
+                "path": "server-version/frontend/vitest.config.ts",
+                "blob": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7"
+              }
+            ],
+            "sha256": "94d4489dbf9ce4d9f34cd4c47683146db054e8fb99650abcb0483612c64e987d"
+          }
+        },
+        {
+          "files": [
+            "src/components/education-tools/EducationCompositionPreviewBoundary.review.test.tsx"
+          ],
+          "expectedPassed": [
+            "Review: lazy immutable leaf preview response boundaries keeps the selected public Form when the previous Standard response arrives late",
+            "Review: lazy immutable leaf preview response boundaries discards a pending leaf body when the same transport switches entry and author"
+          ],
+          "expectedFiltered": [],
+          "inputClosure": {
+            "files": [
+              {
+                "path": "server-version/frontend/package-lock.json",
+                "blob": "38d624d2dd610673f9392a89af7290682862e2b0"
+              },
+              {
+                "path": "server-version/frontend/src/components/education-tools/EducationCompositionPreviewBoundary.review.test.tsx",
+                "blob": "b6b6a592efa756a8f04bce68736f7f9c3e1cc051"
+              },
+              {
+                "path": "server-version/frontend/vitest.config.ts",
+                "blob": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7"
+              }
+            ],
+            "sha256": "f7117f7ffc30be908d7a0f961b48f80ecb3677c3738b5478087347e3aefd5245"
+          }
+        },
+        {
+          "files": [
+            "src/components/education-tools/EducationCompositionPublicForms.test.tsx"
+          ],
+          "expectedPassed": [
+            "ordinary questionnaire public fixed Form adapter SCHOOL saves/reopens exact public origin alongside a colliding private version ID and only previews the selected leaf",
+            "ordinary questionnaire public fixed Form adapter TEACHER saves/reopens exact public origin alongside a colliding private version ID and only previews the selected leaf",
+            "ordinary questionnaire public fixed Form adapter discards a late public catalog response when the same transport changes entry/author",
+            "ordinary questionnaire public fixed Form adapter deduplicates pages and searches before selecting; repeating the same search preserves loaded rows"
+          ],
+          "expectedFiltered": [],
+          "inputClosure": {
+            "files": [
+              {
+                "path": "server-version/frontend/package-lock.json",
+                "blob": "38d624d2dd610673f9392a89af7290682862e2b0"
+              },
+              {
+                "path": "server-version/frontend/src/components/education-tools/EducationCompositionPublicForms.test.tsx",
+                "blob": "e43df1c78f4ac37dc66aebf230a1343e92974ce4"
+              },
+              {
+                "path": "server-version/frontend/vitest.config.ts",
+                "blob": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7"
+              }
+            ],
+            "sha256": "69e4f308cc6a2f9f90980b2461b9a7c76f58b91431229f6659ef3c6e1e1187d0"
+          }
+        },
+        {
+          "files": [
+            "src/components/education-tools/EducationCompositionPublicStandard.test.tsx"
+          ],
+          "expectedPassed": [
+            "public exact Standard ordinary questionnaire adapter shows C/P/R and required context, saves only references, reopens explicit background fields, previews just that leaf and freezes"
+          ],
+          "expectedFiltered": [],
+          "inputClosure": {
+            "files": [
+              {
+                "path": "server-version/frontend/package-lock.json",
+                "blob": "38d624d2dd610673f9392a89af7290682862e2b0"
+              },
+              {
+                "path": "server-version/frontend/src/components/education-tools/EducationCompositionPublicStandard.test.tsx",
+                "blob": "29c6b55fb2f164201fe3c4f7b016b27c3d8457c7"
+              },
+              {
+                "path": "server-version/frontend/vitest.config.ts",
+                "blob": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7"
+              }
+            ],
+            "sha256": "dd4d500c4acd40c5f000150d472aeb398ddc453a95686caa5659dddac73097ea"
+          }
+        },
+        {
+          "files": [
+            "src/components/education-tools/EducationCompositionSchoolConsumers.test.tsx"
+          ],
+          "expectedPassed": [
+            "School composition product consumers / synthetic HTTP contracts exposes the shared School editor through its parent authoring studio",
+            "School composition product consumers / synthetic HTTP contracts attaches one fixed questionnaire from the actual activity consumer and displays the source revision",
+            "School composition product consumers / synthetic HTTP contracts does not render a late Teacher draft after the entry changes on the same transport"
+          ],
+          "expectedFiltered": [],
+          "inputClosure": {
+            "files": [
+              {
+                "path": "server-version/frontend/package-lock.json",
+                "blob": "38d624d2dd610673f9392a89af7290682862e2b0"
+              },
+              {
+                "path": "server-version/frontend/src/components/education-tools/EducationCompositionSchoolConsumers.test.tsx",
+                "blob": "91aee3f61d8ec16a61c993ef3cffe332e4a95844"
+              },
+              {
+                "path": "server-version/frontend/vitest.config.ts",
+                "blob": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7"
+              }
+            ],
+            "sha256": "9ea190eea57256f5552f90d09565dee11d8aa192a00053ac7e4a2a73c3e73f3f"
+          }
+        },
+        {
+          "files": [
+            "src/components/education-tools/EducationCompositionStudio.test.tsx"
+          ],
+          "expectedPassed": [
+            "education ordinary questionnaire authoring and fixed task attachment TEACHER chooses explicit immutable versions, saves/reopens real order and lazily previews only the current source",
+            "education ordinary questionnaire authoring and fixed task attachment SCHOOL chooses explicit immutable versions, saves/reopens real order and lazily previews only the current source",
+            "education ordinary questionnaire authoring and fixed task attachment TEACHER attaches one fixed ordinary version with draft CAS and SELF selectors, blocking duplicate writes",
+            "education ordinary questionnaire authoring and fixed task attachment SCHOOL attaches one fixed ordinary version with draft CAS and SELF selectors, blocking duplicate writes",
+            "education ordinary questionnaire authoring and fixed task attachment ignores a late questionnaire creation result after switching the Teacher account"
+          ],
+          "expectedFiltered": [],
+          "inputClosure": {
+            "files": [
+              {
+                "path": "server-version/frontend/package-lock.json",
+                "blob": "38d624d2dd610673f9392a89af7290682862e2b0"
+              },
+              {
+                "path": "server-version/frontend/src/components/education-tools/EducationCompositionStudio.test.tsx",
+                "blob": "66ae34350c3eca9721005874e68621b2101d4f31"
+              },
+              {
+                "path": "server-version/frontend/vitest.config.ts",
+                "blob": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7"
+              }
+            ],
+            "sha256": "77a5e9eea6061632dab81cb331eb70712a669eeb74f77dfdb3272b3be58eaf17"
+          }
+        },
+        {
+          "files": [
+            "src/components/education-tools/EducationPrivateFeedbackAuthoring.test.tsx"
+          ],
+          "expectedPassed": [
+            "Teacher private native feedback choice opts into a future fixed version explicitly without inventing a review or changing score definitions"
+          ],
+          "expectedFiltered": [],
+          "inputClosure": {
+            "files": [
+              {
+                "path": "server-version/frontend/package-lock.json",
+                "blob": "38d624d2dd610673f9392a89af7290682862e2b0"
+              },
+              {
+                "path": "server-version/frontend/src/components/education-tools/EducationPrivateFeedbackAuthoring.test.tsx",
+                "blob": "656b6c421d1213b79b23e8a34365bbc75b673c9c"
+              },
+              {
+                "path": "server-version/frontend/vitest.config.ts",
+                "blob": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7"
+              }
+            ],
+            "sha256": "c94eacd7df38ff2ff65877254372e572858ab3dd11d2c5b6db2432b6e0b54db5"
+          }
+        },
+        {
+          "files": [
+            "src/components/education-tools/EducationPrivateToolStudio.test.tsx"
+          ],
+          "expectedPassed": [
+            "EducationPrivateToolStudio bounded private authoring workflow does not route an ordinary questionnaire deep link into the Form editor"
+          ],
+          "expectedFiltered": [
+            "EducationPrivateToolStudio bounded private authoring workflow explains private image editing and authorized task/report reading separately",
+            "EducationPrivateToolStudio bounded private authoring workflow creates one draft despite repeated clicks and opens the returned native definition",
+            "EducationPrivateToolStudio bounded private authoring workflow does not blindly retry uncertain creation and requires an explicit list reload",
+            "EducationPrivateToolStudio bounded private authoring workflow preserves the draft after CAS 409 and does not automatically reload or overwrite",
+            "EducationPrivateToolStudio bounded private authoring workflow guards dirty back and unload, and removes the unload guard on unmount",
+            "EducationPrivateToolStudio bounded private authoring workflow ignores an old school detail response after scope change",
+            "EducationPrivateToolStudio bounded private authoring workflow freezes only a checked private revision and never calls Training media transport",
+            "EducationPrivateToolStudio bounded private authoring workflow rejects a preview produced from a changed server definition and revokes freeze readiness",
+            "private version history copy labels a cursor-limited history as partial rather than newest or complete"
+          ],
+          "inputClosure": {
+            "files": [
+              {
+                "path": "server-version/frontend/package-lock.json",
+                "blob": "38d624d2dd610673f9392a89af7290682862e2b0"
+              },
+              {
+                "path": "server-version/frontend/src/components/education-tools/EducationPrivateToolStudio.test.tsx",
+                "blob": "c55d90a51072338a5273fe92a78f932999b1e728"
+              },
+              {
+                "path": "server-version/frontend/vitest.config.ts",
+                "blob": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7"
+              }
+            ],
+            "sha256": "31c4d2755b102d64ec0917bfde2f97097167a109eb51001daf3153b2c94c2124"
+          },
+          "namePattern": "^(?:EducationPrivateToolStudio\\ bounded\\ private\\ authoring\\ workflow\\ does\\ not\\ route\\ an\\ ordinary\\ questionnaire\\ deep\\ link\\ into\\ the\\ Form\\ editor)$"
+        },
+        {
+          "files": [
+            "src/huiteacher/HuiteacherPrivacyV2.test.tsx"
+          ],
+          "expectedPassed": [
+            "Huiteacher PR2 student feedback admin materialized release uses one explicit admin release before read, never submits raw answers",
+            "Huiteacher streamlined three-stage student evaluation prepares config and Run with one action, opens + publishes once, and resumes from saved states"
+          ],
+          "expectedFiltered": [],
+          "inputClosure": {
+            "files": [
+              {
+                "path": "server-version/frontend/package-lock.json",
+                "blob": "38d624d2dd610673f9392a89af7290682862e2b0"
+              },
+              {
+                "path": "server-version/frontend/src/huiteacher/HuiteacherPrivacyV2.test.tsx",
+                "blob": "82217d76606eacca862f82795082bbbe1e6f4c0f"
+              },
+              {
+                "path": "server-version/frontend/vitest.config.ts",
+                "blob": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7"
+              }
+            ],
+            "sha256": "4cdb9e5295dd6c2730365fd793f88166c153bcf4dcbe595b91fcbeb3cfe32269"
+          }
+        },
+        {
+          "files": [
+            "src/huiteacher/HuiteacherPrivateToolNavigation.test.tsx"
+          ],
+          "expectedPassed": [
+            "keeps TEACHER participants outside authoring when this school has no Teacher admin grant",
+            "keeps ADMIN participants outside authoring when this school has no Teacher admin grant",
+            "drops the authoring capability on a school change before loading private data for the next school",
+            "protects private drafts on Teacher tab and school changes, including pending writes"
+          ],
+          "expectedFiltered": [],
+          "inputClosure": {
+            "files": [
+              {
+                "path": "server-version/frontend/package-lock.json",
+                "blob": "38d624d2dd610673f9392a89af7290682862e2b0"
+              },
+              {
+                "path": "server-version/frontend/src/huiteacher/HuiteacherPrivateToolNavigation.test.tsx",
+                "blob": "4b396e5d06261c19c7b734e6a36c48f324d1a3f7"
+              },
+              {
+                "path": "server-version/frontend/vitest.config.ts",
+                "blob": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7"
+              }
+            ],
+            "sha256": "5111d9517090dfff13d7cb46bdbe1adf75144b8fe7a8b50f4260edfbc0cf27c3"
+          }
+        },
+        {
+          "files": [
+            "src/huiteacher/HuiteacherStudentEvaluationReadRecovery.test.tsx"
+          ],
+          "expectedPassed": [
+            "Teacher student evaluation read recovery keeps a configuration read error distinct from an absent configuration: TypeError: \u7f51\u7edc\u4e2d\u65ad",
+            "Teacher student evaluation read recovery keeps a configuration read error distinct from an absent configuration: Error: HTTP 403",
+            "Teacher student evaluation read recovery keeps a configuration read error distinct from an absent configuration: Error: HTTP 500",
+            "Teacher student evaluation read recovery does not offer Run creation on an uncertain Run read: TypeError: \u4efb\u52a1\u7f51\u7edc\u4e2d\u65ad",
+            "Teacher student evaluation read recovery does not offer Run creation on an uncertain Run read: Error: HTTP 403",
+            "Teacher student evaluation read recovery does not offer Run creation on an uncertain Run read: Error: HTTP 500",
+            "Teacher student evaluation read recovery treats only an explicit Run 404 as absent and rereads an unknown creation before another POST",
+            "Teacher student evaluation read recovery retains the known Run after a post-publication read failure and blocks writes until an explicit reread",
+            "Teacher student evaluation read recovery clears the previous event immediately and ignores its late configuration response",
+            "Teacher student evaluation read recovery drops loaded configuration on an API identity change and ignores the old Run response",
+            "Teacher student evaluation read recovery does not continue a configuration POST into Run creation after switching API identity"
+          ],
+          "expectedFiltered": [],
+          "inputClosure": {
+            "files": [
+              {
+                "path": "server-version/frontend/package-lock.json",
+                "blob": "38d624d2dd610673f9392a89af7290682862e2b0"
+              },
+              {
+                "path": "server-version/frontend/src/huiteacher/HuiteacherStudentEvaluationReadRecovery.test.tsx",
+                "blob": "1caed2a419b17c828ad52bf6001be86d6c73d8bd"
+              },
+              {
+                "path": "server-version/frontend/vitest.config.ts",
+                "blob": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7"
+              }
+            ],
+            "sha256": "cd774db4412bed63e13e3078e78f906e89bdedfb331c128128d68e4098afa6a0"
+          }
+        },
+        {
+          "files": [
+            "src/school/SchoolActivityTeacherObserverTargets.test.tsx"
+          ],
+          "expectedPassed": [
+            "School real observer DTO target selection requires the owned psychology activity homeroom target before sending the unchanged observer policy",
+            "School real observer DTO target selection offers only the supported explicit administrator targets and refuses an empty target"
+          ],
+          "expectedFiltered": [],
+          "inputClosure": {
+            "files": [
+              {
+                "path": "server-version/frontend/package-lock.json",
+                "blob": "38d624d2dd610673f9392a89af7290682862e2b0"
+              },
+              {
+                "path": "server-version/frontend/src/school/SchoolActivityTeacherObserverTargets.test.tsx",
+                "blob": "8d4ca8e7238dd86b82539e26eda2fe329ff1b4ac"
+              },
+              {
+                "path": "server-version/frontend/vitest.config.ts",
+                "blob": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7"
+              }
+            ],
+            "sha256": "4be9fbaf77d3bd64dfae484625ef45bf2f05a0918e6ad408d4d495b2721b75cf"
+          }
+        },
+        {
+          "files": [
+            "src/school/SchoolStudentTasks.completion.test.tsx"
+          ],
+          "expectedPassed": [
+            "School authoritative completion feedback consumer (synthetic transport) routes an assigned ordinary questionnaire completion to its scoped feedback without relying on a refreshed list",
+            "School authoritative completion feedback consumer (synthetic transport) opens feedback once independently of a slow or failed list refresh",
+            "School authoritative completion feedback consumer (synthetic transport) preserves FORM completion without requesting personal psychological feedback",
+            "remounts a newly selected task and prevents the previous completion callback from opening feedback",
+            "keeps the active task feedback identity when a background list changes its page contents",
+            "uses the server-declared education feedback namespace for approved new families"
+          ],
+          "expectedFiltered": [],
+          "inputClosure": {
+            "files": [
+              {
+                "path": "server-version/frontend/package-lock.json",
+                "blob": "38d624d2dd610673f9392a89af7290682862e2b0"
+              },
+              {
+                "path": "server-version/frontend/src/school/SchoolStudentTasks.completion.test.tsx",
+                "blob": "6efd554c5461fcfb9a2f1a53ad78ddc3621e4640"
+              },
+              {
+                "path": "server-version/frontend/vitest.config.ts",
+                "blob": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7"
+              }
+            ],
+            "sha256": "5e8ed344f2c19bd7d78fbf6ab5c9827ca414c5951e78472dd99bfe196734f4a2"
+          }
+        }
+      ],
+      "inputClosure": {
+        "files": [
+          {
+            "path": ".github/release-tools/package-lock.json",
+            "blob": "b7731f8e3b798e08d1693a9c7b108405d183f45e"
+          },
+          {
+            "path": ".github/release-tools/package.json",
+            "blob": "1913b93fbd582fbbd28398488e8e91d6bb9865d5"
+          },
+          {
+            "path": "server-version/scripts/ci-install-canvas-deps.sh",
+            "blob": "75e8b7f5ce24a53e1c040d105b8b757e3686f102"
+          }
+        ],
+        "trees": [
+          {
+            "path": "server-version/frontend",
+            "tree": "2907eedb6ad9d1bdc5559f3e61b1f6145ac8b39b"
+          },
+          {
+            "path": "server-version/backend",
+            "tree": "8a5df3518f9cadd5b56a397a71de7019e9fb5b95"
+          }
+        ],
+        "sha256": "c2227558d8886f1ddeb6b88f6f85e87d187b7e9f07a1aad01a26183a09043a20"
+      },
+      "types": true,
+      "lintFiles": [
+        "src/components/FinalCompositeAssessment.tsx",
+        "src/components/education-tools/EducationAssessmentFeedback.tsx",
+        "src/components/education-tools/EducationCompositionRunPicker.tsx",
+        "src/components/education-tools/EducationCompositionStudio.tsx",
+        "src/components/education-tools/EducationMaterialPicker.tsx",
+        "src/components/education-tools/EducationOrdinaryFeedback.tsx",
+        "src/components/education-tools/EducationPrivateToolStudio.tsx",
+        "src/components/education-tools/EducationPrivateVersionChooser.tsx",
+        "src/components/education-tools/EducationPublicFormChooser.tsx",
+        "src/components/education-tools/EducationTaskFeedback.tsx",
+        "src/components/education-tools/PrivateToolPreview.tsx",
+        "src/components/education-tools/educationCompositionClient.ts",
+        "src/components/education-tools/educationPublicFormClient.ts",
+        "src/components/education-tools/privateToolClient.ts",
+        "src/huiteacher/HuiteacherApp.tsx",
+        "src/huiteacher/HuiteacherEvaluationStudio.tsx",
+        "src/huiteacher/HuiteacherMyAssessmentTasks.tsx",
+        "src/huiteacher/HuiteacherStudentEvaluationManager.tsx",
+        "src/huiteacher/assessmentRuntime.client.ts",
+        "src/modules/assessment-context/options.ts",
+        "src/modules/assessment-core/composition/CompositionOutline.tsx",
+        "src/modules/composite/types.ts",
+        "src/pages/scaleDefinitionEditorModel.ts",
+        "src/school/SchoolActivityManager.tsx",
+        "src/school/SchoolPrivateToolCollection.tsx",
+        "src/school/SchoolStudentTasks.tsx",
+        "src/survey/SurveyCompositionEditor.tsx"
+      ]
+    },
+    "backend": {
+      "batches": [
+        {
+          "files": [
+            "src/__tests__/huiteacher/assessment-runtime-composition-page.review.test.ts",
+            "src/__tests__/education-tools/access.test.ts",
+            "src/__tests__/education-tools/capabilities.routes.test.ts",
+            "src/__tests__/education-tools/private-tool.run-contract.test.ts",
+            "src/__tests__/assessment-runtime/education-block-presentation.test.ts",
+            "src/__tests__/measurement-content/admin-authority-route.test.ts",
+            "src/__tests__/measurement-content/training-standard-combination-boundary.test.ts",
+            "src/__tests__/reporting/education-assessment-report.projector.test.ts",
+            "src/__tests__/scale/scale-presentation.test.ts"
+          ],
+          "expectedPassed": [
+            "ordinary questionnaire frozen block presentation stores a multi-page Form instruction once, resolves it on every own page and never borrows another block",
+            "Review: ordinary Teacher page isolates current source-use withdrawal retains an entered questionnaire when another not-yet-entered source on the page loses U",
+            "Review: ordinary Teacher page isolates current source-use withdrawal advances by the last scanned row when a known withdrawn source leaves an empty page",
+            "Review: ordinary Teacher page isolates current source-use withdrawal propagates an unknown 403 instead of treating it as ordinary source withdrawal",
+            "education tool authoring capability contract maps SCHOOL to its own product in one current authority query",
+            "education tool authoring capability contract maps TEACHER to its own product in one current authority query",
+            "education tool authoring capability contract rejects a Teacher member without this school product-admin grant, including a psychology author",
+            "education tool authoring capability contract rechecks Teacher administration on the next request instead of caching an allowed hint",
+            "education tool authoring capability contract leaves existing member queries free of new professional restrictions",
+            "education tool authoring capability contract rejects foreign account domains and invalid runtime entries before querying",
+            "education tool authoring capability contract returns no school details or broader permissions in navigation hints",
+            "education tool authoring capability contract uses the supplied transaction and never falls back to the global connection",
+            "education tool authoring capability contract does not turn database errors into an allowed capability",
+            "School/Teacher read-only tool authoring capability routes SCHOOL selects its own authentication and fixed product despite forged query",
+            "School/Teacher read-only tool authoring capability routes TEACHER selects its own authentication and fixed product despite forged query",
+            "School/Teacher read-only tool authoring capability routes does not grant Teacher authoring to a member or psychology teacher without product administration",
+            "School/Teacher read-only tool authoring capability routes blocks password-only or foreign Teacher admin sessions before private data access or capability SQL",
+            "School/Teacher read-only tool authoring capability routes lists a current Teacher administrator\u2019s own tools with one authority query and no fresh MFA step-up",
+            "School/Teacher read-only tool authoring capability routes SCHOOL rejects invalid IDs before SQL and does not swallow database failures",
+            "School/Teacher read-only tool authoring capability routes TEACHER rejects invalid IDs before SQL and does not swallow database failures",
+            "School/Teacher read-only tool authoring capability routes SCHOOL returns the same minimal false hint for absent authority",
+            "School/Teacher read-only tool authoring capability routes TEACHER returns the same minimal false hint for absent authority",
+            "Private fixed-version draft request accepts only an exact ordinary composition version and SELF selectors, without client-supplied authority or package edits",
+            "Private fixed-version draft request requires CAS and exact version hash without accepting a resource or authority body",
+            "Private fixed-version draft request requires canonical parent respondent and never parent subject",
+            "Private fixed-version draft request requires explicit class target only for teacher observer and rejects course",
+            "Private fixed-version draft request requires selected teacher IDs exactly for selected-class mode",
+            "Private fixed-version draft request rejects arbitrary selectors, extra user role facts and empty membership lists",
+            "education exact-version declared projection renders approved SCHOOL mixed-family saved facts through the shared interpreter and renderer",
+            "education exact-version declared projection renders approved TEACHER mixed-family saved facts through the shared interpreter and renderer",
+            "education exact-version declared projection withholds audience without falling back to numeric facts",
+            "education exact-version declared projection withholds training-private without falling back to numeric facts",
+            "education exact-version declared projection withholds metric-withdrawn without falling back to numeric facts",
+            "education exact-version declared projection honors current MEASUREMENT revocation while retaining original completion facts",
+            "education exact-version declared projection honors current REPORT revocation while retaining original completion facts",
+            "education exact-version declared projection allows exact retired history but never an unselected or missing report version",
+            "education exact-version declared projection rejects substituted result identity",
+            "education exact-version declared projection rejects substituted source identity",
+            "education exact-version declared projection rejects substituted family identity",
+            "ordinary native disclosure ceiling on declared R keeps permitted numeric blocks and strips forbidden interpretations without changing saved facts",
+            "system content grant routes reuse real management router boundaries runs authenticate/origin/system/limiter/recent key before issuance with trusted claims",
+            "system content grant routes reuse real management router boundaries blocks untrusted origin and recent-key denial without entering the mutation",
+            "system content grant routes reuse real management router boundaries uses the same middleware and authenticated session for system revocation",
+            "system content grant routes reuse real management router boundaries preserves current-auth and CAS error status returned by the transactional service",
+            "protects exact metadata read with existing system and recent-key boundaries",
+            "protects /static-sjt/prepare with existing strong session, origin and exact body",
+            "protects /static-sjt/publish with existing strong session, origin and exact body",
+            "current Training consumers do not borrow Survey approval or PRIVATE scope does not treat a combination id as the existing V1 Scale/config/SJT source contract",
+            "current Training consumers do not borrow Survey approval or PRIVATE scope does not turn a forged education Standard descriptor into an ordinary sealed parent",
+            "current Training consumers do not borrow Survey approval or PRIVATE scope a PLATFORM theoretical_range parameter snapshot is not a formal normative publication just because its Survey combo is approved",
+            "current Training consumers do not borrow Survey approval or PRIVATE scope a PLATFORM descriptive_sample parameter snapshot is not a formal normative publication just because its Survey combo is approved",
+            "current Training consumers do not borrow Survey approval or PRIVATE scope a PLATFORM criterion_threshold parameter snapshot is not a formal normative publication just because its Survey combo is approved",
+            "current Training consumers do not borrow Survey approval or PRIVATE scope does not admit a Survey private parameter copy to the Training owner/composite",
+            "current Training consumers do not borrow Survey approval or PRIVATE scope does not treat a SURVEY report pointer as an existing Training private report binding",
+            "current Training consumers do not borrow Survey approval or PRIVATE scope does not treat a PLATFORM report pointer as an existing Training private report binding",
+            "exact frozen Scale presentation and course start binds the approved immutable mode without consulting live entry state",
+            "exact frozen Scale presentation and course start writes the binding through the actual new-attempt freezer",
+            "exact frozen Scale presentation and course start uses the sealed education presentation without another measurement read and rejects a different native entry, C or M",
+            "exact frozen Scale presentation and course start keeps historical snapshot bytes and defaults legacy/RUNNER_DEFAULT to Training one-by-one",
+            "exact frozen Scale presentation and course start does not accept a different executable definition under the release identity",
+            "exact frozen Scale presentation and course start requires current exact use permission of a linked course owner for NEW standalone starts"
+          ],
+          "expectedFiltered": [],
+          "inputClosure": {
+            "files": [
+              {
+                "path": "server-version/backend/package-lock.json",
+                "blob": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/assessment-runtime/education-block-presentation.test.ts",
+                "blob": "95ae53a017615268706df8263eba462798dd28cc"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/education-tools/access.test.ts",
+                "blob": "9f7642a5f2ae480b014cb7da8266b351f0fc03c9"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/education-tools/capabilities.routes.test.ts",
+                "blob": "3934e15861d86d8e800af75f00ecce5bd7f1fc73"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/education-tools/private-tool.run-contract.test.ts",
+                "blob": "e49ed240f7c7b05d81692d6291c374baa615ef0a"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/huiteacher/assessment-runtime-composition-page.review.test.ts",
+                "blob": "7df44c634668ddcdcf35f7fb1f32aa05cf9d9da5"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/measurement-content/admin-authority-route.test.ts",
+                "blob": "719cb74c7a47898242da1b8ba27ecce3eda93728"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/measurement-content/training-standard-combination-boundary.test.ts",
+                "blob": "d66d4ca06df3fe269e3d1883d1e5e28c1971ed90"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/reporting/education-assessment-report.projector.test.ts",
+                "blob": "8a4fbc68091539d5d26dde51915ce10598d86b5c"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/scale/scale-presentation.test.ts",
+                "blob": "8b82ab6697fe327061f8f6e2631c88b58acddc8e"
+              },
+              {
+                "path": "server-version/backend/vitest.config.ts",
+                "blob": "619cca9b71a3046d22f1e8bcbcf59eaea5f0b406"
+              }
+            ],
+            "sha256": "58f23d9160e6989ad4e728de28838be4842684e89d58323209d89f798e10fc1e"
+          }
+        },
+        {
+          "files": [
+            "src/__tests__/integration/educationPrivateComposition.postgres.integration.test.ts",
+            "src/__tests__/integration/educationPrivateCompositionLocks.postgres.integration.test.ts",
+            "src/__tests__/integration/educationLibrarySourceCatalog.postgres.integration.test.ts"
+          ],
+          "expectedPassed": [
+            "Original Scale library U / ordinary author directory batches the real issuer basis across exact entries, deduplicates USER/ORGANIZATION U, and preserves independent fallback/revocation without runtime creation",
+            "Original Scale library U / ordinary author directory keeps Training system-distribution denial and local Teacher author identity separate from content D",
+            "Ordinary private composition / actual source-bound PostgreSQL sealing TEACHER saves/reopens/previews and atomically freezes one ordered Scale + Form parent, once",
+            "Ordinary private composition / actual source-bound PostgreSQL sealing SCHOOL saves/reopens/previews and atomically freezes one ordered Scale + Form parent, once",
+            "Ordinary private composition / actual source-bound PostgreSQL sealing rejects cross-owner/cross-school/cross-entry sources and stale CAS without creating a version or parent",
+            "Ordinary private composition / actual source-bound PostgreSQL sealing enforces current Teacher administration for edits/freeze and keeps a non-admin participant outside the author path",
+            "Ordinary private composition / actual source-bound PostgreSQL sealing protects sealed parent, Form children and Scale identity while permitting only explicit publication lifecycle",
+            "Ordinary private composition / actual source-bound PostgreSQL sealing rejects a caller-created receipt even when its origin and all hashes are self-consistent",
+            "Ordinary private composition / actual source-bound PostgreSQL sealing serializes child insertion with sealing and validates the complete post-wait structure",
+            "Ordinary private composition / actual source-bound PostgreSQL sealing loads a sealed header with one SELECT and no source, item or snapshot-body reads",
+            "COMPOSITION organization sharing against the actual product-admin revocation writer lets a different author freeze while one draft waits, blocks real governance until that freeze commits, then rejects revoked author writes"
+          ],
+          "expectedFiltered": [],
+          "inputClosure": {
+            "files": [
+              {
+                "path": "server-version/backend/package-lock.json",
+                "blob": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/integration/educationLibrarySourceCatalog.postgres.integration.test.ts",
+                "blob": "247abef2e3813b9b15e60b3a323b8b87decaf1c5"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/integration/educationPrivateComposition.postgres.integration.test.ts",
+                "blob": "40efde3ba0ef7722a23da2b392ee2748a0df28b9"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/integration/educationPrivateCompositionLocks.postgres.integration.test.ts",
+                "blob": "863d9999a6f98a049977f0d45ca2afec8bb72718"
+              },
+              {
+                "path": "server-version/backend/vitest.config.ts",
+                "blob": "619cca9b71a3046d22f1e8bcbcf59eaea5f0b406"
+              }
+            ],
+            "sha256": "f16d0508c2b2bd49ed60f7805d59265dbbe894bb0b59550eb7eb6d7e94ac7543"
+          }
+        },
+        {
+          "files": [
+            "src/__tests__/integration/educationPrivateCompositionPublication.postgres.integration.test.ts",
+            "src/__tests__/integration/educationPrivateCompositionExecution.postgres.integration.test.ts",
+            "src/__tests__/integration/educationSchoolCompositionExecution.postgres.integration.test.ts"
+          ],
+          "expectedPassed": [
+            "Teacher ordinary questionnaire / actual SELF participation and block feedback delivers frozen block instructions through the real Scale/Form execution after a draft edit, without extra pages",
+            "Teacher ordinary questionnaire / actual SELF participation and block feedback starts one frozen parent, resumes after author withdrawal, finalizes Scale/Form once, and discloses only the permitted same-key block",
+            "Teacher ordinary questionnaire / actual SELF participation and block feedback rejects new entry after author withdrawal, and current participant withdrawal or emergency stop before native FINAL writes",
+            "Private ordinary questionnaire / Teacher SELF real Run publication attaches one fixed parent, previews without mutation, and atomically publishes one SELF execution with exact per-unit ceilings",
+            "Private ordinary questionnaire / Teacher SELF real Run publication rolls back the real source publication, frozen policy and assigned executions on a post-source Run update failure",
+            "Private ordinary questionnaire / Teacher SELF real Run publication denies foreign ownership, author revocation and stopped leaves, while metadata batches avoid reading source bodies",
+            "School psychological author / ordinary questionnaire real HTTP execution runs one student Scale/Form questionnaire after author withdrawal and projects only the own allowed block",
+            "School psychological author / ordinary questionnaire real HTTP execution enforces the real School author/own workflow/CAS before HTTP attachment, and rejects a new start after author withdrawal"
+          ],
+          "expectedFiltered": [],
+          "inputClosure": {
+            "files": [
+              {
+                "path": "server-version/backend/package-lock.json",
+                "blob": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/integration/educationPrivateCompositionExecution.postgres.integration.test.ts",
+                "blob": "6d97debd0ee3758a1e74af88fd61eab5ac3c9288"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/integration/educationPrivateCompositionPublication.postgres.integration.test.ts",
+                "blob": "11ad0c7b1657aa6e6342f461408087fbf22b9257"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/integration/educationSchoolCompositionExecution.postgres.integration.test.ts",
+                "blob": "9431441891abcdc06157f2148df905dca60c95f9"
+              },
+              {
+                "path": "server-version/backend/vitest.config.ts",
+                "blob": "619cca9b71a3046d22f1e8bcbcf59eaea5f0b406"
+              }
+            ],
+            "sha256": "4ef0d913cae51d69cf800e40f243be8524b0044e7aef6f21782855b46cf3a711"
+          }
+        },
+        {
+          "files": [
+            "src/__tests__/integration/educationPublicFormComposition.postgres.integration.test.ts",
+            "src/__tests__/integration/educationPublicStandardComposition.postgres.integration.test.ts",
+            "src/__tests__/integration/educationLibraryComposition.postgres.integration.test.ts",
+            "src/__tests__/integration/educationLibraryCompositionExecution.postgres.integration.test.ts",
+            "src/__tests__/integration/educationLibraryCompositionPreview.postgres.integration.test.ts",
+            "src/__tests__/integration/educationLibraryConcurrentDelivery.review.postgres.integration.test.ts"
+          ],
+          "expectedPassed": [
+            "Original approved library / ordinary composition sealing seals the original C/native R and independent blocks once, creates no per-leaf Composite, and rejects new freeze after U withdrawal",
+            "Original approved library / ordinary composition sealing rejects a forged approved-source descriptor in the actual DB seal even when its parent hash is recomputed",
+            "Original approved library / ordinary composition sealing waits on issuer User before taking school SHARE, preserves the real account lifecycle writer, and denies the waiting new use after its freeze",
+            "Original library U / actual ordinary SELF Scale-Form journey TEACHER enforces its distinct author identity, starts once, retains entered completion after U withdrawal, and isolates native same-key feedback",
+            "Original library U / actual ordinary SELF Scale-Form journey SCHOOL enforces its distinct author identity, starts once, retains entered completion after U withdrawal, and isolates native same-key feedback",
+            "Original library / exact display, draft header and original shared stimulus HTTP reads one original display/asset, saves only exact identity and reopens scoped headers, then denies withdrawn/foreign reads without copying source ownership",
+            "Public fixed Form / one ordinary education questionnaire TEACHER runs a private Scale + exact public Form once, preserves pages, and fences new admission after U withdrawal",
+            "Public fixed Form / one ordinary education questionnaire SCHOOL runs a private Scale + exact public Form once, preserves pages, and fences new admission after U withdrawal",
+            "Exact approved Standard C/P/R in an ordinary education questionnaire School SELF preserves independent native/declared blocks and freezes a repeated exact Standard source once per START",
+            "School ordinary questionnaires / concurrent first library delivery serializes two first V1 deliveries after private Scale and Form without replacing frozen identity"
+          ],
+          "expectedFiltered": [],
+          "inputClosure": {
+            "files": [
+              {
+                "path": "server-version/backend/package-lock.json",
+                "blob": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/integration/educationLibraryComposition.postgres.integration.test.ts",
+                "blob": "810445f31058d99c7c1dbcc40aa3d782d18cdcf8"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/integration/educationLibraryCompositionExecution.postgres.integration.test.ts",
+                "blob": "c05563c9abb6bc3921b56a22d89092a5c3191fc8"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/integration/educationLibraryCompositionPreview.postgres.integration.test.ts",
+                "blob": "adc00e184eae97d9993efd84fac0f37a239bda7b"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/integration/educationLibraryConcurrentDelivery.review.postgres.integration.test.ts",
+                "blob": "17bf549d2ad339063cf01b70ede39e00091c1efd"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/integration/educationPublicFormComposition.postgres.integration.test.ts",
+                "blob": "96a006af12fea9c0dcdde9dee9c959b771fe44a5"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/integration/educationPublicStandardComposition.postgres.integration.test.ts",
+                "blob": "acbf2a856928575f0f78e0f2eccbe6720a644b5e"
+              },
+              {
+                "path": "server-version/backend/vitest.config.ts",
+                "blob": "619cca9b71a3046d22f1e8bcbcf59eaea5f0b406"
+              }
+            ],
+            "sha256": "136aadd08719b878929c24dcf61905acdc007bf08d9394213eb88b1c6a06ba3c"
+          }
+        },
+        {
+          "files": [
+            "src/__tests__/integration/educationCompositionPreviewBoundary.review.postgres.integration.test.ts",
+            "src/__tests__/integration/educationLibraryNumericFreeze.review.postgres.integration.test.ts",
+            "src/__tests__/integration/educationScientificHash.postgres.integration.test.ts",
+            "src/__tests__/integration/educationToolAuthoringAccess.postgres.integration.test.ts",
+            "src/__tests__/integration/educationPublicSourceUse.postgres.integration.test.ts"
+          ],
+          "expectedPassed": [
+            "Review: public Standard content at the whole-composition preview boundary does not serialize scorer, reference policy or report internals through the alternate whole-preview endpoint",
+            "Review: approved library scientific numbers at ordinary composition freeze freezes an authorized approved Survey scale with its original fractional scores intact",
+            "Education public fixed-source use on isolated PostgreSQL issues exact non-delegable U and exposes bounded source summaries without wrappers, content copies or source rights",
+            "Education public fixed-source use on isolated PostgreSQL keeps current target, exact source/state and existing UUID-root boundaries on issuance",
+            "Education scientific source hash / structural binding separation matches the existing JS publisher bytes for fractional, signed, exponent and map-key boundaries without rounding",
+            "Education scientific source hash / structural binding separation keeps structural positions integer-only and continues rejecting forged numeric bindings",
+            "School/Teacher authoring current PostgreSQL authority allows Teacher-only entitlement and requires a separate School entitlement",
+            "School/Teacher authoring current PostgreSQL authority keeps School dependent on its persona without restricting Teacher administration or participant membership",
+            "School/Teacher authoring current PostgreSQL authority keeps School dependent on its capability without restricting Teacher administration or participant membership",
+            "School/Teacher authoring current PostgreSQL authority honors explicit * deny even for Teacher administrators",
+            "School/Teacher authoring current PostgreSQL authority honors explicit EDUCATION_ACCESS deny even for Teacher administrators",
+            "School/Teacher authoring current PostgreSQL authority honors explicit HUITEACHER_ACCESS deny even for Teacher administrators",
+            "School/Teacher authoring current PostgreSQL authority honors explicit HUITEACHER_ADMIN deny even for Teacher administrators",
+            "School/Teacher authoring current PostgreSQL authority does not replace School professional authority with administration or Teacher administration with global, organization or School roles",
+            "School/Teacher authoring current PostgreSQL authority rejects a Teacher psychology author after product administration is revoked, retaining ordinary participant membership",
+            "School/Teacher authoring current PostgreSQL authority keeps School psychology deny separate from Teacher product administration",
+            "School/Teacher authoring current PostgreSQL authority cannot combine a counselor persona here with a psychology capability in another school",
+            "School/Teacher authoring current PostgreSQL authority does not apply an unrelated School-product deny to Teacher",
+            "School/Teacher authoring current PostgreSQL authority rejects current Teacher account restrictions {\"isActive\":false}",
+            "School/Teacher authoring current PostgreSQL authority rejects current Teacher account restrictions {\"isFrozen\":true}",
+            "School/Teacher authoring current PostgreSQL authority rejects current Teacher account restrictions {\"mustChangePassword\":true}",
+            "School/Teacher authoring current PostgreSQL authority rejects current Teacher account restrictions {\"teacherApproved\":false}",
+            "School/Teacher authoring current PostgreSQL authority rejects current Teacher account restrictions {\"expiresAt\":\"2000-01-01T00:00:00.000Z\"}",
+            "School/Teacher authoring current PostgreSQL authority rejects current Teacher account restrictions {\"accountDomain\":\"SURVEY\"}",
+            "School/Teacher authoring current PostgreSQL authority rejects expired membership and cannot reuse its grants on a replacement membership",
+            "School/Teacher authoring current PostgreSQL authority does not use another school\u2019s grants or reveal its membership",
+            "School/Teacher authoring current PostgreSQL authority rejects suspended organization and product entitlement"
+          ],
+          "expectedFiltered": [],
+          "inputClosure": {
+            "files": [
+              {
+                "path": "server-version/backend/package-lock.json",
+                "blob": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/integration/educationCompositionPreviewBoundary.review.postgres.integration.test.ts",
+                "blob": "bd0e04f04ee98f26384567699f04e37b3bdd0fb2"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/integration/educationLibraryNumericFreeze.review.postgres.integration.test.ts",
+                "blob": "b6e4bbbd23a6b84fa669d94cd53f9c658ee49d75"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/integration/educationPublicSourceUse.postgres.integration.test.ts",
+                "blob": "5ff372869443f38cece3bf9d24b47f9ca4631567"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/integration/educationScientificHash.postgres.integration.test.ts",
+                "blob": "f25a5a257fb218ff270f5adf62682c096d84093a"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/integration/educationToolAuthoringAccess.postgres.integration.test.ts",
+                "blob": "d3ff6d03c3a2e23c05d8733c929df90746d45dcf"
+              },
+              {
+                "path": "server-version/backend/vitest.config.ts",
+                "blob": "619cca9b71a3046d22f1e8bcbcf59eaea5f0b406"
+              }
+            ],
+            "sha256": "7a43b625f645e483322bba0a56f65fe06f33c677352281df68c4ed203da379d5"
+          }
+        }
+      ],
+      "inputClosure": {
+        "files": [
+          {
+            "path": ".github/release-tools/package-lock.json",
+            "blob": "b7731f8e3b798e08d1693a9c7b108405d183f45e"
+          },
+          {
+            "path": ".github/release-tools/package.json",
+            "blob": "1913b93fbd582fbbd28398488e8e91d6bb9865d5"
+          },
+          {
+            "path": "server-version/scripts/ci-install-canvas-deps.sh",
+            "blob": "75e8b7f5ce24a53e1c040d105b8b757e3686f102"
+          }
+        ],
+        "trees": [
+          {
+            "path": "server-version/backend",
+            "tree": "8a5df3518f9cadd5b56a397a71de7019e9fb5b95"
+          }
+        ],
+        "sha256": "fdb8b48ff2edad80f85d1ff924a0d02291312211c726382cba1ee334c06591f1"
+      }
+    },
+    "migration": {
+      "baselineFixturePath": ".github/scripts/school-teacher-self-baseline.sql",
+      "baselineFixtureSql": "-- Isolated synthetic row-preservation fixture, exact base 9801107019d51a4af7ddb651789b674867539d24; not login or business-authorization evidence.\nBEGIN;\nINSERT INTO users (id,username,password_hash,role,account_domain,updated_at) VALUES\n('8f761e22-0000-4000-8000-000000000001','hs_migration_fixture','synthetic-not-a-login-hash','ADMIN','SCHOOL','2026-10-22T00:00:00Z');\nINSERT INTO organizations (id,name,created_by_user_id,product_domain) VALUES\n('8f761e22-0000-4000-8000-000000000002','Synthetic migration school','8f761e22-0000-4000-8000-000000000001','SCHOOL');\nINSERT INTO organization_memberships (id,organization_id,user_id,org_role) VALUES\n('8f761e22-0000-4000-8000-000000000003','8f761e22-0000-4000-8000-000000000002','8f761e22-0000-4000-8000-000000000001','ORG_ADMIN');\nINSERT INTO courses (id,title,course_code,creator_id,course_type,organization_id,status,is_library,is_recruiting,updated_at) VALUES\n('8f761e22-0000-4000-8000-000000000004','Synthetic migration preservation','school-teacher-ci-migration','8f761e22-0000-4000-8000-000000000001','CAMPUS_ACTIVITY','8f761e22-0000-4000-8000-000000000002','DRAFT',false,false,'2026-10-22T00:00:00Z');\nINSERT INTO campus_activities (course_id,organization_id,owner_membership_id,purpose) VALUES\n('8f761e22-0000-4000-8000-000000000004','8f761e22-0000-4000-8000-000000000002','8f761e22-0000-4000-8000-000000000003','STUDENT_WELLBEING');\nINSERT INTO education_private_tools(id,entry,organization_id,owner_user_id,kind,title,definition,content_hash)\nVALUES('8f761e22-0000-4000-8000-000000000005','SCHOOL','8f761e22-0000-4000-8000-000000000002','8f761e22-0000-4000-8000-000000000001','FORM','Synthetic pre-existing private Form','{\"schemaVersion\":2,\"pages\":[{\"pageKey\":\"baseline\",\"title\":\"Synthetic preserved Form\",\"questions\":[{\"itemKey\":\"note\",\"type\":\"SHORT_TEXT\",\"prompt\":\"Synthetic preserved question\",\"required\":true,\"options\":[],\"rows\":[]}]}]}'::jsonb,'8eb6dc8ff0c33f938427acde7de57da85a8796104806db7079824864b3deb47f');\nINSERT INTO education_private_tool_versions(id,tool_id,entry,organization_id,owner_user_id,kind,source_revision,title,definition,content_hash)\nSELECT '8f761e22-0000-4000-8000-000000000006',id,entry,organization_id,owner_user_id,kind,revision,title,definition,content_hash FROM education_private_tools WHERE id='8f761e22-0000-4000-8000-000000000005';\nINSERT INTO users(id,username,password_hash,role,account_domain,teacher_approved,updated_at) VALUES\n('8f761e22-0000-4000-8000-000000000007','training_migration_fixture','synthetic-not-a-login-hash','TEACHER','TRAINING',true,'2026-10-28T00:00:00Z');\nINSERT INTO composite_assessments(id,code,name,created_by,updated_at) VALUES\n('8f761e22-0000-4000-8000-000000000008','synthetic-existing-training-composite','Synthetic native Training draft','8f761e22-0000-4000-8000-000000000007','2026-10-28T00:00:00Z');\nCOMMIT;\n",
+      "baselineFixtureSha256": "d2cf14a3c9284fe7b98ec349e1b0be7298104793f6e536d6c2e08c8deb359562",
+      "preserveTables": [
+        "users",
+        "organizations",
+        "organization_memberships",
+        "courses",
+        "campus_activities",
+        "education_private_tools",
+        "education_private_tool_versions",
+        "composite_assessments"
+      ],
+      "restoreTables": [
+        "users",
+        "organizations",
+        "organization_memberships",
+        "courses",
+        "campus_activities",
+        "education_private_tools",
+        "education_private_tool_versions",
+        "measurement_content_releases",
+        "registered_assessment_resources",
+        "composite_assessments",
+        "composite_assessment_items",
+        "assessments",
+        "composite_form_answers",
+        "composite_form_section_attempts",
+        "composite_assessment_attempts",
+        "assessment_run_executions",
+        "assessment_result_facts",
+        "scale_library_submissions",
+        "scale_library_entries",
+        "scale_library_use_grants",
+        "survey_standard_releases",
+        "survey_standard_versions",
+        "survey_standard_trials"
+      ]
+    },
+    "finalized": true,
+    "auditComponents": [
+      "frontend",
+      "backend"
+    ],
+    "browserHelper": "server-version/e2e/education-self-questionnaire.cjs",
+    "continuationDecision": {
+      "previousRun": 40833644317,
+      "previousCheckout": "c6a75a7e08bad5b22e5e148c8129ee941112137e",
+      "previousSource": "cc65f8587a31cc53cb45959362013c2c2242419b",
+      "officialReuse": "NOT_SUPPORTED_BY_EXISTING_FRESH_EXECUTOR",
+      "reason": "Official legacy consumers bind PR338 and fixed run/job/build identities; fresh artifacts require current SHA/run and reject old receipts. Parameter-only substitution cannot preserve those invariants.",
+      "method": "Keep the unchanged bounded fresh jobs,117 backend cases/five batches, frontend56/41 declared filtered, migration/restore and current SAST. Ninth-run CodeQL succeeded; browser failed at the first save-and-exit resume and exited on an unhandled response-wait rejection before publishing browser.json. The actual stack points to participant162, proving initial START and first option selection had already occurred. Teacher START leaves the mounted card in its pre-START row state, while the executor read a fresh runtimeBindingRef and sought the new button label. Repair43c2ba35b waits for durable exit, reloads and verifies the same persisted parent/item/answer; it also attaches response/action rejection handling immediately. Two targeted synthetic Node executor contracts fail-before/pass-after, not application or browser qualification. No repeated old DOM/PG/local groups. The unchanged existing fresh executor does not accept arbitrary old runs or child-journey evidence. Preserve previous real outcomes and require both current complete real SELF journeys plus all selected gates; no new reuse framework."
+    }
+  },
+  "blockers": []
+}

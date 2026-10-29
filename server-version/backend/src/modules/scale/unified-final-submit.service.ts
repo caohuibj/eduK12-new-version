@@ -344,6 +344,13 @@ export const submitUnifiedScaleAssessmentFinal = async (
     input, child, { submissionId, admission, snapshot, answers, payloadHash, timing }, wholeReceipt, referenceDb)
 
   const committed = await withFinalOnlyCompletionTransaction(async (tx) => {
+    if(child.compositeAttempt?.compositeAssessment?.creationKey?.startsWith('education-composition:')){
+      // Only this new education lane needs the Run continuation fence here.
+      // Acquire org -> Run -> execution before the native child UPDATE lock;
+      // old Survey/Training finals do not gain an extra source/authority query.
+      const {assertPrivateFormFinalCurrent}=await import('../assessment-run/educationPrivateFormExecution')
+      await assertPrivateFormFinalCurrent(tx,{attemptId:child.compositeAttemptId!,actorUserId:input.userId})
+    }
     await assertCurrentStudyPrincipal(tx,{attemptId:child.compositeAttemptId,userId:input.userId,recoveryTokenHash:input.recoveryTokenHash,attemptEpoch:input.attemptEpoch,frozenHash:admission.principal.recoveryTokenHash,receipt:wholeReceipt?.studyReceipt,unit:input},true)
     const assertFlowFinal = await lockTrainingFlowFinalAdmission(tx, { attemptId: child.compositeAttemptId, parent: child.compositeAttempt, attemptEpoch: input.attemptEpoch, itemId: child.compositeItemId, sourceAttemptId: child.id, submissionId })
     const current = await tx.assessment.findUnique({

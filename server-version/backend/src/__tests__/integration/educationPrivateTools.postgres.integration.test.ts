@@ -25,6 +25,9 @@ async function actor(organizationId?:string){
  const context:PrivateToolContext={principal:{userId:user.id,accountDomain:'SCHOOL'},entry:'SCHOOL',organizationId:org}
  return {user,org,member,capability,context}
 }
+async function teacherAdmin(a:Awaited<ReturnType<typeof actor>>){
+ await db.educationProductRoleGrant.create({data:{id:randomUUID(),organizationId:a.org,membershipId:a.member.id,product:'HUITEACHER',role:'PRODUCT_ADMIN',grantedByUserId:a.user.id}})
+}
 suite('Education author-private tool API services / isolated PostgreSQL',()=>{
  beforeAll(async()=>{requireIsolatedReleaseDatabase(url!);db=new PrismaClient({datasources:{db:{url:url!}}});await db.$connect()})
  afterAll(async()=>{await db?.$disconnect()})
@@ -32,12 +35,14 @@ suite('Education author-private tool API services / isolated PostgreSQL',()=>{
   const a=await actor(),other=await actor(a.org),foreign=await actor()
   const draft=await tools.createPrivateTool(a.context,{kind:'FORM',title:'Private'})
   expect((await tools.listPrivateTools(a.context)).list.map(x=>x.id)).toContain(draft.id)
+  await expect(createHuiteacherForm({organizationId:a.org,actorUserId:a.user.id,title:'Not product admin'})).rejects.toThrow('MANAGER_REQUIRED')
+  await expect(tools.listPrivateTools({...a.context,entry:'TEACHER'})).rejects.toThrow('PRIVATE_TOOL_AUTHOR_REQUIRED')
+  await teacherAdmin(a)
   for(const context of [other.context,foreign.context,{...a.context,entry:'TEACHER' as const}]){
    expect((await tools.listPrivateTools(context)).list.map(x=>x.id)).not.toContain(draft.id)
    await expect(tools.readPrivateTool(context,draft.id)).rejects.toThrow('NOT_FOUND')
    await expect(tools.updatePrivateTool(context,draft.id,{expectedRevision:1,title:'Hijack',definition:form})).rejects.toThrow('NOT_FOUND')
   }
-  await expect(createHuiteacherForm({organizationId:a.org,actorUserId:a.user.id,title:'Not product admin'})).rejects.toThrow('MANAGER_REQUIRED')
   const teacher=await tools.createPrivateTool({...a.context,entry:'TEACHER'},{kind:'SCALE',title:'Teacher private'})
   expect(teacher).toMatchObject({entry:'TEACHER',visibility:'AUTHOR_PRIVATE',canPublish:false,canShare:false})
   expect((await tools.validatePrivateTool({...a.context,entry:'TEACHER'},teacher.id)).valid).toBe(false)
@@ -137,6 +142,7 @@ suite('Education author-private tool API services / isolated PostgreSQL',()=>{
   await media.registerPrivateToolImage(a.context,draft.id,reference)
   expect((await media.listPrivateToolImages(a.context,draft.id)).assets.map(x=>x.assetId)).toContain(id)
   expect(await media.readPrivateToolImage(a.context,draft.id,id)).toEqual(reference)
+  await teacherAdmin(a)
   for(const context of [other.context,foreign.context,{...a.context,entry:'TEACHER' as const}]){
    await expect(media.listPrivateToolImages(context,draft.id)).rejects.toThrow('NOT_FOUND')
    await expect(media.readPrivateToolImage(context,draft.id,id)).rejects.toThrow('NOT_FOUND')
@@ -160,6 +166,7 @@ suite('Education author-private tool API services / isolated PostgreSQL',()=>{
   const version=await tools.freezePrivateTool(a.context,draft.id,{expectedRevision:saved.revision,expectedContentHash:saved.contentHash})
   expect((await media.listPrivateToolMaterials(a.context,draft.id,{kind:'all',page:1})).list).toContainEqual(expect.objectContaining({id:ref.assetId,mimeType}))
   expect(await db.assetReference.count({where:{entityType:'EducationPrivateToolVersion',entityId:version.id,field:'stimuli',assetId:ref.assetId}})).toBe(1)
+  await teacherAdmin(a)
   for(const context of [other.context,foreign.context,{...a.context,entry:'TEACHER' as const}]){
    await expect(media.listPrivateToolMaterials(context,draft.id,{})).rejects.toThrow('NOT_FOUND')
    await expect(media.readPrivateToolImage(context,draft.id,ref.assetId)).rejects.toThrow('NOT_FOUND')

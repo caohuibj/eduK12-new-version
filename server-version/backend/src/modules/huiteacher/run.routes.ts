@@ -1,5 +1,5 @@
 import { RELATIONAL_RESOURCE_KINDS } from '../assessment-relational/types'
-import {privateToolRunTrackInput} from '../education-tools/private-tool.run-contract'
+import {educationPrivateRunTrackInput} from '../education-tools/private-tool.run-contract'
 import {listEducationAssessmentResources} from '../education-tools/assessment-resource.catalog'
 import { Router } from 'express'
 import { z,ZodError } from 'zod'
@@ -8,7 +8,7 @@ import { authenticateHuiteacher } from '../../middleware/auth'
 import { success } from '../../utils/response'
 import { requireTeacherProductAdmin,requireRecentTeacherMfa } from './authority'
 import {
-  HuiteacherRunError,addTeacherRunTrack,addTeacherPrivateRunTrack,addTeacherPrivateFormRunTrack,previewTeacherRun,publishTeacherRun,
+  HuiteacherRunError,addTeacherRunTrack,addTeacherPrivateRunTrack,addTeacherPrivateFormRunTrack,addTeacherPrivateCompositionRunTrack,previewTeacherRun,publishTeacherRun,
   progressTeacherRun,closeTeacherRun,cancelTeacherRun,listTeacherAvailableScales,
 } from './run.service'
 
@@ -79,9 +79,9 @@ router.get(base+'/released-scales',authenticateHuiteacher,requireTeacherProductA
 router.post(base+'/tracks',authenticateHuiteacher,requireTeacherProductAdmin,
   wrap(async(req,res)=>{
     const scope={...keys.parse(req.params),actorUserId:req.user!.userId}
-    if(req.body&&(Object.prototype.hasOwnProperty.call(req.body,'privateScale')||Object.prototype.hasOwnProperty.call(req.body,'privateForm'))){
-      const selected=privateToolRunTrackInput.parse(req.body)
-      return success(res,await ('privateForm' in selected?addTeacherPrivateFormRunTrack:addTeacherPrivateRunTrack)(scope,selected))
+    if(req.body&&['privateScale','privateForm','privateComposition'].some(key=>Object.prototype.hasOwnProperty.call(req.body,key))){
+      const selected=educationPrivateRunTrackInput.parse(req.body)
+      return success(res,await ('privateComposition' in selected?addTeacherPrivateCompositionRunTrack:'privateForm' in selected?addTeacherPrivateFormRunTrack:addTeacherPrivateRunTrack)(scope,selected))
     }
     return success(res,await addTeacherRunTrack({...scope,...track.parse(req.body)}))
   }))

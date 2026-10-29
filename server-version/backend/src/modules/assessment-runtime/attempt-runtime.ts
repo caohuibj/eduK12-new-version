@@ -24,6 +24,8 @@ type FormSlotInput = {
   definitionHash: string
 }
 
+export type EducationSlotPresentation={blockId:string;instruction?:string}
+
 type SituationalSlotInput = FrozenSituationalRuntimeIdentityV1 & {
   compositeItemId: string
 }
@@ -133,6 +135,9 @@ export const freezeCompositeActiveSlotSet = (input: {
   cognitive: CognitiveSlotInput[]
   formSections: FormSlotInput[]
   situational?: SituationalSlotInput[]
+  /** Ordinary education source order, frozen once without altering its source. */
+  unitOrder?: ReadonlyMap<string,number>
+  unitPresentation?: ReadonlyMap<string,EducationSlotPresentation>
 }): FrozenActiveSlotSetV1 => createFrozenActiveSlotSet({
   schemaVersion: 1,
   runtimeGeneration: 'UNIFIED_V1',
@@ -142,8 +147,27 @@ export const freezeCompositeActiveSlotSet = (input: {
     ...input.cognitive.map(cognitiveSlot),
     ...input.formSections.map(formSlot),
     ...(input.situational ?? []).map(situationalSlot),
-  ].sort(compareSlotKeys),
+  ].sort(compareSlotKeys).map(slot=>{
+    if(!input.unitOrder)return slot
+    const order=input.unitOrder.get(slot.slotKey)
+    if(order===undefined)throw new Error('Education composition slot order is incomplete')
+    const presentation=input.unitPresentation?.get(slot.slotKey)
+    if(input.unitPresentation&&!presentation)throw new Error('Education composition slot presentation is incomplete')
+    return {...slot,sourceBinding:{...slot.sourceBinding,educationOrder:order,
+      ...(presentation?{educationBlockId:presentation.blockId,
+        ...(presentation.instruction?{educationInstruction:presentation.instruction}:{})}:{})}}
+  }),
 })
+
+/** Already verified frozen slots only. One instruction per block, even when a
+ * Form spans many pages; no source lookup, draft read or duplicate text copy. */
+export function frozenEducationBlockInstruction(slots:readonly FrozenActiveSlotV1[],slotKey:string):string|undefined{
+ const blockId=slots.find(slot=>slot.slotKey===slotKey)?.sourceBinding.educationBlockId
+ if(typeof blockId!=='string')return undefined
+ const value=slots.find(slot=>slot.sourceBinding.educationBlockId===blockId&&typeof slot.sourceBinding.educationInstruction==='string')
+  ?.sourceBinding.educationInstruction
+ return typeof value==='string'&&value.length?value:undefined
+}
 
 export const sourceDefinitionHashForScale = (definition: unknown): string => canonicalHash(definition)
 

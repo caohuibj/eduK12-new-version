@@ -1,4 +1,6 @@
-import {readVerifiedEducationStart,bindVerifiedEducationAttempt,type VerifiedEducationStart,type VerifiedEducationAttempt} from '../assessment-run/education-start-context'
+import {readEducationStandardStartSources} from '../education-tools/public-source.standard'
+import {freezeExactStandardScaleDefinition} from './training-standard-combination'
+import {readVerifiedEducationStart,readVerifiedCompositionStart,bindVerifiedEducationAttempt,type VerifiedEducationStart,type VerifiedEducationAttempt} from '../assessment-run/education-start-context'
 import {resolveEducationAssessmentSituationalItems} from '../education-tools/assessment-resource.source'
 import { emptyOptionalReportRelations, OPTIONAL_REPORT_RELATION_COUNTS } from './composite-report-read-plan'
 import { lockAuthenticatedAdmission } from './authenticated-admission-lock'
@@ -189,6 +191,7 @@ import {
 import {
   formSectionIdentityHash,
   freezeCompositeActiveSlotSet,
+  frozenEducationBlockInstruction,
 } from '../assessment-runtime/attempt-runtime'
 import {
   loadFrozenScaleRuntimeSnapshot,
@@ -288,6 +291,8 @@ const loadComposite = async (id: string, includeItems = false, db: Db = prisma) 
                     instruction: true,
                     instrumentClass: true,
                     instrumentVersion: true,
+                    libraryEntryId: true,
+                    measurementReleaseId: true,
                     definition: true,
                   },
                 },
@@ -2713,6 +2718,8 @@ const createAttempt = async (
 ) => {
   assertSupportedComposite(composite)
   const educationProduct=educationStart?readVerifiedEducationStart(educationStart,{tx:db,compositeId:composite.id,assignmentRef:relationalIdentity?.assignmentRef??'',respondentUserId:userId??''}):undefined
+  const educationComposition=readVerifiedCompositionStart(educationStart,{tx:db,compositeId:composite.id,
+    assignmentRef:relationalIdentity?.assignmentRef??'',respondentUserId:userId??''})
   if(educationProduct&&(composite.productKind!=='ORGANIZATION_RESOURCE'||!relationalIdentity||relationalIdentity.subjectUserId!==userId||relationalIdentity.respondentUserId!==userId))throw compositeForbidden('教育测评准入上下文不匹配')
   // Parent START and publication stop/archive serialize on the same row. Child
   // progression later consumes the already-admitted immutable runtime plan.
@@ -2726,11 +2733,13 @@ const createAttempt = async (
   let feedbackBinding: TrainingFeedbackBinding | null = null
   let persistenceBinding: { publicationIdentity: Record<string, unknown>; courseId: string; roundId: string | null; cutoffs: Array<Date | null> } | null = null
   if(composite.items.some((item:any)=>item.formPolicy!=null) && (composite.productKind!=='QUESTIONNAIRE' || composite.deliveryMode==='LEGACY' || relationalIdentity || composite.reportPackageKey || composite.analysisProtocolKey)) {
-    if(composite.productKind!=='ORGANIZATION_RESOURCE'||!composite.creationKey?.startsWith('private-form:')||!relationalIdentity||!userId
+    if(composite.productKind!=='ORGANIZATION_RESOURCE'||!(educationComposition||composite.creationKey?.startsWith('private-form:'))||!relationalIdentity||!userId
       ||composite.deliveryMode==='LEGACY'||composite.reportPackageKey||composite.analysisProtocolKey)
       throw compositeBadRequest('Form V3 只支持普通问卷的统一 FINAL 运行时')
-    const {readPrivateFormExecutionSource}=await import('../assessment-run/educationPrivateFormExecution')
-    await readPrivateFormExecutionSource(db as Prisma.TransactionClient,{assignmentRef:relationalIdentity.assignmentRef,compositeId:composite.id,actorUserId:userId})
+    if(!educationComposition){
+      const {readPrivateFormExecutionSource}=await import('../assessment-run/educationPrivateFormExecution')
+      await readPrivateFormExecutionSource(db as Prisma.TransactionClient,{assignmentRef:relationalIdentity.assignmentRef,compositeId:composite.id,actorUserId:userId})
+    }
   }
   if (['QUESTIONNAIRE', 'ASSESSMENT_BUNDLE'].includes(composite.productKind)) {
     // A shared publication lock still fences archive, while independent
@@ -2839,7 +2848,11 @@ const createAttempt = async (
   }
   const variantEnabled = composite.trainingVariantFrozen != null || composite.trainingVariantDraft != null || composite.trainingVariantDigest != null
   const hasStandardCombinations=composite.items.some((item:any)=>item.standardCombinationSource!=null)
-  const prepared: PreparedVariantRuntimes | undefined = (variantEnabled||flowEnabled||hasStandardCombinations) ? { scales:new Map(), cognitive:new Map(), assignments:new Map() } : undefined
+  const educationStandardUnits=educationComposition?(composite.trainingContentSnapshot as import('./training-content-binding').TrainingContentSnapshot).units.filter(unit=>unit.source.educationStandard):[]
+  const educationLibraryUnits=educationComposition?(composite.trainingContentSnapshot as import('./training-content-binding').TrainingContentSnapshot).units.filter(unit=>unit.source.educationLibrary):[]
+  const educationStandards=await readEducationStandardStartSources(db as Prisma.TransactionClient,educationStandardUnits,composite.items.filter((item:any)=>item.type==='SCALE').map((item:any)=>item.scale))
+  const educationFrozenScales=new Map<string,Awaited<ReturnType<typeof freezeExactStandardScaleDefinition>>>()
+  const prepared: PreparedVariantRuntimes | undefined = (variantEnabled||flowEnabled||hasStandardCombinations||educationStandardUnits.length>0||educationLibraryUnits.length>0) ? { scales:new Map(), cognitive:new Map(), assignments:new Map() } : undefined
   if (variantEnabled && relationalIdentity) throw compositeBadRequest('概率分卷不支持关系测评投放')
   if (variantEnabled || flowEnabled) {
     if(variantEnabled)await assertTrainingVariantAuthoringScope(db as any, composite)
@@ -2866,7 +2879,35 @@ const createAttempt = async (
   if (prepared) {
     try {
     for (const item of composite.items) {
-      if (item.type === 'SCALE'&&item.standardCombinationSource!=null)prepared.scales.set(item.id,await freezeTrainingStandardScaleRuntime(db as Prisma.TransactionClient,
+      const educationUnit=educationStandardUnits.find(unit=>unit.itemId===item.id)
+      const libraryUnit=educationLibraryUnits.find(unit=>unit.itemId===item.id)
+      if(educationUnit){
+        const source=educationStandards.get(educationUnit.source.educationStandard!.releaseId)
+        if(!source)throw compositeForbidden('教育标准量表固定版本不一致')
+        const sourceId=educationUnit.source.educationStandard!.releaseId
+        let runtime=educationFrozenScales.get(sourceId)
+        if(!runtime){runtime=await freezeExactStandardScaleDefinition(db as Prisma.TransactionClient,source);educationFrozenScales.set(sourceId,runtime)}
+        if(runtime.sourceDefinitionHash!==educationUnit.source.educationStandard!.nativeDefinitionHash)throw compositeForbidden('教育标准量表冻结内容不一致')
+        prepared.scales.set(item.id,runtime)
+      }
+      else if(libraryUnit){
+        const source=libraryUnit.source.educationLibrary!,key='library:'+source.entryId
+        if(item.type!=='SCALE'||item.scaleId!==libraryUnit.source.id||item.scale.libraryEntryId!==source.entryId||item.scale.creatorId!==libraryUnit.source.ownerId
+          ||item.scale.measurementReleaseId!==libraryUnit.measurement.releaseId)
+          throw compositeForbidden('教育共用量表固定身份不一致')
+        let runtime=educationFrozenScales.get(key)
+        if(!runtime){
+          runtime=await freezeScaleRuntimeAtAttemptStart(db,{instrumentKey:item.scale.code,instrumentVersion:item.scale.instrumentVersion,
+            definition:frozenDatabaseScaleDefinition(item.scale),requestedMode:'COMPOSITE',instruction:resolveFrozenScaleInstructionForScale(item.scale),
+            sealedLibraryPresentation:{entryId:source.entryId,sourceDefinitionHash:source.nativeDefinitionHash,
+              presentation:{releaseId:libraryUnit.measurement.releaseId,contentHash:libraryUnit.measurement.contentHash,
+                presentationMode:source.presentationMode==='ALL_AT_ONCE'?'ALL_AT_ONCE':'ONE_BY_ONE'}}})
+          educationFrozenScales.set(key,runtime)
+        }
+        if(runtime.sourceDefinitionHash!==source.nativeDefinitionHash)throw compositeForbidden('教育共用量表冻结内容不一致')
+        prepared.scales.set(item.id,runtime)
+      }
+      else if (item.type === 'SCALE'&&item.standardCombinationSource!=null)prepared.scales.set(item.id,await freezeTrainingStandardScaleRuntime(db as Prisma.TransactionClient,
         await verifyStoredTrainingStandardItem(db as Prisma.TransactionClient,composite,item,'COLLECTION')))
       else if (item.type === 'SCALE') prepared.scales.set(item.id, await freezeScaleRuntimeAtAttemptStart(db, {
         instrumentKey:item.scale.code,instrumentVersion:item.scale.instrumentVersion,
@@ -2930,7 +2971,7 @@ const createAttempt = async (
   const contentCandidate=await prepareTrainingContentAttemptBinding(db as Prisma.TransactionClient,{
     compositeId:composite.id,attemptId:newAttemptId,epoch:attemptEpoch,
     snapshot:composite.trainingContentSnapshot,snapshotHash:composite.trainingContentSnapshotHash,
-    composite,resolvedSituational:situationalReleases,
+    composite,resolvedSituational:situationalReleases,educationComposition,
   })
   let variantAllocation: ReturnType<typeof createWeightedVariantAllocation> | null = null
   if (variantEnabled) {
@@ -3036,6 +3077,8 @@ const createAttempt = async (
   if (finalOnly) {
     const frozenActiveSlotSet = freezeCompositeActiveSlotSet({
       attemptEpoch,
+      unitOrder:contentCandidate&&'educationUnitOrder' in contentCandidate?contentCandidate.educationUnitOrder:undefined,
+      unitPresentation:contentCandidate&&'educationUnitPresentation' in contentCandidate?contentCandidate.educationUnitPresentation:undefined,
       scales: runtime.scales,
       cognitive: runtime.cognitive,
       situational: runtime.situational,
@@ -3917,7 +3960,11 @@ const getUnifiedCompositeAttemptState = async (
       .filter((item: any) => item.type !== 'FORM' && item.required)
       .map((item: any) => ({ id: item.id, type: item.type, position: item.position, required: item.required, item })),
     ...sections.map((section: any) => ({ id: section.id, type: 'FORM_SECTION', position: section.position, required: true, section })),
-  ].sort((left: any, right: any) => left.position - right.position || left.id.localeCompare(right.id))
+  ].sort((left: any, right: any) => {
+    const key=(unit:any)=>unit.type==='FORM_SECTION'?formSectionSlotKey(unit.id):compositeItemSlotKey(unit.id,unit.type)
+    const l=slotsByKey.get(key(left))?.sourceBinding.educationOrder,r=slotsByKey.get(key(right))?.sourceBinding.educationOrder
+    return typeof l==='number'&&typeof r==='number'?l-r:left.position-right.position||left.id.localeCompare(right.id)
+  })
   const unitCompleted = (unit: any) => unit.type === 'FORM_SECTION'
     ? completedSlot(formSectionSlotKey(unit.id))
     : completedItem(unit.item)
@@ -4098,6 +4145,11 @@ const getUnifiedCompositeAttemptState = async (
     }
   }
 
+  if(currentItem&&currentUnit){
+    const key=currentUnit.type==='FORM_SECTION'?formSectionSlotKey(currentUnit.id):compositeItemSlotKey(currentUnit.id,currentUnit.type)
+    const instruction=frozenEducationBlockInstruction(frozenSlotSet.slots,key)
+    if(instruction)currentItem.questionnaireInstruction=instruction
+  }
   const definitionHash = computeSubmissionPayloadHash({
     assessmentId: attempt.compositeAssessment.id,
     items: attempt.compositeAssessment.items.map((item: any) => ({ id: item.id, type: item.type, position: item.position, formSectionId: item.formSectionId ?? null })),
