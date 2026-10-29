@@ -9,7 +9,7 @@
 - R1/R2 修复及增强回归已在 ff528cafa；9fa 又扩展了展示白名单的 SQL 投影。需核对最终原件及消费输入，再决定哪些证据仍有效。本线未重复诊断或重跑它们。
 - B 两项修复及 privacy fixture 已在固定父链；8756addf5 与 c55d6d721 的八控制 patch-id 完全相同。本轮无 CI 控制输入变化，八项控制及已有 UI 本地结果不重跑。
 - R3：原 53193a894 的真实 FAIL 保留；799066638 只转入其独立测试。新 forward migration 保留原结构整数编码，只有两个完整科学定义摘要调用改用专用编码；没有修改既有迁移或科学分值。
-- 本线定向结果：原批准小数来源冻结、JS/PG 编码边界、结构整数约束共 3 PASS；既有库伪造描述符案例 1 PASS（其余 2 个未选中）；受同一新摘要调用点影响的 Standard School 案例 1 PASS。两份新测试的消费类型 PASS。未进行前后端构建、浏览器或正式 CI。
+- 本线定向结果：原批准小数来源冻结、JS/PG 编码边界、结构整数约束共 3 PASS；既有库伪造描述符案例 1 PASS（其余 2 个未选中）；受同一新摘要调用点影响的 Standard School 案例 1 PASS。两份新测试的消费类型 PASS。独立 review 的跨预览叶迟到响应、跨入口/账号迟到预览两例未在固定候选中集成；本线只补入这两例，当前消费者下 2 PASS，新增文件消费类型 PASS。未进行前后端构建、浏览器或正式 CI。
 - 新迁移最初使用保留字 leading 的本地语法失败已保留，改为 leading_count 后只续应用该未提交迁移。Standard 首次因缺合成校园 HMAC key 在夹具阶段失败；补明确隔离测试环境后才通过，保留首错。
 
 ## DOT 复核的所选行为集合
@@ -20,7 +20,7 @@
 2. 私有完整能力与受众：`integration/educationPrivateCompositionPublication.postgres.integration.test.ts`、`integration/educationPrivateCompositionExecution.postgres.integration.test.ts`、`integration/educationSchoolCompositionExecution.postgres.integration.test.ts`。
 3. 获授权来源：`integration/educationPublicFormComposition.postgres.integration.test.ts`、`integration/educationPublicStandardComposition.postgres.integration.test.ts`、`integration/educationLibraryComposition.postgres.integration.test.ts`、`integration/educationLibraryCompositionExecution.postgres.integration.test.ts`、`integration/educationLibraryCompositionPreview.postgres.integration.test.ts`。
 4. 已知边界：`integration/educationCompositionPreviewBoundary.review.postgres.integration.test.ts`、`huiteacher/assessment-runtime-composition-page.review.test.ts`、`integration/educationLibraryNumericFreeze.review.postgres.integration.test.ts`、`integration/educationScientificHash.postgres.integration.test.ts`。上述路径均相对 backend `src/__tests__/`。
-5. UI：按原 A/B 已交付的精确用例/输入接纳；当前差异中的共享 Studio、公共来源/库选择、School/Teacher 消费和反馈，以及 B 两管理页的原有定向测试。原件未到本节点的状态为 UNKNOWN，不把父线口头通过当成正式接纳。只补真实缺失或输入变化失效的断言。
+5. UI：新增 `components/education-tools/EducationCompositionPreviewBoundary.review.test.tsx` 的两条不同预览边界；按原 A/B 已交付的精确用例/输入接纳；当前差异中的共享 Studio、公共来源/库选择、School/Teacher 消费和反馈，以及 B 两管理页的原有定向测试。原件未到本节点的状态为 UNKNOWN，不把父线口头通过当成正式接纳。只补真实缺失或输入变化失效的断言。
 
 ## 执行接线与预算
 
