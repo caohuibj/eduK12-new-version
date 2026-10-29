@@ -16,7 +16,7 @@ env:
   GH_TOKEN: ${{ github.token }}
 jobs:
   admission:
-    if: github.event_name == 'pull_request' && github.event.pull_request.draft == false && github.event.pull_request.head.repo.full_name == github.repository
+    if: github.event_name == 'pull_request' && (github.event.pull_request.draft == false || (fromJSON(inputs.plan).candidate == 'native-bundle' && fromJSON(inputs.plan).preflightOnly == true)) && github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
@@ -33,7 +33,7 @@ jobs:
       - name: authenticate frozen scope and all configured source inputs
         run: node .github/scripts/school-teacher-checks.mjs admission
       - name: verify legacy candidate control contracts
-        if: fromJSON(inputs.plan).candidate != 'education-self'
+        if: fromJSON(inputs.plan).candidate != 'education-self' && fromJSON(inputs.plan).candidate != 'native-bundle'
         run: |
           node --test .github/scripts/school-teacher-fresh.test.mjs .github/scripts/school-teacher-restore.test.mjs server-version/e2e/school-teacher-theme-settle.test.cjs
           node --test --test-name-pattern='complete exact-source report' server-version/e2e/school-teacher-ui.test.cjs
@@ -48,6 +48,7 @@ jobs:
           if-no-files-found: error
           retention-days: 3
   frontend:
+    if: fromJSON(inputs.plan).preflightOnly != true
     needs: admission
     runs-on: ubuntu-24.04
     timeout-minutes: 12
@@ -89,11 +90,20 @@ jobs:
           path: school-teacher-evidence/*.json
           if-no-files-found: error
           retention-days: 3
+      - uses: actions/upload-artifact@v4
+        if: fromJSON(inputs.plan).candidate == 'native-bundle'
+        with:
+          name: school-teacher-native-frontend-context-${{ github.sha }}
+          path: |
+            school-teacher-evidence/frontend-runtime.tar.gz
+            school-teacher-evidence/frontend-runtime-context.json
+          if-no-files-found: error
+          retention-days: 3
       - name: remove private diagnostics
         if: always()
         run: node .github/scripts/school-teacher-checks.mjs cleanup
   connected:
-    if: fromJSON(inputs.plan).candidate != 'education-self'
+    if: fromJSON(inputs.plan).candidate != 'education-self' && fromJSON(inputs.plan).candidate != 'native-bundle'
     needs: [admission, frontend]
     runs-on: ubuntu-24.04
     timeout-minutes: 30
@@ -131,10 +141,10 @@ jobs:
           node-version: '24.21.0'
       - name: bind disposable endpoints after service initialization
         env:
-          DATABASE_URL: postgresql://ptool:synthetic-actions-disposable@127.0.0.1:${{ job.services.postgres.ports[5432] }}/school_teacher_browser_ci_test?schema=public&connection_limit=10
-          SCHOOL_TEACHER_TEST_DATABASE_URL: postgresql://ptool:synthetic-actions-disposable@127.0.0.1:${{ job.services.postgres.ports[5432] }}/school_teacher_browser_ci_test?schema=public&connection_limit=10
-          RELEASE_INTEGRATION_DATABASE_URL: postgresql://ptool:synthetic-actions-disposable@127.0.0.1:${{ job.services.postgres.ports[5432] }}/school_teacher_browser_ci_test?schema=public&connection_limit=10
-          REDIS_URL: redis://127.0.0.1:${{ job.services.redis.ports[6379] }}/0
+          DATABASE_URL: postgresql://ptool:synthetic-actions-disposable@127.0.0.1:${{ job.services.postgres.ports['5432'] }}/school_teacher_browser_ci_test?schema=public&connection_limit=10
+          SCHOOL_TEACHER_TEST_DATABASE_URL: postgresql://ptool:synthetic-actions-disposable@127.0.0.1:${{ job.services.postgres.ports['5432'] }}/school_teacher_browser_ci_test?schema=public&connection_limit=10
+          RELEASE_INTEGRATION_DATABASE_URL: postgresql://ptool:synthetic-actions-disposable@127.0.0.1:${{ job.services.postgres.ports['5432'] }}/school_teacher_browser_ci_test?schema=public&connection_limit=10
+          REDIS_URL: redis://127.0.0.1:${{ job.services.redis.ports['6379'] }}/0
           CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
           SCHOOL_TEACHER_PRIVATE_DIR: ${{ runner.temp }}/school-teacher-private
         run: |
@@ -207,7 +217,7 @@ jobs:
           retention-days: 3
   backend-self:
     needs: admission
-    if: fromJSON(inputs.plan).candidate == 'education-self'
+    if: fromJSON(inputs.plan).candidate == 'education-self' || (fromJSON(inputs.plan).candidate == 'native-bundle' && fromJSON(inputs.plan).preflightOnly != true)
     runs-on: ubuntu-24.04
     timeout-minutes: 12
     env:
@@ -246,6 +256,15 @@ jobs:
       with:
         name: school-teacher-backend-checks-${{ github.sha }}
         path: school-teacher-evidence/*.json
+        if-no-files-found: error
+        retention-days: 3
+    - uses: actions/upload-artifact@v4
+      if: fromJSON(inputs.plan).candidate == 'native-bundle'
+      with:
+        name: school-teacher-native-backend-context-${{ github.sha }}
+        path: |
+          school-teacher-evidence/backend-runtime.tar.gz
+          school-teacher-evidence/backend-runtime-context.json
         if-no-files-found: error
         retention-days: 3
     - name: remove private test material on every outcome
@@ -322,12 +341,12 @@ jobs:
         node-version: 24.21.0
     - name: bind disposable endpoints after service initialization
       env:
-        DATABASE_URL: postgresql://ptool:synthetic-actions-disposable@127.0.0.1:${{ job.services.postgres.ports[5432] }}/school_teacher_browser_ci_test?schema=public&connection_limit=10
-        SCHOOL_TEACHER_TEST_DATABASE_URL: postgresql://ptool:synthetic-actions-disposable@127.0.0.1:${{ job.services.postgres.ports[5432]
+        DATABASE_URL: postgresql://ptool:synthetic-actions-disposable@127.0.0.1:${{ job.services.postgres.ports['5432'] }}/school_teacher_browser_ci_test?schema=public&connection_limit=10
+        SCHOOL_TEACHER_TEST_DATABASE_URL: postgresql://ptool:synthetic-actions-disposable@127.0.0.1:${{ job.services.postgres.ports['5432']
           }}/school_teacher_browser_ci_test?schema=public&connection_limit=10
-        RELEASE_INTEGRATION_DATABASE_URL: postgresql://ptool:synthetic-actions-disposable@127.0.0.1:${{ job.services.postgres.ports[5432]
+        RELEASE_INTEGRATION_DATABASE_URL: postgresql://ptool:synthetic-actions-disposable@127.0.0.1:${{ job.services.postgres.ports['5432']
           }}/school_teacher_browser_ci_test?schema=public&connection_limit=10
-        REDIS_URL: redis://127.0.0.1:${{ job.services.redis.ports[6379] }}/0
+        REDIS_URL: redis://127.0.0.1:${{ job.services.redis.ports['6379'] }}/0
         CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
         SCHOOL_TEACHER_PRIVATE_DIR: ${{ runner.temp }}/school-teacher-private
       run: |
@@ -400,6 +419,7 @@ jobs:
         retention-days: 3
 
   security:
+    if: fromJSON(inputs.plan).preflightOnly != true
     needs: admission
     runs-on: ubuntu-24.04
     timeout-minutes: 8
@@ -425,8 +445,70 @@ jobs:
           retention-days: 3
       - if: always()
         run: node .github/scripts/school-teacher-checks.mjs cleanup
+  native-evidence:
+    if: fromJSON(inputs.plan).candidate == 'native-bundle' && fromJSON(inputs.plan).preflightOnly != true
+    needs: admission
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: refuse unreviewed original application assertions
+        run: node .github/scripts/school-teacher-checks.mjs native-evidence
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: school-teacher-native-evidence-${{ github.sha }}
+          path: school-teacher-evidence/*.json
+          if-no-files-found: error
+          retention-days: 3
+      - if: always()
+        run: node .github/scripts/school-teacher-checks.mjs cleanup
+  native-runtime:
+    if: fromJSON(inputs.plan).candidate == 'native-bundle' && fromJSON(inputs.plan).preflightOnly != true
+    needs: [admission, frontend, backend-self]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - uses: actions/download-artifact@v4
+        with:
+          name: school-teacher-native-frontend-context-${{ github.sha }}
+          path: native-runtime-inputs/frontend
+      - uses: actions/download-artifact@v4
+        with:
+          name: school-teacher-native-backend-context-${{ github.sha }}
+          path: native-runtime-inputs/backend
+      - uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514
+        with:
+          version: v0.70.0
+          cache: false
+      - name: package the same compiled bytes and scan actual runtime images
+        env:
+          TRIVY_CACHE_DIR: ${{ runner.temp }}/native-trivy-cache
+        run: node .github/scripts/school-teacher-checks.mjs native-runtime
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: school-teacher-native-runtime-${{ github.sha }}
+          path: school-teacher-evidence/*.json
+          if-no-files-found: error
+          retention-days: 3
+      - if: always()
+        run: node .github/scripts/school-teacher-checks.mjs cleanup
   qualified:
-    needs: [admission, frontend, connected, backend-self, postgres-self, browser-self, security]
+    needs: [admission, frontend, connected, backend-self, postgres-self, browser-self, native-evidence, native-runtime, security]
     if: always()
     runs-on: ubuntu-24.04
     timeout-minutes: 5

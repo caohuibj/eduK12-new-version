@@ -2826,11 +2826,14 @@ const createAttempt = async (
       studentId: userId, courseId: composite.productKind === 'QUESTIONNAIRE' ? composite.deliveryCourseId : composite.courseId, status: { in: ['ACTIVE', 'APPROVED'] }, course: { isLibrary: false,...(composite.trainingTimingPolicy?{courseType:'TRAINING_COURSE'}:{}) },
     } })) throw compositeForbidden('不是问卷投放课程的有效学生')
   }
-  if (composite.productKind === 'ASSESSMENT_BUNDLE') {
-    const instance = await db.bundleInstance.findUniqueOrThrow({ where: { compositeId: composite.id } })
-    const { readInstance } = await import('../bundle-product/service')
-    const frozen = readInstance(instance).frozen
-    if (frozen.declarativePackage) await (await import('../bundle-product/package-release')).assertPackageAdmission(db, frozen.declarativePackage)
+  const nativeBundleInstance = composite.productKind === 'ASSESSMENT_BUNDLE'
+    ? await db.bundleInstance.findUniqueOrThrow({where:{compositeId:composite.id}})
+    : composite.productKind === 'ORGANIZATION_RESOURCE' && composite.creationKey?.startsWith('education-assessment:')
+    ? await db.bundleInstance.findUnique({where:{compositeId:composite.id}}) : null
+  if(nativeBundleInstance){
+    const {readInstance}=await import('../bundle-product/service')
+    const frozen=readInstance(nativeBundleInstance).frozen
+    if(frozen.declarativePackage)await (await import('../bundle-product/package-release')).assertPackageAdmission(db,frozen.declarativePackage)
   }
   const finalOnly = composite.deliveryMode !== 'LEGACY'
   let formSections = finalOnly ? (composite.formSections ?? []) : []
@@ -2848,7 +2851,7 @@ const createAttempt = async (
     || packageSnapshot.packageVersion !== composite.reportPackageVersion
     || packageSnapshot.profile !== composite.reportPackageProfile
   )) throw compositeBadRequest('综合测评报告包实例与冻结快照不匹配')
-  const bundleRuntimeHash = composite.productKind === 'ASSESSMENT_BUNDLE'
+  const bundleRuntimeHash = nativeBundleInstance
     ? await (await import('../bundle-product/runtime')).compiledHashForInstance(db, composite.id)
     : null
   const flowEnabled = composite.trainingFlowFrozen!=null||composite.trainingFlowDraft!=null||composite.trainingFlowDigest!=null
@@ -4649,7 +4652,7 @@ export const finalizeCompositeAttemptIfReady = async (attemptId: string, options
   } else {
     result = await finalizeCompositeAttemptFinalOnlyIfReady(attemptId)
   }
-  if (result?.status === 'COMPLETED' && route?.status !== 'COMPLETED' && route?.compositeAssessment?.productKind === 'ASSESSMENT_BUNDLE') {
+  if (result?.status === 'COMPLETED' && ((route?.status !== 'COMPLETED' && route?.compositeAssessment?.productKind === 'ASSESSMENT_BUNDLE') || (route?.compositeAssessment?.productKind === 'ORGANIZATION_RESOURCE' && route.compiledBundleRuntimeHash!==null))) {
     await (await import('../bundle-product/analysis')).processInitial(attemptId)
   }
   // The canonical runtime commits first. Reconcile outside its transaction to

@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "contextDefinitionKey": "learning_motivation_math_context",
+  "contextDefinitionVersion": "0.1.0",
+  "fields": [
+    {
+      "contextKey": "grade_level",
+      "required": true,
+      "valueType": "number"
+    }
+  ]
+}

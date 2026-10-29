@@ -58,6 +58,7 @@ export async function publishPackage(db:PrismaClient,actorId:string,key:string,v
     if(row.status==='HOLD' && (!review.reviewedAt || Date.parse(review.reviewedAt)<=row.updatedAt.getTime() || (row.review as any)?.signature===review.signature))throw new Error('BUNDLE_HOLD_REVIEW_REQUIRED')
     if(hashDeclarativePackage(p)!==row.contentHash)throw new Error('BUNDLE_CONTENT_HASH_MISMATCH')
     const blockers=dependencyBlockers(p);if(blockers.length)throw new Error(blockers.join('; '))
+    if(p.schemaVersion===2 && !review.claims.includes('cross_source_condition'))throw new Error('BUNDLE_CLAIM_NOT_APPROVED')
     if(p.rules.items.some(r=>r.kind!=='limitation'&&!review.claims.includes(r.kind)))throw new Error('BUNDLE_CLAIM_NOT_APPROVED')
     await assertPublishedDependencies(tx, p)
     return tx.bundlePackageRelease.update({where,data:{status:'PUBLISHED',review:review as Prisma.InputJsonValue,publishedBy:actorId}})
@@ -82,6 +83,7 @@ export async function assertPackageAdmission(db:Prisma.TransactionClient,raw:unk
   const review=validateReview(row.review,row.contentHash,process.env.BUNDLE_REVIEW_SIGNING_KEY)
   await admin(db,review.reviewerId)
   if(review.reviewerId===row.installedBy)throw new Error('BUNDLE_INDEPENDENT_REVIEW_REQUIRED')
+  if(p.schemaVersion===2 && !review.claims.includes('cross_source_condition'))throw new Error('BUNDLE_CLAIM_NOT_APPROVED')
   const blockers = dependencyBlockers(p); if (blockers.length) throw new Error(blockers.join('; '))
   await assertPublishedDependencies(db, p)
   return row

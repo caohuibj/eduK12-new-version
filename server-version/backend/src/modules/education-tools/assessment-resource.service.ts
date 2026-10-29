@@ -1,3 +1,5 @@
+import {educationNativeBundleSchema} from '../bundle-product/education-identity'
+import {retainEducationNativeBundle,assertEducationNativeBundle,assertEducationNativeBundlePopulation} from '../bundle-product/education-adapter'
 import {CompositeServiceError} from '../composite/composite.errors'
 import {InstrumentFinalSubmitError} from '../../services/instrumentFinalSubmit'
 import {decodeTrainingStandardItemSource} from '../composite/training-standard-combination'
@@ -33,7 +35,7 @@ export const registerEducationAssessmentSchema=z.object({expectedPreparationHash
 export const transitionEducationAssessmentSchema=z.object({expectedEntryHash:hash,reason:z.string().trim().min(1).max(500)}).strict()
 const preparationSchema=z.object({schemaVersion:z.literal(1),resourceId:uuid,product:z.enum(['SCHOOL','TEACHER']),organizationId:uuid,
  family:z.enum(['COGNITIVE','SITUATIONAL','BUNDLE']),sourceCompositeId:uuid,sourceSnapshotHash:hash,sourceDefinitionHash:hash,runtimeCompositeId:uuid,
- runtimeSnapshotHash:hash,runtimeDefinitionHash:hash,snapshot:trainingContentSnapshotSchema,title:z.string(),createdAuthority:educationDeliveryAuthoritySchema,distribution:educationDistributionSchema}).strict()
+ runtimeSnapshotHash:hash,runtimeDefinitionHash:hash,nativeBundle:educationNativeBundleSchema.optional(),snapshot:trainingContentSnapshotSchema,title:z.string(),createdAuthority:educationDeliveryAuthoritySchema,distribution:educationDistributionSchema}).strict()
 type Preparation=z.infer<typeof preparationSchema>
 type Row={id:string;entry:Record<string,unknown>;entry_hash:string;status:string;created_by_user_id:string;created_authority:unknown;reviewed_by_user_id:string|null;reviewed_authority:unknown;published_authority:unknown}
 const options={isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted,maxWait:5000,timeout:15000}
@@ -56,6 +58,7 @@ async function readRuntime(tx:Tx,c:EducationAssessmentContext,p:Preparation,lock
  if(!runtime||runtime.productKind!=='ORGANIZATION_RESOURCE'||runtime.creationKey!==key(c,p.resourceId)||runtime.creationHash!==canonicalHash(p)
   ||runtime.createdBy!==p.createdAuthority.actorId||runtime.courseId!==null||runtime.publicEnabled||runtime.copyable
   ||canonicalHash(buildTrainingFlowUnits(runtime))!==p.runtimeDefinitionHash)fail('EDUCATION_ASSESSMENT_PREPARATION_CHANGED')
+ await assertEducationNativeBundle(runtime.bundleInstance,p.nativeBundle)
  return runtime
 }
 async function boundary(tx:Tx,c:EducationAssessmentContext,sourceId:string,proofs:z.infer<typeof educationDeliveryAuthoritySchema>[]=[]){
@@ -135,6 +138,7 @@ export async function prepareEducationAssessment(c:EducationAssessmentContext,ra
    resourceIds:[source.id,...content.snapshot.units.map(unit=>unit.measurement.releaseId),...assets.map(asset=>asset.assetId)]})
   if(input.family!=='BUNDLE'&&(content.snapshot.units.length!==1||source.items.some(item=>item.type==='FORM')
    ||content.snapshot.units[0].family!==(input.family==='COGNITIVE'?'COGNITIVE':'SJT')))fail('EDUCATION_ASSESSMENT_FAMILY_MISMATCH')
+  assertEducationNativeBundlePopulation(source.bundleInstance,c.product)
   const runtimeId=randomUUID(),items=new Map(source.items.map(item=>[item.id,randomUUID()])),sections=new Map(source.formSections.map(section=>[section.id,randomUUID()]))
   const runtime=await tx.compositeAssessment.create({data:{id:runtimeId,code:'education-assessment-'+input.resourceId,name:input.title,
    instruction:source.instruction,createdBy:c.principal.userId,productKind:'ORGANIZATION_RESOURCE',status:'DRAFT',publicEnabled:false,copyable:false,
@@ -144,10 +148,11 @@ export async function prepareEducationAssessment(c:EducationAssessmentContext,ra
     formType:item.formType,formLabel:item.formLabel,formPlaceholder:item.formPlaceholder,formOptions:item.formOptions??Prisma.DbNull,formPolicy:item.formPolicy??Prisma.DbNull,
     formDefinition:item.formDefinition??Prisma.DbNull,contextKey:item.contextKey,formSectionId:item.formSectionId?sections.get(item.formSectionId)!:null,
     formSectionPosition:item.formSectionPosition,standardCombinationSource:item.standardCombinationSource??Prisma.DbNull}))}},include:educationCompositeInclude})
+  const nativeBundle=await retainEducationNativeBundle(tx,source.bundleInstance,runtime.id,items)
   const snapshot=trainingContentSnapshotSchema.parse({schemaVersion:1,compositeId:runtime.id,units:content.snapshot.units.map(unit=>({itemId:items.get(unit.itemId)!,family:unit.family,source:{...unit.source,...(unit.source.standardCombination||unit.source.privateVersionId?{educationBinding:{schemaVersion:1,product:c.product,organizationId:c.organizationId,resourceId:input.resourceId,sourceCompositeId:source.id,sourceItemId:unit.itemId,runtimeCompositeId:runtime.id,runtimeItemId:items.get(unit.itemId)!,ownerId:c.principal.userId}}:{})},measurement:unit.measurement}))})
   const p=preparationSchema.parse({schemaVersion:1,resourceId:input.resourceId,...{product:c.product,organizationId:c.organizationId},family:input.family,sourceCompositeId:source.id,
    sourceSnapshotHash:canonicalHash(source.trainingContentSnapshot),sourceDefinitionHash:canonicalHash(buildTrainingFlowUnits(source)),runtimeCompositeId:runtime.id,
-   runtimeSnapshotHash:canonicalHash(snapshot),runtimeDefinitionHash:canonicalHash(buildTrainingFlowUnits(runtime)),snapshot,title:input.title,createdAuthority:actor,distribution})
+   runtimeSnapshotHash:canonicalHash(snapshot),runtimeDefinitionHash:canonicalHash(buildTrainingFlowUnits(runtime)),...(nativeBundle?{nativeBundle}:{}),snapshot,title:input.title,createdAuthority:actor,distribution})
   await content.recheckSourceLicenses()
   await retainEducationAssessmentIssuers(tx,c,[actor]);await captureEducationAssessmentIssuer(tx,c)
   await assertEducationAssessmentDistribution(tx,{...c,actorId:c.principal.userId,selection:input.licenses,
@@ -236,6 +241,7 @@ export async function registerEducationAssessment(c:EducationAssessmentContext,i
   }
   const {source,content}=await readEducationAssessmentSource(tx,p.sourceCompositeId,identities,c.product)
   if(canonicalHash(source.trainingContentSnapshot)!==p.sourceSnapshotHash||canonicalHash(buildTrainingFlowUnits(source))!==p.sourceDefinitionHash)fail('EDUCATION_ASSESSMENT_SOURCE_CHANGED')
+  if(p.nativeBundle&&(source.bundleInstance?.definitionHash!==p.nativeBundle.definitionHash||source.bundleInstance.bindingsHash!==p.nativeBundle.sourceBindingsHash))fail('EDUCATION_NATIVE_BUNDLE_SOURCE_CHANGED')
   const runtime=await readRuntime(tx,c,p)
   if(runtime.status!=='DRAFT'||runtime.trainingContentSnapshotHash!==null||runtime.trainingContentSnapshot!==null
    ||canonicalHash(p.snapshot)!==p.runtimeSnapshotHash||p.snapshot.compositeId!==runtime.id)fail('EDUCATION_ASSESSMENT_PREPARATION_CHANGED')
@@ -247,7 +253,7 @@ export async function registerEducationAssessment(c:EducationAssessmentContext,i
   for(const original of p.distribution.grants)if(!distribution.grants.some(grant=>grant.resourceId===original.resourceId&&grant.grantId===original.grantId&&grant.version===original.version))fail('EDUCATION_ASSESSMENT_DISTRIBUTION_CHANGED',403)
   const origin=educationAssessmentOriginSchema.parse({schemaVersion:1,adapterVersion:'1.0.0',resourceId:id,product:c.product,organizationId:c.organizationId,family:p.family,
    sourceCompositeId:source.id,runtimeCompositeId:runtime.id,sourceSnapshotHash:p.sourceSnapshotHash,runtimeSnapshotHash:canonicalHash(selected.snapshot),runtimeDefinitionHash:p.runtimeDefinitionHash,
-   distribution,feedbackPolicy:input.feedbackPolicy,units:selected.snapshot.units.map(unit=>({itemId:unit.itemId,family:unit.family,measurement:unit.measurement,
+   distribution,...(p.nativeBundle?{nativeBundle:p.nativeBundle}:{}),feedbackPolicy:input.feedbackPolicy,units:selected.snapshot.units.map(unit=>({itemId:unit.itemId,family:unit.family,measurement:unit.measurement,
     references:[...new Map((unit.referencePolicy?.choices??[]).map(choice=>[choice.releaseId,{releaseId:choice.releaseId,contentHash:choice.contentHash}])).values()],report:unit.report??null}))})
   const entry=(()=>{try{return draftEducationAssessmentEntry({origin,title:p.title,disclosure:input.disclosure})}
    catch(error){if(error instanceof z.ZodError)throw error;fail('EDUCATION_ASSESSMENT_DISCLOSURE_INVALID',400)}})()

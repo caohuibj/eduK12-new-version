@@ -3,18 +3,21 @@ import {createHash} from 'node:crypto';
 import {readFileSync} from 'node:fs';
 import {execFileSync} from 'node:child_process';
 import observerReuse from './school-teacher-observer-reuse.cjs';
+import {nativeBinding,nativePlan,requireNativeQualification,NATIVE_BRANCH,NATIVE_MARKER,NATIVE_JOBS} from './school-teacher-native.mjs';
 export const BRANCH='work/school-teacher-review-20261022', REPOSITORY='caohuibj/eduK12-new-version';
 export const SELF_BRANCH='release/education-observer-native-20261029';
 export const SELF_BASE='f39a00f12fed2e1b8e1d3cc45185969262925ed8';
 export const SELF_MARKER='.github/scripts/school-teacher-self-bindings.json';
 export const JOBS=['admission','frontend','connected','security'];
 export const SELF_JOBS=['admission','frontend','backend-self','postgres-self','browser-self','security'];
-const allJobs=[...new Set([...JOBS,...SELF_JOBS])];
+const allJobs=[...new Set([...JOBS,...SELF_JOBS,...NATIVE_JOBS])];
 export const sha256=x=>createHash('sha256').update(x).digest('hex');
 const sha=x=>typeof x==='string'&&/^[a-f0-9]{40}$/.test(x);
 export const binding=(env=process.env)=>{
  const branch=env.CI_HEAD_REF||env.GITHUB_HEAD_REF||env.GITHUB_REF_NAME;
+ if(branch===NATIVE_BRANCH||env.PLAN&&JSON.parse(env.PLAN).candidate==='native-bundle')return nativeBinding();
  const before=env.CI_BASE_SHA||(env.GITHUB_EVENT_NAME==='push'&&env.GITHUB_EVENT_PATH?JSON.parse(readFileSync(env.GITHUB_EVENT_PATH,'utf8')).before:null);
+ if(branch==='main'&&before===nativeBinding().base)return nativeBinding();
  const selected=branch===SELF_BRANCH||branch==='main'&&before===SELF_BASE||env.PLAN&&JSON.parse(env.PLAN).candidate==='education-self';
  return JSON.parse(readFileSync(new URL(selected?'./school-teacher-self-bindings.json':'./school-teacher-bindings.json',import.meta.url)));
 };
@@ -42,6 +45,7 @@ export function requireFreshQualification(b){
  return true;
 }
 export function requireSchoolQualification(b){
+ if(b.candidate==='native-bundle')return requireNativeQualification(b);
  if(b.qualification!==observerReuse.mode)return requireFreshQualification(b);
  assert.equal(b.branch,SELF_BRANCH);assert.equal(b.base,SELF_BASE);
  assert.equal(b.frontendTree,observerReuse.fixed.frontendTree);assert.equal(b.backendTree,observerReuse.fixed.currentBackendTree);
@@ -96,9 +100,9 @@ export function observedCandidate(b,env=process.env){
   frontendTree:git('rev-parse','HEAD:server-version/frontend'),backendTree:git('rev-parse','HEAD:server-version/backend'),
   productFrontendTree:git('rev-parse',b.productHead+':server-version/frontend'),productBackendTree:git('rev-parse',b.productHead+':server-version/backend')};
 }
-export function actualPlan(env=process.env){const b=binding(env);assert.equal(b.enabled,true,'DRAFT_DISABLED');return validateCandidate(b,observedCandidate(b,env),readFileSync(new URL('./school-teacher-evidence.json',import.meta.url)))}
+export function actualPlan(env=process.env){const b=binding(env);if(b.candidate==='native-bundle'){const o=observedCandidate(b,env);return nativePlan(o.entries,o.base,o.checkoutHead,git,{...env,CI_EVENT:env.GITHUB_EVENT_NAME,CI_HEAD_REF:o.branch,CI_PR_REPOSITORY:o.repository,CI_SOURCE_HEAD:o.sourceHead,CI_IS_DRAFT:String(o.draft)},b)}assert.equal(b.enabled,true,'DRAFT_DISABLED');return validateCandidate(b,observedCandidate(b,env),readFileSync(new URL('./school-teacher-evidence.json',import.meta.url)))}
 export function requireSuccess(plan,needs){
- assert([JOBS,SELF_JOBS].some(ids=>JSON.stringify(ids)===JSON.stringify(plan.requiredJobs)),'Unknown School job set');
+ assert([JOBS,SELF_JOBS,NATIVE_JOBS,...(plan.candidate==='native-bundle'&&plan.preflightOnly===true?[['admission']]:[])].some(ids=>JSON.stringify(ids)===JSON.stringify(plan.requiredJobs)),'Unknown School job set');
  const keys=Object.keys(needs);assert(keys.every(id=>allJobs.includes(id)),'Unknown School dependency');
  for(const id of plan.requiredJobs)assert.equal(needs[id]?.result,'success',id+' not successful');
  for(const id of keys.filter(id=>!plan.requiredJobs.includes(id)))assert.equal(needs[id].result,'skipped','Unselected School job ran');
@@ -108,6 +112,7 @@ export function requireSuccess(plan,needs){
 export const marker='.github/scripts/school-teacher-bindings.json';
 export function schoolTeacherPlan(entries,base,head,read=git,env=process.env,b,evidenceBytes){
  const branch=env.CI_HEAD_REF||env.GITHUB_HEAD_REF||env.GITHUB_REF_NAME;
+ if(branch===NATIVE_BRANCH||entries.some(e=>e.file===NATIVE_MARKER))return nativePlan(entries,base,head,read,env,b);
  const self=entries.some(e=>e.file===SELF_MARKER),legacy=entries.some(e=>e.file===marker);
  assert(!(self&&legacy),'Ambiguous School candidates');
  if([BRANCH,SELF_BRANCH].includes(branch))assert.notEqual(env.CI_EVENT,'workflow_dispatch','No manual/full/probe fallback');
