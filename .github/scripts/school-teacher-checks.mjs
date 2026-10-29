@@ -508,6 +508,7 @@ async function nativePhase(phase,b,plan){
   const kind=phase==='frontend'?'frontend':'backend';
   // Build each component once. Original application cases and Draft lint/types
   // keep their own identities; they are not silently reexecuted here.
+  if(kind==='frontend'&&plan.publicPackage)process.env.P6_PACKAGE_PROBE_BUILD='true';
   freshBuild(kind);nativeContext(kind);
  }
  else if(phase==='verify-frontend-artifact')freshArtifact('frontend');

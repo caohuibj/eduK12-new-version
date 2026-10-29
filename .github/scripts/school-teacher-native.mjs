@@ -5,20 +5,24 @@ import {createHash} from 'node:crypto';
 import {readFileSync} from 'node:fs';
 import {readNativeEvidenceBytes,verifyNativeEvidence} from './school-teacher-native-evidence.mjs';
 export const NATIVE_BRANCH='feat/bundle-evc-profile-20261029';
+export const PACKAGE_BRANCH='feat/education-package-runtime-20261029';
+export const PACKAGE_MARKER='.github/scripts/school-teacher-package-bindings.json';
+export const isNativeBranch=branch=>[NATIVE_BRANCH,PACKAGE_BRANCH].includes(branch);
+const markerFor=b=>b.branch===PACKAGE_BRANCH?PACKAGE_MARKER:NATIVE_MARKER;
 export const NATIVE_MARKER='.github/scripts/school-teacher-native-bindings.json';
 export const NATIVE_JOBS=['admission','frontend','backend-self','native-evidence','native-runtime','security'];
 const hash=x=>createHash('sha256').update(x).digest('hex');
 const sha=x=>typeof x==='string'&&/^[a-f0-9]{40}$/.test(x);
-export const nativeBinding=()=>JSON.parse(readFileSync(new URL('./school-teacher-native-bindings.json',import.meta.url)));
+export const nativeBinding=(branch=NATIVE_BRANCH)=>{assert(isNativeBranch(branch),'Unknown native branch');return JSON.parse(readFileSync(new URL(branch===PACKAGE_BRANCH?'./school-teacher-package-bindings.json':'./school-teacher-native-bindings.json',import.meta.url)))};
 export function nativeSastConfig(paths){
  const python=new Set(['.github/scripts/school-teacher-native-runtime.py','.github/scripts/school-teacher-native-runtime.test.py','.github/scripts/exact-candidate-runtime.py']);
  assert([...python].every(p=>paths.includes(p)),'Native Python extractor inputs missing');
- return {paths:['server-version/backend/src','server-version/frontend/src','.github/scripts'],
+ return {paths:['server-version/backend/src','server-version/frontend/src','.github/scripts',...(paths.some(p=>p.includes('school-teacher-package'))?['server-version/e2e']:[])],
   'paths-ignore':paths.filter(p=>p.startsWith('.github/scripts/')&&p.endsWith('.py')&&!python.has(p)).sort(),queries:[{uses:'security-extended'}]};
 }
 export function requireNativeQualification(b){
  assert.equal(b.candidate,'native-bundle');
- assert.equal(b.branch,NATIVE_BRANCH);assert.equal(b.repository,'caohuibj/eduK12-new-version');
+ assert(isNativeBranch(b.branch),'Unknown native branch');assert.equal(b.repository,'caohuibj/eduK12-new-version');
  assert.equal(b.enabled,true,'Native Bundle activation pending independent review');
  assert.equal(b.review.status,'INDEPENDENTLY_REVIEWED','Native controls not independently reviewed');
  assert.match(b.review.recordSha256||'',/^[a-f0-9]{64}$/);
@@ -30,9 +34,9 @@ export function requireNativeQualification(b){
  return true;
 }
 export function validateNativeBoundary(b,o,{draftPreflight=false}={}){
- assert.equal(b.candidate,'native-bundle');assert.equal(b.branch,NATIVE_BRANCH);
+ assert.equal(b.candidate,'native-bundle');assert(isNativeBranch(b.branch),'Unknown native branch');
  assert.equal(o.repository,b.repository);assert(['pull_request','push'].includes(o.event));
- assert.equal(o.branch,o.event==='push'?'main':NATIVE_BRANCH);
+ assert.equal(o.branch,o.event==='push'?'main':b.branch);
  assert.equal(o.forceFull,false);assert.equal(o.draft,draftPreflight);
  if(draftPreflight)assert.equal(o.event,'pull_request');
  for(const key of ['base','productHead','productTree','frontendTree','backendTree'])assert(sha(b[key]),'Missing '+key);
@@ -41,7 +45,7 @@ export function validateNativeBoundary(b,o,{draftPreflight=false}={}){
  assert.equal(o.productTree,b.productTree);assert.equal(o.frontendTree,b.frontendTree);assert.equal(o.backendTree,b.backendTree);
  const files={...b.source,...b.controls};
  assert.equal(Object.keys(files).length,Object.keys(b.source).length+Object.keys(b.controls).length,'Overlapping source/control paths');
- assert(Object.keys(b.source).length>0);assert(Object.hasOwn(b.controls,NATIVE_MARKER));
+ assert(Object.keys(b.source).length>0);assert(Object.hasOwn(b.controls,markerFor(b)));
  assert.equal(o.entries.length,Object.keys(files).length,'Complete raw diff required');
  assert.equal(new Set(o.entries.map(e=>e.file)).size,o.entries.length);
  for(const e of o.entries){
@@ -50,20 +54,23 @@ export function validateNativeBoundary(b,o,{draftPreflight=false}={}){
   assert(['A','M'].includes(e.status));assert.equal(e.newMode,'100644');
   assert.equal(e.oldMode,e.status==='A'?'000000':'100644');
   assert.equal(e.oldBlob,expected.before||'0'.repeat(40));assert(sha(e.newBlob));
-  if(e.file!==NATIVE_MARKER){assert(sha(expected.after));assert.equal(e.newBlob,expected.after,'Changed native input '+e.file);}
+  if(e.file!==markerFor(b)){assert(sha(expected.after));assert.equal(e.newBlob,expected.after,'Changed native input '+e.file);}
  }
  assert(Object.keys(b.protectedInputs).length>10,'Runtime/config closure missing');
  assert.deepEqual(o.protectedInputs,b.protectedInputs,'Locked dependency/schema/runtime/control dependency drift');
  return {schema:1,route:'school-teacher',candidate:'native-bundle',base:b.base,head:o.checkoutHead,sourceHead:o.sourceHead,sourceTree:o.sourceTree,
-  product:b.productHead,productTree:b.productTree,components:{frontend:b.frontendTree,backend:b.backendTree},...(o.event==='push'?{postMerge:true}:{}),...(draftPreflight?{preflightOnly:true}:{}),requiredJobs:draftPreflight?['admission']:NATIVE_JOBS,changes:o.entries,
+  product:b.productHead,productTree:b.productTree,...(b.branch===PACKAGE_BRANCH?{publicPackage:true}:{}),components:{frontend:b.frontendTree,backend:b.backendTree},...(o.event==='push'?{postMerge:true}:{}),...(draftPreflight?{preflightOnly:true}:{}),requiredJobs:draftPreflight?['admission']:NATIVE_JOBS,changes:o.entries,
   inputsSha256:hash(JSON.stringify({source:b.source,controls:b.controls,protectedInputs:b.protectedInputs,execution:b.execution}))};
 }
-export function nativePlan(entries,base,head,read,env,b=nativeBinding()){
+export function nativePlan(entries,base,head,read,env,b){
  const branch=env.CI_HEAD_REF||env.GITHUB_HEAD_REF||env.GITHUB_REF_NAME;
- const marker=entries.some(e=>e.file===NATIVE_MARKER),known=branch===NATIVE_BRANCH;
+ const markers=[NATIVE_MARKER,PACKAGE_MARKER].filter(p=>entries.some(e=>e.file===p)),known=isNativeBranch(branch);
+ assert(markers.length<=1,'Mixed native candidate markers');
+ const marker=markers.length===1;
+ b??=nativeBinding(known?branch:markers[0]===PACKAGE_MARKER?PACKAGE_BRANCH:NATIVE_BRANCH);
  if(!known&&!marker)return null;
  assert.notEqual(env.CI_EVENT,'workflow_dispatch','Native manual/full/probe fallback forbidden');
- assert(branch===NATIVE_BRANCH||branch==='main'&&env.CI_EVENT==='push','Native marker on wrong branch');
+ assert(branch===b.branch||branch==='main'&&env.CI_EVENT==='push','Native marker on wrong branch');
  assert(marker,'Native marker missing; no platform fallback');
  assert(!entries.some(e=>['.github/scripts/school-teacher-bindings.json','.github/scripts/school-teacher-self-bindings.json'].includes(e.file)),'Mixed historical/native scenarios');
  // Draft runs only the closed control graph, never unchanged application
@@ -79,7 +86,7 @@ export function nativePlan(entries,base,head,read,env,b=nativeBinding()){
   entries:entries.map(e=>({...e,oldBlob:e.oldMode==='000000'?'0'.repeat(40):read('rev-parse',base+':'+e.file),newBlob:read('rev-parse',head+':'+e.file)}))};
  return validateNativeBoundary(b,observed,{draftPreflight});
 }
-export function requireNativeEvidence(b,helpers){const result=verifyNativeEvidence(readNativeEvidenceBytes(),b,helpers);assert.equal(result.pendingFinalReview,false,'Native supplement not admitted until final candidate review');return result}
+export function requireNativeEvidence(b,helpers){const result=verifyNativeEvidence(readNativeEvidenceBytes(b),b,helpers);assert.equal(result.pendingFinalReview,false,'Native supplement not admitted until final candidate review');return result}
 export function requireNativeProducerAttempt(attempt){
  assert.equal(attempt,'1','Native producer retry requires diagnosis and an exact continuation; never rebuild an existing successful artifact by default');
 }
@@ -90,16 +97,17 @@ export async function nativeOfficialApi(path,env=process.env){
 }
 export async function observeNativeMain(plan,api=nativeOfficialApi){
  assert.equal(plan.candidate,'native-bundle');assert.equal(plan.postMerge,true);assert.notEqual(plan.preflightOnly,true);assert.deepEqual(plan.requiredJobs,NATIVE_JOBS);
- const pr=await api('/pulls/388');
- assert.equal(pr.number,388);assert.equal(pr.merged,true);assert.equal(pr.state,'closed');assert.equal(pr.draft,false);
- assert.equal(pr.head.ref,NATIVE_BRANCH);assert.equal(pr.head.repo.full_name,'caohuibj/eduK12-new-version');assert.equal(pr.head.sha,plan.sourceHead);
+ const prNumber=plan.publicPackage?392:388,branch=plan.publicPackage?PACKAGE_BRANCH:NATIVE_BRANCH;
+ const pr=await api('/pulls/'+prNumber);
+ assert.equal(pr.number,prNumber);assert.equal(pr.merged,true);assert.equal(pr.state,'closed');assert.equal(pr.draft,false);
+ assert.equal(pr.head.ref,branch);assert.equal(pr.head.repo.full_name,'caohuibj/eduK12-new-version');assert.equal(pr.head.sha,plan.sourceHead);
  assert.equal(pr.base.ref,'main');assert.equal(pr.base.repo.full_name,'caohuibj/eduK12-new-version');assert.equal(pr.merge_commit_sha,plan.head);
  const listing=await api('/actions/workflows/ci.yml/runs?event=pull_request&head_sha='+plan.sourceHead+'&per_page=100');
  assert(listing.total_count>0&&listing.total_count<=100);assert.equal(listing.workflow_runs.length,listing.total_count);
  // Inspect the newest run for this exact source, never search backwards for
  // an older green result when a newer attempt is pending or failed.
  const run=[...listing.workflow_runs].sort((a,b)=>b.id-a.id)[0];
- assert.equal(run.head_sha,plan.sourceHead);assert.equal(run.head_branch,NATIVE_BRANCH);assert.equal(run.event,'pull_request');assert.equal(run.path,'.github/workflows/ci.yml');
+ assert.equal(run.head_sha,plan.sourceHead);assert.equal(run.head_branch,branch);assert.equal(run.event,'pull_request');assert.equal(run.path,'.github/workflows/ci.yml');
  assert.equal(run.repository.full_name,'caohuibj/eduK12-new-version');assert.equal(run.status,'completed');assert.equal(run.conclusion,'success');
  assert(Number.isSafeInteger(run.id)&&run.id>0&&Number.isSafeInteger(run.run_attempt)&&run.run_attempt>0);
  const rows=[];let total;
@@ -115,5 +123,5 @@ export async function observeNativeMain(plan,api=nativeOfficialApi){
   assert.equal(j.run_id,run.id);assert.equal(j.head_sha,plan.sourceHead);assert.equal(j.run_attempt,run.run_attempt);assert.equal(j.status,'completed');assert.equal(j.conclusion,'success',name+' did not qualify');
   return {id:j.id,name:j.name};
  });
- return {kind:'EXACT_MERGED_PR_OBSERVATION',pr:388,sourceHead:plan.sourceHead,mergeHead:plan.head,runId:run.id,attempt:run.run_attempt,jobs,applicationExecuted:false};
+ return {kind:'EXACT_MERGED_PR_OBSERVATION',pr:prNumber,sourceHead:plan.sourceHead,mergeHead:plan.head,runId:run.id,attempt:run.run_attempt,jobs,applicationExecuted:false};
 }

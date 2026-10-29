@@ -494,6 +494,9 @@ jobs:
         with:
           version: v0.70.0
           cache: false
+      - name: install locked browser driver for the sole missing package connection
+        if: fromJSON(inputs.plan).publicPackage == true
+        run: npm ci --prefix .github/release-tools
       - name: package the same compiled bytes and scan actual runtime images
         env:
           TRIVY_CACHE_DIR: ${{ runner.temp }}/native-trivy-cache
