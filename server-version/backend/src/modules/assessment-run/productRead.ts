@@ -123,7 +123,7 @@ export async function readAssessmentRunProduct(
         v.title,v.source_revision AS "sourceRevision"
       FROM "assessment_run_tracks" t LEFT JOIN education_private_tool_versions v ON v.id=split_part(t.resource_key,':',3)
        AND v.organization_id=t.organization_id AND v.kind='COMPOSITION' AND t.resource_family='BUNDLE'
-       AND t.resource_key='education-composition:'||v.entry||':'||v.id||':'||CASE v.entry WHEN 'SCHOOL' THEN 'STUDENT' ELSE 'TEACHER' END||':SELF:1.0.0'
+       AND t.resource_key='education-composition:'||v.entry||':'||v.id||':'||(v.definition#>>'{administration,population}')||':'||(v.definition#>>'{administration,responseMode}')||':1.0.0'
       WHERE t."organization_id" = ${organizationId} AND t."run_id" = ${runId}
       ORDER BY t."created_at",t."id"
     `,

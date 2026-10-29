@@ -39,7 +39,7 @@ export async function assertLockedLibraryUseTime(tx:Prisma.TransactionClient,pro
 export async function lockCompositionLibraryUses(tx:Prisma.TransactionClient,c:PrivateToolContext,keys:readonly string[],additionalEntryIds:readonly string[]=[]){
  const rows=keys.length?await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT DISTINCT b->>'versionId' AS id
   FROM composite_assessments parent JOIN education_private_tool_versions v ON parent.creation_key=
-   'education-composition:'||v.entry||':'||v.id||':'||CASE v.entry WHEN 'SCHOOL' THEN 'STUDENT' ELSE 'TEACHER' END||':SELF:1.0.0'
+   'education-composition:'||v.entry||':'||v.id||':'||(v.definition#>>'{administration,population}')||':'||(v.definition#>>'{administration,responseMode}')||':1.0.0'
   CROSS JOIN LATERAL jsonb_array_elements(parent.training_content_snapshot#>'{educationBinding,manifest}') b
   WHERE parent.creation_key IN (${Prisma.join([...new Set(keys)])}) AND v.entry=${c.entry} AND v.organization_id=${c.organizationId}
    AND v.owner_user_id=${c.principal.userId} AND b->>'sourceProvider'='LIBRARY_SCALE'`):[]

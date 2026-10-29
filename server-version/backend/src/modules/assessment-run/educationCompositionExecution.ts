@@ -10,7 +10,7 @@ import {readEducationPublicSourceHeaders} from '../education-tools/public-source
 import {assertEducationLibraryHeaders} from '../education-tools/library-source.catalog'
 import {assertEducationLibraryUses,lockEducationLibraryUses,type LockedEducationLibraryUses} from '../education-tools/library-source.use'
 import type {PrivateToolContext} from '../education-tools/private-tool.contracts'
-import {educationCompositionKey,educationCompositionPolicyBindingSchema,educationCompositionRuntimeAnchorSchema,
+import {educationCompositionKey,educationCompositionPolicyBindingSchema,educationCompositionRuntimeAnchorSchema,educationCompositionVariant,matchesEducationCompositionRespondent,
  type EducationCompositionRuntimeAnchor} from '../education-tools/private-tool.composition-contracts'
 import {assertScaleLibraryCollectionAllowed} from '../scale-library-governance/collection-guard'
 import {issueVerifiedEducationStart} from './education-start-context'
@@ -27,13 +27,14 @@ const unitsSchema=z.array(z.object({itemId:z.string(),scaleId:z.string(),version
  * only the independent header anchors and bounded references, never full source
  * definitions, stimuli, report bodies or full snapshot hashes. No author rights. */
 export async function readFrozenCompositionIdentity(tx:Tx,input:{policy:RunResourcePolicy;policyHash:string;organizationId:string;key:string;version:string}){
- const policy=input.policy,binding=educationCompositionPolicyBindingSchema.parse(policy.educationComposition),origin=binding.origin
+ const policy=input.policy,binding=educationCompositionPolicyBindingSchema.parse(policy.educationComposition),origin=binding.origin,
+  variant=educationCompositionVariant(origin)
  if(input.version!=='1.0.0'||policy.version!==input.version||policy.family!=='BUNDLE'||policy.key!==input.key
   ||educationCompositionKey(origin)!==input.key||origin.organizationId!==input.organizationId||canonicalHash(policy)!==input.policyHash
   ||policy.runtimeLaunchTarget?.kind!=='COMPOSITE'||policy.scientificMaturity!=='PILOT'
   ||policy.analysisMode!=='INDIVIDUAL_ONLY'||policy.minimumRespondents!==null
   ||canonicalHash([policy.subjectRoles,policy.respondentRoles,policy.relationshipKinds,policy.perspectives])
-   !==canonicalHash([[origin.entry==='TEACHER'?'TEACHER':'STUDENT'],[origin.entry==='TEACHER'?'TEACHER':'STUDENT'],['SELF'],['SELF_REPORT']]))
+   !==canonicalHash([[variant.subjectRole],[variant.respondentRole],variant.relationshipKinds.filter(kind=>kind!=='COURSE_TEACHER_STUDENT'),[variant.perspective]]))
   privateToolFail('PRIVATE_COMPOSITION_EXECUTION_INVALID')
  const [row]=await tx.$queryRaw<Array<{title:string;manifest:unknown;units:unknown}>>(Prisma.sql`SELECT c.name AS title,
   (SELECT jsonb_agg(jsonb_build_object('blockId',b->>'blockId','kind',b->>'kind','versionId',b->>'versionId','contentHash',b->>'contentHash','sourceProvider',b->>'sourceProvider',
@@ -91,22 +92,27 @@ export async function assertCompositionCollection(tx:Tx,identity:FrozenCompositi
  * does not repeat that query or confer those rights. */
 export async function readCompositionExecutionSource(tx:Tx,input:{executionId?:string;assignmentRef?:string;actorUserId?:string;compositeId?:string;parentAttemptId?:string}){
  const [row]=await tx.$queryRaw<Array<{executionId:string;organizationId:string;key:string;version:string;policy:RunResourcePolicy;policyHash:string;
-  assignmentRef:string;subjectUserId:string;respondentUserId:string;bindingKind:string|null;bindingRef:string|null;status:string;runStatus:string;assignmentStatus:string;product:'SCHOOL'|'TEACHER'}>>(Prisma.sql`
+  assignmentRef:string;subjectUserId:string;respondentUserId:string;subjectRole:string;respondentRole:string;relationshipKind:string;perspective:string;
+  bindingKind:string|null;bindingRef:string|null;status:string;runStatus:string;assignmentStatus:string;product:'SCHOOL'|'TEACHER'}>>(Prisma.sql`
   SELECT e.id AS "executionId",e.organization_id AS "organizationId",t.resource_key AS key,t.resource_version AS version,
    t.frozen_resource_policy AS policy,t.resource_policy_hash AS "policyHash",a.id AS "assignmentRef",a.subject_user_id AS "subjectUserId",
-   a.respondent_user_id AS "respondentUserId",e.runtime_binding_kind AS "bindingKind",e.runtime_binding_ref AS "bindingRef",e.status,
+   a.respondent_user_id AS "respondentUserId",a.subject_role AS "subjectRole",a.respondent_role AS "respondentRole",a.relationship_kind AS "relationshipKind",a.perspective,
+   e.runtime_binding_kind AS "bindingKind",e.runtime_binding_ref AS "bindingRef",e.status,
    r.status AS "runStatus",a.status AS "assignmentStatus",CASE WHEN school.run_id IS NOT NULL THEN 'SCHOOL' ELSE 'TEACHER' END AS product
   FROM assessment_run_executions e JOIN assessment_runs r ON r.id=e.run_id AND r.organization_id=e.organization_id
   JOIN assessment_run_tracks t ON t.id=e.track_id AND t.run_id=e.run_id AND t.organization_id=e.organization_id
   JOIN relational_assessment_assignments a ON a.id=e.relational_assignment_id AND a.policy_domain='ORGANIZATION_RUN'
    AND a.resource_kind=t.resource_family AND a.resource_key=t.resource_key AND a.resource_version=t.resource_version
-   AND a.subject_user_id=a.respondent_user_id
-   AND a.relationship_kind='SELF' AND a.perspective='SELF_REPORT' AND a.analysis_mode='INDIVIDUAL_ONLY'
+   AND a.analysis_mode='INDIVIDUAL_ONLY'
+  JOIN assessment_run_actor_snapshots subject ON subject.id=e.subject_actor_snapshot_id AND subject.organization_id=e.organization_id
+   AND subject.run_id=e.run_id AND subject.user_id=a.subject_user_id AND subject.actor_role=a.subject_role
+  JOIN assessment_run_actor_snapshots respondent ON respondent.id=e.respondent_actor_snapshot_id AND respondent.organization_id=e.organization_id
+   AND respondent.run_id=e.run_id AND respondent.user_id=a.respondent_user_id AND respondent.actor_role=a.respondent_role
   LEFT JOIN huiteacher_evaluation_run_links teacher ON teacher.organization_id=e.organization_id AND teacher.run_id=e.run_id
   LEFT JOIN campus_activity_runs school ON school.organization_id=e.organization_id AND school.run_id=e.run_id
   WHERE ${input.executionId?Prisma.sql`e.id=${input.executionId}`:Prisma.sql`a.id=${input.assignmentRef??''}`}
    AND t.resource_family='BUNDLE'
-   AND ((school.run_id IS NOT NULL AND teacher.run_id IS NULL AND a.subject_role='STUDENT' AND a.respondent_role='STUDENT'
+   AND ((school.run_id IS NOT NULL AND teacher.run_id IS NULL AND a.subject_role='STUDENT'
      AND t.resource_key LIKE 'education-composition:SCHOOL:%')
     OR (teacher.run_id IS NOT NULL AND school.run_id IS NULL AND a.subject_role='TEACHER' AND a.respondent_role='TEACHER'
      AND t.resource_key LIKE 'education-composition:TEACHER:%'))`)
@@ -116,6 +122,7 @@ export async function readCompositionExecutionSource(tx:Tx,input:{executionId?:s
  const identity=await readFrozenCompositionIdentity(tx,row)
  if(identity.origin.entry!==row.product||input.compositeId!==undefined&&identity.compositeId!==input.compositeId)
   privateToolFail('PRIVATE_COMPOSITION_EXECUTION_INVALID')
+ if(!matchesEducationCompositionRespondent(identity.origin,row))privateToolFail('PRIVATE_COMPOSITION_EXECUTION_INVALID')
  if(input.parentAttemptId!==undefined){
   const parent=await tx.compositeAssessmentAttempt.findUnique({where:{id:input.parentAttemptId},select:{userId:true,subjectUserId:true,respondentUserId:true,assignmentRef:true,compositeAssessmentId:true}})
   if(row.bindingKind!=='COMPOSITE'||row.bindingRef!==input.parentAttemptId||!parent||parent.assignmentRef!==row.assignmentRef
@@ -128,7 +135,7 @@ export async function admitCompositionStart(tx:Tx,input:{executionId:string;comp
  const source=await readCompositionExecutionSource(tx,input)
  await assertCompositionCollection(tx,source.identity,'NEW_START',true,libraryUses)
  return issueVerifiedEducationStart({tx,product:source.product,compositeId:source.identity.compositeId,assignmentRef:source.assignmentRef,
-  respondentUserId:source.respondentUserId,composition:source.identity.binding})
+  subjectUserId:source.subjectUserId,respondentUserId:source.respondentUserId,composition:source.identity.binding})
 }
 
 /** Before Organization/Run/Execution locks, for this actual frozen respondent

@@ -4,7 +4,7 @@ import {lockCompositionLibraryUses,assertLockedLibraryUseTime,type LockedEducati
 import {privateCompositionRunTrackInput} from '../education-tools/private-tool.run-contract'
 import {assertPrivateScaleRunWorkflow} from './educationPrivateScaleContext'
 import {assertPrivateScaleRunResource,assertPrivateFormRunResource} from './educationPrivateScaleContext'
-import {privateRunTrackInput,privateFormRunTrackInput,assertPrivateRunSelection} from '../education-tools/private-tool.run-contract'
+import {privateRunTrackInput,privateFormRunTrackInput,assertPrivateRunSelection,assertPrivateAdministrationSelection} from '../education-tools/private-tool.run-contract'
 import {assertRunTrackNarrowing,relationalEntryToRunPolicy} from './resourceAuthority'
 import {assertEducationLibraryPopulationSupport} from './educationLibraryPopulation'
 import {assertEducationRunLibraryResources,readEducationRunLibraryContext,lockAndAssertEducationRunWorkflow} from './educationLibraryContext'
@@ -133,11 +133,16 @@ export async function addAssessmentRunTrackDraft(input: {
         throw new AssessmentRunRepositoryError('HUITEACHER_STUDENT_EVAL_TRACK_READONLY','Student evaluation tracks require their protected workflow',403)
       if(composition){
         const selected=privateCompositionRunTrackInput.parse({expectedVersion:input.expectedVersion,privateComposition:input.privateComposition,
-          subjectSelector:input.subjectSelector,respondentSelector:input.respondentSelector})
+          subjectSelector:input.subjectSelector,respondentSelector:input.respondentSelector,targetPolicy:input.requestedPolicy.targetPolicy})
         const editor=await assertPrivateScaleRunWorkflow(tx,{...input,actorUserId:input.actorUserId},current)
         const sources=await readPrivateCompositionRunSources(tx,editor.context,[input.resource],{lockForUse:true,libraryUses}),source=sources.get(input.resource.key)!
         if(source.origin.versionId!==selected.privateComposition.versionId||source.origin.contentHash!==selected.privateComposition.contentHash)
           throw new AssessmentRunRepositoryError('PRIVATE_COMPOSITION_VERSION_MISMATCH','Exact fixed version required',409)
+        const mode=source.origin.variantKey.split(':')[1]
+        assertPrivateAdministrationSelection(mode,selected)
+        if(editor.context.entry==='SCHOOL'&&!editor.schoolAdmin&&mode==='TEACHER_REPORT'&&selected.targetPolicy?.mode!=='HOMEROOM_TEACHER')
+          throw new AssessmentRunRepositoryError('PRIVATE_TOOL_HOMEROOM_TARGET_REQUIRED','Psychology drafts require explicit homeroom target',403)
+        assertEducationLibraryPopulationSupport([input])
         assertRunTrackNarrowing(source.policy,input.requestedPolicy)
       }else{
         const {assertEducationAssessmentRunUse}=await import('../education-tools/assessment-resource.authority')

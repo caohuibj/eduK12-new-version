@@ -2717,10 +2717,11 @@ const createAttempt = async (
   educationStart?: VerifiedEducationStart,
 ) => {
   assertSupportedComposite(composite)
-  const educationProduct=educationStart?readVerifiedEducationStart(educationStart,{tx:db,compositeId:composite.id,assignmentRef:relationalIdentity?.assignmentRef??'',respondentUserId:userId??''}):undefined
+  const educationProduct=educationStart?readVerifiedEducationStart(educationStart,{tx:db,compositeId:composite.id,assignmentRef:relationalIdentity?.assignmentRef??'',subjectUserId:relationalIdentity?.subjectUserId??'',respondentUserId:userId??''}):undefined
   const educationComposition=readVerifiedCompositionStart(educationStart,{tx:db,compositeId:composite.id,
-    assignmentRef:relationalIdentity?.assignmentRef??'',respondentUserId:userId??''})
-  if(educationProduct&&(composite.productKind!=='ORGANIZATION_RESOURCE'||!relationalIdentity||relationalIdentity.subjectUserId!==userId||relationalIdentity.respondentUserId!==userId))throw compositeForbidden('教育测评准入上下文不匹配')
+    assignmentRef:relationalIdentity?.assignmentRef??'',subjectUserId:relationalIdentity?.subjectUserId??'',respondentUserId:userId??''})
+  if(educationProduct&&(composite.productKind!=='ORGANIZATION_RESOURCE'||!relationalIdentity
+    ||(!educationComposition&&relationalIdentity.subjectUserId!==userId)||relationalIdentity.respondentUserId!==userId))throw compositeForbidden('教育测评准入上下文不匹配')
   // Parent START and publication stop/archive serialize on the same row. Child
   // progression later consumes the already-admitted immutable runtime plan.
   await db.$queryRawUnsafe('SELECT "id" FROM "composite_assessments" WHERE "id" = $1 FOR SHARE', composite.id)

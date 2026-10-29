@@ -9,6 +9,7 @@ import type {RunResourcePolicy} from '../assessment-run/resourceAuthority'
 import type {ResultDisclosureContractV1} from '../assessment-policy/result-disclosure'
 import {readNativeEducationScaleFeedback,type NativeEducationFeedbackSource} from './education-native-scale-feedback'
 import {reportingFail} from './types'
+import {matchesEducationCompositionRespondent} from '../education-tools/private-tool.composition-contracts'
 
 function hidden():never{return reportingFail('REPORT_NOT_FOUND','reporting resource not found',404)}
 type Input={executionId:string;actorUserId:string}
@@ -16,28 +17,32 @@ type ScopedInput=Input&{entry:'SCHOOL'|'TEACHER'}
 async function readOwn(tx:Prisma.TransactionClient,input:ScopedInput,loadContent=false){
  const population=input.entry==='SCHOOL'?'STUDENT':'TEACHER'
  const [row]=await tx.$queryRaw<Array<{organizationId:string;key:string;version:string;policy:RunResourcePolicy;policyHash:string;status:string;
+  subjectUserId:string;respondentUserId:string;subjectRole:string;respondentRole:string;relationshipKind:string;perspective:string;
   contentState:OrdinaryStoredContent|null;parentId:string|null;parentStatus:string|null;attemptEpoch:number|null;contextSnapshotHash:string|null;frozenSlots:string|null;frozenSlotsHash:string|null}>>(Prisma.sql`
   SELECT e.organization_id AS "organizationId",t.resource_key AS key,t.resource_version AS version,t.frozen_resource_policy AS policy,
    t.resource_policy_hash AS "policyHash",e.status,p.id AS "parentId",p.status AS "parentStatus",p.attempt_epoch AS "attemptEpoch",
-   p.context_snapshot_hash AS "contextSnapshotHash",p.frozen_active_slot_set_encrypted AS "frozenSlots",p.frozen_active_slot_set_hash AS "frozenSlotsHash",
-   ${loadContent?Prisma.sql`jsonb_build_object('trainingContentBinding',p.training_content_binding,'trainingContentBindingHash',p.training_content_binding_hash,
+   a.subject_user_id AS "subjectUserId",a.respondent_user_id AS "respondentUserId",a.subject_role AS "subjectRole",a.respondent_role AS "respondentRole",
+   a.relationship_kind AS "relationshipKind",a.perspective,p.context_snapshot_hash AS "contextSnapshotHash",
+   CASE WHEN a.relationship_kind='SELF' THEN p.frozen_active_slot_set_encrypted END AS "frozenSlots",
+   CASE WHEN a.relationship_kind='SELF' THEN p.frozen_active_slot_set_hash END AS "frozenSlotsHash",
+   ${loadContent?Prisma.sql`CASE WHEN a.relationship_kind='SELF' THEN jsonb_build_object('trainingContentBinding',p.training_content_binding,'trainingContentBindingHash',p.training_content_binding_hash,
     'trainingReferenceBinding',p.training_reference_binding,'trainingReferenceBindingHash',p.training_reference_binding_hash,
     'trainingContentInterpretationEncrypted',p.training_content_interpretation_encrypted,'trainingContentInterpretationHash',p.training_content_interpretation_hash,
-    'aggregateInputHash',p.aggregate_input_hash)`:Prisma.sql`NULL::jsonb`} AS "contentState"
+    'aggregateInputHash',p.aggregate_input_hash) END`:Prisma.sql`NULL::jsonb`} AS "contentState"
   FROM assessment_run_executions e JOIN assessment_runs r ON r.id=e.run_id AND r.organization_id=e.organization_id AND r.status IN ('PUBLISHED','CLOSED')
   JOIN assessment_run_tracks t ON t.id=e.track_id AND t.run_id=e.run_id AND t.organization_id=e.organization_id
    AND t.resource_family='BUNDLE' AND t.resource_key LIKE ${'education-composition:'+input.entry+':%'}
   JOIN assessment_run_actor_snapshots subject ON subject.id=e.subject_actor_snapshot_id AND subject.organization_id=e.organization_id
-   AND subject.run_id=e.run_id AND subject.user_id=${input.actorUserId} AND subject.actor_role=${population}
+   AND subject.run_id=e.run_id AND subject.actor_role=${population}
   JOIN assessment_run_actor_snapshots respondent ON respondent.id=e.respondent_actor_snapshot_id AND respondent.organization_id=e.organization_id
-   AND respondent.run_id=e.run_id AND respondent.user_id=${input.actorUserId} AND respondent.actor_role=${population}
+   AND respondent.run_id=e.run_id AND respondent.user_id=${input.actorUserId}
   JOIN relational_assessment_assignments a ON a.id=e.relational_assignment_id AND a.policy_domain='ORGANIZATION_RUN'
    AND a.resource_kind=t.resource_family AND a.resource_key=t.resource_key AND a.resource_version=t.resource_version
-   AND a.subject_user_id=${input.actorUserId} AND a.respondent_user_id=${input.actorUserId} AND a.subject_role=${population} AND a.respondent_role=${population}
-   AND a.relationship_kind='SELF' AND a.perspective='SELF_REPORT'
+   AND a.subject_user_id=subject.user_id AND a.respondent_user_id=respondent.user_id
+   AND a.subject_role=subject.actor_role AND a.respondent_role=respondent.actor_role AND a.analysis_mode='INDIVIDUAL_ONLY'
   LEFT JOIN composite_assessment_attempts p ON p.id=e.runtime_binding_ref AND e.runtime_binding_kind='COMPOSITE'
    AND p.assignment_ref=a.id AND p.episode_id=a.episode_id AND p.user_id=${input.actorUserId}
-   AND p.subject_user_id=${input.actorUserId} AND p.respondent_user_id=${input.actorUserId}
+   AND p.subject_user_id=a.subject_user_id AND p.respondent_user_id=a.respondent_user_id
    AND p.composite_assessment_id=t.frozen_resource_policy#>>'{runtimeLaunchTarget,ref}'
    AND p.delivery_mode='FINAL_ONLY' AND p.runtime_generation='UNIFIED_V1'
   WHERE e.id=${input.executionId} AND ((e.status='COMPLETED' AND a.status='COMPLETED' AND p.status='COMPLETED')
@@ -66,9 +71,15 @@ async function readOrdinaryFeedback(input:ScopedInput){
   const own=await readOwn(tx,input,true)
   if(!own)hidden()
   const identity=await readFrozenCompositionIdentity(tx,own)
-  if(identity.origin.entry!==input.entry)hidden()
+  if(identity.origin.entry!==input.entry||!matchesEducationCompositionRespondent(identity.origin,own))hidden()
   if(own.status!=='COMPLETED')return {schemaVersion:1 as const,kind:'EDUCATION_FEEDBACK' as const,mode:'COMPOSITION' as const,state:'IN_PROGRESS' as const,title:identity.title,units:[]}
   if(!own.parentId||own.parentStatus!=='COMPLETED'||!own.attemptEpoch)hidden()
+  // Reuse the existing observer contract: no new individual report right is
+  // inferred from library U, authorship or becoming a parent/teacher respondent.
+  // Its completion receipt needs no result decryption, scoring or report body.
+  if(own.relationshipKind!=='SELF')return {schemaVersion:1 as const,kind:'EDUCATION_FEEDBACK' as const,mode:'COMPOSITION' as const,
+   state:'COMPLETION_ONLY' as const,title:identity.title,units:identity.manifest.map(block=>({blockId:block.blockId,kind:block.kind,title:block.title,
+    state:block.kind==='FORM'?'COMPLETION_ONLY' as const:'WITHHELD' as const}))}
   const sources:NativeEducationFeedbackSource[]=[],declaredBlocks=new Set<string>()
   for(const block of identity.manifest.filter(block=>block.kind==='SCALE')){
    const ceiling=identity.binding.unitReports.find(unit=>unit.blockId===block.blockId)

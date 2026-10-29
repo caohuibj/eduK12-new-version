@@ -222,6 +222,7 @@ export async function listCampusParentRunTasks(actor:AuthenticatedPrincipal){
       organizationId:activity.organizationId,activityId:activity.courseId,
       activityTitle:activity.activityTitle,runTitle:t.runName,
       status:t.status,deadline:t.deadline?.toISOString()??null,
+      ...(t.resourceKey?.startsWith('education-composition:SCHOOL:')?{feedbackNamespace:'EDUCATION_ASSESSMENT' as const,feedbackMode:'COMPOSITION' as const}:{}),
       canResumeExisting:t.canResumeExisting,consentRequired:t.consentRequired,consentPurpose:t.consentPurpose,
       consentVisibility:t.consentVisibility,
       // No child identifiers, reports, psychometric scores or raw responses.

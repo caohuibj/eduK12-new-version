@@ -8,7 +8,7 @@ import {trainingContentSnapshotSchema} from '../composite/training-content-bindi
 import {privateScaleMeasurementInput} from './private-tool.runtime-source'
 import {privateScaleCode} from './private-tool.runtime-origin'
 import {privateToolFail,type PrivateToolContext} from './private-tool.contracts'
-import {educationCompositionBindingSchema,educationCompositionOriginSchema,educationCompositionKey,
+import {educationCompositionBindingSchema,educationCompositionOriginSchema,educationCompositionKey,privateCompositionAdministrationSchema,
  type EducationCompositionOrigin,type EducationCompositionBinding} from './private-tool.composition-contracts'
 import type {CompiledPrivateComposition,CompositionLeaf} from './private-tool.composition-compiler'
 import {compositionLeafKey} from './private-tool.composition-compiler'
@@ -37,12 +37,13 @@ export async function loadSealedEducationIdentity(tx:Tx,anchor:{compositeId:stri
 
 /** Owner freeze retry reads only the sealed header/origin; no full-source
  * recompilation. Scope/current author authorization belongs to its service. */
-export async function readOwnedCompositionIdentity(tx:Tx,c:PrivateToolContext,version:Pick<EducationPrivateToolVersion,'id'|'toolId'|'entry'|'organizationId'|'ownerUserId'|'contentHash'>){
+export async function readOwnedCompositionIdentity(tx:Tx,c:PrivateToolContext,version:Pick<EducationPrivateToolVersion,'id'|'toolId'|'entry'|'organizationId'|'ownerUserId'|'contentHash'|'definition'>){
  if(version.entry!==c.entry||version.organizationId!==c.organizationId||version.ownerUserId!==c.principal.userId)
   privateToolFail('PRIVATE_COMPOSITION_SOURCE_NOT_FOUND',404)
+ const administration=privateCompositionAdministrationSchema.parse((version.definition as {administration?:unknown})?.administration)
  const origin=educationCompositionOriginSchema.parse({schemaVersion:1,adapterVersion:'1.0.0',mode:'COMPOSITION',entry:c.entry,
   organizationId:c.organizationId,ownerUserId:c.principal.userId,toolId:version.toolId,versionId:version.id,
-  contentHash:version.contentHash,variantKey:c.entry==='SCHOOL'?'STUDENT:SELF':'TEACHER:SELF'})
+  contentHash:version.contentHash,variantKey:administration.population+':'+administration.responseMode})
  const row=await tx.compositeAssessment.findUnique({where:{creationKey:educationCompositionKey(origin)},select:identitySelect})
  if(!row||!row.trainingContentSnapshotHash)privateToolFail('PRIVATE_COMPOSITION_IDENTITY_INVALID')
  // Reuse the row already loaded in this request, rather than calling the reader
@@ -75,7 +76,7 @@ async function materializeScale(tx:Tx,leaf:Extract<CompositionLeaf,{provider:'PR
 export async function sealPrivateComposition(tx:Tx,c:PrivateToolContext,version:EducationPrivateToolVersion,compiled:CompiledPrivateComposition){
  const origin=educationCompositionOriginSchema.parse({schemaVersion:1,adapterVersion:'1.0.0',mode:'COMPOSITION',entry:c.entry,
   organizationId:c.organizationId,ownerUserId:c.principal.userId,toolId:version.toolId,versionId:version.id,contentHash:version.contentHash,
-  variantKey:compiled.definition.administration.population+':SELF'})
+  variantKey:compiled.definition.administration.population+':'+compiled.definition.administration.responseMode})
  const key=educationCompositionKey(origin)
  await tx.$executeRaw(Prisma.sql`SELECT pg_advisory_xact_lock(hashtext(${key}))`)
  const prior=await tx.compositeAssessment.findUnique({where:{creationKey:key},select:{id:true}})

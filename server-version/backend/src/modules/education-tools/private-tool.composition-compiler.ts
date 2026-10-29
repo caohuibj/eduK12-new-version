@@ -62,10 +62,10 @@ export async function compilePrivateComposition(tx:Prisma.TransactionClient,c:Pr
    leaves.set(key,{provider:'PRIVATE_VERSION',version:row,kind:'SCALE',definition:scale})
   }else leaves.set(key,{provider:'PRIVATE_VERSION',version:row,kind:'FORM',form:compilePrivateFormRuntime(row.definition)})
  }
- const standards=await readEducationStandardSources(tx,publicSources.filter(source=>source.provider==='STANDARD_SCALE'))
+ const standards=await readEducationStandardSources(tx,publicSources.filter(source=>source.provider==='STANDARD_SCALE'),definition.administration)
  for(const standard of standards.values())leaves.set('STANDARD_SCALE:'+standard.row.id,{provider:'STANDARD_SCALE',kind:'SCALE',standard,definition:standard.row.snapshot.definition,
   version:{id:standard.row.id,toolId:standard.row.id,title:standard.row.snapshot.title,contentHash:standard.row.combination_hash}})
- const libraries=await readEducationLibrarySources(tx,c,librarySources)
+ const libraries=await readEducationLibrarySources(tx,librarySources,definition.administration)
  for(const library of libraries.values())leaves.set('LIBRARY_SCALE:'+library.row.entryId,{provider:'LIBRARY_SCALE',kind:'SCALE',library,definition:library.definition,
   version:{id:library.row.entryId,toolId:library.row.entryId,title:library.row.snapshot.title,contentHash:library.row.snapshotHash}})
  const formSources=publicSources.filter(source=>source.provider==='PUBLIC_FORM')

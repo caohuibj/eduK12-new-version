@@ -8,7 +8,8 @@ import {preparePrivateFormRuntimeResource} from './private-tool.form-runtime-res
 import {preparePrivateScaleRuntimeResource} from './private-tool.runtime-resources'
 import {privateScaleVariant} from './private-tool.runtime-origin'
 import {privateToolFail} from './private-tool.contracts'
-import {privateRunTrackInput,privateFormRunTrackInput,privateCompositionRunTrackInput,assertPrivateRunSelection} from './private-tool.run-contract'
+import {privateRunTrackInput,privateFormRunTrackInput,privateCompositionRunTrackInput,assertPrivateRunSelection,assertPrivateAdministrationSelection} from './private-tool.run-contract'
+import {privateCompositionAdministrationSchema} from './private-tool.composition-contracts'
 
 /** Fixed-version attachment to an EXISTING draft only. No activity/event,
  * approval, publication, participant or report entitlement is created. */
@@ -19,13 +20,27 @@ export const addPrivateFormRunTrack=(input:PrivateRunAttachmentContext,raw:unkno
  * sealed source under the actual product workflow/editor and draft CAS. */
 export async function addPrivateCompositionRunTrack(input:PrivateRunAttachmentContext,raw:unknown){
  const selected=privateCompositionRunTrackInput.parse(raw)
- const product=input.parent.kind==='SCHOOL_ACTIVITY'?'SCHOOL':'TEACHER',population=product==='SCHOOL'?'STUDENT':'TEACHER'
- return addAssessmentRunTrackDraft({...input,expectedVersion:selected.expectedVersion,expectedRunId:input.runId,
-  educationWorkflow:{product,id:input.parent.id},privateComposition:selected.privateComposition,
-  resource:{family:'BUNDLE',key:`education-composition:${product}:${selected.privateComposition.versionId}:${population}:SELF:1.0.0`,version:'1.0.0'},
-  subjectSelector:selected.subjectSelector,respondentSelector:selected.respondentSelector,
-  requestedPolicy:{subjectRoles:[population],respondentRoles:[population],relationshipKinds:['SELF'],perspectives:['SELF_REPORT'],
-   analysisMode:'INDIVIDUAL_ONLY',visibilityPolicyKey:'EDUCATION_PRIVATE_COMPOSITION_V1',minimumRespondents:null}})
+ const product=input.parent.kind==='SCHOOL_ACTIVITY'?'SCHOOL':'TEACHER'
+ return prisma.$transaction(async tx=>{
+  // Only the immutable owned administration header chooses the resource key.
+  // Current author/workflow/U/CAS remain the repository's one locked write
+  // boundary. No request can substitute a response mode.
+  const [version]=await tx.$queryRaw<Array<{administration:unknown}>>(Prisma.sql`
+   SELECT definition->'administration' AS administration FROM education_private_tool_versions
+   WHERE id=${selected.privateComposition.versionId} AND content_hash=${selected.privateComposition.contentHash}
+    AND kind='COMPOSITION' AND entry=${product} AND organization_id=${input.organizationId} AND owner_user_id=${input.actorUserId}`)
+  if(!version)privateToolFail('PRIVATE_COMPOSITION_SOURCE_NOT_FOUND',404)
+  const administration=privateCompositionAdministrationSchema.parse(version.administration),variant=privateScaleVariant(product,administration)
+  assertPrivateAdministrationSelection(variant.responseMode,selected)
+  return addAssessmentRunTrackDraft({...input,tx,expectedVersion:selected.expectedVersion,expectedRunId:input.runId,
+   educationWorkflow:{product,id:input.parent.id},privateComposition:selected.privateComposition,
+   resource:{family:'BUNDLE',key:`education-composition:${product}:${selected.privateComposition.versionId}:${variant.variantKey}:1.0.0`,version:'1.0.0'},
+   subjectSelector:selected.subjectSelector,respondentSelector:selected.respondentSelector,
+   requestedPolicy:{subjectRoles:[variant.subjectRole],respondentRoles:[variant.respondentRole],
+    relationshipKinds:variant.relationshipKinds.filter(kind=>kind!=='COURSE_TEACHER_STUDENT'),perspectives:[variant.perspective],
+    analysisMode:'INDIVIDUAL_ONLY',visibilityPolicyKey:variant.responseMode==='SELF'?'EDUCATION_PRIVATE_COMPOSITION_V1':'observer_private_respondent_v1',
+    minimumRespondents:null,...(selected.targetPolicy?{targetPolicy:selected.targetPolicy}:{})}})
+ },{isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted})
 }
 async function addPrivateToolRunTrack(input:PrivateRunAttachmentContext,raw:unknown,kind:'SCALE'|'FORM'){
  const selected=kind==='FORM'?privateFormRunTrackInput.parse(raw):privateRunTrackInput.parse(raw)

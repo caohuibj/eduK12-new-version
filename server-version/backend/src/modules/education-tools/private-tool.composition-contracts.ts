@@ -2,6 +2,7 @@ import {disclosureCapabilitiesV1Schema} from '../scale/policy/schema'
 import {assessmentContextKeySchema} from '../assessment-context/context'
 import {z} from 'zod'
 import {resultAudiencePolicySchema} from '../assessment-policy/result-disclosure'
+import {compileEducationApplicability} from '../scale-library-governance/education-applicability'
 
 const id=z.string().guid(),hash=z.string().regex(/^[a-f0-9]{64}$/)
 // P1 consumes immutable author-private leaves. Public/native providers are added
@@ -12,8 +13,12 @@ export const privateCompositionSourceSchema=z.discriminatedUnion('provider',[
  z.object({provider:z.literal('STANDARD_SCALE'),kind:z.literal('SCALE'),versionId:id,contentHash:hash}).strict(),
  z.object({provider:z.literal('PUBLIC_FORM'),kind:z.literal('FORM'),versionId:id,contentHash:hash}).strict(),
 ])
+export const privateCompositionAdministrationSchema=z.discriminatedUnion('population',[
+ z.object({population:z.literal('STUDENT'),responseMode:z.enum(['SELF','PARENT_REPORT','TEACHER_REPORT'])}).strict(),
+ z.object({population:z.literal('TEACHER'),responseMode:z.literal('SELF')}).strict(),
+])
 export const privateCompositionDefinitionSchema=z.object({schemaVersion:z.literal(1),adapterVersion:z.literal('1.0.0'),
- administration:z.object({population:z.enum(['STUDENT','TEACHER']),responseMode:z.literal('SELF')}).strict(),
+ administration:privateCompositionAdministrationSchema,
  contextFields:z.array(z.object({contextKey:assessmentContextKeySchema,formType:z.enum(['year_month','single_choice','fill_blank']),formLabel:z.string().min(1).max(240),formOptions:z.array(z.object({value:z.string().min(1).max(240),label:z.string().min(1).max(240)}).strict()).max(50)}).strict()).min(1).max(5).optional(),
  instruction:z.string().max(16000),blocks:z.array(z.object({blockId:id,instruction:z.string().max(16000),
   source:privateCompositionSourceSchema}).strict()).max(50),
@@ -26,15 +31,31 @@ export type PrivateCompositionDefinition=z.infer<typeof privateCompositionDefini
 
 export const educationCompositionOriginSchema=z.object({schemaVersion:z.literal(1),adapterVersion:z.literal('1.0.0'),
  mode:z.literal('COMPOSITION'),entry:z.enum(['SCHOOL','TEACHER']),organizationId:id,ownerUserId:id,toolId:id,
- versionId:id,contentHash:hash,variantKey:z.enum(['STUDENT:SELF','TEACHER:SELF'])}).strict()
+ versionId:id,contentHash:hash,variantKey:z.enum(['STUDENT:SELF','STUDENT:PARENT_REPORT','STUDENT:TEACHER_REPORT','TEACHER:SELF'])}).strict()
+ .superRefine((origin,ctx)=>{
+  if(origin.variantKey.startsWith('STUDENT:')!==(origin.entry==='SCHOOL'))
+   ctx.addIssue({code:'custom',message:'教育入口与施测对象不匹配'})
+ })
+/** Existing applicability compiler supplies role/relationship semantics. This
+ * describes a fixed version; it grants no actor, relationship or report right. */
+export function educationCompositionVariant(origin:Pick<z.infer<typeof educationCompositionOriginSchema>,'variantKey'>){
+ const [population,responseMode]=origin.variantKey.split(':')
+ return compileEducationApplicability({schemaVersion:1,administrations:[{population,responseMode}]}).variants[0]
+}
+export function matchesEducationCompositionRespondent(origin:Pick<z.infer<typeof educationCompositionOriginSchema>,'variantKey'>,assignment:{
+ subjectUserId:string;respondentUserId:string;subjectRole:string;respondentRole:string;relationshipKind:string;perspective:string;
+}){
+ const variant=educationCompositionVariant(origin)
+ return assignment.subjectRole===variant.subjectRole&&assignment.respondentRole===variant.respondentRole
+  &&assignment.perspective===variant.perspective&&variant.relationshipKinds.some(kind=>kind===assignment.relationshipKind)
+  &&(variant.responseMode==='SELF')===(assignment.subjectUserId===assignment.respondentUserId)
+}
 export const educationCompositionBindingSchema=z.object({schemaVersion:z.literal(1),origin:educationCompositionOriginSchema,
  sealed:z.literal(true),context:z.object({sectionId:id,itemIds:z.array(id).min(1).max(5)}).strict().optional(),manifest:z.array(z.object({blockId:id,instruction:z.string().max(16000),kind:z.enum(['SCALE','FORM']),versionId:id,contentHash:hash,
   sourceProvider:z.enum(['PRIVATE_VERSION','PUBLIC_FORM','STANDARD_SCALE','LIBRARY_SCALE']),sourceInstruction:z.string().max(16000).optional(),
   toolId:id,itemIds:z.array(id).min(1).max(1000),sectionIds:z.array(id).max(500)}).strict()).min(1).max(50),
 }).strict().superRefine((binding,ctx)=>{
- const {origin,manifest}=binding
- if(origin.variantKey!==(origin.entry==='SCHOOL'?'STUDENT:SELF':'TEACHER:SELF'))
-  ctx.addIssue({code:'custom',message:'教育入口与施测对象不匹配'})
+ const {manifest}=binding
  for(const field of ['blockId','itemIds','sectionIds'] as const){
   const values=manifest.flatMap(block=>field==='blockId'?[block.blockId]:block[field])
   if(new Set(values).size!==values.length)ctx.addIssue({code:'custom',message:'封存映射身份重复'})
@@ -51,7 +72,7 @@ export type EducationCompositionOrigin=z.infer<typeof educationCompositionOrigin
 export const educationCompositionKey=(origin:EducationCompositionOrigin)=>
  `education-composition:${origin.entry}:${origin.versionId}:${origin.variantKey}:${origin.adapterVersion}`
 
-export const educationCompositionResourceKeySchema=z.string().regex(/^education-composition:(SCHOOL|TEACHER):[0-9a-f-]{36}:(STUDENT|TEACHER):SELF:1\.0\.0$/)
+export const educationCompositionResourceKeySchema=z.string().regex(/^education-composition:(?:SCHOOL:[0-9a-f-]{36}:STUDENT:(?:SELF|PARENT_REPORT|TEACHER_REPORT)|TEACHER:[0-9a-f-]{36}:TEACHER:SELF):1\.0\.0$/)
 export const privateCompositionSelectionSchema=z.object({versionId:id,contentHash:hash}).strict()
 /** Frozen task anchor. Native scores are scoped to a block, never pooled into
  * an invented cross-tool score or widened by a same-named score in another unit. */

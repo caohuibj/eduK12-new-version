@@ -11,7 +11,7 @@ import {parseEducationPublicSourceKey} from './public-source.identity'
 import {readEducationPublicSourceHeaders} from './public-source.headers'
 import {assertEducationLibraryHeaders} from './library-source.catalog'
 import {assertEducationLibraryUses,type LockedEducationLibraryUses} from './library-source.use'
-import {educationCompositionKey,educationCompositionOriginSchema,educationCompositionResourceKeySchema,
+import {educationCompositionKey,educationCompositionOriginSchema,educationCompositionResourceKeySchema,educationCompositionVariant,
  educationCompositionPolicyBindingSchema,type EducationCompositionOrigin} from './private-tool.composition-contracts'
 
 type Tx=Prisma.TransactionClient
@@ -20,7 +20,7 @@ const leafSummarySchema=z.array(z.object({blockId:z.string().guid(),versionId:z.
  kind:z.enum(['SCALE','FORM']),audience:z.string().nullable(),metricKeys:z.array(z.string()).max(100)}).strict()).min(1).max(50)
 type Row={id:string;key:string;creationHash:string;createdBy:string;status:string;publishedAt:Date|null;productKind:string;
  publicEnabled:boolean;copyable:boolean;manifestHash:string;versionId:string;toolId:string;entry:string;organizationId:string;
- ownerUserId:string;contentHash:string;title:string;leaves:unknown;available:boolean;releaseIds:string[];scaleIds:string[];publicKeys:string[];librarySources:Array<{versionId:string;contentHash:string}>}
+ ownerUserId:string;contentHash:string;variantKey:string;title:string;leaves:unknown;available:boolean;releaseIds:string[];scaleIds:string[];publicKeys:string[];librarySources:Array<{versionId:string;contentHash:string}>}
 export type PrivateCompositionRunSource={origin:EducationCompositionOrigin;compositeId:string;manifestHash:string;
  resourceEntry:RelationalProductEntryV1;policy:RunResourcePolicy;identityOnly:true;canPublish:false}
 
@@ -43,6 +43,7 @@ export async function readPrivateCompositionRunSources(tx:Tx,c:PrivateToolContex
   c.status,c.published_at AS "publishedAt",c.product_kind AS "productKind",c.public_enabled AS "publicEnabled",c.copyable,
   c.training_content_snapshot_hash AS "manifestHash",v.id AS "versionId",v.tool_id AS "toolId",v.entry,
   v.organization_id AS "organizationId",v.owner_user_id AS "ownerUserId",v.content_hash AS "contentHash",v.title,
+  (v.definition#>>'{administration,population}')||':'||(v.definition#>>'{administration,responseMode}') AS "variantKey",
   (SELECT COALESCE(jsonb_agg(jsonb_build_object('versionId',b->>'versionId','contentHash',b->>'contentHash')),'[]'::jsonb)
    FROM jsonb_array_elements(c.training_content_snapshot#>'{educationBinding,manifest}') b WHERE b->>'sourceProvider'='LIBRARY_SCALE') AS "librarySources",
   (SELECT jsonb_agg(jsonb_build_object('blockId',b->>'blockId','versionId',b->>'versionId','contentHash',b->>'contentHash','kind',b->>'kind',
@@ -64,7 +65,7 @@ export async function readPrivateCompositionRunSources(tx:Tx,c:PrivateToolContex
   ARRAY(SELECT 'education-source:'||CASE b->>'sourceProvider' WHEN 'PUBLIC_FORM' THEN 'FORM' ELSE 'STANDARD_SCALE' END||':'||(b->>'versionId')||':'||(b->>'contentHash')
    FROM jsonb_array_elements(c.training_content_snapshot#>'{educationBinding,manifest}') b WHERE b->>'sourceProvider' IN ('PUBLIC_FORM','STANDARD_SCALE')) AS "publicKeys"
   FROM composite_assessments c JOIN education_private_tool_versions v ON c.creation_key=
-   'education-composition:'||v.entry||':'||v.id||':'||CASE v.entry WHEN 'SCHOOL' THEN 'STUDENT' ELSE 'TEACHER' END||':SELF:1.0.0'
+   'education-composition:'||v.entry||':'||v.id||':'||(v.definition#>>'{administration,population}')||':'||(v.definition#>>'{administration,responseMode}')||':1.0.0'
   WHERE c.creation_key IN (${Prisma.join(keys)}) AND v.kind='COMPOSITION' AND v.entry=${c.entry}
    AND v.organization_id=${c.organizationId} AND v.owner_user_id=${c.principal.userId}`)
  const librarySources=rows.flatMap(row=>row.librarySources)
@@ -89,21 +90,24 @@ export async function readPrivateCompositionRunSources(tx:Tx,c:PrivateToolContex
  for(const row of rows){
   const origin=educationCompositionOriginSchema.parse({schemaVersion:1,adapterVersion:'1.0.0',mode:'COMPOSITION',entry:row.entry,
    organizationId:row.organizationId,ownerUserId:row.ownerUserId,toolId:row.toolId,versionId:row.versionId,contentHash:row.contentHash,
-   variantKey:row.entry==='SCHOOL'?'STUDENT:SELF':'TEACHER:SELF'})
+   variantKey:row.variantKey})
   if(educationCompositionKey(origin)!==row.key||row.creationHash!==canonicalHash(origin)||row.createdBy!==origin.ownerUserId
    ||row.productKind!=='ORGANIZATION_RESOURCE'||row.publicEnabled||row.copyable||!['DRAFT','PUBLISHED'].includes(row.status)
    ||(row.status==='DRAFT'?row.publishedAt!==null:row.publishedAt===null))privateToolFail('PRIVATE_COMPOSITION_IDENTITY_INVALID')
   if(!row.available)privateToolFail('PRIVATE_COMPOSITION_SOURCE_UNAVAILABLE')
-  const none={mode:'NONE' as const,metricKeys:[],longitudinalMetricKeys:[]}
+  const variant=educationCompositionVariant(origin),none={mode:'NONE' as const,metricKeys:[],longitudinalMetricKeys:[]}
   const binding=educationCompositionPolicyBindingSchema.parse({origin,manifestHash:row.manifestHash,
    unitReports:leafSummarySchema.parse(row.leaves).filter(leaf=>leaf.kind==='SCALE').map(leaf=>({blockId:leaf.blockId,versionId:leaf.versionId,
-    contentHash:leaf.contentHash,respondent:leaf.audience===(origin.entry==='SCHOOL'?'student':'teacher')
+    contentHash:leaf.contentHash,respondent:variant.responseMode==='SELF'&&leaf.audience===(origin.entry==='SCHOOL'?'student':'teacher')
      ?{mode:'INDIVIDUAL_SUMMARY',metricKeys:leaf.metricKeys,longitudinalMetricKeys:[]}:none}))})
-  const policyKey='EDUCATION_PRIVATE_COMPOSITION_V1',population=origin.entry==='SCHOOL'?'STUDENT':'TEACHER'
+  const policyKey='EDUCATION_PRIVATE_COMPOSITION_V1'
   const resourceEntry:RelationalProductEntryV1={title:row.title,description:'普通问卷固定版本；单元独立计分，不是跨工具评分整包。',
-   releaseStatus:row.status as 'DRAFT'|'PUBLISHED',scienceMaturity:'PILOT',initiationModes:['ORG_ASSIGN','CLASS_ASSIGN'],subjectReportMode:'NONE',
-   applicability:{schemaVersion:1,resourceKind:'BUNDLE',resourceKey:row.key,resourceVersion:'1.0.0',subjectRoles:[population],respondentRoles:[population],
-    relationshipKinds:['SELF'],perspectives:['SELF_REPORT'],analysisMode:'INDIVIDUAL_ONLY',visibilityPolicyKey:policyKey,minimumRespondents:null},
+   releaseStatus:row.status as 'DRAFT'|'PUBLISHED',scienceMaturity:'PILOT',
+   initiationModes:variant.responseMode==='SELF'?['ORG_ASSIGN','CLASS_ASSIGN']:['ORG_ASSIGN','RELATED_OBSERVER_ASSIGN'],subjectReportMode:'NONE',
+   applicability:{schemaVersion:1,resourceKind:'BUNDLE',resourceKey:row.key,resourceVersion:'1.0.0',subjectRoles:[variant.subjectRole],respondentRoles:[variant.respondentRole],
+    relationshipKinds:variant.relationshipKinds.filter(kind=>kind!=='COURSE_TEACHER_STUDENT'),perspectives:[variant.perspective],analysisMode:'INDIVIDUAL_ONLY',
+    visibilityPolicyKey:variant.responseMode==='SELF'?policyKey:'observer_private_respondent_v1',minimumRespondents:null},
+   ...(variant.responseMode==='TEACHER_REPORT'?{allowedTargetModes:['HOMEROOM_TEACHER','ALL_CLASS_TEACHERS','SELECTED_CLASS_TEACHERS'] as const}:{}),
    cohortAnalysisPolicy:null,launchTarget:{runtime:'COMPOSITE',compositeAssessmentId:row.id},
    resultDisclosure:{schemaVersion:1,policyKey,minimumRespondents:null,audiences:{
     // This parent has no cross-tool metric namespace. Its native unit ceilings

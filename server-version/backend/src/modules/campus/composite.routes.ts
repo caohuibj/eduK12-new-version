@@ -35,12 +35,12 @@ import {ReportingError} from '../reporting/types'
 const router=Router()
 router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
 // The same ordinary-questionnaire feedback projection as Teacher, with the
-// School student's actual task/class/report authority; no author role needed.
+// Actual School respondent/relationship/report authority; no author role needed.
 async function ordinaryFeedback(req:Request,res:Response,next:NextFunction){
  try{
   const id=z.string().guid().safeParse(req.params.executionId)
   const asset=req.params.assetId===undefined?undefined:assessmentAssetIdSchema.safeParse(req.params.assetId)
-  if(req.user?.accountDomain!=='SCHOOL'||req.user.role!=='STUDENT'||Object.keys(req.query).length||!id.success||asset&&!asset.success)
+  if(req.user?.accountDomain!=='SCHOOL'||!['STUDENT','PARENT','TEACHER'].includes(req.user.role)||Object.keys(req.query).length||!id.success||asset&&!asset.success)
    return notFound(res,'当前校园反馈不可访问')
   const feedback=await readSchoolOrdinaryFeedback({executionId:id.data,actorUserId:req.user.userId})
   if(asset?.success)return serveProjectedReportImage({unitReports:feedback.units.flatMap(unit=>'nativeScaleUnits' in unit?unit.nativeScaleUnits:[])},asset.data,res)
