@@ -1,3 +1,4 @@
+import {readSurveyNativeReportAudience} from '../bundle-product/survey-source'
 import {assertSystemSurveyDataAudit,type SystemDataAccess} from './system-data-authority'
 import {surveyAttemptCode} from './analytics.export-format'
 import {Prisma} from '@prisma/client'
@@ -31,6 +32,8 @@ export async function readSurveyStoredReport(actorId:string,input:{projectId:str
     const current=await tx.surveyWaveFinal.findFirst({where:{id:input.finalId,projectId:input.projectId,waveId:input.waveId,
       attempt:{id:saved!.attemptId,status:'COMPLETED',excludedAt:null,OR:[{sampleReview:{is:null}},{sampleReview:{is:{verdict:'INCLUDED'}}}]}},select:{resultsHash:true}})
     if(!project||project.revision!==source.sourceRevision||!current||current.resultsHash!==saved!.sourceFinalHash)fail(409,'研究来源或当前访问范围已变化')
+    const nativeAudience=await readSurveyNativeReportAudience(tx,input)
+    if(nativeAudience!==undefined&&nativeAudience!=='researcher')fail(403,'此原生整包单项报告未向研究者开放')
     const cache=new Map<string,StoredRelease>()
     const read=async(pointer:{releaseId:string;contentHash:string})=>{
       let release=cache.get(pointer.releaseId)

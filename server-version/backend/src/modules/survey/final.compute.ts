@@ -1,3 +1,4 @@
+import type {SurveyNativeReport} from '../bundle-product/survey-native'
 import { SURVEY_NATIVE_SJT_PROTOCOL,surveySituationalExecutionProtocol,type SurveySituationalReceiptReference } from './situational-native.contract'
 import {readSurveyScalePresentation,scalePresentationOptions} from './catalog-scale.presentation'
 import { matchRawScoreFeedback } from '../scale/raw-score-feedback'
@@ -41,6 +42,7 @@ export interface FrozenUnitResult {
   notExecuted?:true
 }
 export interface SurveyComputedFinal {
+  nativeBundleReports?:SurveyNativeReport[]
   interpretation?:SurveyFinalInterpretation
   schemaVersion:1
   definitionDigest:string

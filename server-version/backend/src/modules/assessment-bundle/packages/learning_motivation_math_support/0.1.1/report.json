@@ -1,0 +1,48 @@
+{
+  "key": "learning_motivation_math_support_report",
+  "version": "0.1.0",
+  "locale": "zh-CN",
+  "blocks": [
+    {
+      "blockId": "core",
+      "kind": "conclusions",
+      "title": "当前学习动机的暂定组合",
+      "audience": [
+        "student",
+        "parent",
+        "teacher",
+        "admin"
+      ],
+      "ruleIds": []
+    },
+    {
+      "blockId": "evidence",
+      "kind": "evidence",
+      "title": "三个不同含义的核心指标",
+      "audience": [
+        "student",
+        "parent",
+        "teacher",
+        "admin"
+      ],
+      "ruleIds": []
+    },
+    {
+      "blockId": "scope",
+      "kind": "limitations",
+      "title": "解释边界",
+      "audience": [
+        "student",
+        "parent",
+        "teacher",
+        "admin"
+      ],
+      "ruleIds": []
+    }
+  ],
+  "states": {
+    "missing": "核心证据不完整，暂不分型。",
+    "limited": "作答或测量证据有限，仅阅读可支持的单项信息。",
+    "unavailable": "当前证据或权限不足以形成综合画像。"
+  }
+}

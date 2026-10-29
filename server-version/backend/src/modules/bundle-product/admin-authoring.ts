@@ -43,10 +43,11 @@ function previewValidatedPackage(actor: BundleActor, raw: unknown) {
   const fixtures = verifyPackageFixtures(p)
   return { contentHash: hashDeclarativePackage(p), definition: p.manifest.definition,
     blockers: [...dependencyBlockers(p), ...provider.publicationBlockers(entry.definition.bundleKey, entry.definition.bundleVersion).filter(value => value !== 'BUNDLE_NOT_PUBLISHED')],
-    requiredClaims: [...new Set(p.rules.items.filter(rule => rule.kind !== 'limitation').map(rule => rule.kind))],
-    report: p.report, scientific: p.scientific,
+    requiredClaims: [...new Set([...p.rules.items.filter(rule => rule.kind !== 'limitation').map(rule => rule.kind),...(p.schemaVersion===2?['cross_source_condition' as const]:[])])],
+    report: p.report, scientific: p.scientific, ...(p.schemaVersion===2?{profile:p.profile}:{}),
     scenarios: fixtures.map(({ name, result }) => ({ name, kind: result.kind, ruleIds: p.fixtures[name].expectedRuleIds, synthetic: true,
       conclusions: result.kind === 'COMPUTED' ? (result.payload as { conclusions: Array<{ ruleId: string; text: string }> }).conclusions.map(({ ruleId, text }) => ({ ruleId, text })) : [],
+      ...(p.schemaVersion===2 && result.kind==='COMPUTED'?{profile:(result.payload as {profile:{state:string;profileId:string|null}}).profile}:{}),
       message: result.kind === 'UNAVAILABLE' ? p.report.states.unavailable : null,
     })),
   }

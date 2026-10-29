@@ -1,3 +1,4 @@
+import {resolveAudienceDisclosure} from '../scale/policy/disclosure'
 import {materialListSchema,publicMaterial} from '../assessment-media/material'
 import { assessmentImagePresentationListSchema } from '../assessment-media/assessment-image-presentation'
 import {z} from 'zod'
@@ -45,6 +46,8 @@ const recordedScores=z.object({
  * template rendering, population inference, or private result spreading. */
 export function rawParticipantFeedback(unit:ResearchFrozenUnit,result:FrozenUnitResult,collectionClosed:boolean){
   if(unit.sourceProvenance?.reportConfigured===false)return null
+  const nativePolicy=unit.nativeBundleReport?resolveAudienceDisclosure(unit.nativeBundleReport.policy.disclosure,'subject'):null
+  if(unit.nativeBundleReport&&(unit.nativeBundleReport.audience!=='student'||unit.nativeBundleReport.policy.disposition==='UNKNOWN'||!nativePolicy?.numericScores))return null
   if(!['SCALE','SJT'].includes(unit.kind)||!unit.participantFeedback||result.notExecuted)return null
   const policy=surveyRawFeedbackSchema.parse(unit.participantFeedback)
   if(policy.mode!=='DESCRIPTIVE')return null
@@ -74,7 +77,7 @@ export function rawParticipantFeedback(unit:ResearchFrozenUnit,result:FrozenUnit
   // Display only saved matches for the same already-authorized metrics. Never
   // rerender current definitions on read or disclose unselected interval rules.
   const feedback=savedFeedbackSchema.safeParse(saved?.rawScoreFeedback)
-  const rawScoreFeedback=unit.kind==='SCALE'&&feedback.success
+  const rawScoreFeedback=unit.kind==='SCALE'&&feedback.success&&(!nativePolicy||nativePolicy.individualInterpretations)
     ?feedback.data.filter(item=>metrics.some(metric=>metric.key===item.scoreKey)).map(item=>({...item,...(item.materials?{materials:item.materials.map(publicMaterial)}:{})})):[]
   return {feedbackKind:'RAW_METRICS' as const,pending:false as const,instrumentKey:unit.instrumentKey,title:unit.title,
     measurementReleaseId:unit.measurementRelease.releaseId,metrics,...(rawScoreFeedback.length?{rawScoreFeedback}:{}),quality:'interpretable' as const}

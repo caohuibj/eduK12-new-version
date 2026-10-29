@@ -1,3 +1,6 @@
+import {readInstance as readNativeInstance} from '../bundle-product/instance'
+import {freezeSurveyNativeSource,assertSurveyNativeAdmission} from '../bundle-product/survey-source'
+import type {SurveyNativeSource} from '../bundle-product/survey-native'
 import {catalogDiscoveryRecords,discoveryFacets,discoveryJoin,discoverySqlFilter,governedDiscoveryIdentity} from './catalog-discovery'
 import type {CatalogDiscoveryFilters} from '../scale/library/catalog-discovery'
 import {approveToolEntryPolicies,exactToolEntryProducts} from '../assessment-governance/tool-entry-policy'
@@ -30,7 +33,7 @@ export async function governedRow(db:Db,id:string,lock=false){
  return row
 }
 export function governedView(row:GovernedRow){return {id:row.id,family:row.family,title:row.title,toolKey:row.tool_key,toolVersion:row.tool_version,hash:row.snapshot_hash,state:row.state,version:row.version,submittedBy:row.submitted_by,submittedAt:row.submitted_at,approvedBy:row.approved_by,approvedAt:row.approved_at,approvalReason:row.approval_reason,reason:row.reason,blockers:row.blockers,
- versions:{content:row.snapshot.unit?.ref.sourceVersion??row.tool_version,parameters:row.snapshot.parameters?.version??null,report:row.snapshot.report?.version??row.snapshot.packageReport?.version??null},metrics:artifactMetrics(row.snapshot),components:row.snapshot.components.map(c=>({slotKey:c.slotKey,title:c.title,kind:c.unit.ref.kind,source:c.source})),policyIdentity:governedPolicyIdentity(row)}}
+ versions:{content:row.snapshot.unit?.ref.sourceVersion??row.tool_version,parameters:row.snapshot.parameters?.version??null,report:row.snapshot.report?.version??row.snapshot.packageReport?.version??row.snapshot.nativeBundle?.definition.reportDefinition.version??null},metrics:artifactMetrics(row.snapshot),components:row.snapshot.components.map(c=>({slotKey:c.slotKey,title:c.title,kind:c.unit.ref.kind,source:c.source})),policyIdentity:governedPolicyIdentity(row)}}
 async function audit(tx:Prisma.TransactionClient,actor:string,action:string,metadata:object){await tx.surveyEvent.create({data:{id:randomUUID(),actorUserId:actor,action,metadata:metadata as Prisma.InputJsonValue}})}
 export async function assertGovernedOnline(db:Db,id:string,hash?:string){
  const row=await governedRow(db,id)
@@ -53,7 +56,7 @@ export async function approvedComponent(db:Db,source:{type:'STANDARD'|'GOVERNED'
  if(packageFamily(row.family))governedFail(409,'组合组件必须是固定单个工具，不能嵌套拆取另一个包')
  return governedSnapshot(row)
 }
-export async function assertGovernedDependencies(db:Db,a:GovernedArtifact){for(const c of [...a.components].sort((x,y)=>x.source.id.localeCompare(y.source.id))){
+export async function assertGovernedDependencies(db:Db,a:GovernedArtifact){if(a.nativeBundle)await assertSurveyNativeAdmission(db as Prisma.TransactionClient,a.nativeBundle);for(const c of [...a.components].sort((x,y)=>x.source.id.localeCompare(y.source.id))){
  const current=await approvedComponent(db,c.source)
  if(canonicalHash(current)!==canonicalHash(c.unit))governedFail(409,'组合组件版本或状态已变化：'+c.slotKey)
 }}
@@ -76,11 +79,11 @@ async function selectedParameters(db:Db,id:string|undefined|null):Promise<Govern
  if(!measurement||measurement.layer!=='MEASUREMENT'||measurement.status!=='PUBLISHED'||measurement.contentHash!==ref.content.measurement.contentHash)governedFail(409,'参数来源测量版本已变化或不可用')
  return {...clone(ref),sourceMeasurementHash:measurement.content.measurementHash} as GovernedParameter
 }
-export type SourceSubmission={requestId:string;source:CatalogSourceRef;version:string;title:string;parameterReleaseId?:string|null;report:{version:string;template:ReportTemplate}|null;reference:Record<string,unknown>}
+export type SourceSubmission={requestId:string;source:CatalogSourceRef;version:string;title:string;parameterReleaseId?:string|null;report:{version:string;template:ReportTemplate;audience?:'student'|'researcher'}|null;reference:Record<string,unknown>}
 export async function submitGovernedSource(actor:string,input:SourceSubmission,proof:AdminSessionProof){return prisma.$transaction(async tx=>{
  await assertStandardSystem(tx,actor,proof)
  if(input.source.sourceId.startsWith('survey-tool:')||input.source.sourceId.startsWith('survey-standard:'))governedFail(409,'已批准版本请作为组合组件使用；修订应从原来源提交新版本')
- const unit=await getCatalogSourceSnapshot({actorUserId:actor,ref:input.source},tx),a:GovernedArtifact={schemaVersion:1,family:unit.ref.kind,toolKey:unit.ref.kind+':'+unit.ref.sourceId,version:input.version,title:input.title,unit,parameters:await selectedParameters(tx,input.parameterReleaseId),report:input.report?{version:input.report.version,template:reportTemplateSchema.parse(input.report.template)}:null,components:[],packageReport:null,
+ const unit=await getCatalogSourceSnapshot({actorUserId:actor,ref:input.source},tx),a:GovernedArtifact={schemaVersion:1,family:unit.ref.kind,toolKey:unit.ref.kind+':'+unit.ref.sourceId,version:input.version,title:input.title,unit,parameters:await selectedParameters(tx,input.parameterReleaseId),report:input.report?{version:input.report.version,...(input.report.audience?{audience:input.report.audience}:{}),template:reportTemplateSchema.parse(input.report.template)}:null,components:[],packageReport:null,
  reference:artifactReference(unit.ref.kind,unit.ref.sourceId,{originalSource:unit.ref,originalProvenance:unit.provenance,annotations:clone(input.reference)})}
  return insertSubmission(tx,actor,input.requestId,a)
 },{timeout:20000})}
@@ -95,11 +98,21 @@ export async function submitOwnedSurveyTool(actor:string,projectId:string,draftI
  a.reference.applications.push({submittedBy:actor,projectId,draftId,revision:row!.revision,statement:input.statement})
  return insertSubmission(tx,actor,input.requestId,a)
 })}
-export async function submitGovernedPackage(actor:string,input:{requestId:string;family:'COMBINATION'|'BUNDLE';toolKey:string;version:string;title:string;components:Array<{slotKey:string;source:{type:'STANDARD'|'GOVERNED';id:string;hash:string}}> ;report:PackageReport|null;reference:Record<string,unknown>},proof:AdminSessionProof){return prisma.$transaction(async tx=>{
+export async function previewSurveyNativeSource(actor:string,id:string){
+ await assertStandardSystem(prisma,actor)
+ const row=await prisma.compositeAssessment.findFirst({where:{id,createdBy:actor,status:'PUBLISHED',productKind:'ASSESSMENT_BUNDLE'},include:{bundleInstance:true}})
+ if(!row?.bundleInstance)governedFail(404,'原生整包必须是本人已发布版本')
+ const {frozen}=readNativeInstance(row.bundleInstance)
+ if(frozen.declarativePackage?.schemaVersion!==2)governedFail(409,'此来源尚无理论画像适配')
+ return {title:row.name,compositeId:row.id,definitionHash:row.bundleInstance.definitionHash,bindingsHash:row.bundleInstance.bindingsHash,slots:frozen.bundleSnapshot.slotBindings.map(s=>({slotKey:s.slotKey,kind:s.unitType})),context:frozen.contextDefinition?.fields.map(f=>({contextKey:f.contextKey,valueType:f.valueType}))??[]}
+}
+export async function submitGovernedPackage(actor:string,input:{requestId:string;family:'COMBINATION'|'BUNDLE';toolKey:string;version:string;title:string;components:Array<{slotKey:string;source:{type:'STANDARD'|'GOVERNED';id:string;hash:string}}> ;report:PackageReport|null;nativeBundle?:SurveyNativeSource;reference:Record<string,unknown>},proof:AdminSessionProof){return prisma.$transaction(async tx=>{
  await assertStandardSystem(tx,actor,proof)
  const components=[]
  for(const c of input.components){const unit=await approvedComponent(tx,c.source);components.push({...c,title:unit.title,unit})}
- const a:GovernedArtifact={schemaVersion:1,family:input.family,toolKey:input.toolKey,version:input.version,title:input.title,unit:null,parameters:null,report:null,components,packageReport:input.report?packageReportSchema.parse(input.report):null,reference:artifactReference(input.family,input.toolKey,{annotations:clone(input.reference),components:components.map(c=>({slotKey:c.slotKey,source:c.source,reference:c.unit.provenance.toolReference??c.unit.provenance}))})}
+ const nativeBundle=input.nativeBundle?await freezeSurveyNativeSource(tx,actor,input.nativeBundle,components):undefined
+ if(nativeBundle&&(input.family!=='BUNDLE'||input.report!==null))governedFail(400,'原生综合画像必须保留整包身份')
+ const a:GovernedArtifact={...(nativeBundle?{nativeBundle}:{}),schemaVersion:1,family:input.family,toolKey:input.toolKey,version:input.version,title:input.title,unit:null,parameters:null,report:null,components,packageReport:input.report?packageReportSchema.parse(input.report):null,reference:artifactReference(input.family,input.toolKey,{annotations:clone(input.reference),components:components.map(c=>({slotKey:c.slotKey,source:c.source,reference:c.unit.provenance.toolReference??c.unit.provenance}))})}
  return insertSubmission(tx,actor,input.requestId,a)
 },{timeout:20000})}
 export async function governedSources(actor:string,kind:'SCALE'|'COGNITIVE'|'SJT'|'FORM',page:number,query=''){await assertStandardSystem(prisma,actor);return listCatalogSources({actorUserId:actor,kind,page,query,includeGoverned:false},prisma)}

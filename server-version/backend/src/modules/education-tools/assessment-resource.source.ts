@@ -13,7 +13,7 @@ import {frozenDatabaseScaleDefinition} from '../scale/scale-workflow.service'
 import {assertScalePublicationRights} from '../scale/scale-publication-guard'
 import {prelockEducationStandardSourceActors} from './assessment-resource.marker'
 
-export const educationCompositeInclude={questionnaireCourses:true,items:{orderBy:{position:'asc' as const},include:{scale:true,cognitiveAssignment:{include:{config:true}}}},formSections:{orderBy:{position:'asc' as const},include:{items:{orderBy:{position:'asc' as const}}}}}
+export const educationCompositeInclude={bundleInstance:true,questionnaireCourses:true,items:{orderBy:{position:'asc' as const},include:{scale:true,cognitiveAssignment:{include:{config:true}}}},formSections:{orderBy:{position:'asc' as const},include:{items:{orderBy:{position:'asc' as const}}}}}
 /** Lock these advisory source identities before Org/User/Composite row locks.
  * The initial item read orders locks only; readEducationAssessmentSource then
  * verifies the same exact identities under the composite lock. */

@@ -5,7 +5,7 @@ export type GovernedSummaryRow={id:string;family:GovernedFamily;title:string;too
 /** List-only projection: no executable, scoring keys, templates or Reference
  * bodies leave PostgreSQL. Actions still load/hash/validate the full artifact. */
 export const governedSummaryColumns=Prisma.sql`t.id,t.family,t.title,t.tool_key,t.tool_version,t.snapshot_hash,t.state,t.version,t.blockers,t.submitted_by,t.submitted_at,t.approved_by,t.approved_at,t.approval_reason,t.reason,
- jsonb_build_object('content',COALESCE(t.snapshot#>>'{unit,ref,sourceVersion}',t.tool_version),'parameters',t.snapshot#>>'{parameters,version}','report',COALESCE(t.snapshot#>>'{report,version}',t.snapshot#>>'{packageReport,version}')) AS versions,
+ jsonb_build_object('content',COALESCE(t.snapshot#>>'{unit,ref,sourceVersion}',t.tool_version),'parameters',t.snapshot#>>'{parameters,version}','report',COALESCE(t.snapshot#>>'{report,version}',t.snapshot#>>'{packageReport,version}',t.snapshot#>>'{nativeBundle,definition,reportDefinition,version}')) AS versions,
  COALESCE((SELECT jsonb_agg(jsonb_build_object('slotKey',c->>'slotKey','title',c->>'title','kind',c#>>'{unit,ref,kind}','source',c->'source','versions',
  CASE WHEN g.id IS NOT NULL THEN jsonb_build_object('content',g.snapshot#>>'{unit,ref,sourceVersion}','parameters',g.snapshot#>>'{parameters,version}','report',g.snapshot#>>'{report,version}')
  WHEN s.id IS NOT NULL THEN jsonb_build_object('content',s.snapshot#>>'{parts,CONTENT,version}','parameters',CASE WHEN s.snapshot#>'{parts,PARAMETERS,payload}'='null'::jsonb THEN NULL ELSE s.snapshot#>>'{parts,PARAMETERS,version}' END,'report',CASE WHEN s.snapshot#>'{parts,REPORT,payload}'='null'::jsonb THEN NULL ELSE s.snapshot#>>'{parts,REPORT,version}' END)
