@@ -347,7 +347,7 @@ export function verifyExecutionInputs(b,read=path=>readFileSync(resolve(path),'u
   'server-version/e2e/school-teacher-fixture.cjs','server-version/e2e/school-teacher-browser.cjs','server-version/e2e/school-teacher-chrome.cjs','server-version/e2e/school-teacher-chrome-permissions.cjs','server-version/e2e/school-teacher-ui.cjs',b.execution.browserHelper]);
  for(const component of ['frontend','backend']){
   const prefix='server-version/'+component+'/';paths.add(prefix+'package.json');paths.add(prefix+'package-lock.json');
-  if(b.branch==='release/education-self-scale-form-20261028')for(const f of b.execution[component].inputClosure.files)paths.add(f.path);
+  if(b.branch==='release/education-observer-native-20261029')for(const f of b.execution[component].inputClosure.files)paths.add(f.path);
   for(const batch of b.execution[component].batches){for(const f of batch.files)paths.add(prefix+f);for(const f of batch.inputClosure.files)paths.add(f.path)}
  }
  for(const f of b.execution.frontend.lintFiles)paths.add('server-version/frontend/'+f);
@@ -355,7 +355,7 @@ export function verifyExecutionInputs(b,read=path=>readFileSync(resolve(path),'u
  const frontend=JSON.parse(read('server-version/frontend/package.json')),backend=JSON.parse(read('server-version/backend/package.json'));
  assert.equal(frontend.scripts?.build,'vite build','Frontend build script changed');assert.equal(backend.scripts?.['db:generate'],'prisma generate','Backend client generation script changed');
  assert.equal(sha256(b.execution.migration.baselineFixtureSql),b.execution.migration.baselineFixtureSha256);
- if(b.branch==='release/education-self-scale-form-20261028'){
+ if(b.branch==='release/education-observer-native-20261029'){
   assert.equal(b.execution.migration.baselineFixturePath,'.github/scripts/school-teacher-self-baseline.sql');
   assert.equal(read(b.execution.migration.baselineFixturePath),b.execution.migration.baselineFixtureSql,'Reviewed nonempty baseline fixture changed');
  }
@@ -363,7 +363,7 @@ export function verifyExecutionInputs(b,read=path=>readFileSync(resolve(path),'u
 }
 function admission(b,plan){
  const evidence=JSON.parse(readFileSync('.github/scripts/school-teacher-evidence.json','utf8'));requireNoHistoricalAcceptance(evidence);
- if(b.branch==='release/education-self-scale-form-20261028')for(const component of ['frontend','backend'])verifyClosure(b.execution[component].inputClosure);
+ if(b.branch==='release/education-observer-native-20261029')for(const component of ['frontend','backend'])verifyClosure(b.execution[component].inputClosure);
  const inputs=verifyExecutionInputs(b);receipt('admission',{status:'PASSED',plan,inputs,historicalAcceptedCases:0,acceptedCases:[]});
 }
 function batches(component,selected,offset=0){const cwd=resolve('server-version',component),allowedSourcePaths=new Set(git('ls-files','server-version/'+component+'/src').split('\n').map(p=>p.slice(('server-version/'+component+'/').length)));assert(Array.isArray(selected));for(const [index,b] of selected.entries()){const i=index+offset;
@@ -391,12 +391,12 @@ function freshBuild(kind){
  command(kind+'-manifest',process.execPath,['.github/scripts/ci-artifact.mjs','write',kind]);
  receipt(kind+'-fresh-build',{status:'PASSED',qualification:'fresh-current-source',manifest:freshArtifact(kind)});
 }
-export const frontendTypeCommand=b=>b.branch==='release/education-self-scale-form-20261028'
+export const frontendTypeCommand=b=>b.branch==='release/education-observer-native-20261029'
  ?{exe:'npm',args:['run','typecheck']}:{exe:process.execPath,args:['node_modules/typescript/bin/tsc','-b']};
 async function frontend(b){
  if(b.qualification!=='fresh-integrated-authoring'){await reuseCompletedFrontend(b);return}
  const cwd=resolve('server-version/frontend');
- if(b.branch==='release/education-self-scale-form-20261028')verifyClosure(b.execution.frontend.inputClosure);
+ if(b.branch==='release/education-observer-native-20261029')verifyClosure(b.execution.frontend.inputClosure);
  const types=frontendTypeCommand(b);command('frontend-types',types.exe,types.args,cwd);
  if(b.execution.frontend.lintFiles.length)command('frontend-lint',process.execPath,['node_modules/eslint/bin/eslint.js',...b.execution.frontend.lintFiles],cwd);
  batches('frontend',b.execution.frontend.batches);freshBuild('frontend');
@@ -468,7 +468,7 @@ async function restore(b){
  receipt('restore',{status:'PASSED',preserved,restrictedRuntimeRole:true,releaseSchemaVerified:true});
 }
 async function restoreQualifiedPostgres(b){
- databaseGuard();assert.equal(b.branch,'release/education-self-scale-form-20261028');assert.equal(process.env.ASSESSMENT_COMPACT_FACTS_ENABLED,'false');
+ databaseGuard();assert.equal(b.branch,'release/education-observer-native-20261029');assert.equal(process.env.ASSESSMENT_COMPACT_FACTS_ENABLED,'false');
  for(const [index,batch]of b.execution.backend.batches.entries()){
   const result=JSON.parse(readFileSync(join(out,'backend-tests-'+index+'.json')));
   assert.equal(result.sourceHead,git('rev-parse','HEAD'));assert.equal(result.wholeInvocationSucceeded,true);
@@ -493,7 +493,7 @@ async function main(){const phase=process.argv[2];if(phase==='cleanup'){cleanup(
  else if(phase==='backend'){if(fresh)freshBuild('backend');else await reuseCompletedBackend(b);}
  else if(phase==='verify-backend-artifact')fresh?freshArtifact('backend'):verifyConnectedBackend();
  else if(phase==='migrate'){if(fresh){freshArtifact('backend');await migrate(b)}else await prepareCurrentDatabase(b);}
- else if(phase==='postgres'){if(fresh){freshArtifact('backend');databaseGuard();assert.notEqual(process.env.EDUCATION_MATERIAL_CAPACITY_PROBE_STUB,'true','Real upload admission capacity required');if(b.branch==='release/education-self-scale-form-20261028')verifyClosure(b.execution.backend.inputClosure);batches('backend',b.execution.backend.batches)}else{verifyConnectedBackend();await reuseCompletedRemainder(b)}}
+ else if(phase==='postgres'){if(fresh){freshArtifact('backend');databaseGuard();assert.notEqual(process.env.EDUCATION_MATERIAL_CAPACITY_PROBE_STUB,'true','Real upload admission capacity required');if(b.branch==='release/education-observer-native-20261029')verifyClosure(b.execution.backend.inputClosure);batches('backend',b.execution.backend.batches)}else{verifyConnectedBackend();await reuseCompletedRemainder(b)}}
  else if(phase==='fonts')prepareFonts();
  else if(phase==='seed'){databaseGuard();command('browser-fixture',process.execPath,['server-version/e2e/school-teacher-fixture.cjs','seed']);}
  else if(phase==='restore')await restore(b);
