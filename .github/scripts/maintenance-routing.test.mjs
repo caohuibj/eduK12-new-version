@@ -53,17 +53,38 @@ test('draft and ready attachment PRs require the actual maintenance job; skip/fa
 });
 const source=n=>readFileSync(new URL('../workflows/'+n+'.yml',import.meta.url),'utf8');
 const job=(s,n)=>s.split('  '+n+':\n')[1]?.split(/\n  [a-z][a-z0-9-]*:\n/)[0]??'';
-const maintenanceNeeds=/needs: \[scope, (?:[^\]\n]*, )?maintenance(?:,|\])/;
+const jobNeeds = block => {
+  const lines=block.split('\n');
+  const index=lines.findIndex(line=>/^    needs:/.test(line));
+  if(index<0)return [];
+  const value=lines[index].slice('    needs:'.length).trim();
+  if(value.startsWith('[')&&value.endsWith(']'))
+    return value.slice(1,-1).split(',').map(name=>name.trim()).filter(Boolean);
+  if(value)return /^[a-z][a-z0-9-]*$/.test(value)?[value]:[];
+  const values=[];
+  for(let i=index+1;i<lines.length;i++){
+    const dep=lines[i].match(/^    (?:  )?- ([a-z][a-z0-9-]*)$/);
+    if(!dep)break;
+    values.push(dep[1]);
+  }
+  return values;
+};
 test('maintenance dependency assertion matches a complete needs item, never a suffix',()=>{
-  for(const line of ['needs: [scope, maintenance, docker]','needs: [scope, exact-candidate, maintenance, docker]','needs: [scope, exact-candidate, maintenance]'])assert.match(line,maintenanceNeeds);
-  for(const line of ['needs: [scope, fake-maintenance, docker]','needs: [scope, maintenance-extra, docker]','needs: [scope, docker]'])assert.doesNotMatch(line,maintenanceNeeds);
+  for(const values of [['scope','maintenance','docker'],['scope','exact-candidate','maintenance'],
+    ['scope','fake-maintenance','docker'],['scope','maintenance-extra','docker'],['scope','docker']]) {
+    for(const block of ['    needs: ['+values.join(', ')+']',
+      '    needs:\n'+values.map(value=>'    - '+value).join('\n'),
+      '    needs:\n'+values.map(value=>'      - '+value).join('\n')])
+      assert.equal(jobNeeds(block).includes('maintenance'),values.includes('maintenance'));
+  }
+  assert.deepEqual(jobNeeds('    steps:\n      - run: echo maintenance\n        needs: [maintenance]'),[]);
 });
 test('normal scheduler runs maintenance for pure attachment changes and keeps application checks for mixed changes',()=>{
   const ci=source('ci'),lane=source('ci-maintenance');
   assert.match(job(ci,'maintenance'),/outputs\.maintenance == 'true'/);
-  // The current merge gate declares its needs as a multiline YAML sequence.
-  // Require the exact "maintenance" item after "scope"; suffixes still fail.
-  assert.match(job(ci,'merge-gate'), /^    needs:\n    - scope\n(?:    - [a-z][a-z0-9-]*\n)*    - maintenance\n/m);
+  const dependencies=jobNeeds(job(ci,'merge-gate'));
+  for(const name of ['scope','maintenance'])
+    assert.ok(dependencies.includes(name),'merge-gate must depend on exact job '+name);
   for(const name of ['pr-light-backend','pr-light-frontend','post-merge-smoke','backend',
     'backend-regression','frontend','docker','miniprogram'])
     assert.match(job(ci,name),/outputs\.maintenance != 'true'/,name);

@@ -50,18 +50,30 @@ const job = (text, name) => text.split(`  ${name}:\n`)[1]?.split(/\n  [a-z][a-z0
 // multiline sequence. Reject suffix lookalikes such as "fake-frontend".
 const jobNeeds = block => {
   const lines=block.split('\n');
-  const index=lines.findIndex(line=>/^    needs:(?: \[[^\]]*\])?$/.test(line));
+  const index=lines.findIndex(line=>/^    needs:/.test(line));
   if(index<0)return [];
-  const inline=lines[index].match(/^    needs: \[([^\]]*)\]$/);
-  if(inline)return inline[1].split(',').map(name=>name.trim()).filter(Boolean);
+  const value=lines[index].slice('    needs:'.length).trim();
+  if(value.startsWith('[')&&value.endsWith(']'))
+    return value.slice(1,-1).split(',').map(name=>name.trim()).filter(Boolean);
+  if(value)return /^[a-z][a-z0-9-]*$/.test(value)?[value]:[];
   const values=[];
   for(let i=index+1;i<lines.length;i++){
-    const dep=lines[i].match(/^    - ([a-z][a-z0-9-]*)$/);
+    const dep=lines[i].match(/^    (?:  )?- ([a-z][a-z0-9-]*)$/);
     if(!dep)break;
     values.push(dep[1]);
   }
   return values;
 };
+test('gate dependency inspection accepts YAML layouts but not similar job identities or nested decoys',()=>{
+  for(const block of ['    needs: [scope, frontend, browser]',
+    '    needs:\n    - scope\n    - frontend\n    - browser',
+    '    needs:\n      - scope\n      - frontend\n      - browser'])
+    assert.deepEqual(jobNeeds(block),['scope','frontend','browser']);
+  assert.deepEqual(jobNeeds('    needs: scope'),['scope']);
+  assert.deepEqual(jobNeeds('    needs: [scope, fake-frontend, frontend-extra]'),['scope','fake-frontend','frontend-extra']);
+  assert.equal(jobNeeds('    needs: [scope, fake-frontend, frontend-extra]').includes('frontend'),false);
+  assert.deepEqual(jobNeeds('    steps:\n      - run: echo frontend\n        needs: [frontend]'),[]);
+});
 test('Bundle validation is mandatory on content and platform routes with stable aggregate', () => {
   const ci = source('ci'), content = source('scale-onboarding-boundary');
   assert.match(job(ci, 'merge-gate'), /name: \$\{\{[\s\S]*'PR356 \/ no merge eligibility' \|\| 'merge gate \/ ready PR' \}\}/);

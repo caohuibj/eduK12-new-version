@@ -202,6 +202,10 @@ function totp(secret, step = Math.floor(Date.now() / 30000)) {
 
 async function run() {
   const { root, value: fixture } = readFixture()
+  const plan=JSON.parse(process.env.PLAN||'{}'),selfMode=plan.candidate==='education-self'
+  const selfConsumer=selfMode?require('./education-self-questionnaire.cjs'):null
+  if(selfMode){assert.equal(plan.browserMode,'SELF_COMPOSITION');assert.equal(fixture.browserMode,'SELF_COMPOSITION')}
+  const reportVerifier=selfConsumer?selfConsumer.verifyReport:verifyReport
   const { chromium } = require('../../.github/release-tools/node_modules/playwright-core')
   const axeSource = fs.readFileSync(path.join(repo, '.github/release-tools/node_modules/axe-core/axe.min.js'), 'utf8')
   const dist = fs.realpathSync(process.env.SCHOOL_TEACHER_FRONTEND_DIST || path.join(__dirname, '../frontend/dist'))
@@ -256,6 +260,7 @@ async function run() {
     startups: [], storageModes: [], chrome: null, ui: {},
     transport: 'Synthetic canonical-origin static documents; unmodified real loopback backend API responses. No public TLS/DNS/deployment assertion.',
     runtime: 'Official runtime-role-defaults/contract and release-schema checks; API never uses owner principal.',
+    ...(selfMode?{browserMode:'SELF_COMPOSITION'}:{}),
     coverage: [], screenshots: [], keyboard: [], errors: [], notCovered: ['Real media upload/storage/delivery and report images', 'Parent/teacher-observer/revocation matrix',
       'Public deployment TLS, DNS, reverse proxy', 'MFA enrollment UI visuals (real enrollment API is used)', 'Manual construction of every question (real saved definition template API is used)'],
     sessions: [], status: 'RUNNING' }
@@ -421,9 +426,10 @@ async function run() {
         return result.status === 200 ? result.body.data : result
       }
       s.click = async (locator, uri, method = 'POST') => {
-        const pending = page.waitForResponse(res => new URL(res.url()).pathname === prefix + uri && res.request().method() === method)
-        await locator.click()
-        const response = await pending; assert.equal(response.status(), 200, `${method} ${uri}`)
+        const [response] = await Promise.all([
+          page.waitForResponse(res => new URL(res.url()).pathname === prefix + uri && res.request().method() === method),
+          locator.click(),
+        ]); assert.equal(response.status(), 200, `${method} ${uri}`)
         const body = await response.json(); assert.equal(body.code, 0, `${method} ${uri} application error`)
         return body.data
       }
@@ -465,10 +471,12 @@ async function run() {
       }
       const me = await s.api('/auth/me'); assert.equal(me.id, user.id)
       assert.equal(me.role, user.role)
+      if(product==='TEACHER')s.authenticatedOrganizations=me.organizations
       const cookies = (await context.cookies(origin)).filter(c => c.name === (product === 'SCHOOL' ? 'huischool_session' : 'huiteacher_session'))
       assert.equal(cookies.length, 1); assert.equal(cookies[0].secure, true); assert.equal(cookies[0].httpOnly, true)
       await page.reload(); s.authenticated = true; lastSafeSession = s
-      await ui.preference(s)
+      audit.authenticated=true
+      if(!selfMode)await ui.preference(s)
       s.stepUp = async () => {
         assert.ok(s.mfaSecret, 'Privileged action must retain the real verified MFA challenge')
         if (Math.floor(Date.now() / 30000) === s.mfaStep) await pause(30000 - Date.now() % 30000 + 50)
@@ -628,7 +636,8 @@ async function run() {
       }
       await s.page.reload()
       await s.page.getByRole('navigation', { name: 'Teacher 工作台' }).getByRole('button', { name: '学校改进', exact: true }).click()
-      await ui.schoolManagementAnchor(s)
+      if(selfMode)await s.page.getByRole('navigation',{name:'学校管理分区',exact:true}).getByRole('link',{name:'评价活动',exact:true}).click()
+      else await ui.schoolManagementAnchor(s)
       const event = s.page.getByRole('region', { name: '评价活动', exact: true }).locator('article.ht-event').filter({ has: s.page.locator('strong').filter({ hasText: w.title }) })
       await event.getByRole('button', { name: '查看任务配置', exact: true }).click()
       return event
@@ -651,6 +660,14 @@ async function run() {
       }
       let scope = await workflowPage(s, f, w)
       for (const [kind, version] of Object.entries(versions)) {
+        if(kind==='COMPOSITION'){
+          const picker=scope.locator('details').filter({has:s.page.getByText('选用本人普通问卷',{exact:true})})
+          await picker.locator('summary').click()
+          await picker.getByRole('button',{name:'选择固定版本 · '+version.title,exact:true}).click()
+          await picker.getByRole('button',{name:'选择本版本 · 修订 '+version.sourceRevision,exact:true}).click()
+          await s.click(picker.getByRole('button',{name:s.product==='SCHOOL'?'加入测评批次':'加入评价任务',exact:true}),w.endpoint+'/tracks')
+          continue
+        }
         const label = kind === 'SCALE' ? '量表' : '表单', picker = scope.getByRole('region', { name: '我的' + label + '固定版本', exact: true })
         await picker.getByRole('button', { name: '读取我的固定' + label, exact: true }).click()
         await picker.getByRole('combobox', { name: '我的' + label + ' · 固定版本', exact: true }).selectOption(version.id)
@@ -659,13 +676,14 @@ async function run() {
       }
       const previewLabel = s.product === 'SCHOOL' ? '预览合法参与者数量' : '预览任务配置'
       const preview = await s.click(scope.getByRole('button', { name: previewLabel, exact: true }), w.endpoint + '/preview')
-      assert.equal(preview.tracks.length, 2)
+      const tracks=Object.keys(versions).length
+      assert.equal(preview.tracks.length, tracks)
       assert.ok(preview.tracks.every(track => track.executionCount === (s.product === 'SCHOOL' ? 1 : 2)))
       if (s.product === 'TEACHER') {
         const rendered = scope.getByRole('region', { name: '任务配置预览', exact: true })
-        await rendered.getByText('预计作答任务：4 个', { exact: true }).waitFor()
+        await rendered.getByText('预计作答任务：'+(tracks*2)+' 个', { exact: true }).waitFor()
       } else await scope.getByRole('status').filter({ hasText: '预览：' }).waitFor()
-      await shot(s, 'fixed-version-selection-preview')
+      if(!selfMode)await shot(s, 'fixed-version-selection-preview')
       await s.stepUp()
       if (s.product === 'SCHOOL') {
         const detail = await s.api(w.parent), submitted = await s.api(w.parent + '/submit', 'POST', { expectedVersion: detail.version })
@@ -675,7 +693,7 @@ async function run() {
       await s.click(scope.getByRole('button', { name: previewLabel, exact: true }), w.endpoint + '/preview')
       s.page.once('dialog', dialog => dialog.accept())
       const result = await s.click(scope.getByRole('button', { name: s.product === 'SCHOOL' ? '正式发布本人测评' : '发布教师评价任务', exact: true }), w.endpoint + '/publish')
-      assert.equal(result.executionCount, s.product === 'SCHOOL' ? 2 : 4)
+      assert.equal(result.executionCount, tracks*(s.product === 'SCHOOL' ? 1 : 2))
       report.coverage.push({ product: s.product, check: 'fixed-version-preview-publish', executionCount: result.executionCount, schoolPublisherIsNonAdmin: s.product === 'SCHOOL' })
       return w
     }
@@ -813,6 +831,35 @@ async function run() {
       journey: async product => {
         await startBackend(product)
         const f = fixture.products[product]
+        if(selfMode){
+          stage=product+'-ordinary-author-login'
+          const author=await session(product,f.author,'author')
+          const capabilities=await author.api('/organizations/'+f.organizationId+'/tool-authoring-capabilities')
+          assert.equal(capabilities.canAuthor,true)
+          if(product==='SCHOOL'){
+            const scope=await author.api('/organizations/'+f.organizationId+'/context')
+            assert.equal(scope.access.orgRole,'MEMBER');assert.equal(scope.access.canGovern,false)
+            assert.ok(scope.access.capabilities.includes('PSYCHOLOGY_STAFF'))
+          }
+          stage=product+'-ordinary-source-authoring'
+          const version=await selfConsumer.authorQuestionnaire(author,f,{suffix:fixture.suffix,toolsPage,report,out})
+          stage=product+'-ordinary-publish'
+          const workflow=await publish(author,f,{COMPOSITION:version})
+          stage=product+'-ordinary-participant-login'
+          const learner=await session(product,f.participant,'participant')
+          const capabilityPath='/organizations/'+f.organizationId+'/tool-authoring-capabilities'
+          if(product==='SCHOOL')assert.equal((await learner.api(capabilityPath)).canAuthor,false)
+          else {
+            assert.ok(Array.isArray(learner.authenticatedOrganizations))
+            const organization=learner.authenticatedOrganizations.find(row=>row.organizationId===f.organizationId)
+            assert.ok(organization)
+            assert.equal(organization.productAdmin,false)
+            assert.equal((await learner.api(capabilityPath,'GET',undefined,[403])).status,403)
+          }
+          stage=product+'-ordinary-execution-feedback'
+          await selfConsumer.participant(learner,f,workflow,version,{author,report,out})
+          await learner.close();await author.close();return
+        }
         stage = product + '-public-theme-layout'
         await ui.publicChecks(session, product)
         stage = product + '-author-login'
@@ -857,8 +904,9 @@ async function run() {
           note: 'Realm journey failed; dependent steps stopped. No raw exception is published.' })
         if (lastSafeSession?.authenticated && !lastSafeSession.page.isClosed()) {
           try {
-            const unsafe = await lastSafeSession.page.locator('input[type=password],.ht-secret,.hs-secret,.ht-mfa-setup').count()
-            if (!unsafe) await lastSafeSession.page.screenshot({ path: path.join(out, 'screenshots', product.toLowerCase() + '-failure.png'), fullPage: true })
+            const safe = selfConsumer ? await selfConsumer.isSafeScreenshot(lastSafeSession.page, lastSafeSession.product)
+              : await lastSafeSession.page.locator('input[type=password],.ht-secret,.hs-secret,.ht-mfa-setup').count() === 0
+            if (safe) await lastSafeSession.page.screenshot({ path: path.join(out, 'screenshots', product.toLowerCase() + '-failure.png'), fullPage: true })
           } catch { /* Preserve the original sanitized failure. */ }
         }
       },
@@ -883,15 +931,16 @@ async function run() {
     }
     stage = 'final-evidence-verification'
     report.status = 'PASSED'
-    verifyReport(report, { ...fixture.identity, runId: process.env.GITHUB_RUN_ID, ...report.inputs, ...buildEvidence }, file => fs.readFileSync(path.join(out, file)))
+    reportVerifier(report, { ...fixture.identity, runId: process.env.GITHUB_RUN_ID, ...report.inputs, ...buildEvidence }, file => fs.readFileSync(path.join(out, file)))
   } catch (error) {
     bodyFailed = true
     report.status = 'FAILED'; report.errors.push({ stage, name: error.name, messageHash: sha(String(error)),
       note: 'No raw auth-bearing exception/body/trace is published. Inspect the failing stage and status records.' })
     if (lastSafeSession?.authenticated && !lastSafeSession.page.isClosed()) {
       try {
-        const unsafe = await lastSafeSession.page.locator('input[type=password],.ht-secret,.hs-secret,.ht-mfa-setup').count()
-        if (!unsafe) await lastSafeSession.page.screenshot({ path: path.join(out, 'screenshots', 'failure.png'), fullPage: true })
+        const safe = selfConsumer ? await selfConsumer.isSafeScreenshot(lastSafeSession.page, lastSafeSession.product)
+          : await lastSafeSession.page.locator('input[type=password],.ht-secret,.hs-secret,.ht-mfa-setup').count() === 0
+        if (safe) await lastSafeSession.page.screenshot({ path: path.join(out, 'screenshots', 'failure.png'), fullPage: true })
       } catch { /* A broken renderer must not hide the original sanitized failure. */ }
     }
     throw new Error('School/Teacher browser acceptance failed at ' + stage + '; see sanitized evidence, not fixture secrets')
