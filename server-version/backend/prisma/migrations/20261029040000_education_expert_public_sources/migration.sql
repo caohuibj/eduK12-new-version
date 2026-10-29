@@ -36,18 +36,18 @@ BEGIN
         OR (expert_block#>>'{source,provider}'='PRIVATE_VERSION' AND expert_leaf.definition->>'respondentType' IS DISTINCT FROM 'expert_report'))$new$),
  ($old$IF NOT FOUND OR NOT COALESCE((standard_source.snapshot#>'{parts,CONTENT,reference,metadata,applicability,respondentTypes}') ?
     CASE split_part(variant,':',2) WHEN 'SELF' THEN 'SELF' WHEN 'PARENT_REPORT' THEN 'PARENT' ELSE 'TEACHER' END,false)$old$,
-  $new$IF NOT FOUND OR CASE WHEN variant='TEACHER:EXPERT_REPORT' THEN
+  $new$IF NOT FOUND OR (CASE WHEN variant='TEACHER:EXPERT_REPORT' THEN
     NOT education_expert_applicability_matches(standard_source.snapshot#>'{parts,CONTENT,reference,metadata,educationExpertApplicability}',origin->>'targetKind')
     OR origin->>'targetKind'<>'PERSON' OR NOT COALESCE(standard_source.snapshot#>>'{definition,respondentType}' IN ('expert_report','observer_report'),false)
     OR NOT COALESCE((standard_source.snapshot#>'{parts,CONTENT,reference,metadata,applicability,respondentTypes}') ? 'OBSERVER',false)
    ELSE NOT COALESCE((standard_source.snapshot#>'{parts,CONTENT,reference,metadata,applicability,respondentTypes}') ?
-    CASE split_part(variant,':',2) WHEN 'SELF' THEN 'SELF' WHEN 'PARENT_REPORT' THEN 'PARENT' ELSE 'TEACHER' END,false) END$new$),
+    CASE split_part(variant,':',2) WHEN 'SELF' THEN 'SELF' WHEN 'PARENT_REPORT' THEN 'PARENT' ELSE 'TEACHER' END,false) END)$new$),
  ($old$OR NOT EXISTS(SELECT 1 FROM jsonb_array_elements(public_form.snapshot#>'{reference,metadata,annotations,educationApplicability,administrations}') administration
      WHERE administration->>'population'=split_part(variant,':',1) AND administration->>'responseMode'=split_part(variant,':',2))$old$,
-  $new$OR CASE WHEN variant='TEACHER:EXPERT_REPORT' THEN
+  $new$OR (CASE WHEN variant='TEACHER:EXPERT_REPORT' THEN
      NOT education_expert_applicability_matches(public_form.snapshot#>'{reference,metadata,annotations,educationExpertApplicability}',origin->>'targetKind')
     ELSE NOT EXISTS(SELECT 1 FROM jsonb_array_elements(public_form.snapshot#>'{reference,metadata,annotations,educationApplicability,administrations}') administration
-     WHERE administration->>'population'=split_part(variant,':',1) AND administration->>'responseMode'=split_part(variant,':',2)) END$new$),
+     WHERE administration->>'population'=split_part(variant,':',1) AND administration->>'responseMode'=split_part(variant,':',2)) END)$new$),
  ($old$AND EXISTS(SELECT 1 FROM jsonb_array_elements(library_submission.snapshot#>'{educationApplicability,administrations}') administration
       WHERE administration->>'population'=split_part(variant,':',1) AND administration->>'responseMode'=split_part(variant,':',2))$old$,
   $new$AND CASE WHEN variant='TEACHER:EXPERT_REPORT' THEN origin->>'targetKind'='PERSON'
