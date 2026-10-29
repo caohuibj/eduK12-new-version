@@ -26,6 +26,7 @@ import {educationPublicSourceKey} from './public-source.identity'
 import {educationBlockPublicSource} from './public-source.identity'
 import {compositionLeafKey} from './private-tool.composition-compiler'
 import {lockOwnedDraftNativeSources} from './native-source.locks'
+import {assertSelectedSourceBindingsUnchanged,selectedSourceBindingsFromBlocks} from './selected-source-binding'
 
 type Tx=Prisma.TransactionClient
 const boundary={visibility:'AUTHOR_PRIVATE',snapshotOnly:true,canPublish:false,canShare:false,canReadParticipantReports:false} as const
@@ -92,7 +93,7 @@ export async function readPrivateTool(c:PrivateToolContext,id:string){
   // A mutable draft may contain an as-yet unverified reference. It cannot be
   // used as an oracle for another public source's title/version without U.
   // Keep the owner's draft intact; resolve only currently authorized summaries.
-  const allowed=await readEducationPublicUse(tx,c,publicSources.map(publicKey))
+  const allowed=await readEducationPublicUse(tx,c,publicSources.map(publicKey),false,selectedSourceBindingsFromBlocks(definition.blocks))
   const visibleSources=publicSources.filter(source=>allowed.has(publicKey(source)))
   const publicHeaders=await readEducationPublicSourceHeaders(tx,visibleSources)
   const libraryHeaders=await readEducationLibrarySourceSummaries(tx,c,definition.blocks.filter(block=>block.source.provider==='LIBRARY_SCALE').map(block=>block.source),definition.administration.responseMode,definition.administration.responseMode==='EXPERT_REPORT'?definition.administration.targetKind:undefined)
@@ -109,6 +110,15 @@ export async function updatePrivateTool(c:PrivateToolContext,id:string,raw:unkno
   const row=await readOwned(tx,c,id,true)
   if(row.revision!==input.expectedRevision)privateToolFail('PRIVATE_TOOL_REVISION_CONFLICT')
   const definition=privateToolDefinition(row.kind as PrivateToolKind,input.definition)
+  if(row.kind==='COMPOSITION'){
+   const previous=row.definition as unknown as PrivateCompositionDefinition,next=definition as PrivateCompositionDefinition
+   assertSelectedSourceBindingsUnchanged(previous.blocks,next.blocks)
+   const pins=selectedSourceBindingsFromBlocks(next.blocks)
+   if(pins.size){
+    const allowed=await readEducationPublicUse(tx,c,[...pins.keys()],true,pins)
+    if(allowed.size!==pins.size)privateToolFail('SELECTED_CONFIGURATION_USE_REQUIRED',403)
+   }
+  }
   const media=await assertPrivateToolImages(tx,c,id,row.kind as PrivateToolKind,definition)
   const contentHash=privateToolContentHash(row.kind as PrivateToolKind,input.title,definition)
   const result=await tx.educationPrivateTool.updateMany({where:{id,...scope(c),revision:input.expectedRevision},

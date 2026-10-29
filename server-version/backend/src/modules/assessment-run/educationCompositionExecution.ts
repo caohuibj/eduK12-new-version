@@ -21,6 +21,7 @@ import {educationCompositionKey,educationCompositionPolicyBindingSchema,educatio
 import {assertScaleLibraryCollectionAllowed} from '../scale-library-governance/collection-guard'
 import {issueVerifiedEducationStart} from './education-start-context'
 import type {RunResourcePolicy} from './resourceAuthority'
+import {readSelectedSourceBindings,type SelectedSourceBindings} from '../education-tools/selected-source-binding'
 
 type Tx=Prisma.TransactionClient
 const manifestSchema=z.array(z.object({blockId:z.string().guid(),kind:z.enum(['SCALE','FORM','COGNITIVE','SJT']),versionId:z.string().guid(),
@@ -43,7 +44,9 @@ export async function readFrozenCompositionIdentity(tx:Tx,input:{policy:RunResou
   ||canonicalHash([policy.subjectRoles,policy.respondentRoles,policy.relationshipKinds,policy.perspectives])
    !==canonicalHash([[variant.subjectRole],[variant.respondentRole],variant.relationshipKinds.filter(kind=>kind!=='COURSE_TEACHER_STUDENT'),[variant.perspective]]))
   privateToolFail('PRIVATE_COMPOSITION_EXECUTION_INVALID')
- const [row]=await tx.$queryRaw<Array<{title:string;manifest:unknown;units:unknown}>>(Prisma.sql`SELECT c.name AS title,
+ const [row]=await tx.$queryRaw<Array<{title:string;manifest:unknown;units:unknown;publicBindings?:unknown}>>(Prisma.sql`SELECT c.name AS title,
+  (SELECT COALESCE(jsonb_agg((b->'source')-'kind'),'[]'::jsonb) FROM jsonb_array_elements(original.definition->'blocks') b
+   WHERE b#>>'{source,provider}'='STANDARD_SCALE' AND b->'source'?'selectedBinding') AS "publicBindings",
   (SELECT jsonb_agg(jsonb_build_object('blockId',b->>'blockId','kind',b->>'kind','versionId',b->>'versionId','contentHash',b->>'contentHash','sourceProvider',b->>'sourceProvider',
    'itemIds',b->'itemIds','sectionIds',b->'sectionIds','title',COALESCE(v.title,g.title,std.snapshot->>'title',library.snapshot->>'title',cog.name,sjt.package#>>'{definition,source,title}',static.instrument_key)) ORDER BY ordinal)
    FROM jsonb_array_elements(c.training_content_snapshot#>'{educationBinding,manifest}') WITH ORDINALITY blocks(b,ordinal)
@@ -59,13 +62,16 @@ export async function readFrozenCompositionIdentity(tx:Tx,input:{policy:RunResou
    'contentHash',u#>>'{measurement,contentHash}','releaseId',u#>>'{measurement,releaseId}','definitionHash',COALESCE(u#>>'{source,educationStandard,nativeDefinitionHash}',u#>>'{source,educationLibrary,nativeDefinitionHash}',s.definition_hash,u#>>'{source,educationNative,contentHash}'),
    'measurementHash',u#>>'{measurement,measurementHash}')||CASE WHEN u#>'{source,educationNative}' IS NOT NULL THEN jsonb_build_object('native',u#>'{source,educationNative}') ELSE '{}'::jsonb END),'[]'::jsonb)
    FROM jsonb_array_elements(c.training_content_snapshot->'units') u LEFT JOIN scales s ON u->>'family'='SCALE' AND s.id=u#>>'{source,id}') AS units
-  FROM composite_assessments c WHERE c.id=${policy.runtimeLaunchTarget.ref} AND c.creation_key=${input.key}
+  FROM composite_assessments c JOIN education_private_tool_versions original ON original.id=${origin.versionId}
+   AND original.content_hash=${origin.contentHash} AND original.entry=${origin.entry} AND original.kind='COMPOSITION'
+   AND original.organization_id=${origin.organizationId} AND original.owner_user_id=${origin.ownerUserId}
+  WHERE c.id=${policy.runtimeLaunchTarget.ref} AND c.creation_key=${input.key}
    AND c.creation_hash=${canonicalHash(origin)} AND c.training_content_snapshot_hash=${binding.manifestHash}
    AND c.created_by=${origin.ownerUserId} AND c.status='PUBLISHED' AND c.published_at IS NOT NULL
    AND c.product_kind='ORGANIZATION_RESOURCE' AND NOT c.public_enabled AND NOT c.copyable`)
  if(!row)privateToolFail('PRIVATE_COMPOSITION_EXECUTION_INVALID')
  return {kind:'COMPOSITION' as const,origin,compositeId:policy.runtimeLaunchTarget.ref,title:row.title,policy,binding,
-  manifest:manifestSchema.parse(row.manifest),units:unitsSchema.parse(row.units),identityOnly:true as const}
+  manifest:manifestSchema.parse(row.manifest),units:unitsSchema.parse(row.units),selectedBindings:readSelectedSourceBindings(row.publicBindings??[]),identityOnly:true as const}
 }
 export type FrozenCompositionIdentity=Awaited<ReturnType<typeof readFrozenCompositionIdentity>>
 
@@ -74,7 +80,7 @@ export type FrozenCompositionIdentity=Awaited<ReturnType<typeof readFrozenCompos
  * while emergency stops still fence collection. Ordinary role withdrawal does
  * not destroy an entered attempt or historical report. */
 export async function assertCompositionCollection(tx:Tx,identity:Pick<FrozenCompositionIdentity,'origin'>&{
- units:ReadonlyArray<{releaseId:string;scaleId?:string|null;native?:{provider:string;sourceMeasurementReleaseId?:string}}>;manifest:ReadonlyArray<{sourceProvider:string;versionId:string;contentHash:string}>
+ units:ReadonlyArray<{releaseId:string;scaleId?:string|null;native?:{provider:string;sourceMeasurementReleaseId?:string}}>;manifest:ReadonlyArray<{sourceProvider:string;versionId:string;contentHash:string}>;selectedBindings?:SelectedSourceBindings
 },purpose:'NEW_START'|'BOUND_COLLECTION',lock=false,libraryUses?:LockedEducationLibraryUses){
  if(isStudentComposition(identity.origin)&&process.env.HUITEACHER_STUDENT_FEEDBACK_ENABLED!=='true')privateToolFail('HUITEACHER_STUDENT_FEEDBACK_DISABLED',403)
  const c={entry:identity.origin.entry,organizationId:identity.origin.organizationId,principal:{userId:identity.origin.ownerUserId,accountDomain:'SCHOOL' as const}}
@@ -99,7 +105,7 @@ export async function assertCompositionCollection(tx:Tx,identity:Pick<FrozenComp
   const sources=identity.manifest.map(block=>educationBlockPublicSource({...block,provider:block.sourceProvider})).filter((source):source is NonNullable<typeof source>=>source!==null)
   const keys=[...new Set(sources.map(educationPublicSourceKey))]
   if(keys.length){
-   const headers=await readEducationPublicSourceHeaders(tx,sources,lock),allowed=await readEducationPublicUse(tx,c,keys,lock)
+   const headers=await readEducationPublicSourceHeaders(tx,sources,lock),allowed=await readEducationPublicUse(tx,c,keys,lock,identity.selectedBindings,true)
    if(headers.size!==keys.length||allowed.size!==keys.length)privateToolFail('PUBLIC_SOURCE_USE_REQUIRED',403)
   }
  }

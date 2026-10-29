@@ -5,6 +5,7 @@ import {resultAudiencePolicySchema} from '../assessment-policy/result-disclosure
 import {compileEducationApplicability} from '../scale-library-governance/education-applicability'
 import {expertCompositionAdministrationSchema,expertTargetKindSchema,isExpertComposition} from './expert-observation.contract'
 import {educationCognitiveSourceSchema,educationSjtSourceSchema} from './native-source.contracts'
+import {selectedConfigurationPointerSchema} from '../assessment-authorization/standard-configuration-binding'
 
 const id=z.string().guid(),hash=z.string().regex(/^[a-f0-9]{64}$/)
 // P1 consumes immutable author-private leaves. Public/native providers are added
@@ -12,7 +13,7 @@ const id=z.string().guid(),hash=z.string().regex(/^[a-f0-9]{64}$/)
 export const privateCompositionSourceSchema=z.discriminatedUnion('provider',[
  z.object({provider:z.literal('PRIVATE_VERSION'),kind:z.enum(['SCALE','FORM']),versionId:id,contentHash:hash}).strict(),
  z.object({provider:z.literal('LIBRARY_SCALE'),kind:z.literal('SCALE'),versionId:id,contentHash:hash}).strict(),
- z.object({provider:z.literal('STANDARD_SCALE'),kind:z.literal('SCALE'),versionId:id,contentHash:hash}).strict(),
+ z.object({provider:z.literal('STANDARD_SCALE'),kind:z.literal('SCALE'),versionId:id,contentHash:hash,selectedBinding:selectedConfigurationPointerSchema.optional()}).strict(),
  z.object({provider:z.literal('PUBLIC_FORM'),kind:z.literal('FORM'),versionId:id,contentHash:hash}).strict(),
  educationCognitiveSourceSchema,educationSjtSourceSchema,
 ])

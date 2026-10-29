@@ -13,6 +13,9 @@ import {supportsStudentStandardSource} from './student-observation.contract'
 import {readEducationStandardCurrentEvidence,educationStandardEvidenceCurrent} from '../assessment-authorization/education-standard-use-current'
 import type {SelectedConfigurationBinding} from '../assessment-authorization/selected-configuration'
 import {EDUCATION_STANDARD_USE_ACTION} from '../assessment-authorization/education-standard-use'
+import {selectedConfigurationPointer} from '../assessment-authorization/standard-configuration-binding'
+import {canonicalHash} from '../assessment-runtime/canonical'
+import type {SelectedSourceBindings} from './selected-source-binding'
 
 const key=z.string().max(240).refine(value=>parseEducationPublicSourceKey(value)!==null)
 export const educationPublicCatalogQuery=z.object({cursor:key.optional(),kind:z.enum(['SCALE','FORM','COGNITIVE','SJT']).optional(),q:z.string().trim().max(160).optional(),responseMode:educationCompositionResponseModeSchema.optional(),targetKind:expertTargetKindSchema.optional()}).strict()
@@ -29,8 +32,9 @@ const grantFromRow=(row:GrantRow):ContentGrant=>({id:row.id,subjectId:row.subjec
  * transaction. Only this narrow, non-delegable root-use branch is accepted.
  * One grant batch + one post-lock clock covers all referenced public leaves;
  * no per-card ancestry reads or persistent authorization cache. */
-export async function readEducationPublicUse(tx:Prisma.TransactionClient,c:PrivateToolContext,keys:readonly string[],lock=false){
+export async function readEducationPublicUse(tx:Prisma.TransactionClient,c:PrivateToolContext,keys:readonly string[],lock=false,expected:SelectedSourceBindings=new Map(),typedPinsRequired=false){
  const exact=[...new Set(keys)];if(exact.length>128||exact.some(value=>!key.safeParse(value).success))privateToolFail('PUBLIC_SOURCE_INPUT_INVALID',400)
+ if([...expected.keys()].some(value=>!exact.includes(value)))privateToolFail('SELECTED_CONFIGURATION_SOURCE_MISMATCH',400)
  if(!exact.length)return new Map<string,{grantId:string;grantVersion:number;expiresAt:Date;selectedBinding?:SelectedConfigurationBinding}>()
  const rows=await tx.$queryRaw<GrantRow[]>(Prisma.sql`SELECT g.id,g.subject_id,g.issuer_id,g.product,g.scope_id,g.resource_keys,
   g.valid_from,g.expires_at,clock_timestamp() AS read_at,g.version,g.revoked_at,g.parent_grant_id,g.ancestry,g.capabilities,g.delegable_capabilities,g.remaining_delegation_depth,
@@ -46,6 +50,7 @@ export async function readEducationPublicUse(tx:Prisma.TransactionClient,c:Priva
  const audits=rows.flatMap(row=>row.selected_configuration_actor!==null&&row.selected_configuration_actor!==undefined?
   [{id:row.id,actor_id:row.selected_configuration_actor,metadata:row.selected_configuration_metadata}]:[])
  const typed=await readEducationStandardCurrentEvidence(tx,c,rows,lock,audits)
+ const matchedPins=new Set<string>()
  // Only a protected write's SHARE locks can wait behind a revoke. Read-only
  // preview/media calls reuse this statement's clock rather than another SQL.
  const clock=lock?(await tx.$queryRaw<Array<{now:Date}>>(Prisma.sql`SELECT clock_timestamp() AS now`))[0]:{now:new Date(Math.max(...rows.map(row=>row.read_at.getTime()),
@@ -55,9 +60,20 @@ export async function readEducationPublicUse(tx:Prisma.TransactionClient,c:Priva
   const evidence=typed.get(row.id)
   if(evidence&&!educationStandardEvidenceCurrent(evidence,clock.now))continue
   const grant=assertContentGrantChain([grantFromRow(row)],row.id,clock.now)
-  for(const resourceKey of grant.scope.resourceKeys)if(exact.includes(resourceKey)&&!allowed.has(resourceKey))allowed.set(resourceKey,{grantId:row.id,grantVersion:row.version,expiresAt:row.expires_at,
-   ...(evidence?{selectedBinding:evidence.binding}:{})})
+  for(const resourceKey of grant.scope.resourceKeys){
+   const pins=expected.get(resourceKey),actual=evidence?selectedConfigurationPointer(evidence.binding):null
+   // A new typed grant is not an implicit upgrade of a legacy draft. Existing
+   // independent untyped use grants keep their original legal path.
+   if(typedPinsRequired&&resourceKey.startsWith('education-source:STANDARD_SCALE:')&&!pins&&evidence)continue
+   const matches=pins?.filter(pin=>pin.authorizationId===row.id&&pin.authorizationRevision===row.version
+    &&actual&&canonicalHash(pin)===canonicalHash(actual))
+   if(pins&&!matches?.length)continue
+   for(const pin of matches??[])matchedPins.add(resourceKey+':'+pin.bindingHash)
+   if(exact.includes(resourceKey)&&!allowed.has(resourceKey))allowed.set(resourceKey,{grantId:row.id,grantVersion:row.version,expiresAt:row.expires_at,
+    ...(evidence?{selectedBinding:evidence.binding}:{})})
+  }
  }
+ for(const [resourceKey,pins]of expected)if(pins.some(pin=>!matchedPins.has(resourceKey+':'+pin.bindingHash)))allowed.delete(resourceKey)
  return allowed
 }
 
