@@ -447,6 +447,10 @@ jobs:
           const b=binding();
           assert(b.enabled===true || b.candidate==='native-bundle' && JSON.parse(readFileSync(process.env.GITHUB_EVENT_PATH,'utf8')).pull_request?.draft===true,'School candidate disabled');assert.match(b.productHead||'',/^[a-f0-9]{40}$/);
           execFileSync('git',['fetch','--no-tags','--depth=1','origin',b.productHead],{stdio:'inherit'});
+          if(b.candidate==='native-bundle' && process.env.GITHUB_EVENT_NAME==='push'){
+            assert.match(process.env.GITHUB_SHA||'',/^[a-f0-9]{40}$/);
+            execFileSync('git',['fetch','--no-tags','--depth=2','origin',process.env.GITHUB_SHA],{stdio:'inherit'});
+          }
           JS
       - name: fetch the fixed reviewed candidate source for shallow classification
         if: (github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'fix/shared-assessment-foundation-merge-20261017' && github.event.pull_request.head.repo.full_name == github.repository) || (github.event_name == 'push' && github.ref == 'refs/heads/main' && github.event.before == '0c41f07cb8c6104ad7c88448d948682baf24cf37')
