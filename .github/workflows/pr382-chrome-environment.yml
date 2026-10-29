@@ -1,0 +1,78 @@
+name: PR382 isolated Chrome environment verification
+# Temporary environment evidence only; never application or merge admission.
+on:
+  push:
+    branches: [ci/pr382-chrome-environment-20261029]
+permissions:
+  contents: read
+env:
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+jobs:
+  environment:
+    if: github.repository == 'caohuibj/eduK12-new-version' && github.event_name == 'push' && github.ref == 'refs/heads/ci/pr382-chrome-environment-20261029'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.21.0
+      - name: install only the existing locked release tools from the official registry
+        working-directory: .github/release-tools
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: tighten only the explicitly approved and dynamically verified Chrome scope
+        env:
+          SCHOOL_TEACHER_CHROME_TIGHTEN: confirmed-self-package-scope
+        run: node server-version/e2e/school-teacher-chrome-permissions.cjs tighten
+      - name: require unchanged strict Chrome preflight and a real active sandbox
+        run: |
+          node <<'NODE'
+          'use strict'
+          const fs = require('node:fs'), path = require('node:path')
+          const { createHash } = require('node:crypto')
+          const { preflightChrome, CHROME_LAUNCH_OPTIONS, verifyChromeSandbox, validateChromeEvidence } = require('./server-version/e2e/school-teacher-chrome.cjs')
+          const repo = process.cwd(), report = { schemaVersion: 1, purpose: 'PR382_CHROME_ENVIRONMENT_ONLY', acceptance: false,
+            applicationQualified: false, browserLaunched: false, status: 'FAILED',
+            reviewedFix: '0b6b3a31ce5a384abaafff6568d56329fec3174d',
+            source: { sha: process.env.GITHUB_SHA, runId: process.env.GITHUB_RUN_ID, attempt: process.env.GITHUB_RUN_ATTEMPT },
+            runner: { imageOS: process.env.ImageOS, imageVersion: process.env.ImageVersion, node: process.version },
+            launchOptions: CHROME_LAUNCH_OPTIONS }
+          let browser, stage = 'STRICT_PREFLIGHT'
+          ;(async () => {
+            try {
+              report.preflight = preflightChrome({ repo, diagnostics: true })
+              if (!report.preflight.ok) { report.code = report.preflight.code; return }
+              stage = 'SANDBOXED_LAUNCH'
+              const { chromium } = require(path.join(repo, '.github/release-tools/node_modules/playwright-core'))
+              browser = await chromium.launch(CHROME_LAUNCH_OPTIONS); report.browserLaunched = true
+              stage = 'SANDBOX_OBSERVATION'
+              report.sandbox = await verifyChromeSandbox(browser)
+              const checked = validateChromeEvidence({ options: CHROME_LAUNCH_OPTIONS, preflight: report.preflight, sandbox: report.sandbox })
+              if (!checked.ok) { report.code = checked.code; return }
+              report.status = 'ENVIRONMENT_READY'; report.code = 'CHROME_ENVIRONMENT_VERIFIED'
+            } catch (error) {
+              report.code = 'CHROME_ENVIRONMENT_OPERATION_FAILED'
+              report.errorDigest = createHash('sha256').update(String(error)).digest('hex')
+            } finally {
+              report.stage = stage
+              if (browser) { try { await browser.close() } catch { report.status = 'FAILED'; report.code = 'BROWSER_CLOSE_FAILED' } }
+              try {
+                fs.writeFileSync(path.join(repo, 'school-teacher-evidence/chrome-environment.json'), JSON.stringify(report, null, 2) + '\n', { mode: 0o600, flag: 'wx' })
+              } catch { report.status = 'FAILED'; report.code = 'ENVIRONMENT_EVIDENCE_WRITE_FAILED' }
+              process.stdout.write('CHROME_ENVIRONMENT ' + JSON.stringify(report) + '\n')
+              process.exitCode = report.status === 'ENVIRONMENT_READY' ? 0 : 1
+            }
+          })()
+          NODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pr382-chrome-environment-${{ github.sha }}
+          path: |
+            school-teacher-evidence/chrome-permissions.json
+            school-teacher-evidence/chrome-environment.json
+          if-no-files-found: error
+          retention-days: 3
