@@ -1,0 +1,91 @@
+name: PR382 Chrome scope read-only observation
+# Diagnostic branch only. No application checkout, qualification or merge-gate use.
+# Fixed candidate reference: ed2b146580f7ef0ab5665c7c618457dca1003257
+on:
+  push:
+    branches: [ci/pr382-chrome-readonly-20261029]
+permissions: {}
+jobs:
+  observe:
+    if: github.repository == 'caohuibj/eduK12-new-version' && github.event_name == 'push' && github.ref == 'refs/heads/ci/pr382-chrome-readonly-20261029'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    steps:
+      - name: read only Chrome package version and bounded path attributes
+        env:
+          DIAGNOSTIC_SOURCE_SHA: ${{ github.sha }}
+          DIAGNOSTIC_WORKFLOW_SHA: ${{ github.workflow_sha }}
+          DIAGNOSTIC_WORKFLOW_REF: ${{ github.workflow_ref }}
+          DIAGNOSTIC_REPOSITORY: ${{ github.repository }}
+          DIAGNOSTIC_REF: ${{ github.ref }}
+          DIAGNOSTIC_EVENT: ${{ github.event_name }}
+        run: |
+          node <<'NODE'
+          'use strict'
+          const fs = require('node:fs'), path = require('node:path')
+          const { spawnSync } = require('node:child_process')
+          const ROOT = '/opt/google/chrome', parents = ['/opt', '/opt/google', ROOT]
+          const env = process.env, sha = value => /^[a-f0-9]{40}$/.test(value || '')
+          const report = { schemaVersion: 1, purpose: 'PR382_READONLY_ENVIRONMENT_OBSERVATION', qualification: false, acceptance: false,
+            permissionChangeAttempted: false, browserLaunched: false, applicationCheckedOut: false,
+            candidateReference: { sha: 'ed2b146580f7ef0ab5665c7c618457dca1003257', tree: '77853547ba6192aa39244dc5092b06f563ee9d26' },
+            diagnosticSource: { sha: env.DIAGNOSTIC_SOURCE_SHA, workflowSha: env.DIAGNOSTIC_WORKFLOW_SHA, workflowRef: env.DIAGNOSTIC_WORKFLOW_REF },
+            runner: { platform: process.platform, architecture: process.arch, node: process.version,
+              os: env.RUNNER_OS || null, arch: env.RUNNER_ARCH || null, environment: env.RUNNER_ENVIRONMENT || null,
+              imageOS: env.ImageOS || null, imageVersion: env.ImageVersion || null },
+            parents: [], affectedPackagePaths: [], blocked: [], packageBytesRead: false }
+          const fail = code => { throw Object.assign(new Error(code), { safeCode: code }) }
+          const safePath = p => p.length <= 512 && /^[A-Za-z0-9_./+ -]+$/.test(p) && path.posix.normalize(p) === p
+          const query = args => {
+            const r = spawnSync('/usr/bin/dpkg-query', args, { encoding: 'utf8', timeout: 10000,
+              maxBuffer: 1024 * 1024, stdio: ['ignore', 'pipe', 'pipe'], env: { PATH: '/usr/bin:/bin', LANG: 'C', LC_ALL: 'C' } })
+            if (!r || r.error || r.signal || r.status !== 0 || typeof r.stdout !== 'string') fail('PACKAGE_QUERY_FAILED')
+            return r.stdout
+          }
+          const cache = new Map()
+          const observe = p => {
+            try {
+              const s = fs.lstatSync(p), mode = s.mode & 0o7777
+              const row = { path: p, uid: s.uid, gid: s.gid, permissionMode: mode, modeOctal: mode.toString(8).padStart(4, '0'),
+                type: s.isSymbolicLink() ? 'SYMLINK' : s.isDirectory() ? 'DIRECTORY' : s.isFile() ? 'FILE' : 'OTHER' }
+              cache.set(p, row); return row
+            } catch (e) {
+              report.blocked.push({ path: p, code: ['ENOENT', 'EACCES', 'EPERM', 'ELOOP', 'ENOTDIR'].includes(e.code) ? e.code : 'STAT_FAILED' })
+              return null
+            }
+          }
+          try {
+            if (env.DIAGNOSTIC_REPOSITORY !== 'caohuibj/eduK12-new-version' || env.DIAGNOSTIC_EVENT !== 'push' ||
+                env.DIAGNOSTIC_REF !== 'refs/heads/ci/pr382-chrome-readonly-20261029' || !sha(env.DIAGNOSTIC_SOURCE_SHA) ||
+                env.DIAGNOSTIC_SOURCE_SHA !== env.DIAGNOSTIC_WORKFLOW_SHA || process.platform !== 'linux' ||
+                env.RUNNER_ENVIRONMENT !== 'github-hosted') fail('DIAGNOSTIC_CONTEXT_MISMATCH')
+            const version = query(['-W', '-f=${binary:Package}\t${Status}\t${Architecture}\t${Version}\n', 'google-chrome-stable'])
+            const m = /^google-chrome-stable(?::amd64)?\tinstall ok installed\tamd64\t((?:\d+:)?\d+(?:\.\d+){3}(?:-\d+)?)\r?\n?$/.exec(version)
+            if (!m) fail('PACKAGE_IDENTITY_UNAVAILABLE')
+            report.package = { name: 'google-chrome-stable', architecture: 'amd64', version: m[1] }
+            const listed = query(['-L', 'google-chrome-stable']).trimEnd().split('\n').filter(p => p === ROOT || p.startsWith(ROOT + '/'))
+            if (!listed.includes(ROOT) || listed.length > 2048 || listed.some(p => !safePath(p))) fail('PACKAGE_PATH_LIST_INVALID')
+            const paths = [...new Set(listed)].sort((a, b) => a.split('/').length - b.split('/').length || a.localeCompare(b))
+            report.packagePathsListed = paths.length
+            let traversable = true
+            for (const p of parents) {
+              const row = observe(p); if (row) report.parents.push(row)
+              if (!row || row.type !== 'DIRECTORY') {
+                if (row) report.blocked.push({ path: p, code: 'ANCESTOR_NOT_DIRECTORY' })
+                traversable = false; break
+              }
+            }
+            if (traversable) for (const p of paths) {
+              if (p === ROOT) continue
+              if (cache.get(path.posix.dirname(p))?.type !== 'DIRECTORY') {
+                report.blocked.push({ path: p, code: 'ANCESTOR_NOT_OBSERVED_AS_DIRECTORY' }); continue
+              }
+              const row = observe(p)
+              if (row && (row.permissionMode & 0o022) !== 0) report.affectedPackagePaths.push(row)
+            }
+            report.packagePathsObserved = Math.max(0, cache.size - 2)
+            report.status = report.blocked.length ? 'PARTIAL_OBSERVATION' : 'OBSERVED'
+          } catch (e) { report.status = 'OBSERVATION_FAILED'; report.code = e.safeCode || 'UNEXPECTED_DIAGNOSTIC_FAILURE' }
+          process.stdout.write('CHROME_SCOPE_READONLY ' + JSON.stringify(report) + '\n')
+          process.exitCode = report.status === 'OBSERVED' ? 0 : 1
+          NODE
