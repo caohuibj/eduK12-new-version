@@ -79,9 +79,11 @@ suite('Teacher student ordinary Scale/Form questionnaire (isolated PostgreSQL)',
    const draft=await tools.createPrivateTool(context,{kind,title}),saved=await tools.updatePrivateTool(context,draft.id,{expectedRevision:1,title,definition})
    return tools.freezePrivateTool(context,draft.id,{expectedRevision:saved.revision,expectedContentHash:saved.contentHash})
   }
-  const scale=compileResearchScale('Fixed observed classroom support',{schemaVersion:1,presentationMode:'ONE_BY_ONE',respondentType:'observer_report',aggregation:'mean',
+  const scale=compileResearchScale('Fixed observed classroom support',{schemaVersion:1,presentationMode:'ONE_BY_ONE',respondentType:'teacher_self_report',aggregation:'mean',
    responseOptions:[{optionKey:'zero',label:'未观察到',score:0},{optionKey:'one',label:'观察到',score:1}],dimensions:[{dimensionKey:'support',label:'支持观察',direction:'descriptive'}],
    items:[{itemKey:'q',prompt:'教师提供明确课堂支持',required:true,reverse:false,dimensionKeys:['support']}]})
+  // Explicit native observer declaration on this new synthetic version, before freeze.
+  scale.respondentType='observer_report'
   scale.report.audienceContract={schemaVersion:1,respondent:'OBSERVER_REPORT',audience:'teacher',locale:'zh-CN'}
   const [scaleVersion,formVersion]=[await fixed('SCALE','Observed support',scale),await fixed('FORM','Unscored classroom Form',form)]
   const definition={schemaVersion:1,adapterVersion:'1.0.0',administration:{population:'TEACHER',responseMode:'STUDENT_REPORT'},instruction:'Observe the assigned teacher',
