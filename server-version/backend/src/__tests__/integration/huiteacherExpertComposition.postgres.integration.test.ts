@@ -29,7 +29,7 @@ import {listEducationLibrarySources} from '../../modules/education-tools/library
 import {readEducationPublicFormPreview} from '../../modules/education-tools/public-source.preview'
 import {readEducationLibraryScalePreview} from '../../modules/education-tools/library-source.preview'
 const url=integrationDatabaseUrl('RELEASE_INTEGRATION_DATABASE_URL'),suite=url?describe:describe.skip
-// R executes this on the migrated disposable real PG. No production access,
+// Runs on an explicitly selected migrated disposable real PG. No production access,
 // fake relational assignment or test-only execution protocol is introduced.
 suite('Teacher explicit expert Scale/Form field questionnaire (real PostgreSQL)',()=>{
  let server:Server,base:string
@@ -43,9 +43,9 @@ suite('Teacher explicit expert Scale/Form field questionnaire (real PostgreSQL)'
   base=`http://127.0.0.1:${(server.address() as {port:number}).port}/api/huiteacher`
  })
  afterAll(async()=>{server?.closeAllConnections();if(server)await new Promise<void>(resolve=>server.close(()=>resolve()));vi.unstubAllEnvs();await db.$disconnect()})
- async function request(userId:string,path:string,body?:unknown,mfa=true){
+ async function request(userId:string,path:string,body?:unknown,mfa:'fresh'|'stale'|'missing'='fresh'){
   const user=await db.user.findUniqueOrThrow({where:{id:userId}}),csrf='synthetic-expert-csrf'
-  const token=generateToken({userId,username:user.username,role:user.role,accountDomain:'SCHOOL',sessionProduct:'HUITEACHER',tokenVersion:user.tokenVersion,...(mfa?{mfaVerifiedAt:Math.floor(Date.now()/1000)}:{})})
+  const token=generateToken({userId,username:user.username,role:user.role,accountDomain:'SCHOOL',sessionProduct:'HUITEACHER',tokenVersion:user.tokenVersion,...(mfa==='missing'?{}:{mfaVerifiedAt:Math.floor(Date.now()/1000)-(mfa==='stale'?600:0)})})
   const response=await fetch(base+path,{method:body===undefined?'GET':'POST',headers:{'content-type':'application/json',cookie:`${HUITEACHER_AUTH_COOKIE_NAME}=${token}; ${HUITEACHER_CSRF_COOKIE_NAME}=${csrf}`,[CSRF_HEADER_NAME]:csrf},...(body===undefined?{}:{body:JSON.stringify(body)})})
   const value:any=await response.json();return {status:response.status,value,data:value.data}
  }
@@ -160,7 +160,9 @@ suite('Teacher explicit expert Scale/Form field questionnaire (real PostgreSQL)'
   const stored=await db.huiteacherFieldFormEvidence.findUniqueOrThrow({where:{recordId:note.id}})
   expect(stored).toMatchObject({attemptId:parent,attemptEpoch:1,formId:null,definitionDigest:null});expect(stored.finalHash).toMatch(/^[a-f0-9]{64}$/)
   expect(stored.answersCipher).not.toContain('EXPERT professional evidence')
-  expect((await request(teacher.id,evidencePath)).status).toBe(403);expect((await request(manager.id,evidencePath,undefined,false)).status).toBe(403)
+  expect((await request(teacher.id,evidencePath)).status).toBe(403)
+  expect((await request(manager.id,evidencePath,undefined,'missing')).status).toBe(401)
+  expect((await request(manager.id,evidencePath,undefined,'stale')).status).toBe(403)
   const evidence=await request(manager.id,evidencePath);expect(evidence.status,JSON.stringify(evidence.value)).toBe(200)
   expect(evidence.data.units).toEqual(expect.arrayContaining([expect.objectContaining({kind:'FORM',items:expect.arrayContaining([expect.objectContaining({value:'EXPERT professional evidence'})])}),expect.objectContaining({kind:'SCALE',metrics:expect.arrayContaining([expect.objectContaining({value:0})])})]))
   expect(JSON.stringify(evidence.data)).not.toContain(expert.id);expect(JSON.stringify(evidence.data)).not.toContain('PRIVATE expert reflection')

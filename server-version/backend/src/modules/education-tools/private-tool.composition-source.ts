@@ -80,6 +80,10 @@ export async function readPrivateCompositionRunSources(tx:Tx,c:PrivateToolContex
  const librarySources=rows.flatMap(row=>row.librarySources)
  await assertEducationLibraryUses(tx,c,librarySources.map(source=>source.versionId),{locked:options.libraryUses,requireLocked:options.lockForUse})
  await assertEducationLibraryHeaders(tx,librarySources,options.lockForUse)
+ const publicKeys=[...new Set(rows.flatMap(row=>row.publicKeys))]
+ // Match native retire's config -> measurement order; this is the existing
+ // current-use check, moved ahead of the collection identity locks.
+ if(publicKeys.length)await assertEducationCognitiveOriginalUse(tx,c,publicKeys.map(key=>parseEducationPublicSourceKey(key)!).filter(source=>source.kind==='COGNITIVE_CONFIG').map(source=>source.id),options.lockForUse)
  if(options.lockForUse){
   const releases=[...new Set(rows.flatMap(row=>row.releaseIds))],scales=[...new Set(rows.flatMap(row=>row.scaleIds))]
   // Reuse the real emergency writer's identity locks, then read mutable status
@@ -90,9 +94,7 @@ export async function readPrivateCompositionRunSources(tx:Tx,c:PrivateToolContex
    WHERE id=ANY(${releases}::text[]) AND status<>'PUBLISHED'`)
   if(unavailable.length)privateToolFail('PRIVATE_COMPOSITION_SOURCE_UNAVAILABLE')
  }
- const publicKeys=[...new Set(rows.flatMap(row=>row.publicKeys))]
  if(publicKeys.length){
-  await assertEducationCognitiveOriginalUse(tx,c,publicKeys.map(key=>parseEducationPublicSourceKey(key)!).filter(source=>source.kind==='COGNITIVE_CONFIG').map(source=>source.id),options.lockForUse)
   const headers=await readEducationPublicSourceHeaders(tx,publicKeys.map(key=>parseEducationPublicSourceKey(key)!),options.lockForUse),allowed=await readEducationPublicUse(tx,c,publicKeys,options.lockForUse)
   if(allowed.size!==publicKeys.length||headers.size!==publicKeys.length)privateToolFail('PUBLIC_SOURCE_USE_REQUIRED',403)
  }
