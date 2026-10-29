@@ -35,6 +35,9 @@ function runAcceptance(root, pkg) {
       maxBuffer: 8 * 1024 * 1024,
     },
   )
+  // Keep the original reporter on stderr so JSON stdout remains machine-readable.
+  if (result.stdout) process.stderr.write(result.stdout)
+  if (result.stderr) process.stderr.write(result.stderr)
   if (result.error || result.status !== 0)
     throw new Error(
       'COG_RUNNER_ACCEPTANCE_FAILED: ' +

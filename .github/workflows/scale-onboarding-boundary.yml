@@ -6,6 +6,9 @@ on:
       runner_profile:
         type: string
         default: hosted
+      cognitive_intake_light:
+        type: boolean
+        default: false
       scale_intake_light:
         type: boolean
         default: false
@@ -32,8 +35,59 @@ env:
   NPM_CONFIG_REPLACE_REGISTRY_HOST: always
 
 jobs:
+  cognitive-intake:
+    if: inputs.cognitive_intake_light
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    env:
+      CI: 'true'
+      NODE_ENV: test
+      COGNITIVE_MODULE_ENABLED: 'true'
+      VITE_COGNITIVE_MODULE_ENABLED: 'true'
+      BACKGROUND_WORKERS_ENABLED: 'false'
+      TZ: UTC
+      COGNITIVE_INTAKE_BASE_SHA: ${{ inputs.base }}
+      COGNITIVE_INTAKE_HEAD_SHA: ${{ github.sha }}
+      COGNITIVE_INTAKE_REPORT_DIR: ${{ github.workspace }}/cognitive-intake-evidence
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+          cache: npm
+          cache-dependency-path: |
+            server-version/backend/package-lock.json
+            server-version/frontend/package-lock.json
+      - name: enforce isolated cognitive input and exact Git scope before dependencies
+        env:
+          SCALE: ${{ inputs.scale }}
+          SCALE_LIGHT: ${{ inputs.scale_intake_light }}
+          COGNITIVE: ${{ inputs.cognitive }}
+          SITUATIONAL: ${{ inputs.situational }}
+          BUNDLE: ${{ inputs.bundle }}
+        run: |
+          test "$COGNITIVE" = true && test "$SCALE" = false && test "$SCALE_LIGHT" = false && test "$SITUATIONAL" = false && test "$BUNDLE" = false
+          node .github/scripts/cognitive-intake-scope.mjs
+      - name: install each unchanged locked dependency tree once without application hooks
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund --prefix server-version/backend
+          npm ci --ignore-scripts --no-audit --no-fund --prefix server-version/frontend
+      - name: selected identities real scorer fixtures reports DOM and affected types
+        run: env -u DATABASE_URL node .github/scripts/cognitive-intake-check.mjs
+      - name: preserve actual selected execution and compiler reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cognitive-intake-evidence
+          path: cognitive-intake-evidence
+          if-no-files-found: warn
   scale-intake:
-    if: inputs.scale_intake_light
+    if: inputs.scale_intake_light && !inputs.cognitive_intake_light
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:
@@ -64,7 +118,7 @@ jobs:
         working-directory: server-version/backend
         run: node --import tsx scripts/scale-intake-selected-check.ts
   boundary:
-    if: ${{ !inputs.scale_intake_light }}
+    if: ${{ !inputs.scale_intake_light && !inputs.cognitive_intake_light }}
     timeout-minutes: 30
     services:
       postgres:
