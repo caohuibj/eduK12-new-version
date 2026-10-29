@@ -4,7 +4,9 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 import path from 'node:path';
 import {createRequire} from 'node:module';
-import {verifyCognitiveBatch} from './cognitive-intake-check.mjs';
+import {verifyCognitiveBatch,checkCognitiveDeclarations} from './cognitive-intake-check.mjs';
+import {isDataModule} from './cognitive-content.mjs';
+import os from 'node:os';
 const require=createRequire(new URL('../../server-version/backend/package.json',import.meta.url));
 const ts=require('typescript');
 const id=(version='1.0.0')=>({testType:'reaction',engineVersion:'1.0.0',scoringVersion:version});
@@ -56,3 +58,10 @@ test('real CLI batch orchestrates globals once and all identity stages',async()=
 test('per-identity exception keeps the remaining actual result and fails batch',async()=>{const r=await cli(['--tasks','reaction','--json'],{identityFailure:true});assert.equal(r.exitCode,1);const report=JSON.parse(r.stdout);assert.equal(report.identityResults.length,2);assert.equal(report.decisions.length,2);assert.deepEqual(r.calls.fixtures,['1.1.0']);assert.equal(report.decisions[1].technical.ready,true);assert.throws(()=>verifyCognitiveBatch(r.stdout,{tasks:['reaction']},packages));});
 test('outer discovery exception emits failed envelope instead of empty success',async()=>{const r=await cli(['--tasks','reaction','--json'],{discoveryFailure:true});assert.equal(r.exitCode,1);assert.equal(JSON.parse(r.stdout).exitCode,1);assert.equal(r.calls.acceptance,0);});
 test('DOM child failure propagates and legacy JSON stays one decision per line',async()=>{const failed=await cli(['--tasks','reaction','--json'],{acceptanceFailure:true});assert.equal(failed.exitCode,1);assert.equal(JSON.parse(failed.stdout).checks.find(c=>c.name==='frontend-acceptance').status,'FAIL');const old=await cli(['reaction','--json']);assert.equal(old.exitCode,0);const lines=old.stdout.trim().split('\n').map(x=>JSON.parse(x));assert.equal(lines.length,2);assert.ok(lines.every(x=>x.kind===undefined));});
+test('mixing backend implementation never disables the existing declaration AST guard',t=>{
+  const root=fs.mkdtempSync(path.join(os.tmpdir(),'cognitive-declaration-'));t.after(()=>fs.rmSync(root,{recursive:true,force:true}));
+  const file='server-version/backend/src/modules/cognitive/tasks/reaction/seeds.ts',absolute=path.join(root,file);fs.mkdirSync(path.dirname(absolute),{recursive:true});
+  const selection={taskModes:{reaction:'task'},entries:[{file},{file:file.replace('seeds.ts','definitions.ts')}]};
+  fs.writeFileSync(absolute,'export const seeds=[{count:1}]');assert.doesNotThrow(()=>checkCognitiveDeclarations(root,selection,isDataModule));
+  fs.writeFileSync(absolute,'export const seeds=loadRuntimeConfig()');assert.throws(()=>checkCognitiveDeclarations(root,selection,isDataModule),/UNSAFE_DECLARATION/);
+});

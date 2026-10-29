@@ -8,6 +8,10 @@ import {readCognitiveIntakeDiff,cognitiveTaskRoot} from './cognitive-intake-scop
 
 const identity = id => `${id.testType}/${id.engineVersion}/${id.scoringVersion}`;
 const tFor = file => file.slice(cognitiveTaskRoot.length).split('/')[0];
+export function checkCognitiveDeclarations(root,selection,isDataModule) {
+  for(const e of selection.entries) if(/^server-version\/backend\/src\/modules\/cognitive\/tasks\/[^/]+\/(seeds|participant-presentation|governance|scientific)\.ts$/.test(e.file))
+    assert.ok(isDataModule(fs.readFileSync(path.join(root,e.file),'utf8')),'UNSAFE_DECLARATION:'+e.file);
+}
 const sameSet = (actual,expected,label) => {
   assert.ok(Array.isArray(actual),label);
   assert.equal(new Set(actual).size,actual.length,label+':duplicate');
@@ -96,8 +100,7 @@ export async function runCognitiveIntake({root=process.cwd(),base=process.env.CO
   const require=createRequire(path.join(root,'server-version/backend/package.json'));
   // Import the existing AST guard only after exact Git planning and locked installation.
   const {isDataModule}=await import(pathToFileURL(path.join(root,'.github/scripts/cognitive-content.mjs')));
-  for(const e of selection.entries) if(selection.taskModes[e.file.slice(cognitiveTaskRoot.length).split('/')[0]]==='data')
-    assert.ok(isDataModule(fs.readFileSync(path.join(root,e.file),'utf8')),'UNSAFE_DECLARATION:'+e.file);
+  checkCognitiveDeclarations(root,selection,isDataModule);
   const manifests=require(path.join(root,'server-version/scripts/cognitive/manifests.cjs'));
   // Discovery is structural; global manifest/dependency validation executes once in the child.
   const packages=manifests.discover();
