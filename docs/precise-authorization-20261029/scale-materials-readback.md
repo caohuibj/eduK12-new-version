@@ -29,3 +29,11 @@
 重复前后全部 56 份量表、32 个认知配置的 ID、定义 hash、版本、状态及 createdAt/updatedAt，连同 seed 管理员头信息完全一致；canonical state hash 为 `2175cdd75219bcfab7ac2a7f7a022d58b0bb88cf54f3b11c0719daa0043d1e4c`。三份 basic 的定义与轴来源 hash 同先前精确原件一致。独立数据库没有 use grant、任务、入口资格、发布量表、deployment 或 standard C/P/R 注册组合；seed 管理员是旧 ADMIN/STANDARD 身份，没有 SYSTEM_ADMIN 或入口资格。
 
 证据命令、退出状态、来源、seed 文件 hash、全量身份与重复快照已索引在 `source-manifest.json.currentMainSetup`；原始记录位于本节点 evidence 目录。该证明覆盖新数据库正常迁移/seed 与幂等回读，未重新安装依赖、构建前端或证明生产 runtime 角色资格。fun R 仍仅为 Git 素材，没有独立注册；没有执行被拒 sidecar 工程、生产操作或真实用户授权。
+
+## main c52：第二批声明式素材前移
+
+main 后续前进到 `c52e1675fe7990ce49b42589d993fb12e8541ae1`（PR #389），tree `269d73372e9d47b578059c7078bb66402e1b689c`。增量为98个纯素材/索引文件，新增32份标准增强报告原件及保留旧/标准/趣味 R 的素材 JSON；后端 package/lock、prisma seed/迁移、运行时、权限和 CI 均未变。本分支正常合入该 main，没有复制私有工作树或代做此前被拒工程。
+
+精确 c52 的独立 clean worktree 和新库 `main_setup_test_c52_20261029` 再执行正常 guarded migrate/完整 db:seed，并各重复一次，所有命令和两次只读检查退出0。实际88份量表均 DRAFT/HIDDEN、32个主干默认认知配置；包括本轮新增32份标准R（31项1.1.0，IPIP50为1.1.2）。重复前后所有行身份/定义/hash/时间戳一致，state hash `4add92f85e5ea1da1ae01a3d85d836818c03b0201f1f96b6a2c33c41c9610ca9`。原三份 basic 定义/轴来源与6fa原件仍完全一致。
+
+新库仍0个 grants、任务、入口资格、SYS管理员、发布量表、deployment 或 C/P/R standard注册组合；fun R 仍未注册。88份DRAFT不等于全部获得入口准入，32个默认认知配置也不替代候选11项或22个profile运行资格。旧6142的56份结果保留为历史，不改写到新基线；完整身份和证据移到 manifest.currentMainSetup，旧快照在 previousMainSetup。检查仅补正常数据库初始化/seed和回读，未重复DOT评分/报告对照或运行全平台setup/CI。
