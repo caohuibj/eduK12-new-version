@@ -1,3 +1,5 @@
+import {readSurveyStoredReport} from '../../modules/survey/report-results.service'
+import type {FormDraft} from '../../modules/survey/builder.definition'
 import {it,expect,vi,beforeAll,afterAll} from 'vitest'
 import fs from 'node:fs'
 import {prisma as db} from '../../config/database'
@@ -20,6 +22,7 @@ test('reads restored native Survey feedback from immutable saved facts, with no 
  const started=performance.now(),cpu=process.cpuUsage(),feedback=await readGeneralForOwnAttempt({publicId:result.publicId,attemptId:result.attemptId,accessCredential:state.attempt.accessCredential}),readMs=performance.now()-started,readCpu=process.cpuUsage(cpu)
  expect(feedback).toMatchObject({nativeBundles:[{factsHash:result.factsHash,profileView:{profileId:'P4'}}],measurements:expect.any(Array)})
  const reports=await readGovernedPackageReports(state.owner.userId,{projectId:result.projectId,waveId:result.waveId,finalId:result.finalId});expect(reports.list[0].artifact).toMatchObject({nativeBundle:{profileView:{state:'WITHHELD',profileId:null,constructs:[]}}})
+ await expect(readSurveyStoredReport(state.owner.userId,{projectId:result.projectId,waveId:result.waveId,finalId:result.finalId,instrumentKey:state.imported.bindings.find((b:{slotKey:string})=>b.slotKey==='ase').instrumentKey})).rejects.toMatchObject({statusCode:403})
  await expect(readGeneralForOwnAttempt({publicId:result.publicId,attemptId:result.attemptId,accessCredential:'x'.repeat(43)})).rejects.toThrow()
  expect(score).not.toHaveBeenCalled();expect(profile).not.toHaveBeenCalled();expect(current).not.toHaveBeenCalled()
  fs.writeFileSync(directory+'/survey-native-saved-read-result.json',JSON.stringify({status:'PASS',readMs,readCpu,responseBytes:Buffer.byteLength(JSON.stringify(feedback)),factsHash:result.factsHash,wrongCredentialDenied:true,noRescore:true,noReprofile:true,noCurrentSourceLookup:true},null,2))
@@ -31,5 +34,8 @@ test('rejects split or reordered native content and changed source identity befo
  try{
  for(const components of [row.snapshot.components.slice(1),[...row.snapshot.components].reverse()])await expect(db.$transaction(tx=>source.freezeSurveyNativeSource(tx,native.ownerId,native.source,components))).rejects.toMatchObject({code:'SURVEY_NATIVE_WHOLE_PACKAGE_REQUIRED'})
  await expect(db.$transaction(tx=>source.freezeSurveyNativeSource(tx,native.ownerId,{...native.source,definitionHash:'0'.repeat(64)},row.snapshot.components))).rejects.toMatchObject({code:'SURVEY_NATIVE_SOURCE_CHANGED'})
+ const extra=structuredClone(row.snapshot.components),form=extra.find(c=>c.unit.ref.kind==='FORM')!.unit.displayDefinition as FormDraft
+ form.pages[0].questions.push({...form.pages[0].questions[0],itemKey:'extra'})
+ await expect(db.$transaction(tx=>source.freezeSurveyNativeSource(tx,native.ownerId,native.source,extra))).rejects.toMatchObject({code:'SURVEY_NATIVE_CONTEXT_INCOMPLETE'})
  }finally{await db.$disconnect()}
 },60000)

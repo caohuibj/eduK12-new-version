@@ -33,7 +33,11 @@ export async function freezeSurveyNativeSource(tx:Prisma.TransactionClient,actor
   native.reportAudiences[binding.slotKey]=component.unit.provenance.reportConfigured===true&&audience===originalAudience&&(audience==='student'||audience==='researcher')?audience:null
  }
  const fields=frozen.contextDefinition?.fields??[]
- if(source.context.length!==fields.length||new Set(source.context.map(c=>c.contextKey)).size!==fields.length)fail('SURVEY_NATIVE_CONTEXT_INCOMPLETE')
+ if(source.context.length!==fields.length||new Set(source.context.map(c=>c.contextKey)).size!==fields.length||new Set(source.context.map(c=>c.slotKey+':'+c.itemKey)).size!==fields.length)fail('SURVEY_NATIVE_CONTEXT_INCOMPLETE')
+ for(const component of components.filter(c=>c.unit.ref.kind==='FORM')){
+  const form=assertSurveyDraft('FORM',component.unit.displayDefinition,true) as FormDraft,questions=form.pages.flatMap(p=>p.questions),declared=source.context.filter(c=>c.slotKey===component.slotKey)
+  if(questions.length!==declared.length||questions.some(q=>!declared.some(c=>c.itemKey===q.itemKey)))fail('SURVEY_NATIVE_CONTEXT_INCOMPLETE')
+ }
  for(const field of fields){
   const mapping=source.context.find(c=>c.contextKey===field.contextKey),component=components.find(c=>c.slotKey===mapping?.slotKey)
   if(!component||component.unit.ref.kind!=='FORM')fail('SURVEY_NATIVE_CONTEXT_BINDING')
@@ -50,4 +54,15 @@ export async function assertSurveyNativeAdmission(tx:Prisma.TransactionClient,na
  const row=await tx.bundleInstance.findUnique({where:{compositeId:native.source.compositeId},include:{composite:true}})
  if(!row||row.composite.status!=='PUBLISHED'||row.composite.createdBy!==native.ownerId||row.definitionHash!==native.source.definitionHash||row.bindingsHash!==native.source.bindingsHash)fail('SURVEY_NATIVE_SOURCE_CHANGED')
  const {pack}=nativeProfilePackage(native);readInstance(row!);await assertPackageAdmission(tx,pack)
+}
+
+/** After the caller's existing data authority, inspect only this FINAL's frozen
+ * unit. Undefined means a historical/non-native unit and preserves its old path. */
+export async function readSurveyNativeReportAudience(tx:Prisma.TransactionClient,input:{projectId:string;finalId:string;instrumentKey:string}){
+ const [row]=await tx.$queryRaw<Array<{native:boolean;audience:string|null}>>`SELECT u.value ? 'nativeBundleReport' AS native,
+  u.value #>> '{nativeBundleReport,audience}' AS audience
+  FROM survey_wave_finals f JOIN survey_publications p ON p.id=f.publication_id
+  CROSS JOIN LATERAL jsonb_array_elements(p.compiled_snapshot->'units') AS u(value)
+  WHERE f.id=${input.finalId} AND f.project_id=${input.projectId} AND u.value->>'instrumentKey'=${input.instrumentKey}`
+ return row?.native===false?undefined:row?.audience??null
 }

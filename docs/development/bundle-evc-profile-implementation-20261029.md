@@ -436,3 +436,19 @@ B模型仍0.1.0、映射/包0.1.1、模板0.1.0、model hash87f889c9…40a3f。�
 当前实际能力矩阵更新：Training、School现有授权整源分发、Survey现有整包U三条EVC试验链已具备真实FINAL/单项＋综合、受众边界、保存/恢复和代表阅读浏览器证据。Teacher成人SELF仍明确不适用本B，未修改年龄范围；一般人口匹配的包仍消费现有合同，但本轮没有另造一个成人科学模型或宣称已跑通成人示范。P6公共native包目录U仍是另一来源入口未接通，不能以此否定已经独立验证的现有整源分发/Survey整包U，也不能冒称P6已完成。
 
 CI checklist已有本次提交/fixture首错/原CI修复成功和下一轮边界增量写回；Notion09自然节点交接随后以最终远端head和当前真实结果为准。第19节qualification路由改动仍只是待集中review计划，没有新增workflow/改gate/移除CodeQL，尚未合main或部署。
+
+
+### 冻结与旧版本兼容收尾
+
+编制页锁定修复9ca165b1b已推送，正式run40936037550和publication40936032164均SUCCESS，后台tree与347完全相同。随后只读自审补了两个必要合同：Context的FORM只能包含已声明且唯一映射的全部字段，不能在原包槽位里夹带额外问卷；只在R原件**显式记录**audience时才向governedSnapshot增加此可选metadata，旧R缺省不补默认属性，避免改变旧组件/technical grant/整包的既有hash。旧R实际发布audience缺省仍researcher；这不是扩张旧授权。
+
+新增表单字段拒绝并入原来源边界case，真实PG定向1 PASS（只读，无作答/计分）；旧SCALE/R metadata投影与手写历史形状严格相等、canonicalHash相等、显式student R保留的新增case1 PASS。没有找到旧非native整包的真实历史样本，不能把这个纯投影合同声称为全套旧Survey PG升级验收。本B原显式student R及三字段映射输入均未改变，不重复其FINAL/恢复/浏览器。以上为独立小型兼容提交，后续CI只报告其实际source结果。
+
+
+### Survey单项R的另一读取消费者
+
+在合成已完成FINAL上新增真实只读probe确认：原 `survey/report-results.service.ts` 的研究者接口会返回 `{accessAudience:researcher,intendedAudience:student,reportBlocks:1}`。probe使用本B仅RAW指标的student R，不宣称真实用户或敏感解释已泄漏；这一新接线不能只保护综合artifact而忽略单项入口。
+
+最小修复新增一个共享消费文件 `survey/report-results.service.ts`：沿原项目/研究者/数据/来源权限之后，读取**该FINAL冻结publication中对应unit**的可选nativeBundleReport受众，原生R未开放researcher时返回403。实现放 `bundle-product/survey-source.ts`，仅查当前FINAL的一份静态publication（最多30unit），不扫被试、不调用当前native source/admission或重新计分。历史/非native unit无此字段时返回undefined，原通用报告路径保持；没有把所有报告的intendedAudience重新定义为一套通用授权策略，也没有重写角色、grant或管理员分配。
+
+只复验受影响保存读取case：学生2单项＋P4仍可读，研究者不能经旧单项接口绕过native R受众，原aggregate研究者WITHHELD/错误凭据拒绝保持，scorer、Profile与current native admission spy零调用，实际1 PASS/exit0。原PG FINAL/三入口浏览器不重跑。该共享文件及最小输入/输出已列明供DOT在本自然节点集中复核。

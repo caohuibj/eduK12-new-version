@@ -107,6 +107,6 @@ export function governedSnapshot(row:GovernedRow):CatalogSourceSnapshot{
  if(!row.snapshot.unit||packageFamily(row.family))throw new Error('组合只能整包导入，禁止按单个工具使用')
  const s=clone(row.snapshot.unit)
  return {...s,ref:{kind:s.ref.kind,sourceId:'survey-tool:'+row.id,sourceVersion:row.snapshot_hash},provenance:{...s.provenance,surveyToolReleaseId:row.id,governedInstrumentVersion:s.ref.sourceVersion,
- reportConfigured:row.snapshot.report!==null,...(row.snapshot.report?{reportAudience:row.snapshot.report.audience??'researcher'}:{}),parametersConfigured:row.snapshot.parameters!==null,toolReference:row.reference,...(row.measurement_release?{sourceMeasurementRelease:row.measurement_release}:{})}}
+ reportConfigured:row.snapshot.report!==null,...(row.snapshot.report?.audience?{reportAudience:row.snapshot.report.audience}:{}),parametersConfigured:row.snapshot.parameters!==null,toolReference:row.reference,...(row.measurement_release?{sourceMeasurementRelease:row.measurement_release}:{})}}
 }
 export const isGovernedSource=(id:string)=>id.startsWith('survey-tool:')

@@ -1,3 +1,5 @@
+import {governedSnapshot,artifactReference,type GovernedRow} from '../../modules/survey/governed-tool.model'
+import {CATALOG_ADAPTER_VERSION} from '../../modules/survey/catalog.sources'
 import {canonicalHash} from '../../modules/assessment-runtime/canonical'
 import {it,expect} from 'vitest'
 import {computeSurveyNativeReports,savedSurveyNativeFeedback} from '../../modules/bundle-product/survey-native'
@@ -30,4 +32,15 @@ it('does not promote a raw selection into a different R audience or expose a res
  expect(hidden.constructs.some(c=>c.key==='math.academic_self_efficacy')).toBe(false)
  unit.nativeBundleReport={definitionHash:native.source.definitionHash,audience:'student',policy:native.policies.ase}
  expect(rawParticipantFeedback(unit,result.units[0],true)).toBeNull()
+})
+
+it('preserves the exact legacy governed snapshot footprint when no R audience was explicitly recorded',()=>{
+ const reference=artifactReference('SCALE','legacy',{}),unit={ref:{kind:'SCALE' as const,sourceId:'original',sourceVersion:'1'},title:'Legacy metadata fixture',displayDefinition:{},compiledDefinition:{},definitionDigest:'d',scoringDigest:null,adapterVersion:CATALOG_ADAPTER_VERSION,provenance:{original:true}}
+ const row:GovernedRow={id:'legacy',family:'SCALE',tool_key:'legacy',tool_version:'1',title:'Legacy metadata fixture',snapshot_hash:'h',reference,submitted_by:'author',submitted_at:new Date(0),state:'ONLINE',version:1,approved_by:'reviewer',approved_at:new Date(0),approval_reason:'synthetic',reason:'synthetic',latest_trial:null,lease_until:null,blockers:[],measurement_release:null,snapshot:{schemaVersion:1,family:'SCALE',toolKey:'legacy',version:'1',title:'Legacy metadata fixture',unit,parameters:null,report:{version:'r1',template:{blocks:[],limitations:[]}},components:[],packageReport:null,reference}}
+ // Metadata-only historical shape; not a new publishable Scale measurement/report fixture.
+ const historical={...unit,ref:{kind:'SCALE',sourceId:'survey-tool:legacy',sourceVersion:'h'},provenance:{original:true,surveyToolReleaseId:'legacy',governedInstrumentVersion:'1',reportConfigured:true,parametersConfigured:false,toolReference:reference}}
+ expect(governedSnapshot(row)).toStrictEqual(historical)
+ expect(canonicalHash(governedSnapshot(row))).toBe(canonicalHash(historical))
+ row.snapshot.report!.audience='student'
+ expect(governedSnapshot(row).provenance.reportAudience).toBe('student')
 })
