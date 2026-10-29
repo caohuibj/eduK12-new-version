@@ -1,7 +1,7 @@
 import {authorizePrivateTool} from './private-tool.access'
 import {educationPackageReferenceSchema,educationPackageUseSchema,type EducationPackageReference} from './package-reference.contracts'
 import {readEducationPackageUse,readEducationPackageForUse} from './package-reference.access'
-import {fixedEducationPackageSelection,preservesEducationPackageSelection} from './package-reference.selection'
+import {fixedEducationPackageSelection,preservesEducationPackageSelection,originalEducationPackageScopeReason} from './package-reference.selection'
 import {readEducationWholePackageSource,matchesEducationWholePackage} from './package-reference.source'
 import {educationNativeBundleSchema} from '../bundle-product/education-identity'
 import {retainEducationNativeBundle,assertEducationNativeBundle,assertEducationNativeBundlePopulation} from '../bundle-product/education-adapter'
@@ -145,6 +145,7 @@ export async function prepareEducationAssessment(c:EducationAssessmentContext,ra
    publicPackage=(await readEducationPackageUse(tx,{...c,actorId:c.principal.userId},input.publicPackage)).use
    const whole=await readEducationPackageForUse(tx,input.publicPackage,c.product)
    if(!matchesEducationWholePackage(source.bundleInstance,whole))fail('EDUCATION_PACKAGE_SOURCE_CHANGED')
+   if(await originalEducationPackageScopeReason(tx,trainingContentSnapshotSchema.parse(source.trainingContentSnapshot),content.releases))fail('EDUCATION_PACKAGE_ORIGINAL_CONTENT_SCOPE_UNSUPPORTED',400)
   }
   const assets=educationAssessmentAssets(source,content.releases.values())
   await assertEducationAssessmentAssets(tx,assets)
@@ -393,10 +394,12 @@ export async function listEducationAssessmentSourceCandidates(c:EducationAssessm
   for(const candidate of page){
    const sourceLicenses=await discoverLicenses(tx,c,[candidate.id])
    if(!sourceLicenses)continue
-   let licenses:License[]|null=null,unavailableReason:'SOURCE_NOT_AVAILABLE'|'MISSING_DISTRIBUTION_AUTHORITY'|null=null
+   let licenses:License[]|null=null,unavailableReason:'SOURCE_NOT_AVAILABLE'|'MISSING_DISTRIBUTION_AUTHORITY'|'ORIGINAL_CONTENT_SCOPE_UNSUPPORTED'|null=null
    try{
     const {source,content}=await readEducationAssessmentSource(tx,candidate.id,identities.get(candidate.id)!,c.product)
     if(whole&&!matchesEducationWholePackage(source.bundleInstance,whole))continue
+    if(whole)unavailableReason=await originalEducationPackageScopeReason(tx,trainingContentSnapshotSchema.parse(source.trainingContentSnapshot),content.releases)
+    if(unavailableReason){list.push({sourceCompositeId:candidate.id,title:candidate.name,canPrepare:false,canPublish:false as const,unavailableReason,licenses:[]});continue}
     await assertPreparationPrivateOwners(tx,c,content.snapshot)
     const assets=educationAssessmentAssets(source,content.releases.values())
     await assertEducationAssessmentAssets(tx,assets)

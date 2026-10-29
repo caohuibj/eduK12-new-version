@@ -11,7 +11,7 @@ type Rows=Awaited<ReturnType<Client['list']>>['list']
 type Props={api:PrivateToolApi;organizationId:string;actorId:string;product:'SCHOOL'|'TEACHER';publicPackage?:EducationPackageRef;onDraftStateChange?:(state:PrivateDraftState)=>void}
 const object=(value:unknown):Record<string,unknown>=>value&&typeof value==='object'&&!Array.isArray(value)?value as Record<string,unknown>:{}
 const text=(value:unknown,fallback='未返回')=>typeof value==='string'&&value?value:fallback
-const unavailableText=(reason:unknown)=>reason==='MISSING_DISTRIBUTION_AUTHORITY'?'缺少必要分发许可':reason==='SOURCE_NOT_AVAILABLE'?'来源当前不可用':reason==='CONTENT_NOT_AVAILABLE'?'内容当前不可用':'等待许可确认'
+const unavailableText=(reason:unknown)=>reason==='ORIGINAL_CONTENT_SCOPE_UNSUPPORTED'?'原包私有参考或报告仅适用于原来源，不能用于新的本校版本':reason==='MISSING_DISTRIBUTION_AUTHORITY'?'缺少必要分发许可':reason==='SOURCE_NOT_AVAILABLE'?'来源当前不可用':reason==='CONTENT_NOT_AVAILABLE'?'内容当前不可用':'等待许可确认'
 const familyNames:Record<string,string>={BUNDLE:'组合测评',COGNITIVE:'认知测评',SITUATIONAL:'情境测评',SCALE:'量表',SJT:'情境测评'}
 const disclosureNames:Record<string,string>={NONE:'不展示反馈',COMPLETION_ONLY:'仅完成确认',INDIVIDUAL_SUMMARY:'已批准报告的本人摘要'}
 function FrozenRegistrationSummary({registration}:{registration:EducationAssessmentRegistration}){

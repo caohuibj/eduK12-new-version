@@ -1,5 +1,15 @@
 import type {TrainingContentSnapshot} from '../composite/training-content-binding'
 import {canonicalHash} from '../assessment-runtime/canonical'
+import type {Prisma} from '@prisma/client'
+import {getContentReleaseBatch,type StoredRelease} from '../measurement-content/repository'
+
+/** A new runtime cannot inherit the source's PRIVATE resource identity. Use
+ * already loaded releases, fetching only missing original P/R in one batch. */
+export async function originalEducationPackageScopeReason(tx:Prisma.TransactionClient,snapshot:TrainingContentSnapshot,loaded:ReadonlyMap<string,StoredRelease>){
+ const ids=[...new Set(snapshot.units.flatMap(unit=>[...(unit.referencePolicy?.choices.map(choice=>choice.releaseId)??[]),...(unit.report?[unit.report.releaseId]:[])]))]
+ const missing=ids.filter(id=>!loaded.has(id)),extra=missing.length?await getContentReleaseBatch(tx,missing,true):new Map<string,StoredRelease>()
+ return ids.some(id=>(loaded.get(id)??extra.get(id))?.scope.kind==='PRIVATE')?'ORIGINAL_CONTENT_SCOPE_UNSUPPORTED' as const:null
+}
 /** The original whole source owns P/R choices, priorities and explicit absence. */
 export function fixedEducationPackageSelection(snapshot:TrainingContentSnapshot){return {
  references:{schemaVersion:1 as const,units:snapshot.units.map(unit=>({itemId:unit.itemId,
