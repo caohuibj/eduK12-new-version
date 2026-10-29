@@ -20,4 +20,3 @@ it('renders independent original ranges and an equivalent table, then consumes t
   expect(container.textContent).not.toContain('P4')
   expect(container.querySelectorAll('path')).toHaveLength(0)
 })
-

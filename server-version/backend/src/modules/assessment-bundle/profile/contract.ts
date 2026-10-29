@@ -54,4 +54,3 @@ export function validateProfileModel(model: ProfileModel) {
   }
   unique(patterns)
 }
-

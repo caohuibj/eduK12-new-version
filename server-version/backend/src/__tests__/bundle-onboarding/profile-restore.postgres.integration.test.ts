@@ -25,4 +25,3 @@ test('reads the native-restored frozen EVC report without a second engine invoca
     expect(await db.assessmentUnitSnapshot.count({where:{compositeAttemptId:fixture.attemptId}})).toBe(3)
   }finally{spy.mockRestore();await db.$disconnect()}
 },60000)
-

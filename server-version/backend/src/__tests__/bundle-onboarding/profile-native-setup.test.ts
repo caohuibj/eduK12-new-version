@@ -15,4 +15,3 @@ it('exposes the native model and required theory claim through the existing setu
   const field=parseBundleContextDefinition(pack.context).fields[0]
   expect(profileGradeForm(pack,field)).toMatchObject({contextKey:'gradeLevel',formType:'single_choice',formLabel:'年级'})
 })
-

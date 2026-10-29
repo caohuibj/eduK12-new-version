@@ -39,4 +39,3 @@ export function projectProfileView(result:ProfileResult,pack:DeclarativePackage,
   }
   return view
 }
-

@@ -97,4 +97,3 @@ export function matchProfileConstructs(model:ProfileModel,out:ProfileResult):Pro
   out.trace.supportRefs=[...new Set(model.profiles.filter(p=>p.id===out.profileId || out.state==='MIXED' && candidates.slice(0,2).some(c=>c.profileId===p.id)).flatMap(p=>p.supportRefs))].sort()
   return out
 }
-

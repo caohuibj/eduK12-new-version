@@ -9,4 +9,3 @@ export function profileGradeForm(pack:DeclarativePackage|undefined,field:BundleC
   return {formType:'single_choice',formLabel:'年级',contextKey:'gradeLevel',
     formOptions:Array.from({length:12},(_,i)=>({value:String(i+1),label:i<6?'小学'+(i+1)+'年级':i<9?'初中'+(i-5)+'年级':'高中'+(i-8)+'年级'}))}
 }
-

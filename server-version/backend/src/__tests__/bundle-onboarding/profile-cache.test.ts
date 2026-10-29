@@ -20,4 +20,3 @@ it('bounds static model reuse through immutable content and rejects incomplete f
 it('verifies the new typed package2 fixture branch after its compiler repair',()=>{
   expect(verifyPackageFixtures(pack)).toHaveLength(4)
 })
-

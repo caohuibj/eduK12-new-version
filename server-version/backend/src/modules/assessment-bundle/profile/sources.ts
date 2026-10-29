@@ -14,4 +14,3 @@ export function projectProfileScaleSource(input:{slotKey:string;expectedInstrume
     sourceResultId:envelope.persistenceProvenance.sourceAttemptId,qualityFlags:[...envelope.core.quality.flags],
   }}
 }
-

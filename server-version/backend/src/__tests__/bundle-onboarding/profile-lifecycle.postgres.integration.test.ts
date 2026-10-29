@@ -107,4 +107,3 @@ suite('EVC normal install to durable FINAL and saved report',{timeout:120000},()
     // and restore consumers. There is no production state or mocked approval.
   })
 })
-

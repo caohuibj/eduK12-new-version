@@ -54,4 +54,3 @@ export default function BundleProfileSummary({view}:{view:BundleProfileView}){
     </ReportDetails>}
   </div>
 }
-
