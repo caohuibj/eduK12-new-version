@@ -1,0 +1,71 @@
+{
+  "completed": true,
+  "database": "eduk12_ipip_0cd9fe6030",
+  "operations": 18,
+  "assertions": 47,
+  "packages": [
+    {
+      "identity": {
+        "instrumentKey": "ipip_neo_c1_self_efficacy10_zh_cn_research",
+        "instrumentVersion": "1.0.0"
+      },
+      "versions": {
+        "instrument": "1.0.0",
+        "scoring": "1.0.0",
+        "report": "1.0.1",
+        "localization": "1.0.0",
+        "instruction": "1.0.0"
+      },
+      "scaleId": "14857510-ce3a-42b5-bd45-dcfa92f42e29",
+      "states": {
+        "installed": true,
+        "status": "PUBLISHED",
+        "visibility": "PUBLIC",
+        "deployment": "ACTIVE",
+        "auditCount": 1
+      }
+    },
+    {
+      "identity": {
+        "instrumentKey": "ipip_neo_c5_self_discipline10_zh_cn_research",
+        "instrumentVersion": "1.0.0"
+      },
+      "versions": {
+        "instrument": "1.0.0",
+        "scoring": "1.0.0",
+        "report": "1.0.0",
+        "localization": "1.0.0",
+        "instruction": "1.0.0"
+      },
+      "scaleId": "5dae94f9-5d80-454d-b782-a51152c7698e",
+      "states": {
+        "installed": true,
+        "status": "PUBLISHED",
+        "visibility": "PUBLIC",
+        "deployment": "ACTIVE",
+        "auditCount": 1
+      }
+    },
+    {
+      "identity": {
+        "instrumentKey": "ipip_nfc10_zh_cn_research",
+        "instrumentVersion": "1.0.0"
+      },
+      "versions": {
+        "instrument": "1.0.0",
+        "scoring": "1.0.0",
+        "report": "1.0.1",
+        "localization": "1.0.0",
+        "instruction": "1.0.0"
+      },
+      "scaleId": "99ffb2ff-fab4-4602-a6d2-2a6b356fc3c4",
+      "states": {
+        "installed": true,
+        "status": "PUBLISHED",
+        "visibility": "PUBLIC",
+        "deployment": "ACTIVE",
+        "auditCount": 1
+      }
+    }
+  ]
+}

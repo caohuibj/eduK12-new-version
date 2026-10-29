@@ -1,0 +1,18 @@
+[
+  {
+    "originalPath": "evidence/isolation-report.json",
+    "originalSHA256": "c8f954b7722688e6766119dca6ed9f1c8ca975abc0b9b5e98fb634368e8ded00",
+    "originalBytes": 605359,
+    "storedPath": "evidence/isolation-report.json.gz",
+    "storedSHA256": "fba5d01063cfb9be87d402fd226fd6458c2e3209a3162276db7220f064b8d7ae",
+    "encoding": "gzip; exact original bytes, not rewritten"
+  },
+  {
+    "originalPath": "evidence/schema-migrate.stdout.log",
+    "originalSHA256": "bee9ca161efc8ea769aa9983bb3b4e346dfaa1d5925c61dcfe62fee4f26a43f7",
+    "originalBytes": 34101,
+    "storedPath": "evidence/schema-migrate.stdout.log.gz",
+    "storedSHA256": "a0fdc6023a3c39d755a95f0ba9b4a38082e0e12f08f32f908511471a74ed5ee5",
+    "encoding": "gzip; exact original bytes, not rewritten"
+  }
+]

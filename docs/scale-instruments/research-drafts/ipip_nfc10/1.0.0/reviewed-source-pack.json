@@ -1,0 +1,153 @@
+{
+  "status": "CONTENT_DRAFT_NOT_VALIDATED_NOT_PUBLISHED",
+  "checked_at": "2026-10-25",
+  "translation_status": "项目中文工作译稿；未声称为既有经验证中文版；需独立译审及目标人群认知访谈",
+  "rights": {
+    "type": "public_domain",
+    "source": "https://www.ipip.ori.org/",
+    "electronic_and_translation_source": "https://www.ipip.ori.org/New_IPIP-50-item-scale.htm",
+    "summary": "IPIP官方允许复制、编辑、翻译及任何用途，包括网上施测；仍保留来源署名。"
+  },
+  "anchors": [
+    {
+      "value": 1,
+      "en": "Very Inaccurate",
+      "zh": "很不符合"
+    },
+    {
+      "value": 2,
+      "en": "Moderately Inaccurate",
+      "zh": "比较不符合"
+    },
+    {
+      "value": 3,
+      "en": "Neither Inaccurate nor Accurate",
+      "zh": "介于不符合与符合之间"
+    },
+    {
+      "value": 4,
+      "en": "Moderately Accurate",
+      "zh": "比较符合"
+    },
+    {
+      "value": 5,
+      "en": "Very Accurate",
+      "zh": "很符合"
+    }
+  ],
+  "instructions_zh": "请根据你通常的实际情况，判断下面的描述与你有多符合。请按真实情况作答，而不是你希望自己成为的样子。",
+  "item_source": "https://www.ipip.ori.org/newSingleConstructsKey.htm",
+  "scoring_source": "https://www.ipip.ori.org/newScoringInstructions.htm",
+  "scoring": {
+    "method": "sum",
+    "positive": "response",
+    "negative": "6-response",
+    "range": [
+      10,
+      50
+    ],
+    "secondary_mean": {
+      "formula": "sum/10",
+      "range": [
+        1,
+        5
+      ]
+    },
+    "total_requires_all_items": true,
+    "missing_policy": "项目实现选择：不对缺失补零或推算；未完成时不给总分。未检到官方缺失插补标准。"
+  },
+  "reference": {
+    "clinical_cutoffs": null,
+    "norm_percentiles": null,
+    "reference_status": "NO_VERIFIED_TARGET_POPULATION_NORMS",
+    "source": "https://www.ipip.ori.org/newNorms.htm",
+    "note": "IPIP官方不提供通用常模，提醒按适当样本建立本地参照。不能用量尺等分点或任意均值±SD冒称经验阈值；不移植所对应原版权量表常模。"
+  },
+  "audience": "优先成人/教师研究与自我了解；青少年适用性尚需该中文版证据，不能把原英文统计移植为中文信效度。",
+  "illustration_plan": "仅报告后配原创解释图，不在题干旁加入暗示性图片；图应有替代文本，不使用病理红黄绿分区。",
+  "code": "IPIP_NFC10",
+  "name_zh": "认知需求（IPIP 10题表征版）",
+  "name_en": "IPIP representation of Need for Cognition",
+  "tags": [
+    "人格与个体差异",
+    "学习相关倾向",
+    "认知需求",
+    "自评",
+    "非诊断",
+    "10题",
+    "工作译稿"
+  ],
+  "items": [
+    {
+      "id": "IPIP_NFC10_01",
+      "en": "Like to solve complex problems.",
+      "zh_draft": "我喜欢解决复杂的问题。",
+      "reverse": false
+    },
+    {
+      "id": "IPIP_NFC10_02",
+      "en": "Need things explained only once.",
+      "zh_draft": "别人只需解释一次，我就能明白。",
+      "reverse": false
+    },
+    {
+      "id": "IPIP_NFC10_03",
+      "en": "Can handle a lot of information.",
+      "zh_draft": "我能处理大量信息。",
+      "reverse": false
+    },
+    {
+      "id": "IPIP_NFC10_04",
+      "en": "Love to think up new ways of doing things.",
+      "zh_draft": "我喜欢想出做事的新方法。",
+      "reverse": false
+    },
+    {
+      "id": "IPIP_NFC10_05",
+      "en": "Am quick to understand things.",
+      "zh_draft": "我能很快理解事物。",
+      "reverse": false
+    },
+    {
+      "id": "IPIP_NFC10_06",
+      "en": "Love to read challenging material.",
+      "zh_draft": "我喜欢阅读有挑战性的材料。",
+      "reverse": false
+    },
+    {
+      "id": "IPIP_NFC10_07",
+      "en": "Have difficulty understanding abstract ideas.",
+      "zh_draft": "我觉得抽象的观念很难理解。",
+      "reverse": true
+    },
+    {
+      "id": "IPIP_NFC10_08",
+      "en": "Try to avoid complex people.",
+      "zh_draft": "我会尽量避开复杂的人。",
+      "reverse": true
+    },
+    {
+      "id": "IPIP_NFC10_09",
+      "en": "Avoid difficult reading material.",
+      "zh_draft": "我会避开难懂的阅读材料。",
+      "reverse": true
+    },
+    {
+      "id": "IPIP_NFC10_10",
+      "en": "Avoid philosophical discussions.",
+      "zh_draft": "我会避开哲学性的讨论。",
+      "reverse": true
+    }
+  ],
+  "source_statistics": {
+    "official_reported_alpha": 0.84,
+    "status": "官方英文构念页历史统计，不是当前中文版本信度；本包不把它作为常模参数"
+  },
+  "report": {
+    "summary": "本量表反映你对复杂思考、挑战性阅读以及理解信息的自我描述。得分较高表示你更倾向认可这些描述；它不是智力测验，也不能用来判断一个人聪不聪明。",
+    "interpretation": "本次总分为{score}/50，题均分为{mean}/5。当前没有与你的人群和中文版本匹配的可靠常模，因此不提供人群排名或“高/中/低”判定。",
+    "action": "回想最近一次愿意认真思考的问题：是兴趣、任务意义，还是足够的时间与支持帮助了你？可以选一项略有挑战但可完成的任务，记录尝试过程，而不只看是否答对。",
+    "limitations": "部分条目同时涉及自评理解能力和阅读习惯，不能将总分等同于纯粹学习动机、实际认知能力或学业潜力。",
+    "display_condition": "全部10题有效作答后才显示总分、题均分和得分解释；不完整时仅提示尚未完成，不作高低或阴性判定。"
+  }
+}

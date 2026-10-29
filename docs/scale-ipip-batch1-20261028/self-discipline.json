@@ -1,0 +1,117 @@
+{
+  "key": "ipip_neo_c5_self_discipline10_zh_cn_research",
+  "sourceSHA": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "instrumentVersion": "1.0.0",
+  "scoringVersion": "1.0.0",
+  "reportVersion": "1.0.0",
+  "localizationVersion": "1.0.0",
+  "instructionVersion": "1.0.0",
+  "files": [
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_neo_c5_self_discipline10/1.0.0/README.md",
+      "originalBlob": "7a92f6c6c3be562a26685743466db6ee102501b8",
+      "originalSHA256": "3855e4e8892c0e647127247155b870a1bfd79613547ae50bd6841396d891ea75"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_neo_c5_self_discipline10/1.0.0/bilingual-content.json",
+      "originalBlob": "9061addb883c5768d116b08a4241ea878293f4dd",
+      "originalSHA256": "0d1111e344c8665641a5f99a4dda0c3c5531e05a337de7cd24c10aac09349bbc"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_neo_c5_self_discipline10/1.0.0/local-validation.json",
+      "originalBlob": "902390a8a739b9fa9104632c5863acc2f6a1a85c",
+      "originalSHA256": "ab50774d841bdc190b56d6b57f7fe2f79a8b61aba9e5b1be0470a61b8eb1c18c"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_neo_c5_self_discipline10/1.0.0/original-research-pack.json",
+      "originalBlob": "0a882e67107a00c8315911bc34cfbefd810de30b",
+      "originalSHA256": "bd1cb8e64933451fa4d696daadc0e735e747f32f9b3abfd015979ecc92796567"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_neo_c5_self_discipline10/1.0.0/references.md",
+      "originalBlob": "0731013b86801684b70aea0bd470f77f8f5049c7",
+      "originalSHA256": "2772d7660ccc16da4e39c32442e9ea7a1dc580b16dc0593cbc2c29db32d99b79"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_neo_c5_self_discipline10/1.0.0/report-example.md",
+      "originalBlob": "8ddf0c556c6c58e267dc5a86d6c4a8c14665ecb9",
+      "originalSHA256": "4aa83e5f60ace069cc3a78006d5d4eca1b224800e5a79470796865aea4a6ce00"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_neo_c5_self_discipline10/1.0.0/scoring-and-thresholds.md",
+      "originalBlob": "4296f08a0fe04107553a33a55929f08849387fb0",
+      "originalSHA256": "7f5929615ab0aaae6bf84b80673d56ed75337385e5f176f35c1008acc22f17b1"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_neo_c5_self_discipline10/1.0.0/synthetic-report-example.json",
+      "originalBlob": "32596a1c884d5a356fbaabf11f84b6be7537c701",
+      "originalSHA256": "6e6ff030943ee6b38019a39a5cd859073ec52c1353a606bc789623e2a5f028f3"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ipip_neo_c5_self_discipline10_zh_cn_research/1.0.0/instrument.ts",
+      "originalBlob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "originalSHA256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ipip_neo_c5_self_discipline10_zh_cn_research/1.0.0/source.json",
+      "originalBlob": "916ca9491b04d6d8001d44ac1e9b9e09c6e87270",
+      "originalSHA256": "7f3a2d36a86d3f2a8cd6a35991e35d1ac1bebbc9f9ebfbc87d54ea07a95c6bfa"
+    }
+  ],
+  "identitySnapshots": [
+    {
+      "sha": "aa774983db8edd85b3c1617aef7218f71664746d",
+      "pathExists": false,
+      "blob": null
+    },
+    {
+      "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "pathExists": true,
+      "blob": "916ca9491b04d6d8001d44ac1e9b9e09c6e87270"
+    },
+    {
+      "sha": "fa355ff2dcd859b57a4bf2e8bddd77f8d428e3cf",
+      "pathExists": false,
+      "blob": null
+    },
+    {
+      "sha": "2612a9f5bf22c1370ec786f3d6feb50805003065",
+      "pathExists": false,
+      "blob": null
+    },
+    {
+      "sha": "afec8395927de44195b8b8b70b013a3608d21a54",
+      "pathExists": false,
+      "blob": null
+    },
+    {
+      "sha": "57909890479147f9840ad38a12ac026d762ac023",
+      "pathExists": false,
+      "blob": null
+    },
+    {
+      "sha": "fe18fb4ab209b6f5b4babd044c28051220f41cdc",
+      "pathExists": false,
+      "blob": null
+    },
+    {
+      "sha": "11681a6977a1b1845089799be6afce7bc30fdb3f",
+      "pathExists": false,
+      "blob": null
+    }
+  ],
+  "sourceChange": {
+    "path": "server-version/backend/src/modules/scale/instruments/ipip_neo_c5_self_discipline10_zh_cn_research/1.0.0/source.json",
+    "originalSHA256": "7f3a2d36a86d3f2a8cd6a35991e35d1ac1bebbc9f9ebfbc87d54ea07a95c6bfa",
+    "newSHA256": "9225de562dc45d4fa58dc3da308a131d6c6bebd597d0b66092be62a0030ed0bf",
+    "newBlob": "e2c213b684891511ab5f45c25fb5ef1f789dc2bf",
+    "changedFields": [
+      "instruction (exact existing working text, version/provenance binding)",
+      "executable.releaseStatus DRAFT -> PUBLISHED (technical source candidate, not scientific approval or database publication)"
+    ],
+    "unchangedDefinition": true,
+    "unchangedManualStates": true
+  },
+  "databaseState": "NOT_EXECUTED_AT_PREPARATION",
+  "manualReview": "Original CANDIDATE/PILOT/localization PENDING retained; no fabricated expert/rights/norm approval; adults only; see independent audit"
+}

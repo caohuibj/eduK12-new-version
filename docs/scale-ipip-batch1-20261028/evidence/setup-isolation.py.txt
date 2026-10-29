@@ -1,0 +1,21 @@
+import os,json,pathlib,subprocess,datetime,urllib.parse,hashlib,uuid,sys
+root=pathlib.Path('/workspace/eduK12-new-version');backend=root/'server-version/backend';out=root/'docs/scale-ipip-batch1-20261028/evidence'
+u=urllib.parse.urlsplit(os.environ['DATABASE_URL'])
+assert u.hostname in ['127.0.0.1','localhost'] and u.port==55432 and u.username=='clouddev'
+name='eduk12_ipip_'+uuid.uuid4().hex[:10]
+url=urllib.parse.urlunsplit((u.scheme,u.netloc,'/'+name,u.query,u.fragment)); env=dict(os.environ,DATABASE_URL=url,NODE_ENV='test')
+context={'database':name,'host':u.hostname,'port':u.port,'role':u.username,'createdFresh':False,'schemaInitialized':False,'production':'NOT_ACCESSED','commands':[]}
+path=out/'database-setup.json'
+def run(label,argv):
+ start=datetime.datetime.now(datetime.timezone.utc).isoformat();p=subprocess.run(argv,cwd=backend,env=env,capture_output=True)
+ for k,b in [('stdout',p.stdout),('stderr',p.stderr)]: (out/(label+'.'+k+'.log')).write_bytes(b)
+ context['commands'].append({'label':label,'argv':argv,'startedAt':start,'endedAt':datetime.datetime.now(datetime.timezone.utc).isoformat(),'exitCode':p.returncode,'logs':{k:{'path':label+'.'+k+'.log','sha256':hashlib.sha256(b).hexdigest()} for k,b in [('stdout',p.stdout),('stderr',p.stderr)]}})
+ path.write_text(json.dumps(context,indent=2)+'\n');print(label,'exit',p.returncode,flush=True)
+ if p.returncode: print(p.stderr.decode(errors='replace')[-1800:]);sys.exit(p.returncode)
+ return p.stdout
+check=run('database-absence',['docker','exec','eduk12-cloud-postgres-1','psql','-U','clouddev','-d','postgres','-tAc',"SELECT count(*) FROM pg_database WHERE datname='"+name+"'"])
+assert check.strip()==b'0'
+run('database-create',['docker','exec','eduk12-cloud-postgres-1','createdb','-U','clouddev',name]);context['createdFresh']=True
+run('schema-migrate',['node','node_modules/prisma/build/index.js','migrate','deploy'])
+context['schemaInitialized']=True;path.write_text(json.dumps(context,indent=2)+'\n')
+print('new database',name,'only; no seed, no service app startup')

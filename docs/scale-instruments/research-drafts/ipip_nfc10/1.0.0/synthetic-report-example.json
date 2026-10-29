@@ -1,0 +1,162 @@
+{
+  "schemaVersion": 2,
+  "instrument": {
+    "scaleId": "synthetic-local-only",
+    "code": "ipip_nfc10_zh_cn_research",
+    "name": "认知需求（IPIP 10题表征版） — 中文研究工作译稿",
+    "instrumentVersion": "1.0.0"
+  },
+  "method": {
+    "scaleId": "synthetic-local-only",
+    "instrumentVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "reportVersion": "1.0.1",
+    "reportAudience": "student",
+    "localizationVersion": "1.0.0",
+    "definitionHash": "12d62646f9e28fb576a8aaa4f677b8c5ab2964c379a6d956fea1cbf13de384a3",
+    "referenceVersions": [],
+    "assessmentContext": null
+  },
+  "quality": {
+    "status": "interpretable",
+    "flags": []
+  },
+  "itemScores": [
+    {
+      "itemCode": "IPIP_NFC10_01",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_NFC10_02",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_NFC10_03",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_NFC10_04",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_NFC10_05",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_NFC10_06",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_NFC10_07",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_NFC10_08",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_NFC10_09",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_NFC10_10",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    }
+  ],
+  "scores": [
+    {
+      "key": "need_for_cognition",
+      "type": "total",
+      "label": "认知需求",
+      "description": "本量表反映你对复杂思考、挑战性阅读以及理解信息的自我描述。得分较高表示你更倾向认可这些描述；它不是智力测验，也不能用来判断一个人聪不聪明。 回想最近一次愿意认真思考的问题：是兴趣、任务意义，还是足够的时间与支持帮助了你？可以选一项略有挑战但可完成的任务，记录尝试过程，而不只看是否答对。",
+      "direction": "higher_is_more",
+      "canonical": true,
+      "displayPrecision": 0,
+      "value": 30,
+      "range": {
+        "min": 10,
+        "max": 50
+      },
+      "expectedItems": [
+        "IPIP_NFC10_01",
+        "IPIP_NFC10_02",
+        "IPIP_NFC10_03",
+        "IPIP_NFC10_04",
+        "IPIP_NFC10_05",
+        "IPIP_NFC10_06",
+        "IPIP_NFC10_07",
+        "IPIP_NFC10_08",
+        "IPIP_NFC10_09",
+        "IPIP_NFC10_10"
+      ],
+      "answeredItems": [
+        "IPIP_NFC10_01",
+        "IPIP_NFC10_02",
+        "IPIP_NFC10_03",
+        "IPIP_NFC10_04",
+        "IPIP_NFC10_05",
+        "IPIP_NFC10_06",
+        "IPIP_NFC10_07",
+        "IPIP_NFC10_08",
+        "IPIP_NFC10_09",
+        "IPIP_NFC10_10"
+      ],
+      "status": "calculated",
+      "prorated": false
+    }
+  ],
+  "references": [],
+  "interpretations": [
+    {
+      "scoreKey": "need_for_cognition",
+      "headline": "认知需求：什么会让你愿意多想一会儿",
+      "label": null,
+      "interpretation": "这一项关注你对复杂思考、挑战性阅读和理解信息的兴趣与自我感受。分数越高，表示这次更认可这些描述。比如，遇到一个有趣的问题时，有的人想追根究底，有的人更想先找到够用的答案。这里不评判谁更聪明，时间、疲劳和任务意义都值得一起考虑。",
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "回想一个让你自愿认真思考的问题：吸引你的是内容本身、解决问题的用途，还是找到答案的过程？"
+        },
+        {
+          "category": "strategy",
+          "text": "选一个你真正在意的小问题，先写下自己的猜想，再找一条支持或修正它的信息。把重点放在发现了什么，而不是答得多快。"
+        }
+      ],
+      "limitations": [
+        "这份中文研究译稿仍待专家审校和适用人群验证，目前只供成人研究和自我了解。",
+        "目前没有足够依据把这个中文版本的结果划分高低或与别人比较。",
+        "题目也涉及阅读习惯和对理解能力的自我感受；它不测智力，不能单凭结果判断学习动机或潜力。",
+        "10题都需完整回答；漏答不当作零分，也不代填。不用于诊断、学生筛选、考核或排名。"
+      ],
+      "referenceVersion": null
+    }
+  ],
+  "caveats": [
+    "这份中文研究译稿仍待专家审校和适用人群验证，目前只供成人研究和自我了解。",
+    "目前没有足够依据把这个中文版本的结果划分高低或与别人比较。",
+    "题目也涉及阅读习惯和对理解能力的自我感受；它不测智力，不能单凭结果判断学习动机或潜力。",
+    "10题都需完整回答；漏答不当作零分，也不代填。不用于诊断、学生筛选、考核或排名。",
+    "未提供群体参考。"
+  ],
+  "disclaimer": "仅供研究内容审查与描述性自我了解，不用于心理诊断、智力鉴定或高风险决策。公有领域不等于本译稿已经得到原作者认可。"
+}

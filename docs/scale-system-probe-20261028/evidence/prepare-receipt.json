@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "node",
+    "node_modules/tsx/dist/cli.mjs",
+    "/tmp/scale-system-prepare.ts"
+  ],
+  "cwd": "/workspace/eduK12-new-version/server-version/backend",
+  "startedAt": "2026-10-28T02:20:16.460184+00:00",
+  "endedAt": "2026-10-28T02:20:19.643377+00:00",
+  "processExitCode": 0,
+  "inputsBeforeAfterIdentical": true,
+  "inputManifestSHA256": "18cdb3ab3be122b73fb1fc46ba34446e85c6309afc3583f4379a0743f71b796b",
+  "harnessSHA256": "db67a44bceae6d0db0d4bdf78a1e286637b45ba14865f19d499aa28abbe26e5c",
+  "limits": [
+    "No full dependency/environment byte manifest",
+    "Management uses actual business functions with synthetic fixture principals and management proof, not a successful browser admin MFA assertion"
+  ]
+}

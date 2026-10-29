@@ -1,0 +1,124 @@
+{
+  "schemaVersion": 1,
+  "base": "aa774983db8edd85b3c1617aef7218f71664746d",
+  "contentSourceHead": "e24b38ab81082fbe511b8c5d1c4dba4567d9ed23",
+  "fixedCandidateSHA": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "packages": "packages.json",
+  "independentAudits": {
+    "model": "gpt-6.1-terra",
+    "reasoningEffort": "high",
+    "count": 3,
+    "mode": "one package per agent, read-only; root integrates and runs selected checks",
+    "files": [
+      "audits/audit-ipip-self-efficacy.json",
+      "audits/audit-ipip-self-discipline.json",
+      "audits/audit-ipip-nfc.json"
+    ]
+  },
+  "selectedChecks": {
+    "unitReporter": "evidence/ipip-batch-intake.json",
+    "cases": [
+      {
+        "fullName": "ipip_neo_c1_self_efficacy10 selected intake binds existing working instructions and preserves manual review states",
+        "status": "passed"
+      },
+      {
+        "fullName": "ipip_neo_c1_self_efficacy10 selected intake consumes retained reports with exact versions, score direction and true counts without rescoring",
+        "status": "passed"
+      },
+      {
+        "fullName": "ipip_neo_c5_self_discipline10 selected intake binds existing working instructions and preserves manual review states",
+        "status": "passed"
+      },
+      {
+        "fullName": "ipip_neo_c5_self_discipline10 selected intake consumes retained reports with exact versions, score direction and true counts without rescoring",
+        "status": "passed"
+      },
+      {
+        "fullName": "ipip_nfc10 selected intake binds existing working instructions and preserves manual review states",
+        "status": "passed"
+      },
+      {
+        "fullName": "ipip_nfc10 selected intake consumes retained reports with exact versions, score direction and true counts without rescoring",
+        "status": "passed"
+      }
+    ],
+    "commandAndInputHashReceipts": "evidence/execution-receipt.json",
+    "unitAndGeneratorProcessExitCodes": [
+      0,
+      0
+    ],
+    "outerExitCode": 0,
+    "databaseExecutionReceipt": "evidence/integration-execution-receipt.json",
+    "databaseSummary": "evidence/isolation-summary.json",
+    "databaseProcessAndOuterExitCode": 0,
+    "browser": "presentation/execution-index.json"
+  },
+  "implicitExecution": "Registry selected validation calls existing product-readiness/validateScalePackage, including each selected package’s three declared golden fixtures. Cached once per source identity per process, not a standalone golden suite. Unit and business harness are separate cold processes, hence repeated selected validation; no per-scorer invocation trace captured. Future runs consolidate selected content and business work rather than repeating extra suites.",
+  "scopeReview": "scope-review.md",
+  "database": {
+    "kind": "OWN_FRESH_SYNTHETIC_CLOUD_DATABASE",
+    "name": "eduk12_ipip_0cd9fe6030",
+    "production": "NOT_ACCESSED",
+    "packages": [
+      {
+        "identity": {
+          "instrumentKey": "ipip_neo_c1_self_efficacy10_zh_cn_research",
+          "instrumentVersion": "1.0.0"
+        },
+        "status": {
+          "installed": true,
+          "status": "PUBLISHED",
+          "visibility": "PUBLIC",
+          "deployment": "ACTIVE",
+          "auditCount": 1
+        }
+      },
+      {
+        "identity": {
+          "instrumentKey": "ipip_neo_c5_self_discipline10_zh_cn_research",
+          "instrumentVersion": "1.0.0"
+        },
+        "status": {
+          "installed": true,
+          "status": "PUBLISHED",
+          "visibility": "PUBLIC",
+          "deployment": "ACTIVE",
+          "auditCount": 1
+        }
+      },
+      {
+        "identity": {
+          "instrumentKey": "ipip_nfc10_zh_cn_research",
+          "instrumentVersion": "1.0.0"
+        },
+        "status": {
+          "installed": true,
+          "status": "PUBLISHED",
+          "visibility": "PUBLIC",
+          "deployment": "ACTIVE",
+          "auditCount": 1
+        }
+      }
+    ]
+  },
+  "notRun": [
+    "CI/SAST/build/full tsc/full catalog checker",
+    "production database/deploy/merge",
+    "real participants/capability grants",
+    "School/Teacher per-package organization or entry flows"
+  ],
+  "reuse": {
+    "PR365": "mechanism previously accepted by root; no mechanism rerun requested",
+    "PR367": "Generic Scale count/direction/null/invalid/restricted/responsive assertions unchanged, retained original evidence. No rerun of prior eight views or twelve unit cases.",
+    "PR370": "CLI parser/business adapter unchanged; current batch invokes same business functions directly, not six fresh CLI processes per package.",
+    "guards": "Actual business operations retain dynamic actor/deployment/version/source/proof/transaction checks. Reuse never removes these checks."
+  },
+  "limitations": [
+    "No full installed dependency byte manifest; execution receipts contain actual source/config/tool hashes and limits. Original reports are unsigned, acceptance pending independent root review.",
+    "Fixed original docs and per-package preparation records retain original DRAFT/not-executed/historical assertions; this index is current state, not a rewrite of those original records.",
+    "No independent root scientific/technical approval of these three packages is claimed.",
+    "PUBLIC status belongs only to isolated database; not formal platform public release or automatic real-user grants.",
+    "Generated index will need normal integration/regeneration when prior content PR367/370 enter main; no full rerun absent affected inputs."
+  ]
+}

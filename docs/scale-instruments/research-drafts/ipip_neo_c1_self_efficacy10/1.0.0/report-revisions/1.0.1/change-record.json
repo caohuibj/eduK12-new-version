@@ -1,0 +1,108 @@
+{
+  "instrumentKey": "ipip_neo_c1_self_efficacy10_zh_cn_research",
+  "instrumentVersion": "1.0.0",
+  "previousSourceSha256": "08b00eff9f80be9a13a1785075cb792d2ac26362b73888566336402c6f3eb237",
+  "sourceSha256": "4399539b137a7b712f0f3c5f7675a370ecc96ced45ede575cb159a4ce2ac0373",
+  "fromReportVersion": "1.0.0",
+  "toReportVersion": "1.0.1",
+  "changeScope": "report-only reader-friendly wording; measurement, scoring, references, licensing and source identity unchanged",
+  "patches": [
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/interpretations/0/headline",
+      "before": "一般任务自我效能感：描述性反馈",
+      "after": "任务自我效能：遇到事情时，你有多少把握",
+      "reason": "先说明构念和分数含义，用日常语言替代描述性反馈/自陈等术语；不按未知分档对个人下结论。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/interpretations/0/summary",
+      "before": "总分描述你对完成一般任务、判断情况和寻找解决办法的信心，理论范围为10–50。分数较高表示本次作答呈现更强的任务自我效能感，不等于客观能力、实际绩效或个人价值更高。本工具是IPIP对NEO C1的公共领域表征，不是专有NEO-PI-R题目，也不等同GSE或具体学科的自我效能。中文工作译稿未验证，不提供人群排名和高低等级。",
+      "after": "这一项关注你对完成任务、判断情况和寻找办法的信心。分数越高，表示这次更认可“我能处理好”的描述。开始一件熟悉的事和面对全新任务时，把握可能不同。信心与实际能力有关，但并不相等；这个分数也不评价个人价值，不提供高低等级或与他人的排名。",
+      "reason": "先说明构念和分数含义，用日常语言替代描述性反馈/自陈等术语；不按未知分档对个人下结论。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/interpretations/0/guidance/0/text",
+      "before": "回想最近一次完成任务的经历：你的信心来自经验、信息、准备还是他人的支持？",
+      "after": "回想最近一次有把握完成的任务：信心来自经验、充分准备，还是知道可以向谁求助？",
+      "reason": "将抽象/重复模板改成构念相关的生活反思和可选小行动，不承诺效果或改变计分。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/interpretations/0/guidance/1/text",
+      "before": "选择一个可完成的小步骤，记录用了什么方法和资源；把需要帮助看作任务信息，而不是能力不足的标签。",
+      "after": "把一件想做的事拆出一个能开始的小步骤，并写下可能用到的信息或支持。做完后记录具体做法，给下一次留下可参考的经验。",
+      "reason": "将抽象/重复模板改成构念相关的生活反思和可选小行动，不承诺效果或改变计分。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/limitations",
+      "before": [
+        "中文工作译稿未完成专家译审、认知访谈和目标人群验证。",
+        "没有可运行的目标人群常模或经验分档；30仅为理论中点，不是人群均值。",
+        "完整10项有效作答才求和；不插补，该缺失规则是项目实现选择。",
+        "不用于诊断、选拔、能力排名、学生筛选或教师考核。",
+        "官方英文alpha=.78仅为来源统计，样本细节未重新建立，不冒称中文信度或个人准确性。"
+      ],
+      "after": [
+        "这份中文研究译稿仍待专家审校和适用人群验证，目前只供成人研究和自我了解。",
+        "目前没有可靠依据划分高低或排名；信心不等于实际能力，也不代表个人价值。",
+        "这是IPIP的一项独立工具，并非完整人格评估；不能借用其他自我效能量表的分界。原英文研究的数据不能证明本中文版本已经验证。",
+        "10题都需完整回答；漏答不当作零分，也不代填。不用于诊断、学生筛选或教师考核。"
+      ],
+      "reason": "保留成人、待验证、非诊断、缺失和许可等必要边界，用白话缩短；具体样本统计、算法和文献仍保留在源资料/参数档案，不修改。"
+    }
+  ],
+  "measurementHash": "99c88b01aa596875b10b95a65aa43dc10c4c3ad73bdffdf0546e21d327b7ff2c",
+  "originalMeasurementHash": "99c88b01aa596875b10b95a65aa43dc10c4c3ad73bdffdf0546e21d327b7ff2c",
+  "finalReport": {
+    "reportVersion": "1.0.1",
+    "primaryScoreKeys": [
+      "ipip_neo_c1_self_efficacy10"
+    ],
+    "scoreOrder": [
+      "ipip_neo_c1_self_efficacy10"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "ipip_neo_c1_self_efficacy10",
+        "headline": "任务自我效能：遇到事情时，你有多少把握",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一项关注你对完成任务、判断情况和寻找办法的信心。分数越高，表示这次更认可“我能处理好”的描述。开始一件熟悉的事和面对全新任务时，把握可能不同。信心与实际能力有关，但并不相等；这个分数也不评价个人价值。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回想最近一次有把握完成的任务：信心来自经验、充分准备，还是知道可以向谁求助？"
+          },
+          {
+            "category": "strategy",
+            "text": "把一件想做的事拆出一个能开始的小步骤，并写下可能用到的信息或支持。做完后记录具体做法，给下一次留下可参考的经验。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "这份中文研究译稿仍待专家审校和适用人群验证，目前只供成人研究和自我了解。",
+      "目前没有可靠依据划分高低或排名；信心不等于实际能力，也不代表个人价值。",
+      "这是IPIP的一项独立工具，并非完整人格评估；不能借用其他自我效能量表的分界。原英文研究的数据不能证明本中文版本已经验证。",
+      "10题都需完整回答；漏答不当作零分，也不代填。不用于诊断、学生筛选或教师考核。"
+    ],
+    "disclaimer": "仅供成人研究与描述性自我了解，不用于心理诊断、高风险选拔或个人价值判定。本工具是独立IPIP-NEO C1表征，非完整NEO人格评估。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI-assisted local editorial check (not human expert review)",
+        "reviewedAt": "2026-10-25T14:42:00Z",
+        "basis": "AI editorial check: adult self-description, correct source identity, no universal cutoffs or objective ability claims; not human expert review."
+      }
+    }
+  },
+  "additionalEditorialAdjustment": "Repeated no-ranking/no-band warnings consolidated in limitations; retained construct-specific caveats and distinct everyday examples."
+}

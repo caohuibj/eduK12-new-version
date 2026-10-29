@@ -1,0 +1,145 @@
+{
+  "kind": "ACTUAL_TRAINING_UI_SAME_EXISTING_ATTEMPT_CONTINUATION",
+  "startedAt": "2026-10-28T02:30:15.438Z",
+  "steps": [
+    {
+      "question": 1,
+      "selected": "3",
+      "observedNext": 2
+    },
+    {
+      "question": 2,
+      "selected": "3",
+      "observedNext": 3
+    },
+    {
+      "question": 3,
+      "selected": "3",
+      "observedNext": 4
+    },
+    {
+      "question": 4,
+      "selected": "3",
+      "observedNext": 5
+    },
+    {
+      "question": 5,
+      "selected": "3",
+      "observedNext": 6
+    },
+    {
+      "question": 6,
+      "selected": "3",
+      "observedNext": 7
+    },
+    {
+      "question": 7,
+      "selected": "3",
+      "observedNext": 8
+    },
+    {
+      "question": 8,
+      "selected": "3",
+      "observedNext": 9
+    },
+    {
+      "question": 9,
+      "selected": "3",
+      "observedNext": 10
+    },
+    {
+      "question": 10,
+      "selected": "3",
+      "observedNext": 10
+    }
+  ],
+  "api": [
+    {
+      "method": "GET",
+      "path": "/api/capabilities",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/composite-assessments/5fdd2f20-f1ba-47ce-9573-dd812bca81c7/attempts",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/composite-assessments/5fdd2f20-f1ba-47ce-9573-dd812bca81c7/attempts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/composite-assessments/attempts/45ec3127-256d-4f24-b9d7-8377e845274a/report-status",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/composite-assessments/attempts/45ec3127-256d-4f24-b9d7-8377e845274a/whole/definition",
+      "status": 409
+    },
+    {
+      "method": "POST",
+      "path": "/api/composite-assessments/attempts/45ec3127-256d-4f24-b9d7-8377e845274a/items/50742cf7-21a2-4e8a-bdf7-c88a44294828/scale/submit",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/composite-assessments/attempts/45ec3127-256d-4f24-b9d7-8377e845274a",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/composite-assessments/attempts/45ec3127-256d-4f24-b9d7-8377e845274a/report",
+      "status": 200
+    }
+  ],
+  "errors": [],
+  "completed": false,
+  "afterAnswers": {
+    "text": "跳到主要内容\nsysprobe_learner_0b03a1 · 学员\n\n问卷\n\n单量表系统探针：C1\n作答说明\n综合测评单元进度\n0 / 1\n\n已保存到本机。\n\n量表\n\n一般任务自我效能感（IPIP-NEO C1 中文研究译稿）\n题目 10 / 10\n我看不出事情会带来什么后果。必答\n很不符合\n比较不符合\n介于不符合与符合之间\n比较符合\n很符合\n上一题\n提交整份量表\n保存并退出\n\n提交单元\n\n1. 一般任务自我效能感（IPIP-NEO C1 中文研究译稿）",
+    "buttons": [
+      "很不符合",
+      "比较不符合",
+      "介于不符合与符合之间",
+      "比较符合",
+      "很符合",
+      "上一题",
+      "提交整份量表",
+      "保存并退出"
+    ]
+  },
+  "afterSubmit": {
+    "url": "http://training.localhost:5187/student/composite/attempts/45ec3127-256d-4f24-b9d7-8377e845274a/report",
+    "text": "跳到主要内容\n退出登录\n返回我的课程\n单量表系统探针：C1\n以下按内容顺序展示各项测评的独立结果。\n完成时间\n2026/10/28 02:30:21\n用时\n5分47秒\n✓\n已提交\n本次作答已提交，测评结果如下。\n适用范围与解释边界\n参考来源、适用人群与版本以各单项报告的已审批方案为准。\n质量受限或没有可用参考依据时，保留相应说明；重复测验的差异不自动代表成长或能力改变。\n\n模块 1\n\n一般任务自我效能感（IPIP-NEO C1 中文研究译稿）\n一般任务自我效能感（IPIP-NEO C1 中文研究译稿）\n报告版本 1.0.1\n数据质量：可解释\n\n分数层\n\n实际得分\n查看本次得分及其原始量尺范围。\n\n总体结果\n\n一般任务自我效能感\n\n原始范围 10–50\n\n30\n10\n50\n\n已答\n10\n/ 共\n10\n题\n未答 0 题\n\n分数说明：一般任务自我效能感的自述；较高分表示相关信心更强，不代表客观能力或道德价值更高。\n\n核心反馈\n\n结果说明\n\n这一项关注你对完成任务、判断情况和寻找办法的信心。分数越高，表示这次更认可“我能处理好”的描述。开始一件熟悉的事和面对全新任务时，把握可能不同。信心与实际能力有关，但并不相等；这个分数也不评价个人价值。\n\n自我观察：回想最近一次有把握完成的任务：信心来自经验、充分准备，还是知道可以向谁求助？\n策略建议：把一件想做的事拆出一个能开始的小步骤，并写下可能用到的信息或支持。做完后记录具体做法，给下一次留下可参考的经验。\n\n解释限制：这份中文研究译稿仍待专家审校和适用人群验证，目前只供成人研究和自我了解。；目前没有可靠依据划分高低或排名；信心不等于实际能力，也不代表个人价值。；这是IPIP的一项独立工具，并非完整人格评估；不能借用其他自我效能量表的分界。原英文研究的数据不能证明本中文版本已经验证。；10题都需完整回答；漏答不当作零分，也不代填。不用于诊断、学生筛选或教师考核。\n\n限制\n\n阅读提示\n这份中文研究译稿仍待专家审校和适用人群验证，目前只供成人研究和自我了解。\n目前没有可靠依据划分高低或排名；信心不等于实际能力，也不代表个人价值。\n这是IPIP的一项独立工具，并非完整人格评估；不能借用其他自我效能量表的分界。原英文研究的数据不能证明本中文版本已经验证。\n10题都需完整回答；漏答不当作零分，也不代填。不用于诊断、学生筛选或教师考核。\n未提供群体参考。\n\n仅供成人研究与描述性自我了解，不用于心理诊断、高风险选拔或个人价值判定。本工具是独立IPIP-NEO C1表征，非完整NEO人格评估。\n\n科学依据与详细参考",
+    "buttons": [
+      "退出登录",
+      "",
+      "返回我的课程"
+    ]
+  },
+  "failure": {
+    "name": "TimeoutError",
+    "message": "locator.waitFor: Timeout 12000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: '查看个人报告', exact: true }) to be visible\u001b[22m\n",
+    "page": {
+      "url": "http://training.localhost:5187/student/composite/attempts/45ec3127-256d-4f24-b9d7-8377e845274a/report",
+      "text": "跳到主要内容\n退出登录\n返回我的课程\n单量表系统探针：C1\n以下按内容顺序展示各项测评的独立结果。\n完成时间\n2026/10/28 02:30:21\n用时\n5分47秒\n✓\n已提交\n本次作答已提交，测评结果如下。\n适用范围与解释边界\n参考来源、适用人群与版本以各单项报告的已审批方案为准。\n质量受限或没有可用参考依据时，保留相应说明；重复测验的差异不自动代表成长或能力改变。\n\n模块 1\n\n一般任务自我效能感（IPIP-NEO C1 中文研究译稿）\n一般任务自我效能感（IPIP-NEO C1 中文研究译稿）\n报告版本 1.0.1\n数据质量：可解释\n\n分数层\n\n实际得分\n查看本次得分及其原始量尺范围。\n\n总体结果\n\n一般任务自我效能感\n\n原始范围 10–50\n\n30\n10\n50\n\n已答\n10\n/ 共\n10\n题\n未答 0 题\n\n分数说明：一般任务自我效能感的自述；较高分表示相关信心更强，不代表客观能力或道德价值更高。\n\n核心反馈\n\n结果说明\n\n这一项关注你对完成任务、判断情况和寻找办法的信心。分数越高，表示这次更认可“我能处理好”的描述。开始一件熟悉的事和面对全新任务时，把握可能不同。信心与实际能力有关，但并不相等；这个分数也不评价个人价值。\n\n自我观察：回想最近一次有把握完成的任务：信心来自经验、充分准备，还是知道可以向谁求助？\n策略建议：把一件想做的事拆出一个能开始的小步骤，并写下可能用到的信息或支持。做完后记录具体做法，给下一次留下可参考的经验。\n\n解释限制：这份中文研究译稿仍待专家审校和适用人群验证，目前只供成人研究和自我了解。；目前没有可靠依据划分高低或排名；信心不等于实际能力，也不代表个人价值。；这是IPIP的一项独立工具，并非完整人格评估；不能借用其他自我效能量表的分界。原英文研究的数据不能证明本中文版本已经验证。；10题都需完整回答；漏答不当作零分，也不代填。不用于诊断、学生筛选或教师考核。\n\n限制\n\n阅读提示\n这份中文研究译稿仍待专家审校和适用人群验证，目前只供成人研究和自我了解。\n目前没有可靠依据划分高低或排名；信心不等于实际能力，也不代表个人价值。\n这是IPIP的一项独立工具，并非完整人格评估；不能借用其他自我效能量表的分界。原英文研究的数据不能证明本中文版本已经验证。\n10题都需完整回答；漏答不当作零分，也不代填。不用于诊断、学生筛选或教师考核。\n未提供群体参考。\n\n仅供成人研究与描述性自我了解，不用于心理诊断、高风险选拔或个人价值判定。本工具是独立IPIP-NEO C1表征，非完整NEO人格评估。\n\n科学依据与详细参考",
+      "buttons": [
+        "退出登录",
+        "",
+        "返回我的课程"
+      ]
+    }
+  }
+}

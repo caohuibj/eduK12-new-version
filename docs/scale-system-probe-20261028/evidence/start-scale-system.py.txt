@@ -1,0 +1,20 @@
+import pathlib,os,json,subprocess,urllib.parse,time,urllib.request
+r=pathlib.Path('/workspace/eduK12-new-version');out=r/'docs/scale-system-probe-20261028/evidence';setup=json.load(open(out/'database-setup.json'));u=urllib.parse.urlsplit(os.environ['DATABASE_URL']);assert u.hostname=='127.0.0.1' and u.port==55432 and setup['database'].startswith('eduk12_system_')
+env=dict(os.environ,DATABASE_URL=urllib.parse.urlunsplit((u.scheme,u.netloc,'/'+setup['database'],u.query,u.fragment)),PORT='3107',NODE_ENV='development',BACKGROUND_WORKERS_ENABLED='false',HEAVY_PROCESSING_ENABLED='false',VIDEO_PROCESSING_ENABLED='false',SURVEY_WORKSPACE_ENABLED='true',SURVEY_PUBLICATION_ENABLED='true',SURVEY_ANALYTICS_ENABLED='true',HUITEACHER_WORKSPACE_ENABLED='true',E2E_BACKEND_URL='http://127.0.0.1:3107',COOKIE_SECURE='false',CORS_ORIGIN=','.join('http://'+x+'.localhost:5187'for x in ['training','survey','school','teacher']))
+redis=urllib.parse.urlsplit(env['REDIS_URL']);env['REDIS_URL']=urllib.parse.urlunsplit((redis.scheme,redis.netloc,'/9',redis.query,redis.fragment))
+# Local synthetic MFA key, never copied from a production or prior credential.
+import secrets
+env['SURVEY_MFA_ENCRYPTION_KEY']=secrets.token_hex(32)
+private=pathlib.Path('/tmp/scale-system-runtime.json');private.write_text(json.dumps({'database':setup['database'],'surveyMfaKey':env['SURVEY_MFA_ENCRYPTION_KEY']}));private.chmod(0o600)
+states=[]
+for name,cwd,argv in [('api',r/'server-version/backend',['node','node_modules/tsx/dist/cli.mjs','src/index.ts']),('frontend',pathlib.Path('/tmp/scale-ipip-presentation-fccc/server-version/frontend'),['node','node_modules/vite/bin/vite.js','--host','127.0.0.1','--port','5187','--strictPort'])]:
+ with (out/(name+'.stdout.log')).open('wb') as stdout,(out/(name+'.stderr.log')).open('wb') as stderr:p=subprocess.Popen(argv,cwd=cwd,env=env,stdout=stdout,stderr=stderr,start_new_session=True)
+ states.append({'name':name,'pid':p.pid,'cwd':str(cwd),'argv':argv})
+pathlib.Path('/tmp/scale-system-processes.json').write_text(json.dumps(states,indent=2))
+for _ in range(45):
+ try:
+  with urllib.request.urlopen('http://127.0.0.1:3107/ready',timeout=1)as res:ready=json.load(res)
+  with urllib.request.urlopen('http://127.0.0.1:5187',timeout=1)as res:html=res.read()
+  print(json.dumps({'apiReady':ready,'frontendShell':b'id="root"' in html,'database':setup['database'],'redisLogicalDatabase':9,'workers':'heavy/media disabled','frontendSource':'fccc98c43ba42947052875f5cbbe5caf359e3de6','backendSource':'4db7fdff3624e4e7d7fbc784d360d013c48d29fe'}));break
+ except Exception:time.sleep(.5)
+else:raise RuntimeError('API/frontend readiness missing; inspect isolated logs')

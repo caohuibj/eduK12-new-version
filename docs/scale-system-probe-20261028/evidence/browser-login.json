@@ -1,0 +1,368 @@
+{
+  "scope": "Real four-host app and authentication, own synthetic principals only",
+  "startedAt": "2026-10-28T02:24:31.943Z",
+  "entries": [
+    {
+      "product": "training",
+      "outcome": "AUTHENTICATED_REAL_UI",
+      "url": "http://training.localhost:5187/student",
+      "text": "跳到主要内容\n退出登录\n\n正在加载页面…",
+      "scrollWidth": 390,
+      "viewport": 390,
+      "fixtureUsername": "sysprobe_learner_0b03a1"
+    },
+    {
+      "product": "school",
+      "outcome": "AUTHENTICATED_REAL_UI",
+      "url": "http://school.localhost:5187/login",
+      "text": "跳到主要内容\n退出\n\nSCHOOL · 校园空间\n\n欢迎回来，\nsysprobe_school_student_18f739\n\n从今天的校园活动开始，\n让每一次参与与陪伴都有温度。\n\n我的校园活动\n\n目前暂无可参加的校园活动。请向学校确认注册及审批状态。\n\n尚未审批的账号不能进入历史课程、校园测评或学生报告。\n\nSchool · 科学支持 · 专业陪伴 · 健康成长",
+      "scrollWidth": 390,
+      "viewport": 390,
+      "fixtureUsername": "sysprobe_school_student_18f739"
+    },
+    {
+      "product": "teacher",
+      "outcome": "FAILED",
+      "name": "TimeoutError",
+      "message": "page.waitForFunction: Timeout 12000ms exceeded.",
+      "url": "http://teacher.localhost:5187/login",
+      "text": "跳到主要内容\n教师成长\n我的工具\n专业实践\n退出\n我的教育发展空间\n\n欢迎，sysprobe_teacher_ca1704\n\n参与测评\n个人测评\n参与测评\n\n暂无分配给你的测评任务。\n\n当前学校管理范围\n合成成人系统验收组织\nTeacher · 教师发展与学校改进"
+    },
+    {
+      "product": "survey",
+      "outcome": "AUTHENTICATED_REAL_UI",
+      "url": "http://survey.localhost:5187/workspace",
+      "text": "我的研究\n工具集\n素材库\n外观 · 自动\n\n恢复码仅显示一次，请安全保存\n\n研究工作台\n\n集中管理问卷、波次与数据。\n\n新建研究\n全部\n草稿\n进行中\n已暂停\n已结束\n已归档\n创建时间\n最新在前\n最早在前\n每页显示\n10 项\n25 项\n50 项\n100 项\n从一项研究草稿开始\n\n先填写研究名称与采集方式，再编制工具、配置波次并检查发布。\n\n填写第一项研究\n\n共 0 项研究\n\n上一页\n第 1 / 1 页\n下一页",
+      "scrollWidth": 390,
+      "viewport": 390,
+      "fixtureUsername": "sysprobe_researcher_761a45"
+    }
+  ],
+  "api": [
+    {
+      "product": "training",
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 401
+    },
+    {
+      "product": "training",
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 401
+    },
+    {
+      "product": "training",
+      "method": "GET",
+      "path": "/api/capabilities",
+      "status": 200
+    },
+    {
+      "product": "training",
+      "method": "GET",
+      "path": "/api/auth/csrf",
+      "status": 200
+    },
+    {
+      "product": "training",
+      "method": "POST",
+      "path": "/api/auth/training-login",
+      "status": 200
+    },
+    {
+      "product": "training",
+      "method": "GET",
+      "path": "/api/capabilities",
+      "status": 200
+    },
+    {
+      "product": "training",
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "product": "training",
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "product": "training",
+      "method": "POST",
+      "path": "/api/composite-assessments/5fdd2f20-f1ba-47ce-9573-dd812bca81c7/attempts",
+      "status": 200
+    },
+    {
+      "product": "training",
+      "method": "POST",
+      "path": "/api/composite-assessments/5fdd2f20-f1ba-47ce-9573-dd812bca81c7/attempts",
+      "status": 200
+    },
+    {
+      "product": "training",
+      "method": "GET",
+      "path": "/api/composite-assessments/attempts/45ec3127-256d-4f24-b9d7-8377e845274a/report-status",
+      "status": 200
+    },
+    {
+      "product": "training",
+      "method": "GET",
+      "path": "/api/composite-assessments/attempts/45ec3127-256d-4f24-b9d7-8377e845274a/whole/definition",
+      "status": 409
+    },
+    {
+      "product": "school",
+      "method": "GET",
+      "path": "/api/campus/auth/me",
+      "status": 401
+    },
+    {
+      "product": "school",
+      "method": "GET",
+      "path": "/api/campus/auth/me",
+      "status": 401
+    },
+    {
+      "product": "school",
+      "method": "GET",
+      "path": "/api/campus/auth/csrf",
+      "status": 200
+    },
+    {
+      "product": "school",
+      "method": "POST",
+      "path": "/api/campus/auth/login",
+      "status": 200
+    },
+    {
+      "product": "school",
+      "method": "GET",
+      "path": "/api/campus/auth/me",
+      "status": 200
+    },
+    {
+      "product": "school",
+      "method": "GET",
+      "path": "/api/campus/reports/availability",
+      "status": 200
+    },
+    {
+      "product": "school",
+      "method": "GET",
+      "path": "/api/campus/organizations",
+      "status": 200
+    },
+    {
+      "product": "school",
+      "method": "GET",
+      "path": "/api/campus/my-status",
+      "status": 200
+    },
+    {
+      "product": "school",
+      "method": "GET",
+      "path": "/api/campus/organizations/f2085294-ee09-41eb-a8c0-011854a0b6f6/tool-authoring-capabilities",
+      "status": 200
+    },
+    {
+      "product": "school",
+      "method": "GET",
+      "path": "/api/campus/organizations/f2085294-ee09-41eb-a8c0-011854a0b6f6/context",
+      "status": 200
+    },
+    {
+      "product": "teacher",
+      "method": "GET",
+      "path": "/api/huiteacher/auth/me",
+      "status": 401
+    },
+    {
+      "product": "teacher",
+      "method": "GET",
+      "path": "/api/huiteacher/auth/me",
+      "status": 401
+    },
+    {
+      "product": "teacher",
+      "method": "GET",
+      "path": "/api/huiteacher/auth/csrf",
+      "status": 200
+    },
+    {
+      "product": "teacher",
+      "method": "POST",
+      "path": "/api/huiteacher/auth/login",
+      "status": 200
+    },
+    {
+      "product": "teacher",
+      "method": "GET",
+      "path": "/api/huiteacher/auth/me",
+      "status": 200
+    },
+    {
+      "product": "teacher",
+      "method": "GET",
+      "path": "/api/huiteacher/organizations/f2085294-ee09-41eb-a8c0-011854a0b6f6/tool-authoring-capabilities",
+      "status": 200
+    },
+    {
+      "product": "teacher",
+      "method": "GET",
+      "path": "/api/huiteacher/personal-scale/catalog",
+      "status": 200
+    },
+    {
+      "product": "teacher",
+      "method": "GET",
+      "path": "/api/huiteacher/organizations/f2085294-ee09-41eb-a8c0-011854a0b6f6/units",
+      "status": 200
+    },
+    {
+      "product": "teacher",
+      "method": "GET",
+      "path": "/api/huiteacher/my-private-form-tasks",
+      "status": 200
+    },
+    {
+      "product": "teacher",
+      "method": "GET",
+      "path": "/api/huiteacher/personal-scale/assessments",
+      "status": 200
+    },
+    {
+      "product": "teacher",
+      "method": "GET",
+      "path": "/api/huiteacher/my-form-tasks",
+      "status": 200
+    },
+    {
+      "product": "teacher",
+      "method": "GET",
+      "path": "/api/huiteacher/personal-scale/catalog",
+      "status": 200
+    },
+    {
+      "product": "teacher",
+      "method": "GET",
+      "path": "/api/huiteacher/personal-scale/assessments",
+      "status": 200
+    },
+    {
+      "product": "teacher",
+      "method": "GET",
+      "path": "/api/huiteacher/my-form-tasks",
+      "status": 200
+    },
+    {
+      "product": "teacher",
+      "method": "GET",
+      "path": "/api/huiteacher/my-private-form-tasks",
+      "status": 200
+    },
+    {
+      "product": "teacher",
+      "method": "GET",
+      "path": "/api/huiteacher/my-scale-tasks",
+      "status": 200
+    },
+    {
+      "product": "teacher",
+      "method": "GET",
+      "path": "/api/huiteacher/my-assessment-tasks",
+      "status": 200
+    },
+    {
+      "product": "teacher",
+      "method": "GET",
+      "path": "/api/huiteacher/my-assessment-tasks",
+      "status": 200
+    },
+    {
+      "product": "teacher",
+      "method": "GET",
+      "path": "/api/huiteacher/my-scale-tasks",
+      "status": 200
+    },
+    {
+      "product": "survey",
+      "method": "GET",
+      "path": "/api/survey/auth/me",
+      "status": 401
+    },
+    {
+      "product": "survey",
+      "method": "GET",
+      "path": "/api/survey/auth/capabilities",
+      "status": 200
+    },
+    {
+      "product": "survey",
+      "method": "GET",
+      "path": "/api/survey/auth/me",
+      "status": 401
+    },
+    {
+      "product": "survey",
+      "method": "GET",
+      "path": "/api/survey/auth/capabilities",
+      "status": 200
+    },
+    {
+      "product": "survey",
+      "method": "GET",
+      "path": "/api/survey/auth/csrf",
+      "status": 200
+    },
+    {
+      "product": "survey",
+      "method": "POST",
+      "path": "/api/survey/auth/login",
+      "status": 200
+    },
+    {
+      "product": "survey",
+      "method": "POST",
+      "path": "/api/survey/auth/mfa/setup",
+      "status": 200
+    },
+    {
+      "product": "survey",
+      "method": "POST",
+      "path": "/api/survey/auth/mfa/confirm",
+      "status": 200
+    },
+    {
+      "product": "survey",
+      "method": "GET",
+      "path": "/api/survey/auth/me",
+      "status": 200
+    },
+    {
+      "product": "survey",
+      "method": "GET",
+      "path": "/api/survey/projects",
+      "status": 200
+    }
+  ],
+  "errors": [],
+  "completed": true,
+  "browserVersion": "151.0.7922.173",
+  "trainingEntry": {
+    "url": "http://training.localhost:5187/student/composite/5fdd2f20-f1ba-47ce-9573-dd812bca81c7",
+    "text": "跳到主要内容\nsysprobe_learner_0b03a1 · 学员\n\n问卷\n\n单量表系统探针：C1\n作答说明\n综合测评单元进度\n0 / 1\n\n量表\n\n一般任务自我效能感（IPIP-NEO C1 中文研究译稿）\n题目 1 / 10\n我能成功完成任务。必答\n很不符合\n比较不符合\n介于不符合与符合之间\n比较符合\n很符合\n上一题\n下一题\n保存并退出\n\n提交单元\n\n1. 一般任务自我效能感（IPIP-NEO C1 中文研究译稿）",
+    "radios": 0,
+    "buttons": [
+      "很不符合",
+      "比较不符合",
+      "介于不符合与符合之间",
+      "比较符合",
+      "很符合",
+      "上一题",
+      "下一题",
+      "保存并退出"
+    ]
+  },
+  "endedAt": "2026-10-28T02:24:51.866Z"
+}

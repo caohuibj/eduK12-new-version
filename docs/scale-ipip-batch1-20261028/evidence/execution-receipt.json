@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "base": "e24b38ab81082fbe511b8c5d1c4dba4567d9ed23",
+  "node": {
+    "executable": "/workspace/eduk12-cloud/tools/node_modules/.bin/node",
+    "version": "v24.21.0",
+    "sha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c"
+  },
+  "execution": "cloud isolated process; no database or HTTP writes; login:false outer shell",
+  "checks": [
+    {
+      "id": "ipip-batch-intake",
+      "cwd": "/workspace/eduK12-new-version/server-version/backend",
+      "argv": [
+        "/workspace/eduk12-cloud/tools/node_modules/.bin/node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/__tests__/scale/instruments/ipip-batch-intake.test.ts",
+        "--reporter=json",
+        "--outputFile=/workspace/eduK12-new-version/docs/scale-ipip-batch1-20261028/evidence/ipip-batch-intake.json"
+      ],
+      "startedAt": "2026-10-28T02:02:48.444898+00:00",
+      "endedAt": "2026-10-28T02:02:49.997996+00:00",
+      "processExitCode": 0,
+      "inputs": {
+        "manifest": "ipip-batch-intake.inputs.json.gz",
+        "compressedSha256": "7200c67b51e1a571e5ab4c2ba809e1cdce803db1e173db3602d4092ffaeb6ab8",
+        "uncompressedSha256": "bf90dda03c9cbc0d3afb84d309bfaab2e75764289318fda6bc21ba803488d887",
+        "uncompressedBytes": 893646,
+        "count": 2934,
+        "beforeAfterIdentical": true
+      },
+      "logs": {
+        "stdout": {
+          "path": "ipip-batch-intake.stdout.log",
+          "sha256": "bdd38fe200dc0714365f6587ededf7bf434dd15804739e400dbf3e604fef46db",
+          "bytes": 117
+        },
+        "stderr": {
+          "path": "ipip-batch-intake.stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      }
+    },
+    {
+      "id": "generated-index",
+      "cwd": "/workspace/eduK12-new-version/server-version/backend",
+      "argv": [
+        "/workspace/eduk12-cloud/tools/node_modules/.bin/node",
+        "node_modules/tsx/dist/cli.mjs",
+        "scripts/generate-scale-instruments.ts",
+        "--check"
+      ],
+      "startedAt": "2026-10-28T02:02:50.358562+00:00",
+      "endedAt": "2026-10-28T02:02:50.495343+00:00",
+      "processExitCode": 0,
+      "inputs": {
+        "manifest": "generated-index.inputs.json.gz",
+        "compressedSha256": "7200c67b51e1a571e5ab4c2ba809e1cdce803db1e173db3602d4092ffaeb6ab8",
+        "uncompressedSha256": "bf90dda03c9cbc0d3afb84d309bfaab2e75764289318fda6bc21ba803488d887",
+        "uncompressedBytes": 893646,
+        "count": 2934,
+        "beforeAfterIdentical": true
+      },
+      "logs": {
+        "stdout": {
+          "path": "generated-index.stdout.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "stderr": {
+          "path": "generated-index.stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      }
+    }
+  ],
+  "scope": "Three selected IPIP sources and retained report compatibility; no standalone golden replay, full catalog, build, types, database or CI",
+  "environment": {
+    "COGNITIVE_TEST_FIXTURES_ENABLED": "true (Vitest config)",
+    "credentials": "not retained; env values not printed"
+  },
+  "limits": [
+    "Source/config/tool hashes are contemporaneous; full installed dependency package bytes and process environment are not enumerated.",
+    "Snapshots include other backend source files solely as input evidence, not assertions that they executed."
+  ]
+}

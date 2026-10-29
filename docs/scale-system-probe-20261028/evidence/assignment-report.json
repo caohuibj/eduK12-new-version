@@ -1,0 +1,161 @@
+{
+  "startedAt": "2026-10-28T02:28:22.139Z",
+  "scope": "Actual existing assignment/run APIs; only one C1 resource per product; all persons/organization/class fixtures synthetic adult technical roles",
+  "stages": [
+    {
+      "name": "TEACHER-target",
+      "outcome": "RESOLVED",
+      "result": {
+        "id": "36392534-8bfc-49fe-a09c-5b87cac10efa",
+        "organizationId": "f2085294-ee09-41eb-a8c0-011854a0b6f6",
+        "kind": "PERSON",
+        "subjectUserId": "39029578-0fe6-4d60-9dc0-91d26b0950ae",
+        "name": "合成成人本人",
+        "status": "ACTIVE",
+        "createdByUserId": "ee5847e7-a2d8-4f7c-881b-943c323e5c46",
+        "createdAt": "2026-10-28T02:28:23.469Z",
+        "updatedAt": "2026-10-28T02:28:23.469Z"
+      }
+    },
+    {
+      "name": "TEACHER-event",
+      "outcome": "RESOLVED",
+      "result": {
+        "id": "94d01a22-b04e-4d84-bb23-46ded9e0e458",
+        "organizationId": "f2085294-ee09-41eb-a8c0-011854a0b6f6",
+        "targetId": "36392534-8bfc-49fe-a09c-5b87cac10efa",
+        "kind": "ASSESSMENT",
+        "title": "C1单量表系统验收",
+        "notes": null,
+        "status": "DRAFT",
+        "version": 1,
+        "scheduledAt": null,
+        "openedAt": null,
+        "closedAt": null,
+        "createdByUserId": "ee5847e7-a2d8-4f7c-881b-943c323e5c46",
+        "createdAt": "2026-10-28T02:28:23.477Z",
+        "updatedAt": "2026-10-28T02:28:23.477Z"
+      }
+    },
+    {
+      "name": "TEACHER-run-draft",
+      "outcome": "RESOLVED",
+      "result": {
+        "eventId": "94d01a22-b04e-4d84-bb23-46ded9e0e458",
+        "runId": "06abbbfa-85e8-4163-924d-a7a0d31594ab",
+        "status": "DRAFT",
+        "version": 1
+      }
+    },
+    {
+      "name": "TEACHER-add-exact-track",
+      "outcome": "RESOLVED",
+      "result": {
+        "id": "a82cbb37-e515-4535-85c8-e212d4c186f3",
+        "organizationId": "f2085294-ee09-41eb-a8c0-011854a0b6f6",
+        "runId": "06abbbfa-85e8-4163-924d-a7a0d31594ab",
+        "resourceFamily": "BUNDLE",
+        "resourceKey": "education-assessment:TEACHER:f2085294-ee09-41eb-a8c0-011854a0b6f6:e6301d85-f85e-45ac-9b79-ad06f1c1e440",
+        "resourceVersion": "1.0.0",
+        "subjectSelector": {
+          "kind": "MEMBERSHIP_IDS",
+          "membershipIds": [
+            "ad95d355-7049-4106-a85f-ac411ac143b0"
+          ]
+        },
+        "respondentSelector": {
+          "kind": "MEMBERSHIP_IDS",
+          "membershipIds": [
+            "ad95d355-7049-4106-a85f-ac411ac143b0"
+          ]
+        },
+        "requestedPolicy": {
+          "analysisMode": "INDIVIDUAL_ONLY",
+          "perspectives": [
+            "SELF_REPORT"
+          ],
+          "subjectRoles": [
+            "TEACHER"
+          ],
+          "respondentRoles": [
+            "TEACHER"
+          ],
+          "relationshipKinds": [
+            "SELF"
+          ],
+          "minimumRespondents": null,
+          "visibilityPolicyKey": "synthetic-one-scale-respondent-only"
+        },
+        "frozenResourcePolicy": null,
+        "resourcePolicyHash": null
+      }
+    },
+    {
+      "name": "TEACHER-event-open",
+      "outcome": "RESOLVED",
+      "result": {
+        "id": "94d01a22-b04e-4d84-bb23-46ded9e0e458",
+        "status": "OPEN",
+        "version": 2
+      }
+    },
+    {
+      "name": "TEACHER-run-publish",
+      "outcome": "RESOLVED",
+      "result": {
+        "runId": "06abbbfa-85e8-4163-924d-a7a0d31594ab",
+        "version": 3,
+        "trackCount": 1,
+        "executionCount": 1
+      }
+    },
+    {
+      "name": "SCHOOL-grade",
+      "outcome": "RESOLVED",
+      "result": {
+        "id": "37aa45bf-924c-4cf0-a13f-14cc18d5e8f5",
+        "organizationId": "f2085294-ee09-41eb-a8c0-011854a0b6f6",
+        "unitKind": "GRADE",
+        "name": "成人合成技术年级",
+        "parentUnitId": null,
+        "createdAt": "2026-10-28T02:28:23.730Z",
+        "updatedAt": "2026-10-28T02:28:23.730Z"
+      }
+    },
+    {
+      "name": "SCHOOL-class",
+      "outcome": "RESOLVED",
+      "result": {
+        "id": "3fd201d5-ec54-4faa-aa81-afafb4c0368a",
+        "organizationId": "f2085294-ee09-41eb-a8c0-011854a0b6f6",
+        "unitKind": "CLASS",
+        "name": "合成验收班",
+        "parentUnitId": "37aa45bf-924c-4cf0-a13f-14cc18d5e8f5",
+        "createdAt": "2026-10-28T02:28:23.734Z",
+        "updatedAt": "2026-10-28T02:28:23.734Z"
+      }
+    },
+    {
+      "name": "SCHOOL-roster",
+      "outcome": "REJECTED",
+      "code": "CAMPUS_KEY_NOT_CONFIGURED",
+      "message": "CAMPUS_KEY_NOT_CONFIGURED"
+    }
+  ],
+  "failures": [
+    {
+      "name": "SCHOOL-roster",
+      "code": "CAMPUS_KEY_NOT_CONFIGURED",
+      "message": "CAMPUS_KEY_NOT_CONFIGURED",
+      "stack": "CampusAdmissionError: CAMPUS_KEY_NOT_CONFIGURED\n    at fail (/workspace/eduK12-new-version/server-version/backend/src/modules/campus/admission.service.ts:21:61)\n    at digestCampusStudentNumber (/workspace/eduK12-new-version/server-version/backend/src/modules/campus/admission.service.ts:35:47)\n    at <anonymous> (/workspace/eduK12-new-version/server-version/backend/src/modules/campus/admission.service.ts:119:35)\n    at Array.map (<anonymous>)\n    at Object.replaceCampusRoster (/workspace/eduK12-new-version/server-version/backend/src/modules/campus/admission.service.ts:119:24)\n    at async step (/tmp/scale-system-assign.ts:7:71)\n    at async main (/tmp/scale-system-assign.ts:35:15)"
+    }
+  ],
+  "fixturePreconditions": [
+    {
+      "scope": "Synthetic pre-existing org-admin/counselor authority, not production or governance endpoint acceptance",
+      "membershipId": "05dbb006-4f12-4bae-a5c9-207c9a0aff4e",
+      "counselorMembershipId": "858716e7-a504-4702-94fc-38548708a879"
+    }
+  ],
+  "endedAt": "2026-10-28T02:28:23.744Z"
+}

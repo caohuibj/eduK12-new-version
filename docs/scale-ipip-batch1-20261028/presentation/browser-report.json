@@ -1,0 +1,301 @@
+{
+  "schemaVersion": 1,
+  "kind": "REAL_CHROMIUM_COMPONENT_PREVIEW_SYNTHETIC_DATA",
+  "scope": "Existing React Scale report components and actual CSS; no API/backend/session/participant workflow; no production build",
+  "screenshots": [
+    {
+      "file": "ipip_neo_c1_self_efficacy10-390.png",
+      "state": "ipip_neo_c1_self_efficacy10",
+      "width": 390,
+      "height": 844,
+      "sha256": "8f02af12c535aa0c469365e3a816b642136db485fe663f06ae6c9083368de4ad",
+      "observation": {
+        "width": 390,
+        "scrollWidth": 390,
+        "text": "一般任务自我效能感（IPIP-NEO C1 中文研究译稿）\n\n合成报告 · 成人自我了解 · 仅用于组件呈现核对\n\n一般任务自我效能感（IPIP-NEO C1 中文研究译稿）\n报告版本 1.0.1\n数据质量：可解释\n\n分数层\n\n实际得分\n查看本次得分及其原始量尺范围。\n\n总体结果\n\n一般任务自我效能感\n\n原始范围 10–50\n\n30\n10\n50\n\n已答\n10\n/ 共\n10\n题\n未答 0 题\n\n分数说明：一般任务自我效能感的自述；较高分表示相关信心更强，不代表客观能力或道德价值更高。\n\n核心反馈\n\n任务自我效能：遇到事情时，你有多少把握\n\n这一项关注你对完成任务、判断情况和寻找办法的信心。分数越高，表示这次更认可“我能处理好”的描述。开始一件熟悉的事和面对全新任务时，把握可能不同。信心与实际能力有关，但并不相等；这个分数也不评价个人价值。\n\n自我观察：回想最近一次有把握完成的任务：信心来自经验、充分准备，还是知道可以向谁求助？\n策略建议：把一件想做的事拆出一个能开始的小步骤，并写下可能用到的信息或支持。做完后记录具体做法，给下一次留下可参考的经验。\n\n解释限制：这份中文研究译稿仍待专家审校和适用人群验证，目前只供成人研究和自我了解。；目前没有可靠依据划分高低或排名；信心不等于实际能力，也不代表个人价值。；这是IPIP的一项独立工具，并非完整人格评估；不能借用其他自我效能量表的分界。原英文研究的数据不能证明本中文版本已经验证。；10题都需完整回答；漏答不当作零分，也不代填。不用于诊断、学生筛选或教师考核。\n\n限制\n\n阅读提示\n这份中文研究译稿仍待专家审校和适用人群验证，目前只供成人研究和自我了解。\n目前没有可靠依据划分高低或排名；信心不等于实际能力，也不代表个人价值。\n这是IPIP的一项独立工具，并非完整人格评估；不能借用其他自我效能量表的分界。原英文研究的数据不能证明本中文版本已经验证。\n10题都需完整回答；漏答不当作零分，也不代填。不用于诊断、学生筛选或教师考核。\n未提供群体参考。\n\n仅供成人研究与描述性自我了解，不用于心理诊断、高风险选拔或个人价值判定。本工具是独立IPIP-NEO C1表征，非完整NEO人格评估。\n\n科学依据与详细参考",
+        "counts": [
+          "已答 10 / 共 10 题未答 0 题"
+        ],
+        "gridColumns": "none",
+        "explanationFonts": [
+          "13px"
+        ],
+        "markerCount": 1
+      }
+    },
+    {
+      "file": "ipip_neo_c1_self_efficacy10-820.png",
+      "state": "ipip_neo_c1_self_efficacy10",
+      "width": 820,
+      "height": 1180,
+      "sha256": "044273a00a15b6524629afdfa3635af74c984f25bc8bede87b98d34c0c0533fd",
+      "observation": {
+        "width": 820,
+        "scrollWidth": 820,
+        "text": "一般任务自我效能感（IPIP-NEO C1 中文研究译稿）\n\n合成报告 · 成人自我了解 · 仅用于组件呈现核对\n\n一般任务自我效能感（IPIP-NEO C1 中文研究译稿）\n报告版本 1.0.1\n数据质量：可解释\n\n分数层\n\n实际得分\n查看本次得分及其原始量尺范围。\n\n总体结果\n\n一般任务自我效能感\n\n原始范围 10–50\n\n30\n10\n50\n\n已答\n10\n/ 共\n10\n题\n未答 0 题\n\n分数说明：一般任务自我效能感的自述；较高分表示相关信心更强，不代表客观能力或道德价值更高。\n\n核心反馈\n\n任务自我效能：遇到事情时，你有多少把握\n\n这一项关注你对完成任务、判断情况和寻找办法的信心。分数越高，表示这次更认可“我能处理好”的描述。开始一件熟悉的事和面对全新任务时，把握可能不同。信心与实际能力有关，但并不相等；这个分数也不评价个人价值。\n\n自我观察：回想最近一次有把握完成的任务：信心来自经验、充分准备，还是知道可以向谁求助？\n策略建议：把一件想做的事拆出一个能开始的小步骤，并写下可能用到的信息或支持。做完后记录具体做法，给下一次留下可参考的经验。\n\n解释限制：这份中文研究译稿仍待专家审校和适用人群验证，目前只供成人研究和自我了解。；目前没有可靠依据划分高低或排名；信心不等于实际能力，也不代表个人价值。；这是IPIP的一项独立工具，并非完整人格评估；不能借用其他自我效能量表的分界。原英文研究的数据不能证明本中文版本已经验证。；10题都需完整回答；漏答不当作零分，也不代填。不用于诊断、学生筛选或教师考核。\n\n限制\n\n阅读提示\n这份中文研究译稿仍待专家审校和适用人群验证，目前只供成人研究和自我了解。\n目前没有可靠依据划分高低或排名；信心不等于实际能力，也不代表个人价值。\n这是IPIP的一项独立工具，并非完整人格评估；不能借用其他自我效能量表的分界。原英文研究的数据不能证明本中文版本已经验证。\n10题都需完整回答；漏答不当作零分，也不代填。不用于诊断、学生筛选或教师考核。\n未提供群体参考。\n\n仅供成人研究与描述性自我了解，不用于心理诊断、高风险选拔或个人价值判定。本工具是独立IPIP-NEO C1表征，非完整NEO人格评估。\n\n科学依据与详细参考",
+        "counts": [
+          "已答 10 / 共 10 题未答 0 题"
+        ],
+        "gridColumns": "none",
+        "explanationFonts": [
+          "13px"
+        ],
+        "markerCount": 1
+      }
+    },
+    {
+      "file": "ipip_neo_c5_self_discipline10-390.png",
+      "state": "ipip_neo_c5_self_discipline10",
+      "width": 390,
+      "height": 844,
+      "sha256": "8165149b74f1af90e9bcadc67c6b58ac0d98f6ac6336a821f68dce1c95ca1c13",
+      "observation": {
+        "width": 390,
+        "scrollWidth": 390,
+        "text": "任务启动与自律（IPIP-NEO C5 中文研究译稿）\n\n合成报告 · 成人自我了解 · 仅用于组件呈现核对\n\n任务启动与自律（IPIP-NEO C5 中文研究译稿）\n报告版本 1.0.0\n数据质量：可解释\n\n分数层\n\n实际得分\n查看本次得分及其原始量尺范围。\n\n总体结果\n\n任务启动与执行习惯\n\n原始范围 10–50\n\n30\n10\n50\n\n已答\n10\n/ 共\n10\n题\n未答 0 题\n\n分数说明：开始任务、准备和执行计划习惯的自我描述；不是道德评价或客观能力分数。\n\n核心反馈\n\n从“想做”到“开始做”：你的日常节奏\n\n这一项关注你怎样开始任务、做好准备并落实计划。分数越高，表示这次更认可容易开始、较少拖延的描述。比如，同样是整理资料，第一步清楚时可能很快动手，任务含糊或疲惫时则可能卡住。结果不能把你分成勤快或懒惰的人，也不能判断是否有注意力或执行功能方面的障碍；理解当时的任务和支持条件更有帮助。\n\n自我观察：想一件最近容易开始的事和一件拖着没做的事：第一步是否清楚？材料、时间、体力或情绪有什么不同？\n策略建议：为眼前一件事写一个小到可以立即着手的动作，比如“打开文档，写下标题”，并提前放好所需材料。观察哪种安排更容易开始，不拿问卷分数责备自己。\n\n解释限制：这份中文研究译稿仍待人工审校和适用人群验证，目前只供成人研究和自我了解。；没有可靠依据划分高低或排名，也不能借用Grit、BSCS或其他工具的分界。；任务不清楚、疲劳、情绪和可用支持都可能影响回答；不能据此评价人品、努力程度或做临床诊断。；10题都需完整回答；漏答不当作零分，也不代填。不用于学生筛选、教师考核或重要选拔。\n\n限制\n\n阅读提示\n这份中文研究译稿仍待人工审校和适用人群验证，目前只供成人研究和自我了解。\n没有可靠依据划分高低或排名，也不能借用Grit、BSCS或其他工具的分界。\n任务不清楚、疲劳、情绪和可用支持都可能影响回答；不能据此评价人品、努力程度或做临床诊断。\n10题都需完整回答；漏答不当作零分，也不代填。不用于学生筛选、教师考核或重要选拔。\n未提供群体参考。\n\n仅供成人研究与描述性自我了解，不用于心理诊断、道德评价或高风险选择。本工具是独立IPIP-NEO C5公共领域表征，不是专有NEO-PI-R或完整人格评估。\n\n科学依据与详细参考",
+        "counts": [
+          "已答 10 / 共 10 题未答 0 题"
+        ],
+        "gridColumns": "none",
+        "explanationFonts": [
+          "13px"
+        ],
+        "markerCount": 1
+      }
+    },
+    {
+      "file": "ipip_neo_c5_self_discipline10-820.png",
+      "state": "ipip_neo_c5_self_discipline10",
+      "width": 820,
+      "height": 1180,
+      "sha256": "49c733ff3af8b82e7d5b52e9c3c2d1b01450a59aabba3434ab183457b7682618",
+      "observation": {
+        "width": 820,
+        "scrollWidth": 820,
+        "text": "任务启动与自律（IPIP-NEO C5 中文研究译稿）\n\n合成报告 · 成人自我了解 · 仅用于组件呈现核对\n\n任务启动与自律（IPIP-NEO C5 中文研究译稿）\n报告版本 1.0.0\n数据质量：可解释\n\n分数层\n\n实际得分\n查看本次得分及其原始量尺范围。\n\n总体结果\n\n任务启动与执行习惯\n\n原始范围 10–50\n\n30\n10\n50\n\n已答\n10\n/ 共\n10\n题\n未答 0 题\n\n分数说明：开始任务、准备和执行计划习惯的自我描述；不是道德评价或客观能力分数。\n\n核心反馈\n\n从“想做”到“开始做”：你的日常节奏\n\n这一项关注你怎样开始任务、做好准备并落实计划。分数越高，表示这次更认可容易开始、较少拖延的描述。比如，同样是整理资料，第一步清楚时可能很快动手，任务含糊或疲惫时则可能卡住。结果不能把你分成勤快或懒惰的人，也不能判断是否有注意力或执行功能方面的障碍；理解当时的任务和支持条件更有帮助。\n\n自我观察：想一件最近容易开始的事和一件拖着没做的事：第一步是否清楚？材料、时间、体力或情绪有什么不同？\n策略建议：为眼前一件事写一个小到可以立即着手的动作，比如“打开文档，写下标题”，并提前放好所需材料。观察哪种安排更容易开始，不拿问卷分数责备自己。\n\n解释限制：这份中文研究译稿仍待人工审校和适用人群验证，目前只供成人研究和自我了解。；没有可靠依据划分高低或排名，也不能借用Grit、BSCS或其他工具的分界。；任务不清楚、疲劳、情绪和可用支持都可能影响回答；不能据此评价人品、努力程度或做临床诊断。；10题都需完整回答；漏答不当作零分，也不代填。不用于学生筛选、教师考核或重要选拔。\n\n限制\n\n阅读提示\n这份中文研究译稿仍待人工审校和适用人群验证，目前只供成人研究和自我了解。\n没有可靠依据划分高低或排名，也不能借用Grit、BSCS或其他工具的分界。\n任务不清楚、疲劳、情绪和可用支持都可能影响回答；不能据此评价人品、努力程度或做临床诊断。\n10题都需完整回答；漏答不当作零分，也不代填。不用于学生筛选、教师考核或重要选拔。\n未提供群体参考。\n\n仅供成人研究与描述性自我了解，不用于心理诊断、道德评价或高风险选择。本工具是独立IPIP-NEO C5公共领域表征，不是专有NEO-PI-R或完整人格评估。\n\n科学依据与详细参考",
+        "counts": [
+          "已答 10 / 共 10 题未答 0 题"
+        ],
+        "gridColumns": "none",
+        "explanationFonts": [
+          "13px"
+        ],
+        "markerCount": 1
+      }
+    },
+    {
+      "file": "ipip_nfc10-390.png",
+      "state": "ipip_nfc10",
+      "width": 390,
+      "height": 844,
+      "sha256": "80dc342e0ad13945c089cd4bc293234157e32528ddd2f50ca9c1b5b2e352dd3a",
+      "observation": {
+        "width": 390,
+        "scrollWidth": 390,
+        "text": "认知需求（IPIP 10题表征版） — 中文研究工作译稿\n\n合成报告 · 成人自我了解 · 仅用于组件呈现核对\n\n认知需求（IPIP 10题表征版） — 中文研究工作译稿\n报告版本 1.0.1\n数据质量：可解释\n\n分数层\n\n实际得分\n查看本次得分及其原始量尺范围。\n\n总体结果\n\n认知需求\n\n原始范围 10–50\n\n30\n10\n50\n\n已答\n10\n/ 共\n10\n题\n未答 0 题\n\n分数说明：本量表反映你对复杂思考、挑战性阅读以及理解信息的自我描述。得分较高表示你更倾向认可这些描述；它不是智力测验，也不能用来判断一个人聪不聪明。 回想最近一次愿意认真思考的问题：是兴趣、任务意义，还是足够的时间与支持帮助了你？可以选一项略有挑战但可完成的任务，记录尝试过程，而不只看是否答对。\n\n核心反馈\n\n认知需求：什么会让你愿意多想一会儿\n\n这一项关注你对复杂思考、挑战性阅读和理解信息的兴趣与自我感受。分数越高，表示这次更认可这些描述。比如，遇到一个有趣的问题时，有的人想追根究底，有的人更想先找到够用的答案。这里不评判谁更聪明，时间、疲劳和任务意义都值得一起考虑。\n\n自我观察：回想一个让你自愿认真思考的问题：吸引你的是内容本身、解决问题的用途，还是找到答案的过程？\n策略建议：选一个你真正在意的小问题，先写下自己的猜想，再找一条支持或修正它的信息。把重点放在发现了什么，而不是答得多快。\n\n解释限制：这份中文研究译稿仍待专家审校和适用人群验证，目前只供成人研究和自我了解。；目前没有足够依据把这个中文版本的结果划分高低或与别人比较。；题目也涉及阅读习惯和对理解能力的自我感受；它不测智力，不能单凭结果判断学习动机或潜力。；10题都需完整回答；漏答不当作零分，也不代填。不用于诊断、学生筛选、考核或排名。\n\n限制\n\n阅读提示\n这份中文研究译稿仍待专家审校和适用人群验证，目前只供成人研究和自我了解。\n目前没有足够依据把这个中文版本的结果划分高低或与别人比较。\n题目也涉及阅读习惯和对理解能力的自我感受；它不测智力，不能单凭结果判断学习动机或潜力。\n10题都需完整回答；漏答不当作零分，也不代填。不用于诊断、学生筛选、考核或排名。\n未提供群体参考。\n\n仅供研究内容审查与描述性自我了解，不用于心理诊断、智力鉴定或高风险决策。公有领域不等于本译稿已经得到原作者认可。\n\n科学依据与详细参考",
+        "counts": [
+          "已答 10 / 共 10 题未答 0 题"
+        ],
+        "gridColumns": "none",
+        "explanationFonts": [
+          "13px"
+        ],
+        "markerCount": 1
+      }
+    },
+    {
+      "file": "ipip_nfc10-820.png",
+      "state": "ipip_nfc10",
+      "width": 820,
+      "height": 1180,
+      "sha256": "b4d2bca2b4d0b9da3c9f85647b791b47bf7d2a78d0e9c28a4f16a29a670cc1d4",
+      "observation": {
+        "width": 820,
+        "scrollWidth": 820,
+        "text": "认知需求（IPIP 10题表征版） — 中文研究工作译稿\n\n合成报告 · 成人自我了解 · 仅用于组件呈现核对\n\n认知需求（IPIP 10题表征版） — 中文研究工作译稿\n报告版本 1.0.1\n数据质量：可解释\n\n分数层\n\n实际得分\n查看本次得分及其原始量尺范围。\n\n总体结果\n\n认知需求\n\n原始范围 10–50\n\n30\n10\n50\n\n已答\n10\n/ 共\n10\n题\n未答 0 题\n\n分数说明：本量表反映你对复杂思考、挑战性阅读以及理解信息的自我描述。得分较高表示你更倾向认可这些描述；它不是智力测验，也不能用来判断一个人聪不聪明。 回想最近一次愿意认真思考的问题：是兴趣、任务意义，还是足够的时间与支持帮助了你？可以选一项略有挑战但可完成的任务，记录尝试过程，而不只看是否答对。\n\n核心反馈\n\n认知需求：什么会让你愿意多想一会儿\n\n这一项关注你对复杂思考、挑战性阅读和理解信息的兴趣与自我感受。分数越高，表示这次更认可这些描述。比如，遇到一个有趣的问题时，有的人想追根究底，有的人更想先找到够用的答案。这里不评判谁更聪明，时间、疲劳和任务意义都值得一起考虑。\n\n自我观察：回想一个让你自愿认真思考的问题：吸引你的是内容本身、解决问题的用途，还是找到答案的过程？\n策略建议：选一个你真正在意的小问题，先写下自己的猜想，再找一条支持或修正它的信息。把重点放在发现了什么，而不是答得多快。\n\n解释限制：这份中文研究译稿仍待专家审校和适用人群验证，目前只供成人研究和自我了解。；目前没有足够依据把这个中文版本的结果划分高低或与别人比较。；题目也涉及阅读习惯和对理解能力的自我感受；它不测智力，不能单凭结果判断学习动机或潜力。；10题都需完整回答；漏答不当作零分，也不代填。不用于诊断、学生筛选、考核或排名。\n\n限制\n\n阅读提示\n这份中文研究译稿仍待专家审校和适用人群验证，目前只供成人研究和自我了解。\n目前没有足够依据把这个中文版本的结果划分高低或与别人比较。\n题目也涉及阅读习惯和对理解能力的自我感受；它不测智力，不能单凭结果判断学习动机或潜力。\n10题都需完整回答；漏答不当作零分，也不代填。不用于诊断、学生筛选、考核或排名。\n未提供群体参考。\n\n仅供研究内容审查与描述性自我了解，不用于心理诊断、智力鉴定或高风险决策。公有领域不等于本译稿已经得到原作者认可。\n\n科学依据与详细参考",
+        "counts": [
+          "已答 10 / 共 10 题未答 0 题"
+        ],
+        "gridColumns": "none",
+        "explanationFonts": [
+          "13px"
+        ],
+        "markerCount": 1
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "ipip_neo_c1_self_efficacy10 390 has no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "ipip_neo_c1_self_efficacy10 390 no internal item identifiers",
+      "passed": true
+    },
+    {
+      "name": "ipip_neo_c1_self_efficacy10 390 actual 10 of 10 counts",
+      "passed": true
+    },
+    {
+      "name": "ipip_neo_c1_self_efficacy10 390 one theoretical range marker",
+      "passed": true
+    },
+    {
+      "name": "ipip_neo_c1_self_efficacy10 390 includes actual saved direction description",
+      "passed": true
+    },
+    {
+      "name": "ipip_neo_c1_self_efficacy10 390 no percentile rank or population reference",
+      "passed": true
+    },
+    {
+      "name": "ipip_neo_c1_self_efficacy10 820 has no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "ipip_neo_c1_self_efficacy10 820 no internal item identifiers",
+      "passed": true
+    },
+    {
+      "name": "ipip_neo_c1_self_efficacy10 820 actual 10 of 10 counts",
+      "passed": true
+    },
+    {
+      "name": "ipip_neo_c1_self_efficacy10 820 one theoretical range marker",
+      "passed": true
+    },
+    {
+      "name": "ipip_neo_c1_self_efficacy10 820 includes actual saved direction description",
+      "passed": true
+    },
+    {
+      "name": "ipip_neo_c1_self_efficacy10 820 no percentile rank or population reference",
+      "passed": true
+    },
+    {
+      "name": "ipip_neo_c5_self_discipline10 390 has no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "ipip_neo_c5_self_discipline10 390 no internal item identifiers",
+      "passed": true
+    },
+    {
+      "name": "ipip_neo_c5_self_discipline10 390 actual 10 of 10 counts",
+      "passed": true
+    },
+    {
+      "name": "ipip_neo_c5_self_discipline10 390 one theoretical range marker",
+      "passed": true
+    },
+    {
+      "name": "ipip_neo_c5_self_discipline10 390 includes actual saved direction description",
+      "passed": true
+    },
+    {
+      "name": "ipip_neo_c5_self_discipline10 390 no percentile rank or population reference",
+      "passed": true
+    },
+    {
+      "name": "ipip_neo_c5_self_discipline10 820 has no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "ipip_neo_c5_self_discipline10 820 no internal item identifiers",
+      "passed": true
+    },
+    {
+      "name": "ipip_neo_c5_self_discipline10 820 actual 10 of 10 counts",
+      "passed": true
+    },
+    {
+      "name": "ipip_neo_c5_self_discipline10 820 one theoretical range marker",
+      "passed": true
+    },
+    {
+      "name": "ipip_neo_c5_self_discipline10 820 includes actual saved direction description",
+      "passed": true
+    },
+    {
+      "name": "ipip_neo_c5_self_discipline10 820 no percentile rank or population reference",
+      "passed": true
+    },
+    {
+      "name": "ipip_nfc10 390 has no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "ipip_nfc10 390 no internal item identifiers",
+      "passed": true
+    },
+    {
+      "name": "ipip_nfc10 390 actual 10 of 10 counts",
+      "passed": true
+    },
+    {
+      "name": "ipip_nfc10 390 one theoretical range marker",
+      "passed": true
+    },
+    {
+      "name": "ipip_nfc10 390 includes actual saved direction description",
+      "passed": true
+    },
+    {
+      "name": "ipip_nfc10 390 no percentile rank or population reference",
+      "passed": true
+    },
+    {
+      "name": "ipip_nfc10 820 has no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "ipip_nfc10 820 no internal item identifiers",
+      "passed": true
+    },
+    {
+      "name": "ipip_nfc10 820 actual 10 of 10 counts",
+      "passed": true
+    },
+    {
+      "name": "ipip_nfc10 820 one theoretical range marker",
+      "passed": true
+    },
+    {
+      "name": "ipip_nfc10 820 includes actual saved direction description",
+      "passed": true
+    },
+    {
+      "name": "ipip_nfc10 820 no percentile rank or population reference",
+      "passed": true
+    },
+    {
+      "name": "component preview made no API or external requests",
+      "passed": true
+    },
+    {
+      "name": "component preview has no page errors",
+      "passed": true
+    }
+  ],
+  "browserErrors": [],
+  "unexpectedRequests": [],
+  "completed": true,
+  "origin": "http://127.0.0.1:5173",
+  "launchOptions": {
+    "executablePath": "/usr/bin/chromium",
+    "headless": true,
+    "chromiumSandbox": false,
+    "args": [
+      "--no-sandbox",
+      "--disable-dev-shm-usage"
+    ],
+    "env": {
+      "PATH": "/workspace/eduk12-cloud/tools/node_modules/.bin:/home/agent/.codex/tmp/arg0/codex-arg0oAZyJX:/opt/codex/codex-path:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+      "LANG": "C.UTF-8",
+      "XDG_CONFIG_HOME": "/tmp/ipip-browser-config",
+      "XDG_CACHE_HOME": "/tmp/ipip-browser-cache"
+    }
+  },
+  "browserVersion": "151.0.7922.173"
+}

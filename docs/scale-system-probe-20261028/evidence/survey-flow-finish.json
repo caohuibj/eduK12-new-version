@@ -1,0 +1,118 @@
+{
+  "startedAt": "2026-10-28T02:38:29.824Z",
+  "scope": "Survey only continuation with corrected radio click locator; earlier synthetic unlinked participant remains pending and is never rewritten. One new synthetic participant required because prior volatile access credential was not captured by the harness.",
+  "entries": [
+    {
+      "product": "survey",
+      "outcome": "UI_FINAL_AND_EXPLICIT_METRIC_FEEDBACK_VISIBLE",
+      "instruction": {
+        "sourceText": "请根据你目前通常的情况，而不是希望将来成为的样子，判断下面各句话与你的实际情况有多符合。",
+        "nodes": 1,
+        "bodyContains": true
+      },
+      "answering": {
+        "file": "survey-answering-390.png",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "scrollWidth": 390,
+        "text": "跳至研究内容\n问卷作答\n填写问卷\n\n第 1 / 1 部分\n\n一般任务自我效能感 · 系统探针\n\n请根据你目前通常的情况，而不是希望将来成为的样子，判断下面各句话与你的实际情况有多符合。\n\n01 / 10\n作答进度\n已答 0 / 10\n题目导航\n选择后自动进入下一道未答题\n第 1 题 · 必答\n我能成功完成任务。\n很不符合\n比较不符合\n介于不符合与符合之间\n比较符合\n很符合\n提交本轮正式回答\n\n答案仅在此标签页暂存，最长两小时；关闭页面或更换设备后无法恢复，请尽量一次完成。\n\n检查完成后点击提交，看到完成提示即表示已保存。"
+      },
+      "answers": [
+        {
+          "item": 1,
+          "value": "3"
+        },
+        {
+          "item": 2,
+          "value": "3"
+        },
+        {
+          "item": 3,
+          "value": "3"
+        },
+        {
+          "item": 4,
+          "value": "3"
+        },
+        {
+          "item": 5,
+          "value": "3"
+        },
+        {
+          "item": 6,
+          "value": "3"
+        },
+        {
+          "item": 7,
+          "value": "3"
+        },
+        {
+          "item": 8,
+          "value": "3"
+        },
+        {
+          "item": 9,
+          "value": "3"
+        },
+        {
+          "item": 10,
+          "value": "3"
+        }
+      ],
+      "submittedVia": "actual visible UI control",
+      "report": {
+        "file": "survey-final-feedback-390.png",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "scrollWidth": 390,
+        "text": "跳至研究内容\n问卷作答\n01\n阅读并同意\n02\n填写问卷\n03\n提交完成\n感谢参与，问卷已提交\n\n合成系统验证已保存。\n\n本次表现反馈\n一般任务自我效能感 · 系统探针\n\n受控原始指标 · 质量状态：interpretable。仅反映本次条件下的表现。\n\nipip_neo_c1_self_efficacy10：30（OK）\n\n完成时间：2026/10/28 02:38:35\n\n本研究反馈仅作一般说明，不提供未经验证的常模、诊断或个体能力等级。\n\n参与与数据管理"
+      }
+    }
+  ],
+  "api": [
+    {
+      "product": "survey",
+      "path": "/api/public/survey/r/04331810-e957-44a6-a4b5-5e56b0f9a8d7/info",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "product": "survey",
+      "path": "/api/public/survey/r/04331810-e957-44a6-a4b5-5e56b0f9a8d7/info",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "product": "survey",
+      "path": "/api/public/survey/r/04331810-e957-44a6-a4b5-5e56b0f9a8d7/waves/cb558b55-e311-462a-a1cd-61dd26cc3f05/start-unlinked",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "product": "survey",
+      "path": "/api/public/survey/r/04331810-e957-44a6-a4b5-5e56b0f9a8d7/attempts/43f747ee-770e-4df6-a18d-2794f70bfac0/task",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "product": "survey",
+      "path": "/api/public/survey/r/04331810-e957-44a6-a4b5-5e56b0f9a8d7/attempts/43f747ee-770e-4df6-a18d-2794f70bfac0/final",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "product": "survey",
+      "path": "/api/public/survey/r/04331810-e957-44a6-a4b5-5e56b0f9a8d7/attempts/43f747ee-770e-4df6-a18d-2794f70bfac0/general",
+      "method": "POST",
+      "status": 200
+    }
+  ],
+  "errors": [],
+  "completed": true,
+  "browserVersion": "151.0.7922.173",
+  "endedAt": "2026-10-28T02:38:36.302Z"
+}

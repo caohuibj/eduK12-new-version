@@ -1,0 +1,139 @@
+{
+  "database": "eduk12_ipip_0cd9fe6030",
+  "completed": true,
+  "operations": 18,
+  "assertions": 47,
+  "failures": [],
+  "packages": [
+    {
+      "identity": {
+        "instrumentKey": "ipip_neo_c1_self_efficacy10_zh_cn_research",
+        "instrumentVersion": "1.0.0"
+      },
+      "versions": {
+        "instrument": "1.0.0",
+        "scoring": "1.0.0",
+        "report": "1.0.1",
+        "localization": "1.0.0",
+        "instruction": "1.0.0"
+      },
+      "sourceSHA256": "c1f67bc13ced80481a727d3321cdd3b94e4a8b363c5cf3c41e5689bf2b3b7294",
+      "scaleId": "14857510-ce3a-42b5-bd45-dcfa92f42e29",
+      "publication": {
+        "scaleId": "14857510-ce3a-42b5-bd45-dcfa92f42e29",
+        "status": "PUBLISHED",
+        "visibility": "PUBLIC",
+        "proofHash": "f67fc6bf7c7612d901cdd8ec5a00801dbf86a7c004b90996a91409d9b009c344",
+        "measurementReleaseId": "310bba9d-2def-4112-9da8-9d75587e2bdc"
+      },
+      "databaseStatus": {
+        "installed": true,
+        "status": "PUBLISHED",
+        "visibility": "PUBLIC",
+        "deployment": "ACTIVE",
+        "auditCount": 1
+      },
+      "entryProducts": {
+        "SURVEY": "policy allowed/catalog available; no end-user grant",
+        "TRAINING": {
+          "result": "REFUSED",
+          "error": {
+            "name": "Error",
+            "message": "该精确版本未获本入口准入或已停止新增使用：TRAINING；TRAINING 入口尚未获准"
+          }
+        },
+        "SCHOOL": "NOTRUN no organization/distribution created",
+        "TEACHER": "NOTRUN no organization/distribution created"
+      }
+    },
+    {
+      "identity": {
+        "instrumentKey": "ipip_neo_c5_self_discipline10_zh_cn_research",
+        "instrumentVersion": "1.0.0"
+      },
+      "versions": {
+        "instrument": "1.0.0",
+        "scoring": "1.0.0",
+        "report": "1.0.0",
+        "localization": "1.0.0",
+        "instruction": "1.0.0"
+      },
+      "sourceSHA256": "9225de562dc45d4fa58dc3da308a131d6c6bebd597d0b66092be62a0030ed0bf",
+      "scaleId": "5dae94f9-5d80-454d-b782-a51152c7698e",
+      "publication": {
+        "scaleId": "5dae94f9-5d80-454d-b782-a51152c7698e",
+        "status": "PUBLISHED",
+        "visibility": "PUBLIC",
+        "proofHash": "2f3391fb39c98515b7c528f5a03551535a0fbce911d9ab13dfacd63adb91b961",
+        "measurementReleaseId": "29405928-120d-47c1-ac2b-bff4bdfd6148"
+      },
+      "databaseStatus": {
+        "installed": true,
+        "status": "PUBLISHED",
+        "visibility": "PUBLIC",
+        "deployment": "ACTIVE",
+        "auditCount": 1
+      },
+      "entryProducts": {
+        "SURVEY": "policy allowed/catalog available; no end-user grant",
+        "TRAINING": {
+          "result": "REFUSED",
+          "error": {
+            "name": "Error",
+            "message": "该精确版本未获本入口准入或已停止新增使用：TRAINING；TRAINING 入口尚未获准"
+          }
+        },
+        "SCHOOL": "NOTRUN no organization/distribution created",
+        "TEACHER": "NOTRUN no organization/distribution created"
+      }
+    },
+    {
+      "identity": {
+        "instrumentKey": "ipip_nfc10_zh_cn_research",
+        "instrumentVersion": "1.0.0"
+      },
+      "versions": {
+        "instrument": "1.0.0",
+        "scoring": "1.0.0",
+        "report": "1.0.1",
+        "localization": "1.0.0",
+        "instruction": "1.0.0"
+      },
+      "sourceSHA256": "435024c067dfe87775e0b310c58b5d955a9e939a1af3f800613171dd782fe60a",
+      "scaleId": "99ffb2ff-fab4-4602-a6d2-2a6b356fc3c4",
+      "publication": {
+        "scaleId": "99ffb2ff-fab4-4602-a6d2-2a6b356fc3c4",
+        "status": "PUBLISHED",
+        "visibility": "PUBLIC",
+        "proofHash": "255e99f5f41fae39e2482bfda56de758e96b0e36c6e66221b3786190ab7d8406",
+        "measurementReleaseId": "2dd19ad2-e473-40c5-8dff-13d07340e94a"
+      },
+      "databaseStatus": {
+        "installed": true,
+        "status": "PUBLISHED",
+        "visibility": "PUBLIC",
+        "deployment": "ACTIVE",
+        "auditCount": 1
+      },
+      "entryProducts": {
+        "SURVEY": "policy allowed/catalog available; no end-user grant",
+        "TRAINING": {
+          "result": "REFUSED",
+          "error": {
+            "name": "Error",
+            "message": "该精确版本未获本入口准入或已停止新增使用：TRAINING；TRAINING 入口尚未获准"
+          }
+        },
+        "SCHOOL": "NOTRUN no organization/distribution created",
+        "TEACHER": "NOTRUN no organization/distribution created"
+      }
+    }
+  ],
+  "raw": "isolation-report.json.gz",
+  "notRun": [
+    "Full scoring/report/golden suites",
+    "HTTP/browser participant flow",
+    "Real School/Teacher organizations, distribution or capabilities",
+    "Production"
+  ]
+}

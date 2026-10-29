@@ -1,0 +1,26 @@
+{
+  "kind": "POST_RUN_INDEX_NOT_A_CONTEMPORANEOUS_EXECUTION_MANIFEST",
+  "command": "source /workspace/eduk12-cloud/load-local-env.sh && node /tmp/ipip-browser.cjs > docs/scale-ipip-batch1-20261028/presentation/browser.stdout.log 2> docs/scale-ipip-batch1-20261028/presentation/browser.stderr.log",
+  "observedOuterExitCode": 0,
+  "exitEvidence": "Tool exec session 91393 completed with exit_code 0; recorded here after completion, not signed",
+  "browserReport": "browser-report.json",
+  "completed": true,
+  "assertions": 38,
+  "screenshots": 6,
+  "fixtureSHA256": "2a25862b82443076913843a5c4d27045a2266bb3851544d4bd1d91381156cf61",
+  "browserHarnessSHA256": "a724f00656c740b5f417e8f86834ce87c583291e00398ffd9671cc4fdbd3fd1c",
+  "componentSourceHead": "fccc98c43ba42947052875f5cbbe5caf359e3de6",
+  "componentSourcePR": 367,
+  "componentSourceFrontendTree": "925d20e813c2dad4db4213eb39d833800c926925",
+  "mode": "Existing managed cloud container browser configuration; Chromium sandbox=false, outer managed sandbox unchanged; local synthetic component pages only",
+  "manualVisualRead": [
+    "ipip_neo_c1_self_efficacy10-390.png",
+    "ipip_neo_c5_self_discipline10-820.png",
+    "ipip_nfc10-390.png"
+  ],
+  "limits": [
+    "No timestamps or pre/post complete input manifest captured by this browser invocation; missing provenance is not reconstructed. Fixed detached worktree source and retained fixture/harness bytes identify current inputs.",
+    "Uses pending PR367 Scale components in detached worktree; no UI code copied into this content PR. This is not current main deployment or full end-user authorization acceptance.",
+    "User subsequently rejected per-package display repetition. These completed six views are historical evidence and are not a recurring admission requirement."
+  ]
+}

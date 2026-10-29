@@ -1,0 +1,86 @@
+{
+  "database": "eduk12_ipip_0cd9fe6030",
+  "host": "127.0.0.1",
+  "port": 55432,
+  "role": "clouddev",
+  "createdFresh": true,
+  "schemaInitialized": true,
+  "production": "NOT_ACCESSED",
+  "commands": [
+    {
+      "label": "database-absence",
+      "argv": [
+        "docker",
+        "exec",
+        "eduk12-cloud-postgres-1",
+        "psql",
+        "-U",
+        "clouddev",
+        "-d",
+        "postgres",
+        "-tAc",
+        "SELECT count(*) FROM pg_database WHERE datname='eduk12_ipip_0cd9fe6030'"
+      ],
+      "startedAt": "2026-10-28T02:03:43.244025+00:00",
+      "endedAt": "2026-10-28T02:03:43.338103+00:00",
+      "exitCode": 0,
+      "logs": {
+        "stdout": {
+          "path": "database-absence.stdout.log",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        },
+        "stderr": {
+          "path": "database-absence.stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "label": "database-create",
+      "argv": [
+        "docker",
+        "exec",
+        "eduk12-cloud-postgres-1",
+        "createdb",
+        "-U",
+        "clouddev",
+        "eduk12_ipip_0cd9fe6030"
+      ],
+      "startedAt": "2026-10-28T02:03:43.338313+00:00",
+      "endedAt": "2026-10-28T02:03:43.450777+00:00",
+      "exitCode": 0,
+      "logs": {
+        "stdout": {
+          "path": "database-create.stdout.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "path": "database-create.stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "label": "schema-migrate",
+      "argv": [
+        "node",
+        "node_modules/prisma/build/index.js",
+        "migrate",
+        "deploy"
+      ],
+      "startedAt": "2026-10-28T02:03:43.451052+00:00",
+      "endedAt": "2026-10-28T02:03:45.910865+00:00",
+      "exitCode": 0,
+      "logs": {
+        "stdout": {
+          "path": "schema-migrate.stdout.log",
+          "sha256": "bee9ca161efc8ea769aa9983bb3b4e346dfaa1d5925c61dcfe62fee4f26a43f7"
+        },
+        "stderr": {
+          "path": "schema-migrate.stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    }
+  ]
+}

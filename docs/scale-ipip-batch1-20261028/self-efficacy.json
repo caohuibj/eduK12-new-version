@@ -1,0 +1,137 @@
+{
+  "key": "ipip_neo_c1_self_efficacy10_zh_cn_research",
+  "sourceSHA": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "instrumentVersion": "1.0.0",
+  "scoringVersion": "1.0.0",
+  "reportVersion": "1.0.1",
+  "localizationVersion": "1.0.0",
+  "instructionVersion": "1.0.0",
+  "files": [
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_neo_c1_self_efficacy10/1.0.0/README.md",
+      "originalBlob": "b953722c62d6053e6e8cc5ff7be0782db875a3b3",
+      "originalSHA256": "7c97d50ee33de22b4a3cf87fbd0c3805aba8bc7998632411a5f5bff7d84314f7"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_neo_c1_self_efficacy10/1.0.0/bilingual-content.json",
+      "originalBlob": "7a40cd4f72bd0d430ea9b13a370fe70a544b3e55",
+      "originalSHA256": "3dc91a92ab875f34aa0b83033153619009cbe175eae503146f8449f9673452d8"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_neo_c1_self_efficacy10/1.0.0/local-validation.json",
+      "originalBlob": "c1fb5d07b5f16243254dde05e0c2d0968e85454c",
+      "originalSHA256": "88f323641fc4e4c7df112f1717d72b826ca1235867fb91f1e8e9701432f1d3cf"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_neo_c1_self_efficacy10/1.0.0/references.md",
+      "originalBlob": "ae029b013d8eca03f81d0b202472ea42b71ba4fd",
+      "originalSHA256": "ea955c2a59917bb79c407f95085f8072f2f449a30c9a2e4705179595fcc0a056"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_neo_c1_self_efficacy10/1.0.0/report-example.md",
+      "originalBlob": "773cfc46cb90d8629aaea11f93db15828b4bca66",
+      "originalSHA256": "fb98873daf16105bc507b4c5b531ddd38a3d67cbd905121ba67f6bc77c5e83e6"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_neo_c1_self_efficacy10/1.0.0/report-revisions/1.0.1/change-record.json",
+      "originalBlob": "0901240b9f9eb7176eeabb10d1b6381e53e34ddb",
+      "originalSHA256": "3fe4be071ba0d8d17b3b8922ce79a3cabad321ee3c382fc99428ba4c1553402a"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_neo_c1_self_efficacy10/1.0.0/report-revisions/1.0.1/previous-report-1.0.0.json",
+      "originalBlob": "df2a6dda72917bfa4ccd8c598a7a7ded7c1e96e9",
+      "originalSHA256": "d7209b6b368743678dfb6d814eb630b85b9551f0939d4c3321b9b5ef727a0e6a"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_neo_c1_self_efficacy10/1.0.0/report-revisions/1.0.1/previous-report-example.md",
+      "originalBlob": "938aa04236f01771e998045a724f95b797b339b5",
+      "originalSHA256": "f939724c8b8354979ec373f7a37c0a81d688a7b013ed3f276ef2d40aa06fcb46"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_neo_c1_self_efficacy10/1.0.0/report-revisions/1.0.1/previous-synthetic-report-example.json",
+      "originalBlob": "65e4ea8a7a9359f2b6082343e0cfc85391200ff8",
+      "originalSHA256": "3cd29691d5c44744451b137f57835a47e24305b43b9a7ef23248e6be45f944f5"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_neo_c1_self_efficacy10/1.0.0/report-revisions/1.0.1/validation.json",
+      "originalBlob": "dba6740de2458e0d7bdcd729f0b6fecbc321f510",
+      "originalSHA256": "e57292edc024c8f79ee1c25896cc67434967f6fedae5ad3b63b38b7071b099bc"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_neo_c1_self_efficacy10/1.0.0/reviewed-source-pack.json",
+      "originalBlob": "a5b4c5c8fb2a5eb21374543ace173d259d8b5394",
+      "originalSHA256": "94d40441102535b29b06391bd091e0b0fffa4731fbd721d4ad41c412409a5a67"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip_neo_c1_self_efficacy10/1.0.0/synthetic-report-example.json",
+      "originalBlob": "f89cb42eb7bf940894a73e5df9eb8aff675c93be",
+      "originalSHA256": "9e7a9c2548e8bf668b8e1aea6d66b55d54c0b0fbf7ce493088f5ecc60a512748"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ipip_neo_c1_self_efficacy10_zh_cn_research/1.0.0/instrument.ts",
+      "originalBlob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "originalSHA256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ipip_neo_c1_self_efficacy10_zh_cn_research/1.0.0/source.json",
+      "originalBlob": "9c74ef87a6f1833264f553c0f08aa778ee4146a5",
+      "originalSHA256": "22ddbb0f7d0a94240c21d56eb5a807306688158bb70a83a228a3857d565acac9"
+    }
+  ],
+  "identitySnapshots": [
+    {
+      "sha": "aa774983db8edd85b3c1617aef7218f71664746d",
+      "pathExists": false,
+      "blob": null
+    },
+    {
+      "sha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+      "pathExists": true,
+      "blob": "9c74ef87a6f1833264f553c0f08aa778ee4146a5"
+    },
+    {
+      "sha": "fa355ff2dcd859b57a4bf2e8bddd77f8d428e3cf",
+      "pathExists": false,
+      "blob": null
+    },
+    {
+      "sha": "2612a9f5bf22c1370ec786f3d6feb50805003065",
+      "pathExists": false,
+      "blob": null
+    },
+    {
+      "sha": "afec8395927de44195b8b8b70b013a3608d21a54",
+      "pathExists": false,
+      "blob": null
+    },
+    {
+      "sha": "57909890479147f9840ad38a12ac026d762ac023",
+      "pathExists": false,
+      "blob": null
+    },
+    {
+      "sha": "fe18fb4ab209b6f5b4babd044c28051220f41cdc",
+      "pathExists": false,
+      "blob": null
+    },
+    {
+      "sha": "11681a6977a1b1845089799be6afce7bc30fdb3f",
+      "pathExists": false,
+      "blob": null
+    }
+  ],
+  "sourceChange": {
+    "path": "server-version/backend/src/modules/scale/instruments/ipip_neo_c1_self_efficacy10_zh_cn_research/1.0.0/source.json",
+    "originalSHA256": "22ddbb0f7d0a94240c21d56eb5a807306688158bb70a83a228a3857d565acac9",
+    "newSHA256": "c1f67bc13ced80481a727d3321cdd3b94e4a8b363c5cf3c41e5689bf2b3b7294",
+    "newBlob": "ad7f273512fae42aab9a129b319c04af7110d040",
+    "changedFields": [
+      "instruction (exact existing working text, version/provenance binding)",
+      "executable.releaseStatus DRAFT -> PUBLISHED (technical source candidate, not scientific approval or database publication)"
+    ],
+    "unchangedDefinition": true,
+    "unchangedManualStates": true
+  },
+  "databaseState": "NOT_EXECUTED_AT_PREPARATION",
+  "manualReview": "Original CANDIDATE/PILOT/localization PENDING retained; no fabricated expert/rights/norm approval; adults only; see independent audit"
+}

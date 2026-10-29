@@ -1,0 +1,18 @@
+import os,json,pathlib,signal,subprocess,urllib.parse,secrets,time,urllib.request
+r=pathlib.Path('/workspace/eduK12-new-version');o=r/'docs/scale-system-probe-20261028/evidence';states=json.load(open('/tmp/scale-system-processes.json'));private=pathlib.Path('/tmp/scale-system-runtime.json');s=json.load(open(private));s['campusEligibilityKey']=secrets.token_hex(32);s['campusMfaKey']=secrets.token_hex(32);private.write_text(json.dumps(s));private.chmod(0o600)
+api=next(x for x in states if x['name']=='api');pid=api['pid'];cmd=pathlib.Path('/proc/'+str(pid)+'/cmdline').read_bytes();assert b'tsx' in cmd and b'src/index.ts' in cmd and os.getpgid(pid)==pid
+os.killpg(pid,signal.SIGTERM)
+for _ in range(32):
+ p=pathlib.Path('/proc/'+str(pid)+'/stat')
+ if not p.exists() or p.read_text().rsplit(')',1)[1].split()[0]=='Z':break
+ time.sleep(.25)
+else:raise RuntimeError('Own API process not stopped, no blind restart')
+u=urllib.parse.urlsplit(os.environ['DATABASE_URL']);red=urllib.parse.urlsplit(os.environ['REDIS_URL']);env=dict(os.environ,DATABASE_URL=urllib.parse.urlunsplit((u.scheme,u.netloc,'/'+s['database'],u.query,u.fragment)),REDIS_URL=urllib.parse.urlunsplit((red.scheme,red.netloc,'/9',red.query,red.fragment)),SURVEY_MFA_ENCRYPTION_KEY=s['surveyMfaKey'],CAMPUS_ELIGIBILITY_HMAC_KEY=s['campusEligibilityKey'],CAMPUS_MFA_ENCRYPTION_KEY=s['campusMfaKey'],PORT='3107',NODE_ENV='development',BACKGROUND_WORKERS_ENABLED='false',HEAVY_PROCESSING_ENABLED='false',VIDEO_PROCESSING_ENABLED='false',SURVEY_WORKSPACE_ENABLED='true',SURVEY_PUBLICATION_ENABLED='true',SURVEY_ANALYTICS_ENABLED='true',HUITEACHER_WORKSPACE_ENABLED='true',COOKIE_SECURE='false',CORS_ORIGIN=','.join('http://'+x+'.localhost:5187'for x in ['training','survey','school','teacher']))
+with(o/'api-campus-config.stdout.log').open('wb')as stdout,(o/'api-campus-config.stderr.log').open('wb')as stderr:p=subprocess.Popen(api['argv'],cwd=api['cwd'],env=env,stdout=stdout,stderr=stderr,start_new_session=True)
+api['pid']=p.pid;pathlib.Path('/tmp/scale-system-processes.json').write_text(json.dumps(states,indent=2))
+for _ in range(40):
+ try:
+  with urllib.request.urlopen('http://127.0.0.1:3107/ready',timeout=1)as res:ready=json.load(res)
+  print(json.dumps({'ready':ready,'database':s['database'],'changedEnvironment':['CAMPUS_ELIGIBILITY_HMAC_KEY','CAMPUS_MFA_ENCRYPTION_KEY'],'secrets':'independently generated for new synthetic DB only; not logged; original Survey MFA key retained','applicationSourceChanged':False}));break
+ except Exception:time.sleep(.25)
+else:raise RuntimeError('Own API not ready; inspect logs')
