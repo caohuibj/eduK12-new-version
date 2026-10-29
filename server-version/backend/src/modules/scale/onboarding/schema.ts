@@ -1,3 +1,5 @@
+import {expertSourceApplicabilitySchema} from '../../education-tools/expert-observation.contract'
+import {educationApplicabilitySchema} from '../../scale-library-governance/education-applicability'
 import { z } from 'zod'
 import { validateReferenceSetDefinition } from '../../assessment-reference/reference'
 import { scaleCatalogIdentitySchema, scaleCatalogManifestV1Schema } from '../library/catalog-manifest'
@@ -146,5 +148,3 @@ export const parseScaleInstrumentSources = (inputs: readonly ScaleInstrumentSour
   }
   return { sources, diagnostics }
 }
-import {expertSourceApplicabilitySchema} from '../../education-tools/expert-observation.contract'
-import {educationApplicabilitySchema} from '../../scale-library-governance/education-applicability'
