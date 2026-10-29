@@ -74,3 +74,9 @@ test('only the two exact Scale CI tools are excluded from application fingerprin
   assert.notEqual(componentFingerprint(head,'backend'),componentFingerprint(git('rev-parse','HEAD'),'backend'));
  }finally{process.chdir(original);rmSync(dir,{recursive:true,force:true});}
 });
+
+ test('release tooling CodeQL includes the exact backend Scale checker and regression source',()=>{
+ const ci=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
+ const paths=ci.split("scenario == 'release-tooling' && 'paths: [")[1]?.split(']')[0].split(',').map(path=>path.trim());
+ assert.deepEqual(paths,['.github/scripts','server-version/scripts/release','server-version/backend/scripts/scale-intake-selected-check.ts','server-version/backend/scripts/scale-intake-selected-check.test.ts']);
+ });
