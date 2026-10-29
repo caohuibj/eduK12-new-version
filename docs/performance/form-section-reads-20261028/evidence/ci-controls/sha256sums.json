@@ -1,0 +1,14 @@
+{
+  "actionlint-base.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "actionlint-candidate.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "actionlint-comparison.json": "e342225a6725e880e1d0e8a50f27d4cb12714fade700d94c885b58b9e411ef5c",
+  "actionlint-tool.json": "9dd81ea6555ce006da3c75e54cdee243c7dac53388ce33b2d8b746b08abc09ae",
+  "evidence-metadata-check.json": "333fd0a740bd1c04efe03cda7071eb3e33f0a45517e7169cde5cf3b39b23c480",
+  "onboarding-controls-round1.test.mjs": "f1c0d161e55cb0d0ece5d490136de4d3b854d0d13dbed8b32f0b20e8d33fd119",
+  "pr381-browser-round1.mjs": "06251c499110e73ac1d8236f85b176d8eae09243d237519536319b3922d90d1c",
+  "round1-execution.json": "bfb6a436f107b53d55cd4bd95507bceb11cb9ec1cbfa5148d05d7cb5dd0602d0",
+  "round1.tap": "308301f226a79f12377244a0b23827564e0b35d7d725c9a3f60ec5c1528f3943",
+  "round2-build-log-contract.tap": "896c6e4a40a9ff6a7e51ccd5d1a184ee8199913a390bcb4b781de0f641882bc8",
+  "round2-execution.json": "c1dd39409e07e11acf785a590c55484f4453d0a7fa00879bc5701a47ef7647ec",
+  "syntax-tool-result.json": "f572ac9c4b3de2d7ec373a0dad7a34046a636f912d9e388ed64310ddb300c933"
+}

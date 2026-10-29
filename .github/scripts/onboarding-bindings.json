@@ -1,182 +1,196 @@
 {
-  "pr": 377,
+  "schemaVersion": 1,
+  "pr": 381,
   "enabled": true,
-  "base": "93235b6c6a61cefb30fd525eea13ee9c6d4cc0fe",
-  "product": "086ab229fd35e12b05c83372843aaa3653e23f87",
-  "controlCheckpoint": "d19ff30f670398c2e1ff8933bd6d2ef86b7ace37",
-  "source": {
-    "docs/performance/storage-ledger-20261028/CI-PLAN.md": {
-      "before": null,
-      "after": "ba1080f0d2357d6d7826498b1fc79ebdba786fb5"
-    },
-    "docs/performance/storage-ledger-20261028/LIFECYCLE.md": {
-      "before": null,
-      "after": "bc230903994fff0c33ec18b9ba7e16b7460986d0"
-    },
-    "docs/performance/storage-ledger-20261028/README.md": {
-      "before": null,
-      "after": "5a404635974d69a1252dd2f91a962c646bc3d2b6"
-    },
-    "docs/performance/storage-ledger-20261028/START-PLANNER.md": {
-      "before": null,
-      "after": "92859eacfddce96db76c0984e66d6cb620bf9855"
-    },
-    "docs/performance/storage-ledger-20261028/evidence-index.json": {
-      "before": null,
-      "after": "af1229d0ee738c7acc3208ddda5eaa29d139548d"
-    },
-    "docs/performance/storage-ledger-20261028/evidence/observer-completed-ledger.json": {
-      "before": null,
-      "after": "5059300068b877626f6947a959f0cf8bfe3de083"
-    },
-    "docs/performance/storage-ledger-20261028/lifecycle/comparison-r2.json": {
-      "before": null,
-      "after": "44e91cb01d10332ec823afd9f6a34758dd74fb90"
-    },
-    "docs/performance/storage-ledger-20261028/lifecycle/index.json": {
-      "before": null,
-      "after": "c2e06be5782ee2d3028454ade1e7ffe3311ee0f1"
-    },
-    "docs/performance/storage-ledger-20261028/lifecycle/legacy-r1-execution.json": {
-      "before": null,
-      "after": "b54b1918319d35cbe31816e910b92aba4b45c377"
-    },
-    "docs/performance/storage-ledger-20261028/lifecycle/legacy-r1.json": {
-      "before": null,
-      "after": "ba28397b9ba3b91899c89fab19c11a2570a85f98"
-    },
-    "docs/performance/storage-ledger-20261028/lifecycle/legacy-r1.log": {
-      "before": null,
-      "after": "dd00675bc4f92d3871c2d5067f6b68a870565f98"
-    },
-    "docs/performance/storage-ledger-20261028/lifecycle/legacy-r2-execution.json": {
-      "before": null,
-      "after": "74213d2d4c5c3412181a05e392fdc498995ef2be"
-    },
-    "docs/performance/storage-ledger-20261028/lifecycle/legacy-r2.json": {
-      "before": null,
-      "after": "d14773414899587e21ac3af4452b7b2cd80d17c0"
-    },
-    "docs/performance/storage-ledger-20261028/lifecycle/measure-lifecycle-r1.mts": {
-      "before": null,
-      "after": "e1750417c66ec81f0f1fd1ba284bb43d79f4192d"
-    },
-    "docs/performance/storage-ledger-20261028/lifecycle/measure-lifecycle.mts": {
-      "before": null,
-      "after": "c26ddb75474d99ff6e58bf6f46fb20277040b751"
-    },
-    "docs/performance/storage-ledger-20261028/lifecycle/run-lifecycle-r1.py": {
-      "before": null,
-      "after": "d90c584c5bc2250e51bd12ad18e55079348dd94d"
-    },
-    "docs/performance/storage-ledger-20261028/lifecycle/run-lifecycle-r2.py": {
-      "before": null,
-      "after": "8b2dd4344233f8a81124ef4c0f7f29aeffe794b9"
-    },
-    "docs/performance/storage-ledger-20261028/lifecycle/shared-compact-r2-execution.json": {
-      "before": null,
-      "after": "8ed9e5e4c4744a7569b7c8cd75bb0fecd0fa2bec"
-    },
-    "docs/performance/storage-ledger-20261028/lifecycle/shared-compact-r2.json": {
-      "before": null,
-      "after": "67938a8ce0bd674ce6a42e20852dac786662f3f7"
-    },
-    "docs/performance/storage-ledger-20261028/read-existing-ledger.py": {
-      "before": null,
-      "after": "e05d5613dfac56b5e95258718b49c8a7062bca39"
-    },
-    "docs/performance/storage-ledger-20261028/start-planner/authority-profile-r1-execution.json": {
-      "before": null,
-      "after": "f183e9600cc143549855c2c8e94a1526ed03f0c9"
-    },
-    "docs/performance/storage-ledger-20261028/start-planner/authority-profile-r1.json.gz": {
-      "before": null,
-      "after": "2bf72c6e5c1094b5322126782c0260d40de137b7"
-    },
-    "docs/performance/storage-ledger-20261028/start-planner/authority-profile-r1.log": {
-      "before": null,
-      "after": "0d37b0fa89ee2c515b07ee5c945190570740de8e"
-    },
-    "docs/performance/storage-ledger-20261028/start-planner/authority-profile-summary.json": {
-      "before": null,
-      "after": "0aad6cad0eafb71a58e9ac3363052f007ec3e3de"
-    },
-    "docs/performance/storage-ledger-20261028/start-planner/index.json": {
-      "before": null,
-      "after": "dc77d8101d906c8da52c54816ebd6ac33c5dfd09"
-    },
-    "docs/performance/storage-ledger-20261028/start-planner/planner-backend-types-r1.json": {
-      "before": null,
-      "after": "977ea34a042afac747c8dc3f6c9930f9e657e71f"
-    },
-    "docs/performance/storage-ledger-20261028/start-planner/planner-backend-types-r1.log": {
-      "before": null,
-      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
-    },
-    "docs/performance/storage-ledger-20261028/start-planner/planner-pg-r1-execution.json": {
-      "before": null,
-      "after": "591a566e8af8db4c138ac590ba0d2da801013fcd"
-    },
-    "docs/performance/storage-ledger-20261028/start-planner/planner-pg-r1.json": {
-      "before": null,
-      "after": "4901f772f7365f0d51e60604cfd0c1426654024a"
-    },
-    "docs/performance/storage-ledger-20261028/start-planner/planner-validation-r1-execution.json": {
-      "before": null,
-      "after": "4e1d57873b5da30d56fbb083ba2bd27125da1444"
-    },
-    "docs/performance/storage-ledger-20261028/start-planner/planner-validation-r1.json": {
-      "before": null,
-      "after": "ee97a6c761840bed5a761ee3b1ff0a662d26c625"
-    },
-    "docs/performance/storage-ledger-20261028/start-planner/profile-start-authority.mts": {
-      "before": null,
-      "after": "6c1baa6914aadad37a62a42e8f5723817cabd9f2"
-    },
-    "docs/performance/storage-ledger-20261028/start-planner/run-authority-profile.py": {
-      "before": null,
-      "after": "b6b4940ff3cdd087152c76089fb14446ae733320"
-    },
-    "docs/performance/storage-ledger-20261028/start-planner/run-planner-pg.py": {
-      "before": null,
-      "after": "42c0b1735e339241e4f0712535eeb399831e9b19"
-    },
-    "docs/performance/storage-ledger-20261028/start-planner/run-planner-validation.py": {
-      "before": null,
-      "after": "de6a6b861b0eae7c881b32f52781ff424c2f5d50"
-    },
-    "docs/performance/storage-ledger-20261028/start-planner/start-planner-unit-r1.json": {
-      "before": null,
-      "after": "9c3c826c6c9d47029fc1643d18859ea067bb3422"
-    },
-    "docs/performance/storage-ledger-20261028/start-planner/validate-start-planner.mts": {
-      "before": null,
-      "after": "3b5e062884a5c4f103a02a615cf0d2e7d9dce964"
-    },
-    "server-version/backend/src/__tests__/scale-library-governance/education-execution-authority.test.ts": {
-      "before": "6fbf9217629702e12ea1ffcf763cb148af61cf0a",
-      "after": "fa42bdf314561b4365ad6514a5b47924d16327c0"
-    },
-    "server-version/backend/src/modules/assessment-run/startAuthority.ts": {
-      "before": "ab946c097650f977fbcd1e264d0cd13d3c338855",
-      "after": "dada40dbf8a0a305aea3067f61d2361a4723668e"
-    }
+  "base": "c5c28f85085e53de1b7be4ed821489accaae7228",
+  "product": "ebf90d6dd7d22cc0a907d8a258f28e95d70f5e64",
+  "controlCheckpoint": "fed24d825c518464605ad0c9353d1c8b26d8ff0a",
+  "components": {
+    "backend": "b7fe981eea351ebb94232571479894e921e53bcd",
+    "frontend": "cf228766bf881fd1a4d9e922fc8171488a27756b"
   },
   "controlBefore": {
     ".github/scripts/content-scope.mjs": "31a340af23927250b9a40f6097b3815d617c70ec",
     ".github/scripts/merge-gate.mjs": "985c744ac800aa425323db1c57010e64d0d69a8e",
-    ".github/scripts/onboarding-bindings.json": "70a0bc585fc65f26bb7920f8fb34fab04cc860a8",
-    ".github/scripts/onboarding-checks.mjs": "27f7a30c62a281b4c9bb7a13269071e98cebd7a8",
-    ".github/scripts/onboarding-controls.test.mjs": "31af571d4641c9676487e4f2da033bd85b4270cf",
-    ".github/scripts/onboarding-evidence.json": "3ae31a623b4acc23cf57f3dcac402e5b4ebdeb35",
-    ".github/scripts/onboarding-scope.mjs": "4176bb688bc4d6703cfac87fdc298c0d1b4e3a50",
+    ".github/scripts/onboarding-bindings.json": "2f23321c29e931316c2a80ba8d35d05f74d4af1a",
+    ".github/scripts/onboarding-checks.mjs": "9e87c249dde03a009b8286c31141ede3df1ee66e",
+    ".github/scripts/onboarding-controls.test.mjs": "bb960b061cdd3c13fb25e13b3442c9d04eecd755",
+    ".github/scripts/onboarding-evidence.json": "ddf30836b393812366c0cd0adae48622a6508381",
+    ".github/scripts/onboarding-scope.mjs": "215b68222d52645b214567f19ab95a48eec1a9cf",
     ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
     ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
     ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
-    ".github/workflows/ci.yml": "71ee6d10921c5c9bb27a00c8112a04f2d2351187"
+    ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
+    ".github/scripts/pr380-browser-reuse.mjs": "35fde26a8103c0c32c28f0cc458278c47ccb7067",
+    ".github/scripts/pr380-browser-reuse.test.mjs": "6da41c90df0b9d4aae0106a45eede5e0afae89c3",
+    ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
+    ".github/scripts/pr381-browser.mjs": null,
+    ".github/workflows/ci.yml": "f644951edb4f109f7d6e33d9561407673bfd739c"
   },
-  "components": {
-    "backend": "b7fe981eea351ebb94232571479894e921e53bcd",
-    "frontend": "41f956f8c717c1e6829998bfab896bd1a4e50af1"
+  "source": {
+    "docs/performance/form-section-reads-20261028/README.md": {
+      "before": null,
+      "after": "70effbed38eca4265d58de3e75ab76242d1a8cc0"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/baseline/browser-preflight.log": {
+      "before": null,
+      "after": "7dbd402e6e289f944611dab9739a34b97aeac106"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/baseline/component-http.log": {
+      "before": null,
+      "after": "79fe01ec6ba19c89557b6e4d5ef6d4eeedfd1af3"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/baseline/harness-r1.tsx": {
+      "before": null,
+      "after": "4a84bdd892aec749d9d81f273904a644c8bf3976"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/baseline/inputs.json": {
+      "before": null,
+      "after": "988cd7c4894d85c46744be6cc81d70591aca4fd6"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/baseline/measurements.jsonl": {
+      "before": null,
+      "after": "02b04d4950bff493fb3ea27d14cd55e20542e8c5"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/baseline/reporter.json": {
+      "before": null,
+      "after": "9e33c377121e892e04ac42cd4599d3523bd38864"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/candidate/component-http.log": {
+      "before": null,
+      "after": "5b2836eee2b575c9bbb7b45b3b1e9f335e9e7e9f"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/candidate/errors-r2.log": {
+      "before": null,
+      "after": "6b1e2f8f340b188da3cda2511b70dcab791643d1"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/candidate/harness-r1.tsx": {
+      "before": null,
+      "after": "4a84bdd892aec749d9d81f273904a644c8bf3976"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/candidate/inputs-final.json": {
+      "before": null,
+      "after": "c1597a34cd8e308c45402503c5b21339ece9a6a2"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/candidate/inputs-r1.json": {
+      "before": null,
+      "after": "6dba2a565398ea871e1e89ddd92602d85b3fb9ed"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/candidate/lint-final-test.log": {
+      "before": null,
+      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/candidate/lint.log": {
+      "before": null,
+      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/candidate/measurements.jsonl": {
+      "before": null,
+      "after": "9edee5056877ab91611046e41be51b17c90daad8"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/candidate/nested-r3.log": {
+      "before": null,
+      "after": "1537183ec11f43cf433751d5b2be394113176a1f"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/candidate/reporter-r2-errors.json": {
+      "before": null,
+      "after": "b5a985caabc00177dccd94ca387cc6b0189357f4"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/candidate/reporter-r3-nested.json": {
+      "before": null,
+      "after": "6d38288389d29aa04b09ced11b944f956183c976"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/candidate/reporter.json": {
+      "before": null,
+      "after": "b4fa0bc7cc53cd6d423b3507fde487d8c377be84"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/candidate/types-app-final.log": {
+      "before": null,
+      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/candidate/types-app.log": {
+      "before": null,
+      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/case-evidence.json": {
+      "before": null,
+      "after": "86c60efe18b136406a6ac2fe925b64b384b767dd"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/ci-controls/actionlint-base.log": {
+      "before": null,
+      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/ci-controls/actionlint-candidate.log": {
+      "before": null,
+      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/ci-controls/actionlint-comparison.json": {
+      "before": null,
+      "after": "aa8de48993a92ba6e83964efd15440f95366e46e"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/ci-controls/actionlint-tool.json": {
+      "before": null,
+      "after": "ab77605f347d5a914a0c3bd0a10acae7f279702d"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/ci-controls/evidence-metadata-check.json": {
+      "before": null,
+      "after": "a03c41856b968ba4b950c77d3a0a94fec3ade584"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/ci-controls/onboarding-controls-round1.test.mjs": {
+      "before": null,
+      "after": "783a1e69765ab610b756a72a3fb8b872d06372b6"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/ci-controls/pr381-browser-round1.mjs": {
+      "before": null,
+      "after": "10ac0dfd8bce13b7b0bdc5afbe4a06d5466c32ed"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/ci-controls/round1-execution.json": {
+      "before": null,
+      "after": "c930e7e8544ca45ca76d2d9137aa31957a979729"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/ci-controls/round1.tap": {
+      "before": null,
+      "after": "97d4aebd2ec8787089a2bfdba1f77278bfd84c7a"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/ci-controls/round2-build-log-contract.tap": {
+      "before": null,
+      "after": "d859755f0e0b6464a80858a26ad66ee990fa14dd"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/ci-controls/round2-execution.json": {
+      "before": null,
+      "after": "b69bb226432a523d87e3700d27918916661c5e2e"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/ci-controls/sha256sums.json": {
+      "before": null,
+      "after": "2b6f4aeca4ecb6e0bf8ec287ee094c55349a995b"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/ci-controls/syntax-tool-result.json": {
+      "before": null,
+      "after": "ab131656884ad150851bf741ea05b3dea958c8c3"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/commands.json": {
+      "before": null,
+      "after": "e5fd41355b3b30834e41675a9f9fad512af8e98d"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/comparison.json": {
+      "before": null,
+      "after": "553ed499a37e2bc8b1937d333adfd7d1ef7725ec"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/module-before.tsx": {
+      "before": null,
+      "after": "599cc279bc75be989455e3144b5100703e4d2bd2"
+    },
+    "docs/performance/form-section-reads-20261028/evidence/sha256sums.json": {
+      "before": null,
+      "after": "3f8e450beda11bb5fce38f1f3632eb9639f2a42b"
+    },
+    "server-version/frontend/src/components/FormSectionManager.tsx": {
+      "before": "599cc279bc75be989455e3144b5100703e4d2bd2",
+      "after": "74f332fad7d94b9e7c0d1d0c49e16e150f66041e"
+    },
+    "server-version/frontend/src/components/__tests__/FormSectionManager.http.test.tsx": {
+      "before": null,
+      "after": "a40a38fe914f7d251b7e47c9802914cafa99ab5b"
+    }
   }
 }

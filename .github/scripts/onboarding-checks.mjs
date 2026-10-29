@@ -49,7 +49,7 @@ export function verifyFailureContinuations(reports,admitted){
 }
 export function verifyTypeReceipt(receipt,review,readBytes,currentTree){
   const component=review.component??'backend';assert(['backend','frontend'].includes(component));
-  const argv=component==='frontend'?['node','node_modules/typescript/bin/tsc','-p','tsconfig.app.json','--noEmit']:['node','node_modules/typescript/bin/tsc','--noEmit'];
+  const argv=component==='frontend'&&receipt.argv?.[0]==='npm'?['npm','run','typecheck']:component==='frontend'?['node','node_modules/typescript/bin/tsc','-p','tsconfig.app.json','--noEmit']:['node','node_modules/typescript/bin/tsc','--noEmit'];
   assert.equal(receipt[review.exitField],0);assert.deepEqual(receipt.argv??receipt.command,argv);
   const tree=review.componentTree??review.backendTree;
   if(tree){assert.equal(receipt.componentTree??receipt.backendTree,tree);assert.equal(currentTree,tree);}
@@ -61,6 +61,62 @@ export function verifyTypeReceipt(receipt,review,readBytes,currentTree){
   if(receipt.logSHA256)assert.equal(hash(readBytes(safePath(review.log))),receipt.logSHA256);
   return {originalExitCode:0,originalNode:receipt.node??null,originalSigned:false,component,currentComponentTree:currentTree,
     ...(component==='backend'?{currentBackend:currentTree}:{}),coverage:tree?'exact-'+component+'-tree':'recorded-before-after-source-files'};
+}
+
+// PR381's original task recorded shell commands/exits, not the older argv
+// receipt schema. Read that exact unsigned, retrospective record directly;
+// never infer exit 0 from an empty log or manufacture an original argv receipt.
+export function verifyPr381CommandRecords(commands,inputs,firstInputs,currentTree,readBytes){
+  const root='docs/performance/form-section-reads-20261028/evidence/';
+  const frontend='server-version/frontend/';
+  const modulePath=frontend+'src/components/FormSectionManager.tsx';
+  const testPath=frontend+'src/components/__tests__/FormSectionManager.http.test.tsx';
+  assert.equal(commands.baselineSource,'c5c28f85085e53de1b7be4ed821489accaae7228');
+  assert.equal(commands.productSource,'ebf90d6dd7d22cc0a907d8a258f28e95d70f5e64');
+  assert.equal(commands.workingDirectory,'/workspace/eduK12-new-version/server-version/frontend');
+  assert.equal(inputs.sourceCommit,commands.productSource);
+  assert.equal(inputs.sourceTree,'5ab5f09ad590733d9733a33d6afb5ea2ab3c5773');
+  assert.equal(inputs.nodeVersion,'v24.21.0');
+  assert.equal(inputs.executionSignature,'UNSIGNED_LOCAL');
+  assert.equal(currentTree,'cf228766bf881fd1a4d9e922fc8171488a27756b');
+  const files=inputs.fullFrontendTrackedFileSha256;
+  assert(files&&Object.keys(files).length===1841,'Complete original input inventory required');
+  const backendMeta=['server-version/backend/package.json','server-version/backend/package-lock.json','server-version/backend/prisma/schema.prisma'];
+  for(const [path,digest]of Object.entries(files)){
+    safePath(path);assert(path.startsWith(frontend)||backendMeta.includes(path));
+    assert.match(digest,/^[a-f0-9]{64}$/);
+    assert.equal(hash(readBytes(path)),digest,'Original task input drift: '+path);
+  }
+  for(const path of [modulePath,frontend+'src/components/__tests__/FormSectionManager.test.tsx',frontend+'src/pages/teacher/GeneralQuestionnaireEdit.deferred.test.tsx'])
+    assert.equal(hash(readBytes(path)),firstInputs[path],'First passing cases consumed different source');
+  const original=readBytes(root+'candidate/harness-r1.tsx');
+  assert.equal(hash(original),firstInputs[testPath]);
+  const supplement="\n  it('derives membership when nested field DTOs omit their enclosing section IDs', async () => {\n    sections.forEach(section => section.items.forEach(item => {\n      delete item.sectionId\n      delete item.formSectionId\n    }))\n    render(<FormSectionManager basePath={basePath} />)\n    await ready()\n    expect(within(target()).getByRole('option', { name: field1 })).toBeInTheDocument()\n    expect(within(target()).queryByRole('option', { name: field2 })).toBeNull()\n    expect(within(target()).queryByRole('option', { name: '背景字段' })).toBeNull()\n    expect(requests).toHaveLength(2)\n  })\n";
+  const current=readBytes(testPath).toString('utf8');
+  assert.equal(current.split(supplement).length,2,'Unexpected supplementary test delta');
+  const corrected="toHaveTextContent('服务暂时不可用，请稍后重试。')";
+  assert.equal(current.split(corrected).length,2);
+  assert.equal(current.replace(supplement,'').replace(corrected,"toHaveTextContent('合成暂时不可用')"),original.toString('utf8'),'Unreviewed earlier-case changes');
+  const expected=[
+    [5,'final app types','node_modules/.bin/tsc -p tsconfig.app.json --noEmit','candidate/types-app-final.log','278ac1'],
+    [6,'changed-file lint','node_modules/.bin/eslint src/components/FormSectionManager.tsx src/components/__tests__/FormSectionManager.http.test.tsx','candidate/lint.log','62534f'],
+    [7,'final supplementary test lint','node_modules/.bin/eslint src/components/__tests__/FormSectionManager.http.test.tsx','candidate/lint-final-test.log','a94af5'],
+  ];
+  assert(Array.isArray(commands.invocations)&&commands.invocations.length===9);
+  const checked=expected.map(([index,name,command,log,originalTaskChunk])=>{
+    const record=commands.invocations[index];
+    assert.equal(record?.name,name);assert.equal(record?.command,command);assert.equal(record?.log,log);
+    assert(Object.hasOwn(record,'exitCode')&&Number.isInteger(record.exitCode));
+    assert.equal(record.exitCode,0,'Original command has no successful exit');
+    const bytes=readBytes(root+safePath(log));
+    assert.equal(bytes.length,0,'Original empty log bytes changed');
+    return {name,command,originalExitCode:record.exitCode,logSHA256:hash(bytes),originalTaskChunk,
+      originalTaskReferenceStatus:'Reference to observed task completion, not authenticated by Git',ciExecuted:false};
+  });
+  return {component:'frontend',currentComponentTree:currentTree,originalNode:inputs.nodeVersion,
+    originalSigned:false,sourceAssociation:'Original task record, retrospectively indexed, unsigned; no historical whole-tree execution attestation',
+    type:{...checked[0],component:'frontend',currentComponentTree:currentTree,originalSigned:false,coverage:'reviewed-original-command-and-recorded-source-inputs'},
+    lint:checked.slice(1),inputCount:Object.keys(files).length};
 }
 export function verifyReportPlanningObservation(observation,execution){
   assert.equal(execution.exitCode,0);assert.match(execution.head,/^[a-f0-9]{40}$/);
@@ -119,7 +175,13 @@ function admit(){
   assert(admitted.length&&new Set(admitted.flatMap(r=>r.caseNames)).size===admitted.flatMap(r=>r.caseNames).length);
   assert.equal(new Set(admitted.map(r=>r.id)).size,admitted.length);
   verifyFailureContinuations(review.reports,admitted);
-  const types=(Array.isArray(review.types)?review.types:[review.types]).map(record=>verifyTypeReceipt(readOriginal(record),record,path=>readFileSync(path),p.components[record.component??'backend']));
+  let originalTaskChecks=null;
+  if(p.pr===381){
+    const record=review.pr381LocalChecks;assert(record?.sourceAssociationBasis&&record.limitations?.length);
+    assert.deepEqual(review.types,[],'PR381 does not fabricate an argv-style original receipt');
+    originalTaskChecks=verifyPr381CommandRecords(readOriginal(record.commands),readOriginal(record.inputs),readOriginal(record.firstInputs),p.components.frontend,path=>readFileSync(path));
+  }else assert(!review.pr381LocalChecks);
+  const types=originalTaskChecks?[originalTaskChecks.type]:(Array.isArray(review.types)?review.types:[review.types]).map(record=>verifyTypeReceipt(readOriginal(record),record,path=>readFileSync(path),p.components[record.component??'backend']));
   assert(types.length);
   if([372,374].includes(p.pr))assert.deepEqual(types.map(t=>t.component).sort(),['backend','frontend']);
   const observations=[];
@@ -137,7 +199,7 @@ function admit(){
   if(p.pr===374)observations.push(verifyPr374Observations(review.pr374));
   else assert(!review.pr374);
   mkdirSync('onboarding-evidence',{recursive:true});
-  writeFileSync('onboarding-evidence/admission.json',JSON.stringify({schemaVersion:1,source:p,runId:process.env.GITHUB_RUN_ID,attempt:process.env.GITHUB_RUN_ATTEMPT,admitted,types,observations,environment:review.environment,testsExecutedInCI:false,rootReviewAuthentication:'Immutable reviewed Git record, not a signed original execution'},null,2)+'\n');
+  writeFileSync('onboarding-evidence/admission.json',JSON.stringify({schemaVersion:1,source:p,runId:process.env.GITHUB_RUN_ID,attempt:process.env.GITHUB_RUN_ATTEMPT,admitted,types,observations,...(originalTaskChecks?{originalTaskChecks}:{}),environment:review.environment,testsExecutedInCI:false,rootReviewAuthentication:'Immutable reviewed Git record, not a signed original execution'},null,2)+'\n');
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
   if(process.argv[2]==='admit')admit();

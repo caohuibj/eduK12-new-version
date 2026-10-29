@@ -50,7 +50,6 @@ const itemLabel = (item: FormItem): string => item.formLabel || item.label || it
  */
 const FormSectionManager: React.FC<FormSectionManagerProps> = ({ basePath, readOnly = false, title = '内容与顺序', refreshKey, onChange, onRemoveItem, allowRemoveEmptySection = false }) => {
   const [sections, setSections] = useState<FormSection[]>([])
-  const [items, setItems] = useState<FormItem[]>([])
   const [units, setUnits] = useState<ContentUnit[]>([])
   const [newTitle, setNewTitle] = useState('新表单区段')
   const [loading, setLoading] = useState(true)
@@ -60,16 +59,13 @@ const FormSectionManager: React.FC<FormSectionManagerProps> = ({ basePath, readO
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const [sectionResponse, itemResponse, contentResponse] = await Promise.all([
+      const [sectionResponse, contentResponse] = await Promise.all([
         apiClient.get<{ list: FormSection[] }>(`${basePath}/form-sections`),
-        apiClient.get<{ list: FormItem[] }>(`${basePath}/form-items`),
         apiClient.get<{ units?: ContentUnit[] }>(`${basePath}/content`),
       ])
       if (sectionResponse.code !== 0) throw new Error(sectionResponse.message || '区段加载失败')
-      if (itemResponse.code !== 0) throw new Error(itemResponse.message || '字段加载失败')
       if (contentResponse.code !== 0) throw new Error(contentResponse.message || '内容顺序加载失败')
       setSections((sectionResponse.data?.list ?? []).slice().sort((left, right) => left.position - right.position))
-      setItems(itemResponse.data?.list ?? [])
       setUnits((contentResponse?.code === 0 ? contentResponse.data?.units ?? [] : []).slice().sort((left, right) => left.position - right.position))
       setNotice(null)
     } catch (error) {
@@ -81,7 +77,12 @@ const FormSectionManager: React.FC<FormSectionManagerProps> = ({ basePath, readO
 
   useEffect(() => { void load() }, [load, refreshKey])
 
-  const movableItems = useMemo(() => items.filter(item => !item.contextKey), [items])
+  // Management section responses contain every field after server-side
+  // membership repair. Derive membership from that same canonical snapshot;
+  // the nested field DTO deliberately omits its enclosing section ID.
+  const movableItems = useMemo(() => sections.flatMap(section => section.items
+    .filter(item => !item.contextKey)
+    .map(item => ({ ...item, formSectionId: section.id }))), [sections])
 
   const run = async (operation: () => Promise<{ code: number | string; message: string }>) => {
     setSaving(true)

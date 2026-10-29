@@ -1,144 +1,338 @@
 {
   "schemaVersion": 1,
-  "product": "086ab229fd35e12b05c83372843aaa3653e23f87",
+  "product": "ebf90d6dd7d22cc0a907d8a258f28e95d70f5e64",
   "reviewer": "root dot",
   "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
   "ciExecuted": false,
   "originalExecutionSigned": false,
   "environment": {
+    "node": "v24.21.0",
     "limitations": [
-      "Original local results unsigned; source associations retrospective; no complete installed-dependency byte manifest.",
-      "Four selected unit cases and two fresh real PG School/Teacher START/FINAL/report cases; filtered rows remain filtered. Original PG HTTP identity and image bytes mocked, not browser/login acceptance.",
-      "Separate existing-record planner validation uses temporary synthetic negative mutations and rolls them back. Not read-only for those negative transactions.",
-      "Storage lifecycle observations are fixed-order single-sequence measurements, not production p95/capacity or full four-entry qualification. No flags enabled in production.",
-      "Frontend/schema/locks unchanged; no browser, build, repeated application/PG/compiler or 60-answer lifecycle replay in CI."
+      "Original task records are retrospectively indexed and unsigned; Git does not authenticate their execution.",
+      "Only selected installed dependency versions and locked inputs were recorded; not a byte-level installed dependency attestation.",
+      "The original 20 PASS / 2 FAIL report remains failed; retries/filters remain original and selected passed cases form a disjoint 23-case union.",
+      "Eight deferred parent tests replace the manager and do not prove manager late-response behavior.",
+      "Empty type/lint logs are never treated as success without the exact original command exit record.",
+      "Current-cloud Chromium launch was blocked; the new compiled GET-only consumer has not run. No real backend login/START/FINAL or production performance qualification."
     ]
   },
   "reports": [
     {
-      "id": "current-authority-unit",
-      "path": "docs/performance/storage-ledger-20261028/start-planner/start-planner-unit-r1.json",
-      "sha256": "d9561e00e72bdcc1067cc75c0242050d5aab0ebed8703ee77d974fd270ce8311",
-      "originalSourceAssociation": "086ab229fd35e12b05c83372843aaa3653e23f87",
+      "id": "pr381-original-r1",
+      "path": "docs/performance/form-section-reads-20261028/evidence/candidate/reporter.json",
+      "sha256": "72dc0332495b1998246c4a6832890e2cc2f9d793328ad823793cf71a0efab96d",
+      "originalSourceAssociation": "ebf90d6dd7d22cc0a907d8a258f28e95d70f5e64",
       "sourceRoots": [
-        "server-version/backend"
+        "server-version/frontend"
       ],
-      "sourceAssociationBasis": "Root retrospective source association to exact final backend tree; original checks ran while four-line patch and direct test changes were uncommitted. No signed-execution claim.",
       "reviewedUnrelatedSourceDelta": [],
-      "deltaRationale": "No backend input changes after the recorded checks; documentation only.",
+      "sourceAssociationBasis": "Retrospective association with committed product; original runtime and selected source hashes retained in inputs-r1.json and inputs-final.json. Not a claim that the final whole tree was the original execution tree.",
+      "deltaRationale": "Runtime module and existing parent/shared tests match the captured source. Original new HTTP harness retained; only the two failed 503 message expectations were corrected, then one separately executed membership-omission case was appended. The PR381 command-record verifier checks that exact source delta.",
       "cases": [
         {
-          "fullName": "education execution purpose and account-lock boundary keeps default collection denies and rejects School Training fallback",
-          "status": "skipped"
-        },
-        {
-          "fullName": "education execution purpose and account-lock boundary report history uses current report denies, not collection denies or School legacy collection policy",
-          "status": "skipped"
-        },
-        {
-          "fullName": "education execution purpose and account-lock boundary default caller keeps its existing user SHARE fence",
-          "status": "skipped"
-        },
-        {
-          "fullName": "education execution purpose and account-lock boundary actual library metadata permits query-time accounts without a post-org user lock",
-          "status": "skipped"
-        },
-        {
-          "fullName": "education execution purpose and account-lock boundary requesting detection cannot remove legacy user locks when no actual library track exists",
-          "status": "skipped"
-        },
-        {
-          "fullName": "education execution purpose and account-lock boundary private source qualification joins the immutable version and real workflow before changing account-lock mode",
-          "status": "skipped"
-        },
-        {
-          "fullName": "education execution purpose and account-lock boundary cannot use bound FINAL intake semantics for an unverified legacy/public source",
-          "status": "skipped"
-        },
-        {
-          "fullName": "education execution purpose and account-lock boundary only DB-bound FORM FINAL may finish after the new-intake deadline (final=false)",
+          "fullName": "canonical section field source over synthetic HTTP measures initial shared manager at /general-questionnaires/q",
           "status": "passed"
         },
         {
-          "fullName": "education execution purpose and account-lock boundary only DB-bound FORM FINAL may finish after the new-intake deadline (final=true)",
+          "fullName": "canonical section field source over synthetic HTTP measures initial shared manager at /questionnaires/q",
           "status": "passed"
         },
         {
-          "fullName": "education execution purpose and account-lock boundary planner bound preserves current accountsCurrent refusal",
+          "fullName": "canonical section field source over synthetic HTTP measures initial shared manager at /composite-assessments/q",
           "status": "passed"
         },
         {
-          "fullName": "education execution purpose and account-lock boundary planner bound preserves current populationCurrent refusal",
+          "fullName": "canonical section field source over synthetic HTTP measures the real ordinary editor basic, content and cached tab revisit",
+          "status": "passed"
+        },
+        {
+          "fullName": "canonical section field source over synthetic HTTP uses only sections and order and refreshes canonical membership after a move at /general-questionnaires/q",
+          "status": "passed"
+        },
+        {
+          "fullName": "canonical section field source over synthetic HTTP uses only sections and order and refreshes canonical membership after a move at /questionnaires/q",
+          "status": "passed"
+        },
+        {
+          "fullName": "canonical section field source over synthetic HTTP uses only sections and order and refreshes canonical membership after a move at /composite-assessments/q",
+          "status": "passed"
+        },
+        {
+          "fullName": "canonical section field source over synthetic HTTP uses the refreshed section list for newly available fields",
+          "status": "passed"
+        },
+        {
+          "fullName": "canonical section field source over synthetic HTTP keeps a failed /form-sections distinguishable from an empty section list",
+          "status": "failed"
+        },
+        {
+          "fullName": "canonical section field source over synthetic HTTP keeps a failed /content distinguishable from an empty section list",
+          "status": "failed"
+        },
+        {
+          "fullName": "canonical section field source over synthetic HTTP keeps published/read-only section management non-mutating",
+          "status": "passed"
+        },
+        {
+          "fullName": "content order management repairs a trailing context in one complete final order request",
+          "status": "passed"
+        },
+        {
+          "fullName": "content order management shows a plain API validation error instead of a generic failure",
+          "status": "passed"
+        },
+        {
+          "fullName": "content order management refreshes the canonical unit list after the parent removes a module",
+          "status": "passed"
+        },
+        {
+          "fullName": "GeneralQuestionnaireEdit deferred tabs waits for metadata before exposing an editor and loads no optional code or data on basic",
+          "status": "passed"
+        },
+        {
+          "fullName": "GeneralQuestionnaireEdit deferred tabs loads each tab on first visit and preserves basic, section and token drafts across switches",
+          "status": "passed"
+        },
+        {
+          "fullName": "GeneralQuestionnaireEdit deferred tabs keeps unknown content distinct from empty and retries content and catalog failures without replacing basic edits",
+          "status": "passed"
+        },
+        {
+          "fullName": "GeneralQuestionnaireEdit deferred tabs does not apply late metadata after route identity changes",
+          "status": "passed"
+        },
+        {
+          "fullName": "GeneralQuestionnaireEdit deferred tabs discards late content and catalog results and resets visited tabs when the id changes",
+          "status": "passed"
+        },
+        {
+          "fullName": "GeneralQuestionnaireEdit deferred tabs publishes from basic by loading only validation content and retaining the shared synchronous operation lock",
+          "status": "passed"
+        },
+        {
+          "fullName": "GeneralQuestionnaireEdit deferred tabs shares an in-flight first content load with publishing instead of requesting the same data twice",
+          "status": "passed"
+        },
+        {
+          "fullName": "GeneralQuestionnaireEdit deferred tabs does not publish empty or failed unknown content and permits a later retry",
           "status": "passed"
         }
+      ],
+      "selectedCases": [
+        "canonical section field source over synthetic HTTP measures initial shared manager at /general-questionnaires/q",
+        "canonical section field source over synthetic HTTP measures initial shared manager at /questionnaires/q",
+        "canonical section field source over synthetic HTTP measures initial shared manager at /composite-assessments/q",
+        "canonical section field source over synthetic HTTP measures the real ordinary editor basic, content and cached tab revisit",
+        "canonical section field source over synthetic HTTP uses only sections and order and refreshes canonical membership after a move at /general-questionnaires/q",
+        "canonical section field source over synthetic HTTP uses only sections and order and refreshes canonical membership after a move at /questionnaires/q",
+        "canonical section field source over synthetic HTTP uses only sections and order and refreshes canonical membership after a move at /composite-assessments/q",
+        "canonical section field source over synthetic HTTP uses the refreshed section list for newly available fields",
+        "canonical section field source over synthetic HTTP keeps published/read-only section management non-mutating",
+        "content order management repairs a trailing context in one complete final order request",
+        "content order management shows a plain API validation error instead of a generic failure",
+        "content order management refreshes the canonical unit list after the parent removes a module",
+        "GeneralQuestionnaireEdit deferred tabs waits for metadata before exposing an editor and loads no optional code or data on basic",
+        "GeneralQuestionnaireEdit deferred tabs loads each tab on first visit and preserves basic, section and token drafts across switches",
+        "GeneralQuestionnaireEdit deferred tabs keeps unknown content distinct from empty and retries content and catalog failures without replacing basic edits",
+        "GeneralQuestionnaireEdit deferred tabs does not apply late metadata after route identity changes",
+        "GeneralQuestionnaireEdit deferred tabs discards late content and catalog results and resets visited tabs when the id changes",
+        "GeneralQuestionnaireEdit deferred tabs publishes from basic by loading only validation content and retaining the shared synchronous operation lock",
+        "GeneralQuestionnaireEdit deferred tabs shares an in-flight first content load with publishing instead of requesting the same data twice",
+        "GeneralQuestionnaireEdit deferred tabs does not publish empty or failed unknown content and permits a later retry"
       ],
       "summary": {
-        "success": true,
-        "numPassedTests": 4,
-        "numFailedTests": 0,
-        "numPendingTests": 7
-      }
+        "success": false,
+        "numPassedTests": 20,
+        "numFailedTests": 2,
+        "numPendingTests": 0
+      },
+      "allowPartialFailure": true,
+      "failureContinuations": [
+        {
+          "caseName": "canonical section field source over synthetic HTTP keeps a failed /form-sections distinguishable from an empty section list",
+          "reportId": "pr381-errors-r2"
+        },
+        {
+          "caseName": "canonical section field source over synthetic HTTP keeps a failed /content distinguishable from an empty section list",
+          "reportId": "pr381-errors-r2"
+        }
+      ]
     },
     {
-      "id": "real-start-final-report",
-      "path": "docs/performance/storage-ledger-20261028/start-planner/planner-pg-r1.json",
-      "sha256": "3fa8e06526289ec9eba43a4ce4912dd371a61a05af48355ce5ccc7abf508bbda",
-      "originalSourceAssociation": "086ab229fd35e12b05c83372843aaa3653e23f87",
+      "id": "pr381-errors-r2",
+      "path": "docs/performance/form-section-reads-20261028/evidence/candidate/reporter-r2-errors.json",
+      "sha256": "918cc250126cd068b3d461f4fd2f6752a72c150993b44102fbfb774d629ab07c",
+      "originalSourceAssociation": "ebf90d6dd7d22cc0a907d8a258f28e95d70f5e64",
       "sourceRoots": [
-        "server-version/backend"
+        "server-version/frontend"
       ],
-      "sourceAssociationBasis": "Root retrospective source association to exact final backend tree; original checks ran while four-line patch and direct test changes were uncommitted. No signed-execution claim.",
       "reviewedUnrelatedSourceDelta": [],
-      "deltaRationale": "No backend input changes after the recorded checks; documentation only.",
+      "sourceAssociationBasis": "Retrospective association with committed product; original runtime and selected source hashes retained in inputs-r1.json and inputs-final.json. Not a claim that the final whole tree was the original execution tree.",
+      "deltaRationale": "Runtime module and existing parent/shared tests match the captured source. Original new HTTP harness retained; only the two failed 503 message expectations were corrected, then one separately executed membership-omission case was appended. The PR381 command-record verifier checks that exact source delta.",
       "cases": [
         {
-          "fullName": "Education library real START→FINAL→personal report and image authorization reads SCHOOL self feedback from real FINAL and enforces identical current image access",
+          "fullName": "canonical section field source over synthetic HTTP measures initial shared manager at /general-questionnaires/q",
+          "status": "skipped"
+        },
+        {
+          "fullName": "canonical section field source over synthetic HTTP measures initial shared manager at /questionnaires/q",
+          "status": "skipped"
+        },
+        {
+          "fullName": "canonical section field source over synthetic HTTP measures initial shared manager at /composite-assessments/q",
+          "status": "skipped"
+        },
+        {
+          "fullName": "canonical section field source over synthetic HTTP measures the real ordinary editor basic, content and cached tab revisit",
+          "status": "skipped"
+        },
+        {
+          "fullName": "canonical section field source over synthetic HTTP uses only sections and order and refreshes canonical membership after a move at /general-questionnaires/q",
+          "status": "skipped"
+        },
+        {
+          "fullName": "canonical section field source over synthetic HTTP uses only sections and order and refreshes canonical membership after a move at /questionnaires/q",
+          "status": "skipped"
+        },
+        {
+          "fullName": "canonical section field source over synthetic HTTP uses only sections and order and refreshes canonical membership after a move at /composite-assessments/q",
+          "status": "skipped"
+        },
+        {
+          "fullName": "canonical section field source over synthetic HTTP uses the refreshed section list for newly available fields",
+          "status": "skipped"
+        },
+        {
+          "fullName": "canonical section field source over synthetic HTTP keeps a failed /form-sections distinguishable from an empty section list",
           "status": "passed"
         },
         {
-          "fullName": "Education library real START→FINAL→personal report and image authorization reads TEACHER self feedback from real FINAL and enforces identical current image access",
+          "fullName": "canonical section field source over synthetic HTTP keeps a failed /content distinguishable from an empty section list",
           "status": "passed"
         },
         {
-          "fullName": "Education library real START→FINAL→personal report and image authorization does not invent personal text or image rights for a version with no content audience",
+          "fullName": "canonical section field source over synthetic HTTP keeps published/read-only section management non-mutating",
           "status": "skipped"
         }
+      ],
+      "selectedCases": [
+        "canonical section field source over synthetic HTTP keeps a failed /form-sections distinguishable from an empty section list",
+        "canonical section field source over synthetic HTTP keeps a failed /content distinguishable from an empty section list"
       ],
       "summary": {
         "success": true,
         "numPassedTests": 2,
         "numFailedTests": 0,
-        "numPendingTests": 1
+        "numPendingTests": 9
+      }
+    },
+    {
+      "id": "pr381-nested-r3",
+      "path": "docs/performance/form-section-reads-20261028/evidence/candidate/reporter-r3-nested.json",
+      "sha256": "d2ec80be012e9b836f9da7c30d2665130d0d1c7c6b951fdb1abb800d1d2f1655",
+      "originalSourceAssociation": "ebf90d6dd7d22cc0a907d8a258f28e95d70f5e64",
+      "sourceRoots": [
+        "server-version/frontend"
+      ],
+      "reviewedUnrelatedSourceDelta": [],
+      "sourceAssociationBasis": "Retrospective association with committed product; original runtime and selected source hashes retained in inputs-r1.json and inputs-final.json. Not a claim that the final whole tree was the original execution tree.",
+      "deltaRationale": "Runtime module and existing parent/shared tests match the captured source. Original new HTTP harness retained; only the two failed 503 message expectations were corrected, then one separately executed membership-omission case was appended. The PR381 command-record verifier checks that exact source delta.",
+      "cases": [
+        {
+          "fullName": "canonical section field source over synthetic HTTP measures initial shared manager at /general-questionnaires/q",
+          "status": "skipped"
+        },
+        {
+          "fullName": "canonical section field source over synthetic HTTP measures initial shared manager at /questionnaires/q",
+          "status": "skipped"
+        },
+        {
+          "fullName": "canonical section field source over synthetic HTTP measures initial shared manager at /composite-assessments/q",
+          "status": "skipped"
+        },
+        {
+          "fullName": "canonical section field source over synthetic HTTP measures the real ordinary editor basic, content and cached tab revisit",
+          "status": "skipped"
+        },
+        {
+          "fullName": "canonical section field source over synthetic HTTP uses only sections and order and refreshes canonical membership after a move at /general-questionnaires/q",
+          "status": "skipped"
+        },
+        {
+          "fullName": "canonical section field source over synthetic HTTP uses only sections and order and refreshes canonical membership after a move at /questionnaires/q",
+          "status": "skipped"
+        },
+        {
+          "fullName": "canonical section field source over synthetic HTTP uses only sections and order and refreshes canonical membership after a move at /composite-assessments/q",
+          "status": "skipped"
+        },
+        {
+          "fullName": "canonical section field source over synthetic HTTP uses the refreshed section list for newly available fields",
+          "status": "skipped"
+        },
+        {
+          "fullName": "canonical section field source over synthetic HTTP derives membership when nested field DTOs omit their enclosing section IDs",
+          "status": "passed"
+        },
+        {
+          "fullName": "canonical section field source over synthetic HTTP keeps a failed /form-sections distinguishable from an empty section list",
+          "status": "skipped"
+        },
+        {
+          "fullName": "canonical section field source over synthetic HTTP keeps a failed /content distinguishable from an empty section list",
+          "status": "skipped"
+        },
+        {
+          "fullName": "canonical section field source over synthetic HTTP keeps published/read-only section management non-mutating",
+          "status": "skipped"
+        }
+      ],
+      "selectedCases": [
+        "canonical section field source over synthetic HTTP derives membership when nested field DTOs omit their enclosing section IDs"
+      ],
+      "summary": {
+        "success": true,
+        "numPassedTests": 1,
+        "numFailedTests": 0,
+        "numPendingTests": 11
       }
     }
   ],
-  "types": [
-    {
-      "component": "backend",
-      "path": "docs/performance/storage-ledger-20261028/start-planner/planner-backend-types-r1.json",
-      "sha256": "24bfa88a00e4bb32d43fc9bb9d48da2f3ec9d0995504bc68fe0ce6c215f09b94",
-      "exitField": "exitCode",
-      "componentTree": "b7fe981eea351ebb94232571479894e921e53bcd",
-      "log": "docs/performance/storage-ledger-20261028/start-planner/planner-backend-types-r1.log"
-    }
-  ],
-  "runStartPlanning": {
-    "validation": {
-      "path": "docs/performance/storage-ledger-20261028/start-planner/planner-validation-r1.json",
-      "sha256": "752b3593d4201a758d96b7e9582dd9c6050c6c2b2fb14160b56d6c492558b67e"
+  "types": [],
+  "pr381LocalChecks": {
+    "commands": {
+      "path": "docs/performance/form-section-reads-20261028/evidence/commands.json",
+      "sha256": "66faa4002978edaf7183e536574850e90fd97f20b139e46b5a544568a38c66e1"
     },
-    "execution": {
-      "path": "docs/performance/storage-ledger-20261028/start-planner/planner-validation-r1-execution.json",
-      "sha256": "8f68c068ff93652c62f6a29c4c48a27529edae3a327eb1206bd6e6059c2050dd"
+    "inputs": {
+      "path": "docs/performance/form-section-reads-20261028/evidence/candidate/inputs-final.json",
+      "sha256": "4d6a580fc7de277c394213215de053c382bb50122136fbff8eae7e1fe9130e66"
     },
-    "profile": {
-      "path": "docs/performance/storage-ledger-20261028/start-planner/authority-profile-summary.json",
-      "sha256": "24d69ca055127a8153771b326eec3fda86ac016a4041eeaeb6662bfdb9ea3265"
+    "firstInputs": {
+      "path": "docs/performance/form-section-reads-20261028/evidence/candidate/inputs-r1.json",
+      "sha256": "e7603bf4c5b41d4083ef559236ca04094c6afbbaee7ecdb127bff4e58d1ad083"
     },
-    "fullProfile": {
-      "path": "docs/performance/storage-ledger-20261028/start-planner/authority-profile-r1.json.gz",
-      "sha256": "2aa0f9e828f52bb5d173797c948a8bf8b3e330291d7e4050a4bf0677248705a3"
+    "sourceAssociationBasis": "Read the existing original task command/exit index and final source inventory directly. No invented argv or new original execution receipt.",
+    "originalTaskCompletionReferences": {
+      "finalAppTypes": {
+        "sessionId": 58900,
+        "completionChunk": "278ac1",
+        "observedExitCode": 0
+      },
+      "changedFileLint": {
+        "sessionId": 14222,
+        "completionChunk": "62534f",
+        "observedExitCode": 0
+      },
+      "finalTestLint": {
+        "completionChunk": "a94af5",
+        "observedExitCode": 0
+      }
     },
-    "sourceAssociationBasis": "Original planner SELECT statements unchanged by SET LOCAL addition; actual raw diagnostic and same-PID restore/negative rollback verified by root."
+    "limitations": [
+      "Task completion references point to the observed platform responses; the repository cannot independently authenticate those responses.",
+      "commands.json was summarized after the actual executions; it is not contemporaneously signed evidence.",
+      "Admission remains pending DOT final review; missing/null/string/nonzero exits are rejected, not inferred from the logs."
+    ]
   }
 }

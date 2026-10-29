@@ -1,8 +1,9 @@
+import {deferredPage} from '../components/page-loading/deferredPage'
 import {useCallback,useEffect,useMemo,useRef,useState,type ReactNode} from 'react'
 import {MemoryRouter} from 'react-router-dom'
-import FinalCompositeAssessment from '../components/FinalCompositeAssessment'
-import {CognitiveRunner} from '../modules/cognitive/pages/CognitiveRunner'
-import SituationalRunner from '../modules/situational/pages/SituationalRunner'
+const FinalCompositeAssessment=deferredPage(()=>import('../components/FinalCompositeAssessment'))
+const CognitiveRunner=deferredPage(async()=>({default:(await import('../modules/cognitive/pages/CognitiveRunner')).CognitiveRunner}))
+const SituationalRunner=deferredPage(()=>import('../modules/situational/pages/SituationalRunner'))
 import type {CompositeAttemptState,CompositeCurrentItem} from '../modules/composite/types'
 import type {EducationReportApi} from '../components/education-tools/EducationScalePersonalReport'
 import {TeacherAssessmentPage} from './TeacherAssessmentPage'

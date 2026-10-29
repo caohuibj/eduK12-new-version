@@ -90,7 +90,7 @@ it('requests only a receipt from the existing Teacher scale submission endpoint'
 it('opens feedback from completed parent reload while a list refresh stays pending, without duplicate completion reads',async()=>{
  let parentReads=0,lists=0
  const api=vi.fn(async(path:string)=>{
-  if(path==='/my-scale-tasks'){lists+=1;if(lists>2)return new Promise(()=>{});return {list:[task]}}
+  if(path==='/my-scale-tasks'){lists+=1;if(lists>1)return new Promise(()=>{});return {list:[task]}}
   if(path.endsWith('/personal-summary'))return {state:'PENDING'}
   if(path==='/composite-attempts/existing-attempt?view=current-unit')return {id:'existing-attempt',status:++parentReads===1?'IN_PROGRESS':'COMPLETED',currentItem:{id:'scale',type:'SCALE'}}
   throw Error('Unexpected path '+path)

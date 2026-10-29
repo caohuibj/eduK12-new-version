@@ -1,0 +1,17 @@
+{
+  "kind": "RETROSPECTIVE_UNSIGNED_TASK_COMMAND_INDEX",
+  "command": "node --test --test-reporter=tap --test-name-pattern='PR381 keeps one compiled' .github/scripts/onboarding-controls.test.mjs",
+  "node": "v24.21.0",
+  "observedExitCode": 0,
+  "originalTaskCompletionChunk": "085fd8",
+  "report": "round2-build-log-contract.tap",
+  "reportSHA256": "896c6e4a40a9ff6a7e51ccd5d1a184ee8199913a390bcb4b781de0f641882bc8",
+  "selectedTests": 1,
+  "passed": 1,
+  "failed": 0,
+  "reason": "The producer now retains original stdout/stderr separately even for successful builds; only its affected static control contract was rechecked. This supersedes the same case from round1, not an additional distinct application case.",
+  "consumedControlFileSHA256": {
+    ".github/scripts/onboarding-controls.test.mjs": "f4c32abd232a4c9eb9e593ec2d8006bc334a4c12c44a355e16bbeea6b56abc9e",
+    ".github/scripts/pr381-browser.mjs": "116a7b36a85cb6e66d6c124e8d028974521776cecac2d48cd4d708136023299c"
+  }
+}

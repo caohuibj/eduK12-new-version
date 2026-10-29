@@ -1,0 +1,121 @@
+{
+  "originalRuns": [
+    {
+      "reporter": "reporter.json",
+      "commandExit": 1,
+      "passed": 20,
+      "failed": 2,
+      "filtered": 0
+    },
+    {
+      "reporter": "reporter-r2-errors.json",
+      "commandExit": 0,
+      "passed": 2,
+      "failed": 0,
+      "filtered": 9
+    },
+    {
+      "reporter": "reporter-r3-nested.json",
+      "commandExit": 0,
+      "passed": 1,
+      "failed": 0,
+      "filtered": 11
+    }
+  ],
+  "uniquePassedCases": {
+    "canonical section field source over synthetic HTTP measures initial shared manager at /general-questionnaires/q": {
+      "reporter": "reporter.json",
+      "file": "/workspace/eduK12-new-version/server-version/frontend/src/components/__tests__/FormSectionManager.http.test.tsx"
+    },
+    "canonical section field source over synthetic HTTP measures initial shared manager at /questionnaires/q": {
+      "reporter": "reporter.json",
+      "file": "/workspace/eduK12-new-version/server-version/frontend/src/components/__tests__/FormSectionManager.http.test.tsx"
+    },
+    "canonical section field source over synthetic HTTP measures initial shared manager at /composite-assessments/q": {
+      "reporter": "reporter.json",
+      "file": "/workspace/eduK12-new-version/server-version/frontend/src/components/__tests__/FormSectionManager.http.test.tsx"
+    },
+    "canonical section field source over synthetic HTTP measures the real ordinary editor basic, content and cached tab revisit": {
+      "reporter": "reporter.json",
+      "file": "/workspace/eduK12-new-version/server-version/frontend/src/components/__tests__/FormSectionManager.http.test.tsx"
+    },
+    "canonical section field source over synthetic HTTP uses only sections and order and refreshes canonical membership after a move at /general-questionnaires/q": {
+      "reporter": "reporter.json",
+      "file": "/workspace/eduK12-new-version/server-version/frontend/src/components/__tests__/FormSectionManager.http.test.tsx"
+    },
+    "canonical section field source over synthetic HTTP uses only sections and order and refreshes canonical membership after a move at /questionnaires/q": {
+      "reporter": "reporter.json",
+      "file": "/workspace/eduK12-new-version/server-version/frontend/src/components/__tests__/FormSectionManager.http.test.tsx"
+    },
+    "canonical section field source over synthetic HTTP uses only sections and order and refreshes canonical membership after a move at /composite-assessments/q": {
+      "reporter": "reporter.json",
+      "file": "/workspace/eduK12-new-version/server-version/frontend/src/components/__tests__/FormSectionManager.http.test.tsx"
+    },
+    "canonical section field source over synthetic HTTP uses the refreshed section list for newly available fields": {
+      "reporter": "reporter.json",
+      "file": "/workspace/eduK12-new-version/server-version/frontend/src/components/__tests__/FormSectionManager.http.test.tsx"
+    },
+    "canonical section field source over synthetic HTTP keeps published/read-only section management non-mutating": {
+      "reporter": "reporter.json",
+      "file": "/workspace/eduK12-new-version/server-version/frontend/src/components/__tests__/FormSectionManager.http.test.tsx"
+    },
+    "content order management repairs a trailing context in one complete final order request": {
+      "reporter": "reporter.json",
+      "file": "/workspace/eduK12-new-version/server-version/frontend/src/components/__tests__/FormSectionManager.test.tsx"
+    },
+    "content order management shows a plain API validation error instead of a generic failure": {
+      "reporter": "reporter.json",
+      "file": "/workspace/eduK12-new-version/server-version/frontend/src/components/__tests__/FormSectionManager.test.tsx"
+    },
+    "content order management refreshes the canonical unit list after the parent removes a module": {
+      "reporter": "reporter.json",
+      "file": "/workspace/eduK12-new-version/server-version/frontend/src/components/__tests__/FormSectionManager.test.tsx"
+    },
+    "GeneralQuestionnaireEdit deferred tabs waits for metadata before exposing an editor and loads no optional code or data on basic": {
+      "reporter": "reporter.json",
+      "file": "/workspace/eduK12-new-version/server-version/frontend/src/pages/teacher/GeneralQuestionnaireEdit.deferred.test.tsx"
+    },
+    "GeneralQuestionnaireEdit deferred tabs loads each tab on first visit and preserves basic, section and token drafts across switches": {
+      "reporter": "reporter.json",
+      "file": "/workspace/eduK12-new-version/server-version/frontend/src/pages/teacher/GeneralQuestionnaireEdit.deferred.test.tsx"
+    },
+    "GeneralQuestionnaireEdit deferred tabs keeps unknown content distinct from empty and retries content and catalog failures without replacing basic edits": {
+      "reporter": "reporter.json",
+      "file": "/workspace/eduK12-new-version/server-version/frontend/src/pages/teacher/GeneralQuestionnaireEdit.deferred.test.tsx"
+    },
+    "GeneralQuestionnaireEdit deferred tabs does not apply late metadata after route identity changes": {
+      "reporter": "reporter.json",
+      "file": "/workspace/eduK12-new-version/server-version/frontend/src/pages/teacher/GeneralQuestionnaireEdit.deferred.test.tsx"
+    },
+    "GeneralQuestionnaireEdit deferred tabs discards late content and catalog results and resets visited tabs when the id changes": {
+      "reporter": "reporter.json",
+      "file": "/workspace/eduK12-new-version/server-version/frontend/src/pages/teacher/GeneralQuestionnaireEdit.deferred.test.tsx"
+    },
+    "GeneralQuestionnaireEdit deferred tabs publishes from basic by loading only validation content and retaining the shared synchronous operation lock": {
+      "reporter": "reporter.json",
+      "file": "/workspace/eduK12-new-version/server-version/frontend/src/pages/teacher/GeneralQuestionnaireEdit.deferred.test.tsx"
+    },
+    "GeneralQuestionnaireEdit deferred tabs shares an in-flight first content load with publishing instead of requesting the same data twice": {
+      "reporter": "reporter.json",
+      "file": "/workspace/eduK12-new-version/server-version/frontend/src/pages/teacher/GeneralQuestionnaireEdit.deferred.test.tsx"
+    },
+    "GeneralQuestionnaireEdit deferred tabs does not publish empty or failed unknown content and permits a later retry": {
+      "reporter": "reporter.json",
+      "file": "/workspace/eduK12-new-version/server-version/frontend/src/pages/teacher/GeneralQuestionnaireEdit.deferred.test.tsx"
+    },
+    "canonical section field source over synthetic HTTP keeps a failed /form-sections distinguishable from an empty section list": {
+      "reporter": "reporter-r2-errors.json",
+      "file": "/workspace/eduK12-new-version/server-version/frontend/src/components/__tests__/FormSectionManager.http.test.tsx"
+    },
+    "canonical section field source over synthetic HTTP keeps a failed /content distinguishable from an empty section list": {
+      "reporter": "reporter-r2-errors.json",
+      "file": "/workspace/eduK12-new-version/server-version/frontend/src/components/__tests__/FormSectionManager.http.test.tsx"
+    },
+    "canonical section field source over synthetic HTTP derives membership when nested field DTOs omit their enclosing section IDs": {
+      "reporter": "reporter-r3-nested.json",
+      "file": "/workspace/eduK12-new-version/server-version/frontend/src/components/__tests__/FormSectionManager.http.test.tsx"
+    }
+  },
+  "uniquePassedCount": 23,
+  "scope": "local case-level union, not a claim that the first invocation succeeded or that CI has admitted these cases; r2 changes only the two error expectations; r3 adds one separately executed omitted-membership case"
+}

@@ -1,7 +1,10 @@
+import {deferredPage} from '../components/page-loading/deferredPage'
 import {TeacherAssessmentPage} from './TeacherAssessmentPage'
 import {useCallback,useEffect,useMemo,useRef,useState} from 'react'
 import {assessmentStatus,type AssessmentListPresentation} from './assessmentTaskPresentation'
-import FinalCompositeAssessment from '../components/FinalCompositeAssessment'
+const FinalCompositeAssessment=deferredPage(()=>import('../components/FinalCompositeAssessment'),{
+ label:'取消打开测评',run:props=>props.onExit(),
+})
 import type {CompositeAttemptState} from '../modules/composite/types'
 
 type Api=<T>(path:string,method?:string,payload?:unknown,options?:{responseType?:'blob'})=>Promise<T>
@@ -91,7 +94,7 @@ function PrivateFormSession({api,actorKey,unified=false,onListStateChange}:{api:
   if(!valid())return
   assertAttempt(state,id)
   setActive({api,task,attempt:state})
-  if(state.status==='COMPLETED'){setCompleted(old=>Array.from(new Set([...old,task.executionId])));setMessage('本次表单已正式提交。表单不计算量表分数，也不新增个人报告读取权。')}
+  if(state.status==='COMPLETED'){setCompleted(old=>Array.from(new Set([...old,task.executionId])));setMessage('本次表单已正式提交。表单不计算量表分数，也不新增个人报告读取权。');void refresh()}
  }
  const open=(task:Task)=>void work(async valid=>{
   if(!canOpen(task)||completed.includes(task.executionId))throw Error('任务当前不接受新的作答；已收尾任务仅可继续获准的已有作答。')
@@ -108,7 +111,6 @@ function PrivateFormSession({api,actorKey,unified=false,onListStateChange}:{api:
   const bound={...task,status:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:id}
   setActive({api,task:bound,attempt:null})
   await read(bound,id,valid)
-  try{await refresh()}catch{if(valid())setMessage('表单已打开，但任务列表刷新失败；可继续当前获授权作答。')}
  })
  const reload=async()=>{
   const source=activeRef.current
@@ -116,9 +118,14 @@ function PrivateFormSession({api,actorKey,unified=false,onListStateChange}:{api:
   const token=epoch.current,valid=()=>alive.current&&currentApi.current===api&&token===epoch.current&&activeRef.current?.task.executionId===source.task.executionId
   setActive({...source,attempt:null})
   try{await read(source.task,source.task.runtimeBindingRef,valid)}catch(error){if(valid())setMessage(error instanceof Error?error.message:'表单读取失败，请重新读取当前表单。');throw error}
-  try{await refresh()}catch{if(valid())setMessage('当前表单状态已读取，任务列表刷新失败，请稍后刷新列表。')}
+  // Do not await or reread the hidden list between sections. Completion in
+  // read(), or leaving this session, refreshes its status independently.
  }
- const leave=()=>{epoch.current++;activeRef.current=null;setActive(null);setBusy(false);locked.current=false}
+ const leave=()=>{
+  const hadSession=activeRef.current?.api===api
+  epoch.current++;activeRef.current=null;setActive(null);setBusy(false);locked.current=false
+  if(hadSession)void refresh()
+ }
  return <section className={unified?"ht-assessment-source":"ht-panel"} aria-label={unified?undefined:"我的自编表单任务"}>{!unified&&<><h2>我的自编表单任务</h2>
   <p>完成分配给本人的固定版本表单，按分节逐步作答并提交；表单只记录作答，不生成量表分数。</p>
   <button type="button" disabled={busy||listPending} onClick={()=>void refresh()}>刷新自编表单任务</button></>}

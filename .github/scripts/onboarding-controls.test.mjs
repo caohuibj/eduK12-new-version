@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {BRANCHES,CONTROLS,MARKER,onboardingPlan,onboardingOutputs} from './onboarding-scope.mjs';
-import {verifyOriginalReport,verifyTypeReceipt,verifyReportPlanningObservation,verifyFailureContinuations,verifyRunStartPlanningObservation} from './onboarding-checks.mjs';
+import {verifyOriginalReport,verifyTypeReceipt,verifyReportPlanningObservation,verifyFailureContinuations,verifyRunStartPlanningObservation,verifyPr381CommandRecords} from './onboarding-checks.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 const h=c=>c.repeat(40),base=h('a'),head=h('b'),source=h('c'),tree=h('d'),blob=h('e');
 function fixture(){
@@ -112,7 +112,7 @@ test('observer follow-up admits only its HTTP test, scoped CSS and evidence; bro
  const read=(cmd,a,...r)=>cmd==='rev-parse'&&a===base+':server-version/frontend'?h('9'):f.read(cmd,a,...r);
  assert.equal(onboardingPlan(entries,base,head,read,env,b).pr,376);
  for(const outside of ['server-version/backend/src/middleware/auth.ts','server-version/backend/prisma/schema.prisma'])assert.throws(()=>onboardingPlan(entries.map(e=>e.file===path?{...e,file:outside}:e),base,head,read,env,{...b,source:{[outside]:{before:null,after:blob}}}));
- const yaml=readFileSync('.github/workflows/ci.yml','utf8');assert(yaml.includes('node .github/scripts/pr376-browser.mjs'));assert(yaml.includes("contains(fromJSON('[374,376]')"));
+ const yaml=readFileSync('.github/workflows/ci.yml','utf8');assert(yaml.includes('node .github/scripts/pr376-browser.mjs'));assert(yaml.includes("contains(fromJSON('[374,376,378,380,381]')"));
  const script=readFileSync('.github/scripts/pr376-browser.mjs','utf8');assert(script.includes('chromiumSandbox:true'));assert(script.includes('verifyChromeSandbox'));assert(script.includes('results.cases.length,6'));assert(script.includes('row.warning.ratio>=4.5'));assert(script.includes('Display fixture forbids simulated writes'));
 });
 test('observer display retry keeps failed report and narrows execution without weakening contrast',()=>{
@@ -127,4 +127,89 @@ test('START planner scope and original diagnostic reject unrelated runtime or in
  const profile=read('authority-profile-summary.json'),validation=read('planner-validation-r1.json'),execution=read('planner-validation-r1-execution.json');assert.equal(verifyRunStartPlanningObservation(profile,validation,execution).ciExecuted,false);
  assert.throws(()=>verifyRunStartPlanningObservation(profile,{...validation,completed:false},execution));assert.throws(()=>verifyRunStartPlanningObservation(profile,validation,{...execution,exitCode:1}));const bad=structuredClone(validation);bad.cases[0].after.value='1';assert.throws(()=>verifyRunStartPlanningObservation(profile,bad,execution));
  const yaml=readFileSync('.github/workflows/ci.yml','utf8');assert(yaml.includes(".pr == 377 && 'paths: [server-version/backend/src/modules/assessment-run/startAuthority.ts"));
+});
+
+test('PR378 keeps frontend-only scope, exact npm type receipt and compiled loading consumers mandatory',()=>{
+ const f=fixture(),path='server-version/frontend/src/huiteacher/HuiteacherApp.tsx',b={...f.b,pr:378,source:{[path]:{before:null,after:blob}}};
+ const entries=f.entries.map(e=>Object.hasOwn(f.b.source,e.file)?{...e,file:path}:e),env={...f.env,CI_PR_NUMBER:'378',CI_HEAD_REF:BRANCHES[378]};
+ assert.equal(onboardingPlan(entries,base,head,f.read,env,b).pr,378);
+ const outside='server-version/backend/src/modules/assessment-run/startAuthority.ts';assert.throws(()=>onboardingPlan(entries.map(e=>e.file===path?{...e,file:outside}:e),base,head,f.read,env,{...b,source:{[outside]:{before:null,after:blob}}}));
+ assert.throws(()=>onboardingPlan(entries,base,head,(cmd,a,...rest)=>a===base+':server-version/backend'?h('9'):f.read(cmd,a,...rest),env,b));
+ const receipt={argv:['npm','run','typecheck'],exitCode:0,componentTree:h('3')},review={component:'frontend',componentTree:h('3'),exitField:'exitCode'};
+ assert.equal(verifyTypeReceipt(receipt,review,()=>Buffer.from(''),h('3')).originalExitCode,0);assert.throws(()=>verifyTypeReceipt({...receipt,argv:['npm','run','build']},review,()=>Buffer.from(''),h('3')));
+ const yaml=readFileSync('.github/workflows/ci.yml','utf8'),script=readFileSync('.github/scripts/pr378-browser.mjs','utf8');assert(yaml.includes('node .github/scripts/pr378-browser.mjs'));assert(yaml.includes(".pr == 378 && 'paths: [server-version/frontend/src"));assert(script.includes("['run','build','--','--manifest']"));assert(script.includes('chromiumSandbox:true'));assert(script.includes('verifyChromeSandbox'));assert(!script.includes('--no-sandbox'));assert(script.includes("request.method()!=='GET'"));
+ assert.deepEqual(requiredChecks({scope:{outputs:{application_route:'onboarding-structure'}}},false),['scope','onboarding-structure','codeql']);
+});
+
+
+test('PR380 admits only its frontend delta and requires one compiled postlogin consumer',()=>{
+ const f=fixture(),path='server-version/frontend/src/survey/TaskForm.tsx',b={...f.b,pr:380,source:{[path]:{before:null,after:blob}}};
+ const entries=f.entries.map(e=>Object.hasOwn(f.b.source,e.file)?{...e,file:path}:e),env={...f.env,CI_PR_NUMBER:'380',CI_HEAD_REF:BRANCHES[380]};assert.equal(onboardingPlan(entries,base,head,f.read,env,b).pr,380);
+ const outside='server-version/backend/src/modules/campus/auth.routes.ts';assert.throws(()=>onboardingPlan(entries.map(e=>e.file===path?{...e,file:outside}:e),base,head,f.read,env,{...b,source:{[outside]:{before:null,after:blob}}}));
+ const yaml=readFileSync('.github/workflows/ci.yml','utf8'),script=readFileSync('.github/scripts/pr380-browser.mjs','utf8');assert(yaml.includes('node .github/scripts/pr380-browser.mjs'));assert(yaml.includes(".pr == 380 && 'paths: [server-version/frontend/src"));assert(script.includes('chromiumSandbox:true'));assert(script.includes('verifyChromeSandbox'));assert(!script.includes('--no-sandbox'));assert(script.includes("request.method()!=='GET'"));assert(script.includes("cpSync(dist,resolve(out,'dist')"));assert(script.includes("restoreBrowserBuild"));assert(script.includes("executedThisRun:false"));assert(script.includes("assert.equal(result.cases.length,5)"));assert.deepEqual(requiredChecks({scope:{outputs:{application_route:'onboarding-structure'}}},false),['scope','onboarding-structure','codeql']);
+});
+
+test('PR381 binds the two frontend files, exact evidence and unchanged backend without a platform fallback',()=>{
+ const f=fixture(),path='server-version/frontend/src/components/FormSectionManager.tsx';
+ const b={...f.b,pr:381,source:{[path]:{before:null,after:blob}}};
+ const entries=f.entries.map(e=>Object.hasOwn(f.b.source,e.file)?{...e,file:path}:e);
+ const env={...f.env,CI_PR_NUMBER:'381',CI_HEAD_REF:BRANCHES[381]};
+ const p=onboardingPlan(entries,base,head,f.read,env,b);
+ assert.equal(p.pr,381);assert.equal(onboardingOutputs(p).application_route,'onboarding-structure');
+ assert.equal(onboardingOutputs(p).frontend,false);assert.equal(onboardingOutputs(p).run_performance_tests,false);
+ for(const outside of ['server-version/backend/src/controllers/authController.ts','server-version/frontend/package-lock.json','server-version/backend/prisma/schema.prisma','server-version/frontend/src/App.tsx']){
+  assert.throws(()=>onboardingPlan(entries.map(e=>e.file===path?{...e,file:outside}:e),base,head,f.read,env,{...b,source:{[outside]:{before:null,after:blob}}}));
+ }
+ for(const patch of [{CI_EVENT:'workflow_dispatch'},{CI_HEAD_REF:BRANCHES[380]},{CI_PR_NUMBER:'380'},{CI_FORCE_FULL:'true'},{CI_SOURCE_HEAD:h('9')}]){
+  const read=(cmd,a,...rest)=>a===h('9')+'^{tree}'?h('9'):f.read(cmd,a,...rest);
+  assert.throws(()=>onboardingPlan(entries,base,head,read,{...env,...patch},b));
+ }
+ assert.throws(()=>onboardingPlan(entries,base,head,(cmd,a,...rest)=>a===base+':server-version/backend'?h('9'):f.read(cmd,a,...rest),env,b));
+ assert.throws(()=>onboardingPlan([...entries,{file:'unknown',newMode:'100644'}],base,head,f.read,env,b));
+ assert.throws(()=>onboardingPlan(entries.map(e=>e.file===path?{...e,newMode:'120000'}:e),base,head,f.read,env,b));
+ assert.throws(()=>onboardingPlan(entries,base,head,f.read,env,{...b,enabled:false}));
+ const outcomes={scope:{result:'success',outputs:Object.fromEntries(Object.entries(onboardingOutputs(p)).map(([k,v])=>[k,String(v)]))},'onboarding-structure':{result:'success'},codeql:{result:'success'}};
+ assert.deepEqual(requiredChecks(outcomes,false),['scope','onboarding-structure','codeql']);assert.deepEqual(failedChecks(outcomes,false),[]);
+ for(const result of ['failure','skipped','cancelled',undefined])assert(failedChecks({...outcomes,'onboarding-structure':{result}},false).length);
+ assert(failedChecks(outcomes,true).length);
+});
+
+test('PR381 reads recorded command exits and exact source without inferring success from empty logs',()=>{
+ const root='docs/performance/form-section-reads-20261028/evidence/';
+ const json=path=>JSON.parse(readFileSync(root+path,'utf8'));
+ const commands=json('commands.json'),inputs=json('candidate/inputs-final.json'),first=json('candidate/inputs-r1.json');
+ const component='cf228766bf881fd1a4d9e922fc8171488a27756b';
+ const verify=(c=commands,i=inputs,f=first,read=path=>readFileSync(path))=>verifyPr381CommandRecords(c,i,f,component,read);
+ const result=verify();assert.equal(result.type.originalExitCode,0);assert.equal(result.originalSigned,false);assert.equal(result.lint.length,2);
+ assert.equal(result.type.originalTaskChunk,'278ac1');assert(result.lint.every(row=>row.ciExecuted===false));
+ for(const exitCode of [undefined,null,'0',1])for(const index of [5,6,7]){
+  const bad=structuredClone(commands);if(exitCode===undefined)delete bad.invocations[index].exitCode;else bad.invocations[index].exitCode=exitCode;
+  assert.throws(()=>verify(bad));
+ }
+ const bad=structuredClone(commands);bad.invocations[5].command='npm run typecheck';assert.throws(()=>verify(bad));
+ assert.throws(()=>verify({...commands,invocations:[]}));
+ assert.throws(()=>verify(commands,{...inputs,nodeVersion:'v24.19.0'}));
+ const missing=structuredClone(inputs);delete missing.fullFrontendTrackedFileSha256['server-version/frontend/package-lock.json'];assert.throws(()=>verify(commands,missing));
+ assert.throws(()=>verify(commands,inputs,first,path=>path.endsWith('types-app-final.log')?Buffer.from('changed'):readFileSync(path)));
+ assert.throws(()=>verify(commands,inputs,first,path=>path==='server-version/frontend/src/components/FormSectionManager.tsx'?Buffer.from('changed'):readFileSync(path)));
+ assert.throws(()=>verify(commands,inputs,{...first,['server-version/frontend/src/components/__tests__/FormSectionManager.http.test.tsx']:'0'.repeat(64)}));
+ assert.throws(()=>verifyPr381CommandRecords(commands,inputs,first,h('9'),path=>readFileSync(path)));
+});
+
+test('PR381 keeps one compiled GET-only editor and live sandbox verification before the sole build',()=>{
+ const yaml=readFileSync('.github/workflows/ci.yml','utf8');
+ const job=yaml.slice(yaml.indexOf('  onboarding-structure:\n'),yaml.indexOf('  report-planning:\n'));
+ assert(job.includes('node .github/scripts/pr381-browser.mjs'));
+ assert(job.includes(".pr == 381 && 10"));assert(job.includes("contains(fromJSON('[374,376,378,380,381]')"));
+ assert(yaml.includes(".pr == 381 && 'paths: [server-version/frontend/src, .github/scripts]'"));
+ const script=readFileSync('.github/scripts/pr381-browser.mjs','utf8');
+ assert(script.includes('chromiumSandbox:true'));assert(script.includes('verifyChromeSandbox(browser)'));assert(!script.includes('--no-sandbox'));
+ assert(script.indexOf('verifyChromeSandbox(browser)')<script.indexOf("execFileSync('npm',command"));
+ assert.equal(script.split("execFileSync('npm',command").length,2);
+ assert(script.includes("resolve(out,'build.stdout.log')"));assert(script.includes("resolve(out,'build.stderr.log')"));
+ assert(script.includes("stdio:['ignore',...descriptors]"));
+ assert(script.includes("request.method()!=='GET'"));assert(script.includes('Unexpected API '));
+ assert(script.includes('result.cases.length,1'));assert(script.includes("path:resolve(out,'compiled-ordinary-editor.png')"));
+ assert(script.includes("assert.deepEqual(admitted.source,plan)"));assert(script.includes("assert.equal(plan.pr,381)"));
+ assert(!script.includes('restoreBrowserBuild'));
 });

@@ -4,7 +4,7 @@ import {afterEach,describe,expect,it,vi} from 'vitest'
 import {TeacherAssessmentPage,TeacherAssessmentProvider} from './TeacherAssessmentPage'
 import {HuiteacherAssessmentTasks} from './HuiteacherAssessmentTasks'
 import {HuiteacherPersonalSelf} from './HuiteacherPersonalSelf'
-vi.mock('../survey/SurveyPublicApp',()=>({TaskForm:({answer,onChange}:{answer:Record<string,string>;onChange:(key:string,value:string)=>void})=><input aria-label="草稿答案" value={answer.q??''} onChange={e=>onChange('q',e.target.value)}/>}))
+vi.mock('../survey/TaskForm',()=>({TaskForm:({answer,onChange}:{answer:Record<string,string>;onChange:(key:string,value:string)=>void})=><input aria-label="草稿答案" value={answer.q??''} onChange={e=>onChange('q',e.target.value)}/>}))
 vi.mock('../components/FinalCompositeAssessment',()=>({default:()=> <p>共享作答界面</p>}))
 type Api=Parameters<typeof HuiteacherAssessmentTasks>[0]['api']
 function Workspace({api}:{api:Api}){const [active,setActive]=useState(false);return <TeacherAssessmentProvider onActiveChange={setActive}><div hidden={active}><h1>我的任务首页</h1><HuiteacherAssessmentTasks api={api} actorKey="teacher"/></div></TeacherAssessmentProvider>}
@@ -23,7 +23,7 @@ describe('dedicated Teacher assessment pages',()=>{
   const page=await screen.findByRole('region',{name:'测评独立作答页'})
   expect(screen.queryByRole('heading',{name:'我的任务首页'})).not.toBeInTheDocument()
   expect(screen.queryByRole('button',{name:'继续测评'})).not.toBeInTheDocument()
-  fireEvent.change(within(page).getByRole('textbox',{name:'草稿答案'}),{target:{value:'保留我的草稿'}})
+  fireEvent.change(await within(page).findByRole('textbox',{name:'草稿答案'}),{target:{value:'保留我的草稿'}})
   fireEvent.click(within(page).getByRole('button',{name:'返回测评列表'}))
   expect(await screen.findByRole('heading',{name:'我的任务首页'})).toBeVisible()
   fireEvent.click(screen.getByRole('button',{name:'继续测评'}))

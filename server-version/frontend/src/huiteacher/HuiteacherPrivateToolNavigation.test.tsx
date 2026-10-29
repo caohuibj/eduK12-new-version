@@ -49,6 +49,7 @@ it('protects private drafts on Teacher tab and school changes, including pending
  await act(async()=>resolveSave(reply({revision:2,contentHash:'hash-2'})))
  await waitFor(()=>expect(screen.getByRole('button',{name:'保存草稿'})).toBeEnabled())
  fireEvent.click(screen.getByRole('button',{name:'教师成长'}))
+ fireEvent.click(await screen.findByRole('link',{name:'个人测评'}))
  expect(await screen.findByText('本人个人测评')).toBeInTheDocument()
  expect(screen.queryByLabelText('工具名称')).not.toBeInTheDocument()
 })

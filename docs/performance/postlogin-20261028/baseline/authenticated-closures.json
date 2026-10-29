@@ -1,0 +1,565 @@
+{
+  "scope": "Reuse exact PR378 official dist, static closure only, excludes conditional dynamic children/API/public media; extra relative to product shell, not measured HTTP transfer",
+  "rows": [
+    {
+      "entry": "Training",
+      "page": "training/TrainingLogin",
+      "coldGzip1": 257884,
+      "extraBeyondShellGzip1": 2699,
+      "extraFiles": 4,
+      "heaviestNew": [
+        [
+          "assets/TrainingLogin-lXO5F68y.js",
+          1608
+        ],
+        [
+          "assets/LoginRecoveryNotice-W8xm3zxQ.js",
+          477
+        ],
+        [
+          "assets/useLoginReturn-D0W9zMMO.js",
+          351
+        ]
+      ]
+    },
+    {
+      "entry": "Training",
+      "page": "training/TrainingLearnerHome",
+      "coldGzip1": 271342,
+      "extraBeyondShellGzip1": 16157,
+      "extraFiles": 14,
+      "heaviestNew": [
+        [
+          "assets/TrainingLearnerHome-Dg5J4LOD.js",
+          5912
+        ],
+        [
+          "assets/TrainingLearnerHome-DTq0mELR.css",
+          5389
+        ],
+        [
+          "assets/ModalSurface-Cdq3-Pbo.js",
+          1239
+        ]
+      ]
+    },
+    {
+      "entry": "Training",
+      "page": "training/TrainingTeacherManagement",
+      "coldGzip1": 260782,
+      "extraBeyondShellGzip1": 5597,
+      "extraFiles": 5,
+      "heaviestNew": [
+        [
+          "assets/TrainingTeacherManagement-Cn-h35w7.js",
+          2308
+        ],
+        [
+          "assets/ModalSurface-Cdq3-Pbo.js",
+          1239
+        ],
+        [
+          "assets/TemporaryPasswordHandoff-0aLFv_fA.js",
+          1227
+        ]
+      ]
+    },
+    {
+      "entry": "Training",
+      "page": "training/TrainingTrainerCourse",
+      "coldGzip1": 266594,
+      "extraBeyondShellGzip1": 11409,
+      "extraFiles": 7,
+      "heaviestNew": [
+        [
+          "assets/TrainingTrainerCourse-CpToSIig.js",
+          3699
+        ],
+        [
+          "assets/useCatalogQuery-chSr4Ywt.js",
+          1962
+        ],
+        [
+          "assets/TrainingCourseCode-BP9xHhS_.css",
+          1905
+        ]
+      ]
+    },
+    {
+      "entry": "Training",
+      "page": "training/TrainingLearnerCourse",
+      "coldGzip1": 263838,
+      "extraBeyondShellGzip1": 8653,
+      "extraFiles": 4,
+      "heaviestNew": [
+        [
+          "assets/TrainingLearnerCourse-BBpZfd48.js",
+          5596
+        ],
+        [
+          "assets/TrainingLearnerCourse-EZRIw4ga.css",
+          1606
+        ],
+        [
+          "assets/api-ZP4Ewl9G.js",
+          1181
+        ]
+      ]
+    },
+    {
+      "entry": "Training",
+      "page": "training/TrainingCourseAssessments",
+      "coldGzip1": 271354,
+      "extraBeyondShellGzip1": 16169,
+      "extraFiles": 10,
+      "heaviestNew": [
+        [
+          "assets/DeferredAssessmentDataExport-Cea8ukY7.css",
+          3109
+        ],
+        [
+          "assets/TrainingCourseAssessments-ROxkDlrc.js",
+          2761
+        ],
+        [
+          "assets/TrainingCourseAssessments-DXG1DCZ5.css",
+          2491
+        ]
+      ]
+    },
+    {
+      "entry": "Training",
+      "page": "training/TrainingCourseAnalysis",
+      "coldGzip1": 279779,
+      "extraBeyondShellGzip1": 24594,
+      "extraFiles": 5,
+      "heaviestNew": [
+        [
+          "assets/TrainingCourseAnalysis-Cp8MsXUr.js",
+          14668
+        ],
+        [
+          "assets/FormalReferenceStudio-DbLQXvAU.js",
+          6346
+        ],
+        [
+          "assets/TrainingCourseAnalysis-BXOdWXjL.css",
+          1974
+        ]
+      ]
+    },
+    {
+      "entry": "Training",
+      "page": "pages/student/QuestionnaireAssessment",
+      "coldGzip1": 299225,
+      "extraBeyondShellGzip1": 44040,
+      "extraFiles": 24,
+      "heaviestNew": [
+        [
+          "assets/FinalQuestionnaireAssessment-Bb7twJ7j.js",
+          6727
+        ],
+        [
+          "assets/finalDraftStore-Dm59dNEG.js",
+          6530
+        ],
+        [
+          "assets/QuestionnaireAssessment-qULfeuUx.js",
+          6315
+        ]
+      ]
+    },
+    {
+      "entry": "Training",
+      "page": "pages/teacher/GeneralQuestionnaireEdit",
+      "coldGzip1": 471226,
+      "extraBeyondShellGzip1": 216041,
+      "extraFiles": 32,
+      "heaviestNew": [
+        [
+          "assets/index-CblezCvv.js",
+          83424
+        ],
+        [
+          "assets/ScaleSelector-B9YEMQb5.js",
+          71819
+        ],
+        [
+          "assets/PublicDeliveryManager-8Fhxi8Zo.js",
+          12793
+        ]
+      ]
+    },
+    {
+      "entry": "Training",
+      "page": "pages/teacher/CompositeAssessmentEdit",
+      "coldGzip1": 301919,
+      "extraBeyondShellGzip1": 46734,
+      "extraFiles": 22,
+      "heaviestNew": [
+        [
+          "assets/PublicDeliveryManager-8Fhxi8Zo.js",
+          12793
+        ],
+        [
+          "assets/CompositeAssessmentEdit-KTiSy39U.js",
+          7449
+        ],
+        [
+          "assets/survey-participant-Be5qZXqZ.css",
+          6009
+        ]
+      ]
+    },
+    {
+      "entry": "Training",
+      "page": "modules/composite/CompositeReportPage",
+      "coldGzip1": 298897,
+      "extraBeyondShellGzip1": 43712,
+      "extraFiles": 18,
+      "heaviestNew": [
+        [
+          "assets/CompositeReportPage-1T1c_xtO.js",
+          17270
+        ],
+        [
+          "assets/ScaleUnitReportCard-Cah-WOtG.js",
+          4740
+        ],
+        [
+          "assets/ReportPrimitives-BJQ-FC7T.css",
+          3550
+        ]
+      ]
+    },
+    {
+      "entry": "School",
+      "page": "school/SchoolStudentTasks",
+      "coldGzip1": 297913,
+      "extraBeyondShellGzip1": 140272,
+      "extraFiles": 43,
+      "heaviestNew": [
+        [
+          "assets/chunk-BV7QT456-wzp59Q_j.js",
+          36535
+        ],
+        [
+          "assets/client-DLEYkVg8.js",
+          23624
+        ],
+        [
+          "assets/FinalCompositeAssessment-CcOBFTTx.js",
+          12475
+        ]
+      ]
+    },
+    {
+      "entry": "School",
+      "page": "school/SchoolTeacherTasks",
+      "coldGzip1": 278711,
+      "extraBeyondShellGzip1": 121070,
+      "extraFiles": 36,
+      "heaviestNew": [
+        [
+          "assets/chunk-BV7QT456-wzp59Q_j.js",
+          36535
+        ],
+        [
+          "assets/client-DLEYkVg8.js",
+          23624
+        ],
+        [
+          "assets/FinalCompositeAssessment-CcOBFTTx.js",
+          12475
+        ]
+      ]
+    },
+    {
+      "entry": "School",
+      "page": "school/SchoolParentTasks",
+      "coldGzip1": 278302,
+      "extraBeyondShellGzip1": 120661,
+      "extraFiles": 36,
+      "heaviestNew": [
+        [
+          "assets/chunk-BV7QT456-wzp59Q_j.js",
+          36535
+        ],
+        [
+          "assets/client-DLEYkVg8.js",
+          23624
+        ],
+        [
+          "assets/FinalCompositeAssessment-CcOBFTTx.js",
+          12475
+        ]
+      ]
+    },
+    {
+      "entry": "School",
+      "page": "school/SchoolActivityManager",
+      "coldGzip1": 179310,
+      "extraBeyondShellGzip1": 21669,
+      "extraFiles": 4,
+      "heaviestNew": [
+        [
+          "assets/SchoolActivityManager-BSb7Om-5.js",
+          12029
+        ],
+        [
+          "assets/EducationAssessmentResourcePicker-Dcxxtz4u.js",
+          5557
+        ],
+        [
+          "assets/SchoolActivityManager-lsADvXU2.css",
+          3838
+        ]
+      ]
+    },
+    {
+      "entry": "School",
+      "page": "school/SchoolGroupReports",
+      "coldGzip1": 160907,
+      "extraBeyondShellGzip1": 3266,
+      "extraFiles": 1,
+      "heaviestNew": [
+        [
+          "assets/SchoolGroupReports-KQEjaAhk.js",
+          3266
+        ]
+      ]
+    },
+    {
+      "entry": "Teacher",
+      "page": "huiteacher/HuiteacherAssessmentTasks",
+      "coldGzip1": 269853,
+      "extraBeyondShellGzip1": 108259,
+      "extraFiles": 36,
+      "heaviestNew": [
+        [
+          "assets/SurveyPublicApp-DJxzKQ85.js",
+          31983
+        ],
+        [
+          "assets/FinalCompositeAssessment-CcOBFTTx.js",
+          12475
+        ],
+        [
+          "assets/HuiteacherAssessmentTasks-0QYGFzk_.js",
+          9808
+        ]
+      ]
+    },
+    {
+      "entry": "Teacher",
+      "page": "huiteacher/HuiteacherMyAssessmentTasks",
+      "coldGzip1": 250321,
+      "extraBeyondShellGzip1": 88727,
+      "extraFiles": 29,
+      "heaviestNew": [
+        [
+          "assets/chunk-BV7QT456-wzp59Q_j.js",
+          36535
+        ],
+        [
+          "assets/FinalCompositeAssessment-CcOBFTTx.js",
+          12475
+        ],
+        [
+          "assets/HuiteacherMyAssessmentTasks-BGl7faz3.js",
+          6546
+        ]
+      ]
+    },
+    {
+      "entry": "Teacher",
+      "page": "huiteacher/HuiteacherFormStudio",
+      "coldGzip1": 196575,
+      "extraBeyondShellGzip1": 34981,
+      "extraFiles": 22,
+      "heaviestNew": [
+        [
+          "assets/ResearchFormEditor-D__Gp8Of.js",
+          10151
+        ],
+        [
+          "assets/ResearchFormEditor-C24I2AKZ.css",
+          4922
+        ],
+        [
+          "assets/BasicFormConstraints-BoUTd1ok.js",
+          4607
+        ]
+      ]
+    },
+    {
+      "entry": "Teacher",
+      "page": "huiteacher/HuiteacherEvaluationStudio",
+      "coldGzip1": 181986,
+      "extraBeyondShellGzip1": 20392,
+      "extraFiles": 5,
+      "heaviestNew": [
+        [
+          "assets/HuiteacherEvaluationStudio-CorJrDG8.js",
+          11211
+        ],
+        [
+          "assets/EducationAssessmentResourcePicker-Dcxxtz4u.js",
+          5557
+        ],
+        [
+          "assets/HuiteacherConsensus-KV_fAdLq.js",
+          3045
+        ]
+      ]
+    },
+    {
+      "entry": "Teacher",
+      "page": "huiteacher/HuiteacherFieldWorkspace",
+      "coldGzip1": 221116,
+      "extraBeyondShellGzip1": 59522,
+      "extraFiles": 13,
+      "heaviestNew": [
+        [
+          "assets/SurveyPublicApp-DJxzKQ85.js",
+          31983
+        ],
+        [
+          "assets/SurveyPublicApp-BUaAwE3x.css",
+          6527
+        ],
+        [
+          "assets/survey-participant-Be5qZXqZ.css",
+          6009
+        ]
+      ]
+    },
+    {
+      "entry": "Survey",
+      "page": "survey/SurveyBuilder",
+      "coldGzip1": 291809,
+      "extraBeyondShellGzip1": 143546,
+      "extraFiles": 55,
+      "heaviestNew": [
+        [
+          "assets/client-DLEYkVg8.js",
+          23624
+        ],
+        [
+          "assets/SurveyBuilder-D6RbO69f.js",
+          17886
+        ],
+        [
+          "assets/ResearchFormEditor-D__Gp8Of.js",
+          10151
+        ]
+      ]
+    },
+    {
+      "entry": "Survey",
+      "page": "survey/SurveyWaveStudio",
+      "coldGzip1": 231283,
+      "extraBeyondShellGzip1": 83020,
+      "extraFiles": 15,
+      "heaviestNew": [
+        [
+          "assets/SurveyWaveStudio-D6UUuUNU.js",
+          35518
+        ],
+        [
+          "assets/client-DLEYkVg8.js",
+          23624
+        ],
+        [
+          "assets/SurveySectionHeader-nQSCcYYG.css",
+          7187
+        ]
+      ]
+    },
+    {
+      "entry": "Survey",
+      "page": "survey/SurveyReportStudio",
+      "coldGzip1": 165784,
+      "extraBeyondShellGzip1": 17521,
+      "extraFiles": 4,
+      "heaviestNew": [
+        [
+          "assets/SurveyReportStudio-GcVdkmFh.js",
+          9370
+        ],
+        [
+          "assets/SurveySectionHeader-nQSCcYYG.css",
+          7187
+        ],
+        [
+          "assets/SurveySectionHeader-CSFm8mM6.js",
+          818
+        ]
+      ]
+    },
+    {
+      "entry": "Survey",
+      "page": "survey/SurveyAnalyticsWorkspace",
+      "coldGzip1": 216791,
+      "extraBeyondShellGzip1": 68528,
+      "extraFiles": 12,
+      "heaviestNew": [
+        [
+          "assets/client-DLEYkVg8.js",
+          23624
+        ],
+        [
+          "assets/SurveyAnalyticsWorkspace-BLlDXHvI.js",
+          22533
+        ],
+        [
+          "assets/SurveySectionHeader-nQSCcYYG.css",
+          7187
+        ]
+      ]
+    },
+    {
+      "entry": "Survey",
+      "page": "survey/ResearchPreview",
+      "coldGzip1": 159200,
+      "extraBeyondShellGzip1": 10937,
+      "extraFiles": 7,
+      "heaviestNew": [
+        [
+          "assets/ResearchPreview-B3J0QQ_d.js",
+          4464
+        ],
+        [
+          "assets/FormChoiceExtras-kwcjx2Hj.js",
+          2806
+        ],
+        [
+          "assets/AssessmentMaterialDisplay-D8V6m1Mq.js",
+          1095
+        ]
+      ]
+    },
+    {
+      "entry": "Survey",
+      "page": "survey/ResearchFormEditor",
+      "coldGzip1": 181876,
+      "extraBeyondShellGzip1": 33613,
+      "extraFiles": 21,
+      "heaviestNew": [
+        [
+          "assets/ResearchFormEditor-D__Gp8Of.js",
+          10151
+        ],
+        [
+          "assets/ResearchFormEditor-C24I2AKZ.css",
+          4922
+        ],
+        [
+          "assets/BasicFormConstraints-BoUTd1ok.js",
+          4607
+        ]
+      ]
+    }
+  ],
+  "compression": "Node gzipSync level1, base shell bytes verified equal to official artifact"
+}

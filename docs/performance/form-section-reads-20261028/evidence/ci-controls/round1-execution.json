@@ -1,0 +1,22 @@
+{
+  "kind": "RETROSPECTIVE_UNSIGNED_TASK_COMMAND_INDEX",
+  "command": "node --test --test-reporter=tap --test-name-pattern='PR381|observer follow-up admits' .github/scripts/onboarding-controls.test.mjs",
+  "node": "v24.21.0",
+  "observedExitCode": 0,
+  "originalTaskCompletionChunk": "a6c2e1",
+  "report": "round1.tap",
+  "reportSHA256": "308301f226a79f12377244a0b23827564e0b35d7d725c9a3f60ec5c1528f3943",
+  "selectedTests": 4,
+  "passed": 4,
+  "failed": 0,
+  "unselected": "not executed; not added to passed count",
+  "consumedControlFileSHA256": {
+    ".github/scripts/onboarding-scope.mjs": "3bc6fe96cd7a300381b255f318cd52e0b85428c25a32984234e824e0f31dcaa4",
+    ".github/scripts/onboarding-checks.mjs": "04dcc13a887c0062a97c7ff0b98cfc3bc3d61e1fbbb47ed3b5316476edd56750",
+    ".github/scripts/onboarding-controls.test.mjs": "f1c0d161e55cb0d0ece5d490136de4d3b854d0d13dbed8b32f0b20e8d33fd119",
+    ".github/scripts/pr381-browser.mjs": "06251c499110e73ac1d8236f85b176d8eae09243d237519536319b3922d90d1c",
+    ".github/workflows/ci.yml": "2847995c12b9ac92eae2e29729d9bf3a1468a2085b84a54f46af18a7d324127a"
+  },
+  "importedMarkerAtExecution": "2f23321c29e931316c2a80ba8d35d05f74d4af1a",
+  "sourceBoundary": "Tests pass explicit synthetic bindings and do not consume the active binding value; later binding/evidence metadata is checked separately. This is a retrospective source association, not a signed whole-tree original execution."
+}
