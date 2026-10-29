@@ -48,7 +48,7 @@ test('exact actual checkout and paired wrappers checked with real Git, no PR-num
  try{
   git('init','-q');git('config','user.name','Synthetic test');git('config','user.email','test@example.invalid');writeFileSync(join(dir,'base.txt'),'base');git('add','.');git('commit','-qm','base');const base=git('rev-parse','HEAD');
   mkdirSync(dirname(join(dir,file)),{recursive:true});writeFileSync(join(dir,file),'export const SCALE_INSTRUMENT_SOURCE = {};\n');git('add','.');git('commit','-qm','candidate');const head=git('rev-parse','HEAD');
-  assert.deepEqual(readScaleIntakeDiff(base,head,{cwd:dir}).sources,[file]);assert.throws(()=>readScaleIntakeDiff(base,base,{cwd:dir}));assert.throws(()=>readScaleIntakeDiff(head,base,{cwd:dir}));
+  assert.deepEqual(readScaleIntakeDiff(base,head,{cwd:dir}).sources,[file]);assert.deepEqual(readScaleIntakeDiff(base,head,{cwd:join(dir,'server-version/backend')}).sources,[file]);assert.throws(()=>readScaleIntakeDiff(base,base,{cwd:dir}));assert.throws(()=>readScaleIntakeDiff(head,base,{cwd:dir}));
   const orphan=file.replace('test_scale','orphan').replace('instrument.ts','source.json');mkdirSync(dirname(join(dir,orphan)),{recursive:true});writeFileSync(join(dir,orphan),'{}');git('add','.');git('commit','-qm','orphan');assert.throws(()=>readScaleIntakeDiff(head,git('rev-parse','HEAD'),{cwd:dir}),/wrapper/);
  }finally{rmSync(dir,{recursive:true,force:true});}
 });

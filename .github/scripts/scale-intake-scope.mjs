@@ -40,7 +40,8 @@ export function parseScaleIntakeRawDiff(raw) {
 export function readScaleIntakeDiff(base,head,{cwd=process.cwd()}={}) {
  assert.match(base||'',/^[a-f0-9]{40}$/,'Exact base required');assert.match(head||'',/^[a-f0-9]{40}$/,'Exact checkout required');
  assert.notEqual(base,head,'Empty candidate');
- const git=(...args)=>execFileSync('git',args,{cwd,encoding:'utf8',maxBuffer:8*1024*1024});
+ const root=execFileSync('git',['rev-parse','--show-toplevel'],{cwd,encoding:'utf8'}).trim();
+ const git=(...args)=>execFileSync('git',args,{cwd:root,encoding:'utf8',maxBuffer:8*1024*1024});
  assert.equal(git('rev-parse','HEAD').trim(),head,'Checkout identity mismatch');
  const entries=parseScaleIntakeRawDiff(git('diff','--raw','--abbrev=40','--no-renames','-z',base,head));
  const selected=selectScaleIntake(entries);assert.ok(selected,'Not an isolated Scale declaration intake');
