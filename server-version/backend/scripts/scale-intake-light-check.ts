@@ -11,6 +11,7 @@ import { evaluateScaleProductReadiness } from '../src/modules/scale/library/prod
 import { projectScalePackage } from '../src/modules/scale/onboarding/define-instrument'
 import { buildScaleResult, parseScaleResultV2 } from '../src/modules/scale/scale-result'
 
+const main=async()=>{
 const repo=resolve(process.cwd(),'../..')
 const base=process.env.SCALE_LIGHT_BASE_SHA ?? ''
 const head=process.env.SCALE_LIGHT_HEAD_SHA ?? ''
@@ -34,7 +35,7 @@ for(const file of changedSources) {
  assert.equal(source.identity.instrumentVersion,match[2])
  const reviewed=validateScaleInstrumentSource(source)
  assert.equal(reviewed.valid,true,JSON.stringify({file,issues:reviewed.issues}))
- const meta={key:source.identity.instrumentKey,version:source.identity.instrumentVersion,sha256:createHash('sha256').update(itemText).digest('hex'),catalog:true}
+ const meta: {key:string;version:string;sha256:string;catalog:true;status?:string;references?:number;golden?:number;measurement?:string;report?:string}={key:source.identity.instrumentKey,version:source.identity.instrumentVersion,sha256:createHash('sha256').update(itemText).digest('hex'),catalog:true}
  if(!source.executable) {
   assert.equal(source.candidatePreview?.status,'CATALOG_ONLY','Catalog candidate must declare explicit status')
   assert.ok((source.candidatePreview?.blockers?.length??0)>0,'Catalog-only source must list blockers')
@@ -50,7 +51,7 @@ for(const file of changedSources) {
  const pkg=projectScalePackage(source)
  assert.ok(pkg,'Missing executable projection')
  const readiness=evaluateScaleProductReadiness(pkg)
- assert.equal(readiness.ready,true,'Draft executable product contract invalid: '+JSON.stringify(readiness.blockers))
+ assert.equal(readiness.ready,true,'Draft executable product contract invalid: '+JSON.stringify(readiness))
  assert.ok(exec.goldenCases.length>0,'Executable source needs golden cases')
  if(exec.definition.referencePolicy.type==='none') assert.deepEqual(exec.references,[])
  for (const fixture of exec.goldenCases) {
@@ -103,3 +104,6 @@ for(const file of changedSources) {
  outcome.push(meta)
 }
 console.log(JSON.stringify({status:'SCALE_INTAKE_LIGHT_PASSED',base,head,checked:outcome.length,results:outcome}))
+
+}
+main().catch(error=>{console.error(error);process.exitCode=1})
