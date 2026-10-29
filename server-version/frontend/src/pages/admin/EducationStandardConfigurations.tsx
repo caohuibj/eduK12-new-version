@@ -29,6 +29,8 @@ function ConfigurationSession(props:Props){
  const [recipientPage,setRecipientPage]=useState(1),[recipientMore,setRecipientMore]=useState(false),[q,setQ]=useState(''),[search,setSearch]=useState('')
  const [authorityId,setAuthorityId]=useState(''),[name,setName]=useState(''),[from,setFrom]=useState(''),[until,setUntil]=useState(''),[password,setPassword]=useState('')
  const [grants,setGrants]=useState<EducationManagedUse[]>([]),[grantPage,setGrantPage]=useState(1),[grantMore,setGrantMore]=useState(false)
+ const [replacement,setReplacement]=useState<EducationManagedUse|null>(null),[replacementReason,setReplacementReason]=useState('')
+ const replacementRecipient=replacement?.userId??null
  const [busy,setBusy]=useState(false),[detailsLoading,setDetailsLoading]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('')
  const [preview,setPreview]=useState<ReportPreview|null>(null)
  const inFlight=useRef(false),choice=rows.find(row=>row.id===combinationId),locked=busy||Boolean(pending)||blocked
@@ -45,10 +47,10 @@ function ConfigurationSession(props:Props){
   setDetailsLoading(true)
   const path=base+'/'+choice.id+'/recipients?combinationHash='+choice.combinationHash+'&page='+recipientPage+'&q='+encodeURIComponent(search)
   void (choice.assignable?request<Page<Recipient>>(path):Promise.resolve({page:1,hasMore:false,list:[]})).then(value=>{
-   if(alive){setRecipients(value.list);setRecipientMore(value.hasMore)}
+   if(alive){setRecipients(value.list);setRecipientMore(value.hasMore);if(replacementRecipient&&value.list.some(row=>row.userId===replacementRecipient))setRecipientId(replacementRecipient)}
   }).catch(reason=>{if(alive)setError(message(reason))}).finally(()=>{if(alive)setDetailsLoading(false)})
   return()=>{alive=false}
- },[base,choice,recipientPage,search])
+ },[base,choice,recipientPage,search,replacementRecipient])
  useEffect(()=>{
   let alive=true;setGrants([])
   if(!combinationId)return
@@ -68,7 +70,7 @@ function ConfigurationSession(props:Props){
   catch{setStorageError('浏览器无法保留请求；请在离开前完成原编号核对。')}
  }
  function clear(){
-  try{sessionStorage.removeItem(storageKey);setPending(null);setCheckedAbsent(false);setStorageError('');setBlocked(false);return true}
+  try{sessionStorage.removeItem(storageKey);setPending(null);setCheckedAbsent(false);setStorageError('');setBlocked(false);setReplacement(null);setReplacementReason('');return true}
   catch{setBlocked(true);setStorageError('结果已确认，但浏览器未清除旧请求；请先处理浏览器存储再签发新配置。');return false}
  }
  async function refreshGrants(id:string){
@@ -85,7 +87,7 @@ function ConfigurationSession(props:Props){
    if(!ack||ack.id!==(value.kind==='ISSUE'?value.body.requestId:value.grantId)||!Number.isInteger(ack.version)||ack.version<1||typeof ack.revoked!=='boolean'
     ||value.kind==='REVOKE'&&(!ack.revoked||ack.version!==value.body.expectedVersion+1))
     throw Error('操作响应身份不完整，请核对原请求。')
-   clear();setNotice(value.kind==='REVOKE'?'原配置授权已撤销。':ack.revoked?'原请求已经保存，该授权目前已撤销。':'固定配置授权已保存。')
+   clear();setNotice(value.kind==='REVOKE'?'原配置授权已撤销。':ack.revoked?'原请求已经保存，该授权目前已撤销。':value.body.replaces?'新配置授权已保存，原授权已撤销；旧草稿保持原配置。':'固定配置授权已保存。')
    await refreshGrants(value.combinationId)
   }catch(reason){
    const rejected=reason instanceof EducationConfigurationHttpError&&reason.status>=400&&reason.status<500
@@ -96,12 +98,16 @@ function ConfigurationSession(props:Props){
  function issue(){
   if(inFlight.current||locked||!choice?.assignable)return
   const recipient=recipients.find(row=>row.userId===recipientId),authority=choice.authorities.find(row=>row.id===authorityId)
+  if(replacement&&(recipientId!==replacement.userId||!replacementReason.trim()||replacementReason.trim().length>500)){
+   setError('替换须保留原接收者并填写最多500字的明确原因。');return
+  }
   if(!recipient||!authority||!name.trim()||name.trim().length>120||!from||!until||!Number.isFinite(Date.parse(from))||!Number.isFinite(Date.parse(until))
    ||Date.parse(until)<=Math.max(Date.parse(from),Date.now())||Date.parse(from)<Date.parse(authority.validFrom)||Date.parse(until)>Date.parse(authority.expiresAt)||!password){
    setError('请选择合法接收者和分发委托，填写配置名称、委托期限内的使用期限及本次密码。');return
   }
   void send({kind:'ISSUE',combinationId:choice.id,unknown:false,body:{requestId:crypto.randomUUID(),userId:recipient.userId,combinationHash:choice.combinationHash,
-   authorityGrantId:authority.id,expectedAuthorityVersion:authority.version,configurationName:name.trim(),validFrom:new Date(from).toISOString(),expiresAt:new Date(until).toISOString()}})
+   authorityGrantId:authority.id,expectedAuthorityVersion:authority.version,configurationName:name.trim(),validFrom:new Date(from).toISOString(),expiresAt:new Date(until).toISOString(),
+   ...(replacement?{replaces:{grantId:replacement.id,expectedVersion:replacement.version,reason:replacementReason.trim()}}:{})}})
  }
  async function recover(){
   if(!pending||inFlight.current)return
@@ -121,11 +127,14 @@ function ConfigurationSession(props:Props){
   catch(reason){setError(message(reason))}finally{inFlight.current=false;setBusy(false)}
  }
  function select(value:string){
-  setCombinationId(value);setAuthorityId('');setRecipientPage(1);setGrantPage(1);setSearch('');setQ('');setError('');setNotice('')
+  setCombinationId(value);setAuthorityId('');setRecipientPage(1);setGrantPage(1);setSearch(replacement?.username??'');setQ(replacement?.username??'');setError('');setNotice('')
  }
  return <section className="epg-panel epg-fixed-configurations" aria-label="固定量表配置授权"><h2>固定量表配置授权</h2>
   <p>为{product==='HUISCHOOL'?'本校心理教师':'本校 Teacher 产品管理员'}选定已批准配置。接收者直接使用此配置创建任务；修改配置应创建新授权，旧作答与报告保留原版。</p>
   {error&&<p role="alert">{error}</p>}{storageError&&<p role="alert">{storageError}</p>}{notice&&<p role="status">{notice}</p>}
+  {replacement&&<section aria-label="明确替换原配置"><p>替换 {replacement.username} 的 {replacement.configurationName??'原固定配置'}。请选择新配置并保留原接收者；保存时原授权撤销，旧草稿不会自动切换，历史作答与报告保留原版。</p>
+   <label>配置替换原因<input maxLength={500} disabled={locked} value={replacementReason} onChange={event=>setReplacementReason(event.target.value)}/></label>
+   <button disabled={locked} onClick={()=>{setReplacement(null);setReplacementReason('');setError('')}}>取消替换配置</button></section>}
   {loading&&<p role="status">正在读取本校可分发配置…</p>}
   {!loading&&!rows.length&&<p>当前没有可分发配置。请先完成原件装载、入口批准及本校精确分发委托。</p>}
   <label>已批准量表配置<select value={combinationId} disabled={locked} onChange={event=>select(event.target.value)}>
@@ -143,14 +152,17 @@ function ConfigurationSession(props:Props){
    <form onSubmit={event=>{event.preventDefault();setRecipientPage(1);setSearch(q.trim())}}><label>搜索本校接收者<input disabled={locked||!choice.assignable} value={q} onChange={event=>setQ(event.target.value)}/></label><button disabled={locked||!choice.assignable}>查找</button></form>
    {detailsLoading&&<p role="status">正在读取当前接收者资格…</p>}
    {!detailsLoading&&choice.assignable&&!recipients.length&&<p>当前学校没有符合本入口资格的接收者。</p>}
-   <label>配置接收者<select disabled={locked||detailsLoading||!choice.assignable} value={recipientId} onChange={event=>setRecipientId(event.target.value)}><option value="">选择接收者</option>{recipients.map(row=><option key={row.userId} value={row.userId}>{row.username}</option>)}</select></label>
+   {!detailsLoading&&replacement&&!recipients.some(row=>row.userId===replacement.userId)&&<p>原接收者尚未在当前有效名单中，请核对其资格或检索原接收者；不能改为另一人。</p>}
+   <label>配置接收者<select disabled={locked||detailsLoading||!choice.assignable||Boolean(replacement)} value={recipientId} onChange={event=>setRecipientId(event.target.value)}><option value="">选择接收者</option>{recipients.filter(row=>!replacement||row.userId===replacement.userId).map(row=><option key={row.userId} value={row.userId}>{row.username}</option>)}</select></label>
    <div className="epg-actions">{recipientPage>1&&<button disabled={locked||detailsLoading} onClick={()=>setRecipientPage(old=>old-1)}>上一页接收者</button>}{recipientMore&&<button disabled={locked||detailsLoading} onClick={()=>setRecipientPage(old=>old+1)}>下一页接收者</button>}</div>
    <label>授权配置名称<input value={name} maxLength={120} disabled={locked||!choice.assignable} onChange={event=>setName(event.target.value)}/></label>
    <label>使用权生效时间<input type="datetime-local" value={from} disabled={locked||!choice.assignable} onChange={event=>setFrom(event.target.value)}/></label>
    <label>使用权截止时间<input type="datetime-local" value={until} disabled={locked||!choice.assignable} onChange={event=>setUntil(event.target.value)}/></label>
-   <button disabled={locked||detailsLoading||!choice.assignable} onClick={issue}>保存固定配置并授权</button>
+   <button disabled={locked||detailsLoading||!choice.assignable} onClick={issue}>{replacement?'保存替换配置并授权':'保存固定配置并授权'}</button>
    <h3>本人已发行的本校配置</h3>{grants.map(grant=><article key={grant.id} className="epg-grant"><strong>{grant.username} · {grant.configurationName??'原固定配置'}</strong><span> · {grant.revokedAt?'已撤销':Date.parse(grant.expiresAt)<=Date.now()?'已过期':'已保存'} · 截止 {new Date(grant.expiresAt).toLocaleString()}</span>
-    {!grant.revokedAt&&<button disabled={locked} onClick={()=>{if(!password){setError('请填写本次管理员密码');return}const reason=window.prompt('撤销此配置授权的原因');if(!reason?.trim())return;if(reason.trim().length>500){setError('撤销原因最多500字');return}void send({kind:'REVOKE',combinationId:choice.id,grantId:grant.id,unknown:false,body:{requestId:crypto.randomUUID(),expectedVersion:grant.version,reason:reason.trim()}})}}>撤销 {grant.username} 的此配置</button>}
+    {grant.supersedes&&<details><summary>查看前一授权修订</summary><p>原授权：<code>{grant.supersedes.selectedBinding.authorizationId}</code> · 原因：{grant.supersedes.reason}</p></details>}
+    {!grant.revokedAt&&<><button disabled={locked||Boolean(replacement)} onClick={()=>{setReplacement(grant);setReplacementReason('');setName(grant.configurationName??'');setRecipientPage(1);setSearch(grant.username);setQ(grant.username);setError('')}}>以新配置替换 {grant.username} 的此配置</button>
+     <button disabled={locked||Boolean(replacement)} onClick={()=>{if(!password){setError('请填写本次管理员密码');return}const reason=window.prompt('撤销此配置授权的原因');if(!reason?.trim())return;if(reason.trim().length>500){setError('撤销原因最多500字');return}void send({kind:'REVOKE',combinationId:choice.id,grantId:grant.id,unknown:false,body:{requestId:crypto.randomUUID(),expectedVersion:grant.version,reason:reason.trim()}})}}>撤销 {grant.username} 的此配置</button></>}
    </article>)}<div className="epg-actions">{grantPage>1&&<button disabled={locked} onClick={()=>setGrantPage(old=>old-1)}>上一页授权</button>}{grantMore&&<button disabled={locked} onClick={()=>setGrantPage(old=>old+1)}>下一页授权</button>}</div>
   </>}
   <label>本次配置操作的管理员密码<input type="password" autoComplete="off" value={password} onChange={event=>setPassword(event.target.value)} disabled={busy||blocked}/></label>

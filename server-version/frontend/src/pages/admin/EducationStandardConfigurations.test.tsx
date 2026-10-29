@@ -137,4 +137,57 @@ describe('education manager exact configuration and unknown-result recovery',()=
   await waitFor(()=>expect(screen.queryByText('原请求已确认，该配置授权目前已撤销。')).not.toBeInTheDocument())
   expect(screen.queryByRole('button',{name:'核对原配置请求'})).not.toBeInTheDocument();expect(api.mock.calls.some(([,method])=>method==='POST')).toBe(false)
  })
+ it('explicitly replaces an old use with another approved R, preserving the receiver and full reason in the original request',async()=>{
+  const old={id:id(7),userId:recipient.userId,username:recipient.username,version:1,revokedAt:null,validFrom:'2020-01-01T00:00:00Z',expiresAt:'2090-01-01T00:00:00Z',configurationName:'原报告配置',canManage:true}
+  const later={...choice,id:id(9),title:'另一份已批准报告',combinationHash:'d'.repeat(64),versions:{...choice.versions,REPORT:'R-3'}}
+  let sent:any
+  api.mockImplementation(async(path,method,raw)=>{
+   if(method==='POST'){sent=raw;expect(JSON.parse(sessionStorage.getItem(storageKey)!).pending.body.replaces).toEqual({grantId:old.id,expectedVersion:1,reason:'管理员明确改用另一份报告'});return {id:sent.requestId,version:1,revoked:false} as never}
+   if(path===base+'?page=1')return {page:1,list:[choice,later],hasMore:false} as never
+   if(path.includes('/use-grants?page='))return {page:1,list:path.includes('/'+choice.id+'/')?[old]:[],hasMore:false} as never
+   return reads(path) as never
+  })
+  render(<EducationStandardConfigurations {...props}/>);await fill()
+  fireEvent.click(await screen.findByRole('button',{name:'以新配置替换 '+recipient.username+' 的此配置'}))
+  fireEvent.change(screen.getByLabelText('已批准量表配置'),{target:{value:later.id}})
+  await waitFor(()=>expect(screen.getByLabelText('配置接收者')).toHaveValue(recipient.userId))
+  expect(screen.getByLabelText('配置接收者')).toBeDisabled()
+  fireEvent.change(screen.getByLabelText('精确分发委托'),{target:{value:id(4)}})
+  fireEvent.click(screen.getByRole('button',{name:'保存替换配置并授权'}));await screen.findByText(/替换须保留原接收者并填写/)
+  expect(api.mock.calls.some(([,method])=>method==='POST')).toBe(false)
+  fireEvent.change(screen.getByLabelText('配置替换原因'),{target:{value:'管理员明确改用另一份报告'}})
+  fireEvent.change(screen.getByLabelText('授权配置名称'),{target:{value:'新固定长报告'}})
+  fireEvent.click(screen.getByRole('button',{name:'保存替换配置并授权'}))
+  await screen.findByText('新配置授权已保存，原授权已撤销；旧草稿保持原配置。')
+  expect(sent).toMatchObject({userId:recipient.userId,combinationHash:later.combinationHash,configurationName:'新固定长报告',replaces:{grantId:old.id,expectedVersion:1,reason:'管理员明确改用另一份报告'}})
+  expect(api.mock.calls.filter(([,method])=>method==='POST')).toHaveLength(1)
+ })
+ it('recovers a replacement only when the original prior revision and reason also match',async()=>{
+  const pending:EducationPendingOperation={kind:'ISSUE',combinationId:choice.id,unknown:true,body:{requestId:id(8),userId:recipient.userId,
+   combinationHash:choice.combinationHash,authorityGrantId:id(4),expectedAuthorityVersion:1,configurationName:'新固定报告',validFrom:'2030-01-01T00:00:00Z',expiresAt:'2031-01-01T00:00:00Z',
+   replaces:{grantId:id(7),expectedVersion:1,reason:'原替换原因'}}}
+  sessionStorage.setItem(storageKey,JSON.stringify({...props,pending}));let wrong=true
+  api.mockImplementation(async path=>path.includes('/operations/')?{kind:'ISSUE',grant:{id:id(8),version:1,revokedAt:null},
+   request:{...pending.body,replaces:{...pending.body.replaces,reason:wrong?'另一原因':'原替换原因'}}} as never:reads(path) as never)
+  render(<EducationStandardConfigurations {...props}/>);fireEvent.click(await screen.findByRole('button',{name:'核对原配置请求'}))
+  await screen.findByText(/已找到的请求与原完整配置、接收者或权限依据不一致/)
+  expect(screen.queryByRole('button',{name:'按原请求重试'})).toBeNull();expect(sessionStorage.getItem(storageKey)).not.toBeNull()
+  wrong=false;fireEvent.click(screen.getByRole('button',{name:'核对原配置请求'}));await screen.findByText('原请求与固定配置已确认保存。')
+  expect(sessionStorage.getItem(storageKey)).toBeNull();expect(api.mock.calls.some(([,method])=>method==='POST')).toBe(false)
+ })
+ it('cannot substitute another receiver when the original replacement recipient has lost current eligibility',async()=>{
+  const old={id:id(7),userId:recipient.userId,username:recipient.username,version:1,revokedAt:null,validFrom:'2020-01-01T00:00:00Z',expiresAt:'2090-01-01T00:00:00Z',configurationName:'原报告配置',canManage:true}
+  api.mockImplementation(async path=>{
+   if(path.includes('/recipients?'))return {page:1,list:[{...recipient,userId:id(20),username:'另一个当前合法成员'}],hasMore:false} as never
+   if(path.includes('/use-grants?page='))return {page:1,list:[old],hasMore:false} as never
+   return reads(path) as never
+  })
+  render(<EducationStandardConfigurations {...props}/>);await screen.findByRole('option',{name:/已批准固定量表/})
+  fireEvent.change(screen.getByLabelText('已批准量表配置'),{target:{value:choice.id}})
+  fireEvent.click(await screen.findByRole('button',{name:'以新配置替换 '+recipient.username+' 的此配置'}))
+  await screen.findByText(/原接收者尚未在当前有效名单中/);expect(screen.getByLabelText('配置接收者')).toBeDisabled()
+  fireEvent.change(screen.getByLabelText('配置替换原因'),{target:{value:'明确调整报告'}})
+  fireEvent.click(screen.getByRole('button',{name:'保存替换配置并授权'}));expect(api.mock.calls.some(([,method])=>method==='POST')).toBe(false)
+  fireEvent.click(screen.getByRole('button',{name:'取消替换配置'}));await waitFor(()=>expect(screen.getByLabelText('配置接收者')).toBeEnabled())
+ })
 })

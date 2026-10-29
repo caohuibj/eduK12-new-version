@@ -95,7 +95,8 @@ export async function educationStandardManagementGrants(actorId:string,scope:Edu
    const resourceKey=`education-source:STANDARD_SCALE:${combinationId}:${stored.binding.configuration.combinationHash}`
    const selected=readEducationStandardUseBinding(row.metadata,{id:row.id,issuerId:actorId,recipientId:row.userId,scope,resourceKey})
    return {id:row.id,userId:row.userId,username:row.username,version:row.version,revokedAt:row.revokedAt,validFrom:row.validFrom,expiresAt:row.expiresAt,
-    configurationName:metadata.configurationName??null,selectedBinding:selectedConfigurationPointer(selected),configuration:selected.binding.configuration,authority:selected.binding.authorization.authority,canManage:true}
+    configurationName:metadata.configurationName??null,selectedBinding:selectedConfigurationPointer(selected),configuration:selected.binding.configuration,authority:selected.binding.authorization.authority,
+    supersedes:metadata.supersedes??null,canManage:true}
   })}
  },options)
 }
@@ -134,7 +135,8 @@ export async function educationStandardManagementOperation(actorId:string,scope:
   const grant={id:row.grantId,version:row.version,revokedAt:row.revokedAt}
   if(row.action===EDUCATION_STANDARD_USE_ACTION)return {kind:'ISSUE' as const,grant,request:{requestId:row.grantId,userId:row.userId,
    combinationHash:configuration.combinationHash,authorityGrantId:authorization.authority[1].id,expectedAuthorityVersion:authorization.authority[1].revision,
-   validFrom:row.validFrom.toISOString(),expiresAt:row.expiresAt.toISOString(),...(original.configurationName?{configurationName:original.configurationName}:{})}}
+   validFrom:row.validFrom.toISOString(),expiresAt:row.expiresAt.toISOString(),...(original.configurationName?{configurationName:original.configurationName}:{}),
+   ...(original.supersedes?{replaces:{grantId:original.supersedes.selectedBinding.authorizationId,expectedVersion:original.supersedes.selectedBinding.authorizationRevision,reason:original.supersedes.reason}}:{})}}
   const revoked=z.object({schemaVersion:z.literal(1),grantId:id,requestIntentHash:z.string().regex(/^[a-f0-9]{64}$/),previousVersion:z.number().int().positive(),
    version:z.number().int().positive(),reason:z.string().min(1),scope:z.object({product:z.enum(['SCHOOL','TEACHER']),organizationId:id}).strict()}).strict().parse(row.metadata)
   if(revoked.grantId!==row.grantId||revoked.version!==revoked.previousVersion+1||row.version!==revoked.version||!row.revokedAt

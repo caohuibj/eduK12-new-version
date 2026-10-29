@@ -31,4 +31,18 @@ describe('exact education configuration operation recovery',()=>{
   expect(sameEducationOperation(issue,{} as EducationManagerOperation)).toBe(false)
   expect(sameEducationOperation(issue,{kind:'REVOKE',grant:found.grant,request:{requestId:issue.body.requestId,expectedVersion:1,reason:'other'}})).toBe(false)
  })
+ it('retains only an explicit prior grant revision and reason when replacing, and excludes injected authority or password',()=>{
+  const replaces={grantId:id(8),expectedVersion:1,reason:'管理员明确调整报告'}
+  expect(isEducationPending({...issue,body:{...issue.body,replaces}})).toBe(true)
+  for(const value of [{...replaces,expectedVersion:0},{...replaces,reason:''},{...replaces,selectedBinding:{injected:true}},
+   {...replaces,currentPassword:'must-not-store'}])expect(isEducationPending({...issue,body:{...issue.body,replaces:value}})).toBe(false)
+ })
+ it('compares the complete replacement lineage during recovery instead of confirming another old grant or reason',()=>{
+  const replaces={grantId:id(8),expectedVersion:1,reason:'明确替换原配置'},pending={...issue,body:{...issue.body,replaces}},operation={...found,request:{...issue.body,replaces}}
+  expect(sameEducationOperation(pending,operation)).toBe(true)
+  expect(sameEducationOperation(pending,found)).toBe(false)
+  expect(sameEducationOperation(issue,operation)).toBe(false)
+  for(const value of [{...replaces,grantId:id(9)},{...replaces,expectedVersion:2},{...replaces,reason:'another'}])
+   expect(sameEducationOperation(pending,{...operation,request:{...operation.request,replaces:value}})).toBe(false)
+ })
 })

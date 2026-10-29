@@ -1,4 +1,5 @@
 import {Prisma} from '@prisma/client'
+import {randomUUID} from 'node:crypto'
 import {z} from 'zod'
 import {prisma} from '../../config/database'
 import {assertEntryAdmin,AdminPermissionError} from '../admin-permissions/service'
@@ -15,15 +16,17 @@ import {frozenDatabaseScaleDefinition} from '../scale/scale-workflow.service'
 import {scaleMeasurementRelease} from '../measurement-content/scale'
 import {prepareRelease} from '../measurement-content/release'
 import {canonicalHash} from '../assessment-runtime/canonical'
-import {standardConfigurationIdentity} from './standard-configuration-binding'
+import {standardConfigurationIdentity,selectedConfigurationPointer,selectedConfigurationPointerSchema} from './standard-configuration-binding'
 import {sealSelectedConfigurationBinding,readSelectedConfigurationBinding} from './selected-configuration'
 
 const id=z.string().guid(),hash=z.string().regex(/^[a-f0-9]{64}$/)
 export type EducationConfigurationScope={product:'SCHOOL'|'TEACHER';organizationId:string}
 export const educationStandardUseInput=z.object({requestId:id,userId:id,combinationHash:hash,authorityGrantId:id,
- expectedAuthorityVersion:z.number().int().positive(),validFrom:z.string().datetime(),expiresAt:z.string().datetime(),configurationName:z.string().trim().min(1).max(120).optional()}).strict()
+ expectedAuthorityVersion:z.number().int().positive(),validFrom:z.string().datetime(),expiresAt:z.string().datetime(),configurationName:z.string().trim().min(1).max(120).optional(),
+ replaces:z.object({grantId:id,expectedVersion:z.number().int().positive(),reason:z.string().trim().min(1).max(500)}).strict().optional()}).strict()
 export const educationStandardUseMetadata=z.object({schemaVersion:z.literal(1),selectedBinding:z.unknown(),requestIntentHash:hash,selfGrant:z.boolean(),
- configurationName:z.string().trim().min(1).max(120).optional()}).strict()
+ configurationName:z.string().trim().min(1).max(120).optional(),
+ supersedes:z.object({selectedBinding:selectedConfigurationPointerSchema,reason:z.string().trim().min(1).max(500)}).strict().optional()}).strict()
 const options={isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted,maxWait:5000,timeout:15000}
 const deny:(message:string)=>never=(message)=>{throw new AdminPermissionError(403,message)}
 const conflict:(message:string)=>never=(message)=>{throw new AdminPermissionError(409,message)}
@@ -39,6 +42,7 @@ export async function grantEducationStandardConfigurationUse(actorId:string,scop
  if(!['SCHOOL','TEACHER'].includes(scope.product))deny('教育入口不合法')
  const input=educationStandardUseInput.parse(raw),validFrom=new Date(input.validFrom),expiresAt=new Date(input.expiresAt)
  if(expiresAt<=validFrom)conflict('使用授权有效期不合法')
+ if(input.replaces?.grantId===input.requestId)conflict('新授权修订不能替换自身请求编号')
  const intentHash=canonicalHash({schemaVersion:1,actorId,scope,combinationId,...input})
  return prisma.$transaction(async tx=>{
   const [header]=await tx.$queryRaw<Array<{tool_key:string;instrument_version:string}>>(Prisma.sql`
@@ -89,6 +93,26 @@ export async function grantEducationStandardConfigurationUse(actorId:string,scop
     conflict('请求编号已用于不同的授权意图')
    return {id:previous.id,version:previous.version,revoked:previous.revokedAt!==null,changed:false,replayed:true,bindingHash:sealed.bindingHash}
   }
+  let supersedes:z.infer<typeof educationStandardUseMetadata>['supersedes']
+  let replacedCombinationId:string|undefined
+  if(input.replaces){
+   const [old]=await tx.$queryRaw<Array<{id:string;version:number;revoked_at:Date|null;resource_keys:string[]}>>(Prisma.sql`
+    SELECT id,version,revoked_at,resource_keys FROM content_capability_grants
+    WHERE id=${input.replaces.grantId} AND issuer_id=${actorId} AND subject_id=${input.userId} AND product=${scope.product}
+     AND scope_kind='ORGANIZATION' AND scope_id=${scope.organizationId} AND resource_kind='material'
+     AND capabilities=ARRAY['material.use']::text[] AND parent_grant_id IS NULL AND ancestry=ARRAY[id]::text[]
+     AND remaining_delegation_depth=0 AND delegable_capabilities=ARRAY[]::text[] FOR UPDATE`)
+   const oldAudit=old?await tx.assessmentManagementEvent.findUnique({where:{id:old.id}}):null
+   if(!old||old.resource_keys.length!==1||!oldAudit||oldAudit.actorId!==actorId||oldAudit.action!==EDUCATION_STANDARD_USE_ACTION)
+    deny('只能替换本人为同一学校、入口和接收者发行的原精确配置')
+   if(old.revoked_at||old.version!==input.replaces.expectedVersion)conflict('原配置授权已变化，请重新读取后明确替换')
+   const original=readEducationStandardUseBinding(oldAudit.metadata,{id:old.id,issuerId:actorId,recipientId:input.userId,scope,resourceKey:old.resource_keys[0]})
+   const oldConfiguration=original.binding.configuration
+   if(oldConfiguration.kind!=='STANDARD_COMBINATION'||oldConfiguration.toolKey!==header.tool_key||oldAudit.resourceId!==oldConfiguration.combinationId
+    ||original.binding.authorization.revision!==old.version)conflict('替换必须保留同一工具和可信原授权修订')
+   supersedes={selectedBinding:selectedConfigurationPointer(original),reason:input.replaces.reason}
+   replacedCombinationId=oldConfiguration.combinationId
+  }
   const [clock]=await tx.$queryRaw<Array<{now:Date}>>`SELECT clock_timestamp() AS now`
   if(!clock||expiresAt<=clock.now||issuer.expires_at&&issuer.expires_at<=clock.now)deny('账号或使用授权已过期')
   // Same retained root-use contract as the existing public-source consumers;
@@ -100,7 +124,13 @@ export async function grantEducationStandardConfigurationUse(actorId:string,scop
     ARRAY['material.use']::text[],ARRAY[]::text[],0,(${validFrom}::timestamptz AT TIME ZONE 'UTC'),(${expiresAt}::timestamptz AT TIME ZONE 'UTC'),${[input.requestId]}::text[])`)
   await tx.assessmentManagementEvent.create({data:{id:input.requestId,actorId,resourceId:combinationId,action:EDUCATION_STANDARD_USE_ACTION,
    metadata:{schemaVersion:1,selectedBinding:sealed,requestIntentHash:intentHash,selfGrant:actorId===input.userId,
-    ...(input.configurationName?{configurationName:input.configurationName}:{})}}})
+    ...(input.configurationName?{configurationName:input.configurationName}:{}),...(supersedes?{supersedes}:{})}}})
+  if(input.replaces&&supersedes){
+   await tx.$executeRaw`UPDATE content_capability_grants SET revoked_at=clock_timestamp() AT TIME ZONE 'UTC',revoked_by=${actorId},
+    revoke_reason=${'由新固定配置授权 '+input.requestId+' 替换：'+input.replaces.reason},version=version+1 WHERE id=${input.replaces.grantId}`
+   await tx.assessmentManagementEvent.create({data:{id:randomUUID(),actorId,resourceId:replacedCombinationId!,action:'EDUCATION_STANDARD_CONFIGURATION_USE_REPLACED',
+    metadata:{schemaVersion:1,scope,requestIntentHash:intentHash,previous:supersedes.selectedBinding,next:selectedConfigurationPointer(sealed),reason:input.replaces.reason}}})
+  }
   // Final current checks after all waits. Recipient membership is protected by
   // Organization; manager/account/source/delegation locks remain held to commit.
   await assertEntryAdmin(tx,actorId,entry(scope.product))
