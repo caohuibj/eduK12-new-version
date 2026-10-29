@@ -1,13 +1,14 @@
 import {useEffect,useState} from 'react'
 import type {ScaleDefinition} from '../../pages/scaleDefinitionEditorModel'
 import type {FormDraft} from '../../survey/builder.types'
+import type {CompositionAdministration} from './educationCompositionAdministration'
 export type PrivateToolApi=<T>(path:string,method?:string,data?:unknown,options?:{responseType?:'blob'})=>Promise<T>
 export type PrivateToolKind='SCALE'|'FORM'
 export type PrivateToolSummary={id:string;kind:PrivateToolKind;title:string;revision:number;contentHash:string;updatedAt?:string}
 export type PrivateTool=PrivateToolSummary & {definition:ScaleDefinition|FormDraft}
 export type PrivateToolIssue={path:string;message:string;severity?:string}
 export type PrivateToolValidation={valid:boolean;issues:PrivateToolIssue[];revision:number;contentHash:string}
-export type PrivateToolVersion={id:string;title:string;sourceRevision:number;contentHash:string;definition?:ScaleDefinition|FormDraft}
+export type PrivateToolVersion={id:string;title:string;sourceRevision:number;contentHash:string;administration?:CompositionAdministration;definition?:ScaleDefinition|FormDraft}
 export type PrivateDraftState={dirty:boolean;writing:boolean}
 export const privateToolBase=(organizationId:string)=>`/organizations/${encodeURIComponent(organizationId)}/private-tools`
 export function usePrivateToolCapability(api:PrivateToolApi,organizationId:string,userId?:string){
@@ -28,7 +29,7 @@ export function privateToolError(error:unknown):string{
   PRIVATE_TOOL_FREEZE_CONFLICT:'固定版本已变化，请核对最新草稿后再试。',
   PRIVATE_TOOL_AUTHOR_REQUIRED:'当前账号或学校不具备私有工具编制权限。',
   PRIVATE_COMPOSITION_SOURCE_NOT_FOUND:'所选固定工具不属于当前作者、学校或入口，或版本已不可用。请重新选择。',
-  PRIVATE_COMPOSITION_VARIANT_UNSUPPORTED:'当前普通问卷仅支持本入口的自评对象，请重新核对工具来源。',
+  PRIVATE_COMPOSITION_VARIANT_UNSUPPORTED:'问卷施测对象或作答方式不适用于当前入口，请重新核对固定版本。',
   PRIVATE_COMPOSITION_SOURCE_UNAVAILABLE:'所选固定工具当前不可用于新增任务，请重新核对来源状态。',
   PUBLIC_SOURCE_USE_REQUIRED:'当前学校、入口或作者已无该固定公共版本的使用授权，请重新核对来源。',
   PUBLIC_SOURCE_USE_EXPIRED:'固定公共版本的使用授权已到期。本页草稿仍保留，请核对授权后再固定或投放。',

@@ -105,6 +105,7 @@ export async function listCampusTeacherRunTasks(actor: AuthenticatedPrincipal, o
       activityTitle:access.activityTitle,runTitle:row.runName,
       studentReference:campusStudentReference(access.organizationId,access.studentUserId),
       status:row.status,deadline:row.deadline?.toISOString()??null,
+      ...(row.resourceKey.startsWith('education-composition:SCHOOL:')?{feedbackMode:'COMPOSITION' as const}:{}),
       canResumeExisting:row.canResumeExisting,consentRequired:row.consentRequired,consentPurpose:row.consentPurpose,
       consentVisibility:row.consentVisibility,
     }]

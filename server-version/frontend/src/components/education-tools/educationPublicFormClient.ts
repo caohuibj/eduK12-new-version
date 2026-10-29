@@ -1,16 +1,18 @@
 import type {ImageAuthoringAdapter} from '../../modules/assessment-media/AssessmentImageField'
 import type {PublicMaterial} from '../../modules/assessment-media/material'
 import {privateToolBase,type PrivateToolApi} from './privateToolClient'
+import type {CompositionResponseMode} from './educationCompositionAdministration'
 
 export type EducationPublicSourceSummary={catalogKey:string;kind:'FORM'|'SCALE';sourceProvider:'FORM'|'STANDARD_SCALE'|'LIBRARY_SCALE';sourceId:string;contentHash:string;title:string;language:string|null;
  versions:{content:string;parameters:string|null;report:string|null};requiredContextKeys?:string[];referenceContextKeys?:string[];allowedActions:string[];canEditOriginal:false;canDistribute:false;unavailableReason?:string}
 export type EducationPublicFormSummary=EducationPublicSourceSummary
-export const publicStandardPreviewPath=(organizationId:string,versionId:string,contentHash:string)=>
- `${privateToolBase(organizationId)}/public-sources/standard/${encodeURIComponent(versionId)}?contentHash=${encodeURIComponent(contentHash)}`
-export const publicFormPreviewPath=(organizationId:string,versionId:string,contentHash:string)=>
- `${privateToolBase(organizationId)}/public-sources/form/${encodeURIComponent(versionId)}?contentHash=${encodeURIComponent(contentHash)}`
-export const libraryScalePreviewPath=(organizationId:string,versionId:string,contentHash:string)=>
- `${privateToolBase(organizationId)}/library-sources/${encodeURIComponent(versionId)}?contentHash=${encodeURIComponent(contentHash)}`
+const responseModeQuery=(mode:CompositionResponseMode)=>mode==='SELF'?'':'&responseMode='+mode
+export const publicStandardPreviewPath=(organizationId:string,versionId:string,contentHash:string,responseMode:CompositionResponseMode='SELF')=>
+ `${privateToolBase(organizationId)}/public-sources/standard/${encodeURIComponent(versionId)}?contentHash=${encodeURIComponent(contentHash)}${responseModeQuery(responseMode)}`
+export const publicFormPreviewPath=(organizationId:string,versionId:string,contentHash:string,responseMode:CompositionResponseMode='SELF')=>
+ `${privateToolBase(organizationId)}/public-sources/form/${encodeURIComponent(versionId)}?contentHash=${encodeURIComponent(contentHash)}${responseModeQuery(responseMode)}`
+export const libraryScalePreviewPath=(organizationId:string,versionId:string,contentHash:string,responseMode:CompositionResponseMode='SELF')=>
+ `${privateToolBase(organizationId)}/library-sources/${encodeURIComponent(versionId)}?contentHash=${encodeURIComponent(contentHash)}${responseModeQuery(responseMode)}`
 export function educationPublicFormPreviewMedia({api,organizationId,versionId,contentHash,entry,actorId,provider='PUBLIC_FORM'}:{api:PrivateToolApi;organizationId:string;versionId:string;contentHash:string;entry:'SCHOOL'|'TEACHER';actorId:string;provider?:'PUBLIC_FORM'|'STANDARD_SCALE'|'LIBRARY_SCALE'}){
  const loadContent=async(asset:PublicMaterial['asset'])=>{
   const sourcePath=provider==='LIBRARY_SCALE'?'library-sources':`public-sources/${provider==='STANDARD_SCALE'?'standard':'form'}`

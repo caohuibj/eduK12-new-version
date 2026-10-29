@@ -1,9 +1,10 @@
 import type {PrivateToolSummary,PrivateToolVersion} from './privateToolClient'
+import type {CompositionAdministration} from './educationCompositionAdministration'
 export type CompositionSource={provider:'PRIVATE_VERSION';kind:'SCALE'|'FORM';versionId:string;contentHash:string}|
  {provider:'LIBRARY_SCALE';kind:'SCALE';versionId:string;contentHash:string}|
  {provider:'STANDARD_SCALE';kind:'SCALE';versionId:string;contentHash:string}|
  {provider:'PUBLIC_FORM';kind:'FORM';versionId:string;contentHash:string}
-export type CompositionDefinition={schemaVersion:1;adapterVersion:'1.0.0';administration:{population:'TEACHER'|'STUDENT';responseMode:'SELF'};
+export type CompositionDefinition={schemaVersion:1;adapterVersion:'1.0.0';administration:CompositionAdministration;
  contextFields?:Array<{contextKey:import('../../modules/assessment-context/options').AssessmentContextKey;formType:'year_month'|'single_choice'|'fill_blank';formLabel:string;formOptions:Array<{value:string;label:string}>}>;
  instruction:string;blocks:Array<{blockId:string;instruction:string;source:CompositionSource}>}
 export type CompositionReference=(Pick<PrivateToolVersion,'id'|'title'|'sourceRevision'|'contentHash'>&{toolId:string;kind:'SCALE'|'FORM';sourceProvider:'PRIVATE_VERSION'})|

@@ -32,7 +32,7 @@ suite('School ordinary observer questionnaire: exact subject, relationship and c
   const token=generateToken({userId,username:user.username,role:user.role,tokenVersion:user.tokenVersion,accountDomain:'SCHOOL',mfaVerifiedAt:Math.floor(Date.now()/1000)})
   const response=await fetch(base+path,{method:method??(body===undefined?'GET':'POST'),headers:{'content-type':'application/json',
    cookie:`${SCHOOL_AUTH_COOKIE_NAME}=${token}; ${SCHOOL_CSRF_COOKIE_NAME}=${csrf}`,[CSRF_HEADER_NAME]:csrf},...(body===undefined?{}:{body:JSON.stringify(body)})})
-  const value=await response.json();return {status:response.status,value,data:value.data}
+  const value:any=await response.json();return {status:response.status,value,data:value.data}
  }
  async function prepare(mode:'PARENT_REPORT'|'TEACHER_REPORT'){
   const f=await setupEducationLibraryRuntimeFixture({db,product:'SCHOOL',responseMode:mode,publisher:'PSYCHOLOGY',trackCount:0,publish:false})
@@ -50,6 +50,13 @@ suite('School ordinary observer questionnaire: exact subject, relationship and c
    {blockId:randomUUID(),instruction:'Fixed observer Scale',source:{provider:'LIBRARY_SCALE',kind:'SCALE',versionId:f.entryId,contentHash:entry.hash}},
    {blockId:randomUUID(),instruction:'An unscored observation',source:{provider:'PRIVATE_VERSION',kind:'FORM',versionId:form.version.id,contentHash:form.version.contentHash}}]}
   const composition=await fixed('COMPOSITION',definition),run=`/organizations/${f.organizationId}/activities/${f.workflow.id}/runs/${f.runId}`
+  const summaries=await request(author,composition.path+'/versions')
+  expect(summaries.status,JSON.stringify(summaries.value)).toBe(200)
+  expect(summaries.data.list[0]).toMatchObject({id:composition.version.id,administration:definition.administration})
+  expect(summaries.data.list[0]).not.toHaveProperty('definition')
+  const preview=await request(author,`${tools}/library-sources/${f.entryId}?contentHash=${entry.hash}&responseMode=${mode}`)
+  expect(preview.status,JSON.stringify(preview.value)).toBe(200)
+  expect(preview.data).toMatchObject({id:f.entryId,contentHash:entry.hash,kind:'SCALE',previewOnly:true,canEditOriginal:false})
   const body={expectedVersion:f.expectedVersion,privateComposition:{versionId:composition.version.id,contentHash:composition.version.contentHash},
    subjectSelector:{kind:'MEMBERSHIP_IDS',membershipIds:[f.subjectMembershipId]},
    respondentSelector:mode==='PARENT_REPORT'?{kind:'RELATED_PARENT'}:{kind:'MEMBERSHIP_IDS',membershipIds:[f.participantMembershipId]},
@@ -77,7 +84,7 @@ suite('School ordinary observer questionnaire: exact subject, relationship and c
   expect(assignment).toMatchObject({subject:f.subjectUserId,respondent:actor,perspective:'OBSERVER_REPORT'})
   expect(assignment.consent).toBeTruthy();expect(assignment.policy.educationComposition.unitReports.every((unit:any)=>unit.respondent.mode==='NONE')).toBe(true)
   const parent=await db.user.findUniqueOrThrow({where:{id:actor}})
-  const inbox=await listCampusParentRunTasks({userId:actor,username:parent.username,role:parent.role,accountDomain:'SCHOOL',tokenVersion:parent.tokenVersion})
+  const inbox=await listCampusParentRunTasks({userId:actor,username:parent.username,role:parent.role,accountDomain:'SCHOOL',tokenVersion:parent.tokenVersion,platformRole:parent.platformRole,mustChangePassword:parent.mustChangePassword})
   expect(inbox.list.find(task=>task.executionId===execution.id)).toMatchObject({consentRequired:true,feedbackMode:'COMPOSITION'})
   const pending=await request(actor,path+'/start',{});expect(pending.status,JSON.stringify(pending.value)).toBe(409)
   expect(pending.value).toMatchObject({code:-1,message:'current accepted consent is required before Run START'})
@@ -111,7 +118,7 @@ suite('School ordinary observer questionnaire: exact subject, relationship and c
   await db.organizationAccessDeny.create({data:{id:randomUUID(),organizationId:f.organizationId,userId:actor,permission:'REPORT_READ',reason:'Synthetic respondent report withdrawal',deniedByUserId:f.author}})
   expect((await request(actor,feedbackPath)).status).toBe(404)
  },60000)
- it('teacher observer requires an explicit homeroom target and preserves the distinct student through actual START',async()=>{
+ it('teacher observer requires a homeroom target and preserves the student through START, FINAL and restricted feedback',async()=>{
   const f=await prepare('TEACHER_REPORT')
   expect(f.composition.version.runtime.origin.variantKey).toBe('STUDENT:TEACHER_REPORT')
   const {targetPolicy:_,...withoutTarget}=f.body
@@ -125,5 +132,20 @@ suite('School ordinary observer questionnaire: exact subject, relationship and c
   const start=await request(f.participantUserId,path+'/start',{});expect(start.status,JSON.stringify(start.value)).toBe(200)
   expect(await db.compositeAssessmentAttempt.findUnique({where:{id:start.data.runtimeBindingRef},select:{userId:true,subjectUserId:true,respondentUserId:true}}))
    .toEqual({userId:f.participantUserId,subjectUserId:f.subjectUserId,respondentUserId:f.participantUserId})
+  const attemptPath='/composite-attempts/'+start.data.runtimeBindingRef
+  expect((await request(f.participantUserId,path+'/start',{})).data).toMatchObject({runtimeBindingRef:start.data.runtimeBindingRef,replayed:true})
+  for(let index=0;index<2;index++){
+   const state=await request(f.participantUserId,attemptPath+'?view=current-unit');expect(state.status,JSON.stringify(state.value)).toBe(200)
+   const item=state.data.currentItem,input={submissionId:randomUUID(),attemptEpoch:state.data.attemptEpoch,definitionHash:item.definitionHash,contextSnapshotHash:state.data.contextSnapshotHash,
+    answers:index===0?item.scale.definition.items.map((q:any)=>({itemCode:q.itemCode,responseValue:'option_3'})):item.answers.map((q:any)=>({formItemId:q.formItemId,value:'Private teacher observation'}))}
+   const endpoint=attemptPath+(index===0?`/items/${item.id}/scale/submit`:`/form-sections/${item.formSectionId}/submit`)
+   expect((await request(f.subjectUserId,endpoint,input)).status).toBe(404)
+   const final=await request(f.participantUserId,endpoint,input);expect(final.status,JSON.stringify(final.value)).toBe(200)
+  }
+  const feedbackPath='/run-executions/'+execution.id+'/feedback',feedback=await request(f.participantUserId,feedbackPath)
+  expect(feedback.status,JSON.stringify(feedback.value)).toBe(200)
+  expect(feedback.data).toMatchObject({state:'COMPLETION_ONLY',units:[{state:'WITHHELD'},{state:'COMPLETION_ONLY'}]})
+  expect(JSON.stringify(feedback.data)).not.toMatch(/Private teacher observation|scores|rawScore|sourceDefinition|manifestHash/)
+  for(const other of [f.subjectUserId,f.author,f.schoolAdmin!.userId])expect((await request(other,feedbackPath)).status).toBe(404)
  },60000)
 })

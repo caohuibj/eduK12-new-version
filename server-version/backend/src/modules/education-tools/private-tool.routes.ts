@@ -15,6 +15,9 @@ import {EducationPrivateToolError,privateToolId,privateToolKind,type PrivateTool
 import * as service from './private-tool.service'
 import {listEducationPublicSources,educationPublicCatalogQuery} from './public-source.catalog'
 import {readEducationPublicFormPreview,readEducationPublicStandardPreview} from './public-source.preview'
+import {educationCompositionResponseModeSchema} from './private-tool.composition-contracts'
+
+const sourcePreviewQuery=z.object({contentHash:z.string().regex(/^[a-f0-9]{64}$/),responseMode:educationCompositionResponseModeSchema.optional()}).strict()
 
 /** Mounted under the matching product authentication middleware only. */
 export function educationPrivateToolRouter(entry:EducationToolEntry){
@@ -45,17 +48,17 @@ export function educationPrivateToolRouter(entry:EducationToolEntry){
  router.post('/',handle(req=>service.createPrivateTool(context(req),req.body)))
  router.get('/library-sources',handle(req=>listEducationLibrarySources(context(req),req.query)))
  router.get('/library-sources/:versionId',handle(req=>{
-  const query=z.object({contentHash:z.string().regex(/^[a-f0-9]{64}$/)}).strict().parse(req.query)
-  return readEducationLibraryScalePreview(context(req),privateToolId.parse(req.params.versionId),query.contentHash)
+  const query=sourcePreviewQuery.parse(req.query)
+  return readEducationLibraryScalePreview(context(req),privateToolId.parse(req.params.versionId),query.contentHash,query.responseMode)
  }))
  router.get('/public-sources',handle(req=>listEducationPublicSources(context(req),educationPublicCatalogQuery.parse(req.query))))
  router.get('/public-sources/form/:versionId',handle(req=>{
-  const query=z.object({contentHash:z.string().regex(/^[a-f0-9]{64}$/)}).strict().parse(req.query)
-  return readEducationPublicFormPreview(context(req),privateToolId.parse(req.params.versionId),query.contentHash)
+  const query=sourcePreviewQuery.parse(req.query)
+  return readEducationPublicFormPreview(context(req),privateToolId.parse(req.params.versionId),query.contentHash,query.responseMode)
  }))
  router.get('/public-sources/standard/:versionId',handle(req=>{
-  const query=z.object({contentHash:z.string().regex(/^[a-f0-9]{64}$/)}).strict().parse(req.query)
-  return readEducationPublicStandardPreview(context(req),privateToolId.parse(req.params.versionId),query.contentHash)
+  const query=sourcePreviewQuery.parse(req.query)
+  return readEducationPublicStandardPreview(context(req),privateToolId.parse(req.params.versionId),query.contentHash,query.responseMode)
  }))
  router.get('/runtime-candidates',handle(req=>{
   const query=z.object({cursor:privateToolId.optional(),kind:z.enum(['SCALE','FORM']).default('SCALE')}).strict().parse(req.query)

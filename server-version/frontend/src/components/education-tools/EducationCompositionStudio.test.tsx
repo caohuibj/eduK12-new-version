@@ -29,7 +29,7 @@ describe('education ordinary questionnaire authoring and fixed task attachment',
    if(path===base+'/'+formId+'/versions/'+formVersion)return {...formRef,definition:form}
    if(path===base+'/'+rootId&&method==='PUT'){expect(data.expectedRevision).toBe(1);root={...root,title:data.title,definition:data.definition,revision:2,contentHash:hash('f')};return structuredClone(root)}
    if(path===base+'/'+rootId&&method==='GET')return {...structuredClone(root),references:[scaleRef,formRef]}
-   if(path===base+'/'+rootId+'/versions')return {list:fixed?[{id:rootVersion,title:root.title,sourceRevision:2,contentHash:root.contentHash}]:[],nextCursor:null}
+   if(path===base+'/'+rootId+'/versions')return {list:fixed?[{id:rootVersion,title:root.title,sourceRevision:2,contentHash:root.contentHash,administration:root.definition.administration}]:[],nextCursor:null}
    if(path===base+'/'+rootId+'/freeze'){expect(data).toEqual({expectedRevision:2,expectedContentHash:hash('f')});fixed=true;return {id:rootVersion,title:root.title,sourceRevision:2,contentHash:root.contentHash}}
    throw new Error('Unexpected API '+method+' '+path)
   })
@@ -76,7 +76,7 @@ describe('education ordinary questionnaire authoring and fixed task attachment',
   const pending=new Promise(resolve=>{finish=resolve})
   const api=vi.fn(async(path:string,method='GET',data?:unknown)=>{
    if(path===base+'?kind=COMPOSITION')return {list:[{id:rootId,kind:'COMPOSITION',title:'已固定普通问卷',revision:20,contentHash:hash('a')}],nextCursor:null}
-   if(path===base+'/'+rootId+'/versions')return {list:[{id:rootVersion,title:'固定问卷五',sourceRevision:5,contentHash:hash('f')}],nextCursor:null}
+   if(path===base+'/'+rootId+'/versions')return {list:[{id:rootVersion,title:'固定问卷五',sourceRevision:5,contentHash:hash('f'),administration:{population:entry==='SCHOOL'?'STUDENT':'TEACHER',responseMode:'SELF'}}],nextCursor:null}
    if(path===endpoint&&method==='POST')return pending
    throw new Error('Unexpected API '+path+' '+JSON.stringify(data))
   })

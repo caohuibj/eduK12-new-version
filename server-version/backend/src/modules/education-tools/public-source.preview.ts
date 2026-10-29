@@ -7,10 +7,12 @@ import {educationPublicSourceKey} from './public-source.identity'
 import {materialSchema} from '../assessment-media/material'
 import {educationApplicabilitySchema} from '../scale-library-governance/education-applicability'
 import type {FormDraft} from '../assessment-core/form/definition'
+import {educationCompositionAdministrationForEntry} from './private-tool.composition-contracts'
 
 /** One explicitly selected immutable leaf only. No saved draft/latest lookup,
  * whole-questionnaire preview, runtime materialization or writable public copy. */
-export async function readEducationPublicFormPreview(c:PrivateToolContext,versionId:string,contentHash:string){
+export async function readEducationPublicFormPreview(c:PrivateToolContext,versionId:string,contentHash:string,responseMode:unknown='SELF'){
+ const administration=educationCompositionAdministrationForEntry(c.entry,responseMode)
  return prisma.$transaction(async tx=>{
   await authorizePrivateTool(tx,c)
   const key=educationPublicSourceKey({kind:'FORM',id:versionId,hash:contentHash})
@@ -22,7 +24,7 @@ export async function readEducationPublicFormPreview(c:PrivateToolContext,versio
   if(!row)privateToolFail('PUBLIC_FORM_SOURCE_UNAVAILABLE',404)
   const declared=educationApplicabilitySchema.safeParse(row.applicability)
   if(!declared.success)privateToolFail('PUBLIC_FORM_APPLICABILITY_REQUIRED',400)
-  if(!declared.data.administrations.some(a=>a.population===(c.entry==='SCHOOL'?'STUDENT':'TEACHER')&&a.responseMode==='SELF'))privateToolFail('PUBLIC_FORM_VARIANT_UNSUPPORTED',400)
+  if(!declared.data.administrations.some(a=>a.population===administration.population&&a.responseMode===administration.responseMode))privateToolFail('PUBLIC_FORM_VARIANT_UNSUPPORTED',400)
   // Original approval + immutable source guard bind this fixed display body.
   // Preview does not run the full compiler/hash/media pass owned by freeze.
   return {id:versionId,kind:'FORM' as const,title:row.title,contentHash,definition:row.definition,
@@ -48,7 +50,9 @@ export async function readEducationPublicFormPreviewAsset(c:PrivateToolContext,v
 
 /** Fixed Standard display projection: items/options/instruction only. P/R and
  * scorer inputs remain internal; preview is never a freeze or use receipt. */
-export async function readEducationPublicStandardPreview(c:PrivateToolContext,versionId:string,contentHash:string){
+export async function readEducationPublicStandardPreview(c:PrivateToolContext,versionId:string,contentHash:string,responseMode:unknown='SELF'){
+ const administration=educationCompositionAdministrationForEntry(c.entry,responseMode)
+ const respondent=administration.responseMode==='SELF'?'SELF':administration.responseMode==='PARENT_REPORT'?'PARENT':'TEACHER'
  return prisma.$transaction(async tx=>{
   await authorizePrivateTool(tx,c)
   const key=educationPublicSourceKey({kind:'STANDARD_SCALE',id:versionId,hash:contentHash})
@@ -63,7 +67,7 @@ export async function readEducationPublicStandardPreview(c:PrivateToolContext,ve
        FROM jsonb_array_elements(rs->'options') WITH ORDINALITY options(opt,ordinal)))) FROM jsonb_array_elements(s.snapshot#>'{definition,responseSets}') rs)) AS definition
    FROM survey_standard_releases s JOIN measurement_content_releases m ON m.id=s.measurement_release->>'releaseId'
    WHERE s.id=${versionId} AND s.combination_hash=${contentHash} AND s.state='ONLINE' AND m.status='PUBLISHED'
-    AND m.content_hash=s.measurement_release->>'contentHash' AND s.snapshot#>'{parts,CONTENT,reference,metadata,applicability,respondentTypes}' ? 'SELF'`)
+    AND m.content_hash=s.measurement_release->>'contentHash' AND s.snapshot#>'{parts,CONTENT,reference,metadata,applicability,respondentTypes}' ? ${respondent}`)
   if(!row)privateToolFail('PUBLIC_STANDARD_SOURCE_UNAVAILABLE',404)
   return {id:versionId,kind:'SCALE' as const,title:row.title,contentHash,definition:row.definition,
    ...(row.instruction?{instruction:row.instruction}:{}),previewOnly:true,canEditOriginal:false}

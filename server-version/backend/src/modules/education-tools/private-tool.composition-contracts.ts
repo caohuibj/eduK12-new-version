@@ -13,10 +13,15 @@ export const privateCompositionSourceSchema=z.discriminatedUnion('provider',[
  z.object({provider:z.literal('STANDARD_SCALE'),kind:z.literal('SCALE'),versionId:id,contentHash:hash}).strict(),
  z.object({provider:z.literal('PUBLIC_FORM'),kind:z.literal('FORM'),versionId:id,contentHash:hash}).strict(),
 ])
+export const educationCompositionResponseModeSchema=z.enum(['SELF','PARENT_REPORT','TEACHER_REPORT'])
 export const privateCompositionAdministrationSchema=z.discriminatedUnion('population',[
- z.object({population:z.literal('STUDENT'),responseMode:z.enum(['SELF','PARENT_REPORT','TEACHER_REPORT'])}).strict(),
+ z.object({population:z.literal('STUDENT'),responseMode:educationCompositionResponseModeSchema}).strict(),
  z.object({population:z.literal('TEACHER'),responseMode:z.literal('SELF')}).strict(),
 ])
+/** Read-only catalog/preview filter. Task identity still comes from the sealed
+ * version in the write adapter, never from this client-selected filter. */
+export const educationCompositionAdministrationForEntry=(entry:'SCHOOL'|'TEACHER',responseMode:unknown='SELF')=>
+ privateCompositionAdministrationSchema.parse({population:entry==='SCHOOL'?'STUDENT':'TEACHER',responseMode})
 export const privateCompositionDefinitionSchema=z.object({schemaVersion:z.literal(1),adapterVersion:z.literal('1.0.0'),
  administration:privateCompositionAdministrationSchema,
  contextFields:z.array(z.object({contextKey:assessmentContextKeySchema,formType:z.enum(['year_month','single_choice','fill_blank']),formLabel:z.string().min(1).max(240),formOptions:z.array(z.object({value:z.string().min(1).max(240),label:z.string().min(1).max(240)}).strict()).max(50)}).strict()).min(1).max(5).optional(),

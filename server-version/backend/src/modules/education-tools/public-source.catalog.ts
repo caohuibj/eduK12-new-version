@@ -7,9 +7,10 @@ import {parseEducationPublicSourceKey} from './public-source.identity'
 import {educationStandardHeaderColumns,educationFormHeaderColumns,educationPublicRequiredContextKeys,type EducationPublicSourceHeader} from './public-source.headers'
 import {assertContentGrantChain,type ContentGrant} from '../measurement-content/content-authority'
 import {educationApplicabilitySchema} from '../scale-library-governance/education-applicability'
+import {educationCompositionResponseModeSchema,educationCompositionAdministrationForEntry} from './private-tool.composition-contracts'
 
 const key=z.string().max(240).refine(value=>parseEducationPublicSourceKey(value)!==null)
-export const educationPublicCatalogQuery=z.object({cursor:key.optional(),kind:z.enum(['SCALE','FORM']).optional(),q:z.string().trim().max(160).optional()}).strict()
+export const educationPublicCatalogQuery=z.object({cursor:key.optional(),kind:z.enum(['SCALE','FORM']).optional(),q:z.string().trim().max(160).optional(),responseMode:educationCompositionResponseModeSchema.optional()}).strict()
 type GrantRow={id:string;subject_id:string;issuer_id:string;product:'SCHOOL'|'TEACHER';scope_id:string;resource_keys:string[];
  valid_from:Date;expires_at:Date;read_at:Date;version:number;revoked_at:Date|null;parent_grant_id:string|null;ancestry:string[];
  capabilities:ContentGrant['capabilities'];delegable_capabilities:ContentGrant['capabilities'];remaining_delegation_depth:number}
@@ -49,6 +50,8 @@ export async function readEducationPublicUse(tx:Prisma.TransactionClient,c:Priva
  * recheck exact use and current source state in their own write transaction. */
 export async function listEducationPublicSources(c:PrivateToolContext,raw:unknown){
  const input=educationPublicCatalogQuery.parse(raw)
+ const administration=educationCompositionAdministrationForEntry(c.entry,input.responseMode)
+ const respondent=administration.responseMode==='SELF'?'SELF':administration.responseMode==='PARENT_REPORT'?'PARENT':'TEACHER'
  return prisma.$transaction(async tx=>{
   await authorizePrivateTool(tx,c)
   // Deduplicate grant keys before the PK joins and paginate/search real source
@@ -79,12 +82,12 @@ export async function listEducationPublicSources(c:PrivateToolContext,raw:unknow
   const selected=candidates.slice(0,40)
   return {list:selected.map(header=>{
    const declaration=header.kind==='FORM'?educationApplicabilitySchema.safeParse(header.applicability):null
-   const applicable=header.kind==='STANDARD_SCALE'?header.nativeAvailable&&(header.applicability as {respondentTypes?:string[]}|null)?.respondentTypes?.includes('SELF'):declaration?.success&&declaration.data.administrations.some(a=>a.population===(c.entry==='SCHOOL'?'STUDENT':'TEACHER')&&a.responseMode==='SELF')
+   const applicable=header.kind==='STANDARD_SCALE'?header.nativeAvailable&&(header.applicability as {respondentTypes?:string[]}|null)?.respondentTypes?.includes(respondent):declaration?.success&&declaration.data.administrations.some(a=>a.population===administration.population&&a.responseMode===administration.responseMode)
    return {
    catalogKey:header.key,kind:header.kind==='STANDARD_SCALE'?'SCALE':'FORM',sourceProvider:header.kind,sourceId:header.id,contentHash:header.hash,
    title:header.title,language:header.language,versions:header.versions,requiredContextKeys:educationPublicRequiredContextKeys(header),referenceContextKeys:header.referenceContextKeys,sourceLabel:'获授权公共固定版本',
    allowedActions:applicable?['REFERENCE_FIXED_VERSION']:[],runtimeStatus:header.kind==='FORM'?'CHECK_EXACT_FORM_AT_FREEZE':header.nativeAvailable?'CHECK_EXACT_STANDARD_AT_FREEZE':'NATIVE_UNAVAILABLE',canEditOriginal:false,canDistribute:false,
-   ...(header.kind==='STANDARD_SCALE'&&!applicable?{unavailableReason:header.nativeAvailable?'该版本未声明支持自评。':'原生量表尚未安装或已停止使用；授权不会创建执行程序。'}:{}),
+   ...(header.kind==='STANDARD_SCALE'&&!applicable?{unavailableReason:header.nativeAvailable?'该版本未声明支持当前作答方式。':'原生量表尚未安装或已停止使用；授权不会创建执行程序。'}:{}),
    ...(header.kind==='FORM'&&!applicable?{unavailableReason:'该固定版本未声明适用于当前问卷的施测方式。'}:{}),
   }}),nextCursor:candidates.length>40?selected.at(-1)!.key:null}
  },{isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted})
