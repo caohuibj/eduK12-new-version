@@ -658,7 +658,7 @@ async function run() {
       let scope = await workflowPage(s, f, w)
       for (const [kind, version] of Object.entries(versions)) {
         if(kind==='COMPOSITION'){
-          const picker=scope.locator('details').filter({has:scope.locator('summary').filter({hasText:'选用本人普通问卷'})})
+          const picker=scope.locator('details').filter({has:s.page.getByText('选用本人普通问卷',{exact:true})})
           await picker.locator('summary').click()
           await picker.getByRole('button',{name:'选择固定版本 · '+version.title,exact:true}).click()
           await picker.getByRole('button',{name:'选择本版本 · 修订 '+version.sourceRevision,exact:true}).click()
