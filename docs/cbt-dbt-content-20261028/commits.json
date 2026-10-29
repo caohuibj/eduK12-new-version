@@ -37,6 +37,16 @@
       "family": "cats40",
       "commit": "60589e0",
       "message": "content(scale): stage CATS-40 child self-report en draft with official subscale keys, golden cases and report sample [skip ci]"
+    },
+    {
+      "family": "dasb40",
+      "commit": "c5a9229",
+      "message": "content(scale): stage DAS-B 40-item en parallel-form draft with official functional-item key, golden cases and report sample; fix DAS-A sample-report figure [skip ci]"
+    },
+    {
+      "family": "cats40_zh_cn",
+      "commit": "edad977",
+      "message": "content(scale): stage official zh-CN CATS child self-report draft (translator-credited Macquarie form) with golden cases [skip ci]"
     }
   ]
 }

@@ -8,7 +8,12 @@
       "instrumentKey": "atq30@1.0.0",
       "goldenCases": 4,
       "testsPassed": true,
-      "expectedTotals": { "all-keyed-min": 30, "all-keyed-max": 150, "sample-nsne4-rest2": 74, "missing-total": null }
+      "expectedTotals": {
+        "all-keyed-min": 30,
+        "all-keyed-max": 150,
+        "sample-nsne4-rest2": 74,
+        "missing-total": null
+      }
     },
     {
       "family": "kims39",
@@ -16,9 +21,24 @@
       "goldenCases": 4,
       "testsPassed": true,
       "expectedSubscales": {
-        "all-keyed-min": { "observe": 12, "describe": 8, "act_awareness": 10, "accept_without_judgment": 9 },
-        "all-keyed-max": { "observe": 60, "describe": 40, "act_awareness": 50, "accept_without_judgment": 45 },
-        "sample-observe4-rest3": { "observe": 48, "describe": 24, "act_awareness": 30, "accept_without_judgment": 27 },
+        "all-keyed-min": {
+          "observe": 12,
+          "describe": 8,
+          "act_awareness": 10,
+          "accept_without_judgment": 9
+        },
+        "all-keyed-max": {
+          "observe": 60,
+          "describe": 40,
+          "act_awareness": 50,
+          "accept_without_judgment": 45
+        },
+        "sample-observe4-rest3": {
+          "observe": 48,
+          "describe": 24,
+          "act_awareness": 30,
+          "accept_without_judgment": 27
+        },
         "missing-describe": "invalid"
       }
     },
@@ -27,36 +47,85 @@
       "instrumentKey": "bsl23@1.0.0",
       "goldenCases": 4,
       "testsPassed": true,
-      "expectedTotals": { "all-keyed-min": 0, "all-keyed-max": 92, "sample-odd1-even2": 34, "missing-total": null }
+      "expectedTotals": {
+        "all-keyed-min": 0,
+        "all-keyed-max": 92,
+        "sample-odd1-even2": 34,
+        "missing-total": null
+      }
     },
     {
       "family": "dts15",
       "instrumentKey": "dts15@1.0.0",
       "goldenCases": 4,
       "testsPassed": true,
-      "expectedMeans": { "all-keyed-min": 5.0, "all-keyed-max": 1.0, "sample-234-bands": 3.0, "missing-total": null }
+      "expectedMeans": {
+        "all-keyed-min": 5.0,
+        "all-keyed-max": 1.0,
+        "sample-234-bands": 3.0,
+        "missing-total": null
+      }
     },
     {
       "family": "dasa40",
       "instrumentKey": "dasa40@1.0.0",
       "goldenCases": 4,
       "testsPassed": true,
-      "expectedTotals": { "all-keyed-min": 40, "all-keyed-max": 280, "sample-rev3-rest5": 200, "missing-total": null }
+      "expectedTotals": {
+        "all-keyed-min": 40,
+        "all-keyed-max": 280,
+        "sample-rev3-rest5": 200,
+        "missing-total": null
+      }
     },
     {
       "family": "rfl48",
       "instrumentKey": "rfl48@1.0.0",
       "goldenCases": 4,
       "testsPassed": true,
-      "expectedTotals": { "all-keyed-min": 48, "all-keyed-max": 288, "sample-odd3-even4": 168, "missing-total": null }
+      "expectedTotals": {
+        "all-keyed-min": 48,
+        "all-keyed-max": 288,
+        "sample-odd3-even4": 168,
+        "missing-total": null
+      }
     },
     {
       "family": "cats40",
       "instrumentKey": "cats40@1.0.0",
       "goldenCases": 4,
       "testsPassed": true,
-      "expectedTotals": { "all-keyed-min": 0, "all-keyed-max": 160, "sample-social2-rest1": 50, "missing-social": null }
+      "expectedTotals": {
+        "all-keyed-min": 0,
+        "all-keyed-max": 160,
+        "sample-social2-rest1": 50,
+        "missing-social": null
+      }
+    },
+    {
+      "family": "dasb40",
+      "instrumentKey": "dasb40@1.0.0",
+      "goldenCases": 4,
+      "testsPassed": true,
+      "expectedTotals": {
+        "all-keyed-min": 40,
+        "all-keyed-max": 280,
+        "sample-rev3-rest5": 200,
+        "missing-total": null
+      }
+    },
+    {
+      "family": "cats40_zh_cn",
+      "instrumentKey": "cats40_zh_cn@1.0.0",
+      "goldenCases": 4,
+      "testsPassed": true,
+      "expectedTotals": {
+        "all-keyed-min": 0,
+        "all-keyed-max": 160,
+        "sample-social2-rest1": 50,
+        "missing-social": null
+      }
     }
   ],
-  "goldenCaseTotal": 28
+  "goldenCaseTotal": 36
 }

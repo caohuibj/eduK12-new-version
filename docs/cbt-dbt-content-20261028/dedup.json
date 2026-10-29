@@ -51,8 +51,8 @@
     },
     {
       "newFamily": "dasa40",
-      "existing": "PLANNED:das_b40",
-      "relation": "DAS-B 为 DAS-A 的平行表（官方计分表已在手，其中 #12/#30 与 A 表共用条目号）；两表是平行版本，不构成独立构念，入库时各立精确 key 且不合并总分。"
+      "existing": "dasb40",
+      "relation": "DAS-B（dasb40@1.0.0）已入库：与 DAS-A 为平行表（官方计分表 #12/#30 两表均列为功能题），不构成独立构念；两表各立精确 key，分数不互换、不相加、不比较。"
     },
     {
       "newFamily": "rfl48",
@@ -61,8 +61,8 @@
     },
     {
       "newFamily": "cats40",
-      "existing": "PLANNED:cats_zh_cn",
-      "relation": "麦考瑞官网另有简体中文版 CATS 表单（第三方核对提示可见繁体字形）；中文路径须核对语种、翻译验证后立新版本，不得与英文版混用。"
+      "existing": "cats40_zh_cn",
+      "relation": "官方简体中文版（cats40_zh_cn@1.0.0，译者署名北师大孙玲）已入库；经渲染核对为简体字形，但译文含港式用语且时段用语不一致（一个周/一星期），语言验证标记待复核；与英文版题序一一对应，分数不混用。"
     },
     {
       "newFamily": "dts15",

@@ -4,12 +4,12 @@
   "actualDatabaseImport": false,
   "published": false,
   "ciTriggered": false,
-  "toolFamilies": 7,
-  "exactVersions": 7,
-  "executableDrafts": 7,
+  "toolFamilies": 8,
+  "exactVersions": 9,
+  "executableDrafts": 9,
   "catalogOnly": 0,
-  "nativeGoldenCases": 28,
-  "reportSamples": 7,
+  "nativeGoldenCases": 36,
+  "reportSamples": 9,
   "tools": [
     {
       "family": "atq30",
@@ -126,10 +126,35 @@
       "fullTextSource": "https://www.mq.edu.au/__data/assets/pdf_file/0007/520099/CATS_ChildReport_copyright_2015.pdf",
       "wordingAndScoring": "PASS",
       "report": "NATIVE_TEMPLATE_AND_STATIC_SAMPLE",
-      "commit": "60589e0",
+      "commit": "60589e0, edad977(zh-CN)",
       "versions": [
         {
           "key": "cats40",
+          "version": "1.0.0",
+          "itemCount": 40,
+          "locale": "en",
+          "executable": true
+        },
+        {
+          "key": "cats40_zh_cn",
+          "version": "1.0.0",
+          "itemCount": 40,
+          "locale": "zh-CN",
+          "executable": true
+        }
+      ]
+    },
+    {
+      "family": "dasb40",
+      "name": "DAS-B",
+      "category": "CBT认知机制/失调态度自评（与DAS-A平行表）",
+      "fullTextSource": "https://beckinstitute.org/wp-content/uploads/2021/06/DAS-Full-Documents-1.pdf",
+      "wordingAndScoring": "PASS",
+      "report": "NATIVE_TEMPLATE_AND_STATIC_SAMPLE",
+      "commit": "c5a9229",
+      "versions": [
+        {
+          "key": "dasb40",
           "version": "1.0.0",
           "itemCount": 40,
           "locale": "en",
