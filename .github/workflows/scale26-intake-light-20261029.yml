@@ -1,0 +1,100 @@
+# One-off exact-tree validation; not the protected merge gate or an installation.
+# The only permitted validation-branch change is this workflow. No DB/deploy.
+name: Scale26 intake lightweight validation
+on:
+  push:
+    branches: [validation/scale26-intake-light-20261029]
+    paths: [.github/workflows/scale26-intake-light-20261029.yml]
+
+permissions:
+  contents: read
+concurrency:
+  group: scale26-intake-light-20261029
+  cancel-in-progress: false
+
+env:
+  CI: 'true'
+  NODE_ENV: test
+  TZ: UTC
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+  JWT_SECRET: scale26-isolated-test-jwt-secret-12345678901234567890
+  DATA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+  DATA_PSEUDONYM_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
+
+jobs:
+  exact-source:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          persist-credentials: false
+      - name: refuse unfrozen source or any additional validation-branch change
+        shell: bash
+        run: |
+          set -euo pipefail
+          source_commit='191a187439af026f33d46fbdc2f9d7958340f789'
+          test "$(git rev-parse HEAD^)" = "$source_commit"
+          test "$(git diff --name-only "$source_commit" HEAD)" = '.github/workflows/scale26-intake-light-20261029.yml'
+          test "$(git ls-tree HEAD .github/workflows/scale26-intake-light-20261029.yml | awk '{print $1}')" = 100644
+          git checkout --detach "$source_commit"
+          test "$(git rev-parse HEAD)" = "$source_commit"
+          test "$(git rev-parse HEAD^{tree})" = 'cffae9ecd3b0a3a786008b5e5a857785eb9bd1ff'
+          test "$(git rev-parse HEAD:server-version/backend/src/modules/scale/onboarding/instruments.generated.ts)" = de1f0d395c1ef6b712f89c5516642eccc139adcd
+          test "$(git rev-parse HEAD:server-version/backend/src/modules/scale/packages/spane12-balance-scorer.ts)" = "$(git rev-parse 5c680be4d121ecc3bf042a5b05da62cdd72866b0:server-version/backend/src/modules/scale/packages/spane12-balance-scorer.ts)" || {
+            echo 'A-stage scorer blob cannot be read; source identity must be established before reuse' >&2
+            exit 1
+          }
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+          cache: npm
+          cache-dependency-path: |
+            server-version/backend/package-lock.json
+            server-version/frontend/package-lock.json
+      - name: assert the one previously failing multi-line merge-gate control case
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --test --test-reporter=tap --test-name-pattern='light test-only route never starts unrelated builds, scans or platform smoke' .github/scripts/content-workflows.test.mjs > /tmp/scale26-router-case.tap
+          cat /tmp/scale26-router-case.tap
+          grep -qx '# pass 1' /tmp/scale26-router-case.tap
+          grep -qx '# fail 0' /tmp/scale26-router-case.tap
+      - name: locked backend dependency and compiler setup
+        working-directory: server-version/backend
+        run: |
+          npm ci --ignore-scripts
+          npx prisma generate
+      - name: generated registry identity and version integrity
+        working-directory: server-version/backend
+        run: npm run scale:instruments:check
+      - name: scorer registry and source contracts only
+        working-directory: server-version/backend
+        run: npx vitest run src/__tests__/scale/instrument-source.test.ts src/__tests__/scale/scale-scorer-registry.test.ts --no-file-parallelism
+      - name: backend TypeScript for the merged source
+        working-directory: server-version/backend
+        run: npx tsc --noEmit
+      - name: locked frontend dependencies
+        working-directory: server-version/frontend
+        run: npm ci
+      - name: frontend application TypeScript for the merged source
+        working-directory: server-version/frontend
+        run: npx tsc -p tsconfig.app.json --noEmit
+      - name: direct report-card and Teacher Scale consumers
+        working-directory: server-version/frontend
+        run: npx vitest run src/modules/reporting/__tests__/ScaleUnitReportCard.metadata.test.tsx src/huiteacher/HuiteacherMyScaleTasks.test.tsx --maxWorkers=2
+      - name: record exact tested source, without asserting unrun checks
+        if: always()
+        run: |
+          echo '{"sourceCommit":"191a187439af026f33d46fbdc2f9d7958340f789","sourceTree":"cffae9ecd3b0a3a786008b5e5a857785eb9bd1ff","registryBlob":"de1f0d395c1ef6b712f89c5516642eccc139adcd","scope":"registry+scorer+backend-types+frontend-report+teacher-scale","formalMergeGate":"NOT_RUN","dbInstall":"NOT_RUN"}' > /tmp/scale26-intake-source.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: scale26-intake-exact-source
+          path: |
+            /tmp/scale26-intake-source.json
+            /tmp/scale26-router-case.tap
+          if-no-files-found: warn
+          retention-days: 7
