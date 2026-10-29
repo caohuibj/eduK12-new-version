@@ -5,11 +5,12 @@ import {educationPublicSourceKey} from './public-source.identity'
 
 export type EducationPublicSourceHeader={
  key:string;kind:EducationPublicSource['kind'];id:string;hash:string;title:string;language:string|null
- versions:{content:string;parameters:string|null;report:string|null;profiles?:Array<'experience'|'standard'|'research'>};applicability:unknown;expertApplicability?:unknown;nativeRespondentType?:string|null;referenceContextKeys:string[];nativeAvailable:boolean
+ versions:{content:string;parameters:string|null;report:string|null;profiles?:Array<'experience'|'standard'|'research'>};applicability:unknown;educationApplicability?:unknown;expertApplicability?:unknown;nativeRespondentType?:string|null;referenceContextKeys:string[];nativeAvailable:boolean
 }
 export const educationStandardHeaderColumns=Prisma.sql`'education-source:STANDARD_SCALE:'||s.id||':'||s.combination_hash AS key,'STANDARD_SCALE' AS kind,s.id,s.combination_hash AS hash,s.snapshot->>'title' AS title,
  s.snapshot#>>'{parts,CONTENT,reference,metadata,executable,contentLocale}' AS language,s.snapshot#>'{parts,CONTENT,reference,metadata,applicability}' AS applicability,
  s.snapshot#>'{parts,CONTENT,reference,metadata,educationExpertApplicability}' AS "expertApplicability",
+ s.snapshot#>'{parts,CONTENT,reference,metadata,educationApplicability}' AS "educationApplicability",
  s.snapshot#>>'{definition,respondentType}' AS "nativeRespondentType",
  ARRAY_REMOVE(ARRAY[
   CASE WHEN jsonb_path_exists(s.snapshot,'$.references[*].entries[*].population.ageBand') OR jsonb_path_exists(s.snapshot,'$.references[*].entries[*].population.match.minAgeMonthsInclusive') OR jsonb_path_exists(s.snapshot,'$.references[*].entries[*].population.match.maxAgeMonthsExclusive') THEN 'birthYearMonth' END,
@@ -24,10 +25,10 @@ export const educationStandardHeaderColumns=Prisma.sql`'education-source:STANDAR
   'report',CASE WHEN s.snapshot#>'{parts,REPORT,payload}'='null'::jsonb THEN NULL ELSE s.snapshot#>>'{parts,REPORT,version}' END) AS versions`
 export const educationFormHeaderColumns=Prisma.sql`'education-source:FORM:'||t.id||':'||t.snapshot_hash AS key,'FORM' AS kind,t.id,t.snapshot_hash AS hash,t.title,
  t.reference#>>'{metadata,annotations,language}' AS language,t.snapshot#>'{reference,metadata,annotations,educationApplicability}' AS applicability,
- t.snapshot#>'{reference,metadata,annotations,educationExpertApplicability}' AS "expertApplicability",NULL::text AS "nativeRespondentType",ARRAY[]::text[] AS "referenceContextKeys",true AS "nativeAvailable",
+ t.snapshot#>'{reference,metadata,annotations,educationExpertApplicability}' AS "expertApplicability",NULL::jsonb AS "educationApplicability",NULL::text AS "nativeRespondentType",ARRAY[]::text[] AS "referenceContextKeys",true AS "nativeAvailable",
  jsonb_build_object('content',t.snapshot#>>'{unit,ref,sourceVersion}','parameters',NULL,'report',NULL) AS versions`
 export const educationCognitiveHeaderColumns=Prisma.sql`'education-source:COGNITIVE_CONFIG:'||c.id||':'||m.content_hash AS key,'COGNITIVE_CONFIG' AS kind,c.id,m.content_hash AS hash,c.name AS title,
- 'und'::text AS language,NULL::jsonb AS applicability,NULL::jsonb AS "expertApplicability",'participant_self_report'::text AS "nativeRespondentType",
+ 'und'::text AS language,NULL::jsonb AS applicability,NULL::jsonb AS "expertApplicability",NULL::jsonb AS "educationApplicability",'participant_self_report'::text AS "nativeRespondentType",
  ARRAY[]::text[] AS "referenceContextKeys",true AS "nativeAvailable",jsonb_build_object('content',c.config_version,'parameters',NULL,'report',NULL,
   'profiles',ARRAY(SELECT jsonb_object_keys(m.content#>'{executable,profiles}'))) AS versions`
 // sjt_source is a bounded metadata UNION over the two native source tables;
@@ -38,7 +39,7 @@ export const educationSjtHeaderSources=(ids:Prisma.Sql|readonly string[])=>Prism
  UNION ALL SELECT id,instrument_key,instrument_version,measurement_release_id,instrument_key AS title,NULL::text AS respondent
  FROM static_sjt_measurement_mappings WHERE id=ANY(${ids}::text[]) AND measurement_release_id IS NOT NULL AND deployment_hash IS NOT NULL) sjt_source`
 export const educationSjtHeaderColumns=Prisma.sql`'education-source:SJT_RELEASE:'||sjt_source.id||':'||m.content_hash AS key,'SJT_RELEASE' AS kind,sjt_source.id,m.content_hash AS hash,sjt_source.title,
- 'und'::text AS language,NULL::jsonb AS applicability,NULL::jsonb AS "expertApplicability",COALESCE(sjt_source.respondent,m.content#>>'{executable,respondentType}') AS "nativeRespondentType",
+ 'und'::text AS language,NULL::jsonb AS applicability,NULL::jsonb AS "expertApplicability",NULL::jsonb AS "educationApplicability",COALESCE(sjt_source.respondent,m.content#>>'{executable,respondentType}') AS "nativeRespondentType",
  ARRAY[]::text[] AS "referenceContextKeys",true AS "nativeAvailable",jsonb_build_object('content',sjt_source.instrument_version,'parameters',NULL,'report',NULL) AS versions`
 /** Bounded discovery/action metadata. The source guards make approved contents
  * immutable; no source body/hash/compiler or runtime object is needed here.

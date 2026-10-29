@@ -60,6 +60,7 @@ export const scaleInstrumentSourceV1Schema = z.object({
   catalog: catalogBodySchema,
   localization: z.record(z.string(), z.unknown()).optional(),
   applicability: instrumentApplicabilityV1Schema.optional(),
+  educationApplicability: educationApplicabilitySchema.optional(),
   educationExpertApplicability: expertSourceApplicabilitySchema.optional(),
   disclosure: audienceDisclosurePolicyV1Schema.optional(),
   usageRequirements: instrumentUsageRequirementsV1Schema.optional(),
@@ -146,3 +147,4 @@ export const parseScaleInstrumentSources = (inputs: readonly ScaleInstrumentSour
   return { sources, diagnostics }
 }
 import {expertSourceApplicabilitySchema} from '../../education-tools/expert-observation.contract'
+import {educationApplicabilitySchema} from '../../scale-library-governance/education-applicability'

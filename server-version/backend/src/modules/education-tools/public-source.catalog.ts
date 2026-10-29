@@ -9,6 +9,7 @@ import {assertContentGrantChain,type ContentGrant} from '../measurement-content/
 import {educationApplicabilitySchema} from '../scale-library-governance/education-applicability'
 import {educationCompositionResponseModeSchema,educationCompositionAdministrationForEntry} from './private-tool.composition-contracts'
 import {expertTargetKindSchema,supportsExpertSource,isNativeExpertObserver} from './expert-observation.contract'
+import {supportsStudentStandardSource} from './student-observation.contract'
 
 const key=z.string().max(240).refine(value=>parseEducationPublicSourceKey(value)!==null)
 export const educationPublicCatalogQuery=z.object({cursor:key.optional(),kind:z.enum(['SCALE','FORM','COGNITIVE','SJT']).optional(),q:z.string().trim().max(160).optional(),responseMode:educationCompositionResponseModeSchema.optional(),targetKind:expertTargetKindSchema.optional()}).strict()
@@ -52,7 +53,7 @@ export async function readEducationPublicUse(tx:Prisma.TransactionClient,c:Priva
 export async function listEducationPublicSources(c:PrivateToolContext,raw:unknown){
  const input=educationPublicCatalogQuery.parse(raw)
  const administration=educationCompositionAdministrationForEntry(c.entry,input.responseMode,input.targetKind)
- const respondent=administration.responseMode==='SELF'?'SELF':administration.responseMode==='PARENT_REPORT'?'PARENT':administration.responseMode==='TEACHER_REPORT'?'TEACHER':'STUDENT'
+ const respondent=administration.responseMode==='SELF'?'SELF':administration.responseMode==='PARENT_REPORT'?'PARENT':administration.responseMode==='TEACHER_REPORT'?'TEACHER':'OBSERVER'
  return prisma.$transaction(async tx=>{
   await authorizePrivateTool(tx,c)
   // Deduplicate grant keys before the PK joins and paginate/search real source
@@ -97,7 +98,9 @@ export async function listEducationPublicSources(c:PrivateToolContext,raw:unknow
    const native=['COGNITIVE_CONFIG','SJT_RELEASE'].includes(header.kind)
    const applicable=native?administration.responseMode==='SELF'&&['participant_self_report',c.entry==='SCHOOL'?'student_self_report':'teacher_self_report'].includes(header.nativeRespondentType??''):administration.responseMode==='EXPERT_REPORT'?supportsExpertSource(header.expertApplicability,administration)
     &&(header.kind==='FORM'||administration.targetKind==='PERSON'&&header.nativeAvailable&&isNativeExpertObserver(header.nativeRespondentType)&&(header.applicability as {respondentTypes?:string[]}|null)?.respondentTypes?.includes('OBSERVER')):
-    header.kind==='STANDARD_SCALE'?header.nativeAvailable&&(header.applicability as {respondentTypes?:string[]}|null)?.respondentTypes?.includes(respondent):declaration?.success&&declaration.data.administrations.some(a=>a.population===administration.population&&a.responseMode===administration.responseMode)
+    header.kind==='STANDARD_SCALE'?header.nativeAvailable&&(administration.responseMode==='STUDENT_REPORT'
+     ?supportsStudentStandardSource({nativeRespondentType:header.nativeRespondentType,educationApplicability:header.educationApplicability,applicability:header.applicability})
+     :(header.applicability as {respondentTypes?:string[]}|null)?.respondentTypes?.includes(respondent)):declaration?.success&&declaration.data.administrations.some(a=>a.population===administration.population&&a.responseMode===administration.responseMode)
    const requiredContextKeys=educationPublicRequiredContextKeys(header)
    const contextUnavailable=['STUDENT_REPORT','EXPERT_REPORT'].includes(administration.responseMode)&&requiredContextKeys.length>0
    return {

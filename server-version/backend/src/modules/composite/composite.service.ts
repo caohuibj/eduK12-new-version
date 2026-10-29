@@ -2706,7 +2706,7 @@ const ensureTrainingFlowCurrentChild = async (attemptId:string, context:{userId?
 export interface RelationalCompositeAttemptIdentityV1 {
   subjectUserId: string
   respondentUserId: string
-  respondentType: 'SELF' | 'PARENT' | 'TEACHER' | null
+  respondentType: 'SELF' | 'PARENT' | 'TEACHER' | 'OBSERVER' | null
   episodeId: string
   assignmentRef: string
   consentId: string | null
