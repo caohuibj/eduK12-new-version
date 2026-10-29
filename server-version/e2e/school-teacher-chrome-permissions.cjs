@@ -156,6 +156,14 @@ function tightenChromePermissions({ repo = path.resolve(__dirname, '../..'), env
     const before = inspectInstallation(io, query)
     if (selfOptOnly) {
       const opt = before.entries.find(entry => entry.path === '/opt')
+      const unexpected = before.entries.filter(entry => (entry.stat.mode & 0o022) !== 0 && entry.path !== '/opt')
+      report.selfScopeInspection = {
+        opt: opt ? { uid: opt.stat.uid, gid: opt.stat.gid, permissionMode: opt.stat.mode & 0o7777 } : null,
+        unexpectedWritableCount: unexpected.length,
+        unexpectedWritable: unexpected.slice(0, 32).map(entry => ({ path: entry.path, uid: entry.stat.uid,
+          gid: entry.stat.gid, permissionMode: entry.stat.mode & 0o7777 })),
+        truncated: unexpected.length > 32,
+      }
       check(opt && opt.kind === 'directory' && opt.stat.gid === 0 && [0o755, 0o777].includes(opt.stat.mode & 0o7777) &&
         before.entries.filter(entry => (entry.stat.mode & 0o022) !== 0).every(entry => entry.path === '/opt'),
       'SELF_UNOBSERVED_WRITABLE_RUNTIME_PATH')

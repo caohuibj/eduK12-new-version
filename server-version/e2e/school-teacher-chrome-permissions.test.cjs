@@ -64,6 +64,7 @@ test('PR382 explicit confirmation tightens only observed root opt and rejects ev
     return f
   }
   const good = setup(), result = good.run(); assert.equal(result.status, 'PERMISSIONS_TIGHTENED')
+  assert.deepEqual(result.selfScopeInspection, { opt: { uid: 0, gid: 0, permissionMode: 0o777 }, unexpectedWritableCount: 0, unexpectedWritable: [], truncated: false })
   assert.deepEqual(mutations(good).map(c => c.args), [['-n', '/usr/bin/chmod', 'go-w', '--', '/opt']])
   assert.equal(good.items.get('/opt').mode & 0o7777, 0o755)
   const already = setup(); already.items.get('/opt').mode &= ~0o022
@@ -74,6 +75,16 @@ test('PR382 explicit confirmation tightens only observed root opt and rejects ev
     f => { f.items.get('/opt').gid = 1001 }, f => { f.items.get('/opt').mode = 0o40775 }]) {
     const f = setup(); alter(f); assert.equal(f.run().status, 'FAILED'); assert.equal(mutations(f).length, 0)
   }
+})
+test('PR382 read-only diagnostics name only verified scope mismatches before any permission command', () => {
+  const f = fixture(); f.env.GITHUB_REF = 'refs/pull/382/merge'; f.env.GITHUB_HEAD_REF = 'release/education-self-scale-form-20261028'
+  f.env.SCHOOL_TEACHER_CHROME_TIGHTEN = 'confirmed-self-opt-only'
+  for (const [p, row] of f.items) if (p === '/opt/google' || p === ROOT || p.startsWith(ROOT + '/')) row.mode &= ~0o022
+  f.items.get(ROOT + '/chrome').mode |= 0o022
+  const r = f.run(); assert.equal(r.code, 'SELF_UNOBSERVED_WRITABLE_RUNTIME_PATH'); assert.equal(r.permissionChangeAttempted, false); assert.equal(mutations(f).length, 0)
+  assert.deepEqual(r.selfScopeInspection, { opt: { uid: 0, gid: 0, permissionMode: 0o777 }, unexpectedWritableCount: 1,
+    unexpectedWritable: [{ path: ROOT + '/chrome', uid: 0, gid: 0, permissionMode: 0o777 }], truncated: false })
+  assert.equal(JSON.stringify(r).includes('synthetic private exception'), false)
 })
 test('PR382 workflow calls only the guarded existing helper immediately before unchanged strict Chrome preflight', () => {
   const workflow = require('node:fs').readFileSync(require('node:path').resolve(__dirname, '../../.github/workflows/ci-school-teacher.yml'), 'utf8')
