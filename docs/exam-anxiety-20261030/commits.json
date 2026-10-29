@@ -1,0 +1,84 @@
+{
+  "branch": "screen-use-20261030",
+  "baseSha": "9801107019d51a4af7ddb651789b674867539d24",
+  "baseTree": "9a960561e651463ee237ece84f49b4c5d4b11b18",
+  "note": "逐家族独立提交，[skip ci]；未触发 CI、未建 PR、未合并、未部署。",
+  "commits": [
+    {
+      "sha": "826d19670557e2f9a95cf35a87647196aa09efc2",
+      "message": "docs(screen-use): 手机与电脑使用领域入库骨架与查重预案 [skip ci]",
+      "files": [
+        "docs/screen-use-20261030/README.md",
+        "docs/screen-use-20261030/dedup.json"
+      ]
+    },
+    {
+      "sha": "94c328471aa4b325585fcd81b1fba9113d61c24e",
+      "message": "content(scale): sas_sv_10_adol_en 原生 DRAFT（PLoS CC BY、逐字题文、4 组 golden cases） [skip ci]",
+      "files": [
+        "server-version/backend/src/modules/scale/instruments/sas_sv_10_adol_en/1.0.0/instrument.ts",
+        "docs/screen-use-20261030/sas_sv/source.md",
+        "docs/screen-use-20261030/sas_sv/scoring.py",
+        "docs/screen-use-20261030/sas_sv/report_sample.html"
+      ]
+    },
+    {
+      "sha": "21dba2b0e73e7a323c7129a8f88a742df9a059f6",
+      "message": "content(scale): igds9_sf_en 原生 DRAFT（作者自存档题文、官方 5 点计分、4 组 golden cases） [skip ci]",
+      "files": [
+        "server-version/backend/src/modules/scale/instruments/igds9_sf_en/1.0.0/instrument.ts",
+        "docs/screen-use-20261030/igds9_sf/source.md",
+        "docs/screen-use-20261030/igds9_sf/scoring.py",
+        "docs/screen-use-20261030/igds9_sf/report_sample.html"
+      ]
+    },
+    {
+      "sha": "410736f33e7c1dd4f4479e096001d4fb768e81ab",
+      "message": "content(scale): 登记 iat_20_young_en（catalog-only：题文源不可达） [skip ci]",
+      "files": [
+        "server-version/backend/src/modules/scale/instruments/iat_20_young_en/1.0.0/instrument.ts",
+        "docs/screen-use-20261030/iat/source-and-blockers.md"
+      ]
+    },
+    {
+      "sha": "cb550b961e6e1ef12a55e0a88a4ab676085d8c88",
+      "message": "content(scale): 登记 mpats_16_xiongjie_zh_cn（catalog-only：CNKI 付费墙+授权） [skip ci]",
+      "files": [
+        "server-version/backend/src/modules/scale/instruments/mpats_16_xiongjie_zh_cn/1.0.0/instrument.ts",
+        "docs/screen-use-20261030/mpats/source-and-blockers.md"
+      ]
+    },
+    {
+      "sha": "df092289976fa2b782f7ccd8b639f21717ca1bda",
+      "message": "content(scale): 登记 cias_26_chen_zh_tw（catalog-only：付费墙+授权；简体须另立版本） [skip ci]",
+      "files": [
+        "server-version/backend/src/modules/scale/instruments/cias_26_chen_zh_tw/1.0.0/instrument.ts",
+        "docs/screen-use-20261030/cias/source-and-blockers.md"
+      ]
+    },
+    {
+      "sha": "ca7d8b04d6fa0d0fda55e8afa6e7ec91ab4af2c7",
+      "message": "content(scale): 登记 bsmas_6_andreassen_en（catalog-only：APA 付费墙+Bergen 条款） [skip ci]",
+      "files": [
+        "server-version/backend/src/modules/scale/instruments/bsmas_6_andreassen_en/1.0.0/instrument.ts",
+        "docs/screen-use-20261030/bsmas/source-and-blockers.md"
+      ]
+    },
+    {
+      "sha": "52f59ca74d7cd160a964024603b5641d53555518",
+      "message": "content(scale): 登记 nmpq_20_yildirim_en（catalog-only：Elsevier 付费墙） [skip ci]",
+      "files": [
+        "server-version/backend/src/modules/scale/instruments/nmpq_20_yildirim_en/1.0.0/instrument.ts",
+        "docs/screen-use-20261030/nmpq/source-and-blockers.md"
+      ]
+    },
+    {
+      "sha": "bd96768e6e164aff62d7e6d9466a8799c267930a",
+      "message": "content(scale): 登记 smd9_vdeijnden_en（catalog-only：Utrecht 自存档不可达） [skip ci]",
+      "files": [
+        "server-version/backend/src/modules/scale/instruments/smd9_vdeijnden_en/1.0.0/instrument.ts",
+        "docs/screen-use-20261030/smd9/source-and-blockers.md"
+      ]
+    }
+  ]
+}
