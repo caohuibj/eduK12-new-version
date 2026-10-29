@@ -18,10 +18,20 @@ function mergeGateWriter() {
   assert.ok(gate);
   assert.doesNotMatch(gate,/\bNEEDS_JSON:/);
   assert.doesNotMatch(gate.split('    steps:')[0], /runner\./, 'runner context is unavailable in job-level env');
-  const block=gate.split('      - name: materialize complete merge-gate inputs\n')[1]?.split('      - name:')[0];
-  assert.match(block??'',/shell: node \{0\}/);
+  // YAML permits a sequence aligned with "steps:" (four spaces) or indented
+  // beneath it (six). Keep testing the real Node writer and hostile inputs.
+  const match=gate.match(/^([ ]{4,6})- name: materialize complete merge-gate inputs\n/m);
+  assert.ok(match,'merge-gate must materialize its complete needs');
+  const indent=match[1].length;
+  const tail=gate.slice(match.index+match[0].length);
+  const block=tail.split(new RegExp('^ {'+indent+'}- name:', 'm'))[0];
+  assert.match(block,/^\s*shell: node \{0\}$/m);
   assert.match(block,/const serialized = \$\{\{ toJSON\(toJSON\(needs\)\) \}\};/);
-  return block.split('        run: |\n')[1].split('\n').map(line=>line.replace(/^          /,'')).join('\n');
+  const run=block.match(/^([ ]+)run: \|\n/m);
+  assert.ok(run,'real materialization script must be embedded in run: |');
+  const sourceIndent=' '.repeat(run[1].length+2);
+  return block.slice(run.index+run[0].length).split('\n')
+    .map(line=>line.startsWith(sourceIndent)?line.slice(sourceIndent.length):line).join('\n');
 }
 test('merge-gate large full-object transport preserves hostile strings with a small process environment',()=>{
   const dir=mkdtempSync(join(tmpdir(),'merge-gate-input-'));

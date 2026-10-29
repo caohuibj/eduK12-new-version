@@ -6,6 +6,9 @@ on:
       runner_profile:
         type: string
         default: hosted
+      scale_intake_light:
+        type: boolean
+        default: false
       scale:
         type: boolean
         required: true
@@ -29,7 +32,39 @@ env:
   NPM_CONFIG_REPLACE_REGISTRY_HOST: always
 
 jobs:
+  scale-intake:
+    if: inputs.scale_intake_light
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    env:
+      CI: 'true'
+      SCALE_INTAKE_BASE_SHA: ${{ inputs.base }}
+      SCALE_INTAKE_HEAD_SHA: ${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+          cache: npm
+          cache-dependency-path: server-version/backend/package-lock.json
+      - name: recompute exact isolated declaration scope before installing dependencies
+        run: node .github/scripts/scale-intake-scope.mjs
+      - name: install the unchanged locked content dependencies without hooks
+        working-directory: server-version/backend
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: check the generated registry once
+        working-directory: server-version/backend
+        run: npm run scale:instruments:check
+      - name: selected source scoring parameters reports and affected dependencies
+        working-directory: server-version/backend
+        run: node --import tsx scripts/scale-intake-selected-check.ts
   boundary:
+    if: ${{ !inputs.scale_intake_light }}
     timeout-minutes: 30
     services:
       postgres:

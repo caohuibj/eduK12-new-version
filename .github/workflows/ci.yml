@@ -385,6 +385,7 @@ jobs:
       content: ${{ steps.scope.outputs.content }}
       presentation: ${{ steps.scope.outputs.presentation }}
       scale: ${{ steps.scope.outputs.scale }}
+      scale_intake_light: ${{ steps.scope.outputs.scale_intake_light }}
       cognitive: ${{ steps.scope.outputs.cognitive }}
       situational: ${{ steps.scope.outputs.situational }}
       bundle: ${{ steps.scope.outputs.bundle }}
@@ -778,6 +779,7 @@ jobs:
     with:
       runner_profile: hosted
       scale: ${{ needs.scope.outputs.scale == 'true' }}
+      scale_intake_light: ${{ needs.scope.outputs.scale_intake_light == 'true' }}
       cognitive: ${{ needs.scope.outputs.cognitive == 'true' }}
       situational: ${{ needs.scope.outputs.situational == 'true' }}
       bundle: ${{ needs.scope.outputs.bundle == 'true' }}

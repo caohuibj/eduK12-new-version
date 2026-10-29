@@ -1,0 +1,76 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {mkdtempSync,mkdirSync,writeFileSync,rmSync,readFileSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import {join,dirname} from 'node:path';
+import {execFileSync} from 'node:child_process';
+import {selectScaleIntake,readScaleIntakeDiff,scaleIntakeToolingChanged} from './scale-intake-scope.mjs';
+import {classifyChanges} from './content-scope.mjs';
+import {requiredChecks,failedChecks} from './merge-gate.mjs';
+import {componentFingerprint} from '../../server-version/scripts/release/policy.mjs';
+const file='server-version/backend/src/modules/scale/instruments/test_scale/1.0.0/instrument.ts';
+const add=f=>({file:f,status:'A',oldMode:'000000',newMode:'100644'});
+const mod=f=>({...add(f),status:'M',oldMode:'100644'});
+test('inline and JSON-backed declarations share one selected identity, normal metadata and generated index',()=>{
+ const e=[add(file),add(file.replace('instrument.ts','source.json')),add(file.replace('instrument.ts','THIRD_PARTY_LICENSE.md')),
+  mod('server-version/backend/src/modules/scale/onboarding/instruments.generated.ts'),add('docs/scale-intake/batch/record.json')];
+ assert.deepEqual(selectScaleIntake(e).sources,[file]);assert.equal(classifyChanges(e).scale_intake_light,true);
+ assert.equal(classifyChanges(e,true).scale_intake_light,false);
+});
+test('control and runtime changes cannot declare themselves pure content',()=>{
+ for(const other of ['.github/scripts/scale-intake-scope.mjs','.github/workflows/ci.yml',
+  'server-version/backend/scripts/scale-intake-selected-check.ts','server-version/backend/package-lock.json',
+  'server-version/backend/prisma/schema.prisma',file.replace('instrument.ts','scorer.ts'),
+  'server-version/frontend/src/components/ScaleReport.tsx'])assert.equal(selectScaleIntake([add(file),mod(other)]),null,other);
+ assert.equal(selectScaleIntake([add('docs/scale-intake/batch.md')]),null);
+});
+test('mixed cognitive/bundle changes keep established heavier affected-content lane',()=>{
+ for(const other of ['server-version/backend/src/modules/cognitive/tasks/STROOP/seeds.ts',
+ 'server-version/backend/src/modules/assessment-bundle/packages/new/1.0.0/manifest.json']){
+  const result=classifyChanges([add(file),add(other)]);assert.equal(result.content,true);assert.equal(result.scale_intake_light,false);
+ }
+});
+test('deletions renames symlinks executables duplicates and noncanonical paths cannot enter',()=>{
+ for(const e of [{...add(file),newMode:'120000'},{...add(file),newMode:'100755'},{...mod(file),status:'D',newMode:'000000'},
+ {...mod(file),status:'R'},{...mod(file),oldMode:'120000'},add(file.replace('/test_scale/','/../')),add(file+'\n')])assert.equal(selectScaleIntake([e]),null);
+ assert.equal(selectScaleIntake([add(file),add(file)]),null);
+});
+test('required merge gate consumes content and actual CodeQL, never standalone focused success',()=>{
+ const disabled=Object.fromEntries(['maintenance','presentation','frontend','documentation','media2','media7','situational_video','situational_branching','video_core','app_shell','canonical_visual','perf_smoke','ops'].map(k=>[k,'false']));
+ const needs={scope:{result:'success',outputs:{...disabled,application_route:'legacy',scenario:'content',content:'true',scale:'true',scale_intake_light:'true',codeql:'true',runner_profile:'hosted',frontend_test:'false',frontend_build:'false',ui_required:'false',visual_hosted:'false',media_selection:'[]',media_groups:'[]'}},content:{result:'success'},codeql:{result:'success'}};
+ assert.deepEqual(requiredChecks(needs,false),['scope','content','codeql']);assert.deepEqual(failedChecks(needs,false),[]);
+ for(const state of ['skipped','failure','cancelled',undefined]){const n=structuredClone(needs);n.content={result:state};n.focused={result:'success'};assert.ok(failedChecks(n,false).includes('content'));}
+ for(const flag of ['invalid',null]){const n=structuredClone(needs);n.scope.outputs.scale_intake_light=flag;assert.ok(failedChecks(n,false).includes('scope'));}
+ const q=structuredClone(needs);q.codeql.result='skipped';assert.ok(failedChecks(q,false).includes('codeql'));
+});
+test('exact actual checkout and paired wrappers checked with real Git, no PR-number binding',()=>{
+ const dir=mkdtempSync(join(tmpdir(),'scale-intake-scope-'));const git=(...args)=>execFileSync('git',args,{cwd:dir,encoding:'utf8'}).trim();
+ try{
+  git('init','-q');git('config','user.name','Synthetic test');git('config','user.email','test@example.invalid');writeFileSync(join(dir,'base.txt'),'base');git('add','.');git('commit','-qm','base');const base=git('rev-parse','HEAD');
+  mkdirSync(dirname(join(dir,file)),{recursive:true});writeFileSync(join(dir,file),'export const SCALE_INSTRUMENT_SOURCE = {};\n');git('add','.');git('commit','-qm','candidate');const head=git('rev-parse','HEAD');
+  assert.deepEqual(readScaleIntakeDiff(base,head,{cwd:dir}).sources,[file]);assert.throws(()=>readScaleIntakeDiff(base,base,{cwd:dir}));assert.throws(()=>readScaleIntakeDiff(head,base,{cwd:dir}));
+  const orphan=file.replace('test_scale','orphan').replace('instrument.ts','source.json');mkdirSync(dirname(join(dir,orphan)),{recursive:true});writeFileSync(join(dir,orphan),'{}');git('add','.');git('commit','-qm','orphan');assert.throws(()=>readScaleIntakeDiff(head,git('rev-parse','HEAD'),{cwd:dir}),/wrapper/);
+ }finally{rmSync(dir,{recursive:true,force:true});}
+});
+
+test('dependency preparation and selected tooling tests use the same exact inputs, not document substrings',()=>{
+ assert.equal(scaleIntakeToolingChanged(['docs/development/scale-intake-ci-20261029.md','.github/workflows/ci.yml']),false);
+ assert.equal(scaleIntakeToolingChanged(['server-version/backend/scripts/scale-intake-selected-check.ts']),true);
+ const recipe=readFileSync(new URL('./local-validation.mjs',import.meta.url),'utf8');
+ const workflow=readFileSync(new URL('../workflows/ci-release-tools.yml',import.meta.url),'utf8');
+ assert.ok(recipe.includes('scaleIntakeToolingChanged(files)'));assert.ok(workflow.includes('scaleIntakeToolingChanged(files)'));
+});
+test('only the two exact Scale CI tools are excluded from application fingerprints',()=>{
+ const dir=mkdtempSync(join(tmpdir(),'scale-tool-fingerprint-')),original=process.cwd();
+ const git=(...args)=>execFileSync('git',args,{cwd:dir,encoding:'utf8'}).trim();
+ const put=(p,content)=>{mkdirSync(dirname(join(dir,p)),{recursive:true});writeFileSync(join(dir,p),content);};
+ try{
+  git('init','-q');git('config','user.name','Synthetic test');git('config','user.email','test@example.invalid');
+  put('server-version/backend/src/app.ts','export const app=1;');git('add','.');git('commit','-qm','base');const base=git('rev-parse','HEAD');
+  put('server-version/backend/scripts/scale-intake-selected-check.ts','export const tool=1;');
+  put('server-version/backend/scripts/scale-intake-selected-check.test.ts','export const test=1;');git('add','.');git('commit','-qm','tools');const head=git('rev-parse','HEAD');
+  process.chdir(dir);assert.equal(componentFingerprint(base,'backend'),componentFingerprint(head,'backend'));
+  put('server-version/backend/scripts/unknown.ts','export const other=1;');git('add','.');git('commit','-qm','unknown');
+  assert.notEqual(componentFingerprint(head,'backend'),componentFingerprint(git('rev-parse','HEAD'),'backend'));
+ }finally{process.chdir(original);rmSync(dir,{recursive:true,force:true});}
+});
